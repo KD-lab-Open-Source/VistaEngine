@@ -1,6 +1,8 @@
 #ifndef __STARFORCE_H__
 #define __STARFORCE_H__
 
+#define USE_SECUROM
+
 #ifdef USE_SECUROM
 
 #include "securom_api.h"
