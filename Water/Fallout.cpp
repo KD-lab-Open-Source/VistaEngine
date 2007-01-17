@@ -372,7 +372,9 @@ void cFallout::Draw(cCamera *pCamera)
 		if (circles.Visible())
 			circles.Draw(pCamera,dt);
 		break;
-	case FALLOUT_SNOW:		DrawSnow(pCamera); break;
+	case FALLOUT_SNOW:		
+		DrawSnow(pCamera); 
+		break;
 	}
 	dt=0;
 }
@@ -600,6 +602,8 @@ void FalloutAttributes::serialize(Archive& ar)
 
 void cFallout::SetupAttributes(FalloutAttributes& attributes)
 {
+	MTAuto mlock(lock);
+
 	current_intensity = attributes.intensity_;
 	snow_texture = attributes.snow_.textureName_;
 	rain_texture = attributes.rain_.textureName_;

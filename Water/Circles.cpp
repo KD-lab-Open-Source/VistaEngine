@@ -70,8 +70,6 @@ void cCircles::SetCircle(const Vect3f& dr_pos0)
 */
 }
 
-//const int trg[2][3] = {{0,2,1},{3,2,1}};
-
 const float cir_delta_time = 0.3f;
 void cCircles::SetCirclePos(cWaterCircle& circle, Vect2f& p)
 {
@@ -181,40 +179,38 @@ void cCircles::Draw(cCamera *pCamera, float dt)
 	pBuf->BeginDraw();
 	{
 		list<cWaterCircle>::iterator it;
-		for(list<cWaterCircle>::iterator it = drops.begin(); it != drops.end();)
-		{
+		for(it = drops.begin(); it != drops.end();){
 			it->phasa+=(dt*it->time);
-			if (it->phasa<=1)
-			{
+			if (it->phasa<=1){
 				if(pCamera->GetScene()->GetFogOfWar())
-					if(!pCamera->GetScene()->GetFogOfWar()->GetSelectedMap()->isVisible(Vect2f(it->pos.x,it->pos.y)))
+					if(!pCamera->GetScene()->GetFogOfWar()->GetSelectedMap()->isVisible(Vect2f(it->pos.x,it->pos.y))){
+						++it;
 						continue;
+					}
 				sVertexXYZDT1 *v=pBuf->Get();
 				float size = (it->phasa)*max_size;
 				Vect3f sx(size,0,0);
 				Vect3f sy(0,size,0);
 				static int alpha = 255;
 				color.a = alpha*(1 - it->phasa);
-				if (Texture)
-				{
+				if (Texture){
 					const sRectangle4f& rt = Texture->GetFramePos(1-it->phasa);
 					v[0].pos=it->pos-sx-sy; v[0].diffuse=color; v[0].GetTexel().set(rt.min.x,rt.min.y);	
 					v[1].pos=it->pos-sx+sy; v[1].diffuse=color; v[1].GetTexel().set(rt.min.x,rt.max.y);
 					v[2].pos=it->pos+sx-sy; v[2].diffuse=color; v[2].GetTexel().set(rt.max.x,rt.min.y);
 					v[3].pos=it->pos+sx+sy; v[3].diffuse=color; v[3].GetTexel().set(rt.max.x,rt.max.y);
-				}else
-				{
+				}
+				else{
 					v[0].pos=it->pos-sx-sy; v[0].diffuse=color; v[0].GetTexel().set(0,1);
 					v[1].pos=it->pos-sx+sy; v[1].diffuse=color; v[1].GetTexel().set(0,0);
 					v[2].pos=it->pos+sx-sy; v[2].diffuse=color; v[2].GetTexel().set(1,1);
 					v[3].pos=it->pos+sx+sy; v[3].diffuse=color; v[3].GetTexel().set(1,0);
 				}
 
-				it++;
-			}else
-			{
-				it = drops.erase(it);
+				++it;
 			}
+			else
+				it = drops.erase(it);
 		}
 	}
 
