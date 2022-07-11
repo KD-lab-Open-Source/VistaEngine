@@ -1,0 +1,1269 @@
+Version = 0;
+AuxAttributeLibrary = {
+	header = {
+		4;
+		"AUX_ATTRIBUTE_ENVIRONMENT",
+		"AUX_ATTRIBUTE_ENVIRONMENT_SIMPLE",
+		"AUX_ATTRIBUTE_DETONATOR",
+		"AUX_ATTRIBUTE_ZONE"
+	};
+	strings = {
+		4;
+		{
+			name = "AUX_ATTRIBUTE_ENVIRONMENT";
+			auxAttributeID = AUX_ATTRIBUTE_ENVIRONMENT;
+			second = "class AttributeBase" {
+				libraryKey = "";
+				unitClass = UNIT_CLASS_ENVIRONMENT;
+				modelName = "";
+				boundHeight = 0.5;
+				boundScale = 1.;
+				boundRadius = 0.;
+				showSilhouette = false;
+				hideByDistance = false;
+				mode_transparent = false;
+				fow_mode = FVM_ALLWAYS;
+				shadowType = SHADOW_REAL;
+				permanentEffects = {
+					0;
+				};
+				animationChains = {
+					7;
+					{
+						chainID = CHAIN_STAND;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "stand";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						priority = 0;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_WALK;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "walk";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						priority = 0;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_RUN;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "run";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						priority = 0;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_MOVE;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "move";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						priority = 1;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_GIVE_RESOURCE;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "give_resource";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						priority = 20;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_BIRTH;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "birth";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						priority = 100;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_DEATH;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "death";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						priority = 100;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					}
+				};
+				rigidBodyPrm = "Environment";
+				excludeCollision = EXCLUDE_COLLISION_ENVIRONMENT;
+				collisionGroup = ;
+				internal = true;
+				boundBoxMin = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				boundBoxMax = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				producedThisFactories = {
+					0;
+				};
+				distanceLod = OBJECT_LOD_DEFAULT;
+			};
+		},
+		{
+			name = "AUX_ATTRIBUTE_ENVIRONMENT_SIMPLE";
+			auxAttributeID = AUX_ATTRIBUTE_ENVIRONMENT_SIMPLE;
+			second = "class AttributeBase" {
+				libraryKey = "";
+				unitClass = UNIT_CLASS_ENVIRONMENT_SIMPLE;
+				modelName = "";
+				boundHeight = 0.5;
+				boundScale = 1.;
+				boundRadius = 0.;
+				showSilhouette = false;
+				hideByDistance = false;
+				mode_transparent = false;
+				fow_mode = FVM_ALLWAYS;
+				shadowType = SHADOW_REAL;
+				permanentEffects = {
+					0;
+				};
+				animationChains = {
+					7;
+					{
+						chainID = CHAIN_STAND;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "stand";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						priority = 0;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_WALK;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "walk";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						priority = 0;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_RUN;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "run";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						priority = 0;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_MOVE;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "move";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						priority = 1;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_GIVE_RESOURCE;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "give_resource";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						priority = 20;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_BIRTH;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "birth";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						priority = 100;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_DEATH;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "death";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						priority = 100;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					}
+				};
+				rigidBodyPrm = "Environment";
+				excludeCollision = EXCLUDE_COLLISION_ENVIRONMENT;
+				collisionGroup = ;
+				internal = true;
+				boundBoxMin = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				boundBoxMax = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				producedThisFactories = {
+					0;
+				};
+				distanceLod = OBJECT_LOD_DEFAULT;
+			};
+		},
+		{
+			name = "AUX_ATTRIBUTE_DETONATOR";
+			auxAttributeID = AUX_ATTRIBUTE_DETONATOR;
+			second = "class AttributeBase" {
+				libraryKey = "";
+				unitClass = UNIT_CLASS_ZONE;
+				modelName = "";
+				boundHeight = 0.5;
+				boundScale = 1.;
+				boundRadius = 0.;
+				showSilhouette = false;
+				hideByDistance = false;
+				mode_transparent = false;
+				fow_mode = FVM_ALLWAYS;
+				shadowType = SHADOW_DISABLED;
+				permanentEffects = {
+					0;
+				};
+				animationChains = {
+					7;
+					{
+						chainID = CHAIN_STAND;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "stand";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						priority = 0;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_WALK;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "walk";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						priority = 0;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_RUN;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "run";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						priority = 0;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_MOVE;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "move";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						priority = 1;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_GIVE_RESOURCE;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "give_resource";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						priority = 20;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_BIRTH;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "birth";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						priority = 100;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_DEATH;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "death";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						priority = 100;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					}
+				};
+				rigidBodyPrm = "Building";
+				excludeCollision = ;
+				collisionGroup = COLLISION_GROUP_COLLIDER;
+				internal = false;
+				boundBoxMin = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				boundBoxMax = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				producedThisFactories = {
+					0;
+				};
+				distanceLod = OBJECT_LOD_DEFAULT;
+			};
+		},
+		{
+			name = "AUX_ATTRIBUTE_ZONE";
+			auxAttributeID = AUX_ATTRIBUTE_ZONE;
+			second = "class AttributeBase" {
+				libraryKey = "";
+				unitClass = UNIT_CLASS_ZONE;
+				modelName = "";
+				boundHeight = 0.5;
+				boundScale = 1.;
+				boundRadius = 0.;
+				showSilhouette = false;
+				hideByDistance = false;
+				mode_transparent = false;
+				fow_mode = FVM_ALLWAYS;
+				shadowType = SHADOW_REAL;
+				permanentEffects = {
+					0;
+				};
+				animationChains = {
+					7;
+					{
+						chainID = CHAIN_STAND;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "stand";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						priority = 0;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_WALK;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "walk";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						priority = 0;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_RUN;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "run";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						priority = 0;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_MOVE;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "move";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						priority = 1;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_GIVE_RESOURCE;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "give_resource";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						priority = 20;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_BIRTH;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "birth";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						priority = 100;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						chainID = CHAIN_DEATH;
+						movementState = MOVEMENT_STATE_ALL_SIDES | MOVEMENT_STATE_ON_GROUND;
+						counter = 0;
+						ChainIndex = {
+							name = "death";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						priority = 100;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					}
+				};
+				rigidBodyPrm = "Unit Ground Underwater";
+				excludeCollision = EXCLUDE_COLLISION_ENVIRONMENT;
+				collisionGroup = ;
+				internal = true;
+				boundBoxMin = {
+					x = -1.;
+					y = -1.;
+					z = -1.;
+				};
+				boundBoxMax = {
+					x = 1.;
+					y = 1.;
+					z = 1.;
+				};
+				producedThisFactories = {
+					0;
+				};
+				distanceLod = OBJECT_LOD_DEFAULT;
+			};
+		}
+	};
+};

@@ -1,0 +1,6 @@
+; AttribEditor.def : Declares the module parameters for the DLL.
+
+LIBRARY      "AttribEditor"
+
+EXPORTS
+    ; Explicit exports can go here

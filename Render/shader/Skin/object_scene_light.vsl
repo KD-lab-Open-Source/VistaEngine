@@ -1,0 +1,151 @@
+
+struct VS_INPUT
+{
+    float4 pos : POSITION;
+	float3 n : NORMAL;
+    float2 t0 : TEXCOORD0;
+#if(WEIGHT>1)    
+	float4 bw: COLOR0;
+#endif	
+    float4 blend:BLENDINDICES;
+#if(SECOND_OPACITY_TEXTURE==2)
+    float2 t1 : TEXCOORD1;
+#endif
+};
+
+struct VS_OUTPUT
+{
+    float4  pos : POSITION;
+    float2  t0 : TEXCOORD0;
+#ifdef SECOND_OPACITY_TEXTURE
+    float2  t1 : TEXCOORD1;
+#endif
+#ifdef  REFLECTION
+	#if(REFLECTION==1)
+		float2 uv_reflection:TEXCOORD1;
+	#else
+		float3 uv_reflection:TEXCOORD1;
+	#endif
+#endif	
+
+	float4  diffuse: COLOR0;
+	float3  specular: COLOR1;
+#ifdef SHADOW
+	float4  tshadow : TEXCOORD2;
+#endif
+    float fog: FOG;
+#if defined(FOG_OF_WAR) || defined(LIGHTMAP)
+	float2 uv_lightmap:TEXCOORD3;
+#endif
+
+#ifdef ZREFLECTION
+	float3  treflection: TEXCOORD5;
+#endif
+#ifdef ZBUFFER
+	float  z: TEXCOORD6;
+#endif
+};
+
+float4x4 mVP: register(c0);
+
+float4 vAmbient: register(c4);
+float4 vDiffuse: register(c5);
+float4 vSpecular: register(c6);//xyz- specular color, w - specular power
+float3 vCameraPos: register(c7);
+float3 vLightDirection: register(c8);
+
+float4x3 mWorldM[20]: register(c9);
+float4x4 mShadow:register(c70);
+#ifdef SECOND_OPACITY_TEXTURE
+float3 vSecondUtrans:register(c74);
+float3 vSecondVtrans:register(c75);
+#endif
+
+float3 vReflectionMul:register(c87);
+float3 vUtrans:register(c88);
+float3 vVtrans:register(c89);
+float4x4 mView:register(c90);
+float3 vFog:register(c94);
+float4 fPlanarNode:register(c95);
+
+
+float3 vPointPos0:register(c76);
+float3 vPointPos1:register(c77);
+float3 vPointColor0:register(c78);
+float3 vPointColor1:register(c79);
+float4 vLightAttenuation:register(c80);
+
+VS_OUTPUT main(const VS_INPUT v)
+{
+    VS_OUTPUT o;
+	float3 world_pos;
+	float4x3 mWorld;
+	
+	int4 blend = D3DCOLORtoUBYTE4(v.blend);
+#if (WEIGHT>1)	
+		mWorld=mWorldM[blend[0]]*v.bw[0];
+		for(int i=1;i<WEIGHT;i++)
+		{
+			mWorld+=mWorldM[blend[i]]*v.bw[i];
+		}
+#else
+		mWorld=mWorldM[blend[0]];
+#endif	
+
+	world_pos=mul(v.pos,mWorld);
+	float4 world_pos4=float4(world_pos,1);
+	o.pos=mul(world_pos4,mVP);
+#ifdef ZBUFFER
+	o.z=o.pos.w;
+#endif
+
+#include "uvtrans.inl"
+
+	//light
+#ifdef NOLIGHT
+	o.diffuse=vAmbient;
+	o.specular.xyz=0;
+#else	
+	float3 world_n;
+	world_n=mul(v.n,(float3x3)mWorld);
+	world_n=normalize(world_n);
+
+	float3 ldir=-vLightDirection;
+	float3 dir=normalize(vCameraPos-world_pos);
+	float3 half_v=normalize(dir+ldir);
+	float4 ret=lit(dot(world_n,ldir),dot(world_n,half_v),vSpecular.w); 
+
+	float mdiffuse=ret.y;
+	float mspecular=ret.z;
+	o.diffuse.rgb=mdiffuse*vDiffuse;//+vAmbient;
+	o.diffuse.a=vDiffuse.a;
+	o.specular=mspecular*vSpecular;
+	
+	#ifdef REFLECTION
+		#if(REFLECTION==1)
+			o.uv_reflection=mul(world_n,(float3x2)mView)*float2(0.5,0.5)+float2(0.5,0.5);
+		#else
+			//o.uv_reflection=mul(world_n,(float3x3)mView);
+			o.uv_reflection=dir+(2*dot(world_n,dir))*world_n;
+		#endif
+	#endif
+	
+#endif
+#ifdef SHADOW
+	o.tshadow=mul(world_pos4,mShadow);
+#endif
+	//fog
+	float fogz=mul(world_pos4,mView).z;
+	o.fog=fogz*vFog.z+vFog.y;
+
+#if defined(FOG_OF_WAR) || defined(LIGHTMAP)
+	o.uv_lightmap=world_pos*fPlanarNode.zw+fPlanarNode.xy;
+#endif	
+#ifdef ZREFLECTION
+	o.treflection=world_pos*vReflectionMul;
+#endif
+
+#include "pointcolor.inl"
+
+    return o;
+}

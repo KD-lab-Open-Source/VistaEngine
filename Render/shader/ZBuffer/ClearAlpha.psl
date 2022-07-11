@@ -1,0 +1,10 @@
+struct PS_INPUT
+{
+}; 
+float4 vColor:register(c0);
+float4 main(const PS_INPUT v):COLOR
+{
+   float4 ot;
+   ot = vColor;
+   return ot;
+} 

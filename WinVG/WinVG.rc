@@ -1,0 +1,706 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Russian resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
+#ifdef _WIN32
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+#pragma code_page(1251)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\WinVG.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#include ""afxprint.rc""       // printing/print preview resources\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_TEXTURE_DIRECTORY DIALOG  0, 0, 151, 47
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Select texture directory"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,27,26,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,87,26,50,14
+    COMBOBOX        IDC_DIRECTORY,7,7,136,131,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_SCREENSHOT DIALOG  0, 0, 129, 45
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Screenshot size"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,7,24,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,72,24,50,14
+    LTEXT           "X",IDC_STATIC,30,9,11,8
+    EDITTEXT        IDC_EDITX,47,7,54,14,ES_AUTOHSCROLL
+END
+
+IDD_TAB_DIALOG DIALOGEX 0, 0, 134, 379
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "Custom1",IDC_TREE,"TreeListCtrl.TigerX_And_KB-I",
+                    WS_TABSTOP,0,206,132,166
+    LTEXT           "Аним. цепочки",IDC_STATIC,3,190,52,9
+    LTEXT           "Группы видимости",IDC_STATIC,1,23,75,9
+    COMBOBOX        IDC_CHAIN,59,188,73,107,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP
+    LTEXT           "LOD",IDC_STATIC,1,9,22,8
+    COMBOBOX        IDC_LOD,40,7,92,118,CBS_DROPDOWNLIST | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Custom1",IDC_TREE_VISIBILITY,
+                    "TreeListCtrl.TigerX_And_KB-I",WS_TABSTOP,0,35,132,139
+END
+
+IDD_DLG_BUMP_MAP DIALOGEX 0, 0, 214, 382
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | WS_POPUP | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Add",IDC_BUTTON1,164,7,18,14,BS_NOTIFY
+    PUSHBUTTON      "Del",IDC_BUTTON2,187,7,20,14,BS_NOTIFY
+    COMBOBOX        IDC_COMBO_MAT,87,7,71,140,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Load",IDC_LOAD_OPT,7,7,24,14
+    PUSHBUTTON      "Save",IDC_SAVE_OPT,34,7,26,14
+    PUSHBUTTON      "Export",IDC_BUMP_EXPORT,62,7,24,14
+END
+
+IDD_SHOW_HIERARCHY DIALOGEX 0, 0, 429, 326
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Object node hierarhy"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_TREE,"SysTreeView32",TVS_HASBUTTONS | 
+                    TVS_HASLINES | TVS_SHOWSELALWAYS | WS_BORDER | 
+                    WS_TABSTOP,7,7,357,312
+    DEFPUSHBUTTON   "OK",IDOK,372,7,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,372,24,50,14
+END
+
+IDD_SET_TIME_DIALOG DIALOGEX 0, 0, 226, 67
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Time"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_HOUR_EDIT,163,15,43,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "time",IDC_STATIC,133,17,20,8
+    CONTROL         "",IDC_SLIDER_TIME,"msctls_trackbar32",TBS_AUTOTICKS | 
+                    TBS_NOTICKS | WS_TABSTOP,15,36,196,13
+END
+
+IDD_NODE_CONTROL_DIALOG DIALOGEX 0, 0, 264, 341
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Node Control"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_X_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,7,215,249,15
+    CONTROL         "",IDC_Y_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,7,241,249,15
+    CONTROL         "",IDC_Z_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,7,268,249,15
+    LISTBOX         IDC_NODE_LIST,7,7,125,184,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Reset All",IDC_RESET_BUTTON,137,320,70,14
+    PUSHBUTTON      "Reset Current",IDC_RESET_SELECTED_BUTTON,58,320,69,14
+    LTEXT           "Z Transform",IDC_Z_STATIC,7,258,249,8
+    LTEXT           "Y Transform",IDC_Y_STATIC,7,231,242,8
+    LTEXT           "X Transform",IDC_X_STATIC,7,206,238,8
+    LISTBOX         IDC_LOGIC_NODE_LIST,132,7,124,183,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Deselect",IDC_DESELECT_NODE,7,190,125,14
+    PUSHBUTTON      "Deselect",IDC_DESELECT_LOGIC_NODE,134,190,122,14
+    CONTROL         "Вращать графическую ноду по осям имя_ноды_logic.",
+                    IDC_CHECK_GRAPH_BY_LOGIC_NODE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,7,289,249,21
+END
+
+IDD_PHASE_CONTROL_DIALOG DIALOGEX 0, 0, 265, 70
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Phase Control"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDCANCEL,107,49,50,14
+    EDITTEXT        IDC_PHASE_EDIT,7,7,251,14,ES_AUTOHSCROLL | ES_READONLY
+    CONTROL         "",IDC_PHASE_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,7,30,251,15
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_SCREENSHOT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 122
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 38
+    END
+
+    IDD_TAB_DIALOG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 132
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 372
+    END
+
+    IDD_DLG_BUMP_MAP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 207
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 375
+    END
+
+    IDD_SHOW_HIERARCHY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 422
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 319
+    END
+
+    IDD_SET_TIME_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 219
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 59
+    END
+
+    IDD_NODE_CONTROL_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 256
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 334
+    END
+
+    IDD_PHASE_CONTROL_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 258
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 63
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// FONTS
+//
+
+IDR_FONTS1              FONTS                   "res\\Arial.font"
+#endif    // Russian resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOG  0, 0, 295, 172
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About WinVG"
+FONT 8, "MS Sans Serif"
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "WinVG Version 1.0",IDC_STATIC,53,7,65,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2001",IDC_STATIC,51,19,119,8
+    DEFPUSHBUTTON   "OK",IDOK,238,7,50,14,WS_GROUP
+    LTEXT           "Static",IDC_INFO_TEXT,7,44,281,121
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 288
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 165
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_MAINFRAME TOOLBAR  16, 15
+BEGIN
+    BUTTON      ID_FILE_OPEN
+    SEPARATOR
+    BUTTON      ID_APP_ABOUT
+    BUTTON      ID_MODEL_INFO
+    SEPARATOR
+    BUTTON      ID_BUTTON_BBOX
+    BUTTON      ID_BUTTON_OBJECT
+    BUTTON      ID_BUTTON_LOGIC
+    BUTTON      ID_BUTTON_BOUND
+    BUTTON      ID_DRAW_SCELETON
+    SEPARATOR
+    BUTTON      ID_BUTTON_SHADOW
+    BUTTON      ID_BUTTON_LIGHTING
+    BUTTON      ID_BUTTON_COLOR
+    BUTTON      ID_LOGOOPEN
+    BUTTON      ID_BUTTON_BKCOLOR
+    SEPARATOR
+    BUTTON      ID_BUTTON_PAUSE
+    BUTTON      ID_BUTTON_REVERSE
+    SEPARATOR
+    BUTTON      ID_NUM_OBJECT
+    BUTTON      ID_NUM_OBJECT2
+    BUTTON      ID_HOLOGRAM
+    BUTTON      ID_SCALENORMAL
+    BUTTON      ID_ENABLE_BUMP
+    SEPARATOR
+    BUTTON      ID_BUTTON_BASEMENT
+    BUTTON      ID_SCREEN_SHOOT
+    BUTTON      ID_LIGHT_ON
+    SEPARATOR
+    BUTTON      ID_HIERARHY_OBJECT
+    BUTTON      ID_HIERARHY_LOGIC
+    BUTTON      ID_MODEL_CAMERA
+    BUTTON      ID_ZERO_PLANE
+    BUTTON      ID_BUTTON_TIME
+    BUTTON      ID_BUTTON_FOG
+    BUTTON      ID_VIEW_NODECONTROL
+    BUTTON      ID_SHOW_NORMALS
+    BUTTON      ID_PHASE_CONTROL
+    BUTTON      ID_SHOW_DEBRISES
+    BUTTON      ID_CAMERA43
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\WinVG.ico"
+IDR_WINVGTYPE           ICON                    "res\\WinVGDoc.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM "Set effect directory",        ID_EFFECT_DIRECTORY
+        MENUITEM "Set texture directory",       ID_FILE_SETTEXTUREDIRECTORY
+        MENUITEM SEPARATOR
+        MENUITEM "Recent File",                 ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+        MENUITEM "Anisotropic",                 ID_ENABLE_ANISOTROPIC
+        MENUITEM "Tilemap",                     ID_ENABLE_TILEMAP
+        MENUITEM "Node Control",                ID_VIEW_NODECONTROL
+        MENUITEM SEPARATOR
+        MENUITEM "Automatic mipmap",            ID_VIEW_AUTOMATICMIPMAP
+        MENUITEM "0 mip level",                 ID_VIEW_0MIPLEVEL
+        MENUITEM "1 mip level",                 ID_VIEW_1MIPLEVEL
+        MENUITEM "2 mip level",                 ID_VIEW_2MIPLEVEL
+        MENUITEM "3 mip level",                 ID_VIEW_3MIPLEVEL
+        MENUITEM "force mip color",             ID_VIEW_FORCEMIPCOLOR
+    END
+    POPUP "Control"
+    BEGIN
+        MENUITEM "Object",                      ID_MENU_CONTROL_OBJECT
+        , CHECKED
+        MENUITEM "Camera",                      ID_MENU_CONTROL_CAMERA
+        , CHECKED
+        MENUITEM "DirLight",                    ID_MENU_CONTROL_DIRLIGHT
+        , CHECKED
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About WinVG...",             ID_APP_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS 
+BEGIN
+    "A",            ID_ENABLE_ANISOTROPIC,  VIRTKEY, CONTROL, NOINVERT
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    "E",            ID_SCREEN_SHOOT,        VIRTKEY, CONTROL, NOINVERT
+    "G",            ID_DEBUG_MEMORY,        VIRTKEY, NOINVERT
+    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL, NOINVERT
+    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL, NOINVERT
+    "P",            ID_FILE_PRINT,          VIRTKEY, CONTROL, NOINVERT
+    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT, NOINVERT
+    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT, NOINVERT
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
+    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT, NOINVERT
+    "W",            ID_MODEL_INFO,          VIRTKEY, CONTROL, NOINVERT
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL, NOINVERT
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "WinVG MFC Application"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "WinVG"
+            VALUE "LegalCopyright", "Copyright (C) 2001"
+            VALUE "OriginalFilename", "WinVG.EXE"
+            VALUE "ProductName", "WinVG Application"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDR_MAINFRAME           "WinVG\n\nWinVG\n*.3dx\n.3dx\nWinVG.Document\nWinVG Document"
+    ID_INDICATOR_FPS        "FPS: 000.00"
+    ID_INDICATOR_PHASE      "phase: 00.000000"
+    ID_INDICATOR_MEGA_POLY  "100.0 mpoly/s"
+    ID_INDICATOR_POLY       "10000 polygons"
+    ID_INDICATOR_CHAIN_TIME "ChainTime: 0.000"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_APP_TITLE       "WinVG"
+    AFX_IDS_IDLEMESSAGE     "Ready"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_INDICATOR_EXT        "EXT"
+    ID_INDICATOR_CAPS       "CAP"
+    ID_INDICATOR_NUM        "NUM"
+    ID_INDICATOR_SCRL       "SCRL"
+    ID_INDICATOR_OVR        "OVR"
+    ID_INDICATOR_REC        "REC"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILE_NEW             "Create a new document\nNew"
+    ID_FILE_OPEN            "Open an existing document\nOpen"
+    ID_FILE_CLOSE           "Close the active document\nClose"
+    ID_FILE_SAVE            "Save the active document\nSave"
+    ID_FILE_SAVE_AS         "Save the active document with a new name\nSave As"
+    ID_FILE_PAGE_SETUP      "Change the printing options\nPage Setup"
+    ID_FILE_PRINT_SETUP     "Change the printer and printing options\nPrint Setup"
+    ID_FILE_PRINT           "Print the active document\nPrint"
+    ID_FILE_PRINT_PREVIEW   "Display full pages\nPrint Preview"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
+    ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILE_MRU_FILE1       "Open this document"
+    ID_FILE_MRU_FILE2       "Open this document"
+    ID_FILE_MRU_FILE3       "Open this document"
+    ID_FILE_MRU_FILE4       "Open this document"
+    ID_FILE_MRU_FILE5       "Open this document"
+    ID_FILE_MRU_FILE6       "Open this document"
+    ID_FILE_MRU_FILE7       "Open this document"
+    ID_FILE_MRU_FILE8       "Open this document"
+    ID_FILE_MRU_FILE9       "Open this document"
+    ID_FILE_MRU_FILE10      "Open this document"
+    ID_FILE_MRU_FILE11      "Open this document"
+    ID_FILE_MRU_FILE12      "Open this document"
+    ID_FILE_MRU_FILE13      "Open this document"
+    ID_FILE_MRU_FILE14      "Open this document"
+    ID_FILE_MRU_FILE15      "Open this document"
+    ID_FILE_MRU_FILE16      "Open this document"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_NEXT_PANE            "Switch to the next window pane\nNext Pane"
+    ID_PREV_PANE            "Switch back to the previous window pane\nPrevious Pane"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_WINDOW_SPLIT         "Split the active window into panes\nSplit"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_EDIT_CLEAR           "Erase the selection\nErase"
+    ID_EDIT_CLEAR_ALL       "Erase everything\nErase All"
+    ID_EDIT_COPY            "Copy the selection and put it on the Clipboard\nCopy"
+    ID_EDIT_CUT             "Cut the selection and put it on the Clipboard\nCut"
+    ID_EDIT_FIND            "Find the specified text\nFind"
+    ID_EDIT_PASTE           "Insert Clipboard contents\nPaste"
+    ID_EDIT_REPEAT          "Repeat the last action\nRepeat"
+    ID_EDIT_REPLACE         "Replace specific text with different text\nReplace"
+    ID_EDIT_SELECT_ALL      "Select the entire document\nSelect All"
+    ID_EDIT_UNDO            "Undo the last action\nUndo"
+    ID_EDIT_REDO            "Redo the previously undone action\nRedo"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_TOOLBAR         "Show or hide the toolbar\nToggle ToolBar"
+    ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle StatusBar"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCSIZE          "Change the window size"
+    AFX_IDS_SCMOVE          "Change the window position"
+    AFX_IDS_SCMINIMIZE      "Reduce the window to an icon"
+    AFX_IDS_SCMAXIMIZE      "Enlarge the window to full size"
+    AFX_IDS_SCNEXTWINDOW    "Switch to the next document window"
+    AFX_IDS_SCPREVWINDOW    "Switch to the previous document window"
+    AFX_IDS_SCCLOSE         "Close the active window and prompts to save the documents"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCRESTORE       "Restore the window to normal size"
+    AFX_IDS_SCTASKLIST      "Activate Task List"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_PREVIEW_CLOSE   "Close print preview mode\nCancel Preview"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_BUTTON_BBOX          "Show/Hide Bounding Box\nShow/Hide Bounding Box"
+    ID_BUTTON_BOUND         "Show/Hide logic bound\nShow/Hide logic bound"
+    ID_BUTTON_LOGIC         "Show/Hide logic objects\nShow/Hide logic objects"
+    ID_BUTTON_OBJECT        "Show/Hide object\nShow/Hide object"
+    ID_PIXNORM              "FOG"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_BUTTON_LIGHTING      "Enable/Disable lighting\nEnable/Disable lighting"
+    ID_MENU_CONTROL_OBJECT  "orientation obect control"
+    ID_MENU_CONTROL_CAMERA  "orientation camera control"
+    ID_MENU_CONTROL_DIRLIGHT "orientation direction light control"
+    ID_BUTTON_COLOR         "choose skin color\nchoose skin color"
+    ID_BUTTON_BKCOLOR       "change background color\nchange background color"
+    ID_NUM_OBJECT           "Test many object\nTest many object"
+    ID_MODEL_INFO           "Model info Ctrl-W\nModel info Ctrl-W"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_HOLOGRAM             "Set hologram\nSet hologram"
+    ID_SCALENORMAL          "Set scale=1\nSet scale=1"
+    ID_USE_SHADER           "Use shader\nUse shader"
+    ID_BUTTON_SHADOW        "Show/Hide shadow\nShow/Hide shadow"
+    ID_ENABLE_BUMP          "Ebable bump\nEbable bump"
+    ID_BUTTON_BASEMENT      "Show basement\nShow basement"
+    ID_SCREEN_SHOOT         "Screen shoot (Ctrl-E)\nScreen shoot (Ctrl-E)"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_OPEN_MAP             "\nOpen maps"
+    ID_SAVE_MAP             "\nSave maps"
+    ID_ADD_MAP              "\nAdd new map"
+    ID_DEL_MAP              "\nDelete selected map"
+    ID_EXPORT_MAP           "\nSave bump texture"
+    ID_LIGHT_ON             "Light on/off\nLight on/off"
+    ID_HIERARHY_OBJECT      "Object hierarhy\nObject hierarhy"
+    ID_HIERARHY_LOGIC       "Logic hierarhy\nLogic hierarhy"
+    ID_MODEL_CAMERA         "Set model camera\nSet model camera"
+    ID_ZERO_PLANE           "Zero plane\nZero plane"
+    ID_BUTTON_TIME          "Set time\nSet time"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_DRAW_SCELETON        "Show graph node\nShow graph node"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_BUTTON_FOG           "FOG"
+    ID_BUTTON_NODE_CONTROL  "Show Node Control"
+    ID_SHOW_NORMALS         "Show normals\nShow normals"
+    ID_PHASE_CONTROL        "\nPhase control"
+    ID_LOGOOPEN             "\nSelect Emblem"
+    ID_BUTTON_REVERSE       "Play reverse animation"
+    ID_SHOW_DEBRISES        "Show debrises\nShow debrises"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\WinVG.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#include "afxprint.rc"       // printing/print preview resources
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

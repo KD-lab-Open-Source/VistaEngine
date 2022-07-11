@@ -1,0 +1,51 @@
+struct PS_INPUT
+{
+	float2 uv_tex0:TEXCOORD0;
+	float2 uv_tex1:TEXCOORD1;
+	float2 uv_sky:TEXCOORD2;
+    float4  diffuse: COLOR0;
+    
+	float2 uv_lightmap:TEXCOORD3;
+	float3 uv_mirror:TEXCOORD4;
+#ifdef FLOAT_ZBUFFER	
+	float4 zpos:TEXCOORD5;
+#endif
+};
+
+sampler2D Tex0Sampler:register(s0);
+sampler2D Tex1Sampler:register(s1);
+samplerCUBE SkySampler:register(s2);
+sampler2D LightMapSampler:register(s3);
+sampler2D ZBufferMap:register(s4);
+float4 vFogOfWar:register(c3);
+float4 vReflectionColor;
+
+float4 main(const PS_INPUT v):COLOR
+{
+//*
+	float4 tex0=tex2D(Tex0Sampler,v.uv_tex0);
+	float4 tex1=tex2D(Tex1Sampler,v.uv_tex1);
+	float3 cube=v.uv_mirror;
+	cube.xy+=(tex0.xy+tex1.xy)*0.3;
+	float4 sky=texCUBE(SkySampler,cube);
+	
+	float4 ot;
+	ot.rgb=sky.rgb*vReflectionColor.a+vReflectionColor.rgb;
+	ot.a=v.diffuse.a;
+	ot.a+=ot.a*saturate((tex0.x+tex1.x));
+#ifdef FOG_OF_WAR
+	float4 lightmap=tex2D(LightMapSampler,v.uv_lightmap);
+	ot.rgb=lerp(ot.rgb,vFogOfWar,lightmap.a);
+#endif	
+#ifdef FLOAT_ZBUFFER
+	float zb = tex2Dproj(ZBufferMap,v.zpos).r;
+	float res = (zb-v.zpos.z)*0.1f;
+	ot.a *= saturate(res);
+#endif
+
+	return ot;
+/*/
+	//float4 sky=tex3D(SkySampler,v.uv_mirror);
+	return float4(1,0,0,v.diffuse.a);
+/**/
+};

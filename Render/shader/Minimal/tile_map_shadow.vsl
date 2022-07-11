@@ -1,0 +1,26 @@
+struct VS_INPUT
+{
+    float4 pos : POSITION;
+};
+
+struct VS_OUTPUT
+{
+    float4  pos : POSITION;
+#ifdef SHADOW_9700
+    float  t0 : TEXCOORD0;
+#endif
+};
+
+float4x4 mWVP;
+
+VS_OUTPUT main(const VS_INPUT v)
+{
+	VS_OUTPUT o;
+#include "..\Minimal\ConvertPos.inl"
+	o.pos=mul(pos,mWVP);
+#ifdef SHADOW_9700
+	o.t0=o.pos.z;
+#endif
+	return o;
+}
+

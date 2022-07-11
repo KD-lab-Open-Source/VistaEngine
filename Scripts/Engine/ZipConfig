@@ -1,0 +1,83 @@
+Version = 0;
+ZipConfigTable = {
+	header = {
+		8;
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	};
+	strings = {
+		8;
+		{
+			name = "";
+			zipName = "Resource\\resource.pak";
+			path = "Resource\\TerrainData;Resource\\FX;Resource\\UI;Resource\\Models;Resource\\cacheData\\baseCache";
+			filesMask = "*.*";
+			excludeFilesMask = "cache*Info;*.avi";
+			compressionLevel = 6;
+		},
+		{
+			name = "";
+			zipName = "Resource\\worlds.pak";
+			path = "Resource\\Worlds";
+			filesMask = "*.*";
+			excludeFilesMask = "qswl.*;*.spg;*.sph;*.cls;*.spg.bin;*.sph.bin";
+			compressionLevel = 6;
+		},
+		{
+			name = "";
+			zipName = "Resource\\sound.pak";
+			path = "Resource\\Sounds";
+			filesMask = "*.*";
+			excludeFilesMask = "";
+			compressionLevel = 0;
+		},
+		{
+			name = "";
+			zipName = "Resource\\voices_en.pak";
+			path = "Resource\\LocData\\English\\Voice";
+			filesMask = "*.ogg";
+			excludeFilesMask = "Intro.*";
+			compressionLevel = 0;
+		},
+		{
+			name = "";
+			zipName = "Resource\\voices_fr.pak";
+			path = "Resource\\LocData\\French\\Voice";
+			filesMask = "*.ogg";
+			excludeFilesMask = "Intro.*";
+			compressionLevel = 0;
+		},
+		{
+			name = "";
+			zipName = "Resource\\voices_de.pak";
+			path = "Resource\\LocData\\German\\Voice";
+			filesMask = "*.ogg";
+			excludeFilesMask = "Intro.*";
+			compressionLevel = 0;
+		},
+		{
+			name = "";
+			zipName = "Resource\\voices_es.pak";
+			path = "Resource\\LocData\\Spanish\\Voice";
+			filesMask = "*.ogg";
+			excludeFilesMask = "Intro.*";
+			compressionLevel = 0;
+		},
+		{
+			name = "";
+			zipName = "Resource\\voices_it.pak";
+			path = "Resource\\LocData\\Italian\\Voice";
+			filesMask = "*.ogg";
+			excludeFilesMask = "Intro.*";
+			compressionLevel = 0;
+		}
+
+	};
+};

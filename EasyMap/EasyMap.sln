@@ -1,0 +1,57 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Render", "..\Render\Render.vcproj", "{8D254B90-E306-4081-A5B8-9F4E31436AE1}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EasyMap", "EasyMap.vcproj", "{D6153C1D-B7A9-49D1-994D-2D72A451DC8D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3255C187-3794-48D2-9228-904CFFB7FA5B} = {3255C187-3794-48D2-9228-904CFFB7FA5B}
+		{8D254B90-E306-4081-A5B8-9F4E31436AE1} = {8D254B90-E306-4081-A5B8-9F4E31436AE1}
+		{C9C324DD-85D1-4135-9191-6CE8F6613E83} = {C9C324DD-85D1-4135-9191-6CE8F6613E83}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Terra", "..\Terra\Terra.vcproj", "{C9C324DD-85D1-4135-9191-6CE8F6613E83}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Serialization", "..\Util\Serialization\lib\Serialization.vcproj", "{3255C187-3794-48D2-9228-904CFFB7FA5B}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Final = Final
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{8D254B90-E306-4081-A5B8-9F4E31436AE1}.Debug.ActiveCfg = Debug|Win32
+		{8D254B90-E306-4081-A5B8-9F4E31436AE1}.Debug.Build.0 = Debug|Win32
+		{8D254B90-E306-4081-A5B8-9F4E31436AE1}.Final.ActiveCfg = Final|Win32
+		{8D254B90-E306-4081-A5B8-9F4E31436AE1}.Final.Build.0 = Final|Win32
+		{8D254B90-E306-4081-A5B8-9F4E31436AE1}.Release.ActiveCfg = Release|Win32
+		{8D254B90-E306-4081-A5B8-9F4E31436AE1}.Release.Build.0 = Release|Win32
+		{D6153C1D-B7A9-49D1-994D-2D72A451DC8D}.Debug.ActiveCfg = Debug|Win32
+		{D6153C1D-B7A9-49D1-994D-2D72A451DC8D}.Debug.Build.0 = Debug|Win32
+		{D6153C1D-B7A9-49D1-994D-2D72A451DC8D}.Final.ActiveCfg = Release|Win32
+		{D6153C1D-B7A9-49D1-994D-2D72A451DC8D}.Final.Build.0 = Release|Win32
+		{D6153C1D-B7A9-49D1-994D-2D72A451DC8D}.Release.ActiveCfg = Release|Win32
+		{D6153C1D-B7A9-49D1-994D-2D72A451DC8D}.Release.Build.0 = Release|Win32
+		{C9C324DD-85D1-4135-9191-6CE8F6613E83}.Debug.ActiveCfg = Debug|Win32
+		{C9C324DD-85D1-4135-9191-6CE8F6613E83}.Debug.Build.0 = Debug|Win32
+		{C9C324DD-85D1-4135-9191-6CE8F6613E83}.Final.ActiveCfg = Final|Win32
+		{C9C324DD-85D1-4135-9191-6CE8F6613E83}.Final.Build.0 = Final|Win32
+		{C9C324DD-85D1-4135-9191-6CE8F6613E83}.Release.ActiveCfg = Release|Win32
+		{C9C324DD-85D1-4135-9191-6CE8F6613E83}.Release.Build.0 = Release|Win32
+		{3255C187-3794-48D2-9228-904CFFB7FA5B}.Debug.ActiveCfg = Debug|Win32
+		{3255C187-3794-48D2-9228-904CFFB7FA5B}.Debug.Build.0 = Debug|Win32
+		{3255C187-3794-48D2-9228-904CFFB7FA5B}.Final.ActiveCfg = Final|Win32
+		{3255C187-3794-48D2-9228-904CFFB7FA5B}.Final.Build.0 = Final|Win32
+		{3255C187-3794-48D2-9228-904CFFB7FA5B}.Release.ActiveCfg = Release|Win32
+		{3255C187-3794-48D2-9228-904CFFB7FA5B}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

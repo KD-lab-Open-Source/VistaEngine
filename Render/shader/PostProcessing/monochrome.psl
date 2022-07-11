@@ -1,0 +1,16 @@
+struct PS_INPUT
+{
+	float2 Tex:TEXCOORD0;
+	float4 diffuse:COLOR0;
+};
+
+sampler2D SrcTexture:register(s0);
+static float3 LuminanceConv = { 0.2125f, 0.7154f, 0.0721f };
+//static float4 LuminanceConv = { -0.1f, -0.1f, 0.1f ,0};
+float3 fTime:register(c0);//float3(time,time,time)
+float3 fTimeInv:register(c1);//1-fTime
+float4 main (const PS_INPUT v):COLOR
+{
+	float4 c = tex2D(SrcTexture,v.Tex)*v.diffuse;
+	return 	float4(c.rgb*fTimeInv+dot(c.rgb,LuminanceConv)*fTime,c.a);
+}

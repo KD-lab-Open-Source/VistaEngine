@@ -1,0 +1,208 @@
+struct PS_INPUT
+{
+	float2 uv0:TEXCOORD0;
+	float4 shadow:TEXCOORD2;
+#ifndef BUMP	
+	float4 diffuse:COLOR0;
+#endif
+	float3 specular:COLOR1;
+
+#ifdef BUMP	
+	float3 half_obj:TEXCOORD1;
+	float3 light_obj:TEXCOORD4;
+	//COLOR0,COLOR1 - клампятся 0..1
+#endif
+
+#if defined(FOG_OF_WAR) || defined(LIGHTMAP)
+	float2 uv_lightmap:TEXCOORD3;
+#endif
+	
+#ifdef REFLECTION
+	#if(REFLECTION==1)
+		float2 uv_reflection:TEXCOORD1;
+	#else
+		float3 uv_reflection:TEXCOORD1;
+	#endif
+#endif
+
+#ifdef SECOND_OPACITY_TEXTURE
+    float2 uv1:TEXCOORD1;
+#endif
+#ifdef ZREFLECTION
+	float3  treflection: TEXCOORD5;
+#endif 
+#ifdef ZBUFFER
+	float  tz: TEXCOORD6;
+#endif 
+};
+
+struct PS_OUTPUT
+{
+	float4 color:COLOR0;
+#ifdef ZBUFFER
+	float4 z:COLOR1;
+#endif 
+};
+
+#if defined(SHADOW_9700) || defined(SHADOW_FX)
+float4 fx_offset:register(c0);
+float4 vShade:register(c2);
+#include "shadow9700.inl"
+#endif
+
+sampler2D DiffuseSampler:register(s0);
+sampler ShadowSampler:register(s2);
+sampler2D ReflectionZ:register(s5);
+
+float4 bumpAmbient:register(c4);
+#ifdef BUMP
+sampler2D BumpSampler:register(s1);
+float4 bumpDiffuse:register(c5);
+float4 bumpSpecular:register(c6);
+  #ifdef SPECULARMAP
+  sampler2D SpecularSampler:register(s4);
+  #endif
+#endif
+
+#ifdef REFLECTION
+sampler ReflectionSampler:register(s1);
+float4 reflectionAmount:register(c1);
+#endif
+#ifdef SECOND_OPACITY_TEXTURE
+sampler2D SecondOpacityTextureSampler:register(s1);
+#endif
+
+sampler2D LightMapSampler:register(s3);
+float4 vFogOfWar:register(c3);
+
+float4 tLerpPre:register(c7);//rgb=tlerp.rgb*tlerp.a; a=1-tlerp.a
+
+PS_OUTPUT main(const PS_INPUT v)
+{
+	float4 ot;
+#if defined(FOG_OF_WAR) || defined(LIGHTMAP)	
+	float4 lightmap=tex2D(LightMapSampler,v.uv_lightmap);
+#endif
+#ifdef LIGHTMAP
+	lightmap.rgb=2*(lightmap.rgb-0.5);
+	if(LIGHTMAP==2)
+		lightmap.rgb=saturate(lightmap.rgb);
+#endif
+
+#ifdef NOTEXTURE
+	#ifdef NOLIGHT
+		ot.rgb=v.diffuse;
+	#else
+		ot.rgb=v.diffuse+v.specular;
+	#endif
+	#ifdef LIGHTMAP
+		ot.rgb+=lightmap;
+	#endif
+	ot.a=v.diffuse.a;
+#else
+    float4 t0 = tex2D(DiffuseSampler,v.uv0);
+//	t0.rgb=float3(1,0,0);
+	#ifdef LERP_TEXTURE_COLOR
+	t0.rgb=t0.rgb*tLerpPre.a+tLerpPre.rgb;
+	#endif
+	
+    #ifdef SECOND_OPACITY_TEXTURE
+    float4 t1 = tex2D(SecondOpacityTextureSampler, v.uv1);
+    #endif
+	
+	#ifdef NOLIGHT
+		float3 diffuse=v.diffuse;
+		#ifdef LIGHTMAP
+			diffuse+=lightmap;
+		#endif
+		ot.rgb=t0*diffuse;
+	#else
+		#ifdef BUMP
+			float3 tbump=tex2D(BumpSampler,v.uv0);
+			tbump.z=sqrt(1-tbump.x*tbump.x-tbump.y*tbump.y);
+			ot.rgb=saturate(dot(tbump,v.light_obj))*bumpDiffuse;
+			//ot.rgb=(dot(tbump,v.light_obj)*0.5+0.5)*bumpDiffuse;//Для следующего проекта, и при отсутствии бампа диффузу так считать.
+			
+			//ot.rgb=saturate(dot(tbump,v.light_obj));
+			
+			float3 halfv=normalize(v.half_obj);
+			
+			#ifdef LIGHTMAP
+				ot.rgb=ot.rgb+lightmap.rgb;
+			#endif
+			ot.rgb*=t0;
+			
+			#ifdef SPECULARMAP
+			float4 tspecular=tex2D(SpecularSampler,v.uv0);
+			float specular=pow(saturate(dot(tbump,halfv)),tspecular.a*50);
+			ot.rgb+=specular*tspecular.rgb;
+			#else
+			float specular=pow(saturate(dot(tbump,halfv)),bumpSpecular.w);
+			ot.rgb+=specular*bumpSpecular.rgb;
+			#endif
+
+			//ot.rgb=saturate(dot(tbump,v.light_obj));
+			//ot.rgb=tbump;
+		#else
+			float3 diffuse=v.diffuse;
+			#ifdef LIGHTMAP
+				diffuse=diffuse+lightmap;
+			#endif
+			ot.rgb=t0.rgb*diffuse;
+		#endif
+		#ifdef REFLECTION
+			#if(REFLECTION==1)
+				ot.rgb+=tex2D(ReflectionSampler,v.uv_reflection)*reflectionAmount;
+				//ot.rgb=tex2D(ReflectionSampler,v.uv_reflection);
+			#else
+				ot.rgb+=texCUBE(ReflectionSampler,v.uv_reflection)*reflectionAmount;
+				//ot.rgb=texCUBE(ReflectionSampler,v.uv_reflection);
+			#endif
+		#endif
+
+		#if defined(SHADOW_9700) || defined(SHADOW_FX)
+		Shadow(ot.rgb,ShadowSampler,v.shadow);
+		#endif
+		
+		ot.rgb+=bumpAmbient*t0;
+	#endif
+	ot.rgb+=v.specular;
+
+    #ifdef SECOND_OPACITY_TEXTURE
+//		ot.rgb+=t1.rgb;
+        ot.a = t0.a * t1.a * v.diffuse.a;
+	#else
+		#ifdef SELF_ILLUMINATION
+			#ifdef BUMP
+				ot.a=bumpDiffuse.a;
+			#else
+				ot.a=v.diffuse.a;
+			#endif
+			ot.rgb=lerp(ot.rgb,t0,t0.a);
+		#else
+			#ifdef BUMP
+				ot.a=t0.a*bumpDiffuse.a;
+			#else
+				ot.a=t0.a*v.diffuse.a;
+			#endif
+		#endif
+    #endif
+#endif
+		
+#ifdef ZREFLECTION
+	float4 refz_raw=tex2D(ReflectionZ,v.treflection);
+	float refz=refz_raw.w*256+refz_raw.x;
+	clip(v.treflection.z-refz);
+#endif
+
+#ifdef FOG_OF_WAR
+	ot.rgb=lerp(ot.rgb,vFogOfWar,lightmap.a);
+#endif
+	
+	PS_OUTPUT output;
+	output.color=ot;
+#ifdef ZBUFFER
+	output.z=v.tz;
+#endif
+	return output;
+}

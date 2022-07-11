@@ -1,0 +1,415 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Russian resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
+#ifdef _WIN32
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+#pragma code_page(1251)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)\r\n"
+    "LANGUAGE 25, 1\r\n"
+    "#pragma code_page(1251)\r\n"
+    "#include ""res\\IGameExporter.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""     // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041904e3"
+        BEGIN
+            VALUE "CompanyName", "TODO: <Company name>"
+            VALUE "FileDescription", "TODO: <File description>"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "IGameExporter.dll"
+            VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
+            VALUE "OriginalFilename", "IGameExporter.dll"
+            VALUE "ProductName", "TODO: <Product name>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x419, 1251
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_MAIN_DLG DIALOGEX 0, 0, 184, 293
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "3dx Exporter"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Анимационные группы",IDC_ANIMATION_GROUP,12,18,162,14
+    PUSHBUTTON      "Анимационные цепочки",IDC_ANIMATION_CHAIN,12,42,162,14
+    PUSHBUTTON      "Анимационные группы материалов",IDC_ANIMATION_GROUP_MAT,
+                    12,66,162,14
+    PUSHBUTTON      "Группы видимости",IDC_VISIBLE_GROUP,12,90,162,14
+    PUSHBUTTON      "Неудаляемые Node (Анимационные узлы)",
+                    IDC_NONDELETE_NODE,12,114,162,14
+    CONTROL         "",IDC_MAX_WEIGHTS_SPIN,"msctls_updown32",UDS_ARROWKEYS,
+                    146,211,11,12
+    DEFPUSHBUTTON   "OK",IDOK,13,272,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,67,272,50,14
+    GROUPBOX        "",IDC_STATIC,6,7,173,175
+    GROUPBOX        "",IDC_STATIC,7,201,174,30
+    LTEXT           "Max количество весов у точки",IDC_STATIC,14,212,105,8
+    EDITTEXT        IDC_MAX_WEIGHTS,122,211,24,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "Debug",IDC_DEBUG,121,272,50,14
+    PUSHBUTTON      "Логические Node",IDC_LOGIC_NODE,12,137,162,14
+    PUSHBUTTON      "Выставить эмблему",IDC_PLACE_EMBLEM,12,162,162,14
+    PUSHBUTTON      "Bip Bound Node (to test)",IDC_BOUND_NODE,72,186,105,14
+    DEFPUSHBUTTON   "Export LOD1",ID_EXPORT_LOD1,118,233,59,14
+    DEFPUSHBUTTON   "Export LOD2",ID_EXPORT_LOD2,118,250,59,14
+END
+
+IDD_ANIMATION_GRUP_DLG DIALOGEX 0, 0, 503, 407
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Анимационные группы"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,195,384,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,255,384,50,14
+    CONTROL         "",IDC_TREE_GROUP,"SysTreeView32",TVS_HASBUTTONS | 
+                    TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | 
+                    WS_BORDER | WS_TABSTOP,18,54,228,324
+    CONTROL         "",IDC_OBJECT_TREE,"SysTreeView32",TVS_HASBUTTONS | 
+                    TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | 
+                    WS_BORDER | WS_TABSTOP,256,54,240,324
+    LTEXT           "Анимационные группы",IDC_STATIC,72,42,78,8
+    LTEXT           "Дерево объектов",IDC_STATIC,348,42,61,8
+    PUSHBUTTON      "<<<<<<<<<<<<<<<",IDC_ADD_OBJECT_INTREE,262,12,234,18,
+                    BS_MULTILINE
+    PUSHBUTTON      "Добавить группу",IDC_ADD_GROUP,6,24,84,14
+    PUSHBUTTON      "Удалить группу",IDC_DEL_GROUP,96,24,85,14
+    EDITTEXT        IDC_NEW_GROUP_NAME,6,6,174,14,ES_AUTOHSCROLL
+END
+
+IDD_DEBUG_DLG DIALOGEX 0, 0, 154, 113
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Debug Options"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,21,90,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,81,90,50,14
+    CONTROL         "Log Rotation",IDC_LOG_ROTATION,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,12,18,57,10
+    CONTROL         "Log Position",IDC_LOG_POSITION,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,12,30,54,10
+    CONTROL         "Log Scale",IDC_LOG_SCALE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,12,42,46,10
+    CONTROL         "Log Info Polygon",IDC_LOG_INFO_POLYGON,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,54,70,10
+    CONTROL         "Log Info Delete Node",IDC_LOG_INFO_DELETE_NODE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,12,66,84,10
+    GROUPBOX        "",IDC_STATIC,6,7,144,77
+END
+
+IDD_ANIMATION_CHAIN_DLG DIALOGEX 0, 0, 418, 301
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Анимационные цепочки"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,306,276,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,360,276,50,14
+    CONTROL         "",IDC_LIST_CHAINS,"SysListView32",LVS_REPORT | 
+                    LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,7,404,260
+    PUSHBUTTON      "Добавить",IDC_ADD_CHAIN,12,276,50,14
+    PUSHBUTTON      "Удалить",IDC_DELETE_CHAIN,66,276,50,14
+    PUSHBUTTON      "Изменить",IDC_EDIT_CHAIN,120,276,50,14
+END
+
+IDD_ADD_CHAIN DIALOGEX 0, 0, 206, 137
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Параметры анимационной цепочки"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,48,114,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,108,114,50,14
+    GROUPBOX        "",IDC_STATIC,7,7,192,101
+    LTEXT           "Имя:",IDC_STATIC,12,18,16,8
+    LTEXT           "Начало цепочки:",IDC_STATIC,12,38,58,8
+    LTEXT           "Конец цепочки:",IDC_STATIC,12,56,54,8
+    LTEXT           "Время проигрывания (сек):",IDC_STATIC,12,73,93,8
+    EDITTEXT        IDC_CHAIN_NAME,114,18,78,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_BEGIN_FRAME,114,36,60,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_END_FRAME,114,54,60,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_TIME,114,72,60,12,ES_AUTOHSCROLL
+    CONTROL         "Зацикленная цепочка анимации",IDC_CYCLED,"Button",
+                    BS_AUTOCHECKBOX | BS_LEFTTEXT | WS_TABSTOP,12,90,124,10
+    CONTROL         "",IDC_BEGIN_SPIN,"msctls_updown32",UDS_ARROWKEYS,174,36,
+                    12,12
+    CONTROL         "",IDC_END_SPIN,"msctls_updown32",UDS_ARROWKEYS,174,54,
+                    12,12
+    CONTROL         "",IDC_TIME_SPIN,"msctls_updown32",UDS_ARROWKEYS,174,72,
+                    11,12
+END
+
+IDD_VISIBLE_GROUP DIALOGEX 0, 0, 471, 319
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Группы Видимости"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,183,294,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,237,294,50,14
+    PUSHBUTTON      "Добавить множество",IDC_ADD_SET,6,6,78,14
+    PUSHBUTTON      "Удалить множество",IDC_DELETE_SET,6,24,78,14
+    CONTROL         "",IDC_TREE_SETS,"SysTreeView32",TVS_HASBUTTONS | 
+                    TVS_HASLINES | TVS_LINESATROOT | TVS_EDITLABELS | 
+                    TVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,6,42,162,246
+    CONTROL         "",IDC_LIST_VISIBLE,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,
+                    174,6,288,282
+    PUSHBUTTON      "Добавить группу",IDC_ADD_GROUP,90,6,78,14
+    PUSHBUTTON      "Удалить группу",IDC_DELETE_GROUP,90,24,78,14
+END
+
+IDD_ADD_GROUP DIALOGEX 0, 0, 186, 47
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Имя группы"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_NAME,7,7,172,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,35,26,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,101,26,50,14
+END
+
+IDD_LOGIC_NODE DIALOGEX 0, 0, 274, 285
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Логические Node"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,83,264,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,140,264,50,14
+    CONTROL         "",IDC_TREE_VISIBLE,"SysTreeView32",TVS_HASBUTTONS | 
+                    TVS_HASLINES | TVS_LINESATROOT | TVS_CHECKBOXES | 
+                    WS_BORDER | WS_TABSTOP,7,7,260,251
+END
+
+IDD_MOVE_EMBLEM DIALOGEX 0, 0, 520, 389
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Установка эмблем"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_MATERIALS_LIST,"SysListView32",LVS_LIST | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | 
+                    WS_BORDER | WS_TABSTOP,12,36,120,318
+    PUSHBUTTON      "Ok",IDBOK,12,366,50,18
+    PUSHBUTTON      "Cancel",IDCANCEL,84,366,50,18
+    CONTROL         "",IDC_PICTURE,"Static",SS_BLACKFRAME,150,36,342,312,
+                    WS_EX_STATICEDGE
+    SCROLLBAR       IDC_SCROLLBAR1,150,348,342,11,SBS_RIGHTALIGN
+    SCROLLBAR       IDC_SCROLLBAR2,492,36,12,312,SBS_BOTTOMALIGN | SBS_VERT
+    PUSHBUTTON      "+",IDC_ZOOMIN,150,18,22,14
+    PUSHBUTTON      "-",IDC_ZOOMOUT,174,18,22,14
+    PUSHBUTTON      "1:1",IDC_ONEONE,204,18,22,14
+    EDITTEXT        IDC_EDIT1,174,366,42,12,ES_AUTOHSCROLL
+    LTEXT           "Width:",IDC_STATIC,150,369,22,8
+    EDITTEXT        IDC_EDIT2,246,366,42,12,ES_AUTOHSCROLL
+    LTEXT           "Height:",IDC_STATIC,222,368,24,8
+    PUSHBUTTON      "Color",IDC_COLOR,234,18,22,14
+    GROUPBOX        "Список текстур",IDC_STATIC,6,6,132,354
+    CONTROL         "Включить эмблему",IDC_USE_LOGO,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,18,18,108,10
+    GROUPBOX        "Текстура",IDC_STATIC,144,6,372,378
+    LTEXT           "Angle:",IDC_STATIC,300,369,22,8
+    EDITTEXT        IDC_EDIT5,324,366,40,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_TEXTURE_PATH,261,17,224,15,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "...",IDC_BUTTON_SELECT_TEXTURE_PATH,485,18,19,14
+    PUSHBUTTON      "Paste",IDC_BUTTON_PASTE,477,368,30,14
+    PUSHBUTTON      "Copy",IDC_BUTTON_COPY,431,368,30,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_MAIN_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 177
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 286
+    END
+
+    IDD_ANIMATION_GRUP_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 496
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 400
+    END
+
+    IDD_DEBUG_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 147
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 106
+    END
+
+    IDD_ANIMATION_CHAIN_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 411
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 294
+    END
+
+    IDD_ADD_CHAIN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 199
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 130
+    END
+
+    IDD_VISIBLE_GROUP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 464
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 312
+    END
+
+    IDD_ADD_GROUP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 40
+    END
+
+    IDD_LOGIC_NODE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 267
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 278
+    END
+
+    IDD_MOVE_EMBLEM, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 513
+        VERTGUIDE, 477
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 382
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_TREE_IMAGE          BITMAP                  "bitmap1.bmp"
+#endif    // Russian resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
+LANGUAGE 25, 1
+#pragma code_page(1251)
+#include "res\IGameExporter.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"     // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

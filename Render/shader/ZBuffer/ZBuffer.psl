@@ -1,0 +1,16 @@
+struct PS_INPUT
+{
+	float3 pos:TEXCOORD0;
+}; 
+sampler2D DiffuseSampler:register(s0);
+sampler2D SecondSampler:register(s1);
+float4 main(const PS_INPUT v):COLOR
+{
+   float4 ot;
+#ifdef FLOATZBUFFER
+   ot = float4(v.pos.z,0,0,1);
+#else
+   ot = float4(0,0,0,v.pos.z);
+#endif
+   return ot;
+}

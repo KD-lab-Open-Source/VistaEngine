@@ -1,0 +1,82 @@
+#define TYPE 3
+
+struct PS_INPUT
+{
+	float2 tex:TEXCOORD0;
+};
+
+sampler2D tex:register(s0);
+sampler2D ptex0:register(s1);
+sampler2D ptex1:register(s2);
+sampler2D ptex2:register(s3);
+
+float2 pixel_size;
+float4 blobs_color;
+float4 specular_color;
+float fade_phase;
+
+float clamp_smooth(float f)
+{
+	return smoothstep(0.05, 0.2,f);
+}
+
+float4 main (const PS_INPUT v):COLOR
+{
+#if(TYPE==0)
+	float4 t1=tex2D(tex,v.tex);
+	t1.xyz=clamp_smooth(t1.x);
+	return t1; 
+#endif
+
+#if(TYPE==1)
+	float threshold=0.3;
+	float4 t1=tex2D(tex,v.tex);
+	float mul=clamp_smooth(t1.x);
+	float4 t2=tex2D(tex,v.tex+float2(pixel_size.x,0));
+	float f=(t1.x-t2.x)*10*mul;
+	return float4(f,f,f,1);
+#endif
+
+#if(TYPE==2)
+	float4 t1=tex2D(tex,v.tex);
+	float mul=clamp_smooth(t1.x+t1.y+t1.z);
+	
+	float3 tout=(t1.x>t1.y)?float3(1,0,0):float3(0,1,0);
+	float f;
+	f=max(t1.x,t1.y);
+	if(t1.z>f)
+		tout=float3(0,0,1);
+		
+	tout*=mul;
+	return float4(tout,1);
+#endif
+#if(TYPE==3)
+
+	float4 tout;
+
+	float4 t1 = tex2D(tex, v.tex);
+	float mul = clamp_smooth(t1.x);
+
+	float4 t2 = (tex2D(tex, v.tex + float2(0,pixel_size.y)) + 
+				 tex2D(tex, v.tex + float2(pixel_size.x,0))) / 2;
+	float4 out1 = tex2D(ptex0,v.tex + ((t2.x) - (t1.x)) * 0.15) * (1.0 - blobs_color[3]) + float4(blobs_color[0], blobs_color[1], blobs_color[2], 1.0) * blobs_color[3];
+	float4 out2 = tex2D(ptex0,v.tex);
+
+	tout = mul ? out1 : out2;
+
+	// Придаем объем.
+	float4 specUp=tex2D(tex,v.tex+float2(0,pixel_size.y*8));
+	tout += specUp.x * specUp.x * specUp.x * mul * specular_color;
+
+	// Обводочка.
+	//if(mul != 1 && mul != 0)
+	{
+		float mulnew = mul - 0.5;
+		tout = lerp( tout * 0.8, tout, mul);
+	}
+
+	return tout * fade_phase;
+
+#endif
+
+}

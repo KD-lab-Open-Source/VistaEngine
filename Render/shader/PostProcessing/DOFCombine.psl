@@ -1,0 +1,51 @@
+#define NUM_DOF_TAPS 12
+struct PS_INPUT
+{
+	float2 Tex:TEXCOORD0;
+};
+
+sampler2D BaseTexture:register(s0);
+//sampler2D BlurTexture:register(s1);
+sampler2D ZBufferTexture:register(s1);
+float2 dofParams:register(c0);
+float maxCoC:register(c1);
+float2 filterTaps[NUM_DOF_TAPS];
+float4 main (const PS_INPUT v):COLOR
+{
+    
+    //float4 ColorOrig = tex2D( BaseTexture, v.Tex );
+    //float3 ColorBlur = tex2D( BlurTexture, v.Tex );
+    //float zb = tex2D( ZBufferTexture, v.Tex ).r;
+    //return float4( lerp( ColorOrig.rgb, ColorBlur, saturate(abs(zb-dofParams.x)*dofParams.y)), 1.0f );
+    //return float4(ColorBlur,1);
+	// Get center sample
+	
+    float4 colorSum = tex2D( BaseTexture, v.Tex );
+    float zb = tex2D( ZBufferTexture, v.Tex ).r;
+	// Compute CoC size based on blurriness
+	float sizeCoC = colorSum.a * maxCoC;
+
+	float totalContribution = 1.0f;
+
+	// Run through all taps
+	for (int i = 0; i < NUM_DOF_TAPS; i++)
+	{
+		// Compute tap coordinates
+		float2 tapCoord = v.Tex + filterTaps[i]*sizeCoC;
+
+		// Fetch tap sample
+		float4 tapColor = tex2D(BaseTexture, tapCoord);
+		float zb1 = tex2D( ZBufferTexture, tapCoord ).r;
+
+		// Compute tap contribution
+		float tapContribution = (zb1 > zb) ? 1.0f : tapColor.a;
+		
+		// Accumulate color and contribution
+		colorSum += tapColor*tapContribution;
+		totalContribution += tapContribution;
+	}
+
+	// Normalize to get proper luminance
+	float4 finalColor = colorSum / totalContribution;
+	return finalColor;
+}

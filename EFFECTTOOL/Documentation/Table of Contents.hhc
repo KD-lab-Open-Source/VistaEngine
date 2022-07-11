@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<meta name="GENERATOR" content="Microsoft&reg; HTML Help Workshop 4.1">
+<!-- Sitemap 1.0 -->
+</HEAD><BODY>
+<OBJECT type="text/site properties">
+	<param name="FrameName" value="EffectTool">
+	<param name="Window Styles" value="0x800025">
+	<param name="ImageType" value="Folder">
+</OBJECT>
+<UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="EffectTool">
+		<param name="Local" value="EffectTool.html">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&Igrave;&aring;&iacute;&thorn;">
+			<param name="Local" value="EffectTool.html#ToolBar">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&Auml;&aring;&eth;&aring;&acirc;&icirc; &yacute;&igrave;&egrave;&ograve;&ograve;&aring;&eth;&icirc;&acirc;">
+			<param name="Local" value="EffectTool.html#EmitterTree">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&Icirc;&ecirc;&iacute;&icirc; &iuml;&agrave;&eth;&agrave;&igrave;&aring;&ograve;&eth;&icirc;&acirc;">
+			<param name="Local" value="EffectTool.html#OptTree">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="3D &icirc;&ecirc;&iacute;&icirc;">
+			<param name="Local" value="EffectTool.html#3DWindow">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&Icirc;&ecirc;&iacute;&icirc; &atilde;&eth;&agrave;&ocirc;&egrave;&ecirc;&icirc;&acirc;">
+			<param name="Local" value="EffectTool.html#GraphWindow">
+			</OBJECT>
+	</UL>
+</UL>
+</BODY></HTML>

@@ -1,0 +1,129 @@
+struct VS_INPUT
+{
+    float4 pos : POSITION;
+	float3 n : NORMAL;
+    float2 t0 : TEXCOORD0;
+#if(WEIGHT>1)    
+	float4 bw: COLOR0;
+#endif	
+    float4 blend:BLENDINDICES;
+};
+
+struct VS_OUTPUT
+{
+    float4  pos : POSITION;
+    float2  t0 : TEXCOORD0;
+	float4  diffuse: COLOR0;
+	//float3  specular: COLOR1;
+#ifdef ZREFLECTION
+	float3  treflection: TEXCOORD5;
+#endif
+#if defined(FOG_OF_WAR) || defined(LIGHTMAP)
+	float2 uv_lightmap:TEXCOORD3;
+#endif
+	float fog: FOG;
+};
+
+float4x4 mVP: register(c0);
+
+float4 vAmbient: register(c4);
+float4 vDiffuse: register(c5);
+float4 vSpecular: register(c6);//xyz- specular color, w - specular power
+float3 vCameraPos: register(c7);
+float3 vLightDirection: register(c8);
+
+float4x3 mWorldM[20]: register(c9);
+float4x4 mShadow:register(c70);
+
+float3 vReflectionMul:register(c87);
+float3 vUtrans:register(c88);
+float3 vVtrans:register(c89);
+float4x4 mView:register(c90);
+float3 vFog:register(c94);
+float4 fPlanarNode:register(c95);
+
+
+#ifdef SECOND_OPACITY_TEXTURE
+float3 vSecondUtrans:register(c74);
+float3 vSecondVtrans:register(c75);
+#endif
+float animTime:register(c76);
+float startPhase:register(c77);
+
+static float4 fixup={1.02, 0.04, 0, 0};
+static float4 waveHeight =  {1, 1, 0.5, 0.5};// waveHeight0, waveHeight1, waveHeight2, waveHeight3
+static float4 waveOffset =  {0.0, 0.0, 0.0, 0.0};  // waveOffset0, waveOffset1, waveOffset2, waveOffset3
+static float4 waveSpeed =   {2.0, 2.0, 4.0, 4.0};  // waveSpeed0, waveSpeed1, waveSpeed2, waveSpeed3
+static float4 waveDirX  =   {2.0, 0.0, 4.0, 0.0};  // waveDirX0, waveDirX1, waveDirX2, waveDirX3
+static float4 waveDirY  =   {0.0, 2.0, 0.0, 4.0};  // waveDirY0, waveDirY1, waveDirY2, waveDirY3
+
+VS_OUTPUT main(const VS_INPUT v)
+{
+    VS_OUTPUT o;
+	float3 world_pos;
+	float4x3 mWorld;
+	
+	int4 blend = D3DCOLORtoUBYTE4(v.blend);
+#if (WEIGHT>1)	
+		mWorld=mWorldM[blend[0]]*v.bw[0];
+		for(int i=1;i<WEIGHT;i++)
+		{
+			mWorld+=mWorldM[blend[i]]*v.bw[i];
+		}
+#else
+		mWorld=mWorldM[blend[0]];
+#endif	
+
+	
+	float4 waveVec = waveDirX*v.t0.x+waveDirY*v.t0.y + waveSpeed*animTime+waveOffset;
+	waveVec = frac(waveVec);
+	waveVec *= fixup.x;
+	waveVec -= 0.5;
+	waveVec *= 6.2831853071796;
+	float4 sn = sin(waveVec);
+	float d = dot(sn,waveHeight);
+	float4 res = v.pos+float4(v.n*d,0);
+	world_pos=mul(res,mWorld);
+
+	//world_pos=mul(v.pos,mWorld);
+
+	float4 world_pos4=float4(world_pos,1);
+	o.pos=mul(world_pos4,mVP);
+	
+	
+	
+
+#ifdef UVTRANS
+	float3 vt0=float3(v.t0.x,v.t0.y,1);
+	o.t0.x=dot(vt0,vUtrans);
+	o.t0.y=dot(vt0,vVtrans);
+#else
+	o.t0=v.t0;
+#endif
+	float3 world_n;
+	world_n=mul(v.n,(float3x3)mWorld);
+	world_n=normalize(world_n);
+	float3 ldir=-vLightDirection;
+	float3 dir=normalize(vCameraPos-world_pos);
+	float3 half_v=normalize(dir+ldir);
+	float4 ret=lit(dot(world_n,ldir),dot(world_n,half_v),vSpecular.w); 
+
+	float mdiffuse=ret.y;
+	float mspecular=ret.z;
+	o.diffuse.rgb=vDiffuse;//+vAmbient;
+	float dd = (startPhase + 1 - world_n.z);
+	o.diffuse.a = dd*dd*dd*abs(dot(world_n,dir));	
+	
+	//o.specular=0;//mspecular*vSpecular;
+	//o.diffuse.a+=mspecular*0.5f;
+#ifdef ZREFLECTION
+	o.treflection=world_pos*vReflectionMul;
+#endif
+#if defined(FOG_OF_WAR) || defined(LIGHTMAP)
+	o.uv_lightmap=world_pos*fPlanarNode.zw+fPlanarNode.xy;
+#endif	
+	float fogz=mul(world_pos4,mView).z;
+	o.fog=fogz*vFog.z+vFog.y;
+
+    return o;
+}

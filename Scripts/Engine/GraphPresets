@@ -1,0 +1,328 @@
+presets = {
+	5;
+	{
+		locName = {
+			key = "P_Lowest";
+			id = 15952;
+		};
+		preset = {
+			14;
+			{
+				type = OPTION_MAP_LEVEL_LOD;
+				phase = 0.5;
+			},
+			{
+				type = OPTION_SHADOW;
+				number = 0;
+			},
+			{
+				type = OPTION_TILEMAP_DETAIL;
+				flag = false;
+			},
+			{
+				type = OPTION_TEXTURE_DETAIL_LEVEL;
+				number = 0;
+			},
+			{
+				type = OPTION_TILEMAP_TYPE_NORMAL;
+				flag = false;
+			},
+			{
+				type = OPTION_REFLECTION;
+				flag = false;
+			},
+			{
+				type = OPTION_PARTICLE_RATE;
+				phase = 0.;
+			},
+			{
+				type = OPTION_BUMP;
+				flag = false;
+			},
+			{
+				type = OPTION_ANTIALIAS;
+				number = 0;
+			},
+			{
+				type = OPTION_ANISOTROPY;
+				number = 0;
+			},
+			{
+				type = OPTION_SILHOUETTE;
+				flag = false;
+			},
+			{
+				type = OPTION_SOFT_SMOKE;
+				number = 0;
+			},
+			{
+				type = OPTION_BLOOM;
+				flag = false;
+			},
+			{
+				type = OPTION_GRASSDENSITY;
+				phase = 0.;
+			}
+		};
+	},
+	{
+		locName = {
+			key = "P_Low";
+			id = 15954;
+		};
+		preset = {
+			14;
+			{
+				type = OPTION_MAP_LEVEL_LOD;
+				phase = 0.8;
+			},
+			{
+				type = OPTION_SHADOW;
+				number = 1;
+			},
+			{
+				type = OPTION_TILEMAP_DETAIL;
+				flag = true;
+			},
+			{
+				type = OPTION_TEXTURE_DETAIL_LEVEL;
+				number = 1;
+			},
+			{
+				type = OPTION_TILEMAP_TYPE_NORMAL;
+				flag = true;
+			},
+			{
+				type = OPTION_REFLECTION;
+				flag = false;
+			},
+			{
+				type = OPTION_PARTICLE_RATE;
+				phase = 0.4;
+			},
+			{
+				type = OPTION_BUMP;
+				flag = false;
+			},
+			{
+				type = OPTION_ANTIALIAS;
+				number = 0;
+			},
+			{
+				type = OPTION_ANISOTROPY;
+				number = 0;
+			},
+			{
+				type = OPTION_SILHOUETTE;
+				flag = true;
+			},
+			{
+				type = OPTION_SOFT_SMOKE;
+				number = 0;
+			},
+			{
+				type = OPTION_BLOOM;
+				flag = false;
+			},
+			{
+				type = OPTION_GRASSDENSITY;
+				phase = 0.2;
+			}
+		};
+	},
+	{
+		locName = {
+			key = "P_Medium";
+			id = 15956;
+		};
+		preset = {
+			14;
+			{
+				type = OPTION_MAP_LEVEL_LOD;
+				phase = 0.8;
+			},
+			{
+				type = OPTION_SHADOW;
+				number = 2;
+			},
+			{
+				type = OPTION_TILEMAP_DETAIL;
+				flag = true;
+			},
+			{
+				type = OPTION_TEXTURE_DETAIL_LEVEL;
+				number = 1;
+			},
+			{
+				type = OPTION_TILEMAP_TYPE_NORMAL;
+				flag = true;
+			},
+			{
+				type = OPTION_REFLECTION;
+				flag = false;
+			},
+			{
+				type = OPTION_PARTICLE_RATE;
+				phase = 0.6;
+			},
+			{
+				type = OPTION_BUMP;
+				flag = true;
+			},
+			{
+				type = OPTION_ANTIALIAS;
+				number = 1;
+			},
+			{
+				type = OPTION_ANISOTROPY;
+				number = 3;
+			},
+			{
+				type = OPTION_SILHOUETTE;
+				flag = true;
+			},
+			{
+				type = OPTION_SOFT_SMOKE;
+				number = 0;
+			},
+			{
+				type = OPTION_BLOOM;
+				flag = false;
+			},
+			{
+				type = OPTION_GRASSDENSITY;
+				phase = 0.4;
+			}
+		};
+	},
+	{
+		locName = {
+			key = "P_High";
+			id = 15958;
+		};
+		preset = {
+			14;
+			{
+				type = OPTION_MAP_LEVEL_LOD;
+				phase = 1.;
+			},
+			{
+				type = OPTION_SHADOW;
+				number = 3;
+			},
+			{
+				type = OPTION_TILEMAP_DETAIL;
+				flag = true;
+			},
+			{
+				type = OPTION_TEXTURE_DETAIL_LEVEL;
+				number = 2;
+			},
+			{
+				type = OPTION_TILEMAP_TYPE_NORMAL;
+				flag = true;
+			},
+			{
+				type = OPTION_REFLECTION;
+				flag = true;
+			},
+			{
+				type = OPTION_PARTICLE_RATE;
+				phase = 0.8;
+			},
+			{
+				type = OPTION_BUMP;
+				flag = true;
+			},
+			{
+				type = OPTION_ANTIALIAS;
+				number = 3;
+			},
+			{
+				type = OPTION_ANISOTROPY;
+				number = 3;
+			},
+			{
+				type = OPTION_SILHOUETTE;
+				flag = true;
+			},
+			{
+				type = OPTION_SOFT_SMOKE;
+				number = 2;
+			},
+			{
+				type = OPTION_BLOOM;
+				flag = true;
+			},
+			{
+				type = OPTION_GRASSDENSITY;
+				phase = 0.6;
+			}
+		};
+	},
+	{
+		locName = {
+			key = "P_Crazy";
+			id = 15960;
+		};
+		preset = {
+			14;
+			{
+				type = OPTION_MAP_LEVEL_LOD;
+				phase = 1.;
+			},
+			{
+				type = OPTION_SHADOW;
+				number = 3;
+			},
+			{
+				type = OPTION_TILEMAP_DETAIL;
+				flag = true;
+			},
+			{
+				type = OPTION_TEXTURE_DETAIL_LEVEL;
+				number = 2;
+			},
+			{
+				type = OPTION_TILEMAP_TYPE_NORMAL;
+				flag = true;
+			},
+			{
+				type = OPTION_REFLECTION;
+				flag = true;
+			},
+			{
+				type = OPTION_PARTICLE_RATE;
+				phase = 1.;
+			},
+			{
+				type = OPTION_BUMP;
+				flag = true;
+			},
+			{
+				type = OPTION_ANTIALIAS;
+				number = 5;
+			},
+			{
+				type = OPTION_ANISOTROPY;
+				number = 3;
+			},
+			{
+				type = OPTION_SILHOUETTE;
+				flag = true;
+			},
+			{
+				type = OPTION_SOFT_SMOKE;
+				number = 2;
+			},
+			{
+				type = OPTION_BLOOM;
+				flag = true;
+			},
+			{
+				type = OPTION_GRASSDENSITY;
+				phase = 1.;
+			}
+		};
+	}
+};

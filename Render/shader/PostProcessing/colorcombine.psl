@@ -1,0 +1,14 @@
+struct PS_INPUT
+{
+	float2 Tex:TEXCOORD0;
+};
+
+sampler2D SrcTexture1:register(s0);
+sampler2D SrcTexture2:register(s1);
+float3 addColor:register(c0);
+float4 main (const PS_INPUT v):COLOR
+{
+    float3 ColorOrig = tex2D( SrcTexture2, v.Tex );
+    ColorOrig += tex2D( SrcTexture1, v.Tex )+addColor;
+    return float4( ColorOrig, 1.0f );
+}

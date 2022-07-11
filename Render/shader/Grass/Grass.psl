@@ -1,0 +1,44 @@
+struct PS_INPUT
+{
+	float2 uv0:TEXCOORD0;
+	float4 color:COLOR0;
+	float4 shadow:TEXCOORD2;
+#if defined(FOG_OF_WAR) || defined(LIGHTMAP)
+	float2 uv_lightmap:TEXCOORD3;
+#endif
+};
+#if defined(SHADOW_9700) || defined(SHADOW_FX)
+float4 fx_offset:register(c0);
+float4 vShade:register(c2);
+#include "..\Skin\shadow9700.inl"
+#endif
+float4 vFogOfWar:register(c3);
+
+sampler2D t0:register(s0);
+sampler ShadowSampler:register(s2);
+sampler2D LightMapSampler:register(s3);
+float4 main(const PS_INPUT v):COLOR
+{
+	float4 ot = tex2D(t0,v.uv0);
+#if defined(FOG_OF_WAR) || defined(LIGHTMAP)	
+	float4 lightmap=tex2D(LightMapSampler,v.uv_lightmap);
+#endif
+#ifdef LIGHTMAP
+	lightmap.rgb=(lightmap.rgb-0.5);
+#endif
+	float3 diffuse=v.color;
+	#ifdef LIGHTMAP
+		diffuse+=lightmap;
+		diffuse = saturate(diffuse);
+	#endif
+
+	ot.rgb *= diffuse;
+	ot.a *= v.color.a;
+	#if defined(SHADOW_9700) || defined(SHADOW_FX)
+	Shadow(ot.rgb,ShadowSampler,v.shadow);
+	#endif
+#ifdef FOG_OF_WAR
+	ot.rgb=lerp(ot.rgb,vFogOfWar,lightmap.a);
+#endif	
+	return ot;
+} 

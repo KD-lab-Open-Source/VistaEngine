@@ -1,0 +1,30 @@
+struct VS_INPUT
+{
+    float4 pos : POSITION;
+    float2 t0 : TEXCOORD0;
+    float2 t1 : TEXCOORD1;
+	float4 color: COLOR0;
+};
+
+struct VS_OUTPUT
+{
+    float4 pos : POSITION;
+	float2 uv0:TEXCOORD0;
+	float2 uv1:TEXCOORD1;
+	float4 color: COLOR0;
+	float fog: FOG;
+};
+
+float4x4 mWVP:register(c0);
+
+VS_OUTPUT main(const VS_INPUT v)
+{
+	VS_OUTPUT o;
+	o.pos=mul(v.pos,mWVP);
+	o.color=v.color;
+	o.uv0=v.t0;
+	o.uv1=v.t1;
+	
+	o.fog=1;
+	return o;
+}

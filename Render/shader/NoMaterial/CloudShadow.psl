@@ -1,0 +1,37 @@
+struct PS_INPUT
+{
+	float2 uv0:TEXCOORD0;
+	float2 uv1:TEXCOORD1;
+	float4 color: COLOR0;
+};
+sampler2D t0:register(s0);
+sampler2D t1:register(s1);
+
+float4 tfactor;
+float4 tfactorm05;//0.5-0.75*tfactorm05
+
+float4 main(const PS_INPUT v):COLOR
+{
+	float4 tex0=tex2D(t0,v.uv0);
+	float4 tex1=tex2D(t1,v.uv1);
+	float4 ot;
+	//ot.rgb=0.5-tfactor+(tex0+0.5f)*(tex1+0.5f)*tfactor;//ps.2.0 only 
+	
+	float3 c=tex0*tex1+0.5f*tex0+0.5*tex1;
+	ot.rgb=c*tfactor+tfactorm05;
+	
+//	ot.rgb=tex0*tex1;
+	
+	ot.a=tfactor.a;
+	return ot;
+}
+
+/*
+	ot.rgb=0.5-tfactor+(tex0+0.5f)*(tex1+0.5f)*tfactor;
+	ot.rgb=0.5+((tex0+0.5f)*(tex1+0.5f)-1)*tfactor;
+	ot.rgb=0.5+(tex0*tex1+0.5f*tex0+0.5*tex1+0.25-1)*tfactor;
+	
+	ot.rgb=0.5-tfactor;
+	
+	
+*/

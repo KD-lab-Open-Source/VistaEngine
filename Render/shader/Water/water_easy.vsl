@@ -1,0 +1,45 @@
+struct VS_INPUT
+{
+    float4 pos : POSITION;
+	float4  diffuse: COLOR0;
+};
+
+struct VS_OUTPUT
+{
+    float4  pos : POSITION;
+	float4  diffuse: COLOR0;
+    float2  uv_tex0 : TEXCOORD0;
+    float2  uv_tex1 : TEXCOORD1;
+    float2  uv_lightmap : TEXCOORD3;
+    float fog: FOG;
+};
+
+float4x4 mVP;
+float4 uvScaleOffset;
+float4 uvScaleOffset1;
+float4 uvScaleOffsetSky;
+float3 vCameraPos;
+
+float4x4 mView;
+float3 vFog;
+
+float4 fPlanarNode:register(c95);
+
+VS_OUTPUT main(const VS_INPUT v)
+{
+    VS_OUTPUT o;
+	o.pos=mul(v.pos,mVP);
+	o.diffuse=v.diffuse;
+	o.uv_lightmap=v.pos.xy*fPlanarNode.zw+fPlanarNode.xy;
+	float2 uv_offset=uvScaleOffset.zw;
+	float2 uv_scale=uvScaleOffset.xy;
+	o.uv_tex0=uv_offset+v.pos.xy*uv_scale;
+	float2 uv_offset1=uvScaleOffset1.zw;
+	float2 uv_scale1=uvScaleOffset1.xy;
+	o.uv_tex1=uv_offset1+v.pos.yx*uv_scale1;
+	//fog
+	float fogz=mul(v.pos,mView).z;
+	float fog=fogz*vFog.z+vFog.y;
+	o.fog=clamp(fog,0,1);
+	return o;
+}

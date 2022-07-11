@@ -1,0 +1,35 @@
+struct PS_INPUT
+{
+	float2 t:TEXCOORD0;
+	float tdepth:TEXCOORD2;
+#ifdef SECOND_OPACITY_TEXTURE
+	float2 t1:TEXCOORD1;
+#endif	
+}; 
+sampler2D DiffuseSampler:register(s0);
+sampler2D SecondSampler:register(s1);
+float4 main(const PS_INPUT v):COLOR
+{
+#ifdef ALPHA
+
+	float4 o=tex2D(DiffuseSampler,v.t.xy);
+	#ifdef SECOND_OPACITY_TEXTURE
+		float4 t1=tex2D(SecondSampler,v.t1.xy);
+		o.a*=t1.a;
+	#endif
+	
+	clip(o.a-0.32);
+	return float4(v.tdepth,0,0,1);
+#else
+	return float4(v.tdepth,0,0,1);
+#endif
+}
+// Запись в RGB ZBUFFER
+//float3 p=frac(mul(v.tdepth,float3(65536,256,1)));
+//p.yz-=p.xy*float2(1.0f/256,1.0f/256);
+//return float4(p,1);
+
+// Чтение из RGB ZBUFFER
+//float3 pix = tex2Dproj(ZBufferMap,v.zpos);
+//zb = dot(pix,float3(1.f/65536.f,1.f/256.f,1.f));
+

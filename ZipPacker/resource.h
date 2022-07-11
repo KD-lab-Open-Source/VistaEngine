@@ -1,0 +1,50 @@
+//{{NO_DEPENDENCIES}}
+// Microsoft Visual C++ generated include file.
+// Used by ZipPacker.rc
+//
+#define IDD_ABOUTBOX                    100
+#define IDP_OLE_INIT_FAILED             100
+#define IDR_MAINFRAME                   128
+#define IDR_ZipPackerTYPE               129
+#define IDD_ATTRIB_EDITOR               130
+#define IDB_HDRUP                       141
+#define IDB_HDRDOWN                     142
+#define IDB_ATTRIB_EDITOR_CTRL          146
+#define IDD_OUTPUT_PROGRESS             215
+#define IDC_ATTRIB_EDITOR               1000
+#define IDC_HORIZONTAL_LINE             1001
+#define IDC_STATUS_LABEL                1143
+#define IDC_FILE_PROGRESS               1280
+#define IDC_TOTAL_PROGRESS              1281
+#define IDC_FILENAME_LABEL              1282
+#define IDC_TOTAL_LABEL                 1283
+#define IDC_FILE_LABEL                  1284
+#define IDC_CURRENT_LABEL               1285
+#define IDB_TREELIST_BITMAP             8000
+#define IDC_CURSOR_SIZE                 8002
+#define IDB_TREELIST_CHECK              8003
+#define IDB_TREELIST_LOCK               8004
+#define IDC_CURSOR_BUTTON               8005
+#define IDC_CURSOR_CHECK                8006
+#define IDC_CURSOR_LOCK                 8007
+#define IDB_TREELIST_TREE               8008
+#define IDB_TREELIST_SORT               8009
+#define IDB_TREELIST_HEADER             8010
+#define IDB_TREELIST_DISABLE            8011
+#define IDC_CURSOR_VERT                 8012
+#define IDC_CURSOR_HORZ                 8013
+#define IDC_CURSOR_CROSS                8014
+#define IDC_CURSOR_DROP                 8015
+#define IDC_CURSOR_STOP                 8016
+#define IDC_CURSOR_SPLIT                8017
+
+// Next default values for new objects
+// 
+#ifdef APSTUDIO_INVOKED
+#ifndef APSTUDIO_READONLY_SYMBOLS
+#define _APS_NEXT_RESOURCE_VALUE        130
+#define _APS_NEXT_COMMAND_VALUE         32771
+#define _APS_NEXT_CONTROL_VALUE         1000
+#define _APS_NEXT_SYMED_VALUE           101
+#endif
+#endif

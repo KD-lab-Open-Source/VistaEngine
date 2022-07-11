@@ -1,0 +1,23 @@
+struct PS_INPUT
+{
+	float2 uv0:TEXCOORD0;
+	float2 uv1:TEXCOORD1;
+	float2 uv_embm1:TEXCOORD2;
+	float2 uv_embm2:TEXCOORD3;
+};
+
+sampler2D tex0:register(s0);
+sampler2D tex1:register(s1);
+sampler2D embm:register(s2);
+
+float4 main(const PS_INPUT v):COLOR
+{
+	float2 b1=tex2D(embm,v.uv_embm1);
+	float2 b2=tex2D(embm,v.uv_embm2);
+	float2 b=(b1+b2)*0.1;
+	
+	float4 t0=tex2D(tex0,b+v.uv0);
+	float4 t1=tex2D(tex1,b+v.uv1);
+	
+	return t0+t1;
+}

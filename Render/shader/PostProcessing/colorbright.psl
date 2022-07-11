@@ -1,0 +1,24 @@
+struct PS_INPUT
+{
+	float2 Tex:TEXCOORD0;
+};
+
+sampler2D SrcTexture:register(s0);
+float Luminance:register(c0);
+static const float fMiddleGray = 0.18f;
+static const float fWhiteCutoff = 0.8f;
+
+float4 main (const PS_INPUT v):COLOR
+{
+    float3 ColorOut = tex2D( SrcTexture, v.Tex );
+
+    ColorOut *= fMiddleGray / ( Luminance + 0.001f );
+    ColorOut *= ( 1.0f + ( ColorOut / ( fWhiteCutoff * fWhiteCutoff ) ) );
+    ColorOut -= 5.0f;
+
+    ColorOut = max( ColorOut, 0.0f );
+
+    ColorOut /= ( 10.0f + ColorOut );
+
+    return float4( ColorOut, 1.0f );
+}

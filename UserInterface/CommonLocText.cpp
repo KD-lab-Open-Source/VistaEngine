@@ -1,0 +1,127 @@
+#include "StdAfx.h"
+#include "CommonLocText.h"
+#include "Serialization.h"
+#include "skey.h"
+
+WRAP_LIBRARY(CommonLocText, "CommonLocText", "CommonLocText", "Scripts\\Content\\CommonLocTexts", 0, false);
+
+CommonLocText::CommonLocText()
+{
+	locTexts_.resize(UI_COMMON_TEXT_LAST_ENUM);
+
+}
+
+CommonLocText::~CommonLocText()
+{
+}
+
+const char* CommonLocText::getText(UI_CommonLocText text_id) const
+{
+	xassert(text_id >= 0 && text_id < UI_COMMON_TEXT_LAST_ENUM);
+	return locTexts_[text_id].c_str();
+}
+
+UI_CommonLocText CommonLocText::getId(const char* text) const
+{
+	if(text){
+		int idx = 0;
+		LocTextVector::const_iterator it;
+		FOR_EACH(locTexts_, it)
+			if(!strcmp(it->c_str(), text))
+				return UI_CommonLocText(idx);
+			else
+				++idx;
+	}
+	dassert(0 && "ID текста не найден");
+	return UI_COMMON_TEXT_LAST_ENUM;
+}
+
+void CommonLocText::update()
+{
+	LocTextVector::iterator it;
+	FOR_EACH(locTexts_, it){
+		it->update();
+	}
+}
+
+void CommonLocText::serialize(Archive& ar)
+{
+	for(int idx = 0; idx < UI_COMMON_TEXT_LAST_ENUM; ++idx)
+		ar.serialize(locTexts_[idx], getEnumName(UI_CommonLocText(idx)), getEnumNameAlt(UI_CommonLocText(idx)));
+	
+	ar.serialize(anyTexts_, "anyTexts", "Тексты для локализации");
+
+	ar.openStruct("vk_key_names", "локализация клавиш", "sKey");
+	sKey::serializeLocale(ar);
+	ar.closeStruct("vk_key_names");
+}
+
+const char* getLocString(UI_CommonLocText id, const char* def)
+{
+	const char* text = CommonLocText::instance().getText(id);
+	return text && *text ? text : def;
+}
+
+UI_CommonLocText getLocStringId(const char* text)
+{
+	return CommonLocText::instance().getId(text);
+}
+
+BEGIN_ENUM_DESCRIPTOR(UI_CommonLocText, "UI_CommonLocText")
+REGISTER_ENUM(UI_COMMON_TEXT_YES, "Да")
+REGISTER_ENUM(UI_COMMON_TEXT_NO, "Нет")
+REGISTER_ENUM(UI_COMMON_TEXT_DEFAULT, "Любой")
+REGISTER_ENUM(UI_COMMON_TEXT_STAT_FREE_FOR_ALL, "Каждый за себя")
+REGISTER_ENUM(UI_COMMON_TEXT_STAT_1_VS_1, "1 на 1")
+REGISTER_ENUM(UI_COMMON_TEXT_STAT_2_VS_2, "2 на 2")
+REGISTER_ENUM(UI_COMMON_TEXT_STAT_3_VS_3, "3 на 3")
+REGISTER_ENUM(UI_COMMON_TEXT_ANY_UNITS_SIZE, "Любое количество игроков на карте")
+REGISTER_ENUM(UI_COMMON_TEXT_ANY_GAME, "Любая игра (custom или predefine)")
+REGISTER_ENUM(UI_COMMON_TEXT_ALL_GAMES, "Любая игра из фильтра (все игры)")
+REGISTER_ENUM(UI_COMMON_TEXT_ANY_RACE, "Любая раса")
+REGISTER_ENUM(UI_COMMON_TEXT_CUSTOM_GAME, "Custom game")
+REGISTER_ENUM(UI_COMMON_TEXT_PREDEFINE_GAME, "Predefine game")
+REGISTER_ENUM(UI_COMMON_TEXT_INDIVIDUAL_LAN_GAME, "Индивидульная сетевая игра")
+REGISTER_ENUM(UI_COMMON_TEXT_PLAYER_DISCONNECTED, "Игрок отключился")
+REGISTER_ENUM(UI_COMMON_TEXT_TEEM_LAN_GAME, "Командная сетевая игра")
+REGISTER_ENUM(UI_COMMON_TEXT_ERROR_DISCONNECT, "Полный обрыв связи")
+REGISTER_ENUM(UI_COMMON_TEXT_ERROR_SESSION_TERMINATE, "Обрыв сессии")
+REGISTER_ENUM(UI_COMMON_TEXT_ERROR_CONNECTION, "Ошибка подключения")
+REGISTER_ENUM(UI_COMMON_TEXT_ERROR_INCORRECT_VERSION, "Не совпадает версия игры")
+REGISTER_ENUM(UI_COMMON_TEXT_ERROR_ACCOUNT_BAD_PASSWORD, "Пароль пустой или пароли не совпадают")
+REGISTER_ENUM(UI_COMMON_TEXT_ERROR_ACCOUNT_BAD_NAME, "Неверное имя или пароль")
+REGISTER_ENUM(UI_COMMON_TEXT_ERROR_ACCOUNT_LOCKED, "Аккаунт заблокирован")
+REGISTER_ENUM(UI_COMMON_TEXT_ERROR_ACCOUNT_NAME_EXIST, "Имя занято")
+REGISTER_ENUM(UI_COMMON_TEXT_ERROR_ACCOUNT_CREATE, "Ошибка создания аккаунта")
+REGISTER_ENUM(UI_COMMON_TEXT_ERROR_ACCOUNT_CREATE_MAX, "Превышено количество аккаунтов")
+REGISTER_ENUM(UI_COMMON_TEXT_ERROR_ACCOUNT_CREATE_BAD_LIC, "Плохая лицензия")
+REGISTER_ENUM(UI_COMMON_TEXT_ERROR_CREATE_GAME, "Ошибка создания игры")
+REGISTER_ENUM(UI_COMMON_TEXT_ERROR_UNKNOWN, "Неизвестная сетевая ошибка")
+REGISTER_ENUM(UI_COMMON_TEXT_ERROR_OPEN, "Ошибка открытия")
+REGISTER_ENUM(UI_COMMON_TEXT_ERROR_SAVE, "Ошибка сохранения")
+REGISTER_ENUM(UI_COMMON_TEXT_ERROR_GRAPH_INIT, "Ошибка инициализации графики")
+REGISTER_ENUM(UI_COMMON_TEXT_TIME_AM, "время до полудня")
+REGISTER_ENUM(UI_COMMON_TEXT_TIME_PM, "время после полудня")
+REGISTER_ENUM(UI_COMMON_TEXT_SLOT_OPEN, "слот открыт")
+REGISTER_ENUM(UI_COMMON_TEXT_SLOT_CLOSED, "слот закрыт")
+REGISTER_ENUM(UI_COMMON_TEXT_SLOT_AI, "слот выбран AI")
+REGISTER_ENUM(UI_COMMON_TEXT_AI, "Компьютер")
+REGISTER_ENUM(UI_COMMON_TEXT_LANG_ENGLISH, "английский")
+REGISTER_ENUM(UI_COMMON_TEXT_LANG_RUSSIAN, "русский")
+REGISTER_ENUM(UI_COMMON_TEXT_LANG_GERMAN, "немецкий")
+REGISTER_ENUM(UI_COMMON_TEXT_LANG_FRENCH, "французкий")
+REGISTER_ENUM(UI_COMMON_TEXT_LANG_SPANISH, "испанский")
+REGISTER_ENUM(UI_COMMON_TEXT_LANG_ITALIAN, "итальянский")
+REGISTER_ENUM(UI_COMMON_TEXT_CUSTOM_PRESET, "пользовательский набор настроек")
+REGISTER_ENUM(UI_COMMON_TEXT_DISABLED, "Disabled")
+REGISTER_ENUM(UI_COMMON_TEXT_SHADOW_CIRCLE, "Круглые тени")
+REGISTER_ENUM(UI_COMMON_TEXT_SHADOW_BAD, "Плохие тени")
+REGISTER_ENUM(UI_COMMON_TEXT_SHADOW_GOOD, "Хорошие тени")
+REGISTER_ENUM(UI_COMMON_TEXT_TEXTURE_LOW, "Текстуры плохие")
+REGISTER_ENUM(UI_COMMON_TEXT_TEXTURE_MEDIUM, "Текстуры средние")
+REGISTER_ENUM(UI_COMMON_TEXT_TEXTURE_GOOD, "Текстуры хорошие")
+REGISTER_ENUM(UI_COMMON_TEXT_EFFECT_SMOOTH_TERRAIN, "Размытие эффектов только с землей")
+REGISTER_ENUM(UI_COMMON_TEXT_EFFECT_SMOOTH_FULL, "Размытие эффектов полное")
+REGISTER_ENUM(UI_COMMON_TEXT_HIGH_QA, "Высокое качество")
+REGISTER_ENUM(UI_COMMON_TEXT_LOW_QA, "Низкое качество")
+END_ENUM_DESCRIPTOR(UI_CommonLocText)

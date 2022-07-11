@@ -1,0 +1,30 @@
+struct PS_INPUT
+{
+    float4  pos : POSITION;
+    float3  n : TEXCOORD0;
+	float3  T : TEXCOORD1;
+	float3  S : TEXCOORD2;
+	float3  SxT : TEXCOORD3;
+};
+
+float4 main(const PS_INPUT v):COLOR
+{
+	float3 n;
+	float3 T=normalize(v.T);
+	float3 S=normalize(v.S);
+	float3 SxT=normalize(v.SxT);
+//	n.x=T.x*v.n.x+S.x*v.n.y+SxT.x*v.n.z;
+//	n.y=T.y*v.n.x+S.y*v.n.y+SxT.y*v.n.z;
+//	n.z=T.z*v.n.x+S.z*v.n.y+SxT.z*v.n.z;
+
+//	n.x=dot(v.T,v.n);
+//	n.y=dot(v.S,v.n);
+//	n.z=dot(v.SxT,v.n);
+	n=v.n;
+	
+	n=normalize(n);
+	float4 ot;
+	ot.xyz=n;
+	ot.w=1;
+	return ot;
+}

@@ -1,0 +1,47 @@
+Version = 0;
+AiActionChainList = {
+	header = {
+		2;
+		"AttackTarget",
+		"Test_2"
+	};
+	strings = {
+		2;
+		{
+			name = "AttackTarget";
+			aiPairList = {
+				3;
+				{
+					condition = "class AiCondition_FireRadius" {
+					};
+					action = "class AiAction_MoveToFireRadius" {
+					};
+				},
+				{
+					condition = "class AiCondition_RotToPoint" {
+					};
+					action = "class AiAction_RotToPoint" {
+					};
+				},
+				{
+					condition = 					0;
+					action = "class AiAction_Stop" {
+					};
+				}
+			};
+		},
+		{
+			name = "Test_2";
+			aiPairList = {
+				1;
+				{
+					condition = "class AiCondition_FireRadius" {
+					};
+					action = "class AiAction_ExecuteChain" {
+						chain = "AttackTarget";
+					};
+				}
+			};
+		}
+	};
+};

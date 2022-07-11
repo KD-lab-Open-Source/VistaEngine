@@ -1,0 +1,229 @@
+Version = 0;
+ExplodeTable = {
+	header = {
+		9;
+		"Нет взрыва",
+		"Смерть анимацией (становится прозрачным)",
+		"Взрыв здания (осыпание)",
+		"Взрыв юнита",
+		"Смерть анимацией (уходит под землю)",
+		"Взрыв здания (разлет осколков)",
+		"Взрыв здания/юнита (вертикальный)",
+		"Комбинированная смерть",
+		"Взрыв снаряда"
+	};
+	strings = {
+		10;
+		{
+			name = "Нет взрыва";
+			enableExplode = false;
+			animatedDeath = false;
+			alphaDisappear = false;
+			explodeAxisFactors = {
+				x = 1.;
+				y = 1.;
+				z = 1.;
+			};
+			selfPower = 0.;
+			liveTime = 10000.;
+			z_gravity = 9.8;
+			friction = 0.8;
+			restitution = 0.2;
+			relaxation_type = 0;
+			relaxation_time = 0.;
+			velocity_tolerance = 0.;
+			penetration_tolerance = 0.;
+			sleep_velocity = 2.;
+		},
+		{
+			name = "Смерть анимацией (становится прозрачным)";
+			enableExplode = false;
+			animatedDeath = true;
+			alphaDisappear = true;
+			explodeAxisFactors = {
+				x = 4.;
+				y = 1.;
+				z = 1.;
+			};
+			selfPower = 0.;
+			liveTime = 15000.;
+			z_gravity = 9.8;
+			friction = 0.8;
+			restitution = 0.2;
+			relaxation_type = 0;
+			relaxation_time = 0.;
+			velocity_tolerance = 0.;
+			penetration_tolerance = 0.;
+			sleep_velocity = 4.;
+		},
+		{
+			name = "Взрыв здания (осыпание)";
+			enableExplode = true;
+			animatedDeath = false;
+			alphaDisappear = true;
+			explodeAxisFactors = {
+				x = 1.;
+				y = 1.;
+				z = 1.;
+			};
+			selfPower = 0.;
+			liveTime = 10000.;
+			z_gravity = 100.;
+			friction = 1.5;
+			restitution = 5.e-002;
+			relaxation_type = 0;
+			relaxation_time = 2.;
+			velocity_tolerance = 0.2;
+			penetration_tolerance = 0.2;
+			sleep_velocity = 4.;
+		},
+		{
+			name = "Взрыв юнита";
+			enableExplode = true;
+			animatedDeath = false;
+			alphaDisappear = true;
+			explodeAxisFactors = {
+				x = 1.;
+				y = 1.;
+				z = 1.;
+			};
+			selfPower = 30.;
+			liveTime = 15000.;
+			z_gravity = 100.;
+			friction = 0.99;
+			restitution = 0.1;
+			relaxation_type = 0;
+			relaxation_time = 0.;
+			velocity_tolerance = 0.;
+			penetration_tolerance = 0.;
+			sleep_velocity = 4.;
+		},
+		{
+			name = "Смерть анимацией (уходит под землю)";
+			enableExplode = false;
+			animatedDeath = true;
+			alphaDisappear = false;
+			explodeAxisFactors = {
+				x = 1.;
+				y = 1.;
+				z = 1.;
+			};
+			selfPower = 0.;
+			liveTime = 15000.;
+			z_gravity = 9.8;
+			friction = 0.8;
+			restitution = 0.2;
+			relaxation_type = 0;
+			relaxation_time = 0.;
+			velocity_tolerance = 0.;
+			penetration_tolerance = 0.;
+			sleep_velocity = 4.;
+		},
+		{
+			name = "Взрыв здания (разлет осколков)";
+			enableExplode = true;
+			animatedDeath = false;
+			alphaDisappear = true;
+			explodeAxisFactors = {
+				x = 1.;
+				y = 1.;
+				z = 1.;
+			};
+			selfPower = 10.;
+			liveTime = 10000.;
+			z_gravity = 100.;
+			friction = 1.5;
+			restitution = 5.e-002;
+			relaxation_type = 0;
+			relaxation_time = 2.;
+			velocity_tolerance = 0.2;
+			penetration_tolerance = 0.2;
+			sleep_velocity = 4.;
+		},
+		{
+			name = "Взрыв здания/юнита (вертикальный)";
+			enableExplode = true;
+			animatedDeath = false;
+			alphaDisappear = true;
+			explodeAxisFactors = {
+				x = 0.;
+				y = 0.;
+				z = 1.;
+			};
+			selfPower = 30.;
+			liveTime = 10000.;
+			z_gravity = 100.;
+			friction = 0.99;
+			restitution = 0.1;
+			relaxation_type = 0;
+			relaxation_time = 0.;
+			velocity_tolerance = 0.;
+			penetration_tolerance = 0.;
+			sleep_velocity = 4.;
+		},
+		{
+			name = "Комбинированная смерть";
+			enableExplode = true;
+			animatedDeath = true;
+			alphaDisappear = true;
+			explodeAxisFactors = {
+				x = 1.;
+				y = 1.;
+				z = 1.;
+			};
+			selfPower = 10.;
+			liveTime = 10000.;
+			z_gravity = 100.;
+			friction = 1.5;
+			restitution = 2.e-002;
+			relaxation_type = 0;
+			relaxation_time = 2.;
+			velocity_tolerance = 0.2;
+			penetration_tolerance = 0.2;
+			sleep_velocity = 4.;
+		},
+		{
+			name = "Рэг Долл";
+			enableExplode = false;
+			animatedDeath = false;
+			enableRagDoll = true;
+			alphaDisappear = false;
+			explodeAxisFactors = {
+				x = 0.;
+				y = 0.;
+				z = 0.;
+			};
+			selfPower = 0.;
+			liveTime = 10000.;
+			z_gravity = 100.;
+			friction = 1.5;
+			restitution = 2.e-002;
+			relaxation_type = 0;
+			relaxation_time = 2.;
+			velocity_tolerance = 0.2;
+			penetration_tolerance = 0.2;
+			sleep_velocity = 4.;
+		},
+		{
+			name = "Взрыв снаряда";
+			enableExplode = true;
+			animatedDeath = false;
+			alphaDisappear = true;
+			explodeAxisFactors = {
+				x = 0.;
+				y = 0.;
+				z = 1.;
+			};
+			selfPower = 3.;
+			liveTime = 15000.;
+			z_gravity = 100.;
+			friction = 0.99;
+			restitution = 0.1;
+			relaxation_type = 0;
+			relaxation_time = 0.;
+			velocity_tolerance = 0.;
+			penetration_tolerance = 0.;
+			sleep_velocity = 4.;
+		}
+	};
+};

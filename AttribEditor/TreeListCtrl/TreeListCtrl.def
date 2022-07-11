@@ -1,0 +1,6 @@
+; TreeListCtrl.def : Declares the module parameters for the DLL.
+
+LIBRARY      "xtreelistctrlvc71_st_mt_d"
+
+EXPORTS
+    ; Explicit exports can go here

@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IGameExporter", "IGameExporter.vcproj", "{90E341D2-097E-4249-9E0A-DB473D9D0953}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+		Release MAX 7 = Release MAX 7
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{90E341D2-097E-4249-9E0A-DB473D9D0953}.Debug.ActiveCfg = Debug|Win32
+		{90E341D2-097E-4249-9E0A-DB473D9D0953}.Debug.Build.0 = Debug|Win32
+		{90E341D2-097E-4249-9E0A-DB473D9D0953}.Release.ActiveCfg = Release|Win32
+		{90E341D2-097E-4249-9E0A-DB473D9D0953}.Release.Build.0 = Release|Win32
+		{90E341D2-097E-4249-9E0A-DB473D9D0953}.Release MAX 7.ActiveCfg = Release MAX 7|Win32
+		{90E341D2-097E-4249-9E0A-DB473D9D0953}.Release MAX 7.Build.0 = Release MAX 7|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

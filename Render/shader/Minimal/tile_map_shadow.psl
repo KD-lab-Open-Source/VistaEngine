@@ -1,0 +1,13 @@
+struct PS_INPUT
+{
+	float uv0:TEXCOORD0;
+};
+
+float4 main(const PS_INPUT v):COLOR
+{
+#ifdef SHADOW_9700
+    return float4(v.uv0,v.uv0,v.uv0,v.uv0);
+#else
+	return float4(0,0,1,1);
+#endif
+}

@@ -1,0 +1,33 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XMath", "XMath.vcproj", "{FC069613-3598-4F30-891B-D441EEF763BE}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		MT = MT
+		MT Debug = MT Debug
+		MT DLL = MT DLL
+		MT DLL Debug = MT DLL Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{FC069613-3598-4F30-891B-D441EEF763BE}.Debug.ActiveCfg = Debug|Win32
+		{FC069613-3598-4F30-891B-D441EEF763BE}.Debug.Build.0 = Debug|Win32
+		{FC069613-3598-4F30-891B-D441EEF763BE}.MT.ActiveCfg = MT|Win32
+		{FC069613-3598-4F30-891B-D441EEF763BE}.MT.Build.0 = MT|Win32
+		{FC069613-3598-4F30-891B-D441EEF763BE}.MT Debug.ActiveCfg = MT Debug|Win32
+		{FC069613-3598-4F30-891B-D441EEF763BE}.MT Debug.Build.0 = MT Debug|Win32
+		{FC069613-3598-4F30-891B-D441EEF763BE}.MT DLL.ActiveCfg = MT DLL|Win32
+		{FC069613-3598-4F30-891B-D441EEF763BE}.MT DLL.Build.0 = MT DLL|Win32
+		{FC069613-3598-4F30-891B-D441EEF763BE}.MT DLL Debug.ActiveCfg = MT DLL Debug|Win32
+		{FC069613-3598-4F30-891B-D441EEF763BE}.MT DLL Debug.Build.0 = MT DLL Debug|Win32
+		{FC069613-3598-4F30-891B-D441EEF763BE}.Release.ActiveCfg = Release|Win32
+		{FC069613-3598-4F30-891B-D441EEF763BE}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

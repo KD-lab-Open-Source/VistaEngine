@@ -1,0 +1,17 @@
+struct PS_INPUT
+{
+	float2 Tex:TEXCOORD0;
+	float4 diffuse:COLOR0;
+};
+
+sampler2D SrcTexture:register(s0);
+sampler2D Texture:register(s1);
+float fTime:register(c0);
+float4 main (const PS_INPUT v):COLOR
+{
+	float3 c2 = tex2D(Texture,v.Tex);
+	float3 c = tex2D(SrcTexture,v.Tex+lerp(0,c2.gb*0.01f,fTime));
+	float3 cm = c/lerp(1,(1-c2),fTime);
+	return float4(cm,1);
+	//return float4(c.rgb,1);
+}

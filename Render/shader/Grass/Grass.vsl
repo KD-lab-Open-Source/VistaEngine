@@ -1,0 +1,93 @@
+struct VS_INPUT
+{
+    float4 pos : POSITION;
+    float4 color: COLOR0;
+    float4 t0 : TEXCOORD0;
+    float t1 : TEXCOORD1;
+    float4 n: NORMAL;
+}; 
+
+struct VS_OUTPUT
+{
+    float4 pos : POSITION;
+#ifdef ZBUFFER    
+	float tdepth:TEXCOORD2;
+#else
+	float4 color:COLOR0;
+	float2 uv0:TEXCOORD0;
+#ifdef SHADOW
+	float4  tshadow : TEXCOORD2;
+#endif
+#if defined(FOG_OF_WAR) || defined(LIGHTMAP)
+	float2 uv_lightmap:TEXCOORD3;
+#endif
+	float fog: FOG;
+#endif
+}; 
+float4x4 mVP:register(c0);
+float3 vLightDirection: register(c4);
+float time:register(c5);
+float hideDistance:register(c6);
+float4 SunDiffuse:register(c7);
+float3 vCameraPos: register(c8);
+float4x3 mWorld: register(c9);
+float4x4 mView:register(c12);
+float3 vFog:register(c16);
+float4x4 mShadow:register(c70);
+float4 fPlanarNode:register(c95);
+#ifdef ZBUFFER
+float2 vDofParams:register(c96);
+#endif
+
+VS_OUTPUT main(const VS_INPUT v)
+{
+    VS_OUTPUT o;
+    float sc = saturate(time-v.t1);
+    float y = v.t0.w;
+    float z = y*(1-sc);
+    float x = v.t0.z;
+    float shift = v.color.a*2.5f;
+    float3 displ={x,y*sc,z};
+
+	float2 fTime;
+	fTime       = frac(v.pos.xz + shift*time);
+	fTime       *= 2.0f;
+	fTime       -= 1.0f;
+	fTime       = fTime * fTime * fTime - fTime;
+	displ.x        += (fTime.x + fTime.y)*2;
+    
+	float3 tpos = v.pos.xyz - vCameraPos;
+	float distanceReal = dot(tpos,tpos);
+	float alpha = 1-distanceReal*hideDistance;
+	//float alpha = 1;
+	//alpha = lerp(0.4f,1,alpha);
+	displ.y *= min(2.0f,1+distanceReal*hideDistance);
+    //displ *= alpha;
+    displ = mul(displ,mWorld);
+    float4 pos = {v.pos.x+displ.x,
+			   v.pos.y+displ.y,
+			   v.pos.z+displ.z,1};
+
+	o.pos = mul(pos,mVP);
+#ifdef ZBUFFER
+	o.tdepth = o.pos.z;
+#else
+	float ret =-dot(v.n*2-1,vLightDirection);
+#ifdef OLD_LIGHTING    
+    o.color.rgb = (ret*(v.color.rgb+v.n.a)*SunDiffuse.rgb+SunDiffuse.w)*sc;
+#else
+    o.color.rgb = (v.color.rgb+v.n.a)*(ret*SunDiffuse.rgb+SunDiffuse.w)*sc;
+#endif
+    o.uv0.xy = v.t0.xy*0.0001f;
+    o.color.a = alpha;
+#ifdef SHADOW
+	o.tshadow=mul(pos,mShadow);
+#endif
+#if defined(FOG_OF_WAR) || defined(LIGHTMAP)
+	o.uv_lightmap=pos*fPlanarNode.zw+fPlanarNode.xy;
+#endif	
+	float fogz=mul(pos,mView).z;
+	o.fog=fogz*vFog.z+vFog.y;
+#endif
+    return o;
+}

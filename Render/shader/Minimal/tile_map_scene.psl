@@ -1,0 +1,87 @@
+struct PS_INPUT
+{
+  float2 uv_color:TEXCOORD0;
+  float2 uv_lightmap:TEXCOORD3;
+#ifdef VERTEX_LIGHT
+  float3  color: COLOR0;
+#else
+  float2 uv_mapbump:TEXCOORD1;
+#endif
+  float4 shadow:TEXCOORD2;
+#ifdef DETAIL_TEXTURE 
+  float2 minitexture:TEXCOORD4;
+#endif  
+#ifdef ZREFLECTION
+  float3  treflection: TEXCOORD5;
+#endif 
+};
+
+sampler2D ColorSampler:register(s0);
+sampler2D MapBumpSampler:register(s1);
+sampler2D LightMapSampler:register(s3);
+
+sampler ShadowSampler:register(s2);
+sampler ShadowMinitexture:register(s4);
+sampler2D ReflectionZ:register(s5);
+
+float4 light_color:register(c0);
+float3 inv_light_dir:register(c1);
+float4 vShade:register(c2);
+float4 vFogOfWar:register(c3);
+
+float4 fx_offset:register(c4);
+#include "..\skin\shadow9700.inl"
+
+float4 main(const PS_INPUT v):COLOR
+{
+#ifdef VERTEX_LIGHT
+  float3 light=v.color;
+#else
+  float3 mapbump=tex2D(MapBumpSampler,v.uv_mapbump);
+  mapbump.z=0.5;
+  mapbump=normalize(mapbump);
+//  return float4(mapbump,1);
+//  mapbump=mapbump*2-1;
+//  mapbump.z=sqrt(1-mapbump.x*mapbump.x-mapbump.y*mapbump.y);
+
+  float3 light=dot(mapbump,inv_light_dir.rgb);
+  light=light*light_color.rgb+light_color.a;
+#endif  
+  float4 ot=tex2D(ColorSampler,v.uv_color);
+  float4 lightmap=tex2D(LightMapSampler,v.uv_lightmap);
+  
+  lightmap.rgb=2*(lightmap.rgb-0.5);
+  light+=lightmap.rgb;
+//  light*=lightmap.rgb*2;
+    
+  ot.rgb*=light;
+#ifdef DETAIL_TEXTURE
+  ot.rgb+=tex2D(ShadowMinitexture,v.minitexture)-0.5;
+#endif
+
+  #if defined(SHADOW_9700) || defined(SHADOW_FX)
+  Shadow(ot.rgb,ShadowSampler,v.shadow);
+  #endif
+  
+#ifdef FOG_OF_WAR
+  ot.rgb=lerp(ot.rgb,vFogOfWar,lightmap.a);
+  //ot.rgb=lightmap.a;
+#endif
+
+#ifdef ZREFLECTION
+  float4 refz_raw=tex2D(ReflectionZ,v.treflection);
+  float refz=refz_raw.w*256+refz_raw.x;
+  clip(v.treflection.z-refz);
+#endif
+  return ot;
+}
+
+/*
+   Про туман войны. В каждый ps/vs шейдер вставить соответствующюю текстуру.
+   В корень шейдеров вставить установку vFogOfWar,fPlanarNode и 
+   выбор FOG_OF_WAR глобальный(!!!) в зависимости от камеры.
+   Написать простой шейдер для alpha blend и тумана войны, вставить его в SetNoMaterial.
+    Возможно fPlanarNode прикрутить жестко к определённому регистру, и устанавливать в камере.
+   
+   Про shadow map - вырубить расчёт освещения при расчете Z-буфера для shadow map.
+*/

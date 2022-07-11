@@ -1,0 +1,69 @@
+struct VS_INPUT
+{
+    float4 pos : POSITION;
+    float2 t0 : TEXCOORD0;
+#ifdef COLOR_OPERATION
+    float2 t1 : TEXCOORD1;
+#endif
+	float4 color: COLOR0;
+};
+
+struct VS_OUTPUT
+{
+    float4 pos : POSITION;
+	float2 uv0:TEXCOORD0;
+#ifdef COLOR_OPERATION
+	float2 uv1:TEXCOORD1;
+#endif	
+	float4 color: COLOR0;
+	float2 uv_lightmap:TEXCOORD2;
+#ifdef ZREFLECTION
+	float3  treflection: TEXCOORD5;
+#endif
+#ifdef FLOAT_ZBUFFER
+	float4 zpos:TEXCOORD3;
+#endif
+	float fog: FOG;
+};
+
+float4x4 mWVP:register(c0);
+float4x4 mWorld:register(c4);
+#ifdef FLOAT_ZBUFFER
+float4x4 mZBuffer:register(c8);
+#endif
+float4x4 mView:register(c90);
+float3 vReflectionMul:register(c87);
+
+float3 vFog:register(c94);
+float4 fPlanarNode:register(c95);
+
+VS_OUTPUT main(const VS_INPUT v)
+{
+	VS_OUTPUT o;
+	o.pos=mul(v.pos,mWVP);
+	o.color=v.color;
+	o.uv0=v.t0;
+#ifdef COLOR_OPERATION
+	o.uv1=v.t1;
+#endif
+	
+	float4 world_pos=mul(v.pos,mWorld);
+	o.uv_lightmap=world_pos*fPlanarNode.zw+fPlanarNode.xy;
+	//fog
+	float fogz=mul(world_pos,mView).z;
+#ifdef FLOAT_ZBUFFER
+	o.zpos = mul(world_pos,mZBuffer);
+#endif	
+	float fog=fogz*vFog.z+vFog.y;
+#ifdef FIX_FOG_ADD_BLEND
+	o.color.a*=clamp(fog,0,1);
+	o.fog=1;
+#else	
+	o.fog=fog;
+#endif	
+#ifdef ZREFLECTION
+	o.treflection=world_pos*vReflectionMul;
+#endif
+
+	return o;
+}

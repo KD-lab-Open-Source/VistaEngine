@@ -1,0 +1,319 @@
+
+<models>
+	<node>
+		<title value='Akpatok Island'/>
+		<texture src='GeoTool\res\Templates\models\64x64\EarthAsArt\AkpatokIsland.tga'/>
+	</node>
+	<node>
+		<title value='AkpatokIsland-a'/>
+		<texture src='GeoTool\res\Templates\AkpatokIsland-a.tga'/>
+	</node>
+	<node>
+		<title value='AkpatokIsland_b'/>
+		<texture src='GeoTool\res\Templates\AkpatokIsland_b.tga'/>
+	</node>
+	<node>
+		<title value='BONAGE'/>
+		<texture src='GeoTool\res\Templates\BONAGE.tga'/>
+	</node>
+	<node>
+		<title value='BONAGE_a'/>
+		<texture src='GeoTool\res\Templates\BONAGE_a.tga'/>
+	</node>
+	<node>
+		<title value='001'/>
+		<texture src='GeoTool\res\Templates\001.tga'/>
+	</node>
+	<node>
+		<title value='001_a'/>
+		<texture src='GeoTool\res\Templates\001_a.tga'/>
+	</node>
+	<node>
+		<title value='001_b'/>
+		<texture src='GeoTool\res\Templates\001_b.tga'/>
+	</node>
+	<node>
+		<title value='002'/>
+		<texture src='GeoTool\res\Templates\002.tga'/>
+	</node>
+	<node>
+		<title value='002a'/>
+		<texture src='GeoTool\res\Templates\002a.tga'/>
+	</node>
+	<node>
+		<title value='Snow'/>
+		<texture src='GeoTool\res\Templates\Snow.tga'/>
+	</node>
+	<node>
+		<title value='003'/>
+		<texture src='GeoTool\res\Templates\003.tga'/>
+	</node>
+	<node>
+		<title value='003a'/>
+		<texture src='GeoTool\res\Templates\003a.tga'/>
+	</node>
+	<node>
+		<title value='Stone_3'/>
+		<texture src='GeoTool\res\Templates\Stone_3.tga'/>
+	</node>
+	<node>
+		<title value='Stone_blue'/>
+		<texture src='GeoTool\res\Templates\Stone_blue.tga'/>
+	</node>
+	<node>
+		<title value='Stone_blue_a'/>
+		<texture src='GeoTool\res\Templates\Stone_blue_a.tga'/>
+	</node>
+	<node>
+		<title value='Stone_blue_b'/>
+		<texture src='GeoTool\res\Templates\Stone_blue_b.tga'/>
+	</node>
+	<node>
+		<title value='Wood_2'/>
+		<texture src='GeoTool\res\Templates\Wood_2.tga'/>
+	</node>
+	<node>
+		<title value='Wood_2a'/>
+		<texture src='GeoTool\res\Templates\Wood_2a.tga'/>
+	</node>
+	<node>
+		<title value='bear'/>
+		<texture src='GeoTool\res\Templates\models\bear.tga'/>
+	</node>
+	<node>
+		<title value='stone_1'/>
+		<texture src='GeoTool\res\Templates\stone_1.tga'/>
+	</node>
+	<node>
+		<title value='Some_5'/>
+		<texture src='GeoTool\res\Templates\Some_5.tga'/>
+	</node>
+	<node>
+		<title value='Some_7'/>
+		<texture src='GeoTool\res\Templates\Some_7.tga'/>
+	</node>
+	<node>
+		<title value='ALIENTRANSE'/>
+		<texture src='GeoTool\res\Templates\ALIENTRANSE.tga'/>
+	</node>
+	<node>
+		<title value='Stone_2'/>
+		<texture src='GeoTool\res\Templates\Stone_2.tga'/>
+	</node>
+	<node>
+		<title value='Stone_2a'/>
+		<texture src='GeoTool\res\Templates\Stone_2a.tga'/>
+	</node>
+	<node>
+		<title value='Stone_2b'/>
+		<texture src='GeoTool\res\Templates\Stone_2b.tga'/>
+	</node>
+	<node>
+		<title value='Water'/>
+		<texture src='GeoTool\res\Templates\Water.tga'/>
+	</node>
+	<node>
+		<title value='Bubbles'/>
+		<texture src='GeoTool\res\Templates\Bubbles.tga'/>
+	</node>
+	<node>
+		<title value='Aleutian Clouds'/>
+		<texture src='GeoTool\res\Templates\models\64x64\EarthAsArt\AleutianClouds.tga'/>
+	</node>
+	<node>
+		<title value='Wood_3'/>
+		<texture src='GeoTool\res\Templates\Wood_3.tga'/>
+	</node>
+	<node>
+		<title value='Wood_4'/>
+		<texture src='GeoTool\res\Templates\Wood_4.tga'/>
+	</node>
+	<node>
+		<title value='sand_01'/>
+		<texture src='GeoTool\res\Templates\sand_01.tga'/>
+	</node>
+	<node>
+		<title value='Atlas Mountains'/>
+		<texture src='GeoTool\res\Templates\models\64x64\EarthAsArt\AtlasMountains.tga'/>
+	</node>
+	<node>
+		<title value='Demini River'/>
+		<texture src='GeoTool\res\Templates\models\64x64\EarthAsArt\DeminiRiver.tga'/>
+	</node>
+	<node>
+		<title value='Ganges River Delta'/>
+		<texture src='GeoTool\res\Templates\models\64x64\EarthAsArt\GangesRiverDelta.tga'/>
+	</node>
+	<node>
+		<title value='xMark'/>
+		<texture src='GeoTool\res\Templates\xMark.tga'/>
+	</node>
+	<node>
+		<title value='xMark_a'/>
+		<texture src='GeoTool\res\Templates\xMark_a.tga'/>
+	</node>
+	<node>
+		<title value='Great Sandy Scars'/>
+		<texture src='GeoTool\res\Templates\models\64x64\EarthAsArt\GreatSandyScars.tga'/>
+	</node>
+	<node>
+		<title value='Icefall 1'/>
+		<texture src='GeoTool\res\Templates\models\64x64\EarthAsArt\Icefall0.tga'/>
+	</node>
+	<node>
+		<title value='XMars'/>
+		<texture src='GeoTool\res\Templates\XMars.tga'/>
+	</node>
+	<node>
+		<title value='Icefall 2'/>
+		<texture src='GeoTool\res\Templates\models\64x64\EarthAsArt\Icefall1.tga'/>
+	</node>
+	<node>
+		<title value='Mine 1'/>
+		<texture src='GeoTool\res\Templates\models\64x64\Mine0.tga'/>
+	</node>
+	<node>
+		<title value='Lines'/>
+		<texture src='GeoTool\res\Templates\Lines.tga'/>
+	</node>
+	<node>
+		<title value='004'/>
+		<texture src='GeoTool\res\Templates\004.tga'/>
+	</node>
+	<node>
+		<title value='005'/>
+		<texture src='GeoTool\res\Templates\005.tga'/>
+	</node>
+	<node>
+		<title value='005_a'/>
+		<texture src='GeoTool\res\Templates\005_a.tga'/>
+	</node>
+	<node>
+		<title value='005_b'/>
+		<texture src='GeoTool\res\Templates\005_b.tga'/>
+	</node>
+	<node>
+		<title value='006'/>
+		<texture src='GeoTool\res\Templates\006.tga'/>
+	</node>
+	<node>
+		<title value='006_a'/>
+		<texture src='GeoTool\res\Templates\006_a.tga'/>
+	</node>
+	<node>
+		<title value='007'/>
+		<texture src='GeoTool\res\Templates\007.tga'/>
+	</node>
+	<node>
+		<title value='008'/>
+		<texture src='GeoTool\res\Templates\008.tga'/>
+	</node>
+	<node>
+		<title value='009'/>
+		<texture src='GeoTool\res\Templates\009.tga'/>
+	</node>
+	<node>
+		<title value='010'/>
+		<texture src='GeoTool\res\Templates\010.tga'/>
+	</node>
+	<node>
+		<title value='011'/>
+		<texture src='GeoTool\res\Templates\011.tga'/>
+	</node>
+	<node>
+		<title value='012'/>
+		<texture src='GeoTool\res\Templates\012.tga'/>
+	</node>
+	<node>
+		<title value='013'/>
+		<texture src='GeoTool\res\Templates\013.tga'/>
+	</node>
+	<node>
+		<title value='013a'/>
+		<texture src='GeoTool\res\Templates\013a.tga'/>
+	</node>
+	<node>
+		<title value='014'/>
+		<texture src='GeoTool\res\Templates\014.tga'/>
+	</node>
+	<node>
+		<title value='015'/>
+		<texture src='GeoTool\res\Templates\015.tga'/>
+	</node>
+	<node>
+		<title value='016'/>
+		<texture src='GeoTool\res\Templates\016.tga'/>
+	</node>
+	<node>
+		<title value='016_a'/>
+		<texture src='GeoTool\res\Templates\016_a.tga'/>
+	</node>
+	<node>
+		<title value='017'/>
+		<texture src='GeoTool\res\Templates\017.tga'/>
+	</node>
+	<node>
+		<title value='018'/>
+		<texture src='GeoTool\res\Templates\018.tga'/>
+	</node>
+	<node>
+		<title value='018a'/>
+		<texture src='GeoTool\res\Templates\018a.tga'/>
+	</node>
+	<node>
+		<title value='019'/>
+		<texture src='GeoTool\res\Templates\019.tga'/>
+	</node>
+	<node>
+		<title value='019_a'/>
+		<texture src='GeoTool\res\Templates\019_a.tga'/>
+	</node>
+	<node>
+		<title value='Mine 2'/>
+		<texture src='GeoTool\res\Templates\models\64x64\Mine1.tga'/>
+	</node>
+	<node>
+		<title value='IceCream'/>
+		<texture src='GeoTool\res\Templates\models\16x16\IceCream.tga'/>
+	</node>
+	<node>
+		<title value='Stone_4'/>
+		<texture src='GeoTool\res\Templates\Stone_4.tga'/>
+	</node>
+	<node>
+		<title value='001'/>
+		<texture src='GeoTool\res\Templates\001.tga'/>
+	</node>
+	<node>
+		<title value='Wood 1'/>
+		<texture src='GeoTool\res\Templates\models\16x16\Mine.tga'/>
+	</node>
+	<node>
+		<title value='Wood 2'/>
+		<texture src='GeoTool\res\Templates\models\16x16\Mine.tga'/>
+	</node>
+	<node>
+		<title value='Eyes'/>
+		<texture src='GeoTool\res\Templates\models\16x16\Eyes.tga'/>
+	</node>
+	<node>
+		<title value='Clang'/>
+		<texture src='GeoTool\res\Templates\models\16x16\Clang.tga'/>
+	</node>
+	<node>
+		<title value='Some_3'/>
+		<texture src='GeoTool\res\Templates\Some_3.tga'/>
+	</node>
+	<node>
+		<title value='Brown'/>
+		<texture src='GeoTool\res\Templates\models\16x16\Brown.tga'/>
+	</node>
+	<node>
+		<title value='Flame'/>
+		<texture src='GeoTool\res\Templates\models\flame.tga'/>
+	</node>
+	<node>
+		<title value='grey'/>
+		<texture src='GeoTool\res\Templates\grey.tga'/>
+	</node>
+</models>

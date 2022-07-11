@@ -1,0 +1,15 @@
+struct PS_INPUT
+{
+	float2 uv0:TEXCOORD0;
+};
+
+sampler2D DiffuseSampler:register(s0);
+
+float4 main(const PS_INPUT v):COLOR
+{
+    float4 t0 = tex2D(DiffuseSampler,v.uv0);
+    t0.rgb=t0.a;
+    t0.a=1;
+    return t0;
+}
+

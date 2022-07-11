@@ -1,0 +1,9 @@
+Dictionary = {
+	dictionary = {
+		1;
+		{
+			first = "class AttributeReal";
+			second = "class AttributeLegionary";
+		}
+	};
+};

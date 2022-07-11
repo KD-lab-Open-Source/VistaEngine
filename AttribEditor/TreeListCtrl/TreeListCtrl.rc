@@ -1,0 +1,104 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Russian resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
+#ifdef _WIN32
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+#pragma code_page(1251)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_TREELIST_TREE       BITMAP                  "res\\bm_def_tree.bmp"
+IDB_TREELIST_SORT       BITMAP                  "res\\bm_def_sort.bmp"
+IDB_TREELIST_LOCK       BITMAP                  "res\\bm_lockbox.bmp"
+IDB_TREELIST_HEADER     BITMAP                  "res\\bm_def_head.bmp"
+IDB_TREELIST_DISABLE    BITMAP                  "res\\bm_bkgnd2.bmp"
+IDB_TREELIST_CHECK      BITMAP                  "res\\bm_checkbox.bmp"
+IDB_TREELIST_BITMAP     BITMAP                  "res\\bm_bkgnd.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_CURSOR_VERT         CURSOR                  "res\\cur_vert.cur"
+IDC_CURSOR_STOP         CURSOR                  "res\\cur_stop.cur"
+IDC_CURSOR_SPLIT        CURSOR                  "res\\cur_split.cur"
+IDC_CURSOR_SIZE         CURSOR                  "res\\cursor_s.cur"
+IDC_CURSOR_LOCK         CURSOR                  "res\\cur_lockbox.cur"
+IDC_CURSOR_HORZ         CURSOR                  "res\\cur_horz.cur"
+IDC_CURSOR_DROP         CURSOR                  "res\\cur_drop.cur"
+IDC_CURSOR_CROSS        CURSOR                  "res\\cur_cross.cur"
+IDC_CURSOR_CHECK        CURSOR                  "res\\cur_checkbox.cur"
+IDC_CURSOR_BUTTON       CURSOR                  "res\\cur_button.cur"
+#endif    // Russian resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

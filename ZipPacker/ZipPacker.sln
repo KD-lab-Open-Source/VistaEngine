@@ -1,0 +1,60 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZipPacker", "ZipPacker.vcproj", "{95CE74E2-79C0-4277-8A45-2DF0D9E234A3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3255C187-3794-48D2-9228-904CFFB7FA5B} = {3255C187-3794-48D2-9228-904CFFB7FA5B}
+		{32F47DFC-DA16-4F61-9B0B-3B9D272CC72F} = {32F47DFC-DA16-4F61-9B0B-3B9D272CC72F}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Serialization", "..\Util\Serialization\lib\Serialization.vcproj", "{3255C187-3794-48D2-9228-904CFFB7FA5B}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TreeListCtrl", "..\AttribEditor\TreeListCtrl\TreeListCtrl.vcproj", "{32F47DFC-DA16-4F61-9B0B-3B9D272CC72F}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Debug DLL = Debug DLL
+		Final = Final
+		Release = Release
+		Release DLL = Release DLL
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{95CE74E2-79C0-4277-8A45-2DF0D9E234A3}.Debug.ActiveCfg = Debug|Win32
+		{95CE74E2-79C0-4277-8A45-2DF0D9E234A3}.Debug.Build.0 = Debug|Win32
+		{95CE74E2-79C0-4277-8A45-2DF0D9E234A3}.Debug DLL.ActiveCfg = Debug|Win32
+		{95CE74E2-79C0-4277-8A45-2DF0D9E234A3}.Debug DLL.Build.0 = Debug|Win32
+		{95CE74E2-79C0-4277-8A45-2DF0D9E234A3}.Final.ActiveCfg = Release|Win32
+		{95CE74E2-79C0-4277-8A45-2DF0D9E234A3}.Final.Build.0 = Release|Win32
+		{95CE74E2-79C0-4277-8A45-2DF0D9E234A3}.Release.ActiveCfg = Release|Win32
+		{95CE74E2-79C0-4277-8A45-2DF0D9E234A3}.Release.Build.0 = Release|Win32
+		{95CE74E2-79C0-4277-8A45-2DF0D9E234A3}.Release DLL.ActiveCfg = Release|Win32
+		{95CE74E2-79C0-4277-8A45-2DF0D9E234A3}.Release DLL.Build.0 = Release|Win32
+		{3255C187-3794-48D2-9228-904CFFB7FA5B}.Debug.ActiveCfg = Debug|Win32
+		{3255C187-3794-48D2-9228-904CFFB7FA5B}.Debug.Build.0 = Debug|Win32
+		{3255C187-3794-48D2-9228-904CFFB7FA5B}.Debug DLL.ActiveCfg = Debug|Win32
+		{3255C187-3794-48D2-9228-904CFFB7FA5B}.Debug DLL.Build.0 = Debug|Win32
+		{3255C187-3794-48D2-9228-904CFFB7FA5B}.Final.ActiveCfg = Final|Win32
+		{3255C187-3794-48D2-9228-904CFFB7FA5B}.Final.Build.0 = Final|Win32
+		{3255C187-3794-48D2-9228-904CFFB7FA5B}.Release.ActiveCfg = Release|Win32
+		{3255C187-3794-48D2-9228-904CFFB7FA5B}.Release.Build.0 = Release|Win32
+		{3255C187-3794-48D2-9228-904CFFB7FA5B}.Release DLL.ActiveCfg = Release|Win32
+		{3255C187-3794-48D2-9228-904CFFB7FA5B}.Release DLL.Build.0 = Release|Win32
+		{32F47DFC-DA16-4F61-9B0B-3B9D272CC72F}.Debug.ActiveCfg = Debug|Win32
+		{32F47DFC-DA16-4F61-9B0B-3B9D272CC72F}.Debug.Build.0 = Debug|Win32
+		{32F47DFC-DA16-4F61-9B0B-3B9D272CC72F}.Debug DLL.ActiveCfg = Debug DLL|Win32
+		{32F47DFC-DA16-4F61-9B0B-3B9D272CC72F}.Debug DLL.Build.0 = Debug DLL|Win32
+		{32F47DFC-DA16-4F61-9B0B-3B9D272CC72F}.Final.ActiveCfg = Release DLL|Win32
+		{32F47DFC-DA16-4F61-9B0B-3B9D272CC72F}.Final.Build.0 = Release DLL|Win32
+		{32F47DFC-DA16-4F61-9B0B-3B9D272CC72F}.Release.ActiveCfg = Release|Win32
+		{32F47DFC-DA16-4F61-9B0B-3B9D272CC72F}.Release.Build.0 = Release|Win32
+		{32F47DFC-DA16-4F61-9B0B-3B9D272CC72F}.Release DLL.ActiveCfg = Release DLL|Win32
+		{32F47DFC-DA16-4F61-9B0B-3B9D272CC72F}.Release DLL.Build.0 = Release DLL|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

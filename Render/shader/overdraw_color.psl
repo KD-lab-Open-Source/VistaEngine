@@ -1,0 +1,18 @@
+struct PS_INPUT
+{
+	float2 Tex:TEXCOORD0;
+};
+sampler2D SrcTexture:register(s0);
+static float4 minColor={0,1,0,1};
+static float4 maxColor={1,0,0,1};
+float4 main (const PS_INPUT v):COLOR
+{
+    float4 t = tex2D(SrcTexture,v.Tex);
+    float4 c = {0,0,0,1};
+    float z;
+    c.y = smoothstep(0,0.06,t.x);
+    c.x = smoothstep(0.06,0.25,t.x);
+	z = smoothstep(0.25,1,t.x);
+	c.y -= z;
+	return c;
+}
