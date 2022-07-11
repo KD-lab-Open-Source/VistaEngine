@@ -21,4 +21,4 @@
 Perimeter2.sln
 
 ## Запуск игры
-Скопируйте файл GameDBG.exe в папку с игрой из Steam.
+Скопируйте файлы GameDBG.exe, AttribEditor.dll и TriggerEditor.dll в папку с игрой из Steam.
