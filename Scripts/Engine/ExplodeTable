@@ -1,0 +1,189 @@
+Version = 0;
+ExplodeTable = {
+	header = {
+		10;
+		"Нет взрыва",
+		"Смерть анимацией (становится прозрачным)",
+		"Взрыв здания (осыпание)",
+		"Взрыв юнита",
+		"Смерть анимацией (уходит под землю)",
+		"Взрыв здания (разлет осколков)",
+		"Взрыв здания/юнита (вертикальный)",
+		"Комбинированная смерть",
+		"Рэг Долл",
+		"Взрыв снаряда"
+	};
+	strings = {
+		10;
+		{
+			name = "Нет взрыва";
+			enableExplode = false;
+			animatedDeath = false;
+			enableRagDoll = false;
+			alphaDisappear = false;
+			explodeAxisFactors = {
+				x = 1.;
+				y = 1.;
+				z = 1.;
+			};
+			selfPower = 0.;
+			liveTimeInt = 10000;
+			z_gravity = 9.8;
+			friction = 0.8;
+			restitution = 0.2;
+		},
+		{
+			name = "Смерть анимацией (становится прозрачным)";
+			enableExplode = false;
+			animatedDeath = true;
+			enableRagDoll = false;
+			alphaDisappear = true;
+			explodeAxisFactors = {
+				x = 4.;
+				y = 1.;
+				z = 1.;
+			};
+			selfPower = 0.;
+			liveTimeInt = 15000;
+			z_gravity = 9.8;
+			friction = 0.8;
+			restitution = 0.2;
+		},
+		{
+			name = "Взрыв здания (осыпание)";
+			enableExplode = true;
+			animatedDeath = false;
+			enableRagDoll = false;
+			alphaDisappear = true;
+			explodeAxisFactors = {
+				x = 1.;
+				y = 1.;
+				z = 1.;
+			};
+			selfPower = 0.;
+			liveTimeInt = 10000;
+			z_gravity = 100.;
+			friction = 1.5;
+			restitution = 5.e-002;
+		},
+		{
+			name = "Взрыв юнита";
+			enableExplode = true;
+			animatedDeath = false;
+			enableRagDoll = false;
+			alphaDisappear = true;
+			explodeAxisFactors = {
+				x = 1.;
+				y = 1.;
+				z = 1.;
+			};
+			selfPower = 30.;
+			liveTimeInt = 15000;
+			z_gravity = 100.;
+			friction = 0.99;
+			restitution = 0.1;
+		},
+		{
+			name = "Смерть анимацией (уходит под землю)";
+			enableExplode = false;
+			animatedDeath = true;
+			enableRagDoll = false;
+			alphaDisappear = false;
+			explodeAxisFactors = {
+				x = 1.;
+				y = 1.;
+				z = 1.;
+			};
+			selfPower = 0.;
+			liveTimeInt = 15000;
+			z_gravity = 9.8;
+			friction = 0.8;
+			restitution = 0.2;
+		},
+		{
+			name = "Взрыв здания (разлет осколков)";
+			enableExplode = true;
+			animatedDeath = false;
+			enableRagDoll = false;
+			alphaDisappear = true;
+			explodeAxisFactors = {
+				x = 1.;
+				y = 1.;
+				z = 1.;
+			};
+			selfPower = 10.;
+			liveTimeInt = 10000;
+			z_gravity = 100.;
+			friction = 1.5;
+			restitution = 5.e-002;
+		},
+		{
+			name = "Взрыв здания/юнита (вертикальный)";
+			enableExplode = true;
+			animatedDeath = false;
+			enableRagDoll = false;
+			alphaDisappear = true;
+			explodeAxisFactors = {
+				x = 0.;
+				y = 0.;
+				z = 1.;
+			};
+			selfPower = 30.;
+			liveTimeInt = 10000;
+			z_gravity = 100.;
+			friction = 0.99;
+			restitution = 0.1;
+		},
+		{
+			name = "Комбинированная смерть";
+			enableExplode = true;
+			animatedDeath = true;
+			enableRagDoll = false;
+			alphaDisappear = true;
+			explodeAxisFactors = {
+				x = 1.;
+				y = 1.;
+				z = 1.;
+			};
+			selfPower = 10.;
+			liveTimeInt = 10000;
+			z_gravity = 100.;
+			friction = 1.5;
+			restitution = 2.e-002;
+		},
+		{
+			name = "Рэг Долл";
+			enableExplode = false;
+			animatedDeath = false;
+			enableRagDoll = true;
+			alphaDisappear = false;
+			explodeAxisFactors = {
+				x = 0.;
+				y = 0.;
+				z = 0.;
+			};
+			selfPower = 0.;
+			liveTimeInt = 10000;
+			z_gravity = 100.;
+			friction = 1.5;
+			restitution = 2.e-002;
+		},
+		{
+			name = "Взрыв снаряда";
+			enableExplode = true;
+			animatedDeath = false;
+			enableRagDoll = false;
+			alphaDisappear = true;
+			explodeAxisFactors = {
+				x = 0.;
+				y = 0.;
+				z = 1.;
+			};
+			selfPower = 3.;
+			liveTimeInt = 15000;
+			z_gravity = 100.;
+			friction = 0.99;
+			restitution = 0.1;
+		}
+	};
+};

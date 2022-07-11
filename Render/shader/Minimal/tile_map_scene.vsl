@@ -1,0 +1,82 @@
+struct VS_INPUT
+{
+    float4 pos : POSITION;
+//#ifdef VERTEX_LIGHT
+    float3 n : COLOR0;
+//#endif
+};
+
+struct VS_OUTPUT
+{
+    float4  pos : POSITION;
+#ifdef VERTEX_LIGHT
+    float3  color: COLOR0;
+#else
+	float2  tbump : TEXCOORD1;
+#endif
+    float2  t0 : TEXCOORD0;
+    
+	float2  uv_lightmap : TEXCOORD3;
+#ifdef SHADOW
+	float4  tshadow: TEXCOORD2;
+	float  shadowFactor: COLOR1;
+#endif	
+	float2  tminitexture: TEXCOORD4;
+	
+#ifdef ZREFLECTION
+	float3  treflection: TEXCOORD5;
+#endif
+
+	float fog: FOG;
+};
+
+
+float4 UV:register(c0);
+float4 UVbump:register(c1);
+float4 vColor:register(c2);//xyz-diffuse, w-ambient
+float4 fPlanarNode:register(c95);
+float3 vFog:register(c4);
+float3 vLightDirection:register(c5);
+
+float4x4 mView:register(c6);
+float4x4 mShadow:register(c10);
+//row_major - матрица при умножении 4x4 по количеству циклов такая же, но не пользует w.
+float4x4 mWVP:register(c14);
+float2 mulMiniTexture:register(c18);
+float3 vReflectionMul:register(c19);
+
+VS_OUTPUT main(const VS_INPUT v)
+{
+    VS_OUTPUT o;
+
+//	float3  pos;
+//	pos.xyz=v.pos.xyz+offset_pos.xyz;
+//	pos.z+=v.pos.w*offset_pos.w;
+//  pos.w=1;
+#include "ConvertPos.inl"
+	
+	o.pos=mul(pos,mWVP);
+	o.t0=pos.xy*UV.zw+UV.xy;
+#ifndef VERTEX_LIGHT
+	o.tbump=pos.xy*UVbump.zw+UVbump.xy;
+#endif	
+	o.uv_lightmap = (pos.xy - fPlanarNode.xy)*fPlanarNode.zw;
+	o.tminitexture = pos.xy*mulMiniTexture;
+
+#ifdef SHADOW
+	o.tshadow=mul(pos,mShadow);
+	o.shadowFactor = smoothstep(0.15, 0.2, -dot(v.n*2-1,vLightDirection));
+#endif
+	
+#ifdef VERTEX_LIGHT
+	o.color.rgb=-dot(v.n*2-1,vLightDirection);
+	o.color.rgb=o.color.rgb*vColor.rgb+vColor.w;
+#endif	
+#ifdef ZREFLECTION
+	o.treflection=pos*vReflectionMul;
+#endif
+	//fog
+	float fogz=mul(pos,mView).z;
+	o.fog=fogz*vFog.z+vFog.y;
+    return o;
+}

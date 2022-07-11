@@ -1,0 +1,33 @@
+struct PS_INPUT
+{
+	float4 diffuse: COLOR0;
+#ifdef USE_BORDER
+	float2 uv0:TEXCOORD0;
+#endif
+#ifdef USE_TEXTURE
+	float2 uv1:TEXCOORD1;
+#endif
+};
+
+#ifdef USE_BORDER
+sampler2D borderTexture:register(s0);
+#endif
+#ifdef USE_TEXTURE
+sampler2D baseTexture:register(s1);
+#endif
+
+float4 main(const PS_INPUT v):COLOR
+{
+  float4 o;
+#ifdef USE_TEXTURE
+  o = tex2D(baseTexture,v.uv1) * v.diffuse;
+#else
+  o = v.diffuse;
+#endif
+#ifdef USE_BORDER
+  float4 b;
+  b = tex2D(borderTexture,v.uv0);
+  o.a = o.a * b.a;
+#endif  
+  return o;
+}

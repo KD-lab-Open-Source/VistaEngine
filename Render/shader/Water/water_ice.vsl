@@ -1,0 +1,70 @@
+struct VS_INPUT
+{
+    float4 pos : POSITION;
+	float4  diffuse: COLOR0;
+};
+
+struct VS_OUTPUT
+{
+    float4  pos : POSITION;
+#ifdef USE_ALPHA
+    float2  talpha : TEXCOORD0;
+#endif    
+    float2  tsnow : TEXCOORD1;
+    float2  tbump : TEXCOORD2;
+    float2  uv_lightmap : TEXCOORD3;
+#ifndef PS11
+	#ifdef MIRROR_LINEAR
+		float4  mirror : TEXCOORD4;
+	#else
+		float3  mirror : TEXCOORD4;
+	#endif
+    float2  tcleft: TEXCOORD5;
+#endif
+	float4  diffuse: COLOR0;
+    float fog: FOG;
+};
+
+float4x4 mVP:register(c0);
+float4x4 mView:register(c4);
+float4x4 vMirrorVP:register(c8);
+float3 vFog:register(c12);
+float2 uvScaleOffset:register(c13);
+float3 vCameraPos:register(c14);
+float3 fScaleBumpSnow:register(c15);//0.01,0.003
+
+float4 fPlanarNode:register(c95);
+
+VS_OUTPUT main(const VS_INPUT v)
+{
+    VS_OUTPUT o;
+	float4 pos = v.pos;
+#ifdef USE_ALPHA
+	o.talpha=pos.xy*uvScaleOffset;
+#else
+	pos.z=pos.z*(1/64.0f);
+#endif	
+	o.pos=mul(pos,mVP);
+	o.diffuse=v.diffuse;
+	o.uv_lightmap = (pos.xy - fPlanarNode.xy)*fPlanarNode.zw;
+	
+	o.tbump=pos.xy*fScaleBumpSnow.x;
+	o.tsnow=pos.xy*fScaleBumpSnow.y;
+#ifndef PS11
+	o.tcleft=pos.xy*fScaleBumpSnow.z;
+	#ifdef MIRROR_LINEAR
+		o.mirror=mul(pos,vMirrorVP);
+	#else
+		float3 dir=vCameraPos-pos;
+		dir.z-=pos.z;
+		o.mirror=normalize(dir);
+	#endif
+#endif
+	
+	//fog
+	float fogz=mul(pos,mView).z;
+	float fog=fogz*vFog.z+vFog.y;
+	o.fog=clamp(fog,0,1);
+	
+    return o;
+}

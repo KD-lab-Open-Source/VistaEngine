@@ -1,0 +1,27 @@
+struct PS_INPUT
+{
+    float4  diffuse: COLOR0;
+	float2 uv_tex0:TEXCOORD0;
+	float2 uv_tex1:TEXCOORD1;
+	float2 uv_lightmap:TEXCOORD3;
+};
+sampler2D Tex0Sampler:register(s0);
+sampler2D Tex1Sampler:register(s1);
+sampler2D LightMapSampler:register(s3);
+
+float4 vPS11Color;
+float4 vFogOfWar:register(c3);
+float4 main(const PS_INPUT v):COLOR
+{
+	float4 ot;
+	ot.rgb=vPS11Color;
+	ot.a=v.diffuse.a;
+#ifdef FOG_OF_WAR
+	float4 lightmap=tex2D(LightMapSampler,v.uv_lightmap);
+	ot.rgb=lerp(ot.rgb, vFogOfWar, lightmap.a);
+#endif	
+	float4 tex0=tex2D(Tex0Sampler,v.uv_tex0);
+	float4 tex1=tex2D(Tex1Sampler,v.uv_tex1);
+	ot.a+=ot.a*saturate((tex0.x+tex1.x));
+	return ot;
+}

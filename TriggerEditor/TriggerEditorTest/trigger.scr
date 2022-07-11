@@ -1,0 +1,4665 @@
+TriggerChain = {
+	name = "trigger.scr";
+	version = 0;
+	checkType = LOGIC_TRIGGER;
+	triggers = {
+		114;
+		{
+			name = "START";
+			internalColor_ = 0;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				50;
+				{
+					triggerName = "«‡‚Ó‰À“";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "«‡‚Ó‰ —“";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "«‡‚Ó‰ ““";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 98;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -13;
+					};
+				},
+				{
+					triggerName = "¡¿«¿2";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -58;
+						y = 15;
+					};
+					childOffset = {
+						x = -58;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "¡¿«¿3";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -48;
+						y = 15;
+					};
+					childOffset = {
+						x = -43;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "·‡Á‡1 ÔÓËÁ‚Ó‰ÒÚ‚Ó Ô‡‡ÏÂÚÓ‚";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = -5;
+					};
+					childOffset = {
+						x = -100;
+						y = -6;
+					};
+				},
+				{
+					triggerName = "·‡Á‡2 ÔÓËÁ‚Ó‰ÒÚ‚Ó Ô‡‡ÏÂÚÓ‚0";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = -2;
+					};
+					childOffset = {
+						x = -100;
+						y = 9;
+					};
+				},
+				{
+					triggerName = "·‡Á‡3 ÔÓËÁ‚Ó‰ÒÚ‚Ó Ô‡‡ÏÂÚÓ‚00";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = 3;
+					};
+					childOffset = {
+						x = -100;
+						y = -6;
+					};
+				},
+				{
+					triggerName = "ﬂƒ–Œ";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = 15;
+					};
+					childOffset = {
+						x = 100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "ﬂƒ–Œ Í ‚‡„Û";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = 15;
+					};
+					childOffset = {
+						x = 100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "¬€ À ¬€–¿¬Õ»¬¿Õ»≈";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = 15;
+					};
+					childOffset = {
+						x = 100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "√¿”¡»÷¿";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 71;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "¿“¿ ¿ ÍÓ„‰‡ ‡Ú‡ÍÛ˛Ú";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = -7;
+					};
+					childOffset = {
+						x = 100;
+						y = -11;
+					};
+				},
+				{
+					triggerName = "¿“¿ ¿ ÍÓ„‰‡ Õ≈¿“¿ ”ﬁ“";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = -1;
+					};
+					childOffset = {
+						x = 100;
+						y = -1;
+					};
+				},
+				{
+					triggerName = "«‡‚Ó‰À“0";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = 7;
+					};
+					childOffset = {
+						x = -100;
+						y = -9;
+					};
+				},
+				{
+					triggerName = "«‡‚Ó‰ —“0";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = 8;
+					};
+					childOffset = {
+						x = -100;
+						y = -14;
+					};
+				},
+				{
+					triggerName = "«‡‚Ó‰À“00";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = -2;
+					};
+					childOffset = {
+						x = -100;
+						y = -3;
+					};
+				},
+				{
+					triggerName = "«¿¬Œƒ À≈√ »’";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = -12;
+					};
+					childOffset = {
+						x = -100;
+						y = -4;
+					};
+				},
+				{
+					triggerName = "«¿¬Œƒ —–≈ƒÕ»’";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = 6;
+					};
+					childOffset = {
+						x = -100;
+						y = -2;
+					};
+				},
+				{
+					triggerName = "«¿¬Œƒ À≈√ »’0";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = -10;
+					};
+					childOffset = {
+						x = -100;
+						y = -13;
+					};
+				},
+				{
+					triggerName = "¬€–¿¬Õ»¬¿“‹ ¬ À";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = 7;
+					};
+					childOffset = {
+						x = 100;
+						y = -4;
+					};
+				},
+				{
+					triggerName = "œ”À≈Ã≈“ «";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = 10;
+					};
+					childOffset = {
+						x = -100;
+						y = -10;
+					};
+				},
+				{
+					triggerName = "–¿ ≈“Õ»÷¿ 3";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "«¿¬Œƒ À≈√ »’1";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = 2;
+					};
+					childOffset = {
+						x = -100;
+						y = -5;
+					};
+				},
+				{
+					triggerName = "«¿¬Œƒ —–≈ƒÕ»’0";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = 6;
+					};
+					childOffset = {
+						x = -100;
+						y = -12;
+					};
+				},
+				{
+					triggerName = "«¿¬Œƒ “ﬂ∆≈À€’";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = -4;
+					};
+					childOffset = {
+						x = -100;
+						y = -9;
+					};
+				},
+				{
+					triggerName = "¡¿«¿";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -18;
+						y = 15;
+					};
+					childOffset = {
+						x = -18;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "¡¿«¿  œ";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 3;
+						y = 15;
+					};
+					childOffset = {
+						x = -8;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "¡¿«¿  œ2";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 19;
+						y = 15;
+					};
+					childOffset = {
+						x = 6;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "¡¿«¿  œ3";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 26;
+						y = 15;
+					};
+					childOffset = {
+						x = 17;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "œ”À≈Ã≈“ œ";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 54;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "–¿ ≈“Õ»÷¿ œ0";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 41;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "√¿”¡»÷¿ Ô";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 29;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "ﬂƒ–Œ œ";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -74;
+						y = 15;
+					};
+					childOffset = {
+						x = 100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "À≈√ »… Õ≈“ –¿ ≈“Õ€’";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -63;
+						y = 15;
+					};
+					childOffset = {
+						x = 100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "«‡Í‡Á  ÓÌÒÚÛÍÚÓ‡";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = -15;
+					};
+					childOffset = {
+						x = 100;
+						y = 10;
+					};
+				},
+				{
+					triggerName = "À≈√ »… ≈—“‹ –¿ ≈“Õ€…";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -52;
+						y = 15;
+					};
+					childOffset = {
+						x = 100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "—–≈ƒÕ»… Õ≈“ “ﬂ∆≈À€’";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -32;
+						y = 15;
+					};
+					childOffset = {
+						x = 100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "À≈√ »… ≈—“‹ “ﬂ∆≈À€…";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -16;
+						y = 15;
+					};
+					childOffset = {
+						x = 100;
+						y = -12;
+					};
+				},
+				{
+					triggerName = "“ﬂ∆≈À€… ﬁ";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -5;
+						y = 15;
+					};
+					childOffset = {
+						x = 100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "—–≈ƒÕ»… ≈—“‹ “ﬂ∆≈À€’0";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -7;
+						y = 15;
+					};
+					childOffset = {
+						x = 100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "«‡Í‡Á ÌÂ‚Ë‰ËÏÍË";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 5;
+						y = 15;
+					};
+					childOffset = {
+						x = 100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = " ŒÕ—“–” “Œ–   ¬–¿√”";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = 1;
+					};
+					childOffset = {
+						x = 100;
+						y = 1;
+					};
+				},
+				{
+					triggerName = " ŒÕ—“–” “Œ–   Œ“ Àﬁ◊≈ÕÕŒÃ”";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = 4;
+					};
+					childOffset = {
+						x = 100;
+						y = -12;
+					};
+				},
+				{
+					triggerName = "—–≈ƒÕ»… ”–Œ¬≈Õ‹";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 27;
+						y = 15;
+					};
+					childOffset = {
+						x = 42;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "“ﬂ∆≈À€… ”–Œ¬≈Õ‹";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 33;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "À≈√ »… ”–Œ¬≈Õ‹";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -53;
+						y = 15;
+					};
+					childOffset = {
+						x = 61;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "ﬂƒ–Œ Í ÓÚÍÎ˛˜ÂÌÌÓÏÛ";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = 6;
+					};
+					childOffset = {
+						x = 100;
+						y = -12;
+					};
+				},
+				{
+					triggerName = "À≈√ »…";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = -15;
+					};
+					childOffset = {
+						x = 57;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "ÌÂ‚Â‰ËÏÍ‡";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = 3;
+					};
+					childOffset = {
+						x = 100;
+						y = -7;
+					};
+				}
+			};
+			state_ = CHECKING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 0;
+				y = 0;
+			};
+			boundingRect = {
+				left = 0;
+				top = 0;
+				right = 256;
+				bottom = 32;
+			};
+		},
+		{
+			name = "¡¿«¿";
+			internalColor_ = 8454016;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 0;
+				y = 1;
+			};
+			boundingRect = {
+				left = 0;
+				top = 64;
+				right = 256;
+				bottom = 96;
+			};
+		},
+		{
+			name = "«‡‚Ó‰À“";
+			internalColor_ = 8454016;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 1;
+			};
+			boundingRect = {
+				left = 288;
+				top = 64;
+				right = 544;
+				bottom = 96;
+			};
+		},
+		{
+			name = "«‡‚Ó‰ —“";
+			internalColor_ = 8454016;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 2;
+			};
+			boundingRect = {
+				left = 288;
+				top = 128;
+				right = 544;
+				bottom = 160;
+			};
+		},
+		{
+			name = "«‡‚Ó‰ ““";
+			internalColor_ = 8454016;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 3;
+			};
+			boundingRect = {
+				left = 288;
+				top = 192;
+				right = 544;
+				bottom = 224;
+			};
+		},
+		{
+			name = "¡¿«¿2";
+			internalColor_ = 8454016;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 0;
+				y = 2;
+			};
+			boundingRect = {
+				left = 0;
+				top = 128;
+				right = 256;
+				bottom = 160;
+			};
+		},
+		{
+			name = "¡¿«¿3";
+			internalColor_ = 8454016;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 0;
+				y = 3;
+			};
+			boundingRect = {
+				left = 0;
+				top = 192;
+				right = 256;
+				bottom = 224;
+			};
+		},
+		{
+			name = "ﬂƒ–Œ";
+			internalColor_ = 8454016;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -1;
+				y = 1;
+			};
+			boundingRect = {
+				left = -288;
+				top = 64;
+				right = -32;
+				bottom = 96;
+			};
+		},
+		{
+			name = "¿“¿ ¿ ÍÓ„‰‡ ‡Ú‡ÍÛ˛Ú";
+			internalColor_ = 8421631;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				8;
+				{
+					triggerName = "—–≈ƒÕ»…";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 83;
+						y = -15;
+					};
+					childOffset = {
+						x = 85;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "À≈√ »…‡";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 47;
+						y = -15;
+					};
+					childOffset = {
+						x = 44;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "À≈√ »… ˛";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -50;
+						y = -15;
+					};
+					childOffset = {
+						x = -43;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "À≈√ »… —¿ÃŒÀ≈“‹";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -7;
+						y = -15;
+					};
+					childOffset = {
+						x = -7;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "À≈√ »… f0";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 24;
+						y = -15;
+					};
+					childOffset = {
+						x = 28;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "À≈√ »… —¿ÃŒÀ≈“ ﬁÕ»“€";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -31;
+						y = -15;
+					};
+					childOffset = {
+						x = -27;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "À≈√ »… —¿ÃŒÀ≈“ ﬂƒ–Œ";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -87;
+						y = -15;
+					};
+					childOffset = {
+						x = -79;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "À≈√ »…  ﬂƒ–Œ0";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -99;
+						y = -15;
+					};
+					childOffset = {
+						x = -91;
+						y = 15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -2;
+				y = 0;
+			};
+			boundingRect = {
+				left = -576;
+				top = 0;
+				right = -320;
+				bottom = 32;
+			};
+		},
+		{
+			name = "ﬂƒ–Œ Í ‚‡„Û";
+			internalColor_ = 8454016;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -1;
+				y = 2;
+			};
+			boundingRect = {
+				left = -288;
+				top = 128;
+				right = -32;
+				bottom = 160;
+			};
+		},
+		{
+			name = "«‡Í‡Á  ÓÌÒÚÛÍÚÓ‡";
+			internalColor_ = 8454016;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -1;
+				y = -1;
+			};
+			boundingRect = {
+				left = -288;
+				top = -64;
+				right = -32;
+				bottom = -32;
+			};
+		},
+		{
+			name = "À≈√ »… Õ≈“ –¿ ≈“Õ€’";
+			internalColor_ = 4259584;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -2;
+				y = 7;
+			};
+			boundingRect = {
+				left = -576;
+				top = 448;
+				right = -320;
+				bottom = 480;
+			};
+		},
+		{
+			name = "—–≈ƒÕ»… Õ≈“ “ﬂ∆≈À€’";
+			internalColor_ = 4259584;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -2;
+				y = 9;
+			};
+			boundingRect = {
+				left = -576;
+				top = 576;
+				right = -320;
+				bottom = 608;
+			};
+		},
+		{
+			name = "“ﬂ∆≈À€… ﬁ";
+			internalColor_ = 4259584;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -2;
+				y = 12;
+			};
+			boundingRect = {
+				left = -576;
+				top = 768;
+				right = -320;
+				bottom = 800;
+			};
+		},
+		{
+			name = "—–≈ƒÕ»…";
+			internalColor_ = 8421631;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -2;
+				y = -2;
+			};
+			boundingRect = {
+				left = -576;
+				top = -128;
+				right = -320;
+				bottom = -96;
+			};
+		},
+		{
+			name = "«‡Í‡Á ÌÂ‚Ë‰ËÏÍË";
+			internalColor_ = 4259584;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -2;
+				y = 13;
+			};
+			boundingRect = {
+				left = -576;
+				top = 832;
+				right = -320;
+				bottom = 864;
+			};
+		},
+		{
+			name = "·‡Á‡1 ÔÓËÁ‚Ó‰ÒÚ‚Ó Ô‡‡ÏÂÚÓ‚";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				6;
+				{
+					triggerName = "‡Ô„ÂÈ‰ ·ÓÌË1";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -61;
+						y = -15;
+					};
+					childOffset = {
+						x = -61;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ÓÛÊËˇ1";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -24;
+						y = -15;
+					};
+					childOffset = {
+						x = -24;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ÒÍ‚‡‰‡";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 30;
+						y = -15;
+					};
+					childOffset = {
+						x = 30;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ÚÂÎÂÔÓÚ0";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 69;
+						y = -15;
+					};
+					childOffset = {
+						x = 74;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ‚ ÒÂ‰ÌËÈ1";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 94;
+						y = -15;
+					};
+					childOffset = {
+						x = 100;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ÒÍ‚‡‰‡01";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = -15;
+					};
+					childOffset = {
+						x = 100;
+						y = 15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 2;
+				y = 0;
+			};
+			boundingRect = {
+				left = 576;
+				top = 0;
+				right = 832;
+				bottom = 32;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ·ÓÌË1";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 2;
+				y = -1;
+			};
+			boundingRect = {
+				left = 576;
+				top = -64;
+				right = 832;
+				bottom = -32;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ÒÍ‚‡‰‡";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 2;
+				y = -3;
+			};
+			boundingRect = {
+				left = 576;
+				top = -192;
+				right = 832;
+				bottom = -160;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ÓÛÊËˇ1";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 2;
+				y = -2;
+			};
+			boundingRect = {
+				left = 576;
+				top = -128;
+				right = 832;
+				bottom = -96;
+			};
+		},
+		{
+			name = "·‡Á‡2 ÔÓËÁ‚Ó‰ÒÚ‚Ó Ô‡‡ÏÂÚÓ‚0";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				9;
+				{
+					triggerName = "‡Ô„ÂÈ‰ ·ÓÌË10";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -61;
+						y = -15;
+					};
+					childOffset = {
+						x = -61;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ÓÛÊËˇ10";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -24;
+						y = -15;
+					};
+					childOffset = {
+						x = -24;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ÒÍ‚‡‰‡0";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 30;
+						y = -15;
+					};
+					childOffset = {
+						x = 30;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ·ÓÌË2";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -43;
+						y = -15;
+					};
+					childOffset = {
+						x = -43;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ÓÛÊËˇ2";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 15;
+						y = -15;
+					};
+					childOffset = {
+						x = 13;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ‚ ÒÂ‰ÌËÈ";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 53;
+						y = -15;
+					};
+					childOffset = {
+						x = 47;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ÚÂÎÂÔÓÚ";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 88;
+						y = -15;
+					};
+					childOffset = {
+						x = 84;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ‚ ÚˇÊÂÎ˚È0";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = -15;
+					};
+					childOffset = {
+						x = 100;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ÒÍ‚‡‰‡02";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 1;
+						y = -15;
+					};
+					childOffset = {
+						x = 8;
+						y = 15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 3;
+				y = 0;
+			};
+			boundingRect = {
+				left = 864;
+				top = 0;
+				right = 1120;
+				bottom = 32;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ·ÓÌË10";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 3;
+				y = -1;
+			};
+			boundingRect = {
+				left = 864;
+				top = -64;
+				right = 1120;
+				bottom = -32;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ÒÍ‚‡‰‡0";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 3;
+				y = -8;
+			};
+			boundingRect = {
+				left = 864;
+				top = -512;
+				right = 1120;
+				bottom = -480;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ÓÛÊËˇ10";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 3;
+				y = -3;
+			};
+			boundingRect = {
+				left = 864;
+				top = -192;
+				right = 1120;
+				bottom = -160;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ·ÓÌË2";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 3;
+				y = -2;
+			};
+			boundingRect = {
+				left = 864;
+				top = -128;
+				right = 1120;
+				bottom = -96;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ÓÛÊËˇ2";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 3;
+				y = -4;
+			};
+			boundingRect = {
+				left = 864;
+				top = -256;
+				right = 1120;
+				bottom = -224;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ‚ ÒÂ‰ÌËÈ";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 3;
+				y = -6;
+			};
+			boundingRect = {
+				left = 864;
+				top = -384;
+				right = 1120;
+				bottom = -352;
+			};
+		},
+		{
+			name = "·‡Á‡3 ÔÓËÁ‚Ó‰ÒÚ‚Ó Ô‡‡ÏÂÚÓ‚00";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				12;
+				{
+					triggerName = "‡Ô„ÂÈ‰ ·ÓÌË100";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -61;
+						y = -15;
+					};
+					childOffset = {
+						x = -61;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ÓÛÊËˇ100";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -24;
+						y = -15;
+					};
+					childOffset = {
+						x = -24;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ÒÍ‚‡‰‡00";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 30;
+						y = -15;
+					};
+					childOffset = {
+						x = 30;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ·ÓÌË20";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -43;
+						y = -15;
+					};
+					childOffset = {
+						x = -43;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ÓÛÊËˇ20";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 15;
+						y = -15;
+					};
+					childOffset = {
+						x = 13;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ‚ ÒÂ‰ÌËÈ0";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 53;
+						y = -15;
+					};
+					childOffset = {
+						x = 47;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ·ÓÌË3";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -32;
+						y = -15;
+					};
+					childOffset = {
+						x = -32;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ÓÛÊËˇ3";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 65;
+						y = -15;
+					};
+					childOffset = {
+						x = 64;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ‚ ÚˇÊÂÎ˚È";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 89;
+						y = -15;
+					};
+					childOffset = {
+						x = 85;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ÚÂÎÂÔÓÚ1";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = -15;
+					};
+					childOffset = {
+						x = 100;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ÒÍ‚‡‰‡000";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = -15;
+					};
+					childOffset = {
+						x = 82;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "‡Ô„ÂÈ‰ ÒÍ‚‡‰‡0000";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 75;
+						y = -15;
+					};
+					childOffset = {
+						x = 64;
+						y = 15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 4;
+				y = 0;
+			};
+			boundingRect = {
+				left = 1152;
+				top = 0;
+				right = 1408;
+				bottom = 32;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ·ÓÌË100";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 4;
+				y = -1;
+			};
+			boundingRect = {
+				left = 1152;
+				top = -64;
+				right = 1408;
+				bottom = -32;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ÒÍ‚‡‰‡00";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 4;
+				y = -10;
+			};
+			boundingRect = {
+				left = 1152;
+				top = -640;
+				right = 1408;
+				bottom = -608;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ÓÛÊËˇ100";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 4;
+				y = -4;
+			};
+			boundingRect = {
+				left = 1152;
+				top = -256;
+				right = 1408;
+				bottom = -224;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ·ÓÌË20";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 4;
+				y = -2;
+			};
+			boundingRect = {
+				left = 1152;
+				top = -128;
+				right = 1408;
+				bottom = -96;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ÓÛÊËˇ20";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 4;
+				y = -5;
+			};
+			boundingRect = {
+				left = 1152;
+				top = -320;
+				right = 1408;
+				bottom = -288;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ‚ ÒÂ‰ÌËÈ0";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 4;
+				y = -8;
+			};
+			boundingRect = {
+				left = 1152;
+				top = -512;
+				right = 1408;
+				bottom = -480;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ·ÓÌË3";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 4;
+				y = -3;
+			};
+			boundingRect = {
+				left = 1152;
+				top = -192;
+				right = 1408;
+				bottom = -160;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ÓÛÊËˇ3";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 4;
+				y = -6;
+			};
+			boundingRect = {
+				left = 1152;
+				top = -384;
+				right = 1408;
+				bottom = -352;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ‚ ÚˇÊÂÎ˚È";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 4;
+				y = -9;
+			};
+			boundingRect = {
+				left = 1152;
+				top = -576;
+				right = 1408;
+				bottom = -544;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ÚÂÎÂÔÓÚ";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 3;
+				y = -5;
+			};
+			boundingRect = {
+				left = 864;
+				top = -320;
+				right = 1120;
+				bottom = -288;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ÚÂÎÂÔÓÚ0";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 2;
+				y = -4;
+			};
+			boundingRect = {
+				left = 576;
+				top = -256;
+				right = 832;
+				bottom = -224;
+			};
+		},
+		{
+			name = "¬€ À ¬€–¿¬Õ»¬¿Õ»≈";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -1;
+				y = 4;
+			};
+			boundingRect = {
+				left = -288;
+				top = 256;
+				right = -32;
+				bottom = 288;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ‚ ÒÂ‰ÌËÈ1";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 2;
+				y = -5;
+			};
+			boundingRect = {
+				left = 576;
+				top = -320;
+				right = 832;
+				bottom = -288;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ‚ ÚˇÊÂÎ˚È0";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 3;
+				y = -7;
+			};
+			boundingRect = {
+				left = 864;
+				top = -448;
+				right = 1120;
+				bottom = -416;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ÚÂÎÂÔÓÚ1";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 4;
+				y = -7;
+			};
+			boundingRect = {
+				left = 1152;
+				top = -448;
+				right = 1408;
+				bottom = -416;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ÒÍ‚‡‰‡000";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 4;
+				y = -11;
+			};
+			boundingRect = {
+				left = 1152;
+				top = -704;
+				right = 1408;
+				bottom = -672;
+			};
+		},
+		{
+			name = "√¿”¡»÷¿";
+			internalColor_ = 8454016;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 6;
+			};
+			boundingRect = {
+				left = 288;
+				top = 384;
+				right = 544;
+				bottom = 416;
+			};
+		},
+		{
+			name = "À≈√ »… —¿ÃŒÀ≈“ ﬁÕ»“€";
+			internalColor_ = 8421631;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -2;
+				y = -5;
+			};
+			boundingRect = {
+				left = -576;
+				top = -320;
+				right = -320;
+				bottom = -288;
+			};
+		},
+		{
+			name = "¿“¿ ¿ ÍÓ„‰‡ Õ≈¿“¿ ”ﬁ“";
+			internalColor_ = 8421631;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				12;
+				{
+					triggerName = "À≈√ »…0";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 66;
+						y = -15;
+					};
+					childOffset = {
+						x = 69;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "—–≈ƒÕ»…0";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 83;
+						y = -15;
+					};
+					childOffset = {
+						x = 85;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "“ﬂ∆≈À€…0";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 99;
+						y = -15;
+					};
+					childOffset = {
+						x = 100;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "À≈√ »… —¿ÃŒÀ≈“0";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -83;
+						y = -15;
+					};
+					childOffset = {
+						x = -76;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "—–≈ƒÕ»… —¿ÃŒÀ≈“0";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -93;
+						y = -15;
+					};
+					childOffset = {
+						x = -84;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "“ﬂ∆≈À€… —¿ÃŒÀ≈“0";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = -15;
+					};
+					childOffset = {
+						x = -97;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "À≈√ »… Ò‡ÏÓÎÂÚ";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 43;
+						y = 15;
+					};
+					childOffset = {
+						x = 43;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "—–≈ƒÕ»… ‡0";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 22;
+						y = 15;
+					};
+					childOffset = {
+						x = 18;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "“ﬂ∆≈À€… ‡00";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 4;
+						y = 15;
+					};
+					childOffset = {
+						x = -4;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "“ﬂ∆≈À€…Ò‡ÏÓÎÂÚ00";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -10;
+						y = 15;
+					};
+					childOffset = {
+						x = -18;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "À≈√ »… f";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 66;
+						y = 15;
+					};
+					childOffset = {
+						x = 64;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "—–≈ƒÕ≈…Ò‡ÏÓÎÂÚ0";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -19;
+						y = 15;
+					};
+					childOffset = {
+						x = -27;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -3;
+				y = 0;
+			};
+			boundingRect = {
+				left = -864;
+				top = 0;
+				right = -608;
+				bottom = 32;
+			};
+		},
+		{
+			name = "À≈√ »…0";
+			internalColor_ = 8421631;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -3;
+				y = -1;
+			};
+			boundingRect = {
+				left = -864;
+				top = -64;
+				right = -608;
+				bottom = -32;
+			};
+		},
+		{
+			name = "—–≈ƒÕ»…0";
+			internalColor_ = 8421631;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -3;
+				y = -2;
+			};
+			boundingRect = {
+				left = -864;
+				top = -128;
+				right = -608;
+				bottom = -96;
+			};
+		},
+		{
+			name = "“ﬂ∆≈À€…0";
+			internalColor_ = 8421631;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -3;
+				y = -3;
+			};
+			boundingRect = {
+				left = -864;
+				top = -192;
+				right = -608;
+				bottom = -160;
+			};
+		},
+		{
+			name = "À≈√ »… —¿ÃŒÀ≈“0";
+			internalColor_ = 8421631;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -3;
+				y = -5;
+			};
+			boundingRect = {
+				left = -864;
+				top = -320;
+				right = -608;
+				bottom = -288;
+			};
+		},
+		{
+			name = "—–≈ƒÕ»… —¿ÃŒÀ≈“0";
+			internalColor_ = 8421631;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -3;
+				y = -6;
+			};
+			boundingRect = {
+				left = -864;
+				top = -384;
+				right = -608;
+				bottom = -352;
+			};
+		},
+		{
+			name = "“ﬂ∆≈À€… —¿ÃŒÀ≈“0";
+			internalColor_ = 8421631;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -3;
+				y = -7;
+			};
+			boundingRect = {
+				left = -864;
+				top = -448;
+				right = -608;
+				bottom = -416;
+			};
+		},
+		{
+			name = "À≈√ »…‡";
+			internalColor_ = 4227327;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -2;
+				y = -1;
+			};
+			boundingRect = {
+				left = -576;
+				top = -64;
+				right = -320;
+				bottom = -32;
+			};
+		},
+		{
+			name = "À≈√ »… Ò‡ÏÓÎÂÚ";
+			internalColor_ = 4227327;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -3;
+				y = 2;
+			};
+			boundingRect = {
+				left = -864;
+				top = 128;
+				right = -608;
+				bottom = 160;
+			};
+		},
+		{
+			name = "—–≈ƒÕ»… ‡0";
+			internalColor_ = 4227327;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -3;
+				y = 3;
+			};
+			boundingRect = {
+				left = -864;
+				top = 192;
+				right = -608;
+				bottom = 224;
+			};
+		},
+		{
+			name = "—–≈ƒÕ≈…Ò‡ÏÓÎÂÚ0";
+			internalColor_ = 4227327;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -3;
+				y = 4;
+			};
+			boundingRect = {
+				left = -864;
+				top = 256;
+				right = -608;
+				bottom = 288;
+			};
+		},
+		{
+			name = "“ﬂ∆≈À€… ‡00";
+			internalColor_ = 4227327;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -3;
+				y = 5;
+			};
+			boundingRect = {
+				left = -864;
+				top = 320;
+				right = -608;
+				bottom = 352;
+			};
+		},
+		{
+			name = "“ﬂ∆≈À€…Ò‡ÏÓÎÂÚ00";
+			internalColor_ = 4227327;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -3;
+				y = 6;
+			};
+			boundingRect = {
+				left = -864;
+				top = 384;
+				right = -608;
+				bottom = 416;
+			};
+		},
+		{
+			name = "À≈√ »… f";
+			internalColor_ = 4227327;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -3;
+				y = 1;
+			};
+			boundingRect = {
+				left = -864;
+				top = 64;
+				right = -608;
+				bottom = 96;
+			};
+		},
+		{
+			name = "À≈√ »… —¿ÃŒÀ≈“‹";
+			internalColor_ = 4227327;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -2;
+				y = -3;
+			};
+			boundingRect = {
+				left = -576;
+				top = -192;
+				right = -320;
+				bottom = -160;
+			};
+		},
+		{
+			name = "À≈√ »… ˛";
+			internalColor_ = 8421631;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -2;
+				y = -7;
+			};
+			boundingRect = {
+				left = -576;
+				top = -448;
+				right = -320;
+				bottom = -416;
+			};
+		},
+		{
+			name = "«‡‚Ó‰À“0";
+			internalColor_ = 8454016;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 2;
+				y = 1;
+			};
+			boundingRect = {
+				left = 576;
+				top = 64;
+				right = 832;
+				bottom = 96;
+			};
+		},
+		{
+			name = "«‡‚Ó‰ —“0";
+			internalColor_ = 8454016;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 2;
+				y = 2;
+			};
+			boundingRect = {
+				left = 576;
+				top = 128;
+				right = 832;
+				bottom = 160;
+			};
+		},
+		{
+			name = "«‡‚Ó‰À“00";
+			internalColor_ = 8454016;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 3;
+				y = 1;
+			};
+			boundingRect = {
+				left = 864;
+				top = 64;
+				right = 1120;
+				bottom = 96;
+			};
+		},
+		{
+			name = "«¿¬Œƒ À≈√ »’";
+			internalColor_ = 16744448;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "10";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -4;
+						y = 15;
+					};
+					childOffset = {
+						x = -3;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 4;
+				y = 1;
+			};
+			boundingRect = {
+				left = 1152;
+				top = 64;
+				right = 1408;
+				bottom = 96;
+			};
+		},
+		{
+			name = "«¿¬Œƒ —–≈ƒÕ»’";
+			internalColor_ = 16744448;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "1";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -54;
+						y = 15;
+					};
+					childOffset = {
+						x = -57;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 3;
+				y = 2;
+			};
+			boundingRect = {
+				left = 864;
+				top = 128;
+				right = 1120;
+				bottom = 160;
+			};
+		},
+		{
+			name = "«¿¬Œƒ À≈√ »’0";
+			internalColor_ = 16744448;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "11";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -20;
+						y = 15;
+					};
+					childOffset = {
+						x = -22;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 5;
+				y = 1;
+			};
+			boundingRect = {
+				left = 1440;
+				top = 64;
+				right = 1696;
+				bottom = 96;
+			};
+		},
+		{
+			name = "À≈√ »… !";
+			internalColor_ = 16777088;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 15;
+			};
+			boundingRect = {
+				left = 288;
+				top = 960;
+				right = 544;
+				bottom = 992;
+			};
+		},
+		{
+			name = "—–≈ƒÕ»… !";
+			internalColor_ = 16777088;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 16;
+			};
+			boundingRect = {
+				left = 288;
+				top = 1024;
+				right = 544;
+				bottom = 1056;
+			};
+		},
+		{
+			name = "“ﬂ∆≈À€… !";
+			internalColor_ = 16777088;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 17;
+			};
+			boundingRect = {
+				left = 288;
+				top = 1088;
+				right = 544;
+				bottom = 1120;
+			};
+		},
+		{
+			name = "¬€–¿¬Õ»¬¿“‹ ¬ À";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -1;
+				y = 3;
+			};
+			boundingRect = {
+				left = -288;
+				top = 192;
+				right = -32;
+				bottom = 224;
+			};
+		},
+		{
+			name = "œ”À≈Ã≈“ «";
+			internalColor_ = 8454016;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 4;
+			};
+			boundingRect = {
+				left = 288;
+				top = 256;
+				right = 544;
+				bottom = 288;
+			};
+		},
+		{
+			name = "–¿ ≈“Õ»÷¿ 3";
+			internalColor_ = 8454016;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 5;
+			};
+			boundingRect = {
+				left = 288;
+				top = 320;
+				right = 544;
+				bottom = 352;
+			};
+		},
+		{
+			name = "1";
+			internalColor_ = 0;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "«¿¬Œƒ —–≈ƒÕ»’";
+					color = STRATEGY_GREEN;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -16;
+						y = -15;
+					};
+					childOffset = {
+						x = -16;
+						y = 15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 3;
+				y = 3;
+			};
+			boundingRect = {
+				left = 864;
+				top = 192;
+				right = 1120;
+				bottom = 224;
+			};
+		},
+		{
+			name = "10";
+			internalColor_ = 0;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "«¿¬Œƒ À≈√ »’";
+					color = STRATEGY_GREEN;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 34;
+						y = -15;
+					};
+					childOffset = {
+						x = 34;
+						y = 15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 4;
+				y = 2;
+			};
+			boundingRect = {
+				left = 1152;
+				top = 128;
+				right = 1408;
+				bottom = 160;
+			};
+		},
+		{
+			name = "11";
+			internalColor_ = 0;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "«¿¬Œƒ À≈√ »’0";
+					color = STRATEGY_GREEN;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 19;
+						y = -15;
+					};
+					childOffset = {
+						x = 19;
+						y = 15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 5;
+				y = 2;
+			};
+			boundingRect = {
+				left = 1440;
+				top = 128;
+				right = 1696;
+				bottom = 160;
+			};
+		},
+		{
+			name = "œŒÀ≈ ¬ À";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 0;
+				y = 16;
+			};
+			boundingRect = {
+				left = 0;
+				top = 1024;
+				right = 256;
+				bottom = 1056;
+			};
+		},
+		{
+			name = "¬€ À œŒÀ≈";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 0;
+				y = 17;
+			};
+			boundingRect = {
+				left = 0;
+				top = 1088;
+				right = 256;
+				bottom = 1120;
+			};
+		},
+		{
+			name = "À≈√ »… f0";
+			internalColor_ = 4227327;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -2;
+				y = -4;
+			};
+			boundingRect = {
+				left = -576;
+				top = -256;
+				right = -320;
+				bottom = -224;
+			};
+		},
+		{
+			name = "À≈√ »… —¿ÃŒÀ≈“ ﬂƒ–Œ";
+			internalColor_ = 8421631;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -2;
+				y = -6;
+			};
+			boundingRect = {
+				left = -576;
+				top = -384;
+				right = -320;
+				bottom = -352;
+			};
+		},
+		{
+			name = "«¿¬Œƒ —–≈ƒÕ»’0";
+			internalColor_ = 16744448;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "12";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -54;
+						y = 15;
+					};
+					childOffset = {
+						x = -57;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 3;
+				y = 4;
+			};
+			boundingRect = {
+				left = 864;
+				top = 256;
+				right = 1120;
+				bottom = 288;
+			};
+		},
+		{
+			name = "12";
+			internalColor_ = 0;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "«¿¬Œƒ —–≈ƒÕ»’0";
+					color = STRATEGY_GREEN;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -16;
+						y = -15;
+					};
+					childOffset = {
+						x = -16;
+						y = 15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 3;
+				y = 5;
+			};
+			boundingRect = {
+				left = 864;
+				top = 320;
+				right = 1120;
+				bottom = 352;
+			};
+		},
+		{
+			name = "«¿¬Œƒ À≈√ »’1";
+			internalColor_ = 16744448;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "100";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -4;
+						y = 15;
+					};
+					childOffset = {
+						x = -3;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 6;
+				y = 1;
+			};
+			boundingRect = {
+				left = 1728;
+				top = 64;
+				right = 1984;
+				bottom = 96;
+			};
+		},
+		{
+			name = "100";
+			internalColor_ = 0;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "«¿¬Œƒ À≈√ »’1";
+					color = STRATEGY_GREEN;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 34;
+						y = -15;
+					};
+					childOffset = {
+						x = 34;
+						y = 15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 6;
+				y = 2;
+			};
+			boundingRect = {
+				left = 1728;
+				top = 128;
+				right = 1984;
+				bottom = 160;
+			};
+		},
+		{
+			name = "«¿¬Œƒ “ﬂ∆≈À€’";
+			internalColor_ = 16744448;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "13";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -54;
+						y = 15;
+					};
+					childOffset = {
+						x = -57;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 4;
+				y = 3;
+			};
+			boundingRect = {
+				left = 1152;
+				top = 192;
+				right = 1408;
+				bottom = 224;
+			};
+		},
+		{
+			name = "13";
+			internalColor_ = 0;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "«¿¬Œƒ “ﬂ∆≈À€’";
+					color = STRATEGY_GREEN;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 25;
+						y = -15;
+					};
+					childOffset = {
+						x = 29;
+						y = 15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 4;
+				y = 4;
+			};
+			boundingRect = {
+				left = 1152;
+				top = 256;
+				right = 1408;
+				bottom = 288;
+			};
+		},
+		{
+			name = "¡¿«¿  œ";
+			internalColor_ = 16744448;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 0;
+				y = 4;
+			};
+			boundingRect = {
+				left = 0;
+				top = 256;
+				right = 256;
+				bottom = 288;
+			};
+		},
+		{
+			name = "¡¿«¿  œ2";
+			internalColor_ = 16744448;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 0;
+				y = 5;
+			};
+			boundingRect = {
+				left = 0;
+				top = 320;
+				right = 256;
+				bottom = 352;
+			};
+		},
+		{
+			name = "¡¿«¿  œ3";
+			internalColor_ = 16744448;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 0;
+				y = 6;
+			};
+			boundingRect = {
+				left = 0;
+				top = 384;
+				right = 256;
+				bottom = 416;
+			};
+		},
+		{
+			name = "œ”À≈Ã≈“ œ";
+			internalColor_ = 16744448;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "120";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -54;
+						y = 15;
+					};
+					childOffset = {
+						x = -57;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 7;
+			};
+			boundingRect = {
+				left = 288;
+				top = 448;
+				right = 544;
+				bottom = 480;
+			};
+		},
+		{
+			name = "120";
+			internalColor_ = 0;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "œ”À≈Ã≈“ œ";
+					color = STRATEGY_GREEN;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -7;
+						y = -15;
+					};
+					childOffset = {
+						x = -7;
+						y = 15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 8;
+			};
+			boundingRect = {
+				left = 288;
+				top = 512;
+				right = 544;
+				bottom = 544;
+			};
+		},
+		{
+			name = "–¿ ≈“Õ»÷¿ œ0";
+			internalColor_ = 16744448;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "1200";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -54;
+						y = 15;
+					};
+					childOffset = {
+						x = -57;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 9;
+			};
+			boundingRect = {
+				left = 288;
+				top = 576;
+				right = 544;
+				bottom = 608;
+			};
+		},
+		{
+			name = "1200";
+			internalColor_ = 0;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "–¿ ≈“Õ»÷¿ œ0";
+					color = STRATEGY_GREEN;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -10;
+						y = -15;
+					};
+					childOffset = {
+						x = -10;
+						y = 15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 10;
+			};
+			boundingRect = {
+				left = 288;
+				top = 640;
+				right = 544;
+				bottom = 672;
+			};
+		},
+		{
+			name = "√¿”¡»÷¿ Ô";
+			internalColor_ = 16744448;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "12000";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -54;
+						y = 15;
+					};
+					childOffset = {
+						x = -57;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 11;
+			};
+			boundingRect = {
+				left = 288;
+				top = 704;
+				right = 544;
+				bottom = 736;
+			};
+		},
+		{
+			name = "12000";
+			internalColor_ = 0;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "√¿”¡»÷¿ Ô";
+					color = STRATEGY_GREEN;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -28;
+						y = -15;
+					};
+					childOffset = {
+						x = -23;
+						y = 15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 12;
+			};
+			boundingRect = {
+				left = 288;
+				top = 768;
+				right = 544;
+				bottom = 800;
+			};
+		},
+		{
+			name = "À≈√ »…  ﬂƒ–Œ0";
+			internalColor_ = 8421631;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -2;
+				y = -9;
+			};
+			boundingRect = {
+				left = -576;
+				top = -576;
+				right = -320;
+				bottom = -544;
+			};
+		},
+		{
+			name = "ﬂƒ–Œ œ";
+			internalColor_ = 16744448;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "120000";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -54;
+						y = 15;
+					};
+					childOffset = {
+						x = -57;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -1;
+				y = 5;
+			};
+			boundingRect = {
+				left = -288;
+				top = 320;
+				right = -32;
+				bottom = 352;
+			};
+		},
+		{
+			name = "120000";
+			internalColor_ = 0;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "ﬂƒ–Œ œ";
+					color = STRATEGY_GREEN;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 42;
+						y = -15;
+					};
+					childOffset = {
+						x = 39;
+						y = 15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -1;
+				y = 6;
+			};
+			boundingRect = {
+				left = -288;
+				top = 384;
+				right = -32;
+				bottom = 416;
+			};
+		},
+		{
+			name = "À≈√ »… ≈—“‹ –¿ ≈“Õ€…";
+			internalColor_ = 4259584;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -2;
+				y = 8;
+			};
+			boundingRect = {
+				left = -576;
+				top = 512;
+				right = -320;
+				bottom = 544;
+			};
+		},
+		{
+			name = "—–≈ƒÕ»… ≈—“‹ “ﬂ∆≈À€’0";
+			internalColor_ = 4259584;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -2;
+				y = 11;
+			};
+			boundingRect = {
+				left = -576;
+				top = 704;
+				right = -320;
+				bottom = 736;
+			};
+		},
+		{
+			name = "À≈√ »… ≈—“‹ “ﬂ∆≈À€…";
+			internalColor_ = 4259584;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -2;
+				y = 10;
+			};
+			boundingRect = {
+				left = -576;
+				top = 640;
+				right = -320;
+				bottom = 672;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ÒÍ‚‡‰‡01";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 2;
+				y = -6;
+			};
+			boundingRect = {
+				left = 576;
+				top = -384;
+				right = 832;
+				bottom = -352;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ÒÍ‚‡‰‡02";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 3;
+				y = -9;
+			};
+			boundingRect = {
+				left = 864;
+				top = -576;
+				right = 1120;
+				bottom = -544;
+			};
+		},
+		{
+			name = "‡Ô„ÂÈ‰ ÒÍ‚‡‰‡0000";
+			internalColor_ = 8454143;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 4;
+				y = -12;
+			};
+			boundingRect = {
+				left = 1152;
+				top = -768;
+				right = 1408;
+				bottom = -736;
+			};
+		},
+		{
+			name = " ŒÕ—“–” “Œ–   ¬–¿√”";
+			internalColor_ = 0;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -1;
+				y = 0;
+			};
+			boundingRect = {
+				left = -288;
+				top = 0;
+				right = -32;
+				bottom = 32;
+			};
+		},
+		{
+			name = " ŒÕ—“–” “Œ–   Œ“ Àﬁ◊≈ÕÕŒÃ”";
+			internalColor_ = 0;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -2;
+				y = 1;
+			};
+			boundingRect = {
+				left = -576;
+				top = 64;
+				right = -320;
+				bottom = 96;
+			};
+		},
+		{
+			name = "ﬂƒ–Œ Í ÓÚÍÎ˛˜ÂÌÌÓÏÛ";
+			internalColor_ = 8454016;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -2;
+				y = 2;
+			};
+			boundingRect = {
+				left = -576;
+				top = 128;
+				right = -320;
+				bottom = 160;
+			};
+		},
+		{
+			name = "À≈√ »… ”–Œ¬≈Õ‹";
+			internalColor_ = 255;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -1;
+				y = 12;
+			};
+			boundingRect = {
+				left = -288;
+				top = 768;
+				right = -32;
+				bottom = 800;
+			};
+		},
+		{
+			name = "—–≈ƒÕ»… ”–Œ¬≈Õ‹";
+			internalColor_ = 255;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				5;
+				{
+					triggerName = "À≈√ »… !";
+					color = STRATEGY_GREEN;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "—–≈ƒÕ»… !";
+					color = STRATEGY_GREEN;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 93;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "“ﬂ∆≈À€… !";
+					color = STRATEGY_GREEN;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 71;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "œŒÀ≈ ¬ À";
+					color = STRATEGY_GREEN;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 3;
+						y = 15;
+					};
+					childOffset = {
+						x = 3;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "¬€ À œŒÀ≈";
+					color = STRATEGY_GREEN;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 20;
+						y = 15;
+					};
+					childOffset = {
+						x = 20;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 0;
+				y = 13;
+			};
+			boundingRect = {
+				left = 0;
+				top = 832;
+				right = 256;
+				bottom = 864;
+			};
+		},
+		{
+			name = "“ﬂ∆≈À€… ”–Œ¬≈Õ‹";
+			internalColor_ = 255;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				6;
+				{
+					triggerName = "À≈√ »… !";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 37;
+						y = 15;
+					};
+					childOffset = {
+						x = 35;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "—–≈ƒÕ»… !";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 20;
+						y = 15;
+					};
+					childOffset = {
+						x = 17;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "“ﬂ∆≈À€… !";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 8;
+						y = 15;
+					};
+					childOffset = {
+						x = -6;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "œŒÀ≈ ¬ À";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = 15;
+					};
+					childOffset = {
+						x = 100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "¬€ À œŒÀ≈";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = 15;
+					};
+					childOffset = {
+						x = 100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "œŒ»—   –»—“¿ÀÀŒ¬";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = false;
+					parentOffset = {
+						x = 59;
+						y = 15;
+					};
+					childOffset = {
+						x = 46;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 14;
+			};
+			boundingRect = {
+				left = 288;
+				top = 896;
+				right = 544;
+				bottom = 928;
+			};
+		},
+		{
+			name = "œŒ»—   –»—“¿ÀÀŒ¬";
+			internalColor_ = 0;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 18;
+			};
+			boundingRect = {
+				left = 288;
+				top = 1152;
+				right = 544;
+				bottom = 1184;
+			};
+		},
+		{
+			name = "À≈√ »…";
+			internalColor_ = 16777215;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -1;
+				y = -5;
+			};
+			boundingRect = {
+				left = -288;
+				top = -256;
+				right = -32;
+				bottom = -224;
+			};
+		},
+		{
+			name = "ÌÂ‚Â‰ËÏÍ‡";
+			internalColor_ = 0;
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -2;
+				y = 3;
+			};
+			boundingRect = {
+				left = -576;
+				top = 192;
+				right = -320;
+				bottom = 224;
+			};
+		}
+	};
+	boundingRect = {
+		left = -864;
+		top = -768;
+		right = 1984;
+		bottom = 1184;
+	};
+	viewRect = {
+		left = -822;
+		top = -470;
+		right = 675;
+		bottom = 718;
+	};
+	triggerEvents = {
+		0;
+	};
+};

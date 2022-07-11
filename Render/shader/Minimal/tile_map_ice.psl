@@ -1,0 +1,78 @@
+
+struct PS_INPUT
+{
+  float2 uv_snow:TEXCOORD1;
+  float2 uv_lightmap:TEXCOORD2;
+#ifndef PS11
+  float3 mirror:TEXCOORD6;
+  float2 uv_bump:TEXCOORD4;
+#endif
+#ifdef VERTEX_LIGHT
+  float3  color: COLOR0;
+#else
+  float2 uv_mapbump:TEXCOORD0;
+#endif
+  float4 shadow:TEXCOORD3;
+};
+
+sampler2D MapBumpSampler:register(s0);
+sampler2D SnowSampler:register(s1);
+sampler2D LightMapSampler:register(s3);
+
+#ifndef PS11
+samplerCUBE CubeSampler:register(s6);
+sampler2D BumpSampler:register(s4);
+#endif
+
+sampler ShadowSampler:register(s2);
+
+float4 light_color:register(c0);
+float3 inv_light_dir:register(c1);
+float4 vShade:register(c2);
+float4 vFogOfWar:register(c3);
+
+float4 fx_offset:register(c4);
+#include "..\skin\shadow9700.inl"
+
+float4 main(const PS_INPUT v):COLOR
+{
+#ifdef VERTEX_LIGHT
+  float3 light=v.color;
+#else
+  float4 mapbump=tex2D(MapBumpSampler,v.uv_mapbump);
+  float3 light=dot((mapbump.rgb*2-1),inv_light_dir.rgb);
+  light=light*light_color.rgb+light_color.a;
+#endif  
+  float4 lightmap=tex2D(LightMapSampler,v.uv_lightmap);
+  lightmap.rgb=2*(lightmap-0.5);
+  light+=lightmap;
+  float4 snow=tex2D(SnowSampler,v.uv_snow);
+
+#ifdef PS11
+  float4 ot=snow;
+  ot.rgb*=light;
+#else 
+  float3 cube_coord=v.mirror;
+  float4 bump=tex2D(BumpSampler,v.uv_bump);
+  cube_coord.xy+=bump.xy*0.2;
+  float4 ot=texCUBE(CubeSampler,cube_coord);
+  ot.rgb=lerp(ot,snow,snow.a);
+  ot.rgb*=light;
+#endif
+
+#ifdef SHADOW_9700
+  ot.rgb*=Shadow9700(ShadowSampler,v.shadow);
+  //ot.rgb=v.shadow.z-tex2D(ShadowSampler,v.shadow).x;
+  //ot.rgb=v.shadow.z;
+#endif
+#ifdef SHADOW_FX
+  ot.rgb*=ShadowFX(ShadowSampler,v.shadow);
+#endif
+#ifdef FOG_OF_WAR
+  ot.rgb=lerp(ot.rgb,vFogOfWar,lightmap.a);
+#endif
+  return ot;
+//  return float4(light,1);//
+//  bump.rgb=(bump.rgb+1)*0.5f;
+//  return bump;
+}

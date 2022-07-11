@@ -1,0 +1,36 @@
+struct VS_INPUT
+{
+    float4 pos : POSITION;
+	float3 n : NORMAL;
+    float2 t0 : TEXCOORD0;
+	float3 T : TEXCOORD1; //tangent
+	float3 S : TEXCOORD2; //binormal
+	float3 SxT : TEXCOORD3; //normal
+};
+
+struct VS_OUTPUT
+{
+    float4  pos : POSITION;
+    float3  n : TEXCOORD0;
+	float3  T : TEXCOORD1;
+	float3  S : TEXCOORD2;
+	float3  SxT : TEXCOORD3;
+};
+
+VS_OUTPUT main(const VS_INPUT v)
+{
+    VS_OUTPUT o;
+    o.pos=v.pos;
+    o.pos.x=o.pos.x*2-1;
+    o.pos.y=-(o.pos.y*2-1);
+    o.n=v.n;
+	o.n.x=dot(v.n,v.T);
+	o.n.y=dot(v.n,v.S);
+	o.n.z=dot(v.n,v.SxT);
+	
+    o.T=v.T;
+    o.S=v.S;
+    o.SxT=v.SxT;
+
+	return o;
+}

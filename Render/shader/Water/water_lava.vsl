@@ -1,0 +1,50 @@
+struct VS_INPUT
+{
+    float4 pos : POSITION;
+	float4  diffuse: COLOR0;
+};
+
+struct VS_OUTPUT
+{
+    float4  pos : POSITION;
+    float3  tvolume : TEXCOORD0;
+    float3  uv_ground: TEXCOORD1;
+    float4  diffuse: COLOR0;
+    float fog: FOG;
+#ifdef FOG_OF_WAR    
+	float2 uv_lightmap:TEXCOORD3;
+#endif
+};
+
+float4x4 mVP;
+
+float4x4 mView;
+float3 vFog;
+float4 fPlanarNode:register(c95);
+float2 textureScale; // [0] - ground, [1] - volume
+
+VS_OUTPUT main(const VS_INPUT v)
+{
+    VS_OUTPUT o;
+
+	float4 pos=v.pos;
+#ifdef CONVERT_Z
+	pos.z=pos.z*(1/64.0f);
+#endif
+
+	o.pos=mul(pos,mVP);
+	o.tvolume=pos*textureScale[1];
+	o.uv_ground=pos*textureScale[0];
+	o.diffuse.rgb=v.diffuse.rgb;
+	o.diffuse.a=v.diffuse.a*2;
+
+	//fog
+	float fogz=mul(pos,mView).z;
+	float fog=fogz*vFog.z+vFog.y;
+	o.fog=clamp(fog,0,1);
+	
+#ifdef FOG_OF_WAR
+	o.uv_lightmap = (pos.xy - fPlanarNode.xy)*fPlanarNode.zw;
+#endif	
+    return o;
+}

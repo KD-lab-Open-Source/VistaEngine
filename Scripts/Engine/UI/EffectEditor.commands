@@ -1,0 +1,89 @@
+commandTemplates = {
+	children = {
+		1;
+		{
+			name = "main";
+			label = "main";
+			separate = false;
+			hotkey = {
+				key = -858994688;
+				sticky = true;
+			};
+			children = {
+				2;
+				{
+					name = "file";
+					label = "&Файл";
+					separate = false;
+					hotkey = {
+						key = 67;
+						sticky = true;
+					};
+					children = {
+						2;
+						{
+							name = "open";
+							label = "&Открыть";
+							separate = false;
+							hotkey = {
+								key = 335;
+								sticky = true;
+							};
+							children = {
+								0;
+							};
+						},
+						{
+							name = "exit";
+							label = "В&ыход";
+							separate = true;
+							hotkey = {
+								key = -858994688;
+								sticky = true;
+							};
+							children = {
+								0;
+							};
+						}
+					};
+				},
+				{
+					name = "help";
+					label = "&Справка";
+					separate = false;
+					hotkey = {
+						key = -858994688;
+						sticky = true;
+					};
+					children = {
+						2;
+						{
+							name = "help";
+							label = "&Помощь";
+							separate = false;
+							hotkey = {
+								key = -858994688;
+								sticky = true;
+							};
+							children = {
+								0;
+							};
+						},
+						{
+							name = "about";
+							label = "&О программе..";
+							separate = true;
+							hotkey = {
+								key = -858994688;
+								sticky = true;
+							};
+							children = {
+								0;
+							};
+						}
+					};
+				}
+			};
+		}
+	};
+};

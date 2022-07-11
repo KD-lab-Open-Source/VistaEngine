@@ -1,0 +1,71 @@
+struct VS_INPUT
+{
+    float4 pos : POSITION;
+#ifdef VERTEX_LIGHT
+    float3 n : NORMAL;
+#endif
+};
+
+struct VS_OUTPUT
+{
+    float4  pos : POSITION;
+#ifdef VERTEX_LIGHT
+    float3  color: COLOR0;
+#else
+    float2  tmapbump : TEXCOORD0;
+#endif	
+	float2  tsnow : TEXCOORD1;
+	float3  mirror : TEXCOORD6;
+    float2  tbump : TEXCOORD4;
+	float2  lightmap : TEXCOORD2;
+	float fog: FOG;
+#ifdef SHADOW
+	float3  tshadow: TEXCOORD3;
+#endif	
+};
+
+float4x4 mWVP:register(c3);
+float4 fPlanarNode:register(c95);
+
+float3 vLightDirection:register(c7);
+float4 UV:register(c0);
+float4 UVbump:register(c1);
+float4 vColor:register(c2);//xyz-diffuse, w-ambient
+
+float4x4 mView:register(c8);
+float3 vFog:register(c12);
+float3 vCameraPos:register(c13);
+float4x4 mShadow:register(c14);
+
+VS_OUTPUT main(const VS_INPUT v)
+{
+    VS_OUTPUT o;
+#include "ConvertPos.inl"
+
+
+	o.pos=mul(pos,mWVP);
+	float mulpos=0.01;
+	o.tbump=pos.xy*mulpos;
+	float mul_snow=0.003;
+	o.tsnow=pos.xy*mul_snow;
+	float3 dir=vCameraPos-pos;
+	dir.z-=pos.z;
+	o.mirror=normalize(dir);
+	
+#ifndef VERTEX_LIGHT
+	o.tmapbump=pos.xy*UVbump.zw+UVbump.xy;
+#endif	
+	o.lightmap=pos*fPlanarNode.zw+fPlanarNode.xy;
+
+#ifdef VERTEX_LIGHT
+	o.color.rgb=-dot(v.n*2-1,vLightDirection);
+	o.color.rgb=o.color.rgb*vColor.rgb+vColor.w;
+#endif	
+#ifdef SHADOW
+	o.tshadow=mul(pos,mShadow);
+#endif
+	//fog
+	float fogz=mul(pos,mView).z;
+	o.fog=fogz*vFog.z+vFog.y;
+    return o;
+}

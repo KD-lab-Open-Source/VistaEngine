@@ -1,0 +1,26 @@
+struct PS_INPUT
+{
+	float2 uv0:TEXCOORD0;
+	float2 uv_lightmap:TEXCOORD2;
+};
+sampler2D t0:register(s0);
+sampler2D t1:register(s1);
+sampler2D LightMapSampler:register(s2);
+sampler2D ZbufferMap:register(s3);
+sampler2D ReflectionZ:register(s5);
+
+float4 tfactor;
+float4 vFogOfWar:register(c3);
+
+float4 main(const PS_INPUT v):COLOR
+{
+	float4 ot=tex2D(t0,v.uv0);
+	ot.rgb=ot.rgb*tfactor*2;
+
+#ifdef FOG_OF_WAR
+	float4 lightmap=tex2D(LightMapSampler,v.uv_lightmap);
+	ot.rgb=lerp(ot.rgb, vFogOfWar, lightmap.a);
+#endif
+
+	return ot;
+}

@@ -1,0 +1,19 @@
+struct VS_INPUT
+{
+    float4 pos : POSITION;
+};
+
+struct VS_OUTPUT
+{
+    float4  pos : POSITION;
+};
+
+float4x4 mVP:register(c0);
+
+VS_OUTPUT main(const VS_INPUT v)
+{
+	VS_OUTPUT o;
+#include "..\Minimal\ConvertPos.inl"
+	o.pos=mul(pos,mVP);
+	return o;
+}

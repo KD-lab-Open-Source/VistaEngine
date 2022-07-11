@@ -1,0 +1,2157 @@
+Version = 0;
+AuxAttributeLibrary = {
+	header = {
+		5;
+		"AUX_ATTRIBUTE_ENVIRONMENT",
+		"AUX_ATTRIBUTE_ENVIRONMENT_SIMPLE",
+		"AUX_ATTRIBUTE_DETONATOR",
+		"AUX_ATTRIBUTE_ZONE",
+		"AUX_ATTRIBUTE_PLAYER_UNIT"
+	};
+	strings = {
+		5;
+		{
+			name = "AUX_ATTRIBUTE_ENVIRONMENT";
+			type = "class AttributeBase" {
+				libraryKey = "";
+				unitClass = UNIT_CLASS_ENVIRONMENT;
+				modelName = "";
+				boundHeight = 0.5;
+				accurateBound = false;
+				boundScale = 1.;
+				boundRadius = 0.;
+				modelTime = {
+					low = 0;
+					high = 0;
+				};
+				showSilhouette = false;
+				hideByDistance = false;
+				canBeTransparent = false;
+				fow_mode = FVM_ALLWAYS;
+				permanentEffects = {
+					0;
+				};
+				animationChainsNew = {
+					7;
+					{
+						name = "";
+						chainID = CHAIN_DEATH;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "death";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_BIRTH;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "birth";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_GIVE_RESOURCE;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "give_resource";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_MOVE;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "move";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_WALK;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_WALK | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "walk";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_WALK;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_RUN | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "run";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_STAND;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "stand";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					}
+				};
+				excludeCollision = EXCLUDE_COLLISION_ENVIRONMENT;
+				collisionGroup = ;
+				internal = true;
+				boundBoxMin = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				boundBoxMax = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				producedThisFactories = {
+					0;
+				};
+				distanceLod = OBJECT_LOD_DEFAULT;
+			};
+		},
+		{
+			name = "AUX_ATTRIBUTE_ENVIRONMENT_SIMPLE";
+			type = "class AttributeBase" {
+				libraryKey = "";
+				unitClass = UNIT_CLASS_ENVIRONMENT_SIMPLE;
+				modelName = "";
+				boundHeight = 0.5;
+				accurateBound = false;
+				boundScale = 1.;
+				boundRadius = 0.;
+				modelTime = {
+					low = 0;
+					high = 0;
+				};
+				showSilhouette = false;
+				hideByDistance = false;
+				canBeTransparent = false;
+				fow_mode = FVM_ALLWAYS;
+				permanentEffects = {
+					0;
+				};
+				animationChainsNew = {
+					7;
+					{
+						name = "";
+						chainID = CHAIN_DEATH;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "death";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_BIRTH;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "birth";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_GIVE_RESOURCE;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "give_resource";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_MOVE;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "move";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_WALK;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_WALK | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "walk";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_WALK;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_RUN | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "run";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_STAND;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "stand";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					}
+				};
+				excludeCollision = EXCLUDE_COLLISION_ENVIRONMENT;
+				collisionGroup = ;
+				internal = true;
+				boundBoxMin = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				boundBoxMax = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				producedThisFactories = {
+					0;
+				};
+				distanceLod = OBJECT_LOD_DEFAULT;
+			};
+		},
+		{
+			name = "AUX_ATTRIBUTE_DETONATOR";
+			type = "class AttributeBase" {
+				libraryKey = "";
+				unitClass = UNIT_CLASS_ZONE;
+				modelName = "";
+				boundHeight = 0.5;
+				accurateBound = false;
+				boundScale = 1.;
+				boundRadius = 0.;
+				modelTime = {
+					low = 0;
+					high = 0;
+				};
+				showSilhouette = false;
+				hideByDistance = false;
+				canBeTransparent = false;
+				fow_mode = FVM_ALLWAYS;
+				permanentEffects = {
+					0;
+				};
+				animationChainsNew = {
+					7;
+					{
+						name = "";
+						chainID = CHAIN_DEATH;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "death";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_BIRTH;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "birth";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_GIVE_RESOURCE;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "give_resource";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_MOVE;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "move";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_WALK;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_WALK | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "walk";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_WALK;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_RUN | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "run";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_STAND;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "stand";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					}
+				};
+				excludeCollision = ;
+				collisionGroup = COLLISION_GROUP_COLLIDER;
+				internal = false;
+				boundBoxMin = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				boundBoxMax = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				producedThisFactories = {
+					0;
+				};
+				distanceLod = OBJECT_LOD_DEFAULT;
+			};
+		},
+		{
+			name = "AUX_ATTRIBUTE_ZONE";
+			type = "class AttributeBase" {
+				libraryKey = "";
+				unitClass = UNIT_CLASS_ZONE;
+				modelName = "";
+				boundHeight = 0.5;
+				accurateBound = false;
+				boundScale = 1.;
+				boundRadius = 0.;
+				modelTime = {
+					low = 0;
+					high = 0;
+				};
+				showSilhouette = false;
+				hideByDistance = false;
+				canBeTransparent = false;
+				fow_mode = FVM_ALLWAYS;
+				permanentEffects = {
+					0;
+				};
+				animationChainsNew = {
+					7;
+					{
+						name = "";
+						chainID = CHAIN_DEATH;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "death";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_BIRTH;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "birth";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_GIVE_RESOURCE;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "give_resource";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_MOVE;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "move";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_WALK;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_WALK | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "walk";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_WALK;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_RUN | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "run";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					},
+					{
+						name = "";
+						chainID = CHAIN_STAND;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ON_GROUND;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "stand";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = true;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					}
+				};
+				excludeCollision = EXCLUDE_COLLISION_ENVIRONMENT;
+				collisionGroup = ;
+				internal = true;
+				boundBoxMin = {
+					x = -1.;
+					y = -1.;
+					z = -1.;
+				};
+				boundBoxMax = {
+					x = 1.;
+					y = 1.;
+					z = 1.;
+				};
+				producedThisFactories = {
+					0;
+				};
+				distanceLod = OBJECT_LOD_DEFAULT;
+			};
+		},
+		{
+			name = "AUX_ATTRIBUTE_PLAYER_UNIT";
+			type = "class AttributeBuilding" {
+				libraryKey = "";
+				unitClass = UNIT_CLASS_BUILDING;
+				modelName = ".\\Scripts\\Resource\\Models\\PlayerUnit.3DX";
+				boundHeight = 20.;
+				accurateBound = false;
+				radius = 0.;
+				boundScale = 3.58051;
+				boundRadius = 17.4173;
+				modelTime = {
+					low = 1922704384;
+					high = 29909421;
+				};
+				showSilhouette = false;
+				hideByDistance = false;
+				canBeTransparent = false;
+				fow_mode = FVM_ALLWAYS;
+				permanentEffects = {
+					0;
+				};
+				animationChainsNew = {
+					0;
+				};
+				nightVisibilitySet = {
+					name = "default";
+					index = 0;
+				};
+				dayVisibilityGroup = {
+					name = "main";
+					index = 0;
+				};
+				nightVisibilityGroup = {
+					name = "main";
+					index = 0;
+				};
+				parametersInitial = {
+					0;
+				};
+				ptBoundCheck = false;
+				bodyParts = {
+					0;
+				};
+				rigidBodyModelPrm = {
+					0;
+				};
+				dockNodeNumber = 0;
+				creationTime = 60.;
+				creationValue = {
+					0;
+				};
+				installValue = {
+					0;
+				};
+				cancelConstructionValue = {
+					0;
+				};
+				uninstallValue = {
+					0;
+				};
+				needBuilders = false;
+				accessValue = {
+					0;
+				};
+				accessBuildingsList = {
+					0;
+				};
+				formationType = " ŒÕ—“–” “Œ–";
+				accountingNumber = 1;
+				unitNumberMaxType = "";
+				inheritHealthArmor = false;
+				upgrades = {
+					0;
+				};
+				transportSlots = {
+					0;
+				};
+				transportLoadRadius = 10.;
+				transportLoadDirectControlRadius = 16.;
+				tipsName = {
+					key = "";
+				};
+				interfaceNames = {
+					0;
+				};
+				interfaceDescriptions = {
+					0;
+				};
+				Miniatures = {
+					UI_STATE_TYPE_NORMAL = "";
+					UI_STATE_TYPE_SELECTED = "";
+					UI_STATE_TYPE_WAITING = "";
+				};
+				ui_faces = {
+					0;
+				};
+				minimapScale = 1.;
+				symbolType = UI_MINIMAP_SYMBOLTYPE_DEFAULT;
+				hasPermanentSymbol = false;
+				minimapSymbolSpecial = {
+					type = SYMBOL_RECTANGLE;
+					scaleByEvent = false;
+					selfScale = 1.;
+					useLegionColor = false;
+					color = {
+						r = 1.;
+						g = 1.;
+						b = 1.;
+						a = 1.;
+					};
+				};
+				showUpgradeEvent = true;
+				isHero = false;
+				isStrategicPoint = false;
+				accountInCondition = false;
+				inventories = {
+					0;
+				};
+				equipment = {
+					0;
+				};
+				selectBySphere = true;
+				selection_cursor = "";
+				selectionListPriority = 0;
+				initialHeightUIParam = 40;
+				showSpriteForUnvisible = true;
+				selectBySprite = false;
+				selectSprites = {
+					ORDINARY = {
+						selectSpriteNormal = {
+							sprite = {
+								texture_ = "";
+							};
+							useLegionColor = false;
+							spriteOffset = {
+								x = 0.;
+								y = 0.;
+							};
+							spriteScale = 1.;
+							minPerspectiveScale = 0.4;
+							maxPerspectiveScale = 2.;
+							hideScale = 0.2;
+						};
+						selectSpriteHover = {
+							sprite = {
+								texture_ = "";
+							};
+							useLegionColor = false;
+							spriteOffset = {
+								x = 0.;
+								y = 0.;
+							};
+							spriteScale = 1.;
+							minPerspectiveScale = 0.4;
+							maxPerspectiveScale = 2.;
+							hideScale = 0.2;
+						};
+						selectSpriteSelected = {
+							sprite = {
+								texture_ = "";
+							};
+							useLegionColor = false;
+							spriteOffset = {
+								x = 0.;
+								y = 0.;
+							};
+							spriteScale = 1.;
+							minPerspectiveScale = 0.4;
+							maxPerspectiveScale = 2.;
+							hideScale = 0.2;
+						};
+						showSelectSpritesForOthers = false;
+					};
+					UNPOWERED = {
+						selectSpriteNormal = {
+							sprite = {
+								texture_ = "";
+							};
+							useLegionColor = false;
+							spriteOffset = {
+								x = 0.;
+								y = 0.;
+							};
+							spriteScale = 1.;
+							minPerspectiveScale = 0.4;
+							maxPerspectiveScale = 2.;
+							hideScale = 0.2;
+						};
+						selectSpriteHover = {
+							sprite = {
+								texture_ = "";
+							};
+							useLegionColor = false;
+							spriteOffset = {
+								x = 0.;
+								y = 0.;
+							};
+							spriteScale = 1.;
+							minPerspectiveScale = 0.4;
+							maxPerspectiveScale = 2.;
+							hideScale = 0.2;
+						};
+						selectSpriteSelected = {
+							sprite = {
+								texture_ = "";
+							};
+							useLegionColor = false;
+							spriteOffset = {
+								x = 0.;
+								y = 0.;
+							};
+							spriteScale = 1.;
+							minPerspectiveScale = 0.4;
+							maxPerspectiveScale = 2.;
+							hideScale = 0.2;
+						};
+						showSelectSpritesForOthers = true;
+						ownSelectSpritesForOthers = false;
+					};
+				};
+				offsideSprite = "";
+				offsideSpriteForEnemy = "";
+				parameterShowSettings = {
+					0;
+				};
+				showChangeParameterSettings = {
+					0;
+				};
+				showSelectRadius = true;
+				selectCircleRelativeRadius = 1.;
+				selectRadius = 14.2605;
+				fireRadiusCircle = {
+					useLegionColor = false;
+					color = {
+						r = 150;
+						g = 0;
+						b = 0;
+						a = 0;
+					};
+					texture = "Scripts\\Resource\\Textures\\Region.tga";
+					length = 30.;
+					width = 1.;
+					segmentLength = 5.;
+				};
+				fireMinRadiusCircle = {
+					useLegionColor = false;
+					color = {
+						r = 0;
+						g = 100;
+						b = 0;
+						a = 0;
+					};
+					texture = "Scripts\\Resource\\Textures\\Region.tga";
+					length = 30.;
+					width = 1.;
+					segmentLength = 5.;
+				};
+				fireDispRadiusCircle = {
+					useLegionColor = false;
+					color = {
+						r = 0;
+						g = 150;
+						b = 0;
+						a = 0;
+					};
+					texture = "Scripts\\Resource\\Textures\\Region.tga";
+					length = 30.;
+					width = 1.;
+					segmentLength = 5.;
+				};
+				signRadiusCircle = {
+					useLegionColor = false;
+					color = {
+						r = 0;
+						g = 0;
+						b = 150;
+						a = 0;
+					};
+					texture = "Scripts\\Resource\\Textures\\Region.tga";
+					length = 30.;
+					width = 1.;
+					segmentLength = 5.;
+				};
+				noiseRadiusCircle = {
+					useLegionColor = false;
+					color = {
+						r = 0;
+						g = 150;
+						b = 0;
+						a = 0;
+					};
+					texture = "Scripts\\Resource\\Textures\\Region.tga";
+					length = 30.;
+					width = 1.;
+					segmentLength = 5.;
+				};
+				hearingRadiusCircle = {
+					useLegionColor = false;
+					color = {
+						r = 100;
+						g = 100;
+						b = 170;
+						a = 0;
+					};
+					texture = "Scripts\\Resource\\Textures\\Region.tga";
+					length = 30.;
+					width = 1.;
+					segmentLength = 5.;
+				};
+				interfaceTV = {
+					radius = 80.;
+					position = {
+						x = 0.;
+						y = 0.;
+					};
+					orientation = {
+						x = 70.;
+						y = 0.;
+						z = 0.;
+					};
+					chain = {
+						name = "";
+						chainID = CHAIN_NONE;
+						animationMovementState = {
+							state = ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE | ANIMATION_STATE_ATTACK;
+							terrainType = ANIMATION_ALL_SURFACES;
+						};
+						weapon = {
+							weaponType = "";
+						};
+						counter = 0;
+						possibility = 100;
+						ChainIndex = {
+							name = "chain";
+							index = 0;
+						};
+						AnimationGroup = {
+							name = "main";
+							index = 0;
+						};
+						VisibilityGroup = {
+							name = "main";
+							index = 0;
+						};
+						animationAcceleration = 0;
+						cycled = false;
+						supportedByLogic = false;
+						reversed = false;
+						syncBySound = false;
+						randomPhase = false;
+						effects = {
+							0;
+						};
+						stopPermanentEffects = false;
+						soundReferences = {
+							0;
+						};
+						soundMarkers = {
+							0;
+						};
+						noiseRadiusFactor = 1.;
+						abnormalStateTypes = {
+							0;
+						};
+						period = 1000;
+						periodSeconds = 1.;
+					};
+				};
+				weaponAttributesMap = {
+					0;
+				};
+				hasAutomaticAttackMode = false;
+				attackTargetNotificationMode = TARGET_NOTIFY_SQUAD;
+				noiseTargetEffect = {
+					isCycled = true;
+					stopImmediately = false;
+					bindOrientation = true;
+					legionColor = false;
+					switchOffByInterface = false;
+					switchOffUnderWater = false;
+					switchOffUnderLava = false;
+					switchOffByDay = false;
+					switchOffOnIce = false;
+					switchOnIce = false;
+					ignoreFogOfWar = false;
+					ignoreInvisibility = false;
+					ignoreDistanceCheck = false;
+					waterPlacementMode = WATER_BOTTOM;
+					scale = 1.;
+					effectReference = "";
+					scaleByModel = true;
+					onlyForActivePlayer = false;
+					switchOffByAnimationChain = false;
+					node = {
+						name = "group center";
+						index = 0;
+					};
+				};
+				syndicateControlAimEnabled = false;
+				disablePathTrackingInSyndicateControl = false;
+				syndicatControlCameraRestrictionFactor = 1.;
+				syndicateControlOffset = {
+					x = 0.;
+					y = 0.;
+					z = 10.;
+				};
+				directControlNode = {
+					name = "group center";
+					index = 0;
+				};
+				directControlOffset = {
+					x = -100.;
+					y = 0.;
+					z = 10.;
+				};
+				directControlOffsetWater = {
+					x = -100.;
+					y = 0.;
+					z = 10.;
+				};
+				directControlThetaMin = 0.;
+				directControlThetaMax = 180.;
+				waterEffect = {
+					type = "";
+					duration = 1.;
+					durationRnd = 0.;
+					damage = {
+						MainDamage = {
+							0;
+						};
+					};
+					useArithmetics = false;
+					freeze = false;
+					freezeAttack = false;
+				};
+				lavaEffect = {
+					type = "";
+					duration = 1.;
+					durationRnd = 0.;
+					damage = {
+						MainDamage = {
+							0;
+						};
+					};
+					useArithmetics = false;
+					freeze = false;
+					freezeAttack = false;
+				};
+				iceEffect = {
+					type = "";
+					duration = 1.;
+					durationRnd = 0.;
+					damage = {
+						MainDamage = {
+							0;
+						};
+					};
+					useArithmetics = false;
+					freeze = false;
+					freezeAttack = false;
+				};
+				earthEffect = {
+					type = "";
+					duration = 1.;
+					durationRnd = 0.;
+					damage = {
+						MainDamage = {
+							0;
+						};
+					};
+					useArithmetics = false;
+					freeze = false;
+					freezeAttack = false;
+				};
+				abnormalStateEffects = {
+					0;
+				};
+				explodeReference = "ÕÂÚ ‚Á˚‚‡";
+				explodeFactor = 1.;
+				effectAttr = {
+					isCycled = true;
+					stopImmediately = false;
+					bindOrientation = true;
+					legionColor = false;
+					switchOffByInterface = false;
+					switchOffUnderWater = false;
+					switchOffUnderLava = false;
+					switchOffByDay = false;
+					switchOffOnIce = false;
+					switchOnIce = false;
+					ignoreFogOfWar = false;
+					ignoreInvisibility = false;
+					ignoreDistanceCheck = false;
+					waterPlacementMode = WATER_BOTTOM;
+					scale = 1.;
+					effectReference = "";
+					scaleByModel = true;
+					onlyForActivePlayer = false;
+					switchOffByAnimationChain = false;
+					node = {
+						name = "group center";
+						index = 0;
+					};
+				};
+				effectAttrFly = {
+					isCycled = true;
+					stopImmediately = false;
+					bindOrientation = true;
+					legionColor = false;
+					switchOffByInterface = false;
+					switchOffUnderWater = false;
+					switchOffUnderLava = false;
+					switchOffByDay = false;
+					switchOffOnIce = false;
+					switchOnIce = false;
+					ignoreFogOfWar = false;
+					ignoreInvisibility = false;
+					ignoreDistanceCheck = false;
+					waterPlacementMode = WATER_BOTTOM;
+					scale = 1.;
+					effectReference = "";
+					scaleByModel = true;
+					onlyForActivePlayer = false;
+					switchOffByAnimationChain = false;
+					node = {
+						name = "group center";
+						index = 0;
+					};
+				};
+				enableExplodeFantom = false;
+				sources = {
+					0;
+				};
+				contactWeight = 0.;
+				unitAttackClass = ATTACK_CLASS_IGNORE;
+				excludeFromAutoAttack = false;
+				leavingItems = {
+					0;
+				};
+				leavingItemsRandom = false;
+				dropInventoryItems = false;
+				deathGainArithmetics = {
+					data = {
+						0;
+					};
+				};
+				producedUnits = {
+					0;
+				};
+				producedUnitQueueSize = 5;
+				dockNodes = {
+					0;
+				};
+				impassibility = 0;
+				automaticProduction = false;
+				totalProductionNumber = 0;
+				productivity = {
+					0;
+				};
+				productivityTotal = {
+					0;
+				};
+				productionRequirement = PRODUCE_EVERYWHERE;
+				productionNightFactor = 1.;
+				producedParameters = {
+					0;
+				};
+				resourceCapacity = {
+					0;
+				};
+				putInIdleList = false;
+				excludeCollision = EXCLUDE_COLLISION_ENVIRONMENT;
+				collisionGroup = COLLISION_GROUP_REAL;
+				internal = false;
+				boundBoxMin = {
+					x = -10.0573;
+					y = -9.83895;
+					z = -9.8152;
+				};
+				boundBoxMax = {
+					x = 10.3539;
+					y = 10.0814;
+					z = 10.1848;
+				};
+				producedThisFactories = {
+					0;
+				};
+				chainTransitionTime = 1000;
+				chainBirthTime = 1000;
+				chainRiseTime = 1000;
+				chainOpenTime = 1000;
+				chainCloseTime = 1000;
+				chainOpenForLandingTime = 1000;
+				chainCloseForLandingTime = 1000;
+				chainFlyDownTime = 1000;
+				chainUpgradedFromBuilding = 1000;
+				chainUpgradedFromLegionary = 1000;
+				chainUninsatalTime = 1000;
+				killAfterDisconnect = false;
+				invisible = false;
+				canChangeVisibility = false;
+				invisibleColorForAlien = {
+					color = {
+						r = 255;
+						g = 255;
+						b = 255;
+						a = 6;
+					};
+					isBrightColor = false;
+				};
+				invisibleColorForClan = {
+					color = {
+						r = 255;
+						g = 255;
+						b = 255;
+						a = 64;
+					};
+					isBrightColor = false;
+				};
+				distanceLod = OBJECT_LOD_DEFAULT;
+				enablePathTracking = true;
+				interactionType = INTERACTION_NORMAL;
+				basementExtent = {
+					x = 0.;
+					y = 0.;
+				};
+				placementMode = PLACE_ON_GROUND;
+				terrainType4Placement = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
+				analyzeTerrain = false;
+				cancelConstructionTime = 60;
+				placementZone = "";
+				producedPlacementZone = "";
+				producedPlacementZoneRadius = 0.;
+				placementZoneMaterial = -1;
+				toolzer = {
+					terrainType = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
+					terToolReference = "";
+					scaleFactor = 1.;
+					currentScaleFactor = 1.;
+					scaleFactorTerrainType = 1.;
+				};
+				killAfterToolzerFinished = false;
+				mass = 1.;
+				sightSector = 6.28319;
+				sightSectorColorIndex = 0;
+				showSightSector = false;
+				sightRadiusNightFactor = 1.;
+				sightFogOfWarFactor = 1.;
+				fieldOfViewMapAdd = false;
+				teleport = false;
+				includeBase = false;
+				selectAble = false;
+			};
+		}
+	};
+};

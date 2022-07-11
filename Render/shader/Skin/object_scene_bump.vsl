@@ -1,0 +1,161 @@
+
+struct VS_INPUT
+{
+    float4 pos : POSITION;
+	float3 n : NORMAL;
+    float2 t0 : TEXCOORD0;
+#if(WEIGHT>1)    
+	float4 blend_weight: COLOR0;
+#endif	
+    float4 blend:BLENDINDICES;
+	float3 T : TANGENT;
+	float3 S : BINORMAL;
+//	SxT==n; //normal
+};
+
+struct VS_OUTPUT
+{
+    float4  pos : POSITION;
+    float2  t0 : TEXCOORD0;
+	float3  light_obj : TEXCOORD4;
+	float3  half_obj : TEXCOORD1;
+#ifdef SHADOW
+	float4  tshadow : TEXCOORD2;
+#endif
+    float fog: FOG;
+    
+#if defined(FOG_OF_WAR) || defined(LIGHTMAP)
+	float2 uv_lightmap:TEXCOORD3;
+#endif
+#ifdef ZREFLECTION
+	float3  treflection: TEXCOORD5;
+#endif
+	float3  specular: COLOR1;
+};
+
+float4x4 mVP: register(c0);
+
+float4 vAmbient: register(c4);
+float4 vDiffuse: register(c5);
+float3 vCameraPos: register(c7);
+float3 vLightDirection: register(c8);
+
+float4x3 mWorldM[20]: register(c9);
+float4x4 mShadow;
+
+float3 vPointPos0:register(c76);
+float3 vPointPos1:register(c77);
+float3 vPointColor0:register(c78);
+float3 vPointColor1:register(c79);
+float4 vLightAttenuation:register(c80);
+
+float3 vReflectionMul:register(c87);
+float3 vUtrans:register(c88);
+float3 vVtrans:register(c89);
+
+float4x4 mView:register(c90);
+float3 vFog:register(c94);
+float4 fPlanarNode:register(c95);
+/*
+float3 mul3(float3 v,float3x3 m)
+{
+	float3 o;
+	o.x=dot(v,m._m00_m10_m20);
+	o.y=dot(v,m._m01_m11_m21);
+	o.z=dot(v,m._m02_m12_m22);
+	return o;
+}
+*/
+
+float3 mul_trans(float3 v,float3x3 m)
+{
+	float3 o;
+	o =v.x*m._m00_m10_m20;
+	o+=v.y*m._m01_m11_m21;
+	o+=v.z*m._m02_m12_m22;
+	return o;
+}
+
+/*
+float3 mul_trans(float3 v,float3x3 m)
+{
+	float3 o;
+	o.x=dot(v,m._m00_m01_m02);
+	o.y=dot(v,m._m10_m11_m12);
+	o.z=dot(v,m._m20_m21_m22);
+	return o;
+}
+*/
+/*
+float3 mul_trans(float3 v,float3x3 m)
+{
+	float3x3 mt=transpose(m);
+	return mul(v,mt);
+}
+*/
+
+VS_OUTPUT main(const VS_INPUT v)
+{
+    VS_OUTPUT o;
+	float3 world_pos;
+	float4x3 mWorld;
+	int4 blend = D3DCOLORtoUBYTE4(v.blend);
+	
+#if (WEIGHT>1)	
+		mWorld=mWorldM[blend[0]]*v.blend_weight[0];
+		for(int i=1;i<WEIGHT;i++)
+		{
+			mWorld+=mWorldM[blend[i]]*v.blend_weight[i];
+		}
+		
+#else
+		mWorld=mWorldM[blend[0]];
+#endif	
+	
+	world_pos=mul(v.pos,mWorld);
+	float4 world_pos4=float4(world_pos,1);
+	o.pos=mul(world_pos4,mVP);
+#ifdef UVTRANS
+	float3 vt0=float3(v.t0.x,v.t0.y,1);
+	o.t0.x=dot(vt0,vUtrans);
+	o.t0.y=dot(vt0,vVtrans);
+#else
+	o.t0=v.t0;
+#endif
+
+	//light
+	float3 light=-mul_trans(vLightDirection,mWorld);
+	// move light vector into tangent space
+	o.light_obj.x=dot(light,v.T);
+	o.light_obj.y=dot(light,v.S);
+	o.light_obj.z=dot(light,v.n);
+	o.light_obj=normalize(o.light_obj);//потом просто *1/scale
+
+	float3 dir=normalize(vCameraPos-world_pos);
+	float3 half_v=dir-vLightDirection;
+	float3 half_obj=(mul_trans(half_v,mWorld));
+
+	o.half_obj.x=dot(half_obj,v.T);
+	o.half_obj.y=dot(half_obj,v.S);
+	o.half_obj.z=dot(half_obj,v.n);
+	o.half_obj=normalize(o.half_obj);
+	
+#ifdef SHADOW
+	o.tshadow=mul(world_pos4,mShadow);
+#endif
+	//fog
+	float fogz=mul(world_pos4,mView).z;
+	o.fog=fogz*vFog.z+vFog.y;
+	
+#if defined(FOG_OF_WAR) || defined(LIGHTMAP)
+	o.uv_lightmap = (world_pos.xy - fPlanarNode.xy)*fPlanarNode.zw;
+#endif	
+#ifdef ZREFLECTION
+	o.treflection=world_pos*vReflectionMul;
+#endif
+
+	o.specular=0;
+#include "pointcolor.inl"
+
+    return o;
+}

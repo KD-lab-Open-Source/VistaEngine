@@ -1,0 +1,20 @@
+struct PS_INPUT
+{
+	float2 Tex:TEXCOORD0;
+};
+static const int g_cKernelSize = 13;
+
+sampler2D SrcTexture:register(s0);
+float4 PixelKernel[13]:register(c0);
+float BloomScale:register(c13);
+
+float4 main (const PS_INPUT v):COLOR
+{
+    float4 Color = 0;
+
+    for (int i = 0; i < g_cKernelSize; i++)
+    {    
+        Color += tex2D( SrcTexture, v.Tex + PixelKernel[i].xy ) * PixelKernel[i].z;
+    }
+    return Color * BloomScale;
+}

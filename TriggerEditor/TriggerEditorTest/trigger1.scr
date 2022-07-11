@@ -1,0 +1,3436 @@
+TriggerChain = {
+	name = "trigger1.scr";
+	version = 0;
+	checkType = LOGIC_TRIGGER;
+	triggers = {
+		75;
+		{
+			name = "START";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				7;
+				{
+					triggerName = "SetPartyNum";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = 15;
+					};
+					childOffset = {
+						x = 100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "ReleaseUnits";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = -3;
+					};
+					childOffset = {
+						x = -100;
+						y = -4;
+					};
+				},
+				{
+					triggerName = "DisableControl";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 46;
+						y = -15;
+					};
+					childOffset = {
+						x = -100;
+						y = 4;
+					};
+				},
+				{
+					triggerName = "Cheat0";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = true;
+					parentOffset = {
+						x = 11;
+						y = 15;
+					};
+					childOffset = {
+						x = -8;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "LoseTank";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = true;
+					parentOffset = {
+						x = 31;
+						y = -15;
+					};
+					childOffset = {
+						x = -100;
+						y = 8;
+					};
+				},
+				{
+					triggerName = "Test_KillTruck";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = true;
+					parentOffset = {
+						x = -83;
+						y = -15;
+					};
+					childOffset = {
+						x = 100;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "FrolovAt_01";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = true;
+					parentOffset = {
+						x = -79;
+						y = -15;
+					};
+					childOffset = {
+						x = 100;
+						y = 15;
+					};
+				}
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 0;
+				y = 2;
+			};
+			boundingRect = {
+				left = 0;
+				top = 128;
+				right = 256;
+				bottom = 160;
+			};
+		},
+		{
+			name = "SCENE_01";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 6;
+				y = -12;
+			};
+			boundingRect = {
+				left = 1728;
+				top = -768;
+				right = 1984;
+				bottom = -736;
+			};
+		},
+		{
+			name = "Objective_01";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "Objective_01_Complete";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = true;
+					parentOffset = {
+						x = -100;
+						y = 15;
+					};
+					childOffset = {
+						x = 100;
+						y = -11;
+					};
+				}
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 2;
+				y = 6;
+			};
+			boundingRect = {
+				left = 576;
+				top = 384;
+				right = 832;
+				bottom = 416;
+			};
+		},
+		{
+			name = "Mark_01_On";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				2;
+				{
+					triggerName = "Objective_02";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -23;
+						y = 15;
+					};
+					childOffset = {
+						x = -24;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "Mark_01_Off";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 4;
+						y = 15;
+					};
+					childOffset = {
+						x = 5;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 2;
+				y = 16;
+			};
+			boundingRect = {
+				left = 576;
+				top = 1024;
+				right = 832;
+				bottom = 1056;
+			};
+		},
+		{
+			name = "Objective_01_Complete";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = CHECKING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 7;
+			};
+			boundingRect = {
+				left = 288;
+				top = 448;
+				right = 544;
+				bottom = 480;
+			};
+		},
+		{
+			name = "Mark_01_Off";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				3;
+				{
+					triggerName = "SetProgress";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -8;
+						y = 15;
+					};
+					childOffset = {
+						x = -8;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "Objective_01_Complete0";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = 4;
+					};
+					childOffset = {
+						x = 100;
+						y = 5;
+					};
+				},
+				{
+					triggerName = "StopUnits";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 2;
+				y = 18;
+			};
+			boundingRect = {
+				left = 576;
+				top = 1152;
+				right = 832;
+				bottom = 1184;
+			};
+		},
+		{
+			name = "SetProgress";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "DisableControl0";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 2;
+				y = 19;
+			};
+			boundingRect = {
+				left = 576;
+				top = 1216;
+				right = 832;
+				bottom = 1248;
+			};
+		},
+		{
+			name = "OpenNextMap";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "Run_C2";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -26;
+						y = 15;
+					};
+					childOffset = {
+						x = -23;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 46;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 2944;
+				right = 2272;
+				bottom = 2976;
+			};
+		},
+		{
+			name = "Cheat";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				2;
+				{
+					triggerName = "Mark_01_Off";
+					color = STRATEGY_GREEN;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = 13;
+					};
+					childOffset = {
+						x = 100;
+						y = -5;
+					};
+				},
+				{
+					triggerName = "Mark_01_Off";
+					color = STRATEGY_GREEN;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = 13;
+					};
+					childOffset = {
+						x = 100;
+						y = -5;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 3;
+				y = 16;
+			};
+			boundingRect = {
+				left = 864;
+				top = 1024;
+				right = 1120;
+				bottom = 1056;
+			};
+		},
+		{
+			name = "FinalCam";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 2;
+				y = 20;
+			};
+			boundingRect = {
+				left = 576;
+				top = 1280;
+				right = 832;
+				bottom = 1312;
+			};
+		},
+		{
+			name = "Objective_01_Complete0";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 18;
+			};
+			boundingRect = {
+				left = 288;
+				top = 1152;
+				right = 544;
+				bottom = 1184;
+			};
+		},
+		{
+			name = "SetProgress0";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "SaveWorld";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -23;
+						y = 15;
+					};
+					childOffset = {
+						x = -21;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 44;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 2816;
+				right = 2272;
+				bottom = 2848;
+			};
+		},
+		{
+			name = "SetPartyNum";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "SetPartyNum0";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = true;
+					parentOffset = {
+						x = -84;
+						y = 15;
+					};
+					childOffset = {
+						x = -85;
+						y = -15;
+					};
+				}
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -1;
+				y = 2;
+			};
+			boundingRect = {
+				left = -288;
+				top = 128;
+				right = -32;
+				bottom = 160;
+			};
+		},
+		{
+			name = "Objective_02";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 2;
+				y = 17;
+			};
+			boundingRect = {
+				left = 576;
+				top = 1088;
+				right = 832;
+				bottom = 1120;
+			};
+		},
+		{
+			name = "StopUnits";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 4;
+				y = 20;
+			};
+			boundingRect = {
+				left = 1152;
+				top = 1280;
+				right = 1408;
+				bottom = 1312;
+			};
+		},
+		{
+			name = "ReleaseUnits";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 1;
+			};
+			boundingRect = {
+				left = 288;
+				top = 64;
+				right = 544;
+				bottom = 96;
+			};
+		},
+		{
+			name = "Pause2sek";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				2;
+				{
+					triggerName = "Skip";
+					color = STRATEGY_GREEN;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = 15;
+					};
+					childOffset = {
+						x = 100;
+						y = -12;
+					};
+				},
+				{
+					triggerName = "FreeEng";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -17;
+						y = 15;
+					};
+					childOffset = {
+						x = -18;
+						y = -15;
+					};
+				}
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = -10;
+			};
+			boundingRect = {
+				left = 2016;
+				top = -640;
+				right = 2272;
+				bottom = -608;
+			};
+		},
+		{
+			name = "DisableControl";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				6;
+				{
+					triggerName = "SkipMessage";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = true;
+					parentOffset = {
+						x = 100;
+						y = -5;
+					};
+					childOffset = {
+						x = -100;
+						y = -4;
+					};
+				},
+				{
+					triggerName = "SetSkip";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -12;
+					};
+				},
+				{
+					triggerName = "SCENE_01";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = 6;
+					};
+					childOffset = {
+						x = 100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "StopUnitsCS";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -14;
+						y = 15;
+					};
+					childOffset = {
+						x = -13;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "SetEmptyCur";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = -15;
+					};
+					childOffset = {
+						x = 100;
+						y = 15;
+					};
+				},
+				{
+					triggerName = "DelMess";
+					color = STRATEGY_RED;
+					type = THICK;
+					active_ = true;
+					parentOffset = {
+						x = 100;
+						y = -14;
+					};
+					childOffset = {
+						x = -100;
+						y = 15;
+					};
+				}
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = -13;
+			};
+			boundingRect = {
+				left = 2016;
+				top = -832;
+				right = 2272;
+				bottom = -800;
+			};
+		},
+		{
+			name = "EnableControl";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				7;
+				{
+					triggerName = "Objective_01";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -28;
+						y = 15;
+					};
+					childOffset = {
+						x = 100;
+						y = -13;
+					};
+				},
+				{
+					triggerName = "StopUnitsCS0";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -15;
+						y = 15;
+					};
+					childOffset = {
+						x = -17;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "SCENE_010";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 32;
+						y = 15;
+					};
+					childOffset = {
+						x = 33;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "ShowPanels";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 72;
+						y = 15;
+					};
+					childOffset = {
+						x = 72;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "CSReset";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "SetEmptyCur0";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = 15;
+					};
+					childOffset = {
+						x = -96;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "SPause1sek";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = true;
+					parentOffset = {
+						x = 37;
+						y = 15;
+					};
+					childOffset = {
+						x = 6;
+						y = -15;
+					};
+				}
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = -4;
+			};
+			boundingRect = {
+				left = 2016;
+				top = -256;
+				right = 2272;
+				bottom = -224;
+			};
+		},
+		{
+			name = "LoseTank";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "Pause";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -94;
+						y = 15;
+					};
+					childOffset = {
+						x = -94;
+						y = -15;
+					};
+				}
+			};
+			state_ = CHECKING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = -3;
+			};
+			boundingRect = {
+				left = 288;
+				top = -192;
+				right = 544;
+				bottom = -160;
+			};
+		},
+		{
+			name = "CreateNewTank";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "LoseTank";
+					color = STRATEGY_GREEN;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 45;
+						y = -15;
+					};
+					childOffset = {
+						x = 47;
+						y = 15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = 0;
+			};
+			boundingRect = {
+				left = 288;
+				top = 0;
+				right = 544;
+				bottom = 32;
+			};
+		},
+		{
+			name = "StopUnitsCS";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "HidePanels";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -12;
+						y = 15;
+					};
+					childOffset = {
+						x = -11;
+						y = -15;
+					};
+				}
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = -12;
+			};
+			boundingRect = {
+				left = 2016;
+				top = -768;
+				right = 2272;
+				bottom = -736;
+			};
+		},
+		{
+			name = "FreeEng";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "FreeEng0";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -35;
+						y = 15;
+					};
+					childOffset = {
+						x = -36;
+						y = -15;
+					};
+				}
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = -9;
+			};
+			boundingRect = {
+				left = 2016;
+				top = -576;
+				right = 2272;
+				bottom = -544;
+			};
+		},
+		{
+			name = "StopUnitsCS0";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				2;
+				{
+					triggerName = "Tips_01";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = true;
+					parentOffset = {
+						x = 98;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -15;
+					};
+				},
+				{
+					triggerName = "Tips_0100";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -15;
+					};
+				}
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = -3;
+			};
+			boundingRect = {
+				left = 2016;
+				top = -192;
+				right = 2272;
+				bottom = -160;
+			};
+		},
+		{
+			name = "SCENE_010";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = -2;
+			};
+			boundingRect = {
+				left = 2016;
+				top = -128;
+				right = 2272;
+				bottom = -96;
+			};
+		},
+		{
+			name = "KillFriendsEng110";
+			unitsPerQuant = 1;
+			extendedScan = true;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "CreateNewTank";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = -1;
+			};
+			boundingRect = {
+				left = 288;
+				top = -64;
+				right = 544;
+				bottom = -32;
+			};
+		},
+		{
+			name = "KillFriendsEng0010";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "CreateNewTank";
+					color = STRATEGY_GREEN;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = 15;
+					};
+					childOffset = {
+						x = 100;
+						y = -7;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 2;
+				y = -1;
+			};
+			boundingRect = {
+				left = 576;
+				top = -64;
+				right = 832;
+				bottom = -32;
+			};
+		},
+		{
+			name = "HidePanels";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "Pause2sek";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -5;
+						y = 15;
+					};
+					childOffset = {
+						x = -3;
+						y = -15;
+					};
+				}
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = -11;
+			};
+			boundingRect = {
+				left = 2016;
+				top = -704;
+				right = 2272;
+				bottom = -672;
+			};
+		},
+		{
+			name = "ShowPanels";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = -1;
+			};
+			boundingRect = {
+				left = 2016;
+				top = -64;
+				right = 2272;
+				bottom = -32;
+			};
+		},
+		{
+			name = "CSReset";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 8;
+				y = -2;
+			};
+			boundingRect = {
+				left = 2304;
+				top = -128;
+				right = 2560;
+				bottom = -96;
+			};
+		},
+		{
+			name = "HidePanels0";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 9;
+				y = -11;
+			};
+			boundingRect = {
+				left = 2592;
+				top = -704;
+				right = 2848;
+				bottom = -672;
+			};
+		},
+		{
+			name = "SkipMessage";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = CHECKING;
+			executionCounter_ = 4;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 8;
+				y = -13;
+			};
+			boundingRect = {
+				left = 2304;
+				top = -832;
+				right = 2560;
+				bottom = -800;
+			};
+		},
+		{
+			name = "SetSkip";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 8;
+				y = -12;
+			};
+			boundingRect = {
+				left = 2304;
+				top = -768;
+				right = 2560;
+				bottom = -736;
+			};
+		},
+		{
+			name = "Skip";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "EnableControl";
+					color = STRATEGY_BLUE;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 28;
+						y = 15;
+					};
+					childOffset = {
+						x = -100;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 6;
+				y = -7;
+			};
+			boundingRect = {
+				left = 1728;
+				top = -448;
+				right = 1984;
+				bottom = -416;
+			};
+		},
+		{
+			name = "Cheat0";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "SetProgress";
+					color = STRATEGY_GREEN;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = 10;
+					};
+					childOffset = {
+						x = -100;
+						y = -2;
+					};
+				}
+			};
+			state_ = CHECKING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 0;
+				y = 18;
+			};
+			boundingRect = {
+				left = 0;
+				top = 1152;
+				right = 256;
+				bottom = 1184;
+			};
+		},
+		{
+			name = "DisableControl0";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "StopUnitsCS1";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -6;
+						y = 15;
+					};
+					childOffset = {
+						x = -6;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 29;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 1856;
+				right = 2272;
+				bottom = 1888;
+			};
+		},
+		{
+			name = "StopUnitsCS1";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "HidePanels1";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -4;
+						y = 15;
+					};
+					childOffset = {
+						x = -2;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 30;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 1920;
+				right = 2272;
+				bottom = 1952;
+			};
+		},
+		{
+			name = "HidePanels1";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "FreeEng1";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -42;
+						y = 15;
+					};
+					childOffset = {
+						x = -42;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 31;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 1984;
+				right = 2272;
+				bottom = 2016;
+			};
+		},
+		{
+			name = "EnableControl0";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "StopUnitsCS00";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -15;
+						y = 15;
+					};
+					childOffset = {
+						x = -17;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 41;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 2624;
+				right = 2272;
+				bottom = 2656;
+			};
+		},
+		{
+			name = "StopUnitsCS00";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "ShowPanels0";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -20;
+						y = 15;
+					};
+					childOffset = {
+						x = -20;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 42;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 2688;
+				right = 2272;
+				bottom = 2720;
+			};
+		},
+		{
+			name = "ShowPanels0";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "SetProgress0";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -27;
+						y = 15;
+					};
+					childOffset = {
+						x = -28;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 43;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 2752;
+				right = 2272;
+				bottom = 2784;
+			};
+		},
+		{
+			name = "FreeEng0";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "OffRestrictions";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -25;
+						y = 15;
+					};
+					childOffset = {
+						x = -26;
+						y = -15;
+					};
+				}
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = -8;
+			};
+			boundingRect = {
+				left = 2016;
+				top = -512;
+				right = 2272;
+				bottom = -480;
+			};
+		},
+		{
+			name = "OutOf0";
+			unitsPerQuant = 1;
+			extendedScan = true;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 8;
+				y = 35;
+			};
+			boundingRect = {
+				left = 2304;
+				top = 2240;
+				right = 2560;
+				bottom = 2272;
+			};
+		},
+		{
+			name = "SetCamera";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "Dialog24";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -10;
+						y = 15;
+					};
+					childOffset = {
+						x = -10;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 36;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 2304;
+				right = 2272;
+				bottom = 2336;
+			};
+		},
+		{
+			name = "Dialog24";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "Pause5sek";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -18;
+						y = 15;
+					};
+					childOffset = {
+						x = -18;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 37;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 2368;
+				right = 2272;
+				bottom = 2400;
+			};
+		},
+		{
+			name = "Run_CS";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "OffRestrictions0";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -28;
+						y = 15;
+					};
+					childOffset = {
+						x = -28;
+						y = -15;
+					};
+				}
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = -6;
+			};
+			boundingRect = {
+				left = 2016;
+				top = -384;
+				right = 2272;
+				bottom = -352;
+			};
+		},
+		{
+			name = "DisableControl1";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = -15;
+			};
+			boundingRect = {
+				left = 2016;
+				top = -960;
+				right = 2272;
+				bottom = -928;
+			};
+		},
+		{
+			name = "Run_CS0";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 16;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 1024;
+				right = 2272;
+				bottom = 1056;
+			};
+		},
+		{
+			name = "Test_KillTruck";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = CHECKING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -1;
+				y = -2;
+			};
+			boundingRect = {
+				left = -288;
+				top = -128;
+				right = -32;
+				bottom = -96;
+			};
+		},
+		{
+			name = "OffRestrictions";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "Run_CS";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -36;
+						y = 15;
+					};
+					childOffset = {
+						x = -36;
+						y = -15;
+					};
+				}
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = -7;
+			};
+			boundingRect = {
+				left = 2016;
+				top = -448;
+				right = 2272;
+				bottom = -416;
+			};
+		},
+		{
+			name = "OffRestrictions0";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "EnableControl";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -22;
+						y = 15;
+					};
+					childOffset = {
+						x = -22;
+						y = -15;
+					};
+				}
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = -5;
+			};
+			boundingRect = {
+				left = 2016;
+				top = -320;
+				right = 2272;
+				bottom = -288;
+			};
+		},
+		{
+			name = "Pause";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				2;
+				{
+					triggerName = "KillFriendsEng0010";
+					color = STRATEGY_GREEN;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 100;
+						y = 12;
+					};
+					childOffset = {
+						x = -100;
+						y = -13;
+					};
+				},
+				{
+					triggerName = "KillFriendsEng110";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -93;
+						y = 15;
+					};
+					childOffset = {
+						x = -94;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 1;
+				y = -2;
+			};
+			boundingRect = {
+				left = 288;
+				top = -128;
+				right = 544;
+				bottom = -96;
+			};
+		},
+		{
+			name = "FrolovAt_01";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = CHECKING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -1;
+				y = 0;
+			};
+			boundingRect = {
+				left = -288;
+				top = 0;
+				right = -32;
+				bottom = 32;
+			};
+		},
+		{
+			name = "SetEmptyCur";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 6;
+				y = -14;
+			};
+			boundingRect = {
+				left = 1728;
+				top = -896;
+				right = 1984;
+				bottom = -864;
+			};
+		},
+		{
+			name = "SetEmptyCur0";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 8;
+				y = -3;
+			};
+			boundingRect = {
+				left = 2304;
+				top = -192;
+				right = 2560;
+				bottom = -160;
+			};
+		},
+		{
+			name = "SPause1sek";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "tmp_DLG_012";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -72;
+						y = 15;
+					};
+					childOffset = {
+						x = -64;
+						y = -15;
+					};
+				}
+			};
+			state_ = CHECKING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 14;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 896;
+				right = 2272;
+				bottom = 928;
+			};
+		},
+		{
+			name = "FreeEng1";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "FreeEng00";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -35;
+						y = 15;
+					};
+					childOffset = {
+						x = -36;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 32;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 2048;
+				right = 2272;
+				bottom = 2080;
+			};
+		},
+		{
+			name = "FreeEng00";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "FreeEng000";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -34;
+						y = 15;
+					};
+					childOffset = {
+						x = -34;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 33;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 2112;
+				right = 2272;
+				bottom = 2144;
+			};
+		},
+		{
+			name = "FreeEng000";
+			unitsPerQuant = 1;
+			extendedScan = true;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "SetCamera";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -20;
+						y = 15;
+					};
+					childOffset = {
+						x = -17;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 34;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 2176;
+				right = 2272;
+				bottom = 2208;
+			};
+		},
+		{
+			name = "SaveWorld";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "OpenNextMap";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -24;
+						y = 15;
+					};
+					childOffset = {
+						x = -24;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 45;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 2880;
+				right = 2272;
+				bottom = 2912;
+			};
+		},
+		{
+			name = "tmp_DLG_01";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 17;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 1088;
+				right = 2272;
+				bottom = 1120;
+			};
+		},
+		{
+			name = "tmp_DLG_010";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 18;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 1152;
+				right = 2272;
+				bottom = 1184;
+			};
+		},
+		{
+			name = "tmp_DLG_011";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 19;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 1216;
+				right = 2272;
+				bottom = 1248;
+			};
+		},
+		{
+			name = "tmp_DLG_012";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "tmp_DLG_013";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -70;
+						y = 15;
+					};
+					childOffset = {
+						x = -73;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 20;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 1280;
+				right = 2272;
+				bottom = 1312;
+			};
+		},
+		{
+			name = "tmp_DLG_013";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "Mark_01_On";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -100;
+						y = -10;
+					};
+					childOffset = {
+						x = 100;
+						y = -1;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 21;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 1344;
+				right = 2272;
+				bottom = 1376;
+			};
+		},
+		{
+			name = "DelMess";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = CHECKING;
+			executionCounter_ = 4;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 8;
+				y = -14;
+			};
+			boundingRect = {
+				left = 2304;
+				top = -896;
+				right = 2560;
+				bottom = -864;
+			};
+		},
+		{
+			name = "Run_C2";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "Run_C20";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -18;
+						y = 15;
+					};
+					childOffset = {
+						x = -18;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 47;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 3008;
+				right = 2272;
+				bottom = 3040;
+			};
+		},
+		{
+			name = "Run_C20";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 48;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 3072;
+				right = 2272;
+				bottom = 3104;
+			};
+		},
+		{
+			name = "SetPartyNum0";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "SetPartyNum";
+					color = STRATEGY_GREEN;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = 43;
+						y = -15;
+					};
+					childOffset = {
+						x = 44;
+						y = 15;
+					};
+				}
+			};
+			state_ = CHECKING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = -1;
+				y = 3;
+			};
+			boundingRect = {
+				left = -288;
+				top = 192;
+				right = -32;
+				bottom = 224;
+			};
+		},
+		{
+			name = "ShowFlash";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "HideFlash";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -16;
+						y = 15;
+					};
+					childOffset = {
+						x = -16;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 39;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 2496;
+				right = 2272;
+				bottom = 2528;
+			};
+		},
+		{
+			name = "HideFlash";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "EnableControl0";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -6;
+						y = 15;
+					};
+					childOffset = {
+						x = -10;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 40;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 2560;
+				right = 2272;
+				bottom = 2592;
+			};
+		},
+		{
+			name = "Pause5sek";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "ShowFlash";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -12;
+						y = 15;
+					};
+					childOffset = {
+						x = -12;
+						y = -15;
+					};
+				}
+			};
+			state_ = SLEEPING;
+			executionCounter_ = 0;
+			internalColor_ = 0;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 7;
+				y = 38;
+			};
+			boundingRect = {
+				left = 2016;
+				top = 2432;
+				right = 2272;
+				bottom = 2464;
+			};
+		},
+		{
+			name = "Tips_01";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = CHECKING;
+			executionCounter_ = 0;
+			internalColor_ = 65535;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 8;
+				y = 1;
+			};
+			boundingRect = {
+				left = 2304;
+				top = 64;
+				right = 2560;
+				bottom = 96;
+			};
+		},
+		{
+			name = "Tips_010";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				0;
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 65535;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 8;
+				y = 3;
+			};
+			boundingRect = {
+				left = 2304;
+				top = 192;
+				right = 2560;
+				bottom = 224;
+			};
+		},
+		{
+			name = "Tips_0100";
+			unitsPerQuant = 1;
+			extendedScan = false;
+			condition = 0;
+			action = 0;
+			outcomingLinks = {
+				1;
+				{
+					triggerName = "Tips_010";
+					color = STRATEGY_RED;
+					type = THIN;
+					active_ = false;
+					parentOffset = {
+						x = -9;
+						y = 15;
+					};
+					childOffset = {
+						x = -11;
+						y = -15;
+					};
+				}
+			};
+			state_ = DONE;
+			executionCounter_ = 1;
+			internalColor_ = 65535;
+			randomizeOutcomingLinks = false;
+			breakWhenActivate = false;
+			cellIndex = {
+				x = 8;
+				y = 2;
+			};
+			boundingRect = {
+				left = 2304;
+				top = 128;
+				right = 2560;
+				bottom = 160;
+			};
+		}
+	};
+	boundingRect = {
+		left = -288;
+		top = -960;
+		right = 2848;
+		bottom = 3104;
+	};
+	viewRect = {
+		left = -232;
+		top = -266;
+		right = 992;
+		bottom = 1132;
+	};
+	triggerEvents = {
+		106;
+		{
+			event = "Start [8]: START (1)";
+			triggerName = "START";
+			state = WORKING;
+		},
+		{
+			event = "Finish[8]: START";
+			triggerName = "START";
+			state = DONE;
+		},
+		{
+			event = "Ready[8]: Cheat0";
+			triggerName = "Cheat0";
+			state = CHECKING;
+		},
+		{
+			event = "Ready[9]: SetPartyNum";
+			triggerName = "SetPartyNum";
+			state = CHECKING;
+		},
+		{
+			event = "Start [9]: SetPartyNum - Установка целочисленной переменной (1)";
+			triggerName = "SetPartyNum";
+			state = WORKING;
+		},
+		{
+			event = "Finish[9]: SetPartyNum";
+			triggerName = "SetPartyNum";
+			state = DONE;
+		},
+		{
+			event = "Ready[9]: ReleaseUnits";
+			triggerName = "ReleaseUnits";
+			state = CHECKING;
+		},
+		{
+			event = "Start [9]: ReleaseUnits - Заморозить/разморозить юнитов для кат-сцены (1)";
+			triggerName = "ReleaseUnits";
+			state = WORKING;
+		},
+		{
+			event = "Finish[9]: ReleaseUnits";
+			triggerName = "ReleaseUnits";
+			state = DONE;
+		},
+		{
+			event = "Ready[9]: DisableControl";
+			triggerName = "DisableControl";
+			state = CHECKING;
+		},
+		{
+			event = "Start [9]: DisableControl - Запретить/разрешить управление игрока (1)";
+			triggerName = "DisableControl";
+			state = WORKING;
+		},
+		{
+			event = "Finish[9]: DisableControl";
+			triggerName = "DisableControl";
+			state = DONE;
+		},
+		{
+			event = "Ready[9]: LoseTank";
+			triggerName = "LoseTank";
+			state = CHECKING;
+		},
+		{
+			event = "Ready[9]: Test_KillTruck";
+			triggerName = "Test_KillTruck";
+			state = CHECKING;
+		},
+		{
+			event = "Ready[9]: FrolovAt_01";
+			triggerName = "FrolovAt_01";
+			state = CHECKING;
+		},
+		{
+			event = "Ready[9]: SkipMessage";
+			triggerName = "SkipMessage";
+			state = CHECKING;
+		},
+		{
+			event = "Ready[9]: SetSkip";
+			triggerName = "SetSkip";
+			state = CHECKING;
+		},
+		{
+			event = "Ready[9]: DelMess";
+			triggerName = "DelMess";
+			state = CHECKING;
+		},
+		{
+			event = "Ready[10]: SetPartyNum0";
+			triggerName = "SetPartyNum0";
+			state = CHECKING;
+		},
+		{
+			event = "Ready[10]: SCENE_01";
+			triggerName = "SCENE_01";
+			state = CHECKING;
+		},
+		{
+			event = "Start [10]: SCENE_01 - Установка Камеры (1)";
+			triggerName = "SCENE_01";
+			state = WORKING;
+		},
+		{
+			event = "Ready[10]: StopUnitsCS";
+			triggerName = "StopUnitsCS";
+			state = CHECKING;
+		},
+		{
+			event = "Start [10]: StopUnitsCS - Заморозить/разморозить юнитов для кат-сцены (1)";
+			triggerName = "StopUnitsCS";
+			state = WORKING;
+		},
+		{
+			event = "Finish[10]: StopUnitsCS";
+			triggerName = "StopUnitsCS";
+			state = DONE;
+		},
+		{
+			event = "Ready[10]: SetEmptyCur";
+			triggerName = "SetEmptyCur";
+			state = CHECKING;
+		},
+		{
+			event = "Start [10]: SetEmptyCur - Установить курсор (1)";
+			triggerName = "SetEmptyCur";
+			state = WORKING;
+		},
+		{
+			event = "Finish[10]: SetEmptyCur";
+			triggerName = "SetEmptyCur";
+			state = DONE;
+		},
+		{
+			event = "Ready[11]: HidePanels";
+			triggerName = "HidePanels";
+			state = CHECKING;
+		},
+		{
+			event = "Start [11]: HidePanels - Операции над кнопками (1)";
+			triggerName = "HidePanels";
+			state = WORKING;
+		},
+		{
+			event = "Finish[11]: HidePanels";
+			triggerName = "HidePanels";
+			state = DONE;
+		},
+		{
+			event = "Ready[12]: Pause2sek";
+			triggerName = "Pause2sek";
+			state = CHECKING;
+		},
+		{
+			event = "Start [12]: Pause2sek - Задержка времени (1)";
+			triggerName = "Pause2sek";
+			state = WORKING;
+		},
+		{
+			event = "Finish[73]: Pause2sek";
+			triggerName = "Pause2sek";
+			state = DONE;
+		},
+		{
+			event = "Ready[74]: Skip";
+			triggerName = "Skip";
+			state = CHECKING;
+		},
+		{
+			event = "Ready[74]: FreeEng";
+			triggerName = "FreeEng";
+			state = CHECKING;
+		},
+		{
+			event = "Start [74]: FreeEng - Вкл./выкл. игнорирование общей заморозки для отдельного объекта (1)";
+			triggerName = "FreeEng";
+			state = WORKING;
+		},
+		{
+			event = "Finish[74]: FreeEng";
+			triggerName = "FreeEng";
+			state = DONE;
+		},
+		{
+			event = "Ready[75]: FreeEng0";
+			triggerName = "FreeEng0";
+			state = CHECKING;
+		},
+		{
+			event = "Start [75]: FreeEng0 - Вкл./выкл. игнорирование общей заморозки для отдельного объекта (1)";
+			triggerName = "FreeEng0";
+			state = WORKING;
+		},
+		{
+			event = "Finish[75]: FreeEng0";
+			triggerName = "FreeEng0";
+			state = DONE;
+		},
+		{
+			event = "Ready[76]: OffRestrictions";
+			triggerName = "OffRestrictions";
+			state = CHECKING;
+		},
+		{
+			event = "Start [76]: OffRestrictions - Ограничения камеры (1)";
+			triggerName = "OffRestrictions";
+			state = WORKING;
+		},
+		{
+			event = "Finish[76]: OffRestrictions";
+			triggerName = "OffRestrictions";
+			state = DONE;
+		},
+		{
+			event = "Ready[77]: Run_CS";
+			triggerName = "Run_CS";
+			state = CHECKING;
+		},
+		{
+			event = "Start [77]: Run_CS - Запустить очередь команд на выполнение (1)";
+			triggerName = "Run_CS";
+			state = WORKING;
+		},
+		{
+			event = "Finish[102]: SCENE_01";
+			triggerName = "SCENE_01";
+			state = DONE;
+		},
+		{
+			event = "Start [258]: SkipMessage - Прервать очередь команд (1)";
+			triggerName = "SkipMessage";
+			state = WORKING;
+		},
+		{
+			event = "Finish[258]: SkipMessage";
+			triggerName = "SkipMessage";
+			state = DONE;
+		},
+		{
+			event = "Start [258]: SetSkip - Установка целочисленной переменной (1)";
+			triggerName = "SetSkip";
+			state = WORKING;
+		},
+		{
+			event = "Finish[258]: SetSkip";
+			triggerName = "SetSkip";
+			state = DONE;
+		},
+		{
+			event = "Start [258]: DelMess - Прервать сообщение (1)";
+			triggerName = "DelMess";
+			state = WORKING;
+		},
+		{
+			event = "Finish[258]: DelMess";
+			triggerName = "DelMess";
+			state = DONE;
+		},
+		{
+			event = "Finish[259]: Run_CS";
+			triggerName = "Run_CS";
+			state = DONE;
+		},
+		{
+			event = "Ready[259]: SkipMessage";
+			triggerName = "SkipMessage";
+			state = CHECKING;
+		},
+		{
+			event = "Ready[259]: DelMess";
+			triggerName = "DelMess";
+			state = CHECKING;
+		},
+		{
+			event = "Ready[260]: OffRestrictions0";
+			triggerName = "OffRestrictions0";
+			state = CHECKING;
+		},
+		{
+			event = "Start [260]: OffRestrictions0 - Ограничения камеры (1)";
+			triggerName = "OffRestrictions0";
+			state = WORKING;
+		},
+		{
+			event = "Finish[260]: OffRestrictions0";
+			triggerName = "OffRestrictions0";
+			state = DONE;
+		},
+		{
+			event = "Ready[261]: EnableControl";
+			triggerName = "EnableControl";
+			state = CHECKING;
+		},
+		{
+			event = "Start [261]: EnableControl - Запретить/разрешить управление игрока (1)";
+			triggerName = "EnableControl";
+			state = WORKING;
+		},
+		{
+			event = "Finish[261]: EnableControl";
+			triggerName = "EnableControl";
+			state = DONE;
+		},
+		{
+			event = "Ready[262]: Objective_01";
+			triggerName = "Objective_01";
+			state = CHECKING;
+		},
+		{
+			event = "Start [262]: Objective_01 - Задача (1)";
+			triggerName = "Objective_01";
+			state = WORKING;
+		},
+		{
+			event = "Ready[262]: StopUnitsCS0";
+			triggerName = "StopUnitsCS0";
+			state = CHECKING;
+		},
+		{
+			event = "Start [262]: StopUnitsCS0 - Заморозить/разморозить юнитов для кат-сцены (1)";
+			triggerName = "StopUnitsCS0";
+			state = WORKING;
+		},
+		{
+			event = "Finish[262]: StopUnitsCS0";
+			triggerName = "StopUnitsCS0";
+			state = DONE;
+		},
+		{
+			event = "Ready[262]: SCENE_010";
+			triggerName = "SCENE_010";
+			state = CHECKING;
+		},
+		{
+			event = "Start [262]: SCENE_010 - Установка Камеры (1)";
+			triggerName = "SCENE_010";
+			state = WORKING;
+		},
+		{
+			event = "Ready[262]: ShowPanels";
+			triggerName = "ShowPanels";
+			state = CHECKING;
+		},
+		{
+			event = "Start [262]: ShowPanels - Операции над кнопками (1)";
+			triggerName = "ShowPanels";
+			state = WORKING;
+		},
+		{
+			event = "Finish[262]: ShowPanels";
+			triggerName = "ShowPanels";
+			state = DONE;
+		},
+		{
+			event = "Ready[262]: CSReset";
+			triggerName = "CSReset";
+			state = CHECKING;
+		},
+		{
+			event = "Start [262]: CSReset - Установка целочисленной переменной (1)";
+			triggerName = "CSReset";
+			state = WORKING;
+		},
+		{
+			event = "Finish[262]: CSReset";
+			triggerName = "CSReset";
+			state = DONE;
+		},
+		{
+			event = "Ready[262]: SetEmptyCur0";
+			triggerName = "SetEmptyCur0";
+			state = CHECKING;
+		},
+		{
+			event = "Start [262]: SetEmptyCur0 - Отменить установленный курсор (1)";
+			triggerName = "SetEmptyCur0";
+			state = WORKING;
+		},
+		{
+			event = "Finish[262]: SetEmptyCur0";
+			triggerName = "SetEmptyCur0";
+			state = DONE;
+		},
+		{
+			event = "Ready[262]: SPause1sek";
+			triggerName = "SPause1sek";
+			state = CHECKING;
+		},
+		{
+			event = "Ready[263]: Tips_01";
+			triggerName = "Tips_01";
+			state = CHECKING;
+		},
+		{
+			event = "Ready[263]: Tips_0100";
+			triggerName = "Tips_0100";
+			state = CHECKING;
+		},
+		{
+			event = "Start [263]: Tips_0100 - Задержка времени (1)";
+			triggerName = "Tips_0100";
+			state = WORKING;
+		},
+		{
+			event = "Start [265]: SkipMessage - Прервать очередь команд (2)";
+			triggerName = "SkipMessage";
+			state = WORKING;
+		},
+		{
+			event = "Finish[265]: SkipMessage";
+			triggerName = "SkipMessage";
+			state = DONE;
+		},
+		{
+			event = "Start [265]: DelMess - Прервать сообщение (2)";
+			triggerName = "DelMess";
+			state = WORKING;
+		},
+		{
+			event = "Finish[265]: DelMess";
+			triggerName = "DelMess";
+			state = DONE;
+		},
+		{
+			event = "Ready[266]: SkipMessage";
+			triggerName = "SkipMessage";
+			state = CHECKING;
+		},
+		{
+			event = "Ready[266]: DelMess";
+			triggerName = "DelMess";
+			state = CHECKING;
+		},
+		{
+			event = "Finish[272]: SCENE_010";
+			triggerName = "SCENE_010";
+			state = DONE;
+		},
+		{
+			event = "Start [274]: SkipMessage - Прервать очередь команд (3)";
+			triggerName = "SkipMessage";
+			state = WORKING;
+		},
+		{
+			event = "Finish[274]: SkipMessage";
+			triggerName = "SkipMessage";
+			state = DONE;
+		},
+		{
+			event = "Start [274]: DelMess - Прервать сообщение (3)";
+			triggerName = "DelMess";
+			state = WORKING;
+		},
+		{
+			event = "Finish[274]: DelMess";
+			triggerName = "DelMess";
+			state = DONE;
+		},
+		{
+			event = "Ready[275]: SkipMessage";
+			triggerName = "SkipMessage";
+			state = CHECKING;
+		},
+		{
+			event = "Ready[275]: DelMess";
+			triggerName = "DelMess";
+			state = CHECKING;
+		},
+		{
+			event = "Start [289]: SkipMessage - Прервать очередь команд (4)";
+			triggerName = "SkipMessage";
+			state = WORKING;
+		},
+		{
+			event = "Finish[289]: SkipMessage";
+			triggerName = "SkipMessage";
+			state = DONE;
+		},
+		{
+			event = "Start [289]: DelMess - Прервать сообщение (4)";
+			triggerName = "DelMess";
+			state = WORKING;
+		},
+		{
+			event = "Finish[289]: DelMess";
+			triggerName = "DelMess";
+			state = DONE;
+		},
+		{
+			event = "Ready[290]: SkipMessage";
+			triggerName = "SkipMessage";
+			state = CHECKING;
+		},
+		{
+			event = "Ready[290]: DelMess";
+			triggerName = "DelMess";
+			state = CHECKING;
+		},
+		{
+			event = "Finish[314]: Tips_0100";
+			triggerName = "Tips_0100";
+			state = DONE;
+		},
+		{
+			event = "Ready[315]: Tips_010";
+			triggerName = "Tips_010";
+			state = CHECKING;
+		},
+		{
+			event = "Start [315]: Tips_010 - Сообщение (1)";
+			triggerName = "Tips_010";
+			state = WORKING;
+		},
+		{
+			event = "Finish[317]: Tips_010";
+			triggerName = "Tips_010";
+			state = DONE;
+		},
+		{
+			event = "Finish[363]: Objective_01";
+			triggerName = "Objective_01";
+			state = DONE;
+		},
+		{
+			event = "Ready[364]: Objective_01_Complete";
+			triggerName = "Objective_01_Complete";
+			state = CHECKING;
+		}
+	};
+};

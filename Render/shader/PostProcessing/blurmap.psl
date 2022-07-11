@@ -1,0 +1,16 @@
+struct PS_INPUT
+{
+	float2 Tex:TEXCOORD0;
+};
+
+sampler2D BaseTexture:register(s0);
+sampler2D ZBufferTexture:register(s1);
+float2 dofParams:register(c0);
+float4 main (const PS_INPUT v):COLOR
+{
+    
+    float3 baseColor = tex2D( BaseTexture, v.Tex );
+    float zb = tex2D( ZBufferTexture, v.Tex ).r;
+    //return float4(baseColor, saturate(abs(zb-dofParams.x)*dofParams.y)); // формула с размыванием вблизи (правильная)
+    return float4(baseColor, saturate((zb-dofParams.x)*dofParams.y));
+}

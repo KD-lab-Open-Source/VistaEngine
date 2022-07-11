@@ -1,0 +1,5463 @@
+Version = 0;
+RigidBodyPrmLibrary = {
+	header = {
+		54;
+		"Building",
+		"Building Water",
+		"Debris",
+		"Environment",
+		"Environment Fence",
+		"Environment Fence Falling",
+		"Environment Phantom",
+		"Environment Stone",
+		"Environment Stone Editor",
+		"Environment Tree",
+		"Environment Tree Falling",
+		"Item",
+		"Missile",
+		"Missile Arrow",
+		"Missile Arrow Universal",
+		"Missile Ballistic",
+		"Missile Bomb",
+		"Missile Bomb Universal",
+		"Missile Howitzer",
+		"Missile Howitzer Universal",
+		"Missile Stone",
+		"Missile Weightless",
+		"Missile Universal",
+		"RagDoll",
+		"RigidBodyBase",
+		"RigidBodyCar",
+		"RigidBodyNode",
+		"Rocket",
+		"Rocket Slow",
+		"Rocket Underground",
+		"Rocket Underwater",
+		"Rocket Universal",
+		"Unit Ground",
+		"Unit Ground Human",
+		"Unit Ground Underwater",
+		"Unit Underground",
+		"Unit Underwater",
+		"Unit Water",
+		"Unit Water Ground",
+		"Unit Water Ground Air",
+		"Unit Water Ground Air Human",
+		"Unit Water Ground Air Planer",
+		"Unit Water Ground Human",
+		"UnitCorpse",
+		"Unit Hover",
+		"Unit Flying",
+		"Unit Flying Stop",
+		"Unit Flying Aiming",
+		"Unit Ground Underwater Ignoring Obstacles",
+		"Unit Ground Underwater Ignoring Obstacles Human",
+		"Unit Pad",
+		"Unit Tank",
+		"Unit Tank Water",
+		"Item Inventory"
+	};
+	strings = {
+		54;
+		{
+			name = "Building";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 6.;
+				unmovable = false;
+				controled_by_points = false;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 0.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 9.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 1.;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 100.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Building Water";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 6.;
+				unmovable = false;
+				controled_by_points = false;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 0.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 9.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = true;
+				position_tau = 0.5;
+				orientation_tau = 0.15;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = true;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 100.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Debris";
+			type = "struct RigidBodyPrm" {
+				unit_type = DEBRIS;
+				rigidBodyType = RIGID_BODY_BOX;
+				linear_damping = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				angular_damping = 0.;
+				unmovable = false;
+				controled_by_points = false;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 20.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 0.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = false;
+				enableSleeping = true;
+				awakeCounter = 10;
+				sleepMovemenThreshould = 1.e-003;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 100.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Environment";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_ENVIRONMENT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 2.;
+				unmovable = false;
+				controled_by_points = false;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 0.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 20.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 100.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Environment Fence";
+			type = "struct RigidBodyPrm" {
+				unit_type = ENVIRONMENT;
+				rigidBodyType = RIGID_BODY_ENVIRONMENT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 2.;
+				unmovable = false;
+				controled_by_points = false;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 0.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 20.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = false;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = true;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = true;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 100.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Environment Fence Falling";
+			type = "struct RigidBodyPrm" {
+				unit_type = ENVIRONMENT;
+				rigidBodyType = RIGID_BODY_BOX;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 2.;
+				unmovable = false;
+				controled_by_points = false;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 0.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 20.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = false;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = true;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = false;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 200.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Environment Phantom";
+			type = "struct RigidBodyPrm" {
+				unit_type = NOT_EVOLUTION;
+				rigidBodyType = RIGID_BODY_BASE;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 2.;
+				unmovable = false;
+				controled_by_points = false;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 0.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 9.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 100.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.25;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Environment Stone";
+			type = "struct RigidBodyPrm" {
+				unit_type = ENVIRONMENT;
+				rigidBodyType = RIGID_BODY_BOX;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 2.;
+				unmovable = false;
+				controled_by_points = false;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 4.;
+				forward_velocity_max = 20.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 9.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 1.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 100.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 8.e-002;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Environment Stone Editor";
+			type = "struct RigidBodyPrm" {
+				unit_type = ENVIRONMENT;
+				rigidBodyType = RIGID_BODY_BOX;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 2.;
+				unmovable = false;
+				controled_by_points = false;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 4.;
+				forward_velocity_max = 20.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 9.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 1.e-003;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 100.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 8.e-002;
+				relaxationTime = 1.;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Environment Tree";
+			type = "struct RigidBodyPrm" {
+				unit_type = ENVIRONMENT;
+				rigidBodyType = RIGID_BODY_ENVIRONMENT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 2.;
+				unmovable = false;
+				controled_by_points = false;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 0.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 20.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = false;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 100.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Environment Tree Falling";
+			type = "struct RigidBodyPrm" {
+				unit_type = ENVIRONMENT;
+				rigidBodyType = RIGID_BODY_BOX;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 2.;
+				unmovable = false;
+				controled_by_points = false;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 0.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 20.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = false;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = false;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 5.e-002;
+				gravity = 200.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.4;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Item";
+			type = "struct RigidBodyPrm" {
+				unit_type = ITEM;
+				rigidBodyType = RIGID_BODY_ENVIRONMENT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 6.;
+				unmovable = false;
+				controled_by_points = false;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 0.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 9.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 100.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Missile";
+			type = "struct RigidBodyPrm" {
+				unit_type = MISSILE;
+				rigidBodyType = RIGID_BODY_MISSILE;
+				linear_damping = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				angular_damping = 6.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 200.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 40.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = true;
+				upper_theta = 90.;
+				lower_theta = -90.;
+				targetCorrectionZ = 1.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = true;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = true;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 10.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Missile Arrow";
+			type = "struct RigidBodyPrm" {
+				unit_type = MISSILE;
+				rigidBodyType = RIGID_BODY_MISSILE;
+				linear_damping = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				angular_damping = 6.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 50.;
+				forward_acceleration = 20.;
+				orientation_torque_factor = 40.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = true;
+				upper_theta = 90.;
+				lower_theta = -90.;
+				targetCorrectionZ = 2.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = true;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = true;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 10.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Missile Arrow Universal";
+			type = "struct RigidBodyPrm" {
+				unit_type = MISSILE;
+				rigidBodyType = RIGID_BODY_MISSILE;
+				linear_damping = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				angular_damping = 6.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 100.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 40.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = true;
+				upper_theta = 90.;
+				lower_theta = -90.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = true;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = true;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 400.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.8;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Missile Ballistic";
+			type = "struct RigidBodyPrm" {
+				unit_type = MISSILE;
+				rigidBodyType = RIGID_BODY_MISSILE;
+				linear_damping = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				angular_damping = 6.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 100.;
+				forward_acceleration = 10.;
+				orientation_torque_factor = 40.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -90.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = true;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = true;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 400.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Missile Bomb";
+			type = "struct RigidBodyPrm" {
+				unit_type = MISSILE;
+				rigidBodyType = RIGID_BODY_MISSILE;
+				linear_damping = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				angular_damping = 6.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 2.;
+				forward_acceleration = 2.;
+				orientation_torque_factor = 0.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = true;
+				upper_theta = 90.;
+				lower_theta = -90.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = true;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = true;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 100.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Missile Bomb Universal";
+			type = "struct RigidBodyPrm" {
+				unit_type = MISSILE;
+				rigidBodyType = RIGID_BODY_MISSILE;
+				linear_damping = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				angular_damping = 6.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 2.;
+				forward_acceleration = 2.;
+				orientation_torque_factor = 0.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = true;
+				upper_theta = 90.;
+				lower_theta = -90.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = true;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 100.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Missile Howitzer";
+			type = "struct RigidBodyPrm" {
+				unit_type = MISSILE;
+				rigidBodyType = RIGID_BODY_MISSILE;
+				linear_damping = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				angular_damping = 6.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 100.;
+				forward_acceleration = 10.;
+				orientation_torque_factor = 40.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -90.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = true;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = true;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 200.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Missile Howitzer Universal";
+			type = "struct RigidBodyPrm" {
+				unit_type = MISSILE;
+				rigidBodyType = RIGID_BODY_MISSILE;
+				linear_damping = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				angular_damping = 6.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 100.;
+				forward_acceleration = 10.;
+				orientation_torque_factor = 40.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -90.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = true;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 200.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Missile Stone";
+			type = "struct RigidBodyPrm" {
+				unit_type = DEBRIS;
+				rigidBodyType = RIGID_BODY_BOX;
+				linear_damping = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				angular_damping = 0.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 100.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 40.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = true;
+				upper_theta = 90.;
+				lower_theta = -90.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = true;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = true;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = false;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = true;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 30.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.8;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Missile Weightless";
+			type = "struct RigidBodyPrm" {
+				unit_type = MISSILE;
+				rigidBodyType = RIGID_BODY_MISSILE;
+				linear_damping = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				angular_damping = 6.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 100.;
+				forward_acceleration = 10.;
+				orientation_torque_factor = 40.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.9;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -90.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = true;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = true;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 0.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Missile Universal";
+			type = "struct RigidBodyPrm" {
+				unit_type = MISSILE;
+				rigidBodyType = RIGID_BODY_MISSILE;
+				linear_damping = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				angular_damping = 6.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 100.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 40.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = true;
+				upper_theta = 90.;
+				lower_theta = -90.;
+				targetCorrectionZ = -0.5;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = true;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = true;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 5.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.8;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "RagDoll";
+			type = "struct RigidBodyPrm" {
+				unit_type = DEBRIS;
+				rigidBodyType = RIGID_BODY_BOX;
+				linear_damping = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				angular_damping = 0.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 1000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 20.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 0.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = true;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = true;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = false;
+				enableSleeping = true;
+				awakeCounter = 10;
+				sleepMovemenThreshould = 1.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 100.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 2.e-002;
+				relaxationTime = 2.e-002;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "RigidBodyBase";
+			type = "struct RigidBodyPrm" {
+				unit_type = NOT_EVOLUTION;
+				rigidBodyType = RIGID_BODY_BASE;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 6.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 4.;
+				forward_velocity_max = 20.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 9.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.2;
+				orientation_tau = 0.2;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = false;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 1.e-002;
+				average_movement_tau = 0.1;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 0.;
+				TOI_factor = -4.31602e+008;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "RigidBodyCar";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_BOX;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 2.;
+				unmovable = false;
+				controled_by_points = false;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 4.;
+				forward_velocity_max = 20.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 9.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 1.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 1.e-002;
+				angularDamping = 1.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 0.9;
+				restitution = 8.e-002;
+				relaxationTime = 4.e-002;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 10.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "RigidBodyNode";
+			type = "struct RigidBodyPrm" {
+				unit_type = DEBRIS;
+				rigidBodyType = RIGID_BODY_BASE;
+				linear_damping = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				angular_damping = 0.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 1000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 20.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 0.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = true;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = true;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 3;
+				sleepMovemenThreshould = 300000;
+				average_movement_tau = 0.5;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 2.e-002;
+				angularDamping = 0.1;
+				gravity = 100.;
+				TOI_factor = 1.;
+				friction = 0.5;
+				restitution = 2.e-002;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Rocket";
+			type = "struct RigidBodyPrm" {
+				unit_type = ROCKET;
+				rigidBodyType = RIGID_BODY_MISSILE;
+				linear_damping = {
+					x = 3.;
+					y = 3.;
+					z = 3.;
+				};
+				angular_damping = 10.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 1500;
+				is_point_reached_radius_max = 0.;
+				forward_velocity_max = 300.;
+				forward_acceleration = 500.;
+				orientation_torque_factor = 30.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 40.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = true;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 0.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Rocket Slow";
+			type = "struct RigidBodyPrm" {
+				unit_type = ROCKET;
+				rigidBodyType = RIGID_BODY_MISSILE;
+				linear_damping = {
+					x = 3.;
+					y = 3.;
+					z = 3.;
+				};
+				angular_damping = 7.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 1500;
+				is_point_reached_radius_max = 0.;
+				forward_velocity_max = 100.;
+				forward_acceleration = 80.;
+				orientation_torque_factor = 15.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 40.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = true;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 0.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Rocket Underground";
+			type = "struct RigidBodyPrm" {
+				unit_type = ROCKET;
+				rigidBodyType = RIGID_BODY_MISSILE;
+				linear_damping = {
+					x = 3.;
+					y = 3.;
+					z = 3.;
+				};
+				angular_damping = 7.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 5000;
+				is_point_reached_radius_max = 0.;
+				forward_velocity_max = 100.;
+				forward_acceleration = 100.;
+				orientation_torque_factor = 15.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = true;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 40.;
+				alwaysMoving = false;
+				minimize_theta = true;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = true;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = true;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 0.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Rocket Underwater";
+			type = "struct RigidBodyPrm" {
+				unit_type = ROCKET;
+				rigidBodyType = RIGID_BODY_MISSILE;
+				linear_damping = {
+					x = 3.;
+					y = 3.;
+					z = 3.;
+				};
+				angular_damping = 7.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 1500;
+				is_point_reached_radius_max = 0.;
+				forward_velocity_max = 100.;
+				forward_acceleration = 100.;
+				orientation_torque_factor = 15.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 10.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 40.;
+				alwaysMoving = false;
+				minimize_theta = true;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = true;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = true;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 0.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Rocket Universal";
+			type = "struct RigidBodyPrm" {
+				unit_type = ROCKET;
+				rigidBodyType = RIGID_BODY_MISSILE;
+				linear_damping = {
+					x = 3.;
+					y = 3.;
+					z = 3.;
+				};
+				angular_damping = 10.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 5000;
+				is_point_reached_radius_max = 0.;
+				forward_velocity_max = 400.;
+				forward_acceleration = 400.;
+				orientation_torque_factor = 40.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 40.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 0.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.2;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Ground";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 10.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 5.;
+				forward_velocity_max = 60.;
+				forward_acceleration = 100.;
+				orientation_torque_factor = 15.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 1.;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 0.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 0.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Ground Human";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 5.;
+					y = 5.;
+					z = 5.;
+				};
+				angular_damping = 10.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 5.;
+				forward_velocity_max = 60.;
+				forward_acceleration = 300.;
+				orientation_torque_factor = 15.;
+				moveVertical = true;
+				verticalFactor = 0.5;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.8;
+				orientation_tau = 1.;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 0.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 0.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = false;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Ground Underwater";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 10.;
+				unmovable = true;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 5.;
+				forward_velocity_max = 60.;
+				forward_acceleration = 100.;
+				orientation_torque_factor = 15.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.8;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 0.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 0.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = true;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Underground";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 10.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 5.;
+				forward_velocity_max = 60.;
+				forward_acceleration = 30.;
+				orientation_torque_factor = 15.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 0.;
+				digging_depth_velocity = 10.;
+				undergroundMode = true;
+				flyingMode = true;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Underwater";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 10.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 5.;
+				forward_velocity_max = 60.;
+				forward_acceleration = 30.;
+				orientation_torque_factor = 15.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 0.;
+				digging_depth_velocity = 10.;
+				undergroundMode = true;
+				flyingMode = true;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = true;
+				groundPass = false;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Water";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 10.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 5.;
+				forward_velocity_max = 60.;
+				forward_acceleration = 30.;
+				orientation_torque_factor = 15.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 0.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 0.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = true;
+				groundPass = false;
+				fieldPass = false;
+				waterAnalysis = true;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Water Ground";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 10.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 5.;
+				forward_velocity_max = 60.;
+				forward_acceleration = 100.;
+				orientation_torque_factor = 15.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 1.;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 0.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 0.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = true;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = true;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Water Ground Air";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 4.;
+					y = 0.2;
+					z = 4.;
+				};
+				angular_damping = 5.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 5.;
+				forward_velocity_max = 60.;
+				forward_acceleration = 100.;
+				orientation_torque_factor = 6.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.2;
+				additionalHorizontalRot = 20.;
+				additionalForvardRot = 0.3;
+				digging_depth = 0.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = true;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 100.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = true;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = true;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Water Ground Air Human";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 1.;
+				};
+				angular_damping = 6.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 5.;
+				forward_velocity_max = 50.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 3.;
+				moveVertical = true;
+				verticalFactor = 0.5;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = true;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = true;
+				hoverMode = true;
+				flying_height_relative = true;
+				flying_height = 100.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = true;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = true;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Water Ground Air Planer";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 4.;
+					y = 0.2;
+					z = 4.;
+				};
+				angular_damping = 5.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 5.;
+				forward_velocity_max = 60.;
+				forward_acceleration = 30.;
+				orientation_torque_factor = 6.;
+				moveVertical = true;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.15;
+				additionalHorizontalRot = 20.;
+				additionalForvardRot = 0.;
+				digging_depth = 0.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = true;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 100.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = true;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = false;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Water Ground Human";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 5.;
+					y = 5.;
+					z = 5.;
+				};
+				angular_damping = 10.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 5.;
+				forward_velocity_max = 60.;
+				forward_acceleration = 300.;
+				orientation_torque_factor = 15.;
+				moveVertical = true;
+				verticalFactor = 0.5;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.8;
+				orientation_tau = 1.;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 0.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 0.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = true;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = true;
+				path_tracking_back = false;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "UnitCorpse";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 6.;
+				unmovable = false;
+				controled_by_points = false;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 50.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 15.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 1.;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = true;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Hover";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 1.;
+				};
+				angular_damping = 6.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 5.;
+				forward_velocity_max = 50.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 3.;
+				moveVertical = false;
+				verticalFactor = 0.5;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = true;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = true;
+				hoverMode = true;
+				flying_height_relative = true;
+				flying_height = 100.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = true;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = true;
+				path_tracking_back = false;
+				ptObstaclesCheck = false;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Flying";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 4.;
+					y = 0.2;
+					z = 4.;
+				};
+				angular_damping = 5.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 5.;
+				forward_velocity_max = 100.;
+				forward_acceleration = 30.;
+				orientation_torque_factor = 6.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.1;
+				orientation_tau = 0.1;
+				additionalHorizontalRot = 45.;
+				additionalForvardRot = 0.;
+				digging_depth = 0.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = true;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 100.;
+				alwaysMoving = true;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = true;
+				groundPass = true;
+				fieldPass = true;
+				waterAnalysis = true;
+				path_tracking_back = false;
+				ptObstaclesCheck = false;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Flying Stop";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 4.;
+					y = 0.2;
+					z = 4.;
+				};
+				angular_damping = 5.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 5.;
+				forward_velocity_max = 100.;
+				forward_acceleration = 30.;
+				orientation_torque_factor = 6.;
+				moveVertical = true;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.1;
+				orientation_tau = 0.1;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 0.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = true;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 100.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = true;
+				groundPass = true;
+				fieldPass = true;
+				waterAnalysis = true;
+				path_tracking_back = false;
+				ptObstaclesCheck = false;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Flying Aiming";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 4.;
+					y = 0.2;
+					z = 4.;
+				};
+				angular_damping = 5.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 5.;
+				forward_velocity_max = 100.;
+				forward_acceleration = 30.;
+				orientation_torque_factor = 6.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.1;
+				orientation_tau = 0.1;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 0.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = true;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 100.;
+				alwaysMoving = true;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = true;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = true;
+				path_tracking_back = false;
+				ptObstaclesCheck = false;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Ground Underwater Ignoring Obstacles";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 10.;
+				unmovable = true;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 5.;
+				forward_velocity_max = 60.;
+				forward_acceleration = 100.;
+				orientation_torque_factor = 15.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.8;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 0.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 0.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = true;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = false;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Ground Underwater Ignoring Obstacles Human";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 10.;
+				unmovable = true;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 5.;
+				forward_velocity_max = 60.;
+				forward_acceleration = 100.;
+				orientation_torque_factor = 15.;
+				moveVertical = true;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.8;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 0.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 0.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = true;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = false;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Pad";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 1.;
+				};
+				angular_damping = 6.;
+				unmovable = false;
+				controled_by_points = false;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 5.;
+				forward_velocity_max = 50.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 3.;
+				moveVertical = false;
+				verticalFactor = 0.5;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 0.7;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = true;
+				hoverMode = true;
+				flying_height_relative = true;
+				flying_height = 0.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = true;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = false;
+				ptObstaclesCheck = false;
+				sleepAtStart = false;
+				enableSleeping = false;
+				awakeCounter = 10;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Tank";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 10.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 20.;
+				forward_velocity_max = 100.;
+				forward_acceleration = 100.;
+				orientation_torque_factor = 15.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 1.;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 0.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 0.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = true;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 0.7;
+				suspensionDamping = 1.;
+				drivingForceLimit = 10000.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Unit Tank Water";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 6.;
+					y = 0.2;
+					z = 5.;
+				};
+				angular_damping = 10.;
+				unmovable = false;
+				controled_by_points = true;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 20.;
+				forward_velocity_max = 100.;
+				forward_acceleration = 100.;
+				orientation_torque_factor = 15.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 1.;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 0.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 0.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = true;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = true;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 0.1;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 2.e-002;
+				gravity = 300.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 7.;
+				suspensionDamping = 35.;
+				drivingForceLimit = 10000.;
+				wheelMass = 0.1;
+			};
+		},
+		{
+			name = "Item Inventory";
+			type = "struct RigidBodyPrm" {
+				unit_type = UNIT;
+				rigidBodyType = RIGID_BODY_UNIT;
+				linear_damping = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				angular_damping = 0.;
+				unmovable = false;
+				controled_by_points = false;
+				steering_duration = 3000;
+				is_point_reached_radius_max = 2.;
+				forward_velocity_max = 0.;
+				forward_acceleration = 40.;
+				orientation_torque_factor = 9.;
+				moveVertical = false;
+				verticalFactor = 1.;
+				canEnablePointAnalyze = true;
+				placeOnWaterSurface = false;
+				position_tau = 0.3;
+				orientation_tau = 1.;
+				additionalHorizontalRot = 0.;
+				additionalForvardRot = 0.;
+				digging_depth = 150.;
+				digging_depth_velocity = 10.;
+				undergroundMode = false;
+				flyingMode = false;
+				hoverMode = false;
+				flying_height_relative = true;
+				flying_height = 50.;
+				alwaysMoving = false;
+				minimize_theta = false;
+				upper_theta = 90.;
+				lower_theta = -45.;
+				targetCorrectionZ = 0.;
+				distance_correction_factor = 0.96;
+				ground_colliding_delay = 100;
+				ground_collision_enabled = false;
+				rocket_vertical_control_distance = 120.;
+				rocket_forward_analysis_distance = 80.;
+				rocket_target_offset_z = 0.;
+				underwaterRocket = false;
+				fence = false;
+				waterPass = false;
+				groundPass = true;
+				fieldPass = false;
+				waterAnalysis = false;
+				path_tracking_back = true;
+				ptObstaclesCheck = true;
+				sleepAtStart = true;
+				enableSleeping = true;
+				awakeCounter = 4;
+				sleepMovemenThreshould = 5.e-002;
+				average_movement_tau = 0.6;
+				sphereCollision = false;
+				holdOrientation = false;
+				linearDamping = 0.;
+				angularDamping = 0.;
+				gravity = 200.;
+				TOI_factor = 1.;
+				friction = 1.;
+				restitution = 0.25;
+				relaxationTime = 0.1;
+				joint = false;
+				axes = {
+					xrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					yrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+					zrow = {
+						x = 0.;
+						y = 0.;
+						z = 0.;
+					};
+				};
+				upperLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				lowerLimits = {
+					x = 0.;
+					y = 0.;
+					z = 0.;
+				};
+				suspensionSpringConstant = 1.1;
+				suspensionDamping = 3.;
+				drivingForceLimit = 2.;
+				wheelMass = 0.1;
+			};
+		}
+	};
+};

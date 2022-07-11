@@ -1,0 +1,55 @@
+struct VS_INPUT
+{
+    float4 pos : POSITION;
+#ifdef OBJECT
+#if(WEIGHT>1)    
+	float4 bw: COLOR0;
+#endif	
+    float4 blend:BLENDINDICES;
+#endif
+}; 
+
+struct VS_OUTPUT
+{
+    float4 p : POSITION;
+	float4 pos:TEXCOORD1;
+	
+}; 
+float4x4 mView:register(c0);
+float4x4 mVP:register(c4);
+float4x3 mWorldM[20]: register(c9);
+float2 vDofParams:register(c70);
+//static float2 vDofParams = {100,1000};
+VS_OUTPUT main(const VS_INPUT v)
+{
+    VS_OUTPUT o;
+	float4x3 mWorld;
+	float f;
+#ifdef OBJECT
+	float3 world_pos;
+	int4 blend = D3DCOLORtoUBYTE4(v.blend);
+#if (WEIGHT>1)	
+		mWorld=mWorldM[blend[0]]*v.bw[0];
+		for(int i=1;i<WEIGHT;i++)
+		{
+			mWorld+=mWorldM[blend[i]]*v.bw[i];
+		}
+#else
+		mWorld=mWorldM[blend[0]];
+#endif	
+
+	world_pos=mul(v.pos,mWorld);
+	float4 world_pos4=float4(world_pos,1);
+	f = mul(world_pos4,mView).z;
+	o.p = mul(world_pos4,mVP);
+#else
+#include "..\\Minimal\\ConvertPos.inl"
+   f = mul(pos,mView).z;
+	o.p = mul(pos,mVP);
+#endif
+	f = (f-vDofParams.x)/(vDofParams.y-vDofParams.x);
+	f = clamp(f,0,vDofParams.y);
+	//f=o.p.z;
+	o.pos = f;
+	return o;
+}

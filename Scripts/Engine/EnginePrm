@@ -1,0 +1,11 @@
+Version = 0;
+EnginePrm = {
+	actionAttackLabel = {
+		helixDeltaAngle = 1.;
+		helixDeltaRadius = 0.5;
+		sourceRadius = 50.;
+		digRadius = 15.;
+		throwRadius = 75.;
+		pickRadius = 5.;
+	};
+};

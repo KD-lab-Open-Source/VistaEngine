@@ -1,0 +1,14 @@
+.svn
+/.vscode
+/perimeter
+/build
+/Source/cache_font
+.scc
+.Debug/
+Debug/
+.Release/
+.garbage/
+Garbage/
+*.user
+*.ncb
+/GameDBG.pdb

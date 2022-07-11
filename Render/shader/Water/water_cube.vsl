@@ -1,0 +1,64 @@
+struct VS_INPUT
+{
+    float4 pos : POSITION;
+	float4  diffuse: COLOR0;
+};
+
+struct VS_OUTPUT
+{
+    float4  pos : POSITION;
+    float2  uv_tex0 : TEXCOORD0;
+    float2  uv_tex1 : TEXCOORD1;
+    float2  uv_sky : TEXCOORD2;
+    float2  uv_lightmap : TEXCOORD3;
+    float3  uv_mirror : TEXCOORD4;
+#ifdef FLOAT_ZBUFFER
+    float4  zpos:TEXCOORD5;
+#endif
+	float4  diffuse: COLOR0;
+    float fog: FOG;
+};
+
+float4x4 mVP;
+float4 uvScaleOffset;
+float4 uvScaleOffset1;
+float4 uvScaleOffsetSky;
+float3 vCameraPos;
+
+float4x4 mView;
+float3 vFog;
+#ifdef FLOAT_ZBUFFER
+float4x4 mZBuffer:register(c13);
+#endif
+float4 fPlanarNode:register(c95);
+
+VS_OUTPUT main(const VS_INPUT v)
+{
+    VS_OUTPUT o;
+	float2 uv_offset=uvScaleOffset.zw;
+	float2 uv_scale=uvScaleOffset.xy;
+	o.uv_tex0=uv_offset+v.pos.xy*uv_scale;
+	float2 uv_offset1=uvScaleOffset1.zw;
+	float2 uv_scale1=uvScaleOffset1.xy;
+	o.uv_tex1=uv_offset1+v.pos.yx*uv_scale1;
+	o.pos=mul(v.pos,mVP);
+	o.uv_lightmap = (v.pos.xy - fPlanarNode.xy)*fPlanarNode.zw;
+	
+	float2 uv_offset_sky=uvScaleOffsetSky.zw;
+	float2 uv_scale_sky=uvScaleOffsetSky.xy;
+	o.uv_sky=uv_offset_sky+v.pos.yx*uv_scale_sky;
+
+	o.diffuse=v.diffuse;
+	float3 dir=vCameraPos-v.pos;
+	dir.z-=v.pos.z;
+	o.uv_mirror=normalize(dir);
+
+	//fog
+	float fogz=mul(v.pos,mView).z;
+	float fog=fogz*vFog.z+vFog.y;
+	o.fog=clamp(fog,0,1);
+#ifdef FLOAT_ZBUFFER
+	o.zpos = mul(v.pos,mZBuffer);
+#endif	
+    return o;
+}

@@ -1,0 +1,40 @@
+struct VS_INPUT
+{
+    float3 pos : POSITION;
+    float4 blend:color0;
+};
+
+struct VS_OUTPUT
+{
+    float4  pos : POSITION;
+	float4  diffuse: COLOR0;
+	float2  t0 : TEXCOORD0;
+};
+
+/*
+VS_OUTPUT main(const VS_INPUT v)
+{
+    VS_OUTPUT o;
+    o.pos.xy=v.pos.xy;
+    o.pos.z=o.pos.w=1;//0.001f;
+    o.diffuse.xyz=v.blend;
+    o.diffuse.w=1;
+    o.t0=0;
+    return o;
+}
+*/
+
+float4 pos[95]: register(c0);
+
+VS_OUTPUT main(const VS_INPUT v)
+{
+    VS_OUTPUT o;
+    int4 blend = D3DCOLORtoUBYTE4(v.blend);
+    float4 p=pos[blend.w];
+    o.pos.xyz=p.xyz+v.pos.xyz;
+    o.pos.w=1;
+    o.diffuse.xyz=v.blend;
+    o.diffuse.w=1;
+    o.t0=0;
+    return o;
+}

@@ -1,0 +1,18 @@
+struct PS_INPUT
+{
+	float2 Tex:TEXCOORD0;
+};
+
+sampler2D SrcTexture0:register(s0);
+sampler2D SrcTexture1:register(s1);
+sampler2D SrcTexture2:register(s2);
+float shift:register(c0);
+float2 scale:register(c1);
+float4 color:register(c2);
+float4 main (const PS_INPUT v):COLOR
+{
+	float4 c = tex2D(SrcTexture1,v.Tex+float2(0,shift));
+	//float4 uv = tex2D(SrcTexture0,lerp(0+scale.x,1-scale.x,v.Tex)+c.xy*scale.x*2-scale.x);
+	float4 uv = tex2D(SrcTexture0,v.Tex*(1-scale.x*2)+c.xy*scale.x*2);
+	return uv+lerp(0,color,scale.y);
+}

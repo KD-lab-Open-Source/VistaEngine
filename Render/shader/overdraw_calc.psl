@@ -1,0 +1,15 @@
+struct PS_INPUT
+{
+	float2 Tex:TEXCOORD0;
+};
+sampler2D SrcTexture:register(s0);
+float4 PixelSum[16]:register(c0);
+float4 main (const PS_INPUT v):COLOR
+{
+    float4 color = 0;
+	for (int i=0; i<16; i++)
+	{
+	  color += tex2D(SrcTexture,v.Tex + PixelSum[i].xy);
+	}
+    return color/16;
+}

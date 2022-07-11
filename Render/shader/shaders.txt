@@ -1,0 +1,644 @@
+"Skin\object_scene_light.vsl" {
+  define {
+    FOG_OF_WAR=off,1;
+    WEIGHT=1,2,3,4;
+    NOLIGHT=off,1;
+    LIGHTMAP=off,1;
+    UVTRANS=off,1;
+    ZREFLECTION=off,1;
+    POINT_LIGHT=off,1;
+  }
+  static {
+    SHADOW=off,1;
+  }
+}
+
+"Skin\object_scene_light.vsl" {
+  output=object_scene_light_fur;
+  define {
+    FOG_OF_WAR=off,1;
+    WEIGHT=1,2,3,4;
+    NOLIGHT=off,1;
+    LIGHTMAP=off,1;
+    UVTRANS=off,1;
+    ZREFLECTION=off,1;
+    POINT_LIGHT=off,1;
+    FUR=1;
+  }
+  static {
+    SHADOW=off,1;
+  }
+}
+
+"Skin\object_scene_light.vsl" {
+  output=object_scene_reflection;
+  define {
+    FOG_OF_WAR=off,1;
+    WEIGHT=1,2,3,4;
+    LIGHTMAP=off,1;
+    UVTRANS=off,1;
+    REFLECTION=1,2;
+    ZREFLECTION=off,1;
+    POINT_LIGHT=off,1;
+  }
+  static {
+    SHADOW=off,1;
+  }
+}
+
+"Skin\object_scene_light.vsl" { 
+  output="object_scene_light_second_opacity";
+  define {
+    FOG_OF_WAR=off,1;
+    WEIGHT=1,2,3,4;
+    NOLIGHT=off,1;
+    UVTRANS=off,1;
+    ZREFLECTION=off,1;
+    SECOND_OPACITY_TEXTURE=1,2;
+    SECOND_UVTRANS=off,1;
+  }
+}
+
+"Skin\object_scene_bump.vsl" {
+  profile=vs_1_1;
+  define {
+    FOG_OF_WAR=off,1;
+    WEIGHT=1,2,3,4;
+    LIGHTMAP=off,1;
+    UVTRANS=off,1;
+    ZREFLECTION=off,1;
+    POINT_LIGHT=off,1;
+  }
+  static {
+    SHADOW=off,1;
+  }
+}
+
+"Skin\object_shadow.vsl" {
+  define {
+    WEIGHT=1,2,3,4;
+    TARGET=0,1;
+    UVTRANS=off,1;
+    SECOND_OPACITY_TEXTURE=off,1,2;
+    SECOND_UVTRANS=off,1;
+  }
+}
+
+"Skin\object_shadow.psl" {
+  profile=ps_2_0;
+  define {
+     SHADOW_9700=off,1;
+     ALPHA=off,1;
+     SECOND_OPACITY_TEXTURE=off,1;
+  }
+}
+
+"Skin\object_scene_light.psl" {
+  output=object_scene_light;
+  profile=ps_1_1;
+  define {
+    FOG_OF_WAR=off,1;
+    LIGHTMAP=off,1,2;
+    NOTEXTURE=off,1;
+    NOLIGHT=off,1;
+    SELF_ILLUMINATION=off,1;
+    ZREFLECTION=off,1;
+    LERP_TEXTURE_COLOR=off,1;
+  }
+  
+  profile=ps_2_0 {
+    ZREFLECTION=1;
+  }
+}
+    
+"Skin\object_scene_light.psl" {
+  profile=ps_2_0;
+  output=object_scene_bump;
+  define {
+    FOG_OF_WAR=off,1;
+    LIGHTMAP=off,1,2;
+    BUMP=1;
+    SPECULARMAP=off,1;
+    SELF_ILLUMINATION=off,1;
+    ZREFLECTION=off,1;
+    LERP_TEXTURE_COLOR=off,1;
+  }
+}
+
+"Skin\object_scene_light.psl" {
+  profile=ps_2_0;
+  output=object_scene_light_shadow9700;
+  define {
+    FOG_OF_WAR=off,1;
+    LIGHTMAP=off,1,2;
+    FILTER_SHADOW=off,1;
+    SHADOW_9700=1;
+    SELF_ILLUMINATION=off,1;
+    ZREFLECTION=off,1;
+    LERP_TEXTURE_COLOR=off,1;
+  }
+}
+
+"Skin\object_scene_light.psl" {
+  profile=ps_2_0;
+  output=object_scene_bump_shadow9700;
+  define {
+    FOG_OF_WAR=off,1;
+    LIGHTMAP=off,1,2;
+    FILTER_SHADOW=off,1;
+    SHADOW_9700=1;
+    BUMP=1;
+    SPECULARMAP=off,1;
+    SELF_ILLUMINATION=off,1;
+    ZREFLECTION=off,1;
+    LERP_TEXTURE_COLOR=off,1;
+  }
+}
+
+"Skin\object_scene_light.psl" {
+  profile=ps_2_0;
+  output=object_scene_light_shadowFX;
+  define {
+    FOG_OF_WAR=off,1;
+    LIGHTMAP=off,1,2;
+    FILTER_SHADOW=off,1;
+    SHADOW_FX=1;
+    SELF_ILLUMINATION=off,1;
+    ZREFLECTION=off,1;
+    LERP_TEXTURE_COLOR=off,1;
+  }
+}
+
+"Skin\object_scene_light.psl" {
+  profile=ps_2_0;
+  output=object_scene_bump_shadowFX;
+  define {
+    FOG_OF_WAR=off,1;
+    LIGHTMAP=off,1,2;
+    FILTER_SHADOW=off,1;
+    SHADOW_FX=1;
+    BUMP=1;
+    SPECULARMAP=off,1;
+    SELF_ILLUMINATION=off,1;
+    ZREFLECTION=off,1;
+    LERP_TEXTURE_COLOR=off,1;
+  }
+}
+
+"Skin\object_scene_light.psl" {
+  profile=ps_1_1;
+  output=object_scene_reflection;
+  define {
+    FOG_OF_WAR=off,1;
+    REFLECTION=1,2;
+    SELF_ILLUMINATION=off,1;
+    LERP_TEXTURE_COLOR=off,1;
+  }
+}
+
+"Skin\object_scene_light.psl" {
+  profile=ps_2_0;
+  output=object_scene_reflection_shadow9700;
+  define {
+    FOG_OF_WAR=off,1;
+    FILTER_SHADOW=off,1;
+    REFLECTION=1,2;
+    SHADOW_9700=1;
+    SELF_ILLUMINATION=off,1;
+    ZREFLECTION=off,1;
+    LERP_TEXTURE_COLOR=off,1;
+  }
+}
+
+"Skin\object_scene_light.psl" {
+  profile=ps_2_0;
+  output=object_scene_reflection_shadowFX;
+  define {
+    FOG_OF_WAR=off,1;
+    FILTER_SHADOW=off,1;
+    REFLECTION=1,2;
+    SHADOW_FX=1;
+    SELF_ILLUMINATION=off,1;
+    ZREFLECTION=off,1;
+    LERP_TEXTURE_COLOR=off,1;
+  }
+}
+
+"Skin\object_scene_light.psl" {
+  profile=ps_1_1;
+  output=object_scene_light_second_opacity;
+  define {
+    NOTEXTURE=off,1;
+    NOLIGHT=off,1;
+    SELF_ILLUMINATION=1;
+    SECOND_OPACITY_TEXTURE=1;
+    ZREFLECTION=off,1;
+    LERP_TEXTURE_COLOR=off,1;
+  }
+  profile=ps_2_0 {
+    ZREFLECTION=1;
+  }
+}
+
+
+"Minimal\tile_map_scene.psl" {
+  profile=ps_1_1;
+  define {
+    FOG_OF_WAR=off,1;
+    ZREFLECTION=off,1;
+    FILTER_SHADOW=off;
+    VERTEX_LIGHT=1;
+  }
+  
+  profile=ps_2_0 {
+    ZREFLECTION=1;
+  }
+}
+
+
+"Minimal\tile_map_scene.psl" {
+  profile=ps_2_0;
+  output=tile_map_scenep;
+  define {
+    FOG_OF_WAR=off,1;
+    FILTER_SHADOW=off;
+    ZREFLECTION=off,1;
+  }
+}
+
+"Minimal\tile_map_scene.psl" {
+  profile=ps_2_0;
+  output=tile_map_scened;
+  define {
+    DETAIL_TEXTURE=1;
+    FOG_OF_WAR=off,1;
+    FILTER_SHADOW=off;
+    VERTEX_LIGHT=off,1;
+    ZREFLECTION=off,1;
+  }
+}
+
+"Minimal\tile_map_scene.psl" {
+  profile=ps_2_0;
+  output=tile_map_scene_shadowFX;
+  define {
+    FOG_OF_WAR=off,1;
+    SHADOW_FX=1;
+    ZREFLECTION=off,1;
+    FILTER_SHADOW=off,1;
+    VERTEX_LIGHT=off,1;
+    DETAIL_TEXTURE=off,1;
+  }
+}
+
+"Minimal\tile_map_scene.psl" {
+  profile=ps_2_0;
+  output=tile_map_scene_shadow9700;
+  define {
+    FOG_OF_WAR=off,1;
+    SHADOW_9700=1;
+    ZREFLECTION=off,1;
+    FILTER_SHADOW=off,1;
+    VERTEX_LIGHT=off,1;
+    DETAIL_TEXTURE=off,1;
+  }
+}
+
+"Minimal\tile_map_scene.vsl" {
+  output=tile_map_scene_pixel;
+  define {
+    FOG_OF_WAR=off,1;
+    ZREFLECTION=off,1;
+  }
+}
+
+"Minimal\tile_map_scene.vsl" {
+  output=tile_map_scene_vertex;
+  define {
+    FOG_OF_WAR=off,1;
+    VERTEX_LIGHT=1;
+    ZREFLECTION=off,1;
+  }
+}
+    
+"Minimal\tile_map_scene.vsl" {
+  output=tile_map_scene_shadowFX;
+  define {
+    FOG_OF_WAR=off,1;
+    VERTEX_LIGHT=off,1;
+    SHADOW=1;
+    ZREFLECTION=off,1;
+  }
+}
+
+"Water\water_lava.psl" {
+  profile=ps_2_0;
+  define {
+    FOG_OF_WAR=off,1;
+  }
+}
+
+"Water\water_lava.vsl" {
+  define {
+    FOG_OF_WAR=off,1;
+	CONVERT_Z=off,1;
+  }
+}
+
+"Water\water_lava_ps11.psl" {
+  profile=ps_1_1;
+  define {
+    FOG_OF_WAR=off,1;
+  }
+}
+    
+"Water\water_lava_ps11.vsl" {
+  define {
+    FOG_OF_WAR=off,1;
+  }
+}
+
+"Water\water_cube.psl" {
+  profile=ps_2_0;
+  define {
+    FOG_OF_WAR=off,1;
+    FLOAT_ZBUFFER=off,1;
+  }
+}
+
+"Water\water_easy.psl" {
+  profile=ps_1_1;
+  define {
+    FOG_OF_WAR=off,1;
+    FLOAT_ZBUFFER=off,1;
+  }
+}
+
+"Water\water_cube.vsl" {
+  define {
+    FOG_OF_WAR=off,1;
+    FLOAT_ZBUFFER=off,1;
+  }
+}
+
+"Water\water_easy.vsl" {
+  define {
+    FOG_OF_WAR=off,1;
+  }
+}
+
+"Minimal\tile_map_shadow.vsl" {
+  define {
+    SHADOW_9700=off,1;
+  }
+}
+
+"Minimal\tile_map_shadow.psl" {
+  profile=ps_2_0;
+  define {
+    SHADOW_9700=off,1;
+  }
+}
+
+"Chaos\chaos.vsl" {
+  define {
+    VERTEX_FOG=off,1;
+  }
+}
+
+"Chaos\chaos.psl" {
+  profile=ps_2_0;
+}
+
+"Minimal\ShowMap9700.psl" {
+  profile=ps_2_0;
+}
+
+"Minimal\ShowAlpha.psl" {
+  profile=ps_1_1;
+}
+
+//  profile=ps_2_0;
+"NoMaterial\standart.psl" {
+  profile=$$ if FLOAT_ZBUFFER=="1" or ZREFLECTION=="1" then return "ps_2_0"; end; return "ps_1_1"; $$
+  define {
+    FOG_OF_WAR=off,1;
+    COLOR_OPERATION=off,1,2,3,4;
+    FLOAT_ZBUFFER=off,1;
+    ZREFLECTION=off,1;
+  }
+}
+
+"NoMaterial\standart.vsl" {
+  define {
+    FOG_OF_WAR=off,1;
+    FIX_FOG_ADD_BLEND=off,1;
+    COLOR_OPERATION=off,1;
+    FLOAT_ZBUFFER=off,1;
+    ZREFLECTION=off,1;
+  }
+}
+
+"NoMaterial\EnvironmentEarth.psl" {
+  profile=ps_1_1;
+  define {
+    FOG_OF_WAR=off,1;
+  }
+}
+
+"Water\water_ice.psl" {
+//  profile=ps_2_0;
+  profile=$$ if PS11=="1"then return "ps_1_1"; end; return "ps_2_0"; $$
+  define {
+    FOG_OF_WAR=off,1;
+    MIRROR_LINEAR=off,1;
+    PS11=off,1;
+    USE_ALPHA=off,1;
+  }
+}
+
+"Water\water_ice.vsl" {
+  define {
+    FOG_OF_WAR=off,1;
+    MIRROR_LINEAR=off,1;
+    PS11=off,1;
+    USE_ALPHA=off,1;
+  }
+}
+
+"RasterizeNormals\vs.vsl" { }
+"RasterizeNormals\ps.psl" {
+  profile=ps_2_0;
+}
+
+"Water\water_linear.psl" {
+  profile=ps_2_0;
+  define {
+    FOG_OF_WAR=off,1;
+    FLOAT_ZBUFFER=off,1;
+  }
+}
+
+"Water\water_linear.vsl" {
+  define {
+    FOG_OF_WAR=off,1;
+    FLOAT_ZBUFFER=off,1;
+  }
+}
+
+"font.psl" {
+  profile=ps_1_1;
+}
+
+"PostProcessing\monochrome.psl" {
+  profile=ps_1_1;
+}
+"PostProcessing\colorbright.psl" {
+  profile=ps_2_0;
+}
+"PostProcessing\colordodge.psl" {
+  profile=ps_2_0;
+}
+"PostProcessing\colorcombine.psl" {
+  profile=ps_2_0;
+}
+"PostProcessing\bloom.psl" {
+  profile=ps_2_0;
+}
+"PostProcessing\underwater.psl" {
+  profile=ps_2_0;
+}
+"PostProcessing\mirage.psl" {
+  profile=ps_2_0;
+}
+"PostProcessing\down4.psl" {
+  profile=ps_2_0;
+}
+"PostProcessing\blurmap.psl" {
+  profile=ps_2_0;
+}
+"PostProcessing\DOFCombine.psl" {
+  profile=ps_2_0;
+}
+"overdraw.psl"{
+  profile=ps_2_0;
+}
+"overdraw_color.psl"{
+  profile=ps_2_0;
+}
+"overdraw_calc.psl"{
+  profile=ps_2_0;
+}
+"Grass\grass.vsl"{
+define{
+    FOG_OF_WAR=off,1;
+    LIGHTMAP=off,1;
+    OLD_LIGHTING=off,1;
+    ZBUFFER=off,1;
+    }
+   static {
+    SHADOW=off,1;
+  }
+
+}
+"miniMap.psl"{
+  profile=ps_1_1;
+  define {
+    USE_WATER=off,1;
+    ADDITION_TEXTURE=off,1,2;
+    USE_TERRA_COLOR=off,1;
+    USE_BORDER=off,1;
+  }
+}
+"miniMapBorder.psl"{
+  profile=ps_1_1;
+  define {
+    USE_TEXTURE=off,1;
+    USE_BORDER=off,1;
+  }
+}
+"Grass\grass.psl"{
+  profile=ps_2_0;
+  output=grass_shadow9700;
+  define{
+    FOG_OF_WAR=off,1;
+    LIGHTMAP=off,1;
+    FILTER_SHADOW=off,1;
+    SHADOW_9700=1;
+  }
+}
+"Grass\grass.psl"{
+  profile=ps_1_1;
+  define{
+    FOG_OF_WAR=off,1;
+    LIGHTMAP=off,1;
+    FILTER_SHADOW=off,1;
+  }
+}
+"Grass\grass.psl"{
+  profile=ps_2_0;
+  output=grass_shadowFX;
+  define{
+    FOG_OF_WAR=off,1;
+    LIGHTMAP=off,1;
+    FILTER_SHADOW=off,1;
+    SHADOW_FX=1;
+  }
+}
+"ZBuffer\ZBuffer.psl"{
+  profile=ps_2_0;
+  define{
+    FLOATZBUFFER=off,1;
+ }
+}
+"ZBuffer\ClearAlpha.psl"{
+  profile=ps_2_0;
+}
+"ZBuffer\ZBuffer.vsl"{
+define{
+    FOG_OF_WAR=off,1;
+    WEIGHT=1,2,3,4;
+    OBJECT=off,1;
+  }
+}
+
+"ZBuffer\tilemap_zbuffer.vsl"{
+define{
+    FOG_OF_WAR=off,1;
+  }
+}
+
+"ZBuffer\object_zbuffer.vsl" {
+  define {
+    WEIGHT=1,2,3,4;
+    TARGET=0,1;
+    UVTRANS=off,1;
+    SECOND_OPACITY_TEXTURE=off,1,2;
+    SECOND_UVTRANS=off,1;
+  }
+}
+"ZBuffer\object_zbuffer.psl" {
+  profile=ps_2_0;
+  define {
+     ALPHA=off,1;
+     SECOND_OPACITY_TEXTURE=off,1;
+  }
+}
+
+"NoMaterial\CloudShadow.psl" {
+  profile=ps_1_1;
+}
+
+"NoMaterial\CloudShadow.vsl" {
+}
+
+"NoMaterial\SolidColor.psl" {
+  profile=ps_1_1;
+}
+
+"PostProcessing\blobs.psl" {
+  profile=ps_2_0;
+}
+
+"dipcost.vsl" { }
+"dipcost.psl" { profile=ps_1_1; }

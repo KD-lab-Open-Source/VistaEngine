@@ -1,0 +1,45 @@
+
+struct PS_INPUT
+{
+	float3 uv_volume:TEXCOORD0;
+	float3 uv_volume1:TEXCOORD2;
+	float2 uv_ground:TEXCOORD1;
+    float4  diffuse: COLOR0;
+    
+	float2 uv_lightmap:TEXCOORD3;
+};
+
+sampler3D VolumeSampler:register(s0);
+sampler3D VolumeSampler1:register(s2);
+sampler2D GroundSampler:register(s1);
+float time:register(c0);
+float3 vLavaColor;
+float3 vLavaColorAmbient;
+
+sampler2D LightMapSampler:register(s3);
+float4 vFogOfWar:register(c3);
+
+float4 main(const PS_INPUT v):COLOR
+{
+	float rnd;
+	
+	half4 fnoise = tex3D(VolumeSampler, v.uv_volume);
+	fnoise -=.55;
+	fnoise *= 2.0f;
+	rnd=fnoise.x;
+	fnoise = tex3D(VolumeSampler1, v.uv_volume1);
+	fnoise -=.55;
+	rnd+=fnoise.x;
+	
+	float4 ot;
+	ot.rgb=rnd*vLavaColor+vLavaColorAmbient;
+	//ot.rgb=max(ot.rgb,tex2D(GroundSampler,v.uv_ground));
+	ot.rgb=ot.rgb+tex2D(GroundSampler,v.uv_ground);
+	ot.a=v.diffuse.a;
+#ifdef FOG_OF_WAR
+	float4 lightmap=tex2D(LightMapSampler,v.uv_lightmap);
+	ot.rgb=lerp(ot.rgb, vFogOfWar, lightmap.a);
+#endif	
+	
+	return ot;
+}

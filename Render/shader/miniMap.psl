@@ -1,0 +1,69 @@
+struct PS_INPUT
+{
+	float2 uv0:TEXCOORD0;
+#ifdef USE_WATER
+	float2 uv1:TEXCOORD1;
+#endif
+#ifdef ADDITION_TEXTURE
+	float2 uv2:TEXCOORD2;
+#endif
+	float4 color: COLOR0;
+#ifdef USE_BORDER
+	float2 uv3:TEXCOORD3;
+#endif
+};
+
+sampler2D baseTexture:register(s0);
+
+#ifdef USE_WATER
+  sampler2D waterTexture:register(s1);
+  float3 waterColor:register(c0);
+#endif
+
+#ifdef ADDITION_TEXTURE
+  sampler2D additionTexture:register(s2);
+  float4 additionAlpha:register(c1);
+#endif
+
+#ifdef USE_TERRA_COLOR
+  float4 terraColor:register(c2);
+#endif
+
+#ifdef USE_BORDER
+  sampler2D borderTexture:register(s3);
+#endif
+
+float4 main(const PS_INPUT v):COLOR
+{
+  float4 o;
+
+#ifdef USE_TERRA_COLOR
+  o=terraColor;
+#else
+  o=tex2D(baseTexture,v.uv0);
+#endif
+
+#ifdef USE_WATER  
+  float3 wa=tex2D(waterTexture,v.uv1);
+  o.rgb = lerp(o.rgb,waterColor,wa);
+#endif
+
+#ifdef ADDITION_TEXTURE
+  float4 t;
+  t = tex2D(additionTexture, v.uv2);
+  #if(ADDITION_TEXTURE==1)
+    o.a = v.color.a - v.color.a * t.z * additionAlpha.a;
+  #else
+	o.rgb = lerp(o.rgb, t, additionAlpha.a * t.a);
+  #endif
+#endif
+
+#ifdef USE_BORDER
+  float4 b;
+  b = tex2D(borderTexture,v.uv3);
+  o.a = o.a * b.a;
+#endif
+  return o;
+}
+
+ 

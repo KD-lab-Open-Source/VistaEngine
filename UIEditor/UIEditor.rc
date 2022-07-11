@@ -1,0 +1,695 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Russian resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
+#ifdef _WIN32
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+#pragma code_page(1251)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\UIEditor.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#include ""afxprint.rc""       // printing/print preview resources\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_TREE_SELECTOR DIALOGEX 0, 0, 316, 321
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_MAXIMIZEBOX | WS_CAPTION | WS_SYSMENU | 
+    WS_THICKFRAME
+CAPTION "Select Library Reference"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,209,302,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,261,302,50,14
+    CONTROL         "Custom1",IDC_TREE_CONTROL,"VistaEngineObjectsTreeCtrl",
+                    WS_TABSTOP,5,5,306,286
+    CONTROL         "",IDC_HORIZONTAL_LINE,"Static",SS_BLACKFRAME | 
+                    SS_SUNKEN,5,297,306,1
+    EDITTEXT        IDC_FILTER_EDIT,28,303,177,12,ES_AUTOHSCROLL
+    LTEXT           "Filter:",IDC_FILTER_LABEL,7,305,20,8
+END
+
+IDD_CONDITION_EDITOR DIALOGEX 0, 0, 554, 273
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | 
+    WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Condition Editor"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,443,252,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,497,252,50,14
+    CONTROL         "Custom1",IDC_CONDITION_EDITOR,
+                    "VistaEngineConditionEditor",WS_BORDER | WS_TABSTOP,174,
+                    7,373,235
+    CONTROL         "",IDC_HLINE,"Static",SS_BLACKFRAME | SS_SUNKEN,7,247,
+                    540,1
+    CONTROL         "Custom1",IDC_CONDITION_LIST,
+                    "TreeListCtrl.TigerX_And_KB-I",WS_BORDER | WS_TABSTOP,7,
+                    7,159,235
+END
+
+IDD_GRADIENT_EDITOR DIALOGEX 0, 0, 348, 121
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Gradient Editor"
+FONT 8, "Tahoma", 400, 0, 0xCC
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,238,100,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,291,100,50,14
+    CONTROL         "Custom1",IDC_GRADIENT_EDITOR,"VistaEngineGradientEditor",
+                    WS_BORDER | WS_TABSTOP,7,17,334,36
+    CONTROL         "",IDC_R_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,75,62,122,11
+    CONTROL         "",IDC_G_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,75,76,122,11
+    CONTROL         "",IDC_A_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,75,103,122,11
+    CONTROL         "",IDC_B_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,75,90,122,11
+    EDITTEXT        IDC_R_EDIT,201,62,28,12,ES_CENTER | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    EDITTEXT        IDC_G_EDIT,201,75,28,12,ES_CENTER | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    EDITTEXT        IDC_B_EDIT,201,89,28,12,ES_CENTER | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    EDITTEXT        IDC_A_EDIT,201,102,28,12,ES_CENTER | ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    RTEXT           "R:",IDC_STATIC,65,63,8,8
+    RTEXT           "G:",IDC_STATIC,65,78,8,8
+    RTEXT           "B:",IDC_STATIC,65,91,8,8
+    RTEXT           "A:",IDC_A_LABEL,65,105,8,8
+    CONTROL         "Custom1",IDC_SOLID_COLOR,"VistaEngineSolidColor",
+                    WS_BORDER | WS_TABSTOP,7,62,54,52
+    EDITTEXT        IDC_POSITION_EDIT,303,75,37,12,ES_AUTOHSCROLL
+    LTEXT           "Position:",IDC_STATIC,242,76,28,8
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,9,7,1,8
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,173,7,1,
+                    8
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,338,7,1,
+                    8
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,91,6,1,
+                    9
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,256,6,1,
+                    9
+    LTEXT           "0",IDC_MARK_FIRST,14,6,32,8
+    LTEXT           "0.25",IDC_MARK_SECOND,96,6,31,8
+    LTEXT           "0.5",IDC_MARK_THIRD,178,6,32,8
+    LTEXT           "0.75",IDC_MARK_FOURTH,259,6,36,8
+    PUSHBUTTON      "<",IDC_PREV_BUTTON,304,59,18,14
+    PUSHBUTTON      ">",IDC_NEXT_BUTTON,322,59,18,14
+    LTEXT           "Peg: ",IDC_STATIC,242,62,18,8
+    RTEXT           "0/0",IDC_PEG_LABEL,258,62,42,8
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,49,10,1,
+                    5
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,132,10,
+                    1,5
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,214,10,
+                    1,5
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,297,10,
+                    1,5
+    CONTROL         "Cycled",IDC_CYCLED_CHECK,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,304,89,37,10
+END
+
+IDD_DLG_FORMATION_EDITOR DIALOGEX 0, 0, 350, 270
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_MAXIMIZEBOX | WS_CAPTION | WS_SYSMENU | 
+    WS_THICKFRAME
+CAPTION "Formation Pattern Editor"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_H_LINE,"Static",SS_BLACKFRAME | SS_SUNKEN,7,244,
+                    336,1
+    DEFPUSHBUTTON   "OK",IDOK,241,249,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,293,249,50,14
+    LTEXT           "Formation Name:",IDC_STATIC,7,9,56,8
+    EDITTEXT        IDC_NAME_EDIT,67,8,181,12,ES_AUTOHSCROLL
+    CONTROL         "Custom1",IDC_FORMATION_EDITOR,
+                    "VistaEngineFormationEditor",WS_BORDER | WS_TABSTOP,7,26,
+                    335,214
+    PUSHBUTTON      "Edit Formation Types...",IDC_TYPES_BUTTON,252,7,91,15
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_TREE_SELECTOR, DIALOG
+    BEGIN
+        LEFTMARGIN, 5
+        RIGHTMARGIN, 311
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 316
+    END
+
+    IDD_CONDITION_EDITOR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 547
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 266
+        HORZGUIDE, 242
+    END
+
+    IDD_GRADIENT_EDITOR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 341
+        VERTGUIDE, 65
+        VERTGUIDE, 75
+        VERTGUIDE, 90
+        VERTGUIDE, 174
+        VERTGUIDE, 197
+        VERTGUIDE, 201
+        VERTGUIDE, 238
+        VERTGUIDE, 258
+        TOPMARGIN, 6
+        BOTTOMMARGIN, 114
+        HORZGUIDE, 14
+    END
+
+    IDD_DLG_FORMATION_EDITOR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 343
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 263
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+CONTROLS                BITMAP                  "res\\ControlsTreeIcons.bmp"
+IDB_SPLASH              BITMAP                  "..\\SurMap5\\res\\Splash.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_CONTROL_MENU MENU 
+BEGIN
+    POPUP "popup"
+    BEGIN
+        POPUP "Add Control"
+        BEGIN
+            MENUITEM "first control",               IDM_ADD_CONTROL_FIRST
+        END
+        MENUITEM "Add State",                   IDM_ADD_STATE
+        MENUITEM "Duplicate",                   IDM_CONTROL_DUPLICATE
+        MENUITEM SEPARATOR
+        MENUITEM "Sort By Name",                IDM_SORT
+        MENUITEM SEPARATOR
+        MENUITEM "Delete",                      IDM_DELETE
+    END
+END
+
+IDR_STATE_MENU MENU 
+BEGIN
+    POPUP "popup"
+    BEGIN
+        MENUITEM "Delete",                      IDM_DELETE
+    END
+END
+
+IDR_CONTROLS_MENU MENU 
+BEGIN
+    POPUP "popup"
+    BEGIN
+        MENUITEM "Add Screen",                  IDM_ADD_SCREEN
+    END
+END
+
+IDR_FORMATION_MENU MENU 
+BEGIN
+    POPUP "popup"
+    BEGIN
+        POPUP "Add"
+        BEGIN
+            MENUITEM "First Item",                  IDM_TYPE_FIRST_ITEM
+        END
+    END
+END
+
+IDR_FORMATION_CELL_MENU MENU 
+BEGIN
+    POPUP "popup"
+    BEGIN
+        POPUP "Type"
+        BEGIN
+            MENUITEM "First Item",                  IDM_TYPE_FIRST_ITEM
+        END
+        MENUITEM "Delete",                      ID_POPUP_DELETE
+    END
+END
+
+IDR_ELEMENT_MENU MENU 
+BEGIN
+    POPUP "zzz"
+    BEGIN
+        POPUP "Crea&te"
+        BEGIN
+            MENUITEM "First Dynamic Menu",          IDM_FIRST_DYNAMIC_MENU
+        END
+        MENUITEM "Edit\tClick",                 IDM_EDIT
+        MENUITEM "&Follow Reference\tShift+Click", IDM_FOLLOW_REFERENCE
+        MENUITEM "De&lete\tShift+Delete",       IDM_POINTER_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "&Append Element\tShift+Insert", IDM_ADD_ELEMENT
+        MENUITEM "Cl&ear Elements",             IDM_CLEAR_CONTAINER
+        MENUITEM SEPARATOR
+        MENUITEM "&Insert Element\tInsert",     IDM_INSERT_ELEMENT_BEFORE
+        MENUITEM "&Remove Element\tDelete",     IDM_REMOVE_ELEMENT
+        MENUITEM "Move &Up\tCtrl+Up",           IDM_MOVE_UP
+        MENUITEM "Move &Down\tCtrl+Down",       IDM_MOVE_DOWN
+        MENUITEM SEPARATOR
+        MENUITEM "Cop&y\tCtrl+C",               IDM_COPY
+        MENUITEM "&Paste\tCtrl+V",              IDM_PASTE
+    END
+    MENUITEM "xxx",                         65535
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_UIEDITORFRAME       ICON                    "res\\UiEditorHicolor.ico"
+#endif    // Russian resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_UI_SPRITE_EDITOR_DLG DIALOGEX 0, 0, 456, 247
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | 
+    WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&Remove",IDC_TEXTURE_REMOVE_BUTTON,417,38,32,14
+    EDITTEXT        IDC_COORD_LEFT_EDIT,340,75,22,13,ES_CENTER | 
+                    ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_COORD_TOP_EDIT,370,75,22,13,ES_CENTER | 
+                    ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_COORD_WIDTH_EDIT,397,75,22,13,ES_CENTER | 
+                    ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_COORD_HEIGHT_EDIT,427,75,22,13,ES_CENTER | 
+                    ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_SATURATION_EDIT,428,100,22,12,ES_CENTER | 
+                    ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER | NOT WS_BORDER
+    CONTROL         "",IDC_SATURATION_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,340,115,109,15
+    CONTROL         "Custom1",IDC_DIFFUSE_COLOR,"VistaEngineSolidColorCtrl",
+                    WS_BORDER | WS_TABSTOP,383,147,56,32
+    PUSHBUTTON      "<",IDC_PREV_FRAME,340,207,19,15
+    CONTROL         "Play",IDC_PLAY_CHECK,"Button",BS_AUTOCHECKBOX | 
+                    BS_PUSHLIKE | WS_TABSTOP,362,207,65,15
+    PUSHBUTTON      ">",IDC_NEXT_FRAME,430,207,19,15
+    DEFPUSHBUTTON   "OK",IDOK,340,225,56,14
+    PUSHBUTTON      "Cancel",IDCANCEL,399,225,50,14
+    CONTROL         "Custom1",IDC_VIEW,"UITextureEditor",WS_BORDER | 
+                    WS_TABSTOP,7,6,315,233
+    COMBOBOX        IDC_TEXTURES_COMBO,340,21,109,161,CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "&Add...",IDC_TEXTURE_ADD_BUTTON,340,38,32,14
+    LTEXT           "&Coordinates (px):",IDC_COORD_LABEL,346,63,58,8
+    CTEXT           ",",IDC_COORD_COMMA_LABEL,362,78,8,8
+    CTEXT           "x",IDC_COORD_X_LABEL,419,78,8,8
+    CONTROL         "",IDC_V_LINE,"Static",SS_BLACKFRAME | SS_SUNKEN,330,6,1,
+                    218
+    LTEXT           "&Texture:",IDC_TEXTURE_LABEL,340,9,29,8
+    RTEXT           "sizeLabel",IDC_TEXTURE_SIZE_LABEL,395,10,53,8
+    CONTROL         "Custom1",IDC_BACKGROUND_COLOR,"VistaEngineSolidColorCtrl",
+                    WS_BORDER | WS_TABSTOP,325,228,11,11
+    LTEXT           "&Saturation:",IDC_SATURATION_LABEL,347,101,37,8
+    LTEXT           "Diffuse &Color:",IDC_DIFFUSE_COLOR_LABEL,348,148,27,21,
+                    NOT WS_GROUP
+    CONTROL         "",IDC_H_LINE1,"Static",SS_BLACKFRAME | SS_SUNKEN,340,58,
+                    108,1
+    CONTROL         "",IDC_H_LINE2,"Static",SS_BLACKFRAME | SS_SUNKEN,341,95,
+                    108,1
+    CONTROL         "",IDC_H_LINE3,"Static",SS_BLACKFRAME | SS_SUNKEN,341,
+                    137,108,1
+    PUSHBUTTON      "&LAdd...",IDC_TEXTURE_LOC_ADD_BUTTON,379,38,32,14
+END
+
+IDD_UI_ABOUTBOX DIALOGEX 0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "About UIEditor"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            128,IDC_STATIC,11,17,20,20
+    LTEXT           "UIEditor Version 1.0",IDC_STATIC,40,10,119,8,
+                    SS_NOPREFIX
+    LTEXT           "Copyright (C) 2004",IDC_STATIC,40,25,119,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,16,WS_GROUP
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_UI_SPRITE_EDITOR_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 449
+        VERTGUIDE, 13
+        VERTGUIDE, 340
+        VERTGUIDE, 395
+        VERTGUIDE, 399
+        TOPMARGIN, 6
+        BOTTOMMARGIN, 239
+    END
+
+    IDD_UI_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_UIEDITORFRAME       BITMAP                  "res\\Toolbar.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_UIEDITORFRAME MENU 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Save",                       ID_UI_FILE_SAVE
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "Undo\tCtrl+Z",                ID_UI_EDIT_UNDO
+        MENUITEM SEPARATOR
+        MENUITEM "Resize to Texture\tCtrl+T",   ID_UI_EDIT_TO_TEXTURE_SIZE
+        MENUITEM SEPARATOR
+        MENUITEM "Add Screen",                  ID_UI_EDIT_ADD_SCREEN
+        MENUITEM SEPARATOR
+        MENUITEM "Font Library...",             ID_UI_EDIT_FONT_LIBRARY
+        MENUITEM "Inventory Cell Types...",     ID_UI_EDIT_INVENTORY_CELL_TYPES
+
+        MENUITEM "Equipment Slot Types...",     ID_UI_EDIT_EQUIPMENT_SLOT_TYPES
+
+        MENUITEM SEPARATOR
+        MENUITEM "UI Settings...",              ID_UI_EDIT_PARAMETERS
+    END
+    POPUP "View"
+    BEGIN
+        POPUP "Zoom"
+        BEGIN
+            MENUITEM "Show All",                    ID_UI_VIEW_ZOOM_BY_WIDTH
+            MENUITEM "100%",                        ID_UI_VIEW_ZOOM_ONE_TO_ONE
+
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Show Grid",                   ID_UI_VIEW_SHOW_GRID
+        MENUITEM "Snap to Grid",                ID_UI_VIEW_SNAP_TO_GRID
+        MENUITEM SEPARATOR
+        MENUITEM "Show Border",                 ID_UI_VIEW_SHOW_BORDER
+        MENUITEM "Snap to Border",              ID_UI_VIEW_SNAP_TO_BORDER
+        MENUITEM SEPARATOR
+        MENUITEM "Show hot keys",               ID_UI_VIEW_SHOWHOTKEYS
+        MENUITEM SEPARATOR
+        MENUITEM "Preferences...",              ID_UI_EDIT_SNAP_OPTIONS
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About...",                   ID_APP_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_UIEDITORFRAME TOOLBAR  16, 16
+BEGIN
+    BUTTON      ID_UI_FILE_SAVE
+    SEPARATOR
+    BUTTON      ID_UI_EDIT_UNDO
+    SEPARATOR
+    BUTTON      ID_UI_EDIT_FONT_LIBRARY
+    BUTTON      ID_UI_EDIT_SNAP_OPTIONS
+    SEPARATOR
+    BUTTON      ID_UI_EDIT_ADD_SCREEN
+    SEPARATOR
+    BUTTON      ID_UI_VIEW_ZOOM_BY_WIDTH
+    BUTTON      ID_UI_VIEW_ZOOM_ONE_TO_ONE
+    SEPARATOR
+    BUTTON      ID_UI_EDIT_TO_TEXTURE_SIZE
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_UIEDITORFRAME ACCELERATORS 
+BEGIN
+    "T",            ID_UI_EDIT_TO_TEXTURE_SIZE, VIRTKEY, CONTROL, NOINVERT
+    "Z",            ID_UI_EDIT_UNDO,        VIRTKEY, CONTROL, NOINVERT
+    VK_F12,         ID_UI_FILE_QUICK_SAVE,  VIRTKEY, SHIFT, CONTROL, ALT, 
+                                                    NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDR_UIEDITORFRAME       "User Interface Editor"
+    IDS_NAME_COLUMN         "Property"
+    IDS_VALUE_COLUMN        "Value"
+    IDS_TYPE_COLUMN         "Type"
+    IDC_VECTOR_NODE_ADD_ELEMENT "Add element"
+    IDC_EDIT_NODE_VECTOR_ELEMENT_INSERT_BEFORE "Add element before selection"
+    IDC_EDIT_NODE_VECTOR_ELEMENT_REMOVE "Remove selected element"
+    IDS_REMOVE_ITEM         "Really want to remove?"
+    IDS_ERROR_IN_CUSTOM_VALUE 
+                            "Произошла ошибка при вызове (или внутри) функции customValue"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_APP_TITLE       "User Interface Editor"
+    AFX_IDS_IDLEMESSAGE     "Ready"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_INDICATOR_EXT        "EXT"
+    ID_INDICATOR_CAPS       "CAP"
+    ID_INDICATOR_NUM        "NUM"
+    ID_INDICATOR_SCRL       "SCRL"
+    ID_INDICATOR_OVR        "OVR"
+    ID_INDICATOR_REC        "REC"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILE_PAGE_SETUP      "Change the printing options\nPage Setup"
+    ID_FILE_PRINT_SETUP     "Change the printer and printing options\nPrint Setup"
+    ID_FILE_PRINT           "Print the active document\nPrint"
+    ID_FILE_PRINT_PREVIEW   "Display full pages\nPrint Preview"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
+    ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_NEXT_PANE            "Switch to the next window pane\nNext Pane"
+    ID_PREV_PANE            "Switch back to the previous window pane\nPrevious Pane"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_WINDOW_SPLIT         "Split the active window into panes\nSplit"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_EDIT_CLEAR           "Erase the selection\nErase"
+    ID_EDIT_CLEAR_ALL       "Erase everything\nErase All"
+    ID_EDIT_COPY            "Copy the selection and put it on the Clipboard\nCopy"
+    ID_EDIT_CUT             "Cut the selection and put it on the Clipboard\nCut"
+    ID_EDIT_FIND            "Find the specified text\nFind"
+    ID_EDIT_PASTE           "Insert Clipboard contents\nPaste"
+    ID_EDIT_REPEAT          "Repeat the last action\nRepeat"
+    ID_EDIT_REPLACE         "Replace specific text with different text\nReplace"
+    ID_EDIT_SELECT_ALL      "Select the entire document\nSelect All"
+    ID_EDIT_UNDO            "Undo the last action\nUndo"
+    ID_EDIT_REDO            "Redo the previously undone action\nRedo"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_TOOLBAR         "Show or hide the toolbar\nToggle ToolBar"
+    ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle StatusBar"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCSIZE          "Change the window size"
+    AFX_IDS_SCMOVE          "Change the window position"
+    AFX_IDS_SCMINIMIZE      "Reduce the window to an icon"
+    AFX_IDS_SCMAXIMIZE      "Enlarge the window to full size"
+    AFX_IDS_SCNEXTWINDOW    "Switch to the next document window"
+    AFX_IDS_SCPREVWINDOW    "Switch to the previous document window"
+    AFX_IDS_SCCLOSE         "Close the active window and prompts to save the documents"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_SCRESTORE       "Restore the window to normal size"
+    AFX_IDS_SCTASKLIST      "Activate Task List"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_PREVIEW_CLOSE   "Close print preview mode\nCancel Preview"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_CLEAR_POLYMORFIC     "Remove all child elements"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_APPLY_BUTTON        "Apply"
+    IDS_CANCEL_BUTTON       "Cancel"
+    IDS_FALSE               "False"
+    IDS_TRUE                "IDS_TRUE"
+    IDS_NOITEMSEL           "No item selected!"
+    IDS_SELFORINFO          "Select property to view it's description"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "res\UIEditor.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#include "afxprint.rc"       // printing/print preview resources
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

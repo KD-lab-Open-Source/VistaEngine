@@ -1,0 +1,60 @@
+
+struct VS_INPUT
+{
+    float4 pos : POSITION;
+#if(WEIGHT>1)    
+	float4 bw: COLOR0;
+#endif	
+    float4 blend:BLENDINDICES;
+    float2  t0 : TEXCOORD0;
+#if(SECOND_OPACITY_TEXTURE==2)
+    float2 t1 : TEXCOORD1;
+#endif
+};
+
+struct VS_OUTPUT
+{
+    float4  pos : POSITION;
+    float2  t0 : TEXCOORD0;
+#ifdef SECOND_OPACITY_TEXTURE
+    float2  t1 : TEXCOORD1;
+#endif
+    float  tdepth : TEXCOORD2;
+};
+
+float4x4 mVP:register(c0);
+float4x3 mWorldM[20]: register(c9);
+
+#ifdef SECOND_OPACITY_TEXTURE
+float3 vSecondUtrans:register(c74);
+float3 vSecondVtrans:register(c75);
+#endif
+
+float3 vUtrans:register(c88);
+float3 vVtrans:register(c89);
+
+VS_OUTPUT main(const VS_INPUT v)
+{
+    VS_OUTPUT o;
+	float3 world_pos;
+	float4x3 mWorld;
+	int4 blend = D3DCOLORtoUBYTE4(v.blend);
+	
+#if (WEIGHT>1)	
+		mWorld=mWorldM[blend[0]]*v.bw[0];
+		for(int i=1;i<WEIGHT;i++)
+		{
+			mWorld+=mWorldM[blend[i]]*v.bw[i];
+		}
+		
+#else
+		mWorld=mWorldM[blend[0]];
+#endif	
+	
+	world_pos=mul(v.pos,mWorld);
+
+#include "..\\Skin\\uvtrans.inl"
+	o.pos=mul(float4(world_pos,1),mVP);
+	o.tdepth=o.pos.z;
+    return o;
+}

@@ -1,0 +1,23 @@
+struct PS_INPUT
+{
+	float2 uv0:TEXCOORD0;
+	float2 uv1:TEXCOORD1;
+	float4 color: COLOR0;
+	float2 uv_lightmap:TEXCOORD2;
+};
+sampler2D t0:register(s0);
+sampler2D t1:register(s1);
+sampler2D LightMapSampler:register(s2);
+sampler2D ZbufferMap:register(s3);
+sampler2D ReflectionZ:register(s5);
+
+float4 tfactor[6]:register(c0);
+
+float4 main(const PS_INPUT v):COLOR
+{
+	float4 ot=v.color;
+	//float4 ot=tfactor[0];
+	ot+=tfactor[0]*tfactor[1]+tfactor[2]*tfactor[3]+tfactor[4]*tfactor[5];
+	
+	return ot;
+}
