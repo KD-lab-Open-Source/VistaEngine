@@ -1,26 +1,25 @@
 #ifndef __SUR_TOOL_TRANSFORM_H_INCLUDED__
 #define __SUR_TOOL_TRANSFORM_H_INCLUDED__
 
-#include "MFC\SizeLayoutManager.h"
+#include "..\Util\MFC\SizeLayoutManager.h"
 #include "SurToolAux.h"
-#include "EventListeners.h"
 
-class CSurToolTransform : public CSurToolBase, public ObjectObserver{
+class CSurToolTransform : public CSurToolBase{
 	DECLARE_DYNAMIC(CSurToolTransform)
 public:
 	CSurToolTransform(CWnd* pParent = 0);
 	virtual ~CSurToolTransform();
 
-	virtual bool onTrackingMouse (const Vect3f& worldCoord, const Vect2i& scrCoord);
-	virtual bool onLMBDown (const Vect3f& worldCoord, const Vect2i& screenCoord);
-	virtual bool onLMBUp (const Vect3f& worldCoord, const Vect2i& screenCoord);
-	virtual bool onRMBDown (const Vect3f& worldCoord, const Vect2i& screenCoord);
-	virtual void onSelectionChanged ();
+	virtual bool CallBack_TrackingMouse (const Vect3f& worldCoord, const Vect2i& scrCoord);
+	virtual bool CallBack_LMBDown (const Vect3f& worldCoord, const Vect2i& screenCoord);
+	virtual bool CallBack_LMBUp (const Vect3f& worldCoord, const Vect2i& screenCoord);
+	virtual bool CallBack_RMBDown (const Vect3f& worldCoord, const Vect2i& screenCoord);
+	virtual void CallBack_SelectionChanged ();
 
-	virtual bool onDelete ();
-    virtual bool onKeyDown (unsigned int keyCode, bool shift, bool control, bool alt);
+	virtual bool CallBack_Delete ();
+    virtual bool CallBack_KeyDown (unsigned int keyCode, bool shift, bool control, bool alt);
 
-	virtual bool onDrawAuxData(void);
+	virtual bool CallBack_DrawAuxData(void);
 	void drawAxis(const Vect3f& point, float radius, bool axis[3]);
 
 	Vect3f transformAxis() const {
@@ -49,7 +48,7 @@ protected:
 	virtual void onTransformAxisChanged(int index) {};
 	
     // utils
-    void drawCircle (const Se3f& position, float radius, const Color4c& color);
+    void drawCircle (const Se3f& position, float radius, const sColor4c& color);
 
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();

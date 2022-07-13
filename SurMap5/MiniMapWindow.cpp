@@ -1,18 +1,15 @@
 #include "stdafx.h"
-#include "MiniMapWindow.h"
-#include "Game\RenderObjects.h"
+#include ".\MiniMapWindow.h"
+#include "..\Game\RenderObjects.h"
 #include "MainFrame.h"
 #include "GeneralView.h"
 
 #include "SurToolAux.h"
-#include "UserInterface\UI_Render.h"
-#include "UserInterface\UI_Minimap.h"
+#include "..\UserInterface\UI_Render.h"
+#include "..\UserInterface\UI_CustomControls.h"
 
-#include "Environment\Environment.h"
-#include "Game\CameraManager.h"
-#include "Render\Src\cCamera.h"
-#include "Render\Src\Scene.h"
-#include "Render\Src\VisGeneric.h"
+#include "..\Environment\Environment.h"
+#include "..\Game\CameraManager.h"
 
 CMiniMapWindow::CMiniMapWindow(CMainFrame* mainFrame)
 : renderWindow_(0)
@@ -42,7 +39,7 @@ CMiniMapWindow::CMiniMapWindow(CMainFrame* mainFrame)
 	}
 
 	flag_CameraRestrictionDrag_ = 0;
-	mainFrame->signalWorldChanged().connect(this, &CMiniMapWindow::onWorldChanged);
+	mainFrame->eventWorldChanged().registerListener(this);
 }
 
 CMiniMapWindow::~CMiniMapWindow()
@@ -91,7 +88,7 @@ void CMiniMapWindow::initRenderDevice()
 	CRect clientRect;
 	GetClientRect (&clientRect);
 	xassert (gb_RenderDevice != 0);
-	renderWindow_ = gb_RenderDevice->createRenderWindow (GetSafeHwnd ());
+	renderWindow_ = gb_RenderDevice->CreateRenderWindow (GetSafeHwnd ());
 	scene_ = gb_VisGeneric->CreateScene ();
 	xassert (scene_ != 0);
 	camera_ = scene_->CreateCamera ();
@@ -117,7 +114,7 @@ void CMiniMapWindow::updateCameraFrustum (int _width, int _height)
 	if (!gb_RenderDevice || !_width || !_height)
 		return;
 
-    gb_RenderDevice->selectRenderWindow (renderWindow_);
+    gb_RenderDevice->SelectRenderWindow (renderWindow_);
 	
 	float width = 1.0f;
 	float height = 1.0f;
@@ -133,7 +130,7 @@ void CMiniMapWindow::updateCameraFrustum (int _width, int _height)
 	if (!camera_)
 		return;
 
-	camera_->setAttribute (ATTRCAMERA_PERSPECTIVE);
+	camera_->SetAttr (ATTRCAMERA_PERSPECTIVE);
     camera_->SetFrustum (&Vect2f (0.5f, 0.5f),
                            &sRectangle4f (-0.5f * width, -0.5f * height,
 										   0.5f * width,  0.5f * height), 
@@ -160,7 +157,7 @@ void CMiniMapWindow::updateCameraFrustum (int _width, int _height)
 
 	camera_->SetPosition(cameraMatrix);
 
-	gb_RenderDevice->selectRenderWindow (0);
+	gb_RenderDevice->SelectRenderWindow (0);
 }
 
 
@@ -176,13 +173,13 @@ void CMiniMapWindow::OnSize(UINT nType, int cx, int cy)
 		if (!renderWindow_)
 			initRenderDevice();
 
-		gb_RenderDevice->selectRenderWindow(renderWindow_);
+		gb_RenderDevice->SelectRenderWindow(renderWindow_);
 		renderWindow_->ChangeSize();
 		UI_Render::instance().setWindowPosition(Vect2i (cx, cy));
         updateCameraFrustum (cx, cy);
 		updateMinimapPosition (cx, cy);
 	
-		gb_RenderDevice->selectRenderWindow(0);
+		gb_RenderDevice->SelectRenderWindow(0);
 	}
 	windowSize_.set (cx, cy);
 	sizing_ = false;
@@ -200,7 +197,7 @@ void CMiniMapWindow::redraw(CDC& dc)
 	if (!renderWindow_ || gb_RenderDevice->IsInBeginEndScene() || sizing_ || clientRect.Width() == 0 || clientRect.Height() == 0)
 		return;
 
-	gb_RenderDevice->selectRenderWindow (renderWindow_);
+	gb_RenderDevice->SelectRenderWindow (renderWindow_);
 	gb_RenderDevice->Fill (0, 0, 0);
 	
 	gb_RenderDevice->BeginScene ();
@@ -211,7 +208,7 @@ void CMiniMapWindow::redraw(CDC& dc)
 	
 	CMainFrame* pMainFrame = (CMainFrame*)AfxGetMainWnd ();
 	if(CSurToolBase* currentToolzer = pMainFrame->view().getCurCtrl()){
-        if(!currentToolzer->onDrawPreview(windowSize_.x, windowSize_.y))
+        if(!currentToolzer->CallBack_DrawPreview(windowSize_.x, windowSize_.y))
             drawMiniMap ();
 	}
 	else
@@ -221,12 +218,12 @@ void CMiniMapWindow::redraw(CDC& dc)
 
 	gb_RenderDevice->EndScene();
 	gb_RenderDevice->Flush();
-	gb_RenderDevice->selectRenderWindow (0);
+	gb_RenderDevice->SelectRenderWindow (0);
 }
 
 void CMiniMapWindow::drawMiniMap ()
 {
-	if (vMap.isWorldLoaded () && cameraManager) {
+	if (vMap.isWorldLoaded ()) {
 		minimap().redraw();
 	}
 }
@@ -238,14 +235,13 @@ void CMiniMapWindow::PreSubclassWindow()
 	CWnd::PreSubclassWindow();
 }
 
-void CMiniMapWindow::onWorldChanged(WorldObserver* changer)
+void CMiniMapWindow::onWorldChanged()
 {
 	if(!renderWindow_)
 		return;
 	std::string minimap_filename = vMap.getTargetName("map.tga");
-	if (vMap.isWorldLoaded () && !vMap.getWorldName().empty() && PathFileExists (minimap_filename.c_str())) {
+	if (vMap.isWorldLoaded () && !vMap.worldName.empty() && PathFileExists (minimap_filename.c_str())) {
 		minimap().init (Vect2f (vMap.H_SIZE, vMap.V_SIZE), minimap_filename.c_str());
-		minimap().waterColor(environment->minimapWaterColor());
 		CRect client_rect;
 		GetClientRect (&client_rect);
 		updateMinimapPosition (client_rect.Width(), client_rect.Height());
@@ -279,7 +275,7 @@ void CMiniMapWindow::OnLButtonDown(UINT nFlags, CPoint point)
 	Vect2f coord((float)point.x/(float)client_rect.Width(), (float)point.y/(float)client_rect.Height());
 
 	CSurToolBase* tool = currentToolzer();
-	if(tool && tool->onPreviewLMBDown(coord)){
+	if(tool && tool->CallBack_PreviewLMBDown(coord)){
 		SetCapture();
 	}
 	else{
@@ -295,7 +291,7 @@ void CMiniMapWindow::OnLButtonUp(UINT nFlags, CPoint point)
 	Vect2f coord((float)point.x/(float)client_rect.Width(), (float)point.y/(float)client_rect.Height());
 
 	CSurToolBase* tool = currentToolzer();
-	if(tool && tool->onPreviewLMBUp(coord)){
+	if(tool && tool->CallBack_PreviewLMBUp(coord)){
 
 	}
 	if(GetCapture() == this)
@@ -310,7 +306,7 @@ void CMiniMapWindow::OnMouseMove(UINT nFlags, CPoint point)
 	Vect2f coord((float)point.x/(float)client_rect.Width(), (float)point.y/(float)client_rect.Height());
 
 	CSurToolBase* tool = currentToolzer();
-	if(tool && tool->onPreviewTrackingMouse(coord)){
+	if(tool && tool->CallBack_PreviewTrackingMouse(coord)){
 
 	}
 

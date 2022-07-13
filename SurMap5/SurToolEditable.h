@@ -4,7 +4,7 @@
 #include "EScroll.h"
 #include "SurToolAux.h"
 
-#include "MFC\SizeLayoutManager.h"
+#include "..\Util\MFC\SizeLayoutManager.h"
 
 class CAttribEditorCtrl;
 class Archive;

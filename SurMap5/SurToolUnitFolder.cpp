@@ -3,10 +3,14 @@
 #include "SurToolUnitFolder.h"
 #include "SurToolPlayerFolder.h"
 #include "SurToolUnit.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\StringTable.h"
-#include "Units\UnitAttribute.h"
-#include "Game\Universe.h"
+#include "Serialization.h"
+
+// Unit-û
+#include "..\Units\UnitAttribute.h"
+
+//#include "ArchiveContainer.h"
+#include "..\Game\Universe.h"
+
 
 // CSurToolUnitFolder dialog
 

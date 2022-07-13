@@ -3,8 +3,8 @@
 
 #include "SelectionUtil.h"
 
-#include "Render\inc\IRenderDevice.h"
-#include "Game\RenderObjects.h"
+#include "..\Render\inc\IRenderDevice.h"
+#include "..\Game\RenderObjects.h"
 
 namespace UniverseObjectActions{
 
@@ -62,10 +62,10 @@ CSurToolRotate::CSurToolRotate(CWnd* parent)
 	angleStep_ = 15.0f / 180.0f * M_PI;
 }
 
-bool CSurToolRotate::onLMBUp(const Vect3f& worldCoord, const Vect2i& screenCoord)
+bool CSurToolRotate::CallBack_LMBUp(const Vect3f& worldCoord, const Vect2i& screenCoord)
 {
 	using namespace UniverseObjectActions;
-	__super::onLMBUp(worldCoord, screenCoord);
+	__super::CallBack_LMBUp(worldCoord, screenCoord);
     if(localTransform_)
         forEachSelected(RotateLocal(transformAxis(), 0, true));
     else
@@ -73,10 +73,10 @@ bool CSurToolRotate::onLMBUp(const Vect3f& worldCoord, const Vect2i& screenCoord
 	return true;
 }
 
-bool CSurToolRotate::onTrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord)
+bool CSurToolRotate::CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord)
 {
 	using namespace UniverseObjectActions;
-	CSurToolTransform::onTrackingMouse(worldCoord, scrCoord);
+	CSurToolTransform::CallBack_TrackingMouse(worldCoord, scrCoord);
     if(buttonPressed_) {
 		Vect3f point = projectScreenPointOnPlane(transformAxis (), selectionCenter_, cursorCoord_);
 		endPoint_ = point;
@@ -136,7 +136,7 @@ void CSurToolRotate::onTransformAxisChanged(int index)
 		transformAxis_[i] = (i == index);
 }
 
-bool CSurToolRotate::onDrawAuxData()
+bool CSurToolRotate::CallBack_DrawAuxData()
 {
     Vect3f position = selectionCenter_;
 
@@ -185,8 +185,8 @@ bool CSurToolRotate::onDrawAuxData()
 			a *= selectionRadius_;
 			b *= selectionRadius_;
 
-			gb_RenderDevice->DrawLine (unitPoint, unitPoint + a, Color4c(255, 255, 255));
-			gb_RenderDevice->DrawLine (unitPoint, unitPoint + b, Color4c(255, 255, 255));
+			gb_RenderDevice->DrawLine (unitPoint, unitPoint + a, sColor4c(255, 255, 255));
+			gb_RenderDevice->DrawLine (unitPoint, unitPoint + b, sColor4c(255, 255, 255));
 			if (transformAxisIndex () == 1) {
 				circle_pose.rot().set (M_PI * 0.5f, Vect3f::I, 0);
 			} else if (transformAxisIndex () == 0) {
@@ -197,7 +197,7 @@ bool CSurToolRotate::onDrawAuxData()
 		}
 
 	}
-    drawCircle (circle_pose, selectionRadius_, Color4c(255 * transformAxis_[0],
+    drawCircle (circle_pose, selectionRadius_, sColor4c(255 * transformAxis_[0],
                                                         255 * transformAxis_[1],
                                                         255 * transformAxis_[2], 255));
 	return true;

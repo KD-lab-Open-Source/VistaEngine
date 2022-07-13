@@ -1,17 +1,16 @@
 #ifndef __SUR_TOOL_UNIT_H_INCLUDED__
 #define __SUR_TOOL_UNIT_H_INCLUDED__
 
-#include "Units\AttributeReference.h"
-#include "mfc\SizeLayoutManager.h"
+#include "..\Units\AttributeReference.h"
+#include "..\Util\mfc\SizeLayoutManager.h"
 #include "SurToolAux.h"
 #include "EScroll.h"
-#include "XMath\xmath.h"
-#include "EventListeners.h"
+#include "xmath.h"
 
 class Player;
 class UnitBase;
 
-class CSurToolUnit : public CSurToolBase, public ObjectObserver
+class CSurToolUnit : public CSurToolBase
 {
 	DECLARE_DYNAMIC(CSurToolUnit)
 
@@ -29,9 +28,9 @@ public:
 
 	void quant();
 
-	bool onOperationOnMap(int x, int y);
-    bool onTrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord);
-	void onReleaseScene();
+	bool CallBack_OperationOnMap(int x, int y);
+    bool CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord);
+	void CallBack_ReleaseScene();
 
 
 	int getIDD() const { return IDD_BARDLG_UNIT; }

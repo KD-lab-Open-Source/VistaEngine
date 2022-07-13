@@ -5,11 +5,10 @@
 #include "EScroll.h"
 #include "SurToolAux.h"
 
-#include "ObjectSpreader.h"
-#include "MFC\SizeLayoutManager.h"
-#include "XTL/sigslot.h"
-#include "EventListeners.h"
+#include "..\Util\ObjectSpreader.h"
+#include "..\Util\MFC\SizeLayoutManager.h"
 
+class TreeNode;
 class UnitEnvironment;
 
 class CSurTool3DM : public CSurToolBase
@@ -33,10 +32,6 @@ public:
 	int m_cBoxPlaceMetod;
 	int cBoxPlaceMetodArr[PLACEMETOD_MAX_METODS];
 
-	int rbUpDown;
-	int rbRelAbs;
-	int rbPutDig;
-
 	RandomGenerator random_;
 	int seed_;
 	Se3f pose;
@@ -51,7 +46,6 @@ public:
 
     void hide2WControls();
     void initControls();
-	void updateRBControl(bool flag_init);
     void createModels(const char* fileName, int count);
     void releaseModels();
 
@@ -63,11 +57,11 @@ public:
 	void UpdateShapeModel(void);
 
 	// virtuals:
-	void onCreateScene(void);
-	void onReleaseScene(void);
-	bool onOperationOnMap(int x, int y);
-	bool onTrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord);
-	bool onDrawPreview (int cx, int cy);
+	void CallBack_CreateScene(void);
+	void CallBack_ReleaseScene(void);
+	bool CallBack_OperationOnMap(int x, int y);
+	bool CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord);
+	bool CallBack_DrawPreview (int cx, int cy);
 
 	void serialize(Archive& ar);
 	bool isLabelEditable() const { return true; }
@@ -94,29 +88,39 @@ public:
 	afx_msg void OnVerticalCheckClicked();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnCbnSelchangeCboxPlacemetod();
-	afx_msg void OnRBClicked(UINT nID);
 };
 
-class CSurToolEnvironment : public CSurTool3DM, public sigslot::has_slots, public ObjectObserver
+class TreeNode;
+class CSurToolEnvironment : public CSurTool3DM 
 {
 public:
+	/*
+	typedef StaticMap<EnvironmentType, ShareHandle<TreeNode> > Presets;
+	struct StaticSettings{
+		CSurToolEnvironment::Presets presets;
+        void serialize(Archive& ar);
+	};
+	static StaticSettings staticSettings;
+	*/
+
+
 	bool isLabelEditable() const{ return true; }
 	bool isLabelTranslatable() const{ return false; }
 
 	void OnBnClickedBtnBrowseModel();
     bool ReloadM3D ();
 
+
+	//static void savePreset(EnvironmentType type, const TreeNode& node);
 	static void savePreset(UnitEnvironment* unit);
 	static void loadPreset(UnitEnvironment* unit);
 
 	// virtuals:
 	BOOL OnInitDialog();
 
-	void onBrushRadiusChanged();
-	bool onOperationOnMap(int x, int y);
-	bool onDrawAuxData ();
-	bool onTrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord);
-
+	void CallBack_BrushRadiusChanged();
+	bool CallBack_OperationOnMap(int x, int y);
+	bool CallBack_DrawAuxData ();
 private:
 };
 

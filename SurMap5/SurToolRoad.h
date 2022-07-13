@@ -5,7 +5,7 @@
 #include "SurToolAux.h"
 
 struct sPolygon;
-#include "terra\road.h"
+#include "..\terra\road.h"
 
 //struct Vect3s {
 //	short x, y, z;
@@ -32,8 +32,6 @@ public:
 	CEScroll m_roadWidth;
 	CEScroll m_edgeAngle;
 	CEScroll m_sphericH;
-	CEScroll m_AlphaRoad;
-	CEScroll m_AlphaRoadSide;
 	enum eStateRoadMetod {
 		SRM_BegEndLinear=0,
 		SRM_BegEndSpheric=1,
@@ -42,13 +40,13 @@ public:
 	};
 	eStateRoadMetod state_rd_roadMetod;
 
-	virtual bool onTrackingMouse (const Vect3f& worldCoord, const Vect2i& scrCoord);
-	virtual bool onLMBDown (const Vect3f& worldCoord, const Vect2i& screenCoord);
-	virtual bool onLMBUp (const Vect3f& worldCoord, const Vect2i& screenCoord);
-	virtual bool onRMBDown (const Vect3f& worldCoord, const Vect2i& screenCoord);
-    virtual bool onKeyDown (unsigned int keyCode, bool shift, bool control, bool alt);
+	virtual bool CallBack_TrackingMouse (const Vect3f& worldCoord, const Vect2i& scrCoord);
+	virtual bool CallBack_LMBDown (const Vect3f& worldCoord, const Vect2i& screenCoord);
+	virtual bool CallBack_LMBUp (const Vect3f& worldCoord, const Vect2i& screenCoord);
+	virtual bool CallBack_RMBDown (const Vect3f& worldCoord, const Vect2i& screenCoord);
+    virtual bool CallBack_KeyDown (unsigned int keyCode, bool shift, bool control, bool alt);
 
-	virtual bool onDrawAuxData(void);
+	virtual bool CallBack_DrawAuxData(void);
 
 	//sRoad road;
 	enum eCurRoadOperation{
@@ -61,7 +59,6 @@ public:
 	bool selectVerge(const Vect2i& scrCoord);
 	void correctWidthAngleRange();
 
-	void serialize(Archive& ar);
 
 // Dialog Data
 	int getIDD() const { return IDD_BARDLG_ROAD; }

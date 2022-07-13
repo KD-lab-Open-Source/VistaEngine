@@ -3,9 +3,8 @@
 
 #include "SurToolAux.h"
 //class CSurToolBase;
-#include "Render\3dx\Umath.h"
+#include "..\Render\inc\Umath.h"
 #include "UniverseObjectAction.h"
-#include "XMath\Plane.h"
 
 
 namespace UniverseObjectActions{
@@ -55,14 +54,14 @@ struct RadiusExtractor : UniverseObjectAction
 };
 
 struct SelectByObjectBoxTest : UniverseObjectAction{
-    SelectByObjectBoxTest(bool& selectionChanged, const Plane* planeClip, bool select, bool deselectOutside, bool selectHidden = false);
+    SelectByObjectBoxTest(bool& selectionChanged, const sPlane4f* planeClip, bool select, bool deselectOutside, bool selectHidden = false);
     void operator()(BaseUniverseObject& object);
 
     bool select_;
 	bool selectHidden_;
     bool deselectOutside_;
     bool& selectionChanged_;
-    const Plane* planeClip_;
+    const sPlane4f* planeClip_;
 };
 
 struct GetSelectionInfo : UniverseObjectAction{
@@ -106,7 +105,7 @@ void forEachSelected(UniverseObjectAction& action, bool includeDead = false);
 
 void deselectAll();
 void deleteSelectedUniverseObjects();
-bool objectBoxTest(const Vect3f& pos, const Plane* box);
+bool objectBoxTest(const Vect3f& pos, const sPlane4f* box);
 bool isObjectFiltered(BaseUniverseObject& object);
 void awakePhysics(BaseUniverseObject& object);
 

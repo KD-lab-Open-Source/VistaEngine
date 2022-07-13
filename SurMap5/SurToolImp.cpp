@@ -34,6 +34,7 @@ BOOL CSurToolImp::OnInitDialog()
 {
 	CSurToolBase::OnInitDialog();
 
+	// TODO:  Add extra initialization here
 	m_Width.Create(this, IDC_SLIDER_WIDTH, IDC_EDIT_WIDTH);
 	m_Height.Create(this, IDC_SLIDER_HEIGHT, IDC_EDIT_HEIGHT);
 	m_H.Create(this, IDC_SLIDER_H, IDC_EDIT_H);
@@ -41,7 +42,7 @@ BOOL CSurToolImp::OnInitDialog()
 	return FALSE;
 }
 
-bool CSurToolImp::onOperationOnMap(int x, int y)
+bool CSurToolImp::CallBack_OperationOnMap(int x, int y)
 {
 	return true;
 }

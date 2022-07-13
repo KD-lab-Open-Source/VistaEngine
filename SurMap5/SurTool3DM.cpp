@@ -1,17 +1,24 @@
 #include "stdafx.h"
 #include "SurMap5.h"
-#include "SurTool3DM.h"
-#include "Game\Universe.h"
-#include "Game\RenderObjects.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\XPrmArchive.h"
-#include "Serialization\MultiArchive.h"
+#include ".\SurTool3DM.h"
+
+#include ".\utl\shape3D.h"
+
+#include "..\Render\inc\IVisGeneric.h"
+#include "..\Render\inc\TerraInterface.inl"
+
+#include "TreeInterface.h"
+
+#include "..\Game\Universe.h"
+#include "..\Game\RenderObjects.h"
+#include "Serialization.h"
+#include "EditArchive.h"
+#include "XPrmArchive.h"
+#include "MultiArchive.h"
 #include "UnitEnvironment.h"
+#include "ExternalShow.h"
 #include "EventListeners.h"
-#include "Terra\tools.h"
-#include "Terra\terTools.h"
-#include "Water\CircleManager.h"
-#include "Render\Src\Scene.h"
+#include "..\Terra\tools.h"
 
 // CSurTool3DM dialog
 const int MIN_SHAPE3D_CORNER=0;
@@ -60,11 +67,7 @@ CSurTool3DM::CSurTool3DM(CWnd* pParent /*=NULL*/)
 	, m_bSpread(false)
 {	
 	flag_repeatOperationEnable = false;
-#ifdef _VISTA_ENGINE_EXTERNAL_
-	popUpMenuRestriction = PUMR_NotPermission;
-#else
 	popUpMenuRestriction = PUMR_PermissionDelete;
-#endif
 	visualPreviewObject3DM = 0;
 	angleSlider_.SetRange(MIN_SHAPE3D_CORNER, MAX_SHAPE3D_CORNER);
 	angleSlider_.value = 0;
@@ -89,7 +92,6 @@ CSurTool3DM::CSurTool3DM(CWnd* pParent /*=NULL*/)
 	m_cBoxPlaceMetod = 0;
 
 	pose = Se3f::ID;
-	rbUpDown = rbRelAbs = rbPutDig=0;
 }
 
 CSurTool3DM::~CSurTool3DM()
@@ -100,9 +102,6 @@ CSurTool3DM::~CSurTool3DM()
 void CSurTool3DM::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-#ifdef _VISTA_ENGINE_EXTERNAL_
-	popUpMenuRestriction = PUMR_NotPermission;
-#endif
 	ar.serialize(dataFileName, "dataFileName", 0);
 	ar.serialize(angleSlider_.value, "m_TurnZ", 0);
 	ar.serialize(angleDeltaSlider_.value, "m_TurnZDelta", 0);
@@ -118,9 +117,6 @@ void CSurTool3DM::serialize(Archive& ar)
 
 	ar.serialize(m_bSpread, "spread", 0);
 	ar.serialize(m_bVertical, "vertical", 0);
-	ar.serialize(rbUpDown, "rbUpDown", 0);
-	ar.serialize(rbRelAbs, "rbRelAbs", 0);
-	ar.serialize(rbPutDig, "rbPutDig", 0);
 }
 
 void CSurTool3DM::DoDataExchange(CDataExchange* pDX)
@@ -141,7 +137,6 @@ BEGIN_MESSAGE_MAP(CSurTool3DM, CSurToolBase)
 	ON_BN_CLICKED(IDC_VERTICAL_CHECK, OnVerticalCheckClicked)
 	ON_WM_SIZE()
 	ON_CBN_SELCHANGE(IDC_CBOX_PLACEMETOD, OnCbnSelchangeCboxPlacemetod)
-	ON_CONTROL_RANGE(BN_CLICKED, IDCRB_UP_DOWN_1, IDCRB_PUT_DIG_2, OnRBClicked)
 END_MESSAGE_MAP()
 
 
@@ -213,9 +208,8 @@ BOOL CSurTool3DM::OnInitDialog()
 {
 	CSurToolBase::OnInitDialog();
 
-    initControls();
-	updateRBControl(true);
-    hide2WControls();
+    initControls ();
+    hide2WControls ();
 
 	CRect rt;
 	GetWindowRect (&rt);
@@ -236,35 +230,10 @@ BOOL CSurTool3DM::OnInitDialog()
 
 	m_layout.add(1, 0, 1, 0, IDC_STATIC_LINE2);
 	m_layout.add(1, 0, 1, 0, IDC_CBOX_PLACEMETOD);
-
-#ifdef _VISTA_ENGINE_EXTERNAL_
-	GetDlgItem(IDC_BTN_BROWSE_FILE)->EnableWindow(FALSE);
-#endif
-
+	
 	ReloadM3D();
 	return FALSE;
 }
-
-void CSurTool3DM::updateRBControl(bool flag_init)
-{
-	if(flag_init){
-		CheckRadioButton(IDCRB_UP_DOWN_1, IDCRB_UP_DOWN_2, IDCRB_UP_DOWN_1+rbUpDown);//
-		CheckRadioButton(IDCRB_RELATIVE_ABS_1, IDCRB_RELATIVE_ABS_2, IDCRB_RELATIVE_ABS_1+rbRelAbs);//
-		CheckRadioButton(IDCRB_PUT_DIG_1, IDCRB_PUT_DIG_2, IDCRB_PUT_DIG_1+rbPutDig);//
-	}
-	else {
-		rbUpDown=GetCheckedRadioButton(IDCRB_UP_DOWN_1, IDCRB_UP_DOWN_2)-IDCRB_UP_DOWN_1;
-		rbRelAbs=GetCheckedRadioButton(IDCRB_RELATIVE_ABS_1, IDCRB_RELATIVE_ABS_2)-IDCRB_RELATIVE_ABS_1;
-		rbPutDig=GetCheckedRadioButton(IDCRB_PUT_DIG_1, IDCRB_PUT_DIG_2)-IDCRB_PUT_DIG_1;
-	}
-}
-
-void CSurTool3DM::OnRBClicked(UINT nID)
-{
-	updateRBControl(false);
-}
-
-
 
 /*
 bool CSurTool3DM::copyM3D2InternalResource(const char* _fullFileName, const char* _path2InternalResource)
@@ -368,10 +337,9 @@ bool CSurTool3DM::ReloadM3D()
 			if (visualPreviewObject3DM = getPreviewScene()->CreateObject3dx(dataFileName.c_str())) {
 				sBox6f box;
 				visualPreviewObject3DM->GetBoundBox (box);
-				float scale = min(125.0f / (box.xmax()+ 0.01f), 125.0f / (box.ymax()+ 0.01f), 125.0f / (box.zmax()+ 0.01f));
+				float scale = 80.0f / box.GetRadius ();
 				visualPreviewObject3DM->SetScale(scale);
-				visualPreviewObject3DM->GetBoundBox (box);
-				visualPreviewObject3DM->SetPosition (MatXf(Mat3f::ID, Vect3f(125.f - box.xmax(), 0.f, 0.f)));
+				visualPreviewObject3DM->SetPosition (MatXf::ID);
 			}
 		}
 
@@ -381,29 +349,34 @@ bool CSurTool3DM::ReloadM3D()
 	return 0;
 }
 
-void CSurTool3DM::onCreateScene(void)
+void CSurTool3DM::CallBack_CreateScene(void)
 {
 	ReloadM3D();
 }
-void CSurTool3DM::onReleaseScene(void)
+void CSurTool3DM::CallBack_ReleaseScene(void)
 {
 	releaseModels ();
 	RELEASE(visualPreviewObject3DM);
 }
 
 //IDC_CBOX_PLACEMETOD
-bool CSurTool3DM::onOperationOnMap(int x, int y)
+bool CSurTool3DM::CallBack_OperationOnMap(int x, int y)
 {
+	wrkMesh.load(dataFileName.c_str());
 	float kScale=scaleSlider_.value/100.f;
-	bool putModel2VBitmap(const char* fName, const Se3f& pos, sVoxelBitmap& voxelBitmap, bool flag_placePlane, float scaleFactor, float zScale);
-	void putVoxelBitmap2VMap(const sVoxelBitmap& voxelBitmap, bool flag_relAbs, bool flag_putDig);
-	sVoxelBitmap voxBM;
-	putModel2VBitmap(dataFileName.c_str(), pose, voxBM, true, kScale, 1.f);
-	putVoxelBitmap2VMap(voxBM, rbRelAbs, rbPutDig);
+	wrkMesh.rotateAndScaling(0,0,angleSlider_.value, kScale,kScale,kScale);
+	wrkMesh.moveModel2(x, y);
+	switch(m_cBoxPlaceMetod){
+	case 0:	TerrainMetod.mode=sTerrainMetod::PM_Absolutely; break;
+	case 1:	TerrainMetod.mode=sTerrainMetod::PM_AbsolutelyMAX; break;
+	case 2:	TerrainMetod.mode=sTerrainMetod::PM_AbsolutelyMIN; break;
+	case 3:	TerrainMetod.mode=sTerrainMetod::PM_Relatively; break;
+	}
+	wrkMesh.put2Earch();
 	return true;
 }
 
-bool CSurTool3DM::onTrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord)
+bool CSurTool3DM::CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord)
 {
 	pose.trans() = worldCoord;
 	UpdateShapeModel();
@@ -412,7 +385,6 @@ bool CSurTool3DM::onTrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoo
 
 void CSurTool3DM::OnBnClickedBtnBrowseModel()
 {
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	dataFileName = requestModelAndPut2InternalResource ("Resource\\TerrainData\\Shapes", "*.3dx", "model.3dx",
                                                         TRANSLATE("Выбрать файл с 3DX моделью..."));
 	if (dataFileName.empty()) {
@@ -428,7 +400,6 @@ void CSurTool3DM::OnBnClickedBtnBrowseModel()
 	}
 
 	ReloadM3D();
-#endif
 }
 
 
@@ -445,6 +416,7 @@ void CSurTool3DM::OnDestroy()
 
 void CSurTool3DM::OnCbnSelchangeCboxPlacemetod()
 {
+	// TODO: Add your control notification handler code here
 	if(flag_init_dialog) {
 		CComboBox* comBox;
 		comBox=(CComboBoxEx*)GetDlgItem(IDC_CBOX_PLACEMETOD);
@@ -500,7 +472,7 @@ inline float CSurTool3DM::getScale ()
 void CSurTool3DM::UpdateShapeModel()
 {
 	random_.set (seed_);
-	if(vMap.isWorldLoaded() && !visualObjects.empty()){
+	if(vMap.isLoad() && !visualObjects.empty()){
 		int index = 0;
 		if (m_bSpread) {
 			for(int i = 0; i < visualObjects.size(); ++i) {
@@ -513,7 +485,7 @@ void CSurTool3DM::UpdateShapeModel()
 				//float radius = model->GetBoundRadius();
 				//float logic_radius = logicModel->GetBoundRadius();
 				//model->SetScale(circle.radius * getScale () / logic_radius);
-				model->SetScale(getScale()/*circle.radius/spreadRadiusSlider_.value*/);
+				model->SetScale(getScale()*circle.radius/spreadRadiusSlider_.value);
 				float radius = model->GetBoundRadius();
 
                 Vect2f pos(Vect2f(pose.trans()) + Vect2f(circle.position));
@@ -530,8 +502,7 @@ void CSurTool3DM::UpdateShapeModel()
 			//float logic_radius = logicModel->GetBoundRadius();
 			model->SetScale(getScale());
 			float radius = model->GetBoundRadius();
-			radius = clamp(radius, 0.001f, min(vMap.H_SIZE / 2.5f, vMap.V_SIZE / 2.5f));
-
+			
 			Vect3f normal;
 			Se3f objectPose = pose;
 			Vect2f analyze_pos (clamp (objectPose.trans().x, radius * 1.1f, float(vMap.H_SIZE) - radius * 1.1f),
@@ -539,15 +510,8 @@ void CSurTool3DM::UpdateShapeModel()
 			objectPose.trans().z = vMap.analyzeArea(analyze_pos, radius, normal);
 
 			float angle = float(angleSlider_.value) + random_.frnd (float(angleDeltaSlider_.value));
-
-			QuatF r=QuatF(angle * (M_PI/180.0f), Vect3f::K);
-			if(rbUpDown!=0) {
-				r.premult(QuatF(M_PI, Vect3f::I));
-				sBox6f bb;
-				model->GetBoundBox(bb);
-				objectPose.trans().z += bb.extent().z*2; // radius;
-			}
-			objectPose.rot() = r;
+			objectPose.rot() = QuatF(angle * (M_PI/180.0f), Vect3f::K);
+			
 			if (!m_bVertical) {
 				Vect3f cross = Vect3f::K % normal;
 				float len = cross.norm();
@@ -555,6 +519,7 @@ void CSurTool3DM::UpdateShapeModel()
 				if(len > FLT_EPS)
 					objectPose.rot().premult(QuatF(Acos(dot(Vect3f::K, normal)/(normal.norm() + 1e-5)), cross));
 			}
+
 			model->SetPosition(objectPose);
 			++index;
 			pose = objectPose;
@@ -592,20 +557,8 @@ Se3f CSurTool3DM::calculateObjectPose (Vect2f position, float radius)
 	}
     return result;
 }
-bool CSurToolEnvironment::onTrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord)
-{
-	__super::onTrackingMouse(worldCoord, scrCoord);
-	if(::isPressed(VK_SHIFT) && visualPreviewObject3DM)
-	{
-		Mat3f r = visualPreviewObject3DM->GetPosition().rot();
-		visualPreviewObject3DM->SetPosition(MatXf(r.set(scrCoord.x/(2.f*M_PI), Z_AXIS), visualPreviewObject3DM->GetPosition().trans()));
-		return true;
-	}
 
-	return false;
-}
-
-bool CSurToolEnvironment::onOperationOnMap(int x, int y)
+bool CSurToolEnvironment::CallBack_OperationOnMap(int x, int y)
 {
 	random_.set (seed_);
 	if(visualObjects.size()){
@@ -620,8 +573,8 @@ bool CSurToolEnvironment::onOperationOnMap(int x, int y)
 				cObject3dx* logicModel = logicObjects[i] ? logicObjects[i] : model;
 				const ObjectSpreader::Circle& circle = objectSpreader.circles()[index];
 
-				//model->SetScale(1.0f);
-				//model->SetScale (/*circle.radius / logicModel->GetBoundRadius() */ getScale ());
+				model->SetScale(1.0f);
+				model->SetScale (circle.radius / logicModel->GetBoundRadius() * getScale ());
 
 				float radius = logicModel->GetBoundRadius();
                 Vect2f pos(Vect2f(pose.trans()) + Vect2f(circle.position));
@@ -646,7 +599,7 @@ bool CSurToolEnvironment::onOperationOnMap(int x, int y)
 					unit->setEnvirontmentType(environmentType);
 					unit->setModel(dataFileName.c_str());
 					
-					float logic_radius = getScale()/*(circle.radius/spreadRadiusSlider_.value)*/*unit->radius();
+					float logic_radius = getScale()*(circle.radius/spreadRadiusSlider_.value)*unit->radius();
 					unit->setRadius(logic_radius);
 					unit->setPose(calculateObjectPose (pos, logic_radius), true);
 					unit->mapUpdate(unit->position2D().x - unit->radius(), unit->position2D().x + unit->radius(), unit->position2D().y - unit->radius(), unit->position2D().y + unit->radius());
@@ -656,7 +609,7 @@ bool CSurToolEnvironment::onOperationOnMap(int x, int y)
 			}
 			ReloadM3D ();
 			UpdateShapeModel ();
-			eventMaster().signalObjectChanged().emit(this);
+			eventMaster().eventObjectChanged().emit();
 		} 
 		else{
 			EnvironmentType environmentType = convertIdx2EnvironmentType(m_idxCurAttribute);
@@ -665,6 +618,12 @@ bool CSurToolEnvironment::onOperationOnMap(int x, int y)
 			xassert(unit && "Unabled to build AUX_ATTRIBUTE_ENVIRONMENT");
 			if(unit){
 				unit->setEnvirontmentType(environmentType);
+				/*
+				if(TreeNode* node = staticSettings.presets[environmentType]){
+					EditIArchive ia(node);
+                    ia.serialize(*unit, "", "");
+				}
+				*/
 				unit->setModel(dataFileName.c_str());
 
 				float logic_radius = getScale()*unit->radius();
@@ -677,7 +636,7 @@ bool CSurToolEnvironment::onOperationOnMap(int x, int y)
 			}
 			seed_ = rand();
 			UpdateShapeModel();
-			eventMaster().signalObjectChanged().emit(this);
+			eventMaster().eventObjectChanged().emit();
 		}
 	}
 	return true;
@@ -710,7 +669,7 @@ void CSurTool3DM::OnCbnSelchangeComboModelshape3d()
 
 }
 
-bool CSurTool3DM::onDrawPreview(int cx, int cy)
+bool CSurTool3DM::CallBack_DrawPreview(int cx, int cy)
 {
 	if (visualPreviewObject3DM) {
 		typedef sVertexXYZDT1 Vertex;
@@ -727,7 +686,7 @@ bool CSurTool3DM::onDrawPreview(int cx, int cy)
 			vertices [3].pos.set ( 0.5f * cell_size + cell_size * (float)i, -0.5f * cell_size + cell_size * (float)j, -10.0f);
 			vertices [1].pos.set ( 0.5f * cell_size + cell_size * (float)i,  0.5f * cell_size + cell_size * (float)j, -10.0f);
 			vertices [0].pos.set (-0.5f * cell_size + cell_size * (float)i,  0.5f * cell_size + cell_size * (float)j, -10.0f);
-			Color4c cell_color = (abs(i + j) % 2) ? Color4c (255, 255, 255) : Color4c (100, 0, 0);
+			sColor4c cell_color = (abs(i + j) % 2) ? sColor4c (255, 255, 255) : sColor4c (100, 0, 0);
 			vertices [0].diffuse = vertices [1].diffuse = vertices [2].diffuse = vertices [3].diffuse = cell_color;
 		}
 		buffer->EndDraw();
@@ -735,60 +694,42 @@ bool CSurTool3DM::onDrawPreview(int cx, int cy)
 	return true;
 }
 
-bool CSurToolEnvironment::onDrawAuxData()
+bool CSurToolEnvironment::CallBack_DrawAuxData()
 {
 	if (vMap.isWorldLoaded ()) {
 		if (m_bSpread) {
 			int radius = getBrushRadius();
-			universe()->circleManager()->addCircle(pose.trans(), radius, CircleManagerParam(Color4c(0, 0, 255, 255)));
-			int index = 0;
+			universe()->circleShow()->Circle (pose.trans(), radius, CircleColor (sColor4c (0, 0, 255, 255)));
 
-			Player* player = universe()->worldPlayer ();
-			const UnitList units =  player->units ();
-
-			for(int i = 0; i < visualObjects.size(); ++i) {
-				cObject3dx* model = visualObjects[i];
-				cObject3dx* logicModel = logicObjects[i] ? logicObjects[i] : model;
-				const ObjectSpreader::Circle& circle = objectSpreader.circles()[index];
-
-				//model->SetScale(1.0f);
-				//model->SetScale (/*circle.radius / logicModel->GetBoundRadius() */ getScale ());
-
-				float radius = logicModel->GetBoundRadius();
-				Vect2f pos(Vect2f(pose.trans()) + Vect2f(circle.position));
-
-				UnitList::const_iterator unit_it;
-				bool can_be_placed = true;
-				FOR_EACH(units, unit_it){
-					UnitBase* unit_base = *unit_it;
-					UnitEnvironment* unit = dynamic_cast<UnitEnvironment*>(unit_base);
-					if (unit && unit->environmentType() != ENVIRONMENT_PHANTOM) {
-						float unit_radius = unit->radius ();
-						Vect2f unit_position (unit->pose().trans());
-						if ((unit_position - pos).norm() < (unit_radius + circle.radius) * 0.8f) {
-							can_be_placed = false;
-						}
-					}
-				}
-				if (can_be_placed) {
-					if (!circle.active) {
-						Vect3f position (circle.position.x, circle.position.y, 10.0f);
-						position += pose.trans();
-						universe()->circleManager()->addCircle(position, circle.radius, CircleManagerParam(Color4c (255, 0, 0, 96)));
-					} else {
-						Vect3f position (circle.position.x, circle.position.y, 10.0f);
-						position += pose.trans();
-						universe()->circleManager()->addCircle(position, circle.radius, CircleManagerParam(Color4c (0, 128, 255, 96)));
-					}	
-				}
-				else
-				{
-					Vect3f position (circle.position.x, circle.position.y, 10.0f);
+			ObjectSpreader::CirclesList::const_iterator it;
+			int index = 1;
+			FOR_EACH (objectSpreader.circles(), it) {
+				if (!it->active) {
+					Vect3f position (it->position.x, it->position.y, 10.0f);
 					position += pose.trans();
-					universe()->circleManager()->addCircle(position, circle.radius, CircleManagerParam(Color4c (255, 255, 255, 255)));
+					universe()->circleShow()->Circle (position, it->radius, CircleColor (sColor4c (255, 0, 0, 96)));
+					++index;
+				} else {
+					Vect3f position (it->position.x, it->position.y, 10.0f);
+					position += pose.trans();
+					universe()->circleShow()->Circle (position, it->radius, CircleColor (sColor4c (0, 128, 255, 96)));
+					++index;
 				}
-				++index;
 			}
+			/*
+			ObjectSpreader::Node* outline = objectSpreader.getOutline ();
+			ObjectSpreader::Node* node = outline;
+			do {
+				xassert (node && node->next);
+				Vect2f c1 (objectSpreader.getCircle (node).position);
+				Vect2f c2 (objectSpreader.getCircle (node->next).position);
+				Vect3f point1 (c1.x, c1.y, pose.trans().z);
+				Vect3f point2 (c2.x, c2.y, pose.trans().z);
+				gb_RenderDevice->DrawLine (point1 + pose.trans(), point2 + pose.trans(), sColor4f (200, 0, 0));
+
+				node = node->next;
+			} while (node != outline);
+			*/
 		}
 	}
 	return true;
@@ -822,10 +763,9 @@ bool CSurToolEnvironment::ReloadM3D()
             if (visualPreviewObject3DM = getPreviewScene()->CreateObject3dx(dataFileName.c_str())) {
                 sBox6f box;
                 visualPreviewObject3DM->GetBoundBox (box);
-				float scale = min(125.0f / (box.xmax()+ 0.01f), 125.0f / (box.ymax()+ 0.01f), 125.0f / (box.zmax()+ 0.01f));
+                float scale = 80.0f / box.GetRadius ();
                 visualPreviewObject3DM->SetScale(scale);
-				visualPreviewObject3DM->GetBoundBox (box);
-                visualPreviewObject3DM->SetPosition (MatXf(Mat3f::ID, Vect3f(125.f - box.xmax(), 0.f, 0.f)));
+                visualPreviewObject3DM->SetPosition (MatXf::ID);
             }
         }
 
@@ -857,7 +797,7 @@ void CSurTool3DM::OnSize(UINT nType, int cx, int cy)
 	Invalidate ();
 }
 
-void CSurToolEnvironment::onBrushRadiusChanged()
+void CSurToolEnvironment::CallBack_BrushRadiusChanged()
 {
 	ReloadM3D ();
 	UpdateShapeModel ();

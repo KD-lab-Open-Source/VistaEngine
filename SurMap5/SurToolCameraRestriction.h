@@ -4,7 +4,7 @@
 #include "EScroll.h"
 #include "SurToolAux.h"
 #include "SurToolEditable.h"
-#include "XTL\Rect.h"
+#include "Rect.h"
 #include "mfc\LayoutMFC.h"
 
 class CameraSpline;
@@ -18,26 +18,22 @@ public:
 	CSurToolCameraRestriction(CWnd* parent = 0);
 	virtual ~CSurToolCameraRestriction();
 
-	bool onOperationOnMap(int x, int y);
+	bool CallBack_OperationOnMap(int x, int y);
 
 
 	void onLMBDown(const Vect2f& worldPosition);
 	void onLMBUp(const Vect2f& worldPosition);
 	void onMouseMove(const Vect2f& worldPosition);
 
-	bool onLMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord);
-	bool onLMBUp(const Vect3f& worldCoord, const Vect2i& screenCoord);
-	bool onTrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord);
-	bool onDrawAuxData();
+	bool CallBack_LMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord);
+	bool CallBack_LMBUp(const Vect3f& worldCoord, const Vect2i& screenCoord);
+	bool CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord);
+	bool CallBack_DrawAuxData();
 
-	bool onPreviewLMBDown(const Vect2f& point);
-	bool onPreviewLMBUp(const Vect2f& point);
-	bool onPreviewTrackingMouse(const Vect2f& point);
-	bool onDrawPreview(int width, int height);
-
-
-	Recti cameraBorder();
-	void setCameraBorder(const Recti& cameraBorder);
+	bool CallBack_PreviewLMBDown(const Vect2f& point);
+	bool CallBack_PreviewLMBUp(const Vect2f& point);
+	bool CallBack_PreviewTrackingMouse(const Vect2f& point);
+	bool CallBack_DrawPreview(int width, int height);
 
 	Vect2f buttonStep() const;
 

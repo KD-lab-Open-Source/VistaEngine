@@ -1,11 +1,8 @@
 #include "stdafx.h"
 
 #include "SurMap5.h"
-#include "SurToolCameraEditor.h"
-#include "Game\CameraManager.h"
-#include "Game\RenderObjects.h"
-#include "Render\Inc\IRenderDevice.h"
-#include "SystemUtil.h"
+#include ".\SurToolCameraEditor.h"
+#include "..\Game\CameraManager.h"
 
 // ---------------------------------------------------------------------------------------------- //
 IMPLEMENT_DYNAMIC(CSurToolCameraEditor, CSurToolBase)
@@ -46,8 +43,7 @@ CSurToolCameraEditor::~CSurToolCameraEditor()
 }
 
 // ---------------------------------------------------------------------------------------------- //
-
-bool CSurToolCameraEditor::onTrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord)
+bool CSurToolCameraEditor::CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord)
 {
 	static Vect3f lastPos = worldCoord;
 
@@ -82,7 +78,7 @@ void CSurToolCameraEditor::addPoint(const Vect3f& worldCoord)
 }
 
 // ---------------------------------------------------------------------------------------------- //
-bool CSurToolCameraEditor::onLMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord)
+bool CSurToolCameraEditor::CallBack_LMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord)
 {
 	if(::isPressed(VK_SHIFT)){
 		addPoint(worldCoord);
@@ -104,7 +100,7 @@ bool CSurToolCameraEditor::onLMBDown(const Vect3f& worldCoord, const Vect2i& scr
 }
 
 // ---------------------------------------------------------------------------------------------- //
-bool CSurToolCameraEditor::onLMBUp(const Vect3f& worldCoord, const Vect2i& screenCoord)
+bool CSurToolCameraEditor::CallBack_LMBUp(const Vect3f& worldCoord, const Vect2i& screenCoord)
 {
 	moving_ = false;
 	if(selectedPoint_ == -1)
@@ -114,26 +110,26 @@ bool CSurToolCameraEditor::onLMBUp(const Vect3f& worldCoord, const Vect2i& scree
 }
 
 // ---------------------------------------------------------------------------------------------- //
-bool CSurToolCameraEditor::onRMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord)
+bool CSurToolCameraEditor::CallBack_RMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord)
 {
     return false;
 }
 
 // ---------------------------------------------------------------------------------------------- //
-void CSurToolCameraEditor::onSelectionChanged ()
+void CSurToolCameraEditor::CallBack_SelectionChanged ()
 {
 	spline_ = 0;
 	popEditorMode();
 }
 
 // ---------------------------------------------------------------------------------------------- //
-bool CSurToolCameraEditor::onDelete ()
+bool CSurToolCameraEditor::CallBack_Delete ()
 {
     return false;
 }
 
 // ---------------------------------------------------------------------------------------------- //
-bool CSurToolCameraEditor::onKeyDown(unsigned int keyCode, bool shift, bool control, bool alt)
+bool CSurToolCameraEditor::CallBack_KeyDown(unsigned int keyCode, bool shift, bool control, bool alt)
 {
 	switch(keyCode){
 	case VK_ESCAPE:
@@ -147,7 +143,7 @@ bool CSurToolCameraEditor::onKeyDown(unsigned int keyCode, bool shift, bool cont
     return false;
 }
 
-bool CSurToolCameraEditor::onDrawAuxData()
+bool CSurToolCameraEditor::CallBack_DrawAuxData()
 {
     if(spline_)
         spline_->showEditor(selectedPoint_);
@@ -157,7 +153,7 @@ bool CSurToolCameraEditor::onDrawAuxData()
 
 	Rectf rect = aspectedWorkArea(Rectf(0.0f, 0.0f, width, height), 4.0f / 3.0f);
 
-	Color4c color(0, 255, 0, 255);
+	sColor4c color(0, 255, 0, 255);
 
     gb_RenderDevice->DrawLine(round(rect.left()), round(rect.top()), round(rect.right()), round(rect.top()), color);
     gb_RenderDevice->DrawLine(round(rect.left()), round(rect.top()), round(rect.left()), round(rect.bottom()), color);
@@ -166,8 +162,8 @@ bool CSurToolCameraEditor::onDrawAuxData()
 
 	float crossSize = 10.0f;
 	Vect3f pos = cameraManager->coordinate().position();
-	gb_RenderDevice->DrawLine(pos - Vect3f::I * crossSize, pos + Vect3f::I * crossSize, Color4c(255, 255, 255, 64));
-	gb_RenderDevice->DrawLine(pos - Vect3f::J * crossSize, pos + Vect3f::J * crossSize, Color4c(255, 255, 255, 64));
+	gb_RenderDevice->DrawLine(pos - Vect3f::I * crossSize, pos + Vect3f::I * crossSize, sColor4c(255, 255, 255, 64));
+	gb_RenderDevice->DrawLine(pos - Vect3f::J * crossSize, pos + Vect3f::J * crossSize, sColor4c(255, 255, 255, 64));
 	return true;
 }
 
@@ -315,7 +311,7 @@ void CSurToolCameraEditor::OnViewToPointButton()
 void CSurToolCameraEditor::OnPointToViewButton()
 {
 	if(spline_ && selectedPoint_ >= 0)
-		cameraManager->setCoordinate((*spline_)[selectedPoint_] + CameraCoordinate(spline_->position(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
+		cameraManager->setCoordinate((*spline_)[selectedPoint_] + CameraCoordinate(spline_->position(), 0.0f, 0.0f, 0.0f));
 	else
 		xassert(0);
 }
@@ -363,7 +359,6 @@ void CSurToolCameraEditor::OnDeleteButton()
 	if(spline_ && selectedPoint_ >= 0){
 		spline_->erasePoint(selectedPoint_);
 		selectedPoint_ = -1;
-
 		updateControls();
 	}
 }
@@ -374,7 +369,7 @@ void CSurToolCameraEditor::OnDoneButton()
 	if(cameraManager->isPlayingBack())
 		cameraManager->stopReplayPath();
 
-	replaceEditorModeSelect();
+	popEditorMode();
 }
 
 // ---------------------------------------------------------------------------------------------- //

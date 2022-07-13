@@ -1,8 +1,7 @@
 #ifndef __SUR_MAP_OPTIONS_H_INCLUDED__
 #define __SUR_MAP_OPTIONS_H_INCLUDED__
 
-#include "XMath\Colors.h"
-#include "XTL\Rect.h"
+#include "..\Render\inc\Umath.h"
 
 class SurMapOptions
 {
@@ -45,31 +44,23 @@ public:
 	int lastToolzerForm;
 
 	bool showFog_;
-	bool zFarInfinite;
 
 	float lod12,lod23;
 
 	bool enableGrid_;
 	int gridSpacing_;
-	Color4c gridColor_;
+	sColor4c gridColor_;
 
-	Color4c cameraBorderColor_;
-	Color4c cameraBorderMinimapColor_;
+	bool enableCameraBorder_;
+	sColor4c cameraBorderColor_;
+	sColor4c cameraBorderMinimapColor_;
 
-	float evolutionSpeed;
-
-	bool showCameraBorders()const{ return showCameraBorders_; }
-	void setShowCameraBorders(bool show){ showCameraBorders_ = show; }
-	const Recti& cameraBorderSelection()const{ return cameraBorderSelection_; }
-	void setCameraBorderSelection(const Recti& rect){ cameraBorderSelection_ = rect; }
 protected:
 	bool showSources_;
 	bool showCameras_;
 
 	bool hideWorldModels_;
 	bool showPathFinding_;
-	bool showCameraBorders_;
-    Recti cameraBorderSelection_;
 	std::string showPathFindingReferenceUnit_;
 
 	static const char* configFile;

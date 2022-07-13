@@ -2,23 +2,20 @@
 #include "SelectionUtil.h"
 
 #include "UniverseObjectAction.h"
-#include "Game\Universe.h"
-#include "Game\CameraManager.h"
-#include "Game\RenderObjects.h"
-#include "Units\UnitEnvironment.h"
-#include "Environment\SourceManager.h"
-#include "Environment\Anchor.h"
+#include "..\Game\Universe.h"
+#include "..\Game\CameraManager.h"
+#include "..\Game\RenderObjects.h"
+#include "..\Units\UnitEnvironment.h"
+#include "..\Environment\Environment.h"
+#include "..\Environment\Anchor.h"
 #include "EditorVisual.h"
 
 #include "SurToolPathEditor.h"
 #include "SurToolCameraEditor.h"
 #include "SurToolEnvironmentEditor.h"
 
-#include "Serialization\Serialization.h"
-#include "Serialization\SerializationFactory.h"
-#include "Serialization\BinaryArchive.h"
-#include "Render\Src\cCamera.h"
-#include "Render\Src\Scene.h"
+#include "Serialization.h"
+#include "EditArchive.h"
 
 bool forFirstSelected(UniverseObjectAction& action, bool includeDead)
 {
@@ -40,11 +37,11 @@ bool forFirstSelected(UniverseObjectAction& action, bool includeDead)
         }
     }
 
-	if(!sourceManager)
+	if(!environment)
 		return false;
 	{
-		SourceManager::Sources::iterator it;
-		FOR_EACH(sourceManager->sources(),it){
+		Environment::Sources::iterator it;
+		FOR_EACH(environment->sources(),it){
 			SourceBase& source=**it;
 			if(source.selected() && (includeDead || source.isAlive())) {
 				action(source);
@@ -54,8 +51,8 @@ bool forFirstSelected(UniverseObjectAction& action, bool includeDead)
 	}
 
 	{
-		SourceManager::Anchors::const_iterator it;
-		FOR_EACH(sourceManager->anchors(),it){
+		Environment::Anchors::const_iterator it;
+		FOR_EACH(environment->anchors(),it){
             Anchor& anchor = **it;
 			if(anchor.selected()){
 				action(anchor);
@@ -100,19 +97,19 @@ void forEachUniverseObject(UniverseObjectAction& action, bool includeDead)
         }
     }
 
-	if(!sourceManager)
+	if(!environment)
 		return;
 	{
-		SourceManager::Sources::iterator it;
-		FOR_EACH(sourceManager->sources(),it){
+		Environment::Sources::iterator it;
+		FOR_EACH(environment->sources(),it){
 			SourceBase& source=**it;
 			if(includeDead || source.isAlive())
 				action(source);
 		}
 	}
 	{
-		SourceManager::Anchors::const_iterator it;
-		FOR_EACH(sourceManager->anchors(),it){
+		Environment::Anchors::const_iterator it;
+		FOR_EACH(environment->anchors(),it){
             Anchor& anchor = **it;
             action(anchor);
 		}
@@ -138,10 +135,10 @@ void forEachSelected(UniverseObjectAction& action, bool includeDead)
 
 void deselectAll()
 {
-	if(!sourceManager || !universe())
+	if(!environment || !universe())
 		return;
 
-    sourceManager->deselectAll();
+    environment->deselectAll();
     universe()->deselectAll();
 	
 	CameraSplines::iterator it;
@@ -164,11 +161,23 @@ BaseUniverseObject* unitHoverAll(const Vect2f& pos, bool ignore_non_selectable)
 		UnitList::const_iterator i_unit;
 		FOR_EACH(unit_list, i_unit){
 			UnitBase* unit = *i_unit;
-			Vect3f v;
-			if(unit->alive() && unit->intersect(v0,v1,v) &&
-			  distMin > (dist = unit->position().distance2(v0))){
-				distMin = dist;
-				unitMin = unit;
+			if(unit->alive()){
+				if(unit->model()){
+					if(unit->model()->Intersect(v0,v1) &&
+						distMin > (dist = unit->position().distance2(v0))){
+							distMin = dist;
+							unitMin = unit;
+						}
+				}
+				else{
+					Vect3f v0x = unit->position() - v0;
+					Vect3f v_normal, v_tangent;
+					decomposition(v01, v0x, v_normal, v_tangent);
+					if(v_tangent.norm2() < sqr(unit->radius()) && distMin > (dist = v_normal.norm2())){
+						distMin = dist;
+						unitMin = unit;
+					}
+				}
 			}
 		}
 	}
@@ -176,12 +185,12 @@ BaseUniverseObject* unitHoverAll(const Vect2f& pos, bool ignore_non_selectable)
 	return unitMin;
 }
 
-bool objectBoxTest(const Vect3f& pos, const Plane* box)
+bool objectBoxTest(const Vect3f& pos, const sPlane4f* box)
 {
-	float leftDist = box[1].distance(pos);
-	float rightDist = box[2].distance(pos);
-	float topDist = box[3].distance(pos);
-	float bottomDist = box[4].distance(pos);
+	float leftDist = box[1].GetDistance(pos);
+	float rightDist = box[2].GetDistance(pos);
+	float topDist = box[3].GetDistance(pos);
+	float bottomDist = box[4].GetDistance(pos);
 
 	return
 			(leftDist >= 0 && rightDist >= 0)
@@ -205,18 +214,13 @@ Vect3f screenPointToGround(const Vect2i& mouse_pos)
 	cameraManager->GetCamera()->GetWorldRay(pos_in, pos, dir);
 	Vect3f result;
 	// проверяем пересечение с ландшафтом
-	if(terScene->TraceDir(pos, dir, &result)){
-		xassert(round(result.x) >= 0 && round(result.x) < vMap.H_SIZE &&
-				round(result.y) >= 0 && round(result.y) < vMap.V_SIZE);					
+	if(terScene->TraceDir(pos, dir, &result))
 		return result;
-	}
 	else{
 		float rayLength = 5000.0f;
 		Vect3f normal(Vect3f::K);
 		// проверяем на пересечение с горизонтальной плоскостью
-		if(intersect(normal, pos, pos + dir * rayLength, &result) && 
-			round(result.x) >= 0 && round(result.x) < vMap.H_SIZE &&
-			round(result.y) >= 0 && round(result.y) < vMap.V_SIZE)
+		if(intersect(normal, pos, pos + dir * rayLength, &result))
 			return result;
 		else{
 			// проверяем на пересечение с гранями bound-а мира
@@ -237,14 +241,11 @@ Vect3f screenPointToGround(const Vect2i& mouse_pos)
 
 				Vect3f point;
 				if(intersect(normal, pos + offset, pos + offset + dir * rayLength, &point, false)){
-					if(Vect2f(point.x + offset.x, point.y + offset.y).distance2(center) < Vect2f(result.x, result.y).distance2(center))
-						result = point + offset;
+					if(Vect2f(point.x - offset.x, point.y - offset.y).distance2(center) < Vect2f(result.x, result.y).distance2(center))
+						result = point - offset;
 				}
 			}
 			xassert(!result.eq(Vect3f(vMap.H_SIZE * 1e5f, vMap.V_SIZE* 1e5f, 0.0f)));
-			result.x = clamp(result.x, 0.0f, vMap.H_SIZE - 1.0f);
-			result.y = clamp(result.y, 0.0f, vMap.V_SIZE - 1.0f);
-			result = To3D(Vect2f(result.x, result.y));
 			return result;
 		}
 	}
@@ -315,7 +316,7 @@ bool selectByScreenRectangle(Vect2i p1, Vect2i p2, bool select, bool deselectOut
     x1 += inf;
     y1 += inf;
     
-    Plane planeClip[5];
+    sPlane4f planeClip[5];
     cameraManager->GetCamera()->GetPlaneClip(planeClip, &sRectangle4f(x0, y0, x1, y1));
 
     bool selectionChanged = false;
@@ -325,7 +326,7 @@ bool selectByScreenRectangle(Vect2i p1, Vect2i p2, bool select, bool deselectOut
 
 void deleteSelectedUniverseObjects()
 {
-	sourceManager->deleteSelected();
+	environment->deleteSelected();
 	universe()->deleteSelected();
 	cameraManager->deleteSelected();
 }
@@ -447,7 +448,7 @@ int RadiusExtractor::count() const
 
 // ---------------------------------------------------------------------------
 
-SelectByObjectBoxTest::SelectByObjectBoxTest(bool& selectionChanged, const Plane* planeClip, bool select, bool deselectOutside, bool selectHidden)
+SelectByObjectBoxTest::SelectByObjectBoxTest(bool& selectionChanged, const sPlane4f* planeClip, bool select, bool deselectOutside, bool selectHidden)
 : planeClip_(planeClip)
 , selectionChanged_(selectionChanged)
 , select_(select)
@@ -495,7 +496,7 @@ void GetSelectionInfo::operator()(BaseUniverseObject& object)
 {
 	switch(object.objectClass()){
 	case UNIVERSE_OBJECT_UNIT:
-		text_ = TRANSLATE(FactorySelector<UnitBase>::Factory::instance().nameAlt(typeid(object).name()));
+		text_ = TRANSLATE(ClassCreatorFactory<UnitBase>::instance().nameAlt(typeid(object).name()));
 		movable_ = true;
 		return;
 	case UNIVERSE_OBJECT_ENVIRONMENT:
@@ -534,6 +535,7 @@ EditorCreator::EditorCreator(ShareHandle<CSurToolBase>& editor)
 
 void EditorCreator::operator()(BaseUniverseObject& object)
 {
+	// TODO: сделать фабрику
 	editor_ = 0;
 
 	switch(object.objectClass()){
@@ -556,7 +558,7 @@ void Cloner::operator()(BaseUniverseObject& object)
 	case UNIVERSE_OBJECT_SOURCE:
 		{
 		SourceBase* source = safe_cast<SourceBase*>(&object);
-		sources_.push_back(sourceManager->addSource(source));
+		sources_.push_back(environment->addSource(source));
 		((SourceBase*)sources_.back())->setActivity(source->active());
 		}
 		return;
@@ -567,9 +569,9 @@ void Cloner::operator()(BaseUniverseObject& object)
 		Player* player = unit->player();
 		UnitBase* newUnit = player->buildUnit(&unit->attr());
 
-		BinaryOArchive oar;
+		EditOArchive oar;
 		oar.serialize(*unit, "unit", "unit");
-		BinaryIArchive iar(oar);
+		EditIArchive iar(oar);
 		iar.serialize(*newUnit, "unit", "unit");
 
 		newUnit->setPose(unit->pose(), true);

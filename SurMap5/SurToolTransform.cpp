@@ -1,10 +1,13 @@
 #include "stdafx.h"
 
 #include "SurToolTransform.h"
-#include "Serialization\Serialization.h"
-#include "Render\inc\IRenderDevice.h"
-#include "Game\RenderObjects.h"
-#include "Units\BaseUniverseObject.h"
+
+#include "Serialization.h"
+
+#include "..\Render\inc\IRenderDevice.h"
+#include "..\Game\RenderObjects.h"
+
+#include "..\Units\BaseUniverseObject.h"
 
 #include "SelectionUtil.h"
 #include "EventListeners.h"
@@ -64,7 +67,7 @@ BOOL CSurToolTransform::OnInitDialog()
 	CheckDlgButton(IDC_Z_AXIS_CHECK, transformAxis_[2]);
 
 	if (vMap.isWorldLoaded())
-		onSelectionChanged();
+		CallBack_SelectionChanged();
 
 	layout_.init(this);
 	layout_.add(1, 0, 1, 0, IDC_TO_SURFACE_LEVEL_BUTTON);
@@ -92,7 +95,7 @@ struct ResetRotation : UniverseObjectAction{
 struct LevelToSurface : UniverseObjectAction{
 	void operator() (BaseUniverseObject& unit) {
 		Vect3f pos = unit.position();
-		pos.z = float(vMap.getApproxAlt (pos.xi(), pos.yi()));
+		pos.z = float(vMap.GetApproxAlt (pos.xi(), pos.yi()));
 		unit.setPose(Se3f(unit.orientation(), pos), true);
 	}
 };
@@ -143,14 +146,14 @@ void CSurToolTransform::select(Vect2i p1, Vect2i p2)
 }
 */
 
-bool CSurToolTransform::onLMBDown(const Vect3f& worldCoord, const Vect2i& scrCoord)
+bool CSurToolTransform::CallBack_LMBDown(const Vect3f& worldCoord, const Vect2i& scrCoord)
 {
     buttonPressed_ = true;
     beginTransformation();
 	return false;
 }
 
-bool CSurToolTransform::onLMBUp (const Vect3f& coord, const Vect2i&)
+bool CSurToolTransform::CallBack_LMBUp (const Vect3f& coord, const Vect2i&)
 {
     if (buttonPressed_) {
         finishTransformation ();
@@ -160,27 +163,27 @@ bool CSurToolTransform::onLMBUp (const Vect3f& coord, const Vect2i&)
 }
 
 
-bool CSurToolTransform::onTrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord)
+bool CSurToolTransform::CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord)
 {
 	cursorCoord_ = scrCoord;
 	return true;
 }
 
 
-bool CSurToolTransform::onRMBDown (const Vect3f& worldCoord, const Vect2i& screenCoord)
+bool CSurToolTransform::CallBack_RMBDown (const Vect3f& worldCoord, const Vect2i& screenCoord)
 {
 	cancelTransformation ();
 	return false;
 }
 
-bool CSurToolTransform::onDelete(void)
+bool CSurToolTransform::CallBack_Delete(void)
 {
 	::deleteSelectedUniverseObjects();
-	eventMaster().signalObjectChanged().emit(this);
+	eventMaster().eventObjectChanged().emit();
 	return true;
 }
 
-void CSurToolTransform::drawCircle (const Se3f& position, float radius, const Color4c& color)
+void CSurToolTransform::drawCircle (const Se3f& position, float radius, const sColor4c& color)
 {
 	Vect3f point;
 
@@ -198,7 +201,7 @@ void CSurToolTransform::drawCircle (const Se3f& position, float radius, const Co
 	}
 }
 
-void drawFilledArc (const Se3f& position, float radius, float start_angle, float end_angle, const Color4c& start_color, const Color4c& end_color)
+void drawFilledArc (const Se3f& position, float radius, float start_angle, float end_angle, const sColor4c& start_color, const sColor4c& end_color)
 {
 	Vect3f point;
 
@@ -215,10 +218,10 @@ void drawFilledArc (const Se3f& position, float radius, float start_angle, float
 		point.set (sin (angle) * radius, cos (angle) * radius, 0.0f);
 		position.xformPoint (point);
 		if (i) {
-			Color4c color;
+			sColor4c color;
 
 			vertices [0].pos = position.trans();
-			vertices [0].diffuse = Color4c (0, 0, 0, 255);
+			vertices [0].diffuse = sColor4c (0, 0, 0, 255);
 			vertices [1].pos = last_point;
 			color.interpolate (start_color, end_color, float(i - 1) / count);
 			vertices [1].diffuse = color;
@@ -234,12 +237,12 @@ void drawFilledArc (const Se3f& position, float radius, float start_angle, float
 
 void CSurToolTransform::drawAxis(const Vect3f& point, float radius, bool axis[3])
 {
-	gb_RenderDevice->DrawLine(point, point + Vect3f(0.f, 0.f, radius), Color4c (0, 0, 255, 63 + 192 * axis[2]));
-	gb_RenderDevice->DrawLine(point, point + Vect3f(radius, 0.f, 0.f), Color4c (255, 0, 0, 63 + 192 * axis[0]));
-	gb_RenderDevice->DrawLine(point, point + Vect3f(0.f, radius, 0.f), Color4c (0, 255, 0, 63 + 192 * axis[1]));
+	gb_RenderDevice->DrawLine(point, point + Vect3f(0.f, 0.f, radius), sColor4c (0, 0, 255, 63 + 192 * axis[2]));
+	gb_RenderDevice->DrawLine(point, point + Vect3f(radius, 0.f, 0.f), sColor4c (255, 0, 0, 63 + 192 * axis[0]));
+	gb_RenderDevice->DrawLine(point, point + Vect3f(0.f, radius, 0.f), sColor4c (0, 255, 0, 63 + 192 * axis[1]));
 }
 
-bool CSurToolTransform::onDrawAuxData(void)
+bool CSurToolTransform::CallBack_DrawAuxData(void)
 {/*
 	if(mode() == ROTATE) {
 		Vect3f position = selectionCenter_;
@@ -252,8 +255,8 @@ bool CSurToolTransform::onDrawAuxData(void)
 		a.normalize(selectionRadius_);
 		b.normalize(selectionRadius_);
 
-		gb_RenderDevice->DrawLine (unitPoint, unitPoint + a, Color4c(255, 255, 255));
-		gb_RenderDevice->DrawLine (unitPoint, unitPoint + b, Color4c(255, 255, 255));
+		gb_RenderDevice->DrawLine (unitPoint, unitPoint + a, sColor4c(255, 255, 255));
+		gb_RenderDevice->DrawLine (unitPoint, unitPoint + b, sColor4c(255, 255, 255));
 		Se3f circle_pose (Se3f (QuatF::ID, selectionCenter_));
 		if (transformAxisIndex () == 1) {
 			circle_pose.rot().set (M_PI * 0.5f, Vect3f::I, 0);
@@ -262,14 +265,14 @@ bool CSurToolTransform::onDrawAuxData(void)
 		} else {
 			circle_pose.rot().set (0, Vect3f::I, 0);
 		}
-		drawCircle (circle_pose, selectionRadius_, Color4c(255 * transformAxis_[0],
+		drawCircle (circle_pose, selectionRadius_, sColor4c(255 * transformAxis_[0],
 															255 * transformAxis_[1],
 															255 * transformAxis_[2], 255));
 	} else if (mode() == SCALE) {
 		drawAxis (selectionCenter_, selectionRadius_, transformAxis_);
 
-		gb_RenderDevice->DrawLine (selectionCenter_, selectionCenter_ + startPoint_, Color4c(0, 0, 255));
-		gb_RenderDevice->DrawLine (selectionCenter_, selectionCenter_ + endPoint_, Color4c(255, 255, 255));
+		gb_RenderDevice->DrawLine (selectionCenter_, selectionCenter_ + startPoint_, sColor4c(0, 0, 255));
+		gb_RenderDevice->DrawLine (selectionCenter_, selectionCenter_ + endPoint_, sColor4c(255, 255, 255));
 	}
 	*/
 	return true;
@@ -298,7 +301,7 @@ void CSurToolTransform::finishTransformation ()
 }
 
 
-bool CSurToolTransform::onKeyDown(unsigned int keyCode, bool shift, bool control, bool alt)
+bool CSurToolTransform::CallBack_KeyDown(unsigned int keyCode, bool shift, bool control, bool alt)
 {
 	if(!vMap.isWorldLoaded())
 		return true;
@@ -343,7 +346,7 @@ bool CSurToolTransform::onKeyDown(unsigned int keyCode, bool shift, bool control
     return true;
 }
 
-void CSurToolTransform::onSelectionChanged ()
+void CSurToolTransform::CallBack_SelectionChanged ()
 {
 	using namespace UniverseObjectActions;
 	poses_.clear();

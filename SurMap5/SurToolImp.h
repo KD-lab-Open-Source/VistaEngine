@@ -18,7 +18,7 @@ public:
 	CEScroll m_Height;
 	CEScrollVx m_H;
 
-	virtual bool onOperationOnMap(int x, int y);
+	virtual bool CallBack_OperationOnMap(int x, int y);
 // Dialog Data
 	int getIDD() const { return IDD_BARDLG_IMP; }
 

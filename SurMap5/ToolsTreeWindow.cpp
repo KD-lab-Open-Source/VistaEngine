@@ -1,11 +1,11 @@
 #include "stdafx.h"
 
-#include "ToolsTreeWindow.h"
+#include ".\ToolsTreeWindow.h"
 
 #include "MainFrame.h"
 #include "GeneralView.h"
 
-#include "Game\CameraManager.h"
+#include "..\Game\CameraManager.h"
 
 #include "ToolsTreeCtrl.h"
 
@@ -67,7 +67,7 @@ CToolsTreeWindow::CToolsTreeWindow()
 
 CToolsTreeWindow::~CToolsTreeWindow()
 {
-	//delete &tree_; 
+	delete &tree_;
 }
 
 int CToolsTreeWindow::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -102,7 +102,7 @@ int CToolsTreeWindow::OnCreate(LPCREATESTRUCT lpCreateStruct)
     //////////////////////////////////////////////////////////////////////////////
 
 	tree_.init(mainFrame_);
-	if(!tree_.CreateEx(WS_EX_CLIENTEDGE, 0,0, WS_CHILD|WS_VISIBLE|WS_VSCROLL|WS_HSCROLL|WS_BORDER
+	if(!tree_.CreateEx(WS_EX_CLIENTEDGE, WS_CHILD|WS_VISIBLE|WS_VSCROLL|WS_HSCROLL|WS_BORDER
 		/*|TVS_HASBUTTONS*/|TVS_HASLINES|TVS_LINESATROOT|TVS_EDITLABELS
         |TVS_INFOTIP|TVS_DISABLEDRAGDROP|TVS_SINGLEEXPAND|TVS_SHOWSELALWAYS|TVS_TRACKSELECT,
         CRect(0,0,0,0), this, 0))
@@ -192,8 +192,8 @@ void CToolsTreeWindow::setCurrentTool(CSurToolBase* tool)
 		if(tool == tools_[i])
 			tool_in_tree = false;
 	}
-	//if(!tool_in_tree)
-	//	tree_.SelectItem(0);
+	if(!tool_in_tree)
+		tree_.SelectItem(0);
 
 	Vect3f cursorPosition = Vect3f::ZERO;
 	if(vMap.isWorldLoaded()) {
@@ -264,7 +264,7 @@ bool CToolsTreeWindow::onKeyDown(UINT key, UINT flags)
 			if(!tree_.shortcuts_[index].empty()){
 				CSurToolBase* tool = tree_.findTool(tree_.shortcuts_[index]);
 				//replaceEditorMode(tool);
-				tree_.GetTreeCtrl().SelectItem(tool->treeItem());
+				tree_.SelectItem(tool->treeItem());
 			}
 		}
 		return true;
@@ -297,7 +297,7 @@ bool CToolsTreeWindow::onKeyDown(UINT key, UINT flags)
 void CToolsTreeWindow::OnBrushRadiusComboSelChanged ()
 {
 	if(CSurToolBase* currentToolzer = currentTool())
-		currentToolzer->onBrushRadiusChanged();
+		currentToolzer->CallBack_BrushRadiusChanged();
 }
 
 void CToolsTreeWindow::OnUpdateBrushRadius(CCmdUI* pCmdUI)

@@ -1,86 +1,67 @@
 #include "stdafx.h"
 #include "SurMap5.h"
-#include "GeneralView.h"
+#include ".\GeneralView.h"
+
 #include "MainFrame.h"
 #include "ToolsTreeWindow.h"
 #include "ObjectsManagerWindow.h"
 #include "MiniMapWindow.h"
 #include "TimeSliderDlg.h"
+
 #include "BaseUniverseObject.h"
-#include "Console.h"
-#include "ConsoleWindow.h"
-#include "Water\Water.h"
-#include "VistaRender\postEffects.h"
-#include "Environment\Environment.h"
-#include "Environment\SourceManager.h"
-#include "Game\SoundApp.h"
-#include "Game\Universe.h"
-#include "Game\CameraManager.h"
-#include "Game\RenderObjects.h"
-#include "UserInterface\UserInterface.h"
-#include "UserInterface\UI_Render.h"
-#include "UserInterface\UI_BackgroundScene.h"
-#include "UserInterface\UI_Minimap.h"
-#include "Game\GameOptions.h"
-#include "Render\Src\TileMap.h"
-#include "Render\Src\Scene.h"
-#include "Render\Src\VisGeneric.h"
+#include "..\Render\inc\IVisGeneric.h"
+#include "..\Render\inc\TerraInterface.inl"
+#include "..\Util\Console.h"
+#include "..\Util\ConsoleWindow.h"
+#include "..\Water\Water.h"
+#include "..\Render\src\postEffects.h"
+#include "..\Environment\Environment.h"
+#include "..\Game\SoundApp.h"
+#include "..\Game\Universe.h"
+#include "..\Game\CameraManager.h"
+#include "..\UserInterface\UserInterface.h"
+#include "..\UserInterface\UI_BackgroundScene.h"
+#include "..\UserInterface\UI_CustomControls.h"
+#include "GameOptions.h"
+
 #include "SelectionUtil.h"
 #include "SurMapOptions.h"
 #include "SurToolSelect.h"
 #include "SurToolSource.h"
 #include "EditorVisual.h"
-#include "Units\UnitActing.h"
 
-#include "Serialization\Dictionary.h"
-#include "Serialization\XPrmArchive.h"
-#include "kdw/PropertyEditor.h"
+#include "..\Units\ExternalShow.h"
+#include "Dictionary.h"
 
-#include "Water\SkyObject.h"
+#include "..\Water\SkyObject.h"
 
-#include "Game\StreamCommand.h"
+#include "StreamCommand.h"
 
-
-#include "Terra\TerrainType.h"
+#include "XPrmArchive.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
-namespace UniverseObjectActions{
-
-	struct CountSelected : public UniverseObjectAction{
-		int& count_;
-
-		CountSelected(int& count)
-			: count_(count)
-		{
-			count_ = 0;
+class cMonowideFont {
+	cFont* pfont;
+public:
+	cMonowideFont(){
+		pfont=0;
+	}
+	~cMonowideFont(){
+		if(pfont) pfont->Release();
+	}
+	cFont* getFont(){
+		if(!pfont) {
+			pfont=gb_VisGeneric->CreateFont("Scripts\\Resource\\fonts\\Courier New.font", 16, 1);//Тихая ошибка
+			if(!pfont)pfont=gb_VisGeneric->CreateFont("Scripts\\Resource\\fonts\\Arial.font", 16);
 		}
+		return pfont;
+	}
+};
 
-		void operator()(BaseUniverseObject& object){
-			UniverseObjectClass objectClass = object.objectClass();
-			if(object.selected())
-				++count_;
-		}		
-	};
-
-	struct DeselectDead : public UniverseObjectAction{
-		DeselectDead(bool& needUpdate)
-			: needUpdate_(needUpdate)
-		{}
-		void operator()(BaseUniverseObject& object){
-			UniverseObjectClass objectClass = object.objectClass();
-			if(objectClass == UNIVERSE_OBJECT_UNIT || objectClass == UNIVERSE_OBJECT_ENVIRONMENT || objectClass == UNIVERSE_OBJECT_SOURCE){
-				if(object.selected() && object.dead()){
-					object.setSelected(false);
-					needUpdate_ = true;
-				}
-			}
-		}
-		bool& needUpdate_;
-	};
-}
+cMonowideFont* pMonowideFont;
 
 // CGeneralView
 
@@ -96,6 +77,8 @@ CGeneralView::CGeneralView()
 
 	//demo3d
 	prevtime=0;
+	terMapPoint=NULL;
+	pFont=NULL;
 	///vPosition.set(945.894f,2042.05f,2197.22f);
 	vPosition.set(945.894f,1042.05f,2197.22f);
 	AnglePosition.set(0.404606f,7.91086f);
@@ -104,12 +87,14 @@ CGeneralView::CGeneralView()
 	m_Timer4RepetitionID=0;
 
 	pointOnMouse=Vect3f::ZERO;
+	pMonowideFont=0;
 	draw_num_polygon=0;
 	draw_num_tilemappolygon=0;
 }
 
 CGeneralView::~CGeneralView()
 {
+	RELEASE(pFont);
 	renderDeviceInited_=0;
 	sceneInited_ = 0;
 }
@@ -126,23 +111,16 @@ void CGeneralView::initRenderDevice()
 	createRenderContext(false);
 
 	initRenderObjects(RENDERDEVICE_MODE_WINDOW|RENDERDEVICE_MODE_STENCIL, GetSafeHwnd());
-	renderWindow_ = gb_RenderDevice->createRenderWindow (GetSafeHwnd ());
+	renderWindow_ = gb_RenderDevice->CreateRenderWindow (GetSafeHwnd ());
 
 	GameOptions::instance().gameSetup();
 
 	renderDeviceInited_ = true;
 
-	loadAllLibraries();
+	loadAllLibraries(true);
 	surMapOptions.load();
 	UI_Dispatcher::instance().init();
-	minimap()
-		.viewZone(true)
-		.canFog(false)
-		.water(true)
-		.drawEvents(true)
-		.wind(false)
-		.rotate(false)
-		.align(UI_ALIGN_CENTER);
+	minimap().setViewParameters(1.f, true, false, true, true);
 }
 
 void CGeneralView::doneRenderDevice()
@@ -175,23 +153,32 @@ void CGeneralView::createScene()
 
     cameraManager->setCoordinate (coord);
 
-	cameraManager->SetFrustumEditor(surMapOptions.zFarInfinite);
+	cameraManager->SetFrustumEditor();
 
 	terScene->SetSunDirection(Vect3f(-1,0,-1));
 
 	CSurToolBase* cc=getCurCtrl();
 	if(cc) 
-		cc->onCreateScene();
+		cc->CallBack_CreateScene();
 
 	CMainFrame* pMainFrame = static_cast<CMainFrame*>(AfxGetMainWnd ());
+
+	if(pMonowideFont) delete pMonowideFont;
+	pMonowideFont= new cMonowideFont();
+
 }
 
 void CGeneralView::doneUniverse()
 {
 	if(CSurToolBase* currentTool = getCurCtrl())
-		currentTool->onReleaseScene();
+		currentTool->CallBack_ReleaseScene();
 
 	UI_Dispatcher::instance().reset();
+	//extern StreamDataManager uiStreamLogicCommand;
+	//uiStreamLogicCommand.lock();
+	//uiStreamLogicCommand.execute();
+	//uiStreamLogicCommand.unlock();
+	//uiStreamCommand.execute(); // так можно только при одном потоке
 
 	if(universe())
 		delete universe();
@@ -199,11 +186,13 @@ void CGeneralView::doneUniverse()
 
 void CGeneralView::doneScene(void)
 {
+	delete pMonowideFont;
+	pMonowideFont = 0;
 	sceneInited_ = 0;
 
 	doneUniverse();
 	
-	RELEASE(tileMap);//Подстраховка
+	RELEASE(terMapPoint);//Подстраховка
 
 	finitScene();
 }
@@ -218,12 +207,13 @@ void CGeneralView::reInitWorld()
 		return;
 
 	if(CSurToolBase* currentTool = getCurCtrl())
-		currentTool->onCreateScene();
+		currentTool->CallBack_CreateScene();
 
+	vMap.ShadowControl(true);
 	
 	pointOnMouse = Vect3f::ZERO;
 
-	std::string spgPath = string(vMap.getWorldsDir()) + "\\" + vMap.getWorldName() + ".spg";
+	std::string spgPath = string(vMap.getWorldsDir()) + "\\" + vMap.worldName + ".spg";
 
 	XPrmIArchive ia;
 	if(ia.open(spgPath.c_str())){
@@ -250,18 +240,19 @@ void CGeneralView::reInitWorld()
 	surMapOptions.apply();
 
 	CMainFrame* mainFrame = (CMainFrame*)(AfxGetMainWnd());
-	mainFrame->signalWorldChanged().emit(mainFrame);
+	mainFrame->eventWorldChanged().emit();
 
 	setSilhouetteColors();
 
+
 	cameraManager->reset();
 	CameraCoordinate coord = cameraManager->coordinate();
-	if(lastWorldName.empty() || (lastWorldName!=vMap.getWorldName())){
+	if(lastWorldName.empty() || (lastWorldName!=vMap.worldName)){
         coord.position() = To3D(Vect2f(vMap.H_SIZE * 0.5f, vMap.V_SIZE * 0.5f));
 	}
 	cameraManager->setCoordinate(coord);
 	cameraManager->setRestriction(false);
-	lastWorldName = vMap.getWorldName();
+	lastWorldName = vMap.worldName;
 
 	Invalidate(FALSE);
 }
@@ -273,7 +264,7 @@ void CGeneralView::graphQuant()
 
 	CMainFrame* pMF=(CMainFrame*)AfxGetMainWnd();
 	if(universe()){
-		cameraManager->SetFrustumEditor(surMapOptions.zFarInfinite);
+		cameraManager->SetFrustum();
 		gb_VisGeneric->SetGraphLogicQuant(universe()->quantCounter());
 
 		universe()->streamCommand.process(0.0f);
@@ -281,14 +272,15 @@ void CGeneralView::graphQuant()
 
 		uiStreamCommand.execute();
 
+		gb_VisGeneric->SetInterpolationFactor(0);
 		universe()->streamInterpolator.process(0);
 	}
 
-	gb_RenderDevice->selectRenderWindow(renderWindow_);
+	gb_RenderDevice->SelectRenderWindow(renderWindow_);
 
 	frame_time.next_frame();
 
-	Color4c& Color = environment->environmentTime()->GetCurFoneColor();
+	sColor4c& Color = environment->environmentTime()->GetCurFoneColor();
 	gb_RenderDevice->Fill(Color.r,Color.g,Color.b);
 	gb_RenderDevice->BeginScene();
 
@@ -300,35 +292,42 @@ void CGeneralView::graphQuant()
 
 	float dt = 0.001f*terScene->GetDeltaTime();
 
-	environment->graphQuant(dt, cameraManager->GetCamera());
-	cameraManager->GetCamera()->setAttribute(ATTRCAMERA_CLEARZBUFFER);//Потому как в небе могут рисоваться планеты в z buffer.
+	environment->graphQuant(dt);
+	cameraManager->GetCamera()->SetAttr(ATTRCAMERA_CLEARZBUFFER);//Потому как в небе могут рисоваться планеты в z buffer.
 	terScene->Draw(cameraManager->GetCamera());
 	drawGrid();
-	if(surMapOptions.showCameraBorders())
-		drawCameraBorders();
 
-	environment->drawPostEffects(dt, cameraManager->GetCamera());
+	environment->drawPostEffects(dt);
 
 	gb_RenderDevice->SetRenderState(RS_FILLMODE, FILL_SOLID);
 
 	cameraManager->showEditor();
 
+	if(universe()){
+		universe()->circleShow()->Lock();
+		universe()->circleShow()->Clear();
+	}
+	
 	universe()->graphQuant(dt);
 	UI_Dispatcher::instance().quant(dt);
 
-	sourceManager->showEditor();
 	environment->showEditor();
 	
+	if(universe()){
+		universe()->circleShow()->Unlock();
+		universe()->circleShow()->Quant(dt);
+	}
+
 	CSurToolBase* cc = getCurCtrl();
 	if(cc) 
-		cc->onDrawAuxData();
+		cc->CallBack_DrawAuxData();
 
 	editorVisual().afterQuant();
 
 	gb_RenderDevice->EndScene();
 	gb_RenderDevice->Flush();
 
-	gb_RenderDevice->selectRenderWindow(0);
+	gb_RenderDevice->SelectRenderWindow(0);
 	draw_num_polygon=gb_RenderDevice->GetDrawNumberPolygon();
 	draw_num_tilemappolygon=gb_RenderDevice->GetDrawNumberTilemapPolygon();
 
@@ -421,12 +420,13 @@ bool CGeneralView::CoordScr2vMap(const Vect2i& inMouse_pos, Vect3f& outWorld_pos
 }
 
 
-#include "SystemUtil.h"
+#include "..\Util\SystemUtil.h"
 LRESULT CGeneralView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	//Унивепсальная смена фокуса на окно
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	setLogicFp();
-
+#endif
 	if(message==WM_RBUTTONDOWN || message==WM_LBUTTONDOWN){
 		SetFocus();
 	}
@@ -448,19 +448,15 @@ LRESULT CGeneralView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			
             CameraCoordinate coord = cameraManager->coordinate();
 
-			if(flags & MK_SHIFT)
-				if(::isPressed(VK_MENU)){
-					coord.focus() = clamp(coord.focus() + SIGN(delta)*0.04f, 0.1f, 10.0f);
-					cameraManager->setCoordinate(coord);
-				}else
-					cameraManager->addFlyingHeight(-SIGN(delta) * ((flags & MK_CONTROL) ? 0.0025f : 0.01f) * coord.distance());
+			if(flags & MK_SHIFT){
+				Vect3f newPos = coord.position() + Vect3f(0.0f, 0.0f, -SIGN(delta) * ((flags & MK_CONTROL) ? 0.0025f : 0.01f) * coord.distance());
+				newPos.z = max(newPos.z, To3D(Vect2f(newPos)).z);
+                coord.setPosition(newPos);
+            }
             else{
-				if(::isPressed(VK_MENU))
-					coord.fi() = coord.fi() - SIGN(delta)*0.04f;
-				else
-					coord.distance() = max(coord.distance(),  2.0f) * (1.0f - ((flags & MK_CONTROL) ? 0.01f : 0.2f) * SIGN(delta));
-				cameraManager->setCoordinate(coord);
+				coord.distance() = max(coord.distance(),  2.0f) * (1.0f - ((flags & MK_CONTROL) ? 0.01f : 0.2f) * SIGN(delta));
 			}
+            cameraManager->setCoordinate (coord);
 		}
 		break;
 	case WM_MBUTTONDOWN:
@@ -492,7 +488,7 @@ LRESULT CGeneralView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			Vect3f coordMap;
 			CoordScr2vMap (CurMousePos, coordMap);
 			CSurToolBase* currentToolzer = getCurCtrl();
-			if(currentToolzer && currentToolzer->onRMBDown(coordMap, CurMousePos)){
+			if(currentToolzer && currentToolzer->CallBack_RMBDown(coordMap, CurMousePos)){
 				Invalidate(FALSE);
 			}else{
 				SetCapture();
@@ -515,7 +511,7 @@ LRESULT CGeneralView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				Vect3f coordMap;
 				CoordScr2vMap (CurMousePos, coordMap );
 
-                currentToolzer->onRMBUp (coordMap, CurMousePos);
+                currentToolzer->CallBack_RMBUp (coordMap, CurMousePos);
 			}
 		}
 		break;
@@ -529,10 +525,6 @@ LRESULT CGeneralView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			CurMousePos.x = LOSHORT(lParam);
 			CurMousePos.y = HISHORT(lParam);
-
-			Vect3f worldCoord = screenPointToGround(CurMousePos);
-			xassert(round(worldCoord.x) >= 0 && round(worldCoord.x) < vMap.H_SIZE &&
-					round(worldCoord.y) >= 0 && round(worldCoord.y) < vMap.V_SIZE);					
 			CoordScr2vMap(Vect2i(CurMousePos.x, CurMousePos.y), pointOnMouse);
 			if(flag_MMouseDown){
 				Vect2f delta = CurMousePos - BegMousePos;
@@ -554,12 +546,8 @@ LRESULT CGeneralView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				CameraCoordinate coord = cameraManager->coordinate();
 
 				Vect3f coord_position = coord.position();
-#ifdef _VISTA_ENGINE_EXTERNAL_
-				coord.position().z = worldCoord.z;
-#else
 				float zDelta = To3D(Vect2f(coord_position) + Vect2f(delta)).z - To3D(Vect2f(coord.position())).z;
 				coord.position().z = max(0.0f, coord_position.z + zDelta);
-#endif
 				coord.position().x += delta.x;
 				coord.position().y += delta.y;
 
@@ -569,6 +557,7 @@ LRESULT CGeneralView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				UpdateStatusBar(); // Если не поворот камеры
 			
 			if(CSurToolBase* tool = getCurCtrl()){
+				Vect3f worldCoord = screenPointToGround(CurMousePos);
 				tool->TrackMouse(worldCoord, CurMousePos);
 			}
 		}
@@ -582,18 +571,17 @@ loc_repeat_operationOnMap:
 			
 			
 			Vect2i coordScr = CurMousePos;
-			//Vect3f coordMap = screenPointToGround(CurMousePos);
-			Vect3f coordMap;
-			bool result = CoordScr2vMap(Vect2i(CurMousePos.x, CurMousePos.y), coordMap);
+			Vect3f coordMap = screenPointToGround(CurMousePos);
+			//bool result = CoordScr2vMap(Vect2i(CurMousePos.x, CurMousePos.y), coordMap);
 
 			CSurToolBase* tool = getCurCtrl();
-			if(/*result && */tool){
+			if(tool){
 				CRect rect;
 				GetClientRect(&rect);
 
-				tool->onOperationOnMap(round(coordMap.x), round(coordMap.y));
+				tool->CallBack_OperationOnMap(round(coordMap.x), round(coordMap.y));
 				if(!flag_LMouseDown)
-					tool->onLMBDown(coordMap, CurMousePos); //если первое нажатие
+					tool->CallBack_LMBDown(coordMap, CurMousePos); //если первое нажатие
 
 				UpdateStatusBar();
 				Invalidate(FALSE);
@@ -609,7 +597,7 @@ loc_repeat_operationOnMap:
 			if (CSurToolBase* cc=getCurCtrl()) {
 				Vect3f cm;
 				CoordScr2vMap(Vect2i(CurMousePos.x, CurMousePos.y), cm);
-				cc->onLMBUp(cm, CurMousePos);
+				cc->CallBack_LMBUp(cm, CurMousePos);
 			}
 		}
 		break;
@@ -684,6 +672,7 @@ int CGeneralView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	return 0;
 }
 
+unsigned int profileTimeOperation=0;
 void CGeneralView::UpdateStatusBar()
 {
 	if(vMap.isWorldLoaded()){
@@ -698,14 +687,14 @@ void CGeneralView::UpdateStatusBar()
 		CExtStatusControlBar & statusBar = pMF->statusBar();
 
 		unsigned char atr=vMap.GetAtr(xPointInfo, yPointInfo);
-		//if(Vm_IsGeo(atr))
-		//	strncpy(str1, "Geo", sizeof(str1));
-		//else 
-		//	strncpy(str1, "Dam", sizeof(str1));
-		//if(Vm_IsIndestructability(atr))
-		//	strcat(str1, "+Inds");
-		strncpy(str1, TerrainTypeDescriptor::instance().nameAlt(1 << vMap.getSurKind(xPointInfo, yPointInfo)), sizeof(str1));
-		str1[sizeof(str1)-1]=0;
+		if(Vm_IsGeo(atr))
+			strncpy(str1, "Geo", sizeof(str1));
+		else 
+			strncpy(str1, "Dam", sizeof(str1));
+		if(Vm_IsIndestructability(atr))
+			strcat(str1, "+Inds");
+		if(Vm_IsLeveled(atr))
+			strcat(str1, "+Lev");
 /*		switch(atr){
 		case VmAt_Nrml_Geo:
 			strncpy(str1, "    Geo     ", sizeof(str1));
@@ -732,16 +721,16 @@ void CGeneralView::UpdateStatusBar()
 			strncpy(str1, "indsDam+soot", sizeof(str1));
 			break;
 		}*/
-		sprintf(str, "%s / 0x%X", str1, vMap.gABuf[vMap.offsetGBufC(xPointInfo>>kmGrid, yPointInfo>>kmGrid)]);
+		sprintf(str, "%s/0x%X", str1, vMap.GABuf[vMap.offsetGBufC(xPointInfo>>kmGrid, yPointInfo>>kmGrid)]);
 		statusBar.SetPaneText(0, str, 0);
 		//высота
-		convert_vox2vid(vMap.getAlt(xPointInfo, yPointInfo), str1);
-		itoa(vMap.getApproxAlt(vMap.XCYCL(xPointInfo), vMap.YCYCL(yPointInfo)), str2, 10);
+		convert_vox2vid(vMap.GetAlt(xPointInfo, yPointInfo), str1);
+		itoa(vMap.GetApproxAlt(vMap.XCYCL(xPointInfo), vMap.YCYCL(yPointInfo)), str2, 10);
 		itoa(round(environment->water()->GetZ(vMap.XCYCL(xPointInfo), vMap.YCYCL(yPointInfo))), str3, 10);
 		sprintf(str, "Alt:%5s/%3s/%3s", str1,str2, str3);
 		statusBar.SetPaneText(1, str, 0);
 		//2 -mega операций на процедурной карте
-		float mop=0;//(double)vMap.procMapOp/1000000.;
+		float mop=(double)vMap.procMapOp/1000000.;
 		sprintf(str, "MOp:%8f", mop);
 		statusBar.SetPaneText(2, str, 0);
 		int posMOp=round((mop/MAX_MEGA_PROCEDUR_MAP_OPERATION)*100);
@@ -756,12 +745,11 @@ void CGeneralView::UpdateStatusBar()
 		sprintf(str, "Y:%4d", yPointInfo);
 		statusBar.SetPaneText(5, str, 0);
 		//6- separator //Но пока используем
-		if(cameraManager)
-			sprintf(str, "Focus:%3.2f", cameraManager->coordinate().focus());
+		sprintf(str, "MS:%9d", profileTimeOperation );
 		statusBar.SetPaneText(6, str, 0);
 
-		//sprintf(str, "Clr:%4d", (unsigned int)vMap.clrBuf[vMap.offsetBuf(xPointInfo, yPointInfo)] ); //GetTer(xPointInfo, yPointInfo));
-		//statusBar.SetPaneText(7, str, 0);
+		sprintf(str, "Sur:%4d", vMap.GetTer(xPointInfo, yPointInfo));
+		statusBar.SetPaneText(7, str, 0);
 		//sprintf(str, "Lght:%4d", vMap.RnrBuf[vMap.offsetBuf(xPointInfo, yPointInfo)] );
 		//statusBar.SetPaneText(8, str, 0);
 
@@ -773,7 +761,7 @@ void CGeneralView::UpdateStatusBar()
 		}
 
 		//sprintf(str, "MS:%8d", profileTimeOperation );
-//		sprintf(str, "GH:%4d", vMap.gVBuf[vMap.offsetGBuf(m_SurToolMoveVar.m_XCenterM>>kmGrid, m_SurToolMoveVar.m_YCenterM>>kmGrid)] );
+//		sprintf(str, "GH:%4d", vMap.GVBuf[vMap.offsetGBuf(m_SurToolMoveVar.m_XCenterM>>kmGrid, m_SurToolMoveVar.m_YCenterM>>kmGrid)] );
 //		statusBar.SetPaneText(5, str, 0);
 
 	}
@@ -793,7 +781,7 @@ void CGeneralView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 	if(toolsWindow_->onKeyDown(nChar, nFlags)){
 	}
-    else if (currentToolzer && !currentToolzer->onKeyDown (nChar, false, false, false)) {
+    else if (currentToolzer && !currentToolzer->CallBack_KeyDown (nChar, false, false, false)) {
         const float WORLD_ANGLE_STEP = 15.f * (M_PI/180.f);
         const int WORLD_STEP = 40;
 
@@ -829,7 +817,7 @@ void CGeneralView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 			break;
         case VK_DELETE:
             if (currentToolzer) {
-                currentToolzer->onDelete();
+                currentToolzer->CallBack_Delete();
             }
 			updateCameraCoordinate = false;
             break;
@@ -858,6 +846,41 @@ void CGeneralView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	CWnd::OnKeyDown(nChar, nRepCnt, nFlags);
 }
 
+namespace UniverseObjectActions{
+
+struct CountSelected : public UniverseObjectAction{
+	int& count_;
+
+	CountSelected(int& count)
+	: count_(count)
+	{
+		count_ = 0;
+	}
+
+	void operator()(BaseUniverseObject& object){
+		UniverseObjectClass objectClass = object.objectClass();
+		if(object.selected())
+			++count_;
+	}		
+};
+
+struct DeselectDead : public UniverseObjectAction{
+	DeselectDead(bool& needUpdate)
+	: needUpdate_(needUpdate)
+	{}
+	void operator()(BaseUniverseObject& object){
+		UniverseObjectClass objectClass = object.objectClass();
+		if(objectClass == UNIVERSE_OBJECT_UNIT || objectClass == UNIVERSE_OBJECT_ENVIRONMENT || objectClass == UNIVERSE_OBJECT_SOURCE){
+			if(object.selected() && object.dead()){
+				object.setSelected(false);
+				needUpdate_ = true;
+			}
+		}
+	}
+	bool& needUpdate_;
+};
+};
+
 void CGeneralView::quant()
 {
 	using namespace UniverseObjectActions;
@@ -871,13 +894,13 @@ void CGeneralView::quant()
 
 	CMainFrame& mainFrame = ::mainFrame();
 	if(needUpdate)
-		mainFrame.signalObjectChanged().emit(&mainFrame);
+		mainFrame.eventObjectChanged().emit();
 	if(CSurToolBase* currentTool = getCurCtrl())
 		currentTool->quant();
 	lastSelectedCount = selectedCount;
 }
 
-void drawLineTerrain(const Vect2f& point1, const Vect2f& point2, const Color4c& color, float segmentLength)
+void drawLineTerrain(const Vect2f& point1, const Vect2f& point2, const sColor4c& color, float segmentLength)
 {
 	float len = point1.distance(point2);
 	segmentLength = len / max(1.0f, float(round(len / segmentLength)));
@@ -890,32 +913,12 @@ void drawLineTerrain(const Vect2f& point1, const Vect2f& point2, const Color4c& 
 	}
 }
 
-void CGeneralView::drawCameraBorders()
-{
-	Color4c color(surMapOptions.cameraBorderColor_.r, surMapOptions.cameraBorderColor_.g, surMapOptions.cameraBorderColor_.b, 128);
-	Color4c selectedColor(255, 255, 128);
-
-	Recti rect = cameraManager->cameraBorder().rect();
-
-	Vect3f box[4] = {
-		Vect3f(rect.left(),  rect.top(),    vMap.initialHeight),
-		Vect3f(rect.right(), rect.top(),    vMap.initialHeight),
-		Vect3f(rect.right(), rect.bottom(), vMap.initialHeight),
-		Vect3f(rect.left(),  rect.bottom(), vMap.initialHeight)
-	};
-
-	gb_RenderDevice->DrawLine(box[0], box[1], surMapOptions.cameraBorderSelection().top() ? selectedColor : color);
-	gb_RenderDevice->DrawLine(box[1], box[2], surMapOptions.cameraBorderSelection().width() ? selectedColor : color);
-	gb_RenderDevice->DrawLine(box[2], box[3], surMapOptions.cameraBorderSelection().height() ? selectedColor : color);
-	gb_RenderDevice->DrawLine(box[3], box[0], surMapOptions.cameraBorderSelection().left() ? selectedColor : color);
-}
-
 void CGeneralView::drawGrid()
 {
 	if(surMapOptions.enableGrid_) {
 		int gridStep = max(16, surMapOptions.gridSpacing_);
 		int segmentLength = max(8, min(16, gridStep / 4));
-		const Color4c& color = surMapOptions.gridColor_;
+		const sColor4c& color = surMapOptions.gridColor_;
 		float level = 0.0f;
 		if(vMap.isWorldLoaded()) {
 			for(int x = 0; x <= vMap.H_SIZE; x += gridStep) {

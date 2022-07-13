@@ -13,7 +13,7 @@ public:
 	CSurToolGeoTx(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CSurToolGeoTx();
 
-	virtual bool onOperationOnMap(int x, int y);
+	virtual bool CallBack_OperationOnMap(int x, int y);
 
 	void serialize(Archive& ar);
 

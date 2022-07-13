@@ -3,10 +3,6 @@
 
 #include "EScroll.h"
 
-#include "Serialization\Serialization.h"
-#include "AttribEditor\AttribEditorCtrl.h"
-#include "Terra\vmap.h"
-
 struct HistogramDate {
 	enum { HISTOGRAM_ARRAY_SIZE=256 };
 	int minVxHeight;
@@ -38,10 +34,6 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
-public:
-	vrtMapChangeParam m_changeParam;
-protected:
-	CAttribEditorCtrl m_ctlAttribEditor;
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);

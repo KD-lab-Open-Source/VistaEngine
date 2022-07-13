@@ -1,14 +1,15 @@
 #ifndef __MINI_MAP_WINDOW_H_INCLUDED__
 #define __MINI_MAP_WINDOW_H_INCLUDED__
 
-#include "Render\Inc\IRenderDevice.h"
+#include "IRenderDevice.h"
+#include "IVisGeneric.h"
 #include "EventListeners.h"
 
 class CSurToolBase;
 class CMainFrame;
-class cScene;
 
-class CMiniMapWindow : public CWnd, public WorldObserver, public sigslot::has_slots{
+class CMiniMapWindow : public CWnd, public WorldChangedListener
+{
 public:
     static const char* className() { return "VistaEngineMiniMap"; }
 	BOOL Create (DWORD dwStyle, const CRect& rect, CWnd* pParentWnd);
@@ -19,7 +20,7 @@ public:
 		return scene_;
 	}
 
-	void onWorldChanged(WorldObserver* changer);
+	void onWorldChanged ();
 	
 	void updateCameraFrustum (int width, int height);
 	void updateMinimapPosition (int width, int height);
@@ -44,7 +45,7 @@ protected:
 
 	Vect2i windowSize_;
 	cRenderWindow* renderWindow_;
-    Camera* camera_;
+    cCamera* camera_;
 	cScene* scene_;
 	bool sizing_;
 	float zoom_;

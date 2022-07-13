@@ -1,11 +1,13 @@
+// DlgChangeTotalWorldHeight.cpp : implementation file
+//
+
 #include "stdafx.h"
 #include "SurMap5.h"
 #include "DlgChangeTotalWorldHeight.h"
 
-#include "terra\vmap.h"
+#include "..\terra\terra.h"
 #include "LIMITS.H"
-#include "dlgchangetotalworldheight.h"
-#include "Serialization\Dictionary.h"
+#include ".\dlgchangetotalworldheight.h"
 
 static void world2Histogram(HistogramDate& outHistArr)
 {
@@ -17,10 +19,10 @@ static void world2Histogram(HistogramDate& outHistArr)
 	int i, j;
 	for(i=0; i<vMap.V_SIZE; i++){
 		for(j=0; j<vMap.H_SIZE; j++){
-			int h=vMap.getAlt(j,i);
+			int h=vMap.GetAlt(j,i);
 			if(minVx>h) minVx=h;
 			if(maxVx<h) maxVx=h;
-			histArr[h*HistogramDate::HISTOGRAM_ARRAY_SIZE/(MAX_VX_HEIGHT+1)]++;
+			histArr[h>>VX_FRACTION]++;
 		}
 	}
 	int idxMax=0;
@@ -131,7 +133,7 @@ void CDlgChangeTotalWorldHeight::drawHisogram(CPaintDC& dc, int HISTOGRAM_WND, H
 	m_bmpHistogram.DeleteObject();
 
 }
-
+// CDlgChangeTotalWorldHeight dialog
 static const int MIN_DELTA_H=-128<<VX_FRACTION;
 static const int MAX_DELTA_H=128<<VX_FRACTION;
 static const int MIN_SCALE_H=10;
@@ -154,7 +156,6 @@ CDlgChangeTotalWorldHeight::~CDlgChangeTotalWorldHeight()
 void CDlgChangeTotalWorldHeight::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_ATTRIB_EDITOR, m_ctlAttribEditor);
 }
 
 
@@ -163,10 +164,14 @@ BEGIN_MESSAGE_MAP(CDlgChangeTotalWorldHeight, CDialog)
 	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
+
+// CDlgChangeTotalWorldHeight message handlers
+
 BOOL CDlgChangeTotalWorldHeight::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
+	// TODO:  Add extra initialization here
 	m_deltaH.Create(this, IDC_SLDR_DELTA_H, IDC_EDT_DELTA_H);
 	m_scaleH.Create(this, IDC_SLDR_SCALE_H, IDC_EDT_SCALE_H);
 
@@ -174,17 +179,13 @@ BOOL CDlgChangeTotalWorldHeight::OnInitDialog()
 	world2Histogram(inputHistogram);
 	inHistogram2OutHistogram(inputHistogram, outPutHistogram, m_deltaH.value, (float)m_scaleH.value/100.f);
 
-	static_cast<vrtMapCreationParam&>(m_changeParam) = static_cast<vrtMapCreationParam>(vMap);
-	m_ctlAttribEditor.setStyle(CAttribEditorCtrl::AUTO_SIZE);
-	m_ctlAttribEditor.initControl ();
-	m_ctlAttribEditor.attachSerializer(Serializer(m_changeParam, "m_changeParam", "Свойства карты"));
-	UpdateData(FALSE);
-
-	return TRUE;
+	return TRUE;  // return TRUE unless you set the focus to a control
+	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
 void CDlgChangeTotalWorldHeight::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
+	// TODO: Add your message handler code here and/or call default
 	CSliderCtrl * slR1;
 	CSliderCtrl * slR2;
 	//
@@ -202,8 +203,9 @@ void CDlgChangeTotalWorldHeight::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* 
 
 void CDlgChangeTotalWorldHeight::OnPaint()
 {
-	CPaintDC dc(this);
-
+	CPaintDC dc(this); // device context for painting
+	// TODO: Add your message handler code here
+	// Do not call CDialog::OnPaint() for painting messages
 	CWnd* pw;
 	char buf[MAX_PATH];
 	pw=GetDlgItem(IDC_EDT_INPUT_MIN_HEIGHT);
@@ -220,7 +222,8 @@ void CDlgChangeTotalWorldHeight::OnPaint()
 
 void CDlgChangeTotalWorldHeight::OnOK()
 {
-	UpdateData(TRUE);
+	// TODO: Add your specialized code here and/or call the base class
 
+	vMap.changeTotalWorldHeight(m_deltaH.value, (float)m_scaleH.value/100.f);
 	CDialog::OnOK();
 }

@@ -1,7 +1,7 @@
 #include "StdAfx.h"
-#include "ExcelExport\ExcelExporter.h"
+#include "..\ExcelExport\ExcelExporter.h"
 
-#include "Environment\SourceZone.h"
+#include "..\Environment\SourceZone.h"
 
 #include "AttributeReference.h"
 #include "UnitAttribute.h"
@@ -10,16 +10,13 @@
 
 #include "ParameterTree.h"
 
+#include "EditArchive.h"
 #include "Console.h"
-#include "UserInterface\UI_Render.h"
-#include "Serialization\StringTable.h"
-
-#include "UnicodeConverter.h"
-#include "WBuffer.h"
+#include "..\UserInterface\UI_Render.h"
 
 namespace ParameterTree{
 
-static std::string unitNameFromInterfaceName(const wchar_t* interfaceName)
+static std::string unitNameFromInterfaceName(const char* interfaceName)
 {
 	return UI_Render::instance().extractFirstLineText(interfaceName);
 }
@@ -32,10 +29,10 @@ const char* makeReferenceCopy(const Reference& const_reference, const char* newN
 	Library& library = Library::instance();
 	xassert(!library.exists(newName));
 
-	BinaryOArchive oa;
+	EditOArchive oa;
 	oa.serialize(*reference, "element", "element");
 
-	BinaryIArchive ia(oa);
+	EditIArchive ia(oa);
 
 	library.add(newName);
 	ia.serialize(*Reference(newName), "element", "element");
@@ -149,9 +146,9 @@ void obtainParameters(ParameterArchive& ar, UnitAttribute& attribute)/*{{{*/
 		}
 		case 2:
 		{
-			WeaponSlotAttributes::iterator it;
+			AttributeBase::WeaponSlotAttributes::iterator it;
 			FOR_EACH(attr->weaponAttributes, it){
-				WeaponPrmReference ref = const_cast<WeaponPrmReference&>(it->second.weaponPrmReference());
+				WeaponPrmReference ref = const_cast<WeaponPrmReference&>(it->weaponPrmReference());
 				std::string name = ref.c_str();
 				ar(*ref, name.c_str());
 
@@ -279,12 +276,12 @@ const int READ_ONLY_COLOR = 7;
 
 void writeNameRow(ExcelExporter& excel, const Vect2i& pos, int length, const char* name, bool readOnly, const Vect2i& linkPos)
 {
-	excel.setCellText(pos, a2w(name).c_str());
+	excel.setCellText(pos, name);
 	if(readOnly){
 		excel.setBackColor(Recti(pos, Vect2i(2, 1)), READ_ONLY_COLOR);
 		if(linkPos != Vect2i::ZERO){
 			std::string addr = excel.cellName(linkPos);
-			excel.addHyperlink(pos + Vect2i(1, 0), "", addr.c_str(), L"Original", L"Navigate to original location");
+			excel.addHyperlink(pos + Vect2i(1, 0), "", addr.c_str(), "Original", "Navigate to original location");
 		}
 	}
 }
@@ -296,7 +293,7 @@ void writeParametersRow(ExcelExporter& excel, const Vect2i& pos, ParameterCustom
 	const ParameterCustom::Vector& vec = params.customVector();
 	for(int i = 0; i < vec.size(); ++i){
 		const ParameterValue& value = *vec[i];
-		WBuffer buf;
+		XBuffer buf;
 		buf <= value.value() * multiplier;
 		int typeIndex = -1;
 		const ParameterType* type = &*value.type();
@@ -309,8 +306,9 @@ void writeParametersRow(ExcelExporter& excel, const Vect2i& pos, ParameterCustom
 		xassert(typeIndex >= 0);
 		if(typeIndex >= 0){
 			usedTypes[typeIndex] = true;
+			std::string name = strings[typeIndex].c_str();
 			Vect2i position(pos.x + typeIndex, pos.y);
-			excel.setCellText(position, buf.c_str());
+			excel.setCellText(position, buf, 1251);
 		}
 	}
 	if(readOnly)
@@ -323,7 +321,7 @@ void writeParametersHeader(ExcelExporter& excel, const Vect2i& pos)/*{{{*/
 	for(int index = 0; index < strings.size(); ++index){
 		std::string name = strings[index].c_str();
 		Vect2i position(pos.x + index, pos.y);
-		excel.setCellText(position, a2w(name).c_str());
+		excel.setCellText(position, name.c_str(), 1251);
 		excel.setCellTextOrientation(position, 90);
 	}
 }/*}}}*/
@@ -376,11 +374,11 @@ Node* findNodeByPath(Node* root, const char* path)
 void Exporter::importExcelNode(ExcelImporter& excel, Vect2i& pos, ParameterTree::Node* root, int maxLevel, const char* prefix)
 {
 	while(true){
-		wstring text = excel.getCellText(pos);
+		std::string text = excel.getCellText(pos, 1251);
 		if(text.empty())
 			break;
 
-		Node* node = findNodeByPath(root, w2a(text).c_str());
+		Node* node = findNodeByPath(root, text.c_str());
 		if(node/* && !node->readOnly()*/)
 			readParametersRow(excel, Vect2i(pos.x + maxLevel, pos.y), node);
 
@@ -449,11 +447,11 @@ void Exporter::exportExcel(const char* filename)
 		const char* sheetName = sheetNames[section];
 		if(firstSection){
 			exporter->beginSheet();
-			exporter->setSheetName(a2w(sheetName).c_str());
+			exporter->setSheetName(sheetName);
 			firstSection = false;
 		}
 		else
-			exporter->addSheet(a2w(sheetName).c_str());
+			exporter->addSheet(sheetName);
 
 		currentSection_ = section;
 
@@ -479,7 +477,7 @@ void Exporter::readParametersHeader(ExcelImporter& excel, const Vect2i& pos)
 	types_.clear();
 	Vect2i current = pos;
 	while(true){
-		string name = w2a(excel.getCellText(current));
+		std::string name = excel.getCellText(current, 1251);
 		if(name.empty())
 			break;
 		

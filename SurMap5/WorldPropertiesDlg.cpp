@@ -4,10 +4,9 @@
 #include "stdafx.h"
 #include "SurMap5.h"
 #include "WorldPropertiesDlg.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\EnumDescriptor.h"
-#include "Terra\vmap.h"
+#include "..\Render\inc\TerraInterface.inl"
 
+#include "Serialization.h"
 
 // CWorldPropertiesDlg dialog
 

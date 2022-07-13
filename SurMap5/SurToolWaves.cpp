@@ -1,10 +1,11 @@
 #include "stdafx.h"
 #include "SurMap5.h"
 #include "SurToolWaves.h"
-#include "Game\RenderObjects.h"
+#include "..\Game\RenderObjects.h"
+#include "..\Units\ExternalShow.h"
 
 #include "MainFrame.h"
-#include "surtoolwaves.h"
+#include ".\surtoolwaves.h"
 
 IMPLEMENT_DYNAMIC(CSurToolWaves, CSurToolBase)
 
@@ -27,31 +28,31 @@ void CSurToolWaves::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CSurToolWaves, CSurToolBase)
 	ON_WM_DESTROY()
 END_MESSAGE_MAP()
-bool CSurToolWaves::onLMBDown (const Vect3f& worldCoord, const Vect2i& screenCoord)
+bool CSurToolWaves::CallBack_LMBDown (const Vect3f& worldCoord, const Vect2i& screenCoord)
 {
 	leftButtonDown_ = true;
 	waveDlg_->OnMapLBClick(worldCoord);
 	return true;
 }
 
-bool CSurToolWaves::onLMBUp (const Vect3f& worldCoord, const Vect2i& screenCoord)
+bool CSurToolWaves::CallBack_LMBUp (const Vect3f& worldCoord, const Vect2i& screenCoord)
 {
 	leftButtonDown_ = false;
 	return true;
 }
-bool CSurToolWaves::onRMBUp (const Vect3f& worldCoord, const Vect2i& screenCoord)
+bool CSurToolWaves::CallBack_RMBUp (const Vect3f& worldCoord, const Vect2i& screenCoord)
 {
 	waveDlg_->OnMapRBClick(worldCoord);
 	return true;
 }
-bool CSurToolWaves::onTrackingMouse (const Vect3f& worldCoord, const Vect2i& scrCoord)
+bool CSurToolWaves::CallBack_TrackingMouse (const Vect3f& worldCoord, const Vect2i& scrCoord)
 {
 	if (leftButtonDown_)
 		waveDlg_->OnMapMouseMove(worldCoord);
 	return true;
 }
 
-bool CSurToolWaves::onDrawAuxData(void)
+bool CSurToolWaves::CallBack_DrawAuxData(void)
 {
 	return true;
 }

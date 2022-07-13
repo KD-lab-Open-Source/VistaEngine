@@ -17,8 +17,8 @@ public:
 	CEScroll m_RadiusBlur;
 	int m_Intensity;
 
-	virtual bool onOperationOnMap(int x, int y);
-	virtual bool onDrawAuxData(void);
+	virtual bool CallBack_OperationOnMap(int x, int y);
+	virtual bool CSurToolBlur::CallBack_DrawAuxData(void);
 // Dialog Data
 	int getIDD() const { return IDD_BARDLG_BLUR; }
 

@@ -5,8 +5,8 @@
 #include "SurMap5.h"
 #include "SurToolGeoTx.h"
 
-#include "Serialization\Serialization.h"
-#include "surtoolgeotx.h"
+#include "Serialization.h"
+#include ".\surtoolgeotx.h"
 
 // CSurToolGeoTx dialog
 
@@ -45,6 +45,7 @@ END_MESSAGE_MAP()
 
 void CSurToolGeoTx::OnBnClickedBtnBrowseFile()
 {
+	// TODO: Add your control notification handler code here
 	//dataFileName = requestResourceAndPut2InternalResource("Resource\\TerrainData\\GeoTx", 
 	//	"*.xml", "defaulr.xml",
 	//	"Will select location of an file geotextures");
@@ -63,6 +64,7 @@ void CSurToolGeoTx::OnBnClickedBtnBrowseFile()
 }
 void CSurToolGeoTx::OnBnClickedBtnBrowseFile2()
 {
+	// TODO: Add your control notification handler code here
 	dataFileName2 = requestResourceAndPut2InternalResource("Resource\\TerrainData\\Textures", 
 		"*.tga", "default.tga",
 		"Will select location of an file geotextures");
@@ -76,11 +78,11 @@ void CSurToolGeoTx::OnBnClickedBtnBrowseFile2()
 	}
 }
 
-bool CSurToolGeoTx::onOperationOnMap(int x, int y)
+bool CSurToolGeoTx::CallBack_OperationOnMap(int x, int y)
 {
 	if( vMap.isWorldLoaded() ) { //&& !dataFileName.empty() 
 		CWaitCursor wait;
-		//vMap.putNewGeoTexture(dataFileName.c_str(), dataFileName2.c_str());
+		vMap.putNewGeoTexture(dataFileName.c_str(), dataFileName2.c_str());
 		vMap.WorldRender();
 	}
 	return true;
@@ -90,22 +92,23 @@ BOOL CSurToolGeoTx::OnInitDialog()
 {
 	CSurToolBase::OnInitDialog();
 
+	// TODO:  Add extra initialization here
 	CEdit* ew=(CEdit*)GetDlgItem(IDC_EDT_GEOTX);
 	ew->SetWindowText(dataFileName.c_str());
 
 	ew=(CEdit*)GetDlgItem(IDC_EDT_GEOTX2);
 	ew->SetWindowText(dataFileName2.c_str());
 
-	//if(vMap.IsShowSpecialInfo()!=vrtMap::SSI_ShowAllGeo){
-	//	if(vMap.isWorldLoaded()) {
-	//		CWaitCursor wait;
-	//		vMap.toShowSpecialInfo(vrtMap::SSI_ShowAllGeo);
-	//		vMap.WorldRender();
-	//		flag_changedGeoViewOption=true;
-	//	}
-	//}
-	//else 
-	//	flag_changedGeoViewOption=false;
+	if(vMap.IsShowSpecialInfo()!=vrtMap::SSI_ShowAllGeo){
+		if(vMap.isWorldLoaded()) {
+			CWaitCursor wait;
+			vMap.toShowSpecialInfo(vrtMap::SSI_ShowAllGeo);
+			vMap.WorldRender();
+			flag_changedGeoViewOption=true;
+		}
+	}
+	else 
+		flag_changedGeoViewOption=false;
 
 	return FALSE;
 }
@@ -114,10 +117,11 @@ BOOL CSurToolGeoTx::OnInitDialog()
 void CSurToolGeoTx::OnDestroy()
 {
 	CSurToolBase::OnDestroy();
+	// TODO: Add your message handler code here
 	if(flag_changedGeoViewOption){
 		if(vMap.isWorldLoaded()) {
 			CWaitCursor wait;
-			//vMap.toShowSpecialInfo(vrtMap::SSI_NoShow);
+			vMap.toShowSpecialInfo(vrtMap::SSI_NoShow);
 			vMap.WorldRender();
 		}
 	}

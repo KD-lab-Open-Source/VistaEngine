@@ -3,25 +3,25 @@
 
 #include "SurToolEditable.h"
 
-#include "EventListeners.h"
-#include "Environment\Environment.h"
+#include "..\Environment\Environment.h"
 
 class Anchor;
 
 class Archive;
-class CSurToolAnchor : public CSurToolEditable, public ObjectObserver{
+class CSurToolAnchor : public CSurToolEditable {
+
 	DECLARE_DYNAMIC(CSurToolAnchor)
 public:
 	CSurToolAnchor(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CSurToolAnchor();
 
-	bool onOperationOnMap(int x, int y);
-	void onBrushRadiusChanged();
-	bool onTrackingMouse(const Vect3f& worldCoord, const Vect2i& screenCoord);
+	bool CallBack_OperationOnMap(int x, int y);
+	void CallBack_BrushRadiusChanged();
+	bool CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i& screenCoord);
 
 	void onPropertyChanged();
 
-	bool onDrawAuxData(void);
+	bool CallBack_DrawAuxData(void);
 
 	void serialize(Archive& ar);
 	const Anchor* originalAnchor();

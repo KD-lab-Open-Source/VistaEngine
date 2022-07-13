@@ -1,6 +1,6 @@
 #include "StdAfx.h"
-#include "Serialization\Dictionary.h"
-#include "OutputProgressDlg.h"
+#include "Dictionary.h"
+#include ".\OutputProgressDlg.h"
 
 IMPLEMENT_DYNAMIC(COutputProgressDlg, CDialog)
 COutputProgressDlg::COutputProgressDlg(const char* title, CWnd* parent)

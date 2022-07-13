@@ -3,22 +3,21 @@
 #include "DebugUtil.h"
 #include "SurToolAnchor.h"
 
-#include "AttribEditor\AttribEditorCtrl.h"
-#include "Environment\Anchor.h"
+#include "..\AttribEditor\AttribEditorCtrl.h"
+#include "..\Environment\Anchor.h"
 
 #include "SurToolAux.h"
-#include "Environment\SourceManager.h"
-#include "Serialization\Dictionary.h"
-#include "Serialization\BinaryArchive.h"
+#include "..\Environment\Environment.h"
+#include "EditArchive.h"
+#include "Dictionary.h"
 #include "EventListeners.h"
-#include "kdw/LibraryTab.h" // для makeName
 
 Anchor* CSurToolAnchor::anchorOnMouse_ = 0;
 
 IMPLEMENT_DYNAMIC(CSurToolAnchor, CSurToolEditable)
 CSurToolAnchor::CSurToolAnchor(CWnd* pParent /*=NULL*/)
 : CSurToolEditable(pParent)
-, anchor_(new Anchor(true))
+, anchor_(new Anchor())
 {
 }
 
@@ -36,55 +35,56 @@ BOOL CSurToolAnchor::OnInitDialog()
 {
     CSurToolEditable::OnInitDialog();
 
-	if(sourceManager){
+	if(environment){
         killAnchor();
 		if(anchor_) {
 			anchor_->setRadius(getBrushRadius());
-			attribEditor().attachSerializer(Serializer(*anchor_));
+			attribEditor().attachSerializeable(Serializeable(*anchor_));
 		}
 		if(originalAnchor()) {
-			anchorOnMouse_ = sourceManager->addAnchor(originalAnchor());
+			anchorOnMouse_ = environment->addAnchor(originalAnchor());
 			anchorOnMouse_->setPose(Se3f(QuatF::ID, cursorPosition()), true);
 		}
 	}
 	return FALSE;
 }
 
-void CSurToolAnchor::onBrushRadiusChanged()
+void CSurToolAnchor::CallBack_BrushRadiusChanged()
 {
 	if(anchor_) {
-		attribEditor().attachSerializer(Serializer(*anchor_));
+		attribEditor().attachSerializeable(Serializeable(*anchor_));
 		onPropertyChanged();
 	}
 }
 
-bool CSurToolAnchor::onOperationOnMap(int x, int y)
+std::string makeName(const char* reservedComboList, const char* nameBase);
+
+bool CSurToolAnchor::CallBack_OperationOnMap(int x, int y)
 {
-	if(vMap.isWorldLoaded () && sourceManager) {
+	if(vMap.isWorldLoaded () && environment) {
 		xassert(originalAnchor());
 		std::string comboList;
-		const SourceManager::Anchors& anchors = sourceManager->anchors();
-		SourceManager::Anchors::const_iterator it;
+		Environment::Anchors& anchors = environment->anchors();
+		Environment::Anchors::iterator it;
 		FOR_EACH(anchors, it){
 			if(*it != anchorOnMouse()){
 				if(it != anchors.begin())
 					comboList += "|";
-				comboList += (*it)->label();
+				comboList += (*it)->c_str();
 			}
 		}
 
-		Anchor* anchor = sourceManager->addAnchor(originalAnchor());
-		anchor->enable();
-		std::string label = kdw::makeName(comboList.c_str(), anchor->label());
+		Anchor* anchor = environment->addAnchor(originalAnchor());
+		std::string label = makeName(comboList.c_str(), anchor->c_str());
 
 		anchor->setLabel(label.c_str());
 		anchor->setPose(Se3f(QuatF::ID, To3D(Vect2f(x,y))), true);
-		eventMaster().signalObjectChanged().emit(this);
+		eventMaster().eventObjectChanged().emit();
 	}
 	return true;
 }
 
-bool CSurToolAnchor::onDrawAuxData()
+bool CSurToolAnchor::CallBack_DrawAuxData()
 {
 	drawCursorCircle();
 	return true;
@@ -98,16 +98,16 @@ void CSurToolAnchor::serialize(Archive& ar)
 
 void CSurToolAnchor::OnDestroy()
 {
-	if(sourceManager && anchorOnMouse_) {
+	if(environment && anchorOnMouse_) {
         killAnchor();
 	}
 
 	CSurToolEditable::OnDestroy();
 }
 
-bool CSurToolAnchor::onTrackingMouse(const Vect3f& worldCoord, const Vect2i& screenCoord)
+bool CSurToolAnchor::CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i& screenCoord)
 {
-	if(sourceManager && anchorOnMouse_) {
+	if(environment && anchorOnMouse_) {
 		anchorOnMouse_->setPose(Se3f(anchorOnMouse_->orientation(), worldCoord), true);
 	}
 	return true;
@@ -119,12 +119,12 @@ void CSurToolAnchor::onPropertyChanged()
 		if(!anchor_ && anchor) {
 			if(anchorOnMouse_)
                 killAnchor();
-			anchorOnMouse_ = sourceManager->addAnchor(originalAnchor());
+			anchorOnMouse_ = environment->addAnchor(originalAnchor());
 		}
 		if(anchorOnMouse_) {
 			Se3f old_pose = anchorOnMouse_->pose();
-			BinaryOArchive oa;     oa.serialize(*anchor, "anchor", "anchor");
-			BinaryIArchive ia(oa); ia.serialize(*anchorOnMouse_, "anchor", "anchor");
+			EditOArchive oa;     oa.serialize(*anchor, "anchor", "anchor");
+			EditIArchive ia(oa); ia.serialize(*anchorOnMouse_, "anchor", "anchor");
 			anchorOnMouse_->setPose(old_pose, true);
 		}
 	}
@@ -148,9 +148,9 @@ void CSurToolAnchor::setAnchorOnMouse(Anchor* anchor)
 void CSurToolAnchor::killAnchor()
 {
 	if(anchorOnMouse_){
-		SourceManager::Anchors::iterator it = std::find(sourceManager->anchors().begin(),sourceManager->anchors().end(), anchorOnMouse_);
-		xassert(it != sourceManager->anchors().end());
-		sourceManager->anchors().erase(it);
+		Environment::Anchors::iterator it = std::find(environment->anchors().begin(),environment->anchors().end(), anchorOnMouse_);
+		xassert(it != environment->anchors().end());
+		environment->anchors().erase(it);
 		anchorOnMouse_ = 0;
 	}
 }

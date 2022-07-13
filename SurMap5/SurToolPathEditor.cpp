@@ -1,15 +1,14 @@
 #include "stdafx.h"
-#include "SurToolPathEditor.h"
-#include "Game\RenderObjects.h"
-#include "Game\CameraManager.h"
-#include "Environment\SourceBase.h"
-#include "Serialization\SerializationFactory.h"
-#include "Render\Src\cCamera.h"
+#include ".\SurToolPathEditor.h"
+#include "..\Game\RenderObjects.h"
+#include "..\Game\CameraManager.h"
+
+#include "..\Environment\SourceBase.h"
 
 #include "DebugUtil.h"
 #include "NameComboDlg.h"
+#include "TypeLibraryImpl.h"
 #include "UnitAttribute.h" // FIXME
-#include "Serialization\StringTable.h"
 
 IMPLEMENT_DYNAMIC(CSurToolPathEditor, CSurToolBase)
 
@@ -33,7 +32,7 @@ CSurToolPathEditor::~CSurToolPathEditor()
 
 }
 
-bool CSurToolPathEditor::onTrackingMouse (const Vect3f& worldCoord, const Vect2i& scrCoord)
+bool CSurToolPathEditor::CallBack_TrackingMouse (const Vect3f& worldCoord, const Vect2i& scrCoord)
 {
 	static Vect3f lastPos = worldCoord;
 
@@ -72,7 +71,7 @@ int CSurToolPathEditor::nodeUnderPoint(const Vect3f& worldCoord)
 	return -1;
 }
 
-bool CSurToolPathEditor::onLMBDown (const Vect3f& worldCoord, const Vect2i& screenCoord)
+bool CSurToolPathEditor::CallBack_LMBDown (const Vect3f& worldCoord, const Vect2i& screenCoord)
 {
 	setSelectedNode(nodeUnderPoint(worldCoord));
 	if(selectedNode_ == -1) {
@@ -96,7 +95,7 @@ bool CSurToolPathEditor::onLMBDown (const Vect3f& worldCoord, const Vect2i& scre
 		return true;
 	}
 }
-bool CSurToolPathEditor::onLMBUp (const Vect3f& worldCoord, const Vect2i& screenCoord)
+bool CSurToolPathEditor::CallBack_LMBUp (const Vect3f& worldCoord, const Vect2i& screenCoord)
 {
 	moving_ = false;
 	if(selectedNode_ == -1) {
@@ -105,7 +104,7 @@ bool CSurToolPathEditor::onLMBUp (const Vect3f& worldCoord, const Vect2i& screen
 		return true;
 	}
 }
-bool CSurToolPathEditor::onRMBDown (const Vect3f& worldCoord, const Vect2i& screenCoord)
+bool CSurToolPathEditor::CallBack_RMBDown (const Vect3f& worldCoord, const Vect2i& screenCoord)
 {
 	int node = nodeUnderPoint(worldCoord);
 	if(node != -1) {
@@ -121,23 +120,23 @@ bool CSurToolPathEditor::onRMBDown (const Vect3f& worldCoord, const Vect2i& scre
     }
     return false;
 }
-void CSurToolPathEditor::onSelectionChanged ()
+void CSurToolPathEditor::CallBack_SelectionChanged ()
 {
 }
-bool CSurToolPathEditor::onDelete ()
+bool CSurToolPathEditor::CallBack_Delete ()
 {
     return false;
 }
-bool CSurToolPathEditor::onKeyDown (unsigned int keyCode, bool shift, bool control, bool alt)
+bool CSurToolPathEditor::CallBack_KeyDown (unsigned int keyCode, bool shift, bool control, bool alt)
 {
     return false;
 }
 
-bool CSurToolPathEditor::onDrawAuxData()
+bool CSurToolPathEditor::CallBack_DrawAuxData()
 {
 	const SourceBase::Path& path = source_->path();
 	for(int i = 0; i < path.size(); ++i) {
-		Color4f color(1.0f, 1.0f, 1.0f, 1.0f);
+		sColor4f color(1.0f, 1.0f, 1.0f, 1.0f);
 		Vect3f pos = path[i];
 
 		source_->orientation().xform(pos);
@@ -146,15 +145,15 @@ bool CSurToolPathEditor::onDrawAuxData()
 		source_->orientation().xform(next_pos);
 		next_pos += source_->origin();
 				
-		pos.z = vMap.getApproxAlt(pos.x, pos.y);
-		next_pos.z = vMap.getApproxAlt(next_pos.x, next_pos.y);
+		pos.z = vMap.GetApproxAlt(pos.x, pos.y);
+		next_pos.z = vMap.GetApproxAlt(next_pos.x, next_pos.y);
 
 		if(path.cycled_ || i < path.size()-1) {
 			gb_RenderDevice->DrawLine(pos, next_pos, color);
 		}
 
 		if(selectedNode_ == i) {
-			color = Color4f(1.0f, 0.0f, 0.0f, 1.0f);
+			color = sColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 		}
 		gb_RenderDevice->DrawLine(Vect3f(pos.x-10, pos.y, pos.z),
 								  Vect3f(pos.x+10, pos.y, pos.z), color );
@@ -189,9 +188,7 @@ BOOL CSurToolPathEditor::OnInitDialog()
     layout_.add(1, 0, 0, 0, IDC_SPEED_LABEL);
     layout_.add(0, 0, 1, 0, IDC_SPEED_EDIT);
 	layout_.add(1, 0, 1, 0, IDC_ADD_TO_LIBRARY_BUTTON);
-#ifdef _VISTA_ENGINE_EXTERNAL_
-	GetDlgItem(IDC_ADD_TO_LIBRARY_BUTTON)->EnableWindow(FALSE);
-#endif
+
     return FALSE;
 }
 
@@ -236,7 +233,6 @@ void CSurToolPathEditor::setSelectedNode(int node)
 
 void CSurToolPathEditor::OnAddToLibraryButton()
 {
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	SourceBase* source = source_;
 	CNameComboDlg dlg("Source Name", "New Source", SourcesLibrary::instance().comboList());
 	if(dlg.DoModal() == IDOK){
@@ -252,5 +248,4 @@ void CSurToolPathEditor::OnAddToLibraryButton()
 		SourcesLibrary::instance().add(SourcesLibrary::StringType(dlg.name(), toAdd));
 		SourcesLibrary::instance().saveLibrary();
 	}
-#endif
 }

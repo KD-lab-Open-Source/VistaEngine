@@ -1,11 +1,14 @@
 #include "stdafx.h"
 #include "SurMap5.h"
-#include "SurToolGrass.h"
+#include ".\SurToolGrass.h"
 
-#include "Environment\Environment.h"
-#include "Game\RenderObjects.h"
-#include "Serialization\Serialization.h"
-#include "Render\src\Grass.h"
+//#include ".\MainFrame.h"
+//#include "ExternalShow.h"
+
+#include "..\Environment\Environment.h"
+#include "..\Game\RenderObjects.h"
+#include "Serialization.h"
+#include "..\Render\src\Grass.h"
 
 
 int CSurToolGrass::nextGrass = 0;
@@ -90,14 +93,15 @@ void CSurToolGrass::OnDestroy()
 	CSurToolBase::OnDestroy();
 }
 
-bool CSurToolGrass::onDrawAuxData()
+bool CSurToolGrass::CallBack_DrawAuxData()
 {
 	drawCursorCircle();
 	return true;
 }
-bool CSurToolGrass::onOperationOnMap(int x, int y)
+bool CSurToolGrass::CallBack_OperationOnMap(int x, int y)
 {
-	if(environment && environment->grass()) {
+	if (environment && environment->grass())
+	{
 		CComboBox* cmb = (CComboBox*)GetDlgItem(IDC_GRASS_LIST);
 		int radius = getBrushRadius();
 		bool erase = ((CButton*)GetDlgItem(IDC_ERASE))->GetCheck();
@@ -116,7 +120,8 @@ void CSurToolGrass::DoDataExchange(CDataExchange* pDX)
 
 void CSurToolGrass::OnBnClickedSelectTexture()
 {
-	if(environment && environment->grass()) {
+	if (environment && environment->grass())
+	{
 		string fname = requestResourceAndPut2InternalResource("Resource\\TerrainData\\Textures", 
 			"*.tga", "bitmap.tga", "Will select location of an file textures");
 
@@ -149,9 +154,10 @@ void CSurToolGrass::OnCbnSelchangeGrassList()
 	str.Format("%d",intensity2[oldSelectedGrass]);
 	GetDlgItem(IDC_BOTTOM)->SetWindowText(str);
 }
-bool CSurToolGrass::onDrawPreview(int width, int height)
+bool CSurToolGrass::CallBack_DrawPreview(int width, int height)
 {
-	if(environment && environment->grass() && environment->grass()->GetTexture()) {
+	if (environment->grass()->GetTexture())
+	{
 		CComboBox* cmb = (CComboBox*)GetDlgItem(IDC_GRASS_LIST);
 		const sRectangle4f& rt = ((cTextureAviScale*)environment->grass()->GetTexture())->GetFramePos(cmb->GetCurSel());
 		

@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "TreeInterface.h"
 #include "LibrarySearcher.h"
 
 #include "mfc\ObjectsTreeCtrl.h"

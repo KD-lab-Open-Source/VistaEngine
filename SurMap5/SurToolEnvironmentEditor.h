@@ -1,7 +1,7 @@
 #ifndef __SUR_TOOL_ENVIRONMENT_EDITOR_H_INCLUDED__
 #define __SUR_TOOL_ENVIRONMENT_EDITOR_H_INCLUDED__
 #include "SurToolAux.h"
-#include "MFC\SizeLayoutManager.h"
+#include "..\Util\MFC\SizeLayoutManager.h"
 
 class UnitEnvironment;
 class BaseUniverseObject;

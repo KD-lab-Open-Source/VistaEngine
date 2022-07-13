@@ -1,16 +1,19 @@
 #include "stdafx.h"
 #include "SurMap5.h"
 #include "MainFrame.h"
-#include "TimeSliderDlg.h"
-#include "Environment\Environment.h"
-#include "Water\SkyObject.h"
+#include ".\TimeSliderDlg.h"
+
+#include "..\Render\inc\IVisGeneric.h"
+
+#include "..\Environment\Environment.h"
+#include "..\Water\SkyObject.h"
 
 IMPLEMENT_DYNAMIC(CTimeSliderDlg, CDialog)
 CTimeSliderDlg::CTimeSliderDlg(CMainFrame* mainFrame, CWnd* parent)
 : CDialog(CTimeSliderDlg::IDD, parent)
 , wasTimeFlowEnabled_(false)
 {
-	mainFrame->signalWorldChanged().connect(this, &CTimeSliderDlg::onWorldChanged);
+	mainFrame->eventWorldChanged().registerListener(this);
 }
 
 CTimeSliderDlg::~CTimeSliderDlg()
@@ -26,6 +29,7 @@ void CTimeSliderDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CTimeSliderDlg, CDialog)
 	ON_WM_HSCROLL()
 	ON_EN_CHANGE(IDC_TIME_EDIT, OnTimeEditChange)
+	ON_WM_LBUTTONDOWN()
 END_MESSAGE_MAP()
 
 void CTimeSliderDlg::updateSlider()
@@ -129,9 +133,15 @@ void CTimeSliderDlg::OnTimeEditChange()
 	updateSlider();
 }
 
-void CTimeSliderDlg::onWorldChanged(WorldObserver* changer)
+void CTimeSliderDlg::onWorldChanged()
 {
 	wasTimeFlowEnabled_ = !Environment::flag_EnableTimeFlow;
 	quant();
 }
 
+void CTimeSliderDlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+
+	__super::OnLButtonDown(nFlags, point);
+}

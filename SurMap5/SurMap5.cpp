@@ -2,28 +2,35 @@
 #include "SurMap5.h"
 #include "MainFrame.h"
 
-#include "Terra\vMap.h"
+#include "..\Terra\vMap.h"
 #include "EffectReference.h"
 
-#include "SystemUtil.h"
-#include "ConsoleWindow.h"
-#include "Game\GameOptions.h"
+#include "..\Util\SystemUtil.h"
+#include "..\Util\ConsoleWindow.h"
+#include "GameOptions.h"
 #include "SurToolAux.h"
 #include "ZipConfig.h"
 #include "SplashScreen.h"
 
-#include "Serialization\Dictionary.h"
-#include "FileUtils\FileUtils.h"
-#include "TextDB.h"
-#include "Game\IniFile.h"
-#include "kdw/Win32/Window.h"
-#include "UserInterface\UI_Render.h"
 
-#include "Util\Win32\DebugSymbolManager.h"
+#include "Dictionary.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+
+
+double clockf()
+{
+	return 0;
+} 
+
+int clocki()
+{
+	return 0;
+}
+
 
 BEGIN_MESSAGE_MAP(CSurMap5App, CWinApp)
 	ON_COMMAND(ID_APP_ABOUT, OnAppAbout)
@@ -101,14 +108,9 @@ void CSurMap5App::SetupUiAdvancedOptions(CWnd* wnd)
 		CExtPopupMenuWnd::__AT_NONE;
 }
 
-int dummyReferencesFunction();
-
 // CSurMap5App initialization
 BOOL CSurMap5App::InitInstance()
 {
-	Win32::_setGlobalInstance(m_hInstance);
-	DebugSymbolManager::create();
-
 	// InitCommonControls() is required on Windows XP if an application
 	// manifest specifies use of ComCtl32.dll version 6 or later to enable
 	// visual styles.  Otherwise, any window creation will fail.
@@ -125,7 +127,7 @@ BOOL CSurMap5App::InitInstance()
 	AfxEnableControlContainer();
 	AfxInitRichEdit();
 
-	SetRegistryKey(_T("VistaGame Editor"));
+	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
 
 	ASSERT( m_pszRegistryKey != NULL );
 	ASSERT( m_pszProfileName != NULL );
@@ -134,33 +136,29 @@ BOOL CSurMap5App::InitInstance()
 	VERIFY(splash.create(IDB_SPLASH));
 	splash.show();
 
-#ifdef _VISTA_ENGINE_EXTERNAL_
-//	char modulePath[MAX_PATH + 1];
-//	GetModuleFileName(GetModuleHandle(0), modulePath, MAX_PATH);
-//
-//	std::string path = ::extractFilePath(modulePath);
-//	std::string gamePath = path + "\\Perimeter2.exe";
-//	if(!::isFileExists(gamePath.c_str())){
-//		AfxMessageBox(TRANSLATE("Похоже, что игра была удалена после установки редактора. Вам нужно переустановить игру в тот же каталог."), MB_ICONEXCLAMATION, 0);
-//		return FALSE;
-//	}
-	ZipConfig::initArchives();
-#else
-	if(iniFile.ZIP)
+#ifndef _VISTA_ENGINE_EXTERNAL_
+	int zip = 1;
+	IniManager("Game.ini").getInt("Game", "ZIP", zip);
+	if(zip)
 		ZipConfig::initArchives();
+#else
+	ZipConfig::initArchives();
 #endif
-	UI_Render::create();
 
 	GameOptions::instance().setTranslate();
-	TranslationManager::instance().setTranslationsDir("Scripts\\Engine\\Translations");
+	GameOptions::instance().loadPresets();
+	TranslationManager::instance().setTranslationsDir(".\\Scripts\\Engine\\Translations");
 	TranslationManager::instance().setDefaultLanguage("english");
 	
 	Console::instance().registerListener(&ConsoleWindow::instance());
 
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	//Инициализация FP
 	setLogicFp();
-
+#endif
 	//Инициализация внешнего модуля для Shape3D
+
+	vMap.prepare("Resource\\Worlds");//"worlds.prm",
 
 	// Инициализация библиотеки спецэффектов
 	EffectContainer::setTexturesPath("Resource\\FX\\Textures");
@@ -226,12 +224,16 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
 
-
+// App command to run the dialog
 void CSurMap5App::OnAppAbout()
 {
 	CAboutDlg aboutDlg;
 	aboutDlg.DoModal();
 }
+
+
+// CSurMap5App message handlers
+
 
 BOOL CSurMap5App::OnIdle(LONG lCount)
 {
@@ -240,6 +242,7 @@ BOOL CSurMap5App::OnIdle(LONG lCount)
 	if(result)
 		return TRUE;
 
+	//BOOL result = CWinApp::OnIdle(lCount);
 	if(!flag_animation) 
 		return FALSE;
 	else {
@@ -251,6 +254,7 @@ BOOL CSurMap5App::OnIdle(LONG lCount)
 
 void CSurMap5App::OnViewAnimation()
 {
+	// TODO: Add your command handler code here
 	if(flag_animation) flag_animation=0;
 	else flag_animation=1;
 
@@ -258,6 +262,7 @@ void CSurMap5App::OnViewAnimation()
 
 void CSurMap5App::OnUpdateViewAnimation(CCmdUI *pCmdUI)
 {
+	// TODO: Add your command update UI handler code here
 	pCmdUI->SetCheck(flag_animation);
 }
 
@@ -290,5 +295,4 @@ CSize MakeVoluntaryImageList(UINT inBitmapID, UINT toolBarBitDepth, int amountIm
 	//outImageList.Add(&bm,reinterpret_cast<CBitmap*>(NULL));
 	return buttonImgSize;
 }
-
 

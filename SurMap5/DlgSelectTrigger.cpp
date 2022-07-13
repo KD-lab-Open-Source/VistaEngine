@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "SurMap5.h"
-#include "DlgSelectTrigger.h"
+#include ".\DlgSelectTrigger.h"
+
 #include "DlgWorldName.h"
-#include "Serialization\Dictionary.h"
+#include "Dictionary.h"
 
 IMPLEMENT_DYNAMIC(CDlgSelectTrigger, CDialog)
 CDlgSelectTrigger::CDlgSelectTrigger(const char* _path2triggersFiles, const char* _title, CWnd* pParent /*=NULL*/)
@@ -56,14 +57,17 @@ BOOL CDlgSelectTrigger::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
+	// TODO:  Add extra initialization here
 	SetWindowText(title.c_str());
 
 	m_listTriggers.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_HEADERDRAGDROP);
 
+	//CString str;
 	m_listTriggers.InsertColumn(0, "TriggerName", LVCFMT_LEFT, 140);
 	fillTriggerList();
 
-	return TRUE;
+	return TRUE;  // return TRUE unless you set the focus to a control
+	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
 void CDlgSelectTrigger::OnOK()

@@ -1,13 +1,13 @@
 #include "stdafx.h"
 
 #include "SurMap5.h"
-#include "SurToolEnvironmentEditor.h"
+#include ".\SurToolEnvironmentEditor.h"
 
-#include "Game\Universe.h"
-#include "Units\Nature.h"
-#include "Units\EnvironmentSimple.h"
-#include "Game\RenderObjects.h"
-#include "Game\CameraManager.h"
+#include "..\Game\Universe.h"
+#include "..\Units\Nature.h"
+#include "..\Units\EnvironmentSimple.h"
+#include "..\Game\RenderObjects.h"
+#include "..\Game\CameraManager.h"
 
 #include "DebugUtil.h"
 

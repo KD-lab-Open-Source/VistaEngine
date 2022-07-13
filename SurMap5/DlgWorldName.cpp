@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "SurMap5.h"
 #include "DlgWorldName.h"
-#include "dlgworldname.h"
+#include ".\dlgworldname.h"
 
 
 // CDlgWorldName dialog
@@ -37,7 +37,9 @@ BOOL CDlgWorldName::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
+	// TODO:  Add extra initialization here
 	//CEdit* pWnd=(CEdit*)GetDlgItem(IDC_EDT_WORLDNAME);
 	//pWnd->SetFocus();
-	return TRUE;
+	return TRUE;  // return TRUE unless you set the focus to a control
+	// EXCEPTION: OCX Property Pages should return FALSE
 }

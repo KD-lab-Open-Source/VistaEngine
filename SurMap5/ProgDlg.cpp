@@ -1,6 +1,6 @@
 //  ProgDlg.cpp : implementation file
 // CG: This file was added by the Progress Dialog component
-//#include "SurMap5\stdafx.h"
+//#include ".\SurMap5\stdafx.h"
 #include "stdafx.h"
 #include "ProgDlg.h"
 

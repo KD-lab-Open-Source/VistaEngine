@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "SurMap5.h"
 #include "SComboBox.h"
-#include "scombobox.h"
+#include ".\scombobox.h"
 
 
 
@@ -30,6 +30,7 @@ END_MESSAGE_MAP()
 
 void CSComboBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 {
+	// TODO:  Add your code to draw the specified item
 	ASSERT(lpDrawItemStruct->CtlType == ODT_COMBOBOX);
 //	int di=GetItemData(lpDrawItemStruct->itemID);
 //	void* pdi=GetItemDataPtr(lpDrawItemStruct->itemID);
@@ -81,12 +82,16 @@ void CSComboBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 BOOL CSComboBox::PreCreateWindow(CREATESTRUCT& cs)
 {
+	// TODO: Add your specialized code here and/or call the base class
+
 	cs.style|=CBS_OWNERDRAWVARIABLE;
 	return __super::PreCreateWindow(cs);
 }
 
 void CSComboBox::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 {
+
+	// TODO:  Add your code to determine the size of specified item
 	ASSERT(lpMeasureItemStruct->CtlType == ODT_COMBOBOX);
 	lpMeasureItemStruct->itemHeight=16;
 
@@ -94,5 +99,7 @@ void CSComboBox::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 
 void CSComboBox::DeleteItem(LPDELETEITEMSTRUCT lpDeleteItemStruct)
 {
+	// TODO: Add your specialized code here and/or call the base class
+
 	__super::DeleteItem(lpDeleteItemStruct);
 }

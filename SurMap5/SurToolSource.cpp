@@ -3,16 +3,15 @@
 #include "SurToolSource.h"
 #include "DebugUtil.h"
 
-#include "AttribEditor\AttribEditorCtrl.h"
+#include "..\AttribEditor\AttribEditorCtrl.h"
 
 #include "SurToolAux.h"
-#include "Serialization\Dictionary.h"
-#include "Serialization\BinaryArchive.h"
+#include "EditArchive.h"
+#include "Dictionary.h"
 #include "EventListeners.h"
 
-#include "Environment\SourceManager.h"
-#include "Environment\SourceBase.h"
-#include "Serialization\SerializationFactory.h"
+#include "..\Environment\Environment.h"
+#include "..\Environment\SourceBase.h"
 
 struct SourceReferenceHolder{
 	SourceReference source;
@@ -45,7 +44,7 @@ BOOL CSurToolSource::OnInitDialog()
 {
     CSurToolEditable::OnInitDialog();
 
-	if(sourceManager){
+	if(environment){
 		if(sourceOnMouse_) {
 			sourceOnMouse_->kill();
 			sourceOnMouse_ = 0;
@@ -54,12 +53,12 @@ BOOL CSurToolSource::OnInitDialog()
 		setLabels(TRANSLATE("Создать источник"), "");
 
 		if(source_){
-			const char* typeNameAlt = TRANSLATE(FactorySelector<SourceBase>::Factory::instance().find(source_).nameAlt());
+			const char* typeNameAlt = TRANSLATE(ClassCreatorFactory<SourceBase>::instance().find(source_).nameAlt());
 
 			setLabels(0, typeNameAlt);
 		} 
 		if(originalSource()) {
-			sourceOnMouse_ = sourceManager->addSource(originalSource());
+			sourceOnMouse_ = environment->addSource(originalSource());
 			sourceOnMouse_->setPose(Se3f(QuatF::ID, cursorPosition()), true);
 			sourceOnMouse_->setRadius(getBrushRadius());
 			sourceOnMouse_->setActivity(sourceActive_);
@@ -67,30 +66,30 @@ BOOL CSurToolSource::OnInitDialog()
 		}
 
 		if(source_)
-			attribEditor().attachSerializer(Serializer(*sourceOnMouse_));
+			attribEditor().attachSerializeable(Serializeable(*sourceOnMouse_));
 		else
-			attribEditor().attachSerializer(Serializer(*refHolder_));
+			attribEditor().attachSerializeable(Serializeable(*refHolder_));
 	}
 	return FALSE;
 }
 
-void CSurToolSource::onBrushRadiusChanged()
+void CSurToolSource::CallBack_BrushRadiusChanged()
 {
 	onPropertyChanged();
 }
 
-bool CSurToolSource::onOperationOnMap(int x, int y)
+bool CSurToolSource::CallBack_OperationOnMap(int x, int y)
 {
 	if(vMap.isWorldLoaded () && sourceOnMouse() && originalSource()) {
-		SourceBase* src = sourceManager->addSource(sourceOnMouse()); //originalSource()
+		SourceBase* src = environment->addSource(sourceOnMouse()); //originalSource()
 		src->setPose(Se3f(QuatF::ID, To3D(Vect2f(x,y))), true);
 		//src->setActivity(originalSource()->active());
-		eventMaster().signalObjectChanged().emit(this);
+		eventMaster().eventObjectChanged().emit();
 	}
 	return true;
 }
 
-bool CSurToolSource::onDrawAuxData(void)
+bool CSurToolSource::CallBack_DrawAuxData(void)
 {
 	drawCursorCircle();
 	return true;
@@ -107,7 +106,7 @@ void CSurToolSource::serialize(Archive& ar)
 void CSurToolSource::OnDestroy()
 {
 	attribEditor().detachData();
-	if(sourceManager && sourceOnMouse_) {
+	if(environment && sourceOnMouse_) {
 		sourceOnMouse_->setActivity(false);
 		sourceOnMouse_->kill();
 		sourceOnMouse_ = 0;
@@ -116,9 +115,9 @@ void CSurToolSource::OnDestroy()
 	CSurToolEditable::OnDestroy();
 }
 
-bool CSurToolSource::onTrackingMouse(const Vect3f& worldCoord, const Vect2i& screenCoord)
+bool CSurToolSource::CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i& screenCoord)
 {
-	if(sourceManager && sourceOnMouse_) {
+	if(environment && sourceOnMouse_) {
 		sourceOnMouse_->setPose(Se3f(sourceOnMouse_->orientation(), worldCoord), true);
 	}
 	return true;
@@ -130,13 +129,13 @@ void CSurToolSource::onPropertyChanged()
 		if(!source_ && source) {
 			if(sourceOnMouse_)
 				sourceOnMouse_->kill();
-			sourceOnMouse_ = sourceManager->addSource(originalSource());
+			sourceOnMouse_ = environment->addSource(originalSource());
 			sourceOnMouse_->setRadius(getBrushRadius());
 		}
 		if(source_ && sourceOnMouse_){
 			Se3f old_pose = sourceOnMouse_->pose();
-			BinaryOArchive oa;     oa.serialize(*sourceOnMouse_, "source", "source");
-			BinaryIArchive ia(oa); ia.serialize(*source_, "source", "source");
+			EditOArchive oa;     oa.serialize(*sourceOnMouse_, "source", "source");
+			EditIArchive ia(oa); ia.serialize(*source_, "source", "source");
 			sourceActive_ = sourceOnMouse_->active();
 			sourceOnMouse_->setRadius(getBrushRadius());
 		}

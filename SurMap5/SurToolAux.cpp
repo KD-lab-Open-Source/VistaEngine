@@ -4,19 +4,18 @@
 #include "ToolsTreeWindow.h"
 #include "ToolsTreeCtrl.h"
 #include "MiniMapWindow.h"
-#include "Serialization\Dictionary.h"
+#include "Dictionary.h"
 #include "SurMapOptions.h"
-#include "SurToolAux.h"
-#include "ConsoleWindow.h"
-#include "Serialization\XPrmArchive.h"
-#include "Serialization\MultiArchive.h"
-#include "Environment\Environment.h"
-#include "Game\CameraManager.h"
-#include "Game\GameOptions.h"
-#include "FileUtils\FileUtils.h"
-#include "Water\CircleManager.h"
-#include "Game\Universe.h"
-#include "Serialization\SerializationFactory.h"
+
+#include ".\SurToolAux.h"
+#include "..\Render\inc\IVisGeneric.h"
+#include "..\Util\ConsoleWindow.h"
+#include "XPrmArchive.h"
+#include "MultiArchive.h"
+#include "ExternalShow.h"
+#include "..\Environment\Environment.h"
+#include "..\Game\CameraManager.h"
+#include "GameOptions.h"
 
 BEGIN_ENUM_DESCRIPTOR(ePopUpMenuRestriction, "ePopUpMenuRestriction")
 REGISTER_ENUM(PUMR_PermissionAll, "PUMR_PermissionAll");
@@ -45,14 +44,12 @@ CSurToolBase::CSurToolBase(int IDD, CWnd* pParent)
 	popUpMenuRestriction=PUMR_NotPermission;//PUMR_PermissionDelete;
 	iconInSurToolTree=IconISTT_Tool;
 	subfolderExpandPermission=SEP_NotPermission;
-	flag_select=false;
 }
 
 void CSurToolBase::serialize(Archive& ar) 
 {
 	ar.serialize(name_, "NodeName", 0);
 	ar.serialize(popUpMenuRestriction, "popUpMenuRestriction", 0);
-	ar.serialize(flag_select, "flag_select", 0);
 	if(!ar.isEdit())
 		ar.serialize(children_, "treeSDTB", 0);
 }
@@ -182,17 +179,6 @@ string requestModelAndPut2InternalResource(const char* resourceHomePath, const c
 			errorMessage = TRANSLATE("Ошибка копирования во внутренние ресурсы");
 			AfxMessageBox (errorMessage, MB_OK | MB_ICONERROR);
 		}
-		
-		// копируем .furinfo, если такой имеется
-		{
-		std::string fileName = extractFileBase(fileDlg.GetPathName());
-		std::string filePath = extractFilePath(fileDlg.GetPathName());
-		std::string sourceFilename = filePath + fileName + ".furinfo";
-		std::string destinationFilename = resourceHomePath;
-		destinationFilename+= "\\";
-		destinationFilename += fileName + ".furinfo";
-		CopyFile(sourceFilename.c_str(), destinationFilename.c_str(), FALSE);
-		}
 
 		//извлечение названий текстур из модели и копирование
 		vector<string> textureNames;
@@ -230,7 +216,7 @@ bool CSurToolBase::CreateExt(CWnd* parentWnd)
 void CSurToolBase::drawCursorCircle()
 {
 	int radius = getBrushRadius();
-	universe()->circleManager()->addCircle(cursorPosition_, radius, CircleManagerParam(Color4c(0, 0, 255, 255)));
+	gbCircleShow->Circle(cursorPosition_, radius, CircleColor(sColor4c(0, 0, 255)));
 }
 
 CObjectsManagerWindow& CSurToolBase::objectsManager()
@@ -255,14 +241,14 @@ void CSurToolBase::updateTreeNode ()
 {
 	if(treeItem())
 		if(CMainFrame* mainFrame = static_cast<CMainFrame*>(AfxGetMainWnd()))
-			mainFrame->getToolWindow().getTree().GetTreeCtrl().SetItemText(treeItem(), name());
+			mainFrame->getToolWindow().getTree().SetItemText(treeItem(), name());
 }
 
 void CSurToolBase::TrackMouse (const Vect3f& worldCoord, const Vect2i& screenCoord)
 {
 	cursorPosition_ = worldCoord;
 	cursorScreenPosition_ = screenCoord;
-	onTrackingMouse(worldCoord, screenCoord);
+	CallBack_TrackingMouse(worldCoord, screenCoord);
 }
 
 BOOL CSurToolBase::DestroyWindow()
@@ -312,12 +298,6 @@ void CSurToolBase::pushEditorMode(CSurToolBase* editorMode)
 {
     CToolsTreeWindow& toolWindow = ((CMainFrame*)AfxGetMainWnd())->getToolWindow();
 	toolWindow.pushEditorMode(editorMode);
-}
-
-void CSurToolBase::replaceEditorModeSelect()
-{
-    CToolsTreeWindow& toolWindow = ((CMainFrame*)AfxGetMainWnd())->getToolWindow();
-	toolWindow.replaceEditorMode(toolWindow.tools()[CToolsTreeWindow::TOOL_SELECT]);
 }
 
 void CSurToolBase::drawPreviewTexture(cTexture* texture, int width, int height, const sRectangle4f& rect)

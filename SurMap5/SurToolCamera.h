@@ -4,19 +4,18 @@
 #include "EScroll.h"
 #include "SurToolAux.h"
 #include "SurToolEditable.h"
-#include "EventListeners.h"
 
 class CameraSpline;
 class CameraCoordinate;
 
-class CSurToolCamera : public CSurToolEditable, public ObjectObserver, public sigslot::has_slots
+class CSurToolCamera : public CSurToolEditable
 {
 	DECLARE_DYNAMIC(CSurToolCamera)
 public:
 	CSurToolCamera(CWnd* parent = 0);
 	virtual ~CSurToolCamera();
 
-	bool onOperationOnMap(int x, int y);
+	bool CallBack_OperationOnMap(int x, int y);
 
 	virtual BOOL OnInitDialog();
 protected:

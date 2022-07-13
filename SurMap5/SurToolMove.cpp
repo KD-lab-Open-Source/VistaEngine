@@ -1,10 +1,8 @@
 #include "stdafx.h"
 #include "SurToolMove.h"
 #include "SelectionUtil.h"
-#include "Game\RenderObjects.h"
-#include "Game\CameraManager.h"
-#include "Render\Src\cCamera.h"
-#include "SystemUtil.h"
+#include "..\Game\RenderObjects.h"
+#include "..\Game\CameraManager.h"
 
 namespace UniverseObjectActions{
 struct Move : UniverseObjectAction{
@@ -32,10 +30,10 @@ CSurToolMove::CSurToolMove(CWnd* parent)
     transformAxis_[2] = false;
 }
 
-bool CSurToolMove::onTrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord)
+bool CSurToolMove::CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord)
 {
 	using namespace UniverseObjectActions;
-	CSurToolTransform::onTrackingMouse(worldCoord, scrCoord);
+	CSurToolTransform::CallBack_TrackingMouse(worldCoord, scrCoord);
 	const float CLONE_THRESHOLD = 10.0f; // world units
 
 	if(buttonPressed_){
@@ -83,7 +81,7 @@ bool CSurToolMove::onTrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCo
 	return true;
 }
 
-bool CSurToolMove::onDrawAuxData()
+bool CSurToolMove::CallBack_DrawAuxData()
 {
     Vect3f position = selectionCenter_;
     drawAxis (position, selectionRadius_, transformAxis_);
@@ -125,16 +123,16 @@ void CSurToolMove::onTransformAxisChanged(int index)
 	}
 }
 
-bool CSurToolMove::onLMBDown(const Vect3f& worldCoord, const Vect2i& scrCoord )
+bool CSurToolMove::CallBack_LMBDown(const Vect3f& worldCoord, const Vect2i& scrCoord )
 {
 	if(::isAltPressed())
 		cloneOnMove_ = true;
-	return __super::onLMBDown(worldCoord, scrCoord);
+	return __super::CallBack_LMBDown(worldCoord, scrCoord);
 }
 
-bool CSurToolMove::onLMBUp(const Vect3f& coord, const Vect2i& screenCoord)
+bool CSurToolMove::CallBack_LMBUp(const Vect3f& coord, const Vect2i& screenCoord)
 {
 	using namespace UniverseObjectActions;
 	forEachSelected(Move(Vect3f::ZERO, true));
-	return __super::onLMBUp(coord, screenCoord);
+	return __super::CallBack_LMBUp(coord, screenCoord);
 }

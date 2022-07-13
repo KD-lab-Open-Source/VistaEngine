@@ -3,7 +3,7 @@
 
 #include "SynchroTimer.h"
 
-#include "Render\inc\fps.h"
+#include "..\render\inc\fps.h"
 #include "EventListeners.h"
 #include "ExtStatusBarProgressCtrl.h"
 
@@ -30,7 +30,7 @@ class CToolsTreeWindow;
 class CGeneralView;
 class CMiniMapWindow;
 
-class CMainFrame : public CFrameWnd, public EventMaster, public ObjectObserver, public WorldObserver, public sigslot::has_slots
+class CMainFrame : public CFrameWnd, public EventMaster, SelectionChangedListener
 {
 	DECLARE_DYNAMIC(CMainFrame)
 public:
@@ -60,16 +60,14 @@ public:
 
 	CGeneralView& view() { return *view_; }
 
-	bool reloadMenu();
 
 	void resetWorkspace();
 
-	void setSpeed(float speed);
 	bool universeQuant();
 	void put2TitleNameDirWorld(void);
 	void editLibrary(const char* libraryName = "");
-	void save(const char* worldName);
-	void onSelectionChanged(SelectionObserver* changer);
+	void save(const char* worldName, bool flag_useTerToolColor=true);
+	void onSelectionChanged();
 
 	static UINT toolBarID() {
 #ifdef _VISTA_ENGINE_EXTERNAL_
@@ -134,16 +132,17 @@ public:
 	afx_msg void OnFileSave();
 	afx_msg void OnFileSaveas();
 
-	afx_msg void OnFileExportImportWorld();
-
     afx_msg void OnFileMerge();
 
 	afx_msg void OnFileSaveminimaptoworld();
 
 	afx_msg void OnFileRunWorld();
 	afx_msg void OnFileRunMenu();
+
 	afx_msg void OnFileProperties();
+
 	afx_msg void OnFileExportVistaEngine();
+
 
 	afx_msg void OnFileSavewithouttertoolcolor();
 	afx_msg void OnFileSaveVoiceFileDurations();
@@ -151,8 +150,7 @@ public:
 	afx_msg void OnFileResaveTriggers();
 
 	// Edit menu
-	afx_msg void OnEditMap();
-	afx_msg void OnEditPreset();
+	afx_msg void OnEditMapScenario();
 	afx_msg void OnEditRebuildworld();
 	afx_msg void OnEditUpdateSurface();
 	afx_msg void OnEditPreferences();
@@ -163,8 +161,6 @@ public:
 
 	afx_msg void OnUpdateViewToolbar(CCmdUI *pCmdUI);
 	afx_msg void OnViewToolbar();
-	afx_msg void OnUpdateViewShowCameraBorders(CCmdUI *pCmdUI);
-	afx_msg void OnViewShowCameraBorders();
 
 	afx_msg void OnActivateApp(BOOL bActive, DWORD dwThreadID);
 	afx_msg void OnEditPlaypmo();
@@ -211,6 +207,7 @@ public:
 	afx_msg void OnEditHeads();
 	afx_msg void OnEditSoundTracks();
 	afx_msg void OnEditReels();
+	afx_msg void OnEditGlobalTrigger();
 	afx_msg void OnUpdateViewCameras(CCmdUI *pCmdUI);
 
 	afx_msg void OnViewSources();
@@ -231,6 +228,7 @@ public:
 
 	afx_msg void OnEditEffectsEditor();
 	afx_msg void OnEditCursors();
+	afx_msg void OnEditFormations();
 
 	afx_msg void OnDebugEditDebugPrm();
 	afx_msg void OnDebugEditAuxAttribute();
@@ -245,13 +243,11 @@ public:
 			void reloadLocStrings();
 	afx_msg void OnDebugUISpriteLib();
 	afx_msg void OnEditUITextSprites();
-	afx_msg void OnEditCommandColor();
 
 	LRESULT OnConstructPopupMenu(WPARAM wParam, LPARAM lParam);
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	afx_msg void OnLibrariesUIMessageTypes();
 	afx_msg void OnLibrariesUIMessages();
-	afx_msg void OnLibrariesUIShowModeSprites();
 
 	afx_msg void OnImportParameters();
 	afx_msg void OnExportParameters();
@@ -269,9 +265,6 @@ public:
 	afx_msg void OnFileParametersExportUnits();
 	afx_msg void OnFileParametersExportFull();
 	afx_msg void OnFileParametersExportStatistics();
-	afx_msg void OnFileUpdateQuickStartWorldsList();
-	afx_msg void OnLibrariesTerrraintypename();
-	afx_msg void OnEditRollingborder();
 };
 
 CMainFrame& mainFrame();

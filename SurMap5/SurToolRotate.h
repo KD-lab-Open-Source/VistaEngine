@@ -7,9 +7,9 @@
 class CSurToolRotate : public CSurToolTransform {
 public:
     CSurToolRotate(CWnd* parent = NULL);
-    bool onTrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord);
-	bool onLMBUp(const Vect3f& worldCoord, const Vect2i& screenCoord);
-    bool onDrawAuxData();
+    bool CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord);
+	bool CallBack_LMBUp(const Vect3f& worldCoord, const Vect2i& screenCoord);
+    bool CallBack_DrawAuxData();
 
 protected:
 	void onTransformAxisChanged(int index);

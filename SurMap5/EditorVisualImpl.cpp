@@ -1,18 +1,19 @@
 #include "StdAfx.h"
 #include "EditorVisual.h"
-#include "Game\CameraManager.h"
-#include "Game\Universe.h"
-#include "Water\CircleManager.h"
-#include "Units\Squad.h"
+#include "..\Game\CameraManager.h"
+#include "..\Game\Universe.h"
+#include "..\Units\ExternalShow.h"
+#include "..\Units\Squad.h"
 #include "MainFrame.h"
 #include "SurMapOptions.h"
+
 #include "EventListeners.h"
-#include "Terra\vMap.h"
-#include "Render\Src\cCamera.h"
 
 namespace EditorVisual{
 
-class Impl : public Interface, public WorldObserver, public sigslot::has_slots{
+class Impl : public Interface, public WorldChangedListener
+		
+{
 public:
 	Impl();
 	~Impl();
@@ -28,7 +29,7 @@ public:
 	void drawOrientationArrow(const Se3f& pose, bool selected);
 
 	// virtuals (WorldChangedListener):
-	void onWorldChanged(WorldObserver* changer);
+	void onWorldChanged();
 protected:
 	void createAuxUnit();
 	void killAuxUnit();
@@ -37,7 +38,7 @@ protected:
 
 Impl::Impl()
 {
-	static_cast<CMainFrame*>(AfxGetMainWnd())->signalWorldChanged().connect(this, &Impl::onWorldChanged);
+	static_cast<CMainFrame*>(AfxGetMainWnd())->eventWorldChanged().registerListener(this);
 }
 
 Impl::~Impl()
@@ -87,7 +88,7 @@ void Impl::killAuxUnit()
 	}
 }
 
-void Impl::onWorldChanged(WorldObserver* changer)
+void Impl::onWorldChanged()
 {
 	//createAuxUnit();
 }
@@ -117,23 +118,23 @@ void Impl::drawImpassabilityRadius(UnitBase& unit)
 
 void Impl::drawCross(const Vect3f& position, float size, CrossType crossType, bool selected)
 {
-	Color4c color = selected ? Color4c::RED : Color4c::GREEN;
+	sColor4c color = selected ? RED : GREEN;
 	gb_RenderDevice->DrawLine(position + Vect3f(-size, 0.0f, 0.0f), position + Vect3f(size, 0.0f, 0.0f), color);
 	gb_RenderDevice->DrawLine(position + Vect3f(0.0f, -size, 0.0f), position + Vect3f(0.0f, size, 0.0f), color);
 }
 
 void Impl::drawRadius(const Vect3f& position, float radius, RadiusType radiusType, bool selected)
 {
-	Color4c color = selected ? Color4c::RED : Color4c::GREEN;
+	sColor4c color = selected ? RED : GREEN;
 	switch(radiusType){
 	case RADIUS_IMPASSABILITY:
-		universe()->circleManager()->addCircle(position, max(radius, 7.0f), CircleManagerParam(Color4c::MAGENTA));
+		universe()->circleShow()->Circle(position, max(radius, 7.0f), MAGENTA);
 		break;
 	case RADIUS_OBJECT:
-		universe()->circleManager()->addCircle(position, max(radius, 7.0f), CircleManagerParam(color));
+		universe()->circleShow()->Circle(position, max(radius, 7.0f), color);
 		break;
 	default:
-		universe()->circleManager()->addCircle(position, max(radius, 7.0f), CircleManagerParam(color));
+		universe()->circleShow()->Circle(position, max(radius, 7.0f), color);
 		break;
 	}
 }
@@ -142,20 +143,20 @@ void Impl::drawText(const Vect3f& position, const char* text, TextType textType)
 {
 	Vect3f e, w;
 	cameraManager->GetCamera()->ConvertorWorldToViewPort(&position, &w, &e);
-	Color4c color;
+	sColor4c color;
 	switch(textType){
 	case TEXT_LABEL:
-		color = Color4c::RED;
+		color = RED;
 		break;
 	case TEXT_PROPERTIES:
-		color = Color4c::BLUE;
+		color = BLUE;
 		e.y += 16;
 		break;
 	default:
-		color = Color4c::WHITE;
+		color = WHITE;
 		break;
 	}
-	gb_RenderDevice->OutText(round(e.x), round(e.y), text, Color4f(color));
+	gb_RenderDevice->OutText(round(e.x), round(e.y), text, sColor4f(color));
 }
 
 void Impl::drawOrientationArrow(const Se3f& pose, bool selected)
@@ -179,7 +180,7 @@ void Impl::drawOrientationArrow(const Se3f& pose, bool selected)
 		Vect3f b = points [i] * scale;
 		pose.rot().xform(a);
 		pose.rot().xform(b);
-		gb_RenderDevice->DrawLine(pos3d + a, pos3d + b, Color4c (0, 200, 0));
+		gb_RenderDevice->DrawLine(pos3d + a, pos3d + b, sColor4c (0, 200, 0));
 	}
 }
 

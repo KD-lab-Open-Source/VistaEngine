@@ -1,8 +1,8 @@
 #ifndef __FILE_LIBRARY_EDITOR_DLG_H_INCLUDED__
 #define __FILE_LIBRARY_EDITOR_DLG_H_INCLUDED__
 
-#include "MFC\SizeLayoutManager.h"
-#include "MFC\TreeListCtrl.h"
+#include "..\Util\MFC\SizeLayoutManager.h"
+#include "..\Util\MFC\TreeListCtrl.h"
 
 // CFileLibraryEditorDlg dialog
 

@@ -2,7 +2,8 @@
 #define __TOOLS_TREE_CTRL_H_INCLUDED__
 
 #include "Handle.h"
-#include "Serialization/ComboStrings.h"
+
+#include "TreeInterface.h"
 
 class CSurToolBase;
 class CMainFrame;
@@ -11,7 +12,7 @@ class PopupMenu;
 
 typedef vector< ShareHandle<CSurToolBase> > SurTools;
 
-class CToolsTreeCtrl : public CTreeView //CTreeCtrl
+class CToolsTreeCtrl : public CTreeCtrl
 {
 	DECLARE_DYNAMIC(CToolsTreeCtrl)
 
@@ -77,11 +78,9 @@ protected:
 	CSurToolBase* pCurrentNode;
 	HTREEITEM curTreeItemRClick;
 	bool flag_tree_build;
-	HTREEITEM lastHTreeSelect; 
 
 	DECLARE_MESSAGE_MAP()
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-	virtual void OnInitialUpdate();
 public:
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 };

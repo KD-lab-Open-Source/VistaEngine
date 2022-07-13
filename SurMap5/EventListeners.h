@@ -1,25 +1,21 @@
 #ifndef __EVENT_LISTENERS_H_INCLUDED__
 #define __EVENT_LISTENERS_H_INCLUDED__
 
-#include "XTL/sigslot.h"
+#include "Event.h"
 
-struct SelectionObserver{};
-struct ObjectObserver{};
-struct WorldObserver{};
+DECLARE_EVENT(WorldChanged);
+DECLARE_EVENT(ObjectChanged);
+DECLARE_EVENT(SelectionChanged);
 
 class EventMaster{
 public:
-	typedef sigslot::signal1<WorldObserver*> SignalWorldChanged;
-	SignalWorldChanged& signalWorldChanged(){ return signalWorldChanged_; }
-	typedef sigslot::signal1<ObjectObserver*> SignalObjectChanged;
-	SignalObjectChanged& signalObjectChanged(){ return signalObjectChanged_; }
-	typedef sigslot::signal1<SelectionObserver*> SignalSelectionChanged;
-	SignalSelectionChanged& signalSelectionChanged(){ return signalSelectionChanged_; }
-
+	EventWorldChanged& eventWorldChanged() { return eventWorldChanged_; }
+	EventObjectChanged& eventObjectChanged() { return eventObjectChanged_; }
+	EventSelectionChanged& eventSelectionChanged() { return eventSelectionChanged_; }
 protected:
-	SignalWorldChanged signalWorldChanged_;
-	SignalSelectionChanged signalSelectionChanged_;
-	SignalObjectChanged signalObjectChanged_;
+	EventSelectionChanged eventSelectionChanged_;
+	EventObjectChanged eventObjectChanged_;
+	EventWorldChanged eventWorldChanged_;
 };
 
 EventMaster& eventMaster();

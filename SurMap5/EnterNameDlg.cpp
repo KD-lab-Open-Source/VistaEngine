@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "SurMap5.h"
 #include "EnterNameDlg.h"
-#include "enternamedlg.h"
+#include ".\enternamedlg.h"
 
 
 // CEnterNameDlg dialog

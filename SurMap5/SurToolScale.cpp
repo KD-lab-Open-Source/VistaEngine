@@ -1,19 +1,17 @@
 #include "stdafx.h"
 #include "SurToolScale.h"
-#include "Units\BaseUniverseObject.h"
+#include "..\Units\BaseUniverseObject.h"
 
-#include "Environment\Environment.h"
+#include "..\Environment\Environment.h"
 
 #include "ObjectsManagerWindow.h"
-#include "Serialization\Serialization.h"
+#include "Serialization.h"
+// ^^
 
-#include "Game\RenderObjects.h"
-#include "Game\CameraManager.h"
+#include "..\Game\RenderObjects.h"
+#include "..\Game\CameraManager.h"
 
 #include "SelectionUtil.h"
-#include "Render\Src\cCamera.h"
-#include "Render\Inc\IRenderDevice.h"
-
 namespace UniverseObjectActions{
 
 struct ScaleOnCenter : UniverseObjectAction{
@@ -62,10 +60,10 @@ CSurToolScale::CSurToolScale(CWnd* parent)
     transformAxis_[2] = true;
 }
 
-bool CSurToolScale::onTrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord)
+bool CSurToolScale::CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord)
 {
 	using namespace UniverseObjectActions;
-	CSurToolTransform::onTrackingMouse(worldCoord, scrCoord);
+	CSurToolTransform::CallBack_TrackingMouse(worldCoord, scrCoord);
 
     if(buttonPressed_) {
 		Vect3f pos, dir;
@@ -104,13 +102,13 @@ void CSurToolScale::onTransformAxisChanged(int index)
 	transformAxis_[2] = true;
 }
 
-bool CSurToolScale::onDrawAuxData()
+bool CSurToolScale::CallBack_DrawAuxData()
 {
     drawAxis (selectionCenter_, selectionRadius_, transformAxis_);
 
 	if(buttonPressed_) {
-		gb_RenderDevice->DrawLine (selectionCenter_, selectionCenter_ + startPoint_, Color4c(0, 0, 255));
-		gb_RenderDevice->DrawLine (selectionCenter_, selectionCenter_ + endPoint_, Color4c(255, 255, 255));
+		gb_RenderDevice->DrawLine (selectionCenter_, selectionCenter_ + startPoint_, sColor4c(0, 0, 255));
+		gb_RenderDevice->DrawLine (selectionCenter_, selectionCenter_ + endPoint_, sColor4c(255, 255, 255));
 	}
 	return true;
 }

@@ -25,7 +25,7 @@ public:
 	int m_PowShiftCS4RG;
 	int m_Curving;
 
-	virtual bool onOperationOnMap(int x, int y);
+	virtual bool CallBack_OperationOnMap(int x, int y);
 
 	void serialize(Archive& ar);
 

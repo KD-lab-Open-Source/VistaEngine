@@ -1,12 +1,10 @@
 #include "stdafx.h"
 #include "ParameterImportExportExcel.h"
-#include "ExcelExport\ExcelExporter.h"
-#include "Units\Parameters.h"
-#include "Units\UnitAttribute.h"
-#include "Serialization\Dictionary.h"
-#include "Serialization\StringTable.h"
-#include "UnicodeConverter.h"
-#include "WBuffer.h"
+#include "..\ExcelExport\ExcelExporter.h"
+#include "..\Units\Parameters.h"
+#include "..\Units\UnitAttribute.h"
+#include "Dictionary.h"
+
 
 ParameterImportExcel::ParameterImportExcel(const char* filename)
 {
@@ -31,16 +29,18 @@ void ParameterImportExcel::importParameters()
 	int rows_count = usedRange.height();
 
 	for(int i = 2; i < rows_count; i++) {
-		std::string group = w2a(application_->getCellText(Vect2i(0, i)));
+		std::string group = application_->getCellText(Vect2i(0, i));
 		std::string type = "";
 		for(int j = 1; j < columns_count; j++) {
-			string fulltype = w2a(application_->getCellText(Vect2i(j, 0)));
-			size_t pos = fulltype.find('[');
-			if(pos != string::npos)
-				fulltype = fulltype.substr(pos);
-			if(!fulltype.empty()) 
-				type = fulltype;
-			std::string colName = w2a(application_->getCellText(Vect2i(j, 1)));
+			char dest[512] = "";
+			const char* fulltype_ = application_->getCellText(Vect2i(j, 0));
+			const char* pdest = strrchr(fulltype_, '[');
+			if(pdest) 
+				strncpy(dest, fulltype_,(int)(pdest - fulltype_) - 1);
+			std::string type_ = dest;
+			if(type_ != "") 
+				type = type_;
+			std::string colName = application_->getCellText(Vect2i(j, 1));
 	        FOR_EACH(strings, it)
 			    if (group == TRANSLATE((*it).group()->c_str()) && type == TRANSLATE((*it).type()->c_str()) && strcmp((*it).c_str(), "") != 0) {
 					char columnName[16] = "";
@@ -55,7 +55,7 @@ void ParameterImportExcel::importParameters()
 
 					if(strcmp(columnName, "") != 0){ 
 						if(strcmp(colName.c_str(), columnName) == 0){ 
-							std::string value = w2a(application_->getCellText(Vect2i(j, i)));
+							std::string value = application_->getCellText(Vect2i(j, i));
 							if (value == "")
 									xassert(0 && "Проверьте правильность данных!!!");
 
@@ -88,7 +88,7 @@ ParameterExportExcel::~ParameterExportExcel()
 
 void ParameterExportExcel::exportParameters()
 {
-	application_->setCellText(Vect2i(0,0), a2w(TRANSLATE("Группа/Имя параметра")).c_str());
+	application_->setCellText(Vect2i(0,0), TRANSLATE("Группа/Имя параметра"));
 
 	const ParameterValueTable::Strings& valueStrings = ParameterValueTable::instance().strings();
     ParameterValueTable::Strings::const_iterator vi;
@@ -123,17 +123,17 @@ void ParameterExportExcel::exportParameters()
 		int column = subTypeCount;
 		vector<string>::iterator ci;
 		if(!columnNames.empty()){ 
-			WBuffer buf_(XB_DEFSIZE,1);
+			XBuffer buf_(XB_DEFSIZE,1);
 			buf_ < TRANSLATE((*ti).c_str());
 			int posBracket = buf_.tell() + 2;
-			buf_ < L" [" < TRANSLATE((*ti).comment()) < L"]";
-			application_->setCellText(Vect2i(column + 1, 0), buf_.c_str());
+			buf_ < " [" < TRANSLATE((*ti).comment()) < "]";
+			application_->setCellText(Vect2i(column + 1, 0), buf_);
 			application_->setTextColor(Vect2i(column + 1, 0), 1, posBracket - 1 , 0, "Tahoma", 12, true, false);
 			application_->setTextColor(Vect2i(column + 1, 0), posBracket , buf_.tell() - posBracket + 1, 54, "Tahoma", 9, false, false);
 		}
 		FOR_EACH(columnNames, ci){
 			column++;
-			application_->setCellText(Vect2i(column, 1), a2w(*ci).c_str());
+			application_->setCellText(Vect2i(column, 1), (*ci).c_str());
 		}
 		if (column - subTypeCount > 1)
 			application_->mergeCellRange(Recti(subTypeCount + 1, 0, column - subTypeCount, 1));
@@ -156,16 +156,17 @@ void ParameterExportExcel::exportParameters()
 					
 						int col = subTypeCount + distance(columnNames.begin(),find(columnNames.begin(), columnNames.end(), columnName)) + 1;
 						
-						application_->setCellComment(Vect2i(col, row), a2w(TRANSLATE((*vi).c_str())).c_str());
-						WBuffer buf;
-						wchar_t charBuf[16] = L"";
-						swprintf(charBuf, 16, L"%.7g", (*vi).rawValue()); 
+						application_->setCellComment(Vect2i(col, row), TRANSLATE((*vi).c_str()));
+						XBuffer buf;
+						char charBuf[16] = "";
+						sprintf(charBuf, "%.7g", (*vi).rawValue()); 
 						buf	< charBuf;
 						int devidePosition = buf.tell() + 1;
-						swprintf(charBuf, 16, L"%.7g", (*vi).value()); 
-						buf < L"/" < charBuf;
+						char charBuf_[16] = "";
+						sprintf(charBuf_, "%.7g", (*vi).value()); 
+						buf < "/" < charBuf_;
 						application_->setCellFormat(Vect2i(col, row), "@"); //"@" - текстовый формат
-						application_->setCellText(Vect2i(col, row), buf.c_str());
+						application_->setCellText(Vect2i(col, row), buf);
 						if ((*vi).canModify()) { 
   							application_->setTextColor(Vect2i(col, row), 1, devidePosition - 1, 5, "Tahoma", 12, true, false);
 							int color_ = _stricmp((*vi).formula().get()->formula().c_str(), FormulaString().c_str()) != 0 ? 3 : 5;
@@ -187,7 +188,7 @@ void ParameterExportExcel::exportParameters()
 
 	int row = 2;
     FOR_EACH(groupStrings, gi) {
-        application_->setCellText(Vect2i(0, row), a2w(TRANSLATE((*gi).c_str())).c_str());
+        application_->setCellText(Vect2i(0, row), TRANSLATE((*gi).c_str()));
 		++row;
 	}
 	application_->setFont(Recti(0, 0, 1, 1), "Tahoma", 12.0f, true, false);

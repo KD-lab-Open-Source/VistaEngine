@@ -19,7 +19,7 @@ public:
 
 	void serialize(Archive& ar);
 
-	bool onDrawAuxData(void);
+	bool CallBack_DrawAuxData(void);
 
 // Dialog Data
 	int getIDD() const { return IDD_BARDLG_WATERSRC; }
@@ -38,9 +38,9 @@ public:
 class CSurToolWater : public CSurToolWaterSrc
 {
 public:
-	bool onOperationOnMap(int x, int y);
+	bool CallBack_OperationOnMap(int x, int y);
 	void serialize(Archive& ar);
-	bool onDrawAuxData(void);
+	bool CallBack_DrawAuxData(void);
 
 // Dialog Data
 	int getIDD() const { return IDD_BARDLG_WATERSRC; }

@@ -1,15 +1,19 @@
 #include "StdAfx.h"
-#include "Serialization\Serialization.h"
+#include "Serialization.h"
 #include "SurMapOptions.h"
-#include "Environment\Environment.h"
+#include "..\Environment\Environment.h"
 #include "ConsoleWindow.h"
-#include "Serialization\Dictionary.h"
-#include "UserInterface\UI_Types.h"
-#include "Game\GameOptions.h"
-#include "Serialization\XPrmArchive.h"
-#include "MainFrame.h"
+#include "Dictionary.h"
 
-const char* SurMapOptions::configFile = "UserInterface.cfg";
+#include "..\UserInterface\UI_Types.h"
+#include "GameOptions.h"
+
+// will be removed:
+#include "XPrmArchive.h"
+#include "EditArchive.h"
+// ^^^
+
+const char* SurMapOptions::configFile = ".\\UserInterface.cfg";
 SurMapOptions surMapOptions;
 
 SurMapOptions::SurMapOptions()
@@ -17,10 +21,8 @@ SurMapOptions::SurMapOptions()
 , showSources_(true)
 , showCameras_(true)
 , hideWorldModels_(false)
-, cameraBorderSelection_(0, 0, 0, 0)
 {
-	showFog_ = false;
-	zFarInfinite = false;
+	showFog_ = true;
 
 	lastToolzerRadius=1;
 	lastToolzerForm=0;
@@ -29,11 +31,10 @@ SurMapOptions::SurMapOptions()
 	enableGrid_ = false;
 	gridColor_.set(0, 255, 0, 128);
 
-	showCameraBorders_ = false;
+	//restrictCamera_ = false;
+	enableCameraBorder_ = false;
 	cameraBorderColor_.set(0, 150, 0, 192);
 	cameraBorderMinimapColor_.set(0, 150, 0, 192);
-
-	evolutionSpeed = 1;
 }
 
 SurMapOptions::~SurMapOptions()
@@ -89,11 +90,10 @@ void SurMapOptions::serialize(Archive& ar)
 	ar.serialize(showSources_, "showSources", 0);
 
 	if(ar.isEdit())
-		GameOptions::instance().serializeForEditor(ar, GameOptions::GRAPHICS | GameOptions::SOUND | GameOptions::GAME
-		                                               | GameOptions::CAMERA | GameOptions::SYSTEM);
+		GameOptions::instance().serializeForEditor(ar, GameOptions::GRAPHICS | GameOptions::SOUND | GameOptions::GAME | GameOptions::CAMERA);
 
 	ar.openBlock("", "Отображение камер/ограниений камеры");
-	ar.serialize(showCameraBorders_, "showCameraBorders", "Показывать ограничение камеры на мире");
+	ar.serialize(enableCameraBorder_, "enableCameraBorder", "Показывать ограничение камеры на мире");
 	ar.serialize(cameraBorderColor_, "cameraBorderColor", "Цвет рамки камеры на мире");
 	ar.serialize(cameraBorderMinimapColor_, "cameraBorderMinimapColor", "Цвет рамки камеры на миникарте");
 	ar.closeBlock();
@@ -105,8 +105,6 @@ void SurMapOptions::serialize(Archive& ar)
 	ar.closeBlock();
 
 	ar.serialize(showFog_, "showFog", "Отображать туман (в редакторе)");
-	ar.serialize(zFarInfinite, "zFarInfinite", "Снять ограничение на дальность камеры");
-	ar.serialize(evolutionSpeed, "evolutionSpeed", "Скорость эволюции");
 
 	if(!ar.isEdit()){
 		ConsoleWindow::Options consoleOptions = ConsoleWindow::instance().options();
@@ -139,6 +137,4 @@ void SurMapOptions::apply()
 	TranslationManager::instance().setLanguage(GameOptions::instance().getLanguage());
 	if(environment)
 		environment->setFogTempDisabled(!showFog_);
-
-	mainFrame().setSpeed(evolutionSpeed);
 }

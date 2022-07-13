@@ -2,12 +2,12 @@
 #define __SUR_TOOL_SOURCE_H_INCLUDED__
 
 #include "SurToolEditable.h"
-#include "Environment\SourceBase.h"
-#include "EventListeners.h"
+
+#include "..\Environment\Environment.h"
 
 class Archive;
 struct SourceReferenceHolder;
-class CSurToolSource : public CSurToolEditable, public ObjectObserver {
+class CSurToolSource : public CSurToolEditable {
 
 	DECLARE_DYNAMIC(CSurToolSource)
 public:
@@ -16,13 +16,13 @@ public:
 
 	void quant();
 
-	bool onOperationOnMap(int x, int y);
-	void onBrushRadiusChanged();
-	bool onTrackingMouse(const Vect3f& worldCoord, const Vect2i& screenCoord);
+	bool CallBack_OperationOnMap(int x, int y);
+	void CallBack_BrushRadiusChanged();
+	bool CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i& screenCoord);
 
 	void onPropertyChanged();
 
-	bool onDrawAuxData(void);
+	bool CallBack_DrawAuxData(void);
 
 	void serialize(Archive& ar);
 	const SourceBase* originalSource();

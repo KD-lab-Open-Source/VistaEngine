@@ -21,12 +21,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;..,ProfUIS\Include;..\Util;..\Units;..\AttribEditor\TreeListCtrl\include"
+				AdditionalIncludeDirectories="..\XLibs.Net\MSDXSDK_02_06\Include;..\XLibs.Net\stl;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XUtil\CRC;..\XLibs.Net\Heap;..\XLibs.Net\XUtil;..\Util\;..\Util;.;ProfUIS\Include;..\Util\Serialization;..\Scripts;..\Units;..\Network;..\Render\Client;..\Render\Inc;..\Sound;..\AI;..\AttribEditor\TreeListCtrl\include;..\XLibs.Net\XZip"
 				PreprocessorDefinitions="_SURMAP_,EXPORT_ATTRIB_EDITOR,_VISTA_ENGINE_EDITOR_"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				TreatWChar_tAsBuiltInType="FALSE"
+				TreatWChar_tAsBuiltInType="TRUE"
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="3"
@@ -39,12 +39,13 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="dsound.lib PlayOggDbgMT.lib ExcelExport.lib shlwapi.lib XMathMtDbg.lib"
 				OutputFile="$(OutDir)/VistaEngineDbg.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)..&quot;;&quot;$(SolutionDir)\ProfUIS\Bin_710\&quot;;c:\arhiv\7z\7z433\7zip\Bundles\Alone\Debug"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)..&quot;;&quot;$(SolutionDir)\ProfUIS\Bin_710\&quot;;..\XLibs.Net\lib;..\XLibs.Net\MSDXSDK_02_06\Lib\x86;&quot;C:\Windows.old-Windows-7\Users\DileSoft\Documents\git\VistaEnginePrivate2003\Util\XMath\&quot;"
 				IgnoreAllDefaultLibraries="FALSE"
-				IgnoreDefaultLibraryNames=""
+				IgnoreDefaultLibraryNames="libcmt.lib libcpmtd.lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/VistaEngineDBG.pdb"
 				SubSystem="2"
@@ -84,12 +85,12 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".;..,ProfUIS\Include;..\Util;..\Units;..\AttribEditor\TreeListCtrl\include"
+				AdditionalIncludeDirectories=".;ProfUIS\Include;..\Util;..\Util\Serialization;..\Scripts;..\Units;..\Network;..\Render\Client;..\Render\Inc;..\Sound;..\AI;..\AttribEditor\TreeListCtrl\include"
 				PreprocessorDefinitions="_SURMAP_;EXPORT_ATTRIB_EDITOR;_VISTA_ENGINE_EDITOR_"
 				StringPooling="TRUE"
 				MinimalRebuild="FALSE"
 				RuntimeLibrary="0"
-				TreatWChar_tAsBuiltInType="FALSE"
+				TreatWChar_tAsBuiltInType="TRUE"
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="3"
@@ -101,7 +102,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies=""
+				AdditionalDependencies="dsound.lib PlayOggMT.lib ExcelExport.lib shlwapi.lib"
 				ShowProgress="0"
 				OutputFile="$(OutDir)/VistaEngine.exe"
 				LinkIncremental="1"
@@ -149,13 +150,12 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".;..,ProfUIS\Include;..\Util;..\Units;..\AttribEditor\TreeListCtrl\include"
-				PreprocessorDefinitions="_SURMAP_;_VISTA_ENGINE_EXTERNAL_;_VISTA_ENGINE_EDITOR_;_FINAL_VERSION_"
+				AdditionalIncludeDirectories=".;ProfUIS\Include;..\Util;..\Util\Serialization;..\Scripts;..\Units;..\Network;..\Render\Client;..\Render\Inc;..\Sound;..\AI;..\AttribEditor\TreeListCtrl\include"
+				PreprocessorDefinitions="_SURMAP_;_VISTA_ENGINE_EXTERNAL_;_VISTA_ENGINE_EDITOR_"
 				StringPooling="TRUE"
 				MinimalRebuild="FALSE"
 				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="TRUE"
-				TreatWChar_tAsBuiltInType="FALSE"
+				TreatWChar_tAsBuiltInType="TRUE"
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="3"
@@ -167,79 +167,13 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies=""
+				AdditionalDependencies="dsound.lib PlayOggMT.lib ExcelExport.lib shlwapi.lib"
 				OutputFile="$(OutDir)/VistaEngineExt.exe"
 				LinkIncremental="1"
-				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="&quot;$(SolutionDir)..&quot;;&quot;$(SolutionDir)\ProfUIS\Bin_710\&quot;"
 				IgnoreDefaultLibraryNames=""
-				GenerateDebugInformation="FALSE"
-				ProgramDatabaseFile="$(OutDir)/VistaEngineExt.pdb"
-				SubSystem="2"
-				OptimizeReferences="0"
-				EnableCOMDATFolding="0"
-				TargetMachine="1"/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="FALSE"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
-		<Configuration
-			Name="ReleaseDLL|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			UseOfMFC="2"
-			CharacterSet="2">
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".;..,ProfUIS\Include;..\Util;..\Units;..\AttribEditor\TreeListCtrl\include"
-				PreprocessorDefinitions="_SURMAP_;EXPORT_ATTRIB_EDITOR;_VISTA_ENGINE_EDITOR_"
-				StringPooling="TRUE"
-				MinimalRebuild="FALSE"
-				RuntimeLibrary="2"
-				TreatWChar_tAsBuiltInType="FALSE"
-				ForceConformanceInForLoopScope="TRUE"
-				RuntimeTypeInfo="TRUE"
-				UsePrecompiledHeader="3"
-				PrecompiledHeaderFile="$(IntDir)/$(TargetName).pch"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="3"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="d3d9.lib d3dx9.lib binkw32.lib dinput8.lib"
-				ShowProgress="0"
-				OutputFile="$(OutDir)/VistaEngine.exe"
-				LinkIncremental="2"
-				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)..&quot;;&quot;$(SolutionDir)\ProfUIS\Bin_710\&quot;"
-				IgnoreDefaultLibraryNames="stlport_static.5.0.lib;libcmt.lib;XUtilVC7Mt.lib;ProfilerMT.lib"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/VistaEngine.pdb"
+				ProgramDatabaseFile="$(OutDir)/VistaEngineExt.pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -270,75 +204,137 @@
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
-		<Configuration
-			Name="DebugDLL|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			UseOfMFC="2"
-			CharacterSet="2">
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories=".;..,ProfUIS\Include;..\Util;..\Units;..\AttribEditor\TreeListCtrl\include"
-				PreprocessorDefinitions="_SURMAP_,EXPORT_ATTRIB_EDITOR,_VISTA_ENGINE_EDITOR_"
-				MinimalRebuild="TRUE"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				TreatWChar_tAsBuiltInType="FALSE"
-				ForceConformanceInForLoopScope="TRUE"
-				RuntimeTypeInfo="TRUE"
-				UsePrecompiledHeader="3"
-				BrowseInformation="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="3"
-				ShowIncludes="FALSE"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="dxguid.lib d3d9.lib d3dx9.lib"
-				OutputFile="$(OutDir)/VistaEngineDbg.exe"
-				LinkIncremental="1"
-				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)..&quot;;&quot;$(SolutionDir)\ProfUIS\Bin_710\&quot;"
-				IgnoreAllDefaultLibraries="FALSE"
-				IgnoreDefaultLibraryNames="stlportd_static.5.0.lib;libcmtd.lib;XUtilVC7dbgMt.lib"
-				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/VistaEngineDBG.pdb"
-				SubSystem="2"
-				TargetMachine="1"/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="FALSE"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
 	</Configurations>
 	<References>
 	</References>
 	<Files>
+		<Filter
+			Name="Sources"
+			Filter=""
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			<File
+				RelativePath="..\Util\AttribEditorInterface.h">
+			</File>
+			<File
+				RelativePath="..\Util\AttribEditorInterfaceImpl.cpp">
+			</File>
+			<File
+				RelativePath=".\EditorVisualImpl.cpp">
+			</File>
+			<File
+				RelativePath=".\GeneralView.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseExternal|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\GeneralView.h">
+			</File>
+			<File
+				RelativePath=".\MainFrame.cpp">
+			</File>
+			<File
+				RelativePath=".\MainFrame.h">
+			</File>
+			<File
+				RelativePath=".\MiniMapWindow.cpp">
+			</File>
+			<File
+				RelativePath=".\MiniMapWindow.h">
+			</File>
+			<File
+				RelativePath=".\ObjectsManagerTree.cpp">
+			</File>
+			<File
+				RelativePath=".\ObjectsManagerTree.h">
+			</File>
+			<File
+				RelativePath=".\ObjectsManagerWindow.cpp">
+			</File>
+			<File
+				RelativePath=".\ObjectsManagerWindow.h">
+			</File>
+			<File
+				RelativePath=".\Resource.h">
+			</File>
+			<File
+				RelativePath=".\resource.hm">
+			</File>
+			<File
+				RelativePath=".\stdafx.cpp">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseExternal|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\stdafx.h">
+			</File>
+			<File
+				RelativePath=".\SurMap5.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseExternal|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\SurMap5.h">
+			</File>
+			<File
+				RelativePath=".\SurMapOptions.cpp">
+			</File>
+			<File
+				RelativePath=".\SurMapOptions.h">
+			</File>
+			<File
+				RelativePath=".\ToolsTreeCtrl.cpp">
+			</File>
+			<File
+				RelativePath=".\ToolsTreeCtrl.h">
+			</File>
+			<File
+				RelativePath=".\ToolsTreeWindow.cpp">
+			</File>
+			<File
+				RelativePath=".\ToolsTreeWindow.h">
+			</File>
+			<File
+				RelativePath=".\VistaEngineContext.cpp">
+			</File>
+		</Filter>
 		<Filter
 			Name="Dialogs &amp; Windows"
 			Filter="">
@@ -349,22 +345,16 @@
 				RelativePath=".\CreateAttribDlg.h">
 			</File>
 			<File
-				RelativePath=".\DlgBorderRolling.cpp">
-			</File>
-			<File
-				RelativePath=".\DlgBorderRolling.h">
-			</File>
-			<File
 				RelativePath=".\DlgChangeTotalWorldHeight.cpp">
 			</File>
 			<File
 				RelativePath=".\DlgChangeTotalWorldHeight.h">
 			</File>
 			<File
-				RelativePath=".\DlgExImWorld.cpp">
+				RelativePath=".\DlgCreateWorld.cpp">
 			</File>
 			<File
-				RelativePath=".\DlgExImWorld.h">
+				RelativePath=".\DlgCreateWorld.h">
 			</File>
 			<File
 				RelativePath=".\DlgSelectTrigger.cpp">
@@ -391,6 +381,24 @@
 				RelativePath=".\EnterNameDlg.h">
 			</File>
 			<File
+				RelativePath=".\ExcelFileStruct.h">
+			</File>
+			<File
+				RelativePath=".\ExcelImEx.h">
+			</File>
+			<File
+				RelativePath=".\FileLibraryEditorDlg.cpp">
+			</File>
+			<File
+				RelativePath=".\FileLibraryEditorDlg.h">
+			</File>
+			<File
+				RelativePath=".\FormationsEditorDlg.cpp">
+			</File>
+			<File
+				RelativePath=".\FormationsEditorDlg.h">
+			</File>
+			<File
 				RelativePath=".\NameComboDlg.cpp">
 			</File>
 			<File
@@ -409,16 +417,10 @@
 				RelativePath=".\ProgDlg.h">
 			</File>
 			<File
-				RelativePath="..\Util\SplashScreen.cpp">
+				RelativePath=".\SelectFolderDialog.cpp">
 			</File>
 			<File
-				RelativePath="..\Util\SplashScreen.h">
-			</File>
-			<File
-				RelativePath=".\TimeSliderDlg.cpp">
-			</File>
-			<File
-				RelativePath=".\TimeSliderDlg.h">
+				RelativePath=".\SelectFolderDialog.h">
 			</File>
 			<File
 				RelativePath=".\WaveDlg.cpp">
@@ -465,10 +467,10 @@
 				RelativePath=".\res\Bm_bkgnd.bmp">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\bm_bkgnd2.bmp">
+				RelativePath=".\res\bm_bkgnd2.bmp">
 			</File>
 			<File
-				RelativePath=".\res\bm_bkgnd2.bmp">
+				RelativePath=".\AttribEditorCtrl\res\bm_bkgnd2.bmp">
 			</File>
 			<File
 				RelativePath=".\res\bm_checkbox.bmp">
@@ -486,16 +488,13 @@
 				RelativePath=".\AttribEditorCtrl\res\bm_def_sort.bmp">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\bm_def_sort.bmp">
-			</File>
-			<File
 				RelativePath=".\res\bm_def_sort.bmp">
 			</File>
 			<File
-				RelativePath=".\res\bm_def_tree.bmp">
+				RelativePath=".\AttribEditorCtrl\res\bm_def_tree.bmp">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\bm_def_tree.bmp">
+				RelativePath=".\res\bm_def_tree.bmp">
 			</File>
 			<File
 				RelativePath=".\res\bm_lockbox.bmp">
@@ -531,13 +530,13 @@
 				RelativePath=".\res\Cur_drop.cur">
 			</File>
 			<File
+				RelativePath=".\res\Cur_horz.cur">
+			</File>
+			<File
+				RelativePath=".\res\Cur_horz.cur">
+			</File>
+			<File
 				RelativePath=".\AttribEditorCtrl\res\Cur_horz.cur">
-			</File>
-			<File
-				RelativePath=".\res\Cur_horz.cur">
-			</File>
-			<File
-				RelativePath=".\res\Cur_horz.cur">
 			</File>
 			<File
 				RelativePath=".\AttribEditorCtrl\res\cur_lockbox.cur">
@@ -546,19 +545,16 @@
 				RelativePath=".\res\cur_lockbox.cur">
 			</File>
 			<File
-				RelativePath=".\res\cur_lockbox.cur">
+				RelativePath=".\AttribEditorCtrl\res\cur_lockbox.cur">
 			</File>
 			<File
 				RelativePath=".\res\Cur_size.cur">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\cur_split.cur">
-			</File>
-			<File
 				RelativePath=".\res\cur_split.cur">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\Cur_stop.cur">
+				RelativePath=".\AttribEditorCtrl\res\cur_split.cur">
 			</File>
 			<File
 				RelativePath=".\AttribEditorCtrl\res\Cur_stop.cur">
@@ -567,34 +563,31 @@
 				RelativePath=".\res\Cur_stop.cur">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\Cur_vert.cur">
+				RelativePath=".\AttribEditorCtrl\res\Cur_stop.cur">
 			</File>
 			<File
 				RelativePath=".\res\Cur_vert.cur">
 			</File>
 			<File
+				RelativePath=".\AttribEditorCtrl\res\Cur_vert.cur">
+			</File>
+			<File
 				RelativePath=".\AttribEditorCtrl\res\cursor1.cur">
+			</File>
+			<File
+				RelativePath=".\AttribEditorCtrl\res\cursor_s.cur">
 			</File>
 			<File
 				RelativePath=".\res\cursor_s.cur">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\cursor_s.cur">
-			</File>
-			<File
-				RelativePath=".\AttribEditorCtrl\res\cursor_s.cur">
+				RelativePath=".\res\cursor_s.cur">
 			</File>
 			<File
 				RelativePath=".\res\editors_.bmp">
 			</File>
 			<File
-				RelativePath=".\res\fpoint.cur">
-			</File>
-			<File
 				RelativePath=".\PropTree\res\fpoint.cur">
-			</File>
-			<File
-				RelativePath=".\res\fpoint.cur">
 			</File>
 			<File
 				RelativePath=".\AttribEditorCtrl\PropTree\res\fpoint.cur">
@@ -603,7 +596,10 @@
 				RelativePath=".\res\fpoint.cur">
 			</File>
 			<File
-				RelativePath=".\res\FX_Pan_256.bmp">
+				RelativePath=".\res\fpoint.cur">
+			</File>
+			<File
+				RelativePath=".\res\fpoint.cur">
 			</File>
 			<File
 				RelativePath=".\res\hdrdown.bmp">
@@ -612,16 +608,16 @@
 				RelativePath=".\res\hdrup.bmp">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\AttribEditorCtrl\res\icons.bmp">
-			</File>
-			<File
-				RelativePath=".\res\icons.bmp">
-			</File>
-			<File
-				RelativePath=".\res\icons.bmp">
-			</File>
-			<File
 				RelativePath=".\AttribEditorCtrl\res\icons.bmp">
+			</File>
+			<File
+				RelativePath=".\res\icons.bmp">
+			</File>
+			<File
+				RelativePath=".\res\icons.bmp">
+			</File>
+			<File
+				RelativePath=".\AttribEditorCtrl\AttribEditorCtrl\res\icons.bmp">
 			</File>
 			<File
 				RelativePath=".\res\ifi.bmp">
@@ -648,7 +644,7 @@
 				RelativePath=".\res\nodrop.cur">
 			</File>
 			<File
-				RelativePath=".\res\nodrop.cur">
+				RelativePath=".\AttribEditorCtrl\res\nodrop.cur">
 			</File>
 			<File
 				RelativePath=".\res\Splash.bmp">
@@ -702,9 +698,6 @@
 				RelativePath=".\res\ToolbarFilters.bmp">
 			</File>
 			<File
-				RelativePath=".\res\ToolbarFiltersExternal.bmp">
-			</File>
-			<File
 				RelativePath=".\res\ToolbarLibraries.bmp">
 			</File>
 			<File
@@ -731,159 +724,51 @@
 			<File
 				RelativePath="..\vistaengine_version.rc">
 			</File>
-			<Filter
-				Name="Sources"
-				Filter=""
-				UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
-				<File
-					RelativePath=".\EditorVisualImpl.cpp">
-				</File>
-				<File
-					RelativePath=".\GeneralView.cpp">
-					<FileConfiguration
-						Name="Release|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="ReleaseExternal|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="ReleaseDLL|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath=".\GeneralView.h">
-				</File>
-				<File
-					RelativePath=".\MainFrame.cpp">
-				</File>
-				<File
-					RelativePath=".\MainFrame.h">
-				</File>
-				<File
-					RelativePath=".\MiniMapWindow.cpp">
-				</File>
-				<File
-					RelativePath=".\MiniMapWindow.h">
-				</File>
-				<File
-					RelativePath=".\ObjectsManagerTree.cpp">
-				</File>
-				<File
-					RelativePath=".\ObjectsManagerTree.h">
-				</File>
-				<File
-					RelativePath=".\ObjectsManagerWindow.cpp">
-				</File>
-				<File
-					RelativePath=".\ObjectsManagerWindow.h">
-				</File>
-				<File
-					RelativePath=".\Resource.h">
-				</File>
-				<File
-					RelativePath=".\resource.hm">
-				</File>
-				<File
-					RelativePath=".\stdafx.cpp">
-					<FileConfiguration
-						Name="Debug|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="1"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="1"
-							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="ReleaseExternal|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="1"
-							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="ReleaseDLL|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="1"
-							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="DebugDLL|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="1"/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath=".\stdafx.h">
-				</File>
-				<File
-					RelativePath=".\SurMap5.cpp">
-					<FileConfiguration
-						Name="Release|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="ReleaseExternal|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="ReleaseDLL|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath=".\SurMap5.h">
-				</File>
-				<File
-					RelativePath=".\SurMapOptions.cpp">
-				</File>
-				<File
-					RelativePath=".\SurMapOptions.h">
-				</File>
-				<File
-					RelativePath=".\ToolsTreeCtrl.cpp">
-				</File>
-				<File
-					RelativePath=".\ToolsTreeCtrl.h">
-				</File>
-				<File
-					RelativePath=".\ToolsTreeWindow.cpp">
-				</File>
-				<File
-					RelativePath=".\ToolsTreeWindow.h">
-				</File>
-				<File
-					RelativePath=".\VistaEngineContext.cpp">
-				</File>
-				<File
-					RelativePath=".\WorldTreeObjects.h">
-				</File>
-			</Filter>
+		</Filter>
+		<Filter
+			Name="Utl2"
+			Filter="">
+			<File
+				RelativePath=".\Utl\shape3D.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseExternal|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+			</File>
+		</Filter>
+		<Filter
+			Name="Interfaces"
+			Filter="">
+			<File
+				RelativePath=".\Utl\shape3D.h">
+			</File>
+			<File
+				RelativePath="..\Util\TreeInterface.h">
+			</File>
+			<File
+				RelativePath="..\UserInterface\UI_ControlsAux.cpp">
+			</File>
+			<File
+				RelativePath="..\UserInterface\UI_LogicAux.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="SurTool&apos;s"
 			Filter="">
+			<File
+				RelativePath=".\NormalizeTga.cpp">
+			</File>
+			<File
+				RelativePath=".\NormalizeTGA.h">
+			</File>
 			<File
 				RelativePath=".\SelectionUtil.cpp">
 			</File>
@@ -900,12 +785,6 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="ReleaseExternal|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseDLL|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
@@ -934,12 +813,6 @@
 						Name="VCCLCompilerTool"
 						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseDLL|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\SurToolAux.h">
@@ -954,12 +827,6 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="ReleaseExternal|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseDLL|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
@@ -1012,12 +879,6 @@
 						Name="VCCLCompilerTool"
 						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseDLL|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\SurToolEmpty.h">
@@ -1060,12 +921,6 @@
 						Name="VCCLCompilerTool"
 						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseDLL|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\SurToolImp.h">
@@ -1081,12 +936,6 @@
 			</File>
 			<File
 				RelativePath=".\SurToolMiniDetaile.h">
-			</File>
-			<File
-				RelativePath=".\SurToolMiniDetaileFolder.cpp">
-			</File>
-			<File
-				RelativePath=".\SurToolMiniDetaileFolder.h">
 			</File>
 			<File
 				RelativePath=".\SurToolMove.cpp">
@@ -1137,12 +986,6 @@
 				RelativePath=".\SurToolSource.h">
 			</File>
 			<File
-				RelativePath=".\SurToolSpecFilter.cpp">
-			</File>
-			<File
-				RelativePath=".\SurToolSpecFilter.h">
-			</File>
-			<File
 				RelativePath=".\SurToolToolzer.cpp">
 				<FileConfiguration
 					Name="Release|Win32">
@@ -1152,12 +995,6 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="ReleaseExternal|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseDLL|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
@@ -1201,10 +1038,49 @@
 			Name="AttribEditor"
 			Filter="">
 			<File
+				RelativePath="..\AttribEditor\AttribColorComboBox.cpp">
+			</File>
+			<File
+				RelativePath="..\AttribEditor\AttribColorComboBox.h">
+			</File>
+			<File
+				RelativePath="..\AttribEditor\attribcombobox.CPP">
+			</File>
+			<File
+				RelativePath="..\AttribEditor\AttribComboBox.h">
+			</File>
+			<File
 				RelativePath="..\AttribEditor\AttribEditorCtrl.cpp">
 			</File>
 			<File
 				RelativePath="..\AttribEditor\AttribEditorCtrl.h">
+			</File>
+			<File
+				RelativePath="..\AttribEditor\AttribEditorDlg.cpp">
+			</File>
+			<File
+				RelativePath="..\AttribEditor\AttribEditorDlg.h">
+			</File>
+			<File
+				RelativePath="..\AttribEditor\AttribEditorDrawNotifyListener.cpp">
+			</File>
+			<File
+				RelativePath="..\AttribEditor\AttribEditorDrawNotifyListener.h">
+			</File>
+			<File
+				RelativePath="..\AttribEditor\CheckComboBox.cpp">
+			</File>
+			<File
+				RelativePath="..\AttribEditor\CheckComboBox.h">
+			</File>
+			<File
+				RelativePath="..\AttribEditor\CustomEdit.cpp">
+			</File>
+			<File
+				RelativePath="..\AttribEditor\CustomEdit.h">
+			</File>
+			<File
+				RelativePath="..\Util\Functor.h">
 			</File>
 			<File
 				RelativePath="..\Util\mfc\PopupMenu.cpp">
@@ -1212,16 +1088,287 @@
 			<File
 				RelativePath="..\Util\mfc\PopupMenu.h">
 			</File>
+			<File
+				RelativePath=".\SerializeableUniverseObject.h">
+			</File>
+			<File
+				RelativePath="..\Util\TreeEditor.h">
+			</File>
+			<File
+				RelativePath="..\AttribEditor\Dll\TreeNodeStorageImpl.cpp">
+			</File>
+			<File
+				RelativePath="..\AttribEditor\Dll\TreeNodeStorageImpl.h">
+			</File>
+			<Filter
+				Name="TreeEditors"
+				Filter="">
+				<File
+					RelativePath=".\TreeEditors\ColorRampCtrl.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\ColorRampCtrl.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\ColorSelector.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\ColorSelector.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\ColorSelectorWindow.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\ColorSelectorWindow.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\ColorUtils.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\ConditionEditor.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\ConditionEditor.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\ConditionEditorDlg.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\ConditionEditorDlg.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\ConditionList.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\ConditionList.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\FormationEditor.cpp">
+					<FileConfiguration
+						Name="Debug|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="ReleaseExternal|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\TreeEditors\FormationEditor.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\FormationEditorDlg.cpp">
+					<FileConfiguration
+						Name="Debug|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="ReleaseExternal|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\TreeEditors\FormationEditorDlg.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\FormulaEditorDlg.cpp">
+					<FileConfiguration
+						Name="Debug|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="ReleaseExternal|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\TreeEditors\FormulaEditorDlg.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\GradientEditor.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\GradientEditor.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\GradientEditorWindow.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\GradientEditorWindow.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\GradientPositionCtrl.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\GradientPositionCtrl.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\HotKeySelectorDlg.cpp">
+					<FileConfiguration
+						Name="Debug|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="ReleaseExternal|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\TreeEditors\HotKeySelectorDlg.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\IConditionDroppable.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\ParameterComboBox.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\ParameterComboBox.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\ReferenceTreeBuilder.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\SolidColorCtrl.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\SolidColorCtrl.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\TreeColorComboEditor.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\TreeColorSelector.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\TreeComboBox.cpp">
+					<FileConfiguration
+						Name="Debug|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="ReleaseExternal|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\TreeEditors\TreeComboBox.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\TreeConditionEditor.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\TreeEffectContainerEditor.cpp">
+				</File>
+				<File
+					RelativePath="..\AttribEditor\TreeEditors\TreeFileSelector.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\TreeFormationEditor.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\TreeFormulaEditor.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\TreeGradientEditor.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\TreeHotKeySelector.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\TreeRangedEditor.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\TreeReferenceEditor.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\TreeResourceSelector.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\TreeSelector.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\TreeSelector.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\TreeShadowingOptionsEditor.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\TreeTypeLibrarySelector.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\TreeUIControlReferenceSelector.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\TreeUISpriteEditor.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\UISpriteEditor.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\UISpriteEditor.h">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\UISpriteEditorDlg.cpp">
+				</File>
+				<File
+					RelativePath=".\TreeEditors\UISpriteEditorDlg.h">
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Generic Controls"
 			Filter="">
-			<File
-				RelativePath=".\ColorButton.cpp">
-			</File>
-			<File
-				RelativePath=".\ColorButton.h">
-			</File>
 			<File
 				RelativePath=".\EScroll.cpp">
 				<FileConfiguration
@@ -1232,12 +1379,6 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="ReleaseExternal|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseDLL|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
@@ -1263,6 +1404,9 @@
 			</File>
 			<File
 				RelativePath=".\ListViewCtrlEx.h">
+			</File>
+			<File
+				RelativePath="..\Util\mfc\MemDC.h">
 			</File>
 		</Filter>
 		<Filter
@@ -1300,15 +1444,12 @@
 						Name="VCCLCompilerTool"
 						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseDLL|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\SComboBox.h">
+			</File>
+			<File
+				RelativePath="..\AttribEditor\Serializeable.h">
 			</File>
 		</Filter>
 		<Filter
@@ -1317,58 +1458,121 @@
 			<File
 				RelativePath="..\ExcelExport\ExcelExporter.h">
 			</File>
+		</Filter>
+		<Filter
+			Name="LibraryEditor"
+			Filter="">
 			<File
-				RelativePath=".\ExcelImEx.cpp">
+				RelativePath=".\LibraryAttribEditor.cpp">
 			</File>
 			<File
-				RelativePath=".\ExcelImEx.h">
+				RelativePath=".\LibraryAttribEditor.h">
 			</File>
 			<File
-				RelativePath=".\ExportTreeToExcel.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="DebugDLL|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
+				RelativePath=".\LibraryBookmark.h">
 			</File>
 			<File
-				RelativePath=".\ExportTreeToExcel.h">
+				RelativePath=".\LibraryEditorTree.cpp">
 			</File>
 			<File
-				RelativePath=".\ParameterImportExportExcel.cpp">
+				RelativePath=".\LibraryEditorTree.h">
 			</File>
 			<File
-				RelativePath=".\ParameterImportExportExcel.h">
+				RelativePath=".\LibraryEditorWindow.cpp">
 			</File>
 			<File
-				RelativePath=".\ParameterStatisticsExport.cpp">
+				RelativePath=".\LibraryEditorWindow.h">
 			</File>
 			<File
-				RelativePath=".\ParameterStatisticsExport.h">
+				RelativePath=".\LibraryTab.cpp">
 			</File>
 			<File
-				RelativePath=".\ParameterTree.cpp">
+				RelativePath=".\LibraryTab.h">
 			</File>
 			<File
-				RelativePath=".\ParameterTree.h">
+				RelativePath=".\LibraryTabCtrl.cpp">
 			</File>
 			<File
-				RelativePath=".\UnitListExportExcel.cpp">
+				RelativePath=".\LibraryTabCtrl.h">
 			</File>
 			<File
-				RelativePath=".\UnitListExportExcel.h">
+				RelativePath=".\LibraryTreeObject.h">
 			</File>
+			<Filter
+				Name="custom"
+				Filter="">
+				<File
+					RelativePath=".\LibraryCustomEffectEditor.cpp">
+				</File>
+				<File
+					RelativePath=".\LibraryCustomEffectEditor.h">
+				</File>
+				<File
+					RelativePath=".\LibraryCustomParameterEditor.cpp">
+				</File>
+				<File
+					RelativePath=".\LibraryUnitTreeObject.cpp">
+				</File>
+			</Filter>
+			<Filter
+				Name="Export-Import"
+				Filter="">
+				<File
+					RelativePath=".\BalanceStats.cpp">
+				</File>
+				<File
+					RelativePath=".\BalanceStats.h">
+				</File>
+				<File
+					RelativePath=".\ExportTreeToExcel.cpp">
+					<FileConfiguration
+						Name="Debug|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\ExportTreeToExcel.h">
+				</File>
+				<File
+					RelativePath=".\ParameterImportExportExcel.cpp">
+				</File>
+				<File
+					RelativePath=".\ParameterImportExportExcel.h">
+				</File>
+				<File
+					RelativePath=".\ParameterStatisticsExport.cpp">
+				</File>
+				<File
+					RelativePath=".\ParameterStatisticsExport.h">
+				</File>
+				<File
+					RelativePath=".\ParameterTree.cpp">
+				</File>
+				<File
+					RelativePath=".\ParameterTree.h">
+				</File>
+				<File
+					RelativePath=".\UnitListExportExcel.cpp">
+				</File>
+				<File
+					RelativePath=".\UnitListExportExcel.h">
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Util"
 			Filter="">
+			<File
+				RelativePath="..\Util\Serialization\lib\Dictionary.cpp">
+			</File>
+			<File
+				RelativePath=".\Event.cpp">
+			</File>
+			<File
+				RelativePath=".\Event.h">
+			</File>
 			<File
 				RelativePath=".\EventListeners.cpp">
 			</File>
@@ -1376,18 +1580,30 @@
 				RelativePath=".\EventListeners.h">
 			</File>
 			<File
-				RelativePath=".\SerializerUniverseObject.h">
-			</File>
-			<File
 				RelativePath="..\Util\mfc\SizeLayoutManager.h">
 			</File>
 			<File
-				RelativePath="..\UserInterface\UI_ControlsAux.cpp">
+				RelativePath="..\Util\SplashScreen.cpp">
 			</File>
 			<File
-				RelativePath="..\UserInterface\UI_LogicAux.cpp">
+				RelativePath="..\Util\SplashScreen.h">
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\FormulaEditorDlg.h">
+		</File>
+		<File
+			RelativePath=".\SortListCtrl.cpp">
+		</File>
+		<File
+			RelativePath=".\SortListCtrl.h">
+		</File>
+		<File
+			RelativePath=".\TimeSliderDlg.cpp">
+		</File>
+		<File
+			RelativePath=".\TimeSliderDlg.h">
+		</File>
 		<File
 			RelativePath="..\Resource\Scripts\VistaEngine.scr">
 		</File>

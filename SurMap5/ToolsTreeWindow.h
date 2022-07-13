@@ -3,6 +3,7 @@
 
 #include "Handle.h"
 #include "SComboBox.h"
+#include "TreeInterface.h"
 
 class CSurToolBase;
 class CToolsTreeCtrl;
@@ -38,16 +39,6 @@ public:
 
 	CToolsTreeCtrl& getTree() { return tree_; }
 
-	enum {
-		TOOL_SELECT,
-		TOOL_MOVE,
-		TOOL_ROTATE,
-		TOOL_SCALE,
-		TOOL_MAX
-	};
-	typedef std::vector < ShareHandle<CSurToolBase> > Tools;
-	Tools& tools(){ return tools_; }
-
 	BOOL Create(CMainFrame* parent, CExtControlBar* bar);
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
@@ -64,12 +55,20 @@ protected:
     DECLARE_DYNAMIC(CToolsTreeWindow)
 	DECLARE_MESSAGE_MAP()
 private:
+	enum {
+		TOOL_SELECT,
+		TOOL_MOVE,
+		TOOL_ROTATE,
+		TOOL_SCALE,
+		TOOL_MAX
+	};
 
 	void setCurrentTool(CSurToolBase* tool);
 	void destroyToolWindows();
 
 	bool transformToolsEnabled_;
 
+	typedef std::vector < ShareHandle<CSurToolBase> > Tools;
 	Tools tools_;
 
 	CFont defaultFont_;

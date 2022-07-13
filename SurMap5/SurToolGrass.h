@@ -14,9 +14,9 @@ public:
 
 	int getIDD() const { return IDD_BARDLG_GRASS; }
 
-	bool onDrawAuxData();
-	bool onOperationOnMap(int x, int y);
-	bool onDrawPreview(int width, int height);
+	bool CallBack_DrawAuxData();
+	bool CallBack_OperationOnMap(int x, int y);
+	bool CallBack_DrawPreview(int width, int height);
 	virtual BOOL OnInitDialog();
 	afx_msg void OnDestroy();
 	static int nextGrass;

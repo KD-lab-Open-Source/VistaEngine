@@ -2,7 +2,7 @@
 #define __SUR_TOOL_PATH_EDITOR_H_INCLUDED__
 
 #include "SurToolAux.h"
-#include "MFC\SizeLayoutManager.h"
+#include "..\Util\MFC\SizeLayoutManager.h"
 
 class SourceBase;
 class BaseUniverseObject;
@@ -14,16 +14,16 @@ public:
 	CSurToolPathEditor(BaseUniverseObject* source);   // standard constructor
 	virtual ~CSurToolPathEditor();
 
-	bool onTrackingMouse (const Vect3f& worldCoord, const Vect2i& scrCoord);
-	bool onLMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord);
-	bool onLMBUp(const Vect3f& worldCoord, const Vect2i& screenCoord);
-	bool onRMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord);
-	void onSelectionChanged ();
+	bool CallBack_TrackingMouse (const Vect3f& worldCoord, const Vect2i& scrCoord);
+	bool CallBack_LMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord);
+	bool CallBack_LMBUp(const Vect3f& worldCoord, const Vect2i& screenCoord);
+	bool CallBack_RMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord);
+	void CallBack_SelectionChanged ();
 
-	bool onDelete();
-    bool onKeyDown(unsigned int keyCode, bool shift, bool control, bool alt);
+	bool CallBack_Delete();
+    bool CallBack_KeyDown(unsigned int keyCode, bool shift, bool control, bool alt);
 
-	bool onDrawAuxData();
+	bool CallBack_DrawAuxData();
 
 	int nodeUnderPoint(const Vect3f& worldCoord);
     void setSelectedNode(int node);

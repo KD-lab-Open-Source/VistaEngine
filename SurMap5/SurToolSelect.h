@@ -2,14 +2,14 @@
 #define __SUR_TOOL_SELECT_H_INCLUDED__
 
 #include "SurToolAux.h"
-#include "MFC\SizeLayoutManager.h"
-#include "Serialization\Serializer.h"
+#include "..\Util\MFC\SizeLayoutManager.h"
+#include "Serializeable.h"
 #include "EventListeners.h"
 
 class CAttribEditorCtrl;
 
-class CSurToolSelect : public CSurToolBase, public sigslot::has_slots,
-	public ObjectObserver, public SelectionObserver
+class CSurToolSelect : public CSurToolBase,
+	public ObjectChangedListener, public SelectionChangedListener
 {
 	DECLARE_DYNAMIC(CSurToolSelect)
 public:
@@ -29,31 +29,30 @@ public:
 		int numCameras;
 	};
 
-	typedef std::vector<Serializer> Serializers;
+	typedef std::vector<Serializeable> Serializeables;
 
 	CSurToolSelect(CWnd* pParent = NULL);
 	~CSurToolSelect();
 
     void serialize(Archive& ar);
 
-	bool onTrackingMouse (const Vect3f& worldCoord, const Vect2i& scrCoord);
-	bool onLMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord);
-	bool onLMBUp(const Vect3f& worldCoord, const Vect2i& screenCoord);
-	bool onRMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord);
-	void onSelectionChanged();
+	bool CallBack_TrackingMouse (const Vect3f& worldCoord, const Vect2i& scrCoord);
+	bool CallBack_LMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord);
+	bool CallBack_LMBUp(const Vect3f& worldCoord, const Vect2i& screenCoord);
+	bool CallBack_RMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord);
+	void CallBack_SelectionChanged();
 
-	bool onDelete();
-	bool onKeyDown (unsigned int keyCode, bool shift, bool control, bool alt);
+	bool CallBack_Delete();
+	bool CallBack_KeyDown (unsigned int keyCode, bool shift, bool control, bool alt);
 
-	bool onDrawAuxData(void);
+	bool CallBack_DrawAuxData(void);
 	void updateLayout();
 	void showControls(bool multiselect);
 
 	int getIDD() const { return IDD_BARDLG_SELECT; }
 
-	void onObjectChanged(ObjectObserver* changer);
-	void onSelectionChanged(SelectionObserver* changer);
-	void onPropertyChanged();
+	void onObjectChanged();
+	void onSelectionChanged();
 
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnEditButton();
@@ -67,7 +66,7 @@ protected:
 private:
 	void calcSubEditorRect(CRect& rect);
 
-	Serializers serializeables_;
+	Serializeables serializeables_;
 	std::string selectionDescription_;
 	SelectionCount selectionCount_;
 
@@ -87,7 +86,6 @@ private:
     float randomSelectionChance_;
     
 	bool flag_mouseLBDown;
-	bool objectChangedEmitted_;
 
 	static std::vector<CSurToolSelect*> instances_;
 public:

@@ -4,9 +4,9 @@
 #include "stdafx.h"
 #include "WaveDlg.h"
 #include "EnterNameDlg.h"
-#include "Environment\Environment.h"
+#include "..\Environment\Environment.h"
 #include "SurToolAux.h"
-#include "wavedlg.h"
+#include ".\wavedlg.h"
 // CWaveDlg dialog
 
 IMPLEMENT_DYNAMIC(CWaveDlg, CDialog)
@@ -60,7 +60,7 @@ void CWaveDlg::OnBnClickedCreateWave()
 		{
 			if (environment->fixedWaves()->GetWave(i)->name() == dlg.buf)
 			{
-				MessageBox("Такое имя уже существует!!!","Error!!!",MB_ICONERROR|MB_OK);
+				MessageBox("Таоке имя уже существует!!!","Error!!!",MB_ICONERROR|MB_OK);
 				return;
 			}
 		}
@@ -213,6 +213,12 @@ void CWaveDlg::OnBnClickedApply()
 	}
 }
 
+void CWaveDlg::OnCancel()
+{
+	//// TODO: Add your specialized code here and/or call the base class
+
+	CDialog::OnCancel();
+}
 
 void CWaveDlg::OnOK()
 {

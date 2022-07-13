@@ -3,18 +3,15 @@
 
 #include <string>
 
-#include "MainFrame.h"
-#include "GeneralView.h"
+#include ".\MainFrame.h"
+#include ".\GeneralView.h"
 
-#include "Serialization\Serializer.h"
-#include "Serialization\XPrmArchive.h"
-#include "Serialization/Dictionary.h"
-#include "kdw/PropertyEditor.h"
-#include "kdw/TreeSelector.h"
-#include "kdw/ReferenceTreeBuilder.h"
-#include "kdw/HotkeyDialog.h"
-#include "kdw/LibraryEditorDialog.h"
+#include "Serializeable.h"
+#include "EditArchive.h"
+#include "XPrmArchive.h"
 
+#include "DlgCreateWorld.h"
+#include "SelectFolderDialog.h"
 #include "WaveDlg.h"
 #include "TimeSliderDlg.h"
 #include "ToolsTreeWindow.h"
@@ -22,75 +19,61 @@
 #include "MiniMapWindow.h"
 
 #include "DlgSelectWorld.h"
-#include "DlgExImWorld.h"
 #include "DlgChangeTotalWorldHeight.h"
-#include "DlgBorderRolling.h"
 
+#include "LibraryEditorWindow.h"
 #include "WorldPropertiesDlg.h"
+#include "FileLibraryEditorDlg.h"
+#include "FormationsEditorDlg.h"
 #include "SurToolSelect.h"
 #include "ToolsTreeCtrl.h"
 #include "SurMapOptions.h"
-#include "Serialization\GenericFileSelector.h"
-#include "Serialization\SerializationFactory.h"
-#include "Render\src\TileMap.h"
-#include "Render\Src\VisGeneric.h"
+#include "TreeEditors\TreeSelector.h"
+#include "TreeEditors\ReferenceTreeBuilder.h"
+#include "TreeEditors\HotKeySelectorDlg.h"
+#include "..\AttribEditor\AttribEditorDlg.h"
 
-#include "ExtCmdManager.h"
+
 
 #include "SurToolAux.h"
 #include "Triggers.h"
-#include "DlgSelectTrigger.h"
 
-#include "SelectionUtil.h"
+#ifndef _VISTA_ENGINE_EXTERNAL_
+# include "..\TriggerEditor\TriggerEditor.h"
+# include "DlgSelectTrigger.h"
+#endif
+
 #include "SystemUtil.h"
 
-#include "Game\RenderObjects.h"
-#include "Game\Universe.h"
-#include "Game\CameraManager.h"
-#include "Environment\Environment.h"
-#include "Environment\SourceManager.h"
+#include "..\Game\Universe.h"
+#include "..\Environment\Environment.h"
 #include "AttributeReference.h"
 #include "AttributeSquad.h"
-#include "Game\IniFile.h"
-#include "Render\3dx\Lib3dx.h"
-#include "Render\Src\TexLibrary.h"
 
-#include "version.h"
+#include "..\version.h"
 
-#include "UserInterface\UserInterface.h"
-#include "Game\GameOptions.h"
-#include "Render\Src\Scene.h"
+#include "..\UserInterface\UserInterface.h"
+#include "GameOptions.h"
 
-#include "Terra\vmap.inl"
-#include "Terra\vmap4vi.h"
+#include "..\Terra\vmap4vi.h"
 
-#include "TextDB.h"
-#include "UnicodeConverter.h"
-#include "GlobalAttributes.h"
+#include "ExcelImEx.h"
+#include "..\Util\TextDB.h"
 
-# include "ExcelImEx.h"
-# include "ExcelExport\ExcelExporter.h"
-# include "ParameterImportExportExcel.h"
-# include "ParameterStatisticsExport.h"
-# include "ParameterTree.h"
-
-#include "Console.h"
-#include "ZipConfig.h"
+#include "..\ExcelExport\ExcelExporter.h"
+#include "ParameterImportExportExcel.h"
+#include "ParameterStatisticsExport.h"
+#include "ParameterTree.h"
+#include "..\Util\Console.h"
+#include "..\Util\ZipConfig.h"
 #include "OutputProgressDlg.h"
 
-#include "Game\StreamCommand.h"
+#include "StreamCommand.h"
 
-#include "Game\MergeOptions.h"
+#include "..\Game\MergeOptions.h"
 
-#include "Serialization\XPrmArchive.h"
-#include "FileUtils\FileUtils.h"
-#include "Terra\qsWorldsMgr.h"
-
-#include "Terra\TerrainType.h"
-#include <CrtDbg.h>
-#include "VistaEditor\CommandEditor.h"
-#include "VistaEditor\FormationEditor.h"
-#include "TriggerEditor\TriggerEditor.h"
+#include "XPrmArchive.h"
+#include "FileUtils.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -125,9 +108,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_UPDATE_COMMAND_UI(IDD_TIME_SLIDER, OnUpdateTimeSlider)
 	
-	ON_COMMAND(ID_VIEW_SHOW_CAMERA_BORDERS, OnViewShowCameraBorders)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_SHOW_CAMERA_BORDERS, OnUpdateViewShowCameraBorders)
-
 	ON_UPDATE_COMMAND_UI(ID_VIEW_HIDE_MODELS, OnUpdateViewHideModels)
 	ON_COMMAND(ID_VIEW_HIDE_MODELS, OnViewHideModels)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_CAMERAS, OnUpdateViewCameras)
@@ -163,7 +143,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_FILE_RUN_MENU, OnUpdateIsWorldLoaded)
 	ON_UPDATE_COMMAND_UI(ID_FILE_RUN_WORLD, OnUpdateIsWorldLoaded)
 
-	ON_COMMAND(ID_FILE_EXIMWORLD, OnFileExportImportWorld)
 	ON_COMMAND(ID_FILE_IMPORTTEXTFROMEXCEL, OnFileImportTextFromExcel)
 	ON_COMMAND(ID_FILE_EXPORTTEXTTOEXCEL, OnFileExportTextToExcel)
 
@@ -171,8 +150,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_FILE_PARAMETERS_IMPORT_BY_GROUPS, OnFileParametersImportByGroups)
 	ON_COMMAND(ID_FILE_PARAMETERS_IMPORT_UNITS, OnFileParametersImportUnits)
 
-	ON_COMMAND(ID_FILE_PARAMETERS_EXPORT_FULL, OnFileParametersExportFull)
-	ON_COMMAND(ID_FILE_PARAMETERS_EXPORT_BY_GROUPS, OnFileParametersExportByGroups)
+	ON_COMMAND(ID_FILE_PARAMETERS_EXPORT_FULL, OnFileParametersImportFull)
+	ON_COMMAND(ID_FILE_PARAMETERS_EXPORT_BY_GROUPS, OnFileParametersImportByGroups)
 	ON_COMMAND(ID_FILE_PARAMETERS_EXPORT_UNITS, OnFileParametersExportUnits)
 	ON_COMMAND(ID_FILE_PARAMETERS_EXPORT_STATISTICS, OnFileParametersExportStatistics)
 
@@ -190,8 +169,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_EDIT_REDO, OnEditRedo)
 	ON_UPDATE_COMMAND_UI(ID_EDIT_REDO, OnUpdateEditRedo)
 	ON_COMMAND(ID_EDIT_PLAYPMO, OnEditPlaypmo)
-	ON_COMMAND(ID_EDIT_MAPSCENARIO, OnEditMap)
-	ON_COMMAND(ID_EDIT_MAPPRESET, OnEditPreset)
+	ON_COMMAND(ID_EDIT_MAPSCENARIO, OnEditMapScenario)
 	ON_UPDATE_COMMAND_UI(ID_EDIT_MAPSCENARIO, OnUpdateIsWorldLoaded)
 	ON_COMMAND(ID_EDIT_GAME_SCENARIO, OnEditGameScenario)
 	ON_COMMAND(ID_EDIT_REBUILDWORLD, OnEditRebuildworld)
@@ -217,7 +195,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	
 	ON_COMMAND(ID_LIBRARIES_UI_MESSAGE_TYPE, OnLibrariesUIMessageTypes)
 	ON_COMMAND(ID_LIBRARIES_UI_MESSAGES, OnLibrariesUIMessages)
-	ON_COMMAND(ID_LIBRARIES_UI_SHOW_MODE_SPRITES, OnLibrariesUIShowModeSprites)
 
 	ON_COMMAND(ID_EDIT_SOUND_TRACKS, OnEditSoundTracks)
 	ON_COMMAND(ID_EDIT_REELS, OnEditReels)
@@ -230,6 +207,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_EDIT_UNITS, OnEditUnits)
 	ON_COMMAND(ID_EDIT_USER_INTERFACE, OnEditUserInterface)
 	ON_COMMAND(ID_EDIT_OBJECTS, OnEditObjects)
+	ON_COMMAND(ID_EDIT_FORMATIONS, OnEditFormations)
+	ON_COMMAND(ID_EDIT_GLOBAL_TRIGGER, OnEditGlobalTrigger)
 	ON_COMMAND(ID_EDIT_EFFECTS_EDITOR, OnEditEffectsEditor)
 
     // Workspace Menu
@@ -258,7 +237,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_DEBUG_SHOWMIPMAP, OnDebugShowmipmap)
 	ON_COMMAND(ID_DEBUG_UI_SPRITE_LIB, OnDebugUISpriteLib)
 	ON_COMMAND(ID_TEXT_SPRITES, OnEditUITextSprites)
-	ON_COMMAND(ID_LIBRARIES_COMMANDCOLORS, OnEditCommandColor)
 
 	ON_COMMAND(ID_DEBUG_SHOWPALETTETEXTURE, OnDebugShowpalettetexture)
 	ON_UPDATE_COMMAND_UI(ID_DEBUG_SHOWPALETTETEXTURE, OnUpdateDebugShowpalettetexture)
@@ -271,9 +249,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_IMPORT_PARAMETERS, OnImportParameters)
 	ON_COMMAND(ID_EXPORT_PARAMETERS, OnExportParameters)
 	ON_COMMAND(ID_FILE_SAVEWITHOUTTERTOOLCOLOR, OnFileSavewithouttertoolcolor)
-	ON_COMMAND(ID_FILE_UPDATE_QUICK_START_WORLDS_LIST, OnFileUpdateQuickStartWorldsList)
-	ON_COMMAND(ID_LIBRARIES_TERRRAINTYPENAME, OnLibrariesTerrraintypename)
-	ON_COMMAND(ID_EDIT_ROLLINGBORDER, OnEditRollingborder)
 	END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -308,13 +283,8 @@ CMainFrame::CMainFrame()
 
 	lastTime = 0;
 	syncroTimer.set(1, logicTimePeriod, 300);
-	syncroTimer.setSpeed(surMapOptions.evolutionSpeed);
 	memset(&statisticsAttr,1,sizeof(statisticsAttr));
 
-	if(check_command_line("export")){
-		OnFileExportVistaEngine();
-		ErrH.Exit();
-	}
 }
 
 CMainFrame::~CMainFrame()
@@ -344,8 +314,8 @@ void CMainFrame::resetWorkspace()
 	toolBar_.FloatControlBar(CPoint(0, 0));
 #ifndef _VISTA_ENGINE_EXTERNAL_
 	librariesBar_.FloatControlBar(CPoint(100, 0));
-	editorsBar_.FloatControlBar(CPoint(300, 0));
 #endif
+	editorsBar_.FloatControlBar(CPoint(300, 0));
 	filtersBar_.FloatControlBar(CPoint(400, 0));
 	//timeSliderBar_.FloatControlBar(CPoint(500, 0));
 
@@ -374,8 +344,8 @@ void CMainFrame::resetWorkspace()
 	toolBar_.DockControlBar(AFX_IDW_DOCKBAR_TOP, 0, this, false);
 #ifndef _VISTA_ENGINE_EXTERNAL_
 	librariesBar_.DockControlBar(AFX_IDW_DOCKBAR_TOP, 0, this, false);
-	editorsBar_.DockControlBar(AFX_IDW_DOCKBAR_TOP, 0, this, false);
 #endif
+	editorsBar_.DockControlBar(AFX_IDW_DOCKBAR_TOP, 0, this, false);
 	filtersBar_.DockControlBar(AFX_IDW_DOCKBAR_TOP, 0, this, false);
 	menuBar_.ToggleDocking();
 
@@ -404,8 +374,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		AfxMessageBox ("Failed to create view window\n");
 		return -1;
 	}
-
-	if (!menuBar_.Create("Menu Bar", this, ID_VIEW_MENUBAR) || !reloadMenu()){
+	if (!menuBar_.Create("Menu Bar", this, ID_VIEW_MENUBAR) ||
+		!menuBar_.LoadMenuBar(external ? IDR_MAINFRAME_EXTERNAL : IDR_MAINFRAME)){
 		AfxMessageBox ("Failed to create view window\n");
 		return -1;
 	}
@@ -424,18 +394,18 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     // VERIFY(timeSliderDialog_.Create(IDD_TIME_SLIDER, &timeSliderBar_));
 	// timeSliderBar_.EnableDocking(CBRS_ALIGN_ANY);
 
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	VERIFY(editorsBar_.Create("Editors Bar", this, IDR_EDITORS_BAR)
 		&& editorsBar_.LoadToolBar(external ? IDR_EDITORS_EXTERNAL_BAR : IDR_EDITORS_BAR, RGB(255, 0, 255)));
 	editorsBar_.EnableDocking(CBRS_ALIGN_ANY);
 	
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	VERIFY(librariesBar_.Create("Libraries Bar", this, IDR_LIBRARIES_BAR)
 		&& librariesBar_.LoadToolBar(external ? IDR_LIBRARIES_EXTERNAL_BAR : IDR_LIBRARIES_BAR, RGB(255, 0, 255)));
 	librariesBar_.EnableDocking(CBRS_ALIGN_ANY);
 #endif
 
 	VERIFY(filtersBar_.Create("Filters Bar", this, IDR_FILTERS_BAR)
-		&& filtersBar_.LoadToolBar(external ? IDR_FILTERS_EXTERNAL_BAR : IDR_FILTERS_BAR, RGB(255, 0, 255)));
+		&& filtersBar_.LoadToolBar(IDR_FILTERS_BAR));
 	       filtersBar_.EnableDocking(CBRS_ALIGN_ANY);
 
     //////////////////////////////////////////////////////////////////////////////
@@ -514,8 +484,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 
 	waveDialog_->Create(CWaveDlg::IDD, 0);
-	signalSelectionChanged().connect(this, &CMainFrame::onSelectionChanged);
-
+	eventSelectionChanged().registerListener(this);
 	return 0;
 }
 
@@ -595,13 +564,12 @@ void CMainFrame::put2TitleNameDirWorld(void)
 {
 	CString strAppName;
 	strAppName.LoadString (IDR_MAINFRAME);
-	SetWindowText (strAppName + " - " + vMap.getWorldName().c_str());
+	SetWindowText (strAppName + " - " + vMap.worldName.c_str());
 }
 
 //////////////////////////////////////////////
 //#include <Windows.h>
 #include <shlobj.h>
-#include ".\mainframe.h"
 
 //#import "D:\WINNT\system32\Shell32.dll"
 static TCHAR szCurSurmapWorldDir[MAX_PATH]= { 0 };
@@ -679,6 +647,24 @@ char* SelectWorkDirectory(const char * _coment)
 	return returnValue;
 }
 
+string SelectWorkinFolder2(const char* initialDir, CWnd* pParentWnd = NULL)
+{
+	CString cstrFilters = "";
+
+	CString cstrInitialFolder = initialDir;
+
+	char bufDir[MAX_PATH];
+	::GetCurrentDirectory(MAX_PATH, bufDir);
+	CSelectFolderDialog selFolder(false, cstrInitialFolder, OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_NOCHANGEDIR, cstrFilters, pParentWnd);
+	string retval;
+	if(selFolder.DoModal() == IDOK) {
+		///AfxMessageBox("The selected folder is\n\n" + selFolder.GetSelectedPath());
+		retval=selFolder.GetSelectedPath();
+	}
+	::SetCurrentDirectory(bufDir);
+	return retval;
+}
+
 static bool flag_active_app = true;
 
 bool CMainFrame::universeQuant()
@@ -726,122 +712,46 @@ void CMainFrame::OnEditPlaypmo()
 }
 
 
-struct MapSerializer {
+struct MapScenarioSerialization {
 	MissionDescription& mission_;
 	PlayerDataVect& players_;
 	TriggerChainNames& worldTriggers_;
 
-	MapSerializer(MissionDescription& mission, PlayerDataVect& players, TriggerChainNames& worldTriggers) :
+	MapScenarioSerialization(MissionDescription& mission, PlayerDataVect& players, TriggerChainNames& worldTriggers) :
 		mission_(mission),
 		players_(players),
 		worldTriggers_(worldTriggers)
 	{}
 
 	void serialize(Archive& ar) {
-		ar.setFilter(SERIALIZE_PRESET_DATA);
 		mission_.serialize(ar);
-		if(universe())
-			universe()->serialize(ar);
 
 		static_cast<vrtMap&>(vMap).serializeParameters(ar);
-		
-		if(environment){
-			ar.setFilter(SERIALIZE_WORLD_DATA);
-			string presetName = environment->presetName();
-			ar.serialize(*environment, "environment", "Визуальные параметры мира");
-		}
-			
-		if(cameraManager)
-			ar.serialize(*cameraManager, "cameraManager", "Настройки камеры");
+		if(environment)
+			environment->serializeParameters(ar);
 		
 		ar.serialize(players_, "players", "Игроки");
-#ifdef _VISTA_ENGINE_EXTERNAL_
-		ar.serialize(worldTriggers_, "worldTriggers", 0);
-#else
 		ar.serialize(worldTriggers_, "worldTriggers", "Триггера для мира");
-#endif
 	}
 };
 
-struct PresetSerializer
-{
-	void serialize(Archive& ar)
-	{
-		if(environment){
-			if(presetName_ == "")
-				presetName_ = environment->presetName();
-			
-			ResourceSelector::Options presetOption("*.set", "Scripts\\Content\\Presets", "", false, false);
-			ar.serialize(ResourceSelector(presetName_, presetOption), "presetName", "Имя файла настроек");
-
-			ar.setFilter(SERIALIZE_PRESET_DATA);
-			static XBuffer nameAlt;
-			nameAlt.init();
-			nameAlt < "Пресет " < environment->presetName();
-			ar.serialize(*environment, "environmentPreset", nameAlt);
-
-			if(ar.isInput() && presetName_ != environment->presetName()){
-				environment->setPresetName(presetName_.c_str());
-				environment->loadPreset();
-			}
-		}
-
-	}
-
-	string presetName_;
-};
-
-struct GameSerializer {
+struct GameScenarioSerialization {
 
 	void serialize(Archive& ar){
 		GlobalAttributes::instance().serializeGameScenario(ar);
+		RaceTable::instance().serialize(ar);
+		DifficultyTable::instance().serialize(ar);
+		AttributeSquadTable::instance().serialize(ar);
 		GameOptions::instance().serializePresets(ar);
 		UI_GlobalAttributes::instance().serialize(ar);
-		if(ar.openBlock("Controls", "Управление")){
-			ControlManager::instance().serialize(ar);
-			ar.closeBlock();
-		}
-		if(environment){
-			ar.setFilter(SERIALIZE_GLOBAL_DATA);
-			environment->serialize(ar);
-		}
+
+		ar.openBlock("Controls", "Управление");
+		ControlManager::instance().serialize(ar);
+		ar.closeBlock();
 	}
 };
 
-void CMainFrame::OnEditPreset()
-{
-	bool environmentCreated = false;
-	if(!environment){
-		for(DirIterator it("Resource\\Worlds\\*.*"); it; ++it)
-			if(it.isDirectory()){
-				view_->createScene();
-				vMap.load(it.c_str(), true);
-				view_->reInitWorld();
-				environmentCreated = true;
-				break;
-			}
-	}
-
-	string presetName = environment->presetName();
-
-	PresetSerializer presetSerializer;
-	Serializer serializeable(presetSerializer, "presetSerializer", TRANSLATE("Пресет"));
-
-	if(kdw::edit(serializeable, "Scripts\\TreeControlSetups\\EditPresetState", kdw::ONLY_TRANSLATED | kdw::IMMEDIATE_UPDATE, GetSafeHwnd()))
-		environment->savePreset();
-
-	signalObjectChanged().emit(this);
-
-	if(environmentCreated)
-		view_->doneScene();
-	else if(presetName != environment->presetName()){
-		environment->setPresetName(presetName.c_str());
-		environment->loadPreset();
-	}
-
-}
-
-void CMainFrame::OnEditMap()
+void CMainFrame::OnEditMapScenario()
 {
 	if(!universe())
 		return;
@@ -851,20 +761,21 @@ void CMainFrame::OnEditMap()
 	PlayerDataEdit worldPlayer;
 	universe()->worldPlayer()->getPlayerData(worldPlayer);
 
-	MapSerializer mapSerializer(view_->currentMission(), players, worldPlayer.triggerChainNames);
+	MapScenarioSerialization mapScenario(view_->currentMission(), players, worldPlayer.triggerChainNames);
 
-	Serializer serializeable(mapSerializer, "mapSerializer", TRANSLATE("Сценарий карты"));
-	if(kdw::edit(serializeable, "Scripts\\TreeControlSetups\\EditMapState", kdw::ONLY_TRANSLATED | kdw::IMMEDIATE_UPDATE, GetSafeHwnd())){
+	Serializeable serializeable(mapScenario, "mapScenario", TRANSLATE("Сценарий карты"));
+	TreeControlSetup treeControlSetup(0, 0, 640, 480, "Scripts\\TreeControlSetups\\MapScenarioNew", false, true);
+
+	CAttribEditorDlg dlg;
+	if(dlg.edit(serializeable, GetSafeHwnd(), treeControlSetup, TRANSLATE("Сохранить"), TRANSLATE("Закрыть"))){ 
 		GlobalAttributes::instance().saveLibrary();
-		TextDB::instance().saveLanguage();
-		OnFileSave();
+		TextIdMap::instance().saveLibrary();
 	}
 
-	signalObjectChanged().emit(this);
+	eventObjectChanged().emit();
 
 	if(universe()){
 		universe()->importPlayers(players);
-		universe()->worldPlayer()->setPlayerData(worldPlayer);
 		setSilhouetteColors();
 		toolsWindow_->rebuildTools();
 	}
@@ -877,11 +788,14 @@ void CMainFrame::OnEditTriggers()
 	int nRet=dlgST.DoModal();
 	if(nRet==IDOK){
 		if(!dlgST.selectTriggersFile.empty()){
-			TriggerChain triggerChain;
-			triggerChain.load(setExtention((string("Scripts\\Content\\Triggers\\") + transliterate(extractFileBase(dlgST.selectTriggersFile.c_str()).c_str())).c_str(), "scr").c_str());
-			if(TriggerEditor(triggerChain, GetSafeHwnd()).edit()){
-				triggerChain.save();
-				TextDB::instance().saveLanguage();
+			static TriggerEditor triggerEditor(triggerInterface());
+			if(!triggerEditor.isOpen()){
+				TriggerChain triggerChain;
+				triggerChain.load(setExtention((string("Scripts\\Content\\Triggers\\") + dlgST.selectTriggersFile).c_str(), "scr").c_str());
+				if(triggerEditor.run(triggerChain, GetSafeHwnd(), true)){
+					triggerChain.save();
+					TextIdMap::instance().saveLibrary();
+				}
 			}
 		}
 		else {
@@ -889,6 +803,14 @@ void CMainFrame::OnEditTriggers()
 		}
 	}
 #endif
+	/*
+#else // _VISTA_ENGINE_EXTERNAL_
+
+	CString message (TRANSLATE("Недоступно во внешней версии"));
+	MessageBox (message, 0, MB_OK | MB_ICONERROR);
+
+#endif // _VISTA_ENGINE_EXTERNAL_
+	*/
 }
 
 void CMainFrame::OnDebugEditZipConfig()
@@ -898,30 +820,25 @@ void CMainFrame::OnDebugEditZipConfig()
 
 void CMainFrame::editLibrary(const char* libraryName)
 {
-	_CrtCheckMemory();
-#ifndef _VISTA_ENGINE_EXTERNAL_
-	kdw::LibraryEditorDialog libraryEditor(GetSafeHwnd());
+    CLibraryEditorWindow libraryEditor(this);
 
-	const char* configFileName = "Scripts\\TreeControlSetups\\LibraryEditorState";
+	const char* configFileName = "Scripts\\TreeControlSetups\\LibraryEditorSetup";
 	XPrmIArchive ia;
 	if(ia.open(configFileName)){
-		ia.setFilter(kdw::SERIALIZE_STATE);
 		ia.serialize(libraryEditor, "libraryEditor", 0);
 		ia.close();
 	}
-    if(libraryEditor.showModal(libraryName) == kdw::RESPONSE_OK)
+	
+    if(libraryEditor.doModal(libraryName))
 		saveAllLibraries();
 
 	XPrmOArchive oa(configFileName);
-	oa.setFilter(kdw::SERIALIZE_STATE);
-	oa.serialize(libraryEditor, "libraryEditor", 0);
-	oa.close();
+	{
+		oa.serialize(libraryEditor, "libraryEditor", 0);
+		oa.close();
+	}
 
 	toolsWindow_->rebuildTools();
-#else
-	::MessageBox(0, "Warning: saveAllLibraries", "warning", MB_OK);
-#endif
-	_CrtCheckMemory();
 }
 
 void CMainFrame::OnEditUnits()
@@ -964,45 +881,42 @@ bool fileExists(const char* fName)
 
 };
 
-struct WorldCreationParam : vrtMapCreationParam
-{
-	string name;
-	void serialize(Archive& ar){
-		ar.serialize(name, "name", "Имя мира");
-		__super::serialize(ar);
-	}
-};
-
 void CMainFrame::OnFileNew()
 {
-	WorldCreationParam creationParam;
-	if(kdw::edit(Serializer(creationParam), "Scripts\\TreeControlSetups\\WorldCreationParam", kdw::ONLY_TRANSLATED, GetSafeHwnd(), TRANSLATE("Создание нового мира"))){
-		CWaitCursor wait;
-		view_->createScene();
-		static_cast<vrtMapCreationParam&>(vMap) = creationParam;
-
-		string pathToWorldData = vMap.getWorldsDir();
-		pathToWorldData += vMap.getWorldsDir();
-		pathToWorldData += "\\";
-		pathToWorldData += creationParam.name;
-		pathToWorldData += "\\";
-		pathToWorldData += vrtMap::worldDataFile;
+	CDlgCreateWorld dlgCW;
+	int nRet = -1;
+	nRet = dlgCW.DoModal();
+	CWaitCursor wait;
+	switch (nRet) {
+	case IDOK:
+		{
+			view_->createScene();
+			static_cast<vrtMapCreationParam&>(vMap) = dlgCW.m_CreationParam;
 			
-		if(fileExists(pathToWorldData.c_str())){
-			MessageBox(TRANSLATE("Мир с таким именем уже существует, создание невозможно!"), 0, MB_OK);
-			return;
+
+			std::string pathToWorldData = vMap.getWorldsDir();
+			pathToWorldData += vMap.getWorldsDir();
+			pathToWorldData += "\\";
+			pathToWorldData += dlgCW.m_strWorldName;
+			pathToWorldData += "\\";
+			pathToWorldData += vrtMap::worldDataFile;
+
+			
+			if(fileExists(pathToWorldData.c_str())){
+				MessageBox(TRANSLATE("Мир с таким именем уже существует, создание невозможно!"), 0, MB_OK);
+				return;
+			}
+
+			vMap.create(dlgCW.m_strWorldName);
+			view_->reInitWorld();
+			Invalidate(FALSE);
+			put2TitleNameDirWorld();
+			toolsWindow_->rebuildTools();
 		}
-
-		vMap.create(creationParam.name.c_str());
-		view_->reInitWorld();
-
-		Invalidate(FALSE);
-		put2TitleNameDirWorld();
-		toolsWindow_->rebuildTools();
+		break;
 	}
 	Invalidate(FALSE);
 }
-
 
 void CMainFrame::OnFileOpen()
 {
@@ -1010,124 +924,77 @@ void CMainFrame::OnFileOpen()
 
 	CDlgSelectWorld dlgSW(vMap.getWorldsDir(), TRANSLATE("Выбор мира для загрузки"), false);
 	int nRet=dlgSW.DoModal();
-	if(nRet == IDOK){
-		XBuffer worldDataPath;
-		worldDataPath < vMap.getWorldsDir() < "\\" < dlgSW.selectWorldName.c_str() < "\\" < vrtMap::worldDataFile;
-
-		if(!dlgSW.selectWorldName.empty() && testExistingFile(worldDataPath)){
-			XBuffer cacheTgaPath;
-			cacheTgaPath < vMap.getWorldsDir() < "\\" < dlgSW.selectWorldName.c_str() < "\\cache.tga";
-
-			if(!testExistingFile(cacheTgaPath)){
-				wait.Restore();
-				MessageBox(TRANSLATE("Этот мир был эспортирован только для игры на нем, вы не можете его отредактировать!"), 0, MB_ICONEXCLAMATION | MB_OK);
-				return;
-			}
-			else{
-				view_->createScene();
-				vMap.load(dlgSW.selectWorldName.c_str(), true);
-				view_->reInitWorld();
-				GlobalAttributes::instance().loadLibrary();
-				put2TitleNameDirWorld();
-				Invalidate(FALSE);
-				wait.Restore();
-			}
+	if( nRet==IDOK ) {
+		XBuffer patch2worlddata;
+		patch2worlddata< vMap.getWorldsDir() < "\\" < dlgSW.selectWorldName.c_str() < "\\" < vrtMap::worldDataFile;
+		if( (!dlgSW.selectWorldName.empty()) && (testExistingFile(patch2worlddata)) ){
+			view_->createScene();
+			vMap.load(dlgSW.selectWorldName.c_str(), true);
+			view_->reInitWorld();
+			GlobalAttributes::instance().loadLibrary();
+			put2TitleNameDirWorld();
+			Invalidate(FALSE);
+			wait.Restore();
 		}
 		else{
 			wait.Restore();
 			XBuffer str;
-			str < TRANSLATE("Следующий мир поврежден: ");
-			str < dlgSW.selectWorldName.c_str();
-			MessageBox(str, 0, MB_OK | MB_ICONERROR);
-
+			str < "World: " < dlgSW.selectWorldName.c_str() < "  is empty";
+			AfxMessageBox(str);
 		}
-		eventMaster().signalObjectChanged().emit(this);
-		toolsWindow_->rebuildTools();
+
 	}
-}
-
-void CMainFrame::OnFileExportImportWorld()
-{
-	CWaitCursor wait;
-
-	CDlgExImWorld dlgSW(vMap.getWorldsDir(), TRANSLATE("Экспорт/Импорт миров"), false);
-	int nRet=dlgSW.DoModal();
+	eventMaster().eventObjectChanged().emit();
+	toolsWindow_->rebuildTools();
 }
 
 void CMainFrame::OnFileSave()
 {
-	if(vMap.getWorldName().empty()){
+	if(vMap.worldName.empty()){
 		OnFileSaveas();
 	}
 	else{
-		save(vMap.getWorldName().c_str());
+		save(vMap.worldName.c_str());
 	}
 }
 
 void CMainFrame::OnFileSaveVoiceFileDurations()
 {
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	UI_TextLibrary::instance().saveLibrary();
 	VoiceAttribute::VoiceFile::saveVoiceFileDurations();
-#endif
 }
 
 void CMainFrame::OnFileSavewithouttertoolcolor()
 {
-	//if(vMap.worldName.empty()){
-	//	AfxMessageBox("No world!");
-	//}
-	//else{
-	//	save(vMap.worldName.c_str(), false);
-	//}
+	if(vMap.worldName.empty()){
+		AfxMessageBox("No world!");
+	}
+	else{
+		save(vMap.worldName.c_str(), false);
+	}
 }
 
 
-void CMainFrame::save(const char* worldName)
+void CMainFrame::save(const char* worldName, bool flag_useTerToolColor)
 {
 	CWaitCursor wait;
 	getToolWindow().rebuildTools();
-	int idxColorCnt=vMap.convertVMapTryColor2TerClr();
-	vMap.save(worldName);
-	if(view_->currentMission().saveMiniMap)
-		vMap.saveMiniMap(vMap.H_SIZE/16, vMap.V_SIZE/16); //128, 128
+	int idxColorCnt=vMap.convertVMapTryColor2IdxColor(flag_useTerToolColor);
+	vMap.save(worldName, idxColorCnt);
+	vMap.saveMiniMap(128, 128);
 	view_->currentMission().setByWorldName(worldName);
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	GlobalAttributes::instance().saveLibrary();
-#endif
+
 	XPrmOArchive oa(view_->currentMission().saveName());
-#ifdef _VISTA_ENGINE_EXTERNAL_
-	view_->currentMission().setBattle(true);
-	view_->currentMission().is_fog_of_war = true;
-#endif
 	universe()->universalSave(view_->currentMission(), false, oa);
-#ifdef _VISTA_ENGINE_EXTERNAL_
-	if(environment){
-		environment->setFogEnabled(true);
-		bool gotStartPoint = false;
-		SourceManager::Anchors& anchors = sourceManager->anchors();
-		SourceManager::Anchors::iterator it;
-		FOR_EACH(anchors, it){
-			if((*it)->type () == Anchor::START_LOCATION){
-				gotStartPoint = true;
-				break;
-			}
-		}
-		if(!gotStartPoint){
-			MessageBox(TRANSLATE("Ни для одного из игроков не установлена стартовая точка (Инструмент: Зоны\\Стартовая точка).\nСтартовая точка дает начальный комплект юнитов."), 0, MB_OK | MB_ICONINFORMATION);
-		}
-	}
-#else
-	//if(view_->currentMission().isBattle())
-	//	qsWorldsMgr.updateQSWorld(view_->currentMission().saveName(), XGUID(view_->currentMission().missionGUID()));
-#endif
-	signalWorldChanged().emit(this);
+
+	eventWorldChanged_.emit();
 }
 
-void CMainFrame::onSelectionChanged(SelectionObserver* changer)
+void CMainFrame::onSelectionChanged()
 {
 	if(CSurToolBase* currentToolzer = getToolWindow().currentTool())
-		currentToolzer->onSelectionChanged();
+		currentToolzer->CallBack_SelectionChanged();
 }
 
 MergeOptions::MergeOptions()
@@ -1139,7 +1006,7 @@ mergeCameras(false)
 
 void MergeOptions::serialize(Archive& ar)
 {
-    static GenericFileSelector::Options options("*.spg", "Resource\\Worlds", TRANSLATE("Слить миры..."), false);
+    static GenericFileSelector::Options options("*.spg", ".\\Resource\\Worlds", TRANSLATE("Слить миры..."), false);
     ar.serialize(GenericFileSelector(worldFile), "worldFile", "Путь к файлу мира (*.spg)");
     ar.serialize(mergePlayers, "mergePlayers", "Импортировать игроков");
     ar.serialize(mergeWorld, "mergeWorld", "Импортировать мир (декорации и объекты, установленные за мир)");
@@ -1149,8 +1016,9 @@ void MergeOptions::serialize(Archive& ar)
 
 void CMainFrame::OnFileMerge()
 {
+    EditArchive ea(GetSafeHwnd(), TreeControlSetup(100, 100, 700, 700, "Scripts\\TreeControlSetups\\WorldMerge"));
     MergeOptions options;
-	if(kdw::edit(Serializer(options), "Scripts\\TreeControlSetups\\WorldMerge", kdw::ONLY_TRANSLATED | kdw::IMMEDIATE_UPDATE, GetSafeHwnd())){
+    if(ea.edit(options)){
         if(options.worldFile.empty()){
             CString message(TRANSLATE("Не указан путь к файлу мира!"));
             MessageBox(message, 0, MB_OK | MB_ICONEXCLAMATION);
@@ -1181,11 +1049,11 @@ void CMainFrame::OnFileSaveas()
 
 void CMainFrame::OnFileSaveminimaptoworld()
 {
-	if(vMap.getWorldName().empty()){
+	if(vMap.worldName.empty()){
 		AfxMessageBox("Не выбран мир");
 	}
 	else{
-		vMap.saveMiniMap(vMap.H_SIZE/16, vMap.V_SIZE/16);//128,128
+		vMap.saveMiniMap(128,128);
 	}
 }
 
@@ -1299,7 +1167,7 @@ void CMainFrame::OnViewResettoolbar2default()
 
 void CMainFrame::OnClose()
 {
-	if (view_->isSceneInitialized() && vMap.isChanged()){
+	if (view_->isSceneInitialized() && vMap.IsChanged()){
 		CString message = "Do you want to save changes before exit?";
 
 		int result = MessageBox (message, 0, MB_YESNOCANCEL | MB_ICONQUESTION);
@@ -1314,7 +1182,7 @@ void CMainFrame::OnClose()
 }
 
 //                                                       Atr  Vx  Oper Pgs X   Y  разд.Sur Lgt  Ms(profile)
-static int xSizePartsStatusBar[NUMBERS_PARTS_STATUSBAR]={ 40+80+20, 70+30, 100, 00, 70, 70, 00, 50, 50, 280};
+static int xSizePartsStatusBar[NUMBERS_PARTS_STATUSBAR]={ 80+20, 70+30, 100, 00, 70, 70, 00, 50, 50, 280};
 static int rightCrdPartsStatusBar[NUMBERS_PARTS_STATUSBAR];
 
 void CMainFrame::OnSize(UINT nType, int cx, int cy)
@@ -1425,7 +1293,7 @@ bool CMainFrame::loadDlgBarState()
 		// get information from registry
 		CMemFile _file;
 		//if( !CExtCmdManager::FileObjFromRegistry( _file, sRegKeyPath ) )
-#ifdef _VISTA_ENGINE_EXTERNAL_
+#ifdef _VISTA_ENGINE_EXTERNAL
 		std::vector<unsigned char>& dlgBarState = surMapOptions.dlgBarStateExt;
 #else
 		std::vector<unsigned char>& dlgBarState = surMapOptions.dlgBarState;
@@ -1488,7 +1356,7 @@ void CMainFrame::OnUpdateViewSources(CCmdUI *pCmdUI)
 	const char* GAME_EXE_PATH = "Game.exe"; 
 # endif
 #else
-	const char* GAME_EXE_PATH = "Perimeter2.exe"; 
+	const char* GAME_EXE_PATH = "Maelstrom.exe"; 
 #endif
 
 void CMainFrame::OnFileRunWorld()
@@ -1496,10 +1364,10 @@ void CMainFrame::OnFileRunWorld()
 	const char* TEMP_WORLD="TMP";
 	if(!universe())
 		return;
-	string currentWorldName = vMap.getWorldName();
+	string currentWorldName = vMap.worldName;
 	save(TEMP_WORLD);
 
-	vMap.setWorldName(currentWorldName.c_str());
+	vMap.worldName = currentWorldName;
 	view_->currentMission().setByWorldName(currentWorldName.c_str());
 
 	bool flag_animation = static_cast<CSurMap5App*>(AfxGetApp ())->flag_animation;
@@ -1507,11 +1375,7 @@ void CMainFrame::OnFileRunWorld()
 	ShowWindow (SW_HIDE);
 	Sleep (200);
 
-#ifdef _VISTA_ENGINE_EXTERNAL_
-	int result = _spawnl (_P_WAIT, GAME_EXE_PATH, GAME_EXE_PATH, "-battle", "openResource\\Worlds\\TMP.spg", NULL);
-#else
-	int result = _spawnl (_P_WAIT, GAME_EXE_PATH, GAME_EXE_PATH, "openResource\\Worlds\\TMP.spg", NULL);
-#endif
+	int result = _spawnl (_P_WAIT /*_P_NOWAIT*/, GAME_EXE_PATH, GAME_EXE_PATH, "openResource\\Worlds\\TMP.spg", NULL);
 	if (result < 0)
 	{
         CString message (TRANSLATE("Не могу запустить игру!"));
@@ -1528,31 +1392,20 @@ void CMainFrame::OnFileRunWorld()
 void CMainFrame::OnEditGameScenario()
 {
 #ifndef _VISTA_ENGINE_EXTERNAL_
+	static GameScenarioSerialization gameScenario;
 
-	bool environmentCreated = false;
-	if(!environment){
-		for(DirIterator it("Resource\\Worlds\\*.*"); it; ++it)
-			if(it.isDirectory()){
-				view_->createScene();
-				vMap.load(it.c_str(), true);
-				view_->reInitWorld();
-				environmentCreated = true;
-				break;
-			}
-	}
+	Serializeable serializeable(gameScenario, "gameScenario", TRANSLATE("Сценарий игры"));
 
-	static GameSerializer gameSerializer;
-	Serializer serializeable(gameSerializer, "gameSerializer", TRANSLATE("Сценарий игры"));
+    CAttribEditorDlg dlg;
 
-	if(kdw::edit(serializeable, "Scripts\\TreeControlSetups\\GameScenarioState", kdw::ONLY_TRANSLATED | kdw::IMMEDIATE_UPDATE, GetSafeHwnd()))
+	TreeControlSetup treeControlSetup(0, 0, 640, 480, "Scripts\\TreeControlSetups\\GameScenario");
+
+	if(dlg.edit(serializeable, GetSafeHwnd(), treeControlSetup, "Save", "Close"))
 		saveAllLibraries();
 
-	eventMaster().signalObjectChanged().emit(this);
+	eventMaster().eventObjectChanged().emit();
 
-	if(environmentCreated)
-		view_->doneScene();
-
-#else // _VISTA_ENGINE_EXTERNAL_	
+#else // _VISTA_ENGINE_EXTERNAL_
 
 	CString message(TRANSLATE("Недоступно во внешней версии"));
 	MessageBox(message, 0, MB_OK | MB_ICONERROR);
@@ -1563,16 +1416,21 @@ void CMainFrame::OnEditGameScenario()
 
 void CMainFrame::OnEditRebuildworld()
 {
-	if(vMap.isWorldLoaded()){
+	if(vMap.isLoad()){
 		CWaitCursor wait;
 
 		unsigned long vxacrc=vMap.getVxABufCRC();
+		unsigned long geocrc=vMap.getGeoSurBufCRC();
 		unsigned long damcrc=vMap.getDamSurBufCRC();
 		unsigned int begTime=xclock();
 		vMap.rebuild();
+		extern unsigned int profileTimeOperation;
+		profileTimeOperation=xclock()-begTime;
 		view_->UpdateStatusBar();
 		if(vxacrc!=vMap.getVxABufCRC())
 			::AfxMessageBox(TRANSLATE("Сгенеренные высоты не совпадают с предыдущими"));
+		if(geocrc!=vMap.getGeoSurBufCRC())
+			::AfxMessageBox(TRANSLATE("Поверхность 3D текстуры(Geo) сгенеренного мира не совпадает с предыдущей"));
 		if(damcrc!=vMap.getDamSurBufCRC())
 			::AfxMessageBox(TRANSLATE("Поверхность текстуры(Dam) сгенеренного мира не совпадает с предыдущей"));
 
@@ -1593,23 +1451,30 @@ void CMainFrame::OnEditEffects()
 
 void CMainFrame::OnEditPreferences ()
 {
-	if(kdw::edit(Serializer(surMapOptions), "Scripts\\TreeControlSetups\\UserPreferences", kdw::ONLY_TRANSLATED | kdw::IMMEDIATE_UPDATE, GetSafeHwnd()))
-		eventMaster().signalObjectChanged().emit(this);
+	EditOArchive oarchive;
+	surMapOptions.serialize (oarchive);
+
+    CAttribEditorDlg dlg;
+    if (const TreeNode* rootNode = dlg.edit(oarchive.rootNode (), GetSafeHwnd (),
+                                            TreeControlSetup (0, 0, 640, 480, "Scripts\\TreeControlSetups\\UserPreferences")))
+	{
+        EditIArchive iarchive (rootNode);
+        surMapOptions.serialize (iarchive);
+
+		eventMaster().eventObjectChanged().emit();
+    }
 	surMapOptions.apply();
-	reloadMenu();
 }
 
 void CMainFrame::OnFileRunMenu()
 {
-	if(vMap.isWorldLoaded())
-		OnFileSave();
 	bool flag_animation = static_cast<CSurMap5App*>(AfxGetApp ())->flag_animation;
 	static_cast<CSurMap5App*>(AfxGetApp ())->flag_animation = false;
 
 	ShowWindow (SW_HIDE);
 	Sleep (200);
 
-	int result = _spawnl (_P_WAIT, GAME_EXE_PATH, GAME_EXE_PATH, NULL);
+	int result = _spawnl (_P_WAIT, GAME_EXE_PATH, GAME_EXE_PATH, "-mainmenu", NULL);
 	if (result < 0)	{
 		CString message (TRANSLATE ("Не могу запустить игру!"));
 		MessageBox (message, 0, MB_OK | MB_ICONERROR);
@@ -1621,35 +1486,22 @@ void CMainFrame::OnFileRunMenu()
 
 void CMainFrame::OnFileParametersExportStatistics()
 {
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	CFileDialog fileDlg (FALSE, "*.xls", 0,
 						 OFN_LONGNAMES|OFN_HIDEREADONLY|OFN_NOCHANGEDIR|OFN_OVERWRITEPROMPT,
 						 "(*.xls)|*.xls||", 0);
 	fileDlg.m_ofn.lpstrTitle = TRANSLATE("Сохранить XLS файл...");
 
-
 	if(fileDlg.DoModal() == IDOK){
-	
 		CWaitCursor waitCursor;
 		CString path = fileDlg.GetPathName();	
+
 		ParameterStatisticsExport exporter;
-		const char* fileName = "Scripts\\TreeControlSetups\\ParameterExportStatistics.dat";
-		if(::isFileExists(fileName)){
-			XPrmIArchive ia(fileName);
-			ia.serialize(exporter, "exporter", 0);
-		}
-		if(kdw::edit(Serializer(exporter), "Scripts\\TreeControlSetups\\ParameterExportStatistics", kdw::ONLY_TRANSLATED | kdw::IMMEDIATE_UPDATE, GetSafeHwnd())){
-			exporter.exportExcel(path);
-			XPrmOArchive oa(fileName);
-			oa.serialize(exporter, "exporter", 0);
-		}
+		exporter.exportExcel(path);
 	}
-#endif
 }
 
 void CMainFrame::OnFileParametersExportUnits()
 {
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	CFileDialog fileDlg (FALSE, "*.xls", 0,
 						 OFN_LONGNAMES|OFN_HIDEREADONLY|OFN_NOCHANGEDIR|OFN_OVERWRITEPROMPT,
 						 "(*.xls)|*.xls||", 0);
@@ -1662,20 +1514,16 @@ void CMainFrame::OnFileParametersExportUnits()
 		ParameterTree::Exporter exporter;
 		exporter.exportExcel(path);
 	}
-#endif
 }
 
 void askForSaveAllLibraries()
 {
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	if(AfxMessageBox(TRANSLATE("Сохранить библиотеки?\n(если нет - это нужно будет сделать вручную)"), MB_YESNO | MB_ICONQUESTION) == IDYES)
 		saveAllLibraries();
-#endif
 }
 
 void CMainFrame::OnFileParametersImportUnits()
 {
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	CFileDialog fileDlg (TRUE, "*.xls", 0,
 						 OFN_LONGNAMES|OFN_HIDEREADONLY|OFN_NOCHANGEDIR|OFN_FILEMUSTEXIST,
 						 "(*.xls)|*.xls||", this);
@@ -1690,10 +1538,13 @@ void CMainFrame::OnFileParametersImportUnits()
 			ParameterTree::Exporter exporter;
 			exporter.importExcel(path);
 
+#ifndef _VISTA_ENGINE_EXTERNAL_
 			askForSaveAllLibraries();
+#else
+			saveAllLibraries();
+#endif
 		}
 	}
-#endif
 }
 
 void CMainFrame::OnDebugSaveDictionary()
@@ -1725,247 +1576,22 @@ void CMainFrame::OnEditSounds()
 	editLibrary("SoundLibrary");
 }
 
-struct ExportParameters
-{
-	string projectName;
-	bool packResource;
-	bool exportPDB;
-	bool exportEditor;
-	bool exportFinal;
-	bool protect;
-	bool buildInstaller;
-	string fileNSIS;
-
-	struct World {
-		string name;
-		string nameTrans;
-		bool export;
-		World(const char* _name) : name(_name), export(false), nameTrans(transliterate(_name)) {}
-		void serialize(Archive& ar){
-			ar.serialize(export, nameTrans.c_str(), name.c_str());
-		}
-	};
-	typedef vector<World> Worlds;
-	Worlds worlds;
-	ExportParameters()
-	{
-		projectName = "gameFinal";
-		packResource = false;
-		exportPDB = true;
-		exportEditor = false;
-		exportFinal = true;
-		protect = false;
-		buildInstaller = false;
-
-		DirIterator it("Resource\\Worlds\\*.*");
-		while(it){
-			if(it.isDirectory())
-				worlds.push_back(*it);
-			++it;
-		}
-	}
-
-	void serialize(Archive& ar)
-	{
-		ar.serialize(projectName, "projectName", "Имя проекта");
-		ar.serialize(packResource, "packResource", "Паковать ресурсы");
-		ar.serialize(exportEditor, "exportEditor", "Экспортировать редактор");
-		ar.serialize(exportPDB, "exportPDB", "Экспортировать файлы дебаговой информации");
-		ar.serialize(exportFinal, "exportFinal", "Экспортировать финальный исполняемый файл (с выключенными run-time проверками)");
-		ar.serialize(protect, "protect", "Защищать StarForce (будет произведена остановка для запуска вручную, открыть порт 27705)");
-		ar.serialize(buildInstaller, "buildInstaller", "Собирать установщик");
-		if(buildInstaller){
-			static ResourceSelector::Options options("*.nsi", "Scripts\\Engine\\NSIS", "NSIS Project");
-			ar.serialize(ResourceSelector(fileNSIS, options), "fileNSIS", "Проект установщика");
-		}
-
-		if(ar.openBlock("worlds", "Миры для экспорта")){
-			Worlds::iterator i;
-			FOR_EACH(worlds, i)
-				i->serialize(ar);
-			ar.closeBlock();
-		}
-	}
-};
-
-void modelSelectorCallBack(const char* name)
-{
-	if(getExtention(name) == "3dx"){
-		cStatic3dx* element = pLibrary3dx->GetElement(name, 0, false);
-		if(element){
-			TextureNames textures;
-			element->GetTextureNames(textures);
-			TextureNames::iterator i;
-			FOR_EACH(textures, i)
-				ExportInterface::export(i->c_str());
-		}
-	}
-	else if(getExtention(name) == "effect"){
-		ExportInterface::export(name);
-		vector<string> textures;
-		if(GetAllTextureNamesEffectLibrary(name, textures)){
-			vector<string>::iterator i;
-			FOR_EACH(textures, i)
-				ExportInterface::export(i->c_str());
-		}
-	}
-	else
-		xassert(!strlen(name));
-}
-
 void CMainFrame::OnFileExportVistaEngine()
 {
-	ExportParameters params;
-
-	XPrmIArchive ia;
-	if(ia.open("Scripts\\Content\\export.scr"))
-		params.serialize(ia);
-
-	if(!kdw::edit(Serializer(params), "Scripts\\TreeControlSetups\\export", kdw::ONLY_TRANSLATED | kdw::IMMEDIATE_UPDATE, GetSafeHwnd()))
-		return;
-
-	params.serialize(XPrmOArchive("Scripts\\Content\\export.scr"));
-
-	if(terScene){
-		view_->doneUniverse();
-		terScene->Compact();
-	}
-
+	bool packResources = MessageBox(TRANSLATE("Запаковать ресурсы?"), 0, MB_YESNO | MB_ICONQUESTION) == IDYES;
 	const char* path = "ExportVistaEngine.bat"; 
-	if(system(path) < 0){ 
+	if (0 > system (path)) { 
 		CString message(TRANSLATE("Не могу запустить скрипт экспорта!"));
 		MessageBox (message, 0, MB_OK | MB_ICONERROR);
 		return;
 	}
-
-	CopyFile("ConfigurationTool.exe", "Output\\ConfigurationTool.exe", true);
-	CopyFile("AttribEditor.dll", "Output\\AttribEditor.dll", true);
-	if(params.exportFinal){
-		XBuffer buffer;
-		buffer < "Output\\" < params.projectName.c_str() < ".exe";
-		CopyFile("GameFinal.exe", buffer, true);
-		if(params.exportPDB)
-			CopyFile("gameFinal.pdb", "Output\\gameFinal.pdb", true);
-	}
-	else{
-		XBuffer buffer;
-		buffer < "Output\\" < params.projectName.c_str() < ".exe";
-		CopyFile("Game.exe", buffer, true);
-		if(params.exportPDB){
-			CopyFile("game.pdb", "Output\\game.pdb", true);
-		}
-	}
-	CopyFile("binkw32.dll", "Output\\binkw32.dll", true);
-
-	if(params.exportEditor){
-		XBuffer buffer;
-		buffer < "Output\\" < params.projectName.c_str() < "MapEditor.exe";
-		CopyFile("VistaEngineExt.exe", buffer, true);
-		if(params.exportPDB)
-			CopyFile("VistaEngineExt.pdb", "Output\\VistaEngineExt.pdb", true);
-
-		CopyFile("ExcelExport.dll", "Output\\ExcelExport.dll", true);
-	}
-
-	iniFile.save();
-	CopyFile("iniFile.cfg", "Output\\iniFile.cfg", true);
-
-	ExportInterface::setExport(true, modelSelectorCallBack);
-
-	GetTexLibrary()->clearCacheInfo();
-	pLibrary3dx->clearCacheInfo();
-
-	EffectContainer::setTexturesPath("Resource\\FX\\Textures");
-	for(EffectLibrary::Strings::const_iterator it = EffectLibrary::instance().strings().begin(); it != EffectLibrary::instance().strings().end(); ++it)
-		if(it->get())
-			it->get()->preloadLibrary();
-
-	saveAllLibraries();
-
-	TriggerChain globalTrigger;
-	globalTrigger.load("Scripts\\Content\\Triggers\\GlobalTrigger.scr");
-
-	ExportParameters::Worlds::iterator i;
-	FOR_EACH(params.worlds, i){
-		if(!i->export)
-			continue;
-		view_->createScene();
-		vMap.load(i->name.c_str(), true);
-		view_->reInitWorld();
-		
-		save(vMap.getWorldName().c_str());
-
-		string srcDir = "Resource\\Worlds\\";
-		string destDir = "Output\\Resource\\Worlds\\";
-		srcDir += i->name;
-		destDir += i->name;
-		CopyFile((srcDir + ".spg").c_str(), (destDir + ".spg").c_str(), true);
-		CopyFile((srcDir + ".spg.bin").c_str(), (destDir + ".spg.bin").c_str(), true);
-		srcDir += "\\";
-		destDir += "\\";
-		createDirectory(destDir.c_str());
-		DirIterator it((srcDir + "*.*").c_str());
-		while(it){
-			if(it.isFile())
-				CopyFile((srcDir + *it).c_str(), (destDir + *it).c_str(), true);
-			++it;
-		}
-	}
-
-	OnFileUpdateQuickStartWorldsList();
-	CopyFile("Resource\\Worlds\\qswl.scr", "Output\\Resource\\Worlds\\qswl.scr", true);
-
-	GetTexLibrary()->saveCacheInfo(true);
-	pLibrary3dx->saveCacheInfo(true);
-
-	const char* path2 = "ExportVistaEngine.bat pass2"; 
-	if(system(path2) < 0){ 
-		CString message(TRANSLATE("Не могу запустить скрипт экспорта!"));
-		MessageBox(message, 0, MB_OK | MB_ICONERROR);
-		return;
-	}
-
-	ExportInterface::setExport(false, 0);
-	GetTexLibrary()->saveCacheInfo(false);
-	pLibrary3dx->saveCacheInfo(false);
-
-	if(params.packResource){
+	if(packResources){
 		ExportOutputCallback::show(this);
 		SetCurrentDirectory("Output");
 		ZipConfig::makeArchives(&ExportOutputCallback::callback);
-		iniFile.ZIP = true;
+		IniManager("game.ini").putInt("Game", "ZIP", 1);
 		SetCurrentDirectory("..");
 		ExportOutputCallback::hide(this);
-	}
-
-	if(params.protect){
-		XBuffer substCommand;
-		substCommand < "subst X: " < extractFilePath(__argv[0]).c_str() < "\\Output";
-		system(substCommand);
-
-		MessageBox("Запустите защиту StarForce вручную", 0, MB_OK | MB_ICONERROR);
-
-		while(!isFileExists("Output\\SFOutput\\protect.dll"))
-			MessageBox("Защита прошла неудачно, запустите защиту еще раз", 0, MB_OK | MB_ICONERROR);
-
-		system("move Output\\SFOutput\\*.* Output");
-		system("rmdir /Q /S Output\\SFOutput");
-		system("rmdir /Q /S Output\\Scripts\\Content");
-		system("mkdir Output\\Scripts\\Content");
-		system("copy Scripts\\Content\\Controls Output\\Scripts\\Content");
-		system("copy Scripts\\Content\\GameOptions Output\\Scripts\\Content");
-		system("subst X: /D");
-	}
-
-	if(params.buildInstaller){
-		while(!isFileExists("C:\\Program Files\\NSIS\\makensis.exe")){
-			MessageBox("Необходимо установить NSIS (в путях по-умолчанию - C:\\Program Files\\)", 0, MB_OK | MB_ICONERROR);
-			system("\\\\CENTER\\Incubator\\Heap\\NSIS\\nsis-2.32-setup.exe");
-		}
-
-		XBuffer run;
-		run < "\"C:\\Program Files\\NSIS\\makensis.exe\" " < params.fileNSIS.c_str();
-		system(run);
 	}
 }
 
@@ -1983,7 +1609,7 @@ void CMainFrame::OnEditSaveCameraAsDefault()
 void CMainFrame::OnEditUndo()
 {
 	CWaitCursor wait;
-	if(vMap.isWorldLoaded()){
+	if(vMap.isLoad()){
 		vMap.UndoDispatcher_Undo();
 		Invalidate(FALSE);
 	}
@@ -1997,7 +1623,7 @@ void CMainFrame::OnUpdateEditRedo(CCmdUI *pCmdUI)
 void CMainFrame::OnEditRedo()
 {
 	CWaitCursor wait;
-	if(vMap.isWorldLoaded()){
+	if(vMap.isLoad()){
 		vMap.UndoDispatcher_Redo();
 		Invalidate(FALSE);
 	}
@@ -2006,6 +1632,7 @@ void CMainFrame::OnEditRedo()
 void CMainFrame::OnDebugShowpalettetexture()
 {
 	CWaitCursor wait;
+		//vMap.convertSupBuf2SurBuf();
 	if(vMap.isShowTryColorDamTexture())
 		vMap.toShowTryColorDamTexture(false);
 	else 
@@ -2016,22 +1643,18 @@ void CMainFrame::OnDebugShowpalettetexture()
 
 void CMainFrame::OnUpdateDebugShowpalettetexture(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(vMap.isWorldLoaded());
+	pCmdUI->Enable(vMap.isLoad());
 	pCmdUI->SetCheck(!vMap.isShowTryColorDamTexture());
 }
 
-struct HeadLibrarySerialization{
-	void serialize(Archive& ar){
-		GlobalAttributes::instance().serializeHeadLibrary(ar);
-	}
-};
-
 void CMainFrame::OnEditHeads()
 {
-#ifndef _VISTA_ENGINE_EXTERNAL_
-	if(kdw::edit(Serializer(HeadLibrarySerialization()), "Scripts\\TreeControlSetups\\heads", kdw::ONLY_TRANSLATED | kdw::IMMEDIATE_UPDATE, GetSafeHwnd()))
+	EditArchive ea(0, TreeControlSetup(0, 0, 200, 200, "Scripts\\TreeControlSetups\\heads"));
+	GlobalAttributes::instance().serializeHeadLibrary(static_cast<EditOArchive&>(ea));
+	if(ea.edit()){
+		GlobalAttributes::instance().serializeHeadLibrary(static_cast<EditIArchive&>(ea));
 		::saveAllLibraries();
-#endif
+	}
 }
 
 void CMainFrame::OnEditSoundTracks()
@@ -2041,9 +1664,28 @@ void CMainFrame::OnEditSoundTracks()
 
 void CMainFrame::OnEditReels()
 {
-	//CFileLibraryEditorDlg dlg ("Resource\\Video", "*.bik");
-	//dlg.DoModal ();
+	CFileLibraryEditorDlg dlg (".\\Resource\\Video", "*.bik");
+	dlg.DoModal ();
 }
+
+void CMainFrame::OnEditGlobalTrigger()
+{
+#ifndef _VISTA_ENGINE_EXTERNAL_
+	static TriggerEditor triggerEditor(triggerInterface());
+	if(!triggerEditor.isOpen()) {
+		TriggerChain triggerChain;
+		triggerChain.load("Scripts\\Content\\GlobalTrigger.scr");
+		if(triggerEditor.run(triggerChain, GetSafeHwnd(), true)){
+			triggerChain.save();
+			TextIdMap::instance().saveLibrary();
+		}
+	}
+#else // _VISTA_ENGINE_EXTERNAL_
+	CString message (TRANSLATE("Недоступно во внешней версии"));
+	MessageBox (message, 0, MB_OK | MB_ICONERROR);
+#endif // _VISTA_ENGINE_EXTERNAL_
+}
+
 
 void CMainFrame::OnViewHideModels()
 {
@@ -2070,13 +1712,13 @@ void CMainFrame::OnViewGeosurface()
 {
 	if(view_->isWorldOpen()){
 		CWaitCursor wait;
-		//if(vMap.IsShowSpecialInfo()==vrtMap::SSI_ShowAllGeo){
-		//	vMap.toShowSpecialInfo(vrtMap::SSI_NoShow);
-		//}
-		//else {
-		//	vMap.toShowSpecialInfo(vrtMap::SSI_ShowAllGeo);
-		//}
-		//vMap.WorldRender();
+		if(vMap.IsShowSpecialInfo()==vrtMap::SSI_ShowAllGeo){
+			vMap.toShowSpecialInfo(vrtMap::SSI_NoShow);
+		}
+		else {
+			vMap.toShowSpecialInfo(vrtMap::SSI_ShowAllGeo);
+		}
+		vMap.WorldRender();
 	}
 }
 
@@ -2094,17 +1736,17 @@ void CMainFrame::OnUpdateViewPathFinding(CCmdUI *cmd)
 void CMainFrame::OnViewPathFindingReferenceUnit()
 {
 	AttributeReference reference(surMapOptions.showPathFindingReferenceUnit());
-	kdw::TreeSelectorDialog dlg(*this);
-	kdw::ReferenceTreeBuilder<AttributeReference> treeBuilder(reference);
+	CTreeSelectorDlg dlg(this);
+	ReferenceTreeBuilder<AttributeReference> treeBuilder(reference);
 	dlg.setBuilder(&treeBuilder);
-	if(dlg.showModal() == kdw::RESPONSE_OK){
-		surMapOptions.setShowPathFindingReferenceUnit(reference.unitAttributeID().nameRace().c_str());
+    if(dlg.DoModal() == IDOK){
+		surMapOptions.setShowPathFindingReferenceUnit(reference.key().c_str());
 	}
 }
 
 void CMainFrame::OnUpdateViewGeosurface(CCmdUI *pCmdUI)
 {
-	pCmdUI->SetCheck(false /*vMap.IsShowSpecialInfo()==vrtMap::SSI_ShowAllGeo*/);
+	pCmdUI->SetCheck(vMap.IsShowSpecialInfo()==vrtMap::SSI_ShowAllGeo);
 	pCmdUI->Enable(view_->isWorldOpen());
 }
 
@@ -2132,6 +1774,15 @@ void CMainFrame::OnEditEffectsEditor()
 void CMainFrame::OnEditCursors()
 {
 	editLibrary("UI_CursorLibrary");
+}
+
+void CMainFrame::OnEditFormations()
+{
+	CFormationsEditorDlg dlg;
+	dlg.DoModal ();
+
+	UnitFormationTypes::instance().saveLibrary();
+	FormationPatterns::instance().saveLibrary();
 }
 
 void CMainFrame::OnDebugEditDebugPrm()
@@ -2178,63 +1829,10 @@ void CMainFrame::OnUpdateDebugShowmipmap(CCmdUI *pCmdUI)
 		pCmdUI->SetCheck(GetTexLibrary()->IsDebugMipMapColor());
 }
 
-struct MoveShiftScale : UniverseObjectAction{
-	MoveShiftScale(const Vect3f& _shift, const Vect2f& _scaleXY, float _baseH, float _scaleH, float _scaleObjects, bool _init)
-    : shift(_shift), scaleXY(_scaleXY), baseH(_baseH), scaleH(_scaleH), scaleObjects(_scaleObjects), init(_init) { }
-	void operator()(BaseUniverseObject& object){
-		Vect3f pos(object.position());
-		pos.x *=scaleXY.x;
-		pos.y *=scaleXY.y;
-		pos.z = (pos.z - baseH) * scaleH + baseH;
-		pos+=shift;
-		object.setRadius(object.radius() * scaleObjects);
-		object.setPose(Se3f(object.orientation(), pos), init);
-		awakePhysics(object);
-	}
-	Vect3f shift;
-	Vect2f scaleXY;
-	float baseH;
-	float scaleH;
-	float scaleObjects;
-	bool init;
-};
-
 void CMainFrame::OnEditChangetotalworldheight()
 {
 	CDlgChangeTotalWorldHeight dlg;
-	int nRet = -1;
-	nRet = dlg.DoModal();
-	if(nRet==IDOK){
-		CWaitCursor wait;
-		MergeOptions options;
-		options.mergePlayers=true;
-		options.mergeWorld=true;
-		options.mergeSourcesAndAnchors=false;
-		options.mergeCameras=false;
-		options.worldFile = string(vMap.getWorldsDir()) + "\\" + vMap.getWorldName() + ".spg";
-		Vect2f oldWorldSize(vMap.H_SIZE, vMap.V_SIZE);
-
-		view_->createScene();
-		float scaleVx=(float)dlg.m_scaleH.value/100.f;
-		float baseH=vMap.changeTotalWorldParam(dlg.m_deltaH.value, scaleVx, dlg.m_changeParam);
-		
-		view_->reInitWorld();
-
-		Vect2f scaleXY;
-		if(dlg.m_changeParam.flag_resizeWorld2NewBorder)
-            scaleXY.set((float)vMap.H_SIZE/oldWorldSize.x, (float)vMap.V_SIZE/oldWorldSize.y);
-		else 
-			scaleXY.set(1.f, 1.f);
-		Vect3f shift(dlg.m_changeParam.oldWorldBegCoordX, dlg.m_changeParam.oldWorldBegCoordY, dlg.m_deltaH.value);
-		MoveShiftScale moveAnShift(shift, scaleXY, baseH, scaleVx, dlg.m_changeParam.kScaleModels, true);
-		universe()->universeObjectAction=&moveAnShift;
-		universe()->mergeWorld(options);
-		universe()->universeObjectAction=0;
-		//forEachUniverseObject(), true);
-		Invalidate(FALSE);
-		put2TitleNameDirWorld();
-		toolsWindow_->rebuildTools();
-	}
+	dlg.DoModal();
 }
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
@@ -2255,17 +1853,6 @@ void CMainFrame::OnFileStatistics()
 void CMainFrame::OnViewToolbar()
 {
 	toggleControlBar(toolBar_);
-}
-
-
-void CMainFrame::OnUpdateViewShowCameraBorders(CCmdUI *cmdUI)
-{
-	cmdUI->SetCheck(surMapOptions.showCameraBorders() ? 1 : 0);
-}
-
-void CMainFrame::OnViewShowCameraBorders()
-{
-	surMapOptions.setShowCameraBorders(!surMapOptions.showCameraBorders());
 }
 
 void CMainFrame::OnUpdateViewToolbar(CCmdUI *pCmdUI)
@@ -2302,51 +1889,51 @@ void CMainFrame::OnUpdateIsWorldLoaded(CCmdUI *cmdUI)
 
 void CMainFrame::OnFileImportTextFromExcel()
 {
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	CFileDialog fileDlg (TRUE, "*.xls", 0,
 						 OFN_LONGNAMES|OFN_HIDEREADONLY|OFN_NOCHANGEDIR|OFN_FILEMUSTEXIST,
 						 "(*.xls)|*.xls||", this);
 	fileDlg.m_ofn.lpstrTitle = TRANSLATE("Открыть XLS файл...");
 
-	if(fileDlg.DoModal() == IDOK){
+	if (fileDlg.DoModal () == IDOK) {
 		CWaitCursor waitCursor;
 		CString path = fileDlg.GetPathName();	
-
 		ImportImpl excl_(path);
-
-		if(excl_.importLangList(GlobalAttributes::instance().languagesList))
-			if(excl_.importAllLangText(GlobalAttributes::instance().languagesList))
-				GlobalAttributes::instance().saveLibrary(); // сохраняем изменения кодовых страниц
+		excl_.importLangList(GlobalAttributes::instance().languagesList);
+		excl_.importAllLangText(GlobalAttributes::instance().languagesList);
+		GlobalAttributes::instance().saveLibrary(); // сохраняем изменения кодовых страниц
 	}
-#endif
+	else 
+		return;	
 }
 
 void CMainFrame::OnFileExportTextToExcel()
 {
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	CFileDialog fileDlg (FALSE, "*.xls", 0,
 						 OFN_LONGNAMES|OFN_HIDEREADONLY|OFN_NOCHANGEDIR|OFN_OVERWRITEPROMPT,
 						 "(*.xls)|*.xls||", this);
 	fileDlg.m_ofn.lpstrTitle = TRANSLATE("Сохранить XLS файл...");
 
-	if(fileDlg.DoModal() == IDOK){
+	if (fileDlg.DoModal () == IDOK) {
 		CWaitCursor waitCursor;
 		CString path = fileDlg.GetPathName();
 		FILE* stream;
 		if((stream = fopen(path, "r")) != NULL){
 			fclose(stream);
-			//ImportImpl exclIm_(path);
-			//exclIm_.application()->openSheet();
-			//exclIm_.importAllLangText(GlobalAttributes::instance().languagesList);
+			ImportImpl exclIm_(path);
+			exclIm_.application()->openSheet();
+			ExcelFileStruct structure;
+			if (structure.check(exclIm_.application())) 
+				exclIm_.importAllLangText(GlobalAttributes::instance().languagesList);
 		}
         DeleteFile(path);
 		
 		reloadLocStrings();
 
 		ExportImpl excl_(path);
-		excl_.exportAllLangText(GlobalAttributes::instance().languagesList);
+		excl_.exportAllLangText(TextIdMap::instance(), GlobalAttributes::instance().languagesList);
 	}
-#endif
+	else
+		return;
 }
 
 void CMainFrame::reloadLocStrings()
@@ -2354,9 +1941,6 @@ void CMainFrame::reloadLocStrings()
 	AttributeLibrary::instance();
 	UI_Dispatcher::instance();
 	UI_TextLibrary::instance();
-	CommonLocText::instance();
-	GlobalAttributes::instance();
-	GameOptions::instance();
 
 	WIN32_FIND_DATA FindFileData;
 	HANDLE hf = FindFirstFile( "Scripts\\Content\\Triggers\\*.scr", &FindFileData );
@@ -2387,12 +1971,6 @@ void CMainFrame::OnDebugUISpriteLib()
 {
 	editLibrary("UI_ShowModeSpriteTable");
 }
-
-void CMainFrame::OnEditCommandColor()
-{
-	CommandColorManager::instance().editLibrary(true);
-}
-
 
 void CMainFrame::OnEditUITextSprites()
 {
@@ -2427,11 +2005,6 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return CFrameWnd::WindowProc(message, wParam, lParam);
 }
 
-void CMainFrame::OnLibrariesUIShowModeSprites()
-{
-	editLibrary("UI_ShowModeSpriteTable");
-}
-
 void CMainFrame::OnLibrariesUIMessages()
 {
 	editLibrary("UI_TextLibrary");
@@ -2444,7 +2017,6 @@ void CMainFrame::OnLibrariesUIMessageTypes()
 
 void exportParametersByGroups()
 {
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	CFileDialog fileDlg (FALSE, "*.xls", 0,
 						 OFN_LONGNAMES|OFN_HIDEREADONLY|OFN_NOCHANGEDIR|OFN_OVERWRITEPROMPT,
 						 "(*.xls)|*.xls||", 0);
@@ -2459,12 +2031,12 @@ void exportParametersByGroups()
 		excl_.exportParameters();
 		
 	}
-#endif
+	else
+		return;
 }
 
 void importParametersByGroups()
 {
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	CFileDialog fileDlg (TRUE, "*.xls", 0,
 						 OFN_LONGNAMES|OFN_HIDEREADONLY|OFN_NOCHANGEDIR,
 						 "(*.xls)|*.xls||", 0);
@@ -2474,24 +2046,30 @@ void importParametersByGroups()
 		CString path = fileDlg.GetPathName();
 
 		ParameterImportExcel excl_(path);
+
+		EditOArchive oa;
+		ParameterValueTable::instance().serialize(oa);
+		TreeNode* root = oa.rootNode()->front();
+
 		excl_.importParameters();
 	}
-#endif
+
 }
+
 
 void CMainFrame::OnImportParameters()
 {
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	importParametersByGroups();
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	askForSaveAllLibraries();
+#else
+	saveAllLibraries();
 #endif
 }
 
 void CMainFrame::OnExportParameters()
 {
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	exportParametersByGroups();
-#endif
 }
 
 void CMainFrame::OnEditUpdateSurface()
@@ -2508,7 +2086,6 @@ CMainFrame& mainFrame()
 
 void CMainFrame::OnFileParametersImportFull()
 {
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	CFileDialog fileDlg (TRUE, "*.xls", 0,
 						 OFN_LONGNAMES|OFN_HIDEREADONLY|OFN_NOCHANGEDIR,
 						 "(*.xls)|*.xls||", this);
@@ -2518,6 +2095,10 @@ void CMainFrame::OnFileParametersImportFull()
 		CString path = fileDlg.GetPathName();
 		
 		ExcelImporter* importer = ExcelImporter::create(path);
+
+		EditOArchive oa;
+		ParameterValueTable::instance().serialize(oa);
+		TreeNode* root = oa.rootNode()->front();
 
 		importer->openSheet();
         
@@ -2532,15 +2113,15 @@ void CMainFrame::OnFileParametersImportFull()
             
             value.setRawValue(importer->getCellFloat(Vect2i(1, line)));
 
-			std::string type = w2a(importer->getCellText(Vect2i(2, line)));
+			std::string type = importer->getCellText(Vect2i(2, line));
 			if(type != value.type()->c_str())
 				value.setType(ParameterTypeReference(type.c_str()));
 
-			std::string formula = w2a(importer->getCellText(Vect2i(3, line)));
+			std::string formula = importer->getCellText(Vect2i(3, line));
 			if(formula != value.formula()->c_str())
 				value.setFormula(ParameterFormulaReference(formula.c_str()));
 
-			std::string group = w2a(importer->getCellText(Vect2i(4, line)));
+			std::string group = importer->getCellText(Vect2i(4, line));
 			if(group != value.group()->c_str())
 				value.setGroup(ParameterGroupReference(group.c_str()));
 
@@ -2548,23 +2129,27 @@ void CMainFrame::OnFileParametersImportFull()
         }
         importer->free();
 
+#ifndef _VISTA_ENGINE_EXTERNAL_
 		askForSaveAllLibraries();
+#else
+		saveAllLibraries();
+#endif
 	} else {
 	}
-#endif
 }
 
 void CMainFrame::OnFileParametersImportByGroups()
 {
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	::importParametersByGroups();
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	askForSaveAllLibraries();
+#else
+	saveAllLibraries();
 #endif
 }
 
 void CMainFrame::OnFileParametersExportFull()
 {
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	CFileDialog fileDlg (FALSE, "*.xls", 0,
 						 OFN_LONGNAMES|OFN_HIDEREADONLY|OFN_NOCHANGEDIR|OFN_OVERWRITEPROMPT,
 						 "(*.xls)|*.xls||", this);
@@ -2581,12 +2166,12 @@ void CMainFrame::OnFileParametersExportFull()
         const ParameterValueTable::Strings& strings = ParameterValueTable::instance().strings();
         ParameterValueTable::Strings::const_iterator it;
 
-		exporter->setCellText(Vect2i(0, 0), L"Имя параметра");
-		exporter->setCellText(Vect2i(1, 0), L"Значение");
-		exporter->setCellText(Vect2i(2, 0), L"Тип");
-		exporter->setCellText(Vect2i(3, 0), L"Формула");
-		exporter->setCellText(Vect2i(4, 0), L"Группа");
-		exporter->setCellText(Vect2i(5, 0), L"Выч. знач.");
+		exporter->setCellText(Vect2i(0, 0), "Имя параметра");
+		exporter->setCellText(Vect2i(1, 0), "Значение");
+		exporter->setCellText(Vect2i(2, 0), "Тип");
+		exporter->setCellText(Vect2i(3, 0), "Формула");
+		exporter->setCellText(Vect2i(4, 0), "Группа");
+		exporter->setCellText(Vect2i(5, 0), "Выч. знач.");
 		int columns_count = 6;
 
 		exporter->setPageOrientation(true);
@@ -2596,14 +2181,14 @@ void CMainFrame::OnFileParametersExportFull()
         FOR_EACH(strings, it) {
             const ParameterValue& value = *it;
             
-			exporter->setCellText(Vect2i(0, line), a2w(value.c_str()).c_str());
+			exporter->setCellText(Vect2i(0, line), value.c_str());
             exporter->setCellFloat(Vect2i(1, line), value.rawValue());
-            exporter->setCellText(Vect2i(2, line), a2w(value.type()->c_str()).c_str());
-            exporter->setCellText(Vect2i(3, line), a2w(value.formula()->c_str()).c_str());
+            exporter->setCellText(Vect2i(2, line), value.type()->c_str());
+            exporter->setCellText(Vect2i(3, line), value.formula()->c_str());
 			if(strlen(value.formula()->c_str()))
 			    exporter->setBackColor(Recti(0, line, columns_count, 1), 48);
 
-            exporter->setCellText(Vect2i(4, line), a2w(value.group()->c_str()).c_str());
+            exporter->setCellText(Vect2i(4, line), value.group()->c_str());
 			exporter->setCellFloat(Vect2i(5, line), value.value());
             ++line;
         }
@@ -2625,7 +2210,7 @@ void CMainFrame::OnFileParametersExportFull()
 	} else {
 		return;
 	}
-#endif
+
 }
 
 void CMainFrame::OnFileParametersExportByGroups()
@@ -2636,9 +2221,9 @@ void CMainFrame::OnFileParametersExportByGroups()
 void CMainFrame::OnHelpKeyInfo()
 {
 	sKey key;
-	kdw::HotkeyDialog dlg(*this, key);
-	if(dlg.showModal() == kdw::RESPONSE_OK){
-		key = dlg.get();
+	CHotKeySelectorDlg dlg(key);
+	if(dlg.DoModal() == IDOK){
+		key = dlg.key();
 
 		CString str;
 
@@ -2672,7 +2257,7 @@ void CMainFrame::OnFileResaveWorlds()
 			vMap.load(*it, true);
 			view_->reInitWorld();
 
-			save(vMap.getWorldName().c_str());
+			save(vMap.worldName.c_str());
 		}
 		++it;
 	}
@@ -2690,159 +2275,8 @@ void CMainFrame::OnFileResaveTriggers()
 		}
 		++it;
 	}
-}
 
-
-void translateMenu(HMENU menu, const char* pathBase)
-{
-//	HINSTANCE instance = ::GetWindowInstance(GetSafeHwnd
-	UINT count = ::GetMenuItemCount(menu);
-	for(UINT i = 0; i < count; ++i){
-		std::string path = pathBase;
-		MENUITEMINFO menuInfo;
-		memset(&menuInfo, 0, sizeof(menuInfo));
-		menuInfo.cbSize = sizeof(menuInfo);
-		menuInfo.fMask = MIIM_TYPE | MIIM_ID;
-		if(::GetMenuItemInfo(menu, i, TRUE, &menuInfo)){
-			WORD commandID = menuInfo.wID;
-			CString idString;
-			idString.LoadString(commandID);
-			if(menuInfo.fType == MFT_STRING){
-				VERIFY(::GetMenuItemInfo(menu, i, TRUE, &menuInfo));
-				if(menuInfo.cch > 0){
-					std::string text(menuInfo.cch + 1, '\0');
-					menuInfo.dwTypeData = &text[0];
-					menuInfo.cch += 1;
-					::GetMenuItemInfo(menu, i, TRUE, &menuInfo);
-
-
-					std::string::size_type pos = text.find("\t");
-					std::string hotkey = "";
-					if(pos != std::string::npos){
-						hotkey = "\t";
-						hotkey += text.c_str() + pos;
-						text = std::string(text.begin(), text.begin() + pos);
-					}
-					else
-						text.pop_back(); // удаляем последний '\0'
-
-
-					std::string tooltip = "";
-
-					path += text;
-					std::string translationKey = path;
-					const char* ptr = static_cast<const char*>(idString);
-					const char* end = ptr + strlen(ptr);
-					ptr = std::find(ptr, end, '\n');
-					if(ptr != end){
-						tooltip = std::string(ptr, end);
-						translationKey += tooltip;
-					}
-
-					const char* key = translationKey.c_str();
-					const char* translatedName = TRANSLATE(key);
-					
-					std::string nameWithHotkey = text + hotkey;
-
-					if(translatedName != key){
-						const char* name = translatedName + strlen(translatedName);
-						if(name != translatedName)
-							while((name - 1) != translatedName && *(name-1) != '\\')
-								--name;
-                        if(name - 1 == translatedName)
-							name = translatedName;
-						const char* end = name;
-						while(*end && *end != '\n')
-                            ++end;
-						nameWithHotkey = std::string(name, end) + hotkey;
-						if(*end){
-							++end;
-							tooltip = end;
-						}
-					}
-					
-					
-					CExtCmdManager::cmd_t* cmd;
-					cmd = g_CmdManager->CmdGetPtr(AfxGetApp()->m_pszProfileName, commandID);
-					if(commandID && cmd){
-						cmd->m_sTipTool = tooltip.c_str();
-						cmd->m_sMenuText = nameWithHotkey.c_str();
-					}
-
-					MENUITEMINFO info;
-					memset(&info, 0, sizeof(info));
-					info.cbSize = sizeof(info);
-					info.fMask = MIIM_STRING;
-					info.dwTypeData = (char*)nameWithHotkey.c_str();
-					VERIFY(::SetMenuItemInfo(menu, i, TRUE, &info));
-					//VERIFY(::ModifyMenu(menu, i, MF_BYPOSITION | MF_STRING, 0, nameWithHotkey.c_str()));
-					path += "\\";
-				}
-			}
-			menuInfo.fMask = MIIM_SUBMENU;
-			if(::GetMenuItemInfo(menu, i, TRUE, &menuInfo)){
-				if(menuInfo.hSubMenu)
-					translateMenu(menuInfo.hSubMenu, path.c_str());
-			}
-		}
-	}
-}
-
-bool CMainFrame::reloadMenu()
-{
-#ifndef _VISTA_ENGINE_EXTERNAL_
-	const bool external = false;
-#else
-	const bool external = true;
-#endif
-	if(!menuBar_.LoadMenuBar(external ? IDR_MAINFRAME_EXTERNAL : IDR_MAINFRAME))
-		return false;
-	
-	HMENU menu = menuBar_.GetMenu()->m_hMenu;
-	::translateMenu(menu, "");
-
-	if(!g_CmdManager->UpdateFromMenu(g_CmdManager->ProfileNameFromWnd(GetSafeHwnd()), menu), false){
-		ASSERT(FALSE);
-	}
-	menuBar_.UpdateMenuBar();
-	CWnd::RepositionBars(0, 0, 0);
-
-	DrawMenuBar();
-	return true;
-}
-
-void CMainFrame::OnFileUpdateQuickStartWorldsList()
-{
-	CWaitCursor waitCursor;
-
-	string dir = "Resource\\Worlds\\";
-	DirIterator it((dir + "*.spg").c_str());
-	while(it){
-		MissionDescription md((dir + *it).c_str());
-		if(md.isBattle())
-			qsWorldsMgr.updateQSWorld(md.saveName(), (XGUID)md.missionGUID());
-		++it;
-	}
-
-	qsWorldsMgr.save();
-}
-
-void CMainFrame::setSpeed(float speed) 
-{ 
-	syncroTimer.setSpeed(speed);
-}
-
-void CMainFrame::OnLibrariesTerrraintypename()
-{
-	TerrainTypeDescriptor::instance().editLibrary();
-	vMap.WorldRender();
-}
-
-void CMainFrame::OnEditRollingborder()
-{
-	// TODO: Add your command handler code here
-	DlgBorderRolling dlgBorderRolling;
-	if(dlgBorderRolling.DoModal() == IDOK) {
-		vMap.autoLace(dlgBorderRolling.borderHeight*VOXEL_MULTIPLIER, (float)dlgBorderRolling.boderAngle*M_PI/180.);
-	}
+	TriggerChain triggerChain;
+	triggerChain.load("Scripts\\Content\\GlobalTrigger.scr");
+	triggerChain.save();
 }

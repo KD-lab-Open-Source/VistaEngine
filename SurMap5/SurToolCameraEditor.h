@@ -2,7 +2,7 @@
 #define __SUR_TOOL_CAMERA_EDITOR_H_INCLUDED__
 
 #include "SurToolAux.h"
-#include "MFC\SizeLayoutManager.h"
+#include "..\Util\MFC\SizeLayoutManager.h"
 
 class CameraSpline;
 class BaseUniverseObject;
@@ -14,16 +14,16 @@ public:
 	CSurToolCameraEditor(BaseUniverseObject* spline, bool playAndQuit = false);
 	virtual ~CSurToolCameraEditor();
 
-	bool onTrackingMouse (const Vect3f& worldCoord, const Vect2i& scrCoord);
-	bool onLMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord);
-	bool onLMBUp(const Vect3f& worldCoord, const Vect2i& screenCoord);
-	bool onRMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord);
-	void onSelectionChanged ();
+	bool CallBack_TrackingMouse (const Vect3f& worldCoord, const Vect2i& scrCoord);
+	bool CallBack_LMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord);
+	bool CallBack_LMBUp(const Vect3f& worldCoord, const Vect2i& screenCoord);
+	bool CallBack_RMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord);
+	void CallBack_SelectionChanged ();
 
-	bool onDelete();
-    bool onKeyDown(unsigned int keyCode, bool shift, bool control, bool alt);
+	bool CallBack_Delete();
+    bool CallBack_KeyDown(unsigned int keyCode, bool shift, bool control, bool alt);
 
-	bool onDrawAuxData();
+	bool CallBack_DrawAuxData();
 	void quant();
 
 	int getIDD() const{ return IDD_BARDLG_CAMERA; }

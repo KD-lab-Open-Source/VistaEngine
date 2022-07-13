@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "FileLibraryEditorDlg.h"
 #include "SurToolAux.h" // for requestResourceAndPut2InternalResource
-#include "FileUtils\FileUtils.h"
-#include "filelibraryeditordlg.h"
+#include "..\Util\FileIterator.h"
+#include ".\filelibraryeditordlg.h"
 
 IMPLEMENT_DYNAMIC(CFileLibraryEditorDlg, CDialog)
 
@@ -69,10 +69,11 @@ BOOL CFileLibraryEditorDlg::OnInitDialog()
 
 void CFileLibraryEditorDlg::updateList ()
 {
-	m_ctlFileList.DeleteAllItems();
+	m_ctlFileList.DeleteAllItems ();
 	std::string path = libraryPath_ + "\\" + filter_;
-    DirIterator iter (path.c_str());
-	for(; iter != DirIterator::end; ++iter) {
+    FileIterator iter (path.c_str());
+    FileIterator end;
+    for (; iter != end; ++iter) {
         if (iter.isFile ()) {
             m_ctlFileList.InsertItem (*iter);
         }

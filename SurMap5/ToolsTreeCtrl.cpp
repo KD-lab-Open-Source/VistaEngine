@@ -1,15 +1,14 @@
 #include "stdafx.h"
-#include "ToolsTreeCtrl.h"
+#include ".\ToolsTreeCtrl.h"
 #include "mfc\PopupMenu.h"
 #include "SurMap5.h"
 #include "ToolsTreeWindow.h"
 #include "MainFrame.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\XPrmArchive.h"
-#include "Serialization\MultiArchive.h"
-#include "Serialization\Dictionary.h"
-#include "Serialization\SerializationFactory.h"
-#include "kdw/PropertyEditor.h"
+#include "Serialization.h"
+#include "XPrmArchive.h"
+#include "MultiArchive.h"
+#include "Dictionary.h"
+#include "EditArchive.h"
 	
 #include "SurTool3DM.h"
 #include "SurToolBlur.h"
@@ -31,13 +30,10 @@
 #include "SurToolWaves.h"
 #include "SurToolAnchor.h"
 #include "SurToolGrass.h"
-#include "SurToolMiniDetaileFolder.h"
-#include "SurToolSpecFilter.h"
-
 
 #include <algorithm>
 
-BEGIN_MESSAGE_MAP(CToolsTreeCtrl, CTreeView) //CTreeCtrl
+BEGIN_MESSAGE_MAP(CToolsTreeCtrl, CTreeCtrl)
 	ON_NOTIFY_REFLECT(TVN_SELCHANGED, OnTvnSelchanged)
 	ON_WM_CREATE()
 	ON_NOTIFY_REFLECT(NM_RCLICK, OnRClick)
@@ -79,19 +75,16 @@ REGISTER_CLASS(CSurToolBase, CSurToolSource,     "Source");
 REGISTER_CLASS(CSurToolBase, CSurToolAnchor,     "Anchor");
 REGISTER_CLASS(CSurToolBase, CSurToolWaves,      "Waves");
 REGISTER_CLASS(CSurToolBase, CSurToolGrass,      "Grass");
-REGISTER_CLASS(CSurToolBase, CSurToolMiniDetaileFolder, "MiniDetaile Folder");
-REGISTER_CLASS(CSurToolBase, CSurToolSpecFilter,   "Detail Filter");
 
-static const char* treeToolDefaultCfgFName="Scripts\\Engine\\VistaEngine.scr";
-static const char* treeToolCfgFName="Scripts\\Content\\VistaEngine.scr";
+static const char* treeToolDefaultCfgFName=".\\Scripts\\Engine\\VistaEngine.scr";
+static const char* treeToolCfgFName=".\\Scripts\\Content\\VistaEngine.scr";
 static const char* treeToolCfgSection="Tree777";
 
-IMPLEMENT_DYNAMIC(CToolsTreeCtrl, CTreeView)//CTreeCtrl
+IMPLEMENT_DYNAMIC(CToolsTreeCtrl, CTreeCtrl)
 CToolsTreeCtrl::CToolsTreeCtrl()
 : mainFrame_(0)
-, popupMenu_(new PopupMenu(FactorySelector<CSurToolBase>::Factory::instance().size() + 5))
+, popupMenu_(new PopupMenu(ClassCreatorFactory<CSurToolBase>::instance().size() + 5))
 {
-	lastHTreeSelect=0;
 	pCurrentNode=0;
 	flag_tree_build=0; //признак что дерево не построено
 	curTreeItemRClick=NULL;
@@ -127,13 +120,7 @@ void CToolsTreeCtrl::init(CMainFrame* mainFrame)
 BOOL CToolsTreeCtrl::DestroyWindow()
 {
 	flag_tree_build=0; //признак что дерево не построено
-	return __super::DestroyWindow(); //CTreeCtrl
-}
-
-HTREEITEM lastHTreeSelect=0; 
-void CToolsTreeCtrl::OnInitialUpdate()
-{
-	BuildTree();
+	return CTreeCtrl::DestroyWindow();
 }
 
 enum e_BitmapTreeState{
@@ -159,12 +146,10 @@ void CToolsTreeCtrl::OnTvnSelchanged(NMHDR *pNMHDR, LRESULT *pResult)
 	destroyToolWindows();
 
 	curHTI=pNMTreeView->itemNew.hItem;
-	if(curHTI == 0 || !flag_tree_build)
+	if(curHTI == 0)
 		return;
 
-	if(pCurrentNode) pCurrentNode->flag_select=false;
 	pCurrentNode = findNode(curHTI);
-	if(pCurrentNode) pCurrentNode->flag_select=true;
 	CToolsTreeWindow* window = safe_cast<CToolsTreeWindow*>(GetParent());
 	window->replaceEditorMode(pCurrentNode);
 }
@@ -249,29 +234,20 @@ void CToolsTreeCtrl::buildNode(CSurToolBase* node, HTREEITEM parent, TV_INSERTST
 		break;
 	}
 
-	HTREEITEM htiCurLoc = GetTreeCtrl().InsertItem(&ins);
+	HTREEITEM htiCurLoc = InsertItem(&ins);
 	node->setTreeItem(htiCurLoc);
-	if(node->flag_select){
-		if(!lastHTreeSelect)
-			lastHTreeSelect=htiCurLoc;
-		else if(lastHTreeSelect!=htiCurLoc)
-			node->flag_select=false;
-	}
 	vector< ShareHandle<CSurToolBase> >::iterator p;
 	for(p = node->children().begin(); p != node->children().end(); ++p){
 		ins.item.state     = TVIS_EXPANDED|TVIS_EXPANDEDONCE;
         ins.item.stateMask = TVIS_EXPANDED|TVIS_EXPANDEDONCE; // | TVIS_BOLD
 		buildNode(*p, htiCurLoc, ins);
 	}
-	if(node->iconInSurToolTree==IconISTT_FolderTools)
-		GetTreeCtrl().SortChildren(htiCurLoc);
 }
 
 void CToolsTreeCtrl::BuildTree()
 {
 	flag_tree_build=0; //признак что дерево не построено
-	GetTreeCtrl().DeleteAllItems();
-	lastHTreeSelect=0;
+	DeleteAllItems();
 
 	TV_INSERTSTRUCT ins;
 	ins.hParent = TVI_ROOT;//m_hTreeItem;
@@ -293,31 +269,25 @@ void CToolsTreeCtrl::BuildTree()
 
 	flag_tree_build=1; //дерево построено
 
-	if(lastHTreeSelect){
-		//SelectItem(lastHTreeSelect);
-		GetTreeCtrl().Select(lastHTreeSelect, TVGN_FIRSTVISIBLE);
-		//Expand(lastHTreeSelect, TVE_EXPAND);
-		GetTreeCtrl().SelectItem(lastHTreeSelect);
-		//Invalidate(FALSE);
-	}
 	Invalidate();
 }
 
 int CToolsTreeCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	if (__super::OnCreate(lpCreateStruct) == -1)//CTreeCtrl
+	if (CTreeCtrl::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
 	ASSERT(mainFrame_); //not  call fuction init() !
 
 #ifdef EXTENDED_COLOR_BITMAP_IN_CONTROL
 	MakeVoluntaryImageList(IDB_TREETOOLDLG_BITMAP256, ILC_COLOR24, 4, m_ImgList);
-	GetTreeCtrl().SetImageList(&m_ImgList, TVSIL_NORMAL);
+	SetImageList(&m_ImgList, TVSIL_NORMAL);
 #else
 	m_ImgList.Create(IDB_TREETOOLDLG_BITMAP, 16, 0, RGB(255,0,255));
-	GetTreeCtrl().SetImageList(&m_ImgList, TVSIL_NORMAL);
+	SetImageList(&m_ImgList, TVSIL_NORMAL);
 #endif
 
+	BuildTree();
 	return 0;
 }
 
@@ -330,17 +300,17 @@ void CToolsTreeCtrl::OnRClick(NMHDR *pNMHDR, LRESULT *pResult)
 	CPoint curPoint(GET_X_LPARAM(GetMessagePos()), GET_Y_LPARAM(GetMessagePos()));
 	ScreenToClient(&curPoint);
 	UINT uFlags;
-	HTREEITEM item = GetTreeCtrl().HitTest(curPoint, &uFlags);
+	HTREEITEM item = HitTest(curPoint, &uFlags);
 	CSurToolBase* tool = 0;
 	if(item != TVI_ROOT && item != 0)
 		 tool = findNode(item);
 	
 	if(item){
 		curTreeItemRClick = item;
-		CString str = GetTreeCtrl().GetItemText (curTreeItemRClick);
-		GetTreeCtrl().Select(item, TVGN_CARET);
-		GetTreeCtrl().SelectItem(item);
-		str = GetTreeCtrl().GetItemText (curTreeItemRClick);
+		CString str = GetItemText (curTreeItemRClick);
+		Select(item, TVGN_CARET);
+		SelectItem(item);
+		str = GetItemText (curTreeItemRClick);
 	}
 	else
 		curTreeItemRClick=NULL;
@@ -348,7 +318,7 @@ void CToolsTreeCtrl::OnRClick(NMHDR *pNMHDR, LRESULT *pResult)
 	CMenu popMenu;
 	popMenu.LoadMenu(IDR_POPUP_TREE);
 
-	typedef FactorySelector<CSurToolBase>::Factory CF;
+	typedef ClassCreatorFactory<CSurToolBase> CF;
 	typedef CF::CreatorBase CreatorType;
 
 	const ComboStrings& strings = CF::instance().comboStringsAlt();
@@ -383,14 +353,12 @@ void CToolsTreeCtrl::OnRClick(NMHDR *pNMHDR, LRESULT *pResult)
 			case PUMR_PermissionAll:
 				popMenu.GetSubMenu(0)->TrackPopupMenu(0,posMouse.x,posMouse.y,this);
 				break;
-#ifndef _VISTA_ENGINE_EXTERNAL_
 			case PUMR_Permission3DM:
 				popMenu.GetSubMenu(1)->TrackPopupMenu(0,posMouse.x,posMouse.y,this);
 				break;
 			case PUMR_Permission3DM_2W:
 				popMenu.GetSubMenu(2)->TrackPopupMenu(0,posMouse.x,posMouse.y,this);
 				break;
-#endif
 			case PUMR_PermissionColorPic:
 				popMenu.GetSubMenu(3)->TrackPopupMenu(0,posMouse.x,posMouse.y ,this);
 				break;
@@ -406,7 +374,6 @@ void CToolsTreeCtrl::OnRClick(NMHDR *pNMHDR, LRESULT *pResult)
 				popMenu.GetSubMenu(5)->TrackPopupMenu(0,posMouse.x,posMouse.y,this);
 				break;
 			case PUMR_NotPermission:
-			default:
 				break;
 			}
 		}
@@ -513,7 +480,7 @@ void CToolsTreeCtrl::Create_PushBrowse_And_DestroyIfErr(CSurToolBase* tool)
 		else 
 			tool->setName(tmp.c_str());
 		AddNode2Tree(tool);
-		GetTreeCtrl().SelectItem(tool->treeItem());
+		SelectItem(tool->treeItem());
 	}
 	else {
 		tool->DestroyWindow();
@@ -542,10 +509,9 @@ void CToolsTreeCtrl::OnPopAddM3d2w()
 void CToolsTreeCtrl::serialize(Archive& ar)
 {
 	CSurToolColorPic::staticSerialize(ar);
-	CSurToolKind::staticSerialize(ar);
-	CSurToolToolzer::staticSerialize(ar);
 	//ar.serialize(CSurToolEnvironment::staticSettings, "environmentStaticSettings", 0);
 
+	ar.serialize(flag_tree_build, "flag_tree_build", 0);
 	ar.serializeArray(shortcuts_, "shortcuts", 0);
 	ar.serialize(tools_, "treeSDTB", 0);
 }
@@ -555,7 +521,9 @@ void CToolsTreeCtrl::serialize(Archive& ar)
 void CToolsTreeCtrl::onMenuProperties(CSurToolBase* tool)
 {
 	if(tool){
-		if(kdw::edit(Serializer(*tool), 0, kdw::IMMEDIATE_UPDATE, GetSafeHwnd()))
+		EditArchive ea;
+		ea.setTranslatedOnly(false);
+		if(ea.edit(*tool))
 			BuildTree();
 	}
 }
@@ -577,7 +545,7 @@ void CToolsTreeCtrl::OnPopSort()
 
 void CToolsTreeCtrl::onMenuCreateTool(int index)
 {
-	typedef FactorySelector<CSurToolBase>::Factory CF;
+	typedef ClassCreatorFactory<CSurToolBase> CF;
 	int typesCount = CF::instance().size();
 	xassert(index >= 0 && index < typesCount);
 
@@ -601,14 +569,14 @@ void CToolsTreeCtrl::OnDestroy()
 {
 	destroyToolWindows();
 
-	__super::OnDestroy();
+	CTreeCtrl::OnDestroy();
 }
 
 BOOL CToolsTreeCtrl::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	popupMenu_->onCommand(wParam, lParam);
 
-	return __super::OnCommand(wParam, lParam);
+	return CTreeCtrl::OnCommand(wParam, lParam);
 }
 
 CSurToolBase* CToolsTreeCtrl::findTool(const ComboStrings& path)
@@ -663,5 +631,5 @@ void CToolsTreeCtrl::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		window->onKeyDown(nChar, nFlags);
 	}
 
-	__super::OnKeyDown(nChar, nRepCnt, nFlags);
+	CTreeCtrl::OnKeyDown(nChar, nRepCnt, nFlags);
 }

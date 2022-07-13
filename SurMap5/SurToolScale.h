@@ -7,8 +7,8 @@
 class CSurToolScale : public CSurToolTransform {
 public:
     CSurToolScale(CWnd* parent = NULL);
-    bool onTrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord);
-    bool onDrawAuxData();
+    bool CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord);
+    bool CallBack_DrawAuxData();
 
 protected:
 	void onTransformAxisChanged(int index);

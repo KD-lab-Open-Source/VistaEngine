@@ -7,11 +7,10 @@
 class CSurToolMove : public CSurToolTransform {
 public:
     CSurToolMove(CWnd* parent = NULL);
-    bool onTrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord);
-	bool onLMBDown(const Vect3f& worldCoord, const Vect2i& scrCoord);
-	bool onLMBUp(const Vect3f& coord, const Vect2i& screenCoord);
-    bool onDrawAuxData();
-	bool onRMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord) { return false; }
+    bool CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord);
+	bool CallBack_LMBDown(const Vect3f& worldCoord, const Vect2i& scrCoord);
+	bool CallBack_LMBUp(const Vect3f& coord, const Vect2i& screenCoord);
+    bool CallBack_DrawAuxData();
 
 protected:
 	void onTransformAxisChanged(int index);

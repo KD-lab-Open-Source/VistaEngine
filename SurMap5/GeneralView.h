@@ -1,9 +1,9 @@
 #ifndef __GENERALVIEW_H__
 #define __GENERALVIEW_H__
 
-#include "Render\Inc\IRenderDevice.h"
+#include "IRenderDevice.h"
+#include "..\Game\RenderObjects.h"
 #include "Handle.h"
-
 class MissionDescription;
 
 // CGeneralView window
@@ -13,7 +13,7 @@ class CSurToolBase;
 //Создание полей в статус баре
 enum { NUMBERS_PARTS_STATUSBAR = 8 + 2 };//8-полей 2-промежутка
 
-void drawLineTerrain(const Vect2f& point1, const Vect2f& point2, const Color4c& color, float segmentLength = 16.0);
+void drawLineTerrain(const Vect2f& point1, const Vect2f& point2, const sColor4c& color, float segmentLength = 16.0);
 
 class CGeneralView : public CWnd
 {
@@ -42,6 +42,8 @@ public:
 	// ID таймера повтора инструмента
 	UINT m_Timer4RepetitionID;
 
+	class cFont* pFont;
+
 	double prevtime;
     Vect3f	vPosition;
 	Vect2f	AnglePosition;
@@ -51,7 +53,6 @@ public:
 	virtual ~CGeneralView();
 
 	void drawGrid();
-	void drawCameraBorders();
 
 	void InitAux();
 	void graphQuant();
@@ -88,8 +89,5 @@ private:
 	int draw_num_polygon;
 	int draw_num_tilemappolygon;
 };
-
-void saveAllLibraries();
-void loadAllLibraries();
 
 #endif //__GENERALVIEW_H__

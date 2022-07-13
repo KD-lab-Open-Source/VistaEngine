@@ -1,20 +1,26 @@
 #include "stdafx.h"
 
 #include "SurMap5.h"
-#include "SurToolSelect.h"
+#include ".\SurToolSelect.h"
+
+/// zzz
 #include "MainFrame.h"
 #include "GeneralView.h"
-#include "Serialization\Serialization.h"
-#include "Game\RenderObjects.h"
-#include "Units\BaseUniverseObject.h"
+// ^^^
+
+#include "Serialization.h"
+
+#include "..\Render\inc\IVisGeneric.h"
+#include "..\Game\RenderObjects.h"
+#include "..\Units\BaseUniverseObject.h"
 
 #include "SurToolPathEditor.h"
 #include "SurToolEnvironmentEditor.h"
 #include "SurToolCameraEditor.h"
 
-#include "AttribEditor\AttribEditorCtrl.h"
+#include "..\AttribEditor\AttribEditorCtrl.h"
 
-#include "SerializerUniverseObject.h"
+#include "SerializeableUniverseObject.h"
 #include "EventListeners.h"
 
 #include "SelectionUtil.h"
@@ -26,12 +32,7 @@
 
 std::vector<CSurToolSelect*> CSurToolSelect::instances_;
 
-class CSurToolSelectAttribEditor : public CAttribEditorCtrl {
-	void onChanged(){
-		CSurToolSelect* tool = safe_cast<CSurToolSelect*>(GetParent());
-		tool->onPropertyChanged();
-	}
-};
+// CSurToolSelect dialog
 
 IMPLEMENT_DYNAMIC(CSurToolSelect, CSurToolBase)
 CSurToolSelect::CSurToolSelect(CWnd* pParent /*=NULL*/)
@@ -42,7 +43,6 @@ CSurToolSelect::CSurToolSelect(CWnd* pParent /*=NULL*/)
 
 , isSelectionEditable_(false)
 , isSelectionMovable_(false)
-, objectChangedEmitted_(false)
 {
     iconInSurToolTree=IconISTT_FolderTools;
 }
@@ -72,17 +72,17 @@ BOOL CSurToolSelect::OnInitDialog()
 {
     CSurToolBase::OnInitDialog();
 
-	eventMaster().signalObjectChanged().connect(this, &CSurToolSelect::onObjectChanged);
-	eventMaster().signalSelectionChanged().connect(this, &CSurToolSelect::onSelectionChanged);
+	eventMaster().eventObjectChanged().registerListener(this);
+	eventMaster().eventSelectionChanged().registerListener(this);
 
     CRect attribEditorRect;
     GetDlgItem(IDC_ATTRIB_EDITOR)->GetWindowRect(&attribEditorRect);
     GetParent()->ScreenToClient(&attribEditorRect);
 	SetDlgItemInt(IDC_RANDOM_SEL_PERCENT_EDIT, round(randomSelectionChance_ * 100.0f));
     
-	attribEditor_ = new CSurToolSelectAttribEditor();
+    attribEditor_ = new CAttribEditorCtrl();
     attribEditor_->setStyle(CAttribEditorCtrl::AUTO_SIZE |
-                            //CAttribEditorCtrl::COMPACT | 
+                            CAttribEditorCtrl::COMPACT | 
                             CAttribEditorCtrl::HIDE_ROOT_NODE);
     VERIFY(attribEditor_->Create(WS_CHILD, attribEditorRect, this, 0));
 
@@ -100,7 +100,7 @@ BOOL CSurToolSelect::OnInitDialog()
 	layout_.add(0, 0, 1, 1, IDC_RANDOM_SEL_PERCENT_LABEL);
 
 	if(vMap.isWorldLoaded())
-        onSelectionChanged();
+        CallBack_SelectionChanged();
     
 	updateLayout();
 	return FALSE;
@@ -130,16 +130,16 @@ struct AttachToAttribEditor : public UniverseObjectAction{
 	void operator()(BaseUniverseObject& object){
 		UniverseObjectClass objectClass = object.objectClass();
 		if(objectClass == UNIVERSE_OBJECT_SOURCE || objectClass == UNIVERSE_OBJECT_UNIT || objectClass == UNIVERSE_OBJECT_ENVIRONMENT)
-			attribEditor_.attachSerializer(SerializerUniverseObject(UnitLink<BaseUniverseObject>(&object)));
+			attribEditor_.attachSerializeable(SerializeableUniverseObject(UnitLink<BaseUniverseObject>(&object)));
 		else
-			attribEditor_.attachSerializer(Serializer(object));
+			attribEditor_.attachSerializeable(Serializeable(object));
 	}
 	
 	CAttribEditorCtrl& attribEditor_;
 };
 
-struct CollectSerializersAndCount : UniverseObjectAction{
-	CollectSerializersAndCount(CSurToolSelect::Serializers& serializeables, CSurToolSelect::SelectionCount& selectionCount)
+struct CollectSerializeablesAndCount : UniverseObjectAction{
+	CollectSerializeablesAndCount(CSurToolSelect::Serializeables& serializeables, CSurToolSelect::SelectionCount& selectionCount)
 	: serializeables_(serializeables)
 	, selectionCount_(selectionCount)
 	{
@@ -150,66 +150,66 @@ struct CollectSerializersAndCount : UniverseObjectAction{
 		switch(object.objectClass()){
 		case UNIVERSE_OBJECT_ENVIRONMENT:
 			++selectionCount_.numEnvironment;
-			serializeables_.push_back(SerializerUniverseObject(UnitLink<BaseUniverseObject>(&object)));
+			serializeables_.push_back(SerializeableUniverseObject(UnitLink<BaseUniverseObject>(&object)));
 			return;
 		case UNIVERSE_OBJECT_UNIT:
 			++selectionCount_.numUnits;
-			serializeables_.push_back(SerializerUniverseObject(UnitLink<BaseUniverseObject>(&object)));
+			serializeables_.push_back(SerializeableUniverseObject(UnitLink<BaseUniverseObject>(&object)));
 			return;
 		case UNIVERSE_OBJECT_SOURCE:
 			++selectionCount_.numSources;
-			serializeables_.push_back(SerializerUniverseObject(UnitLink<BaseUniverseObject>(&object)));
+			serializeables_.push_back(SerializeableUniverseObject(UnitLink<BaseUniverseObject>(&object)));
 			return;
 		case UNIVERSE_OBJECT_CAMERA_SPLINE:
 			++selectionCount_.numCameras;
-			serializeables_.push_back(Serializer(object, "", ""));
+			serializeables_.push_back(Serializeable(object, "", ""));
 			return;
 		case UNIVERSE_OBJECT_ANCHOR:
 			++selectionCount_.numAnchors;
-			serializeables_.push_back(Serializer(object, "", ""));
+			serializeables_.push_back(Serializeable(object, "", ""));
 			return;
 		}
 	}
 
-	CSurToolSelect::Serializers& serializeables_;
+	CSurToolSelect::Serializeables& serializeables_;
 	CSurToolSelect::SelectionCount& selectionCount_;
 };
 
 };
 
-bool CSurToolSelect::onLMBDown(const Vect3f& worldCoord, const Vect2i& scrCoord)
+bool CSurToolSelect::CallBack_LMBDown(const Vect3f& worldCoord, const Vect2i& scrCoord)
 {
 	flag_mouseLBDown = true;
 	
-	selectionStart_ = Vect3f(scrCoord.x, scrCoord.y, 0.f); 
+	selectionStart_ = worldCoord;
 	if(::selectByScreenRectangle(scrCoord, scrCoord, !isControlPressed(), !isControlPressed() && !isShiftPressed())){
-		eventMaster().signalSelectionChanged().emit(this);
-		onSelectionChanged();
+		eventMaster().eventSelectionChanged().emit();
+		CallBack_SelectionChanged();
 	}
 	return false;
 }
 
-bool CSurToolSelect::onTrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord)
+bool CSurToolSelect::CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord)
 {
 	if(flag_mouseLBDown){
-		Vect2i screenStart = selectionStart_;
-		Vect2i screenEnd = scrCoord;
+		Vect2i screenStart = worldToScreen(selectionStart_);
+		Vect2i screenEnd = scrCoord;//worldToScreen(worldCoord);
 
 		bool selectionChanged = ::selectByScreenRectangle(screenStart, screenEnd, 
 														  !::isControlPressed(),
 														  !::isShiftPressed() && !::isControlPressed());
 
-		eventMaster().signalSelectionChanged().emit(this);
+		eventMaster().eventSelectionChanged().emit();
 	}
     return true;
 }
 
 
-bool CSurToolSelect::onLMBUp (const Vect3f& coord, const Vect2i& scrCoord)
+bool CSurToolSelect::CallBack_LMBUp (const Vect3f& coord, const Vect2i& scrCoord)
 {
 	if(flag_mouseLBDown){
 		bool selectionChanged = false;
-		if(Vect2i(selectionStart_) == scrCoord){
+		if(Vect2i(selectionStart_) == Vect2i(coord.xi(), coord.yi())){
 			CMainFrame* mainFrame = (CMainFrame*)AfxGetMainWnd();
 			CRect rt;
 			mainFrame->view().GetClientRect(&rt);
@@ -231,42 +231,42 @@ bool CSurToolSelect::onLMBUp (const Vect3f& coord, const Vect2i& scrCoord)
 			}
 		}
 		else
-			selectionChanged = ::selectByScreenRectangle(Vect2i(selectionStart_), scrCoord, !isControlPressed(), !isControlPressed() && !isShiftPressed());
+			selectionChanged = ::selectByScreenRectangle(worldToScreen(selectionStart_), scrCoord, !isControlPressed(), !isControlPressed() && !isShiftPressed());
 
 		if(selectionChanged)
-			eventMaster().signalSelectionChanged().emit(this);
+			eventMaster().eventSelectionChanged().emit();
 	}
 	flag_mouseLBDown = false;
     return true;
 }
 
-bool CSurToolSelect::onRMBDown (const Vect3f& worldCoord, const Vect2i& screenCoord)
+bool CSurToolSelect::CallBack_RMBDown (const Vect3f& worldCoord, const Vect2i& screenCoord)
 {
     return false;
 }
 
-bool CSurToolSelect::onDelete(void)
+bool CSurToolSelect::CallBack_Delete(void)
 {
 	::deleteSelectedUniverseObjects();
 	return true;
 }
 
-void drawCircle (const Se3f& position, float radius, const Color4c& color);
-void drawFilledArc (const Se3f& position, float radius, float start_angle, float end_angle, const Color4c& start_color, const Color4c& end_color);
+void drawCircle (const Se3f& position, float radius, const sColor4c& color);
+void drawFilledArc (const Se3f& position, float radius, float start_angle, float end_angle, const sColor4c& start_color, const sColor4c& end_color);
 
-bool CSurToolSelect::onDrawAuxData()
+bool CSurToolSelect::CallBack_DrawAuxData()
 {
     if(flag_mouseLBDown){
 		Vect2i currentPos = cursorScreenPosition();
-		Vect2i startPos = selectionStart_;
+		Vect2i startPos = worldToScreen(selectionStart_);
         Vect2i size = currentPos - startPos;
-        gb_RenderDevice->DrawRectangle(startPos.x, startPos.y, size.x,  size.y, Color4c(0, 255, 0, 255), 1);
+        gb_RenderDevice->DrawRectangle(startPos.x, startPos.y, size.x,  size.y, sColor4c(0, 255, 0, 255), 1);
     }
     return true;
 }
 
 
-bool CSurToolSelect::onKeyDown(unsigned int keyCode, bool shift, bool control, bool alt)
+bool CSurToolSelect::CallBack_KeyDown(unsigned int keyCode, bool shift, bool control, bool alt)
 {
     if(!vMap.isWorldLoaded())
         return true;
@@ -274,14 +274,14 @@ bool CSurToolSelect::onKeyDown(unsigned int keyCode, bool shift, bool control, b
     return false;
 }
 
-void CSurToolSelect::onSelectionChanged()
+void CSurToolSelect::CallBack_SelectionChanged()
 {
 	using namespace UniverseObjectActions;
 	if(!attribEditor_ || !::IsWindow(attribEditor_->GetSafeHwnd()))
 		return;
 
 	serializeables_.clear();
-	forEachSelected(CollectSerializersAndCount(serializeables_, selectionCount_));
+	forEachSelected(CollectSerializeablesAndCount(serializeables_, selectionCount_));
 
 	selectionDescription_ = "";
 	isSelectionMovable_ = false;
@@ -345,7 +345,7 @@ void CSurToolSelect::updateLayout()
 
 	if(serializeables_.size() > 1){
 		XBuffer buf(256, 1);
-		buf < TRANSLATE("Выделение") < ":\n";
+		buf < TRANSLATE("Выделенеие") < ":\n";
 		
 		if(selectionCount_.numSources)
 			buf < "\t" < TRANSLATE("Источники") < ": " <= selectionCount_.numSources < "\n";
@@ -381,22 +381,14 @@ void CSurToolSelect::OnSize(UINT nType, int cx, int cy)
     layout_.onSize(cx, cy);
 }
 
-void CSurToolSelect::onSelectionChanged(SelectionObserver* changer)
+void CSurToolSelect::onSelectionChanged()
 {
-	onSelectionChanged();
+	CallBack_SelectionChanged();
 }
 
-void CSurToolSelect::onObjectChanged(ObjectObserver* changer)
+void CSurToolSelect::onObjectChanged()
 {
-	if(!objectChangedEmitted_)
-		onSelectionChanged();
-}
-
-void CSurToolSelect::onPropertyChanged()
-{
-	objectChangedEmitted_ = true;
-	eventMaster().signalObjectChanged().emit(this);
-	objectChangedEmitted_ = true;
+	CallBack_SelectionChanged();
 }
 
 namespace UniverseObjectActions{
@@ -428,7 +420,7 @@ void CSurToolSelect::OnRandomSelectionClicked()
 	using namespace UniverseObjectActions;
     forEachSelected(RandomDeselect(1.0f - randomSelectionChance_));
       
-	eventMaster().signalSelectionChanged().emit(this);
+	eventMaster().eventSelectionChanged().emit();
 }
 
 void CSurToolSelect::OnRandomSelPercentChange()
@@ -454,9 +446,9 @@ void CSurToolSelect::OnEditButton()
 	else if(serializeables_.size() > 1){
 		attribEditor_->detachData();
 
-		Serializers::iterator it;
+		Serializeables::iterator it;
 		FOR_EACH(serializeables_, it){
-			Serializer& ser = *it;
+			Serializeable& ser = *it;
             attribEditor_->mixIn(ser);
 		}
 		attribEditor_->showMix();

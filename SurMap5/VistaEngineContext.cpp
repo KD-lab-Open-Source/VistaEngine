@@ -1,10 +1,44 @@
 #include "StdAfx.h"
-#include "Game\Actions.h"
-#include "Game\Conditions.h"
-#include "Game\GameOptions.h"
-#include "Serialization\SerializationFactory.h"
-#include "CommandsQueue.h"
-#include "Render\Src\VisGeneric.h"
+#include "Actions.h"
+#include "Conditions.h"
+#include "AbnormalStateAttribute.h"
+//#include "WeaponAttribute.h"
+#include "IronBullet.h"
+#include "IronLegion.h"
+#include "GameOptions.h"
+
+#include "TreeEditors\TreeReferenceEditor.h"
+#include "TreeEditors\TreeTypeLibrarySelector.h"
+
+#define REGISTER_REFERENCE_SELECTOR(Type) \
+typedef TreeReferenceSelector<Type> Type##_Selector; \
+REGISTER_TREE_EDITOR(typeid(Type).name(), Type##_Selector, &Type::StringTableType::instance);
+
+REGISTER_REFERENCE_SELECTOR(SourceReference)
+REGISTER_REFERENCE_SELECTOR(WeaponPrmReference)
+REGISTER_REFERENCE_SELECTOR(AttributeReference)
+
+REGISTER_REFERENCE_SELECTOR(AttributeUnitReference)
+REGISTER_REFERENCE_SELECTOR(AttributeUnitOrBuildingReference)
+REGISTER_REFERENCE_SELECTOR(AttributeItemReference)
+REGISTER_REFERENCE_SELECTOR(AttributeItemResourceReference)
+REGISTER_REFERENCE_SELECTOR(AttributeItemInventoryReference)
+
+REGISTER_REFERENCE_SELECTOR(SoundReference)
+REGISTER_REFERENCE_SELECTOR(TerToolReference)
+REGISTER_REFERENCE_SELECTOR(EffectReference)
+REGISTER_REFERENCE_SELECTOR(AttributeProjectileReference)
+REGISTER_REFERENCE_SELECTOR(ParameterValueReference)
+REGISTER_REFERENCE_SELECTOR(PlacementZone)
+REGISTER_REFERENCE_SELECTOR(UnitFormationTypeReference)
+REGISTER_REFERENCE_SELECTOR(ParameterFormulaReference)
+REGISTER_REFERENCE_SELECTOR(ParameterTypeReference)
+REGISTER_REFERENCE_SELECTOR(ParameterGroupReference)
+REGISTER_REFERENCE_SELECTOR(AbnormalStateTypeReference)
+REGISTER_REFERENCE_SELECTOR(BodyPartType)
+REGISTER_REFERENCE_SELECTOR(UI_MessageTypeReference)
+
+#undef REGISTER_REFERENCE_POLYMORPHIC_SELECTOR
 
 void ActionSetDirectControl::activate()
 {
@@ -39,7 +73,7 @@ void ActionSetCurrentMission::activate()
 {
 }
 
-void ActionResetCurrentMission::activate()
+void ActionReseCurrentMission::activate()
 {
 }
 
@@ -63,11 +97,11 @@ void ActionChangeUnitCursor::activate()
 {
 }
 
-void ActionCreateNetClient::activate()
+void ActionChangeCommonCursor::activate()
 {
 }
 
-void ActionOnlineLogout::activate()
+void ActionCreateNetClient::activate()
 {
 }
 
@@ -128,10 +162,6 @@ void ActionSetCutScene::activate()
 {
 }
 
-void ActionSetCurrentMissionAsPassed::activate()
-{
-}
-
 bool ConditionSelected::check() const
 {
 	return false;
@@ -181,7 +211,7 @@ MissionDescription* MissionDescriptionForTrigger::operator ()() const
 	return 0;
 }
 
-void UnitActing::setActiveDirectControl(DirectControlMode activeDirectControl, int transitionTime)
+void UnitActing::setActiveDirectControl(DirectControlMode activeDirectControl)
 {
 
 }
@@ -190,14 +220,3 @@ void UpdateSilhouettes()
 {
 	gb_VisGeneric->EnableSilhouettes(GameOptions::instance().getBool(OPTION_SILHOUETTE));
 }
-
-CommandColorManager::CommandColorManager()
-{
-	for(int i = 0; i < COMMAND_MAX; i++){
-		float hue = (360.f * i) / COMMAND_MAX;
-		Color4f color;
-		color.setHSV(hue, 1.f, 1.f);
-		colors_.push_back(Color3c(color));
-	}
-}
-

@@ -3,10 +3,10 @@
 
 #include "stdafx.h"
 #include "EScroll.h"
-#include "terra\vmap.h"
+#include "..\terra\terra.h"
 
-#include "XMath\xmath.h"
-#include "escroll.h"
+#include "xmath.h"
+#include ".\escroll.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -133,6 +133,7 @@ void CEScroll::ShowControl(bool flag)
 void CEScroll::OnPaint() 
 {
 	CPaintDC dc(this); // device context for painting
+	// TODO: Add your message handler code here
 
 	//Расчет скроллера
 	CRect rectScroll;
@@ -278,6 +279,7 @@ void CEScroll::EditWin_EN_KILLFOCUS(void)
 
 void CEScroll::OnLButtonDown(UINT nFlags, CPoint point) 
 {
+	// TODO: Add your message handler code here and/or call default
 	SetCapture();
 	interSetPos(point.x);
 	
@@ -286,6 +288,7 @@ void CEScroll::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CEScroll::OnLButtonUp(UINT nFlags, CPoint point) 
 {
+	// TODO: Add your message handler code here and/or call default
 	if(this==GetCapture()){
 		interSetPos(point.x);
 		::ReleaseCapture();
@@ -295,6 +298,7 @@ void CEScroll::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CEScroll::OnMouseMove(UINT nFlags, CPoint point) 
 {
+	// TODO: Add your message handler code here and/or call default
 	if(this==GetCapture()){
 		interSetPos(point.x);
 	}
@@ -373,11 +377,18 @@ END_MESSAGE_MAP()
 
 void CEdit4CEScroll::OnChange() 
 {
+	// TODO: If this is a RICHEDIT control, the control will not
+	// send this notification unless you override the CEdit::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask()
+	// with the ENM_CHANGE flag ORed into the mask.
+	
+	// TODO: Add your control notification handler code here
 	ownerClass->EditWin_EN_CHANGE();
 }
 
 void CEdit4CEScroll::OnKillfocus() 
 {
+	// TODO: Add your control notification handler code here
 	ownerClass->EditWin_EN_KILLFOCUS();
 }
 
@@ -443,6 +454,7 @@ END_MESSAGE_MAP()
 
 void CButton4EScroll2::OnBnClicked()
 {
+	// TODO: Add your control notification handler code here
 	ownerClass->ButtonWin_BN_CLICKED(GetDlgCtrlID());
 }
 

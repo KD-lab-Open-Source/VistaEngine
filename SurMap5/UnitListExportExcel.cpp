@@ -1,10 +1,9 @@
 #include "stdafx.h"
 #include "UnitListExportExcel.h"
-#include "ExcelExport\ExcelExporter.h"
-#include "Units\UnitAttribute.h"
-#include "Serialization\Dictionary.h"
-#include "Serialization\StringTable.h"
-#include "UnicodeConverter.h"
+#include "..\ExcelExport\ExcelExporter.h"
+#include "..\Units\UnitAttribute.h"
+#include "Dictionary.h"
+
 
 UnitListExportExcel::UnitListExportExcel(const char* filename)
 {
@@ -20,7 +19,7 @@ UnitListExportExcel::~UnitListExportExcel()
 
 void UnitListExportExcel::exportUnitList()
 {
-	application_->setCellText(Vect2i(0,0), a2w(TRANSLATE("Тип юнита/Тип юнита")).c_str());
+	application_->setCellText(Vect2i(0,0), TRANSLATE("Тип юнита/Тип юнита"));
 
 	int column = 0;
 	int row = 0;
@@ -30,12 +29,12 @@ void UnitListExportExcel::exportUnitList()
 		row++;
 		const AttributeBase* attribute = mi->get();
 
-		application_->setCellText(Vect2i(column, 0), a2w(attribute->libraryKey()).c_str());
+		application_->setCellText(Vect2i(column, 0), attribute->libraryKey());
 		// formatting
 		application_->setCellTextOrientation(Vect2i(column, 0), -90);
 		application_->setColumnWidthAuto(column);
 
-		application_->setCellText(Vect2i(0, row), a2w(attribute->libraryKey()).c_str());
+		application_->setCellText(Vect2i(0, row), attribute->libraryKey());
 		
 	}	
 

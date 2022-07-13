@@ -2,9 +2,9 @@
 #include "SurMap5.h"
 #include "SurToolWater.h"
 
-#include "Environment\Environment.h"
-#include "water\Water.h"
-#include "Serialization\Serialization.h"
+#include "..\Environment\Environment.h"
+#include "..\water\Water.h"
+#include "Serialization.h"
 
 // CSurToolWaterSrc dialog
 
@@ -67,7 +67,7 @@ void CSurToolWaterSrc::OnBnClickedRdbInsertdeleteSource2()
 	state_radio_button_InsDel=GetCheckedRadioButton(IDC_RDB_INSERTDELETE_SOURCE1, IDC_RDB_INSERTDELETE_SOURCE2)-IDC_RDB_INSERTDELETE_SOURCE1;//
 }
 
-bool CSurToolWaterSrc::onDrawAuxData(void)
+bool CSurToolWaterSrc::CallBack_DrawAuxData(void)
 {
 	drawCursorCircle ();
 	return true;
@@ -106,7 +106,7 @@ void CSurToolWater::serialize(Archive& ar)
 	ar.serialize(state_radio_button_InsDel, "state_radio_button_InsDel", 0);
 }
 
-bool CSurToolWater::onOperationOnMap(int x, int y)
+bool CSurToolWater::CallBack_OperationOnMap(int x, int y)
 {
 	if(vMap.isWorldLoaded() && environment && environment->water()) {
 		int rad = getBrushRadius();
@@ -115,7 +115,7 @@ bool CSurToolWater::onOperationOnMap(int x, int y)
 			const float dhWater=2.0f;
 			//float hEnv = environment->water()->GetEnvironmentWater();
 			float hWater = environment->water()->GetZ(x,y);
-			float hSur=(float)vMap.getAlt(x,y)*VOXEL_DIVIDER;
+			float hSur=(float)vMap.GetAlt(x,y)*VOXEL_DIVIDER;
 			float h=max(hWater, hSur)+dhWater;
 			environment->water()->SetWaterRect(x,y,h,rad*2);
 		}
@@ -127,7 +127,7 @@ bool CSurToolWater::onOperationOnMap(int x, int y)
 	return true;
 }
 
-bool CSurToolWater::onDrawAuxData(void)
+bool CSurToolWater::CallBack_DrawAuxData(void)
 {
 	return true;
 }

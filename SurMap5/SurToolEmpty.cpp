@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "SurMap5.h"
-#include "SurToolEmpty.h"
+#include ".\SurToolEmpty.h"
 
 IMPLEMENT_DYNAMIC(CSurToolEmpty, CSurToolBase)
 CSurToolEmpty::CSurToolEmpty(CWnd* pParent)

@@ -2,11 +2,11 @@
 #include "SurMap5.h"
 #include "SurToolPlayerFolder.h"
 #include "SurToolUnit.h"
-#include "Serialization\Serialization.h"
-#include "Game\Universe.h"
-#include "Serialization\StringTable.h"
-#include "Units\UnitAttribute.h"
-#include "UnicodeConverter.h"
+#include "Serialization.h"
+#include "..\Game\Universe.h"
+
+// Unit-û
+#include "..\Units\UnitAttribute.h"
 
 // CSurToolPlayerFolder dialog
 IMPLEMENT_DYNAMIC(CSurToolPlayerFolder, CSurToolEmpty)
@@ -96,7 +96,7 @@ void CSurToolPlayerFolder::setPlayer (Player* _player) {
     player_ = _player;
 	
 	if (player_) {
-		std::string label(w2a(player_->name()));
+		std::string label = player_->name();
 		if (player_ != universe()->worldPlayer()) {
 			label += " [";
 			label += player_->race().c_str();

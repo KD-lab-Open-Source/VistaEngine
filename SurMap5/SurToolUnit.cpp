@@ -4,10 +4,10 @@
 #include "ObjectsManagerWindow.h"
 #include "SurToolSelect.h"
 
-#include "Units\IronLegion.h"
-#include "Units\UnitAttribute.h"
-#include "Units\Squad.h"
-#include "Game\Player.h"
+#include "..\Units\IronLegion.h"
+#include "..\Units\UnitAttribute.h"
+#include "..\Units\Squad.h"
+#include "..\Game\Player.h"
 
 BEGIN_MESSAGE_MAP(CSurToolUnit, CSurToolBase)
 	ON_WM_HSCROLL()
@@ -47,7 +47,7 @@ static UnitBase* createUnit(const AttributeReference& attributeReference, const 
 			UnitSquad* squad = safe_cast<UnitSquad*>(player->buildUnit(&*legionary->attr().squad));
 			squad->setAuxiliary(auxiliary);
 			squad->setPose(Se3f(QuatF::ID, unitPosition), true);
-			squad->addUnit(legionary);
+			squad->addUnit(legionary, false);
 		}
 		unit->setPose(pose, true);
 		return unit;
@@ -55,34 +55,26 @@ static UnitBase* createUnit(const AttributeReference& attributeReference, const 
 	return 0;
 }
 
-bool CSurToolUnit::onOperationOnMap(int x, int y)
+bool CSurToolUnit::CallBack_OperationOnMap(int x, int y)
 {
     if(player_){
 		Se3f pose;
 		calculateUnitPose(pose);
-		unitAttribute_->setCurrentAttribute(unitAttribute_);
-		if(!unitAttribute_->model())
-			unitAttribute_->createModel(unitAttribute_->modelName.c_str());
-		if(unitAttribute_->model()){
-			createUnit(unitAttribute_, pose, player_, false);
-			eventMaster().signalObjectChanged().emit(this);
-			updateSeed();
-		}
-		else{
-			MessageBox(TRANSLATE("Юнит не может быть создан: в аттрибутах не указана модель, или файл модели не может быть загружен!"), TRANSLATE("Внимание!"), MB_OK | MB_ICONSTOP);
-		}
+		createUnit(unitAttribute_, pose, player_, false);
+		eventMaster().eventObjectChanged().emit();
+		updateSeed();
     }
     return true;
 }
 
-void CSurToolUnit::onReleaseScene ()
+void CSurToolUnit::CallBack_ReleaseScene ()
 {
 	if(unitOnMouse_){
 		unitOnMouse_ = 0;
 	}
 }
 
-bool CSurToolUnit::onTrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord)
+bool CSurToolUnit::CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord)
 {
     if (player_)
 		updateUnitOnMouse();
@@ -112,13 +104,7 @@ BOOL CSurToolUnit::OnInitDialog()
 	updateSeed();
 	Se3f pose;
 	calculateUnitPose(pose);
-	unitAttribute_->setCurrentAttribute(unitAttribute_);
-	if(!unitAttribute_->model())
-		unitAttribute_->createModel(unitAttribute_->modelName.c_str());
-	if(unitAttribute_->model())
-		unitOnMouse_ = createUnit(unitAttribute_, pose, player_, true);
-	else
-		unitOnMouse_ = 0;
+	unitOnMouse_ = createUnit(unitAttribute_, pose, player_, true);
 	return FALSE;
 }
 
@@ -170,7 +156,7 @@ void CSurToolUnit::OnDestroy()
 void CSurToolUnit::setUnitID(const AttributeBase* unitAttribute)
 {
     unitAttribute_ = unitAttribute;
-	setName(AttributeReference(unitAttribute).unitAttributeID().unitName().c_str());
+	setName(AttributeReference(unitAttribute).key().unitName().c_str());
 }
 
 void CSurToolUnit::quant()

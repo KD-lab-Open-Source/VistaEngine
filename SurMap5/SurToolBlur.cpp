@@ -34,6 +34,7 @@ BOOL CSurToolBlur::OnInitDialog()
 {
 	CSurToolBase::OnInitDialog();
 
+	// TODO:  Add extra initialization here
 	m_RadiusBlur.Create(this, IDC_SLIDER_EDITRADIUS, IDC_EDITRADIUS);
 
 	CSliderCtrl * slR;
@@ -48,13 +49,13 @@ BOOL CSurToolBlur::OnInitDialog()
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
-bool CSurToolBlur::onDrawAuxData(void)
+bool CSurToolBlur::CallBack_DrawAuxData(void)
 {
 	drawCursorCircle();
 	return true;
 }
 
-bool CSurToolBlur::onOperationOnMap(int x, int y)
+bool CSurToolBlur::CallBack_OperationOnMap(int x, int y)
 {
 	if(vMap.isWorldLoaded()) {
 		CSurMap5App* pApp=(CSurMap5App*)AfxGetApp();
@@ -76,6 +77,7 @@ bool CSurToolBlur::onOperationOnMap(int x, int y)
 
 void CSurToolBlur::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
+	// TODO: Add your message handler code here and/or call default
 	CSliderCtrl * slR;
 	//
 	slR=(CSliderCtrl *)GetDlgItem(IDC_SLIDER_BLUR_INTENSITY);

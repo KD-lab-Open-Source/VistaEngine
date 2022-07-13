@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "SurMap5.h"
-#include "AttribEditor\AttribEditorCtrl.h"
+#include "..\AttribEditor\AttribEditorCtrl.h"
 #include "SurToolCamera.h"
 #include "SurToolCameraEditor.h"
 #include "SurToolSelect.h"
 #include "SelectionUtil.h"
-#include "Game\CameraManager.h"
-#include "Serialization\Serialization.h"
+#include "..\game\CameraManager.h"
+#include "Serialization.h"
 
 Vect3f To3D(const Vect2f& pos);
 
@@ -39,12 +39,12 @@ BOOL CSurToolCamera::OnInitDialog()
     CSurToolEditable::OnInitDialog();
 
 	if(cameraManager){
-		attribEditor().attachSerializer(Serializer(cameraSpline_));
+		attribEditor().attachSerializeable(Serializeable(cameraSpline_));
 	}
 	return TRUE;
 }
 
-bool CSurToolCamera::onOperationOnMap(int x, int y)
+bool CSurToolCamera::CallBack_OperationOnMap(int x, int y)
 {
 	using namespace UniverseObjectActions;
     if(cameraManager){
@@ -65,7 +65,7 @@ bool CSurToolCamera::onOperationOnMap(int x, int y)
 		
 	
 		spline->setSelected(true);
-		eventMaster().signalObjectChanged().emit(this);
+		eventMaster().eventObjectChanged().emit();
 		pushEditorMode(new CSurToolCameraEditor(spline));
     }
     return true;

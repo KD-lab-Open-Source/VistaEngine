@@ -2,11 +2,12 @@
 #include "SurMap5.h"
 #include "SurToolEditable.h"
 
-#include "AttribEditor\AttribEditorCtrl.h"
-#include "XTL\SafeCast.h"
+#include "..\AttribEditor\AttribEditorCtrl.h"
+#include "SafeCast.h"
 
 class CSurToolAttribEditor : public CAttribEditorCtrl {
-	void onChanged() {
+	void onElementChanged(CTreeListItem* item) {
+		__super::onElementChanged(item);
 		CSurToolEditable* tool = safe_cast<CSurToolEditable*>(GetParent());
 		tool->onPropertyChanged();
 	}
@@ -49,7 +50,7 @@ BOOL CSurToolEditable::OnInitDialog()
 	
 	attribEditor_ = new CSurToolAttribEditor();
 	attribEditor_->setStyle(CAttribEditorCtrl::AUTO_SIZE |
-							//CAttribEditorCtrl::COMPACT | 
+							CAttribEditorCtrl::COMPACT | 
 							CAttribEditorCtrl::HIDE_ROOT_NODE);
 	attribEditor_->Create(WS_VISIBLE | WS_CHILD, attribEditorRect, this, 0);
 

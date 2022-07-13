@@ -3,10 +3,10 @@
 
 #include "stdafx.h"
 #include "SurMap5.h"
-#include "SurToolGeoNet.h"
+#include ".\SurToolGeoNet.h"
 
 #include "SurToolAux.h"
-#include "Serialization\Serialization.h"
+#include "Serialization.h"
 
 
 // CSurToolGeoNet dialog
@@ -85,7 +85,7 @@ BOOL CSurToolGeoNet::OnInitDialog()
 	return FALSE;
 }
 
-bool CSurToolGeoNet::onOperationOnMap(int x, int y)
+bool CSurToolGeoNet::CallBack_OperationOnMap(int x, int y)
 {
 	CSurMap5App* pApp=(CSurMap5App*)AfxGetApp();
 	int rad = getBrushRadius();

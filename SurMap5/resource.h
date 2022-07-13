@@ -2,7 +2,6 @@
 // Microsoft Visual C++ generated include file.
 // Used by SurMap5.rc
 //
-#define ID_SAVE                         2
 #define IDD_ABOUTBOX                    100
 #define IDP_OLE_INIT_FAILED             100
 #define IDD_BARDLG_GEO                  102
@@ -12,7 +11,6 @@
 #define IDR_HTML_DLGSELECTWORLD         104
 #define IDS_CODEPAGE_NUMS               104
 #define IDS_ID_COLUMN_HEADER            105
-#define IDS_STATUS_SAVE_LANGUAGE        105
 #define CG_IDS_PROGRESS_CAPTION         106
 #define IDS_STATUS_LOAD_LANGUAGE        107
 #define CG_IDD_PROGRESS                 108
@@ -24,6 +22,7 @@
 #define ID_COMBO                        129
 #define IDS_APPLY_BUTTON                130
 #define IDC_NODROP                      130
+#define IDD_ATTRIB_EDITOR               130
 #define IDR_LIBRARIES_EXTERNAL_BAR      130
 #define IDR_POPUP_TREE                  131
 #define IDS_CANCEL_BUTTON               131
@@ -38,7 +37,7 @@
 #define IDD_BARDLG_KIND                 135
 #define IDD_BARDLG_COLORPIC             136
 #define IDS_PANE_TEXT                   136
-#define ID_FILE_EXIT                    137
+#define IDD_DLG_CREATEWORLD             137
 #define IDC_FPOINT                      140
 #define IDB_HDRUP                       141
 #define IDC_POINTER                     141
@@ -46,6 +45,7 @@
 #define IDC_SPLITTER                    142
 #define IDD_DLG_SELECTWORLD             143
 #define IDD_DLG_WORLDNAME               144
+#define IDD_DLG_UNIT_EDITOR             145
 #define IDB_ATTRIB_EDITOR_CTRL          146
 #define IDD_DLG_CREATE_UNIT             146
 #define IDD_DLG_CAMERA                  149
@@ -60,8 +60,13 @@
 #define IDB_TREETOOLDLG_BITMAP256       167
 #define IDD_BARDLG_IMP                  168
 #define IDD_BARDLG_GEOTX                169
+#define IDD_FILE_LIBRARY_EDITOR         170
 #define IDD_BARDLG_3DM                  173
 #define IDD_BARDLG_ROAD                 175
+#define IDD_DLG_FORMATION_EDITOR        176
+#define IDR_FORMATION_CELL_MENU         177
+#define IDD_DLG_FORMATIONS_EDITOR       178
+#define IDD_DLG_FORMULA_EDITOR          179
 #define IDR_MENU1                       180
 #define IDD_COMBO_NAME_DLG              182
 #define IDD_DLG_NAME_COMBO              182
@@ -86,25 +91,22 @@
 #define IDD_BARDLG_UNIT                 195
 #define IDD_BARDLG_UNITFOLDER           196
 #define IDD_BARDLG_PLAYERFOLDER         197
-#define IDR_FILTERS_EXTERNAL_BAR        198
 #define IDD_BARDLG_CAMERA               201
+#define IDD_DLG_STATISTICS_SHOW         202
 #define IDD_BARDLG_ICE                  203
+#define IDD_GRADIENT_EDITOR             204
+#define IDD_DLG_TEXTURES_STATISTICS     205
 #define IDD_BARDLG_WAVES                206
 #define IDD_DLG_WAVE                    207
 #define IDD_BARDLG_WINDSRC1             208
 #define IDD_BARDLG_WINDSTATIC           208
+#define IDR_PARAMETERS_MENU             208
 #define IDD_BARDLG_GRASS                209
 #define IDD_BARDLG_DETAILE              210
+#define IDD_FIND_DIALOG                 211
+#define IDD_UI_SPRITE_EDITOR_DLG        214
 #define IDD_OUTPUT_PROGRESS             215
 #define IDB_SPLASH                      217
-#define IDD_DLG_EXIMWORLD               218
-#define IDD_PROGRESSDIALOG              219
-#define IDD_BARDLG_MINIDETAILE_FOLDER   220
-#define IDI_ICON1                       221
-#define IDI_WORLD                       221
-#define IDD_DLG_BORDER_ROLLING          222
-#define IDB_BITMAP1                     223
-#define IDD_BARDLG_SPECFILTER           225
 #define IDC_TREE_CTRL                   1000
 #define IDC_ATTRIB_EDITOR               1000
 #define CG_IDC_PROGTIME_ELAPSED         1000
@@ -116,13 +118,11 @@
 #define IDC_RDB_LEVELING_1              1003
 #define IDC_COORD_TOP_EDIT              1003
 #define CG_IDC_PROGDLG_PERCENT          1003
-#define IDC_FULL_EXPORT                 1003
-#define IDCRB_UP_DOWN_1                 1003
 #define IDC_RDB_LEVELING_2_ZL_OR_LEVELING_H_2 1004
 #define IDC_RDB_LEVELING_2              1004
+#define IDR_INSERTABLE_NODE             1004
 #define IDC_COORD_WIDTH_EDIT            1004
 #define IDC_BUTTON_STOP                 1004
-#define IDCRB_UP_DOWN_2                 1004
 #define IDC_BUTTON1                     1005
 #define IDC_COORD_HEIGHT_EDIT           1005
 #define CG_IDC_PROGDLG_STATUS           1005
@@ -137,19 +137,16 @@
 #define IDC_COORD_LABEL                 1007
 #define IDC_ADD_POINT                   1007
 #define IDC_RIGHT_LESS_BUTTON           1007
-#define IDCRB_RELATIVE_ABS_1            1007
 #define IDC_SLIDER1                     1008
 #define IDC_SLIDER_EDITRADIUS           1008
 #define IDC_COORD_COMMA_LABEL           1008
 #define IDC_REMOVE_POINT                1008
 #define IDC_RIGHT_MORE_BUTTON           1008
-#define IDCRB_RELATIVE_ABS_2            1008
 #define IDC_SLIDER_EDITDELTAH           1009
 #define IDC_COORD_X_LABEL               1009
-#define IDCRB_PUT_DIG_1                 1009
 #define IDC_LOWER_LINE                  1010
 #define IDC_SATURATION_EDIT             1010
-#define IDCRB_PUT_DIG_2                 1010
+#define IDR_GENERAL_NODE_MENU           1011
 #define IDC_UPPER_LINE                  1011
 #define IDC_V_LINE                      1011
 #define IDC_EDITDELTAH                  1012
@@ -157,6 +154,7 @@
 #define IDC_RADIO_DIGPUT1               1013
 #define IDC_TEXTURES_COMBO              1013
 #define IDC_RADIO_DIGPUT2               1014
+#define IDR_FORMATION_MENU              1014
 #define IDC_TEXTURE_SIZE_LABEL          1014
 #define IDC_COMBOBOXEX_TOOLZERFORM      1015
 #define IDC_TEXTURE_REMOVE_BUTTON       1015
@@ -280,19 +278,11 @@
 #define IDC_SLDR_CENTERALPHA            1057
 #define IDC_SLIDER_SCALINGZ             1058
 #define IDC_STATIC_POLIGON1             1058
-#define IDC_EDT_KCOLOR                  1058
 #define IDC_STATIC_POLIGON2             1059
-#define IDCSL_ABS_H                     1059
-#define IDC_SLD_KCOLOR                  1059
-#define IDCSLE_ABS_H                    1060
-#define IDC_EDT_SATURATION              1060
 #define IDC_SLIDER_TURNZ                1061
-#define IDC_SLD_SATURATION              1061
 #define IDC_EDIT_TURNZ                  1062
-#define IDC_EDT_BRIGHTNESS              1062
 #define IDC_SLIDER_SCALINGXYZ           1063
 #define IDC_SCALE_SLIDER                1063
-#define IDC_SLD_BRIGHTNESS              1063
 #define IDC_EDIT_TURNZ2                 1064
 #define IDC_EDIT_SCALINGXYZ             1064
 #define IDC_SCALE_EDIT                  1064
@@ -332,7 +322,6 @@
 #define IDC_D_RADIUS_EDIT               1079
 #define IDC_COMBO_MODELSHAPE3D          1080
 #define IDC_RBUT_DRAWERASE2             1080
-#define IDCCH_ENABLE_ABS_H              1080
 #define IDC_BTN_NEWTRIGGER              1081
 #define IDC_BTN_DELETETRIGGER           1082
 #define IDC_LST_TRIGGER                 1083
@@ -382,26 +371,18 @@
 #define IDC_FORMATION_EDITOR            1117
 #define IDC_D_DENSITY_SLIDER            1118
 #define IDC_H_LINE                      1118
-#define IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY9 1118
 #define IDC_D_DENSITY_EDIT              1119
 #define IDC_TYPES_BUTTON                1119
-#define IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY10 1119
 #define IDC_D_DENSITY_LESS_BUTTON       1120
 #define IDC_BTN_PUTTRACK                1120
-#define IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY11 1120
 #define IDC_D_DENSITY_MORE_BUTTON       1121
 #define IDC_BTN_CLEARROAD               1121
-#define IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY12 1121
 #define IDC_SLDR_EDT_ROADWIDTH          1122
-#define IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY13 1122
 #define IDC_EDT_ROADWIDTH               1123
-#define IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY14 1123
 #define IDC_CHECK_WIND                  1124
 #define IDC_FORMULA_EDIT                1124
-#define IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY15 1124
 #define IDC_EDIT_WINDZ                  1125
 #define IDC_RESULT_LABEL                1125
-#define IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY16 1125
 #define IDC_STATIC_WIND                 1126
 #define IDC_INSERT_BUTTON               1126
 #define IDC_SLDR_EDT_EDGEWIDTH          1127
@@ -471,9 +452,6 @@
 #define IDC_CBOX_PLACEMETOD             1219
 #define IDC_STATIC_LINE2                1220
 #define IDC_IPADDRESS1                  1221
-#define IDC_STATIC_LINE3                1221
-#define IDC_STATIC_LINE4                1222
-#define IDC_STATIC_LINE5                1223
 #define IDC_LIST_                       1224
 #define IDC_SIMPLY_LIST                 1224
 #define IDC_KEY_LABEL                   1225
@@ -536,43 +514,15 @@
 #define IDC_TOTAL_LABEL                 1283
 #define IDC_FILE_LABEL                  1284
 #define IDC_CURRENT_LABEL               1285
-#define IDC_COMMANDS_TREE               1286
-#define IDC_COMMAND_EDITOR              1287
-#define IDC_COMMAND_CUSTOM              1289
-#define IDC_BTN_EXPORT                  1291
-#define IDC_BTN_IMPORT                  1292
-#define IDC_RADIO3                      1296
-#define IDC_PARTIAL_EXPORT              1296
-#define IDC_EXPORT_OPTIONS              1297
-#define IDC_WORLD_NAME_LABEL            1298
-#define IDC_HEIGHT_LIMIT_CHECK          1299
-#define IDC_LIMIT_HEIGHT_CHECK          1299
-#define IDC_LEVELING_LABEL              1300
-#define IDC_COLORTERRAINTYPE            1301
-#define IDCBTN_PUT2ALLWORLD             1302
-#define IDCSLE_ALPHAROAD                1303
-#define IDCSL_ALPHAROAD                 1304
-#define IDCSLE_ALPHAROADSIDE            1305
-#define IDCE_H                          1305
-#define IDCSL_ALPHAROADSIDE             1306
-#define IDCE_ANGLE                      1306
-#define IDCCB_ROAD_MINIDETAIL           1307
-#define IDCCB_EDGE_MINIDETAIL           1308
-#define IDC_BTN_COLOR                   1308
-#define IDC_EDT_MAXDH                   1309
-#define IDC_SLD_MAXDH                   1310
-#define IDC_EDT_KDETAIL                 1311
-#define IDC_SLD_KDETAIL                 1312
-#define IDC_EDT_BALANSH                 1313
-#define IDC_SLD_BALANSH                 1314
-#define IDC_EDT_KUNBRIGHTNESS           1315
-#define IDC_SLD_KUNBRIGHTNESS           1316
 #define IDC_CONDITION_EDITOR            2001
+#define IDD_CONDITION_EDITOR            2012
 #define IDD_BARDLG_SOURCE               2018
 #define IDD_BARDLG_EDITABLE             2018
 #define IDD_BARDLG_PATHEDITOR           2019
 #define IDD_BARDLG_SELECT               2020
 #define IDD_BARDLG_TRANSFORM            2021
+#define IDD_TREE_SELECTOR               2022
+#define IDD_DLG_HOTKEY_SELECTOR         2023
 #define IDD_BARDLG_PATHEDITOR1          2024
 #define IDD_BARDLG_ENVIRONMENT_EDITOR   2024
 #define IDD_TIME_SLIDER                 2025
@@ -638,6 +588,7 @@
 #define ID_POPUP_ADDM3D                 32827
 #define ID_POP_ADD_M3D_2W               32830
 #define ID_POP                          32831
+#define ID_POP_DELETETOOL               32832
 #define ID_FILE_GENERATE                32836
 #define ID_EDIT_UNIT_TREE               32837
 #define ID_POPUP_CREATEBUBLESRC         32839
@@ -686,6 +637,7 @@
 #define ID_EDIT_SOUND_TRACKS            32934
 #define ID_POPUP_CREATEEFFECT           32934
 #define ID_EDIT_REELS                   32941
+#define ID_EDIT_GLOBAL_TRIGGER          32943
 #define ID_POPUP_CREATEGEOWAVESRC       32945
 #define IDM_POINTER_DELETE              40007
 #define IDM_FIRST_DYNAMIC_MENU          40011
@@ -703,6 +655,7 @@
 #define ID_EDIT_TERTOOLS                40235
 #define ID_POP_SORT                     40236
 #define ID_EDIT_CURSORS                 40237
+#define ID_EDIT_FORMATIONS              40238
 #define ID_POPUP_TYPE                   40239
 #define IDM_TYPE_FIRST_ITEM             40240
 #define IDM_TYPE_EDIT                   40241
@@ -732,6 +685,7 @@
 #define ID_TOOL_LAST                    40279
 #define ID_VIEW_GEOSURFACE              40282
 #define ID_Menu40283                    40283
+#define ID_EDIT_GAMEOPTIONS             40285
 #define ID_ZZZ_PASTE                    40286
 #define ID_FILE_STATISTICS              40288
 #define ID_VIEW_ENABLE_TIME_FLOW        40292
@@ -796,22 +750,14 @@
 #define ID_HELP_KEY_INFO                40392
 #define ID_FILE_RESAVE_WORLDS           40395
 #define ID_FILE_RESAVE_TRIGGERS         40396
-#define ID_FILE_UPDATE_QUICK_START_WORLDS_LIST 40398
-#define ID_LIBRARIES_COMMANDCOLORS      40399
-#define ID_FILE_EXIMWORLD               40401
-#define ID_LIBRARIES_UI_SHOW_MODE_SPRITES 40403
-#define ID_VIEW_SHOW_CAMERA_BORDERS     40405
-#define ID_LIBRARIES_TERRRAINTYPENAME   40406
-#define ID_EDIT_MAPPRESET               40407
-#define ID_EDIT_ROLLINGBORDER           40408
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        226
-#define _APS_NEXT_COMMAND_VALUE         40409
-#define _APS_NEXT_CONTROL_VALUE         1311
+#define _APS_NEXT_RESOURCE_VALUE        218
+#define _APS_NEXT_COMMAND_VALUE         40397
+#define _APS_NEXT_CONTROL_VALUE         1285
 #define _APS_NEXT_SYMED_VALUE           105
 #endif
 #endif

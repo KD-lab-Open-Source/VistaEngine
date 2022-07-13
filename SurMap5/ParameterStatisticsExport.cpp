@@ -1,115 +1,52 @@
 #include "StdAfx.h"
-
-#include "ExcelExport\ExcelExporter.h"
-#include "UserInterface\UI_Render.h"
+#include "ParameterStatisticsExport.h"
+#include "..\ExcelExport\ExcelExporter.h"
+#include "..\UserInterface\UI_Render.h"
 #include "UnitAttribute.h"
 #include "WeaponPrms.h"
-#include "Environment\SourceZone.h"
-#include "Serialization\StringTable.h"
-#include "UnicodeConverter.h"
-#include "ParameterStatisticsExport.h"
-#include "WBuffer.h"
+#include "..\Environment\SourceZone.h"
 
-class ParameterStatisticsExportImpl{
-public:
-	ParameterStatisticsExportImpl(ParameterStatisticsExport* owner);
-
-	// группа ресурсов
-	class ResourceGroup{
-	public:
-		void serialize(Archive& ar);       
-
-		typedef ParameterTypeReference Type;
-		typedef std::vector<Type> Types;
-
-		std::string name_;
-		Types types_;
-	};
-
-	bool validWeaponName(const char* name) const;
-	int slotsLimit(const RaceProperty& race) const;
-	std::string unitName(const AttributeBase& attribute);
-	void serialize(Archive& ar);
-
-	typedef std::vector<ResourceGroup> ResourceGroups;
-	typedef ParameterTypeReference ArmorType;
-	typedef std::vector<ArmorType> ArmorTypes;
-	ResourceGroups resourceGroups_;
-
-	int slotsLimit_;
-	bool onlyWithPrefixes_;
-	bool useInterfaceUnitNames_;
-	ArmorTypes armorTypes_;
-protected:
-	ParameterStatisticsExport* owner_;
-};
-
-ParameterStatisticsExportImpl::ParameterStatisticsExportImpl(ParameterStatisticsExport* owner)
-: owner_(owner)
-, onlyWithPrefixes_(false)
-, useInterfaceUnitNames_(false)
-, slotsLimit_(120)
+static std::string unitNameFromInterfaceName(const char* interfaceName)
 {
-	//armorTypes_.
+	return UI_Render::instance().extractFirstLineText(interfaceName);
 }
-
-void ParameterStatisticsExportImpl::ResourceGroup::serialize(Archive& ar)
-{
-	ar.serialize(name_, "name", "Заголовок");
-	ar.serialize(types_, "types", "Типы параметров");
-}
-
-int ParameterStatisticsExportImpl::slotsLimit(const RaceProperty& race) const
-{
-	return slotsLimit_;
-}
-
-void ParameterStatisticsExportImpl::serialize(Archive& ar)
-{
-	ar.serialize(resourceGroups_, "resourceGroups", "Группы ресурсов");
-	ar.serialize(armorTypes_, "armorTypes", "Типы брони");
-	ar.serialize(slotsLimit_, "slotsLimit", "Лимит слотов");
-	ar.serialize(onlyWithPrefixes_, "onlyWithPrefixes", "Оружие только с префиксами WS, WC, WF");
-	ar.serialize(useInterfaceUnitNames_, "useInterfaceUnitNames", "Использовать интерфейсные названия юнитов");
-}
-
-std::string ParameterStatisticsExportImpl::unitName(const AttributeBase& attribute)
-{
-	if(useInterfaceUnitNames_)
-		return UI_Render::instance().extractFirstLineText(attribute.interfaceName(0));
-	else
-		return attribute.libraryKey();
-}
-
-bool ParameterStatisticsExportImpl::validWeaponName(const char* name) const
-{
-	if(!onlyWithPrefixes_)
-		return true;
-	else
-		if(strlen(name) > 2 &&
-		(name[0] == 'W' || name[0] == 'w') &&
-		((name[1] == 'S' || name[1] == 's') || (name[1] == 'C' || name[1] == 'c') || (name[1] == 'F' || name[1] == 'f')))
-		return true;
-    return false;									
-}
-
-// -----------------------------------------------------------------
-
-void ParameterStatisticsExport::serialize(Archive& ar)
-{
-	impl().serialize(ar);
-}
-
 
 ParameterStatisticsExport::ParameterStatisticsExport()
-: impl_(new ParameterStatisticsExportImpl(this))
 {
+
 }
 
-ParameterStatisticsExport::~ParameterStatisticsExport()
+static int calculateSlotsLimit(const RaceProperty& race)
 {
-	delete impl_;
-	impl_ = 0;
+	/*
+	if(race.unitNumbers.empty())
+		return 0;
+
+	const UnitNumber& unitNumber = race.unitNumbers.front();
+	UnitFormationTypeReference formation = unitNumber.type;
+	if(!formation.numberParameters.customVector().empty()){
+		ParameterValueReference valueRef = unitNumber.numberParameters.customVector().front()[0];
+		ParameterTypeRefeernce typeRef = valueRef->type();
+		float result = 0;
+		
+		FOR_EACH(unitAttributes, it){
+			UnitAttributeID id = it->key();
+			const AttributeBase& attribute = *it->get();
+			if(attribute.formationType == formation){
+				float capacity = attribute.resourceCapacity.findByName(typeRef.c_str(), 0.0f);
+				if(capacity > FLT_EPS){
+					...
+				}
+			}
+
+		}
+		return round(result);
+	
+	}
+	else 
+		return 0;
+	*/
+	return 120;
 }
 
 static bool exportableUnit(const AttributeBase& attr)
@@ -150,6 +87,7 @@ static float weaponDamage(const WeaponPrm* weapon, const char* name)
 			return -1e7f;
 	}
 	else{
+		
 		return weapon->damage().findByName(name, -1e7f);
 	}
 }
@@ -169,51 +107,41 @@ void ParameterStatisticsExport::exportExcel(const char* fileName)
 	excel->beginSheet();
 
 	// Лист 2 - Оружие
-	excel->setSheetName(L"Оружие");
-	excel->setCellText(Vect2i(0, 0), L"Название юнита/оружия");
-	excel->setCellText(Vect2i(1, 0), L"Раса");
-	excel->setCellText(Vect2i(2, 0), L"Время выстрела");
-	int column = 3;
+	excel->setSheetName("Оружие", 1251);
+	excel->setCellText(Vect2i(0, 0), "Название юнита/оружия", 1251);
+	excel->setCellText(Vect2i(1, 0), "Раса", 1251);
+	excel->setCellText(Vect2i(2, 0), "Повр. по Armour", 1251);
+	excel->setCellText(Vect2i(3, 0), "Повр. по Armour4", 1251);
+	excel->setCellText(Vect2i(4, 0), "Время выстрела", 1251);
+	excel->setCellText(Vect2i(5, 0), "Повр. по Armour/с", 1251);
+	excel->setCellText(Vect2i(6, 0), "Повр. по Armour4/с", 1251);
+	excel->setCellText(Vect2i(7, 0), "max повр. по Armour/с", 1251);
+	excel->setCellText(Vect2i(8, 0), "max повр. по Armour4/с", 1251);
+	excel->setCellText(Vect2i(9, 0), "время убийства max-ой 4-й брони", 1251);
 
-	Impl::ArmorTypes& armorTypes = impl().armorTypes_;
-	Impl::ArmorTypes::iterator ait;
-	int numArmors = armorTypes.size();
-	float* maxArmors = new float[numArmors];
-
-	int index = 0;
-	FOR_EACH(armorTypes, ait){
-		Impl::ArmorType& armorType = *ait;
-		wstring armorName = a2w(armorType.c_str());
-
-		excel->setCellText(Vect2i(column + index + 0, 0),
-						   (wstring(L"Повр. по ") + armorName).c_str());
-		excel->setCellText(Vect2i(column + index + numArmors, 0),
-						   (wstring(L"Повр. по ") + armorName + L"/с").c_str());
-		excel->setCellText(Vect2i(column + index + numArmors * 2, 0),
-						   (wstring(L"Max повр. по ") + armorName + L"/с").c_str());
-		excel->setCellText(Vect2i(column + index + numArmors * 3, 0),
-						   (wstring(L"Время убийства Max ") + armorName).c_str());
-
-		FOR_EACH(unitAttributes, it){
-			UnitAttributeID id = it->key();
-			const AttributeBase& attribute = *it->get();
-			maxArmors[index] = max(maxArmors[index], attribute.parametersInitial.findByName(armorType.c_str(), 0.0f));
-		}
-
-	   ++index;
+	float maxArmour4 = 0.0f;
+	FOR_EACH(unitAttributes, it){
+		UnitAttributeID id = it->key();
+		const AttributeBase& attribute = *it->get();
+		maxArmour4 = max(maxArmour4, attribute.parametersInitial.findByName("Armour4", 0.0f));
 	}
 
 	int row = 1;
 	FOR_EACH(unitAttributes, it){
 		UnitAttributeID id = it->key();
 		const AttributeBase& attribute = *it->get();
-		std::string unitName = impl().unitName(attribute);
+		std::string unitName = unitNameFromInterfaceName(attribute.interfaceName(0));
 		if(exportableUnit(attribute)){
-			WeaponSlotAttributes::const_iterator wit;
+			AttributeBase::WeaponSlotAttributes::const_iterator wit;
 			FOR_EACH(attribute.weaponAttributes, wit){
-				if(const WeaponPrm* weapon = wit->second.weaponPrm()){
-					std::string weaponName = wit->second.weaponPrmReference().c_str();
-					if(impl().validWeaponName(weaponName.c_str())){
+				if(const WeaponPrm* weapon = wit->weaponPrm()){
+					std::string weaponName = wit->weaponPrmReference().c_str();
+					if(weaponName.size() >= 2 &&
+						(weaponName[0] == 'W' || weaponName[0] == 'w') &&
+						((weaponName[1] == 'S' || weaponName[1] == 's') ||
+						 (weaponName[1] == 'C' || weaponName[1] == 'c') ||
+						 (weaponName[1] == 'F' || weaponName[1] == 'f')))
+					{
 						float reloadTime = weapon->parameters().findByType(ParameterType::RELOAD_TIME, 0.1f);
 						float fireTime = weapon->parameters().findByType(ParameterType::FIRE_TIME, 0.5f);
 
@@ -224,32 +152,35 @@ void ParameterStatisticsExport::exportExcel(const char* fileName)
 						int accountingNumber = attribute.accountingNumber;
 						int maxNumber = 0;
 						if(accountingNumber > 0){
-							maxNumber = int(float(impl().slotsLimit(*id.race())) / float(accountingNumber));
+							maxNumber = int(float(calculateSlotsLimit(*id.race())) / float(accountingNumber));
 						}
 
-						WBuffer name;
-						name < unitName.c_str() < L" / " < weaponName.c_str();
-						excel->setCellText(Vect2i(0, row), name.c_str());
-						excel->setCellText(Vect2i(1, row), a2w(id.race().c_str()).c_str());
-						setFloat(excel, 2, row, shotDuration);
+						XBuffer name;
+						name < unitName.c_str();
+						name < " / ";
+						name < weaponName.c_str();
+						excel->setCellText(Vect2i(0, row), name, 1251);
+						excel->setCellText(Vect2i(1, row), id.race().c_str(), 1251);
+						setFloat(excel, 4, row, shotDuration);
 
-						Impl::ArmorTypes::iterator ait;
-
-						int index = 0;
-						FOR_EACH(armorTypes, ait){
-							Impl::ArmorType& armorType = *ait;
-							float damage = weaponDamage(weapon, armorType.c_str());
-							if(damage > INVALID_VALUE){
-								setFloat(excel, index + column, row, damage);
-								setFloat(excel, index + column + numArmors, row, damage * shotsPerSecond);
-								if(maxNumber){
-									setFloat(excel, index + column + numArmors * 2, row, damage * maxNumber * shotsPerSecond);
-								}
-								if(damage > FLT_EPS && shotsPerSecond > FLT_EPS){
-									setFloat(excel, index + column + numArmors * 3, row, maxArmors[index] / (damage * shotsPerSecond));
-								}
+						float weaponDamage1 = weaponDamage(weapon, "Armour");
+						if(weaponDamage1 > INVALID_VALUE){
+							setFloat(excel, 2, row, weaponDamage1);
+							setFloat(excel, 5, row, weaponDamage1 * shotsPerSecond);
+							if(maxNumber){
+								setFloat(excel, 7, row, weaponDamage1 * maxNumber * shotsPerSecond);
 							}
-							++index;
+						}
+						float weaponDamage4 = weaponDamage(weapon, "Armour4");
+						if(weaponDamage4 > INVALID_VALUE){
+							setFloat(excel, 3, row, weaponDamage4);
+							setFloat(excel, 6, row, weaponDamage4 * shotsPerSecond);
+							if(maxNumber){
+								setFloat(excel, 8, row, weaponDamage4 * maxNumber * shotsPerSecond);
+							}
+							if(weaponDamage4 > FLT_EPS && shotsPerSecond > FLT_EPS){
+								setFloat(excel, 9, row, maxArmour4 / (weaponDamage4 * shotsPerSecond));
+							}
 						}
 						++row;
 					}
@@ -261,73 +192,59 @@ void ParameterStatisticsExport::exportExcel(const char* fileName)
 	excel->setColumnWidthAuto(i);
 
 	// Лист 1 - Юниты
-	excel->addSheet(L"Юниты");
-	excel->setCellText(Vect2i(0, 0), L"Название юнита");
+	excel->addSheet("Юниты");
+	excel->setCellText(Vect2i(0, 0), "Название юнита", 1251);
 	excel->mergeCellRange(Recti(Vect2i(0, 0), Vect2i(1, 2)));
-	excel->setCellText(Vect2i(1, 0), L"Раса");
+	excel->setCellText(Vect2i(1, 0), "Раса", 1251);
 	excel->mergeCellRange(Recti(Vect2i(1, 0), Vect2i(1, 2)));
-	excel->setCellText(Vect2i(2, 0), L"Слотов");
+	excel->setCellText(Vect2i(2, 0), "Слотов", 1251);
 	excel->mergeCellRange(Recti(Vect2i(2, 0), Vect2i(1, 2)));
-	excel->setCellText(Vect2i(3, 0), L"max кол-во");
+	excel->setCellText(Vect2i(3, 0), "max кол-во", 1251);
 	excel->mergeCellRange(Recti(Vect2i(3, 0), Vect2i(1, 2)));
 
-	int numResourceGroups = impl().resourceGroups_.size();
-	if(numResourceGroups > 0){
-		excel->setCellText(Vect2i(4, 0), L"max стоимость");
-		excel->mergeCellRange(Recti(Vect2i(4, 0), Vect2i(numResourceGroups, 1)));
-		
-		int index = 0;
-		Impl::ResourceGroups& groups = impl().resourceGroups_;
-		Impl::ResourceGroups::iterator git;
-		FOR_EACH(groups, git){
-			excel->setCellText(Vect2i(4 + index, 1), a2w(git->name_).c_str());
-			++index;
-		}
-	}
-	column = 4 + impl().resourceGroups_.size();
+	excel->setCellText(Vect2i(4, 0), "max стоимость", 1251);
+	excel->mergeCellRange(Recti(Vect2i(4, 0), Vect2i(3, 1)));
+	excel->setCellText(Vect2i(4, 1),  "Вода/Биоэнергия", 1251);
+	excel->setCellText(Vect2i(5, 1),  "Соларка", 1251);
+	excel->setCellText(Vect2i(6, 1),  "Материал/Биомасса", 1251);
 
-	excel->setCellText(Vect2i(column, 0), L"Время стр-ва");
-	excel->mergeCellRange(Recti(Vect2i(column, 0), Vect2i(1, 2)));
-	excel->setCellText(Vect2i(column + 1, 0), L"Время стр-ва max кол-ва");
-	excel->mergeCellRange(Recti(Vect2i(column + 1, 0), Vect2i(1, 2)));
+	excel->setCellText(Vect2i(7, 0), "Время стр-ва", 1251);
+	excel->mergeCellRange(Recti(Vect2i(7, 0), Vect2i(1, 2)));
+	excel->setCellText(Vect2i(8, 0), "Время стр-ва max кол-ва", 1251);
+	excel->mergeCellRange(Recti(Vect2i(9, 0), Vect2i(1, 2)));
 	
 	row = 2;
 	FOR_EACH(unitAttributes, it){
 		UnitAttributeID id = it->key();
 		const AttributeBase& attribute = *it->get();
 		if(exportableUnit(attribute)){
-			std::string unitName = impl().unitName(attribute);
-			excel->setCellText(Vect2i(0, row), a2w(unitName.c_str()).c_str());
-			excel->setCellText(Vect2i(1, row), a2w(id.race().c_str()).c_str());
+			std::string unitName = unitNameFromInterfaceName(attribute.interfaceName(0));
+			excel->setCellText(Vect2i(0, row), unitName.c_str(), 1251);
+			excel->setCellText(Vect2i(1, row), id.race().c_str(), 1251);
 			int accountingNumber = attribute.accountingNumber;
 			excel->setCellFloat(Vect2i(2, row), accountingNumber);
 			if(accountingNumber > 0){
-				int maxNumber = int(float(impl().slotsLimit(*id.race())) / float(accountingNumber));
+				int maxNumber = int(float(calculateSlotsLimit(*id.race())) / float(accountingNumber));
 				excel->setCellFloat(Vect2i(3, row), maxNumber);
 
-				Impl::ResourceGroups& resourceGroups = impl().resourceGroups_;
-				Impl::ResourceGroups::iterator git;
-				
-				int index = 0;
-				FOR_EACH(resourceGroups, git){
-					Impl::ResourceGroup& group = *git;
+				const char* types[]    =  { "R-fresh water",	"Е-hydro energy",		"A-bioenergy",
+											"R-solar energy",	"Е-solar energy",		0,
+											"R-salvage",		"Е-science resource",	"А-biomass" };
 
-					Impl::ResourceGroup::Types::iterator tit;
-					FOR_EACH(group.types_, tit){
-						Impl::ResourceGroup::Type& type = *tit;
-						float cost = attribute.installValue.findByName(type.c_str(), -1e7f);
-						if(cost > -1e6f){
-							setFloat(excel, 4 + index, row, cost * maxNumber);
-							break;
+				for(int j = 0; j < 3; ++j){
+					for(int i = 0; i < 3; ++i){
+						if(const char* typeName = types[i * 3 + j]){
+							float cost = attribute.installValue.findByName(typeName, -1e7f);
+							if(cost > -1e6f){
+								setFloat(excel, 4 + i, row, cost * maxNumber);
+							}
 						}
 					}
-					++index;
 				}
-
 				float maxNumberProductionTime = attribute.creationTime * maxNumber;
-				setFloat(excel, column + 1, row, maxNumberProductionTime);
+				setFloat(excel, 8, row, maxNumberProductionTime);
 			}
-			setFloat(excel, column, row, attribute.creationTime);
+			setFloat(excel, 7, row, attribute.creationTime);
 			++row;
 		}
 	}

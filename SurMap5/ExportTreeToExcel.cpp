@@ -1,26 +1,22 @@
 #include "stdafx.h"
 #include "ExportTreeToExcel.h"
-#include "ExcelExport\ExcelExporter.h"
+#include "..\ExcelExport\ExcelExporter.h"
+#include "..\Util\Serialization\TreeInterface.h"
 
 ExportTreeToExcel::ExportTreeToExcel(const char* filename)
 {
-	/*
 	application_ = ExcelExporter::create(filename);
 	application_->beginSheet();
 	label_ = "";
-	*/
 }
 
 ExportTreeToExcel::~ExportTreeToExcel()
 {
-	/*
 	application_->free();
-	*/
 }
 
 void ExportTreeToExcel::outTreeNode(const TreeNode* node, int level, int line)
 {
-	/*
 	if(!application_ || !node)
 		return;
 
@@ -29,12 +25,10 @@ void ExportTreeToExcel::outTreeNode(const TreeNode* node, int level, int line)
 
 	application_->setCellText(Vect2i(level, line), node->name());
 	application_->setCellText(Vect2i(level + 1, line), node->value());
-	*/
 }
 
 bool ExportTreeToExcel::exportTreeNode(const TreeNode* node, int level, int* line)
 {
-	/*
 	if(!application_ || !node)
 		return false;
 	
@@ -45,17 +39,12 @@ bool ExportTreeToExcel::exportTreeNode(const TreeNode* node, int level, int* lin
 			return false;
 
 	return true;
-	*/
-	return false;
 }
 
 bool ExportTreeToExcel::exportTreeFromNode(const TreeNode* rootNode)
 {
-	/*
 	if(!application_ || !rootNode)
 		return false;
 	int line = 0;
 	return exportTreeNode(rootNode, 0, &line);
-	*/
-	return false;
 }

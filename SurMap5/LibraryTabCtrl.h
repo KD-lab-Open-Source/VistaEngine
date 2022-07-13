@@ -1,7 +1,7 @@
 #ifndef __LIBRARY_TAB_CTRL_H_INCLUDED__
 #define __LIBRARY_TAB_CTRL_H_INCLUDED__
 
-#include "XTL\Functor.h"
+#include "Functor.h"
 
 class CLibraryTabCtrl : public CTabCtrl{
     DECLARE_DYNAMIC(CLibraryTabCtrl);

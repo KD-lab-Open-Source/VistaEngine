@@ -2,8 +2,8 @@
 #define __SURTOOLAUX_H__
 
 #include "Handle.h"
-#include "Serialization\Dictionary.h"
-#include "terra\vmap.h"
+#include "Dictionary.h"
+#include "..\terra\terra.h"
 
 class Archive;
 class cTexture;
@@ -57,7 +57,6 @@ public:
 	eSubfolderExpandPermission subfolderExpandPermission;
 	bool flag_repeatOperationEnable;
 	bool flag_init_dialog;
-	bool flag_select;
 
 	CSurToolBase(int IDD, CWnd* pParent);
 	bool CreateExt(CWnd* pParentWnd = 0);
@@ -88,28 +87,28 @@ public:
 	virtual void serialize(Archive& ar);
 
 	virtual void quant() {}
-	virtual void onBrushRadiusChanged(){}
-	virtual void onReleaseScene(){}
-	virtual void onCreateScene(){}
-	virtual bool onOperationOnMap(int x, int y){ return false; }
-	virtual bool onTrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord) { return false;}
+	virtual void CallBack_BrushRadiusChanged(){}
+	virtual void CallBack_ReleaseScene(){}
+	virtual void CallBack_CreateScene(){}
+	virtual bool CallBack_OperationOnMap(int x, int y){ return false; }
+	virtual bool CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i& scrCoord) { return false;}
 
-	virtual bool onLMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord) { return false; }
-	virtual bool onLMBUp(const Vect3f& worldCoord, const Vect2i& screenCoord) { return false; }
+	virtual bool CallBack_LMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord) { return false; }
+	virtual bool CallBack_LMBUp(const Vect3f& worldCoord, const Vect2i& screenCoord) { return false; }
 
-	virtual bool onRMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord) { return false; }
-	virtual bool onRMBUp(const Vect3f& worldCoord, const Vect2i& screenCoord) { return false; }
+	virtual bool CallBack_RMBDown(const Vect3f& worldCoord, const Vect2i& screenCoord) { return false; }
+	virtual bool CallBack_RMBUp(const Vect3f& worldCoord, const Vect2i& screenCoord) { return false; }
 
-	virtual bool onKeyDown(unsigned int keyCode, bool shift, bool control, bool alt) { return false; }
+	virtual bool CallBack_KeyDown(unsigned int keyCode, bool shift, bool control, bool alt) { return false; }
 
-	virtual void onSelectionChanged() {}
-	virtual bool onDelete() { return false; }
-	virtual bool onDrawAuxData() { return false; }
+	virtual void CallBack_SelectionChanged() {}
+	virtual bool CallBack_Delete() { return false; }
+	virtual bool CallBack_DrawAuxData() { return false; }
 
-	virtual bool onDrawPreview(int width, int height){ return false; }
-	virtual bool onPreviewLMBDown(const Vect2f& point){ return false; }
-	virtual bool onPreviewLMBUp(const Vect2f& point){ return false; }
-	virtual bool onPreviewTrackingMouse(const Vect2f& point){ return false; }
+	virtual bool CallBack_DrawPreview(int width, int height){ return false; }
+	virtual bool CallBack_PreviewLMBDown(const Vect2f& point){ return false; }
+	virtual bool CallBack_PreviewLMBUp(const Vect2f& point){ return false; }
+	virtual bool CallBack_PreviewTrackingMouse(const Vect2f& point){ return false; }
 
 	virtual void FillIn();
 
@@ -131,7 +130,6 @@ public:
 protected:
 	void popEditorMode();
 	void pushEditorMode(CSurToolBase* editorMode);
-	void replaceEditorModeSelect();
 	HTREEITEM treeItem_;
 
 	SurTools children_;
