@@ -1,0 +1,1924 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+// Generated Help ID header file
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "resource.hm"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Neutral resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+#ifdef _WIN32
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(1251)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_BARDLG_MINIDETAILE_FOLDER DIALOGEX 0, 0, 136, 47
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+END
+
+#endif    // Neutral resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Russian resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
+#ifdef _WIN32
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+#pragma code_page(1251)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 109
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "About..."
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,9,11,20,20
+    LTEXT           "VistaGame Engine -  Map Editor ver. 1.1",IDC_STATIC,47,
+                    14,160,10,SS_NOPREFIX
+    LTEXT           "© KD VISION games Development Company limited, 2004-2007. All rights reserved.\n\nVistaGame Engine is a registered trademark of the KD VISION Company",
+                    IDC_STATIC,47,35,167,46
+    DEFPUSHBUTTON   "OK",IDOK,177,89,50,14,WS_GROUP
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDVERT,39,3,1,103
+END
+
+IDD_BARDLG_GEO DIALOGEX 0, 0, 143, 62
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "TODO: layout formview",IDC_STATIC,7,28,87,8
+    PUSHBUTTON      "Button1",IDC_BUTTON1,7,7,37,17
+    EDITTEXT        IDC_EDIT1,59,7,28,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,56,22,64,6
+END
+
+IDD_BARDLG_BLUR DIALOGEX 0, 0, 513, 27
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    LTEXT           "Radius",IDC_STATIC,406,5,21,8
+    EDITTEXT        IDC_EDITRADIUS,427,5,27,12,ES_AUTOHSCROLL
+    CONTROL         "Slider1",IDC_SLIDER_EDITRADIUS,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,406,18,62,6
+    CONTROL         "Slider1",IDC_SLIDER_BLUR_INTENSITY,"msctls_trackbar32",
+                    TBS_AUTOTICKS | TBS_TOP | WS_TABSTOP,2,8,106,13
+    CONTROL         "Circle",IDC_RADIO_CIRCLEQUAD1,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP,347,7,45,8
+    CONTROL         "Quadrate",IDC_RADIO_CIRCLEQUAD2,"Button",
+                    BS_AUTORADIOBUTTON,347,16,45,8
+    LTEXT           "Сила воздействия",IDC_STATIC,9,0,93,8
+END
+
+IDD_BARDLG_GEONET DIALOGEX 0, 0, 593, 27
+STYLE DS_SETFONT | DS_3DLOOK | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    CONTROL         "Slider1",IDC_SLIDER_CELLPOWER,"msctls_trackbar32",
+                    TBS_AUTOTICKS | WS_TABSTOP,458,1,62,10
+    EDITTEXT        IDC_EDIT_WIDTH,153,7,28,12,ES_AUTOHSCROLL
+    CONTROL         "Slider1",IDC_SLIDER_WIDTH,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,150,21,58,6
+    EDITTEXT        IDC_EDIT_HEIGHT,254,7,28,12,ES_AUTOHSCROLL
+    CONTROL         "Slider1",IDC_SLIDER_HEIGHT,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,227,21,58,6
+    CONTROL         "",IDC_CHECK_SYNC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    214,11,8,8
+    LTEXT           "-width",IDC_STATIC,182,9,23,8
+    LTEXT           "height-",IDC_STATIC,230,9,23,8
+    CTEXT           "Sync.",IDC_STATIC,209,0,19,8
+    EDITTEXT        IDC_EDIT_GNOISE,341,4,28,12,ES_AUTOHSCROLL
+    LTEXT           "Noise",IDC_STATIC,319,7,21,8
+    EDITTEXT        IDC_EDIT_MESH,401,4,28,12,ES_AUTOHSCROLL
+    LTEXT           "Mesh",IDC_STATIC,379,6,21,9
+    CONTROL         "Slider1",IDC_SLIDER_SHIFTCELLPOWER,"msctls_trackbar32",
+                    TBS_AUTOTICKS | WS_TABSTOP,458,16,62,10
+    LTEXT           "Cell",IDC_STATIC,442,3,14,8
+    LTEXT           "CellShift",IDC_STATIC,431,14,29,10
+    CONTROL         "Slider1",IDC_SLIDER_BORDERFORM,"msctls_trackbar32",
+                    TBS_AUTOTICKS | WS_TABSTOP,528,15,51,10
+    CONTROL         191,IDC_STATIC,"Static",SS_BITMAP,535,2,160,15
+    EDITTEXT        IDC_EDIT_H,44,7,28,12,ES_AUTOHSCROLL
+    CONTROL         "Slider1",IDC_SLIDER_H,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,18,21,66,6
+    LTEXT           "H:",IDC_STATIC,32,9,8,8
+    CONTROL         "",IDC_CHECK_INVERSE2,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,303,12,12,11
+    CTEXT           "Inverse",IDC_STATIC,295,2,25,8
+END
+
+IDD_BARDLG_3DM DIALOGEX 0, 0, 158, 367
+STYLE DS_SETFONT | DS_3DLOOK | WS_CHILD | WS_VISIBLE
+FONT 8, "Tahoma", 400, 0, 0xCC
+BEGIN
+    CONTROL         "",IDC_CHECK_SYNCSCALINGXYZ,"Button",BS_AUTOCHECKBOX | 
+                    NOT WS_VISIBLE | WS_TABSTOP,138,244,8,8
+    CTEXT           "Sync.",IDC_STATIC,134,236,17,8,NOT WS_VISIBLE
+    EDITTEXT        IDC_EDIT_SCALINGZ,42,210,23,12,ES_AUTOHSCROLL | NOT 
+                    WS_VISIBLE
+    CONTROL         "Slider1",IDC_SLIDER_SCALINGZ,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,81,
+                    215,73,7
+    LTEXT           "Scale Z",IDC_STATIC,5,213,28,8,NOT WS_VISIBLE,0,
+                    HIDC_STATIC
+    CONTROL         "Slider1",IDC_ANGLE_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,81,34,73,7
+    EDITTEXT        IDC_ANGLE_EDIT,42,30,24,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_EDIT_SCALINGY,107,236,23,12,ES_AUTOHSCROLL | NOT 
+                    WS_VISIBLE
+    CONTROL         "Slider1",IDC_SLIDER_SCALINGY,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,25,
+                    249,110,6
+    LTEXT           "Y",IDC_STATIC,62,237,8,8,NOT WS_VISIBLE
+    CONTROL         "Slider1",IDC_SLIDER_TURNY,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,17,230,110,7
+    EDITTEXT        IDC_EDIT_TURNY,21,236,23,12,ES_AUTOHSCROLL | ES_READONLY | 
+                    NOT WS_VISIBLE
+    EDITTEXT        IDC_EDIT_SCALINGX,108,263,23,12,ES_AUTOHSCROLL | NOT 
+                    WS_VISIBLE
+    CONTROL         "Slider1",IDC_SLIDER_SCALINGX,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,27,
+                    276,110,6
+    LTEXT           "X",IDC_STATIC,63,266,8,8,NOT WS_VISIBLE
+    CONTROL         "Slider1",IDC_SLIDER_TURNX,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,18,257,110,7
+    EDITTEXT        IDC_EDIT_TURNX,22,263,23,12,ES_AUTOHSCROLL | NOT 
+                    WS_VISIBLE
+    CONTROL         "",IDC_CHECK_SYNCSCALINGXY,"Button",BS_AUTOCHECKBOX | 
+                    NOT WS_VISIBLE | WS_TABSTOP,4,244,8,8
+    CTEXT           "Sync.",IDC_STATIC,0,236,17,8,NOT WS_VISIBLE
+    LTEXT           "Model:",IDC_STATIC,4,3,26,9
+    CONTROL         "Up",IDC_SIDEUPDOWN1,"Button",BS_AUTORADIOBUTTON | 
+                    BS_PUSHLIKE | NOT WS_VISIBLE | WS_GROUP,115,294,21,9
+    CONTROL         "Down",IDC_SIDEUPDOWN2,"Button",BS_AUTORADIOBUTTON | 
+                    BS_PUSHLIKE | NOT WS_VISIBLE,115,302,21,9
+    LTEXT           "Side:",IDC_STATIC,115,286,17,8,NOT WS_VISIBLE
+    PUSHBUTTON      "R",IDC_BUT_RESETSHAPE3D,39,328,10,17,NOT WS_VISIBLE
+    CONTROL         "Slider1",IDC_SLIDER_QUALITY,"msctls_trackbar32",
+                    TBS_AUTOTICKS | NOT WS_VISIBLE | WS_TABSTOP,52,328,77,13
+    LTEXT           "Quality",IDC_STATIC,85,321,37,8
+    EDITTEXT        IDC_EDT_MODEL,28,1,113,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_FILE,142,1,12,12
+    PUSHBUTTON      "<",IDC_ANGLE_LESS_BUTTON,31,30,9,11
+    PUSHBUTTON      ">",IDC_ANGLE_MORE_BUTTON,68,30,9,11
+    CONTROL         "",IDC_SCALE_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,81,59,73,7
+    EDITTEXT        IDC_SCALE_EDIT,42,56,24,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "<",IDC_SCALE_LESS_BUTTON,31,56,9,11
+    PUSHBUTTON      ">",IDC_SCALE_MORE_BUTTON,68,56,9,11
+    LTEXT           "Угол",IDC_STATIC,4,32,17,8
+    LTEXT           "Размер",IDC_STATIC,4,58,24,8
+    COMBOBOX        IDC_CBOX_ATTRIBUTES,81,16,73,104,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Множество объектов",IDC_SPREAD_CHECK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,2,84,89,10
+    CONTROL         "",IDC_H_LINE,"Static",SS_BLACKFRAME | SS_SUNKEN,93,88,
+                    57,1
+    CONTROL         "",IDC_RADIUS_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,81,98,73,7
+    EDITTEXT        IDC_RADIUS_EDIT,42,94,25,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "<",IDC_RADIUS_LESS_BUTTON,31,95,9,11
+    PUSHBUTTON      ">",IDC_RADIUS_MORE_BUTTON,69,95,9,11
+    LTEXT           "Радиус",IDC_STATIC,4,97,25,8
+    CONTROL         "",IDC_D_RADIUS_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,81,111,73,7
+    EDITTEXT        IDC_D_RADIUS_EDIT,42,108,25,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "<",IDC_D_RADIUS_LESS_BUTTON,31,108,9,11
+    PUSHBUTTON      ">",IDC_D_RADIUS_MORE_BUTTON,69,108,9,11
+    CONTROL         "",IDC_D_ANGLE_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,81,47,73,7
+    EDITTEXT        IDC_D_ANGLE_EDIT,42,43,24,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "<",IDC_D_ANGLE_LESS_BUTTON,31,43,9,11
+    PUSHBUTTON      ">",IDC_D_ANGLE_MORE_BUTTON,68,43,9,11
+    CONTROL         "",IDC_D_SCALE_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,81,72,73,7
+    EDITTEXT        IDC_D_SCALE_EDIT,42,69,24,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "<",IDC_D_SCALE_LESS_BUTTON,31,69,9,11
+    PUSHBUTTON      ">",IDC_D_SCALE_MORE_BUTTON,68,69,9,11
+    LTEXT           "± (%)",IDC_STATIC,4,110,21,8
+    LTEXT           "± (%)",IDC_STATIC,4,70,21,8
+    LTEXT           "± (%)",IDC_STATIC,4,44,21,8
+    CONTROL         "Вертикально",IDC_VERTICAL_CHECK,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,2,18,60,10
+    COMBOBOX        IDC_CBOX_PLACEMETOD,31,301,68,93,CBS_DROPDOWN | NOT 
+                    WS_VISIBLE | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDC_STATIC_LINE2,"Static",SS_BLACKFRAME | SS_SUNKEN | 
+                    WS_DISABLED,4,125,150,1
+    LTEXT           "Method",IDC_STATIC,2,301,28,13,NOT WS_VISIBLE
+    CONTROL         "Up",IDCRB_UP_DOWN_1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP | WS_TABSTOP,56,153,40,10
+    CONTROL         "Down",IDCRB_UP_DOWN_2,"Button",BS_AUTORADIOBUTTON,56,
+                    163,41,10
+    CONTROL         "По поверхности",IDCRB_RELATIVE_ABS_1,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,43,128,65,10
+    CONTROL         "По модели",IDCRB_RELATIVE_ABS_2,"Button",
+                    BS_AUTORADIOBUTTON,43,138,61,10
+    CONTROL         "Put",IDCRB_PUT_DIG_1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP | WS_TABSTOP,112,129,41,10
+    CONTROL         "Dig",IDCRB_PUT_DIG_2,"Button",BS_AUTORADIOBUTTON,112,
+                    139,41,10
+    CONTROL         "",IDCSL_ABS_H,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,52,193,73,7
+    CONTROL         "Manual H",IDCCH_ENABLE_ABS_H,"Button",BS_AUTOCHECKBOX | 
+                    NOT WS_VISIBLE | WS_TABSTOP,15,178,43,8
+    EDITTEXT        IDCSLE_ABS_H,25,188,23,12,ES_AUTOHSCROLL | NOT 
+                    WS_VISIBLE
+    CONTROL         "",IDC_STATIC_LINE3,"Static",SS_BLACKFRAME | SS_SUNKEN | 
+                    WS_DISABLED,4,205,150,1
+    LTEXT           "Перевернуть модель",IDC_STATIC,4,152,45,16,NOT 
+                    WS_VISIBLE,0,HIDC_STATIC
+    LTEXT           "Режимы установки",IDC_STATIC,4,129,36,16,NOT WS_VISIBLE,
+                    0,HIDC_STATIC
+    CONTROL         "",IDC_STATIC_LINE4,"Static",SS_BLACKFRAME | SS_SUNKEN | 
+                    WS_DISABLED,4,149,150,1
+END
+
+IDD_BARDLG_TOOLZER DIALOGEX 0, 0, 589, 152
+STYLE DS_SETFONT | DS_3DLOOK | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    LTEXT           "Toolzer tool",IDC_STATIC,305,72,42,14
+    LTEXT           "Radius",IDC_STATIC,515,75,25,8,NOT WS_VISIBLE
+    EDITTEXT        IDC_EDITRADIUS,541,72,32,12,ES_AUTOHSCROLL | NOT 
+                    WS_VISIBLE
+    CONTROL         "Slider1",IDC_SLIDER_EDITRADIUS,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,515,
+                    88,74,6
+    EDITTEXT        IDC_EDITDELTAH,54,52,30,12,ES_RIGHT | ES_AUTOHSCROLL
+    LTEXT           "deltaH",IDC_STATIC,317,86,25,8
+    CONTROL         "Dig",IDC_RADIO_DIGPUT1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,10,76,26,8
+    CONTROL         "Put",IDC_RADIO_DIGPUT2,"Button",BS_AUTORADIOBUTTON,10,
+                    87,26,8
+    CONTROL         "Slider1",IDC_SLIDER_EDITDELTAH,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,88,56,461,6
+    CONTROL         "",IDC_COMBOBOXEX_TOOLZERFORM,"ComboBoxEx32",
+                    CBS_DROPDOWNLIST | CBS_SORT | NOT WS_VISIBLE | 
+                    WS_VSCROLL | WS_TABSTOP,355,79,44,93
+    CONTROL         160,IDC_STATIC,"Static",SS_BITMAP | SS_NOTIFY | 
+                    SS_CENTERIMAGE | NOT WS_VISIBLE,403,72,49,13
+    CONTROL         "Slider1",IDC_SLIDER_TOOLZERFRONTFORM,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,397,
+                    85,58,12
+    CONTROL         "Circle",IDC_RADIO_CIRCLEQUAD1,"Button",
+                    BS_AUTORADIOBUTTON | NOT WS_VISIBLE | WS_GROUP,465,78,45,
+                    8
+    CONTROL         "Quadrate",IDC_RADIO_CIRCLEQUAD2,"Button",
+                    BS_AUTORADIOBUTTON | NOT WS_VISIBLE,465,87,45,8
+    COMBOBOX        IDC_CBOXEX_TOOLZERTYPE,86,72,60,83,CBS_DROPDOWN | 
+                    WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDT_ROUGHNESS,108,89,36,12,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SLDR_ROUGHNESS,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,84,103,63,6
+    LTEXT           "Высота воздействия",IDC_STATIC,8,49,44,16
+    EDITTEXT        IDC_EDT_MAXH,54,31,30,12,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    CONTROL         "",IDC_SLD_MAXH,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,85,33,494,6
+    CONTROL         "",IDC_SLD_MINH,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,85,21,494,7
+    EDITTEXT        IDC_EDT_MINH,54,18,30,12,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    CONTROL         "Вкл. фильтра по высоте",IDC_CHECK_ENABLE_H_FILTER,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,6,
+                    100,8
+    LTEXT           "Мин.высота",IDC_STATIC,7,19,42,8
+    LTEXT           "Макс.высота",IDC_STATIC,8,32,45,8
+END
+
+IDD_BARDLG_EMPTY DIALOGEX 0, 0, 176, 95
+STYLE DS_SETFONT | DS_3DLOOK | WS_CHILD | WS_VISIBLE
+FONT 8, "Tahoma", 400, 0, 0xCC
+BEGIN
+    LTEXT           " ",IDC_MODE_LABEL,2,2,173,8,WS_TABSTOP
+    LTEXT           " ",IDC_HINT_LABEL,8,10,167,85,WS_TABSTOP
+END
+
+IDD_BARDLG_WATERSRC DIALOGEX 0, 0, 516, 27
+STYLE DS_SETFONT | DS_3DLOOK | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    CONTROL         "Insert",IDC_RDB_INSERTDELETE_SOURCE1,"Button",
+                    BS_AUTORADIOBUTTON | BS_PUSHLIKE,7,8,55,9
+    CONTROL         "Delete",IDC_RDB_INSERTDELETE_SOURCE2,"Button",
+                    BS_AUTORADIOBUTTON | BS_PUSHLIKE,7,17,55,9
+    CONTROL         "",IDC_SLDR_EDT_DELTALEVELING_H2O,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,7,1,94,6
+    EDITTEXT        IDC_EDT_DELTALEVELING_H2O,70,8,22,12,ES_AUTOHSCROLL
+END
+
+IDD_BARDLG_IMP DIALOGEX 0, 0, 547, 27
+STYLE DS_SETFONT | DS_3DLOOK | WS_CHILD | WS_VISIBLE
+FONT 7, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_EDIT_WIDTH,12,7,28,12,ES_AUTOHSCROLL
+    CONTROL         "Slider1",IDC_SLIDER_WIDTH,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,9,21,58,6
+    EDITTEXT        IDC_EDIT_HEIGHT,113,7,28,12,ES_AUTOHSCROLL
+    CONTROL         "Slider1",IDC_SLIDER_HEIGHT,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,86,21,58,6
+    CONTROL         "",IDC_CHECK_SYNC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    73,11,8,8
+    CONTROL         "",IDC_CHECK_INVERSE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,225,12,12,11
+    EDITTEXT        IDC_EDIT_H,330,7,28,12,ES_AUTOHSCROLL
+    CONTROL         "Slider1",IDC_SLIDER_H,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,284,21,78,6
+    EDITTEXT        IDC_EDIT_N,371,15,27,12,ES_AUTOHSCROLL
+    CONTROL         "Spin1",IDC_SPIN_N,"msctls_updown32",UDS_SETBUDDYINT | 
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,386,7,13,
+                    19
+    LTEXT           "Ph:",IDC_STATIC_POLIGON2,387,2,11,8
+    LTEXT           "-width",IDC_STATIC,41,9,23,8
+    LTEXT           "height-",IDC_STATIC,89,9,23,8
+    CTEXT           "Sync.",IDC_STATIC,68,0,19,8
+    LTEXT           "H:",IDC_STATIC,318,9,8,8
+    CTEXT           "Inverse",IDC_STATIC,217,2,25,8
+    LTEXT           "N:",IDC_STATIC_POLIGON1,362,16,8,9
+    EDITTEXT        IDC_EDIT_PHASE,396,0,30,12,ES_AUTOHSCROLL
+    CONTROL         "Spin1",IDC_SPIN_PHASE,"msctls_updown32",UDS_SETBUDDYINT | 
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,424,0,13,
+                    19
+    CONTROL         "Ph.Rnd",IDC_CHECK_PHASERND,"Button",BS_AUTOCHECKBOX | 
+                    BS_LEFTTEXT | WS_TABSTOP,397,17,36,8
+    LTEXT           "Polgon",IDC_STATIC_POLIGON,362,1,25,8
+END
+
+IDD_BARDLG_KIND DIALOGEX 0, 0, 163, 235
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    CONTROL         "Некопаемость",
+                    IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY1,
+                    "Button",BS_AUTORADIOBUTTON,5,81,150,9
+    CONTROL         "Копаемость",
+                    IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY2,
+                    "Button",BS_AUTORADIOBUTTON,5,90,150,9
+    CONTROL         "Поверхность 1",
+                    IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY3,
+                    "Button",BS_AUTORADIOBUTTON,5,99,150,9
+    CONTROL         "Поверхность 2",
+                    IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY4,
+                    "Button",BS_AUTORADIOBUTTON,5,108,150,9
+    CONTROL         "Поверхность 3",
+                    IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY5,
+                    "Button",BS_AUTORADIOBUTTON,5,117,150,9
+    CONTROL         "Поверхность 4",
+                    IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY6,
+                    "Button",BS_AUTORADIOBUTTON,5,126,150,9
+    CONTROL         "Непроходимость",
+                    IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY7,
+                    "Button",BS_AUTORADIOBUTTON,5,135,150,9
+    CONTROL         "Проходимость",
+                    IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY8,
+                    "Button",BS_AUTORADIOBUTTON,5,144,150,9
+    CONTROL         "",IDC_STATIC_LINE2,"Static",SS_BLACKFRAME | SS_SUNKEN | 
+                    WS_DISABLED,0,60,163,1
+    EDITTEXT        IDC_EDT_MAXH,6,44,30,12,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    CONTROL         "",IDC_SLD_MAXH,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,38,51,116,6
+    CONTROL         "",IDC_SLD_MINH,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,38,30,116,7
+    EDITTEXT        IDC_EDT_MINH,6,23,30,12,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    CONTROL         "Включить фильтр по высоте",IDC_CHECK_ENABLE_H_FILTER,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,4,67,10
+    CONTROL         "Проходимость",
+                    IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY9,
+                    "Button",BS_AUTORADIOBUTTON,5,153,150,9
+    CONTROL         "Проходимость",
+                    IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY10,
+                    "Button",BS_AUTORADIOBUTTON,5,162,150,9
+    CONTROL         "Проходимость",
+                    IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY11,
+                    "Button",BS_AUTORADIOBUTTON,5,171,150,9
+    CONTROL         "Проходимость",
+                    IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY12,
+                    "Button",BS_AUTORADIOBUTTON,5,180,150,9
+    CONTROL         "Проходимость",
+                    IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY13,
+                    "Button",BS_AUTORADIOBUTTON,5,189,150,9
+    CONTROL         "Проходимость",
+                    IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY14,
+                    "Button",BS_AUTORADIOBUTTON,5,198,150,9
+    CONTROL         "Проходимость",
+                    IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY15,
+                    "Button",BS_AUTORADIOBUTTON,5,207,150,9
+    CONTROL         "Проходимость",
+                    IDC_RDB_INSDELHARDNESS_SETSURKIND_INSDELIMPASSABILITY16,
+                    "Button",BS_AUTORADIOBUTTON,5,216,149,9
+    GROUPBOX        "",IDC_COLORTERRAINTYPE,5,64,150,15
+    LTEXT           "Мин.высота",IDC_STATIC,7,14,42,8
+    LTEXT           "Макс.высота",IDC_STATIC,7,35,45,8
+END
+
+IDD_BARDLG_COLORPIC DIALOGEX 0, 0, 171, 263
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "Color picture",IDC_STATIC,23,226,48,14
+    EDITTEXT        IDC_EDT_BITMAP,6,5,102,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_FILE,112,5,12,12
+    EDITTEXT        IDC_EDT_CENTERALPHA,8,29,23,12,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SLDR_CENTERALPHA,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,33,35,127,6
+    LTEXT           "Альфа",IDC_STATIC,10,19,29,9,SS_ENDELLIPSIS
+    CONTROL         "Draw",IDC_RBUT_DRAWERASE1,"Button",BS_AUTORADIOBUTTON | 
+                    NOT WS_VISIBLE | WS_GROUP,125,198,29,8
+    CONTROL         "Erase",IDC_RBUT_DRAWERASE2,"Button",BS_AUTORADIOBUTTON | 
+                    NOT WS_VISIBLE,125,207,30,8
+    EDITTEXT        IDC_EDT_MAXH,8,168,30,12,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    CONTROL         "",IDC_SLD_MAXH,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,40,173,128,6
+    CONTROL         "",IDC_SLD_MINH,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | NOT WS_VISIBLE | WS_TABSTOP,40,152,128,7
+    EDITTEXT        IDC_EDT_MINH,8,147,30,12,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    CONTROL         "",IDC_STATIC_LINE2,"Static",SS_BLACKFRAME | SS_SUNKEN | 
+                    WS_DISABLED,1,124,150,1
+    CONTROL         "Вкл.фильтр по высоте",IDC_CHECK_ENABLE_H_FILTER,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,129,119,10
+    PUSHBUTTON      "Мозаика на весь мир",IDCBTN_PUT2ALLWORLD,7,193,83,12
+    LTEXT           "Мин.высота",IDC_STATIC,9,139,42,8
+    LTEXT           "Макс.высота",IDC_STATIC,9,160,45,8
+    EDITTEXT        IDC_EDT_KCOLOR,8,101,23,12,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SLD_KCOLOR,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,34,107,127,6
+    EDITTEXT        IDC_EDT_SATURATION,8,51,23,12,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SLD_SATURATION,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,33,57,127,6
+    EDITTEXT        IDC_EDT_BRIGHTNESS,8,73,23,12,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SLD_BRIGHTNESS,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,34,79,127,6
+    CONTROL         "Button",IDC_BTN_COLOR,"Button",BS_OWNERDRAW | 
+                    WS_TABSTOP,55,90,104,12
+    LTEXT           "Насыщенность текстуры",IDC_STATIC,10,43,85,8
+    LTEXT           "Яркость текстуры",IDC_STATIC,10,65,68,8
+    LTEXT           "Сила цвета",IDC_STATIC,10,90,42,8
+END
+
+IDD_DLG_EXIMWORLD DIALOGEX 0, 0, 268, 302
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "List of available for selection worlds."
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,214,279,50,14
+    CONTROL         "",IDC_LST_WORLD,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | 
+                    WS_TABSTOP,7,7,253,244
+    PUSHBUTTON      "Export",IDC_BTN_EXPORT,104,279,50,15
+    PUSHBUTTON      "Import",IDC_BTN_IMPORT,161,279,50,14
+    GROUPBOX        "Export options",IDC_EXPORT_OPTIONS,6,252,152,45
+    CONTROL         "For play and edit",IDC_FULL_EXPORT,"Button",
+                    BS_AUTORADIOBUTTON,15,264,70,10
+    CONTROL         "Only for play",IDC_PARTIAL_EXPORT,"Button",
+                    BS_AUTORADIOBUTTON,15,279,57,10
+END
+
+IDD_DLG_WORLDNAME DIALOGEX 0, 0, 186, 49
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDT_WORLDNAME,7,7,107,14,ES_AUTOHSCROLL | 
+                    ES_WANTRETURN | WS_GROUP
+    DEFPUSHBUTTON   "OK",IDOK,129,7,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,129,28,50,14
+END
+
+IDD_BARDLG_UNIT DIALOGEX 0, 0, 149, 112
+STYLE DS_SETFONT | DS_3DLOOK | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Shell Dlg", 400, 0, 0xCC
+BEGIN
+    LTEXT           "Unit/Building",IDC_STATIC,4,1,42,8
+    CONTROL         "",IDC_H_LINE,"Static",SS_BLACKFRAME | SS_SUNKEN,3,12,
+                    141,1
+    CONTROL         "",IDC_ANGLE_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,71,20,73,7
+    EDITTEXT        IDC_ANGLE_EDIT,35,16,24,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "<",IDC_ANGLE_LESS_BUTTON2,25,16,9,11
+    PUSHBUTTON      ">",IDC_ANGLE_MORE_BUTTON,61,16,9,11
+    LTEXT           "Angle",IDC_STATIC,3,18,19,8
+    CONTROL         "",IDC_D_ANGLE_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,71,33,73,7
+    EDITTEXT        IDC_D_ANGLE_EDIT,35,29,24,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "<",IDC_D_ANGLE_LESS_BUTTON,25,29,9,11
+    PUSHBUTTON      ">",IDC_D_ANGLE_MORE_BUTTON,61,29,9,11
+    LTEXT           "± (%)",IDC_STATIC,3,30,21,8
+END
+
+IDD_BARDLG_UNITFOLDER DIALOGEX 0, 0, 122, 41
+STYLE DS_SETFONT | DS_3DLOOK | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+END
+
+IDD_BARDLG_PLAYERFOLDER DIALOGEX 0, 0, 122, 41
+STYLE DS_SETFONT | DS_3DLOOK | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+END
+
+IDD_DLG_CREATE_UNIT DIALOGEX 0, 0, 214, 82
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Create Object"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,105,61,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,157,61,50,14
+    EDITTEXT        IDC_NAME_EDIT,18,20,178,12,ES_AUTOHSCROLL
+    GROUPBOX        "Object Name",IDC_STATIC,7,5,200,49
+    CONTROL         "Paste content",IDC_PASTE_CHECK,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,17,38,61,10
+END
+
+IDD_BARDLG_CAMERA DIALOGEX 0, 0, 223, 148
+STYLE DS_SETFONT | DS_3DLOOK | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    PUSHBUTTON      "Play Camera",IDC_PLAY_CAMERA_BUTTON,3,1,216,15
+    PUSHBUTTON      "Move Point -> View",IDC_VIEW_TO_POINT_BUTTON,3,71,216,
+                    15,WS_DISABLED
+    PUSHBUTTON      "Move View -> Point",IDC_POINT_TO_VIEW_BUTTON,3,55,216,
+                    15,WS_DISABLED
+    DEFPUSHBUTTON   "Done",IDC_DONE_BUTTON,144,131,75,14
+    PUSHBUTTON      "Add Point",IDC_ADD_BUTTON,3,21,216,14
+    PUSHBUTTON      "Delete Point",IDC_DELETE_BUTTON,3,36,216,14
+    PUSHBUTTON      "<<",IDC_PREV_POINT_BUTTON,3,106,50,14
+    CTEXT           "0 / 0",IDC_POINT_LABEL,58,109,105,8
+    PUSHBUTTON      ">>",IDC_NEXT_POINT_BUTTON,169,107,50,14
+    PUSHBUTTON      "Move Origin -> View",IDC_ORIGIN_TO_VIEW_BUTTON,3,88,216,
+                    14
+END
+
+IDD_DLG_CAMERA DIALOGEX 0, 0, 154, 325
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Camera Editor"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Create Camera",IDC_BUTTON1,6,6,138,12
+    PUSHBUTTON      "Remove Camera",IDC_BUTTON2,6,18,138,12,WS_DISABLED
+    PUSHBUTTON      "Play Camera",IDC_BUTTON3,6,30,138,12,WS_DISABLED
+    PUSHBUTTON      "Assign Current View To Point",IDC_BUTTON4,6,48,138,12,
+                    WS_DISABLED
+    PUSHBUTTON      "Set View From Current Point",IDC_BUTTON5,6,60,138,12,
+                    WS_DISABLED
+    PUSHBUTTON      "Remove Point",IDC_BUTTON6,6,84,138,12,WS_DISABLED
+    LISTBOX         IDC_LIST1,6,178,138,132,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Camera Properties",IDC_STATIC,6,106,138,66
+    EDITTEXT        IDC_EDIT1,32,118,106,12,ES_AUTOHSCROLL
+    LTEXT           "Name",IDC_STATIC,12,121,18,8,NOT WS_GROUP
+    EDITTEXT        IDC_EDIT2,78,136,60,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Duration (ms)",IDC_STATIC,12,139,44,8,NOT WS_GROUP
+    CONTROL         "Closed Spline",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,12,154,126,12
+    PUSHBUTTON      "Add Point",IDC_BUTTON7,6,72,138,12,WS_DISABLED
+END
+
+IDD_DLG_ENTERNAME DIALOGEX 0, 0, 186, 46
+STYLE DS_ABSALIGN | DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | 
+    WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Please, Enter Name"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDIT1,7,14,107,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,129,7,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,129,24,50,14
+END
+
+IDD_BARDLG_GEOTX DIALOGEX 0, 0, 330, 40
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "Geo tx",IDC_STATIC,111,2,52,17
+    LTEXT           "GeoTx:",IDC_STATIC,5,6,23,9
+    EDITTEXT        IDC_EDT_GEOTX,30,4,59,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_FILE,92,4,12,12
+    LTEXT           "GeoTx:",IDC_STATIC,5,22,23,9
+    EDITTEXT        IDC_EDT_GEOTX2,30,20,59,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_FILE2,92,20,12,12
+END
+
+IDD_DLG_SELECTTRIGGER DIALOGEX 0, 0, 227, 198
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,170,7,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,170,24,50,14
+    CONTROL         "",IDC_LST_TRIGGER,"SysListView32",LVS_REPORT | 
+                    LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,7,149,184
+    PUSHBUTTON      "New Trigger",IDC_BTN_NEWTRIGGER,170,100,50,15
+    PUSHBUTTON      "Delete trigger",IDC_BTN_DELETETRIGGER,170,137,50,15
+    PUSHBUTTON      "Copy Trigger",IDC_BTN_COPY_TRIGGER,170,117,50,14
+END
+
+IDD_DLG_FILE_PROPERTIES DIALOGEX 0, 0, 171, 151
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "World Properties"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Close",IDOK,114,130,50,14
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,123,
+                    157,1
+    EDITTEXT        IDC_MAP_SIZE_EDIT,81,12,75,12,ES_RIGHT | ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_BORDER
+    LTEXT           "Map Size:",IDC_STATIC,15,12,32,8
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,7,157,
+                    1
+END
+
+IDD_BARDLG_ICE DIALOGEX 0, 0, 117, 38
+STYLE DS_SETFONT | DS_3DLOOK | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Sans Serif", 400, 0, 0xCC
+BEGIN
+    LTEXT           "Ice",-1,3,1,11,8
+    CONTROL         "",-1,"Static",SS_BLACKFRAME | SS_SUNKEN,3,12,109,1
+END
+
+IDD_BARDLG_MINIMAP DIALOGEX 0, 0, 124, 106
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Button1",IDC_BUTTON1,27,15,50,14
+    EDITTEXT        IDC_EDIT1,84,91,40,14,ES_AUTOHSCROLL
+END
+
+IDD_BARDLG_ROAD DIALOGEX 0, 0, 191, 336
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    PUSHBUTTON      "put road",IDC_BTN_PUTTRACK,134,5,38,12
+    PUSHBUTTON      "clear road",IDC_BTN_CLEARROAD,13,5,38,12
+    CONTROL         "",IDC_SLDR_EDT_ROADWIDTH,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,3,81,133,6
+    EDITTEXT        IDC_EDT_ROADWIDTH,138,72,42,12,ES_AUTOHSCROLL
+    LTEXT           "Текстура:",IDC_STATIC,5,150,34,8
+    EDITTEXT        IDC_EDT_BITMAP,45,147,41,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_FILE,88,147,12,12
+    LTEXT           "Рельеф:",IDC_STATIC,6,163,38,9
+    EDITTEXT        IDC_EDT_BITMAPV,45,161,41,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_FILEV,88,162,12,12
+    CONTROL         "Берет высоту мира в начале и конце дороги",
+                    IDC_RD_ROADMETOD1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
+                    WS_TABSTOP,7,29,165,8
+    CONTROL         "Кладется по сфере/высота в центре:",IDC_RD_ROADMETOD2,
+                    "Button",BS_AUTORADIOBUTTON,7,38,139,8
+    CONTROL         "Берет высоту мира во всех точках дороги",
+                    IDC_RD_ROADMETOD3,"Button",BS_AUTORADIOBUTTON,7,51,159,8
+    GROUPBOX        "Режимы:",IDC_STATIC,4,20,180,51
+    CONTROL         "",IDC_SLDR_EDT_EDGEANGLE,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,3,97,134,6
+    EDITTEXT        IDC_EDT_EDGEANGLE,138,88,42,12,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SLDR_EDT_SPHERIC_H,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,57,47,92,6
+    EDITTEXT        IDC_EDT_SPHERIC_H,149,38,29,12,ES_AUTOHSCROLL
+    CONTROL         "Кладет только текстуру",IDC_RD_ROADMETOD4,"Button",
+                    BS_AUTORADIOBUTTON,7,60,106,8
+    LTEXT           "Ширина дороги:",IDC_STATIC,5,72,69,8
+    LTEXT           "Ширина обочины:",IDC_STATIC,4,87,72,8
+    EDITTEXT        IDC_EDT_EDGEBITMAP_TEXTURE,44,207,41,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_FILE_EDGEBITMAP_TEXTURE,87,207,12,
+                    12
+    EDITTEXT        IDC_EDT_EDGEBITMAP_VTEXTURE,43,221,42,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_FILE_EDGEBITMAP_VTEXTURE,87,221,12,
+                    12
+    COMBOBOX        IDC_CMB_TEXTURING_METHOD,5,119,178,63,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_CMB_PUT_METHOD,5,104,178,63,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDCSLE_ALPHAROAD,139,147,42,12,ES_AUTOHSCROLL
+    CONTROL         "",IDCSL_ALPHAROAD,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,101,160,84,6
+    LTEXT           "Alpha:",IDC_STATIC,107,149,20,9
+    EDITTEXT        IDCSLE_ALPHAROADSIDE,140,206,42,12,ES_AUTOHSCROLL
+    CONTROL         "",IDCSL_ALPHAROADSIDE,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,101,218,84,6
+    COMBOBOX        IDCCB_ROAD_MINIDETAIL,61,177,119,126,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDCCB_EDGE_MINIDETAIL,61,237,119,104,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDC_STATIC_LINE3,"Static",SS_BLACKFRAME | SS_SUNKEN | 
+                    WS_DISABLED,7,194,167,1
+    LTEXT           " Текстура дороги",IDC_STATIC,63,136,63,8
+    LTEXT           " Текстура обочины",IDC_STATIC,60,194,65,11
+    LTEXT           "Дет.текстура",IDC_STATIC,5,178,49,8
+    CONTROL         "",IDC_STATIC_LINE5,"Static",SS_BLACKFRAME | SS_SUNKEN | 
+                    WS_DISABLED,6,136,167,1
+    LTEXT           "Текстура:",IDC_STATIC,5,208,34,8
+    LTEXT           "Рельеф:",IDC_STATIC,6,224,38,9
+    LTEXT           "Alpha:",IDC_STATIC,107,207,20,9
+    LTEXT           "Дет.текстура",IDC_STATIC,5,238,49,8
+END
+
+IDD_BARDLG_WINDSTATIC DIALOGEX 0, 0, 197, 46
+STYLE DS_SETFONT | DS_3DLOOK | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_EDIT_WINDZ,33,8,40,14,ES_AUTOHSCROLL
+    LTEXT           "Height",IDC_STATIC_WIND,3,11,22,8
+    CONTROL         "Clear",IDC_CH_CLEAR_WIND,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,11,30,32,10
+END
+
+IDD_BARDLG_DETAILE DIALOGEX 0, 0, 330, 40
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_EDT_MINITX,6,4,148,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_FILE,156,3,12,12
+    CONTROL         "Erase",IDC_MINI_DETAIL_ERACE,"Button",BS_AUTOCHECKBOX | 
+                    NOT WS_VISIBLE | WS_TABSTOP,29,23,34,10
+    LTEXT           "Not supported",IDC_LAYER_NOT_SUPPORT,15,15,139,8,NOT 
+                    WS_VISIBLE
+    CONTROL         "Erase ALL",IDC_DETAIL_ERACE_ALL,"Button",
+                    BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,87,23,47,
+                    10
+END
+
+IDD_DLG_NAME_COMBO DIALOGEX 0, 0, 186, 44
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Source Name"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,77,23,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,129,23,50,14
+    COMBOBOX        IDC_NAME_COMBO,7,7,172,153,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_DLG_CHANGE_WORLD_HEIGHT DIALOGEX 0, 0, 306, 351
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Change world height"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,83,332,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,157,332,50,14
+    GROUPBOX        "Histogram input",IDC_HISTOGRAM_WORLD_INPUT,18,30,256,64,
+                    NOT WS_VISIBLE,WS_EX_CLIENTEDGE
+    GROUPBOX        "Histogram output",IDC_HISTOGRAM_WORLD_OUTPUT,18,177,256,
+                    64,NOT WS_VISIBLE,WS_EX_CLIENTEDGE
+    EDITTEXT        IDC_EDT_INPUT_MAX_HEIGHT,242,16,32,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_EDT_INPUT_MIN_HEIGHT,18,16,40,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_EDT_OUT_MAX_HEIGHT,233,162,40,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_EDT_OUT_MIN_HEIGHT,18,162,40,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    CONTROL         "",IDC_SLDR_DELTA_H,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,15,121,264,6
+    EDITTEXT        IDC_EDT_DELTA_H,234,106,40,12,ES_AUTOHSCROLL
+    LTEXT           "Delta H",IDC_STATIC,22,109,24,8
+    CONTROL         "",IDC_SLDR_SCALE_H,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,15,144,264,6
+    EDITTEXT        IDC_EDT_SCALE_H,234,130,40,12,ES_AUTOHSCROLL
+    LTEXT           "Scale H",IDC_STATIC,21,133,24,8
+    GROUPBOX        "Input world",IDC_STATIC,10,5,271,97
+    GROUPBOX        "Output world",IDC_STATIC,10,151,271,97
+    CONTROL         "Custom1",IDC_ATTRIB_EDITOR,"SurMapAttribEditorCtrl",
+                    WS_TABSTOP,12,258,270,69
+END
+
+IDD_BARDLG_EDITABLE DIALOGEX 0, 0, 193, 133
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    CONTROL         "",IDC_ATTRIB_EDITOR,"Static",SS_GRAYRECT | NOT 
+                    WS_VISIBLE | WS_BORDER,0,12,193,120,WS_EX_CLIENTEDGE
+    LTEXT           "Create ...:",IDC_CREATE_LABEL,4,1,36,8
+    RTEXT           "Type",IDC_TYPE_LABEL,58,1,130,8
+END
+
+IDD_BARDLG_PATHEDITOR DIALOGEX 0, 0, 173, 32
+STYLE DS_SETFONT | DS_3DLOOK | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 400, 0, 0xCC
+BEGIN
+    EDITTEXT        IDC_SPEED_EDIT,120,2,47,12,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "Point Speed:",IDC_SPEED_LABEL,7,4,42,8
+    PUSHBUTTON      "Add To Library",IDC_ADD_TO_LIBRARY_BUTTON,4,16,165,14
+END
+
+IDD_BARDLG_SELECT DIALOGEX 0, 0, 193, 133
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    CONTROL         "",IDC_ATTRIB_EDITOR,"Static",SS_BLACKFRAME | NOT 
+                    WS_VISIBLE,0,20,193,113,WS_EX_CLIENTEDGE
+    LTEXT           "Selected:",IDC_SELECTED_INFO_LABEL,9,25,172,79,NOT 
+                    WS_VISIBLE
+    PUSHBUTTON      "Randomize Selection",IDC_RANDOM_SEL_BUTTON,7,114,124,14
+    EDITTEXT        IDC_RANDOM_SEL_PERCENT_EDIT,135,115,41,12,ES_CENTER | 
+                    ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "%",IDC_RANDOM_SEL_PERCENT_LABEL,178,116,8,8
+    PUSHBUTTON      "Edit",IDC_EDIT_BUTTON,2,3,188,14
+    CTEXT           "Static",IDC_LABEL,4,6,182,8
+END
+
+IDD_BARDLG_TRANSFORM DIALOGEX 0, 0, 175, 94
+STYLE DS_SETFONT | DS_3DLOOK | WS_CHILD | WS_VISIBLE
+FONT 8, "Tahoma", 400, 0, 0xCC
+BEGIN
+    CONTROL         "X",IDC_X_AXIS_CHECK,"Button",BS_AUTOCHECKBOX | 
+                    BS_PUSHLIKE | WS_TABSTOP,4,6,40,16
+    CONTROL         "Y",IDC_Y_AXIS_CHECK,"Button",BS_AUTOCHECKBOX | 
+                    BS_PUSHLIKE | WS_TABSTOP,46,6,40,16
+    CONTROL         "Z",IDC_Z_AXIS_CHECK,"Button",BS_AUTOCHECKBOX | 
+                    BS_PUSHLIKE | WS_TABSTOP,88,6,40,16
+    PUSHBUTTON      "To Surface Normal",IDC_TO_SURFACE_NORMAL_BUTTON,4,44,
+                    164,14
+    PUSHBUTTON      "To Surface Level",IDC_TO_SURFACE_LEVEL_BUTTON,4,27,164,
+                    14
+END
+
+IDD_DLG_STATISTICS_SHOW DIALOGEX 0, 0, 550, 396
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Statictics"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Close",IDCANCEL,249,375,50,14
+    GROUPBOX        "Общая статистика",IDC_STATIC,6,294,150,78
+    LTEXT           "Количество объектов:",IDC_STATIC,12,306,78,8
+    LTEXT           "Уникальных объектов",IDC_STATIC,12,318,78,8
+    LTEXT           "Количество текстур:",IDC_STATIC,12,330,73,8
+    LTEXT           "Объем всех текстур:",IDC_STATIC,12,342,72,8
+    LTEXT           "Объем всех вершин:",IDC_STATIC,12,354,70,8
+    LTEXT           "TotalObj",IDC_TOTAL_OBJ,96,306,50,8
+    LTEXT           "UniqObj",IDC_UNIQE_OBJ,96,318,48,8
+    LTEXT           "TotalTextures",IDC_TOTAL_TEXTURES,96,330,52,8
+    LTEXT           "TextureSize",IDC_TOTAL_TEXTURES_SIZE,96,342,54,8
+    LTEXT           "VertexSize",IDC_VERTEX_SIZE,96,354,56,8
+    CONTROL         "",IDC_OBJECTS_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | 
+                    WS_BORDER | WS_TABSTOP,7,20,537,271
+    CONTROL         "",IDC_TEXTURES_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | 
+                    WS_BORDER | WS_TABSTOP,162,294,381,78
+    CONTROL         "Только видимые объекты",IDC_ONLY_VISIBLE_OBJECTS,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,377,104,10
+    PUSHBUTTON      "Все Текстуры",IDC_ALL_TEXTURES,464,375,79,14
+    CONTROL         "",IDC_TAB_OBJECTS,"SysTabControl32",0x0,11,4,536,14
+    CONTROL         "",IDC_SIMPLY_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | NOT 
+                    WS_VISIBLE | WS_BORDER | WS_TABSTOP,7,21,536,270
+END
+
+IDD_BARDLG_WAVES DIALOGEX 0, 0, 186, 131
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+END
+
+IDD_DLG_WAVE DIALOGEX 0, 0, 186, 335
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Wave Editor"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Create Wave Line",IDC_CREATE_WAVE,6,7,174,14
+    PUSHBUTTON      "Remove Wave Line",IDC_REMOVE_WAVE,6,24,174,14
+    PUSHBUTTON      "Add Point",IDC_ADD_POINT,6,54,174,14
+    PUSHBUTTON      "Remove Point",IDC_REMOVE_POINT,6,72,174,14
+    GROUPBOX        "Wave Line Properties",IDC_STATIC,6,90,174,114
+    LISTBOX         IDC_LIST_WAVE_LINES,6,210,174,120,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Distance:",IDC_STATIC,12,102,31,8
+    LTEXT           "Speed:",IDC_STATIC,12,116,24,8
+    LTEXT           "Texture:",IDC_STATIC,12,156,29,8
+    EDITTEXT        IDC_TEXTURE_NAME,12,168,144,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SELECT_TEXTURE,156,168,20,14
+    EDITTEXT        IDC_DISTANCE,42,100,40,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_SPEED,42,114,40,12,ES_AUTOHSCROLL
+    LTEXT           "Generation Time:",IDC_STATIC,12,130,56,8
+    EDITTEXT        IDC_GENERATION_TIME,72,128,40,12,ES_AUTOHSCROLL
+    CONTROL         "Invert direction",IDC_INVERT,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,16,145,65,10
+    PUSHBUTTON      "Apply",IDC_APPLY,126,186,50,14
+    LTEXT           "Size Min:",IDC_STATIC,90,102,29,8
+    EDITTEXT        IDC_SCALE,125,99,40,14,ES_AUTOHSCROLL
+    LTEXT           "Size Max:",IDC_STATIC,90,116,32,8
+    EDITTEXT        IDC_SCALE2,125,114,40,14,ES_AUTOHSCROLL
+END
+
+IDD_BARDLG_GRASS DIALOGEX 0, 0, 257, 128
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_TEXTURE_NAME,6,24,120,14,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "...",IDC_SELECT_TEXTURE,126,24,18,14
+    COMBOBOX        IDC_GRASS_LIST,6,6,138,60,CBS_DROPDOWNLIST | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Erase",IDC_ERASE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    7,42,34,10
+    CONTROL         "",IDC_SLIDER_DENSITY,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,7,66,137,9
+    LTEXT           "Density:",IDC_STATIC,6,54,28,8
+    LTEXT           "Static",IDC_STATIC_DENSITY,36,54,36,8
+    CONTROL         "",IDC_SLIDER_INTENSITY,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,7,84,137,10
+    CONTROL         "",IDC_SLIDER_INTENSITY2,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,7,101,137,10
+    LTEXT           "Top grass:",IDC_STATIC,7,75,35,8
+    LTEXT           "Bottom grass:",IDC_STATIC,7,93,46,8
+    PUSHBUTTON      "Apply To All Selected Grass",IDC_APPLY,43,42,102,10
+    LTEXT           "Static",IDC_TOPGRASS,44,75,96,8
+    LTEXT           "Static",IDC_BOTTOM,53,93,87,8
+END
+
+IDD_BARDLG_ENVIRONMENT_EDITOR DIALOGEX 0, 0, 173, 16
+STYLE DS_SETFONT | DS_3DLOOK | WS_CHILD
+FONT 8, "Tahoma", 400, 0, 0xCC
+BEGIN
+    LTEXT           " ",IDC_MODEL_NAME_LABEL,5,3,164,8
+END
+
+IDD_TIME_SLIDER DIALOGEX 0, 0, 175, 17
+STYLE DS_SETFONT | WS_CHILD | WS_VISIBLE
+FONT 8, "Tahoma", 400, 0, 0xCC
+BEGIN
+    CONTROL         "",IDC_TIME_SLIDER,"msctls_trackbar32",TBS_TOP | 
+                    TBS_NOTICKS | WS_DISABLED | WS_TABSTOP,42,8,131,9
+    EDITTEXT        IDC_TIME_EDIT,2,2,39,12,ES_CENTER | ES_AUTOHSCROLL | 
+                    WS_DISABLED
+    LTEXT           "0",IDC_STATIC,48,0,8,8
+    LTEXT           "12",IDC_STATIC,109,0,9,8
+    LTEXT           "18",IDC_STATIC,141,0,9,8
+    LTEXT           "6",IDC_STATIC,79,0,8,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDVERT,107,1,1,7
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDVERT,138,1,1,7
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDVERT,77,1,1,7
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDVERT,46,1,1,7
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDVERT,152,1,1,5
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDVERT,61,1,1,5
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDVERT,92,1,1,5
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDVERT,122,1,1,5
+END
+
+IDD_BARDLG_CAMERA_RESTRICTION DIALOGEX 0, 0, 213, 179
+STYLE DS_SETFONT | DS_3DLOOK | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    PUSHBUTTON      " ",IDC_LEFT_LESS_BUTTON,3,72,21,41
+    PUSHBUTTON      " ",IDC_LEFT_MORE_BUTTON,25,72,21,41
+    PUSHBUTTON      " ",IDC_RIGHT_LESS_BUTTON,166,72,21,41
+    PUSHBUTTON      " ",IDC_RIGHT_MORE_BUTTON,188,72,21,41
+    PUSHBUTTON      " ",IDC_TOP_LESS_BUTTON,81,25,50,16
+    PUSHBUTTON      " ",IDC_TOP_MORE_BUTTON,81,42,50,16
+    PUSHBUTTON      " ",IDC_BOTTOM_LESS_BUTTON,80,129,50,16
+    PUSHBUTTON      " ",IDC_BOTTOM_MORE_BUTTON,80,145,50,16
+    CONTROL         "",IDC_ZOOM_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,3,2,61,15
+    CONTROL         "",IDC_H_LINE,"Static",SS_ETCHEDHORZ | WS_BORDER,3,21,60,
+                    3
+END
+
+IDD_OUTPUT_PROGRESS DIALOGEX 0, 0, 306, 94
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
+    WS_CAPTION
+CAPTION "Working..."
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_FILE_PROGRESS,"msctls_progress32",WS_BORDER | 0x1,
+                    7,44,292,14
+    CONTROL         "",IDC_TOTAL_PROGRESS,"msctls_progress32",WS_BORDER | 
+                    0x1,7,17,292,14
+    LTEXT           "Общий прогресс:",IDC_TOTAL_LABEL,12,7,287,8
+    LTEXT           "Текущий архив:",IDC_FILE_LABEL,12,34,287,8
+    LTEXT           "RESOURCE\\TerrainData\\Models\\Textures\\Test.tga",
+                    IDC_FILENAME_LABEL,9,74,290,8,SS_PATHELLIPSIS
+    LTEXT           "Пакуется файл:",IDC_CURRENT_LABEL,12,63,286,8
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,84,
+                    292,1
+END
+
+IDD_DLG_SELECTWORLD DIALOGEX 0, 0, 325, 310
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "List of available for selection worlds."
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,268,7,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,268,24,50,14
+    CONTROL         "",IDC_LST_WORLD,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | 
+                    WS_TABSTOP,7,7,253,296
+    PUSHBUTTON      "New world",IDC_BTN_NEWWORLD,268,72,50,15
+    PUSHBUTTON      "Delete world",IDC_BTN_DELETEWORLD,268,108,50,15
+    PUSHBUTTON      "Rename",IDC_BTN_RENAME,268,90,50,14
+END
+
+IDD_PROGRESSDIALOG DIALOGEX 0, 0, 186, 42
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "Operation progress"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Cancel",IDCANCEL,64,19,50,14
+    CONTROL         "",IDC_PROGRESS,"msctls_progress32",WS_BORDER,7,7,172,8
+END
+
+IDD_DLG_BORDER_ROLLING DIALOGEX 0, 0, 140, 81
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,10,57,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,80,57,50,14
+    EDITTEXT        IDCE_H,60,9,50,12,ES_AUTOHSCROLL
+    EDITTEXT        IDCE_ANGLE,60,27,50,12,ES_AUTOHSCROLL
+    LTEXT           "Height:",IDC_STATIC,20,9,25,12
+    LTEXT           "Angle:",IDC_STATIC,20,27,25,12
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\SurMap5.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\r\n"
+    "// _VISTA_ENGINE_EXTERNAL_\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BTMP_FORM_BRUSH     BITMAP                  "res\\bitmap1.bmp"
+IDB_HDRUP               BITMAP                  "res\\hdrup.bmp"
+IDB_HDRDOWN             BITMAP                  "res\\hdrdown.bmp"
+IDB_TREELIST_TREE       BITMAP                  "res\\bm_def_tree.bmp"
+IDB_TREELIST_SORT       BITMAP                  "res\\bm_def_sort.bmp"
+IDB_TREELIST_LOCK       BITMAP                  "res\\bm_lockbox.bmp"
+IDB_TREELIST_HEADER     BITMAP                  "res\\bm_def_head.bmp"
+IDB_TREELIST_DISABLE    BITMAP                  "res\\bm_bkgnd2.bmp"
+IDB_TREELIST_CHECK      BITMAP                  "res\\bm_checkbox.bmp"
+IDB_TREELIST_BITMAP     BITMAP                  "res\\bm_bkgnd.bmp"
+IDB_ATTRIB_EDITOR_CTRL  BITMAP                  "res\\icons.bmp"
+IDB_TREETOOLDLG_BITMAP  BITMAP                  "res\\ifi.bmp"
+IDB_TREETOOLDLG_BITMAP256 BITMAP                  "res\\ifi256.bmp"
+IDB_CONDITION_CORNER    BITMAP                  "res\\condition_corner.bmp"
+IDB_CONDITION_CORNER_NOT BITMAP                  "res\\condition_corner_not.bmp"
+IDB_UNIT_EDITOR_TREE    BITMAP                  "res\\UnitEditorTree.bmp"
+FX_PAN_257              BITMAP                  "res\\Toolbar256.bmp"
+IDB_SPLASH              BITMAP                  "res\\Splash.bmp"
+FX_PAN_256              BITMAP                  "res\\FX_Pan_256.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_POPUP_TREE MENU 
+BEGIN
+    POPUP "POPUP_TREE"
+    BEGIN
+        POPUP "Create"
+        BEGIN
+            MENUITEM "First Item",                  ID_POPUP_CREATE_FIRST_DYNAMIC
+
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Delete",                      ID_POPUP_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "Properties",                  ID_POP_PROPERTIES
+    END
+    POPUP "POPUP_M3D"
+    BEGIN
+        MENUITEM "Add Model...",                ID_POPUP_ADDM3D
+        MENUITEM "Sort by Name",                ID_POP_SORT
+    END
+    POPUP "POP_M3D_2W"
+    BEGIN
+        MENUITEM "Add Model...",                ID_POP_ADD_M3D_2W
+        MENUITEM "Sort by Name",                ID_POP_SORT
+    END
+    POPUP "POP_COLORPIC"
+    BEGIN
+        MENUITEM "Add Texture...",              ID_POP_ADDCOLORPIC
+        MENUITEM "Sort by Name",                ID_POP_SORT
+    END
+    MENUITEM "POP_TOOL",                    ID_POP
+    POPUP "POP_DELETE"
+    BEGIN
+        MENUITEM "Delete Toolzer",              ID_POPUP_DELETE
+    END
+    POPUP "POP_ZONE"
+    BEGIN
+        MENUITEM "Add Zone",                    ID_POPUP_CREATEZONE
+        MENUITEM "Sort by Name",                ID_POP_SORT
+    END
+END
+
+IDR_MAINFRAME_EXTERNAL MENU 
+BEGIN
+    POPUP "&Файл"
+    BEGIN
+        MENUITEM "&Новый",                      ID_FILE_NEW
+        MENUITEM "&Открыть",                    ID_FILE_OPEN
+        MENUITEM "&Сохранить",                  ID_FILE_SAVE
+        MENUITEM "Сохранить &Как...",           ID_FILE_SAVEAS
+        MENUITEM SEPARATOR
+        MENUITEM "&Запустить Мир...",           ID_FILE_RUN_WORLD
+        MENUITEM "Запустить &Главное Меню...",  ID_FILE_RUN_MENU
+        MENUITEM SEPARATOR
+        MENUITEM "С&войства...",                ID_FILE_PROPERTIES
+        MENUITEM "Статистика...",               ID_FILE_STATISTICS
+        MENUITEM SEPARATOR
+        MENUITEM "В&ыход",                      ID_APP_EXIT
+    END
+    POPUP "&Правка"
+    BEGIN
+        MENUITEM "&Отменить\tCtrl+Z",           ID_EDIT_UNDO
+        MENUITEM "&Повторить",                  ID_EDIT_REDO
+        MENUITEM SEPARATOR
+        MENUITEM "&Сценарий карты...",          ID_EDIT_MAPSCENARIO
+        MENUITEM SEPARATOR
+        MENUITEM "&Настройки...",               ID_EDIT_PREFERENCES
+    END
+    POPUP "&Вид"
+    BEGIN
+        MENUITEM "&Источники",                  ID_VIEW_SOURCES
+        MENUITEM "&Камеры",                     ID_VIEW_CAMERAS
+        MENUITEM "&Геоповерхность",             ID_VIEW_GEOSURFACE
+        MENUITEM "Показывать &сетку",           ID_VIEW_SHOW_GRID
+        MENUITEM "Спрятать модели",             40354
+    END
+    POPUP "&Интерфейс"
+    BEGIN
+        MENUITEM "&Сбросить интерфейс",         ID_VIEW_RESETTOOLBAR2DEFAULT
+        MENUITEM SEPARATOR
+        MENUITEM "Строка &меню",                ID_VIEW_MENUBAR
+        MENUITEM "Панель &инструментов",        IDR_MAINFRAME
+        MENUITEM "Панель &фильтров",            IDR_FILTERS_BAR
+        MENUITEM "&Строка состояния",           ID_VIEW_STATUS_BAR
+        MENUITEM SEPARATOR
+        MENUITEM "Инструменты",                 ID_VIEW_TREE_BAR
+        MENUITEM "Сво&йства",                   ID_VIEW_DLGBAR
+        MENUITEM "&Миникарта",                  ID_VIEW_MINIMAP
+        MENUITEM "Менеджер &объектов",          ID_VIEW_OBJECTS_MANAGER
+    END
+    POPUP "&Справка"
+    BEGIN
+        MENUITEM "&О VistaGame Engine...",      ID_APP_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 55
+    END
+
+    IDD_BARDLG_3DM, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 361
+    END
+
+    IDD_BARDLG_TOOLZER, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 99
+    END
+
+    IDD_DLG_EXIMWORLD, DIALOG
+    BEGIN
+        RIGHTMARGIN, 264
+        BOTTOMMARGIN, 300
+    END
+
+    IDD_BARDLG_ROAD, DIALOG
+    BEGIN
+        RIGHTMARGIN, 184
+        BOTTOMMARGIN, 327
+    END
+
+    IDD_DLG_CHANGE_WORLD_HEIGHT, DIALOG
+    BEGIN
+        RIGHTMARGIN, 290
+        BOTTOMMARGIN, 274
+    END
+
+    IDD_PROGRESSDIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 33
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_SPLITTER            CURSOR                  "res\\spliter.cur"
+IDC_POINTER_COPY        CURSOR                  "res\\arrowcop.cur"
+IDC_POINTER             CURSOR                  "res\\arrow.cur"
+IDC_NODROP              CURSOR                  "res\\nodrop.cur"
+IDC_FPOINT              CURSOR                  "res\\fpoint.cur"
+IDC_CURSOR_VERT         CURSOR                  "res\\cur_vert.cur"
+IDC_CURSOR_STOP         CURSOR                  "res\\cur_stop.cur"
+IDC_CURSOR_SPLIT        CURSOR                  "res\\cur_split.cur"
+IDC_CURSOR_SIZE         CURSOR                  "res\\cursor_s.cur"
+IDC_CURSOR_LOCK         CURSOR                  "res\\cur_lockbox.cur"
+IDC_CURSOR_HORZ         CURSOR                  "res\\cur_horz.cur"
+IDC_CURSOR_DROP         CURSOR                  "res\\cur_drop.cur"
+IDC_CURSOR_CROSS        CURSOR                  "res\\cur_cross.cur"
+IDC_CURSOR_CHECK        CURSOR                  "res\\cur_checkbox.cur"
+IDC_CURSOR_BUTTON       CURSOR                  "res\\cur_button.cur"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\Vista.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDR_MAINFRAME           "VistaGame Engine - Map Editor"
+    ID_COMBO                "zzz"
+    IDS_ERROR_IN_CUSTOM_VALUE "Error In Custom Value"
+    IDS_PANE_TEXT           "Status"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_APP_TITLE       "VistaGame Engine - Map Editor"
+    AFX_IDS_IDLEMESSAGE     "Ready"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_INDICATOR_EXT        "EXT"
+    ID_INDICATOR_CAPS       "CAP"
+    ID_INDICATOR_NUM        "NUM"
+    ID_INDICATOR_SCRL       "SCRL"
+    ID_INDICATOR_OVR        "OVR"
+    ID_INDICATOR_REC        "REC"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_APP_ABOUT            "\nПоказать информацию о программе, версию и Copyright"
+    ID_APP_EXIT             "\nВыйти из приложения"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_EDIT_UNDO            "\nОтменить последнее действие"
+    ID_EDIT_REDO            "\nПовторить отмененное действие"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_TOOLBAR         "Показать/спрятать панель инструментов"
+    ID_VIEW_STATUS_BAR      "Показать/спрятать строку состояния"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILE_RUN_WORLD       "\nЗапустить игру с текущим миром"
+    ID_EDIT_GAME_SCENARIO   "\nСценарий игры"
+    ID_VIEW_BREAKSOURCE     "\nФильтр отображеня: показывать/прятать источники трещин"
+    ID_EDIT_REBUILDWORLD    "\nПерестроить мир по процедурной карте"
+    ID_EDIT_EFFECTS         "\nБиблиотека эффектов"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILE_RUN_MENU        "\nЗапустить игру с главным меню"
+    ID_EDIT_TOOLZERS        "\nБиблиотека тулзеров"
+    ID_FILE_PROPERTIES      "\nПоказать свойства мира"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_BRUSH_COMBO_PLACE    "\nРазмер кисти"
+    ID_BUTTON_FREE_PLACE2   "\nФорма кисти"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_EDIT_SOUNDS          "\nБиблиотека звуковых эффектов"
+    ID_EDIT_MAPSCENARIO     "\nСценарий карты..."
+    ID_EDIT_TRIGGERS        "\nРедактор триггеров..."
+    ID_EDIT_UNITS           "\nРедактор библиотек..."
+END
+
+STRINGTABLE 
+BEGIN
+    ID_EDIT_USER_INTERFACE  "\nЗапустить редактор интерфейса (внешнее приложение)..."
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_OBJECTS_MANAGER "\nМенеджер объектов (список объектов на мире)"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_BUBBLESOURCE    "Selection filter: Toggle bubble sources\nSelection filter: Toggle bubble sources"
+    ID_VIEW_WINDSOURCE      "Selection filter: Toggle wind sources\nSelection filter: Toggle wind sources"
+    ID_VIEW_LIGHTSOURCE     "Selection filter: Toggle light sources\nSelection filter: Toggle light sources"
+    ID_VIEW_SOURCES         "\nФильтр отображения: показывать/прятать источники"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILE_NEW             "\nСоздать новый мир..."
+    ID_FILE_OPEN            "\nОткрыть мир..."
+    ID_FILE_SAVE            "\nСохранить текущий мир"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_EDIT_VOICES          "\nVoices Library"
+    ID_FILE_EXPORTVISTAENGINE "\nЭкспортировать версию"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_EDIT_EFFECTS_EDITOR  "\nЗапустить редактор спецэффектов(внешнее приложение)..."
+    ID_EDIT_TERTOOLS        "\nБиблиотека тулзеров"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_CAMERAS         "\nФильтр отображения: показывать/прятать камеры"
+    ID_VIEW_EFFECTS         "\nФильтр отображения: показывать/прятать источники"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_GEOSURFACE      "\nФильтр отображения: показывать/прятать геоинформцаию"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TIME_ELAPSED_LOAD_LANGUAGE "Time elapsed:\t %.2d:%.2d:%.2d"
+    IDS_STATUS_SAVE_LANGUAGE "Выгрузка данных локализации..."
+    CG_IDS_PROGRESS_CAPTION "Progress..."
+    IDS_STATUS_LOAD_LANGUAGE "Loading %s language..."
+    IDS_TIME_LEFT_LOAD_LANGUAGE "Time left:\t %.2d:%.2d:%.2d"
+    IDS_IMPORT_XLS_FILE     "Import progress..."
+    IDS_EXPORT_XLS_FILE     "Export progress..."
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_SHOW_GRID       "\nПоказывать сетку"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_ENABLE_TIME_FLOW "\nВключить течение времени"
+END
+
+#endif    // Russian resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Neutral (Sys. Default) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEUSD)
+#ifdef _WIN32
+LANGUAGE LANG_NEUTRAL, SUBLANG_SYS_DEFAULT
+#pragma code_page(1251)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_BARDLG_SPECFILTER DIALOGEX 0, 0, 175, 254
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_EDT_MAXDH,8,20,30,12,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SLD_MAXDH,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,38,26,127,6
+    LTEXT           "Высота воздействия",IDC_STATIC,10,10,81,8,
+                    SS_ENDELLIPSIS
+    EDITTEXT        IDC_EDT_KDETAIL,8,45,30,12,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SLD_KDETAIL,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,38,51,127,6
+    LTEXT           "Детальность воздействия",IDC_STATIC,10,35,96,8,
+                    SS_ENDELLIPSIS
+    EDITTEXT        IDC_EDT_BALANSH,70,74,30,12,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SLD_BALANSH,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,8,91,154,6
+    LTEXT           "Воздействовать больше в копание/насыпание",IDC_STATIC,8,
+                    64,158,8,SS_ENDELLIPSIS
+    EDITTEXT        IDC_EDT_KUNBRIGHTNESS,8,118,23,12,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SLD_KUNBRIGHTNESS,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,34,123,127,6
+    LTEXT           "Коэффициент блеклости",IDC_STATIC,10,107,96,8,
+                    SS_ENDELLIPSIS
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_BARDLG_SPECFILTER, DIALOG
+    BEGIN
+        RIGHTMARGIN, 174
+        BOTTOMMARGIN, 253
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // Neutral (Sys. Default) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+CG_IDD_PROGRESS DIALOGEX 0, 0, 169, 89
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    CONTROL         "",CG_IDC_PROGDLG_PROGRESS,"msctls_progress32",WS_BORDER | 
+                    WS_GROUP,14,50,125,13
+    LTEXT           "0 %",CG_IDC_PROGDLG_PERCENT,146,51,16,10
+    DEFPUSHBUTTON   "&Cancel",IDC_BUTTON_STOP,67,66,52,14
+    LTEXT           "",CG_IDC_PROGDLG_STATUS,7,7,155,10
+    LTEXT           "",CG_IDC_PROGTIME_ELAPSED,7,21,135,10
+    LTEXT           "",CG_IDC_PROGTIME_LEFT,7,34,135,10
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_TOOLS_BAR           BITMAP                  "res\\ToolsBar.bmp"
+IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
+IDR_LIBRARIES_EXTERNAL_BAR BITMAP                  "res\\ToolbarLibrariesExternal.bmp"
+IDR_EDITORS_BAR         BITMAP                  "res\\ToolbarEditors.bmp"
+IDR_LIBRARIES_BAR       BITMAP                  "res\\ToolbarLibraries.bmp"
+IDR_FILTERS_BAR         BITMAP                  "res\\ToolbarFilters.bmp"
+IDR_FILTERS_EXTERNAL_BAR BITMAP                  "res\\ToolbarFiltersExternal.bmp"
+IDR_MAINFRAME_EXTERNAL  BITMAP                  "res\\ToolbarExternal.bmp"
+IDR_EDITORS_EXTERNAL_BAR BITMAP                  "res\\ToolbarEditorsExternal.bmp"
+IDR_WORKSPACE_BAR       BITMAP                  "res\\ToolbarWorkspace.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New",                        ID_FILE_NEW
+        MENUITEM "&Open",                       ID_FILE_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "&Save",                       ID_FILE_SAVE
+        MENUITEM "Save &As...",                 ID_FILE_SAVEAS
+        MENUITEM "Save MiniMap to World",       ID_FILE_SAVEMINIMAPTOWORLD
+        MENUITEM "Save Without terTool Color",  ID_FILE_SAVEWITHOUTTERTOOLCOLOR
+
+        MENUITEM SEPARATOR
+        MENUITEM "Resave All Worlds",           ID_FILE_RESAVE_WORLDS
+        MENUITEM "Resave All Triggers",         ID_FILE_RESAVE_TRIGGERS
+        MENUITEM "Save VoiceFile Durations",    ID_FILE_SAVEVOICEFILEDURATIONS
+
+        MENUITEM "Update quick start worlds list", 
+                                                ID_FILE_UPDATE_QUICK_START_WORLDS_LIST
+
+        MENUITEM SEPARATOR
+        MENUITEM "Merge...",                    ID_FILE_MERGE
+        MENUITEM SEPARATOR
+        MENUITEM "&Run World...",               ID_FILE_RUN_WORLD
+        MENUITEM "Run &Main Menu...",           ID_FILE_RUN_MENU
+        MENUITEM "&Export VistaEngine...",      ID_FILE_EXPORTVISTAENGINE
+        MENUITEM SEPARATOR
+        MENUITEM "&Import Text from Excel...",  ID_FILE_IMPORTTEXTFROMEXCEL
+        MENUITEM "Ex&port Text to Excel...",    ID_FILE_EXPORTTEXTTOEXCEL
+        MENUITEM "Export/Import World...",      ID_FILE_EXIMWORLD
+        MENUITEM SEPARATOR
+        MENUITEM "P&roperties...",              ID_FILE_PROPERTIES
+        MENUITEM "Statistics...",               ID_FILE_STATISTICS
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "&Undo\tCtrl+Z",               ID_EDIT_UNDO
+        MENUITEM "&Redo\tCtrl+Y",               ID_EDIT_REDO
+        MENUITEM SEPARATOR
+        MENUITEM "&Map Scenario...",            ID_EDIT_MAPSCENARIO
+        MENUITEM "&Game Scenario...",           ID_EDIT_GAME_SCENARIO
+        MENUITEM SEPARATOR
+        MENUITEM "Save Camera As Default",      ID_EDIT_SAVE_CAMERA_AS_DEFAULT
+
+        MENUITEM SEPARATOR
+        MENUITEM "PlayPMO",                     ID_EDIT_PLAYPMO
+        MENUITEM "&Rebuild World",              ID_EDIT_REBUILDWORLD
+        MENUITEM "Update Surface",              ID_EDIT_UPDATE_SURFACE
+        MENUITEM "Change Total World Param",    ID_EDIT_CHANGETOTALWORLDHEIGHT
+
+        MENUITEM "Rolling Border",              ID_EDIT_ROLLINGBORDER
+        MENUITEM SEPARATOR
+        MENUITEM "Pre&ferences...",             ID_EDIT_PREFERENCES
+    END
+    POPUP "View"
+    BEGIN
+        MENUITEM "&Sources",                    ID_VIEW_SOURCES
+        MENUITEM "&Cameras",                    ID_VIEW_CAMERAS
+        MENUITEM "&Geosurface",                 ID_VIEW_GEOSURFACE
+        MENUITEM SEPARATOR
+        MENUITEM "Path Finding",                ID_VIEW_PATH_FINDING
+        MENUITEM "Path Finding - Select Reference Unit", 
+                                                ID_VIEW_PATH_FINDING_SELECT_REFERENCE
+
+        MENUITEM SEPARATOR
+        MENUITEM "Show &Grid",                  ID_VIEW_SHOW_GRID
+        MENUITEM "Show Camera &Borders",        ID_VIEW_SHOW_CAMERA_BORDERS
+        MENUITEM "&Animation",                  ID_VIEW_ANIMATION
+        MENUITEM "Enable &Time Flow",           ID_VIEW_ENABLE_TIME_FLOW
+        MENUITEM "Hide Models",                 ID_VIEW_HIDE_MODELS
+    END
+    POPUP "Libraries"
+    BEGIN
+        MENUITEM "U&nits...",                   ID_EDIT_UNITS
+        MENUITEM "&Effects...",                 ID_EDIT_EFFECTS
+        MENUITEM "&Sounds...",                  ID_EDIT_SOUNDS
+        MENUITEM "UI Message Types...",         ID_LIBRARIES_UI_MESSAGE_TYPE
+        MENUITEM "UI &Messages...",             ID_LIBRARIES_UI_MESSAGES
+        MENUITEM "UI Show Mode Sprites...",     ID_LIBRARIES_UI_SHOW_MODE_SPRITES
+
+        MENUITEM "Sound Tracks...",             ID_EDIT_SOUND_TRACKS
+        MENUITEM "Cut-Scenes...",               ID_EDIT_REELS
+        MENUITEM "Heads...",                    ID_EDIT_HEADS
+        MENUITEM "TerTools...",                 ID_EDIT_TERTOOLS
+        MENUITEM "Cursors...",                  ID_EDIT_CURSORS
+        MENUITEM "Command Colors",              ID_LIBRARIES_COMMANDCOLORS
+        MENUITEM "Text images",                 ID_TEXT_SPRITES
+        MENUITEM "Terrrain Type Name",          ID_LIBRARIES_TERRRAINTYPENAME
+
+        MENUITEM SEPARATOR
+        POPUP "Import Parameters from Excel"
+        BEGIN
+            MENUITEM "Full",                        ID_FILE_PARAMETERS_IMPORT_FULL
+
+            MENUITEM "By Groups",                   ID_FILE_PARAMETERS_IMPORT_BY_GROUPS
+
+            MENUITEM "Units",                       40382
+        END
+        POPUP "Export Parameters to Excel"
+        BEGIN
+            MENUITEM "Full",                        ID_FILE_PARAMETERS_EXPORT_FULL
+
+            MENUITEM "By Groups",                   ID_FILE_PARAMETERS_EXPORT_BY_GROUPS
+
+            MENUITEM "Units",                       40381
+            MENUITEM "Balance Parameters",          ID_FILE_PARAMETERS_EXPORT_STATISTICS
+
+        END
+    END
+    POPUP "Tools"
+    BEGIN
+        MENUITEM "&UI Editor",                  ID_EDIT_USER_INTERFACE
+        MENUITEM "&Effects Editor",             ID_EDIT_EFFECTS_EDITOR
+        MENUITEM SEPARATOR
+        MENUITEM "Edit &Triggers...",           ID_EDIT_TRIGGERS
+    END
+    POPUP "Workspace"
+    BEGIN
+        MENUITEM "&Reset Workspace",            ID_VIEW_RESETTOOLBAR2DEFAULT
+        MENUITEM SEPARATOR
+        MENUITEM "Menu Bar",                    ID_VIEW_MENUBAR
+        MENUITEM "Main &Toolbar",               IDR_MAINFRAME
+        MENUITEM "Filters Bar",                 IDR_FILTERS_BAR
+        MENUITEM "Libraries Bar",               IDR_LIBRARIES_BAR
+        MENUITEM "Editors Bar",                 IDR_EDITORS_BAR
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+        MENUITEM SEPARATOR
+        MENUITEM "Tools",                       ID_VIEW_TREE_BAR
+        MENUITEM "Properties",                  ID_VIEW_DLGBAR
+        MENUITEM "&Minimap",                    ID_VIEW_MINIMAP
+        MENUITEM "Objects Manager",             ID_VIEW_OBJECTS_MANAGER
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "Key Information",             ID_HELP_KEY_INFO
+        MENUITEM SEPARATOR
+        MENUITEM "&About Vista Game Engine...", ID_APP_ABOUT
+    END
+    POPUP "Debug"
+    BEGIN
+        MENUITEM "Editable Tools Tree",         ID_VIEW_EXTENDEDMODETREELBAR
+        MENUITEM "Save Tools Tree",             ID_DEBUG_SAVECONFIG
+        MENUITEM SEPARATOR
+        MENUITEM "Edit ZipConfig...",           ID_DEBUG_EDIT_ZIP_CONFIG
+        MENUITEM "Edit Default Animation Chains", 
+                                                ID_EDIT_DEFAULT_ANIMATION_CHAINS
+
+        MENUITEM "Edit debugPrm...",            ID_DEBUG_EDIT_DEBUG_PRM
+        MENUITEM "Edit AuxAttributeLibrary",    ID_DEBUG_EDIT_AUX_ATTRIBUTE
+        MENUITEM "Edit RigidBodyPrmArchive",    ID_DEBUG_EDIT_RIGID_BODY_PRM
+        MENUITEM "Edit ToolzerLibrary",         ID_DEBUG_EDIT_TOOLZER
+        MENUITEM "Edit ExplodeTable",           ID_DEBUG_EDIT_EXPLODE_TABLE
+        MENUITEM "Edit Strategy",               ID_DEBUG_EDITSTRATEGY
+        MENUITEM SEPARATOR
+        MENUITEM "Show Palette Texture",        ID_DEBUG_SHOWPALETTETEXTURE
+        MENUITEM "Show Mipmap",                 ID_DEBUG_SHOWMIPMAP
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    CG_IDD_PROGRESS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 162
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 81
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_TOOLS_BAR TOOLBAR  24, 24
+BEGIN
+    BUTTON      ID_TOOL_SELECT
+    BUTTON      ID_TOOL_MOVE
+    BUTTON      ID_TOOL_ROTATE
+    BUTTON      ID_TOOL_SCALE
+    SEPARATOR
+    BUTTON      ID_BRUSH_COMBO_PLACE
+END
+
+IDR_MAINFRAME TOOLBAR  24, 24
+BEGIN
+    BUTTON      ID_FILE_NEW
+    BUTTON      ID_FILE_OPEN
+    BUTTON      ID_FILE_SAVE
+    SEPARATOR
+    BUTTON      ID_FILE_RUN_WORLD
+    BUTTON      ID_FILE_RUN_MENU
+    SEPARATOR
+    BUTTON      ID_FILE_EXPORTVISTAENGINE
+    SEPARATOR
+    BUTTON      ID_EDIT_UNDO
+    BUTTON      ID_EDIT_REDO
+    SEPARATOR
+    BUTTON      ID_EDIT_UPDATE_SURFACE
+    SEPARATOR
+    BUTTON      ID_EDIT_MAPSCENARIO
+    BUTTON      ID_EDIT_GAME_SCENARIO
+    BUTTON      ID_EDIT_MAPPRESET
+    BUTTON      ID_VIEW_OBJECTS_MANAGER
+END
+
+IDR_LIBRARIES_EXTERNAL_BAR TOOLBAR  24, 24
+BEGIN
+    BUTTON      ID_EDIT_SOUNDS
+    BUTTON      ID_LIBRARIES_UI_MESSAGES
+    BUTTON      ID_EDIT_SOUND_TRACKS
+    BUTTON      ID_EDIT_REELS
+    BUTTON      ID_EDIT_HEADS
+    BUTTON      ID_EDIT_CURSORS
+END
+
+IDR_EDITORS_BAR TOOLBAR  24, 24
+BEGIN
+    BUTTON      ID_EDIT_USER_INTERFACE
+    BUTTON      ID_EDIT_TRIGGERS
+    BUTTON      ID_EDIT_EFFECTS_EDITOR
+    BUTTON      ID_EDIT_UNITS
+END
+
+IDR_LIBRARIES_BAR TOOLBAR  24, 24
+BEGIN
+    BUTTON      ID_EDIT_EFFECTS
+    BUTTON      ID_EDIT_SOUNDS
+    BUTTON      ID_LIBRARIES_UI_MESSAGES
+    BUTTON      ID_EDIT_SOUND_TRACKS
+    BUTTON      ID_EDIT_REELS
+    BUTTON      ID_EDIT_HEADS
+    BUTTON      ID_EDIT_TERTOOLS
+    BUTTON      ID_EDIT_CURSORS
+END
+
+IDR_FILTERS_BAR TOOLBAR  24, 24
+BEGIN
+    BUTTON      ID_VIEW_SHOW_GRID
+    BUTTON      ID_VIEW_ENABLE_TIME_FLOW
+    BUTTON      IDD_TIME_SLIDER
+    SEPARATOR
+    BUTTON      ID_VIEW_SOURCES
+    BUTTON      ID_VIEW_CAMERAS
+    BUTTON      ID_VIEW_PATH_FINDING
+    BUTTON      ID_VIEW_PATH_FINDING_SELECT_REFERENCE
+END
+
+IDR_FILTERS_EXTERNAL_BAR TOOLBAR  24, 24
+BEGIN
+    BUTTON      ID_VIEW_SHOW_GRID
+    BUTTON      ID_VIEW_ENABLE_TIME_FLOW
+    BUTTON      IDD_TIME_SLIDER
+    SEPARATOR
+    BUTTON      ID_VIEW_SOURCES
+    BUTTON      ID_VIEW_CAMERAS
+END
+
+IDR_MAINFRAME_EXTERNAL TOOLBAR  24, 24
+BEGIN
+    BUTTON      ID_FILE_NEW
+    BUTTON      ID_FILE_OPEN
+    BUTTON      ID_FILE_SAVE
+    SEPARATOR
+    BUTTON      ID_FILE_RUN_WORLD
+    BUTTON      ID_FILE_RUN_MENU
+    SEPARATOR
+    BUTTON      ID_EDIT_UNDO
+    BUTTON      ID_EDIT_REDO
+    SEPARATOR
+    BUTTON      ID_EDIT_MAPSCENARIO
+    BUTTON      ID_VIEW_OBJECTS_MANAGER
+END
+
+IDR_EDITORS_EXTERNAL_BAR TOOLBAR  24, 24
+BEGIN
+    BUTTON      ID_IMPORT_PARAMETERS
+    BUTTON      ID_EXPORT_PARAMETERS
+END
+
+IDR_WORKSPACE_BAR TOOLBAR  24, 24
+BEGIN
+    BUTTON      ID_VIEW_TREE_BAR
+    BUTTON      ID_VIEW_DLGBAR
+    BUTTON      ID_VIEW_MINIMAP
+    BUTTON      ID_VIEW_OBJECTS_MANAGER
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS 
+BEGIN
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT, NOINVERT
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL, NOINVERT
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "res\SurMap5.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+// _VISTA_ENGINE_EXTERNAL_
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
