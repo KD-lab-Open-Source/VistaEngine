@@ -1,5 +1,7 @@
 # Maelstrom: The Battle for Earth Begins
 
+Discord: https://discord.gg/a9PYzSYZ
+
 Чат для обсуждения: https://t.me/PerimeterGame
 
 (с) ООО "КД ВИЖЕН" (Калининград)
