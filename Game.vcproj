@@ -49,7 +49,7 @@
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories=".\XLibs.Net\lib;.\XLibs.Net\MSDXSDK_02_06\Lib\x86;.\XLibs.Net\Heap\VC7.1;.\Util\XMath;.\Util\Serialization\.debug;.\Util\kdw\.Debug"
-				IgnoreDefaultLibraryNames="XMathMtDbg.lib;SerializationMtDbg.lib;kdwidgetsmtdbg.lib"
+				IgnoreDefaultLibraryNames="XMathMtDbg.lib;SerializationMtDbg.lib;kdwidgetsmtdbg.lib;binkw32.lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="./GameDBG.pdb"
 				GenerateMapFile="TRUE"

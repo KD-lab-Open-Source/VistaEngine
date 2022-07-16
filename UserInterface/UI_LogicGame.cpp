@@ -15,7 +15,6 @@
 #include "Units\UnitItemResource.h"
 #include "Units\UnitPad.h"
 #include "Network\P2P_interface.h"
-#include "Network\DW_interface.h"
 #include "Terra\QSWorldsMgr.h"
 #include "AI\PFTrap.h"
 #include "Weapon.h"
