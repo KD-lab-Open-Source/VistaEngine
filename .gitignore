@@ -6,6 +6,7 @@
 .scc
 .Debug/
 Debug/
+!/XLibs.Net/boost/**/debug/
 .Release/
 .garbage/
 Garbage/
