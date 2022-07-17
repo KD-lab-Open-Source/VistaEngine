@@ -10,6 +10,7 @@
 #include "tgai.h"
 #include "..\Util\Console.h"
 
+// коммент не удалять!  нужно для перевода: _VISTA_ENGINE_EXTERNAL_
 
 /* ----------------------------- EXTERN SECTION ---------------------------- */
 

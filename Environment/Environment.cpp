@@ -45,6 +45,8 @@
 #include "..\Util\Console.h"
 #include "..\UserInterface\UI_Logic.h"
 
+// коммент не удал€ть!  нужно дл€ перевода: _VISTA_ENGINE_EXTERNAL_
+
 REGISTER_CLASS(Anchor, Anchor, "якорь на мире");
 
 BEGIN_ENUM_DESCRIPTOR(CoastSpritesMode, "–ежимы прибрежных спрайтов")

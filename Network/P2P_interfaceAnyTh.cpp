@@ -41,13 +41,13 @@ bool PNetCenter::ExecuteInternalCommand(e_PNCInternalCommand _ic, bool waitExecu
 
 
 //Запускается из 2 3-го потока
-int PNetCenter::AddClient(ConnectPlayerData& pd, const UNetID& unid)
+int PNetCenter::AddClient(ConnectPlayerData& pd, const UNetID& unid, bool flag_quickStart)
 {
 	MTAuto _lock(m_GeneralLock); //В этой функции в некоторых вызовах будет вложенный
 
 	int userIdx=USER_IDX_NONE;
 	if(hostMissionDescription.gameType()==GAME_TYPE_MULTIPLAYER || hostMissionDescription.gameType()==GAME_TYPE_MULTIPLAYER_COOPERATIVE){
-		userIdx=hostMissionDescription.connectNewUser(pd, unid, networkTime_th2);
+		userIdx=hostMissionDescription.connectNewUser(pd, unid, networkTime_th2, flag_quickStart);
 	}
 	hostMissionDescription.setChanged();
 	if(userIdx!=USER_IDX_NONE){

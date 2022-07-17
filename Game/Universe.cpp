@@ -33,6 +33,7 @@
 #include "IronBullet.h"
 #include "MergeOptions.h"
 #include "..\Units\ExternalShow.h"
+#include "PlayerStatistics.h"
 
 BEGIN_ENUM_DESCRIPTOR(RealPlayerType, "RealPlayerType");
 REGISTER_ENUM(REAL_PLAYER_TYPE_CLOSE, "Closed");
@@ -151,8 +152,6 @@ unitGrid(vMap.H_SIZE, vMap.V_SIZE)
 	}
 
 	Player* world_player = addPlayer(PlayerData(Players.size(), REAL_PLAYER_TYPE_WORLD));
-
-	const_cast<PlayerStatistics&>(world_player->playerStatistics()).writeWorldInfo(mission.interfaceName());
 
 	terMapPoint = terScene->CreateMap(CreateTerraInterface(), NumDetailTextures);
 

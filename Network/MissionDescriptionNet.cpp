@@ -136,10 +136,10 @@ int MissionDescriptionNet::amountUsersConnected() const
 int MissionDescriptionNet::getUniquePlayerColor(int begColor, bool dirBack)
 {
 	int i,c;
-	for(c=0; c<GlobalAttributes::instance().playerAllowedColorSize(); c++){
+	for(c=0; c<=GlobalAttributes::instance().playerAllowedColorSize(); c++){
 		int curColor;
-		if(dirBack==0)curColor=(begColor+c)%GlobalAttributes::instance().playerAllowedColorSize();
-		else curColor=(begColor-c)%GlobalAttributes::instance().playerAllowedColorSize();
+		if(dirBack==0)curColor=(begColor+c)%(GlobalAttributes::instance().playerAllowedColorSize()+1);
+		else curColor=(begColor-c)%(GlobalAttributes::instance().playerAllowedColorSize()+1);
 		bool error=0;
 		//for(i=0; i<NETWORK_PLAYERS_MAX; i++){
 		//	if(playersData_[i].realPlayerType==REAL_PLAYER_TYPE_AI || playersData_[i].realPlayerType==REAL_PLAYER_TYPE_PLAYER){
@@ -264,9 +264,8 @@ int MissionDescriptionNet::getFreeSlotID()
 	return PLAYER_ID_NONE;
 }
 
-int MissionDescriptionNet::connectNewUser(ConnectPlayerData& pd, const UNetID& unid, unsigned int _curTime)
+int MissionDescriptionNet::connectNewUser(ConnectPlayerData& pd, const UNetID& unid, unsigned int _curTime, bool flag_quickStart)
 {
-	setChanged(true);
 	int result=-1;
 
 	int freeUserIdx;
@@ -287,7 +286,8 @@ int MissionDescriptionNet::connectNewUser(ConnectPlayerData& pd, const UNetID& u
 				int newClan=getUniquePlayerClan();
 				slotsData[i].realPlayerType=REAL_PLAYER_TYPE_PLAYER; //for getUniquePlayerColor & getUniquePlayerClan 
 				slotsData[i].usersIdxArr[0]=freeUserIdx;
-				slotsData[i].race.setKey(pd.race >= 0 ? pd.race : logicRND(NETWORK_RACE_NUMBER));
+				if(flag_quickStart)
+                    slotsData[i].race.setKey(pd.race >= 0 ? pd.race : logicRND(NETWORK_RACE_NUMBER));
 				if(colorNewPlayer!=-1)  
 					slotsData[i].colorIndex = colorNewPlayer;
 				else 
@@ -321,6 +321,8 @@ int MissionDescriptionNet::connectNewUser(ConnectPlayerData& pd, const UNetID& u
 			ud.accessibleLogicQuantPeriod=0;
 		}
 	}
+	if(result!=-1)
+		setChanged(true);
 	return result;
 }
 

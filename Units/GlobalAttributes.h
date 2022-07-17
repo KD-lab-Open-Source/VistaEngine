@@ -212,6 +212,8 @@ struct GlobalAttributes : public LibraryWrapper<GlobalAttributes>
 
 	int cheatTypeSpeed;
 
+	ParameterCustom profileParameters;
+
 	GlobalAttributes();
 
 	int playerAllowedColorSize() const { return playerColors.size() - 1; }

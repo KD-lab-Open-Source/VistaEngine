@@ -11,6 +11,8 @@
 #include "EditArchive.h"
 #include "EditorVisual.h"
 
+// _VISTA_ENGINE_EXTERNAL_ - нужно для переврода external-версии
+
 REGISTER_CLASS(UnitBase, UnitEnvironmentBuilding, "UnitEnvironmentBuilding")
 REGISTER_CLASS_IN_FACTORY(UnitFactory, UNIT_CLASS_ENVIRONMENT, UnitEnvironmentBuilding);
 

@@ -91,7 +91,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\VisGeneric\INC,.,..\terra,..\Render\INC;..\Util;..\Game"
+				AdditionalIncludeDirectories="..\XLibs.Net\Heap;..\XLibs.Net\stl;..\XLibs.Net\XUtil;..\XLibs.Net\XUtil\CRC;..\VisGeneric\INC;.;..\terra;..\Render\INC;..\Util;..\Game"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_STLP_DEBUG 1;_SURMAP_"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -112,11 +112,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib msimg32.lib shlwapi.lib TreeListCtrlVC71_ST_MT_D.lib"
+				AdditionalDependencies="winmm.lib msimg32.lib shlwapi.lib TreeListCtrlVC71_ST_MT_D.lib xmathmtdbg.lib"
 				OutputFile="Debug/EffectToolDBG.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="$(SolutionDir)\TreeList\output"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)\TreeList\output&quot;;..\XLibs.Net\lib;..\XLibs.Net\MSDXSDK_02_06\Lib\x86"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="../EffectToolDBG.pdb"
 				SubSystem="2"

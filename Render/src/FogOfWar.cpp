@@ -632,8 +632,9 @@ FogOfWarState FogOfWarMap::getFogState(int x, int y) const
 				return FOGST_NONE;
 			else if (scoutmap[ix]<max_opacity)
 				return FOGST_HALF;
-	} catch (...) {
+		} catch (...) {
 	}
+
 	return FOGST_FULL;
 }
 

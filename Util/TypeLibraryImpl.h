@@ -6,6 +6,8 @@
 #include "AttribEditorInterface.h"
 #include "Console.h"
 
+// _VISTA_ENGINE_EXTERNAL_ - нужно для перевода external-редактора
+
 AttribEditorInterface& attribEditorInterface();
 
 template<class String>

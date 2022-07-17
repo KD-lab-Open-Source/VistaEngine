@@ -10,6 +10,8 @@
 #include "Serialization.h"
 #endif
 
+const char* getColorString(const sColor4f& color);
+
 #define readGlobalStatsAtOnce 20
 
 UI_NetCenter::UI_NetCenter()
@@ -24,7 +26,13 @@ UI_NetCenter::UI_NetCenter()
 	currentStatisticFilterGamePopulation_ = -1;
 	firstScorePosition_ = 1;
 	gameCreated_ = false;
+	onlineLogined_ = false;
 	isOnPause_ = false;
+	subscribedChannel_ = -1;
+	subscribeWaitingChannel_ = -1;
+	selectedChannel_ = -1;
+	autoSubscribeMode_ = false;
+	lastSubscribeAttempt_ = -1;
 }
 
 UI_NetCenter::~UI_NetCenter()
@@ -43,6 +51,7 @@ void UI_NetCenter::commit(UI_NetStatus status)
 {
 	xassert(status != UI_NET_WAITING);
 	lock_.lock();
+	bool checkVersion = false;
 
 	if(status == UI_NET_SERVER_DISCONNECT){
 		LogMsg("UI_NetCenter: DISCONNECT commited\n");
@@ -56,7 +65,7 @@ void UI_NetCenter::commit(UI_NetStatus status)
 		LogMsg("UI_NetCenter: TERMANATE SESION commited\n");
 		setStatus(UI_NET_ERROR);
 		lock_.unlock();
-		reset();
+		reset(true);
 		UI_LogicDispatcher::instance().networkDisconnect(false);
 		return;
 	}
@@ -64,8 +73,16 @@ void UI_NetCenter::commit(UI_NetStatus status)
 		switch(delayOperation_){
 		case CREATE_GAME:
 			gameCreated_ = true;
+			resetChatBoard();
 			break;
 		case ONLINE_NEW_LOGIN:
+			UI_LogicDispatcher::instance().profileSystem().newOnlineLogin();
+			UI_LogicDispatcher::instance().handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_ONLINE_LOGIN_LIST, UI_ActionDataControlCommand::RE_INIT)));
+			onlineLogined_ = true;
+			resetChatBoard();
+			checkVersion = true;
+			break;
+		case ONLINE_CREATE_LOGIN:
 			UI_LogicDispatcher::instance().profileSystem().newOnlineLogin();
 			UI_LogicDispatcher::instance().handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_ONLINE_LOGIN_LIST, UI_ActionDataControlCommand::RE_INIT)));
 			break;
@@ -76,12 +93,28 @@ void UI_NetCenter::commit(UI_NetStatus status)
 		case QUERY_GLOBAL_STATISTIC:
 			applyNewGlobalStatistic(gsForRead_);
 			break;
+		case ONLINE_CHECK_VERSION:
+			if(!setGameVersion()){
+				UI_LogicDispatcher::instance().handleNetwork(NetRC_LoadInfoFile_Err);
+				lock_.unlock();
+				return;
+			}
+			break;
 		}
 	}
 	
-	delayOperation_ = DELAY_NONE;
-	setStatus(status);
-	lock_.unlock();
+	if(checkVersion) {
+		delayOperation_ = ONLINE_CHECK_VERSION;
+		setStatus(UI_NET_WAITING);
+		lock_.unlock();
+		queryGameVersion();
+		return;
+	}
+	else {
+		delayOperation_ = DELAY_NONE;
+		setStatus(status);
+		lock_.unlock();
+	}
 }
 
 void UI_NetCenter::create(NetType type)
@@ -161,7 +194,6 @@ void UI_NetCenter::setPass2(const char* pass)
 void UI_NetCenter::resetPasswords() 
 {
 	MTAuto lock(lock_);
-	LogMsg("UI_NetCenter: RESET PASSES done\n");
 
 	password_.clear();
 	pass2_.clear();
@@ -194,26 +226,39 @@ void UI_NetCenter::abortCurrentOperation()
 		LogMsg("skiped, net system not created\n");
 }
 
-void UI_NetCenter::reset()
+void UI_NetCenter::reset(bool flag_internalReset)
 {
 	{
 		MTAuto lock(lock_);
 
-		resetPasswords();
-
 		LogMsg("UI_NetCenter: RESET ");
+
+		resetPasswords();
 
 		clear();
 		UI_LogicDispatcher::instance().resetCurrentMission();
 	}
 	
-	if(PNetCenter* center = gameShell->getNetClient()){
-		LogMsg("done\n");
-		center->ResetAndStartFindHost();
+	if(!flag_internalReset){
+		if(PNetCenter* center = gameShell->getNetClient()){
+			LogMsg("done\n");
+			center->ResetAndStartFindHost();
+		}
+		else
+			LogMsg("skiped, net system not created\n");
 	}
 	else
-		LogMsg("skiped, net system not created\n");
+		LogMsg("skiped, internal reset\n");
+
 }
+
+class GameSorting
+{
+public:
+	bool operator () (const sGameHostInfo& lsh, const sGameHostInfo& rsh) const {
+		return !lsh.gameStatusInfo.flag_gameRun && rsh.gameStatusInfo.flag_gameRun;
+	}
+};
 
 bool UI_NetCenter::updateGameList()
 {
@@ -240,18 +285,20 @@ bool UI_NetCenter::updateGameList()
 
 	netGames_ = tmpHostList;
 
-	GameHostInfos::iterator it = netGames_.begin();
-	while(it != netGames_.end())
-		if(it->gameStatusInfo.flag_gameRun)
-			it = netGames_.erase(it);
-		else
-			++it;
+	//GameHostInfos::iterator it = netGames_.begin();
+	//while(it != netGames_.end())
+	//	if(it->gameStatusInfo.flag_gameRun)
+	//		it = netGames_.erase(it);
+	//	else
+	//		++it;
+
+	stable_sort(netGames_.begin(), netGames_.end(), GameSorting());
 
 	if(selectedGameIndex_ >= 0){
 		selectedGameIndex_ = -1;
 		for(int i = 0; i < netGames_.size(); ++i)
 			if(netGames_[i].gameHostGUID == selectedGameInfo_.gameHostGUID){
-				selectedGameIndex_ = i;
+				selectedGameIndex_ = netGames_[i].gameStatusInfo.flag_gameRun ? -1 : i;
 				break;
 			}
 		if(selectedGameIndex_ == -1)
@@ -261,66 +308,87 @@ bool UI_NetCenter::updateGameList()
 	return true;
 }
 
-int UI_NetCenter::getGameList(ComboStrings&  strings, GameListInfoType infoType)
+int UI_NetCenter::getGameList(const GameListInfoTypes& format, ComboStrings&  board, const sColor4c& started)
 {
 	MTAuto lock(lock_);
+
+	board.clear();
 
 	if(!gameShell->getNetClient())
 		return -1;
 
-	for(int i = 0; i < netGames_.size(); i++){
-		switch(infoType){
-		case GAME_INFO_TAB_LIST: {
-			string tabs = netGames_[i].gameName;
-			tabs += "\t\t";
-			XBuffer buf;
-			buf <= netGames_[i].gameStatusInfo.ping;
-			tabs += buf.c_str();
-			tabs += "\t\t";
-			buf.init();
-			buf <= netGames_[i].gameStatusInfo.currrentPlayers < "/" <= netGames_[i].gameStatusInfo.maximumPlayers;
-			tabs += buf.c_str();
-			tabs += "\t\t";
-			tabs += netGames_[i].gameStatusInfo.missionName();
-			tabs += "\t\t";
-			tabs += (netGames_[i].gameStatusInfo.jointGameType.isUseMapSetting()
-				? GET_LOC_STR(UI_COMMON_TEXT_PREDEFINE_GAME)
-				: GET_LOC_STR(UI_COMMON_TEXT_CUSTOM_GAME));
-			tabs += "\t\t";
-			tabs += netGames_[i].hostName;
-			strings.push_back(tabs);
-			break;
-								 }
-		case GAME_INFO_GAME_NAME:
-			strings.push_back(netGames_[i].gameName);
-			break;
-		case GAME_INFO_HOST_NAME:
-			strings.push_back(netGames_[i].hostName);
-			break;
-		case GAME_INFO_WORLD_NAME:
-			strings.push_back(netGames_[i].gameStatusInfo.missionName());
-			break;
-		case GAME_INFO_PLAYERS_NUMBER: {
-			XBuffer buf;
-			buf <= netGames_[i].gameStatusInfo.currrentPlayers < "/" <= netGames_[i].gameStatusInfo.maximumPlayers;
-			strings.push_back(buf.c_str());
-			break;
-							 }
-		case GAME_INFO_PING:{
-			XBuffer buf;
-			buf <= netGames_[i].gameStatusInfo.ping;
-			strings.push_back(buf.c_str());
-			break;
-				  }
-		case GAME_INFO_GAME_TYPE:
-			if(netGames_[i].gameStatusInfo.jointGameType.isUseMapSetting())
-				strings.push_back(GET_LOC_STR(UI_COMMON_TEXT_PREDEFINE_GAME));
-			else
-				strings.push_back(GET_LOC_STR(UI_COMMON_TEXT_CUSTOM_GAME));
-			break;
+	XBuffer buf;
+
+	GameHostInfos::const_iterator gm;
+	FOR_EACH(netGames_, gm){
+		buf.init();
+		GameListInfoTypes::const_iterator frm;
+		FOR_EACH(format, frm){
+			if(gm->gameStatusInfo.flag_gameRun && started.a > 0)
+				buf < getColorString(sColor4f(started));
+			switch(*frm){
+			case GAME_INFO_GAME_NAME:
+				buf < gm->gameName.c_str();
+				break;
+			case GAME_INFO_HOST_NAME:
+				buf < gm->hostName.c_str();
+				break;
+			case GAME_INFO_WORLD_NAME:
+				buf < gm->gameStatusInfo.missionName();
+				break;
+			case GAME_INFO_PLAYERS_CURRENT:
+				buf <= gm->gameStatusInfo.currrentPlayers;
+				break;
+			case GAME_INFO_PLAYERS_MAX:
+				buf <= gm->gameStatusInfo.maximumPlayers;
+				break;
+			case GAME_INFO_PLAYERS_NUMBER:
+				buf <= gm->gameStatusInfo.currrentPlayers < "/" <= gm->gameStatusInfo.maximumPlayers;
+				break;
+			case GAME_INFO_PING:
+				buf <= gm->gameStatusInfo.ping;
+				break;
+			case GAME_INFO_GAME_TYPE:
+				if(gm->gameStatusInfo.jointGameType.isUseMapSetting())
+					buf < GET_LOC_STR(UI_COMMON_TEXT_PREDEFINE_GAME);
+				else
+					buf < GET_LOC_STR(UI_COMMON_TEXT_CUSTOM_GAME);
+				break;
+			case GAME_INFO_START_STATUS:
+				if(gm->gameStatusInfo.flag_gameRun)
+					buf < GET_LOC_STR(UI_COMMON_TEXT_GAME_RUNNING);
+				else
+					buf < GET_LOC_STR(UI_COMMON_TEXT_GAME_NOT_RUNNING);
+				break;
+			case GAME_INFO_NAT_TYPE:
+				switch(gm->dwNATType){
+				case DWNT_Open:
+					buf < GET_LOC_STR(UI_COMMON_TEXT_NAT_TYPE_OPEN);
+					break;
+				case DWNT_Moderate:
+					buf < GET_LOC_STR(UI_COMMON_TEXT_NAT_TYPE_MODERATE);
+					break;
+				case DWNT_Strict:
+					buf < GET_LOC_STR(UI_COMMON_TEXT_NAT_TYPE_STRICT);
+					break;
+				}
+				break;
+			case GAME_INFO_NAT_COMPATIBILITY:
+				if(gameShell->isNetClientConfigured(PNCWM_ONLINE_DW)){
+					buf < GET_LOC_STR(UI_COMMON_TEXT_NAT_INCOMPATIBLE);
+				}
+				else
+					buf < " ";
+				break;
+			default:
+				buf < " ";
+			}
+			buf < "\t";
 		}
+		board.push_back(buf.c_str());
 	}
 
+	xassert(selectedGameIndex_ < (int)board.size());
 	return selectedGameIndex_;
 }
 
@@ -368,18 +436,24 @@ void UI_NetCenter::selectGame(int idx)
 
 	if(selectedGameIndex_ >= 0){
 		selectedGameInfo_ = netGames_[selectedGameIndex_];
-		if(const MissionDescription* mission = UI_LogicDispatcher::instance().getMissionByID(selectedGameInfo_.gameStatusInfo.missionGuid)){
-			MissionDescription md(*mission);
-			md.setGameType(
-				selectedGameInfo_.gameStatusInfo.jointGameType.isCooperative()
-				? GAME_TYPE_MULTIPLAYER_COOPERATIVE
-				: GAME_TYPE_MULTIPLAYER);
-			selectedGame_ = md;
-			LogMsg("done\n");
+		if(!selectedGameInfo_.gameStatusInfo.flag_gameRun){
+			if(const MissionDescription* mission = UI_LogicDispatcher::instance().getMissionByID(selectedGameInfo_.gameStatusInfo.missionGuid)){
+				MissionDescription md(*mission);
+				md.setGameType(
+					selectedGameInfo_.gameStatusInfo.jointGameType.isCooperative()
+					? GAME_TYPE_MULTIPLAYER_COOPERATIVE
+					: GAME_TYPE_MULTIPLAYER);
+				selectedGame_ = md;
+				LogMsg("done\n");
+			}
+			else{
+				selectedGame_.clear();
+				LogMsg("failed, world by guid not found\n");
+			}
 		}
-		else{
+		else {
 			selectedGame_.clear();
-			LogMsg("failed, world by guid not found\n");
+			LogMsg("failed, game is run\n");
 		}
 	}
 	else {
@@ -435,6 +509,57 @@ void UI_NetCenter::login()
 	}
 }
 
+void UI_NetCenter::logout()
+{
+	{
+		MTAuto lock(lock_);
+
+		LogMsg("UI_NetCenter: LOGOUT ");
+
+		if(acyncEventWaiting()){
+			LogMsg("skiped, waiting acync event\n");
+			return;
+		}
+
+		if(!gameShell->isNetClientConfigured(PNCWM_ONLINE_DW)){
+			LogMsg("ERROR, online client not created\n");
+			commit(UI_NET_ERROR);
+			return;
+		}
+
+		onlineLogined_ = false;
+	}
+
+	LogMsg("started\n");
+
+	resetChatBoard(false);
+	
+	commit(UI_NET_OK); // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+
+	resetPasswords();
+
+	clear();
+	UI_LogicDispatcher::instance().resetCurrentMission();
+
+}
+
+void UI_NetCenter::refreshGameList()
+{
+	{
+		MTAuto lock(lock_);
+
+		LogMsg("UI_NetCenter: REFRESH GAME LIST ");
+
+		if(!gameShell->isNetClientConfigured(PNCWM_ONLINE_DW)){
+			LogMsg("ERROR, online client not created\n");
+			commit(UI_NET_ERROR);
+			return;
+		}
+
+		LogMsg("started\n");
+	}
+}
+
 void UI_NetCenter::quickStart()
 {
 	{
@@ -464,7 +589,7 @@ void UI_NetCenter::quickStart()
 				UI_LogicDispatcher::instance().currentPlayerDisplayName(),
 				UI_LogicDispatcher::instance().currentProfile().quickStartFilterRace,
 				GameOrder_1v1,
-				UI_LogicDispatcher::instance().currentProfile().quickStartMissionFilter.getFilter()
+				UI_LogicDispatcher::instance().quickStartFilter()
 		);
 	else {
 		LogMsg("ERROR quickStart, pNnetCenter killed\n");
@@ -490,7 +615,7 @@ void UI_NetCenter::createAccount()
 			if(!password_.empty() && password_ == pass2_){
 				LogMsg("started\n");
 				setStatus(UI_NET_WAITING);
-				delayOperation_ = ONLINE_NEW_LOGIN;
+				delayOperation_ = ONLINE_CREATE_LOGIN;
 				localDelayOperation = 1;
 			}
 			else {
@@ -589,7 +714,7 @@ void UI_NetCenter::deleteAccount()
 	case 1:
 		break;
 	case 2:
-		gameShell->networkMessageHandler(NetRC_CreateAccount_IllegalOrEmptyPassword_Err);			
+		UI_LogicDispatcher::instance().handleNetwork(NetRC_CreateAccount_IllegalOrEmptyPassword_Err);			
 		break;
 	}
 }
@@ -657,7 +782,7 @@ void UI_NetCenter::createGame()
 					if(sufix > 0){
 						XBuffer suf; 
 						suf <= sufix;
-						xxassert(suf.tell() < MAX_MULTIPALYER_GAME_NAME, "Ну ни хрена себе!");
+						xxassert(suf.tell() < MAX_MULTIPALYER_GAME_NAME, "пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ!");
 						gameName = originalGameName.substr(0, MAX_MULTIPALYER_GAME_NAME - suf.tell());
 						gameName += suf.c_str();
 					}
@@ -717,6 +842,9 @@ bool UI_NetCenter::canJoinGame() const
 		return false;
 
 	if(!gameSelected())
+		return false;
+
+	if(selectedGameInfo_.gameStatusInfo.flag_gameRun)
 		return false;
 	
 	return true;
@@ -784,6 +912,11 @@ bool UI_NetCenter::isServer() const
 	return false;
 }
 
+const char* UI_NetCenter::natType() const
+{
+	return "";
+}
+
 void UI_NetCenter::startGame()
 {
 	LogMsg("UI_NetCenter: START GAME ");
@@ -839,11 +972,18 @@ void UI_NetCenter::release()
 
 		LogMsg("done\n");
 
+		onlineLogined_ = false;
+
 		clear();
+
 	}
+
+	resetChatBoard(false);
 
 	gameShell->stopNetClient();
 }
+
+
 
 void UI_NetCenter::setChatString(const char* stringForSend) 
 {
@@ -854,7 +994,7 @@ void UI_NetCenter::setChatString(const char* stringForSend)
 	currentChatString_ = stringForSend;
 }
 
-void UI_NetCenter::sendChatString(int rawIntData) 
+bool UI_NetCenter::sendChatString(int rawIntData) 
 {
 	string forSend(UI_LogicDispatcher::instance().currentPlayerDisplayName());
 	{
@@ -864,22 +1004,30 @@ void UI_NetCenter::sendChatString(int rawIntData)
 		
 		if(!gameShell->getNetClient()){
 			LogMsg("ERROR, net client not created\n");
-			return;
+			return false;
 		}
 		else if(currentChatString_.empty()){
 			LogMsg("skiped: message empty\n");
-			return;
+			return false;
 		}
 		else {
 			forSend += ": ";
 			forSend += currentChatString_;
 			currentChatString_.clear();
-			LogMsg("message: (%d, %s)\n", rawIntData, forSend.c_str());
+			LogMsg("message: (%d, %s) ", rawIntData, forSend.c_str());
 		}
 	}
 	
-	if(PNetCenter* center = gameShell->getNetClient())
-		center->chatMessage(ChatMessage(forSend.c_str(), rawIntData));
+	if(PNetCenter* center = gameShell->getNetClient()){
+		bool st = center->chatMessage(ChatMessage(forSend.c_str(), rawIntData));
+		LogMsg(st ? "done\n" : "skiped by netClient\n");
+		return st;
+	}
+	else {
+		LogMsg("skiped\n");
+	}
+	
+	return false;
 }
 
 void UI_NetCenter::handleChatString(const char* str) 
@@ -898,30 +1046,70 @@ void UI_NetCenter::getChatBoard(ComboStrings &board) const
 	board = chatBoard_;
 }
 
-void UI_NetCenter::clearChatBoard() 
+void UI_NetCenter::clearChatBoard()
 {
 	MTAuto lock(lock_);
 
-	LogMsg("UI_NetCenter: CLEAR CHAT board\n");
+	LogMsg("UI_NetCenter: CLEAR CHAT done\n");
 
 	currentChatString_.clear();
 	chatBoard_.clear();
-	chatUsers_.clear();
 }
 
-bool UI_NetCenter::updateChatUsers()
+void UI_NetCenter::resetChatBoard(bool unsubscribe) 
 {
+	ChatChannelID sid = -1;
+	{
+		MTAuto lock(lock_);
+
+		LogMsg("UI_NetCenter: RESET CHAT done\n");
+
+		currentChatString_.clear();
+		chatBoard_.clear();
+		chatUsers_.clear();
+//		chatChanelInfos_.clear();
+
+		selectedChannel_ = -1;
+		autoSubscribeMode_ = false;
+		lastSubscribeAttempt_ = -1;
+
+		currentChatChannelName_.clear();
+
+		if(!gameShell->isNetClientConfigured(PNCWM_ONLINE_DW))
+			return;
+
+		if(subscribedChannel_ == -1)
+			return;
+
+		if(unsubscribe)
+			sid = subscribedChannel_;
+		subscribedChannel_ = -1;
+
+		subscribeWaitingChannel_ = -1;
+	}
+
+	if(sid != -1){
+		LogMsg("UI_NetCenter: USUBSCRIBE CURRENT CHANNEL done\n");
+	}
+}
+
+void UI_NetCenter::updateChatUsers()
+{
+	/*
+	vector<DWInterfaceSimple::ChatMemberInfo> infos;
 	
-	if(gameShell->isNetClientConfigured(PNCWM_ONLINE_DW))
-		;
+	if(gameShell->isNetClientConfigured(PNCWM_ONLINE_DW));
 	else
-		return false;
+		return;
 
 	MTAuto lock(lock_);
 
 	chatUsers_.clear();
 
-	return true;
+	vector<DWInterfaceSimple::ChatMemberInfo>::const_iterator it;
+	FOR_EACH(infos, it)
+		chatUsers_.push_back(it->name);
+	*/
 }
 
 int UI_NetCenter::getChatUsers(ComboStrings &users) const
@@ -987,6 +1175,7 @@ void UI_NetCenter::queryGlobalStatistic(bool force)
 		}
 	}
 
+	if(delayRequerest);
 }
 
 void UI_NetCenter::getGlobalStatisticFromBegin()
@@ -1157,7 +1346,7 @@ int UI_NetCenter::getCurrentGlobalStatisticValue(StatisticType type)
 {
 	MTAuto lock(lock_);
 
-	if(selectedGlobalStatisticIndex_ > 0)
+	if(selectedGlobalStatisticIndex_ >= 0)
 		return globalStatistics_[selectedGlobalStatisticIndex_][type];
 	
 	return 0;
@@ -1189,23 +1378,21 @@ void UI_NetCenter::updateFilter()
 
 		LogMsg("UI_NetCenter: UPDATE FILTER ");
 
-		LogMsg((XBuffer()
-			< "|gt=" <= UI_LogicDispatcher::instance().currentProfile().gameTypeFilter
-			< ", slot=" <= UI_LogicDispatcher::instance().currentProfile().playersSlotFilter
-			< ", map={size=" <= UI_LogicDispatcher::instance().currentProfile().findMissionFilter.getFilter().size()
-				< ", first=" < (UI_LogicDispatcher::instance().currentProfile().findMissionFilter.getFilter().empty()
-				? "EMPTY"
-				: (UI_LogicDispatcher::instance().getMissionByID(UI_LogicDispatcher::instance().currentProfile().findMissionFilter.getFilter().front())
-					? UI_LogicDispatcher::instance().getMissionByID(UI_LogicDispatcher::instance().currentProfile().findMissionFilter.getFilter().front())->interfaceName()
-					: "MISSION UNDEFINED"))
-			< "}| ").c_str());
-
 		if(!gameShell->isNetClientConfigured(PNCWM_ONLINE_DW)){
 			LogMsg("skiped, online client not created\n");
 			return;
 		}
 		else {
-			LogMsg("done\n");
+			LogMsg((XBuffer()
+				< "|gt=" <= UI_LogicDispatcher::instance().currentProfile().gameTypeFilter
+				< ", slot=" <= UI_LogicDispatcher::instance().currentProfile().playersSlotFilter
+				< ", map={size=" <= UI_LogicDispatcher::instance().currentProfile().findMissionFilter.getFilter().size()
+				< ", first=" < (UI_LogicDispatcher::instance().currentProfile().findMissionFilter.getFilter().empty()
+				? "EMPTY"
+				: (UI_LogicDispatcher::instance().getMissionByID(UI_LogicDispatcher::instance().currentProfile().findMissionFilter.getFilter().front())
+				? UI_LogicDispatcher::instance().getMissionByID(UI_LogicDispatcher::instance().currentProfile().findMissionFilter.getFilter().front())->interfaceName()
+				: "MISSION UNDEFINED"))
+				< "}| done\n").c_str());
 		}
 	}
 		
@@ -1215,4 +1402,281 @@ void UI_NetCenter::updateFilter()
 			UI_LogicDispatcher::instance().currentProfile().findMissionFilter.getFilter(),
 			UI_LogicDispatcher::instance().currentProfile().playersSlotFilter
 		);
+}
+
+void UI_NetCenter::queryGameVersion()
+{
+	xassert(acyncEventWaiting() && "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+
+	LogMsg("UI_NetCenter: GET GAME VERSION ");
+
+	if(!gameShell->isNetClientConfigured(PNCWM_ONLINE_DW)){
+		LogMsg("skiped, online client not created\n");
+		setStatus(UI_NET_ERROR);
+		return;
+	}
+	LogMsg("started\n");
+}
+
+bool UI_NetCenter::setGameVersion()
+{
+	xassert(acyncEventWaiting() && "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+	
+	version_ < '\0';
+
+	LogMsg("UI_NetCenter: PARSE GAME VERSION\n<file dump begin>\n");
+	LogMsg(version_.c_str());
+	LogMsg("\n<file dump end>\n");
+
+	return UI_LogicDispatcher::instance().parseGameVersion(version_.buffer());
+}
+
+class ChanelSortRule{
+};
+
+void UI_NetCenter::updateChatChannels()
+{
+	/*
+	ChatChanelInfos infos;
+
+	if(gameShell->isNetClientConfigured(PNCWM_ONLINE_DW) && onlineLogined_ && !gameCreated_);
+	else
+		return;
+
+	sort(infos.begin(), infos.end(), ChanelSortRule());
+	*/
+
+	bool needAutoSubscribe = false;
+	/*
+
+	{
+		MTAuto lock(lock_);
+
+		chatChanelInfos_.clear();
+		ChatChanelInfos::const_iterator it;
+		FOR_EACH(infos, it){
+			chatChanelInfos_.push_back(*it);
+		}
+
+		if(subscribedChannel_ == -1)
+			if(subscribeWaitingChannel_ == -1)
+				if(chatChanelInfos_.empty())
+					currentChatChannelName_.clear();
+				else {
+					needAutoSubscribe = true;
+					currentChatChannelName_ = GET_LOC_STR(UI_COMMON_TEXT_CONNECTING);
+				}
+			else
+				currentChatChannelName_ = GET_LOC_STR(UI_COMMON_TEXT_CONNECTING);
+		else {
+			ChatChanelInfos::const_iterator info = find(chatChanelInfos_.begin(), chatChanelInfos_.end(), subscribedChannel_);
+			if(info != chatChanelInfos_.end())
+				currentChatChannelName_ = info->name;
+			else
+				currentChatChannelName_ = "ERROR";
+		}
+	}
+	*/
+
+	if(needAutoSubscribe)
+		autoSubscribeChatChannel();
+}
+
+int UI_NetCenter::getChatChannels(ComboStrings& channels) const
+{
+	MTAuto lock(lock_);
+
+	channels.clear();
+	int selected = -1;
+
+	XBuffer buf;
+	/*
+	ChatChanelInfos::const_iterator it;
+	FOR_EACH(chatChanelInfos_, it){
+		buf.init();
+		buf < it->name.c_str() < "\t" <= it->numSubscribers < "/" <= it->maxSubscribers;
+		if(it->id == selectedChannel_)
+			selected = channels.size();
+		channels.push_back(buf.c_str());
+	}
+
+	if(channels.empty())
+		channels.push_back(GET_LOC_STR(UI_COMMON_TEXT_CONNECTING));
+	*/
+
+	return selected;
+}
+
+void UI_NetCenter::getCurrentChatChannelName(string& name) const
+{
+	MTAuto lock(lock_);
+
+	name = currentChatChannelName_;
+}
+
+void UI_NetCenter::selectChatChannel(int channel)
+{
+	LogMsg("UI_NetCenter: SELECT CHANNEL ");
+	if(channel < 0){
+		LogMsg("skiped, chan num < 0\n");
+		return;
+	}
+
+	MTAuto lock(lock_);
+
+	/*
+	if(channel >= chatChanelInfos_.size()){
+		LogMsg("skiped, chan num > channels size\n");
+		return;
+	}
+
+	LogMsg("ok, channel:");
+	LogMsg(chatChanelInfos_[channel].name.c_str());
+	LogMsg("\n");
+
+	selectedChannel_ = chatChanelInfos_[channel].id;
+	*/
+}
+
+void UI_NetCenter::autoSubscribeChatChannel()
+{
+	ChatChannelID sid = -1;
+
+	{	
+		MTAuto lock(lock_);
+
+//		xassert(!chatChanelInfos_.empty() && subscribedChannel_ == -1 && subscribeWaitingChannel_ == -1);
+
+		LogMsg("UI_NetCenter: AUTOSUBSCRIBE CHANNEL MODE ");
+
+		if(!onlineLogined_){
+			autoSubscribeMode_ = false;
+			LogMsg("stoped, online not login\n");
+			return;
+		}
+		else if(gameCreated_){
+			autoSubscribeMode_ = false;
+			LogMsg("stoped, game created\n");
+			return;
+		}
+
+		if(autoSubscribeMode_){
+			/*
+			ChatChanelInfos::const_iterator info = find(chatChanelInfos_.begin(), chatChanelInfos_.end(), lastSubscribeAttempt_);
+			++info;
+			if(info != chatChanelInfos_.end()){
+				LogMsg("next channel attempt.\n");
+				sid = info->id;
+			}
+			else {
+				LogMsg("finished unsusseful.\n");
+				autoSubscribeMode_ = false;
+			}
+			*/
+		}
+		else {
+			autoSubscribeMode_ = true;
+			LogMsg("main channel attempt.\n");
+			/* sid = chatChanelInfos_[0].id; */
+		}
+
+		lastSubscribeAttempt_ = sid;
+	}
+
+	if(sid != -1)
+		enterChatChannel(sid);
+
+}
+
+void UI_NetCenter::enterChatChannel(ChatChannelID forceID)
+{
+	LogMsg("UI_NetCenter: ENTER CHANNEL ");
+
+	ChatChannelID sid = -1;
+	{
+		MTAuto lock(lock_);
+
+		if(!gameShell->isNetClientConfigured(PNCWM_ONLINE_DW)){
+			LogMsg("skiped, online client not created\n");
+			return;
+		}
+
+		if(subscribeWaitingChannel_ != -1){
+			LogMsg("skiped, connect in progress\n");
+			return;
+		}
+
+		if(forceID != -1){
+			LogMsg(XBuffer() < "(force id=" <= (unsigned int)(forceID) < ") ");
+			selectedChannel_ = forceID;
+		}
+
+		if(selectedChannel_ == -1){
+			LogMsg("skiped, no channel selected\n");
+			return;
+		}
+
+		if(selectedChannel_ == subscribedChannel_){
+			LogMsg("skiped, this channel just suscribed\n");
+			return;
+		}
+
+		/*
+		ChatChanelInfos::const_iterator info = find(chatChanelInfos_.begin(), chatChanelInfos_.end(), selectedChannel_);
+		if(info == chatChanelInfos_.end()){
+			LogMsg("skiped, no channel found with selected id\n");
+			return;
+		}
+
+		subscribeWaitingChannel_ = selectedChannel_;
+		sid = subscribeWaitingChannel_;
+		*/
+	}
+
+	xassert(sid != -1);
+	LogMsg("done.\n");
+}
+
+void UI_NetCenter::chatSubscribeOK()
+{
+	LogMsg("UI_NetCenter: SUBSCRIBE ");
+
+	ChatChannelID sid = -1;
+
+	{
+		MTAuto lock(lock_);
+
+		if(subscribeWaitingChannel_ == -1 || !onlineLogined_){
+			LogMsg(" ERROR, not waiting subscribe or not logined\n");
+			xassert(false && "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+			return;
+		}
+
+		sid = subscribedChannel_;
+		subscribedChannel_ = subscribeWaitingChannel_;
+		subscribeWaitingChannel_ = -1;
+
+		/*
+		ChatChanelInfos::const_iterator info = find(chatChanelInfos_.begin(), chatChanelInfos_.end(), subscribedChannel_);
+		if(info != chatChanelInfos_.end()){
+			LogMsg(" OK\n");
+			currentChatChannelName_ = info->name;
+		}
+		else {
+			LogMsg(" STRANGE!!!, not found channel in list\n");
+			currentChatChannelName_ = "ERROR";
+		}
+		*/
+
+		autoSubscribeMode_ = false;
+	}
+}
+
+void UI_NetCenter::chatSubscribeFailed()
+{
+	LogMsg("UI_NetCenter: SUBSCRIBE FAILED\n");
+
+	MTAuto lock(lock_);
+
+	subscribeWaitingChannel_ = -1;
 }

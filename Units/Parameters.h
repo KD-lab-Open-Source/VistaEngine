@@ -204,8 +204,9 @@ public:
 
 	void set(float value);
 	void set(float value, ParameterType::Type type); 
-	void mask(ParameterType::Type type); // Зануляет все, кроме type
 	void set(const ParameterSet& set);
+	void mask(ParameterType::Type type); // Зануляет все, кроме type
+	void mask(const ParameterSet& set); // Зануляет все, кроме типов в set
 	
 	ParameterSet& operator+=(const ParameterSet& rhs);
 	ParameterSet& operator*=(float k);
@@ -256,6 +257,9 @@ public:
 	const Value& operator[](int index) const { return values_[index]; }
 
 	void serialize(Archive& ar);
+	
+	void read(XBuffer& buffer);
+	void write(XBuffer& buffer) const;
 
 	void showDebug(const Vect3f& position, const sColor4c& color) const;
 	const char* debugStr() const;

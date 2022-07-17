@@ -117,6 +117,12 @@ struct sGameStatusInfo {
 	int ping;
 };
 
+enum DWNATType {
+	DWNT_Open = 1,
+	DWNT_Moderate=2,
+	DWNT_Strict=3
+};
+inline bool isNATCompatible(DWNATType t1, DWNATType t2) { return t1+t2 < 5; }
 
 class bdMatchMakingInfo;
 struct sGameHostInfo {
@@ -125,19 +131,21 @@ struct sGameHostInfo {
 	string portStr;
 	string gameName;
 	sGameStatusInfo gameStatusInfo;
+	DWNATType dwNATType;
 	sGameHostInfo(){
 		GUID guid = {0, 0, 0, {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}};
 		set(guid, "", "", "", sGameStatusInfo());
 	}
-	sGameHostInfo(GUID _gameHostID, const char * _hostName, const char * _port, const char * _gameName, const sGameStatusInfo& gsi){
+	sGameHostInfo(GUID _gameHostID, const char * _hostName, const char * _port, const char * _gameName, const sGameStatusInfo& gsi, DWNATType _dwNATType=DWNT_Open){
 		set(_gameHostID, _hostName, _port, _gameName, gsi);
 	}
-	void set(GUID _gameHostGUID, const char * _hostName, const char * _port, const char * _gameName, const sGameStatusInfo& gsi){
+	void set(GUID _gameHostGUID, const char * _hostName, const char * _port, const char * _gameName, const sGameStatusInfo& gsi, DWNATType _dwNATType=DWNT_Open){
 		gameStatusInfo=gsi;
 		hostName=_hostName;
 		portStr=_port;
 		gameName=_gameName;
 		gameHostGUID=_gameHostGUID;
+		dwNATType=_dwNATType;
 	}
 };
 
@@ -203,7 +211,8 @@ enum eNetMessageCode {
 	NetRC_CreateAccount_Ok,
 	NetRC_CreateAccount_BadLicensed,
 	NetRC_CreateAccount_IllegalOrEmptyPassword_Err,
-	NetRC_CreateAccount_IllegalOrVulgarUserName_Err,
+	NetRC_CreateAccount_IllegalUserName_Err,
+	NetRC_CreateAccount_VulgarUserName_Err,
 	NetRC_CreateAccount_UserNameExist_Err,
 	NetRC_CreateAccount_MaxAccountExceeded_Err,
 	NetRC_CreateAccount_Other_Err,
@@ -234,7 +243,7 @@ enum eNetMessageCode {
 	NetRC_QuickStart_Err,
 
 	NetRC_ReadStats_Ok,
-	NetRC_ReadStats_Empty,
+	//NetRC_ReadStats_Empty,
 	NetRC_ReadStats_Err,
 
 	NetRC_WriteStats_Ok,
@@ -242,6 +251,12 @@ enum eNetMessageCode {
 
 	NetRC_ReadGlobalStats_Ok,
 	NetRC_ReadGlobalStats_Err,
+
+	NetRC_LoadInfoFile_Ok,
+	NetRC_LoadInfoFile_Err,
+
+	NetRC_Subscribe2ChatChanel_Ok,
+	NetRC_Subscribe2ChatChanel_Err,
 
 	NetMsg_PlayerDisconnected,
 	NetMsg_PlayerExit
@@ -279,8 +294,9 @@ enum e_PNCInternalCommand {
 	PNC_COMMAND__CLIENT_STARTING_LOAD_GAME = 5,
 	PNC_COMMAND__CLIENT_STARTING_GAME = 6,
 	//Special command
-	PNC_COMMAND__STOP_GAME_AND_ASSIGN_HOST_2_MY = 10,
-	PNC_COMMAND__STOP_GAME_AND_WAIT_ASSIGN_OTHER_HOST = 11,
+	//PNC_COMMAND__STOP_GAME_AND_ASSIGN_HOST_2_MY = 10,
+	//PNC_COMMAND__STOP_GAME_AND_WAIT_ASSIGN_OTHER_HOST = 11,
+	PNC_COMMAND__STOP_GAME_AND_MIGRATION_HOST = 10,
 
 	PNC_COMMAND__END = 20,
 	PNC_COMMAND__ABORT_PROGRAM = 21,
@@ -369,7 +385,7 @@ public:
 	void Configurate(const char* playerName=0, const char* password = 0, const char* InternetAddress=0);
 	~PNetCenter();
 
-	void getGameHostList(vector<sGameHostInfo>& ghl);
+	void getGameHostList(vector<sGameHostInfo>& ghl); 
 	void CreateGame(const char* gameName, const MissionDescription& md, const char* playerName, Race race, unsigned int color, float gameSpeed=1.0f, const char* password="");
 	void JoinGame(GUID _gameHostID, const char* playerName, Race race, unsigned int color);
 	void JoinGame(const char* strIP, const char* playerName, Race race, unsigned int color, const char* password="");
@@ -405,7 +421,7 @@ public:
 	void SendEventSync(const NetCommandBase* event);
 
 	//Chat
-	void chatMessage(const class ChatMessage& chatMsg);
+	bool chatMessage(const class ChatMessage& chatMsg);
 	void setGameHostFilter(int gameTypeFilter, std::vector<XGUID> missionFilter, int maxPlayersFilter);
 	// END EXTERNAL INTERFACE
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -499,7 +515,7 @@ protected:
 	void ClearCommandList();
 	void ClearDeletePlayerGameCommand();
 
-	void th2_UpdateBattleData(); //Internal 2Th
+	void sendStartLoadGame2AllPlayers_th2(const XBuffer& auxdata); //Internal 2Th
 	void th2_UpdateCurrentMissionDescription4C(); //Internal 2Th
 	void th2_CheckClients(); //Internal 2Th
 	void th2_DumpClients();  //Internal 2Th
@@ -511,12 +527,14 @@ protected:
 	void putNetCommand2InClientBuf_th2(NetCommandBase& event);// Используется DW для того чтоб положить чат команду клиенту
 
 
-	int AddClient(ConnectPlayerData& pd, const UNetID& unid);//Internal 2&3Th
+	int AddClient(ConnectPlayerData& pd, const UNetID& unid, bool flag_quickStart=false);//Internal 2&3Th
 
 	void th3_setDPNIDInClientsDate(const int missionDescriptionIdx, DPNID dpnid); //Internal 3Th
 	void th3_DeleteClientByMissionDescriptionIdx(const int missionDescriptionIdx);//Internal 3Th
 	//void deleteClientByDPNID_th3(const DPNID dpnid, DWORD dwReason); //Internal 3Th
+	vector<UNetID> disconnectUsersSuspended;
 	vector<UNetID> deleteUsersSuspended;
+	void discardUser_th2(const UNetID& unid);
 	void deleteUser_thA(const UNetID& unid); //Internal 2&3Th //, DWORD dwReason
 	void deleteUserQuant_th2(); //Internal 2Th
 
@@ -587,7 +605,7 @@ protected:
 	GUID getHostGUIDInstance();
 	void SetConnectionTimeout(int ms);
 	int GetConnectionTimeout(void);
-	void RemovePlayer(const UNetID& unid);
+	void RemovePlayerDP(const UNetID& unid);
 	void SetServerInfo(void* pb, int sz);
 	int GetServerInfo(void* pb);
 	bool GetConnectionInfo(DPN_CONNECTION_INFO& info);

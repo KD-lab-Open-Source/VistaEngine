@@ -5,6 +5,8 @@
 #include "xMath.h"
 #include "Range.h"
 
+// _VISTA_ENGINE_EXTERNAL_ - нужно для перевода external-редактора
+
 /*
  * FIXME: Подразумевается, что left < right и top < bottom, добавить
  * стратегию для кустомизации этого понятия?

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include ".\HotKeySelectorDlg.h"
 #include "Dictionary.h"
+#include "SystemUtil.h"
 
 
 IMPLEMENT_DYNAMIC(CHotKeySelectorDlg, CDialog)

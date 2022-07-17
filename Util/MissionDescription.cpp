@@ -16,8 +16,10 @@
 #include "GlobalAttributes.h"
 #include "..\Terra\QSWorldsMgr.h"
 
+// коммент не удалять!  нужно для перевода: _VISTA_ENGINE_EXTERNAL_
+
 const GUID ReplayHeader::FilePlayReelID = { 0x129460bb, 0x93cf, 0x499f, { 0x8a, 0xef, 0x76, 0x77, 0x2b, 0xc7, 0x5e, 0xa0 } };
-const int ReplayHeader::FilePlayReelVersion = 9;
+const int ReplayHeader::FilePlayReelVersion = 11;
 
 enum BitFlag {
 	BIT_FLAG_0 = 1 << 0,

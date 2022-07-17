@@ -4,10 +4,35 @@
 import codecs
 import copy
 
+def escape(string):
+    if(type(string) is unicode):
+        string = string.replace(u"\\", u"\\\\")
+        string = string.replace(u"\t", u"\\t")
+        string = string.replace(u"\n", u"\\n")
+    elif(type(string) is str):
+        string = string.replace("\\", "\\\\")
+        string = string.replace("\t", "\\t")
+        string = string.replace("\n", "\\n")
+    else:
+        assert(False)
+    return string
+
+def unescape(string):
+    if(type(string) is unicode):
+        string = string.replace(u"\\\\", u"\\")
+        string = string.replace(u"\\n", u"\n")
+        string = string.replace(u"\\t", u"\t")
+    elif(type(string) is str):
+        string = string.replace("\\\\", "\\")
+        string = string.replace("\\n", "\n")
+        string = string.replace("\\t", "\t")
+    else:
+        assert(False)
+    return string
+
 def writePairs(f, offset, name, pairs, codepage):#{{{
     f.write(offset + "%s = {\n" % name)
     f.write(offset + "\t%i;" % len(pairs))
-    # f.write("\t\t{\n")
     first = True
     for pair in pairs:
         if(first):
@@ -16,9 +41,9 @@ def writePairs(f, offset, name, pairs, codepage):#{{{
         else:
             f.write(",\n" + offset + "\t{\n")
 
-        first = pair[0].encode('windows-1251', 'strict')
+        first = escape(pair[0].encode('windows-1251', 'strict'))
         try:
-            second = pair[1].encode('windows-%i' % codepage, 'strict')
+            second = escape(pair[1].encode('windows-%i' % codepage, 'strict'))
         except:
             print "ERROR: unable to encode following strings in codepage %i" % codepage
             print pair[0]
@@ -54,6 +79,7 @@ class Dictionary:
 
     def __init__(self):
         self.values_ = dict()
+        self.unusedValues_ = dict()
         self.language_ = ""
         self.codepage_ = 1251
         self.useFallback_ = True
@@ -73,7 +99,8 @@ class Dictionary:
 
     def setValues(s, rhs):
         assert(not s is rhs)
-        s.values_   = copy.deepcopy(rhs.values_)
+        s.values_ = copy.deepcopy(rhs.values_)
+        s.unusedValues_ = copy.deepcopy(rhs.unusedValues_)
 
     def clear(s): s.values_ = dict()
     def name(s): return s.language_
@@ -88,7 +115,10 @@ class Dictionary:
         return result
 
     def items(self): return self.values_.items()
+    def unusedItems(self): return self.unusedValues_.items()
+
     def values(self): return self.values_.values()
+    def unusedValues(self): return self.unusedValues_
     def __len__(self): return len(self.values_)
 
     def __dict__(key): return self.values_[key]
@@ -136,6 +166,12 @@ class Dictionary:
 
         #}}}
 
+    def importPairs(self, pairs):
+        for pair in pairs:
+            (key, value) = pair
+            if key != u"":
+                self.values_[key] = value
+
     def importPot(self, fileName):#{{{
         print "\n** Reading PO Template %s" % fileName
 
@@ -151,21 +187,24 @@ class Dictionary:
         for line in f:
             result = msgid.match(line)
             if not result is None:
-                key = unicode(result.groups()[0], 'utf-8')
+                key = unescape(unicode(result.groups()[0], 'utf-8'))
                 lastWasKey = True
             else:
                 result = msgstr.match(line)
                 if not result is None:
-                    self.values_[key] = result.groups()[0]
+                    self.values_[key] = unescape(result.groups()[0])
                     lastWasKey = False
                 else:
                     result = juststr.match(line)
                     if not result is None:
                         if lastWasKey:
-                            key += result.groups()[0]
+                            key += unescape(result.groups()[0])
                         else:
-                            self.values_[key] += result.groups()[0]
-        self.values_.pop(u"")
+                            self.values_[key] += unescape(result.groups()[0])
+        try:
+            self.values_.pop(u"")
+        except:
+            pass
 
         print "Got %i messages" % len(self.values_)#}}}
 
@@ -218,9 +257,29 @@ class Dictionary:
         pairs = d.items()
         result = 0
         for pair in pairs:
-            if (pair[0] in self.values_) and pair[1] != u"":
-                self.values_[pair[0]] = pair[1]
-                result += 1
+            (key, value) = pair
+            if value != u"":
+                if key in self.values_:
+                    self.values_[key] = value
+                    result += 1
+                else:
+                    self.unusedValues_[key] = value
+
+
+        for pair in self.items():
+            (key, value) = pair
+            if value == u"":
+                if key in d.unusedValues_:
+                    self.values_[key] = d.unusedValues_[key]
+
+        for pair in d.unusedValues_.iteritems():
+            (key, value) = pair
+            if key in self.values_:
+                if self.values_[key] == u"":
+                    self.values_[key] = value
+            else:
+                self.unusedValues_[key] = value
+            
         return result
     #}}}
 
@@ -235,17 +294,29 @@ class Dictionary:
         language = re.compile('\s*language = "(.*)";', re.M)
         codepage = re.compile('\s*codePage = (\d+);', re.M)
         useFallback = re.compile('\s*useFallback = (.*);', re.M)
+        unused = re.compile('\s*unused = {', re.M)
 
         key = u""
+
+        unusedSection = False
+
         for line in f:
+            result = unused.match(line)
+            if not result is None:
+                unusedSection = True
+                continue
+
             result = first.match(line)
             if not result is None:
-                key = unicode(result.groups()[0], 'windows-1251')
+                key = unescape(unicode(result.groups()[0], 'windows-1251'))
                 continue
 
             result = second.match(line)
             if not result is None:
-                s.values_[key] = unicode((result.groups()[0]), 'windows-%i' % s.codepage_)
+                if unusedSection:
+                    s.unusedValues_[key] = unescape(unicode((result.groups()[0]), 'windows-%i' % s.codepage_))
+                else:
+                    s.values_[key] = unescape(unicode((result.groups()[0]), 'windows-%i' % s.codepage_))
                 continue
 
             result = language.match(line)
@@ -297,7 +368,7 @@ class Dictionary:
 
         f.write("Version = 0;\n")
         f.write("Dictionary = {\n")
-        #f.write('\tlanguage = "%s";\n' % s.language_)
+
         if(s.useFallback_):
             f.write('\tuseFallback = true;\n')
         else:
@@ -306,6 +377,7 @@ class Dictionary:
 
         writePairs(f, "\t", "untranslated", untranslated, s.codepage_)
         writePairs(f, "\t", "translated", translated, s.codepage_)
+        writePairs(f, "\t", "unused", s.unusedValues_.items(), s.codepage_)
 
         f.write("};\n")#}}}
 

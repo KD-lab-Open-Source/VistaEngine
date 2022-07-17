@@ -57,15 +57,16 @@ private:
 class UI_ActionDataHostList : public UI_ActionDataFull
 {
 public:
-	UI_ActionDataHostList() : gameListInfoType_(GAME_INFO_GAME_NAME) {}
+	UI_ActionDataHostList() {}
 
 	void serialize(Archive& ar);
 
-	GameListInfoType infoType() const { return gameListInfoType_; }
+	const GameListInfoTypes& format() const { return format_; }
+	const sColor4c& startedGameColor() const { return startedGameColor_; }
 
 private:
-
-	GameListInfoType gameListInfoType_;
+	GameListInfoTypes format_;
+	sColor4c startedGameColor_;
 };
 
 class UI_ActionDataPlayer : public UI_ActionDataFull

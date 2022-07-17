@@ -1107,11 +1107,6 @@ private:
 
 	TransformMode transformMode_;
 
-	/// текущее время анимации текстуры
-	float bgTextureAnimationTime_;
-	/// проигрывать анимацию
-	bool bgTextureAnimationIsPlaying_;
-
 	/// маска прозрачности кнопки
 	/// если пустая, то вся кнопка считается непрозрачной для мыши
 	UI_Mask mask_;
@@ -1141,6 +1136,7 @@ private:
 	bool borderOutline_;
 	/// отрисовывать рамку или нет
 	bool borderEnabled_;
+	bool autoFormatText_;
 	/// цвет рамки
 	sColor4f borderColor_;
 	/// цвет обводки рамки
@@ -1158,8 +1154,6 @@ private:
 	/// коордитаты и размеры области для текста относительно координат и размеров кнопки
 	Rectf textPosition_;
 
-	bool autoFormatText_;
-
 	UI_FontReference font_;
 
 	friend class UI_Transform;
@@ -1171,6 +1165,13 @@ private:
 	UI_Transform::ScaleMode activationScaleMode_;
 	/// В какую сторону выезжать при активации
 	ActivationMove activationMove_;
+
+	/// текущее время анимации текстуры
+	float bgTextureAnimationTime_;
+	/// проигрывать анимацию
+	bool bgTextureAnimationIsPlaying_;
+
+	bool compatibleHotKey_;
 
 	/// true если заданы отдельные настройки для деактивации
 	bool hasDeactivationSettings_;

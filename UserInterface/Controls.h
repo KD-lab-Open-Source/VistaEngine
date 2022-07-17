@@ -8,7 +8,7 @@
 
 enum InterfaceGameControlID
 {
-	CTRL_CAMERA_MOVE_UP,
+	CTRL_CAMERA_MOVE_UP = 0,
 	CTRL_CAMERA_MOVE_DOWN,
 	CTRL_CAMERA_MOVE_LEFT,
 	CTRL_CAMERA_MOVE_RIGHT,
@@ -41,8 +41,6 @@ enum InterfaceGameControlID
 	CTRL_SELECT_ALL,
 	CTRL_MOVE,
 
-	CTRL_KILL_UNIT,
-
 	CTRL_MAX,
 	
 	CTRL_CAMERA_MAP_SHIFT,
@@ -71,6 +69,7 @@ public:
 
 	InterfaceGameControlID control(int fullKey) const;
 	const sKey& key(InterfaceGameControlID ctrl) const;
+	sKey defaultKey(InterfaceGameControlID ctrl) const;
 
 	bool isCompatible(InterfaceGameControlID ctrl1, InterfaceGameControlID ctrl2) const;
 
@@ -114,6 +113,8 @@ private:
 	ControlNodeList controls_;
 	HotKeyList hotKeyHandlers_;
 
+	int interpret_;
+	sKey interpret(sKey src) const;
 	void defaultSettings();
 };
 

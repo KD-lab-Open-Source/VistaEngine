@@ -1,5 +1,7 @@
 # Maelstrom: The Battle for Earth Begins
 
+Discord: https://discord.gg/a9PYzSYZ
+
 Чат для обсуждения: https://t.me/PerimeterGame
 
 (с) ООО "КД ВИЖЕН" (Калининград)
@@ -21,4 +23,4 @@
 Perimeter2.sln
 
 ## Запуск игры
-Скопируйте файлы GameDBG.exe, AttribEditor.dll и TriggerEditor.dll в папку с игрой из Steam.
+Скопируйте файлы GameDBG.exe, AttribEditor.dll и TriggerEditor.dll в папку с игрой версии 1.1.

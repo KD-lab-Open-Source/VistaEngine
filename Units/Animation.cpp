@@ -124,7 +124,6 @@ ChainController::~ChainController()
 
 void ChainController::setChain(const AnimationChain& chain,UnitBase* owner_, cObject3dx* model_, cObject3dx* modelLogic_, bool additionalChain)
 {
-	additionalChain = additionalChain;
 	if(chain_ && chain_->compare(chain) && (additionalChain || chain_->visibilityGroup() == chain.visibilityGroup())
 		&& ((chain_->counter == chain.counter && chain_->cycled == chain.cycled) ||	(!finished() 
 		&&	chain_->reversed ? phase() > phase_.deltaPhase() : phase() < 1 - phase_.deltaPhase())))

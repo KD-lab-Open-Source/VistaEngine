@@ -16,6 +16,8 @@
 #include "AttribEditorDrawNotifyListener.h"
 #include "Dictionary.h"
 
+// _VISTA_ENGINE_EXTERNAL_ - нужно для перевода external-редактора
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE

@@ -43,6 +43,7 @@
 extern Singleton<UI_StreamVideo> streamVideo;
 
 #include "StreamCommand.h"
+#include <shellapi.h>
 
 Singleton<UI_NetCenter> netCenter;
 
@@ -168,16 +169,17 @@ enum UITextTag {
 	UI_TAG_SELECTED_GAME_SIZE,
 	UI_TAG_SELECTED_GAME_TYPE,
 	UI_TAG_SELECTED_GAME_PLAYERS,
+	UI_TAG_CURRENT_CHAT_CHANNEL,
 	UI_TAG_TIME_H12,
 	UI_TAG_TIME_AMPM,
 	UI_TAG_TIME_H24,
 	UI_TAG_TIME_M,
 	UI_TAG_HOTKEY,
-	UI_TAG_ACCESSIBLE, // что надо для доступности юнита
-	UI_TAG_ACCESSIBLE_PARAM,  // что надо для доступности параметра
-	UI_TAG_LEVEL, // уровень юнита
-	UI_TAG_ACCOUNTSIZE, // сколько слотов занимает юнит
-	UI_TAG_SUPPLYSLOTS // сколько слотов занимает юнит (с раскраской)
+	UI_TAG_ACCESSIBLE, // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	UI_TAG_ACCESSIBLE_PARAM,  // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	UI_TAG_LEVEL, // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	UI_TAG_ACCOUNTSIZE, // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+	UI_TAG_SUPPLYSLOTS // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
 };
 
 struct CharStringLess {
@@ -259,24 +261,28 @@ UI_LogicDispatcher::UI_LogicDispatcher() : mousePosition_(0,0),
 	diskOpID_ = UI_DISK_OP_NONE;
 	diskOpConfirmed_ = false;
 
-	uiTextTags.insert(make_pair("display_name", UI_TAG_PLAYER_DISPLAY_NAME)); // в online - DW логин, иначе имя профиля
-	uiTextTags.insert(make_pair("players_count", UI_TAG_PLAYERS_COUNT)); // количество оставшихся игроков
-	uiTextTags.insert(make_pair("game_name", UI_TAG_CURRENT_GAME_NAME)); // название текущей загруженной карты
-	uiTextTags.insert(make_pair("cm_name", UI_TAG_SELECTED_GAME_NAME)); // название выбранной в списке карты
-	uiTextTags.insert(make_pair("multi_name", UI_TAG_SELECTED_MULTIPLAYER_GAME_NAME)); // название выбранной сетевой игры
-	uiTextTags.insert(make_pair("cm_size", UI_TAG_SELECTED_GAME_SIZE)); // размер выбранной карты
-	uiTextTags.insert(make_pair("cm_type", UI_TAG_SELECTED_GAME_TYPE)); // тип (custom, predefine) выбранной карты
-	uiTextTags.insert(make_pair("cm_players", UI_TAG_SELECTED_GAME_PLAYERS)); // максимальное количество игроков
-	uiTextTags.insert(make_pair("hotkey", UI_TAG_HOTKEY)); // горячая клавиша для кнопки
-	uiTextTags.insert(make_pair("accessible", UI_TAG_ACCESSIBLE)); // что надо для доступности юнита
-	uiTextTags.insert(make_pair("accessible_param", UI_TAG_ACCESSIBLE_PARAM)); // что надо для доступности параметра
-	uiTextTags.insert(make_pair("level", UI_TAG_LEVEL)); // уровень юнита
-	uiTextTags.insert(make_pair("accountsize", UI_TAG_ACCOUNTSIZE)); // сколько слотов занимает юнит
-	uiTextTags.insert(make_pair("supplyslots", UI_TAG_SUPPLYSLOTS)); // сколько слотов занимает юнит (с раскраской)
-	uiTextTags.insert(make_pair("time_h12", UI_TAG_TIME_H12)); // время мира в 12 часовом формате
-	uiTextTags.insert(make_pair("time_ampm", UI_TAG_TIME_AMPM)); // до полудня или после полудня
-	uiTextTags.insert(make_pair("time_h24", UI_TAG_TIME_H24)); // вреям мира в 24 часовом формате
-	uiTextTags.insert(make_pair("time_min", UI_TAG_TIME_M)); // минуты времени мира
+	lastCurrentHiVer_ = UI_Dispatcher::instance().gameMajorVersion();
+	lastCurrentLoVer_ = UI_Dispatcher::instance().gameMinorVersion();
+
+	uiTextTags.insert(make_pair("display_name", UI_TAG_PLAYER_DISPLAY_NAME)); // пїЅ online - DW пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair("players_count", UI_TAG_PLAYERS_COUNT)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair("game_name", UI_TAG_CURRENT_GAME_NAME)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair("cm_name", UI_TAG_SELECTED_GAME_NAME)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair("multi_name", UI_TAG_SELECTED_MULTIPLAYER_GAME_NAME)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair("cm_size", UI_TAG_SELECTED_GAME_SIZE)); // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair("cm_type", UI_TAG_SELECTED_GAME_TYPE)); // пїЅпїЅпїЅ (custom, predefine) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair("cm_players", UI_TAG_SELECTED_GAME_PLAYERS)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair("channel_name", UI_TAG_CURRENT_CHAT_CHANNEL)); //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair("hotkey", UI_TAG_HOTKEY)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair("accessible", UI_TAG_ACCESSIBLE)); // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair("accessible_param", UI_TAG_ACCESSIBLE_PARAM)); // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair("level", UI_TAG_LEVEL)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair("accountsize", UI_TAG_ACCOUNTSIZE)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair("supplyslots", UI_TAG_SUPPLYSLOTS)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
+	uiTextTags.insert(make_pair("time_h12", UI_TAG_TIME_H12)); // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ 12 пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair("time_ampm", UI_TAG_TIME_AMPM)); // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair("time_h24", UI_TAG_TIME_H24)); // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ 24 пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair("time_min", UI_TAG_TIME_M)); // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 }
 
 UI_LogicDispatcher::~UI_LogicDispatcher()
@@ -306,6 +312,10 @@ bool UI_LogicDispatcher::init()
 
 	missions_.readFromDir("RESOURCE\\WORLDS\\", GAME_TYPE_SCENARIO);
 
+	for(MissionDescriptions::const_iterator qsm = missions_.begin(); qsm != missions_.end(); ++qsm)
+		if(qsm->isBattle() && qsWorldsMgr.isMissionPresent(qsm->missionGUID()))
+			quickStartMissions_.push_back(qsm->missionGUID());
+
 	validateMissionFilter(currentProfile().findMissionFilter);
 
 	GUIDcontainer::iterator it = currentProfile().quickStartMissionFilter.filterList.begin();
@@ -317,6 +327,13 @@ bool UI_LogicDispatcher::init()
 	validateMissionFilter(currentProfile().quickStartMissionFilter);
 
 	return true;
+}
+
+const GUIDcontainer& UI_LogicDispatcher::quickStartFilter()
+{
+	return currentProfile().quickStartMissionFilter.filterDisabled
+		? quickStartMissions_
+		: currentProfile().quickStartMissionFilter.filterList;
 }
 
 void UI_LogicDispatcher::validateMissionFilter(Profile::MissionFilter& filter)
@@ -611,7 +628,7 @@ void UI_LogicDispatcher::graphQuant(float dt)
 			Vect3f dirPoint = v1 - v0;
 			dirPoint.Normalize(clamp(sqrtf(distMin) - 15.f, 1.f, 10000.f));
 			if(!weapon_helpers::traceGround(v0, v0+dirPoint, dirPoint))
-				unitNear = 0; // земля ближе
+				unitNear = 0; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		}
 	}
 	hoverUnit_ = unitNear;
@@ -736,7 +753,7 @@ bool UI_LogicDispatcher::handleInput(const UI_InputEvent& event)
 			mousePressPos_ = mousePosition();
 	}
 
-	// для мышино-кнопочных действий, shift независимо от настроек является флагом постановки в очередь (добавления к селекту)
+	// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, shift пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
 	int withoutShiftCode = event.keyCode() & ~KBD_SHIFT;
 	bool shiftPressed = event.keyCode() & KBD_SHIFT;
 
@@ -966,7 +983,7 @@ void UI_LogicDispatcher::toggleTracking(bool state)
 
 void UI_LogicDispatcher::setCursor(const UI_Cursor* cursor)
 {
-	// Если какой-нибудь курсор установлен и это устанавливаемый, то выход
+	// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	if (activeCursor() && cursor == activeCursor()) 
 		return;
 	activeCursor_ = cursor;
@@ -1111,7 +1128,7 @@ void UI_LogicDispatcher::selectClickMode(UI_ClickModeID mode_id, const WeaponPrm
 	MTG();
 	
 	if(mode_id != UI_CLICK_MODE_NONE && selected_weapon){
-		// тогда выбираем только, если это оружие у юнита есть
+		// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 		if(UnitInterface* unit = selectManager->selectedUnit())
 			if(!safe_cast<UnitActing*>(unit->getUnitReal())->hasWeapon(selected_weapon->ID()))
 				return;
@@ -1173,8 +1190,10 @@ void UI_LogicDispatcher::focusControlProcess(const UI_ControlBase* lastHovered)
 void UI_LogicDispatcher::toggleBuildingInstaller(const AttributeBase* attr)
 {
 	MTG();
-	if(attr && UI_Dispatcher::instance().isEnabled())
+	if(attr && UI_Dispatcher::instance().isEnabled()){
 		buildingInstaller_.InitObject(safe_cast<const AttributeBuilding*>(attr), true);
+		buildingInstaller_.SetBuildPosition(hoverPosition_, buildingInstaller_.angle());
+	}
 	else
 		buildingInstaller_.Clear();
 }
@@ -1495,9 +1514,9 @@ const MissionDescription* UI_LogicDispatcher::getControlStateByGameType(GameTune
 
 		case TUNE_BUTTON_KICK:
 			state.enable();
-			if(netCenter().isNetGame() 
+			if(netCenter().isServer() 
 			&& playerType == REAL_PLAYER_TYPE_PLAYER
-			&& mission->gameType() == GAME_TYPE_MULTIPLAYER_COOPERATIVE
+			&& data->playerIndex() != mission->activePlayerID()
 			&& mission->playerData(data->playerIndex()).usersIdxArr[data->teamIndex()] != USER_IDX_NONE)
 				state.show();
 			else
@@ -1873,7 +1892,6 @@ void UI_LogicDispatcher::controlInit(UI_ControlActionID id, UI_ControlBase* cont
 			netCenter().updateFilter();
 			break;
 
-		//case UI_ACTION_LAN_CHAT_USER_LIST:
 		case UI_ACTION_CHAT_MESSAGE_BOARD:
 			netCenter().clearChatBoard();
 			break;
@@ -1882,6 +1900,12 @@ void UI_LogicDispatcher::controlInit(UI_ControlActionID id, UI_ControlBase* cont
 			clearGameChat();
 			break;
 		
+		case UI_ACTION_CHAT_EDIT_STRING:
+			control->setText(0);
+			if(UI_ControlEdit* edit = dynamic_cast<UI_ControlEdit*>(control))
+				edit->setEditText("");
+			break;
+
 		case UI_ACTION_INET_STATISTIC_SHOW:
 			netCenter().queryGlobalStatistic(true);
 			break;
@@ -2100,9 +2124,9 @@ void UI_LogicDispatcher::controlInit(UI_ControlActionID id, UI_ControlBase* cont
 				}
 				else if(data >= 0 && !strings.empty()) {
 					data = data % strings.size();
-					if(control->states().size() > 1 && control->states().size() == strings.size()) // переключаем состояния
+					if(control->states().size() > 1 && control->states().size() == strings.size()) // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 						control->setState(data);
-					else // иначе надписи
+					else // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 						control->setText(strings[data].c_str());
 				}
 			}
@@ -2139,14 +2163,14 @@ void UI_LogicDispatcher::controlUpdate(UI_ControlActionID id, UI_ControlBase* co
 					}
 				}
 				else{
-					if(p->useUnitList()){ // раскручиваем владельцев вверх до списка юнитов
+					if(p->useUnitList()){ // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 						const UI_ControlBase* current = control;
 						const UI_ControlContainer* parent = current->owner();
 						while(parent){
 							if(const UI_ControlUnitList* ul = dynamic_cast<const UI_ControlUnitList*>(parent)){
 								xassert(ul->GetType() == UI_UNITLIST_SELECTED);
 								dassert(std::find(ul->controlList().begin(), ul->controlList().end(), current) != ul->controlList().end());
-								// вычисляем номер контрола в списке
+								// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 								int child_index = std::distance(ul->controlList().begin(), std::find(ul->controlList().begin(), ul->controlList().end(), current));
 								if(selectManager->selectedSlot() == child_index)
 									control->setPermanentTransform(ul->activeTransform());
@@ -2160,7 +2184,7 @@ void UI_LogicDispatcher::controlUpdate(UI_ControlActionID id, UI_ControlBase* co
 							else
 								current = safe_cast<const UI_ControlBase*>(parent);
 							parent = current->owner();
-							xassert(parent && "<<список юнитов>> во владельцах не найден");
+							xassert(parent && "<<пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ>> пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 						}
 					}
 					else if(UnitInterface* ui = selectedUnit())
@@ -2247,10 +2271,14 @@ void UI_LogicDispatcher::controlUpdate(UI_ControlActionID id, UI_ControlBase* co
 				controlState.hide();
 			break;
 											 }
+		case UI_ACTION_INET_NAT_TYPE:
+			control->setText(netCenter().natType());
+			break;
 		case UI_ACTION_LAN_GAME_LIST:{
+			const UI_ActionDataHostList* dat = safe_cast<const UI_ActionDataHostList*>(data);
 			netCenter().updateGameList();
 			ComboStrings  strings;
-			int selected = netCenter().getGameList(strings, safe_cast<const UI_ActionDataHostList*>(data)->infoType());
+			int selected = netCenter().getGameList(dat->format(), strings, dat->startedGameColor());
 			UI_ControlComboList::setList(control, strings, selected);
 			break;
 									 }
@@ -2278,6 +2306,17 @@ void UI_LogicDispatcher::controlUpdate(UI_ControlActionID id, UI_ControlBase* co
 				break;
 			}
 			break;
+		case UI_ACTION_LAN_CHAT_CHANNEL_LIST:{
+			netCenter().updateChatChannels();
+			ComboStrings  strings;
+			int selected = netCenter().getChatChannels(strings);
+			UI_ControlComboList::setList(control, strings, selected);
+			if(netCenter().autoSubscribeMode())
+				controlState.disable();
+			else
+				controlState.enable();
+			break;
+										  }
 		case UI_ACTION_LAN_CHAT_USER_LIST:{
 			netCenter().updateChatUsers();
 			ComboStrings  strings;
@@ -2975,6 +3014,15 @@ void UI_LogicDispatcher::controlAction(UI_ControlActionID id, UI_ControlBase* co
 			netCenter().abortCurrentOperation();
 			break;
 
+		case UI_ACTION_LAN_CHAT_CHANNEL_LIST:
+			if(UI_ControlStringList* sp = dynamic_cast<UI_ControlStringList*>(control)){
+				netCenter().selectChatChannel(sp->selectedStringIndex());
+			}
+			break;
+		case UI_ACTION_LAN_CHAT_CHANNEL_ENTER:
+			netCenter().enterChatChannel();
+			break;
+
 		case UI_ACTION_LAN_GAME_LIST:
 			if(UI_ControlStringList* sp = dynamic_cast<UI_ControlStringList*>(control)){
 				netCenter().selectGame(sp->selectedStringIndex());
@@ -3105,7 +3153,7 @@ void UI_LogicDispatcher::controlAction(UI_ControlActionID id, UI_ControlBase* co
 				    break;
 				}
 				if(type == REAL_PLAYER_TYPE_CLOSE && pdata->playerIndex() == mission->activePlayerID())
-					break; // свой слот закрывать нельзя
+					break; // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 				if(mission->playerData(pdata->playerIndex()).realPlayerType != type){
 					mission->changePlayerData(pdata->playerIndex()).realPlayerType = type;
 					if(gameShell->getNetClient())
@@ -3290,13 +3338,13 @@ void UI_LogicDispatcher::controlAction(UI_ControlActionID id, UI_ControlBase* co
 			break;
 
 		case UI_ACTION_CHAT_SEND_MESSAGE:
-			netCenter().sendChatString(-1);
-			handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_CHAT_EDIT_STRING, UI_ActionDataControlCommand::CLEAR)));
+			if(netCenter().sendChatString(-1))
+				handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_CHAT_EDIT_STRING, UI_ActionDataControlCommand::CLEAR)));
 			break;
 
 		case UI_ACTION_CHAT_SEND_CLAN_MESSAGE:
-			netCenter().sendChatString(gameShell->CurrentMission.playerData(gameShell->CurrentMission.activePlayerID()).clan);
-			handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_CHAT_EDIT_STRING, UI_ActionDataControlCommand::CLEAR)));
+			if(netCenter().sendChatString(gameShell->CurrentMission.playerData(gameShell->CurrentMission.activePlayerID()).clan))
+				handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_CHAT_EDIT_STRING, UI_ActionDataControlCommand::CLEAR)));
 			break;
 
 		case UI_ACTION_INET_LOGIN:
@@ -3325,6 +3373,10 @@ void UI_LogicDispatcher::controlAction(UI_ControlActionID id, UI_ControlBase* co
 
 		case UI_ACTION_INET_QUICK_START:
 			netCenter().quickStart();
+			break;
+
+		case UI_ACTION_INET_REFRESH_GAME_LIST:
+			netCenter().refreshGameList();
 			break;
 
 		case UI_ACTION_LAN_CREATE_GAME:
@@ -3538,7 +3590,7 @@ void UI_LogicDispatcher::expandTextTemplate(string& text, UnitInterface* unit, c
 			break;
 		}
 
-		if(text[begin + 1] == '$'){ // обязательный тег
+		if(text[begin + 1] == '$'){ // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 			const char* par = getParam(text.substr(begin + 2, end - begin - 2).c_str(), unit, attr);
 			if(par && *par)
 				out += par;
@@ -3580,35 +3632,35 @@ const char* UI_LogicDispatcher::getParam(const char* name, UnitInterface* unit, 
 		}
 	}
 
-	if(name[1] == '!'){ // это из параметров юнита
+	if(name[1] == '!'){ // пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		switch(*name){
-		case 'c': // текущие личные параметры
+		case 'c': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			if(unit)
 				params = &(unit->getUnitReal()->parameters());
 			break;
-		case 'm': // максимальные личные параметры
+		case 'm': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			if(unit)
 				params = &(unit->getUnitReal()->parametersMax());
 			break;
-		case 'b': // ресурсы для постройки
+		case 'b': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			if(attr)
 				params = &(attr->creationValue);
 			break;
-		case 'i': // ресурсы для заказа
+		case 'i': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			if(attr)
 				params = &(attr->installValue);
 			break;
-		case 'a': // необходимые параметры
+		case 'a': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			if(attr)
 				params = &(attr->accessValue);
 			break;
-		case 'w':// параметр из личных параметров оружия
-		case 'd': // параметр из урона оружия
-		case 's': // из abnormalState
+		case 'w':// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+		case 'd': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+		case 's': // пїЅпїЅ abnormalState
 			if(unit){
 				char type = *name;
-				//имя параметра из оружия задается в виде: WeaponName/ParameterNameOrModifer
-				//WeaponName - ключ локализации для имени оружия
+				//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ: WeaponName/ParameterNameOrModifer
+				//WeaponName - пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 				name+=2;
 				if(const char* delimeter = strchr(name, '/')){
 					const WeaponBase* weapon = 0;
@@ -3618,7 +3670,7 @@ const char* UI_LogicDispatcher::getParam(const char* name, UnitInterface* unit, 
 						weapon = shooter->findWeapon(weaponLabel.c_str());
 					}
 					else if(int weaponID = shooter->selectedWeaponID())
-						weapon = shooter->findWeapon(weaponID);  // текущее выбранное оружие
+						weapon = shooter->findWeapon(weaponID);  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
 					if(weapon && weapon->isEnabled() && weapon->getParametersForUI(++delimeter, type, cacheParams))
 						params = &cacheParams;
@@ -3626,7 +3678,7 @@ const char* UI_LogicDispatcher::getParam(const char* name, UnitInterface* unit, 
 				}
 			}
 			break;
-		case '*': // параметры из текущего контрола под мышой, стоимость команды показывается для заселекченного
+		case '*': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			if(const UI_ControlBase* control = hoverControl())
 				if(const AttributeBase* attr = selectManager->selectedAttribute())
 					if(control->actionParameters(attr, cacheParams))
@@ -3638,14 +3690,14 @@ const char* UI_LogicDispatcher::getParam(const char* name, UnitInterface* unit, 
 		}
 		name += 2;
 	}
-	else if(name[1] == '&'){ // это из параметров игрока
+	else if(name[1] == '&'){ // пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		const Player* plr = plrID < 0 ? universe()->activePlayer() : universe()->findPlayer(plrID);
 		xassert(plr);
 		switch(*name){
-		case 'c': // текущие ресурсы игрока
+		case 'c': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			params = &(plr->resource());
 			break;
-		case 'm': // максимальные ресурсы игрока
+		case 'm': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			params = &(plr->resourceCapacity());
 			break;
 		}
@@ -3692,29 +3744,35 @@ const char* UI_LogicDispatcher::getParam(const char* name, UnitInterface* unit, 
 				if(const MissionDescription* mission = currentMission())
 					retBuf <= mission->playersAmountMax();
 				break;
-			case UI_TAG_HOTKEY: // hotkey для кнопки под мышкой
+			case UI_TAG_CURRENT_CHAT_CHANNEL:{
+				string get;
+				getNetCenter().getCurrentChatChannelName(get);
+				retBuf < get.c_str();
+				break;
+											 }
+			case UI_TAG_HOTKEY: // hotkey пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 				if(const UI_ControlBase* hov = hoverControl())
 					retBuf < hov->hotKey().toString().c_str();
 				break;
-			case UI_TAG_ACCESSIBLE: // что надо для доступности юнита
+			case UI_TAG_ACCESSIBLE: // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 				if(attr)
 					player()->printAccessible(retBuf, attr->accessBuildingsList, enableColorString(), disableColorString());
 				break;
-			case UI_TAG_ACCESSIBLE_PARAM: // что надо для доступности параметра
+			case UI_TAG_ACCESSIBLE_PARAM: // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				if(const UI_ControlBase* control = hoverControl())
 					if(const AttributeBase* attr = selectManager->selectedAttribute())
 						if(const ProducedParameters* par = control->actionBuildParameter(attr))
 							player()->printAccessible(retBuf, par->accessBuildingsList, enableColorString(), disableColorString());
 				break;
-			case UI_TAG_LEVEL: // уровень юнита
+			case UI_TAG_LEVEL: // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 				if(unit && unit->getUnitReal()->attr().isLegionary())
 					retBuf <= safe_cast<const UnitLegionary*>(unit->getUnitReal())->level() + 1;
 				break;
-			case UI_TAG_ACCOUNTSIZE: // сколько слотов занимает юнит
+			case UI_TAG_ACCOUNTSIZE: // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 				if(attr)
 					retBuf <= attr->accountingNumber;
 				break;
-			case UI_TAG_SUPPLYSLOTS: // сколько слотов занимает юнит (с раскраской)
+			case UI_TAG_SUPPLYSLOTS: // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
 				if(attr){
 					if(universe()->activePlayer()->checkUnitNumber(attr))
 						retBuf < enableColorString();
@@ -3763,7 +3821,7 @@ const char* UI_LogicDispatcher::getParam(const char* name, UnitInterface* unit, 
 				break;
 							   }
 			default:
-				xxassert(false, "такого быть не должно!");
+				xxassert(false, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ!");
 			    return "";
 			}
 			return retBuf.c_str();
@@ -3773,15 +3831,15 @@ const char* UI_LogicDispatcher::getParam(const char* name, UnitInterface* unit, 
 
 	if(params){
 		switch(*name){
-		case '?':  // чего не хватает у игрока
+		case '?':  // пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			player()->resource().printSufficient(retBuf, *params, enableColorString(), disableColorString());
-		case '&': // чего не хватает у юнита
+		case '&': // пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
 			if(unit)
 				unit->getUnitReal()->parameters().printSufficient(retBuf, *params, enableColorString(), disableColorString());
 			break;
-		case '!': // просто напечатать все параметры
+		case '!': // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			params->toString(retBuf);
-		default: // вывести конкретный параметр
+		default: // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			retBuf <= round(params->findByLabel(name));
 		}
 		return retBuf.c_str();
@@ -3814,7 +3872,7 @@ void UI_LogicDispatcher::selectCursor(const UI_Cursor* cameraCursor)
 	UnitInterface* hovered_unit = hoverUnit();
 
 	if(cursorTriggered())
-	{// Ничего не делаем - работает курсор, назначенный триггером
+	{// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		SET_CURSOR_REASON("by trigger");
 	}
 	else if(cameraCursor){
@@ -3822,7 +3880,7 @@ void UI_LogicDispatcher::selectCursor(const UI_Cursor* cameraCursor)
 		setCursor(cameraCursor);
 	}
 	else if(const UI_ControlBase* control = UI_LogicDispatcher::instance().hoverControl())
-	{// Курсор на интерфейсе - нужный курсор должен назначить	обработчик мышки для объектов интерфейса
+	{// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		if(control->hoveredCursor()){
 			SET_CURSOR_REASON("control own hover cursor");
 			setCursor(control->hoveredCursor());
@@ -3920,9 +3978,9 @@ void UI_LogicDispatcher::selectCursor(const UI_Cursor* cameraCursor)
 					xxassert(0, "new click mode type?");
 		}
 	}
-	else if (universe()->activePlayer() && hovered_unit){ // Если юниты под мышкой найдены
+	else if (universe()->activePlayer() && hovered_unit){ // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		const UI_Cursor* unit_cur = hovered_unit->attr().selectionCursorProxy();
-		if(unit_cur){ // В приоритете курсор, назначенный объекту - если его нет, то вешаем общие курсоры
+		if(unit_cur){ // пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			SET_CURSOR_REASON("object hover, object own cursor");
 			setCursor(unit_cur);
 		}
@@ -3953,12 +4011,12 @@ void UI_LogicDispatcher::selectCursor(const UI_Cursor* cameraCursor)
 				if(universe()->activePlayer() == hovered_unit->player())
 					if(hovered_unit->attr().isTransport() && selectManager->canPutInTransport(safe_cast<UnitActing*>(hovered_unit))){
 						SET_CURSOR_REASON("own object hover, this is transport, selected can put in");
-						setCursor(UI_GlobalAttributes::instance().cursor(UI_CURSOR_TRANSPORT)); // для транспортов в которые можно сесть отдельный курсор
+						setCursor(UI_GlobalAttributes::instance().cursor(UI_CURSOR_TRANSPORT)); // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 					}
 					else if(hovered_unit->attr().isBuilding() && !safe_cast<const UnitBuilding*>(hovered_unit)->isConstructed()
 						&& selectManager->canBuild(hovered_unit->getUnitReal())){
 							SET_CURSOR_REASON("own object hover, this is not constructed building, selected build this");
-							setCursor(UI_GlobalAttributes::instance().cursor(UI_CURSOR_CAN_BUILD)); // может достроить этот долгострой
+							setCursor(UI_GlobalAttributes::instance().cursor(UI_CURSOR_CAN_BUILD)); // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 						}
 					else {
 						SET_CURSOR_REASON("own object hover");
@@ -3981,7 +4039,7 @@ void UI_LogicDispatcher::selectCursor(const UI_Cursor* cameraCursor)
 			setCursor(UI_GlobalAttributes::instance().cursor(UI_CURSOR_ATTACK_DISABLED));
 		}
 	}
-	else if(cursorInWorld()) // Если пересеклись с землей
+	else if(cursorInWorld()) // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		if(!hoverPassable()) {
 			SET_CURSOR_REASON("ipassible region in world");
 			setCursor(UI_GlobalAttributes::instance().cursor(UI_CURSOR_IMPASSABLE));
@@ -4097,8 +4155,13 @@ void UI_LogicDispatcher::handleNetwork(eNetMessageCode message)
 		str="DWLobbyConnectionFailed";
 		break;
 	case NetGEC_DWLobbyConnectionFailed_MultipleLogons:
-		locKey = UI_COMMON_TEXT_ERROR_DISCONNECT;
+		locKey = UI_COMMON_TEXT_ERROR_DISCONNECT_MULTIPLE_LOGON;
 		str="DWLobbyConnectionFailed_MultipleLogons";
+		break;
+
+	case NetGEC_GameDesynchronized:
+		locKey = UI_COMMON_TEXT_ERROR_DESINCH;
+		str="GameDesynchronized";
 		break;
 
 		//Init
@@ -4106,7 +4169,7 @@ void UI_LogicDispatcher::handleNetwork(eNetMessageCode message)
 		break;
 	case NetRC_Init_Err:
 		gameShell->stopNetClient();
-		locKey = UI_COMMON_TEXT_ERROR_DISCONNECT;
+		locKey = UI_COMMON_TEXT_ERROR_CANT_CONNECT;
 		str="Internet init error";
 		break;
 
@@ -4122,9 +4185,13 @@ void UI_LogicDispatcher::handleNetwork(eNetMessageCode message)
 		locKey = UI_COMMON_TEXT_ERROR_ACCOUNT_BAD_PASSWORD;
 		str="CreateAccount Err: NetRC_CreateAccount_IllegalOrEmptyPassword_Err";
 		break;
-	case NetRC_CreateAccount_IllegalOrVulgarUserName_Err:
+	case NetRC_CreateAccount_IllegalUserName_Err:
 		locKey = UI_COMMON_TEXT_ERROR_ACCOUNT_BAD_NAME;
-		str="CreateAccount Err: IllegalOrVulgarUserName";
+		str="CreateAccount Err: IllegalUserName";
+		break;
+	case NetRC_CreateAccount_VulgarUserName_Err:
+		locKey = UI_COMMON_TEXT_ERROR_ACCOUNT_VULGAR_NAME;
+		str="CreateAccount Err: VulgarUserName";
 		break;
 	case NetRC_CreateAccount_UserNameExist_Err:
 		locKey = UI_COMMON_TEXT_ERROR_ACCOUNT_NAME_EXIST;
@@ -4142,14 +4209,14 @@ void UI_LogicDispatcher::handleNetwork(eNetMessageCode message)
 	case NetRC_ChangePassword_Ok:
 		break;
 	case NetRC_ChangePassword_Err:
-		locKey = UI_COMMON_TEXT_ERROR_ACCOUNT_BAD_PASSWORD;
+		locKey = UI_COMMON_TEXT_ERROR_ACCOUNT_CHANGE_PASSWORD;
 		str="ChangePassword Err.";
 		break;
 
 	case NetRC_DeleteAccount_Ok:
 		break;
 	case NetRC_DeleteAccount_Err:
-		locKey = UI_COMMON_TEXT_ERROR_ACCOUNT_BAD_PASSWORD;
+		locKey = UI_COMMON_TEXT_ERROR_ACCOUNT_DELETE;
 		str="DeleteAccount Err.";
 		break;
 
@@ -4162,11 +4229,11 @@ void UI_LogicDispatcher::handleNetwork(eNetMessageCode message)
 		str="Configurate: ServiceConnect Err";
 		break;
 	case NetRC_Configurate_UnknownName_Err:
-		locKey = UI_COMMON_TEXT_ERROR_ACCOUNT_BAD_NAME;
+		locKey = UI_COMMON_TEXT_ERROR_ACCOUNT_UNKNOWN_NAME;
 		str="Configurate: UnknownName";
 		break;
 	case NetRC_Configurate_IncorrectPassword_Err:
-		locKey = UI_COMMON_TEXT_ERROR_ACCOUNT_BAD_NAME;
+		locKey = UI_COMMON_TEXT_ERROR_ACCOUNT_INCORRECT_PASSWORD;
 		str="Configurate: IncorrectPassword";
 		break;
 	case NetRC_Configurate_AccountLocked_Err:
@@ -4193,19 +4260,19 @@ void UI_LogicDispatcher::handleNetwork(eNetMessageCode message)
 		//setCurrentMission(gameShell->getNetClient()->getCurrentMissionDescription());
 		break;
 	case NetRC_JoinGame_GameSpyPassword_Err:
-		locKey = UI_COMMON_TEXT_ERROR_ACCOUNT_BAD_NAME;
+		locKey = UI_COMMON_TEXT_ERROR_ACCOUNT_INCORRECT_PASSWORD;
 		break;
 	case NetRC_JoinGame_GameSpyConnection_Err:
 	case NetRC_JoinGame_Connection_Err:
-		locKey = UI_COMMON_TEXT_ERROR_CONNECTION;
+		locKey = UI_COMMON_TEXT_ERROR_CONNECTION_GAME;
 		str="Join Game: Connection Error";
 		break;
 	case NetRC_JoinGame_GameIsRun_Err:
-		locKey = UI_COMMON_TEXT_ERROR_CONNECTION;
+		locKey = UI_COMMON_TEXT_ERROR_CONNECTION_GAME_IS_RUN;
 		str="Join Game Connection Error: GameIsRun";
 		break;
 	case NetRC_JoinGame_GameIsFull_Err:
-		locKey = UI_COMMON_TEXT_ERROR_CONNECTION;
+		locKey = UI_COMMON_TEXT_ERROR_CONNECTION_GAME_IS_FULL;
 		str="Join Game Connection Error: GameIsFull";
 		break;
 	case NetRC_JoinGame_GameNotEqualVersion_Err:
@@ -4213,16 +4280,32 @@ void UI_LogicDispatcher::handleNetwork(eNetMessageCode message)
 		str="Join Game Connection Error: GameNotEqualVersion";
 		break;
 
-
 	case NetRC_ReadStats_Ok:
-	case NetRC_ReadStats_Empty:
+	//case NetRC_ReadStats_Empty:
 	case NetRC_WriteStats_Ok:
 	case NetRC_ReadGlobalStats_Ok:
+	case NetRC_LoadInfoFile_Ok:
 		break;
 	case NetRC_ReadStats_Err:
 	case NetRC_WriteStats_Err:
 	case NetRC_ReadGlobalStats_Err:
 		//locKey = UI_COMMON_TEXT_ERROR_UNKNOWN;
+		break;
+	
+	case NetRC_LoadInfoFile_Err:
+		locKey = UI_COMMON_TEXT_ERROR_CONNECTION;
+		str="Read version info failed";
+		break;
+
+	case NetRC_Subscribe2ChatChanel_Ok:
+		getNetCenter().chatSubscribeOK();
+		return;
+	case NetRC_Subscribe2ChatChanel_Err:
+		getNetCenter().chatSubscribeFailed();
+		return;
+
+	case NetMsg_PlayerDisconnected:
+	case NetMsg_PlayerExit:
 		break;
 
 	default:
@@ -4230,24 +4313,32 @@ void UI_LogicDispatcher::handleNetwork(eNetMessageCode message)
 		str="Unknown Message-Error";
 	}
 
-	if(locKey == UI_COMMON_TEXT_LAST_ENUM)
+	switch(locKey){
+	case UI_COMMON_TEXT_LAST_ENUM:
 		getNetCenter().commit(UI_NET_OK);
-	else {
-		if(locKey == UI_COMMON_TEXT_ERROR_DISCONNECT)
-			getNetCenter().commit(UI_NET_SERVER_DISCONNECT);
-		else if(locKey == UI_COMMON_TEXT_ERROR_SESSION_TERMINATE)
-			getNetCenter().commit(UI_NET_TERMINATE_SESSION);
-		else
-			getNetCenter().commit(UI_NET_ERROR);
+		return;
+	case UI_COMMON_TEXT_ERROR_CANT_CONNECT:
+	case UI_COMMON_TEXT_ERROR_DISCONNECT:
+	case UI_COMMON_TEXT_ERROR_DISCONNECT_MULTIPLE_LOGON:
+		getNetCenter().commit(UI_NET_SERVER_DISCONNECT);
+	    break;
+	case UI_COMMON_TEXT_ERROR_SESSION_TERMINATE:
+		getNetCenter().commit(UI_NET_TERMINATE_SESSION);
+		break;
+	default:
+		getNetCenter().commit(UI_NET_ERROR);
+	    break;
+	}
+
 #ifndef _FINAL_VERSION_
 		XBuffer buf;
 		buf < str.c_str() < " (" <= (int)message < ")\n";
-		buf < getLocString(locKey);
+		buf < getLocString(locKey, "NO COMMON LOCTEXT KEY");
 		UI_Dispatcher::instance().messageBox(buf);
 #else
 		UI_Dispatcher::instance().messageBox(getLocString(locKey, "NO MESSAGE"));
 #endif
-	}
+
 }
 
 bool UI_LogicDispatcher::makeDiskOp(UI_DiskOpID id, const char* path, GameType game_type)
@@ -4291,3 +4382,120 @@ bool UI_LogicDispatcher::makeDiskOp(UI_DiskOpID id, const char* path, GameType g
 	return true;
 }
 
+bool UI_LogicDispatcher::parseGameVersion(const char* ptr)
+{
+
+	int hVer = lastCurrentHiVer_;
+	int lVer = lastCurrentLoVer_;
+
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	while(*ptr && *ptr != '\r' && *ptr != '\n' && !isdigit(*ptr))
+		++ptr;
+
+	XBuffer tag;
+	while(*ptr && isdigit(*ptr))
+		tag < *ptr++;
+
+	if(!*ptr || !tag.tell())
+		return false;
+
+	tag < '\0';
+	tag.set(0);
+	tag >= hVer;
+
+	if(*ptr == '.')
+		++ptr;
+
+	tag.init();
+	while(*ptr && isdigit(*ptr))
+		tag < *ptr++;
+
+	if(!*ptr || !tag.tell())
+		return false;
+
+	tag < '\0';
+	tag.set(0);
+	tag >= lVer;
+
+	while(*ptr && *ptr != '\n')
+		++ptr;
+	if(!*ptr)
+		return false;
+	
+	++ptr;
+
+	lastCurrentHiVer_ = hVer;
+	lastCurrentLoVer_ = lVer;
+
+	updateUrls_.clear();
+
+	ComboStrings urls;
+	splitComboList(urls, ptr, '\n');
+
+	if(urls.empty())
+		return false;
+
+	ComboStrings::const_iterator it;
+	FOR_EACH(urls, it){
+		string url;
+		string::const_iterator del = find(it->begin(), it->end(), ':');
+		if(it->end() - del > 10){
+			int langIndex = -1;
+			string lang(it->begin(), del);
+			if(stricmp(lang.c_str(), "ru") == 0)
+				langIndex = UI_COMMON_TEXT_LANG_RUSSIAN;
+			else if(stricmp(lang.c_str(), "en") == 0)
+				langIndex = UI_COMMON_TEXT_LANG_ENGLISH;
+			else if(stricmp(lang.c_str(), "de") == 0)
+				langIndex = UI_COMMON_TEXT_LANG_GERMAN;
+			else if(stricmp(lang.c_str(), "fr") == 0)
+				langIndex = UI_COMMON_TEXT_LANG_FRENCH;
+			else if(stricmp(lang.c_str(), "sp") == 0)
+				langIndex = UI_COMMON_TEXT_LANG_SPANISH;
+			else if(stricmp(lang.c_str(), "it") == 0)
+				langIndex = UI_COMMON_TEXT_LANG_ITALIAN;
+			
+			++del;
+			while(del != url.end() && !isgraph(*del))
+				++del;
+			string url(del, it->end());
+			while(!url.empty() && !isgraph(*(url.end()-1)))
+				url.pop_back();
+
+			if(url.size() < 10)
+				continue;
+
+			updateUrls_.push_back(make_pair(langIndex, url));
+		}
+	}
+	return !updateUrls_.empty();
+}
+
+bool UI_LogicDispatcher::checkNeedUpdate() const
+{
+	return lastCurrentHiVer_ > UI_Dispatcher::instance().gameMajorVersion()
+		|| lastCurrentLoVer_ > UI_Dispatcher::instance().gameMinorVersion();
+}
+
+void UI_LogicDispatcher::openUpdateUrl() const
+{
+	if(updateUrls_.empty())
+		return;
+
+	int lang = GameOptions::instance().getTranslate();
+	string url;
+
+	UpdateUrls::const_iterator it;
+	FOR_EACH(updateUrls_, it)
+		if(it->first == lang){
+			url = it->second;
+			break;
+		}
+		else if(it->first == -1)
+			url = it->second;
+
+	if(url.empty())
+		return;
+
+	ShellExecute(0, "open", url.c_str(), 0, 0, SW_SHOWNORMAL);
+}

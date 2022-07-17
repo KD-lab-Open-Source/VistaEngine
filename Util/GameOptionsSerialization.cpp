@@ -8,6 +8,8 @@
 #include "TextDB.h"
 #include "VideoMemoryInformation.h"
 
+// коммент не удалять!  нужно для перевода: _VISTA_ENGINE_EXTERNAL_
+
 bool isUnderEditor();
 
 WRAP_LIBRARY(GameOptions, "GameOptions", "Игровые опции", (isUnderEditor() ? "Scripts\\Content\\GameOptionsEditor" : "Scripts\\Content\\GameOptions"), 0, false);
@@ -132,7 +134,7 @@ GameOptions::GameOptions()
 
 	gameOptionPrms_[OPTION_SHOW_HINTS]				.set(GAME,		TYPE_BOOL);
 	gameOptionPrms_[OPTION_SHOW_MESSAGES]			.set(GAME,		TYPE_BOOL);
-	gameOptionPrms_[OPTION_FOG_OF_WAR]				.set(GAME,		TYPE_BOOL);
+	gameOptionPrms_[OPTION_FOG_OF_WAR]				.set(SYSTEM,	TYPE_BOOL);
 
 	gameOptionPrms_[OPTION_DEBUG_WINDOW]			.set(SYSTEM,	TYPE_BOOL);
 
@@ -241,6 +243,11 @@ void GameOptions::setTranslate()
 	buf.init();
 	buf < GET_LOC_STR(UI_COMMON_TEXT_HIGH_QA) < "|" < GET_LOC_STR(UI_COMMON_TEXT_LOW_QA);
 	gameOptionPrms_[OPTION_TILEMAP_TYPE_NORMAL].setTranslate(buf);
+}
+
+UI_CommonLocText GameOptions::getTranslate() const
+{
+	return locDataFolders_[getInt(OPTION_LANGUAGE)].second;
 }
 
 void GameOptions::filterBaseGraphOptions()

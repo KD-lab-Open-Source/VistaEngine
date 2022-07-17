@@ -8,6 +8,8 @@
 #include "SkyObject.h"
 #include "FileUtils.h"
 
+// _VISTA_ENGINE_EXTERNAL - переводить для external-редактора
+
 /*
   О листопаде.
   1) Необходимо регистрировать и удалять объекты (с lock для многопоточности).
@@ -327,6 +329,8 @@ void cFallLeaves::serializeForModel(Archive& ar, const char* modelName)
 				updateObjectTexture(objects[i]);
 	}
 }
+
+// _VISTA_ENGINE_EXTERNAL_ - переводить для external-редактора
 
 void cFallLeaves::serialize(Archive& ar)
 {

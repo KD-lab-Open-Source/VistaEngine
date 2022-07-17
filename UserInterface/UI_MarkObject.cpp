@@ -152,6 +152,7 @@ void UI_MarkObject::clear()
 	type_ = UI_MARK_TYPE_DEFAULT;
 	attribute_ = 0;
 	owner_ = 0;
+	target_ = 0;
 }
 
 bool UI_MarkObject::update(const UI_MarkObjectInfo& inf)
@@ -165,8 +166,8 @@ bool UI_MarkObject::update(const UI_MarkObjectInfo& inf)
 
 	target_ = inf.target();
 
-	if(target_)
-		setPose(Se3f(QuatF::ID, target_->interpolatedPose().trans()), true);
+	if(const UnitInterface* target = target_)
+		setPose(Se3f(QuatF::ID, target->interpolatedPose().trans()), true);
 	else
 		setPose(inf.pose(), true);
 
@@ -223,8 +224,8 @@ bool UI_MarkObject::quant(float dt)
 
 	xassert(attribute_);
 
-	if(target_){
-		Se3f pos = Se3f(QuatF::ID, target_->interpolatedPose().trans());
+	if(const UnitInterface* target = target_){
+		Se3f pos = Se3f(QuatF::ID, target->interpolatedPose().trans());
 		setPose(pos, false);
 	}
 

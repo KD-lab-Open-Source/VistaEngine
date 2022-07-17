@@ -277,6 +277,9 @@
 				RelativePath=".\Util\ObjStatistic.h">
 			</File>
 			<File
+				RelativePath=".\Util\ProcessEnumeration.cpp">
+			</File>
+			<File
 				RelativePath=".\Util\ProTool.h">
 			</File>
 			<File

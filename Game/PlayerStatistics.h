@@ -1,9 +1,9 @@
 #ifndef __PLAYER_STATISTICS_H__
 #define __PLAYER_STATISTICS_H__
-#include "DebugUtil.h"
 
 class Player;
 class UnitBase;
+class Scores;
 class Event;
 struct RatingFactors;
 
@@ -56,8 +56,8 @@ class PlayerStatistics
 public:
 	PlayerStatistics();
 
-	void set();
-	void get() const;
+	void set(const Scores& scores);
+	void get(Scores& scores) const;
 
 	int operator[](StatisticType type) const;
 	void registerEvent(const Event& event, Player* player);
@@ -65,16 +65,12 @@ public:
 	void serialize(Archive& ar);
 
 	void showDebugInfo();
-	void writeWorldInfo(const char* title);
 
 private:
-	void outLogOut(const Player* player, const UnitBase* unit, StatisticType stType);
 
 	int statistics_[STAT_LAST_ENUM];
 	bool finalized_;
 	
-	static LogStream outLogStat;
-	static string title_;
 };
 
 #endif /* __PLAYER_STATISTICS_H__ */

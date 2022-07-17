@@ -2027,7 +2027,10 @@ bool TerToolTorpedo::quant()
 		if(round(Vect2f(position.trans()).distance2(prevPosInds)) >  sqr(radius+TILE_ADDON_SIZE)){
 			int xi=round(prevPosInds.x);
 			int yi=round(prevPosInds.y);
-			vMap.setInds(xi, yi, radius);
+			if(setingIndsMetod==SIM_SetInds)
+                vMap.setInds(xi, yi, radius);
+			else if(setingIndsMetod==SIM_UnSetInds)
+                vMap.setInds(xi, yi, radius, true);
 			vMap.recalcArea2Grid(xi-radius, yi-radius, xi+radius, yi+radius);
 			prevPosInds=Vect2f(position.trans());
 		}

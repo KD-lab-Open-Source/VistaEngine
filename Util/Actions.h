@@ -1167,7 +1167,12 @@ public:
 	void activate();
 };
 
-// UI actions
+/// выход из игры
+class ActionGameUpdateOpen : public Action 
+{
+public:
+	void activate();
+};
 
 struct ActionSetInterface : Action // ¬ключить/выключить интерфейс
 {
@@ -1316,6 +1321,14 @@ public:
 
 private:
 	bool paused_;
+};
+
+/// logoff из online
+class ActionOnlineLogout : public Action
+{
+public:
+
+	void activate();
 };
 
 /// старт сетевой игры
@@ -1623,5 +1636,16 @@ private:
 	SwitchMode switchMode;
 };
 
+class ActionReadPlayerParameters : public Action
+{
+public: 
+	void activate();
+};
+
+class ActionWritePlayerParameters : public Action
+{
+public:
+	void activate();
+};
 
 #endif //__ACTIONS_H__

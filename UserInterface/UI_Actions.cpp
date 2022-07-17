@@ -36,6 +36,8 @@ UI_ActionDataFactory::UI_ActionDataFactory()
 	add<UI_ActionDataAction>(UI_ACTION_QUICK_START_FILTER_RACE);
 	add<UI_ActionDataAction>(UI_ACTION_QUICK_START_FILTER_POPULATION);
 	add<UI_ActionDataSaveGameList>(UI_ACTION_BIND_SAVE_LIST);
+	add<UI_ActionDataFull>(UI_ACTION_LAN_CHAT_CHANNEL_LIST);
+	add<UI_ActionDataAction>(UI_ACTION_LAN_CHAT_CHANNEL_ENTER);
 	add<UI_ActionDataUpdate>(UI_ACTION_LAN_CHAT_USER_LIST);
 	add<UI_ActionDataHostList>(UI_ACTION_LAN_GAME_LIST);
 	add<UI_ActionDataAction>(UI_ACTION_LAN_DISCONNECT_SERVER);
@@ -115,10 +117,12 @@ UI_ActionDataFactory::UI_ActionDataFactory()
 	add<UI_ActionDataFull>(UI_ACTION_MINIMAP_ROTATION);
 	add<UI_ActionDataUpdate>(UI_ACTION_SHOW_TIME);
 	add<UI_ActionDataUpdate>(UI_ACTION_SHOW_COUNT_DOWN_TIMER);
+	add<UI_ActionDataUpdate>(UI_ACTION_INET_NAT_TYPE);
 	add<UI_ActionDataAction>(UI_ACTION_INET_CREATE_ACCOUNT);
 	add<UI_ActionDataAction>(UI_ACTION_INET_CHANGE_PASSWORD);
 	add<UI_ActionDataAction>(UI_ACTION_INET_LOGIN);
 	add<UI_ActionDataAction>(UI_ACTION_INET_QUICK_START);
+	add<UI_ActionDataAction>(UI_ACTION_INET_REFRESH_GAME_LIST);
 	add<UI_ActionDataFull>(UI_ACTION_LAN_CREATE_GAME);
 	add<UI_ActionDataFull>(UI_ACTION_LAN_JOIN_GAME);
 	add<UI_ActionDataAction>(UI_ACTION_INET_DELETE_ACCOUNT);
@@ -255,7 +259,8 @@ void UI_ActionDataHostList::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(gameListInfoType_, "gameListInfoType", "Выводимая информация");
+	ar.serialize(format_, "showGameListFormat", "Столбцы информации об играх");
+	ar.serialize(startedGameColor_, "startedGameColor", "Цвет строчки с запущенной игрой");
 }
 
 

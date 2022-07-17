@@ -177,6 +177,8 @@ protected:
 
 private:
 	bool waitingInput_;
+	/// может пересекаться с хоткеями на кнопках
+	bool compatible_;
 	
 	sKey key_;
 	sKey saveKey_;

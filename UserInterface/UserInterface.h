@@ -156,6 +156,9 @@ public:
 
 	bool autoConfirmDiskOp() const { return autoConfirmDiskOp_; }
 
+	int gameMajorVersion() const { return 1; }
+	int gameMinorVersion() const { return 1; }
+
 private:
 
 	UI_Screen* currentScreen_;

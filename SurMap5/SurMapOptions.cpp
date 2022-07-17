@@ -13,6 +13,8 @@
 #include "EditArchive.h"
 // ^^^
 
+// коммент не удалять!  нужно для перевода: _VISTA_ENGINE_EXTERNAL_
+
 const char* SurMapOptions::configFile = ".\\UserInterface.cfg";
 SurMapOptions surMapOptions;
 

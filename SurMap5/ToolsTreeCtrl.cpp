@@ -33,6 +33,8 @@
 
 #include <algorithm>
 
+// коммент не удалять!  нужно для перевода: _VISTA_ENGINE_EXTERNAL_
+
 BEGIN_MESSAGE_MAP(CToolsTreeCtrl, CTreeCtrl)
 	ON_NOTIFY_REFLECT(TVN_SELCHANGED, OnTvnSelchanged)
 	ON_WM_CREATE()

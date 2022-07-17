@@ -3,6 +3,8 @@
 #include "Serialization.h"
 #include "RangedWrapper.h"
 
+// коммент не удалять!  нужно для перевода: _VISTA_ENGINE_EXTERNAL_
+
 EnvironmentAttributes::EnvironmentAttributes()
 {
 	fogOfWarColor_.set(0, 0, 0, 200);

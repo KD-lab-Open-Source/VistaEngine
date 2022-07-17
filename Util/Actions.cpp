@@ -61,6 +61,8 @@ REGISTER_CLASS(Action, ActionDelay, "Глобальные действия\\Задержка времени")
 REGISTER_CLASS(Action, ActionRestartTriggers, "Глобальные действия\\Сделать неактивными все стрелки триггера")
 REGISTER_CLASS(Action, ActionExitFromMission, "Глобальные действия\\Выход из миссии")
 REGISTER_CLASS(Action, ActionGameQuit, "Глобальные действия\\Выход из игры")
+REGISTER_CLASS(Action, ActionOnlineLogout, "Глобальные действия\\Выход из online (logout)")
+REGISTER_CLASS(Action, ActionGameUpdateOpen, "Глобальные действия\\Открыть страницу для загрузки обновления")
 REGISTER_CLASS(Action, ActionShowReel, "Глобальные действия\\Показать ролик")
 REGISTER_CLASS(Action, ActionShowLogoReel, "Глобальные действия\\Показать программный ролик")
 REGISTER_CLASS(Action, ActionStartMission, "Глобальные действия\\Запустить миссию")
@@ -72,6 +74,8 @@ REGISTER_CLASS(Action, ActionSetPlayerDefeat, "Глобальные действия\\Считать игро
 REGISTER_CLASS(Action, ActionSetInt, "Глобальные действия\\Установка целочисленной переменной")
 REGISTER_CLASS(Action, ActionSetSignalVariable, "Глобальные действия\\Сигнальная переменная");
 REGISTER_CLASS(Action, ActionSetCutScene, "Глобальные действия\\Включить/выключить кат-сцену (убирает игровую информацию)");
+REGISTER_CLASS(Action, ActionReadPlayerParameters, "Глобальные действия\\Прочитать параметры профиля");
+REGISTER_CLASS(Action, ActionWritePlayerParameters, "Глобальные действия\\Записать параметры профиля");
 
 REGISTER_CLASS(Action, ActionUpgradeUnit, "Контекстные действия\\Апгрейд юнита определенного типа")
 REGISTER_CLASS(Action, ActionAttackLabel, "Контекстные действия\\Атаковать метку на мире")
@@ -279,6 +283,11 @@ void ActionEnableMessage::serialize(Archive& ar)
 	__super::serialize(ar);
 	ar.serialize(messageType_, "messageType", "Тип сообщения");
 	ar.serialize(mode_, "mode", "Действие");
+}
+
+void ActionGameUpdateOpen::activate()
+{
+	UI_LogicDispatcher::instance().openUpdateUrl();
 }
 
 void fCommandSwitchPlayer(XBuffer& stream)
@@ -605,13 +614,16 @@ bool ActionSoundMessage::automaticCondition() const
 	if(!__super::automaticCondition())
 		return false;
 
-	if(!SNDIsSoundEnabled() || !soundReference || soundReference->is3D() || (!aiPlayer().active() && !aiPlayer().isWorld()))
+	if(!soundReference || soundReference->is3D() || (!aiPlayer().active() && !aiPlayer().isWorld()))
 		return false;
 	return true;
 }
 
 void ActionSoundMessage::activate() 
 {
+	if(!SNDIsSoundEnabled())
+		return;
+
 	switch(switchMode_)
 	{
 	case ON:
@@ -5005,4 +5017,23 @@ void ActionSetCutScene::serialize(Archive& ar)
 	ar.serialize(switchMode, "switchMode", "Режим");
 }
 
+void ActionReadPlayerParameters::activate()
+{
+	if(aiPlayer().active()){
+		ParameterSet resource = aiPlayer().resource();
+		resource.mask(GlobalAttributes::instance().profileParameters);
+		aiPlayer().subResource(resource);
+		aiPlayer().addResource(universe()->currentProfileParameters(), false);
+	}
+}
 
+void ActionWritePlayerParameters::activate()
+{
+	if(aiPlayer().active()){
+		ParameterSet resource = GlobalAttributes::instance().profileParameters;
+		resource.set(0);
+		resource += aiPlayer().resource();
+		resource.mask(GlobalAttributes::instance().profileParameters);
+		universe()->currentProfileParameters() = resource;
+	}
+}

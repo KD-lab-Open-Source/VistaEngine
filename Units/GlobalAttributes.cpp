@@ -389,6 +389,7 @@ void GlobalAttributes::serializeGameScenario(Archive& ar)
 
 	ar.serialize(circleManagerDrawOrder, "circleManagerDrawOrder", "Момент отрисовки селектов юнитов");
 	ar.serialize(cheatTypeSpeed, "cheatTypeSpeed", "Минимальная скорость ввода читов, знаков в минуту");
+	ar.serialize(profileParameters, "profileParameters", "Типы параметров, которые будут сохраняться в профиле (используется только тип)");
 }
 
 void GlobalAttributes::serialize(Archive& ar) 

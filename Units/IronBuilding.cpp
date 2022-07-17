@@ -360,8 +360,10 @@ bool UnitBuilding::addResourceToBuild(const ParameterSet& resource)
 
 	if(!isConstructed()){
 		if(buildConsumer_.addQuant(resource, constructionsSpeedFactor())){
-			if(buildingStatus() & ~BUILDING_STATUS_UPGRADING)
+			if(buildingStatus() & ~BUILDING_STATUS_UPGRADING){
 				player()->checkEvent(EventUnitPlayer(Event::COMPLETE_BUILDING, this, player()));
+				setRegisteredInPlayerStatistics(true);
+			}
 			setBuildingStatus((buildingStatus() | BUILDING_STATUS_CONSTRUCTED) & ~BUILDING_STATUS_UPGRADING);
 			setUpgradeProgresParameters();
 			parameters_ = parametersMax();

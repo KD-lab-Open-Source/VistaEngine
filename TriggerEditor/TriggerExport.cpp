@@ -150,6 +150,21 @@ Trigger::Trigger()
 
 void Trigger::serialize(Archive& ar) 
 {
+	if(ar.isOutput()){ // CONVERSION 19.02.07
+		for(OutcomingLinksList::iterator i = outcomingLinks_.begin(); i != outcomingLinks_.end();){
+			bool found = false;
+			for(OutcomingLinksList::iterator j = i + 1; j != outcomingLinks_.end(); j++)
+				if(!strcmp(i->triggerName(), j->triggerName())){
+					found = true;
+					break;
+				}
+				if(found)
+					i = outcomingLinks_.erase(i);
+				else
+					++i;
+		}
+	}
+
 	ar.serialize(name_, "name", "&Имя");
 	ar.serialize(unitsPerQuant_, "unitsPerQuant", "Обрабатывать юнитов за квант");
 	ar.serialize(extendedScan_, "extendedScan", "Расширенное сканирование контекста");
@@ -167,7 +182,7 @@ void Trigger::serialize(Archive& ar)
 		
 	ar.serialize(cellIndex_, "cellIndex", 0);
 	ar.serialize(boundingRect_, "boundingRect", 0);
-	if (ar.isInput() && action){
+	if(ar.isInput() && action){
 		isContext_ = action->isContext();
 		if(condition)
 			isContext_ |= condition->isContext();

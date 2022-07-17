@@ -314,26 +314,12 @@ LErrorReturn:
 
 
 			m_hostUNID=UNetID(pHostMigrateMsg->dpnidNewHost);
-            if( m_hostUNID == m_localUNID ){//Host Я
-				{
-/*					if(universe() ){
-						universe()->stopGame_HostMigrate();//Очистка всех команд текущего кванта
-					}
-					flag_SkipProcessingGameCommand=1;
-					m_DPPacketList.clear();
-*/				}
-				ExecuteInternalCommand(PNC_COMMAND__STOP_GAME_AND_ASSIGN_HOST_2_MY, false);
-			}
-			else { // Host не Я
-				{
-/*					if(universe() ){
-						universe()->stopGame_HostMigrate();//Очистка всех команд текущего кванта
-					}
-					flag_SkipProcessingGameCommand=1;
-					m_DPPacketList.clear();
-*/				}
-				ExecuteInternalCommand(PNC_COMMAND__STOP_GAME_AND_WAIT_ASSIGN_OTHER_HOST, false);
-			}
+			//if( m_hostUNID == m_localUNID )//Host Я
+			//	ExecuteInternalCommand(PNC_COMMAND__STOP_GAME_AND_ASSIGN_HOST_2_MY, false);
+			//else  // Host не Я
+			//	ExecuteInternalCommand(PNC_COMMAND__STOP_GAME_AND_WAIT_ASSIGN_OTHER_HOST, false);
+			ExecuteInternalCommand(PNC_COMMAND__STOP_GAME_AND_MIGRATION_HOST, false);
+
 			///NetHandlerProc(pHostMigrateMsg->dpnidNewHost, msg);
             break;
         }

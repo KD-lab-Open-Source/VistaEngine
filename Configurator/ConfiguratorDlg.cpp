@@ -39,6 +39,9 @@ END_MESSAGE_MAP()
 
 // ---------------------------------------------------------------------------
 
+#pragma warning(push)
+#pragma warning(4355: disable)
+
 CConfiguratorDlg::CConfiguratorDlg(CWnd* pParent)
 : CDialog(CConfiguratorDlg::IDD, pParent)
 , layout_(new LayoutWindow(this))
@@ -187,3 +190,5 @@ void CConfiguratorDlg::onConfigChanged()
 	TranslationManager::instance().setLanguage(GameOptions::instance().getLanguage());
     updateControlsLanguage();
 }
+
+#pragma warning(pop)

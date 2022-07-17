@@ -34,6 +34,8 @@
 #include "mfc\ObjectsTreeCtrl.h"
 #include "mfc\PopupMenu.h"
 
+// коммент не удалять!  нужно для перевода: _VISTA_ENGINE_EXTERNAL_
+
 typedef CObjectsTreeCtrl::ItemType ItemType;
 
 //////////////////////////////////////////////////////////////////////////////

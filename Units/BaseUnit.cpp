@@ -106,6 +106,9 @@ void UnitBase::setPlayer(Player* player)
 void UnitBase::serialize(Archive& ar) 
 {
 	BaseUniverseObject::serialize(ar);
+	
+	if(dead())
+		alive_ = false;
 
 	ar.serialize(pose_, "pose", 0);
 	ar.serialize(abnormalStates_, "anbormalStates", 0);

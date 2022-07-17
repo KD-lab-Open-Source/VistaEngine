@@ -3,7 +3,8 @@
 #include "Serialization\Serialization.h"
 
 
-const char* toHex(unsigned char byte)
+const char* toHex(unsigned char byte);
+/*
 {
 	static char char_values[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 	static char byteBuf[3];
@@ -12,6 +13,7 @@ const char* toHex(unsigned char byte)
 	byteBuf[2] = '\0';
 	return byteBuf;
 }
+*/
 
 const char* sKey::vk_table_[]  = {
 	"", "LB", "RB", "Cancel", "MB", "", "", "", "Backspace", "Tab", "", "", "Clear", "Enter", "", "", //0x00 - 0x0F
@@ -32,7 +34,7 @@ const char* sKey::vk_table_[]  = {
 		"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "WakeUp" //0xF0 - 0xFF
 };
 
-sKey::sKey(int _fullkey, bool checkAsyncState)
+/*sKey::sKey(int _fullkey, bool checkAsyncState)
 {
 	fullkey = _fullkey;
 	if(key == VK_CONTROL) 
@@ -60,6 +62,7 @@ bool sKey::serialize(Archive& ar, const char* name, const char* nameAlt)
 	else
 		return ar.serialize(fullkey, name, nameAlt);
 }
+*/
 
 string sKey::toString(bool compact) const
 {

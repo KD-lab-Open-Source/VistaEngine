@@ -1,13 +1,11 @@
 #ifndef __P2P_INTERFACEAUX_H__
 #define __P2P_INTERFACEAUX_H__
 
-//#include "CommonEvents.h"//убрать перенеся SIMPLE_GAME_CURRENT_VERSION сюда!
-
 #include "crc.h"
 
 #include "..\version.h" 
 const char SIMPLE_GAME_CURRENT_VERSION[]= MULTIPLAYER_VERSION;
-extern const unsigned int INTERNAL_BUILD_VERSION;
+//extern const unsigned int INTERNAL_BUILD_VERSION;
 
 
 struct sDigitalGameVersion {

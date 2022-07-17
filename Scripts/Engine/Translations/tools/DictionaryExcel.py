@@ -164,6 +164,144 @@ def importSingleXLS(languageManager, fileName, progressCallback):
         else:
             pass
 
+def importSingleSheetXLS(languageManager, fileName, progressCallback):
+
+    e = Excel()
+    print "Importing " + fileName
+    e.open(fileName)
+
+    langs = languageManager.languages()
+    
+    keyColumn = 0
+    column = 1
+
+    def readValue(pos):
+        text = e.getCellText(pos)
+        if not text is None:
+            if text != "":
+                text = strFromExcel(text).replace(u"\n", u"\\n")
+                return text
+
+    while True:
+        languageName = e.getCellText((column, 0))
+        if languageName == u"":
+            break
+
+        lang = languageManager.languageByName(languageName)
+        if lang is None:
+            print "Warning! Unknown language!"
+            break
+
+        translated = []
+        untranslated = []
+
+        row = 2
+        last_row = e.usedRange()[1]
+
+        print "last_row = %i\n" % last_row
+
+        while row < last_row:
+            key = readValue((keyColumn, row))
+            value = readValue((column, row))
+
+            if not key is None and key != u"":
+                if value is None:
+                    value = u""
+                if key in lang.values_:
+                    lang.values_[key] = value
+                else:
+                    lang.unusedValues_[key] = value
+
+            row += 1
+            if row % 10 == 0:
+                progressCallback(float(row) / float(last_row))
+
+        column += 1
+
+
+def exportSingleSheetXLS(languageManager, progressCallback):
+    e = Excel()
+    e.newWorkbook()
+
+    langs = languageManager.languages()
+
+    count =  len(langs[0].items()) # * len(langs)
+    index = 0
+    column = 0
+
+    def writeLanguage(lang, keys, keyLanguage, column):
+        e.setColumnWidth(0, 56)
+        e.setCellText((column, 0), lang.name())
+        e.setCellText((column, 1), lang.codepage())
+        e.setColumnWidth(column, 56)
+
+        pos = (column, 2)
+
+        index = 0
+
+        for key in keys:
+            pos = (pos[0], pos[1] + 1)
+
+            if keyLanguage:
+                e.setCellText(pos, key)
+            else:
+                value = lang.values_.get(key, u"")
+                e.setCellText(pos, value)
+
+            if index % 10 == 0:
+                progressCallback(float(index) / float(count))
+            index += 1
+
+        #for pair in untranslated.items():
+        #    (key, value) = pair
+
+        #    pos = (pos[0], pos[1] + 1)
+        #    if keyLanguage:
+        #        e.setCellText(pos, key)
+        #    else:
+        #        e.setCellText(pos, value)
+        #    if index % 10 == 0:
+        #        progressCallback(float(index) / float(count))
+        #    index += 1 
+
+        #for key in keys:
+        #    value = translated.get(key, None)
+        #    if not value is None:
+        #        pos = (pos[0], pos[1] + 1)
+        #        if keyLanguage:
+        #            e.setCellText(pos, key)
+        #        else:
+        #            e.setCellText(pos, value)
+        #    if index % 10 == 0:
+        #        progressCallback(float(index) / float(count))
+        #    index += 1 
+
+    keys = []
+
+    for lang in langs:
+        mainLanguage = lang.useFallback_ == False
+        keyLanguage = lang.name() == languageManager.keyLanguage().name()
+        if mainLanguage:
+            keys = lang.values_.keys()
+            writeLanguage(lang, keys, mainLanguage, column)
+            column += 1
+
+    for lang in langs:
+        mainLanguage = lang.useFallback_ == False
+        keyLanguage = lang.name() == languageManager.keyLanguage().name()
+        if keyLanguage and not mainLanguage:
+            writeLanguage(lang, keys, mainLanguage, column)
+            column += 1
+
+    for lang in langs:
+        keyLanguage = lang.name() == languageManager.keyLanguage().name()
+        if not keyLanguage and not mainLanguage:
+            writeLanguage(lang, keys, mainLanguage, column)
+            column += 1
+
+    e.show()
+
+
 def exportSingleXLS(languageManager, progressCallback):
 
     e = Excel()

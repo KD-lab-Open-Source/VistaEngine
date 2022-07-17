@@ -7,6 +7,8 @@
 #include "GlobalAttributes.h"
 #include "EditorVisual.h"
 
+// _VISTA_ENGINE_EXTERNAL_ - нужно для переврода external-версии
+
 UnitEnvironment::UnitEnvironment(const UnitTemplate& data)
 : UnitBase(data)
 {

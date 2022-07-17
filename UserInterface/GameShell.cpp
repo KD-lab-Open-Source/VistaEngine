@@ -90,6 +90,8 @@ const char* COMMAND_LINE_PLAY_REEL="reel";
 const char* COMMAND_LINE_DW_HOST="dwhost";
 const char* COMMAND_LINE_DW_CLIENT="dwclient";
 
+//Scores scoresArray_[NETWORK_PLAYERS_MAX];
+
 void abortWithMessage(const string& messageID) 
 {
 	FinitSound();
@@ -375,7 +377,7 @@ void GameShell::startMPWithoutInterface(const char* missionName)
 		else {
 			getNetClient()->JoinGame(ipstr.c_str(), playerName.c_str(), Race(), 1, "");
 		}
-		while(getNetClient()->getCurrentMissionDescription().playersAmount() < 1){ //Hint-овая проверка на то, что подключились
+		while(getNetClient()->getCurrentMissionDescription().playersAmount() < 1){ //Hint-пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			getNetClient()->quant_th1();
 			::Sleep(40);
 		}
@@ -423,7 +425,7 @@ void GameShell::startDWMPWithoutInterface(const char* missionName)
 		else {
 			getNetClient()->JoinGame(ipstr.c_str(), playerName, Race(), 1, "");
 		}
-		while(getNetClient()->getCurrentMissionDescription().playersAmount() < 1){ //Hint-овая проверка на то, что подключились
+		while(getNetClient()->getCurrentMissionDescription().playersAmount() < 1){ //Hint-пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			getNetClient()->quant_th1();
 			::Sleep(40);
 		}
@@ -637,12 +639,19 @@ void GameShell::GameStart(const MissionDescription& mission)
 	ratingDelta_ = 0;
 	if(NetClient && CurrentMission.isMultiPlayer() && isNetClientConfigured(PNCWM_ONLINE_DW) && currentMissionPopulation_ >= 0){
 		sendStatsTimer_.start(2*60000);
+		/*
+		static Scores scores;
+		scores = Scores();
+		scores.setTotalConnections(1);
 		PlayerVect::iterator pi;
 		FOR_EACH(universe()->Players, pi){
 			if((*pi)->realPlayerType() == REAL_PLAYER_TYPE_PLAYER && (*pi)->auxPlayerType() == AUX_PLAYER_TYPE_ORDINARY_PLAYER){
 				xassert((*pi)->playerID() < NETWORK_PLAYERS_MAX);
+				Scores* scores = &scoresArray_[(*pi)->playerID()];
+				*scores = Scores();
 			}
 		}
+		*/
 	}
 
 	frame_time.skip();
@@ -675,7 +684,7 @@ void GameShell::GameClose()
 
 	//SNDSetFade(false,1000);
 	SNDStopAll();
-	SNDSetFade(false,0); // после того как появится поток для загрузки вернуть значение времени
+	SNDSetFade(false,0); // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	SNDSetGameActive(false);
 	UI_LogicDispatcher::instance().setCursor(UI_GlobalAttributes::instance().cursor(UI_CURSOR_WAITING));
 	UI_LogicDispatcher::instance().profileSystem().saveState();
@@ -718,7 +727,41 @@ void GameShell::GameClose()
 
 void GameShell::sendStats(bool final, bool win)
 {
+	if(isNetClientConfigured(PNCWM_ONLINE_DW) && currentMissionPopulation_ >= 0){
+		Player* activePlayer = universe()->activePlayer();
+		/*
+		const Scores& myScores = scoresArray_[activePlayer->playerID()];
+		double Rme = myScores.getTotalRating();
+		double W = 1;
+		double K = 20;
+		PlayerVect::iterator pi;
+		FOR_EACH(universe()->Players, pi){
+			if((*pi)->realPlayerType() == REAL_PLAYER_TYPE_PLAYER && (*pi)->auxPlayerType() == AUX_PLAYER_TYPE_ORDINARY_PLAYER && (*pi)->clan() != activePlayer->clan()){
+				double Rx = scoresArray_[(*pi)->playerID()].getTotalRating();
+				W += pow(10., clamp((Rx - Rme)/K, -100., 100.));
+			}
+		}
+		W = 1./W;
+		double factor = 2./sqrt(Rme + 1.);
 
+		static Scores scoresPre, scoresFinal;
+		Scores& scores = final ? scoresFinal : scoresPre;
+		scores = Scores();
+		if(final){
+			universe()->activePlayer()->playerStatistics().get(scores);
+			scores.setTotalRating((win ? 1. - W : -W)*factor);
+			scores.setTotalRatingDelta(-ratingDelta_);
+		}
+		else{
+			double deltaPrev = myScores.getTotalRatingDelta();
+			scores.setTotalRating(deltaPrev);
+			scores.setTotalRatingDelta(-deltaPrev + (ratingDelta_ = -W*factor));
+		}
+		if(myScores.getTotalRating() + scores.getTotalRating() < 0)
+			scores.setTotalRating(-myScores.getTotalRating());
+		scores.setRating(round(myScores.getTotalRating() + scores.getTotalRating()) - myScores.getRating());
+		*/
+	}
 }
 
 bool GameShell::universalSave(const char* name, bool userSave)
@@ -979,7 +1022,7 @@ void GameShell::GraphQuant()
 		if(terminateMission_ && UI_Dispatcher::instance().canExit())
 			HTManager::instance()->GameClose();	
 	}
-	else{ // MainMenu, только графический поток
+	else{ // MainMenu, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		tls_is_graph = MT_GRAPH_THREAD | MT_LOGIC_THREAD;
 
 		interpolation_timer_ += scale_time.delta();
@@ -1131,7 +1174,7 @@ void GameShell::Show(float realGraphDT)
 
 		environment->graphQuant(realGraphDT);
 
-		cameraManager->GetCamera()->SetAttr(ATTRCAMERA_CLEARZBUFFER);//Потому как в небе могут рисоваться планеты в z buffer.
+		cameraManager->GetCamera()->SetAttr(ATTRCAMERA_CLEARZBUFFER);//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ z buffer.
 		terScene->Draw(cameraManager->GetCamera());
 
 		environment->drawPostEffects(realGraphDT);
@@ -1511,7 +1554,7 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 			Player* player = universe()->activePlayer();
 			if(isShiftPressed()){
 				XBuffer nameAlt;
-				nameAlt < "Игрок (0-" <= universe()->Players.size() - 1 < ")";
+				nameAlt < "пїЅпїЅпїЅпїЅпїЅ (0-" <= universe()->Players.size() - 1 < ")";
 				int playerID = player->playerID();
 				EditArchive ea(0, TreeControlSetup(0, 0, 500, 300, "Scripts\\TreeControlSetups\\chooseTrigger"));
 				static_cast<EditOArchive&>(ea).serialize(playerID,"playerID", nameAlt);
@@ -1624,15 +1667,15 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 			static int number = 1;
 			static bool inTheSameSquad = false;
 			EditArchive ea(0, TreeControlSetup(0, 0, 500, 300, "Scripts\\TreeControlSetups\\createUnit"));
-			static_cast<EditOArchive&>(ea).serialize(attr,"Unit","Юнит");
-			static_cast<EditOArchive&>(ea).serialize(playerID,"playerID","Игрок");
-			static_cast<EditOArchive&>(ea).serialize(number,"number","Количество");
-			static_cast<EditOArchive&>(ea).serialize(inTheSameSquad,"inTheSameSquad","В одном скваде");
+			static_cast<EditOArchive&>(ea).serialize(attr,"Unit","пїЅпїЅпїЅпїЅ");
+			static_cast<EditOArchive&>(ea).serialize(playerID,"playerID","пїЅпїЅпїЅпїЅпїЅ");
+			static_cast<EditOArchive&>(ea).serialize(number,"number","пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			static_cast<EditOArchive&>(ea).serialize(inTheSameSquad,"inTheSameSquad","пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 			if(ea.edit()){
-				static_cast<EditIArchive&>(ea).serialize(attr,"Unit","Юнит");
-				static_cast<EditIArchive&>(ea).serialize(playerID,"playerID","Игрок");
-				static_cast<EditIArchive&>(ea).serialize(number,"number","Количество");
-				static_cast<EditIArchive&>(ea).serialize(inTheSameSquad,"inTheSameSquad","В одном скваде");
+				static_cast<EditIArchive&>(ea).serialize(attr,"Unit","пїЅпїЅпїЅпїЅ");
+				static_cast<EditIArchive&>(ea).serialize(playerID,"playerID","пїЅпїЅпїЅпїЅпїЅ");
+				static_cast<EditIArchive&>(ea).serialize(number,"number","пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				static_cast<EditIArchive&>(ea).serialize(inTheSameSquad,"inTheSameSquad","пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 				playerID = clamp(playerID, 0, universe()->Players.size()-1);
 				UnitSquad* squad = 0;
 				if(attr){
@@ -1674,7 +1717,7 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 			return false;
 	}
 
-	// Конфликтующие клавиши
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	switch(Key.fullkey){
 	case 'D':
 		if(selectManager)
@@ -1792,11 +1835,6 @@ void GameShell::ControlPressed(int key)
 			GameOptions::instance().setOption(OPTION_SOUND_ENABLE, !terSoundEnable);
 			GameOptions::instance().userApply(true);
 			UI_LogicDispatcher::instance().handleMessageReInitGameOptions();
-			break;
-
-		case CTRL_KILL_UNIT:
-			if(selectManager)
-				selectManager->explodeUnit();
 			break;
 
 		case CTRL_MAKESHOT:
@@ -2070,7 +2108,7 @@ void GameShell::cameraQuant(float frameDeltaTime)
 {
 	cameraCursor_ = 0;
 
-	//сдвиг когда курсор у края окна
+	//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	if(!selectMouseTrack && !cameraMouseTrack && cameraCursorInWindow && !cameraMouseZoom && controlEnabled()){
 		if(int dir = cameraManager->mouseQuant(mousePosition()))
 			cameraCursor_ = UI_GlobalAttributes::instance().getMoveCursor(dir);
@@ -2080,7 +2118,7 @@ void GameShell::cameraQuant(float frameDeltaTime)
 	bool needLockMouse = false;
 	
 	static int lockState;
-	//поворот мышью
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	if(cameraMouseTrack && (MouseMoveFlag || lockState)){
 		if(MouseMoveFlag && controlEnabled()){
 			needLockMouse = true;
@@ -2265,21 +2303,21 @@ void GameShell::editParameters()
 
 	bool reloadParameters = false;
     
-	const char* header = "Заголовок миссии";
-	const char* mission = "Миссия";
-	const char* missionAll = "Миссия все данные";
+	const char* header = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ";
+	const char* mission = "пїЅпїЅпїЅпїЅпїЅпїЅ";
+	const char* missionAll = "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ";
 	const char* debugPrmTitle = "Debug.prm";
-	const char* global = "Глобальные параметры";
-	const char* attribute = "Атрибуты";
-	const char* sounds = "Звуки";
-	const char* interface_ = "Интерфейс";
-	const char* physics = "Физические параметры";
-	const char* unitAttributes = "Параметры юнитов";
-	const char* explode = "Параметры взрывов";
-	const char* sources = "Источники";
-	const char* projectileAttributes = "Аттрибуты снарядов";
+	const char* global = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ";
+	const char* attribute = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ";
+	const char* sounds = "пїЅпїЅпїЅпїЅпїЅ";
+	const char* interface_ = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ";
+	const char* physics = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ";
+	const char* unitAttributes = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ";
+	const char* explode = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ";
+	const char* sources = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ";
+	const char* projectileAttributes = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ";
 	const char* gameSettings = "Game settins";
-	const char* keySettings = "Настройки клавиатуры";
+	const char* keySettings = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ";
 	const char* separator = "--------------";
 
 	vector<const char*> items;

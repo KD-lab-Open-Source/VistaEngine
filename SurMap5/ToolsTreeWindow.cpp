@@ -16,6 +16,8 @@
 
 #include "SurToolPathEditor.h"
 
+// коммент не удалять!  нужно для перевода: _VISTA_ENGINE_EXTERNAL_
+
 IMPLEMENT_DYNAMIC(CToolsTreeWindow, CFrameWnd)
 
 BEGIN_MESSAGE_MAP(CToolsTreeWindow, CFrameWnd)

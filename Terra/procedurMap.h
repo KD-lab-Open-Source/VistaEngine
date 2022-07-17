@@ -1,7 +1,7 @@
 #ifndef __PROCEDURMAP_H__
 #define __PROCEDURMAP_H__
 
-#include "Handle.h"
+#include "..\Util\Serialization\Handle.h"
 #include "bitGen.h"
 
 const float MAX_MEGA_PROCEDUR_MAP_OPERATION=1000.f;

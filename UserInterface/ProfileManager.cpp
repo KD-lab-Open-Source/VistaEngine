@@ -4,6 +4,8 @@
 #include "Serialization.h"
 #include "XPrmArchive.h"
 #include "MultiArchive.h"
+#include "UnitAttribute.h"
+#include "GlobalAttributes.h"
 
 GUIDcontainer Profile::MissionFilter::EMPTY;
 
@@ -11,23 +13,24 @@ Profile::Profile(const string& _dirName) :
 dirName(_dirName)
 {
 	dirIndex = atoi((dirName.substr(7)).c_str());
-	playersSlotFilter = -1;
-	gameTypeFilter = -1;
-	statisticFilterRace = 0;
-	statisticFilterGamePopulation = 0;
-	quickStartFilterRace = -1;
-	quickStartFilterGamePopulation = 0;
+	init();
 }
 
 Profile::Profile() 
 {
 	dirIndex = 0;
+	init();
+}
+
+void Profile::init()
+{
 	playersSlotFilter = -1;
 	gameTypeFilter = -1;
 	statisticFilterRace = 0;
 	statisticFilterGamePopulation = 0;
 	quickStartFilterRace = -1;
 	quickStartFilterGamePopulation = 0;
+	parametersByRace.insert(parametersByRace.end(), RaceTable::instance().size(), GlobalAttributes::instance().profileParameters);
 }
 
 void Profile::MissionFilter::serialize(Archive& ar)
@@ -57,6 +60,7 @@ STARFORCE_API void Profile::serialize(Archive& ar)
 	ar.serialize(statisticFilterRace, "statisticFilterRace", 0);
 	ar.serialize(statisticFilterGamePopulation, "statisticFilterGamePopulation", 0);
 	intVariables.serialize(ar, "intVariables", 0);
+	ar.serialize(parametersByRace, "parametersByRace", 0);
 
 	SECUROM_MARKER_HIGH_SECURITY_OFF(9);
 }

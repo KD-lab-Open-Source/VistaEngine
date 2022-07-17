@@ -176,6 +176,7 @@ public:
 	void environmentSetup();
 
 	void setTranslate();
+	UI_CommonLocText getTranslate() const;
 	void filterGameOptions();
 	void filterBaseGraphOptions();
 	void filterGraphOptions();

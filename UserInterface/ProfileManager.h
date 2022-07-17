@@ -3,6 +3,7 @@
 
 #include "..\Network\NetPlayer.h"
 #include "GUIDSerialize.h"
+#include "Parameters.h"
 #include "Starforce.h"
 
 class Arhive;
@@ -13,6 +14,7 @@ typedef std::vector<std::string> ComboStrings;
 struct Profile {
 	Profile();
 	Profile(const string& _dirName);
+	void init();
 	STARFORCE_API void serialize(Archive& ar);
 
 	string dirName;
@@ -22,7 +24,9 @@ struct Profile {
 	string cdKey;
 	
 	IntVariables intVariables;
-	
+	typedef vector<ParameterSet> ParametersByRace;
+	ParametersByRace parametersByRace;
+
 	string lastSaveGameName;
 	string lastSaveReplayName;
 	

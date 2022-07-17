@@ -283,7 +283,7 @@ bool XPrmOArchive::openItem( const char* name, const char* nameAlt )
 		while(*p){
 			if(disabledChars_[*(p++)]){
 				XBuffer buf;
-				buf < "������������ ������ � ����� ��������: " < name;
+				buf < "???????????? ?????? ? ????? ????????: " < name;
 				ErrH.Abort(buf);
 			}
 		}
@@ -409,7 +409,7 @@ int XPrmIArchive::openCollection()
 
 void XPrmIArchive::closeStructure()
 {
-    // �� ������ closeStructure() ������ ���� ������ popBlock()
+    // ?? ?????? closeStructure() ?????? ???? ?????? popBlock()
     // readingStarts_.pop_back();
     for(;;){
         string token;
@@ -648,8 +648,8 @@ const char* XPrmIArchive::getToken()
 		else
 			if(*i == '"'){ // Character Literal 
 				i++;
-				// �������� ����� '"', ���� ����� '"' ����� '\' � ����� '"' �� ������� ';',
-				// �� ��� �� ����������� '"', ��� ��������� '"' ��������� ������������ 
+				// ???????? ????? '"', ???? ????? '"' ????? '\' ? ????? '"' ?? ??????? ';',
+				// ?? ??? ?? ??????????? '"', ??? ????????? '"' ????????? ???????????? 
 				while ((i = strstr(i, "\"")) != 0){
 					if (*(i - 1) == '\\' && *(i + 1) != ';')
 						i++;
@@ -938,8 +938,8 @@ bool XPrmIArchive::openItem(const char* name)
 				releaseToken();
 				// if(firstConversion){
                 //     XBuffer buf;
-                //     buf < "���������� ���������/������� �������� \"" < name < "\" ��� ������: "
-                //       < fileName_.c_str() < ", line " <= line() < "\n���������� ������������ ������.";
+                //     buf < "?????????? ?????????/??????? ???????? \"" < name < "\" ??? ??????: "
+                //       < fileName_.c_str() < ", line " <= line() < "\n?????????? ???????????? ??????.";
                 //     kdWarning("&Serialization", buf);
                 //     firstConversion = false;
                 // }
@@ -966,8 +966,8 @@ bool XPrmIArchive::openStruct (const char* name, const char* nameAlt, const char
 	bool exists = isNodeExists ();
 	if (exists) {
 		if (! isContainer ()) {
-			// ���� �� ������ ����������:
-			// �������� ����� ������� "name" � ������� �����
+			// ???? ?? ?????? ??????????:
+			// ???????? ????? ??????? "name" ? ??????? ?????
 			exists = openItem (name);
 			if (exists) {
 				openBracket();
@@ -1179,6 +1179,8 @@ bool XPrmIArchive::processBinary (XBuffer& buffer, const char* name, const char*
 				result = false;
 			}
 		}
+		else
+			releaseToken();
 		closeBracket();
     }
 	closeNode(name);
@@ -1241,14 +1243,14 @@ void Mat3d::serialize(Archive& ar)
 
 void MatXf::serialize(Archive& ar) 
 {
-	ar.serialize(rot(), "rotation", "����������");
-	ar.serialize(trans(), "position", "�������");
+	ar.serialize(rot(), "rotation", "??????????");
+	ar.serialize(trans(), "position", "???????");
 }
 
 void MatXd::serialize(Archive& ar) 
 {
-	ar.serialize(rot(), "rotation", "����������");
-	ar.serialize(trans(), "position", "�������");
+	ar.serialize(rot(), "rotation", "??????????");
+	ar.serialize(trans(), "position", "???????");
 }
 
 void QuatF::serialize(Archive& ar) 
@@ -1269,14 +1271,14 @@ void QuatD::serialize(Archive& ar)
 
 void Se3f::serialize(Archive& ar) 
 {
-	ar.serialize(rot(), "rotation", "����������");
-	ar.serialize(trans(), "position", "�������");
+	ar.serialize(rot(), "rotation", "??????????");
+	ar.serialize(trans(), "position", "???????");
 }
 
 void Se3d::serialize(Archive& ar) 
 {
-	ar.serialize(rot(), "rotation", "����������");
-	ar.serialize(trans(), "position", "�������");
+	ar.serialize(rot(), "rotation", "??????????");
+	ar.serialize(trans(), "position", "???????");
 }
 
 void Vect4f::serialize(Archive& ar) 

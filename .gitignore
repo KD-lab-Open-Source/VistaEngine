@@ -5,6 +5,8 @@
 /Source/cache_font
 .scc
 .Debug/
+Debug/
+!/XLibs.Net/boost/**/debug/
 .Final/
 .Release/
 *.user

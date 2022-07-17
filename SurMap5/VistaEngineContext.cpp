@@ -105,6 +105,10 @@ void ActionCreateNetClient::activate()
 {
 }
 
+void ActionOnlineLogout::activate()
+{
+}
+
 void ActionUI_GameStart::activate()
 {
 }

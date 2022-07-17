@@ -12,6 +12,7 @@
 #include "Installer.h"
 #include "..\Units\CircleManagerParam.h"
 #include "..\Units\WeaponTarget.h"
+#include "SystemUtil.h"
 
 class WeaponPrm;
 
@@ -208,6 +209,7 @@ public:
 	const MissionDescription* getMissionByID(const GUID& id) const;
 	const MissionDescription* getMissionByID(GameType type, const GUID& id);
 
+	const GUIDcontainer& quickStartFilter();
 	void validateMissionFilter(Profile::MissionFilter& filter);
 	
 	void setCurrentMission(const MissionDescription& descr, bool inherit = false);
@@ -260,6 +262,9 @@ public:
 	void setLastHotKeyInput(const UI_ControlHotKeyInput* control){ lastHotKeyInput_ = control; hotKeyUpdated_ = false; }
 	bool hotKeyUpdated() const { return hotKeyUpdated_; }
 
+	bool parseGameVersion(const char* updates);
+	bool checkNeedUpdate() const;
+	void openUpdateUrl() const;
 	/// вызывается при необходммости заменить входящие в строку
 	/// шаблонные последовательности: {name} на значения
 	void expandTextTemplate(string& text, UnitInterface* unit = 0, const AttributeBase* attr = 0);
@@ -324,6 +329,7 @@ private:
 
 	/// поддержка загрузки и отображения списка миссий с диска
 	MissionDescriptions missions_;
+	GUIDcontainer quickStartMissions_;
 	GameType getGameType(const UI_ActionDataSaveGameList& data);
 	const MissionDescriptions& getMissionsList(const UI_ActionDataSaveGameList& data);
 	const MissionDescription* getMissionByName(const char* name, const UI_ActionDataSaveGameList& data);
@@ -435,6 +441,13 @@ private:
 	bool makeDiskOp(UI_DiskOpID id, const char* path, GameType game_type);
 
 	string debugCursorReason_;
+
+	int lastCurrentHiVer_;
+	int lastCurrentLoVer_;
+
+	typedef pair<int, string> UpdateUrl;
+	typedef vector<UpdateUrl> UpdateUrls;
+	UpdateUrls updateUrls_;
 };
 
 #endif /* __UI_LOGIC_H__ */

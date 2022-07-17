@@ -7,6 +7,8 @@
 #include "..\Environment\Environment.h"
 #include "SkyObject.h"
 
+// _VISTA_ENGINE_EXTERNAL_ - нужно для перевода external-редактора
+
 static const int size_vb = 4;
 static const int size_ib = 2;
 

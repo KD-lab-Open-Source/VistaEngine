@@ -33,7 +33,7 @@
 #include "..\util\ConsoleWindow.h"
 #include "..\util\ZipConfig.h"
 #include <CommCtrl.h>
-
+#include "LogMsg.h"
 
 const char* currentVersion = 
 "Ver " VISTA_ENGINE_VERSION " (" __DATE__ " " __TIME__ ")";
@@ -132,6 +132,7 @@ void InternalErrorHandler()
 	RestoreGDI();
 	if(universeX()) 
 		universeX()->allSavePlayReel();
+	logMsgCenter.saveLog();
 }
 
 Rectf aspectedWorkArea(const Rectf& windowPosition, float aspect);
@@ -277,6 +278,66 @@ void checkSingleRunning()
 	}
 }
 
+
+typedef bool (*PFNENUMPROC)(DWORD id, const char* name, DWORD lParam);
+bool EnumProcesses_ToolHelp(PFNENUMPROC pfnEnumProc, DWORD lParam);
+
+bool processCallBack(DWORD id, const char* name, DWORD lParam);
+
+class ProcessFinder
+{
+public:
+	enum Type{
+		SUBSTRING,
+		FULLSTRING
+	};
+
+	ProcessFinder() : found_(false) {}
+
+	bool find(const char* _name, Type type = FULLSTRING)
+	{
+		type_ = type;
+
+		char* name = _strlwr(_strdup(_name));
+		processNameForFind_ = name;
+		free(name);
+
+		found_ = false;
+		bool ret = EnumProcesses_ToolHelp(&processCallBack, (DWORD)this);
+		xxassert(ret, "Не удалось получить список процессов");
+		return found_;
+	}
+
+private:
+	Type type_;
+	string processNameForFind_;
+	bool found_;
+
+public:
+	bool processEnumeratorCallBack(DWORD id, const char* _name)
+	{
+		char* name = _strlwr(_strdup(_name));
+
+		switch(type_){
+		case SUBSTRING:
+			found_ = (strstr(name, processNameForFind_.c_str()) != 0); 
+			break;
+		case FULLSTRING:
+			found_ = (strcmp(name, processNameForFind_.c_str()) == 0);
+			break;
+		}
+		
+		free(name);
+		
+		return !found_;
+	}
+};
+
+bool processCallBack(DWORD id, const char* name, DWORD lParam)
+{
+	return ((ProcessFinder*)lParam)->processEnumeratorCallBack(id, name);
+}
+
 //------------------------------
 int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 {
@@ -298,6 +359,10 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 #ifdef _FINAL_VERSION_
 	checkSingleRunning();
 #endif
+
+	//ProcessFinder processFinder;
+	//xassert(!processFinder.find("yasu", ProcessFinder::SUBSTRING));
+	//xassert(!processFinder.find("daemon.exe"));
 
 	gb_hInstance=hInst;
 	int ht;

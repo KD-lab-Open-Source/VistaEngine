@@ -32,7 +32,7 @@
 
 std::vector<CSurToolSelect*> CSurToolSelect::instances_;
 
-// CSurToolSelect dialog
+// _VISTA_ENGINE_EXTERNAL_
 
 IMPLEMENT_DYNAMIC(CSurToolSelect, CSurToolBase)
 CSurToolSelect::CSurToolSelect(CWnd* pParent /*=NULL*/)

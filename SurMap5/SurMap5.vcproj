@@ -21,7 +21,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\XLibs.Net\MSDXSDK_02_06\Include;..\XLibs.Net\stl;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XUtil\CRC;..\XLibs.Net\Heap;..\XLibs.Net\XUtil;..\Util\;..\Util;.;ProfUIS\Include;..\Util\Serialization;..\Scripts;..\Units;..\Network;..\Render\Client;..\Render\Inc;..\Sound;..\AI;..\AttribEditor\TreeListCtrl\include;..\XLibs.Net\XZip"
+				AdditionalIncludeDirectories="..\XLibs.Net\MSDXSDK_02_06\Include;..\XLibs.Net\stl;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XUtil\CRC;..\XLibs.Net\Heap;..\XLibs.Net\XUtil;.;ProfUIS\Include;..\Util;..\Util\Serialization;..\Scripts;..\Units;..\Network;..\Render\Client;..\Render\Inc;..\Sound;..\AI;..\AttribEditor\TreeListCtrl\include;..\XLibs.Net\XZip"
 				PreprocessorDefinitions="_SURMAP_,EXPORT_ATTRIB_EDITOR,_VISTA_ENGINE_EDITOR_"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -43,7 +43,7 @@
 				OutputFile="$(OutDir)/VistaEngineDbg.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)..&quot;;&quot;$(SolutionDir)\ProfUIS\Bin_710\&quot;;..\XLibs.Net\lib;..\XLibs.Net\MSDXSDK_02_06\Lib\x86;&quot;C:\Windows.old-Windows-7\Users\DileSoft\Documents\git\VistaEnginePrivate2003\Util\XMath\&quot;"
+				AdditionalLibraryDirectories="..\XLibs.Net\MSDXSDK_02_06\Lib\x86;..\XLibs.Net\lib;&quot;$(SolutionDir)..&quot;;&quot;$(SolutionDir)\ProfUIS\Bin_710\&quot;;&quot;C:\Windows.old-Windows-7\Users\DileSoft\Documents\git\VistaEnginePrivate2003\Util\XMath\&quot;"
 				IgnoreAllDefaultLibraries="FALSE"
 				IgnoreDefaultLibraryNames="libcmt.lib libcpmtd.lib"
 				GenerateDebugInformation="TRUE"
@@ -446,10 +446,10 @@
 				RelativePath=".\res\arrow.cur">
 			</File>
 			<File
-				RelativePath=".\res\arrowcop.cur">
+				RelativePath=".\AttribEditorCtrl\res\arrowcop.cur">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\arrowcop.cur">
+				RelativePath=".\res\arrowcop.cur">
 			</File>
 			<File
 				RelativePath=".\res\attrib_e.bmp">
@@ -461,16 +461,16 @@
 				RelativePath=".\res\bitmap1.bmp">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\Bm_bkgnd.bmp">
-			</File>
-			<File
 				RelativePath=".\res\Bm_bkgnd.bmp">
 			</File>
 			<File
-				RelativePath=".\res\bm_bkgnd2.bmp">
+				RelativePath=".\AttribEditorCtrl\res\Bm_bkgnd.bmp">
 			</File>
 			<File
 				RelativePath=".\AttribEditorCtrl\res\bm_bkgnd2.bmp">
+			</File>
+			<File
+				RelativePath=".\res\bm_bkgnd2.bmp">
 			</File>
 			<File
 				RelativePath=".\res\bm_checkbox.bmp">
@@ -482,10 +482,10 @@
 				RelativePath=".\res\bm_def_head.bmp">
 			</File>
 			<File
-				RelativePath=".\res\bm_def_sort.bmp">
+				RelativePath=".\AttribEditorCtrl\res\bm_def_sort.bmp">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\bm_def_sort.bmp">
+				RelativePath=".\res\bm_def_sort.bmp">
 			</File>
 			<File
 				RelativePath=".\res\bm_def_sort.bmp">
@@ -497,10 +497,10 @@
 				RelativePath=".\res\bm_def_tree.bmp">
 			</File>
 			<File
-				RelativePath=".\res\bm_lockbox.bmp">
+				RelativePath=".\AttribEditorCtrl\res\bm_lockbox.bmp">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\bm_lockbox.bmp">
+				RelativePath=".\res\bm_lockbox.bmp">
 			</File>
 			<File
 				RelativePath=".\res\bmp00001.bmp">
@@ -515,10 +515,10 @@
 				RelativePath=".\res\cur_button.cur">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\cur_checkbox.cur">
+				RelativePath=".\res\cur_checkbox.cur">
 			</File>
 			<File
-				RelativePath=".\res\cur_checkbox.cur">
+				RelativePath=".\AttribEditorCtrl\res\cur_checkbox.cur">
 			</File>
 			<File
 				RelativePath=".\res\cur_cross.cur">
@@ -530,13 +530,16 @@
 				RelativePath=".\res\Cur_drop.cur">
 			</File>
 			<File
-				RelativePath=".\res\Cur_horz.cur">
-			</File>
-			<File
-				RelativePath=".\res\Cur_horz.cur">
-			</File>
-			<File
 				RelativePath=".\AttribEditorCtrl\res\Cur_horz.cur">
+			</File>
+			<File
+				RelativePath=".\res\Cur_horz.cur">
+			</File>
+			<File
+				RelativePath=".\res\Cur_horz.cur">
+			</File>
+			<File
+				RelativePath=".\AttribEditorCtrl\res\cur_lockbox.cur">
 			</File>
 			<File
 				RelativePath=".\AttribEditorCtrl\res\cur_lockbox.cur">
@@ -545,16 +548,16 @@
 				RelativePath=".\res\cur_lockbox.cur">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\cur_lockbox.cur">
+				RelativePath=".\res\Cur_size.cur">
 			</File>
 			<File
-				RelativePath=".\res\Cur_size.cur">
+				RelativePath=".\AttribEditorCtrl\res\cur_split.cur">
 			</File>
 			<File
 				RelativePath=".\res\cur_split.cur">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\cur_split.cur">
+				RelativePath=".\AttribEditorCtrl\res\Cur_stop.cur">
 			</File>
 			<File
 				RelativePath=".\AttribEditorCtrl\res\Cur_stop.cur">
@@ -563,16 +566,16 @@
 				RelativePath=".\res\Cur_stop.cur">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\Cur_stop.cur">
+				RelativePath=".\AttribEditorCtrl\res\Cur_vert.cur">
 			</File>
 			<File
 				RelativePath=".\res\Cur_vert.cur">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\Cur_vert.cur">
+				RelativePath=".\AttribEditorCtrl\res\cursor1.cur">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\cursor1.cur">
+				RelativePath=".\res\cursor_s.cur">
 			</File>
 			<File
 				RelativePath=".\AttribEditorCtrl\res\cursor_s.cur">
@@ -581,13 +584,7 @@
 				RelativePath=".\res\cursor_s.cur">
 			</File>
 			<File
-				RelativePath=".\res\cursor_s.cur">
-			</File>
-			<File
 				RelativePath=".\res\editors_.bmp">
-			</File>
-			<File
-				RelativePath=".\PropTree\res\fpoint.cur">
 			</File>
 			<File
 				RelativePath=".\AttribEditorCtrl\PropTree\res\fpoint.cur">
@@ -600,6 +597,9 @@
 			</File>
 			<File
 				RelativePath=".\res\fpoint.cur">
+			</File>
+			<File
+				RelativePath=".\PropTree\res\fpoint.cur">
 			</File>
 			<File
 				RelativePath=".\res\hdrdown.bmp">
@@ -638,10 +638,10 @@
 				RelativePath=".\res\mainframe_stripped.bmp">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\nodrop.cur">
+				RelativePath=".\res\nodrop.cur">
 			</File>
 			<File
-				RelativePath=".\res\nodrop.cur">
+				RelativePath=".\AttribEditorCtrl\res\nodrop.cur">
 			</File>
 			<File
 				RelativePath=".\AttribEditorCtrl\res\nodrop.cur">
@@ -696,6 +696,9 @@
 			</File>
 			<File
 				RelativePath=".\res\ToolbarFilters.bmp">
+			</File>
+			<File
+				RelativePath=".\res\ToolbarFiltersExternal.bmp">
 			</File>
 			<File
 				RelativePath=".\res\ToolbarLibraries.bmp">

@@ -289,7 +289,7 @@ void SelectManager::addSelection(int num)
 
 	UnitInterfaceList::const_iterator it;
 	FOR_EACH(savedSelections_[num], it)
-		if((*it)->alive())
+		if(*it && (*it)->alive())
 			if(findInSelection(*it) == selection_.end())
 				addToSelection(*it);
 }
@@ -306,10 +306,10 @@ void SelectManager::subSelection(int num)
 
 	UnitInterfaceList::const_iterator it;
 	FOR_EACH(savedSelections_[num], it)
-		if((*it)->alive()){
-			UnitInterfaceList::iterator it = findInSelection(*it);
-			if(it != selection_.end())
-				erase(it);
+		if(*it && (*it)->alive()){
+			UnitInterfaceList::iterator uit = findInSelection(*it);
+			if(uit != selection_.end())
+				erase(uit);
 		}
 }
 

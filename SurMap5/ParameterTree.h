@@ -3,7 +3,6 @@
 
 #include "Handle.h"
 #include "Parameters.h"
-#include "SystemUtil.h"
 
 class UnitAttribute;
 class AttributeBase;

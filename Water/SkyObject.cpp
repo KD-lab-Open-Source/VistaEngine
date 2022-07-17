@@ -10,6 +10,8 @@
 #include "RangedWrapper.h"
 #include "..\ht\StreamInterpolation.h"
 
+// коммент не удалять!  нужно для перевода: _VISTA_ENGINE_EXTERNAL_
+
 //cRenderSky потомок от cRenderCubemap отвечает за отражения неба в воде.
 
 //Конструктор, в качестве параметра передается указатель на cSkyObj

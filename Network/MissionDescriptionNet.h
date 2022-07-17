@@ -49,7 +49,7 @@ public:
 	bool disconnectUser(unsigned int idxUsersData); //REAL_PLAYER_TYPE_PLAYER
 	void disconnectAI(unsigned int slotID); //REAL_PLAYER_TYPE_AI only
 	void connectAI(unsigned int slotID);
-	int connectNewUser(ConnectPlayerData& pd, const UNetID& unid, unsigned int _curTime);
+	int connectNewUser(ConnectPlayerData& pd, const UNetID& unid, unsigned int _curTime, bool flag_quickStart);
 	bool join2Command(int playerIdx, int slotID);
 	int getFreeSlotID();
 	int getAmountCooperativeUsers(int slotID);

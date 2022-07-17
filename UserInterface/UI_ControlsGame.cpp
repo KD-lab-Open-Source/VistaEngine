@@ -126,8 +126,10 @@ void UI_ControlBase::actionUpdate(UI_ControlActionID action_id, const UI_ActionD
 		case UI_ACTION_EXPAND_TEMPLATE:{
 			string str = locText_.c_str();
 			UI_LogicDispatcher::instance().expandTextTemplate(str);
-			if(!str.empty())
+			if(!str.empty()){
 				setText(str.c_str());
+				controlState.show();
+			}
 			else
 				controlState.hide();
 			break;
@@ -1220,6 +1222,12 @@ void UI_ControlButton::actionExecute(UI_ControlActionID action_id, const UI_Acti
 								}
 			break;
 		
+		case UI_OPTION_DEFAULT:	{
+			UI_ActionKeys msg(UI_OPTION_DEFAULT);
+			UI_LogicDispatcher::instance().handleMessage(ControlMessage(UI_ACTION_SET_KEYS, &msg));
+								}
+			break;
+
 		case UI_OPTION_CANCEL:	{
 			UI_ActionKeys msg(UI_OPTION_CANCEL);
 			UI_LogicDispatcher::instance().handleMessage(ControlMessage(UI_ACTION_SET_KEYS, &msg));
@@ -1334,10 +1342,12 @@ void UI_ControlHotKeyInput::quant(float dt)
 bool UI_ControlHotKeyInput::inputEventHandler(const UI_InputEvent& event)
 {
 	bool ret = __super::inputEventHandler(event);
-	
+
 	switch(event.ID()) {
 	case UI_INPUT_MOUSE_LBUTTON_DBLCLICK:
 	case UI_INPUT_MOUSE_RBUTTON_DBLCLICK:
+		if(!waitingInput_)
+			saveKey_ = key_;
 		done(sKey(event.keyCode(), true), true);
 		return true;
 	}
@@ -1392,7 +1402,11 @@ void UI_ControlHotKeyInput::actionExecute(UI_ControlActionID action_id, const UI
 					ControlManager::instance().setKey(action->Option(), key_);
 				else
 					key_ = saveKey_;
-
+				break;
+			
+			case UI_OPTION_DEFAULT:
+				key_ = ControlManager::instance().defaultKey(action->Option());
+				saveKey_ = key_;
 				break;
 
 			case UI_OPTION_CANCEL:

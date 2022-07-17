@@ -147,11 +147,13 @@ public:
 
 	IntVariables& intVariables() { return intVariables_; }
 	virtual IntVariables& currentProfileIntVariables() { return intVariables_; }
+	virtual ParameterSet& currentProfileParameters() { return currentProfileParameters_; }
 	virtual float voiceFileDuration(const char* fileName, float duration) { return duration; }
 
 protected:
 	bool enableEventChecking_;
 	unsigned long missionSignature;
+	ParameterSet currentProfileParameters_;
 
 private:
 	Player* active_player_;

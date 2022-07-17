@@ -191,7 +191,6 @@ public:
 	bool setResourceItem(UnitInterface* resourceItem);
 
 	void setTransport(UnitActing* transport, int transportSlotIndex);
-	void updateTransport(UnitActing* transport) { transport_ = transport; }
 	bool setTransportAuto();
 	void clearTransport();
 	void putInTransport();
@@ -258,7 +257,7 @@ public:
 
 	bool isTeleporting() const { return teleport_ != 0; }
 	bool isWorking() const { return __super::isWorking() || resourcerMode_ != RESOURCER_IDLE || teleport_ || constructedBuilding_; }
-	bool canAutoAttack() const { return (__super::canAutoAttack() && resourcerMode_ == RESOURCER_IDLE && !teleport_ && !constructedBuilding_);}
+	bool canAutoAttack() const { return (__super::canAutoAttack() && (resourcerMode_ == RESOURCER_IDLE || autoAttackMode() == ATTACK_MODE_OFFENCE) && !teleport_ && !constructedBuilding_);}
 	float forwardVelocity();
 	void velocityProcessing();
 

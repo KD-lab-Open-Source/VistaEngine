@@ -62,7 +62,8 @@ void UnitID::operator=(const BaseUniverseObject* unit)
 	
 	if(unit){
 		index_ = unit->unitID().index();
-		incrRef();
+		if(index_)
+			incrRef();
 	}
 }
 

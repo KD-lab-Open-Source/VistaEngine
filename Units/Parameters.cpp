@@ -402,6 +402,27 @@ void ParameterSet::serialize(Archive& ar)
 	}
 }
 
+void ParameterSet::write(XBuffer& buffer) const
+{
+	buffer < values_.size();
+	Values::const_iterator i;
+	FOR_EACH(values_, i)
+		buffer < i->index < i->value;
+}
+
+void ParameterSet::read(XBuffer& buffer)
+{
+	values_.clear();
+	int size;
+	buffer > size;
+	values_.reserve(size);
+	while(size--){
+		Value value;
+		buffer > value.index > value.value;
+		values_.push_back(value);
+	}
+}
+
 void ParameterSet::showDebug(const Vect3f& position, const sColor4c& color) const
 {
 	XBuffer buffer(1000, 1);
@@ -659,6 +680,17 @@ void ParameterSet::mask(ParameterType::Type type)
 	FOR_EACH(values_, i)
 		if(ParameterTypeTable::instance()[i->index].type() != type)
 			i->value = 0;
+}
+
+void ParameterSet::mask(const ParameterSet& set) 
+{
+	Values::iterator i;
+	FOR_EACH(values_, i){
+		ParameterTypeReference type;
+		type.setKey(i->index);
+		if(!set.contain(type))
+			i->value = 0;
+	}
 }
 
 void ParameterSet::set(const ParameterSet& rhs)

@@ -1,5 +1,7 @@
 #include "StdAfx.h"
 #include "Controls.h"
+#include "CommonLocText.h"
+#include "GameOptions.h"
 
 #include "Serialization.h"
 
@@ -7,6 +9,7 @@ WRAP_LIBRARY(ControlManager, "ControlManager", "ControlManager", "Scripts\\Conte
 
 ControlManager::ControlManager()
 {
+	interpret_ = GameOptions::instance().getTranslate();
 	defaultSettings();
 	xassert(controls_.size() >= (int)(CTRL_MAX));
 }
@@ -102,58 +105,105 @@ void ControlManager::setKey(InterfaceGameControlID ctrl, const sKey& key)
 		it->key_ = key;
 }
 
+sKey ControlManager::defaultKey(InterfaceGameControlID ctrl) const
+{
+	switch(ctrl){
+	case CTRL_CAMERA_MOVE_UP:
+		return interpret(sKey(VK_UP));
+	case CTRL_CAMERA_MOVE_DOWN:
+		return interpret(sKey(VK_DOWN));
+	case CTRL_CAMERA_MOVE_LEFT:
+		return interpret(sKey(VK_LEFT));
+	case CTRL_CAMERA_MOVE_RIGHT:
+		return interpret(sKey(VK_RIGHT));
+	case CTRL_CAMERA_ROTATE_UP:
+		return interpret(sKey(VK_NUMPAD8));
+	case CTRL_CAMERA_ROTATE_DOWN:
+		return interpret(sKey(VK_NUMPAD2));
+	case CTRL_CAMERA_ROTATE_LEFT:
+		return interpret(sKey(VK_NUMPAD4));
+	case CTRL_CAMERA_ROTATE_RIGHT:
+		return interpret(sKey(VK_NUMPAD6));
+	case CTRL_CAMERA_ZOOM_INC:
+		return interpret(sKey(VK_ADD));
+	case CTRL_CAMERA_ZOOM_DEC:
+		return interpret(sKey(VK_SUBTRACT));
+	case CTRL_CAMERA_MOUSE_LOOK:
+		return interpret(sKey(VK_MBUTTON));
+	case CTRL_DIRECT_UP:
+		return interpret(sKey('W'));
+	case CTRL_DIRECT_DOWN:
+		return interpret(sKey('S'));
+	case CTRL_DIRECT_LEFT:
+		return interpret(sKey('A'));
+	case CTRL_DIRECT_RIGHT:
+		return interpret(sKey('D'));
+	case CTRL_DIRECT_STRAFE_LEFT:
+		return interpret(sKey('Q'));
+	case CTRL_DIRECT_STRAFE_RIGHT:
+		return interpret(sKey('E'));
+	case CTRL_PAUSE:
+		return interpret(sKey(VK_PAUSE));
+	case CTRL_MAKESHOT:
+		return interpret(sKey(VK_F11));
+	case CTRL_SHOW_UNIT_PARAMETERS:
+		return interpret(sKey(VK_MENU));
+	case CTRL_TOGGLE_MUSIC:
+		return interpret(sKey(KBD_SHIFT|'M'));
+	case CTRL_TOGGLE_SOUND:
+		return interpret(sKey(KBD_SHIFT|'S'));
+	case CTRL_TIME_NORMAL:
+		return interpret(sKey(KBD_SHIFT|KBD_CTRL|'A'));
+	case CTRL_TIME_DEC:
+		return interpret(sKey(KBD_SHIFT|'Z'));
+	case CTRL_TIME_INC:
+		return interpret(sKey(KBD_SHIFT|'A'));
+
+	case CTRL_CLICK_ACTION:
+		return interpret(sKey(VK_LBUTTON));
+	case CTRL_ATTACK:
+		return interpret(sKey(VK_RBUTTON));
+	case CTRL_SELECT_ALL:
+		return interpret(sKey(VK_LDBL));
+	case CTRL_SELECT:
+		return interpret(sKey(VK_LBUTTON));
+	case CTRL_MOVE:
+		return interpret(sKey(VK_RBUTTON));
+
+	}
+
+	return sKey();
+}
+
+sKey ControlManager::interpret(sKey out) const
+{
+	switch(interpret_){
+	case UI_COMMON_TEXT_LANG_GERMAN:
+		switch(out.key){
+		case 'Z': out.key = 'Y'; break;
+		case 'Y': out.key = 'Z'; break;
+		}
+		break;
+	case UI_COMMON_TEXT_LANG_FRENCH:
+		switch(out.key){
+		case 'W': out.key = 'Z'; break;
+		case 'Z': out.key = 'W'; break;
+		case 'Q': out.key = 'A'; break;
+		case 'A': out.key = 'Q'; break;
+			}
+		break;
+	//case UI_COMMON_TEXT_LANG_SPANISH:
+	//case UI_COMMON_TEXT_LANG_ITALIAN:
+	}
+	return out;
+}
+
 void ControlManager::defaultSettings()
 {
-	setKey(CTRL_CAMERA_MOVE_UP, sKey(VK_UP));
-	setKey(CTRL_CAMERA_MOVE_DOWN, sKey(VK_DOWN));
-	setKey(CTRL_CAMERA_MOVE_LEFT, sKey(VK_LEFT));
-	setKey(CTRL_CAMERA_MOVE_RIGHT, sKey(VK_RIGHT));
-	setKey(CTRL_CAMERA_ROTATE_UP, sKey(VK_HOME));
-	setKey(CTRL_CAMERA_ROTATE_DOWN, sKey(VK_END));
-	setKey(CTRL_CAMERA_ROTATE_LEFT, sKey(VK_DELETE));
-	setKey(CTRL_CAMERA_ROTATE_RIGHT, sKey(VK_NEXT));
-	setKey(CTRL_CAMERA_ZOOM_INC, sKey(VK_ADD));
-	setKey(CTRL_CAMERA_ZOOM_DEC, sKey(VK_SUBTRACT));
-	setKey(CTRL_CAMERA_MOUSE_LOOK, sKey(VK_MBUTTON));
-	setKey(CTRL_DIRECT_UP, sKey(VK_NUMPAD8));
-	setKey(CTRL_DIRECT_DOWN, sKey(VK_NUMPAD5));
-	setKey(CTRL_DIRECT_LEFT, sKey(VK_NUMPAD4));
-	setKey(CTRL_DIRECT_RIGHT, sKey(VK_NUMPAD6));
-	setKey(CTRL_DIRECT_STRAFE_LEFT, sKey(VK_NUMPAD7));
-	setKey(CTRL_DIRECT_STRAFE_RIGHT, sKey(VK_NUMPAD9));
-	setKey(CTRL_PAUSE, sKey(VK_PAUSE));
-	setKey(CTRL_MAKESHOT, sKey(VK_F11));
-	setKey(CTRL_SHOW_UNIT_PARAMETERS, sKey(VK_MENU));
-	setKey(CTRL_TOGGLE_MUSIC, sKey(KBD_SHIFT|'M'));
-	setKey(CTRL_TOGGLE_SOUND, sKey(KBD_SHIFT|'S'));
-	setKey(CTRL_TIME_NORMAL, sKey(KBD_SHIFT|'A'));
-	setKey(CTRL_TIME_DEC, sKey('Z'));
-	setKey(CTRL_TIME_INC, sKey('A'));
-	
-	setKey(CTRL_CLICK_ACTION, sKey(VK_LBUTTON));
-	setKey(CTRL_ATTACK, sKey(VK_RBUTTON));
-	setKey(CTRL_SELECT_ALL, sKey(VK_LDBL));
-	setKey(CTRL_SELECT, sKey(VK_LBUTTON));
-	setKey(CTRL_MOVE, sKey(VK_RBUTTON));
+	for(int i = 0; i < CTRL_MAX; ++i)
+		setKey(InterfaceGameControlID(i), defaultKey(InterfaceGameControlID(i)));
 
-	setKey(CTRL_KILL_UNIT, sKey('D'));
-
-	//setKey(CTRL_LOAD, sKey(KBD_CTRL|'O'));
-	//setKey(CTRL_SAVE, sKey(KBD_CTRL|'S'));
-
-	//setKey(CTRL_CAMERA_RESTORE1, sKey(VK_F1));
-	//setKey(CTRL_CAMERA_RESTORE2, sKey(VK_F2));
-	//setKey(CTRL_CAMERA_RESTORE3, sKey(VK_F3));
-	//setKey(CTRL_CAMERA_RESTORE4, sKey(VK_F4));
-	//setKey(CTRL_CAMERA_RESTORE5, sKey(VK_F5));
-	//setKey(CTRL_CAMERA_SAVE1, sKey(VK_F1|KBD_SHIFT));
-	//setKey(CTRL_CAMERA_SAVE2, sKey(VK_F2|KBD_SHIFT));
-	//setKey(CTRL_CAMERA_SAVE3, sKey(VK_F3|KBD_SHIFT));
-	//setKey(CTRL_CAMERA_SAVE4, sKey(VK_F4|KBD_SHIFT));
-	//setKey(CTRL_CAMERA_SAVE5, sKey(VK_F5|KBD_SHIFT));
-	
-	//setKey(CTRL_CAMERA_TO_EVENT, sKey(VK_SPACE));
-
+	compatibleControls_.clear();
 	compatibleControls_.reserve(16);
 
 	compatibleControls_.push_back(CompatibleControlsNode(CTRL_CAMERA_MOVE_UP, CTRL_DIRECT_UP));
@@ -164,6 +214,7 @@ void ControlManager::defaultSettings()
 	compatibleControls_.push_back(CompatibleControlsNode(CTRL_SELECT, CTRL_CLICK_ACTION));
 	compatibleControls_.push_back(CompatibleControlsNode(CTRL_SELECT, CTRL_ATTACK));
 	compatibleControls_.push_back(CompatibleControlsNode(CTRL_CLICK_ACTION, CTRL_ATTACK));
+	compatibleControls_.push_back(CompatibleControlsNode(CTRL_MOVE, CTRL_ATTACK));
 }
 
 BEGIN_ENUM_DESCRIPTOR(InterfaceGameControlID, "InterfaceGameControlID")
@@ -200,7 +251,6 @@ REGISTER_ENUM(CTRL_ATTACK, "Атаковать")
 REGISTER_ENUM(CTRL_SELECT, "Выделить")
 REGISTER_ENUM(CTRL_SELECT_ALL, "Выделить всех")
 REGISTER_ENUM(CTRL_MOVE, "Идти")
-REGISTER_ENUM(CTRL_KILL_UNIT, "Убить выделенных юнитов")
 REGISTER_ENUM(CTRL_MAX, "Неопределена")
 REGISTER_ENUM(CTRL_CAMERA_SAVE1, "Сохранить положение камеры 1")
 REGISTER_ENUM(CTRL_CAMERA_SAVE2, "Сохранить положение камеры 2")

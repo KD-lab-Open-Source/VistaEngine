@@ -45,8 +45,8 @@ public:
 	bool savePlayReel(const char* fname);
 	void autoSavePlayReel(void);
 	void allSavePlayReel(void);
-	bool flag_stopSavePlayReel;
 	void stopPlayReel() { flag_stopSavePlayReel=true; }
+	bool isPlayingReel() const { return flag_rePlayReel; }
 
 	long getInternalLagQuant();
 	unsigned long getNextQuantInterval();
@@ -57,6 +57,7 @@ public:
 	void setActivePlayer(int playerID, int cooperativeIndex = 0);
 	
 	IntVariables& currentProfileIntVariables();
+	ParameterSet& currentProfileParameters();
 	float voiceFileDuration(const char* fileName, float duration);
 
 	void stopNetCenter() { pNetCenter = 0; }
@@ -133,6 +134,7 @@ private:
 	bool flag_savePlayReel;
 	bool flag_rePlayReel;
 	bool flag_autoSavePlayReel;
+	bool flag_stopSavePlayReel;
 
 	IntVariables currentProfileIntVariables_;
 

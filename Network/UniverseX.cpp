@@ -29,7 +29,7 @@ const char* autoSavePlayReelDir = "AUTOSAVE";
 
 const char * COMMAND_LINE_SAVE_PLAY_REEL="saveplay";
 
-const unsigned int INTERNAL_BUILD_VERSION=1003;
+//const unsigned int INTERNAL_BUILD_VERSION=1003;
 
 #ifndef _FINAL_VERSION_
 class cMonowideFont {
@@ -135,6 +135,7 @@ UniverseX::UniverseX(PNetCenter* net_client, MissionDescription& mission, XPrmIA
 	libsSignature=crc32((unsigned char*)&tcrc, sizeof(tcrc), libsSignature);
 
 	currentProfileIntVariables_ = UI_LogicDispatcher::instance().currentProfile().intVariables;
+	currentProfileParameters_ = UI_LogicDispatcher::instance().currentProfile().parametersByRace[activePlayer()->race().key()];
 
 	flag_autoSavePlayReel = flag_rePlayReel=flag_savePlayReel=false;
 	flag_savePlayReel = true;
@@ -198,6 +199,11 @@ IntVariables& UniverseX::currentProfileIntVariables()
 	return !flag_rePlayReel ? UI_LogicDispatcher::instance().currentProfile().intVariables : currentProfileIntVariables_;
 }
 
+ParameterSet& UniverseX::currentProfileParameters()
+{
+	return !flag_rePlayReel ? UI_LogicDispatcher::instance().currentProfile().parametersByRace[activePlayer()->race().key()] : currentProfileParameters_;
+}
+
 float UniverseX::voiceFileDuration(const char* fileName, float duration)
 {
 	if(!flag_rePlayReel){
@@ -237,6 +243,8 @@ bool UniverseX::loadPlayReel(const char* fname)
 		buffer > StringInWrapper(name) > value;
 		currentProfileIntVariables_[name] = value;
 	}
+
+	currentProfileParameters_.read(buffer);
 
 	buffer > varsSize;
 	for(; varsSize; varsSize--){
@@ -324,6 +332,8 @@ bool UniverseX::savePlayReel(const char* _fname)
 	IntVariables::iterator i;
 	FOR_EACH(currentProfileIntVariables_, i)
 		buffer < StringOutWrapper(i->first) < i->second;
+
+	currentProfileParameters_.write(buffer);
 
 	buffer < voiceFileDurations_.size();
 	VoiceFileDurations::iterator vi;
@@ -567,7 +577,8 @@ void UniverseX::sendLog(unsigned int quant)
 		for(i=begLogQuant; i<=quant; i++){
 			sLogElement* pLogElemente=getLogElement(i);
 			xassert(pLogElemente);
-			sgn=crc32((unsigned char*)pLogElemente->pLog->buffer(), pLogElemente->pLog->tell(), sgn);
+			if(pLogElemente)
+				sgn=crc32((unsigned char*)pLogElemente->pLog->buffer(), pLogElemente->pLog->tell(), sgn);
 
 		}
 		pNetCenter->SendEvent(&netCommand4H_BackGameInformation2(getInternalLagQuant(), quant, sgn, gameShell->accessibleQuantPeriod(), true, pNetCenter->getState()));

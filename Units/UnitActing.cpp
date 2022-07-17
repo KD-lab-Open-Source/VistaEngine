@@ -1093,6 +1093,8 @@ void UnitActing::changeUnitOwner(Player* playerIn)
 	possession.mask(ParameterType::POSSESSION);
 	parameters_ += possession;
 
+	putOutTransport();
+	
 	__super::changeUnitOwner(playerIn);
 
 	RealsLinks::iterator dockedUnit(dockedUnits.begin());
@@ -1103,19 +1105,6 @@ void UnitActing::changeUnitOwner(Player* playerIn)
 		}
 		else
 			dockedUnit = dockedUnits.erase(dockedUnit);
-	}
-
-	LegionariesLinks::const_iterator i;
-	FOR_EACH(transportSlots_, i){
-		if(UnitLegionary* unit = *i){
-			unit->updateTransport(this);
-			if(unit->isDocked()){
-				if(unit->player() != player()){
-					unit->changeUnitOwner(player());
-				}
-			}else
-				unit->clearTransport();
-		}
 	}
 
 	clearAttackTarget();
@@ -2241,6 +2230,8 @@ bool UnitActing::fireRequest(WeaponTarget& target, bool no_movement_weapons_only
 	bool skip_group = false;
 	const WeaponGroupType* group = 0;
 
+	UnitInterface* target_unit = target.unit();
+
 	for(Weapons::const_iterator it = weapons_.begin(); it != weapons_.end(); ++it){
 		WeaponBase* weapon = *it;
 
@@ -2329,17 +2320,21 @@ bool UnitActing::fireRequest(WeaponTarget& target, bool no_movement_weapons_only
 						}
 						else {
 							if(UnitInterface* unit = weapon->autoTarget()){
-								WeaponTarget trg(unit);		
-								if(weapon->canAttack(trg)){
-									if(group->shootingMode() == WEAPON_GROUP_MODE_PRIORITY && weapon->fireDistanceCheck(trg)){
-										skip_group = true;
-										group_priority = weapon->priority();
+								// исправление бага 4005, будет в патче
+								if(unit == target_unit || (group->shootingMode() != WEAPON_GROUP_MODE_PRIORITY
+								&& weapon->weaponPrm()->canShootWhileRunning() && weapon->weaponPrm()->canShootOnMove())){
+									WeaponTarget trg(unit);		
+									if(weapon->canAttack(trg)){
+										if(group->shootingMode() == WEAPON_GROUP_MODE_PRIORITY && weapon->fireDistanceCheck(trg)){
+											skip_group = true;
+											group_priority = weapon->priority();
+										}
+										if(weapon->fireRequest(trg))
+											ret = true;
 									}
-									if(weapon->fireRequest(trg))
-										ret = true;
+									else
+										weapon->setAutoTarget(0);
 								}
-								else
-									weapon->setAutoTarget(0);
 							}
 						}
 					}

@@ -3,19 +3,22 @@
 
 #include "PlayerStatistics.h"
 
+class Scores;
+class ScoresResult;
+
 struct StatisticsEntry : PlayerStatistics
 {
 	int position;
 	string name;
 	__int64 rating;
 
-	void set();
+	void set(const Scores& scores);
 };
 
 class GlobalStatistics : public vector<StatisticsEntry> 
 {
 public:
-	void set();
+	void set(const ScoresResult& scoresResult);
 };
 
 #endif //__GLOBAL_STATISTICS_H__

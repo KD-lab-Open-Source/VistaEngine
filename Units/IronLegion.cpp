@@ -406,6 +406,8 @@ void UnitLegionary::Quant()
 
 	if(!alive()){
 		UnitReal::Quant();
+		if(!isFrozen())
+			rigidBody()->unFreeze();
 		return;
 	}
 
@@ -698,6 +700,9 @@ bool UnitLegionary::setResourceItem(UnitInterface* resourceItem)
 
 void UnitLegionary::resourcerQuant()
 {
+	if(unitState == AUTO_MODE && autoAttackMode() == ATTACK_MODE_OFFENCE && targetUnit())
+		return;
+
 	switch(resourcerMode_){
 	case RESOURCER_FINDING:
 		if(resourceItem_ && !resourceItem_->isUnseen()){

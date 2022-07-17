@@ -19,9 +19,31 @@ public:
 struct netCommand4C_StartLoadGame : public NetCommandGeneral<NETCOM_4C_ID_START_LOAD_GAME> {
 
 	MissionDescription missionDescription_;
-	netCommand4C_StartLoadGame(MissionDescription& missionDescription) { missionDescription_=missionDescription; }
-	netCommand4C_StartLoadGame(XBuffer& in) { missionDescription_.readNet(in); }
-	void Write(XBuffer& out) const { missionDescription_.writeNet(out); }
+	netCommand4C_StartLoadGame(MissionDescription& missionDescription, const XBuffer& data) {
+		missionDescription_=missionDescription;
+		dataSizeInAuxBuf = data.tell();
+		xassert(dataSizeInAuxBuf <= sizeof(auxBuf));
+		if(dataSizeInAuxBuf <= sizeof(auxBuf))
+			memcpy(auxBuf, data.buffer(), dataSizeInAuxBuf);
+        else
+			dataSizeInAuxBuf=0;
+	}
+	netCommand4C_StartLoadGame(XBuffer& in) { 
+		missionDescription_.readNet(in);
+		in.read(&dataSizeInAuxBuf, sizeof(dataSizeInAuxBuf));
+		xassert(dataSizeInAuxBuf <= sizeof(auxBuf));
+		if(dataSizeInAuxBuf <= sizeof(auxBuf))
+            in.read(&auxBuf[0], dataSizeInAuxBuf);
+		else
+			dataSizeInAuxBuf=0;
+	}
+	void Write(XBuffer& out) const { 
+		missionDescription_.writeNet(out);
+		out.write(&dataSizeInAuxBuf, sizeof(dataSizeInAuxBuf));
+		out.write(&auxBuf[0], dataSizeInAuxBuf);
+	}
+	short dataSizeInAuxBuf;
+	unsigned char auxBuf[512];
 };
 
 ////////////////////////////////////
@@ -710,6 +732,22 @@ struct netCommand4H_KickInCommand : NetCommandGeneral<NETCOM_4H_ID_KICK_IN_COMMA
 	int commandID_;
 	int teamIdx_;
 };
+
+struct netCommand4C_DiscardUser : NetCommandGeneral<NETCOM_4C_ID_DISCARD_USER>
+{
+	enum { NOT_PLAYER_IDX=-1 };
+	UNetID unid;
+	netCommand4C_DiscardUser(const UNetID& _unid){
+		unid=_unid;
+	}
+	netCommand4C_DiscardUser(XBuffer& in){
+		in.read(&unid, sizeof(unid));
+	}
+	void Write(XBuffer& out) const {
+		out.write(&unid, sizeof(unid));
+	}
+};
+
 
 
 struct terEventControlServerTime : NetCommandGeneral<EVENT_ID_SERVER_TIME_CONTROL>

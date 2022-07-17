@@ -128,6 +128,8 @@ void ActionSetGamePause::activate()
 
 void ActionSetControlEnabled::activate()
 {
+	if(universeX()->isPlayingReel())
+		return;
 	aiPlayer().setControlEnabled(controlEnabled);
 	gameShell->setControlEnabled(controlEnabled);
 }
@@ -168,29 +170,40 @@ void ActionUI_GameStart::activate()
 	UI_LogicDispatcher::instance().missionStart();
 }
 
+void ActionOnlineLogout::activate()
+{
+	if(aiPlayer().active())
+		UI_LogicDispatcher::instance().getNetCenter().logout();
+}
+
 void ActionUI_LanGameStart::activate()
 {
-	UI_LogicDispatcher::instance().getNetCenter().startGame();
+	if(aiPlayer().active())
+		UI_LogicDispatcher::instance().getNetCenter().startGame();
 }
 
 void ActionUI_LanGameJoin::activate()
 {
-	UI_LogicDispatcher::instance().getNetCenter().joinGame();
+	if(aiPlayer().active())
+		UI_LogicDispatcher::instance().getNetCenter().joinGame();
 }
 
 void ActionUI_LanGameCreate::activate()
 {
-	UI_LogicDispatcher::instance().getNetCenter().createGame();
+	if(aiPlayer().active())
+		UI_LogicDispatcher::instance().getNetCenter().createGame();
 }
 
 void ActionResetNetCenter::activate()
 {
-	UI_LogicDispatcher::instance().getNetCenter().reset();
+	if(aiPlayer().active())
+		UI_LogicDispatcher::instance().getNetCenter().reset();
 }
 
 void ActionKillNetCenter::activate()
 {
-	UI_LogicDispatcher::instance().getNetCenter().release();
+	if(aiPlayer().active())
+		UI_LogicDispatcher::instance().getNetCenter().release();
 }
 
 bool ConditionLastNetStatus::check() const

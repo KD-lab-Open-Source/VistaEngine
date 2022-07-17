@@ -243,6 +243,7 @@ private:
 	CameraSplineName startCamera_;
 
 	PlayerStatistics playerStatistics_;
+	Scores* scores_;
 
 	bool active_;
 	bool controlEnabled_;

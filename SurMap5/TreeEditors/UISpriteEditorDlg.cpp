@@ -9,6 +9,7 @@
 
 #include "SolidColorCtrl.h"
 #include "mfc\SizeLayoutManager.h"
+#include "SystemUtil.h"
 
 
 IMPLEMENT_DYNAMIC(CUISpriteEditorDlg, CDialog)

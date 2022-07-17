@@ -21,7 +21,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;..\SurMap5\ProfUIS\Include;..\Util;..\Util\Serialization;..\Terra;..\Network;..\Render\inc;..\Render;..\AttribEditor\TreeListCtrl\include;..\Scripts;..\Units"
+				AdditionalIncludeDirectories="..\XLibs.Net\stl;..\XLibs.Net\XUtil;..\XLibs.Net\MSDXSDK_02_06\Include;..\XLibs.Net\XUtil\CRC;..\XLibs.Net\Heap;..\XLibs.Net\Profiler\Profiler;.;..\SurMap5\ProfUIS\Include;..\Util;..\Util\Serialization;..\Terra;..\Network;..\Render\inc;..\Render;..\AttribEditor\TreeListCtrl\include;..\Scripts;..\Units;..\XLibs.Net\XZip"
 				PreprocessorDefinitions="_CORE_;_SURMAP_;EXPORT_ATTRIB_EDITOR"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -38,11 +38,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="dsound.lib PlayOggDbgMT.lib shlwapi.lib AttribEditor.lib"
+				AdditionalDependencies="dsound.lib PlayOggDbgMT.lib shlwapi.lib AttribEditor.lib XMathMtDbg.lib"
 				OutputFile="$(OutDir)/UIEditor-Debug.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="$(SolutionDir).."
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)..&quot;;..\XLibs.Net\lib;..\XLibs.Net\MSDXSDK_02_06\Lib\x86"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"

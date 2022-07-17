@@ -12,6 +12,8 @@
 #include "EditArchive.h"
 #include "CameraManager.h"
 
+// _VISTA_ENGINE_EXTERNAL_ - нужно для переврода external-версии
+
 REGISTER_CLASS(UnitBase, UnitEnvironmentSimple, "UnitEnvironmentSimple")
 REGISTER_CLASS_IN_FACTORY(UnitFactory, UNIT_CLASS_ENVIRONMENT_SIMPLE, UnitEnvironmentSimple);
 
@@ -311,7 +313,7 @@ void UnitEnvironmentSimple::setModel(const char* name)
 		if(modelSimple()){
 			releaseSpringDamping3DX();
 			environment->shadowWrapper().decRef(modelSimple_);
-			RELEASE(modelSimple_);
+			streamLogicCommand.set(fCommandRelease, modelSimple_);
 		}
 
 		cSimply3dx* modelIn;

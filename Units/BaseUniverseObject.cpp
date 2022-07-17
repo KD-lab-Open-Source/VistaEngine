@@ -31,7 +31,7 @@ void BaseUniverseObject::serialize(Archive& ar)
 			xassert(!unitID_.numRefs());
 		}
 		unitID_.serialize(ar);
-		if(ar.isInput())
+		if(ar.isInput() && !dead())
 			unitID_.registerUnit(this);
 	}
 

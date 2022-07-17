@@ -38,6 +38,7 @@
 #define IDD_BARDLG_COLORPIC             136
 #define IDS_PANE_TEXT                   136
 #define IDD_DLG_CREATEWORLD             137
+#define ID_FILE_EXIT                    137
 #define IDC_FPOINT                      140
 #define IDB_HDRUP                       141
 #define IDC_POINTER                     141
@@ -91,6 +92,7 @@
 #define IDD_BARDLG_UNIT                 195
 #define IDD_BARDLG_UNITFOLDER           196
 #define IDD_BARDLG_PLAYERFOLDER         197
+#define IDR_FILTERS_EXTERNAL_BAR        198
 #define IDD_BARDLG_CAMERA               201
 #define IDD_DLG_STATISTICS_SHOW         202
 #define IDD_BARDLG_ICE                  203
@@ -750,13 +752,14 @@
 #define ID_HELP_KEY_INFO                40392
 #define ID_FILE_RESAVE_WORLDS           40395
 #define ID_FILE_RESAVE_TRIGGERS         40396
+#define ID_FILE_UPDATE_QUICK_START_WORLDS_LIST 40398
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        218
-#define _APS_NEXT_COMMAND_VALUE         40397
+#define _APS_NEXT_COMMAND_VALUE         40399
 #define _APS_NEXT_CONTROL_VALUE         1285
 #define _APS_NEXT_SYMED_VALUE           105
 #endif

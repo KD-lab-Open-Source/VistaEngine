@@ -4,6 +4,8 @@
 #include "ResourceSelector.h"
 #include "RangedWrapper.h"
 
+// _VISTA_ENGINE_EXTERNAL_ - нужно для перевода external-версии
+
 CoastSpriteSimpleAttributes::CoastSpriteSimpleAttributes()
 {
 	minSize_	= 10.f;

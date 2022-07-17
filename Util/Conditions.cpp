@@ -64,6 +64,7 @@ REGISTER_CLASS(Condition, ConditionIsPlayerActive, "Глобальные условия\\Игрок ак
 REGISTER_CLASS(Condition, ConditionEnvironmentTime, "Глобальные условия\\Время суток")
 REGISTER_CLASS(Condition, ConditionIsPlayerAI, "Глобальные условия\\АИ ли Игрок")
 REGISTER_CLASS(Condition, ConditionMissionSelected, "Глобальные условия\\Миссия выбрана")
+REGISTER_CLASS(Condition, ConditionNeedUpdate, "Глобальные условия\\Есть свежее обновление")
 REGISTER_CLASS(Condition, ConditionCheckGameType, "Глобальные условия\\Проверка типа игры")
 REGISTER_CLASS(Condition, ConditionCheckPause, "Глобальные условия\\Проверка паузы")
 REGISTER_CLASS(Condition, ConditionIsMultiplayer, "Глобальные условия\\Мультиплеер")
@@ -72,6 +73,7 @@ REGISTER_CLASS(Condition, ConditionCheckRace, "Глобальные условия\\Проверка расы
 REGISTER_CLASS(Condition, ConditionOnlyMyClan, "Глобальные условия\\!!! Устарело !!! Остался только мой клан")
 REGISTER_CLASS(Condition, ConditionNoUnitsLeft, "Глобальные условия\\У игрока не осталось дееспособных юнитов")
 REGISTER_CLASS(Condition, ConditionDifficultyLevel, "Глобальные условия\\Уровень сложности")
+REGISTER_CLASS(Condition, ConditionUserSave, "Глобальные условия\\Игровой сейв")
 REGISTER_CLASS(Condition, ConditionCheckDirectControl, "Глобальные условия\\Проверка прямого управления")
 REGISTER_CLASS(Condition, ConditionPlayerWin, "Глобальные условия\\Игрок выиграл, потому что все другие кланы проиграли") 
 REGISTER_CLASS(Condition, ConditionPlayerDefeat, "Глобальные условия\\Игрок проиграл, потому что другой клан выиграл") 
@@ -573,8 +575,8 @@ bool ConditionPlayerWin::check() const
 			if((*pi)->clan() == aiPlayer().clan()){
 				if((*pi)->isWin())
 					return true;
-				if((*pi)->isDefeat())
-                    return false;
+				//if((*pi)->isDefeat())
+                //    return false;
 			}
 			else{
 				theresEnemy = true;
@@ -2461,6 +2463,11 @@ bool ConditionDifficultyLevel::check() const
 	return aiPlayer().difficulty() == difficulty;
 }
 
+ConditionUserSave::ConditionUserSave()
+{
+	userSave_ = universe() && universe()->userSave();
+}
+
 ConditionUnitLevel::ConditionUnitLevel()
 {
  	level_ = 0;
@@ -2779,6 +2786,11 @@ void ConditionCheckDirectControl::serialize(Archive& ar)
 bool ConditionMissionSelected::check() const
 {
 	return UI_LogicDispatcher::instance().currentMission() != 0;
+}
+
+bool ConditionNeedUpdate::check() const
+{
+	return UI_LogicDispatcher::instance().checkNeedUpdate();
 }
 
 ConditionCheckGameType::ConditionCheckGameType()

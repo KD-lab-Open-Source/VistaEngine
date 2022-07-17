@@ -19,6 +19,16 @@ BEGIN_MESSAGE_MAP(CUIEditorApp, CWinApp)
 	ON_COMMAND(ID_APP_ABOUT, OnAppAbout)
 END_MESSAGE_MAP()
 
+double clockf()
+{
+	return 0;
+} 
+
+int clocki()
+{
+	return 0;
+}
+
 string GetMissionSaveNameFromPlayReel(const char* fname) { xassert(0&&"Replay not support in editor!"); return string(""); }
 void UpdateMDFromPlayReel(const char* fname, class MissionDescription* pmd){ xassert(0&&"Replay not support in editor!"); }
 

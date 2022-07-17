@@ -1378,7 +1378,7 @@ void UnitSquad::serialize(Archive& ar)
 //	position_generator.setMode(PositionGenerator::Square, curvatureRadius);
 
 	ar.serialize(units_, "units_", 0);
-	xassert(!units_.empty());
+	xassert(dead() || !units_.empty());
 	needUpdateUnits_ = true;
 
 	ar.serialize(average_position, "averagePosition", 0);

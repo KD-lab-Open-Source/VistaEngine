@@ -62,6 +62,7 @@ using namespace std;
 
 #include "xmath.h"
 #include <afxdhtml.h>
-#include <SystemUtil.h>
+
+#include "SystemUtil.h"
 
 #endif

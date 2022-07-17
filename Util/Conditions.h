@@ -925,6 +925,13 @@ public:
 	bool check() const;
 };
 
+class ConditionNeedUpdate : public Condition
+{
+public:
+	ConditionNeedUpdate() {}
+	bool check() const;
+};
+
 class ConditionCheckGameType : public Condition
 {
 public:
@@ -1065,6 +1072,15 @@ struct ConditionDifficultyLevel : Condition // Уровень сложности
 
 	bool check() const;
 	void serialize(Archive& ar);
+};
+
+struct ConditionUserSave : Condition 
+{
+	ConditionUserSave();
+	bool check() const { return userSave_; }
+
+private:
+	bool userSave_;
 };
 
 struct ConditionIsMultiplayer : Condition 

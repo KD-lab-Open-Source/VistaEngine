@@ -6,6 +6,8 @@
 #include "Serialization.h"
 #include "ResourceSelector.h"
 
+// _VISTA_ENGINE_EXTERNAL_ - переводить для external-редактора
+
 void GetNormal(TerraInterface *terra,int x,int y,int step,Vect3f& out);
 unsigned int ColorByNormalRGBA(Vect3f n);
 

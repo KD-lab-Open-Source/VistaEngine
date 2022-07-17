@@ -8,6 +8,7 @@
 #include <setjmp.h>		// JPG include
 #include <math.h>
 #include <XUtil.h>
+#include "XZip.h"
 #include "FileImage.h"
 
 #include <fcntl.h>
@@ -417,7 +418,7 @@ bool SaveTga(const char* filename,int width,int height,unsigned char* buf,int by
 bool LoadTGA(const char* filename,int& dx,int& dy,unsigned char*& buf,
 			 int& byte_per_pixel)
 {
-	XStream f(0);
+	XZipStream f(0);
 	if(!f.open(filename, XS_IN))
 		return false; 
 

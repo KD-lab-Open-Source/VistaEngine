@@ -237,3 +237,17 @@ void UI_LogicDispatcher::selectCursor(const UI_Cursor*)
 void UI_LogicDispatcher::handleMessageReInitGameOptions()
 {
 }
+
+bool UI_LogicDispatcher::parseGameVersion(const char* ptr)
+{
+	return true;
+}
+
+bool UI_LogicDispatcher::checkNeedUpdate() const
+{
+	return false;
+}
+
+void UI_LogicDispatcher::openUpdateUrl() const
+{
+}

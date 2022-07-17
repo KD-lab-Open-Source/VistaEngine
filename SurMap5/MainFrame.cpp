@@ -33,7 +33,7 @@
 #include "TreeEditors\HotKeySelectorDlg.h"
 #include "..\AttribEditor\AttribEditorDlg.h"
 
-
+#include "ExtCmdManager.h"
 
 #include "SurToolAux.h"
 #include "Triggers.h"
@@ -74,6 +74,7 @@
 
 #include "XPrmArchive.h"
 #include "FileUtils.h"
+#include "..\Terra\qsWorldsMgr.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -249,6 +250,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_IMPORT_PARAMETERS, OnImportParameters)
 	ON_COMMAND(ID_EXPORT_PARAMETERS, OnExportParameters)
 	ON_COMMAND(ID_FILE_SAVEWITHOUTTERTOOLCOLOR, OnFileSavewithouttertoolcolor)
+	ON_COMMAND(ID_FILE_UPDATE_QUICK_START_WORLDS_LIST, OnFileUpdateQuickStartWorldsList)
 	END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -314,8 +316,8 @@ void CMainFrame::resetWorkspace()
 	toolBar_.FloatControlBar(CPoint(0, 0));
 #ifndef _VISTA_ENGINE_EXTERNAL_
 	librariesBar_.FloatControlBar(CPoint(100, 0));
-#endif
 	editorsBar_.FloatControlBar(CPoint(300, 0));
+#endif
 	filtersBar_.FloatControlBar(CPoint(400, 0));
 	//timeSliderBar_.FloatControlBar(CPoint(500, 0));
 
@@ -344,8 +346,8 @@ void CMainFrame::resetWorkspace()
 	toolBar_.DockControlBar(AFX_IDW_DOCKBAR_TOP, 0, this, false);
 #ifndef _VISTA_ENGINE_EXTERNAL_
 	librariesBar_.DockControlBar(AFX_IDW_DOCKBAR_TOP, 0, this, false);
-#endif
 	editorsBar_.DockControlBar(AFX_IDW_DOCKBAR_TOP, 0, this, false);
+#endif
 	filtersBar_.DockControlBar(AFX_IDW_DOCKBAR_TOP, 0, this, false);
 	menuBar_.ToggleDocking();
 
@@ -374,8 +376,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		AfxMessageBox ("Failed to create view window\n");
 		return -1;
 	}
-	if (!menuBar_.Create("Menu Bar", this, ID_VIEW_MENUBAR) ||
-		!menuBar_.LoadMenuBar(external ? IDR_MAINFRAME_EXTERNAL : IDR_MAINFRAME)){
+
+	if (!menuBar_.Create("Menu Bar", this, ID_VIEW_MENUBAR) || !reloadMenu()){
 		AfxMessageBox ("Failed to create view window\n");
 		return -1;
 	}
@@ -394,18 +396,18 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     // VERIFY(timeSliderDialog_.Create(IDD_TIME_SLIDER, &timeSliderBar_));
 	// timeSliderBar_.EnableDocking(CBRS_ALIGN_ANY);
 
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	VERIFY(editorsBar_.Create("Editors Bar", this, IDR_EDITORS_BAR)
 		&& editorsBar_.LoadToolBar(external ? IDR_EDITORS_EXTERNAL_BAR : IDR_EDITORS_BAR, RGB(255, 0, 255)));
 	editorsBar_.EnableDocking(CBRS_ALIGN_ANY);
 	
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	VERIFY(librariesBar_.Create("Libraries Bar", this, IDR_LIBRARIES_BAR)
 		&& librariesBar_.LoadToolBar(external ? IDR_LIBRARIES_EXTERNAL_BAR : IDR_LIBRARIES_BAR, RGB(255, 0, 255)));
 	librariesBar_.EnableDocking(CBRS_ALIGN_ANY);
 #endif
 
 	VERIFY(filtersBar_.Create("Filters Bar", this, IDR_FILTERS_BAR)
-		&& filtersBar_.LoadToolBar(IDR_FILTERS_BAR));
+		&& filtersBar_.LoadToolBar(external ? IDR_FILTERS_EXTERNAL_BAR : IDR_FILTERS_BAR, RGB(255, 0, 255)));
 	       filtersBar_.EnableDocking(CBRS_ALIGN_ANY);
 
     //////////////////////////////////////////////////////////////////////////////
@@ -1460,10 +1462,10 @@ void CMainFrame::OnEditPreferences ()
 	{
         EditIArchive iarchive (rootNode);
         surMapOptions.serialize (iarchive);
-
 		eventMaster().eventObjectChanged().emit();
     }
 	surMapOptions.apply();
+	reloadMenu();
 }
 
 void CMainFrame::OnFileRunMenu()
@@ -2279,4 +2281,139 @@ void CMainFrame::OnFileResaveTriggers()
 	TriggerChain triggerChain;
 	triggerChain.load("Scripts\\Content\\GlobalTrigger.scr");
 	triggerChain.save();
+}
+
+
+void translateMenu(HMENU menu, const char* pathBase)
+{
+//	HINSTANCE instance = ::GetWindowInstance(GetSafeHwnd
+	UINT count = ::GetMenuItemCount(menu);
+	for(UINT i = 0; i < count; ++i){
+		std::string path = pathBase;
+		MENUITEMINFO menuInfo;
+		memset(&menuInfo, 0, sizeof(menuInfo));
+		menuInfo.cbSize = sizeof(menuInfo);
+		menuInfo.fMask = MIIM_TYPE | MIIM_ID;
+		if(::GetMenuItemInfo(menu, i, TRUE, &menuInfo)){
+			WORD commandID = menuInfo.wID;
+			CString idString;
+			idString.LoadString(commandID);
+			if(menuInfo.fType == MFT_STRING){
+				VERIFY(::GetMenuItemInfo(menu, i, TRUE, &menuInfo));
+				if(menuInfo.cch > 0){
+					std::string text(menuInfo.cch + 1, '\0');
+					menuInfo.dwTypeData = &text[0];
+					menuInfo.cch += 1;
+					::GetMenuItemInfo(menu, i, TRUE, &menuInfo);
+
+
+					std::string::size_type pos = text.find("\t");
+					std::string hotkey = "";
+					if(pos != std::string::npos){
+						hotkey = "\t";
+						hotkey += text.begin() + pos;
+						text = std::string(text.begin(), text.begin() + pos);
+					}
+					else
+						text.pop_back(); // удаляем последний '\0'
+
+
+					std::string tooltip = "";
+
+					path += text;
+					std::string translationKey = path;
+					const char* ptr = static_cast<const char*>(idString);
+					const char* end = ptr + strlen(ptr);
+					ptr = std::find(ptr, end, '\n');
+					if(ptr != end){
+						tooltip = std::string(ptr, end);
+						translationKey += tooltip;
+					}
+
+					const char* key = translationKey.c_str();
+					const char* translatedName = TRANSLATE(key);
+					
+					std::string nameWithHotkey = text + hotkey;
+
+					if(translatedName != key){
+						const char* name = translatedName + strlen(translatedName);
+						if(name != translatedName)
+							while((name - 1) != translatedName && *(name-1) != '\\')
+								--name;
+                        if(name - 1 == translatedName)
+							name = translatedName;
+						const char* end = name;
+						while(*end && *end != '\n')
+                            ++end;
+						nameWithHotkey = std::string(name, end) + hotkey;
+						if(*end){
+							++end;
+							tooltip = end;
+						}
+					}
+					
+					
+					CExtCmdManager::cmd_t* cmd;
+					cmd = g_CmdManager->CmdGetPtr(AfxGetApp()->m_pszProfileName, commandID);
+					if(commandID && cmd){
+						cmd->m_sTipTool = tooltip.c_str();
+						cmd->m_sMenuText = nameWithHotkey.c_str();
+					}
+
+					MENUITEMINFO info;
+					memset(&info, 0, sizeof(info));
+					info.cbSize = sizeof(info);
+					info.fMask = MIIM_STRING;
+					info.dwTypeData = (char*)nameWithHotkey.c_str();
+					VERIFY(::SetMenuItemInfo(menu, i, TRUE, &info));
+					//VERIFY(::ModifyMenu(menu, i, MF_BYPOSITION | MF_STRING, 0, nameWithHotkey.c_str()));
+					path += "\\";
+				}
+			}
+			menuInfo.fMask = MIIM_SUBMENU;
+			if(::GetMenuItemInfo(menu, i, TRUE, &menuInfo)){
+				if(menuInfo.hSubMenu)
+					translateMenu(menuInfo.hSubMenu, path.c_str());
+			}
+		}
+	}
+}
+
+bool CMainFrame::reloadMenu()
+{
+#ifndef _VISTA_ENGINE_EXTERNAL_
+	const bool external = false;
+#else
+	const bool external = true;
+#endif
+	if(!menuBar_.LoadMenuBar(external ? IDR_MAINFRAME_EXTERNAL : IDR_MAINFRAME))
+		return false;
+	
+	HMENU menu = menuBar_.GetMenu()->m_hMenu;
+	::translateMenu(menu, "");
+
+	if(!g_CmdManager->UpdateFromMenu(g_CmdManager->ProfileNameFromWnd(GetSafeHwnd()), menu), false){
+		ASSERT(FALSE);
+	}
+	menuBar_.UpdateMenuBar();
+	CWnd::RepositionBars(0, 0, 0);
+
+	DrawMenuBar();
+	return true;
+}
+
+void CMainFrame::OnFileUpdateQuickStartWorldsList()
+{
+	CWaitCursor waitCursor;
+
+	string dir = "Resource\\Worlds\\";
+	DirIterator it((dir + "*.spg").c_str());
+	while(it){
+		MissionDescription md((dir + *it).c_str());
+		if(md.isBattle())
+			qsWorldsMgr.updateQSWorld(md.saveName(), (XGUID)md.missionGUID());
+		++it;
+	}
+
+	qsWorldsMgr.save();
 }

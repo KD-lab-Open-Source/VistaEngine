@@ -60,6 +60,7 @@ public:
 
 	CGeneralView& view() { return *view_; }
 
+	bool reloadMenu();
 
 	void resetWorkspace();
 
@@ -138,11 +139,8 @@ public:
 
 	afx_msg void OnFileRunWorld();
 	afx_msg void OnFileRunMenu();
-
 	afx_msg void OnFileProperties();
-
 	afx_msg void OnFileExportVistaEngine();
-
 
 	afx_msg void OnFileSavewithouttertoolcolor();
 	afx_msg void OnFileSaveVoiceFileDurations();
@@ -265,6 +263,7 @@ public:
 	afx_msg void OnFileParametersExportUnits();
 	afx_msg void OnFileParametersExportFull();
 	afx_msg void OnFileParametersExportStatistics();
+	afx_msg void OnFileUpdateQuickStartWorldsList();
 };
 
 CMainFrame& mainFrame();

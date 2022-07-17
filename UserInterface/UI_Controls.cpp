@@ -472,11 +472,13 @@ void UI_ControlSlider::quant(float dt)
 UI_ControlHotKeyInput::UI_ControlHotKeyInput()
 {
 	waitingInput_ = false;
+	compatible_ = false;
 }
 
 void UI_ControlHotKeyInput::serialize(Archive& ar)
 {
 	__super::serialize(ar);
+	ar.serialize(compatible_, "compatible", "Может совпадать с хоткеями на кнопках");
 	postSerialize();
 }
 
@@ -496,7 +498,8 @@ bool UI_ControlHotKeyInput::activate()
 
 void UI_ControlHotKeyInput::done(const sKey& button, bool force)
 {
-	if((force || (button.key && button.key != VK_SHIFT && button.key != VK_CONTROL && button.key != VK_MENU)) && ControlManager::instance().checkHotKey(button.fullkey) && !UI_Dispatcher::instance().isIngameHotKey(button))
+	if((force || (button.key && button.key != VK_SHIFT && button.key != VK_CONTROL && button.key != VK_MENU))
+		&& (compatible_ || (ControlManager::instance().checkHotKey(button.fullkey) && !UI_Dispatcher::instance().isIngameHotKey(button))))
 	{
 		sKey last_key = key_;
 
@@ -1961,6 +1964,7 @@ UI_ControlBase::UI_ControlBase() :
 	visibleInEditor_ = true;
 	isVisibleByTrigger_ = true;
 
+	compatibleHotKey_ = false;
 	canHovered_ = true;
 
 	showModeID_ = UI_SHOW_NORMAL;
@@ -2006,6 +2010,7 @@ void UI_ControlBase::serialize(Archive& ar)
 	showModeID_ = (isEnabled_) ? UI_SHOW_NORMAL : UI_SHOW_DISABLED;
 
 	ar.serialize(hotKey_, "hotKey", "Горячая клавиша");
+	ar.serialize(compatibleHotKey_, "compatibleHotKey", "Горячая клавиша может совпадать с кнопками управления");
 
 	ar.serialize(linkToAnchor_, "linkToAnchor", "Привязать к миру");
 	ar.serialize(bgTextureAnimationIsPlaying_, "bgTextureAnimationIsPlaying", "Проигрывать анимацию фона");
@@ -3065,7 +3070,7 @@ void UI_ControlBase::getHotKeyList(vector<UI_ControlHotKey>& out) const
 
 void UI_ControlBase::getHotKeyList(vector<sKey>& out) const
 {
-	if(hotKey_.fullkey){
+	if(hotKey_.fullkey && !compatibleHotKey_){
 		vector<sKey>::const_iterator it = std::find(out.begin(), out.end(), hotKey_);
 		if(it == out.end())
 			out.push_back(hotKey_);

@@ -56,6 +56,8 @@ BEGIN
     "#include ""res\\SurMap5.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
     "#include ""afxres.rc""         // Standard components\r\n"
     "#endif\r\n"
+    "\r\n"
+    "// _VISTA_ENGINE_EXTERNAL_\r\n"
     "\0"
 END
 
@@ -190,6 +192,60 @@ BEGIN
     BEGIN
         MENUITEM "Excel - Full...",             IDM_EXPORT_FULL
         MENUITEM "Excel - By Group/Type...",    IDM_EXPORT_GROUP_TYPE
+    END
+END
+
+IDR_MAINFRAME_EXTERNAL MENU 
+BEGIN
+    POPUP "&Файл"
+    BEGIN
+        MENUITEM "&Новый",                      ID_FILE_NEW
+        MENUITEM "&Открыть",                    ID_FILE_OPEN
+        MENUITEM "&Сохранить",                  ID_FILE_SAVE
+        MENUITEM "Сохранить &Как...",           ID_FILE_SAVEAS
+        MENUITEM SEPARATOR
+        MENUITEM "&Запустить Мир...",           ID_FILE_RUN_WORLD
+        MENUITEM "Запустить &Главное Меню...",  ID_FILE_RUN_MENU
+        MENUITEM SEPARATOR
+        MENUITEM "С&войства...",                ID_FILE_PROPERTIES
+        MENUITEM "Статистика...",               ID_FILE_STATISTICS
+        MENUITEM SEPARATOR
+        MENUITEM "В&ыход",                      ID_APP_EXIT
+    END
+    POPUP "&Правка"
+    BEGIN
+        MENUITEM "&Отменить\tCtrl+Z",           ID_EDIT_UNDO
+        MENUITEM "&Повторить",                  ID_EDIT_REDO
+        MENUITEM SEPARATOR
+        MENUITEM "&Сценарий карты...",          ID_EDIT_MAPSCENARIO
+        MENUITEM SEPARATOR
+        MENUITEM "&Настройки...",               ID_EDIT_PREFERENCES
+    END
+    POPUP "&Вид"
+    BEGIN
+        MENUITEM "&Источники",                  ID_VIEW_SOURCES
+        MENUITEM "&Камеры",                     ID_VIEW_CAMERAS
+        MENUITEM "&Геоповерхность",             ID_VIEW_GEOSURFACE
+        MENUITEM "Показывать &сетку",           ID_VIEW_SHOW_GRID
+        MENUITEM "Спрятать модели",             40354
+    END
+    POPUP "&Интерфейс"
+    BEGIN
+        MENUITEM "&Сбросить интерфейс",         ID_VIEW_RESETTOOLBAR2DEFAULT
+        MENUITEM SEPARATOR
+        MENUITEM "Строка &меню",                ID_VIEW_MENUBAR
+        MENUITEM "Панель &инструментов",        IDR_MAINFRAME
+        MENUITEM "Панель &фильтров",            IDR_FILTERS_BAR
+        MENUITEM "&Строка состояния",           ID_VIEW_STATUS_BAR
+        MENUITEM SEPARATOR
+        MENUITEM "Инструменты",                 ID_VIEW_TREE_BAR
+        MENUITEM "Сво&йства",                   ID_VIEW_DLGBAR
+        MENUITEM "&Миникарта",                  ID_VIEW_MINIMAP
+        MENUITEM "Менеджер &объектов",          ID_VIEW_OBJECTS_MANAGER
+    END
+    POPUP "&Справка"
+    BEGIN
+        MENUITEM "&О Vista Game Engine...",     ID_APP_ABOUT
     END
 END
 
@@ -1740,6 +1796,150 @@ IDC_CURSOR_BUTTON       CURSOR                  "res\\cur_button.cur"
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\Vista.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDR_MAINFRAME           "Vista Engine"
+    ID_COMBO                "zzz"
+    IDS_ERROR_IN_CUSTOM_VALUE "Error In Custom Value"
+    IDS_PANE_TEXT           "Status"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_APP_TITLE       "Vista Engine"
+    AFX_IDS_IDLEMESSAGE     "Ready"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_INDICATOR_EXT        "EXT"
+    ID_INDICATOR_CAPS       "CAP"
+    ID_INDICATOR_NUM        "NUM"
+    ID_INDICATOR_SCRL       "SCRL"
+    ID_INDICATOR_OVR        "OVR"
+    ID_INDICATOR_REC        "REC"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_APP_ABOUT            "\nПоказать информацию о программе, версию и Copyright"
+    ID_APP_EXIT             "\nВыйти из приложения"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_EDIT_UNDO            "\nОтменить последнее действие"
+    ID_EDIT_REDO            "\nПовторить отмененное действие"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_TOOLBAR         "Показать/спрятать панель инструментов"
+    ID_VIEW_STATUS_BAR      "Показать/спрятать строку состояния"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILE_RUN_WORLD       "\nЗапустить игру с текущим миром"
+    ID_EDIT_GAME_SCENARIO   "\nСценарий игры"
+    ID_VIEW_BREAKSOURCE     "\nФильтр отображеня: показывать/прятать источники трещин"
+    ID_EDIT_REBUILDWORLD    "\nПерестроить мир по процедурной карте"
+    ID_EDIT_EFFECTS         "\nБиблиотека эффектов"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILE_RUN_MENU        "\nЗапустить игру с главным меню"
+    ID_EDIT_TOOLZERS        "\nБиблиотека тулзеров"
+    ID_FILE_PROPERTIES      "\nПоказать свойства мира"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_BRUSH_COMBO_PLACE    "\nРазмер кисти"
+    ID_BUTTON_FREE_PLACE2   "\nФорма кисти"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_EDIT_SOUNDS          "\nБиблиотека звуковых эффектов"
+    ID_EDIT_MAPSCENARIO     "\nСценарий карты..."
+    ID_EDIT_TRIGGERS        "\nРедактор триггеров..."
+    ID_EDIT_UNITS           "\nРедактор библиотек..."
+END
+
+STRINGTABLE 
+BEGIN
+    ID_EDIT_USER_INTERFACE  "\nЗапустить редактор интерфейса (внешнее приложение)..."
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_OBJECTS_MANAGER "\nМенеджер объектов (список объектов на мире)"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_BUBBLESOURCE    "Selection filter: Toggle bubble sources\nSelection filter: Toggle bubble sources"
+    ID_VIEW_WINDSOURCE      "Selection filter: Toggle wind sources\nSelection filter: Toggle wind sources"
+    ID_VIEW_LIGHTSOURCE     "Selection filter: Toggle light sources\nSelection filter: Toggle light sources"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILE_NEW             "\nСоздать новый мир..."
+    ID_FILE_OPEN            "\nОткрыть мир..."
+    ID_FILE_SAVE            "\nСохранить текущий мир"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_EDIT_VOICES          "\nVoices Library"
+    ID_FILE_EXPORTVISTAENGINE "\nЭкспортировать версию"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_EDIT_GLOBAL_TRIGGER  "\nРедактировать глобальный триггер..."
+END
+
+STRINGTABLE 
+BEGIN
+    ID_EDIT_EFFECTS_EDITOR  "\nЗапустить редактор спецэффектов(внешнее приложение)..."
+    ID_EDIT_TERTOOLS        "\nБиблиотека тулзеров"
+    ID_EDIT_FORMATIONS      "\nРедактор формаций"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_CAMERAS         "\nФильтр отображения: показывать/прятать камеры"
+    ID_VIEW_EFFECTS         "\nФильтр отображения: показывать/прятать источники"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_GEOSURFACE      "\nФильтр отображения: показывать/прятать геоинформцаию"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TIME_ELAPSED_LOAD_LANGUAGE "Time elapsed:\t %.2d:%.2d:%.2d"
+    IDS_LANGUAGE_FILE_VERSION "Version"
+    IDS_CODEPAGE_NUMS       "Code Page Number"
+    IDS_ID_COLUMN_HEADER    "ID"
+    CG_IDS_PROGRESS_CAPTION "Progress..."
+    IDS_STATUS_LOAD_LANGUAGE "Loading %s language..."
+    IDS_TIME_LEFT_LOAD_LANGUAGE "Time left:\t %.2d:%.2d:%.2d"
+    IDS_IMPORT_XLS_FILE     "Import progress..."
+    IDS_EXPORT_XLS_FILE     "Export progress..."
+END
+
 #endif    // Russian resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -1764,6 +1964,7 @@ IDR_LIBRARIES_EXTERNAL_BAR BITMAP                  "res\\ToolbarLibrariesExterna
 IDR_EDITORS_BAR         BITMAP                  "res\\ToolbarEditors.bmp"
 IDR_LIBRARIES_BAR       BITMAP                  "res\\ToolbarLibraries.bmp"
 IDR_FILTERS_BAR         BITMAP                  "res\\ToolbarFilters.bmp"
+IDR_FILTERS_EXTERNAL_BAR BITMAP                  "res\\ToolbarFiltersExternal.bmp"
 IDR_MAINFRAME_EXTERNAL  BITMAP                  "res\\ToolbarExternal.bmp"
 IDR_EDITORS_EXTERNAL_BAR BITMAP                  "res\\ToolbarEditorsExternal.bmp"
 IDR_WORKSPACE_BAR       BITMAP                  "res\\ToolbarWorkspace.bmp"
@@ -1790,6 +1991,9 @@ BEGIN
         MENUITEM "Resave All Triggers",         ID_FILE_RESAVE_TRIGGERS
         MENUITEM "Save VoiceFile Durations",    ID_FILE_SAVEVOICEFILEDURATIONS
 
+        MENUITEM "Update quick start worlds list", 
+                                                ID_FILE_UPDATE_QUICK_START_WORLDS_LIST
+
         MENUITEM SEPARATOR
         MENUITEM "Merge...",                    ID_FILE_MERGE
         MENUITEM SEPARATOR
@@ -1809,10 +2013,6 @@ BEGIN
     BEGIN
         MENUITEM "&Undo\tCtrl+Z",               ID_EDIT_UNDO
         MENUITEM "&Redo\tCtrl+Y",               ID_EDIT_REDO
-        MENUITEM SEPARATOR
-        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
-        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
-        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
         MENUITEM SEPARATOR
         MENUITEM "&Map Scenario...",            ID_EDIT_MAPSCENARIO
         MENUITEM "&Game Scenario...",           ID_EDIT_GAME_SCENARIO
@@ -1926,87 +2126,6 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Show Palette Texture",        ID_DEBUG_SHOWPALETTETEXTURE
         MENUITEM "Show Mipmap",                 ID_DEBUG_SHOWMIPMAP
-    END
-END
-
-IDR_MAINFRAME_EXTERNAL MENU 
-BEGIN
-    POPUP "&File"
-    BEGIN
-        MENUITEM "&New",                        ID_FILE_NEW
-        MENUITEM "&Open",                       ID_FILE_OPEN
-        MENUITEM SEPARATOR
-        MENUITEM "&Save",                       ID_FILE_SAVE
-        MENUITEM "Save &As...",                 ID_FILE_SAVEAS
-        MENUITEM SEPARATOR
-        MENUITEM "&Run World...",               ID_FILE_RUN_WORLD
-        MENUITEM "Run &Main Menu...",           ID_FILE_RUN_MENU
-        MENUITEM SEPARATOR
-        MENUITEM "P&roperties...",              ID_FILE_PROPERTIES
-        MENUITEM "Statistics...",               ID_FILE_STATISTICS
-        MENUITEM SEPARATOR
-        MENUITEM "E&xit",                       ID_APP_EXIT
-    END
-    POPUP "&Edit"
-    BEGIN
-        MENUITEM "&Undo\tCtrl+Z",               ID_EDIT_UNDO
-        MENUITEM "&Redo\tCtrl+Y",               ID_EDIT_REDO
-        MENUITEM SEPARATOR
-        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
-        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
-        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
-        MENUITEM SEPARATOR
-        MENUITEM "&Map Scenario...",            ID_EDIT_MAPSCENARIO
-        MENUITEM SEPARATOR
-        MENUITEM "PlayPMO",                     ID_EDIT_PLAYPMO
-        MENUITEM "Change Total World Height",   ID_EDIT_CHANGETOTALWORLDHEIGHT
-
-        MENUITEM "&Rebuild World",              ID_EDIT_REBUILDWORLD
-        MENUITEM SEPARATOR
-        MENUITEM "Pre&ferences...",             ID_EDIT_PREFERENCES
-    END
-    POPUP "View"
-    BEGIN
-        MENUITEM "&Sources",                    ID_VIEW_SOURCES
-        MENUITEM "&Cameras",                    ID_VIEW_CAMERAS
-        MENUITEM "&Geosurface",                 ID_VIEW_GEOSURFACE
-        MENUITEM SEPARATOR
-        MENUITEM "Show &Grid",                  ID_VIEW_SHOW_GRID
-        MENUITEM "&Animation",                  ID_VIEW_ANIMATION
-        MENUITEM "Enable &Time Flow",           ID_VIEW_ENABLE_TIME_FLOW
-        MENUITEM "Hide Models",                 40354
-    END
-    POPUP "Parameters"
-    BEGIN
-        MENUITEM "Import By Groups...",         ID_IMPORT_PARAMETERS
-        MENUITEM "Export By Groups...",         ID_EXPORT_PARAMETERS
-        MENUITEM SEPARATOR
-        MENUITEM "Import By Units...",          ID_FILE_PARAMETERS_IMPORT_UNITS
-
-        MENUITEM "Export By Units...",          ID_FILE_PARAMETERS_EXPORT_UNITS
-
-        MENUITEM SEPARATOR
-        MENUITEM "Export Balance Parameters...", 
-                                                ID_FILE_PARAMETERS_EXPORT_STATISTICS
-
-    END
-    POPUP "Workspace"
-    BEGIN
-        MENUITEM "&Reset Workspace",            ID_VIEW_RESETTOOLBAR2DEFAULT
-        MENUITEM SEPARATOR
-        MENUITEM "Menu Bar",                    ID_VIEW_MENUBAR
-        MENUITEM "Main &Toolbar",               IDR_MAINFRAME
-        MENUITEM "Filters Bar",                 IDR_FILTERS_BAR
-        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
-        MENUITEM SEPARATOR
-        MENUITEM "Tools",                       ID_VIEW_TREE_BAR
-        MENUITEM "Properties",                  ID_VIEW_DLGBAR
-        MENUITEM "&Minimap",                    ID_VIEW_MINIMAP
-        MENUITEM "Objects Manager",             ID_VIEW_OBJECTS_MANAGER
-    END
-    POPUP "&Help"
-    BEGIN
-        MENUITEM "&About Vista Game Engine...", ID_APP_ABOUT
     END
 END
 
@@ -2194,6 +2313,16 @@ BEGIN
     BUTTON      ID_VIEW_PATH_FINDING_SELECT_REFERENCE
 END
 
+IDR_FILTERS_EXTERNAL_BAR TOOLBAR  24, 24
+BEGIN
+    BUTTON      ID_VIEW_SHOW_GRID
+    BUTTON      ID_VIEW_ENABLE_TIME_FLOW
+    BUTTON      IDD_TIME_SLIDER
+    SEPARATOR
+    BUTTON      ID_VIEW_SOURCES
+    BUTTON      ID_VIEW_CAMERAS
+END
+
 IDR_MAINFRAME_EXTERNAL TOOLBAR  24, 24
 BEGIN
     BUTTON      ID_FILE_NEW
@@ -2240,201 +2369,6 @@ BEGIN
     VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
 END
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE 
-BEGIN
-    IDR_MAINFRAME           "Vista Engine"
-    ID_COMBO                "zzz"
-    IDS_APPLY_BUTTON        "Apply"
-    IDS_CANCEL_BUTTON       "Cancel"
-    IDS_ERROR_IN_CUSTOM_VALUE "Error In Custom Value"
-    IDS_NAME_COLUMN         "Property"
-    IDS_VALUE_COLUMN        "Value"
-    IDS_REMOVE_ITEM         "Remove Item"
-    IDS_PANE_TEXT           "Status"
-END
-
-STRINGTABLE 
-BEGIN
-    AFX_IDS_APP_TITLE       "Vista Engine"
-    AFX_IDS_IDLEMESSAGE     "Ready"
-END
-
-STRINGTABLE 
-BEGIN
-    ID_INDICATOR_EXT        "EXT"
-    ID_INDICATOR_CAPS       "CAP"
-    ID_INDICATOR_NUM        "NUM"
-    ID_INDICATOR_SCRL       "SCRL"
-    ID_INDICATOR_OVR        "OVR"
-    ID_INDICATOR_REC        "REC"
-END
-
-STRINGTABLE 
-BEGIN
-    ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
-    ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
-END
-
-STRINGTABLE 
-BEGIN
-    ID_NEXT_PANE            "Switch to the next window pane\nNext Pane"
-    ID_PREV_PANE            "Switch back to the previous window pane\nPrevious Pane"
-END
-
-STRINGTABLE 
-BEGIN
-    ID_WINDOW_SPLIT         "Split the active window into panes\nSplit"
-END
-
-STRINGTABLE 
-BEGIN
-    ID_EDIT_CLEAR           "Erase the selection\nErase"
-    ID_EDIT_CLEAR_ALL       "Erase everything\nErase All"
-    ID_EDIT_COPY            "Copy the selection and put it on the Clipboard\nCopy"
-    ID_EDIT_CUT             "Cut the selection and put it on the Clipboard\nCut"
-    ID_EDIT_FIND            "Find the specified text\nFind"
-    ID_EDIT_PASTE           "Insert Clipboard contents\nPaste"
-    ID_EDIT_REPEAT          "Repeat the last action\nRepeat"
-    ID_EDIT_REPLACE         "Replace specific text with different text\nReplace"
-    ID_EDIT_SELECT_ALL      "Select the entire document\nSelect All"
-    ID_EDIT_UNDO            "Undo the last action\nUndo"
-    ID_EDIT_REDO            "Redo the previously undone action\nRedo"
-END
-
-STRINGTABLE 
-BEGIN
-    ID_VIEW_TOOLBAR         "Show or hide the toolbar\nToggle ToolBar"
-    ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle StatusBar"
-END
-
-STRINGTABLE 
-BEGIN
-    AFX_IDS_SCSIZE          "Change the window size"
-    AFX_IDS_SCMOVE          "Change the window position"
-    AFX_IDS_SCMINIMIZE      "Reduce the window to an icon"
-    AFX_IDS_SCMAXIMIZE      "Enlarge the window to full size"
-    AFX_IDS_SCNEXTWINDOW    "Switch to the next document window"
-    AFX_IDS_SCPREVWINDOW    "Switch to the previous document window"
-    AFX_IDS_SCCLOSE         "Close the active window and prompts to save the documents"
-END
-
-STRINGTABLE 
-BEGIN
-    AFX_IDS_SCRESTORE       "Restore the window to normal size"
-    AFX_IDS_SCTASKLIST      "Activate Task List"
-END
-
-STRINGTABLE 
-BEGIN
-    ID_FILE_RUN_WORLD       "Launch game with current world\nLaunch game with current world"
-    ID_EDIT_GAME_SCENARIO   "Game Scenario Dialog\nGame Scenario Dialog"
-    ID_VIEW_BREAKSOURCE     "Selection filter: Toggle fissure sources\nSelection filter: Toggle fissure sources"
-    ID_EDIT_REBUILDWORLD    "Rebuild World\nRebuild World"
-    ID_EDIT_EFFECTS         "Effects Library\nEffects Library"
-END
-
-STRINGTABLE 
-BEGIN
-    ID_FILE_RUN_MENU        "Launch game with main menu\nLaunch game with main menu"
-    ID_EDIT_TOOLZERS        "Toolzer Library\nToolzer Library"
-    ID_FILE_PROPERTIES      "Show World Properties\nShow World Properties"
-END
-
-STRINGTABLE 
-BEGIN
-    ID_BRUSH_COMBO_PLACE    "Brush size\nBrush size"
-    ID_BUTTON_FREE_PLACE2   "Brush shape\nBrush shape"
-END
-
-STRINGTABLE 
-BEGIN
-    ID_EDIT_SOUNDS          "Sound Effects Library\nSound Effects Library"
-    ID_EDIT_MAPSCENARIO     "Map scenario dialog...\nMap scenario dialog..."
-    ID_EDIT_TRIGGERS        "Trigger Editor...\nTrigger Editor..."
-    ID_EDIT_UNITS           "Unit Editor...\nUnit Editor..."
-END
-
-STRINGTABLE 
-BEGIN
-    ID_EDIT_USER_INTERFACE  "Launch Interface Editor\nLaunch Interface Editor"
-END
-
-STRINGTABLE 
-BEGIN
-    ID_VIEW_OBJECTS_MANAGER "Full Object List (included all objects), not all objects are included yet.\nFull Object List (included all objects), not all objects are included yet."
-END
-
-STRINGTABLE 
-BEGIN
-    ID_VIEW_BUBBLESOURCE    "Selection filter: Toggle bubble sources\nSelection filter: Toggle bubble sources"
-    ID_VIEW_WINDSOURCE      "Selection filter: Toggle wind sources\nSelection filter: Toggle wind sources"
-    ID_VIEW_LIGHTSOURCE     "Selection filter: Toggle light sources\nSelection filter: Toggle light sources"
-END
-
-STRINGTABLE 
-BEGIN
-    ID_FILE_NEW             "Create new world...\nCreate new world..."
-    ID_FILE_OPEN            "Open world..\nOpen world.."
-    ID_FILE_SAVE            "Save current world...\nSave current world..."
-END
-
-STRINGTABLE 
-BEGIN
-    ID_EDIT_VOICES          "Voices Library\nVoices Library"
-    ID_FILE_EXPORTVISTAENGINE "Export Version...\nExport version..."
-END
-
-STRINGTABLE 
-BEGIN
-    ID_EDIT_HEADS           "Talking Heads Library\nTalking Heads Library"
-    ID_EDIT_SOUND_TRACKS    "Audio Tracks Library\nAudio Tracks Library"
-    ID_EDIT_REELS           "Cutscenes Library\nCutscenes Library"
-    ID_EDIT_GLOBAL_TRIGGER  "Edit Global Trigger...\nEdit Global Trigger..."
-END
-
-STRINGTABLE 
-BEGIN
-    ID_EDIT_EFFECTS_EDITOR  "Launch Effects Editor...\nLaunch Effects Editor..."
-    ID_EDIT_TERTOOLS        "Terra Toolzers Library\nTerra Toolzers Library"
-    ID_EDIT_FORMATIONS      "Formations Editor...\nFormations Editor"
-END
-
-STRINGTABLE 
-BEGIN
-    ID_VIEW_CAMERAS         "Selection filter: Toggle cameras\nSelection filter: Toggle cameras"
-    ID_VIEW_EFFECTS         "Selection filter: Toggle effects\nSelection filter: Toggle effects"
-END
-
-STRINGTABLE 
-BEGIN
-    ID_VIEW_GEOSURFACE      "Section filter: Toggle geo\nSection filter: Toggle GEO"
-END
-
-STRINGTABLE 
-BEGIN
-    IDS_TIME_ELAPSED_LOAD_LANGUAGE "Time elapsed:\t %.2d:%.2d:%.2d"
-    IDS_LANGUAGE_FILE_VERSION "Version"
-    IDS_CODEPAGE_NUMS       "Code Page Number"
-    IDS_ID_COLUMN_HEADER    "ID"
-    CG_IDS_PROGRESS_CAPTION "Progress..."
-    IDS_STATUS_LOAD_LANGUAGE "Loading %s language..."
-    IDS_TIME_LEFT_LOAD_LANGUAGE "Time left:\t %.2d:%.2d:%.2d"
-    IDS_IMPORT_XLS_FILE     "Import progress..."
-    IDS_EXPORT_XLS_FILE     "Export progress..."
-END
-
-STRINGTABLE 
-BEGIN
-    ID_FILE_EXPORTTEXTTOEXCEL "Export language data to Excel file"
-    ID_FILE_IMPORTTEXTFROMEXCEL "Import language data from Excel file"
-END
-
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -2456,6 +2390,8 @@ LANGUAGE 9, 1
 #include "res\SurMap5.rc2"  // non-Microsoft Visual C++ edited resources
 #include "afxres.rc"         // Standard components
 #endif
+
+// _VISTA_ENGINE_EXTERNAL_
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED

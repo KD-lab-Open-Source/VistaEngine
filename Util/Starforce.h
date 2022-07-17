@@ -1,11 +1,7 @@
 #ifndef __STARFORCE_H__
 #define __STARFORCE_H__
 
-#define USE_SECUROM
-
 #ifdef USE_SECUROM
-
-#include "securom_api.h"
 
 //#define STARFORCE_API extern "C" __declspec(dllexport)
 //#define STARFORCE_API __declspec(dllexport)

@@ -9,6 +9,8 @@
 #include "..\Physics\WindMap.h"
 #include "..\Terra\vmap.h"
 
+// _VISTA_ENGINE_EXTERNAL_ - нужно для перевода
+
 BEGIN_ENUM_DESCRIPTOR(ModeFall,"ModeFall");
 REGISTER_ENUM(FALLOUT_RAIN, "Дождь");
 REGISTER_ENUM(FALLOUT_SNOW, "Снег");

@@ -158,10 +158,14 @@ enum UI_ControlActionID
 	UI_ACTION_BIND_SAVE_LIST,
 	/// быстрое создание и старт online игры
 	UI_ACTION_INET_QUICK_START,
+	/// обновить список online игр
+	UI_ACTION_INET_REFRESH_GAME_LIST,
 	/// создать сервер сетевой игры
 	UI_ACTION_LAN_CREATE_GAME,
 	/// присоединиться к игре
 	UI_ACTION_LAN_JOIN_GAME,
+	/// тип подключения к интернету
+	UI_ACTION_INET_NAT_TYPE,
 	/// создание online аккаунта
 	UI_ACTION_INET_CREATE_ACCOUNT,
 	/// online login
@@ -170,6 +174,10 @@ enum UI_ControlActionID
 	UI_ACTION_INET_DELETE_ACCOUNT,
 	/// сменить online пароль
 	UI_ACTION_INET_CHANGE_PASSWORD,
+	/// список каналов чата
+	UI_ACTION_LAN_CHAT_CHANNEL_LIST,
+	/// войти на выбранный канал чата
+	UI_ACTION_LAN_CHAT_CHANNEL_ENTER,
 	/// список людей в чате
 	UI_ACTION_LAN_CHAT_USER_LIST,
 	/// LAN - вывод списка сетевых игр
@@ -567,6 +575,7 @@ enum UI_OptionType
 {
 	UI_OPTION_UPDATE,
 	UI_OPTION_APPLY,
+	UI_OPTION_DEFAULT,
 	UI_OPTION_CANCEL
 };
 
@@ -636,14 +645,21 @@ enum TeamGameType {
 };
 
 enum GameListInfoType {
-	GAME_INFO_TAB_LIST,
+	GAME_INFO_START_STATUS,
+	GAME_INFO_TAB,
 	GAME_INFO_GAME_NAME,
 	GAME_INFO_HOST_NAME,
 	GAME_INFO_WORLD_NAME,
 	GAME_INFO_PLAYERS_NUMBER,
+	GAME_INFO_PLAYERS_CURRENT,
+	GAME_INFO_PLAYERS_MAX,
 	GAME_INFO_PING,
+	GAME_INFO_NAT_TYPE,
+	GAME_INFO_NAT_COMPATIBILITY,
 	GAME_INFO_GAME_TYPE
 };
+
+typedef vector<GameListInfoType> GameListInfoTypes;
 
 // С какой стороны выезжать кнопке при активации
 enum ActivationMove {

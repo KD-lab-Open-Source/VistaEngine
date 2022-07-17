@@ -19,7 +19,14 @@
 #define new DEBUG_NEW
 #endif
 
+BEGIN_MESSAGE_MAP(CSurMap5App, CWinApp)
+	ON_COMMAND(ID_APP_ABOUT, OnAppAbout)
+	ON_COMMAND(ID_VIEW_ANIMATION, OnViewAnimation)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_ANIMATION, OnUpdateViewAnimation)
+END_MESSAGE_MAP()
 
+string GetMissionSaveNameFromPlayReel(const char* fname) { xassert(0&&"Replay is not supported in editor!"); return string(""); }
+void UpdateMDFromPlayReel(const char* fname, class MissionDescription* pmd){ xassert(0&&"Replay is not supported in editor!"); }
 
 double clockf()
 {
@@ -30,16 +37,6 @@ int clocki()
 {
 	return 0;
 }
-
-
-BEGIN_MESSAGE_MAP(CSurMap5App, CWinApp)
-	ON_COMMAND(ID_APP_ABOUT, OnAppAbout)
-	ON_COMMAND(ID_VIEW_ANIMATION, OnViewAnimation)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_ANIMATION, OnUpdateViewAnimation)
-END_MESSAGE_MAP()
-
-string GetMissionSaveNameFromPlayReel(const char* fname) { xassert(0&&"Replay is not supported in editor!"); return string(""); }
-void UpdateMDFromPlayReel(const char* fname, class MissionDescription* pmd){ xassert(0&&"Replay is not supported in editor!"); }
 
 
 CSurMap5App::CSurMap5App()

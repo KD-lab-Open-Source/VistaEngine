@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # vim:set foldmethod=marker:
 
 import gtk
@@ -6,15 +6,21 @@ import gobject
 
 import os
 from os.path import abspath
+from os.path import isdir
+from os.path import isfile
 
 import fnmatch
+import re
 
 from Dictionary import Dictionary
+from Dictionary import unescape
+from Dictionary import escape
 from LanguageManager import LanguageManager
-from DictionaryExcel import exportSingleXLS
-from DictionaryExcel import importSingleXLS
+from DictionaryExcel import exportSingleSheetXLS as exportSingleXLS
+from DictionaryExcel import importSingleSheetXLS as importSingleXLS
 
-SOURCE_DIRS =  ['AI',
+SOURCE_DIRS =  [
+                'AI',
                 'AttribEditor',
                 'AttribEditor\\TreeEditors',
                 'AttribEditor\\DLL',
@@ -55,7 +61,7 @@ KEYWORDS = ['serialize:3',
             'REGISTER_CLASS_CONVERSION:3',
             'WRAP_LIBRARY:3']
 
-TYPES = ['*.h', '*.cpp']
+TYPES = ['*.h', '*.cpp', '*.rc']
 
 PO_DIR = '.'
 TRANSLATIONS_DIR = '..'
@@ -70,6 +76,51 @@ keywords = ""
 for word in KEYWORDS:
     keywords += "--keyword=%s " % word
         
+def fileIncludesString(filename, string):
+    f = file(filename, 'r')
+    for line in f:
+        if line.find(string, 0, -1) != -1:
+            return True
+    return False
+
+def readPot(fileName):#{{{
+
+    pairs = []
+
+    # print "\n** Reading PO Template %s" % fileName
+
+    f = file(fileName, 'r')
+
+    msgid = re.compile('^msgid "(.*)"$', re.M)
+    msgstr = re.compile('^msgstr "(.*)"$', re.M)
+    juststr = re.compile('^"(.*)"$', re.M)
+
+    key = u""
+    value = u""
+
+    lastWasKey = True
+    for line in f:
+        result = msgid.match(line)
+        if not result is None:
+            key = unescape(unicode(result.groups()[0], 'utf-8'))
+            lastWasKey = True
+        else:
+            result = msgstr.match(line)
+            if not result is None:
+                pairs += [ (key, unescape(result.groups()[0])) ]
+                lastWasKey = False
+            else:
+                result = juststr.match(line)
+                if not result is None:
+                    if lastWasKey:
+                        key += unescape(result.groups()[0])
+                    else:
+                        last_item = pairs[-1];
+                        last_item = (last_item[0], last_item[1] + unescape(result.groups()[0]))
+
+    print "Got %i messages" % len(pairs)
+    return pairs
+    #}}}
 
 def extractStrings(dirs, outFileName, progressCallback):#{{{
     try:
@@ -83,20 +134,24 @@ def extractStrings(dirs, outFileName, progressCallback):#{{{
 
     fileNames = []
     for d in dirs:
-        print "\n** Entering %s..." % d
         path = ROOT + "\\" + d
-        for mask in TYPES:
-            files = fnmatch.filter(os.listdir(path), mask)
-            for f in files:
-                fileNames += [path + "\\" + f]
+        if isdir(path):
+            # print "** Entering %s..." % d
+            for mask in TYPES:
+                files = fnmatch.filter(os.listdir(path), mask)
+                for f in files:
+                    filename = path + "\\" + f
+                    if fileIncludesString(filename, "_VISTA_ENGINE_EXTERNAL_"):
+                        fileNames += [filename]
+        elif isfile(path):
+                # print "\n** Listing %s..." % d
+                if isValidSource(path):
+                    fileNames += path
 
-    count = len(fileNames)
-    index = 0
-    command = 'xgettext %s -c++ --from-code=cp1251 -o %s -' % (keywords, outFileName)
-    (stdin, stdout) = os.popen2(command, 't')
-    for sourceFileName in fileNames:
-        print "* Extracting strings from %s" % sourceFileName
-
+    def processCpp(sourceFileName):#{{{
+        index = 0
+        command = 'xgettext %s -c++ --from-code=cp1251 -o %s -' % (keywords, outFileName)
+        (stdin, stdout) = os.popen2(command, 't')
         sourceFile = file(sourceFileName, 'r')
         for line in sourceFile:
             stdin.write(line)
@@ -104,10 +159,138 @@ def extractStrings(dirs, outFileName, progressCallback):#{{{
 
         progressCallback(float(index) / float(count))
         index += 1
-    stdin.close()
-    for line in stdout:
-        print line
-    stdout.close()
+        stdin.close()
+        for line in stdout:
+            print line
+        stdout.close()
+
+        return readPot(outFileName)#}}}
+
+    def processRC(sourceFileName):#{{{
+        re_menu     = re.compile('^\s*(IDR_\w+)\s*MENU\s*$', re.M)
+        re_string   = re.compile('^\s*(ID_\w+)\s*"(.*)"\s*$', re.M)
+
+        re_begin    = re.compile('^\s*BEGIN\s*$', re.M)
+        re_end      = re.compile('^\s*END\s*$', re.M)
+        re_popup    = re.compile('^\s*POPUP\s*"(.*)"$', re.M)
+        re_menuitem_text = re.compile('^\s*MENUITEM\s*"(.*)",\s*(ID_\w+)\s*$', re.M)
+
+        f = file(sourceFileName, 'r')
+
+        class Menu:
+            def visit(self, visitor):
+                visitor(self)
+                for child in self.children:
+                    child.visit(visitor)
+            def __init__(self, parent, name = u"", path = u""):
+                self.parent = parent
+                self.path = path
+                self.name = name
+                self.children = []
+
+            def __call__(self, line):
+                result = re_popup.match(line)
+                if not result is None:
+                    text = unescape(unicode(result.groups()[0], 'windows-1251'))
+                    if len(self.path):
+                        path = self.path + u"\\" + text
+                    else:
+                        path = text
+                    self.children += [ Menu(self, u"", path) ]
+                    return self.children[-1]
+
+                result = re_menuitem_text.match(line)
+                if not result is None:
+                    text = unescape(unicode(result.groups()[0], 'windows-1251'))
+                    name = unicode(result.groups()[1], 'windows-1251')
+
+                    position = text.find("\t")
+                    if position != -1:
+                        text = text[0:position]
+
+                    print text
+                    if len(self.path):
+                        path = self.path + u"\\" + text
+                    else:
+                        path = text
+                    self.children += [ Menu(self, name, path) ]
+                    return self
+
+                if not re_end.match(line) is None:
+                    return self.parent
+
+                return self
+
+        class Root:
+
+            def __init__(self):
+                self.children = []
+                self.strings = dict()
+            def __call__(self, line):
+                result = re_menu.match(line)
+                if not result is None:
+                    text = unicode(result.groups()[0], 'windows-1251')
+                    self.children += [ Menu(self, u"", u"") ]
+                    return self.children[-1]
+                result = re_string.match(line)
+                if not result is None:
+                    name = unicode(result.groups()[0], 'windows-1251')
+                    text = unescape(unicode(result.groups()[1], 'windows-1251'))
+                    self.strings[name] = text
+                return self
+            def visit(self, visitor):
+                for child in self.children:
+                    child.visit(visitor)
+            def generatePairs(self):
+                pairs = []
+                class Parser:
+                    def __init__(self, pairs, strings): self.pairs = pairs; self.strings = strings
+                    def __call__(self, item):
+                        key = item.path
+                        tooltip = self.strings.get(item.name, None)
+                        if not tooltip is None:
+                            pos = tooltip.find("\n")
+                            if pos != -1:
+                                tooltip = tooltip[pos:]
+                                key += tooltip
+                                print key
+                        self.pairs += [ (key, u"") ]
+                self.visit(Parser(pairs, self.strings))
+                return pairs
+
+        root = Root()
+        cur = root
+
+        for line in f:
+            cur = cur(line)
+
+        pairs = root.generatePairs()
+        return pairs
+    #}}}
+
+    associations = dict()
+    associations['.cpp'] = processCpp
+    associations['.h']   = processCpp
+    associations['.rc']  = processRC
+
+    result = []
+
+    count = len(fileNames)
+    for sourceFileName in fileNames:
+
+        extStart = sourceFileName.rfind(".")
+        if(not extStart is None):
+            fileExtension = sourceFileName[extStart:].lower()
+            action = associations.get(fileExtension, None)
+            if not action is None:
+                print "* Extracting strings from %s" % sourceFileName
+                result += action(sourceFileName)
+                continue
+
+        print " * Skipping %s (unknown type)" % sourceFileName;
+
+    return result
+
 #}}}
 
 languageManager = LanguageManager(TRANSLATIONS_DIR, "Russian")
@@ -244,9 +427,6 @@ class ToolWindow:
         gtk.main()
         #}}}
 
-    def onParse(s, button):#{{{
-        pass
-        #}}}
 
     #def onCreateTemplate(s, button):#{{{
 
@@ -270,13 +450,12 @@ class ToolWindow:
     def onParseSources(s, button):
         wnd = ProgressWindow(s.window)
         wnd.show()
-        extractStrings(SOURCE_DIRS, pot_path, wnd.onProgress)
+        pairs = extractStrings(SOURCE_DIRS, pot_path, wnd.onProgress)
         wnd.hide()
-
         message = "Merge results:\n\n"
 
         d = Dictionary()
-        d.importPot(pot_path)
+        d.importPairs(pairs)
         d.importVistaEngineScr(vistaEngineScr_path)
         d.wipeNonTranslatable()
 

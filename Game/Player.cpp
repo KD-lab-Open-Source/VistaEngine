@@ -22,6 +22,8 @@
 #include "..\UserInterface\UI_Logic.h"
 #include "..\UserInterface\UI_CustomControls.h"
 
+// _VISTA_ENGINE_EXTERNAL_ - переводить для external-редактора
+
 BEGIN_ENUM_DESCRIPTOR(AuxPlayerType, "AuxPlayerType")
 REGISTER_ENUM(AUX_PLAYER_TYPE_ORDINARY_PLAYER, "Обычный игрок");
 REGISTER_ENUM(AUX_PLAYER_TYPE_COMMON_FRIEND, "Общий союзник");
@@ -72,6 +74,8 @@ Player::Player(const PlayerData& playerData)
 
 	legionariesAndBuildings_ = 0;
 	unitNumberReserved_ = 0;
+
+	scores_ = 0;
 
 	active_ = false;
 	if(playerData.realPlayerType == REAL_PLAYER_TYPE_AI)
@@ -1334,7 +1338,7 @@ UnitBuilding* Player::buildStructure(const AttributeBase* buildingAttr, const Ve
 	subResource(buildingAttr->installValue);
 
 	UnitBuilding* n = safe_cast<UnitBuilding*>(buildUnit(buildingAttr));
-	n->registerInPlayerStatistics();
+	n->setRegisteredInPlayerStatistics(false);
 	n->startConstruction();
 	n->setPose(Se3f(QuatF(pos.z, Vect3f::K), pos), true);
 	return n;
