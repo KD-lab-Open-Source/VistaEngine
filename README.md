@@ -1,6 +1,6 @@
 # Maelstrom: The Battle for Earth Begins
 
-Discord: https://discord.gg/a9PYzSYZ
+Discord: https://discord.gg/rUcXXCY
 
 Чат для обсуждения: https://t.me/PerimeterGame
 
