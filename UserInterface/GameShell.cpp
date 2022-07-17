@@ -377,7 +377,7 @@ void GameShell::startMPWithoutInterface(const char* missionName)
 		else {
 			getNetClient()->JoinGame(ipstr.c_str(), playerName.c_str(), Race(), 1, "");
 		}
-		while(getNetClient()->getCurrentMissionDescription().playersAmount() < 1){ //Hint-���� �������� �� ��, ��� ������������
+		while(getNetClient()->getCurrentMissionDescription().playersAmount() < 1){ //Hint-овая проверка на то, что подключились
 			getNetClient()->quant_th1();
 			::Sleep(40);
 		}
@@ -425,7 +425,7 @@ void GameShell::startDWMPWithoutInterface(const char* missionName)
 		else {
 			getNetClient()->JoinGame(ipstr.c_str(), playerName, Race(), 1, "");
 		}
-		while(getNetClient()->getCurrentMissionDescription().playersAmount() < 1){ //Hint-���� �������� �� ��, ��� ������������
+		while(getNetClient()->getCurrentMissionDescription().playersAmount() < 1){ //Hint-овая проверка на то, что подключились
 			getNetClient()->quant_th1();
 			::Sleep(40);
 		}
@@ -684,7 +684,7 @@ void GameShell::GameClose()
 
 	//SNDSetFade(false,1000);
 	SNDStopAll();
-	SNDSetFade(false,0); // ����� ���� ��� �������� ����� ��� �������� ������� �������� �������
+	SNDSetFade(false,0); // после того как появится поток для загрузки вернуть значение времени
 	SNDSetGameActive(false);
 	UI_LogicDispatcher::instance().setCursor(UI_GlobalAttributes::instance().cursor(UI_CURSOR_WAITING));
 	UI_LogicDispatcher::instance().profileSystem().saveState();
@@ -1022,7 +1022,7 @@ void GameShell::GraphQuant()
 		if(terminateMission_ && UI_Dispatcher::instance().canExit())
 			HTManager::instance()->GameClose();	
 	}
-	else{ // MainMenu, ������ ����������� �����
+	else{ // MainMenu, только графический поток
 		tls_is_graph = MT_GRAPH_THREAD | MT_LOGIC_THREAD;
 
 		interpolation_timer_ += scale_time.delta();
@@ -1174,7 +1174,7 @@ void GameShell::Show(float realGraphDT)
 
 		environment->graphQuant(realGraphDT);
 
-		cameraManager->GetCamera()->SetAttr(ATTRCAMERA_CLEARZBUFFER);//������ ��� � ���� ����� ���������� ������� � z buffer.
+		cameraManager->GetCamera()->SetAttr(ATTRCAMERA_CLEARZBUFFER);//Потому как в небе могут рисоваться планеты в z buffer.
 		terScene->Draw(cameraManager->GetCamera());
 
 		environment->drawPostEffects(realGraphDT);
@@ -1554,7 +1554,7 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 			Player* player = universe()->activePlayer();
 			if(isShiftPressed()){
 				XBuffer nameAlt;
-				nameAlt < "����� (0-" <= universe()->Players.size() - 1 < ")";
+				nameAlt < "Игрок (0-" <= universe()->Players.size() - 1 < ")";
 				int playerID = player->playerID();
 				EditArchive ea(0, TreeControlSetup(0, 0, 500, 300, "Scripts\\TreeControlSetups\\chooseTrigger"));
 				static_cast<EditOArchive&>(ea).serialize(playerID,"playerID", nameAlt);
@@ -1667,15 +1667,15 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 			static int number = 1;
 			static bool inTheSameSquad = false;
 			EditArchive ea(0, TreeControlSetup(0, 0, 500, 300, "Scripts\\TreeControlSetups\\createUnit"));
-			static_cast<EditOArchive&>(ea).serialize(attr,"Unit","����");
-			static_cast<EditOArchive&>(ea).serialize(playerID,"playerID","�����");
-			static_cast<EditOArchive&>(ea).serialize(number,"number","����������");
-			static_cast<EditOArchive&>(ea).serialize(inTheSameSquad,"inTheSameSquad","� ����� ������");
+			static_cast<EditOArchive&>(ea).serialize(attr,"Unit","Юнит");
+			static_cast<EditOArchive&>(ea).serialize(playerID,"playerID","Игрок");
+			static_cast<EditOArchive&>(ea).serialize(number,"number","Количество");
+			static_cast<EditOArchive&>(ea).serialize(inTheSameSquad,"inTheSameSquad","В одном скваде");
 			if(ea.edit()){
-				static_cast<EditIArchive&>(ea).serialize(attr,"Unit","����");
-				static_cast<EditIArchive&>(ea).serialize(playerID,"playerID","�����");
-				static_cast<EditIArchive&>(ea).serialize(number,"number","����������");
-				static_cast<EditIArchive&>(ea).serialize(inTheSameSquad,"inTheSameSquad","� ����� ������");
+				static_cast<EditIArchive&>(ea).serialize(attr,"Unit","Юнит");
+				static_cast<EditIArchive&>(ea).serialize(playerID,"playerID","Игрок");
+				static_cast<EditIArchive&>(ea).serialize(number,"number","Количество");
+				static_cast<EditIArchive&>(ea).serialize(inTheSameSquad,"inTheSameSquad","В одном скваде");
 				playerID = clamp(playerID, 0, universe()->Players.size()-1);
 				UnitSquad* squad = 0;
 				if(attr){
@@ -1717,7 +1717,7 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 			return false;
 	}
 
-	// ������������� �������
+	// Конфликтующие клавиши
 	switch(Key.fullkey){
 	case 'D':
 		if(selectManager)
@@ -2108,7 +2108,7 @@ void GameShell::cameraQuant(float frameDeltaTime)
 {
 	cameraCursor_ = 0;
 
-	//����� ����� ������ � ���� ����
+	//сдвиг когда курсор у края окна
 	if(!selectMouseTrack && !cameraMouseTrack && cameraCursorInWindow && !cameraMouseZoom && controlEnabled()){
 		if(int dir = cameraManager->mouseQuant(mousePosition()))
 			cameraCursor_ = UI_GlobalAttributes::instance().getMoveCursor(dir);
@@ -2118,7 +2118,7 @@ void GameShell::cameraQuant(float frameDeltaTime)
 	bool needLockMouse = false;
 	
 	static int lockState;
-	//������� �����
+	//поворот мышью
 	if(cameraMouseTrack && (MouseMoveFlag || lockState)){
 		if(MouseMoveFlag && controlEnabled()){
 			needLockMouse = true;
@@ -2303,21 +2303,21 @@ void GameShell::editParameters()
 
 	bool reloadParameters = false;
     
-	const char* header = "��������� ������";
-	const char* mission = "������";
-	const char* missionAll = "������ ��� ������";
+	const char* header = "Заголовок миссии";
+	const char* mission = "Миссия";
+	const char* missionAll = "Миссия все данные";
 	const char* debugPrmTitle = "Debug.prm";
-	const char* global = "���������� ���������";
-	const char* attribute = "��������";
-	const char* sounds = "�����";
-	const char* interface_ = "���������";
-	const char* physics = "���������� ���������";
-	const char* unitAttributes = "��������� ������";
-	const char* explode = "��������� �������";
-	const char* sources = "���������";
-	const char* projectileAttributes = "��������� ��������";
+	const char* global = "Глобальные параметры";
+	const char* attribute = "Атрибуты";
+	const char* sounds = "Звуки";
+	const char* interface_ = "Интерфейс";
+	const char* physics = "Физические параметры";
+	const char* unitAttributes = "Параметры юнитов";
+	const char* explode = "Параметры взрывов";
+	const char* sources = "Источники";
+	const char* projectileAttributes = "Аттрибуты снарядов";
 	const char* gameSettings = "Game settins";
-	const char* keySettings = "��������� ����������";
+	const char* keySettings = "Настройки клавиатуры";
 	const char* separator = "--------------";
 
 	vector<const char*> items;

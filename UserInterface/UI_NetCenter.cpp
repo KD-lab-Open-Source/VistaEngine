@@ -534,7 +534,7 @@ void UI_NetCenter::logout()
 
 	resetChatBoard(false);
 	
-	commit(UI_NET_OK); // ������ ����������� �������
+	commit(UI_NET_OK); // всегда завершается успешно
 
 	resetPasswords();
 
@@ -782,7 +782,7 @@ void UI_NetCenter::createGame()
 					if(sufix > 0){
 						XBuffer suf; 
 						suf <= sufix;
-						xxassert(suf.tell() < MAX_MULTIPALYER_GAME_NAME, "�� �� ����� ����!");
+						xxassert(suf.tell() < MAX_MULTIPALYER_GAME_NAME, "Ну ни хрена себе!");
 						gameName = originalGameName.substr(0, MAX_MULTIPALYER_GAME_NAME - suf.tell());
 						gameName += suf.c_str();
 					}
@@ -1406,7 +1406,7 @@ void UI_NetCenter::updateFilter()
 
 void UI_NetCenter::queryGameVersion()
 {
-	xassert(acyncEventWaiting() && "������������ ������ ������ ����");
+	xassert(acyncEventWaiting() && "несинхронный запрос версии игры");
 
 	LogMsg("UI_NetCenter: GET GAME VERSION ");
 
@@ -1420,7 +1420,7 @@ void UI_NetCenter::queryGameVersion()
 
 bool UI_NetCenter::setGameVersion()
 {
-	xassert(acyncEventWaiting() && "������������ ��������� ������ ����");
+	xassert(acyncEventWaiting() && "несинхронная обработка версии игры");
 	
 	version_ < '\0';
 
@@ -1648,7 +1648,7 @@ void UI_NetCenter::chatSubscribeOK()
 
 		if(subscribeWaitingChannel_ == -1 || !onlineLogined_){
 			LogMsg(" ERROR, not waiting subscribe or not logined\n");
-			xassert(false && "��������� ������ ������������ �� �����");
+			xassert(false && "серьезная ошибка подписывания на канал");
 			return;
 		}
 

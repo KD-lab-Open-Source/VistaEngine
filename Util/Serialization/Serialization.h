@@ -137,7 +137,7 @@ private:
 };
 
 /////////////////////////////////////////////////
-//		����������� enums
+//		Регистрация enums
 /////////////////////////////////////////////////
 template<class Enum>
 const EnumDescriptor& getEnumDescriptor(const Enum& key);
@@ -158,7 +158,7 @@ const EnumDescriptor& getEnumDescriptor(const Enum& key);
 		return descriptor;	\
 	}
 
-// ��� enums, �������� ��������
+// Для enums, закрытых классами
 #define BEGIN_ENUM_DESCRIPTOR_ENCLOSED(nameSpace, enumType, enumName)	\
 	struct Enum##nameSpace##enumType : EnumDescriptor { Enum##nameSpace##enumType(); }; \
 	Enum##nameSpace##enumType::Enum##nameSpace##enumType() : EnumDescriptor(enumName) {
@@ -175,7 +175,7 @@ const EnumDescriptor& getEnumDescriptor(const Enum& key);
 
 
 /////////////////////////////////////////////////
-//	��������������� ������� ��� �����������
+//	Вспомогательные функции для отображения
 /////////////////////////////////////////////////
 template<class Enum>
 const char* getEnumName(const Enum& key) {
@@ -191,20 +191,20 @@ template<class Enum>
 const EnumDescriptor& getEnumDescriptor(const Enum& key);
 
 
-/// ��������������� ������� ��� ������ � �����-�������
+/// Вспомогательная функция для работы с комбо-листами
 string cutTokenFromComboList(string& comboList);
 string getEnumToken(const char*& buffer);
 ComboInts makeComboInts(const ComboStrings& values, const ComboStrings& list);
 void joinComboList(std::string& outComboList, const ComboStrings& strings, char delimeter = '|');
 void splitComboList(ComboStrings& outComboStrings, const char* comboList, char delimeter = '|');
-// TODO: ����������
+// TODO: переписать
 int indexInComboListString(const char* comboList, const char* value);
 
 template<class Pair>
 struct PairSerializationTraits
 {
-	static const char* firstName() { return "&���"; }
-	static const char* secondName() { return "&��������"; }
+	static const char* firstName() { return "&Имя"; }
+	static const char* secondName() { return "&Значение"; }
 };
 
 ////////////////////////////////////////////////////////////////////
@@ -224,7 +224,7 @@ struct PairSerializationTraits
 // 4. ��� ������������ ����������� ���������� ������������ serializePolymorphic,
 // ShareHandle ��� PolymorphicWrapper. ��� ���������� � ���������� ��� (��������� 
 // ����������� ������� (REGISTER_CLASS, ������ ��������� ��������, - FORCE_REGISTER_CLASS).
-// 5. ��� ������������ ������������� ���������� (������ ������ ������), ������������
+// 5. ��� сериализации ������������� ���������� (������ ������ ������), ������������
 // serializePointer ��� PointerWrapper.
 // 6. ��� �������� - serializeArray, wrapper'� ���� ���, �� ��� �������������  ��������.
 //
@@ -286,11 +286,11 @@ public:
             int result = processEnum(usesNameAlt ? descriptor.comboListAlt() : descriptor.comboList(), name, nameAlt);
             if (result != -1) {
                 if(usesNameAlt){
-                    xassert(result >= 0 && result < strings.size() && "�������� ������ �������� Enum-�!");
+                    xassert(result >= 0 && result < strings.size() && "Неверный индекс значения Enum-а!");
                     value = (Enum)descriptor.keyByNameAlt(strings[result].c_str());
                 }
 				else{
-                    xassert (result >= 0 && result < strings.size() && "�������� ������ �������� Enum-�!");
+                    xassert (result >= 0 && result < strings.size() && "Неверный индекс значения Enum-а!");
                     value = (Enum)descriptor.keyByName(strings[result].c_str());
                 }
                 return true;
@@ -459,7 +459,7 @@ public:
 
 			bool result = true;
 			if(openTypeIndex == UNREGISTERED_CLASS) {
-				skipValue(1); // { ��� �������
+				skipValue(1); // { уже открыта
 				result = false;
 			}
 
@@ -501,7 +501,7 @@ public:
         }
     }
 
-    template<class T> // ��� ������������� ����������
+    template<class T> // Для неполиморфных указателей
     bool serializePointer(const T*& t, const char* name, const char* nameAlt) {
         if(isInput()) {
             if(!t)
@@ -521,7 +521,7 @@ public:
         }
     }
 
-    template<class T> // ��� ����������� ����������
+    template<class T> // Для полиморфных указателей
 	bool serializePolymorphic(const T*& t, const char* name, const char* nameAlt) {
         if(isInput()) {
             return loadPointer(const_cast<T*&>(t), name, nameAlt);
@@ -713,12 +713,12 @@ protected:
 		
 		bool result = true;
         if(openTypeIndex == UNREGISTERED_CLASS) {
-            skipValue(1); // { ��� �������
+            skipValue(1); // { уже открыта
 			result = false;
         } else if(!ptr && openTypeIndex != NULL_POINTER) {
             ptr = factory.createByIndex(openTypeIndex);
 			if(!ptr)
-				skipValue(1); // { ��� �������
+				skipValue(1); // { уже открыта
         }
 
 		if(ptr)
@@ -805,10 +805,10 @@ private:
 				return result;
 				if (result != -1) {
 					if (ar.usesNameAlt ()) {
-						xassert(result >= 0 && result < comboList.size() && "�������� ������ �������� Enum-�!");
+						xassert(result >= 0 && result < comboList.size() && "Неверный индекс значения Enum-а!");
 						const_cast<Enum&>(value) = (Enum)descriptor.keyByNameAlt(comboList[result].c_str());
 					} else {
-						xassert(result >= 0 && result < comboList.size() && "�������� ������ �������� Enum-�!");
+						xassert(result >= 0 && result < comboList.size() && "Неверный индекс значения Enum-а!");
 						const_cast<Enum&>(value) = (Enum)descriptor.keyByName(comboList[result].c_str());
 					}
 					return true;
@@ -882,7 +882,7 @@ __declspec( selectany ) int Archive::typeIDs_ = 0;
   int* registeredDummyPtr##baseClass##derivedClass = &registeredDummy##baseClass##derivedClass;
 
 
-/// ������� ��� ������������ ������������� ����������
+/// Обертка для сериализации неполиморфных указателей
 template<class T>
 class PointerWrapper
 {
@@ -898,7 +898,7 @@ private:
 	T* t_;
 };
 
-/// ������� ��� ������������ ����������� ����������
+/// Обертка для сериализации полиморфных указателей
 template<class T>
 class PolymorphicWrapper
 {

@@ -175,11 +175,11 @@ enum UITextTag {
 	UI_TAG_TIME_H24,
 	UI_TAG_TIME_M,
 	UI_TAG_HOTKEY,
-	UI_TAG_ACCESSIBLE, // ��� ���� ��� ����������� �����
-	UI_TAG_ACCESSIBLE_PARAM,  // ��� ���� ��� ����������� ���������
-	UI_TAG_LEVEL, // ������� �����
-	UI_TAG_ACCOUNTSIZE, // ������� ������ �������� ����
-	UI_TAG_SUPPLYSLOTS // ������� ������ �������� ���� (� ����������)
+	UI_TAG_ACCESSIBLE, // что надо для доступности юнита
+	UI_TAG_ACCESSIBLE_PARAM,  // что надо для доступности параметра
+	UI_TAG_LEVEL, // уровень юнита
+	UI_TAG_ACCOUNTSIZE, // сколько слотов занимает юнит
+	UI_TAG_SUPPLYSLOTS // сколько слотов занимает юнит (с раскраской)
 };
 
 struct CharStringLess {
@@ -264,25 +264,25 @@ UI_LogicDispatcher::UI_LogicDispatcher() : mousePosition_(0,0),
 	lastCurrentHiVer_ = UI_Dispatcher::instance().gameMajorVersion();
 	lastCurrentLoVer_ = UI_Dispatcher::instance().gameMinorVersion();
 
-	uiTextTags.insert(make_pair("display_name", UI_TAG_PLAYER_DISPLAY_NAME)); // � online - DW �����, ����� ��� �������
-	uiTextTags.insert(make_pair("players_count", UI_TAG_PLAYERS_COUNT)); // ���������� ���������� �������
-	uiTextTags.insert(make_pair("game_name", UI_TAG_CURRENT_GAME_NAME)); // �������� ������� ����������� �����
-	uiTextTags.insert(make_pair("cm_name", UI_TAG_SELECTED_GAME_NAME)); // �������� ��������� � ������ �����
-	uiTextTags.insert(make_pair("multi_name", UI_TAG_SELECTED_MULTIPLAYER_GAME_NAME)); // �������� ��������� ������� ����
-	uiTextTags.insert(make_pair("cm_size", UI_TAG_SELECTED_GAME_SIZE)); // ������ ��������� �����
-	uiTextTags.insert(make_pair("cm_type", UI_TAG_SELECTED_GAME_TYPE)); // ��� (custom, predefine) ��������� �����
-	uiTextTags.insert(make_pair("cm_players", UI_TAG_SELECTED_GAME_PLAYERS)); // ������������ ���������� �������
-	uiTextTags.insert(make_pair("channel_name", UI_TAG_CURRENT_CHAT_CHANNEL)); //�������� �������� ������ ��� ������ �����������
-	uiTextTags.insert(make_pair("hotkey", UI_TAG_HOTKEY)); // ������� ������� ��� ������
-	uiTextTags.insert(make_pair("accessible", UI_TAG_ACCESSIBLE)); // ��� ���� ��� ����������� �����
-	uiTextTags.insert(make_pair("accessible_param", UI_TAG_ACCESSIBLE_PARAM)); // ��� ���� ��� ����������� ���������
-	uiTextTags.insert(make_pair("level", UI_TAG_LEVEL)); // ������� �����
-	uiTextTags.insert(make_pair("accountsize", UI_TAG_ACCOUNTSIZE)); // ������� ������ �������� ����
-	uiTextTags.insert(make_pair("supplyslots", UI_TAG_SUPPLYSLOTS)); // ������� ������ �������� ���� (� ����������)
-	uiTextTags.insert(make_pair("time_h12", UI_TAG_TIME_H12)); // ����� ���� � 12 ������� �������
-	uiTextTags.insert(make_pair("time_ampm", UI_TAG_TIME_AMPM)); // �� ������� ��� ����� �������
-	uiTextTags.insert(make_pair("time_h24", UI_TAG_TIME_H24)); // ����� ���� � 24 ������� �������
-	uiTextTags.insert(make_pair("time_min", UI_TAG_TIME_M)); // ������ ������� ����
+	uiTextTags.insert(make_pair("display_name", UI_TAG_PLAYER_DISPLAY_NAME)); // в online - DW логин, иначе имя профиля
+	uiTextTags.insert(make_pair("players_count", UI_TAG_PLAYERS_COUNT)); // количество оставшихся игроков
+	uiTextTags.insert(make_pair("game_name", UI_TAG_CURRENT_GAME_NAME)); // название текущей загруженной карты
+	uiTextTags.insert(make_pair("cm_name", UI_TAG_SELECTED_GAME_NAME)); // название выбранной в списке карты
+	uiTextTags.insert(make_pair("multi_name", UI_TAG_SELECTED_MULTIPLAYER_GAME_NAME)); // название выбранной сетевой игры
+	uiTextTags.insert(make_pair("cm_size", UI_TAG_SELECTED_GAME_SIZE)); // размер выбранной карты
+	uiTextTags.insert(make_pair("cm_type", UI_TAG_SELECTED_GAME_TYPE)); // тип (custom, predefine) выбранной карты
+	uiTextTags.insert(make_pair("cm_players", UI_TAG_SELECTED_GAME_PLAYERS)); // максимальное количество игроков
+	uiTextTags.insert(make_pair("channel_name", UI_TAG_CURRENT_CHAT_CHANNEL)); //название текущего канала или статус подключения
+	uiTextTags.insert(make_pair("hotkey", UI_TAG_HOTKEY)); // горячая клавиша для кнопки
+	uiTextTags.insert(make_pair("accessible", UI_TAG_ACCESSIBLE)); // что надо для доступности юнита
+	uiTextTags.insert(make_pair("accessible_param", UI_TAG_ACCESSIBLE_PARAM)); // что надо для доступности параметра
+	uiTextTags.insert(make_pair("level", UI_TAG_LEVEL)); // уровень юнита
+	uiTextTags.insert(make_pair("accountsize", UI_TAG_ACCOUNTSIZE)); // сколько слотов занимает юнит
+	uiTextTags.insert(make_pair("supplyslots", UI_TAG_SUPPLYSLOTS)); // сколько слотов занимает юнит (с раскраской)
+	uiTextTags.insert(make_pair("time_h12", UI_TAG_TIME_H12)); // время мира в 12 часовом формате
+	uiTextTags.insert(make_pair("time_ampm", UI_TAG_TIME_AMPM)); // до полудня или после полудня
+	uiTextTags.insert(make_pair("time_h24", UI_TAG_TIME_H24)); // вреям мира в 24 часовом формате
+	uiTextTags.insert(make_pair("time_min", UI_TAG_TIME_M)); // минуты времени мира
 }
 
 UI_LogicDispatcher::~UI_LogicDispatcher()
@@ -628,7 +628,7 @@ void UI_LogicDispatcher::graphQuant(float dt)
 			Vect3f dirPoint = v1 - v0;
 			dirPoint.Normalize(clamp(sqrtf(distMin) - 15.f, 1.f, 10000.f));
 			if(!weapon_helpers::traceGround(v0, v0+dirPoint, dirPoint))
-				unitNear = 0; // ����� �����
+				unitNear = 0; // земля ближе
 		}
 	}
 	hoverUnit_ = unitNear;
@@ -753,7 +753,7 @@ bool UI_LogicDispatcher::handleInput(const UI_InputEvent& event)
 			mousePressPos_ = mousePosition();
 	}
 
-	// ��� ������-��������� ��������, shift ���������� �� �������� �������� ������ ���������� � ������� (���������� � �������)
+	// для мышино-кнопочных действий, shift независимо от настроек является флагом постановки в очередь (добавления к селекту)
 	int withoutShiftCode = event.keyCode() & ~KBD_SHIFT;
 	bool shiftPressed = event.keyCode() & KBD_SHIFT;
 
@@ -983,7 +983,7 @@ void UI_LogicDispatcher::toggleTracking(bool state)
 
 void UI_LogicDispatcher::setCursor(const UI_Cursor* cursor)
 {
-	// ���� �����-������ ������ ���������� � ��� ���������������, �� �����
+	// Если какой-нибудь курсор установлен и это устанавливаемый, то выход
 	if (activeCursor() && cursor == activeCursor()) 
 		return;
 	activeCursor_ = cursor;
@@ -1128,7 +1128,7 @@ void UI_LogicDispatcher::selectClickMode(UI_ClickModeID mode_id, const WeaponPrm
 	MTG();
 	
 	if(mode_id != UI_CLICK_MODE_NONE && selected_weapon){
-		// ����� �������� ������, ���� ��� ������ � ����� ����
+		// тогда выбираем только, если это оружие у юнита есть
 		if(UnitInterface* unit = selectManager->selectedUnit())
 			if(!safe_cast<UnitActing*>(unit->getUnitReal())->hasWeapon(selected_weapon->ID()))
 				return;
@@ -2124,9 +2124,9 @@ void UI_LogicDispatcher::controlInit(UI_ControlActionID id, UI_ControlBase* cont
 				}
 				else if(data >= 0 && !strings.empty()) {
 					data = data % strings.size();
-					if(control->states().size() > 1 && control->states().size() == strings.size()) // ����������� ���������
+					if(control->states().size() > 1 && control->states().size() == strings.size()) // переключаем состояния
 						control->setState(data);
-					else // ����� �������
+					else // иначе надписи
 						control->setText(strings[data].c_str());
 				}
 			}
@@ -2163,14 +2163,14 @@ void UI_LogicDispatcher::controlUpdate(UI_ControlActionID id, UI_ControlBase* co
 					}
 				}
 				else{
-					if(p->useUnitList()){ // ������������ ���������� ����� �� ������ ������
+					if(p->useUnitList()){ // раскручиваем владельцев вверх до списка юнитов
 						const UI_ControlBase* current = control;
 						const UI_ControlContainer* parent = current->owner();
 						while(parent){
 							if(const UI_ControlUnitList* ul = dynamic_cast<const UI_ControlUnitList*>(parent)){
 								xassert(ul->GetType() == UI_UNITLIST_SELECTED);
 								dassert(std::find(ul->controlList().begin(), ul->controlList().end(), current) != ul->controlList().end());
-								// ��������� ����� �������� � ������
+								// вычисляем номер контрола в списке
 								int child_index = std::distance(ul->controlList().begin(), std::find(ul->controlList().begin(), ul->controlList().end(), current));
 								if(selectManager->selectedSlot() == child_index)
 									control->setPermanentTransform(ul->activeTransform());
@@ -2184,7 +2184,7 @@ void UI_LogicDispatcher::controlUpdate(UI_ControlActionID id, UI_ControlBase* co
 							else
 								current = safe_cast<const UI_ControlBase*>(parent);
 							parent = current->owner();
-							xassert(parent && "<<������ ������>> �� ���������� �� ������");
+							xassert(parent && "<<список юнитов>> во владельцах не найден");
 						}
 					}
 					else if(UnitInterface* ui = selectedUnit())
@@ -3153,7 +3153,7 @@ void UI_LogicDispatcher::controlAction(UI_ControlActionID id, UI_ControlBase* co
 				    break;
 				}
 				if(type == REAL_PLAYER_TYPE_CLOSE && pdata->playerIndex() == mission->activePlayerID())
-					break; // ���� ���� ��������� ������
+					break; // свой слот закрывать нельзя
 				if(mission->playerData(pdata->playerIndex()).realPlayerType != type){
 					mission->changePlayerData(pdata->playerIndex()).realPlayerType = type;
 					if(gameShell->getNetClient())
@@ -3590,7 +3590,7 @@ void UI_LogicDispatcher::expandTextTemplate(string& text, UnitInterface* unit, c
 			break;
 		}
 
-		if(text[begin + 1] == '$'){ // ������������ ���
+		if(text[begin + 1] == '$'){ // обязательный тег
 			const char* par = getParam(text.substr(begin + 2, end - begin - 2).c_str(), unit, attr);
 			if(par && *par)
 				out += par;
@@ -3632,35 +3632,35 @@ const char* UI_LogicDispatcher::getParam(const char* name, UnitInterface* unit, 
 		}
 	}
 
-	if(name[1] == '!'){ // ��� �� ���������� �����
+	if(name[1] == '!'){ // это из параметров юнита
 		switch(*name){
-		case 'c': // ������� ������ ���������
+		case 'c': // текущие личные параметры
 			if(unit)
 				params = &(unit->getUnitReal()->parameters());
 			break;
-		case 'm': // ������������ ������ ���������
+		case 'm': // максимальные личные параметры
 			if(unit)
 				params = &(unit->getUnitReal()->parametersMax());
 			break;
-		case 'b': // ������� ��� ���������
+		case 'b': // ресурсы для постройки
 			if(attr)
 				params = &(attr->creationValue);
 			break;
-		case 'i': // ������� ��� ������
+		case 'i': // ресурсы для заказа
 			if(attr)
 				params = &(attr->installValue);
 			break;
-		case 'a': // ����������� ���������
+		case 'a': // необходимые параметры
 			if(attr)
 				params = &(attr->accessValue);
 			break;
-		case 'w':// �������� �� ������ ���������� ������
-		case 'd': // �������� �� ����� ������
-		case 's': // �� abnormalState
+		case 'w':// параметр из личных параметров оружия
+		case 'd': // параметр из урона оружия
+		case 's': // из abnormalState
 			if(unit){
 				char type = *name;
-				//��� ��������� �� ������ �������� � ����: WeaponName/ParameterNameOrModifer
-				//WeaponName - ���� ����������� ��� ����� ������
+				//имя параметра из оружия задается в виде: WeaponName/ParameterNameOrModifer
+				//WeaponName - ключ локализации для имени оружия
 				name+=2;
 				if(const char* delimeter = strchr(name, '/')){
 					const WeaponBase* weapon = 0;
@@ -3670,7 +3670,7 @@ const char* UI_LogicDispatcher::getParam(const char* name, UnitInterface* unit, 
 						weapon = shooter->findWeapon(weaponLabel.c_str());
 					}
 					else if(int weaponID = shooter->selectedWeaponID())
-						weapon = shooter->findWeapon(weaponID);  // ������� ��������� ������
+						weapon = shooter->findWeapon(weaponID);  // текущее выбранное оружие
 
 					if(weapon && weapon->isEnabled() && weapon->getParametersForUI(++delimeter, type, cacheParams))
 						params = &cacheParams;
@@ -3678,7 +3678,7 @@ const char* UI_LogicDispatcher::getParam(const char* name, UnitInterface* unit, 
 				}
 			}
 			break;
-		case '*': // ��������� �� �������� �������� ��� �����, ��������� ������� ������������ ��� ��������������
+		case '*': // параметры из текущего контрола под мышой, стоимость команды показывается для заселекченного
 			if(const UI_ControlBase* control = hoverControl())
 				if(const AttributeBase* attr = selectManager->selectedAttribute())
 					if(control->actionParameters(attr, cacheParams))
@@ -3690,14 +3690,14 @@ const char* UI_LogicDispatcher::getParam(const char* name, UnitInterface* unit, 
 		}
 		name += 2;
 	}
-	else if(name[1] == '&'){ // ��� �� ���������� ������
+	else if(name[1] == '&'){ // это из параметров игрока
 		const Player* plr = plrID < 0 ? universe()->activePlayer() : universe()->findPlayer(plrID);
 		xassert(plr);
 		switch(*name){
-		case 'c': // ������� ������� ������
+		case 'c': // текущие ресурсы игрока
 			params = &(plr->resource());
 			break;
-		case 'm': // ������������ ������� ������
+		case 'm': // максимальные ресурсы игрока
 			params = &(plr->resourceCapacity());
 			break;
 		}
@@ -3750,29 +3750,29 @@ const char* UI_LogicDispatcher::getParam(const char* name, UnitInterface* unit, 
 				retBuf < get.c_str();
 				break;
 											 }
-			case UI_TAG_HOTKEY: // hotkey ��� ������ ��� ������
+			case UI_TAG_HOTKEY: // hotkey для кнопки под мышкой
 				if(const UI_ControlBase* hov = hoverControl())
 					retBuf < hov->hotKey().toString().c_str();
 				break;
-			case UI_TAG_ACCESSIBLE: // ��� ���� ��� ����������� �����
+			case UI_TAG_ACCESSIBLE: // что надо для доступности юнита
 				if(attr)
 					player()->printAccessible(retBuf, attr->accessBuildingsList, enableColorString(), disableColorString());
 				break;
-			case UI_TAG_ACCESSIBLE_PARAM: // ��� ���� ��� ����������� ���������
+			case UI_TAG_ACCESSIBLE_PARAM: // что надо для доступности параметра
 				if(const UI_ControlBase* control = hoverControl())
 					if(const AttributeBase* attr = selectManager->selectedAttribute())
 						if(const ProducedParameters* par = control->actionBuildParameter(attr))
 							player()->printAccessible(retBuf, par->accessBuildingsList, enableColorString(), disableColorString());
 				break;
-			case UI_TAG_LEVEL: // ������� �����
+			case UI_TAG_LEVEL: // уровень юнита
 				if(unit && unit->getUnitReal()->attr().isLegionary())
 					retBuf <= safe_cast<const UnitLegionary*>(unit->getUnitReal())->level() + 1;
 				break;
-			case UI_TAG_ACCOUNTSIZE: // ������� ������ �������� ����
+			case UI_TAG_ACCOUNTSIZE: // сколько слотов занимает юнит
 				if(attr)
 					retBuf <= attr->accountingNumber;
 				break;
-			case UI_TAG_SUPPLYSLOTS: // ������� ������ �������� ���� (� ����������)
+			case UI_TAG_SUPPLYSLOTS: // сколько слотов занимает юнит (с раскраской)
 				if(attr){
 					if(universe()->activePlayer()->checkUnitNumber(attr))
 						retBuf < enableColorString();
@@ -3821,7 +3821,7 @@ const char* UI_LogicDispatcher::getParam(const char* name, UnitInterface* unit, 
 				break;
 							   }
 			default:
-				xxassert(false, "������ ���� �� ������!");
+				xxassert(false, "такого быть не должно!");
 			    return "";
 			}
 			return retBuf.c_str();
@@ -3831,15 +3831,15 @@ const char* UI_LogicDispatcher::getParam(const char* name, UnitInterface* unit, 
 
 	if(params){
 		switch(*name){
-		case '?':  // ���� �� ������� � ������
+		case '?':  // чего не хватает у игрока
 			player()->resource().printSufficient(retBuf, *params, enableColorString(), disableColorString());
-		case '&': // ���� �� ������� � �����
+		case '&': // чего не хватает у юнита
 			if(unit)
 				unit->getUnitReal()->parameters().printSufficient(retBuf, *params, enableColorString(), disableColorString());
 			break;
-		case '!': // ������ ���������� ��� ���������
+		case '!': // просто напечатать все параметры
 			params->toString(retBuf);
-		default: // ������� ���������� ��������
+		default: // вывести конкретный параметр
 			retBuf <= round(params->findByLabel(name));
 		}
 		return retBuf.c_str();
@@ -3872,7 +3872,7 @@ void UI_LogicDispatcher::selectCursor(const UI_Cursor* cameraCursor)
 	UnitInterface* hovered_unit = hoverUnit();
 
 	if(cursorTriggered())
-	{// ������ �� ������ - �������� ������, ����������� ���������
+	{// Ничего не делаем - работает курсор, назначенный триггером
 		SET_CURSOR_REASON("by trigger");
 	}
 	else if(cameraCursor){
@@ -3880,7 +3880,7 @@ void UI_LogicDispatcher::selectCursor(const UI_Cursor* cameraCursor)
 		setCursor(cameraCursor);
 	}
 	else if(const UI_ControlBase* control = UI_LogicDispatcher::instance().hoverControl())
-	{// ������ �� ���������� - ������ ������ ������ ���������	���������� ����� ��� �������� ����������
+	{// Курсор на интерфейсе - нужный курсор должен назначить	обработчик мышки для объектов интерфейса
 		if(control->hoveredCursor()){
 			SET_CURSOR_REASON("control own hover cursor");
 			setCursor(control->hoveredCursor());
@@ -3978,9 +3978,9 @@ void UI_LogicDispatcher::selectCursor(const UI_Cursor* cameraCursor)
 					xxassert(0, "new click mode type?");
 		}
 	}
-	else if (universe()->activePlayer() && hovered_unit){ // ���� ����� ��� ������ �������
+	else if (universe()->activePlayer() && hovered_unit){ // Если юниты под мышкой найдены
 		const UI_Cursor* unit_cur = hovered_unit->attr().selectionCursorProxy();
-		if(unit_cur){ // � ���������� ������, ����������� ������� - ���� ��� ���, �� ������ ����� �������
+		if(unit_cur){ // В приоритете курсор, назначенный объекту - если его нет, то вешаем общие курсоры
 			SET_CURSOR_REASON("object hover, object own cursor");
 			setCursor(unit_cur);
 		}
@@ -4011,12 +4011,12 @@ void UI_LogicDispatcher::selectCursor(const UI_Cursor* cameraCursor)
 				if(universe()->activePlayer() == hovered_unit->player())
 					if(hovered_unit->attr().isTransport() && selectManager->canPutInTransport(safe_cast<UnitActing*>(hovered_unit))){
 						SET_CURSOR_REASON("own object hover, this is transport, selected can put in");
-						setCursor(UI_GlobalAttributes::instance().cursor(UI_CURSOR_TRANSPORT)); // ��� ����������� � ������� ����� ����� ��������� ������
+						setCursor(UI_GlobalAttributes::instance().cursor(UI_CURSOR_TRANSPORT)); // для транспортов в которые можно сесть отдельный курсор
 					}
 					else if(hovered_unit->attr().isBuilding() && !safe_cast<const UnitBuilding*>(hovered_unit)->isConstructed()
 						&& selectManager->canBuild(hovered_unit->getUnitReal())){
 							SET_CURSOR_REASON("own object hover, this is not constructed building, selected build this");
-							setCursor(UI_GlobalAttributes::instance().cursor(UI_CURSOR_CAN_BUILD)); // ����� ��������� ���� ����������
+							setCursor(UI_GlobalAttributes::instance().cursor(UI_CURSOR_CAN_BUILD)); // может достроить этот долгострой
 						}
 					else {
 						SET_CURSOR_REASON("own object hover");
@@ -4039,7 +4039,7 @@ void UI_LogicDispatcher::selectCursor(const UI_Cursor* cameraCursor)
 			setCursor(UI_GlobalAttributes::instance().cursor(UI_CURSOR_ATTACK_DISABLED));
 		}
 	}
-	else if(cursorInWorld()) // ���� ����������� � ������
+	else if(cursorInWorld()) // Если пересеклись с землей
 		if(!hoverPassable()) {
 			SET_CURSOR_REASON("ipassible region in world");
 			setCursor(UI_GlobalAttributes::instance().cursor(UI_CURSOR_IMPASSABLE));
@@ -4388,7 +4388,7 @@ bool UI_LogicDispatcher::parseGameVersion(const char* ptr)
 	int hVer = lastCurrentHiVer_;
 	int lVer = lastCurrentLoVer_;
 
-	// ������� �� ������ �����
+	// пропуск до первой цифры
 	while(*ptr && *ptr != '\r' && *ptr != '\n' && !isdigit(*ptr))
 		++ptr;
 
