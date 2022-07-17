@@ -203,7 +203,7 @@ INDEX_HANDLE cShaderStorageInternal::GetIndexHandle(const char* def_name)
 		}
 	}
 
-//����� ����� ���������� ��������� ��-�� ����� ����������	xassert(0);
+//Потом могут возникнуть проблеммы из-за этого коментария	xassert(0);
 	return INDEX_HANDLE();
 }
 
