@@ -333,6 +333,7 @@ void FogOfWarMap::unlockScoutmap() const
 
 const char* FogOfWarMap::lockSummarymap() const
 {
+	// @dilesoft
 	try {
 		lock_.lock();
 	} catch (...) {
@@ -451,6 +452,7 @@ void cFogOfWar::UpdateTexture()
 	int bpp=pTextureTilemap->GetBitsPerPixel();
 	xassert(bpp==8);
 
+	// @dilesoft
 	if (!selected_map) {
 		return;
 	}
@@ -626,6 +628,7 @@ FogOfWarState FogOfWarMap::getFogState(int x, int y) const
 	x>>=cFogOfWar::shift;
 	y>>=cFogOfWar::shift;
 	int ix = x+y*size.x;
+	// @dilesoft
 	try {
 		if((UINT)ix<size.x*size.y)
 			if (tilemap[ix]<max_opacity)

@@ -160,6 +160,7 @@ void UnitEnvironmentBuilding::setPose(const Se3f& poseIn, bool initPose)
 
 void UnitEnvironmentBuilding::placeToSecondMap()
 {
+	// @dilesoft
 	try {
 		universe()->secondMap->projectModel(model());
 	} catch (...) {

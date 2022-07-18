@@ -537,6 +537,7 @@ bool XPrmIArchive::processValue(double& value, const char* name, const char* nam
 }
 bool XPrmIArchive::processValue(PrmString& value, const char* name, const char* nameAlt) {
     bool result = openNode(name, nameAlt);
+    // @dilesoft
 	// try {
     if(isNodeExists()) {
         std::string str;
@@ -726,6 +727,7 @@ void XPrmIArchive::passString(const char* token)
 			< "\", Received Token: \"" < s < "\", file: \"" < fileName_.c_str() < "\", line: " <= line();
 		xassertStr(0 && "Expected another token", msg);
 		releaseToken();
+		// @dilesoft
 		//ErrH.Abort(msg);
 	} else {
 		releaseToken();
