@@ -101,6 +101,7 @@ void UnitObjective::fowQuant()
 	if(!alive())
 		return;
 
+	// @dilesoft
 	try {
 		if(player()->fogOfWarMap()){
 			if(!(hiddenGraphic() & (HIDE_BY_TELEPORT | HIDE_BY_TRANSPORT | HIDE_BY_TRIGGER))){

@@ -1641,6 +1641,7 @@ const char* cObject3dx::GetFileName() const
 
 void cObject3dx::SetSkinColor(sColor4c skin_color_, const char* logo_name_)//emblem_name - хранит путь к эмблеме. 
 {
+	// @dilesoft
 	try {
 		skin_color=skin_color_;
 
@@ -1732,6 +1733,7 @@ void cObject3dx::EnableSelfIllumination(bool enable)
 }
 void cObject3dx::DisableDetailLevel()
 {
+	// @dilesoft
 	try {
 		SetAttribute(ATTR3DX_NO_RESIZE_TEXTURES);
 		LoadTexture(false,false,"");

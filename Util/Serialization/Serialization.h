@@ -384,6 +384,7 @@ public:
                 }
                 int i = 0;
                 FOR_EACH(cont, it){
+                	// @dilesoft
 					// try {
 						serialize(*it, "@", "@");
 					// } catch (...) {
