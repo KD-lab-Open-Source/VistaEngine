@@ -928,46 +928,50 @@ void AttributeBase::refreshChains(bool editArchive)
 
 void AttributeBase::initGeometryAttribute()
 {
-    if(!strlen(modelName.c_str()) || !gb_VisGeneric)
-		return;
+	// @Hallkezz
+	try{
+		if(!strlen(modelName.c_str()) || !gb_VisGeneric)
+			return;
 
-	cObject3dx* logic = logicModel();
-	if(!logic){
-        logic = model();
-		kdWarning("GAV", XBuffer() < TRANSLATE("Отсутствует логический баунд в моделе ") < modelName.c_str());
-	}
-	xassert(logic);
-	logic->SetPosition(Se3f::ID);
-
-	if(!boundHeight)
-		boundHeight = boundRadius > 0 ? boundBox.max.z - boundBox.min.z : 20;
-
-	//logic->SetScale(boundScale);
-	//logic->Update();
-	//boundRadius = logic->GetBoundRadius();
-
-	logic->SetScale(1);
-	logic->Update();
-	logic->GetBoundBox(boundBox);
-	boundScale = boundHeight/max(boundBox.max.z - boundBox.min.z, FLT_EPS);
-	logic->SetScale(boundScale);
-	logic->Update();
-
-	boundRadius = logic->GetBoundRadius();
-	logic->GetBoundBox(boundBox);
-
-	Vect3f deltaBound = boundBox.max - boundBox.min;
-	xassert_s(deltaBound.x > FLT_EPS && deltaBound.y > FLT_EPS && deltaBound.z > FLT_EPS && "Объект слишком маленький или не имеет логического баунда: ", modelName.c_str());
-	float radiusMin = 3;
-	for(int i = 0; i < 2; i++)
-		if(deltaBound[i] < 2*radiusMin){
-			boundBox.max[i] = radiusMin;
-			boundBox.min[i] = -radiusMin;
+		cObject3dx* logic = logicModel();
+		if(!logic){
+			logic = model();
+			kdWarning("GAV", XBuffer() < TRANSLATE("Отсутствует логический баунд в моделе ") < modelName.c_str());
 		}
-	if(deltaBound.z < 2*radiusMin)
-		boundBox.max.z = 2*radiusMin - boundBox.min.z;
+		xassert(logic);
+		logic->SetPosition(Se3f::ID);
 
-	selectRadius = selectCircleRelativeRadius*((const Vect2f&)boundBox.max).distance(boundBox.min)/2;
+		if(!boundHeight)
+			boundHeight = boundRadius > 0 ? boundBox.max.z - boundBox.min.z : 20;
+
+		//logic->SetScale(boundScale);
+		//logic->Update();
+		//boundRadius = logic->GetBoundRadius();
+
+		logic->SetScale(1);
+		logic->Update();
+		logic->GetBoundBox(boundBox);
+		boundScale = boundHeight/max(boundBox.max.z - boundBox.min.z, FLT_EPS);
+		logic->SetScale(boundScale);
+		logic->Update();
+
+		boundRadius = logic->GetBoundRadius();
+		logic->GetBoundBox(boundBox);
+
+		Vect3f deltaBound = boundBox.max - boundBox.min;
+		xassert_s(deltaBound.x > FLT_EPS && deltaBound.y > FLT_EPS && deltaBound.z > FLT_EPS && "Объект слишком маленький или не имеет логического баунда: ", modelName.c_str());
+		float radiusMin = 3;
+		for(int i = 0; i < 2; i++)
+			if(deltaBound[i] < 2*radiusMin){
+				boundBox.max[i] = radiusMin;
+				boundBox.min[i] = -radiusMin;
+			}
+		if(deltaBound.z < 2*radiusMin)
+			boundBox.max.z = 2*radiusMin - boundBox.min.z;
+
+		selectRadius = selectCircleRelativeRadius*((const Vect2f&)boundBox.max).distance(boundBox.min)/2;
+		} catch (...) {
+	}
 }
 
 void AttributeBase::calcBasementPoints(float angle, const Vect2f& center, Vect2i points[4]) const 
