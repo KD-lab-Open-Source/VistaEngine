@@ -24,5 +24,6 @@ Perimeter2.sln
 Скопируйте файл GameDBG.exe в папку с игрой из Steam.
 
 ## Чаты для обсуждения
-* Telegram: https://t.me/PerimeterGame
+* Telegram (Perimeter): https://t.me/PerimeterGame
+* Telegram (Maelstrom): https://t.me/maelstrom2007chat
 * Discord (Maelstrom): https://discord.gg/rUcXXCY
