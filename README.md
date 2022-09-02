@@ -24,6 +24,6 @@ Perimeter2.sln
 Скопируйте файлы GameDBG.exe, AttribEditor.dll и TriggerEditor.dll в папку с игрой версии 1.1.
 
 ## Чаты для обсуждения
-* Discord: https://discord.gg/rUcXXCY
+* Discord (Maelstrom): https://discord.gg/rUcXXCY
 * Telegram (Maelstrom): https://t.me/maelstrom2007chat
 * Telegram (Perimeter): https://t.me/PerimeterGame
