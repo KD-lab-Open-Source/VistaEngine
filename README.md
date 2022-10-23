@@ -1,8 +1,6 @@
 # Maelstrom: The Battle for Earth Begins
 
-Discord: https://discord.gg/rUcXXCY
-
-Чат для обсуждения: https://t.me/PerimeterGame
+![Maelstrom](https://cdn.cloudflare.steamstatic.com/steam/apps/11560/header.jpg?t=1625754149)
 
 (с) ООО "КД ВИЖЕН" (Калининград)
 
@@ -16,7 +14,7 @@ Discord: https://discord.gg/rUcXXCY
 
 ## Что потребуется
 
-Проверено что игра собирается в окружении Windows 10 + Visual Studio 2003.
+Проверено что игра собирается в окружении Windows 10 (21H2) + Visual Studio 2003.
 
 ## Сборка
 
@@ -24,3 +22,8 @@ Perimeter2.sln
 
 ## Запуск игры
 Скопируйте файлы GameDBG.exe, AttribEditor.dll и TriggerEditor.dll в папку с игрой из Steam.
+
+## Чаты для обсуждения
+* Discord (Maelstrom): https://discord.gg/rUcXXCY
+* Telegram (Maelstrom): https://t.me/maelstrom2007chat
+* Telegram (Perimeter): https://t.me/PerimeterGame
