@@ -614,31 +614,32 @@ bool FogOfWarMap::checkFogStateInCircle(Vect2i& centerPosition, int radius) cons
 
 bool FogOfWarMap::isVisible(const Vect2i& position) const 
 { 
+	/*
 	int x=position.x>>cFogOfWar::shift;
 	int y=position.y>>cFogOfWar::shift;
 	int ix = x+y*size.x;
 	if((UINT)ix<size.x*size.y)
 		if (tilemap[ix]<max_opacity)
 			return true;
-	return false;
+	*/
+	return true;
+	// Временный фикс тумана
 }
 
 FogOfWarState FogOfWarMap::getFogState(int x, int y) const
 {
+	/*
 	x>>=cFogOfWar::shift;
 	y>>=cFogOfWar::shift;
 	int ix = x+y*size.x;
-	// @dilesoft
-	try {
-		if((UINT)ix<size.x*size.y)
-			if (tilemap[ix]<max_opacity)
-				return FOGST_NONE;
-			else if (scoutmap[ix]<max_opacity)
-				return FOGST_HALF;
-		} catch (...) {
-	}
+	if((UINT)ix<size.x*size.y)
+		if (tilemap[ix]<max_opacity)
+			return FOGST_NONE;
+		else if (scoutmap[ix]<max_opacity)
+			return FOGST_HALF;
+*/
+	return FOGST_NONE; // Временный фикс тумана
 
-	return FOGST_FULL;
 }
 
 void FogOfWarMap::drawCircle(int x, int y, int radius)

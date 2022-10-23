@@ -11,4 +11,4 @@ Debug/
 .Release/
 *.user
 *.ncb
-/GameDBG.pdb
+*.pdb
