@@ -283,7 +283,8 @@ void Environment::logicQuant()
 		temperature_->LogicQuant();
 		stop_timer(temperature);
 	}
-		
+
+	fogOfWar_ = 0; // Временный фикс тумана	
 	if(fogOfWar_ && scene_->IsFogOfWarEnabled()){
 		start_timer(fow);
 		fogOfWar_->AnimateLogic();
