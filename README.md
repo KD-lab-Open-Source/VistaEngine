@@ -1,6 +1,6 @@
 # Периметр 2: Новая земля
 
-Чат для обсуждения: https://t.me/PerimeterGame
+![Perimeter2](https://cdn.cloudflare.steamstatic.com/steam/apps/12420/header.jpg?t=1574188988)
 
 (с) ООО "КД ВИЖЕН" (Калининград)
 
@@ -14,7 +14,7 @@
 
 ## Что потребуется
 
-Проверено что игра собирается в окружении Windows 10 + Visual Studio 2003.
+Проверено что игра собирается в окружении Windows 10 (21H2) + Visual Studio 2003.
 
 ## Сборка
 
@@ -22,3 +22,8 @@ Perimeter2.sln
 
 ## Запуск игры
 Скопируйте файл GameDBG.exe в папку с игрой из Steam.
+
+## Чаты для обсуждения
+* Telegram (Perimeter): https://t.me/PerimeterGame
+* Telegram (Maelstrom): https://t.me/maelstrom2007chat
+* Discord (Maelstrom): https://discord.gg/rUcXXCY
