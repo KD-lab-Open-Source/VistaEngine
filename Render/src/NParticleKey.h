@@ -243,8 +243,6 @@ public:
 template <class type> int BackVector<type>::GetIndexFree()
 {
 	int FreeParticle=-1;
-	// @dilesoft
-	try {
 	if(stopped.empty())
 	{
 		FreeParticle=size();
@@ -255,8 +253,6 @@ template <class type> int BackVector<type>::GetIndexFree()
 		FreeParticle=stopped.back();
 		stopped.pop_back();
 		VISASSERT(bempty[FreeParticle]);
-	}
-	} catch (...) {
 	}
 
 	bempty[FreeParticle]=false;

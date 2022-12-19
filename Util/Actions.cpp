@@ -412,8 +412,6 @@ void ActionCreateUnit::activate()
 			UnitSquad* squad = 0;
 			for(int i = 0; i < count_; i++){
 				UnitReal* unit = safe_cast<UnitReal*>(player->buildUnit(attr_));
-				// @dilesoft
-				if (!unit) continue;
 				Vect3f pos = anchor->position();				
 				if(count_ > 1)
 					pos += Mat3f(2*M_PI*i/count_, Z_AXIS)*Vect3f(unit->radius()*2, 0, 0);

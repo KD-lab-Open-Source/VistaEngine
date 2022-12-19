@@ -124,7 +124,7 @@ public:
 	WaterPlumeAttribute& waterPlumeAtribute(){ return environmentAttributes_.waterPlume_;}
 	cTemperature* temperature(){ return temperature_;}
 	LensFlareRenderer* lensFlare(){ return lensFlare_; }
-	cFogOfWar* fogOfWar(){ return 0;} // fogOfWar_; } // Временный фикс тумана
+	cFogOfWar* fogOfWar(){ return fogOfWar_; }
 	cFallLeaves* fallLeaves(){ return fallLeaves_; }
 	ShadowWrapper& shadowWrapper() { return shadowWrapper_; }
 	bool isVisibleUnderForOfWar(const UnitBase*, bool checkAllwaysVisible = false) const;

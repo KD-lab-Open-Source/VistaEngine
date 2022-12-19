@@ -65,7 +65,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="Units;Util;Util\Serialization;Render\Inc;Render\Client;Game;Network;Physics;Sound;Terra;Game\Scripts;AI"
+				AdditionalIncludeDirectories=".\XLibs.Net\boost;.\XLibs.Net\Heap;.\XLibs.Net\stl;.\XLibs.Net\XUtil\CRC;.\XLibs.Net\Profiler\Profiler;.\XLibs.Net\MSDXSDK_02_06\Include;.\XLibs.Net\OGG\PlayOgg;Units;Util;Util\Serialization;Render\Inc;Render\Client;Game;Network;Physics;Sound;Terra;Game\Scripts;AI;.\XLibs.Net\XUtil;.\XLibs.Net\XZip"
 				PreprocessorDefinitions="_PERIMETER_;_CORE_;_SURMAP_"
 				ExceptionHandling="FALSE"
 				RuntimeLibrary="0"
@@ -81,8 +81,8 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="binkw32.lib"
-				OutputFile="$(OutDir)/Core.lib"/>
+				OutputFile="$(OutDir)/Core.lib"
+				AdditionalLibraryDirectories=".\XLibs.Net\lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool

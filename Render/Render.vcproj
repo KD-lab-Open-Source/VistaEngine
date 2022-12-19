@@ -133,7 +133,7 @@
 				InlineFunctionExpansion="0"
 				EnableIntrinsicFunctions="TRUE"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="inc;src;client;d3d;..\util;..\util\Serialization"
+				AdditionalIncludeDirectories="..\XLibs.Net\Heap;..\XLibs.Net\stl;..\XLibs.Net\XUtil;..\XLibs.Net\XZip;..\XLibs.Net\XUtil\CRC;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\MSDXSDK_02_06\Include;inc;src;client;d3d;..\util;..\util\Serialization"
 				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS"
 				StringPooling="TRUE"
 				ExceptionHandling="FALSE"

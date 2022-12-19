@@ -24,7 +24,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="..\Util;..\Util\Serialization"
+				AdditionalIncludeDirectories="..\XLibs.Net\Heap;..\XLibs.Net\XUtil\CRC;..\XLibs.Net\XUtil;..\Util;..\Util\Serialization;..\XLibs.Net\XZip;..\XLibs.Net\Profiler\Profiler"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				StringPooling="TRUE"
 				ExceptionHandling="FALSE"

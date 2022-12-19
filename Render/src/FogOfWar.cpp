@@ -333,11 +333,7 @@ void FogOfWarMap::unlockScoutmap() const
 
 const char* FogOfWarMap::lockSummarymap() const
 {
-	// @dilesoft
-	try {
 		lock_.lock();
-	} catch (...) {
-	};
 	return summarymap;
 }
 
@@ -451,11 +447,6 @@ void cFogOfWar::UpdateTexture()
 	int pitch;
 	int bpp=pTextureTilemap->GetBitsPerPixel();
 	xassert(bpp==8);
-
-	// @dilesoft
-	if (!selected_map) {
-		return;
-	}
 
 	if(show_tilemap)
 	{
@@ -614,21 +605,17 @@ bool FogOfWarMap::checkFogStateInCircle(Vect2i& centerPosition, int radius) cons
 
 bool FogOfWarMap::isVisible(const Vect2i& position) const 
 { 
-	/*
 	int x=position.x>>cFogOfWar::shift;
 	int y=position.y>>cFogOfWar::shift;
 	int ix = x+y*size.x;
 	if((UINT)ix<size.x*size.y)
 		if (tilemap[ix]<max_opacity)
 			return true;
-	*/
-	return true;
-	// Временный фикс тумана
+	return false;
 }
 
 FogOfWarState FogOfWarMap::getFogState(int x, int y) const
 {
-	/*
 	x>>=cFogOfWar::shift;
 	y>>=cFogOfWar::shift;
 	int ix = x+y*size.x;
@@ -637,9 +624,7 @@ FogOfWarState FogOfWarMap::getFogState(int x, int y) const
 			return FOGST_NONE;
 		else if (scoutmap[ix]<max_opacity)
 			return FOGST_HALF;
-*/
-	return FOGST_NONE; // Временный фикс тумана
-
+	return FOGST_FULL;
 }
 
 void FogOfWarMap::drawCircle(int x, int y, int radius)

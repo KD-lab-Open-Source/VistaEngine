@@ -63,7 +63,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..,..\..,..\..\kdWidgets\extern"
+				AdditionalIncludeDirectories="..\..\..\XLibs.Net\Heap;..\..\..\XLibs.Net\stl;..\..\..\XLibs.Net\XUtil\CRC;..\..\..\XLibs.Net\XUtil;..;..\..;..\..\kdWidgets\extern"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				ExceptionHandling="FALSE"
 				RuntimeLibrary="0"

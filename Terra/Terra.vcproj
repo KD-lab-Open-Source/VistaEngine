@@ -128,7 +128,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="..\tx3d;..\Util;..\Util\Serialization"
+				AdditionalIncludeDirectories="..\XLibs.Net\Heap;..\XLibs.Net\stl;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XUtil;..\XLibs.Net\XUtil\CRC;..\tx3d;..\Util;..\Util\Serialization;..\XLibs.Net\XZip"
 				PreprocessorDefinitions="NDEBUG;WIN32;_LIB;_PERIMETER_;_TX3D_LIBRARY_"
 				StringPooling="TRUE"
 				ExceptionHandling="FALSE"
