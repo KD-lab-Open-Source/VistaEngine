@@ -101,8 +101,6 @@ void UnitObjective::fowQuant()
 	if(!alive())
 		return;
 
-	// @dilesoft
-	try {
 		if(player()->fogOfWarMap()){
 			if(!(hiddenGraphic() & (HIDE_BY_TELEPORT | HIDE_BY_TRANSPORT | HIDE_BY_TRIGGER))){
 				if(fow_handle == -1)
@@ -145,8 +143,6 @@ void UnitObjective::fowQuant()
 		case FVM_NO_FOG:
 			hide(HIDE_BY_FOW, fow->getFogState(position2D().xi(), position2D().yi()) != FOGST_NONE);
 			break;
-		}
-	} catch (...) {
 	}
 }
 

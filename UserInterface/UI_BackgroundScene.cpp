@@ -87,10 +87,6 @@ void UI_BackgroundModelSetup::preLoad(cScene* scene, const Player* player) const
 	
 	cObject3dx* model = scene->CreateObject3dx(modelName(), NULL);
 	xassert(model);
-	// @dilesoft
-	if (!model) {
-		return;
-	}
 
 	model->DisableDetailLevel();
 	

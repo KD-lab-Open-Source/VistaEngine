@@ -627,11 +627,7 @@ void UnitReal::Kill()
 		if(model())
 			streamLogicPostCommand.set(fCommandSetIgnored, model()) << true;
 		if(currentState()){
-			// @dilesoft
-			try {
 			currentState_->finish(this, false);
-			} catch (...) {
-			}
 			currentStateID_ = CHAIN_NONE;
 			currentState_ = 0;
 		}
@@ -972,11 +968,7 @@ void UnitReal::enableFlying(int flyingReason, int time)
 void UnitReal::makeStatic(int staticReason) 
 { 
 	staticReason_ |= staticReason; 
-	// @dilesoft
-	try {
 		rigidBody_->makeStatic();
-	} catch (...) {
-	}
 }
 
 void UnitReal::makeStaticXY(int staticReason) 

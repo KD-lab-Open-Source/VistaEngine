@@ -1040,6 +1040,7 @@ void Channel::ChangeVolume(float volume)
 }
 bool Channel::isInFogOfWar()
 {
+	return false; // @dilesoft
 	if(sound_->system_->gameActive_&&stopInFogOfWar_&&universe()->activePlayer()->fogOfWarMap()&&is3DSound_&&
 	   universe()->activePlayer()->fogOfWarMap()->getFogState(ds3DBuffer_.vPosition.x,ds3DBuffer_.vPosition.y) != FOGST_NONE)
 	{
