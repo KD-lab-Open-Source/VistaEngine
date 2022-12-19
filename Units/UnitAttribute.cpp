@@ -928,8 +928,6 @@ void AttributeBase::refreshChains(bool editArchive)
 
 void AttributeBase::initGeometryAttribute()
 {
-	// @Hallkezz
-	try{
 		if(!strlen(modelName.c_str()) || !gb_VisGeneric)
 			return;
 
@@ -970,8 +968,6 @@ void AttributeBase::initGeometryAttribute()
 			boundBox.max.z = 2*radiusMin - boundBox.min.z;
 
 		selectRadius = selectCircleRelativeRadius*((const Vect2f&)boundBox.max).distance(boundBox.min)/2;
-		} catch (...) {
-	}
 }
 
 void AttributeBase::calcBasementPoints(float angle, const Vect2f& center, Vect2i points[4]) const 

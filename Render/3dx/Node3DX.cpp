@@ -1729,12 +1729,8 @@ void cObject3dx::EnableSelfIllumination(bool enable)
 }
 void cObject3dx::DisableDetailLevel()
 {
-	// @dilesoft
-	try {
 		SetAttribute(ATTR3DX_NO_RESIZE_TEXTURES);
 		LoadTexture(false,false,"");
-	} catch (...) {
-	}
 }
 
 void cObject3dx::GetLocalBorder(int *nVertex,Vect3f **Vertex,int *nIndex,short **Index)
