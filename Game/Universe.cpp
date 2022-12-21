@@ -53,7 +53,7 @@ Universe* Universe::universe_ = NULL;
 
 bool Channel::isInFogOfWar() // @dilesoft
 {
-	if(sound_->system_->gameActive_&&stopInFogOfWar_&&universe()->activePlayer()->fogOfWarMap()&&is3DSound_&&
+	if(sound_->system_->gameActive_&&stopInFogOfWar_&&universe()&&universe()->activePlayer()->fogOfWarMap()&&is3DSound_&&
 	   universe()->activePlayer()->fogOfWarMap()->getFogState(ds3DBuffer_.vPosition.x,ds3DBuffer_.vPosition.y) != FOGST_NONE)
 	{
 		return true;
