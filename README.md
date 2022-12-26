@@ -6,6 +6,9 @@
 
 Весь код, за исключением сторонних библиотек, публикуется под лицензией GPLv3. Код сторонних библиотек (где указана иная лицензия) публикуется под лицензией этих библиотек.
 
+Ветки:\
+[`Perimeter 2`](https://github.com/KD-lab-Open-Source/VistaEngine/tree/Perimeter2) [`Maelstrom (v1.0)`](https://github.com/KD-lab-Open-Source/VistaEngine/tree/Maelstrom) [`Maelstrom (v1.1)`](https://github.com/KD-lab-Open-Source/VistaEngine/tree/Maelstrom_1_1)
+
 ## Состав репозитория
 
 * / - основной код
