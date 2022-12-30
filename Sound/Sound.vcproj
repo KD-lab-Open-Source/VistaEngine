@@ -24,7 +24,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="..\XLibs.Net\Heap;..\XLibs.Net\XUtil\CRC;..\XLibs.Net\XUtil;..\Util;..\Util\Serialization;..\XLibs.Net\XZip;..\XLibs.Net\Profiler\Profiler"
+				AdditionalIncludeDirectories="..\XLibs.Net\Heap;..\XLibs.Net\stl;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XUtil\CRC;..\XLibs.Net\XUtil;..\Util;..\Util\Serialization;..\XLibs.Net\XZip"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				StringPooling="TRUE"
 				ExceptionHandling="FALSE"
@@ -76,7 +76,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\XLibs.Net\Heap;..\XLibs.Net\XUtil\CRC;..\XLibs.Net\XUtil;..\Util;..\Util\Serialization;..\XLibs.Net\XZip;..\XLibs.Net\Profiler\Profiler"
+				AdditionalIncludeDirectories="..\XLibs.Net\Heap;..\XLibs.Net\stl;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XUtil\CRC;..\XLibs.Net\XUtil;..\Util;..\Util\Serialization;..\XLibs.Net\XZip"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				ExceptionHandling="FALSE"
 				BasicRuntimeChecks="3"
