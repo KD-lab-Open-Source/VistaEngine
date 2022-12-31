@@ -1,0 +1,48 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PlayOgg", "PlayOgg.vcproj", "{C2AA1893-AED2-4154-8819-2C9199287443}"
+	ProjectSection(ProjectDependencies) = postProject
+		{60DB95AD-0BE5-45D4-955C-EDBDC6347570} = {60DB95AD-0BE5-45D4-955C-EDBDC6347570}
+		{C20CA155-531D-4B73-9CC2-437AE910E8BB} = {C20CA155-531D-4B73-9CC2-437AE910E8BB}
+		{90F0CB7D-5A4B-43EB-8002-7535E977CDFF} = {90F0CB7D-5A4B-43EB-8002-7535E977CDFF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ogg_static", "..\libogg-1.1\win32\ogg_static.vcproj", "{90F0CB7D-5A4B-43EB-8002-7535E977CDFF}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vorbis_static", "..\libvorbis-1.0.1\win32\vorbis_static.vcproj", "{C20CA155-531D-4B73-9CC2-437AE910E8BB}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vorbisfile_static", "..\libvorbis-1.0.1\win32\vorbisfile_static.vcproj", "{60DB95AD-0BE5-45D4-955C-EDBDC6347570}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{C2AA1893-AED2-4154-8819-2C9199287443}.Debug.ActiveCfg = Debug|Win32
+		{C2AA1893-AED2-4154-8819-2C9199287443}.Debug.Build.0 = Debug|Win32
+		{C2AA1893-AED2-4154-8819-2C9199287443}.Release.ActiveCfg = Release|Win32
+		{C2AA1893-AED2-4154-8819-2C9199287443}.Release.Build.0 = Release|Win32
+		{90F0CB7D-5A4B-43EB-8002-7535E977CDFF}.Debug.ActiveCfg = Debug|Win32
+		{90F0CB7D-5A4B-43EB-8002-7535E977CDFF}.Debug.Build.0 = Debug|Win32
+		{90F0CB7D-5A4B-43EB-8002-7535E977CDFF}.Release.ActiveCfg = Release|Win32
+		{90F0CB7D-5A4B-43EB-8002-7535E977CDFF}.Release.Build.0 = Release|Win32
+		{C20CA155-531D-4B73-9CC2-437AE910E8BB}.Debug.ActiveCfg = Debug|Win32
+		{C20CA155-531D-4B73-9CC2-437AE910E8BB}.Debug.Build.0 = Debug|Win32
+		{C20CA155-531D-4B73-9CC2-437AE910E8BB}.Release.ActiveCfg = Release|Win32
+		{C20CA155-531D-4B73-9CC2-437AE910E8BB}.Release.Build.0 = Release|Win32
+		{60DB95AD-0BE5-45D4-955C-EDBDC6347570}.Debug.ActiveCfg = Debug|Win32
+		{60DB95AD-0BE5-45D4-955C-EDBDC6347570}.Debug.Build.0 = Debug|Win32
+		{60DB95AD-0BE5-45D4-955C-EDBDC6347570}.Release.ActiveCfg = Release|Win32
+		{60DB95AD-0BE5-45D4-955C-EDBDC6347570}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

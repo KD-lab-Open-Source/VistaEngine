@@ -25,7 +25,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\XLibs.Net\Heap;.\XLibs.Net\stl;.\XLibs.Net\MSDXSDK_02_06\Include;.\XLibs.Net\XUtil\CRC;.\XLibs.Net\Profiler\Profiler;.\XLibs.Net\DemonWare;.\XLibs.Net;.\XLibs.Net\DemonWare\external\libtomcrypt\src\headers;Util;Util\Serialization;Render\INC;Terra;Game;UserInterface;GeoLogic;Network;Units;Render\Client;Physics;AI;Squad;Sound;Sound\Mpp\PlayMpp;Scripts;tx3d;Game\scripts;Network\DemonWare;.\XLibs.Net\XUtil;.\XLibs.Net\XZip"
+				AdditionalIncludeDirectories=".\XLibs.Net\Heap;.\XLibs.Net\stl;.\XLibs.Net\OGG\PlayOgg;.\XLibs.Net\MSDXSDK_02_06\Include;.\XLibs.Net\XUtil\CRC;.\XLibs.Net\Profiler\Profiler;.\XLibs.Net\DemonWare;.\XLibs.Net;.\XLibs.Net\DemonWare\external\libtomcrypt\src\headers;Util;Util\Serialization;Render\INC;Terra;Game;UserInterface;GeoLogic;Network;Units;Render\Client;Physics;AI;Squad;Sound;Sound\Mpp\PlayMpp;Scripts;tx3d;Game\scripts;Network\DemonWare;.\XLibs.Net\XUtil;.\XLibs.Net\XZip"
 				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;_PERIMETER_;_SURMAP_;_STLP_SHRED_BYTE=0xA3;_TX3D_LIBRARY_;IMPORT_ATTRIB_EDITOR"
 				MinimalRebuild="TRUE"
 				ExceptionHandling="FALSE"
@@ -48,7 +48,7 @@
 				OutputFile="GameDBG.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories=".\XLibs.Net\lib;.\XLibs.Net\MSDXSDK_02_06\Lib\x86"
+				AdditionalLibraryDirectories=".\XLibs.Net\lib;.\XLibs.Net\OGG\PlayOgg;.\XLibs.Net\MSDXSDK_02_06\Lib\x86"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="./GameDBG.pdb"

@@ -190,7 +190,7 @@ long XZipMpegTell(void *datasource)
 	return stream->tell();
 }
 
-//MpegCallbacks zipMpegCallbacks = { XZipMpegOpen, XZipMpegRead, XZipMpegSeek, XZipMpegClose, XZipMpegTell };
+MpegCallbacks zipMpegCallbacks = { XZipMpegOpen, XZipMpegRead, XZipMpegSeek, XZipMpegClose, XZipMpegTell };
 
 VoiceManager::VoiceManager() : stream_(false)
 {
@@ -199,7 +199,7 @@ VoiceManager::VoiceManager() : stream_(false)
 	soundTrack_ = "";
 	canPaused_ = true;
 
-//	MpegSound::SetCallbacks(&zipMpegCallbacks);
+	MpegSound::SetCallbacks(&zipMpegCallbacks);
 }
 
 bool VoiceManager::isPlaying() const
@@ -250,7 +250,7 @@ bool VoiceManager::Play(const char* soundTrack, bool cycled, bool canPaused, boo
 	canPaused_ = canPaused;
 
 	SetVolume(terVoiceVolume);
-	bool b = mpeg->OpenToPlay(soundTrack, cycled/*, &stream_*/);
+	bool b = mpeg->OpenToPlay(soundTrack, cycled, &stream_);
 	// из-за открытия файла позже в другом потоке, говорит лишь о невозможности создания потока
 	xassert_s(b && "Cannot open music: ", soundTrack); 
 	return b;

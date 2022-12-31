@@ -1,0 +1,15 @@
+## Process this file with automake to produce Makefile.in
+
+AUTOMAKE_OPTIONS = foreign dist-zip
+
+SUBDIRS = po intl include share debian win32 @OPT_SUBDIRS@
+DIST_SUBDIRS = po intl include share debian win32 ogg123 oggenc oggdec ogginfo \
+	vcut vorbiscomment
+
+EXTRA_DIST = README AUTHORS COPYING vorbis-tools.spec config.h
+
+debug:
+	$(MAKE) all CFLAGS="@DEBUG@"
+
+profile:
+	$(MAKE) all CFLAGS="@PROFILE@"
