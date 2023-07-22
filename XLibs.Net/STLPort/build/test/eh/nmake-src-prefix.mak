@@ -1,5 +1,5 @@
 # -*- makefile -*- Time-stamp: <04/03/29 22:25:01 ptr>
-# $Id: nmake-src-prefix.mak 1802 2005-11-01 08:25:57Z complement $
+# $Id: nmake-src-prefix.mak,v 1.1.2.1 2005/05/13 19:15:29 dums Exp $
 
 ALLOBJS = $(ALLOBJS:../../../test/eh/=)
 

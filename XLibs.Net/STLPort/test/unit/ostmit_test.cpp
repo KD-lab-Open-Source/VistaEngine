@@ -36,7 +36,7 @@ void OstreamIteratorTest::ostmit0()
   char* text = "hello";
 
   ostringstream os;
-
+  
   ostream_iterator<char> iter(os);
   copy(text, text + 5, iter);
   CPPUNIT_ASSERT(os.good());

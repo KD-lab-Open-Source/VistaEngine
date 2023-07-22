@@ -133,6 +133,8 @@ public:
 	afx_msg void OnFileSave();
 	afx_msg void OnFileSaveas();
 
+	afx_msg void OnFileExportImportWorld();
+
     afx_msg void OnFileMerge();
 
 	afx_msg void OnFileSaveminimaptoworld();

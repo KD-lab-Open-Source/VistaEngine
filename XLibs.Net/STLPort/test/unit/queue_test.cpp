@@ -37,9 +37,9 @@ void QueueTest::pqueue1()
   q.push(101);
   q.push(69);
 
-  CPPUNIT_ASSERT( q.top()==101 );
+  CPPUNIT_ASSERT( q.top()==101 ); 
   q.pop();
-  CPPUNIT_ASSERT( q.top()==69 );
+  CPPUNIT_ASSERT( q.top()==69 ); 
   q.pop();
   CPPUNIT_ASSERT( q.top()==42 );
   q.pop();
@@ -53,9 +53,9 @@ void QueueTest::queue1()
   q.push(101);
   q.push(69);
 
-  CPPUNIT_ASSERT( q.front()==42 );
+  CPPUNIT_ASSERT( q.front()==42 ); 
   q.pop();
-  CPPUNIT_ASSERT( q.front()==101 );
+  CPPUNIT_ASSERT( q.front()==101 ); 
   q.pop();
   CPPUNIT_ASSERT( q.front()==69 );
   q.pop();

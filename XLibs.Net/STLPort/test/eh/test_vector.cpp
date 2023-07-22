@@ -1,6 +1,6 @@
 /***********************************************************************************
   test_vector.cpp
-
+  
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -52,7 +52,7 @@ struct test_reserve
     test_reserve( size_t n ) : fAmount(n) {
             gTestController.SetCurrentTestName("vector::reserve()");
     }
-
+  
     void operator()( TestVector& v ) const
     {
         v.reserve( fAmount );
@@ -75,11 +75,11 @@ void test_vector()
 {
 
     ConstCheck( 0, test_construct_n<TestVector>( random_number(random_base) ) );
-
+   
     TestVector emptyVector;
     TestVector testVector, testVector2;
     size_t vectorSize = random_number(random_base);
-
+  
     testVector.reserve(vectorSize*4);
     while ( testVector.size() < vectorSize )
     {
@@ -87,7 +87,7 @@ void test_vector()
         testVector.push_back( x );
         testVector2.push_back( TestClass() );
     }
-
+  
     size_t insCnt = random_number(random_base);
     TestClass *insFirst = new TestVector::value_type[1+ insCnt];
 
@@ -107,7 +107,7 @@ void test_vector()
     WeakCheck( testVector, test_insert_n<TestVector>(testVector, random_number(random_base), (int)testVector.size() ) );
 
     WeakCheck( testVector, insert_range_tester(testVector, testVector2.begin(), testVector2.end() ) );
-
+  
 
     StrongCheck( testVector, test_reserve( testVector.capacity() + random_number(random_base) ) );
     StrongCheck( testVector, test_push_back<TestVector>(testVector) );

@@ -8,12 +8,12 @@
 # endif
 
 # if defined (_STLP_USE_NAMESPACES)
-#  undef  __STL_USE_NAMESPACES
+#  undef  __STL_USE_NAMESPACES 
 #  define __STL_USE_NAMESPACES _STLP_USE_NAMESPACES
 # endif
 
 # if defined (_STLP_USE_EXCEPTIONS)
-#  undef  __STL_USE_EXCEPTIONS
+#  undef  __STL_USE_EXCEPTIONS 
 #  define __STL_USE_EXCEPTIONS _STLP_USE_EXCEPTIONS
 # endif
 
@@ -39,17 +39,17 @@
 #endif
 
 /* provide a uniform way to access full funclionality */
-# define __slist__         slist
-# define __map__           map
-# define __multimap__      multimap
-# define __set__           set
-# define __multiset__      multiset
-# define __list__          list
-# define __hash_map__      hash_map
-# define __hash_multimap__ hash_multimap
-# define __hash_set__      hash_set
-# define __hash_multiset__ hash_multiset
-# define __vector__        vector
+# define __slist__  __FULL_NAME(slist)
+# define __map__  __FULL_NAME(map)
+# define __multimap__  __FULL_NAME(multimap)
+# define __set__  __FULL_NAME(set)
+# define __multiset__  __FULL_NAME(multiset)
+# define __list__ __FULL_NAME(list)
+# define __hash_map__ __FULL_NAME(hash_map)
+# define __hash_multimap__ __FULL_NAME(hash_multimap)
+# define __hash_set__       __FULL_NAME(hash_set)
+# define __hash_multiset__  __FULL_NAME(hash_multiset)
+# define __vector__ __FULL_NAME(vector)
 
 #endif
 

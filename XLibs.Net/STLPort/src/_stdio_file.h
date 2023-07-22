@@ -2,19 +2,19 @@
  * Copyright (c) 1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
  * modified is included with the above copyright notice.
  *
- */
+ */ 
 
 
 // WARNING: This is an internal header file, included by other C++
@@ -25,8 +25,8 @@
 #ifndef _STLP_STDIO_FILE_H
 #define _STLP_STDIO_FILE_H
 
-// This file provides a low-level interface between the internal
-// representation of struct FILE, from the C stdio library, and
+// This file provides a low-level interface between the internal 
+// representation of struct FILE, from the C stdio library, and 
 // the C++ I/O library.  The C++ I/O library views a FILE object as
 // a collection of three pointers: the beginning of the buffer, the
 // current read/write position, and the end of the buffer.
@@ -42,16 +42,16 @@
 //       Returns the number of characters remaining in the buffer, i.e.
 //       _FILE_[IO]_end(__f) - _FILE_[IO]_next(__f).
 // - char& _FILE_[IO]_preincr(FILE *__f)
-//       Increments the current read/write position by 1, returning the
+//       Increments the current read/write position by 1, returning the 
 //       character at the old position.
 // - char& _FILE_[IO]_postincr(FILE *__f)
-//       Increments the current read/write position by 1, returning the
+//       Increments the current read/write position by 1, returning the 
 //       character at the old position.
 // - char& _FILE_[IO]_predecr(FILE *__f)
-//       Decrements the current read/write position by 1, returning the
+//       Decrements the current read/write position by 1, returning the 
 //       character at the old position.
 // - char& _FILE_[IO]_postdecr(FILE *__f)
-//       Decrements the current read/write position by 1, returning the
+//       Decrements the current read/write position by 1, returning the 
 //       character at the old position.
 // - void _FILE_[IO]_bump(FILE *__f, int __n)
 //       Increments the current read/write position by __n.
@@ -78,6 +78,7 @@
 
 _STLP_BEGIN_NAMESPACE
 
+#if !defined(_STLP_WINCE)
 //----------------------------------------------------------------------
 // Implementation for eMbedded Visual C++ 3.0 and 4.2 (.NET)
 #if defined (_STLP_WCE)
@@ -95,7 +96,7 @@ inline int _FILE_fd(const FILE *__f) { return (int)::_fileno((FILE*)__f); }
       (defined (_STLP_MSVC) && !defined (_STLP_WCE_EVC3)) || \
       defined (__ICL) || defined (__MINGW32__) || defined(__DJGPP) || defined (_AIX) || defined (_CRAY))
 
-#if defined (_STLP_MSVC) || defined (__ICL) || defined (__MINGW32__) || defined(__DJGPP)
+#if defined ( _MSC_VER ) || defined (__ICL) || defined (__MINGW32__) || defined(__DJGPP)
 typedef  char* _File_ptr_type;
 #else
 typedef  unsigned char* _File_ptr_type;
@@ -103,7 +104,7 @@ typedef  unsigned char* _File_ptr_type;
 
 inline int   _FILE_fd(const FILE *__f) { return __f->_file; }
 inline char* _FILE_I_begin(const FILE *__f) { return (char*) __f->_base; }
-inline char* _FILE_I_next(const FILE *__f) { return (char*) __f->_ptr; }
+inline char* _FILE_I_next(const FILE *__f) { return (char*) __f->_ptr; }  
 inline char* _FILE_I_end(const FILE *__f)
   { return (char*) __f->_ptr + __f->_cnt; }
 
@@ -234,7 +235,7 @@ __f->__pad[3] = __end - __next;
 
 inline int _FILE_fd(const FILE *__f) { return __f->_file; }
 inline char* _FILE_I_begin(const FILE *__f) { return (char*)   __f->_bf._base; }
-inline char* _FILE_I_next(const FILE *__f) { return (char*) __f->_p; }
+inline char* _FILE_I_next(const FILE *__f) { return (char*) __f->_p; } 
 inline char* _FILE_I_end(const FILE *__f)
 { return (char*) __f->_p + __f->_r; }
 
@@ -270,7 +271,7 @@ inline void _FILE_I_set(FILE *__f, char* __begin, char* __next, char* __end) {
   __f->_r = __f->_bf._size = __end - __next;
 }
 inline char* _FILE_O_begin(const FILE *__f) { return (char*) __f->_bf._base; }
-inline char* _FILE_O_next(const FILE *__f) { return (char*) __f->_p; }
+inline char* _FILE_O_next(const FILE *__f) { return (char*) __f->_p; } 
 inline char* _FILE_O_end(const FILE *__f)
 { return (char*) __f->_p + __f->_w; }
 
@@ -317,7 +318,7 @@ inline char* _FILE_I_begin(const FILE *__f) { return __f->_IO_read_base; }
 inline char* _FILE_I_next(const FILE *__f)  { return __f->_IO_read_ptr; }
 inline char* _FILE_I_end(const FILE *__f)   { return __f->_IO_read_end; }
 
-inline ptrdiff_t _FILE_I_avail(const FILE *__f)
+inline ptrdiff_t _FILE_I_avail(const FILE *__f) 
   { return __f->_IO_read_end - __f->_IO_read_ptr; }
 
 inline char& _FILE_I_preincr(FILE *__f)  { return *++__f->_IO_read_ptr; }
@@ -327,16 +328,16 @@ inline char& _FILE_I_postdecr(FILE *__f) { return *__f->_IO_read_ptr--; }
 inline void  _FILE_I_bump(FILE *__f, int __n) { __f->_IO_read_ptr += __n; }
 
 inline void _FILE_I_set(FILE *__f, char* __begin, char* __next, char* __end) {
-  __f->_IO_read_base = __begin;
-  __f->_IO_read_ptr  = __next;
-  __f->_IO_read_end  = __end;
+  __f->_IO_read_base = __begin; 
+  __f->_IO_read_ptr  = __next; 
+  __f->_IO_read_end  = __end; 
 }
 
 inline char* _FILE_O_begin(const FILE *__f) { return __f->_IO_write_base; }
 inline char* _FILE_O_next(const FILE *__f)  { return __f->_IO_write_ptr; }
 inline char* _FILE_O_end(const FILE *__f)   { return __f->_IO_write_end; }
 
-inline ptrdiff_t _FILE_O_avail(const FILE *__f)
+inline ptrdiff_t _FILE_O_avail(const FILE *__f) 
   { return __f->_IO_write_end - __f->_IO_write_ptr; }
 
 inline char& _FILE_O_preincr(FILE *__f)  { return *++__f->_IO_write_ptr; }
@@ -346,9 +347,9 @@ inline char& _FILE_O_postdecr(FILE *__f) { return *__f->_IO_write_ptr--; }
 inline void  _FILE_O_bump(FILE *__f, int __n) { __f->_IO_write_ptr += __n; }
 
 inline void _FILE_O_set(FILE *__f, char* __begin, char* __next, char* __end) {
-  __f->_IO_write_base = __begin;
-  __f->_IO_write_ptr  = __next;
-  __f->_IO_write_end  = __end;
+  __f->_IO_write_base = __begin; 
+  __f->_IO_write_ptr  = __next; 
+  __f->_IO_write_end  = __end; 
 
 }
 
@@ -360,7 +361,7 @@ extern "C" unsigned char *__bufendtab[];
 #  define _bufend(__p) \
      (*(((__p)->__flag & _IOEXT)  ? &(((_FILEX *)(__p))->__bufendp)      \
              : &(__bufendtab[(__p) - __iob])))
-
+ 
 #  define _bufsiz(__p)  (_bufend(__p) - (__p)->__base)
 #endif /* _INCLUDE_HPUX_SOURCE */
 
@@ -383,16 +384,16 @@ inline char& _FILE_I_postincr(FILE *__f) { --__f->__cnt; return *__REINTERPRET_C
 inline char& _FILE_I_predecr(FILE *__f)  { ++__f->__cnt; return *__REINTERPRET_CAST(char*,--__f->__ptr); }
 inline char& _FILE_I_postdecr(FILE *__f) { ++__f->__cnt; return *__REINTERPRET_CAST(char*,__f->__ptr--); }
 inline void  _FILE_I_bump(FILE *__f, int __n) { __f->__cnt -= __n; __f->__ptr += __n; }
-
+ 
 inline void _FILE_I_set(FILE *__f, char* __begin, char* __next, char* __end) {
 # if defined(__hpux)
    if( (unsigned long) (__f - &__iob[0]) > _NFILE)
         __f->__flag |= _IOEXT;  // used by stdio's _bufend macro and goodness knows what else...
 # endif
-  __f->__cnt  = __end - __next;
-  __f->__base = __REINTERPRET_CAST(unsigned char*, __begin);
+  __f->__cnt  = __end - __next; 
+  __f->__base = __REINTERPRET_CAST(unsigned char*, __begin); 
   __f->__ptr  = __REINTERPRET_CAST(unsigned char*, __next);
-  _bufend(__f) = __REINTERPRET_CAST(unsigned char*, __end);
+  _bufend(__f) = __REINTERPRET_CAST(unsigned char*, __end); 
 }
 
 // For HPUX stdio, input and output FILE manipulation is identical.
@@ -406,8 +407,8 @@ typedef unsigned char* _File_ptr_type;
 inline int _FILE_fd(const FILE *__f) { return __f->fd; }
 inline char* _FILE_I_begin(const FILE *__f) { return (char*) __f->buffer;
 }
-inline char* _FILE_I_next(const FILE *__f)
-{ return (char*)__f->curp; }
+inline char* _FILE_I_next(const FILE *__f) 
+{ return (char*)__f->curp; } 
 inline char* _FILE_I_end(const FILE *__f)
 { return (char*) __f->curp + __f->level; }
 
@@ -459,7 +460,7 @@ inline char* _FILE_I_end(const FILE *__f) { return __REINTERPRET_CAST(char*, __f
 //       _FILE_[IO]_end(__f) - _FILE_[IO]_next(__f).
 inline ptrdiff_t _FILE_I_avail(const FILE *__f) { return __f->buffer_len; }
 
-//       Increments the current read/write position by 1, returning the
+//       Increments the current read/write position by 1, returning the 
 //       character at the old position.
 inline char& _FILE_I_preincr(FILE *__f)
   { --__f->buffer_len; return *(char*) (++__f->buffer_ptr); }
@@ -531,20 +532,20 @@ inline char* _FILE_I_end(const FILE *__f) { return __f->_ptr + __f->_cnt; }
 //       _FILE_[IO]_end(__f) - _FILE_[IO]_next(__f).
 inline ptrdiff_t _FILE_I_avail(const FILE *__f) { return __f->_cnt; }
 
-//       Increments the current read/write position by 1, returning the
+//       Increments the current read/write position by 1, returning the 
 //       character at the NEW position.
 inline char& _FILE_I_preincr(FILE *__f) { --__f->_cnt; return *(++__f->_ptr); }
 
 
-//       Increments the current read/write position by 1, returning the
+//       Increments the current read/write position by 1, returning the 
 //       character at the old position.
 inline char& _FILE_I_postincr(FILE *__f) { --__f->_cnt; return *(__f->_ptr++); }
 
-//       Decrements the current read/write position by 1, returning the
+//       Decrements the current read/write position by 1, returning the 
 //       character at the NEW position.
 inline char& _FILE_I_predecr(FILE *__f) { ++__f->_cnt; return *(--__f->_ptr); }
 
-//       Decrements the current read/write position by 1, returning the
+//       Decrements the current read/write position by 1, returning the 
 //       character at the old position.
 inline char& _FILE_I_postdecr(FILE *__f) { ++__f->_cnt; return *(__f->_ptr--); }
 
@@ -581,20 +582,20 @@ inline char* _FILE_I_end(const FILE *__f) { return (char*)__f->_end; }
 //       _FILE_[IO]_end(__f) - _FILE_[IO]_next(__f).
 inline ptrdiff_t _FILE_I_avail(const FILE *__f) { return __f->_cnt; }
 
-//       Increments the current read/write position by 1, returning the
+//       Increments the current read/write position by 1, returning the 
 //       character at the NEW position.
 inline char& _FILE_I_preincr(FILE *__f) { --__f->_cnt; return*(char*) (++__f->_ptr); }
 
 
-//       Increments the current read/write position by 1, returning the
+//       Increments the current read/write position by 1, returning the 
 //       character at the old position.
 inline char& _FILE_I_postincr(FILE *__f) { --__f->_cnt; return*(char*) (__f->_ptr++); }
 
-//       Decrements the current read/write position by 1, returning the
+//       Decrements the current read/write position by 1, returning the 
 //       character at the NEW position.
 inline char& _FILE_I_predecr(FILE *__f) { ++__f->_cnt; return*(char*) (--__f->_ptr); }
 
-//       Decrements the current read/write position by 1, returning the
+//       Decrements the current read/write position by 1, returning the 
 //       character at the old position.
 inline char& _FILE_I_postdecr(FILE *__f) { ++__f->_cnt; return*(char*) (__f->_ptr--); }
 
@@ -710,21 +711,21 @@ inline void _FILE_I_set(FILE *__f, char* __begin, char*
 }
 
 # define _STLP_FILE_I_O_IDENTICAL
-
+ 
 #elif defined(__WATCOMC__)                   // Nikolaev
-
+ 
 inline int       _FILE_fd      (const FILE *__f) { return __f->_handle;}
 inline char*     _FILE_I_begin (const FILE *__f) { return __REINTERPRET_CAST(char*, __f->_link); }
 inline char*     _FILE_I_next  (const FILE *__f) { return __REINTERPRET_CAST(char*, __f->_ptr); }
 inline char*     _FILE_I_end   (const FILE *__f) { return __REINTERPRET_CAST(char*, __f->_ptr + __f->_cnt); }
 inline ptrdiff_t _FILE_I_avail (const FILE *__f) { return __f->_cnt; }
-
+ 
 inline char& _FILE_I_preincr(FILE *__f)
 {
   --__f->_cnt;
   return *__REINTERPRET_CAST(char*, ++__f->_ptr);
 }
-
+ 
 inline char& _FILE_I_postincr(FILE *__f)
 {
   --__f->_cnt;
@@ -736,26 +737,26 @@ inline char& _FILE_I_predecr(FILE *__f)
   ++__f->_cnt;
   return *__REINTERPRET_CAST(char*, --__f->_ptr);
 }
-
+ 
 inline char& _FILE_I_postdecr(FILE *__f)
 {
   ++__f->_cnt;
   return *__REINTERPRET_CAST(char*, __f->_ptr--);
 }
-
+ 
 inline void _FILE_I_bump(FILE *__f, int __n)
 {
   __f->_ptr += __n;
   __f->_cnt -= __n;
 }
-
+ 
 inline void _FILE_I_set(FILE *__f, char* __begin, char* __next, char* __end)
 {
   __f->_link = __REINTERPRET_CAST(__stream_link*, __begin);
   __f->_ptr  = __REINTERPRET_CAST(unsigned char*, __next);
   __f->_cnt  = __end - __next;
 }
-
+ 
 # define _STLP_FILE_I_O_IDENTICAL
 
 #elif defined (__Lynx__)
@@ -763,12 +764,12 @@ inline void _FILE_I_set(FILE *__f, char* __begin, char* __next, char* __end)
 // the prototypes are taken from LynxOS patch for STLport 4.0
 inline int   _FILE_fd(const FILE *__f) { return __f->_fd; }
 inline char* _FILE_I_begin(const FILE *__f) { return (char*) __f->_base; }
-inline char* _FILE_I_next(const FILE *__f) { return (char*) __f->_ptr; }
+inline char* _FILE_I_next(const FILE *__f) { return (char*) __f->_ptr; }  
 inline char* _FILE_I_end(const FILE *__f)
   { return (char*) __f->_ptr + __f->_cnt; }
-
+ 
 inline ptrdiff_t _FILE_I_avail(const FILE *__f) { return __f->_cnt; }
-
+ 
 inline char& _FILE_I_preincr(FILE *__f)
   { --__f->_cnt; return *(char*) (++__f->_ptr); }
 inline char& _FILE_I_postincr(FILE *__f)
@@ -811,6 +812,10 @@ inline void  _FILE_O_bump(FILE *__f, int __n) { _FILE_I_bump(__f, __n); }
 inline void _FILE_O_set(FILE *__f, char* __begin, char* __next, char* __end)
   { _FILE_I_set(__f, __begin, __next, __end); }
 # endif
+
+#else
+inline int _FILE_fd(const FILE *__f) { return (int)::_fileno(__CONST_CAST(FILE *, __f)); }
+#endif /* _STLP_WINCE */
 
 _STLP_END_NAMESPACE
 

@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "P2P_interface.h"
 #include "GS_interface.h"
+//#include "DW_interfaceFull.h"
 
 
 #include "GameShell.h"
@@ -47,7 +48,7 @@ const GUID guidPerimeterGame =
 //#define INITGUID
 #include "objbase.h"
 #include "initguid.h"
-//#include "dp8sim.h"
+#include "dp8sim.h"
 
 
 //HRESULT WINAPI DirectPlayMessageHandler(PVOID pvUserContext, DWORD dwMessageId, PVOID pMsgBuffer)
@@ -136,7 +137,7 @@ bool PNetCenter::InitDP(void)
 	XDP_CHECK_HR(hr, "CoCreateInstance");
 	if(hr!=S_OK) return 0;
 
-	//m_pDPClient=m_pDPServer;//пїЅпїЅпїЅпїЅ
+	//m_pDPClient=m_pDPServer;//Пока
 
     // Init IDirectPlay8Server
 	DWORD dwFlags=0;
@@ -208,8 +209,8 @@ int PNetCenter::ServerStart(const char* _name, int port)
 	XDP_CHECK_HR(hr, "CoCreateInstance");
 
 
-	if(flag_NetworkSimulation);
-		//hr=pDP8AddrLocal->SetSP(&CLSID_NETWORKSIMULATOR_DP8SP_TCPIP);
+	if(flag_NetworkSimulation)
+		hr=pDP8AddrLocal->SetSP(&CLSID_NETWORKSIMULATOR_DP8SP_TCPIP);
 	else
 		hr=pDP8AddrLocal->SetSP(&CLSID_DP8SP_TCPIP);
 	XDP_CHECK_HR(hr, "SetSP");
@@ -264,7 +265,7 @@ int PNetCenter::ServerStart(const char* _name, int port)
 
     pDP8AddrLocal->Release();
 
-	//for internet пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ host-пїЅ
+	//for internet получение адреса host-а
 /*	IDirectPlay8Address *pDP8AddressHost = NULL;
 	DWORD dwNumAddresses = 1;
 
@@ -408,6 +409,8 @@ void PNetCenter::RemovePlayerDP(const UNetID& unid)
 	//		ExecuteInternalCommand(PNC_COMMAND__END_GAME, false);
 	//		ExecuteInterfaceCommand_thA(NetGEC_HostTerminatedSession);
 	//	}
+	//	else 
+	//		demonwareFull()->removePlayer(unid);
 
 	//	return;
 	//}
@@ -660,7 +663,7 @@ int PNetCenter::Connect(unsigned int ip)//, int port
 	sprintf(ip_string, "%d.%d.%d.%d", IP1(ip), IP2(ip), IP3(ip), IP4(ip));
 
 	{
-		///clearFoundHostList();//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ StopFindHost
+		///clearFoundHostList();//Вызывается в StopFindHost
 		StopFindHostDP();
 	}
 
@@ -706,7 +709,7 @@ void PNetCenter::StartConnect2IP(unsigned int ip)//, int port
 	sprintf(ip_string, "%d.%d.%d.%d", IP1(ip), IP2(ip), IP3(ip), IP4(ip));
 
 	{
-		///clearFoundHostList();//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ StopFindHost
+		///clearFoundHostList();//Вызывается в StopFindHost
 		StopFindHostDP();
 	}
 
@@ -748,6 +751,7 @@ bool PNetCenter::isConnectedDP()
 int PNetCenter::Send(const char* buffer, int size, const UNetID& unid, bool flag_guaranted)
 {
 	if(isDemonWareMode()){
+		return false /*demonwareFull()->sendDW(buffer,size, unid, flag_guaranted)*/;
 	}
 
 	DPNID dpnid = unid.dpnid();
@@ -801,8 +805,8 @@ bool PNetCenter::FindHost(const char* lpszHost)
 	XDP_CHECK_HR(hr, "CoCreateInstance");
 
     // Set IP service provider
-	if(flag_NetworkSimulation);
-		//hr=pDP8AddressLocal->SetSP(&CLSID_NETWORKSIMULATOR_DP8SP_TCPIP);
+	if(flag_NetworkSimulation)
+		hr=pDP8AddressLocal->SetSP(&CLSID_NETWORKSIMULATOR_DP8SP_TCPIP);
     else 
 		hr=pDP8AddressLocal->SetSP(&CLSID_DP8SP_TCPIP);
 	XDP_CHECK_HR(hr, "SetSP");
@@ -814,8 +818,8 @@ bool PNetCenter::FindHost(const char* lpszHost)
 	XDP_CHECK_HR(hr, "CoCreateInstance");
 
     // Set IP service provider
-	if(flag_NetworkSimulation);
-		//hr=pDP8AddressHost->SetSP(&CLSID_NETWORKSIMULATOR_DP8SP_TCPIP);
+	if(flag_NetworkSimulation)
+		hr=pDP8AddressHost->SetSP(&CLSID_NETWORKSIMULATOR_DP8SP_TCPIP);
 	else 
 		hr=pDP8AddressHost->SetSP(&CLSID_DP8SP_TCPIP);
 	XDP_CHECK_HR(hr, "SetSP");
@@ -866,8 +870,8 @@ bool PNetCenter::FindHost(const char* lpszHost)
     ZeroMemory(&dpnAppDesc, sizeof(DPN_APPLICATION_DESC));
     dpnAppDesc.dwSize = sizeof(DPN_APPLICATION_DESC);
     dpnAppDesc.guidApplication = guidPerimeterGame;
-	//if(flag_HostMigrate) dpnAppDesc.dwFlags |= DPNSESSION_MIGRATE_HOST; //пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅsta)
-	//if(flag_NoUseDPNSVR) dpnAppDesc.dwFlags |= DPNSESSION_NODPNSVR; //пїЅпїЅ пїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ
+	//if(flag_HostMigrate) dpnAppDesc.dwFlags |= DPNSESSION_MIGRATE_HOST; //Похоже тут это делать нельзя (только при создании Ноsta)
+	//if(flag_NoUseDPNSVR) dpnAppDesc.dwFlags |= DPNSESSION_NODPNSVR; //Не знаю - можно или нет
 
 
     // Enumerate all StressMazeApp hosts running on IP service providers
@@ -923,8 +927,8 @@ bool PNetCenter::StartFindHostDP(const char* lpszHost)
 	XDP_CHECK_HR(hr, "CoCreateInstance");
 
     // Set IP service provider
-	if(flag_NetworkSimulation);
-		//hr=pDP8AddressLocal->SetSP(&CLSID_NETWORKSIMULATOR_DP8SP_TCPIP);
+	if(flag_NetworkSimulation)
+		hr=pDP8AddressLocal->SetSP(&CLSID_NETWORKSIMULATOR_DP8SP_TCPIP);
 	else 
 		hr=pDP8AddressLocal->SetSP(&CLSID_DP8SP_TCPIP);
 	XDP_CHECK_HR(hr, "SetSP");
@@ -936,8 +940,8 @@ bool PNetCenter::StartFindHostDP(const char* lpszHost)
 	XDP_CHECK_HR(hr, "CoCreateInstance");
 
     // Set IP service provider
-	if(flag_NetworkSimulation);
-		//hr=pDP8AddressHost->SetSP(&CLSID_NETWORKSIMULATOR_DP8SP_TCPIP);
+	if(flag_NetworkSimulation)
+		hr=pDP8AddressHost->SetSP(&CLSID_NETWORKSIMULATOR_DP8SP_TCPIP);
 	else
 		hr=pDP8AddressHost->SetSP(&CLSID_DP8SP_TCPIP);
 	XDP_CHECK_HR(hr, "SetSP");
@@ -977,8 +981,8 @@ bool PNetCenter::StartFindHostDP(const char* lpszHost)
 		ZeroMemory(&dpnAppDesc, sizeof(DPN_APPLICATION_DESC));
 		dpnAppDesc.dwSize = sizeof(DPN_APPLICATION_DESC);
 		dpnAppDesc.guidApplication = guidPerimeterGame;
-		//if(flag_HostMigrate) dpnAppDesc.dwFlags |= DPNSESSION_MIGRATE_HOST; //пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅsta)
-		//if(flag_NoUseDPNSVR) dpnAppDesc.dwFlags |= DPNSESSION_NODPNSVR; //пїЅпїЅ пїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ
+		//if(flag_HostMigrate) dpnAppDesc.dwFlags |= DPNSESSION_MIGRATE_HOST; //Похоже тут это делать нельзя (только при создании Ноsta)
+		//if(flag_NoUseDPNSVR) dpnAppDesc.dwFlags |= DPNSESSION_NODPNSVR; //Не знаю - можно или нет
 
 
 		DPNHANDLE m_hEnumAsyncOp;
@@ -1020,8 +1024,8 @@ bool PNetCenter::StartFindHostDP(const char* lpszHost)
 			ZeroMemory(&dpnAppDesc, sizeof(DPN_APPLICATION_DESC));
 			dpnAppDesc.dwSize = sizeof(DPN_APPLICATION_DESC);
 			dpnAppDesc.guidApplication = guidPerimeterGame;
-			//if(flag_HostMigrate) dpnAppDesc.dwFlags |= DPNSESSION_MIGRATE_HOST; //пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅsta)
-			//if(flag_NoUseDPNSVR) dpnAppDesc.dwFlags |= DPNSESSION_NODPNSVR; //пїЅпїЅ пїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ
+			//if(flag_HostMigrate) dpnAppDesc.dwFlags |= DPNSESSION_MIGRATE_HOST; //Похоже тут это делать нельзя (только при создании Ноsta)
+			//if(flag_NoUseDPNSVR) dpnAppDesc.dwFlags |= DPNSESSION_NODPNSVR; //Не знаю - можно или нет
 
 
 			DPNHANDLE m_hEnumAsyncOp;
@@ -1054,12 +1058,12 @@ void PNetCenter::StopFindHostDP(void)
     HRESULT hr;
 //	vector<DPNHANDLE>::iterator p;
 //	for(p=m_hEnumAsyncOp_Arr.begin(); p!=m_hEnumAsyncOp_Arr.end(); p++){
-//		hr = m_pDPPeer->CancelAsyncOperation( *p, 0);//пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ ! DPNCANCEL_ENUM;
+//		hr = m_pDPPeer->CancelAsyncOperation( *p, 0);//в случае когда есть хандлеры флаг не нужен ! DPNCANCEL_ENUM;
 //		if( FAILED(hr) ){
 //			DXTRACE_ERR_MSGBOX( TEXT("PNetCenter::StopFindHostDP-error cancel operation"), hr );
 //		}
 //	}
-	///hr = m_pDPPeer->CancelAsyncOperation( NULL, DPNCANCEL_ENUM);//пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ(пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ) ! ;
+	///hr = m_pDPPeer->CancelAsyncOperation( NULL, DPNCANCEL_ENUM);//в случае когда указывается флаг хандлеры не нужны(отменяются все) ! ;
 	hr = m_pDPPeer->CancelAsyncOperation( NULL, DPNCANCEL_ALL_OPERATIONS);
 	if( FAILED(hr) ){
 		DXTRACE_ERR_MSGBOX( TEXT("PNetCenter::StopFindHostDP-error cancel operation"), hr );
@@ -1067,7 +1071,7 @@ void PNetCenter::StopFindHostDP(void)
 	m_hEnumAsyncOp_Arr.clear();
 
 
-	Sleep(20);//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ back пїЅпїЅпїЅпїЅпїЅпїЅ DP(3-пїЅ пїЅпїЅпїЅпїЅпїЅ)
+	Sleep(20);//Для завершения back фукции DP(3-й поток)
 	clearInternalFoundHostList();
 	///clearGameHostList();
 }

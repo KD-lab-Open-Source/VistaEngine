@@ -12,6 +12,8 @@
 
 #pragma warning ( disable : 4710 )
 
+#include <vector>
+
 // More STL weirdo errors.
 
 #pragma warning(disable: 4073)
@@ -35,12 +37,19 @@ XBuffer& assertsBuffer()
 #define DIAGASSERT_BUFFSIZE 4096
 
 /*//////////////////////////////////////////////////////////////////////
+                          File Scope Typedefs
+//////////////////////////////////////////////////////////////////////*/
+// The typedef for the list of HMODULES that can possibly hold message
+//  resources.
+typedef std::vector<HINSTANCE> HINSTVECTOR;
+// The address typedef.
+typedef std::vector<ULONG> ADDRVECTOR;
+
+/*//////////////////////////////////////////////////////////////////////
                            File Scope Globals
 //////////////////////////////////////////////////////////////////////*/
 // The HMODULE vector.
-static const int g_HMODVectorSizeMax = 200;
-static int g_HMODVectorSize = 0;
-static HINSTANCE g_HMODVector[g_HMODVectorSizeMax];
+static HINSTVECTOR g_HMODVector ;
 
 // The DiagAssert display options.
 static DWORD g_DiagAssertOptions = DA_SHOWMSGBOX | DA_SHOWODS ;
@@ -74,12 +83,11 @@ DWORD BUGSUTIL_DLLINTERFACE __stdcall
     return ( dwOld ) ;
 }
 
-BOOL BUGSUTIL_DLLINTERFACE __stdcall AddDiagAssertModule(HMODULE hMod)
+BOOL BUGSUTIL_DLLINTERFACE __stdcall
+    AddDiagAssertModule ( HMODULE hMod )
 {
-	g_HMODVector[g_HMODVectorSize] = hMod;
-	if(++g_HMODVectorSize == g_HMODVectorSizeMax)
-		g_HMODVectorSize = g_HMODVectorSizeMax - 1;
-	return ( TRUE ) ;
+    g_HMODVector.push_back ( hMod ) ;
+    return ( TRUE ) ;
 }
 
 static void (*assert_restore_graphics_function)() = 0;
@@ -89,9 +97,9 @@ void SetAssertRestoreGraphicsFunction(void(*func)())
 	assert_restore_graphics_function = func;
 }
 
-int DiagAssert(unsigned long dwOverrideOpts, const char* szMsg, const char* szFile, unsigned long dwLine )
+int DiagAssert (unsigned long dwOverrideOpts, const char* szMsg, const char* szFile, unsigned long dwLine )
 {
-	static bool flag_recursion=check_command_line("noassert");
+	static bool flag_recursion=0;
 	if(flag_recursion)
 		return 0;
 	flag_recursion=1;
@@ -112,19 +120,35 @@ int DiagAssert(unsigned long dwOverrideOpts, const char* szMsg, const char* szFi
     if(assert_restore_graphics_function)
 		assert_restore_graphics_function();
 
-    if(DA_USEDEFAULTS == dwOverrideOpts)
+    if ( DA_USEDEFAULTS == dwOverrideOpts )
+    {
         dwOpts = g_DiagAssertOptions ;
+    }
 
     // Look in any specified modules for the code.
-	for(HINSTANCE* loop = g_HMODVector; loop != g_HMODVector + g_HMODVectorSize; loop++){
-        if(FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_FROM_HMODULE      ,
-          *loop, dwLastErr, 0, (LPTSTR)&szFmtMsg, 0, NULL))
-            break;
+    HINSTVECTOR::iterator loop ;
+    for ( loop =  g_HMODVector.begin ( ) ;
+          loop != g_HMODVector.end ( )   ;
+          loop++                          )
+    {
+        if ( 0 != FormatMessage ( FORMAT_MESSAGE_ALLOCATE_BUFFER    |
+                                    FORMAT_MESSAGE_IGNORE_INSERTS   |
+                                    FORMAT_MESSAGE_FROM_HMODULE      ,
+                                  *loop                              ,
+                                  dwLastErr                          ,
+                                  0                                  ,
+                                  (LPTSTR)&szFmtMsg                  ,
+                                  0                                  ,
+                                  NULL                                ))
+        {
+            break ;
+        }
     }
 
     // If the message was not translated, just look in the system.
-    if(NULL == szFmtMsg){
-        FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER    |
+    if ( NULL == szFmtMsg )
+    {
+        FormatMessage ( FORMAT_MESSAGE_ALLOCATE_BUFFER    |
                           FORMAT_MESSAGE_IGNORE_INSERTS   |
                           FORMAT_MESSAGE_FROM_SYSTEM        ,
                         NULL                                ,
@@ -137,14 +161,20 @@ int DiagAssert(unsigned long dwOverrideOpts, const char* szMsg, const char* szFi
 
     // Make sure the message got translated into something.
     LPTSTR szRealLastErr ;
-    if( NULL != szFmtMsg )
+    if ( NULL != szFmtMsg )
+    {
         szRealLastErr = szFmtMsg ;
+    }
     else
+    {
         szRealLastErr = _T ( "**Last error code does not exist!!!!" ) ;
+    }
 
     // Get the module name.
     if ( 0 == GetModuleFileName ( NULL , szModName , MAX_PATH ) )
+    {
         _tcscpy ( szModName , _T ( "<unknown application>" ) ) ;
+    }
 
     // Build the message.
     pCurrPos += (wsprintf ( szBuff                                 ,
@@ -446,10 +476,7 @@ static void DoStackTrace ( LPTSTR szString  ,
     // The symbol engine is initialized so do the stack walk.
 
     // The array of addresses.
-	
-	const int vAddrsSizeMax = 512;
-	int vAddrsSize = 0;
-    unsigned long vAddrs[vAddrsSizeMax];
+    ADDRVECTOR vAddrs ;
 
     // The thread information.
     CONTEXT    stCtx  ;
@@ -481,7 +508,8 @@ static void DoStackTrace ( LPTSTR szString  ,
 #endif
 
         // Loop for the first 512 stack elements.
-        for ( DWORD i = 0 ; i < 512; i++ ){
+        for ( DWORD i = 0 ; i < 512 ; i++ )
+        {
             if ( FALSE == StackWalk ( dwMachine              ,
                                       hProcess               ,
                                       hProcess               ,
@@ -490,14 +518,18 @@ static void DoStackTrace ( LPTSTR szString  ,
                                       NULL                   ,
                                       SymFunctionTableAccess ,
                                       GetModBase             ,
-                                      NULL                    ) ){
+                                      NULL                    ) )
+            {
                 break ;
             }
-            if ( i > dwNumSkip ){
+            if ( i > dwNumSkip )
+            {
                 // Also check that the address is not zero.  Sometimes
                 //  StackWalk returns TRUE with a frame of zero.
-                if(stFrame.AddrPC.Offset)
-                    vAddrs[vAddrsSize++] = stFrame.AddrPC.Offset;
+                if ( 0 != stFrame.AddrPC.Offset )
+                {
+                    vAddrs.push_back ( stFrame.AddrPC.Offset ) ;
+                }
             }
         }
 
@@ -508,10 +540,17 @@ static void DoStackTrace ( LPTSTR szString  ,
         TCHAR szSym [ MAX_PATH * 2 ] ;
         LPTSTR szCurrPos = szString ;
 
-        for(unsigned long* loop = vAddrs; loop != vAddrs + vAddrsSize; loop++){
+        ADDRVECTOR::iterator loop ;
+        for ( loop =  vAddrs.begin ( ) ;
+              loop != vAddrs.end ( )   ;
+              loop++                     )
+        {
+
             dwSymSize = ConvertAddress ( *loop , szSym ) ;
             if ( dwSizeLeft < dwSymSize )
+            {
                 break ;
+            }
             _tcscpy ( szCurrPos , szSym ) ;
             szCurrPos += dwSymSize ;
             dwSizeLeft -= dwSymSize ;

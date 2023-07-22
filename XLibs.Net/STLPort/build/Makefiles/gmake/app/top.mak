@@ -1,4 +1,5 @@
-# -*- makefile -*- Time-stamp: <05/12/07 01:07:18 ptr>
+# -*- makefile -*- Time-stamp: <04/07/25 12:44:54 ptr>
+# $Id: top.mak,v 1.1.2.1 2004/12/24 11:29:38 ptr Exp $
 
 include ${RULESBASE}/${USE_MAKE}/app/macro.mak
 include ${RULESBASE}/${USE_MAKE}/app/${COMPILER_NAME}.mak

@@ -2,19 +2,19 @@
  * Copyright (c) 1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
  * modified is included with the above copyright notice.
  *
- */
+ */ 
 
 // Implementation of the classes in header <strstream>.
 // WARNING: The classes defined in <strstream> are DEPRECATED.  This
@@ -23,10 +23,9 @@
 // header <sstream> instead.
 
 #include "stlport_prefix.h"
-
-#include <strstream>
-#include <algorithm>
-#include <limits>
+#include <stl/_strstream.h>
+#include <stl/_algobase.h>
+#include <stl/_limits.h>
 
 _STLP_BEGIN_NAMESPACE
 
@@ -96,7 +95,7 @@ strstreambuf::strstreambuf(const unsigned char* get, streamsize n)
 
 strstreambuf::~strstreambuf() {
   if (_M_dynamic && !_M_frozen)
-    _M_free(eback());
+    _M_free(eback());    
 }
 
 void strstreambuf::freeze(bool frozenflag) {
@@ -137,7 +136,7 @@ strstreambuf::int_type strstreambuf::overflow(int_type c) {
       setp(buf, buf + new_size);
       pbump((int)old_size);
 
-      if (reposition_get)
+      if (reposition_get) 
         setg(buf, buf + old_get_offset, buf + (max)(old_get_offset, old_size));
 
       _M_free(old_buffer);
@@ -183,7 +182,7 @@ strstreambuf::int_type strstreambuf::underflow() {
     return _Traits::eof();
 }
 
-basic_streambuf<char, char_traits<char> >*
+basic_streambuf<char, char_traits<char> >* 
 strstreambuf::setbuf(char*, streamsize) {
   return this;
 }
@@ -231,7 +230,7 @@ strstreambuf::seekoff(off_type off,
     return pos_type(off_type(-1));
 
   if (do_put) {
-    if (seeklow + __STATIC_CAST(ptrdiff_t, off) < pbase()) {
+    if (seeklow + off < pbase()) {
       setp(seeklow, epptr());
       pbump((int)off);
     }
@@ -242,11 +241,11 @@ strstreambuf::seekoff(off_type off,
   }
   if (do_get) {
     if (off <= egptr() - seeklow)
-      setg(seeklow, seeklow + __STATIC_CAST(ptrdiff_t, off), egptr());
+      setg(seeklow, seeklow + off, egptr());
     else if (off <= pptr() - seeklow)
-      setg(seeklow, seeklow + __STATIC_CAST(ptrdiff_t, off), pptr());
+      setg(seeklow, seeklow + off, pptr());
     else
-      setg(seeklow, seeklow + __STATIC_CAST(ptrdiff_t, off), epptr());
+      setg(seeklow, seeklow + off, epptr());
   }
 
   return pos_type(newoff);
@@ -276,7 +275,7 @@ void strstreambuf::_M_free(char* p) {
 void strstreambuf::_M_setup(char* get, char* put, streamsize n) {
   if (get) {
     size_t N = n > 0 ? size_t(n) : n == 0 ? strlen(get) : size_t(INT_MAX);
-
+    
     if (put) {
       setg(get, get, put);
       setp(put, put + N);
@@ -327,7 +326,7 @@ ostrstream::ostrstream()
 }
 
 ostrstream::ostrstream(char* s, int n, ios_base::openmode mode)
-  : basic_ostream<char, char_traits<char> >(0),
+  : basic_ostream<char, char_traits<char> >(0), 
     _M_buf(s, n, mode & ios_base::app ? s + strlen(s) : s) {
   basic_ios<char, char_traits<char> >::init(&_M_buf);
 }
@@ -360,11 +359,11 @@ strstream::strstream()
 }
 
 strstream::strstream(char* s, int n, ios_base::openmode mode)
-  : basic_iostream<char, char_traits<char> >(0),
+  : basic_iostream<char, char_traits<char> >(0), 
     _M_buf(s, n, mode & ios_base::app ? s + strlen(s) : s) {
   basic_ios<char, char_traits<char> >::init(&_M_buf);
 }
-
+  
 strstream::~strstream() {}
 
 strstreambuf* strstream::rdbuf() const {

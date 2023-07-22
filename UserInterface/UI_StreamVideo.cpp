@@ -1,10 +1,42 @@
 #include "StdAfx.h"
 #include "UI_StreamVideo.h"
+//#include "bink.h" // binkw32.lib, binkw32.dll @Hallkezz
 
 #include "Handle.h"
 #include "GameOptions.h"
 
 void* SNDGetDirectSound();
+
+///////////////////////////////////////////////////
+//Заглушки для работы без бинка @Hallkezz
+typedef unsigned int U32;
+
+struct Bink
+{
+    int Frames;
+    int FrameNum;
+    int Width;
+    int Height;
+    int BinkType;
+    bool Paused;
+};
+
+typedef Bink* HBINK;
+
+void BinkPause(Bink*, bool) {}
+void BinkSetVolume(Bink*, int, int) {}
+void BinkClose(Bink*) {}
+void BinkSoundUseDirectSound(void*) {}
+HBINK BinkOpen(const char*, int) { return NULL; }
+void BinkDoFrame(Bink*) {}
+void BinkCopyToBuffer(Bink*, BYTE*, int, int, int, int, int) {}
+void BinkNextFrame(Bink*) {}
+void BinkGoto(Bink*, int, int) {}
+int BinkWait(Bink*) { return 0; }
+
+const int BINKSURFACE32A = 0;
+const int BINKALPHA = 0;
+///////////////////////////////////////////////////
 
 class BinkSimplePlayer
 {
@@ -20,34 +52,37 @@ public:
 	const char* getBinkFileName() const { return binkFile_.c_str(); }
 
 	void setPhase(float phase);
-	float getPhase() const { return 1.f; }
+	float getPhase() const { return pBinkInfo_->Frames ? float(pBinkInfo_->FrameNum) / float(pBinkInfo_->Frames) : 1.f; }
 
-	void setPause(bool pause) {  }
-	bool getPause() const { return false; }
+	void setPause(bool pause) { BinkPause(pBinkInfo_, pause); }
+	bool getPause() const { return pBinkInfo_->Paused; }
 
 	void setVolume(float vol);
 
 	cTexture* getTexture() const { return pTextureBink_; }
-	Vect2i getSize() const { return Vect2i(0, 0); }
+	Vect2i getSize() const { return Vect2i((int)pBinkInfo_->Width, (int)pBinkInfo_->Height); }
 
-	bool isEnd() const { return true; }
+	bool isEnd() const { xassert(pBinkInfo_); return pBinkInfo_->FrameNum == pBinkInfo_->Frames; }
 
-	int flags() const { return 0; } 
+	U32 flags() const { return pBinkInfo_->BinkType; } 
 
 private:
 	void release();
 	void computeFrame();
 
 	string binkFile_;
+	HBINK pBinkInfo_;
 	cTexture* pTextureBink_;
 };
 
 void BinkSimplePlayer::preInit()
 {
+	BinkSoundUseDirectSound(SNDGetDirectSound());
 }
 
 BinkSimplePlayer::BinkSimplePlayer()
 {
+	pBinkInfo_ = 0;
 	pTextureBink_ = 0;
 }
 
@@ -58,6 +93,15 @@ BinkSimplePlayer::~BinkSimplePlayer()
 
 void BinkSimplePlayer::release()
 {
+	if(pBinkInfo_)
+	{
+		try{
+			BinkSetVolume(pBinkInfo_, 0, 0);
+			BinkClose(pBinkInfo_);
+		} catch(...){}
+		pBinkInfo_ = 0;
+		binkFile_.clear();
+	}
 
 	RELEASE(pTextureBink_);
 }
@@ -66,29 +110,61 @@ bool BinkSimplePlayer::open(const char* bink_file)
 {
 	release();
 	
+	try{
+		if((pBinkInfo_ = BinkOpen(bink_file, BINKALPHA)) == NULL)
+			return false;
+	}catch(...){
+		pBinkInfo_ = 0;
 		return false;
+	}
+
+	binkFile_ = bink_file;
+
+	if(!pBinkInfo_->Frames || !pBinkInfo_->Width || !pBinkInfo_->Height){
+		release();
+		return false;
+	}
+
+	int dx_real = Power2up(pBinkInfo_->Width);
+	int dy_real = Power2up(pBinkInfo_->Height);
+
+	if((pTextureBink_ = gb_VisGeneric->CreateTexture(dx_real, dy_real, false)) == NULL){
+		release();
+		return false;
+	}
 
 	return true;
 }
 
 void BinkSimplePlayer::computeFrame()
 {
+	xassert(pBinkInfo_);
 	if(isEnd())
 		return;
 
+	BinkDoFrame(pBinkInfo_);
+
 	int pitch = 0;
+	BYTE* ptr = pTextureBink_->LockTexture(pitch, Vect2i(0, 0), Vect2i((int)pBinkInfo_->Width, (int)pBinkInfo_->Height));
+
+	BinkCopyToBuffer(pBinkInfo_, ptr, pitch, pBinkInfo_->Height, 0, 0, BINKSURFACE32A);
 
 	pTextureBink_->UnlockTexture();
 	
+	if(!isEnd())
+		BinkNextFrame(pBinkInfo_);
 }
 
 void BinkSimplePlayer::setPhase(float phase)
 {
+	xassert(pBinkInfo_);
+	BinkGoto(pBinkInfo_, clamp(clamp(phase, 0.f, 1.f) * (pBinkInfo_->Frames - 1), 1, pBinkInfo_->Frames), 0);
 	computeFrame();
 }
 
 void BinkSimplePlayer::setVolume(float vol)
 {
+	xassert(pBinkInfo_);
 	const float amplification = 0.8f;
 
 	if(vol < amplification)
@@ -96,10 +172,14 @@ void BinkSimplePlayer::setVolume(float vol)
 	else
 		vol = 32767 + (vol - amplification) / (1.f - amplification) * 32768;
 
+	BinkSetVolume(pBinkInfo_, 0, round(vol));
 }
 
 void BinkSimplePlayer::quant()
 {
+	xassert(pBinkInfo_);
+	if(BinkWait(pBinkInfo_))
+		return;
 	computeFrame();
 }
 

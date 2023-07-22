@@ -5,7 +5,7 @@
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
@@ -13,19 +13,26 @@
  *
  */
 
-/* $Id: cppunit_proxy.h 2221 2006-03-27 20:20:34Z dums $ */
+/* $Id: cppunit_proxy.h,v 1.1.2.3 2004/10/25 19:43:07 dums Exp $ */
 
 #ifndef _CPPUNITPROXYINTERFACE_H_
-#define _CPPUNITPROXYINTERFACE_H_
+# define _CPPUNITPROXYINTERFACE_H_
 
-/*
- * STLport specific
- */
-#if !defined (CPPUNIT_MINI_USE_EXCEPTIONS) && \
-    (!defined (STLPORT) || defined (_STLP_USE_EXCEPTIONS))
-#  define CPPUNIT_MINI_USE_EXCEPTIONS
+ /*
+  * Exception-usage settings
+  */
+#ifdef CPPUNIT_MINI_USE_EXCEPTIONS
+# undef CPPUNIT_MINI_USE_EXCEPTIONS
 #endif
 
-#include "cppunit_mini.h"
+ /*
+  * STLport specific
+  */
+#if defined _STLP_USE_EXCEPTIONS
+# define CPPUNIT_MINI_USE_EXCEPTIONS
+#endif
+
+# include "cppunit_mini.h"
 
 #endif
+

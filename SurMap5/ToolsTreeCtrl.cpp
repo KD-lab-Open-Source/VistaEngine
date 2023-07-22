@@ -355,12 +355,14 @@ void CToolsTreeCtrl::OnRClick(NMHDR *pNMHDR, LRESULT *pResult)
 			case PUMR_PermissionAll:
 				popMenu.GetSubMenu(0)->TrackPopupMenu(0,posMouse.x,posMouse.y,this);
 				break;
+#ifndef _VISTA_ENGINE_EXTERNAL_
 			case PUMR_Permission3DM:
 				popMenu.GetSubMenu(1)->TrackPopupMenu(0,posMouse.x,posMouse.y,this);
 				break;
 			case PUMR_Permission3DM_2W:
 				popMenu.GetSubMenu(2)->TrackPopupMenu(0,posMouse.x,posMouse.y,this);
 				break;
+#endif
 			case PUMR_PermissionColorPic:
 				popMenu.GetSubMenu(3)->TrackPopupMenu(0,posMouse.x,posMouse.y ,this);
 				break;
@@ -376,6 +378,7 @@ void CToolsTreeCtrl::OnRClick(NMHDR *pNMHDR, LRESULT *pResult)
 				popMenu.GetSubMenu(5)->TrackPopupMenu(0,posMouse.x,posMouse.y,this);
 				break;
 			case PUMR_NotPermission:
+			default:
 				break;
 			}
 		}

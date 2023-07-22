@@ -2,6 +2,7 @@
 // Microsoft Visual C++ generated include file.
 // Used by SurMap5.rc
 //
+#define ID_SAVE                         2
 #define IDD_ABOUTBOX                    100
 #define IDP_OLE_INIT_FAILED             100
 #define IDD_BARDLG_GEO                  102
@@ -109,6 +110,10 @@
 #define IDD_UI_SPRITE_EDITOR_DLG        214
 #define IDD_OUTPUT_PROGRESS             215
 #define IDB_SPLASH                      217
+#define IDD_DLG_EXIMWORLD               218
+#define IDD_PROGRESSDIALOG              219
+#define IDI_ICON1                       221
+#define IDI_WORLD                       221
 #define IDC_TREE_CTRL                   1000
 #define IDC_ATTRIB_EDITOR               1000
 #define CG_IDC_PROGTIME_ELAPSED         1000
@@ -120,6 +125,7 @@
 #define IDC_RDB_LEVELING_1              1003
 #define IDC_COORD_TOP_EDIT              1003
 #define CG_IDC_PROGDLG_PERCENT          1003
+#define IDC_FULL_EXPORT                 1003
 #define IDC_RDB_LEVELING_2_ZL_OR_LEVELING_H_2 1004
 #define IDC_RDB_LEVELING_2              1004
 #define IDR_INSERTABLE_NODE             1004
@@ -516,6 +522,12 @@
 #define IDC_TOTAL_LABEL                 1283
 #define IDC_FILE_LABEL                  1284
 #define IDC_CURRENT_LABEL               1285
+#define IDC_BTN_EXPORT                  1291
+#define IDC_BTN_IMPORT                  1292
+#define IDC_RADIO3                      1296
+#define IDC_PARTIAL_EXPORT              1296
+#define IDC_EXPORT_OPTIONS              1297
+#define IDC_WORLD_NAME_LABEL            1298
 #define IDC_CONDITION_EDITOR            2001
 #define IDD_CONDITION_EDITOR            2012
 #define IDD_BARDLG_SOURCE               2018
@@ -753,14 +765,15 @@
 #define ID_FILE_RESAVE_WORLDS           40395
 #define ID_FILE_RESAVE_TRIGGERS         40396
 #define ID_FILE_UPDATE_QUICK_START_WORLDS_LIST 40398
+#define ID_FILE_EXIMWORLD               40401
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        218
-#define _APS_NEXT_COMMAND_VALUE         40399
-#define _APS_NEXT_CONTROL_VALUE         1285
+#define _APS_NEXT_RESOURCE_VALUE        222
+#define _APS_NEXT_COMMAND_VALUE         40403
+#define _APS_NEXT_CONTROL_VALUE         1299
 #define _APS_NEXT_SYMED_VALUE           105
 #endif
 #endif

@@ -1,60 +1,57 @@
 #define _STLP_DO_IMPORT_CSTD_FUNCTIONS
 #include <cmath>
 
-#if !defined (STLPORT) || defined (_STLP_USE_NAMESPACES)
+#if !defined (STLPORT) || defined(_STLP_USE_NAMESPACES)
 
 namespace NS1 {
 
-bool f()
+void f()
 {
   double d( 1.0 );
 
   d = sqrt( d );
   d = ::sqrt( d );
   d = std::sqrt( d );
-  return d == 1.0;
-}
+};
 
 }
 
 namespace {
 
-bool g()
+void g()
 {
   double d( 1.0 );
 
   d = sqrt( d );
   d = ::sqrt( d );
   d = std::sqrt( d );
-  return d == 1.0;
-}
+};
 
 }
 
-// VC6 consider call to sqrt ambiguous as soon as using namespace std has
-// been invoked.
-#if !defined (STLPORT) || !defined (_STLP_MSVC) || (_STLP_MSVC >= 1300)
+#ifndef _STLP_MSVC // I'm sorry, VC still can't resolve name below
 using namespace std;
 #endif
 
-bool h()
+void h()
 {
   double d( 1.0 );
 
   d = sqrt( d );
   d = ::sqrt( d );
   d = std::sqrt( d );
-  return d == 1.0;
-}
+};
 
 struct sq
 {
-  sq() {}
+    sq()
+      { }
 
-  double sqroot( double x ) {
-    using std::sqrt;
-    return sqrt(x);
-  }
+    double sqroot( double x )
+      {
+        using std::sqrt;
+        return sqrt(x);
+      }
 };
 
 #endif

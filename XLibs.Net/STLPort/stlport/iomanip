@@ -2,19 +2,19 @@
  * Copyright (c) 1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
  * modified is included with the above copyright notice.
  *
- */
+ */ 
 
 #ifndef _STLP_IOMANIP
 #define _STLP_IOMANIP
@@ -40,10 +40,10 @@ _STLP_BEGIN_NAMESPACE
 template <class _Arg>
 struct _Ios_Manip_1 {
    typedef _Arg (ios_base::*__f_ptr_type)(_Arg);
-
-  _Ios_Manip_1(__f_ptr_type __f, const _Arg& __arg)
+ 
+  _Ios_Manip_1(__f_ptr_type __f, const _Arg& __arg)  
     : _M_f(__f), _M_arg(__arg) {}
-
+  
   void operator()(ios_base& __ios) const
   { (__ios.*_M_f)(_M_arg); }
 
@@ -118,7 +118,7 @@ inline _Ios_Setf_Manip _STLP_CALL setbase(int __n) {
   return _Ios_Setf_Manip(__base, ios_base::basefield);
 }
 
-inline _Ios_Manip_1<streamsize> _STLP_CALL
+inline _Ios_Manip_1<streamsize> _STLP_CALL 
 setprecision(int __n) {
   _Ios_Manip_1<streamsize>::__f_ptr_type __f = &ios_base::precision;
   return _Ios_Manip_1<streamsize>(__f, __n);
@@ -126,7 +126,7 @@ setprecision(int __n) {
 
 inline _Ios_Manip_1<streamsize>  _STLP_CALL
 setw(int __n) {
-  _Ios_Manip_1<streamsize>::__f_ptr_type __f = &ios_base::width;  
+  _Ios_Manip_1<streamsize>::__f_ptr_type __f = &ios_base::width;	
   return _Ios_Manip_1<streamsize>(__f, __n);
 }
 
@@ -140,23 +140,23 @@ struct _Setfill_Manip {
 };
 
 template <class _CharT, class _CharT2, class _Traits>
-inline basic_ostream<_CharT, _Traits>& _STLP_CALL
-operator<<(basic_ostream<_CharT, _Traits>& __os,
+inline basic_ostream<_CharT, _Traits>& _STLP_CALL 
+operator<<(basic_ostream<_CharT, _Traits>& __os, 
            const _Setfill_Manip<_CharT2>& __m) {
   __os.fill(__m._M_c);
   return __os;
 }
 
 template <class _CharT, class _CharT2, class _Traits>
-inline basic_istream<_CharT, _Traits>& _STLP_CALL
-operator>>(basic_istream<_CharT, _Traits>& __is,
+inline basic_istream<_CharT, _Traits>& _STLP_CALL 
+operator>>(basic_istream<_CharT, _Traits>& __is, 
            const _Setfill_Manip<_CharT2>& __m) {
   __is.fill(__m._M_c);
   return __is;
 }
 
 template <class _CharT>
-inline _Setfill_Manip<_CharT> _STLP_CALL
+inline _Setfill_Manip<_CharT> _STLP_CALL 
 setfill(_CharT __c) {
   return _Setfill_Manip<_CharT>(__c);
 }

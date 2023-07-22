@@ -12,12 +12,12 @@
  */
 /***********************************************************************************
   LeakCheck.h
-
+  
     SUMMARY: A suite of template functions for verifying the behavior of
       operations in the presence of exceptions. Requires that the operations
       be written so that each operation that could cause an exception causes
       simulate_possible_failure() to be called (see "nc_alloc.h").
-
+    
 ***********************************************************************************/
 #ifndef INCLUDED_MOTU_LeakCheck
 #define INCLUDED_MOTU_LeakCheck 1
@@ -35,8 +35,8 @@
 EH_BEGIN_NAMESPACE
 
 template <class T1, class T2>
-inline ostream& operator << (
-ostream& s,
+inline ostream& operator << ( 
+ostream& s, 
 const pair <T1, T2>& p) {
     return s<<'['<<p.first<<":"<<p.second<<']';
 }
@@ -134,12 +134,12 @@ void ConstCheck(const Value& v, const Operation& op, long max_iters = 2000000) {
   EFFECTS:  Similar to WeakCheck (above), but additionally checks a component of
     the "strong guarantee": if the operation fails due to an exception, the
     value being operated on must be unchanged, as checked with operator==().
-
+    
   CAVEATS: Note that this does not check everything required for the strong
     guarantee, which says that if an exception is thrown, the operation has no
     effects. Do do that we would have to check that no there were no side-effects
     on objects which are not part of v (e.g. iterator validity must be preserved).
-
+    
 ====================================================================================*/
 template <class Value, class Operation>
 void StrongCheck(const Value& v, const Operation& op, long max_iters = 2000000) {
@@ -165,7 +165,7 @@ void StrongCheck(const Value& v, const Operation& op, long max_iters = 2000000) 
           gTestController.CancelFailureCountdown();
           bool unchanged = (dup == v);
           EH_ASSERT( unchanged );
-
+                
           if ( !unchanged ) {
 #if 0
             typedef typename Value::value_type value_type;
@@ -188,7 +188,7 @@ void StrongCheck(const Value& v, const Operation& op, long max_iters = 2000000) 
     EH_ASSERT( !leaked );
     if ( leaked )
       failed = true;
-
+    
     if ( succeeded )
       gTestController.ReportSuccess(count);
   }

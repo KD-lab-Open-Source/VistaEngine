@@ -1,0 +1,80 @@
+Here is the list of the environment variables you can define
+at build time to modify the generated library:
+
+- STLP_BUILD_BOOST_PATH : 
+
+ value:
+
+	The boost library install directory.
+
+ decription:
+
+	It is only used if you have set the _STLP_USE_BOOST_SUPPORT
+in the STLport configuration file. Check the config file for a complete
+description of this feature.
+
+ platform/compiler:
+
+	It is only an experimental feature at the moment. It has been
+tested under linux using gcc and icc with success. For the moment it
+has failed under Windows using MSVC because of a wrong include schema.
+
+ impact:
+
+	It hasn't been quantify and highly depends on the way you use
+it. If you have specialised the boost::type_traits struct for all the
+types you are using to instanciate the STL containers it might be a 
+very important feature. Otherwise you will have to count on the boost
+support of specific compiler features to have some gain in using it.
+
+
+
+- STLP_BUILD_FORCE_DYNAMIC_RUNTIME :
+
+ value:
+
+	Unused.
+
+ description:
+
+	By default when you build a static library using one of the
+*-static rules the STLport library is automatically linked to the
+static version of the native runtime library. This option force the 
+use of the dynamic one. Beware this option won't modify the generated 
+library name. It is the library that has to be used when the 
+_STLP_USE_STATIC_LIBRARY macro is defined within the STLport 
+configuration file to force the use of STLport as a static library.
+
+ platform/compiler:
+
+	This option only works under the Windows platform using MSVC++
+compilers.
+
+ impact:
+
+	Most of the time people are using this feature to avoid 
+distribution of the STLport dll. So they link their numerous dll 
+with the static version of the STLport library but keep the dynamic
+native runtime. Such a configuration might be dangerous. For instance
+if you have always the same dll allocating memory and an other one 
+releasing it you might run out of memory very quickely. This is because
+by default STLport has its own memory management that, at the time of 
+this writing, never returns memory to the system. When using such a 
+mode you should also use a new/delete or malloc/free based allocator.
+
+- STLP_BUILD_FORCE_STATIC_RUNTIME :
+
+ value:
+
+	Unused
+
+ description:
+
+	Idem STLP_BUILD_FORCE_DYNAMIC_RUNTIME but to force the static 
+runtime version.
+
+ impact
+
+	Idem previous version but this time the problem rely on the
+native runtime so consult Microsoft documentation for further details.
+

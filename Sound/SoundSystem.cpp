@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "..\Game\Universe.h" // @dilesoft
+#include "..\Game\Universe.h"
 #include "soundSystem.h"
 #include "SoundInternal.h"
 #include "..\util\Console.h"
@@ -1038,7 +1038,6 @@ void Channel::ChangeVolume(float volume)
 		return;
 	buffer_->SetVolume(vol);
 }
-/* @dilesoft */
 bool Channel::isInFogOfWar()
 {
 	if(sound_->system_->gameActive_&&stopInFogOfWar_&&universe()->activePlayer()->fogOfWarMap()&&is3DSound_&&
@@ -1048,7 +1047,6 @@ bool Channel::isInFogOfWar()
 	}
 	return false;
 }
-/**/
 void Channel::CheckFogOfWar()
 {
 	if(!sound_->system_->gameActive_)

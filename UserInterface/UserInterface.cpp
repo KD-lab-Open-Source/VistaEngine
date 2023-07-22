@@ -625,6 +625,7 @@ UI_Dispatcher::UI_Dispatcher()
 	autoConfirmDiskOp_ = true;
 
 	privateMessageColor_[0] = 0;
+	systemMessageColor_[0] = 0;
 
 	tipsDelay_ = 0.f;
 
@@ -823,6 +824,8 @@ void UI_Dispatcher::init()
 	strncpy(privateMessageColor_, getColorString(UI_GlobalAttributes::instance().privateMessage()), 7);
 	privateMessageColor_[7] = 0;
 	
+	strncpy(systemMessageColor_, getColorString(UI_GlobalAttributes::instance().systemMessage()), 7);
+	systemMessageColor_[7] = 0;
 }
 
 void UI_Dispatcher::quickRedraw()
@@ -1498,6 +1501,7 @@ UI_GlobalAttributes::UI_GlobalAttributes()
 	chatDelay_ = 5.f;
 	messageSetups_.resize(UI_MESSAGE_ID_MAX);
 	privateMessage_ = sColor4f(0, 1, 0, 1); 
+	systemMessage_ = sColor4f(0, 1, 0, 1);
 }
 
 void UI_GlobalAttributes::setCursor(UI_CursorType cur_type, const UI_Cursor* cursor)
@@ -1540,6 +1544,7 @@ void UI_GlobalAttributes::serialize(Archive& ar)
 	UI_Task::serializeColors(ar);
 
 	ar.serialize(privateMessage_, "privateMessage", "Цвет личного/кланового сообщения");
+	ar.serialize(systemMessage_, "systemMessage", "Цвет системного сообщения");
 	ar.serialize(chatDelay_, "chatMessageDelay", "Время отображения игрового чат-сообщения (сек)");
 
 	int i;
@@ -1807,6 +1812,7 @@ REGISTER_ENUM(UI_ACTION_CHAT_EDIT_STRING, "сетевая игра\\строка сообщения чата")
 REGISTER_ENUM(UI_ACTION_CHAT_SEND_MESSAGE, "сетевая игра\\отослать сообщение в общий чат")
 REGISTER_ENUM(UI_ACTION_CHAT_SEND_CLAN_MESSAGE, "сетевая игра\\отослать сообщение в клановый чат")
 REGISTER_ENUM(UI_ACTION_CHAT_MESSAGE_BOARD, "сетевая игра\\список сообщений в чате")
+REGISTER_ENUM(UI_ACTION_LAN_CHAT_CLEAR, "сетевая игра\\очистить чат")
 REGISTER_ENUM(UI_ACTION_GAME_CHAT_BOARD, "сетевая игра\\отображение сообщений игрового чата")
 REGISTER_ENUM(UI_ACTION_INET_STATISTIC_QUERY, "игра в интернете\\запросить глобальную статистику")
 REGISTER_ENUM(UI_ACTION_INET_STATISTIC_SHOW, "игра в интернете\\отображение глобальной статистики")

@@ -178,6 +178,8 @@ enum UI_ControlActionID
 	UI_ACTION_LAN_CHAT_CHANNEL_LIST,
 	/// войти на выбранный канал чата
 	UI_ACTION_LAN_CHAT_CHANNEL_ENTER,
+	/// очистить чат
+	UI_ACTION_LAN_CHAT_CLEAR,
 	/// список людей в чате
 	UI_ACTION_LAN_CHAT_USER_LIST,
 	/// LAN - вывод списка сетевых игр

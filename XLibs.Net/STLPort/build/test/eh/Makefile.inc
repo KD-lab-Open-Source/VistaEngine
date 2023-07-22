@@ -1,9 +1,9 @@
 # -*- makefile -*- Time-stamp: <05/03/29 23:39:01 ptr>
-# $Id: Makefile.inc 1871 2005-11-26 20:55:00Z dums $
+# $Id: Makefile.inc,v 1.1.2.1 2005/03/30 07:26:41 ptr Exp $
 
 # this is the version number of needed STLport library for linking
 LIBMAJOR = 5
-LIBMINOR = 1
+LIBMINOR = 0
 
 PRGNAME = eh_test
 SRC_CPP = ../../../test/eh/TestClass.cpp \

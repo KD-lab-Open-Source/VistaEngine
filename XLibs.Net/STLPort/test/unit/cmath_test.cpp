@@ -2,7 +2,7 @@
 
 #include <limits>
 #include <cmath>
-//We also test math functions imported from stdlib.h or
+//We also test math functions imported from stdlib.h or 
 //defined in cstdlib
 #include <cstdlib>
 
@@ -77,7 +77,7 @@ void CMathTest::test()
   CPPUNIT_CHECK( are_equals(std::pow(2.0, 2), 4.0) );
   /*
    * Uncomment the following to check that it generates an ambiguous call
-   * as there is no Standard pow(int, int) function only pow(double, int),
+   * as there is no Standard pow(int, int) function only pow(double, int), 
    * pow(float, int) and some others...
    * If it do not generate a compile time error it should at least give
    * the good result.

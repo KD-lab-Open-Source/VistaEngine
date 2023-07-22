@@ -30,9 +30,10 @@ public:
 	void serialize(Archive& ar);
 
 	const Map& map() const { return map_; }
-
+	void setSave(bool save) { save_ = save; }
 private:
 	int lastId_;
+	bool save_;
 	Map map_;
 };
 

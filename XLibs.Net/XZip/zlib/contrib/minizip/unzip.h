@@ -213,21 +213,9 @@ typedef struct unz_file_pos_s
     uLong num_of_file;            /* # of file */
 } unz_file_pos;
 
-typedef struct unz_file_seek_info_s
-{
-	uLong seek_offset;			/* offset from zip file beginning */
-	uLong seek_size;			/* raw file size */
-} unz_file_seek_info;
-
 extern int ZEXPORT unzGetFilePos(
     unzFile file,
     unz_file_pos* file_pos);
-
-extern int ZEXPORT unzGetFileSeekPos(
-    unzFile file,
-    unz_file_pos* file_pos,
-	unz_file_seek_info* seek_info
-	);
 
 extern int ZEXPORT unzGoToFilePos(
     unzFile file,

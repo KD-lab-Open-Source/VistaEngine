@@ -1,6 +1,5 @@
 #include <vector>
 #include <algorithm>
-#include <functional>
 
 #include "cppunit/cppunit_proxy.h"
 
@@ -47,8 +46,9 @@ void LogicTest::logicnot()
 {
   bool input [7] = { 1, 0, 0, 1, 1, 1, 1 };
 
-  int n = count_if(input, input + 7, logical_not<bool>());
-  CPPUNIT_ASSERT( n == 2 );
+  int n = 0;
+  n = count_if(input, input + 7, logical_not<bool>());
+  CPPUNIT_ASSERT(n==2);
 }
 void LogicTest::logicor()
 {

@@ -2,19 +2,19 @@
  * Copyright (c) 1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
  * modified is included with the above copyright notice.
  *
- */
+ */ 
 
 // This file is #included into locale_impl.cpp, due to locale use many
 // statics from locale_impl.cpp
@@ -27,16 +27,18 @@ _STLP_BEGIN_NAMESPACE
 
 locale::facet::~facet() {}
 
-#if !defined (_STLP_MEMBER_TEMPLATES) || defined (_STLP_INLINE_MEMBER_TEMPLATES)
+#if ! defined ( _STLP_MEMBER_TEMPLATES ) || defined (_STLP_INLINE_MEMBER_TEMPLATES)
 // members that fail to be templates
 bool locale::operator()(const string& __x,
-                        const string& __y) const
-{ return __locale_do_operator_call(*this, __x, __y); }
+                        const string& __y) const {
+  return __locale_do_operator_call(this, __x, __y);
+}
 
 #  if !defined (_STLP_NO_WCHAR_T)
 bool locale::operator()(const wstring& __x,
-                        const wstring& __y) const
-{ return __locale_do_operator_call(*this, __x, __y); }
+                        const wstring& __y) const {
+  return __locale_do_operator_call(this, __x, __y);
+}
 #  endif
 #endif
 
@@ -45,21 +47,12 @@ void _STLP_CALL locale::_M_throw_runtime_error(const char* name) {
 
   if (name) {
     const char* prefix = "bad locale name: ";
-#if !defined (_STLP_USE_SAFE_STRING_FUNCTIONS)
     strcpy(buf, prefix);
-    strncat(buf, name, _STLP_ARRAY_SIZE(buf) - strlen(prefix));
-    buf[_STLP_ARRAY_SIZE(buf) - 1] = 0;
-#else
-    strcpy_s(_STLP_ARRAY_AND_SIZE(buf), prefix);
-    strncat_s(_STLP_ARRAY_AND_SIZE(buf), name, _TRUNCATE);
-#endif
+    strncat(buf, name, 256 - strlen(prefix));
+    buf[255] = '\0';
   }
   else {
-#if !defined (_STLP_USE_SAFE_STRING_FUNCTIONS)
     strcpy(buf, "locale error");
-#else
-    strcpy_s(_STLP_ARRAY_AND_SIZE(buf), "locale error");
-#endif
   }
   _STLP_THROW(runtime_error(buf));
 }
@@ -69,10 +62,8 @@ void _STLP_CALL locale::_M_throw_runtime_error(const char* name) {
 // value is always positive.
 static size_t _Stl_loc_get_index(locale::id& id) {
   if (id._M_index == 0) {
-#if defined (_STLP_ATOMIC_INCREMENT) && \
-   (!defined (_STLP_WIN32_VERSION) || (_STLP_WIN32_VERSION > 0x0400))
-    static _STLP_VOLATILE __stl_atomic_t _S_index = __STATIC_CAST(__stl_atomic_t, locale::id::_S_max);
-    id._M_index = _STLP_ATOMIC_INCREMENT(&_S_index);
+#if defined (_STLP_ATOMIC_INCREMENT)
+    id._M_index = _STLP_ATOMIC_INCREMENT(&(locale::id::_S_max));
 #else
     static _STLP_STATIC_MUTEX _Index_lock _STLP_MUTEX_INITIALIZER;
     _STLP_auto_lock sentry(_Index_lock);
@@ -84,14 +75,13 @@ static size_t _Stl_loc_get_index(locale::id& id) {
 }
 
 // Default constructor: create a copy of the global locale.
-locale::locale() _STLP_NOTHROW
-  : _M_impl(_get_Locale_impl(_Stl_get_global_locale()->_M_impl))
+locale::locale() : _M_impl(_get_Locale_impl(_Stl_get_global_locale()->_M_impl))
 {}
 
 // Copy constructor
 locale::locale(const locale& L) _STLP_NOTHROW
-  : _M_impl( _get_Locale_impl( L._M_impl ) )
-{}
+  : _M_impl( _get_Locale_impl( L._M_impl ) ) {
+}
 
 void locale::_M_insert(facet* f, locale::id& n) {
   if (f)
@@ -118,13 +108,12 @@ locale::locale(const char* name)
     impl = new _Locale_impl(locale::id::_S_max, name);
 
     // Insert categories one at a time.
-    _Locale_name_hint *hint = 0;
-    hint = impl->insert_ctype_facets(name, hint);
-    hint = impl->insert_numeric_facets(name, hint);
-    hint = impl->insert_time_facets(name, hint);
-    hint = impl->insert_collate_facets(name, hint);
-    hint = impl->insert_monetary_facets(name, hint);
-    impl->insert_messages_facets(name, hint);
+    impl->insert_ctype_facets(name);
+    impl->insert_numeric_facets(name);
+    impl->insert_time_facets(name);
+    impl->insert_collate_facets(name);
+    impl->insert_monetary_facets(name);
+    impl->insert_messages_facets(name);
     // reassign impl
     _M_impl = _get_Locale_impl( impl );
   }
@@ -133,9 +122,9 @@ locale::locale(const char* name)
 
 // Give L a name where all facets except those in category c
 // are taken from name1, and those in category c are taken from name2.
-static void _Stl_loc_combine_names(_Locale_impl* L,
-                                   const char* name1, const char* name2,
-                                   locale::category c) {
+void _Stl_loc_combine_names(_Locale_impl* L,
+                            const char* name1, const char* name2,
+                            locale::category c) {
   if ((c & locale::all) == 0 || strcmp(name1, name2) == 0)
     L->name = name1;
   else if ((c & locale::all) == locale::all)
@@ -149,17 +138,15 @@ static void _Stl_loc_combine_names(_Locale_impl* L,
     char monetary_buf[_Locale_MAX_SIMPLE_NAME];
     char messages_buf[_Locale_MAX_SIMPLE_NAME];
 
-    // TODO: check returnvalues?
-    _Locale_extract_ctype_name((c & locale::ctype) ? name2 : name1, ctype_buf, 0);
-    _Locale_extract_numeric_name((c & locale::numeric) ? name2 : name1, numeric_buf, 0);
-    _Locale_extract_time_name((c & locale::time) ? name2 : name1, time_buf, 0);
-    _Locale_extract_collate_name((c & locale::collate) ? name2 : name1, collate_buf, 0);
-    _Locale_extract_monetary_name((c & locale::monetary) ? name2 : name1, monetary_buf, 0);
-    _Locale_extract_messages_name((c & locale::messages) ? name2 : name1, messages_buf, 0);
+    _Locale_extract_ctype_name((c & locale::ctype) ? name2 : name1, ctype_buf);
+    _Locale_extract_numeric_name((c & locale::numeric) ? name2 : name1, numeric_buf);
+    _Locale_extract_time_name((c & locale::time) ? name2 : name1, time_buf);
+    _Locale_extract_collate_name((c & locale::collate) ? name2 : name1, collate_buf);
+    _Locale_extract_monetary_name((c & locale::monetary) ? name2 : name1, monetary_buf);
+    _Locale_extract_messages_name((c & locale::messages) ? name2 : name1, messages_buf);
 
     // Construct a new composite name.
     char composite_buf[_Locale_MAX_COMPOSITE_NAME];
-    // TODO: check returnvalue?
     _Locale_compose_name(composite_buf,
                          ctype_buf, numeric_buf, time_buf,
                          collate_buf, monetary_buf, messages_buf,
@@ -181,19 +168,18 @@ locale::locale(const locale& L, const char* name, locale::category c)
     impl = new _Locale_impl(*L._M_impl);
     _Stl_loc_combine_names(impl, L._M_impl->name.c_str(), name, c);
 
-    _Locale_name_hint *hint = 0;
     if (c & locale::ctype)
-      hint = impl->insert_ctype_facets(name, hint);
+      impl->insert_ctype_facets(name);
     if (c & locale::numeric)
-      hint = impl->insert_numeric_facets(name, hint);
+      impl->insert_numeric_facets(name);
     if (c & locale::time)
-      hint = impl->insert_time_facets(name, hint);
+      impl->insert_time_facets(name);
     if (c & locale::collate)
-      hint = impl->insert_collate_facets(name, hint);
+      impl->insert_collate_facets(name);
     if (c & locale::monetary)
-      hint = impl->insert_monetary_facets(name, hint);
+      impl->insert_monetary_facets(name);
     if (c & locale::messages)
-      impl->insert_messages_facets(name, hint);
+      impl->insert_messages_facets(name);
     _M_impl = _get_Locale_impl( impl );
   }
   _STLP_UNWIND(delete impl)
@@ -322,7 +308,7 @@ locale _STLP_CALL locale::global(const locale& L) {
     _Stl_get_global_locale()->_M_impl = _get_Locale_impl(L._M_impl);
 
     // Set the global C locale, if appropriate.
-#if !defined(_STLP_NO_LOCALE_SUPPORT)
+#if !defined(_STLP_NO_LOCALE_SUPPORT) && !defined(_STLP_WINCE) && !defined(_STLP_WCE_NET)
     if (L.name() != _Nameless)
       setlocale(LC_ALL, L.name().c_str());
 #endif

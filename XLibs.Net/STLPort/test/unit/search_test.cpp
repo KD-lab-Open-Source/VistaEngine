@@ -2,7 +2,6 @@
 #include <numeric>
 #include <algorithm>
 
-#include "iota.h"
 #include "cppunit/cppunit_proxy.h"
 
 #if !defined (STLPORT) || defined(_STLP_USE_NAMESPACES)
@@ -54,16 +53,16 @@ void SearchTest::search1()
 {
   typedef vector <int> IntVec;
   IntVec v1(10);
-  __iota(v1.begin(), v1.end(), 0);
+  iota(v1.begin(), v1.end(), 0);
   IntVec v2(3);
-  __iota(v2.begin(), v2.end(), 50);
+  iota(v2.begin(), v2.end(), 50);
 
   IntVec::iterator location;
   location = search(v1.begin(), v1.end(), v2.begin(), v2.end());
 
   CPPUNIT_ASSERT(location == v1.end());
 
-  __iota(v2.begin(), v2.end(), 4);
+  iota(v2.begin(), v2.end(), 4);
 
   location = search(v1.begin(), v1.end(), v2.begin(), v2.end());
 
@@ -72,16 +71,16 @@ void SearchTest::search1()
 }
 void SearchTest::search2()
 {
-  char const* grades[] = { "A", "B", "C", "D", "F" };
-  char const* letters[] = { "Q", "E", "D" };
+  char* grades[] = { "A", "B", "C", "D", "F" };
+  char* letters[] = { "Q", "E", "D" };
   const unsigned gradeCount = sizeof(grades) / sizeof(grades[0]);
   const unsigned letterCount = sizeof(letters) / sizeof(letters[0]);
-  char const** location = search((char const**)grades, (char const**)grades + gradeCount, (char const**)letters, (char const**)letters + letterCount, str_equal);
+  char** location = search((char**)grades, (char**)grades + gradeCount, (char**)letters, (char**)letters + letterCount, str_equal);
 
   CPPUNIT_ASSERT(location == grades + gradeCount);
 
-  copy((char const**)grades + 1, (char const**)grades + 1 + letterCount, (char const**)letters);
-  location = search((char const**)grades, (char const**)grades + gradeCount, (char const**)letters, (char const**)letters + letterCount, str_equal);
+  copy((char**)grades + 1, (char**)grades + 1 + letterCount, (char**)letters);
+  location = search((char**)grades, (char**)grades + gradeCount, (char**)letters, (char**)letters + letterCount, str_equal);
 
   CPPUNIT_ASSERT(location != grades + gradeCount);
   CPPUNIT_ASSERT(location - grades == 1);

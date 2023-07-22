@@ -55,7 +55,12 @@ void CDlgSelectWorld::fillWorldList()
 	clearWorldList();
 
 	MissionDescriptions descriptions;
+//#ifdef _VISTA
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	descriptions.readFromDir(path2worlds.c_str(), GAME_TYPE_SCENARIO);
+#else
+	descriptions.readUserWorldsFromDir(path2worlds.c_str());
+#endif
 
 	MissionDescriptions::iterator it;
 	int index = 0;
@@ -162,6 +167,8 @@ void CDlgSelectWorld::OnButtonDelete()
 		if(result==IDOK){
 			vMap.deleteWorld(*pstr);
 			string fileMission= path2worlds + "\\" + (LPCTSTR)(*pstr) + ".spg";
+			::DeleteFile(fileMission.c_str());
+			fileMission= path2worlds + "\\" + (LPCTSTR)(*pstr) + ".spg.bin";
 			::DeleteFile(fileMission.c_str());
 			fillWorldList();
 		}

@@ -12,8 +12,9 @@
 #include "ZipConfig.h"
 #include "SplashScreen.h"
 
-
+#include "TextDB.h"
 #include "Dictionary.h"
+#include "FileUtils.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -27,16 +28,6 @@ END_MESSAGE_MAP()
 
 string GetMissionSaveNameFromPlayReel(const char* fname) { xassert(0&&"Replay is not supported in editor!"); return string(""); }
 void UpdateMDFromPlayReel(const char* fname, class MissionDescription* pmd){ xassert(0&&"Replay is not supported in editor!"); }
-
-double clockf()
-{
-	return 0;
-} 
-
-int clocki()
-{
-	return 0;
-}
 
 
 CSurMap5App::CSurMap5App()
@@ -124,7 +115,7 @@ BOOL CSurMap5App::InitInstance()
 	AfxEnableControlContainer();
 	AfxInitRichEdit();
 
-	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
+	SetRegistryKey(_T("VistaGame Editor"));
 
 	ASSERT( m_pszRegistryKey != NULL );
 	ASSERT( m_pszProfileName != NULL );
@@ -133,13 +124,23 @@ BOOL CSurMap5App::InitInstance()
 	VERIFY(splash.create(IDB_SPLASH));
 	splash.show();
 
-#ifndef _VISTA_ENGINE_EXTERNAL_
+#ifdef _VISTA_ENGINE_EXTERNAL_
+	char modulePath[MAX_PATH + 1];
+	GetModuleFileName(GetModuleHandle(0), modulePath, MAX_PATH);
+
+	std::string path = ::extractFilePath(modulePath);
+	std::string gamePath = path + "\\Maelstrom.exe";
+	if(!::isFileExists(gamePath.c_str())){
+		AfxMessageBox(TRANSLATE("Похоже, что игра была удалена после установки редактора. Вам нужно переустановить игру в тот же каталог."), MB_ICONEXCLAMATION, 0);
+		return FALSE;
+	}
+	ZipConfig::initArchives();
+	TextIdMap::instance().setSave(false);
+#else
 	int zip = 1;
 	IniManager("Game.ini").getInt("Game", "ZIP", zip);
 	if(zip)
 		ZipConfig::initArchives();
-#else
-	ZipConfig::initArchives();
 #endif
 
 	GameOptions::instance().setTranslate();
@@ -149,10 +150,9 @@ BOOL CSurMap5App::InitInstance()
 	
 	Console::instance().registerListener(&ConsoleWindow::instance());
 
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	//Инициализация FP
 	setLogicFp();
-#endif
+
 	//Инициализация внешнего модуля для Shape3D
 
 	vMap.prepare("Resource\\Worlds");//"worlds.prm",

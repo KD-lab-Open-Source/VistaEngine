@@ -6,7 +6,7 @@
 #endif
 
 // the following is a workaround for arrow operator problems
-#if defined  ( _STLP_NO_ARROW_OPERATOR )
+#if defined  ( _STLP_NO_ARROW_OPERATOR ) 
 // User wants to disable proxy -> operators
 #  define _STLP_DEFINE_ARROW_OPERATOR
 #  define _STLP_ARROW_SPECIALIZE_WITH_PTRS(_Tp)
@@ -15,7 +15,7 @@
 #  define _STLP_ARROW_SPECIALIZE_WITH_PTRS(_Tp)
 #  if defined (__BORLANDC__)
 #    define _STLP_DEFINE_ARROW_OPERATOR  pointer operator->() const { return &(*(*this)); }
-#  elif defined(__WATCOMC__)
+#  elif defined ( _STLP_WINCE ) || defined(__WATCOMC__)
 #    define _STLP_DEFINE_ARROW_OPERATOR pointer operator->() const { reference x = operator*(); return &x; }
 #  else
 #    define _STLP_DEFINE_ARROW_OPERATOR  pointer operator->() const { return &(operator*()); }

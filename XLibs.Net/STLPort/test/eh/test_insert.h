@@ -1,6 +1,6 @@
 /***********************************************************************************
   test_insert.h
-
+  
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -34,7 +34,7 @@
 // A classification system for containers, for verification
 struct container_tag {};
 struct sequence_container_tag  {};
-struct associative_container_tag  {};
+struct associative_container_tag  {}; 
 
 struct set_tag  {};
 struct multiset_tag  {};
@@ -42,7 +42,7 @@ struct map_tag {};
 struct multimap_tag {};
 
 template <class C, class Iter>
-size_t CountNewItems( const C&, const Iter& firstNew,
+size_t CountNewItems( const C&, const Iter& firstNew, 
                       const Iter& lastNew, sequence_container_tag )
 {
     size_t dist = 0;
@@ -55,14 +55,14 @@ size_t CountNewItems( const C&, const Iter& firstNew,
 }
 
 template <class C, class Iter>
-size_t CountNewItems( const C& c, const Iter& firstNew,
+size_t CountNewItems( const C& c, const Iter& firstNew, 
                       const Iter& lastNew, multimap_tag )
 {
     return CountNewItems( c, firstNew, lastNew, sequence_container_tag() );
 }
 
 template <class C, class Iter>
-size_t CountNewItems( const C& c, const Iter& firstNew,
+size_t CountNewItems( const C& c, const Iter& firstNew, 
                       const Iter& lastNew, multiset_tag )
 {
     return CountNewItems( c, firstNew, lastNew, sequence_container_tag() );
@@ -71,9 +71,9 @@ size_t CountNewItems( const C& c, const Iter& firstNew,
 
 template <class C, class Iter, class KeyOfValue>
 #ifdef __BORLANDC__
-size_t CountUniqueItems_Aux( const C& original, const Iter& firstNew,
+size_t CountUniqueItems_Aux( const C& original, const Iter& firstNew, 
 #else
-size_t CountUniqueItems_Aux( const C& original, Iter firstNew,
+size_t CountUniqueItems_Aux( const C& original, Iter firstNew, 
 #endif
                              Iter lastNew, const KeyOfValue& keyOfValue )
 {
@@ -91,10 +91,10 @@ size_t CountUniqueItems_Aux( const C& original, Iter firstNew,
   keys.reserve( dist );
   for ( Iter x = firstNew; x != lastNew; ++x )
     keys.push_back( keyOfValue(*x) );
-
+    
   EH_STD::sort( keys.begin(), keys.end() );
   key_iterator last = EH_STD::unique( keys.begin(), keys.end() );
-
+   
     size_t cnt = 0;
     for ( key_iterator tmp = keys.begin(); tmp != last; ++tmp )
     {
@@ -123,47 +123,47 @@ EH_END_NAMESPACE
 #endif
 
 template <class C, class Iter>
-size_t CountUniqueItems( const C& original, const Iter& firstNew,
+size_t CountUniqueItems( const C& original, const Iter& firstNew, 
                          const Iter& lastNew, set_tag )
 {
     typedef typename C::value_type value_type;
-    return CountUniqueItems_Aux( original, firstNew, lastNew,
+    return CountUniqueItems_Aux( original, firstNew, lastNew, 
                                  EH_STD::identity<value_type>() );
 }
 
 template <class C, class Iter>
-size_t CountUniqueItems( const C& original, const Iter& firstNew,
+size_t CountUniqueItems( const C& original, const Iter& firstNew, 
                          const Iter& lastNew, map_tag )
 {
 #ifdef EH_MULTI_CONST_TEMPLATE_ARG_BUG
-    return CountUniqueItems_Aux( original, firstNew, lastNew,
+    return CountUniqueItems_Aux( original, firstNew, lastNew, 
                                  EH_SELECT1ST_HINT<C::value_type, C::key_type>() );
 #else
     typedef typename C::value_type value_type;
-    return CountUniqueItems_Aux( original, firstNew, lastNew,
+    return CountUniqueItems_Aux( original, firstNew, lastNew, 
                                  EH_STD::select1st<value_type>() );
 #endif
 }
 
 template <class C, class Iter>
-size_t CountNewItems( const C& original, const Iter& firstNew,
+size_t CountNewItems( const C& original, const Iter& firstNew, 
                       const Iter& lastNew, map_tag )
 {
-    return CountUniqueItems( original, firstNew, lastNew,
+    return CountUniqueItems( original, firstNew, lastNew, 
                              container_category( original ) );
 }
 
 template <class C, class Iter>
-size_t CountNewItems( const C& original, const Iter& firstNew,
+size_t CountNewItems( const C& original, const Iter& firstNew, 
                       const Iter& lastNew, set_tag )
 {
-    return CountUniqueItems( original, firstNew, lastNew,
+    return CountUniqueItems( original, firstNew, lastNew, 
                              container_category( original ) );
 }
 
 template <class C, class SrcIter>
-inline void VerifyInsertion( const C& original, const C& result,
-                             const SrcIter& firstNew, const SrcIter& lastNew,
+inline void VerifyInsertion( const C& original, const C& result, 
+                             const SrcIter& firstNew, const SrcIter& lastNew, 
                              size_t, associative_container_tag )
 {
     typedef typename C::const_iterator DstIter;
@@ -172,7 +172,7 @@ inline void VerifyInsertion( const C& original, const C& result,
 
     DstIter* from_orig = new DstIter[original.size()];
     DstIter* last_from_orig = from_orig;
-
+    
     // fbp : for hashed containers, the following is needed :
     while ( first2 != result.end() )
     {
@@ -180,13 +180,13 @@ inline void VerifyInsertion( const C& original, const C& result,
         if ( p.second != result.end() )
         {
             SrcIter srcItem = EH_STD::find( SrcIter(firstNew), SrcIter(lastNew), *p.second );
-
+      
             if (srcItem == lastNew)
-            {
+            {                           
                 // not found in input range, probably re-ordered from the orig
                 DstIter* tmp;
                 tmp = EH_STD::find( from_orig, last_from_orig, p.first );
-
+                
                 // if already here, exclude
                 if (tmp != last_from_orig)
                 {
@@ -209,61 +209,61 @@ inline void VerifyInsertion( const C& original, const C& result,
         first1 = p.first;
         first2 = p.second;
     }
-
+  
     delete [] from_orig;
 }
 
-// VC++
+// VC++ 
 template <class C, class SrcIter>
 inline void VerifyInsertion(
-    const C& original, const C& result, const SrcIter& firstNew,
+    const C& original, const C& result, const SrcIter& firstNew, 
     const SrcIter& lastNew, size_t, set_tag )
 {
-    VerifyInsertion( original, result, firstNew, lastNew,
+    VerifyInsertion( original, result, firstNew, lastNew, 
                      size_t(0), associative_container_tag() );
 }
 
 template <class C, class SrcIter>
-inline void VerifyInsertion(const C& original, const C& result,
-                            const SrcIter& firstNew, const SrcIter& lastNew,
+inline void VerifyInsertion(const C& original, const C& result, 
+                            const SrcIter& firstNew, const SrcIter& lastNew, 
                             size_t, multiset_tag )
 {
-    VerifyInsertion( original, result, firstNew, lastNew,
+    VerifyInsertion( original, result, firstNew, lastNew, 
                      size_t(0), associative_container_tag() );
 }
 
 template <class C, class SrcIter>
 inline void VerifyInsertion(
-    const C& original, const C& result, const SrcIter& firstNew,
+    const C& original, const C& result, const SrcIter& firstNew, 
     const SrcIter& lastNew, size_t, map_tag )
 {
-    VerifyInsertion( original, result, firstNew, lastNew,
+    VerifyInsertion( original, result, firstNew, lastNew, 
                      size_t(0), associative_container_tag() );
 }
 
 template <class C, class SrcIter>
 inline void VerifyInsertion(
-    const C& original, const C& result, const SrcIter& firstNew,
+    const C& original, const C& result, const SrcIter& firstNew, 
     const SrcIter& lastNew, size_t, multimap_tag )
 {
-    VerifyInsertion( original, result, firstNew, lastNew,
+    VerifyInsertion( original, result, firstNew, lastNew, 
                      size_t(0), associative_container_tag() );
 }
 
 template <class C, class SrcIter>
 void VerifyInsertion(
 # ifdef _MSC_VER
-    const C& original, const C& result, SrcIter firstNew,
+    const C& original, const C& result, SrcIter firstNew, 
     SrcIter lastNew, size_t insPos, sequence_container_tag )
 # else
-    const C& original, const C& result, const SrcIter& firstNew,
+    const C& original, const C& result, const SrcIter& firstNew, 
     const SrcIter& lastNew, size_t insPos, sequence_container_tag )
 # endif
 {
     typename C::const_iterator p1 = original.begin();
     typename C::const_iterator p2 = result.begin();
     SrcIter tmp(firstNew);
-
+    
     for ( size_t n = 0; n < insPos; n++, ++p1, ++p2)
         EH_ASSERT( *p1 == *p2 );
 
@@ -278,19 +278,19 @@ void VerifyInsertion(
 }
 
 template <class C, class SrcIter>
-inline void VerifyInsertion( const C& original, const C& result,
-                             const SrcIter& firstNew,
+inline void VerifyInsertion( const C& original, const C& result, 
+                             const SrcIter& firstNew, 
                              const SrcIter& lastNew, size_t insPos )
 {
-    EH_ASSERT( result.size() == original.size() +
-            CountNewItems( original, firstNew, lastNew,
+    EH_ASSERT( result.size() == original.size() + 
+            CountNewItems( original, firstNew, lastNew, 
                            container_category(original) ) );
-    VerifyInsertion( original, result, firstNew, lastNew, insPos,
+    VerifyInsertion( original, result, firstNew, lastNew, insPos, 
                      container_category(original) );
 }
 
 template <class C, class Value>
-void VerifyInsertN( const C& original, const C& result, size_t insCnt,
+void VerifyInsertN( const C& original, const C& result, size_t insCnt, 
                     const Value& val, size_t insPos )
 {
     typename C::const_iterator p1 = original.begin();
@@ -306,7 +306,7 @@ void VerifyInsertN( const C& original, const C& result, size_t insCnt,
         EH_ASSERT(*p2 == val );
         ++p2;
     }
-
+  
     while ( p2 != result.end() ) {
         EH_ASSERT( *p1 == *p2 );
         ++p1; ++p2;
@@ -342,14 +342,14 @@ struct test_insert_one
         else
             gTestController.SetCurrentTestName("single insertion at random position");
     }
-
+  
     void operator()( C& c ) const
     {
         prepare_insert_n( c, (size_t)1 );
         typename C::iterator pos = c.begin();
         EH_STD::advance( pos, size_t(fPos) );
         c.insert( pos, fInsVal );
-
+    
         // Prevent simulated failures during verification
         gTestController.CancelFailureCountdown();
         // Success. Check results.
@@ -379,14 +379,14 @@ struct test_insert_n
         else
             gTestController.SetCurrentTestName("n-ary insertion at random position");
     }
-
+  
     void operator()( C& c ) const
     {
         prepare_insert_n( c, fInsCnt );
         typename C::iterator pos = c.begin();
         EH_STD::advance( pos, fPos );
         c.insert( pos, fInsCnt, fInsVal );
-
+    
         // Prevent simulated failures during verification
         gTestController.CancelFailureCountdown();
         // Success. Check results.
@@ -408,11 +408,11 @@ struct test_insert_value
         MakeRandomValue( fInsVal );
         gTestController.SetCurrentTestName("insertion of random value");
     }
-
+  
     void operator()( C& c ) const
     {
         c.insert( fInsVal );
-
+    
         // Prevent simulated failures during verification
         gTestController.CancelFailureCountdown();
         // Success. Check results.
@@ -448,7 +448,7 @@ private:
 };
 
 template <class C, class Position, class Iter>
-void do_insert_range( C& c_inst, Position offset,
+void do_insert_range( C& c_inst, Position offset, 
                       Iter first, Iter last, sequence_container_tag )
 {
     typedef typename C::iterator CIter;
@@ -458,7 +458,7 @@ void do_insert_range( C& c_inst, Position offset,
 }
 
 template <class C, class Position, class Iter>
-void do_insert_range( C& c, Position,
+void do_insert_range( C& c, Position, 
                       Iter first, Iter last, associative_container_tag )
 {
     c.insert( first, last );
@@ -519,7 +519,7 @@ struct test_insert_range
     {
 //        prepare_insert_range( c, fPos, fFirst, fLast );
         do_insert_range( c, fPos, fFirst, fLast, container_category(c) );
-
+    
         // Prevent simulated failures during verification
         gTestController.CancelFailureCountdown();
         // Success. Check results.

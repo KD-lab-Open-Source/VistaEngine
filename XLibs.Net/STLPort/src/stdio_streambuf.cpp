@@ -2,19 +2,19 @@
  * Copyright (c) 1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
  * modified is included with the above copyright notice.
  *
- */
+ */ 
 
 #include "stlport_prefix.h"
 #include "stdio_streambuf.h"
@@ -25,8 +25,8 @@
 #  include <sys/stat.h>
 #endif /* __unix */
 
-#include <fstream>
-#include <limits>
+#include <stl/_fstream.h>
+#include <stl/_limits.h>
 #include "fstream_impl.h"
 
 #if defined (_STLP_USE_WIN32_IO) && !defined(_STLP_WCE)
@@ -40,9 +40,7 @@
 #  include <sys/stat.h>
 #endif
 
-_STLP_BEGIN_NAMESPACE
-_STLP_MOVE_TO_PRIV_NAMESPACE
-
+__SGI_BEGIN_NAMESPACE
 //----------------------------------------------------------------------
 // Class stdio_streambuf_base
 
@@ -86,8 +84,8 @@ stdio_streambuf_base::seekoff(off_type off, ios_base::seekdir dir,
 
   //We also check that off is not larger than the fseek parameter that is supposed to take
   //a long integer.
-  _STLP_STATIC_ASSERT(sizeof(off_type) >= sizeof(long))
-  if (off <= numeric_limits<long>::max() &&
+  typedef char __static_assert[sizeof(off_type) >= sizeof(long)];
+  if (off <= numeric_limits<long>::max() && 
       _STLP_VENDOR_CSTD::fseek(_M_file, __STATIC_CAST(long, off), whence) == 0) {
     fpos_t pos;
     _STLP_VENDOR_CSTD::fgetpos(_M_file, &pos);
@@ -125,7 +123,7 @@ stdio_streambuf_base::seekpos(pos_type pos, ios_base::openmode /* mode */) {
 #  else
   memset( &(p.__state), 0, sizeof(p.__state) );
 #  endif
-#elif defined (__MVS__) || defined (__OS400__)
+#elif defined(__MVS__) || (__OS400__)
   fpos_t p;
   p.__fpos_elem[0] = pos;
 #elif defined(__EMX__)
@@ -152,7 +150,7 @@ int stdio_streambuf_base::sync() {
 stdio_istreambuf::~stdio_istreambuf() {}
 
 streamsize stdio_istreambuf::showmanyc() {
-  if (feof(_M_file))
+  if (feof(_M_file)) 
     return -1;
   else {
     int fd = _FILE_fd(_M_file);
@@ -168,12 +166,16 @@ streamsize stdio_istreambuf::showmanyc() {
     // in this case, __file_size works with Win32 fh , not libc one
     streamoff size;
     struct stat buf;
+#  ifdef __BORLANDC__
+    if(fstat(fd, &buf) == 0 && S_ISREG( buf.st_mode ) )
+#  else
     if(fstat(fd, &buf) == 0 && ( _S_IFREG & buf.st_mode ) )
+#  endif
       size = ( buf.st_size > 0  ? buf.st_size : 0);
     else
       size = 0;
 #else
-    streamoff size = __file_size(fd);
+    streamoff size = _SgI::__file_size(fd);
 #endif
     // fbp : we can use ftell as this flavour always use stdio.
     long pos = _STLP_VENDOR_CSTD::ftell(_M_file);
@@ -253,14 +255,13 @@ stdio_ostreambuf::int_type stdio_ostreambuf::overflow(int_type c) {
 #ifdef _STLP_WCE
     int result = fputc(c, _M_file);
 #else
-    int result = putc(c, _M_file);
+    int result = putc(c, _M_file);  
 #endif
     return result != EOF ? result : traits_type::eof();
   }
 }
 
-_STLP_MOVE_TO_STD_NAMESPACE
-_STLP_END_NAMESPACE
+__SGI_END_NAMESPACE
 
 // Local Variables:
 // mode:C++

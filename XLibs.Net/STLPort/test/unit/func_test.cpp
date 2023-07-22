@@ -1,6 +1,5 @@
 #include <vector>
 #include <algorithm>
-#include <functional>
 
 #include "cppunit/cppunit_proxy.h"
 
@@ -46,10 +45,10 @@ void FuncTest::func1()
   v.push_back(4);
   v.push_back(1);
   v.push_back(5);
-  int n = count_if(v.begin(), v.end(), bigger);
-  CPPUNIT_ASSERT( n == 2 )
+  int n = 0;
+  n = count_if(v.begin(), v.end(), bigger);
+  CPPUNIT_ASSERT(n==2)
 }
-
 void FuncTest::func2()
 {
   std::vector<int>v;
@@ -58,9 +57,9 @@ void FuncTest::func2()
   v.push_back(5);
   sort(v.begin(), v.end(), bigger_than);
 
-  CPPUNIT_ASSERT( v[0] == 5 );
-  CPPUNIT_ASSERT( v[1] == 4 );
-  CPPUNIT_ASSERT( v[2] == 1 );
+  CPPUNIT_ASSERT(v[0]==5);
+  CPPUNIT_ASSERT(v[1]==4);
+  CPPUNIT_ASSERT(v[2]==1);
 }
 void FuncTest::func3()
 {
@@ -70,7 +69,7 @@ void FuncTest::func3()
   v.push_back(5);
   sort(v.begin(), v.end(), greater<int>());
 
-  CPPUNIT_ASSERT( v[0] == 5 );
-  CPPUNIT_ASSERT( v[1] == 4 );
-  CPPUNIT_ASSERT( v[2] == 1 );
+  CPPUNIT_ASSERT(v[0]==5);
+  CPPUNIT_ASSERT(v[1]==4);
+  CPPUNIT_ASSERT(v[2]==1);
 }

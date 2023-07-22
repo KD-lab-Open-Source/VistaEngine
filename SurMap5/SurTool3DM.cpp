@@ -67,7 +67,11 @@ CSurTool3DM::CSurTool3DM(CWnd* pParent /*=NULL*/)
 	, m_bSpread(false)
 {	
 	flag_repeatOperationEnable = false;
+#ifdef _VISTA_ENGINE_EXTERNAL_
+	popUpMenuRestriction = PUMR_NotPermission;
+#else
 	popUpMenuRestriction = PUMR_PermissionDelete;
+#endif
 	visualPreviewObject3DM = 0;
 	angleSlider_.SetRange(MIN_SHAPE3D_CORNER, MAX_SHAPE3D_CORNER);
 	angleSlider_.value = 0;
@@ -102,6 +106,9 @@ CSurTool3DM::~CSurTool3DM()
 void CSurTool3DM::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
+#ifdef _VISTA_ENGINE_EXTERNAL_
+	popUpMenuRestriction = PUMR_NotPermission;
+#endif
 	ar.serialize(dataFileName, "dataFileName", 0);
 	ar.serialize(angleSlider_.value, "m_TurnZ", 0);
 	ar.serialize(angleDeltaSlider_.value, "m_TurnZDelta", 0);
@@ -230,7 +237,12 @@ BOOL CSurTool3DM::OnInitDialog()
 
 	m_layout.add(1, 0, 1, 0, IDC_STATIC_LINE2);
 	m_layout.add(1, 0, 1, 0, IDC_CBOX_PLACEMETOD);
-	
+
+#ifdef _VISTA_ENGINE_EXTERNAL_
+	GetDlgItem(IDC_BTN_BROWSE_FILE)->EnableWindow(FALSE);
+#endif
+
+
 	ReloadM3D();
 	return FALSE;
 }
@@ -385,6 +397,7 @@ bool CSurTool3DM::CallBack_TrackingMouse(const Vect3f& worldCoord, const Vect2i&
 
 void CSurTool3DM::OnBnClickedBtnBrowseModel()
 {
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	dataFileName = requestModelAndPut2InternalResource ("Resource\\TerrainData\\Shapes", "*.3dx", "model.3dx",
                                                         TRANSLATE("Выбрать файл с 3DX моделью..."));
 	if (dataFileName.empty()) {
@@ -400,6 +413,7 @@ void CSurTool3DM::OnBnClickedBtnBrowseModel()
 	}
 
 	ReloadM3D();
+#endif
 }
 
 

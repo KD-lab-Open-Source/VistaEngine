@@ -2,13 +2,13 @@
  * Copyright (c) 1998
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
@@ -19,12 +19,12 @@
 #ifndef _STLP_BITSET_H
 #define _STLP_BITSET_H
 
-// A bitset of size N has N % (sizeof(unsigned long) * CHAR_BIT) unused
+// A bitset of size N has N % (sizeof(unsigned long) * CHAR_BIT) unused 
 // bits.  (They are the high- order bits in the highest word.)  It is
 // a class invariant of class bitset<> that those unused bits are
 // always zero.
 
-// Most of the actual code isn't contained in bitset<> itself, but in the
+// Most of the actual code isn't contained in bitset<> itself, but in the 
 // base class _Base_bitset.  The base class works with whole words, not with
 // individual bits.  This allows us to specialize _Base_bitset for the
 // important special case where the bitset is only a single word.
@@ -64,40 +64,19 @@
 
 _STLP_BEGIN_NAMESPACE
 
-_STLP_MOVE_TO_PRIV_NAMESPACE
-
 // structure to aid in counting bits
-class _STLP_CLASS_DECLSPEC _Bs_G
-{
-  public:
-    //returns the number of bit set within the buffer between __beg and __end.
-    static size_t _S_count(const unsigned char *__beg, const unsigned char *__end)
-#if defined (_STLP_USE_NO_IOSTREAMS)
-    {
-      size_t __result = 0;
-      for (; __beg != __end; ++__beg) {
-        for (size_t i = 0; i < (sizeof(unsigned char) * 8); ++i) {
-          if ((*__beg & (1 << i)) != 0) { ++__result; }
-        }
-      }
-      return __result;
-    }
-#else
-      ;
-#endif
-    // Mapping from 8 bit unsigned integers to the index of the first one bit set:
-    static unsigned char _S_first_one(unsigned char __x)
-#if defined (_STLP_USE_NO_IOSTREAMS)
-    {
-      for (unsigned char i = 0; i < (sizeof(unsigned char) * 8); ++i) {
-        if ((__x & (1 << i)) != 0) { return i; }
-      }
-      return 0;
-    }
-#else
-      ;
-#endif
+template<class _Dummy> 
+class _Bs_G {
+public:
+  //returns the number of bit set within the buffer between __beg and __end.
+  static size_t _S_count(const unsigned char *__beg, const unsigned char *__end);
+  // Mapping from 8 bit unsigned integers to the index of the first one bit:
+  static unsigned char _S_first_one(unsigned char);
 };
+
+#if defined (_STLP_USE_TEMPLATE_EXPORT) 
+_STLP_EXPORT_TEMPLATE_CLASS _Bs_G<bool>;
+#endif
 
 //
 // Base class: general case.
@@ -115,7 +94,7 @@ struct _Base_bitset {
     _M_do_reset();
     _M_w[0] = __val;
   }
-
+  
   static size_t _STLP_CALL _S_whichword( size_t __pos ) {
     return __pos / __BITS_PER_WORD;
   }
@@ -191,7 +170,7 @@ struct _Base_bitset {
     const unsigned char* __byte_ptr = (const unsigned char*)_M_w;
     const unsigned char* __end_ptr = (const unsigned char*)(_M_w+_Nw);
 
-    return _Bs_G::_S_count(__byte_ptr, __end_ptr);
+    return _Bs_G<bool>::_S_count(__byte_ptr, __end_ptr);
   }
 
   unsigned long _M_do_to_ulong() const;
@@ -215,7 +194,7 @@ struct _Base_bitset<1UL> {
 
   _Base_bitset( void ) : _M_w(0) {}
   _Base_bitset(unsigned long __val) : _M_w(__val) {}
-
+  
   static size_t _STLP_CALL _S_whichword( size_t __pos ) {
     return __pos / __BITS_PER_WORD ;
   }
@@ -254,7 +233,7 @@ struct _Base_bitset<1UL> {
   size_t _M_do_count() const {
     const unsigned char* __byte_ptr = (const unsigned char*)&_M_w;
     const unsigned char* __end_ptr = ((const unsigned char*)&_M_w)+sizeof(_M_w);
-    return _Bs_G::_S_count(__byte_ptr, __end_ptr);
+    return _Bs_G<bool>::_S_count(__byte_ptr, __end_ptr);
   }
 
   unsigned long _M_do_to_ulong() const { return _M_w; }
@@ -262,7 +241,7 @@ struct _Base_bitset<1UL> {
   inline size_t _M_do_find_first(size_t __not_found) const;
 
   // find the next "on" bit that follows "prev"
-  inline size_t _M_do_find_next(size_t __prev, size_t __not_found) const;
+  inline size_t _M_do_find_next(size_t __prev, size_t __not_found) const; 
 };
 
 
@@ -271,7 +250,7 @@ struct _Base_bitset<1UL> {
 // Definitions of should-be-non-inline functions from the single-word version of
 //  _Base_bitset.
 //
-inline size_t
+inline size_t 
 _Base_bitset<1UL>::_M_do_find_first(size_t __not_found) const {
   //  typedef unsigned long _WordT;
   _WordT __thisword = _M_w;
@@ -282,7 +261,7 @@ _Base_bitset<1UL>::_M_do_find_first(size_t __not_found) const {
       unsigned char __this_byte
         = __STATIC_CAST(unsigned char,(__thisword & (~(unsigned char)0)));
       if ( __this_byte )
-        return __j*CHAR_BIT + _Bs_G::_S_first_one(__this_byte);
+        return __j*CHAR_BIT + _Bs_G<bool>::_S_first_one(__this_byte);
 
       __thisword >>= CHAR_BIT;
     }
@@ -291,8 +270,8 @@ _Base_bitset<1UL>::_M_do_find_first(size_t __not_found) const {
   return __not_found;
 }
 
-inline size_t
-_Base_bitset<1UL>::_M_do_find_next(size_t __prev,
+inline size_t 
+_Base_bitset<1UL>::_M_do_find_next(size_t __prev, 
                                    size_t __not_found ) const {
   // make bound inclusive
   ++__prev;
@@ -315,7 +294,7 @@ _Base_bitset<1UL>::_M_do_find_next(size_t __prev,
       unsigned char __this_byte
         = __STATIC_CAST(unsigned char,(__thisword & (~(unsigned char)0)));
       if ( __this_byte )
-        return __j*CHAR_BIT + _Bs_G::_S_first_one(__this_byte);
+        return __j*CHAR_BIT + _Bs_G<bool>::_S_first_one(__this_byte);
 
       __thisword >>= CHAR_BIT;
     }
@@ -338,21 +317,21 @@ _STLP_TEMPLATE_NULL struct _Sanitize<0UL> {
   static void _STLP_CALL _M_do_sanitize(unsigned long) {}
 };
 
-_STLP_MOVE_TO_STD_NAMESPACE
-
 // ------------------------------------------------------------
 // Class bitset.
 //   _Nb may be any nonzero number of type size_t.
+
+
 template<size_t _Nb>
-class bitset : public _STLP_PRIV _Base_bitset<__BITSET_WORDS(_Nb) > {
+class bitset : public _Base_bitset<__BITSET_WORDS(_Nb) > {
 public:
   enum { _Words = __BITSET_WORDS(_Nb) } ;
 
 private:
-  typedef _STLP_PRIV _Base_bitset< _Words > _Base;
+  typedef _Base_bitset< _Words > _Base;
 
   void _M_do_sanitize() {
-    _STLP_PRIV _Sanitize<_Nb%__BITS_PER_WORD >::_M_do_sanitize(this->_M_hiword());
+    _Sanitize<_Nb%__BITS_PER_WORD >::_M_do_sanitize(this->_M_hiword());
   }
 public:
   typedef unsigned long _WordT;
@@ -361,7 +340,7 @@ public:
 
   // bit reference:
   struct reference {
-  typedef _STLP_PRIV _Base_bitset<_Words > _Bitset_base;
+  typedef _Base_bitset<_Words > _Bitset_base;
   typedef bitset<_Nb> _Bitset;
     //    friend _Bitset;
     _WordT *_M_wp;
@@ -414,14 +393,14 @@ public:
   // 23.3.5.1 constructors:
   bitset() {}
 
-  bitset(unsigned long __val) : _STLP_PRIV _Base_bitset<_Words>(__val) { _M_do_sanitize(); }
+  bitset(unsigned long __val) : _Base_bitset<_Words>(__val) { _M_do_sanitize(); }
 
 #if defined (_STLP_MEMBER_TEMPLATES)
   template<class _CharT, class _Traits, class _Alloc>
   explicit bitset(const basic_string<_CharT,_Traits,_Alloc>& __s,
                   size_t __pos = 0)
-    : _STLP_PRIV _Base_bitset<_Words >() {
-    if (__pos > __s.size())
+    : _Base_bitset<_Words >() {
+    if (__pos > __s.size()) 
       __stl_throw_out_of_range("bitset");
     _M_copy_from_string(__s, __pos,
                         basic_string<_CharT, _Traits, _Alloc>::npos);
@@ -430,17 +409,18 @@ public:
   bitset(const basic_string<_CharT, _Traits, _Alloc>& __s,
           size_t __pos,
           size_t __n)
-  : _STLP_PRIV _Base_bitset<_Words >() {
-    if (__pos > __s.size())
+  : _Base_bitset<_Words >() {
+    if (__pos > __s.size()) 
       __stl_throw_out_of_range("bitset");
     _M_copy_from_string(__s, __pos, __n);
   }
 #else /* _STLP_MEMBER_TEMPLATES */
   explicit bitset(const string& __s,
                   size_t __pos = 0,
-                  size_t __n = (size_t)-1)
-    : _STLP_PRIV _Base_bitset<_Words >() {
-    if (__pos > __s.size())
+                  size_t __n = (size_t)-1) 
+    : _Base_bitset<_Words >() 
+  {
+    if (__pos > __s.size()) 
       __stl_throw_out_of_range("bitset");
     _M_copy_from_string(__s, __pos, __n);
   }
@@ -480,7 +460,7 @@ public:
   //
 
   bitset<_Nb>& _Unchecked_set(size_t __pos) {
-    this->_M_getword(__pos) |= _STLP_PRIV _Base_bitset<_Words > ::_S_maskbit(__pos);
+    this->_M_getword(__pos) |= _Base_bitset<_Words > ::_S_maskbit(__pos);
     return *this;
   }
 
@@ -552,7 +532,7 @@ public:
     return _Unchecked_flip(__pos);
   }
 
-  bitset<_Nb> operator~() const {
+  bitset<_Nb> operator~() const { 
     return bitset<_Nb>(*this).flip();
   }
 
@@ -592,37 +572,35 @@ public:
   bool test(size_t __pos) const {
     if (__pos >= _Nb)
       __stl_throw_out_of_range("bitset");
-
+    
     return _Unchecked_test(__pos);
   }
 
   bool any() const { return this->_M_is_any(); }
   bool none() const { return !this->_M_is_any(); }
 
-  bitset<_Nb> operator<<(size_t __pos) const {
+  bitset<_Nb> operator<<(size_t __pos) const { 
     bitset<_Nb> __result(*this);
-    __result <<= __pos ;  return __result;
+    __result <<= __pos ;  return __result; 
   }
-  bitset<_Nb> operator>>(size_t __pos) const {
+  bitset<_Nb> operator>>(size_t __pos) const { 
     bitset<_Nb> __result(*this);
-    __result >>= __pos ;  return __result;
+    __result >>= __pos ;  return __result; 
   }
 
-#if !defined (_STLP_NO_EXTENSIONS)
   //
   // EXTENSIONS: bit-find operations.  These operations are
   // experimental, and are subject to change or removal in future
   // versions.
-  //
+  // 
 
   // find the index of the first "on" bit
-  size_t _Find_first() const
+  size_t _Find_first() const 
     { return this->_M_do_find_first(_Nb); }
 
   // find the index of the next "on" bit after prev
-  size_t _Find_next( size_t __prev ) const
+  size_t _Find_next( size_t __prev ) const 
     { return this->_M_do_find_next(__prev, _Nb); }
-#endif
 
 //
 // Definitions of should-be non-inline member functions.
@@ -648,7 +626,7 @@ public:
         __stl_throw_invalid_argument("bitset");
     }
   }
-
+ 
 #if defined (_STLP_MEMBER_TEMPLATES)
   template <class _CharT, class _Traits, class _Alloc>
   void _M_copy_to_string(basic_string<_CharT, _Traits, _Alloc>& __s) const
@@ -657,7 +635,7 @@ public:
 #endif
   {
     __s.assign(_Nb, '0');
-
+      
     for (size_t __i = 0; __i < _Nb; ++__i) {
       if (_Unchecked_test(__i))
         __s[_Nb - 1 - __i] = '1';
@@ -680,7 +658,7 @@ public:
     __result ^= __y;
     return __result;
   }
-#endif
+#endif 
 };
 
 // ------------------------------------------------------------

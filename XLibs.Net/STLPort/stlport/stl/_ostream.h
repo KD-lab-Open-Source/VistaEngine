@@ -2,19 +2,19 @@
  * Copyright (c) 1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
  * modified is included with the above copyright notice.
  *
- */
+ */ 
 
 
 #ifndef _STLP_INTERNAL_OSTREAM_H
@@ -28,10 +28,6 @@
 #  include <stl/_ostreambuf_iterator.h>
 #endif
 
-#if !defined (_STLP_NO_UNCAUGHT_EXCEPT_SUPPORT) && !defined (_STLP_INTERNAL_EXCEPTION)
-#  include <stl/_exception.h>
-#endif
-
 _STLP_BEGIN_NAMESPACE
 
 #if defined (_STLP_USE_TEMPLATE_EXPORT)
@@ -39,12 +35,9 @@ template <class _CharT, class _Traits>
 class _Osentry;
 #endif
 
-_STLP_MOVE_TO_PRIV_NAMESPACE
-
 template <class _CharT, class _Traits>
-bool __init_bostr(basic_ostream<_CharT, _Traits>& __str);
-
-_STLP_MOVE_TO_STD_NAMESPACE
+bool
+_M_init(basic_ostream<_CharT, _Traits>& __str);
 
 //----------------------------------------------------------------------
 // class basic_ostream<>
@@ -58,7 +51,7 @@ class basic_ostream : virtual public basic_ios<_CharT, _Traits> {
   basic_ostream(_Self const&);
   _Self& operator = (_Self const&);
 #endif
-
+  
 public:                         // Types
   typedef _CharT                     char_type;
   typedef typename _Traits::int_type int_type;
@@ -106,20 +99,13 @@ public:                         // Formatted output.
   _Self& operator<<(short __x);
   _Self& operator<<(unsigned short __x);
   _Self& operator<<(int __x);
-#if defined (_WIN64) || !defined (_STLP_MSVC) || (_STLP_MSVC < 1300)
   _Self& operator<<(unsigned int __x);
-#else
-/* We define this operator with size_t rather than unsigned int to avoid
- * 64 bits warning.
- */
-  _Self& operator<<(size_t __x);
-#endif
   _Self& operator<<(long __x);
   _Self& operator<<(unsigned long __x);
 #ifdef _STLP_LONG_LONG
   _Self& operator<< (_STLP_LONG_LONG __x);
   _Self& operator<< (unsigned _STLP_LONG_LONG __x);
-#endif
+#endif 
   _Self& operator<<(float __x);
   _Self& operator<<(double __x);
 # ifndef _STLP_NO_LONG_DOUBLE
@@ -178,13 +164,13 @@ public:                         // Buffer positioning and manipulation.
       bool _M_ok;
     public:
       explicit sentry(basic_ostream<_CharT, _Traits>& __str)
-        : _M_str(__str), /* _M_buf(__str.rdbuf()), */ _M_ok(_STLP_PRIV __init_bostr(__str))
+        : _M_str(__str), /* _M_buf(__str.rdbuf()), */ _M_ok(_M_init(__str))
       {}
-
+      
       ~sentry() {
         if (_M_str.flags() & ios_base::unitbuf)
-#if !defined (_STLP_NO_UNCAUGHT_EXCEPT_SUPPORT)
-          if (!uncaught_exception())
+#ifndef _STLP_NO_UNCAUGHT_EXCEPT_SUPPORT
+          if (!_STLP_VENDOR_EXCEPT_STD::uncaught_exception())
 #endif
             _M_str.flush();
       }
@@ -198,10 +184,10 @@ public:                         // Buffer positioning and manipulation.
 #if defined (_STLP_USE_TEMPLATE_EXPORT)
 #  undef sentry
 #else
-  // close basic_ostream class definition here
+  // close basic_ostream class definition here    
 };
 #endif
-
+ 
 #if defined (_STLP_USE_TEMPLATE_EXPORT)
 _STLP_EXPORT_TEMPLATE_CLASS basic_ostream<char, char_traits<char> >;
 _STLP_EXPORT_TEMPLATE_CLASS _Osentry<char, char_traits<char> >;
@@ -211,11 +197,9 @@ _STLP_EXPORT_TEMPLATE_CLASS _Osentry<wchar_t, char_traits<wchar_t> >;
 #  endif
 #endif /* _STLP_USE_TEMPLATE_EXPORT */
 
-_STLP_MOVE_TO_PRIV_NAMESPACE
-
 // Helper functions for istream<>::sentry constructor.
 template <class _CharT, class _Traits>
-bool __init_bostr(basic_ostream<_CharT, _Traits>& __str) {
+bool _M_init(basic_ostream<_CharT, _Traits>& __str) {
   if (__str.good()) {
     // boris : check if this is needed !
     if (!__str.rdbuf())
@@ -229,16 +213,15 @@ bool __init_bostr(basic_ostream<_CharT, _Traits>& __str) {
 }
 
 template <class _CharT, class _Traits>
-inline basic_streambuf<_CharT, _Traits>* _STLP_CALL
-__get_ostreambuf(basic_ostream<_CharT, _Traits>& __St)
+inline basic_streambuf<_CharT, _Traits>* _STLP_CALL 
+_M_get_ostreambuf(basic_ostream<_CharT, _Traits>& __St) 
 { return __St.rdbuf(); }
 
-_STLP_MOVE_TO_STD_NAMESPACE
-
 // Non-member functions.
+
 template <class _CharT, class _Traits>
 inline basic_ostream<_CharT, _Traits>& _STLP_CALL
-operator<<(basic_ostream<_CharT, _Traits>& __os, _CharT __c){
+operator<<(basic_ostream<_CharT, _Traits>& __os, _CharT __c) {
   __os._M_put_char(__c);
   return __os;
 }
@@ -375,6 +358,8 @@ flush(basic_ostream<_CharT, _Traits>& __os) {
 }
 
 _STLP_END_NAMESPACE
+
+#undef _STLP_MANIP_INLINE
 
 #if defined (_STLP_EXPOSE_STREAM_IMPLEMENTATION) && !defined (_STLP_LINK_TIME_INSTANTIATION)
 #  include <stl/_ostream.c>

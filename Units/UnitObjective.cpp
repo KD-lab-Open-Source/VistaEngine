@@ -101,48 +101,48 @@ void UnitObjective::fowQuant()
 	if(!alive())
 		return;
 
-		if(player()->fogOfWarMap()){
-			if(!(hiddenGraphic() & (HIDE_BY_TELEPORT | HIDE_BY_TRANSPORT | HIDE_BY_TRIGGER))){
-				if(fow_handle == -1)
-					fow_handle = player()->fogOfWarMap()->createVisible();
-				player()->fogOfWarMap()->moveVisibleOuterRadius(fow_handle, pose().trans().x, pose().trans().y, sightRadius());
-			}
-			else{
-				player()->fogOfWarMap()->deleteVisible(fow_handle);
-				fow_handle = -1;
-			}
+	if(player()->fogOfWarMap()){
+		if(!(hiddenGraphic() & (HIDE_BY_TELEPORT | HIDE_BY_TRANSPORT | HIDE_BY_TRIGGER))){
+			if(fow_handle == -1)
+				fow_handle = player()->fogOfWarMap()->createVisible();
+			player()->fogOfWarMap()->moveVisibleOuterRadius(fow_handle, pose().trans().x, pose().trans().y, sightRadius());
 		}
-
- 		FogOfWarMap* fow = universe()->activePlayer()->fogOfWarMap();
-		if(!fow || !model())
-			return;
-
-		if(!terScene->IsFogOfWarEnabled()){
-			if(hiddenGraphic() & HIDE_BY_FOW)
-				hide(HIDE_BY_FOW, false);
-			return;
+		else{
+			player()->fogOfWarMap()->deleteVisible(fow_handle);
+			fow_handle = -1;
 		}
+	}
 
-		switch(attr().fow_mode){
-		case FVM_HISTORY_TRACK:
-			switch(fow->getFogState(position2D().xi(), position2D().yi())){
-			case FOGST_NONE:
-				hide(HIDE_BY_FOW, false);
-				break;
-			case FOGST_HALF:
-				if(!(hiddenGraphic() & HIDE_BY_FOW)){
-					universe()->addFowModel(model());
-					hide(HIDE_BY_FOW, true);
-				}
-				break;
-			case FOGST_FULL:
+ 	FogOfWarMap* fow = universe()->activePlayer()->fogOfWarMap();
+	if(!fow || !model())
+		return;
+
+	if(!terScene->IsFogOfWarEnabled()){
+		if(hiddenGraphic() & HIDE_BY_FOW)
+			hide(HIDE_BY_FOW, false);
+		return;
+	}
+
+	switch(attr().fow_mode){
+	case FVM_HISTORY_TRACK:
+		switch(fow->getFogState(position2D().xi(), position2D().yi())){
+		case FOGST_NONE:
+			hide(HIDE_BY_FOW, false);
+			break;
+		case FOGST_HALF:
+			if(!(hiddenGraphic() & HIDE_BY_FOW)){
+				universe()->addFowModel(model());
 				hide(HIDE_BY_FOW, true);
-				break;
 			}
 			break;
-		case FVM_NO_FOG:
-			hide(HIDE_BY_FOW, fow->getFogState(position2D().xi(), position2D().yi()) != FOGST_NONE);
+		case FOGST_FULL:
+			hide(HIDE_BY_FOW, true);
 			break;
+		}
+		break;
+	case FVM_NO_FOG:
+		hide(HIDE_BY_FOW, fow->getFogState(position2D().xi(), position2D().yi()) != FOGST_NONE);
+		break;
 	}
 }
 

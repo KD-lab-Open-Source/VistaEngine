@@ -38,6 +38,7 @@ UI_ActionDataFactory::UI_ActionDataFactory()
 	add<UI_ActionDataSaveGameList>(UI_ACTION_BIND_SAVE_LIST);
 	add<UI_ActionDataFull>(UI_ACTION_LAN_CHAT_CHANNEL_LIST);
 	add<UI_ActionDataAction>(UI_ACTION_LAN_CHAT_CHANNEL_ENTER);
+	add<UI_ActionDataAction>(UI_ACTION_LAN_CHAT_CLEAR);
 	add<UI_ActionDataUpdate>(UI_ACTION_LAN_CHAT_USER_LIST);
 	add<UI_ActionDataHostList>(UI_ACTION_LAN_GAME_LIST);
 	add<UI_ActionDataAction>(UI_ACTION_LAN_DISCONNECT_SERVER);

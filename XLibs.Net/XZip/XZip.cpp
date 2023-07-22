@@ -23,8 +23,8 @@ public:
 	bool isOpen() const { if(isOutput()) return zipHandle_ != 0; else return !index_.empty(); }
 	bool close();
 
-	bool fileOpen(XZipStream& fh, const char* file_name, unsigned int flags = XZS_IN, int compression_level = 0);
-	bool fileClose(XZipStream& fh);
+	void* fileOpen(const char* file_name, unsigned int flags = XZS_IN, int compression_level = 0);
+	bool fileClose(void* file_handle);
 
 	unsigned long fileRead(void* file_handle, void* buf, unsigned long len);
 	unsigned long fileWrite(void* file_handle, const void* buf, unsigned long len);
@@ -40,23 +40,7 @@ private:
 
 	unzFile zipHandle_;
 
-	class ZLibFileInfo
-	{
-	public:
-		ZLibFileInfo(const unz_file_info& info, const unz_file_pos& pos, const unz_file_seek_info& seek_info) : 
-		  filePos_(pos), seekInfo_(seek_info) {
-			  compressionMethod_ = info.compression_method;
-			  dosDate_ = info.dosDate;
-		  }
-
-		unsigned int compressionMethod_;
-		unsigned int dosDate_;
-
-		unz_file_pos filePos_;
-		unz_file_seek_info seekInfo_;
-	};
-
-	typedef std::hash_map<std::string, ZLibFileInfo, std::hash<std::string> > IndexMap;
+	typedef std::hash_map<std::string, unz_file_pos_s, std::hash<std::string> > IndexMap;
 	IndexMap index_;
 
 	/// имя открытого в данный момент файла
@@ -102,10 +86,6 @@ XZipStream::XZipStream(bool handle_errors) : archive_(0)
 	directReadMode_ = false;
 	directReadPosition_ = 0;
 	directReadEOF_ = false;
-	directReadFromArchive_ = false;
-	directReadStartPosition_ = 0;
-	directReadSize_ = 0;
-	dosDate_ = 0;
 
 	compressionLevel_ = 0;
 }
@@ -122,10 +102,6 @@ XZipStream::XZipStream(const char* name, int flags, bool handle_errors, int comp
 	directReadMode_ = false;
 	directReadPosition_ = 0;
 	directReadEOF_ = false;
-	directReadFromArchive_ = false;
-	directReadStartPosition_ = 0;
-	directReadSize_ = 0;
-	dosDate_ = 0;
 
 	compressionLevel_ = compression_level;
 
@@ -137,29 +113,25 @@ void XZipStream::gettime(unsigned& fdate,unsigned& ftime) const
 	fdate = ftime = 0;
 
 	if(directReadMode_){
-		if(directReadFromArchive_){
-			fdate = dosDate_ >> 16;
-			ftime = dosDate_ & 0xFFFF;
-		}
-		else {
-			unsigned short dt,tm;
-			FILETIME ft;
-			if(!GetFileTime(fileHandle_,0,0,&ft)){
-				if(handleErrors_)
-					zipError(timeMSG, GetFileName());
-				else
-					return;
-			}
+		unsigned short dt,tm;
 
-			if(!FileTimeToDosDateTime(&ft,&dt,&tm)){
-				if(handleErrors_)
-					zipError(timeMSG, GetFileName());
-				else
-					return;
-			}
-			fdate = dt;
-			ftime = tm;
+		FILETIME ft;
+		if(!GetFileTime(fileHandle_,0,0,&ft)){
+			if(handleErrors_)
+				zipError(timeMSG, GetFileName());
+			else
+				return;
 		}
+
+		if(!FileTimeToDosDateTime(&ft,&dt,&tm)){
+			if(handleErrors_)
+				zipError(timeMSG, GetFileName());
+			else
+				return;
+		}
+
+		fdate = dt;
+		ftime = tm;
 	}
 	else {
 		if(archive_)
@@ -204,10 +176,6 @@ void XZipStream::close()
 	if(directReadMode_){
 		directReadPosition_ = 0;
 		directReadEOF_ = false;
-		directReadFromArchive_ = false;
-		directReadStartPosition_ = 0;
-		directReadSize_ = 0;
-		dosDate_ = 0;
 
 		directReadMode_ = false;
 
@@ -220,7 +188,7 @@ void XZipStream::close()
 	}
 	else {
 		if(archive_)
-			archive_->fileClose(*this);
+			archive_->fileClose(fileHandle_);
 
 		archive_ = 0;
 		fileHandle_ = INVALID_HANDLE_VALUE;
@@ -230,18 +198,14 @@ void XZipStream::close()
 long XZipStream::size() const
 {
 	if(directReadMode_){
-		if(!directReadFromArchive_){
-			long sz = GetFileSize(fileHandle_, 0);
-			if(sz == -1L){
-				if(handleErrors_) 
-					zipError(sizeMSG);
-				else 
-					return -1;
-			}
-			return sz;
+		long sz = GetFileSize(fileHandle_, 0);
+		if(sz == -1L){
+			if(handleErrors_) 
+				zipError(sizeMSG);
+			else 
+				return -1;
 		}
-		else
-			return directReadSize_;
+		return sz;
 	}
 	else {
 		if(archive_)
@@ -266,18 +230,6 @@ long XZipStream::tell() const
 long XZipStream::seek(long offset, int dir)
 {
 	if(directReadMode_){
-		if(directReadFromArchive_){
-			switch(dir){
-			case XZS_BEG:
-				offset += directReadStartPosition_;
-				break;
-			case XZS_END:
-				offset = directReadStartPosition_ + directReadSize_ - offset;
-				dir = XZS_BEG;
-				break;
-			}
-		}
-
 		long ret = SetFilePointer(fileHandle_, offset, 0, dir);
 		if(ret == -1){
 			if(handleErrors_)
@@ -285,9 +237,6 @@ long XZipStream::seek(long offset, int dir)
 			else
 				return -1;
 		}
-
-		if(directReadFromArchive_)
-			ret -= directReadStartPosition_;
 
 		if(ret >= size() - 1)
 			directReadEOF_ = true;
@@ -513,18 +462,16 @@ bool ZLibArchive::open(const char* name, XZipOpenMode open_mode)
 		}
 
 		int err = unzGoToFirstFile(zipHandle_);
-		unz_file_pos pos;
-		unz_file_info file_info;
-		unz_file_seek_info seek_info;
+		unz_file_pos_s pos;
 
 		while(err == UNZ_OK){
 			char fname[MAX_PATH];
-			err = unzGetCurrentFileInfo(zipHandle_, &file_info, fname, MAX_PATH, 0, 0, 0, 0);
+			err = unzGetCurrentFileInfo(zipHandle_, 0, fname, MAX_PATH, 0, 0, 0, 0);
 			if(err == UNZ_OK){
-				err = unzGetFileSeekPos(zipHandle_, &pos, &seek_info);
+				err = unzGetFilePos(zipHandle_, &pos);
 				if(err == UNZ_OK){
 					const char* file_name = convertFileName(fname);
-					index_.insert(IndexMap::value_type(file_name, ZLibFileInfo(file_info, pos, seek_info)));
+					index_.insert(IndexMap::value_type(file_name, pos));
 				}
 
 				err = unzGoToNextFile(zipHandle_);
@@ -588,7 +535,7 @@ bool ZLibArchive::close()
 	return true;
 }
 
-bool ZLibArchive::fileOpen(XZipStream& fh, const char* file_name, unsigned int flags, int compression_level)
+void* ZLibArchive::fileOpen(const char* file_name, unsigned int flags, int compression_level)
 {
 	if(!isOpen())
 		return false;
@@ -598,72 +545,42 @@ bool ZLibArchive::fileOpen(XZipStream& fh, const char* file_name, unsigned int f
 			if(handleErrors()) 
 				zipError(openMSG, file_name);
 			else 
-				return false;
+				return 0;
 		}
 
 		const char* fname = convertFileName(file_name);
 
 		IndexMap::iterator it = index_.find(fname);
 		if(it != index_.end()){
-			if(it->second.compressionMethod_){
-				void* handle = unzOpen(zipName_.c_str());
-				if(unzGoToFilePos(handle, &it->second.filePos_) != UNZ_OK){
-					if(handleErrors())
-						zipError(locateMSG, fname);
-					else {
-						unzClose(handle);
-						return false;
-					}
+			void* handle = unzOpen(zipName_.c_str());
+			if(unzGoToFilePos(handle, &it->second) != UNZ_OK){
+				if(handleErrors())
+					zipError(locateMSG, fname);
+				else {
+					unzClose(handle);
+					return 0;
 				}
-
-				if(unzOpenCurrentFile(handle) != UNZ_OK){
-					if(handleErrors()) 
-						zipError(openMSG, zipName_.c_str());
-					else {
-						unzClose(handle);
-						return false;
-					}
-				}
-
-				fh.setZipHandle(handle, this);
-				return true;
 			}
-			else {
-				void* handle = CreateFile(zipName_.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, 0);
 
-				if(handle == INVALID_HANDLE_VALUE){
-					if(handleErrors())
-						zipError(openMSG, zipName_.c_str());
-					else
-						return false;
+			if(unzOpenCurrentFile(handle) != UNZ_OK){
+				if(handleErrors()) 
+					zipError(openMSG, zipName_.c_str());
+				else {
+					unzClose(handle);
+					return 0;
 				}
-
-				SetFilePointer(handle, it->second.seekInfo_.seek_offset, 0, FILE_CURRENT);
-
-				fh.fileHandle_ = handle;
-				fh.directReadPosition_ = 0;
-				fh.directReadEOF_ = false;
-
-				fh.directReadStartPosition_ = it->second.seekInfo_.seek_offset;
-				fh.directReadSize_ = it->second.seekInfo_.seek_size;
-
-				fh.dosDate_ = it->second.dosDate_;
-
-				fh.directReadMode_ = true;
-				fh.directReadFromArchive_ = true;
-
-				return true;
 			}
+			return handle;
 		}
 		else
-			return false;
+			return 0;
 	}
 	else if(flags & XZS_OUT){
 		if(!isOutput()){
 			if(handleErrors()) 
 				zipError(openMSG, file_name);
 			else 
-				return false;
+				return 0;
 		}
 
 		fileName_ = file_name;
@@ -683,25 +600,23 @@ bool ZLibArchive::fileOpen(XZipStream& fh, const char* file_name, unsigned int f
 		inf.tmz_date.tm_mon = tm.wMonth - 1;
 		inf.tmz_date.tm_year = tm.wYear;
 
-		if(!zipOpenNewFileInZip(zipHandle_, file_name, &inf, 0, 0, 0, 0, 0, compressionLevel() ? Z_DEFLATED : 0, compressionLevel())){
-			fh.setZipHandle(zipHandle_, this);
-			return true;
-		}
+		if(!zipOpenNewFileInZip(zipHandle_, file_name, &inf, 0, 0, 0, 0, 0, compressionLevel() ? Z_DEFLATED : 0, compressionLevel()))
+			return zipHandle_;
 	}
 
-	return false;
+	return 0;
 }
 
-bool ZLibArchive::fileClose(XZipStream& fh)
+bool ZLibArchive::fileClose(void* file_handle)
 {
 	if(isInput()){
-		if(unzCloseCurrentFile(fh.fileHandle_) == UNZ_OK){
-			unzClose(fh.fileHandle_);
+		if(unzCloseCurrentFile(file_handle) == UNZ_OK){
+			unzClose(file_handle);
 			return true;
 		}
 	}
 	else {
-		if(!zipCloseFileInZip(fh.fileHandle_))
+		if(!zipCloseFileInZip(file_handle))
 			return true;
 	}
 
@@ -797,7 +712,7 @@ long ZLibArchive::fileSeek(void* file_handle, long offset, int dir)
 		static char buf[buf_size];
 		long delta = dest_pos - pos;
 		while(pos < dest_pos){
-			pos += fileRead(file_handle, buf, (delta > buf_size) ? buf_size : delta);
+			pos = fileRead(file_handle, buf, (delta > buf_size) ? buf_size : delta);
 			delta -= buf_size;
 		}
 		return pos;
@@ -904,13 +819,17 @@ bool XZipArchiveManager::fileOpen(XZipStream& fh, const char* file_name, unsigne
 {
 	if(flags & XZS_IN){
 		for(Archives::iterator it = archives_.begin(); it != archives_.end(); ++it){
-			if((*it)->fileOpen(fh, file_name, flags, compression_level))
+			if(void* file_handle = (*it)->fileOpen(file_name, flags, compression_level)){
+				fh.setZipHandle(file_handle, *it);
 				return true;
+			}
 		}
 	}
 	else {
-		if(outputArchive_->fileOpen(fh, file_name, flags, compression_level))
+		if(void* file_handle = outputArchive_->fileOpen(file_name, flags, compression_level)){
+			fh.setZipHandle(file_handle, outputArchive_);
 			return true;
+		}
 	}
 
 	return false;

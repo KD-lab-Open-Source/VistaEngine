@@ -1,24 +1,24 @@
 # -*- makefile -*- Time-stamp: <04/03/16 17:23:52 ptr>
-# $Id: rules-install-a.mak 1952 2005-12-09 21:46:16Z dums $
+# $Id: rules-install-a.mak,v 1.1.2.2 2005/11/01 07:17:21 complement Exp $
 
 PHONY += install-release-static install-dbg-static install-stldbg-static
 
-ifneq (windows, $(OSNAME))
-install-release-static: release-static $(INSTALL_LIB_DIR)
+install-static: install-release-static install-dbg-static install-stldbg-static
+
+install-release-static:	release-static
+	@if [ ! -d $(INSTALL_LIB_DIR) ] ; then \
+	  mkdir -p $(INSTALL_LIB_DIR) ; \
+	fi
 	$(INSTALL_A) ${A_NAME_OUT} $(INSTALL_LIB_DIR)
 
-install-dbg-static: dbg-static $(INSTALL_LIB_DIR_DBG)
+install-dbg-static:	dbg-static
+	@if [ ! -d $(INSTALL_LIB_DIR_DBG) ] ; then \
+	  mkdir -p $(INSTALL_LIB_DIR_DBG) ; \
+	fi
 	$(INSTALL_A) ${A_NAME_OUT_DBG} $(INSTALL_LIB_DIR_DBG)
 
-install-stldbg-static: stldbg-static $(INSTALL_LIB_DIR_STLDBG)
+install-stldbg-static:	stldbg-static
+	@if [ ! -d $(INSTALL_LIB_DIR_STLDBG) ] ; then \
+	  mkdir -p $(INSTALL_LIB_DIR_STLDBG) ; \
+	fi
 	$(INSTALL_A) ${A_NAME_OUT_STLDBG} $(INSTALL_LIB_DIR_STLDBG)
-else
-install-release-static: release-static $(INSTALL_LIB_DIR)
-	$(INSTALL_A) $(subst /,\,$(A_NAME_OUT) $(INSTALL_LIB_DIR)/)
-
-install-dbg-static: dbg-static $(INSTALL_LIB_DIR_DBG)
-	$(INSTALL_A) $(subst /,\,$(A_NAME_OUT_DBG) $(INSTALL_LIB_DIR_DBG)/)
-
-install-stldbg-static: stldbg-static $(INSTALL_LIB_DIR_STLDBG)
-	$(INSTALL_A) $(subst /,\,$(A_NAME_OUT_STLDBG) $(INSTALL_LIB_DIR_STLDBG)/)
-endif

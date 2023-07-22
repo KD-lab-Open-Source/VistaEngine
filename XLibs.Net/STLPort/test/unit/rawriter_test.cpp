@@ -14,7 +14,7 @@ class X
     X(int i_ = 0) : i(i_) {}
     ~X() {}
     operator int() const { return i; }
-
+ 
   private:
     int i;
 };
@@ -43,7 +43,7 @@ void RawriterTest::rawiter1()
   allocator<X> a;
   typedef X* x_pointer;
   x_pointer save_p, p;
-  p = a.allocate(5);
+  p = a.allocate(5); 
   save_p=p;
   raw_storage_iterator<X*, X> r(p);
   int i;
@@ -56,13 +56,11 @@ void RawriterTest::rawiter1()
   CPPUNIT_ASSERT(*p++ == 3);
   CPPUNIT_ASSERT(*p++ == 4);
 
-//#if defined (STLPORT) || defined (__GNUC__)
-  a.deallocate(save_p, 5);
-/*
-#else
+# ifdef _STLPORT_VERSION
+  a.deallocate(save_p,5);
+# else
   a.deallocate(save_p);
-#endif
-*/
+# endif
 
   CPPUNIT_ASSERT(true);
 }

@@ -2,26 +2,25 @@
  * Copyright (c) 1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
  * modified is included with the above copyright notice.
  *
- */
+ */ 
 
-#include "stlport_prefix.h"
+# include "stlport_prefix.h"
 
 #include <algorithm>
-#include <locale>
-#include <functional>
-
+#include <stl/_ctype.h>
+#include <stl/_function.h>
 #include "c_locale.h"
 
 _STLP_BEGIN_NAMESPACE
@@ -31,33 +30,33 @@ _STLP_BEGIN_NAMESPACE
 
 // The classic table: static data members.
 
-#if !defined(_STLP_STATIC_CONST_INIT_BUG) && !(defined(__MRC__) || defined(__SC__))
+# if !defined(_STLP_STATIC_CONST_INIT_BUG) && !(defined(__MRC__) || defined(__SC__))
 //*TY 02/25/2000 - added workaround for MPW compilers; they confuse on in-class static const
 const size_t ctype<char>::table_size;
-#endif
+# endif
 
 // This macro is specifically for platforms where isprint() relies
 // on separate flag
 
-#define PRINTFLAG ctype_base::mask( _Locale_PRINT & ~(_Locale_UPPER | _Locale_LOWER | _Locale_ALPHA | _Locale_DIGIT | _Locale_PUNCT | _Locale_SPACE | _Locale_XDIGIT ))
+# define PRINTFLAG ctype_base::mask( _Locale_PRINT & ~(_Locale_UPPER | _Locale_LOWER | _Locale_ALPHA | _Locale_DIGIT | _Locale_PUNCT | _Locale_SPACE | _Locale_XDIGIT )) 
 
-const ctype_base::mask*
+const ctype_base::mask* 
 ctype<char>::classic_table() _STLP_NOTHROW {
   /* Ctype table for the ASCII character set.
-   * There are 257 entries in this table.  The first is EOF (-1).
+   * There are 257 entries in this table.  The first is EOF (-1).  
    * That is, the "table" seen by ctype<char> member functions is
    * _S_classic_table + 1.
    */
   /* The following static assert check that alpha is not defined as upper | lower.
-   * STLport flags character like 'a' with alpha | lower, if alpha is badly configure
+   * STLport flag character like 'a' with alpha | lower, if alpha is badly configure
    * then 'a' will also be seen as upper which is wrong.
    */
-#if !defined (__MWERKS__)
+#ifndef __MWERKS__
   /* CodeWarrior 8 don't understabd this */
-  _STLP_STATIC_ASSERT((alpha & (lower | upper)) == 0)
+  typedef char __static_assert[(alpha & (lower | upper)) == 0];
 #endif
 
-  static const ctype_base::mask _S_classic_table[table_size] =
+  static const ctype_base::mask _S_classic_table[table_size] = 
   {
     cntrl /* null */,
     cntrl /* ^A */,
@@ -286,22 +285,17 @@ const unsigned char _S_lower[ctype<char>::table_size] =
 };
 
 //An helper struct to check wchar_t index without generating warnings
-//under some compilers (gcc) because of a limited range of value
+//under some compilers (gcc) because of a limited range of value 
 //(when wchar_t is unsigned)
 template <bool _IsSigned>
 struct _WCharIndexT;
 
-#if !defined (__BORLANDC__) && \
-    !(defined (__GNUC__) && (defined (__MINGW32__) || defined (__CYGWIN__))) && \
-    !defined (__ICL)
 _STLP_TEMPLATE_NULL
 struct _WCharIndexT<true> {
   static bool in_range(wchar_t c, size_t upperBound) {
     return c >= 0 && size_t(c) < upperBound;
   }
 };
-#endif
-
 _STLP_TEMPLATE_NULL
 struct _WCharIndexT<false> {
   static bool in_range(wchar_t c, size_t upperBound) {
@@ -316,26 +310,26 @@ typedef _WCharIndexT<wchar_t(-1) < 0> _WCharIndex;
 struct _Ctype_is_mask {
   typedef char argument_type;
   typedef bool result_type;
-
+  
   ctype_base::mask _Mask;
   const ctype_base::mask* _M_table;
-
+  
   _Ctype_is_mask(ctype_base::mask __m, const ctype_base::mask* __t) : _Mask(__m), _M_table(__t) {}
-  bool operator()(char __c) const { return (_M_table[(unsigned char) __c] & _Mask) != 0; }
+  bool operator()(char __c) const { return (_M_table[(unsigned char) __c] & _Mask) == _Mask; }
 };
 
 struct _Ctype_not_mask {
   typedef char argument_type;
   typedef bool result_type;
-
+  
   ctype_base::mask _Mask;
   const ctype_base::mask* _M_table;
-
+  
   _Ctype_not_mask(ctype_base::mask __m, const ctype_base::mask* __t) : _Mask(__m), _M_table(__t) {}
-  bool operator()(char __c) const { return (_M_table[(unsigned char) __c] & _Mask) == 0; }
+  bool operator()(char __c) const { return (_M_table[(unsigned char) __c] & _Mask) != _Mask; }
 };
-
-ctype<char>::ctype(const ctype_base::mask * __tab, bool __del, size_t __refs) :
+ 
+ctype<char>::ctype(const ctype_base::mask * __tab, bool __del, size_t __refs) : 
   locale::facet(__refs),
   _M_ctype_table(__tab ? __tab : classic_table()),
   _M_delete(__tab && __del)
@@ -351,7 +345,7 @@ ctype<char>::scan_is(ctype_base::mask  __m, const char* __low, const char* __hig
   return _STLP_STD::find_if(__low, __high, _Ctype_is_mask(__m, _M_ctype_table));
 }
 
-const char*
+const char* 
 ctype<char>::scan_not(ctype_base::mask  __m, const char* __low, const char* __high) const {
   return _STLP_STD::find_if(__low, __high, _Ctype_not_mask(__m, _M_ctype_table));
 }
@@ -365,29 +359,29 @@ const char* ctype<char>::do_toupper(char* __low, const char* __high) const {
   for ( ; __low < __high; ++__low)
     *__low = (char) _S_upper[(unsigned char) *__low];
   return __high;
-}
+}  
 const char* ctype<char>::do_tolower(char* __low, const char* __high) const {
   for ( ; __low < __high; ++__low)
     *__low = (char) _S_lower[(unsigned char) *__low];
   return __high;
 }
 
-char
+char        
 ctype<char>::do_widen(char __c) const { return __c; }
 
-const char*
+const char* 
 ctype<char>::do_widen(const char* __low, const char* __high,
                       char* __to) const {
-  _STLP_PRIV __copy_trivial(__low, __high, __to);
-  return __high;
+  __copy_trivial(__low, __high, __to);
+  return __high;    
 }
 char
 ctype<char>::do_narrow(char __c, char /* dfault */ ) const { return __c; }
-const char*
+const char* 
 ctype<char>::do_narrow(const char* __low, const char* __high,
                        char /* dfault */, char* __to) const {
-  _STLP_PRIV __copy_trivial(__low, __high, __to);
-  return __high;
+  __copy_trivial(__low, __high, __to);
+  return __high; 
 }
 
 
@@ -399,7 +393,7 @@ ctype<char>::do_narrow(const char* __low, const char* __high,
 
     ctype_base::mask M;
     const ctype_base::mask* table;
-
+    
     _Ctype_w_is_mask(ctype_base::mask m, const ctype_base::mask* t)
       : M(m), table(t) {}
     bool operator()(wchar_t c) const {
@@ -447,7 +441,7 @@ wchar_t ctype<wchar_t>::do_toupper(wchar_t c) const {
                                                            : c;
 }
 
-const wchar_t*
+const wchar_t* 
 ctype<wchar_t>::do_toupper(wchar_t* low, const wchar_t* high) const {
   for ( ; low < high; ++low) {
     wchar_t c = *low;
@@ -462,7 +456,7 @@ wchar_t ctype<wchar_t>::do_tolower(wchar_t c) const {
                                                            : c;
 }
 
-const wchar_t*
+const wchar_t* 
 ctype<wchar_t>::do_tolower(wchar_t* low, const wchar_t* high) const {
   for ( ; low < high; ++low) {
     wchar_t c = *low;
@@ -476,7 +470,7 @@ wchar_t ctype<wchar_t>::do_widen(char c) const {
   return (wchar_t)(unsigned char)c;
 }
 
-const char*
+const char* 
 ctype<wchar_t>::do_widen(const char* low, const char* high,
                          wchar_t* dest) const {
   while (low != high)

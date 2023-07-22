@@ -1,6 +1,6 @@
 /***********************************************************************************
   SortClass.h
-
+  
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -11,11 +11,11 @@
  * in supporting documentation.  Mark of the Unicorn makes no
  * representations about the suitability of this software for any
  * purpose.  It is provided "as is" without express or implied warranty.
-
+    
     SUMMARY: A class designed to test operations that compares objects. All
       comparisons on SortClass may fail. Also records its own address for
       the sake of testing the stability of sorting algorithms.
-
+    
 ***********************************************************************************/
 #if ! defined (INCLUDED_MOTU_SortClass)
 #define INCLUDED_MOTU_SortClass 1
@@ -30,22 +30,22 @@ public:
 
   SortClass( int v ) : TestClass( v ), addr(this) {}
   SortClass() : TestClass( (int)get_random(kRange) ), addr(this) {}
-
+  
   bool operator<( const TestClass& rhs ) const
   {
     simulate_possible_failure();
     return (const TestClass&)*this < ( rhs );
   }
-
+  
   bool operator==( const TestClass& rhs ) const
   {
     simulate_possible_failure();
     return (const TestClass&)*this == ( rhs );
   }
-
+  
   SortClass* GetAddress() const { return addr; }
   void ResetAddress() { addr = this; }
-
+  
 private:
   SortClass* addr;
 };

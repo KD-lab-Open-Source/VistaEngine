@@ -868,12 +868,11 @@ void GrassMap::serialize(Archive& ar)
 	ar.closeBlock();
 	hideDistance2_ = hideDistance_*hideDistance_;
 	invHideDistance2_ = 1/hideDistance2_;
-	if(ar.isInput())
-	{
+	if(ar.isInput()){
 		InitTextures();
 		GenerateGrass();
 	}
-	if (ar.isOutput())
+	if(!ar.isEdit() && ar.isOutput())
 		SaveMap();
 }
 

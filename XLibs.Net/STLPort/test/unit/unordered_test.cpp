@@ -1,12 +1,8 @@
 #include <vector>
 #include <algorithm>
 #include <string>
-#if defined (STLPORT)
-#  include <unordered_map>
-#  include <unordered_set>
-#endif
-
-//#include <iostream>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "cppunit/cppunit_proxy.h"
 
@@ -20,32 +16,13 @@ using namespace std;
 class UnorderedTest : public CPPUNIT_NS::TestCase
 {
   CPPUNIT_TEST_SUITE(UnorderedTest);
-#if !defined (STLPORT) 
-  CPPUNIT_IGNORE;
-#endif
   CPPUNIT_TEST(uset);
   CPPUNIT_TEST(umultiset);
-#if defined (__DMC__)
-  CPPUNIT_IGNORE;
-#endif
   CPPUNIT_TEST(umap);
-  CPPUNIT_STOP_IGNORE;
   CPPUNIT_TEST(umultimap);
-#if defined (__DMC__)
-  CPPUNIT_IGNORE;
-#endif
   CPPUNIT_TEST(user_case);
-  CPPUNIT_STOP_IGNORE;
   CPPUNIT_TEST(hash_policy);
   CPPUNIT_TEST(buckets);
-#if defined (__DMC__)
-  CPPUNIT_IGNORE;
-#endif
-  CPPUNIT_TEST(equal_range);
-#if !defined (_STLP_USE_CONTAINERS_EXTENSION)
-  CPPUNIT_IGNORE;
-#endif
-  CPPUNIT_TEST(template_methods);
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -56,8 +33,6 @@ protected:
   void user_case();
   void hash_policy();
   void buckets();
-  void equal_range();
-  void template_methods();
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(UnorderedTest);
@@ -69,7 +44,6 @@ const int NB_ELEMS = 2000;
 //
 void UnorderedTest::uset()
 {
-#if defined (STLPORT)
   typedef unordered_set<int, hash<int>, equal_to<int> > usettype;
   usettype us;
 
@@ -114,12 +88,10 @@ void UnorderedTest::uset()
   for (i = 0; i < NB_ELEMS; ++i) {
     CPPUNIT_ASSERT( us_val[i] == i );
   }
-#endif
 }
 
 void UnorderedTest::umultiset()
 {
-#if defined (STLPORT)
   typedef unordered_multiset<int, hash<int>, equal_to<int> > usettype;
   usettype us;
 
@@ -153,12 +125,10 @@ void UnorderedTest::umultiset()
     CPPUNIT_ASSERT( us_val[2 * i] == i );
     CPPUNIT_ASSERT( us_val[2 * i + 1] == i );
   }
-#endif
 }
 
 void UnorderedTest::umap()
 {
-#if defined (STLPORT) && !defined (__DMC__)
   typedef unordered_map<int, int, hash<int>, equal_to<int> > umaptype;
   umaptype us;
 
@@ -181,12 +151,12 @@ void UnorderedTest::umap()
   int i;
   pair<umaptype::iterator, bool> ret;
   for (i = 0; i < NB_ELEMS; ++i) {
-    umaptype::value_type p1(i, i);
+    pair<const int, int> p1(i, i);
     ret = us.insert(p1);
     CPPUNIT_ASSERT( ret.second );
     CPPUNIT_ASSERT( *ret.first == p1 );
 
-    umaptype::value_type p2(i, i + 1);
+    pair<const int, int> p2(i, i + 1);
     ret = us.insert(p2);
     CPPUNIT_ASSERT( !ret.second );
     CPPUNIT_ASSERT( *ret.first == p1 );
@@ -214,7 +184,7 @@ void UnorderedTest::umap()
     umaptype::size_type bucket_pos = us.bucket((*lit).first);
     for (; lit != litEnd; ++lit) {
       CPPUNIT_ASSERT( us.bucket((*lit).first) == bucket_pos );
-      us_val.push_back(make_pair((*lit).first, (*lit).second));
+      us_val.push_back(*lit);
     }
   }
 
@@ -222,19 +192,17 @@ void UnorderedTest::umap()
   for (i = 0; i < NB_ELEMS; ++i) {
     CPPUNIT_ASSERT( us_val[i] == make_pair(i, i) );
   }
-#endif
 }
 
 void UnorderedTest::umultimap()
 {
-#if defined (STLPORT)
   typedef unordered_multimap<int, int, hash<int>, equal_to<int> > umaptype;
   umaptype us;
 
   int i;
   umaptype::iterator ret;
   for (i = 0; i < NB_ELEMS; ++i) {
-    umaptype::value_type p(i, i);
+    pair<const int, int> p(i, i);
     ret = us.insert(p);
     CPPUNIT_ASSERT( *ret == p );
 
@@ -260,29 +228,27 @@ void UnorderedTest::umultimap()
 
   sort(us_val.begin(), us_val.end());
   for (i = 0; i < NB_ELEMS; ++i) {
-    ptype p(i, i);
+    pair<int, int> p(i, i);
     CPPUNIT_ASSERT( us_val[i * 2] == p );
     CPPUNIT_ASSERT( us_val[i * 2 + 1] == p );
   }
-#endif
 }
 
 void UnorderedTest::user_case()
 {
-#if defined (STLPORT) && !defined (__DMC__)
   typedef unordered_map<int, string> UnorderedMap1;
   typedef unordered_map<int, UnorderedMap1> UnorderedMap2;
 
   UnorderedMap1 foo;
   UnorderedMap2 bar;
 
-  foo.insert(UnorderedMap1::value_type(1, string("test1")));
-  foo.insert(UnorderedMap1::value_type(2, string("test2")));
-  foo.insert(UnorderedMap1::value_type(3, string("test3")));
-  foo.insert(UnorderedMap1::value_type(4, string("test4")));
-  foo.insert(UnorderedMap1::value_type(5, string("test5")));
+  foo.insert(make_pair(1, string("test1")));
+  foo.insert(make_pair(2, string("test2")));
+  foo.insert(make_pair(3, string("test3")));
+  foo.insert(make_pair(4, string("test4")));
+  foo.insert(make_pair(5, string("test5")));
 
-  bar.insert(UnorderedMap2::value_type(0, foo));
+  bar.insert(make_pair(0, foo));
   UnorderedMap2::iterator it = bar.find(0);
   CPPUNIT_ASSERT( it != bar.end() );
 
@@ -292,12 +258,10 @@ void UnorderedTest::user_case()
 
   body.erase(body.begin(), body.end());
   CPPUNIT_ASSERT( body.empty() );
-#endif
 }
 
 void UnorderedTest::hash_policy()
 {
-#if defined (STLPORT)
   unordered_set<int> int_uset;
 
   CPPUNIT_ASSERT( int_uset.max_load_factor() == 1.0f );
@@ -316,15 +280,10 @@ void UnorderedTest::hash_policy()
   size_t bucketsHint = int_uset.bucket_count() + 1;
   int_uset.rehash(bucketsHint);
   CPPUNIT_ASSERT( int_uset.bucket_count() >= bucketsHint );
-
-  CPPUNIT_ASSERT( int_uset.key_eq()(10, 10) );
-  CPPUNIT_ASSERT( int_uset.hash_function()(10) == 10 );
-#endif
 }
 
 void UnorderedTest::buckets()
 {
-#if defined (STLPORT) 
   unordered_set<int> int_uset;
 
   CPPUNIT_ASSERT( int_uset.bucket_count() < int_uset.max_bucket_count() );
@@ -342,257 +301,4 @@ void UnorderedTest::buckets()
     bucketSizes += int_uset.bucket_size(i);
   }
   CPPUNIT_ASSERT( bucketSizes == int_uset.size() );
-#endif
-}
-
-void UnorderedTest::equal_range()
-{
-#if defined (STLPORT) && !defined (__DMC__)
-  typedef unordered_multiset<size_t> umset;
-  {
-    //General test
-    umset iumset;
-    iumset.max_load_factor(10.0f);
-
-    size_t nbBuckets = iumset.bucket_count();
-
-    for (size_t i = 0; i < nbBuckets; ++i) {
-      iumset.insert(i);
-      iumset.insert(i + nbBuckets);
-      iumset.insert(i + 2 * nbBuckets);
-      iumset.insert(i + 3 * nbBuckets);
-      iumset.insert(i + 4 * nbBuckets);
-    }
-
-    CPPUNIT_ASSERT( nbBuckets == iumset.bucket_count() );
-    CPPUNIT_ASSERT( iumset.size() == 5 * nbBuckets );
-
-    pair<umset::iterator, umset::iterator> p = iumset.equal_range(1);
-    CPPUNIT_ASSERT( p.first != p.second );
-
-    size_t nbElems = iumset.size();
-    nbElems -= distance(p.first, p.second);
-    for (umset::iterator j = p.first; j != p.second;) {
-      iumset.erase(j++);
-    }
-
-    CPPUNIT_ASSERT( nbElems == iumset.size() );
-
-    p = iumset.equal_range(2);
-    CPPUNIT_ASSERT( p.first != p.second );
-    nbElems -= distance(p.first, p.second);
-    iumset.erase(p.first, p.second);
-    CPPUNIT_ASSERT( nbElems == iumset.size() );
-  }
-
-  {
-    //More specific test that tries to put many values in the same bucket
-    umset iumset;
-
-    size_t i;
-    const size_t nbBuckets = iumset.bucket_count();
-    const size_t targetedBucket = nbBuckets / 2;
-
-    //Lets put 10 values in the targeted bucket:
-    for (i = 0; i < 10; ++i) {
-      iumset.insert(targetedBucket + (i * nbBuckets));
-    }
-
-    //We put again 10 values in the targeted bucket and in reverse order:
-    for (i = 9; i <= 10; --i) {
-      iumset.insert(targetedBucket + (i * nbBuckets));
-    }
-
-    //Now we put some more elements until hash container is resized:
-    i = 0;
-    while (iumset.bucket_count() == nbBuckets) {
-      iumset.insert(i++);
-    }
-
-    //CPPUNIT_ASSERT( iumset.bucket_size(targetedBucket) == 21 );
-
-    pair<umset::iterator, umset::iterator> p = iumset.equal_range(targetedBucket);
-    CPPUNIT_ASSERT( p.first != p.second );
-    CPPUNIT_ASSERT( distance(p.first, p.second) == 3 );
-  }
-
-  {
-    srand(0);
-    for (int runs = 0; runs < 2; ++runs) {
-      size_t magic = rand();
-      umset hum;
-      size_t c = 0;
-      for (int i = 0; i < 10000; ++i) {
-        if ((rand() % 500) == 0) {
-          hum.insert(magic);
-          ++c;
-        }
-        else {
-          size_t r;
-          while ((r = rand()) == magic);
-          hum.insert(r);
-        }
-
-        /*
-        if ((float)(hum.size() + 1) / (float)hum.bucket_count() > hum.max_load_factor()) {
-          cout << "Hash container dump: Nb elems: " << hum.size() << ", Nb buckets: " << hum.bucket_count() << "\n";
-          for (size_t b = 0; b < hum.bucket_count(); ++b) {
-            if (hum.bucket_size(b) != 0) {
-              umset::local_iterator litBegin(hum.begin(b)), litEnd(hum.end(b));
-              cout << "B" << b << ": ";
-              for (umset::local_iterator lit = litBegin; lit != litEnd; ++lit) {
-                if (lit != litBegin) {
-                  cout << " - ";
-                }
-                cout << *lit;
-              }
-              cout << "\n";
-            }
-          }
-          cout << endl;
-        }
-        */
-      }
-      CPPUNIT_ASSERT( hum.count(magic) == c );
-    }
-  }
-#endif
-}
-
-struct Key
-{
-  Key() : m_data(0) {}
-  explicit Key(int data) : m_data(data) {}
-
-  int m_data;
-};
-
-struct KeyHash
-{
-  size_t operator () (Key key) const
-  { return (size_t)key.m_data; }
-
-  size_t operator () (int data) const
-  { return (size_t)data; }
-};
-
-struct KeyEqual
-{
-  bool operator () (Key lhs, Key rhs) const
-  { return lhs.m_data == rhs.m_data; }
-
-  bool operator () (Key lhs, int rhs) const
-  { return lhs.m_data == rhs; }
-
-  bool operator () (int lhs, Key rhs) const
-  { return lhs == rhs.m_data; }
-};
-
-struct KeyHashPtr
-{
-  size_t operator () (Key const volatile *key) const
-  { return (size_t)key->m_data; }
-
-  size_t operator () (int data) const
-  { return (size_t)data; }
-};
-
-struct KeyEqualPtr
-{
-  bool operator () (Key const volatile *lhs, Key const volatile *rhs) const
-  { return lhs->m_data == rhs->m_data; }
-
-  bool operator () (Key const volatile *lhs, int rhs) const
-  { return lhs->m_data == rhs; }
-
-  bool operator () (int lhs, Key const volatile *rhs) const
-  { return lhs == rhs->m_data; }
-};
-
-void UnorderedTest::template_methods()
-{
-#if defined (STLPORT) && defined (_STLP_USE_CONTAINERS_EXTENSION)
-  {
-    typedef unordered_set<Key, KeyHash, KeyEqual> Container;
-    Container cont;
-    cont.insert(Key(1));
-    cont.insert(Key(2));
-    cont.insert(Key(3));
-    cont.insert(Key(4));
-
-    CPPUNIT_ASSERT( cont.count(Key(1)) == 1 );
-    CPPUNIT_ASSERT( cont.count(1) == 1 );
-    CPPUNIT_ASSERT( cont.count(5) == 0 );
-
-    CPPUNIT_ASSERT( cont.find(2) != cont.end() );
-    CPPUNIT_ASSERT( cont.equal_range(2) != make_pair(cont.begin(), cont.end()) );
-
-    Container const& ccont = cont;
-    CPPUNIT_ASSERT( ccont.find(2) != ccont.end() );
-    CPPUNIT_ASSERT( ccont.bucket(2) == ccont.bucket(2) );
-    CPPUNIT_ASSERT( ccont.equal_range(2) != make_pair(ccont.begin(), ccont.end()) );
-  }
-
-  {
-    typedef unordered_set<Key*, KeyHashPtr, KeyEqualPtr> Container;
-    Container cont;
-    Key key1(1), key2(2), key3(3), key4(4);
-    cont.insert(&key1);
-    cont.insert(&key2);
-    cont.insert(&key3);
-    cont.insert(&key4);
-
-    CPPUNIT_ASSERT( cont.count(1) == 1 );
-    CPPUNIT_ASSERT( cont.count(5) == 0 );
-
-    CPPUNIT_ASSERT( cont.find(2) != cont.end() );
-    CPPUNIT_ASSERT( cont.equal_range(2) != make_pair(cont.begin(), cont.end()) );
-
-    Container const& ccont = cont;
-    CPPUNIT_ASSERT( ccont.find(2) != ccont.end() );
-    CPPUNIT_ASSERT( ccont.bucket(2) == ccont.bucket(2) );
-    CPPUNIT_ASSERT( ccont.equal_range(2) != make_pair(ccont.begin(), ccont.end()) );
-  }
-  {
-    typedef unordered_multiset<Key, KeyHash, KeyEqual> Container;
-    Container cont;
-    cont.insert(Key(1));
-    cont.insert(Key(2));
-    cont.insert(Key(1));
-    cont.insert(Key(2));
-
-    CPPUNIT_ASSERT( cont.count(Key(1)) == 2 );
-    CPPUNIT_ASSERT( cont.count(1) == 2 );
-    CPPUNIT_ASSERT( cont.count(5) == 0 );
-
-    CPPUNIT_ASSERT( cont.find(2) != cont.end() );
-    CPPUNIT_ASSERT( cont.equal_range(1) != make_pair(cont.end(), cont.end()) );
-
-    Container const& ccont = cont;
-    CPPUNIT_ASSERT( ccont.find(2) != ccont.end() );
-    CPPUNIT_ASSERT( ccont.bucket(2) == ccont.bucket(2) );
-    CPPUNIT_ASSERT( ccont.equal_range(2) != make_pair(ccont.end(), ccont.end()) );
-  }
-
-  {
-    typedef unordered_multiset<Key const volatile*, KeyHashPtr, KeyEqualPtr> Container;
-    Container cont;
-    Key key1(1), key2(2), key3(3), key4(4);
-    cont.insert(&key1);
-    cont.insert(&key2);
-    cont.insert(&key3);
-    cont.insert(&key4);
-
-    CPPUNIT_ASSERT( cont.count(1) == 1 );
-    CPPUNIT_ASSERT( cont.count(5) == 0 );
-
-    CPPUNIT_ASSERT( cont.find(2) != cont.end() );
-    CPPUNIT_ASSERT( cont.equal_range(2) != make_pair(cont.begin(), cont.end()) );
-
-    Container const& ccont = cont;
-    CPPUNIT_ASSERT( ccont.find(2) != ccont.end() );
-    CPPUNIT_ASSERT( ccont.bucket(2) == ccont.bucket(2) );
-    CPPUNIT_ASSERT( ccont.equal_range(2) != make_pair(ccont.begin(), ccont.end()) );
-  }
-#endif
 }

@@ -16,25 +16,27 @@ class MemFunPtrTest : public CPPUNIT_NS::TestCase
 {
   CPPUNIT_TEST_SUITE(MemFunPtrTest);
   CPPUNIT_TEST(mem_ptr_fun);
-#if defined (STLPORT) && !defined (_STLP_CLASS_PARTIAL_SPECIALIZATION)
+#if !defined (STLPORT) || defined (_STLP_CLASS_PARTIAL_SPECIALIZATION)
   //This test require partial template specialization feature to avoid the
   //reference to reference problem. No workaround yet for limited compilers.
-  CPPUNIT_IGNORE;
-#endif
   CPPUNIT_TEST(find);
+#endif
   CPPUNIT_TEST_SUITE_END();
 
 protected:
+#if !defined (STLPORT) || defined (_STLP_CLASS_PARTIAL_SPECIALIZATION)
+  // See comment above
+  void find();
+#endif
   // compile test not neccessary to run but...
   void mem_ptr_fun();
-  void find();
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(MemFunPtrTest);
 
 #if defined(_STLP_DONT_RETURN_VOID) && (defined(_STLP_NO_MEMBER_TEMPLATE_CLASSES) && defined(_STLP_NO_CLASS_PARTIAL_SPECIALIZATION))
 #  define _STLP_DONT_TEST_RETURN_VOID
-#endif
+#endif /*_STLP_DONT_RETURN_VOID*/
 //else there is no workaround for the return void bug
 
 struct S1 { } s1;
@@ -176,6 +178,7 @@ void Class::vf0c() const
 void Class::vf1c(const S1&) const
 {}
 
+#if !defined (STLPORT) || defined (_STLP_CLASS_PARTIAL_SPECIALIZATION)
 struct V {
   public:
     V(int _v) :
@@ -185,14 +188,10 @@ struct V {
   bool f( int _v ) const { return (v == _v); }
 
   int v;
-#if defined (__DMC__)
-  V(){}
-#endif
 };
 
 void MemFunPtrTest::find()
 {
-#if !defined (STLPORT) || defined (_STLP_CLASS_PARTIAL_SPECIALIZATION)
   vector<V> v;
 
   v.push_back( V(1) );
@@ -222,8 +221,9 @@ void MemFunPtrTest::find()
   vector<V>::iterator k = find_if( v.begin(), v.end(), bind2nd( mem_fun_ref( &V::f ), 2 ) );
   CPPUNIT_ASSERT(k != v.end());
   CPPUNIT_ASSERT(k->v == 2);
-#endif
 }
+#endif
+
 
 #ifdef _STLP_DONT_TEST_RETURN_VOID
 #  undef _STLP_DONT_TEST_RETURN_VOID

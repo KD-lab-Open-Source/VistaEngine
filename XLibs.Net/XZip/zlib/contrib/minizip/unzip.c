@@ -920,29 +920,6 @@ extern int ZEXPORT unzGetFilePos(file, file_pos)
     return UNZ_OK;
 }
 
-extern int ZEXPORT unzGetFileSeekPos(file, file_pos, seek_info)
-    unzFile file;
-    unz_file_pos* file_pos;
-	unz_file_seek_info* seek_info;
-{
-    unz_s* s;
-
-    if (file==NULL || file_pos==NULL)
-        return UNZ_PARAMERROR;
-    s=(unz_s*)file;
-    if (!s->current_file_ok)
-        return UNZ_END_OF_LIST_OF_FILE;
-
-    file_pos->pos_in_zip_directory  = s->pos_in_central_dir;
-    file_pos->num_of_file           = s->num_file;
-
-//	seek_info->compression_method = s->cur_file_info.compression_method;
-	seek_info->seek_offset = s->cur_file_info_internal.offset_curfile + SIZEZIPLOCALHEADER + s->cur_file_info.size_filename + s->cur_file_info.size_file_extra;
-	seek_info->seek_size = s->cur_file_info.compressed_size;
-
-    return UNZ_OK;
-}
-
 extern int ZEXPORT unzGoToFilePos(file, file_pos)
     unzFile file;
     unz_file_pos* file_pos;

@@ -5,7 +5,6 @@
 #  include <iomanip>
 #  include <sstream>
 #  include <vector>
-#  include <memory>
 
 #  include "full_streambuf.h"
 #  include "cppunit/cppunit_proxy.h"
@@ -18,11 +17,10 @@ using namespace std;
 //size in Go
 //#define CHECK_BIG_FILE 4
 
-#  if !defined (STLPORT) || !defined (_STLP_NO_CUSTOM_IO) && !defined (_STLP_NO_MEMBER_TEMPLATES) && \
-                            !((defined (_STLP_MSVC) && (_STLP_MSVC < 1300)) || \
-                              (defined (__GNUC__) && (__GNUC__ < 3)) || \
-                              (defined (__SUNPRO_CC)) || \
-                              (defined (__DMC__) && defined (_DLL)))
+#  if !defined(STLPORT) || !( (defined(_STLP_MSVC) && (_STLP_MSVC < 1300)) || \
+                              (defined(__GNUC__) && (__GNUC__ < 3)) || \
+                              (defined(__SUNPRO_CC)) \
+                            )
 #    define DO_CUSTOM_FACET_TEST
 #  endif
 
@@ -40,19 +38,14 @@ class FstreamTest : public CPPUNIT_NS::TestCase
   CPPUNIT_TEST(tellg);
   CPPUNIT_TEST(buf);
   CPPUNIT_TEST(rdbuf);
-#if defined (__DMC__)
-  CPPUNIT_IGNORE;
-#endif
   CPPUNIT_TEST(streambuf_output);
-  CPPUNIT_STOP_IGNORE;
   CPPUNIT_TEST(win32_file_format);
+#  if defined (DO_CUSTOM_FACET_TEST)
+  CPPUNIT_TEST(custom_facet);
+#  endif
 #  if defined (CHECK_BIG_FILE)
   CPPUNIT_TEST(big_file);
 #  endif
-#  if !defined (DO_CUSTOM_FACET_TEST)
-  CPPUNIT_IGNORE;
-#endif
-  CPPUNIT_TEST(custom_facet);
   CPPUNIT_TEST_SUITE_END();
 
   protected:
@@ -66,7 +59,9 @@ class FstreamTest : public CPPUNIT_NS::TestCase
     void rdbuf();
     void streambuf_output();
     void win32_file_format();
+#  if defined (DO_CUSTOM_FACET_TEST)
     void custom_facet();
+#  endif
 #  if defined (CHECK_BIG_FILE)
     void big_file();
 #  endif
@@ -378,7 +373,7 @@ void FstreamTest::win32_file_format()
   }
 }
 
-#if defined (DO_CUSTOM_FACET_TEST)
+#  if defined (DO_CUSTOM_FACET_TEST)
 struct my_state {
   char dummy;
 };
@@ -388,79 +383,19 @@ struct my_traits : public char_traits<char> {
   typedef fpos<state_type> pos_type;
 };
 
-class my_codecvt
-#  if defined (STLPORT)
-  : public codecvt<char, char, my_state> {
-#  else
-  : public locale::facet, public codecvt_base {
-  //STLport grant the same default implementation, other Standard libs implementation
-  //do not necessarily do the same:
-  public:
-    typedef char intern_type;
-    typedef char extern_type;
-    typedef my_state state_type;
-
-    explicit my_codecvt(size_t __refs = 0) : locale::facet(__refs) {}
-    result out(state_type&,
-               const intern_type*  __from,
-               const intern_type*,
-               const intern_type*& __from_next,
-               extern_type*        __to,
-               extern_type*,
-               extern_type*&       __to_next) const
-    { __from_next = __from; __to_next   = __to; return noconv; }
-
-    result in (state_type&,
-               const extern_type*  __from,
-               const extern_type*,
-               const extern_type*& __from_next,
-               intern_type*        __to,
-               intern_type*,
-               intern_type*&       __to_next) const
-    { __from_next = __from; __to_next = __to; return noconv; }
-
-    result unshift(state_type&,
-                   extern_type* __to,
-                   extern_type*,
-                   extern_type*& __to_next) const
-    { __to_next = __to; return noconv; }
-
-    int encoding() const throw()
-    { return 1; }
-
-    bool always_noconv() const throw()
-    { return true; }
-
-    int length(const state_type&,
-                  const extern_type* __from,
-                  const extern_type* __end,
-                  size_t __max) const
-    { return (int)min(static_cast<size_t>(__end - __from), __max); }
-
-    int max_length() const throw()
-    { return 1; }
-
-    static locale::id id;
-#  endif
+class my_codecvt : public codecvt<char, char, my_state>
+{
+public:
+  //static locale::id id;
 };
 
-#  if !defined (STLPORT)
-locale::id my_codecvt::id;
-#  else
-#    if defined (__BORLANDC__)
-template <>
-locale::id codecvt<char, char, my_state>::id;
-#    endif
-#  endif
-#endif
+//locale::id my_codecvt::id;
 
 void FstreamTest::custom_facet()
 {
-#if defined (DO_CUSTOM_FACET_TEST)
-  const char* fileName = "test_file.txt";
   //File preparation:
   {
-    ofstream ofstr(fileName, ios_base::binary);
+    ofstream ofstr("test_file.tmp", ios_base::binary);
     ofstr << "0123456789";
     CPPUNIT_ASSERT( ofstr );
   }
@@ -469,14 +404,14 @@ void FstreamTest::custom_facet()
     typedef basic_ifstream<char, my_traits> my_ifstream;
     typedef basic_string<char, my_traits> my_string;
 
-    my_ifstream ifstr(fileName);
+    my_ifstream ifstr("test_file.tmp");
     CPPUNIT_ASSERT( ifstr );
 
-#  if !defined (STLPORT) || defined (_STLP_USE_EXCEPTIONS)
+#if !defined (STLPORT) || defined (_STLP_USE_EXCEPTIONS)
     ifstr.imbue(locale::classic());
     CPPUNIT_ASSERT( ifstr.fail() && !ifstr.bad() );
     ifstr.clear();
-#  endif
+#endif
     locale my_loc(locale::classic(), new my_codecvt());
     ifstr.imbue(my_loc);
     CPPUNIT_ASSERT( ifstr.good() );
@@ -489,8 +424,8 @@ void FstreamTest::custom_facet()
     CPPUNIT_ASSERT( res == "0123456789" );
     */
   }
-#endif
 }
+#  endif
 
 #  if defined (CHECK_BIG_FILE)
 void FstreamTest::big_file()

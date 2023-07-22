@@ -263,7 +263,7 @@
 				ProgramDataBaseFileName="../../../.garbage/$(ProjectName)/$(ConfigurationName)/"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="1"/>
+				DebugInformationFormat="4"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool

@@ -1,6 +1,6 @@
 /***********************************************************************************
   Tests.h
-
+  
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -11,9 +11,9 @@
  * in supporting documentation.  Mark of the Unicorn makes no
  * representations about the suitability of this software for any
  * purpose.  It is provided "as is" without express or implied warranty.
-
+    
     SUMMARY: Declarations of all of the tests in the exception test suite.
-
+    
 ***********************************************************************************/
 #if ! defined (INCLUDED_MOTU_Tests)
 #define INCLUDED_MOTU_Tests 1

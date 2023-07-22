@@ -188,7 +188,9 @@ BOOL CSurToolPathEditor::OnInitDialog()
     layout_.add(1, 0, 0, 0, IDC_SPEED_LABEL);
     layout_.add(0, 0, 1, 0, IDC_SPEED_EDIT);
 	layout_.add(1, 0, 1, 0, IDC_ADD_TO_LIBRARY_BUTTON);
-
+#ifdef _VISTA_ENGINE_EXTERNAL_
+	GetDlgItem(IDC_ADD_TO_LIBRARY_BUTTON)->EnableWindow(FALSE);
+#endif
     return FALSE;
 }
 
@@ -233,6 +235,7 @@ void CSurToolPathEditor::setSelectedNode(int node)
 
 void CSurToolPathEditor::OnAddToLibraryButton()
 {
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	SourceBase* source = source_;
 	CNameComboDlg dlg("Source Name", "New Source", SourcesLibrary::instance().comboList());
 	if(dlg.DoModal() == IDOK){
@@ -248,4 +251,5 @@ void CSurToolPathEditor::OnAddToLibraryButton()
 		SourcesLibrary::instance().add(SourcesLibrary::StringType(dlg.name(), toAdd));
 		SourcesLibrary::instance().saveLibrary();
 	}
+#endif
 }

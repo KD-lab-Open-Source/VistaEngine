@@ -71,7 +71,11 @@ void vrtMapCreationParam::serialize(Archive& ar)
     ar.serialize(H_SIZE_POWER, "H_SIZE_POWER", "Ширина");
     ar.serialize(V_SIZE_POWER, "V_SIZE_POWER", "Высота");
 
+#ifdef _DEBUG
 	ar.serialize(createWorldMetod, "createWorldMetod", "Метод создания");
+#else
+	ar.serialize(createWorldMetod, "createWorldMetod", 0);
+#endif
 	ar.serialize(initialHeight, "initialHeight", "Начальная высота");
 }
 
@@ -105,37 +109,8 @@ void vrtMap::serializeParameters(Archive& ar)
 		ar.serialize(matGeoTxFileName, "matGeoTxFileName", 0);
 		ar.serialize(loopedGeoTxFileName, "loopedGeoTxFileName", 0);
 
-
 		ar.serialize(bitmapDispatcher, "bitmapDispatcher", 0);
-		if(!disableLoadContainerPMO_) {
-			if( (!ar.serialize(containerPMO, "containerPMO2", 0)) && ar.isInput() ){
-				vector<ElementPMO>::iterator p;
-				vector<ElementPMO> elPMOArrOld;
-				ar.serialize(elPMOArrOld, "containerPMO", 0);
-				for(p=elPMOArrOld.begin(); p!=elPMOArrOld.end(); p++){
-					switch(p->ID){
-					case PMO_ID_TOOLZER:
-						containerPMO.push_back(new sToolzerPMO(p->toolzerPMO));
-						break;
-					case PMO_ID_SQUARE_TOOLZER:
-						containerPMO.push_back(new sSquareToolzerPMO(p->squareToolzerPMO));
-						break;
-					case PMO_ID_GEO:
-						containerPMO.push_back(new sGeoPMO(p->geoPMO));
-						break;
-					case PMO_ID_BLUR:
-						containerPMO.push_back(new sBlurPMO(p->blurPMO));
-						break;
-					case PMO_ID_COLORPIC:
-						containerPMO.push_back(new sColorPicPMO(p->colorPicPMO));
-						break;
-					case PMO_ID_BITGEN:
-						containerPMO.push_back(new sBitGenPMO(p->bitGenPMO));
-						break;
-					}
-				}
-			}
-		}
+
 		curNewPMO=containerPMO.size();
 		unsigned int lowworld_procMapOp=procMapOp&0xffFFffFF;
 		int highworld_procMapOp=procMapOp>>32;

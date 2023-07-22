@@ -1,8 +1,8 @@
 /***********************************************************************************
   test_push_back.h
-
+  
     Interface for the test_push_back class
-
+    
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -13,7 +13,7 @@
  * in supporting documentation.  Mark of the Unicorn makes no
  * representations about the suitability of this software for any
  * purpose.  It is provided "as is" without express or implied warranty.
-
+    
 ***********************************************************************************/
 #ifndef test_push_back_H_
 #define test_push_back_H_
@@ -33,7 +33,7 @@ struct test_push_back
   {
         gTestController.SetCurrentTestName("push_back() method");
     }
-
+  
   void operator()( C& c ) const
   {
       typedef typename C::value_type _value_type;

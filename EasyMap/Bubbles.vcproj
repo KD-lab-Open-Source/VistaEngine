@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\Render\INC,..\terra,..\util,..\util\Serialization"
+				AdditionalIncludeDirectories="..\XLibs.Net\MSDXSDK_02_06\Include;..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XUtil;..\XLibs.Net\XUtil\CRC;..\UserInterface;..\Render\INC;..\terra;..\util;..\util\Serialization"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_SURMAP_"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"

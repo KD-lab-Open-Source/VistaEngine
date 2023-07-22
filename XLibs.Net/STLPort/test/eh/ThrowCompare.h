@@ -1,8 +1,8 @@
 /***********************************************************************************
   ThrowCompare.h
-
+  
     Interface for the ThrowCompare class
-
+    
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -13,7 +13,7 @@
  * in supporting documentation.  Mark of the Unicorn makes no
  * representations about the suitability of this software for any
  * purpose.  It is provided "as is" without express or implied warranty.
-
+        
 ***********************************************************************************/
 #ifndef ThrowCompare_H_
 #define ThrowCompare_H_

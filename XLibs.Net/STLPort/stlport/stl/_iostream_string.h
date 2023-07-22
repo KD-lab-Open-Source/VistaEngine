@@ -21,7 +21,7 @@
   * is not standard conformant as it has an internal state (the static buffer)
   */
 
-
+ 
 #ifndef _STLP_INTERNAL_IOSTREAM_STRING_H
 #define _STLP_INTERNAL_IOSTREAM_STRING_H
 
@@ -34,8 +34,6 @@
 #endif /* _STLP_INTERNAL_STRING_H */
 
 _STLP_BEGIN_NAMESPACE
-
-_STLP_MOVE_TO_PRIV_NAMESPACE
 
 template <class _CharT>
 class __iostring_allocator : public allocator<_CharT> {
@@ -52,11 +50,7 @@ public:
   typedef typename _Base::pointer pointer;
 #if defined (_STLP_MEMBER_TEMPLATE_CLASSES)
   template <class _Tp1> struct rebind {
-#  if !defined (_STLP_MSVC) || (_STLP_MSVC >= 1300)
     typedef __iostring_allocator<_Tp1> other;
-#  else
-    typedef _STLP_PRIV __iostring_allocator<_Tp1> other;
-#  endif
   };
 #endif
 
@@ -78,37 +72,33 @@ public:
  * the basic_string. This is why the associated __stl_alloc_rebind has only one template
  * parameter.
  */
-_STLP_MOVE_TO_STD_NAMESPACE
-
 template <class _Tp>
-inline _STLP_PRIV __iostring_allocator<_Tp>& _STLP_CALL
-__stl_alloc_rebind(_STLP_PRIV __iostring_allocator<_Tp>& __a, const _Tp*)
-{ return __a; }
+inline __iostring_allocator<_Tp>& _STLP_CALL
+__stl_alloc_rebind(__iostring_allocator<_Tp>& __a, const _Tp*) {  return __a; }
 template <class _Tp>
-inline _STLP_PRIV __iostring_allocator<_Tp> _STLP_CALL
-__stl_alloc_create(const _STLP_PRIV __iostring_allocator<_Tp>&, const _Tp*)
-{ return _STLP_PRIV __iostring_allocator<_Tp>(); }
-
-_STLP_MOVE_TO_PRIV_NAMESPACE
+inline __iostring_allocator<_Tp> _STLP_CALL
+__stl_alloc_create(const __iostring_allocator<_Tp>&, const _Tp*) { return __iostring_allocator<_Tp>(); }
 #endif /* _STLP_DONT_SUPPORT_REBIND_MEMBER_TEMPLATE */
 
-#if !defined (_STLP_DEBUG)
+
+
+#ifndef _STLP_DEBUG
+
 template <class _CharT>
-struct __basic_iostring : public basic_string<_CharT, char_traits<_CharT>, __iostring_allocator<_CharT> > {
+struct __basic_iostring : public basic_string<_CharT, char_traits<_CharT>, __iostring_allocator<_CharT> >
+{
   /*
    * A consequence of the non standard conformant allocator is that a string using it
    * must always be presized to the allocator static buffer size because the basic_string implementation
    * do not manage an allocator returning always the same memory adress as long as the
    * requested memory block size is under a certain value.
    */
-  typedef __basic_iostring<_CharT> _Self;
   typedef basic_string<_CharT, char_traits<_CharT>, __iostring_allocator<_CharT> > _Base;
   typedef typename _Base::_Reserve_t _Reserve_t;
-
   __basic_iostring() : _Base(_Reserve_t(), __iostring_allocator<_CharT>::_STR_SIZE)
   {}
 
-  _Self& operator=(const _CharT* __s) {
+  __basic_iostring& operator=(const _CharT* __s) {
     _Base::operator=(__s);
     return *this;
   }
@@ -116,25 +106,24 @@ struct __basic_iostring : public basic_string<_CharT, char_traits<_CharT>, __ios
 
 typedef __basic_iostring<char> __iostring;
 
-#  if !defined (_STLP_NO_WCHAR_T)
+#  ifndef _STLP_NO_WCHAR_T
 typedef __basic_iostring<wchar_t> __iowstring;
 #  endif
 
-#  define _STLP_BASIC_IOSTRING(_CharT) _STLP_PRIV __basic_iostring<_CharT>
+#  define _STLP_BASIC_IOSTRING(_CharT) __basic_iostring<_CharT>
 
-#else
+#else // _STLP_DEBUG
 
 typedef string __iostring;
-#  if !defined (_STLP_NO_WCHAR_T)
+#  ifndef _STLP_NO_WCHAR_T
 typedef wstring __iowstring;
 #  endif
 
 #  define _STLP_BASIC_IOSTRING(_CharT) basic_string<_CharT, char_traits<_CharT>, allocator<_CharT> >
 
-#endif
-
-_STLP_MOVE_TO_STD_NAMESPACE
+#endif // _STLP_DEBUG
 
 _STLP_END_NAMESPACE
 
 #endif /* _STLP_INTERNAL_IOSTREAM_STRING_H */
+

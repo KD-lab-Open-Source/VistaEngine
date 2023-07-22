@@ -9,13 +9,13 @@
  * Copyright (c) 1997
  * Moscow Center for SPARC Technology
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
@@ -34,8 +34,8 @@
 #  include <climits>
 #endif
 
-#ifndef _STLP_INTERNAL_CSTDLIB
-#  include <stl/_cstdlib.h>
+#ifndef _STLP_CSTDLIB
+#  include <cstdlib>
 #endif
 
 #ifndef _STLP_INTERNAL_UNINITIALIZED_H
@@ -123,8 +123,8 @@ public:
     }
     _STLP_UNWIND(free(_M_buffer); _M_buffer = 0; _M_len = 0)
   }
-
-  ~_Temporary_buffer() {
+ 
+  ~_Temporary_buffer() {  
     _STLP_STD::_Destroy_Range(_M_buffer, _M_buffer + _M_len);
     free(_M_buffer);
   }
@@ -139,8 +139,8 @@ private:
 
 // Class temporary_buffer is not part of the standard.  It is an extension.
 
-template <class _ForwardIterator,
-          class _Tp
+template <class _ForwardIterator, 
+          class _Tp 
 #ifdef _STLP_CLASS_PARTIAL_SPECIALIZATION
                     = typename iterator_traits<_ForwardIterator>::value_type
 #endif /* _STLP_CLASS_PARTIAL_SPECIALIZATION */
@@ -153,7 +153,7 @@ struct temporary_buffer : public _Temporary_buffer<_ForwardIterator, _Tp>
 };
 
 # endif /* _STLP_NO_EXTENSIONS */
-
+    
 _STLP_END_NAMESPACE
 
 # ifndef _STLP_LINK_TIME_INSTANTIATION

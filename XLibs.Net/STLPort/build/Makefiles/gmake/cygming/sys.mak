@@ -1,5 +1,5 @@
 # Time-stamp: <05/09/09 21:12:38 ptr>
-# $Id: sys.mak 1802 2005-11-01 08:25:57Z complement $
+# $Id: sys.mak,v 1.1.2.5 2005/09/19 19:53:48 dums Exp $
 
 RC := windres
 INSTALL := install

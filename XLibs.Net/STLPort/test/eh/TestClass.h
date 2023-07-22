@@ -1,6 +1,6 @@
 /***********************************************************************************
   TestClass.h
-
+  
  * Copyright (c) 1997-1998
  * Mark of the Unicorn, Inc.
  *
@@ -11,10 +11,10 @@
  * in supporting documentation.  Mark of the Unicorn makes no
  * representations about the suitability of this software for any
  * purpose.  It is provided "as is" without express or implied warranty.
-
+    
     SUMMARY: TestClass simulates a class that uses resources. It is designed to
       cause exceptions when it is constructed or copied.
-
+    
 ***********************************************************************************/
 #ifndef INCLUDED_MOTU_TestClass
 #define INCLUDED_MOTU_TestClass 1
@@ -36,10 +36,10 @@ public:
     inline TestClass( int value );
     inline TestClass( const TestClass& rhs );
     inline ~TestClass();
-
+    
     inline TestClass& operator=( const TestClass& rhs );
     inline int value() const;
-
+  
     inline TestClass operator!() const;
 
     bool operator==( const TestClass& rhs ) const

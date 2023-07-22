@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\XLibs.Net\Heap;..\..\..\XLibs.Net\stl;..\..\..\XLibs.Net\XUtil\CRC;..\..\..\XLibs.Net\XUtil;..;..\..;..\..\kdWidgets\extern"
+				AdditionalIncludeDirectories="..\..\..\XLibs.Net\MSDXSDK_02_06\Include;..\..\..\XLibs.Net\Heap;..\..\..\XLibs.Net\STLPort\stlport;..\..\..\XLibs.Net\XUtil;..\..\..\XLibs.Net\XUtil\CRC;..;..\..;..\..\kdWidgets\extern"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="TRUE"
 				ExceptionHandling="FALSE"
@@ -63,7 +63,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\XLibs.Net\Heap;..\..\..\XLibs.Net\stl;..\..\..\XLibs.Net\XUtil\CRC;..\..\..\XLibs.Net\XUtil;..;..\..;..\..\kdWidgets\extern"
+				AdditionalIncludeDirectories="..\..\..\XLibs.Net\MSDXSDK_02_06\Include;..\..\..\XLibs.Net\Heap;..\..\..\XLibs.Net\STLPort\stlport;..\..\..\XLibs.Net\XUtil;..\..\..\XLibs.Net\XUtil\CRC;..;..\..;..\..\kdWidgets\extern"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				ExceptionHandling="FALSE"
 				RuntimeLibrary="0"
@@ -105,7 +105,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..,..\..,..\..\kdWidgets\extern"
+				AdditionalIncludeDirectories="..\..\..\XLibs.Net\MSDXSDK_02_06\Include;..\..\..\XLibs.Net\Heap;..\..\..\XLibs.Net\STLPort\stlport;..\..\..\XLibs.Net\XUtil;..\..\..\XLibs.Net\XUtil\CRC;..;..\..;..\..\kdWidgets\extern"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_FINAL_VERSION_"
 				ExceptionHandling="FALSE"
 				RuntimeLibrary="0"

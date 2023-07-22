@@ -77,9 +77,12 @@ public:
 	void deleteAccount();
 
 	bool canCreateGame() const;
+	/// Создать сервер сетевой игры
 	void createGame();
 	bool canJoinGame() const;
+	/// Присоединиться к выбранной сетевой игре
 	void joinGame();
+	/// Готовность начать игру
 	void startGame();
 
 	const char* natType() const;
@@ -107,11 +110,19 @@ public:
 	void resetChatBoard(bool unsubscribe = true);
 	void clearChatBoard();
 	
+	/// Команда на сервер обновить список список комнат чата и игроков в чате
+	void refreshChatChannels();
+	/// Синхронизировать чат с сетевым клиентом
 	void updateChatChannels();
+	/// Получить список комнат чата
 	int getChatChannels(ComboStrings& channels) const;
+	/// Получить имя текущей выбранной комнаты чата
 	void getCurrentChatChannelName(string& name) const;
+	/// Выбрать комнату в чате
 	void selectChatChannel(int channel);
+	/// Войти в выбранную комнату в чате
 	void enterChatChannel(ChatChannelID forceID = -1);
+	/// Сейчас работает режим автовхода в чат
 	bool autoSubscribeMode() const { return autoSubscribeMode_; }
 
 	void chatSubscribeOK();
@@ -167,10 +178,14 @@ private:
 	string password_;
 	string pass2_;
 
+	//typedef vector<ChatChanelInfo> ChatChanelInfos; //@Hallkezz
+	//ChatChanelInfos chatChanelInfos_; //@Hallkezz
 	ChatChannelID subscribedChannel_;
 	ChatChannelID subscribeWaitingChannel_;
 	ChatChannelID selectedChannel_;
 	bool autoSubscribeMode_;
+	//bool autoSubscribeUnsusseful_; //@Hallkezz
+	//bool lastChannelSubscribeAttemptMode_; //@Hallkezz
 	ChatChannelID lastSubscribeAttempt_;
 	string currentChatChannelName_;
 

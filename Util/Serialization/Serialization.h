@@ -137,7 +137,7 @@ private:
 };
 
 /////////////////////////////////////////////////
-//		Р РµРіРёСЃС‚СЂР°С†РёСЏ enums
+//		Регистрация enums
 /////////////////////////////////////////////////
 template<class Enum>
 const EnumDescriptor& getEnumDescriptor(const Enum& key);
@@ -158,7 +158,7 @@ const EnumDescriptor& getEnumDescriptor(const Enum& key);
 		return descriptor;	\
 	}
 
-// Р”Р»СЏ enums, Р·Р°РєСЂС‹С‚С‹С… РєР»Р°СЃСЃР°РјРё
+// Для enums, закрытых классами
 #define BEGIN_ENUM_DESCRIPTOR_ENCLOSED(nameSpace, enumType, enumName)	\
 	struct Enum##nameSpace##enumType : EnumDescriptor { Enum##nameSpace##enumType(); }; \
 	Enum##nameSpace##enumType::Enum##nameSpace##enumType() : EnumDescriptor(enumName) {
@@ -175,7 +175,7 @@ const EnumDescriptor& getEnumDescriptor(const Enum& key);
 
 
 /////////////////////////////////////////////////
-//	Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+//	Вспомогательные функции для отображения
 /////////////////////////////////////////////////
 template<class Enum>
 const char* getEnumName(const Enum& key) {
@@ -191,42 +191,42 @@ template<class Enum>
 const EnumDescriptor& getEnumDescriptor(const Enum& key);
 
 
-/// Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅР°СЏ С„СѓРЅРєС†РёСЏ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РєРѕРјР±Рѕ-Р»РёСЃС‚Р°РјРё
+/// Вспомогательная функция для работы с комбо-листами
 string cutTokenFromComboList(string& comboList);
 string getEnumToken(const char*& buffer);
 ComboInts makeComboInts(const ComboStrings& values, const ComboStrings& list);
 void joinComboList(std::string& outComboList, const ComboStrings& strings, char delimeter = '|');
 void splitComboList(ComboStrings& outComboStrings, const char* comboList, char delimeter = '|');
-// TODO: РїРµСЂРµРїРёСЃР°С‚СЊ
+// TODO: переписать
 int indexInComboListString(const char* comboList, const char* value);
 
 template<class Pair>
 struct PairSerializationTraits
 {
-	static const char* firstName() { return "&РРјСЏ"; }
-	static const char* secondName() { return "&Р—РЅР°С‡РµРЅРёРµ"; }
+	static const char* firstName() { return "&Имя"; }
+	static const char* secondName() { return "&Значение"; }
 };
 
 ////////////////////////////////////////////////////////////////////
 //
-// Р‘Р°Р·РѕРІС‹Р№ Р°СЂС…РёРІ.
+// Базовый архив.
 //
-// 1. РћСЃРЅРѕРІРЅР°СЏ С„СѓРЅРєС†РёСЏ serialize РїСЂРёРЅРёРјР°РµС‚ РєРѕРЅСЃС‚Р°РЅС‚РЅСѓСЋ
-// СЃСЃС‹Р»РєСѓ РЅР° РѕР±СЉРµРєС‚ (РєРѕС‚РѕСЂСѓСЋ РјРµРЅСЏРµС‚), С‡С‚РѕР±С‹ РЅРѕСЂРјР°Р»СЊРЅРѕ 
-// СЂР°Р±РѕС‚Р°Р»Р° РїРµСЂРµРіСЂСѓР·РєР° РІРѕ РІСЃРµС… СЃР»СѓС‡Р°СЏС….
-// 2. nameAlt == 0 - РЅРµ СЂРµРґР°РєС‚РёСЂРѕРІР°С‚СЊ РґР°РЅРЅРѕРµ РїРѕР»Рµ.
-// nameAlt РЅР°С‡РёРЅР°РµС‚СЃСЏ СЃ '&' - РґРѕР±Р°РІР»СЏС‚СЊ Р·РЅР°С‡РµРЅРёРµ СЌС‚РѕРіРѕ РїРѕР»СЏ Рє 
-// СЂРѕРґРёС‚РµР»СЊСЃРєРѕРјСѓ.
-// 3. Р—Р°РїСЂРµС‚ РЅР° РѕС‚РєСЂС‹С‚РёРµ РЅРѕРІРѕРіРѕ Р±Р»РѕРєР° РїСЂРё СЃРµСЂРёР°Р»РёР·Р°С†РёРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёС…
-// С‚РёРїРѕРІ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ РѕРїСЂРµРґРµР»РµРЅРёРµРј С„СѓРЅРєС†РёРё serialize(Archive&, const char*, const char*),
-// РІРјРµСЃС‚Рѕ СЃС‚Р°РЅРґР°СЂС‚РЅРѕР№ serialize(Archive&). РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ UDT РІСЃРµРіРґР° СЃРµСЂРёР°Р»РёР·СѓСЋС‚СЃСЏ
-// СЃ РѕС‚РєСЂС‹С‚РёРµРј Р±Р»РѕРєР°.
-// 4. Р”Р»СЏ СЃРµСЂРёР°Р»РёР·Р°С†РёРё РїРѕР»РёРјРѕСЂС„РЅС‹С… СѓРєР°Р·Р°С‚РµР»РµР№ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ serializePolymorphic,
-// ShareHandle РёР»Рё PolymorphicWrapper. РћРЅРё Р·Р°РїРёСЃС‹РІР°СЋС‚ Рё РІРѕСЃСЃРѕР·РґР°СЋС‚ С‚РёРї (С‚СЂРµР±СѓРµС‚СЃСЏ 
-// СЂРµРіРёСЃС‚СЂР°С†РёСЏ РєР»Р°СЃСЃРѕРІ (REGISTER_CLASS, РёРЅРѕРіРґР° Р»РёРЅРєРѕРІС‰РёРє РѕС‚СЃРµРєР°РµС‚, - FORCE_REGISTER_CLASS).
-// 5. Р”Р»СЏ СЃРµСЂРёР°Р»РёР·Р°С†РёРё РЅРµРїРѕР»РёРјРѕСЂС„РЅС‹С… СѓРєР°Р·Р°С‚РµР»РµР№ (РєСЂР°Р№РЅРµ СЂРµРґРєР°СЏ Р·Р°РґР°С‡Р°), РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ
-// serializePointer РёР»Рё PointerWrapper.
-// 6. Р”Р»СЏ РјР°СЃСЃРёРІРѕРІ - serializeArray, wrapper'Р° РїРѕРєР° РЅРµС‚, РЅРѕ РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё  РІРѕР·РјРѕР¶РµРЅ.
+// 1. Основная функция serialize принимает константную
+// ссылку на объект (которую меняет), чтобы нормально 
+// работала перегрузка во всех случаях.
+// 2. nameAlt == 0 - не редактировать данное поле.
+// nameAlt начинается с '&' - добавлять значение этого поля к 
+// родительскому.
+// 3. Запрет на открытие нового блока при сериализации пользовательских
+// типов производится определением функции serialize(Archive&, const char*, const char*),
+// вместо стандартной serialize(Archive&). По умолчанию UDT всегда сериализуются
+// с открытием блока.
+// 4. Для сериализации полиморфных указателей использовать serializePolymorphic,
+// ShareHandle или PolymorphicWrapper. Они записывают и воссоздают тип (требуется 
+// регистрация классов (REGISTER_CLASS, иногда линковщик отсекает, - FORCE_REGISTER_CLASS).
+// 5. Для сериализации неполиморфных указателей (крайне редкая задача), использовать
+// serializePointer или PointerWrapper.
+// 6. Для массивов - serializeArray, wrapper'а пока нет, но при необходимости  возможен.
 //
 ////////////////////////////////////////////////////////////////////
 
@@ -286,11 +286,11 @@ public:
             int result = processEnum(usesNameAlt ? descriptor.comboListAlt() : descriptor.comboList(), name, nameAlt);
             if (result != -1) {
                 if(usesNameAlt){
-                    xassert(result >= 0 && result < strings.size() && "РќРµРІРµСЂРЅС‹Р№ РёРЅРґРµРєСЃ Р·РЅР°С‡РµРЅРёСЏ Enum-Р°!");
+                    xassert(result >= 0 && result < strings.size() && "Неверный индекс значения Enum-а!");
                     value = (Enum)descriptor.keyByNameAlt(strings[result].c_str());
                 }
 				else{
-                    xassert (result >= 0 && result < strings.size() && "РќРµРІРµСЂРЅС‹Р№ РёРЅРґРµРєСЃ Р·РЅР°С‡РµРЅРёСЏ Enum-Р°!");
+                    xassert (result >= 0 && result < strings.size() && "Неверный индекс значения Enum-а!");
                     value = (Enum)descriptor.keyByName(strings[result].c_str());
                 }
                 return true;
@@ -384,7 +384,7 @@ public:
                 }
                 int i = 0;
                 FOR_EACH(cont, it){
-						serialize(*it, "@", "@");
+                    serialize(*it, "@", "@");
                 }
             }
         }
@@ -456,7 +456,7 @@ public:
 
 			bool result = true;
 			if(openTypeIndex == UNREGISTERED_CLASS) {
-				skipValue(1); // { СѓР¶Рµ РѕС‚РєСЂС‹С‚Р°
+				skipValue(1); // { уже открыта
 				result = false;
 			}
 
@@ -498,7 +498,7 @@ public:
         }
     }
 
-    template<class T> // Р”Р»СЏ РЅРµРїРѕР»РёРјРѕСЂС„РЅС‹С… СѓРєР°Р·Р°С‚РµР»РµР№
+    template<class T> // Для неполиморфных указателей
     bool serializePointer(const T*& t, const char* name, const char* nameAlt) {
         if(isInput()) {
             if(!t)
@@ -518,7 +518,7 @@ public:
         }
     }
 
-    template<class T> // Р”Р»СЏ РїРѕР»РёРјРѕСЂС„РЅС‹С… СѓРєР°Р·Р°С‚РµР»РµР№
+    template<class T> // Для полиморфных указателей
 	bool serializePolymorphic(const T*& t, const char* name, const char* nameAlt) {
         if(isInput()) {
             return loadPointer(const_cast<T*&>(t), name, nameAlt);
@@ -710,12 +710,12 @@ protected:
 		
 		bool result = true;
         if(openTypeIndex == UNREGISTERED_CLASS) {
-            skipValue(1); // { СѓР¶Рµ РѕС‚РєСЂС‹С‚Р°
+            skipValue(1); // { уже открыта
 			result = false;
         } else if(!ptr && openTypeIndex != NULL_POINTER) {
             ptr = factory.createByIndex(openTypeIndex);
 			if(!ptr)
-				skipValue(1); // { СѓР¶Рµ РѕС‚РєСЂС‹С‚Р°
+				skipValue(1); // { уже открыта
         }
 
 		if(ptr)
@@ -802,10 +802,10 @@ private:
 				return result;
 				if (result != -1) {
 					if (ar.usesNameAlt ()) {
-						xassert(result >= 0 && result < comboList.size() && "РќРµРІРµСЂРЅС‹Р№ РёРЅРґРµРєСЃ Р·РЅР°С‡РµРЅРёСЏ Enum-Р°!");
+						xassert(result >= 0 && result < comboList.size() && "Неверный индекс значения Enum-а!");
 						const_cast<Enum&>(value) = (Enum)descriptor.keyByNameAlt(comboList[result].c_str());
 					} else {
-						xassert(result >= 0 && result < comboList.size() && "РќРµРІРµСЂРЅС‹Р№ РёРЅРґРµРєСЃ Р·РЅР°С‡РµРЅРёСЏ Enum-Р°!");
+						xassert(result >= 0 && result < comboList.size() && "Неверный индекс значения Enum-а!");
 						const_cast<Enum&>(value) = (Enum)descriptor.keyByName(comboList[result].c_str());
 					}
 					return true;
@@ -879,7 +879,7 @@ __declspec( selectany ) int Archive::typeIDs_ = 0;
   int* registeredDummyPtr##baseClass##derivedClass = &registeredDummy##baseClass##derivedClass;
 
 
-/// РћР±РµСЂС‚РєР° РґР»СЏ СЃРµСЂРёР°Р»РёР·Р°С†РёРё РЅРµРїРѕР»РёРјРѕСЂС„РЅС‹С… СѓРєР°Р·Р°С‚РµР»РµР№
+/// Обертка для сериализации неполиморфных указателей
 template<class T>
 class PointerWrapper
 {
@@ -895,7 +895,7 @@ private:
 	T* t_;
 };
 
-/// РћР±РµСЂС‚РєР° РґР»СЏ СЃРµСЂРёР°Р»РёР·Р°С†РёРё РїРѕР»РёРјРѕСЂС„РЅС‹С… СѓРєР°Р·Р°С‚РµР»РµР№
+/// Обертка для сериализации полиморфных указателей
 template<class T>
 class PolymorphicWrapper
 {

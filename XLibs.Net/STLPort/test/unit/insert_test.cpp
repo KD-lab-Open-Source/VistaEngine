@@ -30,14 +30,14 @@ CPPUNIT_TEST_SUITE_REGISTRATION(InsertTest);
 //
 void InsertTest::insert1()
 {
-  char const* array1 [] = { "laurie", "jennifer", "leisa" };
-  char const* array2 [] = { "amanda", "saskia", "carrie" };
+  char* array1 [] = { "laurie", "jennifer", "leisa" };
+  char* array2 [] = { "amanda", "saskia", "carrie" };
 
-  deque<char const*> names(array1, array1 + 3);
-  deque<char const*>::iterator i = names.begin() + 2;
+  deque<char*> names(array1, array1 + 3);
+  deque<char*>::iterator i = names.begin() + 2;
 
-  insert_iterator<deque <char const*> > itd(names, i);
-  itd = copy(array2, array2 + 3, insert_iterator<deque <char const*> >(names, i));
+  insert_iterator<deque <char*> > itd(names, i);
+  itd = copy(array2, array2 + 3, insert_iterator<deque <char*> >(names, i));
 
   CPPUNIT_ASSERT( !strcmp(names[0], "laurie") );
   CPPUNIT_ASSERT( !strcmp(names[1], "jennifer") );
@@ -54,11 +54,11 @@ void InsertTest::insert1()
 }
 void InsertTest::insert2()
 {
-  char const* array1 [] = { "laurie", "jennifer", "leisa" };
-  char const* array2 [] = { "amanda", "saskia", "carrie" };
+  char* array1 [] = { "laurie", "jennifer", "leisa" };
+  char* array2 [] = { "amanda", "saskia", "carrie" };
 
-  deque<char const*> names(array1, array1 + 3);
-  deque<char const*>::iterator i = names.begin() + 2;
+  deque<char*> names(array1, array1 + 3);
+  deque<char*>::iterator i = names.begin() + 2;
   copy(array2, array2 + 3, inserter(names, i));
 
   CPPUNIT_ASSERT( !strcmp(names[0], "laurie") );

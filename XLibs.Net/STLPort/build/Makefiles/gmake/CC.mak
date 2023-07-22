@@ -1,4 +1,6 @@
 # Time-stamp: <04/08/23 22:49:14 ptr>
+# $Id: CC.mak,v 1.1.2.3 2005/11/20 08:41:11 complement Exp $
+
 
 #INCLUDES = -I$(SRCROOT)/include
 INCLUDES :=

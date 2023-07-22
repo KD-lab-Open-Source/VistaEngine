@@ -1,6 +1,6 @@
 /***********************************************************************************
   test_assign_op.h
-
+  
     SUMMARY: Test functor template for assignment operators.
 
  * Copyright (c) 1997
@@ -13,7 +13,7 @@
  * in supporting documentation.  Mark of the Unicorn makes no
  * representations about the suitability of this software for any
  * purpose.  It is provided "as is" without express or implied warranty.
-
+    
 ***********************************************************************************/
 #ifndef test_assign_op_H_
 #define test_assign_op_H_
@@ -32,10 +32,10 @@ struct test_assign_op {
     : source(src) {
     gTestController.SetCurrentTestName("assignment operator");
   }
-
+  
   void operator()( T& t ) const {
     t = source;
-
+    
     // Prevent simulated failures during verification
     gTestController.CancelFailureCountdown();
     //EH_ASSERT( source == t );

@@ -3,6 +3,7 @@
 #include <d3dx9.h>
 #include "PlayBink.h"
 
+//#include "bink.h" @Hallkezz
 #include "Sound.h"
 #include "SystemUtil.h"
 #include "RenderObjects.h"
@@ -10,7 +11,9 @@
 #include "..\Render\D3D\RenderDevice.h"
 #include "PlayOgg.h"
 
+#ifdef _DEMO_
 #define _NO_BINK_
+#endif
 
 #ifdef _NO_BINK_
 

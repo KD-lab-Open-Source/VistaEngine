@@ -3,15 +3,15 @@
 Q1 About STLport and availability
 
 Q1.0 What is STLport?
-Q1.1 What are the benefits from using STLport?
-Q1.2 What versions of STLport are available?
+Q1.1 What is benefits from using STLport?
+Q1.2 What versions of STLport available?
 
 Q2 General
 
 Q2.0 Do I need a C++ compiler?
 Q2.1 Do I need runtime libraries from C++ compiler?
 Q2.2 Can I use containers and algorithms from STLport and iostreams from
-library that ship with my compiler?
+library that shipout with compiler?
 Q2.3 Can I mix STL implementations in my project?
 Q2.4 When I switch to STLport in my application, I get errors. Is STLport
 so bad?
@@ -22,7 +22,7 @@ Q3.0 On my XXXX Linux n.n g++ headers are in /usr/include/g++, but they
 are looked for in /usr/include/3.3.1. Is it a STLport bug?
 Q3.1 Do I need to build library to use STLport?
 Q3.2 During library compilation with MS VC++ 6.0 I see following error report:...
-Q3.3 Has anybody succeeded building STLport on OS Y with compiler K n.n?
+Q3.3 Does anybody success in building STLport on OS Y with compiler K n.n?
 Q3.4 Does STLport support cross-compilation?
 
 Q4 Installation
@@ -37,11 +37,11 @@ Q5.0 I found a bug, how can I report about it?
 
 Q6 Design
 
-Q6.0 In STLport, files like locale.h, setjmp.h, stdlib.h, etc.,
-do nothing except include native headers. Why are these files present in STLport?
+Q6.0 In STLport present files like locale.h, setjmp.h, stdlib.h, etc.,
+that do nothing except include native headers. Why this files present in STLport?
 Q6.1 Is STLport a replacement for headers and libraries that shipout
 with compiler?
-Q6.2 My tool detects memory leaks in applications with STLport. Is this leak
+Q6.2 My tool detect memory leaks in application with STLport. Is this leak
 from STLport?
 
                            Answers
@@ -49,16 +49,16 @@ from STLport?
 ========================================================================
 
 Q1.0 What is STLport?
-A1.0 STLport is an implementation of the C++ Standard Library, as described 
-in the INTERNATIONAL STANDARD ISO/IEC 14882:1998(E) and latest
+A1.0 STLport is implementation of C++ Standard Library, as described in
+the INTERNATIONAL STANDARD ISO/IEC 14882:1998(E) and latest
 ISO/IEC 14882:2003(E).
 
 ========================================================================
 
-Q1.1 What are the benefits from using STLport?
+Q1.1 What is benefits from using STLport?
 
 A1.1
-  - For multiplatform/multicompilers project a coherent Standard Library
+  - For multiplatform/multicompilers project a coherent Standard library
 implementation.
   - An easy to use STL safe mode detecting bad use of containers and
 iterators.
@@ -68,7 +68,7 @@ combination like vector of vector, an efficient std::allocator.
 
 ========================================================================
 
-Q1.2 What versions of STLport are available?
+Q1.2 What versions of STLport available?
 
 A1.2
 
@@ -76,20 +76,20 @@ A1.2
 
 Q2.0 Do I need a C++ compiler?
 
-A2.0 STLport is a C++ library. So the answer is 'yes, you do'.
+A2.0 STLport is a C++ library. So answer is 'yes, you need'.
 
 ========================================================================
 
 Q2.1 Do I need runtime libraries from C++ compiler?
 
-A2.1 In any case, the C++ language support from compiler is required
+A2.1 In any case C++ language support from compiler is required
 for STLport (operators new, delete, RTTI, exceptions support). That's why
-in most cases you need some runtime libraries from the C++ compiler.
+in most cases you need some runtime libraries from C++ compiler.
 
 ========================================================================
 
 Q2.2 Can I use containers and algorithms from STLport and iostreams from
-the library that ships with my compiler?
+library that shipout with compiler?
 
 A2.2 This is a case of STL implementations mix. See A2.3 below.
 
@@ -124,7 +124,7 @@ specializations. It is not a bug, but the fact that old compilers just
 did not tried to find functions in the namespaces where arguments' classes
 are defined (indeed no compilers with full-featured support of ADL yet).
 
-Mix implementation via library.
+Mix imlementation via library.
 
 Let's reduce all the complexity of STLport to some very simple example:
 
@@ -218,7 +218,7 @@ pass too. But your application will crash (or randomly crash) either on
 call a.push, or on assignment _str = s. This is evident here, but not
 evident in real applications.
 
-The conclusion is: "Using Wrapper mode is very hard and we removed support
+The conclusion is: "Using Wrapper mode is very hard and we remove support
 for it".
 
 ========================================================================
@@ -226,16 +226,17 @@ for it".
 Q2.4 When I switch to STLport in my application, I get errors. Is STLport
 so bad?
 
-A2.4 Before you post such message, please, check STLport WHITHOUT YOUR code:
+A2.4 Before you post such message, please, check the STLport WHITHOUT
+YOUR errors:
   - build STLport library
   - build STLport unit tests
   - run STLport unit tests
-If any of above steps fail, please, make sure that you carefully followed
-build instructions (in most cases you definitely should reread
+If any of above steps fail, please, check you carefully follow
+build instructions report (in most cases you definitely should reread
 instructions and check that you correctly unpack archive in case you see
 'file not found' message). Build instructions you can found in files
 INSTALL, doc/README.*, build/README*, build/test/unit/README*.
-If you are sure, submit bug report here:
+If you sure, submit bug report here:
 https://sourceforge.net/projects/stlport
 Don't forget to describe you operational environment, compiler version and
 STLport version.
@@ -245,21 +246,20 @@ STLport version.
 Q3.0 On my XXXX Linux n.n g++ headers are in /usr/include/g++, but they
 are looked for in /usr/include/3.3.1. Is it a STLport bug?
 
-A3.0 Path to native compiler headers for GCC correspond to default path
-after build/install compiler (i.e. paths from compiler origo).
+A3.0 Path to native compiler headers for gcc correspond to default path
+after build/install compiler (i.e. pathes from compiler origo).
 Package maintainers can use any path by own taste---we can't satisfy
 variety of distributions/packages.
 
 So you can:
- - fix path in stlport administration config file stlport/stl/config/host.h, 
+ - fix path in stlport administration config file stlport/stl/_site_config.h, 
    see _STLP_NATIVE_INCLUDE_PATH macro and related.
- - create a link to the native compiler headers like expected by STLport
  - make request to package maintainer
  - build and install compiler
 
 ========================================================================
 
-Q3.1 Do I need to build a library to use STLport?
+Q3.1 Do I need to build library to use STLport?
 
 A3.1 You may omit usage (and, thus building) STLport library, but in this
 case you can't use iostreams, locale, complex.
@@ -277,13 +277,12 @@ C:\Program Files\Microsoft SDK\Include\.\winbase.h(1138) : error C2733: second C
 
 A3.2 You have a Platform SDK installed. Uncomment line
 #define _STLP_NEW_PLATFORM_SDK 1
-in the file stlport/stl/config/user_config.h. There is no way to detect SDK
-presence during preprocessor stage, which is why you have to make this
-change manually.
+in the file stlport/stl_user_config.h. There is no way to detect SDK
+presence during preprocessor stage.
 
 ========================================================================
 
-Q3.3 Has anybody succeeded building STLport on OS S with compiler K n.n?
+Q3.3 Does anybody success in building STLport on OS S with compiler K n.n?
 
 A3.3 See report about results of regression tests here: build/test/unit/STATUS.
 
@@ -291,23 +290,23 @@ A3.3 See report about results of regression tests here: build/test/unit/STATUS.
 
 Q3.4 Does STLport support cross-compilation?
 
-A3.4 In case of GCC, use something like following sequence:
+A3.4 In case of gcc, use something like following sequence:
 
   (cd build/lib; ./configure --target=${CROSSTARGET}; \
      export PATH=${BASECROSS}/bin:${PATH}; make -f gcc.mak install-release-shared)
 
-where CROSSTARGET is GCC's cross prefix (something like 'i586-pc-linux-gnu',
+where CROSSTARGET is gcc's cross prefix (something like 'i586-pc-linux-gnu',
 if C++ cross compiler named as 'i586-pc-linux-gnu-c++'), BASECROSS is base of
 cross-compiler's location (i.e. ${BASECROSS}/bin in case above is a location
 of 'i586-pc-linux-gnu-c++').
 
-In case of non-GCC crossecompilers, we need hands-made target system identification.
+In case of non-gcc crosses, we need hands-made target system identification.
 The sample of such compiler (supported by STLport) is MetroWerks Codewarrior
 for Novell Netware (mwccnlm).
 
 ========================================================================
 
-Q4.1 I tried "make -f gcc.mak install", but it installs nothing into
+Q4.1 I tried "make -f gcc.mak install", but it install nothing into
 /usr/local/. How I can install headers into /usr/local/include and
 libs into /usr/local/lib?
 
@@ -329,16 +328,16 @@ Sometimes we will think about 'make install', but not now.
 Q5.0 I found a bug, how I can report about it?
 
 A5.0 
-  0. Ensure that this is really a bug (standard violation, incorrect
+  0. Ensure that this is a really bug (standard violation, incorrect
      behaviour with correct usage).
   1. Ensure that bug is in STLport, not in your code (you can use _STLP_DEBUG
-     for that, see stlport/stl/config/user_config.h).
-  2. Ensure that you correctly built STLport---build and run unit tests
+     for that, see stlport/stl_user_config.h).
+  2. Ensure that you correctly build STLport---build and run unit tests
      (build/test/unit) first with default settings, then with your settings
-     (if you changed any).
-  3. Write a short test that demonstrates the bug.
-  4. Make sure that this test case is really new, i.e. not covered by unit 
-     tests (test/unit/*).
+     (if you change ones).
+  3. Write short test that demonstrate this bug.
+  4. Make sure that this test case really new, i.e. not covered by unit tests
+     (test/unit/*).
   5. Compare your results with reported runs of unit tests (build/test/unit/STATUS).
   6. Write bug description and test here
      
@@ -351,13 +350,13 @@ A5.0
        - STLPORT VERSION
        - RESULT OF UNIT TESTS
 
-     Keep in mind, that your bug MUST be reproduced by other people, so give
+     Keep in mind, that bug MUST be reproduced by other people, so give
      enough information (but compactly, give only essential information).
 
 ========================================================================
 
-Q6.0 In STLport files like locale.h, setjmp.h, stdlib.h, etc., do 
-nothing except include native headers. Why are these files present in STLport?
+Q6.0 In STLport present files like locale.h, setjmp.h, stdlib.h, etc.,
+that do nothing except include native headers. Why this files present in STLport?
 
 A6.0 Sometimes native C headers was using C++ one or was refering
 to the std namespace. That's why, if stddef whould absent in STLport, then
@@ -383,23 +382,22 @@ with compiler?
 
 A6.1 In general no. In any case C++ language support from compiler is required
 for STLport (operators new, delete, RTTI, exceptions support). STLport also
-uses 'native' headers and libraries to take interface to system functions and
+use 'native' headers and libraries to take interface to system functions and
 variables.
 
 ========================================================================
 
-Q6.2 My tool detects memory leaks in application with STLport. Is this leak
+Q6.2 My tool detect memory leaks in application with STLport. Is this leak
 from STLport?
 
-A6.2 In most cases these are 'pseudo memory leaks' that some tools 
-wrongly detect.
+A6.2 In most cases this are 'pseudo memory leaks' that some tools wrongly
+supports.
 
 In the default compile of STLport, the node allocator is used to allocate
 internal memory. The node allocator works by pre-allocating a large chunk of
-memory and handing out small memory blocks. The memory chunk is not freed
-during running an application that uses STLport (i.e. it is not returned to 
-the system, but reused inside application). 
-See also http://www.sgi.com/tech/stl/alloc.html
+memory and handing out small memory blocks out. The memory chunk is not freed
+during running an application that uses STLport (i.e. it don't returned to system,
+but reused inside application). See also http://www.sgi.com/tech/stl/alloc.html
 
 There are tools like BoundsChecker, Purify or Valgrind that check for memory
 leaks, for memory that isn't freed when no longer used. These tools may report
@@ -410,14 +408,14 @@ shared libraries (e.g. DLL, this problem specific for Windows DLL model) that
 uses STLport internally and are statically link to it. If memory is allocated in
 a dll and released in an other then the STLport node allocator will keep the
 released memory for a future use. If you do not use this memory then your
-application global memory consumtion will grow until the app crash even if there
-is no real memory leak. This is why you should always use a coherent configuration
+application global memory consumtion will grow until the appli crash even if there
+is no realy memory leak. This is why you should always use a coherent configuration
 everything in dll or everything in static lib.
 
 There are ways to remove the pseudo memory leaks (since the memory is properly
 freed at the end of the program, the leaks are just pseudo-ones). You could use
 another allocator that is used in STLport. Open the file
-"./stlport/stl/config/host.h" and uncomment either one of the following:
+"./stlport/stl/_site_config.h" and uncomment either one of the following:
 
 
    _STLP_USE_NEWALLOC   enables a simple allocator that uses "new/delete"
@@ -428,7 +426,7 @@ memory starvation, see set_new_handler in your compiler doc or the C++ Standard
 for more information.
 
 Alternatively you can define the following symbol, just uncomment it in
-"./stlport/stl/config/host.h".
+"./stlport/stl/_site_config.h".
 
    _STLP_LEAKS_PEDANTIC
 
@@ -440,7 +438,7 @@ dependent libraries if you make any change to the file!
 
 There are also some defines that help in debugging memory problems in STLport.
 In _STLP_DEBUG mode, just also define the following symbols, either in
-"./stlport/stl/config/user_config.h" or in your project settings:
+"./stlport/stl_user_config.h" or in your project settings:
 
    _STLP_DEBUG_ALLOC
    _STLP_DEBUG_UNINITIALIZED

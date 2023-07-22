@@ -1,5 +1,5 @@
 # Time-stamp: <04/04/30 23:41:02 ptr>
-# $Id: targetdirs.mak 2695 2006-10-26 19:36:35Z dums $
+# $Id: targetdirs.mak,v 1.1.2.1 2004/12/24 11:26:35 ptr Exp $
 
 !ifdef TARGET_PROC
 TARGET_NAME=$(COMPILER_NAME)-$(TARGET_PROC)
@@ -7,22 +7,17 @@ TARGET_NAME=$(COMPILER_NAME)-$(TARGET_PROC)
 TARGET_NAME=$(COMPILER_NAME)
 !endif
 
-# special case for evc3/evc4 emulator compiles
-!if "$(TARGET_PROC)-$(TARGET_PROC_SUBTYPE)" == "x86-emulator"
-TARGET_NAME=$(COMPILER_NAME)-$(TARGET_PROC_SUBTYPE)
-!endif
-
-OUTPUT_ROOT_DIR        = obj
-OUTPUT_TARGET_DIR      = $(OUTPUT_ROOT_DIR)\$(TARGET_NAME)
-OUTPUT_DIR             = $(OUTPUT_TARGET_DIR)\shared$(EXTRA_DIRS)
-OUTPUT_DIR_DBG         = $(OUTPUT_TARGET_DIR)\shared-g$(EXTRA_DIRS)
-OUTPUT_DIR_STLDBG      = $(OUTPUT_TARGET_DIR)\shared-stlg$(EXTRA_DIRS)
-OUTPUT_DIR_A           = $(OUTPUT_TARGET_DIR)\static$(EXTRA_DIRS)
-OUTPUT_DIR_A_DBG       = $(OUTPUT_TARGET_DIR)\static-g$(EXTRA_DIRS)
-OUTPUT_DIR_A_STLDBG    = $(OUTPUT_TARGET_DIR)\static-stlg$(EXTRA_DIRS)
+OUTPUT_DIR             = obj\$(TARGET_NAME)\shared$(EXTRA_DIRS)
+OUTPUT_DIR_DBG         = obj\$(TARGET_NAME)\shared-g$(EXTRA_DIRS)
+OUTPUT_DIR_STLDBG      = obj\$(TARGET_NAME)\shared-stlg$(EXTRA_DIRS)
 
 # file to store generated dependencies for make:
-DEPENDS_COLLECTION     = $(OUTPUT_TARGET_DIR)\.make.depend
+DEPENDS_COLLECTION     = obj\$(TARGET_NAME)\.make.depend
+
+# I use the same catalog, as for shared:
+OUTPUT_DIR_A           = obj\$(TARGET_NAME)\static$(EXTRA_DIRS)
+OUTPUT_DIR_A_DBG       = obj\$(TARGET_NAME)\static-g$(EXTRA_DIRS)
+OUTPUT_DIR_A_STLDBG    = obj\$(TARGET_NAME)\static-stlg$(EXTRA_DIRS)
 
 SRCROOT = $(SRCROOT:/=\)
 !ifdef CROSS_COMPILING

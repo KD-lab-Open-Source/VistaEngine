@@ -2,32 +2,38 @@
  * Copyright (c) 1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
  * modified is included with the above copyright notice.
  *
- */
+ */ 
 #ifndef MESSAGE_FACETS_H
 #define MESSAGE_FACETS_H
 
 #include <string>
-#include <locale>
+#include <stl/_messages_facets.h>
+#include <stl/_ctype.h>
+// #include <istream>
 #include <typeinfo>
 #include <hash_map>
-
+// #include <map>
 #include "c_locale.h"
-#include "acquire_release.h"
 
 _STLP_BEGIN_NAMESPACE
-_STLP_MOVE_TO_PRIV_NAMESPACE
+
+// Forward declaration of an opaque type.
+struct _Catalog_locale_map;
+
+_Locale_messages* __acquire_messages(const char* name); 
+void __release_messages(_Locale_messages* cat);
 
 // Class _Catalog_locale_map.  The reason for this is that, internally,
 // a message string is always a char*.  We need a ctype facet to convert
@@ -62,14 +68,9 @@ private:                        // Invalidate copy constructor and assignment
 
 #if defined (_STLP_REAL_LOCALE_IMPLEMENTED) && (defined (_STLP_USE_GLIBC) && !defined (__CYGWIN__))
 #  define _STLP_USE_NL_CATD_MAPPING
-#else
-/* If no mapping a message_base::catalog entry, int typedef according C++ Standard 22.2.7.1,
- * has to be large enough to contain a nl_catd_type value.
- */
-_STLP_STATIC_ASSERT(sizeof(nl_catd_type) <= sizeof(int))
 #endif
 
-class _STLP_CLASS_DECLSPEC _Catalog_nl_catd_map {
+class _Catalog_nl_catd_map {
 public:
   _Catalog_nl_catd_map()
   {}
@@ -88,7 +89,7 @@ public:
   ;
 #endif
 
-  void erase(messages_base::catalog)
+  void erase(messages_base::catalog cat)
 #if !defined (_STLP_USE_NL_CATD_MAPPING)
   {}
 #else
@@ -103,17 +104,19 @@ public:
 #endif
 
 private:
-  _Catalog_nl_catd_map(const _Catalog_nl_catd_map&);
-  _Catalog_nl_catd_map& operator =(const _Catalog_nl_catd_map&);
+  _Catalog_nl_catd_map(const _Catalog_nl_catd_map&)
+  {}
+  _Catalog_nl_catd_map& operator =(const _Catalog_nl_catd_map&)
+  { return *this; }
 
 #if defined (_STLP_USE_NL_CATD_MAPPING)
   mutable map_type M;
   mutable rmap_type Mr;
-  static _STLP_VOLATILE __stl_atomic_t _count;
+  static int _count;
 #endif
 };
 
-class _STLP_CLASS_DECLSPEC _Messages {
+class _Messages {
 public:
   typedef messages_base::catalog catalog;
 
@@ -122,42 +125,38 @@ public:
   virtual catalog do_open(const string& __fn, const locale& __loc) const;
   virtual string do_get(catalog __c, int __set, int __msgid,
                         const string& __dfault) const;
-#if !defined (_STLP_NO_WCHAR_T)
+# ifndef _STLP_NO_WCHAR_T
   virtual wstring do_get(catalog __c, int __set, int __msgid,
                          const wstring& __dfault) const;
-#endif
+# endif
   virtual void do_close(catalog __c) const;
   virtual ~_Messages();
   bool _M_delete;
 };
 
-class _STLP_CLASS_DECLSPEC _Messages_impl : public _Messages {
+class _Messages_impl : public _Messages {
 public:
-  _Messages_impl(bool, _Locale_name_hint* hint = 0);
+
+  _Messages_impl(bool);
+
   _Messages_impl(bool, _Locale_messages*);
 
   catalog do_open(const string& __fn, const locale& __loc) const;
   string do_get(catalog __c, int __set, int __msgid,
                 const string& __dfault) const;
-#if !defined (_STLP_NO_WCHAR_T)
+# ifndef _STLP_NO_WCHAR_T
   wstring do_get(catalog __c, int __set, int __msgid,
                  const wstring& __dfault) const;
-#endif
+# endif
   void do_close(catalog __c) const;
-
+  
   ~_Messages_impl();
 
 private:
   _Locale_messages* _M_message_obj;
   _Catalog_locale_map* _M_map;
   mutable _Catalog_nl_catd_map _M_cat;
-
-  //private definition to avoid warning (with ICL)
-  _Messages_impl(const _Messages_impl&);
-  _Messages_impl& operator=(const _Messages_impl&);
 };
-
-_STLP_MOVE_TO_STD_NAMESPACE
 
 _STLP_END_NAMESPACE
 

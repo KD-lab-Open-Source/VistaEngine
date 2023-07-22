@@ -1,5 +1,5 @@
 # -*- makefile -*- Time-stamp: <03/10/29 22:20:01 ptr>
-# $Id: clean.mak 1802 2005-11-01 08:25:57Z complement $
+# $Id: clean.mak,v 1.1.2.2 2005/09/19 19:58:07 dums Exp $
 
 clean:
 	@if exist $(OUTPUT_DIR)\*.o del /F /Q $(OUTPUT_DIR)\*.o

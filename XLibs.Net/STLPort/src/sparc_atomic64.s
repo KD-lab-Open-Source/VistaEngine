@@ -10,8 +10,8 @@
         .align  8
 
 _STLP_atomic_exchange:
-1:
-  ldx      [%o0], %o2              ! Set the current value
+1:	
+	ldx      [%o0], %o2              ! Set the current value
         mov      %o1, %o3                ! Set the new value
         casx     [%o0], %o2, %o3         ! Do the compare and swap
         cmp      %o2, %o3                ! Check whether successful
@@ -22,14 +22,14 @@ _STLP_atomic_exchange:
         mov     %o2, %o0                                ! Set the new value
         .size   _STLP_atomic_exchange,(.-_STLP_atomic_exchange)
 
-
+	
 ! int _STLP_atomic_increment (void *pvalue)
 
         .type   _STLP_atomic_increment,#function
         .global _STLP_atomic_increment
         .align  8
 _STLP_atomic_increment:
-0:
+0:	
         ldx      [%o0], %o2              ! set the current
         addx     %o2, 0x1, %o3                   ! Increment and store current
         casx     [%o0], %o2, %o3         ! Do the compare and swap
@@ -42,14 +42,14 @@ _STLP_atomic_increment:
 
         .size   _STLP_atomic_increment,(.-_STLP_atomic_increment)
 
-
+	
 !        /* int _STLP_atomic_decrement (void *pvalue) */
         .type   _STLP_atomic_decrement,#function
         .global _STLP_atomic_decrement
         .align  8
 
 _STLP_atomic_decrement:
-0:
+0:	
         ldx      [%o0], %o2              ! set the current
         subx             %o2, 0x1, %o3                   ! decrement and store current
         casx     [%o0], %o2, %o3         ! Do the compare and swap
@@ -58,8 +58,8 @@ _STLP_atomic_decrement:
         membar  #LoadLoad | #LoadStore  ! Ensure the cas finishes before
                                         ! returning
         retl                            ! return
-  nop
+	nop
         .size   _STLP_atomic_decrement,(.-_STLP_atomic_decrement)
 
-
+	
 

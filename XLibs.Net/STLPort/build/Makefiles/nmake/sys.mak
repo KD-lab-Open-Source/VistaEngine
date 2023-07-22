@@ -1,5 +1,5 @@
 # Time-stamp: <03/09/28 18:59:23 ptr>
-# $Id: sys.mak 1907 2005-12-02 22:07:57Z dums $
+# $Id: sys.mak,v 1.1.2.2 2005/03/28 19:56:04 dums Exp $
 
 # shared library:
 SO  = dll
@@ -15,7 +15,7 @@ ARCH = lib
 AR = lib /nologo
 AR_INS_R = 
 AR_EXTR = 
-AR_OUT = /out:$@
+AR_OUT = /OUT:$@
 
 INSTALL = copy
 

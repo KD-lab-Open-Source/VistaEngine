@@ -75,7 +75,7 @@ void AdjTest::adjfind2()
     v[i] = names[i];
   CStrVector::iterator location;
   location = adjacent_find(v.begin(), v.end(), equal_length);
-
+  
   CPPUNIT_ASSERT(location != v.end());
 }
 int AdjTest::equal_length(const char* v1_, const char* v2_)

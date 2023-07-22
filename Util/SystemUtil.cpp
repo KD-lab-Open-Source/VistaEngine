@@ -53,7 +53,6 @@ const char* IniManager::get(const char* section, const char* key)
 		ErrH.Abort("Ini file not found: ", XERR_USER, 0, fname_);
 	if(!GetPrivateProfileString(section,key,NULL,buf,256,path)){
 		*buf = 0;
-		xassert_s(!check_existence_, (string("Не определен ключ ") + fname_ + " " + section + " " + key).c_str());
 	}
 
 	return buf;

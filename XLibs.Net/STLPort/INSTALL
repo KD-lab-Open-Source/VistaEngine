@@ -1,5 +1,5 @@
 **********************************************************************
-* 	INSTALL file for STLport 5.0                                   *
+* 	INSTALL file for STLport 5.0                                 *
 *                                                                    *
 **********************************************************************
 
@@ -51,8 +51,7 @@ Now you have to choose between STLport iostreams or no iostreams.
     If you DO NOT plan to use STLport iostreams and/or locale implementation but just
     the STL, you do not have to build the library.
  
-    If you have decided to disable STLport iostreams and locale using _STLP_NO_IOSTREAMS
-    configuration macro in stlport/stl/config/user_config.h, you may stop reading here.
+    If you have decided to disable STLport iostreams and locale, you may stop reading here.
 
 
 ==== Building STLport iostreams library ==========
@@ -82,7 +81,7 @@ build process description, for a more detailed one check README files in the doc
         make -f sunpro.mak clean install
 
 
-    Note: 'install' target work slightly different than usual - it installs libraries into
+    Note: 'install' taget work slightly different from ordinal---it installs libraries into
     <STLport root dir>/lib and bin catalog, NOT IN SYSTEM CATALOG. You can do the system
     install by just copying stlport and lib folder to the destination of your choise. For
     example on UNIX-like platforms this can be done with the following commands:
@@ -95,15 +94,15 @@ build process description, for a more detailed one check README files in the doc
       chown -R root:root /usr/local/lib/libstlport*
       exit
 
-    Note: System install is optional, most of compilers/linkers support searching for includes
-    and libs throught out the whole filesystem, just check your documentation on how to achieve
+    Note: System install is optionnal, most of compilers/linkers support searching for includes
+    and libs throught out the whole filesystem, just check your documentation on how to acheive
     this.
 
-    If you use cross-compiler, you can find libraries in the <STLport root dir>/lib/<target platform>
+    If you use cross-compiler, you can find libraries in the <STLport root dir>/lib/<taget platform>
     catalog.
 
 6)  If build fails, you may choose to :
-     - try fixing the build ;)
+     - try fixing the build ;
      - wait until somebody else will submit corresponding changes to be incorporated in next STLport 
        release/snapshot.
 
@@ -135,30 +134,25 @@ build process description, for a more detailed one check README files in the doc
 8) Supply the "lib" subdirectory to the library search path and add desired 
    library to the list of libraries to link with.
    Examples (imagine you have mytest.cpp in the same directory as this file is):
-	With GCC     : g++ -pthread -I./stlport mytest.cpp -L./lib/ -lstlport
+	With gcc     : gcc -pthread -I./stlport mytest.cpp -L./lib/ -lstlport
 	With DEC CC  : cxx -I./stlport mytest.cpp -L./lib/ -lstlport
 	With SUN CC  : CC -mt -I./stlport mytest.cpp -L./lib/ -lstlport
 	.....
-   [ Visual C++ specific ] For (embedded) VC++, you do not have to specify 
-   "stlport_XXX.lib" explicitly, as it is being choosen and forced to link 
-   automatically by "#pragma"'s in compiler config file in 
-   stlport/config/stl_msvc.h. Appropriate version is being selected based on 
-   /MD[d] vs /MT[d] options and _STLP_DEBUG setting. All you have to do is 
-   to set library search path for the linker.
+   [ Visual C++ specific ] For VC++, you do not have to specify "stlport_XXX.lib" explicitly,
+   as it is being choosen and forced to link automatically by "#pragma"'s in compiler config
+   file in stlport/config/stl_msvc.h.
+   Appropriate version is being selected based on /MD[d] vs /MT[d] options and _STLP_DEBUG setting.
+   All you have to do is to set library search path for the linker.
 	Example :
            cl.exe /I.\stlport mytest.cpp /link /libpath:.\lib /MD
 
-9) If you linked your application with shared STLport library (.so or .dll), please 
-   make your .so or .dll can be found by the dynamic linker. 
-   Under Windows, the paths searched depend on the particular flavor, see the MSDN 
-   documentation for LoadLibrary at http://msdn.microsoft.com. Easiest ways are to
-   either modify the PATH environment variable or copy all .dll's next to the 
-   executable. 
-   Under Linux, the environment variable LD_LIBRARY_PATH can be adjusted to point
-   to the dir containing. See the manpage for ld.so for more info.
+9) If you linked your application with shared STLport library (.so or .dll), please make your .so or
+   .dll's to be found in PATH at runtime. On Windows, the simplest way to do it
+   is to copy all .dll's next to the executable. Or, you might choose to add bin directory
+   containing STLport dlls to the PATH environment string.
 
-10) STLport builds only multithreaded libraries, so your application should be compiled
-   as multithreaded, too. Use -pthread (or -pthreads on Solaris) option for GCC, -mt for SunPro,
+10) STLport build only multithreaded libraries, so your application should be compiled
+   as multithreaded too. Use -pthread (or -pthreads on Solaris) option for gcc, -mt for SunPro,
    /MT for VC, and so on. Sometimes you should define _REENTRANT or something else, depends
    upon platform/compiler. See compiler's and linker's options on command line when you build
    unit tests (build/test/unit) for reference. The last is useful for ANY platform (special

@@ -1,6 +1,6 @@
 /***********************************************************************************
   test_rope.cpp
-
+  
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -68,7 +68,7 @@ void test_rope()
 {
     TestRope testRope, testRope2;
     size_t ropeSize = random_number(random_base);
-
+  
     while ( testRope.size() < ropeSize )
     {
         TestRope::value_type x = TestRope::value_type(random_number(random_base));  // initialize before use
@@ -82,7 +82,7 @@ void test_rope()
     WeakCheck( testRope, test_insert_n<TestRope>(testRope, random_number(random_base) ) );
     WeakCheck( testRope, test_insert_n<TestRope>(testRope, random_number(random_base), 0 ) );
     WeakCheck( testRope, test_insert_n<TestRope>(testRope, random_number(random_base), (int)testRope.size() ) );
-
+  
     size_t insCnt = random_number(random_base);
     TestRope::value_type *insFirst = new TestRope::value_type[1+insCnt];
 
@@ -99,7 +99,7 @@ void test_rope()
     WeakCheck( testRope, test_push_back<TestRope>(testRope) );
 
     ConstCheck( 0, test_default_construct<TestRope>() );
-
+    
 // dwa 1/25/00 - not actually valid for rope, because it doesn't
 // have the constructor in question! The code will compile, but with the
 // wrong result (the constructor that gets used does something different).

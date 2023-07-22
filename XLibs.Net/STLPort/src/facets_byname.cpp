@@ -2,53 +2,67 @@
  * Copyright (c) 1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
  * modified is included with the above copyright notice.
  *
- */
-#include "stlport_prefix.h"
+ */ 
+# include "stlport_prefix.h"
 
 #include <hash_map>
-#include <vector>
+#include "locale_impl.h"
+#include "c_locale.h"
 
-#include <locale>
-#include <istream>
+//#include "locale_nonclassic.h"
+#include "locale_impl.h"
+
+
+#include <stl/_codecvt.h>
+#include <stl/_collate.h>
+#include <stl/_ctype.h>
+#include <stl/_monetary.h>
+#include <stl/_time_facets.h>
+#include <stl/_messages_facets.h>
+#include <stl/_istream.h>
+#include <stl/_num_get.h>
+#include <stl/_num_put.h>
 
 #include <algorithm>
-#include <functional>
-
+// #include <stl/_ctype.h>
+#include <stl/_function.h>
 #include "c_locale.h"
-#include "locale_impl.h"
-#include "acquire_release.h"
 
 _STLP_BEGIN_NAMESPACE
+
+_Locale_ctype* __acquire_ctype(const char* name); 
+void __release_ctype(_Locale_ctype* cat);
 
 //----------------------------------------------------------------------
 // ctype_byname<char>
 
-ctype_byname<char>::ctype_byname(const char* name, size_t refs, _Locale_name_hint* hint) :
+ctype_byname<char>::ctype_byname(const char* name, size_t refs) :
     ctype<char>( 0, false, refs),
-    _M_ctype(_STLP_PRIV __acquire_ctype(name, hint)) {
+    _M_ctype(__acquire_ctype(name))
+{
   ctype<char>::_M_ctype_table = _M_byname_table;
   if (!_M_ctype)
     locale::_M_throw_runtime_error();
-
+  
   // We have to do this, instead of just pointer twiddling, because
-  // ctype_base::mask isn't the same type as _Locale_mask_t.
+  // ctype_base::mask isn't the same type as _Locale_mask_t.  
 
   const _Locale_mask_t* p = _Locale_ctype_table(_M_ctype);
 
   if (!p)
-    locale::_M_throw_runtime_error();
+    locale::_M_throw_runtime_error(); 
 
   for (size_t i = 0; i < table_size; ++i) {
     _Locale_mask_t __m = p[i];
@@ -58,34 +72,36 @@ ctype_byname<char>::ctype_byname(const char* name, size_t refs, _Locale_name_hin
   }
 }
 
-ctype_byname<char>::~ctype_byname()
-{ _STLP_PRIV __release_ctype(_M_ctype); }
+ctype_byname<char>::~ctype_byname() {
+  __release_ctype(_M_ctype);
+}
 
-char ctype_byname<char>::do_toupper(char c) const
-{ return (char)_Locale_toupper(_M_ctype, c); }
+char ctype_byname<char>::do_toupper(char c) const {
+  return (char)_Locale_toupper(_M_ctype, c);
+}
 
-char ctype_byname<char>::do_tolower(char c) const
-{ return (char)_Locale_tolower(_M_ctype, c); }
+char ctype_byname<char>::do_tolower(char c) const {
+  return (char)_Locale_tolower(_M_ctype, c);
+}
 
 const char*
 ctype_byname<char>::do_toupper(char* first, const char* last) const {
-  for ( ; first != last ; ++first)
+  for ( ; first != last ; ++first) 
     *first = (char)_Locale_toupper(_M_ctype, *first);
   return last;
 }
 
 const char*
 ctype_byname<char>::do_tolower(char* first, const char* last) const {
-  for ( ; first != last ; ++first)
+  for ( ; first != last ; ++first) 
     *first = (char)_Locale_tolower(_M_ctype, *first);
   return last;
 }
 
 
 // Some helper functions used in ctype<>::scan_is and scan_is_not.
-#if !defined (_STLP_NO_WCHAR_T)
 
-_STLP_MOVE_TO_PRIV_NAMESPACE
+# ifndef _STLP_NO_WCHAR_T
 
 // ctype_byname<wchar_t>
 
@@ -101,20 +117,20 @@ struct _Ctype_byname_w_is_mask {
     { return (M & _Locale_wchar_ctype(M_ctp, c, M)) != 0; }
 };
 
-_STLP_MOVE_TO_STD_NAMESPACE
-
-ctype_byname<wchar_t>::ctype_byname(const char* name, size_t refs, _Locale_name_hint* hint)
+ctype_byname<wchar_t>::ctype_byname(const char* name, size_t refs)
   : ctype<wchar_t>(refs),
-    _M_ctype(_STLP_PRIV __acquire_ctype(name, hint)) {
+    _M_ctype(__acquire_ctype(name)) {
   if (!_M_ctype)
-    locale::_M_throw_runtime_error();
+    locale::_M_throw_runtime_error();    
 }
 
-ctype_byname<wchar_t>::~ctype_byname()
-{ _STLP_PRIV __release_ctype(_M_ctype); }
+ctype_byname<wchar_t>::~ctype_byname() {
+  __release_ctype(_M_ctype);
+}
 
-bool ctype_byname<wchar_t>::do_is(ctype_base::mask  m, wchar_t c) const
-{ return (m & _Locale_wchar_ctype(_M_ctype, c, m)) != 0; }
+bool ctype_byname<wchar_t>::do_is(ctype_base::mask  m, wchar_t c) const {
+  return (m & _Locale_wchar_ctype(_M_ctype, c, m)) != 0;
+}
 
 const wchar_t*
 ctype_byname<wchar_t>::do_is(const wchar_t* low, const wchar_t* high,
@@ -135,55 +151,75 @@ ctype_byname<wchar_t>::do_is(const wchar_t* low, const wchar_t* high,
   return high;
 }
 
+    
 const wchar_t*
 ctype_byname<wchar_t>
-  ::do_scan_is(ctype_base::mask  m, const wchar_t* low, const wchar_t* high) const
-{ return find_if(low, high, _STLP_PRIV _Ctype_byname_w_is_mask(m, _M_ctype)); }
+  ::do_scan_is(ctype_base::mask  m, const wchar_t* low, const wchar_t* high) const {
+  return find_if(low, high, _Ctype_byname_w_is_mask(m, _M_ctype));
+}
 
 const wchar_t*
 ctype_byname<wchar_t>
-  ::do_scan_not(ctype_base::mask  m, const wchar_t* low, const wchar_t* high) const
-{ return find_if(low, high, not1(_STLP_PRIV _Ctype_byname_w_is_mask(m, _M_ctype))); }
+  ::do_scan_not(ctype_base::mask  m, const wchar_t* low, const wchar_t* high) const {
+  return find_if(low, high, not1(_Ctype_byname_w_is_mask(m, _M_ctype)));
+}
 
-wchar_t ctype_byname<wchar_t>::do_toupper(wchar_t c) const
-{ return _Locale_wchar_toupper(_M_ctype, c); }
+wchar_t ctype_byname<wchar_t>::do_toupper(wchar_t c) const {
+  return _Locale_wchar_toupper(_M_ctype, c);
+}
 
-const wchar_t*
+const wchar_t* 
 ctype_byname<wchar_t>::do_toupper(wchar_t* low, const wchar_t* high) const {
   for ( ; low < high; ++low)
     *low = _Locale_wchar_toupper(_M_ctype, *low);
   return high;
 }
 
-wchar_t ctype_byname<wchar_t>::do_tolower(wchar_t c) const
-{ return _Locale_wchar_tolower(_M_ctype, c); }
+wchar_t ctype_byname<wchar_t>::do_tolower(wchar_t c) const {
+  return _Locale_wchar_tolower(_M_ctype, c);
+}
 
-const wchar_t*
+const wchar_t* 
 ctype_byname<wchar_t>::do_tolower(wchar_t* low, const wchar_t* high) const {
   for ( ; low < high; ++low)
     *low = _Locale_wchar_tolower(_M_ctype, *low);
   return high;
 }
 
-#endif /* WCHAR_T */
+# endif /* WCHAR_T */
+
+_STLP_END_NAMESPACE
+
+
+// # include "collate_byname.cpp"
+
+#include "stl/_collate.h"
+#include "c_locale.h"
+#include <vector>
+
+_STLP_BEGIN_NAMESPACE
 
 // collate_byname<char>
-collate_byname<char>::collate_byname(const char* name, size_t refs, _Locale_name_hint* hint)
+_Locale_collate* __acquire_collate(const char* name);
+void __release_collate(_Locale_collate* cat);
+
+collate_byname<char>::collate_byname(const char* name, size_t refs)
   : collate<char>(refs),
-    _M_collate(_STLP_PRIV __acquire_collate(name, hint)) {
+    _M_collate(__acquire_collate(name)) {
   if (!_M_collate)
     locale::_M_throw_runtime_error();
 }
 
-collate_byname<char>::~collate_byname()
-{ _STLP_PRIV __release_collate(_M_collate); }
+collate_byname<char>::~collate_byname() {
+  __release_collate(_M_collate);
+}
 
 int collate_byname<char>::do_compare(const char* __low1,
                                      const char* __high1,
                                      const char* __low2,
                                      const char* __high2) const {
   return _Locale_strcmp(_M_collate,
-                        __low1, __high1 - __low1,
+                        __low1, __high1 - __low1, 
                         __low2, __high2 - __low2);
 }
 
@@ -194,7 +230,8 @@ collate_byname<char>::do_transform(const char* low, const char* high) const {
                              low, high - low);
 
   vector<char, allocator<char> > buf(n);
-  _Locale_strxfrm(_M_collate, &buf.front(), n, low, high - low);
+  _Locale_strxfrm(_M_collate, &buf.front(), n,
+                              low, high - low);
 
    char& __c1 = *(buf.begin());
    char& __c2 = (n == (size_t)-1) ? *(buf.begin() + (high-low-1)) : *(buf.begin() + n);
@@ -203,26 +240,27 @@ collate_byname<char>::do_transform(const char* low, const char* high) const {
 }
 
 
-#if !defined (_STLP_NO_WCHAR_T)
+# ifndef _STLP_NO_WCHAR_T
 
 // collate_byname<wchar_t>
 
-collate_byname<wchar_t>::collate_byname(const char* name, size_t refs, _Locale_name_hint* hint)
+collate_byname<wchar_t>::collate_byname(const char* name, size_t refs)
   : collate<wchar_t>(refs),
-    _M_collate(_STLP_PRIV __acquire_collate(name, hint)) {
+    _M_collate(__acquire_collate(name)) {
   if (!_M_collate)
     locale::_M_throw_runtime_error();
 }
 
-collate_byname<wchar_t>::~collate_byname()
-{ _STLP_PRIV __release_collate(_M_collate); }
+collate_byname<wchar_t>::~collate_byname() {
+  __release_collate(_M_collate);
+}
 
 int collate_byname<wchar_t>::do_compare(const wchar_t* low1,
                                         const wchar_t* high1,
                                         const wchar_t* low2,
                                         const wchar_t* high2) const {
   return _Locale_strwcmp(_M_collate,
-                         low1, high1 - low1,
+                         low1, high1 - low1, 
                          low2, high2 - low2);
 }
 
@@ -242,13 +280,18 @@ collate_byname<wchar_t>
   return string_type( &__c1, &__c2 );
 }
 
-#endif /*  _STLP_NO_WCHAR_T */
+# endif /*  _STLP_NO_WCHAR_T */
 
 _STLP_END_NAMESPACE
 
-#if !defined (_STLP_NO_MBSTATE_T)
+# ifndef _STLP_NO_MBSTATE_T
+
+#include <stl/_codecvt.h>
+#include <stl/_algobase.h>
+#include "c_locale.h"
 
 _STLP_BEGIN_NAMESPACE
+
 
 //----------------------------------------------------------------------
 // codecvt_byname<char>
@@ -260,20 +303,25 @@ codecvt_byname<char, char, mbstate_t>
 codecvt_byname<char, char, mbstate_t>::~codecvt_byname() {}
 
 
-#  if !defined (_STLP_NO_WCHAR_T)
+# ifndef _STLP_NO_WCHAR_T
 
 //----------------------------------------------------------------------
 // codecvt_byname<wchar_t>
+
+_Locale_ctype* __acquire_ctype(const char* name);
+void __release_ctype(_Locale_ctype* cat);
+
 codecvt_byname<wchar_t, char, mbstate_t>
-  ::codecvt_byname(const char* name, size_t refs, _Locale_name_hint* hint)
+  ::codecvt_byname(const char* name, size_t refs)
     : codecvt<wchar_t, char, mbstate_t>(refs),
-      _M_ctype(_STLP_PRIV __acquire_ctype(name, hint)) {
+      _M_ctype(__acquire_ctype(name)) {
   if (!_M_ctype)
     locale::_M_throw_runtime_error();
 }
 
-codecvt_byname<wchar_t, char, mbstate_t>::~codecvt_byname()
-{ _STLP_PRIV __release_ctype(_M_ctype); }
+codecvt_byname<wchar_t, char, mbstate_t>::~codecvt_byname() {
+  __release_ctype(_M_ctype);
+}
 
 codecvt<wchar_t, char, mbstate_t>::result
 codecvt_byname<wchar_t, char, mbstate_t>
@@ -356,11 +404,11 @@ codecvt_byname<wchar_t, char, mbstate_t>
   else if (result == (size_t) -2)
     return partial;
   else
-#    if defined (__ISCPP__)
+#ifdef __ISCPP__
     return /*to_next == to ? noconv :*/ ok;
-#    else
+#else
     return to_next == to ? noconv : ok;
-#    endif
+#endif
 }
 
 int
@@ -374,32 +422,42 @@ codecvt_byname<wchar_t, char, mbstate_t>::do_encoding() const _STLP_NOTHROW {
     return -1;
 }
 
+
 bool codecvt_byname<wchar_t, char, mbstate_t>
   ::do_always_noconv() const _STLP_NOTHROW {
   return false;
 }
 
-int
+int 
 codecvt_byname<wchar_t, char, mbstate_t>::do_length(const state_type&,
                                                     const  extern_type* from, const  extern_type* end,
-                                                    size_t mx) const
-{ return (int)(min) ((size_t) (end - from), mx); }
+                                                    size_t mx) const {
+  return (int)(min) ((size_t) (end - from), mx);
+}
 
 int
-codecvt_byname<wchar_t, char, mbstate_t>::do_max_length() const _STLP_NOTHROW
-{ return _Locale_mb_cur_max(_M_ctype); }
-#  endif
+codecvt_byname<wchar_t, char, mbstate_t>::do_max_length() const _STLP_NOTHROW {
+  return _Locale_mb_cur_max(_M_ctype);
+}
+# endif /* WCHAR_T */
 
 _STLP_END_NAMESPACE
 
-#endif /* MBSTATE_T */
+# endif /* MBSTATE_T */
+
+#include "locale_impl.h"
+# include <stl/_numpunct.h>
 
 _STLP_BEGIN_NAMESPACE
 
+_Locale_numeric*  _STLP_CALL __acquire_numeric(const char* name);
+void  _STLP_CALL __release_numeric(_Locale_numeric* cat);
+
 // numpunct_byname<char>
-numpunct_byname<char>::numpunct_byname(const char* name, size_t refs, _Locale_name_hint* hint)
+
+numpunct_byname<char>::numpunct_byname(const char* name, size_t refs)
   : numpunct<char>(refs),
-    _M_numeric(_STLP_PRIV __acquire_numeric(name, hint)) {
+    _M_numeric(__acquire_numeric(name)) {
   if (!_M_numeric)
     locale::_M_throw_runtime_error();
 
@@ -407,14 +465,17 @@ numpunct_byname<char>::numpunct_byname(const char* name, size_t refs, _Locale_na
   _M_falsename = _Locale_false(_M_numeric);
 }
 
-numpunct_byname<char>::~numpunct_byname()
-{ _STLP_PRIV __release_numeric(_M_numeric); }
+numpunct_byname<char>::~numpunct_byname() {
+  __release_numeric(_M_numeric);
+}
 
-char numpunct_byname<char>::do_decimal_point() const
-{ return _Locale_decimal_point(_M_numeric); }
+char numpunct_byname<char>::do_decimal_point() const {
+  return _Locale_decimal_point(_M_numeric);
+}
 
-char numpunct_byname<char>::do_thousands_sep() const
-{ return _Locale_thousands_sep(_M_numeric); }
+char numpunct_byname<char>::do_thousands_sep() const {
+  return _Locale_thousands_sep(_M_numeric);
+}
 
 string numpunct_byname<char>::do_grouping() const {
   const char * __grouping = _Locale_grouping(_M_numeric);
@@ -426,13 +487,13 @@ string numpunct_byname<char>::do_grouping() const {
 //----------------------------------------------------------------------
 // numpunct<wchar_t>
 
-#if !defined (_STLP_NO_WCHAR_T)
+# ifndef _STLP_NO_WCHAR_T
 
-// numpunct_byname<wchar_t>
+// numpunct_byname<wchar_t> 
 
-numpunct_byname<wchar_t>::numpunct_byname(const char* name, size_t refs, _Locale_name_hint* hint)
+numpunct_byname<wchar_t>::numpunct_byname(const char* name, size_t refs)
   : numpunct<wchar_t>(refs),
-    _M_numeric(_STLP_PRIV __acquire_numeric(name, hint)) {
+    _M_numeric(__acquire_numeric(name)) {
   if (!_M_numeric)
     locale::_M_throw_runtime_error();
 
@@ -444,14 +505,17 @@ numpunct_byname<wchar_t>::numpunct_byname(const char* name, size_t refs, _Locale
   copy(falsename, falsename + strlen(falsename), _M_falsename.begin());
 }
 
-numpunct_byname<wchar_t>::~numpunct_byname()
-{ _STLP_PRIV __release_numeric(_M_numeric); }
+numpunct_byname<wchar_t>::~numpunct_byname() {
+  __release_numeric(_M_numeric);
+}
 
-wchar_t numpunct_byname<wchar_t>::do_decimal_point() const
-{ return (wchar_t) _Locale_decimal_point(_M_numeric); }
+wchar_t numpunct_byname<wchar_t>::do_decimal_point() const {
+  return (wchar_t) _Locale_decimal_point(_M_numeric);
+}
 
-wchar_t numpunct_byname<wchar_t>::do_thousands_sep() const
-{ return (wchar_t) _Locale_thousands_sep(_M_numeric); }
+wchar_t numpunct_byname<wchar_t>::do_thousands_sep() const {
+  return (wchar_t) _Locale_thousands_sep(_M_numeric);
+}
 
 string numpunct_byname<wchar_t>::do_grouping() const {
   const char * __grouping = _Locale_grouping(_M_numeric);
@@ -460,13 +524,21 @@ string numpunct_byname<wchar_t>::do_grouping() const {
   return __grouping;
 }
 
-#endif
+# endif
 
-_STLP_MOVE_TO_PRIV_NAMESPACE
+_STLP_END_NAMESPACE
+
+#include <stl/_monetary.h>
+// #include <stl/_ostream.h>
+// #include <stl/_istream.h>
+#include "c_locale.h"
+
+
+_STLP_BEGIN_NAMESPACE
 
 static void _Init_monetary_formats(money_base::pattern& pos_format,
-                                   money_base::pattern& neg_format,
-                                   _Locale_monetary * monetary) {
+                                    money_base::pattern& neg_format,
+                                    _Locale_monetary * monetary) {
   switch (_Locale_p_sign_posn(monetary)) {
     case 0: // Parentheses surround the quantity and currency_symbol
     case 1: // The sign string precedes the quantity and currency_symbol
@@ -495,7 +567,7 @@ static void _Init_monetary_formats(money_base::pattern& pos_format,
           pos_format.field[2] = (char) money_base::symbol;
           pos_format.field[3] = (char) money_base::none;
         }
-      }
+      }       
       break;
     case 2: // The sign string succeeds the quantity and currency_symbol.
       if (_Locale_p_cs_precedes(monetary)) {
@@ -600,11 +672,11 @@ static void _Init_monetary_formats(money_base::pattern& pos_format,
           neg_format.field[2] = (char) money_base::space;
           neg_format.field[3] = (char) money_base::symbol;
         } else {
-          // a space not separates currency_symbol from a negative value.
+          // a space not separates currency_symbol from a negative value. 
           neg_format.field[2] = (char) money_base::symbol;
           neg_format.field[3] = (char) money_base::none;
         }
-      }
+      }       
       break;
     case 2: // The sign string succeeds the quantity and currency_symbol.
       if (_Locale_n_cs_precedes(monetary)) {
@@ -706,7 +778,7 @@ static void _Init_monetary_formats(money_base::pattern& pos_format,
  * But I am expect that international currency symbol should be the first
  * (not depends upon where currency symbol situated in the national
  * format).
- *
+ * 
  * If this isn't so, let's see:
  *       1 234.56 RUR
  *       GBP 1,234.56
@@ -781,165 +853,173 @@ static void _Init_monetary_formats_int(money_base::pattern& pos_format,
   neg_format.field[3] = (char) money_base::none;
 }
 
-_STLP_MOVE_TO_STD_NAMESPACE
-
 //
 // moneypunct_byname<>
 //
+
+_Locale_monetary* __acquire_monetary(const char* name);
+void __release_monetary(_Locale_monetary* mon);
+
 moneypunct_byname<char, true>::moneypunct_byname(const char * name,
-                                                 size_t refs, _Locale_name_hint* hint):
-  moneypunct<char, true>(refs), _M_monetary(_STLP_PRIV __acquire_monetary(name, hint)) {
+                                                 size_t refs):
+  moneypunct<char, true>(refs), _M_monetary(__acquire_monetary(name)) {
   if (!_M_monetary)
     locale::_M_throw_runtime_error();
-  _STLP_PRIV _Init_monetary_formats_int(_M_pos_format, _M_neg_format, _M_monetary);
+  _Init_monetary_formats_int(_M_pos_format, _M_neg_format, _M_monetary);
 }
 
-moneypunct_byname<char, true>::~moneypunct_byname()
-{ _STLP_PRIV __release_monetary(_M_monetary); }
+moneypunct_byname<char, true>::~moneypunct_byname() {
+  __release_monetary(_M_monetary);
+}
 
-char moneypunct_byname<char, true>::do_decimal_point() const
-{ return _Locale_mon_decimal_point(_M_monetary); }
+char moneypunct_byname<char, true>::do_decimal_point() const 
+  {return _Locale_mon_decimal_point(_M_monetary);}
 
 char moneypunct_byname<char, true>::do_thousands_sep() const
-{ return _Locale_mon_thousands_sep(_M_monetary); }
+  {return _Locale_mon_thousands_sep(_M_monetary);}
 
 string moneypunct_byname<char, true>::do_grouping() const
-{ return _Locale_mon_grouping(_M_monetary); }
+  {return _Locale_mon_grouping(_M_monetary);}
 
 string moneypunct_byname<char, true>::do_curr_symbol() const
-{ return _Locale_int_curr_symbol(_M_monetary); }
+  {return _Locale_int_curr_symbol(_M_monetary);}
 
 string moneypunct_byname<char, true>::do_positive_sign() const
-{ return _Locale_positive_sign(_M_monetary); }
+  {return _Locale_positive_sign(_M_monetary);}
 
 string moneypunct_byname<char, true>::do_negative_sign() const
-{ return _Locale_negative_sign(_M_monetary); }
+  {return _Locale_negative_sign(_M_monetary);}
 
-int moneypunct_byname<char, true>::do_frac_digits() const
-{ return _Locale_int_frac_digits(_M_monetary); }
+int moneypunct_byname<char, true>::do_frac_digits() const 
+  {return _Locale_int_frac_digits(_M_monetary);}
 
 moneypunct_byname<char, false>::moneypunct_byname(const char * name,
-                                                  size_t refs, _Locale_name_hint* hint):
-  moneypunct<char, false>(refs), _M_monetary(_STLP_PRIV __acquire_monetary(name, hint)) {
+                                                  size_t refs):
+  moneypunct<char, false>(refs), _M_monetary(__acquire_monetary(name)) {
   if (!_M_monetary)
     locale::_M_throw_runtime_error();
-  _STLP_PRIV _Init_monetary_formats(_M_pos_format, _M_neg_format, _M_monetary);
+  _Init_monetary_formats(_M_pos_format, _M_neg_format, _M_monetary);
 }
 
-moneypunct_byname<char, false>::~moneypunct_byname()
-{ _STLP_PRIV __release_monetary(_M_monetary); }
+moneypunct_byname<char, false>::~moneypunct_byname() {
+  __release_monetary(_M_monetary);
+}
 
 char moneypunct_byname<char, false>::do_decimal_point() const
-{ return _Locale_mon_decimal_point(_M_monetary); }
+  {return _Locale_mon_decimal_point(_M_monetary);}
 
 char moneypunct_byname<char, false>::do_thousands_sep() const
-{ return _Locale_mon_thousands_sep(_M_monetary); }
+  {return _Locale_mon_thousands_sep(_M_monetary);}
 
 string moneypunct_byname<char, false>::do_grouping() const
-{ return _Locale_mon_grouping(_M_monetary); }
+  {return _Locale_mon_grouping(_M_monetary);}
 
 string moneypunct_byname<char, false>::do_curr_symbol() const
-{ return _Locale_currency_symbol(_M_monetary); }
+  {return _Locale_currency_symbol(_M_monetary);}
 
 string moneypunct_byname<char, false>::do_positive_sign() const
-{ return _Locale_positive_sign(_M_monetary); }
+  {return _Locale_positive_sign(_M_monetary);}
 
 string moneypunct_byname<char, false>::do_negative_sign() const
-{ return _Locale_negative_sign(_M_monetary); }
+  {return _Locale_negative_sign(_M_monetary);}
 
-int moneypunct_byname<char, false>::do_frac_digits() const
-{ return _Locale_frac_digits(_M_monetary); }
+int moneypunct_byname<char, false>::do_frac_digits() const 
+  {return _Locale_frac_digits(_M_monetary);}
 
 //
 // moneypunct_byname<wchar_t>
 //
-#if !defined (_STLP_NO_WCHAR_T)
+# ifndef _STLP_NO_WCHAR_T
 
 moneypunct_byname<wchar_t, true>::moneypunct_byname(const char * name,
-                                                    size_t refs, _Locale_name_hint* hint):
-  moneypunct<wchar_t, true>(refs), _M_monetary(_STLP_PRIV __acquire_monetary(name, hint)) {
+                                                    size_t refs):
+  moneypunct<wchar_t, true>(refs), _M_monetary(__acquire_monetary(name)) {
   if (!_M_monetary)
     locale::_M_throw_runtime_error();
-  _STLP_PRIV _Init_monetary_formats_int(_M_pos_format, _M_neg_format, _M_monetary);
+  _Init_monetary_formats_int(_M_pos_format, _M_neg_format, _M_monetary);
 }
 
-moneypunct_byname<wchar_t, true>::~moneypunct_byname()
-{ _STLP_PRIV __release_monetary(_M_monetary); }
+moneypunct_byname<wchar_t, true>::~moneypunct_byname() {
+  __release_monetary(_M_monetary);
+}
 
 wchar_t moneypunct_byname<wchar_t, true>::do_decimal_point() const
-{ return _Locale_mon_decimal_point(_M_monetary); }
+  {return _Locale_mon_decimal_point(_M_monetary);}
 
 wchar_t moneypunct_byname<wchar_t, true>::do_thousands_sep() const
-{ return _Locale_mon_thousands_sep(_M_monetary); }
+  {return _Locale_mon_thousands_sep(_M_monetary);}
 
 string moneypunct_byname<wchar_t, true>::do_grouping() const
-{ return _Locale_mon_grouping(_M_monetary); }
-
+  {return _Locale_mon_grouping(_M_monetary);}
+  
 inline wstring __do_widen (string const& str) {
-#if defined (_STLP_NO_MEMBER_TEMPLATES) || defined (_STLP_MSVC) || defined(__MRC__) || defined(__SC__) //*ty 05/26/2001 - added workaround for mpw
+# if defined (_STLP_NO_MEMBER_TEMPLATES) || defined (_STLP_MSVC) || defined(__MRC__) || defined(__SC__) //*ty 05/26/2001 - added workaround for mpw
   wstring::_Reserve_t __Reserve;
   size_t __size = str.size();
   wstring result(__Reserve, __size);
   copy(str.begin(), str.end(), result.begin());
-#else
+# else
   wstring result(str.begin(), str.end());
-#endif
+# endif
   return result;
 }
 
-wstring moneypunct_byname<wchar_t, true>::do_curr_symbol() const
-{ return __do_widen(_Locale_int_curr_symbol(_M_monetary)); }
+wstring moneypunct_byname<wchar_t, true>::do_curr_symbol() const 
+  {return __do_widen(_Locale_int_curr_symbol(_M_monetary));}
 
-wstring moneypunct_byname<wchar_t, true>::do_positive_sign() const
-{ return __do_widen(_Locale_positive_sign(_M_monetary)); }
+wstring moneypunct_byname<wchar_t, true>::do_positive_sign() const 
+  {return __do_widen(_Locale_positive_sign(_M_monetary));}
 
-wstring moneypunct_byname<wchar_t, true>::do_negative_sign() const
-{ return __do_widen(_Locale_negative_sign(_M_monetary)); }
+wstring moneypunct_byname<wchar_t, true>::do_negative_sign() const 
+  {return __do_widen(_Locale_negative_sign(_M_monetary));}
 
-int moneypunct_byname<wchar_t, true>::do_frac_digits() const
-{ return _Locale_int_frac_digits(_M_monetary); }
+int moneypunct_byname<wchar_t, true>::do_frac_digits() const 
+  {return _Locale_int_frac_digits(_M_monetary);}
 
 moneypunct_byname<wchar_t, false>::moneypunct_byname(const char * name,
-                                                     size_t refs, _Locale_name_hint* hint):
-  moneypunct<wchar_t, false>(refs), _M_monetary(_STLP_PRIV __acquire_monetary(name, hint)) {
+                                                     size_t refs):
+  moneypunct<wchar_t, false>(refs), _M_monetary(__acquire_monetary(name)) {
   if (!_M_monetary)
     locale::_M_throw_runtime_error() ;
-  _STLP_PRIV _Init_monetary_formats(_M_pos_format, _M_neg_format, _M_monetary);
+  _Init_monetary_formats(_M_pos_format, _M_neg_format, _M_monetary);
 }
 
-moneypunct_byname<wchar_t, false>::~moneypunct_byname()
-{ _STLP_PRIV __release_monetary(_M_monetary); }
+moneypunct_byname<wchar_t, false>::~moneypunct_byname() 
+  {__release_monetary(_M_monetary);}
 
 wchar_t moneypunct_byname<wchar_t, false>::do_decimal_point() const
-{ return _Locale_mon_decimal_point(_M_monetary); }
+  {return _Locale_mon_decimal_point(_M_monetary);}
 
 wchar_t moneypunct_byname<wchar_t, false>::do_thousands_sep() const
-{ return _Locale_mon_thousands_sep(_M_monetary); }
+  {return _Locale_mon_thousands_sep(_M_monetary);}
 
 string moneypunct_byname<wchar_t, false>::do_grouping() const
-{ return _Locale_mon_grouping(_M_monetary); }
+  {return _Locale_mon_grouping(_M_monetary);}
 
-wstring moneypunct_byname<wchar_t, false>::do_curr_symbol() const
-{ return __do_widen(_Locale_currency_symbol(_M_monetary)); }
+wstring moneypunct_byname<wchar_t, false>::do_curr_symbol() const 
+  {return __do_widen(_Locale_currency_symbol(_M_monetary));}
 
-wstring moneypunct_byname<wchar_t, false>::do_positive_sign() const
-{ return __do_widen(_Locale_positive_sign(_M_monetary)); }
+wstring moneypunct_byname<wchar_t, false>::do_positive_sign() const 
+  {return __do_widen(_Locale_positive_sign(_M_monetary));}
 
-wstring moneypunct_byname<wchar_t, false>::do_negative_sign() const
-{ return __do_widen(_Locale_negative_sign(_M_monetary)); }
+wstring moneypunct_byname<wchar_t, false>::do_negative_sign() const 
+  {return __do_widen(_Locale_negative_sign(_M_monetary));}
 
-int moneypunct_byname<wchar_t, false>::do_frac_digits() const
-{ return _Locale_frac_digits(_M_monetary); }
+int moneypunct_byname<wchar_t, false>::do_frac_digits() const 
+  {return _Locale_frac_digits(_M_monetary);}
 
-#endif
+# endif
 
-_STLP_END_NAMESPACE
+_STLP_END_NAMESPACE  
 
+#include <stl/_messages_facets.h>
 #include "message_facets.h"
 
-_STLP_BEGIN_NAMESPACE
+#ifndef _STLP_NO_RTTI
+# include <typeinfo>
+#endif /*_STLP_NO_RTTI*/
 
-_STLP_MOVE_TO_PRIV_NAMESPACE
+_STLP_BEGIN_NAMESPACE
 
 void _Catalog_locale_map::insert(nl_catd_type key, const locale& L) {
   _STLP_TRY {
@@ -958,7 +1038,7 @@ void _Catalog_locale_map::insert(nl_catd_type key, const locale& L) {
       if (!M)
         M = new map_type;
 
-#if defined (__SC__)
+#if defined(__SC__)
       if (!M) delete M;
 #endif
       M->insert(map_type::value_type(key, L));
@@ -985,18 +1065,18 @@ locale _Catalog_locale_map::lookup(nl_catd_type key) const {
 
 
 #if defined (_STLP_USE_NL_CATD_MAPPING)
-_STLP_VOLATILE __stl_atomic_t _Catalog_nl_catd_map::_count = 0;
+int _Catalog_nl_catd_map::_count = 0;
 
 messages_base::catalog _Catalog_nl_catd_map::insert(nl_catd_type cat) {
   messages_base::catalog &res = Mr[cat];
   if ( res == 0 ) {
 #if defined (_STLP_ATOMIC_INCREMENT)
-    res = __STATIC_CAST(int, _STLP_ATOMIC_INCREMENT(&_count));
+    res = _STLP_ATOMIC_INCREMENT(&_count);
 #else
     static _STLP_STATIC_MUTEX _Count_lock _STLP_MUTEX_INITIALIZER;
     {
       _STLP_auto_lock sentry(_Count_lock);
-      res = __STATIC_CAST(int, ++_count);
+      res = ++_count;
     }
 #endif
     M[res] = cat;
@@ -1017,18 +1097,18 @@ void _Catalog_nl_catd_map::erase(messages_base::catalog cat) {
 //
 //
 
-_Messages_impl::_Messages_impl(bool is_wide, _Locale_name_hint* hint) :
-  _M_message_obj(0), _M_map(0) {
+_Messages_impl::_Messages_impl(bool is_wide) : 
+  _M_message_obj(0), _M_map(0) { 
   _M_delete = true;
-  if (is_wide)
+  if (is_wide) 
     _M_map = new _Catalog_locale_map;
-  _M_message_obj = __acquire_messages("C", hint);
+  _M_message_obj = __acquire_messages("C");
 }
 
-_Messages_impl::_Messages_impl(bool is_wide, _Locale_messages* msg_obj ) :
-  _M_message_obj(msg_obj), _M_map(0) {
+_Messages_impl::_Messages_impl(bool is_wide, _Locale_messages* msg_obj ) : 
+  _M_message_obj(msg_obj), _M_map(0) { 
   _M_delete = true;
-  if (is_wide)
+  if (is_wide) 
     _M_map = new _Catalog_locale_map;
 }
 
@@ -1037,7 +1117,7 @@ _Messages_impl::~_Messages_impl() {
   if (_M_map) delete _M_map;
 }
 
-_Messages::catalog _Messages_impl::do_open(const string& filename, const locale& L) const {
+_Messages::catalog _Messages_impl::do_open(const string& filename, const locale& L) const {  
   nl_catd_type result = _M_message_obj ? _Locale_catopen(_M_message_obj, filename.c_str())
     : (nl_catd_type)(-1);
 
@@ -1058,7 +1138,7 @@ string _Messages_impl::do_get(catalog cat,
     : dfault;
 }
 
-#if !defined (_STLP_NO_WCHAR_T)
+# ifndef _STLP_NO_WCHAR_T
 
 wstring
 _Messages_impl::do_get(catalog thecat,
@@ -1080,14 +1160,14 @@ _Messages_impl::do_get(catalog thecat,
   // str is correct.  Now we must widen it to get a wstring.
   size_t n = strlen(str);
 
-  // NOT PORTABLE.  What we're doing relies on internal details of the
+  // NOT PORTABLE.  What we're doing relies on internal details of the 
   // string implementation.  (Contiguity of string elements.)
   wstring result(n, wchar_t(0));
   ct.widen(str, str + n, &*result.begin());
   return result;
 }
 
-#endif
+# endif
 
 void _Messages_impl::do_close(catalog thecat) const {
   if (_M_message_obj)
@@ -1096,48 +1176,47 @@ void _Messages_impl::do_close(catalog thecat) const {
   _M_cat.erase( thecat );
 }
 
-_STLP_MOVE_TO_STD_NAMESPACE
 
 //----------------------------------------------------------------------
 // messages<char>
 
-messages<char>::messages(size_t refs) :
-  locale::facet(refs), _M_impl(new _STLP_PRIV _Messages_impl(false)) {}
+messages<char>::messages(size_t refs)  : 
+  locale::facet(refs), _M_impl(new _Messages_impl(false)) {}
 
-messages<char>::messages(size_t refs, _Locale_messages* msg_obj) : locale::facet(refs),
-  _M_impl(new _STLP_PRIV _Messages_impl(false, msg_obj)) {}
+messages<char>::messages(size_t refs, _Locale_messages* msg_obj) : locale::facet(refs), 
+  _M_impl(new _Messages_impl(false, msg_obj)) {}
 
 
 //----------------------------------------------------------------------
 // messages_byname<char>
 
-messages_byname<char>::messages_byname(const char* name, size_t refs, _Locale_name_hint* hint)
-  : messages<char>(refs, name ? _STLP_PRIV __acquire_messages(name, hint) : 0) {}
+messages_byname<char>::messages_byname(const char* name, size_t refs)
+  : messages<char>(refs, name ? __acquire_messages(name) : 0) {}
 
 messages_byname<char>::~messages_byname() {}
 
-#if !defined (_STLP_NO_WCHAR_T)
+# ifndef _STLP_NO_WCHAR_T
 
 //----------------------------------------------------------------------
 // messages<wchar_t>
 
-messages<wchar_t>::messages(size_t refs)  :
-  locale::facet(refs), _M_impl(new _STLP_PRIV _Messages_impl(true)) {}
+messages<wchar_t>::messages(size_t refs)  : 
+  locale::facet(refs), _M_impl(new _Messages_impl(true)) {}
 
 messages<wchar_t>::messages(size_t refs, _Locale_messages* msg_obj)
   : locale::facet(refs),
-    _M_impl(new _STLP_PRIV _Messages_impl(true, msg_obj)) {}
+    _M_impl(new _Messages_impl(true, msg_obj)) {}
 
 //----------------------------------------------------------------------
 // messages_byname<wchar_t>
 
 
-messages_byname<wchar_t>::messages_byname(const char* name, size_t refs, _Locale_name_hint* hint)
-  : messages<wchar_t>(refs, name ? _STLP_PRIV __acquire_messages(name, hint) : 0) {}
+messages_byname<wchar_t>::messages_byname(const char* name, size_t refs)
+  : messages<wchar_t>(refs, name ? __acquire_messages(name) : 0) {}
 
 messages_byname<wchar_t>::~messages_byname() {}
 
-#endif
+# endif
 
 _STLP_END_NAMESPACE
 

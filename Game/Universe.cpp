@@ -34,7 +34,6 @@
 #include "MergeOptions.h"
 #include "..\Units\ExternalShow.h"
 #include "PlayerStatistics.h"
-//#include "..\Sound\SoundSystem.h" // @dilesoft
 
 BEGIN_ENUM_DESCRIPTOR(RealPlayerType, "RealPlayerType");
 REGISTER_ENUM(REAL_PLAYER_TYPE_CLOSE, "Closed");
@@ -50,16 +49,6 @@ PROGRESSCALLBACK Universe::progressCallback_ = 0;
 Universe* Universe::universe_ = NULL;
 
 //------------------------------------------
-
-/* bool Channel::isInFogOfWar() // @dilesoft
-{
-	if(sound_->system_->gameActive_&&stopInFogOfWar_&&universe()&&universe()->activePlayer()->fogOfWarMap()&&is3DSound_&&
-	   universe()->activePlayer()->fogOfWarMap()->getFogState(ds3DBuffer_.vPosition.x,ds3DBuffer_.vPosition.y) != FOGST_NONE)
-	{
-		return true;
-	}
-	return false;
-} */
 
 Universe::Universe(MissionDescription& mission, XPrmIArchive* ia) :
 unitGrid(vMap.H_SIZE, vMap.V_SIZE)

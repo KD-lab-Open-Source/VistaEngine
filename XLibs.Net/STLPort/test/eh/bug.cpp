@@ -8,15 +8,15 @@ struct compare
 {
     bool operator()(int* x, int* y)
         { return *x < *y; }
-
+            
 };
 
 int main(int argc, char const* const argv[])
 {
     std::size_t niters = argc < 2 ? 1000 : boost::lexical_cast<std::size_t>(argv[1]);
-
+    
     boost::timer t;
-
+    
     std::vector<int> v;
     for (int n = 0; n < niters; ++n)
     {
@@ -24,7 +24,7 @@ int main(int argc, char const* const argv[])
     }
 
     std::cout << "vector fill: " << t.elapsed() << std::endl;
-
+    
     std::multiset<int*,compare> m;
     for (int n = 0; n < niters; ++n)
     {

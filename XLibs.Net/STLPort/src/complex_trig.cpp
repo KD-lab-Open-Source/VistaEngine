@@ -2,24 +2,26 @@
  * Copyright (c) 1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
  * modified is included with the above copyright notice.
  *
- */
-#include "stlport_prefix.h"
+ */ 
+# include "stlport_prefix.h"
 
 
-// Trigonometric and hyperbolic functions for complex<float>,
+// Trigonometric and hyperbolic functions for complex<float>, 
 // complex<double>, and complex<long double>
+
+
 #include <complex>
 #include <cfloat>
 #include <cmath>
@@ -29,6 +31,7 @@ _STLP_BEGIN_NAMESPACE
 
 //----------------------------------------------------------------------
 // helpers
+
 #if defined (__sgi)
   static const union { unsigned int i; float f; } float_ulimit = { 0x42b2d4fc };
   static const float float_limit = float_ulimit.f;
@@ -65,7 +68,7 @@ _STLP_BEGIN_NAMESPACE
 //----------------------------------------------------------------------
 // sin
 template <class _Tp>
-static complex<_Tp> sinT(const complex<_Tp>& z) {
+complex<_Tp> sinT(const complex<_Tp>& z) {
   return complex<_Tp>(::sin(z._M_re) * ::cosh(z._M_im),
                       ::cos(z._M_re) * ::sinh(z._M_im));
 }
@@ -84,7 +87,7 @@ _STLP_DECLSPEC complex<long double> _STLP_CALL sin(const complex<long double>& z
 //----------------------------------------------------------------------
 // cos
 template <class _Tp>
-static complex<_Tp> cosT(const complex<_Tp>& z) {
+complex<_Tp> cosT(const complex<_Tp>& z) {
   return complex<_Tp>(::cos(z._M_re) * ::cosh(z._M_im),
                      -::sin(z._M_re) * ::sinh(z._M_im));
 }
@@ -103,7 +106,7 @@ _STLP_DECLSPEC complex<long double> _STLP_CALL cos(const complex<long double>& z
 //----------------------------------------------------------------------
 // tan
 template <class _Tp>
-static complex<_Tp> tanT(const complex<_Tp>& z, const _Tp& Tp_limit) {
+complex<_Tp> tanT(const complex<_Tp>& z, const _Tp& Tp_limit) {
   _Tp re2 = 2.f * z._M_re;
   _Tp im2 = 2.f * z._M_im;
 
@@ -129,7 +132,7 @@ _STLP_DECLSPEC complex<long double> _STLP_CALL tan(const complex<long double>& z
 //----------------------------------------------------------------------
 // sinh
 template <class _Tp>
-static complex<_Tp> sinhT(const complex<_Tp>& z) {
+complex<_Tp> sinhT(const complex<_Tp>& z) {
   return complex<_Tp>(::sinh(z._M_re) * ::cos(z._M_im),
                       ::cosh(z._M_re) * ::sin(z._M_im));
 }
@@ -148,7 +151,7 @@ _STLP_DECLSPEC complex<long double> _STLP_CALL sinh(const complex<long double>& 
 //----------------------------------------------------------------------
 // cosh
 template <class _Tp>
-static complex<_Tp> coshT(const complex<_Tp>& z) {
+complex<_Tp> coshT(const complex<_Tp>& z) {
   return complex<_Tp>(::cosh(z._M_re) * ::cos(z._M_im),
                       ::sinh(z._M_re) * ::sin(z._M_im));
 }
@@ -167,7 +170,7 @@ _STLP_DECLSPEC complex<long double> _STLP_CALL cosh(const complex<long double>& 
 //----------------------------------------------------------------------
 // tanh
 template <class _Tp>
-static complex<_Tp> tanhT(const complex<_Tp>& z, const _Tp& Tp_limit) {
+complex<_Tp> tanhT(const complex<_Tp>& z, const _Tp& Tp_limit) {
   _Tp re2 = 2.f * z._M_re;
   _Tp im2 = 2.f * z._M_im;
   if (::abs(re2) > Tp_limit)

@@ -5,7 +5,7 @@
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
@@ -26,11 +26,14 @@
 
 _STLP_BEGIN_NAMESPACE
 
+# define  unordered_map      __WORKAROUND_RENAME(unordered_map)
+# define  unordered_multimap __WORKAROUND_RENAME(unordered_multimap)
+
 //Specific iterator traits creation
 _STLP_CREATE_HASH_ITERATOR_TRAITS(UnorderedMapTraitsT, traits)
 
-template <class _Key, class _Tp, _STLP_DFL_TMPL_PARAM(_HashFcn,hash<_Key>),
-          _STLP_DFL_TMPL_PARAM(_EqualKey,equal_to<_Key>),
+template <class _Key, class _Tp, __DFL_TMPL_PARAM(_HashFcn,hash<_Key>),
+          __DFL_TMPL_PARAM(_EqualKey,equal_to<_Key>),
           _STLP_DEFAULT_PAIR_ALLOCATOR_SELECT(const _Key, _Tp) >
 class unordered_map
 #if defined (_STLP_USE_PARTIAL_SPEC_WORKAROUND)
@@ -43,14 +46,10 @@ public:
   typedef _Key key_type;
   typedef _Tp data_type;
   typedef _Tp mapped_type;
-#if !defined (__DMC__)
   typedef pair<const key_type, data_type> value_type;
-#else
-  typedef pair<key_type, data_type> value_type;
-#endif
 private:
   //Specific iterator traits creation
-  typedef _STLP_PRIV _UnorderedMapTraitsT<value_type> _UnorderedMapTraits;
+  typedef _STLP_PRIV::_UnorderedMapTraitsT<value_type> _UnorderedMapTraits;
 
 public:
   typedef hashtable<value_type, key_type, _HashFcn, _UnorderedMapTraits,
@@ -58,7 +57,7 @@ public:
 
   typedef typename _Ht::hasher hasher;
   typedef typename _Ht::key_equal key_equal;
-
+  
   typedef typename _Ht::size_type size_type;
   typedef typename _Ht::difference_type difference_type;
   typedef typename _Ht::pointer pointer;
@@ -79,8 +78,6 @@ public:
 
 private:
   _Ht _M_ht;
-  _STLP_KEY_TYPE_FOR_CONT_EXT(key_type)
-
 public:
   explicit unordered_map(size_type __n = 100, const hasher& __hf = hasher(),
                          const key_equal& __eql = key_equal(),
@@ -92,7 +89,7 @@ public:
 
 #if defined (_STLP_MEMBER_TEMPLATES)
   template <class _InputIterator>
-  unordered_map(_InputIterator __f, _InputIterator __l,
+  unordered_map(_InputIterator __f, _InputIterator __l, 
                 size_type __n = 100, const hasher& __hf = hasher(),
                 const key_equal& __eql = key_equal(),
                 const allocator_type& __a = allocator_type())
@@ -106,7 +103,7 @@ public:
     : _M_ht(__n, __hf, __eql, __a)
   { _M_ht.insert_unique(__f, __l); }
 
-  unordered_map(const_iterator __f, const_iterator __l,
+  unordered_map(const_iterator __f, const_iterator __l, 
                 size_type __n = 100, const hasher& __hf = hasher(),
                 const key_equal& __eql = key_equal(),
                 const allocator_type& __a = allocator_type())
@@ -135,33 +132,45 @@ public:
   template <class _InputIterator>
   void insert(_InputIterator __f, _InputIterator __l)
 #else
-  void insert(const value_type* __f, const value_type* __l)
+  void insert(const value_type* __f, const value_type* __l) 
   { _M_ht.insert_unique(__f,__l); }
   void insert(const_iterator __f, const_iterator __l)
 #endif /*_STLP_MEMBER_TEMPLATES */
   { _M_ht.insert_unique(__f, __l); }
 
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  iterator find(const _KT& __key) { return _M_ht.find(__key); }
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  const_iterator find(const _KT& __key) const { return _M_ht.find(__key); }
+#if defined(_STLP_MEMBER_TEMPLATES) && !defined (_STLP_NO_EXTENSIONS)
+  template <class _KT>
+  iterator find(const _KT& __key)
+#else
+  iterator find(const key_type& __key)
+#endif
+  { return _M_ht.find(__key); }
 
-  _STLP_TEMPLATE_FOR_CONT_EXT
+#if defined(_STLP_MEMBER_TEMPLATES) && !defined (_STLP_NO_EXTENSIONS)
+  template <class _KT>
+  const_iterator find(const _KT& __key) const
+#else
+  const_iterator find(const key_type& __key) const
+#endif
+  { return _M_ht.find(__key); }
+
+#if defined(_STLP_MEMBER_TEMPLATES) && !defined (_STLP_NO_EXTENSIONS)
+  template <class _KT>
   _Tp& operator[](const _KT& __key) {
+#else
+  _Tp& operator[](const key_type& __key) {
+#endif
     iterator __it = _M_ht.find(__key);
-    return (__it == _M_ht.end() ?
-      _M_ht._M_insert(value_type(__key, _STLP_DEFAULT_CONSTRUCTED(_Tp))).second :
-      (*__it).second );
+    return (__it == _M_ht.end() ? 
+	    _M_ht._M_insert(value_type(__key, _STLP_DEFAULT_CONSTRUCTED(_Tp))).second : 
+	    (*__it).second );
   }
 
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  size_type count(const _KT& __key) const { return _M_ht.count(__key); }
-
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  pair<iterator, iterator> equal_range(const _KT& __key)
+  size_type count(const key_type& __key) const { return _M_ht.count(__key); }
+  
+  pair<iterator, iterator> equal_range(const key_type& __key)
   { return _M_ht.equal_range(__key); }
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  pair<const_iterator, const_iterator> equal_range(const _KT& __key) const
+  pair<const_iterator, const_iterator> equal_range(const key_type& __key) const
   { return _M_ht.equal_range(__key); }
 
   size_type erase(const key_type& __key) {return _M_ht.erase(__key); }
@@ -172,8 +181,7 @@ public:
   size_type bucket_count() const { return _M_ht.bucket_count(); }
   size_type max_bucket_count() const { return _M_ht.max_bucket_count(); }
   size_type bucket_size(size_type __n) const { return _M_ht.elems_in_bucket(__n); }
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  size_type bucket(const _KT& __k) const { return _M_ht.bucket(__k); }
+  size_type bucket(const key_type& __k) const { return _M_ht.bucket(__k); }
   local_iterator begin(size_type __n) { return _M_ht.begin(__n); }
   local_iterator end(size_type __n) { return _M_ht.end(__n); }
   const_local_iterator begin(size_type __n) const { return _M_ht.begin(__n); }
@@ -188,8 +196,8 @@ public:
 //Specific iterator traits creation
 _STLP_CREATE_HASH_ITERATOR_TRAITS(UnorderedMultimapTraitsT, traits)
 
-template <class _Key, class _Tp, _STLP_DFL_TMPL_PARAM(_HashFcn,hash<_Key>),
-          _STLP_DFL_TMPL_PARAM(_EqualKey,equal_to<_Key>),
+template <class _Key, class _Tp, __DFL_TMPL_PARAM(_HashFcn,hash<_Key>),
+          __DFL_TMPL_PARAM(_EqualKey,equal_to<_Key>),
           _STLP_DEFAULT_PAIR_ALLOCATOR_SELECT(const _Key, _Tp) >
 class unordered_multimap
 #if defined (_STLP_USE_PARTIAL_SPEC_WORKAROUND)
@@ -202,14 +210,10 @@ public:
   typedef _Key key_type;
   typedef _Tp data_type;
   typedef _Tp mapped_type;
-#if !defined (__DMC__)
   typedef pair<const key_type, data_type> value_type;
-#else
-  typedef pair<key_type, data_type> value_type;
-#endif
 private:
   //Specific iterator traits creation
-  typedef _STLP_PRIV _UnorderedMultimapTraitsT<value_type> _UnorderedMultimapTraits;
+  typedef _STLP_PRIV::_UnorderedMultimapTraitsT<value_type> _UnorderedMultimapTraits;
 
 public:
   typedef hashtable<value_type, key_type, _HashFcn, _UnorderedMultimapTraits,
@@ -238,7 +242,6 @@ public:
 
 private:
   _Ht _M_ht;
-  _STLP_KEY_TYPE_FOR_CONT_EXT(key_type)
 
 public:
   explicit unordered_multimap(size_type __n = 100, const hasher& __hf = hasher(),
@@ -251,7 +254,7 @@ public:
 
 #if defined (_STLP_MEMBER_TEMPLATES)
   template <class _InputIterator>
-  unordered_multimap(_InputIterator __f, _InputIterator __l,
+  unordered_multimap(_InputIterator __f, _InputIterator __l, 
                      size_type __n = 100, const hasher& __hf = hasher(),
                      const key_equal& __eql = key_equal(),
                      const allocator_type& __a = allocator_type())
@@ -265,7 +268,7 @@ public:
     : _M_ht(__n, __hf, __eql, __a)
   { _M_ht.insert_equal(__f, __l); }
 
-  unordered_multimap(const_iterator __f, const_iterator __l,
+  unordered_multimap(const_iterator __f, const_iterator __l, 
                      size_type __n = 100, const hasher& __hf = hasher(),
                      const key_equal& __eql = key_equal(),
                      const allocator_type& __a = allocator_type())
@@ -286,33 +289,42 @@ public:
   const_iterator begin() const { return _M_ht.begin(); }
   const_iterator end() const { return _M_ht.end(); }
 
-  iterator insert(const value_type& __obj)
+  iterator insert(const value_type& __obj) 
   { return _M_ht.insert_equal(__obj); }
   iterator insert(const_iterator /*__hint*/, const value_type& __obj)
   { return _M_ht.insert_equal(__obj); }
 #if defined (_STLP_MEMBER_TEMPLATES)
   template <class _InputIterator>
-  void insert(_InputIterator __f, _InputIterator __l)
+  void insert(_InputIterator __f, _InputIterator __l) 
 #else
-  void insert(const value_type* __f, const value_type* __l)
+  void insert(const value_type* __f, const value_type* __l) 
   { _M_ht.insert_equal(__f,__l); }
-  void insert(const_iterator __f, const_iterator __l)
+  void insert(const_iterator __f, const_iterator __l) 
 #endif /*_STLP_MEMBER_TEMPLATES */
   { _M_ht.insert_equal(__f, __l); }
 
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  iterator find(const _KT& __key) { return _M_ht.find(__key); }
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  const_iterator find(const _KT& __key) const { return _M_ht.find(__key); }
+#if defined(_STLP_MEMBER_TEMPLATES) && !defined (_STLP_NO_EXTENSIONS)
+  template <class _KT>
+  iterator find(const _KT& __key)
+#else
+  iterator find(const key_type& __key)
+#endif
+  { return _M_ht.find(__key); }
 
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  size_type count(const _KT& __key) const { return _M_ht.count(__key); }
+#if defined(_STLP_MEMBER_TEMPLATES) && !defined (_STLP_NO_EXTENSIONS)
+  template <class _KT>
+  const_iterator find(const _KT& __key) const
+#else
+  const_iterator find(const key_type& __key) const
+#endif
+  { return _M_ht.find(__key); }
 
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  pair<iterator, iterator> equal_range(const _KT& __key)
+
+  size_type count(const key_type& __key) const { return _M_ht.count(__key); }
+  
+  pair<iterator, iterator> equal_range(const key_type& __key)
   { return _M_ht.equal_range(__key); }
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  pair<const_iterator, const_iterator> equal_range(const _KT& __key) const
+  pair<const_iterator, const_iterator> equal_range(const key_type& __key) const
   { return _M_ht.equal_range(__key); }
 
   size_type erase(const key_type& __key) {return _M_ht.erase(__key); }
@@ -323,8 +335,7 @@ public:
   size_type bucket_count() const { return _M_ht.bucket_count(); }
   size_type max_bucket_count() const { return _M_ht.max_bucket_count(); }
   size_type bucket_size(size_type __n) const { return _M_ht.elems_in_bucket(__n); }
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  size_type bucket(const _KT& __k) const { return _M_ht.bucket(__k); }
+  size_type bucket(const key_type& __k) const { return _M_ht.bucket(__k); }
   local_iterator begin(size_type __n) { return _M_ht.begin(__n); }
   local_iterator end(size_type __n) { return _M_ht.end(__n); }
   const_local_iterator begin(size_type __n) const { return _M_ht.begin(__n); }
@@ -355,12 +366,12 @@ public:
 #if defined (_STLP_CLASS_PARTIAL_SPECIALIZATION)
 template <class _Key, class _Tp, class _HashFn,  class _EqKey, class _Alloc>
 struct __move_traits<unordered_map<_Key, _Tp, _HashFn, _EqKey, _Alloc> > :
-  _STLP_PRIV __move_traits_help<typename unordered_map<_Key, _Tp, _HashFn, _EqKey, _Alloc>::_Ht>
+  __move_traits_help<typename unordered_map<_Key, _Tp, _HashFn, _EqKey, _Alloc>::_Ht>
 {};
 
 template <class _Key, class _Tp, class _HashFn,  class _EqKey, class _Alloc>
 struct __move_traits<unordered_multimap<_Key, _Tp, _HashFn, _EqKey, _Alloc> > :
-  _STLP_PRIV __move_traits_help<typename unordered_map<_Key, _Tp, _HashFn, _EqKey, _Alloc>::_Ht>
+  __move_traits_help<typename unordered_map<_Key, _Tp, _HashFn, _EqKey, _Alloc>::_Ht>
 {};
 
 template <class _Key, class _Tp, class _HashFn,  class _EqKey, class _Alloc>
@@ -380,7 +391,7 @@ public:
   insert_iterator(_Container& __x, typename _Container::iterator)
     : container(&__x) {}
   insert_iterator<_Container>&
-  operator=(const typename _Container::value_type& __val) {
+  operator=(const typename _Container::value_type& __val) { 
     container->insert(__val);
     return *this;
   }
@@ -407,7 +418,7 @@ public:
   insert_iterator(_Container& __x, typename _Container::iterator)
     : container(&__x) {}
   insert_iterator<_Container>&
-  operator=(const typename _Container::value_type& __val) {
+  operator=(const typename _Container::value_type& __val) { 
     container->insert(__val);
     return *this;
   }
@@ -418,10 +429,22 @@ public:
 
 #endif /* _STLP_CLASS_PARTIAL_SPECIALIZATION */
 
+// do a cleanup
+#undef unordered_map
+#undef unordered_multimap
+
+#define __unordered_map__ __FULL_NAME(unordered_map)
+#define __unordered_multimap__ __FULL_NAME(unordered_multimap)
+
 _STLP_END_NAMESPACE
+
+#if 0 //defined (_STLP_USE_WRAPPER_FOR_ALLOC_PARAM) 
+#  include <stl/wrappers/_unordered_map.h>
+#endif /*  WRAPPER */
 
 #endif /* _STLP_INTERNAL_UNORDERED_MAP_H */
 
 // Local Variables:
 // mode:C++
 // End:
+

@@ -12,7 +12,6 @@
 #include "Installer.h"
 #include "..\Units\CircleManagerParam.h"
 #include "..\Units\WeaponTarget.h"
-#include "SystemUtil.h"
 
 class WeaponPrm;
 
@@ -35,6 +34,7 @@ class UI_ActionDataSaveGameList;
 class UI_ActionDataPlayer;
 
 class UI_NetCenter;
+class ChatMessage;
 
 enum eNetMessageCode;
 
@@ -224,7 +224,8 @@ public:
 
 	UI_NetCenter& getNetCenter() const;
 
-	void handleChatString(const class ChatMessage& _chatMsg);
+	void handleChatString(const ChatMessage& _chatMsg);
+	void handleSystemMessage(const char* msg);
 	void handleNetwork(eNetMessageCode msg);
     
 	void saveGame(const string& gameName = string(""));
@@ -440,6 +441,8 @@ private:
 
 	bool makeDiskOp(UI_DiskOpID id, const char* path, GameType game_type);
 
+	void handleInGameChatString(const char* txt);
+	
 	string debugCursorReason_;
 
 	int lastCurrentHiVer_;

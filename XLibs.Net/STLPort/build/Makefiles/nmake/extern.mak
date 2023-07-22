@@ -1,5 +1,5 @@
 # Time-stamp: <03/09/28 13:44:57 ptr>
-# $Id: extern.mak 2092 2006-01-13 20:19:56Z dums $
+# $Id: extern.mak,v 1.1.2.2 2005/04/07 20:42:27 dums Exp $
 
 #!ifndef MSVC_LIB_DIR
 #MSVC_LIB_DIR = $(MSVC_DIR)\Lib
@@ -82,8 +82,8 @@ STLPORT_VER = 4.5.5
 #gSOAP_BIN_DIR ?= ${gSOAP_DIR}/bin
 
 # boost (http://www.boost.org, http://boost.sourceforge.net)
-!ifdef STLP_BUILD_BOOST_PATH
-INCLUDES=$(INCLUDES) /I$(STLP_BUILD_BOOST_PATH)
+!ifndef BOOST_INCLUDE_DIR
+BOOST_INCLUDE_DIR = $(BOOST_DIR)
 !endif
 
 # This file reflect versions of third-party libraries that

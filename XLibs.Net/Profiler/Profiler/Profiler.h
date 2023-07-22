@@ -6,7 +6,6 @@
 
 #include "xutil.h"
 #include "vector"
-#include "string"
 
 using namespace std;
 class Archive;
@@ -153,8 +152,8 @@ private:
 	static bool autoExit_;
 	static int startLogicQuant_;
 	static int endLogicQuant_;
-	static string title_;
-	static string profileFile_;
+	static XBuffer title_;
+	static XBuffer profileFile_;
 
 	typedef vector<PointerWrapper<Profiler> > Profilers;
 	static Profilers profilers_;
@@ -171,24 +170,27 @@ public:
 	~AutoStopTimer() { timer.stop(); }
 };
 	
-#define start_timer(title) static __declspec(thread) TimerData* __timer_##title; if(!__timer_##title) __timer_##title = new TimerData(__FUNCTION__" "#title); __timer_##title->start(); 
+#define start_timer(title) static __declspec(thread) TimerData* __timer_##title; if(!__timer_##title) __timer_##title = new TimerData(__FUNCTION__"_"#title); __timer_##title->start(); 
 #define stop_timer(title) __timer_##title->stop();
 #define start_timer_auto() static __declspec(thread) TimerData* __timer_; if(!__timer_) __timer_ = new TimerData(__FUNCTION__); __timer_->start(); AutoStopTimer autostop_timer_(*__timer_); 
-#define start_timer_auto1(title) static __declspec(thread) TimerData* __timer_##title; if(!__timer_##title) __timer_##title = new TimerData(__FUNCTION__" "#title); __timer_##title->start(); AutoStopTimer autostop_timer_##title(*__timer_##title); 
+#define start_timer_auto1(title) static __declspec(thread) TimerData* __timer_##title; if(!__timer_##title) __timer_##title = new TimerData(__FUNCTION__"_"#title); __timer_##title->start(); AutoStopTimer autostop_timer_(*__timer_##title); 
 #define statistics_add(title, x) { static __declspec(thread) StatisticalData* stat_##title; if(!stat_##title) stat_##title = new StatisticalData(#title); stat_##title->add(x); }
 
 inline void profiler_start_stop(ProfilerMode profilerMode = PROFILER_REBUILD) { Profiler::instance().start_stop(profilerMode); }
 inline void profiler_quant(int curLogicQuant = 0) { Profiler::instance().quant(curLogicQuant); }
 
-#define _LIB_NAME "Profiler"
-#include "AutomaticLink.h"
+#ifdef _DEBUG
+#pragma comment(lib, "ProfilerMTD.lib") 
+#else
+#pragma comment(lib, "ProfilerMT.lib") 
+#endif
 
 #else //_FINAL_VERSION_
 
 #define start_timer(title) 
 #define stop_timer(title) 
 #define start_timer_auto() 
-#define start_timer_auto1(title) 
+#define start_timer_auto1() 
 #define statistics_add(title, x) 
 
 inline void profiler_start_stop(ProfilerMode profilerMode = PROFILER_REBUILD){}

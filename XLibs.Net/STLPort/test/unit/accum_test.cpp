@@ -3,7 +3,7 @@
 
 #include "cppunit/cppunit_proxy.h"
 
-#if !defined (STLPORT) || defined (_STLP_USE_NAMESPACES)
+#if !defined (STLPORT) || defined(_STLP_USE_NAMESPACES)
 using namespace std;
 #endif
 

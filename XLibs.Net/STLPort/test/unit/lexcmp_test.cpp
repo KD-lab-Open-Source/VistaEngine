@@ -1,6 +1,5 @@
 #include <vector>
 #include <algorithm>
-#include <functional>
 
 #include "cppunit/cppunit_proxy.h"
 

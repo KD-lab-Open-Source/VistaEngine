@@ -214,13 +214,18 @@ Vect3f screenPointToGround(const Vect2i& mouse_pos)
 	cameraManager->GetCamera()->GetWorldRay(pos_in, pos, dir);
 	Vect3f result;
 	// проверяем пересечение с ландшафтом
-	if(terScene->TraceDir(pos, dir, &result))
+	if(terScene->TraceDir(pos, dir, &result)){
+		xassert(round(result.x) >= 0 && round(result.x) < vMap.H_SIZE &&
+				round(result.y) >= 0 && round(result.y) < vMap.V_SIZE);					
 		return result;
+	}
 	else{
 		float rayLength = 5000.0f;
 		Vect3f normal(Vect3f::K);
 		// проверяем на пересечение с горизонтальной плоскостью
-		if(intersect(normal, pos, pos + dir * rayLength, &result))
+		if(intersect(normal, pos, pos + dir * rayLength, &result) && 
+			round(result.x) >= 0 && round(result.x) < vMap.H_SIZE &&
+			round(result.y) >= 0 && round(result.y) < vMap.V_SIZE)
 			return result;
 		else{
 			// проверяем на пересечение с гранями bound-а мира
@@ -241,11 +246,14 @@ Vect3f screenPointToGround(const Vect2i& mouse_pos)
 
 				Vect3f point;
 				if(intersect(normal, pos + offset, pos + offset + dir * rayLength, &point, false)){
-					if(Vect2f(point.x - offset.x, point.y - offset.y).distance2(center) < Vect2f(result.x, result.y).distance2(center))
-						result = point - offset;
+					if(Vect2f(point.x + offset.x, point.y + offset.y).distance2(center) < Vect2f(result.x, result.y).distance2(center))
+						result = point + offset;
 				}
 			}
 			xassert(!result.eq(Vect3f(vMap.H_SIZE * 1e5f, vMap.V_SIZE* 1e5f, 0.0f)));
+			result.x = clamp(result.x, 0.0f, vMap.H_SIZE - 1.0f);
+			result.y = clamp(result.y, 0.0f, vMap.V_SIZE - 1.0f);
+			result = To3D(Vect2f(result.x, result.y));
 			return result;
 		}
 	}

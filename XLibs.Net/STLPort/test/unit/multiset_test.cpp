@@ -29,7 +29,7 @@ protected:
   {
     return a_ < b_;
   }
-
+ 
   static bool greater_than(int a_, int b_)
   {
     return a_ > b_;
@@ -100,10 +100,10 @@ void MultisetTest::mset5()
 {
   int array [] = { 3, 6, 1, 9 };
   int j;
-
+  
   typedef pointer_to_binary_function<int, int, bool> fn_type;
   typedef multiset<int, fn_type, allocator<int> > fn_mset;
-
+  
   fn_type f(less_than);
   fn_mset s1(array+0, array + 4 , f );
   fn_mset::const_iterator i = s1.begin();
@@ -113,7 +113,7 @@ void MultisetTest::mset5()
     CPPUNIT_ASSERT(j != 2 || *i == 6);
     CPPUNIT_ASSERT(j != 3 || *i == 9);
   }
-
+  
   fn_type g(greater_than);
   fn_mset s2(array, array + 4, g);
   i = s2.begin();

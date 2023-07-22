@@ -1,6 +1,6 @@
 /***********************************************************************************
   test_map.cpp
-
+  
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -50,9 +50,9 @@ typedef EH_STD::__multimap__<TestClass, TestClass, ThrowCompare, eh_allocator(Te
 void test_multimap()
 {
     TestMultiMap testMultiMap, testMultiMap2;
-
+  
     const size_t mapSize = random_number(random_base);
-
+  
     while ( testMultiMap.size() < mapSize )
     {
         TestMultiMap::value_type x;
@@ -69,16 +69,16 @@ void test_multimap()
 
     ConstCheck( 0, test_construct_pointer_range<TestMultiMap>(insFirst, insFirst+insCnt) );
     delete[] insFirst;
-
-
+  
+  
     WeakCheck( testMultiMap, insert_range_tester(testMultiMap, testMultiMap2.begin(), testMultiMap2.end() ) );
-
+  
 
     ConstCheck( 0, test_default_construct<TestMultiMap>() );
 
     ConstCheck( 0, test_construct_iter_range<TestMultiMap>( testMultiMap2 ) );
 
-    ConstCheck( testMultiMap, test_copy_construct<TestMultiMap>() );
+    ConstCheck( testMultiMap, test_copy_construct<TestMultiMap>() );  
 
     WeakCheck( testMultiMap, test_assign_op<TestMultiMap>( testMultiMap2 ) );
 }
@@ -88,7 +88,7 @@ typedef EH_STD::__map__<TestClass, TestClass, ThrowCompare, eh_allocator(TestCla
 void CheckInvariant( const TestMap& m );
 
 void CheckInvariant( const TestMap& m )
-{
+{  
 //  assert( map.__rb_verify() );
     size_t total = 0;
     EH_DISTANCE( m.begin(), m.end(), total );
@@ -98,9 +98,9 @@ void CheckInvariant( const TestMap& m )
 void test_map()
 {
     TestMap testMap, testMap2;
-
+  
     const size_t mapSize = random_number(random_base);
-
+  
     while ( testMap.size() < mapSize )
     {
         TestMap::value_type x;

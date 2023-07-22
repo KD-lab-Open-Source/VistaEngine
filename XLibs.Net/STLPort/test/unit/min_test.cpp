@@ -25,7 +25,9 @@ protected:
   void minelem1();
   void minelem2();
   static bool str_compare(const char* a_, const char* b_)
-  { return strcmp(a_, b_) < 0 ? 1 : 0; }
+  {
+    return strcmp(a_, b_) < 0 ? 1 : 0;
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(MinTest);
@@ -43,7 +45,7 @@ void MinTest::min1()
 }
 void MinTest::min2()
 {
-  const char* r = min((const char*)"shoe", (const char*)"shine", str_compare);
+  char* r = min((char *)"shoe",(char *)"shine", str_compare);
   CPPUNIT_ASSERT(!strcmp(r, "shine"));
 }
 void MinTest::minelem1()
@@ -54,9 +56,9 @@ void MinTest::minelem1()
 }
 void MinTest::minelem2()
 {
-  const char* names[] = { "Brett", "Graham", "Jack", "Mike", "Todd" };
+  char* names[] = { "Brett", "Graham", "Jack", "Mike", "Todd" };
 
-  const unsigned namesCt = sizeof(names) / sizeof(names[0]);
-  const char** r = min_element((const char**)names, (const char**)names + namesCt, str_compare);
+  const unsigned namesCt = sizeof(names)/sizeof(names[0]);
+  char** r = min_element((char**)names, (char**)names + namesCt, str_compare);
   CPPUNIT_ASSERT(!strcmp(*r, "Brett"));
 }

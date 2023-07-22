@@ -2,30 +2,29 @@
  * Copyright (c) 1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
  * modified is included with the above copyright notice.
  *
- */
+ */ 
 
-#include "stlport_prefix.h"
-
-#include <algorithm>
-#include <ios>
-#include <locale>
-#include <ostream> // for __get_ostreambuf definition
-
-#include "aligned_buffer.h"
+# include "stlport_prefix.h"
+# include <algorithm>
+# include <stl/_ios.h>
+# include "aligned_buffer.h"
 
 _STLP_BEGIN_NAMESPACE
+
+char* _STLP_CALL
+__write_integer(char* buf, ios_base::fmtflags flags, long x);
 
 //----------------------------------------------------------------------
 // ios_base members
@@ -33,7 +32,7 @@ _STLP_BEGIN_NAMESPACE
 // class ios_base::failure, a subclass of exception.  It's used solely
 // for reporting errors.
 
-ios_base::failure::failure(const string& s)
+ios_base::failure::failure(const string& s) 
   : __Named_exception(s)
 {}
 
@@ -80,7 +79,7 @@ const ios_base::seekdir ios_base::beg;
 const ios_base::seekdir ios_base::cur;
 const ios_base::seekdir ios_base::end;
 
-#endif /*  _STLP_STATIC_CONST_INIT_BUG */
+# endif /*  _STLP_STATIC_CONST_INIT_BUG */
 
 // Internal functions used for managing exponentially-growing arrays of
 // POD types.
@@ -89,23 +88,23 @@ const ios_base::seekdir ios_base::end;
 // if necessary, so that array[index] is meaningful.  All new elements are
 // initialized to zero.  Returns a pointer to the new array, and the new
 // size.
-
 template <class PODType>
-static pair<PODType*, size_t>
-_Stl_expand_array(PODType* __array, size_t N, int index) {
+pair<PODType*, size_t> 
+_Stl_expand_array(PODType* array, size_t N, int index)
+{
   if ((int)N < index + 1) {
     size_t new_N = (max)(2 * N, size_t(index + 1));
     PODType* new_array
-      = __STATIC_CAST(PODType*,realloc(__array, new_N * sizeof(PODType)));
+      = __STATIC_CAST(PODType*,realloc(array, new_N * sizeof(PODType)));
     if (new_array) {
       fill(new_array + N, new_array + new_N, PODType());
       return pair<PODType*, size_t>(new_array, new_N);
     }
-    else
+    else 
       return pair<PODType*, size_t>(__STATIC_CAST(PODType*,0), 0);
   }
   else
-    return pair<PODType*, size_t>(__array, N);
+    return pair<PODType*, size_t>(array, N);
 }
 
 // array is a pointer to N elements of type PODType.  Allocate a new
@@ -113,10 +112,10 @@ _Stl_expand_array(PODType* __array, size_t N, int index) {
 // Return a pointer to the new array.  It is assumed that array is non-null
 // and N is nonzero.
 template <class PODType>
-static PODType* _Stl_copy_array(const PODType* __array, size_t N) {
+PODType* _Stl_copy_array(const PODType* array, size_t N) {
   PODType* result = __STATIC_CAST(PODType*,malloc(N * sizeof(PODType)));
   if (result)
-    copy(__array, __array + N, result);
+    copy(array, array + N, result);
   return result;
 }
 
@@ -134,14 +133,12 @@ locale ios_base::imbue(const locale& loc) {
 }
 
 int _STLP_CALL ios_base::xalloc() {
-#if defined (_STLP_THREADS) && \
-    defined (_STLP_WIN32THREADS) && defined (_STLP_NEW_PLATFORM_SDK)
-  static volatile __stl_atomic_t _S_index = 0;
+  static int _S_index = 0;
+#if defined (_STLP_WIN32THREADS) && defined (_STLP_NEW_PLATFORM_SDK)
   return _STLP_ATOMIC_INCREMENT(&_S_index);
 #else
-  static int _S_index = 0;
-  static _STLP_STATIC_MUTEX __lock _STLP_MUTEX_INITIALIZER;
-  _STLP_auto_lock sentry(__lock);
+  static _STLP_STATIC_MUTEX L _STLP_MUTEX_INITIALIZER;
+  _STLP_auto_lock sentry(L);
   return _S_index++;
 #endif
 }
@@ -162,7 +159,7 @@ long& ios_base::iword(int index) {
   }
 }
 
-
+ 
 void*& ios_base::pword(int index) {
   static void* dummy = 0;
 
@@ -211,9 +208,9 @@ void ios_base::_M_throw_failure() {
   char buffer[256];
   char* ptr;
   strcpy(buffer, "ios failure: rdstate = 0x");
-  ptr = __write_integer(buffer+strlen(buffer), ios_base::hex, __STATIC_CAST(unsigned long,_M_iostate));
+  ptr = __write_integer(buffer+strlen(buffer), ios_base::hex, __STATIC_CAST(unsigned long,_M_iostate)); 
   strcpy(ptr, " mask = 0x");
-  ptr = __write_integer(buffer+strlen(buffer), ios_base::hex, __STATIC_CAST(unsigned long,_M_exception_mask));
+  ptr = __write_integer(buffer+strlen(buffer), ios_base::hex, __STATIC_CAST(unsigned long,_M_exception_mask)); 
   *ptr = 0;
   arg = buffer;
 # else
@@ -227,16 +224,16 @@ void ios_base::_M_throw_failure() {
 # endif
 }
 
-// Copy x's state to *this.  This member function is used in the
+// Copy x's state to *this.  This member function is used in the 
 // implementation of basic_ios::copyfmt.  Does not copy _M_exception_mask
-// or _M_iostate.
+// or _M_iostate.  
 void ios_base::_M_copy_state(const ios_base& x) {
   _M_fmtflags  = x._M_fmtflags; // Copy the flags, except for _M_iostate
   _M_openmode  = x._M_openmode; // and _M_exception_mask.
   _M_seekdir   = x._M_seekdir;
   _M_precision = x._M_precision;
   _M_width     = x._M_width;
-
+  
   if (_M_locale != x._M_locale) {
     _M_locale = x._M_locale;
     _M_cached_ctype = x._M_cached_ctype;
@@ -283,7 +280,7 @@ void ios_base::_M_copy_state(const ios_base& x) {
   }
 }
 
-// ios's (protected) default constructor.  The standard says that all
+// ios's (protected) default constructor.  The standard says that all 
 // fields have indeterminate values; we initialize them to zero for
 // simplicity.  The only thing that really matters is that the arrays
 // are all initially null pointers, and the array element counts are all
@@ -297,10 +294,11 @@ ios_base::ios_base()
     _M_iwords(0), _M_num_iwords(0),
     _M_pwords(0),
     _M_num_pwords(0) , _M_cached_ctype(0), _M_cached_numpunct(0)
-{}
+{ }
 
 // ios's destructor.
-ios_base::~ios_base() {
+ios_base::~ios_base()
+{
   _M_invoke_callbacks(erase_event);
   free(_M_callbacks);
   free(_M_iwords);
@@ -310,12 +308,12 @@ ios_base::~ios_base() {
 //----------------------------------------------------------------------
 // Force instantiation of basic_ios
 // For DLL exports, they are already instantiated.
-#if !defined(_STLP_NO_FORCE_INSTANTIATE)
+#  if !defined(_STLP_NO_FORCE_INSTANTIATE)
 template class _STLP_CLASS_DECLSPEC basic_ios<char, char_traits<char> >;
-#  if !defined (_STLP_NO_WCHAR_T)
+#   ifndef _STLP_NO_WCHAR_T
 template class _STLP_CLASS_DECLSPEC basic_ios<wchar_t, char_traits<wchar_t> >;
-#  endif /* _STLP_NO_WCHAR_T */
-#endif
+#   endif /* _STLP_NO_WCHAR_T */
+#  endif
 
 _STLP_END_NAMESPACE
 

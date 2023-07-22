@@ -23,7 +23,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="..\VisGeneric\INC,.,..\terra,..\Render\INC;..\Util;..\Game"
+				AdditionalIncludeDirectories="..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\XUtil;..\XLibs.Net\XUtil\CRC;..\VisGeneric\INC;.;..\terra;..\Render\INC;..\Util;..\Game"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_PERIMETER_"
 				RuntimeLibrary="0"
 				ForceConformanceInForLoopScope="TRUE"
@@ -47,7 +47,8 @@
 				OutputFile=".\Release/EffectTool.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="$(SolutionDir)\TreeList\output"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)\TreeList\output&quot;;..\XLibs.Net\MSDXSDK_02_06\Lib\x86;..\XLibs.Net\XUtil\libs;..\XLibs.Net\XZip;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\lib"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="../EffectTool.pdb"
 				SubSystem="2"
@@ -91,7 +92,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\XLibs.Net\Heap;..\XLibs.Net\stl;..\XLibs.Net\XUtil;..\XLibs.Net\XUtil\CRC;..\VisGeneric\INC;.;..\terra;..\Render\INC;..\Util;..\Game"
+				AdditionalIncludeDirectories="..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\XUtil;..\XLibs.Net\XUtil\CRC;..\VisGeneric\INC;.;..\terra;..\Render\INC;..\Util;..\Game"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_STLP_DEBUG 1;_SURMAP_"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -112,11 +113,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib msimg32.lib shlwapi.lib TreeListCtrlVC71_ST_MT_D.lib xmathmtdbg.lib"
+				AdditionalDependencies="winmm.lib msimg32.lib shlwapi.lib TreeListCtrlVC71_ST_MT_D.lib"
 				OutputFile="Debug/EffectToolDBG.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)\TreeList\output&quot;;..\XLibs.Net\lib;..\XLibs.Net\MSDXSDK_02_06\Lib\x86"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)\TreeList\output&quot;;..\XLibs.Net\MSDXSDK_02_06\Lib\x86;..\XLibs.Net\XUtil\libs;..\XLibs.Net\XZip;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="../EffectToolDBG.pdb"
 				SubSystem="2"

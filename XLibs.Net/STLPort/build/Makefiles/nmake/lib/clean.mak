@@ -1,5 +1,5 @@
 # -*- makefile -*- Time-stamp: <03/10/26 16:17:03 ptr>
-# $Id: clean.mak 2695 2006-10-26 19:36:35Z dums $
+# $Id: clean.mak,v 1.1.2.4 2005/09/19 19:58:06 dums Exp $
 
 clobber: clean
 	@if exist $(SO_NAME_OUT) del /F /Q $(SO_NAME_OUT)
@@ -32,8 +32,6 @@ clobber: clean
 	@-if exist $(OUTPUT_DIR_A) rd $(OUTPUT_DIR_A)
 	@-if exist $(OUTPUT_DIR_A_DBG) rd $(OUTPUT_DIR_A_DBG)
 	@-if exist $(OUTPUT_DIR_A_STLDBG) rd $(OUTPUT_DIR_A_STLDBG)
-	@-if exist $(OUTPUT_TARGET_DIR) rd $(OUTPUT_TARGET_DIR)
-	@-if exist $(OUTPUT_ROOT_DIR) rd $(OUTPUT_ROOT_DIR)
 
 distclean: clobber
 	@if exist $(INSTALL_BIN_DIR)\$(SO_NAME) del /F /Q $(INSTALL_BIN_DIR)\$(SO_NAME)
@@ -54,9 +52,4 @@ distclean: clobber
 	@if exist $(INSTALL_STATIC_LIB_DIR_DBG)\$(A_PDB_NAME_DBG) del /F /Q $(INSTALL_STATIC_LIB_DIR_DBG)\$(A_PDB_NAME_DBG)
 	@if exist $(INSTALL_STATIC_LIB_DIR_STLDBG)\$(A_NAME_STLDBG) del /F /Q $(INSTALL_STATIC_LIB_DIR_STLDBG)\$(A_NAME_STLDBG)
 	@if exist $(INSTALL_STATIC_LIB_DIR_STLDBG)\$(A_PDB_NAME_STLDBG) del /F /Q $(INSTALL_STATIC_LIB_DIR_STLDBG)\$(A_PDB_NAME_STLDBG)
-	@-if exist $(INSTALL_BIN_DIR) rd $(INSTALL_BIN_DIR)
-	@-if exist $(INSTALL_BIN_DIR_DBG) rd $(INSTALL_BIN_DIR_DBG)
-	@-if exist $(INSTALL_BIN_DIR_STLDBG) rd $(INSTALL_BIN_DIR_STLDBG)
-	@-if exist $(INSTALL_STATIC_LIB_DIR) rd $(INSTALL_STATIC_LIB_DIR)
-	@-if exist $(INSTALL_STATIC_LIB_DIR_DBG) rd $(INSTALL_STATIC_LIB_DIR_DBG)
-	@-if exist $(INSTALL_STATIC_LIB_DIR_STLDBG) rd $(INSTALL_STATIC_LIB_DIR_STLDBG)
+  

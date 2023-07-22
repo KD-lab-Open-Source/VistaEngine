@@ -27,8 +27,9 @@ protected:
 
 CPPUNIT_TEST_SUITE_REGISTRATION(UniqueTest);
 
-static bool str_equal(const char* a_, const char* b_)
-{ return *a_ == *b_; }
+static bool str_equal(const char* a_, const char* b_) {
+  return *a_ == *b_;
+}
 //
 // tests implementation
 //
@@ -36,7 +37,7 @@ void UniqueTest::unique1()
 {
   int numbers[8] = { 0, 1, 1, 2, 2, 2, 3, 4 };
   unique((int*)numbers, (int*)numbers + 8);
-  // 0 1 2 3 4 2 3 4
+  // 0 1 2 3 4 2 3 4 
   CPPUNIT_ASSERT(numbers[0]==0);
   CPPUNIT_ASSERT(numbers[1]==1);
   CPPUNIT_ASSERT(numbers[2]==2);
@@ -49,11 +50,12 @@ void UniqueTest::unique1()
 
 void UniqueTest::unique2()
 {
-  const char* labels[] = {"Q", "Q", "W", "W", "E", "E", "R", "T", "T", "Y", "Y"};
+
+  char* labels[] = { "Q","Q","W","W","E","E","R","T","T","Y","Y" };
 
   const unsigned count = sizeof(labels) / sizeof(labels[0]);
 
-  unique((const char**)labels, (const char**)labels + count, str_equal);
+  unique((char**)labels, (char**)labels + count, str_equal);
 
   // QWERTY
   CPPUNIT_ASSERT(*labels[0] == 'Q');
@@ -72,7 +74,7 @@ void UniqueTest::uniqcpy1()
 
   unique_copy((int*)numbers, (int*)numbers + 8, (int*)result);
 
-  // 0 1 2 3 4 0 0 0
+  // 0 1 2 3 4 0 0 0 
   CPPUNIT_ASSERT(result[0]==0);
   CPPUNIT_ASSERT(result[1]==1);
   CPPUNIT_ASSERT(result[2]==2);
@@ -85,15 +87,13 @@ void UniqueTest::uniqcpy1()
 
 void UniqueTest::uniqcpy2()
 {
-  const char* labels[] = {"Q", "Q", "W", "W", "E", "E", "R", "T", "T", "Y", "Y"};
-  const char **plabels = (const char**)labels;
+  char* labels[] = { "Q","Q","W","W","E","E","R","T","T","Y","Y" };
 
-  const size_t count = sizeof(labels) / sizeof(labels[0]);
+  const unsigned count = sizeof(labels) / sizeof(labels[0]);
   char* uCopy[count];
-  const char **puCopy = (const char**)uCopy;
-  fill(puCopy, puCopy + count, "");
-
-  unique_copy(plabels, plabels + count, puCopy, str_equal);
+  fill((char**)uCopy, (char**)uCopy + count, (char*)"");
+  
+  unique_copy((char**)labels, (char**)labels + count, (char**)uCopy, str_equal);
 
   //QWERTY
   CPPUNIT_ASSERT(*uCopy[0] == 'Q');

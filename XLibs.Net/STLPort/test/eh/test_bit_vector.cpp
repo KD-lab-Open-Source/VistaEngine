@@ -1,6 +1,6 @@
 /***********************************************************************************
   test_bit_vector.cpp
-
+  
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -52,7 +52,7 @@ struct test_BitVector_reserve
     {
         gTestController.SetCurrentTestName("BitVector::reserve()");
     }
-
+  
     void operator()( BitVector& v ) const
     {
         v.reserve( fAmount );
@@ -69,18 +69,18 @@ private:
 void test_bit_vector()
 {
 #define __WORD_BIT (int(CHAR_BIT*sizeof(unsigned int)))
-
+  
   // Make some bit vectors to work with.
   BitVector emptyVector;
   BitVector testVector, testVector2;
-
+    
   EH_ASSERT( testVector.size() == 0 );
-
+    
   size_t BitVectorSize = random_number( random_base );
   // Half the time, choose a size that will guarantee immediate reallocation
   if ( random_number(2) )
     BitVectorSize = BitVectorSize / __WORD_BIT * __WORD_BIT;
-
+  
   EH_ASSERT( testVector.size() == 0 );
   testVector.reserve(BitVectorSize);
   EH_ASSERT( testVector.size() == 0 );
@@ -88,7 +88,7 @@ void test_bit_vector()
     testVector.push_back(random_number(2) != 0);
     testVector2.push_back(random_number(2) != 0);
   }
-
+  
   // Test insertions
   StrongCheck(testVector, test_insert_one<BitVector>(testVector) );
   StrongCheck(testVector, test_insert_one<BitVector>(testVector,0) );
@@ -97,7 +97,7 @@ void test_bit_vector()
   StrongCheck(testVector, test_insert_n<BitVector>(testVector, random_number(random_base) ) );
   StrongCheck(testVector, test_insert_n<BitVector>(testVector, random_number(random_base),0 ) );
   StrongCheck(testVector, test_insert_n<BitVector>(testVector, random_number(random_base), (int)testVector.size()) );
-#if 0
+#if 0  
   // Allocate some random bools to insert
   size_t insCnt = 1 + random_number(random_base);
   bool *insFirst = new BitVector::value_type[insCnt];
@@ -110,9 +110,9 @@ void test_bit_vector()
   delete[] insFirst;
 #endif
   StrongCheck(testVector, insert_range_tester(testVector, testVector2.begin(), testVector2.end()));
-  StrongCheck(testVector, insert_range_at_begin_tester(testVector, testVector2.begin(),
+  StrongCheck(testVector, insert_range_at_begin_tester(testVector, testVector2.begin(), 
                                                                    testVector2.end()));
-  StrongCheck(testVector, insert_range_at_end_tester(testVector, testVector2.begin(),
+  StrongCheck(testVector, insert_range_at_end_tester(testVector, testVector2.begin(), 
                                                                  testVector2.end()));
   StrongCheck(testVector, test_BitVector_reserve( testVector.capacity() + random_number(50)));
   StrongCheck(testVector, test_push_back<BitVector>(testVector));

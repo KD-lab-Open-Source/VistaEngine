@@ -1,5 +1,5 @@
 # Time-stamp: <05/09/09 21:04:30 ptr>
-# $Id: targetsys.mak 1802 2005-11-01 08:25:57Z complement $
+# $Id: targetsys.mak,v 1.1.2.1 2005/09/11 06:27:35 complement Exp $
 
 SO := dylib
 

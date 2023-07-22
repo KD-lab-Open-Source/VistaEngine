@@ -19,13 +19,13 @@ public:
     : _nb_output(nb_output), _do_throw(do_throw)
   {}
 
-  std::string const& str() const
+  std::string const& str() const 
   { return _buf; }
 
 protected:
   int_type overflow(int_type c) {
     if (_nb_output == 0) {
-#if !defined (STLPORT) || defined (_STLP_USE_EXCEPTIONS)
+#if defined (_STLP_USE_EXCEPTIONS)
       if (_do_throw) {
         throw "streambuf full";
       }

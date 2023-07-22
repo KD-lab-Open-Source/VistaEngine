@@ -9,7 +9,7 @@ using _STLP_NEW_IO_NAMESPACE::streamsize;
 using _STLP_NEW_IO_NAMESPACE::ios_base;
 using _STLP_NEW_IO_NAMESPACE::basic_ios;
 
-// _lib.std.ios.manip_, manipulators:
+// _lib.std.ios.manip_, manipulators:	
 using _STLP_NEW_IO_NAMESPACE::boolalpha;
 using _STLP_NEW_IO_NAMESPACE::noboolalpha;
 using _STLP_NEW_IO_NAMESPACE::showbase;

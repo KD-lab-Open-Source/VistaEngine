@@ -1,4 +1,5 @@
-# Time-stamp: <05/12/07 09:50:35 ptr>
+# Time-stamp: <05/11/27 17:27:04 ptr>
+# $Id: targets.mak,v 1.1.2.4 2005/11/27 18:06:36 complement Exp $
 
 # If we have no C++ sources, let's use C compiler for linkage instead of C++.
 ifeq ("$(sort ${SRC_CC} ${SRC_CPP} ${SRC_CXX})","")
@@ -17,11 +18,9 @@ ifeq (${OSNAME},windows)
 DIRS_UNIQUE_SRC += $(dir $(SRC_RC) )
 endif
 DIRS_UNIQUE_SRC := $(sort $(DIRS_UNIQUE_SRC) )
-
 include ${RULESBASE}/${USE_MAKE}/dirsrc.mak
 
 ALLBASE    := $(basename $(notdir $(SRC_CC) $(SRC_CPP) $(SRC_C)))
-
 ifeq (${OSNAME},cygming)
 RCBASE    += $(basename $(notdir $(SRC_RC)))
 endif
@@ -29,7 +28,7 @@ ifeq (${OSNAME},windows)
 RCBASE    += $(basename $(notdir $(SRC_RC)))
 endif
 
-ALLOBJS    := $(addsuffix .$(OBJ_EXT),$(ALLBASE))
+ALLOBJS    := $(addsuffix .o,$(ALLBASE))
 ALLDEPS    := $(addsuffix .d,$(ALLBASE))
 ALLRESS    := $(addsuffix .res,$(RCBASE))
 
@@ -69,24 +68,4 @@ OBJ_A_STLDBG := $(addprefix $(OUTPUT_DIR_A_STLDBG)/,$(ALLOBJS))
 DEP_A_STLDBG := $(addprefix $(OUTPUT_DIR_A_STLDBG)/,$(ALLDEPS))
 endif
 
-ifeq ($(COMPILER_NAME),toto)
-OBJ := $(subst /,\,$(OBJ))
-OBJ_DBG := $(subst /,\,$(OBJ_DBG))
-OBJ_STLDBG := $(subst /,\,$(OBJ_STLDBG))
 
-OBJ_A := $(subst /,\,$(OBJ_A))
-OBJ_A_DBG := $(subst /,\,$(OBJ_A_DBG))
-OBJ_A_STLDBG := $(subst /,\,$(OBJ_A_STLDBG))
-
-DEP := $(subst /,\,$(DEP))
-DEP_DBG := $(subst /,\,$(DEP_DBG))
-DEP_STLDBG := $(subst /,\,$(DEP_STLDBG))
-
-DEP_A := $(subst /,\,$(DEP))
-DEP_A_DBG := $(subst /,\,$(DEP_DBG))
-DEP_A_STLDBG := $(subst /,\,$(DEP_STLDBG))
-
-RES := $(subst /,\,$(RES))
-RES_DBG := $(subst /,\,$(RES_DBG))
-RES_STLDBG := $(subst /,\,$(RES_STLDBG))
-endif
