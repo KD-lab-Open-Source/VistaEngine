@@ -30,7 +30,9 @@
 
 #include "ExternalShow.h"
 #include "Triggers.h"
-//#include "..\TriggerEditor\TriggerEditor.h"
+#ifdef _TRIGGER_EDITOR_
+#include "..\TriggerEditor\TriggerEditor.h"
+#endif
 
 #include "TextDB.h"
 #include "..\ht\ht.h"
@@ -1498,10 +1500,10 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 		break;
 
 
-/*
 #ifndef _FINAL_VERSION_
 	case VK_RETURN | KBD_CTRL: 
 	case VK_RETURN | KBD_CTRL | KBD_SHIFT: {
+		#ifdef _TRIGGER_EDITOR_
 		gb_RenderDevice->Flush();
 		ShowCursor(1);
 		//setUseAlternativeNames(true);
@@ -1531,9 +1533,9 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 		cameraManager->setFocus(HardwareCameraFocus);
 		ShowCursor(0);				
 		restoreFocus();									
+		#endif
 		break; }
 #endif
-*/
 
 	case VK_F6: 
 	case VK_F6 | KBD_CTRL: 
