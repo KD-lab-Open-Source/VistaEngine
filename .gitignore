@@ -34,6 +34,7 @@
 /*.exe
 ConfigurationTool.lib
 TriggerEditor.dll
+TriggerEditor.lib
 UIEditor-Debug.lib
 VistaEngine.lib
 VistaEngineDbg.lib
