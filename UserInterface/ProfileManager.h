@@ -22,6 +22,7 @@ struct Profile {
 	
 	string name;
 	string cdKey;
+	string chatChannel;
 	
 	IntVariables intVariables;
 	typedef vector<ParameterSet> ParametersByRace;

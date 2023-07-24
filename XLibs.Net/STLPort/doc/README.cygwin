@@ -1,15 +1,14 @@
-The cygwin platform is used to build STLport with different compilers.
+The cygwin platform is used as a default platform to
+build different version of the STLport libraries.
 
 - gcc (native compiler):
 
   Makefile : gcc.mak
 
-    WARNING : If you use the static version of the STLport
-  libraries you have to define the _STLP_USE_STATIC_LIB
+    WARNING : If you use the shared version of the STLport
+  libraries you have to define the _STLP_USE_DYNAMIC_LIB
   macro in order to have your executable linked correctly.
 
     To build STLport libraries that do not depend on cygwin1.dll
   making them freely redistributable use the --no-cygwin configuration
   option.
-
-- Borland C++ compiler

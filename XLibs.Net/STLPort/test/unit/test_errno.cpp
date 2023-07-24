@@ -1,5 +1,5 @@
-//We are including stdlib.h and stddef.h first because under MSVC
-//those headers contains a errno macro definition without the underlying value
+//We are including stdlib.h and stddef.h first because under MSVC 
+//those headers contains a errno macro definition without the underlying value 
 //definition.
 #include <stdlib.h>
 #include <stddef.h>

@@ -67,7 +67,7 @@ void GeneratorTest::genern1()
 {
 #if !defined (_STLP_MEMBER_POINTER_PARAM_BUG)
   //*TY 07/18/98 - added conditional
-  // since ptr_gen() is not defined under this condition
+  // since ptr_gen() is not defined under this condition 
   // (see xfunction.h)
   vector <int> v1(10);
   generate_n(v1.begin(), v1.size(), ptr_gen(cxxrand));

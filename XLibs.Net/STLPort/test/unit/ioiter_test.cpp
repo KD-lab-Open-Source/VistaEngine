@@ -51,7 +51,7 @@ void IoiterTest::ioiter_test()
 
   pc = strorg;
   string::size_type sz = strlen(strorg);
-  string::size_type i;
+  string::size_type i = 0;
   for ( i = 0; i < sz; ++i ) {
     c = *pc++;
     tmp += c;
@@ -70,8 +70,8 @@ void IoiterTest::ioiter_test()
 //  cout << "postfix increment operator and indirection: ";
 //#endif
 
-  istreambuf_iterator<char, char_traits<char> > objIStrmbIt1( objIStrStrm1.rdbuf() );
-  istreambuf_iterator<char, char_traits<char> > end;
+  istreambuf_iterator<char> objIStrmbIt1( objIStrStrm1.rdbuf() );
+  istreambuf_iterator<char> end;
 
   // objIStrmbIt1 != end;
 
@@ -97,7 +97,7 @@ void IoiterTest::ioiter_test()
 
   tmp.clear();
 
-  istreambuf_iterator<char, char_traits<char> > objIStrmbIt2( objIStrStrm2.rdbuf() );
+  istreambuf_iterator<char> objIStrmbIt2( objIStrStrm2.rdbuf() );
   for ( i = 0; i < sz; ++i ) {
     c = *objIStrmbIt2;
     tmp += c;
@@ -119,7 +119,7 @@ void IoiterTest::ioiter_test()
 //  cout << "compare, then postfix increment operator and indirection: ";
 //#endif
 
-  istreambuf_iterator<char, char_traits<char> > objIStrmbIt3( objIStrStrm3.rdbuf() );
+  istreambuf_iterator<char> objIStrmbIt3( objIStrStrm3.rdbuf() );
 
   while ( objIStrmbIt3 != end ) {
     c = *objIStrmbIt3++;

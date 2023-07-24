@@ -126,7 +126,7 @@ public:
     }
     return result;
   }
-
+  
   static bool Free(void* p) {
     Block* b = (Block*)p;
     if (mBlocks == 0 || b < mBlocks || b >= mBlocks + kBlockCount)
@@ -135,33 +135,33 @@ public:
     mFree = b;
     return true;
   }
-
+  
   struct Block;
   friend struct Block;
 
   enum {
     // Number of fast allocation blocks to create.
     kBlockCount = 1500,
-
+    
     // You may need to adjust this number for your platform.
     // A good choice will speed tests. A bad choice will still work.
     kMinBlockSize = 48
   };
-
+  
   struct Block {
-    union {
+    union { 
       Block *next;
       double dummy; // fbp - force alignment
       char dummy2[kMinBlockSize];
     };
   };
-
+  
   static Block* mBlocks;
   static Block *mFree;
   static size_t mUsed;
 };
 
-FastAllocator::Block *FastAllocator::mBlocks =
+FastAllocator::Block *FastAllocator::mBlocks = 
 (FastAllocator::Block*)EH_CSTD::calloc( sizeof(FastAllocator::Block), FastAllocator::kBlockCount );
 FastAllocator::Block *FastAllocator::mFree;
 size_t FastAllocator::mUsed;
@@ -171,7 +171,7 @@ static FastAllocator gFastAllocator;
 #endif
 
 inline char* AllocateBlock(size_t s) {
-#if !defined (NO_FAST_ALLOCATOR)
+#if !defined (NO_FAST_ALLOCATOR)  
   char * const p = (char*)gFastAllocator.Allocate( s );
   if (p != 0)
     return p;
@@ -185,7 +185,7 @@ static void* OperatorNew( size_t s ) {
     simulate_possible_failure();
     ++alloc_count;
   }
-
+    
   char *p = AllocateBlock(s);
 
   if (gTestController.TrackingEnabled() &&
@@ -200,7 +200,7 @@ static void* OperatorNew( size_t s ) {
   return p;
 }
 
-void* _STLP_CALL operator new(size_t s)
+void* _STLP_CALL operator new(size_t s) 
 #ifdef EH_DELETE_HAS_THROW_SPEC
 throw(EH_STD::bad_alloc)
 #endif
@@ -255,9 +255,9 @@ void _STLP_CALL operator delete(void* s)
         using_alloc_set = false;
       }
     }
-# if ! defined (NO_FAST_ALLOCATOR)
+# if ! defined (NO_FAST_ALLOCATOR)  
     if ( !gFastAllocator.Free( s ) )
-# endif
+# endif   
       EH_CSTD::free(s);
   }
 }
@@ -279,7 +279,7 @@ void TestController::ClearAllocationSet() {
 
 bool TestController::ReportLeaked() {
   EndLeakDetection();
-
+  
   if (using_alloc_set)
     EH_ASSERT( alloc_count == static_cast<int>(alloc_set().size()) );
 

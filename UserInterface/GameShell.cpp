@@ -30,7 +30,9 @@
 
 #include "ExternalShow.h"
 #include "Triggers.h"
-//#include "..\TriggerEditor\TriggerEditor.h"
+#ifdef _TRIGGER_EDITOR_
+#include "..\TriggerEditor\TriggerEditor.h"
+#endif
 
 #include "TextDB.h"
 #include "..\ht\ht.h"
@@ -65,8 +67,10 @@
 #include "StreamCommand.h"
 #include "..\Render\3dx\Lib3dx.h"
 #include "..\Render\inc\IVisD3D.h"
+//#include "..\Network\DW_Interface.h"
 #undef XREALLOC
 #undef XFREE
+//#include "..\Network\DemonWareAux\Scores.h"
 
 #include "LogMsg.h"
 
@@ -377,7 +381,7 @@ void GameShell::startMPWithoutInterface(const char* missionName)
 		else {
 			getNetClient()->JoinGame(ipstr.c_str(), playerName.c_str(), Race(), 1, "");
 		}
-		while(getNetClient()->getCurrentMissionDescription().playersAmount() < 1){ //Hint-РѕРІР°СЏ РїСЂРѕРІРµСЂРєР° РЅР° С‚Рѕ, С‡С‚Рѕ РїРѕРґРєР»СЋС‡РёР»РёСЃСЊ
+		while(getNetClient()->getCurrentMissionDescription().playersAmount() < 1){ //Hint-овая проверка на то, что подключились
 			getNetClient()->quant_th1();
 			::Sleep(40);
 		}
@@ -425,7 +429,7 @@ void GameShell::startDWMPWithoutInterface(const char* missionName)
 		else {
 			getNetClient()->JoinGame(ipstr.c_str(), playerName, Race(), 1, "");
 		}
-		while(getNetClient()->getCurrentMissionDescription().playersAmount() < 1){ //Hint-РѕРІР°СЏ РїСЂРѕРІРµСЂРєР° РЅР° С‚Рѕ, С‡С‚Рѕ РїРѕРґРєР»СЋС‡РёР»РёСЃСЊ
+		while(getNetClient()->getCurrentMissionDescription().playersAmount() < 1){ //Hint-овая проверка на то, что подключились
 			getNetClient()->quant_th1();
 			::Sleep(40);
 		}
@@ -643,12 +647,14 @@ void GameShell::GameStart(const MissionDescription& mission)
 		static Scores scores;
 		scores = Scores();
 		scores.setTotalConnections(1);
+		demonware()->addStats(getScoresID(universe()->activePlayer()->race().key(), currentMissionPopulation_), scores);
 		PlayerVect::iterator pi;
 		FOR_EACH(universe()->Players, pi){
 			if((*pi)->realPlayerType() == REAL_PLAYER_TYPE_PLAYER && (*pi)->auxPlayerType() == AUX_PLAYER_TYPE_ORDINARY_PLAYER){
 				xassert((*pi)->playerID() < NETWORK_PLAYERS_MAX);
 				Scores* scores = &scoresArray_[(*pi)->playerID()];
 				*scores = Scores();
+				demonware()->readStats(getScoresID((*pi)->race().key(), currentMissionPopulation_), *scores, (*pi)->name());
 			}
 		}
 		*/
@@ -684,7 +690,7 @@ void GameShell::GameClose()
 
 	//SNDSetFade(false,1000);
 	SNDStopAll();
-	SNDSetFade(false,0); // РїРѕСЃР»Рµ С‚РѕРіРѕ РєР°Рє РїРѕСЏРІРёС‚СЃСЏ РїРѕС‚РѕРє РґР»СЏ Р·Р°РіСЂСѓР·РєРё РІРµСЂРЅСѓС‚СЊ Р·РЅР°С‡РµРЅРёРµ РІСЂРµРјРµРЅРё
+	SNDSetFade(false,0); // после того как появится поток для загрузки вернуть значение времени
 	SNDSetGameActive(false);
 	UI_LogicDispatcher::instance().setCursor(UI_GlobalAttributes::instance().cursor(UI_CURSOR_WAITING));
 	UI_LogicDispatcher::instance().profileSystem().saveState();
@@ -760,6 +766,7 @@ void GameShell::sendStats(bool final, bool win)
 		if(myScores.getTotalRating() + scores.getTotalRating() < 0)
 			scores.setTotalRating(-myScores.getTotalRating());
 		scores.setRating(round(myScores.getTotalRating() + scores.getTotalRating()) - myScores.getRating());
+		demonware()->addStats(getScoresID(activePlayer->race().key(), currentMissionPopulation_), scores);
 		*/
 	}
 }
@@ -1022,7 +1029,7 @@ void GameShell::GraphQuant()
 		if(terminateMission_ && UI_Dispatcher::instance().canExit())
 			HTManager::instance()->GameClose();	
 	}
-	else{ // MainMenu, С‚РѕР»СЊРєРѕ РіСЂР°С„РёС‡РµСЃРєРёР№ РїРѕС‚РѕРє
+	else{ // MainMenu, только графический поток
 		tls_is_graph = MT_GRAPH_THREAD | MT_LOGIC_THREAD;
 
 		interpolation_timer_ += scale_time.delta();
@@ -1174,7 +1181,7 @@ void GameShell::Show(float realGraphDT)
 
 		environment->graphQuant(realGraphDT);
 
-		cameraManager->GetCamera()->SetAttr(ATTRCAMERA_CLEARZBUFFER);//РџРѕС‚РѕРјСѓ РєР°Рє РІ РЅРµР±Рµ РјРѕРіСѓС‚ СЂРёСЃРѕРІР°С‚СЊСЃСЏ РїР»Р°РЅРµС‚С‹ РІ z buffer.
+		cameraManager->GetCamera()->SetAttr(ATTRCAMERA_CLEARZBUFFER);//Потому как в небе могут рисоваться планеты в z buffer.
 		terScene->Draw(cameraManager->GetCamera());
 
 		environment->drawPostEffects(realGraphDT);
@@ -1541,10 +1548,10 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 		break;
 
 
-/*
 #ifndef _FINAL_VERSION_
 	case VK_RETURN | KBD_CTRL: 
 	case VK_RETURN | KBD_CTRL | KBD_SHIFT: {
+		#ifdef _TRIGGER_EDITOR_
 		gb_RenderDevice->Flush();
 		ShowCursor(1);
 		//setUseAlternativeNames(true);
@@ -1554,7 +1561,7 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 			Player* player = universe()->activePlayer();
 			if(isShiftPressed()){
 				XBuffer nameAlt;
-				nameAlt < "РРіСЂРѕРє (0-" <= universe()->Players.size() - 1 < ")";
+				nameAlt < "Игрок (0-" <= universe()->Players.size() - 1 < ")";
 				int playerID = player->playerID();
 				EditArchive ea(0, TreeControlSetup(0, 0, 500, 300, "Scripts\\TreeControlSetups\\chooseTrigger"));
 				static_cast<EditOArchive&>(ea).serialize(playerID,"playerID", nameAlt);
@@ -1573,10 +1580,10 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 
 		cameraManager->setFocus(HardwareCameraFocus);
 		ShowCursor(0);				
-		restoreFocus();									
+		restoreFocus();		
+		#endif							
 		break; }
 #endif
-*/
 
 	case VK_F6: 
 	case VK_F6 | KBD_CTRL: 
@@ -1667,15 +1674,15 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 			static int number = 1;
 			static bool inTheSameSquad = false;
 			EditArchive ea(0, TreeControlSetup(0, 0, 500, 300, "Scripts\\TreeControlSetups\\createUnit"));
-			static_cast<EditOArchive&>(ea).serialize(attr,"Unit","Р®РЅРёС‚");
-			static_cast<EditOArchive&>(ea).serialize(playerID,"playerID","РРіСЂРѕРє");
-			static_cast<EditOArchive&>(ea).serialize(number,"number","РљРѕР»РёС‡РµСЃС‚РІРѕ");
-			static_cast<EditOArchive&>(ea).serialize(inTheSameSquad,"inTheSameSquad","Р’ РѕРґРЅРѕРј СЃРєРІР°РґРµ");
+			static_cast<EditOArchive&>(ea).serialize(attr,"Unit","Юнит");
+			static_cast<EditOArchive&>(ea).serialize(playerID,"playerID","Игрок");
+			static_cast<EditOArchive&>(ea).serialize(number,"number","Количество");
+			static_cast<EditOArchive&>(ea).serialize(inTheSameSquad,"inTheSameSquad","В одном скваде");
 			if(ea.edit()){
-				static_cast<EditIArchive&>(ea).serialize(attr,"Unit","Р®РЅРёС‚");
-				static_cast<EditIArchive&>(ea).serialize(playerID,"playerID","РРіСЂРѕРє");
-				static_cast<EditIArchive&>(ea).serialize(number,"number","РљРѕР»РёС‡РµСЃС‚РІРѕ");
-				static_cast<EditIArchive&>(ea).serialize(inTheSameSquad,"inTheSameSquad","Р’ РѕРґРЅРѕРј СЃРєРІР°РґРµ");
+				static_cast<EditIArchive&>(ea).serialize(attr,"Unit","Юнит");
+				static_cast<EditIArchive&>(ea).serialize(playerID,"playerID","Игрок");
+				static_cast<EditIArchive&>(ea).serialize(number,"number","Количество");
+				static_cast<EditIArchive&>(ea).serialize(inTheSameSquad,"inTheSameSquad","В одном скваде");
 				playerID = clamp(playerID, 0, universe()->Players.size()-1);
 				UnitSquad* squad = 0;
 				if(attr){
@@ -1717,7 +1724,7 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 			return false;
 	}
 
-	// РљРѕРЅС„Р»РёРєС‚СѓСЋС‰РёРµ РєР»Р°РІРёС€Рё
+	// Конфликтующие клавиши
 	switch(Key.fullkey){
 	case 'D':
 		if(selectManager)
@@ -2108,7 +2115,7 @@ void GameShell::cameraQuant(float frameDeltaTime)
 {
 	cameraCursor_ = 0;
 
-	//СЃРґРІРёРі РєРѕРіРґР° РєСѓСЂСЃРѕСЂ Сѓ РєСЂР°СЏ РѕРєРЅР°
+	//сдвиг когда курсор у края окна
 	if(!selectMouseTrack && !cameraMouseTrack && cameraCursorInWindow && !cameraMouseZoom && controlEnabled()){
 		if(int dir = cameraManager->mouseQuant(mousePosition()))
 			cameraCursor_ = UI_GlobalAttributes::instance().getMoveCursor(dir);
@@ -2118,7 +2125,7 @@ void GameShell::cameraQuant(float frameDeltaTime)
 	bool needLockMouse = false;
 	
 	static int lockState;
-	//РїРѕРІРѕСЂРѕС‚ РјС‹С€СЊСЋ
+	//поворот мышью
 	if(cameraMouseTrack && (MouseMoveFlag || lockState)){
 		if(MouseMoveFlag && controlEnabled()){
 			needLockMouse = true;
@@ -2303,21 +2310,21 @@ void GameShell::editParameters()
 
 	bool reloadParameters = false;
     
-	const char* header = "Р—Р°РіРѕР»РѕРІРѕРє РјРёСЃСЃРёРё";
-	const char* mission = "РњРёСЃСЃРёСЏ";
-	const char* missionAll = "РњРёСЃСЃРёСЏ РІСЃРµ РґР°РЅРЅС‹Рµ";
+	const char* header = "Заголовок миссии";
+	const char* mission = "Миссия";
+	const char* missionAll = "Миссия все данные";
 	const char* debugPrmTitle = "Debug.prm";
-	const char* global = "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹";
-	const char* attribute = "РђС‚СЂРёР±СѓС‚С‹";
-	const char* sounds = "Р—РІСѓРєРё";
-	const char* interface_ = "РРЅС‚РµСЂС„РµР№СЃ";
-	const char* physics = "Р¤РёР·РёС‡РµСЃРєРёРµ РїР°СЂР°РјРµС‚СЂС‹";
-	const char* unitAttributes = "РџР°СЂР°РјРµС‚СЂС‹ СЋРЅРёС‚РѕРІ";
-	const char* explode = "РџР°СЂР°РјРµС‚СЂС‹ РІР·СЂС‹РІРѕРІ";
-	const char* sources = "РСЃС‚РѕС‡РЅРёРєРё";
-	const char* projectileAttributes = "РђС‚С‚СЂРёР±СѓС‚С‹ СЃРЅР°СЂСЏРґРѕРІ";
+	const char* global = "Глобальные параметры";
+	const char* attribute = "Атрибуты";
+	const char* sounds = "Звуки";
+	const char* interface_ = "Интерфейс";
+	const char* physics = "Физические параметры";
+	const char* unitAttributes = "Параметры юнитов";
+	const char* explode = "Параметры взрывов";
+	const char* sources = "Источники";
+	const char* projectileAttributes = "Аттрибуты снарядов";
 	const char* gameSettings = "Game settins";
-	const char* keySettings = "РќР°СЃС‚СЂРѕР№РєРё РєР»Р°РІРёР°С‚СѓСЂС‹";
+	const char* keySettings = "Настройки клавиатуры";
 	const char* separator = "--------------";
 
 	vector<const char*> items;
@@ -2633,7 +2640,8 @@ void GameShell::playerDisconnected(string& playerName, bool disconnectOrExit)
 {
 	string txt = GET_LOC_STR(UI_COMMON_TEXT_PLAYER_DISCONNECTED);
 	txt += playerName;
-	UI_LogicDispatcher::instance().handleChatString(ChatMessage(txt.c_str(), -1));
+	
+	UI_LogicDispatcher::instance().handleSystemMessage(txt.c_str());
 }
 
 void GameShell::showConnectFailedInGame(const vector<string>& playerList)

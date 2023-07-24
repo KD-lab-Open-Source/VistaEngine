@@ -367,18 +367,23 @@ BOOL CFormationEditor::OnCommand(WPARAM wParam, LPARAM lParam)
 		wParam < IDM_TYPE_FIRST_ITEM + UnitFormationTypes::instance().strings().size())
 	{
 		int index = wParam - IDM_TYPE_FIRST_ITEM;
-		if (selected_cell_ != -1)  {
+		if(selected_cell_ != -1){
 			FormationPattern::Cell& cell = pattern_.cells_ [selected_cell_];
-			cell.type = UnitFormationTypeReference ((UnitFormationTypes::instance().strings().begin() + index)->c_str());
-		} else {
+			ComboStrings names;
+			splitComboList(names, UnitFormationTypes::instance().comboList(), '|');
+			cell.type = UnitFormationTypeReference(names[index].c_str());
+		}
+		else{
 			FormationPattern::Cell cell;
 			cell.set (click_point_.x, click_point_.y);
-			cell.type = UnitFormationTypeReference ((UnitFormationTypes::instance().strings().begin() + index)->c_str());
-			pattern_.cells_.push_back (cell);
-			selected_cell_ = pattern_.cells_.size () - 1;
+			ComboStrings names;
+			splitComboList(names, UnitFormationTypes::instance().comboList(), '|');
+			cell.type = UnitFormationTypeReference(names[index].c_str());
+			pattern_.cells_.push_back(cell);
+			selected_cell_ = pattern_.cells_.size() - 1;
 		}
 
-		Invalidate ();
+		Invalidate();
 	}
 
 	return CWnd::OnCommand(wParam, lParam);

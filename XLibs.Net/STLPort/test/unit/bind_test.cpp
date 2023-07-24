@@ -16,12 +16,6 @@ class BindTest : public CPPUNIT_NS::TestCase
   CPPUNIT_TEST(bind1st1);
   CPPUNIT_TEST(bind2nd1);
   CPPUNIT_TEST(bind2nd2);
-#if !defined (STLPORT) || \
-    defined (_STLP_NO_EXTENSIONS) || !defined (_STLP_CLASS_PARTIAL_SPECIALIZATION)
-  CPPUNIT_IGNORE;
-#endif
-  CPPUNIT_TEST(bind2nd3);
-  CPPUNIT_TEST(bind_memfn);
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -29,7 +23,6 @@ protected:
   void bind2nd1();
   void bind2nd2();
   void bind2nd3();
-  void bind_memfn();
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(BindTest);
@@ -41,7 +34,7 @@ void BindTest::bind1st1()
 {
   int array [3] = { 1, 2, 3 };
   int* p = remove_if((int*)array, (int*)array + 3, bind1st(less<int>(), 2));
-
+  
   CPPUNIT_ASSERT(p==&array[2]);
   CPPUNIT_ASSERT(array[0]==1);
   CPPUNIT_ASSERT(array[1]==2);
@@ -75,47 +68,17 @@ int test_func2 (int &param1, int param2) {
 
 void BindTest::bind2nd3()
 {
-#if defined (STLPORT) && \
-    !defined (_STLP_NO_EXTENSIONS) && defined (_STLP_CLASS_PARTIAL_SPECIALIZATION)
+#ifdef _STLP_CLASS_PARTIAL_SPECIALIZATION
   int array[3] = { 1, 2, 3 };
   transform(array, array + 3, array, bind2nd(ptr_fun(test_func1), 1));
   transform(array, array + 3, array, bind1st(ptr_fun(test_func1), -1));
-  CPPUNIT_ASSERT(array[0] == 1);
-  CPPUNIT_ASSERT(array[1] == 2);
-  CPPUNIT_ASSERT(array[2] == 3);
+  CPPUNIT_ASSERT(array[0]==1);
+  CPPUNIT_ASSERT(array[1]==2);
+  CPPUNIT_ASSERT(array[2]==4);
 
   transform(array, array + 3, array, bind2nd(ptr_fun(test_func2), 10));
-  CPPUNIT_ASSERT(array[0] == 21);
-  CPPUNIT_ASSERT(array[1] == 22);
-  CPPUNIT_ASSERT(array[2] == 23);
-#endif
-}
-
-class A
-{
-  public:
-    A() :
-        m_n( 0 )
-      {}
-
-    void f( int n ) const
-      { m_n = n; }
-
-    int v() const
-      { return m_n; }
-
-  private:
-    mutable int m_n;
-};
-
-void BindTest::bind_memfn()
-{
-#if defined (STLPORT) && \
-    !defined (_STLP_NO_EXTENSIONS) && defined (_STLP_CLASS_PARTIAL_SPECIALIZATION)
-  A array[3];
-
-  for_each( array, array + 3, bind2nd( mem_fun_ref(&A::f), 12 ) );
-
-  CPPUNIT_CHECK( array[0].v() == 12 );
+  CPPUNIT_ASSERT(array[0]==1);
+  CPPUNIT_ASSERT(array[1]==2);
+  CPPUNIT_ASSERT(array[2]==4);
 #endif
 }

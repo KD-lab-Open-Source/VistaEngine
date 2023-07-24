@@ -24,7 +24,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\XLibs.Net\Heap;..\XLibs.Net\stl;..\XLibs.Net\XUtil;..\XLibs.Net\XZip;..\XLibs.Net\XUtil\CRC;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\MSDXSDK_02_06\Include;inc;src;client;d3d;..\util;..\util\Serialization"
+				AdditionalIncludeDirectories="..\XLibs.Net\MSDXSDK_02_06\Include;..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XUtil;..\XLibs.Net\XUtil\CRC;inc;src;client;d3d;..\util;..\util\Serialization;..\XLibs.Net\XZip"
 				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS"
 				ExceptionHandling="FALSE"
 				RuntimeLibrary="1"
@@ -42,6 +42,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalLibraryDirectories=""
 				SuppressStartupBanner="TRUE"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -77,7 +78,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="2"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="inc;src;client;d3d;..\util;..\util\Serialization"
+				AdditionalIncludeDirectories="..\XLibs.Net\MSDXSDK_02_06\Include;..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XUtil;..\XLibs.Net\XUtil\CRC;inc;src;client;d3d;..\util;..\util\Serialization;..\XLibs.Net\XZip"
 				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;_FINAL_VERSION_"
 				StringPooling="TRUE"
 				ExceptionHandling="FALSE"
@@ -133,7 +134,7 @@
 				InlineFunctionExpansion="0"
 				EnableIntrinsicFunctions="TRUE"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="..\XLibs.Net\Heap;..\XLibs.Net\stl;..\XLibs.Net\XUtil;..\XLibs.Net\XZip;..\XLibs.Net\XUtil\CRC;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\MSDXSDK_02_06\Include;inc;src;client;d3d;..\util;..\util\Serialization"
+				AdditionalIncludeDirectories="..\XLibs.Net\MSDXSDK_02_06\Include;..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XUtil;..\XLibs.Net\XUtil\CRC;inc;src;client;d3d;..\util;..\util\Serialization;..\XLibs.Net\XZip"
 				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS"
 				StringPooling="TRUE"
 				ExceptionHandling="FALSE"

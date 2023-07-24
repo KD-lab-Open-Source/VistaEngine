@@ -1,4 +1,4 @@
-# Time-stamp: <05/12/13 23:24:02 ptr>
+# Time-stamp: <05/12/13 23:12:03 ptr>
 
 ifdef TARGET_OS
 TARGET_NAME := ${TARGET_OS}-
@@ -7,25 +7,17 @@ TARGET_NAME :=
 endif
 
 PRE_OUTPUT_DIR         := obj/$(TARGET_NAME)$(COMPILER_NAME)
-OUTPUT_DIR             := $(PRE_OUTPUT_DIR)/so$(EXTRA_DIRS)
-OUTPUT_DIR_DBG         := $(PRE_OUTPUT_DIR)/so_g$(EXTRA_DIRS)
-OUTPUT_DIR_STLDBG      := $(PRE_OUTPUT_DIR)/so_stlg$(EXTRA_DIRS)
+OUTPUT_DIR             := $(PRE_OUTPUT_DIR)/shared$(EXTRA_DIRS)
+OUTPUT_DIR_DBG         := $(PRE_OUTPUT_DIR)/shared-g$(EXTRA_DIRS)
+OUTPUT_DIR_STLDBG      := $(PRE_OUTPUT_DIR)/shared-stlg$(EXTRA_DIRS)
 
 # file to store generated dependencies for make:
 DEPENDS_COLLECTION     := obj/$(TARGET_NAME)$(COMPILER_NAME)/.make.depend
 
 # I use the same catalog, as for shared:
-ifneq (cygming, $(OSNAME))
-ifneq (windows, $(OSNAME))
 OUTPUT_DIR_A           := $(OUTPUT_DIR)
 OUTPUT_DIR_A_DBG       := $(OUTPUT_DIR_DBG)
 OUTPUT_DIR_A_STLDBG    := $(OUTPUT_DIR_STLDBG)
-endif
-endif
-
-OUTPUT_DIR_A           ?= $(PRE_OUTPUT_DIR)/ar$(EXTRA_DIRS)
-OUTPUT_DIR_A_DBG       ?= $(PRE_OUTPUT_DIR)/ar_g$(EXTRA_DIRS)
-OUTPUT_DIR_A_STLDBG    ?= $(PRE_OUTPUT_DIR)/ar_stlg$(EXTRA_DIRS)
 
 INSTALL_LIB_DIR        ?= ${SRCROOT}/../$(TARGET_NAME)lib
 INSTALL_LIB_DIR_DBG    ?= ${SRCROOT}/../$(TARGET_NAME)lib
@@ -35,12 +27,12 @@ INSTALL_BIN_DIR        ?= ${SRCROOT}/../$(TARGET_NAME)bin
 # CygWin or MinGW environments; but you can specify install dir you
 # want---if one is defined it will not be overlaped.
 ifeq ("${TARGET_NAME}","")
-#ifneq (${OSNAME},cygming)
-#ifneq ($(OSNAME),windows)
+ifneq (${OSNAME},cygming)
+ifneq ($(OSNAME),windows)
 INSTALL_BIN_DIR_DBG    ?= ${SRCROOT}/../$(TARGET_NAME)bin-g
 INSTALL_BIN_DIR_STLDBG ?= ${SRCROOT}/../$(TARGET_NAME)bin-stlg
-#endif
-#endif
+endif
+endif
 endif
 ifndef INSTALL_BIN_DIR_DBG
 INSTALL_BIN_DIR_DBG    ?= ${INSTALL_BIN_DIR}

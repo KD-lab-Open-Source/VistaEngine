@@ -782,11 +782,11 @@ void MissionDescription::serialize(Archive& ar)
 	ar.serialize(interfaceName_, "interfaceName", "Интерфейсное имя мира");
 	ar.serialize(enableInterface, "enableInterface", "Интерфейс включен");
 	ar.serialize(enablePause, "enablePause", "Пауза разрешена");
-	ar.serialize(is_fog_of_war, "is_fog_of_war", "Включить туман войны");
+	ar.serialize(is_fog_of_war, "is_fog_of_war", "Включить туман войны"); // 0 для EXTERNAL @Hallkezz
 	ar.serialize(silhouettesEnabled, "silhouettesEnabled", "Разрешить силуэты");
 	ar.serialize(is_water, "is_water", "Включить воду");
 	ar.serialize(is_temperature, "is_temperature", "Включить замерзание жидкости");
-	ar.serialize(isBattle_, "isBattle_", "Мир для баттла");
+	ar.serialize(isBattle_, "isBattle_", "Мир для сражений");
 	ar.serialize(worldName_, "worldName", 0);
 
 	UI_ScreenReference screenToPreload(screenToPreload_);
@@ -953,9 +953,6 @@ void MissionDescription::resetToSave(bool userSave)
 
 	while(number < NETWORK_PLAYERS_MAX)
 		startLocations_[number++].set(worldSize_.x/2, worldSize_.y/2);
-
-	if( (!userSave_) && isBattle())
-        qsWorldsMgr.updateQSWorld(saveName(), XGUID(missionGUID_));
 }
 
 //void MissionDescription::setActivePlayerID(int playerID, int cooperativeIndex)
@@ -1245,6 +1242,32 @@ void MissionDescriptions::readFromDir(const char* path, GameType gameType)
 				name += ffd.cFileName;
 				MissionDescription mission(name.c_str(), gameType);
 				if(mission.valid())
+					push_back(mission);
+			}
+		} while(FindNextFile(hf, &ffd));
+		FindClose(hf);
+	}
+}
+
+void MissionDescriptions::readUserWorldsFromDir(const char* path)
+{
+	clear();
+	std::string fixedPath = path;
+	if(!fixedPath.empty() && fixedPath[fixedPath.size() - 1] != '\\')
+		fixedPath += "\\";
+
+	std::string mask = fixedPath + "*." + MissionDescription::getExtention(GAME_TYPE_MULTIPLAYER);
+
+	WIN32_FIND_DATA ffd;
+	HANDLE hf = FindFirstFile(mask.c_str(), &ffd);
+
+	if(hf != INVALID_HANDLE_VALUE){
+		do {
+			if(ffd.nFileSizeLow){
+				string name = fixedPath;
+				name += ffd.cFileName;
+				MissionDescription mission(name.c_str(), GAME_TYPE_MULTIPLAYER);
+				if(mission.isBattle() && !qsWorldsMgr.isMissionPresent(mission.missionGUID()))
 					push_back(mission);
 			}
 		} while(FindNextFile(hf, &ffd));

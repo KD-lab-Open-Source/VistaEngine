@@ -11,9 +11,9 @@
  * in supporting documentation.  Mark of the Unicorn makes no
  * representations about the suitability of this software for any
  * purpose.  It is provided "as is" without express or implied warranty.
-
+      
     SUMMARY: Configuration #defines for STL EH test suite
-
+    
 ***********************************************************************************/
 
 #ifndef INCLUDED_MOTU_Prefix
@@ -137,13 +137,13 @@ public:
   EH_allocator() _STLP_NOTHROW {}
  # if defined (_STLP_MEMBER_TEMPLATES)
   template <class _Tp1> EH_allocator(const EH_allocator<_Tp1>&) _STLP_NOTHROW {}
- # endif
+ # endif    
   EH_allocator(const EH_allocator<_Tp>&) _STLP_NOTHROW {}
   ~EH_allocator() _STLP_NOTHROW {}
   pointer address(reference __x) { return &__x; }
   const_pointer address(const_reference __x) const { return &__x; }
   // __n is permitted to be 0.  The C++ standard says nothing about what the return value is when __n == 0.
-  _Tp* allocate(size_type __n, const void* = 0) const {
+  _Tp* allocate(size_type __n, const void* = 0) const { 
     return __n != 0 ? __REINTERPRET_CAST(value_type*,EH_STD::__new_alloc::allocate(__n * sizeof(value_type))) : 0;
   }
   // __p is permitted to be a null pointer, only if n==0.
@@ -290,7 +290,7 @@ _STLP_END_NAMESPACE
 // Library-independent configuration.
 //
 #if defined( EH_MULTI_CONST_TEMPLATE_ARG_BUG) && !defined( EH_SELECT1ST_HINT )
-template <class Pair, class U>
+template <class Pair, class U>    
 // JDJ (CW Pro1 doesn't like const when first_type is also const)
 struct eh_select1st_hint : public unary_function<Pair, U> {
     const U& operator () (const Pair& x) const { return x.first; }

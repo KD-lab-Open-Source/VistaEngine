@@ -2,9 +2,7 @@
 #include <algorithm>
 #include <numeric>
 #include <iterator>
-#include <functional>
 
-#include "iota.h"
 #include "cppunit/cppunit_proxy.h"
 
 #if !defined (STLPORT) || defined(_STLP_USE_NAMESPACES)
@@ -51,7 +49,7 @@ void PermTest::prevprm0()
 void PermTest::prevprm1()
 {
   vector <int> v1(3);
-  __iota(v1.begin(), v1.end(), 0);
+  iota(v1.begin(), v1.end(), 0);
 
   prev_permutation(v1.begin(), v1.end());
   CPPUNIT_ASSERT(v1[0]==2);
@@ -93,7 +91,7 @@ void PermTest::prevprm1()
 void PermTest::prevprm2()
 {
   vector <int> v1(3);
-  __iota(v1.begin(), v1.end(), 0);
+  iota(v1.begin(), v1.end(), 0);
 
   prev_permutation(v1.begin(), v1.end(), greater<int>());
   CPPUNIT_ASSERT(v1[0]==0);
@@ -144,7 +142,7 @@ void PermTest::nextprm0()
 void PermTest::nextprm1()
 {
   vector <int> v1(3);
-  __iota(v1.begin(), v1.end(), 0);
+  iota(v1.begin(), v1.end(), 0);
 
   next_permutation(v1.begin(), v1.end());
   CPPUNIT_ASSERT(v1[0]==0);
@@ -186,7 +184,7 @@ void PermTest::nextprm1()
 void PermTest::nextprm2()
 {
   vector <char> v1(3);
-  __iota(v1.begin(), v1.end(), 'A');
+  iota(v1.begin(), v1.end(), 'A');
 
   next_permutation(v1.begin(), v1.end(), less<char>());
   CPPUNIT_ASSERT(v1[0]=='A');

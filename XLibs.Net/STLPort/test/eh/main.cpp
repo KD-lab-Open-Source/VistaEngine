@@ -1,6 +1,6 @@
 /***********************************************************************************
   Main.cpp
-
+  
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -19,7 +19,7 @@
  * and its documentation for any purpose is hereby granted without fee,
  * provided that the above copyright notice appear in all copies and
  * that both that copyright notice and this permission notice appear
- * in supporting documentation.  Moscow Center for SPARC Technology makes
+ * in supporting documentation.  Moscow Center for SPARC Technology makes 
 no
  * representations about the suitability of this software for any
  * purpose.  It is provided "as is" without express or implied warranty.
@@ -52,7 +52,7 @@ no
 
 # if defined (_STL_DEBUG)
 
-#  if defined ( EH_USE_SGI_STL )
+#  if defined ( EH_USE_SGI_STL ) 
 // Override assertion behavior
 #  include <cstdarg>
 //#  include <stldebug.h>
@@ -127,7 +127,7 @@ namespace  // dwa 1/21/00 - must use unnamed namespace here to avoid conflict un
 ====================================================================================*/
 static void usage(const char* name)
 {
-    cerr<<name<<
+    cerr<<name<< 
         " Usage : leak_test [-n <iterations>] [-s <size>] [-l] [-e] [-q]/[-v] [-t] [test_name...]\n";
     cerr<<"\t[-n <iterations>] : number of test iterations, default==100;"<<endl;
     cerr<<"\t[-s <size>] : base value for random container sizes, default==1000;"<<endl;
@@ -236,39 +236,39 @@ int _STLP_CALL main(int argc, char** argv)
             }
         } else {
             run_all = false;
-            // test name
+            // test name 
             if (EH_CSTD::strcmp(p, "algo")==0) {
                 run_algo=true;
             } else if (EH_CSTD::strcmp(p, "vector")==0) {
-                run_vector=true;
+                run_vector=true;               
             } else if (EH_CSTD::strcmp(p, "bit_vector")==0) {
-                run_bit_vector=true;
+                run_bit_vector=true; 
             } else if (EH_CSTD::strcmp(p, "list")==0) {
-                run_list=true;
+                run_list=true;               
             } else if (EH_CSTD::strcmp(p, "slist")==0) {
-                run_slist=true;
+                run_slist=true;               
             } else if (EH_CSTD::strcmp(p, "deque")==0) {
-                run_deque=true;
+                run_deque=true;               
             } else if (EH_CSTD::strcmp(p, "set")==0) {
-                run_set=true;
+                run_set=true;               
             } else if (EH_CSTD::strcmp(p, "map")==0) {
-                run_map=true;
+                run_map=true;               
             } else if (EH_CSTD::strcmp(p, "hash_set")==0) {
-                run_hash_set=true;
+                run_hash_set=true;               
             } else if (EH_CSTD::strcmp(p, "hash_map")==0) {
-                run_hash_map=true;
+                run_hash_map=true;               
             } else if (EH_CSTD::strcmp(p, "rope")==0) {
-                run_rope=true;
+                run_rope=true;               
             } else if (EH_CSTD::strcmp(p, "string")==0) {
-                run_string=true;
+                run_string=true;               
             } else if (EH_CSTD::strcmp(p, "bitset")==0) {
-                run_bitset=true;
+                run_bitset=true;               
             } else if (EH_CSTD::strcmp(p, "valarray")==0) {
-                run_valarray=true;
+                run_valarray=true;               
             } else {
                 usage(argv[0]);
             }
-
+            
         }
     }
 
@@ -308,7 +308,7 @@ int _STLP_CALL main(int argc, char** argv)
             cerr << "EH test : list" << endl;
             test_list();
         }
-
+        
 #if defined( EH_SLIST_IMPLEMENTED )
         if (run_all || run_slist) {
             gTestController.SetCurrentContainer("slist");
@@ -394,7 +394,7 @@ int _STLP_CALL main(int argc, char** argv)
     }
 
   gTestController.TrackAllocations( false );
-
+  
     cerr << "EH test : Done\n";
 
 #if defined(_WIN32_WCE)

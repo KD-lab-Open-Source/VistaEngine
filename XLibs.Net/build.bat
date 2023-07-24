@@ -1,29 +1,9 @@
-svn up
 call set.bat
 
-if exist %XLibs% rd %XLibs% /q /s
+del %XLibs% /q /s
+rd %XLibs% /q /s
 md %XLibs% 
 xcopy Heap %XLibs%\ /E
-
-
-
-cd Util\Serialization
-call build.bat copyHeaders
-cd ..\..
-
-cd Util\XMath
-call build.bat copyHeaders
-cd ..\..
-
-cd Util\kdw
-call build.bat copyHeaders
-cd ..\..
-
-cd Profiler
-call build.bat copyHeaders
-cd ..
-
-
 
 cd STLport
 call build.bat 
@@ -38,17 +18,14 @@ call build.bat
 cd ..
 
 
-cd Util\Serialization
+cd Serialization
 call build.bat 
-cd ..\..
+cd ..
 
-cd Util\XMath
+cd AttribEditor
 call build.bat 
-cd ..\..
+cd ..
 
-cd Util\kdw
-call build.bat
-cd ..\..
 
 cd Profiler
 call build.bat 
@@ -71,17 +48,3 @@ cd DemonWare
 call build.bat 
 cd ..
 
-
-cd FreeType
-call build.bat 
-cd ..
-
-cd Util\XmlRpc
-call build.bat
-cd ..\..
-
-cd MySQLpp
-call build.bat 
-cd ..
-
-exit

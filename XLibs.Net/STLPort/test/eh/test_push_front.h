@@ -1,6 +1,6 @@
 /***********************************************************************************
   test_push_front.h
-
+  
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -11,7 +11,7 @@
  * in supporting documentation.  Mark of the Unicorn makes no
  * representations about the suitability of this software for any
  * purpose.  It is provided "as is" without express or implied warranty.
-
+    
 ***********************************************************************************/
 #ifndef test_push_front_H_
 #define test_push_front_H_
@@ -29,7 +29,7 @@ struct test_push_front
   test_push_front( const C& orig ) : original( orig ) {
             gTestController.SetCurrentTestName("push_front() method");
         }
-
+  
   void operator()( C& c ) const
   {
       typedef typename C::value_type _value_type;

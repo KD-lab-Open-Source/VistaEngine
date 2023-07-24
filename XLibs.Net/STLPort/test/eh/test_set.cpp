@@ -1,6 +1,6 @@
 /***********************************************************************************
   test_set.cpp
-
+  
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -40,9 +40,9 @@ container_category(const TestMultiSet&) {
 
 void test_multiset() {
   TestMultiSet testMultiSet, testMultiSet2;
-
+  
   const size_t setSize = random_number(random_base);
-
+  
   while (testMultiSet.size() < setSize) {
     TestMultiSet::value_type x;
     testMultiSet.insert( x );
@@ -57,7 +57,7 @@ void test_multiset() {
   ConstCheck( 0, test_construct_pointer_range<TestMultiSet>(insFirst, insFirst+insCnt) );
   delete[] insFirst;
   WeakCheck( testMultiSet, insert_range_tester(testMultiSet, testMultiSet2.begin(), testMultiSet2.end() ) );
-
+  
   ConstCheck( 0, test_default_construct<TestMultiSet>() );
   ConstCheck( 0, test_construct_iter_range<TestMultiSet>( testMultiSet2 ) );
   ConstCheck( testMultiSet, test_copy_construct<TestMultiSet>() );
@@ -74,9 +74,9 @@ container_category(const TestSet&) {
 
 void test_set() {
   TestSet testSet, testSet2;
-
+  
   const size_t setSize = random_number(random_base);
-
+  
   while ( testSet.size() < setSize ) {
     TestSet::value_type x;
     testSet.insert( x );

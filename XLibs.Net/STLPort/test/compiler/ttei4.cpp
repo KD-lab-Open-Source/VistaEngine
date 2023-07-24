@@ -5,7 +5,7 @@
  *   gcc 3.4.1
  *
  * It is known that this code compiled by following compilers:
- *
+ *   
  *   MSVC 6
  *   MSVC 8 Beta
  */

@@ -1,6 +1,4 @@
 #include <my_stl.h>
-#include <functional>
-#include <algorithm>
 #include <windows.h>
 #include <process.h>
 #include <crtdbg.h>
@@ -15,24 +13,9 @@
 
 #include "Profiler.h"
 #include "MTSection.h"
-#include "kdw/PropertyEditor.h"
-//#include "kdw/kdWidgetsLib.h"
-#include "Serialization\XPrmArchive.h"
-#include "Serialization\Decorators.h"
+#include "..\Serialization\EditArchive.h"
 
-#pragma warning (disable: 4073)
 #pragma init_seg(lib)
-
-struct SerializeAll{
-	SerializeAll(Profiler* profiler)
-		: profiler_(profiler)
-	{}
-
-	void serialize(Archive& ar){
-		profiler_->serializeAll(ar);
-	}
-	Profiler* profiler_;
-};
 
 __int64 getRDTSC();
 int totalMemoryUsed(); 
@@ -52,11 +35,11 @@ __int64 Profiler::start_ticks = 0;
 __int64 Profiler::ticks = 0;
 double Profiler::time_factor = 0;
 
-bool Profiler::autoExit_;
-int Profiler::startLogicQuant_;
-int Profiler::endLogicQuant_;
-string Profiler::title_;
-string Profiler::profileFile_;
+bool Profiler::autoExit_ = false;
+int Profiler::startLogicQuant_ = 0;
+int Profiler::endLogicQuant_ = 0;
+XBuffer Profiler::title_;
+XBuffer Profiler::profileFile_;
 
 Profiler::Profilers Profiler::profilers_;
 
@@ -167,7 +150,7 @@ void TimerData::serialize(Archive& ar)
 		buf < "size = " <= accumulated_alloc.size < ", blocks = " <= accumulated_alloc.blocks < ", operations = " <= accumulated_alloc.operations;
 
 	string str = buf.c_str();
-	ar.serialize(str, title_, "^!");
+	ar.serialize(str, title_, "&");
 
 	if(!children_.empty()){
 		serializing_ = true;
@@ -188,7 +171,6 @@ void TimerData::serialize(Archive& ar)
 				ar.serialize(message, (*i)->title_, (*i)->title_);
 			}
 		}
-		//ar.serialize(HLineDecorator(), "hline", "<");
 		serializing_ = false;
 	}
 }
@@ -251,8 +233,6 @@ void StatisticalData::add(double x)
 Profiler::Profiler()
 {
 	MTAutoInternal lock(lock_);
-
-	profileFile_ < "profile";
 
 	clear();
 
@@ -319,10 +299,10 @@ void Profiler::start_stop(ProfilerMode profilerMode)
 		ticks = getRDTSC() - start_ticks;
 
 		if(!endLogicQuant_){
-			if(kdw::edit(Serializer(SerializeAll(this)), 0)){
-				if(!profileFile_.empty())
-					serializeAll(XPrmOArchive(profileFile_.c_str(), false));
-			}
+			EditArchive ar;
+			ar.setIgnoreNameDuplication(true);
+			serializeAll(static_cast<EditOArchive&>(ar));
+			ar.edit();
 		}
 		else {
 			/*
@@ -373,8 +353,10 @@ void Profiler::setAutoMode(int startLogicQuant, int endLogicQuant, const char* t
 	startLogicQuant_ = startLogicQuant; 
 	endLogicQuant_ = endLogicQuant;
 	autoExit_ = autoExit;
-	title_ = title;
-	profileFile_ = profileFile;
+	title_.init();
+	title_ < title;
+	profileFile_.init();
+	profileFile_ < profileFile;
 }
 
 void Profiler::serializeAll(Archive& ar)
@@ -398,13 +380,13 @@ void Profiler::serializeAll(Archive& ar)
 #endif
 			break;
 	}
-	ar.serialize(mode, "Mode", "!Режим");
+	ar.serialize(mode, "Режим", "Режим");
 
-	ar.serialize(milliseconds, "Time_interval_mS", "!Time interval, mS");
+	ar.serialize(milliseconds, "Time interval, mS", "Time interval, mS");
 	char total_name[2048];
 	string  ticksName = _i64toa(ticks, total_name, 10);
-	ar.serialize(ticksName, "Ticks", "!Ticks");
-	ar.serialize((double)ticks/(milliseconds*1000.), "CPU_MHz", "!CPU, MHz");
+	ar.serialize(ticksName, "Ticks", "Ticks");
+	ar.serialize((double)ticks/(milliseconds*1000.), "CPU, MHz", "CPU, MHz");
 	//ar.serialize(memory, "Memory start", "Memory start");
 	//ar.serialize(totalMemoryUsed(), "Memory end", "Memory end");
 
@@ -412,21 +394,18 @@ void Profiler::serializeAll(Archive& ar)
 	profilers_.erase(end, profilers_.end());
 
 	serializeMax_ = false;
-	ar.serialize(profilers_, "ThreadsByAvr", "!Сортировка по среднему");
+	ar.serialize(profilers_, "ThreadsByAvr", "Сортировка по среднему");
 
 	serializeMax_ = true;
-	ar.serialize(profilers_, "ThreadsByMax", "!Сортировка по максимуму");
-
-	if(ar.isEdit())
-		ar.serialize(profileFile_, "profileFile", "Записать профайл, имя файла");
+	ar.serialize(profilers_, "ThreadsByMax", "Сортировка по максимуму");
 }
 
 void Profiler::serialize(Archive& ar)
 {
 	profilerForSerialization_ = this;
 	if(profilerMode_ != PROFILER_MEMORY){
-		ar.serialize(frames, "Frames", "!Frames");
-		ar.serialize(frames*1000./milliseconds, "FPS", "!FPS");
+		ar.serialize(frames, "Frames", "Frames");
+		ar.serialize(frames*1000./milliseconds, "FPS", "FPS");
 	}
 
 	if(!milliseconds)
@@ -448,7 +427,7 @@ void Profiler::serialize(Archive& ar)
 	FOR_EACH(list, i)
 		ar.serialize(*i, (*i)->title_, (*i)->title_);
 
-	ar.serialize(statistics_, "Stat", "!Статистика");
+	ar.serialize(statistics_, "Stat", "Статистика");
 }
 
 void Profiler::startBuildTree(TimerData* timer)

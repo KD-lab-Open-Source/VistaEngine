@@ -238,6 +238,7 @@ public:
 	int playersAmount() const;
 
 	bool userSave() const { return userSave_; }
+	void setBattle(bool battle) { isBattle_ = battle; }
 	bool isBattle() const { return isBattle_; }
 	bool isCorrect() const { return errorCode==ErrMD_None; }
 
@@ -335,6 +336,7 @@ class MissionDescriptions : public vector<MissionDescription>
 {
 public:
 	void readFromDir(const char* path, GameType gameType);
+	void readUserWorldsFromDir(const char* path);
 	void add(const MissionDescription& mission);
 	void remove(const MissionDescription& mission);
 	const MissionDescription* find(const char* missionName) const;

@@ -2,24 +2,24 @@
  * Copyright (c) 1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
  * modified is included with the above copyright notice.
  *
- */
+ */ 
 
 #ifndef _STLP_SSTREAM_C
 #define _STLP_SSTREAM_C
 
-#ifndef _STLP_INTERNAL_SSTREAM
+#ifndef _STLP_SSTREAM_H
 #  include <stl/_sstream.h>
 #endif
 
@@ -60,7 +60,7 @@ basic_stringbuf<_CharT, _Traits, _Alloc>::~basic_stringbuf()
 
 // Set the underlying string to a new value.
 template <class _CharT, class _Traits, class _Alloc>
-void
+void 
 basic_stringbuf<_CharT, _Traits, _Alloc>::str(const basic_string<_CharT, _Traits, _Alloc>& __s)
 {
   _M_str = __s;
@@ -68,7 +68,7 @@ basic_stringbuf<_CharT, _Traits, _Alloc>::str(const basic_string<_CharT, _Traits
 }
 
 template <class _CharT, class _Traits, class _Alloc>
-void
+void 
 basic_stringbuf<_CharT, _Traits, _Alloc>::_M_set_ptrs() {
   _CharT* __data_ptr = __CONST_CAST(_CharT*,_M_str.data());
   _CharT* __data_end = __data_ptr + _M_str.size();
@@ -79,7 +79,7 @@ basic_stringbuf<_CharT, _Traits, _Alloc>::_M_set_ptrs() {
     else
       this->setg(__data_ptr, __data_ptr, __data_end);
   }
-
+  
   // The initial write position is the beginning of the string.
   if (_M_mode & ios_base::out) {
     if (_M_mode & (ios_base::app | ios_base::ate))
@@ -148,7 +148,7 @@ basic_stringbuf<_CharT, _Traits, _Alloc>::overflow(int_type __c) {
         // It's a write-only streambuf, so we can use special append buffer.
         if (this->pptr() == this->epptr())
           this->_M_append_buffer();
-
+      
         if (this->pptr() != this->epptr()) {
           *this->pptr() = _Traits::to_char_type(__c);
           this->pbump(1);
@@ -178,7 +178,7 @@ basic_stringbuf<_CharT, _Traits, _Alloc>::overflow(int_type __c) {
         }
       }
     }
-    else                          // Overflow always fails if it's read-only
+    else                          // Overflow always fails if it's read-only 
       return _Traits::eof();
   }
   else                        // __c is EOF, so we don't have to do anything
@@ -186,7 +186,7 @@ basic_stringbuf<_CharT, _Traits, _Alloc>::overflow(int_type __c) {
 }
 
 template <class _CharT, class _Traits, class _Alloc>
-streamsize
+streamsize 
 basic_stringbuf<_CharT, _Traits, _Alloc>::xsputn(const char_type* __s,
                                                  streamsize __n) {
   streamsize __nwritten = 0;
@@ -213,18 +213,18 @@ basic_stringbuf<_CharT, _Traits, _Alloc>::xsputn(const char_type* __s,
     // At this point we know we're appending.
     if (_M_mode & ios_base::in) {
       ptrdiff_t __get_offset = this->gptr() - this->eback();
-      _M_str.append(__s, __s + __STATIC_CAST(ptrdiff_t, __n));
-
-      _CharT* __data_ptr = __CONST_CAST(_CharT*, _M_str.data());
+      _M_str.append(__s, __s + __n);
+      
+      _CharT* __data_ptr = __CONST_CAST(_CharT*,_M_str.data());
       size_t __data_size = _M_str.size();
 
-      this->setg(__data_ptr, __data_ptr + __get_offset, __data_ptr + __data_size);
+      this->setg(__data_ptr, __data_ptr + __get_offset, __data_ptr+__data_size);
       this->setp(__data_ptr, __data_ptr + __data_size);
       this->pbump((int)__data_size);
     }
     else {
       _M_append_buffer();
-      _M_str.append(__s, __s + __STATIC_CAST(ptrdiff_t, __n));
+      _M_str.append(__s, __s + __n);
     }
 
     __nwritten += __n;
@@ -234,7 +234,7 @@ basic_stringbuf<_CharT, _Traits, _Alloc>::xsputn(const char_type* __s,
 }
 
 template <class _CharT, class _Traits, class _Alloc>
-streamsize
+streamsize 
 basic_stringbuf<_CharT, _Traits, _Alloc>::_M_xsputnc(char_type __c,
                                                      streamsize __n) {
   streamsize __nwritten = 0;
@@ -273,7 +273,7 @@ basic_stringbuf<_CharT, _Traits, _Alloc>::_M_xsputnc(char_type __c,
     }
     else {
       _M_append_buffer();
-      _M_str.append(__app_size, __c);
+      _M_str.append(__app_size, __c);      
     }
 
     __nwritten += __app_size;
@@ -330,7 +330,7 @@ basic_stringbuf<_CharT, _Traits, _Alloc>::setbuf(_CharT*, streamsize __n) {
 template <class _CharT, class _Traits, class _Alloc>
 __BSB_pos_type__
 basic_stringbuf<_CharT, _Traits, _Alloc>
-  ::seekoff(off_type __off,
+  ::seekoff(off_type __off, 
             ios_base::seekdir __dir,
             ios_base::openmode __mode) {
   __mode &= _M_mode;
@@ -369,8 +369,7 @@ basic_stringbuf<_CharT, _Traits, _Alloc>
 
     if (__off < 0 || __off > __n)
       return pos_type(off_type(-1));
-    this->setg(this->eback(), this->eback() + __STATIC_CAST(ptrdiff_t, __off),
-                              this->eback() + __STATIC_CAST(ptrdiff_t, __n));
+    this->setg(this->eback(), this->eback() + __off, this->eback() + __n);
   }
 
   if (__omode) {
@@ -407,7 +406,7 @@ basic_stringbuf<_CharT, _Traits, _Alloc>
   if (__imode) {
     if (__n < 0 || __n > this->egptr() - this->eback())
       return pos_type(off_type(-1));
-    this->setg(this->eback(), this->eback() + __STATIC_CAST(ptrdiff_t, __n), this->egptr());
+    this->setg(this->eback(), this->eback() + __n, this->egptr());
   }
 
   if (__omode) {
@@ -416,7 +415,7 @@ basic_stringbuf<_CharT, _Traits, _Alloc>
 
     _CharT* __data_ptr = __CONST_CAST(_CharT*,_M_str.data());
     size_t __data_size = _M_str.size();
-
+    
     this->setp(__data_ptr, __data_ptr+__data_size);
     this->pbump((int)__n);
   }
@@ -424,7 +423,7 @@ basic_stringbuf<_CharT, _Traits, _Alloc>
   return __pos;
 }
 
-// This is declared as a const member function because it is
+// This is declared as a const member function because it is 
 // called by basic_stringbuf<>::str().  Precondition: this is a
 // write-only stringbuf.  We can't use an output buffer for read-
 // write stringbufs.  Postcondition: pptr is reset to the beginning
@@ -490,7 +489,7 @@ basic_ostringstream<_CharT, _Traits, _Alloc>
       _M_buf(__mode | ios_base::out) {
   this->init(&_M_buf);
 }
-
+  
 template <class _CharT, class _Traits, class _Alloc>
 basic_ostringstream<_CharT, _Traits, _Alloc>
   ::basic_ostringstream(const _String& __str, ios_base::openmode __mode)

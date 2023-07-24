@@ -38,6 +38,7 @@
 #include "StreamCommand.h"
 
 #include "XPrmArchive.h"
+#include "SystemUtil.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -419,7 +420,6 @@ bool CGeneralView::CoordScr2vMap(const Vect2i& inMouse_pos, Vect3f& outWorld_pos
 	}
 }
 
-
 #include "..\Util\SystemUtil.h"
 LRESULT CGeneralView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -525,6 +525,10 @@ LRESULT CGeneralView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			CurMousePos.x = LOSHORT(lParam);
 			CurMousePos.y = HISHORT(lParam);
+
+			Vect3f worldCoord = screenPointToGround(CurMousePos);
+			xassert(round(worldCoord.x) >= 0 && round(worldCoord.x) < vMap.H_SIZE &&
+					round(worldCoord.y) >= 0 && round(worldCoord.y) < vMap.V_SIZE);					
 			CoordScr2vMap(Vect2i(CurMousePos.x, CurMousePos.y), pointOnMouse);
 			if(flag_MMouseDown){
 				Vect2f delta = CurMousePos - BegMousePos;
@@ -546,8 +550,12 @@ LRESULT CGeneralView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				CameraCoordinate coord = cameraManager->coordinate();
 
 				Vect3f coord_position = coord.position();
+#ifdef _VISTA_ENGINE_EXTERNAL_
+				coord.position().z = worldCoord.z;
+#else
 				float zDelta = To3D(Vect2f(coord_position) + Vect2f(delta)).z - To3D(Vect2f(coord.position())).z;
 				coord.position().z = max(0.0f, coord_position.z + zDelta);
+#endif
 				coord.position().x += delta.x;
 				coord.position().y += delta.y;
 
@@ -557,7 +565,6 @@ LRESULT CGeneralView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				UpdateStatusBar(); // Если не поворот камеры
 			
 			if(CSurToolBase* tool = getCurCtrl()){
-				Vect3f worldCoord = screenPointToGround(CurMousePos);
 				tool->TrackMouse(worldCoord, CurMousePos);
 			}
 		}

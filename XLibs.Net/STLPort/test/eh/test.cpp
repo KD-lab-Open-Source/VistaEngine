@@ -34,7 +34,7 @@
            }
 # if 0
 # include <iostream>
-main()
+main() 
 {
   // std::stringstream tstr;
   std::cout<<"hello world\n";

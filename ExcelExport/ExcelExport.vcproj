@@ -19,6 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\XUtil;..\ExcelExport"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;EXCELEXPORT_EXPORTS;_STLP_USE_STATIC_LIB"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -34,6 +35,8 @@
 				AdditionalDependencies="XUtilVC7MT.lib"
 				OutputFile="$(OutDir)/ExcelExport.dll"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="..\XLibs.Net\XUtil\libs;..\XLibs.Net\lib"
+				IgnoreDefaultLibraryNames="libcmt.lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/ExcelExport.pdb"
 				SubSystem="2"
@@ -68,6 +71,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\XUtil;..\ExcelExport"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;EXCELEXPORT_EXPORTS"
 				RuntimeLibrary="0"
 				RuntimeTypeInfo="TRUE"
@@ -82,6 +86,8 @@
 				AdditionalDependencies="XUtilVC7MT.lib"
 				OutputFile="$(OutDir)/ExcelExport.dll"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\XLibs.Net\XUtil\libs;..\XLibs.Net\lib"
+				IgnoreDefaultLibraryNames="libcmt.lib"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"

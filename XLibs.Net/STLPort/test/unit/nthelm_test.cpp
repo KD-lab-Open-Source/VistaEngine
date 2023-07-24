@@ -1,6 +1,5 @@
 #include <vector>
 #include <algorithm>
-#include <functional>
 
 #include "cppunit/cppunit_proxy.h"
 
@@ -44,8 +43,8 @@ void NthElemTest::nthelem0()
 }
 void NthElemTest::nthelem1()
 {
-  //6 8 5 1 7 4 1 5 2 6
-  //1 1 4 2 5 5 6 7 8 6
+  //6 8 5 1 7 4 1 5 2 6 
+  //1 1 4 2 5 5 6 7 8 6 
   int numbers[10] = { 6, 8, 5, 1, 7, 4, 1, 5, 2, 6 };
 
   vector <int> v1(numbers, numbers+10);
@@ -64,8 +63,8 @@ void NthElemTest::nthelem1()
 }
 void NthElemTest::nthelem2()
 {
-  //4 5 4 2 1 7 4 3 1 6
-  //6 7 4 4 5 4 3 2 1 1
+  //4 5 4 2 1 7 4 3 1 6 
+  //6 7 4 4 5 4 3 2 1 1 
 
   int numbers[10] = { 4, 5, 4, 2, 1, 7, 4, 3, 1, 6 };
   vector <int> v1(numbers, numbers+10);

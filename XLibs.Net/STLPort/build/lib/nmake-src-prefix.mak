@@ -1,5 +1,5 @@
 # -*- makefile -*- Time-stamp: <03/10/26 15:42:12 ptr>
-# $Id: nmake-src-prefix.mak 2154 2006-02-07 20:34:30Z dums $
+# $Id: nmake-src-prefix.mak,v 1.1.2.4 2005/04/16 14:39:06 dums Exp $
 
 ALLOBJS = $(ALLOBJS:../../src/=)
 ALLRESS = $(ALLRESS:../../src/=)
@@ -37,7 +37,7 @@ ALLRESS = $(ALLRESS:../../src/=)
 	$(COMPILE_c_DBG) $(OUTPUT_OPTION_DBG) $<
 
 {../../src}.c{$(OUTPUT_DIR_STLDBG)}.o:
-	$(COMPILE_c_STLDBG) $(OUTPUT_OPTION_STLDBG) $<
+	$(COMPILE_c_DBG) $(OUTPUT_OPTION_STLDBG) $<
 
 {../../src}.c{$(OUTPUT_DIR_A)}.o:
 	$(COMPILE_c_STATIC_REL) $(OUTPUT_OPTION_STATIC) $<
@@ -46,7 +46,7 @@ ALLRESS = $(ALLRESS:../../src/=)
 	$(COMPILE_c_STATIC_DBG) $(OUTPUT_OPTION_STATIC_DBG) $<
 
 {../../src}.c{$(OUTPUT_DIR_A_STLDBG)}.o:
-	$(COMPILE_c_STATIC_STLDBG) $(OUTPUT_OPTION_STATIC_STLDBG) $<
+	$(COMPILE_c_STATIC_DBG) $(OUTPUT_OPTION_STATIC_STLDBG) $<
 
 #
 # rules for .rc --> .res

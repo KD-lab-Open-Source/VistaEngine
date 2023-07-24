@@ -4,6 +4,7 @@
 #include "Serialization.h"
 #include "ResourceSelector.h"
 #include "IVisD3D.h"
+#include <functional>
 
 //////////////////////////////////////////////////////////////////////////////
 LensFlareSprite::~LensFlareSprite()

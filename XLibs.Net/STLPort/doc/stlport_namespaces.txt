@@ -5,12 +5,12 @@ coming with your compiler.
 1. What is the STLport namespace ?
 
   As STLport is a C++ Standard library implementation the STLport namespace
-is 'std'. In normal use this is all you need to know and you can stop reading
+is: std. In normal use this is all you need to know and you can stop reading
 here.
 
 2. How does STLport replace native C++ Standard library ?
 
-  STLport defines a macro 'std' that replaces all references of std in the
+  STLport define a macro called std that replaces all references of std in the
 user code by a different name. This technique has has some drawback but also
 advantages. The drawback is that you cannot declared Standard component like
 that:
@@ -56,7 +56,7 @@ those headers will replace std with the STLport namespace.
   The advantage of this macro replacement is that we can customize the STLport namespace
 depending on the compilation options. For instance the STLport safe mode you can use by
 defining _STLP_DEBUG is not binary compatible with a normal debug build. To ensure that
-no one will ever build code without _STLP_DEBUG and link with STLport library built with
+no one will ever build code without _STLP_DEBUG and link with STLport library build with
 this option the namespace is different so that it will generate link time error rather
 than random crashes during application execution.
 
@@ -74,9 +74,9 @@ namespace std
 to native headers. If you include a C++ native headers that indirectly define for instance
 the vector class it is going to conflict with the STLport vector definition.
 
-  Moreover this solution just does not work for a very simple reason. The C++ Standard 
-allows users to specialized some of the Standard algorithms. This specialization has to 
-be done in the same namespace as the main template declaration:
+  Moreover this solution just do not work for a very simple reason. C++ Standard allow users
+to specialized some of the Standard algorithm. This specialization has to be done in the
+same namespace as the main template declaration:
 
 //In an STLport header:
 namespace stlport

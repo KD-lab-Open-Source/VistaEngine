@@ -1,6 +1,6 @@
 /***********************************************************************************
   TestController.h
-
+  
     SUMMARY: An "faux-singleton" object to encapsulate a hodgepodge of state and
       functionality relating to the test suite. Probably should be broken
       into smaller pieces.
@@ -15,7 +15,7 @@
  * in supporting documentation.  Mark of the Unicorn makes no
  * representations about the suitability of this software for any
  * purpose.  It is provided "as is" without express or implied warranty.
-
+    
 ***********************************************************************************/
 #if !INCLUDED_MOTU_nc_alloc
 #define INCLUDED_MOTU_nc_alloc 1
@@ -38,20 +38,20 @@ struct TestController {
   //
   // Leak detection
   //
-
+  
   // Turn the recording of the addresses of individual allocated
   // blocks on or off. If not called, allocations will only be
   // counted, but deallocations won't be checked for validity.
   static void TrackAllocations( bool );
   static bool TrackingEnabled();
-
+  
   // Call this to begin a new leak-detection cycle. Resets all
   // allocation counts, etc.
   static void BeginLeakDetection();
-
+  
   // Returns true iff leak detection is currently in effect
   static bool LeakDetectionEnabled();
-
+  
   // Ends leak detection and reports any resource leaks.
   // Returns true if any occurred.
   static bool ReportLeaked();
@@ -59,13 +59,13 @@ struct TestController {
   //
   // Exception-safety
   //
-
+  
   // Don't test for exception-safety
   static void TurnOffExceptions();
-
+    
   // Set operator new to fail on the nth invocation
   static void SetFailureCountdown( long n );
-
+  
   // Set operator new to never fail.
   static void CancelFailureCountdown();
 
@@ -92,11 +92,11 @@ struct TestController {
 
 private:
   enum { kNotInExceptionTest = -1 };
-
+  
   static void ClearAllocationSet();
   static void EndLeakDetection();
   static void PrintTestName( bool err=false );
-
+  
   static long& Failure_threshold();
   static long possible_failure_count;
   static const char* current_test;

@@ -2,19 +2,19 @@
  * Copyright (c) 1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
  * modified is included with the above copyright notice.
  *
- */
+ */ 
 // WARNING: This is an internal header file, included by other C++
 // standard library headers.  You should not attempt to use this header
 // file directly.
@@ -67,10 +67,10 @@ public:
              extern_type*         __to_limit,
              extern_type*&        __to_next) const {
     return do_out(__state,
-                  __from, __from_end, __from_next,
+                  __from, __from_end, __from_next, 
                   __to,   __to_limit, __to_next);
   }
-
+  
   result unshift(state_type&    __state,
                  extern_type*   __to,
                  extern_type*   __to_limit,
@@ -80,12 +80,12 @@ public:
 
   result in(state_type&         __state,
             const extern_type*  __from,
-            const extern_type*  __from_end,
+            const extern_type*  __from_end,  
             const extern_type*& __from_next,
-            intern_type*        __to,
-            intern_type*        __to_limit,
+            intern_type*        __to, 
+            intern_type*        __to_limit, 
             intern_type*&       __to_next) const {
-    return do_in(__state,
+    return do_in(__state, 
                  __from, __from_end, __from_next,
                  __to,  __to_limit, __to_next);
   }
@@ -100,7 +100,7 @@ public:
              size_t             __max) const {
     return do_length(__state, __from, __end, __max);
   }
-
+  
   int max_length() const _STLP_NOTHROW { return do_max_length(); }
 
   static _STLP_STATIC_MEMBER_DECLSPEC locale::id id;
@@ -108,28 +108,28 @@ public:
 protected:
   ~codecvt() {}
 
-  virtual result do_out(state_type&,
-                        const intern_type*  __from,
-                        const intern_type*,
-                        const intern_type*& __from_next,
-                        extern_type*        __to,
-                        extern_type*,
-                        extern_type*&       __to_next) const
-  { __from_next = __from; __to_next   = __to; return noconv; }
+  virtual result do_out(state_type& __state,
+            const intern_type*      __from,
+            const intern_type*      __from_end,
+            const intern_type*&     __from_next,
+            extern_type*            __to,
+            extern_type*            __to_limit,
+            extern_type*&           __to_next) const
+  { __from_next = __from; __to_next   = __to; return noconv; } 
 
-  virtual result do_in (state_type&,
-                        const extern_type*  __from,
-                        const extern_type*,
-                        const extern_type*& __from_next,
-                        intern_type*        __to,
-                        intern_type*,
-                        intern_type*&       __to_next) const
-  { __from_next = __from; __to_next = __to; return noconv; }
+  virtual result do_in (state_type& __state,
+            const extern_type*      __from,
+            const extern_type*      __from_end,
+            const extern_type*&     __from_next,
+            intern_type*            __to,
+            intern_type*            __to_limit,
+            intern_type*&           __to_next) const
+  { __from_next = __from; __to_next   = __to; return noconv; } 
 
-  virtual result do_unshift(state_type&,
-                            extern_type* __to,
-                            extern_type*,
-                            extern_type*& __to_next) const
+  virtual result do_unshift(state_type& __state,
+            extern_type*                __to, 
+            extern_type*                __to_limit,
+            extern_type*&               __to_next) const
   { __to_next = __to; return noconv; }
 
   virtual int do_encoding() const _STLP_NOTHROW
@@ -137,9 +137,9 @@ protected:
 
   virtual bool do_always_noconv() const _STLP_NOTHROW
   { return true; }
-
-  virtual int do_length(const state_type&,
-                        const extern_type* __from,
+  
+  virtual int do_length(const state_type&  __state,
+                        const extern_type* __from, 
                         const extern_type* __end,
                         size_t __max) const
   { return (int)(min) ( __STATIC_CAST(size_t, (__end - __from)), __max); }
@@ -154,10 +154,8 @@ private:
 
 #  if defined (_STLP_EXPOSE_STREAM_IMPLEMENTATION) && !defined (_STLP_LINK_TIME_INSTANTIATION)
 #    if (_STLP_STATIC_TEMPLATE_DATA > 0)
-#      if !defined (__BORLANDC__)
 template <class _InternT, class _ExternT, class _StateT>
 locale::id codecvt<_InternT, _ExternT, _StateT>::id;
-#      endif
 #    endif
 #  endif
 #endif
@@ -167,7 +165,7 @@ class codecvt_byname : public codecvt<_InternT, _ExternT, _StateT> {};
 
 _STLP_TEMPLATE_NULL
 class _STLP_CLASS_DECLSPEC codecvt<char, char, mbstate_t>
-  : public locale::facet, public codecvt_base
+  : public locale::facet, public codecvt_base 
 {
   friend class _Locale_impl;
 
@@ -183,9 +181,9 @@ public:
              const char*  __from_end,
              const char*& __from_next,
              char*        __to,
-             char*        __to_limit,
+             char*        __to_limit, 
              char*&       __to_next) const {
-    return do_out(__state,
+    return do_out(__state, 
                   __from, __from_end, __from_next,
                   __to,   __to_limit, __to_next);
   }
@@ -193,13 +191,13 @@ public:
   result unshift(mbstate_t& __state,
                  char* __to, char* __to_limit, char*& __to_next) const
     { return do_unshift(__state, __to, __to_limit, __to_next); }
-
+    
   result in(state_type&   __state,
             const char*  __from,
-            const char*  __from_end,
+            const char*  __from_end,  
             const char*& __from_next,
-            char*        __to,
-            char*        __to_limit,
+            char*        __to, 
+            char*        __to_limit, 
             char*&       __to_next) const {
     return do_in(__state,
                  __from, __from_end, __from_next,
@@ -214,7 +212,7 @@ public:
              const char* __from, const char* __end,
              size_t __max) const
     { return do_length(__state, __from, __end, __max); }
-
+  
   int max_length() const _STLP_NOTHROW { return do_max_length(); }
 
   static _STLP_STATIC_MEMBER_DECLSPEC locale::id id;
@@ -230,7 +228,7 @@ protected:
                         char*        /* __to_limit */,
                         char*&       __to_next) const;
 
-  virtual result do_in (mbstate_t&   /* __state */ ,
+  virtual result do_in (mbstate_t&   /* __state */ , 
                         const char*  __from,
                         const char*  /* __from_end */,
                         const char*& __from_next,
@@ -246,17 +244,17 @@ protected:
   virtual int do_encoding() const _STLP_NOTHROW;
   virtual bool do_always_noconv() const _STLP_NOTHROW;
   virtual int do_length(const mbstate_t&         __state,
-                        const  char* __from,
+                        const  char* __from, 
                         const  char* __end,
                         size_t __max) const;
   virtual int do_max_length() const _STLP_NOTHROW;
 private:
   codecvt(const codecvt<char, char, mbstate_t>&);
-  codecvt<char, char, mbstate_t>& operator =(const codecvt<char, char, mbstate_t>&);
+  codecvt<char, char, mbstate_t>& operator =(const codecvt<char, char, mbstate_t>&); 
 };
 
 # ifndef _STLP_NO_WCHAR_T
-
+ 
 _STLP_TEMPLATE_NULL
 class _STLP_CLASS_DECLSPEC codecvt<wchar_t, char, mbstate_t>
   : public locale::facet, public codecvt_base
@@ -277,7 +275,7 @@ public:
              char*           __to_limit,
              char*&          __to_next) const {
     return do_out(__state,
-                  __from, __from_end, __from_next,
+                  __from, __from_end, __from_next, 
                   __to,   __to_limit, __to_next);
   }
 
@@ -285,15 +283,15 @@ public:
                  char*  __to, char*  __to_limit, char*& __to_next) const {
     return do_unshift(__state, __to, __to_limit, __to_next);
   }
-
+    
   result in(mbstate_t&   __state,
             const char*  __from,
-            const char*  __from_end,
+            const char*  __from_end,  
             const char*& __from_next,
-            wchar_t*     __to,
-            wchar_t*     __to_limit,
+            wchar_t*     __to, 
+            wchar_t*     __to_limit, 
             wchar_t*&    __to_next) const {
-    return do_in(__state,
+    return do_in(__state, 
                  __from, __from_end, __from_next,
                  __to,   __to_limit, __to_next);
   }
@@ -306,7 +304,7 @@ public:
              const char* __from, const char* __end,
              size_t __max) const
     { return do_length(__state, __from, __end, __max); }
-
+  
   int max_length() const _STLP_NOTHROW { return do_max_length(); }
 
   static _STLP_STATIC_MEMBER_DECLSPEC locale::id id;
@@ -331,16 +329,16 @@ protected:
                         wchar_t*&       __to_next) const;
 
   virtual result do_unshift(mbstate_t&   __state,
-                            char*  __to,
+                            char*  __to, 
                             char*  __to_limit,
                             char*& __to_next) const;
 
   virtual int do_encoding() const _STLP_NOTHROW;
 
   virtual bool do_always_noconv() const _STLP_NOTHROW;
-
+  
   virtual int do_length(const mbstate_t& __state,
-                        const  char* __from,
+                        const  char* __from, 
                         const  char* __end,
                         size_t __max) const;
 
@@ -348,7 +346,7 @@ protected:
 
 private:
   codecvt(const codecvt<wchar_t, char, mbstate_t>&);
-  codecvt<wchar_t, char, mbstate_t>& operator = (const codecvt<wchar_t, char, mbstate_t>&);
+  codecvt<wchar_t, char, mbstate_t>& operator = (const codecvt<wchar_t, char, mbstate_t>&);  
 };
 
 # endif
@@ -361,16 +359,16 @@ public:
   ~codecvt_byname();
 private:
   codecvt_byname(const codecvt_byname<char, char, mbstate_t>&);
-  codecvt_byname<char, char, mbstate_t>& operator =(const codecvt_byname<char, char, mbstate_t>&);
+  codecvt_byname<char, char, mbstate_t>& operator =(const codecvt_byname<char, char, mbstate_t>&);  
 };
 
 # ifndef _STLP_NO_WCHAR_T
 _STLP_TEMPLATE_NULL
 class _STLP_CLASS_DECLSPEC codecvt_byname<wchar_t, char, mbstate_t>
-  : public codecvt<wchar_t, char, mbstate_t>
+  : public codecvt<wchar_t, char, mbstate_t> 
 {
 public:
-  explicit codecvt_byname(const char * __name, size_t __refs = 0, _Locale_name_hint* __hint = 0);
+  explicit codecvt_byname(const char * __name, size_t __refs = 0);    
 
 protected:
   ~codecvt_byname();
@@ -392,16 +390,16 @@ protected:
                         wchar_t*&       __to_next) const;
 
   virtual result do_unshift(mbstate_t&   __state,
-                            char*  __to,
+                            char*  __to, 
                             char*  __to_limit,
                             char*& __to_next) const;
 
   virtual int do_encoding() const _STLP_NOTHROW;
 
   virtual bool do_always_noconv() const _STLP_NOTHROW;
-
+  
   virtual int do_length(const mbstate_t&         __state,
-                        const  char* __from,
+                        const  char* __from, 
                         const  char* __end,
                         size_t __max) const;
 
@@ -410,7 +408,7 @@ protected:
 private:
   _Locale_ctype* _M_ctype;
   codecvt_byname(const codecvt_byname<wchar_t, char, mbstate_t>&);
-  codecvt_byname<wchar_t, char, mbstate_t>& operator =(const codecvt_byname<wchar_t, char, mbstate_t>&);
+  codecvt_byname<wchar_t, char, mbstate_t>& operator =(const codecvt_byname<wchar_t, char, mbstate_t>&);  
 };
 
 # endif

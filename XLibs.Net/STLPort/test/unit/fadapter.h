@@ -3,7 +3,7 @@
 
 #include <functional>
 
-// used as adaptor's return/argument type,
+// used as adaptor's return/argument type, 
 // to allow binders/composers usage
 struct __void_tag {};
 

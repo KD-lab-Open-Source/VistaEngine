@@ -95,10 +95,6 @@ private:
 	bool directReadMode_;
 	unsigned long directReadPosition_;
 	bool directReadEOF_;
-	bool directReadFromArchive_;
-	unsigned long directReadStartPosition_;
-	unsigned long directReadSize_;
-	unsigned long dosDate_;
 
 	/// handle реального файла или указатель на внутренний zip handle из архива
 	void* fileHandle_;
@@ -111,7 +107,6 @@ private:
 	static XZipFileOpenMode openMode_;
 
 	friend class XZipArchiveManager;
-	friend class ZLibArchive;
 };
 
 class XZipArchive
@@ -135,8 +130,8 @@ public:
 	virtual bool isOpen() const = 0;
 	virtual bool close() = 0;
 
-	virtual bool fileOpen(XZipStream& fh, const char* file_name, unsigned int flags = XZS_IN, int compression_level = 0) = 0;
-	virtual bool fileClose(XZipStream& fh) = 0;
+	virtual void* fileOpen(const char* file_name, unsigned int flags = XZS_IN, int compression_level = 0) = 0;
+	virtual bool fileClose(void* file_handle) = 0;
 
 	virtual unsigned long fileRead(void* file_handle, void* buf, unsigned long len) = 0;
 	virtual unsigned long fileWrite(void* file_handle, const void* buf, unsigned long len) = 0;
@@ -238,8 +233,36 @@ private:
 
 #ifndef _XZIP_NO_AUTOMATIC_LIB
 
-#define _LIB_NAME "XZip"
-#include "AutomaticLink.h"
+#if defined(_MT)
+#define _MT_SUFFIX "mt"
+#elif defined(_MTD)
+#define _MT_SUFFIX "mt"
+//#define _MT_SUFFIX "mtdll"
+#else
+#define _MT_SUFFIX 
+#endif//_MT
+
+#ifdef _DEBUG
+#define _DEBUG_SUFFIX "d"
+#else //_DEBUG
+#define _DEBUG_SUFFIX 
+#endif //_DEBUG
+
+#ifdef _DLL
+#define _DLL_SUFFIX "Dll"
+#else //_DLL
+#define _DLL_SUFFIX 
+#endif //_DLL
+
+#define _LIB_NAME "xzip" _MT_SUFFIX _DEBUG_SUFFIX _DLL_SUFFIX ".lib"
+
+#pragma message("Automatically linking with " _LIB_NAME) 
+#pragma comment(lib, _LIB_NAME) 
+
+#undef _DEBUG_SUFFIX
+#undef _MT_SUFFIX
+#undef _LIB_NAME
+#undef _DLL_SUFFIX
 
 #endif // _XZIP_NO_AUTOMATIC_LIB
 

@@ -21,7 +21,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\XLibs.Net\stl;..\XLibs.Net\XUtil;..\XLibs.Net\MSDXSDK_02_06\Include;..\XLibs.Net\XUtil\CRC;..\XLibs.Net\Heap;..\XLibs.Net\Profiler\Profiler;.;..\SurMap5\ProfUIS\Include;..\Util;..\Util\Serialization;..\Terra;..\Network;..\Render\inc;..\Render;..\AttribEditor\TreeListCtrl\include;..\Scripts;..\Units;..\XLibs.Net\XZip"
+				AdditionalIncludeDirectories="..\XLibs.Net\MSDXSDK_02_06\Include;..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\OGG\PlayOgg;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XUtil;..\XLibs.Net\XUtil\CRC;.;..\SurMap5\ProfUIS\Include;..\Util;..\Util\Serialization;..\Terra;..\Network;..\Render\inc;..\Render;..\AttribEditor\TreeListCtrl\include;..\Scripts;..\Units;..\XLibs.Net\XZip"
 				PreprocessorDefinitions="_CORE_;_SURMAP_;EXPORT_ATTRIB_EDITOR"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -38,11 +38,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="dsound.lib PlayOggDbgMT.lib shlwapi.lib AttribEditor.lib XMathMtDbg.lib"
+				AdditionalDependencies="dsound.lib PlayOggDbgMT.lib shlwapi.lib AttribEditor.lib xtreelistctrlvc71_st_mt_d.lib"
 				OutputFile="$(OutDir)/UIEditor-Debug.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)..&quot;;..\XLibs.Net\lib;..\XLibs.Net\MSDXSDK_02_06\Lib\x86"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)..&quot;;..\XLibs.Net\MSDXSDK_02_06\Lib\x86;..\XLibs.Net\OGG\PlayOgg;..\XLibs.Net\XUtil\libs;..\XLibs.Net\XZip;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\lib;..\AttribEditor\TreeListCtrl\output"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
@@ -86,7 +86,7 @@
 				InlineFunctionExpansion="1"
 				OmitFramePointers="TRUE"
 				OptimizeForWindowsApplication="TRUE"
-				AdditionalIncludeDirectories=".;..\SurMap5\ProfUIS\Include;..\Util;..\Util\Serialization;..\Terra;..\Network;..\Render\inc;..\Render;..\AttribEditor\TreeListCtrl\include;..\Scripts;..\Units"
+				AdditionalIncludeDirectories="..\XLibs.Net\MSDXSDK_02_06\Include;..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\OGG\PlayOgg;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XUtil;..\XLibs.Net\XUtil\CRC;.;..\SurMap5\ProfUIS\Include;..\Util;..\Util\Serialization;..\Terra;..\Network;..\Render\inc;..\Render;..\AttribEditor\TreeListCtrl\include;..\Scripts;..\Units;..\XLibs.Net\XZip"
 				PreprocessorDefinitions="_CORE_;_SURMAP_"
 				MinimalRebuild="FALSE"
 				RuntimeLibrary="0"
@@ -100,10 +100,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="dsound.lib PlayOggDbgMT.lib shlwapi.lib AttribEditor.lib"
+				AdditionalDependencies="dsound.lib PlayOggMT.lib shlwapi.lib AttribEditor.lib"
 				OutputFile="$(OutDir)/UIEditor.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(SolutionDir).."
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)..&quot;;..\XLibs.Net\MSDXSDK_02_06\Lib\x86;..\XLibs.Net\OGG\PlayOgg;..\XLibs.Net\XUtil\libs;..\XLibs.Net\XZip;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\lib"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"

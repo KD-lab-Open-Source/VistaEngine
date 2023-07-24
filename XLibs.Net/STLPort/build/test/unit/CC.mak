@@ -1,4 +1,5 @@
 # -*- Makefile -*- Time-stamp: <05/09/04 22:01:11 ptr>
+# $Id: CC.mak,v 1.1.2.2 2005/11/20 08:43:04 complement Exp $
 
 SRCROOT := ../..
 COMPILER_NAME := CC

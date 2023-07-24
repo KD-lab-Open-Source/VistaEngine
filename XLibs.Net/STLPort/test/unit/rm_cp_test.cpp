@@ -70,7 +70,7 @@ void RmCpTest::revcopy1()
 
   int result[6];
   reverse_copy((int*)numbers, (int*)numbers + 6, (int*)result);
-  // 5 4 3 2 1 0
+  // 5 4 3 2 1 0 
   CPPUNIT_ASSERT(result[0]==5);
   CPPUNIT_ASSERT(result[1]==4);
   CPPUNIT_ASSERT(result[2]==3);
@@ -87,7 +87,7 @@ void RmCpTest::replif1()
 
   replace_if(v1.begin(), v1.end(), odd, 42);
 
-  // 0 42 2 42 4 0 42 2 42 4
+  // 0 42 2 42 4 0 42 2 42 4 
   CPPUNIT_ASSERT(v1[0]==0);
   CPPUNIT_ASSERT(v1[1]==42);
   CPPUNIT_ASSERT(v1[2]==2);
@@ -120,7 +120,7 @@ void RmCpTest::replace0()
 
   replace(numbers, numbers + 6, 2, 42);
 
-  // 0 1 42 0 1 42
+  // 0 1 42 0 1 42 
   CPPUNIT_ASSERT(numbers[0]==0);
   CPPUNIT_ASSERT(numbers[1]==1);
   CPPUNIT_ASSERT(numbers[2]==42);
@@ -136,7 +136,7 @@ void RmCpTest::replace1()
     v1[i] = i % 5;
   replace(v1.begin(), v1.end(), 2, 42);
 
-  // 0 1 2 3 4 0 1 2 3 4
+  // 0 1 2 3 4 0 1 2 3 4 
   // 0 1 42 3 4 0 1 42 3 4
   CPPUNIT_ASSERT(v1[0]==0);
   CPPUNIT_ASSERT(v1[1]==1);
@@ -158,8 +158,8 @@ void RmCpTest::repcpif1()
   vector <int> v2(v1.size());
 
   // 0 1 2 3 4 0 1 2 3 4
-  // 0 1 2 3 4 0 1 2 3 4
-  // 0 42 2 42 4 0 42 2 42 4
+  // 0 1 2 3 4 0 1 2 3 4 
+  // 0 42 2 42 4 0 42 2 42 4 
   replace_copy_if(v1.begin(), v1.end(), v2.begin(), odd, 42);
   CPPUNIT_ASSERT(v1[0]==0);
   CPPUNIT_ASSERT(v1[1]==1);
@@ -189,7 +189,7 @@ void RmCpTest::remove1()
   int numbers[6] = { 1, 2, 3, 1, 2, 3 };
   remove((int*)numbers, (int*)numbers + 6, 1);
 
-  // 2 3 2 3 2 3
+  // 2 3 2 3 2 3 
   CPPUNIT_ASSERT(numbers[0]==2);
   CPPUNIT_ASSERT(numbers[1]==3);
   CPPUNIT_ASSERT(numbers[2]==2);
@@ -204,7 +204,7 @@ void RmCpTest::remif1()
 
   remove_if((int*)numbers, (int*)numbers + 6, odd);
 
-  // 0 0 2 2 2 2
+  // 0 0 2 2 2 2 
   CPPUNIT_ASSERT(numbers[0]==0);
   CPPUNIT_ASSERT(numbers[1]==0);
   CPPUNIT_ASSERT(numbers[2]==2);
@@ -219,7 +219,7 @@ void RmCpTest::remcopy1()
   int result[6] = { 0, 0, 0, 0, 0, 0 };
 
   remove_copy((int*)numbers, (int*)numbers + 6, (int*)result, 2);
-
+  
   CPPUNIT_ASSERT(result[0]==1);
   CPPUNIT_ASSERT(result[1]==3);
   CPPUNIT_ASSERT(result[2]==1);
@@ -235,7 +235,7 @@ void RmCpTest::remcpif1()
 
   remove_copy_if((int*)numbers, (int*)numbers + 6, (int*)result, odd);
 
-  // 2 2 0 0 0 0
+  // 2 2 0 0 0 0 
   CPPUNIT_ASSERT(result[0]==2);
   CPPUNIT_ASSERT(result[1]==2);
   CPPUNIT_ASSERT(result[2]==0);

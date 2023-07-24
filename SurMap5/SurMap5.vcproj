@@ -21,8 +21,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\XLibs.Net\MSDXSDK_02_06\Include;..\XLibs.Net\stl;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XUtil\CRC;..\XLibs.Net\Heap;..\XLibs.Net\XUtil;.;ProfUIS\Include;..\Util;..\Util\Serialization;..\Scripts;..\Units;..\Network;..\Render\Client;..\Render\Inc;..\Sound;..\AI;..\AttribEditor\TreeListCtrl\include;..\XLibs.Net\XZip"
-				PreprocessorDefinitions="_SURMAP_,EXPORT_ATTRIB_EDITOR,_VISTA_ENGINE_EDITOR_"
+				AdditionalIncludeDirectories="..\XLibs.Net\MSDXSDK_02_06\Include;..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\OGG\PlayOgg;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XUtil;..\XLibs.Net\XUtil\CRC;.;ProfUIS\Include;..\Util;..\Util\Serialization;..\Scripts;..\Units;..\Network;..\Render\Client;..\Render\Inc;..\Sound;..\AI;..\AttribEditor\TreeListCtrl\include;..\XLibs.Net\XZip"
+				PreprocessorDefinitions="_SURMAP_;EXPORT_ATTRIB_EDITOR;_VISTA_ENGINE_EDITOR_"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -39,13 +39,13 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="dsound.lib PlayOggDbgMT.lib ExcelExport.lib shlwapi.lib XMathMtDbg.lib"
+				AdditionalDependencies="dsound.lib PlayOggDbgMT.lib ExcelExport.lib shlwapi.lib xtreelistctrlvc71_st_mt_d.lib"
 				OutputFile="$(OutDir)/VistaEngineDbg.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\XLibs.Net\MSDXSDK_02_06\Lib\x86;..\XLibs.Net\lib;&quot;$(SolutionDir)..&quot;;&quot;$(SolutionDir)\ProfUIS\Bin_710\&quot;;..\Util\XMath\"
+				AdditionalLibraryDirectories="..\XLibs.Net\MSDXSDK_02_06\Lib\x86;..\XLibs.Net\OGG\PlayOgg;..\XLibs.Net\XUtil\libs;..\XLibs.Net\XZip;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\lib;..\AttribEditor\TreeListCtrl\output;&quot;$(SolutionDir)..&quot;;&quot;$(SolutionDir)\ProfUIS\Bin_710\&quot;"
 				IgnoreAllDefaultLibraries="FALSE"
-				IgnoreDefaultLibraryNames="libcmt.lib libcpmtd.lib"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/VistaEngineDBG.pdb"
 				SubSystem="2"
@@ -85,7 +85,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".;ProfUIS\Include;..\Util;..\Util\Serialization;..\Scripts;..\Units;..\Network;..\Render\Client;..\Render\Inc;..\Sound;..\AI;..\AttribEditor\TreeListCtrl\include"
+				AdditionalIncludeDirectories="..\XLibs.Net\MSDXSDK_02_06\Include;..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\OGG\PlayOgg;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XUtil;..\XLibs.Net\XUtil\CRC;.;ProfUIS\Include;..\Util;..\Util\Serialization;..\Scripts;..\Units;..\Network;..\Render\Client;..\Render\Inc;..\Sound;..\AI;..\AttribEditor\TreeListCtrl\include;..\XLibs.Net\XZip"
 				PreprocessorDefinitions="_SURMAP_;EXPORT_ATTRIB_EDITOR;_VISTA_ENGINE_EDITOR_"
 				StringPooling="TRUE"
 				MinimalRebuild="FALSE"
@@ -107,7 +107,7 @@
 				OutputFile="$(OutDir)/VistaEngine.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)..&quot;;&quot;$(SolutionDir)\ProfUIS\Bin_710\&quot;"
+				AdditionalLibraryDirectories="..\XLibs.Net\MSDXSDK_02_06\Lib\x86;..\XLibs.Net\OGG\PlayOgg;..\XLibs.Net\XUtil\libs;..\XLibs.Net\XZip;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\lib;&quot;$(SolutionDir)..&quot;;&quot;$(SolutionDir)\ProfUIS\Bin_710\&quot;"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/VistaEngine.pdb"
@@ -150,7 +150,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".;ProfUIS\Include;..\Util;..\Util\Serialization;..\Scripts;..\Units;..\Network;..\Render\Client;..\Render\Inc;..\Sound;..\AI;..\AttribEditor\TreeListCtrl\include"
+				AdditionalIncludeDirectories="..\XLibs.Net\MSDXSDK_02_06\Include;..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\OGG\PlayOgg;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XUtil;..\XLibs.Net\XUtil\CRC;.;ProfUIS\Include;..\Util;..\Util\Serialization;..\Scripts;..\Units;..\Network;..\Render\Client;..\Render\Inc;..\Sound;..\AI;..\AttribEditor\TreeListCtrl\include;..\XLibs.Net\XZip"
 				PreprocessorDefinitions="_SURMAP_;_VISTA_ENGINE_EXTERNAL_;_VISTA_ENGINE_EDITOR_"
 				StringPooling="TRUE"
 				MinimalRebuild="FALSE"
@@ -170,7 +170,7 @@
 				AdditionalDependencies="dsound.lib PlayOggMT.lib ExcelExport.lib shlwapi.lib"
 				OutputFile="$(OutDir)/VistaEngineExt.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)..&quot;;&quot;$(SolutionDir)\ProfUIS\Bin_710\&quot;"
+				AdditionalLibraryDirectories="..\XLibs.Net\MSDXSDK_02_06\Lib\x86;..\XLibs.Net\OGG\PlayOgg;..\XLibs.Net\XUtil\libs;..\XLibs.Net\XZip;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\lib;&quot;$(SolutionDir)..&quot;;&quot;$(SolutionDir)\ProfUIS\Bin_710\&quot;"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/VistaEngineExt.pdb"
@@ -357,6 +357,12 @@
 				RelativePath=".\DlgCreateWorld.h">
 			</File>
 			<File
+				RelativePath=".\DlgExImWorld.cpp">
+			</File>
+			<File
+				RelativePath=".\DlgExImWorld.h">
+			</File>
+			<File
 				RelativePath=".\DlgSelectTrigger.cpp">
 			</File>
 			<File
@@ -482,13 +488,13 @@
 				RelativePath=".\res\bm_def_head.bmp">
 			</File>
 			<File
-				RelativePath=".\res\bm_def_sort.bmp">
-			</File>
-			<File
-				RelativePath=".\res\bm_def_sort.bmp">
-			</File>
-			<File
 				RelativePath=".\AttribEditorCtrl\res\bm_def_sort.bmp">
+			</File>
+			<File
+				RelativePath=".\res\bm_def_sort.bmp">
+			</File>
+			<File
+				RelativePath=".\res\bm_def_sort.bmp">
 			</File>
 			<File
 				RelativePath=".\res\bm_def_tree.bmp">
@@ -542,10 +548,10 @@
 				RelativePath=".\AttribEditorCtrl\res\cur_lockbox.cur">
 			</File>
 			<File
-				RelativePath=".\res\cur_lockbox.cur">
+				RelativePath=".\AttribEditorCtrl\res\cur_lockbox.cur">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\cur_lockbox.cur">
+				RelativePath=".\res\cur_lockbox.cur">
 			</File>
 			<File
 				RelativePath=".\res\Cur_size.cur">
@@ -560,10 +566,10 @@
 				RelativePath=".\AttribEditorCtrl\res\Cur_stop.cur">
 			</File>
 			<File
-				RelativePath=".\res\Cur_stop.cur">
+				RelativePath=".\AttribEditorCtrl\res\Cur_stop.cur">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\Cur_stop.cur">
+				RelativePath=".\res\Cur_stop.cur">
 			</File>
 			<File
 				RelativePath=".\AttribEditorCtrl\res\Cur_vert.cur">
@@ -575,16 +581,19 @@
 				RelativePath=".\AttribEditorCtrl\res\cursor1.cur">
 			</File>
 			<File
+				RelativePath=".\res\cursor_s.cur">
+			</File>
+			<File
 				RelativePath=".\AttribEditorCtrl\res\cursor_s.cur">
 			</File>
 			<File
 				RelativePath=".\res\cursor_s.cur">
 			</File>
 			<File
-				RelativePath=".\res\cursor_s.cur">
+				RelativePath=".\res\editors_.bmp">
 			</File>
 			<File
-				RelativePath=".\res\editors_.bmp">
+				RelativePath=".\AttribEditorCtrl\PropTree\res\fpoint.cur">
 			</File>
 			<File
 				RelativePath=".\res\fpoint.cur">
@@ -599,25 +608,22 @@
 				RelativePath=".\PropTree\res\fpoint.cur">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\PropTree\res\fpoint.cur">
-			</File>
-			<File
 				RelativePath=".\res\hdrdown.bmp">
 			</File>
 			<File
 				RelativePath=".\res\hdrup.bmp">
 			</File>
 			<File
-				RelativePath=".\AttribEditorCtrl\res\icons.bmp">
-			</File>
-			<File
-				RelativePath=".\res\icons.bmp">
-			</File>
-			<File
 				RelativePath=".\res\icons.bmp">
 			</File>
 			<File
 				RelativePath=".\AttribEditorCtrl\AttribEditorCtrl\res\icons.bmp">
+			</File>
+			<File
+				RelativePath=".\AttribEditorCtrl\res\icons.bmp">
+			</File>
+			<File
+				RelativePath=".\res\icons.bmp">
 			</File>
 			<File
 				RelativePath=".\res\ifi.bmp">
@@ -650,13 +656,13 @@
 				RelativePath=".\res\Splash.bmp">
 			</File>
 			<File
-				RelativePath=".\res\spliter.cur">
-			</File>
-			<File
-				RelativePath=".\res\spliter.cur">
-			</File>
-			<File
 				RelativePath=".\AttribEditorCtrl\PropTree\res\spliter.cur">
+			</File>
+			<File
+				RelativePath=".\res\spliter.cur">
+			</File>
+			<File
+				RelativePath=".\res\spliter.cur">
 			</File>
 			<File
 				RelativePath=".\res\SurMap5.ico">
@@ -726,6 +732,9 @@
 			</File>
 			<File
 				RelativePath="..\vistaengine_version.rc">
+			</File>
+			<File
+				RelativePath=".\res\World.ico">
 			</File>
 		</Filter>
 		<Filter
@@ -1522,9 +1531,21 @@
 				Filter="">
 				<File
 					RelativePath=".\BalanceStats.cpp">
+					<FileConfiguration
+						Name="ReleaseExternal|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCLCompilerTool"/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\BalanceStats.h">
+					<FileConfiguration
+						Name="ReleaseExternal|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCustomBuildTool"/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\ExportTreeToExcel.cpp">
@@ -1534,33 +1555,93 @@
 							Name="VCCLCompilerTool"
 							UsePrecompiledHeader="0"/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="ReleaseExternal|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCLCompilerTool"/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\ExportTreeToExcel.h">
+					<FileConfiguration
+						Name="ReleaseExternal|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCustomBuildTool"/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\ParameterImportExportExcel.cpp">
+					<FileConfiguration
+						Name="ReleaseExternal|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCLCompilerTool"/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\ParameterImportExportExcel.h">
+					<FileConfiguration
+						Name="ReleaseExternal|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCustomBuildTool"/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\ParameterStatisticsExport.cpp">
+					<FileConfiguration
+						Name="ReleaseExternal|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCLCompilerTool"/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\ParameterStatisticsExport.h">
+					<FileConfiguration
+						Name="ReleaseExternal|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCustomBuildTool"/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\ParameterTree.cpp">
+					<FileConfiguration
+						Name="ReleaseExternal|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCLCompilerTool"/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\ParameterTree.h">
+					<FileConfiguration
+						Name="ReleaseExternal|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCustomBuildTool"/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\UnitListExportExcel.cpp">
+					<FileConfiguration
+						Name="ReleaseExternal|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCLCompilerTool"/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\UnitListExportExcel.h">
+					<FileConfiguration
+						Name="ReleaseExternal|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCustomBuildTool"/>
+					</FileConfiguration>
 				</File>
 			</Filter>
 		</Filter>

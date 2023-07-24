@@ -1,5 +1,5 @@
-#ifndef ALIGNED_BUFFER_H
-#define ALIGNED_BUFFER_H
+# ifndef ALIGNED_BUFFER_H
+#  define ALIGNED_BUFFER_H
 
 _STLP_BEGIN_NAMESPACE
 // this is for fake initialization
@@ -18,4 +18,4 @@ union _Stl_aligned_buffer {
 };
 _STLP_END_NAMESPACE
 
-#endif
+# endif

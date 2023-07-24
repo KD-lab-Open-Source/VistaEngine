@@ -202,10 +202,12 @@ BEGIN
         MENUITEM "&Новый",                      ID_FILE_NEW
         MENUITEM "&Открыть",                    ID_FILE_OPEN
         MENUITEM "&Сохранить",                  ID_FILE_SAVE
-        MENUITEM "Сохранить &Как...",           ID_FILE_SAVEAS
+        MENUITEM "Сохранить &как...",           ID_FILE_SAVEAS
         MENUITEM SEPARATOR
-        MENUITEM "&Запустить Мир...",           ID_FILE_RUN_WORLD
-        MENUITEM "Запустить &Главное Меню...",  ID_FILE_RUN_MENU
+        MENUITEM "Импортировать/Экспортировать мир...", 40401
+        MENUITEM SEPARATOR
+        MENUITEM "&Запустить мир...",           ID_FILE_RUN_WORLD
+        MENUITEM "Запустить &главное меню...",  ID_FILE_RUN_MENU
         MENUITEM SEPARATOR
         MENUITEM "С&войства...",                ID_FILE_PROPERTIES
         MENUITEM "Статистика...",               ID_FILE_STATISTICS
@@ -245,7 +247,7 @@ BEGIN
     END
     POPUP "&Справка"
     BEGIN
-        MENUITEM "&О Vista Game Engine...",     ID_APP_ABOUT
+        MENUITEM "&О VistaGame Engine...",      ID_APP_ABOUT
     END
 END
 
@@ -255,17 +257,19 @@ END
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOGEX 0, 0, 235, 55
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 109
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
     WS_SYSMENU
-CAPTION "About SurMap5"
+CAPTION "About..."
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
-    LTEXT           "Vista Game Engine Version 1.0",IDC_STATIC,40,10,119,8,
-                    SS_NOPREFIX
-    LTEXT           "Copyright (C) 2004-2007.",IDC_STATIC,40,25,119,8
-    DEFPUSHBUTTON   "OK",IDOK,178,7,50,16,WS_GROUP
+    ICON            IDR_MAINFRAME,IDC_STATIC,9,11,20,20
+    LTEXT           "VistaGame Engine -  Map Editor ver. 1.1a",IDC_STATIC,47,
+                    14,160,10,SS_NOPREFIX
+    LTEXT           "© KD VISION games Development Company limited, 2004-2007. All rights reserved.\n\nVistaGame Engine is a registered trademark of the KD VISION Company",
+                    IDC_STATIC,47,35,167,46
+    DEFPUSHBUTTON   "OK",IDOK,177,89,50,14,WS_GROUP
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDVERT,39,3,1,103
 END
 
 IDD_BARDLG_GEO DIALOGEX 0, 0, 143, 62
@@ -612,7 +616,7 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,8,268,
                     375,1
     EDITTEXT        IDC_NAME_EDIT,51,7,332,12,ES_AUTOHSCROLL
-    LTEXT           "World Name:",IDC_STATIC,8,8,42,8
+    LTEXT           "World Name:",IDC_WORLD_NAME_LABEL,8,8,42,8
 END
 
 IDD_DLG_SELECTWORLD DIALOGEX 0, 0, 325, 310
@@ -629,6 +633,25 @@ BEGIN
     PUSHBUTTON      "New world",IDC_BTN_NEWWORLD,268,72,50,15
     PUSHBUTTON      "Delete world",IDC_BTN_DELETEWORLD,268,108,50,15
     PUSHBUTTON      "Rename",IDC_BTN_RENAME,268,90,50,14
+END
+
+IDD_DLG_EXIMWORLD DIALOGEX 0, 0, 268, 302
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "List of available for selection worlds."
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,214,279,50,14
+    CONTROL         "",IDC_LST_WORLD,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | 
+                    WS_TABSTOP,7,7,253,243
+    PUSHBUTTON      "Export",IDC_BTN_EXPORT,104,279,50,15
+    PUSHBUTTON      "Import",IDC_BTN_IMPORT,161,279,50,14
+    GROUPBOX        "Export options",IDC_EXPORT_OPTIONS,6,252,152,45
+    CONTROL         "For play and edit",IDC_FULL_EXPORT,"Button",
+                    BS_AUTORADIOBUTTON,15,265,113,10
+    CONTROL         "Only for play",IDC_PARTIAL_EXPORT,"Button",
+                    BS_AUTORADIOBUTTON,15,280,73,10
 END
 
 IDD_DLG_WORLDNAME DIALOGEX 0, 0, 186, 49
@@ -1379,6 +1402,16 @@ BEGIN
                     292,1
 END
 
+IDD_PROGRESSDIALOG DIALOGEX 0, 0, 186, 42
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | 
+    WS_CAPTION | WS_SYSMENU
+CAPTION "Operation progress"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Cancel",IDCANCEL,64,19,50,14
+    CONTROL         "",IDC_PROGRESS,"msctls_progress32",WS_BORDER,7,7,172,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1390,87 +1423,13 @@ GUIDELINES DESIGNINFO
 BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 228
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 48
-    END
-
-    IDD_BARDLG_GEO, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 136
-        TOPMARGIN, 7
         BOTTOMMARGIN, 55
     END
 
-    IDD_BARDLG_BLUR, DIALOG
+    IDD_DLG_EXIMWORLD, DIALOG
     BEGIN
-        RIGHTMARGIN, 424
-    END
-
-    IDD_BARDLG_3DM, DIALOG
-    BEGIN
-        LEFTMARGIN, 1
-        RIGHTMARGIN, 154
-        VERTGUIDE, 4
-        BOTTOMMARGIN, 303
-    END
-
-    IDD_BARDLG_TOOLZER, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 544
-        TOPMARGIN, 1
-        BOTTOMMARGIN, 30
-    END
-
-    IDD_BARDLG_EMPTY, DIALOG
-    BEGIN
-        RIGHTMARGIN, 175
-    END
-
-    IDD_BARDLG_WATERSRC, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 466
-        TOPMARGIN, 1
-    END
-
-    IDD_BARDLG_IMP, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 540
-    END
-
-    IDD_BARDLG_COLORPIC, DIALOG
-    BEGIN
-        RIGHTMARGIN, 323
-        BOTTOMMARGIN, 133
-    END
-
-    IDD_DLG_CREATEWORLD, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 383
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 288
-    END
-
-    IDD_DLG_SELECTWORLD, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 318
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 303
-    END
-
-    IDD_DLG_WORLDNAME, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 179
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 42
+        RIGHTMARGIN, 264
+        BOTTOMMARGIN, 300
     END
 
     IDD_BARDLG_UNIT, DIALOG
@@ -1763,6 +1722,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 84
     END
+
+    IDD_PROGRESSDIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 33
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -1796,6 +1763,7 @@ IDC_CURSOR_BUTTON       CURSOR                  "res\\cur_button.cur"
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\Vista.ico"
+IDI_WORLD               ICON                    "res\\World.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1804,7 +1772,7 @@ IDR_MAINFRAME           ICON                    "res\\Vista.ico"
 
 STRINGTABLE 
 BEGIN
-    IDR_MAINFRAME           "Vista Engine"
+    IDR_MAINFRAME           "VistaGame Engine - Map Editor"
     ID_COMBO                "zzz"
     IDS_ERROR_IN_CUSTOM_VALUE "Error In Custom Value"
     IDS_PANE_TEXT           "Status"
@@ -1812,7 +1780,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    AFX_IDS_APP_TITLE       "Vista Engine"
+    AFX_IDS_APP_TITLE       "VistaGame Engine - Map Editor"
     AFX_IDS_IDLEMESSAGE     "Ready"
 END
 
@@ -1889,6 +1857,7 @@ BEGIN
     ID_VIEW_BUBBLESOURCE    "Selection filter: Toggle bubble sources\nSelection filter: Toggle bubble sources"
     ID_VIEW_WINDSOURCE      "Selection filter: Toggle wind sources\nSelection filter: Toggle wind sources"
     ID_VIEW_LIGHTSOURCE     "Selection filter: Toggle light sources\nSelection filter: Toggle light sources"
+    ID_VIEW_SOURCES         "\nФильтр отображения: показывать/прятать источники"
 END
 
 STRINGTABLE 
@@ -1938,6 +1907,16 @@ BEGIN
     IDS_TIME_LEFT_LOAD_LANGUAGE "Time left:\t %.2d:%.2d:%.2d"
     IDS_IMPORT_XLS_FILE     "Import progress..."
     IDS_EXPORT_XLS_FILE     "Export progress..."
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_SHOW_GRID       "\nПоказывать сетку"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_VIEW_ENABLE_TIME_FLOW "\nВключить течение времени"
 END
 
 #endif    // Russian resources
@@ -2003,6 +1982,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Import Text from Excel...",  ID_FILE_IMPORTTEXTFROMEXCEL
         MENUITEM "Ex&port Text to Excel...",    ID_FILE_EXPORTTEXTTOEXCEL
+        MENUITEM "Export/Import World...",      ID_FILE_EXIMWORLD
         MENUITEM SEPARATOR
         MENUITEM "P&roperties...",              ID_FILE_PROPERTIES
         MENUITEM "Statistics...",               ID_FILE_STATISTICS
@@ -2334,8 +2314,6 @@ BEGIN
     SEPARATOR
     BUTTON      ID_EDIT_UNDO
     BUTTON      ID_EDIT_REDO
-    SEPARATOR
-    BUTTON      ID_EDIT_UPDATE_SURFACE
     SEPARATOR
     BUTTON      ID_EDIT_MAPSCENARIO
     BUTTON      ID_VIEW_OBJECTS_MANAGER

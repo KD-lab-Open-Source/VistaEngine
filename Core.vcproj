@@ -19,8 +19,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\XLibs.Net\boost;.\XLibs.Net\Heap;.\XLibs.Net\stl;.\XLibs.Net\XUtil\CRC;.\XLibs.Net\Profiler\Profiler;.\XLibs.Net\MSDXSDK_02_06\Include;.\XLibs.Net\OGG\PlayOgg;Units;Util;Util\Serialization;Render\Inc;Render\Client;Game;Network;Physics;Sound;Terra;Game\Scripts;AI;.\XLibs.Net\XUtil;.\XLibs.Net\XZip"
-				PreprocessorDefinitions="_PERIMETER_;_CORE_;_SURMAP_;_TREE_LIST_NO_AUTOMATIC_LINK_"
+				AdditionalIncludeDirectories=".\XLibs.Net\MSDXSDK_02_06\Include;.\XLibs.Net\Heap\boost;.\XLibs.Net\Heap;.\XLibs.Net\STLPort\stlport;.\XLibs.Net\OGG\PlayOgg;.\XLibs.Net\Profiler\Profiler;.\XLibs.Net\XUtil;.\XLibs.Net\XUtil\CRC;Units;Util;Util\Serialization;Render\Inc;Render\Client;Game;Network;Physics;Sound;Terra;Game\Scripts;AI;.\XLibs.Net\XZip"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="TRUE"
 				ExceptionHandling="FALSE"
 				BasicRuntimeChecks="3"
@@ -37,7 +37,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="$(OutDir)/Core.lib"
-				AdditionalLibraryDirectories=".\XLibs.Net\lib"/>
+				AdditionalLibraryDirectories=".\XLibs.Net\Heap\VC7.1"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -65,7 +65,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".\XLibs.Net\boost;.\XLibs.Net\Heap;.\XLibs.Net\stl;.\XLibs.Net\XUtil\CRC;.\XLibs.Net\Profiler\Profiler;.\XLibs.Net\MSDXSDK_02_06\Include;.\XLibs.Net\OGG\PlayOgg;Units;Util;Util\Serialization;Render\Inc;Render\Client;Game;Network;Physics;Sound;Terra;Game\Scripts;AI;.\XLibs.Net\XUtil;.\XLibs.Net\XZip"
+				AdditionalIncludeDirectories=".\XLibs.Net\MSDXSDK_02_06\Include;.\XLibs.Net\Heap;.\XLibs.Net\Heap\boost;.\XLibs.Net\STLPort\stlport;.\XLibs.Net\OGG\PlayOgg;.\XLibs.Net\Profiler\Profiler;.\XLibs.Net\XUtil;.\XLibs.Net\XUtil\CRC;Units;Util;Util\Serialization;Render\Inc;Render\Client;Game;Network;Physics;Sound;Terra;Game\Scripts;AI;.\XLibs.Net\XZip"
 				PreprocessorDefinitions="_PERIMETER_;_CORE_;_SURMAP_"
 				ExceptionHandling="FALSE"
 				RuntimeLibrary="0"
@@ -82,7 +82,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="$(OutDir)/Core.lib"
-				AdditionalLibraryDirectories=".\XLibs.Net\lib"/>
+				AdditionalLibraryDirectories=".\XLibs.Net\Heap\VC7.1"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -110,7 +110,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="Units;Util;Util\Serialization;Render\Inc;Render\Client;Game;Network;Physics;Sound;Terra;Game\Scripts;AI"
+				AdditionalIncludeDirectories=".\XLibs.Net\MSDXSDK_02_06\Include;.\XLibs.Net\Heap;.\XLibs.Net\Heap\boost;.\XLibs.Net\STLPort\stlport;.\XLibs.Net\OGG\PlayOgg;.\XLibs.Net\Profiler\Profiler;.\XLibs.Net\XUtil;.\XLibs.Net\XUtil\CRC;Units;Util;Util\Serialization;Render\Inc;Render\Client;Game;Network;Physics;Sound;Terra;Game\Scripts;AI;.\XLibs.Net\XZip"
 				PreprocessorDefinitions="_PERIMETER_;_CORE_;_SURMAP_;_FINAL_VERSION_"
 				ExceptionHandling="FALSE"
 				RuntimeLibrary="0"
@@ -125,8 +125,8 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="binkw32.lib"
-				OutputFile="$(OutDir)/Core.lib"/>
+				OutputFile="$(OutDir)/Core.lib"
+				AdditionalLibraryDirectories=".\XLibs.Net\Heap\VC7.1"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool

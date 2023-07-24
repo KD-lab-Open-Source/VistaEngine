@@ -12,8 +12,6 @@
 #ifndef __XUTIL_H
 #define __XUTIL_H
 
-#include <memory.h>
-
 ///////////////////////////////////
 //		XBuffer
 ///////////////////////////////////
@@ -347,14 +345,12 @@ int DiagAssert(unsigned long dwOverrideOpts, const char* szMsg, const char* szFi
     } while (0)
 
 #define xassert(exp) xxassert(exp, #exp)
-#define xassertStr(exp, str) { string s = #exp; s += "\n"; s += str; xxassert(exp,s.c_str()); }
 
 #else  //  ...
 
 #define SetAssertRestoreGraphicsFunction(func)
 #define xxassert(exp, msg) 
 #define xassert(exp) 
-#define xassertStr(exp, str) 
 
 #endif  //  ...
 
@@ -443,8 +439,6 @@ int xclock();
 
 void xtDeleteFile(char* fname);
 
-///////////////////////////////////
-
 const char* check_command_line(const char* switch_str); // 0 или строка после ключа для анализа
 
 template<class T> // Для установки параметров
@@ -454,6 +448,7 @@ bool check_command_line_parameter(const char* switch_str, T& parameter) { const 
 //void dcprintfW(wchar_t *format, ...);
 // вывод Unicode текста в Debug Output
 //void dprintfW(wchar_t *format, ...);
+
 
 ///////////////////////////////////
 //		__XCPUID_H
@@ -517,8 +512,47 @@ void ZIP_expand(char* trg,ulong trgsize,char* src,ulong srcsize);
 ///////////////////////////////////
 #ifndef _XUTIL_NO_AUTOMATIC_LIB
 
-#define _LIB_NAME "XUtil" 
-#include "AutomaticLink.h"
+#if defined(_MT)
+#define _MT_SUFFIX "Mt"
+#elif defined(_MTD)
+#define _MT_SUFFIX "MtDll"
+#else
+#define _MT_SUFFIX 
+#endif//_MT
+
+#ifdef _DEBUG
+#define _DEBUG_SUFFIX "Dbg"
+#else //_DEBUG
+#define _DEBUG_SUFFIX 
+#endif //_DEBUG
+
+#if (_MSC_VER == 1200)
+# define _VC_SUFFIX ""
+#elif (_MSC_VER >= 1300 && _MSC_VER < 1400)
+# define _VC_SUFFIX "VC7"
+#elif (_MSC_VER >= 1400)
+# define _VC_SUFFIX "VC8"
+#endif
+
+#ifdef _DLL
+#define _DLL_SUFFIX "Dll"
+#else //_DLL
+#define _DLL_SUFFIX 
+#endif //_DLL
+
+#ifndef __XTOOL_H
+#define _LIB_NAME "XUtil" _VC_SUFFIX _DEBUG_SUFFIX _MT_SUFFIX _DLL_SUFFIX ".lib"
+#else
+#define _LIB_NAME "XTool" _VC_SUFFIX _DEBUG_SUFFIX _MT_SUFFIX _DLL_SUFFIX ".lib"
+#endif
+#pragma message("Automatically linking with " _LIB_NAME) 
+#pragma comment(lib, _LIB_NAME) 
+
+#undef _VC_SUFFIX
+#undef _DEBUG_SUFFIX
+#undef _MT_SUFFIX
+#undef _LIB_NAME
+#undef _DLL_SUFFIX
 
 #endif // _XUTIL_NO_AUTOMATIC_LIB
 

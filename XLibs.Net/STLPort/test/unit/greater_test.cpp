@@ -1,6 +1,5 @@
 #include <vector>
 #include <algorithm>
-#include <functional>
 
 #include "cppunit/cppunit_proxy.h"
 
@@ -31,7 +30,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION(GreaterTest);
 void GreaterTest::greatert()
 {
   int array[4] = { 3, 1, 4, 2 };
-  sort(array, array + 4, greater<int>() );
+  sort(array, array + 4, greater<int>() );  
 
   CPPUNIT_ASSERT(array[0]==4);
   CPPUNIT_ASSERT(array[1]==3);
@@ -41,7 +40,7 @@ void GreaterTest::greatert()
 void GreaterTest::greatereq()
 {
   int array [4] = { 3, 1, 4, 2 };
-  sort(array, array + 4, greater_equal<int>());
+  sort(array, array + 4, greater_equal<int>());  
   CPPUNIT_ASSERT(array[0]==4);
   CPPUNIT_ASSERT(array[1]==3);
   CPPUNIT_ASSERT(array[2]==2);

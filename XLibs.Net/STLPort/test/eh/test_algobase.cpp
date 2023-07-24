@@ -1,6 +1,6 @@
 /***********************************************************************************
   test_algobase.cpp
-
+    
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -39,14 +39,14 @@ struct test_uninitialized_copy
         }
 
     ~test_uninitialized_copy() { delete[] stuff; }
-
+  
     void operator()( TestClass* buffer ) const
     {
         EH_STD::uninitialized_copy((TestClass*)stuff, (TestClass*)end_of_stuff, buffer );
         EH_ASSERT( EH_STD::equal( (TestClass*)stuff, (TestClass*)end_of_stuff, buffer ) );
         stl_destroy( buffer, buffer+kBufferSize );
     }
-
+  
 private:
     TestClass * stuff;
     TestClass * end_of_stuff;
@@ -77,7 +77,7 @@ struct test_uninitialized_fill_n
     }
     void operator()( TestClass* buffer ) const
     {
-        TestClass* end = buffer + kBufferSize;
+        TestClass* end = buffer + kBufferSize;        
         EH_STD::uninitialized_fill_n( buffer, (EH_CSTD::size_t)kBufferSize, testValue );
         for ( EH_CSTD::size_t i = 0; i < kBufferSize; i++ )
             EH_ASSERT( buffer[i] == testValue );

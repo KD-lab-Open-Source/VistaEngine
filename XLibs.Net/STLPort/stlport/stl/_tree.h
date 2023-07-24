@@ -9,13 +9,13 @@
  * Copyright (c) 1997
  * Moscow Center for SPARC Technology
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
@@ -51,28 +51,30 @@ iterators invalidated are those referring to the deleted node.
 */
 
 #ifndef _STLP_INTERNAL_ALGOBASE_H
-#  include <stl/_algobase.h>
+#  include <stl/_algobase.h> 
 #endif
 
 #ifndef _STLP_INTERNAL_ALLOC_H
-#  include <stl/_alloc.h>
+#  include <stl/_alloc.h> 
 #endif
 
 #ifndef _STLP_INTERNAL_ITERATOR_H
-#  include <stl/_iterator.h>
+#  include <stl/_iterator.h> 
 #endif
 
 #ifndef _STLP_INTERNAL_CONSTRUCT_H
-#  include <stl/_construct.h>
+#  include <stl/_construct.h> 
 #endif
 
 #ifndef _STLP_INTERNAL_FUNCTION_BASE_H
-#  include <stl/_function_base.h>
+#  include <stl/_function_base.h> 
+#endif
+
+#if defined (_STLP_DEBUG)
+#  define _Rb_tree __WORKAROUND_DBG_RENAME(Rb_tree)
 #endif
 
 _STLP_BEGIN_NAMESPACE
-
-_STLP_MOVE_TO_PRIV_NAMESPACE
 
 typedef bool _Rb_tree_Color_type;
 //const _Rb_tree_Color_type _S_rb_tree_red = false;
@@ -142,6 +144,7 @@ struct _Rb_tree_base_iterator {
   _Rb_tree_base_iterator(_Base_ptr __x) : _M_node(__x) {}
 };
 
+
 template <class _Value, class _Traits>
 struct _Rb_tree_iterator : public _Rb_tree_base_iterator {
   typedef _Value value_type;
@@ -157,12 +160,6 @@ struct _Rb_tree_iterator : public _Rb_tree_base_iterator {
   typedef _Rb_tree_iterator<_Value, _ConstTraits> const_iterator;
 
   _Rb_tree_iterator() {}
-#if !defined (_STLP_DEBUG)
-  /* In STL debug mode we need this constructor implicit for the pointer
-   * specialization implementation.
-   */
-  explicit
-#endif
   _Rb_tree_iterator(_Base_ptr __x) : _Rb_tree_base_iterator(__x) {}
   //copy constructor for iterator and constructor from iterator for const_iterator
   _Rb_tree_iterator(const iterator& __it) : _Rb_tree_base_iterator(__it._M_node) {}
@@ -201,36 +198,28 @@ struct _Rb_tree_iterator : public _Rb_tree_base_iterator {
   }
 };
 
-#if defined (_STLP_CLASS_PARTIAL_SPECIALIZATION)
-_STLP_MOVE_TO_STD_NAMESPACE
+#ifdef _STLP_CLASS_PARTIAL_SPECIALIZATION
 template <class _Value, class _Traits>
-struct __type_traits<_STLP_PRIV _Rb_tree_iterator<_Value, _Traits> > {
+struct __type_traits<_Rb_tree_iterator<_Value, _Traits> > {
   typedef __false_type   has_trivial_default_constructor;
   typedef __true_type    has_trivial_copy_constructor;
   typedef __true_type    has_trivial_assignment_operator;
   typedef __true_type    has_trivial_destructor;
   typedef __false_type   is_POD_type;
 };
-_STLP_MOVE_TO_PRIV_NAMESPACE
 #endif /* _STLP_CLASS_PARTIAL_SPECIALIZATION */
 
-#if defined (_STLP_USE_OLD_HP_ITERATOR_QUERIES)
-_STLP_MOVE_TO_STD_NAMESPACE
+# ifdef _STLP_USE_OLD_HP_ITERATOR_QUERIES
 template <class _Value, class _Traits>
-inline _Value* value_type(const _STLP_PRIV _Rb_tree_iterator<_Value, _Traits>&)
-{ return (_Value*)0; }
-inline bidirectional_iterator_tag iterator_category(const _STLP_PRIV _Rb_tree_base_iterator&)
-{ return bidirectional_iterator_tag(); }
-inline ptrdiff_t* distance_type(const _STLP_PRIV _Rb_tree_base_iterator&)
-{ return (ptrdiff_t*) 0; }
-_STLP_MOVE_TO_PRIV_NAMESPACE
+inline _Value* value_type(const _Rb_tree_iterator<_Value, _Traits>&) { return (_Value*)0; }
+inline bidirectional_iterator_tag iterator_category(const _Rb_tree_base_iterator&) { return bidirectional_iterator_tag(); }
+inline ptrdiff_t* distance_type(const _Rb_tree_base_iterator&) { return (ptrdiff_t*) 0; }
 #endif /* _STLP_CLASS_PARTIAL_SPECIALIZATION */
 
 // Base class to help EH
 
 template <class _Tp, class _Alloc>
-class _Rb_tree_base {
-public:
+struct _Rb_tree_base {
   typedef _Rb_tree_node_base _Node_base;
   typedef _Rb_tree_node<_Tp> _Node;
   _STLP_FORCE_ALLOCATORS(_Tp, _Alloc)
@@ -263,6 +252,7 @@ protected:
     _M_header._M_data._M_right = &_M_header._M_data;
   }
 
+  
   void _M_rebind(_Node_base *__static_node) {
     if (_M_header._M_data._M_parent != 0) {
       _M_header._M_data._M_parent->_M_parent = &_M_header._M_data;
@@ -278,11 +268,8 @@ protected:
   _AllocProxy _M_header;
 };
 
-#if defined (_STLP_DEBUG)
-#  define _Rb_tree _STLP_NON_DBG_NAME(Rb_tree)
-#endif
 
-template <class _Key, class _Compare,
+template <class _Key, class _Compare, 
           class _Value, class _KeyOfValue, class _Traits,
           _STLP_DEFAULT_ALLOCATOR_SELECT(_Value) >
 class _Rb_tree : public _Rb_tree_base<_Value, _Alloc> {
@@ -307,7 +294,6 @@ public:
 
 protected:
 
-  _STLP_KEY_TYPE_FOR_CONT_EXT(key_type)
   _Base_ptr _M_create_node(const value_type& __x) {
     _Link_type __tmp = this->_M_header.allocate(1);
     _STLP_TRY {
@@ -325,6 +311,7 @@ protected:
     return __tmp;
   }
 
+protected:
   size_type _M_node_count; // keeps track of size of tree
   _Compare _M_key_compare;
 
@@ -419,11 +406,13 @@ public:
   const_iterator end() const { return const_iterator(__CONST_CAST(_Base_ptr, &this->_M_header._M_data)); }
 
   reverse_iterator rbegin() { return reverse_iterator(end()); }
-  const_reverse_iterator rbegin() const
-  { return const_reverse_iterator(end()); }
+  const_reverse_iterator rbegin() const {
+    return const_reverse_iterator(end());
+  }
   reverse_iterator rend() { return reverse_iterator(begin()); }
-  const_reverse_iterator rend() const
-  { return const_reverse_iterator(begin()); }
+  const_reverse_iterator rend() const {
+    return const_reverse_iterator(begin());
+  }
   bool empty() const { return _M_node_count == 0; }
   size_type size() const { return _M_node_count; }
   size_type max_size() const { return size_type(-1); }
@@ -431,7 +420,7 @@ public:
   void swap(_Self& __t) {
     if (__t.empty()) {
       if (this->empty()) return;
-      __t._M_header.swap(this->_M_header);
+      __t._M_header = this->_M_header;
       __t._M_rebind(&this->_M_header._M_data);
       this->_M_empty_initialize();
     }
@@ -440,7 +429,7 @@ public:
       return;
     }
     else {
-      this->_M_header.swap(__t._M_header);
+      _STLP_STD::swap(this->_M_header, __t._M_header);
       this->_M_rebind(&__t._M_header._M_data);
       __t._M_rebind(&this->_M_header._M_data);
     }
@@ -453,10 +442,10 @@ public:
   pair<iterator,bool> insert_unique(const value_type& __x);
   iterator insert_equal(const value_type& __x);
 
-  iterator insert_unique(iterator __pos, const value_type& __x);
-  iterator insert_equal(iterator __pos, const value_type& __x);
+  iterator insert_unique(iterator __position, const value_type& __x);
+  iterator insert_equal(iterator __position, const value_type& __x);
 
-#if defined (_STLP_MEMBER_TEMPLATES)
+#ifdef _STLP_MEMBER_TEMPLATES
   template<class _II> void insert_equal(_II __first, _II __last) {
     for ( ; __first != __last; ++__first)
       insert_equal(*__first);
@@ -465,7 +454,7 @@ public:
     for ( ; __first != __last; ++__first)
       insert_unique(*__first);
   }
-#else
+#else /* _STLP_MEMBER_TEMPLATES */
   void insert_unique(const_iterator __first, const_iterator __last) {
     for ( ; __first != __last; ++__first)
       insert_unique(*__first);
@@ -482,10 +471,10 @@ public:
     for ( ; __first != __last; ++__first)
       insert_equal(*__first);
   }
-#endif
+#endif /* _STLP_MEMBER_TEMPLATES */
 
-  void erase(iterator __pos) {
-    _Base_ptr __x = _Rb_global_inst::_Rebalance_for_erase(__pos._M_node,
+  void erase(iterator __position) {
+    _Base_ptr __x = _Rb_global_inst::_Rebalance_for_erase(__position._M_node,
                                                           this->_M_header._M_data._M_parent,
                                                           this->_M_header._M_data._M_left,
                                                           this->_M_header._M_data._M_right);
@@ -503,7 +492,7 @@ public:
 
   size_type erase_unique(const key_type& __x) {
     iterator __i = find(__x);
-    if (__i._M_node != &this->_M_header._M_data) {
+    if (__i != end()) {
       erase(__i);
       return 1;
     }
@@ -511,8 +500,7 @@ public:
   }
 
   void erase(iterator __first, iterator __last) {
-    if (__first._M_node == this->_M_header._M_data._M_left && // begin()
-        __last._M_node == &this->_M_header._M_data)           // end()
+    if (__first == begin() && __last == end())
       clear();
     else
       while (__first != __last) erase(__first++);
@@ -534,13 +522,18 @@ public:
 
 public:
                                 // set operations:
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  iterator find(const _KT& __k) { return iterator(_M_find(__k)); }
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  const_iterator find(const _KT& __k) const { return const_iterator(_M_find(__k)); }
+# if defined(_STLP_MEMBER_TEMPLATES) && ! defined ( _STLP_NO_EXTENSIONS ) && !defined(__MRC__) && !(defined(__SC__) && !defined(__DMC__))
+  template <class _KT> iterator find(const _KT& __k) { return iterator(_M_find(__k)); }
+  template <class _KT> const_iterator find(const _KT& __k) const { return const_iterator(_M_find(__k)); }
 private:
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  _Base_ptr _M_find(const _KT& __k) const {
+  template <class _KT> _Base_ptr _M_find(const _KT& __k) const
+# else
+  iterator find(const key_type& __k) { return iterator(_M_find(__k)); }
+  const_iterator find(const key_type& __k) const { return const_iterator(_M_find(__k)); }
+private:
+  _Base_ptr _M_find(const key_type& __k) const
+# endif
+  {
     _Base_ptr __y = __CONST_CAST(_Base_ptr, &this->_M_header._M_data);      // Last node which is not less than __k.
     _Base_ptr __x = _M_root();      // Current node.
 
@@ -558,60 +551,48 @@ private:
     return __y;
   }
 
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  _Base_ptr _M_lower_bound(const _KT& __k) const {
+  _Base_ptr _M_lower_bound(const key_type& __k) const {
     _Base_ptr __y = __CONST_CAST(_Base_ptr, &this->_M_header._M_data); /* Last node which is not less than __k. */
     _Base_ptr __x = _M_root(); /* Current node. */
-
-    while (__x != 0)
+    
+    while (__x != 0) 
       if (!_M_key_compare(_S_key(__x), __k))
         __y = __x, __x = _S_left(__x);
       else
         __x = _S_right(__x);
-
+    
     return __y;
   }
 
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  _Base_ptr _M_upper_bound(const _KT& __k) const {
+  _Base_ptr _M_upper_bound(const key_type& __k) const {
     _Base_ptr __y = __CONST_CAST(_Base_ptr, &this->_M_header._M_data); /* Last node which is greater than __k. */
     _Base_ptr __x = _M_root(); /* Current node. */
-
-    while (__x != 0)
+    
+    while (__x != 0) 
       if (_M_key_compare(__k, _S_key(__x)))
         __y = __x, __x = _S_left(__x);
       else
         __x = _S_right(__x);
-
+    
     return __y;
   }
-
-public:
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  size_type count(const _KT& __x) const {
-    pair<const_iterator, const_iterator> __p = equal_range(__x);
-    return distance(__p.first, __p.second);
+  
+public:  
+  size_type count(const key_type& __x) const;
+  iterator lower_bound(const key_type& __x) { return iterator(_M_lower_bound(__x)); }
+  const_iterator lower_bound(const key_type& __x) const { return const_iterator(_M_lower_bound(__x)); }
+  iterator upper_bound(const key_type& __x) { return iterator(_M_upper_bound(__x)); }
+  const_iterator upper_bound(const key_type& __x) const { return const_iterator(_M_upper_bound(__x)); }
+  pair<iterator,iterator> equal_range(const key_type& __x) {
+    return pair<iterator, iterator>(lower_bound(__x), upper_bound(__x));
   }
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  iterator lower_bound(const _KT& __x) { return iterator(_M_lower_bound(__x)); }
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  const_iterator lower_bound(const _KT& __x) const { return const_iterator(_M_lower_bound(__x)); }
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  iterator upper_bound(const _KT& __x) { return iterator(_M_upper_bound(__x)); }
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  const_iterator upper_bound(const _KT& __x) const { return const_iterator(_M_upper_bound(__x)); }
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  pair<iterator,iterator> equal_range(const _KT& __x)
-  { return pair<iterator, iterator>(lower_bound(__x), upper_bound(__x)); }
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  pair<const_iterator, const_iterator> equal_range(const _KT& __x) const
-  { return pair<const_iterator, const_iterator>(lower_bound(__x), upper_bound(__x)); }
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  pair<iterator,iterator> equal_range_unique(const _KT& __x) {
+  pair<const_iterator, const_iterator> equal_range(const key_type& __x) const {
+    return pair<const_iterator, const_iterator>(lower_bound(__x), upper_bound(__x));
+  }
+  pair<iterator,iterator> equal_range_unique(const key_type& __x) {
     pair<iterator, iterator> __p;
     __p.second = lower_bound(__x);
-    if (__p.second._M_node != &this->_M_header._M_data &&
-        !_M_key_compare(__x, _S_key(__p.second._M_node))) {
+    if (__p.second != this->end() && !_M_key_compare(__x, _S_key(__p.second._M_node))) {
       __p.first = __p.second++;
     }
     else {
@@ -619,12 +600,10 @@ public:
     }
     return __p;
   }
-  _STLP_TEMPLATE_FOR_CONT_EXT
-  pair<const_iterator, const_iterator> equal_range_unique(const _KT& __x) const {
+  pair<const_iterator, const_iterator> equal_range_unique(const key_type& __x) const {
     pair<const_iterator, const_iterator> __p;
     __p.second = lower_bound(__x);
-    if (__p.second._M_node != &this->_M_header._M_data &&
-        !_M_key_compare(__x, _S_key(__p.second._M_node))) {
+    if (__p.second != this->end() && !_M_key_compare(__x, _S_key(__p.second._M_node))) {
       __p.first = __p.second++;
     }
     else {
@@ -633,44 +612,36 @@ public:
     return __p;
   }
 
-#if defined (_STLP_DEBUG)
+#ifdef _STLP_DEBUG
 public:
   // Debugging.
   bool __rb_verify() const;
 #endif //_STLP_DEBUG
 };
 
-#if defined (_STLP_DEBUG)
-#  undef _Rb_tree
-#endif
+# define _STLP_TEMPLATE_HEADER template <class _Key, class _Compare, class _Value, class _KeyOfValue, class _Traits, class _Alloc>
+# define _STLP_TEMPLATE_CONTAINER _Rb_tree<_Key,_Compare,_Value,_KeyOfValue,_Traits,_Alloc>
+# include <stl/_relops_cont.h>
+# undef _STLP_TEMPLATE_CONTAINER
+# undef _STLP_TEMPLATE_HEADER
 
-_STLP_MOVE_TO_STD_NAMESPACE
-
-_STLP_END_NAMESPACE
-
-#if !defined (_STLP_LINK_TIME_INSTANTIATION)
-#  include <stl/_tree.c>
-#endif
-
-#if defined (_STLP_DEBUG)
-#  include <stl/debug/_tree.h>
-#endif
-
-_STLP_BEGIN_NAMESPACE
-
-#define _STLP_TEMPLATE_HEADER template <class _Key, class _Compare, class _Value, class _KeyOfValue, class _Traits, class _Alloc>
-#define _STLP_TEMPLATE_CONTAINER _STLP_PRIV _Rb_tree<_Key,_Compare,_Value,_KeyOfValue,_Traits,_Alloc>
-#include <stl/_relops_cont.h>
-#undef _STLP_TEMPLATE_CONTAINER
-#undef _STLP_TEMPLATE_HEADER
-
-#if defined (_STLP_CLASS_PARTIAL_SPECIALIZATION)
+#ifdef _STLP_CLASS_PARTIAL_SPECIALIZATION
 template <class _Key, class _Compare, class _Value, class _KeyOfValue, class _Traits, class _Alloc>
-struct __move_traits<_STLP_PRIV _Rb_tree<_Key, _Compare, _Value, _KeyOfValue, _Traits, _Alloc> >
-  : _STLP_PRIV __move_traits_help2<_Compare, _Alloc> {};
+struct __move_traits<_Rb_tree<_Key, _Compare, _Value, _KeyOfValue, _Traits, _Alloc> >
+  : __move_traits_help2<_Compare, _Alloc> {};
 #endif
 
 _STLP_END_NAMESPACE
+
+# if !defined (_STLP_LINK_TIME_INSTANTIATION)
+#  include <stl/_tree.c> 
+# endif
+
+# undef _Rb_tree
+
+#if defined (_STLP_DEBUG)
+# include <stl/debug/_tree.h> 
+#endif
 
 #endif /* _STLP_INTERNAL_TREE_H */
 

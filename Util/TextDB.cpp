@@ -55,7 +55,8 @@ TextIdMap::TextIdMap()
 
 TextIdMap::~TextIdMap()
 {
-	saveLibrary();
+	if(save_)
+		saveLibrary();
 }
 
 void TextIdMap::serialize(Archive& ar)

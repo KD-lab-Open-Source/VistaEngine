@@ -4,6 +4,7 @@
 #include "GameShell.h"
 #include "CommonLocText.h"
 #include "..\Network\P2P_interface.h"
+//#include "..\Network\DW_interface.h"
 #include "..\Network\LogMsg.h"
 
 #ifndef _FINAL_VERSION_
@@ -32,6 +33,8 @@ UI_NetCenter::UI_NetCenter()
 	subscribeWaitingChannel_ = -1;
 	selectedChannel_ = -1;
 	autoSubscribeMode_ = false;
+	//autoSubscribeUnsusseful_ = false;
+	//lastChannelSubscribeAttemptMode_ = false;
 	lastSubscribeAttempt_ = -1;
 }
 
@@ -375,7 +378,10 @@ int UI_NetCenter::getGameList(const GameListInfoTypes& format, ComboStrings&  bo
 				break;
 			case GAME_INFO_NAT_COMPATIBILITY:
 				if(gameShell->isNetClientConfigured(PNCWM_ONLINE_DW)){
-					buf < GET_LOC_STR(UI_COMMON_TEXT_NAT_INCOMPATIBLE);
+					/*if(isNATCompatible(demonware()->getNATType(), gm->dwNATType))
+						buf < GET_LOC_STR(UI_COMMON_TEXT_NAT_COMPATIBLE);
+					else*/
+						buf < GET_LOC_STR(UI_COMMON_TEXT_NAT_INCOMPATIBLE);
 				}
 				else
 					buf < " ";
@@ -534,7 +540,9 @@ void UI_NetCenter::logout()
 
 	resetChatBoard(false);
 	
-	commit(UI_NET_OK); // РІСЃРµРіРґР° Р·Р°РІРµСЂС€Р°РµС‚СЃСЏ СѓСЃРїРµС€РЅРѕ
+	commit(UI_NET_OK); // всегда завершается успешно
+
+	//demonware()->logout();
 
 	resetPasswords();
 
@@ -558,6 +566,8 @@ void UI_NetCenter::refreshGameList()
 
 		LogMsg("started\n");
 	}
+
+	//demonware()->refreshGameHostList();
 }
 
 void UI_NetCenter::quickStart()
@@ -631,6 +641,7 @@ void UI_NetCenter::createAccount()
 
 	switch(localDelayOperation){
 	case 1:
+		//demonware()->createAccount(UI_LogicDispatcher::instance().currentProfile().lastInetName.c_str(), password_.c_str(), UI_LogicDispatcher::instance().currentProfile().cdKey.c_str()); //, 
 		break;
 	case 2:
 		gameShell->networkMessageHandler(NetRC_CreateAccount_IllegalOrEmptyPassword_Err);
@@ -671,6 +682,7 @@ void UI_NetCenter::changePassword()
 
 	switch(localDelayOperation){
 	case 1:
+		//demonware()->changePassword(UI_LogicDispatcher::instance().currentProfile().lastInetName.c_str(), UI_LogicDispatcher::instance().currentProfile().cdKey.c_str(), 0, pass2_.c_str());
 		break;
 	case 2:
 		gameShell->networkMessageHandler(NetRC_CreateAccount_IllegalOrEmptyPassword_Err);
@@ -712,6 +724,7 @@ void UI_NetCenter::deleteAccount()
 
 	switch(localDelayOperation){
 	case 1:
+		//demonware()->deleteAccount(UI_LogicDispatcher::instance().currentProfile().lastInetName.c_str(), password_.c_str());
 		break;
 	case 2:
 		UI_LogicDispatcher::instance().handleNetwork(NetRC_CreateAccount_IllegalOrEmptyPassword_Err);			
@@ -782,7 +795,7 @@ void UI_NetCenter::createGame()
 					if(sufix > 0){
 						XBuffer suf; 
 						suf <= sufix;
-						xxassert(suf.tell() < MAX_MULTIPALYER_GAME_NAME, "РќСѓ РЅРё С…СЂРµРЅР° СЃРµР±Рµ!");
+						xxassert(suf.tell() < MAX_MULTIPALYER_GAME_NAME, "Ну ни хрена себе!");
 						gameName = originalGameName.substr(0, MAX_MULTIPALYER_GAME_NAME - suf.tell());
 						gameName += suf.c_str();
 					}
@@ -914,6 +927,16 @@ bool UI_NetCenter::isServer() const
 
 const char* UI_NetCenter::natType() const
 {
+	if(gameShell->isNetClientConfigured(PNCWM_ONLINE_DW))
+		/*switch(demonware()->getNATType()){
+			case DWNT_Open:
+				return GET_LOC_STR(UI_COMMON_TEXT_NAT_TYPE_OPEN);
+			case DWNT_Moderate:
+				return GET_LOC_STR(UI_COMMON_TEXT_NAT_TYPE_MODERATE);
+			case DWNT_Strict:
+				return GET_LOC_STR(UI_COMMON_TEXT_NAT_TYPE_STRICT);
+		}*/
+
 	return "";
 }
 
@@ -1067,10 +1090,12 @@ void UI_NetCenter::resetChatBoard(bool unsubscribe)
 		currentChatString_.clear();
 		chatBoard_.clear();
 		chatUsers_.clear();
-//		chatChanelInfos_.clear();
+		//chatChanelInfos_.clear();
 
 		selectedChannel_ = -1;
+		//autoSubscribeUnsusseful_ = false;
 		autoSubscribeMode_ = false;
+		//lastChannelSubscribeAttemptMode_ = false;
 		lastSubscribeAttempt_ = -1;
 
 		currentChatChannelName_.clear();
@@ -1090,15 +1115,16 @@ void UI_NetCenter::resetChatBoard(bool unsubscribe)
 
 	if(sid != -1){
 		LogMsg("UI_NetCenter: USUBSCRIBE CURRENT CHANNEL done\n");
+		//demonware()->subUnsub2ChatChanel(false, sid);
 	}
 }
 
 void UI_NetCenter::updateChatUsers()
 {
-	/*
-	vector<DWInterfaceSimple::ChatMemberInfo> infos;
+	//vector<DWInterfaceSimple::ChatMemberInfo> infos;
 	
-	if(gameShell->isNetClientConfigured(PNCWM_ONLINE_DW));
+	if(gameShell->isNetClientConfigured(PNCWM_ONLINE_DW))
+		/*demonware()->getChatMembers(infos)*/;
 	else
 		return;
 
@@ -1106,10 +1132,9 @@ void UI_NetCenter::updateChatUsers()
 
 	chatUsers_.clear();
 
-	vector<DWInterfaceSimple::ChatMemberInfo>::const_iterator it;
-	FOR_EACH(infos, it)
-		chatUsers_.push_back(it->name);
-	*/
+	//vector<DWInterfaceSimple::ChatMemberInfo>::const_iterator it;
+	/*FOR_EACH(infos, it)
+		chatUsers_.push_back(it->name);*/
 }
 
 int UI_NetCenter::getChatUsers(ComboStrings &users) const
@@ -1175,7 +1200,8 @@ void UI_NetCenter::queryGlobalStatistic(bool force)
 		}
 	}
 
-	if(delayRequerest);
+	/*if(delayRequerest)
+		demonware()->readGlobalStats(getScoresID(localStatisticFilterRace, localStatisticFilterGamePopulation), gsForRead_, localScorePosition, readGlobalStatsAtOnce);*/
 }
 
 void UI_NetCenter::getGlobalStatisticFromBegin()
@@ -1406,7 +1432,7 @@ void UI_NetCenter::updateFilter()
 
 void UI_NetCenter::queryGameVersion()
 {
-	xassert(acyncEventWaiting() && "РЅРµСЃРёРЅС…СЂРѕРЅРЅС‹Р№ Р·Р°РїСЂРѕСЃ РІРµСЂСЃРёРё РёРіСЂС‹");
+	xassert(acyncEventWaiting() && "несинхронный запрос версии игры");
 
 	LogMsg("UI_NetCenter: GET GAME VERSION ");
 
@@ -1416,11 +1442,12 @@ void UI_NetCenter::queryGameVersion()
 		return;
 	}
 	LogMsg("started\n");
+	//demonware()->downloadInfoFile(version_);
 }
 
 bool UI_NetCenter::setGameVersion()
 {
-	xassert(acyncEventWaiting() && "РЅРµСЃРёРЅС…СЂРѕРЅРЅР°СЏ РѕР±СЂР°Р±РѕС‚РєР° РІРµСЂСЃРёРё РёРіСЂС‹");
+	xassert(acyncEventWaiting() && "несинхронная обработка версии игры");
 	
 	version_ < '\0';
 
@@ -1432,51 +1459,85 @@ bool UI_NetCenter::setGameVersion()
 }
 
 class ChanelSortRule{
+public:
+	bool operator()(const ChatChanelInfo& c1, const ChatChanelInfo& c2) const{
+		//return c1.name < c2.name; //по алфавиту
+		//return c1.id < c2.id;
+	}
 };
+
+bool operator==(const ChatChanelInfo& obj, ChatChannelID id){
+	return false /*obj.id == id*/;
+}
+
+bool operator==(const ChatChanelInfo& obj, const char* name){
+	return false /*obj.name == name*/;
+}
+
+void UI_NetCenter::refreshChatChannels()
+{
+	{
+		MTAuto lock(lock_);
+
+		LogMsg("UI_NetCenter: REFRESH CHAT LIST ");
+
+		if(!gameShell->isNetClientConfigured(PNCWM_ONLINE_DW)){
+			LogMsg("ERROR, online client not created\n");
+			commit(UI_NET_ERROR);
+			return;
+		}
+
+		LogMsg("started\n");
+	}
+
+	//demonware()->refreshGameHostList();
+}
 
 void UI_NetCenter::updateChatChannels()
 {
-	/*
-	ChatChanelInfos infos;
+	//ChatChanelInfos infos;
 
-	if(gameShell->isNetClientConfigured(PNCWM_ONLINE_DW) && onlineLogined_ && !gameCreated_);
+	if(gameShell->isNetClientConfigured(PNCWM_ONLINE_DW) && onlineLogined_ && !gameCreated_)
+		/*demonware()->getChatChanelList(infos)*/;
 	else
 		return;
 
-	sort(infos.begin(), infos.end(), ChanelSortRule());
-	*/
+	//sort(infos.begin(), infos.end(), ChanelSortRule());
 
 	bool needAutoSubscribe = false;
-	/*
 
 	{
 		MTAuto lock(lock_);
 
-		chatChanelInfos_.clear();
-		ChatChanelInfos::const_iterator it;
-		FOR_EACH(infos, it){
-			chatChanelInfos_.push_back(*it);
-		}
+		//chatChanelInfos_.clear();
+		//ChatChanelInfos::const_iterator it;
+		/*FOR_EACH(infos, it){
+			if(it->name == demonware()->mainChannel())
+				chatChanelInfos_.insert(chatChanelInfos_.begin(), *it);
+			else
+				chatChanelInfos_.push_back(*it);
+		}*/
 
 		if(subscribedChannel_ == -1)
 			if(subscribeWaitingChannel_ == -1)
-				if(chatChanelInfos_.empty())
+				/*if(chatChanelInfos_.empty())
 					currentChatChannelName_.clear();
-				else {
+				else if(!autoSubscribeUnsusseful_){
 					needAutoSubscribe = true;
 					currentChatChannelName_ = GET_LOC_STR(UI_COMMON_TEXT_CONNECTING);
 				}
+				else*/
+					currentChatChannelName_.clear();
 			else
 				currentChatChannelName_ = GET_LOC_STR(UI_COMMON_TEXT_CONNECTING);
 		else {
-			ChatChanelInfos::const_iterator info = find(chatChanelInfos_.begin(), chatChanelInfos_.end(), subscribedChannel_);
-			if(info != chatChanelInfos_.end())
+			//ChatChanelInfos::const_iterator info = find(chatChanelInfos_.begin(), chatChanelInfos_.end(), subscribedChannel_);
+			/*if(info != chatChanelInfos_.end())
 				currentChatChannelName_ = info->name;
 			else
-				currentChatChannelName_ = "ERROR";
+				currentChatChannelName_ = "ERROR";*/
 		}
 	}
-	*/
 
 	if(needAutoSubscribe)
 		autoSubscribeChatChannel();
@@ -1490,19 +1551,17 @@ int UI_NetCenter::getChatChannels(ComboStrings& channels) const
 	int selected = -1;
 
 	XBuffer buf;
-	/*
-	ChatChanelInfos::const_iterator it;
-	FOR_EACH(chatChanelInfos_, it){
-		buf.init();
-		buf < it->name.c_str() < "\t" <= it->numSubscribers < "/" <= it->maxSubscribers;
-		if(it->id == selectedChannel_)
-			selected = channels.size();
-		channels.push_back(buf.c_str());
-	}
+	//ChatChanelInfos::const_iterator it;
+	//FOR_EACH(chatChanelInfos_, it){
+		//buf.init();
+		//buf < it->name.c_str() < "\t" <= it->numSubscribers < "/" <= it->maxSubscribers;
+		/*if(it->id == selectedChannel_)
+			selected = channels.size();*/
+		//channels.push_back(buf.c_str());
+	//}
 
 	if(channels.empty())
 		channels.push_back(GET_LOC_STR(UI_COMMON_TEXT_CONNECTING));
-	*/
 
 	return selected;
 }
@@ -1523,19 +1582,17 @@ void UI_NetCenter::selectChatChannel(int channel)
 	}
 
 	MTAuto lock(lock_);
-
-	/*
-	if(channel >= chatChanelInfos_.size()){
+	
+	/*if(channel >= chatChanelInfos_.size()){
 		LogMsg("skiped, chan num > channels size\n");
 		return;
-	}
+	}*/
 
 	LogMsg("ok, channel:");
-	LogMsg(chatChanelInfos_[channel].name.c_str());
+	//LogMsg(chatChanelInfos_[channel].name.c_str());
 	LogMsg("\n");
 
-	selectedChannel_ = chatChanelInfos_[channel].id;
-	*/
+	//selectedChannel_ = chatChanelInfos_[channel].id;
 }
 
 void UI_NetCenter::autoSubscribeChatChannel()
@@ -1545,7 +1602,10 @@ void UI_NetCenter::autoSubscribeChatChannel()
 	{	
 		MTAuto lock(lock_);
 
-//		xassert(!chatChanelInfos_.empty() && subscribedChannel_ == -1 && subscribeWaitingChannel_ == -1);
+		/*if(autoSubscribeUnsusseful_)
+			return;*/
+
+		//xassert(!chatChanelInfos_.empty() && subscribedChannel_ == -1 && subscribeWaitingChannel_ == -1);
 
 		LogMsg("UI_NetCenter: AUTOSUBSCRIBE CHANNEL MODE ");
 
@@ -1560,24 +1620,54 @@ void UI_NetCenter::autoSubscribeChatChannel()
 			return;
 		}
 
-		if(autoSubscribeMode_){
+		if(autoSubscribeMode_){ // предыдущая подписка завершилась неудачно, выбираем следующий канал
 			/*
-			ChatChanelInfos::const_iterator info = find(chatChanelInfos_.begin(), chatChanelInfos_.end(), lastSubscribeAttempt_);
-			++info;
-			if(info != chatChanelInfos_.end()){
-				LogMsg("next channel attempt.\n");
-				sid = info->id;
+			if(lastChannelSubscribeAttemptMode_){ // пытались подписаться на предыдущий, теперь попробуем главный (первый в списке)
+				lastChannelSubscribeAttemptMode_ = false;
+				LogMsg("main channel attempt.\n");
+				sid = chatChanelInfos_.front().id;
 			}
-			else {
-				LogMsg("finished unsusseful.\n");
-				autoSubscribeMode_ = false;
+			else { // пробуем подписаться на следующий по списку
+				ChatChanelInfos::const_iterator info = find(chatChanelInfos_.begin(), chatChanelInfos_.end(), lastSubscribeAttempt_);
+				if(info != chatChanelInfos_.end()){
+					++info;
+					if(info != chatChanelInfos_.end()){
+						LogMsg("next channel attempt.\n");
+						sid = info->id;
+					}
+					else {
+						LogMsg("finished unsusseful.\n");
+						autoSubscribeUnsusseful_ = true;
+						autoSubscribeMode_ = false;
+					}
+				}
+				else {
+					LogMsg("chaneel list error.\n");
+					autoSubscribeMode_ = false;
+				}
 			}
 			*/
 		}
-		else {
+		else { // начинаем автоподписку
 			autoSubscribeMode_ = true;
-			LogMsg("main channel attempt.\n");
-			/* sid = chatChanelInfos_[0].id; */
+			//lastChannelSubscribeAttemptMode_ = false;
+			// пробуем начать с канала, на котором были в предыдущий раз
+			if(!UI_LogicDispatcher::instance().currentProfile().chatChannel.empty()){
+				//ChatChanelInfos::const_iterator info = find(chatChanelInfos_.begin(), chatChanelInfos_.end(), UI_LogicDispatcher::instance().currentProfile().chatChannel.c_str());
+				/*if(info != chatChanelInfos_.end()){
+					lastChannelSubscribeAttemptMode_ = true;
+					sid = info->id;
+				}
+				else*/
+					UI_LogicDispatcher::instance().currentProfile().chatChannel.clear();
+			}
+			/*if(lastChannelSubscribeAttemptMode_){
+				LogMsg("last channel attempt.\n");
+			}
+			else*/ { // если подписанный в прошлый раз канал не найден, начинаем с главного (всегда первый в списке)
+				LogMsg("main channel attempt.\n");
+				//sid = chatChanelInfos_.front().id;
+			}
 		}
 
 		lastSubscribeAttempt_ = sid;
@@ -1621,20 +1711,19 @@ void UI_NetCenter::enterChatChannel(ChatChannelID forceID)
 			return;
 		}
 
-		/*
-		ChatChanelInfos::const_iterator info = find(chatChanelInfos_.begin(), chatChanelInfos_.end(), selectedChannel_);
-		if(info == chatChanelInfos_.end()){
+		//ChatChanelInfos::const_iterator info = find(chatChanelInfos_.begin(), chatChanelInfos_.end(), selectedChannel_);
+		/*if(info == chatChanelInfos_.end()){
 			LogMsg("skiped, no channel found with selected id\n");
 			return;
-		}
+		}*/
 
 		subscribeWaitingChannel_ = selectedChannel_;
 		sid = subscribeWaitingChannel_;
-		*/
 	}
 
 	xassert(sid != -1);
 	LogMsg("done.\n");
+	//demonware()->subUnsub2ChatChanel(true, sid);
 }
 
 void UI_NetCenter::chatSubscribeOK()
@@ -1648,7 +1737,7 @@ void UI_NetCenter::chatSubscribeOK()
 
 		if(subscribeWaitingChannel_ == -1 || !onlineLogined_){
 			LogMsg(" ERROR, not waiting subscribe or not logined\n");
-			xassert(false && "СЃРµСЂСЊРµР·РЅР°СЏ РѕС€РёР±РєР° РїРѕРґРїРёСЃС‹РІР°РЅРёСЏ РЅР° РєР°РЅР°Р»");
+			xassert(false && "серьезная ошибка подписывания на канал");
 			return;
 		}
 
@@ -1656,20 +1745,31 @@ void UI_NetCenter::chatSubscribeOK()
 		subscribedChannel_ = subscribeWaitingChannel_;
 		subscribeWaitingChannel_ = -1;
 
-		/*
-		ChatChanelInfos::const_iterator info = find(chatChanelInfos_.begin(), chatChanelInfos_.end(), subscribedChannel_);
-		if(info != chatChanelInfos_.end()){
+		//ChatChanelInfos::const_iterator info = find(chatChanelInfos_.begin(), chatChanelInfos_.end(), subscribedChannel_);
+		/*if(info != chatChanelInfos_.end()){
 			LogMsg(" OK\n");
 			currentChatChannelName_ = info->name;
+			UI_LogicDispatcher::instance().currentProfile().chatChannel = currentChatChannelName_;
 		}
-		else {
+		else*/ {
 			LogMsg(" STRANGE!!!, not found channel in list\n");
 			currentChatChannelName_ = "ERROR";
 		}
-		*/
 
 		autoSubscribeMode_ = false;
 	}
+
+	// отключаемся от старого канала
+	/*if(demonware() && sid != -1){
+		LogMsg(XBuffer() < "UI_NetCenter: UNSUBSCRIBE PREV: " <= (unsigned int)sid < "\n");
+		demonware()->subUnsub2ChatChanel(false, sid);
+	}*/
+
+	refreshChatChannels();
+
+	string name;
+	getCurrentChatChannelName(name);
+	UI_LogicDispatcher::instance().handleSystemMessage((XBuffer() < GET_LOC_STR(UI_COMMON_TEXT_YOU_ENTER_CHAT_ROOM) < name.c_str()).c_str());
 }
 
 void UI_NetCenter::chatSubscribeFailed()

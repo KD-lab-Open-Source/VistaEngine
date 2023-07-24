@@ -1,0 +1,14 @@
+This document describes the workaround for the resource_compiler on MS Windows
+
+
+The resource compiler is not a C++ compiler, it is a compiler that translates
+resource files, i.e. files that describe dialogs, strings, version information
+and other parts of the GUI on MS Windows systems. 
+
+The problem is that it includes files from the C/C++ include path, and 
+STLport uses mechanisms the resource compiler can't handle, e.g. using macro
+names longer than 31 characters. 
+
+The workaround is to guard all affected headers (stdio.h, string.h, stdarg.h,
+stdlib.h, ctype.h) against this. The resource compiler is detected by the 
+macro RC_INVOKED.

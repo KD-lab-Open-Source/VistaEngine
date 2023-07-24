@@ -13,7 +13,7 @@ class XPrmOArchive : public Archive
 {
 friend MultiOArchive;
 public:
-	XPrmOArchive(const char* fname);
+	XPrmOArchive(const char* fname, bool fake = false);
 	~XPrmOArchive();
 
 	void open(const char* fname); 

@@ -22,7 +22,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="$(3DSMAX_DIR)\maxsdk\include;$(3DSMAX_DIR)\maxsdk\include\IGame"
+				AdditionalIncludeDirectories="..\XLibs.Net\Heap;&quot;$(3DSMAX_DIR)\maxsdk\include&quot;;&quot;$(3DSMAX_DIR)\maxsdk\include\IGame&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;_STLP_USE_STATIC_LIB;MAX7;_UTILTVA_"
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"

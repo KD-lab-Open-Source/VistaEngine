@@ -1,6 +1,6 @@
 /***********************************************************************************
   test_hash_map.cpp
-
+  
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -46,9 +46,9 @@ container_category(const TestMultiMap&) {
 void test_hash_multimap() {
 # if !(defined (_MSC_VER) && (_MSC_VER < 1100))
   TestMultiMap testMultiMap, testMultiMap2;
-
+  
         const size_t hash_mapSize = random_number(random_base);
-
+  
   while ( testMultiMap.size() < hash_mapSize )
   {
     TestMultiMap::value_type x;
@@ -68,20 +68,20 @@ void test_hash_multimap() {
   WeakCheck( testMultiMap, insert_range_tester(testMultiMap, insFirst, insFirst+insCnt) );
   ConstCheck( 0, test_construct_pointer_range<TestMultiMap>(insFirst, insFirst+insCnt) );
   delete[] insFirst;
-
+  
   WeakCheck( testMultiMap, insert_range_tester(testMultiMap, testMultiMap2.begin(), testMultiMap2.end() ) );
-
+  
   ConstCheck( 0, test_default_construct<TestMultiMap>() );
 #  if EH_HASH_CONTAINERS_SUPPORT_ITERATOR_CONSTRUCTION
   ConstCheck( 0, test_construct_iter_range_n<TestMultiMap>( testMultiMap2 ) );
 #  endif
   ConstCheck( testMultiMap, test_copy_construct<TestMultiMap>() );
-
+  
   WeakCheck( testMultiMap, test_assign_op<TestMultiMap>( testMultiMap2 ) );
 # endif
 }
 
-typedef EH_STD::__hash_map__<TestClass, TestClass, ThrowHash,
+typedef EH_STD::__hash_map__<TestClass, TestClass, ThrowHash, 
   ThrowEqual, eh_allocator(TestClass) > TestMap;
 
 inline map_tag
@@ -94,7 +94,7 @@ void test_hash_map()
 {
 # if !(defined (_MSC_VER) && (_MSC_VER < 1100))
   TestMap testMap, testMap2;
-
+  
   const size_t hash_mapSize = random_number(random_base);
 
   while ( testMap.size() < hash_mapSize ) {
@@ -115,15 +115,15 @@ void test_hash_map()
   WeakCheck( testMap, insert_range_tester(testMap, insFirst, insFirst+insCnt) );
   ConstCheck( 0, test_construct_pointer_range<TestMap>(insFirst, insFirst+insCnt) );
   delete[] insFirst;
-
+  
   WeakCheck( testMap, insert_range_tester(testMap, testMap2.begin(), testMap2.end() ) );
-
+  
   ConstCheck( 0, test_default_construct<TestMap>() );
 #  if EH_HASH_CONTAINERS_SUPPORT_ITERATOR_CONSTRUCTION
   ConstCheck( 0, test_construct_iter_range_n<TestMap>( testMap2 ) );
 #  endif
   ConstCheck( testMap, test_copy_construct<TestMap>() );
-
+  
   WeakCheck( testMap, test_assign_op<TestMap>( testMap2 ) );
 # endif
 }

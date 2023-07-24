@@ -968,7 +968,7 @@ void UnitReal::enableFlying(int flyingReason, int time)
 void UnitReal::makeStatic(int staticReason) 
 { 
 	staticReason_ |= staticReason; 
-		rigidBody_->makeStatic();
+	rigidBody_->makeStatic();
 }
 
 void UnitReal::makeStaticXY(int staticReason) 

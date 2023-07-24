@@ -1,6 +1,6 @@
 /***********************************************************************************
   test_string.cpp
-
+  
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -26,7 +26,7 @@
 #include <string>
 
 USING_CSTD_NAME(size_t)
-
+  
 typedef EH_STD::basic_string<char, EH_STD::char_traits<char>, eh_allocator(char) > TestString;
 
 inline sequence_container_tag

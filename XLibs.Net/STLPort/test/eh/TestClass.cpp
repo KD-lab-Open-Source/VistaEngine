@@ -1,6 +1,6 @@
 /***********************************************************************************
   TestClass.cpp
-
+  
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -17,8 +17,8 @@
 
 #include <iostream>
 
-std::ostream& operator << (std::ostream& s, const TestClass& t) {
+std::ostream& operator << (std::ostream& s, const TestClass& t) { 
   return s << t.value();
-}
+} 
 
 

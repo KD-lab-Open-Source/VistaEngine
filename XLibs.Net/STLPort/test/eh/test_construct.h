@@ -1,6 +1,6 @@
 /***********************************************************************************
   test_construct.h
-
+  
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -11,7 +11,7 @@
  * in supporting documentation.  Mark of the Unicorn makes no
  * representations about the suitability of this software for any
  * purpose.  It is provided "as is" without express or implied warranty.
-
+    
 ***********************************************************************************/
 #ifndef test_construct_H_
 #define test_construct_H_
@@ -34,7 +34,7 @@ struct test_copy_construct {
   test_copy_construct() {
     gTestController.SetCurrentTestName("copy constructor");
   }
-
+    
   void operator()( const T& t ) const {
     T aCopy( t );
     // Prevent simulated failures during verification
@@ -49,7 +49,7 @@ struct test_default_construct {
   test_default_construct() {
     gTestController.SetCurrentTestName("default constructor");
   }
-
+    
   void operator()( int ) const {
     T t;
     CheckInvariant(t);
@@ -88,7 +88,7 @@ struct test_construct_n_instance {
 
 template <class T>
 struct test_construct_pointer_range {
-  test_construct_pointer_range( const typename T::value_type *first,
+  test_construct_pointer_range( const typename T::value_type *first, 
                                 const typename T::value_type* last )
     : fItems( first ), fEnd( last ) {
     gTestController.SetCurrentTestName("pointer range constructor");

@@ -1,4 +1,4 @@
-# Time-stamp: <05/12/08 01:44:00 ptr>
+# Time-stamp: <05/12/08 00:20:17 ptr>
 
 STLPORT_LIB_DIR ?= $(STLPORT_DIR)/${TARGET_NAME}lib
 STLPORT_INCLUDE_DIR ?= $(STLPORT_DIR)/stlport
@@ -8,3 +8,4 @@ BOOST_INCLUDE_DIR ?= ${BOOST_DIR}
 
 BOOST_DIR ?= ${SRCROOT}/../extern/boost
 STLPORT_DIR ?= /export/home/ptr/STLport.lab/STLport
+

@@ -1,5 +1,5 @@
 # Time-stamp: <05/06/03 21:30:03 ptr>
-# $Id: mwccnlm.mak 1871 2005-11-26 20:55:00Z dums $
+# $Id: mwccnlm.mak,v 1.1.2.4 2005/06/10 18:28:43 ptr Exp $
 
 
 #INCLUDES = -I$(SRCROOT)/include
@@ -26,10 +26,9 @@ LINK_OUTPUT_OPTION = ${OUTPUT_OPTION}
 CPPFLAGS = $(DEFS) -gccinc -I. $(INCLUDES) -ir "$(NWSDK_DIR)" -ir "$(MWCW_NOVELL)" -prefix Headers/nlm_prefix.h
 
 ifeq ($(OSNAME), cygming)
-RCFLAGS = --include-dir=${STLPORT_INCLUDE_DIR} --output-format coff -DCOMP=mwcc
-release-shared : RCFLAGS += -DBUILD=r -DBUILD_INFOS="-O2"
-dbg-shared : RCFLAGS += -DBUILD=d -DBUILD_INFOS="-g"
-stldbg-shared : RCFLAGS += -DBUILD=stld -DBUILD_INFOS="-g -D_STLP_DEBUG"
+release-shared : RCFLAGS = --include-dir=${STLPORT_INCLUDE_DIR} -DCOMP=gcc -DBUILD=r -DBUILD_INFOS="-O2" --output-format coff
+dbg-shared : RCFLAGS = --include-dir=${STLPORT_INCLUDE_DIR} -DCOMP=gcc -DBUILD=d -DBUILD_INFOS="-g" --output-format coff
+stldbg-shared : RCFLAGS = --include-dir=${STLPORT_INCLUDE_DIR} -DCOMP=gcc -DBUILD=stld -DBUILD_INFOS="-g -D_STLP_DEBUG" --output-format coff
 RC_OUTPUT_OPTION = -o $@
 COMPILE.rc = $(RC) $(RCFLAGS)
 endif

@@ -2,34 +2,30 @@
  * Copyright (c) 1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
  * modified is included with the above copyright notice.
  *
- */
+ */ 
 #ifndef _STLP_COMPLEX_C
 #define _STLP_COMPLEX_C
 
-#ifndef _STLP_INTERNAL_COMPLEX
+#ifndef _STLP_INTERNAL_COMPLEX_H
 #  include <stl/_complex.h>
 #endif
 
 #if !defined (_STLP_USE_NO_IOSTREAMS)
-#  ifndef _STLP_INTERNAL_ISTREAM
-#    include <stl/_istream.h>
-#  endif
+#  include <istream>
 
-#  ifndef _STLP_INTERNAL_SSTREAM
-#    include <stl/_sstream.h>
-#  endif
+#  include <sstream>
 
 #  ifndef _STLP_STRING_IO_H
 #    include <stl/_string_io.h>
@@ -85,8 +81,8 @@ void complex<_Tp>::_div(const _Tp& __z1_r,
 // I/O.
 #if !defined (_STLP_USE_NO_IOSTREAMS)
 
-// Complex output, in the form (re,im).  We use a two-step process
-// involving stringstream so that we get the padding right.
+// Complex output, in the form (re,im).  We use a two-step process 
+// involving stringstream so that we get the padding right.  
 template <class _Tp, class _CharT, class _Traits>
 basic_ostream<_CharT, _Traits>& _STLP_CALL
 operator<<(basic_ostream<_CharT, _Traits>& __os, const complex<_Tp>& __z) {

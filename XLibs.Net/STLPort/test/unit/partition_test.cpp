@@ -29,7 +29,7 @@ protected:
   void stblptn1();
 
   struct less_n {
-    less_n(int limit, size_t &nb_calls)
+    less_n(int limit, size_t &nb_calls) 
       : _limit(limit), _nb_calls(nb_calls) {}
 
     bool operator() (int a_) const {
@@ -70,8 +70,8 @@ void PartitionTest::stblptn0()
 }
 void PartitionTest::stblptn1()
 {
-  //5 5 2 10 0 12 5 0 0 19
-  //5 5 2 10 0 5 0 0 12 19
+  //5 5 2 10 0 12 5 0 0 19 
+  //5 5 2 10 0 5 0 0 12 19 
   int numbers[] = { 5, 5, 2, 10, 0, 12, 5, 0, 0, 19 };
   vector <int> v1(numbers, numbers+10);
 
@@ -94,7 +94,7 @@ void PartitionTest::ptition0()
 {
   int numbers[6] = { 6, 12, 3, 10, 1, 20 };
   size_t nb_pred_calls = 0;
-  // 6 1 3 10 12 20
+  // 6 1 3 10 12 20 
   partition((int*)numbers, (int*)numbers + 6, less_n(10, nb_pred_calls));
   CPPUNIT_ASSERT(numbers[0]==6);
   CPPUNIT_ASSERT(numbers[1]==1);
@@ -107,8 +107,8 @@ void PartitionTest::ptition0()
 }
 void PartitionTest::ptition1()
 {
-  // 19 3 11 14 10 19 8 17 9 6
-  // 6 3 9 8 10 19 14 17 11 19
+  // 19 3 11 14 10 19 8 17 9 6 
+  // 6 3 9 8 10 19 14 17 11 19 
 
   int numbers[10] ={ 19, 3, 11, 14, 10, 19, 8, 17, 9, 6 };
 

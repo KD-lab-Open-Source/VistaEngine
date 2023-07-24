@@ -1,6 +1,6 @@
 # -*- makefile -*- Time-stamp: <03/10/17 14:09:57 ptr>
-# $Id: vc70.mak 2403 2006-06-02 20:20:44Z dums $
+# $Id: vc70.mak,v 1.1.2.1 2005/02/19 13:19:47 dums Exp $
 
 
-!include vc-common.mak
+!include $(RULESBASE)/$(USE_MAKE)/lib/vc-common.mak
 

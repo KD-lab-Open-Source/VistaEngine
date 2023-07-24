@@ -192,6 +192,8 @@ GameOptions::GameOptions()
 
 	filterGameOptions();
 	defineGlobalVars();
+
+	loadPresets();
 }
 
 void GameOptions::setTranslate()

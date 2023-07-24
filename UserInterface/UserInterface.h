@@ -22,6 +22,7 @@ public:
 
 	const UI_MessageSetup& messageSetup(int index) const{ return messageSetups_[index]; }
 	const sColor4f& privateMessage() const{ return privateMessage_; }
+	const sColor4f& systemMessage() const{ return systemMessage_; }
 private:
 	/// время отображения чат-чтроки в игре
 	float chatDelay_;
@@ -30,6 +31,8 @@ private:
 	CursorVector cursors_;
 	/// цвет личного сообщения в чате
 	sColor4f privateMessage_;
+	/// Цвет системного сообщения в чате
+	sColor4f systemMessage_;
 
 	typedef std::vector<UI_MessageSetup> MessageSetups;
 	/// предопределённые сообщения, выборка по UI_MessageID
@@ -151,6 +154,7 @@ public:
 	int getNextControlID() { return controlID_++; }
 
 	const char* privateMessageColor() const { return privateMessageColor_; }
+	const char* systemMessageColor() const { return systemMessageColor_; }
 
 	bool isActive(const UI_Screen* scr) const { return scr == currentScreen_ || scr == graphCurrentScreen_; }
 
@@ -196,6 +200,7 @@ private:
 	DurationTimer voiceLockTimer_;
 
 	char privateMessageColor_[8];
+	char systemMessageColor_[8];
 
 	/// Экран, который должен быть выбран следующим, служит для индикации неправильной сборки
 	UI_Screen* preloadedScreen_;

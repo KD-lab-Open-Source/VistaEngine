@@ -2,13 +2,13 @@
  * Copyright (c) 1997-1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
@@ -50,7 +50,7 @@ struct hash<basic_string<_CharT,_Traits,_Alloc> > {
 
 #else
 
-_STLP_TEMPLATE_NULL
+_STLP_TEMPLATE_NULL 
 struct _STLP_CLASS_DECLSPEC hash<string> {
   size_t operator()(const string& __s) const
     { return __stl_string_hash(__s); }

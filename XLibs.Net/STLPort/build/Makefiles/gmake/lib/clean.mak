@@ -1,5 +1,5 @@
 # -*- makefile -*- Time-stamp: <04/03/03 15:34:48 ptr>
-# $Id: clean.mak 2463 2006-06-17 09:33:11Z dums $
+# $Id: clean.mak,v 1.1.2.2 2005/09/19 19:53:48 dums Exp $
 
 ifneq ($(OSNAME),windows)
 clobber::
@@ -59,23 +59,10 @@ clobber::
 	@if exist $(RES_STLDBG) del /f /q $(RES_STLDBG)
 
 distclean::
-	@if exist $(INSTALL_BIN_DIR)/$(SO_NAME) del /f /q $(subst /,\,$(INSTALL_BIN_DIR)/$(SO_NAME))
-	@if exist $(INSTALL_BIN_DIR)/$(SO_NAME_DBG) del /f /q $(subst /,\,$(INSTALL_BIN_DIR)/$(SO_NAME_DBG))
-	@if exist $(INSTALL_BIN_DIR)/$(SO_NAME_STLDBG) del /f /q $(subst /,\,$(INSTALL_BIN_DIR)/$(SO_NAME_STLDBG))
-	@if exist $(INSTALL_LIB_DIR)/$(LIB_NAME) del /f /q $(subst /,\,$(INSTALL_LIB_DIR)/$(LIB_NAME))
-	@if exist $(INSTALL_LIB_DIR_DBG)/$(LIB_NAME_DBG) del /f /q $(subst /,\,$(INSTALL_LIB_DIR_DBG)/$(LIB_NAME_DBG))
-	@if exist $(INSTALL_LIB_DIR_STLDBG)/$(LIB_NAME_STLDBG) del /f /q $(subst /,\,$(INSTALL_LIB_DIR_STLDBG)/$(LIB_NAME_STLDBG))
-	@if exist $(INSTALL_LIB_DIR)/$(A_NAME) del /f /q $(subst /,\,$(INSTALL_LIB_DIR)/$(A_NAME))
-	@if exist $(INSTALL_LIB_DIR_DBG)/$(A_NAME_DBG) del /f /q $(subst /,\,$(INSTALL_LIB_DIR_DBG)/$(A_NAME_DBG))
-	@if exist $(INSTALL_LIB_DIR_STLDBG)/$(A_NAME_STLDBG) del /f /q $(subst /,\,$(INSTALL_LIB_DIR_STLDBG)/$(A_NAME_STLDBG))
-ifeq (bcc, $(COMPILER_NAME))
-#remove STLport bin directories, unless they contains exe
-	@if exist $(INSTALL_BIN_DIR) if not exist $(subst /,\,$(INSTALL_BIN_DIR)/*.EXE) rd /s /q $(subst /,\,$(INSTALL_BIN_DIR))
-	@if exist $(INSTALL_BIN_DIR_DBG) if not exist $(subst /,\,$(INSTALL_BIN_DIR_DBG)/*.EXE) rd /s /q $(subst /,\,$(INSTALL_BIN_DIR_DBG))
-	@if exist $(INSTALL_BIN_DIR_STLDBG) if not exist $(subst /,\,$(INSTALL_BIN_DIR_STLDBG)/*.EXE) rd /s /q $(subst /,\,$(INSTALL_BIN_DIR_STLDBG))
-#remove STLport lib directories
-	@if exist $(INSTALL_LIB_DIR) rd /s /q $(subst /,\,$(INSTALL_LIB_DIR))
-	@if exist $(INSTALL_LIB_DIR_DBG) rd /s /q $(subst /,\,$(INSTALL_LIB_DIR_DBG))
-	@if exist $(INSTALL_LIB_DIR_STLDBG) rd /s /q $(subst /,\,$(INSTALL_LIB_DIR_STLDBG))
-endif
+	@if exist $(INSTALL_LIB_DIR)/$(SO_NAME) del /f /q $(INSTALL_LIB_DIR)/$(SO_NAME)
+	@if exist $(INSTALL_LIB_DIR_DBG)/$(SO_NAME_DBG) del /f /q $(INSTALL_LIB_DIR_DBG)/$(SO_NAME_DBG)
+	@if exist $(INSTALL_LIB_DIR_STLDBG)/$(SO_NAME_STLDBG) del /f /q $(INSTALL_LIB_DIR_STLDBG)/$(SO_NAME_STLDBG)
+	@if exist $(INSTALL_LIB_DIR)/$(A_NAME) del /f /q $(INSTALL_LIB_DIR)/$(A_NAME)
+	@if exist $(INSTALL_LIB_DIR_DBG)/$(A_NAME_DBG) del /f /q $(INSTALL_LIB_DIR_DBG)/$(A_NAME_DBG)
+	@if exist $(INSTALL_LIB_DIR_STLDBG)/$(A_NAME_STLDBG) del /f /q $(INSTALL_LIB_DIR_STLDBG)/$(A_NAME_STLDBG)
 endif

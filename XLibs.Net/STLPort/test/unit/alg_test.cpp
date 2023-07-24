@@ -1,11 +1,8 @@
+#include <slist>
 #include <list>
-#if defined (STLPORT) && !defined (_STLP_NO_EXTENSIONS)
-#  include <slist>
-#endif
 #include <deque>
 #include <vector>
 #include <algorithm>
-#include <functional>
 
 #include "cppunit/cppunit_proxy.h"
 
@@ -23,7 +20,6 @@ class AlgTest : public CPPUNIT_NS::TestCase
   CPPUNIT_TEST(count_test);
   CPPUNIT_TEST(sort_test);
   CPPUNIT_TEST(search_n_test);
-  CPPUNIT_TEST(find_first_of_test);
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -31,7 +27,6 @@ protected:
   void count_test();
   void sort_test();
   void search_n_test();
-  void find_first_of_test();
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(AlgTest);
@@ -42,31 +37,26 @@ CPPUNIT_TEST_SUITE_REGISTRATION(AlgTest);
 void AlgTest::min_max()
 {
   int i = min(4, 7);
-  CPPUNIT_ASSERT( i == 4 );
+  CPPUNIT_ASSERT(i==4);
   char c = max('a', 'z');
-  CPPUNIT_ASSERT( c == 'z' );
-
-#if defined (STLPORT) && !defined (_STLP_NO_EXTENSIONS)
-  c = min('a', 'z', greater<char>());
-  CPPUNIT_ASSERT( c == 'z' );
-  i = max(4, 7, greater<int>());
-  CPPUNIT_ASSERT( i == 4 );
-#endif
+  CPPUNIT_ASSERT(c=='z');
 }
 
 void AlgTest::count_test()
 {
   {
+    int n = 0;
     int i[] = { 1, 4, 2, 8, 2, 2 };
-    int n = count(i, i + 6, 2);
+    n = count(i, i + 6, 2);
     CPPUNIT_ASSERT(n==3);
-#if defined (STLPORT) && !defined (_STLP_NO_ANACHRONISMS)
+#if !defined (_STLP_NO_ANACHRONISMS)
     n = 0;
     count(i, i + 6, 2, n);
     CPPUNIT_ASSERT(n==3);
 #endif
   }
   {
+    int n=0;
     vector<int> i;
     i.push_back(1);
     i.push_back(4);
@@ -74,9 +64,9 @@ void AlgTest::count_test()
     i.push_back(8);
     i.push_back(2);
     i.push_back(2);
-    int n = count(i.begin(), i.end(), 2);
+    n = count(i.begin(), i.end(), 2);
     CPPUNIT_ASSERT(n==3);
-#if defined (STLPORT) && !defined (_STLP_NO_ANACHRONISMS)
+#if !defined (_STLP_NO_ANACHRONISMS)
     n = 0;
     count(i.begin(), i.end(), 2, n);
     CPPUNIT_ASSERT(n==3);
@@ -118,7 +108,6 @@ void AlgTest::search_n_test()
 {
   int ints[] = {0, 1, 2, 3, 3, 4, 4, 4, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5};
 
-#if defined (STLPORT) && !defined (_STLP_NO_EXTENSIONS)
   //search_n
   //Forward iterator
   {
@@ -128,7 +117,6 @@ void AlgTest::search_n_test()
     CPPUNIT_ASSERT( *(slit++) == 2 );
     CPPUNIT_ASSERT( *slit == 2 );
   }
-#endif
 
   //Bidirectionnal iterator
   {
@@ -151,7 +139,6 @@ void AlgTest::search_n_test()
     CPPUNIT_ASSERT( *dit == 4 );
   }
 
-#if defined (STLPORT) && !defined (_STLP_NO_EXTENSIONS)
   //search_n with predicate
   //Forward iterator
   {
@@ -161,7 +148,6 @@ void AlgTest::search_n_test()
     CPPUNIT_ASSERT( *(slit++) > 1 );
     CPPUNIT_ASSERT( *slit > 2 );
   }
-#endif
 
   //Bidirectionnal iterator
   {
@@ -189,75 +175,5 @@ void AlgTest::search_n_test()
     int array[] = {0, 0, 1, 0, 1, 1};
     int* array_end = array + sizeof(array) / sizeof(*array);
     CPPUNIT_ASSERT(search_n(array, array_end, 3, 1) == array_end);
-  }
-
-  // test for bug with counter == 1, reported by Timmie Smith
-  {
-    int array[] = {0, 1, 2, 3, 4, 5};
-    int* array_end = array + sizeof(array) / sizeof(*array);
-    CPPUNIT_ASSERT( search_n(array, array_end, 1, 1, equal_to<int>() ) == &array[1] );
-  }
-}
-
-void AlgTest::find_first_of_test()
-{
-#if defined (STLPORT) && !defined (_STLP_NO_EXTENSIONS)
-  slist<int> intsl;
-  intsl.push_front(1);
-  intsl.push_front(2);
-
-  {
-    vector<int> intv;
-    intv.push_back(0);
-    intv.push_back(1);
-    intv.push_back(2);
-    intv.push_back(3);
-
-    vector<int>::iterator first;
-    first = find_first_of(intv.begin(), intv.end(), intsl.begin(), intsl.end());
-    CPPUNIT_ASSERT( first != intv.end() );
-    CPPUNIT_ASSERT( *first == 1 );
-  }
-  {
-    vector<int> intv;
-    intv.push_back(3);
-    intv.push_back(2);
-    intv.push_back(1);
-    intv.push_back(0);
-
-    vector<int>::iterator first;
-    first = find_first_of(intv.begin(), intv.end(), intsl.begin(), intsl.end());
-    CPPUNIT_ASSERT( first != intv.end() );
-    CPPUNIT_ASSERT( *first == 2 );
-  }
-#endif
-
-  list<int> intl;
-  intl.push_front(1);
-  intl.push_front(2);
-
-  {
-    vector<int> intv;
-    intv.push_back(0);
-    intv.push_back(1);
-    intv.push_back(2);
-    intv.push_back(3);
-
-    vector<int>::iterator first;
-    first = find_first_of(intv.begin(), intv.end(), intl.begin(), intl.end());
-    CPPUNIT_ASSERT( first != intv.end() );
-    CPPUNIT_ASSERT( *first == 1 );
-  }
-  {
-    vector<int> intv;
-    intv.push_back(3);
-    intv.push_back(2);
-    intv.push_back(1);
-    intv.push_back(0);
-
-    vector<int>::iterator first;
-    first = find_first_of(intv.begin(), intv.end(), intl.begin(), intl.end());
-    CPPUNIT_ASSERT( first != intv.end() );
-    CPPUNIT_ASSERT( *first == 2 );
   }
 }

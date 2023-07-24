@@ -1,6 +1,8 @@
 #include "stdAfx.h"
 #undef XREALLOC
 #undef XFREE
+//#include "..\Network\DemonWareAux\Scores.h"
+//#include "..\Network\DemonWareAux\ScoresQueries.h"
 #include "PlayerStatistics.h"
 #include "AttributeReference.h"
 #include "GlobalStatistics.h"

@@ -22,7 +22,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="$(3DSMAX_DIR)\maxsdk\include;$(3DSMAX_DIR)\maxsdk\include\IGame"
+				AdditionalIncludeDirectories="..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\XUtil;..\XLibs.Net\XUtil\XMath;..\XLibs.Net\maxsdk\include;..\XLibs.Net\maxsdk\include\IGame;..\XLibs.Net\XZip"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;_STLP_USE_STATIC_LIB;MAX7;_UTILTVA_"
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"
@@ -39,10 +39,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib core.lib geom.lib gfx.lib mesh.lib maxutil.lib maxscrpt.lib paramblk2.lib msxml2.lib igame.lib"
-				OutputFile="$(3DSMAX_DIR)\plugins\Exporter3dx8.dle"
+				OutputFile="$(OutDir)\plugins\Exporter3dx8.dle"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="$(3DSMAX_DIR)\maxsdk\lib"
+				AdditionalLibraryDirectories="..\XLibs.Net\maxsdk\lib;..\XLibs.Net\XUtil\libs;..\XLibs.Net\XZip;..\XLibs.Net\lib"
 				IgnoreDefaultLibraryNames=""
 				ModuleDefinitionFile=".\IGameExporter.def"
 				GenerateDebugInformation="TRUE"
@@ -64,7 +64,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
 				Culture="1049"
-				AdditionalIncludeDirectories="$(IntDir);$(3DSMAX_DIR)\maxsdk\include"/>
+				AdditionalIncludeDirectories="$(IntDir);..\XLibs.Net\maxsdk\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
@@ -85,7 +85,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="$(3DSMAX_DIR)\maxsdk\include;$(3DSMAX_DIR)\maxsdk\include\IGame"
+				AdditionalIncludeDirectories="..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\XUtil;..\XLibs.Net\XUtil\XMath;..\XLibs.Net\maxsdk\include;..\XLibs.Net\maxsdk\include\IGame;..\XLibs.Net\XZip"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_USRDLL;_STLP_USE_STATIC_LIB;MAX7;_UTILTVA_"
 				RuntimeLibrary="0"
 				TreatWChar_tAsBuiltInType="TRUE"
@@ -99,9 +99,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib core.lib geom.lib gfx.lib mesh.lib maxutil.lib maxscrpt.lib paramblk2.lib msxml2.lib igame.lib"
-				OutputFile="$(3DSMAX_DIR)\plugins\Exporter3dx8.dle"
+				OutputFile="$(OutDir)\plugins\Exporter3dx8.dle"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(3DSMAX_DIR)\maxsdk\lib"
+				AdditionalLibraryDirectories="..\XLibs.Net\maxsdk\lib;..\XLibs.Net\XUtil\libs;..\XLibs.Net\XZip;..\XLibs.Net\lib"
 				ModuleDefinitionFile=".\IGameExporter.def"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
@@ -123,7 +123,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1049"
-				AdditionalIncludeDirectories="$(IntDir);$(3DSMAX_DIR)\maxsdk\include"/>
+				AdditionalIncludeDirectories="$(IntDir);..\XLibs.Net\maxsdk\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
@@ -144,7 +144,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="$(3DSMAX7_DIR)\maxsdk\include;$(3DSMAX7_DIR)\maxsdk\include\IGame"
+				AdditionalIncludeDirectories="..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\XUtil;..\XLibs.Net\XUtil\XMath;..\XLibs.Net\maxsdk\include;..\XLibs.Net\maxsdk\include\IGame;..\XLibs.Net\XZip"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_USRDLL;_STLP_USE_STATIC_LIB;MAX7;_UTILTVA_"
 				RuntimeLibrary="0"
 				TreatWChar_tAsBuiltInType="TRUE"
@@ -158,9 +158,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="odbc32.lib odbccp32.lib comctl32.lib core.lib geom.lib gfx.lib mesh.lib maxutil.lib maxscrpt.lib paramblk2.lib msxml2.lib igame.lib"
-				OutputFile="$(3DSMAX7_DIR)\plugins\Exporter3dx7.dle"
+				OutputFile="$(OutDir)\plugins\Exporter3dx7.dle"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(3DSMAX7_DIR)\maxsdk\lib"
+				AdditionalLibraryDirectories="..\XLibs.Net\maxsdk\lib;..\XLibs.Net\XUtil\libs;..\XLibs.Net\XZip;..\XLibs.Net\lib"
 				ModuleDefinitionFile=".\IGameExporter.def"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
@@ -182,7 +182,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1049"
-				AdditionalIncludeDirectories="$(IntDir);$(3DSMAX_DIR)\maxsdk\include"/>
+				AdditionalIncludeDirectories="$(IntDir);..\XLibs.Net\maxsdk\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool

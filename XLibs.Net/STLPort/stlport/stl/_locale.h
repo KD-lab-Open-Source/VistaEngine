@@ -2,19 +2,19 @@
  * Copyright (c) 1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
  * modified is included with the above copyright notice.
  *
- */
+ */ 
 // WARNING: This is an internal header file, included by other C++
 // standard library headers.  You should not attempt to use this header
 // file directly.
@@ -23,11 +23,11 @@
 #ifndef _STLP_INTERNAL_LOCALE_H
 #define _STLP_INTERNAL_LOCALE_H
 
-#ifndef _STLP_INTERNAL_CSTDLIB
-#  include <stl/_cstdlib.h>
+#ifndef _STLP_CSTDLIB
+#  include <cstdlib>
 #endif
 
-#ifndef _STLP_INTERNAL_CWCHAR
+#ifndef _STLP_CWCHAR_H
 #  include <stl/_cwchar.h>
 #endif
 
@@ -41,56 +41,52 @@
 
 _STLP_BEGIN_NAMESPACE
 
-class _Locale_impl;        // Forward declaration of opaque type.
-class ios_base;
+class _STLP_CLASS_DECLSPEC _Locale_impl;        // Forward declaration of opaque type.
+class _STLP_CLASS_DECLSPEC ios_base;
+
+#if defined (_STLP_USE_MSVC6_MEM_T_BUG_WORKAROUND)
 class locale;
+#  define locale _STLP_NO_MEM_T_NAME(loc)
+class _STLP_CLASS_DECLSPEC locale;
+#else
+class _STLP_CLASS_DECLSPEC locale;
+#endif /* _STLP_USE_MSVC6_MEM_T_BUG_WORKAROUND */
 
 template <class _CharT, class _Traits, class _Alloc>
-bool __locale_do_operator_call (const locale& __loc,
-                                const basic_string<_CharT, _Traits, _Alloc>& __x,
-                                const basic_string<_CharT, _Traits, _Alloc>& __y);
+bool 
+__locale_do_operator_call (const locale* __that, 
+                           const basic_string<_CharT, _Traits, _Alloc>& __x,
+                           const basic_string<_CharT, _Traits, _Alloc>& __y);
 
 _STLP_DECLSPEC _Locale_impl * _STLP_CALL _get_Locale_impl( _Locale_impl *locimpl );
 _STLP_DECLSPEC _Locale_impl * _STLP_CALL _copy_Nameless_Locale_impl( _Locale_impl *locimpl );
 
-template <class _Facet>
-bool _HasFacet(const locale& __loc, const _Facet* __facet) _STLP_NOTHROW;
-
-template <class _Facet>
-_Facet* _UseFacet(const locale& __loc, const _Facet* __facet);
-
-#if defined (_STLP_USE_MSVC6_MEM_T_BUG_WORKAROUND)
-#  define locale _STLP_NO_MEM_T_NAME(loc)
-#endif
-
 class _STLP_CLASS_DECLSPEC locale {
 public:
   // types:
-  class _STLP_CLASS_DECLSPEC facet : protected _Refcount_Base {
+  class _STLP_DECLSPEC facet : protected _Refcount_Base {
   protected:
-    /* Here we filter __init_count user value to 0 or 1 because __init_count is a
-     * size_t instance and _Refcount_Base use __stl_atomic_t instances that might
-     * have lower sizeof and generate roll issues. 1 is enough to keep the facet
-     * alive when required.
-     */
-    explicit facet(size_t __init_count = 0) : _Refcount_Base( __init_count == 0 ? 0 : 1 ) {}
+    explicit facet(size_t __no_del = 0) : _Refcount_Base( __no_del == 0 ? 0 : 1 ), _M_delete(__no_del == 0) {}
     virtual ~facet();
     friend class locale;
     friend class _Locale_impl;
     friend facet * _STLP_CALL _get_facet( facet * );
     friend void _STLP_CALL _release_facet( facet *& );
-
+    
   private:                        // Invalidate assignment and copying.
-    facet(const facet& ) /* : _Refcount_Base(1) {} */;
-    void operator=(const facet&);
+    facet(const facet& ) /* : _Refcount_Base(1), _M_delete(false) {} */;
+    void operator=(const facet&); 
+    
+  private:                        // Data members.
+    const bool _M_delete;
   };
-
-#if defined (__MVS__) || defined (__OS400__)
+  
+#if defined(__MVS__) || defined(__OS400__)
   struct
 #else
   class
 #endif
-  _STLP_CLASS_DECLSPEC id {
+  _STLP_DECLSPEC id {
     friend class locale;
     friend class _Locale_impl;
   public:
@@ -118,12 +114,12 @@ public:
   ;
 
   // construct/copy/destroy:
-  locale() _STLP_NOTHROW;
+  locale();
   locale(const locale&) _STLP_NOTHROW;
   explicit locale(const char *);
   locale(const locale&, const char*, category);
 
-#if defined (_STLP_MEMBER_TEMPLATES) && !defined (_STLP_USE_MSVC6_MEM_T_BUG_WORKAROUND)
+#if defined (_STLP_MEMBER_TEMPLATES) && !defined(_STLP_USE_MSVC6_MEM_T_BUG_WORKAROUND)
   template <class _Facet>
   locale(const locale& __loc, _Facet* __f) {
     if ( __f != 0 ) {
@@ -152,12 +148,16 @@ public:
 #if defined (_STLP_MEMBER_TEMPLATES) && !defined (_STLP_NO_EXPLICIT_FUNCTION_TMPL_ARGS) && \
    !defined(_STLP_USE_MSVC6_MEM_T_BUG_WORKAROUND)
   template <class _Facet>
-  locale combine(const locale& __loc) const {
-    _Facet *__facet = 0;
-    if (!_HasFacet(__loc, __facet))
+  locale combine(const locale& __loc) {
+    facet* __f = __loc._M_get_facet( _Facet::id );
+    if ( __f == 0 )
       _M_throw_runtime_error();
 
-    return locale(*this, _UseFacet(__loc, __facet));
+    locale __result(__loc._M_impl);
+    
+    __result._M_insert(__f, _Facet::id);
+
+    return __result;
   }
 #endif // _STLP_MEMBER_TEMPLATES && !_STLP_NO_EXPLICIT_FUNCTION_TMPL_ARGS
 
@@ -167,16 +167,17 @@ public:
   bool operator==(const locale&) const;
   bool operator!=(const locale&) const;
 
-#if !defined (_STLP_MEMBER_TEMPLATES) || defined (_STLP_INLINE_MEMBER_TEMPLATES) || (defined(__MWERKS__) && __MWERKS__ <= 0x2301)
+#if ! defined ( _STLP_MEMBER_TEMPLATES ) || defined (_STLP_INLINE_MEMBER_TEMPLATES) || (defined(__MWERKS__) && __MWERKS__ <= 0x2301)
   bool operator()(const string& __x, const string& __y) const;
 #  ifndef _STLP_NO_WCHAR_T
   bool operator()(const wstring& __x, const wstring& __y) const;
 #  endif
-#elif !defined (_STLP_USE_MSVC6_MEM_T_BUG_WORKAROUND)
+#else
   template <class _CharT, class _Traits, class _Alloc>
   bool operator()(const basic_string<_CharT, _Traits, _Alloc>& __x,
-                  const basic_string<_CharT, _Traits, _Alloc>& __y) const
-  { return __locale_do_operator_call(*this, __x, __y); }
+                  const basic_string<_CharT, _Traits, _Alloc>& __y) const {
+    return __locale_do_operator_call(this, __x, __y);
+  }              
 #endif
 
   // global locale objects:
@@ -187,7 +188,7 @@ public:
   facet* _M_get_facet(const id&) const;
   // same, but throws
   facet* _M_use_facet(const id&) const;
-  static void _STLP_FUNCTION_THROWS _STLP_CALL _M_throw_runtime_error(const char* = 0);
+  static void _STLP_CALL _M_throw_runtime_error(const char* = 0);
 
 protected:                        // More helper functions.
   void _M_insert(facet* __f, id& __id);
@@ -209,7 +210,7 @@ class locale : public _Locale {
 public:
 
   // construct/copy/destroy:
-  locale() _STLP_NOTHROW {}
+  locale() {}
   locale(const locale& __loc) _STLP_NOTHROW : _Locale(__loc) {}
   explicit locale(const char *__str) : _Locale(__str) {}
   locale(const locale& __loc, const char* __str, category __cat)
@@ -241,22 +242,21 @@ public:
   }
 
   template <class _Facet>
-  locale combine(const locale& __loc) const {
-    _Facet *__facet = 0;
-    if (!_HasFacet(__loc, __facet))
+  locale combine(const locale& __loc) {
+    facet* __f = __loc._M_get_facet( _Facet::id );
+    if ( __f == 0 )
       _M_throw_runtime_error();
 
-    return locale(*this, _UseFacet(__loc, __facet));
+    locale __result(__loc._M_impl);
+    
+    __result._M_insert(__f, _Facet::id);
+
+    return __result;
   }
 
   // locale operations:
   bool operator==(const locale& __loc) const { return _Locale::operator==(__loc); }
   bool operator!=(const locale& __loc) const { return _Locale::operator!=(__loc); }
-
-  template <class _CharT, class _Traits, class _Alloc>
-  bool operator()(const basic_string<_CharT, _Traits, _Alloc>& __x,
-                  const basic_string<_CharT, _Traits, _Alloc>& __y) const
-  { return __locale_do_operator_call(*this, __x, __y); }
 
   // global locale objects:
   static locale _STLP_CALL global(const locale& __loc) {
@@ -273,47 +273,39 @@ public:
 
 #endif /* _STLP_USE_MSVC6_MEM_T_BUG_WORKAROUND */
 
+
 //----------------------------------------------------------------------
 // locale globals
 
-#ifdef _STLP_NO_EXPLICIT_FUNCTION_TMPL_ARGS
+# ifdef _STLP_NO_EXPLICIT_FUNCTION_TMPL_ARGS
 template <class _Facet>
-inline const _Facet&
+inline const _Facet& 
 _Use_facet<_Facet>::operator *() const
-#else
+# else
 template <class _Facet> inline const _Facet& use_facet(const locale& __loc)
-#endif
+# endif
 {
-  _Facet *__facet = 0;
-  return *_UseFacet(__loc, __facet);
+  return *__STATIC_CAST(const _Facet*,__loc._M_use_facet(_Facet::id));
 }
 
-
-#ifdef _STLP_NO_EXPLICIT_FUNCTION_TMPL_ARGS
-template <class _Facet>
+ 
+# ifdef _STLP_NO_EXPLICIT_FUNCTION_TMPL_ARGS
+template <class _Facet> 
 struct has_facet {
   const locale& __loc;
   has_facet(const locale& __p_loc) : __loc(__p_loc) {}
   operator bool() const _STLP_NOTHROW
-#else
-template <class _Facet> inline bool has_facet(const locale& __loc) _STLP_NOTHROW
-#endif
+# else
+template <class _Facet> inline bool has_facet(const locale& __loc) _STLP_NOTHROW 
+# endif
 {
-  _Facet *__facet = 0;
-  return _HasFacet(__loc, __facet);
+  return (__loc._M_get_facet(_Facet::id) != 0);
 }
 
-#ifdef _STLP_NO_EXPLICIT_FUNCTION_TMPL_ARGS
-}; // close class definition
-#endif
-
-template <class _Facet>
-bool _HasFacet(const locale& __loc, const _Facet* __facet) _STLP_NOTHROW
-{ return (__loc._M_get_facet(_Facet::id) != 0); }
-
-template <class _Facet>
-_Facet* _UseFacet(const locale& __loc, const _Facet* __facet)
-{ return __STATIC_CAST(_Facet*, __loc._M_use_facet(_Facet::id)); }
+# ifdef _STLP_NO_EXPLICIT_FUNCTION_TMPL_ARGS
+  // close class definition
+};
+# endif
 
 _STLP_END_NAMESPACE
 

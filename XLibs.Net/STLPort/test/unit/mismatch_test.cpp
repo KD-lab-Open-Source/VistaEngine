@@ -2,7 +2,6 @@
 #include <vector>
 #include <algorithm>
 
-#include "iota.h"
 #include "cppunit/cppunit_proxy.h"
 
 #if !defined (STLPORT) || defined(_STLP_USE_NAMESPACES)
@@ -52,11 +51,11 @@ void MismatchTest::mismatch1()
 {
   typedef vector<int> IntVec;
   IntVec v1(10);
-  __iota(v1.begin(), v1.end(), 0);
-  IntVec v2(v1);
-
+  IntVec v2(v1.size());
+  iota(v1.begin(), v1.end(), 0);
+  iota(v2.begin(), v2.end(), 0);
   pair <IntVec::iterator, IntVec::iterator> result = mismatch(v1.begin(), v1.end(), v2.begin());
-
+  
   CPPUNIT_ASSERT(result.first == v1.end() && result.second == v2.end());
 
   v2[v2.size()/2] = 42;
@@ -67,16 +66,17 @@ void MismatchTest::mismatch1()
 void MismatchTest::mismatch2()
 {
   const unsigned size = 5;
-  char const* n1[size] = { "Brett", "Graham", "Jack", "Mike", "Todd" };
+  char* n1[size] = { "Brett", "Graham", "Jack", "Mike", "Todd" };
 
-  char const* n2[size];
-  copy(n1, n1 + 5, (char const**)n2);
-  pair <char const**, char const**> result = mismatch((char const**)n1, (char const**)n1 + size, (char const**)n2, str_equal);
-
+  char* n2[size];
+  copy(n1, n1 + 5, (char**)n2);
+  pair <char**, char**> result = mismatch((char**)n1, (char**)n1 + size, (char**)n2, str_equal);
+  
   CPPUNIT_ASSERT(result.first == n1 + size && result.second == n2 + size);
 
   n2[2] = "QED";
-  result = mismatch((char const**)n1, (char const**)n1 + size, (char const**)n2, str_equal);
+  result = mismatch((char**)n1, (char**)n1 + size, (char**)n2, str_equal);
   CPPUNIT_ASSERT(!(result.first == n2 + size && result.second == n2 + size));
   CPPUNIT_ASSERT((result.first - n1)==2);
+
 }

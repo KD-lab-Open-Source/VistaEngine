@@ -2,13 +2,13 @@
  * Copyright (c) 1998,1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
@@ -19,7 +19,7 @@
 #ifndef _STLP_LIMITS_C
 #define _STLP_LIMITS_C
 
-#ifndef _STLP_INTERNAL_LIMITS
+#ifndef _STLP_INTERNAL_LIMITS_H
 #  include <stl/_limits.h>
 #endif
 
@@ -29,9 +29,7 @@
 
 _STLP_BEGIN_NAMESPACE
 
-_STLP_MOVE_TO_PRIV_NAMESPACE
-
-#if !defined (_STLP_STATIC_CONST_INIT_BUG)
+#if !defined ( _STLP_STATIC_CONST_INIT_BUG)
 
 #  define __declare_numeric_base_member(__type, __mem, _Init) \
 template <class __number> \
@@ -68,7 +66,7 @@ template <class _Int, _STLP_LIMITS_MIN_TYPE __imin, _STLP_LIMITS_MAX_TYPE __imax
 
 __declare_integer_limits_member(bool, is_specialized, true);
 __declare_integer_limits_member(int, digits, (__idigits < 0) ? \
-          ((int)((sizeof(_Int) * (CHAR_BIT))) - ((__imin == 0) ? 0 : 1)) \
+			    ((int)((sizeof(_Int) * (CHAR_BIT))) - ((__imin == 0) ? 0 : 1)) \
                             : (__idigits) );
 __declare_integer_limits_member(int, digits10, (int)(301UL * digits) /1000);
 __declare_integer_limits_member(bool, is_signed, __imin != 0);
@@ -77,7 +75,6 @@ __declare_integer_limits_member(bool, is_exact, true);
 __declare_integer_limits_member(int, radix, 2);
 __declare_integer_limits_member(bool, is_bounded, true);
 __declare_integer_limits_member(bool, is_modulo, true);
-#  undef __declare_integer_limits_member
 
 #  define __declare_float_limits_member(__type, __mem, _Init) \
 template <class __number,  \
@@ -91,15 +88,15 @@ const __type _Floating_limits< __number, __Digits, __Digits10,    \
          __IsIEC559, __RoundStyle>::\
          __mem
 
-__declare_float_limits_member(bool, is_specialized, true);
-__declare_float_limits_member(int, digits, __Digits);
-__declare_float_limits_member(int, digits10, __Digits10);
-__declare_float_limits_member(bool, is_signed, true);
-__declare_float_limits_member(int, radix, FLT_RADIX);
-__declare_float_limits_member(int, min_exponent, __MinExp);
-__declare_float_limits_member(int, max_exponent, __MaxExp);
-__declare_float_limits_member(int, min_exponent10, __MinExp10);
-__declare_float_limits_member(int, max_exponent10, __MaxExp10);
+__declare_float_limits_member(bool, is_specialized, true);  
+__declare_float_limits_member(int, digits, __Digits);  
+__declare_float_limits_member(int, digits10, __Digits10);  
+__declare_float_limits_member(bool, is_signed, true);  
+__declare_float_limits_member(int, radix, FLT_RADIX);  
+__declare_float_limits_member(int, min_exponent, __MinExp);  
+__declare_float_limits_member(int, max_exponent, __MaxExp);  
+__declare_float_limits_member(int, min_exponent10, __MinExp10);  
+__declare_float_limits_member(int, max_exponent10, __MaxExp10);  
 __declare_float_limits_member(bool, has_infinity, true);
 __declare_float_limits_member(bool, has_quiet_NaN, true);
 __declare_float_limits_member(bool, has_signaling_NaN, true);
@@ -110,15 +107,14 @@ __declare_float_limits_member(bool, is_bounded, true);
 __declare_float_limits_member(bool, traps, true);
 __declare_float_limits_member(bool, tinyness_before, false);
 __declare_float_limits_member(float_round_style, round_style, __RoundStyle);
-#  undef __declare_float_limits_member
 
 #endif /* _STLP_STATIC_CONST_INIT_BUG */
 
 
 #if defined (_STLP_EXPOSE_GLOBALS_IMPLEMENTATION)
 
-#  if defined (_STLP_BIG_ENDIAN)
-#    if defined (__OS400__)
+#  if defined(_STLP_BIG_ENDIAN)
+#    if defined(__OS400__)
 #      define _STLP_FLOAT_INF_REP { 0x7f80, 0 }
 #      define _STLP_FLOAT_QNAN_REP { 0xffc0, 0 }
 #      define _STLP_FLOAT_SNAN_REP { 0xff80, 0 }
@@ -143,7 +139,7 @@ __declare_float_limits_member(float_round_style, round_style, __RoundStyle);
 #  elif defined (_STLP_LITTLE_ENDIAN)
 
 #    if 0 /* defined(_STLP_MSVC) || defined(__linux__) */
-// some IA-32 platform ??
+// some IA-32 platform ?? 
 /*
 #      define _STLP_FLOAT_INF_REP { 0, 0x7f80 }
 #      define _STLP_FLOAT_QNAN_REP { 0, 0xffc0 }
@@ -176,19 +172,15 @@ __declare_float_limits_member(float_round_style, round_style, __RoundStyle);
 #      define _STLP_DOUBLE_INF_REP { 0, 0, 0, 0x7ff0 }
 #      define _STLP_DOUBLE_QNAN_REP { 0, 0, 0, 0x7ff8 }
 #      define _STLP_DOUBLE_SNAN_REP { 0, 0, 0, 0x7ff4 }
-#      if defined (_STLP_MSVC) || defined (__ICL)
-#        define _STLP_LDOUBLE_INF_REP { 0, 0, 0, 0x7FF0, 0 }
-#        define _STLP_LDOUBLE_QNAN_REP { 0, 0, 0, 0xFFF8, 0 }
+#      if defined (_STLP_MSVC) || defined (__ICL) || defined (__BORLANDC__)
+#        define _STLP_LDOUBLE_INF_REP { 0, 0, 0, 0x7FF0, 0 } // ????
+#        define _STLP_LDOUBLE_QNAN_REP { 0, 0, 0, 0xFFF8, 0 } // ????
 #        define _STLP_LDOUBLE_SNAN_REP { 0, 0, 0, 0xFFF8, 0 }
-#      elif defined (__BORLANDC__)
-#        define _STLP_LDOUBLE_INF_REP { 0, 0, 0, 0x8000, 0x7fff }
-#        define _STLP_LDOUBLE_QNAN_REP { 0, 0, 0, 0xc000, 0x7fff }
-#        define _STLP_LDOUBLE_SNAN_REP { 0, 0, 0, 0xa000, 0x7fff }
 #      else
 #        define _STLP_LDOUBLE_INF_REP { 0, 0, 0, 0x8000, 0x7fff, 0 }
 #        define _STLP_LDOUBLE_QNAN_REP { 0, 0, 0, 0xa000, 0x7fff, 0 }
 #        define _STLP_LDOUBLE_SNAN_REP { 0, 0, 0, 0xc000, 0x7fff, 0 }
-#      endif
+#      endif /* _STLP_MSVC || __ICL || __BORLANDC__*/
 #    endif
 #  else
 /* This is an architecture we don't know how to handle. Return some
@@ -210,10 +202,10 @@ obviously wrong values. */
 #    if defined(_STLP_BIG_ENDIAN)
 
 #    elif defined (_STLP_LITTLE_ENDIAN)
-#    else
+#    else 
 
-//This is an architecture we don't know how to handle.  Return some
-//obviously wrong values.
+//This is an architecture we don't know how to handle.  Return some 
+//obviously wrong values. 
 #      define _STLP_FLOAT_INF_REP  { 0, 0 }
 #      define _STLP_FLOAT_QNAN_REP { 0, 0 }
 #      define _STLP_FLOAT_SNAN_REP { 0, 0 }
@@ -244,57 +236,63 @@ union _LD_rep {
 #  endif
 
 template <class __dummy>
-float _STLP_CALL _LimG<__dummy>::get_F_inf() {
+float _LimG<__dummy>::get_F_inf() {
   _F_rep _F_inf = {_STLP_FLOAT_INF_REP};
   return _F_inf.val;
 }
 template <class __dummy>
-float _STLP_CALL _LimG<__dummy>::get_F_qNaN() {
+float _LimG<__dummy>::get_F_qNaN() {
   _F_rep _F_qNaN = {_STLP_FLOAT_QNAN_REP};
   return _F_qNaN.val;
 }
 template <class __dummy>
-float _STLP_CALL _LimG<__dummy>::get_F_sNaN() {
+float _LimG<__dummy>::get_F_sNaN() {
   _F_rep _F_sNaN = {_STLP_FLOAT_SNAN_REP};
   return _F_sNaN.val;
 }
 
 template <class __dummy>
-double _STLP_CALL _LimG<__dummy>::get_D_inf() {
+double _LimG<__dummy>::get_D_inf() {
   _D_rep _D_inf = {_STLP_DOUBLE_INF_REP};
   return _D_inf.val;
 }
 template <class __dummy>
-double _STLP_CALL _LimG<__dummy>::get_D_qNaN() {
+double _LimG<__dummy>::get_D_qNaN() {
   _D_rep _D_qNaN = {_STLP_DOUBLE_QNAN_REP};
   return _D_qNaN.val;
 }
 template <class __dummy>
-double _STLP_CALL _LimG<__dummy>::get_D_sNaN() {
+double _LimG<__dummy>::get_D_sNaN() {
   _D_rep _D_sNaN = {_STLP_DOUBLE_SNAN_REP};
   return _D_sNaN.val;
 }
 
 #  if !defined (_STLP_NO_LONG_DOUBLE)
 template <class __dummy>
-long double _STLP_CALL _LimG<__dummy>::get_LD_inf() {
+long double _LimG<__dummy>::get_LD_inf() {
   _LD_rep _LD_inf = {_STLP_LDOUBLE_INF_REP};
   return _LD_inf.val;
 }
 template <class __dummy>
-long double _STLP_CALL _LimG<__dummy>::get_LD_qNaN() {
+long double _LimG<__dummy>::get_LD_qNaN() {
   _LD_rep _LD_qNaN = {_STLP_LDOUBLE_QNAN_REP};
   return _LD_qNaN.val;
 }
 template <class __dummy>
-long double _STLP_CALL _LimG<__dummy>::get_LD_sNaN() {
+long double _LimG<__dummy>::get_LD_sNaN() {
   _LD_rep _LD_sNaN = {_STLP_LDOUBLE_SNAN_REP};
   return _LD_sNaN.val;
 }
 #  endif /* _STLP_NO_LONG_DOUBLE */
 
 #endif /* _STLP_EXPOSE_GLOBALS_IMPLEMENTATION */
-
+    
+#undef __declare_integer_limits_member
+#undef __declare_float_limits_member
+#undef __HACK_ILIMITS
+#undef __HACK_NOTHING
+#undef __declare_int_members
+#undef __declare_float_members
 #undef _STLP_LIMITS_MIN_TYPE
 #undef _STLP_LIMITS_MAX_TYPE
 
@@ -307,8 +305,6 @@ long double _STLP_CALL _LimG<__dummy>::get_LD_sNaN() {
 #undef _STLP_LDOUBLE_INF_REP
 #undef _STLP_LDOUBLE_QNAN_REP
 #undef _STLP_LDOUBLE_SNAN_REP
-
-_STLP_MOVE_TO_STD_NAMESPACE
 
 _STLP_END_NAMESPACE
 

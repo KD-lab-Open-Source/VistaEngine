@@ -160,7 +160,7 @@ void UnitEnvironmentBuilding::setPose(const Se3f& poseIn, bool initPose)
 
 void UnitEnvironmentBuilding::placeToSecondMap()
 {
-		universe()->secondMap->projectModel(model());
+	universe()->secondMap->projectModel(model());
 }
 
 void UnitEnvironmentBuilding::setModel(const char* name)

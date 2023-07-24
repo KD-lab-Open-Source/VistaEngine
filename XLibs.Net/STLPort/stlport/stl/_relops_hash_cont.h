@@ -5,7 +5,7 @@
 #if defined (_STLP_FUNCTION_TMPL_PARTIAL_ORDER)
 
 _STLP_TEMPLATE_HEADER
-inline void _STLP_CALL
+inline void _STLP_CALL 
 swap(_STLP_TEMPLATE_CONTAINER& __hm1, _STLP_TEMPLATE_CONTAINER& __hm2) {
   __hm1.swap(__hm2);
 }

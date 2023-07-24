@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\zlib"
+				AdditionalIncludeDirectories="..\..\Heap;..\..\STLPort\stlport;..\..\XUtil;..\zlib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -34,6 +34,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/XZipTestDBG.exe"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="..\..\lib;..\..\XUtil\libs"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/XZipTest.pdb"
 				SubSystem="2"
@@ -67,7 +68,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\zlib"
+				AdditionalIncludeDirectories="..\..\Heap;..\..\STLPort\stlport;..\..\XUtil;..\zlib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -80,6 +81,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/XZipTest.exe"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\lib;..\..\XUtil\libs"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"

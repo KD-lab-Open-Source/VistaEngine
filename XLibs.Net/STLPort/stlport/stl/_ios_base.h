@@ -2,36 +2,36 @@
  * Copyright (c) 1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
  * modified is included with the above copyright notice.
  *
- */
+ */ 
 #ifndef _STLP_IOS_BASE_H
 #define _STLP_IOS_BASE_H
 
-#ifndef _STLP_INTERNAL_STDEXCEPT_BASE
-#  include <stl/_stdexcept_base.h>
+#ifndef _STLP_STDEXCEPT
+#include <stdexcept>
 #endif
 
 #ifndef _STLP_UTILITY
-#  include <utility>
+#include <utility>
 #endif
 
 #ifndef _STLP_INTERNAL_LOCALE_H
-#  include <stl/_locale.h>
+#include <stl/_locale.h>
 #endif
 
 #ifndef _STLP_INTERNAL_STRING_H
-#  include <stl/_string.h>
+# include <stl/_string.h>
 #endif
 
 _STLP_BEGIN_NAMESPACE
@@ -47,7 +47,7 @@ _STLP_BEGIN_NAMESPACE
 
 class _STLP_CLASS_DECLSPEC ios_base {
 public:
-
+  
   class _STLP_CLASS_DECLSPEC failure : public __Named_exception {
   public:
     explicit failure(const string&);
@@ -64,12 +64,12 @@ public:
 # endif
 
   // Formatting flags.
-#if defined (_STLP_STATIC_CONST_INIT_BUG)
+# ifdef _STLP_STATIC_CONST_INIT_BUG
   enum  {
-#else
-  // boris : type for all those constants is int
+# else
+  // boris : type for all those constants is int   
   static const int
-#endif
+# endif
     left       = 0x0001,
     right      = 0x0002,
     internal   = 0x0004,
@@ -88,13 +88,13 @@ public:
     adjustfield = left | right | internal,
     basefield   = dec | hex | oct,
     floatfield  = scientific | fixed,
-
+    
     // State flags.
     goodbit = 0x00,
     badbit  = 0x01,
     eofbit  = 0x02,
     failbit = 0x04,
-
+    
     // Openmode flags.
     __default_mode = 0x0, /* implementation detail */
     app    = 0x01,
@@ -103,9 +103,9 @@ public:
     in     = 0x08,
     out    = 0x10,
     trunc  = 0x20,
-
+    
     // Seekdir flags
-
+    
     beg = 0x01,
     cur = 0x02,
     end = 0x04
@@ -197,13 +197,13 @@ protected:                      // The functional protected interface.
   void _M_clear_nothrow(iostate __state) { _M_iostate = __state; }
   iostate _M_get_exception_mask() const { return _M_exception_mask; }
   void _M_set_exception_mask(iostate __mask) { _M_exception_mask = __mask; }
-  void _M_check_exception_mask() {
+  void _M_check_exception_mask() { 
     if (_M_iostate & _M_exception_mask)
-      _M_throw_failure();
+      _M_throw_failure(); 
   }
 
   void _M_invoke_callbacks(event);
-  void _STLP_FUNCTION_THROWS _M_throw_failure();
+  void _M_throw_failure();
 
   ios_base();                   // Default constructor.
 
@@ -211,7 +211,7 @@ protected:                        // Initialization of the I/O system
   static void _STLP_CALL _S_initialize();
   static void _STLP_CALL _S_uninitialize();
   static bool _S_was_synced;
-
+  
 private:                        // Invalidate the copy constructor and
                                 // assignment operator.
   ios_base(const ios_base&);
@@ -255,10 +255,10 @@ public:
 
   // ----------------------------------------------------------------------
   // Nested initializer class.  This is an implementation detail, but it's
-  // prescribed by the standard.  The static initializer object (on
+  // prescribed by the standard.  The static initializer object (on 
   // implementations where such a thing is required) is declared in
   // <iostream>
-
+  
   class _STLP_CLASS_DECLSPEC Init
   {
     public:
@@ -268,6 +268,19 @@ public:
       static long _S_count;
       friend class ios_base;
   };
+
+#if 0
+  // this class is needed to ensure locale initialization w/o <iostream> inclusion
+  class _STLP_CLASS_DECLSPEC _Loc_init {
+  public:
+    _Loc_init();
+    ~_Loc_init();
+  private:
+    friend class locale;
+    static long _S_count;
+    friend class ios_base;
+  };
+#endif
 
   friend class Init;
 
@@ -279,7 +292,7 @@ public:
   typedef seekdir  seek_dir;
   typedef _STLP_STD::streamoff  streamoff;
   typedef _STLP_STD::streampos  streampos;
-# endif
+# endif  
 };
 
 // ----------------------------------------------------------------------
@@ -308,7 +321,7 @@ inline ios_base& _STLP_CALL noshowpoint(ios_base& __s)
 inline ios_base& _STLP_CALL showpos(ios_base& __s)
   { __s.setf(ios_base::showpos); return __s;}
 
-inline ios_base& _STLP_CALL noshowpos(ios_base& __s)
+inline ios_base& _STLP_CALL noshowpos(ios_base& __s) 
   { __s.unsetf(ios_base::showpos); return __s;}
 
 inline ios_base& _STLP_CALL skipws(ios_base& __s)
@@ -344,7 +357,7 @@ inline ios_base& _STLP_CALL right(ios_base& __s)
 inline ios_base& _STLP_CALL dec(ios_base& __s)
   { __s.setf(ios_base::dec, ios_base::basefield); return __s; }
 
-inline ios_base& _STLP_CALL hex(ios_base& __s)
+inline ios_base& _STLP_CALL hex(ios_base& __s) 
   { __s.setf(ios_base::hex, ios_base::basefield); return __s; }
 
 inline ios_base& _STLP_CALL oct(ios_base& __s)

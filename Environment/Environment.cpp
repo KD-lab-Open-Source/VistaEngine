@@ -80,7 +80,7 @@ Environment::Environment(int worldSizeX, int worldSizeY, cScene* scene, cTileMap
 , sourceGrid(vMap.H_SIZE, vMap.V_SIZE)
 
 , fogOfWar_(0)
-, fog_enable_(false)
+, fog_enable_(true)
 , fogTempDisabled_(false)
 
 , sourceOnMouse_(0)
@@ -283,7 +283,7 @@ void Environment::logicQuant()
 		temperature_->LogicQuant();
 		stop_timer(temperature);
 	}
-
+		
 	if(fogOfWar_ && scene_->IsFogOfWarEnabled()){
 		start_timer(fow);
 		fogOfWar_->AnimateLogic();
@@ -872,7 +872,7 @@ STARFORCE_API void Environment::serializeParameters(Archive& ar)
 		SetWaterTechnique();
 	}
 
-	ar.serialize(fog_enable_,"fog_enable","Включить туман");
+	ar.serialize(fog_enable_, "fog_enable", "Включить туман"); // 0 для EXTERNAL @Hallkezz
 
 	ar.serialize(need_alpha_tracking,"need_alpha_tracking","Включить прозрачность объектов");
 	if (environmentTime_)

@@ -9,13 +9,13 @@
  * Copyright (c) 1997
  * Moscow Center for SPARC Technology
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
@@ -37,7 +37,7 @@
 _STLP_BEGIN_NAMESPACE
 
 template <class _ForwardIterator, class _Tp>
-class raw_storage_iterator
+class raw_storage_iterator 
       : public iterator<output_iterator_tag,void,void,void,void>
 {
 protected:
@@ -55,7 +55,7 @@ public:
   raw_storage_iterator<_ForwardIterator, _Tp>& operator=(const _Tp& __element) {
     _Param_Construct(&*_M_iter, __element);
     return *this;
-  }
+  }        
   raw_storage_iterator<_ForwardIterator, _Tp>& operator++() {
     ++_M_iter;
     return *this;

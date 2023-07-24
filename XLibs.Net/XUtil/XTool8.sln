@@ -1,0 +1,31 @@
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XUtil", "XUtil8.vcproj", "{01979DB6-3844-48EE-B8E5-BD650E351948}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		DebugMultithreaded DLL|Win32 = DebugMultithreaded DLL|Win32
+		DebugMultithreaded|Win32 = DebugMultithreaded|Win32
+		Release|Win32 = Release|Win32
+		ReleaseMultithreaded DLL|Win32 = ReleaseMultithreaded DLL|Win32
+		ReleaseMultithreaded|Win32 = ReleaseMultithreaded|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{01979DB6-3844-48EE-B8E5-BD650E351948}.Debug|Win32.ActiveCfg = Debug|Win32
+		{01979DB6-3844-48EE-B8E5-BD650E351948}.Debug|Win32.Build.0 = Debug|Win32
+		{01979DB6-3844-48EE-B8E5-BD650E351948}.DebugMultithreaded DLL|Win32.ActiveCfg = DebugMultithreaded DLL|Win32
+		{01979DB6-3844-48EE-B8E5-BD650E351948}.DebugMultithreaded DLL|Win32.Build.0 = DebugMultithreaded DLL|Win32
+		{01979DB6-3844-48EE-B8E5-BD650E351948}.DebugMultithreaded|Win32.ActiveCfg = DebugMultithreaded|Win32
+		{01979DB6-3844-48EE-B8E5-BD650E351948}.DebugMultithreaded|Win32.Build.0 = DebugMultithreaded|Win32
+		{01979DB6-3844-48EE-B8E5-BD650E351948}.Release|Win32.ActiveCfg = Release|Win32
+		{01979DB6-3844-48EE-B8E5-BD650E351948}.Release|Win32.Build.0 = Release|Win32
+		{01979DB6-3844-48EE-B8E5-BD650E351948}.ReleaseMultithreaded DLL|Win32.ActiveCfg = ReleaseMultithreaded DLL|Win32
+		{01979DB6-3844-48EE-B8E5-BD650E351948}.ReleaseMultithreaded DLL|Win32.Build.0 = ReleaseMultithreaded DLL|Win32
+		{01979DB6-3844-48EE-B8E5-BD650E351948}.ReleaseMultithreaded|Win32.ActiveCfg = ReleaseMultithreaded|Win32
+		{01979DB6-3844-48EE-B8E5-BD650E351948}.ReleaseMultithreaded|Win32.Build.0 = ReleaseMultithreaded|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -2,9 +2,8 @@
 //
 // Version
 //
-#include <windows.h>
 
-#include <stl/_stlport_version.h>
+#include <windows.h>
 
 /* On some evc3/evc4 targets the windows.h doesn't include winver.h or doesn't
  * define needed file version flags, so we redefine them here.
@@ -25,37 +24,26 @@
 #  define VFT2_UNKNOWN   0x00000000L
 #endif
 
+#include <stl/_stlport_version.h>
+
 #define STRINGIZE(X) STRINGIZE_AUX(X)
 #define STRINGIZE_AUX(X) #X
 
-#define VERSION_ID _STLPORT_MAJOR, _STLPORT_MINOR, _STLPORT_PATCHLEVEL, 0
-#if !defined (__BORLANDC__)
-#  define VERSION_STR STRINGIZE(_STLPORT_MAJOR._STLPORT_MINOR._STLPORT_PATCHLEVEL)
-#else
-/* Borland precompiler happen weird character when trying to transform a
- * macro containing 0 in a character string so we use a workaround for this
- * value. We do not check the major version that will never be 0 again.
- */
-#  if (_STLPORT_MINOR == 0)
-#    define _STLP_MINOR "0"
-#  else
-#    define _STLP_MINOR STRINGIZE(_STLPORT_MINOR)
-#  endif
-#  if (_STLPORT_PATCHLEVEL == 0)
-#    define _STLP_PATCH "0"
-#  else
-#    define _STLP_PATCH STRINGIZE(_STLPORT_PATCHLEVEL)
-#  endif
-#  define VERSION_STR STRINGIZE(_STLPORT_MAJOR) "." _STLP_MINOR "." _STLP_PATCH "\0"
-#endif
+#define CONCAT(A, B) CONCAT_AUX(A, B)
+#define CONCAT_AUX(A, B) CONCAT_AUX2(A ## B)
+#define CONCAT_AUX2(X) X
 
-#if defined (__GNUC__)
-#  define LIB_MOTIF "libstlport"
+#define VERSION_ID _STLPORT_MAJOR, _STLPORT_MINOR, _STLPORT_PATCHLEVEL, 0
+#define VERSION_STR STRINGIZE(_STLPORT_MAJOR._STLPORT_MINOR._STLPORT_PATCHLEVEL)
+
+#if !defined (__GNUC__)
+//MSVC rc ressource compiler.
+#  define DLLNAME_STRING2(buildstr) \
+  STRINGIZE(CONCAT(CONCAT(stlport_, CONCAT(buildstr, CONCAT(_STLPORT_MAJOR, _STLPORT_MINOR))), .dll))
 #else
-#  define LIB_MOTIF "stlport"
+//GNU windress ressource compiler.
+#  define DLLNAME_STRING2(buildstr) "stlport_" STRINGIZE(buildstr) STRINGIZE(_STLPORT_MAJOR) STRINGIZE(_STLPORT_MINOR) ".dll"
 #endif
-#define DLLNAME LIB_MOTIF "." STRINGIZE(_STLPORT_MAJOR) "." STRINGIZE(_STLPORT_MINOR) ".dll\0"
-#define DLLNAME2(buildstr) LIB_MOTIF "" STRINGIZE(buildstr) "." STRINGIZE(_STLPORT_MAJOR) "." STRINGIZE(_STLPORT_MINOR) ".dll\0"
 
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION VERSION_ID
@@ -77,15 +65,13 @@ BEGIN
       VALUE "FileVersion", VERSION_STR
       VALUE "InternalName", "STLPORT.DLL\0"
       VALUE "LegalCopyright", "Copyright (C) Boris Fomitchev\0"
-#if !defined (BUILD)
-      VALUE "OriginalFilename", DLLNAME
-#else
-      VALUE "OriginalFilename", DLLNAME2(BUILD)
-#endif
+
+      VALUE "OriginalFilename", DLLNAME_STRING2(BUILD)
+
       VALUE "ProductName", "STLport Standard ANSI C++ Library\0"
       VALUE "ProductVersion", VERSION_STR
-#if defined (BUILD_INFOS)
-      VALUE "SpecialBuild", STRINGIZE(COMP) " " STRINGIZE(BUILD_INFOS) "\0"
+#ifdef BUILD_INFOS
+      VALUE "SpecialBuild", STRINGIZE(COMP) " " STRINGIZE(BUILD_INFOS)
 #endif
     END
   END

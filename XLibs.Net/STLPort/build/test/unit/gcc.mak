@@ -1,16 +1,29 @@
-# -*- Makefile -*- Time-stamp: <05/12/27 10:55:26 ptr>
+# -*- Makefile -*- Time-stamp: <05/12/07 23:37:06 ptr>
 
 SRCROOT := ../..
 COMPILER_NAME := gcc
-#NOT_USE_NOSTDLIB := 1
-#WITHOUT_STLPORT := 1
+
 ALL_TAGS := release-shared stldbg-shared
 STLPORT_DIR := ../../..
 include Makefile.inc
 include ${SRCROOT}/Makefiles/top.mak
 
+DEFS += -D_STLP_NO_CUSTOM_IO
+
 dbg-shared:	DEFS += -D_STLP_DEBUG_UNINITIALIZED 
 stldbg-shared:	DEFS += -D_STLP_DEBUG_UNINITIALIZED 
+
+ifeq ($(OSNAME), cygming)
+release-shared:	DEFS += -D_STLP_USE_DYNAMIC_LIB
+dbg-shared:	DEFS += -D_STLP_USE_DYNAMIC_LIB
+stldbg-shared:	DEFS += -D_STLP_USE_DYNAMIC_LIB
+endif
+
+ifeq ($(OSNAME), windows)
+release-shared:	DEFS += -D_STLP_USE_DYNAMIC_LIB
+dbg-shared:	DEFS += -D_STLP_USE_DYNAMIC_LIB
+stldbg-shared:	DEFS += -D_STLP_USE_DYNAMIC_LIB
+endif
 
 ifdef STLP_BUILD_BOOST_PATH
 INCLUDES += -I${STLP_BUILD_BOOST_PATH}

@@ -27,13 +27,13 @@ __stlp_string_fill(basic_ostream<_CharT, _Traits>& __os,
 
 template <class _CharT, class _Traits, class _Alloc>
 basic_ostream<_CharT, _Traits>& _STLP_CALL
-operator << (basic_ostream<_CharT, _Traits>& __os,
+operator << (basic_ostream<_CharT, _Traits>& __os, 
              const basic_string<_CharT,_Traits,_Alloc>& __s) {
   typedef basic_ostream<_CharT, _Traits> __ostream;
   typedef typename basic_string<_CharT, _Traits, _Alloc>::size_type size_type;
 
   // The hypothesis of this implementation is that size_type is unsigned:
-  _STLP_STATIC_ASSERT(__STATIC_CAST(size_type, -1) > 0)
+  typedef char __static_assert_unsigned_size_type[__STATIC_CAST(size_type, -1) > 0];
 
   typename __ostream::sentry __sentry(__os);
   bool __ok = false;
@@ -48,9 +48,9 @@ operator << (basic_ostream<_CharT, _Traits>& __os,
     const bool __need_pad = (((sizeof(streamsize) > sizeof(size_t)) && (__STATIC_CAST(streamsize, __n) < __w)) ||
                              ((sizeof(streamsize) <= sizeof(size_t)) && (__n < __STATIC_CAST(size_t, __w))));
     streamsize __pad_len = __need_pad ? __w - __n : 0;
-
+    
     if (!__left)
-      __ok = __stlp_string_fill(__os, __buf, __pad_len);
+      __ok = __stlp_string_fill(__os, __buf, __pad_len);    
 
     __ok = __ok && (__buf->sputn(__s.data(), streamsize(__n)) == streamsize(__n));
 
@@ -65,14 +65,14 @@ operator << (basic_ostream<_CharT, _Traits>& __os,
 }
 
 template <class _CharT, class _Traits, class _Alloc>
-basic_istream<_CharT, _Traits>& _STLP_CALL
+basic_istream<_CharT, _Traits>& _STLP_CALL 
 operator >> (basic_istream<_CharT, _Traits>& __is,
              basic_string<_CharT,_Traits, _Alloc>& __s) {
   typedef basic_istream<_CharT, _Traits> __istream;
   typedef typename basic_string<_CharT, _Traits, _Alloc>::size_type size_type;
 
   // The hypothesis of this implementation is that size_type is unsigned:
-  _STLP_STATIC_ASSERT(__STATIC_CAST(size_type, -1) > 0)
+  typedef char __static_assert_unsigned_size_type[__STATIC_CAST(size_type, -1) > 0];
 
   typename __istream::sentry __sentry(__is);
 
@@ -88,10 +88,10 @@ operator >> (basic_istream<_CharT, _Traits>& __is,
     if (__width <= 0)
       __n = __s.max_size();
     /* __width can only overflow size_type if sizeof(streamsize) > sizeof(size_type)
-     * because here we know that __width is positive and the stattic assertion check
+     * because here we know that __width is positive and the stattic assertion check 
      * that size_type is unsigned.
      */
-    else if (sizeof(streamsize) > sizeof(size_type) &&
+    else if (sizeof(streamsize) > sizeof(size_type) && 
              (__width > __STATIC_CAST(streamsize, __s.max_size())))
       __n = 0;
     else {
@@ -117,7 +117,7 @@ operator >> (basic_istream<_CharT, _Traits>& __is,
           __s.push_back(__c);
       }
     }
-
+    
     // If we have read no characters, then set failbit.
     if (__s.empty())
       __is.setstate(__istream::failbit);
@@ -128,8 +128,8 @@ operator >> (basic_istream<_CharT, _Traits>& __is,
   return __is;
 }
 
-template <class _CharT, class _Traits, class _Alloc>
-basic_istream<_CharT, _Traits>& _STLP_CALL
+template <class _CharT, class _Traits, class _Alloc>    
+basic_istream<_CharT, _Traits>& _STLP_CALL 
 getline(basic_istream<_CharT, _Traits>& __is,
         basic_string<_CharT,_Traits,_Alloc>& __s,
         _CharT __delim) {
@@ -150,7 +150,7 @@ getline(basic_istream<_CharT, _Traits>& __is,
       else {
         ++__nread;
         _CharT __c = _Traits::to_char_type(__c1);
-        if (!_Traits::eq(__c, __delim))
+        if (!_Traits::eq(__c, __delim)) 
           __s.push_back(__c);
         else
           break;              // Character is extracted but not appended.

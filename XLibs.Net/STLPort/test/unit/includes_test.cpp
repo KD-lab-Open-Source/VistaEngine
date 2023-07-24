@@ -63,14 +63,14 @@ void IncludesTest::incl1()
 }
 void IncludesTest::incl2()
 {
-  char const* names[] = {  "Todd", "Mike", "Graham", "Jack", "Brett"};
+char* names[] = {  "Todd", "Mike", "Graham", "Jack", "Brett"};
 
   const unsigned nameSize = sizeof(names)/sizeof(names[0]);
-  vector <char const*> v1(nameSize);
+  vector <char*> v1(nameSize);
   for (int i = 0; (size_t)i < v1.size(); ++i) {
     v1[i] = names[i];
   }
-  vector <char const*> v2(2);
+  vector <char*> v2(2);
 
   v2[0] = "foo";
   v2[1] = "bar";

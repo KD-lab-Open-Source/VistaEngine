@@ -24,7 +24,7 @@
 				AdditionalOptions="/GR"
 				Optimization="0"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="..\Render\INC,..\terra,..\util,..\util\Serialization"
+				AdditionalIncludeDirectories="..\XLibs.Net\MSDXSDK_02_06\Include;..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XUtil;..\XLibs.Net\XUtil\CRC;..\Render\INC;..\terra;..\util;..\util\Serialization"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_SURMAP_"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -48,6 +48,7 @@
 				OutputFile=".\Debug/EasyMap.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
+				AdditionalLibraryDirectories="..\XLibs.Net\MSDXSDK_02_06\Lib\x86;..\XLibs.Net\XUtil\libs;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XZip;..\XLibs.Net\lib"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\Debug/EasyMap.pdb"
@@ -94,7 +95,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="..\Render\INC,.,..\terra,..\util,..\util\Serialization"
+				AdditionalIncludeDirectories="..\XLibs.Net\MSDXSDK_02_06\Include;..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XUtil;..\XLibs.Net\XUtil\CRC;.;..\Render\INC;..\terra;..\util;..\util\Serialization"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_SURMAP_"
 				StringPooling="TRUE"
 				ExceptionHandling="FALSE"
@@ -116,6 +117,7 @@
 				OutputFile=".\Release/EasyMap.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
+				AdditionalLibraryDirectories="..\XLibs.Net\MSDXSDK_02_06\Lib\x86;..\XLibs.Net\XUtil\libs;..\XLibs.Net\Profiler\Profiler;..\XLibs.Net\XZip;..\XLibs.Net\lib"
 				IgnoreDefaultLibraryNames="libcp.lib,libc.lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\Release/EasyMap.pdb"
@@ -303,6 +305,9 @@
 		</File>
 		<File
 			RelativePath="StdAfx.h">
+		</File>
+		<File
+			RelativePath="..\Ht\StreamInterpolation.cpp">
 		</File>
 		<File
 			RelativePath="..\Util\xmath.h">

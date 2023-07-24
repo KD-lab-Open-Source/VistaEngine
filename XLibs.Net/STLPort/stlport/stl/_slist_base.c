@@ -10,13 +10,13 @@
  * Copyright (c) 1997
  * Moscow Center for SPARC Technology
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
@@ -27,7 +27,7 @@
 #define _STLP_SLIST_BASE_C
 
 #ifndef _STLP_INTERNAL_SLIST_BASE_H
-#  include <stl/_slist_base.h>
+# include <stl/_slist_base.h>
 #endif
 
 _STLP_BEGIN_NAMESPACE
@@ -84,7 +84,7 @@ _Sl_global<_Dummy>::__reverse(_Slist_node_base* __node) {
   return __result;
 }
 
-template <class _Dummy>
+template <class _Dummy> 
 size_t _STLP_CALL
 _Sl_global<_Dummy>::size(_Slist_node_base* __node) {
   size_t __result = 0;

@@ -19,6 +19,7 @@
 #include "MiniMapWindow.h"
 
 #include "DlgSelectWorld.h"
+#include "DlgExImWorld.h"
 #include "DlgChangeTotalWorldHeight.h"
 
 #include "LibraryEditorWindow.h"
@@ -57,13 +58,20 @@
 
 #include "..\Terra\vmap4vi.h"
 
-#include "ExcelImEx.h"
 #include "..\Util\TextDB.h"
 
-#include "..\ExcelExport\ExcelExporter.h"
-#include "ParameterImportExportExcel.h"
-#include "ParameterStatisticsExport.h"
-#include "ParameterTree.h"
+#include "GlobalAttributes.h"
+#ifndef _VISTA_ENGINE_EXTERNAL_
+# include "ExcelImEx.h"
+# include "..\ExcelExport\ExcelExporter.h"
+# include "ParameterImportExportExcel.h"
+# include "ParameterStatisticsExport.h"
+# include "ParameterTree.h"
+#else
+# include "..\Render\Src\Grass.h"
+# include "..\Environment\Anchor.h"
+#endif
+
 #include "..\Util\Console.h"
 #include "..\Util\ZipConfig.h"
 #include "OutputProgressDlg.h"
@@ -144,6 +152,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_FILE_RUN_MENU, OnUpdateIsWorldLoaded)
 	ON_UPDATE_COMMAND_UI(ID_FILE_RUN_WORLD, OnUpdateIsWorldLoaded)
 
+	ON_COMMAND(ID_FILE_EXIMWORLD, OnFileExportImportWorld)
 	ON_COMMAND(ID_FILE_IMPORTTEXTFROMEXCEL, OnFileImportTextFromExcel)
 	ON_COMMAND(ID_FILE_EXPORTTEXTTOEXCEL, OnFileExportTextToExcel)
 
@@ -151,8 +160,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_FILE_PARAMETERS_IMPORT_BY_GROUPS, OnFileParametersImportByGroups)
 	ON_COMMAND(ID_FILE_PARAMETERS_IMPORT_UNITS, OnFileParametersImportUnits)
 
-	ON_COMMAND(ID_FILE_PARAMETERS_EXPORT_FULL, OnFileParametersImportFull)
-	ON_COMMAND(ID_FILE_PARAMETERS_EXPORT_BY_GROUPS, OnFileParametersImportByGroups)
+	ON_COMMAND(ID_FILE_PARAMETERS_EXPORT_FULL, OnFileParametersExportFull)
+	ON_COMMAND(ID_FILE_PARAMETERS_EXPORT_BY_GROUPS, OnFileParametersExportByGroups)
 	ON_COMMAND(ID_FILE_PARAMETERS_EXPORT_UNITS, OnFileParametersExportUnits)
 	ON_COMMAND(ID_FILE_PARAMETERS_EXPORT_STATISTICS, OnFileParametersExportStatistics)
 
@@ -733,7 +742,11 @@ struct MapScenarioSerialization {
 			environment->serializeParameters(ar);
 		
 		ar.serialize(players_, "players", "Игроки");
+#ifdef _VISTA_ENGINE_EXTERNAL_
+		ar.serialize(worldTriggers_, "worldTriggers", 0);
+#else
 		ar.serialize(worldTriggers_, "worldTriggers", "Триггера для мира");
+#endif
 	}
 };
 
@@ -770,8 +783,10 @@ void CMainFrame::OnEditMapScenario()
 
 	CAttribEditorDlg dlg;
 	if(dlg.edit(serializeable, GetSafeHwnd(), treeControlSetup, TRANSLATE("Сохранить"), TRANSLATE("Закрыть"))){ 
+#ifndef _VISTA_ENGINE_EXTERNAL_
 		GlobalAttributes::instance().saveLibrary();
 		TextIdMap::instance().saveLibrary();
+#endif
 	}
 
 	eventObjectChanged().emit();
@@ -822,6 +837,7 @@ void CMainFrame::OnDebugEditZipConfig()
 
 void CMainFrame::editLibrary(const char* libraryName)
 {
+#ifndef _VISTA_ENGINE_EXTERNAL_
     CLibraryEditorWindow libraryEditor(this);
 
 	const char* configFileName = "Scripts\\TreeControlSetups\\LibraryEditorSetup";
@@ -841,6 +857,9 @@ void CMainFrame::editLibrary(const char* libraryName)
 	}
 
 	toolsWindow_->rebuildTools();
+#else
+	::MessageBox(0, "Warning: saveAllLibraries", "warning", MB_OK);
+#endif
 }
 
 void CMainFrame::OnEditUnits()
@@ -911,6 +930,7 @@ void CMainFrame::OnFileNew()
 
 			vMap.create(dlgCW.m_strWorldName);
 			view_->reInitWorld();
+
 			Invalidate(FALSE);
 			put2TitleNameDirWorld();
 			toolsWindow_->rebuildTools();
@@ -920,16 +940,37 @@ void CMainFrame::OnFileNew()
 	Invalidate(FALSE);
 }
 
+
 void CMainFrame::OnFileOpen()
 {
 	CWaitCursor wait;
 
 	CDlgSelectWorld dlgSW(vMap.getWorldsDir(), TRANSLATE("Выбор мира для загрузки"), false);
 	int nRet=dlgSW.DoModal();
-	if( nRet==IDOK ) {
-		XBuffer patch2worlddata;
-		patch2worlddata< vMap.getWorldsDir() < "\\" < dlgSW.selectWorldName.c_str() < "\\" < vrtMap::worldDataFile;
-		if( (!dlgSW.selectWorldName.empty()) && (testExistingFile(patch2worlddata)) ){
+	if(nRet == IDOK){
+		XBuffer worldDataPath;
+		worldDataPath < vMap.getWorldsDir() < "\\" < dlgSW.selectWorldName.c_str() < "\\" < vrtMap::worldDataFile;
+
+		if(!dlgSW.selectWorldName.empty() && testExistingFile(worldDataPath)){
+#ifdef _VISTA_ENGINE_EXTERNAL_
+			XBuffer cacheTgaPath;
+			cacheTgaPath < vMap.getWorldsDir() < "\\" < dlgSW.selectWorldName.c_str() < "\\cache.tga";
+
+			if(!testExistingFile(cacheTgaPath)){
+				wait.Restore();
+				MessageBox(TRANSLATE("Этот мир был эспортирован только для игры на нем, вы не можете его отредактировать!"), 0, MB_ICONEXCLAMATION | MB_OK);
+				return;
+			}
+			else{
+				view_->createScene();
+				vMap.load(dlgSW.selectWorldName.c_str(), true);
+				view_->reInitWorld();
+				GlobalAttributes::instance().loadLibrary();
+				put2TitleNameDirWorld();
+				Invalidate(FALSE);
+				wait.Restore();
+			}
+#else
 			view_->createScene();
 			vMap.load(dlgSW.selectWorldName.c_str(), true);
 			view_->reInitWorld();
@@ -937,17 +978,32 @@ void CMainFrame::OnFileOpen()
 			put2TitleNameDirWorld();
 			Invalidate(FALSE);
 			wait.Restore();
+#endif
 		}
 		else{
 			wait.Restore();
 			XBuffer str;
-			str < "World: " < dlgSW.selectWorldName.c_str() < "  is empty";
-			AfxMessageBox(str);
-		}
+			str < TRANSLATE("Следующий мир поврежден: ");
+			str < dlgSW.selectWorldName.c_str();
+			MessageBox(str, 0, MB_OK | MB_ICONERROR);
 
+		}
+		eventMaster().eventObjectChanged().emit();
+		toolsWindow_->rebuildTools();
 	}
-	eventMaster().eventObjectChanged().emit();
-	toolsWindow_->rebuildTools();
+}
+
+void CMainFrame::OnFileExportImportWorld()
+{
+	CWaitCursor wait;
+
+#ifdef _VISTA_ENGINE_EXTERNAL_
+	CDlgExImWorld dlgSW(vMap.getWorldsDir(), TRANSLATE("Экспорт/Импорт миров"), false);
+#else
+	CDlgExImWorld dlgSW(vMap.getWorldsDir(), "Export/Import Worlds", false);
+#endif
+
+	int nRet=dlgSW.DoModal();
 }
 
 void CMainFrame::OnFileSave()
@@ -962,8 +1018,10 @@ void CMainFrame::OnFileSave()
 
 void CMainFrame::OnFileSaveVoiceFileDurations()
 {
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	UI_TextLibrary::instance().saveLibrary();
 	VoiceAttribute::VoiceFile::saveVoiceFileDurations();
+#endif
 }
 
 void CMainFrame::OnFileSavewithouttertoolcolor()
@@ -985,11 +1043,35 @@ void CMainFrame::save(const char* worldName, bool flag_useTerToolColor)
 	vMap.save(worldName, idxColorCnt);
 	vMap.saveMiniMap(128, 128);
 	view_->currentMission().setByWorldName(worldName);
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	GlobalAttributes::instance().saveLibrary();
-
+#endif
 	XPrmOArchive oa(view_->currentMission().saveName());
+#ifdef _VISTA_ENGINE_EXTERNAL_
+	view_->currentMission().setBattle(true);
+	view_->currentMission().is_fog_of_war = true;
+#endif
 	universe()->universalSave(view_->currentMission(), false, oa);
-
+#ifdef _VISTA_ENGINE_EXTERNAL_
+	if(environment){
+		environment->setFogEnabled(true);
+		bool gotStartPoint = false;
+		Environment::Anchors& anchors = environment->anchors();
+		Environment::Anchors::iterator it;
+		FOR_EACH(anchors, it){
+			if((*it)->type () == Anchor::START_LOCATION){
+				gotStartPoint = true;
+				break;
+			}
+		}
+		if(!gotStartPoint){
+			MessageBox(TRANSLATE("Ни для одного из игроков не установлена стартовая точка (Инструмент: Зоны\\Стартовая точка).\nСтартовая точка дает начальный комплект юнитов."), 0, MB_OK | MB_ICONINFORMATION);
+		}
+	}
+#else
+	if(view_->currentMission().isBattle())
+        qsWorldsMgr.updateQSWorld(view_->currentMission().saveName(), XGUID(view_->currentMission().missionGUID()));
+#endif
 	eventWorldChanged_.emit();
 }
 
@@ -1377,7 +1459,14 @@ void CMainFrame::OnFileRunWorld()
 	ShowWindow (SW_HIDE);
 	Sleep (200);
 
-	int result = _spawnl (_P_WAIT /*_P_NOWAIT*/, GAME_EXE_PATH, GAME_EXE_PATH, "openResource\\Worlds\\TMP.spg", NULL);
+	int result = 0;
+	if(view_->currentMission().isBattle()){
+		int result = _spawnl (_P_WAIT /*_P_NOWAIT*/, GAME_EXE_PATH, GAME_EXE_PATH, "-battle", "openResource\\Worlds\\TMP.spg", NULL);
+	}
+	else {
+		int result = _spawnl (_P_WAIT /*_P_NOWAIT*/, GAME_EXE_PATH, GAME_EXE_PATH, "openResource\\Worlds\\TMP.spg", NULL);
+	}
+
 	if (result < 0)
 	{
         CString message (TRANSLATE("Не могу запустить игру!"));
@@ -1470,13 +1559,15 @@ void CMainFrame::OnEditPreferences ()
 
 void CMainFrame::OnFileRunMenu()
 {
+	if(vMap.isWorldLoaded())
+		OnFileSave();
 	bool flag_animation = static_cast<CSurMap5App*>(AfxGetApp ())->flag_animation;
 	static_cast<CSurMap5App*>(AfxGetApp ())->flag_animation = false;
 
 	ShowWindow (SW_HIDE);
 	Sleep (200);
 
-	int result = _spawnl (_P_WAIT, GAME_EXE_PATH, GAME_EXE_PATH, "-mainmenu", NULL);
+	int result = _spawnl (_P_WAIT, GAME_EXE_PATH, GAME_EXE_PATH, NULL);
 	if (result < 0)	{
 		CString message (TRANSLATE ("Не могу запустить игру!"));
 		MessageBox (message, 0, MB_OK | MB_ICONERROR);
@@ -1488,6 +1579,7 @@ void CMainFrame::OnFileRunMenu()
 
 void CMainFrame::OnFileParametersExportStatistics()
 {
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	CFileDialog fileDlg (FALSE, "*.xls", 0,
 						 OFN_LONGNAMES|OFN_HIDEREADONLY|OFN_NOCHANGEDIR|OFN_OVERWRITEPROMPT,
 						 "(*.xls)|*.xls||", 0);
@@ -1500,10 +1592,12 @@ void CMainFrame::OnFileParametersExportStatistics()
 		ParameterStatisticsExport exporter;
 		exporter.exportExcel(path);
 	}
+#endif
 }
 
 void CMainFrame::OnFileParametersExportUnits()
 {
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	CFileDialog fileDlg (FALSE, "*.xls", 0,
 						 OFN_LONGNAMES|OFN_HIDEREADONLY|OFN_NOCHANGEDIR|OFN_OVERWRITEPROMPT,
 						 "(*.xls)|*.xls||", 0);
@@ -1516,16 +1610,20 @@ void CMainFrame::OnFileParametersExportUnits()
 		ParameterTree::Exporter exporter;
 		exporter.exportExcel(path);
 	}
+#endif
 }
 
 void askForSaveAllLibraries()
 {
+#ifndef _VISTA_ENGINE_EXTERNAL
 	if(AfxMessageBox(TRANSLATE("Сохранить библиотеки?\n(если нет - это нужно будет сделать вручную)"), MB_YESNO | MB_ICONQUESTION) == IDYES)
 		saveAllLibraries();
+#endif
 }
 
 void CMainFrame::OnFileParametersImportUnits()
 {
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	CFileDialog fileDlg (TRUE, "*.xls", 0,
 						 OFN_LONGNAMES|OFN_HIDEREADONLY|OFN_NOCHANGEDIR|OFN_FILEMUSTEXIST,
 						 "(*.xls)|*.xls||", this);
@@ -1540,13 +1638,10 @@ void CMainFrame::OnFileParametersImportUnits()
 			ParameterTree::Exporter exporter;
 			exporter.importExcel(path);
 
-#ifndef _VISTA_ENGINE_EXTERNAL_
 			askForSaveAllLibraries();
-#else
-			saveAllLibraries();
-#endif
 		}
 	}
+#endif
 }
 
 void CMainFrame::OnDebugSaveDictionary()
@@ -1651,12 +1746,14 @@ void CMainFrame::OnUpdateDebugShowpalettetexture(CCmdUI *pCmdUI)
 
 void CMainFrame::OnEditHeads()
 {
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	EditArchive ea(0, TreeControlSetup(0, 0, 200, 200, "Scripts\\TreeControlSetups\\heads"));
 	GlobalAttributes::instance().serializeHeadLibrary(static_cast<EditOArchive&>(ea));
 	if(ea.edit()){
 		GlobalAttributes::instance().serializeHeadLibrary(static_cast<EditIArchive&>(ea));
 		::saveAllLibraries();
 	}
+#endif
 }
 
 void CMainFrame::OnEditSoundTracks()
@@ -1780,11 +1877,13 @@ void CMainFrame::OnEditCursors()
 
 void CMainFrame::OnEditFormations()
 {
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	CFormationsEditorDlg dlg;
 	dlg.DoModal ();
 
 	UnitFormationTypes::instance().saveLibrary();
 	FormationPatterns::instance().saveLibrary();
+#endif
 }
 
 void CMainFrame::OnDebugEditDebugPrm()
@@ -1891,6 +1990,7 @@ void CMainFrame::OnUpdateIsWorldLoaded(CCmdUI *cmdUI)
 
 void CMainFrame::OnFileImportTextFromExcel()
 {
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	CFileDialog fileDlg (TRUE, "*.xls", 0,
 						 OFN_LONGNAMES|OFN_HIDEREADONLY|OFN_NOCHANGEDIR|OFN_FILEMUSTEXIST,
 						 "(*.xls)|*.xls||", this);
@@ -1906,10 +2006,12 @@ void CMainFrame::OnFileImportTextFromExcel()
 	}
 	else 
 		return;	
+#endif
 }
 
 void CMainFrame::OnFileExportTextToExcel()
 {
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	CFileDialog fileDlg (FALSE, "*.xls", 0,
 						 OFN_LONGNAMES|OFN_HIDEREADONLY|OFN_NOCHANGEDIR|OFN_OVERWRITEPROMPT,
 						 "(*.xls)|*.xls||", this);
@@ -1936,6 +2038,7 @@ void CMainFrame::OnFileExportTextToExcel()
 	}
 	else
 		return;
+#endif
 }
 
 void CMainFrame::reloadLocStrings()
@@ -2019,6 +2122,7 @@ void CMainFrame::OnLibrariesUIMessageTypes()
 
 void exportParametersByGroups()
 {
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	CFileDialog fileDlg (FALSE, "*.xls", 0,
 						 OFN_LONGNAMES|OFN_HIDEREADONLY|OFN_NOCHANGEDIR|OFN_OVERWRITEPROMPT,
 						 "(*.xls)|*.xls||", 0);
@@ -2033,12 +2137,12 @@ void exportParametersByGroups()
 		excl_.exportParameters();
 		
 	}
-	else
-		return;
+#endif
 }
 
 void importParametersByGroups()
 {
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	CFileDialog fileDlg (TRUE, "*.xls", 0,
 						 OFN_LONGNAMES|OFN_HIDEREADONLY|OFN_NOCHANGEDIR,
 						 "(*.xls)|*.xls||", 0);
@@ -2055,23 +2159,22 @@ void importParametersByGroups()
 
 		excl_.importParameters();
 	}
-
+#endif
 }
-
 
 void CMainFrame::OnImportParameters()
 {
-	importParametersByGroups();
 #ifndef _VISTA_ENGINE_EXTERNAL_
+	importParametersByGroups();
 	askForSaveAllLibraries();
-#else
-	saveAllLibraries();
 #endif
 }
 
 void CMainFrame::OnExportParameters()
 {
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	exportParametersByGroups();
+#endif
 }
 
 void CMainFrame::OnEditUpdateSurface()
@@ -2088,6 +2191,7 @@ CMainFrame& mainFrame()
 
 void CMainFrame::OnFileParametersImportFull()
 {
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	CFileDialog fileDlg (TRUE, "*.xls", 0,
 						 OFN_LONGNAMES|OFN_HIDEREADONLY|OFN_NOCHANGEDIR,
 						 "(*.xls)|*.xls||", this);
@@ -2131,27 +2235,23 @@ void CMainFrame::OnFileParametersImportFull()
         }
         importer->free();
 
-#ifndef _VISTA_ENGINE_EXTERNAL_
 		askForSaveAllLibraries();
-#else
-		saveAllLibraries();
-#endif
 	} else {
 	}
+#endif
 }
 
 void CMainFrame::OnFileParametersImportByGroups()
 {
-	::importParametersByGroups();
 #ifndef _VISTA_ENGINE_EXTERNAL_
+	::importParametersByGroups();
 	askForSaveAllLibraries();
-#else
-	saveAllLibraries();
 #endif
 }
 
 void CMainFrame::OnFileParametersExportFull()
 {
+#ifndef _VISTA_ENGINE_EXTERNAL_
 	CFileDialog fileDlg (FALSE, "*.xls", 0,
 						 OFN_LONGNAMES|OFN_HIDEREADONLY|OFN_NOCHANGEDIR|OFN_OVERWRITEPROMPT,
 						 "(*.xls)|*.xls||", this);
@@ -2212,7 +2312,7 @@ void CMainFrame::OnFileParametersExportFull()
 	} else {
 		return;
 	}
-
+#endif
 }
 
 void CMainFrame::OnFileParametersExportByGroups()

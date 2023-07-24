@@ -31,41 +31,31 @@
 #ifndef _STLP_HASH_FUN_H
 #define _STLP_HASH_FUN_H
 
-#ifndef _STLP_INTERNAL_CSTDDEF
-#  include <stl/_cstddef.h>
-#endif
+# ifndef _STLP_CSTDDEF
+#  include <cstddef>
+# endif
 
 _STLP_BEGIN_NAMESPACE
 
 template <class _Key> struct hash { };
 
-_STLP_MOVE_TO_PRIV_NAMESPACE
-
 inline size_t __stl_hash_string(const char* __s) {
   _STLP_FIX_LITERAL_BUG(__s)
-  unsigned long __h = 0;
+  unsigned long __h = 0; 
   for ( ; *__s; ++__s)
     __h = 5*__h + *__s;
-
+  
   return size_t(__h);
 }
 
-_STLP_MOVE_TO_STD_NAMESPACE
-
-_STLP_TEMPLATE_NULL
-struct hash<char*> {
-  size_t operator()(const char* __s) const {
-    _STLP_FIX_LITERAL_BUG(__s)
-    return _STLP_PRIV __stl_hash_string(__s);
-  }
+_STLP_TEMPLATE_NULL struct hash<char*> {
+  size_t operator()(const char* __s) const 
+  { _STLP_FIX_LITERAL_BUG(__s) return __stl_hash_string(__s); }
 };
 
-_STLP_TEMPLATE_NULL
-struct hash<const char*> {
-  size_t operator()(const char* __s) const {
-    _STLP_FIX_LITERAL_BUG(__s)
-    return _STLP_PRIV __stl_hash_string(__s);
-  }
+_STLP_TEMPLATE_NULL struct hash<const char*> {
+  size_t operator()(const char* __s) const 
+  { _STLP_FIX_LITERAL_BUG(__s) return __stl_hash_string(__s); }
 };
 
 _STLP_TEMPLATE_NULL struct hash<char> {

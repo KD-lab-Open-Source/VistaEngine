@@ -9,10 +9,10 @@
 #endif
 
 /* If the platform provides any specific epilog actions,
- * like #pragmas, do include platform-specific prolog file
+ * like #pragmas, do include platform-specific prolog file 
  */
 #if defined (_STLP_HAS_SPECIFIC_PROLOG_EPILOG)
-#  include <stl/config/_epilog.h>
+#  include <config/_epilog.h>
 #endif
 
 #if !defined (_STLP_NO_POST_COMPATIBLE_SECTION)
@@ -22,11 +22,11 @@
 #if defined (_STLP_USE_OWN_NAMESPACE)
 
 #  if !defined (_STLP_DONT_REDEFINE_STD)
-/*  We redefine "std" to STLPORT, so that user code may use std:: transparently
+/*  We redefine "std" to STLPORT, so that user code may use std:: transparently 
  *  The STLPORT macro contains the STLport namespace name containing all the std
  *  stuff.
  */
-#    if defined (std)
+#    ifdef std
 /*
  * Looks like the compiler native library on which STLport rely defined the std macro.
  * This might introduce major incompatibility so report the problem to the STLport

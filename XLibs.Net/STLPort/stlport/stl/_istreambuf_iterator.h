@@ -2,19 +2,19 @@
  * Copyright (c) 1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
  * modified is included with the above copyright notice.
  *
- */
+ */ 
 // WARNING: This is an internal header file, included by other C++
 // standard library headers.  You should not attempt to use this header
 // file directly.
@@ -37,12 +37,12 @@ _STLP_BEGIN_NAMESPACE
 template <class _CharT, class _Traits>
 extern basic_streambuf<_CharT, _Traits>* _STLP_CALL _M_get_istreambuf(basic_istream<_CharT, _Traits>& ) ;
 
-// We do not read any characters until operator* is called. operator* calls sgetc
+// We do not read any characters until operator* is called. operator* calls sgetc 
 // unless the iterator is unchanged from the last call in which case a cached value is
 // used. Calls to operator++ use sbumpc.
 
 template<class _CharT, class _Traits>
-class istreambuf_iterator :
+class istreambuf_iterator : 
   public iterator<input_iterator_tag, _CharT, typename _Traits::off_type, _CharT*, _CharT&>
 {
 public:
@@ -76,7 +76,7 @@ public:
     if (this->_M_buf)
       this->_M_getc();
     if (__i._M_buf)
-      __i._M_getc();
+      __i._M_getc(); 
     return this->_M_eof == __i._M_eof;
   }
 
@@ -112,7 +112,7 @@ private:
 };
 
 template<class _CharT, class _Traits>
-inline istreambuf_iterator<_CharT, _Traits>::istreambuf_iterator(basic_istream<_CharT, _Traits>& __is)
+inline istreambuf_iterator<_CharT, _Traits>::istreambuf_iterator(basic_istream<_CharT, _Traits>& __is) 
 { this->_M_init(_M_get_istreambuf(__is)); }
 
 template<class _CharT, class _Traits>
@@ -142,7 +142,7 @@ _STLP_EXPORT_TEMPLATE_CLASS istreambuf_iterator<wchar_t, char_traits<wchar_t> >;
 template <class _CharT, class _Traits>
 inline input_iterator_tag _STLP_CALL iterator_category(const istreambuf_iterator<_CharT, _Traits>&) { return input_iterator_tag(); }
 template <class _CharT, class _Traits>
-inline streamoff* _STLP_CALL
+inline streamoff* _STLP_CALL 
 distance_type(const istreambuf_iterator<_CharT, _Traits>&) { return (streamoff*)0; }
 template <class _CharT, class _Traits>
 inline _CharT* _STLP_CALL value_type(const istreambuf_iterator<_CharT, _Traits>&) { return (_CharT*)0; }

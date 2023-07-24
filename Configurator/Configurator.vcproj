@@ -20,7 +20,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(ProjectDir)..\Util;$(ProjectDir)..\Util\Serialization;$(ProjectDir)..\Render\inc"
+				AdditionalIncludeDirectories="..\XLibs.Net\MSDXSDK_02_06\Include;..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\XUtil;&quot;$(ProjectDir)..\Util&quot;;&quot;$(ProjectDir)..\Util\Serialization&quot;;&quot;$(ProjectDir)..\Render\inc&quot;;..\XLibs.Net\XZip"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;EXPORT_ATTRIB_EDITOR"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -36,9 +36,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="d3d9.lib"
+				AdditionalDependencies="d3d9.lib xtreelistctrlvc71_st_mt_d.lib"
 				OutputFile="$(OutDir)/ConfigurationTool.exe"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\XLibs.Net\MSDXSDK_02_06\Lib\x86;..\XLibs.Net\XUtil\libs;..\XLibs.Net\XZip;..\XLibs.Net\lib;..\AttribEditor\TreeListCtrl\output"
 				IgnoreDefaultLibraryNames="libcpmtd.lib"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
@@ -78,7 +79,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="$(ProjectDir)..\Util;$(ProjectDir)..\Util\Serialization;$(ProjectDir)..\Render\inc"
+				AdditionalIncludeDirectories="..\XLibs.Net\MSDXSDK_02_06\Include;..\XLibs.Net\Heap;..\XLibs.Net\STLPort\stlport;..\XLibs.Net\XUtil;&quot;$(ProjectDir)..\Util&quot;;&quot;$(ProjectDir)..\Util\Serialization&quot;;&quot;$(ProjectDir)..\Render\inc&quot;;..\XLibs.Net\XZip"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_CONFIGURATOR_"
 				MinimalRebuild="FALSE"
 				RuntimeLibrary="0"
@@ -96,6 +97,7 @@
 				AdditionalDependencies="d3d9.lib"
 				OutputFile="$(OutDir)/ConfigurationTool.exe"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\XLibs.Net\MSDXSDK_02_06\Lib\x86;..\XLibs.Net\XUtil\libs;..\XLibs.Net\XZip;..\XLibs.Net\lib"
 				IgnoreDefaultLibraryNames="libcpmt.lib"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"

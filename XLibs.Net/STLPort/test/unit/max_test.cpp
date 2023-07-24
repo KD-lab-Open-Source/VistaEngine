@@ -26,7 +26,9 @@ protected:
   void maxelem2();
 
   static bool str_compare(const char* a_, const char* b_)
-  { return strcmp(a_, b_) < 0 ? 1 : 0; }
+  {
+    return strcmp(a_, b_) < 0 ? 1 : 0;
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(MaxTest);
@@ -44,7 +46,7 @@ void MaxTest::max1()
 }
 void MaxTest::max2()
 {
-  const char* r = max((const char*)"shoe", (const char*)"shine", str_compare);
+  char* r = max((char *)"shoe",(char *)"shine", str_compare);
   CPPUNIT_ASSERT(!strcmp(r, "shoe"));
 }
 void MaxTest::maxelem1()
@@ -56,9 +58,9 @@ void MaxTest::maxelem1()
 }
 void MaxTest::maxelem2()
 {
-  const char* names[] = { "Brett", "Graham", "Jack", "Mike", "Todd" };
+  char* names[] = { "Brett", "Graham", "Jack", "Mike", "Todd" };
 
-  const unsigned namesCt = sizeof(names) / sizeof(names[0]);
-  const char** r = max_element((const char**)names, (const char**)names + namesCt, str_compare);
+  const unsigned namesCt = sizeof(names)/sizeof(names[0]);
+  char** r = max_element((char**)names, (char**)names + namesCt, str_compare);
   CPPUNIT_ASSERT(!strcmp(*r, "Todd"));
 }

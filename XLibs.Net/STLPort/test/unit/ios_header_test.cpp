@@ -8,7 +8,7 @@
 
 //Including this fle makes the test STLport specific but this is the only way to check
 //compiler config:
-#include <stl/config/features.h>
+#include <stl/_config.h>
 
 #if !defined (_STLP_USE_NO_IOSTREAMS)
 #  include <ios>

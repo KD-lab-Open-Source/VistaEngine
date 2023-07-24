@@ -51,6 +51,7 @@ STARFORCE_API void Profile::serialize(Archive& ar)
 	ar.serialize(cdKey, "cdKey", 0);
 	ar.serialize(lastInetName, "lastNetLogin", 0);
 	ar.serialize(onlineLogins, "onlineLogins", 0);
+	ar.serialize(chatChannel, "chatChannel", 0);
 	ar.serialize(findMissionFilter, "findMissionFilter", 0);
 	ar.serialize(quickStartMissionFilter, "quickStartMissionFilter", 0);
 	ar.serialize(quickStartFilterRace, "quickStartFilterRace", 0);

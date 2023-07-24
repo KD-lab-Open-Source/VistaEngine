@@ -28,7 +28,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION(ForeachTest);
 //
 // tests implementation
 //
-static void increase(int& a_)
+static void increase(int& a_) 
 {
   a_ += 1;
 }
@@ -49,7 +49,7 @@ void ForeachTest::foreach0()
   CPPUNIT_ASSERT(numbers[8]==35);
   CPPUNIT_ASSERT(numbers[9]==56);
 }
-static void sqr(int& a_)
+static void sqr(int& a_) 
 {
   a_ = a_ * a_;
 }

@@ -25,7 +25,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION(ValarrayTest);
 // tests implementation
 //
 // For the moment this test is just a complitation test
-// everyone is welcome to do a real good unit test for
+// everyone is welcome to do a real good unit test for 
 // valarray functionality.
 void ValarrayTest::transcendentals()
 {

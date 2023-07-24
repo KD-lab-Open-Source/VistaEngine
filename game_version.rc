@@ -26,13 +26,13 @@ BEGIN
         BLOCK "041904b0"
         BEGIN
             VALUE "CompanyName", "KDV games"
-            VALUE "FileDescription", "Vista Game Engine Runtime (c) 2004-2007"
+            VALUE "FileDescription", "VistaGame Engine Runtime (c) 2004-2007"
             VALUE "FileVersion", VISTA_ENGINE_VERSION
             VALUE "InternalName", "VistaEngine"
-            VALUE "LegalCopyright", "Vista Game Engine (c) KDV games.  All rights reserved."
-            VALUE "LegalTrademarks", "Vista Game Engine"
+            VALUE "LegalCopyright", "VistaGame Engine (c) KDV games.  All rights reserved."
+            VALUE "LegalTrademarks", "VistaGame Engine"
             VALUE "OriginalFilename", "Game.exe"
-            VALUE "ProductName", "Vista Game Engine"
+            VALUE "ProductName", "VistaGame Engine"
             VALUE "ProductVersion", VISTA_ENGINE_VERSION
         END
     END

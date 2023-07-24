@@ -1,13 +1,13 @@
 #ifndef __STARFORCE_H__
 #define __STARFORCE_H__
 
-#ifdef USE_SECUROM
+#ifndef USE_STARFORCE
 
-//#define STARFORCE_API extern "C" __declspec(dllexport)
-//#define STARFORCE_API __declspec(dllexport)
+#include "securom_api.h"
+
 #define STARFORCE_API 
 
-#else
+#else // USE_STARFORCE
 
 #define STARFORCE_API __declspec(dllexport)
 
@@ -15,7 +15,7 @@
 #define SECUROM_MARKER_HIGH_SECURITY_OFF(x)
 #define SecuROM_Tripwire() 1
 
-#endif
+#endif // USE_STARFORCE
 
 STARFORCE_API void initConditions();
 STARFORCE_API void initActions();

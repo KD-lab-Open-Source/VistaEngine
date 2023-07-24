@@ -1,6 +1,6 @@
 /***********************************************************************************
   test_hash_set.cpp
-
+  
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -42,9 +42,9 @@ void test_hash_multiset()
 {
 # if !(defined (_MSC_VER) && (_MSC_VER < 1100))
   TestMultiSet testMultiSet, testMultiSet2;
-
+  
         const size_t hash_setSize = random_number(random_base);
-
+  
   while ( testMultiSet.size() < hash_setSize )
   {
     TestMultiSet::value_type x;
@@ -64,15 +64,15 @@ void test_hash_multiset()
   WeakCheck( testMultiSet, insert_range_tester(testMultiSet, insFirst, insFirst+insCnt) );
   ConstCheck( 0, test_construct_pointer_range<TestMultiSet>(insFirst, insFirst+insCnt) );
   delete[] insFirst;
-
+  
   WeakCheck( testMultiSet, insert_range_tester(testMultiSet, testMultiSet2.begin(), testMultiSet2.end() ) );
-
+  
   ConstCheck( 0, test_default_construct<TestMultiSet>() );
 #  if EH_HASH_CONTAINERS_SUPPORT_ITERATOR_CONSTRUCTION
   ConstCheck( 0, test_construct_iter_range_n<TestMultiSet>( testMultiSet2 ) );
 #  endif
   ConstCheck( testMultiSet, test_copy_construct<TestMultiSet>() );
-
+  
   WeakCheck( testMultiSet, test_assign_op<TestMultiSet>( testMultiSet2 ) );
 # endif
 }
@@ -89,7 +89,7 @@ void test_hash_set()
 {
 # if !(defined (_MSC_VER) && (_MSC_VER < 1100))
   TestSet testSet, testSet2;
-
+  
         const size_t hash_setSize = random_number(random_base);
 
   while ( testSet.size() < hash_setSize )
@@ -111,15 +111,15 @@ void test_hash_set()
   WeakCheck( testSet, insert_range_tester(testSet, insFirst, insFirst+insCnt) );
   ConstCheck( 0, test_construct_pointer_range<TestSet>(insFirst, insFirst+insCnt) );
   delete[] insFirst;
-
+  
   WeakCheck( testSet, insert_range_tester(testSet, testSet2.begin(), testSet2.end() ) );
-
+  
   ConstCheck( 0, test_default_construct<TestSet>() );
 #  if EH_HASH_CONTAINERS_SUPPORT_ITERATOR_CONSTRUCTION
   ConstCheck( 0, test_construct_iter_range_n<TestSet>( testSet2 ) );
 #  endif
   ConstCheck( testSet, test_copy_construct<TestSet>() );
-
+  
   WeakCheck( testSet, test_assign_op<TestSet>( testSet2 ) );
 # endif
 }

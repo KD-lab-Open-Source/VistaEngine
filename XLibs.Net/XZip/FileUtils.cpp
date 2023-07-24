@@ -221,8 +221,7 @@ bool getFileList(const char* path, const char* file_name_mask, std::list<std::st
 	StringList mask_list;
 	splitFileList(mask_list, file_name_mask, ';');
 
-	StringList::const_iterator path_it;
-	for(path_it = path_list.begin(); path_it != path_list.end(); ++path_it){
+	for(StringList::const_iterator path_it = path_list.begin(); path_it != path_list.end(); ++path_it){
 		for(StringList::const_iterator mask_it = mask_list.begin(); mask_it != mask_list.end(); ++mask_it){
 			DirIterator dir_it((*path_it + "\\" + *mask_it).c_str());
 			while(dir_it != end){

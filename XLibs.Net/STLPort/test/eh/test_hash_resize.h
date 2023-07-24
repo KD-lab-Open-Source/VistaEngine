@@ -1,6 +1,6 @@
 /***********************************************************************************
   test_hash_resize.h
-
+  
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -11,7 +11,7 @@
  * in supporting documentation.  Mark of the Unicorn makes no
  * representations about the suitability of this software for any
  * purpose.  It is provided "as is" without express or implied warranty.
-
+    
 ***********************************************************************************/
 #ifndef test_hash_resize__
 #define test_hash_resize__
@@ -26,7 +26,7 @@ struct test_hash_resize
     {
       gTestController.SetCurrentTestName("hash resize");
     }
-
+    
   void operator()( T& t ) const
   {
     t.resize( 1+random_number(random_base) + t.bucket_count() );
@@ -41,7 +41,7 @@ struct test_construct_iter_range_n
   {
         gTestController.SetCurrentTestName("iterator range n-size constructor");
     }
-
+  
   void operator()( int ) const
   {
     T t( fItems.begin(), fItems.end(), fItems.size() );
@@ -49,7 +49,7 @@ struct test_construct_iter_range_n
     gTestController.CancelFailureCountdown();
     CheckInvariant(t);
   }
-
+  
   const T& fItems;
 };
 

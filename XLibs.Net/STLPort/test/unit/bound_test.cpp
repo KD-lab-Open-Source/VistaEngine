@@ -46,14 +46,13 @@ void BoundTest::uprbnd1()
   int location = upper_bound((int*)arr, (int*)arr + 20, 3) - arr;
   CPPUNIT_ASSERT(location==16);
 }
-
 void BoundTest::uprbnd2()
 {
-  char const* str [] = { "a", "a", "b", "b", "q", "w", "z" };
+  char* str [] = { "a", "a", "b", "b", "q", "w", "z" };
 
   const unsigned strCt = sizeof(str)/sizeof(str[0]);
 
-  int location = (upper_bound((char const**)str,  (char const**)str + strCt, (const char *)"d", char_str_less) - str);
+  int location = (upper_bound((char**)str,  (char**)str + strCt, (const char *)"d", char_str_less) - str);
   CPPUNIT_ASSERT(location==4);
 }
 void BoundTest::lwrbnd1()
@@ -63,18 +62,17 @@ void BoundTest::lwrbnd1()
   {
     v1[i] = i/4;
   }
-  // 0 0 0 0 1 1 1 1 2 2 2 2 3 3 3 3 4 4 4 4
+  // 0 0 0 0 1 1 1 1 2 2 2 2 3 3 3 3 4 4 4 4 
   vector<int>::iterator location = lower_bound(v1.begin(), v1.end(), 3);
 
   CPPUNIT_ASSERT((location - v1.begin())==12);
 }
-
 void BoundTest::lwrbnd2()
 {
-  char const* str [] = { "a", "a", "b", "b", "q", "w", "z" };
+  char* str [] = { "a", "a", "b", "b", "q", "w", "z" };
 
   const unsigned strCt = sizeof(str)/sizeof(str[0]);
-  char const** location = lower_bound((char const**)str,  (char const**)str + strCt, (const char *)"d", char_str_less);
+  char** location = lower_bound((char**)str,  (char**)str + strCt, (const char *)"d", char_str_less);
 
   CPPUNIT_ASSERT((location - str) == 4);
 }

@@ -54,7 +54,7 @@ struct test_slist_sort {
 void test_slist() {
   TestSList testSList, testSList2;
   size_t slistSize = random_number(random_base);
-
+  
   while (testSList.size() < slistSize) {
     TestClass x;
     testSList.push_front( x );
@@ -77,8 +77,8 @@ void test_slist() {
   delete[] insFirst;
   WeakCheck( testSList, test_insert_range<TestSList,TestSList::iterator>(testSList, testSList2.begin(), testSList2.end() ) );
   StrongCheck( testSList, test_push_front<TestSList>(testSList) );
-  StrongCheck( testSList, test_slist_sort() );  // Simply to verify strength.
-
+  StrongCheck( testSList, test_slist_sort() );  // Simply to verify strength.  
+  
   ConstCheck( 0, test_default_construct<TestSList>() );
   ConstCheck( 0, test_construct_n<TestSList>( random_number(random_base) ) );
   ConstCheck( 0, test_construct_n_instance<TestSList>( random_number(random_base) ) );

@@ -36,7 +36,8 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/xtreelistctrlvc71_st_mt_d.lib"/>
+				OutputFile="$(OutDir)/xtreelistctrlvc71_st_mt_d.lib"
+				AdditionalLibraryDirectories="..\..\XLibs.Net\lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -114,6 +115,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="WIN32;_AFXEXT;_WINDOWS;_DEBUG;_USRDLL;_STLP_USE_STATIC_LIB;_TREE_LIST_NO_AUTOMATIC_LINK_"
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"
@@ -135,6 +137,7 @@
 				OutputFile="$(OutDir)\xtreelistctrlvc71_st_mt_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
+				AdditionalLibraryDirectories="..\..\XLibs.Net\lib"
 				ModuleDefinitionFile=".\TreeListCtrl.def"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
@@ -191,6 +194,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)/xTreeListCtrlVC71_ST_MT.dll"
+				AdditionalLibraryDirectories=""
 				ImportLibrary="$(OutDir)/xTreeListCtrlVC71_ST_MT.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>

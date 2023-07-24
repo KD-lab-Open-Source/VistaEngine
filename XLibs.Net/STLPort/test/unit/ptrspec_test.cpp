@@ -1,10 +1,7 @@
 #include <vector>
 #include <list>
-#if defined (STLPORT) && !defined (_STLP_NO_EXTENSIONS)
-#  include <slist>
-#endif
+#include <slist>
 #include <deque>
-#include <set>
 #include <iterator>
 
 #include "cppunit/cppunit_proxy.h"
@@ -19,9 +16,6 @@ using namespace std;
 class PtrSpecTest : public CPPUNIT_NS::TestCase
 {
   CPPUNIT_TEST_SUITE(PtrSpecTest);
-#if (defined (__DMC__) && defined (_STLP_DEBUG))
-  CPPUNIT_IGNORE;
-#endif
   CPPUNIT_TEST(ptr_specialization_test);
   CPPUNIT_TEST_SUITE_END();
 
@@ -55,12 +49,8 @@ CPPUNIT_TEST_SUITE_REGISTRATION(PtrSpecTest);
 #if !defined(_MSC_VER) || (_MSC_VER > 1200)  // excluding MSVC 6.0
 TEST_INSTANCIATE_CONTAINER(vector);
 TEST_INSTANCIATE_CONTAINER(list);
-#  if defined (STLPORT) && !defined (_STLP_NO_EXTENSIONS)
 TEST_INSTANCIATE_CONTAINER(slist);
-#  endif
 TEST_INSTANCIATE_CONTAINER(deque);
-TEST_INSTANCIATE_CONTAINER(set);
-TEST_INSTANCIATE_CONTAINER(multiset);
 #endif
 
 //Function to test pointer to function support:
@@ -77,7 +67,6 @@ public:
 //
 void PtrSpecTest::ptr_specialization_test()
 {
-#  if !(defined (__DMC__) && defined (_STLP_DEBUG))
   int *int_array[] = {0, 0, 0};
   int const* cint_array[] = {0, 0, 0};
 
@@ -85,9 +74,7 @@ void PtrSpecTest::ptr_specialization_test()
     vector<void*> void_vect;
     deque<void*> void_deque;
     list<void*> void_list;
-#if defined (STLPORT) && !defined (_STLP_NO_EXTENSIONS)
     slist<void*> void_slist;
-#endif
   }
 
   {
@@ -110,11 +97,9 @@ void PtrSpecTest::ptr_specialization_test()
   list<int*> pint_list;
   list<int*> pint_list2;
   list<int const*> pcint_list;
-#if defined (STLPORT) && !defined (_STLP_NO_EXTENSIONS)
   slist<int*> pint_slist;
   slist<int*> pint_slist2;
   slist<int const*> pcint_slist;
-#endif
   deque<int*> pint_deque;
   deque<int*> pint_deque2;
   deque<int const*> pcint_deque;
@@ -177,21 +162,20 @@ void PtrSpecTest::ptr_specialization_test()
   pcint_list.assign(cint_array, cint_array + 3);
   //pint_list.assign(pcint_vect.begin(), pcint_vect.end());
 
-#if defined (STLPORT) && !defined (_STLP_NO_EXTENSIONS)
   copy(int_array, int_array + 3, front_inserter(pint_slist));
   copy(int_array, int_array + 3, front_inserter(pint_slist2));
   pint_slist.insert(pint_slist.end(), pint_slist2.begin(), pint_slist2.end());
-#  if defined (_STLP_MEMBER_TEMPLATES)
+#ifdef _STLP_MEMBER_TEMPLATES
   pcint_slist.insert(pcint_slist.end(), pint_slist.begin(), pint_slist.end());
-#  endif
-#  if !defined (_STLP_DEBUG) || defined (_STLP_MEMBER_TEMPLATES)
+#endif
+#if !defined(_STLP_DEBUG) || defined(_STLP_MEMBER_TEMPLATES)
   pint_slist.insert(pint_slist.end(), pint_vect.begin(), pint_vect.end());
   pcint_slist.insert(pcint_slist.end(), pint_vect.begin(), pint_vect.end());
   pcint_slist.insert(pcint_slist.end(), pcint_vect.begin(), pcint_vect.end());
   slist<int*> pint_slist_from_vect(pint_vect.begin(), pint_vect.end());
   pint_slist.assign(pint_vect.begin(), pint_vect.end());
   pcint_slist.assign(pint_vect.begin(), pint_vect.end());
-#  endif
+#endif
   pint_slist.insert(pint_slist.end(), int_array, int_array + 3);
   pcint_slist.insert(pcint_slist.end(), int_array, int_array + 3);
   pcint_slist.insert(pcint_slist.end(), cint_array, cint_array + 3);
@@ -199,7 +183,6 @@ void PtrSpecTest::ptr_specialization_test()
   pcint_slist.assign(int_array, int_array + 3);
   pcint_slist.assign(cint_array, cint_array + 3);
   //pint_slist.assign(pcint_vect.begin(), pcint_vect.end());
-#endif
 
   copy(int_array, int_array + 3, back_inserter(pint_deque));
   copy(int_array, int_array + 3, back_inserter(pint_deque2));
@@ -221,5 +204,4 @@ void PtrSpecTest::ptr_specialization_test()
   pint_deque.assign(int_array, int_array + 3);
   pcint_deque.assign(int_array, int_array + 3);
   pcint_deque.assign(cint_array, cint_array + 3);
-#  endif /* __DMC__ */
 }

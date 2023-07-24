@@ -1,9 +1,9 @@
 **********************************************************************
-* 	README file for STLport 5.0                                    *
+* 	README file for STLport 5.0                                  *
 *                                                                    *
 **********************************************************************
 
-This directory contains the STLport-5.0 release.
+This directory contains STLport-5.0 release.
 
 What's inside :
 
@@ -18,8 +18,7 @@ build/lib        - build directory for STLport library (if you use
 build/test/unit  - build directory for regression (unit) tests
 build/test/eh    - build directory for exception handling tests
 stlport          - main STLport include directory
-src              - source for iostreams implementation and other parts
-                   that aren't pure template code
+src              - source for iostreams implementation
 lib              - installation directory for STLport library (if you
                    use STLport iostreams and/or locale only);
                    it may contain more subdirs, if you use

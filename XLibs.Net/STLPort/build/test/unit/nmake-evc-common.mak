@@ -1,0 +1,22 @@
+# -*- Makefile -*- Time-stamp: <04/03/31 08:14:15 ptr>
+# $Id: nmake-evc-common.mak,v 1.1.2.3 2005/06/08 20:01:48 dums Exp $
+
+SRCROOT=../..
+STLPORT_DIR=../../..
+CROSS_COMPILING=1
+
+!include Makefile.inc
+
+INCLUDES=$(INCLUDES) /I "$(STLPORT_INCLUDE_DIR)" /I "cppunit" /I "$(STLPORT_DIR)/src/" /FI "vc_warning_disable.h"
+DEFS=/D_STLP_NO_CUSTOM_IO
+
+DEFS_REL = /D_STLP_USE_DYNAMIC_LIB
+DEFS_DBG = /D_STLP_USE_DYNAMIC_LIB
+DEFS_STLDBG = /D_STLP_USE_DYNAMIC_LIB
+DEFS_STATIC_REL = /D_STLP_USE_STATIC_LIB
+DEFS_STATIC_DBG = /D_STLP_USE_STATIC_LIB
+DEFS_STATIC_STLDBG = /D_STLP_USE_STATIC_LIB
+
+LDSEARCH=$(LDSEARCH) /LIBPATH:$(STLPORT_LIB_DIR)
+
+!include $(SRCROOT)/Makefiles/nmake/top.mak

@@ -333,7 +333,7 @@ void FogOfWarMap::unlockScoutmap() const
 
 const char* FogOfWarMap::lockSummarymap() const
 {
-		lock_.lock();
+	lock_.lock();
 	return summarymap;
 }
 

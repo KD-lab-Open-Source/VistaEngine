@@ -2,19 +2,19 @@
  * Copyright (c) 1999
  * Silicon Graphics Computer Systems, Inc.
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
  * modified is included with the above copyright notice.
  *
- */
+ */ 
 #ifndef _STLP_INTERNAL_IOS_H
 #define _STLP_INTERNAL_IOS_H
 
@@ -103,7 +103,7 @@ public:                         // Locale-related member functions.
   locale imbue(const locale&);
 
   inline char narrow(_CharT, char) const ;
-  inline _CharT widen(char) const;
+  inline _CharT widen(char) const; 
 
   // Helper function that makes testing for EOF more convenient.
   static bool _STLP_CALL _S_eof(int_type __c) {
@@ -117,11 +117,11 @@ protected:
   void init(basic_streambuf<_CharT, _Traits>* __streambuf);
 
 public:
-
+  
   // Helper function used in istream and ostream.  It is called only from
   // a catch clause.
   void _M_handle_exception(ios_base::iostate __flag);
-
+  
 private:                        // Data members
   char_type _M_fill;            // The fill character, used for padding.
 
@@ -132,13 +132,13 @@ private:                        // Data members
 
 
 template <class _CharT, class _Traits>
-inline char
+inline char 
 basic_ios<_CharT, _Traits>::narrow(_CharT __c, char __default) const
 { return __STATIC_CAST(const ctype<_CharT>*, this->_M_ctype_facet())->narrow(__c, __default); }
 
 template <class _CharT, class _Traits>
-inline _CharT
-basic_ios<_CharT, _Traits>::widen(char __c) const
+inline _CharT 
+basic_ios<_CharT, _Traits>::widen(char __c) const 
 { return __STATIC_CAST(const ctype<_CharT>*, this->_M_ctype_facet())->widen(__c); }
 
 # if !defined (_STLP_NO_METHOD_SPECIALIZATION)
@@ -168,6 +168,25 @@ _STLP_END_NAMESPACE
 
 #if defined (_STLP_EXPOSE_STREAM_IMPLEMENTATION) && !defined (_STLP_LINK_TIME_INSTANTIATION)
 #  include <stl/_ios.c>
+#endif
+
+// The following is needed to ensure that the inlined _Stl_loc_init functions
+// that ios_base::_Loc_init::_Loc_init() calls are found eventually.
+// Otherwise, undefined externs may be caused.
+
+#if defined(__BORLANDC__) && defined(_RTLDLL)
+# ifndef _STLP_INTERNAL_NUM_PUT_H
+#  include <stl/_num_put.h>
+# endif
+# ifndef _STLP_INTERNAL_NUM_GET_H
+#   include <stl/_num_get.h>
+# endif
+# ifndef _STLP_INTERNAL_MONETARY_H
+#  include <stl/_monetary.h>
+# endif
+# ifndef _STLP_INTERNAL_TIME_FACETS_H
+#  include <stl/_time_facets.h>
+# endif
 #endif
 
 #endif /* _STLP_IOS */

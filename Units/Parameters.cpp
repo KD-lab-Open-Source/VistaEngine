@@ -169,17 +169,12 @@ void ParameterValue::serialize(Archive& ar)
 {
 	StringTableBase::serialize(ar);
 	ar.serialize(value_, "value", "Значение (X)");
-#ifndef _VISTA_ENGINE_EXTERNAL_
 	ar.serialize(type_, "type", "&Тип");
 	if(ar.isEdit()){
 		ParameterFormulaString::parameterValue_ = value_;
 		ParameterFormulaString::parameterGroup_ = group_;
 	}
 	ar.serialize(formula_, "formula", "Формула");
-#else
-	ar.serialize(type_, "type", 0);
-	ar.serialize(formula_, "formula", 0);
-#endif
 	ar.serialize(group_, "group", 0);
 	if (ar.isInput ()) {
 		state_ = NOT_CALCULATED;

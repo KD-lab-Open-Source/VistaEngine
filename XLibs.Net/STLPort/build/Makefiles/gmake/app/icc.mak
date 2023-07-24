@@ -1,1 +1,3 @@
-# -*- Makefile -*- Time-stamp: <05/12/07 01:01:22 ptr>
+# -*- Makefile -*- Time-stamp: <04/07/25 13:26:49 ptr>
+# $Id: icc.mak,v 1.1.2.1 2004/12/24 11:29:36 ptr Exp $
+

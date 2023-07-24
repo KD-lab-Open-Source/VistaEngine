@@ -24,7 +24,7 @@ SurMapOptions::SurMapOptions()
 , showCameras_(true)
 , hideWorldModels_(false)
 {
-	showFog_ = true;
+	showFog_ = false;
 
 	lastToolzerRadius=1;
 	lastToolzerForm=0;

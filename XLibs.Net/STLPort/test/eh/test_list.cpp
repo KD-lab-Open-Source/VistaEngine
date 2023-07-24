@@ -1,6 +1,6 @@
 /***********************************************************************************
   test_list.cpp
-
+  
  * Copyright (c) 1997
  * Mark of the Unicorn, Inc.
  *
@@ -45,13 +45,13 @@ struct test_list_sort
     {
         gTestController.SetCurrentTestName("list::sort()");
     }
-
+    
     void operator()( TestList& list ) const
     {
         list.sort();
-
+        
         gTestController.CancelFailureCountdown();
-
+        
         for ( TestList::iterator p = list.begin(); p != list.end(); p++ )
             if ( p != list.begin() ) {
                 TestList::iterator tmp=p;
@@ -65,7 +65,7 @@ void test_list()
 {
     TestList testList, testList2;
     size_t listSize = random_number(random_base);
-
+  
     while ( testList.size() < listSize )
     {
         TestClass x;
@@ -80,7 +80,7 @@ void test_list()
     WeakCheck( testList, test_insert_n<TestList>(testList, random_number(random_base) ) );
     WeakCheck( testList, test_insert_n<TestList>(testList, random_number(random_base), 0 ) );
     WeakCheck( testList, test_insert_n<TestList>(testList, random_number(random_base), (int)testList.size() ) );
-
+  
     size_t insCnt = random_number(random_base);
     TestClass *insFirst = new TestList::value_type[1+insCnt];
 
@@ -97,7 +97,7 @@ void test_list()
     StrongCheck( testList, test_push_back<TestList>(testList) );
 
     StrongCheck( testList, test_list_sort() );  // Simply to verify strength.
-
+       
     ConstCheck( 0, test_default_construct<TestList>() );
     ConstCheck( 0, test_construct_n<TestList>( random_number(random_base) ) );
     ConstCheck( 0, test_construct_n_instance<TestList>( random_number(random_base) ) );

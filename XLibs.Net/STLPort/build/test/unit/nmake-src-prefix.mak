@@ -1,5 +1,5 @@
 # -*- makefile -*- Time-stamp: <04/03/29 22:25:01 ptr>
-# $Id: nmake-src-prefix.mak 2154 2006-02-07 20:34:30Z dums $
+# $Id: nmake-src-prefix.mak,v 1.1.2.4 2005/05/20 19:57:40 dums Exp $
 
 ALLOBJS = $(ALLOBJS:../../../test/unit/=)
 ALLOBJS = $(ALLOBJS:cppunit/=)
@@ -37,7 +37,7 @@ ALLOBJS = $(ALLOBJS:cppunit/=)
 	$(COMPILE_c_DBG) $(OUTPUT_OPTION_DBG) $<
 
 {../../../test/unit}.c{$(OUTPUT_DIR_STLDBG)}.o:
-	$(COMPILE_c_STLDBG) $(OUTPUT_OPTION_STLDBG) $<
+	$(COMPILE_c_DBG) $(OUTPUT_OPTION_STLDBG) $<
 
 {../../../test/unit}.c{$(OUTPUT_DIR_A)}.o:
 	$(COMPILE_c_STATIC_REL) $(OUTPUT_OPTION_STATIC) $<
@@ -46,7 +46,7 @@ ALLOBJS = $(ALLOBJS:cppunit/=)
 	$(COMPILE_c_STATIC_DBG) $(OUTPUT_OPTION_STATIC_DBG) $<
 
 {../../../test/unit}.c{$(OUTPUT_DIR_A_STLDBG)}.o:
-	$(COMPILE_c_STATIC_STLDBG) $(OUTPUT_OPTION_STATIC_STLDBG) $<
+	$(COMPILE_c_STATIC_DBG) $(OUTPUT_OPTION_STATIC_STLDBG) $<
 
 #
 # rules for cppunit/.cpp --> .o

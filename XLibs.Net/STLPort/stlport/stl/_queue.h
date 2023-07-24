@@ -9,13 +9,13 @@
  * Copyright (c) 1997
  * Moscow Center for SPARC Technology
  *
- * Copyright (c) 1999
+ * Copyright (c) 1999 
  * Boris Fomitchev
  *
  * This material is provided "as is", with absolutely no warranty expressed
  * or implied. Any use is at your own risk.
  *
- * Permission to use or copy this software for any purpose is hereby granted
+ * Permission to use or copy this software for any purpose is hereby granted 
  * without fee, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is granted,
  * provided the above notices are retained, and a notice that the code was
@@ -31,7 +31,7 @@
 #define _STLP_INTERNAL_QUEUE_H
 
 #ifndef _STLP_INTERNAL_DEQUE_H
-#  include <stl/_deque.h>
+# include <stl/_deque.h>
 #endif
 
 #ifndef _STLP_INTERNAL_VECTOR_H
@@ -39,14 +39,14 @@
 #endif
 
 #ifndef _STLP_INTERNAL_HEAP_H
-#  include <stl/_heap.h>
+# include <stl/_heap.h>
 #endif
 
-#ifndef _STLP_INTERNAL_FUNCTION_BASE_H
-#  include <stl/_function_base.h>
+#ifndef _STLP_INTERNAL_FUNCTION_H
+# include <stl/_function.h>
 #endif
 
-#if defined(__SC__) && !defined(__DMC__)    //*ty 12/07/2001 - since "comp" is a built-in type and reserved under SCpp
+#if defined(__SC__) && !defined(__DMC__)		//*ty 12/07/2001 - since "comp" is a built-in type and reserved under SCpp
 #  define comp _Comp
 #endif
 
@@ -60,7 +60,7 @@ template <class _Tp>
 # else
 template <class _Tp, class _Sequence>
 # endif
-class queue
+class queue 
 #if defined (_STLP_USE_PARTIAL_SPEC_WORKAROUND)
 #  if defined (_STLP_QUEUE_ARGS)
             : public __stlport_class<queue<_Tp> >
@@ -91,7 +91,7 @@ public:
   explicit queue(const _Sequence& __c) : c(__c) {}
 
   queue(__move_source<_Self> src)
-    : c(_STLP_PRIV _AsMoveSource(src.get().c)) {}
+    : c(_AsMoveSource(src.get().c)) {}
 
   bool empty() const { return c.empty(); }
   size_type size() const { return c.size(); }
@@ -112,7 +112,7 @@ public:
 #endif
 
 template < _STLP_QUEUE_HEADER_ARGS >
-inline bool _STLP_CALL
+inline bool _STLP_CALL 
 operator==(const queue<_STLP_QUEUE_ARGS >& __x, const queue<_STLP_QUEUE_ARGS >& __y) {
   return __x._Get_s() == __y._Get_s();
 }
@@ -126,7 +126,7 @@ operator<(const queue<_STLP_QUEUE_ARGS >& __x, const queue<_STLP_QUEUE_ARGS >& _
 _STLP_RELOPS_OPERATORS( template < _STLP_QUEUE_HEADER_ARGS >, queue<_STLP_QUEUE_ARGS > )
 
 # if !(defined ( _STLP_LIMITED_DEFAULT_TEMPLATES ) || defined ( _STLP_TEMPLATE_PARAM_SUBTYPE_BUG ))
-template <class _Tp, class _Sequence = vector<_Tp>,
+template <class _Tp, class _Sequence = vector<_Tp>, 
           class _Compare = less<_STLP_HEADER_TYPENAME _Sequence::value_type> >
 # elif defined ( _STLP_MINIMUM_DEFAULT_TEMPLATE_PARAMS )
 template <class _Tp>
@@ -163,21 +163,20 @@ protected:
 public:
   priority_queue() : c() {}
   explicit priority_queue(const _Compare& __x) :  c(), comp(__x) {}
-  priority_queue(const _Compare& __x, const _Sequence& __s)
+  priority_queue(const _Compare& __x, const _Sequence& __s) 
     : c(__s), comp(__x)
     { make_heap(c.begin(), c.end(), comp); }
 
   priority_queue(__move_source<_Self> src)
-    : c(_STLP_PRIV _AsMoveSource(src.get().c)),
-      comp(_STLP_PRIV _AsMoveSource(src.get().comp)) {}
+    : c(_AsMoveSource(src.get().c)), comp(_AsMoveSource(src.get().comp)) {}
 
 #ifdef _STLP_MEMBER_TEMPLATES
   template <class _InputIterator>
-  priority_queue(_InputIterator __first, _InputIterator __last)
+  priority_queue(_InputIterator __first, _InputIterator __last) 
     : c(__first, __last) { make_heap(c.begin(), c.end(), comp); }
 
   template <class _InputIterator>
-  priority_queue(_InputIterator __first,
+  priority_queue(_InputIterator __first, 
                  _InputIterator __last, const _Compare& __x)
     : c(__first, __last), comp(__x)
     { make_heap(c.begin(), c.end(), comp); }
@@ -186,24 +185,24 @@ public:
   priority_queue(_InputIterator __first, _InputIterator __last,
                  const _Compare& __x, const _Sequence& __s)
   : c(__s), comp(__x)
-  {
+  { 
     c.insert(c.end(), __first, __last);
     make_heap(c.begin(), c.end(), comp);
   }
 
 #else /* _STLP_MEMBER_TEMPLATES */
-  priority_queue(const value_type* __first, const value_type* __last)
+  priority_queue(const value_type* __first, const value_type* __last) 
     : c(__first, __last) { make_heap(c.begin(), c.end(), comp); }
 
-  priority_queue(const value_type* __first, const value_type* __last,
-                 const _Compare& __x)
+  priority_queue(const value_type* __first, const value_type* __last, 
+                 const _Compare& __x) 
     : c(__first, __last), comp(__x)
     { make_heap(c.begin(), c.end(), comp); }
 
-  priority_queue(const value_type* __first, const value_type* __last,
+  priority_queue(const value_type* __first, const value_type* __last, 
                  const _Compare& __x, const _Sequence& __c)
     : c(__c), comp(__x)
-  {
+  { 
     c.insert(c.end(), __first, __last);
     make_heap(c.begin(), c.end(), comp);
   }
@@ -214,7 +213,7 @@ public:
   const_reference top() const { return c.front(); }
   void push(const value_type& __x) {
     _STLP_TRY {
-      c.push_back(__x);
+      c.push_back(__x); 
       push_heap(c.begin(), c.end(), comp);
     }
     _STLP_UNWIND(c.clear())
@@ -228,15 +227,15 @@ public:
   }
 };
 
-#if defined (_STLP_CLASS_PARTIAL_SPECIALIZATION)
+#ifdef _STLP_CLASS_PARTIAL_SPECIALIZATION
 template <class _Tp, class _Sequence>
 struct __move_traits<queue<_Tp, _Sequence> > :
-  _STLP_PRIV __move_traits_aux<_Sequence>
+  __move_traits_aux<_Sequence>
 {};
 
 template <class _Tp, class _Sequence, class _Compare>
 struct __move_traits<priority_queue<_Tp, _Sequence, _Compare> > :
-  _STLP_PRIV __move_traits_aux2<_Sequence, _Compare>
+  __move_traits_aux2<_Sequence, _Compare>
 {};
 #endif /* _STLP_CLASS_PARTIAL_SPECIALIZATION */
 

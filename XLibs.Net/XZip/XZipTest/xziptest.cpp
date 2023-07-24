@@ -6,8 +6,8 @@
 #include "..\XZip.h"
 #include "..\FileUtils.h"
 
-const char* test_zip_name = "resource0.pak";
-const char* test_file_name = "Resource\\Sound\\bolls.wav";
+const char* test_zip_name = "test.zip";
+const char* test_file_name = "Resource\\models\\a_auriga.3dx";
 
 const int test_count = 100;
 
@@ -28,7 +28,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 
 	fh < "openArchive() time = " <= tm < " msec\r\n";
 
-	XZipStream fz(0);
+	XZipStream fz;
 
 	start_time = xclock();
 	fz.open(test_file_name, XS_IN);

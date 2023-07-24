@@ -3,9 +3,7 @@
 #include <iterator>
 #include <vector>
 #include <algorithm>
-#include <functional>
 
-#include "iota.h"
 #include "cppunit/cppunit_proxy.h"
 
 #if !defined (STLPORT) || defined(_STLP_USE_NAMESPACES)
@@ -56,9 +54,9 @@ void SetDifferenceTest::setsymd0()
 void SetDifferenceTest::setsymd1()
 {
   vector<int> v1(10);
-  __iota(v1.begin(), v1.end(), 0);
+  iota(v1.begin(), v1.end(), 0);
   vector<int> v2(10);
-  __iota(v2.begin(), v2.end(), 7);
+  iota(v2.begin(), v2.end(), 7);
 
   vector<int> diff;
   set_symmetric_difference(v1.begin(), v1.end(), v2.begin(), v2.end(), back_inserter(diff));
@@ -75,7 +73,7 @@ void SetDifferenceTest::setsymd2()
   char* word2 = "LMNOPQRSTUVWXYZ";
 
   string diff;
-  set_symmetric_difference(word1, word1 + ::strlen(word1), word2, word2 + ::strlen(word2),
+  set_symmetric_difference(word1, word1 + ::strlen(word1), word2, word2 + ::strlen(word2), 
                            back_inserter(diff), less<char>());
   CPPUNIT_ASSERT( diff.size() == 22 );
   char char_res[] = "ABCDEFGHIJKPQRSTUVWXYZ";
@@ -89,7 +87,7 @@ void SetDifferenceTest::setdiff0()
   int v1[3] = { 13, 18, 23 };
   int v2[4] = { 10, 13, 17, 23 };
   int result[4] = { 0, 0, 0, 0 };
-  //18 0 0 0
+  //18 0 0 0 
   //10 17 23 0
 
   set_difference((int*)v1, (int*)v1 + 3, (int*)v2, (int*)v2 + 4, (int*)result);
@@ -108,9 +106,9 @@ void SetDifferenceTest::setdiff0()
 void SetDifferenceTest::setdiff1()
 {
   vector<int> v1(10);
-  __iota(v1.begin(), v1.end(), 0);
+  iota(v1.begin(), v1.end(), 0);
   vector<int> v2(10);
-  __iota(v2.begin(), v2.end(), 7);
+  iota(v2.begin(), v2.end(), 7);
 
   vector<int> diff;
   set_difference(v1.begin(), v1.end(), v2.begin(), v2.end(), back_inserter(diff));
