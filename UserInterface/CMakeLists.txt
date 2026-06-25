@@ -1,0 +1,40 @@
+add_library(UserInterface STATIC
+    Bubles/Blobs.cpp
+    Bubles/Cell.cpp
+    CommonLocText.cpp
+    GameShell.cpp
+    ProfileManager.cpp
+    ReelManager.cpp
+    SelectManager.cpp
+    UI_Actions.cpp
+    UI_BackgroundScene.cpp
+    UI_Controls.cpp
+    UI_ControlsGame.cpp
+    UI_Effect.cpp
+    UI_Font.cpp
+    UI_GlobalAttributes.cpp
+    UI_Inventory.cpp
+    UI_Key.cpp
+    UI_LogicGame.cpp
+    UI_MarkObject.cpp
+    UI_Minimap.cpp
+    UI_MinimapRender.cpp
+    UI_MinimapSymbol.cpp
+    UI_NetCenter.cpp
+    UI_References.cpp
+    UI_Render.cpp
+    UI_RenderBase.cpp
+    UI_Sprite.cpp
+    UI_StreamVideo.cpp
+    UI_TextAnimation.cpp
+    UI_TextParser.cpp
+    UI_Types.cpp
+    UI_UnitView.cpp
+    UserInterface.cpp
+    XmlRpc/RpcClient.cpp
+    XmlRpc/RpcTypes.cpp
+    XmlRpc/UI_RpcClient.cpp
+    controls.cpp
+)
+
+target_link_libraries(UserInterface PUBLIC EngineIncludes Util Units Network XmlRpc)
