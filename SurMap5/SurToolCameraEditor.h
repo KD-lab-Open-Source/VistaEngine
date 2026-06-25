@@ -2,7 +2,7 @@
 #define __SUR_TOOL_CAMERA_EDITOR_H_INCLUDED__
 
 #include "SurToolAux.h"
-#include "MFC\SizeLayoutManager.h"
+MFC/SizeLayoutManager.h
 
 class CameraSpline;
 class BaseUniverseObject;

@@ -1,7 +1,7 @@
 #ifndef __LIBRARIES_MANAGER_H_INCLUDED__
 #define __LIBRARIES_MANAGER_H_INCLUDED__
 
-#include "XTL\StaticMap.h"
+XTL/StaticMap.h
 
 class EditorLibraryInterface;
 class LibraryWrapperBase;

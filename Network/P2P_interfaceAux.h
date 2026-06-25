@@ -2,7 +2,7 @@
 #define __P2P_INTERFACEAUX_H__
 
 #include "NetPlayer.h"
-#include "FileUtils\XGUID.h" //определение XGUID
+FileUtils/XGUID.h //определение XGUID
 #include "ExternalTask.h"
 
 const GUID ZERO_GUID = {0, 0, 0, {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}};

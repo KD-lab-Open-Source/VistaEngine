@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 
-#include "XMath\xmath.h" //for configuration tool
+XMath/xmath.h //for configuration tool
 #include "Resource.h"
 #include "AttribEditorDlg.h"
 

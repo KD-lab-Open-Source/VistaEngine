@@ -3,8 +3,8 @@
 #include "SurMap5.h"
 #include "SurToolColorPic.h"
 
-#include "Render\Src\TexLibrary.h"
-#include "Terra\worldFileDispatcher.h"
+Render/Src/TexLibrary.h
+Terra/worldFileDispatcher.h
 
 const int MIN_FILTER_H=0;
 const int MAX_FILTER_H=MAX_VX_HEIGHT;//_WHOLE;

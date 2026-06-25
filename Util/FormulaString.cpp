@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma warning( disable : 4518 )
 
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 
 #include "FormulaString.h"
 

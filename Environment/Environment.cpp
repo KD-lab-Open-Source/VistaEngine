@@ -1,43 +1,43 @@
 #include "StdAfx.h"
 #include "Environment.h"
-#include "Terra\vmap.h"
-#include "Render\src\Gradients.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\Dictionary.h"
-#include "Serialization\RangedWrapper.h"
-#include "Serialization\ResourceSelector.h"
-#include "Serialization\XPrmArchive.h"
+Terra/vmap.h
+Render/src/Gradients.h
+Serialization/Serialization.h
+Serialization/Dictionary.h
+Serialization/RangedWrapper.h
+Serialization/ResourceSelector.h
+Serialization/XPrmArchive.h
 
-#include "Water\Waves.h"
-#include "Water\Fallout.h"
-#include "Water\WaterWalking.h"
-#include "Water\CoastSprites.h"
-#include "Water\CloudShadow.h"
-#include "Water\WaterGarbage.h"
+Water/Waves.h
+Water/Fallout.h
+Water/WaterWalking.h
+Water/CoastSprites.h
+Water/CloudShadow.h
+Water/WaterGarbage.h
 
-#include "Render\src\LensFlare.h"
-#include "Render\src\Scene.h"
-#include "VistaRender\postEffects.h"
-#include "Render\src\Grass.h"
-#include "Render\src\CChaos.h"
-#include "Render\Src\VisGeneric.h"
+Render/src/LensFlare.h
+Render/src/Scene.h
+VistaRender/postEffects.h
+Render/src/Grass.h
+Render/src/CChaos.h
+Render/Src/VisGeneric.h
 
-#include "Render\src\MultiRegion.h"
-#include "Render\Src\FogOfWar.h"
-#include "Render\Src\TileMap.h"
-#include "Water\SkyObject.h"
-#include "Water\FallLeaves.h"
-#include "VistaRender\Flash.h"
-#include "Physics\NormalMap.h"
-#include "Physics\WindMap.h"
+Render/src/MultiRegion.h
+Render/Src/FogOfWar.h
+Render/Src/TileMap.h
+Water/SkyObject.h
+Water/FallLeaves.h
+VistaRender/Flash.h
+Physics/NormalMap.h
+Physics/WindMap.h
 #include "Console.h"
 #include "DebugPrm.h"
 #include "DebugUtil.h"
-#include "Serialization\EnumDescriptor.h"
-#include "Units\ShowChangeController.h"
-#include "VistaRender\FieldOfView.h"
+Serialization/EnumDescriptor.h
+Units/ShowChangeController.h
+VistaRender/FieldOfView.h
 
-#include "UserInterface\GameLoadManager.h"
+UserInterface/GameLoadManager.h
 
 namespace{
 	ResourceSelector::Options presetOptions("*.set", "Scripts\\Content\\Presets", "", false, false);

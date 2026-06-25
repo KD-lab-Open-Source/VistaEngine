@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "RigidBodyBase.h"
 #include "NormalMap.h"
-#include "CD\CDDual.h"
+CD/CDDual.h
 
 ContactInfo::ContactInfo() : 
 	bodyPart1(-1), 

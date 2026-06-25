@@ -1,7 +1,7 @@
 #ifndef __SERIALIZEABLE_UNIVERSE_OBJECT_H_INCLUDED__
 #define __SERIALIZEABLE_UNIVERSE_OBJECT_H_INCLUDED__
 
-#include "Serialization\Serializer.h"
+Serialization/Serializer.h
 #include "BaseUniverseObject.h"
 #include "UnitLink.h"
 

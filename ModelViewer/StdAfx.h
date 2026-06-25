@@ -5,6 +5,6 @@
 #include <stdio.h>
 #include "my_STL.h"
 #include "XUtil.h"
-#include "Render\3dx\Umath.h"
+Render/3dx/Umath.h
 
 #endif

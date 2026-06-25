@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "MaskEditor.h"
-#include "UserInterface\UI_Types.h"
+UserInterface/UI_Types.h
 #include "ActionManager.h"
 
 #include "EditorView.h"

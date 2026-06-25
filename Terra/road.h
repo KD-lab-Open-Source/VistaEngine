@@ -1,8 +1,8 @@
 #ifndef __ROAD_H__
 #define __ROAD_H__
 
-#include "XMath\xmath.h"
-#include "Render\3dx\umath.h"
+XMath/xmath.h
+Render/3dx/umath.h
 
 #include "worldFileDispatcher.h"
 #include "procedurMap.h"

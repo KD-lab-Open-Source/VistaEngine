@@ -4,21 +4,21 @@
 #include "TriggerMiniMap.h"
 #include "TriggerDebugger.h"
 #include "ClassTree.h"
-#include "kdw\CommandManager.h"
-#include "kdw\VBox.h"
-#include "kdw\HBox.h"
-#include "kdw\HLine.h"
-#include "kdw\MenuBar.h"
-#include "kdw\ToolBar.h"
-#include "kdw\HSplitter.h"
-#include "kdw\VSplitter.h"
-#include "kdw\ImageStore.h"
-#include "kdw\PropertyTree.h"
-#include "kdw\FileDialog.h"
-#include "kdw\Label.h"
-#include "kdw\Win32\Rectangle.h"
-#include "kdw\Win32\Window.h"
-#include "Serialization\SerializationFactory.h"
+kdw/CommandManager.h
+kdw/VBox.h
+kdw/HBox.h
+kdw/HLine.h
+kdw/MenuBar.h
+kdw/ToolBar.h
+kdw/HSplitter.h
+kdw/VSplitter.h
+kdw/ImageStore.h
+kdw/PropertyTree.h
+kdw/FileDialog.h
+kdw/Label.h
+kdw/Win32/Rectangle.h
+kdw/Win32/Window.h
+Serialization/SerializationFactory.h
 
 FORCE_SEGMENT(ConditionEditor)
 

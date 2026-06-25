@@ -2,7 +2,7 @@
 #define __OBJSTATISTIC_H__
 
 #ifndef _FINAL_VERSION_
-#include "Render\src\scene.h"
+Render/src/scene.h
 #include <vector>
 #include <CommCtrl.h>
 

@@ -1,7 +1,7 @@
 #ifndef __GEO_H__
 #define __GEO_H__
 
-#include "XMath\xmath.h"
+XMath/xmath.h
 //#include "break.h"
 //#include "geo2.h"
 #include "vbitmap.h"

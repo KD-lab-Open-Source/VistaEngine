@@ -2,10 +2,10 @@
 #define __UI_RENDER_H__
 
 #include "UI_RenderBase.h"
-#include "XTL\Rect.h"
-#include "Render\3dx\UMath.h"
-#include "XMath\Colors.h"
-#include "XTL\SafeCast.h"
+XTL/Rect.h
+Render/3dx/UMath.h
+XMath/Colors.h
+XTL/SafeCast.h
 
 #include "UI_Enums.h"
 

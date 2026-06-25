@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "SourceTeleport.h"
 
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 
-#include "Units\PositionGeneratorCircle.h"
+Units/PositionGeneratorCircle.h
 #include "Squad.h"
-#include "Units\UnitInterface.h"
-#include "Units\IronLegion.h"
+Units/UnitInterface.h
+Units/IronLegion.h
 
 SourceTeleport::SourceTeleport() :
 SourceDamage()

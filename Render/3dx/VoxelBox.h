@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Umath.h"
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 
 class cObject3dx;
 struct Color4c;

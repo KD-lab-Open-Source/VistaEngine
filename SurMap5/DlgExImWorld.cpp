@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "SurMap5.h"
 #include "DlgExImWorld.h"
-#include "FileUtils\FileUtils.h"
-#include "Serialization\Dictionary.h"
-#include "terra\vmap.h"
-#include "Network\NetPlayer.h"
+FileUtils/FileUtils.h
+Serialization/Dictionary.h
+terra/vmap.h
+Network/NetPlayer.h
 
 #include <WinBase.h>
 

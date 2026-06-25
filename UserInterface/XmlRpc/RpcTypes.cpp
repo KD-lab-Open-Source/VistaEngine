@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "RpcTypes.h"
 
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 
 using namespace RpcType;
 

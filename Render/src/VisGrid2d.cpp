@@ -1,6 +1,6 @@
 #include "StdAfxRD.h"
 #include "VisGrid2d.h"
-#include "Render\3dx\Node3dx.h"
+Render/3dx/Node3dx.h
 
 ///////////////////////////////////////////////////////////////////////////////
 QuatTreeVoid::QuatTreeVoid()

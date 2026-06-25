@@ -8,13 +8,13 @@
 #include "PlayOgg.h"
 #include "vmap.h"
 #include "UnitAttribute.h"
-#include "Serialization\ResourceSelector.h"
-#include "Serialization\XPrmArchive.h"
-#include "Serialization\SerializationFactory.h"
+Serialization/ResourceSelector.h
+Serialization/XPrmArchive.h
+Serialization/SerializationFactory.h
 #include "GameOptions.h"
 #include "Console.h"
-#include "FileUtils\FileUtils.h"
-#include "Serialization\StringTable.h"
+FileUtils/FileUtils.h
+Serialization/StringTable.h
 
 bool terSoundEnable = true;
 bool terMusicEnable = true;

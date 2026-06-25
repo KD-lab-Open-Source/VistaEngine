@@ -1,7 +1,7 @@
 #pragma once
 
-#include "XTL\Handle.h"
-#include "Serialization\Serializer.h" // для редактора
+XTL/Handle.h
+Serialization/Serializer.h // для редактора
 
 //////////////////////////////////////////////////////////////
 // String должен иметь конструктор(const char* = ""), c_str() и 

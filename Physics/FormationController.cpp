@@ -2,7 +2,7 @@
 #include "FormationController.h"
 #include "Universe.h"
 #include "NormalMap.h"
-#include "AI\PFTrap.h"
+AI/PFTrap.h
 #include "Squad.h"
 #include "GlobalAttributes.h"
 

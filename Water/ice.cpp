@@ -1,10 +1,10 @@
 #include "StdAfx.h"
 #include "ice.h"
-#include "Render\shader\shaders.h"
-#include "Serialization\ResourceSelector.h"
-#include "Render\Src\TexLibrary.h"
-#include "Render\Src\cCamera.h"
-#include "Render\D3D\D3DRender.h"
+Render/shader/shaders.h
+Serialization/ResourceSelector.h
+Render/Src/TexLibrary.h
+Render/Src/cCamera.h
+Render/D3D/D3DRender.h
 
 cTemperature::cTemperature()
 :BaseGraphObject(0)

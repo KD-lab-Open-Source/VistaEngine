@@ -2,8 +2,8 @@
 #include "Controls.h"
 #include "CommonLocText.h"
 #include "GameOptions.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\EnumDescriptor.h"
+Serialization/Serialization.h
+Serialization/EnumDescriptor.h
 
 WRAP_LIBRARY(ControlManager, "ControlManager", "ControlManager", "Scripts\\Content\\Controls", 0, 0);
 

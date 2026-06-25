@@ -4,9 +4,9 @@
 #include "UnitActing.h"
 #include "WeaponAttribute.h"
 #include "LaunchData.h"
-#include "Physics\RigidBodyMissile.h"
+Physics/RigidBodyMissile.h
 
-#include "Environment\SourceImpulse.h"
+Environment/SourceImpulse.h
 
 class AttributeProjectile : public AttributeBase, public StringTableBase
 {

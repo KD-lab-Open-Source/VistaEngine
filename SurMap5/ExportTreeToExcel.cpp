@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "ExportTreeToExcel.h"
-#include "ExcelExport\ExcelExporter.h"
+ExcelExport/ExcelExporter.h
 
 ExportTreeToExcel::ExportTreeToExcel(const char* filename)
 {

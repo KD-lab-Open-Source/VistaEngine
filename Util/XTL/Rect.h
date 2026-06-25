@@ -2,8 +2,8 @@
 #define __PERIMETER_RECT_H_INCLUDED__
 
 #include <vector>
-#include "XMath\xmath.h"
-#include "Serialization\Range.h"
+XMath/xmath.h
+Serialization/Range.h
 
 /*
  * FIXME: Подразумевается, что left < right и top < bottom, добавить

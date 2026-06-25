@@ -1,7 +1,7 @@
 #ifndef __TOOLS_H__
 #define __TOOLS_H__
 
-#include "Render\3dx\Umath.h"
+Render/3dx/Umath.h
 #include "Terra.h"
 #include "vMap.h"
 

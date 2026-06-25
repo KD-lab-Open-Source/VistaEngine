@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "SurMap5.h"
 #include "NameComboDlg.h"
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 
 IMPLEMENT_DYNAMIC(CNameComboDlg, CDialog)
 

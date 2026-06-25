@@ -1,8 +1,8 @@
 #ifndef __EFFECT_CONTAINER_H__
 #define __EFFECT_CONTAINER_H__
 
-#include "XMath\Colors.h"
-#include "Serialization\StringTableReferencePolymorphic.h"
+XMath/Colors.h
+Serialization/StringTableReferencePolymorphic.h
 
 class EffectKey;
 class Archive;

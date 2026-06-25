@@ -3,11 +3,11 @@
 
 #include <atltypes.h>
 #include "Handle.h"
-#include "Serialization\SerializationTypes.h"
+Serialization/SerializationTypes.h
 #include "Timers.h"
-#include "XMath\xmath.h"
-#include "XMath\Colors.h"
-#include "XTL\UniqueVector.h"
+XMath/xmath.h
+XMath/Colors.h
+XTL/UniqueVector.h
 
 //-----------------------------
 class Player;

@@ -5,8 +5,8 @@
 
 #include "CreateControlAction.h"
 #include "SelectionManager.h"
-#include "Serialization\SerializationFactory.h"
-#include "UserInterface\UI_Types.h"
+Serialization/SerializationFactory.h
+UserInterface/UI_Types.h
 #include "UITreeObjects.h"
 
 CreateControlAction::CreateControlAction(UI_ControlContainer& _container, int _type_index)

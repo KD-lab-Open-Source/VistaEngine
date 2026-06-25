@@ -6,7 +6,7 @@
 #include "Starforce.h"
 
 #include "MissionDescriptionNet.h"
-#include "FileUtils\XGUID.h" //определение XGUID
+FileUtils/XGUID.h //определение XGUID
 
 #include "ExternalTask.h"
 #include "P2P_interfaceAux.h"

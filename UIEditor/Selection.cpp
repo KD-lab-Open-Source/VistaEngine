@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 
-#include "..\UserInterface\UserInterface.h"
+../UserInterface/UserInterface.h
 #include "Selection.h"
 #include "ControlUtils.h"
 

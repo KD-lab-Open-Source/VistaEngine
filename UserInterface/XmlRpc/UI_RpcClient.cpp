@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "UI_RpcClient.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\Decorators.h"
+Serialization/Serialization.h
+Serialization/Decorators.h
 #include "RpcClient.h"
 #include "RpcTypes.h"
-#include "Network\LogMsg.h" 
+Network/LogMsg.h 
 
 using namespace RpcType;
 

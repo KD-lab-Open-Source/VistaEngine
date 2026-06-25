@@ -1,7 +1,7 @@
 #ifndef _MATERIAL_H_
 #define _MATERIAL_H_
 
-#include "Render\inc\IVisGenericInternal.h"
+Render/inc/IVisGenericInternal.h
 
 struct cObjMaterial : public sAttribute
 {

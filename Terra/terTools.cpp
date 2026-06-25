@@ -1,23 +1,23 @@
 #include "stdafxTr.h"
 
-#include "Serialization\Serialization.h"
-#include "Serialization\EnumDescriptor.h"
-#include "Serialization\StringTableImpl.h"
+Serialization/Serialization.h
+Serialization/EnumDescriptor.h
+Serialization/StringTableImpl.h
 #include "quantizer.h"
 #include "terTools.h"
 
-#include "Serialization\ResourceSelector.h"
-#include "Serialization\SerializationFactory.h"
+Serialization/ResourceSelector.h
+Serialization/SerializationFactory.h
 
-#include "Render\inc\IRenderDevice.h"
+Render/inc/IRenderDevice.h
 #include "scalingEngine.h"
-#include "Terra\TerrainType.h"
+Terra/TerrainType.h
 
-#include "Game\RenderObjects.h"
-#include "Render\src\MultiRegion.h"
-#include "Render\src\TileMap.h"
-#include "Render\src\Scene.h"
-#include "FileUtils\FileUtils.h"
+Game/RenderObjects.h
+Render/src/MultiRegion.h
+Render/src/TileMap.h
+Render/src/Scene.h
+FileUtils/FileUtils.h
 
 //REGISTER_CLASS(TerToolLibElement, TerToolLibElement, "Сдвоенный тулзер");
 

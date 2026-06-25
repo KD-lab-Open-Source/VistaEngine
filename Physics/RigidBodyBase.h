@@ -3,7 +3,7 @@
 
 #include "RigidBodyPrm.h"
 #include "Geom.h"
-#include "Serialization\Factory.h"
+Serialization/Factory.h
 
 ///////////////////////////////////////////////////////////////
 

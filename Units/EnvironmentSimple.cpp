@@ -4,15 +4,15 @@
 #include "IronLegion.h"
 #include "RenderObjects.h"
 #include "TransparentTracking.h"
-#include "Environment\Environment.h"
+Environment/Environment.h
 #include "EditorVisual.h"
-#include "Physics\WindMap.h"
-#include "Physics\crash\CrashSystem.h"
+Physics/WindMap.h
+Physics/crash/CrashSystem.h
 #include "EnvironmentSimple.h"
-#include "Serialization\BinaryArchive.h"
-#include "Serialization\SerializationFactory.h"
+Serialization/BinaryArchive.h
+Serialization/SerializationFactory.h
 #include "CameraManager.h"
-#include "Render\src\Scene.h"
+Render/src/Scene.h
 
 DECLARE_SEGMENT(UnitEnvironmentSimple)
 REGISTER_CLASS(UnitBase, UnitEnvironmentSimple, "UnitEnvironmentSimple")

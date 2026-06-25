@@ -1,7 +1,7 @@
 #ifndef _DEBUG_PRM_H_
 #define _DEBUG_PRM_H_
 
-#include "Serialization\LibraryWrapper.h"
+Serialization/LibraryWrapper.h
 extern bool debugShowEnabled;
 
 struct ShowDebugRigidBody {

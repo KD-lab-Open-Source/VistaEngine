@@ -1,9 +1,9 @@
 #include "Stdafx.h"
 #include "TextDB.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\XPrmArchive.h"
-#include "Serialization\MultiArchive.h"
-#include "Game\GameOptions.h"
+Serialization/Serialization.h
+Serialization/XPrmArchive.h
+Serialization/MultiArchive.h
+Game/GameOptions.h
 #include "UnicodeConverter.h"
 
 TextDB::TextDB()

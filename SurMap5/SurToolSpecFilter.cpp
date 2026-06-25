@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "SurMap5.h"
 #include "SurToolSpecFilter.h"
-#include ".\surtoolspecfilter.h"
+./surtoolspecfilter.h
 
 
 // CSurToolSpecFilter dialog

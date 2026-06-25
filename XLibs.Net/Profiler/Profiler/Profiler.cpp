@@ -17,8 +17,8 @@
 #include "MTSection.h"
 #include "kdw/PropertyEditor.h"
 //#include "kdw/kdWidgetsLib.h"
-#include "Serialization\XPrmArchive.h"
-#include "Serialization\Decorators.h"
+Serialization/XPrmArchive.h
+Serialization/Decorators.h
 
 #pragma warning (disable: 4073)
 #pragma init_seg(lib)

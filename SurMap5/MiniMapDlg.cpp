@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "MiniMapDlg.h"
-#include ".\minimapdlg.h"
+./minimapdlg.h
 
 
 // CMiniMapDlg dialog

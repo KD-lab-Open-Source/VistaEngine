@@ -3,7 +3,7 @@
 
 #include "rd.h"
 #include "unknown.h"
-#include "Render\D3D\renderstates.h"
+Render/D3D/renderstates.h
 
 struct IDirect3DVertexBuffer9;
 struct IDirect3DIndexBuffer9;
@@ -135,7 +135,7 @@ struct RENDER_API sPtrIndexBuffer
 };
 
 #include "VertexFormat.h"
-#include "Render\D3D\VertexBuffer.h"
+Render/D3D/VertexBuffer.h
 
 ///—труктура дл€ вывода в несколько окон (HWND) изображени€.
 class RENDER_API cRenderWindow: public UnknownClass

@@ -8,7 +8,7 @@
 //#include <my_STL.h>
 #include <vector>
 #include <string>
-#include "XMath\xmath.h"
+XMath/xmath.h
 
 #include <stdio.h>
 using namespace std;

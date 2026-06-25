@@ -1,16 +1,16 @@
 #include "stdafx.h"
 
-#include "Environment\Environment.h"
+Environment/Environment.h
 #include "WaterWalking.h"
 #include "Water.h"
 #include "RenderObjects.h"
-#include "Render\Src\cCamera.h"
-#include "Render\Src\TexLibrary.h"
-#include "Render\Src\Scene.h"
+Render/Src/cCamera.h
+Render/Src/TexLibrary.h
+Render/Src/Scene.h
 
-#include "Units\Squad.h"
+Units/Squad.h
 
-#include "Serialization\ResourceSelector.h"
+Serialization/ResourceSelector.h
 
 cWaterPlume::cWaterPlume(UnitReal* unit, const WaterPlumeAttribute& attribute) : BaseGraphObject(0), frequency(attribute.waterPlumeFrequency)
 {

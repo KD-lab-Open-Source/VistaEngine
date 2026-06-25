@@ -1,9 +1,9 @@
 #ifndef __UI_FONT_
 #define __UI_FONT_
 
-#include "Render\src\FT_Font.h"
-#include "Serialization\StringTableBase.h"
-#include "Serialization\StringTableReference.h"
+Render/src/FT_Font.h
+Serialization/StringTableBase.h
+Serialization/StringTableReference.h
 
 class Archive;
 

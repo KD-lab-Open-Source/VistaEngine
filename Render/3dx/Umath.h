@@ -3,7 +3,7 @@
 
 #include <windows.h>
 #include <math.h>
-#include "XMath\xmath.h"
+XMath/xmath.h
 
 class Archive;
 

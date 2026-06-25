@@ -1,15 +1,15 @@
 #include "StdAfx.h"
-#include "kdw\Application.h"
-#include "XTL\sigslot.h"
+kdw/Application.h
+XTL/sigslot.h
 #include <process.h>
 
 #include "Runtime.h"
-#include "MySQLpp\TableBase.h"
+MySQLpp/TableBase.h
 
-#include "XMath\XMathLib.h"
-#include "Serialization\SerializationLib.h"
-#include "kdw\kdWidgetsLib.h"
-#include "MySQLpp\MySQLppLib.h"
+XMath/XMathLib.h
+Serialization/SerializationLib.h
+kdw/kdWidgetsLib.h
+MySQLpp/MySQLppLib.h
 
 
 HANDLE server_finish = 0;

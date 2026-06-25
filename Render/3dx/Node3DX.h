@@ -1,10 +1,10 @@
 #ifndef __NODE_3DX_H_INCLUDED__
 #define __NODE_3DX_H_INCLUDED__
 #include "Static3dx.h"
-#include "Render\Src\observer.h"
-#include "Render\Src\nparticle.h"
-#include "XMath\Mats.h"
-#include "Render\Src\Leaves.h"
+Render/Src/observer.h
+Render/Src/nparticle.h
+XMath/Mats.h
+Render/Src/Leaves.h
 /*
 	Ограничения cObject3dx. 
 	65536 вертексов суммарно может быть в модели. 

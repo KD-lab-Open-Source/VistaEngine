@@ -2,7 +2,7 @@
 #define __POPUP_MENU_H_INCLUDED__
 
 #include <list>
-#include "XTL\Functor.h"
+XTL/Functor.h
 
 class PopupMenu;
 class PopupMenuItem : public ShareHandleBase{

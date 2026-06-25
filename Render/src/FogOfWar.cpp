@@ -4,9 +4,9 @@
 #include "cCamera.h"
 #include "D3DRender.h"
 #include <emmintrin.h>		// MMX, SSE, SSE2 intrinsic support
-#include "Serialization\Serialization.h"
-#include "Serialization\RangedWrapper.h"
-#include "Terra\vmap.h"
+Serialization/Serialization.h
+Serialization/RangedWrapper.h
+Terra/vmap.h
 
 
 ///////////////////////////////////////////////////////

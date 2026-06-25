@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "InvertMatrix.h"
-#include "XMath\Mat4f.h"
+XMath/Mat4f.h
 
 void calcLinear(vector<float>& data,float& a0,float& a1)
 {

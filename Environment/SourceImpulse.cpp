@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "SourceImpulse.h"
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 #include "BaseUnit.h"
 #include "UnitActing.h"
 #include "EnvironmentSimple.h"

@@ -5,7 +5,7 @@
 #ifndef __GRID_2D__
 #define __GRID_2D__
 
-#include "Render\inc\RenderMT.h"
+Render/inc/RenderMT.h
 #include "DebugUtil.h"
 
 // Прямоугольная область для сканироавния 

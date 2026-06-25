@@ -1,5 +1,5 @@
 #include "XUtil.h"
-#include "XZip\unzip.h"
+XZip/unzip.h
 #include <windows.h>
 
 struct XZipStream

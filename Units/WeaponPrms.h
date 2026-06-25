@@ -5,7 +5,7 @@
 #include "IronLegion.h"
 #include "UnitPad.h"
 #include "WeaponAttribute.h"
-#include "Environment\ChainLightningController.h"
+Environment/ChainLightningController.h
 
 class AttributeProjectile;
 

@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "XTL\Rect.h"
+XTL/Rect.h
 
 class UI_ControlBase;
 

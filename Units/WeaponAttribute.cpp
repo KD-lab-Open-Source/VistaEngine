@@ -3,12 +3,12 @@
 #include "WeaponAttribute.h"
 #include "WeaponPrms.h"
 #include "UnitAttribute.h"
-#include "Serialization\XPrmArchive.h"
-#include "Serialization\MultiArchive.h"
-#include "Serialization\StringTableImpl.h"
+Serialization/XPrmArchive.h
+Serialization/MultiArchive.h
+Serialization/StringTableImpl.h
 #include "UnitActing.h"
-#include "Serialization\SerializationFactory.h"
-#include "Serialization\ResourceSelector.h"
+Serialization/SerializationFactory.h
+Serialization/ResourceSelector.h
 
 #include "Player.h"
 

@@ -2,7 +2,7 @@
 #define __RESOURCE_SELECTOR_H_INCLUDED__
 
 #include <string>
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 
 class ExportInterface
 {

@@ -1,17 +1,17 @@
 
 #include "StdAfx.h"
 #include "SoundAttribute.h"
-#include "Serialization\ResourceSelector.h"
+Serialization/ResourceSelector.h
 #include "PlayOgg.h"
 #include "Sound.h"
 #include "SoundApp.h"
-#include "Serialization\StringTableImpl.h"
-#include "Sound\soundSystem.h"
+Serialization/StringTableImpl.h
+Sound/soundSystem.h
 #include "Universe.h"
 #include "GlobalAttributes.h"
-#include "Serialization\XPrmArchive.h"
-#include "Serialization\SerializationFactory.h"
-#include "FileUtils\FileUtils.h"
+Serialization/XPrmArchive.h
+Serialization/SerializationFactory.h
+FileUtils/FileUtils.h
 
 REGISTER_CLASS(SoundAttribute, Sound2DAttribute, "2D звук");
 REGISTER_CLASS(SoundAttribute, Sound3DAttribute, "3D звук");

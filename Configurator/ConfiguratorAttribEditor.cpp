@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ConfiguratorAttribEditor.h"
 #include "ConfiguratorDlg.h"
-#include "XTL\SafeCast.h"
+XTL/SafeCast.h
 
 void CConfiguratorAttribEditor::beforeResave()
 {

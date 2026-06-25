@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "EnginePrm.h"
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 
 WRAP_LIBRARY(EnginePrm, "EnginePrm", "EnginePrm", "Scripts\\Engine\\EnginePrm", 0, 0);
 

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "SurMap5.h"
 #include "SurToolWaves.h"
-#include "Game\RenderObjects.h"
+Game/RenderObjects.h
 
 #include "MainFrame.h"
 #include "surtoolwaves.h"

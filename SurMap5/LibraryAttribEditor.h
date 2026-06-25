@@ -1,8 +1,8 @@
 #ifndef __LIBRARY_ATTRIB_EDITOR_H_INCLUDED__
 #define __LIBRARY_ATTRIB_EDITOR_H_INCLUDED__
 
-#include "AttribEditor\AttribEditorCtrl.h"
-#include "XTL\Functor.h"
+AttribEditor/AttribEditorCtrl.h
+XTL/Functor.h
 
 #include "Serialization/LibraryBookmark.h"
 

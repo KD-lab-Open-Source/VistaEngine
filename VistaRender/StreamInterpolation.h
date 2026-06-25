@@ -1,7 +1,7 @@
 #ifndef __STREAM_INTERPOLATION_H_INCLUDED__
 #define __STREAM_INTERPOLATION_H_INCLUDED__
 
-#include "Render\inc\IVisGenericInternal.h"
+Render/inc/IVisGenericInternal.h
 
 /*
 Потоковая интерполяция данных.

@@ -3,7 +3,7 @@
 
 #include "SourceEffect.h"
 #include "UnitAttribute.h"
-#include "Terra\terTools.h"
+Terra/terTools.h
 
 class SourceTornado : public SourceDamage
 {

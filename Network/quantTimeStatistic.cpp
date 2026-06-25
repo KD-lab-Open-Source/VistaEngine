@@ -1,6 +1,6 @@
 #include "StdAfx.h"
-#include "Network\quantTimeStatistic.h"
-#include "Network\P2P_interface.h"
+Network/quantTimeStatistic.h
+Network/P2P_interface.h
 
 
 void QuantTimeStatistic::reset(bool isHT) //использовать до 2-х потоковости

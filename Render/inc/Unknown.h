@@ -16,7 +16,7 @@ public:
 	~cCheckExit();
 };
 
-#include "Render\Util\stack.h"
+Render/Util/stack.h
 class RENDER_API cCheckDelete
 {
 	static cCheckExit root;

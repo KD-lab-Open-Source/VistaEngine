@@ -2,10 +2,10 @@
 #define __DEBUG_UTIL_H__
 
 #include "crc.h"
-#include "XMath\Colors.h"
-#include "Render\Inc\RenderMT.h"
+XMath/Colors.h
+Render/Inc/RenderMT.h
 #include "MTSection.h"
-#include "Serialization\Range.h"
+Serialization/Range.h
 
 class Camera;
 

@@ -1,7 +1,7 @@
 #ifndef __RIGID_BODY_PRM_H__
 #define __RIGID_BODY_PRM_H__
 
-#include "Serialization\StringTableReferencePolymorphic.h"
+Serialization/StringTableReferencePolymorphic.h
 
 enum RigidBodyType;
 

@@ -1,19 +1,19 @@
 #include "StdAfx.h"
 
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 #include "SourceZone.h"
 
-#include "Serialization\RangedWrapper.h"
+Serialization/RangedWrapper.h
 #include "RenderObjects.h"
 #include "Squad.h"
-#include "Environment\SourceManager.h"
-#include "Environment\Environment.h"
-#include "Water\Water.h"
+Environment/SourceManager.h
+Environment/Environment.h
+Water/Water.h
 #include "IronBuilding.h"
 #include "ObjectSpreader.h"
-#include "Game\Universe.h"
-#include "Serialization\MillisecondsWrapper.h"
-#include "Terra\vMap.h"
+Game/Universe.h
+Serialization/MillisecondsWrapper.h
+Terra/vMap.h
 
 // ------------------- SourceZone
 

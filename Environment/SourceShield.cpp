@@ -1,16 +1,16 @@
 #include "stdafx.h"
 #include "SourceShield.h"
 
-#include "Serialization\Serialization.h"
-#include "Serialization\RangedWrapper.h"
-#include "Environment\Environment.h"
-#include "Environment\SourceManager.h"
+Serialization/Serialization.h
+Serialization/RangedWrapper.h
+Environment/Environment.h
+Environment/SourceManager.h
 #include "Player.h"
-#include "Serialization\ResourceSelector.h"
+Serialization/ResourceSelector.h
 #include "RenderObjects.h"
-#include "VistaRender\\Field.h"
+VistaRender//Field.h
 #include "Universe.h"
-#include "AI\PFTrap.h"
+AI/PFTrap.h
 
 SourceShield::SourceShield()
 {

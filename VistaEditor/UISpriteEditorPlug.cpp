@@ -5,7 +5,7 @@
 #include "UISpriteEditorViewport.h"
 #include "kdw/Dialog.h"
 #include "kdw/CheckBox.h"
-#include "Render\Src\Texture.h"
+Render/Src/Texture.h
 
 class UISpriteEditor;
 class UISpriteEditorPlug: public kdw::Plug<UI_Sprite, UISpriteEditorPlug>{

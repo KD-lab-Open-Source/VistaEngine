@@ -5,9 +5,9 @@
 
 #include "UI_UnitView.h"
 #include "UI_Render.h"
-#include "Render\Src\cCamera.h"
-#include "Render\Src\Scene.h"
-#include "Render\src\VisGeneric.h"
+Render/Src/cCamera.h
+Render/Src/Scene.h
+Render/src/VisGeneric.h
 
 UI_UnitView::UI_UnitView() : scene_(0),
 	camera_(0),

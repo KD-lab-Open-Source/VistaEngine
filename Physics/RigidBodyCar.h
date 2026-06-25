@@ -1,7 +1,7 @@
 #ifndef __RIGID_BODY_CAR_H__
 #define __RIGID_BODY_CAR_H__
 
-#include "Math\ConstraintHandlerSimple.h"
+Math/ConstraintHandlerSimple.h
 #include "NormalMap.h"
 
 class RigidBodyCar;

@@ -1,7 +1,7 @@
 #include "stdafxTr.h"
 #include "TerToolCtrl.h"
-#include "Serialization\RangedWrapper.h"
-#include "Serialization\Serialization.h"
+Serialization/RangedWrapper.h
+Serialization/Serialization.h
 #include "terTools.h"
 
 Toolser::Toolser()

@@ -4,16 +4,16 @@
 #include "SoundApp.h"
 #include "PlayOgg.h"
 #include "GameShell.h"
-#include "VistaRender\postEffects.h"
-#include "Units\GlobalAttributes.h"
-#include "bubles\blobs.h"
-#include "bubles\cell.h"
-#include "Render\Src\cCamera.h"
-#include "Render\Src\TexLibrary.h"
-#include "Render\D3D\D3DRender.h"
-#include "Render\src\NParticle.h"
-#include "Render\src\Scene.h"
-#include "Render\src\VisGeneric.h"
+VistaRender/postEffects.h
+Units/GlobalAttributes.h
+bubles/blobs.h
+bubles/cell.h
+Render/Src/cCamera.h
+Render/Src/TexLibrary.h
+Render/D3D/D3DRender.h
+Render/src/NParticle.h
+Render/src/Scene.h
+Render/src/VisGeneric.h
 
 
 float SPLASH_FADE_IN_TIME = 800; 

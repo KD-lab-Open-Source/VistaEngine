@@ -60,7 +60,7 @@
 #include "my_STL.h"
 using namespace std;
 
-#include "XMath\xmath.h"
+XMath/xmath.h
 #include <afxdhtml.h>
 
 #include "DebugPrm.h"

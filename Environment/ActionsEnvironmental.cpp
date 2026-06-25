@@ -1,22 +1,22 @@
 #include "stdafx.h"
 #include "ActionsEnvironmental.h"
 
-#include "VistaRender\postEffects.h"
+VistaRender/postEffects.h
 #include "Environment.h"
 #include "SourceManager.h"
 #include "Anchor.h"
 
-#include "Water\Fallout.h"
+Water/Fallout.h
 #include "RenderObjects.h"
-#include "Water\SkyObject.h"
-#include "Water\CoastSprites.h"
+Water/SkyObject.h
+Water/CoastSprites.h
 #include "vMap.h"
 #include "GameOptions.h"
-#include "Game\SoundApp.h"
-#include "Game\Universe.h"
-#include "Render\src\Gradients.h"
-#include "Render\src\VisGeneric.h"
-#include "Serialization\SerializationFactory.h"
+Game/SoundApp.h
+Game/Universe.h
+Render/src/Gradients.h
+Render/src/VisGeneric.h
+Serialization/SerializationFactory.h
 
 STARFORCE_API void initActionsEnvironmental()
 {

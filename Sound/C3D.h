@@ -2,7 +2,7 @@
 #define __C3_D_H_INCLUDED__
 
 #include "SoftwareBuffer.h"
-#include "..\Util\StaticMap.h"
+../Util/StaticMap.h
 
 struct ScriptParam;
 

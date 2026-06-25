@@ -3,12 +3,12 @@
 #include "Serialization.h"
 #include "ResourceSelector.h"
 #include "RenderObjects.h"
-#include "..\Util\RangedWrapper.h"
+../Util/RangedWrapper.h
 #include "CameraManager.h"
 //#include "Simply3dx.h"
 
-#include "..\terra\terra.h"
-#include "..\Environment\Environment.h"
+../terra/terra.h
+../Environment/Environment.h
 
 //==================================================================
 BEGIN_ENUM_DESCRIPTOR(ListTypeQuant, "ListTypeQuant");

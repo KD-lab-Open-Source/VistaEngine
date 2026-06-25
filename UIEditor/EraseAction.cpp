@@ -6,7 +6,7 @@
 #include "SelectionManager.h"
 #include "UITreeObjects.h"
 
-#include "UserInterface\UI_Types.h"
+UserInterface/UI_Types.h
 
 EraseControlAction::EraseControlAction(const Selection& _selection, UI_ControlContainer& _container)
 : selection_ (_selection)

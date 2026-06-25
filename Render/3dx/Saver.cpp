@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "Saver.h"
 #include "UMath.h"
-#include "XMath\Rectangle4f.h"
+XMath/Rectangle4f.h
 
 Saver& operator<<(Saver& s,const sPolygon& p)
 {

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "RangedWrapper.h"
 
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 
 void RangedWrapperf::clip()
 {

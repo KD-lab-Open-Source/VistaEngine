@@ -1,8 +1,8 @@
 #ifndef __FORMATION_CONTROLLER_H__
 #define __FORMATION_CONTROLLER_H__
 
-#include "XMath\SafeMath.h"
-#include "Util\Timers.h"
+XMath/SafeMath.h
+Util/Timers.h
 #include "RigidBodyUnit.h"
 #include "MovementDirection.h"
 #include "AttributeSquad.h"

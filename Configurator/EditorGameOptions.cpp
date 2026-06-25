@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "EditorGameOptions.h"
-#include "Game\GameOptions.h"
+Game/GameOptions.h
 
 EditorGameOptions::EditorGameOptions()
 {

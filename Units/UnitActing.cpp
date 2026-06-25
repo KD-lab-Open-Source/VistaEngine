@@ -4,22 +4,22 @@
 #include "Squad.h"
 #include "IronLegion.h"
 #include "IronBuilding.h"
-#include "UserInterface\UI_Logic.h"
+UserInterface/UI_Logic.h
 #include "GameOptions.h"
-#include "UserInterface\UserInterface.h"
-#include "Environment\Environment.h"
-#include "Water\Water.h"
-#include "Water\SkyObject.h"
+UserInterface/UserInterface.h
+Environment/Environment.h
+Water/Water.h
+Water/SkyObject.h
 #include "RenderObjects.h"
 #include "MicroAI.h"
-#include "AI\PFTrap.h"
+AI/PFTrap.h
 #include "UnitItemInventory.h"
 #include "CameraManager.h"
 #include "StreamCommand.h"
-#include "Water\CircleManager.h"
+Water/CircleManager.h
 #include "UnitItemResource.h"
 #include "PositionGeneratorSquad.h"
-#include "Physics\crash\CrashSystem.h"
+Physics/crash/CrashSystem.h
 
 BEGIN_ENUM_DESCRIPTOR(DirectControlMode, "DirectControlMode")
 REGISTER_ENUM(DIRECT_CONTROL_DISABLED, "None")

@@ -2,15 +2,15 @@
 #include <math.h>
 
 #include "Fallout.h"
-#include "Serialization\RangedWrapper.h"
-#include "Serialization\ResourceSelector.h"
-#include "Serialization\Serialization.h"
-#include "Environment\Environment.h"
-#include "Physics\WindMap.h"
-#include "Terra\vmap.h"
-#include "Serialization\EnumDescriptor.h"
-#include "Render\Src\cCamera.h"
-#include "Render\Src\TexLibrary.h"
+Serialization/RangedWrapper.h
+Serialization/ResourceSelector.h
+Serialization/Serialization.h
+Environment/Environment.h
+Physics/WindMap.h
+Terra/vmap.h
+Serialization/EnumDescriptor.h
+Render/Src/cCamera.h
+Render/Src/TexLibrary.h
 
 BEGIN_ENUM_DESCRIPTOR(ModeFall,"ModeFall");
 REGISTER_ENUM(FALLOUT_RAIN, "Дождь");

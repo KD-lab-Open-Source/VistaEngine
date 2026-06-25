@@ -17,17 +17,17 @@
 #include "RenderObjects.h"
 
 #include "P2P_interface.h"
-#include "Water\Water.h"
-#include "Render\src\Scene.h"
-#include "Render\src\VisGeneric.h"
+Water/Water.h
+Render/src/Scene.h
+Render/src/VisGeneric.h
 #include "Console.h"
 #include "DebugPrm.h"
-#include "VistaRender\postEffects.h"
-#include "Environment\Environment.h"
-#include "Environment\SourceManager.h"
-#include "VistaRender\FieldOfView.h"
-#include "FileUtils\FileUtils.h"
-#include "Serialization\SerializationFactory.h"
+VistaRender/postEffects.h
+Environment/Environment.h
+Environment/SourceManager.h
+VistaRender/FieldOfView.h
+FileUtils/FileUtils.h
+Serialization/SerializationFactory.h
 #include "UnicodeConverter.h"
 #include "Joystick.h"
 
@@ -37,14 +37,14 @@
 #include "EnginePrm.h"
 
 #include "Triggers.h"
-#include "TriggerEditor\TriggerEditor.h"
+TriggerEditor/TriggerEditor.h
 
 #include "TextDB.h"
 #include "PlayBink.h"
 #include "SelectManager.h"
 
 #include "kdw/PropertyEditor.h"
-#include "Serialization\XPrmArchive.h"
+Serialization/XPrmArchive.h
 #include "ConsoleWindow.h"
 
 #include "GameLoadManager.h"
@@ -58,23 +58,23 @@
 #include "CommonLocText.h"
 #include "ShowHead.h"
 #include "WBuffer.h"
-#include "AI\PFTrap.h"
+AI/PFTrap.h
 #include "UI_Logic.h"
 #include "UI_StreamVideo.h"
 extern Singleton<UI_StreamVideo> streamVideo;
 
-#include "Physics\crash\CrashSystem.h"
+Physics/crash/CrashSystem.h
 
-#include "Water\SkyObject.h"
-#include "Terra\terTools.h"
+Water/SkyObject.h
+Terra/terTools.h
 
 #include "StreamCommand.h"
-#include "Render\3dx\Lib3dx.h"
-#include "Render\Src\TexLibrary.h"
-#include "Render\D3D\D3DRender.h"
+Render/3dx/Lib3dx.h
+Render/Src/TexLibrary.h
+Render/D3D/D3DRender.h
 #undef XREALLOC
 #undef XFREE
-#include "Game\IniFile.h"
+Game/IniFile.h
 #include "kdw/LibraryEditorDialog.h"
 
 #include "LogMsg.h"

@@ -2,8 +2,8 @@
 #define __ENVIRONMENT_SIMPLE_H__
 
 #include "UnitEnvironment.h"
-#include "Water\SpringDamping.h"
-#include "Water\FallLeaves.h"
+Water/SpringDamping.h
+Water/FallLeaves.h
 
 class UnitEnvironmentSimple : public UnitEnvironment
 {

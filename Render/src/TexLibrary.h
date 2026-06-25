@@ -2,10 +2,10 @@
 #define __TEX_LIBRARY_H_INCLUDED__
 
 #include "MTSection.h"
-#include "FileUtils\FileTime.h"
-#include "XMath\Rectangle4f.h"
-#include "XTL\StaticMap.h"
-#include "Render\inc\IVisGenericInternal.h"
+FileUtils/FileTime.h
+XMath/Rectangle4f.h
+XTL/StaticMap.h
+Render/inc/IVisGenericInternal.h
 
 class cTexture;
 class cTextureScale;

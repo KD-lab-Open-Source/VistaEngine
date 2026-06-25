@@ -1,9 +1,9 @@
 #ifndef __WIND_H_INCLUDED__
 #define __WIND_H_INCLUDED__
 #include "Water.h"
-#include "..\Environment\SourceBase.h"
-#include "..\terra\terTools.h"
-#include "..\Units\EnvironmentSimple.h"
+../Environment/SourceBase.h
+../terra/terTools.h
+../Units/EnvironmentSimple.h
 
 class Archive;
 class cMapWind;

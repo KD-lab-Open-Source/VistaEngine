@@ -3,17 +3,17 @@
 
 #include "UnitInterface.h"
 #include "CameraManager.h"
-#include "Render\Src\cCamera.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\RangedWrapper.h"
+Render/Src/cCamera.h
+Serialization/Serialization.h
+Serialization/RangedWrapper.h
 #include "RenderObjects.h"
-#include "Render\src\Scene.h"
+Render/src/Scene.h
 
-#include "Environment\Environment.h"
+Environment/Environment.h
 
-#include "UserInterface\UI_Render.h"
-#include "UserInterface\UserInterface.h"
-#include "UserInterface\UI_Logic.h"
+UserInterface/UI_Render.h
+UserInterface/UserInterface.h
+UserInterface/UI_Logic.h
 
 float ShowUpAttribute::minDrawSize = 10.f;
 bool ShowUpAttribute::distanceFade = true;

@@ -1,11 +1,11 @@
 #include "StdAfx.h"
 
-// #include "Terra\geo2.h"
-// #include "Terra\break.h"
+// Terra/geo2.h
+// Terra/break.h
 
 #include "SourceTerTool.h"
 #include "UnitAttribute.h"
-#include "Serialization\MillisecondsWrapper.h"
+Serialization/MillisecondsWrapper.h
 
 void SourceTerTool::serialize(Archive& ar)
 {

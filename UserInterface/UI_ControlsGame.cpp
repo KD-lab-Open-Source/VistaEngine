@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 
-#include "XTL\SafeCast.h"
-#include "Serialization\Serialization.h"
+XTL/SafeCast.h
+Serialization/Serialization.h
 
 #include "UI_Render.h"
 #include "UserInterface.h"
@@ -15,16 +15,16 @@
 #include "UnitAttribute.h"
 #include "BaseUnit.h"
 #include "Squad.h"
-#include "Environment\Anchor.h"
+Environment/Anchor.h
 
 #include "SelectManager.h"
 #include "ShowHead.h"
 
 #include "CameraManager.h"
-#include "Environment\Environment.h"
-#include "Environment\SourceManager.h"
-#include "Terra\vMap.h"
-#include "Render\Src\cCamera.h"
+Environment/Environment.h
+Environment/SourceManager.h
+Terra/vMap.h
+Render/Src/cCamera.h
 
 #include "Universe.h"
 #include "WBuffer.h"

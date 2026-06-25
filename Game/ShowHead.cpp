@@ -1,14 +1,14 @@
 #include "stdafx.h"
 #include "RenderObjects.h"
-#include "Render\src\WinVideo.h"
-#include "Render\Src\cCamera.h"
-#include "Render\src\Scene.h"
-#include "Render\src\VisGeneric.h"
-#include "Sound\sound.h"
+Render/src/WinVideo.h
+Render/Src/cCamera.h
+Render/src/Scene.h
+Render/src/VisGeneric.h
+Sound/sound.h
 #include "ShowHead.h"
 #include "DebugUtil.h"
 #include "SoundApp.h"
-#include "Units\GlobalAttributes.h"
+Units/GlobalAttributes.h
 
 Singleton<ShowHead> showHead;
 

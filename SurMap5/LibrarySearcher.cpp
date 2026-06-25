@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "LibrarySearcher.h"
 
-#include "mfc\ObjectsTreeCtrl.h"
+mfc/ObjectsTreeCtrl.h
 #include "LibraryBookmark.h"
 #include "EditArchive.h"
 

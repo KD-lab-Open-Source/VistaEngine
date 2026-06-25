@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "ParameterImportExportExcel.h"
-#include "ExcelExport\ExcelExporter.h"
-#include "Units\Parameters.h"
-#include "Units\UnitAttribute.h"
-#include "Serialization\Dictionary.h"
-#include "Serialization\StringTable.h"
+ExcelExport/ExcelExporter.h
+Units/Parameters.h
+Units/UnitAttribute.h
+Serialization/Dictionary.h
+Serialization/StringTable.h
 #include "UnicodeConverter.h"
 #include "WBuffer.h"
 

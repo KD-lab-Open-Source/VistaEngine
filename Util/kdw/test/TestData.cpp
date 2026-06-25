@@ -1,10 +1,10 @@
 #include "StdAfx.h"
 
 #include "TestData.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\LibraryWrapper.h"
-#include "Serialization\EnumDescriptor.h"
-#include "Serialization\SerializationFactory.h"
+Serialization/Serialization.h
+Serialization/LibraryWrapper.h
+Serialization/EnumDescriptor.h
+Serialization/SerializationFactory.h
 
 BEGIN_ENUM_DESCRIPTOR(SwitcherType, "SwitcherType")
     REGISTER_ENUM(SWITCHER_AND, "È")

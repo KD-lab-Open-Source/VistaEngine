@@ -1,11 +1,11 @@
 #include "stdafxTr.h"
 #include "QSWorldsMgr.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\XPrmArchive.h"
-#include "FileUtils\FileUtils.h"
-#include "FileUtils\XGUID.h"
+Serialization/Serialization.h
+Serialization/XPrmArchive.h
+FileUtils/FileUtils.h
+FileUtils/XGUID.h
 
-//#include "Network\LogMsg.h" // Недопустимая зависимость
+//Network/LogMsg.h // Недопустимая зависимость
 
 
 QSWorldsMgr qsWorldsMgr;

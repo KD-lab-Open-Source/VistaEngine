@@ -1,14 +1,14 @@
 #include "StdAfx.h"
 #include "UI_Sprite.h"
-#include "Serialization\StringTableImpl.h"
-#include "Serialization\LibraryWrapper.h"
-#include "Serialization\ResourceSelector.h"
-#include "Serialization\RangedWrapper.h"
-#include "Serialization\SerializationFactory.h"
-#include "FileUtils\FileUtils.h"
-#include "Render\src\Texture.h"
+Serialization/StringTableImpl.h
+Serialization/LibraryWrapper.h
+Serialization/ResourceSelector.h
+Serialization/RangedWrapper.h
+Serialization/SerializationFactory.h
+FileUtils/FileUtils.h
+Render/src/Texture.h
 #include "UI_RenderBase.h"
-#include "Util\DebugPrm.h"
+Util/DebugPrm.h
 
 extern float cycle(float f, float size);
 extern bool isUnderEditor();

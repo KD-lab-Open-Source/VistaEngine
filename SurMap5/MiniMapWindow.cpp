@@ -1,18 +1,18 @@
 #include "stdafx.h"
 #include "MiniMapWindow.h"
-#include "Game\RenderObjects.h"
+Game/RenderObjects.h
 #include "MainFrame.h"
 #include "GeneralView.h"
 
 #include "SurToolAux.h"
-#include "UserInterface\UI_Render.h"
-#include "UserInterface\UI_Minimap.h"
+UserInterface/UI_Render.h
+UserInterface/UI_Minimap.h
 
-#include "Environment\Environment.h"
-#include "Game\CameraManager.h"
-#include "Render\Src\cCamera.h"
-#include "Render\Src\Scene.h"
-#include "Render\Src\VisGeneric.h"
+Environment/Environment.h
+Game/CameraManager.h
+Render/Src/cCamera.h
+Render/Src/Scene.h
+Render/Src/VisGeneric.h
 
 CMiniMapWindow::CMiniMapWindow(CMainFrame* mainFrame)
 : renderWindow_(0)

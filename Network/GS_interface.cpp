@@ -826,8 +826,8 @@ bool GameSpyInterface::JoinStagingRoom(GUID ID)
 	return 0;
 }
 
-#include "Peer2\peer\peerMain.h"
-#include "Peer2\peer\peerMangle.h"
+Peer2/peer/peerMain.h
+Peer2/peer/peerMangle.h
 GameSpyInterface::e_JoinStagingRoomResult GameSpyInterface::JoinStagingRoom(unsigned long ip, const char* password)
 {
 //	char room[PI_ROOM_MAX_LEN];

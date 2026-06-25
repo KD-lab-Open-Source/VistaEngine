@@ -2,7 +2,7 @@
 #include "SurMap5.h"
 #include "SurToolToolzer.h"
 #include "SurToolAux.h"
-#include "..\Terra\vmap.inl"
+../Terra/vmap.inl
 
 // CSurToolToolzer dialog
 const int MIN_TOOLZER_DELTA_H=0;

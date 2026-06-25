@@ -1,9 +1,9 @@
 #ifndef __UI_TYPES_H__
 #define __UI_TYPES_H__
 
-#include "XTL\SwapVector.h"
+XTL/SwapVector.h
 #include "LocString.h"
-#include "Util\Serialization\EnumTable.h"
+Util/Serialization/EnumTable.h
 
 #include "UI_Enums.h"
 #include "UI_References.h"
@@ -11,17 +11,17 @@
 #include "UI_Font.h"
 #include "UI_Sprite.h"
 
-#include "XTL\Rect.h"
-#include "Render\3dx\UMath.h"
+XTL/Rect.h
+Render/3dx/UMath.h
 
 #include "EffectReference.h"
-#include "Units\EffectController.h"
-#include "Game\GlobalStatistics.h"
+Units/EffectController.h
+Game/GlobalStatistics.h
 
 #include "Controls.h"
-#include "XTL\CallWrapper.h"
+XTL/CallWrapper.h
 
-#include "Serialization\Factory.h"
+Serialization/Factory.h
 
 class AttributeBase;
 class ParameterSet;

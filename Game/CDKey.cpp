@@ -2,13 +2,13 @@
 //
 
 #include "stdafx.h"
-#include "kdw\dialog.h"
-#include "kdw\entry.h"
-#include "kdw\HBox.h"
-#include "kdw\Label.h"
-#include "kdw\kdWidgetsLib.h"
-#include "XMath\XMathLib.h"
-#include "Serialization\SerializationLib.h"
+kdw/dialog.h
+kdw/entry.h
+kdw/HBox.h
+kdw/Label.h
+kdw/kdWidgetsLib.h
+XMath/XMathLib.h
+Serialization/SerializationLib.h
 #include "windows.h"
 #include "CDKey.h"
 #include <deque>

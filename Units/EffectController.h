@@ -1,7 +1,7 @@
 #ifndef __EFFECT_CONTROLLER_H__
 #define __EFFECT_CONTROLLER_H__
 
-#include "XTL\SafeCast.h"
+XTL/SafeCast.h
 #include "Interpolation.h"
 #include "SoundAttribute.h"
 #include "UnitLink.h"

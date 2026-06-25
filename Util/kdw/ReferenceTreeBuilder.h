@@ -1,7 +1,7 @@
 #ifndef __REFERENCE_TREE_BUILDER_H_INCLUDED__
 #define __REFERENCE_TREE_BUILDER_H_INCLUDED__
 
-#include "Serialization\StringTable.h"
+Serialization/StringTable.h
 #include "kdw/TreeSelector.h"
 
 namespace kdw{

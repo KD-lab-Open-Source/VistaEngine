@@ -1,7 +1,7 @@
 #ifndef _BLOBS_H_
 #define _BLOBS_H_
 
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 
 class cTexture;
 

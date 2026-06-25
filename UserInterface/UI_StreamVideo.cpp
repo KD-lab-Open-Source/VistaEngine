@@ -4,10 +4,10 @@
 #include "Handle.h"
 #include "GameOptions.h"
 #include "SystemUtil.h"
-#include "Render\3dx\Umath.h"
-#include "Render\Inc\Unknown.h"
-#include "Render\Src\Texture.h"
-#include "Render\src\VisGeneric.h"
+Render/3dx/Umath.h
+Render/Inc/Unknown.h
+Render/Src/Texture.h
+Render/src/VisGeneric.h
 
 void* SNDGetDirectSound();
 

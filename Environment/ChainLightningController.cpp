@@ -1,14 +1,14 @@
 #include "stdafx.h"
 #include "ChainLightningController.h"
 
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 #include "Environment.h"
 #include "DebugPrm.h"
 #include "RenderObjects.h"
-#include "Serialization\RangedWrapper.h"
+Serialization/RangedWrapper.h
 #include "Universe.h"
 #include "Squad.h"
-#include "Render\Src\Scene.h"
+Render/Src/Scene.h
 
 void ChainLightningAttribute::serialize(Archive& ar)
 {

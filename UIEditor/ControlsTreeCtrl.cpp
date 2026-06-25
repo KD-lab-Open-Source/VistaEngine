@@ -1,20 +1,20 @@
 #include "StdAfx.h"
 #include "ControlUtils.h"
-#include ".\ControlsTreeCtrl.h"
+./ControlsTreeCtrl.h
 
 #include "UIEditor.h"
 #include "EditorView.h"
 #include "MainFrame.h"
 
 #include "SelectionManager.h"
-#include "UserInterface\UserInterface.h"
-#include "UserInterface\UI_Controls.h"
+UserInterface/UserInterface.h
+UserInterface/UI_Controls.h
 
 #include "UITreeObjects.h"
 
-#include "Serialization\Dictionary.h"
-#include "Serialization\SerializationFactory.h"
-#include "mfc\PopupMenu.h"
+Serialization/Dictionary.h
+Serialization/SerializationFactory.h
+mfc/PopupMenu.h
 #include "UITreeObjects.h"
 #include "kdw/ImageStore.h"
 #include "kdw/TreeView.h"

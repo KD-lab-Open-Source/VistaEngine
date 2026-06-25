@@ -1,6 +1,6 @@
 #include "stdafxTr.h"
 #include "worldFileDispatcher.h"
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 #include "tgai.h"
 
 BitmapDispatcher bitmapDispatcher;

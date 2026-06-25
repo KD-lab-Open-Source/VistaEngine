@@ -1,7 +1,7 @@
 #ifndef __OBJECT3DX_INTERFACE_H__
 #define __OBJECT3DX_INTERFACE_H__
 
-#include "Serialization\SerializationTypes.h"
+Serialization/SerializationTypes.h
 
 class StringIndexBase
 {

@@ -1,8 +1,8 @@
 #include "StdAfxTr.h"
 #include "DebugUtil.h"			 
-#include "Render\Inc\IRenderDevice.h"
-#include "Render\Src\cCamera.h"
-#include "Terra\vmap.h"
+Render/Inc/IRenderDevice.h
+Render/Src/cCamera.h
+Terra/vmap.h
 
 //LogStream fout("lst",XS_OUT);
 

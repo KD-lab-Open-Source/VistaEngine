@@ -1,17 +1,17 @@
 #include "StdAfx.h"
 
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 #include "UnitAttribute.h"
 #include "UnitItemInventory.h"
 #include "Universe.h"
 #include "IronLegion.h"
 #include "Player.h"
-#include "Serialization\StringTableImpl.h"
+Serialization/StringTableImpl.h
 
 #include "Inventory.h"
-#include "UserInterface\UI_Inventory.h"
+UserInterface/UI_Inventory.h
 #include "StreamCommand.h"
-#include "Serialization\SerializationFactory.h"
+Serialization/SerializationFactory.h
 #include "UnicodeConverter.h"
 #include "WBuffer.h"
 

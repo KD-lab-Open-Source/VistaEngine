@@ -1,7 +1,7 @@
 #ifndef __UI_UNIT_VIEW_H__
 #define __UI_UNIT_VIEW_H__
 
-#include "Units\Animation.h"
+Units/Animation.h
 
 class UI_UnitView
 {

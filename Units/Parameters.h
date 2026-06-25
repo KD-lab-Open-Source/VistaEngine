@@ -1,8 +1,8 @@
 #ifndef __PARAMETERS_H__
 #define __PARAMETERS_H__
 
-#include "Serialization\StringTableReference.h"
-#include "Serialization\SerializationTypes.h"
+Serialization/StringTableReference.h
+Serialization/SerializationTypes.h
 #include "FormulaString.h"
 #include "Timers.h"
 #include "AttributeReference.h"

@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "Serialization.h"
-#include "Serialization\EnumDescriptor.h"
+Serialization/EnumDescriptor.h
 
 template<class Enum, class Type>
 class EnumTable : public std::vector<Type>

@@ -1,7 +1,7 @@
 #ifndef _UNKOBJ_H_
 #define _UNKOBJ_H_
 
-#include "Render\inc\IUnkObj.h"
+Render/inc/IUnkObj.h
 
 class cTexture;
 

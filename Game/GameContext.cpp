@@ -5,24 +5,24 @@
 #include "vmap.h"
 #include "Universe.h"
 #include "Squad.h"
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 #include "kdw/kdWidgetsLib.h"
 #include "ShowHead.h"
-#include "Serialization\ResourceSelector.h"
+Serialization/ResourceSelector.h
 #include "GameShell.h"
 #include "Actions.h"
 #include "Conditions.h"
 #include "UI_Logic.h"
-#include "Network\P2P_interface.h"
+Network/P2P_interface.h
 #include "SelectManager.h"
 #include "GameOptions.h"
-#include "Environment\Environment.h"
-#include "UserInterface\GameShell.h"
-#include "UserInterface\UI_NetCenter.h"
-#include "Network\UniverseX.h"
-#include "FileUtils\FileUtils.h"
-#include "Units\CommandsQueue.h"
-#include "Render\src\VisGeneric.h"
+Environment/Environment.h
+UserInterface/GameShell.h
+UserInterface/UI_NetCenter.h
+Network/UniverseX.h
+FileUtils/FileUtils.h
+Units/CommandsQueue.h
+Render/src/VisGeneric.h
 #include "StreamCommand.h"
 #include "EditorVisual.h"
 

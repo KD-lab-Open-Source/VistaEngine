@@ -4,7 +4,7 @@
 #include "RigidBodyUnit.h"
 #include "RigidBodyNodePrm.h"
 #include "RigidBodyNode.h"
-#include "Math\ConstraintHandler.h"
+Math/ConstraintHandler.h
 
 ///////////////////////////////////////////////////////////////
 //

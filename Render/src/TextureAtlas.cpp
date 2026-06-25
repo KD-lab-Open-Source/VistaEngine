@@ -5,9 +5,9 @@
 #include <vector>
 #include <algorithm>
 using namespace std;
-#include "XMath\xmath.h"
+XMath/xmath.h
 #include <xutil.h>
-#include "Render\3dx\umath.h"
+Render/3dx/umath.h
 #include "TextureAtlas.h"
 
 cTextureAtlas::cTextureAtlas()

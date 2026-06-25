@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "InPlaceArchive.h"
-#include "Serialization\SerializationFactory.h"
+Serialization/SerializationFactory.h
 
 InPlaceOArchive::InPlaceOArchive(const char* fname, bool fixVtable)
 {

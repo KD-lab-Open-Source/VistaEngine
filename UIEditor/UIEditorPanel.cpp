@@ -1,15 +1,15 @@
 #include "StdAfx.h"
 
-#include ".\UIEditorPanel.h"
+./UIEditorPanel.h
 #include "ActionManager.h"
 
 #include "UIEditor.h"
 #include "MainFrame.h"
 #include "EditorView.h"
 #include "ControlsTreeCtrl.h"
-#include "AttribEditor\AttribEditorCtrl.h"
+AttribEditor/AttribEditorCtrl.h
 
-#include "UserInterface\UserInterface.h"
+UserInterface/UserInterface.h
 
 class CUIAttribEditorCtrl : public CAttribEditorCtrl{
 	void onChanged();

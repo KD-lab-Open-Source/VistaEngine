@@ -1,17 +1,17 @@
 #ifndef __BASE_SOURCE_H__
 #define __BASE_SOURCE_H__
 
-#include "Serialization\SerializationTypes.h"
+Serialization/SerializationTypes.h
 #include "Handle.h"
-#include "Units\CircleManagerParam.h"
-#include "Serialization\Range.h"
-#include "Serialization\StringTableReferencePolymorphic.h"
-#include "Units\BaseUniverseObject.h"
-#include "XTL\SafeCast.h"
+Units/CircleManagerParam.h
+Serialization/Range.h
+Serialization/StringTableReferencePolymorphic.h
+Units/BaseUniverseObject.h
+XTL/SafeCast.h
 #include "Timers.h"
 #include "EffectReference.h"
-#include "Units\EffectController.h"
-#include "Units\WeaponEnums.h"
+Units/EffectController.h
+Units/WeaponEnums.h
 #include "Grid2D.h"
 #include "UnitLink.h"
 

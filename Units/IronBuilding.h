@@ -2,7 +2,7 @@
 #define __IRONBUILDING_H__
 
 #include "UnitActing.h"
-#include "..\util\ScanningShape.h"
+../util/ScanningShape.h
 
 class Archive;
 

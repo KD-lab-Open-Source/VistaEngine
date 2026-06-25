@@ -6,11 +6,11 @@
 #include "CameraManager.h"
 #include "EventParameters.h"
 #include "GameCommands.h"
-#include "Environment\Environment.h"
-#include "Water\SkyObject.h"
-#include "Water\CircleManager.h"
-#include "UserInterface\UI_Logic.h"
-#include "Game\GameOptions.h"
+Environment/Environment.h
+Water/SkyObject.h
+Water/CircleManager.h
+UserInterface/UI_Logic.h
+Game/GameOptions.h
 
 UNIT_LINK_GET(UnitInterface)
 UNIT_LINK_GET(const UnitInterface)

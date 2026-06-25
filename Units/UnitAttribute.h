@@ -1,12 +1,12 @@
 #ifndef __UNIT_ATTRIBUTE_H__
 #define __UNIT_ATTRIBUTE_H__
 
-#include "Serialization\StringTableReference.h"
-#include "Serialization\EnumTable.h"
+Serialization/StringTableReference.h
+Serialization/EnumTable.h
 #include "LocString.h"
 
-#include "Terra\TerToolCtrl.h"
-#include "Terra\terra.h"
+Terra/TerToolCtrl.h
+Terra/terra.h
 
 #include "EffectReference.h"
 #include "SoundAttribute.h"
@@ -19,15 +19,15 @@
 #include "AttributeReference.h"
 #include "Object3dxInterface.h"
 
-#include "Physics\RigidBodyNodePrm.h"
-#include "Physics\RigidBodyCarPrm.h"
-#include "Physics\WindMap.h"
+Physics/RigidBodyNodePrm.h
+Physics/RigidBodyCarPrm.h
+Physics/WindMap.h
 
-#include "UserInterface\UI_MarkObjectAttribute.h"
-#include "Environment\Anchor.h"
-#include "UserInterface\UI_MinimapSymbol.h"
-#include "FileUtils\FileTime.h"
-#include "Terra\TerrainType.h"
+UserInterface/UI_MarkObjectAttribute.h
+Environment/Anchor.h
+UserInterface/UI_MinimapSymbol.h
+FileUtils/FileTime.h
+Terra/TerrainType.h
 
 typedef vector<Vect2f> Vect2fVect;
 typedef vector<Vect2i> Vect2iVect;

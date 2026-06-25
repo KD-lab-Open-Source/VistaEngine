@@ -1,9 +1,9 @@
 #include "StdAfx.h"
 
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 #include "SourceLightning.h"
 #include "Environment.h"
-#include "Render\src\Scene.h"
+Render/src/Scene.h
 
 #include "vmap.h"
 #include "RenderObjects.h"

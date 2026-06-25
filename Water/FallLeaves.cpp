@@ -1,16 +1,16 @@
 #include "StdAfx.h"
 #include "FallLeaves.h"
-#include "Terra\vmap.h"
-#include "Physics\WindMap.h"
-#include "Serialization\ResourceSelector.h"
-#include "FileUtils\FileUtils.h"
-#include "Environment\Environment.h"
+Terra/vmap.h
+Physics/WindMap.h
+Serialization/ResourceSelector.h
+FileUtils/FileUtils.h
+Environment/Environment.h
 #include "SkyObject.h"
-#include "FileUtils\FileUtils.h"
-#include "Render\Src\cCamera.h"
-#include "Render\Src\TileMap.h"
-#include "Render\Src\TexLibrary.h"
-#include "Render\Src\Scene.h"
+FileUtils/FileUtils.h
+Render/Src/cCamera.h
+Render/Src/TileMap.h
+Render/Src/TexLibrary.h
+Render/Src/Scene.h
 
 /*
   О листопаде.

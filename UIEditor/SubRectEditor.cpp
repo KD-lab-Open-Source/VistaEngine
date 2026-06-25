@@ -3,7 +3,7 @@
 #include "SelectionManager.h"
 #include "SubRectEditor.h"
 
-#include "UserInterface\UI_Types.h"
+UserInterface/UI_Types.h
 
 Rectf SubRectEditor::getRect(int index) const {
     Rectf subRect (SelectionManager::the().selection().front()->getSubRect (index));

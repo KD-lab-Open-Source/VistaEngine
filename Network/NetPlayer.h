@@ -1,10 +1,10 @@
 #ifndef __PERIMETER_PLAYER_H__
 #define __PERIMETER_PLAYER_H__
 
-#include "FileUtils\FileTime.h"
-#include "Units\AttributeReference.h"
+FileUtils/FileTime.h
+Units/AttributeReference.h
 #include "LocString.h"
-#include "FileUtils\XGUID.h"
+FileUtils/XGUID.h
 
 class Archive;
 class WBuffer;

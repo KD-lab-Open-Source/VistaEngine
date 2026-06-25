@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Colors.h"
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 #include "Windows.h"
 
 #pragma warning(disable : 4073 )

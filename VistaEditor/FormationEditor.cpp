@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "FormationEditor.h"
-#include "Serialization\StringTable.h"
-#include "kdw\Win32\Handle.h"
-#include "util\kdw\PopupMenu.h"
-#include "kdw\ClassMenu.h"
-#include "kdw\Win32\Window.h"
+Serialization/StringTable.h
+kdw/Win32/Handle.h
+util/kdw/PopupMenu.h
+kdw/ClassMenu.h
+kdw/Win32/Window.h
 
-#include "..\units\AttributeSquad.h"
+../units/AttributeSquad.h
 
 DECLARE_SEGMENT(FormationEditor)
 REGISTER_PLUG(FormationPattern, FormationEditorPlug)

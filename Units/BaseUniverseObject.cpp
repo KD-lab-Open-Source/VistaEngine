@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "BaseUniverseObject.h"
 #include "RenderObjects.h"
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 
 BaseUniverseObject::BaseUniverseObject() 
 : radius_(10.f), 

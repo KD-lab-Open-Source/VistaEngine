@@ -1,7 +1,7 @@
 #ifndef __MOVEMENT_DIRECTION_H__
 #define __MOVEMENT_DIRECTION_H__
 
-#include "XMath\SafeMath.h"
+XMath/SafeMath.h
 
 ///////////////////////////////////////////////////////////////
 //

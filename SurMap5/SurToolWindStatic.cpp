@@ -2,12 +2,12 @@
 
 #include "stdafx.h"
 #include "SurMap5.h"
-#include ".\SurToolWindStatic.h"
+./SurToolWindStatic.h
 
 #include "MainFrm.h"
-#include "..\Environment\Environment.h"
-#include "..\Water\Wind.h"
-#include "..\Game\CameraManager.h"
+../Environment/Environment.h
+../Water/Wind.h
+../Game/CameraManager.h
 #include "SurToolSelect.h"
 
 

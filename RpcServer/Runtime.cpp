@@ -5,7 +5,7 @@
 #include "MainWindow.h"
 #include "ShowLog.h"
 
-#include "XmlRpc\XmlRpc.h"
+XmlRpc/XmlRpc.h
 
 #include "Methods.h"
 

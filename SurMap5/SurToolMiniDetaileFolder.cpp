@@ -2,13 +2,13 @@
 #include "SurMap5.h"
 #include "SurToolMiniDetaile.h"
 #include "SurToolMiniDetaileFolder.h"
-#include "Serialization\Serialization.h"
-#include "Game\Universe.h"
-#include "Serialization\StringTable.h"
-#include "Units\UnitAttribute.h"
+Serialization/Serialization.h
+Game/Universe.h
+Serialization/StringTable.h
+Units/UnitAttribute.h
 
-#include "Game\RenderObjects.h"
-#include "Render\src\TileMap.h"
+Game/RenderObjects.h
+Render/src/TileMap.h
 
 // CSurToolMiniDetaleFolder dialog
 IMPLEMENT_DYNAMIC(CSurToolMiniDetaileFolder, CSurToolEmpty)

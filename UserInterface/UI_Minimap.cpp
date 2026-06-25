@@ -4,13 +4,13 @@
 #include "UI_Logic.h"
 #include "StreamCommand.h"
 #include "CameraManager.h"
-#include "Render\src\cCamera.h"
-#include "Game\Player.h"
-#include "Game\Universe.h"
-#include "Units\UnitObjective.h"
-#include "Units\IronBuilding.h"
-#include "Units\Squad.h"
-#include "Environment\Anchor.h"
+Render/src/cCamera.h
+Game/Player.h
+Game/Universe.h
+Units/UnitObjective.h
+Units/IronBuilding.h
+Units/Squad.h
+Environment/Anchor.h
 #include "WBuffer.h"
 
 void fMinimapLogic2GraphQuantCommand(void *data)

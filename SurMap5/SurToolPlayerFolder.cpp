@@ -2,10 +2,10 @@
 #include "SurMap5.h"
 #include "SurToolPlayerFolder.h"
 #include "SurToolUnit.h"
-#include "Serialization\Serialization.h"
-#include "Game\Universe.h"
-#include "Serialization\StringTable.h"
-#include "Units\UnitAttribute.h"
+Serialization/Serialization.h
+Game/Universe.h
+Serialization/StringTable.h
+Units/UnitAttribute.h
 #include "UnicodeConverter.h"
 
 // CSurToolPlayerFolder dialog

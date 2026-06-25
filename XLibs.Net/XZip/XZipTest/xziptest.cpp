@@ -3,8 +3,8 @@
 
 #include "XUtil.h"
 
-#include "..\XZip.h"
-#include "..\FileUtils.h"
+../XZip.h
+../FileUtils.h
 
 const char* test_zip_name = "resource0.pak";
 const char* test_file_name = "Resource\\Sound\\bolls.wav";

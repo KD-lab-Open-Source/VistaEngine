@@ -1,7 +1,7 @@
 #include "StdAfxRD.h"
 #include "AccessTexture.h"
 #include "FileImage.h"
-#include "FileUtils\FileUtils.h"
+FileUtils/FileUtils.h
 
 cAccessTexture::cAccessTexture()
 {

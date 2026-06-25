@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 
 #include "UI_References.h"
 #include "UserInterface.h"

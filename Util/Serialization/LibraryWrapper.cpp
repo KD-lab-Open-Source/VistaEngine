@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "LibraryWrapper.h"
-#include "Serialization\XPrmArchive.h"
+Serialization/XPrmArchive.h
 #include "BinaryArchive.h"
 #include "InPlaceArchive.h"
 #include "LibrariesManager.h"

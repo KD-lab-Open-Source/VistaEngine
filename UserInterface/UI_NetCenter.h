@@ -2,8 +2,8 @@
 #define __UI_NET_CENTER_H__
 
 #include "UI_Enums.h"
-#include "Game\GlobalStatistics.h"
-#include "Network\ExternalTask.h"
+Game/GlobalStatistics.h
+Network/ExternalTask.h
 class Archive;
 struct sGameHostInfo;
 struct ChatChanelInfo;

@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "RootExport.h"
 #include "Interpolate.h"
-#include "XMath\safemath.h"
-#include "FileUtils\FileUtils.h"
+XMath/safemath.h
+FileUtils/FileUtils.h
 
 bool Exporter::exportMaterial(StaticMaterial& staticMaterial, IVisMaterial* mat)
 {

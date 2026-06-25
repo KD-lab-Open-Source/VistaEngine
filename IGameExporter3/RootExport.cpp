@@ -1,16 +1,16 @@
 #include "StdAfx.h"
 #include "RootExport.h"
 #include "Interpolate.h"
-#include "render\3dx\umath.h"
-#include "CS\BipedApi.h"
+render/3dx/umath.h
+CS/BipedApi.h
 
-#include "Serialization\BinaryArchive.h"
-#include "Serialization\XPrmArchive.h"
-#include "FileUtils\FileUtils.h"
-#include "Serialization\Decorators.h"
-#include "Serialization\RangedWrapper.h"
-#include "Serialization\EnumDescriptor.h"
-#include "Serialization\SerializationFactory.h"
+Serialization/BinaryArchive.h
+Serialization/XPrmArchive.h
+FileUtils/FileUtils.h
+Serialization/Decorators.h
+Serialization/RangedWrapper.h
+Serialization/EnumDescriptor.h
+Serialization/SerializationFactory.h
 #include "kdw/PropertyEditor.h"
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(Exporter, Lod, "Lod")

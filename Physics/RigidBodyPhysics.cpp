@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "RigidBodyPhysics.h"
-#include "Math\ConstraintHandler.h"
+Math/ConstraintHandler.h
 #include "NormalMap.h"
 
 ///////////////////////////////////////////////////////////////

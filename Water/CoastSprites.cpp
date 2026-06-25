@@ -1,12 +1,12 @@
 #include "StdAfx.h"
 #include "ice.h"
 #include "CoastSprites.h"
-#include "Serialization\ResourceSelector.h"
-#include "Serialization\RangedWrapper.h"
-#include "Render\Src\cCamera.h"
-#include "Render\Src\TileMap.h"
-#include "Render\Src\TexLibrary.h"
-#include "Render\Src\Scene.h"
+Serialization/ResourceSelector.h
+Serialization/RangedWrapper.h
+Render/Src/cCamera.h
+Render/Src/TileMap.h
+Render/Src/TexLibrary.h
+Render/Src/Scene.h
 
 CoastSpriteSimpleAttributes::CoastSpriteSimpleAttributes()
 {

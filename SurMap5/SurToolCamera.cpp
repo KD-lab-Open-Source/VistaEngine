@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "SurMap5.h"
-#include "AttribEditor\AttribEditorCtrl.h"
+AttribEditor/AttribEditorCtrl.h
 #include "SurToolCamera.h"
 #include "SurToolCameraEditor.h"
 #include "SurToolSelect.h"
 #include "SelectionUtil.h"
-#include "Game\CameraManager.h"
-#include "Serialization\Serialization.h"
+Game/CameraManager.h
+Serialization/Serialization.h
 
 Vect3f To3D(const Vect2f& pos);
 

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "IniFile.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\XPrmArchive.h"
+Serialization/Serialization.h
+Serialization/XPrmArchive.h
 
 IniFile iniFile;
 

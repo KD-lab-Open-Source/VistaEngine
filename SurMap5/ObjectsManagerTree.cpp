@@ -5,8 +5,8 @@
 #include "kdw/Clipboard.h"
 #include "kdw/ObjectsTree.h"
 
-#include "SurMap5\SelectionUtil.h"
-#include "Units\EnvironmentSimple.h"
+SurMap5/SelectionUtil.h
+Units/EnvironmentSimple.h
 
 ObjectsManagerTree::ObjectsManagerTree()
 : tab_(TAB_SOURCES)

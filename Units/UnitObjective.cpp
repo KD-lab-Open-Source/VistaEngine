@@ -6,13 +6,13 @@
 #include "IronBuilding.h"
 #include "RenderObjects.h"
 #include "CameraManager.h"
-#include "UserInterface\UserInterface.h"
-#include "UserInterface\UI_Render.h"
-#include "UserInterface\UI_Logic.h"
-#include "UserInterface\UI_Minimap.h"
-#include "Physics\crash\CrashSystem.h"
-#include "Render\Src\cCamera.h"
-#include "Render\src\Scene.h"
+UserInterface/UserInterface.h
+UserInterface/UI_Render.h
+UserInterface/UI_Logic.h
+UserInterface/UI_Minimap.h
+Physics/crash/CrashSystem.h
+Render/Src/cCamera.h
+Render/src/Scene.h
 
 void ItemHideScaner::operator()(UnitBase* unit) 
 {

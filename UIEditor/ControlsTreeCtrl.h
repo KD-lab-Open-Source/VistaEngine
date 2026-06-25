@@ -1,7 +1,7 @@
 #ifndef __CONTROLS_TREE_CTRL_H__INCLUDED__
 #define __CONTROLS_TREE_CTRL_H__INCLUDED__
 
-#include "MFC\ObjectsTreeCtrl.h"
+MFC/ObjectsTreeCtrl.h
 
 class UI_ControlState;
 class UI_ControlContainer;

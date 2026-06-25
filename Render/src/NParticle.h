@@ -9,11 +9,11 @@
 */
 
 #include "MTSection.h"
-#include "Render\3dx\Saver.h"
-#include "XMath\XMath.h"
-#include "Serialization\StringTableBase.h"
-#include "Serialization\StringTableReference.h"
-#include "Render\Inc\IUnkObj.h"
+Render/3dx/Saver.h
+XMath/XMath.h
+Serialization/StringTableBase.h
+Serialization/StringTableReference.h
+Render/Inc/IUnkObj.h
 #include "NParticleKey.h"
 #include "observer.h"
 #include "texture.h"

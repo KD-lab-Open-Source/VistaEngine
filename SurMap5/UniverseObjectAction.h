@@ -3,7 +3,7 @@
 
 #include "Handle.h"
 #include "BaseUniverseObject.h"
-#include "Serialization\Factory.h"
+Serialization/Factory.h
 
 class UniverseObjectActionList : public std::vector<const char*>{
 public:

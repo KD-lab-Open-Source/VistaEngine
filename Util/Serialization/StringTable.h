@@ -4,9 +4,9 @@
 #ifndef __TYPE_LIBRARY_H__
 #define __TYPE_LIBRARY_H__
 
-#include "XTL\StaticMap.h"
-#include "Serialization\LibraryWrapper.h"
-#include "Serialization\Serializer.h" // для редактора
+XTL/StaticMap.h
+Serialization/LibraryWrapper.h
+Serialization/Serializer.h // для редактора
 
 class Archive;
 

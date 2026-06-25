@@ -1,8 +1,8 @@
 #ifndef __LEAVES_H_INCLUDED__
 #define __LEAVES_H_INCLUDED__
 
-#include "Render\Src\UnkObj.h"
-#include "Render\3dx\Static3dx.h"
+Render/Src/UnkObj.h
+Render/3dx/Static3dx.h
 
 struct Leaf
 {

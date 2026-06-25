@@ -1,9 +1,9 @@
 #ifndef __UI_RENDER_BASE_
 #define __UI_RENDER_BASE_
 
-#include "XTL\Rect.h"
-#include "XMath\Colors.h"
-#include "Render\inc\IRenderDevice.h"
+XTL/Rect.h
+XMath/Colors.h
+Render/inc/IRenderDevice.h
 
 class UI_Sprite;
 class cTexture;

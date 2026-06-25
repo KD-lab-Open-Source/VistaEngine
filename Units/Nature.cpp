@@ -3,14 +3,14 @@
 #include "Nature.h"
 #include "RenderObjects.h"
 #include "GlobalAttributes.h"
-#include "Physics\crash\CrashSystem.h"
-#include "Environment\Environment.h"
+Physics/crash/CrashSystem.h
+Environment/Environment.h
 #include "EnvironmentSimple.h"
-#include "Serialization\BinaryArchive.h"
-#include "Serialization\SerializationFactory.h"
+Serialization/BinaryArchive.h
+Serialization/SerializationFactory.h
 #include "EditorVisual.h"
-#include "VistaRender\FieldOfView.h"
-#include "Render\src\Scene.h"
+VistaRender/FieldOfView.h
+Render/src/Scene.h
 
 DECLARE_SEGMENT(UnitEnvironmentBuilding)
 REGISTER_CLASS(UnitBase, UnitEnvironmentBuilding, "UnitEnvironmentBuilding")

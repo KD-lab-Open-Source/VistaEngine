@@ -1,15 +1,15 @@
 #include "StdAfx.h"
-#include "..\..\render\inc\Umath.h"
-#include "..\..\render\src\NParticleKey.h"
+../../render/inc/Umath.h
+../../render/src/NParticleKey.h
 #include "Rect.h"
-#include ".\GradientsWindow.h"
+./GradientsWindow.h
 
-#include "TreeEditors\GradientEditor.h"
-#include "TreeEditors\GradientPositionCtrl.h"
-#include "TreeEditors\ColorSelector.h"
-#include "TreeEditors\ColorUtils.h"
+TreeEditors/GradientEditor.h
+TreeEditors/GradientPositionCtrl.h
+TreeEditors/ColorSelector.h
+TreeEditors/ColorUtils.h
 
-#include "mfc\LayoutMFC.h"
+mfc/LayoutMFC.h
 
 #include <algorithm>
 
@@ -240,17 +240,17 @@ CGradientEditorView* CGradientsWindow::getViewByIndex(int index)
 	return *it;
 }
 #include "StdAfx.h"
-#include "..\..\render\inc\Umath.h"
-#include "..\..\render\src\NParticleKey.h"
+../../render/inc/Umath.h
+../../render/src/NParticleKey.h
 #include "Rect.h"
-#include ".\GradientsWindow.h"
+./GradientsWindow.h
 
-#include "TreeEditors\GradientEditor.h"
-#include "TreeEditors\GradientPositionCtrl.h"
-#include "TreeEditors\ColorSelector.h"
-#include "TreeEditors\ColorUtils.h"
+TreeEditors/GradientEditor.h
+TreeEditors/GradientPositionCtrl.h
+TreeEditors/ColorSelector.h
+TreeEditors/ColorUtils.h
 
-#include "mfc\LayoutMFC.h"
+mfc/LayoutMFC.h
 
 #include <algorithm>
 
@@ -481,17 +481,17 @@ CGradientEditorView* CGradientsWindow::getViewByIndex(int index)
 	return *it;
 }
 #include "StdAfx.h"
-#include "..\..\render\inc\Umath.h"
-#include "..\..\render\src\NParticleKey.h"
+../../render/inc/Umath.h
+../../render/src/NParticleKey.h
 #include "Rect.h"
-#include ".\GradientsWindow.h"
+./GradientsWindow.h
 
-#include "TreeEditors\GradientEditor.h"
-#include "TreeEditors\GradientPositionCtrl.h"
-#include "TreeEditors\ColorSelector.h"
-#include "TreeEditors\ColorUtils.h"
+TreeEditors/GradientEditor.h
+TreeEditors/GradientPositionCtrl.h
+TreeEditors/ColorSelector.h
+TreeEditors/ColorUtils.h
 
-#include "mfc\LayoutMFC.h"
+mfc/LayoutMFC.h
 
 #include <algorithm>
 
@@ -722,17 +722,17 @@ CGradientEditorView* CGradientsWindow::getViewByIndex(int index)
 	return *it;
 }
 #include "StdAfx.h"
-#include "..\..\render\inc\Umath.h"
-#include "..\..\render\src\NParticleKey.h"
+../../render/inc/Umath.h
+../../render/src/NParticleKey.h
 #include "Rect.h"
-#include ".\GradientsWindow.h"
+./GradientsWindow.h
 
-#include "TreeEditors\GradientEditor.h"
-#include "TreeEditors\GradientPositionCtrl.h"
-#include "TreeEditors\ColorSelector.h"
-#include "TreeEditors\ColorUtils.h"
+TreeEditors/GradientEditor.h
+TreeEditors/GradientPositionCtrl.h
+TreeEditors/ColorSelector.h
+TreeEditors/ColorUtils.h
 
-#include "mfc\LayoutMFC.h"
+mfc/LayoutMFC.h
 
 #include <algorithm>
 
@@ -963,17 +963,17 @@ CGradientEditorView* CGradientsWindow::getViewByIndex(int index)
 	return *it;
 }
 #include "StdAfx.h"
-#include "..\..\render\inc\Umath.h"
-#include "..\..\render\src\NParticleKey.h"
+../../render/inc/Umath.h
+../../render/src/NParticleKey.h
 #include "Rect.h"
-#include ".\GradientsWindow.h"
+./GradientsWindow.h
 
-#include "TreeEditors\GradientEditor.h"
-#include "TreeEditors\GradientPositionCtrl.h"
-#include "TreeEditors\ColorSelector.h"
-#include "TreeEditors\ColorUtils.h"
+TreeEditors/GradientEditor.h
+TreeEditors/GradientPositionCtrl.h
+TreeEditors/ColorSelector.h
+TreeEditors/ColorUtils.h
 
-#include "mfc\LayoutMFC.h"
+mfc/LayoutMFC.h
 
 #include <algorithm>
 
@@ -1204,17 +1204,17 @@ CGradientEditorView* CGradientsWindow::getViewByIndex(int index)
 	return *it;
 }
 #include "StdAfx.h"
-#include "..\..\render\inc\Umath.h"
-#include "..\..\render\src\NParticleKey.h"
+../../render/inc/Umath.h
+../../render/src/NParticleKey.h
 #include "Rect.h"
-#include ".\GradientsWindow.h"
+./GradientsWindow.h
 
-#include "TreeEditors\GradientEditor.h"
-#include "TreeEditors\GradientPositionCtrl.h"
-#include "TreeEditors\ColorSelector.h"
-#include "TreeEditors\ColorUtils.h"
+TreeEditors/GradientEditor.h
+TreeEditors/GradientPositionCtrl.h
+TreeEditors/ColorSelector.h
+TreeEditors/ColorUtils.h
 
-#include "mfc\LayoutMFC.h"
+mfc/LayoutMFC.h
 
 #include <algorithm>
 

@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 #include "PropertyChangeAction.h"
 
-#include "UserInterface\UI_Types.h"
+UserInterface/UI_Types.h
 

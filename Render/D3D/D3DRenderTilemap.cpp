@@ -7,7 +7,7 @@
 #include "MultiRegion.h"
 #include "VisGeneric.h"
 #include "ClippingMesh.h"
-#include "Terra\vmap.h"
+Terra/vmap.h
 
 #define BUMP_IDXTYPE   unsigned short
 #define BUMP_IDXSIZE   sizeof(BUMP_IDXTYPE)

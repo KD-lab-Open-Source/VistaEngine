@@ -2,14 +2,14 @@
 #define __CONDITIONS_H__
 
 #include "Timers.h"
-#include "TriggerEditor\TriggerExport.h"
-#include "Units\UnitAttribute.h"
-#include "UserInterface\UI_References.h"
-#include "Environment\Environment.h"
-#include "Units\Triggers.h"
-#include "Units\RealUnit.h"
-#include "Network\NetPlayer.h"
-#include "Units\LabelObject.h"
+TriggerEditor/TriggerExport.h
+Units/UnitAttribute.h
+UserInterface/UI_References.h
+Environment/Environment.h
+Units/Triggers.h
+Units/RealUnit.h
+Network/NetPlayer.h
+Units/LabelObject.h
 
 class AttributeSquad;
 class AttributeBuilding;

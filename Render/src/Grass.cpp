@@ -3,14 +3,14 @@
 #include "D3DRender.h"
 #include "cCamera.h"
 #include "FileImage.h"
-#include "Terra\vmap.h"
+Terra/vmap.h
 #include "Scene.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\ResourceSelector.h"
-#include "Terra\vmap.h"
+Serialization/Serialization.h
+Serialization/ResourceSelector.h
+Terra/vmap.h
 #include "TileMap.h"
 #include "VisGeneric.h"
-#include "Environment\Environment.h"
+Environment/Environment.h
 
 unsigned int ColorByNormalRGBA(Vect3f n);
 

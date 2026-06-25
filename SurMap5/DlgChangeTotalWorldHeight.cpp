@@ -2,10 +2,10 @@
 #include "SurMap5.h"
 #include "DlgChangeTotalWorldHeight.h"
 
-#include "terra\vmap.h"
+terra/vmap.h
 #include "LIMITS.H"
 #include "dlgchangetotalworldheight.h"
-#include "Serialization\Dictionary.h"
+Serialization/Dictionary.h
 
 static void world2Histogram(HistogramDate& outHistArr)
 {

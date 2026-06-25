@@ -7,5 +7,5 @@
 #include <vector>
 #include <string>
 #include <assert.h>
-#include "XMath\xmath.h"
+XMath/xmath.h
 using namespace std;

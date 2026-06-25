@@ -6,10 +6,10 @@
 #include "D3DRender.h"
 #include "VisGeneric.h"
 #include "FogOfWar.h"
-#include "Render\3dx\Lib3dx.h"
+Render/3dx/Lib3dx.h
 #include "ClippingMesh.h"
-#include "Terra\vmap.h"
-#include "FileUtils\FileUtils.h"
+Terra/vmap.h
+FileUtils/FileUtils.h
 
 bool cScene::is_sky_cubemap=true;
 
@@ -714,7 +714,7 @@ cObject3dx* cScene::CreateObject3dx(const char* fname,const char *TexturePath,bo
 	return pObject;
 }
 
-//#include "J:\Program Files\Intel\VTune\Analyzer\Include\VtuneApi.h"
+//J:/Program Files/Intel/VTune/Analyzer/Include/VtuneApi.h
 //#pragma comment(lib,"J:\\Program Files\\Intel\\VTune\\Analyzer\\Lib\\VtuneApi.lib")
 
 cObject3dx* cScene::CreateObject3dxDetached(const char* fname,const char *TexturePath,bool interpolated)

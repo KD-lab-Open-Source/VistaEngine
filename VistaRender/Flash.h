@@ -1,6 +1,6 @@
 #pragma once
 
-#include "XMath\Colors.h"
+XMath/Colors.h
 #include "Timers.h"
 
 class PostEffectManager;

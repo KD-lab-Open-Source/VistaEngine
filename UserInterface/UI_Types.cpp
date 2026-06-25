@@ -1,19 +1,19 @@
 #include "StdAfx.h"
 
-#include "FileUtils\FileUtils.h"
-#include "Serialization\Factory.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\XPrmArchive.h"
-#include "Serialization\ResourceSelector.h"
-#include "Serialization\SerializationFactory.h"
-#include "Serialization\StringTableImpl.h"
-#include "Serialization\Decorators.h"
+FileUtils/FileUtils.h
+Serialization/Factory.h
+Serialization/Serialization.h
+Serialization/XPrmArchive.h
+Serialization/ResourceSelector.h
+Serialization/SerializationFactory.h
+Serialization/StringTableImpl.h
+Serialization/Decorators.h
 #include "WBuffer.h"
 
 #include "Sound.h"
 #include "PlayOgg.h"
-#include "Game\SoundApp.h"
-#include "Units\UnitAttribute.h"
+Game/SoundApp.h
+Units/UnitAttribute.h
 
 #include "UI_Render.h"
 #include "UI_Types.h"
@@ -23,8 +23,8 @@
 
 #include "UI_Actions.h"
 #include "UI_Inventory.h"
-#include "FileUtils\FileUtils.h"
-#include "Util\Serialization\RangedWrapper.h"
+FileUtils/FileUtils.h
+Util/Serialization/RangedWrapper.h
 
 BEGIN_ENUM_DESCRIPTOR(ActivationMove, "ActivationMove")
 REGISTER_ENUM(ACTIVATION_MOVE_LEFT, "Слева");

@@ -1,11 +1,11 @@
 #ifndef __WATER_H_INCLUDED__
 #define __WATER_H_INCLUDED__
 
-#include "Terra\UpdateMapClient.h"
-#include "Render\inc\IVisGenericInternal.h"
-#include "Render\inc\IRenderDevice.h"
-#include "Render\src\NParticle.h"
-#include "XMath\KeysBase.h"
+Terra/UpdateMapClient.h
+Render/inc/IVisGenericInternal.h
+Render/inc/IRenderDevice.h
+Render/src/NParticle.h
+XMath/KeysBase.h
 
 class cWaterSpeedInterface
 {

@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "OrCircle.h"
-#include "Render\inc\IRenderDevice.h"
+Render/inc/IRenderDevice.h
 
 //О пересечении интервалов на круге.
 

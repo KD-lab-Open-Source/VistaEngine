@@ -2,16 +2,16 @@
 #define __UI_LOGIC_H__
 
 #include "Handle.h"
-#include "Network\NetPlayer.h"
-#include "XTL\SwapVector.h"
+Network/NetPlayer.h
+XTL/SwapVector.h
 #include "ProfileManager.h"
 #include "Controls.h"
 #include "UI_Enums.h"
 #include "UI_MarkObject.h"
 #include "UI_Inventory.h"
 #include "Installer.h"
-#include "Units\CircleManagerParam.h"
-#include "Units\WeaponTarget.h"
+Units/CircleManagerParam.h
+Units/WeaponTarget.h
 
 class WeaponPrm;
 

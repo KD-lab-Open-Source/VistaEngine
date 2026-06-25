@@ -2,9 +2,9 @@
 #define __MULTI_ARCHIVE_H__
 
 #include "Handle.h"
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 #include "BinaryArchive.h"
-#include "Serialization\XPrmArchive.h"
+Serialization/XPrmArchive.h
 #include "InPlaceArchive.h"
 
 // Многорежимные архивы, для output-архива необходимо при сериализации пробежать по списку возможных архивов.

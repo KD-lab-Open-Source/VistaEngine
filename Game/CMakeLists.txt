@@ -1,11 +1,15 @@
-add_executable(Game
+set(GAME_SOURCES
     CDKey.cpp
     GameContext.cpp
-    PlayBink.cpp
     Runtime.cpp
     StdAfx.cpp
 )
 
+if(WIN32)
+    list(APPEND GAME_SOURCES PlayBink.cpp)
+endif()
+
+add_executable(Game ${GAME_SOURCES})
 target_link_libraries(Game PRIVATE
     Util
     AI

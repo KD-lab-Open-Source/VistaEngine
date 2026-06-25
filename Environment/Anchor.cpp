@@ -2,11 +2,11 @@
 
 #include "Anchor.h"
 #include "CameraManager.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\SerializationFactory.h"
-#include "Serialization\EnumDescriptor.h"
-#include "Serialization\Decorators.h"
-#include "UserInterface\UI_MinimapSymbol.h"
+Serialization/Serialization.h
+Serialization/SerializationFactory.h
+Serialization/EnumDescriptor.h
+Serialization/Decorators.h
+UserInterface/UI_MinimapSymbol.h
 #include "EditorVisual.h"
 
 UNIT_LINK_GET(Anchor);

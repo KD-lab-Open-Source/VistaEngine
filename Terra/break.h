@@ -1,7 +1,7 @@
 #ifndef __BREAK_H__
 #define __BREAK_H__
 
-#include "XMath\xmath.h"
+XMath/xmath.h
 #include "vmap.h"
 //#include "Timers.h"
 

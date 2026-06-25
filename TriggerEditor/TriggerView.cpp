@@ -1,15 +1,15 @@
 #include "stdafx.h"
 #include "TriggerView.h"
 #include "TriggerMiniMap.h"
-#include "kdw\Win32\Window.h"
-#include "kdw\PopupMenu.h"
-#include "kdw\PropertyTree.h"
-#include "kdw\DragManager.h"
-#include "kdw\Dialog.h"
-#include "kdw\Entry.h"
+kdw/Win32/Window.h
+kdw/PopupMenu.h
+kdw/PropertyTree.h
+kdw/DragManager.h
+kdw/Dialog.h
+kdw/Entry.h
 #include <functional>
-#include "Serialization\SerializationFactory.h"
-#include "Serialization\Decorators.h"
+Serialization/SerializationFactory.h
+Serialization/Decorators.h
 #include "EditableCondition.h"
 #include "kdw/PropertyEditor.h"
 #include "shlwapi.h"

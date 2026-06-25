@@ -1,14 +1,14 @@
 #ifndef __GLOBAL_ATTRIBUTES_H__
 #define __GLOBAL_ATTRIBUTES_H__
-#include "XTL\Rect.h"
-#include "Serialization\LibraryWrapper.h"
-#include "Serialization\ResourceSelector.h"
+XTL/Rect.h
+Serialization/LibraryWrapper.h
+Serialization/ResourceSelector.h
 #include "Parameters.h"
 #include "CircleManagerParam.h"
-#include "Units\AbnormalStateAttribute.h"
+Units/AbnormalStateAttribute.h
 #include "TriggerChainName.h"
-#include "Units\DirectControlMode.h"
-#include "UserInterface\UI_Sprite.h"
+Units/DirectControlMode.h
+UserInterface/UI_Sprite.h
 
 struct CameraRestriction
 {

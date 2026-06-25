@@ -4,20 +4,20 @@
 
 #include "UI_Logic.h"
 #include "UI_Render.h"
-#include "Render\Inc\IRenderDevice.h"
-#include "Render\Src\cCamera.h"
-#include "Render\d3d\D3DRender.h"
-#include "Render\src\VisGeneric.h"
-#include "VistaRender\postEffects.h"
+Render/Inc/IRenderDevice.h
+Render/Src/cCamera.h
+Render/d3d/D3DRender.h
+Render/src/VisGeneric.h
+VistaRender/postEffects.h
 
-#include "XTL\SafeCast.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\ResourceSelector.h"
-#include "Serialization\XPrmArchive.h"
-#include "Serialization\SerializationFactory.h"
+XTL/SafeCast.h
+Serialization/Serialization.h
+Serialization/ResourceSelector.h
+Serialization/XPrmArchive.h
+Serialization/SerializationFactory.h
 #include "kdw/PropertyEditor.h"
-#include "Units\UnitItemResource.h"
-#include "Units\UnitItemInventory.h"
+Units/UnitItemResource.h
+Units/UnitItemInventory.h
 
 #include "ShowHead.h"
 #include "GameLoadManager.h"
@@ -29,13 +29,13 @@
 #include "UI_NetCenter.h"
 
 #include "SystemUtil.h"
-#include "Units\CircleManagerParam.h"
+Units/CircleManagerParam.h
 
-#include "Units\GlobalAttributes.h"
+Units/GlobalAttributes.h
 
-#include "Game\SoundApp.h"
+Game/SoundApp.h
 #include "Universe.h"
-#include "Serialization\StringTable.h"
+Serialization/StringTable.h
 #include "WBuffer.h"
 #include "UnicodeConverter.h"
 

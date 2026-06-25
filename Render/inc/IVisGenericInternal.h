@@ -3,10 +3,10 @@
 
 #include "RenderMT.h"
 #include "Unknown.h"
-#include "XMath\Mats.h"
-#include "XMath\Box6f.h"
-#include "XMath\Colors.h"
-#include "Render\3dx\umath.h"
+XMath/Mats.h
+XMath/Box6f.h
+XMath/Colors.h
+Render/3dx/umath.h
 
 extern RENDER_API RandomGenerator graphRnd;//Недетерменированный rnd, который вызывается в графическом потоке.
 

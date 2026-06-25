@@ -1,12 +1,12 @@
 #include "StdAfx.h"
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 #include "SurMapOptions.h"
-#include "Environment\Environment.h"
+Environment/Environment.h
 #include "ConsoleWindow.h"
-#include "Serialization\Dictionary.h"
-#include "UserInterface\UI_Types.h"
-#include "Game\GameOptions.h"
-#include "Serialization\XPrmArchive.h"
+Serialization/Dictionary.h
+UserInterface/UI_Types.h
+Game/GameOptions.h
+Serialization/XPrmArchive.h
 #include "MainFrame.h"
 
 const char* SurMapOptions::configFile = "UserInterface.cfg";

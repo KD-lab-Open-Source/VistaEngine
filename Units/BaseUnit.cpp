@@ -1,16 +1,16 @@
 #include "StdAfx.h"
-#include "Game\Universe.h"
-#include "Environment\SourceManager.h"
-#include "Environment\Environment.h"
+Game/Universe.h
+Environment/SourceManager.h
+Environment/Environment.h
 #include "Interpolation.h"
 #include "Sound.h"
 #include "SoundApp.h"
 #include "vmap.h"
 #include "RenderObjects.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\SerializationFactory.h"
+Serialization/Serialization.h
+Serialization/SerializationFactory.h
 #include "UnitObjective.h"
-#include "AI\PFTrap.h"
+AI/PFTrap.h
 #include "GlobalAttributes.h"
 
 #include "EditorVisual.h"

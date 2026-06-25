@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FileLibraryEditorDlg.h"
 #include "SurToolAux.h" // for requestResourceAndPut2InternalResource
-#include "FileUtils\FileUtils.h"
+FileUtils/FileUtils.h
 #include "filelibraryeditordlg.h"
 
 IMPLEMENT_DYNAMIC(CFileLibraryEditorDlg, CDialog)

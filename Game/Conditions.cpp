@@ -6,26 +6,26 @@
 #include "Universe.h"
 
 #include "Squad.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\Dictionary.h"
+Serialization/Serialization.h
+Serialization/Dictionary.h
 #include "Conditions.h"
 
-#include "UserInterface\UI_References.h"
-#include "UserInterface\UI_Controls.h"
-#include "UserInterface\UI_Logic.h"
+UserInterface/UI_References.h
+UserInterface/UI_Controls.h
+UserInterface/UI_Logic.h
 #include "GameOptions.h"
 #include "EventParameters.h"
-#include "Units\UnitItemResource.h"
-#include "Environment\SourceManager.h"
-#include "Environment\Anchor.h"
-#include "Serialization\RangedWrapper.h"
-#include "Water\SkyObject.h"
+Units/UnitItemResource.h
+Environment/SourceManager.h
+Environment/Anchor.h
+Serialization/RangedWrapper.h
+Water/SkyObject.h
 #include "CheatManager.h"
-#include "Ai\PlaceOperators.h"
+Ai/PlaceOperators.h
 #include "ScanningShape.h"
-#include "Units\IronBuilding.h"
-#include "Water\Water.h"
-#include "Serialization\SerializationFactory.h"
+Units/IronBuilding.h
+Water/Water.h
+Serialization/SerializationFactory.h
 
 string editSignalVariableDialog();
 

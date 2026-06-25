@@ -1,6 +1,6 @@
 #include "StdAfxRD.h"
 #include "node3dx.h"
-#include "Render\shader\shaders.h"
+Render/shader/shaders.h
 #include "nparticle.h"
 #include "scene.h"
 #include "TileMap.h"
@@ -8,8 +8,8 @@
 #include "VisGeneric.h"
 #include "cCamera.h"
 #include "OcclusionQuery.h"
-#include "XMath\SafeMath.h"
-#include "Terra\vmap.h"
+XMath/SafeMath.h
+Terra/vmap.h
 
 float AlphaMaxiumBlend=0.95f;
 float AlphaMiniumShadow=0.0f;

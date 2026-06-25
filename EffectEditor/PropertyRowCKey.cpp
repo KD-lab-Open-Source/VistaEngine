@@ -8,7 +8,7 @@
 #include "kdw/PropertyTreeModel.h"
 #include "EffectDocument.h"
 #include "kdw/ImageStore.h"
-#include "Serialization\SerializationFactory.h"
+Serialization/SerializationFactory.h
 
 namespace kdw{
 

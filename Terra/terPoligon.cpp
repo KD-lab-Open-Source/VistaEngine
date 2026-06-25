@@ -1,6 +1,6 @@
 #include "stdafxTr.h"
 
-#include "Render\inc\IRenderDevice.h"
+Render/inc/IRenderDevice.h
 #include "terTools.h"
 #include "tools.h"
 

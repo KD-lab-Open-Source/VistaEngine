@@ -2,7 +2,7 @@
 #define __RIGID_BODY_NODE_H__
 
 #include "RigidBodyPhysics.h"
-#include "Units\\Interpolation.h"
+Units//Interpolation.h
 
 struct RigidBodyNodePrm;
 class cObject3dx;

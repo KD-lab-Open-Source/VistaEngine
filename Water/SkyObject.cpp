@@ -1,22 +1,22 @@
 #include "stdafx.h"
 #include "Water.h"
 #include "SkyObject.h"
-#include "Render\src\RenderCubemap.h"
-#include "Render\src\Gradients.h"
-#include "Render\Src\TileMap.h"
-#include "Render\Src\Scene.h"
-#include "Render\D3D\D3DRender.h"
-#include "Render\3dx\Node3dx.h"
-#include "Render\Src\VisGeneric.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\ResourceSelector.h"
-#include "Serialization\RangedWrapper.h"
-#include "VistaRender\StreamInterpolation.h"
-#include "Serialization\EnumDescriptor.h"
-#include "Terra\vmap.h"
+Render/src/RenderCubemap.h
+Render/src/Gradients.h
+Render/Src/TileMap.h
+Render/Src/Scene.h
+Render/D3D/D3DRender.h
+Render/3dx/Node3dx.h
+Render/Src/VisGeneric.h
+Serialization/Serialization.h
+Serialization/ResourceSelector.h
+Serialization/RangedWrapper.h
+VistaRender/StreamInterpolation.h
+Serialization/EnumDescriptor.h
+Terra/vmap.h
 #include "DebugPrm.h"
 #include "DebugUtil.h"
-#include "Environment\Environment.h"
+Environment/Environment.h
 
 //cRenderSky потомок от cRenderCubemap отвечает за отражения неба в воде.
 

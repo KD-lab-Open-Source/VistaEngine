@@ -2,18 +2,18 @@
 #define __ACTIONS_H__
 
 #include "timers.h"
-#include "TriggerEditor\TriggerExport.h"
-#include "Units\UnitAttribute.h"
-#include "Units\Triggers.h"
-#include "Units\AttributeSquad.h"
-#include "UserInterface\UserInterface.h"
-#include "UserInterface\UI_NetCenter.h"
-#include "UserInterface\Bubles\Blobs.h"
-#include "Game\Player.h"
-#include "Game\SoundApp.h"
-#include "Sound\Sound.h"
-#include "Units\DirectControlMode.h"
-#include "Units\LabelObject.h"
+TriggerEditor/TriggerExport.h
+Units/UnitAttribute.h
+Units/Triggers.h
+Units/AttributeSquad.h
+UserInterface/UserInterface.h
+UserInterface/UI_NetCenter.h
+UserInterface/Bubles/Blobs.h
+Game/Player.h
+Game/SoundApp.h
+Sound/Sound.h
+Units/DirectControlMode.h
+Units/LabelObject.h
 
 class OggPlayer;
 class UnitCommand;

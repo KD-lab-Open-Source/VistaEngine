@@ -1,7 +1,7 @@
 #ifndef __COMMON_LOC_TEXT_H__
 #define __COMMON_LOC_TEXT_H__
 
-#include "Serialization\LibraryWrapper.h"
+Serialization/LibraryWrapper.h
 #include "LocString.h"
 
 enum UI_CommonLocText {

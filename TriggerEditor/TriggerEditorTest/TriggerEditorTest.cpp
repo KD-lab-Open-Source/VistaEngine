@@ -3,14 +3,14 @@
 
 #include "stdafx.h"
 #include "TriggerEditorTest.h"
-#include "..\..\TriggerEditor\TriggerExport.h"
-#include "..\TriggerEditor.h"
-#include "Serialization\SerializationFactory.h"
-#include "..\..\TriggerEditor\TriggerExport.h"
-#include "..\Render/src/NParticle.h"
-#include "kdw\Win32/Window.h"
-#include "Serialization\SerializationLib.h"
-#include "XMath\XMathLib.h"
+../../TriggerEditor/TriggerExport.h
+../TriggerEditor.h
+Serialization/SerializationFactory.h
+../../TriggerEditor/TriggerExport.h
+../Render/src/NParticle.h
+kdw/Win32/Window.h
+Serialization/SerializationLib.h
+XMath/XMathLib.h
 
 
 void test(HWND hwnd)

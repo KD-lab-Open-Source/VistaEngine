@@ -3,7 +3,7 @@
 
 #include "AiAStar.h"
 #include "Timers.h"
-#include "XTL\Rect.h"
+XTL/Rect.h
 
 using namespace std;
 

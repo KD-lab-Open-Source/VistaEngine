@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "UI_MinimapSymbol.h"
-#include "Render\src\Texture.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\EnumDescriptor.h"
+Render/src/Texture.h
+Serialization/Serialization.h
+Serialization/EnumDescriptor.h
 
 
 // ------------------- UI_MinimapSymbol

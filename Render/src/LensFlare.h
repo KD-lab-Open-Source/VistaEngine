@@ -1,9 +1,9 @@
 #ifndef __LENS_FLARE_H_INCLUDED__
 #define __LENS_FLARE_H_INCLUDED__
 
-#include "XMath\xmath.h"
-#include "XMath\Colors.h"
-#include "Render\Inc\IVisGenericInternal.h"
+XMath/xmath.h
+XMath/Colors.h
+Render/Inc/IVisGenericInternal.h
 
 class Archive;
 class cTexture;

@@ -1,34 +1,34 @@
 #include "stdafx.h"
 #include "EasyMap.h"
-#include "Terra\terra.h"
-#include "Render\src\FogOfWar.h"
-#include "Render\src\MultiRegion.h"
-#include "Render\src\lighting.h"
-#include "Water\OrCircle.h"
-#include "Water\SkyObject.h"
-#include "Render\src\FT_Font.h"
-#include "Render\Src\WinVideo.h"
-#include "Render\Src\TexLibrary.h"
-#include "Render\D3D\D3DRender.h"
-#include "VistaRender\postEffects.h"
-#include "Render\src\perlin.h"
-#include "Render\src\Scene.h"
+Terra/terra.h
+Render/src/FogOfWar.h
+Render/src/MultiRegion.h
+Render/src/lighting.h
+Water/OrCircle.h
+Water/SkyObject.h
+Render/src/FT_Font.h
+Render/Src/WinVideo.h
+Render/Src/TexLibrary.h
+Render/D3D/D3DRender.h
+VistaRender/postEffects.h
+Render/src/perlin.h
+Render/src/Scene.h
 #include "DebugUtil.h"
-#include "Serialization\XPrmArchive.h"
-#include "kdw\PropertyEditor.h"
-#include "kdw\kdWidgetsLib.h"
-#include "Serialization\ResourceSelector.h"
-#include "Serialization\RadianWrapper.h"
-#include "VistaRender\StreamInterpolation.h"
-#include "Terra\vmap.h"
-#include "FileUtils\FileUtils.h"
+Serialization/XPrmArchive.h
+kdw/PropertyEditor.h
+kdw/kdWidgetsLib.h
+Serialization/ResourceSelector.h
+Serialization/RadianWrapper.h
+VistaRender/StreamInterpolation.h
+Terra/vmap.h
+FileUtils/FileUtils.h
 #include "UnicodeConverter.h"
 #include "DebugPrm.h"
-#include "XMath\SafeMath.h"
-#include "Render\Src\TileMap.h"
-#include "Render\Src\VisGeneric.h"
-#include "UserInterface\UI_Minimap.h"
-#include "UserInterface\UI_RenderBase.h"
+XMath/SafeMath.h
+Render/Src/TileMap.h
+Render/Src/VisGeneric.h
+UserInterface/UI_Minimap.h
+UserInterface/UI_RenderBase.h
 
 EasyMap* easyMap;
 extern HWND g_hWnd;

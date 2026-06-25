@@ -2,12 +2,12 @@
 #define __PERIMETER_GENERIC_CONTROLS_
 
 #include "UnitAttribute.h"
-#include "Serialization\Factory.h"
+Serialization/Factory.h
 #include "Animation.h"
 #include "EffectController.h"
 #include "Timers.h"
 #include "BaseUniverseObject.h"
-#include "XTL\SwapVector.h"
+XTL/SwapVector.h
 #include "Grid2D.h"
 
 class RigidBodyBase;

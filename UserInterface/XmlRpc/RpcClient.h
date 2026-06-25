@@ -1,9 +1,9 @@
 #ifndef __VISTARPC_CLIENT_H_INCLUDED__
 #define __VISTARPC_CLIENT_H_INCLUDED__
 
-#include "XTL\sigslot.h"
-#include "Serialization\BinaryArchive.h"
-#include "XmlRpc\XmlRpc.h"
+XTL/sigslot.h
+Serialization/BinaryArchive.h
+XmlRpc/XmlRpc.h
 #include "MTSection.h"
 
 #define RPC_EXECUTE_TIMEOUT 5.

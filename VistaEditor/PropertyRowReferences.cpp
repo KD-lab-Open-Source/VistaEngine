@@ -1,11 +1,11 @@
 #include "StdAfx.h"
-#include "Units\AbnormalStateAttribute.h"
-#include "Units\IronBullet.h"
-#include "Units\IronLegion.h"
-#include "Units\CommandsQueue.h"
-#include "UserInterface\UI_References.h"
-#include "UserInterface\UserInterface.h"
-#include "Terra\terTools.h"
+Units/AbnormalStateAttribute.h
+Units/IronBullet.h
+Units/IronLegion.h
+Units/CommandsQueue.h
+UserInterface/UI_References.h
+UserInterface/UserInterface.h
+Terra/terTools.h
 #include "Serialization/StringTableImpl.h"
 #include "Serialization/SerializationFactory.h"
 #include "kdw/PropertyRowReference.h"

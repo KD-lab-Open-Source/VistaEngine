@@ -1,14 +1,14 @@
 #ifndef __ACTIONS_ENVIRONMENTAL_H__
 #define __ACTIONS_ENVIRONMENTAL_H__
 
-#include "Serialization\SerializationTypes.h"
-#include "Serialization\RangedWrapper.h"
-#include "TriggerEditor\TriggerExport.h"
+Serialization/SerializationTypes.h
+Serialization/RangedWrapper.h
+TriggerEditor/TriggerExport.h
 #include "SourceBase.h"
 #include "Triggers.h"
-#include "Physics\WindMap.h"
+Physics/WindMap.h
 #include "Starforce.h"
-#include "Units\LabelObject.h"
+Units/LabelObject.h
 
 struct ActionActivateSources : Action
 {

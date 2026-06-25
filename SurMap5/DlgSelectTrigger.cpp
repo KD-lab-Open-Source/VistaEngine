@@ -2,7 +2,7 @@
 #include "SurMap5.h"
 #include "DlgSelectTrigger.h"
 #include "DlgWorldName.h"
-#include "Serialization\Dictionary.h"
+Serialization/Dictionary.h
 
 IMPLEMENT_DYNAMIC(CDlgSelectTrigger, CDialog)
 CDlgSelectTrigger::CDlgSelectTrigger(const char* _path2triggersFiles, const char* _title, CWnd* pParent /*=NULL*/)

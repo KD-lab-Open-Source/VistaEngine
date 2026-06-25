@@ -4,16 +4,16 @@
 #include <string>
 #include <vector>
 
-#include "xMath\xMath.h"
+xMath/xMath.h
 #include "Handle.h"
 
-#include "XMath\ComboListColor.h"
+XMath/ComboListColor.h
 #include "kdw/PropertyEditor.h"
-#include "Serialization\RangedWrapper.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\SerializationFactory.h"
-#include "Serialization\StringTableBase.h"
-#include "Serialization\Decorators.h"
+Serialization/RangedWrapper.h
+Serialization/Serialization.h
+Serialization/SerializationFactory.h
+Serialization/StringTableBase.h
+Serialization/Decorators.h
 #include "sKey.h"
 
 struct sColor4c{

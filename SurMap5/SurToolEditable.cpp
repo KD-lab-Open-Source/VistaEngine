@@ -2,8 +2,8 @@
 #include "SurMap5.h"
 #include "SurToolEditable.h"
 
-#include "AttribEditor\AttribEditorCtrl.h"
-#include "XTL\SafeCast.h"
+AttribEditor/AttribEditorCtrl.h
+XTL/SafeCast.h
 
 class CSurToolAttribEditor : public CAttribEditorCtrl {
 	void onChanged() {

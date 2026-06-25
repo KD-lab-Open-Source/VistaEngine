@@ -1,8 +1,8 @@
 #include "stdafxTr.h"
 #include "procedurMap.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\SerializationFactory.h"
-#include "Serialization\EnumDescriptor.h"
+Serialization/Serialization.h
+Serialization/SerializationFactory.h
+Serialization/EnumDescriptor.h
 
 #include "road.h"
 #include "vmap.inl"

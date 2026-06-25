@@ -2,7 +2,7 @@
 #include "UIEditor.h"
 #include "SnapOptionsDlg.h"
 #include "Options.h"
-#include ".\snapoptionsdlg.h"
+./snapoptionsdlg.h
 
 IMPLEMENT_DYNAMIC(CSnapOptionsDlg, CDialog)
 CSnapOptionsDlg::CSnapOptionsDlg(CWnd* pParent /*=NULL*/)

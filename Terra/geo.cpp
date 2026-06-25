@@ -1,8 +1,8 @@
 #include "stdafxTr.h"
 
 #include "vmap.h"
-#include "Serialization\Serialization.h"
-#include "Render\inc\IRenderDevice.h"
+Serialization/Serialization.h
+Render/inc/IRenderDevice.h
 
 
 ///NOISE FUNCTION II

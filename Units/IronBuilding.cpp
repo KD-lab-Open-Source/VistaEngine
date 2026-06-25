@@ -6,21 +6,21 @@
 #include "Triggers.h"
 #include "vmap.h"
 #include "RenderObjects.h"
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 #include "UnitEnvironment.h"
-#include "Water\Water.h"
-#include "Environment\Environment.h"
-#include "Render\src\FogOfWar.h"
-#include "AI\PFTrap.h"
-#include "Serialization\RangedWrapper.h"
-#include "Serialization\RadianWrapper.h"
-#include "Physics\CD\CD2D.h"
-#include "VistaRender\FieldOfView.h"
-#include "Serialization\SerializationFactory.h"
-#include "Render\Src\TileMap.h"
-#include "Render\src\Scene.h"
-#include "Terra\TerrainType.h"
-#include "UserInterface\UI_Minimap.h"
+Water/Water.h
+Environment/Environment.h
+Render/src/FogOfWar.h
+AI/PFTrap.h
+Serialization/RangedWrapper.h
+Serialization/RadianWrapper.h
+Physics/CD/CD2D.h
+VistaRender/FieldOfView.h
+Serialization/SerializationFactory.h
+Render/Src/TileMap.h
+Render/src/Scene.h
+Terra/TerrainType.h
+UserInterface/UI_Minimap.h
 
 UNIT_LINK_GET(UnitBuilding)
 

@@ -16,7 +16,7 @@ using namespace std;
 
 // XTool
 #include "xutil.h"
-#include "XMath\xmath.h"
+XMath/xmath.h
 #include "xzip.h"
 
 #include "profiler.h"

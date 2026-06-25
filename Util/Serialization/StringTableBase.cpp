@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "StringTableBase.h"
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 
 void StringTableBase::serialize(Archive& ar) 
 {

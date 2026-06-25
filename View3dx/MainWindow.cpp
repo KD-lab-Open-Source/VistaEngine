@@ -19,8 +19,8 @@
 #include "kdw/PropertyRow.h"
 #include "kdw/Viewport.h"
 #include "kdw/Label.h"
-#include "Serialization\XPrmArchive.h"
-#include "Render\src\TexLibrary.h"
+Serialization/XPrmArchive.h
+Render/src/TexLibrary.h
 
 #include "XMath/ComboListColor.h"
 #include "View3dx.h"

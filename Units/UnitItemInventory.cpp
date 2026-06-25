@@ -1,15 +1,15 @@
 #include "StdAfx.h"
 #include "UnitItemInventory.h"
 #include "Player.h"
-#include "Serialization\RangedWrapper.h"
-#include "Serialization\SerializationFactory.h"
-#include "Game\CameraManager.h"
-#include "Render\Src\cCamera.h"
-#include "UserInterface\UI_Logic.h"
-#include "UserInterface\UI_Font.h"
-#include "UserInterface\UI_TextParser.h"
-#include "UserInterface\UI_Render.h"
-#include "UserInterface\UI_GlobalAttributes.h"
+Serialization/RangedWrapper.h
+Serialization/SerializationFactory.h
+Game/CameraManager.h
+Render/Src/cCamera.h
+UserInterface/UI_Logic.h
+UserInterface/UI_Font.h
+UserInterface/UI_TextParser.h
+UserInterface/UI_Render.h
+UserInterface/UI_GlobalAttributes.h
 
 extern class CameraManager* cameraManager;
 

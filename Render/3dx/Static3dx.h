@@ -3,7 +3,7 @@
 
 #include "Static3dxBase.h"
 #include "VoxelBox.h"
-#include "Render\Inc\IRenderDevice.h"
+Render/Inc/IRenderDevice.h
 
 // Кусок объекта, состоящий из нескольких нодов, но одного материала
 struct StaticBunch

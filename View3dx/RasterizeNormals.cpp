@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "RasterizeNormals.h"
-#include "..\Render\inc\IVisD3D.h"
-#include "..\Render\inc\VertexFormat.h"
+../Render/inc/IVisD3D.h
+../Render/inc/VertexFormat.h
 bool SaveTga(const char* filename,int width,int height,unsigned char* buf,int byte_per_pixel);
 class vsRasterize:public cVertexShader
 {

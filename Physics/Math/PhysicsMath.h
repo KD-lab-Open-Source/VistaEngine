@@ -1,7 +1,7 @@
 #ifndef __PHYSICS_MATH_H__
 #define __PHYSICS_MATH_H__
 
-#include "Physics\RigidBodyPhysics.h"
+Physics/RigidBodyPhysics.h
 
 ///////////////////////////////////////////////////////////////
 //

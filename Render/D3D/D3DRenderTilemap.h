@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Render\src\TileMap.h"
-#include "Render\D3D\PoolManager.h"
+Render/src/TileMap.h
+Render/D3D/PoolManager.h
 
 struct sBumpTile;
 

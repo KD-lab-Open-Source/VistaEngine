@@ -2,7 +2,7 @@
 #ifndef __VISTARPC_GAMETEST_H_INCLUDED__
 #define __VISTARPC_GAMETEST_H_INCLUDED__
 
-#include "FileUtils\XGUID.h"
+FileUtils/XGUID.h
 
 class Archive;
 

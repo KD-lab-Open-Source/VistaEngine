@@ -9,14 +9,14 @@
 #include <process.h>
 #include <math.h>
 #include <d3dx9math.h>
-#include "Profiler\Profiler.h"
-#include "Serialization\SerializationLib.h"
+Profiler/Profiler.h
+Serialization/SerializationLib.h
 #include "kdw/PropertyEditor.h"
 #include "kdw/kdWidgetsLib.h"
 #include "MTSection.h"
-#include "XMath\xmath.h"
-#include "XMath\Mat4f.h"
-#include "XMath\XMathLib.h"
+XMath/xmath.h
+XMath/Mat4f.h
+XMath/XMathLib.h
 
 
 XStream ff("log", XS_OUT);

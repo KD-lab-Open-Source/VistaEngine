@@ -5,9 +5,9 @@
 #include "UIEditor.h"
 #include "AddControlDlg.h"
 
-#include "..\UserInterface\UI_Types.h"
+../UserInterface/UI_Types.h
 #include "ClassCreatorFactory.h"
-#include "..\AttribEditor\AttribEditorCtrl.h"
+../AttribEditor/AttribEditorCtrl.h
 
 
 // CAddControlDlg dialog

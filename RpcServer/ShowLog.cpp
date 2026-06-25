@@ -2,9 +2,9 @@
 #include "ShowLog.h"
 #include <time.h>
 
-#include "kdw\ObjectsTree.h"
-#include "kdw\HLine.h"
-#include "kdw\Label.h"
+kdw/ObjectsTree.h
+kdw/HLine.h
+kdw/Label.h
 
 ShowLog::ShowLog()
 {

@@ -2,7 +2,7 @@
 #include "RigidBodyNode.h"
 #include "RigidBodyNodePrm.h"
 #include "NormalMap.h"
-#include "Render\3dx\Node3dx.h"
+Render/3dx/Node3dx.h
 
 ///////////////////////////////////////////////////////////////
 //

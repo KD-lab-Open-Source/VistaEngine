@@ -2,24 +2,24 @@
 #include "SurMap5.h"
 #include "MainFrame.h"
 
-#include "Terra\vMap.h"
+Terra/vMap.h
 #include "EffectReference.h"
 
 #include "SystemUtil.h"
 #include "ConsoleWindow.h"
-#include "Game\GameOptions.h"
+Game/GameOptions.h
 #include "SurToolAux.h"
 #include "ZipConfig.h"
 #include "SplashScreen.h"
 
-#include "Serialization\Dictionary.h"
-#include "FileUtils\FileUtils.h"
+Serialization/Dictionary.h
+FileUtils/FileUtils.h
 #include "TextDB.h"
-#include "Game\IniFile.h"
+Game/IniFile.h
 #include "kdw/Win32/Window.h"
-#include "UserInterface\UI_Render.h"
+UserInterface/UI_Render.h
 
-#include "Util\Win32\DebugSymbolManager.h"
+Util/Win32/DebugSymbolManager.h
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

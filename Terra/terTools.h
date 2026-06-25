@@ -9,7 +9,7 @@
 #include "break.h"
 #include "bitGen.h"
 #include "TerToolCtrl.h"
-#include "XMath\SafeMath.h"
+XMath/SafeMath.h
 #include <map>
 #include "TerrainType.h"
 

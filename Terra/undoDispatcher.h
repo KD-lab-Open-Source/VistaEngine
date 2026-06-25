@@ -1,7 +1,7 @@
 #ifndef __UNDODISPATCHER_H__
 #define __UNDODISPATCHER_H__
 
-#include "Render\src\MultiRegion.h"
+Render/src/MultiRegion.h
 extern int UNDO_REDO_BUFFER_SIZE; //Текущий размер буфера в SurMap пикселах
 const static int SIZE_SUPA_CELL=3;
 

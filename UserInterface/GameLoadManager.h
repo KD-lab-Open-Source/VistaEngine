@@ -1,8 +1,8 @@
 #ifndef __GAME_LOAD_MANAGER_H__
 #define __GAME_LOAD_MANAGER_H__
 
-#include "XTL\Handle.h"
-#include "Render\Src\VisError.h"
+XTL/Handle.h
+Render/Src/VisError.h
 
 typedef void (*RedrawFunction)(void);
 

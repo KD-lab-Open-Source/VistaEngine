@@ -1,12 +1,12 @@
 #ifndef __CHAIN_LIGHTNING_CONTROLLER_H_INCLUDED__
 #define __CHAIN_LIGHTNING_CONTROLLER_H_INCLUDED__
 
-#include "Units\UnitLink.h"
+Units/UnitLink.h
 #include "Timers.h"
 #include <set>
 
 #include "EffectReference.h"
-#include "Units\AbnormalStateAttribute.h"
+Units/AbnormalStateAttribute.h
 
 typedef set<int> UnitCache;
 

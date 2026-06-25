@@ -1,14 +1,14 @@
 #include "stdafx.h"
 #include "SoundTrack.h"
-#include "Serialization\ResourceSelector.h"
+Serialization/ResourceSelector.h
 #include "DebugUtil.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\XPrmArchive.h"
+Serialization/Serialization.h
+Serialization/XPrmArchive.h
 #include "Actions.h"
 #include "SoundApp.h"
-#include "Serialization\StringTableImpl.h"
-#include "Sound\SoundSystem.h"
-#include "Serialization\SerializationFactory.h"
+Serialization/StringTableImpl.h
+Sound/SoundSystem.h
+Serialization/SerializationFactory.h
 
 WRAP_LIBRARY(SoundTrackTable, "SoundTrackTable", "Звуковые треки", "Scripts\\Content\\SoundTrackTable", 0, 0);
 

@@ -9,10 +9,10 @@
 #include "RenderObjects.h"
 #include "SoundApp.h"
 #include "PlayOgg.h"
-#include "Render\3dx\umath.h"
-#include "Render\Src\VisGeneric.h"
-#include "Render\Src\Texture.h"
-#include "Render\Inc\IRenderDevice.h"
+Render/3dx/umath.h
+Render/Src/VisGeneric.h
+Render/Src/Texture.h
+Render/Inc/IRenderDevice.h
 
 #ifdef _DEMO_
 #define _NO_BINK_

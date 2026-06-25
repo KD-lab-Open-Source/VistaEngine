@@ -3,14 +3,14 @@
 #include "UI_Logic.h"
 #include "GameShell.h"
 #include "CommonLocText.h"
-#include "Network\P2P_interface.h"
-#include "Network\LogMsg.h"
+Network/P2P_interface.h
+Network/LogMsg.h
 #include "UserInterface.h"
 #include "WBuffer.h"
 #include "UnicodeConverter.h"
 
 #ifndef _FINAL_VERSION_
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 #endif
 
 #include <typeinfo>

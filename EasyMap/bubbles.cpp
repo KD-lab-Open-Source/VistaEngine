@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "Runtime3D.h"
-#include "..\Render\src\FileImage.h"
-#include "..\UserInterface\bubles\blobs.h"
-#include "..\UserInterface\bubles\cell.h"
+../Render/src/FileImage.h
+../UserInterface/bubles/blobs.h
+../UserInterface/bubles/cell.h
 #include <algorithm>
 
 class Demo3D:public Runtime3D

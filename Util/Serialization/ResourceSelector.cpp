@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "ResourceSelector.h"
-#include "Serialization\Serialization.h"
-#include "FileUtils\FileUtils.h"
+Serialization/Serialization.h
+FileUtils/FileUtils.h
 
 bool ExportInterface::export_;
 ExportInterface::ModelSelectorCallBack ExportInterface::modelSelectorCallBack_;

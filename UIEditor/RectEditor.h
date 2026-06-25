@@ -1,7 +1,7 @@
 #ifndef __RECT_EDITOR_H_INCLUDED__
 #define __RECT_EDITOR_H_INCLUDED__
 
-#include "XTL\Rect.h"
+XTL/Rect.h
 
 class RectEditor {
 public:

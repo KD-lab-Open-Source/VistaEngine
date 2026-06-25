@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "XZip.h"
 #include "FileTime.h"
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 
 FileTime::FileTime(const char* fileName)
 {

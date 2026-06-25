@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "PlaceOperators.h"
-#include "..\util\ScanningShape.h"
+../util/ScanningShape.h
 
 
 WeaponScanOp::WeaponScanOp(const UnitActing* unit, Player& aiPlayer, float scanRadius, WeaponPrmReference weaponPrm)

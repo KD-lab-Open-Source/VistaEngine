@@ -13,4 +13,4 @@ using namespace std;
 
 #include <xutil.h>
 #include "profiler.h"
-#include "XMath\xMath.h"
+XMath/xMath.h

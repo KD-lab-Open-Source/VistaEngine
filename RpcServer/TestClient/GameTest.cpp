@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "GameTest.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\Decorators.h"
+Serialization/Serialization.h
+Serialization/Decorators.h
 #include "Client.h"
 #include "MainWindow.h"
-#include "UserInterface\XmlRpc\RpcEnums.h"
-#include "UserInterface\XmlRpc\RpcTypes.h"
+UserInterface/XmlRpc/RpcEnums.h
+UserInterface/XmlRpc/RpcTypes.h
 
 GameTest::GameTest()
 {

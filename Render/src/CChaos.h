@@ -1,8 +1,8 @@
 #ifndef __C_CHAOS_H_INCLUDED__
 #define __C_CHAOS_H_INCLUDED__
 
-#include "Render\inc\IVisGenericInternal.h"
-#include "Render\inc\IRenderDevice.h"
+Render/inc/IVisGenericInternal.h
+Render/inc/IRenderDevice.h
 
 class RENDER_API cChaos : public BaseGraphObject
 {

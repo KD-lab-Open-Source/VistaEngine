@@ -8,8 +8,8 @@
 #include "XZip.h"
 #include "FileUtils.h"
 
-#include "zlib\contrib\minizip\unzip.h"
-#include "zlib\contrib\minizip\zip.h"
+zlib/contrib/minizip/unzip.h
+zlib/contrib/minizip/zip.h
 
 using namespace file_utils;
 

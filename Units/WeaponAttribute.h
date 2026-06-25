@@ -5,8 +5,8 @@
 #include "AbnormalStateAttribute.h"
 #include "EffectReference.h"
 #include "CircleManagerParam.h"
-#include "UserInterface\UI_MarkObjectAttribute.h"
-#include "UserInterface\UI_Inventory.h"
+UserInterface/UI_MarkObjectAttribute.h
+UserInterface/UI_Inventory.h
 
 #include "WeaponEnums.h"
 

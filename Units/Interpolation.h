@@ -1,8 +1,8 @@
 #ifndef __INTERPOLATION_
 #define __INTERPOLATION_
 
-#include "XMath\SafeMath.h"
-#include "VistaRender\StreamInterpolation.h"
+XMath/SafeMath.h
+VistaRender/StreamInterpolation.h
 
 template<class T ,class InterpolationOp = DefaultInterpolationOp<T> >
 class Interpolator

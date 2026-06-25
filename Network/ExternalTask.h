@@ -2,8 +2,8 @@
 #define __EXTERNALTASK_H__
 
 #include "CommonLocText.h"
-#include "Units\AttributeReference.h"
-#include "FileUtils\XGUID.h" //определение XGUID
+Units/AttributeReference.h
+FileUtils/XGUID.h //определение XGUID
 #include "GlobalStatistics.h"
 
 #define caseR(a) case a: return #a;

@@ -4,23 +4,23 @@
 #include "Sound.h"
 #include "GlobalAttributes.h"
 #include "GameOptions.h"
-#include "UserInterface\UserInterface.h"
-#include "UserInterface\CommonLocText.h"
-#include "UserInterface\Controls.h"
-#include "UserInterface\UI_Minimap.h"
+UserInterface/UserInterface.h
+UserInterface/CommonLocText.h
+UserInterface/Controls.h
+UserInterface/UI_Minimap.h
 #include "RenderObjects.h"
 #include "BaseUnit.h"
-#include "Serialization\Dictionary.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\RangedWrapper.h"
-#include "Serialization\ResourceSelector.h"
-#include "Serialization\XPrmArchive.h"
-#include "Serialization\StringTableImpl.h"
+Serialization/Dictionary.h
+Serialization/Serialization.h
+Serialization/RangedWrapper.h
+Serialization/ResourceSelector.h
+Serialization/XPrmArchive.h
+Serialization/StringTableImpl.h
 #include "Console.h"
-#include "Serialization\MillisecondsWrapper.h"
-#include "Render\3dx\Lib3dx.h"
-#include "Render\src\Scene.h"
-#include "Render\src\VisGeneric.h"
+Serialization/MillisecondsWrapper.h
+Render/3dx/Lib3dx.h
+Render/src/Scene.h
+Render/src/VisGeneric.h
 #include "SoundTrack.h"
 #include "NetPlayer.h"
 
@@ -29,14 +29,14 @@
 #include "AttributeSquad.h"
 #include "IronBullet.h"
 #include "TextDB.h"
-#include "TriggerEditor\TriggerExport.h"
-#include "Environment\Environment.h"
-#include "Serialization\SerializationFactory.h"
+TriggerEditor/TriggerExport.h
+Environment/Environment.h
+Serialization/SerializationFactory.h
 #include "Starforce.h"
-#include "Terra\terTools.h"
-#include "Terra\TerrainType.h"
-#include "Units\CommandsQueue.h"
-#include "Units\EnginePrm.h"
+Terra/terTools.h
+Terra/TerrainType.h
+Units/CommandsQueue.h
+Units/EnginePrm.h
 #include <time.h>
 
 FORCE_SEGMENT(Sources)

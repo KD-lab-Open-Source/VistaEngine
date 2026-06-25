@@ -2,23 +2,23 @@
 #include "NetPlayer.h"
 #include "crc.h"
 #include "NetCommands.h"
-#include "Serialization\Serialization.h"
-#include "FileUtils\XGUID.h"
+Serialization/Serialization.h
+FileUtils/XGUID.h
 #include "ComboVectorString.h"
 #include "LocString.h"
-#include "XMath\ComboListColor.h"
+XMath/ComboListColor.h
 #include "Runtime.h"
-#include "Serialization\XPrmArchive.h"
-#include "Serialization\MultiArchive.h"
-#include "Environment\SourceManager.h"
-#include "Environment\Anchor.h"
+Serialization/XPrmArchive.h
+Serialization/MultiArchive.h
+Environment/SourceManager.h
+Environment/Anchor.h
 #include "Universe.h"
 #include "GlobalAttributes.h"
-#include "Terra\QSWorldsMgr.h"
-#include "FileUtils\FileUtils.h"
+Terra/QSWorldsMgr.h
+FileUtils/FileUtils.h
 #include "UnicodeConverter.h"
 #include "WBuffer.h"
-#include "Terra\vMap.h"
+Terra/vMap.h
 #include <mmsystem.h>
 
 

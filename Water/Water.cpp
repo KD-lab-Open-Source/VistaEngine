@@ -1,19 +1,19 @@
 #include "StdAfx.h"
-#include "terra\vmap.h"
+terra/vmap.h
 #include "Water.h"
-#include "Render\D3D\D3DRender.h"
-#include "Render\shader\shaders.h"
-#include "Render\src\RenderCubemap.h"
-#include "Serialization\ResourceSelector.h"
+Render/D3D/D3DRender.h
+Render/shader/shaders.h
+Render/src/RenderCubemap.h
+Serialization/ResourceSelector.h
 #include "WaterGarbage.h"
 #include "SkyObject.h"
-#include "Serialization\RangedWrapper.h"
+Serialization/RangedWrapper.h
 #include "DebugUtil.h"
-#include "Render\src\Gradients.h"
-#include "Render\Src\TileMap.h"
-#include "Render\Src\Scene.h"
-#include "Render\Src\VisGeneric.h"
-#include "Environment\Environment.h"
+Render/src/Gradients.h
+Render/Src/TileMap.h
+Render/Src/Scene.h
+Render/Src/VisGeneric.h
+Environment/Environment.h
 
 float cWater::z_int_to_float;
 cWater* water;

@@ -11,7 +11,7 @@ v' = v*M1*M2*M3*...*Mn
 
 */
 
-#include "XMath\xmath.h"
+XMath/xmath.h
 
 struct D3DXMATRIX;
 

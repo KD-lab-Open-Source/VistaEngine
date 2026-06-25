@@ -1,7 +1,7 @@
 #include "StdAfxRD.h"
-#include "Render\D3D\D3DRender.h"
-#include "Render\Src\cCamera.h"
-#include "Render\src\FT_Font.h"
+Render/D3D/D3DRender.h
+Render/Src/cCamera.h
+Render/src/FT_Font.h
 #include "UnicodeConverter.h"
 #include "VisGenericDefine.h"
 

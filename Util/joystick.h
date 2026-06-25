@@ -1,7 +1,7 @@
 #ifndef __JOYSTICK_H__
 #define __JOYSTICK_H__
 
-#include "Serialization\LibraryWrapper.h"
+Serialization/LibraryWrapper.h
 
 const int JOYSTICK_BUTTONS_MAX = 16;
 const int JOYSTICK_AXIS_MAX = 2;

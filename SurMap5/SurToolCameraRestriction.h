@@ -4,8 +4,8 @@
 #include "EScroll.h"
 #include "SurToolAux.h"
 #include "SurToolEditable.h"
-#include "XTL\Rect.h"
-#include "mfc\LayoutMFC.h"
+XTL/Rect.h
+mfc/LayoutMFC.h
 
 class CameraSpline;
 class CameraCoordinate;

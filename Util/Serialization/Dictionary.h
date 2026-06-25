@@ -1,8 +1,8 @@
 #ifndef __DICTIONARY_H__
 #define __DICTIONARY_H__
 
-#include "XTL\StaticMap.h"
-#include "Serialization\Serialization.h"
+XTL/StaticMap.h
+Serialization/Serialization.h
 #include "LibraryWrapper.h"
 
 class Dictionary : public ShareHandleBase

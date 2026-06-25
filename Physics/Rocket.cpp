@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "terra.h"
 #include "RigidBody.h"
-#include "..\Environment\Environment.h"
+../Environment/Environment.h
 
 void RigidBody::startRocket(const RigidBody* owner)
 {

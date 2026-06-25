@@ -1,11 +1,11 @@
 #ifndef __TYPE_LIBRARY_IMPL_H__
 #define __TYPE_LIBRARY_IMPL_H__
 
-#include "Serialization\StringTable.h"
-#include "Serialization\StringTableBase.h"
-#include "Serialization\StringTableReference.h"
-#include "Serialization\StringTableReferencePolymorphic.h"
-#include "Serialization\Factory.h"
+Serialization/StringTable.h
+Serialization/StringTableBase.h
+Serialization/StringTableReference.h
+Serialization/StringTableReferencePolymorphic.h
+Serialization/Factory.h
 #include "Console.h"
 
 ///////////////////////////////////////////////////////////////

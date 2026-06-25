@@ -2,9 +2,9 @@
 #include "SurMap5.h"
 #include "SurToolWater.h"
 
-#include "Environment\Environment.h"
-#include "water\Water.h"
-#include "Serialization\Serialization.h"
+Environment/Environment.h
+water/Water.h
+Serialization/Serialization.h
 
 // CSurToolWaterSrc dialog
 

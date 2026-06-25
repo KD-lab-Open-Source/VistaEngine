@@ -2,7 +2,7 @@
 #define __UNIT_OBJECTIVE_H__
 
 #include "RealUnit.h"
-#include "Render\src\FogOfWar.h"
+Render/src/FogOfWar.h
 
 //////////////////////////////////////////
 // Юнит-цель: легионер, здание и предмет

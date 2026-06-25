@@ -3,10 +3,10 @@
 
 #include "MTSection.h"
 #include "OrCircle.h"
-#include "Units\CircleManagerParam.h"
-#include "XTL\StaticMap.h"
-#include "Render\inc\IVisGenericInternal.h"
-#include "Render\D3D\RenderStates.h"
+Units/CircleManagerParam.h
+XTL/StaticMap.h
+Render/inc/IVisGenericInternal.h
+Render/D3D/RenderStates.h
 
 
 class CircleManager : public BaseGraphObject

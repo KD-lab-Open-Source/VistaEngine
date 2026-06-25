@@ -5,11 +5,11 @@
 #include "CameraManager.h"
 #include "Sound.h"
 #include "RenderObjects.h"
-#include "UserInterface\UI_Render.h"
+UserInterface/UI_Render.h
 
 #include "GameOptions.h"
 #ifndef _FINAL_VERSION_
-#include "Serialization\Dictionary.h"
+Serialization/Dictionary.h
 #endif
 #include "version.h" 
 #include "Console.h"
@@ -19,17 +19,17 @@
 #include "terra.h"
 #include "CameraManager.h"
 
-#include "Game\Universe.h"
-#include "Water\CircleManager.h"
+Game/Universe.h
+Water/CircleManager.h
 #include "GameOptions.h"
-#include "UserInterface\UI_Render.h"
-#include "UserInterface\UserInterface.h"
-#include "Game\Runtime.h"
-#include "Game\IniFile.h"
-#include "Render\src\Scene.h"
-#include "Render\src\VisGeneric.h"
-#include "Util\Win32\DebugSymbolManager.h"
-#include "Util\FileUtils\FileUtils.h"
+UserInterface/UI_Render.h
+UserInterface/UserInterface.h
+Game/Runtime.h
+Game/IniFile.h
+Render/src/Scene.h
+Render/src/VisGeneric.h
+Util/Win32/DebugSymbolManager.h
+Util/FileUtils/FileUtils.h
 
 #include <process.h>
 #include <malloc.h>

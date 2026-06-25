@@ -3,10 +3,10 @@
 #include "OcclusionQuery.h"
 #include "cCamera.h"
 #include "D3DRender.h"
-#include "Render\3dx\Node3dx.h"
+Render/3dx/Node3dx.h
 #include "VisGeneric.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\ResourceSelector.h"
+Serialization/Serialization.h
+Serialization/ResourceSelector.h
 
 //////////////////////////////////////////////////////////////////////////////
 LensFlareSprite::~LensFlareSprite()

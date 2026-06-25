@@ -2,7 +2,7 @@
 #define __ATTRIBUTE_SQUAD_H__
 
 #include "UnitAttribute.h"
-#include "XTL\UniqueVector.h"
+XTL/UniqueVector.h
 
 ////////////////////////////////////////////////
 

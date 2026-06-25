@@ -1,10 +1,10 @@
 #ifndef __N_PARTICLE_KEY_H_INCLUDED__
 #define __N_PARTICLE_KEY_H_INCLUDED__
 
-#include "Render\Inc\rd.h"
-#include "XMath\Colors.h"
-#include "XMath\KeysBase.h"
-#include "Serialization\Serialization.h"
+Render/Inc/rd.h
+XMath/Colors.h
+XMath/KeysBase.h
+Serialization/Serialization.h
 
 struct RENDER_API KeyFloat : KeyBase
 {

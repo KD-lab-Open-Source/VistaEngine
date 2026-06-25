@@ -4,15 +4,15 @@
 #include "Timers.h"
 #include "NetPlayer.h"
 #include "ReelManager.h"
-#include "Render\Inc\fps.h"
+Render/Inc/fps.h
 #include "skey.h"
-#include "VistaRender\StreamInterpolation.h"
-#include "Game\Runtime.h"
-#include "Util\Win32\KeyboardDriver.h"
-#include "Render\Src\WinVideo.h"
-#include "Network\quantTimeStatistic.h"
-#include "UserInterface\Bubles\Blobs.h"
-#include "Units\DirectControlMode.h"
+VistaRender/StreamInterpolation.h
+Game/Runtime.h
+Util/Win32/KeyboardDriver.h
+Render/Src/WinVideo.h
+Network/quantTimeStatistic.h
+UserInterface/Bubles/Blobs.h
+Units/DirectControlMode.h
 
 class PNetCenter;
 class ChatMessage;

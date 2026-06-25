@@ -4,7 +4,7 @@
 #include <vector>
 #include "XUtil.h"
 #include "MTSection.h"
-#include "Render\inc\rd.h"
+Render/inc/rd.h
 
 /*
   Предположение что данные в виде 

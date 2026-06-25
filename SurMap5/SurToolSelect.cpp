@@ -4,15 +4,15 @@
 #include "SurToolSelect.h"
 #include "MainFrame.h"
 #include "GeneralView.h"
-#include "Serialization\Serialization.h"
-#include "Game\RenderObjects.h"
-#include "Units\BaseUniverseObject.h"
+Serialization/Serialization.h
+Game/RenderObjects.h
+Units/BaseUniverseObject.h
 
 #include "SurToolPathEditor.h"
 #include "SurToolEnvironmentEditor.h"
 #include "SurToolCameraEditor.h"
 
-#include "AttribEditor\AttribEditorCtrl.h"
+AttribEditor/AttribEditorCtrl.h
 
 #include "SerializerUniverseObject.h"
 #include "EventListeners.h"

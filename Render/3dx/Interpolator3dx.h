@@ -1,9 +1,9 @@
 #ifndef __INTERPOLATOR3DX_H_INCLUDED__
 #define __INTERPOLATOR3DX_H_INCLUDED__
 
-#include "Render\Inc\3dx.h"
-#include "Render\3dx\Saver.h"
-#include "Serialization\Serialization.h"
+Render/Inc/3dx.h
+Render/3dx/Saver.h
+Serialization/Serialization.h
 
 template<int template_size>
 struct SplineData

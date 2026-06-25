@@ -2,9 +2,9 @@
 #define __CONTROLS_H__
 
 #include "MTSection.h"
-#include "Serialization\LibraryWrapper.h"
-#include "UserInterface\UI_Key.h"
-#include "XTL\CallWrapper.h"
+Serialization/LibraryWrapper.h
+UserInterface/UI_Key.h
+XTL/CallWrapper.h
 
 enum InterfaceGameControlID
 {

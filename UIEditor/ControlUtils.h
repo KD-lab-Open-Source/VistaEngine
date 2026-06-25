@@ -2,8 +2,8 @@
 #define __UIEDITOR_CONTROL_UTILS_H_INCLUDED__
 
 #include "type_name.h"
-#include "UserInterface\UserInterface.h"
-#include "XTL\Rect.h"
+UserInterface/UserInterface.h
+XTL/Rect.h
 #include "ControlsTreeCtrl.h"
 
 static bool is_erased (const UI_ControlBase& control){

@@ -1,9 +1,9 @@
 #ifndef __SOUND_APP_H__
 #define __SOUND_APP_H__
 
-#include "XTL\StaticMap.h"
+XTL/StaticMap.h
 #include <map>
-#include "Units\SoundAttribute.h"
+Units/SoundAttribute.h
 
 class OggPlayer;
 class SoundSystem;

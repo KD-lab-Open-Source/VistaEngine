@@ -6,8 +6,8 @@
 #include "SurToolLighting.h"
 
 #include "MainFrm.h"
-#include "..\water\WaterShell.h"
-#include "..\water\ZoneSource.h"
+../water/WaterShell.h
+../water/ZoneSource.h
 
 IMPLEMENT_DYNAMIC(CSurToolLighting, CSurToolBase)
 CSurToolLighting::CSurToolLighting(CWnd* pParent /*=NULL*/)

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "ComboVectorString.h"
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 #include "UnicodeConverter.h"
 
 string getStringTokenByIndex(const char* worker, int number);

@@ -7,7 +7,7 @@
 #include "kdw/DragManager.h"
 #include "ConditionEditor.h"
 #include "ClassTree.h"
-#include "Serialization\EnumDescriptor.h"
+Serialization/EnumDescriptor.h
 
 string conditionName(Condition* condition, bool withDigest = true){
 	string result = TRANSLATE(FactorySelector<Condition>::Factory::instance().nameAlt(typeid(*condition).name()));

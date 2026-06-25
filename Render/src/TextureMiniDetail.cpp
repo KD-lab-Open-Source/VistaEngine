@@ -1,7 +1,7 @@
 #include "stdafxRD.h"
 #include "TextureMiniDetail.h"
-#include "Render\3dx\umath.h"
-#include "Render\Src\FileImage.h"
+Render/3dx/umath.h
+Render/Src/FileImage.h
 #include "D3DRender.h"
 
 TextureMiniDetail::TextureMiniDetail(const char* textureName, int tileSize)

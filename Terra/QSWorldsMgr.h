@@ -1,7 +1,7 @@
 #ifndef __QSWORLDSMGR_H__
 #define __QSWORLDSMGR_H__
 
-#include "FileUtils\XGUID.h"
+FileUtils/XGUID.h
 
 struct QSWorldInfo {
 	int missionNum;

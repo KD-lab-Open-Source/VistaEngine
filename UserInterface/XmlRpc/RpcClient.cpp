@@ -2,8 +2,8 @@
 #include "RpcClient.h"
 #include <process.h>
 #include "MTSection.h"
-#include "Network\LogMsg.h"
-#include "XmlRpc\XmlRpc.h"
+Network/LogMsg.h
+XmlRpc/XmlRpc.h
 
 #define _LIB_NAME "XmlRpc"
 #include "AutomaticLink.h"

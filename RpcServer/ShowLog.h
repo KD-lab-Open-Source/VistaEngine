@@ -2,7 +2,7 @@
 #ifndef __VISTARPC_SHOW_LOG_H_INCLUDED__
 #define __VISTARPC_SHOW_LOG_H_INCLUDED__
 
-#include "kdw\VBox.h"
+kdw/VBox.h
 
 namespace kdw {
 	class ObjectsTree;

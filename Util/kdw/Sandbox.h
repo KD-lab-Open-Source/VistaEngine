@@ -6,7 +6,7 @@
 #include "XMath/Mat4f.h"
 #include "XMath/Box6f.h"
 #include "XMath/Colors.h"
-#include "XTL\Rect.h"
+XTL/Rect.h
 
 class cInterfaceRenderDevice;
 

@@ -2,8 +2,8 @@
 #define __CAMERA_MANAGER_H__
 
 #include "Timers.h"
-#include "XMath\Rectangle4f.h"
-#include "Units\GlobalAttributes.h"
+XMath/Rectangle4f.h
+Units/GlobalAttributes.h
 #include "BaseUniverseObject.h"
 #include "UnitLink.h"
 

@@ -5,14 +5,14 @@
 #include "Scene.h"
 #include "MultiRegion.h"
 #include "VisGeneric.h"
-#include "Terra\vmap.h"
+Terra/vmap.h
 #include "D3DRenderTilemap.h"
-#include "Serialization\ResourceSelector.h"
-#include "Serialization\RangedWrapper.h"
-#include "Render\src\FileImage.h"
-#include "Serialization\EnumDescriptor.h"
-#include "Environment\Environment.h"
-#include "FileUtils\FileUtils.h"
+Serialization/ResourceSelector.h
+Serialization/RangedWrapper.h
+Render/src/FileImage.h
+Serialization/EnumDescriptor.h
+Environment/Environment.h
+FileUtils/FileUtils.h
 
 namespace {
 ResourceSelector::Options textureOptions("*.tga", "Resource\\TerrainData\\Textures");

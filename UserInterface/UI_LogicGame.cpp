@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 
-#include "Render\inc\fps.h"
+Render/inc/fps.h
 #include "runtime.h"
 #include "GameShell.h"
 #include "Squad.h"
@@ -11,25 +11,25 @@
 #include "vmap.h"
 #include "Triggers.h"
 #include "IronBuilding.h"
-#include "Units\UnitItemInventory.h"
-#include "Units\UnitItemResource.h"
-#include "Units\UnitPad.h"
-#include "Network\P2P_interface.h"
-#include "Terra\QSWorldsMgr.h"
-#include "AI\PFTrap.h"
+Units/UnitItemInventory.h
+Units/UnitItemResource.h
+Units/UnitPad.h
+Network/P2P_interface.h
+Terra/QSWorldsMgr.h
+AI/PFTrap.h
 #include "Weapon.h"
 #include "WeaponPrms.h"
 #include "Timers.h"
-#include "Water\Water.h"
-#include "Environment\Environment.h"
-#include "Environment\SourceManager.h"
-#include "VistaRender\postEffects.h"
+Water/Water.h
+Environment/Environment.h
+Environment/SourceManager.h
+VistaRender/postEffects.h
 #include "TextDB.h"
-#include "FileUtils\FileUtils.h"
-#include "Serialization\StringTable.h"
-#include "Serialization\SerializationFactory.h"
-#include "Render\Src\cCamera.h"
-#include "Render\Src\TexLibrary.h"
+FileUtils/FileUtils.h
+Serialization/StringTable.h
+Serialization/SerializationFactory.h
+Render/Src/cCamera.h
+Render/Src/TexLibrary.h
 #include "WBuffer.h"
 #include "Controls.h"
 #include "GameLoadManager.h"
@@ -44,7 +44,7 @@
 #include "UI_Controls.h"
 #include "UI_NetCenter.h"
 #include "UnicodeConverter.h"
-#include "Render\src\Scene.h"
+Render/src/Scene.h
 
 #include "CameraManager.h"
 #include "UniverseX.h"

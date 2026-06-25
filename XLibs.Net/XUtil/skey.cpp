@@ -1,6 +1,6 @@
 #include "xglobal.h"
 #include "sKey.h"
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 
 
 const char* toHex(unsigned char byte)

@@ -1,15 +1,15 @@
 #include "StdAfx.h"
 
 #include "Options.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\XPrmArchive.h"
-//#include "Serialization\EditArchive.h"
-#include "Serialization\StringTableImpl.h"
+Serialization/Serialization.h
+Serialization/XPrmArchive.h
+//Serialization/EditArchive.h
+Serialization/StringTableImpl.h
 
-#include "UserInterface\UI_Render.h"
+UserInterface/UI_Render.h
 #include "DebugPrm.h"
-#include "Game\GameOptions.h"
-#include "Serialization\EnumDescriptor.h"
+Game/GameOptions.h
+Serialization/EnumDescriptor.h
 #include "UnicodeConverter.h"
 
 Options::Options ()

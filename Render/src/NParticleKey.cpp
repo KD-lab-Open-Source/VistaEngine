@@ -5,13 +5,13 @@
 #include "NParticleID.h"
 #include "TileMap.h"
 #include "VisGeneric.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\GenericFileSelector.h"
-#include "Serialization\RangedWrapper.h"
-#include "Serialization\StringTableImpl.h"
-#include "Serialization\SerializationFactory.h"
-#include "Serialization\EnumDescriptor.h"
-#include "FileUtils\FileUtils.h"
+Serialization/Serialization.h
+Serialization/GenericFileSelector.h
+Serialization/RangedWrapper.h
+Serialization/StringTableImpl.h
+Serialization/SerializationFactory.h
+Serialization/EnumDescriptor.h
+FileUtils/FileUtils.h
 #include "CurveWrapper.h"
 
 KeyFloat::value KeyFloat::none=0;

@@ -6,7 +6,7 @@
 #include "SurToolGeoNet.h"
 
 #include "SurToolAux.h"
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 
 
 // CSurToolGeoNet dialog

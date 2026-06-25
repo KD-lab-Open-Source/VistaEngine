@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "UI_Actions.h"
-#include "UserInterface\SelectManager.h"
-#include "VistaRender\postEffects.h"
-#include "Serialization\RangedWrapper.h"
+UserInterface/SelectManager.h
+VistaRender/postEffects.h
+Serialization/RangedWrapper.h
 
 // ------------------- UI_ActionDataFactory
 

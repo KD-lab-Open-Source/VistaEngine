@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Parameters.h"
-#include "Environment\SourceManager.h"
+Environment/SourceManager.h
 #include "UnitInterface.h"
 
 void ShowChangeParameterSetting::serialize(Archive& ar)

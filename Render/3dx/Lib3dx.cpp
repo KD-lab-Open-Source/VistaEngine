@@ -4,11 +4,11 @@
 #include "Simply3dx.h"
 #include "Node3dx.h"
 #include "VisGeneric.h"
-#include "Serialization\InPlaceArchive.h"
-#include "Serialization\BinaryArchive.h"
-#include "FileUtils\FileUtils.h"
-#include "Serialization\SerializationFactory.h"
-#include "kdw\ContentUtil.h"
+Serialization/InPlaceArchive.h
+Serialization/BinaryArchive.h
+FileUtils/FileUtils.h
+Serialization/SerializationFactory.h
+kdw/ContentUtil.h
 
 int strcmp_null(const char* a,const char* b)
 {

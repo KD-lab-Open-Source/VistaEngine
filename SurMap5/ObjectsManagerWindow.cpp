@@ -13,16 +13,16 @@
 #include "ToolsTreeWindow.h"
 #include "MainFrame.h"
 
-#include "AttribEditor\AttribEditorCtrl.h"
-#include "MFC\SizeLayoutManager.h"
-#include "Environment\SourceManager.h"
-#include "Environment\Anchor.h"
+AttribEditor/AttribEditorCtrl.h
+MFC/SizeLayoutManager.h
+Environment/SourceManager.h
+Environment/Anchor.h
 
-#include "Game\Universe.h"
-#include "Units\Nature.h"
-#include "Units\EnvironmentSimple.h"
+Game/Universe.h
+Units/Nature.h
+Units/EnvironmentSimple.h
 
-#include "Game\CameraManager.h"
+Game/CameraManager.h
 #include "NameComboDlg.h"
 
 #include <algorithm>
@@ -31,8 +31,8 @@
 
 #include "kdw/Clipboard.h"
 #include "kdw/Win32Proxy.h"
-#include "FileUtils\FileUtils.h"
-#include "mfc\PopupMenu.h"
+FileUtils/FileUtils.h
+mfc/PopupMenu.h
 
 //////////////////////////////////////////////////////////////////////////////
 

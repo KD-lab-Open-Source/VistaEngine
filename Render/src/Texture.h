@@ -1,8 +1,8 @@
 #ifndef __TEXTURE_H_INCLUDED__
 #define __TEXTURE_H_INCLUDED__
 
-#include "XMath\Rectangle4f.h"
-#include "Render\inc\IVisGenericInternal.h"
+XMath/Rectangle4f.h
+Render/inc/IVisGenericInternal.h
 
 enum eSurfaceFormat;
 struct IDirect3DTexture9;

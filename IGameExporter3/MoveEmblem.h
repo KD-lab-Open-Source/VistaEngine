@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Render\3dx\umath.h"
-#include "Render\3dx\Static3dxBase.h"
+Render/3dx/umath.h
+Render/3dx/Static3dxBase.h
 
 class cMoveEmblem;
 

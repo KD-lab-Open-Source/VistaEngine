@@ -1,9 +1,9 @@
 #include "StdAfx.h"
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 #include "WindMap.h"
 #include "NormalMap.h"
-#include "Serialization\RangedWrapper.h"
-#include "Serialization\EnumDescriptor.h"
+Serialization/RangedWrapper.h
+Serialization/EnumDescriptor.h
 #include "DebugUtil.h"
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(WindMap, WindType, "WindType")

@@ -5,11 +5,11 @@
 #include "SurToolCameraRestriction.h"
 #include "SelectionUtil.h"
 
-#include "..\UserInterface\UI_Render.h"
-#include "..\UserInterface\UI_Minimap.h"
-#include "Environment\Environment.h"
+../UserInterface/UI_Render.h
+../UserInterface/UI_Minimap.h
+Environment/Environment.h
 
-#include "Game\CameraManager.h"
+Game/CameraManager.h
 
 #include "MainFrame.h"
 #include "GeneralView.h"

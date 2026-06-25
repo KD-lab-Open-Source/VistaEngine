@@ -2,23 +2,23 @@
 #include "SelectionUtil.h"
 
 #include "UniverseObjectAction.h"
-#include "Game\Universe.h"
-#include "Game\CameraManager.h"
-#include "Game\RenderObjects.h"
-#include "Units\UnitEnvironment.h"
-#include "Environment\SourceManager.h"
-#include "Environment\Anchor.h"
+Game/Universe.h
+Game/CameraManager.h
+Game/RenderObjects.h
+Units/UnitEnvironment.h
+Environment/SourceManager.h
+Environment/Anchor.h
 #include "EditorVisual.h"
 
 #include "SurToolPathEditor.h"
 #include "SurToolCameraEditor.h"
 #include "SurToolEnvironmentEditor.h"
 
-#include "Serialization\Serialization.h"
-#include "Serialization\SerializationFactory.h"
-#include "Serialization\BinaryArchive.h"
-#include "Render\Src\cCamera.h"
-#include "Render\Src\Scene.h"
+Serialization/Serialization.h
+Serialization/SerializationFactory.h
+Serialization/BinaryArchive.h
+Render/Src/cCamera.h
+Render/Src/Scene.h
 
 bool forFirstSelected(UniverseObjectAction& action, bool includeDead)
 {

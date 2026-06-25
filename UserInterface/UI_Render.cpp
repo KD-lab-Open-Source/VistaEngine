@@ -2,15 +2,15 @@
 
 #include "UI_Render.h"
 
-#include "Render\d3d\D3DRender.h"
-#include "Render\src\cCamera.h"
+Render/d3d/D3DRender.h
+Render/src/cCamera.h
 
 #include "UI_GlobalAttributes.h"
 #include "UI_TextParser.h"
 #include "UI_Types.h"
 
-#include "Game\CameraManager.h"
-#include "Serialization\StringTable.h"
+Game/CameraManager.h
+Serialization/StringTable.h
 #include "UnicodeConverter.h"
 
 

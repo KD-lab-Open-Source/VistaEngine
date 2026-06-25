@@ -5,7 +5,7 @@
 #include "MainFrame.h"
 #include "GeneralView.h"
 
-#include "Game\CameraManager.h"
+Game/CameraManager.h
 
 #include "ToolsTreeCtrl.h"
 

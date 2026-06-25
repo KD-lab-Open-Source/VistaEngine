@@ -1,6 +1,6 @@
 #pragma once
-#include "Serialization\SerializationTypes.h"
-#include "Serialization\StringTableReference.h"
+Serialization/SerializationTypes.h
+Serialization/StringTableReference.h
 
 enum TerrainType;
 typedef int TerToolsID;

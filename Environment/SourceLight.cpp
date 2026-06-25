@@ -1,12 +1,12 @@
 #include "stdafx.h"
 
 #include "SourceLight.h"
-#include "Serialization\Serialization.h"
-#include "Render\Src\TexLibrary.h"
-#include "Render\Src\Scene.h"
+Serialization/Serialization.h
+Render/Src/TexLibrary.h
+Render/Src/Scene.h
 
 #include "Environment.h"
-#include "Terra\vmap.h"
+Terra/vmap.h
 
 
 SourceLight::SourceLight()

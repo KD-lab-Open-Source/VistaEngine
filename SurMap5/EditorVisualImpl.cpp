@@ -1,14 +1,14 @@
 #include "StdAfx.h"
 #include "EditorVisual.h"
-#include "Game\CameraManager.h"
-#include "Game\Universe.h"
-#include "Water\CircleManager.h"
-#include "Units\Squad.h"
+Game/CameraManager.h
+Game/Universe.h
+Water/CircleManager.h
+Units/Squad.h
 #include "MainFrame.h"
 #include "SurMapOptions.h"
 #include "EventListeners.h"
-#include "Terra\vMap.h"
-#include "Render\Src\cCamera.h"
+Terra/vMap.h
+Render/Src/cCamera.h
 
 namespace EditorVisual{
 

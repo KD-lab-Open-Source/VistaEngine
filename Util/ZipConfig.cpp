@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 
-#include "Serialization\Serialization.h"
-#include "Serialization\RangedWrapper.h"
-#include "Serialization\StringTableImpl.h"
+Serialization/Serialization.h
+Serialization/RangedWrapper.h
+Serialization/StringTableImpl.h
 
 #include "ZipConfig.h"
 

@@ -3,14 +3,14 @@
 
 #include "UI_Types.h"
 #include "UI_References.h"
-#include "Units\Parameters.h"
-#include "Environment\SourceBase.h"
-#include "Game\GameOptions.h"
+Units/Parameters.h
+Environment/SourceBase.h
+Game/GameOptions.h
 #include "UnitCommand.h"
 #include "Controls.h"
-#include "Network\NetPlayer.h"
-#include "Game\PlayerStatistics.h"
-#include "Units\AttributeSquad.h"
+Network/NetPlayer.h
+Game/PlayerStatistics.h
+Units/AttributeSquad.h
 
 enum PostEffectType;
 

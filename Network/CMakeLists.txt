@@ -1,6 +1,5 @@
-add_library(Network STATIC
+set(NETWORK_SOURCES
     CommonEvents.cpp
-    ConnectionDP.cpp
     EventBufferDP.cpp
     ExternalTask.cpp
     GS_interface.cpp
@@ -20,4 +19,9 @@ add_library(Network STATIC
     quantTimeStatistic.cpp
 )
 
+if(WIN32)
+    list(APPEND NETWORK_SOURCES ConnectionDP.cpp)
+endif()
+
+add_library(Network STATIC ${NETWORK_SOURCES})
 target_link_libraries(Network PUBLIC EngineIncludes Util)

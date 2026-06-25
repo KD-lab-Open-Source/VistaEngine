@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Serialization\EnumDescriptor.h"
-#include "Serialization\LibraryWrapper.h"
+Serialization/EnumDescriptor.h
+Serialization/LibraryWrapper.h
 #include "Terra.h"
 
 enum TerrainType

@@ -4,8 +4,8 @@
 #include <process.h>
 #include "quantizer.h"
 //for serilization
-#include "Serialization\Serialization.h"
-#include "Serialization\XPrmArchive.h"
+Serialization/Serialization.h
+Serialization/XPrmArchive.h
 
 bool ColorQuantizer::prepare4PutColor(int _nMaxColors)
 {

@@ -1,9 +1,9 @@
 #ifndef __FACTORY_H__
 #define __FACTORY_H__
 
-#include "XTL\StaticMap.h"
-#include "XTL\SafeCast.h"
-#include "XTL\StaticString.h"
+XTL/StaticMap.h
+XTL/SafeCast.h
+XTL/StaticString.h
 #include "Handle.h"
 #include <typeinfo>
 

@@ -13,6 +13,6 @@ using namespace std;
 
 // XTool
 #include "xutil.h"
-#include "XMath\xmath.h"
+XMath/xmath.h
 
 #endif

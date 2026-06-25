@@ -1,11 +1,11 @@
 #include "StdAfx.h"
 #include "CircleManager.h"
-#include "Serialization\ResourceSelector.h"
-#include "Render\D3D\D3DRender.h"
-#include "Render\Src\cCamera.h"
-#include "Water\Water.h"
-#include "Terra\vMap.h"
-#include "Serialization\EnumDescriptor.h"
+Serialization/ResourceSelector.h
+Render/D3D/D3DRender.h
+Render/Src/cCamera.h
+Water/Water.h
+Terra/vMap.h
+Serialization/EnumDescriptor.h
 
 BEGIN_ENUM_DESCRIPTOR(CircleManagerDrawOrder, "CircleManagerDrawOrder")
 REGISTER_ENUM(CIRCLE_MANAGER_DRAW_AFTER_GRASS_NOZ, "Выше травы без Z")

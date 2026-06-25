@@ -3,9 +3,9 @@
 
 #include <d3d9.h>
 #include <d3dx9.h>
-#include "Render\inc\rd.h"
-#include "Render\inc\Unknown.h"
-#include "Render\3dx\Saver.h"
+Render/inc/rd.h
+Render/inc/Unknown.h
+Render/3dx/Saver.h
 
 struct RENDER_API SHADER_HANDLE
 {

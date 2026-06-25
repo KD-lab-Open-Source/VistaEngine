@@ -8,7 +8,7 @@
 
 #include <my_STL.h>
 
-#include "XMath\xmath.h"
+XMath/xmath.h
 #include "xutil.h"
 #include "xzip.h"
 #include "Profiler.h"

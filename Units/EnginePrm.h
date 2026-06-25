@@ -1,6 +1,6 @@
 #pragma  once
 
-#include "Serialization\LibraryWrapper.h"
+Serialization/LibraryWrapper.h
 
 struct EnginePrm : public LibraryWrapper<EnginePrm>
 {

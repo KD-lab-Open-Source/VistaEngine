@@ -3,7 +3,7 @@
 
 #include "EScroll.h"
 #include "SurToolAux.h"
-#include "MFC\SizeLayoutManager.h"
+MFC/SizeLayoutManager.h
 
 // CSurToolKind dialog
 

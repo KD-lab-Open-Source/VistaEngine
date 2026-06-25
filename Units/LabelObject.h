@@ -1,7 +1,7 @@
 #pragma once
 
 #include "UnitLink.h"
-#include "Serialization\SerializationTypes.h"
+Serialization/SerializationTypes.h
 
 class UnitReal;
 class SourceBase;

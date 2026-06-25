@@ -3,9 +3,9 @@
 
 #include "kdw/Viewport.h"
 #include "kdw/Timer.h"
-#include "XTL\Rect.h"
-#include "UserInterface\UI_Types.h"
-#include "Render\inc\IRenderDevice.h"
+XTL/Rect.h
+UserInterface/UI_Types.h
+Render/inc/IRenderDevice.h
 
 class Archive;
 class UISpriteEditorViewport : public kdw::Viewport{

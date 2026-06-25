@@ -3,22 +3,22 @@
 
 #include "mfc/ObjectsTreeCtrl.h"
 #include "kdw/PopupMenu.h"
-#include "FileUtils\FileUtils.h"
+FileUtils/FileUtils.h
 
 #include "UniverseObjectAction.h"
-#include "SurMap5\SurTool3DM.h"
-#include "SurMap5\SurToolCameraEditor.h"
-#include "SurMap5\SurToolSource.h"
-#include "SurMap5\SurToolAnchor.h"
-#include "SurMap5\ToolsTreeWindow.h"
-#include "SurMap5\MainFrame.h"
+SurMap5/SurTool3DM.h
+SurMap5/SurToolCameraEditor.h
+SurMap5/SurToolSource.h
+SurMap5/SurToolAnchor.h
+SurMap5/ToolsTreeWindow.h
+SurMap5/MainFrame.h
 
-#include "Game\Player.h"
-#include "Game\Universe.h"
-#include "Units\UnitEnvironment.h"
+Game/Player.h
+Game/Universe.h
+Units/UnitEnvironment.h
 
-#include "Environment\SourceManager.h"
-#include "Game\CameraManager.h"
+Environment/SourceManager.h
+Game/CameraManager.h
 
 //////////////////////////////////////////////////////////////////////////////
 

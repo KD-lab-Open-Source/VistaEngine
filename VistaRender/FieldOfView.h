@@ -1,8 +1,8 @@
 #ifndef __FIELD_OF_VISION_H__
 #define __FIELD_OF_VISION_H__
 
-#include "Render\inc\IUnkObj.h"
-#include "XTL\Map2D.h"
+Render/inc/IUnkObj.h
+XTL/Map2D.h
 
 class FieldOfViewMap : public cIUnkObj
 {

@@ -1,12 +1,12 @@
 #include "stdafxTr.h"
 
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 #include "quantizer.h"
 #include "terTools.h"
-#include "Serialization\ResourceSelector.h"
-#include "Serialization\XPrmArchive.h"
-#include "FileUtils\FileUtils.h"
-#include "Serialization\StringTable.h"
+Serialization/ResourceSelector.h
+Serialization/XPrmArchive.h
+FileUtils/FileUtils.h
+Serialization/StringTable.h
 
 #include "scalingEngine.h"
 #include "tgai.h"

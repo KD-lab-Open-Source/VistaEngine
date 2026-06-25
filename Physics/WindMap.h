@@ -1,9 +1,9 @@
 #ifndef __WIND_MAP_H__
 #define __WIND_MAP_H__
 
-#include "XTL\Map2D.h"
-#include "Render\src\perlin.h"
-#include "Render\src\NParticle.h"
+XTL/Map2D.h
+Render/src/perlin.h
+Render/src/NParticle.h
 
 struct WindMapAttributes;
 

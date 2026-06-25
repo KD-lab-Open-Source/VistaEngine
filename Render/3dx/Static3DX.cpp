@@ -5,9 +5,9 @@
 #include "scene.h"
 #include "VisGeneric.h"
 #include "AccessTexture.h"
-#include "Serialization\XPrmArchive.h"
-#include "Serialization\InPlaceArchive.h"
-#include "FileUtils\FileUtils.h"
+Serialization/XPrmArchive.h
+Serialization/InPlaceArchive.h
+FileUtils/FileUtils.h
 
 cStatic3dx::cStatic3dx(bool isLogic, const char* fname)
 : Static3dxBase(isLogic),

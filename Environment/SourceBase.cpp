@@ -1,22 +1,22 @@
 #include "stdafx.h"
 
-#include "Serialization\Serialization.h"
-#include "Serialization\RangedWrapper.h"
+Serialization/Serialization.h
+Serialization/RangedWrapper.h
 #include "SourceBase.h"
 #include "RenderObjects.h"
-#include "Game\Universe.h"
-#include "Water\Water.h"
-#include "Water\CircleManager.h"
-#include "Serialization\Dictionary.h"
-#include "Units\BaseUnit.h"
-#include "Environment\SourceManager.h"
-#include "Environment\Environment.h"
-#include "Physics\WindMap.h"
-#include "UserInterface\UserInterface.h"
-#include "UserInterface\UI_Logic.h"
+Game/Universe.h
+Water/Water.h
+Water/CircleManager.h
+Serialization/Dictionary.h
+Units/BaseUnit.h
+Environment/SourceManager.h
+Environment/Environment.h
+Physics/WindMap.h
+UserInterface/UserInterface.h
+UserInterface/UI_Logic.h
 #include "EditorVisual.h"
-#include "Terra\vMap.h"
-#include "Terra\TerrainType.h"
+Terra/vMap.h
+Terra/TerrainType.h
 
 #pragma warning(disable: 4355)
 

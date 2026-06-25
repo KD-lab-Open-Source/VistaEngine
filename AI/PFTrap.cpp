@@ -1,9 +1,9 @@
 #include "stdAfx.h"
-#include "AI\PFTrap.h"
+AI/PFTrap.h
 
 #include "universe.h"
-#include "Environment\Environment.h"
-#include "Terra\vmap.h"
+Environment/Environment.h
+Terra/vmap.h
 #include "normalMap.h"
 #include "BaseUnit.h"
 #include "UnitEnvironment.h"

@@ -2,7 +2,7 @@
 #define __UNIT_ITEM_INVENTORY_H__
 
 #include "UnitObjective.h"
-#include "UserInterface\UI_Types.h"
+UserInterface/UI_Types.h
 
 class AttributeItemInventory : public AttributeBase
 {

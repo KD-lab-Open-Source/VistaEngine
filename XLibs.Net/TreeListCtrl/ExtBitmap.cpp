@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include ".\ExtBitmap.h"
+./ExtBitmap.h
 
 CExtBitmap::CExtBitmap(void)
 {

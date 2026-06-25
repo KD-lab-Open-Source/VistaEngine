@@ -1,12 +1,12 @@
 #include "StdAfx.h"
 
-#include "XMath\xmath.h"
-#include "XMath\Mat4f.h"
-#include "Serialization\XPrmArchive.h"
-#include "Serialization\EnumDescriptor.h"
+XMath/xmath.h
+XMath/Mat4f.h
+Serialization/XPrmArchive.h
+Serialization/EnumDescriptor.h
 #include "Dictionary.h"
 #include "crc.h"
-#include "FileUtils\FileUtils.h"
+FileUtils/FileUtils.h
 #include "UnicodeConverter.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////

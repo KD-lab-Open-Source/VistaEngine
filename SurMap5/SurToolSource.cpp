@@ -3,16 +3,16 @@
 #include "SurToolSource.h"
 #include "DebugUtil.h"
 
-#include "AttribEditor\AttribEditorCtrl.h"
+AttribEditor/AttribEditorCtrl.h
 
 #include "SurToolAux.h"
-#include "Serialization\Dictionary.h"
-#include "Serialization\BinaryArchive.h"
+Serialization/Dictionary.h
+Serialization/BinaryArchive.h
 #include "EventListeners.h"
 
-#include "Environment\SourceManager.h"
-#include "Environment\SourceBase.h"
-#include "Serialization\SerializationFactory.h"
+Environment/SourceManager.h
+Environment/SourceBase.h
+Serialization/SerializationFactory.h
 
 struct SourceReferenceHolder{
 	SourceReference source;

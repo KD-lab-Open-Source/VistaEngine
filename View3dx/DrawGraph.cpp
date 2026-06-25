@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "DrawGraph.h"
-#include "Render\D3D\D3DRender.h"
+Render/D3D/D3DRender.h
 
 DrawGraph::DrawGraph()
 {

@@ -1,7 +1,7 @@
 #include "StdAfxRD.h"
 #include <math.h>
 #include "MultiRegion.h"
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 
 //MultiRegion::Line MultiRegion::tempLine;
 MTSection MultiRegion::lock_;

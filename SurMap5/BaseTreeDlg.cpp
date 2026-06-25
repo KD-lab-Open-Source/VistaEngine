@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "SurMap5.h"
 #include "BaseTreeDlg.h"
-#include ".\basetreedlg.h"
+./basetreedlg.h
 
 
 // CBaseTreeDlg dialog

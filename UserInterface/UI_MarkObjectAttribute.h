@@ -2,7 +2,7 @@
 #define __UI_MARK_OBJECT_ATTRIBUTE_H__
 
 #include "EffectReference.h"
-#include "Units\Object3dxInterface.h"
+Units/Object3dxInterface.h
 #include "UI_Types.h"
 
 /// Параметры объекта-пометки.

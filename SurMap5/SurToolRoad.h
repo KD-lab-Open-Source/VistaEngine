@@ -5,7 +5,7 @@
 #include "SurToolAux.h"
 
 struct sPolygon;
-#include "terra\road.h"
+terra/road.h
 
 //struct Vect3s {
 //	short x, y, z;

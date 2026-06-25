@@ -12,10 +12,10 @@
 #include "joystick.h"
 #include <dinput.h>
 
-#include "Serialization\XPrmArchive.h"
-#include "Serialization\MultiArchive.h"
-#include "Serialization\RangedWrapper.h"
-#include "Serialization\EnumDescriptor.h"
+Serialization/XPrmArchive.h
+Serialization/MultiArchive.h
+Serialization/RangedWrapper.h
+Serialization/EnumDescriptor.h
 
 WRAP_LIBRARY(JoystickSetup, "JoystickSetup", "JoystickSetup", "Scripts\\Content\\JoystickSetup", 0, 0);
 

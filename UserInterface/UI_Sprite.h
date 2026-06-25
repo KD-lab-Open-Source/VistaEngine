@@ -1,11 +1,11 @@
 #ifndef __UI_SPRITE_H__
 #define __UI_SPRITE_H__
-#include "XTL\Rect.h"
-#include "xtl\Handle.h"
-#include "XMath\Colors.h"
-#include "Serialization\StringTableReferencePolymorphic.h"
-#include "Serialization\StringTableReference.h"
-#include "Serialization\StringTableBase.h"
+XTL/Rect.h
+xtl/Handle.h
+XMath/Colors.h
+Serialization/StringTableReferencePolymorphic.h
+Serialization/StringTableReference.h
+Serialization/StringTableBase.h
 
 class cTexture;
 /// текстура

@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include <string.h>
-#include "Serialization\Dictionary.h"
-#include "Serialization\XPrmArchive.h"
-#include "FileUtils\FileUtils.h"
+Serialization/Dictionary.h
+Serialization/XPrmArchive.h
+FileUtils/FileUtils.h
 
 class TranslationManagerImpl{
 public:

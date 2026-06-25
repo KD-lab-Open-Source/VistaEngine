@@ -5,8 +5,8 @@
 #include "RenderObjects.h"
 #include "terra.h"
 
-#include "..\Environment\Environment.h"
-#include "..\Water\ice.h"
+../Environment/Environment.h
+../Water/ice.h
 
 struct ClusterFindPrm
 {

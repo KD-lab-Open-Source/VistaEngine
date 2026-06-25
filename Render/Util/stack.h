@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Render\inc\rd.h"
+Render/inc/rd.h
 
 #ifdef _DEBUG
 

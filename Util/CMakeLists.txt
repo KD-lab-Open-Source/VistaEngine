@@ -1,11 +1,13 @@
 add_subdirectory(XMath)
 add_subdirectory(Serialization)
 add_subdirectory(XmlRpc)
-add_subdirectory(ShaderToH2)
-add_subdirectory(kdw)
 
-# Core util files compiled into the game (from Core.vcproj and Game.vcproj)
-add_library(Util STATIC
+if(WIN32)
+    add_subdirectory(ShaderToH2)
+    add_subdirectory(kdw)
+endif()
+
+set(UTIL_SOURCES
     ComboVectorString.cpp
     ConsoleWindow.cpp
     DebugPrm.cpp
@@ -26,8 +28,16 @@ add_library(Util STATIC
     VideoMemoryInformation.cpp
     ZipConfig.cpp
     joystick.cpp
-    mfc/PopupMenu.cpp
 )
 
+if(WIN32)
+    list(APPEND UTIL_SOURCES
+        mfc/PopupMenu.cpp
+        Win32/DebugSymbolManager.cpp
+        Win32/KeyboardDriver.cpp
+    )
+endif()
+
+add_library(Util STATIC ${UTIL_SOURCES})
 target_include_directories(Util PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(Util PUBLIC EngineIncludes XUtil XZip XMath Serialization XmlRpc)

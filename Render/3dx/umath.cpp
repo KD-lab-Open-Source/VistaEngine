@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "umath.h"
-#include "Serialization\Serialization.h"
-#include "XMath\SafeMath.h"
+Serialization/Serialization.h
+XMath/SafeMath.h
 
 float HermitSpline(float t,float p0,float p1,float p2,float p3)
 {

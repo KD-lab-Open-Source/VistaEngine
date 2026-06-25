@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "Serialization\Dictionary.h"
+Serialization/Dictionary.h
 #include "OutputProgressDlg.h"
 
 IMPLEMENT_DYNAMIC(COutputProgressDlg, CDialog)

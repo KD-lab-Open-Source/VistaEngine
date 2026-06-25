@@ -1,7 +1,7 @@
 #ifndef __VISTA_ENGINE_EDITABLE_CONDITION_H_INCLUDED__
 #define __VISTA_ENGINE_EDITABLE_CONDITION_H_INCLUDED__
-#include "Serialization\Serialization.h"
-#include "TriggerEditor\TriggerExport.h"
+Serialization/Serialization.h
+TriggerEditor/TriggerExport.h
 
 struct EditableCondition {
 	EditableCondition(Condition* _condition = 0)

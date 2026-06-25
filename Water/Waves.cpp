@@ -1,15 +1,15 @@
 #include "stdafx.h"
-#include "Water\Water.h"
-#include "Water\Waves.h"
+Water/Water.h
+Water/Waves.h
 #include "ice.h"
-#include "Serialization\RangedWrapper.h"
-#include "Serialization\ResourceSelector.h"
-#include "Serialization\SerializationFactory.h"
-#include "VistaRender\StreamInterpolation.h"
-#include "Render\Src\TileMap.h"
-#include "Render\Src\cCamera.h"
-#include "Render\Src\TexLibrary.h"
-#include "Render\Src\Scene.h"
+Serialization/RangedWrapper.h
+Serialization/ResourceSelector.h
+Serialization/SerializationFactory.h
+VistaRender/StreamInterpolation.h
+Render/Src/TileMap.h
+Render/Src/cCamera.h
+Render/Src/TexLibrary.h
+Render/Src/Scene.h
 
 static float mz = 1;
 cWaves::cWaves() : BaseGraphObject(0)

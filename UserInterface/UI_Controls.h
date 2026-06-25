@@ -4,12 +4,12 @@
 #include "UI_Types.h"
 #include "UI_TextParser.h"
 #include "UI_TextAnimation.h"
-#include "Units\UnitLink.h"
-#include "Units\AttributeReference.h"
-#include "Units\AttributeSquad.h"
+Units/UnitLink.h
+Units/AttributeReference.h
+Units/AttributeSquad.h
 #include "UI_Minimap.h"
 #include "SystemUtil.h"
-#include "XTL\SafeCast.h"
+XTL/SafeCast.h
 
 class UnitInterface;
 

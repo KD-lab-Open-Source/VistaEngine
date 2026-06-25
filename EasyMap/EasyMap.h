@@ -1,16 +1,16 @@
 #pragma once
 
-#include "Render\Util\Runtime3D.h"
-#include "Water\Water.h"
-#include "Water\SkyObject.h"
-#include "Water\ice.h"
-#include "Water\CircleManager.h"
-#include "VistaRender\FieldOfView.h"
-#include "VistaRender\Field.h"
-#include "Environment\Environment.h"
-#include "Terra\TerrainType.h"
-#include "Render\src\FogOfWar.h"
-#include "UserInterface\UI_MinimapSymbol.h"
+Render/Util/Runtime3D.h
+Water/Water.h
+Water/SkyObject.h
+Water/ice.h
+Water/CircleManager.h
+VistaRender/FieldOfView.h
+VistaRender/Field.h
+Environment/Environment.h
+Terra/TerrainType.h
+Render/src/FogOfWar.h
+UserInterface/UI_MinimapSymbol.h
 
 class EasyMap : public Runtime3D
 {

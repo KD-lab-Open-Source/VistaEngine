@@ -2,9 +2,9 @@
 //
 
 #include "stdafx.h"
-#include "..\Render\d3d\StdAfxRD.h"
+../Render/d3d/StdAfxRD.h
 #include "DlgTexturesStatistics.h"
-#include ".\dlgtexturesstatistics.h"
+./dlgtexturesstatistics.h
 
 
 // CDlgTexturesStatistics dialog

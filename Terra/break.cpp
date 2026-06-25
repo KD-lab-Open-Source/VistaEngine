@@ -1,8 +1,8 @@
 #include "stdafxTr.h"
 
 #include "vmap.h"
-#include "Serialization\Serialization.h"
-#include "Serialization\XPrmArchive.h"
+Serialization/Serialization.h
+Serialization/XPrmArchive.h
 #include "limits.h"
 #include "auxInlineFuction.h"
 #include "break.h"

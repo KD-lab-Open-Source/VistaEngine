@@ -9,7 +9,7 @@
 #include "MainFrm.h"
 #include "EnterNameDlg.h"
 
-#include "..\game\CameraManager.h"
+../game/CameraManager.h
 #include "SurToolSelect.h"
 
 // CCameraDlg dialog

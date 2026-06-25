@@ -1,8 +1,8 @@
 #pragma once
 
-#include "kdw\VBox.h"
-#include "kdw\ObjectsTree.h"
-#include "TriggerEditor\TriggerExport.h"
+kdw/VBox.h
+kdw/ObjectsTree.h
+TriggerEditor/TriggerExport.h
 
 class TriggerView;
 

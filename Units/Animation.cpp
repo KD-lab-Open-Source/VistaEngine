@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "Universe.h"
 #include "Animation.h"
-#include "Serialization\Serialization.h"
-#include "VistaRender\StreamInterpolation.h"
+Serialization/Serialization.h
+VistaRender/StreamInterpolation.h
 #include "BaseUnit.h"
 #include "Sound.h"
 #include "GlobalAttributes.h"
-#include "Terra\vMap.h"
+Terra/vMap.h
 
 PhaseController::PhaseController() :
 	phase_(0.0f),

@@ -1,22 +1,22 @@
 #include "StdAfx.h"
-#include "Serialization\RangedWrapper.h"
+Serialization/RangedWrapper.h
 #include "ComboVectorString.h"
 #include "GameOptions.h"
 #include "RenderObjects.h"
 
-#include "Serialization\Serialization.h"
+Serialization/Serialization.h
 
-#include "Game\Universe.h"
-#include "Environment\Environment.h"
-#include "Game\CameraManager.h"
-#include "Game\SoundApp.h"
-#include "UserInterface\UI_Logic.h"
-#include "VistaRender\postEffects.h"
-#include "Render\Src\TexLibrary.h"
-#include "Render\src\Scene.h"
-#include "Render\src\Grass.h"
-#include "Render\src\VisGeneric.h"
-#include "Water\Fallout.h"
+Game/Universe.h
+Environment/Environment.h
+Game/CameraManager.h
+Game/SoundApp.h
+UserInterface/UI_Logic.h
+VistaRender/postEffects.h
+Render/Src/TexLibrary.h
+Render/src/Scene.h
+Render/src/Grass.h
+Render/src/VisGeneric.h
+Water/Fallout.h
 
 void UpdateSilhouettes();
 

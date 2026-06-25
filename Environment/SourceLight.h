@@ -2,7 +2,7 @@
 #define __SOURCE_LIGHT_H_INCLUDED__
 
 #include "SourceBase.h"
-#include "Render\src\UnkLight.h"
+Render/src/UnkLight.h
 
 class SourceLight : public SourceBase
 {

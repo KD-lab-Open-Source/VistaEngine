@@ -1,7 +1,7 @@
 #ifndef __UI_REFERENCES_H__
 #define __UI_REFERENCES_H__
 
-#include "XTL\StaticMap.h"
+XTL/StaticMap.h
 
 class UI_ControlContainer;
 class UI_ControlBase;
