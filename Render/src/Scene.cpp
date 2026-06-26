@@ -6,10 +6,10 @@
 #include "D3DRender.h"
 #include "VisGeneric.h"
 #include "FogOfWar.h"
-Render/3dx/Lib3dx.h
+#include "Render/3dx/Lib3dx.h"
 #include "ClippingMesh.h"
-Terra/vmap.h
-FileUtils/FileUtils.h
+#include "Terra/vmap.h"
+#include "FileUtils/FileUtils.h"
 
 bool cScene::is_sky_cubemap=true;
 

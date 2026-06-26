@@ -1,7 +1,7 @@
 #ifndef __UI_EFFECT_
 #define __UI_EFFECT_
-Util/EffectContainer.h
-XTL/Handle.h
+#include "Util/EffectContainer.h"
+#include "XTL/Handle.h"
 
 class cEffect;
 class cObject3dx;

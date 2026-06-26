@@ -2,10 +2,10 @@
 #define __COMMANDS_QUEUE_H__
 
 #include "UnitCommand.h"
-UserInterface/UI_Types.h
-Units/LabelObject.h
-Units/IronLegion.h
-Game/Player.h
+#include "UserInterface/UI_Types.h"
+#include "Units/LabelObject.h"
+#include "Units/IronLegion.h"
+#include "Game/Player.h"
 
 class UnitCommandExtended : public UnitCommand
 {

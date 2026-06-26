@@ -1,17 +1,17 @@
 #include "StdAfx.h"
 #include "ObjStatistic.h"
-Render/3dx/Lib3dx.h
-Game/CameraManager.h
-Game/RenderObjects.h
-Environment/Environment.h
-Water/CoastSprites.h
-Render/shader/shaders.h
-Render/src/Grass.h
-Render/D3D/D3DRender.h
-Render/src/TexLibrary.h
-Render/d3d/D3DRenderTileMap.h
-VistaRender/postEffects.h
-FileUtils/FileUtils.h
+#include "Render/3dx/Lib3dx.h"
+#include "Game/CameraManager.h"
+#include "Game/RenderObjects.h"
+#include "Environment/Environment.h"
+#include "Water/CoastSprites.h"
+#include "Render/shader/shaders.h"
+#include "Render/src/Grass.h"
+#include "Render/D3D/D3DRender.h"
+#include "Render/src/TexLibrary.h"
+#include "Render/d3d/D3DRenderTileMap.h"
+#include "VistaRender/postEffects.h"
+#include "FileUtils/FileUtils.h"
 #include <commctrl.h>
 
 void ShowGraphicsStatistic()

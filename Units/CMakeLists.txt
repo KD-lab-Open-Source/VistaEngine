@@ -43,4 +43,6 @@ add_library(Units STATIC
     stdafx.cpp
 )
 
+target_include_directories(Units PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 target_link_libraries(Units PUBLIC EngineIncludes Util Physics)

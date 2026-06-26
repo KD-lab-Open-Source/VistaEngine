@@ -1,15 +1,15 @@
 #pragma once
 
-XTL/Handle.h
-Serialization/Serializer.h // для редактора
+#include "XTL/Handle.h"
+#include "Serialization/Serializer.h"
 
 //////////////////////////////////////////////////////////////
-// String должен иметь конструктор(const char* = ""), c_str() и 
-// сериализацию. В общем случае, это могут быть не только строки,
-// но и дополнительные данные.
+// String пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ(const char* = ""), c_str() пїЅ 
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ,
+// пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
 //
-// Hints: 1) После сериализации библиотеки необходимо перезапимать
-// ссылки, т.к. возможно изменение ключевых имен.
+// Hints: 1) пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+// пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ.пїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ.
 //////////////////////////////////////////////////////////////
 class StringTableBase
 {
@@ -24,7 +24,7 @@ public:
 	void setStringIndex(int index) { index_ = index; }
 	int stringIndex() const { return index_; }
 
-	// для редактора:
+	// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
 	const char*			editorName() const{ return c_str(); }
 	void				editorCreate(const char* name, const char* groupName) { editorSetGroup(groupName); }
 	template<class T>
@@ -46,7 +46,7 @@ protected:
 	template<class String> friend class StringTable;
 };
 
-// Для наследования объектами без дополнительных данных
+// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 class StringTableBaseSimple : public StringTableBase
 {
 public:
@@ -54,7 +54,7 @@ public:
 
 	bool serialize(Archive& ar, const char* name, const char* nameAlt);
 
-	// для редактора:
+	// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
 	template<class T>
 	Serializer editorSerializer(T* self, const char* name, const char* nameAlt, bool protectedName) { return Serializer(name_, name, nameAlt); }
 };
@@ -70,7 +70,7 @@ public:
 	T* get() const { return type_; }
 	void set(T* type) { type_ = type; }
 	
-	// для редактора:
+	// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
 	template<class U>
 	Serializer       editorSerializer(U* self, const char* name, const char* nameAlt, bool protectedName);
 	template<class U>

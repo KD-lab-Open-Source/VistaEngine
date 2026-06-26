@@ -2,8 +2,8 @@
 #define __SUR_TOOL_SELECT_H_INCLUDED__
 
 #include "SurToolAux.h"
-MFC/SizeLayoutManager.h
-Serialization/Serializer.h
+#include "MFC/SizeLayoutManager.h"
+#include "Serialization/Serializer.h"
 #include "EventListeners.h"
 
 class CAttribEditorCtrl;

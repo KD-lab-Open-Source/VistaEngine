@@ -5,7 +5,7 @@
 #include "SurMap5.h"
 #include "SurToolGeoTx.h"
 
-Serialization/Serialization.h
+#include "Serialization/Serialization.h"
 #include "surtoolgeotx.h"
 
 // CSurToolGeoTx dialog

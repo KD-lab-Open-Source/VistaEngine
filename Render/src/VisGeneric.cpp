@@ -2,11 +2,11 @@
 #include "VisGeneric.h"
 #include "Scene.h"
 #include "D3DRender.h"
-Render/3dx/Lib3dx.h
-Render/Src/VisGeneric.h
+#include "Render/3dx/Lib3dx.h"
+#include "Render/Src/VisGeneric.h"
 #include "kdw/PropertyEditor.h"
-Serialization/XPrmArchive.h
-Serialization/EnumDescriptor.h
+#include "Serialization/XPrmArchive.h"
+#include "Serialization/EnumDescriptor.h"
 
 void Init3dxshader();
 void Done3dxshader();

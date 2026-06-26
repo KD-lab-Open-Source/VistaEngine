@@ -2,10 +2,10 @@
 #define __CAMERA_MANAGER_H__
 
 #include "Timers.h"
-XMath/Rectangle4f.h
-Units/GlobalAttributes.h
+#include "XMath/Rectangle4f.h"
+#include "Units/GlobalAttributes.h"
 #include "BaseUniverseObject.h"
-#include "UnitLink.h"
+#include "Units/UnitLink.h"
 
 extern float HardwareCameraFocus;
 

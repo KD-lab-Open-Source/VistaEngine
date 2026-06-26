@@ -1,6 +1,6 @@
 #include "stdafxTr.h"
 
-Serialization/Serialization.h
+#include "Serialization/Serialization.h"
 
 #include "geo2.h"
 #include "tools.h"
@@ -75,7 +75,7 @@ bool sGeoWave::quant()
 	const long SGEOWAVE_MAX_RADIUS=SGEOWAVE_MAX_TOTAL_RADIUS-waveLenght;
 	if(!flag_beginInitialization){
 		//if(maxRadius < 0) maxRadius=0;
-		//if(maxRadius >= SGEOWAVE_MAX_RADIUS) maxRadius=SGEOWAVE_MAX_RADIUS-1; //Не обязательно (есть проверка ниже)
+		//if(maxRadius >= SGEOWAVE_MAX_RADIUS) maxRadius=SGEOWAVE_MAX_RADIUS-1; //пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ)
 		maxRadius=clamp(maxRadius, 0, SGEOWAVE_MAX_RADIUS-1);
 		begRadius=clamp(begRadius, 0, maxRadius);
 		step=0;
@@ -153,22 +153,22 @@ bool sGeoWave::quant()
 
 void sGeoWave::serialize(Archive& ar)
 {
-	ar.serialize(pos, "pos", "Позиция");
-	ar.serialize(maxRadius, "maxRadius", "Радиус");
-	ar.serialize(begRadius, "begRadius", "Начальный радиус");
-	ar.serialize(fadeRadius, "fadeRadius", "Начальный радиус затухания");
-	ar.serialize(maxWaveAmplitude, "maxWaveAmplitude", "Максимальная амплитуда");
-	ar.serialize(waveLenght, "waveLenght", "Длинна волны");
-	ar.serialize(waveSpeed, "waveSpeed", "Скорость волны");
-	ar.serialize(begPhase, "begPhase", "Фаза(-90/0/+90)");
-	ar.serialize(flag_Track, "flag_Track", "Оставлять след");
+	ar.serialize(pos, "pos", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(maxRadius, "maxRadius", "пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(begRadius, "begRadius", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(fadeRadius, "fadeRadius", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(maxWaveAmplitude, "maxWaveAmplitude", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(waveLenght, "waveLenght", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(waveSpeed, "waveSpeed", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(begPhase, "begPhase", "пїЅпїЅпїЅпїЅ(-90/0/+90)");
+	ar.serialize(flag_Track, "flag_Track", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 }
 
 
 //struct sGeoWaveSrc : public SourceEffect {
 //	mutable Vect3f full_position_;
 //	sGeoWave geo;
-//	int period; //0-не периодичный
+//	int period; //0-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 //	DurationTimer sleepTimer;
 //	sGeoWaveSrc() : SourceEffect() {
 //		period=0;
@@ -226,7 +226,7 @@ void sGeoWave::serialize(Archive& ar)
 //struct GeoBreakSrc : public SourceEffect
 //{
 //	GeoBreak gbreak;
-//	float period; //0-не периодичный
+//	float period; //0-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 //	DurationTimer sleepTimer;
 //	GeoBreakSrc() : SourceEffect() {
 //		period=0;
@@ -235,7 +235,7 @@ void sGeoWave::serialize(Archive& ar)
 //		return new GeoBreakSrc(*this);
 //	}
 //	GeoBreakSrc(Vect2i _pos, int _rad=100, int _begNumBreak=0) : SourceEffect(), gbreak(_pos,_rad,_begNumBreak)
-//	{ //0-случайное кол-во
+//	{ //0-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ-пїЅпїЅ
 //		setPose(Se3f(QuatF::ID, Vect3f(_pos.x, _pos.y, 0.0f)), true);
 //		period=0;
 //	}
@@ -278,14 +278,14 @@ void sGeoWave::serialize(Archive& ar)
 //{
 //	geo.serialize(ar);
 //	SourceEffect::serialize(ar);
-//	ar.serialize(period, "period", "Период");
+//	ar.serialize(period, "period", "пїЅпїЅпїЅпїЅпїЅпїЅ");
 //}
 //
 //void GeoBreakSrc::serialize(Archive& ar)
 //{
 //	gbreak.serialize(ar);
 //	SourceEffect::serialize(ar);
-//	ar.serialize(period, "period", "Период");
+//	ar.serialize(period, "period", "пїЅпїЅпїЅпїЅпїЅпїЅ");
 //}
 //
 
@@ -445,7 +445,7 @@ int sTBubble::quant()
 			if(V==0) { cnt++; continue;}
 			V+=substare[cnt];
 			if(V > MAX_VX_HEIGHT) V=MAX_VX_HEIGHT;
-			if(vm < V){ //нарастание
+			if(vm < V){ //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				tmpVx[cnt]+=V-vm;
 			}
 			else {
@@ -494,14 +494,14 @@ int sTBubble::quant()
 			const int DELTA_DEEP_GEO=3;//10;
 			if(flag_occurrenceGeo && (V>>VX_FRACTION < maxVx[cnt]-DELTA_DEEP_GEO) ){
 				if(Vm_IsDam(vMap.vxaBuf[offset])){
-					vMap.vxaBuf[offset]=VmAt_Nrml_Geo; //Hint высота присваивается ниже
+					vMap.vxaBuf[offset]=VmAt_Nrml_Geo; //Hint пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 					vMap.SurBuf[offset]=vMap.GetGeoType(offset,V);
 				}
 			}
 			//if(V<0)V=0;
 			//if(V>MAX_VX_HEIGHT)V=MAX_VX_HEIGHT;
 
-			//для нормальной границы при  разрушении зеропласта
+			//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			vMap.putAltSpecial(offset, V);
 
 			tmpVx[cnt]=V;
@@ -593,7 +593,7 @@ bool sTorpedo::insert2Arr(int _x, int _y, int _sx, int _sy, bool _flag_occurrenc
 }
 
 
-sRect sTorpedo::quant(Vect2f& prevPos, Vect2f& curPos)
+sRect sTorpedo::quant(const Vect2f& prevPos, const Vect2f& curPos)
 {
 	curX=curPos.x;
 	curY=curPos.y;
@@ -624,7 +624,7 @@ sRect sTorpedo::quant(Vect2f& prevPos, Vect2f& curPos)
 
 
 		for(int m=0; m<256; m++){
-			float x=(float)m/256;//Диапазон от 0 до 1
+			float x=(float)m/256;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 0 пїЅпїЅ 1
 			k_dh[m]=(0.99+0.1*sin(x*50))* exp(-fabsf((x)*(x)*(x))/(0.4f*0.4f))*(1<<16);//(1.2+0.05*sin(2*tan(x*50)))
 		}
 	}
@@ -642,7 +642,7 @@ sRect sTorpedo::quant(Vect2f& prevPos, Vect2f& curPos)
 	if(curY < BORDER || curY+BORDER>=vMap.V_SIZE) return sRect();
 	int i,j;
 
-//Выпячивание
+//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	float kOffset=4.;//8
 	//int curIX=round(curX - /*cos(begAngle)*/direction.x*SPEED*(float)kOffset);
 	//int curIY=round(curY - /*sin(begAngle)*/direction.y*SPEED*(float)kOffset);

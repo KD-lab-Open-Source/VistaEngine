@@ -1,19 +1,19 @@
 #ifndef __N_PARTICLE_H_INCLUDED__
 #define __N_PARTICLE_H_INCLUDED__
 /*
-  Известные баги (фичи), которые правиться не будут:
-      У нас сейчас нет вечно живущих частиц, поэтому приходится извращаться.
-      Если сделать зацикленный спецэффект в котором частица живет столько же сколько и эмиттер,
-	  то при пересоздании угол частицы будет такой же как и во время смерти. 
-	  Но! Это все не очень корректно работает, если продолжительность кадра больше, чем время жизни частицы.
+  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ), пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ:
+      пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+      пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ,
+	  пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ. 
+	  пїЅпїЅ! пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 */
 
 #include "MTSection.h"
-Render/3dx/Saver.h
-XMath/XMath.h
-Serialization/StringTableBase.h
-Serialization/StringTableReference.h
-Render/Inc/IUnkObj.h
+#include "Render/3dx/Saver.h"
+#include "XMath/XMath.h"
+#include "Serialization/StringTableBase.h"
+#include "Serialization/StringTableReference.h"
+#include "Render/Inc/IUnkObj.h"
 #include "NParticleKey.h"
 #include "observer.h"
 #include "texture.h"
@@ -28,8 +28,8 @@ class PSOverdraw;
 class PSOverdrawColor;
 class PSOverdrawCalc;
 class cEffect;
-enum eBlendMode;
-enum eColorMode;
+enum eBlendMode : int;
+enum eColorMode : int;
 template <class vertex> class cQuadBuffer;
 struct sVertexXYZDT1;
 
@@ -64,12 +64,12 @@ struct KeyParticle
 {
 	float dtime;
 	Color4f color;
-	float size;//величина частицы
+	float size;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 };
 
 struct KeyParticleInt : public KeyParticle
 {
-	float vel;//скорость частицы, абсолютное значение
+	float vel;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	float angle_vel;
 	float gravity;
 //protected:
@@ -165,7 +165,7 @@ class EmitterType
 {
 public:
 	EMITTER_TYPE_POSITION type;
-	//Последующие значения зависят от типа эмиттера
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	Vect3f size;
 	bool fix_pos;
 
@@ -336,11 +336,11 @@ public:
 
 	SpiralData spiral_data;
 	string name;
-	string texture_name;//Дублируется с textureNames, не вычистили БЛИН.
+	string texture_name;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ textureNames, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ.
 
 	enum { num_texture_names=10 };
 	string textureNames[num_texture_names];
-	bool cycled;//После emitter_life_time эмиттер начинает работать заново
+	bool cycled;//пїЅпїЅпїЅпїЅпїЅ emitter_life_time пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	bool visibleInEditor;
 
 	float emitter_create_time;
@@ -361,11 +361,11 @@ public:
 	virtual int getTextureCount() const;
 	virtual EmitterKeyInterface* Clone() = 0;
 	virtual void preloadTexture();
-	virtual void BuildRuntimeData() {}	//Пересчитывает данные, которые создаются из известных по
+	virtual void BuildRuntimeData() {}	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ
 
 	virtual void serialize(Archive& ar);
 
-	// ф-ии используемые только в редакторе
+	// пїЅ-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	virtual void changeParticleLifeTime(int generationPoint, float time){ emitter_life_time = clamp(time, 0.01f, 100.0f); }
 	virtual void setParticleLifeTime(float time){}
 	virtual float getParticleLongestLifeTime() const{ return emitter_life_time; }
@@ -526,7 +526,7 @@ public:
 	void RelativeScale(float scale);
 	void MulToColor(Color4c color){	p_color.MulToColor(Color4f(color));	}
 
-	//Параметры эмиттера
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	EMITTER_BLEND sprite_blend;
 	bool generate_prolonged;
 	float particle_life_time;
@@ -535,7 +535,7 @@ public:
 	KeysRotate emitter_rotation;
 	EmitterType particle_position;
 
-	///Общие параметры частиц
+	///пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	KeysFloat life_time;
 	KeysFloat life_time_delta;
 	KeysFloat inv_life_time;
@@ -573,10 +573,10 @@ public:
 	bool turn;
 	bool preciseBound_;
 
-	CVectVect3f begin_position; //Распределение по 3D модели for EMP_3DMODEL_INSIDE
-	CVectVect3f normal_position;//Распределение по 3D модели  for EMP_3DMODEL_INSIDE
+	CVectVect3f begin_position; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 3D пїЅпїЅпїЅпїЅпїЅпїЅ for EMP_3DMODEL_INSIDE
+	CVectVect3f normal_position;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 3D пїЅпїЅпїЅпїЅпїЅпїЅ  for EMP_3DMODEL_INSIDE
 
-	//Параметры отдельной частицы
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	KeysFloat	  p_size;
 	KeysColor p_color;
 	KeysColor p_alpha;
@@ -586,7 +586,7 @@ public:
 	float k_wind_max;
 	bool need_wind;
 
-	//Возвращает в секундах, принимает в LocalTime
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ LocalTime
 	void GetParticleLifeTime(float t,float& mid_t,float& min_t,float& max_t);
 
 	KeyPos* GetOrCreatePosKey(float t,bool* create);
@@ -645,15 +645,15 @@ public:
 
 	void serialize(Archive& ar);
 
-	bool use_light;//Освещение частиц, только при EMP_3DMODEL,EMP_3DMODEL_INSIDE. 
-				//Используется из первого попавшегося материала diffuse и ambient.
+	bool use_light;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ EMP_3DMODEL,EMP_3DMODEL_INSIDE. 
+				//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ diffuse пїЅ ambient.
 
-	Vect3f g;	//ускорение
+	Vect3f g;	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
-	//Параметры отдельной частицы
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	KeysFloat	  p_velocity;
 	KeysFloat	  p_gravity;
-	bool angle_by_center;//Не имеет смысла ставить true, если planar=false
+	bool angle_by_center;//пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ true, пїЅпїЅпїЅпїЅ planar=false
 	
 	EMITTER_CLASS GetType(){return EMC_INTEGRAL;}
 	void BuildKey();
@@ -746,7 +746,7 @@ public:
 	void deleteParticleKey(int index);
 	KeysPosHermit* spline(){ return &p_position; }
 public:	
-	bool p_position_auto_time;//Автоматически прределять время для наиболее равномерного движения
+	bool p_position_auto_time;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	KeysPosHermit    p_position;
 
 	EMITTER_TYPE_DIRECTION_SPLINE direction;
@@ -872,9 +872,9 @@ public:
 	void SetTexture(int n,cTexture *pTexture);
 	inline cTexture* GetTexture(int n = 0) { return Texture[n]; }
 
-	static setTerraFunctor(FunctorGetZ* terraFunctor) { terraFunctor_ = terraFunctor; }
-	static setWaterFunctor(FunctorGetZ* waterFunctor) { waterFunctor_ = waterFunctor; }
-	static setWindFunctor(FunctorWindVelocity* windFunctor) { windFunctor_ = windFunctor; }
+	static void setTerraFunctor(FunctorGetZ* terraFunctor) { terraFunctor_ = terraFunctor; }
+	static void setWaterFunctor(FunctorGetZ* waterFunctor) { waterFunctor_ = waterFunctor; }
+	static void setWindFunctor(FunctorWindVelocity* windFunctor) { windFunctor_ = windFunctor; }
 
 protected:
 
@@ -890,7 +890,7 @@ protected:
 	ShareHandle<EmitterKeyInterface> emitterKey_;
 	bool no_show_obj_editor;
 	EmitterZMode zMode_;
-	MatXf			LocalMatrix;	// локальная матрица объекта относительно родителя
+	MatXf			LocalMatrix;	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	MatXf			GlobalMatrix;
 	cTexture		*Texture[2];
 
@@ -977,7 +977,7 @@ protected:
 	bool oldZBufferWrite;
 
 public:
-	int cur_one_pos;//Индекс в begin_position
+	int cur_one_pos;//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ begin_position
 	virtual Vect3f GetVdir(int i) = 0;
 
 protected:
@@ -1071,16 +1071,16 @@ public:
 
 	struct nParticle
 	{
-		float time;//текущее время в пределах ключа анимации 0..1
-		int key;//номер ключа анимации
+		float time;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 0..1
+		int key;//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		float inv_life_time;
 
 		Vect3f pos0;
-		Vect3f vdir;//начальное направление движения
+		Vect3f vdir;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		float angle0,angle_dir;
 		float baseAngle;
 		float gvel0;
-		//color0,size0 - константы
+		//color0,size0 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		float begin_size;
 
 		float time_summary;
@@ -1096,8 +1096,8 @@ public:
 protected:
 	BackVector<nParticle>	Particle;
 
-	// если объединить EffectBeginSpeed и EffectBeginSpeedMatrix можно целиком избавиться
-	// от этого вектора и брать значения из EmitterKeyInt
+	// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ EffectBeginSpeed пїЅ EffectBeginSpeedMatrix пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	// пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ EmitterKeyInt
 	vector<EffectBeginSpeedMatrix> begin_speed;
 
 	cObjMaterial material;
@@ -1115,14 +1115,14 @@ protected:
 
 	float real_angle;
 /*
-	Если частицы генерируются только EmitInstantly в нулевой момент времени и время жизни частиц 
-	равно времени жизни эмиттера, то эти частицы не убиваются, а происходит их переинициализация.
-	Это нужно ля того, чтобы можно было сделать бесконечно долго живущюю частицу, которая не мигает не прикаких условиях.
+	пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ EmitInstantly пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 
+	пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+	пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 */
 	bool is_intantly_infinity_particle;
 	void CalcIntantlyInfinityParticle();
 
-	bool SetFreeOrCycle(int index_particle);//Возвращает, удалена ри реально частица
+	bool SetFreeOrCycle(int index_particle);//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 	EmitterKeyInt* emitterKey() const { return static_cast<EmitterKeyInt*>(emitterKey_.get()); }
 };
@@ -1168,18 +1168,18 @@ protected:
 
 	struct nParticle
 	{
-		int   key;//номер ключа анимации
-		float time;//текущее время в пределах ключа анимации 0..dtime
+		int   key;//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+		float time;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 0..dtime
 		float inv_life_time;
 		float time_summary;
 		int nframe;
 
-		//То-же, но для сплайнов
+		//пїЅпїЅ-пїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		int   hkey;
 		float htime;
 		MatXf pos;
 		float angle0,angle_dir;
-		//color0,size0 - константы
+		//color0,size0 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		float begin_size;
 
 		cPlume plume;
@@ -1286,7 +1286,7 @@ public:
 	void SetTarget(const Vect3f& pos_begin, const Vect3f& pos_end);
 	void SetTarget(const Vect3f& pos_begin, const Vect3f* pos_end,int pos_end_size);
 	
-	///////////////////////////Только для редактора
+	///////////////////////////пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	void ShowEmitter(EmitterKeyInterface* emitter_id,bool show);
 	void ShowAllEmitter();
 	void HideAllEmitter();
@@ -1295,16 +1295,16 @@ public:
 	void SetTime(float time);
 	void MoveToTime(float time);
 
-	//Этой функцией следует пользоваться с осторожностью, лучше использовать StopAndReleaseAfterEnd
+	//пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ StopAndReleaseAfterEnd
 	virtual void SetAutoDeleteAfterLife(bool auto_delete_after_life_);
 	virtual bool IsAutoDeleteAfterLife()const{return auto_delete_after_life;}
 
-	//Остановить генерацию спрайтов и удалить спецэффект после исчезновения спрайтов 
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
 	virtual void StopAndReleaseAfterEnd();
 
-	//Модулирует количество генерируемых частиц, для эмиттеров, в которых происходит генерация частиц.
-	//Если частица только одна, то она не исчезнет, пока rate не будет равно точно 0.
-	//Для эмиттеров, не генерирующих частицы имеет смысл триггера 0 выключено, больше 0 - включенно.
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
+	//пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ rate пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 0.
+	//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 0 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ 0 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	void SetParticleRate(float rate);
 	void setInterfaceEffectFlag(bool flag) { isInterfaceEffect_ = flag; }
 	void toggleDistanceCheck(bool state){ ignoreDistanceCheck_ = !state; }
@@ -1317,7 +1317,7 @@ public:
 	vector<Vect3f>& GetPos(){return begin_position;}
 	vector<Vect3f>& GetNorm(){return normal_position;}
 	cEmitterBase* GetEmitN(int n){xassert((UINT)n<emitters.size()); return (cEmitterBase*)emitters[n];}
-	void SetFunctorGetZ(FunctorGetZ* func);//Делается вовремя addref,release
+	void SetFunctorGetZ(FunctorGetZ* func);//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ addref,release
 
 	void RecalcBeginPos(int num);
 	inline bool IsTarget() {return isTarget;}
@@ -1363,11 +1363,11 @@ protected:
 	friend class cScene;
 	friend EffectKey;
 	void Init(EffectKey& el,c3dx* models);
-	void Add(cEmitterInterface*);//Предполагается, что эмиттер уже инициализированн
+	void Add(cEmitterInterface*);//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	c3dx* model;
 	const MatXf& GetCenter3DModel();
-	vector<Vect3f> begin_position;//Распределение по 3D модели
-	vector<Vect3f> normal_position;//Распределение по 3D модели
+	vector<Vect3f> begin_position;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 3D пїЅпїЅпїЅпїЅпїЅпїЅ
+	vector<Vect3f> normal_position;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 3D пїЅпїЅпїЅпїЅпїЅпїЅ
 
 	void CalcDistanceRate(float dist);
 	bool no_fog_of_war;
@@ -1428,7 +1428,7 @@ class RENDER_API EffectLibrary2
 	MTSection mtlock;
 public:
 	~EffectLibrary2();
-	//!!!!!!!В этом интерфейсе есть одна большая проблемма - у EffectKey нет Release поэтому нельзя узнать когда эффекты перестают использоваться.
+	//!!!!!!!пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅ EffectKey пїЅпїЅпїЅ Release пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	EffectKey * Get(const char * filename, float scale = 1.0f,const char* texture_path = 0,Color4c skin_color=Color4c(255,255,255));
 	void preloadLibrary(const char * filename, const char* texture_path = 0);
 private:

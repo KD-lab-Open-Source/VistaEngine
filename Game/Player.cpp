@@ -10,25 +10,25 @@
 #include "Nature.h"
 #include "Squad.h"
 #include "IronBuilding.h"
-Serialization/Serialization.h
-Serialization/ResourceSelector.h
-Serialization/SerializationFactory.h
+#include "Serialization/Serialization.h"
+#include "Serialization/ResourceSelector.h"
+#include "Serialization/SerializationFactory.h"
 #include "Installer.h"
 #include "EventParameters.h"
 #include "GameCommands.h"
-Environment/Environment.h
-Environment/SourceManager.h
-Environment/Anchor.h
-UserInterface/UI_Logic.h
-UserInterface/UI_Minimap.h
-Serialization/StringTable.h
-Terra/vMap.h
-VistaRender/Field.h
-SurMap5/UniverseObjectAction.h
-FileUtils/FileUtils.h
+#include "Environment/Environment.h"
+#include "Environment/SourceManager.h"
+#include "Environment/Anchor.h"
+#include "UserInterface/UI_Logic.h"
+#include "UserInterface/UI_Minimap.h"
+#include "Serialization/StringTable.h"
+#include "Terra/vMap.h"
+#include "VistaRender/Field.h"
+#include "SurMap5/UniverseObjectAction.h"
+#include "FileUtils/FileUtils.h"
 #include "WBuffer.h"
 #include "UnicodeConverter.h"
-Render/src/Scene.h
+#include "Render/src/Scene.h"
 
 BEGIN_ENUM_DESCRIPTOR(AuxPlayerType, "AuxPlayerType")
 REGISTER_ENUM(AUX_PLAYER_TYPE_ORDINARY_PLAYER, "Обычный игрок");

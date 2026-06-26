@@ -2,9 +2,9 @@
 #include <Windows.h>
 #include "TriggerDebugger.h"
 #include "TriggerView.h"
-kdw/Slider.h
-kdw/HBox.h
-kdw/Button.h
+#include "kdw/Slider.h"
+#include "kdw/HBox.h"
+#include "kdw/Button.h"
 
 TriggerDebugger::TriggerDebugger(TriggerChain& triggerChain, TriggerView* triggerView)
 : triggerChain_(triggerChain)

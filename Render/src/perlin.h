@@ -1,7 +1,7 @@
 #ifndef __PERLIN_H__
 #define __PERLIN_H__
 
-Render/inc/rd.h
+#include "Render/inc/rd.h"
 
 class Perlin3d
 {

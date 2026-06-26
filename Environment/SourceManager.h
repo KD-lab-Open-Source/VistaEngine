@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Grid2D.h"
-XTL/SwapVector.h
+#include "XTL/SwapVector.h"
 #include "Handle.h"
-#include "UnitLink.h"
+#include "Units/UnitLink.h"
 
 class ParameterCustom;
 class SoundAttribute;

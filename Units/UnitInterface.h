@@ -3,8 +3,8 @@
 
 #include "BaseUnit.h"
 #include "UnitCommand.h"
-Units/Triggers.h
-Units/AttributeCache.h
+#include "Units/Triggers.h"
+#include "Units/AttributeCache.h"
 
 ////////////////////////////////////////////////
 // Интерфейс для игрового интерфейса

@@ -1,10 +1,10 @@
 #ifndef __UI_BACKGROUND_SCENE_H__
 #define __UI_BACKGROUND_SCENE_H__
 
-XMath/Colors.h
+#include "XMath/Colors.h"
 #include "Handle.h"
 #include "UI_Effect.h"
-XTL/SwapVector.h
+#include "XTL/SwapVector.h"
 
 class cScene;
 class Camera;

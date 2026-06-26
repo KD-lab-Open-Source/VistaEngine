@@ -1,13 +1,13 @@
 #include "StdAfx.h"
 #include <functional>
-XTL/SafeCast.h
-Serialization/Serialization.h
-Serialization/RangedWrapper.h
-Serialization/ResourceSelector.h
-Serialization/SerializationFactory.h
+#include "XTL/SafeCast.h"
+#include "Serialization/Serialization.h"
+#include "Serialization/RangedWrapper.h"
+#include "Serialization/ResourceSelector.h"
+#include "Serialization/SerializationFactory.h"
 #include "UnicodeConverter.h"
-Render/src/VisGeneric.h
-Render/src/VisError.h
+#include "Render/src/VisGeneric.h"
+#include "Render/src/VisError.h"
 #include "WBuffer.h"
 #include "Console.h"
 

@@ -1,7 +1,7 @@
 #ifndef __PHYSICS_MATH_H__
 #define __PHYSICS_MATH_H__
 
-Physics/RigidBodyPhysics.h
+#include "Physics/RigidBodyPhysics.h"
 
 ///////////////////////////////////////////////////////////////
 //
@@ -175,7 +175,7 @@ protected:
 	Limits lambdaLimits_;
 	float eta_;
 
-	friend class IterateQuantitiesFriction;
+	template<class SparsityRow> friend class IterateQuantitiesFriction;
 };
 
 ///////////////////////////////////////////////////////////
@@ -303,7 +303,7 @@ public:
 	}
 	void operator delete(void*)
 	{
-		xxassert(false, "попытка удаления объекта из PhysicsPool");
+		xxassert(false, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ PhysicsPool");
 	}
 
 protected:
@@ -333,7 +333,7 @@ public:
 	void quant(vector<IterateQuantitiesBase*>::iterator it)
 	{
 		__super::quant(it);
-		 float limit = friction_ * lambda_;
+		 float limit = friction_ * this->lambda_;
 		(*(++it))->lambdaLimits_ = limit;
 		(*(++it))->lambdaLimits_ = limit;
 	}

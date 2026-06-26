@@ -1,14 +1,14 @@
 #include "stdafx.h"
 #include "Runtime3D.h"
-Render/inc/fps.h
+#include "Render/inc/fps.h"
 
-Render/Inc/IRenderDevice.h
-Render/Src/cCamera.h
-Render/Src/Scene.h
-Render/Src/VisGeneric.h
-Render/D3d/D3dRender.h
-UserInterface/UI_RenderBase.h
-Util/Win32/DebugSymbolManager.h
+#include "Render/Inc/IRenderDevice.h"
+#include "Render/Src/cCamera.h"
+#include "Render/Src/Scene.h"
+#include "Render/Src/VisGeneric.h"
+#include "Render/D3d/D3dRender.h"
+#include "UserInterface/UI_RenderBase.h"
+#include "Util/Win32/DebugSymbolManager.h"
 
 HWND g_hWnd=0;
 Runtime3D* runtime3D=0;

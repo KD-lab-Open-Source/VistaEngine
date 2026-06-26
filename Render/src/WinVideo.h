@@ -2,7 +2,7 @@
 #define __WINVIDEO_H__
 
 #include <vfw.h>		// AVI include
-Render/inc/rd.h
+#include "Render/inc/rd.h"
 
 struct IGraphBuilder;
 struct IMediaControl;

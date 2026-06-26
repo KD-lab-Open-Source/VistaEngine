@@ -1,7 +1,7 @@
 #include "StdAfx.h"
-ExcelExport/ExcelExporter.h
+#include "ExcelExport/ExcelExporter.h"
 
-Environment/SourceZone.h
+#include "Environment/SourceZone.h"
 
 #include "AttributeReference.h"
 #include "UnitAttribute.h"
@@ -11,8 +11,8 @@ Environment/SourceZone.h
 #include "ParameterTree.h"
 
 #include "Console.h"
-UserInterface/UI_Render.h
-Serialization/StringTable.h
+#include "UserInterface/UI_Render.h"
+#include "Serialization/StringTable.h"
 
 #include "UnicodeConverter.h"
 #include "WBuffer.h"

@@ -1,20 +1,20 @@
 #include "stdafx.h"
 #include "SourceManager.h"
 #include "Anchor.h"
-UserInterface/UI_Logic.h
-UserInterface/UserInterface.h
-UserInterface/UI_Minimap.h
+#include "UserInterface/UI_Logic.h"
+#include "UserInterface/UserInterface.h"
+#include "UserInterface/UI_Minimap.h"
 #include "SourceShield.h"
 #include "Actions.h"
-Units/ShowChangeController.h
-Units/UnitAttribute.h
-Game/Universe.h
-Game/CameraManager.h
+#include "Units/ShowChangeController.h"
+#include "Units/UnitAttribute.h"
+#include "Game/Universe.h"
+#include "Game/CameraManager.h"
 #include "Environment.h"
-Water/Water.h
-Water/Ice.h
-Serialization/SerializationFactory.h
-Terra/vMap.h
+#include "Water/Water.h"
+#include "Water/Ice.h"
+#include "Serialization/SerializationFactory.h"
+#include "Terra/vMap.h"
 
 REGISTER_CLASS(Anchor, Anchor, "якорь на мире");
 

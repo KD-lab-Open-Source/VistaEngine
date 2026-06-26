@@ -2,7 +2,7 @@
 #define __FORMULA_STRING_H_INCLUDED__
 
 #include <string>
-XTL/Functor.h
+#include "XTL/Functor.h"
 
 class Archive;
 

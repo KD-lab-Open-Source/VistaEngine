@@ -1,8 +1,8 @@
 #ifndef __WAVES_H_INCLUDED__
 #define __WAVES_H_INCLUDED__
 #include "Handle.h"
-Serialization/Serialization.h
-Render/src/NParticle.h
+#include "Serialization/Serialization.h"
+#include "Render/src/NParticle.h"
  
 class cEffect;
 class cWater;

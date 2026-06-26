@@ -3,7 +3,7 @@
 
 #include "UnkObj.h"
 
-enum eBlendMode;
+enum eBlendMode : int;
 
 struct sLightKey
 {

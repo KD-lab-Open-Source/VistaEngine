@@ -1,16 +1,16 @@
 #include "StdAfx.h"
-XTL/SafeCast.h
+#include "XTL/SafeCast.h"
 #include "GameOptions.h"
-Serialization/Serialization.h
-Serialization/EnumDescriptor.h
-Serialization/XPrmArchive.h
+#include "Serialization/Serialization.h"
+#include "Serialization/EnumDescriptor.h"
+#include "Serialization/XPrmArchive.h"
 #include "ComboVectorString.h"
 #include "UnicodeConverter.h"
 #include "WBuffer.h"
-Serialization/RangedWrapper.h
+#include "Serialization/RangedWrapper.h"
 #include "TextDB.h"
 #include "VideoMemoryInformation.h"
-FileUtils/FileUtils.h
+#include "FileUtils/FileUtils.h"
 
 bool isUnderEditor();
 

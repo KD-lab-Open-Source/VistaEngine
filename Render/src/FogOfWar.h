@@ -2,7 +2,7 @@
 #define __FOG_OF_WAR_H_INCLUDED__
 
 #include "NParticleKey.h"
-Render/inc/IVisGenericInternal.h
+#include "Render/inc/IVisGenericInternal.h"
 
 class cCircleDraw;
 class FogOfWar;

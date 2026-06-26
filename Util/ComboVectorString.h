@@ -1,7 +1,7 @@
 #ifndef __COMBOLISTVECTOR_H_INCLUDED__
 #define __COMBOLISTVECTOR_H_INCLUDED__
 
-Serialization/SerializationTypes.h
+#include "Serialization/SerializationTypes.h"
 #include <vector>
 
 // выбор строки из вектора строк с возвратом индекса

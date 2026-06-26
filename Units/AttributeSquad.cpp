@@ -1,9 +1,9 @@
 #include "StdAfx.h"
 #include "AttributeSquad.h"
 #include "IronLegion.h"
-Serialization/Serialization.h
-Serialization/SerializationFactory.h
-Serialization/StringTableImpl.h
+#include "Serialization/Serialization.h"
+#include "Serialization/SerializationFactory.h"
+#include "Serialization/StringTableImpl.h"
 
 WRAP_LIBRARY(FormationPatterns, "FormationPattern", "Паттерны формаций", "Scripts\\Content\\FormationPattern", 0, LIBRARY_EDITABLE);
 

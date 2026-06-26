@@ -2,9 +2,9 @@
 #ifndef __VISTARPC_METHODS_H_INCLUDED__
 #define __VISTARPC_METHODS_H_INCLUDED__
 
-XmlRpc/XmlRpcServerMethod.h
-UserInterface/XmlRpc/RpcTypes.h
-Serialization/Serialization.h
+#include "XmlRpc/XmlRpcServerMethod.h"
+#include "UserInterface/XmlRpc/RpcTypes.h"
+#include "Serialization/Serialization.h"
 
 namespace RpcMethod
 {

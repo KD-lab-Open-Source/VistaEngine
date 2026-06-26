@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "XZip.h"
 #include "FileTime.h"
-Serialization/Serialization.h
+#include "Serialization/Serialization.h"
 
 FileTime::FileTime(const char* fileName)
 {
@@ -35,7 +35,7 @@ void FileTime::setCurrentTime()
 
 int FileTime::year() const
 {
-	FILETIME fileTime = {low_, high_};
+	FILETIME fileTime = {(DWORD)low_, (DWORD)high_};
 	SYSTEMTIME systemTime, localTime;
 	FileTimeToSystemTime(&fileTime, &systemTime);
 	SystemTimeToTzSpecificLocalTime(0, &systemTime, &localTime);
@@ -44,7 +44,7 @@ int FileTime::year() const
 
 int FileTime::month() const
 {
-	FILETIME fileTime = {low_, high_};
+	FILETIME fileTime = {(DWORD)low_, (DWORD)high_};
 	SYSTEMTIME systemTime, localTime;
 	FileTimeToSystemTime(&fileTime, &systemTime);
 	SystemTimeToTzSpecificLocalTime(0, &systemTime, &localTime);
@@ -53,7 +53,7 @@ int FileTime::month() const
 
 int FileTime::day() const
 {
-	FILETIME fileTime = {low_, high_};
+	FILETIME fileTime = {(DWORD)low_, (DWORD)high_};
 	SYSTEMTIME systemTime, localTime;
 	FileTimeToSystemTime(&fileTime, &systemTime);
 	SystemTimeToTzSpecificLocalTime(0, &systemTime, &localTime);
@@ -62,7 +62,7 @@ int FileTime::day() const
 
 int FileTime::hour() const
 {
-	FILETIME fileTime = {low_, high_};
+	FILETIME fileTime = {(DWORD)low_, (DWORD)high_};
 	SYSTEMTIME systemTime, localTime;
 	FileTimeToSystemTime(&fileTime, &systemTime);
 	SystemTimeToTzSpecificLocalTime(0, &systemTime, &localTime);
@@ -71,7 +71,7 @@ int FileTime::hour() const
 
 int FileTime::minute() const
 {
-	FILETIME fileTime = {low_, high_};
+	FILETIME fileTime = {(DWORD)low_, (DWORD)high_};
 	SYSTEMTIME systemTime, localTime;
 	FileTimeToSystemTime(&fileTime, &systemTime);
 	SystemTimeToTzSpecificLocalTime(0, &systemTime, &localTime);
@@ -80,7 +80,7 @@ int FileTime::minute() const
 
 int FileTime::second() const
 {
-	FILETIME fileTime = {low_, high_};
+	FILETIME fileTime = {(DWORD)low_, (DWORD)high_};
 	SYSTEMTIME systemTime, localTime;
 	FileTimeToSystemTime(&fileTime, &systemTime);
 	SystemTimeToTzSpecificLocalTime(0, &systemTime, &localTime);
@@ -89,7 +89,7 @@ int FileTime::second() const
 
 int FileTime::milliseconds() const
 {
-	FILETIME fileTime = {low_, high_};
+	FILETIME fileTime = {(DWORD)low_, (DWORD)high_};
 	SYSTEMTIME systemTime, localTime;
 	FileTimeToSystemTime(&fileTime, &systemTime);
 	SystemTimeToTzSpecificLocalTime(0, &systemTime, &localTime);

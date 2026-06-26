@@ -1,12 +1,14 @@
 #include "stdafx.h"
 #include "LibraryWrapper.h"
-Serialization/XPrmArchive.h
+#include "Serialization/XPrmArchive.h"
 #include "BinaryArchive.h"
 #include "InPlaceArchive.h"
 #include "LibrariesManager.h"
 #include "MultiArchive.h"
 #include "profiler.h"
+#ifdef _WIN32
 #include "kdw/PropertyEditor.h"
+#endif
 
 LibraryWrapperBase::LibraryWrapperBase()
 {
@@ -79,15 +81,17 @@ public:
 	LibraryWrapperBase* library_;
 };
 
-bool LibraryWrapperBase::editLibrary(bool translatedOnly) 
+bool LibraryWrapperBase::editLibrary(bool translatedOnly)
 {
+#ifdef _WIN32
 	string setupName = string("Scripts\\TreeControlSetups\\") + sectionName_ + "State";
 	LibrarySerializer lib(this);
 	if(kdw::edit(Serializer(lib), setupName.c_str(), translatedOnly ? kdw::ONLY_TRANSLATED : 0)){
 		saveLibrary();
 		return true;
 	}
-	return false;														
+#endif
+	return false;
 }
 
 bool LibrariesManager::registerLibrary(const char* name, LibraryInstanceFunc func, bool editor)

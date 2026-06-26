@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "LibraryAttribEditor.h"
-AttribEditor/TreeListCtrl/xTreeCtrlLib.h
-Serialization/Dictionary.h
-Serialization/LibraryBookmark.h
+#include "AttribEditor/TreeListCtrl/xTreeCtrlLib.h"
+#include "Serialization/Dictionary.h"
+#include "Serialization/LibraryBookmark.h"
 #include "kdw/PropertyRow.h"
 #include "kdw/PropertyTree.h"
 #include "kdw/PropertyTreeModel.h"
-mfc/PopupMenu.h
+#include "mfc/PopupMenu.h"
 
 CLibraryAttribEditor::CLibraryAttribEditor()
 {

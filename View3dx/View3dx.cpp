@@ -6,25 +6,25 @@
 #include <mmsystem.h>
 #include "ModelInfo.h"
 #include "DrawGraph.h"
-Render/D3D/D3DRender.h
-XMath/xmathLib.h
-Terra/vmap.h
-Water/SkyObject.h
-Render/inc/fps.h
-Render/src/FT_Font.h
-Render/src/Scene.h
-Serialization/XPrmArchive.h
+#include "Render/D3D/D3DRender.h"
+#include "XMath/xmathLib.h"
+#include "Terra/vmap.h"
+#include "Water/SkyObject.h"
+#include "Render/inc/fps.h"
+#include "Render/src/FT_Font.h"
+#include "Render/src/Scene.h"
+#include "Serialization/XPrmArchive.h"
 #include "kdw/PropertyEditor.h"
 #include "kdw/Filedialog.h"
 #include "kdw/Label.h"
-VistaRender/StreamInterpolation.h
-Serialization/RangedWrapper.h
-Serialization/Decorators.h
-Serialization/EnumDescriptor.h
-Serialization/ResourceSelector.h
-Render/src/TileMap.h
-Render/Src/VisGeneric.h
-FileUtils/FileUtils.h
+#include "VistaRender/StreamInterpolation.h"
+#include "Serialization/RangedWrapper.h"
+#include "Serialization/Decorators.h"
+#include "Serialization/EnumDescriptor.h"
+#include "Serialization/ResourceSelector.h"
+#include "Render/src/TileMap.h"
+#include "Render/Src/VisGeneric.h"
+#include "FileUtils/FileUtils.h"
 
 using namespace FT;
 

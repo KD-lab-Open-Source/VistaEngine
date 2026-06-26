@@ -41,7 +41,7 @@ inline void swap(unsigned char& c1, unsigned char& c2)
 	c1 = tmp;
 }
 
-/// кодирование/раскодирование по алгоритму RC4
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ/пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ RC4
 void rc4code(char* data, const char* key, int count = -1)
 {
 	size_t keylen;
@@ -75,7 +75,8 @@ void rc4code(char* data, const char* key, int count = -1)
 	}
 }
 
-// вывод Unicode текста в консоль
+#ifdef _WIN32
+// пїЅпїЅпїЅпїЅпїЅ Unicode пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 void dcprintfW(wchar_t *format, ...)
 {
 	static bool inited = false;
@@ -103,7 +104,7 @@ void dcprintfW(wchar_t *format, ...)
 	}
 }
 
-// вывод Unicode текста в Debug Output
+// пїЅпїЅпїЅпїЅпїЅ Unicode пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ Debug Output
 void dprintfW(wchar_t *format, ...)
 {
 	wchar_t buffer[512];
@@ -118,3 +119,13 @@ void dprintfW(wchar_t *format, ...)
 	if(SUCCEEDED(ret) || ret == STRSAFE_E_INSUFFICIENT_BUFFER)
 		OutputDebugStringW(buffer);
 }
+#else
+void dcprintfW(wchar_t* format, ...) {
+	va_list args; va_start(args, format);
+	vfwprintf(stderr, format, args); va_end(args);
+}
+void dprintfW(wchar_t* format, ...) {
+	va_list args; va_start(args, format);
+	vfwprintf(stderr, format, args); va_end(args);
+}
+#endif

@@ -2,11 +2,11 @@
 #include "Simply3dx.h"
 #include "Static3dx.h"
 #include "Scene.h"
-Render/Shader/Shaders.h
+#include "Render/Shader/Shaders.h"
 #include "D3DRender.h"
 #include "cCamera.h"
 #include "VisGeneric.h"
-Terra/vmap.h
+#include "Terra/vmap.h"
 
 /*
 

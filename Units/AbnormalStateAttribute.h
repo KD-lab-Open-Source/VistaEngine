@@ -4,7 +4,7 @@
 
 #include "Parameters.h"
 #include "EffectReference.h"
-Environment/SourceBase.h
+#include "Environment/SourceBase.h"
 
 class cObject3dx;
 

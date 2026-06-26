@@ -3,12 +3,12 @@
 
 #include "RenderMT.h"
 #include "Unknown.h"
-XMath/Mats.h
-XMath/Box6f.h
-XMath/Colors.h
-Render/3dx/umath.h
+#include "XMath/Mats.h"
+#include "XMath/Box6f.h"
+#include "XMath/Colors.h"
+#include "Render/3dx/umath.h"
 
-extern RENDER_API RandomGenerator graphRnd;//Недетерменированный rnd, который вызывается в графическом потоке.
+extern RENDER_API RandomGenerator graphRnd;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ rnd, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
 
 class cInterfaceRenderDevice;
 class cScene;
@@ -16,7 +16,11 @@ class cVisGeneric;
 class cTexture;
 class Camera;
 
-enum ObjectShadowType;
+enum ObjectShadowType : int {
+    OBJECT_SHADOW_NONE = 0,
+    OBJECT_SHADOW_CIRCLE,
+    OBJECT_SHADOW_STENCIL
+};
 
 class RENDER_API  sAttribute
 {
@@ -37,8 +41,8 @@ enum eKindUnknownClass
 {
 	KIND_NULL				=		0,
 
-	KIND_LIGHT				=		4,			// cUnkLight - источники света
-	KIND_OBJ_3DX			=		6,			// cObject3dx - трехмерные объекты из полигонов.
+	KIND_LIGHT				=		4,			// cUnkLight - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	KIND_OBJ_3DX			=		6,			// cObject3dx - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	KIND_SIMPLY3DX			=		7,
 	KIND_STATICSIMPLY3DX	=		8,
 	KIND_EFFECT				=		9,				// 
@@ -48,15 +52,15 @@ enum eKindUnknownClass
 class RENDER_API BaseGraphObject : public UnknownClass, public sAttribute
 {
 public:
-	// инициализационная часть 
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 
 	BaseGraphObject(int kind);
 	virtual ~BaseGraphObject(){}
 	virtual	int Release();
-	virtual void Attach();//Теперь все объекты сначала не добавлены в сцену, это нужно для HT, чтобы не было видно непроинициализированного объекта.
+	virtual void Attach();//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ HT, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 
 	int GetKind() const	{ return Kind; }
 
-	// общие функции для работы объектами cBaseGraphObject
+	// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ cBaseGraphObject
 	virtual void PreDraw(Camera* camera)=0;
 	virtual void Draw(Camera* camera)=0;
 	virtual void Animate(float dt)									{ }
@@ -68,18 +72,18 @@ public:
 	cScene* scene() const { return scene_; }
 	void setScene(cScene* pScene) { scene_=pScene; }
 
-	//В локальных координатах, для получения Box в глобальных координатах,
-	//нужно умножить на GetGlobalMatrix()
+	//пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Box пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ,
+	//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ GetGlobalMatrix()
 	virtual float GetBoundRadius() const;
 	virtual void GetBoundBox(sBox6f& Box) const;
 
-	// sortIndex - по этому индексу сортируются "штучные объекты"
+	// sortIndex - пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ"
 	virtual int sortIndex()const { return 0; }
 
 	inline void MTAccess();
 
 protected:
-	cScene			*scene_;		// интерфейс породивший данный класс
+	cScene			*scene_;		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	eKindUnknownClass	Kind;
 };
 
@@ -119,14 +123,14 @@ public:
 	virtual void SetNodePosition(int nodeindex,const Se3f& pos) = 0;
 	virtual void SetNodePositionMats(int nodeindex,const Mats& pos)=0;
 
-	//radius потом умножается на scale объекта!
-	virtual void SetShadowType(ObjectShadowType type)=0;//Для всех объектов такого типа применяется одновременно
+	//radius пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ scale пїЅпїЅпїЅпїЅпїЅпїЅпїЅ!
+	virtual void SetShadowType(ObjectShadowType type)=0;//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	virtual void SetCircleShadowParam(float radius,float height=-1)=0;
 	virtual ObjectShadowType getShadowType()=0;
 	virtual void getCircleShadowParam(float& radius, float& height)=0;
 
-	//В случае cObject3dx быстрая GetNodePositionMats
-	//В случае cSimply3dx быстрая GetNodePositionMat
+	//пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ cObject3dx пїЅпїЅпїЅпїЅпїЅпїЅпїЅ GetNodePositionMats
+	//пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ cSimply3dx пїЅпїЅпїЅпїЅпїЅпїЅпїЅ GetNodePositionMat
 	virtual const MatXf& GetNodePositionMat(int nodeindex) const=0;
 	virtual const Mats& GetNodePositionMats(int nodeindex) const=0;
 

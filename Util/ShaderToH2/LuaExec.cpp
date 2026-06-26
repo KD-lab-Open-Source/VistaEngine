@@ -2,9 +2,9 @@
 #include "LuaExec.h"
 
 extern "C" {
-lua/src/lua.h
-lua/src/lualib.h
-lua/src/lauxlib.h
+#include "lua/src/lua.h"
+#include "lua/src/lualib.h"
+#include "lua/src/lauxlib.h"
 };
 
 LuaExec::LuaExec()

@@ -1,10 +1,10 @@
 #include "StdAfx.h"
-Game/Actions.h
-Game/Conditions.h
-Game/GameOptions.h
-Serialization/SerializationFactory.h
+#include "Game/Actions.h"
+#include "Game/Conditions.h"
+#include "Game/GameOptions.h"
+#include "Serialization/SerializationFactory.h"
 #include "CommandsQueue.h"
-Render/Src/VisGeneric.h
+#include "Render/Src/VisGeneric.h"
 
 void ActionSetDirectControl::activate()
 {

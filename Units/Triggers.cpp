@@ -9,19 +9,19 @@
 #include "Squad.h"
 #include "Actions.h"
 
-Serialization/Serialization.h
-Serialization/Dictionary.h
-Serialization/SerializationFactory.h
+#include "Serialization/Serialization.h"
+#include "Serialization/Dictionary.h"
+#include "Serialization/SerializationFactory.h"
 #include "kdw/PropertyEditor.h"
 #include "EditableCondition.h"
 #include "Conditions.h"
-Environment/SourceBase.h
-Environment/SourceManager.h
-Environment/Anchor.h
+#include "Environment/SourceBase.h"
+#include "Environment/SourceManager.h"
+#include "Environment/Anchor.h"
 #include "Player.h"
 #include "StringWrappers.h"
-Serialization/BinaryArchive.h
-Serialization/StringTable.h
+#include "Serialization/BinaryArchive.h"
+#include "Serialization/StringTable.h"
 
 class EventFactoryArg1
 {

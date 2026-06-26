@@ -1,7 +1,7 @@
 #ifndef __SUR_TOOL_WAVES_H_INCLUDED__
 #define __SUR_TOOL_WAVES_H_INCLUDED__
 
-Environment/Environment.h
+#include "Environment/Environment.h"
 #include "EScroll.h"
 #include "SurToolAux.h"
 #include "WaveDlg.h"

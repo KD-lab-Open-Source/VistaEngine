@@ -1,13 +1,13 @@
 #include "StdAfx.h"
 
 #include "SourceFlash.h"
-Serialization/Serialization.h
-Serialization/EnumDescriptor.h
+#include "Serialization/Serialization.h"
+#include "Serialization/EnumDescriptor.h"
 #include "Environment.h"
-Serialization/RangedWrapper.h
+#include "Serialization/RangedWrapper.h"
 #include "EditorVisual.h"
 #include "CameraManager.h"
-VistaRender/Flash.h
+#include "VistaRender/Flash.h"
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(SourceFlash, EvolutionType, "тип кривой")
 REGISTER_ENUM_ENCLOSED(SourceFlash, LINEAR, "линейная")

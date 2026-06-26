@@ -5,12 +5,12 @@
 #include "RenderObjects.h"
 #include "BaseUnit.h"
 #include "Universe.h"
-Water/CircleManager.h
+#include "Water/CircleManager.h"
 #include "IronBuilding.h"
 #include "ScanningShape.h"
-Render/src/cZPlane.h
-Render/src/Scene.h
-Render/src/VisGeneric.h
+#include "Render/src/cZPlane.h"
+#include "Render/src/Scene.h"
+#include "Render/src/VisGeneric.h"
 
 BuildingInstaller::BuildingInstaller()
 {

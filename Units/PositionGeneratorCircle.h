@@ -6,7 +6,7 @@
 //class UnitBase;
 
 #include "BaseUnit.h"
-Game/Universe.h
+#include "Game/Universe.h"
 
 
 template <class TUnitList>
@@ -61,7 +61,7 @@ bool PositionGeneratorCircle<TUnitList>::unitInIgnore(UnitBase * unit) const
 	if(!ignoreGroup)
 		return false;
 
-	TUnitList::const_iterator ui;
+	typename TUnitList::const_iterator ui;
 	FOR_EACH((*ignoreGroup), ui)
 		if(unit == (*ui))return true;
 	return false;

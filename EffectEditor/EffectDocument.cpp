@@ -15,7 +15,7 @@
 #include "kdw/PopupMenu.h"
 #include "kdw/FileDialog.h"
 #include "Render/src/NParticleID.h"
-Render/Src/VisGeneric.h
+#include "Render/Src/VisGeneric.h"
 #include "FileUtils/FileUtils.h"
 #include "Serialization/GenericFileSelector.h"
 

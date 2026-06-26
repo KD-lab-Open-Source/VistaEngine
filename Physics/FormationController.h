@@ -1,8 +1,8 @@
 #ifndef __FORMATION_CONTROLLER_H__
 #define __FORMATION_CONTROLLER_H__
 
-XMath/SafeMath.h
-Util/Timers.h
+#include "XMath/SafeMath.h"
+#include "Util/Timers.h"
 #include "RigidBodyUnit.h"
 #include "MovementDirection.h"
 #include "AttributeSquad.h"
@@ -280,7 +280,7 @@ public:
 	const Vect2f& lastWayPoint() const { return wayPoint_; }
 	const WayPoints& wayPoints() const { return wayPoints_; }
 	void wayPointsClear();
-	bool moveAction(Vect2f& point, PTActionPriority priority = ACTION_PRIORITY_DEFAULT) { return ptAction_.setMovePoint(point, priority); }
+	bool moveAction(const Vect2f& point, PTActionPriority priority = ACTION_PRIORITY_DEFAULT) { return ptAction_.setMovePoint(point, priority); }
 	void setFollowSquad(UnitSquad* squadToFollow) { followSquad_ = squadToFollow; }
 	bool followSquad() const { return followSquad_ != 0; }
 	int impassableTerrainTypes() const { return impassability_; }

@@ -1,32 +1,34 @@
 #ifndef __SWAP_VECTOR_H__
 #define __SWAP_VECTOR_H__
 
-// Вектор с ускоренным erase 
-// для несортированных последовательностей
+// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ erase 
+// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 template<class T>
 class SwapVector : public vector<T>
 {
 public:
+	typedef typename vector<T>::iterator iterator;
+
 	iterator erase(iterator it) {
-		iterator last = end();
+		iterator last = this->end();
 		--last;
         if(it != last){
 			std::swap(*it, *last);
-			int index = it - begin();
-			pop_back();
-			return begin() + index;
+			int index = it - this->begin();
+			this->pop_back();
+			return this->begin() + index;
 		}
 		else{
-			pop_back();
-			return end();
+			this->pop_back();
+			return this->end();
 		}
 	}
-	
+
 	void erase(const T& t) {
-		iterator i = std::find(begin(), end(), t);
-		if(i != end())
+		iterator i = std::find(this->begin(), this->end(), t);
+		if(i != this->end())
 			erase(i);
-		xassert(std::find(begin(), end(), t) == end());
+		xassert(std::find(this->begin(), this->end(), t) == this->end());
 	}
 
 	bool serialize(Archive& ar, const char* name, const char* nameAlt) {

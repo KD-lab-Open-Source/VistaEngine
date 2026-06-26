@@ -2,8 +2,8 @@
 #define __UIEDITOR_OPTIONS_H_INCLUDED__
 
 #include "xmath.h"
-XMath/Colors.h
-Serialization/LibraryWrapper.h
+#include "XMath/Colors.h"
+#include "Serialization/LibraryWrapper.h"
 
 class Archive;
 

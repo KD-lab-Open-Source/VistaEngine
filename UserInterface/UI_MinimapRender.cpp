@@ -1,10 +1,10 @@
 #include "StdAfx.h"
 #include "UI_Minimap.h"
 #include "UI_RenderBase.h"
-Render/D3d/D3DRender.h
-Environment/Environment.h
-Water/Water.h
-Render/src/FogOfWar.h
+#include "Render/D3d/D3DRender.h"
+#include "Environment/Environment.h"
+#include "Water/Water.h"
+#include "Render/src/FogOfWar.h"
 
 Singleton<UI_Minimap> minimap;
 

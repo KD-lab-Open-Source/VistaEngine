@@ -1,7 +1,7 @@
 #ifndef __VIS_GRID2D_H_INCLUDED__
 #define __VIS_GRID2D_H_INCLUDED__
 
-Render/inc/rd.h
+#include "Render/inc/rd.h"
 
 class BaseGraphObject;
 

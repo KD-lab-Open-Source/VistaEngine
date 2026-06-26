@@ -2,32 +2,32 @@
 #define __RESOURCE_SELECTOR_H_INCLUDED__
 
 #include <string>
-Serialization/Serialization.h
+#include "Serialization/Serialization.h"
 
 class ExportInterface
 {
 public:
 	typedef void (*ModelSelectorCallBack)(const char* name);
 
-	static void setExport(bool export, ModelSelectorCallBack modelSelectorCallBack) { export_ = export; modelSelectorCallBack_ = modelSelectorCallBack; }
-	static bool isExport() { return export_; }
+	static void setExport(bool doExport, ModelSelectorCallBack modelSelectorCallBack) { doExport_ = doExport; modelSelectorCallBack_ = modelSelectorCallBack; }
+	static bool isExport() { return doExport_; }
 	static ModelSelectorCallBack modelSelectorCallBack() { return modelSelectorCallBack_; }
-	static void export(const char* name);
+	static void exportFile(const char* name);
 
 private:
-	static bool export_;
+	static bool doExport_;
 	static ModelSelectorCallBack modelSelectorCallBack_;
 };
 
 struct ResourceSelector {
 	struct Options {
-		Options(const char* _filter, const char* _initialDir, const char* _title = "", bool _copy = true, bool _export = true);
+		Options(const char* _filter, const char* _initialDir, const char* _title = "", bool _copy = true, bool _doExport = true);
 		void serialize (Archive& ar);
 		string filter;
         string initialDir;
         string title;
         bool copy;
-		bool export;
+		bool doExport;
 	};
 
 	ResourceSelector ()
@@ -86,14 +86,14 @@ struct ResourceSelector {
 
 	static Options DEFAULT_OPTIONS;
 
-	static void setExport() { export_ = true; }
+	static void setExport() { doExport_ = true; }
 
 protected:
     Options options_;
 	string* fileNamePtr_;
 	string fileName_;
-	
-	static bool export_;
+
+	static bool doExport_;
 };
 
 struct ModelSelector : ResourceSelector {

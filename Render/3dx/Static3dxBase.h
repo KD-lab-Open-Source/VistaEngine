@@ -2,12 +2,12 @@
 #define __STATIC_3DX_BASE_H__
 
 #include "Interpolator3DX.h"
-Render/3dx/Umath.h
-XMath/Colors.h
-XMath/Mats.h
-XMath/Rectangle4f.h
-XMath/Box6f.h
-XTL/UniqueVector.h
+#include "Render/3dx/Umath.h"
+#include "XMath/Colors.h"
+#include "XMath/Mats.h"
+#include "XMath/Rectangle4f.h"
+#include "XMath/Box6f.h"
+#include "XTL/UniqueVector.h"
 
 struct cTempMesh3dx;
 typedef ShareHandle<cTempMesh3dx> TempMesh;
@@ -25,7 +25,7 @@ class Exporter;
 class IVisMesh;
 class IVisLight;
 
-enum ObjectShadowType
+enum StaticObjectShadowType : int
 {
 	OST_SHADOW_NONE,
 	OST_SHADOW_CIRCLE,
@@ -66,7 +66,7 @@ struct StaticAnimationChain
 	float time;
 	int begin_frame;
 	int end_frame;
-	bool cycled; //Нужно для корректной интерполяции
+	bool cycled; //пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 	StaticAnimationChain();
 	void serialize(Archive& ar);
@@ -76,8 +76,8 @@ typedef vector<StaticAnimationChain> StaticAnimationChains;
 
 struct cTempVisibleGroup
 {
-	int visibilitySet;//К какому множеству принадлежит.
-	DWORD visibilities;//Видимость в соответствующих группах видимости. Битовыми флажками. Не более 32 групп видимости.
+	int visibilitySet;//пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+	DWORD visibilities;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 32 пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	int begin_polygon;
 	int num_polygon;
 	int visibilityNodeIndex;
@@ -106,12 +106,12 @@ struct FurInfo
 		FUR_LINEAR
 	};
 
-	string material; //Имя материала
-	float scale; //Длинна шерсти
-	float alpha; //Прозрачность слоя
+	string material; //пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	float scale; //пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	float alpha; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	FurType furType; //const or linear
-	string texture; //Текстура шерсти
-	string normal; //RGB - Направление шерсти в tangent space. A - длинна шерсти.
+	string texture; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	string normal; //RGB - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ tangent space. A - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
 
 	FurInfo();
 	void serialize(Archive& ar);
@@ -134,7 +134,7 @@ struct StaticMaterial
 	{	/* texture map in 3dSMAX */
 		TEXMAP_AM					=	0,   // ambient
 		TEXMAP_DI					=	1,   // diffuse						tex_diffuse
-		TEXMAP_SP					=	2,   // specular					tex_specularmap (для бампа только)
+		TEXMAP_SP					=	2,   // specular					tex_specularmap (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ)
 		TEXMAP_SH					=	3,   // shininess
 		TEXMAP_SS					=	4,   // shininess strength
 		TEXMAP_SI					=	5,   // self-illumination			tex_self_illumination
@@ -239,7 +239,7 @@ struct cTempMesh3dx : ShareHandleBase
 	int imaterial;
 	bool visibilityAnimated;
 
-	vector<int> inode_array;//На какие ноды ссылается скиннинг в этом mesh
+	vector<int> inode_array;//пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ mesh
 	vector<cTempVisibleGroup> visible_group;
 
 	cTempMesh3dx();
@@ -255,7 +255,7 @@ struct cTempMesh3dx : ShareHandleBase
 	void OptimizeMesh();
 
 	void deleteSingularPolygon();
-	bool export(IVisMesh* pobject, IVisMaterial* mat, int inode);
+	bool exportTo(IVisMesh* pobject, IVisMaterial* mat, int inode);
 };
 
 struct sLogo
@@ -331,7 +331,7 @@ struct StaticVisibilitySet
 
 	string name;
 	NodeNames meshes; // CONVERSION
-	StaticVisibilityGroups visibilityGroups;//Не менее одной группы
+	StaticVisibilityGroups visibilityGroups;//пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
 	StaticVisibilitySet();
 
@@ -361,7 +361,7 @@ struct StaticLightAnimation
 
 	void serialize(Archive& ar);
 	void Load(CLoadDirectory rd, StaticChainsBlock& chains_block);
-	void export(IVisLight* pobject, int interval_begin, int interval_size, bool cycled);
+	void exportTo(IVisLight* pobject, int interval_begin, int interval_size, bool cycled);
 };
 typedef vector<StaticLightAnimation> StaticLightAnimations;
 
@@ -380,7 +380,7 @@ struct StaticLight
 	void serialize(Archive& ar);
 
 	void Load(CLoadDirectory rd, StaticChainsBlock& chains_block);
-	void export(IVisLight* pobject, int inode);
+	void exportTo(IVisLight* pobject, int inode);
 };
 typedef vector<StaticLight> StaticLights;
 
@@ -396,7 +396,7 @@ struct StaticLeaf
 	StaticLeaf();
 	void serialize(Archive& ar);
 	void Load(CLoadDirectory rd);
-	void export(IVisLight* pobject, int inode_current);
+	void exportTo(IVisLight* pobject, int inode_current);
 };
 typedef vector<StaticLeaf> StaticLeaves;
 
@@ -432,7 +432,7 @@ public:
 	StaticNodes nodes;
 	AnimationGroups animationGroups_;
 	StaticAnimationChains animationChains_;
-	StaticVisibilitySets visibilitySets_;//Не менее одного 
+	StaticVisibilitySets visibilitySets_;//пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 
 	StaticMaterials materials;
 
 	bool isBoundBoxInited;
@@ -450,8 +450,8 @@ public:
 	bool is_old_model;
 	bool loaded;
 
-	ObjectShadowType circle_shadow_enable;
-	ObjectShadowType circle_shadow_enable_min;
+	StaticObjectShadowType circle_shadow_enable;
+	StaticObjectShadowType circle_shadow_enable_min;
 	int circle_shadow_height;
 	float circle_shadow_radius;
 

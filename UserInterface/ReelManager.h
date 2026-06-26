@@ -2,9 +2,9 @@
 #define _REELMANAGER_H
 
 #include "PlayBink.h"
-bubles/blobs.h
-Sound/SoundSystem.h
-Game/SoundApp.h
+#include "bubles/blobs.h"
+#include "Sound/SoundSystem.h"
+#include "Game/SoundApp.h"
 
 struct LogoAttributes
 {

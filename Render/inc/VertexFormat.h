@@ -1,8 +1,8 @@
 #ifndef __VERTEX_FORMAT_H_INCLUDED__
 #define __VERTEX_FORMAT_H_INCLUDED__
 
-Render/3dx/umath.h
-XMath/Colors.h
+#include "Render/3dx/umath.h"
+#include "XMath/Colors.h"
 
 struct IDirect3DVertexDeclaration9;
 

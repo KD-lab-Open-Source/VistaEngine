@@ -1,9 +1,9 @@
 #ifndef __SERIALIZEABLE_UNIVERSE_OBJECT_H_INCLUDED__
 #define __SERIALIZEABLE_UNIVERSE_OBJECT_H_INCLUDED__
 
-Serialization/Serializer.h
+#include "Serialization/Serializer.h"
 #include "BaseUniverseObject.h"
-#include "UnitLink.h"
+#include "Units/UnitLink.h"
 
 typedef UnitLink<BaseUniverseObject> Link;
 

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UI_RpcClient.h"
-Serialization/Serialization.h
-Serialization/Decorators.h
+#include "Serialization/Serialization.h"
+#include "Serialization/Decorators.h"
 #include "RpcClient.h"
 #include "RpcTypes.h"
 Network/LogMsg.h 

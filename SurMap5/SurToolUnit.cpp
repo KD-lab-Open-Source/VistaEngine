@@ -4,10 +4,10 @@
 #include "ObjectsManagerWindow.h"
 #include "SurToolSelect.h"
 
-Units/IronLegion.h
-Units/UnitAttribute.h
-Units/Squad.h
-Game/Player.h
+#include "Units/IronLegion.h"
+#include "Units/UnitAttribute.h"
+#include "Units/Squad.h"
+#include "Game/Player.h"
 
 BEGIN_MESSAGE_MAP(CSurToolUnit, CSurToolBase)
 	ON_WM_HSCROLL()

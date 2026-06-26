@@ -1,7 +1,7 @@
 #ifndef __TERTOOLS_H__
 #define __TERTOOLS_H__
 
-//	elementarTool::locp; //!!!Повторяемость
+//	elementarTool::locp; //!!!пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 #include "vbitmap.h"
 
@@ -9,7 +9,7 @@
 #include "break.h"
 #include "bitGen.h"
 #include "TerToolCtrl.h"
-XMath/SafeMath.h
+#include "XMath/SafeMath.h"
 #include <map>
 #include "TerrainType.h"
 
@@ -77,7 +77,7 @@ public:
 		}
 		bool load8Andprepare4World(const char* name, const float terTextureKScale, int index, ColorQuantizer& cqGeo, ColorQuantizer& cqDam, CashDateBitmap8C* pCDB, const char* cachDir);
 		bool load16(const char* name, const float terTextureKScale, int index);
-		bool loadAndPutBitmap2Quantizer(const char* name, const float terTextureKScale, ColorQuantizer& cq);//Для подмешивания цветов текстур тулзеров в карту
+		bool loadAndPutBitmap2Quantizer(const char* name, const float terTextureKScale, ColorQuantizer& cq);//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
 		bool validateAndLoadDataCash(const char* fname, CashDateBitmap8C* pCDB, const char* cachDir);
 		void saveDataCash(const char* fname, CashDateBitmap8C* pCDB, const char* cachDir);
 	};
@@ -197,7 +197,7 @@ protected:
 		}
 		return p;
 	}
-	static TerToolsID unengagedTerToolID; //инициализируется в cpp
+	static TerToolsID unengagedTerToolID; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ cpp
 	TerToolsID getUnengagedID() { return unengagedTerToolID++; }
 };
 extern TerToolsDispatcher terToolsDispatcher;
@@ -244,7 +244,7 @@ struct sVoxelBitmap {
 	}
 };
 
-enum eTerToolTerrainEffect {
+enum eTerToolTerrainEffect : int {
 	TTTE_PLOTTING_TEXTURE,
 	TTTE_ALIGNMENT_DIG,
 	TTTE_ALIGNMENT_PUT,
@@ -253,7 +253,7 @@ enum eTerToolTerrainEffect {
 	TTTE_PUT,
 	TTTE_SMOOTH
 };
-enum eTerToolSurfaceEffect{
+enum eTerToolSurfaceEffect : int {
 	TTSE_NOT_CHANGE,
 	TTSE_DRAW_DAM,
 	TTSE_DRAW_GEO,
@@ -261,7 +261,7 @@ enum eTerToolSurfaceEffect{
 	TTSE_ROTATE_DRAW_CURRENT
 };
 
-enum eSetingAtrMetod{
+enum eSetingAtrMetod : int {
 	SIM_NotChange,
 	SIM_SetInds,
 	SIM_UnSetInds,
@@ -306,7 +306,7 @@ public:
 		//pRastrGeo=pbmp->pBitmap4Geo;
 		pRastrDam=pbmp->pBitmap4Dam;
 		pRastrAlpha=pbmp->pAlfaLayer;
-		//xassert() надо вставить на размер кратный ^2!
+		//xassert() пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ ^2!
 		textureSizeX=pbmp->size.x;
 		textureSizeY=pbmp->size.y;
 		textureMaskX=pbmp->size.x-1;
@@ -328,7 +328,7 @@ public:
 	void PutAltAndSur(int offB, short v, int x=0, int y=0, short alfa=0);
 	int influenceBM(int x, int y, int sx, int sy, unsigned char * imageArea);
 
-	//int locp; //!!!Повторяемость
+	//int locp; //!!!пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	int influenceDZ(int x, int y, int rad, short dh, int smMode, unsigned char picMode=0, bool flag_Render=true);
 ///////////////////////////////////////////////////
 	inline int tVoxSet(short x, short y, short dV, short alfa=0);
@@ -337,7 +337,7 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////
-/// Базовый класс всех тулзеров
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 class TerToolBase : public ShareHandleBase {
 public:
@@ -460,19 +460,19 @@ public:
 		return pc;
 	}
 	virtual bool pQuant(){
-		switch(setingAtrMetod_){
+		switch(this->setingAtrMetod_){
 		case SIM_SetInds:
-			return (static_cast<cclass*>(this))->quant<SIM_SetInds>();
+			return (static_cast<cclass*>(this))->template quant<SIM_SetInds>();
 		case SIM_UnSetInds:
-			return (static_cast<cclass*>(this))->quant<SIM_UnSetInds>();
+			return (static_cast<cclass*>(this))->template quant<SIM_UnSetInds>();
 		case SIM_NotChange:
 		default:
-			return (static_cast<cclass*>(this))->quant<SIM_NotChange>();
+			return (static_cast<cclass*>(this))->template quant<SIM_NotChange>();
 		}
 	}
 };
 
-//Конкретные тулзеры
+//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 class TerToolTrack1  : public CTCreator<TerToolTrack1> /*, public TerToolBase*/ {
 public:
 	TerToolTrack1() { r=1; curstep=0;}

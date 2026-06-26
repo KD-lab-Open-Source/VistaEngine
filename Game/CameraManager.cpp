@@ -1,23 +1,23 @@
 #include "StdAfx.h"
 #include "CameraManager.h"
 
-UserInterface/UI_Logic.h
-UserInterface/UI_Render.h
+#include "UserInterface/UI_Logic.h"
+#include "UserInterface/UI_Render.h"
 #include "GameOptions.h"
 
 #include "UnitActing.h"
 #include "vmap.h"
 #include "RenderObjects.h"
 #include "EditorVisual.h"
-XMath/SafeMath.h
+#include "XMath/SafeMath.h"
 #include "Squad.h"
-Serialization/Serialization.h
-Water/Water.h
-Environment/Environment.h
-Render/D3D/D3DRender.h
-Render/Src/cCamera.h
-Render/src/Scene.h
-Serialization/SerializationFactory.h
+#include "Serialization/Serialization.h"
+#include "Water/Water.h"
+#include "Environment/Environment.h"
+#include "Render/D3D/D3DRender.h"
+#include "Render/Src/cCamera.h"
+#include "Render/src/Scene.h"
+#include "Serialization/SerializationFactory.h"
 
 //---------------------------------------
 float visibilityDistance2 = sqr(750.f);

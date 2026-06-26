@@ -1,12 +1,12 @@
 #ifndef __SHOWCHANGE_CONTROLLER_H__
 #define __SHOWCHANGE_CONTROLLER_H__
 
-Render/inc/RenderMT.h
+#include "Render/inc/RenderMT.h"
 #include "Timers.h"
-XTL/SwapVector.h
-XMath/Colors.h
+#include "XTL/SwapVector.h"
+#include "XMath/Colors.h"
 
-UserInterface/UI_Font.h
+#include "UserInterface/UI_Font.h"
 
 class UnitInterface;
 class Archive;

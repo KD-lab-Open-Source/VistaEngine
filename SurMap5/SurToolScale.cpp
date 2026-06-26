@@ -1,18 +1,18 @@
 #include "stdafx.h"
 #include "SurToolScale.h"
-Units/BaseUniverseObject.h
+#include "Units/BaseUniverseObject.h"
 
-Environment/Environment.h
+#include "Environment/Environment.h"
 
 #include "ObjectsManagerWindow.h"
-Serialization/Serialization.h
+#include "Serialization/Serialization.h"
 
-Game/RenderObjects.h
-Game/CameraManager.h
+#include "Game/RenderObjects.h"
+#include "Game/CameraManager.h"
 
 #include "SelectionUtil.h"
-Render/Src/cCamera.h
-Render/Inc/IRenderDevice.h
+#include "Render/Src/cCamera.h"
+#include "Render/Inc/IRenderDevice.h"
 
 namespace UniverseObjectActions{
 

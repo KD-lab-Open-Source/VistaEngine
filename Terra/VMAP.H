@@ -1,21 +1,28 @@
 #ifndef __VMAP_H__
 #define __VMAP_H__
 
-#include "XMath\xmath.h"
-#include "Render\src\NParticle.h"
+#include "XMath/xmath.h"
+#include "Render/src/NParticle.h"
+#include "quantizer.h"            // RGBOctree
+#include "worldFileDispatcher.h"  // Bitmap32
 #include "procedurMap.h"
 #include "XMath/Colors.h"
 #include "terra.h"
 #include "undoDispatcher.h"
 #include "UpdateMapClient.h"
-#include "XTL\UniqueVector.h"
-#include "FileUtils\XGUID.h"
+#include "XTL/UniqueVector.h"
+#include "FileUtils/XGUID.h"
 
 class Archive;
 class MultiRegion;
-enum TerrainType;
+enum TerrainType : int;
 
-// Основная структура карты
+enum eSetingAtrMetod : int;
+enum eTerToolTerrainEffect : int;
+enum eTerToolSurfaceEffect : int;
+enum toolzer2TerrainEffect : int;
+
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 struct vrtMapCreationParam {
 	enum eCreateWorldMetod {
 		FullPlain, Mountains
@@ -49,7 +56,7 @@ typedef unsigned short TerrainColor;
 struct vrtMap : public vrtMapCreationParam, FunctorGetZ
 {
 //////////////////////////////////////////////////////////////////////////
-//	PUBLIC fuction для использования 
+//	PUBLIC fuction пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
 //////////////////////////////////////////////////////////////////////////
 public:
 	unsigned int H_SIZE;
@@ -96,10 +103,15 @@ public:
 	Vect2i w2m(const Vect2i& v) { return Vect2i(w2m(v.x), w2m(v.y)); }
 	Vect2i m2w(const Vect2i& v) { return Vect2i(m2w(v.x), m2w(v.y)); }
 
-	//function для работы с буфером
-	//Базовая функция вычисления смещения в буфферах
+	//function пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	int offsetBuf(int x, int y) const { return y*H_SIZE+x; }
 	int offsetBufC(int x, int y) const { return YCYCL(y)*H_SIZE+XCYCL(x); }
+
+	// Geo-texture surface classification (defined in vmap.cpp).
+	unsigned long GetGeoColor(int x, int y);
+	unsigned char GetGeoType(int offset, int h);
+	unsigned char GetGeoType(int x, int y, int h) { return GetGeoType(offsetBuf(x,y), h); }
 	int offsetGBuf(int x, int y) const { return y*GH_SIZE+x; }
 	int offsetGBufC(int x, int y) const { return YCYCLG(y)*GH_SIZE+XCYCLG(x); }
 	int offsetGBufWorldC(int x, int y) const { return YCYCLG(y >> kmGrid)*GH_SIZE+XCYCLG(x >> kmGrid); }
@@ -118,7 +130,7 @@ public:
 	void getNormal(int x,int y,Vect3f& normal);
 	void getTileZ(char* Texture,int pitch,int xstart,int ystart,int xend,int yend,int step);
 
-	// Работа с сеткой высот 4x4
+	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 4x4
 	unsigned short getZGrid(int x, int y) { return gVBuf[offsetGBuf(x,y)]; }
 	unsigned short getZGridC(int x, int y) { return gVBuf[offsetGBufC(x,y)]; }
 	//unsigned short getVoxelW(int x, int y) { return gVBuf[offsetGBufC(w2m(x), w2m(y))]; }
@@ -137,14 +149,14 @@ public:
 	void setImpassabilityAndSurKind(int _x, int _y, int _r, enum TerrainType terrainType, bool _surKind4Work[TERRAIN_TYPES_NUMBER]);
 
 	void setInds(int xc, int yc, int r, bool erase=false);
-	int getTerrainType(const Vect2i& pos, int r); // не используется
+	int getTerrainType(const Vect2i& pos, int r); // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	int getTerrainType(int xw, int yw) { return 1 << getSurKind(xw, yw); } 
 
 	void pointDamageBuildings(int _x, int _y) {
 		int offG=offsetGBuf(XCYCLG(_x>>kmGrid), YCYCLG(_y>>kmGrid));
 		if(gABuf[offG]&GRIDAT_BUILDING) gABuf[offG]|=GRIDAT_BASE_OF_BUILDING_CORRUPT;
 	}
-	Vect2i vrtMap::findNearestFoso(Vect3f begPos);
+	Vect2i findNearestFoso(Vect3f begPos);
 
 	unsigned char getSurKindG(int xg, int yg){ return (unsigned char)(gABuf[offsetGBufC(xg, yg)]&GRIDAT_MASK_SURFACE_KIND); }
 	unsigned char getSurKind(int xw, int yw){ return (unsigned char)(gABuf[offsetGBufWorldC(xw, yw)]&GRIDAT_MASK_SURFACE_KIND); }
@@ -188,7 +200,7 @@ public:
 	const string getWorldName() { return worldName.c_str(); }
 	void setWorldName(const char* _worldName) { worldName=_worldName; }
 
-	//Специальные функции для редактора и сети
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ
 	void toShowTryColorDamTexture(bool flag_show){ xassert(!flag_show || supBuf); flag_tryColorDamTextures=flag_show; }
 	bool isShowTryColorDamTexture(){ return flag_tryColorDamTextures;}
 	//enum eShowSpecialInfo{ SSI_NoShow, SSI_ShowHardnessImpassability, SSI_ShowKind  /*SSI_ShowImpassability, SSI_ShowAllGeo*/ };
@@ -223,7 +235,7 @@ public:
 	inline void putAlt(int x,int y, unsigned short V) { putAlt(offsetBuf(x,y),V); }
 	inline void putAltC(int x,int y, unsigned short V) { putAlt(offsetBufC(x,y), V); }
 
-	void voxSet(int x,int y,int delta) { //фильтруемое изменение высоты
+	void voxSet(int x,int y,int delta) { //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		int offset=offsetBufC(x,y);
 		unsigned short data=vxaBuf[offset];
 		int h=Vm_extractHeigh(data);
@@ -232,7 +244,7 @@ public:
 		vxaBuf[offset]= Vm_prepHeigh4Buf(h) | Vm_extractAtr(vxaBuf[offset]); 
 	}
 
-	template<class GenerationMetod>	void drawBitMetod(int x, int y, int rad, GenerationMetod& genMetod, short _minFH, short _maxFH);
+	template<class GenerationMetod>	void drawBitMetod(int x, int y, int rad, GenerationMetod genMetod, short _minFH, short _maxFH);
 	void drawBitGen(int x, int y, struct sTerrainBitmapBase* pTBM, bool erase=false);
 	void drawBitmapCircle(int x, int y, int rad, unsigned char cntrAlpha, int bitmapIDX, short minFH, short maxFH, const ColorModificator& colorMod);
 	void drawBitmapCircle(const Vect2i& center, int rad, int bitmapIDX, int alpha, float angle, float scale);
@@ -252,7 +264,7 @@ public:
 	void regRender(int LowX,int LowY,int HiX,int HiY, char typeChanges);
 	void recalcArea2Grid(int xl, int yt, int xr, int yb, bool flag_init=false);
 	int convertVMapTryColor2TerClr(){ return convertVMapTryColor2TerClrT<TerrainColor>(); }
-	float changeTotalWorldParam(int deltaVx, float kScale, const vrtMapChangeParam& changeParam); //общий масштаб высоты карты и общую высоту
+	float changeTotalWorldParam(int deltaVx, float kScale, const vrtMapChangeParam& changeParam); //пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
 	MultiRegion& region() { return *region_; }
 	void drawMiniDetailTexture(int layer, const Vect2i& point, int radius);
@@ -270,7 +282,7 @@ public:
 	list<sPreChangedArea> preCAs;
 	list<sPreChangedArea>::iterator curPreCA;
 	void UndoDispatcher_PutPreChangedArea(list<sRect>& _chAreaList, bool saveVx, bool saveRGB, sBasePMOperation* pPMO=0/*ElementPMO* pPMO=0*/);
-	void UndoDispatcher_PutPreChangedArea(sRect& _chArea, bool saveVx, bool saveRGB, sBasePMOperation* pPMO=0/*ElementPMO* pPMO=0*/);
+	void UndoDispatcher_PutPreChangedArea(const sRect& _chArea, bool saveVx, bool saveRGB, sBasePMOperation* pPMO=0/*ElementPMO* pPMO=0*/);
 	void UndoDispatcher_Undo();
 	//void UndoDispatcher_KillLastChange(sBasePMOperation* pPMO/*ElementPMO* pPMO*/);
 	void UndoDispatcher_Redo();
@@ -282,7 +294,7 @@ public:
 	void compareChAreasInformation(unsigned char* pFirstCAI, unsigned char* pSecondCAI, XBuffer& textOut, XBuffer& binOut);
 	void displayChAreas(unsigned char* pd, unsigned int dsize);
 
-	//Toolzer-ные ф-и
+	//Toolzer-пїЅпїЅпїЅ пїЅ-пїЅ
 	inline void digAndNoChange(int offset, int dv){
 		unsigned short data=vxaBuf[offset];
 		int v=Vm_extractHeigh(data)-dv;
@@ -353,7 +365,15 @@ protected:
 	unsigned short* vxaBuf;
 	TerrainColor * clrBuf;
 	//unsigned char* RnrBuf;
+	unsigned char* SurBuf;
 	unsigned long* supBuf;
+
+	// Geo-texture surface classification (ported from the full-engine branch).
+	RGBOctree geoTxOctree;
+	Bitmap32 loopedGeoTx;
+	Bitmap32 matGeoTx;
+	int kXScaleMatGeoTx;
+	int kYScaleMatGeoTx;
 
     unsigned long VxABufCRC;
     unsigned long DamSurBufCRC;
@@ -380,10 +400,10 @@ protected:
 	typedef UniqueVector<UpdateMapClient*> UpdateMapClients;
 	UpdateMapClients updateMapClients_;
 
-	//Перенести!
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ!
 public:
-	unsigned short* gVBuf; //Сетка вокселей
-	unsigned short* gABuf; //сетка атрибутов
+	unsigned short* gVBuf; //пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	unsigned short* gABuf; //пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	unsigned int GH_SIZE;
 	unsigned int clip_mask_x_g;
 	unsigned int GV_SIZE;
@@ -405,14 +425,14 @@ protected:
 	string worldName;
 	string worldsDir;
 
-	TerrainColor veryLightDam; //Самый яркий цвет
+	TerrainColor veryLightDam; //пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 
 	bool flag_ShowDbgInfo;
-	bool* pTempArray;//Массив для показа несовпадающих областе (при игре по сети)
+	bool* pTempArray;//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ)
 
 	template <class T>	unsigned short getColor16T(int off) { xassert(0&& "Not support TerrainColor! "); return 0; }
 	template <class T> unsigned int getColor32T(int off) { xassert(0&& "Not support TerrainColor! "); return 0;}
-	template <>	unsigned short getColor16T<unsigned char>(int off) { return unsigned short(ConvertTry2HighColor(DamPal[clrBuf[off]].argb)); }
+	template <>	unsigned short getColor16T<unsigned char>(int off) { return (unsigned short)(ConvertTry2HighColor(DamPal[clrBuf[off]].argb)); }
 	template <>	unsigned int getColor32T<unsigned char>(int off) { return DamPal[clrBuf[off]].argb;}
 	template <>	unsigned short getColor16T<unsigned short>(int off) { return clrBuf[off]; }
 	template <>	unsigned int getColor32T<unsigned short>(int off) {
@@ -441,12 +461,12 @@ protected:
 	void RotateWorldP90();
 	void RotateWorldM90();
 
-	void scalingHeighMap(int percent); //Уменьшать увеличивать общий масштаб высоты карты
+	void scalingHeighMap(int percent); //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 
 	bool worldChanged;
 	bool flag_tryColorDamTextures;
 
-	//Вспомогательные функции загрузки
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	void initGeneralVariable();
 	void allocMem4Buf(bool flag_useTryColorBuffer);
 	void releaseMem4Buf();
@@ -466,7 +486,7 @@ protected:
 	void convertPath2WorldName(const char* _dirName);
 
 	int buildMountainWorld();
-	//Функции для работы с сеткой
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	void initGrid();
 	void loadSurKind();
 	void saveSurKind();
@@ -487,7 +507,7 @@ protected:
 extern vrtMap vMap;
 
 void geoGeneration(sGeoPMO& var);
-//Вспомогательные фукции
+//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 extern bool testExistingFile(const char* fName);
 extern unsigned char* convert_vox2vid(int vox, char* buf);
 extern int convert_vid2vox(char* buf);

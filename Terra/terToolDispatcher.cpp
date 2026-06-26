@@ -1,17 +1,17 @@
 #include "stdafxTr.h"
 
-Serialization/Serialization.h
+#include "Serialization/Serialization.h"
 #include "quantizer.h"
 #include "terTools.h"
-Serialization/ResourceSelector.h
-Serialization/XPrmArchive.h
-FileUtils/FileUtils.h
-Serialization/StringTable.h
+#include "Serialization/ResourceSelector.h"
+#include "Serialization/XPrmArchive.h"
+#include "FileUtils/FileUtils.h"
+#include "Serialization/StringTable.h"
 
 #include "scalingEngine.h"
 #include "tgai.h"
 
-#include "float.h" //временно
+#include "float.h" //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 
 //#define TERTOOL_LOG
@@ -483,7 +483,7 @@ bool TerToolsDispatcher::Bitmap8C::loadAndPutBitmap2Quantizer(const char* name, 
 		return false;
 	}
 	if( (tgahead.PixelDepth!=24 && tgahead.PixelDepth!=32) || tgahead.ImageType!=2 ) {
-		string str="Не поддерживаемый тип TGA (необходим 32 или 24bit не компрессированный)-";
+		string str="пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ TGA (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 32 пїЅпїЅпїЅ 24bit пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)-";
 		str+=name;
 		xxassert(0, str.c_str());
 		return false;
@@ -524,7 +524,7 @@ bool TerToolsDispatcher::Bitmap8C::loadAndPutBitmap2Quantizer(const char* name, 
 
 bool TerToolsDispatcher::Bitmap8C::validateAndLoadDataCash(const char* fname, CashDateBitmap8C* pCDB, const char* cachDir)
 {
-	xassert(pCDB);// должно быть всегда
+	xassert(pCDB);// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	if(pCDB->cashFileName.empty())
 		return false;
 	XZipStream fb(0);
@@ -621,6 +621,7 @@ void TerToolsDispatcher::Bitmap8C::saveDataCash(const char* fname, CashDateBitma
 	int flag_noterror=1;
 	flag_noterror&=(int)fb.open(newFName.c_str(), XS_OUT);
 	if(!flag_noterror) goto error_handler;
+	{ // scope the initialized locals so the goto above does not jump into their scope
 	fb.write(pBitmap4Dam, sectionsize);
 	//fb.write(pBitmap4Geo, sectionsize);
 	if(pAlfaLayer!=0){
@@ -655,6 +656,7 @@ void TerToolsDispatcher::Bitmap8C::saveDataCash(const char* fname, CashDateBitma
 
 	pCDB->set(kScale, pAlfaLayer!=0, newFName, size.x*size.y, worldFT, bitmapFT, crcdam, /*crcgeo,*/ crcalfa);
 	return;
+	} // end scoped block
 
 error_handler:
 	pCDB->flag_nonUsedCashData=true;
@@ -673,9 +675,9 @@ bool TerToolsDispatcher::Bitmap8C::load8Andprepare4World(const char* fname, cons
 		return false;
 	}
 	if( (tgahead.PixelDepth!=24 && tgahead.PixelDepth!=32) || tgahead.ImageType!=2 ) {
-		//AfxMessageBox("Не поддерживаемый тип TGA (необходим 24b it не компрессированный, с размерами, кратными степени 2)");
-		//xassert(0&&"Не поддерживаемый тип TGA (необходим 32 или 24bit не компрессированный)");
-		string str="Не поддерживаемый тип TGA (необходим 32 или 24bit не компрессированный)-";
+		//AfxMessageBox("пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ TGA (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 24b it пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 2)");
+		//xassert(0&&"пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ TGA (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 32 пїЅпїЅпїЅ 24bit пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)");
+		string str="пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ TGA (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 32 пїЅпїЅпїЅ 24bit пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)-";
 		str+=fname;
 		xxassert(0, str.c_str());
 		return false;
@@ -750,9 +752,9 @@ bool TerToolsDispatcher::Bitmap8C::load16(const char* fname, const float terText
 		return false;
 	}
 	if( (tgahead.PixelDepth!=24 && tgahead.PixelDepth!=32) || tgahead.ImageType!=2 ) {
-		//AfxMessageBox("Не поддерживаемый тип TGA (необходим 24b it не компрессированный, с размерами, кратными степени 2)");
-		//xassert(0&&"Не поддерживаемый тип TGA (необходим 32 или 24bit не компрессированный)");
-		string str="Не поддерживаемый тип TGA (необходим 32 или 24bit не компрессированный)-";
+		//AfxMessageBox("пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ TGA (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 24b it пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 2)");
+		//xassert(0&&"пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ TGA (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 32 пїЅпїЅпїЅ 24bit пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)");
+		string str="пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ TGA (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 32 пїЅпїЅпїЅ 24bit пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)-";
 		str+=fname;
 		xxassert(0, str.c_str());
 		return false;
@@ -826,8 +828,8 @@ bool TerToolsDispatcher::Bitmap8V::load(const char* fname, const float terTextur
 		return false;
 	}
 	if( tgahead.PixelDepth!=8 || tgahead.ImageType!=3 ) {
-		//xassert(0&&"Не поддерживаемый тип TGA (необходим монохромный не компрессированный)");
-		string str="Не поддерживаемый тип TGA (необходим монохромный не компрессированный)-";
+		//xassert(0&&"пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ TGA (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)");
+		string str="пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ TGA (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)-";
 		str+=fname;
 		xxassert(0, str.c_str());
 		return false;

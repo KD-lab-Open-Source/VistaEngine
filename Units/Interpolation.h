@@ -1,8 +1,12 @@
 #ifndef __INTERPOLATION_
 #define __INTERPOLATION_
 
-XMath/SafeMath.h
-VistaRender/StreamInterpolation.h
+#include "XMath/SafeMath.h"
+#include "VistaRender/StreamInterpolation.h"
+
+// Never instantiated: every Interpolator<> below supplies an explicit op.
+// Declared only so the default template argument is a valid name.
+template<class T> class DefaultInterpolationOp;
 
 template<class T ,class InterpolationOp = DefaultInterpolationOp<T> >
 class Interpolator
@@ -30,8 +34,8 @@ public:
 		update_ = true;
 	}
 	
-	const T& prevValue() const { return x_[0]; } //Устаревшее роложение
-	const T& currValue() const { return x_[1]; } //Положение на текущий логический квант
+	const T& prevValue() const { return x_[0]; } //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	const T& currValue() const { return x_[1]; } //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 
 	void operator()(BaseGraphObject* cur)
 	{ 

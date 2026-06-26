@@ -2,18 +2,18 @@
 
 #include "console.h"
 
-Serialization/Serialization.h
-Serialization/ResourceSelector.h
-XTL/Rect.h
+#include "Serialization/Serialization.h"
+#include "Serialization/ResourceSelector.h"
+#include "XTL/Rect.h"
 
-Render/src/Scene.h
-Render/src/cCamera.h
-Render/3dx/Node3dx.h
-Render/src/VisGeneric.h
+#include "Render/src/Scene.h"
+#include "Render/src/cCamera.h"
+#include "Render/3dx/Node3dx.h"
+#include "Render/src/VisGeneric.h"
 
-Environment/Environment.h
-Game/Universe.h
-Game/Player.h
+#include "Environment/Environment.h"
+#include "Game/Universe.h"
+#include "Game/Player.h"
 #include "CameraManager.h"
 
 #include "UI_Render.h"

@@ -1,9 +1,9 @@
 #ifndef __UI_GLOBAL_ATTRUBUTES_H__
 #define __UI_GLOBAL_ATTRUBUTES_H__
 
-XTL/Handle.h
-Serialization/LibraryWrapper.h
-Serialization/EnumTable.h
+#include "XTL/Handle.h"
+#include "Serialization/LibraryWrapper.h"
+#include "Serialization/EnumTable.h"
 
 #include "UI_Enums.h"
 #include "UI_Types.h"

@@ -1,11 +1,11 @@
 #ifndef __PLACE_OPERATORS_H__
 #define __PLACE_OPERATORS_H__
 
-Game/Universe.h
+#include "Game/Universe.h"
 #include "IronBuilding.h"
 #include "UnitItemResource.h"
-Terra/vMap.h
-Environment/SourceShield.h
+#include "Terra/vMap.h"
+#include "Environment/SourceShield.h"
 
 class Archive;
 

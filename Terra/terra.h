@@ -7,13 +7,13 @@
 const int MAX_SURFACE_TYPE = 256;
 //const int MAX_GEO_SURFACE_TYPE = MAX_SURFACE_TYPE;
 const int MAX_DAM_SURFACE_TYPE = MAX_SURFACE_TYPE;
-//const int SIZE_GEO_PALETTE=MAX_GEO_SURFACE_TYPE*3; // 3-это RGB
-const int SIZE_DAM_PALETTE=MAX_DAM_SURFACE_TYPE*4; // 3-это RGB
+//const int SIZE_GEO_PALETTE=MAX_GEO_SURFACE_TYPE*3; // 3-пїЅпїЅпїЅ RGB
+const int SIZE_DAM_PALETTE=MAX_DAM_SURFACE_TYPE*4; // 3-пїЅпїЅпїЅ RGB
 
-//const int MAX_SURFACE_LIGHTING =128; //максимальная освещенность поверхности от 0 до 127
-									 //старший бит идентифицирует Geo-0 или Dam-1
+//const int MAX_SURFACE_LIGHTING =128; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 0 пїЅпїЅ 127
+									 //пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Geo-0 пїЅпїЅпїЅ Dam-1
 
-const int VX_FRACTION=5; // 5 младших бит - дробь вокселя (было6)
+const int VX_FRACTION=5; // 5 пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ6)
 const int VX_FRACTION_MASK= ((1<<VX_FRACTION)-1);
 const float VOXEL_DIVIDER=1.f/(float)(1<<VX_FRACTION);
 const int VOXEL_MULTIPLIER=(1<<VX_FRACTION);
@@ -21,19 +21,25 @@ const int VOXEL_MULTIPLIER=(1<<VX_FRACTION);
 const int VX_SHIFT_VX=2;
 const int VX_FRACTION_FULL=VX_FRACTION+VX_SHIFT_VX;
 
-const int MAX_VX_HEIGHT=((1<<(VX_FRACTION + 9))-1);//это 0x3fff (512)
+const int MAX_VX_HEIGHT=((1<<(VX_FRACTION + 9))-1);//пїЅпїЅпїЅ 0x3fff (512)
 const int MIN_VX_HEIGHT=0;
 const int MAX_VX_HEIGHT_WHOLE=(MAX_VX_HEIGHT>>VX_FRACTION);
 
 
 const int MAX_RADIUS_CIRCLEARR = 210;//175;
 
-//------Атрибуты------//
+//------пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ------//
 #define VmAt_MASK (0x3)
 
 #define VmAt_Inds	(0x1)
 
 #define VmAt_Nrml (0x0)
+
+#define VmAt_GeoDam (0x2) // inferred from the 2-bit VmAt_MASK layout
+
+#define VmAt_Nrml_Geo (0x0)
+#define VmAt_Nrml_Dam (VmAt_GeoDam)
+#define VmAt_Nrml_Dam_Inds (VmAt_GeoDam|VmAt_Inds)
 
 #define Vm_IsIndestructability(D) (((D)&VmAt_Inds)!=0)
 
@@ -43,12 +49,12 @@ const int MAX_RADIUS_CIRCLEARR = 210;//175;
 #define Vm_prepHeigh4Buf(V) ((V)<<VX_SHIFT_VX )
 #define Vm_prepHeighAtr(V, A) (((V)<<VX_SHIFT_VX) | (A))
 
-//сбрасывается неразрушаемость и выравненность
+//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 #define Vm_setNormalAtr(D) ((D)& 0)
 
 
-//Сетки
-#define kmGrid (2) // Это 2^2 - сетка 4x4
+//пїЅпїЅпїЅпїЅпїЅ
+#define kmGrid (2) // пїЅпїЅпїЅ 2^2 - пїЅпїЅпїЅпїЅпїЅ 4x4
 #define sizeCellGrid (1<<kmGrid)
 
 #define TERRAIN_TYPES_NUMBER 16
@@ -65,8 +71,8 @@ const int MAX_RADIUS_CIRCLEARR = 210;//175;
 #define GRIDTST_BUILDING(V) (V&GRIDAT_BUILDING)
 #define GRIDTST_LEVELED(V) (V&GRIDAT_LEVELED)
 
-// Сетка отражения изменений на воксельной поверхности
-#define kmGridChA (6) // 2^6 -сетка 64x64
+// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+#define kmGridChA (6) // 2^6 -пїЅпїЅпїЅпїЅпїЅ 64x64
 #define sizeCellGridCA (1<<kmGridChA)
 
 //#define ConvertTry2HighColor(c) ( ((((c)&0xff0000)+0x040000>>16+3)<<11) | ((((c)&0x00ff00)+ 0x0200>>8+2)<<5) | ((((c)&0xff)+0x04>>0+3)<<0) )

@@ -2,16 +2,16 @@
 #define __UI_LOGIC_H__
 
 #include "Handle.h"
-Network/NetPlayer.h
-XTL/SwapVector.h
+#include "Network/NetPlayer.h"
+#include "XTL/SwapVector.h"
 #include "ProfileManager.h"
 #include "Controls.h"
 #include "UI_Enums.h"
 #include "UI_MarkObject.h"
 #include "UI_Inventory.h"
 #include "Installer.h"
-Units/CircleManagerParam.h
-Units/WeaponTarget.h
+#include "Units/CircleManagerParam.h"
+#include "Units/WeaponTarget.h"
 
 class WeaponPrm;
 
@@ -39,9 +39,9 @@ class UI_ActionDataHoverInfo;
 class UI_NetCenter;
 class ChatMessage;
 
-enum eNetMessageCode;
+enum eNetMessageCode : int;
 
-enum DirectControlMode;
+enum DirectControlMode : int;
 
 struct ExpandInfo
 {
@@ -94,8 +94,8 @@ public:
 	void setSelectedUnitIfOne(UnitInterface* unit) { selectedUnitIfOne_ = unit; }
 	UnitInterface* selectedUnitIfOne() const { return selectedUnitIfOne_; }
 
-	/// обработка ввода с клавиатуры или мыши
-	/// возвращает true, если событие обработано
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ true, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	bool handleInput(const UI_InputEvent& event);
 
 	void handleMessage(const ControlMessage& msg);
@@ -105,7 +105,7 @@ public:
 
 	void updateAimPosition();
 	
-	/// вызывается когда событие \a event обработано контролом \a control
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ \a event пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ \a control
 	void inputEventProcessed(const UI_InputEvent& event, UI_ControlBase* control);
 	void focusControlProcess(const UI_ControlBase* lastHovered);
 
@@ -118,7 +118,7 @@ public:
 	void setInputEventFlag(UI_InputEventID id){ inputFlags_ |= (1 << id); }
 	void clearInputEventFlags(){ inputFlags_ = 0; }
 
-	/// добавление пометки на мире
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ
 	void addMark(const UI_MarkObjectInfo& inf);
 	void addMovementMark();
 	void updateLinkToCursor(const cObject3dx* model, int index, const EffectAttribute& effect);
@@ -129,16 +129,16 @@ public:
 	void addUnitOffscreenSprite(const UnitObjective* unit);
 	void drawUnitSideSprites();
 
-	/// работа с мышью
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
 	const Vect2f& mousePosition() const { return mousePosition_; }
 	void setMousePosition(const Vect2f& pos) { mousePosition_ = pos; }
 	bool isMouseFlagSet(ActionFlags flags) const { return ((mouseFlags_ & flags) != 0); }
 	ActionModeModifer modifiers() const { return (isMouseFlagSet(MK_SHIFT) ? UI_MOUSE_MODIFER_SHIFT : 0) |( isMouseFlagSet(UI_InputEvent::MK_MENU) ? UI_MOUSE_MODIFER_ALT : 0) | ( isMouseFlagSet(MK_CONTROL) ? UI_MOUSE_MODIFER_CTRL : 0); }
 
-	/// Курсорный интерфейс
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	const UI_Cursor* activeCursor() const { return activeCursor_; }
 	bool cursorVisible() const { return cursorVisible_; }
-	void selectCursor(const UI_Cursor* cameraCursor); // подбор курсора для текущего кадра
+	void selectCursor(const UI_Cursor* cameraCursor); // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	void setCursor(const UI_Cursor* cursor);
 	void showCursor();
 	void hideCursor();
@@ -165,8 +165,8 @@ public:
 
 	bool releaseResources();
 
-	/// добавление источника света в 3D модель
-	/// position - мировые координаты, внутри пересчитываются в координаты сцены 3D модели
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ 3D пїЅпїЅпїЅпїЅпїЅпїЅ
+	/// position - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 3D пїЅпїЅпїЅпїЅпїЅпїЅ
 	bool addLight(int light_index, const Vect3f& position) const;
 
 	void selectClickMode(UI_ClickModeID mode_id, const WeaponPrm* selected_weapon = 0);
@@ -180,10 +180,10 @@ public:
 
 	bool drawSelection(const Vect2f& v0, const Vect2f& v1) const;
 
-	/// Эффект под курсором
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	void createCursorEffect();
 	void moveCursorEffect();
-	/// Работает ли еще триггер, установивший курсор
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	bool cursorTriggered() const { return cursorTriggered_; }
 	void toggleCursorTriggered(bool val){ cursorTriggered_ = val; }
 
@@ -202,7 +202,7 @@ public:
 	void resetCurrentMission();
 	MissionDescription* currentMission() const;
 	bool useMapSetings() const { return currentMission() ? currentMission()->useMapSettings() : false; }
-	/// старт выбранной миссии
+	/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	void missionStart();
 	void missionReStart();
 
@@ -256,8 +256,8 @@ public:
 	bool parseGameVersion(const char* updates);
 	bool checkNeedUpdate() const;
 	void openUpdateUrl() const;
-	/// вызывается при необходммости заменить входящие в строку
-	/// шаблонные последовательности: {name} на значения
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: {name} пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	void expandTextTemplate(wstring& text, const ExpandInfo& info);
 	const wchar_t* getParam(const wchar_t* name, const ExpandInfo& info, WBuffer& retBuf);
 
@@ -283,21 +283,21 @@ public:
 	void clearGameChat();
 
 private:
-	/// относительные координаты мышиного курсора
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	/**
-	отсчитываются от верхнего левого угла экрана (0, 0),
-	(1, 1) соответствует правому нижнему углу экрана
+	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (0, 0),
+	(1, 1) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	*/
 	Vect2f mousePosition_;
 	ActionFlags mouseFlags_;
-	/// Курсор интерфейса
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	const UI_Cursor* activeCursor_;
-	/// Видим ли курсор
+	/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	bool cursorVisible_;
 
 	int inputFlags_;
 
-	/// разрешена ли обработка ввода
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	bool enableInput_;
 	bool gamePause_;
 
@@ -306,13 +306,13 @@ private:
 
 	BuildingInstaller buildingInstaller_;
 
-	/// список профилей и текущий профиль
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	ProfileManager profiles_;
 	
 	TeamGameType currentTeemGametype_;
 	MissionDescription selectedMission_;
 
-	/// поддержка загрузки и отображения списка миссий с диска
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
 	MissionDescriptions missions_;
 	GUIDcontainer quickStartMissions_;
 	GameType getGameType(const UI_ActionDataSaveGameList& data);
@@ -335,16 +335,16 @@ private:
 
 	void buildRaceList(UI_ControlBase* control, int selected, bool withAny = false);
 
-	/// режим отдачи команды после клика по миру - идти, атаковать и т.п.
+	/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅ.пїЅ.
 	UI_ClickModeID clickMode_;
 	UI_ClickModeID cachedClickMode_;
 	bool clearClickMode_;
-	/// оружие, для которого указывается цель
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	const WeaponPrm* selectedWeapon_;
 	int cachedWeaponID_;
-	/// координаты прошлого нажатия левой кнопки мыши
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	Vect2f mousePressPos_;
-	/// true при селекте прямоугольником
+	/// true пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	bool trackMode_;
 
 	const UI_ControlHotKeyInput* lastHotKeyInput_;
@@ -416,23 +416,23 @@ private:
 
 	const UI_Cursor* currentWeaponCursor_;
 
-	/// контекстное применение клика
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	bool clickAction(UI_ClickModeID clMode, int weaponID, UnitInterface* unit, bool shiftPressed);
-	/// обработка клика по миру
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ
 	bool clickAction(bool shiftPressed, bool byMinimap);
 
-	/// текущее состояние кнопки атаки
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	bool currentClickAttackState_;
-	/// количество квантов со времени отсылки координат
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	unsigned short attackCoordTime_;
 
-	/// ожидающая подтверждения операция - перезапись сэйва или реплея и т.п.
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅ.пїЅ.
 	UI_DiskOpID diskOpID_;
-	/// true, если игрок разрешил операцию
+	/// true, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	bool diskOpConfirmed_;
-	/// имя файла для операции
+	/// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	std::string diskOpPath_;
-	/// тип игры для операции
+	/// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	GameType diskOpGameType_;
 
 	const Vect3f& cursorPosition() const;

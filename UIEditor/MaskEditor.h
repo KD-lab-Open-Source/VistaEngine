@@ -1,7 +1,7 @@
 #ifndef __MASK_EDITOR_H_INCLUDED__
 #define __MASK_EDITOR_H_INCLUDED__
 
-XTL/Rect.h
+#include "XTL/Rect.h"
 
 class UI_Mask;
 

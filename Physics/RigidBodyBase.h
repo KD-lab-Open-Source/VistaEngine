@@ -3,11 +3,12 @@
 
 #include "RigidBodyPrm.h"
 #include "Geom.h"
-Serialization/Factory.h
+#include "Colors.h"
+#include "Serialization/Factory.h"
 
 ///////////////////////////////////////////////////////////////
 
-enum RigidBodyType
+enum RigidBodyType : int
 {
 	RIGID_BODY_BASE,
 	RIGID_BODY_ENVIRONMENT,
@@ -194,18 +195,18 @@ public:
 	bool isBox() const { return rigidBodyType_ == RIGID_BODY_BOX; }
 	bool isUnitRagDoll() const { return rigidBodyType_ == RIGID_BODY_UNIT_RAG_DOLL; }
 	///////////////////////////////////////////////////////////
-	//	Проверка поверхностей.
+	//	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	///////////////////////////////////////////////////////////
 	virtual bool checkImpassability(const Vect2f& pos) const { return true; }
 	///////////////////////////////////////////////////////////
-	//	2D функции обработки пересечений. Используются в PT.
+	//	2D пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ PT.
 	///////////////////////////////////////////////////////////
 	void setBoundCheck(bool boundCheck) { ptBoundCheck_ = boundCheck; }
 	bool ptBoundCheck() const { return ptBoundCheck_; }
 	bool bodyIntersect(const RigidBodyBase* body, const Vect2f& bodyPosition, const Mat2f& bodyOrientation);
 	// States
-	bool groundColliding() const { return (colliding_ & GROUND_COLLIDING) != 0; } // сталкивается, стоит на земле
-	bool waterColliding() const { return (colliding_ & WATER_COLLIDING) != 0; } // сталкивается, стоит на воде
+	bool groundColliding() const { return (colliding_ & GROUND_COLLIDING) != 0; } // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	bool waterColliding() const { return (colliding_ & WATER_COLLIDING) != 0; } // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ
 	// Debug info
 	virtual void show();
 
@@ -261,7 +262,7 @@ public:
 	void initPose(const Se3f& pose);
 	bool evolve(float dt);
 	void setRadius(float radiusNew);
-	void setPointAreaAnalize() { pointAreaAnalize_ = true; } // Принудительное включение точечного анализа поверхности.
+	void setPointAreaAnalize() { pointAreaAnalize_ = true; } // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	void setHoldOrientation(bool verticalOrientation) { holdOrientation_ = true; verticalOrientation_ = verticalOrientation;}
 	float angleZ() { return angle_; }
 	void setAngleZ(float angle) { angle_ = angle; }
@@ -270,7 +271,7 @@ private:
 	void placeToGround();
 
 	float angle_;
-	bool pointAreaAnalize_; // true - принудительный точечный анализ поверхности.
+	bool pointAreaAnalize_; // true - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	bool holdOrientation_;
 	bool verticalOrientation_;
 };

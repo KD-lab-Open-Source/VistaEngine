@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "ConstraintHandlerSimple.h"
-XMath/SafeMath.h
+#include "XMath/SafeMath.h"
 
 ContactSimple::ContactSimple(const Vect3f& point, const Vect3f& normal, RigidBodyPhysics* body0, float penetration)
 {

@@ -8,9 +8,9 @@
 #include "NParticleID.h"
 #include "TileMap.h"
 #include "FileRead.h"
-Serialization/Serialization.h
-XMath/SafeMath.h
-FileUtils/FileUtils.h
+#include "Serialization/Serialization.h"
+#include "XMath/SafeMath.h"
+#include "FileUtils/FileUtils.h"
 
 bool enableMirage = false;
 static vector<Vect2f> rotate_angle;

@@ -1,6 +1,6 @@
 #pragma once
 
-Terra/terra.h
+#include "Terra/terra.h"
 
 class ScanningShape
 {

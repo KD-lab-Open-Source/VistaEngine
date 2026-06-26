@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #define _NOSTD_
-parse/ParamParse.h
+#include "parse/ParamParse.h"
 #include <stdlib.h>
 #include <conio.h>
 #include "MessageBlock.h"

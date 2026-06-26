@@ -1,8 +1,8 @@
 #ifndef __UNDODISPATCHER_H__
 #define __UNDODISPATCHER_H__
 
-Render/src/MultiRegion.h
-extern int UNDO_REDO_BUFFER_SIZE; //Текущий размер буфера в SurMap пикселах
+#include "Render/src/MultiRegion.h"
+extern int UNDO_REDO_BUFFER_SIZE; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ SurMap пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 const static int SIZE_SUPA_CELL=3;
 
 struct sPreChangedArea {
@@ -50,8 +50,8 @@ struct sPreChangedArea {
 		if(donor.mRegion)
 			putMultiRegion(donor.mRegion);
 	}
-	void prepare4Operation(sRect& _chArea, unsigned int _idxPMO, bool saveVx, bool saveRGB, struct sBasePMOperation* _pmo){
-		xassert(simpleChAreaList.empty()); //Должен быть пустым !
+	void prepare4Operation(const sRect& _chArea, unsigned int _idxPMO, bool saveVx, bool saveRGB, struct sBasePMOperation* _pmo){
+		xassert(simpleChAreaList.empty()); //пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ !
 		simpleChAreaList.push_back(_chArea);
 		sizeArea=_chArea.sx*_chArea.sy;
 		UNDO_REDO_BUFFER_SIZE+=sizeArea;
@@ -67,7 +67,7 @@ struct sPreChangedArea {
 		pmo=_pmo;
 	};
 	void prepare4Operation(list<sRect>& _chAreaList, unsigned int _idxPMO, bool saveVx, bool saveRGB, struct sBasePMOperation* _pmo){
-		xassert(simpleChAreaList.empty()); //Должен быть пустым !
+		xassert(simpleChAreaList.empty()); //пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ !
 		simpleChAreaList.insert(simpleChAreaList.begin(), _chAreaList.begin(), _chAreaList.end());//.insert(simpleChAreaList.begin, _chAreaList);
 		sizeArea=0;
 		vector<sRect>::iterator p;

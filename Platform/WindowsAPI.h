@@ -38,6 +38,7 @@ typedef float     FLOAT;
 
 // ─── Character / string types ─────────────────────────────────────────────────
 typedef char      CHAR;
+typedef unsigned char UCHAR;
 typedef wchar_t   WCHAR;
 typedef char      TCHAR;
 typedef char*     LPSTR;
@@ -70,6 +71,7 @@ typedef void* HPEN;
 typedef void* HFONT;
 typedef void* HGDIOBJ;
 typedef void* HKEY;
+typedef void* HIMAGELIST;
 typedef HANDLE HFILE;
 typedef HANDLE HRSRC;
 typedef HANDLE HGLOBAL;
@@ -309,6 +311,15 @@ struct MSG {
 #define WM_RBUTTONDOWN 0x0204
 #define WM_SIZE        0x0005
 
+// Mouse-key state flags (winuser.h); used by UI input handling.
+#define MK_LBUTTON  0x0001
+#define MK_RBUTTON  0x0002
+#define MK_SHIFT    0x0004
+#define MK_CONTROL  0x0008
+#define MK_MBUTTON  0x0010
+
+typedef LRESULT (*WNDPROC)(HWND, UINT, WPARAM, LPARAM);
+
 inline BOOL    PeekMessage(MSG*, HWND, UINT, UINT, UINT) { return FALSE; }
 inline BOOL    GetMessage(MSG*, HWND, UINT, UINT)         { return FALSE; }
 inline BOOL    TranslateMessage(const MSG*)               { return FALSE; }
@@ -317,8 +328,13 @@ inline void    PostQuitMessage(int)                       {}
 inline HWND    GetForegroundWindow()                      { return nullptr; }
 inline BOOL    SetForegroundWindow(HWND)                  { return TRUE; }
 
+// ─── System-identity stubs ────────────────────────────────────────────────────
+#define MAX_COMPUTERNAME_LENGTH 15
+inline BOOL GetComputerName(LPSTR buf, DWORD* size) { if(buf && size && *size) buf[0] = 0; return FALSE; }
+inline BOOL GetUserName(LPSTR buf, DWORD* size)     { if(buf && size && *size) buf[0] = 0; return FALSE; }
+
 // ─── Critical section stubs ───────────────────────────────────────────────────
-struct CRITICAL_SECTION { pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER; };
+struct CRITICAL_SECTION { pthread_mutex_t mutex; };
 inline void InitializeCriticalSection(CRITICAL_SECTION* cs) { pthread_mutex_init(&cs->mutex, nullptr); }
 inline void DeleteCriticalSection(CRITICAL_SECTION* cs)     { pthread_mutex_destroy(&cs->mutex); }
 inline void EnterCriticalSection(CRITICAL_SECTION* cs)      { pthread_mutex_lock(&cs->mutex); }
@@ -349,6 +365,260 @@ inline LONG RegCloseKey(HKEY) { return 0; }
 inline LONG RegSetValueExA(HKEY, const char*, DWORD, DWORD, const BYTE*, DWORD) { return 1; }
 inline LONG RegCreateKeyExA(HKEY, const char*, DWORD, char*, DWORD, DWORD, void*, PHKEY, DWORD*) { return 1; }
 
+// ─── argv / command line ─────────────────────────────────────────────────────
+#if defined(__APPLE__)
+#  include <crt_externs.h>
+#  define __argv (*_NSGetArgv())
+#  define __argc (*_NSGetArgc())
+#elif defined(__linux__)
+   extern char** __argv;
+   extern int    __argc;
+#endif
+
+// ─── MSVC integer type aliases ───────────────────────────────────────────────
+#ifndef __int64
+#  define __int64 long long
+#endif
+typedef long long          __int64_t;
+typedef unsigned long long __uint64_t;
+
+// ─── LARGE_INTEGER ────────────────────────────────────────────────────────────
+union LARGE_INTEGER {
+    struct { DWORD LowPart; LONG HighPart; } u;
+    LONGLONG QuadPart;
+};
+inline BOOL QueryPerformanceCounter(LARGE_INTEGER* c) {
+    using namespace std::chrono;
+    c->QuadPart = (LONGLONG)duration_cast<nanoseconds>(steady_clock::now().time_since_epoch()).count();
+    return TRUE;
+}
+inline BOOL QueryPerformanceFrequency(LARGE_INTEGER* f) {
+    f->QuadPart = 1000000000LL; return TRUE;
+}
+
+// ─── Additional file / path API ───────────────────────────────────────────────
+#include <dirent.h>
+#include <libgen.h>
+
+#define FILE_FLAG_RANDOM_ACCESS  0x10000000
+#define FILE_FLAG_SEQUENTIAL_SCAN 0x08000000
+
+inline HANDLE CreateFileA(const char* path, DWORD access, DWORD, void*, DWORD creation, DWORD, HANDLE) {
+    const char* mode = (access & GENERIC_WRITE) ? "r+b" : "rb";
+    if (creation == CREATE_ALWAYS) mode = "w+b";
+    else if (creation == CREATE_NEW) mode = "w+bx";
+    FILE* f = fopen(path, mode);
+    return f ? (HANDLE)f : INVALID_HANDLE_VALUE;
+}
+#define CreateFile CreateFileA
+
+inline BOOL ReadFile(HANDLE h, void* buf, DWORD n, DWORD* read, void*) {
+    size_t r = fread(buf, 1, n, (FILE*)h);
+    if (read) *read = (DWORD)r;
+    return r > 0 || n == 0;
+}
+inline BOOL WriteFile(HANDLE h, const void* buf, DWORD n, DWORD* written, void*) {
+    size_t w = fwrite(buf, 1, n, (FILE*)h);
+    if (written) *written = (DWORD)w;
+    return w == n;
+}
+inline BOOL CloseFileHandle(HANDLE h) { return fclose((FILE*)h) == 0; }
+
+#define GetFileSize(h, high) ((DWORD)({ long p=ftell((FILE*)(h)); fseek((FILE*)(h),0,SEEK_END); long s=ftell((FILE*)(h)); fseek((FILE*)(h),p,SEEK_SET); if(high)*(DWORD*)(high)=0; s; }))
+
+inline char* _fullpath(char* absPath, const char* relPath, size_t) {
+    return realpath(relPath, absPath);
+}
+
+inline void _splitpath(const char* path, char* drive, char* dir, char* fname, char* ext) {
+    if (drive) drive[0] = '\0';
+    char tmp[MAX_PATH]; strncpy(tmp, path, MAX_PATH-1); tmp[MAX_PATH-1]='\0';
+    if (dir)   { char* d = dirname(tmp);  strncpy(dir, d, MAX_PATH); strncat(dir, "/", MAX_PATH); }
+    strncpy(tmp, path, MAX_PATH-1);
+    if (fname) { char* b = basename(tmp); char* dot = strrchr(b, '.'); size_t n = dot ? (size_t)(dot-b) : strlen(b); strncpy(fname, b, n); fname[n] = '\0'; }
+    strncpy(tmp, path, MAX_PATH-1);
+    if (ext)   { char* b = basename(tmp); char* dot = strrchr(b, '.'); strncpy(ext, dot ? dot : "", MAX_PATH); }
+}
+
+#define _makepath(path,d,dir,fn,ext) snprintf(path,MAX_PATH,"%s%s%s%s",(dir)?(dir):"",(fn)?(fn):"",(ext)?(ext):"","")
+
+inline DWORD GetCurrentDirectoryA(DWORD n, char* buf) {
+    return getcwd(buf, n) ? (DWORD)strlen(buf) : 0;
+}
+#define GetCurrentDirectory GetCurrentDirectoryA
+
+#define strlwr _strlwr
+
+// ─── WIN32 find file (directory iteration) ────────────────────────────────────
+struct FILETIME { DWORD dwLowDateTime; DWORD dwHighDateTime; };
+
+struct WIN32_FIND_DATAA {
+    DWORD    dwFileAttributes;
+    FILETIME ftCreationTime;
+    FILETIME ftLastAccessTime;
+    FILETIME ftLastWriteTime;
+    DWORD    nFileSizeHigh;
+    DWORD    nFileSizeLow;
+    DWORD    dwReserved0;
+    DWORD    dwReserved1;
+    char     cFileName[MAX_PATH];
+    char     cAlternateFileName[14];
+};
+typedef WIN32_FIND_DATAA WIN32_FIND_DATA;
+
+struct _FindContext { DIR* dir; char pattern[MAX_PATH]; char path[MAX_PATH]; };
+
+inline HANDLE FindFirstFileA(const char* pattern, WIN32_FIND_DATAA* fd) {
+    char dir_path[MAX_PATH]; strncpy(dir_path, pattern, MAX_PATH-1);
+    char* slash = strrchr(dir_path, '/'); if (!slash) slash = strrchr(dir_path, '\\');
+    if (slash) *slash = '\0'; else { dir_path[0]='.'; dir_path[1]='\0'; }
+    DIR* d = opendir(dir_path);
+    if (!d) return INVALID_HANDLE_VALUE;
+    auto* ctx = new _FindContext; ctx->dir = d;
+    strncpy(ctx->path, dir_path, MAX_PATH-1);
+    struct dirent* ent;
+    while ((ent = readdir(d)) != nullptr) {
+        if (ent->d_name[0] == '.') continue;
+        strncpy(fd->cFileName, ent->d_name, MAX_PATH-1);
+        fd->dwFileAttributes = (ent->d_type == DT_DIR) ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL;
+        fd->nFileSizeHigh = fd->nFileSizeLow = 0;
+        return (HANDLE)ctx;
+    }
+    closedir(d); delete ctx; return INVALID_HANDLE_VALUE;
+}
+#define FindFirstFile FindFirstFileA
+
+inline BOOL FindNextFileA(HANDLE h, WIN32_FIND_DATAA* fd) {
+    if (h == INVALID_HANDLE_VALUE) return FALSE;
+    auto* ctx = (_FindContext*)h;
+    struct dirent* ent;
+    while ((ent = readdir(ctx->dir)) != nullptr) {
+        if (ent->d_name[0] == '.') continue;
+        strncpy(fd->cFileName, ent->d_name, MAX_PATH-1);
+        fd->dwFileAttributes = (ent->d_type == DT_DIR) ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL;
+        fd->nFileSizeHigh = fd->nFileSizeLow = 0;
+        return TRUE;
+    }
+    return FALSE;
+}
+#define FindNextFile FindNextFileA
+
+inline BOOL FindCloseHandle(HANDLE h) {
+    if (h == INVALID_HANDLE_VALUE) return FALSE;
+    auto* ctx = (_FindContext*)h;
+    closedir(ctx->dir); delete ctx; return TRUE;
+}
+#define FindClose FindCloseHandle
+
+// ─── SYSTEMTIME ───────────────────────────────────────────────────────────────
+struct SYSTEMTIME {
+    WORD wYear, wMonth, wDayOfWeek, wDay;
+    WORD wHour, wMinute, wSecond, wMilliseconds;
+};
+inline void GetLocalTime(SYSTEMTIME* st) {
+    time_t t = time(nullptr); struct tm* tm = localtime(&t);
+    st->wYear = tm->tm_year + 1900; st->wMonth = tm->tm_mon + 1;
+    st->wDay = tm->tm_mday; st->wDayOfWeek = tm->tm_wday;
+    st->wHour = tm->tm_hour; st->wMinute = tm->tm_min;
+    st->wSecond = tm->tm_sec; st->wMilliseconds = 0;
+}
+inline void GetSystemTime(SYSTEMTIME* st) {
+    time_t t = time(nullptr); struct tm* tm = gmtime(&t);
+    st->wYear = tm->tm_year + 1900; st->wMonth = tm->tm_mon + 1;
+    st->wDay = tm->tm_mday; st->wDayOfWeek = tm->tm_wday;
+    st->wHour = tm->tm_hour; st->wMinute = tm->tm_min;
+    st->wSecond = tm->tm_sec; st->wMilliseconds = 0;
+}
+#include <time.h>
+
+// ─── File seek/time constants ─────────────────────────────────────────────────
+#define FILE_BEGIN    0
+#define FILE_CURRENT  1
+#define FILE_END      2
+
+inline DWORD SetFilePointer(HANDLE h, LONG dist, LONG* distHigh, DWORD method) {
+    int whence = (method == FILE_BEGIN) ? SEEK_SET : (method == FILE_CURRENT) ? SEEK_CUR : SEEK_END;
+    if (fseek((FILE*)h, dist, whence) != 0) return (DWORD)-1;
+    return (DWORD)ftell((FILE*)h);
+}
+
+inline BOOL GetFileTime(HANDLE, FILETIME*, FILETIME*, FILETIME*) { return FALSE; }
+inline BOOL FileTimeToDosDateTime(const FILETIME*, WORD* date, WORD* time_) {
+    if (date) *date = 0; if (time_) *time_ = 0; return FALSE;
+}
+
+#define DeleteFile(path)   (remove(path) == 0)
+#define DeleteFileA(path)  (remove(path) == 0)
+
+// ─── File time stubs ──────────────────────────────────────────────────────────
+inline void GetSystemTimeAsFileTime(FILETIME* ft) {
+    struct timespec ts; clock_gettime(CLOCK_REALTIME, &ts);
+    // Convert POSIX time to Windows FILETIME (100ns intervals since 1601-01-01)
+    uint64_t v = (uint64_t)ts.tv_sec * 10000000ULL + ts.tv_nsec / 100 + 116444736000000000ULL;
+    ft->dwLowDateTime  = (DWORD)(v & 0xFFFFFFFF);
+    ft->dwHighDateTime = (DWORD)(v >> 32);
+}
+inline BOOL DosDateTimeToFileTime(WORD /*date*/, WORD /*time_*/, FILETIME* ft) {
+    if (ft) { ft->dwLowDateTime = 0; ft->dwHighDateTime = 0; } return FALSE;
+}
+inline LONG CompareFileTime(const FILETIME* a, const FILETIME* b) {
+    if (a->dwHighDateTime != b->dwHighDateTime)
+        return a->dwHighDateTime < b->dwHighDateTime ? -1 : 1;
+    if (a->dwLowDateTime != b->dwLowDateTime)
+        return a->dwLowDateTime < b->dwLowDateTime ? -1 : 1;
+    return 0;
+}
+inline BOOL FileTimeToSystemTime(const FILETIME* ft, SYSTEMTIME* st) {
+    uint64_t v = ((uint64_t)ft->dwHighDateTime << 32) | ft->dwLowDateTime;
+    if (v < 116444736000000000ULL) { memset(st, 0, sizeof(*st)); return FALSE; }
+    time_t t = (time_t)((v - 116444736000000000ULL) / 10000000ULL);
+    struct tm* tm = gmtime(&t);
+    if (!tm) { memset(st, 0, sizeof(*st)); return FALSE; }
+    st->wYear = tm->tm_year + 1900; st->wMonth = tm->tm_mon + 1;
+    st->wDay = tm->tm_mday; st->wDayOfWeek = tm->tm_wday;
+    st->wHour = tm->tm_hour; st->wMinute = tm->tm_min;
+    st->wSecond = tm->tm_sec; st->wMilliseconds = 0;
+    return TRUE;
+}
+inline BOOL SystemTimeToTzSpecificLocalTime(void* /*tz*/, const SYSTEMTIME* src, SYSTEMTIME* dst) {
+    if (dst) *dst = *src; return TRUE;
+}
+
+// ─── Directory / file operations ──────────────────────────────────────────────
+#include <sys/stat.h>
+#include <unistd.h>
+inline BOOL CreateDirectoryA(const char* path, void*) {
+    return mkdir(path, 0755) == 0 ? TRUE : FALSE;
+}
+#ifndef CreateDirectory
+#  define CreateDirectory CreateDirectoryA
+#endif
+inline BOOL RemoveDirectoryA(const char* path) { return rmdir(path) == 0 ? TRUE : FALSE; }
+#ifndef RemoveDirectory
+#  define RemoveDirectory RemoveDirectoryA
+#endif
+inline BOOL SetCurrentDirectoryA(const char* path) { return chdir(path) == 0 ? TRUE : FALSE; }
+#ifndef SetCurrentDirectory
+#  define SetCurrentDirectory SetCurrentDirectoryA
+#endif
+
+// ─── String utilities ─────────────────────────────────────────────────────────
+#include <cctype>
+inline char* strupr(char* s) {
+    for (char* p = s; *p; ++p) *p = (char)toupper((unsigned char)*p);
+    return s;
+}
+
+// ─── COM / GUID generation ────────────────────────────────────────────────────
+inline HRESULT CoCreateGuid(GUID* g) {
+    if (!g) return E_POINTER;
+    FILE* f = fopen("/dev/urandom", "rb");
+    if (f) { fread(g, 1, sizeof(GUID), f); fclose(f); }
+    else    memset(g, 0, sizeof(GUID));
+    return S_OK;
+}
+#define objbase_h  // prevent <objbase.h> include
+
 // ─── Pragma warning (ignore MSVC-specific pragmas) ───────────────────────────
 #define PRAGMA_WARNING_PUSH
 #define PRAGMA_WARNING_POP
@@ -357,5 +627,129 @@ inline LONG RegCreateKeyExA(HKEY, const char*, DWORD, char*, DWORD, DWORD, void*
 #ifndef MDebugBreak
 #  define MDebugBreak() __builtin_trap()
 #endif
+
+// ─── xassert (project-wide assertion) ────────────────────────────────────────
+#include <cassert>
+#ifndef xassert
+#  define xassert(e) assert(e)
+#endif
+
+// ─── MSVC function-signature predefined macro ─────────────────────────────────
+#ifndef __FUNCSIG__
+#  define __FUNCSIG__ __PRETTY_FUNCTION__
+#endif
+
+// ─── MessageBox constants and stub ───────────────────────────────────────────
+#define MB_OK                0x00000000
+#define MB_OKCANCEL          0x00000001
+#define MB_YESNO             0x00000004
+#define MB_RETRYCANCEL       0x00000005
+#define MB_ICONHAND          0x00000010
+#define MB_ICONERROR         0x00000010
+#define MB_ICONQUESTION      0x00000020
+#define MB_ICONEXCLAMATION   0x00000030
+#define MB_ICONWARNING       0x00000030
+#define MB_ICONINFORMATION   0x00000040
+#define IDOK     1
+#define IDCANCEL 2
+#define IDABORT  3
+#define IDRETRY  4
+#define IDIGNORE 5
+#define IDYES    6
+#define IDNO     7
+inline int MessageBoxA(HWND, const char*, const char*, UINT) { return IDOK; }
+inline int MessageBoxW(HWND, const wchar_t*, const wchar_t*, UINT) { return IDOK; }
+#define MessageBox MessageBoxA
+
+// ─── Additional window messages ───────────────────────────────────────────────
+#define WM_USER  0x0400
+#define WM_APP   0x8000
+
+// ─── Code page constants ──────────────────────────────────────────────────────
+#define CP_ACP   0
+#define CP_OEMCP 1
+#define CP_UTF8  65001
+
+// ─── Unicode conversion stubs ─────────────────────────────────────────────────
+#include <cwchar>
+#include <clocale>
+inline int MultiByteToWideChar(UINT, DWORD, const char* src, int, wchar_t* dst, int dstLen) {
+    if (!dst) return (int)strlen(src) + 1;
+    return (int)mbstowcs(dst, src, (size_t)dstLen);
+}
+inline int WideCharToMultiByte(UINT, DWORD, const wchar_t* src, int, char* dst, int dstLen, const char*, BOOL*) {
+    if (!dst) return (int)wcslen(src) + 1;
+    return (int)wcstombs(dst, src, (size_t)dstLen);
+}
+
+// Prevent xutil.h's xxassert from using MSVC __asm { int 3 } on non-Windows.
+// With NASSERT defined xutil.h takes the else branch (empty xassert macros).
+#ifndef NASSERT
+#define NASSERT
+#endif
+
+// ─── Prevent xutil.h from defining asm-based round() which clashes with <cmath> ─
+#include <cmath>
+#ifndef __ROUND__
+#  define __ROUND__
+#endif
+
+// ─── sqr<T> helper (also in xutil.h; safe to define here first) ──────────────
+template<class T> inline T sqr(const T& x) { return x * x; }
+
+// ─── Color extraction macros (Windows COLORREF helpers) ───────────────────────
+#define GetRValue(rgb)  ((BYTE)(rgb))
+#define GetGValue(rgb)  ((BYTE)((WORD)(rgb) >> 8))
+#define GetBValue(rgb)  ((BYTE)((rgb) >> 16))
+
+// ─── Virtual key codes ────────────────────────────────────────────────────────
+#define VK_LBUTTON   0x01
+#define VK_RBUTTON   0x02
+#define VK_CANCEL    0x03
+#define VK_MBUTTON   0x04
+#define VK_BACK      0x08
+#define VK_TAB       0x09
+#define VK_RETURN    0x0D
+#define VK_SHIFT     0x10
+#define VK_CONTROL   0x11
+#define VK_MENU      0x12
+#define VK_PAUSE     0x13
+#define VK_CAPITAL   0x14
+#define VK_ESCAPE    0x1B
+#define VK_SPACE     0x20
+#define VK_PRIOR     0x21
+#define VK_NEXT      0x22
+#define VK_END       0x23
+#define VK_HOME      0x24
+#define VK_LEFT      0x25
+#define VK_UP        0x26
+#define VK_RIGHT     0x27
+#define VK_DOWN      0x28
+#define VK_INSERT    0x2D
+#define VK_DELETE    0x2E
+#define VK_F1        0x70
+#define VK_F2        0x71
+#define VK_F3        0x72
+#define VK_F4        0x73
+#define VK_F5        0x74
+#define VK_F6        0x75
+#define VK_F7        0x76
+#define VK_F8        0x77
+#define VK_F9        0x78
+#define VK_F10       0x79
+#define VK_F11       0x7A
+#define VK_F12       0x7B
+#define VK_NUMPAD0   0x60
+#define VK_NUMPAD9   0x69
+#define VK_MULTIPLY  0x6A
+#define VK_ADD       0x6B
+#define VK_SUBTRACT  0x6D
+#define VK_DECIMAL   0x6E
+#define VK_DIVIDE    0x6F
+
+inline SHORT GetAsyncKeyState(int) { return 0; }
+
+// MSVC CRT extension: checks if c is a valid C identifier character
+inline int __iscsym(int c) { return (c >= 0 && c <= 127) && (isalnum(c) || c == '_'); }
 
 #endif // !_WIN32

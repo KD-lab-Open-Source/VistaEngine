@@ -1,7 +1,9 @@
 #include "stdafx.h"
-#include <objbase.h>
-FileUtils/XGUID.h
-Serialization/Serialization.h
+#ifdef _WIN32
+#  include <objbase.h>
+#endif
+#include "FileUtils/XGUID.h"
+#include "Serialization/Serialization.h"
 
 static const GUID gz = {0, 0, 0, {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}};
 const XGUID XGUID::ZERO = gz;

@@ -9,39 +9,39 @@
 #include "BaseUniverseObject.h"
 #include "Console.h"
 #include "ConsoleWindow.h"
-Water/Water.h
-VistaRender/postEffects.h
-Environment/Environment.h
-Environment/SourceManager.h
-Game/SoundApp.h
-Game/Universe.h
-Game/CameraManager.h
-Game/RenderObjects.h
-UserInterface/UserInterface.h
-UserInterface/UI_Render.h
-UserInterface/UI_BackgroundScene.h
-UserInterface/UI_Minimap.h
-Game/GameOptions.h
-Render/Src/TileMap.h
-Render/Src/Scene.h
-Render/Src/VisGeneric.h
+#include "Water/Water.h"
+#include "VistaRender/postEffects.h"
+#include "Environment/Environment.h"
+#include "Environment/SourceManager.h"
+#include "Game/SoundApp.h"
+#include "Game/Universe.h"
+#include "Game/CameraManager.h"
+#include "Game/RenderObjects.h"
+#include "UserInterface/UserInterface.h"
+#include "UserInterface/UI_Render.h"
+#include "UserInterface/UI_BackgroundScene.h"
+#include "UserInterface/UI_Minimap.h"
+#include "Game/GameOptions.h"
+#include "Render/Src/TileMap.h"
+#include "Render/Src/Scene.h"
+#include "Render/Src/VisGeneric.h"
 #include "SelectionUtil.h"
 #include "SurMapOptions.h"
 #include "SurToolSelect.h"
 #include "SurToolSource.h"
 #include "EditorVisual.h"
-Units/UnitActing.h
+#include "Units/UnitActing.h"
 
-Serialization/Dictionary.h
-Serialization/XPrmArchive.h
+#include "Serialization/Dictionary.h"
+#include "Serialization/XPrmArchive.h"
 #include "kdw/PropertyEditor.h"
 
-Water/SkyObject.h
+#include "Water/SkyObject.h"
 
-Game/StreamCommand.h
+#include "Game/StreamCommand.h"
 
 
-Terra/TerrainType.h
+#include "Terra/TerrainType.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

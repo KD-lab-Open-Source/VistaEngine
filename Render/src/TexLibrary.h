@@ -2,17 +2,17 @@
 #define __TEX_LIBRARY_H_INCLUDED__
 
 #include "MTSection.h"
-FileUtils/FileTime.h
-XMath/Rectangle4f.h
-XTL/StaticMap.h
-Render/inc/IVisGenericInternal.h
+#include "FileUtils/FileTime.h"
+#include "XMath/Rectangle4f.h"
+#include "XTL/StaticMap.h"
+#include "Render/inc/IVisGenericInternal.h"
 
 class cTexture;
 class cTextureScale;
 class cTextureAviScale;
 class cTextureComplex;
 
-enum eSurfaceFormat;
+enum eSurfaceFormat : int;
 
 class RENDER_API cTexLibrary
 {
@@ -49,7 +49,7 @@ public:
 	cTexture* CreateTexture(int sizex,int sizey,bool alpha);
 	cTexture* CreateTextureDefaultPool(int sizex,int sizey,bool alpha);
 	cTexture* CreateNormalMap(int sizex,int sizey);
-	cTexture* CreateAlphaTexture(int sizex,int sizey,class cFileImage* image=0,bool dynamic=false);//Всегда _L8
+	cTexture* CreateAlphaTexture(int sizex,int sizey,class cFileImage* image=0,bool dynamic=false);//пїЅпїЅпїЅпїЅпїЅпїЅ _L8
 	cTexture* CreateTexture(int sizex,int sizey,eSurfaceFormat format,bool dynamic);
 	MTSection& GetLock(){return lock;}
 	void ReloadAllTexture();

@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "DebugPrm.h"
-Serialization/XPrmArchive.h
-Serialization/RangedWrapper.h
-Terra/vmap.h
+#include "Serialization/XPrmArchive.h"
+#include "Serialization/RangedWrapper.h"
+#include "Terra/vmap.h"
 
 WRAP_LIBRARY(DebugPrm, "DebugPrm", "DebugPrm", "Scripts\\TreeControlSetups\\Debug.dat", 0, 0);
 

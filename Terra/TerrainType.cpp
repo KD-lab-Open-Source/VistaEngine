@@ -1,6 +1,6 @@
 #include "stdafxTr.h"
 #include "TerrainType.h"
-Serialization/Serialization.h
+#include "Serialization/Serialization.h"
 
 WRAP_LIBRARY(TerrainTypeDescriptor, "TerrainTypeDescriptor", "Типы поверхности", "Scripts\\Content\\TerrainTypeDescriptor", 0, LIBRARY_EDITABLE);
 

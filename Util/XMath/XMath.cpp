@@ -9,7 +9,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 #include "stdafx.h"
-XMath/xmath.h
+#include "XMath/xmath.h"
 #include "XUtil.h"
 
 #pragma warning(disable : 4073 )

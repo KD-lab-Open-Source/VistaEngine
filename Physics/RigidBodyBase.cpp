@@ -1,12 +1,12 @@
 #include "stdafx.h"
-AI/PFTrap.h
+#include "AI/PFTrap.h"
 #include "NormalMap.h"
 #include "GlobalAttributes.h"
 #include "RigidBodyBase.h"
 
-CD/CD2D.h
-CD/CDSphere.h
-CD/CDDual.h
+#include "CD/CD2D.h"
+#include "CD/CDSphere.h"
+#include "CD/CDDual.h"
 
 
 ///////////////////////////////////////////////////////////////

@@ -1,6 +1,6 @@
 #include "StdAfx.h"
-Serialization/Serialization.h
-UserInterface/UI_Key.h
+#include "Serialization/Serialization.h"
+#include "UserInterface/UI_Key.h"
 #include "WBuffer.h"
 
 UI_Key::PairComboStrings UI_Key::locStringsKeyNames_;

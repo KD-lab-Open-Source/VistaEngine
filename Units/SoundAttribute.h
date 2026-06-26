@@ -1,9 +1,9 @@
 #ifndef __SOUND_ATTRIBUTE_H__
 #define __SOUND_ATTRIBUTE_H__
 
-Serialization/StringTableReferencePolymorphic.h
+#include "Serialization/StringTableReferencePolymorphic.h"
 #include "Timers.h"
-XTL/StaticMap.h
+#include "XTL/StaticMap.h"
 
 long CalcVolume(int vol);
 class Archive;

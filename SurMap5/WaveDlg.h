@@ -1,7 +1,7 @@
 #ifndef __WAVE_DLG_H_INCLUDED__
 #define __WAVE_DLG_H_INCLUDED__
 
-Water/Waves.h
+#include "Water/Waves.h"
 
 class CWaveDlg : public CDialog
 {

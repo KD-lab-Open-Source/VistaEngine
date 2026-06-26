@@ -6,12 +6,12 @@
 #include "GameShell.h"
 #include "UniverseX.h"
 #include "UI_Logic.h"
-Terra/vmap.h
+#include "Terra/vmap.h"
 #include <algorithm>
 #include "dxerr9.h"
 #include "QSWorldsMgr.h"
 #include "LogMsg.h"
-Game/IniFile.h
+#include "Game/IniFile.h"
 
 #include "Lmcons.h"
 #include <Winsock2.h>

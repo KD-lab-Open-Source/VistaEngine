@@ -5,15 +5,15 @@
 #include "AbnormalStateAttribute.h"
 #include "EffectReference.h"
 #include "CircleManagerParam.h"
-UserInterface/UI_MarkObjectAttribute.h
-UserInterface/UI_Inventory.h
+#include "UserInterface/UI_MarkObjectAttribute.h"
+#include "UserInterface/UI_Inventory.h"
 
 #include "WeaponEnums.h"
 
 class Player;
 class WeaponPrmCache;
 class UnitActing;
-enum ShootingOnMoveMode;
+enum ShootingOnMoveMode : int;
 
 struct WeaponAmmoType : StringTableBaseSimple
 {

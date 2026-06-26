@@ -1,5 +1,5 @@
 #include "stdafx.h"
-AI/PFTrap.h
+#include "AI/PFTrap.h"
 #include "normalMap.h"
 #include "PositionGeneratorCircle.h"
 #include "WhellController.h"

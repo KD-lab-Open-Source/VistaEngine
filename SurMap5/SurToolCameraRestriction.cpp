@@ -7,9 +7,9 @@
 
 ../UserInterface/UI_Render.h
 ../UserInterface/UI_Minimap.h
-Environment/Environment.h
+#include "Environment/Environment.h"
 
-Game/CameraManager.h
+#include "Game/CameraManager.h"
 
 #include "MainFrame.h"
 #include "GeneralView.h"

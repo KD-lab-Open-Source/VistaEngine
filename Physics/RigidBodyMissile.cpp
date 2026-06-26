@@ -51,7 +51,7 @@ void RigidBodyMissile::EulerEvolve(float dt)
 	quat.normalize();
 
 	// Linear damping anisotropic - apply in local frame
-	// Анизатропный дампинг приводит к повороту вектора скорости, при пастрекинге это вредно. Юнит разгоняется.
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	Vect3f damping(velocity_);
 	orientation().invXform(damping);
 	damping.x *= linear_damping.x*dt;
@@ -198,8 +198,8 @@ int RigidBodyMissile::checkCollisionPointed(const Vect3f& pos)
 int RigidBodyMissile::heightWithWater(int x, int y)
 {
 	if(waterAnalysis())
-		return max(vMap.gVBuf[vMap.offsetGBufC(x >> kmGrid, y >> kmGrid)], 
-			round(environment->water()->GetZ(x, y)));
+		return max(int(vMap.gVBuf[vMap.offsetGBufC(x >> kmGrid, y >> kmGrid)]),
+			(int)round(environment->water()->GetZ(x, y)));
 	else
 		return vMap.gVBuf[vMap.offsetGBufC(x >> kmGrid, y >> kmGrid)];
 }

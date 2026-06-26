@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "FieldOfView.h"
-Render/D3D/D3DRender.h
-Render/Src/cCamera.h
-Terra/vMap.h
+#include "Render/D3D/D3DRender.h"
+#include "Render/Src/cCamera.h"
+#include "Terra/vMap.h"
 #include "ScanPoly.h"
 #include "DebugUtil.h"
 

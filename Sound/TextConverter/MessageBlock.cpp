@@ -1,5 +1,5 @@
 #include "stdafx.h"
-parse/ParamParse.h
+#include "parse/ParamParse.h"
 #include "MessageBlock.h"
 
 static vector<string> stringID;

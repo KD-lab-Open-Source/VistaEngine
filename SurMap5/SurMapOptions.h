@@ -1,8 +1,8 @@
 #ifndef __SUR_MAP_OPTIONS_H_INCLUDED__
 #define __SUR_MAP_OPTIONS_H_INCLUDED__
 
-XMath/Colors.h
-XTL/Rect.h
+#include "XMath/Colors.h"
+#include "XTL/Rect.h"
 
 class SurMapOptions
 {

@@ -1,30 +1,30 @@
 #ifndef __TEXTURE_H_INCLUDED__
 #define __TEXTURE_H_INCLUDED__
 
-XMath/Rectangle4f.h
-Render/inc/IVisGenericInternal.h
+#include "XMath/Rectangle4f.h"
+#include "Render/inc/IVisGenericInternal.h"
 
-enum eSurfaceFormat;
+enum eSurfaceFormat : int;
 struct IDirect3DTexture9;
 class cFileImage;
 
 enum eAttributeTexture
 {
 	TEXTURE_NONDELETE		=	1<<4,
-	TEXTURE_DYNAMIC			=   1<<5,    //Текстура часто меняется
-	TEXTURE_ALPHA_BLEND		=	1<<6,	//  текстура содержит альфу
+	TEXTURE_DYNAMIC			=   1<<5,    //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	TEXTURE_ALPHA_BLEND		=	1<<6,	//  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	TEXTURE_DISABLE_DETAIL_LEVEL=1<<7, 
-	TEXTURE_ALPHA_TEST		=	1<<8,	// текстура содержит маску в альфе
+	TEXTURE_ALPHA_TEST		=	1<<8,	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
 	TEXTURE_BUMP			=   1<<9,
-	TEXTURE_NO_COMPACTED	=	1<<10,  // текстура не удаляется при вызове GetTexLibrary()->Compact();
+	TEXTURE_NO_COMPACTED	=	1<<10,  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ GetTexLibrary()->Compact();
 	TEXTURE_SPECULAR		=	1<<11,
-	TEXTURE_MIPMAP_POINT	=	1<<18,		// текстурные мипмапы получены ближайшими точками
-	TEXTURE_MIPMAP_POINT_ALPHA=	1<<19,		// текстурные мипмапы получены ближайшими точками только для apha
+	TEXTURE_MIPMAP_POINT	=	1<<18,		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	TEXTURE_MIPMAP_POINT_ALPHA=	1<<19,		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ apha
 	TEXTURE_R32F			=   1<<20,		// 32-bit float format 
-	TEXTURE_RENDER16		=	1<<21,		// в текстуру происходит рендер
+	TEXTURE_RENDER16		=	1<<21,		// пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	TEXTURE_RENDER32		=	1<<22,
 	TEXTURE_ADDED_POOL_DEFAULT	=1<<23,
-	TEXTURE_32				=	1<<24,		//Только 32 битный формат
+	TEXTURE_32				=	1<<24,		//пїЅпїЅпїЅпїЅпїЅпїЅ 32 пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	TEXTURE_RENDER_SHADOW_9700 =1<<25,
 	TEXTURE_D3DPOOL_DEFAULT =	1<<26,
 	TEXTURE_GRAY			=   1<<27,
@@ -100,7 +100,7 @@ public:
 	void SetSkinColorName(const char* s){if(s)skin_color_name=s;else skin_color_name.clear();}
 	const char* GetSkinColorName()const{return skin_color_name.c_str();}
 
-	int CalcTextureSize();//Рассчитывает размер текстуры в байтах.
+	int CalcTextureSize();//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
 	void AddToDefaultPool();
 	void SetTexture2D() {is2DTexture = true;}
 	void SetTexture3D() {is2DTexture = false;}
@@ -152,7 +152,7 @@ public:
 	}
 	sRectangle4f& GetFramePosInt(int phase)//float(1) -> int(65535)
 	{
-		//return pos[phase/(65535/(pos.size()-1))];//Даааааа, спасибо Освальд с Алексом. Исполнители хреновы!
+		//return pos[phase/(65535/(pos.size()-1))];//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ!
 		xassert(phase>=0 && phase<=65535);
 		int i=(phase*pos.size())>>16;
 		xassert(i>=0 && i<int(pos.size()));

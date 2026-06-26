@@ -1,10 +1,10 @@
 #pragma once
 
-Serialization/EnumDescriptor.h
-Serialization/LibraryWrapper.h
+#include "Serialization/EnumDescriptor.h"
+#include "Serialization/LibraryWrapper.h"
 #include "Terra.h"
 
-enum TerrainType
+enum TerrainType : int
 {
 	TERRAIN_TYPE0 = 1 << 0,
 	TERRAIN_TYPE1 = 1 << 1,

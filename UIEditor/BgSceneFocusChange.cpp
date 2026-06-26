@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 
 #include "BgSceneFocusChange.h"
-UserInterface/UI_BackgroundScene.h
+#include "UserInterface/UI_BackgroundScene.h"
 
 void BgFocusChangeAction::act()
 {

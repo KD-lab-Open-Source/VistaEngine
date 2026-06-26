@@ -2,8 +2,8 @@
 #include "SurMap5.h"
 #include "MainFrame.h"
 #include "TimeSliderDlg.h"
-Environment/Environment.h
-Water/SkyObject.h
+#include "Environment/Environment.h"
+#include "Water/SkyObject.h"
 
 IMPLEMENT_DYNAMIC(CTimeSliderDlg, CDialog)
 CTimeSliderDlg::CTimeSliderDlg(CMainFrame* mainFrame, CWnd* parent)

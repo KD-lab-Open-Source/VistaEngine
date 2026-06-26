@@ -1,7 +1,7 @@
 #ifndef __SPRING_DAMPING_H__
 #define __SPRING_DAMPING_H__
 
-Render/3dx/Simply3dx.h
+#include "Render/3dx/Simply3dx.h"
 
 class SpringDamping3DX 
 {

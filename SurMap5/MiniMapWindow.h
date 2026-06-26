@@ -1,7 +1,7 @@
 #ifndef __MINI_MAP_WINDOW_H_INCLUDED__
 #define __MINI_MAP_WINDOW_H_INCLUDED__
 
-Render/Inc/IRenderDevice.h
+#include "Render/Inc/IRenderDevice.h"
 #include "EventListeners.h"
 
 class CSurToolBase;

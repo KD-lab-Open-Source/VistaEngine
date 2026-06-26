@@ -1,7 +1,7 @@
 #ifndef __RENDER_CUBEMAP_H_INCLUDED__
 #define __RENDER_CUBEMAP_H_INCLUDED__
 
-Render/inc/IRenderDevice.h
+#include "Render/inc/IRenderDevice.h"
 
 struct IDirect3DSurface9;
 class cScene;

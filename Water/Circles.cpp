@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "circles.h"
 #include "FallOut.h"
-XMath/Plane.h
-Render/Src/cCamera.h
-Render/Src/FogOfWar.h
-Render/Src/TexLibrary.h
-Render/Src/Scene.h
+#include "XMath/Plane.h"
+#include "Render/Src/cCamera.h"
+#include "Render/Src/FogOfWar.h"
+#include "Render/Src/TexLibrary.h"
+#include "Render/Src/Scene.h"
 
 static RandomGenerator rnd;
 

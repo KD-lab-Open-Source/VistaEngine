@@ -4,9 +4,9 @@
 #include "VisGeneric.h"
 #include "FileImage.h"
 #include "TextureAtlas.h"
-Serialization/BinaryArchive.h
-FileUtils/FileUtils.h
-Render/src/TextureMiniDetail.h
+#include "Serialization/BinaryArchive.h"
+#include "FileUtils/FileUtils.h"
+#include "Render/src/TextureMiniDetail.h"
 
 RENDER_API cTexLibrary* GetTexLibrary()
 {

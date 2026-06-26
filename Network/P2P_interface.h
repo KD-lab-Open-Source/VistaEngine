@@ -1,12 +1,13 @@
 #ifndef __P2P_INTERFACE_H__
 #define __P2P_INTERFACE_H__
 
+#include <dplay8.h>          // DirectPlay 8 types (DPNID, IDirectPlay8Peer, ...); stubbed off-Windows
 #include "EventBufferDP.h"
 #include "NetCommands.h"
 #include "Starforce.h"
 
 #include "MissionDescriptionNet.h"
-FileUtils/XGUID.h //определение XGUID
+#include "FileUtils/XGUID.h" //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ XGUID
 
 #include "ExternalTask.h"
 #include "P2P_interfaceAux.h"
@@ -17,7 +18,7 @@ const int NORMAL_QUANT_INTERVAL=100;
 #define SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=NULL; } }
 
 
-enum eNetMessageCode {
+enum eNetMessageCode : int {
 	NetMessageCode_NULL=0,
 	//NetGEC_ConnectionFailed,
 	//NetGEC_HostTerminatedSession,
@@ -153,7 +154,7 @@ enum e_PNCState {
 	NSTATE__FIND_HOST	= 1,
 	NSTATE__PARKING		= 2,
 	PNC_STATE__NET_CENTER_CRITICAL_ERROR = 3,
-	// Состояние завершения
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	PNC_STATE__ENDING_GAME	= 4,
 
 	NSTATE__QSTART_NON_CONNECT =		PNC_State_QuickStart | 5,
@@ -313,7 +314,7 @@ public:
 	UNetID	m_hostUNID; //for info only
 	UNetID	m_localUNID; //for info only
 
-	void setGameDesynchronized(){ if(extNetTask_Game) finitExtTask_Err(extNetTask_Game, ENTGame::ErrCode::GameDesynchronized);} //для хоста десинхронизация высталяется раньше
+	void setGameDesynchronized(){ if(extNetTask_Game) finitExtTask_Err(extNetTask_Game, ENTGame::ErrCode::GameDesynchronized);} //пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	static void createNetCenter(ExternalNetTask_Init* entInit);// { destroyNetCenter(); netCenter = new PNetCenter(entInit); }
 	void stopNetCenter();// { stopNetCenterSuspended = true;	if(universeX()) universeX()->stopNetCenter(); }
 	static bool isNCCreated() { return netCenter!=0; }
@@ -375,8 +376,8 @@ protected:
 
 	//Host !!!
 	void SendEventI(NetCommandBase& event, const UNetID& unid, bool flag_guaranted=1); //Internal 2Th
-	void PutGameCommand2Queue_andAutoDelete(netCommandGame* pCommand); //Internal 2Th (Для 3Th пока неиспользуется)
-	void putNetCommand2InClientBuf_th2(NetCommandBase& event);// Используется DW для того чтоб положить чат команду клиенту
+	void PutGameCommand2Queue_andAutoDelete(netCommandGame* pCommand); //Internal 2Th (пїЅпїЅпїЅ 3Th пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
+	void putNetCommand2InClientBuf_th2(NetCommandBase& event);// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ DW пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 
 	int AddClient(ConnectPlayerData& pd, const UNetID& unid, bool flag_quickStart=false);//Internal 2&3Th
@@ -390,11 +391,11 @@ protected:
 	void deleteUser_thA(const UNetID& unid); //Internal 2&3Th //, DWORD dwReason
 	void deleteUserQuant_th2(); //Internal 2Th
 
-	void th2_LLogicQuant(); //Internal 2Th //Основной обработчик команд
+	void th2_LLogicQuant(); //Internal 2Th //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	void th2_SaveLogByDesynchronization(vector<BackGameInformation2>& firstList, vector<BackGameInformation2>& secondList);
 
 
-	bool flag_SkipProcessingGameCommand;//Нужно при миграции Host-а
+	bool flag_SkipProcessingGameCommand;//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Host-пїЅ
 	unsigned int flag_LockIputPacket;
 
 	void LockInputPacket();
@@ -422,7 +423,7 @@ protected:
 	unsigned int m_quantInterval;
 	unsigned int m_originalQuantInterval;
 
-	unsigned int beginWaitTime_th2; //Используеться для измерения времени при миграции
+	unsigned int beginWaitTime_th2; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 	unsigned int lastTimeServerPacket_th1;
 
@@ -491,11 +492,11 @@ protected:
 
 
 	//Host Date
-	unsigned int m_numberGameQuant; //Кванты на хосте Кванты считаются с 1-цы!
+	unsigned int m_numberGameQuant; //пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ 1-пїЅпїЅ!
 	int m_nQuantCommandCounter;
 	unsigned long hostGeneralCommandCounter;
 	unsigned int quantConfirmation;
-	UNetID unidClientWhichWeWait; //unid игрока которому хост при миграции посылает команду прислать игровые комманды; нужен чтобы в случае выхода переслать комманду другому
+	UNetID unidClientWhichWeWait; //unid пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ; пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 	//Info for GameSpy
 	string gamePassword;
@@ -512,7 +513,7 @@ protected:
 
 	StartGameParam startGameParam;
 	//for QS
-	eGameOrder m_QSGameOrder; //убрать!
+	eGameOrder m_QSGameOrder; //пїЅпїЅпїЅпїЅпїЅпїЅ!
 	QSStateAndCondition m_qsStateAndCondition;
 	void removeUserInQuickStart(const UNetID& unid);
 
@@ -526,7 +527,7 @@ private:
 	friend DWORD WINAPI InternalServerThread(LPVOID lpParameter);
 	friend class DWInterface;
 	friend StartGameParam;
-	friend class DWSessionManager;// прямое обращение к extNetTaskCreateGame
+	friend class DWSessionManager;// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ extNetTaskCreateGame
 };
 
 bool checkInetAddress(const char* ipStr);

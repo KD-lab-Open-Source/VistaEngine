@@ -1,7 +1,7 @@
 #ifndef _TEXTURE_ATLAS_H_
 #define _TEXTURE_ATLAS_H_
 
-XMath/Rectangle4f.h
+#include "XMath/Rectangle4f.h"
 
 /*
 	Аккуратно складывает текстурки в атлас.

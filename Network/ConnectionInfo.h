@@ -4,7 +4,14 @@
 
 #include "crc.h"
 
-#include "version.h" 
+#include "version.h"
+
+// eGameOrder is fully defined in ExternalTask.h; clang (unlike MSVC) forbids the
+// elaborated forward-reference `enum eGameOrder` used as a value member below, so
+// give it a fixed underlying type via an opaque-enum-declaration (must match the
+// `: int` on the definition in ExternalTask.h).
+enum eGameOrder : int;
+
 const char SIMPLE_GAME_CURRENT_VERSION[]= MULTIPLAYER_VERSION;
 //extern const unsigned int INTERNAL_BUILD_VERSION;
 
@@ -25,7 +32,7 @@ struct sDigitalGameVersion {
 			i++;
 			if(i < sizeof(buf)) gameVersion+=atoi(&buf[i]);
 		}
-		else gameVersion=0;//можно -1
+		else gameVersion=0;//пїЅпїЅпїЅпїЅпїЅ -1
 	}
 	bool operator == (const sDigitalGameVersion &ro) const { return (gameVersion==ro.gameVersion); }
 	bool operator != (const sDigitalGameVersion &ro) const { return (gameVersion!=ro.gameVersion); }

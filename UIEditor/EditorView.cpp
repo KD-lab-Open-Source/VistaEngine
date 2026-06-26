@@ -16,22 +16,22 @@
 #include "PropertyChangeAction.h"
 #include "BgSceneFocusChange.h"
 #include "ControlUtils.h"
-Game/GameOptions.h
-UserInterface/UI_Render.h
-UserInterface/UserInterface.h
-UserInterface/UI_Logic.h
-UserInterface/UI_BackgroundScene.h
-AttribEditor/AttribEditorCtrl.h
+#include "Game/GameOptions.h"
+#include "UserInterface/UI_Render.h"
+#include "UserInterface/UserInterface.h"
+#include "UserInterface/UI_Logic.h"
+#include "UserInterface/UI_BackgroundScene.h"
+#include "AttribEditor/AttribEditorCtrl.h"
 Environment/Environment.h // только для drawBlackBars
-Render/Src/cCamera.h
-Render/Src/Scene.h
-Render/Inc/IRenderDevice.h
-Render/d3d/D3DRender.h
-Render/Src/VisGeneric.h
+#include "Render/Src/cCamera.h"
+#include "Render/Src/Scene.h"
+#include "Render/Inc/IRenderDevice.h"
+#include "Render/d3d/D3DRender.h"
+#include "Render/Src/VisGeneric.h"
 
-Game/StreamCommand.h
-Serialization/StringTable.h
-Serialization/SerializationFactory.h
+#include "Game/StreamCommand.h"
+#include "Serialization/StringTable.h"
+#include "Serialization/SerializationFactory.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

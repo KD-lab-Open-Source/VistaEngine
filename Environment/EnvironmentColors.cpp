@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "EnvironmentColors.h"
-Serialization/Serialization.h
-Serialization/RangedWrapper.h
-Serialization/ResourceSelector.h
+#include "Serialization/Serialization.h"
+#include "Serialization/RangedWrapper.h"
+#include "Serialization/ResourceSelector.h"
 
 WaterPlumeAttribute::WaterPlumeAttribute()
 {

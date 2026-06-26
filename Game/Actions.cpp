@@ -2,36 +2,36 @@
 #include "Triggers.h"
 #include "CameraManager.h"
 #include "RenderObjects.h"
-Render/src/Scene.h
-Render/src/VisGeneric.h
+#include "Render/src/Scene.h"
+#include "Render/src/VisGeneric.h"
 #include "vmap.h"
 #include "Universe.h"
 
 #include "Squad.h"
-Serialization/Serialization.h
-Serialization/SerializationFactory.h
+#include "Serialization/Serialization.h"
+#include "Serialization/SerializationFactory.h"
 #include "ShowHead.h"
 #include "PlayOgg.h"
-Serialization/ResourceSelector.h
+#include "Serialization/ResourceSelector.h"
 
 #include "Actions.h"
 #include "Conditions.h"
 #include "IronBuilding.h"
-Environment/SourceManager.h
-Environment/Anchor.h
-Water/Water.h
-UserInterface/UI_Logic.h
-Ai/PlaceOperators.h
-Ai/PFTrap.h
-UserInterface/SelectManager.h
-Game/SoundApp.h
-Serialization/RangedWrapper.h
+#include "Environment/SourceManager.h"
+#include "Environment/Anchor.h"
+#include "Water/Water.h"
+#include "UserInterface/UI_Logic.h"
+#include "Ai/PlaceOperators.h"
+#include "Ai/PFTrap.h"
+#include "UserInterface/SelectManager.h"
+#include "Game/SoundApp.h"
+#include "Serialization/RangedWrapper.h"
 #include "GameOptions.h"
-Units/MicroAI.h
-Units/Inventory.h
-Sound/SoundSystem.h
-FileUtils/FileUtils.h
-Units/CommandsQueue.h
+#include "Units/MicroAI.h"
+#include "Units/Inventory.h"
+#include "Sound/SoundSystem.h"
+#include "FileUtils/FileUtils.h"
+#include "Units/CommandsQueue.h"
 
 #include "StreamCommand.h"
 #include "EnginePrm.h"

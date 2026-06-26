@@ -5,15 +5,15 @@
 #include "DebugUtil.h"
 
 #include "SurToolMiniDetaile.h"
-Serialization/Serialization.h
-Game/RenderObjects.h
-Render/src/MultiRegion.h
-Render/src/FileImage.h
-Render/Src/TexLibrary.h
-Render/src/TileMap.h
-Render/src/Scene.h
-Terra/terTools.h
-FileUtils/FileUtils.h
+#include "Serialization/Serialization.h"
+#include "Game/RenderObjects.h"
+#include "Render/src/MultiRegion.h"
+#include "Render/src/FileImage.h"
+#include "Render/Src/TexLibrary.h"
+#include "Render/src/TileMap.h"
+#include "Render/src/Scene.h"
+#include "Terra/terTools.h"
+#include "FileUtils/FileUtils.h"
 
 // CSurToolHardness dialog
 //int CSurToolMiniDetail::next_layer = 0;

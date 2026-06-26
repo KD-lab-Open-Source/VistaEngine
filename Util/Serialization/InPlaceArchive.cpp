@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "InPlaceArchive.h"
-Serialization/SerializationFactory.h
+#include "Serialization/SerializationFactory.h"
 
 InPlaceOArchive::InPlaceOArchive(const char* fname, bool fixVtable)
 {
@@ -120,7 +120,7 @@ void InPlaceOArchive::writeString(const string& str)
 	int dataEnd = saver_.size();
 	saver_.set(offset);
 	saver_.write(dataOffset);
-	saver_.write(dataEnd - 1); // 0 не считается
+	saver_.write(dataEnd - 1); // 0 пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	saver_.write(dataEnd); 
 	saver_.set(dataEnd);
 }
@@ -224,13 +224,13 @@ bool InPlaceIArchive::open(const char* fname)
 	int* fixUp = (int*)auxData;
 	int fixUpSize = *fixUp++;
 	while(fixUpSize--)
-		*(int*)(data_ + *fixUp++) += (int)data_;
+		*(int*)(data_ + *fixUp++) += (int)(intptr_t)data_;
 
 	int fixVTableSize = *fixUp++;
 	while(fixVTableSize--){
 		int offset = *fixUp++;
 		char* typeName = (char*)fixUp;
-		*(int*)(data_ + offset) = (int)VTableFactory::getVTable(typeName);
+		*(int*)(data_ + offset) = (int)(intptr_t)VTableFactory::getVTable(typeName);
 		typeName += strlen(typeName) + 1;
 		fixUp = (int*)typeName;
 	}

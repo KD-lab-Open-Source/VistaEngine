@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "Static3dxBase.h"
 #include "Saver.h"
-Render/inc/FileRead.h
-Serialization/BinaryArchive.h
-FileUtils/FileUtils.h
-Serialization/SerializationFactory.h
-Serialization/EnumDescriptor.h
+#include "Render/inc/FileRead.h"
+#include "Serialization/BinaryArchive.h"
+#include "FileUtils/FileUtils.h"
+#include "Serialization/SerializationFactory.h"
+#include "Serialization/EnumDescriptor.h"
 
 REGISTER_CLASS(cTempMesh3dx, cTempMesh3dx, "cTempMesh3dx");
 REGISTER_CLASS(StaticVisibilityGroup, StaticVisibilityGroup, "StaticVisibilityGroup");

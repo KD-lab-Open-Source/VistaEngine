@@ -1,8 +1,8 @@
 #ifndef __FILEIMAGE_H__
 #define __FILEIMAGE_H__
-Render/Inc/rd.h
-XMath/Colors.h
-XMath/Rectangle4f.h
+#include "Render/Inc/rd.h"
+#include "XMath/Colors.h"
+#include "XMath/Rectangle4f.h"
 #include <vector>
 #include <string>
 using namespace std;

@@ -1,7 +1,8 @@
 #ifndef __KDW_WIN32_TYPES_H_INCLUDED__
 #define __KDW_WIN32_TYPES_H_INCLUDED__
 
-// основные типы <windows.h>:
+#ifdef _WIN32
+// Windows: use real types from windows.h (included via force-include or transitively)
 typedef unsigned long       DWORD;
 typedef int                 BOOL;
 typedef unsigned char       BYTE;
@@ -41,8 +42,8 @@ struct _IMAGELIST;
 typedef struct _IMAGELIST* HIMAGELIST;
 struct tagRECT;
 typedef tagRECT RECT;
-// ^^^ это все можно заменить на #include <windows.h>
-
+// ^^^ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ #include <windows.h>
+#endif // _WIN32
 
 
 namespace Win32{

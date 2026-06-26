@@ -2,7 +2,7 @@
 #define __COMBO_LIST_COLOR_H_INCLUDED__
 
 #include <vector>
-XMath/Colors.h
+#include "XMath/Colors.h"
 
 typedef std::vector<Color4f> ColorContainer;
 

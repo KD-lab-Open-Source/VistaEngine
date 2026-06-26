@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "SynchroTimer.h"
-XMath/xmath.h
+#include "XMath/xmath.h"
 
 SyncroTimer::SyncroTimer()
 {

@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "WaveDlg.h"
 #include "EnterNameDlg.h"
-Environment/Environment.h
+#include "Environment/Environment.h"
 #include "SurToolAux.h"
 #include "wavedlg.h"
 // CWaveDlg dialog

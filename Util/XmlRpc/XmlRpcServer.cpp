@@ -6,7 +6,9 @@
 #include "XmlRpcUtil.h"
 #include "XmlRpcException.h"
 
-# include <winsock.h> // FIX ME!!!
+#if defined(_WINDOWS) || defined(_WIN32)
+# include <winsock.h>
+#endif
 
 
 using namespace XmlRpc;

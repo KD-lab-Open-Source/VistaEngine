@@ -1,12 +1,12 @@
 #ifndef __UNIT_ATTRIBUTE_H__
 #define __UNIT_ATTRIBUTE_H__
 
-Serialization/StringTableReference.h
-Serialization/EnumTable.h
+#include "Serialization/StringTableReference.h"
+#include "Serialization/EnumTable.h"
 #include "LocString.h"
 
-Terra/TerToolCtrl.h
-Terra/terra.h
+#include "Terra/TerToolCtrl.h"
+#include "Terra/terra.h"
 
 #include "EffectReference.h"
 #include "SoundAttribute.h"
@@ -19,15 +19,15 @@ Terra/terra.h
 #include "AttributeReference.h"
 #include "Object3dxInterface.h"
 
-Physics/RigidBodyNodePrm.h
-Physics/RigidBodyCarPrm.h
-Physics/WindMap.h
+#include "Physics/RigidBodyNodePrm.h"
+#include "Physics/RigidBodyCarPrm.h"
+#include "Physics/WindMap.h"
 
-UserInterface/UI_MarkObjectAttribute.h
-Environment/Anchor.h
-UserInterface/UI_MinimapSymbol.h
-FileUtils/FileTime.h
-Terra/TerrainType.h
+#include "UserInterface/UI_MarkObjectAttribute.h"
+#include "Environment/Anchor.h"
+#include "UserInterface/UI_MinimapSymbol.h"
+#include "FileUtils/FileTime.h"
+#include "Terra/TerrainType.h"
 
 typedef vector<Vect2f> Vect2fVect;
 typedef vector<Vect2i> Vect2iVect;
@@ -37,7 +37,8 @@ typedef vector<ParameterArithmetics> UnitParameterArithmeticsList;
 typedef vector<EffectAttributeAttachable> EffectAttributes;
 typedef vector<LocString> LocStrings;
 
-enum GameType;
+enum GameType : int;
+enum ObjectLodPredefinedType : int;
 
 class AttributeBase;
 class WeaponPrm;
@@ -75,7 +76,7 @@ enum UnitClass
 	UNIT_CLASS_MAX
 };
 
-// Режими атаки без прямого указания цели.
+// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ.
 enum AutoAttackMode
 {
 	ATTACK_MODE_DISABLE = 0,
@@ -83,7 +84,7 @@ enum AutoAttackMode
 	ATTACK_MODE_OFFENCE
 };
 
-// Режими атаки при ходьбе.
+// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
 enum WalkAttackMode
 {
 	WALK_NOT_ATTACK,
@@ -91,15 +92,15 @@ enum WalkAttackMode
 	WALK_STOP_AND_ATTACK,
 };
 
-/// Режим автоматического выбора целей
+/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 enum AutoTargetFilter
 {
-	AUTO_ATTACK_ALL,		///< атаковать всех
-	AUTO_ATTACK_BUILDINGS,	///< атаковать только здания
-	AUTO_ATTACK_UNITS		///< атаковать только юнитов
+	AUTO_ATTACK_ALL,		///< пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+	AUTO_ATTACK_BUILDINGS,	///< пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	AUTO_ATTACK_UNITS		///< пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 };
 
-// Клавиши прямого управления.
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 enum DirectControlKeys {
 	DIRECT_KEY_TURN_LEFT = 1,
 	DIRECT_KEY_TURN_RIGHT = 2,
@@ -143,9 +144,9 @@ enum CollisionGroupID
 
 enum ExcludeCollision
 {
-	EXCLUDE_COLLISION_BULLET = 1, // Пули не сталкиваются между собой
-	EXCLUDE_COLLISION_ENVIRONMENT = 2, // Объекты окружения и игровые здания не сталкиваются между собой
-	EXCLUDE_COLLISION_LEGIONARY = 4, // Юниты не сталкиваются между собой
+	EXCLUDE_COLLISION_BULLET = 1, // пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	EXCLUDE_COLLISION_ENVIRONMENT = 2, // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	EXCLUDE_COLLISION_LEGIONARY = 4, // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 };
 
 /////////////////////////////////////////
@@ -177,7 +178,7 @@ private:
 
 /////////////////////////////////////////
 
-/// Настройки режимов атаки
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 class AttackMode
 {
 public:
@@ -219,7 +220,7 @@ public:
 
 private:
 
-	/// начальные установки режимов атаки
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	AttackMode attackMode_;
 
 	bool targetInsideSightRadius_;
@@ -306,40 +307,40 @@ private:
 	mutable bool used_;
 	mutable Skins skins_;
 	
-	// находится под управлением AI
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ AI
 	UI_UnitSprite workForAISprite_;
 	EffectAttributeAttachable workForAIEffect_;
 
-	// включен режим бега
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	UI_UnitSprite runModeSprite_;
 
 	UI_UnitSprite squadSpriteForOthers_;
 	UI_UnitSprite squadSpriteForOthersHovered_;
 
-	/// флажок точки сбора производимых юнитов
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	UI_MarkObjectAttribute shipmentPositionMark_;
 
 	typedef EnumTable<UI_ClickModeMarkID, UI_MarkObjectAttribute> MarkObjectAttributes;
-	/// визуализация отдачи приказов - атаки, перемещения, ремонта.
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	MarkObjectAttributes orderMarks_;
 
-	/// якорь для установки в точку общего сбора
+	/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	Anchor anchorForAssemblyPoint_;
 
-	/// визуализация атаки по юниту
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	EffectAttributeAttachable unitAttackEffect_;
-	/// визуализация апгрейда оружия
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	EffectAttributeAttachable weaponUpgradeEffect_;
 
 	typedef EnumTable<UI_MinimapSymbolID, UI_MinimapEventStatic> MiniMapMarks;
-	/// обозначения событий на миникарте
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	MiniMapMarks minimapMarks_;
 
 	typedef EnumTable<WindMap::WindType, UI_MinimapSymbol> WindMarkAttributes;
-	/// визуализация направления ветра на миникарте
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	WindMarkAttributes windMarks_;
 
-	/// Настройки режимов атаки
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	AttackModeAttribute attackModeAttribute_;
 
 	AttributePlayerReference playerUnitAttribute_;
@@ -348,9 +349,9 @@ private:
 #include "AttributeReference.h"
 
 /////////////////////////////////////////////
-//		Анимация
+//		пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 /////////////////////////////////////////////
-// Цепочки анимации
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 enum ChainID
 {
 	CHAIN_NONE = 0,
@@ -555,7 +556,7 @@ enum MovementStateID
 	MOVEMENT_STATE_ALL_SURFACES = MOVEMENT_STATE_ON_GROUND | MOVEMENT_STATE_ON_WATER | MOVEMENT_STATE_ON_LOW_WATER | MOVEMENT_STATE_ON_LAVA,
 };
 
-// Типы движений
+// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 enum MovementMode {
 	MODE_CRAWL = ANIMATION_STATE_CRAWL,
 	MODE_GRABBLE = ANIMATION_STATE_GRABBLE,
@@ -563,18 +564,18 @@ enum MovementMode {
 	MODE_RUN = ANIMATION_STATE_RUN
 };
 
-enum ShootingOnMoveMode
+enum ShootingOnMoveMode : int
 {
-	SHOOT_WHILE_IN_TRANSPORT	= 1,				///< может стрелять когда сидит в транспорте
+	SHOOT_WHILE_IN_TRANSPORT	= 1,				///< пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
-	SHOOT_WHILE_LYING			= MODE_CRAWL >> 4,	///< может стрелять когда лежит
-	SHOOT_WHILE_ON_ALL_FOURS	= MODE_GRABBLE >> 4,///< может стрелять когда присел на корточки
-	SHOOT_WHILE_STANDING		= MODE_WALK >> 4,	///< может стрелять когда стоит
+	SHOOT_WHILE_LYING			= MODE_CRAWL >> 4,	///< пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	SHOOT_WHILE_ON_ALL_FOURS	= MODE_GRABBLE >> 4,///< пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	SHOOT_WHILE_STANDING		= MODE_WALK >> 4,	///< пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 
-	SHOOT_WHILE_CRAWLING		= MODE_CRAWL,		///< может стрелять когда ползет
-	SHOOT_WHILE_GRABBLING		= MODE_GRABBLE,		///< может стрелять когда идёт на корточках
-	SHOOT_WHILE_MOVING			= MODE_WALK,		///< может стрелять когда идёт
-	SHOOT_WHILE_RUNNING			= MODE_RUN			///< может стрелять когда бежит
+	SHOOT_WHILE_CRAWLING		= MODE_CRAWL,		///< пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	SHOOT_WHILE_GRABBLING		= MODE_GRABBLE,		///< пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	SHOOT_WHILE_MOVING			= MODE_WALK,		///< пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
+	SHOOT_WHILE_RUNNING			= MODE_RUN			///< пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 };
 
 class MovementState
@@ -642,7 +643,7 @@ struct AnimationChain
 	bool randomPhase; 
 	bool stopPermanentEffects;
 	
-	/// коэффициент для радиуса слышимости
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	float noiseRadiusFactor; 
 
 	EffectAttributes effects;
@@ -722,7 +723,7 @@ private:
 ////////////////////////////////////////
 struct DifficultyPrm : StringTableBase
 {
-	float triggerDelayFactor; // Коэффициент триггера задержка
+	float triggerDelayFactor; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 	int	orderBuildingsDelay;
 	int orderUnitsDelay;
@@ -772,7 +773,7 @@ private:
 
 ////////////////////////////////////////
 
-// Транспорт
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 struct TransportSlot
 {
 	UnitFormationTypeReferences types;
@@ -911,11 +912,11 @@ public:
 	ParameterCustom parametersInitial;
 	ParameterArithmetics parametersArithmetics;
 
-	// Вывод при селекте
+	// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	typedef vector<ParameterShowSetting> ParamShowContainer;
 	ParamShowContainer parameterShowSettings;
 	ShowChangeParameterSettings showChangeParameterSettings;
-	const ShowChangeSettings* getShowChangeSettings(int idx) const; //индекс в ParameterTypeTable
+	const ShowChangeSettings* getShowChangeSettings(int idx) const; //пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ ParameterTypeTable
 	LocString tipsName;
 	int initialHeightUIParam;
 	float selectCircleRelativeRadius;
@@ -951,16 +952,16 @@ public:
 
 	EffectAttributeAttachable noiseTargetEffect;
 
-	/// режимы оповещения о замеченных врагах
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	enum AttackTargetNotificationMode 
 	{
-		/// оповещать свой сквад
+		/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		TARGET_NOTIFY_SQUAD = 1,
-		/// оповещать всех в заданном радиусе
+		/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		TARGET_NOTIFY_ALL = 2
 	};
 	BitVector<AttackTargetNotificationMode> attackTargetNotificationMode;
-	/// радиус оповещения о замеченных врагах
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	float attackTargetNotificationRadius;
 
 	EffectAttributes permanentEffects;
@@ -970,9 +971,9 @@ public:
 	UnitFormationTypeReference formationType;
 
 	AttackClass unitAttackClass;
-	/// если true, то юнита никто не будет атаковать автоматически, 
-	/// он не будет учтен в статистике убитых юнитов, АИ не будет его рассматривать как цель
-	/// будет атакован только по явному указанию
+	/// пїЅпїЅпїЅпїЅ true, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, 
+	/// пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+	/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	bool excludeFromAutoAttack;
 
 	BitVector<ExcludeCollision> excludeCollision;
@@ -1028,7 +1029,7 @@ public:
 	typedef vector<UI_ShowModeUnitSpriteReference> UI_ShowModeUnitSpriteReferences;
 	UI_ShowModeUnitSpriteReferences ui_faces_;
 	
-	/// обозначение юнита на миникарте
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	UI_MinimapSymbolType minimapSymbolType_;
 	UI_MinimapSymbol minimapSymbol_;
 	UI_MinimapSymbol minimapSymbolWaiting_;
@@ -1052,16 +1053,16 @@ public:
 
 	//typedef std::vector<TraceInfo> TraceInfos;
 	typedef std::vector<TerToolCtrl> TraceInfos;
-	/// следы
+	/// пїЅпїЅпїЅпїЅпїЅ
 	TraceInfos traceInfos;
 
 	typedef std::vector<Logic3dxNode> TraceNodes;
-	/// логические объекты, к которым привязываются следы
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	TraceNodes traceNodes;
 
 	Logic3dxNode gripNode;
 
-	RigidBodyPrmReference rigidBodyPrm; // Параметры физики
+	RigidBodyPrmReference rigidBodyPrm; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	float mass;
 	float waterWeight_;
 	float waterVelocityFactor;
@@ -1175,7 +1176,7 @@ public:
 	int chainUninsatalTime;
 	int chainDisconnectTime;
 	bool killAfterDisconnect;
-	// невидимый
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	bool invisible;
 	bool canChangeVisibility;
 	UnitColor transparenceDiffuseForAlien;
@@ -1267,7 +1268,7 @@ public:
 	void refreshChains();
 	virtual bool isChainNecessary(ChainID chainID) const { return true; }
 
-	const AnimationChain* animationChain(ChainID chainID, int counter = -1, const AbnormalStateType* astate = 0, MovementState movementState = MovementState::DEFAULT, WeaponAnimationType weapon = WeaponAnimationType("")) const; // По умолчанию - случайная
+	const AnimationChain* animationChain(ChainID chainID, int counter = -1, const AbnormalStateType* astate = 0, MovementState movementState = MovementState::DEFAULT, WeaponAnimationType weapon = WeaponAnimationType("")) const; // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	const AnimationChain* animationChainByFactor(ChainID chainID, float factor, const AbnormalStateType* astate = 0, MovementState movementState = MovementState::DEFAULT) const;
 	const AnimationChain* animationChainTransition(float factor, const AbnormalStateType* astate, MovementState stateFrom, MovementState stateTo, WeaponAnimationType weapon = WeaponAnimationType("")) const;
 
@@ -1281,8 +1282,8 @@ public:
 
 	void calcBasementPoints(float angle, const Vect2f& center, Vect2i points[4]) const;
 
-	// Кешируется, может отствавать в момент после редактирования до записи
-	// У основной библиотеки формат "Раса, юнит", у сквадов и снарядов - просто имя
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	// пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ", пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 	virtual const char* libraryKey() const; 
 	//const UnitName& unitName() const { return unitAttributeID_.unitName(); }
 	//const Race& race() const { return unitAttributeID_.race(); }
@@ -1325,10 +1326,10 @@ private:
 	FileTime modelTime_;
 	string libraryKey_;
 	
-	AbnormalStateAttribute waterEffect; // Прокеширован в AttributeCache, брать оттуда
-	AbnormalStateAttribute lavaEffect; // Прокеширован в AttributeCache, брать оттуда
-	AbnormalStateAttribute iceEffect; // Прокеширован в AttributeCache, брать оттуда
-	AbnormalStateAttribute earthEffect; // Прокеширован в AttributeCache, брать оттуда
+	AbnormalStateAttribute waterEffect; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ AttributeCache, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	AbnormalStateAttribute lavaEffect; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ AttributeCache, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	AbnormalStateAttribute iceEffect; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ AttributeCache, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	AbnormalStateAttribute earthEffect; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ AttributeCache, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
 	AnimationChainsInterval findAnimationChainInterval(ChainID chainID, const AbnormalStateType* astate, MovementState movementState, WeaponAnimationType weapon = WeaponAnimationType()) const;
 	AnimationChainsInterval findTransitionChainInterval(const AbnormalStateType* astate, MovementState stateFrom, MovementState stateTo, WeaponAnimationType weapon) const;
@@ -1347,8 +1348,8 @@ private:
 
 protected:
 	UI_CursorReference selectionCursor_;
-	// Не сериализуется. Нужен, чтобы можно было менять курсор во время выполнения
-	// без опасения запортить библиотеку
+	// пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	const UI_Cursor* selectionCursorProxy_;
 
 	friend class AttributeCache;

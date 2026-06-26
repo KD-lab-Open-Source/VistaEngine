@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "SourceBlast.h"
-Physics/windMap.h
+#include "Physics/windMap.h"
 
 SourceBlast::SourceBlast()
 :SourceBase()

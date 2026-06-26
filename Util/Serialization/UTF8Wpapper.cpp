@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "UTF8Wrapper.h"
-Serialization/Serialization.h
+#include "Serialization/Serialization.h"
 #include "WBuffer.h"
 #include "UnicodeConverter.h"
 

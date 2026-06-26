@@ -5,7 +5,9 @@
 class Archive;
 struct Color3c;
 
+#ifdef _WIN32
 typedef unsigned long DWORD;
+#endif
 
 struct Color4f
 {
@@ -35,9 +37,9 @@ struct Color4f
 	int GetG() const 						{ return round(255*g); }
 	int GetB() const 						{ return round(255*b); }
 	int GetA() const 						{ return round(255*a); }
-	DWORD RGBA() const 						{ return (round(255*r) << 16) | (round(255*g) << 8) | round(255*b) | (round(255*a) << 24); }
-	DWORD GetRGB() const 					{ return (round(255*r) << 16) | (round(255*g) << 8) | round(255*b); }
-	DWORD RGBGDI() const 					{ return round(255*r) | (round(255*g) << 8) | (round(255*b) << 16); }
+	DWORD RGBA() const 						{ return ((int)round(255*r) << 16) | ((int)round(255*g) << 8) | (int)round(255*b) | ((int)round(255*a) << 24); }
+	DWORD GetRGB() const 					{ return ((int)round(255*r) << 16) | ((int)round(255*g) << 8) | (int)round(255*b); }
+	DWORD RGBGDI() const 					{ return (int)round(255*r) | ((int)round(255*g) << 8) | ((int)round(255*b) << 16); }
 	void interpolate(const Color4f &u,const Color4f &v,float f) { r=u.r+(v.r-u.r)*f; g=u.g+(v.g-u.g)*f; b=u.b+(v.b-u.b)*f; a=u.a+(v.a-u.a)*f; }
 	void interpolate3(const Color4f &u,const Color4f &v,float f) { r=u.r+(v.r-u.r)*f; g=u.g+(v.g-u.g)*f; b=u.b+(v.b-u.b)*f; }
 	bool operator == (const Color4f &color) const { return fabs(r - color.r) < FLT_EPS && fabs(g - color.g) < FLT_EPS && fabs(b - color.b) < FLT_EPS && fabs(a - color.a) < FLT_EPS; }

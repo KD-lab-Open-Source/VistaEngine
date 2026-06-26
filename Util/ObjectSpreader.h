@@ -1,8 +1,9 @@
 #include <stack>
 #include <vector>
 #include "Handle.h"
+#include "XMath/xmath.h"
 
-Serialization/Range.h
+#include "Serialization/Range.h"
 
 template<class T>
 class CyclicList {
@@ -230,7 +231,7 @@ private:
 	int addCircle (float radius, int outlineIndex);
 	void eraseInactive ();
 
-	// вычисления
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	float angle (Outline::iterator node1, Outline::iterator node2, Outline::iterator node3);
     Circle thirdCircle (const Circle& c1, const Circle& c2, float radius);
     Circle adjacentCircle (const Circle& circle, float radius);

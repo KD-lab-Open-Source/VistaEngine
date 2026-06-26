@@ -1,10 +1,10 @@
 #ifndef __EFFECT_CONTROLLER_H__
 #define __EFFECT_CONTROLLER_H__
 
-XTL/SafeCast.h
+#include "XTL/SafeCast.h"
 #include "Interpolation.h"
 #include "SoundAttribute.h"
-#include "UnitLink.h"
+#include "Units/UnitLink.h"
 #include "Timers.h"
 
 class BaseUniverseObject;

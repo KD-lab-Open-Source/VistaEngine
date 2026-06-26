@@ -1,7 +1,7 @@
 #ifndef __VIEW_MANAGER_H_INCLUDED__
 #define __VIEW_MANAGER_H_INCLUDED__
 
-XTL/Rect.h
+#include "XTL/Rect.h"
 
 class ViewManager {
 public:

@@ -2,8 +2,8 @@
 #define __EXTERNALTASK_H__
 
 #include "CommonLocText.h"
-Units/AttributeReference.h
-FileUtils/XGUID.h //определение XGUID
+#include "Units/AttributeReference.h"
+#include "FileUtils/XGUID.h" //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ XGUID
 #include "GlobalStatistics.h"
 
 #define caseR(a) case a: return #a;
@@ -16,7 +16,7 @@ enum e_PNCWorkMode{
 	PNCWM_ONLINE_P2P,
 };
 
-enum eGameOrder {
+enum eGameOrder : int {
 	GameOrder_1v1=2,
 	GameOrder_2v2=4,
 	GameOrder_3v3=6,
@@ -43,7 +43,7 @@ enum ScoresID {
 	SCORESR3 = (10u)
 };
 
-// flag_end сбрасывается первым устанавливается последним! для избежания CriticalSection
+// flag_end пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ! пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ CriticalSection
 class ExternalNetTaskBase {
 public:
 	ExternalNetTaskBase  (){
@@ -277,7 +277,7 @@ public:
 		xassert(buf4File); 
 		if(!buf4File){
 			__super::start(); 
-			setErr();//выставление ошибкм в случае не указанного буфера
+			setErr();//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		}
 		flag_setuped=true;
 	}

@@ -3,7 +3,7 @@
 #include "ProcessString.h"
 #include "ProcessInclude.h"
 #include <direct.h>
-saver/saver.h
+#include "saver/saver.h"
 /*
  Новый формат - внутри psl, vsl в комментариях,
 имя шейдера, дефайны и версия шейдера в одной строчке.

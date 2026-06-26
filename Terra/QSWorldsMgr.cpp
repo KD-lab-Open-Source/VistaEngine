@@ -1,9 +1,9 @@
 #include "stdafxTr.h"
 #include "QSWorldsMgr.h"
-Serialization/Serialization.h
-Serialization/XPrmArchive.h
-FileUtils/FileUtils.h
-FileUtils/XGUID.h
+#include "Serialization/Serialization.h"
+#include "Serialization/XPrmArchive.h"
+#include "FileUtils/FileUtils.h"
+#include "FileUtils/XGUID.h"
 
 //Network/LogMsg.h // Недопустимая зависимость
 

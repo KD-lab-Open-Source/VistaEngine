@@ -1,12 +1,12 @@
 #include "StdAfx.h"
 #include "GlobalAttributes.h"
-Terra/vmap.h
+#include "Terra/vmap.h"
 #include "CameraManager.h"
-Serialization/SerializationFactory.h
-Serialization/EnumDescriptor.h
-Serialization/MillisecondsWrapper.h
-Serialization/RangedWrapper.h
-Serialization/RadianWrapper.h
+#include "Serialization/SerializationFactory.h"
+#include "Serialization/EnumDescriptor.h"
+#include "Serialization/MillisecondsWrapper.h"
+#include "Serialization/RangedWrapper.h"
+#include "Serialization/RadianWrapper.h"
 #include "GameOptions.h"
 #include "UnicodeConverter.h"
 

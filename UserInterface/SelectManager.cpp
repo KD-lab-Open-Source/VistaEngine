@@ -5,7 +5,7 @@
 #include "GameShell.h"
 #include "Squad.h"
 #include "IronBuilding.h"
-Units/PositionGeneratorCircle.h
+#include "Units/PositionGeneratorCircle.h"
 #include "UI_Logic.h"
 #include "UnitAttribute.h"
 #include "GameCommands.h"

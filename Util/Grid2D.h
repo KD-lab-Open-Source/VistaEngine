@@ -1,15 +1,16 @@
 //////////////////////////////////////////////////////////////////////////////
-// 2D сетка для оптимизации поиска объектов.
-// Доступ 
+// 2D пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+// пїЅпїЅпїЅпїЅпїЅпїЅ 
 //////////////////////////////////////////////////////////////////////////////
 #ifndef __GRID_2D__
 #define __GRID_2D__
 
-Render/inc/RenderMT.h
+#include "Render/inc/RenderMT.h"
 #include "DebugUtil.h"
+#include "Profiler.h"
 
-// Прямоугольная область для сканироавния 
-// и 2D баундов
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
+// пїЅ 2D пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 struct GridRectangle 
 {
 	int x0, y0, x1, y1;
@@ -22,7 +23,7 @@ struct GridRectangle
 	bool pointIn(int x, int y) const { return x >= x0 && x <= x1 && y >= y0 && y <= y1; }
 };
 
-// Базовый класс для объектов, помещаемых в сетку
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
 class GridElementType
 {
 	mutable int passCounterLogic_;
@@ -43,15 +44,15 @@ public:
 	void decrInsertion() const { --insert_counter; }
 };
 
-// Вспомогательный класс для учета 
-// вызовов при сканировании
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 class GridPassDispatcher
 {
 public:
 	GridPassDispatcher(){ passCounterLogic_ = passCounterGraphics_ = 0; scanned_ = false; }
-	void scanNext() const { passCounter()++; } // Сбрасывает scanAgain
-	void scanAgain() const { passCounter()--; } // Делает следующий скан атоммарным с предыдущим, т.е не будут вызываться уже вызванные объекты
-	void setAsPassed(const GridElementType& el) const // Отмечает элемент как уже обработанный
+	void scanNext() const { passCounter()++; } // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ scanAgain
+	void scanAgain() const { passCounter()--; } // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ.пїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	void setAsPassed(const GridElementType& el) const // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	{
 		el.passCounter() = passCounter() + 1; 
 	}
@@ -87,29 +88,31 @@ private:
 	int& passCounter() const { return MT_IS_LOGIC() ? passCounterLogic_ : passCounterGraphics_; }
 };
 
-// Шаблон для создания сетки из  векторов
-// Быстрее работает, но занимает больше памяти
+// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 template<class T, int reserve_size = 0>
 class GridVector : public vector<T*>
 {
 public:
-	GridVector() { if(reserve_size) reserve(reserve_size); }
-	void insert(T* obj) { push_back(obj); obj->incrInsertion(); }
-	void remove(T* obj) 
-	{  // Ищем для удаления в обратную сторону,
-		// т.к. более подвижные объекты лежат в конце.
-		xassert(!empty()); // всегда не пустой
-		for(iterator i = end() - 1; i >= begin(); --i)
+	typedef typename vector<T*>::iterator iterator;
+
+	GridVector() { if(reserve_size) this->reserve(reserve_size); }
+	void insert(T* obj) { this->push_back(obj); obj->incrInsertion(); }
+	void remove(T* obj)
+	{  // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ,
+		// пїЅ.пїЅ. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ.
+		xassert(!this->empty()); // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+		for(iterator i = this->end() - 1; i >= this->begin(); --i)
 			if(*i == obj)
-			{ 
-				erase(i); 
+			{
+				this->erase(i);
 				obj->decrInsertion();
 				return;
 			} 
 	}
 };
 
-//	Сетка
+//	пїЅпїЅпїЅпїЅпїЅ
 template <class T, int cell_size_len, class CellList >	
 class Grid2D : public GridPassDispatcher
 {
@@ -218,14 +221,14 @@ public:
 	int size() const // for Debug purpose mostly
 	{
 		int sz = 0;
-		for(int y = 0;y < sy;y++)
-			for(int x = 0;x < sx;x++)
+		for(int y = 0;y < size_y;y++)
+			for(int x = 0;x < size_x;x++)
 				sz += cell_table[y][x].size();
 		return sz;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////
-	//   Операции доступа и сканирования
+	//   пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	////////////////////////////////////////////////////////////////////////////////////
 	template <class Op>
 	void Scan(const Vect2i& position, int side, Op& op) const { Scan(position.x - side, position.y - side, position.x + side, position.y + side, op); }
@@ -244,7 +247,7 @@ public:
 		for(int y = rect.y0;y <= rect.y1;y++)
 			for(int x = rect.x0;x <= rect.x1;x++){
 				CellList& root = table(x, y);
-				CellList::iterator i;
+				typename CellList::iterator i;
 				FOR_EACH(root, i)
 					if(doPass(**i))
 						op(*i);
@@ -265,7 +268,7 @@ public:
 		for(int y = rect.y0;y <= rect.y1;y++)
 			for(int x = rect.x0;x <= rect.x1;x++){
 				CellList& root = table(x, y);
-				CellList::iterator i;
+				typename CellList::iterator i;
 				FOR_EACH(root, i)
 					if(doPass(**i))
 						if(!(op(*i)))
@@ -284,7 +287,7 @@ public:
 		GridRectangle rect(x0, y0, x0, y0);
 		prepRectangle(rect);
 		CellList& root = table(rect.x0, rect.y0);
-		CellList::iterator i;
+		typename CellList::iterator i;
 		FOR_EACH(root, i)
 			if(doPass(**i))
 				op(*i);
@@ -300,7 +303,7 @@ public:
 		GridRectangle rect(x0, y0, x0, y0);
 		prepRectangle(rect);
 		CellList& root = table(rect.x0, rect.y0);
-		CellList::iterator i;
+		typename CellList::iterator i;
 		FOR_EACH(root, i)
 			if(doPass(**i))
 				if(!(op(*i)))
@@ -314,7 +317,7 @@ public:
 		if(insideMap(x, y))
 		{
 			CellList& root = table(x, y);
-			CellList::iterator i;
+			typename CellList::iterator i;
 			FOR_EACH(root, i)
 				if(doPass(**i))
 					op(*i);
@@ -327,7 +330,7 @@ public:
 		if(insideMap(x, y))
 		{
 			CellList& root = table(x, y);
-			CellList::iterator i;
+			typename CellList::iterator i;
 			FOR_EACH(root, i)
 				if(doPass(**i))
 					if(!(op(*i)))
@@ -639,7 +642,7 @@ public:
 		}
 
 		int vals_up = 0;
-		for(i = 1; i < n; i++)
+		for(int i = 1; i < n; i++)
 			if(pY[vals_up] > pY[i])
 				vals_up = i;
 
@@ -829,9 +832,9 @@ private:
 	int size_x, size_y;
 //	int m_mask_x, m_mask_y;
 
-	// Реализован Clamped-режим:
-	// объекты за пределами границ карты не рассматриваются,
-	// сканироание происходит строго в пределах карты.
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Clamped-пїЅпїЅпїЅпїЅпїЅ:
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ,
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.
 	int mask_x(int x) const { return x; }
 	int mask_y(int y) const { return y; }
 	int clamp_x(int x) const { return x > 0 ? (x < size_x ? x : size_x - 1) : 0; }
@@ -847,7 +850,7 @@ private:
 
 	CellList& table(int x, int y) const { xassert(x >= 0 && x < size_x && y >= 0 && y < size_y); return cell_table[mask_y(y)][mask_x(x)]; }
 
-	// Подготовка области для сканирования
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	void prepRectangle(GridRectangle& rectangle)  const
 	{
 		rectangle.x0 = clamp_x(rectangle.x0 >> cell_size_len);

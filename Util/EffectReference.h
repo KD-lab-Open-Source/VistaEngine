@@ -1,9 +1,9 @@
 #ifndef __EFFECT_REFERENCE_H__
 #define __EFFECT_REFERENCE_H__
 
-XMath/Colors.h
-Serialization/SerializationTypes.h
-Units/Object3dxInterface.h
+#include "XMath/Colors.h"
+#include "Serialization/SerializationTypes.h"
+#include "Units/Object3dxInterface.h"
 #include "EffectContainer.h"
 
 /// параметры спецэффекта

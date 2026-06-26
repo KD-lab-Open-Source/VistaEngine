@@ -6,8 +6,8 @@
 #include <commdlg.h>
 #include "resource.h"
 #include "float.h"
-Game/IniFile.h
-Render/inc/IRenderDevice.h
+#include "Game/IniFile.h"
+#include "Render/inc/IRenderDevice.h"
 
 string default_font_name="Scripts\\Resource\\fonts\\default.ttf";
 

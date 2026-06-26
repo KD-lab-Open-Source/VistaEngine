@@ -1,10 +1,10 @@
 #ifndef __UNIVERSE_H__
 #define __UNIVERSE_H__
 
-Units/BaseUnit.h
+#include "Units/BaseUnit.h"
 #include "Player.h"
-XTL/UniqueVector.h
-Physics/Math/ConstraintHandlerSimple.h
+#include "XTL/UniqueVector.h"
+#include "Physics/Math/ConstraintHandlerSimple.h"
 
 class Player;
 class CrashSystem;

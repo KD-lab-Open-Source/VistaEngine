@@ -1,8 +1,9 @@
 #pragma once
-Serialization/SerializationTypes.h
-Serialization/StringTableReference.h
+#include "XMath/xmath.h"
+#include "Serialization/SerializationTypes.h"
+#include "Serialization/StringTableReference.h"
 
-enum TerrainType;
+enum TerrainType : int;
 typedef int TerToolsID;
 
 class TerToolLibElement;

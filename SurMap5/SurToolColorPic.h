@@ -4,7 +4,7 @@
 #include "EScroll.h"
 #include "SurToolAux.h"
 #include "ColorButton.h"
-mfc/SizeLayoutManager.h
+#include "mfc/SizeLayoutManager.h"
 
 // CSurToolColorPic dialog
 

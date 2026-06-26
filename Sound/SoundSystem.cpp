@@ -1,8 +1,8 @@
 #include "stdafx.h"
-Game/Universe.h
+#include "Game/Universe.h"
 #include "soundSystem.h"
 #include "SoundInternal.h"
-Game/SoundApp.h
+#include "Game/SoundApp.h"
 #include "Console.h"
 #include "Profiler.h"
 #include "SystemUtil.h"

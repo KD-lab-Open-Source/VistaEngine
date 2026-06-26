@@ -2,6 +2,7 @@
 #define _PERIMETER_SAFE_MATH_
 
 #include "XMath/fastMath.h"
+#include "XMath/xmath.h" // FLT_EPS
 
 inline float cycle(float f, float size) 
 { 

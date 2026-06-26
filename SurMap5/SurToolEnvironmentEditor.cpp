@@ -3,11 +3,11 @@
 #include "SurMap5.h"
 #include "SurToolEnvironmentEditor.h"
 
-Game/Universe.h
-Units/Nature.h
-Units/EnvironmentSimple.h
-Game/RenderObjects.h
-Game/CameraManager.h
+#include "Game/Universe.h"
+#include "Units/Nature.h"
+#include "Units/EnvironmentSimple.h"
+#include "Game/RenderObjects.h"
+#include "Game/CameraManager.h"
 
 #include "DebugUtil.h"
 

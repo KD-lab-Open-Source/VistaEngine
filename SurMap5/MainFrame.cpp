@@ -6,8 +6,8 @@
 #include "MainFrame.h"
 #include "GeneralView.h"
 
-Serialization/Serializer.h
-Serialization/XPrmArchive.h
+#include "Serialization/Serializer.h"
+#include "Serialization/XPrmArchive.h"
 #include "Serialization/Dictionary.h"
 #include "kdw/PropertyEditor.h"
 #include "kdw/TreeSelector.h"
@@ -30,10 +30,10 @@ Serialization/XPrmArchive.h
 #include "SurToolSelect.h"
 #include "ToolsTreeCtrl.h"
 #include "SurMapOptions.h"
-Serialization/GenericFileSelector.h
-Serialization/SerializationFactory.h
-Render/src/TileMap.h
-Render/Src/VisGeneric.h
+#include "Serialization/GenericFileSelector.h"
+#include "Serialization/SerializationFactory.h"
+#include "Render/src/TileMap.h"
+#include "Render/Src/VisGeneric.h"
 
 #include "ExtCmdManager.h"
 
@@ -44,25 +44,25 @@ Render/Src/VisGeneric.h
 #include "SelectionUtil.h"
 #include "SystemUtil.h"
 
-Game/RenderObjects.h
-Game/Universe.h
-Game/CameraManager.h
-Environment/Environment.h
-Environment/SourceManager.h
+#include "Game/RenderObjects.h"
+#include "Game/Universe.h"
+#include "Game/CameraManager.h"
+#include "Environment/Environment.h"
+#include "Environment/SourceManager.h"
 #include "AttributeReference.h"
 #include "AttributeSquad.h"
-Game/IniFile.h
-Render/3dx/Lib3dx.h
-Render/Src/TexLibrary.h
+#include "Game/IniFile.h"
+#include "Render/3dx/Lib3dx.h"
+#include "Render/Src/TexLibrary.h"
 
 #include "version.h"
 
-UserInterface/UserInterface.h
-Game/GameOptions.h
-Render/Src/Scene.h
+#include "UserInterface/UserInterface.h"
+#include "Game/GameOptions.h"
+#include "Render/Src/Scene.h"
 
 Terra/vmap.inl
-Terra/vmap4vi.h
+#include "Terra/vmap4vi.h"
 
 #include "TextDB.h"
 #include "UnicodeConverter.h"
@@ -78,19 +78,19 @@ Terra/vmap4vi.h
 #include "ZipConfig.h"
 #include "OutputProgressDlg.h"
 
-Game/StreamCommand.h
+#include "Game/StreamCommand.h"
 
-Game/MergeOptions.h
+#include "Game/MergeOptions.h"
 
-Serialization/XPrmArchive.h
-FileUtils/FileUtils.h
-Terra/qsWorldsMgr.h
+#include "Serialization/XPrmArchive.h"
+#include "FileUtils/FileUtils.h"
+#include "Terra/qsWorldsMgr.h"
 
-Terra/TerrainType.h
+#include "Terra/TerrainType.h"
 #include <CrtDbg.h>
-VistaEditor/CommandEditor.h
-VistaEditor/FormationEditor.h
-TriggerEditor/TriggerEditor.h
+#include "VistaEditor/CommandEditor.h"
+#include "VistaEditor/FormationEditor.h"
+#include "TriggerEditor/TriggerEditor.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

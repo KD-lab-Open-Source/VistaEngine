@@ -1,7 +1,7 @@
 #ifndef __MAP2D_H__
 #define __MAP2D_H__
 
-XMath/xmath.h
+#include "XMath/xmath.h"
 
 template <class T, int tileSizeShl_>
 class Map2D

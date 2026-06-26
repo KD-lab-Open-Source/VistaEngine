@@ -2,7 +2,7 @@
 #define __VISERROR_H__
 
 #include "Console.h"
-Render/Inc/rd.h
+#include "Render/Inc/rd.h"
 
 RENDER_API int RDWriteLog(HRESULT err,char *exp,char *file,int line);
 

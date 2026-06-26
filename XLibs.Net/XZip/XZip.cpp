@@ -8,8 +8,8 @@
 #include "XZip.h"
 #include "FileUtils.h"
 
-zlib/contrib/minizip/unzip.h
-zlib/contrib/minizip/zip.h
+#include "zlib/contrib/minizip/unzip.h"
+#include "zlib/contrib/minizip/zip.h"
 
 using namespace file_utils;
 
@@ -59,11 +59,11 @@ private:
 	typedef std::hash_map<std::string, ZLibFileInfo, std::hash<std::string> > IndexMap;
 	IndexMap index_;
 
-	/// имя открытого в данный момент файла
+	/// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	std::string fileName_;
-	/// размер открытого в данный момент файла
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	unsigned long fileSize_;
-	/// дата открытого в данный момент файла
+	/// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	unsigned long fileDate_;
 };
 
@@ -320,9 +320,9 @@ bool XZipStream::eof() const
 unsigned long XZipStream::read(void* buf, unsigned long len)
 {
 	if(directReadMode_){
-		unsigned long ret;
+		DWORD ret;
 
-		if(!ReadFile(fileHandle_, buf, len, &ret, 0)){
+		if(!ReadFile(fileHandle_, buf, (DWORD)len, &ret, 0)){
 			if(handleErrors_)
 				zipError(readMSG);
 			else

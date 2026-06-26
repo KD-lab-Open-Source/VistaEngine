@@ -6,8 +6,13 @@ set(XUTIL_SOURCES
     Unicode/WBuffer.cpp
     skey.cpp
     XUtilCore.cpp
-    XUtil/XClock.cpp
 )
+
+if(WIN32)
+    list(APPEND XUTIL_SOURCES XUtil/XClock.cpp)
+else()
+    list(APPEND XUTIL_SOURCES XUtil/XClock_posix.cpp)
+endif()
 
 if(WIN32)
     list(APPEND XUTIL_SOURCES

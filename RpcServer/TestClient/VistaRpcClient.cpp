@@ -1,10 +1,10 @@
 #include "StdAfx.h"
-kdw/Application.h
+#include "kdw/Application.h"
 #include "Client.h"
 
-XMath/XMathLib.h
-Serialization/SerializationLib.h
-kdw/kdWidgetsLib.h
+#include "XMath/XMathLib.h"
+#include "Serialization/SerializationLib.h"
+#include "kdw/kdWidgetsLib.h"
 
 //#define _LIB_NAME "XmlRpc"
 //#include "AutomaticLink.h"

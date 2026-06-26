@@ -49,7 +49,10 @@ protected:
 		T* operator->() const { return t_; }
 		T& operator*() const { return *t_; }
 		T* get() const { return t_; }
-		bool serialize(Archive& ar, const char* name, const char* nameAlt) { return t_ ? ar.serialize(*t_, name, nameAlt) : true; }
+		// Templated on the archive type so the ar.serialize() lookup is deferred
+		// to instantiation; this header only forward-declares Archive.
+		template<class Archive2>
+		bool serialize(Archive2& ar, const char* name, const char* nameAlt) { return t_ ? ar.serialize(*t_, name, nameAlt) : true; }
 
 	private:
 		T* t_;

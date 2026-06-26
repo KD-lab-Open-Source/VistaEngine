@@ -2,7 +2,7 @@
 #define __SUR_TOOL_PATH_EDITOR_H_INCLUDED__
 
 #include "SurToolAux.h"
-MFC/SizeLayoutManager.h
+#include "MFC/SizeLayoutManager.h"
 
 class SourceBase;
 class BaseUniverseObject;

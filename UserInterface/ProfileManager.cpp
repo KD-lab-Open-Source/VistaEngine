@@ -1,13 +1,13 @@
 #include "stdafx.h"
 #include "ProfileManager.h"
 
-Serialization/Serialization.h
-Serialization/XPrmArchive.h
-Serialization/MultiArchive.h
+#include "Serialization/Serialization.h"
+#include "Serialization/XPrmArchive.h"
+#include "Serialization/MultiArchive.h"
 #include "UnitAttribute.h"
 #include "GlobalAttributes.h"
-FileUtils/FileUtils.h
-Serialization/StringTable.h
+#include "FileUtils/FileUtils.h"
+#include "Serialization/StringTable.h"
 
 #include <shlobj.h>
 

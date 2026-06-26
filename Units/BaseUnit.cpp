@@ -1,25 +1,33 @@
 #include "StdAfx.h"
-Game/Universe.h
-Environment/SourceManager.h
-Environment/Environment.h
+#include "Game/Universe.h"
+#include "Environment/SourceManager.h"
+#include "Environment/Environment.h"
 #include "Interpolation.h"
 #include "Sound.h"
 #include "SoundApp.h"
 #include "vmap.h"
 #include "RenderObjects.h"
-Serialization/Serialization.h
-Serialization/SerializationFactory.h
+#include "Serialization/Serialization.h"
+#include "Serialization/SerializationFactory.h"
 #include "UnitObjective.h"
-AI/PFTrap.h
+#include "AI/PFTrap.h"
 #include "GlobalAttributes.h"
 
 #include "EditorVisual.h"
+
+// Defined here (rather than inline in BaseUnit.h) so the UnitFactoryArg2::createArg
+// template can add a unit to its player without BaseUnit.h needing the complete
+// Game-layer Player type.
+void unitFactoryAddUnit(Player* player, UnitBase* unit)
+{
+	player->addUnit(unit);
+}
 
 UNIT_LINK_GET(BaseUniverseObject)
 UNIT_LINK_GET(const BaseUniverseObject)
 UNIT_LINK_GET(UnitBase)
 
-REGISTER_CLASS(UnitBase, UnitBase, "Базовый юнит");
+REGISTER_CLASS(UnitBase, UnitBase, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 
 FORCE_SEGMENT(UnitItemInventory)
 FORCE_SEGMENT(UnitItemResource)
@@ -205,7 +213,7 @@ void UnitBase::Quant()
 			}
 
 			if(it->isActive()){
-				// цвет держится лишний квант чтобы избежать мигания
+				// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				if(eff->needColorChange())
 					setColor(eff->color());
 				if(it->end()){
@@ -232,7 +240,7 @@ void UnitBase::Quant()
 			++it;
 	}
 
-	if(opacity() < 0.999f) // Восстановление после прозрачности
+	if(opacity() < 0.999f) // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		setOpacity(min(1.f, opacity() + GlobalAttributes::instance().opacityRestoreSpeed));
 }
 

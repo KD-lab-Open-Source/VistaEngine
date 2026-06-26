@@ -3,7 +3,7 @@
 #include "FileUtils/FileUtils.h"
 #include "RootExport.h"
 
-void StaticLight::export(IVisLight* pobject, int inode_current)
+void StaticLight::exportTo(IVisLight* pobject, int inode_current)
 {
 	string name = pobject->GetName();
 	if(pobject->GetType()!=OMNI_LIGHT || name.find("leaf")!=string::npos)
@@ -19,7 +19,7 @@ void StaticLight::export(IVisLight* pobject, int inode_current)
 	chains.resize(animationChains.size());
 	for(int i=0;i < animationChains.size();i++){
 		const StaticAnimationChain& ac = animationChains[i];
-		chains[i].export(pobject, ac.begin_frame, ac.intervalSize(), ac.cycled);
+		chains[i].exportTo(pobject, ac.begin_frame, ac.intervalSize(), ac.cycled);
 	}
 
 	const char* tex_name = pobject->GetBitmapName();
@@ -27,7 +27,7 @@ void StaticLight::export(IVisLight* pobject, int inode_current)
 		texture = extractFileName(tex_name);
 }
 
-void StaticLightAnimation::export(IVisLight* pobject, int interval_begin, int interval_size, bool cycled)
+void StaticLightAnimation::exportTo(IVisLight* pobject, int interval_begin, int interval_size, bool cycled)
 {
 	RefinerColor icolor;
 
@@ -48,7 +48,7 @@ void StaticLightAnimation::export(IVisLight* pobject, int interval_begin, int in
 	icolor.export(color);
 }
 
-void StaticLeaf::export(IVisLight* pobject, int inode_current)
+void StaticLeaf::exportTo(IVisLight* pobject, int inode_current)
 {
 	string name = pobject->GetName();
 	if(pobject->GetType()!=OMNI_LIGHT || name.find("leaf")==string::npos)

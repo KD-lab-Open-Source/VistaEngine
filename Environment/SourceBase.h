@@ -1,19 +1,19 @@
 #ifndef __BASE_SOURCE_H__
 #define __BASE_SOURCE_H__
 
-Serialization/SerializationTypes.h
+#include "Serialization/SerializationTypes.h"
 #include "Handle.h"
-Units/CircleManagerParam.h
-Serialization/Range.h
-Serialization/StringTableReferencePolymorphic.h
-Units/BaseUniverseObject.h
-XTL/SafeCast.h
+#include "Units/CircleManagerParam.h"
+#include "Serialization/Range.h"
+#include "Serialization/StringTableReferencePolymorphic.h"
+#include "Units/BaseUniverseObject.h"
+#include "XTL/SafeCast.h"
 #include "Timers.h"
 #include "EffectReference.h"
-Units/EffectController.h
-Units/WeaponEnums.h
+#include "Units/EffectController.h"
+#include "Units/WeaponEnums.h"
 #include "Grid2D.h"
-#include "UnitLink.h"
+#include "Units/UnitLink.h"
 
 class SourceBase;
 
@@ -104,7 +104,7 @@ private:
 	SourceReference sourceReference_;
 };
 
-enum TerrainType;
+enum TerrainType : int;
 class SourceBase : public BaseUniverseObject, public GridElementType, public PolymorphicBase
 {
 public:

@@ -2,7 +2,7 @@
 #include "ExcelImEx.h"
 #include  <direct.h>
 #include "ProgDlg.h"
-Util/TextDB.h
+#include "Util/TextDB.h"
 #include "GlobalAttributes.h"
 #include "UnicodeConverter.h"
 #include <set>

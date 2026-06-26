@@ -1,8 +1,8 @@
 #ifndef __ZIP_CONFIG_H__
 #define __ZIP_CONFIG_H__
 
-Serialization/StringTableBase.h
-Serialization/StringTable.h
+#include "Serialization/StringTableBase.h"
+#include "Serialization/StringTable.h"
 
 class ZipConfig : public StringTableBase
 {

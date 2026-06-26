@@ -1,13 +1,13 @@
 #include "StdAfx.h"
 #include "shlwapi.h"
 #include "TriggerExport.h"
-Serialization/Serialization.h
-Serialization/Dictionary.h
-Serialization/SerializationFactory.h
-Serialization/EnumDescriptor.h
-Serialization/Decorators.h
-Serialization/MultiArchive.h
-XMath/ComboListColor.h
+#include "Serialization/Serialization.h"
+#include "Serialization/Dictionary.h"
+#include "Serialization/SerializationFactory.h"
+#include "Serialization/EnumDescriptor.h"
+#include "Serialization/Decorators.h"
+#include "Serialization/MultiArchive.h"
+#include "XMath/ComboListColor.h"
 
 // Äëÿ StrStrI
 #pragma message("Automatically linking with shlwapi.lib") 

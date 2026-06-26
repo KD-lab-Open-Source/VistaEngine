@@ -1,7 +1,7 @@
 #ifndef __RIGID_BODY_PHYSICS_H__
 #define __RIGID_BODY_PHYSICS_H__
 
-Math/Vect6f.h
+#include "Math/Vect6f.h"
 #include "RigidBodyBase.h"
 
 class ConstraintHandler;

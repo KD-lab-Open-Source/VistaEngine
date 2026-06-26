@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "CreateStateAction.h"
-UserInterface/UI_Types.h
+#include "UserInterface/UI_Types.h"
 
 CreateStateAction::CreateStateAction (UI_ControlBase& control)
 : control_ (control)

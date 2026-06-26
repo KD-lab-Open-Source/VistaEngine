@@ -1,10 +1,10 @@
 #include "StdAfx.h"
 #include "UI_Font.h"
-Serialization/Serialization.h
-Serialization/ResourceSelector.h
-Serialization/EnumDescriptor.h
+#include "Serialization/Serialization.h"
+#include "Serialization/ResourceSelector.h"
+#include "Serialization/EnumDescriptor.h"
 
-Game/GameOptions.h
+#include "Game/GameOptions.h"
 #include "UI_Render.h"
 
 using namespace FT;

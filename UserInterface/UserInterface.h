@@ -1,9 +1,9 @@
 #ifndef __USER_INTERFACE_H__
 #define __USER_INTERFACE_H__
 
-XTL/Handle.h
-Serialization/LibraryWrapper.h
-Serialization/EnumTable.h
+#include "XTL/Handle.h"
+#include "Serialization/LibraryWrapper.h"
+#include "Serialization/EnumTable.h"
 #include "Timers.h"
 
 #include "UI_Types.h"

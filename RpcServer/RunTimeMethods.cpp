@@ -2,12 +2,12 @@
 #include "Runtime.h"
 #include "GUIDString.h"
 
-MySQLpp/TableBase.h
+#include "MySQLpp/TableBase.h"
 MySQLpp/mysql++.h
-MySQLpp/transaction.h
+#include "MySQLpp/transaction.h"
 
-UserInterface/XmlRpc/RpcEnums.h
-UserInterface/XmlRpc/RpcTypes.h
+#include "UserInterface/XmlRpc/RpcEnums.h"
+#include "UserInterface/XmlRpc/RpcTypes.h"
 
 class TableUser : public TableBase
 {

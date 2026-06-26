@@ -3,8 +3,8 @@
 
 #include "SelectionUtil.h"
 
-Render/inc/IRenderDevice.h
-Game/RenderObjects.h
+#include "Render/inc/IRenderDevice.h"
+#include "Game/RenderObjects.h"
 
 namespace UniverseObjectActions{
 

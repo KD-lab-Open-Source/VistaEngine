@@ -3,8 +3,8 @@
 
 #include "SourceBase.h"
 #include "EffectReference.h"
-Units/EffectController.h
-Units/AbnormalStateAttribute.h
+#include "Units/EffectController.h"
+#include "Units/AbnormalStateAttribute.h"
 
 class cEffect;
 class SourceEffect : public SourceBase  {

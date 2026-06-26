@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "Parameters.h"
 #include "UnitAttribute.h"
-Serialization/StringTableImpl.h
+#include "Serialization/StringTableImpl.h"
 #include <shlwapi.h>
-Serialization/Dictionary.h
-Serialization/SerializationFactory.h
-Serialization/RangedWrapper.h
+#include "Serialization/Dictionary.h"
+#include "Serialization/SerializationFactory.h"
+#include "Serialization/RangedWrapper.h"
 #include "Universe.h"
 #include "WBuffer.h"
 

@@ -2,11 +2,11 @@
 #define __UI_MINIMAP_H__
 
 #include <map>
-Render/inc/RenderMT.h
+#include "Render/inc/RenderMT.h"
 #include "MTSection.h"
 #include "UI_Font.h"
 #include "UI_MinimapSymbol.h"
-Util/Timers.h
+#include "Util/Timers.h"
 
 class cTexture;
 class MultiRegion;

@@ -2,10 +2,10 @@
 #include "SurMap5.h"
 #include "DlgSelectWorld.h"
 #include "DlgWorldName.h"
-FileUtils/FileUtils.h
-Serialization/Dictionary.h
-terra/vmap.h
-Network/NetPlayer.h
+#include "FileUtils/FileUtils.h"
+#include "Serialization/Dictionary.h"
+#include "terra/vmap.h"
+#include "Network/NetPlayer.h"
 
 // CDlgSelectWorld dialog
 int CDlgSelectWorld::previsionWorldSelect=0;

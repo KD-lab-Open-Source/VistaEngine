@@ -1,7 +1,7 @@
 #ifndef __OBJECTS_MANAGER_TREE_H_INCLUDED__
 #define __OBJECTS_MANAGER_TREE_H_INCLUDED__
 
-mfc/ObjectsTreeCtrl.h
+#include "mfc/ObjectsTreeCtrl.h"
 #include "EventListeners.h"
 
 class Player;

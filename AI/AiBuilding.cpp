@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "PlaceOperators.h"
-../util/ScanningShape.h
+#include "ScanningShape.h"
+#include "DebugPrm.h"
 
 
 WeaponScanOp::WeaponScanOp(const UnitActing* unit, Player& aiPlayer, float scanRadius, WeaponPrmReference weaponPrm)
@@ -118,7 +119,7 @@ void RadiusScanOp::checkPosition(const Vect2f& pos)
 void RadiusScanOp::operator()(UnitBase* unit2)
 {
 	const AttributeBase& attr = unit2->attr();
-	// Учитываем только здания 
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 
 	if(&attr == &unit_->attr() && safe_cast<UnitReal*>(unit2)->isUpgrading()) 
 		invalidPosition_ = true;
 	if(attr.isBuilding())
@@ -390,7 +391,7 @@ void PlaceScanOp::checkPosition(const Vect2f& pos)
 		float fullRadius = orientRadius + radius_ + installRadius;
 		float maxSize = installBound.norm();
 		float stepAngle = 2 * atan((maxSize * 0.5f) / fullRadius);
-		xassert(stepAngle > -FLT_EPS && "Очень плохо, попробуйте увеличить радиус в действии Заказать здание");
+		xassert(stepAngle > -FLT_EPS && "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 		float angle = 0.f;
 
 		float bestAngle = FLT_INF;
@@ -429,7 +430,7 @@ void PlaceScanOp::checkPosition(const Vect2f& pos)
 
 void PlaceScanOp::operator()(UnitBase* unit)
 {
-	// Учитываем только здания 
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 
 	const AttributeBase& attr = unit->attr();
 	if(!attr.isBuilding())
 		return;

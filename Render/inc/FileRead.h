@@ -1,6 +1,6 @@
 #pragma once
 
-Render/3dx/Saver.h
+#include "Render/3dx/Saver.h"
 
 bool RenderFileRead(const char *fname,char *&buf,int &size);//Читает файл в буфер созданный new, размер файла - size
 

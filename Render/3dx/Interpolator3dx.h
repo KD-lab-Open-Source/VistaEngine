@@ -1,9 +1,9 @@
 #ifndef __INTERPOLATOR3DX_H_INCLUDED__
 #define __INTERPOLATOR3DX_H_INCLUDED__
 
-Render/Inc/3dx.h
-Render/3dx/Saver.h
-Serialization/Serialization.h
+#include "Render/Inc/3dx.h"
+#include "Render/3dx/Saver.h"
+#include "Serialization/Serialization.h"
 
 template<int template_size>
 struct SplineData
@@ -94,7 +94,7 @@ public:
 
 	int FindIndex(float globalt) const
 	{
-		//потом возможно заменить на binary find
+		//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ binary find
 		return Next(globalt,0);
 	}
 
@@ -107,8 +107,8 @@ public:
 		return Prev(globalt,cur);
 	}
 
-	//cur - значение, которое вернул FindIndex или Next.
-	// предполагается, что globalt постоянно растёт.
+	//cur - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ FindIndex пїЅпїЅпїЅ Next.
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ globalt пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.
 	int Next(float globalt,int cur) const
 	{
 		int size=values.size();
@@ -125,7 +125,7 @@ public:
 		return size-1;
 	}
 
-	// предполагается, что globalt постоянно уменьшается.
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ globalt пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	int Prev(float globalt,int cur) const
 	{
 		int size=values.size();
@@ -147,17 +147,10 @@ public:
 		return ar.serialize(values, name, nameAlt);
 	}
 
-	void LoadIndex(CLoadIterator ld, const StaticChainsBlock& chains_block)
-	{
-		int index = -1;
-		int length = 0;
-		ld >> index;
-		ld >> length;
-		xassert(index >= 0);
-		xassert(length > 0);
-
-		chains_block.setValues(*this, index, length);
-	}
+	// Defined out-of-line below, after StaticChainsBlock is complete:
+	// setValues() is called on the concrete (non-dependent) StaticChainsBlock,
+	// so its definition must be visible when this body is parsed.
+	void LoadIndex(CLoadIterator ld, const StaticChainsBlock& chains_block);
 };
 
 typedef Interpolator3dx<SplineDataBool> Interpolator3dxBool;
@@ -208,5 +201,18 @@ private:
 
 	friend ChainConverter;
 };
+
+template<class _Data>
+void Interpolator3dx<_Data>::LoadIndex(CLoadIterator ld, const StaticChainsBlock& chains_block)
+{
+	int index = -1;
+	int length = 0;
+	ld >> index;
+	ld >> length;
+	xassert(index >= 0);
+	xassert(length > 0);
+
+	chains_block.setValues(*this, index, length);
+}
 
 #endif

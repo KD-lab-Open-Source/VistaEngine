@@ -1,9 +1,9 @@
 #ifndef __NORMAL_MAP_H_INCLUDED__
 #define __NORMAL_MAP_H_INCLUDED__
 
-Terra/vmap.h
-Water/ice.h
-Environment/Environment.h
+#include "Terra/vmap.h"
+#include "Water/ice.h"
+#include "Environment/Environment.h"
 
 class NormalMapTile {
 public:

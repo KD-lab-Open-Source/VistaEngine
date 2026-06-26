@@ -3,13 +3,13 @@
 #include "DebugUtil.h"
 #include "SurToolAnchor.h"
 
-AttribEditor/AttribEditorCtrl.h
-Environment/Anchor.h
+#include "AttribEditor/AttribEditorCtrl.h"
+#include "Environment/Anchor.h"
 
 #include "SurToolAux.h"
-Environment/SourceManager.h
-Serialization/Dictionary.h
-Serialization/BinaryArchive.h
+#include "Environment/SourceManager.h"
+#include "Serialization/Dictionary.h"
+#include "Serialization/BinaryArchive.h"
 #include "EventListeners.h"
 #include "kdw/LibraryTab.h" // для makeName
 

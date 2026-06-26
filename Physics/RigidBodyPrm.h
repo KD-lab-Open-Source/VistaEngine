@@ -1,9 +1,9 @@
 #ifndef __RIGID_BODY_PRM_H__
 #define __RIGID_BODY_PRM_H__
 
-Serialization/StringTableReferencePolymorphic.h
+#include "Serialization/StringTableReferencePolymorphic.h"
 
-enum RigidBodyType;
+enum RigidBodyType : int;
 
 ////////////////////////////////////////
 struct RigidBodyPrm : PolymorphicBase

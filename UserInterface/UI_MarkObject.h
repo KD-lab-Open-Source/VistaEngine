@@ -4,7 +4,7 @@
 #include "UI_Enums.h"
 #include "UI_MarkObjectAttribute.h"
 #include "BaseUniverseObject.h"
-#include "UnitLink.h"
+#include "Units/UnitLink.h"
 #include "EffectReference.h"
 #include "EffectController.h"
 #include "Timers.h"

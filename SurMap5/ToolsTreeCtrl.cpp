@@ -1,14 +1,14 @@
 #include "stdafx.h"
 #include "ToolsTreeCtrl.h"
-mfc/PopupMenu.h
+#include "mfc/PopupMenu.h"
 #include "SurMap5.h"
 #include "ToolsTreeWindow.h"
 #include "MainFrame.h"
-Serialization/Serialization.h
-Serialization/XPrmArchive.h
-Serialization/MultiArchive.h
-Serialization/Dictionary.h
-Serialization/SerializationFactory.h
+#include "Serialization/Serialization.h"
+#include "Serialization/XPrmArchive.h"
+#include "Serialization/MultiArchive.h"
+#include "Serialization/Dictionary.h"
+#include "Serialization/SerializationFactory.h"
 #include "kdw/PropertyEditor.h"
 	
 #include "SurTool3DM.h"

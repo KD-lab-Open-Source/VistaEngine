@@ -1,31 +1,31 @@
 #include "StdAfx.h"
 #include "MainWindow.h"
 
-XMath/XMath.h
+#include "XMath/XMath.h"
 
 #include "ShowLog.h"
-UserInterface/XmlRpc/RpcTypes.h
+#include "UserInterface/XmlRpc/RpcTypes.h"
 #include "Client.h"
 #include "GameTest.h"
 
-XmlRpc/XmlRpcUtil.h
+#include "XmlRpc/XmlRpcUtil.h"
 
-Serialization/Serialization.h
-Serialization/Serializer.h
-Serialization/XPrmArchive.h
+#include "Serialization/Serialization.h"
+#include "Serialization/Serializer.h"
+#include "Serialization/XPrmArchive.h"
 
-kdw/Application.h
-kdw/CommandManager.h
+#include "kdw/Application.h"
+#include "kdw/CommandManager.h"
 
-kdw/VBox.h
-kdw/HBox.h
-kdw/hsplitter.h
-kdw/HLine.h
-kdw/Label.h
-kdw/MenuBar.h
-kdw/ImageStore.h
-kdw/Toolbar.h
-kdw/PropertyTree.h
+#include "kdw/VBox.h"
+#include "kdw/HBox.h"
+#include "kdw/hsplitter.h"
+#include "kdw/HLine.h"
+#include "kdw/Label.h"
+#include "kdw/MenuBar.h"
+#include "kdw/ImageStore.h"
+#include "kdw/Toolbar.h"
+#include "kdw/PropertyTree.h"
 
 #include "resource.h"
 

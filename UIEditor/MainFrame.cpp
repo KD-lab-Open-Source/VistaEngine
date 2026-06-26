@@ -8,16 +8,16 @@
 #include "EditorView.h"
 #include "Options.h"
 
-UserInterface/UI_Render.h
-UserInterface/UserInterface.h
-Game/Universe.h
-Render/Src/VisGeneric.h
+#include "UserInterface/UI_Render.h"
+#include "UserInterface/UserInterface.h"
+#include "Game/Universe.h"
+#include "Render/Src/VisGeneric.h"
 
 #include "kdw/PropertyEditor.h"
-Serialization/XPrmArchive.h
-Serialization/Dictionary.h
-Serialization/SerializationFactory.h
-Serialization/StringTableImpl.h
+#include "Serialization/XPrmArchive.h"
+#include "Serialization/Dictionary.h"
+#include "Serialization/SerializationFactory.h"
+#include "Serialization/StringTableImpl.h"
 
 #include "ActionManager.h"
 #include "PositionChangeAction.h"

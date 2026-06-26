@@ -2,9 +2,9 @@
 #include "terTools.h"
 
 template<class GenerationMetod>	
-void vrtMap::drawBitMetod(int x, int y, int rad, GenerationMetod& genMetod, short _minFH, short _maxFH)
+void vrtMap::drawBitMetod(int x, int y, int rad, GenerationMetod genMetod, short _minFH, short _maxFH)
 {
-	//включение фильтра по высоте
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	int curDH=genMetod.maxHeight;
 	//if(curDH>0) { FilterMinHeight=_minFH; FilterMaxHeight=_maxFH; }
 	//else if(curDH<0) { FilterMinHeight=_minFH; FilterMaxHeight=MAX_VX_HEIGHT; }
@@ -21,7 +21,7 @@ void vrtMap::drawBitMetod(int x, int y, int rad, GenerationMetod& genMetod, shor
 	drawBitGen(x-rad, y-rad, pTBM, false);
 	regRender( XCYCL(x-rad), YCYCL(y-rad), XCYCL(x+rad), YCYCL(y+rad), vrtMap::TypeCh_Height );
 
-	//выключение фильтра по высоте
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	FilterMinHeight=0; FilterMaxHeight=MAX_VX_HEIGHT;
 }
 

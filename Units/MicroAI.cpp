@@ -5,7 +5,7 @@
 #include "IronBuilding.h"
 #include "Squad.h"
 #include "MicroAI.h"
-Environment/SourceShield.h
+#include "Environment/SourceShield.h"
 #include "GlobalAttributes.h"
 
 // веса параметров для расчёта приоритета цели

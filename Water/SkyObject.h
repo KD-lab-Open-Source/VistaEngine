@@ -1,8 +1,8 @@
 #pragma once
 
-Render/src/RenderCubemap.h
-Environment/EnvironmentColors.h
-Render/Src/cCamera.h
+#include "Render/src/RenderCubemap.h"
+#include "Environment/EnvironmentColors.h"
+#include "Render/Src/cCamera.h"
 
 class EnvironmentTime;
 class cSkyObj;

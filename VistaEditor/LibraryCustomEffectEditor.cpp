@@ -1,11 +1,11 @@
 #include "StdAfx.h"
 #include "LibraryCustomEffectEditor.h"
-Serialization/ResourceSelector.h
-Serialization/LibraryWrapper.h
-Serialization/StringTableBase.h
-Serialization/StringTable.h
-Serialization/SerializationFactory.h
-FileUtils/FileUtils.h
+#include "Serialization/ResourceSelector.h"
+#include "Serialization/LibraryWrapper.h"
+#include "Serialization/StringTableBase.h"
+#include "Serialization/StringTable.h"
+#include "Serialization/SerializationFactory.h"
+#include "FileUtils/FileUtils.h"
 #include "kdw/LibraryTree.h"
 #include "kdw/ContentUtil.h"
 #include "kdw/LibraryTab.h"

@@ -1,11 +1,11 @@
 #ifndef _UI_GAME_OPTIONS_H
 #define _UI_GAME_OPTIONS_H
 
-Serialization/LibraryWrapper.h
+#include "Serialization/LibraryWrapper.h"
 #include "Starforce.h"
-XMath/xmath.h
+#include "XMath/xmath.h"
 #include "d3d9types.h"
-UserInterface/CommonLocText.h
+#include "UserInterface/CommonLocText.h"
 
 enum GameOptionType
 {

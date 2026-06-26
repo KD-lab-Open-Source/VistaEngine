@@ -1,9 +1,9 @@
 #ifndef __DRAW_TYPE_H_INCLUDED__
 #define __DRAW_TYPE_H_INCLUDED__
 
-XMath/Colors.h
-Render/src/Texture.h
-Render/Shader/Shaders.h
+#include "XMath/Colors.h"
+#include "Render/src/Texture.h"
+#include "Render/Shader/Shaders.h"
 
 
 class cTileMap;

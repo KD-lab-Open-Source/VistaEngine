@@ -2,7 +2,7 @@
 #ifndef __VISTARPC_RPC_TYPES_H_INCLUDED__
 #define __VISTARPC_RPC_TYPES_H_INCLUDED__
 
-FileUtils/XGUID.h
+#include "FileUtils/XGUID.h"
 
 class Archive;
 

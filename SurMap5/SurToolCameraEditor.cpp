@@ -2,9 +2,9 @@
 
 #include "SurMap5.h"
 #include "SurToolCameraEditor.h"
-Game/CameraManager.h
-Game/RenderObjects.h
-Render/Inc/IRenderDevice.h
+#include "Game/CameraManager.h"
+#include "Game/RenderObjects.h"
+#include "Render/Inc/IRenderDevice.h"
 #include "SystemUtil.h"
 
 // ---------------------------------------------------------------------------------------------- //

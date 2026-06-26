@@ -1,7 +1,7 @@
 #ifndef _NORMALIZETGA_H_
 #define _NORMALIZETGA_H_
 
-Render/src/Texture.h
+#include "Render/src/Texture.h"
 
 class TextureMiniDetail : public cTexture
 {

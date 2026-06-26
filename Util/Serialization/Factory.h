@@ -1,9 +1,9 @@
 #ifndef __FACTORY_H__
 #define __FACTORY_H__
 
-XTL/StaticMap.h
-XTL/SafeCast.h
-XTL/StaticString.h
+#include "XTL/StaticMap.h"
+#include "XTL/SafeCast.h"
+#include "XTL/StaticString.h"
 #include "Handle.h"
 #include <typeinfo>
 
@@ -28,7 +28,7 @@ public:
 
 	static void* getVTable(const char* typeName){
 		VTableCreator* creator = map()[typeName];
-		xxassert(creator, XBuffer() < "Не зарегистрирован класс: " < typeName);
+		xxassert(creator, XBuffer() < "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: " < typeName);
 		if(!creator)
 			return 0;
 		void* vtable = map()[typeName]->vtable();
@@ -146,7 +146,7 @@ public:
 		}
 		BaseType* create() const
 		{
-			return instance().createArg<Derived>();
+			return instance().template createArg<Derived>();
 		}
 		const char* typeName() const 
 		{ 
@@ -165,11 +165,11 @@ public:
 
 		if(creators_.find(key) != creators_.end()) {
 			XBuffer msg;
-			msg < "Попытка повторной регистрации класса в "
+			msg < "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ "
 				< typeid(this).name();
 			xxassert(0, msg);
 		} else {
-			creators_.insert(Creators::value_type(key, &creator_op));
+			creators_.insert(typename Creators::value_type(key, &creator_op));
 		}
 	}
 
@@ -182,27 +182,27 @@ public:
 
 	BaseType* create(const Key& key, bool silent = false) const 
 	{
-		Creators::const_iterator it = creators_.find(key);
+		typename Creators::const_iterator it = creators_.find(key);
 		if(it != creators_.end())
 			return it->second->create();
 
-		xassert(silent && "Неопознанный идентификатор класса");
+		xassert(silent && "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 		return 0;
 	}
 
 	const char* typeName(const Key& key, bool silent = false) const
 	{
-		Creators::const_iterator it = creators_.find(key);
+		typename Creators::const_iterator it = creators_.find(key);
 		if(it != creators_.end())
 			return it->second->typeName();
 
-		xassert(silent && "Неопознанный идентификатор класса");
+		xassert(silent && "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 		return "";
 	}
 
 	const CreatorBase* find(const Key& key) const
 	{
-		Creators::const_iterator it = creators_.find(key);
+		typename Creators::const_iterator it = creators_.find(key);
 		if(it != creators_.end())
 			return it->second;
 
@@ -222,11 +222,11 @@ protected:
 #define INTERNAL_UNIQUE_NAME1(x,y) INTERNAL_UNIQUE_NAME2(x,y)
 #define INTERNAL_UNIQUE_NAME INTERNAL_UNIQUE_NAME1(registerClass, __COUNTER__) 
 
-// Имена могут содержать <>, ::
+// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ <>, ::
 #define REGISTER_CLASS_IN_FACTORY(Factory, classID, derivedClass) \
 	static Factory::Creator<derivedClass > INTERNAL_UNIQUE_NAME(classID); 
 
-// Когда линковщик выкидывает глобальные объекты
+// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 #define DECLARE_SEGMENT(fileName) int dataSegment##fileName; 
 
 #define FORCE_SEGMENT(fileName) \

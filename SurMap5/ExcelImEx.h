@@ -1,7 +1,7 @@
 #ifndef __EXCEL_IM_EX_H_INCLUDED__
 #define __EXCEL_IM_EX_H_INCLUDED__
 
-ExcelExport/ExcelExporter.h
+#include "ExcelExport/ExcelExporter.h"
 
 struct LanguageCombo;
 typedef vector<LanguageCombo> AvaiableLanguages;

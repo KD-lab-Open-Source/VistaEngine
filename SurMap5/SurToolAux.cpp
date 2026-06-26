@@ -4,19 +4,19 @@
 #include "ToolsTreeWindow.h"
 #include "ToolsTreeCtrl.h"
 #include "MiniMapWindow.h"
-Serialization/Dictionary.h
+#include "Serialization/Dictionary.h"
 #include "SurMapOptions.h"
 #include "SurToolAux.h"
 #include "ConsoleWindow.h"
-Serialization/XPrmArchive.h
-Serialization/MultiArchive.h
-Environment/Environment.h
-Game/CameraManager.h
-Game/GameOptions.h
-FileUtils/FileUtils.h
-Water/CircleManager.h
-Game/Universe.h
-Serialization/SerializationFactory.h
+#include "Serialization/XPrmArchive.h"
+#include "Serialization/MultiArchive.h"
+#include "Environment/Environment.h"
+#include "Game/CameraManager.h"
+#include "Game/GameOptions.h"
+#include "FileUtils/FileUtils.h"
+#include "Water/CircleManager.h"
+#include "Game/Universe.h"
+#include "Serialization/SerializationFactory.h"
 
 BEGIN_ENUM_DESCRIPTOR(ePopUpMenuRestriction, "ePopUpMenuRestriction")
 REGISTER_ENUM(PUMR_PermissionAll, "PUMR_PermissionAll");

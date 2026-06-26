@@ -9,32 +9,37 @@ endif()
 
 set(UTIL_SOURCES
     ComboVectorString.cpp
-    ConsoleWindow.cpp
     DebugPrm.cpp
-    DebugUtil.cpp
     FileUtils/FileTime.cpp
     FileUtils/FileUtils.cpp
     FileUtils/XGUID.cpp
-    FormulaString.cpp
     LocString.cpp
-    ObjStatistic.cpp
     ObjectSpreader.cpp
     ScanningShape.cpp
-    SplashScreen.cpp
     SynchroTimer.cpp
-    SystemUtil.cpp
     TextDB.cpp
     Timers.cpp
-    VideoMemoryInformation.cpp
     ZipConfig.cpp
-    joystick.cpp
 )
 
 if(WIN32)
     list(APPEND UTIL_SOURCES
+        ConsoleWindow.cpp
+        DebugUtil.cpp
+        FormulaString.cpp
+        SplashScreen.cpp
         mfc/PopupMenu.cpp
         Win32/DebugSymbolManager.cpp
         Win32/KeyboardDriver.cpp
+        # Win32-GUI / Game-dependent helpers (file dialogs, popup menus, dialog
+        # boxes) and D3D9/WMI display queries. Unused by the lower-level libs;
+        # revisit when porting the higher layers / SDL GPU backend.
+        SystemUtil.cpp
+        VideoMemoryInformation.cpp
+        # Win32 debug statistics window (CommCtrl/HWND); non-_FINAL_VERSION_ tooling.
+        ObjStatistic.cpp
+        # DirectInput8 joystick; SDL3 provides cross-platform joystick input.
+        joystick.cpp
     )
 endif()
 

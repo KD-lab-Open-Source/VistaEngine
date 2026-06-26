@@ -1,17 +1,17 @@
 #include "stdafx.h"
 #include "SurMap5.h"
 #include "SurTool3DM.h"
-Game/Universe.h
-Game/RenderObjects.h
-Serialization/Serialization.h
-Serialization/XPrmArchive.h
-Serialization/MultiArchive.h
+#include "Game/Universe.h"
+#include "Game/RenderObjects.h"
+#include "Serialization/Serialization.h"
+#include "Serialization/XPrmArchive.h"
+#include "Serialization/MultiArchive.h"
 #include "UnitEnvironment.h"
 #include "EventListeners.h"
-Terra/tools.h
-Terra/terTools.h
-Water/CircleManager.h
-Render/Src/Scene.h
+#include "Terra/tools.h"
+#include "Terra/terTools.h"
+#include "Water/CircleManager.h"
+#include "Render/Src/Scene.h"
 
 // CSurTool3DM dialog
 const int MIN_SHAPE3D_CORNER=0;

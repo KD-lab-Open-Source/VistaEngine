@@ -3,8 +3,8 @@
 #include "kdw/Win32/Window.h"
 
 #ifdef KDW_DLL
-Serialization/SerializationLib.h
-XMath/XMathLib.h
+#include "Serialization/SerializationLib.h"
+#include "XMath/XMathLib.h"
 #endif
 
 

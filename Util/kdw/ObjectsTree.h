@@ -7,8 +7,8 @@
 #include "kdw/TreeModel.h"
 #include "Handle.h"
 
-Serialization/SerializationTypes.h
-Serialization/Serializer.h
+#include "Serialization/SerializationTypes.h"
+#include "Serialization/Serializer.h"
 
 namespace kdw{
 class Win32Proxy;

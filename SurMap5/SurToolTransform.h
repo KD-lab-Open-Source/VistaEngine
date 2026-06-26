@@ -1,7 +1,7 @@
 #ifndef __SUR_TOOL_TRANSFORM_H_INCLUDED__
 #define __SUR_TOOL_TRANSFORM_H_INCLUDED__
 
-MFC/SizeLayoutManager.h
+#include "MFC/SizeLayoutManager.h"
 #include "SurToolAux.h"
 #include "EventListeners.h"
 

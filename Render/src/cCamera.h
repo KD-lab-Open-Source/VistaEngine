@@ -1,10 +1,10 @@
 #ifndef __C_CAMERA_H_INCLUDED__
 #define __C_CAMERA_H_INCLUDED__
 
-Render/Inc/IVisGenericInternal.h
-XMath/Plane.h
-XMath/Mat4f.h
-XMath/Rectangle4f.h
+#include "Render/Inc/IVisGenericInternal.h"
+#include "XMath/Plane.h"
+#include "XMath/Mat4f.h"
+#include "XMath/Rectangle4f.h"
 
 struct IDirect3DSurface9;
 

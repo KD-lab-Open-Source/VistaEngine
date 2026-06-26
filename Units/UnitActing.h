@@ -5,12 +5,12 @@
 #include "DirectControlMode.h"
 
 //////////////////////////////////////////
-// "Действующий" юнит: легионер и здание
+// "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ" пїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 //////////////////////////////////////////
 class UnitActing : public UnitObjective
 {
 public:
-	// Причины статичности
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	enum StaticReason {
 		STATIC_DUE_TO_ATTACK = 1,
 		STATIC_DUE_TO_PRODUCTION = 2,
@@ -35,7 +35,7 @@ public:
 		STATIC_DUE_TO_TOUCH_DOWN = 1 << 20
 	};
 
-	// Причины выключения полета
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	enum FlyingReason {
 		FLYING_DUE_TO_TRANSPORT_LOAD = 1,
 		FLYING_DUE_TO_TRANSPORT_UNLOAD = 2,
@@ -91,7 +91,7 @@ public:
 	void mapUpdate(float x0,float y0,float x1,float y1);
 	void collision(UnitBase* unit, const ContactInfo& contactInfo);
 
-	// Транспорт.
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	bool canPutInTransport(const UnitBase* unit) const;
 	bool putInTransport(UnitSquad* squad);
 	void putUnitInTransport(UnitLegionary* unit);
@@ -111,12 +111,12 @@ public:
 	bool autoFindTransport() const { return autoFindTransport_; }
 	void toggleAutoFindTransport(bool state){ autoFindTransport_ = state; } 
 
-	// Производство.
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	bool producedAllParameters() const;
 	Accessibility canProduction(int number) const;
 	Accessibility canProduceParameter(int number) const;
 	void startProductionParamater(const ProducedParameters& prm);
-	bool startProduction(const AttributeBase* producedUnit, UnitSquad* shippedSquad, int counter, bool restartFromQueue = false); // true - производство запущено
+	bool startProduction(const AttributeBase* producedUnit, UnitSquad* shippedSquad, int counter, bool restartFromQueue = false); // true - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	bool isProducing() const { return producedUnit_ || producedParameter_; }
 	float productionProgress() const { return productionConsumer_.progress(); }
 	const ProducedQueue& producedQueue() const { return producedQueue_; }
@@ -133,29 +133,29 @@ public:
 	bool isDirectControl() const { return (directControl_ & DIRECT_CONTROL_ENABLED) != 0; }
 	bool isSyndicateControl() const { return (directControl_ & SYNDICATE_CONTROL_ENABLED) != 0; }
 
-	/// не повторяемые условия, только для активного игрока в прямом упровлении
+	/// пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	bool activeDirectControl() { return activeDirectControl_ != 0; }
 	bool isActiveDirectControl() { return (activeDirectControl_ & DIRECT_CONTROL_ENABLED) != 0; }
 	bool isActiveSyndicateControl() { return (activeDirectControl_ & SYNDICATE_CONTROL_ENABLED) != 0; }
 
 	bool isUnseen() const { return isInvisible() || (hiddenLogic() & (HIDE_BY_TELEPORT | HIDE_BY_TRANSPORT)) != 0; }
-	//если хоть кто-то подсвечивает, то юнит виден
-	// если никто не подсвечивает, то если юнит невидим или кем-то скрыт, то он невидим
+	//пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	bool isInvisible() const;
 	void setVisibility(bool visible, float time = -1.f);
 
 	void setSpecialMinimapMark(bool flag) { specialMinimapSymbolActivated_ = flag; }
 	bool isSpecialMinimapMark() const { return specialMinimapSymbolActivated_; }
 
-	/// Запрос на очистку региона от юнитов.
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
 	void clearRegion(Vect2i position, float radius);
 
 	void setImpulseAbnormalState(const AbnormalStateAttribute& state, UnitBase* owner);
 	bool isWorking() const;
 
-	/// Режимы атаки. Автоматическое поведение.
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	void attackQuant();
-	void targetController();	// Анализ и выставление целей.
+	void targetController();	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.
 	void noiseTargetController();
 	bool needAiUpdate() const { return !aiScanTimer.busy(); }
 	///////////////////////////////////////////////////////////////////////////////////
@@ -163,8 +163,8 @@ public:
 	void setDirectControl(DirectControlMode mode, bool setFoceMainUnit = true);
 	virtual void executeDirectKeys(const UnitCommand& command);
 	void setDirectKeysCommand(const UnitCommand& command) { directKeysCommand = command; }
-	/// переключение оружия в прямом управлении
-	/// direction < 0 - назад, direction >= 0 - вперёд
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	/// direction < 0 - пїЅпїЅпїЅпїЅпїЅ, direction >= 0 - пїЅпїЅпїЅпїЅпїЅ
 	bool changeDirectControlWeapon(int direction);
 	int directControlWeaponID() const;
 	const Vect3f& directControlOffset() const;
@@ -175,7 +175,7 @@ public:
 	void wayPointsClear();
 	void stop();
 		
-	// Оружие
+	// пїЅпїЅпїЅпїЅпїЅпїЅ
 	typedef SwapVector<WeaponBase*> Weapons;
 	typedef std::vector<WeaponSlot> WeaponSlots;
 
@@ -190,7 +190,7 @@ public:
 	Vect3f firePosition() const;
 	Vect3f specialFirePosition() const;
 	float targetRadius();
-	bool fireDistanceCheck() const; // true - если цель(и) в радиусах атаки.
+	bool fireDistanceCheck() const; // true - пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ(пїЅ) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.
 	bool fireWeaponModeCheck(const WeaponBase* weapon) const;
 	bool fireTargetExist() const;
 	bool fireTargetDocked() const;
@@ -202,10 +202,10 @@ public:
 
 	bool canFire(int weaponID, RequestResourceType triggerAction = NEED_RESOURCE_SILENT_CHECK) const;
 	bool fireRequest();
-	bool fireCheck(WeaponTarget& target) const;
+	bool fireCheck(const WeaponTarget& target) const;
 	bool fireDistanceCheck(const WeaponTarget& target, bool check_fow = false) const;
 	WeaponTarget fireTarget() const;
-	/// допустимая дистанция стрельбы по цели
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ
 	Rangef fireDistance(const WeaponTarget& target) const;
 	void fireStop(int weaponID = -1);
 	void detonateMines();
@@ -272,8 +272,8 @@ public:
 	float autoFireRadiusMin() const;
 
 	const AttackModeAttribute& attackModeAttr() const;
-	/// Установка анимации оружия (стрельба/прицеливание).
-	/// Возвращает true если оружием установлана какая-то анимация для всей модели.
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ/пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ).
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ true пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
 	bool weaponChainQuant(MovementState state);
 	WeaponAnimationType getWeaponAnimationType(const WeaponSlot& weaponSlot) const;
 
@@ -285,12 +285,12 @@ public:
 
 	///////////////////////////////////////////////////////////////////////////////////
 
-	// Дамадж
+	// пїЅпїЅпїЅпїЅпїЅпїЅ
 	void setDamage(const ParameterSet& damage, UnitBase* agressor, const ContactInfo* contactInfo = 0);
 	virtual void deathGainMultiplicator(ParameterArithmetics& arithmetics) const {}
 	bool underAttack() const { return eventAttackTimer_.busy(); }
 
-	/// Апгрейды.
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	Accessibility canUpgrade(int upgradeNumber, RequestResourceType triggerAction = NEED_RESOURCE_SILENT_CHECK) const;
 	bool upgrade(int upgradeNumber);
 	float upgradeProgres(int number, bool forFinishPhase) const;
@@ -313,7 +313,7 @@ public:
 	void attachUnit(UnitReal* unit);
 	void detachUnit(UnitReal* unit);
 
-	// Части тела
+	// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	bool hasParts() const { return !bodyParts_.empty(); }
 	bool putOnItem(const InventoryItem& inventoryItem);
 	void putOffItem(InventoryItem& inventoryItem);
@@ -336,7 +336,7 @@ public:
 	static bool freezedByTrigger() { return freezedByTrigger_; }
 
 protected:
-	// Оружие
+	// пїЅпїЅпїЅпїЅпїЅпїЅ
 	void weaponQuant();
 	void weaponPostQuant();
 
@@ -345,29 +345,29 @@ protected:
 	bool isMoving_;
 	
 	WeaponSlots weaponSlots_;
-	/// отсортированный по группам и приоритетам список оружия,	через него раздаются цели
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ,	пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	Weapons weapons_;
 	bool weaponAnimationMode_;
 	int directControlWeaponSlot_;
 
-	/// выбранное для атаки оружие, 0 если не установлено
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, 0 пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	int selectedWeaponID_;
-	// выбрано оружие в интерфейсе, но атака еще не произошла
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	int preSelectedWeaponID_;
 	WeaponRotationController weaponRotation_;
 
-	UnitLink<UnitInterface> targetUnit_;  // Юнит для атаки
-	Vect3f targetPoint_;  // Точка для атаки
+	UnitLink<UnitInterface> targetUnit_;  // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	Vect3f targetPoint_;  // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	bool hadTargetUnit_;
 
-	UnitLink<UnitInterface> specialTargetUnit_;  // Юнит для атаки
-	Vect3f specialTargetPoint_;  // Точка для атаки
+	UnitLink<UnitInterface> specialTargetUnit_;  // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	Vect3f specialTargetPoint_;  // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 
-	bool targetPointEnable; // Указана точка атаки?
-	bool specialTargetPointEnable; // Указана точка атаки?
+	bool targetPointEnable; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ?
+	bool specialTargetPointEnable; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ?
 	bool attackTargetUnreachable_;
 
-	UnitLink<UnitBase> noiseTarget_; // замеченный источник шума
+	UnitLink<UnitBase> noiseTarget_; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 
 	AttackMode attackMode_;
 
@@ -383,11 +383,11 @@ protected:
 	DirectControlMode directControl_;
 	DirectControlMode activeDirectControl_;
 
-	// Режимы атаки.
+	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.
 	LogicTimer aiScanTimer;
 	LogicTimer noiseScanTimer_;
 
-	// Транспорт.
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	LegionariesLinks transportSlots_;
 	Player* playerPrev_;
 	UnitLink<UnitLegionary> cargo_;
@@ -397,7 +397,7 @@ protected:
 
 	bool autoFindTransport_;
 	
-	// Производство.
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	int productionCounter_;
 	const AttributeBase* producedUnit_;
 	ParameterConsumer productionConsumer_;
@@ -429,8 +429,8 @@ protected:
 	struct BodyPart	
 	{
 		const BodyPartAttribute& partAttr;
-		ParameterSet parameters; // Текущие значения параметров надетого предмета
-		AttributeItemInventoryReference item; // Атрибуты надетого предмета
+		ParameterSet parameters; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+		AttributeItemInventoryReference item; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 		int visibilitySet;
 		int visibilityGroup;

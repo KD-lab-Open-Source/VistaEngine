@@ -26,7 +26,7 @@ using namespace std;
 
 // XTool
 #include "xutil.h"
-XMath/xmath.h
+#include "XMath/xmath.h"
 #include "xzip.h"
 
 #include "Profiler.h"
@@ -34,6 +34,6 @@ XMath/xmath.h
 #include "DebugUtil.h"
 #include "DebugPrm.h"
 
-XTL/SwapVector.h
+#include "XTL/SwapVector.h"
 
 #endif

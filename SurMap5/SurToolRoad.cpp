@@ -1,17 +1,17 @@
 #include "stdafx.h"
 #include "SurMap5.h"
 #include "SurToolRoad.h"
-game/CameraManager.h
-Render/Src/cCamera.h
+#include "game/CameraManager.h"
+#include "Render/Src/cCamera.h"
 
-Serialization/Serialization.h
-Serialization/EnumDescriptor.h
+#include "Serialization/Serialization.h"
+#include "Serialization/EnumDescriptor.h"
 
 //Game/RenderObjects.h
-Render/src/MultiRegion.h
-Render/src/TileMap.h
+#include "Render/src/MultiRegion.h"
+#include "Render/src/TileMap.h"
 //Render/src/Scene.h
-FileUtils/FileUtils.h
+#include "FileUtils/FileUtils.h"
 
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(CSurToolRoad, eStateRoadMetod, "StateRoadMetod")

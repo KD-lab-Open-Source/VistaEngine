@@ -2,8 +2,8 @@
 #define __ATTRIB_EDITOR_DLG_H_INCLUDED__
 
 #include "AttribEditorCtrl.h"
-MFC/SizeLayoutManager.h
-Serialization/Serializer.h
+#include "MFC/SizeLayoutManager.h"
+#include "Serialization/Serializer.h"
 
 class TreeNode;
 struct TreeControlSetup {};

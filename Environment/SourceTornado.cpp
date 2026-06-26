@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "SourceTornado.h"
 #include "BaseUnit.h"
-Physics/RigidBodyPrm.h
-Physics/RigidBodyUnit.h
+#include "Physics/RigidBodyPrm.h"
+#include "Physics/RigidBodyUnit.h"
 #include "UnitEnvironment.h"
 #include "EnvironmentSimple.h"
 #include "IronBuilding.h"

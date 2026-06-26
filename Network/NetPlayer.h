@@ -1,10 +1,10 @@
 #ifndef __PERIMETER_PLAYER_H__
 #define __PERIMETER_PLAYER_H__
 
-FileUtils/FileTime.h
-Units/AttributeReference.h
+#include "FileUtils/FileTime.h"
+#include "Units/AttributeReference.h"
 #include "LocString.h"
-FileUtils/XGUID.h
+#include "FileUtils/XGUID.h"
 
 class Archive;
 class WBuffer;
@@ -156,7 +156,7 @@ struct PlayerData : public SlotData {
 };
 
 
-enum GameType {
+enum GameType : int {
 	// Not Using!
 	GameType_Multiplayer=0x80,
 	GameType_Cooperative=0x40,

@@ -3,7 +3,7 @@
 #include "D3DRender.h"
 #include "TileMap.h"
 #include "VisGeneric.h"
-Terra/vmap.h
+#include "Terra/vmap.h"
 
 DrawType::DrawType()
 {

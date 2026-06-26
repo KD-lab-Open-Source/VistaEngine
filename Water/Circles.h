@@ -2,8 +2,8 @@
 #define __CIRCLES_H_INCLUDED__
 #include <math.h>
 
-Serialization/RangedWrapper.h
-Water/ice.h
+#include "Serialization/RangedWrapper.h"
+#include "Water/ice.h"
 
 class cFallout;
 class Plane;

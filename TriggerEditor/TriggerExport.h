@@ -3,11 +3,11 @@
 
 #include <atltypes.h>
 #include "Handle.h"
-Serialization/SerializationTypes.h
+#include "Serialization/SerializationTypes.h"
 #include "Timers.h"
-XMath/xmath.h
-XMath/Colors.h
-XTL/UniqueVector.h
+#include "XMath/xmath.h"
+#include "XMath/Colors.h"
+#include "XTL/UniqueVector.h"
 
 //-----------------------------
 class Player;
@@ -20,7 +20,7 @@ class ContextFilter;
 class AttributeBase;
 class AttributeSquad;
 
-enum CompareOperator;
+enum CompareOperator : int;
 
 //-----------------------------
 enum AIPlayerType

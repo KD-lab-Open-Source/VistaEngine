@@ -4,7 +4,7 @@
 #include "TexLibrary.h"
 #include "D3DRender.h"
 #include "cCamera.h"
-Serialization/Serialization.h
+#include "Serialization/Serialization.h"
 
 LightingParameters::LightingParameters()
 {

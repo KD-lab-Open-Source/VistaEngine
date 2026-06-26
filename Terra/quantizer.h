@@ -24,7 +24,8 @@ struct sOctreeNode{
 	};
 
 	sOctreeNode(unsigned char level, sOctreeNode* pHead, unsigned int& nLeafs) 
-		: nPixels(0), totalR(0), totalG(0), totalB(0), nLevel(level), flag_leaf(level == 0), pNextNode(0), pPrevNode(0)	{
+		: nPixels(0), nLevel(level), flag_leaf(level == 0), pNextNode(0), pPrevNode(0)	{
+		// totalR/G/B share the same union storage as pNextNode/pPrevNode (zeroed above)
 
 		for (char i = 0; i < 8; i++) childPntArr[i] = 0;
 		if (flag_leaf) ++nLeafs;	// If we are a leaf, increment counter
@@ -235,14 +236,14 @@ struct ColorQuantizer {
 	int quantizeOctree(unsigned long* pSource, unsigned char* pDest, Vect2s bitmapSize, int nMaxColors);
 	int ditherFloydSteinberg(unsigned long* pSource, unsigned char* pDest, Vect2s bitmapSize);
 
-	//Ручная индексация
+	//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	bool prepare4PutColor(int _nMaxColors);
 	void putColor(int rgb);
 	bool postProcess();
 	unsigned char GetIdxColor(unsigned int rgb);
 
 private:
-	//Служебные данные использующиеся для поэтапной индексации(prepare4PutColor, putColor, postProcess, GetIdxColor)
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ(prepare4PutColor, putColor, postProcess, GetIdxColor)
 	sOctreeNode* pHead;
 	sOctreeNode* pRoot;
 	UINT nLeafs; // counter of leaf nodes in octree
@@ -278,9 +279,9 @@ public:
 	unsigned char getIdxColor(unsigned long rgb){
 		if(soNodeArr.empty())
 			return 0;
-		unsigned char r = unsigned char((rgb&0xff0000)>>16);
-		unsigned char g = unsigned char((rgb&0xff00)>>8);
-		unsigned char b = unsigned char(rgb&0xff);
+		unsigned char r = (unsigned char)((rgb&0xff0000)>>16);
+		unsigned char g = (unsigned char)((rgb&0xff00)>>8);
+		unsigned char b = (unsigned char)(rgb&0xff);
 		curNodeLvl_=7;
 		return getIdxColor(0, r, g, b);
 	}
@@ -321,7 +322,7 @@ private:
 		curNodeLvl_--;
 		xassert(curNodeLvl_>=0);
 		int childIdx=soNodeArr[idxNode].childIdxArr[ (rBit<<2) | (gBit<<1) | (bBit) ];
-		xassert(childIdx>0); //нет цвета в дереве!
+		xassert(childIdx>0); //пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ!
 		return getIdxColor(childIdx, r, g, b);
 	}
 };

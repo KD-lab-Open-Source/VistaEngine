@@ -1,10 +1,10 @@
 #ifndef __FORMATION_EDITOR_H_INCLUDED__
 #define __FORMATION_EDITOR_H_INCLUDED__
 
-kdw/ViewPort2D.h
-kdw/Plug.h
+#include "kdw/ViewPort2D.h"
+#include "kdw/Plug.h"
 #include "kdw/CheckBox.h"
-kdw/Win32/Handle.h
+#include "kdw/Win32/Handle.h"
 ../units/AttributeSquad.h
 
 struct Color4c;

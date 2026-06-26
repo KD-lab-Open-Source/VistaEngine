@@ -2,7 +2,7 @@
 #include "IVisExporter.h"
 #include "RootExport.h"
 #include "stdmat.h"
-Serialization/SerializationFactory.h
+#include "Serialization/SerializationFactory.h"
 
 REGISTER_CLASS(IVisNode, IVisNode, "IVisNode");
 

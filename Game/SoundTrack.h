@@ -1,8 +1,8 @@
 #ifndef __SOUND_TRACK_H__
 #define __SOUND_TRACK_H__
 
-Serialization/StringTableReference.h
-Serialization/StringTableBase.h
+#include "Serialization/StringTableReference.h"
+#include "Serialization/StringTableBase.h"
 
 class SoundTrack : public StringTableBase
 {

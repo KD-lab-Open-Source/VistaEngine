@@ -1,11 +1,11 @@
 #ifndef __TYPE_LIBRARY_IMPL_H__
 #define __TYPE_LIBRARY_IMPL_H__
 
-Serialization/StringTable.h
-Serialization/StringTableBase.h
-Serialization/StringTableReference.h
-Serialization/StringTableReferencePolymorphic.h
-Serialization/Factory.h
+#include "Serialization/StringTable.h"
+#include "Serialization/StringTableBase.h"
+#include "Serialization/StringTableReference.h"
+#include "Serialization/StringTableReferencePolymorphic.h"
+#include "Serialization/Factory.h"
 #include "Console.h"
 
 ///////////////////////////////////////////////////////////////
@@ -24,9 +24,9 @@ StringTable<String>::StringTable()
 template<class String>
 int StringTable<String>::find(const char* name) const
 {
-	Strings::const_iterator i;		
+	typename Strings::const_iterator i;		
 	FOR_EACH(strings_, i)
-		if(!strcmp(i->c_str(), name) && i->index_ != -1) // index устанавливается только после полного прочтения
+		if(!strcmp(i->c_str(), name) && i->index_ != -1) // index пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			return i->index_;
 
 	vector<string>::const_iterator si;
@@ -42,7 +42,7 @@ void StringTable<String>::add(const String& data)
 {
 	const char* name = data.c_str();
 	int maxIndex = 0;
-	Strings::iterator i;		
+	typename Strings::iterator i;		
 	FOR_EACH(strings_, i){
 		if(!strcmp(i->c_str(), name))
 			return; 
@@ -65,7 +65,7 @@ void StringTable<String>::add(const String& data)
 template<class String>
 void StringTable<String>::remove(const char* name) 
 {
-	Strings::iterator i;		
+	typename Strings::iterator i;		
 	FOR_EACH(strings_, i)
 		if(!strcmp(i->c_str(), name)){
 			strings_.erase(i);
@@ -81,7 +81,7 @@ template<class String>
 void StringTable<String>::buildComboList()
 {
     comboListAlwaysDereference_ = "";
-    Strings::iterator i;		
+    typename Strings::iterator i;		
     FOR_EACH(strings_, i){
         if(i != strings_.begin())
             comboListAlwaysDereference_ += "|";
@@ -111,9 +111,9 @@ template<class String>
 void StringTable<String>::serialize(Archive& ar) 
 {
 	if(!ar.isEdit()){
-		if(ar.isOutput() && !inPlaceCreated()){
+		if(ar.isOutput() && !this->inPlaceCreated()){
 			headerStrings_.clear();
-			Strings::iterator i;
+			typename Strings::iterator i;
 			FOR_EACH(strings_, i)
 				headerStrings_.push_back(i->c_str());
 		}
@@ -121,9 +121,9 @@ void StringTable<String>::serialize(Archive& ar)
 		ar.serialize(headerStrings_, "header", 0);
 	}
 
-	ar.serialize(strings_, "strings", editName_);
-	
-	if(!inPlaceCreated())
+	ar.serialize(strings_, "strings", this->editName_);
+
+	if(!this->inPlaceCreated())
 		headerStrings_.clear();
 
 	if(ar.isInput()){
@@ -134,12 +134,12 @@ void StringTable<String>::serialize(Archive& ar)
 
 		if(!ar.isEdit()){
 			int index = 0;
-			Strings::iterator i;		
+			typename Strings::iterator i;		
 			FOR_EACH(strings_, i)
 				i->index_ = index++;
 		} else {
             int last_index = 0;
-			Strings::iterator i;		
+			typename Strings::iterator i;		
 			FOR_EACH(strings_, i)
 				if (i->index_ > last_index)
 					last_index = i->index_;
@@ -150,14 +150,14 @@ void StringTable<String>::serialize(Archive& ar)
 			}
 		}
 
-		if(ar.isOutput()){ // Инстанцирование кода, никогда не выполняется
-			typedef StringTableUnwrap<String>::Type Type;
-			static StringTableUnwrap<String>::ReferenceTrue dummyReferenceTrue("");
+		if(ar.isOutput()){ // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+			typedef typename StringTableUnwrap<String>::Type Type;
+			static typename StringTableUnwrap<String>::ReferenceTrue dummyReferenceTrue("");
 			dummyReferenceTrue.serialize(ar, "", "");
 			static const Type& stringTrue = *dummyReferenceTrue;
 			static const char* constCharTrue = dummyReferenceTrue.c_str();
 
-			static StringTableUnwrap<String>::ReferenceFalse dummyReferenceFalse("");
+			static typename StringTableUnwrap<String>::ReferenceFalse dummyReferenceFalse("");
 			dummyReferenceFalse.serialize(ar, "", "");
 			static const Type& stringFalse = *dummyReferenceFalse;
 			static const char* constCharFalse = dummyReferenceFalse.c_str();
@@ -176,7 +176,7 @@ const String* StringTable<String>::find(int key) const
 	if(key < strings_.size() && strings_[key].index_ == key)
 		return &strings_[key];
 
-	Strings::const_iterator i;		
+	typename Strings::const_iterator i;		
 	FOR_EACH(strings_, i)
 		if(i->index_ == key)
 			return &*i;
@@ -193,7 +193,7 @@ const char* StringTable<String>::findCStr(int key) const
 	if(key < strings_.size() && strings_[key].index_ == key)
 		return strings_[key].c_str();
 
-	Strings::const_iterator i;		
+	typename Strings::const_iterator i;		
 	FOR_EACH(strings_, i)
 		if(i->index_ == key)
 			return i->c_str();
@@ -299,7 +299,7 @@ std::string StringTable<String>::editorAddElement(const char* name, const char* 
 		return strings_[index].c_str();
 	}
 	else{
-		xassert(0 && "Не могу добавить элемент в StringTable");
+		xassert(0 && "пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ StringTable");
 		return "";
 	}
 }
@@ -345,7 +345,7 @@ template<class String, bool canAlwaysDereference>
 StringTableReference<String, canAlwaysDereference>::StringTableReference(const char* name) 
 {
 	key_ = StringTable<String>::instance().find(name);
-//	xassertStr(!strlen(name) || !strcmp(name, "None") || key_ != -1 && "Не найдена строка в таблице: ", name);
+//	xassertStr(!strlen(name) || !strcmp(name, "None") || key_ != -1 && "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: ", name);
 	if(canAlwaysDereference){
 		if(key_ == -1)
 			key_ = 0;
@@ -361,7 +361,7 @@ const String* StringTableReference<String, canAlwaysDereference>::getInternal() 
 	if(data)
 		return data;
 	else if(canAlwaysDereference){
-		xassertStr(0 && "Не найдена строка в таблице, используется первая", StringTable<String>::instance().editName());
+		xassertStr(0 && "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ", StringTable<String>::instance().editName());
 		return &StringTable<String>::instance().strings().front();
 	}
 	else
@@ -401,7 +401,7 @@ bool StringTableReference<String, canAlwaysDereference>::serialize(Archive& ar, 
 	if(ar.isInput()){
 		*this = StringTableReference(comboStr);
 		if(strlen(comboStr) && key_ == -1)
-			kdWarning("&Shura", XBuffer() < "Не найдена строка в таблице: " < (const char*)comboStr);
+			kdWarning("&Shura", XBuffer() < "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: " < (const char*)comboStr);
 	}
 
 	if(isEdit){
@@ -418,7 +418,7 @@ template<class String, bool canAlwaysDereference, class StringWrapped>
 StringTableReferencePolymorphic<String, canAlwaysDereference, StringWrapped>::StringTableReferencePolymorphic(const char* name) 
 {
 	key_ = Table::instance().find(name);
-//	xassertStr(!strlen(name) || !strcmp(name, "None") || key_ != -1 && "Не найдена строка в таблице: ", name);
+//	xassertStr(!strlen(name) || !strcmp(name, "None") || key_ != -1 && "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: ", name);
 	if(canAlwaysDereference){
 		if(key_ == -1)
 			key_ = 0;
@@ -434,7 +434,7 @@ const String* StringTableReferencePolymorphic<String, canAlwaysDereference, Stri
 	if(data)
 		return data->get();
 	else if(canAlwaysDereference){
-		xassertStr(0 && "Не найдена строка в таблице, используется первая", Table::instance().editName());
+		xassertStr(0 && "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ", Table::instance().editName());
 		return Table::instance().strings().front().get();
 	}
 	else
@@ -445,7 +445,7 @@ template<class String, bool canAlwaysDereference, class StringWrapped>
 StringTableReferencePolymorphic<String, canAlwaysDereference, StringWrapped>::StringTableReferencePolymorphic(const String* type)
 {
 	const Table& table = Table::instance();
-	Table::Strings::const_iterator i;		
+	typename Table::Strings::const_iterator i;		
 	FOR_EACH(table.strings(), i)
 		if(i->get() == type){
 			setKey(i->stringIndex());
@@ -482,7 +482,7 @@ bool StringTableReferencePolymorphic<String, canAlwaysDereference, StringWrapped
 	if(ar.isInput()){
 		*this = StringTableReferencePolymorphic(comboStr);
 		if(strlen(comboStr) && key_ == -1)
-			kdWarning("&Shura", XBuffer() < "Не найдена строка в таблице: " < (const char*)comboStr);
+			kdWarning("&Shura", XBuffer() < "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: " < (const char*)comboStr);
 	}
 
 	if(isEdit){
@@ -509,25 +509,25 @@ public:
     bool serialize(Archive& ar, const char* name, const char* nameAlt){
 		std::string stringName;
 		if(protectName_)
-			stringName = data_.c_str();
-		int stringIndex = data_.stringIndex();
+			stringName = this->data_.c_str();
+		int stringIndex = this->data_.stringIndex();
 		std::string group;
 
 		if(T::editorDynamicGroups())
-			group = data_.editorGroupName();
+			group = this->data_.editorGroupName();
 
-		bool result = ar.serialize(data_, name, nameAlt);
+		bool result = ar.serialize(this->data_, name, nameAlt);
 
 		if(protectName_){
-			if(stringName != data_.c_str()){
-				data_.setName(stringName.c_str());	
+			if(stringName != this->data_.c_str()){
+				this->data_.setName(stringName.c_str());	
 				if(editorLibrary_)
 					editorLibrary_->editorElementRenamed();
 			}
 		}
-		data_.setStringIndex(stringIndex);
+		this->data_.setStringIndex(stringIndex);
 		if(T::editorDynamicGroups())
-			data_.editorSetGroup(group.c_str());
+			this->data_.editorSetGroup(group.c_str());
 		return result;
 	}
 protected:
@@ -563,9 +563,9 @@ void StringTableBasePolymorphic<T>::serialize(Archive& ar)
 {
 	StringTableBase::serialize(ar);
 
-	ar.serialize(type_, "|type|second", "&Значение"); // CONVERSION 31.07.07
+	ar.serialize(type_, "|type|second", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"); // CONVERSION 31.07.07
 
-	if(ar.isInput() && ar.isOutput()){ // Инстанцирование кода, никогда не выполняется
+	if(ar.isInput() && ar.isOutput()){ // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		static StringTableReferencePolymorphic<T, true> dummyTrue((const T*)0);
 		static StringTableReferencePolymorphic<T, false> dummyFalse((const T*)0);
 	}

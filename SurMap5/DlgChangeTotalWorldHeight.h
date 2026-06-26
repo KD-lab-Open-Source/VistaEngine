@@ -3,9 +3,9 @@
 
 #include "EScroll.h"
 
-Serialization/Serialization.h
-AttribEditor/AttribEditorCtrl.h
-Terra/vmap.h
+#include "Serialization/Serialization.h"
+#include "AttribEditor/AttribEditorCtrl.h"
+#include "Terra/vmap.h"
 
 struct HistogramDate {
 	enum { HISTOGRAM_ARRAY_SIZE=256 };

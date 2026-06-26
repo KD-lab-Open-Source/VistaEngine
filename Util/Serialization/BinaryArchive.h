@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "Handle.h"
-Serialization/Serialization.h
+#include "Serialization/Serialization.h"
 
 
 class BinaryOArchive : public Archive
@@ -68,7 +68,7 @@ private:
 	class Saver
 	{
 	public:
-		Saver::Saver(int initial_size=124)
+		Saver(int initial_size=124)
 		{
 			buffer_ = (char*)::malloc(initial_size);
 			assert(buffer_);
@@ -76,7 +76,7 @@ private:
 			allocated_size_ = initial_size;
 		}
 
-		Saver::~Saver()
+		~Saver()
 		{
 			::free(buffer_);
 		}
@@ -133,7 +133,7 @@ private:
 		char* buffer_;
 		char* position_;
 		size_t allocated_size_;
-		/// вектор смещений, вместо вектора указателей
+		/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		vector<size_t> stack_;
 	};
 
@@ -158,7 +158,7 @@ public:
 	bool close();
 
 	void setIgnoreUnregisteredClasses(bool ignore){ ignoreUnregisteredClasses_ = ignore; }
-	void setVersion(int version) { version_ = version; } // Для сложной конверсии: вручную записывать, выставлять и кастить архив к XPrmIArchive
+	void setVersion(int version) { version_ = version; } // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ XPrmIArchive
 	int version() const { return version_; }
 
 	unsigned int crc();
@@ -240,7 +240,7 @@ private:
 			curr_ += (wcslen((wchar_t*)curr_) + 1) * sizeof(wchar_t);
 		}
 
-		bool validToClose() const { return complex_ || curr_ == end_; } // Простые блоки должны быть вычитаны точно
+		bool validToClose() const { return complex_ || curr_ == end_; } // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 
 	private:
 		char* begin_;

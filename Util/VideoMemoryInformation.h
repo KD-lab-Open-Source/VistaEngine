@@ -2,7 +2,7 @@
 #define __VIDEO_MEMORY_INFORMATION_H_INCLUDED__
 
 #include <vector>
-XMath/xmath.h
+#include "XMath/xmath.h"
 
 //Вызывать только после вызова CoInitializeEx(0, COINIT_MULTITHREADED);
 int GetVideoMemory();

@@ -2,8 +2,8 @@
 #define __SURTOOLAUX_H__
 
 #include "Handle.h"
-Serialization/Dictionary.h
-terra/vmap.h
+#include "Serialization/Dictionary.h"
+#include "terra/vmap.h"
 
 class Archive;
 class cTexture;

@@ -1,18 +1,15 @@
+# CommonEvents.cpp, GS_interface.cpp and ConnectionDP.cpp are omitted as orphans:
+# none appear in Core.vcproj or Game.vcproj (the build's sources of truth), and
+# CommonEvents.cpp includes a non-existent "CommonEvents.h". Like AI/AITileMap.cpp.
 set(NETWORK_SOURCES
-    CommonEvents.cpp
     EventBufferDP.cpp
     ExternalTask.cpp
-    GS_interface.cpp
     GameCommands.cpp
     MissionDescriptionNet.cpp
     NetCenterStatic.cpp
     NetCommandBase.cpp
-    P2P_interface1Th.cpp
     P2P_interface2Th.cpp
-    P2P_interface2ThDPF.cpp
-    P2P_interface3Th.cpp
     P2P_interfaceAnyTh.cpp
-    P2P_interfaceAux.cpp
     PlayerStatisticsConversion.cpp
     StartGameParam.cpp
     UniverseX.cpp
@@ -20,7 +17,16 @@ set(NETWORK_SOURCES
 )
 
 if(WIN32)
-    list(APPEND NETWORK_SOURCES ConnectionDP.cpp)
+    # The DirectPlay 8 networking backend. Stubbed off-Windows (the fake dplay8.h
+    # lets the Network headers parse, but these .cpp call IDirectPlay8Peer methods
+    # and DirectPlay8Create). Real cross-platform networking is a later
+    # replacement (Track B, like the renderer / DirectSound audio).
+    list(APPEND NETWORK_SOURCES
+        P2P_interface1Th.cpp
+        P2P_interface2ThDPF.cpp
+        P2P_interface3Th.cpp
+        P2P_interfaceAux.cpp
+    )
 endif()
 
 add_library(Network STATIC ${NETWORK_SOURCES})

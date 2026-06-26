@@ -6,8 +6,8 @@
 #endif
 
 #ifdef CALL_STATISTIC
-Util/xtl/StaticMap.h
-Util/Win32/DebugSymbolManager.h
+#include "Util/xtl/StaticMap.h"
+#include "Util/Win32/DebugSymbolManager.h"
 struct TimerContainer
 {
 	TimerContainer() : name(0), timer(0) {}

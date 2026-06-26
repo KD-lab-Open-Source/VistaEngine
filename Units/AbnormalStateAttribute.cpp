@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
-Serialization/StringTableImpl.h
+#include "Serialization/StringTableImpl.h"
 #include "UnitAttribute.h"
-Serialization/SerializationFactory.h
+#include "Serialization/SerializationFactory.h"
 
 WRAP_LIBRARY(ExplodeTable, "ExplodeTable", "Типы взрывов", "Scripts\\Engine\\ExplodeTable", 0, 0);
 

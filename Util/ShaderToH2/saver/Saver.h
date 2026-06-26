@@ -1,7 +1,7 @@
 //** 1999 Creator - Balmer **//
 #pragma once
 
-XMath/xmath.h
+#include "XMath/xmath.h"
 
 #define WR(x) fwrite(&x,sizeof(x),1,f);
 

@@ -142,7 +142,11 @@ XmlRpcSocket::accept(int fd, unsigned long* out_addr)
 
 	if(out_addr){
 		int ret = (int) ::accept(fd, (struct sockaddr*)&addr, &addrlen);
+#ifdef _WIN32
 		*out_addr = addr.sin_addr.S_un.S_addr;
+#else
+		*out_addr = addr.sin_addr.s_addr;
+#endif
 		return ret;
 	}
 

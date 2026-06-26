@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "CommandEditor.h"
-kdw/PopupMenu.h
-kdw/ClassMenu.h
-kdw/VSplitter.h
+#include "kdw/PopupMenu.h"
+#include "kdw/ClassMenu.h"
+#include "kdw/VSplitter.h"
 
 DECLARE_SEGMENT(CommandEditor)
 REGISTER_PLUG(CommandsQueue, CommandEditorPlug)

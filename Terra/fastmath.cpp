@@ -50,13 +50,16 @@ void  build_sqrt_table()
 // At the assembly level the recommended workaround for the second FIST bug is the same for the first; 
 // inserting the FRNDINT instruction immediately preceding the FIST instruction. 
 
-__forceinline void FloatToInt(int *int_pointer, float f) 
+__forceinline void FloatToInt(int *int_pointer, float f)
 {
+#ifdef _CROSS_PLATFORM_
+	*int_pointer = (int)lrintf(f); // round-to-nearest, matching FRNDINT/fistp
+#else
 	__asm  fld  f
   __asm  mov  edx,int_pointer
   __asm  FRNDINT
   __asm  fistp dword ptr [edx];
-
+#endif
 }
 
 
@@ -99,7 +102,7 @@ float  fastsqrtN (float x)
     if (x < 0.0f)
         return -1.0f;
     if (x == 0.0f)
-        return 0.0f;  /* может привести к делению на 0 */
+        return 0.0f;  /* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 0 */
     EPS = x * eps;
     sq = x;
     sqold = x + 30.0f;         /* != sq */

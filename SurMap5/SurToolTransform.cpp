@@ -1,10 +1,10 @@
 #include "stdafx.h"
 
 #include "SurToolTransform.h"
-Serialization/Serialization.h
-Render/inc/IRenderDevice.h
-Game/RenderObjects.h
-Units/BaseUniverseObject.h
+#include "Serialization/Serialization.h"
+#include "Render/inc/IRenderDevice.h"
+#include "Game/RenderObjects.h"
+#include "Units/BaseUniverseObject.h"
 
 #include "SelectionUtil.h"
 #include "EventListeners.h"

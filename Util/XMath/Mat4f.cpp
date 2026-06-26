@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Mat4f.h"
-XMath/SafeMath.h
+#include "XMath/SafeMath.h"
 
 #pragma warning(disable : 4073 )
 #pragma init_seg(lib)

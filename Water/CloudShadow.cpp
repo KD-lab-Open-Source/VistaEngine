@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "CloudShadow.h"
-terra/vmap.h
-Serialization/ResourceSelector.h
-Render/D3D/D3DRender.h
-XMath/SafeMath.h
+#include "terra/vmap.h"
+#include "Serialization/ResourceSelector.h"
+#include "Render/D3D/D3DRender.h"
+#include "XMath/SafeMath.h"
 #include "SkyObject.h"
-Render/Src/TileMap.h
-Render/Src/Scene.h
+#include "Render/Src/TileMap.h"
+#include "Render/Src/Scene.h"
 
 static const int size_vb = 4;
 static const int size_ib = 2;

@@ -1,9 +1,9 @@
 #ifndef __FALLOUT_H_INCLUDED__
 #define __FALLOUT_H_INCLUDED__
 
-XMath/xmath.h
+#include "XMath/xmath.h"
 #include "Circles.h"
-Environment/EnvironmentColors.h
+#include "Environment/EnvironmentColors.h"
 
 enum ModeFall
 { 

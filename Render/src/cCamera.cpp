@@ -2,10 +2,10 @@
 #include "cCamera.h"
 #include "Scene.h"
 #include "TileMap.h"
-XMath/SafeMath.h
+#include "XMath/SafeMath.h"
 #include "ClippingMesh.h"
-Render/src/FogOfWar.h
-Render/Shader/Shaders.h
+#include "Render/src/FogOfWar.h"
+#include "Render/Shader/Shaders.h"
 #include "D3DRender.h"
 #include "VisGeneric.h"
 

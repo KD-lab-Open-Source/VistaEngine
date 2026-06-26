@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 
-XTL/SafeCast.h
+#include "XTL/SafeCast.h"
 #include "kdw/LibraryTree.h"
 #include "kdw/LibraryTreeObject.h"
 

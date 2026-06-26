@@ -1,7 +1,7 @@
 #pragma once
 
-XTL/StaticMap.h
-XTL/StaticString.h
+#include "XTL/StaticMap.h"
+#include "XTL/StaticString.h"
 #include "ComboStrings.h"
 
 

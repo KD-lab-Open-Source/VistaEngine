@@ -1,7 +1,7 @@
 #ifndef __CIRCLE_MANAGER_PARAM_H__
 #define __CIRCLE_MANAGER_PARAM_H__
 
-XMath/Colors.h
+#include "XMath/Colors.h"
 
 struct CircleManagerParam
 {

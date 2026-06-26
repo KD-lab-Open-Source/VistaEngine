@@ -3,7 +3,7 @@
 #define __INVENTORY_H__
 
 #include "Parameters.h"
-XTL/SwapVector.h
+#include "XTL/SwapVector.h"
 
 class UnitItemInventory;
 class UnitActing;

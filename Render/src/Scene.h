@@ -3,8 +3,8 @@
 #include "UnkLight.h"
 #include "czplane.h"
 #include "NParticle.h"
-Render/3dx/Node3dx.h
-Render/3dx/Simply3dx.h
+#include "Render/3dx/Node3dx.h"
+#include "Render/3dx/Simply3dx.h"
 
 class FogOfWar;
 class cStaticSimply3dx;

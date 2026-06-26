@@ -1,14 +1,14 @@
 #include "stdafx.h"
 #include <functional>
 #include <set>
-Serialization/Serialization.h
-FileUtils/FileUtils.h
+#include "Serialization/Serialization.h"
+#include "FileUtils/FileUtils.h"
 
-Serialization/Dictionary.h
-Serialization/LibraryWrapper.h
-Serialization/LibrariesManager.h
-Serialization/LibraryBookmark.h
-Serialization/SerializationFactory.h
+#include "Serialization/Dictionary.h"
+#include "Serialization/LibraryWrapper.h"
+#include "Serialization/LibrariesManager.h"
+#include "Serialization/LibraryBookmark.h"
+#include "Serialization/SerializationFactory.h"
 
 #include "kdw/LibraryTab.h"
 #include "kdw/LibraryTreeObject.h"

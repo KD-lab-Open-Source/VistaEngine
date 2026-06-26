@@ -95,7 +95,8 @@ void WBuffer::init()
 WBuffer& WBuffer::writeNumAnsiBuf(const char* ansi, sizetype maxSize)
 {
 	wchar_t cbw[CB_SIZE];
-	for(wchar_t* pbuf = cbw; *ansi && maxSize; ++ansi, ++pbuf, --maxSize){
+	wchar_t* pbuf = cbw;
+	for(; *ansi && maxSize; ++ansi, ++pbuf, --maxSize){
 		xassert(*ansi < 0x7F);
 		*pbuf = static_cast<wchar_t>(*ansi);
 	}

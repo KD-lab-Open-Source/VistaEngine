@@ -3,8 +3,8 @@
 
 #include "SourceBase.h"
 #include "SourceEffect.h"
-Units/WeaponTarget.h
-Units/AttributeSquad.h
+#include "Units/WeaponTarget.h"
+#include "Units/AttributeSquad.h"
 class Archive;
 
 class UnitLegionary;

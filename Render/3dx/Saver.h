@@ -8,7 +8,7 @@
 //#include <my_STL.h>
 #include <vector>
 #include <string>
-XMath/xmath.h
+#include "XMath/xmath.h"
 
 #include <stdio.h>
 using namespace std;
@@ -16,11 +16,17 @@ using namespace std;
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <io.h>
+#ifndef _WIN32
+#  include <unistd.h>
+#else
+#  include <io.h>
+#endif
 #include <assert.h>
 
+#ifdef _WIN32
 typedef unsigned long DWORD;
 typedef unsigned char BYTE;
+#endif
 class Saver{
 public:
 	virtual ~Saver() {}
@@ -55,8 +61,8 @@ public:
     }
 
 	virtual int write(const void* data,int size) = 0;
-	virtual void push(const unsigned long id) = 0; //Вызывать при начале записи блока
-	virtual size_t pop() = 0; //Вызывать при окончании записи блока
+	virtual void push(const unsigned long id) = 0; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	virtual size_t pop() = 0; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 
 	DWORD GetData() {return m_Data;}
 	DWORD SetData(DWORD dat) {return m_Data = dat;}
@@ -156,7 +162,7 @@ private:
 class MemorySaver : public Saver
 {
 public:
-	MemorySaver::MemorySaver(size_t initial_size=124)
+	MemorySaver(size_t initial_size=124)
 	{
 		block_ = (char*)::malloc(initial_size);
 		assert(block_);
@@ -164,7 +170,7 @@ public:
 		allocated_size_ = initial_size;
 	}
 
-	MemorySaver::~MemorySaver()
+	~MemorySaver()
 	{
 		::free(block_);
 	}
@@ -225,7 +231,7 @@ protected:
 	char* block_;
 	char* position_;
 	size_t allocated_size_;
-    /// вектор смещений, вместо вектора указателей
+    /// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     vector<size_t> stack_;
 };
 
@@ -249,12 +255,12 @@ protected:
 	BYTE *begin,*cur;
 	int size;
 public:
-	CLoadDirectory::CLoadDirectory(BYTE* data,DWORD _size)
+	CLoadDirectory(BYTE* data,DWORD _size)
 		:begin(data),cur(0),size(_size)
 	{
 	}
 
-	CLoadDirectory::CLoadDirectory(CLoadData* ld)
+	CLoadDirectory(CLoadData* ld)
 	{
 		begin=ld->data;
 		size=ld->size;
@@ -304,28 +310,37 @@ public:
 class CLoadDirectoryFile : public CLoadDirectory
 {
 public:
-	CLoadDirectoryFile::CLoadDirectoryFile()
+	CLoadDirectoryFile()
 		:CLoadDirectory(0,0)
 	{
 	}
 
-	CLoadDirectoryFile::~CLoadDirectoryFile()
+	~CLoadDirectoryFile()
 	{
 		delete begin;
 	}
 
 	bool Load(const char* filename)
 	{
+#ifdef _WIN32
 		int file=_open(filename,_O_RDONLY|_O_BINARY);
 		if(file==-1)return false;
-
 		size=_lseek(file,0,SEEK_END);
 		if(size<0)return false;
 		_lseek(file,0,SEEK_SET);
 		begin=new BYTE[size];
 		_read(file,begin,size);
 		_close(file);
-
+#else
+		int file=open(filename,O_RDONLY);
+		if(file==-1)return false;
+		size=(int)lseek(file,0,SEEK_END);
+		if(size<0)return false;
+		lseek(file,0,SEEK_SET);
+		begin=new BYTE[size];
+		(void)::read(file,begin,size);
+		::close(file);
+#endif
 		cur=0;
 		return true;
 	}
@@ -377,7 +392,7 @@ public:
 	}
 	int getCurPos(){return rd_cur_pos;}
 protected:
-    ///Читает лишь в случае, если rd_cur_pos+sizeof(x)<=ld->size
+    ///пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ rd_cur_pos+sizeof(x)<=ld->size
     template<class T>
     __forceinline void read(T& x){
 		read(&x,sizeof(x));
@@ -394,9 +409,9 @@ if(CLoadData* load_data=dir.find(id))  \
 
 /*
 IF_FIND_DIR
-IF_FIND_DATA для укорочения кода предназначены.
+IF_FIND_DATA пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 
-Пример 
+пїЅпїЅпїЅпїЅпїЅпїЅ 
 saver.push(ID);
 saver<<a;
 saver.pop();
@@ -423,7 +438,7 @@ template<class T>
 Saver& operator<<(Saver& s,vector<T>& v){
 	DWORD size = (DWORD)v.size();
 	s << size;
-	vector<T>::iterator it;
+	typename vector<T>::iterator it;
 	FOR_EACH(v, it){
 		s << *it;
 	}

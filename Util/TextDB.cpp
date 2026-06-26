@@ -1,14 +1,16 @@
 #include "Stdafx.h"
 #include "TextDB.h"
-Serialization/Serialization.h
-Serialization/XPrmArchive.h
-Serialization/MultiArchive.h
-Game/GameOptions.h
+#include "Serialization/Serialization.h"
+#include "Serialization/XPrmArchive.h"
+#include "Serialization/MultiArchive.h"
 #include "UnicodeConverter.h"
 
+// NOTE: TextDB lives in the low-level Util layer and must not depend on the
+// Game layer (GameOptions). The current language is loaded explicitly by
+// higher-level startup code via loadLanguage(); the default-constructed
+// singleton starts empty until then.
 TextDB::TextDB()
 {
-	loadLanguage(GameOptions::instance().getLanguage());
 }
 
 TextDB::TextDB(const char* language)

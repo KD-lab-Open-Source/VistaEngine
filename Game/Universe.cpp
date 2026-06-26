@@ -1,45 +1,45 @@
 #include "StdAfx.h"
 
-Environment/Environment.h
-Environment/SourceManager.h
+#include "Environment/Environment.h"
+#include "Environment/SourceManager.h"
 #include "Universe.h"
 #include "Player.h"
 #include "RenderObjects.h"
 #include "vmap.h"
 #include "CameraManager.h"
 #include "Triggers.h"
-Serialization/Serialization.h
-Serialization/RangedWrapper.h
-Serialization/XPrmArchive.h
-Serialization/SerializationFactory.h
-physics/crash/CrashSystem.h
+#include "Serialization/Serialization.h"
+#include "Serialization/RangedWrapper.h"
+#include "Serialization/XPrmArchive.h"
+#include "Serialization/SerializationFactory.h"
+#include "physics/crash/CrashSystem.h"
 #include "ShowHead.h"
-AI/PFTrap.h
-UserInterface/GameLoadManager.h
-UserInterface/UserInterface.h
-UserInterface/UI_Minimap.h
-UserInterface/UI_Logic.h
-UserInterface/UI_BackgroundScene.h
+#include "AI/PFTrap.h"
+#include "UserInterface/GameLoadManager.h"
+#include "UserInterface/UserInterface.h"
+#include "UserInterface/UI_Minimap.h"
+#include "UserInterface/UI_Logic.h"
+#include "UserInterface/UI_BackgroundScene.h"
 #include "GameOptions.h"
-UserInterface/SelectManager.h
-Terra/terTools.h
+#include "UserInterface/SelectManager.h"
+#include "Terra/terTools.h"
 #include "TransparentTracking.h"
 #include "NormalMap.h"
 #include "WindMap.h"
-Water/CircleManager.h
-Water/SkyObject.h
+#include "Water/CircleManager.h"
+#include "Water/SkyObject.h"
 #include "UnitActing.h"
 #include "StreamCommand.h"
 #include "IronBullet.h"
 #include "MergeOptions.h"
 #include "PlayerStatistics.h"
-Render/src/MultiRegion.h
-Render/Src/TileMap.h
-Render/src/Scene.h
-Render/src/VisGeneric.h
+#include "Render/src/MultiRegion.h"
+#include "Render/Src/TileMap.h"
+#include "Render/src/Scene.h"
+#include "Render/src/VisGeneric.h"
 #include "SoundApp.h"
-Serialization/StringTable.h
-VistaRender/FieldOfView.h
+#include "Serialization/StringTable.h"
+#include "VistaRender/FieldOfView.h"
 
 BEGIN_ENUM_DESCRIPTOR(RealPlayerType, "RealPlayerType");
 REGISTER_ENUM(REAL_PLAYER_TYPE_CLOSE, "Closed");

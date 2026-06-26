@@ -2,7 +2,7 @@
 #define __EXCEL_EXPORTER_H_INCLUDED__
 
 #include "XMath/xmath.h"
-XTL/Rect.h
+#include "XTL/Rect.h"
 
 #ifdef EXCELEXPORT_EXPORTS
 #define EXCELEXPORT_API __declspec(dllexport)

@@ -1,8 +1,8 @@
 #ifndef _VISGENERIC_H_
 #define _VISGENERIC_H_
 
-Render/Inc/IvisGenericInternal.h
-Render/Inc/VisGenericDefine.h
+#include "Render/Inc/IvisGenericInternal.h"
+#include "Render/Inc/VisGenericDefine.h"
 
 class cScene;
 class cInterfaceRenderDevice;

@@ -1,8 +1,8 @@
 #ifndef __CLOUD_SHADOW_H_INCLUDED__
 #define __CLOUD_SHADOW_H_INCLUDED__
 
-Render/inc/IVisGenericInternal.h
-Render/inc/IRenderDevice.h
+#include "Render/inc/IVisGenericInternal.h"
+#include "Render/inc/IRenderDevice.h"
 
 class cCloudShadow : public BaseGraphObject
 {

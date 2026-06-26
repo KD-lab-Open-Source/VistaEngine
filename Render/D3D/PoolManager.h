@@ -1,7 +1,7 @@
 #ifndef __POOL_MANAGER_H_INCLUDED__
 #define __POOL_MANAGER_H_INCLUDED__
 
-Render/inc/rd.h
+#include "Render/inc/rd.h"
 
 //Классы для хранения и выделения одинаковых по размеру объектов.
 

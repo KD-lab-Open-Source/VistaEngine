@@ -17,8 +17,29 @@ FetchContent_MakeAvailable(SDL3)
 # Interface target that gives every module common include paths
 add_library(EngineIncludes INTERFACE)
 target_include_directories(EngineIncludes INTERFACE
+    # Util's precompiled-header StdAfx.h lives here; list it first so bare
+    # "StdAfx.h" includes from Util/*.cpp resolve to it rather than to a
+    # same-named StdAfx.h in one of the module dirs added below.
+    ${CMAKE_SOURCE_DIR}/Util/XMath
     ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/Util
+    # Module source dirs, so legacy unqualified cross-module includes
+    # (e.g. "UnitLink.h", "BaseUniverseObject.h") resolve as they did
+    # under the original MSVC build, where every module dir was a search root.
+    ${CMAKE_SOURCE_DIR}/Units
+    ${CMAKE_SOURCE_DIR}/Environment
+    ${CMAKE_SOURCE_DIR}/Physics
+    ${CMAKE_SOURCE_DIR}/Terra
+    ${CMAKE_SOURCE_DIR}/Game
+    ${CMAKE_SOURCE_DIR}/UserInterface
+    ${CMAKE_SOURCE_DIR}/Network
+    ${CMAKE_SOURCE_DIR}/Render/inc
+    ${CMAKE_SOURCE_DIR}/Render/src
+    ${CMAKE_SOURCE_DIR}/Render/3dx
+    ${CMAKE_SOURCE_DIR}/Render/D3D
     ${CMAKE_SOURCE_DIR}/XLibs.Net/XUtil
+    ${CMAKE_SOURCE_DIR}/XLibs.Net/XUtil/CRC
+    ${CMAKE_SOURCE_DIR}/XLibs.Net/XUtil/Unicode
     ${CMAKE_SOURCE_DIR}/XLibs.Net/XZip
     ${CMAKE_SOURCE_DIR}/XLibs.Net/Profiler/Profiler
     ${CMAKE_SOURCE_DIR}/Util/XTL
@@ -30,6 +51,15 @@ if(NOT WIN32)
         ${CMAKE_SOURCE_DIR}/Platform/fake_includes
     )
     target_compile_definitions(EngineIncludes INTERFACE _CROSS_PLATFORM_)
+    # This is MSVC-origin code: -fms-extensions lets clang accept MSVC-isms that
+    # are pervasive here (notably the __super keyword, used in ~180 files).
+    target_compile_options(EngineIncludes INTERFACE
+        "$<$<COMPILE_LANGUAGE:CXX>:-fms-extensions>"
+        # The 'register' keyword (removed in C++17) is used in ~19 legacy files.
+        "$<$<COMPILE_LANGUAGE:CXX>:-Wno-register>"
+        # Force-include WindowsAPI.h as the very first header in every C++ translation unit
+        "$<$<COMPILE_LANGUAGE:CXX>:-include;${CMAKE_SOURCE_DIR}/Platform/WindowsAPI.h>"
+    )
 endif()
 
 add_subdirectory(XLibs.Net)

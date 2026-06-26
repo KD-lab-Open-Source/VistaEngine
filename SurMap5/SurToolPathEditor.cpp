@@ -1,15 +1,15 @@
 #include "stdafx.h"
 #include "SurToolPathEditor.h"
-Game/RenderObjects.h
-Game/CameraManager.h
-Environment/SourceBase.h
-Serialization/SerializationFactory.h
-Render/Src/cCamera.h
+#include "Game/RenderObjects.h"
+#include "Game/CameraManager.h"
+#include "Environment/SourceBase.h"
+#include "Serialization/SerializationFactory.h"
+#include "Render/Src/cCamera.h"
 
 #include "DebugUtil.h"
 #include "NameComboDlg.h"
 #include "UnitAttribute.h" // FIXME
-Serialization/StringTable.h
+#include "Serialization/StringTable.h"
 
 IMPLEMENT_DYNAMIC(CSurToolPathEditor, CSurToolBase)
 

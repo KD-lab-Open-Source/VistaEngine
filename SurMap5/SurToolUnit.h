@@ -1,11 +1,11 @@
 #ifndef __SUR_TOOL_UNIT_H_INCLUDED__
 #define __SUR_TOOL_UNIT_H_INCLUDED__
 
-Units/AttributeReference.h
-mfc/SizeLayoutManager.h
+#include "Units/AttributeReference.h"
+#include "mfc/SizeLayoutManager.h"
 #include "SurToolAux.h"
 #include "EScroll.h"
-XMath/xmath.h
+#include "XMath/xmath.h"
 #include "EventListeners.h"
 
 class Player;

@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "BinaryArchive.h"
-XMath/xmath.h
+#include "XMath/xmath.h"
 #include "Dictionary.h"
 #include "crc.h"
 #include "EnumDescriptor.h"

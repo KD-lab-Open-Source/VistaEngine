@@ -1,9 +1,9 @@
 #ifndef __LIB_3DX_H_INCLUDED__
 #define __LIB_3DX_H_INCLUDED__
 
-XTL/StaticMap.h
+#include "XTL/StaticMap.h"
 #include "Static3dx.h"
-FileUtils/FileTime.h
+#include "FileUtils/FileTime.h"
 
 class RENDER_API cLib3dx
 {

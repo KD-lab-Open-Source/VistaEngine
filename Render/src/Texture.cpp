@@ -2,7 +2,7 @@
 #include "Texture.h"
 #include "D3DRender.h"
 #include "FileImage.h"
-Serialization/ResourceSelector.h
+#include "Serialization/ResourceSelector.h"
 #include "FileUtils/FileUtils.h"
 #include <ddraw.h>
 

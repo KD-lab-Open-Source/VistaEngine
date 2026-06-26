@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "Flash.h"
-VistaRender/postEffects.h
+#include "VistaRender/postEffects.h"
 #include "DebugPrm.h"
-Render/inc/IRenderDevice.h
+#include "Render/inc/IRenderDevice.h"
 
 Flash::Flash(PostEffectManager* manager)
 {

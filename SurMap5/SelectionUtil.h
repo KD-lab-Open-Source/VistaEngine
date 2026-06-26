@@ -3,9 +3,9 @@
 
 #include "SurToolAux.h"
 //class CSurToolBase;
-Render/3dx/Umath.h
+#include "Render/3dx/Umath.h"
 #include "UniverseObjectAction.h"
-XMath/Plane.h
+#include "XMath/Plane.h"
 
 
 namespace UniverseObjectActions{

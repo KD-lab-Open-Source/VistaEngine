@@ -6,17 +6,17 @@
 
 class XZipArchive;
 
-/// режимы для XZipStream::open()
+/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ XZipStream::open()
 enum XZipFileOpenMode
 {
-	XZIP_ARCHIVE_ONLY,		///< читать только из архива
-	XZIP_ARCHIVE_PRIORITY,	///< сначала искать файл в архиве, если отсутствует открывать напрямую
-	XZIP_FILE_PRIORITY,		///< сначала открывать файл напрямую, если отсутствует искать в архиве
-	XZIP_FILE_ONLY			///< читать только из файла
+	XZIP_ARCHIVE_ONLY,		///< пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	XZIP_ARCHIVE_PRIORITY,	///< пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	XZIP_FILE_PRIORITY,		///< пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	XZIP_FILE_ONLY			///< пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 };
 
-/// режимы для XZipStream::seek()
-/// должны совпадать с режимами XStream::seek() для совместимости кода
+/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ XZipStream::seek()
+/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ XStream::seek() пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 enum XZipSeekMode
 {
 	XZS_BEG = 0,
@@ -24,9 +24,9 @@ enum XZipSeekMode
 	XZS_END = 2
 };
 
-/// режимы для XZipStream::open()
-/// должны совпадать с режимами XStream::open() для совместимости кода
-/// одновременное чтение и запись (XZS_IN | XZS_OUT) не поддерживается
+/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ XZipStream::open()
+/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ XStream::open() пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (XZS_IN | XZS_OUT) пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 enum XZipOpenMode
 {
 	XZS_IN		= 0x0001,
@@ -76,7 +76,7 @@ public:
 	template<class T> XZipStream& read(T& v){ read(&v, sizeof(T)); return *this; }
 
 	static XZipFileOpenMode openMode(){ return openMode_; }
-	static setOpenMode(XZipFileOpenMode mode){ openMode_ = mode; }
+	static void setOpenMode(XZipFileOpenMode mode){ openMode_ = mode; }
 
 	int compressionLevel() const { return compressionLevel_; }
 	void setCompressionLevel(int level);
@@ -88,10 +88,10 @@ private:
 	bool handleErrors_;
 	std::string fileName_;
 
-	/// степень сжатия, 0-9
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, 0-9
 	int compressionLevel_;
 
-	/// режим чтения напрямую из файла вне архива
+	/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	bool directReadMode_;
 	unsigned long directReadPosition_;
 	bool directReadEOF_;
@@ -100,7 +100,7 @@ private:
 	unsigned long directReadSize_;
 	unsigned long dosDate_;
 
-	/// handle реального файла или указатель на внутренний zip handle из архива
+	/// handle пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ zip handle пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	void* fileHandle_;
 
 	bool openFromArchive(const char* file_name, int flags = XZS_IN);
@@ -146,8 +146,8 @@ public:
 	virtual void fileTime(void* file_handle, unsigned& fdate, unsigned& ftime) const = 0;
 	virtual long fileSeek(void* file_handle, long offset, int dir) = 0;
 
-	/// конверсия имени файла, если требуется
-	/// обычно для zip'а надо заменять '\' на '/'
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ zip'пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ '\' пїЅпїЅ '/'
 	virtual const char* convertFileName(const char* file_name) const = 0;
 
 protected:
@@ -157,7 +157,7 @@ protected:
 
 private:
 
-	/// степень сжатия, 0-9
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, 0-9
 	int compressionLevel_;
 	bool handleErrors_;
 };
@@ -168,15 +168,15 @@ public:
 	XZipArchiveManager(bool handle_errors = false);
 	~XZipArchiveManager();
 
-	/// открыть архив, в случае успеха он добавляется в список,
-	/// можно открывать файлы из него через XZipStream::open()
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ,
+	/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ XZipStream::open()
 	bool openArchive(const char* archive_name, XZipOpenMode mode = XZS_IN);
-	/// закрыть архив, при этом он остаётся в списке
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	bool closeArchive(const char* archive_name);
 
-	/// добавить архив в список
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	bool registerArchive(XZipArchive* archive);
-	/// удалить архив из списка
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	bool unregisterArchive(XZipArchive* archive);
 
 	bool fileOpen(XZipStream& fh, const char* file_name, unsigned int flags = XZS_IN, int compression_level = 0);
@@ -189,10 +189,10 @@ public:
 private:
 
 	typedef std::vector<XZipArchive*> Archives;
-	/// список архивов для чтения
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	Archives archives_;
 
-	/// архив для записи, единовременно может быть только один
+	/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	XZipArchive* outputArchive_;
 
 	bool handleErrors_;
@@ -220,15 +220,15 @@ private:
 
 	std::string zipName_;
 
-	/// относительный путь к файлам
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	std::string path_;
 
 	std::string filesMask_;
 	std::string excludeFilesMask_;
 
-	/// список имён файлов
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	FileNames files_;
-	/// список имён файлов, которые не надо класть в архив
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
 	FileNames excludeFiles_;
 
 	ProgressCallback progressCallback_;

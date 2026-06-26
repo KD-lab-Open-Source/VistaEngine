@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "LabelObject.h"
 #include "Universe.h"
-Environment/SourceManager.h
-Units/RealUnit.h
-Environment/SourceBase.h
+#include "Environment/SourceManager.h"
+#include "Units/RealUnit.h"
+#include "Environment/SourceBase.h"
 
 LabelObject::LabelObject(const char* label)
 : label_(label), found_(false)

@@ -2,14 +2,14 @@
 #define __CONDITIONS_H__
 
 #include "Timers.h"
-TriggerEditor/TriggerExport.h
-Units/UnitAttribute.h
-UserInterface/UI_References.h
-Environment/Environment.h
-Units/Triggers.h
-Units/RealUnit.h
-Network/NetPlayer.h
-Units/LabelObject.h
+#include "TriggerEditor/TriggerExport.h"
+#include "Units/UnitAttribute.h"
+#include "UserInterface/UI_References.h"
+#include "Environment/Environment.h"
+#include "Units/Triggers.h"
+#include "Units/RealUnit.h"
+#include "Network/NetPlayer.h"
+#include "Units/LabelObject.h"
 
 class AttributeSquad;
 class AttributeBuilding;
@@ -28,7 +28,7 @@ enum ScopeType
 	SCOPE_MISSION_DESCRIPTION
 };
 
-enum CompareOperator
+enum CompareOperator : int
 {
 	COMPARE_LESS,	// Меньше
 	COMPARE_LESS_EQ, // Меньше либо равно

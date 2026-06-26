@@ -24,11 +24,11 @@ vrtMap vMap;
 const unsigned int MAX_CHANGED_RENDER_AREAS=512;
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(vrtMapCreationParam, eCreateWorldMetod, "eCreateWorldMetod")
-REGISTER_ENUM_ENCLOSED(vrtMapCreationParam, FullPlain, "Плоский");
-REGISTER_ENUM_ENCLOSED(vrtMapCreationParam, Mountains, "Горы");
+REGISTER_ENUM_ENCLOSED(vrtMapCreationParam, FullPlain, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_ENUM_ENCLOSED(vrtMapCreationParam, Mountains, "пїЅпїЅпїЅпїЅ");
 END_ENUM_DESCRIPTOR_ENCLOSED(vrtMapCreationParam, eCreateWorldMetod)
 
-BEGIN_ENUM_DESCRIPTOR_ENCLOSED(vrtMapCreationParam, SIZE_POWER, "Размер")
+BEGIN_ENUM_DESCRIPTOR_ENCLOSED(vrtMapCreationParam, SIZE_POWER, "пїЅпїЅпїЅпїЅпїЅпїЅ")
 REGISTER_ENUM_ENCLOSED(vrtMapCreationParam, SIZE_512,  "512")
 REGISTER_ENUM_ENCLOSED(vrtMapCreationParam, SIZE_1024, "1024")
 REGISTER_ENUM_ENCLOSED(vrtMapCreationParam, SIZE_2048, "2048")
@@ -36,12 +36,12 @@ REGISTER_ENUM_ENCLOSED(vrtMapCreationParam, SIZE_4096, "4096")
 REGISTER_ENUM_ENCLOSED(vrtMapCreationParam, SIZE_8192, "8192")
 END_ENUM_DESCRIPTOR_ENCLOSED(vrtMapCreationParam, SIZE_POWER)
 
-//BEGIN_ENUM_DESCRIPTOR_ENCLOSED(vrtMap, eShowSpecialInfo, "Показ спец поверхности")
-//REGISTER_ENUM_ENCLOSED(vrtMap, SSI_NoShow,  "не показывать")
-//REGISTER_ENUM_ENCLOSED(vrtMap, SSI_ShowHardnessImpassability, "неразрушаемость-непроходимость")
-//REGISTER_ENUM_ENCLOSED(vrtMap, SSI_ShowKind, "1,2,3,4 рода")
-////REGISTER_ENUM_ENCLOSED(vrtMap, SSI_ShowImpassability, "непроходимость")
-////REGISTER_ENUM_ENCLOSED(vrtMap, SSI_ShowAllGeo, "гео")
+//BEGIN_ENUM_DESCRIPTOR_ENCLOSED(vrtMap, eShowSpecialInfo, "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+//REGISTER_ENUM_ENCLOSED(vrtMap, SSI_NoShow,  "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+//REGISTER_ENUM_ENCLOSED(vrtMap, SSI_ShowHardnessImpassability, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+//REGISTER_ENUM_ENCLOSED(vrtMap, SSI_ShowKind, "1,2,3,4 пїЅпїЅпїЅпїЅ")
+////REGISTER_ENUM_ENCLOSED(vrtMap, SSI_ShowImpassability, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+////REGISTER_ENUM_ENCLOSED(vrtMap, SSI_ShowAllGeo, "пїЅпїЅпїЅ")
 //END_ENUM_DESCRIPTOR_ENCLOSED(vrtMap, eShowSpecialInfo)
 
 
@@ -63,6 +63,46 @@ unsigned long generateSerialNumber()
     return myrnd();
 }
 
+// Geo-texture surface classification (ported from the full-engine branch).
+unsigned long vrtMap::GetGeoColor(int x, int y)
+{
+    unsigned long cl=0;
+    unsigned long cm=0;
+    if(matGeoTx.pData){
+        int xp=x*kXScaleMatGeoTx>>16;
+        int kx=(x*kXScaleMatGeoTx>>8)&0xFF;
+        int kx1=(1<<8)-kx;
+        int yp=y*kYScaleMatGeoTx>>16;
+        int ky=(y*kYScaleMatGeoTx>>8)&0xFF;
+        int ky1=(1<<8)-ky;
+        unsigned long cm0=matGeoTx.pData[(xp)%matGeoTx.sx + (yp)%matGeoTx.sy*matGeoTx.sx];
+        unsigned long cm1=matGeoTx.pData[(xp+1)%matGeoTx.sx + (yp)%matGeoTx.sy*matGeoTx.sx];
+        unsigned long cm2=matGeoTx.pData[(xp)%matGeoTx.sx + (yp+1)%matGeoTx.sy*matGeoTx.sx];
+        unsigned long cm3=matGeoTx.pData[(xp+1)%matGeoTx.sx + (yp+1)%matGeoTx.sy*matGeoTx.sx];
+        cm0= (((cm0&0xFF)*kx1 + (cm1&0xFF)*kx)>>8) + ((((cm0&0xFF00)*kx1 + (cm1&0xFF00)*kx)>>8)&0xFF00) + ((((cm0&0xFF0000)*kx1 + (cm1&0xFF0000)*kx)>>8)&0xFF0000);
+        cm1= (((cm2&0xFF)*kx1 + (cm3&0xFF)*kx)>>8) + ((((cm2&0xFF00)*kx1 + (cm3&0xFF00)*kx)>>8)&0xFF00) + ((((cm2&0xFF0000)*kx1 + (cm3&0xFF0000)*kx)>>8)&0xFF0000);
+        cm = (((cm0&0xFF)*ky1 + (cm1&0xFF)*ky)>>8) + ((((cm0&0xFF00)*ky1 + (cm1&0xFF00)*ky)>>8)&0xFF00) + ((((cm0&0xFF0000)*ky1 + (cm1&0xFF0000)*ky)>>8)&0xFF0000);
+    }
+    if(loopedGeoTx.pData) {
+        cl=loopedGeoTx.pData[x%loopedGeoTx.sx + y%loopedGeoTx.sy*loopedGeoTx.sx];
+        if(matGeoTx.pData){
+            const unsigned long mask=0x00FEFEFF;
+            unsigned long c = ( (cl&mask) + (cm&mask) ) >> 1;
+            return c;
+        }
+    }
+    return cl+cm;
+}
+
+unsigned char vrtMap::GetGeoType(int offset, int h)
+{
+    int j=offset & clip_mask_x;
+    int i=offset>>H_SIZE_POWER;
+    unsigned long c=GetGeoColor(j,i);
+    unsigned char idxc=geoTxOctree.getIdxColor(c);
+    return idxc;
+}
+
 vrtMapCreationParam::vrtMapCreationParam() 
 {
     H_SIZE_POWER = SIZE_2048;
@@ -73,23 +113,23 @@ vrtMapCreationParam::vrtMapCreationParam()
 
 void vrtMapCreationParam::serialize(Archive& ar) 
 {
-    ar.serialize(H_SIZE_POWER, "H_SIZE_POWER", "Ширина");
-    ar.serialize(V_SIZE_POWER, "V_SIZE_POWER", "Высота");
+    ar.serialize(H_SIZE_POWER, "H_SIZE_POWER", "пїЅпїЅпїЅпїЅпїЅпїЅ");
+    ar.serialize(V_SIZE_POWER, "V_SIZE_POWER", "пїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	ar.serialize(createWorldMetod, "createWorldMetod", 0);
-	ar.serialize(initialHeight, "initialHeight", "Начальная высота");
+	ar.serialize(initialHeight, "initialHeight", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 void vrtMapChangeParam::serialize(Archive& ar) 
 {
 	vrtMapCreationParam::serialize(ar);
-	ar.serialize(flag_resizeWorld2NewBorder, "flag_resizeWorld2NewBorder", "Масштабировать мир к новым границам");
-	ar.serialize(oldWorldBegCoordX, "oldWorldBegCoordX", "Начальная координата X старого мира в новом");
-	ar.serialize(oldWorldBegCoordY, "oldWorldBegCoordY", "Начальная координата Y старого мира в новом");
-	ar.serialize(kScaleModels, "kScaleModels", "Масштаб моделей");
+	ar.serialize(flag_resizeWorld2NewBorder, "flag_resizeWorld2NewBorder", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(oldWorldBegCoordX, "oldWorldBegCoordX", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ X пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(oldWorldBegCoordY, "oldWorldBegCoordY", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Y пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(kScaleModels, "kScaleModels", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
-//////////////////// Для конвертации старого контейнера PMO
+//////////////////// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ PMO
 class ElementPMO {
 public:
 	sGeoPMO				geoPMO;
@@ -157,7 +197,7 @@ void vrtMap::serializeRegion(Archive& ar)
 
 	if(ar.isInput()){
 		if(region_->width() != H_SIZE || region_->height() != V_SIZE){
-			kdError("3d", "Регион мелкодетальной текстуры имеет некорректные размеры и будет очищен.");
+			kdError("3d", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.");
 			region_->init(H_SIZE, V_SIZE, 1);
 		}
 
@@ -231,7 +271,7 @@ vrtMap::vrtMap()
 
 	inv_vx_fraction = 1.0f/float(1<<VX_FRACTION);
 
-//Очистка списка для Undo  и установка итератора на начальный элемент
+//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ Undo  пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	//preCAs.erase(preCAs.begin(), preCAs.end());
 	//curPreCA=preCAs.begin();
 	containerPMO.reserve(1000);
@@ -420,22 +460,22 @@ void vrtMap::rebuild()
 	//memcpy(backupVxABuf, vxaBuf, sizeof(backupVxABuf[0])*H_SIZE*V_SIZE);
 	//memcpy(backupSupBuf, supBuf, sizeof(backupSupBuf[0])*H_SIZE*V_SIZE);
 	
-	bitmapDispatcher.clearCache();//release вызывать нельзя т.к. colorPic инструменты привязаны к индексам а не к имени файла!
+	bitmapDispatcher.clearCache();//release пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ.пїЅ. colorPic пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ!
 	bitGenDispatcher.release();
-	if(testExistingFile(getTargetName(worldRasterDataFileSource))) { //подложка - старый мир
+	if(testExistingFile(getTargetName(worldRasterDataFileSource))) { //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 		loadDamPal();
 		loadVMP(getTargetName(worldRasterDataFileSource), true);
-		///Загрузка из палитры старого мира
+		///пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 		if(!loadRGBCache(getTargetName(worldRGBFileSource)) )
             setRGBCacheInSurBuf();
 	}
-	else { // подложка - процедурная
+	else { // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		createDamPal();
 		createBeginSurface();
 
 		//f3d.loadVariable();
 
-	} // else // подложка - процедурная
+	} // else // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 	playPMOperation();
 	//putNewGeoTexture(matGeoTxFileName.c_str(), loopedGeoTxFileName.c_str());
@@ -451,7 +491,7 @@ bool vrtMap::load(const char* _worldName, bool flag_useTryColorBuffer) //supBuf
 	bitmapDispatcher.release();
 	bitGenDispatcher.release();
 
-	UndoDispatcher_KillAllUndo(); //Очистка всего буфера Undo-Redo
+	UndoDispatcher_KillAllUndo(); //пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ Undo-Redo
 
 	worldName=_worldName;
 
@@ -490,7 +530,7 @@ bool vrtMap::load(const char* _worldName, bool flag_useTryColorBuffer) //supBuf
 	if(flag_useTryColorBuffer)
 		flagNotBuildWorld&=loadRGBCache(getTargetName(worldRGBCacheFile));
 	flagNotBuildWorld&=loadVMP(getTargetName(worldRasterDataCacheFile), true);
-	if( flagNotBuildWorld ){ //Загрузка из кэша
+	if( flagNotBuildWorld ){ //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ
 		loadDamPal();
 
 		//f3d.load(geoTxFileName.c_str());
@@ -502,16 +542,16 @@ bool vrtMap::load(const char* _worldName, bool flag_useTryColorBuffer) //supBuf
 		//loadHardness();
 		loadSurKind();
 	}
-	else { //Загрузка и компиляция мира
+	else { //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 		rebuild();
 		///f3d.load(geoTxFileName.c_str());
 		unsigned int curVxABufCRC=getVxABufCRC();
 		unsigned int curDamBufCRC=getDamSurBufCRC();
 		if(VxABufCRC!=curVxABufCRC){
-			xassert(0&& "Сгенеренные высоты не совпадают с записанными");
+			xassert(0&& "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		}
 		if(DamSurBufCRC!=curDamBufCRC){
-			xassert(0&& "Поверхность текстуры(Dam) сгенеренного мира не совпадает с записанной");
+			xassert(0&& "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ(Dam) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		}
 	}
 
@@ -539,7 +579,7 @@ void vrtMap::save(const char* _worldName)
 
 	guid.generate();
 
-	//Проверка каталога на существование и создание если нет
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 	string path2world;
 	if(worldsDir.empty()) path2world.clear();
 	else path2world = worldsDir + "\\";
@@ -574,7 +614,7 @@ void vrtMap::save(const char* _worldName)
 
 bool vrtMap::deleteWorld(const char* _worldName)
 {
-	//Проверка каталога на существование и создание если нет
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 	string path2world;
 	if(worldsDir.empty()) path2world.clear();
 	else path2world = worldsDir + "\\";
@@ -588,9 +628,9 @@ bool vrtMap::deleteWorld(const char* _worldName)
 	if(hf != INVALID_HANDLE_VALUE){
 		do{
 			if ( FindFileData.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY ) {
-				if(FindFileData.cFileName[0]=='.' && FindFileData.cFileName[1]=='\0' ) continue;//Проверка на служебные записи
+				if(FindFileData.cFileName[0]=='.' && FindFileData.cFileName[1]=='\0' ) continue;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 				if(FindFileData.cFileName[0]=='.' && FindFileData.cFileName[1]=='.' && FindFileData.cFileName[2]=='\0' ) continue;
-				xassert(0 && "В каталоге мира лишние каталоги!");
+				xassert(0 && "пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ!");
 			}
 			else {
 				filemask=path2world + "\\" + FindFileData.cFileName;
@@ -709,7 +749,7 @@ void vrtMap::saveSurKind()
 void vrtMap::clearGridChangedAreas()
 {
 	int sizeGCA=(V_SIZE>>kmGridChA)*(H_SIZE>>kmGridChA);
-	//обнуление
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	memset(gridChAreas, 0, sizeGCA*sizeof(*gridChAreas));
 	memset(gridChAreas2, 0, sizeGCA*sizeof(*gridChAreas));
 }
@@ -751,14 +791,14 @@ void vrtMap::convertS5L3ToS5L4()
 	//S5L3 
 	//VX_FRACTION=5;
 	//VX_SHIFT_VX=3;
-	// const int MAX_VX_HEIGHT=((1<<(VX_FRACTION + 8))-1);//это 0x1fff//
+	// const int MAX_VX_HEIGHT=((1<<(VX_FRACTION + 8))-1);//пїЅпїЅпїЅ 0x1fff//
 	//#define VmAt_Inds	(0x2)
 	//#define VmAt_MASK (0x7)
 
 	//S5L4
 	//VX_FRACTION=5;
 	//VX_SHIFT_VX=2;
-	// const int MAX_VX_HEIGHT=((1<<(VX_FRACTION + 9))-1);//это 0x3fff//
+	// const int MAX_VX_HEIGHT=((1<<(VX_FRACTION + 9))-1);//пїЅпїЅпїЅ 0x3fff//
 	//#define VmAt_Inds	(0x1)
 	//#define VmAt_MASK (0x3)
 
@@ -810,7 +850,7 @@ bool vrtMap::loadVMP(const char* file, bool flag_NoCheckCRC)
 	}
 	else if(VmpHeader.cmpID("S5L2")) { // solid buffer-a
 		if(!flag_NoCheckCRC){
-			xassert(VmpHeader.XSize==H_SIZE && VmpHeader.YSize==V_SIZE ); //надо перезаписать промежуточную версию формата vmp в итоговую
+			xassert(VmpHeader.XSize==H_SIZE && VmpHeader.YSize==V_SIZE ); //пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ vmp пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			if(VmpHeader.AUX1!=VxABufCRC  /*|| VmpHeader.AUX3!=DamSurBufCRC*/)
 				return 0;
 		}
@@ -822,7 +862,7 @@ bool vrtMap::loadVMP(const char* file, bool flag_NoCheckCRC)
 			convertVMapTryColor2TerClr();
 		else xassert(0&&"Not compatible color in world");;
 	}
-	else if(VmpHeader.cmpID("S5L3") || VmpHeader.cmpID("S5L4") ) { //S5L3 - 256|HiColor  //S5L4 - 512 высота
+	else if(VmpHeader.cmpID("S5L3") || VmpHeader.cmpID("S5L4") ) { //S5L3 - 256|HiColor  //S5L4 - 512 пїЅпїЅпїЅпїЅпїЅпїЅ
 		if(VmpHeader.XSize!=H_SIZE || VmpHeader.YSize!=V_SIZE  || VmpHeader.AUX1!=VxABufCRC)
 			return 0;
 		VxABufCRC=VmpHeader.AUX1; DamSurBufCRC=VmpHeader.AUX3;
@@ -846,8 +886,8 @@ bool vrtMap::loadRGBCache(const char* fname)
 	TGAHEAD tgahead;
 	if( tgahead.loadHeader(fname) ){
 		if((tgahead.PixelDepth!=24) || (tgahead.ImageType!=2)) {
-			///AfxMessageBox("Не поддерживаемый тип TGA (необходим 24bit не компрессованный)");
-			xassert(0&&"Не поддерживаемый тип TGA (необходим 24bit не компрессованный)");
+			///AfxMessageBox("пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ TGA (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 24bit пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)");
+			xassert(0&&"пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ TGA (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 24bit пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)");
 			return false;
 		}
 		tgahead.load2RGBL(H_SIZE, V_SIZE, supBuf);
@@ -860,7 +900,7 @@ bool vrtMap::loadRGBCache(const char* fname)
 void vrtMap::setRGBCacheInSurBuf()
 {
 	xassert(supBuf);
-	///Загрузка из палитры
+	///пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	int y,x;
 	for(y=0; y<V_SIZE; y++){
 		for(x=0; x<H_SIZE; x++){
@@ -908,26 +948,26 @@ bool vrtMap::saveGameMap(Archive& ar)
 	xassert(ar.isOutput());
 
 	updateGridChangedAreas2();
-	if(!checkGridChangedAreas2()){ //случай, когда нет изменений на игровом мире
+	if(!checkGridChangedAreas2()){ //пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 		worldChanged=0;
 		return true;
 	}
-	if(!worldChanged) // случай, когда не менялся игровой мир после загрузки
+	if(!worldChanged) // пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		return true;
 	XBuffer ff;
-	//запись идентификатора 
+	//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
 	ff.write(&worldSurfaceChangeFileGUID, sizeof(GUID));
-	//Запись серийного номера мира
+	//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	ff.write(&worldSerial, sizeof(worldSerial));
-	//Запись crc мира
+	//пїЅпїЅпїЅпїЅпїЅпїЅ crc пїЅпїЅпїЅпїЅ
 	ff.write(&VxABufCRC, sizeof(VxABufCRC));
-	//Запись размера мира
+	//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	ff.write(&H_SIZE, sizeof(H_SIZE));
 	ff.write(&V_SIZE, sizeof(V_SIZE));
-	//Запись таблицы измененных областей
+	//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	int sizeGCA=(V_SIZE>>kmGridChA)*(H_SIZE>>kmGridChA);
 	ff.write(gridChAreas2, sizeGCA*sizeof(unsigned char));
-	//запись измененных тайлов
+	//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	int vSizeGCA=(V_SIZE>>kmGridChA);
 	int hSizeGCA=(H_SIZE>>kmGridChA);
 	unsigned short buf[sizeCellGridCA*sizeCellGridCA];
@@ -984,7 +1024,7 @@ bool vrtMap::loadGameMap(Archive& ar)
 		return false;
 	XBuffer ff(memoryBlock.buffer(), memoryBlock.size());
 	
-	//запись идентификатора 
+	//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
 	GUID fguid;
 	ff.read(&fguid, sizeof(GUID));
 	//if(worldSurfaceChangeFileGUID!=fguid) ErrH.Abort("Incorrect game map file(id)!:", XERR_USER, 0, fname);
@@ -992,18 +1032,18 @@ bool vrtMap::loadGameMap(Archive& ar)
 		xassert(0&&"Incorrect game map file(id)!");
 		return false;
 	}
-	//Запись серийного номера мира
+	//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	unsigned long loadGameMapSerial;
 	xassert(sizeof(loadGameMapSerial)==sizeof(worldSerial));
 	ff.read(&loadGameMapSerial, sizeof(worldSerial));
 	xassert(loadGameMapSerial==worldSerial);
-	//Запись crc мира
+	//пїЅпїЅпїЅпїЅпїЅпїЅ crc пїЅпїЅпїЅпїЅ
 	unsigned long loadGameMapCRC;
 	xassert(sizeof(loadGameMapCRC)==sizeof(VxABufCRC));
 	ff.read(&loadGameMapCRC, sizeof(VxABufCRC));
 	//xassert(loadGameMapCRC==VxABufCRC);
-	if(loadGameMapCRC!=VxABufCRC) { kdWarning("IvnAR", "loadGameMapCRC!=VxABufCRC");; }//вместо xassert
-	//Запись размера мира
+	if(loadGameMapCRC!=VxABufCRC) { kdWarning("IvnAR", "loadGameMapCRC!=VxABufCRC");; }//пїЅпїЅпїЅпїЅпїЅпїЅ xassert
+	//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	int loadGameMapHSize, loadGameMapVSizel;
 	xassert(sizeof(loadGameMapHSize)==sizeof(H_SIZE) && sizeof(loadGameMapVSizel)==sizeof(V_SIZE));
 	ff.read(&loadGameMapHSize, sizeof(H_SIZE));
@@ -1013,10 +1053,10 @@ bool vrtMap::loadGameMap(Archive& ar)
 		xassert(0&&"Incorrect game map file(size)!");
 		return false;
 	}
-	//Чтение таблицы измененных областей
+	//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	int sizeGCA=(V_SIZE>>kmGridChA)*(H_SIZE>>kmGridChA);
 	ff.read(gridChAreas, sizeGCA*sizeof(unsigned char));
-	//Чтение записанных измененных тайлов
+	//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	int vSizeGCA=(V_SIZE>>kmGridChA);
 	int hSizeGCA=(H_SIZE>>kmGridChA);
 	unsigned short buf[sizeCellGridCA*sizeCellGridCA];
@@ -1200,10 +1240,10 @@ void vrtMap::compareChAreasInformation(unsigned char* pFirstCAI, unsigned char* 
 
 		if(x!=-1) {
 			if(flag_crc_notequal){
-				textOut < "Не совпадает CRC в квадратах ";
+				textOut < "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ CRC пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ";
 			}
 			else {
-				textOut < "Не совпадают квадраты ";
+				textOut < "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ";
 			}
 			textOut < "X=" <= (x<<kmGridChA) <"+" <=(sizeCellGridCA)  < " Y=" <= (y<<kmGridChA) <"+" <=(sizeCellGridCA) < "\r\n";
 			binOut < x < y;
@@ -1215,7 +1255,7 @@ void vrtMap::displayChAreas(unsigned char* pd, unsigned int dsize)
 {
 	int size=dsize/sizeof(int);
 	if( (size&0x01) || (dsize%sizeof(int)) ){
-		xassert(0 && "Не корректный размер несовпадающей зоны");
+		xassert(0 && "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 		return;
 	}
 	size/=2;
@@ -1341,7 +1381,7 @@ void vrtMap::loadDamPal()
 	//convertPal2TableSurCol(DamPal, Damming);
 }
 
-void vrtMap::saveDamPal()//unsigned char palBuf[SIZE_GEO_PALETTE] //Bufer в формате BGR
+void vrtMap::saveDamPal()//unsigned char palBuf[SIZE_GEO_PALETTE] //Bufer пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ BGR
 {
 	int i;
 	//XBuffer surBuffer(MAX_GEO_SURFACE_TYPE*3);
@@ -1395,7 +1435,7 @@ unsigned char* convert_vox2vid(int vox, char* buf)
 		sprintf(buf,"%4hi.%02hu\0",cel,fraction);
 	}
 	else {
-		fraction= (-vox) & VX_FRACTION_MASK; //Дробную часть надо показывать без знака
+		fraction= (-vox) & VX_FRACTION_MASK; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		cel=(-vox)>>VX_FRACTION;				
 		sprintf(buf,"-%04hi.%02hu\0",cel,fraction);
 	}
@@ -1413,11 +1453,11 @@ int convert_vid2vox(char* buf)
 	cc[2]=0;
 	fraction=atoi(cc);
 	if(fraction>VX_FRACTION_MASK)fraction=VX_FRACTION_MASK;
-	int cel=(int)cels; //Необходимо т.к. 
+	int cel=(int)cels; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ.пїЅ. 
 	int vox;
 	if (Znak>=0) vox= (cel<<VX_FRACTION) | (fraction);
 	else {
-		vox= ((-cel)<<VX_FRACTION) | (fraction); //Дробная часть знака не имеет
+		vox= ((-cel)<<VX_FRACTION) | (fraction); //пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		vox=-vox;
 	}
 	return vox;

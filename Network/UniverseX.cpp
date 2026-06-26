@@ -7,25 +7,25 @@
 #include "P2P_interface.h"
 #include "GameShell.h"
 #include "CameraManager.h"
-Environment/Environment.h
-Water/Water.h
+#include "Environment/Environment.h"
+#include "Water/Water.h"
 #include "Triggers.h"
-Serialization/StringTable.h
+#include "Serialization/StringTable.h"
 
 #include "Lmcons.h"
 #include "vmap.h"
 #include "SelectManager.h"
 #include "NetCommands.h"
-UserInterface/UI_Logic.h
-UserInterface/UI_NetCenter.h
-Game/SoundApp.h
-Sound/SoundSystem.h
-Serialization/XPrmArchive.h
-Environment/SourceManager.h
-Game/IniFile.h
-FileUtils/FileUtils.h
-Serialization/SerializationFactory.h
-Terra/terTools.h
+#include "UserInterface/UI_Logic.h"
+#include "UserInterface/UI_NetCenter.h"
+#include "Game/SoundApp.h"
+#include "Sound/SoundSystem.h"
+#include "Serialization/XPrmArchive.h"
+#include "Environment/SourceManager.h"
+#include "Game/IniFile.h"
+#include "FileUtils/FileUtils.h"
+#include "Serialization/SerializationFactory.h"
+#include "Terra/terTools.h"
 
 #include "LogMsg.h"
 

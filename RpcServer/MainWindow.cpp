@@ -3,19 +3,19 @@
 
 #include "ShowLog.h"
 
-Serialization/Serialization.h
-Serialization/XPrmArchive.h
+#include "Serialization/Serialization.h"
+#include "Serialization/XPrmArchive.h"
 
-kdw/Application.h
-kdw/CommandManager.h
+#include "kdw/Application.h"
+#include "kdw/CommandManager.h"
 
-kdw/VBox.h
-kdw/HBox.h
-kdw/hsplitter.h
-kdw/HLine.h
-kdw/MenuBar.h
-kdw/ImageStore.h
-kdw/Toolbar.h
+#include "kdw/VBox.h"
+#include "kdw/HBox.h"
+#include "kdw/hsplitter.h"
+#include "kdw/HLine.h"
+#include "kdw/MenuBar.h"
+#include "kdw/ImageStore.h"
+#include "kdw/Toolbar.h"
 
 #include "resource.h"
 

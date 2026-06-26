@@ -6,11 +6,11 @@
 #include "SurToolKind.h"
 
 #include "SurToolAux.h"
-Serialization/Serialization.h
+#include "Serialization/Serialization.h"
 
-Game/Universe.h
-Water/CircleManager.h
-Terra/TerrainType.h
+#include "Game/Universe.h"
+#include "Water/CircleManager.h"
+#include "Terra/TerrainType.h"
 
 
 // CSurToolHardness dialog

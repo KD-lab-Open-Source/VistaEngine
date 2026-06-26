@@ -2,8 +2,8 @@
 
 #include "kdw/Viewport2D.h"
 #include "kdw/Tooltip.h"
-TriggerEditor/TriggerExport.h
-Serialization/BinaryArchive.h
+#include "TriggerEditor/TriggerExport.h"
+#include "Serialization/BinaryArchive.h"
 
 class TriggerMiniMap;
 

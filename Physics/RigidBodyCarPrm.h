@@ -1,9 +1,9 @@
 #ifndef __RIGID_BODY_CAR_PRM_H__
 #define __RIGID_BODY_CAR_PRM_H__
 
-Units/Object3dxInterface.h
-Serialization/StringTableReferencePolymorphic.h
-Render/3dx/Node3DX.h
+#include "Units/Object3dxInterface.h"
+#include "Serialization/StringTableReferencePolymorphic.h"
+#include "Render/3dx/Node3DX.h"
 
 class cObject3dx;
 struct RigidBodyPrm;

@@ -36,7 +36,7 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////
-//                              Пузырь и торпеда
+//                              пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 ///////////////////////////////////////////////////////////////////////////////////////
 struct sTBubble {
 	static int numPreImage;
@@ -107,7 +107,7 @@ struct sTorpedo {
 		bubArr[idx]=0;
 		num_el_arr--;
 	};
-	struct sRect quant(Vect2f& prevPos, Vect2f& curPos);
+	struct sRect quant(const Vect2f& prevPos, const Vect2f& curPos);
 	void bubbleQuant();
 };
 

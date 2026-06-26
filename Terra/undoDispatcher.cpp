@@ -18,13 +18,13 @@ void vrtMap::clearContainerPMO()
 	deleteFromContainer(containerPMO, containerPMO.begin(), containerPMO.end());
 }
 
-void vrtMap::UndoDispatcher_PutPreChangedArea(sRect& _chArea, bool saveVx, bool saveRGB, sBasePMOperation* pPMO)//xL, int yT, int xR, int yB
+void vrtMap::UndoDispatcher_PutPreChangedArea(const sRect& _chArea, bool saveVx, bool saveRGB, sBasePMOperation* pPMO)//xL, int yT, int xR, int yB
 {
 	//xassert(supBuf);
 	if(!isRecordingPMO()) return;
 	if(pPMO!=0){
 		//if(getCurNewPMO()!=containerPMO.end())
-		//	containerPMO.erase(getCurNewPMO(), containerPMO_Old.end()); //Удаление не нужных элементов
+		//	containerPMO.erase(getCurNewPMO(), containerPMO_Old.end()); //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		deleteFromContainer(containerPMO, getCurNewPMO(), containerPMO.end());
 
 		containerPMO.push_back(pPMO);
@@ -33,10 +33,10 @@ void vrtMap::UndoDispatcher_PutPreChangedArea(sRect& _chArea, bool saveVx, bool 
 	int size=_chArea.sx*_chArea.sy;
 
 	if(curPreCA!=preCAs.end()) 
-		preCAs.erase(curPreCA, preCAs.end()); //Удаление не нужных элементов
-	//Проверка на переполнение буфера и удаление 1-х элементов
+		preCAs.erase(curPreCA, preCAs.end()); //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 1-пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	while((UNDO_REDO_BUFFER_SIZE+size) > MAX_SIZE_UNDO_REDO_BUFFER){
-		//if(preCAs.begin()==preCAs.end())ErrH.Abort("Список пустой а UNDO_REDO_BUFFER_SIZE==", XERR_USER, UNDO_REDO_BUFFER_SIZE);
+		//if(preCAs.begin()==preCAs.end())ErrH.Abort("пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ UNDO_REDO_BUFFER_SIZE==", XERR_USER, UNDO_REDO_BUFFER_SIZE);
 		if(preCAs.empty()){
 			xassert("Very larg changed area!");
 			break;
@@ -45,7 +45,7 @@ void vrtMap::UndoDispatcher_PutPreChangedArea(sRect& _chArea, bool saveVx, bool 
 	}
 	preCAs.push_back(sPreChangedArea());
 	curPreCA=preCAs.end();
-	curPreCA--;//Теперь указывет на последний элемент
+	curPreCA--;//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	curPreCA->prepare4Operation(_chArea, containerPMO.size(), saveVx, saveRGB, pPMO);
 	xassert(_chArea.sx <=H_SIZE && _chArea.sy<=V_SIZE );
 	unsigned short* pVxA;
@@ -68,7 +68,7 @@ void vrtMap::UndoDispatcher_PutPreChangedArea(sRect& _chArea, bool saveVx, bool 
 		}
 	}
 	curPreCA->putMultiRegion(region_);
-	curPreCA++;// теперь указывает на окончание
+	curPreCA++;// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 }
 
 void vrtMap::UndoDispatcher_PutPreChangedArea(list<sRect>& _chAreaList, bool saveVx, bool saveRGB, sBasePMOperation* pPMO)
@@ -76,7 +76,7 @@ void vrtMap::UndoDispatcher_PutPreChangedArea(list<sRect>& _chAreaList, bool sav
 	if(!isRecordingPMO()) return;
 	if(pPMO!=0){
 		//if(getCurNewPMO()!=containerPMO_Old.end()) 
-		//	containerPMO_Old.erase(getCurNewPMO(), containerPMO_Old.end()); //Удаление не нужных элементов
+		//	containerPMO_Old.erase(getCurNewPMO(), containerPMO_Old.end()); //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		deleteFromContainer(containerPMO, getCurNewPMO(), containerPMO.end());
 
 		containerPMO.push_back(pPMO);
@@ -89,10 +89,10 @@ void vrtMap::UndoDispatcher_PutPreChangedArea(list<sRect>& _chAreaList, bool sav
 	}
 
 	if(curPreCA!=preCAs.end()) 
-		preCAs.erase(curPreCA, preCAs.end()); //Удаление не нужных элементов
-	//Проверка на переполнение буфера и удаление 1-х элементов
+		preCAs.erase(curPreCA, preCAs.end()); //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 1-пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	while((UNDO_REDO_BUFFER_SIZE+size) > MAX_SIZE_UNDO_REDO_BUFFER){
-		//if(preCAs.begin()==preCAs.end())ErrH.Abort("Список пустой а UNDO_REDO_BUFFER_SIZE==", XERR_USER, UNDO_REDO_BUFFER_SIZE);
+		//if(preCAs.begin()==preCAs.end())ErrH.Abort("пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ UNDO_REDO_BUFFER_SIZE==", XERR_USER, UNDO_REDO_BUFFER_SIZE);
 		if(preCAs.empty()){
 			xassert("Very larg changed area!");
 			break;
@@ -101,7 +101,7 @@ void vrtMap::UndoDispatcher_PutPreChangedArea(list<sRect>& _chAreaList, bool sav
 	}
 	preCAs.push_back(sPreChangedArea());
 	curPreCA=preCAs.end();
-	curPreCA--;//Теперь указывет на последний элемент
+	curPreCA--;//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	curPreCA->prepare4Operation(_chAreaList, containerPMO.size(), saveVx, saveRGB, pPMO);
 	unsigned short* pVxA;
 	unsigned char* pSup;
@@ -128,13 +128,13 @@ void vrtMap::UndoDispatcher_PutPreChangedArea(list<sRect>& _chAreaList, bool sav
 		}
 	}
 	curPreCA->putMultiRegion(region_);
-	curPreCA++;// теперь указывает на окончание
+	curPreCA++;// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 }
 
 //void vrtMap::UndoDispatcher_KillLastChange(sBasePMOperation* pPMO)
 //{
 //	if(getCurNewPMO()!=containerPMO.end()){
-//		//containerPMO.erase(getCurNewPMO(), containerPMO.end()); //Удаление не нужных элементов
+//		//containerPMO.erase(getCurNewPMO(), containerPMO.end()); //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 //		deleteFromContainer(containerPMO, getCurNewPMO(), containerPMO.end());
 //	}
 //	if(!containerPMO.empty()){
@@ -144,10 +144,10 @@ void vrtMap::UndoDispatcher_PutPreChangedArea(list<sRect>& _chAreaList, bool sav
 //	containerPMO.push_back(pPMO);
 //	setCurNewPMO(containerPMO.end());
 //
-//	if( preCAs.begin() ==preCAs.end()) return; //если пустой список то возврат
-//	if(curPreCA==preCAs.begin()) return;//если уже нет изменений
+//	if( preCAs.begin() ==preCAs.end()) return; //пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+//	if(curPreCA==preCAs.begin()) return;//пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 //
-//	curPreCA--;//Теперь указывет на последний элемент
+//	curPreCA--;//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 //
 //	unsigned short* pVxA;
 //	unsigned char* pSup;
@@ -175,19 +175,19 @@ void vrtMap::UndoDispatcher_PutPreChangedArea(list<sRect>& _chAreaList, bool sav
 //	*region_= *curPreCA->mRegion;
 //	region_->unlock();
 //	
-//	curPreCA++;// теперь указывает end
+//	curPreCA++;// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ end
 //}
 
 void vrtMap::UndoDispatcher_Undo()
 {
 
-	if( preCAs.begin() ==preCAs.end()) return; //если пустой список то возврат
-	if(curPreCA==preCAs.begin()) return;//если уже нет изменений
+	if( preCAs.begin() ==preCAs.end()) return; //пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	if(curPreCA==preCAs.begin()) return;//пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
-	curPreCA--;//Теперь указывет на последний элемент
+	curPreCA--;//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	if( curPreCA->pmo!=0){
 		if(containerPMO.empty() || getCurNewPMO()==containerPMO.begin() )
-            xassert(0&& "Невозможное ундо");;
+            xassert(0&& "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");;
 		curNewPMO--;
 		int iddx=curPreCA->idxPMO;
 		xassert( (curNewPMO+1) == curPreCA->idxPMO );
@@ -246,18 +246,18 @@ void vrtMap::UndoDispatcher_Undo()
 	*region_= *backupPreChArea.mRegion;
 	region_->unlock();
 
-	//curPreCA++;// теперь указывает на окончание
+	//curPreCA++;// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 }
 
 void vrtMap::UndoDispatcher_Redo()
 {
 
-	if( preCAs.begin() ==preCAs.end()) return; //если пустой список то возврат
-	if(curPreCA==preCAs.end()) return;//если уже нет изменений
+	if( preCAs.begin() ==preCAs.end()) return; //пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	if(curPreCA==preCAs.end()) return;//пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 	if( curPreCA->pmo!=0){
 		if(containerPMO.empty() || getCurNewPMO()==containerPMO.end() )
-            xassert(0&& "Невозможное редо");;
+            xassert(0&& "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");;
 		curNewPMO++;
 		xassert( (curNewPMO) == curPreCA->idxPMO );
 	}

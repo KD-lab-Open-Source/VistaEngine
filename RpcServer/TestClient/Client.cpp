@@ -5,7 +5,7 @@
 #include "MainWindow.h"
 #include "GameTest.h"
 
-XmlRpc/XmlRpc.h
+#include "XmlRpc/XmlRpc.h"
 
 Client* client = 0;
 

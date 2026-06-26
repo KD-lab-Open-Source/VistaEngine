@@ -1,13 +1,13 @@
 #include "stdafx.h"
 #include "Configurator.h"
 #include "ConfiguratorDlg.h"
-mfc/LayoutMFC.h
-AttribEditor/AttribEditorCtrl.h
+#include "mfc/LayoutMFC.h"
+#include "AttribEditor/AttribEditorCtrl.h"
 #include "EditorGameOptions.h"
-Game/GameOptions.h
-Serialization/Dictionary.h
-kdw/PropertyTree.h
-kdw/PropertyTreeModel.h
+#include "Game/GameOptions.h"
+#include "Serialization/Dictionary.h"
+#include "kdw/PropertyTree.h"
+#include "kdw/PropertyTreeModel.h"
 
 #include "ConfiguratorAttribEditor.h"
 

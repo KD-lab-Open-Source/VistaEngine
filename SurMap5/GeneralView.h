@@ -1,7 +1,7 @@
 #ifndef __GENERALVIEW_H__
 #define __GENERALVIEW_H__
 
-Render/Inc/IRenderDevice.h
+#include "Render/Inc/IRenderDevice.h"
 #include "Handle.h"
 
 class MissionDescription;

@@ -3,7 +3,7 @@
 
 #include "EScroll.h"
 #include "SurToolAux.h"
-mfc/SizeLayoutManager.h
+#include "mfc/SizeLayoutManager.h"
 
 class CSurToolToolzer : public CSurToolBase
 {

@@ -2,7 +2,7 @@
 #define __LIGHTING_H_INCLUDED__
 
 #include <list>
-Render/inc/IVisGenericInternal.h
+#include "Render/inc/IVisGenericInternal.h"
 
 class LightingParameters
 {

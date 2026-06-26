@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include <string.h>
-Serialization/Dictionary.h
-Serialization/XPrmArchive.h
-FileUtils/FileUtils.h
+#include "Serialization/Dictionary.h"
+#include "Serialization/XPrmArchive.h"
+#include "FileUtils/FileUtils.h"
 
 class TranslationManagerImpl{
 public:
@@ -18,7 +18,7 @@ public:
     TranslationManagerImpl();
 
 	struct StrICmpLess{
-		operator()(const std::string& str1, const std::string& str2){
+		bool operator()(const std::string& str1, const std::string& str2) const {
 			return stricmp(str1.c_str(), str2.c_str()) < 0;
 		}
 	};
@@ -153,7 +153,7 @@ bool needTranslation(const std::pair<std::string, std::string*>& p)
 
 	int i = 0;
 	for(i = 0; i < p.first.size(); ++i){
-		if(reinterpret_cast<const unsigned char&>(p.first[i]) >= (unsigned char)('А')) // русская 'А'
+		if(reinterpret_cast<const unsigned char&>(p.first[i]) >= (unsigned char)(0xC0)) // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 'пїЅ'
 			return true;
 	}
 	return false;
@@ -172,10 +172,10 @@ void Dictionary::serialize(Archive& ar)
 				translated[i->first] = *i->second;
 		}
 	}
-    ar.serialize(codePage_, "codePage", "Кодовая страница");
+    ar.serialize(codePage_, "codePage", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	ar.serialize(useFallback_, "useFallback", 0);
-	untranslated.serialize(ar, "untranslated", "Непереведенные");
-	translated.serialize(ar, "translated", "Словарь");
+	untranslated.serialize(ar, "untranslated", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	translated.serialize(ar, "translated", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(ar.isInput()){
 		strings_.clear();
 		StaticMap<std::string, std::string>::const_iterator it;

@@ -2,7 +2,7 @@
 #define __SOURCE_TER_TOOL_H_INCLUDED__
 
 #include "SourceEffect.h"
-Terra/terTools.h
+#include "Terra/terTools.h"
 
 struct SourceTerTool : SourceEffect{
 	TerToolBase* pCurTerTool;

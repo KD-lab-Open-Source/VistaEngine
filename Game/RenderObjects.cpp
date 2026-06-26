@@ -1,15 +1,15 @@
 #include "stdafx.h"
-XTL/Rect.h
+#include "XTL/Rect.h"
 #include "CameraManager.h"
 #include "GameOptions.h"
-UserInterface/UI_Render.h
-Terra/terra.h
+#include "UserInterface/UI_Render.h"
+#include "Terra/terra.h"
 #include "Universe.h"
-Game/IniFile.h
-Render/src/FT_Font.h
-Render/src/Scene.h
-Render/src/VisGeneric.h
-Terra/vMap.h
+#include "Game/IniFile.h"
+#include "Render/src/FT_Font.h"
+#include "Render/src/Scene.h"
+#include "Render/src/VisGeneric.h"
+#include "Terra/vMap.h"
 
 int terFullScreen = 0;
 

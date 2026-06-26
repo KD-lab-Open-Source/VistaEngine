@@ -64,6 +64,9 @@ extern void init_sqrtTable4IntegerCalculate();
 
 inline int fastsqrtI(int s)
 {
+#ifdef _CROSS_PLATFORM_
+	return s > 0 ? (int)sqrtf((float)s) : 0;
+#else
 	_asm{
 		xor eax,eax
 		xor esi,esi
@@ -85,4 +88,5 @@ loc_skip:
 		mov s, eax
 	}
 	return s;
+#endif
 }

@@ -1,7 +1,7 @@
 /**************************************************************************************************************************
-* Контейнер StaticMap на базе std::vector с интерфейсом повторяющим 
-* std::map, результаты тестирования StaticMap<int, int>	и std::map<int, int> 
-* для вставки 100, 1000, 10000 элементов:
+* пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ StaticMap пїЅпїЅ пїЅпїЅпїЅпїЅ std::vector пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
+* std::map, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ StaticMap<int, int>	пїЅ std::map<int, int> 
+* пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 100, 1000, 10000 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:
 * -------------------------------
 * |  Timing:          |  rate % |
 * -------------------------------
@@ -13,8 +13,8 @@
 * | Test map(100)     |   0.063 |
 * -------------------------------
 
-!!!! Для сравнения приведу результаты вставки элементов для StaticMap<string, int>	и std::map<string, int> 
-     в случае, когда string вызывает аллокацию памяти. Время в милисекундах на P4 2.8 Ghz.
+!!!! пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ StaticMap<string, int>	пїЅ std::map<string, int> 
+     пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ string пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ P4 2.8 Ghz.
 * -----------------------------
 * |  Timing:          |  ms   |
 * -----------------------------
@@ -26,9 +26,9 @@
 * | map(100)          | 0.27  |
 * -----------------------------
 
-Время поиска у map и StaticMap примерно одинаковое как в случае <int,int>, так и в случае <string,int>. 
-Вывод - нельзя писать классы оптимизированные по скорости,
-		не померяв впоследствии их реальных характеристик.
+пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ map пїЅ StaticMap пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ <int,int>, пїЅпїЅпїЅ пїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ <string,int>. 
+пїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ,
+		пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 ***************************************************************************************************************************/
 
 #ifndef __STATIC_MAP_H_INCLUDED__
@@ -52,12 +52,12 @@ public:
 	typedef Cmp key_compare;
     typedef A allocator_type;
 	
-	typedef typename A::reference reference;
-    typedef typename A::const_reference const_reference;
-	typedef typename A::pointer pointer;
-	typedef typename A::const_pointer const_pointer;
-	typedef typename A::difference_type difference_type;
-	typedef typename A::size_type size_type;
+	typedef value_type&                                              reference;
+	typedef const value_type&                                        const_reference;
+	typedef typename std::allocator_traits<A>::pointer               pointer;
+	typedef typename std::allocator_traits<A>::const_pointer         const_pointer;
+	typedef typename std::allocator_traits<A>::difference_type       difference_type;
+	typedef typename std::allocator_traits<A>::size_type             size_type;
 
 	typedef std::vector<std::pair<K, T>, A> Vec;
 	typedef typename Vec::iterator iterator;
@@ -66,7 +66,12 @@ public:
 	typedef std::reverse_iterator<iterator> reverse_iterator;
 	typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
-	class value_compare : public std::binary_function<value_type, value_type, bool> {
+	class value_compare {
+	public:
+		typedef value_type first_argument_type;
+		typedef value_type second_argument_type;
+		typedef bool result_type;
+	private:
 		friend class StaticMap<K, T, Cmp, A>;
 	protected:
 		Cmp MComp;
@@ -77,9 +82,10 @@ public:
 		}
 	};
 
-	bool serialize(Archive& ar, const char* name, const char* nameAlt) {
+	template<class Ar>
+	bool serialize(Ar& ar, const char* name, const char* nameAlt) {
 		bool nodeExists = ar.serialize(MapVector, name, nameAlt);
-		if(ar.isInput())// &&(ar.isEdit())) 
+		if(ar.isInput())
 			std::sort(MapVector.begin(), MapVector.end(), value_comp());
 		return nodeExists;
 	}
@@ -307,22 +313,22 @@ public:
 
 	iterator upper_bound(const key_type& key) {
 		iterator ve = MapVector.end();
-		iterator vs = binary_search(MapVector.begin(), vend, key);
-		if vs!=vend {
-			while ((!key_comp()(vs->first, key))&&(!key_comp()(key, vs->first))) { vs++; }
+		iterator vs = binary_search(MapVector.begin(), ve, key);
+		if(vs != ve) {
+			while(vs != ve && (!key_comp()(vs->first, key))&&(!key_comp()(key, vs->first))) { vs++; }
 			return vs;
-		}      
-		return vend;
+		}
+		return ve;
 	}
 
 	const_iterator upper_bound(const key_type& key) const {
 		const_iterator ve = MapVector.end();
-		const_iterator vs = binary_search(MapVector.begin(), vend, key);
-		if vs!=vend {
-			while ((!key_comp()(vs->first, key))&&(!key_comp()(key, vs->first))) { vs++; }
+		const_iterator vs = binary_search(MapVector.begin(), ve, key);
+		if(vs != ve) {
+			while(vs != ve && (!key_comp()(vs->first, key))&&(!key_comp()(key, vs->first))) { vs++; }
 			return vs;
-		}      
-		return vend;
+		}
+		return ve;
 	}
 
 	size_type max_size( ) const { return MapVector.max_size(); }
@@ -332,13 +338,13 @@ public:
 	mapped_type& operator[](const key_type& key) {
 		iterator vi = binary_search(MapVector.begin(), MapVector.end(), key);
 		if (vi==MapVector.end()||(key_comp()(key, vi->first)))
-			vi = MapVector.insert(vi, value_type(key, _STLP_DEFAULT_CONSTRUCTED(mapped_type)));
+			vi = MapVector.insert(vi, value_type(key, mapped_type()));
 		return (*vi).second;
 	}
 
 	const mapped_type& operator[](const key_type& key) const {
 		const_iterator vi = binary_search(MapVector.begin(), MapVector.end(), key);
-		xassert(!(vi==MapVector.end() || (key_comp()(key, vi->first))) && "Не найден элемент в const-operator[]");
+		xassert(!(vi==MapVector.end() || (key_comp()(key, vi->first))) && "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ const-operator[]");
 		return (*vi).second;
 	}
 

@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "LocString.h"
-Serialization/Serialization.h
+#include "Serialization/Serialization.h"
 #include "TextDB.h"
 
 void LocString::serialize(Archive& ar)

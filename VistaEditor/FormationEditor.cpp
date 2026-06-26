@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "FormationEditor.h"
-Serialization/StringTable.h
-kdw/Win32/Handle.h
-util/kdw/PopupMenu.h
-kdw/ClassMenu.h
-kdw/Win32/Window.h
+#include "Serialization/StringTable.h"
+#include "kdw/Win32/Handle.h"
+#include "util/kdw/PopupMenu.h"
+#include "kdw/ClassMenu.h"
+#include "kdw/Win32/Window.h"
 
 ../units/AttributeSquad.h
 

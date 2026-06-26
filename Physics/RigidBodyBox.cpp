@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "RigidBodyBox.h"
 #include "NormalMap.h"
-Math/ConstraintHandlerSimple.h
+#include "Math/ConstraintHandlerSimple.h"
 
 ///////////////////////////////////////////////////////////////
 

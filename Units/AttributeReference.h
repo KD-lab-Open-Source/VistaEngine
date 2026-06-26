@@ -1,9 +1,9 @@
 #ifndef __ATTRIBUTE_REFERENCE_H__
 #define __ATTRIBUTE_REFERENCE_H__
 
-Serialization/StringTableBase.h
-Serialization/StringTableReference.h
-Serialization/StringTableReferencePolymorphic.h
+#include "Serialization/StringTableBase.h"
+#include "Serialization/StringTableReference.h"
+#include "Serialization/StringTableReferencePolymorphic.h"
 
 struct RaceProperty;
 typedef StringTable<RaceProperty> RaceTable;

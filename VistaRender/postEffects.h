@@ -1,8 +1,8 @@
 #ifndef __POST_EFFECTS_H_INCLUDED__
 #define __POST_EFFECTS_H_INCLUDED__
 
-Render/Inc/rd.h
-Render/Src/Texture.h
+#include "Render/Inc/rd.h"
+#include "Render/Src/Texture.h"
 
 class PSMonochrome;
 class PSCombine;

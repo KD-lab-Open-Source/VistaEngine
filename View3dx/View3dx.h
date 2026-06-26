@@ -1,12 +1,12 @@
 #pragma once
 
-kdw/Viewport.h
-kdw/HBox.h
-kdw/Label.h
-Render/3dx/Static3dxBase.h
-Render/Inc/IVisGenericInternal.h
-Render/3dx/Node3dx.h
-Render/3dx/Simply3dx.h
+#include "kdw/Viewport.h"
+#include "kdw/HBox.h"
+#include "kdw/Label.h"
+#include "Render/3dx/Static3dxBase.h"
+#include "Render/Inc/IVisGenericInternal.h"
+#include "Render/3dx/Node3dx.h"
+#include "Render/3dx/Simply3dx.h"
 
 using namespace kdw;
 

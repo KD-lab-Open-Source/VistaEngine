@@ -4,22 +4,22 @@
 #include "Squad.h"
 #include "IronLegion.h"
 #include "IronBuilding.h"
-UserInterface/UI_Logic.h
+#include "UserInterface/UI_Logic.h"
 #include "GameOptions.h"
-UserInterface/UserInterface.h
-Environment/Environment.h
-Water/Water.h
-Water/SkyObject.h
+#include "UserInterface/UserInterface.h"
+#include "Environment/Environment.h"
+#include "Water/Water.h"
+#include "Water/SkyObject.h"
 #include "RenderObjects.h"
 #include "MicroAI.h"
-AI/PFTrap.h
+#include "AI/PFTrap.h"
 #include "UnitItemInventory.h"
 #include "CameraManager.h"
 #include "StreamCommand.h"
-Water/CircleManager.h
+#include "Water/CircleManager.h"
 #include "UnitItemResource.h"
 #include "PositionGeneratorSquad.h"
-Physics/crash/CrashSystem.h
+#include "Physics/crash/CrashSystem.h"
 
 BEGIN_ENUM_DESCRIPTOR(DirectControlMode, "DirectControlMode")
 REGISTER_ENUM(DIRECT_CONTROL_DISABLED, "None")
@@ -544,9 +544,9 @@ bool UnitActing::isInvisible() const
 
 void UnitActing::setVisibility(bool visible, float time)
 {
-	// если хоть кто-то подсвечивает, то юнит виден
-	// если никто не подсвечивает, то если юнит невидимка или кем-то скрыт, то он невидим
-	// одним таймером не обойтись, т.к. будет зависеть от порядка обхода действующих скрывателей/детекторов
+	// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ.пїЅ. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ/пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 	if(!attr().canChangeVisibility)
 		return;
@@ -861,7 +861,7 @@ MovementState UnitActing::getMovementState()
 {
 	MovementState state;
 
-	// Выставляем признаки поверхностей.
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	if(rigidBody()->onDeepWater())
 		if(water->isLava())
 			state.terrainType() |= ANIMATION_ON_LAVA;
@@ -1528,7 +1528,7 @@ void UnitActing::targetController()
 		break;
 
 	case ATTACK_MODE:
-		// Если убили указанную цель - работаем в авто режиме.
+		// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
 		if(!fireTargetExist() || (targetUnit_ && !canAttackTarget(WeaponTarget(targetUnit_)))){
 			setUnitState(AUTO_MODE);
 			wayPointsClear();
@@ -2017,7 +2017,7 @@ void UnitActing::finishUpgrade()
 	
 	if(selected()){
 		universe()->changeSelection(this, unit);
-		unit->setSelected(true); // убирает мигание селекта
+		unit->setSelected(true); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		if(cameraManager->isVisible(position()))
 			universe()->addVisibleUnit(unit);
 	}
@@ -2036,7 +2036,7 @@ void UnitActing::finishUpgrade()
 	finishUpgradeTime_ = 0;
 	hide(HIDE_BY_UPGRADE, true);
 	Kill(); 
-	unit->setPose(pose(), true); // Для восстановления фундамента здания
+	unit->setPose(pose(), true); // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	if(attr().isBuilding())
 		unit->setShipmentPosition(shipmentPosition());
 }
@@ -2105,7 +2105,7 @@ void UnitActing::setDamage(const ParameterSet& damage, UnitBase* agressor, const
 	healthDamage.subPositiveOnly(armor);
 	parameters.subClamped(healthDamage);
 	
-	parameters.clamp(parametersMax()); // Если были отрицательные величины - лечение
+	parameters.clamp(parametersMax()); // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 	if(agressor && agressor->attr().isProjectile())
 		agressor = agressor->ignoredUnit();
@@ -2113,7 +2113,7 @@ void UnitActing::setDamage(const ParameterSet& damage, UnitBase* agressor, const
 	float healthMax = parametersMax().health();
 	if(prevHealth > 1.f && parameters.health() < 1.f){
 		unregisterInPlayerStatistics(agressor);
-		//xassert(agressor && "Не установлен юнит для передачи параметров за гибель");
+		//xassert(agressor && "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 		if(agressor){
 			ParameterArithmetics arithmetics = attr().deathGainArithmetics;
 			UnitActing* unit = safe_cast<UnitActing*>(agressor);
@@ -2141,7 +2141,7 @@ void UnitActing::setDamage(const ParameterSet& damage, UnitBase* agressor, const
 	}
 
 	if(wasPossessed && parameters.possession() < FLT_EPS){
-		//xassert(agressor && "Не установлен юнит для оружия захвата");
+		//xassert(agressor && "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		if(agressor && player() != agressor->player()){
 			player()->checkEvent(EventUnitMyUnitEnemy(Event::CAPTURE_UNIT, this, agressor));
 			agressor->player()->checkEvent(EventUnitMyUnitEnemy(Event::CAPTURE_UNIT, this, agressor));
@@ -2359,7 +2359,7 @@ inline bool UnitActing::fireWeaponModeCheck(const WeaponBase* weapon) const
 		return weapon->isShortRange();
 	case LONG_RANGE:
 		return weapon->isLongRange();
-	case ANY_RANGE: // В этом режиме оружие считается недоступным если перезарежается.
+	case ANY_RANGE: // пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 		return !weapon->weaponPrm()->clearTargetOnLoading() || !weapon->isLoading();
 	}
 
@@ -2665,7 +2665,7 @@ bool UnitActing::fireRequestAuto()
 	return ret;
 }
 
-bool UnitActing::fireCheck(WeaponTarget& target) const
+bool UnitActing::fireCheck(const WeaponTarget& target) const
 {
 	bool ret = false;
 	for(WeaponSlots::const_iterator it = weaponSlots_.begin(); it != weaponSlots_.end(); ++it){
@@ -2809,7 +2809,7 @@ void UnitActing::weaponQuant()
 		weapon->moveQuant();
 	}
 
-	// Запретить движение если стреляет непрерываемым оружием.
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	makeDynamicXY(STATIC_DUE_TO_WEAPON);
 	if(!isDirectControl())
 		for(WeaponSlots::const_iterator it = weaponSlots_.begin(); it != weaponSlots_.end(); ++it){
@@ -2924,7 +2924,7 @@ Vect3f UnitActing::specialFirePosition() const
 	else if(specialTargetUnit_)
 		return specialTargetUnit_->position();
 
-	return position(); // сюда приходить не должно
+	return position(); // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 }
 
 bool UnitActing::fireDistanceCheck() const

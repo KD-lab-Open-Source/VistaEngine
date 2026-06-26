@@ -2,8 +2,8 @@
 #include "MainFrame.h"
 #include "UIEditorPanel.h"
 #include "EditorView.h"
-Serialization/XPrmArchive.h
-Serialization/Serialization.h
+#include "Serialization/XPrmArchive.h"
+#include "Serialization/Serialization.h"
 #include "UITreeObjects.h"
 
 #include "ActionManager.h"
@@ -13,13 +13,13 @@ Serialization/Serialization.h
 #include "CreateControlAction.h"
 #include "CreateStateAction.h"
 #include "EraseAction.h"
-XTL/SafeCast.h
+#include "XTL/SafeCast.h"
 
-UserInterface/UserInterface.h
-AttribEditor/AttribEditorCtrl.h
+#include "UserInterface/UserInterface.h"
+#include "AttribEditor/AttribEditorCtrl.h"
 
-Serialization/Dictionary.h
-Serialization/SerializationFactory.h
+#include "Serialization/Dictionary.h"
+#include "Serialization/SerializationFactory.h"
 
 #include "kdw/PopupMenu.h"
 #include "kdw/ClassMenu.h"

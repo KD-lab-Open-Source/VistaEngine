@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "RigidBodyBase.h"
-Serialization/Serialization.h
-Serialization/SerializationFactory.h
-Serialization/EnumDescriptor.h
-Serialization/RangedWrapper.h
+#include "Serialization/Serialization.h"
+#include "Serialization/SerializationFactory.h"
+#include "Serialization/EnumDescriptor.h"
+#include "Serialization/RangedWrapper.h"
 
 REGISTER_CLASS(RigidBodyPrm, RigidBodyPrm, "Базовая физика");
 

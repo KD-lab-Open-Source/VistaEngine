@@ -1,7 +1,7 @@
 #ifndef __COAST_SPRITES_H_INCLUDED__
 #define __COAST_SPRITES_H_INCLUDED__
 
-Environment/EnvironmentColors.h
+#include "Environment/EnvironmentColors.h"
 enum CoastSpritesMode
 {
 	CSM_NOTHING = 0,

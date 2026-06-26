@@ -7,13 +7,14 @@
 
 ///////////////////////////////////////////////////////////////////////////////////
 //					SerializationFactory 
-//		Не использовать явно, а через FactorySelector<BaseType>
+//		пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅ FactorySelector<BaseType>
 ///////////////////////////////////////////////////////////////////////////////////
 template<class BaseType, class FactoryArg>
-class SerializationFactory : public Factory<StaticString, BaseType, FactoryArg> 
+class SerializationFactory : public Factory<StaticString, BaseType, FactoryArg>
 {
+    using Base = Factory<StaticString, BaseType, FactoryArg>;
 public:
-    struct ClassCreatorBase : CreatorBase {
+    struct ClassCreatorBase : Base::CreatorBase {
         virtual const char* name() {
             return name_;
         }
@@ -31,14 +32,14 @@ public:
     template<class Derived>
     struct ClassCreator : ClassCreatorBase {
 		ClassCreator(const char* id, const char* nameAlt) {
-              name_ = id;
-              nameAlt_ = nameAlt;
-			  sizeOf_ = sizeof(Derived);
+              this->name_ = id;
+              this->nameAlt_ = nameAlt;
+			  this->sizeOf_ = sizeof(Derived);
               instance().add(id, nameAlt, *this);
         }
 		BaseType* create() const
 		{
-			return instance().createArg<Derived>();
+			return instance().template createArg<Derived>();
 		}
 	};
 
@@ -47,13 +48,13 @@ public:
     }
 
     void add(const char* name, const char* nameAlt, ClassCreatorBase& creator_op) {
-        if(creators_.find(name) == creators_.end()){
+        if(this->creators_.find(name) == this->creators_.end()){
             if(!comboList_.empty())
                 comboList_ += "|";
             comboList_ += name;
 			comboStrings_.push_back(name);
 			creatorsByIndex_.push_back(&creator_op);
-            __super::add(name, creator_op);
+            Base::add(name, creator_op);
 			if(nameAlt){
 				if(!comboListAlt_.empty())
 					comboListAlt_ += "|";
@@ -61,13 +62,13 @@ public:
 				comboStringsAlt_.push_back(nameAlt);
 				nameToNameAltMap_ [name] = nameAlt;
 			}
-        } 
+        }
 		else{
             XBuffer msg;
             msg
-              < "Попытка повторной регистрации класса\n"
+              < "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ\n"
               < name < " (" < nameAlt < ")\n"
-			  < "в фабрике\nSerializationFactory<"
+			  < "пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ\nSerializationFactory<"
               < typeid(BaseType).name()
               < ">";
 
@@ -76,12 +77,12 @@ public:
     }
 
     ClassCreatorBase& find(const char* name) {
-        return static_cast <ClassCreatorBase&>(*creators_ [name]);
+        return static_cast <ClassCreatorBase&>(*this->creators_ [name]);
     }
 
     ClassCreatorBase& find(const BaseType* ptr) {
         const char* name = typeid(*ptr).name();
-        return static_cast <ClassCreatorBase&>(*creators_ [name]);
+        return static_cast <ClassCreatorBase&>(*this->creators_ [name]);
     }
 
     const char* nameByNameAlt(const char* nameAlt) const{
@@ -140,13 +141,13 @@ public:
 		}
     } 
 
-    int size() const { return int(creators_.size()); }
+    int size() const { return int(this->creators_.size()); }
 
 private:
     typedef StaticMap<StaticString, StaticString> Map;
     Map nameToNameAltMap_;
 
-	typedef std::vector<CreatorBase*> CreatorsByIndex;
+	typedef std::vector<typename Base::CreatorBase*> CreatorsByIndex;
 	CreatorsByIndex creatorsByIndex_;
 
     std::string comboList_;
@@ -159,7 +160,7 @@ private:
     friend Singleton<SerializationFactory>;
 };
 
-// Имена могут содержать <>, ::
+// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ <>, ::
 #define REGISTER_CLASS(baseClass, derivedClass, classNameAlt) \
   static FactorySelector<baseClass>::Factory::ClassCreator<derivedClass > INTERNAL_UNIQUE_NAME(typeid(derivedClass).name(), classNameAlt);
 

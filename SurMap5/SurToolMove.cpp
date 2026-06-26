@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "SurToolMove.h"
 #include "SelectionUtil.h"
-Game/RenderObjects.h
-Game/CameraManager.h
-Render/Src/cCamera.h
+#include "Game/RenderObjects.h"
+#include "Game/CameraManager.h"
+#include "Render/Src/cCamera.h"
 #include "SystemUtil.h"
 
 namespace UniverseObjectActions{

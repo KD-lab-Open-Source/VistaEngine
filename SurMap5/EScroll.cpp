@@ -3,9 +3,9 @@
 
 #include "stdafx.h"
 #include "EScroll.h"
-terra/vmap.h
+#include "terra/vmap.h"
 
-XMath/xmath.h
+#include "XMath/xmath.h"
 #include "escroll.h"
 
 #ifdef _DEBUG

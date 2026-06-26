@@ -5,11 +5,11 @@
 // By Chris Lomont
 // http://www.lomont.org/Math/Papers/2003/InvSqrt.pdf
 //
-// Максимальная погрешность 0.0017758, приблизительно в 6 раз быстрее 1/sqrtf()
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 0.0017758, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ 6 пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 1/sqrtf()
 //////////////////////////////////////////////////////////////////////////////  
 inline float invSqrtFast(float x)
 {
-	x += 1e-7f; // Добавка, устраняющая деление на 0
+	x += 1e-7f; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 0
 	float xhalf = 0.5f*x;
 	int i = *(int*)&x; // get bits for floating value
 	i = 0x5f375a86 - (i>>1); // gives initial guess y0
@@ -18,9 +18,10 @@ inline float invSqrtFast(float x)
 	return x;
 }
 
-// В 3 раза быстрее за счет проверки аргументов, точная.
+// Fast fmod using x87 FPU (Windows x86 only), falls back to fmodf on POSIX.
 inline float fmodFast(float a, float b)
 {
+#ifdef _WIN32
 	float result;
 	_asm
 	{
@@ -35,6 +36,9 @@ cycle_fast_fmod:
 			fstp result
 	}
 	return result;
+#else
+	return fmodf(a, b);
+#endif
 }
 
 inline unsigned int F2DW( float f ) 

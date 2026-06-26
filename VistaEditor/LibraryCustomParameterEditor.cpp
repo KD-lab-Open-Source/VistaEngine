@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "XTL/SafeCast.h"
-Serialization/Dictionary.h
-Serialization/BinaryArchive.h
-Serialization/StringTable.h
+#include "Serialization/Dictionary.h"
+#include "Serialization/BinaryArchive.h"
+#include "Serialization/StringTable.h"
 #include "kdw/LibraryTreeObject.h"
 #include "kdw/LibraryTree.h"
 #include "kdw/LibraryTab.h"

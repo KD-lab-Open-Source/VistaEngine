@@ -51,7 +51,7 @@ enum Outside_Environment
 class Environment
 {
 public:
-	Environment::Environment(cScene* scene, cTileMap* terrain, bool isWater, bool isFogOfWar, bool isTemperature);
+	Environment(cScene* scene, cTileMap* terrain, bool isWater, bool isFogOfWar, bool isTemperature);
 	~Environment();
 
 	void setTileMap(cTileMap* terrain);

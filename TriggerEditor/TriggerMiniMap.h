@@ -1,7 +1,7 @@
 #pragma once
 
 #include "kdw/Viewport2D.h"
-TriggerEditor/TriggerExport.h
+#include "TriggerEditor/TriggerExport.h"
 
 class TriggerView;
 

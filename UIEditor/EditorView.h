@@ -2,12 +2,12 @@
 #define __EDITOR_VIEW_H_INCLUDED__
 
 #include "Handle.h"
-Render/3dx/Umath.h
+#include "Render/3dx/Umath.h"
 #include "SubRectEditor.h"
 #include "SelectionCorner.h"
 #include "MaskEditor.h"
 
-Render/inc/IRenderDevice.h
+#include "Render/inc/IRenderDevice.h"
 
 
 class cRenderWindow;

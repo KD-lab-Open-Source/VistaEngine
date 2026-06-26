@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "UI_TextAnimation.h"
 #include "UnicodeConverter.h"
-Serialization/Serialization.h
-Serialization/RangedWrapper.h
+#include "Serialization/Serialization.h"
+#include "Serialization/RangedWrapper.h"
 
 UI_TextAnimation::UI_TextAnimation(const FT::Font* fnt)
 : parser_(fnt)

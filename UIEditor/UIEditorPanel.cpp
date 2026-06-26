@@ -7,9 +7,9 @@
 #include "MainFrame.h"
 #include "EditorView.h"
 #include "ControlsTreeCtrl.h"
-AttribEditor/AttribEditorCtrl.h
+#include "AttribEditor/AttribEditorCtrl.h"
 
-UserInterface/UserInterface.h
+#include "UserInterface/UserInterface.h"
 
 class CUIAttribEditorCtrl : public CAttribEditorCtrl{
 	void onChanged();

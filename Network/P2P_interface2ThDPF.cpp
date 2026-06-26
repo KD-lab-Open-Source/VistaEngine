@@ -8,14 +8,14 @@
 
 #include "Lmcons.h"
 
-Terra/vmap.h
+#include "Terra/vmap.h"
 
 #include <algorithm>
 
 #include "dxerr9.h"
 
 #include "ConnectionInfo.h"
-Game/IniFile.h
+#include "Game/IniFile.h"
 
 #include "LogMsg.h"
 

@@ -1,103 +1,103 @@
 #include "stdafxTr.h"
 
-Serialization/Serialization.h
-Serialization/EnumDescriptor.h
-Serialization/StringTableImpl.h
+#include "Serialization/Serialization.h"
+#include "Serialization/EnumDescriptor.h"
+#include "Serialization/StringTableImpl.h"
 #include "quantizer.h"
 #include "terTools.h"
 
-Serialization/ResourceSelector.h
-Serialization/SerializationFactory.h
+#include "Serialization/ResourceSelector.h"
+#include "Serialization/SerializationFactory.h"
 
-Render/inc/IRenderDevice.h
+#include "Render/inc/IRenderDevice.h"
 #include "scalingEngine.h"
-Terra/TerrainType.h
+#include "Terra/TerrainType.h"
 
-Game/RenderObjects.h
-Render/src/MultiRegion.h
-Render/src/TileMap.h
-Render/src/Scene.h
-FileUtils/FileUtils.h
+#include "Game/RenderObjects.h"
+#include "Render/src/MultiRegion.h"
+#include "Render/src/TileMap.h"
+#include "Render/src/Scene.h"
+#include "FileUtils/FileUtils.h"
 
-//REGISTER_CLASS(TerToolLibElement, TerToolLibElement, "Сдвоенный тулзер");
+//REGISTER_CLASS(TerToolLibElement, TerToolLibElement, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
-REGISTER_CLASS(TerToolBase, TerToolTextureTrack, "След тектурный");
-REGISTER_CLASS(TerToolBase, TerToolTexture, "Тектура");
-REGISTER_CLASS(TerToolBase, TerToolTrack1, "След 1");
-REGISTER_CLASS(TerToolBase, TerToolCrater1, "Кратер 1");
-REGISTER_CLASS(TerToolBase, TerToolSimpleCrater, "Простой кратер");
-REGISTER_CLASS(TerToolBase, TerToolLeveler, "Выравниватель");
-REGISTER_CLASS(TerToolBase, TerToolGeoWave, "гео-волна");
-REGISTER_CLASS(TerToolBase, TerToolGeoBreak, "гео-трещина");
-REGISTER_CLASS(TerToolBase, TerToolPutConstantModel, "гео-модель");
-REGISTER_CLASS(TerToolBase, TerToolTorpedo, "торпеда");
+REGISTER_CLASS(TerToolBase, TerToolTextureTrack, "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(TerToolBase, TerToolTexture, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(TerToolBase, TerToolTrack1, "пїЅпїЅпїЅпїЅ 1");
+REGISTER_CLASS(TerToolBase, TerToolCrater1, "пїЅпїЅпїЅпїЅпїЅпїЅ 1");
+REGISTER_CLASS(TerToolBase, TerToolSimpleCrater, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(TerToolBase, TerToolLeveler, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(TerToolBase, TerToolGeoWave, "пїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(TerToolBase, TerToolGeoBreak, "пїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(TerToolBase, TerToolPutConstantModel, "пїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(TerToolBase, TerToolTorpedo, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-WRAP_LIBRARY(TerToolsLibrary, "TerToolsLibrary", "ТерТулзеры", "Scripts\\Content\\TerToolsLibrary", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(TerToolsLibrary, "TerToolsLibrary", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", "Scripts\\Content\\TerToolsLibrary", 0, LIBRARY_EDITABLE);
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(TerToolPutConstantModel, eLayMetod, "LayMetod")
-REGISTER_ENUM_ENCLOSED(TerToolPutConstantModel, LM_AbsoluteHeight, "Абсолютно")
-REGISTER_ENUM_ENCLOSED(TerToolPutConstantModel, LM_RelativeHeightPut, "Относительно")
-REGISTER_ENUM_ENCLOSED(TerToolPutConstantModel, LM_RelativeHeightDig, "Относительно инвертируя")
+REGISTER_ENUM_ENCLOSED(TerToolPutConstantModel, LM_AbsoluteHeight, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TerToolPutConstantModel, LM_RelativeHeightPut, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TerToolPutConstantModel, LM_RelativeHeightDig, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(TerToolPutConstantModel, eLayMetod)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(TerToolTexture, eDrawMetod, "DrawMetod")
-REGISTER_ENUM_ENCLOSED(TerToolTexture, DM_Cyrcle, "рисовать по кругу")
-REGISTER_ENUM_ENCLOSED(TerToolTexture, DM_Bitmap, "рисовать по битмапу")
-REGISTER_ENUM_ENCLOSED(TerToolTexture, DM_ReliefBitmapPressIn, "вдавливать по битмапу")
-REGISTER_ENUM_ENCLOSED(TerToolTexture, DM_ReliefBitmapSwellOut, "вспучивать по битмапу")
+REGISTER_ENUM_ENCLOSED(TerToolTexture, DM_Cyrcle, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TerToolTexture, DM_Bitmap, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TerToolTexture, DM_ReliefBitmapPressIn, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TerToolTexture, DM_ReliefBitmapSwellOut, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(TerToolTexture, eDrawMetod)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(TerToolTextureTrack, eMoveMetod, "MoveMetod")
-REGISTER_ENUM_ENCLOSED(TerToolTextureTrack, MM_Uninterrupted, "непрерывно")
-REGISTER_ENUM_ENCLOSED(TerToolTextureTrack, MM_ChangePosition, "по изменению позиции")
-REGISTER_ENUM_ENCLOSED(TerToolTextureTrack, MM_Stepwise, "по шагу")
+REGISTER_ENUM_ENCLOSED(TerToolTextureTrack, MM_Uninterrupted, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TerToolTextureTrack, MM_ChangePosition, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TerToolTextureTrack, MM_Stepwise, "пїЅпїЅ пїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(TerToolTextureTrack, eMoveMetod)
 
 BEGIN_ENUM_DESCRIPTOR(eSetingAtrMetod, "SetingIndsMetod")
-REGISTER_ENUM(SIM_NotChange, "не менять")
-REGISTER_ENUM(SIM_SetInds, "уст. неразрушаемость")
-REGISTER_ENUM(SIM_UnSetInds, "сбрасывать неразрушаемость")
-//REGISTER_ENUM(SIM_SetGeo, "уст. Geo")
-//REGISTER_ENUM(SIM_SetDam, "уст. Dam")
+REGISTER_ENUM(SIM_NotChange, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(SIM_SetInds, "пїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(SIM_UnSetInds, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+//REGISTER_ENUM(SIM_SetGeo, "пїЅпїЅпїЅ. Geo")
+//REGISTER_ENUM(SIM_SetDam, "пїЅпїЅпїЅ. Dam")
 END_ENUM_DESCRIPTOR(eSetingAtrMetod)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(vrtMap, eSettingImpassabilityMetod, "SettingImpassabilityMetod")
-REGISTER_ENUM_ENCLOSED(vrtMap, SIMM_NotChangeImpassability, "не менять")
-REGISTER_ENUM_ENCLOSED(vrtMap, SIMM_SetImpassability, "устанавливать")
-REGISTER_ENUM_ENCLOSED(vrtMap, SIMM_UnSetImpassability, "сбрасывать")
+REGISTER_ENUM_ENCLOSED(vrtMap, SIMM_NotChangeImpassability, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(vrtMap, SIMM_SetImpassability, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(vrtMap, SIMM_UnSetImpassability, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(vrtMap, eSettingImpassabilityMetod)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(vrtMap, eSettingSurfaceKindMetod, "SettingSurfaceKindMetod")
-REGISTER_ENUM_ENCLOSED(vrtMap, SurfaceKind_NoChange, "не менять")
-REGISTER_ENUM_ENCLOSED(vrtMap, SurfaceKind_Set1, "1 рода")
-REGISTER_ENUM_ENCLOSED(vrtMap, SurfaceKind_Set2, "2 рода")
-REGISTER_ENUM_ENCLOSED(vrtMap, SurfaceKind_Set3, "3 рода")
-REGISTER_ENUM_ENCLOSED(vrtMap, SurfaceKind_Set4, "4 рода")
+REGISTER_ENUM_ENCLOSED(vrtMap, SurfaceKind_NoChange, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(vrtMap, SurfaceKind_Set1, "1 пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(vrtMap, SurfaceKind_Set2, "2 пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(vrtMap, SurfaceKind_Set3, "3 пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(vrtMap, SurfaceKind_Set4, "4 пїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(vrtMap, eSettingSurfaceKindMetod)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(TerToolBase, eDetaledTextueType, "DetaledTextueType")
-REGISTER_ENUM_ENCLOSED(TerToolBase, DTT_NotDetailedTexture, "нет детализированной текстуры")
-REGISTER_ENUM_ENCLOSED(TerToolBase, DTT_DetailedTexture0, "дет.текстура по умолчанию")
-REGISTER_ENUM_ENCLOSED(TerToolBase, DTT_DetailedTexture1, "дет.текстура - Песок")
-REGISTER_ENUM_ENCLOSED(TerToolBase, DTT_DetailedTexture2, "дет.текстура - Земля")
-REGISTER_ENUM_ENCLOSED(TerToolBase, DTT_DetailedTexture3, "дет.текстура - Трава")
-REGISTER_ENUM_ENCLOSED(TerToolBase, DTT_DetailedTexture4, "дет.текстура - Трещины")
-REGISTER_ENUM_ENCLOSED(TerToolBase, DTT_DetailedTexture5, "дет.текстура - Дорога")
-REGISTER_ENUM_ENCLOSED(TerToolBase, DTT_DetailedTexture6, "дет.текстура - Камни")
-REGISTER_ENUM_ENCLOSED(TerToolBase, DTT_DetailedTexture7, "дет.текстура - Кратер")
+REGISTER_ENUM_ENCLOSED(TerToolBase, DTT_NotDetailedTexture, "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TerToolBase, DTT_DetailedTexture0, "пїЅпїЅпїЅ.пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TerToolBase, DTT_DetailedTexture1, "пїЅпїЅпїЅ.пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TerToolBase, DTT_DetailedTexture2, "пїЅпїЅпїЅ.пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TerToolBase, DTT_DetailedTexture3, "пїЅпїЅпїЅ.пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TerToolBase, DTT_DetailedTexture4, "пїЅпїЅпїЅ.пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TerToolBase, DTT_DetailedTexture5, "пїЅпїЅпїЅ.пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TerToolBase, DTT_DetailedTexture6, "пїЅпїЅпїЅ.пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TerToolBase, DTT_DetailedTexture7, "пїЅпїЅпїЅ.пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(TerToolBase, eDetaledTextueType)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(TerToolBase, ExtraDrawType, "ExtraDrawType")
-REGISTER_ENUM_ENCLOSED(TerToolBase, EDT_NoDraw, "Не рисовать")
-REGISTER_ENUM_ENCLOSED(TerToolBase, EDT_DrawMiniDetail, "Рисовать дет. текстурой")
-REGISTER_ENUM_ENCLOSED(TerToolBase, EDT_DrawPlacementZoneMaterial, "Рисовать зонами установки")
+REGISTER_ENUM_ENCLOSED(TerToolBase, EDT_NoDraw, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TerToolBase, EDT_DrawMiniDetail, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TerToolBase, EDT_DrawPlacementZoneMaterial, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(TerToolBase, ExtraDrawType)
 
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(TerToolLeveler, eLevelerMetod, "eLevelerMetod")
-REGISTER_ENUM_ENCLOSED(TerToolLeveler, LevMetod_averageH, "по средней высоте")
-REGISTER_ENUM_ENCLOSED(TerToolLeveler, LevMetod_minH, "по минимальной высоте")
-REGISTER_ENUM_ENCLOSED(TerToolLeveler, LevMetod_maxH, "по максимальной высоте")
+REGISTER_ENUM_ENCLOSED(TerToolLeveler, LevMetod_averageH, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TerToolLeveler, LevMetod_minH, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TerToolLeveler, LevMetod_maxH, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(TerToolLeveler, eLevelerMetod)
 
 ///////////////////////////////////////
@@ -124,9 +124,9 @@ inline void elementarTool<_TT_SETING_ATR_METOD_,_TT_TER_EFF_,_TT_SUR_EFF_,INTERN
 			int x1,y1;
 			x1 = round((A11*x + A12*y + X)+(textureSizeX>>1));
 			y1 = round((A21*x + A22*y + Y)+(textureSizeY>>1));
-			// Не зацикленное наложение
+			// пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			if(x1<0 || y1<0 || x1>=textureSizeX || y1>=textureSizeY) return;
-			// зацикленное наложение
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			//x1%=textureSizeX;
 			//y1%=textureSizeY;
 			//if(x1<0)x1+=textureSizeX;
@@ -142,7 +142,7 @@ inline void elementarTool<_TT_SETING_ATR_METOD_,_TT_TER_EFF_,_TT_SUR_EFF_,INTERN
 		}
 	}
 
-	switch(_TT_SUR_EFF_){ //Заменит на if !
+	switch(_TT_SUR_EFF_){ //пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ if !
 	case TTSE_NOT_CHANGE:
 		//vMap.putAlt(offB, v); //, vMap.GetGeoType(offB,v)
 		switch(_TT_SETING_ATR_METOD_){
@@ -289,7 +289,7 @@ inline int elementarTool<_TT_SETING_ATR_METOD_,_TT_TER_EFF_,_TT_SUR_EFF_,INTERNA
 		break;
 	case TTTE_ALIGNMENT_DIG: 
 		{
-			if(v > hAppr){ //Воздействие если инструмент убирает и высота больше hAppr
+			if(v > hAppr){ //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ hAppr
 				v+=dV;
 				if(v<=hAppr)
 					v=hAppr;
@@ -306,7 +306,7 @@ inline int elementarTool<_TT_SETING_ATR_METOD_,_TT_TER_EFF_,_TT_SUR_EFF_,INTERNA
 		break;
 	case TTTE_ALIGNMENT_PUT:
 		{
-			if(v < hAppr){//Воздействие если инструмент добавляет и высота меньше hAppr
+			if(v < hAppr){//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ hAppr
 				v+=dV;
 				if(v>=hAppr) 
 					v=hAppr;
@@ -317,7 +317,7 @@ inline int elementarTool<_TT_SETING_ATR_METOD_,_TT_TER_EFF_,_TT_SUR_EFF_,INTERNA
 	case TTTE_ALIGNMENT_SMOOTH:
 		{
 			if( dV >0 ){
-				if(v < hAppr){//Воздействие если инструмент добавляет и высота меньше hAppr
+				if(v < hAppr){//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ hAppr
 					v+=dV;
 					if(v>=hAppr)
 						v=hAppr;
@@ -325,7 +325,7 @@ inline int elementarTool<_TT_SETING_ATR_METOD_,_TT_TER_EFF_,_TT_SUR_EFF_,INTERNA
 				}
 			}
 			else {
-				if(v > hAppr){//Воздействие если инструмент убирает и высота больше hAppr
+				if(v > hAppr){//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ hAppr
 					v+=dV;
 					if(v<=hAppr)
 						v=hAppr;
@@ -374,9 +374,9 @@ int elementarTool<_TT_SETING_ATR_METOD_,_TT_TER_EFF_,_TT_SUR_EFF_,INTERNAL_ALPHA
 			ia++;
 		}
 	}
-	//Эта операция должна быть совмещена с рендером
+	//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	vMap.recalcArea2Grid(vMap.XCYCL(begx-1), vMap.YCYCL(begy-1), vMap.XCYCL(begx + sx+1), vMap.YCYCL(begy + sy+1) );
-	vMap.regRender(vMap.XCYCL(begx-1), vMap.YCYCL(begy-1), vMap.XCYCL(begx + sx+1), vMap.YCYCL(begy + sy+1) );
+	vMap.regRender(vMap.XCYCL(begx-1), vMap.YCYCL(begy-1), vMap.XCYCL(begx + sx+1), vMap.YCYCL(begy + sy+1), vrtMap::TypeCh_Height|vrtMap::TypeCh_Texture );
 
 	return 0;
 }
@@ -456,7 +456,7 @@ int elementarTool<_TT_SETING_ATR_METOD_,_TT_TER_EFF_,_TT_SUR_EFF_,INTERNAL_ALPHA
 		locp++;
 	}
 	else {
-		const int DH_MEAN = 1; //дельта по которой усредняются высоты
+		const int DH_MEAN = 1; //пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		int cx,h,cy,cx_;
 		if(eql){
 			mean = k = 0;
@@ -615,12 +615,12 @@ int elementarTool<_TT_SETING_ATR_METOD_,_TT_TER_EFF_,_TT_SUR_EFF_,INTERNAL_ALPHA
 ///////////////////////////////////////////////////////////////////////////////////
 void TerToolBase::serialize(Archive& ar)
 {
-	ar.serialize(flag_changeTerrainType, "flag_changeTerrainType", "Менять тип поверхности");
+	ar.serialize(flag_changeTerrainType, "flag_changeTerrainType", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(flag_changeTerrainType)
-		ar.serialize(newTerrainType, "newTerrainType", "Новый тип поверхности");
-	if(!ar.serialize(extraDraw, "extraDraw", "Доп. отрисовка")){
+		ar.serialize(newTerrainType, "newTerrainType", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	if(!ar.serialize(extraDraw, "extraDraw", "пїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")){
 		bool flag_enableDrawDetailTexture;
-		ar.serialize(flag_enableDrawDetailTexture, "flag_enableDrawDetailTexture", "Рисовать дет. текстурой");
+		ar.serialize(flag_enableDrawDetailTexture, "flag_enableDrawDetailTexture", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		extraDraw = flag_enableDrawDetailTexture==false ? EDT_NoDraw : EDT_DrawMiniDetail;
 	}
 	if(ar.isEdit() && extraDraw!=EDT_NoDraw){
@@ -635,7 +635,7 @@ void TerToolBase::serialize(Archive& ar)
 				}
 				comboListCtrl.setComboList(comboList.c_str());
 				comboListCtrl = getStringTokenByIndex(comboList.c_str(), layerDetailTexture);
-				ar.serialize(comboListCtrl, "comboListCtrl", "Дет. текстура");
+				ar.serialize(comboListCtrl, "comboListCtrl", "пїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 				layerDetailTexture = clamp(indexInComboListString(comboListCtrl.comboList(), comboListCtrl), 0, cTileMap::miniDetailTexturesNumber-1);
 			}
 			else if(extraDraw==EDT_DrawPlacementZoneMaterial){
@@ -645,32 +645,32 @@ void TerToolBase::serialize(Archive& ar)
 				}
 				comboListCtrl.setComboList(comboList.c_str());
 				comboListCtrl = getStringTokenByIndex(comboList.c_str(), layerZonePlacement);
-				ar.serialize(comboListCtrl, "comboListCtrl", "Зона установки");
+				ar.serialize(comboListCtrl, "comboListCtrl", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 				layerZonePlacement = clamp(indexInComboListString(comboListCtrl.comboList(), comboListCtrl), 0, cTileMap::placementZoneMaterialNumber-1);
 			}
 		}
 		else {
 			if(extraDraw==EDT_DrawMiniDetail)
-				ar.serialize(layerDetailTexture, "layerDetailTexture", "Номер дет. текстуры");
+				ar.serialize(layerDetailTexture, "layerDetailTexture", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			else if(extraDraw==EDT_DrawPlacementZoneMaterial)
-                ar.serialize(layerZonePlacement, "layerZonePlacement", "Номер зоны");
+                ar.serialize(layerZonePlacement, "layerZonePlacement", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 		}
 	}
 	if(!ar.isEdit()){
         ar.serialize(layerDetailTexture, "layerDetailTexture", 0);
         ar.serialize(layerZonePlacement, "layerZonePlacement", 0);
 	}
-	ar.serialize(detaledTextueScale_, "detaledTextueScale_", "Масштаб мелкодетальной текстуры");
+	ar.serialize(detaledTextueScale_, "detaledTextueScale_", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 
 void TerToolCrater1::serialize(Archive& ar)
 {
 	static ResourceSelector::Options options("*.tga", "RESOURCE\\TerrainData\\TerTools", "Will select location of texture file");
-	ar.serialize(ResourceSelector(terTexture, options), "terTexture", "тертекстура");
-	ar.serialize(terTextureKScale, "terTextureKScale", "масштаб тертекстуры");
-	ar.serialize(r, "r", "радиус");
-	//ar.serialize(setingAtrMetod_, "setingAtrMetod_", "Изменение типа поверхности");
+	ar.serialize(ResourceSelector(terTexture, options), "terTexture", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(terTextureKScale, "terTextureKScale", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(r, "r", "пїЅпїЅпїЅпїЅпїЅпїЅ");
+	//ar.serialize(setingAtrMetod_, "setingAtrMetod_", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	TerToolBase::serialize(ar);
 	if(r<=0) r=1;
 }
@@ -723,10 +723,10 @@ bool TerToolCrater1::quant()
 
 void TerToolSimpleCrater::serialize(Archive& ar)
 {
-	ar.serialize(r, "r", "радиус");
+	ar.serialize(r, "r", "пїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(r<=0) r=1;
-	ar.serialize(dh, "dh", "глубина");
-	ar.serialize(flag_waving, "flag_waving", "волнистось");
+	ar.serialize(dh, "dh", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(flag_waving, "flag_waving", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	TerToolBase::serialize(ar);
 }
 
@@ -763,13 +763,13 @@ TerToolLeveler::TerToolLeveler()
 
 void TerToolLeveler::serialize(Archive& ar)
 {
-	ar.serialize(r, "r", "радиус");
+	ar.serialize(r, "r", "пїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(r<=0) r=1;
-	ar.serialize(kRoughness, "kRoughness", "неровность");
+	ar.serialize(kRoughness, "kRoughness", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	kRoughness=clamp(kRoughness, 0.0f, 1.f);
-	ar.serialize(amountFrame, "amountFrame", "количество кадров");
-	ar.serialize(levelerMetod, "levelerMetod", "выравнивание");
-	ar.serialize(maxDeltaH, "maxDeltaH", "Макс. дельта высоты");
+	ar.serialize(amountFrame, "amountFrame", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(levelerMetod, "levelerMetod", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(maxDeltaH, "maxDeltaH", "пїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 	TerToolBase::serialize(ar);
 }
 
@@ -784,8 +784,8 @@ bool TerToolLeveler::quant()
 	int begy=round(center.y)-r;
 	begx=clamp(begx, 0, vMap.H_SIZE-2*r);
 	begy=clamp(begy, 0, vMap.V_SIZE-2*r);
-	if(quantCnt<=0){ //подразумевается ==
-		//Инициализация
+	if(quantCnt<=0){ //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ==
+		//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		int minh=MAX_VX_HEIGHT;
 		int maxh=0;
 		int sum=0;
@@ -805,7 +805,7 @@ bool TerToolLeveler::quant()
 			}
 		}
 
-		int hAverage = (sum<<VX_FRACTION)/cnt; // r минимум 1
+		int hAverage = (sum<<VX_FRACTION)/cnt; // r пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 1
 		minh<<=VX_FRACTION;
 		maxh<<=VX_FRACTION;
 		if(levelerMetod==LevMetod_averageH){
@@ -830,7 +830,7 @@ bool TerToolLeveler::quant()
 				sBitGenMetodMPD(3, (maxh-hApproximation)*2, 0, kRoughness).generate(downBitmap);
 		}
 		else if(levelerMetod==LevMetod_maxH){
-			int deltaH = min(round(maxDeltaH*VOXEL_MULTIPLIER), maxh-hAverage);
+			int deltaH = min((int)round(maxDeltaH*VOXEL_MULTIPLIER), maxh-hAverage);
 			//hApproximation=maxh;
 			hApproximation=maxh;
 			upBitmap.create(2*r, 2*r);
@@ -844,7 +844,7 @@ bool TerToolLeveler::quant()
 		quantCnt=1;
 		return true;
 	}
-	// основной цикл
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 
 	int i,j, cnt=0;
 	int curAmountFrame= 30;
@@ -936,13 +936,13 @@ bool TerToolLeveler::quant()
 void TerToolGeoWave::serialize(Archive& ar)
 {
 	sGeoWave::serialize(ar);
-	//ar.serialize(setingAtrMetod_, "setingAtrMetod_", "Изменение типа поверхности");
+	//ar.serialize(setingAtrMetod_, "setingAtrMetod_", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	TerToolBase::serialize(ar);
 }
 void TerToolGeoBreak::serialize(Archive& ar)
 {
 	GeoBreak::serialize(ar);
-	//ar.serialize(setingAtrMetod_, "setingAtrMetod_", "Изменение типа поверхности");
+	//ar.serialize(setingAtrMetod_, "setingAtrMetod_", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	TerToolBase::serialize(ar);
 }
 
@@ -950,7 +950,7 @@ void TerToolGeoBreak::serialize(Archive& ar)
 
 TerToolPutConstantModel::TerToolPutConstantModel()
 {
-	//Редактируемые переменные
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	amountFrame=1;
 	amountFrame2=0;
 	layMetod=LM_AbsoluteHeight;
@@ -959,7 +959,7 @@ TerToolPutConstantModel::TerToolPutConstantModel()
 	independentTerTexture=false;
 	noiseAmp=0;
 
-	//Внутренние переменные
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	quantCnt=0;
 	chainNum=0;
 	//position=Se3f(MatXf(Mat3f::ZERO, Vect3f::ZERO));
@@ -982,21 +982,21 @@ void TerToolPutConstantModel::setScale(float _scaleFactor)
 void TerToolPutConstantModel::serialize(Archive& ar)
 {
 	static ModelSelector::Options options("*.3dx", "RESOURCE\\TerrainData\\TerTools", "Will select location of 3DX model");
-	ar.serialize(ResourceSelector(modelName, options), "terModel", "термодель");
-	ar.serialize(scaleFactor, "scaleFactor", "Масштаб модели");
-	ar.serialize(zScaleFactor, "zScaleFactor", "Масштаб по Z");
+	ar.serialize(ResourceSelector(modelName, options), "terModel", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(scaleFactor, "scaleFactor", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(zScaleFactor, "zScaleFactor", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ Z");
 	static ResourceSelector::Options options2("*.tga", "RESOURCE\\TerrainData\\TerTools", "Will select location of texture file");
-	ar.serialize(ResourceSelector(terTexture, options2), "terTexture", "тертекстура");
-	ar.serialize(terTextureKScale, "terTextureKScale", "масштаб тертекстуры");
-	ar.serialize(independentTerTexture, "independentTerTexture", "Независимая тертекстура");
-	ar.serialize(layMetod, "layMetod", "метод");
+	ar.serialize(ResourceSelector(terTexture, options2), "terTexture", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(terTextureKScale, "terTextureKScale", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(independentTerTexture, "independentTerTexture", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(layMetod, "layMetod", "пїЅпїЅпїЅпїЅпїЅ");
 	//if( !ar.isEdit() || layMetod!=LM_AbsoluteHeight ){
-		ar.serialize(amountFrame, "amountFrame", "количество кадров");
-		ar.serialize(amountFrame2, "amountFrame2", "количество кадров2");
+		ar.serialize(amountFrame, "amountFrame", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(amountFrame2, "amountFrame2", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ2");
 	//}
 	if(amountFrame < 1) amountFrame=1;
-	ar.serialize(noiseAmp, "noiseAmp", "Шум");
-	//ar.serialize(setingAtrMetod_, "setingAtrMetod_", "Изменение типа поверхности");
+	ar.serialize(noiseAmp, "noiseAmp", "пїЅпїЅпїЅ");
+	//ar.serialize(setingAtrMetod_, "setingAtrMetod_", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	TerToolBase::serialize(ar);
 	if(!ar.isEdit()) {
 		ar.serialize(quantCnt, "quantCnt", 0);
@@ -1063,7 +1063,7 @@ bool TerToolPutConstantModel::elemetarQuant(elementarTool<_TT_SETING_ATR_METOD_,
 					dV = ((dV*k1)>>16) - ((dV*k2)>>16);
 					curTool.tVoxSet(vMap.XCYCL(begX+j), vMap.YCYCL(begY+i), dV);
 				}
-				//else{ //Отрисовка зоны где нет изменений
+				//else{ //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				//	vMap.DamPal[255].argb=0x00ff0000;
 				//	vMap.SetTer(vMap.XCYCL(begX+j), vMap.YCYCL(begY+i), 255);
 				//}
@@ -1118,11 +1118,11 @@ bool TerToolPutConstantModel::quant()
 {
 	start_timer_auto();
 
-	if(quantCnt<=1 && flag_stopOnInds){ //проверка на 0 и 1-м кванте
+	if(quantCnt<=1 && flag_stopOnInds){ //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 0 пїЅ 1-пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		if(vMap.isIndestructability(round(position.trans().x), round(position.trans().y))) 
 			return false;
 	}
-	if(quantCnt<=0){ //Инициализация
+	if(quantCnt<=0){ //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		if(modelName.empty()){
 			xassert(0&&"Toolzer isn't contented 3dx!");
 			return false;
@@ -1155,7 +1155,7 @@ bool TerToolPutConstantModel::quant()
 		result=elemetarQuant(tool);
 	}
 
-	if(result==false){ //Наложение независимой текстуры на последнем кванте
+	if(result==false){ //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		if(independentTerTexture && !terTexture.empty()){
 	        float angle=convertPosition2AngleAboutZ(position);
 			TerToolsDispatcher::Bitmap8C* pbmp=terToolsDispatcher.getBitmap8C(terTexture.c_str(), terTextureKScale);
@@ -1260,7 +1260,7 @@ struct Vect3i {
 
 bool RES_putModel2VBitmap(const Se3f& pos)
 {
- /*//основной алгоритм
+ /*//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	vector<sPolygon> poligonArr;
 	vector<Vect3f> pointArr;
 	GetAllTriangle3dx(modelName.c_str(), pointArr, poligonArr);
@@ -1329,14 +1329,14 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 	vector<sPolygon>::iterator p;
 	for(p=poligonArr.begin(); p!=poligonArr.end(); p++){
 
-		//float -алгоритм
-		const Vect3f* a = &pointArr[p->p1]; // Для сортировки по Y.
+		//float -пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+		const Vect3f* a = &pointArr[p->p1]; // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ Y.
 		const Vect3f* b = &pointArr[p->p2];
 		const Vect3f* c = &pointArr[p->p3];
 		if(a->y > b->y) swap(a, b);
 		if(a->y > c->y) swap(a, c);
 		if(b->y > c->y) swap(b, c);
-		// грань нулевой высоты рисовать не будем( а надо, для того-чтоб не пропадали точки когда очень много полигонов на точку)
+		// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ( пїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ)
 		///if (round(c->y) <= round(a->y)) continue;
 
 		int current_sx, current_sy;
@@ -1347,8 +1347,8 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 		int length;
 		//unsigned short *dest;
 
-		// посчитаем du/dsx, dv/dsx, d(1/z)/dsx
-		// считаем по самой длинной линии (т.е. проходящей через вершину B)
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ du/dsx, dv/dsx, d(1/z)/dsx
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (пїЅ.пїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ B)
 		float divisor;
 		divisor=(c->y - a->y);
 		if(divisor) k = (b->y - a->y) / divisor;
@@ -1403,7 +1403,7 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 
 ////////////////////////////////
 
-		// построчная отрисовка грани
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		for (current_sy = ceilf(a->y); current_sy <= floorf(c->y); current_sy++) { //current_sy < ceilf(c->y)
 			if((current_sy-iminY) >= voxelBitmap.sy) break;
 			//if((current_sy-minY) < 0 ) break;//continue;
@@ -1423,7 +1423,7 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 #endif
 			}
 
-			// x_start должен находиться левее x_end
+			// x_start пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ x_end
 			if (x_start > x_end) {
 			  x = x_end;
 			  z1 = z1_end;
@@ -1434,11 +1434,11 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 			  length = ceilf(x_end) - ceilf(x_start);
 			}
 
-			// считаем адрес начала строки в видеопамяти
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			//dest = GB;
 			//dest += current_sy * sizeX05*2 + (int)ceilf(x);
 
-			// текстурируем строку
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			current_sx = round(ceilf(x))-iminX;
 	
 			if((current_sy-iminY) >= 0 ) if (length) {
@@ -1447,7 +1447,7 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 			  z1 += dz1* tmp;
 		#endif
 				while (length--) {
-				// используем z-буфер для определения видимости текущей точки
+				// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ z-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 					if( (current_sx<voxelBitmap.sx) && (current_sx >= 0)) {
 						//if (zBuffer[(current_sy-iminY)*voxelBitmap.sx + current_sx] <= z1) {
 						//	//*dest = palLight[round(cc)];
@@ -1464,18 +1464,18 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 				}
 			}
 
-			// сдвигаем начальные и конечные значения x/u/v/(1/z)
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ x/u/v/(1/z)
 			x_start += dx_start;
 			z1_start += dz1_start;
 			x_end += dx_end;
 			z1_end += dz1_end;
 		}
-*/ //основной алгоритм
+*/ //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 /*
-		//1-й целочисленный алгоритм - на балистик- 1 точка
+		//1-пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ- 1 пїЅпїЅпїЅпїЅпїЅ
 
-		const Vect3i* a = &iPntArr[p->p1]; // Для сортировки по Y.
+		const Vect3i* a = &iPntArr[p->p1]; // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ Y.
 		const Vect3i* b = &iPntArr[p->p2];
 		const Vect3i* c = &iPntArr[p->p3];
 		if(a->y > b->y) swap(a, b);
@@ -1506,8 +1506,8 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 		int length;
 		//unsigned short *dest;
 
-		// посчитаем du/dsx, dv/dsx, d(1/z)/dsx
-		// считаем по самой длинной линии (т.е. проходящей через вершину B)
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ du/dsx, dv/dsx, d(1/z)/dsx
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (пїЅ.пїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ B)
 		int divisor;
 		divisor=(c->y - a->y);
 		//if(roundFIntF0(divisor)) k = ((__int64)(b->y - a->y)<<PN_HALF_FRACTION) / divisor;// F8
@@ -1516,7 +1516,7 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 		//z1_start = a->z + (cvrtFIntF8(c->z - a->z))*(k);
 		if(roundFIntF0(divisor)) k = ((__int64)(b->y - a->y)<<PN_FRACTION) / divisor;// F16
 		else k=0;
-		x_start = a->x + (int)mroundFIntF0((__int64)(c->x - a->x)*(k));//На самом деле F16(F18)!
+		x_start = a->x + (int)mroundFIntF0((__int64)(c->x - a->x)*(k));//пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ F16(F18)!
 		z1_start = a->z + (int)mroundFIntF0((__int64)(c->z - a->z)*(k));
 		x_end = b->x;
 		z1_end = b->z;
@@ -1537,8 +1537,8 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 		else { dx_start=0; dz1_start=0;}
 #ifdef SUBPIXEL
 		tmp = ceilFIntF16(a->y) - a->y;
-		x_start += (__int64)dx_start*tmp>>PN_FRACTION;//(dx_start>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //Норма
-		z1_start += (__int64)dz1_start*tmp>>PN_FRACTION;//(dz1_start>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //Норма
+		x_start += (__int64)dx_start*tmp>>PN_FRACTION;//(dx_start>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //пїЅпїЅпїЅпїЅпїЅ
+		z1_start += (__int64)dz1_start*tmp>>PN_FRACTION;//(dz1_start>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //пїЅпїЅпїЅпїЅпїЅ
 #endif
 		if (ceilFIntF16(b->y) > ceilFIntF16(a->y)) {
 			tmp = ceilFIntF16(a->y) - (a->y);
@@ -1562,13 +1562,13 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 			else{ dx_end=0; dz1_end=0; }
 		}
 #ifdef SUBPIXEL
-		x_end += (__int64)dx_end*tmp>>PN_FRACTION;//(dx_end>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //Норма
-		z1_end += (__int64)dz1_end*tmp>>PN_FRACTION;//(dz1_end>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //Норма
+		x_end += (__int64)dx_end*tmp>>PN_FRACTION;//(dx_end>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //пїЅпїЅпїЅпїЅпїЅ
+		z1_end += (__int64)dz1_end*tmp>>PN_FRACTION;//(dz1_end>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //пїЅпїЅпїЅпїЅпїЅ
 #endif
 
 ////////////////////////////////
 //loc_scip01:;
-		// построчная отрисовка грани
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		for (current_sy = ceilFIntF0(a->y); current_sy <= floorFIntF0(c->y); current_sy++) { //ceilFIntF0(c->y)
 			if((current_sy) >= voxelBitmap.sy ) break;
 			if (current_sy == ceilFIntF0(b->y)) {
@@ -1582,8 +1582,8 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 				else { dx_end=0; dz1_end=0; }
 #ifdef SUBPIXEL
 				tmp = ceilFIntF16(b->y) - b->y;
-				x_end += (__int64)dx_end*tmp>>PN_FRACTION;//(dx_end>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //Норма
-				z1_end += (__int64)dz1_end*tmp>>PN_FRACTION;//(dz1_end>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //Норма
+				x_end += (__int64)dx_end*tmp>>PN_FRACTION;//(dx_end>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //пїЅпїЅпїЅпїЅпїЅ
+				z1_end += (__int64)dz1_end*tmp>>PN_FRACTION;//(dz1_end>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //пїЅпїЅпїЅпїЅпїЅ
 #endif
 			}
 
@@ -1593,7 +1593,7 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 			//xassert(x_end <= curMaxX +(1<<16));
 			//x_start=clamp(x_start, curMinX, curMaxX);
 			//x_end=clamp(x_end, curMinX, curMaxX);
-			// x_start должен находиться левее x_end
+			// x_start пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ x_end
 			if (x_start > x_end) {
 			  x = x_end;
 			  z1 = z1_end;
@@ -1605,7 +1605,7 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 			}
 			length++;
 
-			// текстурируем строку
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			current_sx = ceilFIntF0(x);
 	
 			if((current_sy) >= 0 ) if (length) {
@@ -1615,7 +1615,7 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 			  z1 += (__int64)dz1*tmp>>PN_FRACTION;//(dz1>>PN_HALF_FRACTION)* (tmp>>PN_HALF_FRACTION);
 		#endif
 				while (length--) {
-				// используем z-буфер для определения видимости текущей точки
+				// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ z-пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 					//xassert(current_sx <= ceilFIntF0(a->x)-iminX+10 || current_sx <= ceilFIntF0(b->x)-iminX+10 || current_sx <= ceilFIntF0(c->x)-iminX+10);
 					//xassert(current_sx >= ceilFIntF0(a->x)-iminX-10 || current_sx >= ceilFIntF0(b->x)-iminX-10 || current_sx >= ceilFIntF0(c->x)-iminX-10);
 					//xassert(z1 <= a->z+(20<<16) || z1 <= b->z+(20<<16) || z1 <= c->z+(20<<16));
@@ -1631,7 +1631,7 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 				}
 			}
 
-			// сдвигаем начальные и конечные значения x/u/v/(1/z)
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ x/u/v/(1/z)
 			x_start += dx_start;
 			z1_start += dz1_start;
 			x_end += dx_end;
@@ -1640,10 +1640,10 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 */
 
 /*
-		//2-й целочисленный алгоритм - баги на wall на балистик- 1 точка
+		//2-пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅ пїЅпїЅ wall пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ- 1 пїЅпїЅпїЅпїЅпїЅ
 #undef SUBPIXEL
 #undef SUBTEXEL
-		const Vect3i* a = &iPntArr[p->p1]; // Для сортировки по Y.
+		const Vect3i* a = &iPntArr[p->p1]; // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ Y.
 		const Vect3i* b = &iPntArr[p->p2];
 		const Vect3i* c = &iPntArr[p->p3];
 		if(a->y > b->y) swap(a, b);
@@ -1672,8 +1672,8 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 
 		//unsigned short *dest;
 
-		// посчитаем du/dsx, dv/dsx, d(1/z)/dsx
-		// считаем по самой длинной линии (т.е. проходящей через вершину B)
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ du/dsx, dv/dsx, d(1/z)/dsx
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (пїЅ.пїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ B)
 		int divisor;
 		divisor=(c->y - a->y);
 		//if(roundFIntF0(divisor)) k = ((__int64)(b->y - a->y)<<PN_HALF_FRACTION) / divisor;// F8
@@ -1682,7 +1682,7 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 		//z1_start = a->z + (cvrtFIntF8(c->z - a->z))*(k);
 		if(roundFIntF0(divisor)) k = ((__int64)(b->y - a->y)<<PN_FRACTION) / divisor;// F16
 		else k=0;
-		x_start = a->x + (int)mroundFIntF0((__int64)(c->x - a->x)*(k));//На самом деле F16(F18)!
+		x_start = a->x + (int)mroundFIntF0((__int64)(c->x - a->x)*(k));//пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ F16(F18)!
 		z1_start = a->z + (int)mroundFIntF0((__int64)(c->z - a->z)*(k));
 		x_end = b->x;
 		z1_end = b->z;
@@ -1703,8 +1703,8 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 		else { dx_start=0; dz1_start=0;}
 #ifdef SUBPIXEL
 		tmp = ceilFIntF16(a->y) - a->y;
-		x_start += (__int64)dx_start*tmp>>PN_FRACTION;//(dx_start>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //Норма
-		z1_start += (__int64)dz1_start*tmp>>PN_FRACTION;//(dz1_start>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //Норма
+		x_start += (__int64)dx_start*tmp>>PN_FRACTION;//(dx_start>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //пїЅпїЅпїЅпїЅпїЅ
+		z1_start += (__int64)dz1_start*tmp>>PN_FRACTION;//(dz1_start>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //пїЅпїЅпїЅпїЅпїЅ
 #endif
 
 		int current_sy=mroundFIntF0(a->y);
@@ -1720,12 +1720,12 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 	#ifdef SUBPIXEL
 			//tmp = ceilFIntF16(a->y) - (a->y);
 			tmp = mroundFIntF0(a->y) - (a->y);
-			x_end += (dx_end>>8) * (tmp>>8); //Норма
-			z1_end += (dz1_end>>8) * (tmp>>8); //Норма
+			x_end += (dx_end>>8) * (tmp>>8); //пїЅпїЅпїЅпїЅпїЅ
+			z1_end += (dz1_end>>8) * (tmp>>8); //пїЅпїЅпїЅпїЅпїЅ
 	#endif
-			// построчная отрисовка грани
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 			do {
-				// x_start должен находиться левее x_end
+				// x_start пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ x_end
 				x_start=clamp(x_start, curMinX, curMaxX);
 				x_end=clamp(x_end, curMinX, curMaxX);
 				int x,z1;
@@ -1743,7 +1743,7 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 					//xe = ceilFIntF0(x_end);
 					xe = mroundFIntF0(x_end);
 				}
-				// текстурируем строку
+				// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 				//int current_sx = ceilFIntF0(x);
 				int current_sx = mroundFIntF0(x);
 				xassert(current_sy>=0 && current_sy < voxelBitmap.sy);
@@ -1760,7 +1760,7 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 						z1 += dz1;
 					}
 				//}
-				// сдвигаем начальные и конечные значения x/u/v/(1/z)
+				// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ x/u/v/(1/z)
 				x_start += dx_start;
 				x_end += dx_end;
 				z1_start += dz1_start;
@@ -1781,13 +1781,13 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 		#ifdef SUBPIXEL
 			//tmp = ceilFIntF16(b->y) - b->y;
 			tmp = mroundFIntF0(b->y) - b->y;
-			x_end += (dx_end>>8) * (tmp>>8); //Норма
-			z1_end += (dz1_end>>8) * (tmp>>8); //Норма
+			x_end += (dx_end>>8) * (tmp>>8); //пїЅпїЅпїЅпїЅпїЅ
+			z1_end += (dz1_end>>8) * (tmp>>8); //пїЅпїЅпїЅпїЅпїЅ
 		#endif
-			// построчная отрисовка грани
-			// построчная отрисовка грани
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 			do {
-				// x_start должен находиться левее x_end
+				// x_start пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ x_end
 				x_start=clamp(x_start, curMinX, curMaxX);
 				x_end=clamp(x_end, curMinX, curMaxX);
 				int x,z1;
@@ -1805,7 +1805,7 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 					//xe = ceilFIntF0(x_end);
 					xe = mroundFIntF0(x_end);
 				}
-				// текстурируем строку
+				// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 				//int current_sx = ceilFIntF0(x);
 				int current_sx = mroundFIntF0(x);
 				xassert(current_sy>=0 && current_sy < voxelBitmap.sy);
@@ -1822,7 +1822,7 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 						z1 += dz1;
 					}
 				//}
-				// сдвигаем начальные и конечные значения x/u/v/(1/z)
+				// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ x/u/v/(1/z)
 				x_start += dx_start;
 				x_end += dx_end;
 				z1_start += dz1_start;
@@ -1831,7 +1831,7 @@ bool RES_putModel2VBitmap(const Se3f& pos)
 			}while(current_sy <= mroundFIntF0(c->y));
 		}*/
 	
-//	} //основной алгоритм
+//	} //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	return true;
 }
 
@@ -1902,11 +1902,11 @@ bool TerToolTrack1::quant()
 void TerToolTrack1::serialize(Archive& ar)
 {
 	static ResourceSelector::Options options("*.tga", "RESOURCE\\TerrainData\\TerTools", "Will select location of texture file");
-	ar.serialize(ResourceSelector(terTexture, options), "terTexture", "тертекстура");
-	ar.serialize(terTextureKScale, "terTextureKScale", "масштаб тертекстуры");
-	ar.serialize(r, "r", "радиус");
+	ar.serialize(ResourceSelector(terTexture, options), "terTexture", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(terTextureKScale, "terTextureKScale", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(r, "r", "пїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(r<=0) r=1;
-	//ar.serialize(setingAtrMetod_, "setingAtrMetod_", "Изменение типа поверхности");
+	//ar.serialize(setingAtrMetod_, "setingAtrMetod_", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	TerToolBase::serialize(ar);
 }
 ///////////////////////////////////////////////////////////////////////////////////
@@ -1920,8 +1920,8 @@ TerToolTorpedo::TerToolTorpedo()
 
 void TerToolTorpedo::serialize(Archive& ar)
 {
-	ar.serialize(r, "r", "радиус");
-	//ar.serialize(setingAtrMetod_, "setingAtrMetod_", "Изменение типа поверхности");
+	ar.serialize(r, "r", "пїЅпїЅпїЅпїЅпїЅпїЅ");
+	//ar.serialize(setingAtrMetod_, "setingAtrMetod_", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	TerToolBase::serialize(ar);
 	if(r<=0) r=1;
 }
@@ -2008,12 +2008,12 @@ TerToolTextureBase::TerToolTextureBase()
 void TerToolTextureBase::serialize(Archive& ar)
 {
 	static ResourceSelector::Options options("*.tga", "RESOURCE\\TerrainData\\TerTools", "Will select location of texture file");
-	ar.serialize(ResourceSelector(terTexture, options), "terTexture", "тертекстура");
-	ar.serialize(terTextureKScale, "terTextureKScale", "масштаб тертекстуры");
-	ar.serialize(drawMetod, "drawMetod", "Метод отрисовки");
+	ar.serialize(ResourceSelector(terTexture, options), "terTexture", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(terTextureKScale, "terTextureKScale", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(drawMetod, "drawMetod", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(drawMetod==DM_ReliefBitmapPressIn || drawMetod==DM_ReliefBitmapSwellOut)
-        ar.serialize(vScale, "vScale", "масштаб высоты");
-	ar.serialize(r, "r", "радиус");
+        ar.serialize(vScale, "vScale", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(r, "r", "пїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(r<=0) r=1;
 }
 
@@ -2027,12 +2027,12 @@ TerToolTexture::TerToolTexture()
 void TerToolTexture::serialize(Archive& ar)
 {
 	TerToolTextureBase::serialize(ar);
-	ar.serialize(amountFrame, "amountFrame", "количество кадров");
-	//ar.serialize(setingAtrMetod_, "setingAtrMetod_", "Изменение типа поверхности");
+	ar.serialize(amountFrame, "amountFrame", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	//ar.serialize(setingAtrMetod_, "setingAtrMetod_", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	TerToolBase::serialize(ar);
 	if(amountFrame<=0) amountFrame=0;
 
-	ar.serialize(flag_restoreSurface, "flag_restoreSurface", "Восстанавливать поверхность");
+	ar.serialize(flag_restoreSurface, "flag_restoreSurface", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 
@@ -2111,7 +2111,7 @@ bool TerToolTexture::quant()
 		if(!pbmp) return false;
 		if(pbmp->pAlfaLayer==0) {
 			xassert(0 && "bitmap track Alfa not present!");
-			return false; //Не может быть без альфы следа по битмапу
+			return false; //пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		}
 		float sx05=(pbmp->size.y-1)*quantCnt/(amountFrame*2.f);
 		float sy05=(pbmp->size.x-1)*quantCnt/(amountFrame*2.f);
@@ -2203,10 +2203,10 @@ TerToolTextureTrack::TerToolTextureTrack()
 void TerToolTextureTrack::serialize(Archive& ar)
 {
 	TerToolTextureBase::serialize(ar);
-	ar.serialize(moveMetod, "moveMetod", "метод перемещения");
-	ar.serialize(step, "step", "шаг");
-	ar.serialize(deltaStep, "deltaStep", "относительная дельта шага");
-	//ar.serialize(setingAtrMetod_, "setingAtrMetod_", "Изменение типа поверхности");
+	ar.serialize(moveMetod, "moveMetod", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(step, "step", "пїЅпїЅпїЅ");
+	ar.serialize(deltaStep, "deltaStep", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+	//ar.serialize(setingAtrMetod_, "setingAtrMetod_", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	TerToolBase::serialize(ar);
 }
 
@@ -2308,7 +2308,7 @@ bool TerToolTextureTrack::quant()
 			if(!pbmpc) return false;
 			if(pbmpc->pAlfaLayer==0) {
 				xassert(0 && "bitmap track Alfa not present!");
-				return false; //Не может быть без альфы следа по битмапу
+				return false; //пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			}
 			bmpsize = pbmpc->size;
 		}
@@ -2317,8 +2317,8 @@ bool TerToolTextureTrack::quant()
 			if(!pbmpv) return false;
 			bmpsize = pbmpv->size;
 		}
-		if(moveMetod==MM_Uninterrupted){ //Непрерывный след
-			//минимальный шаг при повороте
+		if(moveMetod==MM_Uninterrupted){ //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+			//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			if(curpos.trans().distance2(prevPos.trans()) < sqr(bmpsize.x*terTextureKScale/2) ) 
 				return true;
 			bool flag_changeOrientation;
@@ -2336,12 +2336,12 @@ bool TerToolTextureTrack::quant()
 				curpos.trans()=c;
 			}
 		}
-		else if(moveMetod==MM_ChangePosition){ //для следов работающих по анимации
+		else if(moveMetod==MM_ChangePosition){ //пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			//if(curpos.trans().distance2(prevPos.trans()) < sqr(bmpsize.x*terTextureKScale/2) )
 			if(curpos.trans().distance2(prevPos.trans()) < 1.f)
 				return true;
 		}
-		else if(moveMetod==MM_Stepwise){ //для следов у которых задается шаг
+		else if(moveMetod==MM_Stepwise){ //пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 			if(curpos.trans().distance2(prevPos.trans()) < sqr(curstep) )
 				return true;
 			//const float minstep=step-0.5f*deltaStep;
@@ -2353,7 +2353,7 @@ bool TerToolTextureTrack::quant()
 			curpos.trans()=c;
 			curstep = bmpsize.x*terTextureKScale*(step + logicRNDfrnd(deltaStep));
 		}
-		else //не подерживаемые режимы
+		else //пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			return false;
 
 		float sx2=(bmpsize.y*terTextureKScale-1)/2.f;
@@ -2392,7 +2392,7 @@ bool TerToolTextureTrack::quant()
 		prevPos=curpos;
 		return true;
 	}
-	else //не поддерживаемый тип метода
+	else //пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		return false;
 
 	return true;
@@ -2509,9 +2509,9 @@ void TerToolTextureBase::draw4SidePolygon(Vertex2i point[4], Bitmap8* pBmp, sBit
 	else { dx_start=0; du_start=0; dv_start=0; }
 //#ifdef SUBPIXEL
 	//tmp = ceilFIntF16(a->y) - a->y;
-	//x_start += (dx_start>>8) * (tmp>>8); //Норма
-	//u_start += (du_start>>8) * (tmp>>8); //Норма
-	//v_start += (dv_start>>8) * (tmp>>8); //Норма
+	//x_start += (dx_start>>8) * (tmp>>8); //пїЅпїЅпїЅпїЅпїЅ
+	//u_start += (du_start>>8) * (tmp>>8); //пїЅпїЅпїЅпїЅпїЅ
+	//v_start += (dv_start>>8) * (tmp>>8); //пїЅпїЅпїЅпїЅпїЅ
 //#endif
 	//int current_sy=ceilFIntF0(a->y);
 	int current_sy=mroundFIntF0(a->y);
@@ -2528,13 +2528,13 @@ void TerToolTextureBase::draw4SidePolygon(Vertex2i point[4], Bitmap8* pBmp, sBit
 		else {dx_end =0; du_end=0; dv_end=0; }
 //#ifdef SUBPIXEL
 		//tmp = ceilFIntF16(a->y) - (a->y);
-		//x_end += (dx_end>>8) * (tmp>>8); //Норма
-		//u_end += (du_end>>8) * (tmp>>8); //Норма
-		//v_end += (dv_end>>8) * (tmp>>8); //Норма
+		//x_end += (dx_end>>8) * (tmp>>8); //пїЅпїЅпїЅпїЅпїЅ
+		//u_end += (du_end>>8) * (tmp>>8); //пїЅпїЅпїЅпїЅпїЅ
+		//v_end += (dv_end>>8) * (tmp>>8); //пїЅпїЅпїЅпїЅпїЅ
 //#endif
-		// построчная отрисовка грани
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		do {
-			// x_start должен находиться левее x_end
+			// x_start пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ x_end
 			x_start=clamp(x_start, curMinX, curMaxX);
 			x_end=clamp(x_end, curMinX, curMaxX);
 			int x,u,v,length;
@@ -2552,7 +2552,7 @@ void TerToolTextureBase::draw4SidePolygon(Vertex2i point[4], Bitmap8* pBmp, sBit
 				length = ceilFIntF0(x_end) - ceilFIntF0(x_start);
 				xe = ceilFIntF0(x_end);
 			}
-			// текстурируем строку
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			int current_sx = ceilFIntF0(x);
 			if((current_sy) >= 0 ) if (length) {
 	//#ifdef SUBTEXEL
@@ -2572,7 +2572,7 @@ void TerToolTextureBase::draw4SidePolygon(Vertex2i point[4], Bitmap8* pBmp, sBit
 					v += dv;
 				}
 			}
-			// сдвигаем начальные и конечные значения x/u/v/(1/z)
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ x/u/v/(1/z)
 			x_start += dx_start;
 			x_end += dx_end;
 			u_start += du_start;
@@ -2595,15 +2595,15 @@ void TerToolTextureBase::draw4SidePolygon(Vertex2i point[4], Bitmap8* pBmp, sBit
 	else{ dx_end=0; du_end=0; dv_end=0; }
 //#ifdef SUBPIXEL
 	//tmp = ceilFIntF16(b->y) - b->y;
-	//x_end += (dx_end>>8) * (tmp>>8); //Норма
-	//u_end += (du_end>>8) * (tmp>>8); //Норма
-	//v_end += (dv_end>>8) * (tmp>>8); //Норма
+	//x_end += (dx_end>>8) * (tmp>>8); //пїЅпїЅпїЅпїЅпїЅ
+	//u_end += (du_end>>8) * (tmp>>8); //пїЅпїЅпїЅпїЅпїЅ
+	//v_end += (dv_end>>8) * (tmp>>8); //пїЅпїЅпїЅпїЅпїЅ
 //#endif
 	if(mroundFIntF0(c->y) > current_sy) {
-		// построчная отрисовка грани
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		do {
 			//if((current_sy) >= imaxY ) break;
-			// x_start должен находиться левее x_end
+			// x_start пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ x_end
 			x_start=clamp(x_start, curMinX, curMaxX);
 			x_end=clamp(x_end, curMinX, curMaxX);
 			int x,u,v,length;
@@ -2621,7 +2621,7 @@ void TerToolTextureBase::draw4SidePolygon(Vertex2i point[4], Bitmap8* pBmp, sBit
 				length = ceilFIntF0(x_end) - ceilFIntF0(x_start);
 				xe = ceilFIntF0(x_end);
 			}
-			// текстурируем строку
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			int current_sx = ceilFIntF0(x);
 			if((current_sy) >= 0 ) if (length) {
 	//#ifdef SUBTEXEL
@@ -2641,7 +2641,7 @@ void TerToolTextureBase::draw4SidePolygon(Vertex2i point[4], Bitmap8* pBmp, sBit
 					v += dv;
 				}
 			}
-			// сдвигаем начальные и конечные значения x/u/v/(1/z)
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ x/u/v/(1/z)
 			x_start += dx_start;
 			x_end += dx_end;
 			u_start += du_start;
@@ -2652,7 +2652,7 @@ void TerToolTextureBase::draw4SidePolygon(Vertex2i point[4], Bitmap8* pBmp, sBit
 		}while(current_sy < mroundFIntF0(c->y));
 	}
 	if(mroundFIntF0(d->y) >= current_sy) {
-		x_start = c->x; /// обязательно???
+		x_start = c->x; /// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ???
 		u_start = c->u;
 		v_start = c->v;
 		divisor=(d->y - c->y);
@@ -2664,13 +2664,13 @@ void TerToolTextureBase::draw4SidePolygon(Vertex2i point[4], Bitmap8* pBmp, sBit
 		else { dx_start=0; du_start=0; dv_start=0; }
 	//#ifdef SUBPIXEL
 		//tmp = ceilFIntF16(c->y) - c->y;
-		//x_start += (dx_start>>8) * (tmp>>8); //Норма
-		//u_start += (du_start>>8) * (tmp>>8); //Норма
-		//v_start += (dv_start>>8) * (tmp>>8); //Норма
+		//x_start += (dx_start>>8) * (tmp>>8); //пїЅпїЅпїЅпїЅпїЅ
+		//u_start += (du_start>>8) * (tmp>>8); //пїЅпїЅпїЅпїЅпїЅ
+		//v_start += (dv_start>>8) * (tmp>>8); //пїЅпїЅпїЅпїЅпїЅ
 	//#endif
-		// построчная отрисовка грани
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		do {
-			// x_start должен находиться левее x_end
+			// x_start пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ x_end
 			x_start=clamp(x_start, curMinX, curMaxX);
 			x_end=clamp(x_end, curMinX, curMaxX);
 			int x,u,v,length;
@@ -2688,7 +2688,7 @@ void TerToolTextureBase::draw4SidePolygon(Vertex2i point[4], Bitmap8* pBmp, sBit
 				length = ceilFIntF0(x_end) - ceilFIntF0(x_start);
 				xe = ceilFIntF0(x_end);
 			}
-			// текстурируем строку
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			int current_sx = ceilFIntF0(x);
 			if((current_sy) >= 0 ) if (length) {
 	//#ifdef SUBTEXEL
@@ -2708,7 +2708,7 @@ void TerToolTextureBase::draw4SidePolygon(Vertex2i point[4], Bitmap8* pBmp, sBit
 					v += dv;
 				}
 			}
-			// сдвигаем начальные и конечные значения x/u/v/(1/z)
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ x/u/v/(1/z)
 			x_start += dx_start;
 			x_end += dx_end;
 			u_start += du_start;
@@ -2729,7 +2729,7 @@ void TerToolTextureBase::draw4SidePolygon(Vertex2i point[4], Bitmap8* pBmp, sBit
 	//vMap.regRender(minx, miny, maxx, maxy);
 	point[0].x=ceilFIntF0(curMinX);
 	point[1].x=ceilFIntF0(curMaxX);
-	//a и d указатели ! на point[]
+	//a пїЅ d пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ! пїЅпїЅ point[]
 	int ominY=ceilFIntF0(a->y);
 	int omaxY=ceilFIntF0(d->y);
 	point[0].y=ominY;
@@ -2897,14 +2897,14 @@ void TerToolCtrl::serialize(Archive& ar)
 	//}
 
 	ar.serialize(terrainType_, "terrainType", "terrainType");
-	ar.serialize(terToolReference, "terToolReference", "&Тертулзер");
+	ar.serialize(terToolReference, "terToolReference", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	//if( !ar.isEdit() || (terToolReference && terToolReference->isPermitChangeModel()) )
-	//	ar.serialize(ModelSelector(modelName), "modelName", "Имя модели");
-	ar.serialize(scaleFactor, "scaleFactor", "&Масштаб");
+	//	ar.serialize(ModelSelector(modelName), "modelName", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(scaleFactor, "scaleFactor", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(!ar.isEdit()) {
 		ar.serialize(currentScaleFactor, "currentScaleFactor", 0);
 	}
-	ar.serialize(scaleFactorTerrainType, "scaleFactorTerrainType", "&Масштаб для поверхности(коэф.)");
+	ar.serialize(scaleFactorTerrainType, "scaleFactorTerrainType", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ(пїЅпїЅпїЅпїЅ.)");
 }
 
 void TerToolCtrl::start(const Se3f& pos, float _scaleFactor)
@@ -2928,8 +2928,8 @@ void TerToolCtrl::setPosition(const Se3f& pos)
 {
 	if(isEmpty())
 		return;
-	int xg=round(pos.trans().x)>>kmGrid;
-	int yg=round(pos.trans().y)>>kmGrid;
+	int xg=(int)round(pos.trans().x)>>kmGrid;
+	int yg=(int)round(pos.trans().y)>>kmGrid;
 	char surkind=vMap.getSurKindG(xg, yg);
 	xassert(surkind>=0 && surkind<TERRAIN_TYPES_NUMBER);
 	if(terToolID==TerToolsDispatcher::NOT_TERTOOL_ID && terToolReference->terTool){
@@ -2963,14 +2963,14 @@ void TerToolLibElement::serialize(Archive& ar)
 	}
 
 
-	if(!ar.serialize(terTool, "terTool", "&Тертулзер")){
+	if(!ar.serialize(terTool, "terTool", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")){
 		if(ar.isInput()){
 			ShareHandle<TerToolBase> terToolNrml;
 			ShareHandle<TerToolBase> terToolInds;
-			ar.serialize(terToolNrml, "terToolNrml", "&Тертулзер для обычной поверхности");
+			ar.serialize(terToolNrml, "terToolNrml", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			terTool=terToolNrml;
 			terToolNrml=0;
-			ar.serialize(terToolInds, "terToolInds", "&Тертулзер для неразрушаемой поверхности");
+			ar.serialize(terToolInds, "terToolInds", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			if(terToolInds){
 				TerToolLibElement tmp(*this);
 				tmp.terTool=terToolInds;
@@ -2980,7 +2980,7 @@ void TerToolLibElement::serialize(Archive& ar)
 			}
 		}
 	}
-	//ar.serializeArray(interplayArr, "interplayArr", "Типы поверхности для взаимодействия");
+	//ar.serializeArray(interplayArr, "interplayArr", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 bool TerToolCtrl::isFinished() const 

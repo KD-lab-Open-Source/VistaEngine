@@ -1,7 +1,7 @@
 #ifndef __DIRECT_CONTROL_MODE_H__
 #define __DIRECT_CONTROL_MODE_H__
 
-enum DirectControlMode
+enum DirectControlMode : int
 {
 	DIRECT_CONTROL_DISABLED = 0,
 	DIRECT_CONTROL_ENABLED = 1,

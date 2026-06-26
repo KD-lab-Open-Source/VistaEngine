@@ -4,7 +4,7 @@
 #include "XMath/xmath.h"
 #include "XMath/Colors.h"
 #include "XTL/Handle.h"
-Render/src/VisGrid2d.h
+#include "Render/src/VisGrid2d.h"
 
 enum INTERSECT_CIRCLE
 {

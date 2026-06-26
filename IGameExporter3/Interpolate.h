@@ -1,6 +1,6 @@
 #pragma once
 
-Render/3dx/Interpolator3dx.h
+#include "Render/3dx/Interpolator3dx.h"
 #include "InvertMatrix.h"
 
 template<int _size>

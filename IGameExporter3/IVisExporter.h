@@ -10,7 +10,7 @@
 #include "cs/Phyexp.h"
 #include "cs/bipexp.h"
 
-Render/3dx/Static3dxBase.h
+#include "Render/3dx/Static3dxBase.h"
 
 class IVisMaterial;
 class IVisTexmap;

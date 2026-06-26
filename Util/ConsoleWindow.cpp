@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "ConsoleWindow.h"
-mfc/PopupMenu.h
-Serialization/Serialization.h
+#include "mfc/PopupMenu.h"
+#include "Serialization/Serialization.h"
 
 #include <string.h>
 #include <commctrl.h>

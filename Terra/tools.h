@@ -1,7 +1,7 @@
 #ifndef __TOOLS_H__
 #define __TOOLS_H__
 
-Render/3dx/Umath.h
+#include "Render/3dx/Umath.h"
 #include "Terra.h"
 #include "vMap.h"
 
@@ -89,7 +89,7 @@ extern int curBmpIndex;
 extern void PutTrackPoints(int num_track);
 
 
-//возвращает в указателе на слово следующее слово, а указатель на буфер передвигает
+//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 inline int get_world_in_buf(char*& buf, char* world)
 {
 	int counter=0;
@@ -149,7 +149,7 @@ inline void damagingBuildingsTolzerS(int _x, int _y, int _r)
 }
 
 
-enum toolzer2TerrainEffect {
+enum toolzer2TerrainEffect : int {
 	T2TE_PLOTTING_VERY_LIGHT_DAM,
 	T2TE_ALIGNMENT_TERRAIN_4ZP,
 	T2TE_ALIGNMENT_TERRAIN_VARIABLE_H,
@@ -208,9 +208,9 @@ public:
 				ia++;
 			}
 		}
-		//Эта операция должна быть совмещена с рендером
+		//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		vMap.recalcArea2Grid(vMap.XCYCL(begx-1), vMap.YCYCL(begy-1), vMap.XCYCL(begx + sx+1), vMap.YCYCL(begy + sy+1) );
-		vMap.regRender(vMap.XCYCL(begx-1), vMap.YCYCL(begy-1), vMap.XCYCL(begx + sx+1), vMap.YCYCL(begy + sy+1) );
+		vMap.regRender(vMap.XCYCL(begx-1), vMap.YCYCL(begy-1), vMap.XCYCL(begx + sx+1), vMap.YCYCL(begy + sy+1), vrtMap::TypeCh_Height|vrtMap::TypeCh_Texture );
 
 		return 0;
 	}
@@ -287,7 +287,7 @@ public:
 			locp++;
 		}
 		else {
-			const int DH_MEAN = 1; //дельта по которой усредняются высоты
+			const int DH_MEAN = 1; //пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			int cx,h,cy,cx_;
 			if(eql){
 				mean = k = 0;
@@ -433,7 +433,7 @@ public:
 			}
 		}
 
-		//Эта операция должна быть совмещена с рендером
+		//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		vMap.recalcArea2Grid(vMap.XCYCL(begx-1), vMap.YCYCL(begy-1), vMap.XCYCL(begx + 2*rad+1), vMap.YCYCL(begy + 2*rad+1) );
 		vMap.regRender(vMap.XCYCL(begx-1), vMap.YCYCL(begy-1), vMap.XCYCL(begx + 2*rad+1), vMap.YCYCL(begy + 2*rad+1), vrtMap::TypeCh_Height );
 
@@ -465,14 +465,14 @@ public:
 
 		case T2TE_ALIGNMENT_TERRAIN_4ZP:
 			if( dV >0 ){
-				if(v < hAppr){//Воздействие если инструмент добавляет и высота меньше hAppr
+				if(v < hAppr){//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ hAppr
 					v+=dV;
 					if(v>hAppr) v=hAppr;
 					vMap.putAlt(offB, v);
 				}
 			}
 			else {
-				if(v > hAppr){//Воздействие если инструмент убирает и высота больше hAppr
+				if(v > hAppr){//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ hAppr
 					v+=dV;
 					if(v<hAppr) v=hAppr;
 					vMap.putAlt(offB, v);
@@ -483,7 +483,7 @@ public:
 			break;
 		case T2TE_ALIGNMENT_TERRAIN_VARIABLE_H:
 			if( dV >0 ){
-				if(v < hAppr){//Воздействие если инструмент добавляет и высота меньше hAppr
+				if(v < hAppr){//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ hAppr
 					v+=dV;
 					if(v>hAppr) v=hAppr;
 					vMap.putAlt(offB, v);
@@ -491,7 +491,7 @@ public:
 				}
 			}
 			else {
-				if(v > hAppr){//Воздействие если инструмент убирает и высота больше hAppr
+				if(v > hAppr){//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ hAppr
 					v+=dV;
 					if(v<hAppr) v=hAppr;
 					vMap.putAlt(offB, v);
@@ -502,13 +502,13 @@ public:
 			break;
 		case T2TE_CHANGING_TERRAIN_HEIGHT_IFNOTZP:
 		case T2TE_CHANGING_TERRAIN_HEIGHT:
-			if( dV >0 ){ //инструмент добавляет
+			if( dV >0 ){ //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				v+=dV;
 				if(v>MAX_VX_HEIGHT) v=MAX_VX_HEIGHT;
 				vMap.putAlt(offB, v);
 				return dV;
 			}
-			else { //if(dV <=0)  инструмент убирает 
+			else { //if(dV <=0)  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
 				v+=dV;
 				if(v< MIN_VX_HEIGHT) v=MIN_VX_HEIGHT;
 				vMap.putAlt(offB, v);
@@ -573,7 +573,7 @@ inline void clearAtrBaseOfBuildingCorrupt(int x, int y, int rad)
 		int offGB=vMap.offsetGBuf(0,vMap.YCYCLG(j));
 		for(i=begxg; i<=endxg; i++){
 			int curoff=offGB+vMap.XCYCLG(i);
-			if(vMap.gABuf[curoff]&GRIDAT_BUILDING && ((vMap.gABuf[curoff]&GRIDAT_LEVELED)==0) ) continue; //в случае здания только с полностью выровненной поверхноти снимается аттрибут поврежденной
+			if(vMap.gABuf[curoff]&GRIDAT_BUILDING && ((vMap.gABuf[curoff]&GRIDAT_LEVELED)==0) ) continue; //пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			vMap.gABuf[curoff]&=~GRIDAT_BASE_OF_BUILDING_CORRUPT;
 		}
 	}

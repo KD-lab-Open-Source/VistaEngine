@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 
-kdw/Win32/Types.h
+#include "kdw/Win32/Types.h"
 
 #include "kdw/Window.h"
 #include "kdw/Application.h"

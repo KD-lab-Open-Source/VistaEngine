@@ -6,7 +6,7 @@
 #include "SurToolAux.h"
 
 #include "ObjectSpreader.h"
-MFC/SizeLayoutManager.h
+#include "MFC/SizeLayoutManager.h"
 #include "XTL/sigslot.h"
 #include "EventListeners.h"
 

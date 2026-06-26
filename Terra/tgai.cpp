@@ -1,6 +1,6 @@
 #include "stdafxTr.h"
 #include "tgai.h"
-Serialization/serialization.h
+#include "Serialization/serialization.h"
 
 void TGAHEAD::save3layers(const char* fname,int sizeX,int sizeY,unsigned char* Ra,unsigned char* Ga,unsigned char* Ba)
 {

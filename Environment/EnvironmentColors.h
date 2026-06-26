@@ -1,8 +1,8 @@
 #ifndef __ENVIRONMENT_COLORS_H__
 #define __ENVIRONMENT_COLORS_H__
 
-Render/src/NParticleKey.h
-Physics/WindMap.h
+#include "Render/src/NParticleKey.h"
+#include "Physics/WindMap.h"
 
 struct SunMoonAttribute{
 	SunMoonAttribute();

@@ -1,11 +1,11 @@
 #ifndef __COMMAND_EDITOR_H_INCLUDED__
 #define __COMMAND_EDITOR_H_INCLUDED__
 
-kdw/Viewport2D.h
-kdw/Plug.h
+#include "kdw/Viewport2D.h"
+#include "kdw/Plug.h"
 #include "kdw/CheckBox.h"
-kdw/Win32/Handle.h
-Units/CommandsQueue.h
+#include "kdw/Win32/Handle.h"
+#include "Units/CommandsQueue.h"
 
 struct Color4c;
 

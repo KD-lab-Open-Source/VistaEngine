@@ -3,11 +3,12 @@
 
 #include <string>
 #include "Handle.h"
+#include "Serialization/Factory.h" // Factory<> used as a default template argument below
 using namespace std;
 
 class Archive;
 
-/// Строка с редактируемыми значениями из списка
+/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 class ComboListString
 {
 public:
@@ -29,7 +30,7 @@ protected:
 	string comboList_;
 };
 
-/// Вектор энумерованных бит
+/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 template<class Enum>
 class BitVector
 {
@@ -47,7 +48,7 @@ private:
 	Value value_;
 };
 
-/// Обертка для сериализации полиморфных указателей по значению enum'а
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ enum'пїЅ
 template<class Enum, class Type, Enum zeroValue, class TypeFactory = Factory<Enum, Type> >
 class EnumToClassSerializer
 {

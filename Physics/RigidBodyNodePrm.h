@@ -1,7 +1,7 @@
 #ifndef __RIGID_BODY_NODE_PRM_H__
 #define __RIGID_BODY_NODE_PRM_H__
 
-Units/Object3dxInterface.h
+#include "Units/Object3dxInterface.h"
 
 struct RigidBodyNodePrm
 {

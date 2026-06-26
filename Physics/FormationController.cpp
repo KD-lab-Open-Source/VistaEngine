@@ -2,7 +2,7 @@
 #include "FormationController.h"
 #include "Universe.h"
 #include "NormalMap.h"
-AI/PFTrap.h
+#include "AI/PFTrap.h"
 #include "Squad.h"
 #include "GlobalAttributes.h"
 
@@ -399,7 +399,7 @@ void FormationUnit::resolvePenetration(const Vect2f& position, float radius)
 
 	Vect2f point = rigidBody_->position2D() - position;
 	if(point.norm2() < FLT_EPS)
-		point = rigidBody_->angle() + ptDirectionAngle();
+		point = static_cast<Vect2f>(rigidBody_->angle() + ptDirectionAngle());
 	point.normalize(radius + rigidBody_->radius());
 	point += position;
 	disableRotationMode();
@@ -950,7 +950,7 @@ bool FormationController::checkNumber(UnitFormationTypeReference unitType, int n
 			++number;
 	
 	if(number == 0){
-		xxassert(!units_.empty(), "Не настроено количество юнитов в скваде");
+		xxassert(!units_.empty(), "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 		return units_.empty();
 	}
 
@@ -1047,7 +1047,7 @@ void FormationController::addToFormation(FormationUnit* unit)
 			return;
 		}
 
-	xxassert(false, "Лишний юнит в скваде или позиции не инициализированны...");
+	xxassert(false, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ...");
 	return;
 }
 
@@ -1387,7 +1387,7 @@ void FormationController::move(float rotSpeed, bool ignoreAngles)
 void FormationController::moveForward(const MovementDirection& direction, bool ignoreAngles)
 {
 	if(moveback()){
-		debugMessage("PT: Едет вперед");
+		debugMessage("PT: пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 		moveback_ = false;
 		stopMoving();
 		return;
@@ -1494,7 +1494,7 @@ bool FormationController::rotateToDirection(const MovementDirection& moveDirecti
 {
 	if(!moveback()){
 		if(canRotate()){
-			debugMessage("PT: Разворот");
+			debugMessage("PT: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			stopMoving();
 			rotate(moveDirection);
 			return true;
@@ -1505,7 +1505,7 @@ bool FormationController::rotateToDirection(const MovementDirection& moveDirecti
 				if(!checkPassabilityBackward(preferedDirection, obstacleList))
 					return false;
 			}
-			debugMessage("PT: Разворот задом");
+			debugMessage("PT: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 			goingAroundBackObstacle_ = false;
 			moveback_ = true;
 			stopMoving();
@@ -1518,7 +1518,7 @@ bool FormationController::rotateToDirection(const MovementDirection& moveDirecti
 	if(checkPassabilityBackward(preferedDirection, obstacleList)){
 		moveBackward(preferedDirection);
 	}else{
-		debugMessage("PT: Препятствия сзади");
+		debugMessage("PT: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 		goingAroundBackObstacle_ = true;	
 		moveback_ = false;
 		stopMoving();
@@ -1547,7 +1547,7 @@ void FormationController::moveAlongWall(const ObstacleList& obstacleList)
 	PossibleMovementDirections directions(sector, 15);
 	computeMoveLinesPassability(directions, obstacleList);
 	if(!goingAroundObstacle_){
-		debugMessage("PT: Объезжает препятствия");
+		debugMessage("PT: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		goingAroundObstacle_ = true;
 		goingLeftAroundObstacle_ = directions.checkLeftBeterThenRight();
 	}
@@ -2064,7 +2064,7 @@ MovementDirection preferedDirection = computeManualDirection();
 if(checkPassability(preferedDirection, obstacleList)){
 moveForward(preferedDirection);
 }else{
-debugMessage("PT: Объезжает препятствия в прямом управлении");
+debugMessage("PT: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 PossibleSector sector = computeForwardSector();
 PossibleMovementDirections directions(sector, 15);
 computeMoveLinesPassability(directions, obstacleList);

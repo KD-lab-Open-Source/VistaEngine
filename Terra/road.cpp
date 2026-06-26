@@ -2,14 +2,14 @@
 
 #include "vmap.h"
 #include "worldFileDispatcher.h"
-Serialization/Serialization.h
-Serialization/XPrmArchive.h
-Serialization/EnumDescriptor.h
+#include "Serialization/Serialization.h"
+#include "Serialization/XPrmArchive.h"
+#include "Serialization/EnumDescriptor.h"
 
 #include "road.h"
 
-Render/src/MultiRegion.h
-Render/src/TileMap.h
+#include "Render/src/MultiRegion.h"
+#include "Render/src/TileMap.h"
 
 const float DEFAULT_EDGE_WIDTH=20.f;
 

@@ -2,12 +2,12 @@
 #define __PERIMETER_GENERIC_CONTROLS_
 
 #include "UnitAttribute.h"
-Serialization/Factory.h
+#include "Serialization/Factory.h"
 #include "Animation.h"
 #include "EffectController.h"
 #include "Timers.h"
 #include "BaseUniverseObject.h"
-XTL/SwapVector.h
+#include "XTL/SwapVector.h"
 #include "Grid2D.h"
 
 class RigidBodyBase;
@@ -18,7 +18,7 @@ class WeaponTarget;
 class InventorySet;
 
 
-/// ненормальное состояние юнита - горение, дымление и т.п.
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅ.пїЅ.
 class AbnormalState
 {
 public:
@@ -135,30 +135,30 @@ public:
 	virtual void updateSkinColor() {}
 
 	//-----------------------------------------------------
-	// Редактор
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	virtual void showEditor();
 
 	virtual void showDebugInfo();
 	void showPathTrackingMap();
 
 	//-----------------------------------------------------
-	//	Координаты
-	virtual void setPose(const Se3f& pose, bool initPose); // true - инициализация - выставление в первый раз с изменением z
-														   // основная функция координатных фич, все остальные сеттеры - просто short-cuts	
+	//	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	virtual void setPose(const Se3f& pose, bool initPose); // true - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ z
+														   // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅ short-cuts	
 	float minimapRadius() const { return radius_ * attr().minimapScale_; }
 
 	//-----------------------------------------------------
-	// Спецэффекты
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 	virtual cObject3dx* model() const { return 0; }
 	virtual c3dx* get3dx() const { return 0; }
 	
-	float height() const { return height_; } // Спецэффекты масштабируются по высоте
+	float height() const { return height_; } // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
 	virtual int modelNodeIndex(const char* node_name) const { return -1; }
 	virtual void setModelNodeTransform(int node_index, const Se3f& pos) {}
 
-	/// старт эффекта
+	/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	bool startEffect(const EffectAttributeAttachable* effect, bool unique = true, int node = -1, int life_time = 0);
 	void startPermanentEffects();
 	bool stopEffect(const EffectAttributeAttachable* effect);
@@ -211,7 +211,7 @@ public:
 
 	//------------------------------------------------
 
-	virtual void mapUpdate(float x0,float y0,float x1,float y1); // Реакция на изменение поверхности земли или воды 
+	virtual void mapUpdate(float x0,float y0,float x1,float y1); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ 
 
 	//---------------------------------------------
 	virtual void graphQuant(float dt) {}
@@ -256,7 +256,7 @@ public:
 
 	void hide(int reason, bool hide);
 	int hiddenLogic() const { return hideReason_ &~ HIDE_BY_FOW; }
-	int hiddenGraphic() const { return hideReason_; } // !!! Не повторяется вызывать только из графики
+	int hiddenGraphic() const { return hideReason_; } // !!! пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 protected:
 	float height_;
@@ -278,7 +278,7 @@ private:
 	Player* player_;
 
 	bool placedIntoDeleteList_;
-	/// вспомогательный юнит: записывать не надо(для редактора)
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ(пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
 	bool auxiliary_;
 
 	int collisionGroup_;
@@ -289,11 +289,11 @@ private:
 		COLOR_CHANGE_PHASE_SET = 1,
 		COLOR_CHANGE_PHASE_RELAX = 2
 	};
-	/// \a true если установлено изменение цвета
+	/// \a true пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	unsigned char colorChange_;
-	/// назначенный цвет
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	UnitColorEffective color_;
-	/// фаза изменения цвета, 0 - цвет по-умолчанию, 1 - цвет из \a colors_
+	/// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, 0 - пїЅпїЅпїЅпїЅ пїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, 1 - пїЅпїЅпїЅпїЅ пїЅпїЅ \a colors_
 	float colorPhase_;
 
 	typedef SwapVector<UnitEffectController> EffectControllers;
@@ -321,28 +321,16 @@ protected:
 	static Player* player_;
 	static const AttributeBase* attribute_;
 
+	// Defined out-of-line below, after the UnitFactory typedef is visible.
+	// Player is only forward-declared here (it is a Game-layer type), so the
+	// player_->addUnit() member access is routed through the non-template
+	// helper unitFactoryAddUnit(), defined in BaseUnit.cpp where Player is complete.
 	template<class Derived>
-	UnitBase* createArg() { 
-		if(!attribute_)
-			return 0;
-		UnitBase* unit = 0;
-		const char* attributeTypeName = UnitFactory::instance().typeName(attribute_->unitClass());
-		if(!strcmp(typeid(Derived).name(), attributeTypeName))
-			unit = new Derived(UnitTemplate(attribute_, player_));
-		else{
-			xassertStr(0 && "Смена класса юнита", (string(typeid(Derived).name()) + " -> " + attributeTypeName).c_str());
-			return UnitBase::create(UnitTemplate(attribute_, player_));
-		}
-		if(!unit->dead()){
-			player_->addUnit(unit);
-			return unit;
-		}
-		else{
-			delete unit;
-			return 0;
-		}
-	}
+	UnitBase* createArg();
 };
+
+// Adds a freshly created unit to its player; defined in BaseUnit.cpp.
+void unitFactoryAddUnit(Player* player, UnitBase* unit);
 
 typedef SerializationFactory<UnitBase, UnitFactoryArg2> UnitSerializationFactory;
 
@@ -354,6 +342,29 @@ struct FactorySelector<UnitBase>
 
 
 typedef Factory<UnitClass, UnitBase, UnitFactoryArg2> UnitFactory;
+
+template<class Derived>
+UnitBase* UnitFactoryArg2::createArg()
+{
+	if(!attribute_)
+		return 0;
+	UnitBase* unit = 0;
+	const char* attributeTypeName = UnitFactory::instance().typeName(attribute_->unitClass());
+	if(!strcmp(typeid(Derived).name(), attributeTypeName))
+		unit = new Derived(UnitTemplate(attribute_, player_));
+	else{
+		xassertStr(0 && "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ", (string(typeid(Derived).name()) + " -> " + attributeTypeName).c_str());
+		return UnitBase::create(UnitTemplate(attribute_, player_));
+	}
+	if(!unit->dead()){
+		unitFactoryAddUnit(player_, unit);
+		return unit;
+	}
+	else{
+		delete unit;
+		return 0;
+	}
+}
 
 class UnitSerializer
 {

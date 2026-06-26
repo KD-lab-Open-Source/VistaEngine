@@ -1,8 +1,8 @@
 #ifndef __TEXTDB_H__
 #define __TEXTDB_H__
 
-XTL/StaticMap.h
-XTL/Handle.h
+#include "XTL/StaticMap.h"
+#include "XTL/Handle.h"
 
 class TextDB : public StaticMap<std::string, std::wstring>
 {

@@ -4,11 +4,11 @@
 #include "UnitInterface.h"
 #include "Interpolation.h"
 #include "Inventory.h"
-XTL/SafeCast.h
+#include "XTL/SafeCast.h"
 #include "Weapon.h"
 #include "StateBase.h"
-Physics/RigidBodyPrm.h
-Physics/RigidBodyUnit.h
+#include "Physics/RigidBodyPrm.h"
+#include "Physics/RigidBodyUnit.h"
 
 class UnitReal;
 class UnitLegionary;

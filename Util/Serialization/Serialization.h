@@ -9,13 +9,14 @@ using namespace std;
 #include "my_stl.h"
 #include "xutil.h"
 
+#include "Factory.h"
 #include "SerializationTypes.h"
 #include "Serialization/ComboStrings.h"
 
 class MemoryBlock;
 
 
-class EnumDescriptor;
+#include "EnumDescriptor.h"
 template<class Enum> const EnumDescriptor& getEnumDescriptor(const Enum& key);
 
 template<class BaseType> class FactoryArg0;
@@ -76,39 +77,36 @@ public:
 };
 };
 
-namespace std {
-template<class T, class A> class list;
-template<class T, class A> class vector;
-template<class T1, class T2> struct pair;
-}
+// Removed: stale STLPort-era forward declarations of std::pair/vector/list.
+// Real declarations come from <vector> and <list> included above.
 
 template<class Pair>
 struct PairSerializationTraits
 {
-	static const char* firstName() { return "&Имя"; }
-	static const char* secondName() { return "&Значение"; }
+	static const char* firstName() { return "&пїЅпїЅпїЅ"; }
+	static const char* secondName() { return "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"; }
 };
 
 ////////////////////////////////////////////////////////////////////
 //
-// Базовый архив.
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.
 //
-// 1. Основная функция serialize принимает константную
-// ссылку на объект (которую меняет), чтобы нормально 
-// работала перегрузка во всех случаях.
-// 2. nameAlt == 0 - не редактировать данное поле.
-// nameAlt начинается с '&' - добавлять значение этого поля к 
-// родительскому.
-// 3. Запрет на открытие нового блока при сериализации пользовательских
-// типов производится определением функции serialize(Archive&, const char*, const char*),
-// вместо стандартной serialize(Archive&). По умолчанию UDT всегда сериализуются
-// с открытием блока.
-// 4. Для сериализации полиморфных указателей использовать serializePolymorphic,
-// ShareHandle или PolymorphicWrapper. Они записывают и воссоздают тип (требуется 
-// регистрация классов (REGISTER_CLASS, когда линковщик отсекает - DECLARE_SEGMENT + FORCE_SEGMENT ).
-// 5. Для сериализации неполиморфных указателей (крайне редкая задача), использовать
-// serializePointer или PointerWrapper.
-// 6. Для массивов - serializeArray, wrapper'а пока нет, но при необходимости  возможен.
+// 1. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ serialize пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ), пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+// 2. nameAlt == 0 - пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ.
+// nameAlt пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ '&' - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ 
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+// 3. пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ serialize(Archive&, const char*, const char*),
+// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ serialize(Archive&). пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ UDT пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+// пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.
+// 4. пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ serializePolymorphic,
+// ShareHandle пїЅпїЅпїЅ PolymorphicWrapper. пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (REGISTER_CLASS, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - DECLARE_SEGMENT + FORCE_SEGMENT ).
+// 5. пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ), пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+// serializePointer пїЅпїЅпїЅ PointerWrapper.
+// 6. пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - serializeArray, wrapper'пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 //
 ////////////////////////////////////////////////////////////////////
 
@@ -139,7 +137,7 @@ public:
 	bool inPlace() const { return inPlace_; }
 
 	void setFilter(int filter) { filter_ = filter; }
-	bool filter(int filter) { xassert("Фильтр не установлен" && filter_); return (filter_ & filter) != 0; }
+	bool filter(int filter) { xassert("пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ" && filter_); return (filter_ & filter) != 0; }
 
     template<class T>
 	bool serialize(const T& t, const char* name, const char* nameAlt) {
@@ -186,14 +184,14 @@ public:
         makeDefaultArchive<T>();
 
         if(isOutput() || inPlace_) {
-            std::vector<T, A>::const_iterator it;
+            typename std::vector<T, A>::const_iterator it;
             FOR_EACH(cont, it){
                 serialize(*it, "@", "@");
             }
         }
         else {
             if(cont_size != -1) {
-                std::vector<T, A>::const_iterator it;
+                typename std::vector<T, A>::const_iterator it;
                 // XXX: HINT!
                 if(cont.size() != cont_size) {
                     cont.clear();
@@ -201,6 +199,42 @@ public:
                 }
                 FOR_EACH(cont, it){
                     serialize(*it, "@", "@");
+                }
+            }
+        }
+        closeContainer(name);
+		return true;
+    }
+
+    // std::vector<bool> is specialised: dereferencing its iterators yields a
+    // proxy reference (e.g. libc++'s __bit_const_reference), not bool&, which
+    // breaks the generic element path (HaveAdvancedSerialization<proxy> probes
+    // a non-existent proxy::serialize). Copy each element through a real bool.
+    template<class A>
+    bool serialize(const std::vector<bool, A>& constCont, const char* name, const char* nameAlt) {
+		std::vector<bool, A>& cont = const_cast<std::vector<bool, A>&>(constCont);
+        int cont_size = (int)cont.size();
+
+		if(!openContainer(&cont, cont_size, name, nameAlt, typeid(std::vector<bool,A>).name(), typeid(bool).name(), sizeof(bool), false))
+			return false;
+        makeDefaultArchive<bool>();
+
+        if(isOutput()) {
+            for(int i = 0; i < (int)cont.size(); ++i) {
+                bool value = cont[i];
+                serialize(value, "@", "@");
+            }
+        }
+        else {
+            if(cont_size != -1) {
+                if((int)cont.size() != cont_size) {
+                    cont.clear();
+                    cont.resize(cont_size);
+                }
+                for(int i = 0; i < cont_size; ++i) {
+                    bool value = cont[i];
+                    serialize(value, "@", "@");
+                    cont[i] = value;
                 }
             }
         }
@@ -222,7 +256,7 @@ public:
 		makeDefaultArchive<T>();
         
 		if(isOutput()) {
-			std::list<T, A>::const_iterator it;
+			typename std::list<T, A>::const_iterator it;
 			FOR_EACH(cont, it){
 				serialize(*it, "@", "@");
 			}
@@ -235,7 +269,7 @@ public:
 						cont.clear();
 					cont.resize(cont_size);
 				}
-				std::list<T, A>::const_iterator it;
+				typename std::list<T, A>::const_iterator it;
 				FOR_EACH(cont, it){
 					serialize(*it, "@", "@");
 				}
@@ -311,12 +345,12 @@ public:
         }
     }
 
-    template<class T> // Для неполиморфных указателей
+    template<class T> // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     bool serializePointer(const T*& t, const char* name, const char* nameAlt) {
 		xassert(!inPlace_);
         if(isInput()) {
             if(!t)
-				const_cast<T*&>(t) = FactorySelector<T>::Factory::instance().createArg<T>(); // FIXME: Создается ненужная фабрика
+				const_cast<T*&>(t) = FactorySelector<T>::Factory::instance().template createArg<T>(); // FIXME: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
       		serialize(*t, name, nameAlt);
 			return true;
         }
@@ -324,7 +358,7 @@ public:
       		if(t)
       			serialize(*t, name, nameAlt);
       		else{
-      			static T* defaultPointer = FactorySelector<T>::Factory::instance().createArg<T>();
+      			static T* defaultPointer = FactorySelector<T>::Factory::instance().template createArg<T>();
       			serialize(*defaultPointer, name, nameAlt);
       			xassert("Attempt to save non-polymorphic zero pointer");
       		}
@@ -332,11 +366,11 @@ public:
         }
     }
 
-    template<class T> // Для полиморфных указателей
-	bool serializePolymorphic(const T*& t, const char* name, const char* nameAlt) {
-		T*& ptr = const_cast<T*&>(t);
+    template<class T> // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	bool serializePolymorphic(T*& t, const char* name, const char* nameAlt) {
+		T*& ptr = t;
 
-		typedef FactorySelector<T>::Factory Factory;
+		typedef typename FactorySelector<T>::Factory Factory;
 		Factory& factory = Factory::instance();
 
 		const char* baseName = typeid(T).name();
@@ -546,7 +580,7 @@ private:
 
     template<class Base>
     void makeDefaultArchivePoly() {
-		typedef FactorySelector<Base>::Factory Factory;
+		typedef typename FactorySelector<Base>::Factory Factory;
 		int count = Factory::instance().size();
 
         for(int i = 0; i < count; ++i) {
@@ -625,7 +659,7 @@ private:
 	friend class MergeBlocksAuto;
 };
 
-/// Обертка для сериализации неполиморфных указателей
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 template<class T>
 class PointerWrapper
 {
@@ -641,7 +675,7 @@ private:
 	T* t_;
 };
 
-/// Обертка для сериализации полиморфных указателей
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 template<class T>
 class PolymorphicWrapper
 {
@@ -659,7 +693,7 @@ private:
 	T* t_;
 };
 
-// Для чтения блоков памяти. Если для чтения передается не нулевой размер, то требуется совпадение.
+// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 class MemoryBlock
 {
 public:
@@ -667,7 +701,7 @@ public:
 	MemoryBlock(void* buffer, int size) : buffer_((char*)buffer), size_(size), makeFree_(false) {}
 	MemoryBlock(XBuffer& buffer) : buffer_(buffer.buffer()), size_(buffer.tell()), makeFree_(false) {}
 
-	MemoryBlock(const MemoryBlock& block); // Выделение и копирование памяти - затратно, но надежно
+	MemoryBlock(const MemoryBlock& block); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	MemoryBlock& operator=(const MemoryBlock& block);
 
 	~MemoryBlock() { free(); }
@@ -679,7 +713,7 @@ public:
 	void free();
 	
 private:
-	char* buffer_; // Должен быть первым элементом в классе
+	char* buffer_; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	int size_;
 	bool makeFree_;
 };

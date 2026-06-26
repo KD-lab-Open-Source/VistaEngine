@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "VoxelBox.h"
-Render/3dx/Node3DX.h
+#include "Render/3dx/Node3DX.h"
 
 VoxelBox::VoxelBox(int sizeLen)
 {

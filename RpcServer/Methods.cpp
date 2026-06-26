@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Methods.h"
-Serialization/BinaryArchive.h
-XmlRpc/XmlRpcValue.h
+#include "Serialization/BinaryArchive.h"
+#include "XmlRpc/XmlRpcValue.h"
 #include "Runtime.h"
 
 using namespace XmlRpc;

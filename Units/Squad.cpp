@@ -11,14 +11,14 @@
 #include "PositionGeneratorCircle.h"
 #include "IronBuilding.h"
 #include "Console.h"
-Serialization/Dictionary.h
-UserInterface/UI_Logic.h
-UserInterface/UI_Minimap.h
-Water/CircleManager.h
-Serialization/SerializationFactory.h
-Terra/vMap.h
-AI/PFTrap.h
-Physics/FormationController.h
+#include "Serialization/Dictionary.h"
+#include "UserInterface/UI_Logic.h"
+#include "UserInterface/UI_Minimap.h"
+#include "Water/CircleManager.h"
+#include "Serialization/SerializationFactory.h"
+#include "Terra/vMap.h"
+#include "AI/PFTrap.h"
+#include "Physics/FormationController.h"
 #include <map>
 
 

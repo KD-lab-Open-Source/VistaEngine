@@ -386,10 +386,10 @@ public:
 
 		// pre-calculate filter contributions for a row
 		short numcontribInPixel;
-		numcontribInPixel= xscale<1.0 ? (int)((filterWidth()/xscale)*2+1+1) : (int)(filterWidth()*2+1+1);
+		numcontribInPixel= xscale<1.0 ? (int)((this->filterWidth()/xscale)*2+1+1) : (int)(this->filterWidth()*2+1+1);
 		ContribList contribListH(dst->xsize, numcontribInPixel);
 		if(xscale < 1.0) {
-			float width = filterWidth() / xscale;
+			float width = this->filterWidth() / xscale;
 			float fscale = 1.0 / xscale;
 			for(i = 0; i < dst->xsize; ++i) {
 				float center = (float) i / xscale; // filter calculation variables
@@ -398,7 +398,7 @@ public:
 				float sumWeight=0;
 				for(j = left; j <= right; ++j) {
 					float weight = center - (float)j; // filter calculation variables
-					weight = getFilterVal(weight / fscale) / fscale;
+					weight = this->getFilterVal(weight / fscale) / fscale;
 					int n; // pixel number
 					if(j < 0) {
 						n = -j;
@@ -419,12 +419,12 @@ public:
 		} else {
 			for(i = 0; i < dst->xsize; ++i) {
 				float center = (float) i / xscale; // filter calculation variables
-				int left = round(ceil(center - filterWidth()));
-				int right = round(floor(center + filterWidth()));
+				int left = round(ceil(center - this->filterWidth()));
+				int right = round(floor(center + this->filterWidth()));
 				float sumWeight=0;
 				for(j = left; j <= right; ++j) {
 					float weight = center - (float) j; // filter calculation variables
-					weight = getFilterVal(weight);
+					weight = this->getFilterVal(weight);
 					int n; // pixel number
 					if(j < 0) {
 						n = -j;
@@ -472,10 +472,10 @@ public:
 		src->resizeH(contribListH, &tmp);
 
 		// pre-calculate filter contributions for a column
-		numcontribInPixel= yscale<1.0 ? (int)((filterWidth()/yscale)*2+1+1) : (int)(filterWidth()*2+1+1);
+		numcontribInPixel= yscale<1.0 ? (int)((this->filterWidth()/yscale)*2+1+1) : (int)(this->filterWidth()*2+1+1);
 		ContribList contribListV(dst->ysize, numcontribInPixel);
 		if(yscale < 1.0f) {
-			float width = filterWidth() / yscale;
+			float width = this->filterWidth() / yscale;
 			float fscale = 1.0f / yscale;
 			for(i = 0; i < dst->ysize; ++i) {
 				float center = (float) i / yscale; // filter calculation variables
@@ -484,7 +484,7 @@ public:
 				float sumWeight=0;
 				for(j = left; j <= right; ++j) {
 					float weight = center - (float) j; // filter calculation variables
-					weight = getFilterVal(weight / fscale) / fscale;
+					weight = this->getFilterVal(weight / fscale) / fscale;
 					int n; // pixel number
 					if(j < 0) {
 						n = -j;
@@ -505,12 +505,12 @@ public:
 		} else {
 			for(i = 0; i < dst->ysize; ++i) {
 				float center = (float) i / yscale; // filter calculation variables
-				int left = round(ceil(center - filterWidth()));
-				int right = round(floor(center + filterWidth()));
+				int left = round(ceil(center - this->filterWidth()));
+				int right = round(floor(center + this->filterWidth()));
 				float sumWeight=0;
 				for(j = left; j <= right; ++j) {
 					float weight = center - (float) j; // filter calculation variables
-					weight = getFilterVal(weight);
+					weight = this->getFilterVal(weight);
 					int n; // pixel number
 					if(j < 0) {
 						n = -j;

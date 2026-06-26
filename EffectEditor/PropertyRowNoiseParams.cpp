@@ -6,7 +6,7 @@
 #include "kdw/Win32/Window.h"
 #include "Render/src/NParticle.h"
 #include "Render/src/NParticleKey.h"
-Serialization/SerializationFactory.h
+#include "Serialization/SerializationFactory.h"
 
 #include "NoiseParamsDialog.h"
 

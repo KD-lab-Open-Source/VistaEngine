@@ -1,10 +1,10 @@
 #include "stdAfx.h"
-AI/PFTrap.h
+#include "AI/PFTrap.h"
 
-#include "universe.h"
-Environment/Environment.h
-Terra/vmap.h
-#include "normalMap.h"
+#include "Game/Universe.h"
+#include "Environment/Environment.h"
+#include "Terra/vmap.h"
+#include "Physics/NormalMap.h"
 #include "BaseUnit.h"
 #include "UnitEnvironment.h"
 #include "IronBuilding.h"
@@ -276,7 +276,7 @@ inline float PathFinder::PFClusterHeuristic::GetH(PFCluster* pos1, PFCluster* po
 //		else
 //			dist = fabs(d2);
 	
-	// Немного евристики...
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ...
 //	return (40*sqr(dist) + pos2->p.distance(endPoint))*(pos2->y2 - pos2->y1);
 //	return sqr(dist)*(pos1->y2 - pos1->y1) + pos2->p.distance(endPoint)*(pos1->y2 - pos1->y1);
 	return pos2->p.distance(endPoint);

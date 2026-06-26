@@ -1,12 +1,13 @@
 #include "StdAfx.h"
 
-Serialization/Serialization.h
-Serialization/RangedWrapper.h
-Serialization/StringTableImpl.h
+#include "Serialization/Serialization.h"
+#include "Serialization/RangedWrapper.h"
+#include "Serialization/StringTableImpl.h"
+#include "XZip.h"
 
 #include "ZipConfig.h"
 
-WRAP_LIBRARY(ZipConfigTable, "ZipConfigTable", "Настройки zip архивов", "Scripts\\Content\\ZipConfig", 0, 0);
+WRAP_LIBRARY(ZipConfigTable, "ZipConfigTable", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ zip пїЅпїЅпїЅпїЅпїЅпїЅпїЅ", "Scripts\\Content\\ZipConfig", 0, 0);
 
 ZipConfig::ZipConfig(const char* name) : StringTableBase(name),
 	filesMask_("*.*"),
@@ -23,11 +24,11 @@ void ZipConfig::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(zipName_, "zipName", "Имя zip файла");
-	ar.serialize(path_, "path", "Путь к файлам");
-	ar.serialize(filesMask_, "filesMask", "Паковать файлы");
-	ar.serialize(excludeFilesMask_, "excludeFilesMask", "Исключить файлы");
-	ar.serialize(RangedWrapperi(compressionLevel_, 0, 9), "compressionLevel", "Степень сжатия");
+	ar.serialize(zipName_, "zipName", "пїЅпїЅпїЅ zip пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(path_, "path", "пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(filesMask_, "filesMask", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(excludeFilesMask_, "excludeFilesMask", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(RangedWrapperi(compressionLevel_, 0, 9), "compressionLevel", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 bool ZipConfig::isEmpty() const

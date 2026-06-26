@@ -116,11 +116,11 @@ namespace CD
 		{
 			return distance_;
 		}
-		xm_inline bool operator<(DualityVertexFV b)
+		xm_inline bool operator<(DualityVertexFV b) const
 		{
 			return distance_ < b.distance_;
 		}
-		xm_inline bool operator>(DualityVertexFV b)
+		xm_inline bool operator>(DualityVertexFV b) const
 		{
 			return distance_ > b.distance_;
 		}

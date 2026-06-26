@@ -2,6 +2,7 @@
 #define __SERIALIZEABLE_H_INCLUDED__
 
 #include "Handle.h"
+#include "Serialization.h"
 
 class Archive;
 

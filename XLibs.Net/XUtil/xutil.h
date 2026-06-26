@@ -77,7 +77,7 @@ public:
 	XBuffer& operator< (double v) { return write(v); }
 	XBuffer& operator< (long double v) { return write(v); }
 
-	XBuffer& operator> (char* v);//Впринципе этот оператор определён корректно, но лучше не пользоваться, потому как слишком легко за пределы блока записать.
+	XBuffer& operator> (char* v);//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	XBuffer& operator> (bool& v) { return read(v); }
 	XBuffer& operator> (char& v) { return read(v); }
 	XBuffer& operator> (unsigned char& v) { return read(v); }
@@ -425,6 +425,7 @@ __forceinline int SIGN(const T& x) { return x ? (x > 0 ? 1 : -1 ) : 0; }
 
 #endif __ROUND__
 
+#ifdef _WIN32
 __forceinline int BitSR(int x)
 {
 	int return_var;
@@ -438,6 +439,13 @@ __forceinline int BitSR(int x)
 	}
 	return return_var;
 }
+#else
+inline int BitSR(int x)
+{
+	unsigned v = (unsigned)(x < 0 ? -x : x);
+	return v ? (31 - __builtin_clz(v)) : 0;
+}
+#endif
 
 int xclock();
 
@@ -445,14 +453,14 @@ void xtDeleteFile(char* fname);
 
 ///////////////////////////////////
 
-const char* check_command_line(const char* switch_str); // 0 или строка после ключа для анализа
+const char* check_command_line(const char* switch_str); // 0 пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
-template<class T> // Для установки параметров
+template<class T> // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 bool check_command_line_parameter(const char* switch_str, T& parameter) { const char* s = check_command_line(switch_str); if(s){ parameter = atoi(s); return true; } else return false; }
 
-// вывод Unicode текста в консоль
+// пїЅпїЅпїЅпїЅпїЅ Unicode пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 //void dcprintfW(wchar_t *format, ...);
-// вывод Unicode текста в Debug Output
+// пїЅпїЅпїЅпїЅпїЅ Unicode пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ Debug Output
 //void dprintfW(wchar_t *format, ...);
 
 ///////////////////////////////////

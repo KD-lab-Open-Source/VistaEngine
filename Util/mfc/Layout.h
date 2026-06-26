@@ -1,7 +1,7 @@
 #ifndef __LAYOUT_H_INCLUDED__
 #define __LAYOUT_H_INCLUDED__
 
-XTL/Rect.h
+#include "XTL/Rect.h"
 #include "Handle.h"
 #include <list>
 

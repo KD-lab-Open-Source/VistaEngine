@@ -1,10 +1,10 @@
 #ifndef __SIMPLY_3DX_H_INCLUDED__
 #define __SIMPLY_3DX_H_INCLUDED__
 
-Render/Src/observer.h
-Render/Inc/IVisGenericInternal.h
-Render/Inc/IRenderDevice.h
-Render/Src/Texture.h
+#include "Render/Src/observer.h"
+#include "Render/Inc/IVisGenericInternal.h"
+#include "Render/Inc/IRenderDevice.h"
+#include "Render/Src/Texture.h"
 
 class cStatic3dx;
 class cStaticSimply3dx;

@@ -1,11 +1,11 @@
 #pragma once
 
-XTL/Handle.h
-XTL/Map2D.h
-XTL/UniqueVector.h
-XTL/StaticMap.h
-Render/Inc/IRenderDevice.h
-Render/Src/UnkObj.h
+#include "XTL/Handle.h"
+#include "XTL/Map2D.h"
+#include "XTL/UniqueVector.h"
+#include "XTL/StaticMap.h"
+#include "Render/Inc/IRenderDevice.h"
+#include "Render/Src/UnkObj.h"
 
 struct sVertexXYZDT2;
 

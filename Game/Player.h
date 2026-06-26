@@ -1,10 +1,10 @@
 #ifndef __PLAYER_H__
 #define __PLAYER_H__
 
-Network/NetPlayer.h
-Units/UnitPad.h
-Units/Triggers.h
-TriggerEditor/TriggerExport.h
+#include "Network/NetPlayer.h"
+#include "Units/UnitPad.h"
+#include "Units/Triggers.h"
+#include "TriggerEditor/TriggerExport.h"
 #include "PlayerStatistics.h"
 #include "Starforce.h"
 

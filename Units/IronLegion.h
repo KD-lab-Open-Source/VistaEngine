@@ -2,7 +2,7 @@
 #define __IRONLEGION_H__
 
 #include "UnitActing.h"
-Physics/FormationController.h
+#include "Physics/FormationController.h"
 
 class Squad;
 class AttributeSquad;

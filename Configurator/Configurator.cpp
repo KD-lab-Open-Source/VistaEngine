@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "Configurator.h"
 #include "ConfiguratorDlg.h"
-FileUtils/FileUtils.h
-Game/GameOptions.h
+#include "FileUtils/FileUtils.h"
+#include "Game/GameOptions.h"
 
-Serialization/Dictionary.h
+#include "Serialization/Dictionary.h"
 #include "ZipConfig.h"
 #include "kdw/Win32/Window.h"
 #include "kdw/kdWidgetsLib.h"

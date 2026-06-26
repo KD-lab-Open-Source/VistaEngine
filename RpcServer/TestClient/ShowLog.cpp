@@ -2,7 +2,7 @@
 #include "ShowLog.h"
 #include <time.h>
 
-kdw/ObjectsTree.h
+#include "kdw/ObjectsTree.h"
 
 ClientLog::ClientLog()
 {

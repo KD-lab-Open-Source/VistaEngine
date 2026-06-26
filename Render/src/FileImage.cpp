@@ -16,12 +16,12 @@
 #include <sys/stat.h>
 #include <io.h>
 
-Render/3dx/Umath.h
-Render/Src/filter.h
+#include "Render/3dx/Umath.h"
+#include "Render/Src/filter.h"
 #include "TextureAtlas.h"
-Serialization/Serialization.h
-Render/inc/FileRead.h
-FileUtils/FileUtils.h
+#include "Serialization/Serialization.h"
+#include "Render/inc/FileRead.h"
+#include "FileUtils/FileUtils.h"
 
 #pragma comment (lib,"vfw32") // AVI library
 

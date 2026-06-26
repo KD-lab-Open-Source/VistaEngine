@@ -2,7 +2,7 @@
 #define __GENERIC_FILE_SELECTOR_H_INCLUDED__
 
 #include <string>
-Serialization/Serialization.h
+#include "Serialization/Serialization.h"
 
 class GenericFileSelector {
 public:

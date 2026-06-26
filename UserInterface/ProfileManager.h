@@ -1,11 +1,11 @@
 #ifndef _USERSINGLEPROFILE_H
 #define _USERSINGLEPROFILE_H
 
-Network/NetPlayer.h
-Units/AttributeReference.h
-xtl/StaticMap.h
-xtl/UniqueVector.h
-FileUtils/XGUID.h
+#include "Network/NetPlayer.h"
+#include "Units/AttributeReference.h"
+#include "xtl/StaticMap.h"
+#include "xtl/UniqueVector.h"
+#include "FileUtils/XGUID.h"
 #include "Parameters.h"
 #include "Starforce.h"
 #include "Serialization/ComboStrings.h"

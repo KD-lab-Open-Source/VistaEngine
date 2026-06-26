@@ -2,8 +2,8 @@
 #include "Object3dxInterface.h"
 #include "UnitAttribute.h"
 #include "Console.h"
-Render/src/Scene.h
-Render/src/VisGeneric.h
+#include "Render/src/Scene.h"
+#include "Render/src/VisGeneric.h"
 
 int VisibilityGroupOfSet::visibilitySet_;
 

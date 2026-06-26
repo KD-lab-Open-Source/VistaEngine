@@ -1,10 +1,10 @@
 #ifndef __N_PARTICLE_KEY_H_INCLUDED__
 #define __N_PARTICLE_KEY_H_INCLUDED__
 
-Render/Inc/rd.h
-XMath/Colors.h
-XMath/KeysBase.h
-Serialization/Serialization.h
+#include "Render/Inc/rd.h"
+#include "XMath/Colors.h"
+#include "XMath/KeysBase.h"
+#include "Serialization/Serialization.h"
 
 struct RENDER_API KeyFloat : KeyBase
 {
@@ -22,7 +22,7 @@ struct RENDER_API KeyFloat : KeyBase
 	}
 	void serialize(Archive& ar){
 		KeyBase::serialize(ar);
-		ar.serialize(f, "value", "Значение");		
+		ar.serialize(f, "value", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");		
 	}
 };
 
@@ -113,22 +113,22 @@ public:
 };
 
 /////////////////////////////
-//BackVector Несортированые одинакового типа элементы. Заменить для прозрачности обращение к key, 
-//на vector<bool> stopped_map, написать IsFree.
+//BackVector пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ key, 
+//пїЅпїЅ vector<bool> stopped_map, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ IsFree.
 template <class type>
 class BackVector : public vector<type>
 {
 	vector<int>	stopped;
 	vector<bool> bempty;
 public:
-	bool is_empty(){return size()<=stopped.size();}
+	bool is_empty(){return this->size()<=stopped.size();}
 	type& GetFree();
 	int GetIndexFree();
 	void SetFree(int n);
 	bool IsFree(int n){return bempty[n];}
 	void clear();
 	void Compress();
-	void resize(size_type __n);//Все новые вертексы считаются уже использованными.
+	void resize(typename vector<type>::size_type __n);
 };
 
 
@@ -137,8 +137,8 @@ template <class type> int BackVector<type>::GetIndexFree()
 	int FreeParticle=-1;
 	if(stopped.empty())
 	{
-		FreeParticle=size();
-		push_back(type());
+		FreeParticle=this->size();
+		this->push_back(type());
 		bempty.push_back(false);
 	}else
 	{
@@ -172,14 +172,14 @@ void BackVector<type>::SetFree(int n)
 template <class type>
 void BackVector<type>::Compress()
 {
-	if(size()<6)
+	if(this->size()<6)
 		return;
-	if(stopped.size()*2<=size())
+	if(stopped.size()*2<=this->size())
 		return;
 	stopped.clear();
 	int curi=0;
 	int i;
-	for(i=0;i<size();i++)
+	for(i=0;i<(int)this->size();i++)
 	{
 		//if((*this)[i].key!=-1)
 		if(!bempty[i])
@@ -192,7 +192,7 @@ void BackVector<type>::Compress()
 		}
 	}
 
-	__super::resize(curi);
+	vector<type>::resize(curi);
 	bempty.resize(curi);
 	for(i=0;i<curi;i++)
 		bempty[i]=false;
@@ -202,17 +202,17 @@ template <class type>
 void BackVector<type>::clear()
 {
 	stopped.clear();
-	__super::clear();
+	vector<type>::clear();
 	bempty.clear();
 }
 
 template <class type>
-void BackVector<type>::resize(size_type n)
+void BackVector<type>::resize(typename vector<type>::size_type n)
 {
-	int prev_size=size();
-	xassert(prev_size<=n);
-	xassert(prev_size==bempty.size());
-	__super::resize(n);
+	int prev_size=this->size();
+	xassert(prev_size<=(int)n);
+	xassert(prev_size==(int)bempty.size());
+	vector<type>::resize(n);
 	bempty.resize(n,false);
 
 }

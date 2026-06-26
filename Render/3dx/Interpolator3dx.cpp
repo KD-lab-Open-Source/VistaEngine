@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "Interpolator3dx.h"
-Serialization/Serialization.h
+#include "Serialization/Serialization.h"
 
 void SplineDataBool::serialize(Archive& ar)
 {

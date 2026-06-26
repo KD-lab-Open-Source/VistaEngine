@@ -2,13 +2,13 @@
 #define __D3_D_RENDER_H_INCLUDED__
 
 #include "SlotManager.h"
-Render/shader/shaders.h
+#include "Render/shader/shaders.h"
 #include "DrawType.h"
-Render/Inc/IRenderDevice.h
-Render/Src/TexLibrary.h
+#include "Render/Inc/IRenderDevice.h"
+#include "Render/Src/TexLibrary.h"
 #include "PoolManager.h"
 #include "OcclusionQuery.h"
-Render/Src/VisError.h
+#include "Render/Src/VisError.h"
 
 class cFileImage;
 

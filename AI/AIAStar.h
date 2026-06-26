@@ -5,27 +5,28 @@
 #include <map>
 #include <vector>
 #include <algorithm>
+#include "XMath/SafeMath.h" // isLess / isGreater (float args -> not found via ADL)
 
-#define HEURISTIC_MAX 1.0e6f // Используется для обозначения непроходимых зон
+#define HEURISTIC_MAX 1.0e6f // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 
 ///////////////////////AIAStarGraph/////////////
-//AIAStarGraph - Так-же поиск пути, но ориентированный на поиск в произвольном графе
+//AIAStarGraph - пїЅпїЅпїЅ-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 /*
 class Node
 {
 	typedef ... iterator;
-	iterator begin();//Работа со списком связанных с этой Node нод.
+	iterator begin();//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ Node пїЅпїЅпїЅ.
 	iterator end();
 
-	void* AIAStarPointer;//Используется в AIAStarGraph
+	void* AIAStarPointer;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ AIAStarGraph
 };
 
 class Heuristic
 {
-	float GetH(Node* pos);//Предполагаемые затраты на продвижение из pos1 к окончанию
-	float GetG(Node* pos1,Node* pos2);//Затраты на продвижение из pos1 в pos2
-	bool IsEndPoint(Node* pos);//Рекурсия должна окончиться здесь
-	//то есть класс AIAStar позволяет задавать несколько точек окончания поиска пути
+	float GetH(Node* pos);//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ pos1 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	float GetG(Node* pos1,Node* pos2);//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ pos1 пїЅ pos2
+	bool IsEndPoint(Node* pos);//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	//пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ AIAStar пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 };
 */
 
@@ -38,8 +39,8 @@ public:
 
 	struct OnePoint
 	{
-		TypeH g;//Затраты на продвижение до этой точки
-		TypeH h;//Предполагаемые затраты на продвижение до финиша
+		TypeH g;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+		TypeH h;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		DWORD used;
 		OnePoint* parent;
 		bool is_open;
@@ -53,16 +54,16 @@ protected:
 	vector<OnePoint> chart;
 	type_point_map open_map;
 
-	DWORD is_used_num;//Если is_used_num==used, то ячейка используется
+	DWORD is_used_num;//пїЅпїЅпїЅпїЅ is_used_num==used, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
-	int num_point_examine;//количество посещённых ячеек
-	int num_find_erase;//Сколько суммарно искали ячейки для удаления
+	int num_point_examine;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	int num_find_erase;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	Heuristic* heuristic;
 public:
 	AIAStarGraph();
 
-	//Общее количество узлов. Константа, которая не должна меняться,
-	//пока существует класс, указывающий на неё.
+	//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ,
+	//пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ.
 	void Init(vector<Node>& all_node);
 
 	bool FindPath(Node* from, Heuristic* h, bool considerImpassabilities, vector<Node*>& path);
@@ -100,7 +101,7 @@ template<class Heuristic,class Node,class TypeH>
 void AIAStarGraph<Heuristic,Node,TypeH>::clear()
 {
 	is_used_num=0;
-	vector<OnePoint>::iterator it;
+	typename vector<OnePoint>::iterator it;
 	FOR_EACH(chart,it)
 		it->used=0;
 }
@@ -115,7 +116,7 @@ bool AIAStarGraph<Heuristic,Node,TypeH>::FindPath(Node* from, Heuristic* hr, boo
 	open_map.clear();
 	path.clear();
 	if(is_used_num==0)
-		clear();//Для того, чтобы вызвалась эта строчка, необходимо гиганское время
+		clear();//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	heuristic=hr;
 
 	OnePoint* p=(OnePoint*)from->AIAStarPointer;
@@ -126,13 +127,13 @@ bool AIAStarGraph<Heuristic,Node,TypeH>::FindPath(Node* from, Heuristic* hr, boo
 	p->is_open=true;
 	p->parent=NULL;
 
-	p->self_it = open_map.insert(type_point_map::value_type(p->f(),p));
+	p->self_it = open_map.insert(typename type_point_map::value_type(p->f(),p));
 
 	bool excludeImpassabilities = !considerImpassabilities;
 
 	while(!open_map.empty())
 	{
-		type_point_map::iterator low=open_map.begin();
+		typename type_point_map::iterator low=open_map.begin();
 
 		OnePoint* parent=low->second;
 		Node* node = parent->node;
@@ -150,7 +151,7 @@ bool AIAStarGraph<Heuristic,Node,TypeH>::FindPath(Node* from, Heuristic* hr, boo
 			if(parent->g > heuristicMax)
 				full_path = false;
 
-			//сконструировать путь
+			//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 			Node* p;
 			while(parent)
 			{
@@ -166,8 +167,8 @@ bool AIAStarGraph<Heuristic,Node,TypeH>::FindPath(Node* from, Heuristic* hr, boo
 			return full_path;
 		}
 
-		//для каждого наследника child узла parent
-		Node::iterator it;
+		//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ child пїЅпїЅпїЅпїЅ parent
+		typename Node::iterator it;
 		FOR_EACH(*node,it)
 		{
 			Node* cur_node=*it;
@@ -201,14 +202,14 @@ bool AIAStarGraph<Heuristic,Node,TypeH>::FindPath(Node* from, Heuristic* hr, boo
 			p->g=newg;
 			p->h=heuristic->GetH(node,cur_node);
 
-			p->self_it = open_map.insert(type_point_map::value_type(p->f(),p));
+			p->self_it = open_map.insert(typename type_point_map::value_type(p->f(),p));
 
 			p->is_open=true;
 			p->used=is_used_num;
 		}
 	}
 
-	xassert(!"Очень серьезная ошибка...");
+	xassert(!"пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ...");
 	return false;
 }
 

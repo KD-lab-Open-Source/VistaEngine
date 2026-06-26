@@ -480,7 +480,7 @@ public:
 	static const Mat2f ID;
 };
 // forward transform
-xm_inline const Vect2f operator* (const Mat2f& m, const Vect2f& v) { return Vect2f(v) *= m; }
+xm_inline const Vect2f operator* (const Mat2f& m, const Vect2f& v) { Vect2f r(v); return r *= m; }
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -509,7 +509,7 @@ public:
 	static const MatX2f ID;
 };
 // forward transform
-xm_inline const Vect2f operator* (const MatX2f& m, const Vect2f& v) { return Vect2f(v) *= m; }
+xm_inline const Vect2f operator* (const MatX2f& m, const Vect2f& v) { Vect2f r(v); return r *= m; }
 
 
 
@@ -1820,9 +1820,9 @@ public:
   xm_inline Se3f& operator*= (const Se3f& T) { return postmult(T); }
   xm_inline Se3f operator* (const Se3f& U) const { Se3f T; return T.mult(*this, U); }
 
-  xm_inline interpolate(const Se3f& u, const Se3f& v, float t) { q.slerp(u.q, v.q, t); d.interpolate(u.d, v.d, t); }
+  xm_inline void interpolate(const Se3f& u, const Se3f& v, float t) { q.slerp(u.q, v.q, t); d.interpolate(u.d, v.d, t); }
 
-  xm_inline interpolateExact(const Se3f& u, const Se3f& v, float t) { q.slerpExact(u.q, v.q, t); d.interpolate(u.d, v.d, t); }
+  xm_inline void interpolateExact(const Se3f& u, const Se3f& v, float t) { q.slerpExact(u.q, v.q, t); d.interpolate(u.d, v.d, t); }
 
   //  Invertion  ///////////////////
   xm_inline Se3f& invert(const Se3f& T);		   // T^-1
@@ -4168,7 +4168,7 @@ QuatF operator* (float w,const QuatF& q)
 xm_inline void QuatF::slerp(const QuatF& a,const QuatF& b,float t)
 { 
 	// Slerp(q1,q2,t) = (sin((1-t)*A)/sin(A))*q1+(sin(t*A)/sin(A))*q2 
-	// Но делаем линейную интерполяцию и нормализуем
+	// пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
     float cosom = a.dot(b);
     if(cosom < 0.0){ 

@@ -2,7 +2,7 @@
 #define __SUR_TOOL_SOURCE_H_INCLUDED__
 
 #include "SurToolEditable.h"
-Environment/SourceBase.h
+#include "Environment/SourceBase.h"
 #include "EventListeners.h"
 
 class Archive;

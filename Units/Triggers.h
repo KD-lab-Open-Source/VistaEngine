@@ -19,7 +19,7 @@ class SourceBase;
 template<class ReferenceList>
 bool removeZeros(ReferenceList& referenceList) 
 {
-	ReferenceList::iterator i = std::remove_if(referenceList.begin(), referenceList.end(), logical_not<ReferenceList::value_type>());
+	typename ReferenceList::iterator i = std::remove_if(referenceList.begin(), referenceList.end(), logical_not<typename ReferenceList::value_type>());
 	if(i != referenceList.end()){
 		referenceList.erase(i, referenceList.end());
 		return true;
@@ -27,10 +27,10 @@ bool removeZeros(ReferenceList& referenceList)
 	return false;
 }
 
-template<class ReferenceList, class Element> // стандартный find будет использовать дорогой конструктор
+template<class ReferenceList, class Element> // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ find пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 bool findReference(const ReferenceList& referenceList, const Element* element) 
 {
-	ReferenceList::const_iterator i;
+	typename ReferenceList::const_iterator i;
 	FOR_EACH(referenceList, i)
 		if(*i == element)
 			return true;
@@ -55,12 +55,12 @@ enum RequestResourceType
 	NEED_RESOURCE_TO_FIRE = 1 << 9,
 };
 
-enum UnitsConstruction { // Состояние объекта (построен или строится)
+enum UnitsConstruction { // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
 	CONSTRUCTED = 1,
 	CONSTRUCTING = 2
 };
 
-enum UnitsTransformation { // Состояние объекта
+enum UnitsTransformation { // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	UNIT_STATE_CONSTRUCTED = 1,
 	UNIT_STATE_CONSTRUCTING = 2,
 	UNIT_STATE_UPGRADING = 4
@@ -247,8 +247,8 @@ private:
 };
 
 enum SwitchMode {  
-	OFF = 0, // Выключен
-	ON = 1 // Включен
+	OFF = 0, // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	ON = 1 // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 };
 
 enum SwitchModeTriple {
@@ -258,9 +258,9 @@ enum SwitchModeTriple {
 };
 
 enum SquadMoveMode {
-	WAIT_FOR_ONE, // хотя бы один
-	WAIT_FOR_ALL, // все
-	DO_NOT_WAIT   // не ждать
+	WAIT_FOR_ONE, // пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ
+	WAIT_FOR_ALL, // пїЅпїЅпїЅ
+	DO_NOT_WAIT   // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 };
 
 class EventTime : public Event

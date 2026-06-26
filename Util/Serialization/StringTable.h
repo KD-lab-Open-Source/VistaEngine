@@ -1,12 +1,12 @@
 //////////////////////////////////////////////
-//		Библиотека типов 
+//		пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 
 //////////////////////////////////////////////
 #ifndef __TYPE_LIBRARY_H__
 #define __TYPE_LIBRARY_H__
 
-XTL/StaticMap.h
-Serialization/LibraryWrapper.h
-Serialization/Serializer.h // для редактора
+#include "XTL/StaticMap.h"
+#include "Serialization/LibraryWrapper.h"
+#include "Serialization/Serializer.h" // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 class Archive;
 
@@ -45,7 +45,7 @@ public:
 	int find(const char* name) const;
 	const char* findCStr(int key) const;
 
-    // для редактора, virtuals:
+    // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, virtuals:
     const char*         editorComboList() const{ return comboList_.c_str(); }
 	const char*         editorGroupsComboList() const{ return String::editorGroupsComboList(); }
 	string         editorGroupName(int index) const;

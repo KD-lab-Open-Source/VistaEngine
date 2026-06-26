@@ -2,16 +2,16 @@
 #include "UIEditor.h"
 #include "MainFrame.h"
 #include "EditorView.h"
-Serialization/Dictionary.h
+#include "Serialization/Dictionary.h"
 #include "EditorVisual.h"
 #include "SplashScreen.h"
 #include "kdw/Win32/Window.h"
 
 #include "DebugPrm.h"
-Game/GameOptions.h
-UserInterface/UI_Render.h
+#include "Game/GameOptions.h"
+#include "UserInterface/UI_Render.h"
 
-Util/Win32/DebugSymbolManager.h
+#include "Util/Win32/DebugSymbolManager.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

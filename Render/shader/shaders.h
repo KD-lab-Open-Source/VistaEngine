@@ -1,11 +1,11 @@
 #ifndef __SHADERS_H_INCLUDED__
 #define __SHADERS_H_INCLUDED__
 
-XMath/Colors.h
-XMath/Mat4f.h
-Render/src/Texture.h
-Render/shader/ShaderStorage.h
-Render/D3d/renderstates.h
+#include "XMath/Colors.h"
+#include "XMath/Mat4f.h"
+#include "Render/src/Texture.h"
+#include "Render/shader/ShaderStorage.h"
+#include "Render/D3d/renderstates.h"
 
 struct sDataRenderMaterial
 {

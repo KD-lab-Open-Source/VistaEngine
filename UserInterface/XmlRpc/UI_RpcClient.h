@@ -1,7 +1,7 @@
 #ifndef __VISTARPC_UI_RPC_CLIENT_H_INCLUDED__
 #define __VISTARPC_UI_RPC_CLIENT_H_INCLUDED__
 
-FileUtils/XGUID.h
+#include "FileUtils/XGUID.h"
 //#include "MTSection.h"
 
 class Archive;

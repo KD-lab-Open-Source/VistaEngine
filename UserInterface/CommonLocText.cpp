@@ -1,8 +1,8 @@
 #include "StdAfx.h"
 #include "CommonLocText.h"
-Serialization/Serialization.h
-Serialization/EnumDescriptor.h
-UserInterface/UI_Key.h
+#include "Serialization/Serialization.h"
+#include "Serialization/EnumDescriptor.h"
+#include "UserInterface/UI_Key.h"
 
 WRAP_LIBRARY(CommonLocText, "CommonLocText", "CommonLocText", "Scripts\\Content\\CommonLocTexts", 0, 0);
 

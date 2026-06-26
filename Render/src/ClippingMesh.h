@@ -1,11 +1,11 @@
 #ifndef __CLIPPING_MESH_H_INCLUDED__
 #define __CLIPPING_MESH_H_INCLUDED__
 
-XTL/UniqueVector.h
-XMath/XMath.h
-XMath/Box6f.h
-XMath/Mat4f.h
-XMath/Plane.h
+#include "XTL/UniqueVector.h"
+#include "XMath/XMath.h"
+#include "XMath/Box6f.h"
+#include "XMath/Mat4f.h"
+#include "XMath/Plane.h"
 
 class Camera;
 

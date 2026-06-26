@@ -14,7 +14,7 @@ struct KeyBase
 	static float time_delta;
 };
 
-template<class Key, class Derived=KeysBase<Key, std::vector<Key> > >
+template<class Key, class Derived>
 class KeysBase : public vector<Key>
 {
 public:
@@ -28,7 +28,7 @@ public:
 	virtual bool serialize(Archive& ar, const char* name, const char* nameAlt){
 		if(ar.isEdit()){
 			if(ar.openStruct(*this, name, nameAlt, typeid(Derived).name())){
-				ar.serialize(static_cast<vector<Key>&>(*this), "values", "Значения");
+				ar.serialize(static_cast<vector<Key>&>(*this), "values", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 				ar.closeStruct(name);
 			}
 			return true;
@@ -42,13 +42,13 @@ public:
 template<class Key, class Derived>
 typename KeysBase<Key, Derived>::value KeysBase<Key, Derived>::Get(float t) const
 {
-	if(empty())return Key::none;
-	if(size()==1)return (*this)[0].Val();
+	if(this->empty())return Key::none;
+	if(this->size()==1)return (*this)[0].Val();
 
 	if(t<(*this)[0].time)
 		return (*this)[0].Val();
 
-	for(int i=1;i<size();i++)
+	for(int i=1;i<(int)this->size();i++)
 		if(t<(*this)[i].time)
 		{
 			const Key& f0=(*this)[i-1];
@@ -63,7 +63,7 @@ typename KeysBase<Key, Derived>::value KeysBase<Key, Derived>::Get(float t) cons
 			return out;
 		}
 
-		return back().Val();
+	return this->back().Val();
 }
 
 template<class Key, class Derived>
@@ -73,23 +73,23 @@ Key& KeysBase<Key, Derived>::InsertKey(float t)
 	p.Val()=Get(t);
 	p.time=t;
 
-	if(!empty())
+	if(!this->empty())
 	{
-		if(t<front().time)
+		if(t<this->front().time)
 		{
-			insert(begin(),p);
-			return front();
+			this->insert(this->begin(),p);
+			return this->front();
 		}
 
-		for(int i=1;i<size();i++)
+		for(int i=1;i<(int)this->size();i++)
 			if(t<(*this)[i].time)
 			{
-				return *insert(begin()+i,p);		
+				return *this->insert(this->begin()+i,p);
 			}
 	}
 
-	push_back(p);
-	return back();
+	this->push_back(p);
+	return this->back();
 }
 
 template<class Key, class Derived>
@@ -101,7 +101,7 @@ Key* KeysBase<Key, Derived>::GetOrCreateKey(float t,float life_time,float create
 		return &(*this)[0];
 
 	iterator it;
-	FOR_EACH(*this,it)
+	FOR_EACH((*this),it)
 	{
 		Key& p=*it;
 		float tp=p.time*life_time+create_time;

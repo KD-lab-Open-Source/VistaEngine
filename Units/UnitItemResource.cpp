@@ -2,8 +2,8 @@
 #include "UnitItemResource.h"
 #include "Player.h"
 #include "Universe.h"
-Serialization/RangedWrapper.h
-Serialization/SerializationFactory.h
+#include "Serialization/RangedWrapper.h"
+#include "Serialization/SerializationFactory.h"
 
 DECLARE_SEGMENT(UnitItemResource)
 REGISTER_CLASS(AttributeBase, AttributeItemResource, "Предмет-ресурс")

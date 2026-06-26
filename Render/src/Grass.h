@@ -1,8 +1,8 @@
 #pragma once
 
-Terra/UpdateMapClient.h
-Render/inc/IRenderDevice.h
-Render/inc/IVisGenericInternal.h
+#include "Terra/UpdateMapClient.h"
+#include "Render/inc/IRenderDevice.h"
+#include "Render/inc/IVisGenericInternal.h"
 
 class VSGrass;
 class PSGrassShadow;
