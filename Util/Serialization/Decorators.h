@@ -52,7 +52,7 @@ struct NotDecorator{
 	bool serialize(Archive& ar, const char* name, const char* nameAlt){		
 		if(ar.isEdit()){
 			if(ar.openStruct(*this, name, nameAlt)){
-				ar.serialize(value_, "value", "Значение");
+				ar.serialize(value_, "value", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 				ar.closeStruct(name);
 			}
 			return true;
@@ -72,18 +72,18 @@ struct OptionalPtr : PointerType{
 		if(ar.isInput()){
 			ar.serialize(optionallyEnabled, "optionallyEnabled", "^");
 			if(optionallyEnabled){
-				if(!get())
-					set(new T());
-				get()->serialize(ar);
+				if(!this->get())
+					this->set(new T());
+				this->get()->serialize(ar);
 			}
 			else
-				set(0);
+				this->set(0);
 		}
 		else{
-			optionallyEnabled = get() != 0;
+			optionallyEnabled = this->get() != 0;
 			ar.serialize(optionallyEnabled, "optionallyEnabled", "^");
 			if(optionallyEnabled)
-				get()->serialize(ar);
+				this->get()->serialize(ar);
 		}
 	}
 };

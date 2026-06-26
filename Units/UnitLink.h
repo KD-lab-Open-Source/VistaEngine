@@ -28,11 +28,11 @@ private:
 #endif
 };
 
-// Необходимо явно инстанцировать функцию get
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ get
 #ifdef _FINAL_VERSION_
 #define UNIT_LINK_GET(Unit)	
 #else
-#define UNIT_LINK_GET(Unit)	Unit* UnitLink<Unit>::get() const { return safe_cast<Unit*>(unitID_.get()); }
+#define UNIT_LINK_GET(Unit)	template<> Unit* UnitLink<Unit>::get() const { return safe_cast<Unit*>(unitID_.get()); }
 #endif
 
 

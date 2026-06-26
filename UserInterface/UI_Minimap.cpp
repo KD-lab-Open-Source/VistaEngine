@@ -33,8 +33,8 @@ void UI_Minimap::logic2GraphQuant()
 {
 	MTG();
 	for(int idx = 0; idx < (int)EVENTS_SIZE; ++idx)
-		events_[idx].erase(remove_if(events_[idx].begin(), events_[idx].end(), not1(mem_fun_ref(&UI_MinimapEvent::alive))), events_[idx].end());
-	worldPoints_.erase(remove_if(worldPoints_.begin(), worldPoints_.end(), not1(mem_fun_ref(&WorldPoint::alive))), worldPoints_.end());
+		events_[idx].erase(remove_if(events_[idx].begin(), events_[idx].end(), [](auto& e){ return !e.alive(); }), events_[idx].end());
+	worldPoints_.erase(remove_if(worldPoints_.begin(), worldPoints_.end(), [](auto& p){ return !p.alive(); }), worldPoints_.end());
 
 	UnitList unitList;
 	{
@@ -61,7 +61,7 @@ void UI_Minimap::logic2GraphQuant()
 				updateEvent(UI_MinimapEvent(*symbol, squad->position2D(), 1.f, squad->player()->unitColor(), squad->angleZ(), (int)squad), UNITS);
 		}
 		else {
-			xxassert(false, "Некорректный юнит на миникарте");
+			xxassert(false, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		}
 	}
 
@@ -362,13 +362,13 @@ void UI_Minimap::eraseZone(const UnitBuilding* building)
 }
 
 BEGIN_ENUM_DESCRIPTOR(MinimapAlign, "MinimapAlign")
-REGISTER_ENUM(UI_ALIGN_CENTER, "По центру")
-REGISTER_ENUM(UI_ALIGN_LEFT, "По левому краю")
-REGISTER_ENUM(UI_ALIGN_RIGHT, "По правому краю")
-REGISTER_ENUM(UI_ALIGN_TOP, "По верхней границе")
-REGISTER_ENUM(UI_ALIGN_BOTTOM, "По нижней границе")
-REGISTER_ENUM(UI_ALIGN_TOP_LEFT, "Левый верхний угол")
-REGISTER_ENUM(UI_ALIGN_TOP_RIGHT, "Правый верхний угол")
-REGISTER_ENUM(UI_ALIGN_BOTTOM_LEFT, "Левый нижний угол")
-REGISTER_ENUM(UI_ALIGN_BOTTOM_RIGHT, "Правый нижний угол")
+REGISTER_ENUM(UI_ALIGN_CENTER, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(UI_ALIGN_LEFT, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(UI_ALIGN_RIGHT, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(UI_ALIGN_TOP, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(UI_ALIGN_BOTTOM, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(UI_ALIGN_TOP_LEFT, "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(UI_ALIGN_TOP_RIGHT, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(UI_ALIGN_BOTTOM_LEFT, "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(UI_ALIGN_BOTTOM_RIGHT, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR(MinimapAlign)

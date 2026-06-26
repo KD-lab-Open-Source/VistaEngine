@@ -30,21 +30,21 @@ void SourceBlast::quant()
 void SourceBlast::serialize( Archive& ar )
 {
 	SourceBase::serialize(ar);
-	ar.serialize(radiusSpeed, "radiusSpeed", "Скорость [100..300]");
-	ar.serialize(blastPower, "blastPower", "Мощность [100..300]");
+	ar.serialize(radiusSpeed, "radiusSpeed", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ [100..300]");
+	ar.serialize(blastPower, "blastPower", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ [100..300]");
 
 	radius_ = 500;
 }
 
 void SourceBlast::windMapQuant()
 {
-	// Динамическая карта ветра очищается сама на каждом кванте.
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
 	float heightCur = blastPower - radiusCur/radius() * blastPower;
 	
-	int xl = max(round(position().x - radiusCur) >> windMap->tileSizeShl, 0);
-	int xr = min(round(position().x + radiusCur) >> windMap->tileSizeShl, windMap->sizeX() - 1);
-	int yl = max(round(position().y - radiusCur) >> windMap->tileSizeShl, 0);
-	int yr = min(round(position().y + radiusCur) >> windMap->tileSizeShl, windMap->sizeY() - 1);
+	int xl = max(int(round(position().x - radiusCur)) >> windMap->tileSizeShl, 0);
+	int xr = min(int(round(position().x + radiusCur)) >> windMap->tileSizeShl, windMap->sizeX() - 1);
+	int yl = max(int(round(position().y - radiusCur)) >> windMap->tileSizeShl, 0);
+	int yr = min(int(round(position().y + radiusCur)) >> windMap->tileSizeShl, windMap->sizeY() - 1);
 
 	for(int j=yl; j<yr; j++){
 		float y = (j << windMap->tileSizeShl) + (windMap->tileSize >> 1);

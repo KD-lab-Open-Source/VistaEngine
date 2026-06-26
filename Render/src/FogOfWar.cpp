@@ -1,10 +1,11 @@
 #include "StdAfxRd.h"
+// Serialization.h first: FogOfWar.h pulls in KeysBase<> whose virtual serialize()
+// is instantiated with the class and needs a complete Archive type.
+#include "Serialization/Serialization.h"
 #include "FogOfWar.h"
 #include "TexLibrary.h"
 #include "cCamera.h"
 #include "D3DRender.h"
-#include <emmintrin.h>		// MMX, SSE, SSE2 intrinsic support
-#include "Serialization/Serialization.h"
 #include "Serialization/RangedWrapper.h"
 #include "Terra/vmap.h"
 
@@ -16,7 +17,7 @@ class cOneCirceData
 public:
 	enum
 	{
-		quality=2,//Два бита меньше размера сетки
+		quality=2,//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		quality_mul=1<<quality,
 		quality_and=quality_mul-1,
 	};
@@ -150,66 +151,18 @@ void cCircleDraw::Draw01(int radius,int x,int y,char* data,int sizex,int sizey)
 		}
 	}
 }
-#pragma warning(disable:4799)
 void cCircleDraw::DrawMmx(int radius,int x,int y,char* data,int sizex,int sizey)
 {
-	radius>>=shift;
-	if(radius==0)return;
-	x-=(FogOfWar::step>>1);y-=(FogOfWar::step>>1);
-	cOneCirceData* c=Get(radius,x,y);
-	int xbase=(x>>shift)-c->center.x,ybase=(y>>shift)-c->center.y;
-	int xmin=xbase,ymin=ybase;
-	int xmax=xmin+c->size.x;
-	int ymax=ymin+c->size.y;
-	xmin=max(xmin,0);
-	xmax=min(xmax,sizex);
-	ymin=max(ymin,0);
-	ymax=min(ymax,sizey);
-
-	static LONGLONG mask[8]=
-	{
-		0xFFFFFFFFFFFFFFFFu,//0
-		0x00000000000000FFu,//1
-		0x000000000000FFFFu,//2
-		0x0000000000FFFFFFu,//3
-		0x00000000FFFFFFFFu,//4
-		0x000000FFFFFFFFFFu,//5
-		0x0000FFFFFFFFFFFFu,//6
-		0x00FFFFFFFFFFFFFFu,//7
-	};
-
-
-	int dx_mask=(xmax-xmin)&7;
-	__m64 right_mask;
-	right_mask.m64_i64=mask[dx_mask];
-	xmax-=8;
-
-	for(int y=ymin;y<ymax;y++)
-	{
-		__m64* out=(__m64*)(data+xmin+y*sizex);
-		int xx=xmin-xbase;
-		int yy=y-ybase;
-		__m64* in=(__m64*)(c->data+(xx+yy*c->size.x));
-		for(int x=xmin;x<xmax;x+=8,out++,in++)
-		{
-			__m64 out_mmx=_mm_cmpgt_pi8(*in,*out);
-			__m64 and_in=_mm_andnot_si64(out_mmx,*in);
-			__m64 and_out=_mm_and_si64(out_mmx,*out);
-			*out=_mm_or_si64(and_in,and_out);
-		}
-
-		__m64 out_mmx=_mm_cmpgt_pi8(*out,*in);
-		out_mmx=_mm_and_si64(out_mmx,right_mask);
-		__m64 and_in=_mm_and_si64(out_mmx,*in);
-		__m64 and_out=_mm_andnot_si64(out_mmx,*out);
-		*out=_mm_or_si64(and_in,and_out);
-	}
+	// The original MMX (__m64) path is x86-only. Fog-of-war is not a hot path on
+	// modern hardware, so delegate to the portable scalar implementation; the
+	// compiler auto-vectorizes the simple byte-min loop.
+	Draw01(radius,x,y,data,sizex,sizey);
 }
 
 void FogOfWarMap::calcSummaryMap()
 {
-/*
-	int inv_scout_alpha=255-fogOfWar_->GetScoutAreaAlpha();
+	// Scalar port of the original MMX path (x86-only). Signed byte arithmetic.
+	int inv_scout_alpha=255-fogOfWar_->scoutAreaAlpha();
 	for(int y=0;y<size.y;y++)
 	{
 		char* tile=tilemap+y*size.x;
@@ -220,48 +173,9 @@ void FogOfWarMap::calcSummaryMap()
 			int c=127-*scout;
 			c=(c*inv_scout_alpha)>>8;
 			c=127-c;
-			*summary=min(c,*tile);
+			*summary=(char)min(c,(int)*tile);
 		}
 	}
-/*/
-	__m64 m127,inv_alpha,zero,shift_count;
-	int i;
-	for(i=0;i<8;i++)
-	{
-		m127.m64_u8[i]=127;
-		zero.m64_u8[i]=0;
-	}
-	for(i=0;i<4;i++)
-	{
-		inv_alpha.m64_u16[i]=255-fogOfWar_->scoutAreaAlpha();
-	}
-	shift_count.m64_u64=8;
-
-	for(int y=0;y<size.y;y++)
-	{
-		__m64* tile=(__m64*)(tilemap+y*size.x);
-		__m64* scout=(__m64*)(scoutmap+y*size.x);
-		__m64* summary=(__m64*)(summarymap+y*size.x);
-		for(int x=0;x<size.x;x+=8,tile++,scout++,summary++)
-		{
-			__m64 sub127=_mm_sub_pi8(m127,*scout);//127-*scout;
-
-			__m64 hi=_mm_unpackhi_pi8 (sub127,zero);
-			__m64 lo=_mm_unpacklo_pi8 (sub127,zero);
-			hi=_mm_mullo_pi16(hi,inv_alpha);
-			lo=_mm_mullo_pi16(lo,inv_alpha);
-			lo=_mm_sra_pi16 (lo,shift_count);
-			hi=_mm_sra_pi16 (hi,shift_count);
-			sub127=_mm_packs_pi16 (lo,hi);
-
-			sub127=_mm_sub_pi8(m127,sub127);//127-c;
-			__m64 out_mmx=_mm_cmpgt_pi8(sub127,*tile);
-			__m64 and_in=_mm_andnot_si64(out_mmx,sub127);
-			__m64 and_out=_mm_and_si64(out_mmx,*tile);
-			*summary=_mm_or_si64(and_in,and_out);
-		}
-	}
-/**/
 
 	for(int y=0;y<size.y;y++)
 	{
@@ -281,7 +195,7 @@ void FogOfWarMap::calcSummaryMap()
 
 void FogOfWarMap::calcScoutMap()
 {
-	//Не забыть про случай, когда scout_area_alpha==0, и разведанное тождественно равно видимому.
+	//пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ scout_area_alpha==0, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 /*
 	for(int y=0;y<size.y;y++)
 	{
@@ -293,16 +207,14 @@ void FogOfWarMap::calcScoutMap()
 		}
 	}
 */
+	// Scalar port of the original MMX path (x86-only): per-byte signed min.
 	for(int y=0;y<size.y;y++)
 	{
-		__m64* tile=(__m64*)(tilemap+y*size.x);
-		__m64* scout=(__m64*)(scoutmap+y*size.x);
-		for(int x=0;x<size.x;x+=8,tile++,scout++)
+		char* tile=tilemap+y*size.x;
+		char* scout=scoutmap+y*size.x;
+		for(int x=0;x<size.x;x++,tile++,scout++)
 		{
-			__m64 out_mmx=_mm_cmpgt_pi8(*scout,*tile);
-			__m64 and_in=_mm_andnot_si64(out_mmx,*scout);
-			__m64 and_out=_mm_and_si64(out_mmx,*tile);
-			*scout=_mm_or_si64(and_in,and_out);
+			*scout=min(*tile,*scout);
 		}
 	}
 
@@ -468,9 +380,9 @@ FogOfWarMap* FogOfWar::CreateMap()
 
 void FogOfWar::serialize(Archive& ar)
 {
-	ar.serialize(fogColor_, "fogColor", "Цвет тумана войны");
-	ar.serialize(RangedWrapperi(scoutAreaAlpha_, 0, 255), "scoutAreaAlpha", "Прозрачность разведанного");
-	ar.serialize(RangedWrapperi(fogMinimapAlpha_, 0, 255), "fogMinimapAlpha", "Прозрачность тумана войны на миникарте");
+	ar.serialize(fogColor_, "fogColor", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(RangedWrapperi(scoutAreaAlpha_, 0, 255), "scoutAreaAlpha", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(RangedWrapperi(fogMinimapAlpha_, 0, 255), "fogMinimapAlpha", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	if(ar.isInput()){
 		invAlpha = fogColor_.a > 0 ? (float)fogMinimapAlpha_/fogColor_.a : 0;
@@ -486,11 +398,11 @@ FogOfWarMap::FogOfWarMap(FogOfWar *const fogOfWar, const Vect2i& size)
 , fogOfWar_(fogOfWar)
 {
 	xassert(size.x%8==0 && size.y%8==0);
-	int size_array=(size.x*size.y+8);/*8-для MMX*/
-	size_array=((size_array>>4)+1)<<4;//Округляем до 16 в верхнюю сторону.
+	int size_array=(size.x*size.y+8);/*8-пїЅпїЅпїЅ MMX*/
+	size_array=((size_array>>4)+1)<<4;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 16 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 
 
-	raw_data=new char[size_array*3];//Чтобы локально лежало.
+	raw_data=new char[size_array*3];//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
 	tilemap = raw_data;
 	scoutmap = raw_data+size_array;
 	summarymap = raw_data+2*size_array;
@@ -542,11 +454,11 @@ void FogOfWarMap::moveVisibleOuterRadius(FOW_HANDLE handle, int x, int y, int ra
 {
 	int delta_radius=min(radius,FogOfWar::fade_delta_radius>>FogOfWar::shift)<<FogOfWar::shift;
 //	delta_radius/=2;
-	moveVisible(handle,x,y,radius+delta_radius);//Можно подбирать для лучшего визуального соответствия
+	moveVisible(handle,x,y,radius+delta_radius);//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 }
 
 
-bool FogOfWarMap::checkFogStateInCircle(Vect2i& centerPosition, int radius) const
+bool FogOfWarMap::checkFogStateInCircle(const Vect2i& centerPosition, int radius) const
 {
 	int minStepRadius = 15;
 	FogOfWarStates status = 0;
@@ -616,7 +528,6 @@ void FogOfWarMap::quant()
 
 	calcScoutMap();
 	calcSummaryMap();
-	_mm_empty();
 
 	lock_.unlock();
 }

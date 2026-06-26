@@ -66,7 +66,7 @@ void UI_ControlBase::logicQuant()
 	LOG_UI_STATE(L"begin");
 
 	ControlState cs;
-	bool and = false;
+	bool andFlag = false;
 	bool waitingUpdate = waitingUpdate_;
 	
 	controlUpdate(cs);
@@ -79,7 +79,7 @@ void UI_ControlBase::logicQuant()
 				actionUpdate(id, data, cs);
 		}
 		else if(id == UI_ACTION_INVERT_SHOW_PRIORITY)
-			and = true;
+			andFlag = true;
 	}
 	
 	if(const UI_ControlState* state = currentState())
@@ -91,14 +91,14 @@ void UI_ControlBase::logicQuant()
 					actionUpdate(id, data, cs);
 			}
 			else if(id == UI_ACTION_INVERT_SHOW_PRIORITY)
-				and = true;
+				andFlag = true;
 		}
 
 	
 	if(cs.stateIdx >= 0)
 		setState(cs.stateIdx);
 		
-	cs.setPriority(and);
+	cs.setPriority(andFlag);
 
 	if(cs.show_control){
 		if(!isVisible_)	
@@ -728,14 +728,14 @@ void UI_ControlBase::actionExecute(UI_ControlActionID action_id, const UI_Action
 				
 				if(p->playerUnit())
 					commandUnit = UI_LogicDispatcher::instance().player()->playerUnit();
-				else if(const UI_ControlUnitList* own = dynamic_cast<const UI_ControlUnitList*>(owner())){ // для списка юнитов нужно узнать индекс дочернего контрола
+				else if(const UI_ControlUnitList* own = dynamic_cast<const UI_ControlUnitList*>(owner())){ // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 					xassert(std::find(own->controlList().begin(), own->controlList().end(), this) != own->controlList().end());
 					int child_index = std::distance(own->controlList().begin(), std::find(own->controlList().begin(), own->controlList().end(), this));
 					switch(own->GetType()){
-					case UI_UNITLIST_SELECTED: // для списка выделенных нужно найти конкретного юнита
+					case UI_UNITLIST_SELECTED: // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 						selectedSlot = child_index;
 						break;
-					case UI_UNITLIST_PRODUCTION: // конкретизировать команду
+					case UI_UNITLIST_PRODUCTION: // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 					case UI_UNITLIST_TRANSPORT:					
 						command = UnitCommand(command.commandID(), child_index);
 						break;
@@ -750,7 +750,7 @@ void UI_ControlBase::actionExecute(UI_ControlActionID action_id, const UI_Action
 						break;
 													  }
 					default:
-						xassert(0 && "новый тип списка селекта");
+						xassert(0 && "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 					}
 					uniform = false;
 				}
@@ -862,7 +862,7 @@ void UI_ControlBase::actionExecute(UI_ControlActionID action_id, const UI_Action
 		case UI_ACTION_EXTERNAL_CONTROL:
 				for_each(	safe_cast<const UI_ActionExternalControl*>(action_data)->actions().begin(),
 							safe_cast<const UI_ActionExternalControl*>(action_data)->actions().end(),
-							mem_fun_ref(&AtomAction::apply));
+							[](auto& a){ a.apply(); });
 				break;
 
 		case UI_ACTION_DIRECT_CONTROL_TRANSPORT:
@@ -1631,7 +1631,7 @@ void UI_ControlEdit::quant(float dt)
 
 		if(caretTimer_ <= 0.f){
 			caretVisible_ = !caretVisible_;
-			caretTimer_ = 0.5f; // Период мигания курсора
+			caretTimer_ = 0.5f; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		}
 	}
 }
@@ -1994,10 +1994,10 @@ bool UI_ControlCustom::inputEventHandler(const UI_InputEvent& ev)
 
 void UI_ControlUnitList::controlUpdate(ControlState& cs){
 	start_timer_auto();
-	// работаем так:
-	// есть список дочерних контролов (простых кнопок) по числу слотов доступных для отображения юнитов
-	// заполняем их текстурами асоциированными с юнитами, которые сейчас в selectManager, остальные чистим
-	// отождествление с юнитом такое: индекс контрола в списке дочерних соответствует индексу юнита в selectManager
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ:
+	// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ) пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ selectManager, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ selectManager
 	if(!UI_LogicDispatcher::instance().isGameActive())
 		return;
 

@@ -560,19 +560,16 @@ cTexture* cTexLibrary::GetWhileTexture()
 
 		cFileImageData* fid=new cFileImageData(size,size,data);
 
-		__try
+		// Original used SEH __try/__finally for cleanup; CreateTexture returns an
+		// error code (not an SEH exception), so plain control flow is equivalent
+		// and portable.
+		bool createFailed = gb_RenderDevice3D->CreateTexture(Texture,fid,-1,-1);
+		delete data;
+		delete fid;
+		if(createFailed)
 		{
-
-
-			if(gb_RenderDevice3D->CreateTexture(Texture,fid,-1,-1))
-			{
-				delete Texture;
-				return 0;
-			}
-		}__finally
-		{
-			delete data;
-			delete fid;
+			delete Texture;
+			return 0;
 		}
 
 		pWhiteTexture=Texture;
@@ -685,7 +682,7 @@ cTexture* cTexLibrary::FindTexture(const char* name)
 cTexture* cTexLibrary::GetElement2D(const char *pTextureName)
 {
 	MTAuto mtenter(lock);
-	if(pTextureName==0||pTextureName[0]==0) return 0; // имя текстуры пустое
+	if(pTextureName==0||pTextureName[0]==0) return 0; // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
 	string texture_name = normalizePath(pTextureName);
 
@@ -715,7 +712,7 @@ cTexture* cTexLibrary::GetElement2D(const char *pTextureName)
 cTexture* cTexLibrary::GetElement2DAviScale(const char *pTextureName)
 {
 	MTAuto mtenter(lock);
-	if(pTextureName==0||pTextureName[0]==0) return 0; // имя текстуры пустое
+	if(pTextureName==0||pTextureName[0]==0) return 0; // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
 	string texture_name = normalizePath(pTextureName);
 	xassert(strstr(texture_name.c_str(), ".AVI"));
@@ -784,7 +781,7 @@ cTextureComplex* cTexLibrary::GetElement2DComplex(vector<string>& textureNames)
 cTexture* cTexLibrary::GetElement2DScale(const char *pTextureName,Vect2f scale)
 {
 	MTAuto mtenter(lock);
-	if(pTextureName==0||pTextureName[0]==0) return 0; // имя текстуры пустое
+	if(pTextureName==0||pTextureName[0]==0) return 0; // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
 	string texture_name = normalizePath(pTextureName);
 
@@ -815,7 +812,7 @@ cTexture* cTexLibrary::GetElement3D(const char *pTextureName,char *pMode)
 	MTAuto mtenter(lock);
 	bool bump = pMode && strstr(pMode,"Bump");
 	
-	if(pTextureName==0||pTextureName[0]==0) return 0; // имя текстуры пустое
+	if(pTextureName==0||pTextureName[0]==0) return 0; // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	
 	string texture_name = normalizePath(pTextureName);
 
@@ -888,7 +885,7 @@ cTexture* cTexLibrary::GetElement3DColor(const char *pTextureName,const char* sk
 {
 
 	MTAuto mtenter(lock);
-	if(pTextureName==0||pTextureName[0]==0) return 0; // имя текстуры пустое
+	if(pTextureName==0||pTextureName[0]==0) return 0; // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	string texture_name = normalizePath(pTextureName);
 	string self_illumination_name = normalizePath(SelfIlluminationName);
 	string logo_name = normalizePath(logoName);
@@ -970,7 +967,7 @@ cTexture* cTexLibrary::GetElement3DComplex(vector<string>& textureNames, bool al
 cTexture* cTexLibrary::GetElement3DAviScale(const char *pTextureName)
 {
 	MTAuto mtenter(lock);
-	if(pTextureName==0||pTextureName[0]==0) return 0; // имя текстуры пустое
+	if(pTextureName==0||pTextureName[0]==0) return 0; // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
 	string texture_name = normalizePath(pTextureName);
 	xassert(strstr(texture_name.c_str(), ".AVI"));
@@ -1088,8 +1085,8 @@ bool cComplexFileImage::Init(vector<string>& names,bool line)
 
 		if(!atlas.Init(texture_size,line))
 		{
-			VisError<<"Слишком много кадров!!!\r\n"<<"Попытка создать - "<<(int)tempImages.size()
-				<<",а доступно - "<<atlas.GetNumTextures()<<" кадров\r\n";
+			VisError<<"пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ!!!\r\n"<<"пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ - "<<(int)tempImages.size()
+				<<",пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - "<<atlas.GetNumTextures()<<" пїЅпїЅпїЅпїЅпїЅпїЅ\r\n";
 			for(int i=0;i<names.size();i++)
 			{
 				VisError<<names[i].c_str()<<",\r\n";

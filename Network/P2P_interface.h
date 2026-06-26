@@ -375,7 +375,7 @@ protected:
 	void resetAllClients_th2(); //Internal 2Th
 
 	//Host !!!
-	void SendEventI(NetCommandBase& event, const UNetID& unid, bool flag_guaranted=1); //Internal 2Th
+	void SendEventI(const NetCommandBase& event, const UNetID& unid, bool flag_guaranted=1); //Internal 2Th
 	void PutGameCommand2Queue_andAutoDelete(netCommandGame* pCommand); //Internal 2Th (��� 3Th ���� ��������������)
 	void putNetCommand2InClientBuf_th2(NetCommandBase& event);// ������������ DW ��� ���� ���� �������� ��� ������� �������
 

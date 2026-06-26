@@ -16,7 +16,7 @@
 #include "Serialization/SerializationFactory.h"
 #include "Terra/vMap.h"
 
-REGISTER_CLASS(Anchor, Anchor, "Якорь на мире");
+REGISTER_CLASS(Anchor, Anchor, "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ");
 
 SourceManager* sourceManager;
 
@@ -34,7 +34,7 @@ SourceManager::~SourceManager()
 	if(sourceOnMouse_) 
 		sourceOnMouse_->setActivity(false);
 
-	std::for_each(sounds_.begin(), sounds_.end(), std::mem_fun_ref(&SoundController::release));
+	std::for_each(sounds_.begin(), sounds_.end(), [](SoundController& s){ s.release(); });
 	sounds_.clear();
 
 	sourceManager = 0;
@@ -66,7 +66,7 @@ void SourceManager::serialize(Archive& ar)
 	if(!ar.isEdit()) {
 		ar.serialize(sources_, "sources", 0);
 
-		// удаляем нулевые источники
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		Sources::iterator it;
 		for(it = sources_.begin(); it != sources_.end();) {
 			if(!*it) {
@@ -165,7 +165,7 @@ void SourceManager::drawUI(float dt)
 
 void fCommandAddShowChangeController(XBuffer& stream)
 {
-	SharedShowChangeController share; // неявный share->decrRef() при разрушении локального объекта
+	SharedShowChangeController share; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ share->decrRef() пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	stream.read(share);
 	sourceManager->showChangeControllers_.push_back(share);
 }
@@ -174,7 +174,7 @@ ShowChangeController* SourceManager::addShowChangeController(const ShowChangeCon
 {
 	MTL();
 	SharedShowChangeController share(new ShowChangeController(ctrl));
-	share->addRef(); // что бы не протух пока лежит в потоке
+	share->addRef(); // пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	streamLogicCommand.set(fCommandAddShowChangeController) << share;
 	return share;
 }
@@ -182,7 +182,7 @@ ShowChangeController* SourceManager::addShowChangeController(const ShowChangeCon
 void SourceManager::clearSources()
 {
 	flushNewSources();
-	std::for_each(sources_.begin(), sources_.end(), bind2nd(mem_fun(&SourceBase::setActivity), false));
+	std::for_each(sources_.begin(), sources_.end(), [](ShareHandle<SourceBase>& s){ s->setActivity(false); });
 	sources_.clear();
 }
 

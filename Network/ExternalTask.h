@@ -8,7 +8,7 @@
 
 #define caseR(a) case a: return #a;
 
-enum e_PNCWorkMode{
+enum e_PNCWorkMode : int{
 	PNCWM_LAN,
 	PNCWM_LAN_DW,
 	PNCWM_ONLINE_GAMESPY,

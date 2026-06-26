@@ -44,17 +44,17 @@ struct APolygons
 {
 	vector<Vect3f> points;
 
-	//формат такой сначала идёт один int - количество элементов в полигоне (N).
-	//потом N элементов - индексы точек в points
+	//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ int - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (N).
+	//пїЅпїЅпїЅпїЅпїЅ N пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ points
 	vector<int> faces_flat;
 };
 
-///Класс для усечения выпуклого техмерного полигона плоскостями.
+///пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 struct ClippingMesh
 {
 public:
 	ClippingMesh(float zmax);	
-	void createBox(Vect3f& vmin,Vect3f& vmax);
+	void createBox(const Vect3f& vmin,const Vect3f& vmax);
 	void createTileBox(Camera* camera, Vect2i TileNumber,Vect2i TileSize);
 
 	void calcBoundTransformed(const Mat3f& m, sBox6f& box);
@@ -62,7 +62,7 @@ public:
 
 	int clip(const Plane& clipplane);
 
-	//Величина visMap должна быть TileMap->GetTileNumber().x*visMapDy=TileMap->GetTileNumber().y
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ visMap пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ TileMap->GetTileNumber().x*visMapDy=TileMap->GetTileNumber().y
 	void calcVisMap(Camera* camera, Vect2i TileNumber,Vect2i TileSize,BYTE* visMap,bool clear);
 	void calcVisBox(Camera* camera, Vect2i TileNumber,Vect2i TileSize,const Mat4f& direction,sBox6f& box);
 

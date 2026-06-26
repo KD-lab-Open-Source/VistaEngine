@@ -25,9 +25,9 @@ public:
     FOW_HANDLE createVisible();
     void deleteVisible(FOW_HANDLE handle);
 
-    void moveVisible(FOW_HANDLE handle, int x, int y, int radius);//Радиус включает всебя переходную область
+    void moveVisible(FOW_HANDLE handle, int x, int y, int radius);//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
-	//moveVisibleOuterRadius Переходная область вне радиуса
+	//moveVisibleOuterRadius пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	void moveVisibleOuterRadius(FOW_HANDLE handle, int x, int y, int radius);
 
 	static int maxSightRadius();
@@ -35,7 +35,7 @@ public:
 	FogOfWarState getFogState(int x, int y) const;
 	bool isVisible(const Vect2i& position) const;
 	typedef BitVector<FogOfWarState> FogOfWarStates;
-	bool checkFogStateInCircle(Vect2i& centerPosition, int radius) const;
+	bool checkFogStateInCircle(const Vect2i& centerPosition, int radius) const;
 
 	const char* lockSummarymap() const;
 	void unlockSummarymap() const;
@@ -61,16 +61,16 @@ private:
 
 	Vect2i size;
 	char* raw_data;
-	char* tilemap;//Видимое на текущий кадр
-	char* scoutmap;//Видимое на предыдущие кадры
-	char* summarymap;//Карта видимости для графики
+	char* tilemap;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+	char* scoutmap;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	char* summarymap;//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	BackVector<One> objects_;
 	FogOfWar* fogOfWar_;
 
 	mutable MTSection lock_;
 };
 
-/// Туман войны - заполняет текстуру тумана войны. Дальше это текстура применяется в шейдерах для каждого объекта.
+/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 class FogOfWar : public BaseGraphObject
 {
 public:
@@ -99,8 +99,8 @@ public:
 	const FogOfWarMap* GetSelectedMap() const{ return selected_map; }
 
 	float GetInvFogAlpha(){return invAlpha;}
-	Color4c GetFogColor(){ return fogColor_; } // Цвет и прозрачность тумана в неразведанной области.
-	int scoutAreaAlpha() const { return scoutAreaAlpha_; } // Относительная прозрачность области, которая разведанна.
+	Color4c GetFogColor(){ return fogColor_; } // пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+	int scoutAreaAlpha() const { return scoutAreaAlpha_; } // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 
 	cTexture* GetTexture(){return texture_;}
 

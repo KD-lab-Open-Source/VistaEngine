@@ -27,11 +27,11 @@ void UI_TextAnimation::release()
 
 void UI_TextAnimation::serialize(Archive& ar)
 {
-	ar.serialize(cursor_, "cursor", "Курсор в конце");
-	ar.serialize(blinkDuringOut_, "blinkDuringOut", "Мерцать при выводе");
-	ar.serialize(RangedWrapperf(blinkPeriodDuringOut_, 0.05f, 2.f), "blinkPeriodDuringOut", "Период мерцания при выводе");
-	ar.serialize(blinkAfterOut_, "blinkAfterOut", "Мерцать после вывода");
-	ar.serialize(RangedWrapperf(blinkPeriodAfterOut_, 0.05f, 2.f), "blinkPeriodAfterOut", "Период мерцания после вывода");
+	ar.serialize(cursor_, "cursor", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(blinkDuringOut_, "blinkDuringOut", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(RangedWrapperf(blinkPeriodDuringOut_, 0.05f, 2.f), "blinkPeriodDuringOut", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(blinkAfterOut_, "blinkAfterOut", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(RangedWrapperf(blinkPeriodAfterOut_, 0.05f, 2.f), "blinkPeriodAfterOut", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 void UI_TextAnimation::start()
@@ -66,7 +66,7 @@ void UI_TextAnimation::update()
 			time += partTime;
 			nextTime(it);
 			if(it == parser_.outNodes_.end()){
-				if(blinkAfterOut_ && round(time_ / blinkPeriodAfterOut_) % 2){
+				if(blinkAfterOut_ && int(round(time_ / blinkPeriodAfterOut_)) % 2){
 					if(addBlink())
 						reparseSize();
 				}
@@ -117,7 +117,7 @@ void UI_TextAnimation::update()
 		else
 			parser_.outNodes_.erase(it+1, parser_.outNodes_.end());
 
-		if(!blinkDuringOut_ || round(time_ / blinkPeriodDuringOut_) % 2)
+		if(!blinkDuringOut_ || int(round(time_ / blinkPeriodDuringOut_)) % 2)
 			addBlink();
 
 		reparseSize();

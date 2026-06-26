@@ -599,7 +599,7 @@ void GameShell::GameClose()
 
 	//SNDSetFade(false,1000);
 	SNDStopAll();
-	SNDSetFade(false,0); // после того как появится поток для загрузки вернуть значение времени
+	SNDSetFade(false,0); // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	SNDSetGameActive(false);
 	UI_LogicDispatcher::instance().setCursor(UI_GlobalAttributes::instance().cursor(UI_CURSOR_WAITING));
 	UI_LogicDispatcher::instance().profileSystem().saveState();
@@ -803,7 +803,7 @@ void GameShell::graphicsQuant()
 		PNetCenter::netQuant(); //NetQuant();
 
 	if(GameActive && useHT()){
-		if(quantTimeStatistic.logicTime() > max(logicTimePeriod, quantTimeStatistic.graphicsTime() + round(sleepGraphicsTime_)))
+		if(quantTimeStatistic.logicTime() > max(float(logicTimePeriod), quantTimeStatistic.graphicsTime() + float(round(sleepGraphicsTime_))))
 			sleepGraphicsTime_ += 0.1f;
 		else
 			sleepGraphicsTime_ = max(sleepGraphicsTime_ - 0.1f, 0.f);
@@ -899,9 +899,9 @@ void GameShell::graphicsQuant()
 		if(terminateMission_ && UI_Dispatcher::instance().canExit())
 			GameClose();	
 	}
-	else if(!loadFpsTimer_.busy()){ // MainMenu, только графический поток
+	else if(!loadFpsTimer_.busy()){ // MainMenu, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		MT_SET_TLS(MT_GRAPH_THREAD | MT_LOGIC_THREAD);
-		loadFpsTimer_.start(1000 / 15); // 15 fps при отсутствии логического потока
+		loadFpsTimer_.start(1000 / 15); // 15 fps пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
 		interpolation_timer_ += scale_time.delta();
 		if(interpolation_timer_ > logicTimePeriod){
@@ -1060,7 +1060,7 @@ void GameShell::Show(float realGraphDT)
 
 		terScene->SetDeltaTime(realGraphDT * 1000);
 
-		Color4c& Color = environment->environmentTime()->GetCurFoneColor();
+		Color4c Color = environment->environmentTime()->GetCurFoneColor();
 		gb_RenderDevice->Fill(Color.r,Color.g,Color.b);
 		gb_RenderDevice->BeginScene();
 
@@ -1074,7 +1074,7 @@ void GameShell::Show(float realGraphDT)
 
 		environment->graphQuant(realGraphDT, cameraManager->GetCamera());
 
-		cameraManager->GetCamera()->setAttribute(ATTRCAMERA_CLEARZBUFFER);//Потому как в небе могут рисоваться планеты в z buffer.
+		cameraManager->GetCamera()->setAttribute(ATTRCAMERA_CLEARZBUFFER);//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ z buffer.
 		terScene->Draw(cameraManager->GetCamera());
 
 		environment->drawPostEffects(realGraphDT, cameraManager->GetCamera());
@@ -1323,7 +1323,7 @@ void GameShell::EventParser(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;			}
 	case WM_KEYUP:
 	case WM_SYSKEYUP:	{
-		if(wParam == VK_SNAPSHOT){ // WM_KEYDOWN для PrintScreen не приходит никогда
+		if(wParam == VK_SNAPSHOT){ // WM_KEYDOWN пїЅпїЅпїЅ PrintScreen пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			sKey key(addModifiersState(wParam));
 			if(isKeyEnabled(key))
 				KeyPressed(key, false);
@@ -1387,10 +1387,10 @@ public:
 		mousePosition_ = mousePosition;
 	}
 	void serialize(Archive& ar){
-		ar.serialize(attr_, "attr", "Юнит");
-		ar.serialize(playerID_,"playerID","Игрок");
-		ar.serialize(number_,"number","Количество");
-		ar.serialize(inTheSameSquad_,"inTheSameSquad","В одном скваде");
+		ar.serialize(attr_, "attr", "пїЅпїЅпїЅпїЅ");
+		ar.serialize(playerID_,"playerID","пїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(number_,"number","пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(inTheSameSquad_,"inTheSameSquad","пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 	}
 	void generate(){
 		playerID_ = clamp(playerID_, 0, universe()->Players.size()-1);
@@ -1544,7 +1544,8 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 		if(const AttributeBase* sel = selectManager->selectedAttribute()){
 			AttributeBase& attr = const_cast<AttributeBase&>(*sel);
 
-			if(kdw::edit(Serializer(attr), "Scripts\\TreeControlSetups\\unitAttributeState", 0, hWnd()))
+			Serializer attrSerializer(attr);
+			if(kdw::edit(attrSerializer, "Scripts\\TreeControlSetups\\unitAttributeState", 0, hWnd()))
 				AttributeLibrary::instance().saveLibrary();
 		}
 		break;
@@ -1554,7 +1555,8 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 			UnitBase* unit = selectManager->selectedUnit();
 			if(unit->attr().isSquad())
 				unit = safe_cast<UnitSquad*>(unit)->getUnitReal();
-			kdw::edit(Serializer(*unit), "Scripts\\TreeControlSetups\\unitState", 0, hWnd());
+			Serializer unitSerializer(*unit);
+			kdw::edit(unitSerializer, "Scripts\\TreeControlSetups\\unitState", 0, hWnd());
 		}
 		break;
 
@@ -1569,9 +1571,10 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 			Player* player = universe()->activePlayer();
 			if(isShiftPressed()){
 				XBuffer nameAlt;
-				nameAlt < "Игрок (0-" <= universe()->Players.size() - 1 < ")";
+				nameAlt < "пїЅпїЅпїЅпїЅпїЅ (0-" <= universe()->Players.size() - 1 < ")";
 				int playerID = player->playerID();
-				if(kdw::edit(Serializer(playerID, "playerID", nameAlt), "Scripts\\TreeControlSetups\\chooseTrigger", 0, hWnd())){
+				Serializer playerIDSerializer(playerID, "playerID", nameAlt);
+				if(kdw::edit(playerIDSerializer, "Scripts\\TreeControlSetups\\chooseTrigger", 0, hWnd())){
 					player = universe()->Players[clamp(playerID, 0, universe()->Players.size() - 1)];
 				}
 			}
@@ -1683,7 +1686,7 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 		//	UnitActing* unit = dynamic_cast<UnitActing*>(selectManager->selectedUnit());
 		//	if(unit){
 		//		static CommandsQueueReference queue;
-		//		if(kdw::edit(Serializer(queue, "queue", "Очередь команд"), "Scripts\\TreeControlSetups\\commandsQueueState", 0, hWnd()))
+		//		if(kdw::edit(Serializer(queue, "queue", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ"), "Scripts\\TreeControlSetups\\commandsQueueState", 0, hWnd()))
 		//			unit->executeCommandsQueue(*queue);
 		//	}
 		//}
@@ -1695,7 +1698,8 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 			Vect3f pos;
 			cameraManager->cursorTrace(mousePosition(), pos);
 			unitGenerator.set(universe()->activePlayer()->playerID(), pos, mousePosition());
-			if(kdw::edit(Serializer(unitGenerator), "Scripts\\TreeControlSetups\\createUnitState", 0, hWnd()))
+			Serializer unitGeneratorSerializer(unitGenerator);
+			if(kdw::edit(unitGeneratorSerializer, "Scripts\\TreeControlSetups\\createUnitState", 0, hWnd()))
 				unitGenerator.generate();
 			break;
 		}
@@ -1723,7 +1727,7 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 			return false;
 	}
 
-	// Конфликтующие клавиши
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	switch(Key.fullkey){
 	case 'D':
 		if(selectManager)
@@ -2168,7 +2172,7 @@ void GameShell::cameraQuant(float frameDeltaTime)
 		}
 	}
 
-	//сдвиг когда курсор у края окна
+	//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	if(!selectMouseTrack && !cameraMouseTrack && cameraCursorInWindow && controlEnabled()){
 		if(int dir = cameraManager->mouseQuant(mousePosition()))
 			cameraCursor_ = UI_GlobalAttributes::instance().getMoveCursor(dir);
@@ -2178,7 +2182,7 @@ void GameShell::cameraQuant(float frameDeltaTime)
 	bool needLockMouse = false;
 	
 	static int lockState;
-	//поворот мышью
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	if(cameraMouseTrack && (MouseMoveFlag || lockState)){
 		if(MouseMoveFlag && controlEnabled()){
 			needLockMouse = true;
@@ -2343,19 +2347,19 @@ void GameShell::editParameters()
 	gb_RenderDevice->Flush();
 	ShowCursor(1);
 
-	const char* libraryEditor = "Редактор библиотек (войск)";
+	const char* libraryEditor = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅ)";
 	const char* enginePrm = "EnginePrm";
 	const char* visGeneric = "VisGeneric";
 	const char* debugPrmTitle = "Debug.prm";
-	const char* globalAttribute = "Глобальные параметры";
-	const char* globalEnvironment = "Глобальные параметры окружения";
-	const char* sounds = "Звуки";
-	const char* interfaceAttribute = "Интерфейс";
-	const char* physics = "Физические параметры";
-	const char* explode = "Параметры взрывов";
+	const char* globalAttribute = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ";
+	const char* globalEnvironment = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ";
+	const char* sounds = "пїЅпїЅпїЅпїЅпїЅ";
+	const char* interfaceAttribute = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ";
+	const char* physics = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ";
+	const char* explode = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ";
 	const char* gameSettings = "Game settins";
-	const char* keySettings = "Настройки клавиатуры";
-	const char* joystickSettings = "Настройки джойстика";
+	const char* keySettings = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ";
+	const char* joystickSettings = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ";
 	const char* separator = "--------------";
 
 	vector<const char*> items;
@@ -2433,7 +2437,8 @@ void GameShell::editParameters()
 	}
 	else if(item == globalEnvironment){
 		string setupName = string("Scripts\\TreeControlSetups\\") + globalEnvironment + "State";
-		if(kdw::edit(Serializer(*environment, "", "", SERIALIZE_GLOBAL_DATA), setupName.c_str(), 0, hWnd()))
+		Serializer environmentSerializer(*environment, "", "", SERIALIZE_GLOBAL_DATA);
+		if(kdw::edit(environmentSerializer, setupName.c_str(), 0, hWnd()))
 			environment->saveGlobalParameters();
 	}
 
@@ -2536,7 +2541,7 @@ UnitReal* GameShell::unitHover(const Vect3f& v0, const Vect3f& v1, float& distMi
 	bool exactHit = underFullDirectControl();
 	Player* player = universe()->activePlayer();
 	UnitReal* unitMin = 0;
-	// visibleUnits_ отсортированы по убыванию глубины, эффективннее проверять начиная с ближайших
+	// visibleUnits_ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	VisibleUnits::const_reverse_iterator ui = visibleUnits_.rbegin();
 	VisibleUnits::const_reverse_iterator ui_end = visibleUnits_.rend();
 	for(; ui != ui_end; ++ui){

@@ -34,7 +34,7 @@ cVisError& cVisError::operator << (const char *a)
 	if(in_message_box)
 		return *this;
 	if(strcmp(a,VERR_END)==0)
-	{// конец потока
+	{// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		kdError("3d", buf.c_str());
 		if(!no_message_box)
 		{
@@ -47,9 +47,13 @@ cVisError& cVisError::operator << (const char *a)
 				no_message_box=true;
 			}
 
-			if(ret==IDABORT) 
+			if(ret==IDABORT)
 			{
+#if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
 				__asm { int 3 };
+#else
+				__builtin_debugtrap();
+#endif
 			}
 		}
 

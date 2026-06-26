@@ -189,11 +189,11 @@ cStatic3dx* cLib3dx::GetElement(const char* fname_,const char* TexturePath,bool 
 			if(!is_logic)
 				VisError<<"Cannot open file: "<<fname.c_str()<<VERR_END;
 			delete pStatic;
-			return false;
+			return 0;
 		}
 		else if(Option_UseMeshCache){
 			pStatic->AddRef();
-			cObject3dx* pTempObject=new cObject3dx(pStatic,false);//Нужно для расчёта bound box, bound sphere
+			cObject3dx* pTempObject=new cObject3dx(pStatic,false);//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ bound box, bound sphere
 			RELEASE(pTempObject);
 			SaveCache(pStatic);
 		}
@@ -249,7 +249,7 @@ void cLib3dx::Unload(const char* file_name,bool logic_model)
 				RELEASE(p);
 				obj_map.erase(obj_map.begin()+i);
 
-				//Могут не все текстуры выгрузиться, но на это не обращаем внимания.
+				//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 				for(vector<string>::iterator it=names.begin();it!=names.end();it++)
 					GetTexLibrary()->Unload(it->c_str());
 				return;

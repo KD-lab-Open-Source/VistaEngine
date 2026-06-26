@@ -27,7 +27,7 @@ struct OneChar
 		uint16 v; //top
 		uint8 du; // width
 		uint8 dv; // height
-		int8 su; // смещение от левого верхнего угла
+		int8 su; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 		int8 sv;
 		int8 lh; //left hinding
 		int8 rh; //right hinding
@@ -39,7 +39,7 @@ struct OneChar
 struct FontParam
 {
 	enum HintMode {
-		DEFAULT, //если есть, то ttf native hinting, если нету, то FreeType auto hinting
+		DEFAULT, //пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅ ttf native hinting, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅ FreeType auto hinting
 		BYTE_CODE_ONLY, //ttf native hinting
 		AUTO_HINT_ONLY, //FreeType auto hinting
 		NO_HINTING
@@ -47,9 +47,9 @@ struct FontParam
 
 	FontParam() : nonPow2(false), inBox(false), antialiasing(false), hinting(DEFAULT) {}
 	
-	bool nonPow2; // по высоте текстура точно поджимается по реальному размеру
-	bool inBox; // окружается вписанной рамкой
-	bool antialiasing; // 256 градаций серого, иначе 1 битный
+	bool nonPow2; // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	bool inBox; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	bool antialiasing; // 256 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ 1 пїЅпїЅпїЅпїЅпїЅпїЅ
 	HintMode hinting;
 };
 
@@ -61,9 +61,9 @@ class Font
 	friend class FontManager;
 public:
 
-	// заданный размер шрифта в пикселах
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	uint16 size() const { return size_; }
-	// максимальное расстояние между верхней и нижней точкой шрифта
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	uint16 lineHeight() const { return lineHeight_; }
 
 	const FontParam& param() const { return param_; }
@@ -110,12 +110,12 @@ private:
 
 	class FT_Render* render_;
 	
-	// таблица перевода utf16 кода символа в индекс (Font::charTable_) имеющегося символа отрендереного в текстуру.
-	// все, для кого нет собственного символа в текстуре, ссылаются на символ с нулевым индексом
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ utf16 пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (Font::charTable_) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+	// пїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	uint16 index_[0xFFFF + 1];
 
 	typedef std::vector<uint16> Chars;
-	// Используемые символы. Только эти символы рендерятся в текстуру при создании шрифта и пишутся в Font::charTable_
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ Font::charTable_
 	Chars chars_;
 
 	ShortSize calcTextureSize(bool nonPow2);
@@ -123,6 +123,10 @@ private:
 	void addChar(uint16 charCode);
 	void addCharPage(uint16 page, bool all_span);
 };
+
+// Namespace-scope declaration: a friend declaration alone is only found via ADL
+// (clang follows the standard; MSVC's friend-injection made it visible directly).
+FontManager& fontManager();
 
 }
 #endif //__FT_FONT_H_

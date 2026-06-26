@@ -11,12 +11,12 @@
 void Init3dxshader();
 void Done3dxshader();
 
-// глобальные переменные
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 RENDER_API cVisGeneric	*gb_VisGeneric=0;
 
 bool Option_VSync = true;
 int Option_MipMapLevel = 5;
-int Option_TextureDetailLevel(0);//Уровень детализации текстур, 0 - самый высокий
+int Option_TextureDetailLevel(0);//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, 0 - пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 bool Option_DrawNumberPolygon = false;
 int Option_ShadowSizePower = 4;
 float Option_MapLevel = 0.8f;
@@ -98,16 +98,16 @@ float CONVERT_PROCENT(float x,float min,float max)
 
 cVisGeneric::cVisGeneric(bool multiThread)
 {
-	maximal_shadow_object=OST_SHADOW_REAL;
+	maximal_shadow_object=ObjectShadowType(OST_SHADOW_REAL);
 	is_multithread=multiThread;
 	logic_quant=0;
-	graph_logic_quant=0;//В случае, когда эти переменные вообще не выставляются, пускай сразу удаляется как только возможно.
+	graph_logic_quant=0;//пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	use_logic_quant=false;
 
 	for(int i=0;i<SHOW_MAX;i++)
 		Option_ShowType[i]=true;
 	Option_ShowType[SHOW_INFO]=false;
-	// инициализация глобальных переменых
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	shaders=0;
 	Lib3dx=new cLib3dx;
 	LibSimply3dx=new cLibSimply3dx;
@@ -202,8 +202,9 @@ void cVisGeneric::serialize(Archive& ar)
 
 void cVisGeneric::editOption()
 {
-	// TODO: переделать через filter
-	if(kdw::edit(Serializer(*this), "Scripts\\TreeControlSetups\\cVisGenericState")){
+	// TODO: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ filter
+	Serializer visGenericSerializer(*this);
+	if(kdw::edit(visGenericSerializer, "Scripts\\TreeControlSetups\\cVisGenericState")){
 		XPrmOArchive oa(optionFileName_.c_str());
 		serialize(oa);
 	}
@@ -274,14 +275,14 @@ void cVisGeneric::SetShadowType(bool shadowEnabled, int shadow_size)
 cScene* cVisGeneric::CreateScene()
 {
 	if(file_dprintf)
-		fflush(file_dprintf);//Чтобы иногда сбрасывался.
+		fflush(file_dprintf);//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 
 	cScene *Scene=new cScene;
 	return Scene;
 }
 //////////////////////////////////////////////////////////////////////////////////////////
-void cVisGeneric::SetData(cInterfaceRenderDevice *pData)//Анахронизм, надо protected сделать.
-{ // функция для работы с окном вывода
+void cVisGeneric::SetData(cInterfaceRenderDevice *pData)//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ protected пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+{ // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	cInterfaceRenderDevice *IRenderDevice=pData;
 	InitShaders();
 	Init3dxshader();
@@ -633,7 +634,7 @@ void cVisGeneric::SetMaximalShadowObject(ObjectShadowType type)
 		pLibrary3dx->GetAllElements(p3dx);
 		cLib3dx::ObjectsList::iterator it;
 		FOR_EACH(p3dx,it)
-			(*it)->circle_shadow_enable_min=min(maximal_shadow_object,(*it)->circle_shadow_enable);
+			(*it)->circle_shadow_enable_min=StaticObjectShadowType(min(int(maximal_shadow_object),int((*it)->circle_shadow_enable)));
 	}
 
 	{
@@ -641,7 +642,7 @@ void cVisGeneric::SetMaximalShadowObject(ObjectShadowType type)
 		pLibrarySimply3dx->GetAllElements(p3dx);
 		vector<cStaticSimply3dx*>::iterator it;
 		FOR_EACH(p3dx,it)
-			(*it)->circle_shadow_enable_min=min(maximal_shadow_object,(*it)->circle_shadow_enable);
+			(*it)->circle_shadow_enable_min=ObjectShadowType(min(int(maximal_shadow_object),int((*it)->circle_shadow_enable)));
 	}
 }
 

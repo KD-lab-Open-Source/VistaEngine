@@ -8,6 +8,12 @@
 
 class cTileMap;
 
+// <sys/dirent.h> (pulled in transitively on macOS/Linux) defines DT_UNKNOWN as
+// a macro for its d_type field; undef it so our enumerator name is usable.
+#ifdef DT_UNKNOWN
+#undef DT_UNKNOWN
+#endif
+
 enum eDrawID
 {
 	DT_UNKNOWN=0,
@@ -24,7 +30,7 @@ public:
 
 	virtual eDrawID GetID()=0;
 	void BeginDraw();
-	virtual void BeginDrawShadow()=0;//Сейчас вызываются не там где нужно, и не имеют особого смысла!
+	virtual void BeginDrawShadow()=0;//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ!
 	virtual void EndDrawShadow()=0;
 
 	virtual void SetMaterialTilemap(const Color4f& shadowIntensity, cTexture* miniDetailTexture, float miniDetailResolution);

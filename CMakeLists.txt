@@ -33,6 +33,7 @@ target_include_directories(EngineIncludes INTERFACE
     ${CMAKE_SOURCE_DIR}/Game
     ${CMAKE_SOURCE_DIR}/UserInterface
     ${CMAKE_SOURCE_DIR}/Network
+    ${CMAKE_SOURCE_DIR}/Sound
     ${CMAKE_SOURCE_DIR}/Render/inc
     ${CMAKE_SOURCE_DIR}/Render/src
     ${CMAKE_SOURCE_DIR}/Render/3dx
@@ -42,6 +43,7 @@ target_include_directories(EngineIncludes INTERFACE
     ${CMAKE_SOURCE_DIR}/XLibs.Net/XUtil/Unicode
     ${CMAKE_SOURCE_DIR}/XLibs.Net/XZip
     ${CMAKE_SOURCE_DIR}/XLibs.Net/Profiler/Profiler
+    ${CMAKE_SOURCE_DIR}/XLibs.Net/OGG/PlayOgg
     ${CMAKE_SOURCE_DIR}/Util/XTL
 )
 
@@ -57,6 +59,10 @@ if(NOT WIN32)
         "$<$<COMPILE_LANGUAGE:CXX>:-fms-extensions>"
         # The 'register' keyword (removed in C++17) is used in ~19 legacy files.
         "$<$<COMPILE_LANGUAGE:CXX>:-Wno-register>"
+        # MSVC allowed taking the address of a temporary (e.g. f(&UI_TextFormat(...)));
+        # this is pervasive in the UI render code. The temporary lives to the end of
+        # the full-expression, so the calls are well-defined; downgrade to a warning.
+        "$<$<COMPILE_LANGUAGE:CXX>:-Wno-error=address-of-temporary>"
         # Force-include WindowsAPI.h as the very first header in every C++ translation unit
         "$<$<COMPILE_LANGUAGE:CXX>:-include;${CMAKE_SOURCE_DIR}/Platform/WindowsAPI.h>"
     )

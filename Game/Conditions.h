@@ -19,7 +19,7 @@ typedef vector<AttributeSquadReference> AttributeSquadReferences;
 typedef BitVector<UnitsConstruction> ConstructionState;
 typedef BitVector<UnitsTransformation> TransformationState;
 
-enum ScopeType
+enum ScopeType : int
 {
 	SCOPE_GLOBAL,
 	SCOPE_PROFILE,
@@ -30,24 +30,24 @@ enum ScopeType
 
 enum CompareOperator : int
 {
-	COMPARE_LESS,	// Меньше
-	COMPARE_LESS_EQ, // Меньше либо равно
-	COMPARE_EQ, // Равно
-	COMPARE_NOT_EQ, // Не равно
-	COMPARE_GREATER, // Больше
-	COMPARE_GREATER_EQ // Больше либо равно		 
+	COMPARE_LESS,	// пїЅпїЅпїЅпїЅпїЅпїЅ
+	COMPARE_LESS_EQ, // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	COMPARE_EQ, // пїЅпїЅпїЅпїЅпїЅ
+	COMPARE_NOT_EQ, // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	COMPARE_GREATER, // пїЅпїЅпїЅпїЅпїЅпїЅ
+	COMPARE_GREATER_EQ // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ		 
 };
 
 enum Activity 
 {
-	ACTIVITY_MOVING = 1, // двигается куда-то
-	ACTIVITY_ATTACKING = 2, //атакует
-	ACTIVITY_PRODUCING = 4, // производит что-то
-	ACTIVITY_CONSTRUCTING = 8, // строится сам
-	ACTIVITY_BUILDING = 16, // строит кого-то
-	ACTIVITY_UPGRADING = 32, //апгрейдится
-	ACTIVITY_PICKING_RESOURCE = 64, //собирает ресурс
-	ACTIVITY_TELEPORTATING = 128, //телепортируется
+	ACTIVITY_MOVING = 1, // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅ
+	ACTIVITY_ATTACKING = 2, //пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	ACTIVITY_PRODUCING = 4, // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ-пїЅпїЅ
+	ACTIVITY_CONSTRUCTING = 8, // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
+	ACTIVITY_BUILDING = 16, // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ-пїЅпїЅ
+	ACTIVITY_UPGRADING = 32, //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	ACTIVITY_PICKING_RESOURCE = 64, //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	ACTIVITY_TELEPORTATING = 128, //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	ACTIVITY_MOVING_TO_TRANSPORT = 256,
 	ACTIVITY_WAITING_FOR_PASSENGER = 512
 };
@@ -77,7 +77,7 @@ public:
 
 	bool checkDebug(UnitActing* unit);
 	bool check() const { xassert(0); return false; }
-	bool check(UnitActing* unit) const { xassert(0); return false; } // не надо вызывать из производных классов, их check - это предикат
+	bool check(UnitActing* unit) const { xassert(0); return false; } // пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ check - пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	bool isContext(ContextFilter& filter) const;
 	void serialize(Archive& ar);
 
@@ -93,7 +93,7 @@ protected:
 	int ignoreContextCounter_;
 };
 
-class ConditionContextSquad : public ConditionContext // Наследовать только для сквадовых условий!!!
+class ConditionContextSquad : public ConditionContext // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ!!!
 {
 public:
 	ConditionContextSquad() { squadFilter_ = true; }
@@ -260,7 +260,7 @@ public:
 	AIPlayerScanner(AIPlayerType playerType = AI_PLAYER_TYPE_ME);
 	bool serialize(Archive& ar, const char* name, const char* nameAlt);
 	Player& player(Player& aiPlayer);
-	bool next(Player& aiPlayer); // true, если _не_ все игроки просканированы
+	bool next(Player& aiPlayer); // true, пїЅпїЅпїЅпїЅ _пїЅпїЅ_ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 private:
 	AIPlayerType playerType_;
 	Player* player_;
@@ -806,7 +806,7 @@ private:
 };
 
 //---------------------------------------
-class ConditionSquadSufficientUnits : public ConditionContextSquad // Cквад состоит из юнитов в указанном количестве
+class ConditionSquadSufficientUnits : public ConditionContextSquad // CпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 {
 public:
     ConditionSquadSufficientUnits();
@@ -829,7 +829,7 @@ private:
 };
 
 //---------------------------------------
-struct ConditionObjectByLabelExists : Condition // Объект по метке существует
+struct ConditionObjectByLabelExists : Condition // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 {
 	bool check() const;
 	void serialize(Archive& ar);
@@ -838,7 +838,7 @@ private:
 	LabelObject anchor_;
 };	
 
-struct ConditionKillObjectByLabel : ConditionEvent // Объект по метке уничтожен
+struct ConditionKillObjectByLabel : ConditionEvent // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 {
 	ConditionKillObjectByLabel() 
 	{
@@ -983,7 +983,7 @@ private:
 	mutable UnitReal* unit1_;
 };
 
-struct ConditionTimeMatched : ConditionEvent // Осталось времени меньше, чем указано
+struct ConditionTimeMatched : ConditionEvent // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 {
 	int time; 
 	
@@ -995,7 +995,7 @@ struct ConditionTimeMatched : ConditionEvent // Осталось времени меньше, чем ука
 	void serialize(Archive& ar);
 };
 
-struct ConditionNetworkDisconnect : ConditionEvent // Разорвано соединение с игровым сервером
+struct ConditionNetworkDisconnect : ConditionEvent // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 {
 	ConditionNetworkDisconnect() { timeOut_ = 1; hardDisconnect_ = true; }
 	void checkEvent(const Event& event);
@@ -1016,7 +1016,7 @@ private:
 	Keys keys_;
 };
 
-struct ConditionClickOnButton : ConditionEvent // Клик по кнопке
+struct ConditionClickOnButton : ConditionEvent // пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 {
 	ConditionClickOnButton();
 
@@ -1051,7 +1051,7 @@ struct ConditionStatusTimeBase : Condition
 	mutable LogicTimer timer_;
 };
 
-struct ConditionFocusOnButton : ConditionStatusTimeBase // Мышь над кнопкой
+struct ConditionFocusOnButton : ConditionStatusTimeBase // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 {
 	ConditionFocusOnButton() : controlPtr_(0) {}
 
@@ -1064,7 +1064,7 @@ private:
 	mutable UI_ControlBase* controlPtr_;
 };
 
-struct ConditionButtonFocus : ConditionEvent // Мышь навелась на кнопку
+struct ConditionButtonFocus : ConditionEvent // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 {
 	ConditionButtonFocus() : controlPtr_(0), onFocus_(true) {}
 
@@ -1147,7 +1147,7 @@ private:
 	bool pausedByMenu_;
 };
 
-class ConditionUI_ControlState : public ConditionStatusTimeBase // включено оределённое состояние кнопки
+class ConditionUI_ControlState : public ConditionStatusTimeBase // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 {
 public:
 	ConditionUI_ControlState() : controlPtr_(0), state_(0) { }
@@ -1163,7 +1163,7 @@ private:
 	mutable UI_ControlBase* controlPtr_;
 };
 
-class ConditionUI_StringSelected : public Condition // в списке выбрана строка
+class ConditionUI_StringSelected : public Condition // пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 {
 public:
 	ConditionUI_StringSelected() :
@@ -1184,7 +1184,7 @@ private:
 	mutable UI_ControlBase* controlPtr_;
 };
 
-class ConditionUI_ProfilesEmpty : public Condition // нет ни одного профиля
+class ConditionUI_ProfilesEmpty : public Condition // пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 {
 public:
 	ConditionUI_ProfilesEmpty() { }
@@ -1193,7 +1193,7 @@ public:
 	bool allowable(bool forLogic) const { return !forLogic; }
 };
 
-class ConditionUI_ProfileSelected : public Condition // нет ни одного профиля
+class ConditionUI_ProfileSelected : public Condition // пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 {
 public:
 	ConditionUI_ProfileSelected() { }
@@ -1202,7 +1202,7 @@ public:
 	bool allowable(bool forLogic) const { return !forLogic; }
 };
 
-class ConditionUI_NeedDiskOpConfirmation : public Condition // надо подтвердить перезапись сэйва, реплея или профайла.
+class ConditionUI_NeedDiskOpConfirmation : public Condition // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 {
 public:
 	ConditionUI_NeedDiskOpConfirmation(){ }
@@ -1211,7 +1211,7 @@ public:
 };
 
 
-class ConditionNeedCommitSettings : public Condition // нужно подтвердить новые настройки
+class ConditionNeedCommitSettings : public Condition // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 {
 public:
 	ConditionNeedCommitSettings() { }
@@ -1219,7 +1219,7 @@ public:
 	bool check() const;
 };
 
-struct ConditionOnlyMyClan : Condition // Остался только мой клан
+struct ConditionOnlyMyClan : Condition // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 {
 	bool checkAuxPlayers;
 
@@ -1239,7 +1239,7 @@ struct ConditionNoUnitsLeft : Condition
 };
 
 
-struct ConditionDifficultyLevel : Condition // Уровень сложности
+struct ConditionDifficultyLevel : Condition // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 {
 	Difficulty difficulty; 
 
@@ -1313,8 +1313,8 @@ public:
 
 private:
 	AttributeUnitOrBuildingReferences objects_;
-	bool singleOnly; // только один
-	bool uniform; // только одного типа
+	bool singleOnly; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+	bool uniform; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 };
 
 class ConditionUnitSelecting : public ConditionContextEvent
@@ -1342,7 +1342,7 @@ public:
 
 private:
 	AttributeSquadReference attribute;
-	bool singleOnly; // только один
+	bool singleOnly; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 };
 
 

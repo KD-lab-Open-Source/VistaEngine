@@ -202,7 +202,7 @@ void cFileImage_GetFrame(void *pDst, int xDst, int yDst,
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
-// реализация интерфейса cTGAImage
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ cTGAImage
 //////////////////////////////////////////////////////////////////////////////////////////
 #pragma pack(push,1)
 
@@ -469,8 +469,12 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
-// реализация интерфейса cAVIImage
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ cAVIImage
 //////////////////////////////////////////////////////////////////////////////////////////
+// Video-for-Windows AVI reader/writer вЂ” Windows-only multimedia backend.
+// Excluded on other platforms (no AVI image support); a cross-platform video
+// path is a later concern (Track B).
+#if defined(_WIN32)
 class cAVIImage : public cFileImage
 {
 	IGetFrame	*Frame;
@@ -568,12 +572,13 @@ public:
 		AVIFileInit(); /*opens AVIFile library*/ 
 	}
 	static void Done()
-	{ 
-		AVIFileExit(); /*closes AVIFile library*/ 
+	{
+		AVIFileExit(); /*closes AVIFile library*/
 	}
 };
+#endif // _WIN32
 //////////////////////////////////////////////////////////////////////////////////////////
-// реализация интерфейса cJPGImage
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ cJPGImage
 //////////////////////////////////////////////////////////////////////////////////////////
 #ifdef USE_JPEG
 struct my_error_mgr
@@ -791,14 +796,16 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
-// реализация интерфейса cFileImage
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ cFileImage
 cFileImage* cFileImage::Create(const char* fname)
 {
 	string ext = extractFileExt(fname);
 	if(ext == ".tga")
 		return new cTGAImage;
+#if defined(_WIN32)
 	else if(ext == ".avi")
 		return (cFileImage*)new cAVIImage;
+#endif
 #ifdef USE_JPEG
 	else if(ext == ".jpg")
 		return new cJPGImage;
@@ -865,14 +872,18 @@ cFileImage* cFileImage::Create(char const * diffuse_name, char const * self_illu
 }
 void cFileImage::InitFileImage()
 {
+#if defined(_WIN32)
 	cAVIImage::Init();
+#endif
 }
 void cFileImage::DoneFileImage()
 {
+#if defined(_WIN32)
 	cAVIImage::Done();
+#endif
 }
 
-////////////////////// Реализация cAviScaleFileImage ///////////////////////////
+////////////////////// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ cAviScaleFileImage ///////////////////////////
 
 cAviScaleFileImage::cAviScaleFileImage():cFileImage()
 {
@@ -899,8 +910,8 @@ bool cAviScaleFileImage::Init(const char* fName)
 		GetDimTexture(t1,t2,t3);//change parameters
 		if (t3 < FileImage->GetLength())
 		{
-//			VisError<<"Слишком много кадров!!!\r\n"<<"Попытка создать - "<<FileImage->GetLength()
-//				<<",а доступно - "<<t3<<" кадров\r\n"<<fName<<VERR_END;
+//			VisError<<"пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ!!!\r\n"<<"пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ - "<<FileImage->GetLength()
+//				<<",пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - "<<t3<<" пїЅпїЅпїЅпїЅпїЅпїЅ\r\n"<<fName<<VERR_END;
 			n_count = t3;
 		}else
 		{
@@ -957,8 +968,8 @@ bool cAviScaleFileImage::Init(const char* fName)
 		vector<Vect2i> texture_size(FileImage->GetLength(),Vect2i(dx,dy));
 		if(!atlas.Init(texture_size))
 		{
-//			VisError<<"Слишком много кадров!!!\r\n"<<"Попытка создать - "<<FileImage->GetLength()
-//				<<",а доступно - "<<t3<<" кадров\r\n"<<fName<<VERR_END;
+//			VisError<<"пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ!!!\r\n"<<"пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ - "<<FileImage->GetLength()
+//				<<",пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - "<<t3<<" пїЅпїЅпїЅпїЅпїЅпїЅ\r\n"<<fName<<VERR_END;
 //			n_count = t3;
 			xassert(0);
 		}
@@ -1027,7 +1038,7 @@ void BikeRotateBilinearAndApply(BYTE* buffer,int dx,int dy,int pitch,
 		in_offsety-=(-iy*in_dx/2+ix*in_dy/2);
 	}
 
-	//xx=( x*ix+y*iy>>shift)+in_offsetx;Прямая
+	//xx=( x*ix+y*iy>>shift)+in_offsetx;пїЅпїЅпїЅпїЅпїЅпїЅ
 	//yy=(-x*iy+y*ix>>shift)+in_offsety;
 	int offx=-(in_offsetx*ix-in_offsety*iy)>>shift;
 	int offy=-(in_offsetx*iy+in_offsety*ix)>>shift;
@@ -1237,9 +1248,9 @@ cCompositeImage::cCompositeImage(cFileImage* pMainImage_,
 
 int cCompositeImage::GetTexture(void *pointer,int time, int xSize,int ySize)
 {
-	if (pMainImage == 0)//Если основная текстура не загрузилась, возвращаем 0
+	if (pMainImage == 0)//пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 0
 		return 0;
-	//Суем в буффер изображение основной текстуры
+	//пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	pMainImage->GetTexture(pointer,time,xSize,ySize);
 
 	if(skin_color.a==255)
@@ -1264,7 +1275,7 @@ int cCompositeImage::GetTexture(void *pointer,int time, int xSize,int ySize)
 
 
 	if (pEmblemImage != 0 && logo_pos != 0)
-	{		//Если эмблема загрузилась, то создаем буффер, суем в него эмблему и накладываем ее на основную текстуру
+	{		//пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			int edx = (int)((logo_pos->max.x -logo_pos->min.x)*xSize);
 			int edy = (int)((logo_pos->max.y -logo_pos->min.y)*ySize);
 			int minx= (int)((logo_pos->min.x+(logo_pos->max.x -logo_pos->min.x)*.5f)*xSize);
@@ -1284,7 +1295,7 @@ int cCompositeImage::GetTexture(void *pointer,int time, int xSize,int ySize)
 	}
 
 	if (pSelfIlluminationImage != 0)
-	{		//Если самосвечение загрузилось, то создаем буффер, суем в него самосвечение и накладываем ее на основную текстуру
+	{		//пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			unsigned int *lpBuf = new unsigned int [xSize*ySize];
 			memset(lpBuf,0xFF,xSize*ySize*sizeof(lpBuf[0]));
 			pSelfIlluminationImage->GetTexture(lpBuf,time,xSize,ySize);

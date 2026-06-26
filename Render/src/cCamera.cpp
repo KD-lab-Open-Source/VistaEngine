@@ -390,8 +390,9 @@ void Camera::Update()
 	WorldI=GetMatrix().rot().xrow();
 	WorldJ=getAttribute(ATTRCAMERA_REFLECTION)?-GetMatrix().rot().yrow():GetMatrix().rot().yrow();
 	WorldK=GetMatrix().rot().zrow();
-	// определение местоположения камеры в мировом пространстве
-	GetPos() = GetMatrix().invXformPoint(Vect3f(0,0,0));
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	Vect3f camOrigin(0,0,0);
+	GetPos() = GetMatrix().invXformPoint(camOrigin);
 
 	CalcClipPlane();
 }
@@ -550,7 +551,8 @@ void Camera::GetPlaneClip(Plane PlaneClip[5],const sRectangle4f *Rect)
 		float yi=-(Rect->ymin()-cy),ya=-(Rect->ymax()-cy);
 
 		Vect2f focus(zPlane.x/(GetScaleViewPort().x*GetFocusX()),zPlane.x/(GetScaleViewPort().y*GetFocusY()));
-		Vect3f Center=GetMatrix().invXformPoint(Vect3f(0,0,0));
+		Vect3f camOrigin(0,0,0);
+		Vect3f Center=GetMatrix().invXformPoint(camOrigin);
 		Vect3f p00=GetMatrix().invXformPoint(Vect3f(xi*focus.x,yi*focus.y,zPlane.x),p00);
 		Vect3f p01=GetMatrix().invXformPoint(Vect3f(xa*focus.x,yi*focus.y,zPlane.x),p01);
 		Vect3f p11=GetMatrix().invXformPoint(Vect3f(xa*focus.x,ya*focus.y,zPlane.x),p11);
@@ -612,7 +614,7 @@ void Camera::GetFrustum(Vect2f *center,sRectangle4f *clip,Vect2f *focus,Vect2f *
 
 void Camera::UpdateViewport()
 {
-	// обновление данных ViewPort
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ ViewPort
 	if(RenderSurface==0 && RenderTarget==0)
 		RenderSize.set(float(gb_RenderDevice->GetSizeX()),float(gb_RenderDevice->GetSizeY()));
 
@@ -816,9 +818,9 @@ void Camera::SetGrass(BaseGraphObject* grass)
 void Camera::DrawSilhouettePlane()
 {
 /*
-	Объекты с ATTRUNKOBJ_SHOW_FLAT_SILHOUETTE выводить после.
-	Сортировать по этому признаку.
-	Если есть такие объекты, вызывать потом DrawShadowPlane()
+	пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ ATTRUNKOBJ_SHOW_FLAT_SILHOUETTE пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.
+	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+	пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ DrawShadowPlane()
 */
 	gb_RenderDevice3D->SetVertexShader(0);
 	gb_RenderDevice3D->SetPixelShader(0);
@@ -851,7 +853,7 @@ void Camera::DrawSilhouettePlane()
 		rd->SetRenderState( D3DRS_STENCILPASS, D3DSTENCILOP_REPLACE );
 	}
 
-	//!!! Прямоугольнички выводятся всегда, хотя могли бы выводиться, только когда прошёл тест на occlusion query и немного fillrate сэкономить.
+	//!!! пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ occlusion query пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ fillrate пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 
     FOR_EACH(drawList, it) {
         xassert((*it)->GetKind() == KIND_OBJ_3DX);
@@ -936,7 +938,7 @@ void Camera::DrawSilhouettePlane()
 			if(screenPoint.y > right_bottom.y)
 				right_bottom.y = screenPoint.y;
 		}
-		const max_size=10000;
+		const int max_size=10000;
 		top_left.x=clamp(top_left.x,-max_size,+max_size);
 		top_left.y=clamp(top_left.y,-max_size,+max_size);
 		right_bottom.x=clamp(right_bottom.x,-max_size,+max_size);
@@ -1016,7 +1018,7 @@ eTestVisible Camera::GridTest(Vect3f p[8])
 {
 	for(int i=0;i<8;i++)
 	{
-		int x=round(p[i].x)>>TestGridShl,y=round(p[i].y)>>TestGridShl;
+		int x=int(round(p[i].x))>>TestGridShl,y=int(round(p[i].y))>>TestGridShl;
 		if(x<0 || x>=TestGridSize.x || y<0 || y>=TestGridSize.y)
 			continue;
 		if(pTestGrid[x+y*TestGridSize.x])
@@ -1027,7 +1029,7 @@ eTestVisible Camera::GridTest(Vect3f p[8])
 }
 
 eTestVisible Camera::TestVisible(const MatXf &matrix,const Vect3f &min,const Vect3f &max)
-{ // для BoundingBox с границами min && max
+{ // пїЅпїЅпїЅ BoundingBox пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ min && max
 	Vect3f	p[8];
 	matrix.xformPoint(Vect3f(min.x,min.y,min.z),p[0]);
 	matrix.xformPoint(Vect3f(max.x,min.y,min.z),p[1]);
@@ -1058,7 +1060,7 @@ eTestVisible Camera::TestVisible(const MatXf &matrix,const Vect3f &min,const Vec
 
 //*
 eTestVisible Camera::TestVisible(const Vect3f &min,const Vect3f &max)
-{ // для BoundingBox с границами min && max, заданными в глобальным координатах
+{ // пїЅпїЅпїЅ BoundingBox пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ min && max, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	for(int i=0;i<GetNumberPlaneClip3d();i++)
 	{
 		Plane& p=GetPlaneClip3d(i);
@@ -1343,7 +1345,7 @@ void CameraPlanarLight::drawLights()
 				sVertexXYZDT1 *v=quad->Get();
 				Vect3f& p=c.pos;
 				float r=c.radius;
-				Color4c Diffuse=c.color;//Учитываем, что 0.5 - это нормальная яркость.
+				Color4c Diffuse=c.color;//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ 0.5 - пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 				Diffuse.r=Diffuse.r>>1;
 				Diffuse.g=Diffuse.g>>1;
 				Diffuse.b=Diffuse.b>>1;
@@ -1535,14 +1537,14 @@ void Camera::DrawObject2Pass()
 	vector<BaseGraphObject*>& obj=DrawArray[SCENENODE_OBJECT_2PASS];
 	vector<BaseGraphObject*>::iterator it;
 	//gb_RenderDevice->SetRenderState( RS_CULLMODE,D3DCULL_CW);
-	// 1 pass - отрисовка в Z буффер
+	// 1 pass - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ Z пїЅпїЅпїЅпїЅпїЅпїЅ
 	gb_RenderDevice3D->SetRenderState(RS_ZWRITEENABLE,FALSE);
 	
 	FOR_EACH(obj,it)
 		(*it)->Draw(this);
 
 	gb_RenderDevice3D->SetRenderState(RS_ZWRITEENABLE,TRUE);
-	// 2 pass - отрисовка в Color буффер
+	// 2 pass - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ Color пїЅпїЅпїЅпїЅпїЅпїЅ
 	//camerapass=SCENENODE_OBJECT_2PASS;
 	//FOR_EACH(obj,it)
 	//{
@@ -1715,7 +1717,7 @@ void CameraShadowMap::DrawScene()
 		return;
 
 	DWORD old_cullmode=gb_RenderDevice3D->GetRenderState(D3DRS_CULLMODE);
-//	gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE,D3DCULL_CCW);//bias должен в другую сторону смотреть.
+//	gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE,D3DCULL_CCW);//bias пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 
 	gb_RenderDevice3D->SetRenderState(D3DRS_ALPHAREF,0);
 	DrawObjectFirst();
@@ -1769,7 +1771,7 @@ void CameraShadowMap::DrawScene()
 
 Vect2f Camera::CalcZMinZMaxShadowReciver()
 {
-    Vect2f all(zPlane.y,zPlane.x);//Тут правильно.
+    Vect2f all(zPlane.y,zPlane.x);//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 
     SceneNode nType[]={SCENENODE_OBJECT,SCENENODE_FLAT_SILHOUETTE};
     for(int itype=0;itype<sizeof(nType)/sizeof(nType[0]);itype++)
@@ -1843,7 +1845,7 @@ void Camera::SetZTexture(cTexture* zTexture)
 		pZTexture->AddRef();
 }
 
-void Camera::SetFrustumPositionAutoCenter(sRectangle4f& camera_position,float focusx)
+void Camera::SetFrustumPositionAutoCenter(const sRectangle4f& camera_position,float focusx)
 {
 	Vect2f vSize(camera_position.xmax()-camera_position.xmin(),camera_position.ymax()-camera_position.ymin());
 	Vect2f vC = (camera_position.min + camera_position.max)*0.5;

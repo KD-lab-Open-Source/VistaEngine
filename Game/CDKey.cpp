@@ -24,7 +24,10 @@ CDKeyChecker::CDKeyChecker()
 	for(int i = 0; i < 13; i++)
 		permutations_[i] = i;
 	RandomGenerator gen(1283);
-	random_shuffle(permutations_, permutations_ + 13, gen);
+	// std::random_shuffle(first,last,gen) was removed in C++17; replicate its
+	// loop (gen(k) returns an index in [0,k)) so the permutation is unchanged.
+	for(int i = 1; i < 13; i++)
+		std::swap(permutations_[i], permutations_[gen(i + 1)]);
 	for(int i = 0; i < 13; i++)
 		permutationsInv_[permutations_[i]] = i;
 }

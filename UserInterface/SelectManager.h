@@ -15,7 +15,7 @@ class UnitActing;
 class UnitBuilding;
 class WeaponTarget;
 class UnitCommand;
-enum CommandID;
+enum CommandID : int;
 
 typedef vector<UnitInterface*> UnitInterfaceList; 
 
@@ -50,21 +50,21 @@ public:
 	void setPlayer(Player* player) { player_ = player; }
 	void clearPlayer() { player_ = 0; }
 
-	// номер активного слота
+	// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	int selectedSlot() const { return selectedSlot_; }
-	// любой юнит из активного слота
+	// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	UnitInterface* selectedUnit();
-	// юнит из слота, но только если там не пачка, (-1) - из активного слота
+	// пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, (-1) - пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	UnitInterface* getUnitIfOne(int slotIndex = -1);
-	// selectionAttribute юнита в активном слоте
+	// selectionAttribute пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	const AttributeBase* selectedAttribute() const { return selectedAttribute_; }
-	// список слотов селекта
+	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	void getSelectList(Slots& out);
-	// в селекте никого и ничего нет
+	// пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 	bool isSelectionEmpty() const { return selectionSize_ == 0; }
-	// количество юнитов в селекте
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	int selectionSize() const { return selectionSize_; }
-	/// флаг однородности селекта (все юниты одного типа (включая внутри сквада) и одного уровня)
+	/// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ) пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ)
 	bool uniform();
 
 	bool selectArea(const Vect2f& p0, const Vect2f& p1, bool multi, UnitInterface* startTrakingUnit);
@@ -106,7 +106,7 @@ public:
 
 	bool isSelected(const AttributeBase* attribute, bool singleOnly, bool needUniform);
 	bool isSquadSelected(const AttributeBase* attribute, bool singleOnly) const;
-	/// возвращает true, если заселекчен транспорт с юнитом определённого типа на борту
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ true, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	bool isInTransport(const AttributeBase* attribute, bool singleOnly) const;
 
 	bool squadsMerge();
@@ -137,7 +137,7 @@ private:
 	const AttributeBase* selectedAttribute_;
 	int selectedSlot_;
 
-	// активный слот
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	void validateSelectedObject();
 
 	UnitInterfaceListsContainer savedSelections_;

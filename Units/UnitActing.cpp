@@ -1452,7 +1452,7 @@ class ClearRegionOp {
 	float radius_;
 public:
 
-	ClearRegionOp(Vect2f& position, float radius):position_(position),radius_(radius) {}
+	ClearRegionOp(const Vect2f& position, float radius):position_(position),radius_(radius) {}
 
 	void operator () (UnitBase* p) 
 	{
@@ -2906,7 +2906,7 @@ bool UnitActing::removeWeapon(WeaponBase* weapon)
 
 UnitInterface* UnitActing::fireUnit() const
 {
-	return specialTargetUnit_ ? specialTargetUnit_ : targetUnit();
+	return specialTargetUnit_ ? (UnitInterface*)specialTargetUnit_ : targetUnit();
 }
 
 Vect3f UnitActing::firePosition() const

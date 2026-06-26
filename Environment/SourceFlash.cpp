@@ -9,9 +9,9 @@
 #include "CameraManager.h"
 #include "VistaRender/Flash.h"
 
-BEGIN_ENUM_DESCRIPTOR_ENCLOSED(SourceFlash, EvolutionType, "тип кривой")
-REGISTER_ENUM_ENCLOSED(SourceFlash, LINEAR, "линейная")
-REGISTER_ENUM_ENCLOSED(SourceFlash, EXPONENTIAL, "экспонента")
+BEGIN_ENUM_DESCRIPTOR_ENCLOSED(SourceFlash, EvolutionType, "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(SourceFlash, LINEAR, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(SourceFlash, EXPONENTIAL, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(SourceFlash, EvolutionType)
 
 SourceFlash::SourceFlash()
@@ -44,29 +44,29 @@ SourceFlash::~SourceFlash()
 
 void SourceFlash::EvolutionPrm::serialize(Archive &ar){
 	ar.serialize(increase_, "increase_", 0);
-	ar.serialize(time_, "time", "длительность");
-	ar.serialize(type_, "type", "тип кривой интенсивности");
+	ar.serialize(time_, "time", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(type_, "type", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(type_ == EXPONENTIAL){
-		ar.serialize(RangedWrapperf(naklon_, 0.2f, 8.f), "naklon", "крутизна кривой интенсивности");
-		ar.serialize(vipuclaya_, "vipuclaya", "кривая выпуклая интенсивности");
+		ar.serialize(RangedWrapperf(naklon_, 0.2f, 8.f), "naklon", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(vipuclaya_, "vipuclaya", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	}
 }
 
 void SourceFlash::serialize(Archive &ar){
 	__super::serialize(ar);
 
-	ar.serialize(color_, "color", "цвет вспышки");
-	ar.serialize(decByDistance_, "decByDistancer", "уменьшать засветку при отдалении");
+	ar.serialize(color_, "color", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(decByDistance_, "decByDistancer", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(decByDistance_){
-		ar.serialize(maxDistance_, "maxDistance", "максимальная дистанция до наблюдателя");
+		ar.serialize(maxDistance_, "maxDistance", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	}
-	ar.serialize(autoKill_, "autoKill", "автоматически удалять источник после затухания");
-	ar.serialize(increase_, "increase", "параметры нарастания вспышки");
+	ar.serialize(autoKill_, "autoKill", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(increase_, "increase", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	increase_.increase_ = true;
-	ar.serialize(decrease_, "decrease", "параметры убывания вспышки");
+	ar.serialize(decrease_, "decrease", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	decrease_.increase_ = false;
 
-	// для редактора
+	// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	if(ar.isInput() && enabled()){
 		setActivity(active_);
 	}
@@ -170,7 +170,7 @@ void SourceFlash::quant(){
 			intensive_ *= (1.f - dist2 / max2);
 	}
 	
-	// так плохо делать, надо через команды
+	// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	environment->flash()->addIntensity(intensive_);
 }
 
@@ -180,7 +180,7 @@ void SourceFlash::showEditor() const
 
 	if(editorVisual().isVisible(objectClass())){
 		char buf[255];
-		itoa(intensive_*100, buf, 10);
+		snprintf(buf, sizeof(buf), "%d", int(intensive_*100));
 		editorVisual().drawText(position(), buf, EditorVisual::TEXT_PROPERTIES);
 	}
 

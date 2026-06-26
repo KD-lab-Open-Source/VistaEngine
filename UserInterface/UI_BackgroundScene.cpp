@@ -20,10 +20,10 @@
 #include "UI_BackgroundScene.h"
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(UI_BackgroundAnimation, PlayMode, "UI_BackgroundAnimation::PlayMode")
-REGISTER_ENUM_ENCLOSED(UI_BackgroundAnimation, PLAY_STARTUP, "при появлении")
-REGISTER_ENUM_ENCLOSED(UI_BackgroundAnimation, PLAY_PERMANENT, "постоянно")
-REGISTER_ENUM_ENCLOSED(UI_BackgroundAnimation, PLAY_HOVER_STARTUP, "появление при наведении мыши")
-REGISTER_ENUM_ENCLOSED(UI_BackgroundAnimation, PLAY_HOVER_PERMANENT, "постоянно при наведении мыши")
+REGISTER_ENUM_ENCLOSED(UI_BackgroundAnimation, PLAY_STARTUP, "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(UI_BackgroundAnimation, PLAY_PERMANENT, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(UI_BackgroundAnimation, PLAY_HOVER_STARTUP, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(UI_BackgroundAnimation, PLAY_HOVER_PERMANENT, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(UI_BackgroundAnimation, PlayMode)
 
 const float UI_BackgroundScene::scale2focus = 0.0025f;
@@ -40,15 +40,15 @@ UI_BackgroundModelSetup::UI_BackgroundModelSetup() :
 
 void UI_BackgroundModelSetup::serialize(Archive& ar)
 {
-	ar.serialize(ModelSelector(modelName_, ModelSelector::DEFAULT_OPTIONS), "fileName", "Модель");
+	ar.serialize(ModelSelector(modelName_, ModelSelector::DEFAULT_OPTIONS), "fileName", "пїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(scale_, "scale", "Маштаб модели");
+	ar.serialize(scale_, "scale", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(useOwnColor_, "useOwnColor", "Собственный цвет легиона");
+	ar.serialize(useOwnColor_, "useOwnColor", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(useOwnColor_)
-		ar.serialize(skinColor_, "skinColor", "Цвет");
+		ar.serialize(skinColor_, "skinColor", "пїЅпїЅпїЅпїЅ");
 
-	ar.serialize(useEmblem_, "useEmblem", "Использовать эмблему легиона");
+	ar.serialize(useEmblem_, "useEmblem", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
  
 	if(ar.isInput() && isUnderEditor())
 		updateComboLists();
@@ -218,7 +218,7 @@ bool UI_BackgroundModel::play(const UI_BackgroundAnimation* animation, bool reve
 
 		int groupIndex = model_->GetAnimationGroup(it->attr()->animationGroupName());
 		if(groupIndex < 0){
-			xassertStr(0, XBuffer() < "В анимационной цепочке контрола указанна несуществующая группа: " < it->attr()->animationGroupName());
+			xassertStr(0, XBuffer() < "пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: " < it->attr()->animationGroupName());
 			return false;
 		}
 //		model_->SetAnimationGroupPhase(groupIndex, it->phase());
@@ -236,7 +236,7 @@ bool UI_BackgroundModel::play(const UI_BackgroundAnimation* animation, bool reve
 	
 	int groupIndex = model_->GetAnimationGroup(animations_.back().attr()->animationGroupName());
 	if(groupIndex < 0){
-		xassertStr(0, XBuffer() < "В анимационной цепочке контрола указанна несуществующая группа: " < animations_.back().attr()->animationGroupName());
+		xassertStr(0, XBuffer() < "пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: " < animations_.back().attr()->animationGroupName());
 		return false;
 	}
 
@@ -361,9 +361,9 @@ UI_BackgroundLight::UI_BackgroundLight()
 
 void UI_BackgroundLight::serialize(Archive& ar)
 {
-	ar.serialize(lifeTime_, "lifeTime", "Время жизни");
-	ar.serialize(radius_, "radius", "Радиус");
-	ar.serialize(color_, "color", "Цвет");
+	ar.serialize(lifeTime_, "lifeTime", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(radius_, "radius", "пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(color_, "color", "пїЅпїЅпїЅпїЅ");
 }
 
 // ------------------------------- UI_BackgroundLightController
@@ -420,14 +420,14 @@ UI_BackgroundAnimation::UI_BackgroundAnimation()
 void UI_BackgroundAnimation::serialize(Archive& ar)
 {
 	if(!ar.isEdit()){
-		ar.serialize(animationGroupName_, "animationGroupName", "Анимационная группа");
-		ar.serialize(chainName_, "chainName", "Цепочка");
+		ar.serialize(animationGroupName_, "animationGroupName", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(chainName_, "chainName", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	}
 	else {
 		ComboListString group_str(UI_BackgroundScene::instance().groupComboList(), animationGroupName_.c_str());
-		ar.serialize(group_str, "animationGroupName", "&Анимационная группа");
+		ar.serialize(group_str, "animationGroupName", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 		ComboListString chain_str(UI_BackgroundScene::instance().chainComboList(), chainName_.c_str());
-		ar.serialize(chain_str, "chainName", "&Цепочка");
+		ar.serialize(chain_str, "chainName", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 		if(ar.isInput()){
 			animationGroupName_ = group_str;
@@ -435,11 +435,11 @@ void UI_BackgroundAnimation::serialize(Archive& ar)
 		}
 	}
 
-	ar.serialize(effect_, "effect", "Прицепленный эффект");
+	ar.serialize(effect_, "effect", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(playMode_, "playMode", "Режим проигрывания");
-	ar.serialize(duration_, "duration", "Длительность");
-	ar.serialize(reversed_, "reversed", "Проигрывать в обратную сторону");
+	ar.serialize(playMode_, "playMode", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(duration_, "duration", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(reversed_, "reversed", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 UI_BackgroundAnimationController::UI_BackgroundAnimationController(const UI_BackgroundAnimation* animation)
@@ -580,7 +580,8 @@ void UI_BackgroundScene::setCamera()
 	sRectangle4f clip(-size.x / 2 / descale_x, -size.y / 2 / descale_y, 
 		               size.x / 2 / descale_x,  size.y / 2 / descale_y);
 
-	camera_->SetFrustum(&center, &clip, &Vect2f(size.x * focus, size.x * focus), 0);
+	Vect2f frustumFocus(size.x * focus, size.x * focus);
+	camera_->SetFrustum(&center, &clip, &frustumFocus, 0);
 }
 
 void UI_BackgroundScene::setFocus(float focus)
@@ -805,21 +806,21 @@ void UI_BackgroundScene::draw() const
 
 void UI_BackgroundScene::serialize(Archive& ar)
 {
-	ar.serialize(enabled_, "enabled", "Активна");
+	ar.serialize(enabled_, "enabled", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(modelSetups_, "models", "Модели");
+	ar.serialize(modelSetups_, "models", "пїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	if(ar.isInput())
 		updateModelComboList();
 
-	ar.serialize(lightDirection_, "lightDirection", "Направление освещения");
-	ar.serialize(lights_, "lights", "Источники света");
+	ar.serialize(lightDirection_, "lightDirection", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(lights_, "lights", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 
-	//if(ar.openBlock("camera", "Камера")){
-	//	ar.serialize(cameraPosition_, "position", "Позиция");
-	//	ar.serialize(cameraAngles_, "angles", "Поворот");
-	//	ar.serialize(cameraFocus_, "focusx", "Фокус");
-	//	ar.serialize(cameraPerspective_, "perspective", "Перспектива");
+	//if(ar.openBlock("camera", "пїЅпїЅпїЅпїЅпїЅпїЅ")){
+	//	ar.serialize(cameraPosition_, "position", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	//	ar.serialize(cameraAngles_, "angles", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	//	ar.serialize(cameraFocus_, "focusx", "пїЅпїЅпїЅпїЅпїЅ");
+	//	ar.serialize(cameraPerspective_, "perspective", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	//	ar.closeBlock();
 	//}

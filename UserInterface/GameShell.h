@@ -2,6 +2,7 @@
 #define __GAME_SHELL_H__
 
 #include "Timers.h"
+#include "XTL/SwapVector.h"
 #include "NetPlayer.h"
 #include "ReelManager.h"
 #include "Render/Inc/fps.h"
@@ -16,7 +17,7 @@
 
 class PNetCenter;
 class ChatMessage;
-enum e_PNCWorkMode;
+enum e_PNCWorkMode : int;
 struct SaveControlData;
 class TriggerChain;
 class Event;
@@ -144,18 +145,18 @@ public:
 	bool GameActive;
 	bool mainMenuEnabled_;
 
-	/// отсылка команд управляемому юниту
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	void directControlQuant();
 
 	void setDirectControl(DirectControlMode mode, UnitInterface* unit, int transitionTime);
 
-	// недетерминированные функции, пользоваться с осторожностью
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	bool directControl() const { return directControl_; }
 	bool underHalfDirectControl() const { return directControl_ & SYNDICATE_CONTROL_ENABLED; }
 	bool underFullDirectControl() const { return directControl_ & DIRECT_CONTROL_ENABLED; }
 	
 	UnitReal* unitHover(const Vect3f& v0, const Vect3f& v1, float& distMin) const;
-	// передается deviceCoords (-0.5f, -0.5f)-(0.5f, 0.5f)
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ deviceCoords (-0.5f, -0.5f)-(0.5f, 0.5f)
 	void unitsInArea(const Rectf& dev, UnitInterfaceList& out_list, UnitInterface* preferendUnit = 0, const AttributeBase* attr_filter = 0) const;
 
 	int MouseMoveFlag;
@@ -296,7 +297,7 @@ private:
 	QuantTimeStatistic quantTimeStatistic;
 	int gameReadyCounter_;
 
-	/// прямое управление юнитом
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	DirectControlMode directControl_;
 
 	//---------------------------------

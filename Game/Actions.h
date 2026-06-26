@@ -16,6 +16,7 @@
 #include "Units/LabelObject.h"
 
 class OggPlayer;
+enum ScopeType : int; // defined in Conditions.h; opaque decl so the value member below is complete
 class UnitCommand;
 class UnitReal;
 class UnitActing;
@@ -31,7 +32,7 @@ typedef  vector<AttributeSquadReference> AttributeSquadReferences;
 class CommandsQueueProcessor;
 
 //---------------------------------
-// Действия					
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ					
 //---------------------------------
 
 struct ActionForAI : Action 
@@ -80,7 +81,7 @@ protected:
 	friend Trigger;
 };
 
-struct ActionDelay : Action // Задержка времени
+struct ActionDelay : Action // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 {
 	float duration; 
 	bool showTimer; 
@@ -123,7 +124,7 @@ private:
 };
 
 
-class ActionSetCameraRestriction : public Action // ограничения камеры
+class ActionSetCameraRestriction : public Action // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 {
 public:
 	ActionSetCameraRestriction();
@@ -133,7 +134,7 @@ private:
 	SwitchModeTriple switchMode_;
 };
 
-struct ActionSetCamera : Action // Установка Камеры
+struct ActionSetCamera : Action // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 {
 	CameraSplineName cameraSplineName;
 	bool smoothTransition; 
@@ -147,7 +148,7 @@ struct ActionSetCamera : Action // Установка Камеры
 	void serialize(Archive& ar);
 };
 
-struct ActionSetDefaultCamera : Action // Установка Камеры
+struct ActionSetDefaultCamera : Action // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 {
 	float duration_;
 
@@ -191,7 +192,7 @@ private:
 	mutable UnitLink<UnitReal> unit_;
 };
 
-struct ActionOscillateCamera : Action // Тряска Камеры
+struct ActionOscillateCamera : Action // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 {
 	int duration; 
 	float factor; 
@@ -226,7 +227,7 @@ private:
 	string name_;
 };
 
-struct ActionSave : Action // Сохранить игру
+struct ActionSave : Action // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 {
 	void activate();
 	void serialize(Archive& ar);
@@ -290,7 +291,7 @@ protected:
 	mutable Vect2i placement_coords;
 	mutable Vect2i scanMin_, scanMax_; // world's scale
 
-	// сканирующий код для поиска места установки здания и связанные с операцией переменные
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	enum BuilderState
 	{	
 		BuildingIdle, 
@@ -447,7 +448,7 @@ private:
 	Vect2f intersect(const Vect2f& l1p0, const Vect2f& l1p1, const Vect2f& l2p0, const Vect2f& l2p1);
 	bool pointIn(const Vect2f& l1p0, const Vect2f& l1p1, const Vect2f& ptCheck) const; 
 	Vect2f normal(const Vect2f& p0, const Vect2f& p1);
-	Vect2f getPointInSection(const Vect2f& p0, const Vect2f& p1, float alfa); // 0<=alfa<=1 чтобы принадлежала отрезку
+	Vect2f getPointInSection(const Vect2f& p0, const Vect2f& p1, float alfa); // 0<=alfa<=1 пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	Vect2f getPointOnDistance(const Vect2f& guide, const Vect2f& point, float distance); 
 
 };
@@ -457,7 +458,7 @@ class ConvexHull
 public:
     typedef std::vector<Vect2f> Polygon;
 
-	ConvexHull(const Polygon& points); // по точкам строит выпуклую оболочку
+	ConvexHull(const Polygon& points); // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 	const Polygon& getPolygon() { return polygon_; }
 
@@ -915,7 +916,7 @@ private:
 	mutable bool firstTime;
 };
 
-struct ActionActivateObjectByLabel : Action // Активировать объект по метке
+struct ActionActivateObjectByLabel : Action // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 {
 	ActionActivateObjectByLabel() : active_(true) {}
 
@@ -927,14 +928,14 @@ protected:
 	LabelUnit label_;
 };
 
-struct ActionDeactivateObjectByLabel : ActionActivateObjectByLabel // Деактивировать объект по метке
+struct ActionDeactivateObjectByLabel : ActionActivateObjectByLabel // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 {
 	ActionDeactivateObjectByLabel(){
 		active_ = false;
 	}
 };
 
-struct ActionSetControlEnabled : Action // Запретить/разрешить управление игрока
+struct ActionSetControlEnabled : Action // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ/пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 {
 	bool controlEnabled; 
 
@@ -1052,7 +1053,7 @@ private:
 	UI_MessageTypeReference messageType_;
 };
 
-class ActionMessage : public Action // Cообщение
+class ActionMessage : public Action // CпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 {
 public:
 	enum Type {
@@ -1086,7 +1087,7 @@ private:
 	InterpolationLogicTimer fadeTimer_;
 };
 
-class ActionTask : public Action // Задача
+class ActionTask : public Action // пїЅпїЅпїЅпїЅпїЅпїЅ
 {
 public:
 	ActionTask();
@@ -1101,7 +1102,7 @@ private:
 	UI_TaskStateID state_;
 	UI_MessageSetup messageSetup_;
 
-	/// второстепенные задачи отображаются другим цветом
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	bool isSecondary_;
 
 	LogicTimer durationTimer_;
@@ -1119,7 +1120,7 @@ protected:
 	SwitchMode switchType;
 };
 
-class ActionSetCameraAtSquad : public Action // Установить камеру на сквад (с возможностью слежения)
+class ActionSetCameraAtSquad : public Action // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
 {
 public:
 	LogicTimer timer;
@@ -1156,7 +1157,7 @@ public:
 	void activate();
 };
 
-struct ActionSetCameraAtObject : ActionContext // Установить камеру на объект
+struct ActionSetCameraAtObject : ActionContext // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 {
 	int transitionTime; 
 	bool setFollow;
@@ -1221,7 +1222,7 @@ public:
 	SoundReference soundReference;
 };
 
-struct ActionSelectUnit : Action // Селектировать юнита
+struct ActionSelectUnit : Action // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 {
 	AttributeReference unitID; 
 	bool onlyConnected_;
@@ -1232,7 +1233,7 @@ struct ActionSelectUnit : Action // Селектировать юнита
 	void serialize(Archive& ar);
 };
 
-class ActionDeselect : public Action // Деселект
+class ActionDeselect : public Action // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 {
 public:
 	ActionDeselect();
@@ -1242,21 +1243,21 @@ private:
 	bool stopPlayerUnit_;
 };
 
-/// выход из игры
+/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ
 class ActionGameQuit : public Action 
 {
 public:
 	void activate();
 };
 
-/// выход из игры
+/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ
 class ActionGameUpdateOpen : public Action 
 {
 public:
 	void activate();
 };
 
-struct ActionSetInterface : Action // Включить/выключить интерфейс
+struct ActionSetInterface : Action // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ/пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 {
 	bool enableInterface; 
 
@@ -1268,7 +1269,7 @@ struct ActionSetInterface : Action // Включить/выключить интерфейс
 	void serialize(Archive& ar);
 };
 
-/// Создать подсистему для игры по сети
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ
 struct ActionCreateNetClient : Action 
 {
 	ActionCreateNetClient() : type_(UI_NetCenter::LAN) { }
@@ -1282,7 +1283,7 @@ private:
 
 class UI_Screen;
 
-/// включить определённый экран интерфейса
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 struct ActionSelectInterfaceScreen : Action 
 {
 	ActionSelectInterfaceScreen(){ }
@@ -1297,7 +1298,7 @@ private:
 	GraphicsTimer nonStopTimer_;
 };
 
-/// спрятать/показать контрол
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ/пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 class ActionInterfaceHideControl : public Action
 {
 public:
@@ -1311,7 +1312,7 @@ private:
 	bool hideControl_;
 };
 
-/// спрятать/показать контрол, из интерфейса не перекрывается
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ/пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 class ActionInterfaceHideControlTrigger : public Action
 {
 public:
@@ -1337,7 +1338,7 @@ private:
 	AtomActions actions_;
 };
 
-/// включить состояние контрола по номеру
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 class ActionInterfaceSetControlState : public Action
 {
 public:
@@ -1351,7 +1352,7 @@ private:
 	int state_;
 };
 
-/// запретить/разрешить контрол
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ/пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 class ActionInterfaceTogglAccessibility : public Action
 {
 public:
@@ -1365,7 +1366,7 @@ private:
 	bool enableControl_;
 };
 
-/// отсылка команды заселекченному юниту
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 class ActionUI_UnitCommand : public ActionContext
 {
 public:
@@ -1378,7 +1379,7 @@ protected:
 	UnitCommand& unitCommand;
 };
 
-/// старт игры
+/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 class ActionUI_GameStart : public Action
 {
 public:
@@ -1391,7 +1392,7 @@ private:
 	bool isBattle_;
 };
 
-/// logoff из online
+/// logoff пїЅпїЅ online
 class ActionOnlineLogout : public Action
 {
 public:
@@ -1399,7 +1400,7 @@ public:
 	void activate();
 };
 
-/// старт сетевой игры
+/// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 class ActionUI_LanGameStart : public Action
 {
 public:
@@ -1407,7 +1408,7 @@ public:
 	void activate();
 };
 
-/// присоединение к сетевой игре
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 class ActionUI_LanGameJoin : public Action
 {
 public:
@@ -1415,7 +1416,7 @@ public:
 	void activate();
 };
 
-/// создание сетевой игры
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 class ActionUI_LanGameCreate : public Action
 {
 public:
@@ -1423,7 +1424,7 @@ public:
 	void activate();
 };
 
-/// выключить интерфейсный экран
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 class ActionUI_ScreenSwitchOff : public Action
 {
 public:
@@ -1432,7 +1433,7 @@ public:
 	bool workedOut();
 };
 
-/// подтвердить или отклонить перезапись сэйва, реплея или профиля
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 class ActionUI_ConfirmDiskOp : public Action
 {
 public:
@@ -1664,7 +1665,7 @@ struct ActionAIUnitCommand : public ActionUI_UnitCommand
 	void activate();
 };
 
-/// Установить курсор, который будет действовать, пока не вызовется ActionFreeCursor
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ActionFreeCursor
 struct ActionSetCursor : Action
 {
 	UI_CursorReference cursor;
@@ -1673,13 +1674,13 @@ struct ActionSetCursor : Action
 	void serialize(Archive& ar);
 };
 
-/// Отменить установку курсора
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 struct ActionFreeCursor : Action
 {
 	void activate();
 };
 
-/// Сменить курсор для выбора юнита данного типа
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 struct ActionChangeUnitCursor : Action
 {
 	AttributeReference attribute;

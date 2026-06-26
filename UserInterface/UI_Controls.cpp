@@ -84,7 +84,7 @@ void logUIState(int line, const char* func, const UI_ControlBase* control, const
 			out < "\n  NewText:" < w2a(control->newText_.c_str()).c_str();
 
 		//out < "\n  ";
-		//control->getDebugString(out); // трансформация
+		//control->getDebugString(out); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 		if(showDebugInterface.writeLog & 0x01)
 			dprintf("%s\n", out.c_str());
@@ -113,10 +113,10 @@ void UI_ControlButton::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 	
-	ar.serialize(autoResize_, "autoResize", "подгонять размер по тексту");
+	ar.serialize(autoResize_, "autoResize", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(autoResize_){
-		ar.serialize(resizeShiftHorizontal_, "resizeShiftHorizontal", "сдвиг по горизонтали");
-		ar.serialize(resizeShiftVertical_, "resizeShiftVertical", "сдвиг по вертикали");
+		ar.serialize(resizeShiftHorizontal_, "resizeShiftHorizontal", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(resizeShiftVertical_, "resizeShiftVertical", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	}
 
 	if(ar.isInput())
@@ -202,16 +202,16 @@ void UI_ControlTextList::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 	
-	ar.serialize(isAnimation_, "isAnimation", "Анимированный вывод");
+	ar.serialize(isAnimation_, "isAnimation", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 	if(isAnimation_)
-		ar.serialize(animation_, "animation", "Настройки анимации");
+		ar.serialize(animation_, "animation", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	else
-		ar.serialize(scrollType_, "scrollType", "Тип скроллинга");
+		ar.serialize(scrollType_, "scrollType", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	
 	if(scrollType_ == AUTO_SMOOTH)
-		ar.serialize(RangedWrapperf(scrollSpeed_, 0.1f, 100.f), "scrollSpeed", "Скорость автоскролла (пикс/сек)");
+		ar.serialize(RangedWrapperf(scrollSpeed_, 0.1f, 100.f), "scrollSpeed", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅ/пїЅпїЅпїЅ)");
 	else
-		ar.serialize(autoHideScroll_, "autoHideScroll", "Показывать скроллер только при необходимости");
+		ar.serialize(autoHideScroll_, "autoHideScroll", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	if(ar.isEdit() && ar.isInput()){
 		lineCountChanged_ = true;
@@ -388,14 +388,14 @@ void UI_ControlSlider::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(orientation_, "orientation_", "ориентация");
+	ar.serialize(orientation_, "orientation_", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(valueDelta_, "valueDelta_", "шаг изменения значения");
+	ar.serialize(valueDelta_, "valueDelta_", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	if(ar.isInput())
 		step_ = valueDelta_;
 
-	ar.serialize(isDiscrete_, "isDiscrete_", "дискретные значения");
+	ar.serialize(isDiscrete_, "isDiscrete_", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 float UI_ControlSlider::index2sliderPhase(int index, int scrolling_size) const
@@ -493,7 +493,7 @@ UI_ControlHotKeyInput::UI_ControlHotKeyInput()
 void UI_ControlHotKeyInput::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(compatible_, "compatible", "Может совпадать с хоткеями на кнопках");
+	ar.serialize(compatible_, "compatible", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 bool UI_ControlHotKeyInput::activate()
@@ -587,11 +587,11 @@ void UI_ControlEdit::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 	
-	ar.serialize(next_, "next", "Следующий контрол");
-	ar.serialize(password_, "password", "Ввод пароля");
-	ar.serialize(saveFocus_, "saveFocus", "Оставлять фокус после редактирования");
-	ar.serialize(textLengthMax_, "textLengthMax_", "максимальная длина строки");
-	ar.serialize(charType_, "charType", "тип символов");
+	ar.serialize(next_, "next", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(password_, "password", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(saveFocus_, "saveFocus", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(textLengthMax_, "textLengthMax_", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(charType_, "charType", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	
 	setEditText(text());
 }
@@ -743,7 +743,7 @@ bool UI_ControlEdit::redraw() const
 
 		if(isEditing_){
 			Rectf pos = textPosition();
-			if(pos.width() >= fullSize){ // влазит
+			if(pos.width() >= fullSize){ // пїЅпїЅпїЅпїЅпїЅпїЅ
 				Vect2f end = UI_Render::instance().outText(pos, parser, parser.outNodes().begin(), parser.outNodes().end(), textFormat(), textAlign(), alpha(), true);
 				if(caretVisible_){
 					end.x -= shiftFronEnd;
@@ -894,8 +894,8 @@ UI_ControlStringList::~UI_ControlStringList()
 
 void UI_ControlStringList::Column::serialize(Archive& ar)
 {
-	ar.serialize(RangedWrapperi(width, 0, 100), "width", "Ширина (%)");
-	ar.serialize(align, "align", "Выравнивание");
+	ar.serialize(RangedWrapperi(width, 0, 100), "width", "пїЅпїЅпїЅпїЅпїЅпїЅ (%)");
+	ar.serialize(align, "align", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 void UI_ControlStringList::serialize(Archive& ar)
@@ -903,19 +903,19 @@ void UI_ControlStringList::serialize(Archive& ar)
 	__super::serialize(ar);
 
 	float stringHeightFactorOld = stringHeightFactor_;
-	ar.serialize(RangedWrapperf(stringHeightFactor_, 0.5f, 5.f), "stringHeightFactor", "высота строки относительно размера шрифта");
+	ar.serialize(RangedWrapperf(stringHeightFactor_, 0.5f, 5.f), "stringHeightFactor", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 	stringHeight_ = stringHeight_ / stringHeightFactorOld * stringHeightFactor_;
 
-	ar.serialize(strings_, "strings_", "строки");
-	ar.serialize(columns_, "columns", "Столбцы");
+	ar.serialize(strings_, "strings_", "пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(columns_, "columns", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(autoResizeList_, "autoResizeList", "подстройка размеров списка");
+	ar.serialize(autoResizeList_, "autoResizeList", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(autoResizeList_)
-		ar.serialize(stringMax_, "stringMax", "Максимальное количество строк в списке");
+		ar.serialize(stringMax_, "stringMax", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(autoHideSlider_, "autoHideSlider", "Показывать слайдер только при необходимости");
+	ar.serialize(autoHideSlider_, "autoHideSlider", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(underline_, "underline", "Подчеркивание строки");
+	ar.serialize(underline_, "underline", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 void UI_ControlStringList::preLoad()
@@ -976,7 +976,7 @@ void UI_ControlStringList::setList(const ComboWStrings& strings)
 	if(MT_IS_GRAPH()){
 		applyNewList(strings);
 	}
-	else if(!listChanged_){ // второй раз за квант поменять нельзя, HT possible трабл
+	else if(!listChanged_){ // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, HT possible пїЅпїЅпїЅпїЅпїЅ
 		newStrings_ = strings;
 		listChanged_ = true;
 	}
@@ -1159,8 +1159,8 @@ void UI_ControlStringCheckedList::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(checkOn_, "checkOn", "Пометка выбранной");
-	ar.serialize(checkOff_, "checkOff", "Пометка НЕ выбранной");
+	ar.serialize(checkOn_, "checkOn", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(checkOff_, "checkOff", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 void UI_ControlStringCheckedList::init()
@@ -1299,7 +1299,7 @@ void UI_ControlComboList::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(autoSetValue_, "autoSetValue", "автоматически выбирать первое значение из списка");
+	ar.serialize(autoSetValue_, "autoSetValue", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 void UI_ControlComboList::init()
@@ -1438,26 +1438,26 @@ void UI_ControlProgressBar::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(colorDone_, "colorDone_", "цвет пройденной области");
-	ar.serialize(colorLeft_, "colorLeft_", "цвет оставшейся области");
+	ar.serialize(colorDone_, "colorDone_", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(colorLeft_, "colorLeft_", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(showProgressChange_, "showProgressChange", "менять цвет при изменении значения");
+	ar.serialize(showProgressChange_, "showProgressChange", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(showProgressChange_){
-		ar.serialize(changePeriod_, "changePeriod", "время, за которое измеряется изменение");
-		ar.serialize(changeMin_, "changeMin", "минимальное показываемое изменение");
+		ar.serialize(changePeriod_, "changePeriod", "пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(changeMin_, "changeMin", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-		ar.serialize(colorDec_, "colorDec", "цвет при уменьшении значения");
-		ar.serialize(colorInc_, "colorInc", "цвет при увеличении значения");
+		ar.serialize(colorDec_, "colorDec", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(colorInc_, "colorInc", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	}
 
-	ar.serialize(changeColor_, "changeColor", "менять цвет по мере заполнения");
+	ar.serialize(changeColor_, "changeColor", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(changeColor_)
-		ar.serialize(colorDoneFull_, "colorDoneFull", "цвет при полном заполнении");
+		ar.serialize(colorDoneFull_, "colorDoneFull", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(show_only_not_empty_, "show_only_not_empty_", "показывать только не пустой");
-	ar.serialize(full_is_transparent_, "full_is_transparent", "полный становится прозрачным");
-	ar.serialize(vertical_, "vertical", "вертикальный");
-	ar.serialize(progressSprite_, "progressSprite", "Спрайт для прогресса");
+	ar.serialize(show_only_not_empty_, "show_only_not_empty_", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(full_is_transparent_, "full_is_transparent", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(vertical_, "vertical", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(progressSprite_, "progressSprite", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 void UI_ControlProgressBar::quant(float dt)
@@ -1513,7 +1513,7 @@ bool UI_ControlProgressBar::redraw() const
 			Rectf texCoords = progressSprite_.textureCoords();
 			
 			if(vertical_){
-				// боремся с паразитными округлениями
+				// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				float realProgress = (float)round(progress_ * scr_pos_full.height()) / (float)scr_pos_full.height();
 
 				float h = realProgress * texCoords.height();
@@ -1525,7 +1525,7 @@ bool UI_ControlProgressBar::redraw() const
 				rect.height(h);
 			}
 			else{
-				// боремся с паразитными округлениями
+				// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				float realProgress = (float)round(progress_ * scr_pos_full.width()) / (float)scr_pos_full.width();
 
 				texCoords.width(realProgress * texCoords.width());
@@ -1627,33 +1627,33 @@ void UI_ControlCustomList::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(type_, "type", "Тип");
+	ar.serialize(type_, "type", "пїЅпїЅпїЅ");
 	if((type_ & MESSAGE_LIST) != 0)
-		ar.serialize(messageTypes_, "messageTypes", "Типы сообщений для вывода");
+		ar.serialize(messageTypes_, "messageTypes", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 	
 	if((type_ & TASK_LIST) != 0){
-		ar.serialize(activeTask_, "activeTask", "Активное задание");
-		ar.serialize(completedTask_, "completedTask", "Выполненное задание");
-		ar.serialize(activeSecTask_, "activeSecTask", "Активное второстепенное задание");
-		ar.serialize(completedSecTask_, "completedSecTask", "Выполненное второстепенное задание");
+		ar.serialize(activeTask_, "activeTask", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(completedTask_, "completedTask", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(activeSecTask_, "activeSecTask", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(completedSecTask_, "completedSecTask", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	}
 
 	if((type_ & MESSAGE_LIST) != 0){
-		ar.serialize(activeMessage_, "activeMessage", "Активное сообщение");
-		ar.serialize(oldMessage_, "oldMessage", "Старое сообщение");
+		ar.serialize(activeMessage_, "activeMessage", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(oldMessage_, "oldMessage", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	}
 
-	ar.serialize(reverse_, "reverse", "В обратном порядке");
-	ar.serialize(hintSide_, "hintSide", "С какой стороны выводить текст");
+	ar.serialize(reverse_, "reverse", "пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(hintSide_, "hintSide", "пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 	
-	ar.serialize(deleteOld_, "deleteOld", "Разрешить убирать старые");
+	ar.serialize(deleteOld_, "deleteOld", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(deleteOld_){
-		// если сообщения удаляются сами, то показывать по клику, иначе показывать при наведении, а удалять по клику
-		ar.serialize(autoDelete_, "autoDelete", "Автоматически убирать старые иначе по клику");
-		showOnHover_ = !autoDelete_; // показывать при наведении, если клик уберает с экрана
+		// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+		ar.serialize(autoDelete_, "autoDelete", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+		showOnHover_ = !autoDelete_; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	}
 	else
-		ar.serialize(showOnHover_, "showOnHover", "Показывать при наведении иначе по клику");
+		ar.serialize(showOnHover_, "showOnHover", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 }
 
 // ------------------- UI_ControlVideo
@@ -1676,10 +1676,10 @@ void UI_ControlVideo::serialize(Archive& ar)
 	__super::serialize(ar);
 	static ResourceSelector::Options binkOptions("*.bik", "Resource\\Video");
 	
-	ar.serialize(ResourceSelector(videoFile_, binkOptions), "videoFileName", "Видео файл");
-	ar.serialize(cycled_, "cycled", "Зациклить проигрывание");
-	ar.serialize(mute_, "mute", "Без звука");
-	ar.serialize(diffuseColor_, "diffuseColor", "Диффузный цвет");
+	ar.serialize(ResourceSelector(videoFile_, binkOptions), "videoFileName", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+	ar.serialize(cycled_, "cycled", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(mute_, "mute", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(diffuseColor_, "diffuseColor", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 }
 
 void UI_ControlVideo::init()
@@ -1794,40 +1794,40 @@ void UI_ControlCustom::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(type_, "type", "тип");
-	ar.serialize(clickAction_, "clickAction", "Реагировать на мышь");
+	ar.serialize(type_, "type", "пїЅпїЅпїЅ");
+	ar.serialize(clickAction_, "clickAction", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ");
 	if(checkType(UI_CUSTOM_CONTROL_MINIMAP)){
-		ar.serialize(mapAlign_, "mapAlign_", "Выравнивание карты");
-		ar.serialize(mapAlpha_, "mapAlpha", "Прозрачность карты");
-		ar.serialize(maskTexture_, "maskTexture", "Текстура маски миникарты");
+		ar.serialize(mapAlign_, "mapAlign_", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(mapAlpha_, "mapAlpha", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(maskTexture_, "maskTexture", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		if(maskTexture_.key() < 0)
-			ar.serialize(miniMapBorderColor_, "miniMapBorderColor", "Цвет рамки миникарты");
-		ar.serialize(viewStartLocations_, "viewStartLocations", "Показывать стартовые локации");
+			ar.serialize(miniMapBorderColor_, "miniMapBorderColor", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(viewStartLocations_, "viewStartLocations", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		if(viewStartLocations_)
-			ar.serialize(font_, "useFont", "Шрифт");
-		ar.serialize(useSelectedMap_, "useSelectedMap", "Брать миникарту из выделенного мира");
+			ar.serialize(font_, "useFont", "пїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(useSelectedMap_, "useSelectedMap", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 		if(!useSelectedMap_){
-			ar.serialize(drawViewZone_, "drawViewZone", "Рисовать видимую область на миникарте");
+			ar.serialize(drawViewZone_, "drawViewZone", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			if(drawViewZone_)
-				ar.serialize(viewZoneColor_, "viewZoneColor", "Цвет рамки видимой области");
-			ar.serialize(scaleMinimap_, "scaleMinimap", "Маштабировать мышкой");
-			ar.serialize(RangedWrapperf(minimapScale_, 1.f, 10.f), "minimapScale_", "Маштаб миникарты по умолчанию");
-			ar.serialize(minimapToSelect_, "minimapToSelect", "Центрировать по выделенному юниту");
+				ar.serialize(viewZoneColor_, "viewZoneColor", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(scaleMinimap_, "scaleMinimap", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(RangedWrapperf(minimapScale_, 1.f, 10.f), "minimapScale_", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(minimapToSelect_, "minimapToSelect", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 			if(!minimapToSelect_)
-				ar.serialize(dragMinimap_, "dragMinimap_", "Двигать миникарту мышкой");
-			ar.serialize(drawFogOfWar_, "drawFogOfWar", "Накладывать туман войны");
+				ar.serialize(dragMinimap_, "dragMinimap_", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(drawFogOfWar_, "drawFogOfWar", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 			if(!drawFogOfWar_)
-				ar.serialize(drawInstallZones_, "drawInstallZones", "Показывать зоны установки");
-			ar.serialize(drawWindDirection_, "drawWindDirection", "Рисовать направление ветра");
-			ar.serialize(rotateByCamera_, "rotateByCamera", "Может вращаться за камерой");
+				ar.serialize(drawInstallZones_, "drawInstallZones", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(drawWindDirection_, "drawWindDirection", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(rotateByCamera_, "rotateByCamera", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			if(rotateByCamera_)
-				ar.serialize(rotateByCameraInitial_, "rotateByCameraInitial", "Вращаться за камерой");
+				ar.serialize(rotateByCameraInitial_, "rotateByCameraInitial", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			else
-				ar.serialize(getAngleFromWorld_, "getAngleFromWorld", "Брать угол поворота из мира");
-			ar.serialize(rotationScale_, "rotationScale", "Масштабировать при вращении");
+				ar.serialize(getAngleFromWorld_, "getAngleFromWorld", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ");
+			ar.serialize(rotationScale_, "rotationScale", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		}
 		if(!rotateByCamera_ && !getAngleFromWorld_)
-			ar.serialize(minimapAngle_, "minimapAngle", "Угол поворота миникарты");
+			ar.serialize(minimapAngle_, "minimapAngle", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	}
 }
 
@@ -1866,14 +1866,14 @@ void UI_ControlUnitList::serialize(Archive& ar)
 {
 	UI_ControlBase::serialize(ar);
 
-	ar.serialize(type_, "type_", "тип списка");
+	ar.serialize(type_, "type_", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(type_ == UI_UNITLIST_SQUADS_IN_WORLD)
-		ar.serialize(squadRef_, "squadRef", "Тип сквада");
-	ar.serialize(defSprite_, "defSprite", "Картинка по умолчанию");
-	ar.serialize(unitSpriteParams_, "unitSpriteParams", "приоритетные картинки юнитов");
+		ar.serialize(squadRef_, "squadRef", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(defSprite_, "defSprite", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(unitSpriteParams_, "unitSpriteParams", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 	
 	float scaleFactor = (activeTransform_.scale().x - 1.f) * 100;
-	ar.serialize(scaleFactor, "scaleFactor", "% изменения активной ячейки");
+	ar.serialize(scaleFactor, "scaleFactor", "% пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 	scaleFactor = 1.f + scaleFactor / 100.f;
 	activeTransform_.setScale(Vect2f(scaleFactor, scaleFactor));
 }
@@ -1891,10 +1891,10 @@ const UI_ShowModeSprite* UI_ControlUnitList::getSprite(const AttributeBase* unit
 class UI_ControlSortFunctor
 {
 public:
-	// оператор "меньше". сортируются по убыванию Z для отрисовки, т.е. Z контрола больше - тем он ближе к началу списка
-	// и тем раньше отрисуется, сответственно закроется кнопками с меньшей глубиной.
-	// для обработки кликов кнопки выбираются в обратном порядке,
-	// т.е. сначала событие получают кнопки с меньшим Z (глубиной)
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ "пїЅпїЅпїЅпїЅпїЅпїЅ". пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Z пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ.пїЅ. Z пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	// пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+	// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ,
+	// пїЅ.пїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ Z (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
 	bool operator()(const UI_ControlBase* lh, const UI_ControlBase* rh) const { return lh->screenZ() > rh->screenZ(); }
 };
 
@@ -1915,9 +1915,9 @@ void UI_ControlContainer::sortControls()
 
 void UI_ControlContainer::serialize(Archive& ar)
 {
-	ar.serialize(name_, "name_", "&имя");
+	ar.serialize(name_, "name_", "&пїЅпїЅпїЅ");
 	if(!ar.isEdit())
-		ar.serialize(controls_, "controls_", "&кнопки");
+		ar.serialize(controls_, "controls_", "&пїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	if(!isUnderEditor() && ar.isInput()){
 		stable_sort(controls_.begin(), controls_.end(), UI_ControlSortFunctor());
@@ -1938,7 +1938,7 @@ void UI_ControlContainer::referenceString(string& out) const
 
 void UI_ControlContainer::init()
 {
-	std::for_each(controls_.begin(), controls_.end(), std::mem_fun(&UI_ControlBase::init));
+	std::for_each(controls_.begin(), controls_.end(), [](auto& c){ c->init(); });
 }
 
 void UI_ControlContainer::preLoad()
@@ -2121,68 +2121,68 @@ void UI_ControlBase::serialize(Archive& ar)
 	if(ar.isInput())
 		hideEffects(true);
 	
-	ar.serialize(isVisible_, "isVisible_", "кнопка видима");
+	ar.serialize(isVisible_, "isVisible_", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	if (!ar.isEdit())
 		ar.serialize(visibleInEditor_, "visibleInEditor_", 0);
 
-	ar.serialize(isVisibleByTrigger_, "isVisibleByTrigger", "разрешена триггером");
+	ar.serialize(isVisibleByTrigger_, "isVisibleByTrigger", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(isEnabled_, "is_enabled", "доступна");
+	ar.serialize(isEnabled_, "is_enabled", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	showModeID_ = (isEnabled_) ? UI_SHOW_NORMAL : UI_SHOW_DISABLED;
 
-	ar.serialize(canHovered_, "canHovered", "реагирует на мышь");
+	ar.serialize(canHovered_, "canHovered", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ");
 
-	ar.serialize(screenZ_, "screenZ", "Глубина");
+	ar.serialize(screenZ_, "screenZ", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	if(ar.openBlock ("text", "текст")){
+	if(ar.openBlock ("text", "пїЅпїЅпїЅпїЅпїЅ")){
 		if(!ar.serialize(text_, "text", "<")){
 			string ansitext;
 			ar.serialize(ansitext, "text_", 0);
 			a2w(text_, ansitext);
 		}
-		ar.serialize(textAlign_, "textAlign_", "горизонтально");
-		ar.serialize(textVAlign_, "textVAlign", "вертикально");
-		ar.serialize(font_, "font_", "шрифт");
-		ar.serialize(autoFormatText_, "autoFormatText", "форматировать текст");
+		ar.serialize(textAlign_, "textAlign_", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(textVAlign_, "textVAlign", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(font_, "font_", "пїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(autoFormatText_, "autoFormatText", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 		ar.closeBlock ();
 	}
 
-	if(ar.openBlock("border", "рамка"))
+	if(ar.openBlock("border", "пїЅпїЅпїЅпїЅпїЅ"))
 	{
-		ar.serialize(borderOutline_, "borderOutline", "обводка");
+		ar.serialize(borderOutline_, "borderOutline", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		if(borderOutline_)
-			ar.serialize(borderOutlineColor_, "borderOutlineClr", "цвет рамки");
+			ar.serialize(borderOutlineColor_, "borderOutlineClr", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 
-		ar.serialize(borderFill_, "borderFill", "заливка");
+		ar.serialize(borderFill_, "borderFill", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		if(borderFill_)
-			ar.serialize(borderColor_, "borderClr", "цвет заливки");
+			ar.serialize(borderColor_, "borderClr", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 		ar.closeBlock ();
 	}
 
 	if(!ar.isEdit()){
-		ar.serialize(states_, "states_", "состояния");
+		ar.serialize(states_, "states_", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 		if(!states_.empty())
 			currentStateIndex_ = 0;
 	}
 
-	if(ar.openBlock("", "координаты")){
+	if(ar.openBlock("", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")){
 		if(ar.isEdit()){
 			Vect2f pos = position_.left_top();
 			Vect2f size = position_.size();
-			ar.serialize(pos, "position", "положение");
-			ar.serialize(size, "size", "размер");
+			ar.serialize(pos, "position", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(size, "size", "пїЅпїЅпїЅпїЅпїЅпїЅ");
 			if(ar.isInput())
 				position_.set(pos.x, pos.y, size.x, size.y);
 		}
 		else
-			ar.serialize(position_, "position_", "кнопка");
+			ar.serialize(position_, "position_", "пїЅпїЅпїЅпїЅпїЅпїЅ");
 
 		transfPosition_ = position_;
 
-		ar.serialize(textPosition_, "textPosition_", "текст");
+		ar.serialize(textPosition_, "textPosition_", "пїЅпїЅпїЅпїЅпїЅ");
 		if(ar.isInput()){
 			float minPixelWidth = 1.f / 3200.f;
 			float minPixelHeight = 1.f / 2048.f;
@@ -2207,32 +2207,32 @@ void UI_ControlBase::serialize(Archive& ar)
 	}
 	
 	if(canHovered_)
-		ar.serialize(mask_, "mask", "маска прозрачности");
+		ar.serialize(mask_, "mask", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	
 	if(!ar.isEdit() && !mask_.isEmpty() && mask_.polygon().size() < 3)
 		canHovered_ = false;
 
-	if(ar.openBlock("activation", "Активация")){
-		ar.serialize(activationType_, "activationType", "<Тип");
+	if(ar.openBlock("activation", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")){
+		ar.serialize(activationType_, "activationType", "<пїЅпїЅпїЅ");
 		if(activationType_ & UI_Transform::TRANSFORM_COORDS)
-			ar.serialize(activationMove_, "activationMove", "Направление вылета");
+			ar.serialize(activationMove_, "activationMove", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 		if(activationType_ & UI_Transform::TRANSFORM_SCALE)
-			ar.serialize(activationScaleMode_, "activationScaleMode", "Масштабировать");
+			ar.serialize(activationScaleMode_, "activationScaleMode", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-		ar.serialize(hasDeactivationSettings_, "hasDeactivationSettings", "Свои настройки деактивации");
+		ar.serialize(hasDeactivationSettings_, "hasDeactivationSettings", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		if(hasDeactivationSettings_){
-			if(ar.openBlock("activation", "Деактивация")){
-				ar.serialize(deactivationType_, "deactivationType", "<Тип");
+			if(ar.openBlock("activation", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")){
+				ar.serialize(deactivationType_, "deactivationType", "<пїЅпїЅпїЅ");
 				if(deactivationType_ & UI_Transform::TRANSFORM_COORDS)
-					ar.serialize(deactivationMove_, "deactivationMove", "Направление отлёта");
+					ar.serialize(deactivationMove_, "deactivationMove", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 				if(deactivationType_ & UI_Transform::TRANSFORM_SCALE)
-					ar.serialize(deactivationScaleMode_, "deactivationScaleMode", "Масштабировать");
+					ar.serialize(deactivationScaleMode_, "deactivationScaleMode", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 				ar.closeBlock();
 			}
 		}
 
-		ar.serialize(activationTime_, "activationTime", "Время активации");
-		ar.serialize(deactivationTime_, "deactivationTime", "Время деактивации");
+		ar.serialize(activationTime_, "activationTime", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(deactivationTime_, "deactivationTime", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 		ar.closeBlock();
 	}
@@ -2242,8 +2242,8 @@ void UI_ControlBase::serialize(Archive& ar)
 			if(const UI_ControlBase* parent = dynamic_cast<const UI_ControlBase*>(owner()))
 				plink->setShift(parent->position().left_top() - position().left_top());
 
-	ar.serialize(actions_, "actions", "назначения");
-	ar.serialize(backgroundAnimations_, "backgroundAnimations", "анимационные цепочки");
+	ar.serialize(actions_, "actions", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(backgroundAnimations_, "backgroundAnimations", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	if(ar.isInput())
 		hasCoordLink_ = findAction(UI_ACTION_LINK_TO_ANCHOR) != 0 || findAction(UI_ACTION_LINK_TO_MOUSE) != 0 || findAction(UI_ACTION_LINK_TO_PARENT) != 0;
@@ -2342,7 +2342,7 @@ void UI_ControlBase::relax(bool isActivate)
 			showEffects();
 		else
 			hideEffects();
-		std::for_each(controls_.begin(), controls_.end(), bind2nd(std::mem_fun(&UI_ControlBase::relax), isActivate));
+		std::for_each(controls_.begin(), controls_.end(), [isActivate](auto& c){ c->relax(isActivate); });
 	}
 }
 
@@ -2368,7 +2368,7 @@ void UI_ControlBase::showEffects()
 	if(const UI_ControlShowMode* mode = showMode(showModeID_)){
 		LOG_UI_STATE(mode->effect() ? a2w(mode->effect()->effectReference().c_str()).c_str() : L"<empty>");
 		if(!UI_BackgroundScene::instance().startEffect(mode->effect(), this))
-			hideEffects(); // новые стартовать не удалось, старые нужно погасить
+			hideEffects(); // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	}
 }
 
@@ -2489,7 +2489,7 @@ void UI_ControlBase::hide(bool immediately)
 
 void UI_ControlBase::hideChildControls(bool immediately)
 {
-	std::for_each(controls_.begin(), controls_.end(), bind2nd(std::mem_fun(&UI_ControlBase::hide), immediately));
+	std::for_each(controls_.begin(), controls_.end(), [immediately](auto& c){ c->hide(immediately); });
 }
 
 void UI_ControlBase::show()
@@ -2532,12 +2532,12 @@ void UI_ControlBase::doShow()
 
 void UI_ControlBase::showChildControls()
 {
-	std::for_each(controls_.begin(), controls_.end(), std::mem_fun(&UI_ControlBase::doShow));
+	std::for_each(controls_.begin(), controls_.end(), [](auto& c){ c->doShow(); });
 }
 
 void UI_ControlBase::hideByTrigger()
 {
-	std::for_each(controls_.begin(), controls_.end(), std::mem_fun(&UI_ControlBase::hideByTrigger));
+	std::for_each(controls_.begin(), controls_.end(), [](auto& c){ c->hideByTrigger(); });
 
 	if(isVisibleByTrigger_){
 		LOG_UI_STATE(0);
@@ -2594,19 +2594,19 @@ void UI_ControlBase::doShowByTrigger()
 			isVisibleByTrigger_ = true;
 	}
 
-	std::for_each(controls_.begin(), controls_.end(), std::mem_fun(&UI_ControlBase::doShowByTrigger));
+	std::for_each(controls_.begin(), controls_.end(), [](auto& c){ c->doShowByTrigger(); });
 }
 
 void UI_ControlBase::disable()
 {
 	isEnabled_ = false;
-	std::for_each(controls_.begin(), controls_.end(), std::mem_fun(&UI_ControlBase::disable));
+	std::for_each(controls_.begin(), controls_.end(), [](auto& c){ c->disable(); });
 }
 
 void UI_ControlBase::enable()
 {
 	isEnabled_ = true;
-	std::for_each(controls_.begin(), controls_.end(), std::mem_fun(&UI_ControlBase::enable));
+	std::for_each(controls_.begin(), controls_.end(), [](auto& c){ c->enable(); });
 }
 
 void UI_ControlBase::startAnimation(PlayControlAction action, bool recursive)
@@ -2879,7 +2879,7 @@ void UI_ControlBase::setText(const wchar_t* p)
 	}
 	else if(waitingExecution())
 		return;
-	else if(!textChanged_){ // второй раз за квант поменять нельзя, HT possible трабл
+	else if(!textChanged_){ // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, HT possible пїЅпїЅпїЅпїЅпїЅ
 		if(p)
 			newText_ = p;
 		else
@@ -2891,7 +2891,7 @@ void UI_ControlBase::setText(const wchar_t* p)
 void UI_ControlBase::clearInputEventFlags()
 {
 	actionFlags_ = 0;
-	std::for_each(controls_.begin(), controls_.end(), std::mem_fun(&UI_ControlBase::clearInputEventFlags));
+	std::for_each(controls_.begin(), controls_.end(), [](auto& c){ c->clearInputEventFlags(); });
 }
 
 const UI_ActionData* UI_ControlBase::findAction(UI_ControlActionID id) const
@@ -2915,7 +2915,7 @@ void UI_ControlBase::updateIndex()
 		UI_ControlReference th(this);
 		ui_ControlMapReference[ui_ControlMapBackReference[th.reference()] = UI_Dispatcher::instance().getNextControlID()] = th.reference();
 	}
-	std::for_each(controls_.begin(), controls_.end(), std::mem_fun(&UI_ControlBase::updateIndex));
+	std::for_each(controls_.begin(), controls_.end(), [](auto& c){ c->updateIndex(); });
 }
 
 bool UI_ControlBase::hoverUpdate(const Vect2f& cursor_pos)

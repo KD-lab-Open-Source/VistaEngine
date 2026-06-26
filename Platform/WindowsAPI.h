@@ -24,6 +24,7 @@
 typedef uint8_t   BYTE;
 typedef uint16_t  WORD;
 typedef uint32_t  DWORD;
+typedef uint64_t  DWORD64;
 typedef uint64_t  QWORD;
 typedef int32_t   LONG;
 typedef uint32_t  ULONG;
@@ -65,6 +66,8 @@ typedef void* HICON;
 typedef void* HCURSOR;
 typedef void* HBRUSH;
 typedef void* HMENU;
+typedef void* HACCEL;
+typedef void* HDWP;
 typedef void* HBITMAP;
 typedef void* HRGN;
 typedef void* HPEN;
@@ -266,6 +269,19 @@ inline LONG InterlockedCompareExchange(LONG volatile* p, LONG ex, LONG cmp) {
     return cmp;
 }
 
+// Native `long` overloads: engine code uses `volatile long` counters, and on
+// LP64 (Linux/macOS) `long` is 64-bit and distinct from LONG (int32_t), so these
+// don't collide with the overloads above. (On Win32 the real API is used.)
+inline long InterlockedIncrement(long volatile* p) { return __atomic_add_fetch(p, 1, __ATOMIC_SEQ_CST); }
+inline long InterlockedDecrement(long volatile* p) { return __atomic_sub_fetch(p, 1, __ATOMIC_SEQ_CST); }
+inline long InterlockedExchange(long volatile* p, long v) {
+    long old; __atomic_exchange(p, &v, &old, __ATOMIC_SEQ_CST); return old;
+}
+inline long InterlockedCompareExchange(long volatile* p, long ex, long cmp) {
+    __atomic_compare_exchange_n(p, &cmp, ex, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
+    return cmp;
+}
+
 // ─── Debug output ─────────────────────────────────────────────────────────────
 inline void OutputDebugStringA(const char* s)    { fputs(s, stderr); }
 inline void OutputDebugStringW(const wchar_t* s) { fputws(s, stderr); }
@@ -310,6 +326,21 @@ struct MSG {
 #define WM_LBUTTONDOWN 0x0201
 #define WM_RBUTTONDOWN 0x0204
 #define WM_SIZE        0x0005
+#define WM_ACTIVATEAPP 0x001C
+#define WM_CHAR        0x0102
+#define WM_SYSKEYDOWN  0x0104
+#define WM_SYSKEYUP    0x0105
+#define WM_MOUSEMOVE   0x0200
+#define WM_LBUTTONUP   0x0202
+#define WM_LBUTTONDBLCLK 0x0203
+#define WM_RBUTTONUP   0x0205
+#define WM_RBUTTONDBLCLK 0x0206
+#define WM_MBUTTONDOWN 0x0207
+#define WM_MBUTTONUP   0x0208
+#define WM_MBUTTONDBLCLK 0x0209
+#define WM_MOUSELAST   0x020E
+#define WM_MOUSELEAVE  0x02A3
+#define WM_UNICHAR     0x0109
 
 // Mouse-key state flags (winuser.h); used by UI input handling.
 #define MK_LBUTTON  0x0001
@@ -319,6 +350,24 @@ struct MSG {
 #define MK_MBUTTON  0x0010
 
 typedef LRESULT (*WNDPROC)(HWND, UINT, WPARAM, LPARAM);
+
+// GDI bitmap header (wingdi.h) — used by value in image/video code.
+#ifndef _BITMAPINFOHEADER_DEFINED_
+#define _BITMAPINFOHEADER_DEFINED_
+struct BITMAPINFOHEADER {
+    DWORD biSize;
+    long  biWidth;
+    long  biHeight;
+    WORD  biPlanes;
+    WORD  biBitCount;
+    DWORD biCompression;
+    DWORD biSizeImage;
+    long  biXPelsPerMeter;
+    long  biYPelsPerMeter;
+    DWORD biClrUsed;
+    DWORD biClrImportant;
+};
+#endif
 
 inline BOOL    PeekMessage(MSG*, HWND, UINT, UINT, UINT) { return FALSE; }
 inline BOOL    GetMessage(MSG*, HWND, UINT, UINT)         { return FALSE; }
@@ -333,6 +382,22 @@ inline BOOL    SetForegroundWindow(HWND)                  { return TRUE; }
 inline BOOL GetComputerName(LPSTR buf, DWORD* size) { if(buf && size && *size) buf[0] = 0; return FALSE; }
 inline BOOL GetUserName(LPSTR buf, DWORD* size)     { if(buf && size && *size) buf[0] = 0; return FALSE; }
 
+// ─── Console / thread stubs (debug logging, thread priority) ──────────────────
+struct COORD { short X, Y; };
+#define STD_OUTPUT_HANDLE ((DWORD)-11)
+#define STD_ERROR_HANDLE  ((DWORD)-12)
+inline HANDLE GetStdHandle(DWORD)                                  { return nullptr; }
+inline BOOL   AllocConsole()                                       { return FALSE; }
+inline BOOL   SetConsoleScreenBufferSize(HANDLE, COORD)            { return FALSE; }
+inline BOOL   WriteConsole(HANDLE, const void*, DWORD, DWORD*, void*) { return FALSE; }
+inline int    lstrlen(const char* s)                               { return s ? (int)strlen(s) : 0; }
+
+#define THREAD_PRIORITY_HIGHEST       2
+#define THREAD_PRIORITY_NORMAL        0
+#define THREAD_PRIORITY_ABOVE_NORMAL  1
+inline HANDLE GetCurrentThread()              { return nullptr; }
+inline BOOL   SetThreadPriority(HANDLE, int)  { return TRUE; }
+
 // ─── Critical section stubs ───────────────────────────────────────────────────
 struct CRITICAL_SECTION { pthread_mutex_t mutex; };
 inline void InitializeCriticalSection(CRITICAL_SECTION* cs) { pthread_mutex_init(&cs->mutex, nullptr); }
@@ -344,6 +409,7 @@ inline void LeaveCriticalSection(CRITICAL_SECTION* cs)      { pthread_mutex_unlo
 typedef DWORD (*LPTHREAD_START_ROUTINE)(LPVOID);
 inline HANDLE CreateThread(void*, SIZE_T, LPTHREAD_START_ROUTINE, LPVOID, DWORD, DWORD*) { return nullptr; }
 inline DWORD  WaitForSingleObject(HANDLE, DWORD)  { return 0; }
+inline DWORD  WaitForMultipleObjects(DWORD, const HANDLE*, BOOL, DWORD) { return 0; }
 inline BOOL   SetEvent(HANDLE)                    { return TRUE; }
 inline BOOL   ResetEvent(HANDLE)                  { return TRUE; }
 inline HANDLE CreateEvent(void*, BOOL, BOOL, const char*) { return nullptr; }
@@ -357,13 +423,124 @@ typedef HKEY* PHKEY;
 #define HKEY_CURRENT_USER   ((HKEY)(ULONG_PTR)0x80000001)
 #define KEY_READ            0x20019
 #define KEY_WRITE           0x20006
+#define KEY_QUERY_VALUE     0x0001
 #define REG_SZ              1
 #define REG_DWORD           4
+#ifndef ERROR_SUCCESS
+#define ERROR_SUCCESS       0L
+#endif
+typedef BYTE* LPBYTE;
 inline LONG RegOpenKeyExA(HKEY, const char*, DWORD, DWORD, PHKEY) { return 1; }
 inline LONG RegQueryValueExA(HKEY, const char*, DWORD*, DWORD*, BYTE*, DWORD*) { return 1; }
 inline LONG RegCloseKey(HKEY) { return 0; }
+#define RegOpenKeyEx    RegOpenKeyExA
+#define RegQueryValueEx RegQueryValueExA
 inline LONG RegSetValueExA(HKEY, const char*, DWORD, DWORD, const BYTE*, DWORD) { return 1; }
 inline LONG RegCreateKeyExA(HKEY, const char*, DWORD, char*, DWORD, DWORD, void*, PHKEY, DWORD*) { return 1; }
+#define RegSetValueEx   RegSetValueExA
+#define RegCreateKeyEx  RegCreateKeyExA
+#define REG_OPTION_NON_VOLATILE 0
+
+// lstr* string helpers (winbase.h) map to the C library equivalents.
+inline char* lstrcpy(char* d, const char* s) { return strcpy(d, s); }
+inline char* lstrcpyn(char* d, const char* s, int n) { if(n>0){ strncpy(d, s, (size_t)(n-1)); d[n-1]=0; } return d; }
+inline int   lstrcmp(const char* a, const char* b) { return strcmp(a, b); }
+
+// COM init flag + Windows version query (kernel32) — stubs.
+#define COINIT_MULTITHREADED 0
+inline DWORD GetVersion() { return 0; }
+inline HRESULT CoInitializeEx(void*, DWORD) { return 0; }
+inline void    CoUninitialize() {}
+inline DWORD_PTR SetThreadAffinityMask(HANDLE, DWORD_PTR mask) { return mask; }
+
+// Window-style flags (winuser.h).
+#define WS_OVERLAPPED   0x00000000
+#define WS_POPUP        0x80000000
+#define WS_VISIBLE      0x10000000
+#define WS_CAPTION      0x00C00000
+#define WS_SYSMENU      0x00080000
+#define WS_THICKFRAME   0x00040000
+#define WS_MINIMIZEBOX  0x00020000
+#define WS_MAXIMIZEBOX  0x00010000
+#define WS_OVERLAPPEDWINDOW (WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_THICKFRAME|WS_MINIMIZEBOX|WS_MAXIMIZEBOX)
+#define SWP_FRAMECHANGED 0x0020
+#define SWP_SHOWWINDOW   0x0040
+inline BOOL GetClientRect(HWND, RECT* r) { if(r){ r->left=r->top=0; r->right=0; r->bottom=0; } return TRUE; }
+
+// Window management (winuser.h) — no-op stubs (real windowing = SDL3, Track B).
+#define GWL_STYLE     (-16)
+#define GWL_EXSTYLE   (-20)
+#define HWND_NOTOPMOST ((HWND)(LONG_PTR)-2)
+#define HWND_TOPMOST   ((HWND)(LONG_PTR)-1)
+#define IMAGE_ICON    1
+#define LR_DEFAULTCOLOR 0
+#define EVENT_ALL_ACCESS 0x1F0003
+inline BOOL SetWindowPos(HWND, HWND, int, int, int, int, UINT) { return TRUE; }
+inline LONG SetWindowLongA(HWND, int, LONG v) { return v; }
+inline LONG GetWindowLongA(HWND, int) { return 0; }
+#define SetWindowLong SetWindowLongA
+#define GetWindowLong GetWindowLongA
+inline HWND SetFocus(HWND h) { return h; }
+inline HWND FindWindowA(const char*, const char*) { return 0; }
+#define FindWindow FindWindowA
+inline HANDLE OpenEventA(DWORD, BOOL, const char*) { return 0; }
+#define OpenEvent OpenEventA
+inline BOOL AdjustWindowRect(RECT*, DWORD, BOOL) { return TRUE; }
+inline HRESULT CoInitialize(void*) { return 0; }
+
+struct SYSTEM_INFO {
+    DWORD dwOemId; DWORD dwPageSize; void* lpMinimumApplicationAddress;
+    void* lpMaximumApplicationAddress; DWORD_PTR dwActiveProcessorMask;
+    DWORD dwNumberOfProcessors; DWORD dwProcessorType; DWORD dwAllocationGranularity;
+    WORD wProcessorLevel; WORD wProcessorRevision;
+};
+inline void GetSystemInfo(SYSTEM_INFO* si) { if(si){ *si = SYSTEM_INFO{}; si->dwNumberOfProcessors = 1; } }
+
+// Window-class registration / creation (winuser.h). No-op stubs; real windowing
+// is the SDL3 replacement (Track B).
+#ifndef SW_SHOWNORMAL
+#define SW_SHOWNORMAL 1
+#endif
+#define CS_VREDRAW 0x0001
+#define CS_HREDRAW 0x0002
+#define CS_DBLCLKS 0x0008
+#define CS_CLASSDC 0x0040
+#define BLACK_BRUSH 4
+#define WHITE_BRUSH 0
+#define HTCLIENT  1
+#define WM_CREATE        0x0001
+#define WM_DESTROY       0x0002
+#define WM_PAINT         0x000F
+#define WM_CLOSE         0x0010
+#define WM_GETMINMAXINFO 0x0024
+#define WM_SETCURSOR     0x0020
+#define WM_MOVE          0x0003
+#define PM_NOREMOVE      0x0000
+#define TME_LEAVE        0x00000002
+struct TRACKMOUSEEVENT { DWORD cbSize, dwFlags; HWND hwndTrack; DWORD dwHoverTime; };
+inline BOOL TrackMouseEvent(TRACKMOUSEEVENT*) { return TRUE; }
+inline BOOL _TrackMouseEvent(TRACKMOUSEEVENT* e) { return TrackMouseEvent(e); }
+inline BOOL WaitMessage() { return TRUE; }
+
+struct WNDCLASSEX {
+    UINT cbSize, style; WNDPROC lpfnWndProc; int cbClsExtra, cbWndExtra;
+    HINSTANCE hInstance; HICON hIcon; HCURSOR hCursor; HBRUSH hbrBackground;
+    const char* lpszMenuName; const char* lpszClassName; HICON hIconSm;
+};
+struct MINMAXINFO { POINT ptReserved, ptMaxSize, ptMaxPosition, ptMinTrackSize, ptMaxTrackSize; };
+typedef void* HGDIOBJ;
+inline HGDIOBJ GetStockObject(int) { return 0; }
+typedef WORD   ATOM;
+inline ATOM    RegisterClassExA(const WNDCLASSEX*) { return 0; }
+inline BOOL    UnregisterClassA(const char*, HINSTANCE) { return TRUE; }
+inline HWND    CreateWindowExA(DWORD, const char*, const char*, DWORD, int, int, int, int, HWND, HMENU, HINSTANCE, void*) { return 0; }
+inline HWND    CreateWindowA(const char* cls, const char* name, DWORD style, int x, int y, int w, int h, HWND parent, HMENU menu, HINSTANCE inst, void* p) { return CreateWindowExA(0, cls, name, style, x, y, w, h, parent, menu, inst, p); }
+inline LRESULT DefWindowProcA(HWND, UINT, WPARAM, LPARAM) { return 0; }
+#define RegisterClassEx RegisterClassExA
+#define UnregisterClass UnregisterClassA
+#define CreateWindowEx  CreateWindowExA
+#define CreateWindow    CreateWindowA
+#define DefWindowProc   DefWindowProcA
 
 // ─── argv / command line ─────────────────────────────────────────────────────
 #if defined(__APPLE__)
@@ -650,6 +827,10 @@ inline HRESULT CoCreateGuid(GUID* g) {
 #define MB_ICONEXCLAMATION   0x00000030
 #define MB_ICONWARNING       0x00000030
 #define MB_ICONINFORMATION   0x00000040
+#define MB_ABORTRETRYIGNORE  0x00000002
+#define MB_ICONSTOP          0x00000010
+#define MB_TOPMOST           0x00040000
+#define SW_MINIMIZE          6
 #define IDOK     1
 #define IDCANCEL 2
 #define IDABORT  3
@@ -673,6 +854,7 @@ inline int MessageBoxW(HWND, const wchar_t*, const wchar_t*, UINT) { return IDOK
 // ─── Unicode conversion stubs ─────────────────────────────────────────────────
 #include <cwchar>
 #include <clocale>
+#define MB_PRECOMPOSED 0x00000001
 inline int MultiByteToWideChar(UINT, DWORD, const char* src, int, wchar_t* dst, int dstLen) {
     if (!dst) return (int)strlen(src) + 1;
     return (int)mbstowcs(dst, src, (size_t)dstLen);
@@ -716,6 +898,12 @@ template<class T> inline T sqr(const T& x) { return x * x; }
 #define VK_PAUSE     0x13
 #define VK_CAPITAL   0x14
 #define VK_ESCAPE    0x1B
+#define VK_SNAPSHOT  0x2C
+#define VK_SCROLL    0x91
+#define VK_NUMLOCK   0x90
+#define VK_LWIN      0x5B
+#define VK_RWIN      0x5C
+#define VK_APPS      0x5D
 #define VK_SPACE     0x20
 #define VK_PRIOR     0x21
 #define VK_NEXT      0x22
@@ -740,6 +928,10 @@ template<class T> inline T sqr(const T& x) { return x * x; }
 #define VK_F11       0x7A
 #define VK_F12       0x7B
 #define VK_NUMPAD0   0x60
+#define VK_NUMPAD2   0x62
+#define VK_NUMPAD4   0x64
+#define VK_NUMPAD6   0x66
+#define VK_NUMPAD8   0x68
 #define VK_NUMPAD9   0x69
 #define VK_MULTIPLY  0x6A
 #define VK_ADD       0x6B
@@ -749,7 +941,58 @@ template<class T> inline T sqr(const T& x) { return x * x; }
 
 inline SHORT GetAsyncKeyState(int) { return 0; }
 
+// PeekMessage flag, LoadImage flags (winuser.h).
+#define PM_REMOVE       0x0001
+#define IMAGE_CURSOR    2
+#define LR_LOADFROMFILE 0x0010
+
+// Common-control notification header (commctrl.h) — used by value in editor
+// UI callbacks (onNotify); only its presence is needed for the headers to parse.
+struct NMHDR { HWND hwndFrom; unsigned long idFrom; UINT code; };
+
+// Window/cursor helpers (winuser.h). No-op on non-Windows; real windowing is the
+// eventual SDL3 replacement (Track B).
+inline BOOL ScreenToClient(HWND, POINT*) { return TRUE; }
+inline BOOL ClientToScreen(HWND, POINT*) { return TRUE; }
+inline BOOL GetCursorPos(POINT* p) { if(p){ p->x = 0; p->y = 0; } return TRUE; }
+inline BOOL DestroyCursor(HCURSOR) { return TRUE; }
+inline int  ShowCursor(BOOL) { return 0; }
+inline BOOL ShowWindow(HWND, int) { return TRUE; }
+
+// GetSystemMetrics indices (winuser.h) + a stub returning sane desktop defaults.
+#define SM_CXSCREEN     0
+#define SM_CYSCREEN     1
+#define SM_CYCAPTION    4
+#define SM_CXSIZEFRAME  32
+#define SM_CYSIZEFRAME  33
+#define SM_CXICON       11
+#define SM_CYICON       12
+#define SM_CXSMICON     49
+#define SM_CYSMICON     50
+inline int GetSystemMetrics(int index) {
+    switch(index) { case SM_CXSCREEN: return 1920; case SM_CYSCREEN: return 1080;
+                    case SM_CYCAPTION: return 24; case SM_CXSIZEFRAME: case SM_CYSIZEFRAME: return 4; }
+    return 0;
+}
+inline BOOL SetCursorPos(int, int) { return TRUE; }
+inline HCURSOR SetCursor(HCURSOR) { return 0; }
+inline HANDLE  LoadImageA(HINSTANCE, const char*, UINT, int, int, UINT) { return 0; }
+#define LoadImage LoadImageA
+
 // MSVC CRT extension: checks if c is a valid C identifier character
 inline int __iscsym(int c) { return (c >= 0 && c <= 127) && (isalnum(c) || c == '_'); }
+
+// MSVC wide-string conversions (CRT extensions).
+inline int    _wtoi(const wchar_t* s) { return (int)wcstol(s, nullptr, 10); }
+inline double _wtof(const wchar_t* s) { return wcstod(s, nullptr); }
+
+// MSVC's swprintf has no buffer-size parameter (swprintf(buf, fmt, ...)), unlike
+// the C standard's swprintf(buf, n, fmt, ...). This array overload recovers the
+// size from the destination buffer and forwards to the standard form. It only
+// matches array arguments, so correctly-sized calls still pick the std version.
+template<size_t N, class... A>
+inline int swprintf(wchar_t (&buf)[N], const wchar_t* fmt, A... args) {
+    return std::swprintf(buf, N, fmt, args...);
+}
 
 #endif // !_WIN32

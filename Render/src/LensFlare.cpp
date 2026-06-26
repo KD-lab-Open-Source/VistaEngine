@@ -32,12 +32,12 @@ void LensFlareSprite::init()
 //////////////////////////////////////////////////////////////////////////////
 void LensFlareSprite::serialize(Archive& ar)
 {
-    ar.serialize(position_, "position", "&Положение");
-    ar.serialize(radius_, "radius", "&Радиус");
-    ar.serialize(color_, "color", "&Цвет");
-    ar.serialize(additiveBlending_, "additiveBlending", "Адитивный блендинг");
+    ar.serialize(position_, "position", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+    ar.serialize(radius_, "radius", "&пїЅпїЅпїЅпїЅпїЅпїЅ");
+    ar.serialize(color_, "color", "&пїЅпїЅпїЅпїЅ");
+    ar.serialize(additiveBlending_, "additiveBlending", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	static ResourceSelector::Options options("*.tga", "Resource\\FX\\Textures", "Please, select texture", true);
-	ar.serialize(ResourceSelector(filename_, options), "filename", "Текстура");
+	ar.serialize(ResourceSelector(filename_, options), "filename", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
     //if(ar.isInput() && ar.isEdit())
     //    init();
 }
@@ -108,7 +108,7 @@ void LensFlareRenderer::drawFlare2D(const Vect2f& screenPoint, const LensFlare& 
 	FOR_EACH(flare, it){
 		const LensFlareSprite& sprite = *it;
 		Color4c color = sprite.color();
-		color.a = unsigned char(color.a * alpha);
+		color.a = (unsigned char)(color.a * alpha);
 		if(color.a<2)
 			continue;
 
@@ -306,10 +306,10 @@ void LensFlareRenderer::init()
 //////////////////////////////////////////////////////////////////////////////
 void LensFlareRenderer::serialize(Archive& ar)
 {
-	ar.serialize(isEnabled_, "isEnabled", "Включить");
-	ar.serialize(showGlowSprite_, "showGlowSprite", "Показывать ореол");
-	ar.serialize(glowSprite_, "glowSprite", showGlowSprite_ ? "Ореол" : 0);
-	ar.serialize(lensFlare_, "sprites", "Спрайты");
+	ar.serialize(isEnabled_, "isEnabled", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(showGlowSprite_, "showGlowSprite", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(glowSprite_, "glowSprite", showGlowSprite_ ? "пїЅпїЅпїЅпїЅпїЅ" : 0);
+	ar.serialize(lensFlare_, "sprites", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(ar.isInput() && isEnabled_)
 		init();
 }

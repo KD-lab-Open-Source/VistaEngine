@@ -104,6 +104,10 @@ private:
 const wchar_t* getLocString(UI_CommonLocText id, const wchar_t* def = 0);
 UI_CommonLocText getLocStringId(const wchar_t* text);
 
-#define GET_LOC_STR(ID) getLocString((ID), L#ID)
+// L#ID does not form a wide string literal under clang ('L' and the stringized
+// token stay separate); widen via an indirection macro so L## pastes correctly.
+#define GLS_WIDEN_(x) L##x
+#define GLS_WIDEN(x)  GLS_WIDEN_(x)
+#define GET_LOC_STR(ID) getLocString((ID), GLS_WIDEN(#ID))
 
 #endif /* __COMMON_LOC_TEXT_H__ */

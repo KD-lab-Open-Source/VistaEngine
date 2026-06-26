@@ -19,15 +19,15 @@
 #include "GlobalAttributes.h"
 
 DECLARE_SEGMENT(Projectile)
-REGISTER_CLASS(UnitBase, ProjectileBase, "снаряды");
-REGISTER_CLASS(UnitBase, ProjectileBullet, "пули");
-REGISTER_CLASS(UnitBase, ProjectileMissile, "ракеты");
+REGISTER_CLASS(UnitBase, ProjectileBase, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(UnitBase, ProjectileBullet, "пїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(UnitBase, ProjectileMissile, "пїЅпїЅпїЅпїЅпїЅпїЅ");
 
 REGISTER_CLASS_IN_FACTORY(UnitFactory, UNIT_CLASS_PROJECTILE, ProjectileBase);
 REGISTER_CLASS_IN_FACTORY(UnitFactory, UNIT_CLASS_PROJECTILE_BULLET, ProjectileBullet);
 REGISTER_CLASS_IN_FACTORY(UnitFactory, UNIT_CLASS_PROJECTILE_MISSILE, ProjectileMissile);
 
-WRAP_LIBRARY(AttributeProjectileTable, "AttributeProjectile", "Снаряды", "Scripts\\Content\\AttributeProjectile", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(AttributeProjectileTable, "AttributeProjectile", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ", "Scripts\\Content\\AttributeProjectile", 0, LIBRARY_EDITABLE);
 
 struct RigidBodyPrmProjectileReference : RigidBodyPrmReference
 {
@@ -76,14 +76,14 @@ void AttributeProjectile::serialize(Archive& ar)
 
 	AttributeBase::serialize(ar);
 
-	ar.serialize(dockedVisibilityGroup_, "dockedVisibilityGroup", "Группа видимости в оружие");
-	ar.serialize(firingVisibilityGroup_, "firingVisibilityGroup", "Группа видимости при выстреле");
+	ar.serialize(dockedVisibilityGroup_, "dockedVisibilityGroup", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(firingVisibilityGroup_, "firingVisibilityGroup", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	RigidBodyPrmProjectileReference rigidBodyProjectile = rigidBodyPrm;
-	ar.serialize(rigidBodyProjectile, "rigidBodyPrm", "Тип снаряда");
+	ar.serialize(rigidBodyProjectile, "rigidBodyPrm", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	rigidBodyPrm = rigidBodyProjectile;
 
-	ar.serialize(forwardVelocity, "forwardVelocity", "Скорость полета");
+	ar.serialize(forwardVelocity, "forwardVelocity", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(!forwardVelocity)
 		forwardVelocity = rigidBodyPrm->forward_velocity_max;
 
@@ -106,40 +106,40 @@ void AttributeProjectile::serialize(Archive& ar)
 		}
 	}
 	
-	ar.serialize(exactCollision, "exactCollision", "Точное попадание");
+	ar.serialize(exactCollision, "exactCollision", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(!exactCollision)
-		ar.serialize(radiusToExplode, "radiusToExplode", "Дистанция до цели для взрыва");
+		ar.serialize(radiusToExplode, "radiusToExplode", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(applyImpulse, "applyImpulse", "Отбрасывать цель при попадании");
+	ar.serialize(applyImpulse, "applyImpulse", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	if(applyImpulse)
-		ar.serialize(impulseStrength, "impulseStrength", "Сила импульса");
+		ar.serialize(impulseStrength, "impulseStrength", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-    ar.serialize(damage_, "damage", "повреждения");
-	ar.serialize(environmentDestruction, "environmentDestruction", "Разрушение объектов окружения");
-	ar.serialize(environmentStop, "environmentStop", "Объекты окружения уничтожающие снаряд");
+    ar.serialize(damage_, "damage", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(environmentDestruction, "environmentDestruction", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(environmentStop, "environmentStop", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	if(!ar.serialize(hitExplosionEffects_, "hitExplosionEffects", "Эффекты при попадании в цель")){ // conversion 26.12.07
+	if(!ar.serialize(hitExplosionEffects_, "hitExplosionEffects", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ")){ // conversion 26.12.07
 		EffectAttribute eff;
-		ar.serialize(eff, "hitExplosionEffect", "Спецэффект попадания в цель");
+		ar.serialize(eff, "hitExplosionEffect", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ");
 		hitExplosionEffects_.push_back(TargetEffect());
 		hitExplosionEffects_[0].setEffect(eff);
 	}
 
-	ar.serialize(shildExplosionEffect_, "shildExplosionEffect", "спецэффект попадания в защитное поле");
-	ar.serialize(explosionState_, "explosionState", "воздействие на цель при попадании");
+	ar.serialize(shildExplosionEffect_, "shildExplosionEffect", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+	ar.serialize(explosionState_, "explosionState", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(sourcesCreationMode_, "sourcesCreationMode", "создавать источники");
+	ar.serialize(sourcesCreationMode_, "sourcesCreationMode", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(LifeTime, "LifeTime", "Время жизни, секунды");
+	ar.serialize(LifeTime, "LifeTime", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(!LifeTime)
 		LifeTime = 10;
 	if(rigidBodyPrm->unit_type == RigidBodyPrm::DEBRIS && rigidBodyPrm->ground_collision_enabled)
-		ar.serialize(collisionCounter, "collisionCounter", "Число отскоков");
+		ar.serialize(collisionCounter, "collisionCounter", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(rigidBodyPrm->unit_type == RigidBodyPrm::ROCKET && rigidBodyPrm->undergroundMode)
-		ar.serialize(traceTerTool, "traceTerTool", "след");
+		ar.serialize(traceTerTool, "traceTerTool", "пїЅпїЅпїЅпїЅ");
 
-	ar.serialize(mass, "mass", "Масса");
+	ar.serialize(mass, "mass", "пїЅпїЅпїЅпїЅпїЅ");
 
 	collisionGroup = COLLISION_GROUP_ACTIVE_COLLIDER;
 }
@@ -468,7 +468,8 @@ void ProjectileBase::testCollision()
 	universe()->unitGrid.setAsPassed(*this);
 	Vect3f p0 = rigidBody()->isBox() ? safe_cast<RigidBodyBox*>(rigidBody())->posePrev().trans() : safe_cast<RigidBodyMissile*>(rigidBody())->posePrev().trans();
 	Vect3f p1 = rigidBody()->position();
-	universe()->unitGrid.Line(p0.xi(), p0.yi(), p1.xi(), p1.yi(), ProjectileCollisionOperator(this, p0, p1));
+	ProjectileCollisionOperator projectileOp(this, p0, p1);
+	universe()->unitGrid.Line(p0.xi(), p0.yi(), p1.xi(), p1.yi(), projectileOp);
 }
 
 

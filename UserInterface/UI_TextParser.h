@@ -22,16 +22,14 @@ struct OutNode{
 			const wchar_t* begin;
 			const wchar_t* end;
 		};
-		struct {
-			const UI_Sprite* sprite;
-			int style;
-		};
+		const UI_Sprite* sprite;
 		DWORD color;
-		struct {
-			float time;
-			int style;
-		};
+		float time;
 	};
+	// `style` was duplicated across two anonymous structs of the union above
+	// (ill-formed in clang); it is always set explicitly per node and never
+	// relied on union aliasing, so it lives here as a standalone member.
+	int style;
 	OutNode() : type(NEW_LINE), width(0) {}
 	OutNode(const wchar_t* b, const wchar_t* e, int wd) : type(TEXT), width(wd), begin(b), end(e) {}
 	OutNode(const Color4c& clr) : type(COLOR), width(0), color(clr.RGBA()) {}
@@ -101,7 +99,7 @@ private:
 		tagWidth_ = 0;
 	}
 
-	__forceinline void putNode(OutNode& node)
+	__forceinline void putNode(const OutNode& node)
 	{
 		outNodes_.push_back(node);
 		skipNode();

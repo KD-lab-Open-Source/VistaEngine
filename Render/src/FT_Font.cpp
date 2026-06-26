@@ -7,7 +7,7 @@
 
 void dprintfW(wchar_t *format, ...);
 
-// расстояние между буквами в текстуре
+// СЂР°СЃСЃС‚РѕСЏРЅРёРµ РјРµР¶РґСѓ Р±СѓРєРІР°РјРё РІ С‚РµРєСЃС‚СѓСЂРµ
 #define GLYPH_PAD_SPACE 2
 
 namespace FT {
@@ -74,18 +74,18 @@ const FontParam FontManager::defParam;
 
 FontManager::FontManager()
 {
-	// изначально все ссылаются на нулевой индекс
+	// РёР·РЅР°С‡Р°Р»СЊРЅРѕ РІСЃРµ СЃСЃС‹Р»Р°СЋС‚СЃСЏ РЅР° РЅСѓР»РµРІРѕР№ РёРЅРґРµРєСЃ
 	ZeroMemory(index_, sizeof(index_));
 
 	render_ = new FT_Render();
 
-	//dprintfW(L"Создан FontManager\n");
+	//dprintfW(L"РЎРѕР·РґР°РЅ FontManager\n");
 
-	chars_.push_back(L' '); // в 0 - Символ по умолчанию
+	chars_.push_back(L' '); // РІ 0 - РЎРёРјРІРѕР» РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 	addCharPage(1252, true);
 	addCharPage(1251, false);
 
-	dprintfW(L"Добавлено %d символов\n", chars_.size());
+	dprintfW(L"Р”РѕР±Р°РІР»РµРЅРѕ %d СЃРёРјРІРѕР»РѕРІ\n", chars_.size());
 }
 
 FontManager::~FontManager()
@@ -103,7 +103,7 @@ void FontManager::addChar(uint16 utf)
 
 void FontManager::addCharPage(uint16 page, bool all_span)
 {
-	//dprintfW(L"Добавляется страница: %d %s\n", page, all_span ? L" полностью" : L"");
+	//dprintfW(L"Р”РѕР±Р°РІР»СЏРµС‚СЃСЏ СЃС‚СЂР°РЅРёС†Р°: %d %s\n", page, all_span ? L" РїРѕР»РЅРѕСЃС‚СЊСЋ" : L"");
 	WCHAR wch[2];
 	char ch[2];
 	int code = (all_span ? 0x21 : 0x80);
@@ -111,7 +111,7 @@ void FontManager::addCharPage(uint16 page, bool all_span)
 		*ch = static_cast<unsigned char>(code);
 		MultiByteToWideChar(page, MB_PRECOMPOSED, ch, 1, wch, 2);
 		uint16 utf = wch[0];
-		//dprintfW(L"0x%02X -> 0x%04X %c -> %d%s\n", code, utf, utf, index_[utf] == 0 ? chars_.size() : index_[utf], index_[utf] != 0 ? L" дубль" : L"");
+		//dprintfW(L"0x%02X -> 0x%04X %c -> %d%s\n", code, utf, utf, index_[utf] == 0 ? chars_.size() : index_[utf], index_[utf] != 0 ? L" РґСѓР±Р»СЊ" : L"");
 		addChar(utf);
 	}
 }
@@ -123,7 +123,7 @@ FontManager::ShortSize FontManager::calcTextureSize(bool nonPow2)
 	max_size.x = max_size.y = 2048;
 
 	while(size.y <= max_size.y && size.x <= max_size.x){
-		//dprintfW(L"<------------------ рассчитывается размер, попытка на %d*%d\n", size.x, size.y);
+		//dprintfW(L"<------------------ СЂР°СЃСЃС‡РёС‚С‹РІР°РµС‚СЃСЏ СЂР°Р·РјРµСЂ, РїРѕРїС‹С‚РєР° РЅР° %d*%d\n", size.x, size.y);
 		Chars::const_iterator ch_it = chars_.begin();
 		uint16 x = GLYPH_PAD_SPACE;
 		uint16 y = GLYPH_PAD_SPACE;
@@ -139,7 +139,7 @@ FontManager::ShortSize FontManager::calcTextureSize(bool nonPow2)
 			//dprintfW(L"%d (%c) -> %d; %d\n", *ch_it, *ch_it, glyph_w, glyph_h);
 
 			if(x + GLYPH_PAD_SPACE + glyph_w > size.x){
-				//dprintfW(L"Перенос строки: x = %d\n", x);
+				//dprintfW(L"РџРµСЂРµРЅРѕСЃ СЃС‚СЂРѕРєРё: x = %d\n", x);
 				x = GLYPH_PAD_SPACE;
 				y = max_line_bottom + GLYPH_PAD_SPACE;
 			}
@@ -180,9 +180,9 @@ Font* FontManager::createFont(const char* ttf, uint8 font_pixel_size, const Font
 	if(!prm)
 		prm = &defParam;
 	
-	//dprintfW(L"Создается шрифт: %S размер: %d пикселов\n", ttf, font_pixel_size);
+	//dprintfW(L"РЎРѕР·РґР°РµС‚СЃСЏ С€СЂРёС„С‚: %S СЂР°Р·РјРµСЂ: %d РїРёРєСЃРµР»РѕРІ\n", ttf, font_pixel_size);
 	if(!render_->loadFont(ttf)){
-		//dprintfW(L"Создать шрифт не удалось\n");
+		//dprintfW(L"РЎРѕР·РґР°С‚СЊ С€СЂРёС„С‚ РЅРµ СѓРґР°Р»РѕСЃСЊ\n");
 		return 0;
 	}
 	render_->setMonochrome(!prm->antialiasing);
@@ -198,7 +198,7 @@ Font* FontManager::createFont(const char* ttf, uint8 font_pixel_size, const Font
 	}
 
 	FontManager::ShortSize size = calcTextureSize(prm->nonPow2);
-	//dprintfW(L"Размер текстуры: %d*%d\n", size.x, size.y);
+	//dprintfW(L"Р Р°Р·РјРµСЂ С‚РµРєСЃС‚СѓСЂС‹: %d*%d\n", size.x, size.y);
 
 	Font* font = new Font();
 	font->param_ = *prm;
@@ -236,7 +236,7 @@ Font* FontManager::createFont(const char* ttf, uint8 font_pixel_size, const Font
 		//dprintfW(L"%d (%c) -> %d; %d\n", *ch_it, *ch_it, glyph_w, glyph_h);
 
 		if(x + GLYPH_PAD_SPACE + glyph_w > size.x){
-			//dprintfW(L"Перенос строки: x = %d\n", x);
+			//dprintfW(L"РџРµСЂРµРЅРѕСЃ СЃС‚СЂРѕРєРё: x = %d\n", x);
 			x = GLYPH_PAD_SPACE;
 			y = max_line_bottom + GLYPH_PAD_SPACE;
 		}
@@ -249,7 +249,7 @@ Font* FontManager::createFont(const char* ttf, uint8 font_pixel_size, const Font
 				font->texture_->UnlockTexture();
 				render_->releaseFont();
 				releaseFont(font);
-				dprintfW(L"Не влезли в рассчитанную текстуру: %d*%d\nШрифт:%S, размер:%d\n", size.x, size.y, ttf, font_pixel_size);
+				dprintfW(L"РќРµ РІР»РµР·Р»Рё РІ СЂР°СЃСЃС‡РёС‚Р°РЅРЅСѓСЋ С‚РµРєСЃС‚СѓСЂСѓ: %d*%d\nРЁСЂРёС„С‚:%S, СЂР°Р·РјРµСЂ:%d\n", size.x, size.y, ttf, font_pixel_size);
 				return 0;
 			}
 		}

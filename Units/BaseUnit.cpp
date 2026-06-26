@@ -666,7 +666,8 @@ struct RealCollisionOperator
 void UnitBase::testCollision()
 {
 	universe()->unitGrid.setAsPassed(*this);
-	universe()->unitGrid.Scan(rigidBody()->position().xi(), rigidBody()->position().yi(), round(radius()), RealCollisionOperator(this));
+	RealCollisionOperator collisionOp(this);
+	universe()->unitGrid.Scan(rigidBody()->position().xi(), rigidBody()->position().yi(), round(radius()), collisionOp);
 }
 
 void RigidBodyBase::show()

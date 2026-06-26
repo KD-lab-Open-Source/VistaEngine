@@ -1,4 +1,5 @@
 #include "stdafxrd.h"
+#include "Serialization/Serialization.h"
 #include "ClippingMesh.h"
 #include "D3DRender.h"
 #include "cCamera.h"
@@ -146,7 +147,7 @@ bool ClippingMesh::GetOpenPolyline(const CFace& face,int& start,int& final)
 
 
 void ClippingMesh::BuildPolygon(APolygons& p)
-{//Самый простой метод, некоторые точки могут не использоваться.
+{//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	p.points.resize(V.size());
 	int i;
 	for(i=0;i<V.size();i++)
@@ -211,7 +212,7 @@ void ClippingMesh::BuildPolygon(APolygons& p)
 }
 
 //////////////////////////////////////////////////////////
-void ClippingMesh::createBox(Vect3f& vmin,Vect3f& vmax)
+void ClippingMesh::createBox(const Vect3f& vmin,const Vect3f& vmax)
 {
 	V.clear();
 	E.clear();
@@ -314,7 +315,7 @@ void ClippingMesh::calcBoundTransformed(const Mat4f& m, sBox6f& box)
 void ClippingMesh::fillVisPoly(BYTE *buf,Vect2f* vert,int vert_size,int VISMAP_W,int VISMAP_H)
 {
 	MTG(); 
-	//Временно для редактора xassert(!MT_IS_LOGIC());
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ xassert(!MT_IS_LOGIC());
 	if(vert_size==0)return;
 	const int VISMAP_W_MAX=128,VISMAP_H_MAX=128;
 	xassert(VISMAP_W<=VISMAP_W_MAX && VISMAP_H<=VISMAP_H_MAX);

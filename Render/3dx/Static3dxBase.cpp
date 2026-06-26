@@ -100,13 +100,13 @@ bool Static3dxBase::loadOld(CLoadDirectory& dir)
 			break;
 		case C3DX_NON_DELETE_NODE:
 			is_new_model = true;
-			CLoadIterator(ld)>>nonDeleteNodes;
+			{ CLoadIterator it(ld); it>>nonDeleteNodes; }
 			break;
 		case C3DX_LOGIC_NODE:
-			CLoadIterator(ld)>>logicNodes;
+			{ CLoadIterator it(ld); it>>logicNodes; }
 			break;
 		case C3DX_LOGIC_BOUND_NODE_LIST:
-			CLoadIterator(ld)>>boundNodes;
+			{ CLoadIterator it(ld); it>>boundNodes; }
 			break;
 
 		case C3DX_LOGOS:
@@ -125,12 +125,12 @@ bool Static3dxBase::loadOld(CLoadDirectory& dir)
 
 	if(!loaded){
 		if(is_logic){
-			//xassertStr("Устаревший формат 3dx, необходимо переэкспортировать: " && 0, file_name);
+			//xassertStr("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 3dx, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: " && 0, file_name);
 			return false;
 		}
 		else{
 			dir.rewind();
-			LoadInternal(dir);//Поддержка старого формата, потом стереть.
+			LoadInternal(dir);//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 		}
 	}
 
@@ -350,11 +350,11 @@ StaticAnimationChain::StaticAnimationChain()
 
 void StaticAnimationChain::serialize(Archive& ar)
 {
-	ar.serialize(name, "name", "&Имя");
-	ar.serialize(time, "time", "Длительность");
-	ar.serialize(begin_frame, "begin_frame", "&Начальный кадр");
-	ar.serialize(end_frame, "end_frame", "Конечный кадр");
-	ar.serialize(cycled, "cycled", "Зацикленная");
+	ar.serialize(name, "name", "&пїЅпїЅпїЅ");
+	ar.serialize(time, "time", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(begin_frame, "begin_frame", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+	ar.serialize(end_frame, "end_frame", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+	ar.serialize(cycled, "cycled", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 void Static3dxBase::LoadChain(CLoadDirectory rd)
@@ -469,7 +469,7 @@ template<class Data>
 void ChainConverter::loadInterpolator(Interpolator3dx<Data>& self, CLoadIterator ld)
 {
 	typedef Interpolator3dx<Data> Interpolator;
-	Interpolator::Values& curve = self.values;
+	typename Interpolator::Values& curve = self.values;
 
 	int size=0;
 	ld>>size;
@@ -477,7 +477,7 @@ void ChainConverter::loadInterpolator(Interpolator3dx<Data>& self, CLoadIterator
 	curve.resize(size);
 	for(int i=0;i<size;i++)
 	{
-		Interpolator::Data& one=curve[i];
+		typename Interpolator::Data& one=curve[i];
 		int type=0;
 		ld>>type;
 		one.itpl=(ITPL)type;
@@ -813,7 +813,7 @@ void cTempMesh3dx::Load(CLoadDirectory rd)
 							xassert(p.weight[ibone]==0);
 					}
 
-					//				xassert(sum>=0.999f && sum<1.001f);//Потом опять вставить, закомментировано для демы
+					//				xassert(sum>=0.999f && sum<1.001f);//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 
 					sum=1/sum;
 					for(ibone=0;ibone<MAX_BONES;ibone++)
@@ -1254,7 +1254,7 @@ StaticVisibilitySet::StaticVisibilitySet()
 void StaticVisibilitySet::serialize(Archive& ar)
 {
 	ar.serialize(name, "name", "^");
-	ar.serialize(visibilityGroups, "visibilityGroups", "Группы видимости");
+	ar.serialize(visibilityGroups, "visibilityGroups", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 void StaticVisibilitySet::DummyVisibilityGroup()
@@ -1364,7 +1364,7 @@ void Static3dxBase::serialize(Archive& ar)
 	ar.serialize(version, "version", "version");
 
 	if(ar.inPlace())
-		ar.serialize(fileName_, "fileName", "fileName"); // Имя самого себя лучше не писать
+		ar.serialize(fileName_, "fileName", "fileName"); // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
 	ar.serialize(maxWeights, "maxWeights", "maxWeights");
 	ar.serialize(nonDeleteNodes, "nonDeleteNodes", "nonDeleteNodes");
@@ -1474,7 +1474,7 @@ bool Static3dxBase::load(const char* fileName)
 	fileName_ = fileName;
 	BinaryIArchive ia(0);
 	if(ia.open((setExtention(fileName_.c_str(), fileExtention).c_str())))
-		return ia.serialize(*this, is_logic ? "logic3dx" : "graphics3dx", 0); // В конверсиях из старого формата может не быть logic3dx
+		return ia.serialize(*this, is_logic ? "logic3dx" : "graphics3dx", 0); // пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ logic3dx
 
 	CLoadDirectoryFileRender rd;
 	if(rd.Load(fileName_.c_str()) && loadOld(rd))

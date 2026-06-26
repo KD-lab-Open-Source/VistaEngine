@@ -13,6 +13,9 @@ inline HRESULT StringCchCopyW(wchar_t* d, size_t n, const wchar_t* s) { wcsncpy(
 inline HRESULT StringCchPrintfA(char* d, size_t n, const char* fmt, ...) {
     va_list a; va_start(a,fmt); vsnprintf(d,(size_t)n,fmt,a); va_end(a); return S_OK;
 }
+inline HRESULT StringCbVPrintf(char* d, size_t cb, const char* fmt, va_list args) {
+    if(cb) { vsnprintf(d,(size_t)cb,fmt,args); d[cb-1]=0; } return S_OK;
+}
 inline HRESULT StringCchLengthA(const char* s, size_t n, size_t* len) { *len=strnlen(s,n); return S_OK; }
 inline HRESULT StringCchCatA(char* d, size_t n, const char* s) { strncat(d,s,n-strlen(d)-1); return S_OK; }
 #define StringCchCopy  StringCchCopyA

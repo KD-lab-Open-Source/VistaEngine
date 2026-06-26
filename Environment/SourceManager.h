@@ -9,7 +9,7 @@ class ParameterCustom;
 class SoundAttribute;
 class SoundController;
 
-enum SourceType;
+enum SourceType : int;
 class SourceAttribute;
 class SourceBase;
 class BaseUniverseObject;
@@ -32,15 +32,15 @@ public:
 
 	void serialize(Archive& ar);
 
-	/// создаёт, устанавливает и запускает источник
-	/// при некоторых условиях может вернуть ноль
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	/// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	SourceBase* createSource(const SourceAttribute* attribute, const Se3f& pose, bool allow_limited_lifetime = true, bool* startFlag = 0);
 	SourceBase* addSource (const SourceBase* original);
 	void flushNewSources();
 
 	void setSourceOnMouse(const SourceBase* source);
 
-	/// добавляет на мир якорь для привязки
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	Anchor* addAnchor();
 	Anchor* addAnchor(const Anchor* original);
 
@@ -75,7 +75,7 @@ public:
 
 	int changeControllersSize() const { return showChangeControllers_.size(); }
 
-	// проверяет позицию на удовлетворяемость SurfaceClass
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ SurfaceClass
 	bool checkEnvironment(const Vect3f& pos, int types) const;
 
 	void clearSources();
@@ -86,7 +86,7 @@ private:
 
 	ShowChangeControllers showChangeControllers_;
 
-	// для показа на КРИ2006
+	// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ2006
 	UnitLink<SourceBase> sourceOnMouse_;
 
 	Anchors anchors_;

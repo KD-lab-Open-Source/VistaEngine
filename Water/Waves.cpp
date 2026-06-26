@@ -473,14 +473,14 @@ void cWaves::Animate(float dt)
 
 void cWaves::serialize (Archive& ar)
 {
-	ar.serialize(T, "Period", "Период");
-//	ar.serialize(RangedWrapperf(Fmax, 0, 1, 0.01f), "Wave_velocity", "Скорость волн");
+	ar.serialize(T, "Period", "пїЅпїЅпїЅпїЅпїЅпїЅ");
+//	ar.serialize(RangedWrapperf(Fmax, 0, 1, 0.01f), "Wave_velocity", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 	string texture;
 	if (Texture)
 		texture = Texture->name();
 	static ResourceSelector::Options textureOptions("*.tga", "Resource\\TerrainData\\Textures");
-	ar.serialize(ResourceSelector (texture, textureOptions), "wave_tga_texture", "Текстура");
-	ar.serialize(active, "waves_on", "Включить");
+	ar.serialize(ResourceSelector (texture, textureOptions), "wave_tga_texture", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(active, "waves_on", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if (ar.isInput())
 		SetTexture(texture.c_str());
 }
@@ -526,7 +526,7 @@ cFixedWaves::~cFixedWaves()
 	RELEASE(texture_);
 }
 
-void cFixedWaves::ShowInfo(Color4c& color)
+void cFixedWaves::ShowInfo(const Color4c& color)
 {
 	Color4c pntColor = Color4c(255,255,255);
 	for (int i=0; i<points_.size(); i++)

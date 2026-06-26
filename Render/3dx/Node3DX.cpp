@@ -15,8 +15,8 @@ float AlphaMaxiumBlend=0.95f;
 float AlphaMiniumShadow=0.0f;
 
 /*
-Оптимизация.
-!! На втором и третьем LOD - уменьшать количество костей до 2 и 1
+пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+!! пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ LOD - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 2 пїЅ 1
 */
 
 Shader3dx::Shader3dx()
@@ -174,11 +174,12 @@ void cObject3dx::QueryVisible(Camera* camera)
 	if(pOcclusionQuery)
 	{
 		Vect3f pos;
-		//camera->GetWorldK() все же не совсем то, что направление от камеры на центр объекта, но во многих случаях прокатывает.
+		//camera->GetWorldK() пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 		if(false)
 		{
 			Vect3f pos=position.trans()-(GetBoundRadius()*1.1f)*camera->GetWorldK();
-			pos+=position.rot().xform((pStatic->boundBox.min+pStatic->boundBox.max)*(0.5f*position.scale()));
+			Vect3f boundCenter = (pStatic->boundBox.min+pStatic->boundBox.max)*(0.5f*position.scale());
+			pos+=position.rot().xform(boundCenter);
 		}else
 		{
 			Vect3f center_pos=position.trans();
@@ -263,7 +264,7 @@ cObject3dx::cObject3dx(cStatic3dx* pStatic_, bool interpolate)
 	pOcclusionQuery=0;
 	updated_=false;
 	treeUpdated_ = false;
-	isTree_ = false; // Временно, потом переделать!!!!!!!!
+	isTree_ = false; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ!!!!!!!!
 	silhouette_index = 0;
 
 	link3dx.SetParent(this);
@@ -290,7 +291,7 @@ cObject3dx::cObject3dx(cStatic3dx* pStatic_, bool interpolate)
 	material_textures.resize(pStatic->materials.size());
 
 	pAnimSecond = 0;
-	if(interpolate)//Переделать GetAllPoints
+	if(interpolate)//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ GetAllPoints
 		pAnimSecond = new cObject3dxAnimationSecond(pStatic);
 
 	if(!pStatic->isBoundBoxInited){
@@ -401,7 +402,7 @@ void cObject3dx::SetScale(float scale_)
 //	if(GetBoundRadius()>1000)
 //		console()<< cConsole::LOW << "&Balmer" << "Big object " <<pStatic->file_name << cConsole::END;
 
-	//Фикс (кривой) для постоянно генерирующихся эффектов
+	//пїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅ) пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	vector<EffectData>::iterator it;
 	FOR_EACH(effects,it)
 	{
@@ -640,7 +641,7 @@ void cObject3dx::Draw(Camera* camera)
 		return;
 
 	if(!isSkinColorSet_ && IsHaveSkinColorMaterial()){
-		VisError << "Для модели " << pStatic->fileName() << " не назначен Skin Color.\nБудет назначен Skin Color по умолчанию" << VERR_END;
+		VisError << "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ " << pStatic->fileName() << " пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Skin Color.\nпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ Skin Color пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ" << VERR_END;
 		SetSkinColor(Color4c(255,255,255,255),0);
 	}
 
@@ -663,9 +664,9 @@ void cObject3dx::Draw(Camera* camera)
 	gb_RenderDevice3D->SetSamplerData(1,sampler_wrap_linear);
 	gb_RenderDevice3D->SetTextureBase(4,0);
 
-	//Из плюсов - выводит стабильное количество полигонов вне зависимости
-	//от количества подобъектов. Из минусов - для больших объектов не слишком
-	//эффективен. indexed 14 mtrtis, nonindexed 26 mtris - пиковые значения на FX 5950.
+	//пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	//пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. indexed 14 mtrtis, nonindexed 26 mtris - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ FX 5950.
 	bool is_shadow=camera->IsShadow();
 
 	DWORD old_zfunc;
@@ -680,7 +681,7 @@ void cObject3dx::Draw(Camera* camera)
 		old_color = gb_RenderDevice3D->GetRenderState(D3DRS_COLORWRITEENABLE);
 	}
 
-	//!!! Не забыть сортировку по материалам.
+	//!!! пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	cStatic3dx::StaticLod& lod=pStatic->lods[iLOD];
 	int size=lod.bunches.size();
 	for(int iBunch=0;iBunch<size;iBunch++){
@@ -742,7 +743,7 @@ void cObject3dx::Draw(Camera* camera)
 		}
 
 		if(is_opacity_vg){
-			//Рисовать прозрачную и непрозрачную часть. Выставлять.
+			//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 			if(draw_opacity)
 				blend=ALPHA_BLEND;
 		}
@@ -850,7 +851,7 @@ void cObject3dx::Draw(Camera* camera)
 		vs->SetReflectionZ(reflectionz);
 		ps->SetReflectionZ(reflectionz);
 
-		//Немного не к месту, зато быстро по скорости, для отражений.
+		//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 		gb_RenderDevice3D->SetTexture(5,camera->GetZTexture());
 		gb_RenderDevice3D->SetSamplerData(5,sampler_clamp_linear);
 		
@@ -996,7 +997,7 @@ void cObject3dx::DrawMaterialGroupSelectively(StaticBunch& bunch,const Color4f& 
 			else if(group.alpha<AlphaMaxiumBlend)
 				continue;
 
-			//БЛИН!!! Этот подход не дает истинной гибкости!
+			//пїЅпїЅпїЅпїЅ!!! пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ!
 
 			gb_RenderDevice3D->DrawIndexedPrimitive(
 				lod.vb,bunch.offset_vertex,bunch.num_vertex,
@@ -1028,7 +1029,7 @@ void cObject3dx::DrawShadowAndZbuffer(Camera* camera,bool ZBuffer)
 {
 	gb_RenderDevice3D->SetTextureBase(1,0);
 
-	//!!! Не забыть сортировку по материалам.
+	//!!! пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	cStatic3dx::StaticLod& lod=pStatic->lods[iLOD];
 	int size=lod.bunches.size();
 	for(int iBunch=0;iBunch<size;iBunch++){
@@ -1108,16 +1109,16 @@ void cObject3dx::DrawShadowAndZbuffer(Camera* camera,bool ZBuffer)
 }
 
 /*Scripts\Resource\balmer\furmap.dds
-Хочется - 
- 1 разного цвета									- это понятно текстурка.
- 2 разной высоты шерсти в разных местах				- grayscale текстурка.
- 3 направления отличного от направления нормали.	- непонятно, можно отдельной геометрией, а можно текстуркой.
- 4 шевеления шерсти????? Хм, хм.					- нафиг надо, лучше про вторую нормаль подумать, да.
+пїЅпїЅпїЅпїЅпїЅпїЅпїЅ - 
+ 1 пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ									- пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+ 2 пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ				- grayscale пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+ 3 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.	- пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+ 4 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ????? пїЅпїЅ, пїЅпїЅ.					- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ.
 
- //Так - есть 2 текстуры.
- Первая текстура - цвет и прозрачность для furmap.
- Вторая текстура RGB - нормаль в tangent space. A - высота шерсти относительная.
- Все эти параметры задаются в текстовом файлике имя_модели.furinfo
+ //пїЅпїЅпїЅ - пїЅпїЅпїЅпїЅ 2 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ furmap.
+ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ RGB - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ tangent space. A - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ_пїЅпїЅпїЅпїЅпїЅпїЅ.furinfo
 */
 
 void cObject3dx::DrawFur(Camera* camera)
@@ -1131,7 +1132,7 @@ void cObject3dx::DrawFur(Camera* camera)
 
 	bool is_shadow=camera->IsShadow();
 
-	//!!! Не забыть сортировку по материалам.
+	//!!! пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	cStatic3dx::StaticLod& lod=pStatic->lods[iLOD];
 	int size=lod.bunches.size();
 	for(int iBunch=0;iBunch<size;iBunch++){
@@ -1206,7 +1207,7 @@ void cObject3dx::DrawFur(Camera* camera)
 		vs->SetReflectionZ(reflectionz);
 		ps->SetReflectionZ(reflectionz);
 
-		//Немного не к месту, зато быстро по скорости, для отражений.
+		//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 		gb_RenderDevice3D->SetTexture(5,camera->GetZTexture());
 		gb_RenderDevice3D->SetSamplerData(5,sampler_clamp_linear);
 		
@@ -1226,11 +1227,11 @@ void cObject3dx::DrawFur(Camera* camera)
 		vs->SetMaterial(&material);
 
 /*
-	Нужно ещё попробовать - 
-	1. изменять прозрачность по разным законам.
-	2. изменять цвет так же взависимости от слоя.
+	пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - 
+	1. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+	2. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ.
 */
-		const max_ifur=10;
+		const int max_ifur=10;
 		float basea=material.Diffuse.a;
 		for(int ifur=1;ifur<=max_ifur;ifur++){
 			if(mat.fur_alpha_type==FurInfo::FUR_LINEAR){
@@ -1258,7 +1259,7 @@ int cObject3dx::GetAnimationGroup(const char* name)
 	}
 
 //	{
-//		string str="Не найдена анимационная группа. Все имена, кроме имен файлов являются чувствительными к регистрам. Файл:";
+//		string str="пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅ:";
 //		str+=pStatic->file_name;
 //		str+="  Animation Group:";
 //		str+=name;
@@ -1276,7 +1277,7 @@ const char* cObject3dx::GetAnimationGroupName(int igroup)
 {
 	if(!(igroup>=0 && igroup<pStatic->animationGroups_.size()))
 	{
-		string str="Bad group index. Файл:";
+		string str="Bad group index. пїЅпїЅпїЅпїЅ:";
 		str+=pStatic->fileName();
 		xxassert(0 ,str.c_str());
 		return 0;
@@ -1306,7 +1307,7 @@ void cObject3dx::SetVisibilityGroup(VisibilityGroupIndex group, VisibilitySetInd
 {
 	if(iset==VisibilitySetIndex::BAD)
 	{
-		xassert(0);//Наверно не нужно такое поведение.
+		xassert(0);//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 		int size=GetVisibilitySetNumber();
 		for(int i=0;i<size;i++)
 			SetVisibilityGroup(group,VisibilitySetIndex(i));
@@ -1324,7 +1325,7 @@ void cObject3dx::SetVisibilityGroup(VisibilityGroupIndex group, VisibilitySetInd
 
 void cObject3dx::UpdateVisibilityGroup(VisibilitySetIndex iset)
 {
-	// !!! не нужна
+	// !!! пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	visibilityGroups_[iset].visibilityGroup = &pStatic->visibilitySets_[iset].visibilityGroups[visibilityGroups_[iset].visibilityGroupIndex];
 }
 
@@ -1478,7 +1479,7 @@ void cObject3dx::Animate(float dt)
 
 	point_light.clear();
 
-	Update();//Все равно там внутри проверка есть.
+	Update();//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ.
 	if(!observer.empty())
 		observer.UpdateLink();
 
@@ -1589,7 +1590,7 @@ const char* cObject3dx::GetFileName() const
 	return pStatic->fileName();
 }
 
-void cObject3dx::SetSkinColor(Color4c skin_color_, const char* logo_name_)//emblem_name - хранит путь к эмблеме. 
+void cObject3dx::SetSkinColor(Color4c skin_color_, const char* logo_name_)//emblem_name - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ. 
 {
 	skin_color=skin_color_;
 
@@ -1921,7 +1922,7 @@ void cObject3dx::ProcessEffect(Camera* camera)
 				e.pEffect->SetParticleRate(visible?1.0f:0);
 		}
 		else if(is_group_visible){
-			///Ищем 
+			///пїЅпїЅпїЅпїЅ 
 			float delta_plus,delta_minus;
 			if(node.phase>e.prev_phase){
 				delta_plus=node.phase-e.prev_phase;
@@ -2128,8 +2129,8 @@ int cObject3dx::GetNodeNum()
 
 void cObject3dx::SetShadowType(ObjectShadowType type)
 {
-	pStatic->circle_shadow_enable=type;
-	pStatic->circle_shadow_enable_min=min(pStatic->circle_shadow_enable,gb_VisGeneric->GetMaximalShadowObject());
+	pStatic->circle_shadow_enable=StaticObjectShadowType(type);
+	pStatic->circle_shadow_enable_min=StaticObjectShadowType(min(int(pStatic->circle_shadow_enable),int(gb_VisGeneric->GetMaximalShadowObject())));
 }
 
 void cObject3dx::SetCircleShadowParam(float radius,float height)
@@ -2140,7 +2141,7 @@ void cObject3dx::SetCircleShadowParam(float radius,float height)
 
 ObjectShadowType cObject3dx::getShadowType()
 {
-	return pStatic->circle_shadow_enable;
+	return ObjectShadowType(pStatic->circle_shadow_enable);
 }
 
 void cObject3dx::getCircleShadowParam(float& radius, float& height)
@@ -2441,7 +2442,7 @@ void cObject3dxAnimation::SetAnimationGroupChain(int igroup,int chain_index)
 	updated_=false;
 	if(!(igroup>=0 && igroup<pStatic->animationGroups_.size()))
 	{
-		string str="Неправильный номер группы анимации. Файл:";
+		string str="пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅ:";
 		str+=pStatic->fileName();
 		xxassert(0 ,str.c_str());
 		return;
@@ -2449,7 +2450,7 @@ void cObject3dxAnimation::SetAnimationGroupChain(int igroup,int chain_index)
 
 	if(chain_index<0 || chain_index>=pStatic->animationChains_.size())
 	{
-		string str="Неправильный номер анимационной цепочки. Файл:";
+		string str="пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅ:";
 		str+=pStatic->fileName();
 		xxassert(0 ,str.c_str());
 		return;
@@ -2502,7 +2503,7 @@ int cObject3dxAnimation::FindChain(const char* chain_name)
 	}
 
 //	{
-//		string str="Не найдена цепочка. Все имена, кроме имен файлов являются чувствительными к регистрам. Файл:";
+//		string str="пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅ:";
 //		str+=pStatic->file_name;
 //		str+="  Chain:";
 //		str+=chain_name;
@@ -2546,7 +2547,7 @@ void cObject3dxAnimation::SetChain(int chain)
 	updated_=false;
 	if(chain<0 || chain>=pStatic->animationChains_.size())
 	{
-		string str="Неправильный номер анимационной цепочки. Файл:";
+		string str="пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅ:";
 		str+=pStatic->fileName();
 		xxassert(0 ,str.c_str());
 	}
@@ -2659,7 +2660,7 @@ void cObject3dxAnimation::UpdateMatrix(Mats& position,vector<c3dxAdditionalTrans
 		cNode3dx& node = nodes_[i];
 		StaticNode& staticNode = pStatic->nodes[i];
 
-		if(staticNode.iparent < 0)//временно
+		if(staticNode.iparent < 0)//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			continue;
 
 		xassert(staticNode.iparent>=0 && staticNode.iparent<size);
@@ -2703,7 +2704,7 @@ void cObject3dx::UpdateAndLerp()
 		cNode3dx& node1=pAnimSecond->nodes_[i];
 		StaticNode& sn=pStatic->nodes[i];
 
-		if(sn.iparent<0)//временно
+		if(sn.iparent<0)//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			continue;
 
 		xassert(sn.iparent>=0 && sn.iparent<size);
@@ -3198,7 +3199,7 @@ void cObject3dx::AddLight(cUnkLight* light)
 {
 	if(getAttribute(ATTRUNKOBJ_IGNORE))
 		return;
-	//Может пооптимальнее потом написать.
+	//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	const int maxc=2;
 	if(point_light.size()>=maxc)
 	{

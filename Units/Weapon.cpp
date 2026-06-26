@@ -183,10 +183,10 @@ private:
 
 	int environmentDestruction_;
 
-	/// список юнитов, которые должны быть уничтожены лучом
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	ContactList unitsToDestruct_;
 
-	/// юнит, в который упёрся луч
+	/// пїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 	ContactInfo traceEnd_;
 
 	bool needDestruct(const UnitBase* unit) const
@@ -305,7 +305,7 @@ private:
 
 }; // namespace weapon_helpers
 
-/// Оружие, стреляющее снарядами по навесной траектории.
+/// пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 class WeaponProjectile : public WeaponBase
 {
 public:
@@ -337,7 +337,7 @@ public:
 
 protected:
 	typedef std::vector<ProjectileBase*> Projectiles;
-	/// визуализация снарядов
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	Projectiles projectiles_;
 
 	void createProjectile()
@@ -440,7 +440,7 @@ private:
 	bool isEmpty_;
 };
 
-/// Лучевое оружие.
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
 class WeaponBeam : public WeaponBase
 {
 public:
@@ -462,18 +462,18 @@ protected:
 
 private:
 
-	/// визуализация луча
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	cEffect* effect_;
 
 	Vect3f beamPrevPos_[2];
 
 	Vect3f firePositionInitial_;
-	/// ошибка прицеливания
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	Vect3f fireDispersionInitial_;
-	/// цель
+	/// пїЅпїЅпїЅпїЅ
 	UnitLink<UnitInterface> fireTargetInitial_;
 
-	/// цепной эффект
+	/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	ChainLightningWeaponFunctor chainLightningFunctor_;
 	ChainLightningController chainLightningController_;
 
@@ -505,7 +505,7 @@ private:
 	bool groundHit() const;
 };
 
-/// захват
+/// пїЅпїЅпїЅпїЅпїЅпїЅ
 class WeaponGrip : public WeaponBase
 {
 public:
@@ -526,7 +526,7 @@ protected:
 	LogicTimer gripTimer;
 };
 
-/// управление источником из оружия
+/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 class WeaponSourceController
 {
 public:
@@ -573,7 +573,7 @@ private:
 	Se3f pose_;
 };
 
-/// оружие, действующее на область
+/// пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 class WeaponPad : public WeaponBase
 {
 public:
@@ -611,7 +611,7 @@ private:
 	float digLenght_;
 };
 
-/// оружие, действующее на область
+/// пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 class WeaponAreaEffect : public WeaponBase
 {
 public:
@@ -709,17 +709,17 @@ WeaponWaitingSourcePrm::WeaponWaitingSourcePrm()
 void WeaponWaitingSourcePrm::serialize(Archive& ar)
 {
 	WeaponPrm::serialize(ar);
-	ar.serialize(type_, "type", "фаза процесса");
+	ar.serialize(type_, "type", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(type_ == MINING){
-		ar.serialize(source_, "sources", "источник"); // с активацией детонатором
-		ar.serialize(delayTime_, "delayTime", "задержка между взрывами");
-		ar.serialize(miningLimit_, "miningLimit", "Максимум мин");
+		ar.serialize(source_, "sources", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"); // пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+		ar.serialize(delayTime_, "delayTime", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(miningLimit_, "miningLimit", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ");
 	}
 }
 
 //-------------------------------------------------------
 
-/// оружие расставляющее источники с запоминанием места и отложенной телопортацией детонаторов в эти места
+/// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 class WeaponWaitingSource : public WeaponBase
 {
 public:
@@ -801,7 +801,7 @@ bool WeaponAimAngleController::init(UnitActing* owner, const WeaponAimAnglePrm& 
 			offset_.trans() = Vect3f::ZERO;
 		}
 		else
-			kdWarning("&stlr", (string(TRANSLATE("Не найдена графическая нода")) + owner->attr().modelName + " / " + prm.nodeGraphics().c_str()).c_str());
+			kdWarning("&stlr", (string(TRANSLATE("пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ")) + owner->attr().modelName + " / " + prm.nodeGraphics().c_str()).c_str());
 	}
 	else
 		nodeIndex_ = -1;
@@ -830,15 +830,15 @@ bool WeaponAimAngleController::init(UnitActing* owner, const WeaponAimAnglePrm& 
 							rotateByLogic_ = true;
 						}
 						else
-							kdWarning("&stlr", (string(TRANSLATE("Неправильно прилинкована логическая нода ")) + owner->attr().modelName + " / " + parent_node_name).c_str());
+							kdWarning("&stlr", (string(TRANSLATE("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ ")) + owner->attr().modelName + " / " + parent_node_name).c_str());
 					}
 				}
 				else
-					kdWarning("&stlr", (string(TRANSLATE("Не найдена логическая нода")) + owner->attr().modelName + " / " + parent_node_name).c_str());
+					kdWarning("&stlr", (string(TRANSLATE("пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ")) + owner->attr().modelName + " / " + parent_node_name).c_str());
 			}
 		}
 		else
-			kdWarning("&stlr", (string(TRANSLATE("Не найдена логическая нода")) + owner->attr().modelName + " / " + prm.nodeLogic().c_str()).c_str());
+			kdWarning("&stlr", (string(TRANSLATE("пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ")) + owner->attr().modelName + " / " + prm.nodeLogic().c_str()).c_str());
 	}
 	else
 		nodeLogicIndex_ = -1;
@@ -2425,7 +2425,7 @@ bool WeaponBase::updateParameters()
 	fireRadiusMin_ = prm.findByType(ParameterType::FIRE_RANGE_MIN, 0.0f);
 	fireRadius_ = prm.findByType(ParameterType::FIRE_RANGE, 100.0f);
 
-	xassertStr(fireRadius_ > fireRadiusMin_ && "Минимальный радиус атаки больше максимального", owner()->attr().libraryKey());
+	xassertStr(fireRadius_ > fireRadiusMin_ && "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", owner()->attr().libraryKey());
 
 	reloadTime_ = round(prm.findByType(ParameterType::RELOAD_TIME, 0.1f) * 1000.0f);
 	reloadTimeInventory_ = round(prm.findByType(ParameterType::RELOAD_TIME_INVENTORY, float(reloadTime_)/1000.f) * 1000.0f);
@@ -2572,19 +2572,19 @@ WeaponPrm::UnitMode WeaponBase::unitMode(UnitBase* unit)
 
 bool WeaponPrmCache::getParametersForUI(const wchar_t* &name, wchar_t type, ParameterSet& out) const
 {
-	if(type == L'w'){ // личные параметры оружия
+	if(type == L'w'){ // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		out = parameters();
 		return true;
 	}
 
 	xassert(type == L'd' || type == L's');
-	if(const wchar_t* delimeter = wcschr(name, L'/')){ // задано еще одно имя
+	if(const wchar_t* delimeter = wcschr(name, L'/')){ // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 		if(delimeter != name){
 			string sourceLabel;
 			w2a(sourceLabel, wstring(name, delimeter));
 			name =  delimeter + 1;
 
-			//сначала ищем непосредственно в кеше
+			//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ
 			WeaponSourcePrms::const_iterator it;
 			FOR_EACH(sources(), it)
 				if(it->checkKey(sourceLabel.c_str())){
@@ -2595,8 +2595,8 @@ bool WeaponPrmCache::getParametersForUI(const wchar_t* &name, wchar_t type, Para
 					return true;
 				}
 
-			//затем по всему дереву производных источников,
-			//эти параметры не кешированы и не могут апгрейдиться
+			//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ,
+			//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			WeaponSourcePrm prm;
 			FOR_EACH(sources(), it)
 				if(const SourceAttribute* sattr = it->getSourceByKey(sourceLabel.c_str())){
@@ -2924,7 +2924,8 @@ bool WeaponBeam::createSources()
 				p->setAffectMode(affectMode());
 				p->setPlayer(owner()->player());
 				p->setOwner(owner());
-				p->setParameters(prmCache().sources()[idx], &WeaponTarget(fireTarget(), firePosition() + fireDispersion()));
+				WeaponTarget weaponTarget(fireTarget(), firePosition() + fireDispersion());
+				p->setParameters(prmCache().sources()[idx], &weaponTarget);
 			}
 		}
 		idx++;
@@ -3107,9 +3108,9 @@ void WeaponProjectilePrm::serialize(Archive& ar)
 {
 	WeaponPrm::serialize(ar);
 
-	ar.serialize(missileID_, "projectile", "Снаряд");
-	ar.serialize(needMissileVisualisation_, "needMissileVisualisation", "Показывать снаряд на оружии");
-	ar.serialize(missileLaunchType_, "missileLaunchType", "Когда выстреливать снаряд");
+	ar.serialize(missileID_, "projectile", "пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(needMissileVisualisation_, "needMissileVisualisation", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(missileLaunchType_, "missileLaunchType", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 bool WeaponProjectilePrm::needMissileVisualisation() const
@@ -3142,28 +3143,28 @@ void WeaponBeamPrm::serialize(Archive& ar)
 {
 	WeaponPrm::serialize(ar);
 
-	ar.serialize(needSurfaceTrace_, "needSurfaceTrace", "учитывать поверхность");
-	ar.serialize(needUnitTrace_, "needUnitTrace", "учитывать юнитов");
-	ar.serialize(needShieldTrace_, "needShieldTrace", "учитывать защитное поле");
-	ar.serialize(damageAtOnce_, "damageAtOnce", "Наносить все повреждения сразу");
-	ar.serialize(shieldEffect_, "shieldEffect", "Эффект при попадании в защитное поле");
-	ar.serialize(targetEffects_, "targetEffects", "Эффекты при попадании в цель");
-	ar.serialize(effectReference_, "effectReference", "спецэффект луча");
-	ar.serialize(effectScale_, "effectScale", "масштаб спецэффекта луча");
-	ar.serialize(effectStopImmediately_, "effectStopImmediately", "обрывать спецэффект луча по окончании выстрела");
+	ar.serialize(needSurfaceTrace_, "needSurfaceTrace", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(needUnitTrace_, "needUnitTrace", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(needShieldTrace_, "needShieldTrace", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+	ar.serialize(damageAtOnce_, "damageAtOnce", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(shieldEffect_, "shieldEffect", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+	ar.serialize(targetEffects_, "targetEffects", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ");
+	ar.serialize(effectReference_, "effectReference", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+	ar.serialize(effectScale_, "effectScale", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+	ar.serialize(effectStopImmediately_, "effectStopImmediately", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(legionColor_, "legionColor", "красить луч в цвет легиона");
+	ar.serialize(legionColor_, "legionColor", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	if(needUnitTrace_)
-		ar.serialize(environmentDestruction_, "environmentDestruction", "Разрушение объектов окружения");
+		ar.serialize(environmentDestruction_, "environmentDestruction", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(sourcesCreationMode_, "sourcesCreationMode", "создавать источники");
+	ar.serialize(sourcesCreationMode_, "sourcesCreationMode", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(sources_, "sources", "параметры источников");
+	ar.serialize(sources_, "sources", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(useChainEffect_, "useChainEffect", "создавать цепной эффект");
+	ar.serialize(useChainEffect_, "useChainEffect", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(useChainEffect_){
-		ar.serialize(chainLightningAttribute_, "chainLightningAttribute", "параметры цепного эффекта");
+		ar.serialize(chainLightningAttribute_, "chainLightningAttribute", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		if(!chainLightningAttribute_.strike_effect_.get())
 			chainLightningAttribute_.strike_effect_ = effectReference_;
 	}
@@ -3183,10 +3184,10 @@ void WeaponBeamPrm::initCache(WeaponPrmCache& cache) const
 
 void TargetEffect::serialize(Archive& ar)
 {
-	ar.serialize(effect_, "effect", "Эффект");
-	ar.serialize(sound_, "sound", "Звук попадания");
-	ar.serialize(targetMode_, "targetMode", "Выводить на целях");
-	ar.serialize(targetAttackClass_, "targetAttackClass", "Тип цели");
+	ar.serialize(effect_, "effect", "пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(sound_, "sound", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(targetMode_, "targetMode", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(targetAttackClass_, "targetAttackClass", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 }
 
 //---------------------------------------------
@@ -3202,12 +3203,12 @@ void WeaponAreaEffectPrm::serialize(Archive& ar)
 {
 	WeaponPrm::serialize(ar);
 
-	ar.serialize(sources_, "sources", "параметры источников");
-	ar.serialize(zonePositionMode_, "zonePositionMode_", "позиционирование источников");
+	ar.serialize(sources_, "sources", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(zonePositionMode_, "zonePositionMode_", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	if(!ar.inPlace()){
 		fowRadius_ *= FogOfWar::step;
-		ar.serialize(fowRadius_, "fowRadiusW", "радиус видимости");
+		ar.serialize(fowRadius_, "fowRadiusW", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		fowRadius_ /= FogOfWar::step;
 	}
 }
@@ -3236,15 +3237,15 @@ void WeaponPadPrm::serialize(Archive& ar)
 {
 	WeaponPrm::serialize(ar);
 
-	ar.serialize(attrPad_, "attrPad", "^Юнит-лапа");
+	ar.serialize(attrPad_, "attrPad", "^пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅ");
 	
-	ar.serialize(pickedUnits_, "pickedUnits", "Переносимые юниты");
-	ar.serialize(pickedItems_, "pickedItems", "Подбираемые предметы");
+	ar.serialize(pickedUnits_, "pickedUnits", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(pickedItems_, "pickedItems", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(type_, "type", "&Работа с землей");
+	ar.serialize(type_, "type", "&пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	if(attrPad_.key() >= 0){
-		if(!ar.serialize(toolser_, "padtoolser", "Тулзеры")){ ///  CONVERSION 2008-1-24
+		if(!ar.serialize(toolser_, "padtoolser", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")){ ///  CONVERSION 2008-1-24
 			vector<TerToolCtrl> toolsers;
 			TerToolCtrl tert;
 			if(!ar.serialize(tert, "toolser", 0))
@@ -3254,26 +3255,26 @@ void WeaponPadPrm::serialize(Archive& ar)
 			toolser_.setControllers(toolsers);
 		}
 		
-		ar.serialize(surfaceType_, "surfaceType", "Поверхность на которой работает");
+		ar.serialize(surfaceType_, "surfaceType", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 		if(type_ == DIG_IN){
-			ar.serialize(RangedWrapperf(power_, 200.f, 1500.f), "diginPower", "Длина траншеи для полного наполнения");
-			ar.serialize(RangedWrapperf(digLenght_, 50.f, power_), "digLenght", "Макс длина единичного копка");
+			ar.serialize(RangedWrapperf(power_, 200.f, 1500.f), "diginPower", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(RangedWrapperf(digLenght_, 50.f, power_), "digLenght", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 		}
 
 		if(type_ == POUR_OUT){
-			ar.serialize(RangedWrapperf(power_, 0.5f, 7.f), "pouroutSpeed", "Время (сек) полного высыпания");
-			ar.serialize(RangedWrapperf(digLenght_, 4.f, 30.f), "dispersion", "Разброс высыпания");
+			ar.serialize(RangedWrapperf(power_, 0.5f, 7.f), "pouroutSpeed", "пїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ) пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(RangedWrapperf(digLenght_, 4.f, 30.f), "dispersion", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		}
 
-		ar.serialize(deselectByPower_, "deselectByPower", "Сбрасывать оружие при полном наборе/высыпании");
+		ar.serialize(deselectByPower_, "deselectByPower", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ/пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 		if(const AttributeBase* pad = attrPad_.get())
 			linkNode_.setName(pad->modelName.c_str());
-		ar.serialize(linkNode_, "linkNode", "Узел привязки связи с курсором");
-		ar.serialize(linkToCursor_, "linkToCursor", "Эффект связи с курсором");
+		ar.serialize(linkNode_, "linkNode", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(linkToCursor_, "linkToCursor", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		
-		ar.serialize(fowRadius_, "fowRadius", "радиус видимости");
+		ar.serialize(fowRadius_, "fowRadius", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	}
 }
 
@@ -3311,13 +3312,13 @@ WeaponGripPrm::WeaponGripPrm()
 void WeaponGripPrm::serialize(Archive& ar)
 {
 	WeaponPrm::serialize(ar);
-	ar.serialize(horizontalImpulse_, "horizontalImpulse", "Горизонтальный импульс");
-	ar.serialize(verticalImpulse_, "verticalImpulse", "Вертикальный импульс");
-	ar.serialize(RadianWrapper(forwardAngle_), "forwardAngle", "Направление выбрасывания (градусы)");
-	ar.serialize(dispersionAngle_, "dispersionAngle", "Угол разлета");
-	ar.serialize(MillisecondsWrapper(startGripTime_), "startGripTime", "Время начала захвата");
+	ar.serialize(horizontalImpulse_, "horizontalImpulse", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(verticalImpulse_, "verticalImpulse", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(RadianWrapper(forwardAngle_), "forwardAngle", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ)");
+	ar.serialize(dispersionAngle_, "dispersionAngle", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(MillisecondsWrapper(startGripTime_), "startGripTime", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	finishGripTime_ -= startGripTime_;
-	ar.serialize(MillisecondsWrapper(finishGripTime_), "finishGripTime", "Время захвата");
+	ar.serialize(MillisecondsWrapper(finishGripTime_), "finishGripTime", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	finishGripTime_ += startGripTime_;
 }
 
@@ -3336,12 +3337,12 @@ bool traceGround(const Vect3f& from, const Vect3f& to, Vect3f& out)
 	int step,max_step;	
 	int x0,y0,x1,y1,z0,z1;
 	
-	x0 = round(from.x) >> kmGrid;
-	y0 = round(from.y) >> kmGrid;
+	x0 = int(round(from.x)) >> kmGrid;
+	y0 = int(round(from.y)) >> kmGrid;
 	z0 = round(from.z);
 	
-	x1 = round(to.x) >> kmGrid;
-	y1 = round(to.y) >> kmGrid;
+	x1 = int(round(to.x)) >> kmGrid;
+	y1 = int(round(to.y)) >> kmGrid;
 	z1 = round(to.z);
 	
 	dx = x1 - x0;
@@ -3412,12 +3413,12 @@ bool traceHeight(const Vect3f& from, const Vect3f& to, Vect3f& out)
 	int step,max_step;	
 	int x0,y0,x1,y1,z0,z1;
 	
-	x0 = round(from.x) >> kmGrid;
-	y0 = round(from.y) >> kmGrid;
+	x0 = int(round(from.x)) >> kmGrid;
+	y0 = int(round(from.y)) >> kmGrid;
 	z0 = round(from.z);
 	
-	x1 = round(to.x) >> kmGrid;
-	y1 = round(to.y) >> kmGrid;
+	x1 = int(round(to.x)) >> kmGrid;
+	y1 = int(round(to.y)) >> kmGrid;
 	z1 = round(to.z);
 	
 	dx = x1 - x0;
@@ -3624,7 +3625,7 @@ void WeaponAreaEffect::quant()
 		updatePosition();
 
 	std::for_each(sourceControllers_.begin(), sourceControllers_.end(),
-		std::mem_fun_ref(&WeaponSourceController::quant));
+		[](WeaponSourceController& c){ c.quant(); });
 }
 
 void WeaponAreaEffect::showInfo(const Vect2f& pos) const
@@ -3641,7 +3642,7 @@ void WeaponAreaEffect::showInfo(const Vect2f& pos) const
 		if(const SourceBase* source = it->attr()->source())
 			universe()->circleManager()->addCircle(shootPos, source->radius(), it->attr()->showParam());
 		else{
-			xassert(0 && "не разыменовался источник из библиотеки");
+			xassert(0 && "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		}
 }
 
@@ -3654,7 +3655,7 @@ bool WeaponAreaEffect::checkFinalCost() const
 				sourceZone->unitGenerationMode() == SourceZone::GENERATION_MODE_ZONE){ 
 					const AttributeBase* attrUnit = sourceZone->generatedUnit();
 					if(attrUnit){
-						// проверка для AI
+						// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ AI
 						if(owner()->player()->isAI() && owner()->player()->checkUnitNumber(attrUnit)==1 && attrUnit->isBuilding() && attrUnit->hasProdused())
 							return false;
 						//
@@ -3773,7 +3774,7 @@ void WeaponAreaEffect::updatePosition(bool init)
 void WeaponAreaEffect::releaseSources()
 {
 	std::for_each(sourceControllers_.begin(), sourceControllers_.end(),
-		std::mem_fun_ref(&WeaponSourceController::release));
+		[](WeaponSourceController& c){ c.release(); });
 
 	if(fowHandle_ != -1){
 		if(owner()->player()->fogOfWarMap()){
@@ -3890,7 +3891,7 @@ bool WeaponPad::fire(const WeaponTarget& target)
 			if(!targetUnit && trg->player() == owner()->player() && weaponPrm()->canPickUnit(safe_cast<const UnitObjective*>(trg->getUnitReal()))){
 				squadPicked_ = safe_cast<UnitSquad*>(trg->getSquadPoint());
 				int n = squadPicked_->units().size();
-				xxassert(n <= pad->attr().nodes.size(), "У лапы слишком мало узлов для линковки");
+				xxassert(n <= pad->attr().nodes.size(), "пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 				for(int i = 0; i < n; ++i)
 					squadPicked_->units()[i]->attachToDock(pad, pad->attr().nodes[i], true);
 				targetUnit = true;
@@ -4038,7 +4039,7 @@ void WeaponPad::fireEnd()
 	if(!pad)
 		return;
 
-	if(squadPicked_){ 	// отпускаем юнита
+	if(squadPicked_){ 	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		pad->finishState(StatePadCarry::instance());
 		LegionariesLinks::const_iterator li;
 		FOR_EACH(squadPicked_->units(), li)
@@ -4327,7 +4328,7 @@ bool WeaponWaitingSource::init(const WeaponBase* old_weapon)
 		return false;
 
 	if(old_weapon){
-		// список зарядов при апгрейде нужно сохранить
+		// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		if(old_weapon->weaponPrm()->weaponClass() == WeaponPrm::WEAPON_WAITING_SOURCE){
 			if(weaponPrm()->type() == WeaponWaitingSourcePrm::MINING){
 				sourceCoordinats_ = safe_cast<const WeaponWaitingSource*>(old_weapon)->sourceCoordinats_;
@@ -4452,37 +4453,37 @@ bool UnitActing::canSuspendCommand(const UnitCommand& command) const
 //-------------------------------------------------------
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(WeaponAreaEffectPrm, ZonePositionMode, "WeaponAreaEffectPrm::ZonePositionMode")
-REGISTER_ENUM_ENCLOSED(WeaponAreaEffectPrm, ZONE_POS_OWNER, "вокруг себя")
-REGISTER_ENUM_ENCLOSED(WeaponAreaEffectPrm, ZONE_POS_TARGET, "вокруг цели")
-REGISTER_ENUM_ENCLOSED(WeaponAreaEffectPrm, ZONE_POS_MOUSE, "привязать к мыши")
+REGISTER_ENUM_ENCLOSED(WeaponAreaEffectPrm, ZONE_POS_OWNER, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(WeaponAreaEffectPrm, ZONE_POS_TARGET, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(WeaponAreaEffectPrm, ZONE_POS_MOUSE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(WeaponAreaEffectPrm, ZonePositionMode)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(WeaponWaitingSourcePrm, ExecuteType, "WeaponWaitingSourcePrm::ExecuteType")
-REGISTER_ENUM_ENCLOSED(WeaponWaitingSourcePrm, MINING, "минирование")
-REGISTER_ENUM_ENCLOSED(WeaponWaitingSourcePrm, DETONATE, "детонация")
+REGISTER_ENUM_ENCLOSED(WeaponWaitingSourcePrm, MINING, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(WeaponWaitingSourcePrm, DETONATE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(WeaponWaitingSourcePrm, ExecuteType)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(WeaponProjectilePrm, MissileLaunchType, "WeaponPprojectilePrm::MissileLaunchType")
-REGISTER_ENUM_ENCLOSED(WeaponProjectilePrm, LAUNCH_SHOT_BEGIN, "В начале выстрела")
-REGISTER_ENUM_ENCLOSED(WeaponProjectilePrm, LAUNCH_SHOT_END, "В конце выстрела")
+REGISTER_ENUM_ENCLOSED(WeaponProjectilePrm, LAUNCH_SHOT_BEGIN, "пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(WeaponProjectilePrm, LAUNCH_SHOT_END, "пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(WeaponProjectilePrm, MissileLaunchType)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(WeaponPadPrm, WorkType, "WeaponBase::WeaponState")
-REGISTER_ENUM_ENCLOSED(WeaponPadPrm, NONE, "ничего");
-REGISTER_ENUM_ENCLOSED(WeaponPadPrm, DIG_IN, "копаем");
-REGISTER_ENUM_ENCLOSED(WeaponPadPrm, POUR_OUT, "насыпаем");
+REGISTER_ENUM_ENCLOSED(WeaponPadPrm, NONE, "пїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_ENUM_ENCLOSED(WeaponPadPrm, DIG_IN, "пїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_ENUM_ENCLOSED(WeaponPadPrm, POUR_OUT, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 END_ENUM_DESCRIPTOR_ENCLOSED(WeaponPadPrm, WorkType)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(WeaponBase, WeaponState, "WeaponBase::WeaponState")
-REGISTER_ENUM_ENCLOSED(WeaponBase, WEAPON_STATE_LOAD, "зарядка");
-REGISTER_ENUM_ENCLOSED(WeaponBase, WEAPON_STATE_FIRE, "стрельба");
+REGISTER_ENUM_ENCLOSED(WeaponBase, WEAPON_STATE_LOAD, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_ENUM_ENCLOSED(WeaponBase, WEAPON_STATE_FIRE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 END_ENUM_DESCRIPTOR_ENCLOSED(WeaponBase, WeaponState)
 
-REGISTER_CLASS(WeaponBase, WeaponProjectile, "оружие, стреляющее снарядами");
-REGISTER_CLASS(WeaponBase, WeaponBeam, "лучевое оружие");
-REGISTER_CLASS(WeaponBase, WeaponAreaEffect, "действующее на зону оружие");
-REGISTER_CLASS(WeaponBase, WeaponPad, "Лапа");
-REGISTER_CLASS(WeaponBase, WeaponWaitingSource, "зона с отложенной активацией");
+REGISTER_CLASS(WeaponBase, WeaponProjectile, "пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(WeaponBase, WeaponBeam, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(WeaponBase, WeaponAreaEffect, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(WeaponBase, WeaponPad, "пїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(WeaponBase, WeaponWaitingSource, "пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 REGISTER_CLASS_IN_FACTORY(WeaponFactory, WeaponPrm::WEAPON_PROJECTILE, WeaponProjectile);
 REGISTER_CLASS_IN_FACTORY(WeaponFactory, WeaponPrm::WEAPON_BEAM, WeaponBeam);
@@ -4491,11 +4492,11 @@ REGISTER_CLASS_IN_FACTORY(WeaponFactory, WeaponPrm::WEAPON_PAD, WeaponPad);
 REGISTER_CLASS_IN_FACTORY(WeaponFactory, WeaponPrm::WEAPON_WAITING_SOURCE, WeaponWaitingSource);
 REGISTER_CLASS_IN_FACTORY(WeaponFactory, WeaponPrm::WEAPON_GRIP, WeaponGrip);
 
-REGISTER_CLASS(WeaponPrm, WeaponBeamPrm, "лучевое оружие");
-REGISTER_CLASS(WeaponPrm, WeaponProjectilePrm, "стреляющее снарядами оружие");
-REGISTER_CLASS(WeaponPrm, WeaponAreaEffectPrm, "действующее на зону оружие");
-REGISTER_CLASS(WeaponPrm, WeaponPadPrm, "лапа");
-REGISTER_CLASS(WeaponPrm, WeaponWaitingSourcePrm, "зоны с отложенной активацией");
-REGISTER_CLASS(WeaponPrm, WeaponGripPrm, "оружие - захват");
+REGISTER_CLASS(WeaponPrm, WeaponBeamPrm, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(WeaponPrm, WeaponProjectilePrm, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(WeaponPrm, WeaponAreaEffectPrm, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(WeaponPrm, WeaponPadPrm, "пїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(WeaponPrm, WeaponWaitingSourcePrm, "пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(WeaponPrm, WeaponGripPrm, "пїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅ");
 
-WRAP_LIBRARY(WeaponPrmLibrary, "WeaponLibrary", "Оружие", "Scripts\\Content\\WeaponLibrary", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(WeaponPrmLibrary, "WeaponLibrary", "пїЅпїЅпїЅпїЅпїЅпїЅ", "Scripts\\Content\\WeaponLibrary", 0, LIBRARY_EDITABLE);

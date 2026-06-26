@@ -198,7 +198,7 @@ public:
 	void quant()
 	{
 		MTL();
-		hoverInfos_.erase(remove_if(hoverInfos_.begin(), hoverInfos_.end(), mem_fun_ref(&UI_HoverInfo::dead)), hoverInfos_.end());
+		hoverInfos_.erase(remove_if(hoverInfos_.begin(), hoverInfos_.end(), [](auto& h){ return h.dead(); }), hoverInfos_.end());
 	}
 };
 
@@ -256,13 +256,13 @@ enum UITextTag {
 	UI_TAG_TIME_H24,
 	UI_TAG_TIME_M,
 	UI_TAG_HOTKEY,
-	UI_TAG_ACCESSIBLE, // что надо для доступности юнита
-	UI_TAG_ACCESSIBLE_PARAM,  // что надо для доступности параметра
-	UI_TAG_LEVEL, // уровень юнита
-	UI_TAG_ACCOUNTSIZE, // сколько слотов занимает юнит
-	UI_TAG_SUPPLYSLOTS, // сколько слотов занимает юнит (с раскраской)
-	UI_TAG_SQUAD_ACCOUNTSIZE, // сколько слотов занимает сквад юнита
-	UI_TAG_SQUAD_SUPPLYSLOTS // сколько слотов занимает сквад юнита (с раскраской)
+	UI_TAG_ACCESSIBLE, // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	UI_TAG_ACCESSIBLE_PARAM,  // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	UI_TAG_LEVEL, // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	UI_TAG_ACCOUNTSIZE, // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+	UI_TAG_SUPPLYSLOTS, // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
+	UI_TAG_SQUAD_ACCOUNTSIZE, // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	UI_TAG_SQUAD_SUPPLYSLOTS // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
 };
 
 struct CharStringLess {
@@ -338,28 +338,28 @@ UI_LogicDispatcher::UI_LogicDispatcher() :
 	lastCurrentHiVer_ = UI_Dispatcher::instance().gameMajorVersion();
 	lastCurrentLoVer_ = UI_Dispatcher::instance().gameMinorVersion();
 
-	uiTextTags.insert(make_pair(L"display_name", UI_TAG_PLAYER_DISPLAY_NAME)); // в online - логин, иначе имя профиля
-	uiTextTags.insert(make_pair(L"players_count", UI_TAG_PLAYERS_COUNT)); // количество оставшихся игроков
-	uiTextTags.insert(make_pair(L"game_name", UI_TAG_CURRENT_GAME_NAME)); // название текущей загруженной карты
-	uiTextTags.insert(make_pair(L"server_address", UI_TAG_CURRENT_SERVER_ADDRESS)); // адрес текущего сервера для подключения
-	uiTextTags.insert(make_pair(L"cm_name", UI_TAG_SELECTED_GAME_NAME)); // название выбранной в списке карты
-	uiTextTags.insert(make_pair(L"multi_name", UI_TAG_SELECTED_MULTIPLAYER_GAME_NAME)); // название выбранной сетевой игры
-	uiTextTags.insert(make_pair(L"cm_size", UI_TAG_SELECTED_GAME_SIZE)); // размер выбранной карты
-	uiTextTags.insert(make_pair(L"cm_type", UI_TAG_SELECTED_GAME_TYPE)); // тип (custom, predefine) выбранной карты
-	uiTextTags.insert(make_pair(L"cm_players", UI_TAG_SELECTED_GAME_PLAYERS)); // максимальное количество игроков
-	uiTextTags.insert(make_pair(L"channel_name", UI_TAG_CURRENT_CHAT_CHANNEL)); //название текущего канала или статус подключения
-	uiTextTags.insert(make_pair(L"hotkey", UI_TAG_HOTKEY)); // горячая клавиша для кнопки
-	uiTextTags.insert(make_pair(L"accessible", UI_TAG_ACCESSIBLE)); // что надо для доступности юнита
-	uiTextTags.insert(make_pair(L"accessible_param", UI_TAG_ACCESSIBLE_PARAM)); // что надо для доступности параметра
-	uiTextTags.insert(make_pair(L"level", UI_TAG_LEVEL)); // уровень юнита
-	uiTextTags.insert(make_pair(L"accountsize", UI_TAG_ACCOUNTSIZE)); // сколько слотов занимает юнит
-	uiTextTags.insert(make_pair(L"supplyslots", UI_TAG_SUPPLYSLOTS)); // сколько слотов занимает юнит (с раскраской)
-	uiTextTags.insert(make_pair(L"squadaccounts", UI_TAG_SQUAD_ACCOUNTSIZE)); // сколько слотов занимает сквад юнита
-	uiTextTags.insert(make_pair(L"squadslots", UI_TAG_SQUAD_SUPPLYSLOTS)); // сколько слотов занимает сквад юнита (с раскраской)
-	uiTextTags.insert(make_pair(L"time_h12", UI_TAG_TIME_H12)); // время мира в 12 часовом формате
-	uiTextTags.insert(make_pair(L"time_ampm", UI_TAG_TIME_AMPM)); // до полудня или после полудня
-	uiTextTags.insert(make_pair(L"time_h24", UI_TAG_TIME_H24)); // вреям мира в 24 часовом формате
-	uiTextTags.insert(make_pair(L"time_min", UI_TAG_TIME_M)); // минуты времени мира
+	uiTextTags.insert(make_pair(L"display_name", UI_TAG_PLAYER_DISPLAY_NAME)); // пїЅ online - пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair(L"players_count", UI_TAG_PLAYERS_COUNT)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair(L"game_name", UI_TAG_CURRENT_GAME_NAME)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair(L"server_address", UI_TAG_CURRENT_SERVER_ADDRESS)); // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair(L"cm_name", UI_TAG_SELECTED_GAME_NAME)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair(L"multi_name", UI_TAG_SELECTED_MULTIPLAYER_GAME_NAME)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair(L"cm_size", UI_TAG_SELECTED_GAME_SIZE)); // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair(L"cm_type", UI_TAG_SELECTED_GAME_TYPE)); // пїЅпїЅпїЅ (custom, predefine) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair(L"cm_players", UI_TAG_SELECTED_GAME_PLAYERS)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair(L"channel_name", UI_TAG_CURRENT_CHAT_CHANNEL)); //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair(L"hotkey", UI_TAG_HOTKEY)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair(L"accessible", UI_TAG_ACCESSIBLE)); // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair(L"accessible_param", UI_TAG_ACCESSIBLE_PARAM)); // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair(L"level", UI_TAG_LEVEL)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair(L"accountsize", UI_TAG_ACCOUNTSIZE)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair(L"supplyslots", UI_TAG_SUPPLYSLOTS)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
+	uiTextTags.insert(make_pair(L"squadaccounts", UI_TAG_SQUAD_ACCOUNTSIZE)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair(L"squadslots", UI_TAG_SQUAD_SUPPLYSLOTS)); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
+	uiTextTags.insert(make_pair(L"time_h12", UI_TAG_TIME_H12)); // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ 12 пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair(L"time_ampm", UI_TAG_TIME_AMPM)); // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair(L"time_h24", UI_TAG_TIME_H24)); // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ 24 пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	uiTextTags.insert(make_pair(L"time_min", UI_TAG_TIME_M)); // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 }
 
 UI_LogicDispatcher::~UI_LogicDispatcher()
@@ -819,7 +819,7 @@ void UI_LogicDispatcher::graphQuant(float dt)
 				Vect3f dirPoint = v1 - v0;
 				dirPoint.normalize(clamp(sqrtf(distMin) - 15.f, 1.f, 10000.f));
 				if(!weapon_helpers::traceGround(v0, v0+dirPoint, dirPoint))
-					unitNear = 0; // земля ближе
+					unitNear = 0; // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 			}
 		}
 	}
@@ -968,7 +968,7 @@ bool UI_LogicDispatcher::handleInput(const UI_InputEvent& event)
 			mousePressPos_ = mousePosition();
 	}
 
-	// для мышино-кнопочных действий, shift независимо от настроек является флагом постановки в очередь (добавления к селекту), ALT во
+	// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, shift пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ), ALT пїЅпїЅ
 	int mask = ~(event.isMouseEvent() ? KBD_SHIFT|KBD_MENU : KBD_SHIFT);
 	int withoutShiftCode = event.keyCode() & mask;
 	bool shiftPressed = event.keyCode() & KBD_SHIFT;
@@ -1266,7 +1266,7 @@ void UI_LogicDispatcher::toggleTracking(bool state)
 
 void UI_LogicDispatcher::setCursor(const UI_Cursor* cursor)
 {
-	// Если какой-нибудь курсор установлен и это устанавливаемый, то выход
+	// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	if (activeCursor() && cursor == activeCursor()) 
 		return;
 	activeCursor_ = cursor;
@@ -1404,8 +1404,8 @@ void UI_LogicDispatcher::addUnitOffscreenSprite(const UnitObjective* unit)
 	if(msprite){
 		SideSprites::iterator it;
 		FOR_EACH(sideSprites_, it)
-			if(it->msprite == msprite && it->sprite && it->pos.rect_overlap(out)){ // это первичный спрайт с таким же мультиспрайтом, пересекающийся с текущим
-				it->sprite = 0; // теперь это мультиспрайт
+			if(it->msprite == msprite && it->sprite && it->pos.rect_overlap(out)){ // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+				it->sprite = 0; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				it->merge(out.center(), rd.relativeCoords(Recti(view.left_top(), view.size())));
 				return;
 			}
@@ -1519,7 +1519,7 @@ void UI_LogicDispatcher::selectClickMode(UI_ClickModeID mode_id, const WeaponPrm
 		else if(const UnitInterface* uif = selectManager->selectedUnit())
 			if(uif->getUnitReal()->attr().isActing())
 				unit = safe_cast<const UnitActing*>(uif->getUnitReal());
-		// тогда выбираем только, если это оружие у юнита есть
+		// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 		if(!unit || !unit->hasWeapon(selected_weapon->ID()))
 			return;
 	}
@@ -2681,9 +2681,9 @@ void UI_LogicDispatcher::controlInit(UI_ControlActionID id, UI_ControlBase* cont
 				}
 				else if(data >= 0 && !strings.empty()) {
 					data = data % strings.size();
-					if(control->states().size() > 1 && control->states().size() == strings.size()) // переключаем состояния
+					if(control->states().size() > 1 && control->states().size() == strings.size()) // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 						control->setState(data);
-					else // иначе надписи
+					else // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 						control->setText(strings[data].c_str());
 				}
 			}
@@ -2790,8 +2790,8 @@ void UI_LogicDispatcher::controlUpdate(UI_ControlActionID id, UI_ControlBase* co
 					while(parent){
 						if(const UI_ControlUnitList* ul = dynamic_cast<const UI_ControlUnitList*>(parent)){
 							dassert(std::find(ul->controlList().begin(), ul->controlList().end(), current) != ul->controlList().end());
-							control->setPermanentTransform(current->permanentTransform()); // такая же трансформация как у активной ячейки
-							// вычисляем номер контрола в списке
+							control->setPermanentTransform(current->permanentTransform()); // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+							// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 							child_index = std::distance(ul->controlList().begin(), std::find(ul->controlList().begin(), ul->controlList().end(), current));
 
 							switch(ul->GetType()){
@@ -2822,12 +2822,12 @@ void UI_LogicDispatcher::controlUpdate(UI_ControlActionID id, UI_ControlBase* co
 						else
 							current = safe_cast<const UI_ControlBase*>(parent);
 						parent = current->owner();
-						xassert(parent && "<<список юнитов>> во владельцах не найден");
+						xassert(parent && "<<пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ>> пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 					}
 					break;
 															}
 				default:
-					xassert(0 && "Необработанный параметр в UI_ActionDataUnitParameter");
+					xassert(0 && "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ UI_ActionDataUnitParameter");
 					break;
 				}
 			
@@ -3974,7 +3974,7 @@ void UI_LogicDispatcher::controlAction(UI_ControlActionID id, UI_ControlBase* co
 				    break;
 				}
 				if(type == REAL_PLAYER_TYPE_CLOSE && pdata->playerIndex() == mission->activePlayerID())
-					break; // свой слот закрывать нельзя
+					break; // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 				if(mission->playerData(pdata->playerIndex()).realPlayerType != type){
 					mission->changePlayerData(pdata->playerIndex()).realPlayerType = type;
 					if(PNetCenter::isNCCreated())
@@ -4313,7 +4313,7 @@ void UI_LogicDispatcher::controlAction(UI_ControlActionID id, UI_ControlBase* co
 
 		case UI_ACTION_QUICK_START_FILTER_RACE:
 			if(UI_ControlStringList* lst = UI_ControlComboList::getList(control))
-				currentProfile().quickStartFilterRace = clamp(lst->selectedStringIndex(), 0, 3) - 1; // FIXME - надо искать по имени
+				currentProfile().quickStartFilterRace = clamp(lst->selectedStringIndex(), 0, 3) - 1; // FIXME - пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 			break;
 
 		case UI_ACTION_QUICK_START_FILTER_POPULATION:
@@ -4330,7 +4330,7 @@ void UI_LogicDispatcher::controlAction(UI_ControlActionID id, UI_ControlBase* co
 
 		case UI_ACTION_STATISTIC_FILTER_RACE:
 			if(UI_ControlStringList* lst = UI_ControlComboList::getList(control)){
-				currentProfile().statisticFilterRace = clamp(lst->selectedStringIndex(), 0, 2); // FIXME - надо искать по имени
+				currentProfile().statisticFilterRace = clamp(lst->selectedStringIndex(), 0, 2); // FIXME - пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 				uiNetCenter().queryGlobalStatistic();
 			}
 			break;
@@ -4393,7 +4393,7 @@ void UI_LogicDispatcher::expandTextTemplate(wstring& text, const ExpandInfo& inf
 		}
 
 		outBuf.init();
-		if(text[begin + 1] == L'$'){ // обязательный тег
+		if(text[begin + 1] == L'$'){ // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 			const wchar_t* par = getParam(text.substr(begin + 2, end - begin - 2).c_str(), info, outBuf);
 			if(par && *par)
 				out += par;
@@ -4427,9 +4427,9 @@ const wchar_t* UI_LogicDispatcher::getParam(const wchar_t* name, const ExpandInf
 		}
 	}
 
-	if(name[1] == L'!'){ // это из параметров юнита
+	if(name[1] == L'!'){ // пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		switch(*name){
-		case L'c': // текущие личные параметры
+		case L'c': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			if(info.type == ExpandInfo::INVENTORY){
 				if(info.item)
 					params = &(info.item->parameters());
@@ -4437,39 +4437,39 @@ const wchar_t* UI_LogicDispatcher::getParam(const wchar_t* name, const ExpandInf
 			else if(info.unit)
 				params = &(info.unit->getUnitReal()->parameters());
 			break;
-		case L'm': // максимальные личные параметры
+		case L'm': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			if(info.unit)
 				params = &(info.unit->getUnitReal()->parametersMax());
 			break;
-		case L'b': // ресурсы для постройки
+		case L'b': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			if(info.attr)
 				params = &(info.attr->creationValue);
 			break;
-		case L'i': // ресурсы для заказа
+		case L'i': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			if(info.attr)
 				params = &(info.attr->installValue);
 			break;
-		case L'u': // ресурсы возвращенные при продаже
+		case L'u': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			if(info.attr)
 				params = &(info.attr->uninstallValue);
 			break;
-		case L'n': // ресурсы возвращенные при отмене строительства
+		case L'n': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			if(info.attr)
 				params = &(info.attr->cancelConstructionValue);
 			break;
-		case L'a': // необходимые параметры
+		case L'a': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			if(info.attr)
 				params = &(info.attr->accessValue);
 			break;
-		case L'w': // параметр из личных параметров оружия
-		case L'd': // параметр из урона оружия
-		case L's': // из abnormalState
-		case L'e': // из accessValue оружия
-		case L'o': // стоимость применения оружия
+		case L'w': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+		case L'd': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+		case L's': // пїЅпїЅ abnormalState
+		case L'e': // пїЅпїЅ accessValue пїЅпїЅпїЅпїЅпїЅпїЅ
+		case L'o': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			if(info.unit && info.attr->isActing()){
 				wchar_t type = *name;
-				//имя параметра из оружия задается в виде: WeaponName/ParameterNameOrModifer
-				//WeaponName - ключ локализации для имени оружия
+				//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ: WeaponName/ParameterNameOrModifer
+				//WeaponName - пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 				name += 2;
 				if(const wchar_t* delimeter = wcschr(name, L'/')){
 					const WeaponBase* weapon = 0;
@@ -4478,7 +4478,7 @@ const wchar_t* UI_LogicDispatcher::getParam(const wchar_t* name, const ExpandInf
 						weapon = shooter->findWeapon(w2a(wstring(name, delimeter)).c_str());
 					}
 					else if(int weaponID = shooter->selectedWeaponID())
-						weapon = shooter->findWeapon(weaponID);  // текущее выбранное оружие
+						weapon = shooter->findWeapon(weaponID);  // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 
 					++delimeter;
 					if(weapon && weapon->isEnabled())
@@ -4496,7 +4496,7 @@ const wchar_t* UI_LogicDispatcher::getParam(const wchar_t* name, const ExpandInf
 			else if(info.attr->isInventoryItem()){
 				wchar_t type = *name;
 				if(name[2] == L'/')
-					++name; // имя оружия для предмета не требуется - оно там одно
+					++name; // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 				if(const WeaponPrm* prm = safe_cast<const AttributeItemInventory*>(info.attr)->weaponReference)
 					if(prm->ID() != -1){
 						if(type == L'e')
@@ -4516,17 +4516,17 @@ const wchar_t* UI_LogicDispatcher::getParam(const wchar_t* name, const ExpandInf
 					}
 			}
 			break;
-		case L'*': // параметры из текущего контрола под мышой, стоимость команды показывается для заселекченного
+		case L'*': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			if(info.control){
 				if(name[2] && name[3] == L'/'){
 					name += 2;
 					wchar_t type = *name;
 					switch(type){
-					case L'w': // параметр из личных параметров оружия
-					case L'd': // параметр из урона оружия
-					case L's': // из abnormalState
-					case L'e': // из accessValue оружия
-					case L'o': // стоимость применения оружия
+					case L'w': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+					case L'd': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+					case L's': // пїЅпїЅ abnormalState
+					case L'e': // пїЅпїЅ accessValue пїЅпїЅпїЅпїЅпїЅпїЅ
+					case L'o': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 						if(const WeaponPrm* prm = info.control->actionWeapon())
 							if(prm->ID() != -1){
 								if(type == L'e')
@@ -4552,7 +4552,7 @@ const wchar_t* UI_LogicDispatcher::getParam(const wchar_t* name, const ExpandInf
 			}
 		
 			break;
-		case L'r': // из арифметики
+		case L'r': // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			name += 2;
 			if(info.type == ExpandInfo::INVENTORY && info.item)
 				if(*name)
@@ -4568,14 +4568,14 @@ const wchar_t* UI_LogicDispatcher::getParam(const wchar_t* name, const ExpandInf
 		}
 		name += 2;
 	}
-	else if(name[1] == L'&'){ // это из параметров игрока
+	else if(name[1] == L'&'){ // пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		const Player* plr = plrID < 0 ? universe()->activePlayer() : universe()->findPlayer(plrID);
 		xassert(plr);
 		switch(*name){
-		case L'c': // текущие ресурсы игрока
+		case L'c': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			params = &(plr->resource());
 			break;
-		case L'm': // максимальные ресурсы игрока
+		case L'm': // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			params = &(plr->resourceCapacity());
 			break;
 		}
@@ -4641,31 +4641,31 @@ const wchar_t* UI_LogicDispatcher::getParam(const wchar_t* name, const ExpandInf
 				retBuf < get.c_str();
 				break;
 											 }
-			case UI_TAG_HOTKEY: // hotkey для кнопки под мышкой
+			case UI_TAG_HOTKEY: // hotkey пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 				if(const UI_ControlBase* hov = hoverControl()){
 					WBuffer keyName;
 					if(const UI_ActionDataHotKey* hotKeyAction = safe_cast<const UI_ActionDataHotKey*>(hov->findAction(UI_ACTION_HOT_KEY)))
 						retBuf < hotKeyAction->hotKey().toString(keyName);
 				}
 				break;
-			case UI_TAG_ACCESSIBLE: // что надо для доступности юнита
+			case UI_TAG_ACCESSIBLE: // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 				if(info.attr)
 					player()->printAccessible(retBuf, info.attr->accessBuildingsList, enableColorString(), disableColorString());
 				break;
-			case UI_TAG_ACCESSIBLE_PARAM: // что надо для доступности параметра
+			case UI_TAG_ACCESSIBLE_PARAM: // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				if(info.control && info.attr)
 					if(const ProducedParameters* par = info.control->actionBuildParameter(info.attr))
 						player()->printAccessible(retBuf, par->accessBuildingsList, enableColorString(), disableColorString());
 				break;
-			case UI_TAG_LEVEL: // уровень юнита
+			case UI_TAG_LEVEL: // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 				if(info.unit && info.unit->getUnitReal()->attr().isLegionary())
 					retBuf <= safe_cast<const UnitLegionary*>(info.unit->getUnitReal())->level() + 1;
 				break;
-			case UI_TAG_ACCOUNTSIZE: // сколько слотов занимает юнит
+			case UI_TAG_ACCOUNTSIZE: // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 				if(info.attr)
 					retBuf <= info.attr->accountingNumber;
 				break;
-			case UI_TAG_SUPPLYSLOTS: // сколько слотов занимает юнит (с раскраской)
+			case UI_TAG_SUPPLYSLOTS: // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
 				if(info.attr){
 					if(universe()->activePlayer()->checkUnitNumber(info.attr))
 						retBuf < enableColorString();
@@ -4674,11 +4674,11 @@ const wchar_t* UI_LogicDispatcher::getParam(const wchar_t* name, const ExpandInf
 					retBuf <= info.attr->accountingNumber;
 				}
 				break;
-			case UI_TAG_SQUAD_ACCOUNTSIZE: // сколько слотов занимает сквад юнита
+			case UI_TAG_SQUAD_ACCOUNTSIZE: // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 				if(info.attr && info.attr->isLegionary())
 					retBuf <= safe_cast<const AttributeLegionary*>(info.attr)->squad->accountingNumber;
 				break;
-			case UI_TAG_SQUAD_SUPPLYSLOTS: // сколько слотов занимает сквад юнита (с раскраской)
+			case UI_TAG_SQUAD_SUPPLYSLOTS: // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
 				if(info.attr && info.attr->isLegionary()){
 					if(universe()->activePlayer()->checkUnitNumber(info.attr))
 						retBuf < enableColorString();
@@ -4727,7 +4727,7 @@ const wchar_t* UI_LogicDispatcher::getParam(const wchar_t* name, const ExpandInf
 				break;
 							   }
 			default:
-				xxassert(false, "такого быть не должно!");
+				xxassert(false, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ!");
 				retBuf.init();
 			}
 			return retBuf.c_str();
@@ -4738,15 +4738,15 @@ const wchar_t* UI_LogicDispatcher::getParam(const wchar_t* name, const ExpandInf
 
 	if(params){
 		switch(*name){
-		case L'?':  // чего не хватает у игрока
+		case L'?':  // пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			player()->resource().printSufficient(retBuf, *params, enableColorString(), disableColorString(), w2a(name+1).c_str());
-		case L'&': // чего не хватает у селекченного юнита
+		case L'&': // пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 			if(const UnitInterface* unit = selectedUnitIfOne())
 				unit->getUnitReal()->parameters().printSufficient(retBuf, *params, enableColorString(), disableColorString(), w2a(name+1).c_str());
 			break;
-		case L'!': // просто напечатать все параметры
+		case L'!': // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			params->toString(retBuf);
-		default: // вывести конкретный параметр
+		default: // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			retBuf <= round(params->findByLabel(w2a(name).c_str()));
 		}
 		return retBuf.c_str();
@@ -4784,7 +4784,7 @@ void UI_LogicDispatcher::selectCursor(const UI_Cursor* cameraCursor)
 	UnitReal* hovered_unit = (gameShell->GameActive && hoverUnit() ? hoverUnit()->getUnitReal() : 0);
 
 	if(cursorTriggered())
-	{// Ничего не делаем - работает курсор, назначенный триггером
+	{// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		SET_CURSOR_REASON("by trigger");
 	}
 	else if(cameraCursor){
@@ -4792,7 +4792,7 @@ void UI_LogicDispatcher::selectCursor(const UI_Cursor* cameraCursor)
 		setCursor(cameraCursor);
 	}
 	else if(const UI_ControlBase* control = UI_LogicDispatcher::instance().hoverControl())
-	{// Курсор на интерфейсе - нужный курсор должен назначить	обработчик мышки для объектов интерфейса
+	{// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		const UI_ActionDataHoverInfo* info = UI_LogicDispatcher::instance().hoverControlInfo();
 		if(info && info->hoveredCursor()){
 			SET_CURSOR_REASON("control own hover cursor");
@@ -4903,9 +4903,9 @@ void UI_LogicDispatcher::selectCursor(const UI_Cursor* cameraCursor)
 					xxassert(0, "new click mode type?");
 		}
 	}
-	else if (universe()->activePlayer() && hovered_unit){ // Если юниты под мышкой найдены
+	else if (universe()->activePlayer() && hovered_unit){ // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		const UI_Cursor* unit_cur = hovered_unit->attr().selectionCursorProxy();
-		if(unit_cur){ // В приоритете курсор, назначенный объекту - если его нет, то вешаем общие курсоры
+		if(unit_cur){ // пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			SET_CURSOR_REASON("object hover, object own cursor");
 			setCursor(unit_cur);
 		}
@@ -4929,7 +4929,7 @@ void UI_LogicDispatcher::selectCursor(const UI_Cursor* cameraCursor)
 		}
 		else if(hovered_unit->attr().isActing() && hovered_unit->attr().isTransport() && selectManager->canPutInTransport(safe_cast<const UnitActing*>(hovered_unit))){
 			SET_CURSOR_REASON("this is transport, selected can put in");
-			setCursor(ui.cursor(UI_CURSOR_TRANSPORT)); // для транспортов в которые можно сесть отдельный курсор
+			setCursor(ui.cursor(UI_CURSOR_TRANSPORT)); // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		}
 		else if(universe()->activePlayer()->clan() == hovered_unit->player()->clan())
 			if(isAttackCursorEnabled()){
@@ -4941,7 +4941,7 @@ void UI_LogicDispatcher::selectCursor(const UI_Cursor* cameraCursor)
 					if(hovered_unit->attr().isBuilding() && !safe_cast<const UnitBuilding*>(hovered_unit)->isConstructed()
 						&& selectManager->canBuild(hovered_unit)){
 							SET_CURSOR_REASON("own object hover, this is not constructed building, selected build this");
-							setCursor(ui.cursor(UI_CURSOR_CAN_BUILD)); // может достроить этот долгострой
+							setCursor(ui.cursor(UI_CURSOR_CAN_BUILD)); // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 					}
 					else {
 						SET_CURSOR_REASON("own object hover");
@@ -4964,7 +4964,7 @@ void UI_LogicDispatcher::selectCursor(const UI_Cursor* cameraCursor)
 			setCursor(ui.cursor(UI_CURSOR_ATTACK_DISABLED));
 		}
 	}
-	else if(cursorInWorld()) // Если пересеклись с землей
+	else if(cursorInWorld()) // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		if(!hoverPassable()) {
 			SET_CURSOR_REASON("impassability region in world");
 			setCursor(ui.cursor(UI_CURSOR_IMPASSABLE));
@@ -5288,7 +5288,7 @@ bool UI_LogicDispatcher::parseGameVersion(const char* ptr)
 	int hVer = lastCurrentHiVer_;
 	int lVer = lastCurrentLoVer_;
 
-	// пропуск до первой цифры
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	while(*ptr && *ptr != '\r' && *ptr != '\n' && !isdigit(*ptr))
 		++ptr;
 

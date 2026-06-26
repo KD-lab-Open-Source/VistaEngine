@@ -90,7 +90,7 @@ UniverseX::UniverseX(MissionDescription& mission, XPrmIArchive* ia)
 	confirmQuant=0;
 	signatureGame=startCRC32;
 
-	//Очистка списков команд
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	{
 		//Lock!
 		MTAuto lock(m_FullListGameCommandLock);
@@ -131,7 +131,7 @@ UniverseX::UniverseX(MissionDescription& mission, XPrmIArchive* ia)
 	}
 	if(iniFile.AutoSavePlayReel){
 		flag_autoSavePlayReel=true;
-		//поиск автосэйв каталога и создание, если его нет
+		//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ
 		WIN32_FIND_DATA FindFileData;
 		HANDLE hFind;
 		hFind = FindFirstFile(autoSavePlayReelDir, &FindFileData);
@@ -383,9 +383,9 @@ UniverseX::~UniverseX()
 
 	allSavePlayReel();
 
-	//Очистка логов
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	clearLogList();
-	//Очистка списков команд
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	{
 		//Lock!
 		MTAuto lock(m_FullListGameCommandLock);
@@ -439,11 +439,11 @@ bool UniverseX::MultiQuant()
 	bool flag_quantExecuted=false;
 
 	if(allowedRealizingQuant > lastRealizedQuant){
-		//Начало кванта
+		//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		currentQuant++;		//currentQuant=lastQuant_inFullListGameCommands;
 
 		lastQuant_inFullListGameCommands=currentQuant;
-		//поиск первой команды в последнем кванте
+		//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		vector<netCommandGame*>::iterator p;
 		p=fullListGameCommands.end();
 		while(p!=fullListGameCommands.begin()) {
@@ -452,14 +452,14 @@ bool UniverseX::MultiQuant()
 				p++; break;
 			}
 		}
-		// p сейчас указывает на первую команду кванта
+		// p пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		for(; p!=fullListGameCommands.end(); p++) {
-			if((*p)->curCommandQuant_ != currentQuant ) break; //проверка на конец команд кванта
+			if((*p)->curCommandQuant_ != currentQuant ) break; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			generalCommandCounter++; //only information
 			receiveCommand(**p);
 		}
 
-		lagQuant=getInternalLagQuant(); //Для визуализации
+		lagQuant=getInternalLagQuant(); //пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 		Quant();
 
@@ -505,7 +505,7 @@ void UniverseX::receiveCommand(const netCommandGame& command)
 	command.execute();
 }
 
-const unsigned int periodSendLogQuant=8; //степень двойки!
+const unsigned int periodSendLogQuant=8; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ!
 const unsigned int maskPeriodSendLogQuant=periodSendLogQuant-1;//
 
 void UniverseX::logQuant()
@@ -532,13 +532,14 @@ void UniverseX::logQuant()
 		}
 	}
 
-	lagQuant=getInternalLagQuant(); //Для сервера
+	lagQuant=getInternalLagQuant(); //пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	if(pNetCenter && currentQuant!=0){
-		lagQuant=getInternalLagQuant(); //Для сервера
+		lagQuant=getInternalLagQuant(); //пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 		signatureGame=crc32((unsigned char*)net_log_buffer.buffer(), net_log_buffer.tell(), signatureGame);
-		if((currentQuant & maskPeriodSendLogQuant)==0){ //Каждый 8 квант отсылается сигнатура
-			pNetCenter->SendEvent(&netCommand4H_BackGameInformation2(lagQuant, currentQuant, signatureGame, gameShell->accessibleQuantPeriod(), false, pNetCenter->getState()));
+		if((currentQuant & maskPeriodSendLogQuant)==0){ //пїЅпїЅпїЅпїЅпїЅпїЅ 8 пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+			netCommand4H_BackGameInformation2 cmd(lagQuant, currentQuant, signatureGame, gameShell->accessibleQuantPeriod(), false, pNetCenter->getState());
+			pNetCenter->SendEvent(&cmd);
 			signatureGame=startCRC32;
 		}
 		pushBackLogList(currentQuant, net_log_buffer);
@@ -550,7 +551,7 @@ void UniverseX::logQuant()
 
 void UniverseX::sendLog(unsigned int quant)
 {
-	xassert(quant);//Проверка, что не нулевой квант(кванты начинаются с 1-цы!)
+	xassert(quant);//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ(пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ 1-пїЅпїЅ!)
 	if(quant && ((quant & maskPeriodSendLogQuant)==0) ){
 		unsigned int begLogQuant=((quant-1) & (~maskPeriodSendLogQuant)) +1;
 		unsigned int sgn=startCRC32;
@@ -562,13 +563,14 @@ void UniverseX::sendLog(unsigned int quant)
 				sgn=crc32((unsigned char*)pLogElemente->pLog->buffer(), pLogElemente->pLog->tell(), sgn);
 
 		}
-		pNetCenter->SendEvent(&netCommand4H_BackGameInformation2(getInternalLagQuant(), quant, sgn, gameShell->accessibleQuantPeriod(), true, pNetCenter->getState()));
+		netCommand4H_BackGameInformation2 cmd(getInternalLagQuant(), quant, sgn, gameShell->accessibleQuantPeriod(), true, pNetCenter->getState());
+		pNetCenter->SendEvent(&cmd);
 	}
 }
 
 void UniverseX::sendCommand(const netCommandGame& command) 
 { 
-	if(gameShell->isPaused(GameShell::PAUSE_BY_ANY)) // Заремить, чтобы ставить здания на паузе
+	if(gameShell->isPaused(GameShell::PAUSE_BY_ANY)) // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		return;
 		
 	debugCommandBuffer_.putNetCommand(&command);
@@ -773,7 +775,7 @@ void UniverseX::drawDebug2D() const
 	}
 }
 
-//По идее вызов корректный т.к. reJoin не пошлется пока игра не остановлена(stopGame_HostMigrate)
+//пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ.пїЅ. reJoin пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ(stopGame_HostMigrate)
 void UniverseX::sendListGameCommand2Host(unsigned int begQuant, unsigned int endQuant)
 {
 	vector<netCommandGame*>::iterator p;
@@ -795,7 +797,7 @@ void UniverseX::sendListGameCommand2Host(unsigned int begQuant, unsigned int end
 void UniverseX::stopGame_HostMigrate()
 {
 	///clearLastQuantListGameCommand();
-	//Очистка всех не выполненных команд из списка
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 //	vector<netCommandGame*>::reverse_iterator p;
 //	for(p=fullListGameCommands.rbegin(); p!=fullListGameCommands.rend(); ){
 //		if((*p)->curCommandQuant_ > lastQuant_inFullListGameCommands) {
@@ -836,24 +838,24 @@ void UniverseX::stopGame_HostMigrate()
 
 void UniverseX::putInputGameCommand2fullListGameCommandAndCheckAllowedRun(netCommandGame* pnc)
 {
-	///if(pnc->curCommandQuant_ >= lastQuant_inFullListGameCommands) //В случае смены хоста - пропускать выполненные комманды
-	if(pnc->curCommandQuant_ > allowedRealizingQuant) {//В случае смены хоста - пропускать выполненные комманды
+	///if(pnc->curCommandQuant_ >= lastQuant_inFullListGameCommands) //пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	if(pnc->curCommandQuant_ > allowedRealizingQuant) {//пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		fullListGameCommands.push_back(pnc);
 		xassert(pnc->curCommandCounter_==clientGeneralCommandCounterInListCommand);
 		clientGeneralCommandCounterInListCommand++;
 //		receiveCommand(*pnc);
 
-		//Разрешение проигрывания комманд
-		if(pnc->flag_lastCommandInQuant_){ //Комманда была последняя в кванте, поэтому разрешаем проигрывать до кванта включительно
+		//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+		if(pnc->flag_lastCommandInQuant_){ //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			allowedRealizingQuant=pnc->curCommandQuant_;
 		}
-		else { //Комманда была не последняя в кванте, поэтому разрешаем проигрывать до предыдущего кванта
+		else { //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			if(pnc->curCommandQuant_>0){
 				allowedRealizingQuant=pnc->curCommandQuant_-1;
 			}
 		} 
-		//Если количество комманд совпадает со счетчиком команд в последней NEXT_COMMAND(TimeCommand)
-		// и при этом более позднее чем разрешенное сейчас  то разрешается проигрывание до кванта указанного в последней TimeComand-е
+		//пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ NEXT_COMMAND(TimeCommand)
+		// пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ  пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ TimeComand-пїЅ
 		if( (clientGeneralCommandCounterInListCommand==generalCommandCounter4TimeCommand) &&
 			(lastQuantAllowedTimeCommand > allowedRealizingQuant) ){
 			allowedRealizingQuant=lastQuantAllowedTimeCommand;
@@ -862,7 +864,7 @@ void UniverseX::putInputGameCommand2fullListGameCommandAndCheckAllowedRun(netCom
 	else {
 		//xassert(0&&"host migrate ?");
 		LogMsg("host migrate ?");
-		//можно вставить поиск в списке и подтверждение
+		//пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		vector<netCommandGame*>::iterator p;
 		for(p=fullListGameCommands.begin(); p!=fullListGameCommands.end(); p++){
 			if((*p)->curCommandCounter_==pnc->curCommandCounter_) break;
@@ -916,9 +918,9 @@ bool UniverseX::ReceiveEvent(NCEventID event, InOutNetComBuffer& in_buffer)
 			if(clientGeneralCommandCounterInListCommand==generalCommandCounter4TimeCommand){
 				allowedRealizingQuant=lastQuantAllowedTimeCommand;
 			}
-			//Не работает ! 
+			//пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ! 
 			/*if(nc.numberQuant_ <= lastQuant_inFullListGameCommands) {
-				XBuffer* pCurLogQuant=getLogInLogList(nc.numberQuant_); //В случае смены хоста - пропускать выполненные комманды но отсылать backGameInformation
+				XBuffer* pCurLogQuant=getLogInLogList(nc.numberQuant_); //пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ backGameInformation
 				if(pCurLogQuant){
 					unsigned int signature=crc32((unsigned char*)pCurLogQuant->address(), pCurLogQuant->tell(), startCRC32);
 					pNetCenter->SendEvent(&netCommand4H_BackGameInformation2(0, nc.numberQuant_, signature));
@@ -926,7 +928,7 @@ bool UniverseX::ReceiveEvent(NCEventID event, InOutNetComBuffer& in_buffer)
 				else xassert(0&&"No log(after migrate host)!");
 				break;
 			}*/
-			if(nc.quantConfirmation_!=netCommandNextQuant::NOT_QUANT_CONFIRMATION){ //Сейчас quantConfirmation_ посылается во всех коммандах
+			if(nc.quantConfirmation_!=netCommandNextQuant::NOT_QUANT_CONFIRMATION){ //пїЅпїЅпїЅпїЅпїЅпїЅ quantConfirmation_ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				confirmQuant=nc.quantConfirmation_;
 				//clear list 
 				eraseLogListUntil(nc.quantConfirmation_);
@@ -934,7 +936,7 @@ bool UniverseX::ReceiveEvent(NCEventID event, InOutNetComBuffer& in_buffer)
 #ifdef NETCOM_DBG_LOG
 			netCommandLog < "Quant=" <=nc.numberQuant_ <"\n";
 #endif
-			///xassert(nc.numberQuant_==(lastQuant_inFullListGameCommands+1));//Проверка на пропуск кванта(в случае выпадения!? пакета) PS. сейчас они выпадают!
+			///xassert(nc.numberQuant_==(lastQuant_inFullListGameCommands+1));//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ(пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ!? пїЅпїЅпїЅпїЅпїЅпїЅ) PS. пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ!
 
 			netPause=nc.flag_pause_;
 			//LogMsg("Quant-%u\n", allowedRealizingQuant);

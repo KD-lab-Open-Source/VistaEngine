@@ -5,7 +5,7 @@ RENDER_API RandomGenerator graphRnd;
 
 #ifdef C_CHECK_DELETE
 cCheckExit cCheckDelete::root;
-static MTSection gb_checkexit_lock;//Кривой синглетон.
+static MTSection gb_checkexit_lock;//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 
 void SaveKindObjNotFree();
 cCheckExit::~cCheckExit()
@@ -46,6 +46,7 @@ int UnknownClass::Release()
 	return 0;
 }
 
+#if defined(_MSC_VER)
 extern "C" {
 LONG _InterlockedIncrement(LONG volatile* lpAddend);
 LONG _InterlockedDecrement(LONG volatile* lpAddend);
@@ -62,6 +63,19 @@ int UnknownClass::DecRef()
 {
 	return _InterlockedDecrement(&m_cRef);
 }
+#else
+// Portable atomic refcount (clang/gcc builtins) вЂ” m_cRef is a plain long, not a
+// 32-bit LONG, so the MSVC _Interlocked* intrinsics don't bind here.
+int UnknownClass::AddRef()
+{
+	return (int)__atomic_add_fetch(&m_cRef, 1, __ATOMIC_SEQ_CST);
+}
+
+int UnknownClass::DecRef()
+{
+	return (int)__atomic_sub_fetch(&m_cRef, 1, __ATOMIC_SEQ_CST);
+}
+#endif
 
 /////////////////////cBaseGraphObject//////////////
 BaseGraphObject::BaseGraphObject(int kind) : scene_(0),Kind(eKindUnknownClass(kind))

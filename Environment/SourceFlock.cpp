@@ -13,8 +13,8 @@
 extern vrtMap vMap;
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(SourceFlock, FlockType, "FlockType")
-REGISTER_ENUM_ENCLOSED(SourceFlock, FLOCK_BIRD, "Птички")
-REGISTER_ENUM_ENCLOSED(SourceFlock, FLOCK_FISH, "Рыбки")
+REGISTER_ENUM_ENCLOSED(SourceFlock, FLOCK_BIRD, "пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(SourceFlock, FLOCK_FISH, "пїЅпїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(SourceFlock, FlockType)
 
 namespace {
@@ -30,13 +30,13 @@ public:
 	Bird();
 	~Bird() { xassert(!model_); }
 
-	// положение без учета рельефа мира
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	const Vect3f& position() const { return relativePose_.trans(); }
 	const QuatF& orientation() const { return relativePose_.rot(); }
-	// реальное положение модели на мире
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ
 	Vect3f realPosition() const { return Vect3f(relativePose_.trans().x, relativePose_.trans().y, realHeight_); }
 
-	// передается направление полета
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	void quant(const Vect3f& bestDir);
 
 	void create(const SourceFlock* owner);
@@ -45,7 +45,7 @@ public:
 	void setFlockness(float fl) { flockness_ = fl; }
 	float flockness() const { return flockness_; }
 
-	/// проверка на воду, возвращает границы воды в глобальных координатах.
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	void checkWaterLevel(int x, int y, Rangef& level) const;
 
 	//Vect3f savedcurrentdirection;
@@ -58,15 +58,15 @@ private:
 	const SourceFlock* owner_;
 	cObject3dx* model_;
 	
-	// точка, без учета облета
+	// пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	Se3f relativePose_;
-	// реальная высота на мире
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ
 	float realHeight_;
 
-	// индивидуальная стадность
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	float flockness_;
 	
-	// время с начала анимации
+	// пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	float animationTime_;
 
 	float boxDZ_;
@@ -97,7 +97,7 @@ void Bird::quant(const Vect3f& direction)
 	streamLogicInterpolator << relativePose_.rot() << realPosition();
 
 	Vect3f dir(0,1,0);
-	float cs = flatDirection.dot(Vect2f(relativePose_.rot().xform(dir))); // косинус угла поворота
+	float cs = flatDirection.dot(Vect2f(relativePose_.rot().xform(dir))); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 	if(cs < ignoreAngleCos)
 	{
@@ -299,21 +299,21 @@ void SourceFlock::serialize(Archive& ar)
 	__super::serialize(ar);
 
 	static ModelSelector::Options options("*.3dx", "RESOURCE\\Models", "Will select location of 3DX model");
-	ar.serialize(ModelSelector(modelName_, options), "modelFilename", "Модель");
+	ar.serialize(ModelSelector(modelName_, options), "modelFilename", "пїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(ar.isEdit() && ar.isOutput())
 		setComboList();
-	ar.serialize(animationName_, "animationName", "Анимационная цепочка");
-	ar.serialize(size_, "size", "Масштаб модели");
+	ar.serialize(animationName_, "animationName", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(size_, "size", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(flockType_, "flockType", "Тип стаи");
-	ar.serialize(flockCount_, "flockCount_", "Количество особей");
+	ar.serialize(flockType_, "flockType", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+	ar.serialize(flockCount_, "flockCount_", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	if(flockType_ == FLOCK_BIRD) {
-		ar.serialize(height_, "height", "Высота над землей");
-		ar.serialize(RangedWrapperf(flockness_, 0.f, 1.f) , "flockness", "Стадность");
+		ar.serialize(height_, "height", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(RangedWrapperf(flockness_, 0.f, 1.f) , "flockness", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	}
 	else
-		ar.serialize(height_, "height", "Глубина под водой");
+		ar.serialize(height_, "height", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 
 
 	serializationApply(ar);
@@ -343,24 +343,24 @@ void SourceFlock::stop()
 
 void SourceFlock::release()
 {
-	for_each(birds_.begin(), birds_.end(), mem_fun(&Bird::release));
+	for_each(birds_.begin(), birds_.end(), [](Bird* b){ b->release(); });
 	birds_.clear();
 }
 
 void SourceFlock::regenerate()
 {
-	// Инициализируем узловые точки
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	Knots::iterator it;
 	FOR_EACH(knots_, it)
 		it->regenerate(this);
 
-	// убиваем старых птиц
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	release();
 	
 	if(!hasModel())
 		return;
 
-	//создаем новых
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	for(int i = 0; i < flockCount_; ++i){
 		birds_.push_back(new Bird());
 		birds_.back()->create(this);
@@ -417,7 +417,7 @@ void SourceFlock::quant()
 
 	start_timer_auto();
 
-	// Двигаем узловые точки
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	float da = d_phase * (1000.f - clamp(radius(), 300.f, 600.f));
 	Knots::iterator knot;
 	FOR_EACH(knots_, knot){

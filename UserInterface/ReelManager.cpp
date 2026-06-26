@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+#include <random>
 #include "ReelManager.h"
 #include "RenderObjects.h"
 #include "SoundApp.h"
@@ -590,7 +591,10 @@ void ReelManager::showLogoModal(LogoAttributes& logoAttributes, const cBlobsSett
 
 				if(i == cellList_.size()) {
 					isWork = true;
-					random_shuffle(cellList_.begin(), cellList_.end());
+					{
+						static std::mt19937 reelRng(std::random_device{}());
+						std::shuffle(cellList_.begin(), cellList_.end(), reelRng);
+					}
 				}
 				dnoMovePhase = float(i)/(cellList_.size());
 			}

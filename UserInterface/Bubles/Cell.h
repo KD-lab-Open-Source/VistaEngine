@@ -13,7 +13,7 @@ public:
 	void stop() {offPhase_ = true; }
 
 	bool isWork() { return work_; }
-	void setVelocity(Vect2f& velocity) { velocity_ = velocity; }
+	void setVelocity(const Vect2f& velocity) { velocity_ = velocity; }
 
 	float colorPhase;
 

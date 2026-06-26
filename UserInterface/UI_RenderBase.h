@@ -34,34 +34,34 @@ public:
 	void drawRectangle(const Rectf& rect, const Color4f& color = Color4f::WHITE, bool outlined = false/*, UI_BlendMode blend_mode = UI_BLEND_NORMAL*/) const;
 
 
-	/// пересчёт из экранных в координаты относительно окна рендера 
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
 	Vect2f deviceCoords(const Vect2i& screen_coords) const;
-	/// пересчёт из экранных в координаты относительно окна рендера 
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
 	Rectf deviceCoords(const Recti& screen_coords) const;
 
-	/// пересчёт из относительных координат в экранные
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	Vect2i screenCoords(const Vect2f& rel_coords) const{
 		Vect2f vec = rel_coords * Vect2f(windowPosition_.size());
 		return Vect2i(vec.xi(), vec.yi()) + windowPosition_.left_top();
 	}
-	/// пересчёт из относительных координат в экранные
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	Recti  screenCoords(const Rectf& rel_coords) const{
 		Rectf rect = rel_coords * Vect2f(windowPosition_.size());
 		return Recti(round(rect.left()) + windowPosition_.left(), 
 			round(rect.top()) + windowPosition_.top(),
-			max(1, round(rect.width())), max(1, round(rect.height())));
+			max(1, (int)round(rect.width())), max(1, (int)round(rect.height())));
 	}
-	/// пересчёт из относительного размера в экранный
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	Vect2i screenSize(const Vect2f& rel_size) const {
 		return Vect2i(
 			round(rel_size.x * float(windowPosition_.width())),
 			round(rel_size.y * float(windowPosition_.height())));
 	}
 
-	/// пересчёт из координат окна рендера в экранные
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	Recti device2screenCoords(const Rectf& device_coords) const;
 
-	/// пересчёт из экранных координат в относительные
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	Vect2f relativeCoords(const Vect2i& screen_coords) const{
 		return Vect2f(screen_coords - windowPosition_.left_top())
 			* Vect2f(1.0f / (float)windowPosition_.width(), 1.0f / (float)windowPosition_.height());
@@ -70,21 +70,21 @@ public:
 		return Vect2f(screen_coords - Vect2f(windowPosition_.left_top()))
 			* Vect2f(1.0f / (float)windowPosition_.width(), 1.0f / (float)windowPosition_.height());
 	}
-	/// пересчёт из экранных координат в относительные
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	Rectf relativeCoords(const Recti& screen_coords) const {
 		Vect2f top_left = relativeCoords(screen_coords.left_top());
 		Vect2f right_bottom = relativeCoords(screen_coords.right_bottom());
 		return Rectf(top_left, right_bottom - top_left);
 	}
-	/// пересчёт из экранного размера в относительный
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	Vect2f relativeSize(const Vect2i& screen_size) const {
 		return Vect2f(screen_size.x / float(windowPosition_.width()), screen_size.y / float(windowPosition_.height()));
 	}
 
-	/// пересчёт из координат окна рендера в относительные экранные
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	Vect2f device2relativeCoords(const Vect2f& device_coords) const;
 
-	/// пересчёт из относительных в координаты окна рендера
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	Vect2f relative2deviceCoords(const Vect2f& relative_coords) const { return deviceCoords(screenCoords(relative_coords));	}
 	Rectf relative2deviceCoords(const Rectf& relative_coords) const { return deviceCoords(screenCoords(relative_coords)); }
 
@@ -99,7 +99,7 @@ public:
 protected:
 	static UI_RenderBase* self_;
 
-	/// экранные координаты области, доступной для рисования
+	/// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	Recti windowPosition_;
 
 	Vect2i defaultResolution_;

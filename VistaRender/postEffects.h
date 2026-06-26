@@ -21,7 +21,7 @@ class PSDOFCombine;
 class PostEffect;
 class PSBlurMap;
 
-enum PostEffectType
+enum PostEffectType : int
 {
 	PE_MIRAGE=0,
 	PE_DOF,
@@ -232,8 +232,8 @@ public:
 	void init();
 	void redraw(float dt);
 	void setColor(Color4f color){ color_ = color; }
-	void setEnvironmentFog(Vect2f &fog){ environmentFog_ = fog; }
-	void setFog(Color4f& fog_color);
+	void setEnvironmentFog(const Vect2f &fog){ environmentFog_ = fog; }
+	void setFog(const Color4f& fog_color);
 	void setFogParameters(Vect2f& fog_planes){ fogPlanes_ = fog_planes; }
 	void setTexture(const char* name);
 	bool isActive() const { return (activeAlways_ || underWater_) && isActive_; }

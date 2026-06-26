@@ -60,33 +60,33 @@ void loadAllLibraries();
 template<>
 struct PairSerializationTraits<pair<int, AttributeBase::Upgrade> >
 {
-	static const char* firstName() { return "&Номер апгрейда"; }
-	static const char* secondName() { return "&Апгрейд"; }
+	static const char* firstName() { return "&пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"; }
+	static const char* secondName() { return "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅ"; }
 };
 
 template<>
 struct PairSerializationTraits<pair<int, AttributeBase::ProducedUnits> >
 {
-	static const char* firstName() { return "&Номер производства"; }
-	static const char* secondName() { return "&Производство"; }
+	static const char* firstName() { return "&пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"; }
+	static const char* secondName() { return "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"; }
 };
 
 template<>
 struct PairSerializationTraits<pair<int, ProducedParameters> >
 {
-	static const char* firstName() { return "&Номер производства"; }
-	static const char* secondName() { return "&Производство"; }
+	static const char* firstName() { return "&пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"; }
+	static const char* secondName() { return "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"; }
 };
 
 template<class Map>
 void fixIntMap(Map& map)
 {
 	bool needSort = false;
-	for(Map::iterator i = map.begin(); i != map.end(); ++i)
-		for(Map::iterator j = map.begin(); j != i; ++j)
+	for(typename Map::iterator i = map.begin(); i != map.end(); ++i)
+		for(typename Map::iterator j = map.begin(); j != i; ++j)
 			if(i->first == j->first){
 				int max = 0;
-				for(Map::iterator k = map.begin(); k != map.end(); ++k)
+				for(typename Map::iterator k = map.begin(); k != map.end(); ++k)
 					if(max < k->first)
 						max = k->first;
 				i->first = max + 1;
@@ -99,30 +99,30 @@ void fixIntMap(Map& map)
 //////////////////////////////////////////////////////
 RandomGenerator effectRND(time(0));
 
-REGISTER_CLASS(AttributeBase, AttributeBase, "Базовые свойства")
+REGISTER_CLASS(AttributeBase, AttributeBase, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 
-WRAP_LIBRARY(AttributeLibrary, "AttributeLibrary", "Юниты", "Scripts\\Content\\AttributeLibrary", 3, LIBRARY_EDITABLE | LIBRARY_IN_PLACE);
+WRAP_LIBRARY(AttributeLibrary, "AttributeLibrary", "пїЅпїЅпїЅпїЅпїЅ", "Scripts\\Content\\AttributeLibrary", 3, LIBRARY_EDITABLE | LIBRARY_IN_PLACE);
 WRAP_LIBRARY(AuxAttributeLibrary, "AuxAttributeLibrary", "AuxAttributeLibrary", "Scripts\\Engine\\AuxAttributeLibrary", 0, 0);
 
 WRAP_LIBRARY(RigidBodyPrmLibrary, "RigidBodyPrmLibrary", "RigidBodyPrmLibrary", "Scripts\\Engine\\RigidBodyPrmLibrary", 0, LIBRARY_IN_PLACE);
 
-WRAP_LIBRARY(RaceTable, "RaceTable", "Расы", "Scripts\\Content\\RaceTable", 0, LIBRARY_EDITABLE | LIBRARY_IN_PLACE);
+WRAP_LIBRARY(RaceTable, "RaceTable", "пїЅпїЅпїЅпїЅ", "Scripts\\Content\\RaceTable", 0, LIBRARY_EDITABLE | LIBRARY_IN_PLACE);
 
-WRAP_LIBRARY(CommandsQueueLibrary, "CommandsQueueLibrary", "Очереди команд", "Scripts\\Content\\CommandsQueueLibrary", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(CommandsQueueLibrary, "CommandsQueueLibrary", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ", "Scripts\\Content\\CommandsQueueLibrary", 0, LIBRARY_EDITABLE);
 
-WRAP_LIBRARY(UnitNameTable, "UnitName", "Названия юнитов", "Scripts\\Content\\UnitName", 0, 0);
+WRAP_LIBRARY(UnitNameTable, "UnitName", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ", "Scripts\\Content\\UnitName", 0, 0);
 
-WRAP_LIBRARY(BodyPartTypeTable, "BodyPartType", "Типы частей тела", "Scripts\\Content\\BodyPartType", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(BodyPartTypeTable, "BodyPartType", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ", "Scripts\\Content\\BodyPartType", 0, LIBRARY_EDITABLE);
 
-WRAP_LIBRARY(WeaponAnimationTypeTable, "WeaponAnimationType", "Типы оружия для анимации", "Scripts\\Content\\WeaponAnimationType", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(WeaponAnimationTypeTable, "WeaponAnimationType", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", "Scripts\\Content\\WeaponAnimationType", 0, LIBRARY_EDITABLE);
 
-WRAP_LIBRARY(DifficultyTable, "DifficultyTable", "Уровни сложности", "Scripts\\Content\\DifficultyTable", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(DifficultyTable, "DifficultyTable", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", "Scripts\\Content\\DifficultyTable", 0, LIBRARY_EDITABLE);
 
-REGISTER_CLASS(EffectContainer, EffectContainer, "Эффект");
+REGISTER_CLASS(EffectContainer, EffectContainer, "пїЅпїЅпїЅпїЅпїЅпїЅ");
 
-WRAP_LIBRARY(EffectLibrary, "EffectContainerLibrary", "Эффекты", "Scripts\\Content\\EffectContainerLibrary", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(EffectLibrary, "EffectContainerLibrary", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ", "Scripts\\Content\\EffectContainerLibrary", 0, LIBRARY_EDITABLE);
 
-WRAP_LIBRARY(PlacementZoneTable, "PlacementZone", "Зоны установки (первая зона должна быть \"Нет зоны\"!)", "Scripts\\Content\\PlacementZone", 1, LIBRARY_EDITABLE);
+WRAP_LIBRARY(PlacementZoneTable, "PlacementZone", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ \"пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ\"!)", "Scripts\\Content\\PlacementZone", 1, LIBRARY_EDITABLE);
 
 BEGIN_ENUM_DESCRIPTOR(AttributeType, "AttributeType");
 REGISTER_ENUM(ATTRIBUTE_NONE, "ATTRIBUTE_NONE");
@@ -133,111 +133,111 @@ REGISTER_ENUM(ATTRIBUTE_PROJECTILE, "ATTRIBUTE_PROJECTILE");
 END_ENUM_DESCRIPTOR(AttributeType);
 
 BEGIN_ENUM_DESCRIPTOR(FOWVisibleMode, "FOWVisibleMode");
-REGISTER_ENUM(FVM_ALLWAYS,"Всегда видим");
-REGISTER_ENUM(FVM_HISTORY_TRACK,"Виден как в последний раз");
-REGISTER_ENUM(FVM_NO_FOG,"Виден в видимой зоне");
+REGISTER_ENUM(FVM_ALLWAYS,"пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+REGISTER_ENUM(FVM_HISTORY_TRACK,"пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ");
+REGISTER_ENUM(FVM_NO_FOG,"пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 END_ENUM_DESCRIPTOR(FOWVisibleMode);
 
-BEGIN_ENUM_DESCRIPTOR(AuxAttributeID, "Служебные аттрибуты")
-REGISTER_ENUM(AUX_ATTRIBUTE_NONE, "Никто")
-REGISTER_ENUM(AUX_ATTRIBUTE_ENVIRONMENT, "Объект окружения")
-REGISTER_ENUM(AUX_ATTRIBUTE_ENVIRONMENT_SIMPLE, "Простой объект окружения")
-REGISTER_ENUM(AUX_ATTRIBUTE_DETONATOR, "Детонатор")
-REGISTER_ENUM(AUX_ATTRIBUTE_ZONE, "Зона")
-REGISTER_ENUM(AUX_ATTRIBUTE_PLAYER_UNIT, "Юнит-игрок")
+BEGIN_ENUM_DESCRIPTOR(AuxAttributeID, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(AUX_ATTRIBUTE_NONE, "пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(AUX_ATTRIBUTE_ENVIRONMENT, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(AUX_ATTRIBUTE_ENVIRONMENT_SIMPLE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(AUX_ATTRIBUTE_DETONATOR, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(AUX_ATTRIBUTE_ZONE, "пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(AUX_ATTRIBUTE_PLAYER_UNIT, "пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR(AuxAttributeID)
 
-BEGIN_ENUM_DESCRIPTOR(AttackClass, "Класс юнитов")
-REGISTER_ENUM(ATTACK_CLASS_IGNORE, "Никто")
-REGISTER_ENUM(ATTACK_CLASS_LIGHT, "Легкий")
-REGISTER_ENUM(ATTACK_CLASS_MEDIUM, "Средний")
-REGISTER_ENUM(ATTACK_CLASS_HEAVY, "Тяжелый")
-REGISTER_ENUM(ATTACK_CLASS_AIR, "Воздушный")
-REGISTER_ENUM(ATTACK_CLASS_AIR_MEDIUM, "Воздушный средний")
-REGISTER_ENUM(ATTACK_CLASS_AIR_HEAVY, "Воздушный тяжелый")
-REGISTER_ENUM(ATTACK_CLASS_UNDERGROUND, "Подземный")
-REGISTER_ENUM(ATTACK_CLASS_BUILDING, "Здание")
-REGISTER_ENUM(ATTACK_CLASS_MISSILE, "Снаряд")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BUSH, "Декорация куст")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_TREE, "Декорация дерево")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_FENCE, "Декорация забор")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_FENCE2, "Декорация неразрушаемый забор")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BARN, "Декорация сарай")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BUILDING, "Декорация здание")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BRIDGE, "Декорация мост")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_STONE, "Декорация камень")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_INDESTRUCTIBLE, "Декорация неразрушаемое строение")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BIG_BUILDING, "Декорация большое здание")
-REGISTER_ENUM(ATTACK_CLASS_TERRAIN_SOFT, "Земля копаемая")
-REGISTER_ENUM(ATTACK_CLASS_TERRAIN_HARD, "Земля некопаемая")
-REGISTER_ENUM(ATTACK_CLASS_WATER, "Вода")
-REGISTER_ENUM(ATTACK_CLASS_WATER_LOW, "Вода относительная")
-REGISTER_ENUM(ATTACK_CLASS_ICE, "Лёд")
-//REGISTER_ENUM(ATTACK_CLASS_ALL, "Все")
+BEGIN_ENUM_DESCRIPTOR(AttackClass, "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_IGNORE, "пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_LIGHT, "пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_MEDIUM, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_HEAVY, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_AIR, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_AIR_MEDIUM, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_AIR_HEAVY, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_UNDERGROUND, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_BUILDING, "пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_MISSILE, "пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BUSH, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_TREE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_FENCE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_FENCE2, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BARN, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BUILDING, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BRIDGE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_STONE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_INDESTRUCTIBLE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BIG_BUILDING, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_TERRAIN_SOFT, "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_TERRAIN_HARD, "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_WATER, "пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_WATER_LOW, "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ATTACK_CLASS_ICE, "ЛёпїЅ")
+//REGISTER_ENUM(ATTACK_CLASS_ALL, "пїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR(AttackClass)
 
 
 BEGIN_ENUM_DESCRIPTOR(ChainID, "ChainID")
 REGISTER_ENUM(CHAIN_NONE, "")
-REGISTER_ENUM(CHAIN_STAND, "Стоять для снарядов и предметов")
-REGISTER_ENUM(CHAIN_WALK, "Двигаться для снарядов")
-REGISTER_ENUM(CHAIN_MOVEMENTS, "Движения");
+REGISTER_ENUM(CHAIN_STAND, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_WALK, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_MOVEMENTS, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 REGISTER_ENUM(CHAIN_BUILDING_STAND, 0)
 REGISTER_ENUM(CHAIN_ATTACK, 0)
-REGISTER_ENUM(CHAIN_FIRE, "Стрелять")
-REGISTER_ENUM(CHAIN_AIM, "Целиться")
-REGISTER_ENUM(CHAIN_RELOAD, "Перезарядка")
-REGISTER_ENUM(CHAIN_RELOAD_INVENTORY, "Перезарядка из инвентаря")
-REGISTER_ENUM(CHAIN_FROZEN, "Заморожен")
+REGISTER_ENUM(CHAIN_FIRE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_AIM, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_RELOAD, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_RELOAD_INVENTORY, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_FROZEN, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 
-REGISTER_ENUM(CHAIN_TRANSITION, "Переход")
+REGISTER_ENUM(CHAIN_TRANSITION, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 
-REGISTER_ENUM(CHAIN_BIRTH, "Рождение")
-REGISTER_ENUM(CHAIN_ITEM_BIRTH, "Рождение (для предметов)")
+REGISTER_ENUM(CHAIN_BIRTH, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_ITEM_BIRTH, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)")
 REGISTER_ENUM(CHAIN_BIRTH_IN_AIR, 0)
-REGISTER_ENUM(CHAIN_DEATH, "Смерть")
-REGISTER_ENUM(CHAIN_FALL, "Падать")
-REGISTER_ENUM(CHAIN_RISE, "Вставать")
-REGISTER_ENUM(CHAIN_LANDING, "Загужаться в транспорт")
-REGISTER_ENUM(CHAIN_UNLANDING, "Высаживаться из транспорта")
-REGISTER_ENUM(CHAIN_IN_TRANSPORT, "Сидеть в транспорте")
+REGISTER_ENUM(CHAIN_DEATH, "пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_FALL, "пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_RISE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_LANDING, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_UNLANDING, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_IN_TRANSPORT, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 REGISTER_ENUM(CHAIN_WORK, 0)
-REGISTER_ENUM(CHAIN_PICKING, "Собирать ресурс")
-REGISTER_ENUM(CHAIN_WITH_RESOURCE, "C полным ресурсом")
-REGISTER_ENUM(CHAIN_GIVE_RESOURCE, "Отдавать ресурс (предметы и сборщики)")
-REGISTER_ENUM(CHAIN_PICK_ITEM, "Подбор предметов")
-REGISTER_ENUM(CHAIN_BUILD, "Строить (для юнитов)")
-REGISTER_ENUM(CHAIN_BE_BUILT, "Строиться (для зданий)")
-REGISTER_ENUM(CHAIN_UPGRADE, "Апгрейд")
+REGISTER_ENUM(CHAIN_PICKING, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_WITH_RESOURCE, "C пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_GIVE_RESOURCE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)")
+REGISTER_ENUM(CHAIN_PICK_ITEM, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_BUILD, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ)")
+REGISTER_ENUM(CHAIN_BE_BUILT, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ)")
+REGISTER_ENUM(CHAIN_UPGRADE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 REGISTER_ENUM(CHAIN_CONSTRUCTION, 0);
-REGISTER_ENUM(CHAIN_PRODUCTION, "Производство")
-REGISTER_ENUM(CHAIN_OPEN, "Открыть")
-REGISTER_ENUM(CHAIN_CLOSE, "Закрыть")
-REGISTER_ENUM(CHAIN_HOLOGRAM, "Голограмма здания")
-REGISTER_ENUM(CHAIN_CONNECT, "Здание подключено")
-REGISTER_ENUM(CHAIN_DISCONNECT, "Здание отключено")
-REGISTER_ENUM(CHAIN_UNINSTALL, "Демонтаж (продажа) здания")
-REGISTER_ENUM(CHAIN_MOVE, "Шевелиться")
-REGISTER_ENUM(CHAIN_TRIGGER, "Цепочка триггера")
-REGISTER_ENUM(CHAIN_PAD_STAND, "Стоять(лапа)")
-REGISTER_ENUM(CHAIN_PAD_GET_SMTH, "Взять что-то(лапа)")
-REGISTER_ENUM(CHAIN_PAD_PUT_SMTH, "Положить что-то(лапа)")
-REGISTER_ENUM(CHAIN_PAD_CARRY, "Нести(лапа)")
-REGISTER_ENUM(CHAIN_PAD_ATTACK, "Атаковать(лапа)")
-REGISTER_ENUM(CHAIN_FLY_DOWN, "Спускаться с высоты")
-REGISTER_ENUM(CHAIN_TOUCH_DOWN, "Приземление")
-REGISTER_ENUM(CHAIN_FLY_UP, "Подниматься на высоту")
-REGISTER_ENUM(CHAIN_WEAPON_GRIP, "Захваченный")
-REGISTER_ENUM(CHAIN_NIGHT, "Ночная цепочка")
-REGISTER_ENUM(CHAIN_OPEN_FOR_LANDING, "Посадка в транспорт открыть")
-REGISTER_ENUM(CHAIN_CLOSE_FOR_LANDING, "Посадка в транспорт закрыть")
+REGISTER_ENUM(CHAIN_PRODUCTION, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_OPEN, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_CLOSE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_HOLOGRAM, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_CONNECT, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_DISCONNECT, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_UNINSTALL, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅ) пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_MOVE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_TRIGGER, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_PAD_STAND, "пїЅпїЅпїЅпїЅпїЅпїЅ(пїЅпїЅпїЅпїЅ)")
+REGISTER_ENUM(CHAIN_PAD_GET_SMTH, "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ-пїЅпїЅ(пїЅпїЅпїЅпїЅ)")
+REGISTER_ENUM(CHAIN_PAD_PUT_SMTH, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ-пїЅпїЅ(пїЅпїЅпїЅпїЅ)")
+REGISTER_ENUM(CHAIN_PAD_CARRY, "пїЅпїЅпїЅпїЅпїЅ(пїЅпїЅпїЅпїЅ)")
+REGISTER_ENUM(CHAIN_PAD_ATTACK, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ(пїЅпїЅпїЅпїЅ)")
+REGISTER_ENUM(CHAIN_FLY_DOWN, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_TOUCH_DOWN, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_FLY_UP, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_WEAPON_GRIP, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_NIGHT, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_OPEN_FOR_LANDING, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_CLOSE_FOR_LANDING, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 REGISTER_ENUM(CHAIN_LAND_TO_LOAD, 0)
 REGISTER_ENUM(CHAIN_MOVE_TO_CARGO, 0)
-REGISTER_ENUM(CHAIN_CARGO_LOADED, "Груз погружен")
-REGISTER_ENUM(CHAIN_SLOT_IS_EMPTY, "Слот пуст")
+REGISTER_ENUM(CHAIN_CARGO_LOADED, "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_SLOT_IS_EMPTY, "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ")
 REGISTER_ENUM(CHAIN_IS_UPGRADED, 0)
-REGISTER_ENUM(CHAIN_UPGRADED_FROM_BUILDING, "Апгрейд из здания")
-REGISTER_ENUM(CHAIN_UPGRADED_FROM_LEGIONARY, "Апгрейд из юнита")
+REGISTER_ENUM(CHAIN_UPGRADED_FROM_BUILDING, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(CHAIN_UPGRADED_FROM_LEGIONARY, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")
 REGISTER_ENUM(CHAIN_TELEPORTING, 0)
 END_ENUM_DESCRIPTOR(ChainID)
 
@@ -258,71 +258,71 @@ REGISTER_ENUM(ANIMATION_TERRAIN_TYPE12, TerrainTypeDescriptor::instance().nameAl
 REGISTER_ENUM(ANIMATION_TERRAIN_TYPE13, TerrainTypeDescriptor::instance().nameAlt(TERRAIN_TYPE13))
 REGISTER_ENUM(ANIMATION_TERRAIN_TYPE14, TerrainTypeDescriptor::instance().nameAlt(TERRAIN_TYPE14))
 REGISTER_ENUM(ANIMATION_TERRAIN_TYPE15, TerrainTypeDescriptor::instance().nameAlt(TERRAIN_TYPE15))
-REGISTER_ENUM(ANIMATION_ON_GROUND, "На земле")
-REGISTER_ENUM(ANIMATION_ON_LOW_WATER, "На неглубокой воде")
-REGISTER_ENUM(ANIMATION_ON_WATER, "На воде")
-REGISTER_ENUM(ANIMATION_ON_LAVA, "В лаве")
-REGISTER_ENUM(ANIMATION_ALL_SURFACES, "На любой поверхности")
+REGISTER_ENUM(ANIMATION_ON_GROUND, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ANIMATION_ON_LOW_WATER, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ANIMATION_ON_WATER, "пїЅпїЅ пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ANIMATION_ON_LAVA, "пїЅ пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ANIMATION_ALL_SURFACES, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR(AnimationTerrainTypeID)
 
 BEGIN_ENUM_DESCRIPTOR(AnimationStateID, "AnimationStateID")
-REGISTER_ENUM(ANIMATION_STATE_LEFT, "идти влево")
-REGISTER_ENUM(ANIMATION_STATE_RIGHT, "идти вправо")
-REGISTER_ENUM(ANIMATION_STATE_FORWARD, "идти вперед")
-REGISTER_ENUM(ANIMATION_STATE_BACKWARD, "идти назад")
+REGISTER_ENUM(ANIMATION_STATE_LEFT, "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ANIMATION_STATE_RIGHT, "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ANIMATION_STATE_FORWARD, "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ANIMATION_STATE_BACKWARD, "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")
 REGISTER_ENUM(ANIMATION_STATE_ALL_SIDES, 0)
-REGISTER_ENUM(ANIMATION_STATE_CRAWL, "режим движения \"Лежа\"")
-REGISTER_ENUM(ANIMATION_STATE_GRABBLE, "режим движения \"На корточках\"")
-REGISTER_ENUM(ANIMATION_STATE_WALK, "режим движения \"Стоя\"")
-REGISTER_ENUM(ANIMATION_STATE_RUN, "ускоренный режим движения")
+REGISTER_ENUM(ANIMATION_STATE_CRAWL, "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ \"пїЅпїЅпїЅпїЅ\"")
+REGISTER_ENUM(ANIMATION_STATE_GRABBLE, "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ \"пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ\"")
+REGISTER_ENUM(ANIMATION_STATE_WALK, "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ \"пїЅпїЅпїЅпїЅ\"")
+REGISTER_ENUM(ANIMATION_STATE_RUN, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 REGISTER_ENUM(ANIMATION_STATE_ALL_POSE, 0)
-REGISTER_ENUM(ANIMATION_STATE_STAND, "cтоять")
-REGISTER_ENUM(ANIMATION_STATE_MOVE, "идти")
-REGISTER_ENUM(ANIMATION_STATE_TURN, "поворачивать на месте")
-REGISTER_ENUM(ANIMATION_STATE_WAIT, "ждать")
-REGISTER_ENUM(ANIMATION_STATE_ATTACK, "атаковать")
+REGISTER_ENUM(ANIMATION_STATE_STAND, "cпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ANIMATION_STATE_MOVE, "пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ANIMATION_STATE_TURN, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ANIMATION_STATE_WAIT, "пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(ANIMATION_STATE_ATTACK, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 REGISTER_ENUM(ANIMATION_STATE_ALL_MOVEMENTS, 0)
 END_ENUM_DESCRIPTOR(AnimationStateID)
 
 BEGIN_ENUM_DESCRIPTOR(MovementStateID, "MovementStateID")
-REGISTER_ENUM(MOVEMENT_STATE_LEFT, "Влево")
-REGISTER_ENUM(MOVEMENT_STATE_RIGHT, "Вправо")
-REGISTER_ENUM(MOVEMENT_STATE_FORWARD, "Вперед")
-REGISTER_ENUM(MOVEMENT_STATE_BACKWARD, "Назад")
-REGISTER_ENUM(MOVEMENT_STATE_ON_GROUND, "На земле")
-REGISTER_ENUM(MOVEMENT_STATE_ON_LOW_WATER, "На неглубокой воде")
-REGISTER_ENUM(MOVEMENT_STATE_ON_WATER, "На воде")
-REGISTER_ENUM(MOVEMENT_STATE_ON_LAVA, "В лаве")
+REGISTER_ENUM(MOVEMENT_STATE_LEFT, "пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(MOVEMENT_STATE_RIGHT, "пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(MOVEMENT_STATE_FORWARD, "пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(MOVEMENT_STATE_BACKWARD, "пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(MOVEMENT_STATE_ON_GROUND, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(MOVEMENT_STATE_ON_LOW_WATER, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(MOVEMENT_STATE_ON_WATER, "пїЅпїЅ пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(MOVEMENT_STATE_ON_LAVA, "пїЅ пїЅпїЅпїЅпїЅ")
 REGISTER_ENUM(MOVEMENT_STATE_ALL_SIDES, 0)
 REGISTER_ENUM(MOVEMENT_STATE_ALL_SURFACES, 0)
-REGISTER_ENUM(MOVEMENT_STATE_CRAWL, "Лежа")
-REGISTER_ENUM(MOVEMENT_STATE_GRABBLE, "На корточках")
-REGISTER_ENUM(MOVEMENT_STATE_WALK, "Стоя")
-REGISTER_ENUM(MOVEMENT_STATE_RUN, "Бежать")
+REGISTER_ENUM(MOVEMENT_STATE_CRAWL, "пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(MOVEMENT_STATE_GRABBLE, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(MOVEMENT_STATE_WALK, "пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(MOVEMENT_STATE_RUN, "пїЅпїЅпїЅпїЅпїЅпїЅ")
 REGISTER_ENUM(MOVEMENT_STATE_ALL_POSE, 0)
-REGISTER_ENUM(MOVEMENT_STATE_STAND, "Стоять")
-REGISTER_ENUM(MOVEMENT_STATE_MOVE, "Двигаться")
-REGISTER_ENUM(MOVEMENT_STATE_TURN, "Поворачивать")
-REGISTER_ENUM(MOVEMENT_STATE_WAIT, "Ждать")
+REGISTER_ENUM(MOVEMENT_STATE_STAND, "пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(MOVEMENT_STATE_MOVE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(MOVEMENT_STATE_TURN, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(MOVEMENT_STATE_WAIT, "пїЅпїЅпїЅпїЅпїЅ")
 REGISTER_ENUM(MOVEMENT_STATE_ALL_MOVEMENTS, 0)
 END_ENUM_DESCRIPTOR(MovementStateID)
 
 BEGIN_ENUM_DESCRIPTOR(MovementMode, "MovementMode")
-REGISTER_ENUM(MODE_CRAWL, "Лёжа")
-REGISTER_ENUM(MODE_GRABBLE, "На корточках")
-REGISTER_ENUM(MODE_WALK, "Стоя")
-REGISTER_ENUM(MODE_RUN, "Бежать")
+REGISTER_ENUM(MODE_CRAWL, "ЛёпїЅпїЅ")
+REGISTER_ENUM(MODE_GRABBLE, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(MODE_WALK, "пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(MODE_RUN, "пїЅпїЅпїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR(MovementMode)
 
 BEGIN_ENUM_DESCRIPTOR(ShootingOnMoveMode, "ShootingOnMoveMode")
-REGISTER_ENUM(SHOOT_WHILE_STANDING, "когда стоит")
-REGISTER_ENUM(SHOOT_WHILE_MOVING, "на ходу")
-REGISTER_ENUM(SHOOT_WHILE_RUNNING, "на бегу")
-REGISTER_ENUM(SHOOT_WHILE_IN_TRANSPORT, "в транспорте")
-REGISTER_ENUM(SHOOT_WHILE_LYING, "когда лежит")
-REGISTER_ENUM(SHOOT_WHILE_CRAWLING, "когда ползет")
-REGISTER_ENUM(SHOOT_WHILE_ON_ALL_FOURS, "когда присел на корточки")
-REGISTER_ENUM(SHOOT_WHILE_GRABBLING, "когда идёт на корточках")
+REGISTER_ENUM(SHOOT_WHILE_STANDING, "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(SHOOT_WHILE_MOVING, "пїЅпїЅ пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(SHOOT_WHILE_RUNNING, "пїЅпїЅ пїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(SHOOT_WHILE_IN_TRANSPORT, "пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(SHOOT_WHILE_LYING, "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(SHOOT_WHILE_CRAWLING, "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(SHOOT_WHILE_ON_ALL_FOURS, "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(SHOOT_WHILE_GRABBLING, "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR(ShootingOnMoveMode)
 
 BEGIN_ENUM_DESCRIPTOR(ExcludeCollision, "ExcludeCollision")
@@ -332,20 +332,20 @@ REGISTER_ENUM(EXCLUDE_COLLISION_LEGIONARY, "EXCLUDE_COLLISION_LEGIONARY")
 END_ENUM_DESCRIPTOR(ExcludeCollision)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(AttributeBase, ProductionRequirement, "ProductionRequirement")
-REGISTER_ENUM_ENCLOSED(AttributeBase, PRODUCE_EVERYWHERE, "Производить везде");
-REGISTER_ENUM_ENCLOSED(AttributeBase, PRODUCE_ON_WATER, "Производить на воде");
-REGISTER_ENUM_ENCLOSED(AttributeBase, PRODUCE_ON_TERRAIN, "Производить на земле");
+REGISTER_ENUM_ENCLOSED(AttributeBase, PRODUCE_EVERYWHERE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+REGISTER_ENUM_ENCLOSED(AttributeBase, PRODUCE_ON_WATER, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ");
+REGISTER_ENUM_ENCLOSED(AttributeBase, PRODUCE_ON_TERRAIN, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 END_ENUM_DESCRIPTOR_ENCLOSED(AttributeBase, ProductionRequirement)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(AttributeBase, UnitUI_StateType, "UnitUI_StateType")
-REGISTER_ENUM_ENCLOSED(AttributeBase, UI_STATE_TYPE_NORMAL, "Обычное состояние")
-REGISTER_ENUM_ENCLOSED(AttributeBase, UI_STATE_TYPE_SELECTED, "Выделен")
-REGISTER_ENUM_ENCLOSED(AttributeBase, UI_STATE_TYPE_WAITING, "Ожидание")
+REGISTER_ENUM_ENCLOSED(AttributeBase, UI_STATE_TYPE_NORMAL, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(AttributeBase, UI_STATE_TYPE_SELECTED, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(AttributeBase, UI_STATE_TYPE_WAITING, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(AttributeBase, UnitUI_StateType)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(AttributeBase, AttackTargetNotificationMode, "AttackTargetNotificationMode")
-REGISTER_ENUM_ENCLOSED(AttributeBase, TARGET_NOTIFY_SQUAD, "оповещать свой сквад");
-REGISTER_ENUM_ENCLOSED(AttributeBase, TARGET_NOTIFY_ALL, "оповещать всех в заданном радиусе");
+REGISTER_ENUM_ENCLOSED(AttributeBase, TARGET_NOTIFY_SQUAD, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+REGISTER_ENUM_ENCLOSED(AttributeBase, TARGET_NOTIFY_ALL, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 END_ENUM_DESCRIPTOR_ENCLOSED(AttributeBase, AttackTargetNotificationMode)
 
 BEGIN_ENUM_DESCRIPTOR(UnitClass, "UnitClass")
@@ -375,36 +375,36 @@ REGISTER_ENUM(COLLISION_GROUP_REAL, "COLLISION_GROUP_REAL");
 END_ENUM_DESCRIPTOR(CollisionGroupID)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(EffectAttribute, WaterPlacementMode, "EffectAttribute::WaterPlacementMode")
-REGISTER_ENUM_ENCLOSED(EffectAttribute, WATER_BOTTOM, "ставить на дно")
-REGISTER_ENUM_ENCLOSED(EffectAttribute, WATER_SURFACE, "ставить на поверхность воды")
+REGISTER_ENUM_ENCLOSED(EffectAttribute, WATER_BOTTOM, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(EffectAttribute, WATER_SURFACE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(EffectAttribute, WaterPlacementMode)
 
 BEGIN_ENUM_DESCRIPTOR(ObjectShadowType, "ObjectShadowType")
-REGISTER_ENUM(OST_SHADOW_NONE, "нет тени");
-REGISTER_ENUM(OST_SHADOW_CIRCLE, "круглая тень");
-REGISTER_ENUM(OST_SHADOW_REAL, "реальная тень");
+REGISTER_ENUM(OST_SHADOW_NONE, "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+REGISTER_ENUM(OST_SHADOW_CIRCLE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+REGISTER_ENUM(OST_SHADOW_REAL, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 END_ENUM_DESCRIPTOR(ObjectShadowType)
 
 BEGIN_ENUM_DESCRIPTOR(SoundSurfKind, "SoundSurfKind")
-REGISTER_ENUM(SOUND_SURF_ALL, "Все типы поверхности");
-REGISTER_ENUM(SOUND_SURF_KIND1, "Поверхность 1 рода");
-REGISTER_ENUM(SOUND_SURF_KIND2, "Поверхность 2 рода");
-REGISTER_ENUM(SOUND_SURF_KIND3, "Поверхность 3 рода");
-REGISTER_ENUM(SOUND_SURF_KIND4, "Поверхность 4 рода");
+REGISTER_ENUM(SOUND_SURF_ALL, "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_ENUM(SOUND_SURF_KIND1, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 1 пїЅпїЅпїЅпїЅ");
+REGISTER_ENUM(SOUND_SURF_KIND2, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 2 пїЅпїЅпїЅпїЅ");
+REGISTER_ENUM(SOUND_SURF_KIND3, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 3 пїЅпїЅпїЅпїЅ");
+REGISTER_ENUM(SOUND_SURF_KIND4, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4 пїЅпїЅпїЅпїЅ");
 END_ENUM_DESCRIPTOR(SoundSurfKind)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(BodyPartAttribute, Functionality, "BodyPartAttribute::Functionality")
-REGISTER_ENUM_ENCLOSED(BodyPartAttribute, LIFE, "Жизнь")
-REGISTER_ENUM_ENCLOSED(BodyPartAttribute, MOVEMENT, "Движение")
-REGISTER_ENUM_ENCLOSED(BodyPartAttribute, PRODUCTION, "Производство")
-REGISTER_ENUM_ENCLOSED(BodyPartAttribute, UPGRADE, "Апгрейд")
-REGISTER_ENUM_ENCLOSED(BodyPartAttribute, FIRE, "Стрельба")
+REGISTER_ENUM_ENCLOSED(BodyPartAttribute, LIFE, "пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(BodyPartAttribute, MOVEMENT, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(BodyPartAttribute, PRODUCTION, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(BodyPartAttribute, UPGRADE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(BodyPartAttribute, FIRE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(BodyPartAttribute, Functionality)
 
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(AttributeBase, SelectSpriteTypes, "BodyPartAttribute::Functionality")
-REGISTER_ENUM_ENCLOSED(AttributeBase, ORDINARY, "Обычный")
-REGISTER_ENUM_ENCLOSED(AttributeBase, UNPOWERED, "Отключено")
+REGISTER_ENUM_ENCLOSED(AttributeBase, ORDINARY, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(AttributeBase, UNPOWERED, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(AttributeBase, SelectSpriteTypes)
 
 MovementState MovementState::DEFAULT(ANIMATION_STATE_DEFAULT, ANIMATION_ALL_SURFACES);
@@ -444,21 +444,21 @@ MovementState MovementState::operator = (const BitVector<MovementStateID>& state
 
 void MovementState::serialize(Archive& ar) 
 {
-	ar.serialize(state_, "state", "&Состояние");
-	ar.serialize(terrainType_, "terrainType", "&Тип поверхности");
+	ar.serialize(state_, "state", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(terrainType_, "terrainType", "&пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 void AttributeBase::SelectSprite::serialize(Archive& ar)
 {
-	ar.serialize(selectSpriteNormal, "selectSpriteNormal", "Обычный");
-	ar.serialize(selectSpriteHover, "selectSpriteHover", "При наведении");
-	ar.serialize(selectSpriteSelected, "selectSpriteSelected", "Выделенный");
-	ar.serialize(showSelectSpritesForOthers, "showSelectSpritesForOthers", "Показывать противнику");
+	ar.serialize(selectSpriteNormal, "selectSpriteNormal", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(selectSpriteHover, "selectSpriteHover", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(selectSpriteSelected, "selectSpriteSelected", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(showSelectSpritesForOthers, "showSelectSpritesForOthers", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(showSelectSpritesForOthers){
-		ar.serialize(ownSelectSpritesForOthers, "ownSelectSpritesForOthers", "Собственные спрайты для показа другим игрокам");
+		ar.serialize(ownSelectSpritesForOthers, "ownSelectSpritesForOthers", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		if(ownSelectSpritesForOthers){
-			ar.serialize(unitSpriteForOthers, "unitSpriteForOthers", "Спрайт для остальных игроков");
-			ar.serialize(unitSpriteForOthersHovered, "unitSpriteForOthersHovered", "Спрайт для остальных игроков при наведении");
+			ar.serialize(unitSpriteForOthers, "unitSpriteForOthers", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(unitSpriteForOthersHovered, "unitSpriteForOthersHovered", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		}
 	}
 }
@@ -557,7 +557,7 @@ AttributeBase::AttributeBase() : modelName("")
 	canBeTransparent = false;
 	fow_mode = FVM_ALLWAYS;
 
-	selectCircleRelativeRadius = 1.0f; // По умолчанию граф. радиус размером с radius()
+	selectCircleRelativeRadius = 1.0f; // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ radius()
 	showSelectRadius = true;
 	selectRadius = 0;
 	fireRadiusCircle.color = Color4c(150, 0, 0, 0);
@@ -660,7 +660,7 @@ void AttributeBase::serialize(Archive& ar)
 	if(ar.isOutput()){
 		setCurrentAttribute(this);
 		createModel(modelName.c_str());
-		if(!ar.isEdit()){	// Сложные расчеты - только перед записью
+		if(!ar.isEdit()){	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			refreshChains();
 			initGeometryAttribute();
 			producedThisFactories.clear();
@@ -688,70 +688,70 @@ void AttributeBase::serialize(Archive& ar)
 	setCurrentLibraryKey(libraryKey());
 
 	ar.serialize(unitClass_, "unitClass", 0);
-	ar.serialize(ModelSelector(modelName), "modelName", "Имя модели");
-	ar.serialize(boundHeight, "boundHeight", "Высота модели (по баунду)");
-	ar.serialize(accurateBound, "accurateBound", "Использовать точный баунд");
+	ar.serialize(ModelSelector(modelName), "modelName", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(boundHeight, "boundHeight", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ)");
+	ar.serialize(accurateBound, "accurateBound", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 	if(isBuilding() || isResourceItem() || isInventoryItem())
-		ar.serialize(radius_, "radius", "Логический радиус");
+		ar.serialize(radius_, "radius", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 	ar.serialize(boundScale, "boundScale", 0);
 	ar.serialize(boundRadius, "boundRadius", 0);
 	ar.serialize(modelTime_, "modelTime", 0);
-	//xassertStr("Модель обновлена без перезаписи редактора войск" && (ar.isEdit() || modelName.empty() || modelTime_ == FileTime(modelName.c_str())), modelName.c_str());
+	//xassertStr("пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ" && (ar.isEdit() || modelName.empty() || modelTime_ == FileTime(modelName.c_str())), modelName.c_str());
 
 	if(!ar.isEdit() || GlobalAttributes::instance().enableSilhouettes)
-		ar.serialize(showSilhouette, "showSilhouette", "Выводить силуэт");
-	ar.serialize(hideByDistance, "hideByDistance", "Исчезает при удалении");
+		ar.serialize(showSilhouette, "showSilhouette", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(hideByDistance, "hideByDistance", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(canBeTransparent, "|canBeTransparent|mode_transparent", "Становится прозрачным если позади юнит");
-	ar.serialize(fow_mode, "fow_mode", "Режим видимости при тумане войны");
-	ar.serialize(permanentEffects, "permanentEffects", "постоянные эффекты");
+	ar.serialize(canBeTransparent, "|canBeTransparent|mode_transparent", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+	ar.serialize(fow_mode, "fow_mode", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(permanentEffects, "permanentEffects", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	
 	ar.serialize(animationChains, "animationChainsNew", 0);
 
 	if(isActing()){
-		if(ar.openBlock("lights", "Лампочки")){
-			ar.serialize(nightVisibilitySet, "nightVisibilitySet", "Часть модели для лампочек"); 
+		if(ar.openBlock("lights", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")){
+			ar.serialize(nightVisibilitySet, "nightVisibilitySet", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"); 
 			VisibilityGroupOfSet::setVisibilitySet(nightVisibilitySet);
-			ar.serialize(dayVisibilityGroup, "dayVisibilityGroup", "Группа видимости днем");
-			ar.serialize(nightVisibilityGroup, "nightVisibilityGroup", "Группа видимости ночью");
+			ar.serialize(dayVisibilityGroup, "dayVisibilityGroup", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+			ar.serialize(nightVisibilityGroup, "nightVisibilityGroup", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 			ar.closeBlock();
 		}
 
-		ar.serialize(parametersInitial, "parametersInitial", "Личные (начальные) параметры юнита");
+		ar.serialize(parametersInitial, "parametersInitial", "пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 		if(parametersInitial.possession())
 			canBeCaptured = true;
 
-		ar.serialize(ptBoundCheck, "ptBoundCheck", "Учитывать баунд в поиске пути");
+		ar.serialize(ptBoundCheck, "ptBoundCheck", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 
-		ar.serialize(bodyParts, "bodyParts", "Части тела");
+		ar.serialize(bodyParts, "bodyParts", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 		
 		if(!ar.isEdit() && ar.isOutput() && !bodyParts.empty())
 			RigidBodyModelPrmBuilder(rigidBodyModelPrm, bodyParts, model());
 		
 		ar.serialize(rigidBodyModelPrm, "rigidBodyModelPrm", 0);
 
-		if(ar.openBlock("cost", "Стоимость")){
-			ar.serialize(dockNodeNumber, "dockNodeNumber", "Номер ноды у завода");
-			ar.serialize(creationTime, "creationTime", "Время производства, секунды");
-			ar.serialize(creationValue, "creationValue", "Стоимость производства");
-			ar.serialize(installValue, "installValue", "Стоимость начального заказа");
+		if(ar.openBlock("cost", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")){
+			ar.serialize(dockNodeNumber, "dockNodeNumber", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(creationTime, "creationTime", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(creationValue, "creationValue", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(installValue, "installValue", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 			if(isBuilding()){
-				ar.serialize(cancelConstructionValue, "cancelConstructionValue", "Возвращаемое от недостроенного здания");
-				ar.serialize(uninstallValue, "uninstallValue", "Возвращаемое после деинсталляции");
-				ar.serialize(needBuilders, "needBuilders", "Необходимы строители");
+				ar.serialize(cancelConstructionValue, "cancelConstructionValue", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(uninstallValue, "uninstallValue", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(needBuilders, "needBuilders", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			}
-			ar.serialize(accessValue, "accessValue", "Необходимые параметры для производства и апгрейда");
-			ar.serialize(accessBuildingsList, "accessBuildingsList", "Необходимые строения для производства и апгрейда");
+			ar.serialize(accessValue, "accessValue", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(accessBuildingsList, "accessBuildingsList", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-			ar.serialize(formationType, "formationType", "Тип юнита в формации");
-			ar.serialize(accountingNumber, "accountingNumber", "Число, учитываемое в максимальном количестве юнитов");
-			ar.serialize(unitNumberMaxType, "unitNumberMaxType", "Тип максимального количества юнитов");
+			ar.serialize(formationType, "formationType", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(accountingNumber, "accountingNumber", "пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(unitNumberMaxType, "unitNumberMaxType", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
-			ar.serialize(inheritHealthArmor, "inheritHealthArmor", "Наследовать здоровье и броню при апгрейде");
+			ar.serialize(inheritHealthArmor, "inheritHealthArmor", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			ar.closeBlock();
 		}
 
-		ar.serialize(upgrades, "upgrades", "Апгрейды");
+		ar.serialize(upgrades, "upgrades", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		if(ar.isInput())
 			fixIntMap(upgrades);
 
@@ -762,10 +762,10 @@ void AttributeBase::serialize(Archive& ar)
 				upgradeAutomatically |= i->second.automatic;
 		}
 		
-		if(ar.openBlock("transport", "Транспорт")){
-			ar.serialize(transportSlots, "transportSlots", "Слоты");
-			ar.serialize(transportLoadRadius, "transportLoadRadius", "Радиус подбора для летных юнитов");
-			ar.serialize(transportLoadDirectControlRadius, "transportLoadDirectControlRadius", "Радиус подбора в прямом управлении");
+		if(ar.openBlock("transport", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")){
+			ar.serialize(transportSlots, "transportSlots", "пїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(transportLoadRadius, "transportLoadRadius", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(transportLoadDirectControlRadius, "transportLoadDirectControlRadius", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			if(ar.isInput()){
 				checkRequirementForMovement = false;
 				TransportSlots::iterator i;
@@ -773,111 +773,111 @@ void AttributeBase::serialize(Archive& ar)
 					checkRequirementForMovement |= i->requiredForMovement;
 			}
 			if(isLegionary()){
-				ar.serialize(additionToTransport, "additionToTransport", "Параметры, добавляемые транспорту");
-				ar.serialize(transportSlotsRequired, "transportSlotsRequired", "Необходимое количество слотов для размещения в транспорте");
+				ar.serialize(additionToTransport, "additionToTransport", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(transportSlotsRequired, "transportSlotsRequired", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			}
 			ar.closeBlock();
 		}
 	}
 	else if(isResourceItem()){
-		if(ar.openBlock("parameters", "Параметры")){
-			ar.serialize(parametersInitial, "parametersInitial", "Личные (начальные) параметры юнита");
+		if(ar.openBlock("parameters", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")){
+			ar.serialize(parametersInitial, "parametersInitial", "пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ) пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 			parametersArithmetics.serialize(ar);
 			ar.closeBlock();
 		}
 	}
 	
 	if(isObjective()){
-		if(ar.openBlock("Interface", "Интерфейс")){
+		if(ar.openBlock("Interface", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")){
 
-			ar.serialize(tipsName, "tipsName", "Имя юнита для интерфейса (Лок)");
+			ar.serialize(tipsName, "tipsName", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ)");
 			
-			ar.serialize(interfaceName_, "interfaceNames", "Краткое описание для интерфейса (Лок)");
-			ar.serialize(interfaceDescription_, "interfaceDescriptions", "Полное описание для интерфейса (Лок)");
+			ar.serialize(interfaceName_, "interfaceNames", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ)");
+			ar.serialize(interfaceDescription_, "interfaceDescriptions", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ)");
 
-			ar.serialize(selectSprites_, "Miniatures", "Миниатюры");
-			ar.serialize(ui_faces_, "ui_faces", "Портреты");
+			ar.serialize(selectSprites_, "Miniatures", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(ui_faces_, "ui_faces", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-			if(ar.openBlock("minimap", "Обозначение на миникарте")){
-				ar.serialize(minimapScale_, "minimapScale", "относительный масштаб юнита для отметки на миникарте");
-				ar.serialize(minimapSymbolType_, "symbolType", "тип пометки");
+			if(ar.openBlock("minimap", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")){
+				ar.serialize(minimapScale_, "minimapScale", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(minimapSymbolType_, "symbolType", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 				if(minimapSymbolType_ == UI_MINIMAP_SYMBOLTYPE_SELF){
-					ar.serialize(minimapSymbol_, "minimapSymbol", "Собственный символ");
+					ar.serialize(minimapSymbol_, "minimapSymbol", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 					if(isLegionary())
-						ar.serialize(minimapSymbolWaiting_, "minimapSymbolWaiting", "Собственный символ для ждущего юнита");
+						ar.serialize(minimapSymbolWaiting_, "minimapSymbolWaiting", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 				}
-				ar.serialize(hasPermanentSymbol_, "hasPermanentSymbol", "Выводить постоянный символ");
+				ar.serialize(hasPermanentSymbol_, "hasPermanentSymbol", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 				if(hasPermanentSymbol_)
-					ar.serialize(minimapPermanentSymbol_, "minimapPermamentSymbol", "Постоянный символ");
-				ar.serialize(minimapSymbolSpecial_, "minimapSymbolSpecial", "Специальная пометка юнита");
-				ar.serialize(showUpgradeEvent_, "showUpgradeEvent", "Показывать событие апгрейда");
+					ar.serialize(minimapPermanentSymbol_, "minimapPermamentSymbol", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(minimapSymbolSpecial_, "minimapSymbolSpecial", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(showUpgradeEvent_, "showUpgradeEvent", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 				ar.closeBlock();
 			}
 
-			ar.serialize(isHero, "isHero", "Герой (для статистики)");
-			ar.serialize(isStrategicPoint, "isStrategicPoint", "Стратегическая точка (для статистики)");
-			ar.serialize(accountInCondition, "accountInCondition", "Учитывать в условии 'У игрока не осталось дееспособных юнитов'");
+			ar.serialize(isHero, "isHero", "пїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)");
+			ar.serialize(isStrategicPoint, "isStrategicPoint", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)");
+			ar.serialize(accountInCondition, "accountInCondition", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 'пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ'");
 
-			ar.serialize(inventories, "inventories", "Инвентарь");
-			ar.serialize(equipment, "equipment", "Начальное снаряжение");
+			ar.serialize(inventories, "inventories", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(equipment, "equipment", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-			ar.serialize(selectBySphere, "selectBySphere", "Селектить по описанной сфере");
-			ar.serialize(selectionCursor_, "selection_cursor", "Курсор выбора");
+			ar.serialize(selectBySphere, "selectBySphere", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(selectionCursor_, "selection_cursor", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 			selectionCursorProxy_ = selectionCursor_;
-			ar.serialize(selectionListPriority, "selectionListPriority", "Приоритет в списке селекта");
+			ar.serialize(selectionListPriority, "selectionListPriority", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-			ar.serialize(initialHeightUIParam, "initialHeightUIParam", "высота юнита для вывода значений");
+			ar.serialize(initialHeightUIParam, "initialHeightUIParam", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-			if(ar.openBlock("unitSign", "Знаки юнита")){
-				ar.serialize(showSpriteForUnvisible, "showSpriteForUnvisible", "Выводить когда юнита не видно");
-				ar.serialize(selectBySprite, "selectBySprite", "Селектить по знаку");
-				ar.serialize(selectSprites, "selectSprites", "Выводимые спрайты");
-				ar.serialize(offscreenSprite, "offsideSprite", "Знак на краю экрана");
-				ar.serialize(offscreenSpriteForEnemy, "offsideSpriteForEnemy", "Знак на краю экрана для врагов");
+			if(ar.openBlock("unitSign", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")){
+				ar.serialize(showSpriteForUnvisible, "showSpriteForUnvisible", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(selectBySprite, "selectBySprite", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(selectSprites, "selectSprites", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(offscreenSprite, "offsideSprite", "пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(offscreenSpriteForEnemy, "offsideSpriteForEnemy", "пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 				useOffscreenSprites = (offscreenSprite.key() >= 0 || offscreenSpriteForEnemy.key() >= 0);
 				if(useOffscreenSprites){
-					ar.serialize(offscreenMultiSprite, "offsideMultiSprite", "Знак на краю экрана при пересечении знаков");
-					ar.serialize(offscreenMultiSpriteForEnemy, "offsideMultiSpriteForEnemy", "Знак на краю экрана для врагов при пересечении знаков");
+					ar.serialize(offscreenMultiSprite, "offsideMultiSprite", "пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+					ar.serialize(offscreenMultiSpriteForEnemy, "offsideMultiSpriteForEnemy", "пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 				}
 				ar.closeBlock();
 			}
 
 			if(isTransport()){
-				if(ar.openBlock("TransportSlots", "Визуализация транспортных слотов")){
-					ar.serialize(transportSlotShowEvent, "transportSlotShowEvent", "Когда показывать");
+				if(ar.openBlock("TransportSlots", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")){
+					ar.serialize(transportSlotShowEvent, "transportSlotShowEvent", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 					if(transportSlotShowEvent == SHOW_AT_PARAMETER_INCREASE || transportSlotShowEvent == SHOW_AT_PARAMETER_DECREASE || transportSlotShowEvent == SHOW_AT_PARAMETER_CHANGE)
 						transportSlotShowEvent = SHOW_ALWAYS;
-					ar.serialize(transportSlotEmpty, "transportSlotEmpty", "Пустой слот");
-					ar.serialize(transportSlotFill, "transportSlotFill", "Заполненный слот");
+					ar.serialize(transportSlotEmpty, "transportSlotEmpty", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+					ar.serialize(transportSlotFill, "transportSlotFill", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 					ar.closeBlock();
 				}
 			}
 
 			ParameterShowSetting::possibleParameters_ = &parametersInitial;
-			ar.serialize(parameterShowSettings, "parameterShowSettings", "Выводимые параметры");
-			ar.serialize(showChangeParameterSettings, "showChangeParameterSettings", "Визуализация изменения общих параметров");
+			ar.serialize(parameterShowSettings, "parameterShowSettings", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(showChangeParameterSettings, "showChangeParameterSettings", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-			if(ar.openBlock("selection", "При селекте")){
-				ar.serialize(showSelectRadius, "showSelectRadius", "Показывать селект");
-				ar.serialize(selectCircleRelativeRadius, "selectCircleRelativeRadius", "Относительный радиус окружности");
+			if(ar.openBlock("selection", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")){
+				ar.serialize(showSelectRadius, "showSelectRadius", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(selectCircleRelativeRadius, "selectCircleRelativeRadius", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 				ar.serialize(selectRadius, "selectRadius", 0);
-				ar.serialize(fireRadiusCircle, "fireRadiusCircle", "Кружок радиуса атаки без разброса");
-				ar.serialize(fireMinRadiusCircle, "fireMinRadiusCircle", "Кружок минимального радиуса атаки");
-				ar.serialize(fireDispRadiusCircle, "fireDispRadiusCircle", "Кружок радиуса атаки с разбросом");
-				ar.serialize(signRadiusCircle, "signRadiusCircle", "Кружок радиуса видимости");
-				ar.serialize(noiseRadiusCircle, "noiseRadiusCircle", "Кружок радиуса шума");
-				ar.serialize(hearingRadiusCircle, "hearingRadiusCircle", "Кружок радиуса слышимости");
+				ar.serialize(fireRadiusCircle, "fireRadiusCircle", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(fireMinRadiusCircle, "fireMinRadiusCircle", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(fireDispRadiusCircle, "fireDispRadiusCircle", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(signRadiusCircle, "signRadiusCircle", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(noiseRadiusCircle, "noiseRadiusCircle", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+				ar.serialize(hearingRadiusCircle, "hearingRadiusCircle", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 				ar.closeBlock();
 			}
 
-			ar.serialize(interfaceTV, "interfaceTV", "ИнтерфейсТВ");
+			ar.serialize(interfaceTV, "interfaceTV", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 			ar.closeBlock();
 		}
 	}
 	
 	if(isActing()){
-		if(!ar.serialize(weaponAttributes, "weaponAttributesMap", "Оружие")){ // конверсия 30.01.2008
+		if(!ar.serialize(weaponAttributes, "weaponAttributesMap", "пїЅпїЅпїЅпїЅпїЅпїЅ")){ // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 30.01.2008
 			vector<WeaponSlotAttribute> vect;
 			ar.serialize(vect, "weaponAttributes", 0);
 			for(int i = 0; i < vect.size(); i++)
@@ -887,39 +887,39 @@ void AttributeBase::serialize(Archive& ar)
 			fixIntMap(weaponAttributes);
 
 		bool no_conversion = false;
-		if(ar.openBlock("attack", "Атака")){
-			ar.serialize(hasAutomaticAttackMode, "hasAutomaticAttackMode", "Собственные настройки режимов атаки");
+		if(ar.openBlock("attack", "пїЅпїЅпїЅпїЅпїЅ")){
+			ar.serialize(hasAutomaticAttackMode, "hasAutomaticAttackMode", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 			if(hasAutomaticAttackMode){
 				attackModeAttribute.setTransport(isTransport());
-				ar.serialize(attackModeAttribute, "attackModeAttribute", "Настройки режимов атаки");
+				ar.serialize(attackModeAttribute, "attackModeAttribute", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 			}
 
-			ar.serialize(attackTargetNotificationMode, "attackTargetNotificationMode", "Режим оповещения о замеченных врагах");
+			ar.serialize(attackTargetNotificationMode, "attackTargetNotificationMode", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
 			if(attackTargetNotificationMode & TARGET_NOTIFY_ALL)
-				ar.serialize(attackTargetNotificationRadius, "attackTargetNotificationRadius", "Радиус оповещения о замеченных врагах (относительно радиуса видимости)");
+				ar.serialize(attackTargetNotificationRadius, "attackTargetNotificationRadius", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)");
 
-			ar.serialize(noiseTargetEffect, "noiseTargetEffect", "Эффект если услышал шум");
+			ar.serialize(noiseTargetEffect, "noiseTargetEffect", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ");
 
 			ar.closeBlock();
 		}
 
-		if(ar.openBlock("directControl", "Прямое управление")){
+		if(ar.openBlock("directControl", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")){
 			if(GlobalAttributes::instance().directControlMode)
-				ar.serialize(defaultDirectControlEnabled, "defaultDirectControlEnabled", "Включать прямое управление по умолчанию");
-			ar.serialize(syndicateControlAimEnabled, "syndicateControlAimEnabled", "Целиться в синдикатном управлении");
-			ar.serialize(disablePathTrackingInSyndicateControl, "disablePathTrackingInSyndicateControl", "запретить поиск пути в синдикатном управлении");
-			ar.serialize(syndicatControlCameraRestrictionFactor, "syndicatControlCameraRestrictionFactor", "Коэффициент отдаления камеры");
-			ar.serialize(syndicateControlOffset, "syndicateControlOffset", "Смещение камеры для синдикатного управления");
-			ar.serialize(directControlNode, "directControlNode", "Узел для линковки камеры");
-			ar.serialize(directControlOffset, "directControlOffset", "Смещение камеры");
-			ar.serialize(directControlOffsetWater, "directControlOffsetWater", "Смещение камеры для плавания");
+				ar.serialize(defaultDirectControlEnabled, "defaultDirectControlEnabled", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(syndicateControlAimEnabled, "syndicateControlAimEnabled", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(disablePathTrackingInSyndicateControl, "disablePathTrackingInSyndicateControl", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(syndicatControlCameraRestrictionFactor, "syndicatControlCameraRestrictionFactor", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(syndicateControlOffset, "syndicateControlOffset", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(directControlNode, "directControlNode", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(directControlOffset, "directControlOffset", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(directControlOffsetWater, "directControlOffsetWater", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			if(!ar.inPlace()){
 				float tmp = directControlThetaMin / M_PI * 180.f;
-				ar.serialize(tmp, "directControlThetaMin", "Минимальный угол");
+				ar.serialize(tmp, "directControlThetaMin", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 				directControlThetaMin = clamp(tmp / 180.f * M_PI, 0.f, M_PI) ;
 				tmp = directControlThetaMax / M_PI * 180.f;
-				ar.serialize(tmp, "directControlThetaMax", "Максимальный угол");
+				ar.serialize(tmp, "directControlThetaMax", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 				directControlThetaMax = clamp(tmp / 180.f * M_PI, directControlThetaMin, M_PI) ;
 			}
 			ar.closeBlock();
@@ -927,43 +927,43 @@ void AttributeBase::serialize(Archive& ar)
 	}
 
 	if(isObjective() || isProjectile()){
-		if(ar.openBlock("Death", "Гибель")){
+		if(ar.openBlock("Death", "пїЅпїЅпїЅпїЅпїЅпїЅ")){
 			if(!ar.inPlace()){
-				ar.serialize(waterEffect, "waterEffect", "воздействие от воды");
-				ar.serialize(lavaEffect, "lavaEffect", "воздействие от лавы");
-				ar.serialize(iceEffect, "iceEffect", "воздействие от заморозки");
-				ar.serialize(earthEffect, "earthEffect", "воздействие от земли");
+				ar.serialize(waterEffect, "waterEffect", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ");
+				ar.serialize(lavaEffect, "lavaEffect", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ");
+				ar.serialize(iceEffect, "iceEffect", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(earthEffect, "earthEffect", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 			}
    			harmAttr.serialize(ar);
-			ar.serialize(contactWeight, "contactWeight", "Сила воздействия при контакте");
+			ar.serialize(contactWeight, "contactWeight", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 			if(isBuilding() || isLegionary() || isPad()){
-				ar.serialize(unitAttackClass, "unitAttackClass", "класс атаки юнита");
+				ar.serialize(unitAttackClass, "unitAttackClass", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 				if(unitAttackClass == ATTACK_CLASS_ENVIRONMENT_BIG_BUILDING)
 					unitAttackClass = ATTACK_CLASS_LIGHT;
 
-				ar.serialize(excludeFromAutoAttack, "excludeFromAutoAttack", "Исключить из автоматичекского поиска целей для атаки");
+				ar.serialize(excludeFromAutoAttack, "excludeFromAutoAttack", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 				
-				ar.serialize(leavingItems, "leavingItems", "Оставляемые предметы");
-				ar.serialize(leavingItemsRandom, "leavingItemsRandom", "Случайно выбирать один предмет из списка");
-				ar.serialize(dropInventoryItems, "dropInventoryItems", "Оставлять предметы из инвентаря");
-				ar.serialize(deathGainArithmetics, "deathGainArithmetics", "Арифметика за гибель");
+				ar.serialize(leavingItems, "leavingItems", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(leavingItemsRandom, "leavingItemsRandom", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(dropInventoryItems, "dropInventoryItems", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(deathGainArithmetics, "deathGainArithmetics", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
 				if(isLegionary())
-					ar.serialize(armorFactors, "armorFactors", "Коэффициенты брони");
+					ar.serialize(armorFactors, "armorFactors", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 			}
 			ar.closeBlock();
 		}
 	}
 
 	if(isActing()){
-		if(ar.openBlock("Production", "Производство")){
-			ar.serialize(producedUnits, "producedUnits", "Производимые юниты");
+		if(ar.openBlock("Production", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")){
+			ar.serialize(producedUnits, "producedUnits", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 			if(ar.isInput())
 				fixIntMap(producedUnits);
 
-			ar.serialize(producedUnitQueueSize, "producedUnitQueueSize", "Максимальная длина очереди");
-			ar.serialize(dockNodes, "dockNodes", "Имя дока");
+			ar.serialize(producedUnitQueueSize, "producedUnitQueueSize", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(dockNodes, "dockNodes", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 					
 			if(isBuilding()){
 				if(!ar.isEdit() && ar.isOutput()){
@@ -973,18 +973,18 @@ void AttributeBase::serialize(Archive& ar)
 						impassability |= it->second.unit->impassability;
 				}
 				ar.serialize(impassability, "impassibility", 0);
-				ar.serialize(automaticProduction, "automaticProduction", "Автоматическое производство юнитов");
-				ar.serialize(totalProductionNumber, "totalProductionNumber", "Максимальное количество произведенных юнитов или параметров");
+				ar.serialize(automaticProduction, "automaticProduction", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(totalProductionNumber, "totalProductionNumber", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			}
 
 			productivity *= 1.f/logicPeriodSeconds;
-			ar.serialize(productivity, "productivity", "Ресурсодобытчик - производительность в секунду");
+			ar.serialize(productivity, "productivity", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			productivity *= logicPeriodSeconds;
-			ar.serialize(productivityTotal, "productivityTotal", "Ресурсодобытчик - максимальная производительность");
-			ar.serialize(productionRequirement, "productionRequirement", "Требования для производительности ресурса");
-			ar.serialize(productionNightFactor, "productionNightFactor", "Коэффициент ночью");
+			ar.serialize(productivityTotal, "productivityTotal", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(productionRequirement, "productionRequirement", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(productionNightFactor, "productionNightFactor", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 
-			ar.serialize(producedParameters, "producedParameters", "Производимые параметры");
+			ar.serialize(producedParameters, "producedParameters", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			if(ar.isInput())
 				fixIntMap(producedParameters);
 
@@ -996,8 +996,8 @@ void AttributeBase::serialize(Archive& ar)
 			}
 
 	        		
-			ar.serialize(resourceCapacity, "resourceCapacity", "Емкость для ресурса");
-			ar.serialize(putInIdleList, "putInIdleList", "Помещать в список бездействующих юнитов");
+			ar.serialize(resourceCapacity, "resourceCapacity", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(putInIdleList, "putInIdleList", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
 			ar.closeBlock();
 		}
@@ -1014,57 +1014,57 @@ void AttributeBase::serialize(Archive& ar)
 	ar.serialize(producedThisFactories, "producedThisFactories", 0);
 
 	if(isObjective()){
-		if(ar.openBlock("chainTimes", "Времена цепочек анимаций")){
-			ar.serialize(MillisecondsWrapper(chainTransitionTime), "chainTransitionTime", "Переходы на другую поверхность");
+		if(ar.openBlock("chainTimes", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")){
+			ar.serialize(MillisecondsWrapper(chainTransitionTime), "chainTransitionTime", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			if(isLegionary()){
-				ar.serialize(MillisecondsWrapper(chainChangeMovementMode), "chainChangeMovementMode", "Переходы между цепочками");
-				ar.serialize(MillisecondsWrapper(chainLandingTime), "chainLandingTime", "Садиться в транспорт");
-				ar.serialize(MillisecondsWrapper(chainUnlandingTime), "chainUnlandingTime", "Высаживаться из транспорта");
-				ar.serialize(MillisecondsWrapper(chainTouchDownTime), "chainTouchDownTime", "Приземляться");
-				ar.serialize(MillisecondsWrapper(chainPickItemTime), "chainPickItemTime", "Подбирать предметы");
+				ar.serialize(MillisecondsWrapper(chainChangeMovementMode), "chainChangeMovementMode", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(MillisecondsWrapper(chainLandingTime), "chainLandingTime", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(MillisecondsWrapper(chainUnlandingTime), "chainUnlandingTime", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(MillisecondsWrapper(chainTouchDownTime), "chainTouchDownTime", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(MillisecondsWrapper(chainPickItemTime), "chainPickItemTime", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			}
 			if(isResourceItem() || isInventoryItem())
-				ar.serialize(MillisecondsWrapper(chainGiveResourceTime), "chainGiveResourceTime", "Отдавать ресурс");
-			ar.serialize(MillisecondsWrapper(chainBirthTime), "chainBirthTime", "Рождение");
+				ar.serialize(MillisecondsWrapper(chainGiveResourceTime), "chainGiveResourceTime", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(MillisecondsWrapper(chainBirthTime), "chainBirthTime", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			if(isActing()){
-				ar.serialize(MillisecondsWrapper(chainRiseTime), "chainRiseTime", "Вставать");
-				ar.serialize(MillisecondsWrapper(chainOpenTime), "chainOpenTime", "Открыть");
-				ar.serialize(MillisecondsWrapper(chainCloseTime), "chainCloseTime", "Закрыть");
-				ar.serialize(MillisecondsWrapper(chainOpenForLandingTime), "chainOpenForLandingTime", "Открыть для посадки");
-				ar.serialize(MillisecondsWrapper(chainCloseForLandingTime), "chainCloseForLandingTime", "Закрыть для посадки");
-				ar.serialize(MillisecondsWrapper(chainFlyDownTime), "chainFlyDownTime", "Спускаться с высоты");
+				ar.serialize(MillisecondsWrapper(chainRiseTime), "chainRiseTime", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(MillisecondsWrapper(chainOpenTime), "chainOpenTime", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(MillisecondsWrapper(chainCloseTime), "chainCloseTime", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(MillisecondsWrapper(chainOpenForLandingTime), "chainOpenForLandingTime", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(MillisecondsWrapper(chainCloseForLandingTime), "chainCloseForLandingTime", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(MillisecondsWrapper(chainFlyDownTime), "chainFlyDownTime", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
 				if(ar.isInput()){
-					ar.serialize(MillisecondsWrapper(chainUpgradedFromBuilding), "chainIsUpgraded", "Апгрейд из здания");
-					ar.serialize(MillisecondsWrapper(chainUpgradedFromBuilding), "chainUpgradedFromBuilding", "Апгрейд из здания");
+					ar.serialize(MillisecondsWrapper(chainUpgradedFromBuilding), "chainIsUpgraded", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+					ar.serialize(MillisecondsWrapper(chainUpgradedFromBuilding), "chainUpgradedFromBuilding", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 				}
 				else{
-					ar.serialize(MillisecondsWrapper(chainUpgradedFromBuilding), "chainUpgradedFromBuilding", "Апгрейд из здания");
+					ar.serialize(MillisecondsWrapper(chainUpgradedFromBuilding), "chainUpgradedFromBuilding", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 				}
 				
-				ar.serialize(MillisecondsWrapper(chainUpgradedFromLegionary), "chainUpgradedFromLegionary", "Апгрейд из юнита");
+				ar.serialize(MillisecondsWrapper(chainUpgradedFromLegionary), "chainUpgradedFromLegionary", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 			}
 			if(isBuilding()){
-				ar.serialize(MillisecondsWrapper(chainUninsatalTime), "chainUninsatalTime", "Демонтаж здания");
-				ar.serialize(killAfterDisconnect, "killAfterDisconnect", "Убивать после отключения");
+				ar.serialize(MillisecondsWrapper(chainUninsatalTime), "chainUninsatalTime", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+				ar.serialize(killAfterDisconnect, "killAfterDisconnect", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 				if(killAfterDisconnect)
-					ar.serialize(MillisecondsWrapper(chainDisconnectTime), "chainDisconnectTime", "Здание отключено");
+					ar.serialize(MillisecondsWrapper(chainDisconnectTime), "chainDisconnectTime", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 			}
 			ar.closeBlock();
 		}
 	}
 
 	if(isActing()){
-		if(ar.openBlock("Invisibility", "Невидимость")){
-			ar.serialize(invisible, "invisible", "Юнит невидим");
-			ar.serialize(canChangeVisibility, "canChangeVisibility", "Юнит может менять режим видимости");
-			ar.serialize(transparenceDiffuseForAlien, "invisibleColorForAlien", "Видимость для врагов");
-			ar.serialize(transparenceDiffuseForClan, "invisibleColorForClan", "Видимость для своих");
+		if(ar.openBlock("Invisibility", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")){
+			ar.serialize(invisible, "invisible", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(canChangeVisibility, "canChangeVisibility", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(transparenceDiffuseForAlien, "invisibleColorForAlien", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+			ar.serialize(transparenceDiffuseForClan, "invisibleColorForClan", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 			ar.closeBlock();
 		}
 	}
 
-	ar.serialize(lodDistance,"distanceLod","ЛОД: Дистанция переключения");
+	ar.serialize(lodDistance,"distanceLod","пїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	if(ar.inPlace()){
 		ar.serialize(waterEffect, "waterEffect", 0);
@@ -1210,7 +1210,7 @@ void AttributeBase::initGeometryAttribute()
 	cObject3dx* logic = logicModel();
 	if(!logic){
         logic = model();
-		kdWarning("GAV", XBuffer() < TRANSLATE("Отсутствует логический баунд в моделе ") < modelName.c_str());
+		kdWarning("GAV", XBuffer() < TRANSLATE("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ ") < modelName.c_str());
 	}
 	xassert(logic);
 	logic->SetPosition(Se3f::ID);
@@ -1229,7 +1229,7 @@ void AttributeBase::initGeometryAttribute()
 	logic->GetBoundBox(boundBox);
 
 	Vect3f deltaBound = boundBox.max - boundBox.min;
-	xassertStr(deltaBound.x > FLT_EPS && deltaBound.y > FLT_EPS && deltaBound.z > FLT_EPS && "Объект слишком маленький или не имеет логического баунда: ", modelName.c_str());
+	xassertStr(deltaBound.x > FLT_EPS && deltaBound.y > FLT_EPS && deltaBound.z > FLT_EPS && "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: ", modelName.c_str());
 	float radiusMin = 3;
 	for(int i = 0; i < 2; i++)
 		if(deltaBound[i] < 2*radiusMin){
@@ -1297,7 +1297,7 @@ const AnimationChain* AttributeBase::animationChainTransition(float factor, cons
 	return 0;
 
 	int numChains = interval.second - interval.first;
-	return &*(interval.first + min(round(factor*numChains), numChains - 1));
+	return &*(interval.first + min((int)round(factor*numChains), numChains - 1));
 }
 
 AnimationChainsInterval AttributeBase::findAnimationChainInterval(ChainID chainID, const AbnormalStateType* astate, MovementState movementState, WeaponAnimationType weapon) const
@@ -1323,14 +1323,14 @@ AnimationChainsInterval AttributeBase::findAnimationChainInterval(ChainID chainI
 						break;
 				}
 			}
-			if(i != end){ // с состояниями
+			if(i != end){ // пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				AnimationChains::const_iterator begin = i;
 				for(; i != end; ++i)
 					if(i->chainID != chainID || i->weapon.animationType() != weapon || !i->checkAbnormalState(astate) || (i->movementState & movementState) != movementState)
 						break;
 				return AnimationChainsInterval(begin, i);
 			}
-			if(iAstateNone != end){ // без состояний
+			if(iAstateNone != end){ // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				AnimationChains::const_iterator begin = i = iAstateNone;
 				for(; i != end; ++i)
 					if(i->chainID != chainID || i->weapon.animationType() != weapon || !i->checkAbnormalState(0) || (i->movementState & movementState) != movementState)
@@ -1367,7 +1367,7 @@ AnimationChainsInterval AttributeBase::findTransitionChainInterval(const Abnorma
 						break;
 				}
 			}
-			if(i != end){ // с состояниями
+			if(i != end){ // пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				AnimationChains::const_iterator begin = i;
 				for(; i != end; ++i)
 					if(i->chainID != CHAIN_TRANSITION || i->weapon.animationType() != weapon || !i->checkAbnormalState(astate)
@@ -1375,7 +1375,7 @@ AnimationChainsInterval AttributeBase::findTransitionChainInterval(const Abnorma
 						break;
 				return AnimationChainsInterval(begin, i);
 			}
-			else if(iAstateNone != end){ // без состояний
+			else if(iAstateNone != end){ // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 				AnimationChains::const_iterator begin = i = iAstateNone;
 				for(; i != end; ++i)
 					if(i->chainID != CHAIN_TRANSITION || i->weapon.animationType() != weapon 
@@ -1431,8 +1431,8 @@ AttributeType AttributeBase::attributeType() const
 
 void AttributeBase::TraceInfo::serialize(Archive& ar)
 {
-	ar.serialize(surfaceKind_, "surfaceKind", "Тип поверхности");
-	ar.serialize(traceTerTool_, "traceTerTool", "След");
+	ar.serialize(surfaceKind_, "surfaceKind", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(traceTerTool_, "traceTerTool", "пїЅпїЅпїЅпїЅ");
 }
 
 //--------------------------------------------
@@ -1520,54 +1520,54 @@ AnimationChain::AnimationChain()
 
 void AnimationChain::serialize(Archive& ar) 
 {
-	ar.serialize(name_, "name", "&Пользовательское имя");
-	ar.serialize(chainID, "chainID", "&Идентификатор цепочки");
-	if(!ar.serialize(movementState, "animationMovementState", "&Движение")){ // conversion 15.02.08
+	ar.serialize(name_, "name", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ");
+	ar.serialize(chainID, "chainID", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	if(!ar.serialize(movementState, "animationMovementState", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")){ // conversion 15.02.08
 		BitVector<MovementStateID> state;
 		ar.serialize(state, "movementState", 0);
 		movementState = state;
 	}
-	ar.serialize(weapon, "weapon", "&Оружие");
+	ar.serialize(weapon, "weapon", "&пїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(chainID == CHAIN_TRANSITION){
-		if(!ar.serialize(transitionToState, "transitionToMovementState", "Переход в состояние")){ // conversion 15.02.08
+		if(!ar.serialize(transitionToState, "transitionToMovementState", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")){ // conversion 15.02.08
 			BitVector<MovementStateID> state;
 			ar.serialize(state, "transitionToState", 0);
 			transitionToState = state;
 		}
 
 	}
-	ar.serialize(counter, "counter", "!&Номер");
-	ar.serialize(RangedWrapperi(possibility, 0, 100), "possibility", "Вероятность");
+	ar.serialize(counter, "counter", "!&пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(RangedWrapperi(possibility, 0, 100), "possibility", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(chainIndex_, "ChainIndex", "&Имя цепочки в модели");
-	ar.serialize(animationGroup_, "AnimationGroup", "&Имя анимационной группы");
-	ar.serialize(visibilityGroup_, "VisibilityGroup", "&Имя группы видимости");
+	ar.serialize(chainIndex_, "ChainIndex", "&пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(animationGroup_, "AnimationGroup", "&пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(visibilityGroup_, "VisibilityGroup", "&пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(animationAcceleration, "animationAcceleration", "Ускорение анимации, %");
-	ar.serialize(cycled, "cycled", "Зацикленная");
+	ar.serialize(animationAcceleration, "animationAcceleration", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, %");
+	ar.serialize(cycled, "cycled", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	ar.serialize(supportedByLogic, "supportedByLogic", 0);
-	ar.serialize(reversed, "reversed", "Проигрывать в обратную сторону");
-	ar.serialize(syncBySound, "syncBySound", "Синхронизировать по звуку");
-	ar.serialize(randomPhase, "randomPhase", "Устанавливать случайную фазу");
-	ar.serialize(effects, "effects", "Спецэффекты");
-	ar.serialize(stopPermanentEffects, "stopPermanentEffects", "Выключать постоянные эффекты");
+	ar.serialize(reversed, "reversed", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(syncBySound, "syncBySound", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(randomPhase, "randomPhase", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+	ar.serialize(effects, "effects", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(stopPermanentEffects, "stopPermanentEffects", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	
-	ar.serialize(soundReferences, "soundReferences", "Звуки");
-	ar.serialize(soundMarkers, "soundMarkers", "Звуковые метки");
-	ar.serialize(noiseRadiusFactor, "noiseRadiusFactor", "Коэффициент для радиуса создаваемого шума");
+	ar.serialize(soundReferences, "soundReferences", "пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(soundMarkers, "soundMarkers", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(noiseRadiusFactor, "noiseRadiusFactor", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 
-	ar.serialize(abnormalStateTypes, "abnormalStateTypes", "&Типы воздействия");
+	ar.serialize(abnormalStateTypes, "abnormalStateTypes", "&пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	if(ar.isOutput()){
 		cObject3dx* model = AttributeBase::model();
 		if(model)
-			period = max(round(model->GetChain(chainIndex())->time*1000/max(1.f + animationAcceleration/100.f, 0.001f)), 100);
+			period = max((int)round(model->GetChain(chainIndex())->time*1000/max(1.f + animationAcceleration/100.f, 0.001f)), 100);
 	}
 
 	ar.serialize(period, "period", 0);
 	float periodSeconds = period/1000.f;
 	if(!ar.inPlace())
-		ar.serialize(periodSeconds, "periodSeconds", "Период анимации (для просмотра), секунды");
+		ar.serialize(periodSeconds, "periodSeconds", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ), пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	if(ar.isInput()){
 		abnormalStateMask = 0;
@@ -1641,8 +1641,8 @@ const char* AnimationChain::name() const
 /////////////////////////////////////
 void UnitColor::serialize(Archive& ar)
 {
-	ar.serialize(color, "color", "Цвет");
-	ar.serialize(isBrightColor, "isBrightColor", "Раскрасить ярко");
+	ar.serialize(color, "color", "пїЅпїЅпїЅпїЅ");
+	ar.serialize(isBrightColor, "isBrightColor", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 }
 
 void UnitColorEffective::apply(cObject3dx* model, float phase)
@@ -1657,20 +1657,22 @@ void UnitColorEffective::apply(cObject3dx* model, float phase)
 	}
 	else {
 		model->SetTextureLerpColor(reset);
+		Color4f ambientColor(clr.r, clr.g, clr.b, 0.2f * phase);
+		Color4f diffuseColor(clr.r, clr.g, clr.b, 0.8f * phase);
 		model->SetColorMaterial(
-			&Color4f(clr.r, clr.g, clr.b, 0.2f * phase),
-			&Color4f(clr.r, clr.g, clr.b, 0.8f * phase),
+			&ambientColor,
+			&diffuseColor,
 			0);
 	}
 }
 
 
 void UnitColorEffective::setColor(const UnitColor& clr, bool reset)
-{	// цвета бывают яркие и не яркие
-	// яркие цвета всегда действуют по одиночке (последний) и они более приоритетны, чем не яркие
-	// альфа яркого цвета - это степень заливки текстуры модели
-	// не яркие цвета складываются, альфа не яркого цвета это всегда прозрачность модели, независимо от типа других цветов
-	// прозрачность берется наименьшая из действующих
+{	// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ) пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	// пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 	if(reset){
 		color = clr.color;
@@ -1710,7 +1712,7 @@ void UnitColorEffective::setOpacity(float op, bool reset)
 		fill_ = 255;
 	}
 	else {
-		color.a = min(color.a, round(op * 255));
+		color.a = min(color.a, (int)round(op * 255));
 	}
 }
 
@@ -1728,10 +1730,10 @@ AttackMode::AttackMode()
 
 void AttackMode::serialize(Archive& ar)
 {
-	ar.serialize(autoAttackMode_, "autoAttackMode", "Режим атаки");
-	ar.serialize(autoTargetFilter_, "autoTargetFilter", "Режим автоматического выбора целей");
-//	ar.serialize(walkAttackMode_, "walkAttackMode", "Режим атаки при движении");
-	ar.serialize(weaponMode_, "weaponMode", "Режим оружия");
+	ar.serialize(autoAttackMode_, "autoAttackMode", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(autoTargetFilter_, "autoTargetFilter", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+//	ar.serialize(walkAttackMode_, "walkAttackMode", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(weaponMode_, "weaponMode", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 AttackModeAttribute::AttackModeAttribute()
@@ -1742,11 +1744,11 @@ AttackModeAttribute::AttackModeAttribute()
 
 void AttackModeAttribute::serialize(Archive& ar)
 {
-	ar.serialize(attackMode_, "attackMode", "Начальные установки режимов атаки");
-	ar.serialize(targetInsideSightRadius_, "targetInsideSightRadius", "Терять цель при выходе из радиуса видимости");
+	ar.serialize(attackMode_, "attackMode", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(targetInsideSightRadius_, "targetInsideSightRadius", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	if(isTransport_)
-		ar.serialize(disableEmptyTransportAttack_, "disableEmptyTransportAttack", "Запретить атаку если в транспорте пусто");
+		ar.serialize(disableEmptyTransportAttack_, "disableEmptyTransportAttack", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 }
 
 //////////////////////////////////////////////////
@@ -1772,67 +1774,67 @@ RaceProperty::RaceProperty(const char* name) :
 void RaceProperty::serialize(Archive& ar) 
 {
 	StringTableBase::serialize(ar); 
-	ar.serialize(locName_, "locName", "Имя расы");
-	ar.serialize(fileNameAddition_, "fileNameAddition", "Добавка к именам файлов");
-	ar.serialize(instrumentary_, "instrumentary", "Служебная");
-	ar.serialize(usedAlways_, "usedAlways", "Загружать всегда");
+	ar.serialize(locName_, "locName", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+	ar.serialize(fileNameAddition_, "fileNameAddition", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(instrumentary_, "instrumentary", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(usedAlways_, "usedAlways", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(shipmentPositionMark_, "shipmentPositionMark", "Флажок точки сбора производимых юнитов");
+	ar.serialize(shipmentPositionMark_, "shipmentPositionMark", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(anchorForAssemblyPoint_, "anchorForAssemblyPoint", "Зона общего сбора альянса");
+	ar.serialize(anchorForAssemblyPoint_, "anchorForAssemblyPoint", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(orderMarks_, "orderMarks", "Визуализация отдачи приказов");
+	ar.serialize(orderMarks_, "orderMarks", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-//	ar.serialize(unitAttackEffect_, "unitAttackEffect", "Визуализация атаки по юниту");
-	ar.serialize(weaponUpgradeEffect_, "weaponUpgradeEffect", "Визуализация апгрейда оружия");
+//	ar.serialize(unitAttackEffect_, "unitAttackEffect", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(weaponUpgradeEffect_, "weaponUpgradeEffect", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(minimapMarks_, "minimapMarks", "Визуализация событий и юнитов на миникарте");
-	ar.serialize(windMarks_, "windMarks", "Визуализация направления ветра на миникарте");
+	ar.serialize(minimapMarks_, "minimapMarks", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(windMarks_, "windMarks", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	if(ar.openBlock("controlAI", "Под управлением AI")){
-		ar.serialize(workForAISprite_, "workForAISprite", "Пометка над юнитом при AI");
-		ar.serialize(workForAIEffect_, "workForAIEffect", "Эффект над юнитом при AI");
+	if(ar.openBlock("controlAI", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ AI")){
+		ar.serialize(workForAISprite_, "workForAISprite", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ AI");
+		ar.serialize(workForAIEffect_, "workForAIEffect", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ AI");
 		ar.closeBlock();
 	}
-	ar.serialize(runModeSprite_, "runModeSprite", "Пометка над юнитом при режиме бега");
+	ar.serialize(runModeSprite_, "runModeSprite", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 
-	if(ar.openBlock("unitSign", "Знак юнита или сквада")){
-		ar.serialize(squadSpriteForOthers_, "squadSpriteForOthers", "Спрайт сквада для остальных игроков");
-		ar.serialize(squadSpriteForOthersHovered_, "squadSpriteForOthersHovered", "Спрайт сквада для остальных игроков при наведении");
+	if(ar.openBlock("unitSign", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")){
+		ar.serialize(squadSpriteForOthers_, "squadSpriteForOthers", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(squadSpriteForOthersHovered_, "squadSpriteForOthersHovered", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		ar.closeBlock();
 	}
 
-	ar.serialize(initialResource, "initialResource", "Первоначальный ресурс");
-	ar.serialize(resourceCapacity, "resourceCapacity", "Первоначальная емкость");
-	ar.serialize(initialUnits, "initialUnits", "Первоначальный набор юнитов");
+	ar.serialize(initialResource, "initialResource", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(resourceCapacity, "resourceCapacity", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(initialUnits, "initialUnits", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 	
 	ar.serialize(commonTriggers, "commonTriggers", 0);
-	ar.serialize(scenarioTriggers, "scenarioTriggers", "Триггера для сингла");
-	ar.serialize(battleTriggers, "battleTriggers", "Триггера для баттла");
-	ar.serialize(multiplayerTriggers, "multiplayerTriggers", "Триггера для мультиплеера");
+	ar.serialize(scenarioTriggers, "scenarioTriggers", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(battleTriggers, "battleTriggers", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(multiplayerTriggers, "multiplayerTriggers", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(ar.isInput() && !ar.isEdit()){
 		if(scenarioTriggers.empty())
 			scenarioTriggers = commonTriggers;
 	}
 
-	ar.serialize(selectQuantityMax, "selectQuantityMax", "Максимальное количество юнитов в селекте");
+	ar.serialize(selectQuantityMax, "selectQuantityMax", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	
-	ar.serialize(playerUnitAttribute_, "playerUnitAttribute", "Юнит-игрок");
+	ar.serialize(playerUnitAttribute_, "playerUnitAttribute", "пїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(startConstructionSound, "startConstructionSound", "Звук на начало строительства здания");
-	ar.serialize(unableToConstructSound, "unableToConstructSound", "Звук, когда здания нельзя установить");
+	ar.serialize(startConstructionSound, "startConstructionSound", "пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(unableToConstructSound, "unableToConstructSound", "пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(attackModeAttribute_, "attackModeAttribute", "Настройки режимов атаки");
+	ar.serialize(attackModeAttribute_, "attackModeAttribute", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(produceMultyAmount, "produceMultyAmount", "Количество заказываемых юнитов с шифтом");
+	ar.serialize(produceMultyAmount, "produceMultyAmount", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(circle, "circle", "Настройки визуализации селекта");
-	ar.serialize(circleTeam, "circleTeam", "Настройки визуализации селекта напарников в командном режиме");
-	ar.serialize(placementZoneCircle, "placementZoneCircle", "Настройки визуализации зоны установки");
+	ar.serialize(circle, "circle", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(circleTeam, "circleTeam", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(placementZoneCircle, "placementZoneCircle", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	selection_param.serialize(ar);
 
-	ar.serialize(screenToPreload, "screenToPreload", "Экран для предзагрузки");
+	ar.serialize(screenToPreload, "screenToPreload", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 void RaceProperty::setUsed(Color4c skinColor, const char* emblemName) const 
@@ -1894,23 +1896,23 @@ string UnitAttributeID::nameRace() const
 
 void UnitAttributeID::serialize(Archive& ar) 
 {
-	ar.serialize(unitName_, "name", "&имя");
-	ar.serialize(race_, "race", "&раса");
+	ar.serialize(unitName_, "name", "&пїЅпїЅпїЅ");
+	ar.serialize(race_, "race", "&пїЅпїЅпїЅпїЅ");
 }
 
 ///////////////////////////////////////////////
 void InterfaceTV::serialize(Archive& ar) 
 {
-	ar.serialize(radius_, "radius", "размер модели");
-	ar.serialize(position_, "position", "смещение");
-	ar.serialize(orientation_, "orientation", "поворот");
-	ar.serialize(chain_, "chain", "анимационная цепочка");
+	ar.serialize(radius_, "radius", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(position_, "position", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(orientation_, "orientation", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(chain_, "chain", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 //////////////////////////////////////////
 void WeaponDamage::serialize(Archive& ar) 
 {
-	ar.serialize(static_cast<ParameterCustom&>(*this), "MainDamage", "Основные повреждения");
+	ar.serialize(static_cast<ParameterCustom&>(*this), "MainDamage", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 ArmorFactors::ArmorFactors() 
@@ -1919,11 +1921,11 @@ ArmorFactors::ArmorFactors()
 
 void ArmorFactors::serialize(Archive& ar)
 {
-	ar.serialize(front, "front", "Перед");
-	ar.serialize(back, "back", "Зад");
-	ar.serialize(left, "left", "Слева");
-	ar.serialize(right, "right", "Справа");
-	ar.serialize(top, "top", "Сверху");
+	ar.serialize(front, "front", "пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(back, "back", "пїЅпїЅпїЅ");
+	ar.serialize(left, "left", "пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(right, "right", "пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(top, "top", "пїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(ar.isInput())
 		used_ = fabs(front - 1.f) > FLT_EPS || fabs(back - 1.f) > FLT_EPS || fabs(left - 1.f) > FLT_EPS
 			|| fabs(right - 1.f) > FLT_EPS || fabs(top - 1.f) < FLT_EPS;
@@ -1960,12 +1962,12 @@ DifficultyPrm::DifficultyPrm(const char* name)
 void DifficultyPrm::serialize(Archive& ar) 
 {
 	StringTableBase::serialize(ar); 
-	ar.serialize(locName, "locName", "Локализованное имя");
-	ar.serialize(triggerDelayFactor, "triggerDelayFactor", "Коэффициент триггера задержка");
-	ar.serialize(orderBuildingsDelay, "orderBuildingsDelay", "Задержка строительства зданий");
-	ar.serialize(orderUnitsDelay, "orderUnitsDelay", "Задержка производства юнитов");
-	ar.serialize(orderParametersDelay, "orderParametersDelay", "Задержка производства параметров");
-	ar.serialize(upgradeUnitDelay, "upgradeUnitDelay", "Задержка апгрейда юнита в здание");
+	ar.serialize(locName, "locName", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ");
+	ar.serialize(triggerDelayFactor, "triggerDelayFactor", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(orderBuildingsDelay, "orderBuildingsDelay", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(orderUnitsDelay, "orderUnitsDelay", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(orderParametersDelay, "orderParametersDelay", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(upgradeUnitDelay, "upgradeUnitDelay", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 // -----------------------------------------
@@ -1981,8 +1983,8 @@ EffectContainer::~EffectContainer()
 
 void EffectContainer::serialize(Archive& ar)
 {
-	ModelSelector::Options effectOptions("*.effect", "Resource\\Fx", "Эффект");
-	ar.serialize(ModelSelector(fileName_, effectOptions), "fileName_", "имя файла");
+	ModelSelector::Options effectOptions("*.effect", "Resource\\Fx", "пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(ModelSelector(fileName_, effectOptions), "fileName_", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 }
 
 EffectKey* EffectContainer::getEffect(float scale, Color4c skin_color) const
@@ -2038,23 +2040,23 @@ EffectAttribute::EffectAttribute (const EffectReference& effectReference, bool i
 
 void EffectAttribute::serialize(Archive& ar)
 {
-	ar.serialize(isCycled_, "isCycled", "зацикливать");
-	ar.serialize(stopImmediately_, "stopImmediately", "Обрывать при окончании");
-	ar.serialize(bindOrientation_, "bindOrientation", "ориентировать по объекту");
-	ar.serialize(legionColor_, "legionColor", "окрашивать в цвет легиона");
-	ar.serialize(switchOffByInterface_, "switchOffByInterface", "Гасить при отключении интерфейса");
-	ar.serialize(switchOffUnderWater_, "switchOffUnderWater", "выключать в воде");
-	ar.serialize(switchOffUnderLava_, "switchOffUnderLava", "выключать в лаве");
-	ar.serialize(switchOffByDay_, "switchOffByDay", "включать ночью");
-	ar.serialize(switchOffOnIce_, "switchOffOnIce", "выключать на льду");
-	ar.serialize(switchOnIce_, "switchOnIce", "включать только на льду");
-	ar.serialize(ignoreFogOfWar_, "ignoreFogOfWar", "виден в тумане войны");
-	ar.serialize(ignoreInvisibility_, "ignoreInvisibility", "виден на невидимом юните");
-	ar.serialize(ignoreDistanceCheck_, "ignoreDistanceCheck", "не пропадает при удалении камеры");
+	ar.serialize(isCycled_, "isCycled", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(stopImmediately_, "stopImmediately", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(bindOrientation_, "bindOrientation", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(legionColor_, "legionColor", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(switchOffByInterface_, "switchOffByInterface", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(switchOffUnderWater_, "switchOffUnderWater", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ");
+	ar.serialize(switchOffUnderLava_, "switchOffUnderLava", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ");
+	ar.serialize(switchOffByDay_, "switchOffByDay", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(switchOffOnIce_, "switchOffOnIce", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ");
+	ar.serialize(switchOnIce_, "switchOnIce", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ");
+	ar.serialize(ignoreFogOfWar_, "ignoreFogOfWar", "пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(ignoreInvisibility_, "ignoreInvisibility", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(ignoreDistanceCheck_, "ignoreDistanceCheck", "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
-	ar.serialize(waterPlacementMode_, "waterPlacementMode", "режим вывода на воде");
+	ar.serialize(waterPlacementMode_, "waterPlacementMode", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ");
 
-	ar.serialize(scale_, "scale", "масштаб");
+	ar.serialize(scale_, "scale", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	ar.serialize(effectReference_, "effectReference", "^");
 }
@@ -2081,23 +2083,23 @@ void EffectAttributeAttachable::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(scaleByModel_, "scaleByModel", "масштабировать по размеру объекта");
-	ar.serialize(onlyForActivePlayer_, "onlyForActivePlayer", "показывать только активному игроку");
+	ar.serialize(scaleByModel_, "scaleByModel", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(onlyForActivePlayer_, "onlyForActivePlayer", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 
 	if (!isCycled_)
-		ar.serialize(synchronizationWithModelAnimation_,"synchronizationWithModelAnimation","синхронизировать с анимацией");
-	ar.serialize(switchOffByAnimationChain_, "switchOffByAnimationChain", "выключается анимацией как постоянный");
+		ar.serialize(synchronizationWithModelAnimation_,"synchronizationWithModelAnimation","пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(switchOffByAnimationChain_, "switchOffByAnimationChain", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(needNodeName_)
-		ar.serialize(node_, "node", "Узел привязки");
+		ar.serialize(node_, "node", "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 // -------------------------------------------
 void AttributeBase::ProducedUnits::serialize(Archive& ar)
 {
-	xassertStr(!(ar.isOutput() && !ar.isEdit() && !unit) && "Пустой производимый юнит у ", currentLibraryKey());
-	ar.serialize(unit, "unit", "&Юнит");
-	ar.serialize(number, "number", "&Количество");
-	ar.serialize(accessValue, "accessValue", "Необходимые параметры для производства");
+	xassertStr(!(ar.isOutput() && !ar.isEdit() && !unit) && "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ ", currentLibraryKey());
+	ar.serialize(unit, "unit", "&пїЅпїЅпїЅпїЅ");
+	ar.serialize(number, "number", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(accessValue, "accessValue", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 ProducedParameters::ProducedParameters() 
@@ -2109,13 +2111,13 @@ ProducedParameters::ProducedParameters()
 void ProducedParameters::serialize(Archive& ar)
 {
 	arithmetics.serialize(ar);
-	ar.serialize(time, "time", "Время, секунды");
-	ar.serialize(cost, "cost", "Стоимость");
-	ar.serialize(accessValue, "accessValue", "Необходимые параметры для производства");
-	ar.serialize(accessBuildingsList, "accessBuildingsList", "Необходимые строения для производства");
-	ar.serialize(sprites_, "sprites", "Спрайты для очереди");
-	ar.serialize(signalVariable, "signalVariable", "Имя сигнальной переменной (нужно задавать для различения уникальных параметров)");
-	ar.serialize(automatic, "automatic", "Производить автоматически");
+	ar.serialize(time, "time", "пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(cost, "cost", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(accessValue, "accessValue", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(accessBuildingsList, "accessBuildingsList", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(sprites_, "sprites", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(signalVariable, "signalVariable", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)");
+	ar.serialize(automatic, "automatic", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 // -------------------------------------------
@@ -2135,16 +2137,16 @@ const AbnormalStateEffect* HarmAttribute::abnormalStateEffect(const AbnormalStat
 
 void HarmAttribute::serializeAbnormalStateEffects(Archive& ar)
 {
-	ar.serialize(abnormalStateEffects, "abnormalStateEffects", "эффекты от воздействий");
+	ar.serialize(abnormalStateEffects, "abnormalStateEffects", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 #ifndef _FINAL_VERSION_
 	AbnormalStateEffects::const_iterator it;
 	FOR_EACH(abnormalStateEffects, it)
 		if(it->effectAttribute().switchOffByInterface()){
 			XBuffer buf;
-			buf < "Юнит: " < AttributeBase::currentLibraryKey()
-				< "\nЭффект: " < it->effectAttribute().effectReference().c_str()
-				< "\nиз воздействия: \"" < it->typeRef().c_str() < "\""
-				< "\nвыключается вместе с интерфейсом";
+			buf < "пїЅпїЅпїЅпїЅ: " < AttributeBase::currentLibraryKey()
+				< "\nпїЅпїЅпїЅпїЅпїЅпїЅ: " < it->effectAttribute().effectReference().c_str()
+				< "\nпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: \"" < it->typeRef().c_str() < "\""
+				< "\nпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ";
 			xxassert(false, buf.c_str());
 			kdError("Effects", buf.c_str());
 		}
@@ -2153,7 +2155,7 @@ void HarmAttribute::serializeAbnormalStateEffects(Archive& ar)
 
 void HarmAttribute::serializeSources(Archive& ar)
 {
-	ar.serialize(deathAttribute_.sources, "sources", "Источники, остающиеся после гибели");
+	ar.serialize(deathAttribute_.sources, "sources", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 void HarmAttribute::serialize(Archive& ar)
@@ -2191,17 +2193,17 @@ chainUpgradeTime(2000)
 
 void AttributeBase::Upgrade::serialize(Archive& ar)
 {
-	xassertStr(!(ar.isOutput() && !ar.isEdit() && !upgrade) && "Пустой апгрейд у ", currentLibraryKey());
-	ar.serialize(upgrade, "upgrade", "&Апгрейд");
-	ar.serialize(automatic, "automatic", "&Автоматический");
-	ar.serialize(upgradeValue, "upgradeValue", "Стоимость апгрейда");
-	ar.serialize(accessParameters, "accessParameters", "Необходимые личные параметры");
-	ar.serialize(chainUpgradeNumber, "chainUpgradeNumber", "Номер цепочки анимации");
-	ar.serialize(MillisecondsWrapper(chainUpgradeTime), "chainUpgradeTime", "Время апгрейда");
+	xassertStr(!(ar.isOutput() && !ar.isEdit() && !upgrade) && "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ ", currentLibraryKey());
+	ar.serialize(upgrade, "upgrade", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(automatic, "automatic", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(upgradeValue, "upgradeValue", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(accessParameters, "accessParameters", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(chainUpgradeNumber, "chainUpgradeNumber", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(MillisecondsWrapper(chainUpgradeTime), "chainUpgradeTime", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(!ar.isEdit() || upgrade && upgrade->isBuilding())
-		ar.serialize(built, "built", "Апгрейдить в достроенное здание");
+		ar.serialize(built, "built", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(!ar.isEdit() || upgrade && upgrade->isLegionary())
-		ar.serialize(level, "level", "Уровень юнита");
+		ar.serialize(level, "level", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 }
 
 const ShowChangeSettings* AttributeBase::getShowChangeSettings(int idx) const
@@ -2235,7 +2237,7 @@ AttributeBase::RigidBodyModelPrmBuilder::RigidBodyModelPrmBuilder(RigidBodyModel
 		++i;
 	}
 	if(!baseNodeInited){
-		xxassert(bodyParts.empty() || modelPrm.size() == 1, "не задан базовый узел");
+		xxassert(bodyParts.empty() || modelPrm.size() == 1, "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 		modelPrm.clear();
 		return;
 	}
@@ -2266,7 +2268,7 @@ PlacementZoneData::PlacementZoneData(const char* name)
 void PlacementZoneData::serialize(Archive& ar)
 {
 	StringTableBase::serialize(ar);
-	ar.serialize(showRadius, "showRadius", "Радиус, на котором показывать зоны подключения");
+	ar.serialize(showRadius, "showRadius", "пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 void loadAllLibraries()
@@ -2309,12 +2311,12 @@ void loadAllLibraries()
 	CommandColorManager::instance();
     TextDB::instance();
 
-    // редактируесть через ComboBox:
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ ComboBox:
 	FormationPatterns::instance();
 	UnitFormationTypes::instance();
 	PlacementZoneTable::instance();
 
-    // Для общей кучи перезагружаем все
+    // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 	GlobalAttributes::instance();
 	EffectLibrary::instance();
 
@@ -2405,12 +2407,12 @@ void saveAllLibraries()
 	CommandColorManager::instance().saveLibrary();
     TextDB::instance().saveLanguage();
 
-    // редактируесть через ComboBox:
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ ComboBox:
 	FormationPatterns::instance().saveLibrary();
 	UnitFormationTypes::instance().saveLibrary();
 	PlacementZoneTable::instance().saveLibrary();
 
-    // Для общей кучи перезаписываем все
+    // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 	GlobalAttributes::instance().saveLibrary();
 	GameOptions::instance().saveLibrary();
 	GameOptions::instance().savePresets();
@@ -2450,7 +2452,7 @@ void AuxAttribute::serialize(Archive& ar)
 {
 	StringTableBase::serialize(ar);
 
-	ar.serialize(type_, "|type|second", "Значение"); // CONVERSION 31.07.07
+	ar.serialize(type_, "|type|second", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"); // CONVERSION 31.07.07
 }
 
 AuxAttributeReference::AuxAttributeReference(const AttributeBase* attribute)
@@ -2501,7 +2503,7 @@ void UnitAttribute::serialize(Archive& ar)
 		else
 			ar.serialize(name_, "|name|first", 0);
 	}
-	ar.serialize(type_, "|type|second", "Значение"); // CONVERSION 31.07.07
+	ar.serialize(type_, "|type|second", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ"); // CONVERSION 31.07.07
 }
 
 void UnitAttribute::setKey(const UnitAttributeID& key)
@@ -2534,7 +2536,7 @@ void UnitAttribute::editorCreate(const char* name, const char* groupName)
 	if(p != groupName + strlen(groupName)){
 		string race(groupName, p);
 		if(!RaceTable::instance().exists(race.c_str())){
-			xassertStr(0 && "Такой расы не существует", race.c_str());
+			xassertStr(0 && "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", race.c_str());
 			return;
 		}
 
@@ -2669,29 +2671,29 @@ BodyPartAttribute::BodyPartAttribute()
 
 void BodyPartAttribute::serialize(Archive& ar)
 {
-	ar.serialize(bodyPartType, "bodyPartType", "&Тип части тела");
-	ar.serialize(functionality, "functionality", "Функционал");
+	ar.serialize(bodyPartType, "bodyPartType", "&пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+	ar.serialize(functionality, "functionality", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(functionality & FIRE)
-		ar.serialize(weapons, "weapons", "Влияет на оружие");
-	ar.serialize(percent, "percent", "Процент от общего здоровья");
-	ar.serialize(visibilitySet_, "visibilitySetName", "&Часть модели");
+		ar.serialize(weapons, "weapons", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(percent, "percent", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(visibilitySet_, "visibilitySetName", "&пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 	VisibilityGroupOfSet::setVisibilitySet(visibilitySet_);
-	ar.serialize(defaultGarment, "defaultGarment", "&Одежда по умолчанию");
-	ar.serialize(possibleGarments, "possibleGarments", "Возможные одежды");
-	ar.serialize(automaticGarments, "automaticGarments", "Автоматические одежды");
-	ar.serialize(rigidBodyBodyPartPrm, "rigidBodyBodyPartPrm", "Физическая модель");
+	ar.serialize(defaultGarment, "defaultGarment", "&пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(possibleGarments, "possibleGarments", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(automaticGarments, "automaticGarments", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(rigidBodyBodyPartPrm, "rigidBodyBodyPartPrm", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 void BodyPartAttribute::Garment::serialize(Archive& ar)
 {
-	ar.serialize(visibilityGroup, "visibilityGroup", "Группа видимости");
-	ar.serialize(item, "item", "Предмет");
+	ar.serialize(visibilityGroup, "visibilityGroup", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(item, "item", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 void BodyPartAttribute::AutomaticGarment::serialize(Archive& ar)
 {
 	Garment::serialize(ar);
-	ar.serialize(parameters, "parameters", "Требуемые параметры");
+	ar.serialize(parameters, "parameters", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 RigidBodyNodePrm::RigidBodyNodePrm() :
@@ -2705,15 +2707,15 @@ RigidBodyNodePrm::RigidBodyNodePrm() :
 
 void RigidBodyNodePrm::serialize(Archive& ar)
 {
-	ar.serialize(logicNode, "logicNode", "&Логический узел");
-	ar.serialize(graphicNode, "graphicNode", "&Графический узел");
+	ar.serialize(logicNode, "logicNode", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+	ar.serialize(graphicNode, "graphicNode", "&пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
 	upperLimits.set(R2G(upperLimits.x), R2G(upperLimits.y), R2G(upperLimits.z));
 	lowerLimits.set(R2G(lowerLimits.x), R2G(lowerLimits.y), R2G(lowerLimits.z));
-	ar.serialize(upperLimits, "upperLimits", "Верхний предел джоинта");
-	ar.serialize(lowerLimits, "lowerLimits", "Нижний предел джоинта");
+	ar.serialize(upperLimits, "upperLimits", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(lowerLimits, "lowerLimits", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	upperLimits.set(G2R(upperLimits.x), G2R(upperLimits.y), G2R(upperLimits.z));
 	lowerLimits.set(G2R(lowerLimits.x), G2R(lowerLimits.y), G2R(lowerLimits.z));
-	ar.serialize(mass, "mass", "Масса");
+	ar.serialize(mass, "mass", "пїЅпїЅпїЅпїЅпїЅ");
 	ar.serialize(parent, "parent", 0);
 	ar.serialize(bodyPartID, "bodyPartID", 0);
 }

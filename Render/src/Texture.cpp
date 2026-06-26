@@ -31,7 +31,7 @@ cTexture::~cTexture()
 		rd->TexLibrary.DeleteFromDefaultPool(this);
 
 	}else
-		xassert(0 && "Текстура удалена слишком поздно");
+		xassert(0 && "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 bool cTexture::reload()
@@ -44,13 +44,13 @@ bool cTexture::reload()
 
 	xassert(name_.find_first_of("###") == string::npos);
 
-	ExportInterface::export(name());
-	ExportInterface::export(GetSelfIlluminationName());
-	ExportInterface::export(logoName());
-	ExportInterface::export(GetSkinColorName());
+	ExportInterface::exportFile(name());
+	ExportInterface::exportFile(GetSelfIlluminationName());
+	ExportInterface::exportFile(logoName());
+	ExportInterface::exportFile(GetSkinColorName());
 
 	if(getExtention(name()) == "dds")
-		return reloadDDS();//Не слишком корректно работает, так как нет возможности узнать, полупрозрачная ли текстура.
+		return reloadDDS();//пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 
 	cFileImage* fileImage = createFileImage();
 	if(!fileImage)
@@ -85,7 +85,7 @@ cFileImage* cTexture::createFileImage()
 	else{
 		cFileImage* fileImage = cFileImage::Create(name(), GetSelfIlluminationName(), logoName(), GetSkinColorName(), skin_color, &logoPosition_, logoAngle_);
 		if(!fileImage)
-			return false;
+			return 0;
 		if(fileImage->GetX() != 1<<ReturnBit(fileImage->GetX()) || fileImage->GetY() != 1<<ReturnBit(fileImage->GetY())){
 			VisError << "Wrong width or height: " << name() << VERR_END;
 			return 0;
@@ -238,7 +238,7 @@ IDirect3DTexture9* ResizeCopy(int level,IDirect3DTexture9* pIn)
 	return lpD3DTextureDst;
 }
 
-//Постирать внутри, и ResizeCopy использовать!
+//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ ResizeCopy пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ!
 void cTexture::Resize(int level)
 {
 	if(level <= 0 || level >= mipmapNumber_ || 
@@ -275,7 +275,7 @@ void cTexture::saveDDS(const char* file_name, int level)
 
 	HRESULT hr = D3DXSaveTextureToFile(file_name, D3DXIFF_DDS, pOut, 0);
 	if(hr != DD_OK)
-		kdError("3d", XBuffer() < "Ошибка при сохранении файла: " < file_name < " Error: " <= hr);
+		kdError("3d", XBuffer() < "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: " < file_name < " Error: " <= hr);
 	
 	RELEASE(pOut);
 }

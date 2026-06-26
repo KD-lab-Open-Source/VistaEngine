@@ -91,7 +91,7 @@ public:
 };
 
 class cFixedWavesContainer;
-// Класс источник волн
+// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 class cFixedWaves
 {
 	struct OneWave
@@ -153,7 +153,7 @@ public:
 	cFixedWaves();
 	~cFixedWaves();
 	
-	void ShowInfo(Color4c& color = Color4c(128,128,255));
+	void ShowInfo(const Color4c& color = Color4c(128,128,255));
 	int SelectPoint(const Vect3f &point);
 	void SelectPoint(int pnt);
 

@@ -6,7 +6,8 @@ add_library(Units STATIC
     BaseUnit.cpp
     BaseUniverseObject.cpp
     CommandsQueue.cpp
-    Economic.cpp
+    # Economic.cpp omitted: orphan (in neither Core.vcproj nor Game.vcproj) and
+    # includes a non-existent "Config.h". Like AI/AITileMap.cpp.
     EffectController.cpp
     EnginePrm.cpp
     EnvironmentSimple.cpp

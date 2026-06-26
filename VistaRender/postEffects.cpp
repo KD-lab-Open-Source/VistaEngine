@@ -634,7 +634,7 @@ void PostEffectUnderWater::redraw(float dtime)
 
 	PE_RENDER_STATE_RESTORE;
 }
-void PostEffectUnderWater::setFog(Color4f& clr)
+void PostEffectUnderWater::setFog(const Color4f& clr)
 {
 	Vect2f fog;
 	if(scale_ < 1){
@@ -696,7 +696,7 @@ void PostEffectDOF::setDofParams(Vect2f &params)
 {
 	dofParams_.x = params.x;
 	if((params.y-params.x)>FLT_EPS)
-		//dofParams_.y = 2.f/params.y; //формула для размывания вблизи (правильная)
+		//dofParams_.y = 2.f/params.y; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
 		dofParams_.y = 1.f/(params.y-params.x); 
 	else
 		dofParams_.y=1;

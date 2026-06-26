@@ -369,9 +369,9 @@ void GrassMap::SetGrass(float x, float y, float radius, int texture, int count, 
 	if (!textureMap_)
 		return;
 	xassert(count>0 && count <=16);
-	int xx = round(x)>>grassMapShift;
-	int yy = round(y)>>grassMapShift;
-	int rad = round(radius)>>grassMapShift;
+	int xx = int(round(x))>>grassMapShift;
+	int yy = int(round(y))>>grassMapShift;
+	int rad = int(round(radius))>>grassMapShift;
 	int pix = (texture+1)<<textureCountShift;
 	Vect2i min(xx-rad,yy-rad);
 	Vect2i max(xx+rad,yy+rad);
@@ -681,10 +681,10 @@ void GrassMap::DownGrass(Vect3f pos, float radius)
 {
 	Vect2i tmin;
 	Vect2i tmax;
-	tmin.x = round(pos.x - radius)>>tileShift;
-	tmin.y = round(pos.y - radius)>>tileShift;
-	tmax.x = round(pos.x + radius)>>tileShift;
-	tmax.y = round(pos.y + radius)>>tileShift;
+	tmin.x = int(round(pos.x - radius))>>tileShift;
+	tmin.y = int(round(pos.y - radius))>>tileShift;
+	tmax.x = int(round(pos.x + radius))>>tileShift;
+	tmax.y = int(round(pos.y + radius))>>tileShift;
 	tmin.x = max(0,tmin.x);
 	tmin.y = max(0,tmin.y);
 	tmax.x = min(tileNumber_.x-1,tmax.x);
@@ -715,10 +715,10 @@ void GrassMap::DeleteGrass(Vect3f pos, float radius)
 {
 	Vect2i tmin;
 	Vect2i tmax;
-	tmin.x = round(pos.x - radius)>>tileShift;
-	tmin.y = round(pos.y - radius)>>tileShift;
-	tmax.x = round(pos.x + radius)>>tileShift;
-	tmax.y = round(pos.y + radius)>>tileShift;
+	tmin.x = int(round(pos.x - radius))>>tileShift;
+	tmin.y = int(round(pos.y - radius))>>tileShift;
+	tmax.x = int(round(pos.x + radius))>>tileShift;
+	tmax.y = int(round(pos.y + radius))>>tileShift;
 	tmin.x = max(0,tmin.x);
 	tmin.y = max(0,tmin.y);
 	tmax.x = min(tileNumber_.x-1,tmax.x);

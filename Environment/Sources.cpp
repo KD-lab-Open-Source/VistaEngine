@@ -26,28 +26,28 @@
 
 #pragma warning(disable: 4355)
 
-WRAP_LIBRARY(SourcesLibrary, "SourcesLibrary", "Источники", "Scripts\\Content\\SourcesLibrary", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(SourcesLibrary, "SourcesLibrary", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", "Scripts\\Content\\SourcesLibrary", 0, LIBRARY_EDITABLE);
 
 DECLARE_SEGMENT(Sources)
-REGISTER_CLASS(SourceBase, SourceZone, "Зона на мире");
-REGISTER_CLASS(SourceBase, SourceLightning, "Зона с молниями");
-REGISTER_CLASS(SourceBase, SourceWater, "Источник воды");
-REGISTER_CLASS(SourceBase, SourceBubble, "Источник пузырьков");
-REGISTER_CLASS(SourceBase, SourceIce, "Источник льда");
-REGISTER_CLASS(SourceBase, SourceFreeze, "Источник заморозки");
-REGISTER_CLASS(SourceBase, SourceLight, "Источник света");
-REGISTER_CLASS(SourceBase, SourceTerTool, "Источник тулзеров");
-REGISTER_CLASS(SourceBase, SourceImpulse, "Источник импульса");
-REGISTER_CLASS(SourceBase, SourceTornado, "Источник торнадо");
-REGISTER_CLASS(SourceBase, SourceBlast, "Источник взрывной волны");
-REGISTER_CLASS(SourceBase, SourceCameraShaking, "Источник тряски камеры");
-REGISTER_CLASS(SourceBase, SourceFlash, "Вспышка экрана");
-REGISTER_CLASS(SourceBase, SourceDetector, "Детектор");
-REGISTER_CLASS(SourceBase, SourceWaterWave, "Источник волны на воде");
-REGISTER_CLASS(SourceBase, SourceShield, "Источник защитного поля");
-REGISTER_CLASS(SourceBase, SourceTeleport, "Источник телепортатор");
-REGISTER_CLASS(SourceBase, SourceDeleteGrass, "Источник удаления травы");
-REGISTER_CLASS(SourceBase, SourceFlock, "Истоник - стая на мире");
+REGISTER_CLASS(SourceBase, SourceZone, "пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(SourceBase, SourceLightning, "пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(SourceBase, SourceWater, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(SourceBase, SourceBubble, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(SourceBase, SourceIce, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(SourceBase, SourceFreeze, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(SourceBase, SourceLight, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(SourceBase, SourceTerTool, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(SourceBase, SourceImpulse, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(SourceBase, SourceTornado, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(SourceBase, SourceBlast, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(SourceBase, SourceCameraShaking, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(SourceBase, SourceFlash, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(SourceBase, SourceDetector, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(SourceBase, SourceWaterWave, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(SourceBase, SourceShield, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(SourceBase, SourceTeleport, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(SourceBase, SourceDeleteGrass, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+REGISTER_CLASS(SourceBase, SourceFlock, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ");
 
 void SourceIce::quant()
 {
@@ -60,7 +60,7 @@ void SourceIce::quant()
 void SourceIce::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(RangedWrapperf(deltaTemperature_, -10.0f, 10.0f, 0.1f), "deltaTemparature", "Разница температуры");
+	ar.serialize(RangedWrapperf(deltaTemperature_, -10.0f, 10.0f, 0.1f), "deltaTemparature", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	serializationApply(ar);
 }
 
@@ -100,7 +100,7 @@ void SourceWater::stop()
 void SourceWater::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(RangedWrapperf (deltaHeight_, -10.0f, 10.0f, 0.1f), "deltaHeight", "Разница высоты");
+	ar.serialize(RangedWrapperf (deltaHeight_, -10.0f, 10.0f, 0.1f), "deltaHeight", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
 	serializationApply(ar);
 }
 
@@ -117,7 +117,7 @@ void SourceEffect::serialize(Archive& ar)
 		if(ar.isInput())
 			effectTime_ = effectTime;
 	}
-	ar.serialize(effectAttribute_, "effectAttribute", "Эффект");
+	ar.serialize(effectAttribute_, "effectAttribute", "пїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 void SourceEffect::quant()
@@ -135,7 +135,7 @@ void SourceEffect::showDebug() const
 
 void SourceEffect::effectStart()
 {
-	xassert(enabled() && "Создание эффекта для источника не на мире");
+	xassert(enabled() && "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ");
 	effectStop();
 	if (!effectPause_){
 		start_timer_auto();
@@ -191,8 +191,8 @@ void SourceDamage::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(damage_, "Damage", "повреждения");
-	ar.serialize(abnormalState_, "abnormalState", "воздействие на юниты");
+	ar.serialize(damage_, "Damage", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(abnormalState_, "abnormalState", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 	if(enabled() && ar.isInput())
 		setScanEnvironment(active());
 }
@@ -365,16 +365,16 @@ SourceWaterWave::~SourceWaterWave()
 void SourceWaterWave::serialize(Archive& ar)
 {
     __super::serialize(ar);
-    ar.serialize(flatWave_, "flatWave", "Прямая волна");
+    ar.serialize(flatWave_, "flatWave", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
     if (flatWave_)
-        ar.serialize(sizeWave_, "sizeWave", "Размер волны");
-    ar.serialize(beginRadius_, "beginRadius", "Начальный радиус");
-    ar.serialize(maxRadius_, "maxRadius", "Максимальный Радиус");
-    ar.serialize(fadeRadius_, "fadeRadius", "Начальный радиус затухания");
-    ar.serialize(RangedWrapperi(waveLenght_,32,maxRadius_/2), "waveLenght", "Длинна волны");
-    ar.serialize(RangedWrapperf(amplitude_,1,waveLenght_/10,1.0f), "amplitude", "Амплитуда волны");
-    ar.serialize(speed_, "speed", "Скорость волны");
-    ar.serialize(autoKill_, "autokill", "Автоудаление");
+        ar.serialize(sizeWave_, "sizeWave", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+    ar.serialize(beginRadius_, "beginRadius", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+    ar.serialize(maxRadius_, "maxRadius", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+    ar.serialize(fadeRadius_, "fadeRadius", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+    ar.serialize(RangedWrapperi(waveLenght_,32,maxRadius_/2), "waveLenght", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+    ar.serialize(RangedWrapperf(amplitude_,1,waveLenght_/10,1.0f), "amplitude", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+    ar.serialize(speed_, "speed", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+    ar.serialize(autoKill_, "autokill", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
     curRadius_ = beginRadius_;
 }
 
@@ -419,8 +419,8 @@ void SourceWaterWave::quant()
         float x2 = max(v1.x,max(v2.x,max(v3.x,v4.x)));
         float y1 = min(v1.y,min(v2.y,min(v3.y,v4.y)));
         float y2 = max(v1.y,max(v2.y,max(v3.y,v4.y)));
-        for (int i = round(x1)>>coordShift_; i<round(x2)>>coordShift_; i++)
-            for (int j = round(y1)>>coordShift_; j<round(y2)>>coordShift_; j++)
+        for (int i = int(round(x1))>>coordShift_; i<int(round(x2))>>coordShift_; i++)
+            for (int j = int(round(y1))>>coordShift_; j<int(round(y2))>>coordShift_; j++)
             {
                 if (i < 0 || i>=gridSize_.x ||
                     j < 0 || j>=gridSize_.y)
@@ -446,8 +446,8 @@ void SourceWaterWave::quant()
         for (int i = 0; i<nRadius*2; i++)
             for (int j = 0; j<nRadius*2; j++)
             {
-                int xx = (round(position().x)>>coordShift_);
-                int yy = (round(position().y)>>coordShift_);
+                int xx = (int(round(position().x))>>coordShift_);
+                int yy = (int(round(position().y))>>coordShift_);
                 Vect2i p(xx-nRadius+i,yy-nRadius+j);
                 if (p.x < 0 || p.x>=gridSize_.x ||
                     p.y < 0 || p.y>=gridSize_.y)
