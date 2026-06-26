@@ -5,15 +5,15 @@
 #include "Serialization/SerializationFactory.h"
 #include "Serialization/StringTableImpl.h"
 
-WRAP_LIBRARY(FormationPatterns, "FormationPattern", "Паттерны формаций", "Scripts\\Content\\FormationPattern", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(FormationPatterns, "FormationPattern", "РџР°С‚С‚РµСЂРЅС‹ С„РѕСЂРјР°С†РёР№", "Scripts\\Content\\FormationPattern", 0, LIBRARY_EDITABLE);
 
-WRAP_LIBRARY(AttributeSquadTable, "AttributeSquad", "Типы сквадов", "Scripts\\Content\\AttributeSquad", 0, LIBRARY_EDITABLE | LIBRARY_IN_PLACE);
+WRAP_LIBRARY(AttributeSquadTable, "AttributeSquad", "РўРёРїС‹ СЃРєРІР°РґРѕРІ", "Scripts\\Content\\AttributeSquad", 0, LIBRARY_EDITABLE | LIBRARY_IN_PLACE);
 
 BEGIN_ENUM_DESCRIPTOR(VelocityCorrection, "VelocityCorrection");
-REGISTER_ENUM(VELOCITY_DEFAULT, "не корректировать");
-REGISTER_ENUM(VELOCITY_MIN, "по минимальной");
-REGISTER_ENUM(VELOCITY_AVERAGE, "по средней");
-REGISTER_ENUM(VELOCITY_MAX, "по максимальной");
+REGISTER_ENUM(VELOCITY_DEFAULT, "РЅРµ РєРѕСЂСЂРµРєС‚РёСЂРѕРІР°С‚СЊ");
+REGISTER_ENUM(VELOCITY_MIN, "РїРѕ РјРёРЅРёРјР°Р»СЊРЅРѕР№");
+REGISTER_ENUM(VELOCITY_AVERAGE, "РїРѕ СЃСЂРµРґРЅРµР№");
+REGISTER_ENUM(VELOCITY_MAX, "РїРѕ РјР°РєСЃРёРјР°Р»СЊРЅРѕР№");
 END_ENUM_DESCRIPTOR(VelocityCorrection);
 
 ///////////////////////////////////////////////////
@@ -27,7 +27,7 @@ void FormationPattern::Cell::serialize(Archive& ar)
 void FormationPattern::serialize(Archive& ar)
 {
 	StringTableBase::serialize(ar); 
-	ar.serialize(cells_, "cells", "Ячейки");
+	ar.serialize(cells_, "cells", "РЇС‡РµР№РєРё");
 }
 
 ///////////////////////////////////////////////////
@@ -40,17 +40,17 @@ AttributeSquad::Formation::Formation()
 void AttributeSquad::Formation::serialize(Archive& ar)
 {
  	ar.serialize(formationPattern, "formationPattern", "^");
- 	ar.serialize(rotateFront, "rotateFront", "Поворачивать фронт");
-	ar.serialize(uniformFormation, "uniformFormation", "Однородная формация");
- 	ar.serialize(attackByRadius, "attackByRadius", "Атаковать на указанном радиусе");
-	if(!ar.serialize(velocityCorrection, "velocityCorrection", "Корректировать скорость юнитов")){
+ 	ar.serialize(rotateFront, "rotateFront", "РџРѕРІРѕСЂР°С‡РёРІР°С‚СЊ С„СЂРѕРЅС‚");
+	ar.serialize(uniformFormation, "uniformFormation", "РћРґРЅРѕСЂРѕРґРЅР°СЏ С„РѕСЂРјР°С†РёСЏ");
+ 	ar.serialize(attackByRadius, "attackByRadius", "РђС‚Р°РєРѕРІР°С‚СЊ РЅР° СѓРєР°Р·Р°РЅРЅРѕРј СЂР°РґРёСѓСЃРµ");
+	if(!ar.serialize(velocityCorrection, "velocityCorrection", "РљРѕСЂСЂРµРєС‚РёСЂРѕРІР°С‚СЊ СЃРєРѕСЂРѕСЃС‚СЊ СЋРЅРёС‚РѕРІ")){
 		bool correctSpeed = false;
-		ar.serialize(correctSpeed, "correctSpeed", "Корректировать скорость юнитов");
+		ar.serialize(correctSpeed, "correctSpeed", "РљРѕСЂСЂРµРєС‚РёСЂРѕРІР°С‚СЊ СЃРєРѕСЂРѕСЃС‚СЊ СЋРЅРёС‚РѕРІ");
 		if(correctSpeed)
 			velocityCorrection = VELOCITY_AVERAGE;
 	}
 	if(!ar.isEdit() || attackByRadius)
- 		ar.serialize(attackRadius, "attackRadius", "Радиус атаки");
+ 		ar.serialize(attackRadius, "attackRadius", "Р Р°РґРёСѓСЃ Р°С‚Р°РєРё");
 }
 
 AttributeSquad::AttributeSquad(const char* name) 
@@ -80,7 +80,7 @@ AttributeSquad::AttributeSquad(const char* name)
 
 void AttributeSquad::serialize(Archive& ar) 
 {
-	if(ar.isOutput() && !ar.isEdit()){	// Сложные расчеты - только перед записью
+	if(ar.isOutput() && !ar.isEdit()){	// РЎР»РѕР¶РЅС‹Рµ СЂР°СЃС‡РµС‚С‹ - С‚РѕР»СЊРєРѕ РїРµСЂРµРґ Р·Р°РїРёСЃСЊСЋ
 		allowedUnitsAttributes.clear();
 		AttributeLibrary::Map::const_iterator mi;
 		FOR_EACH(AttributeLibrary::instance().map(), mi){
@@ -94,16 +94,16 @@ void AttributeSquad::serialize(Archive& ar)
 	}
 
 	StringTableBase::serialize(ar);
-	ar.serialize(parametersInitial, "parametersInitial", "Личные (начальные) параметры сквада");
-	ar.serialize(formations, "formations", "Формации");
-	ar.serialize(enableJoin, "enableJoin", "Разрешить объединение сквадов");
-	ar.serialize(automaticJoin, "automaticJoin", "Автоматически присоединять юнитов");
+	ar.serialize(parametersInitial, "parametersInitial", "Р›РёС‡РЅС‹Рµ (РЅР°С‡Р°Р»СЊРЅС‹Рµ) РїР°СЂР°РјРµС‚СЂС‹ СЃРєРІР°РґР°");
+	ar.serialize(formations, "formations", "Р¤РѕСЂРјР°С†РёРё");
+	ar.serialize(enableJoin, "enableJoin", "Р Р°Р·СЂРµС€РёС‚СЊ РѕР±СЉРµРґРёРЅРµРЅРёРµ СЃРєРІР°РґРѕРІ");
+	ar.serialize(automaticJoin, "automaticJoin", "РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРё РїСЂРёСЃРѕРµРґРёРЅСЏС‚СЊ СЋРЅРёС‚РѕРІ");
 	if(automaticJoin){
-		ar.serialize(automaticJoinRadius, "automaticJoinRadius", "Радиус автоматического присоединения");
-		ar.serialize(automaticJoinRadiusEffect, "automaticJoinRadiusEffect", "Визуализация радиуса автоматического присоединения");
+		ar.serialize(automaticJoinRadius, "automaticJoinRadius", "Р Р°РґРёСѓСЃ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРіРѕ РїСЂРёСЃРѕРµРґРёРЅРµРЅРёСЏ");
+		ar.serialize(automaticJoinRadiusEffect, "automaticJoinRadiusEffect", "Р’РёР·СѓР°Р»РёР·Р°С†РёСЏ СЂР°РґРёСѓСЃР° Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРіРѕ РїСЂРёСЃРѕРµРґРёРЅРµРЅРёСЏ");
 	}
-	ar.serialize(joinRadius, "joinRadius", "Максимальный радиус объеденения сквадов");
-	ar.serialize(joinRadiusEffect, "joinRadiusEffect", "Визуализация максимального радиуса объеденения сквадов");
+	ar.serialize(joinRadius, "joinRadius", "РњР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°РґРёСѓСЃ РѕР±СЉРµРґРµРЅРµРЅРёСЏ СЃРєРІР°РґРѕРІ");
+	ar.serialize(joinRadiusEffect, "joinRadiusEffect", "Р’РёР·СѓР°Р»РёР·Р°С†РёСЏ РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ СЂР°РґРёСѓСЃР° РѕР±СЉРµРґРµРЅРµРЅРёСЏ СЃРєРІР°РґРѕРІ");
 
 	if(ar.isInput()){
 		internal = true;
@@ -111,57 +111,57 @@ void AttributeSquad::serialize(Archive& ar)
 			formations.push_back(Formation());
 	}
 
-	ar.serialize(accountingNumber, "accountingNumber", "Число, учитываемое в максимальном количестве юнитов");
-	ar.serialize(unitNumberMaxType, "unitNumberMaxType", "Тип максимального количества юнитов");
-	ar.serialize(allowedUnits, "allowedUnits", "Список допустимых типов юнитов");
+	ar.serialize(accountingNumber, "accountingNumber", "Р§РёСЃР»Рѕ, СѓС‡РёС‚С‹РІР°РµРјРѕРµ РІ РјР°РєСЃРёРјР°Р»СЊРЅРѕРј РєРѕР»РёС‡РµСЃС‚РІРµ СЋРЅРёС‚РѕРІ");
+	ar.serialize(unitNumberMaxType, "unitNumberMaxType", "РўРёРї РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ РєРѕР»РёС‡РµСЃС‚РІР° СЋРЅРёС‚РѕРІ");
+	ar.serialize(allowedUnits, "allowedUnits", "РЎРїРёСЃРѕРє РґРѕРїСѓСЃС‚РёРјС‹С… С‚РёРїРѕРІ СЋРЅРёС‚РѕРІ");
 
-	ar.serialize(disableMainUnitAutoAttack, "disableMainUnitAutoAttack", "Запретить автоматическую атаку у главного юнита");
-	ar.serialize(forceUnitsAutoAttack, "forceUnitsAutoAttack", "Не главные юниты атакуют только автоматически");
+	ar.serialize(disableMainUnitAutoAttack, "disableMainUnitAutoAttack", "Р—Р°РїСЂРµС‚РёС‚СЊ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєСѓСЋ Р°С‚Р°РєСѓ Сѓ РіР»Р°РІРЅРѕРіРѕ СЋРЅРёС‚Р°");
+	ar.serialize(forceUnitsAutoAttack, "forceUnitsAutoAttack", "РќРµ РіР»Р°РІРЅС‹Рµ СЋРЅРёС‚С‹ Р°С‚Р°РєСѓСЋС‚ С‚РѕР»СЊРєРѕ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё");
 
-	ar.serialize(followMainUnitInAutoMode, "followMainUnitInAutoMode", "Следовать за главным в автоматическом режиме");
+	ar.serialize(followMainUnitInAutoMode, "followMainUnitInAutoMode", "РЎР»РµРґРѕРІР°С‚СЊ Р·Р° РіР»Р°РІРЅС‹Рј РІ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРј СЂРµР¶РёРјРµ");
 
-	ar.serialize(permanentEffects, "permanentEffects", "постоянные эффекты");
-	ar.serialize(mainUnitEffect, "mainUnitEffect", "Эффект для главного юнита в скваде");
-	ar.serialize(waitingUnitEffect, "waitingUnitEffect", "Эффект для ждущего юнита в скваде");
-	ar.serialize(showSightSector, "showSightSector", "Показывать сектор обзора");
+	ar.serialize(permanentEffects, "permanentEffects", "РїРѕСЃС‚РѕСЏРЅРЅС‹Рµ СЌС„С„РµРєС‚С‹");
+	ar.serialize(mainUnitEffect, "mainUnitEffect", "Р­С„С„РµРєС‚ РґР»СЏ РіР»Р°РІРЅРѕРіРѕ СЋРЅРёС‚Р° РІ СЃРєРІР°РґРµ");
+	ar.serialize(waitingUnitEffect, "waitingUnitEffect", "Р­С„С„РµРєС‚ РґР»СЏ Р¶РґСѓС‰РµРіРѕ СЋРЅРёС‚Р° РІ СЃРєРІР°РґРµ");
+	ar.serialize(showSightSector, "showSightSector", "РџРѕРєР°Р·С‹РІР°С‚СЊ СЃРµРєС‚РѕСЂ РѕР±Р·РѕСЂР°");
 
-	if(ar.openBlock("Interface", "Интерфейс")){
-		ar.serialize(selectSprites_, "Miniatures", "Миниатюры");
+	if(ar.openBlock("Interface", "РРЅС‚РµСЂС„РµР№СЃ")){
+		ar.serialize(selectSprites_, "Miniatures", "РњРёРЅРёР°С‚СЋСЂС‹");
 
-		ar.serialize(selectionCursor_, "selection_cursor", "Курсор выбора");
+		ar.serialize(selectionCursor_, "selection_cursor", "РљСѓСЂСЃРѕСЂ РІС‹Р±РѕСЂР°");
 		selectionCursorProxy_ = selectionCursor_;
 
-		ar.serialize(initialHeightUIParam, "initialHeightUIParam", "высота юнита для вывода значений");
+		ar.serialize(initialHeightUIParam, "initialHeightUIParam", "РІС‹СЃРѕС‚Р° СЋРЅРёС‚Р° РґР»СЏ РІС‹РІРѕРґР° Р·РЅР°С‡РµРЅРёР№");
 
-		if(ar.openBlock("squadSign", "Знак сквада")){
-			ar.serialize(showSpriteForUnvisible, "showSpriteForUnvisible", "Выводить когда всего сквада не видно");
-			ar.serialize(selectBySprite, "selectBySprite", "Селектить по знаку");
-			ar.serialize(selectSprites, "selectSprites", "Выводимые спрайты");
+		if(ar.openBlock("squadSign", "Р—РЅР°Рє СЃРєРІР°РґР°")){
+			ar.serialize(showSpriteForUnvisible, "showSpriteForUnvisible", "Р’С‹РІРѕРґРёС‚СЊ РєРѕРіРґР° РІСЃРµРіРѕ СЃРєРІР°РґР° РЅРµ РІРёРґРЅРѕ");
+			ar.serialize(selectBySprite, "selectBySprite", "РЎРµР»РµРєС‚РёС‚СЊ РїРѕ Р·РЅР°РєСѓ");
+			ar.serialize(selectSprites, "selectSprites", "Р’С‹РІРѕРґРёРјС‹Рµ СЃРїСЂР°Р№С‚С‹");
 			ar.closeBlock();
 		}
 
-		if(ar.openBlock("minimap", "Обозначение на миникарте")){
-			ar.serialize(minimapSymbolType_, "symbolType", "тип пометки");
+		if(ar.openBlock("minimap", "РћР±РѕР·РЅР°С‡РµРЅРёРµ РЅР° РјРёРЅРёРєР°СЂС‚Рµ")){
+			ar.serialize(minimapSymbolType_, "symbolType", "С‚РёРї РїРѕРјРµС‚РєРё");
 			if(minimapSymbolType_ == UI_MINIMAP_SYMBOLTYPE_SELF){
-				ar.serialize(minimapSymbol_, "minimapSymbol", "Не выделенный");
+				ar.serialize(minimapSymbol_, "minimapSymbol", "РќРµ РІС‹РґРµР»РµРЅРЅС‹Р№");
 				minimapSymbol_.scaleByEvent = false;
-				ar.serialize(minimapPermanentSymbol_, "minimapSymbolSelected", "Выделенный");
+				ar.serialize(minimapPermanentSymbol_, "minimapSymbolSelected", "Р’С‹РґРµР»РµРЅРЅС‹Р№");
 				minimapPermanentSymbol_.scaleByEvent = false;
 			}
 			ar.closeBlock();
 		}
 
-		ar.serialize(showWayPoint, "showWayPoint", "Показывать точку назначения");
-		ar.serialize(showTriggerWayPoint, "showTriggerWayPoint", "Отображать при команде идти из триггера");
-		ar.serialize(targetPoint, "targetPoint", "Собственная отметка точки назначения");
+		ar.serialize(showWayPoint, "showWayPoint", "РџРѕРєР°Р·С‹РІР°С‚СЊ С‚РѕС‡РєСѓ РЅР°Р·РЅР°С‡РµРЅРёСЏ");
+		ar.serialize(showTriggerWayPoint, "showTriggerWayPoint", "РћС‚РѕР±СЂР°Р¶Р°С‚СЊ РїСЂРё РєРѕРјР°РЅРґРµ РёРґС‚Рё РёР· С‚СЂРёРіРіРµСЂР°");
+		ar.serialize(targetPoint, "targetPoint", "РЎРѕР±СЃС‚РІРµРЅРЅР°СЏ РѕС‚РјРµС‚РєР° С‚РѕС‡РєРё РЅР°Р·РЅР°С‡РµРЅРёСЏ");
 
-		ar.serialize(showAllWayPoints, "showAllWayPoints", "Показывать все точки пути");
+		ar.serialize(showAllWayPoints, "showAllWayPoints", "РџРѕРєР°Р·С‹РІР°С‚СЊ РІСЃРµ С‚РѕС‡РєРё РїСѓС‚Рё");
 		if(showAllWayPoints)
-			ar.serialize(showAllWayPointDist, "showAllWayPointDist", "Расстояние между пометками");
+			ar.serialize(showAllWayPointDist, "showAllWayPointDist", "Р Р°СЃСЃС‚РѕСЏРЅРёРµ РјРµР¶РґСѓ РїРѕРјРµС‚РєР°РјРё");
 
-		if(ar.openBlock("selection", "При селекте")){
-			ar.serialize(showSelectRadius, "showSelectRadius", "Показывать селект");
-			ar.serialize(selectRadius, "selectRadius", "Радиус сквада для селекта, 0 - по реальному радиусу");
+		if(ar.openBlock("selection", "РџСЂРё СЃРµР»РµРєС‚Рµ")){
+			ar.serialize(showSelectRadius, "showSelectRadius", "РџРѕРєР°Р·С‹РІР°С‚СЊ СЃРµР»РµРєС‚");
+			ar.serialize(selectRadius, "selectRadius", "Р Р°РґРёСѓСЃ СЃРєРІР°РґР° РґР»СЏ СЃРµР»РµРєС‚Р°, 0 - РїРѕ СЂРµР°Р»СЊРЅРѕРјСѓ СЂР°РґРёСѓСЃСѓ");
 			ar.closeBlock();
 		}
 

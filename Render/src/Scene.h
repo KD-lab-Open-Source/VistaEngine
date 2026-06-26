@@ -22,54 +22,54 @@ class RENDER_API cScene : public UnknownClass, public ManagedResource
 public:
 	cScene();
 	~cScene();
-	// отрисовка
-	void Compact();  //Удаляет объектя, находящиеся в кеше, на которые нет внешних ссылок.
-	void Draw(Camera* camera);		// отрисовка указанной части мира
+	// РѕС‚СЂРёСЃРѕРІРєР°
+	void Compact();  //РЈРґР°Р»СЏРµС‚ РѕР±СЉРµРєС‚СЏ, РЅР°С…РѕРґСЏС‰РёРµСЃСЏ РІ РєРµС€Рµ, РЅР° РєРѕС‚РѕСЂС‹Рµ РЅРµС‚ РІРЅРµС€РЅРёС… СЃСЃС‹Р»РѕРє.
+	void Draw(Camera* camera);		// РѕС‚СЂРёСЃРѕРІРєР° СѓРєР°Р·Р°РЅРЅРѕР№ С‡Р°СЃС‚Рё РјРёСЂР°
 
-	//Время в милисекундах в этих функциях.
-	void SetDeltaTime(float dTime);//в милисекундах
+	//Р’СЂРµРјСЏ РІ РјРёР»РёСЃРµРєСѓРЅРґР°С… РІ СЌС‚РёС… С„СѓРЅРєС†РёСЏС….
+	void SetDeltaTime(float dTime);//РІ РјРёР»РёСЃРµРєСѓРЅРґР°С…
 	float GetDeltaTime()const{return dTime;};
 	int GetDeltaTimeInt()const{return dTimeInt;};
 
 	Camera* CreateCamera();
-	// функции для работы с объектами
+	// С„СѓРЅРєС†РёРё РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РѕР±СЉРµРєС‚Р°РјРё
 	cObject3dx* CreateObject3dx(const char* fname,const char *TexturePath=0,bool interpolated=false);
 	cObject3dx* CreateLogic3dx(const char* fname, bool interpolated = false);
 	cSimply3dx* CreateSimply3dx(const char* fname,const char* visible_group=0,const char *TexturePath=0);
 
-	//После вызова CreateObject3dxNoAttach нужно будет AttachObj(pObject) вызвать, чтобы прилинковать объект к сцене.
+	//РџРѕСЃР»Рµ РІС‹Р·РѕРІР° CreateObject3dxNoAttach РЅСѓР¶РЅРѕ Р±СѓРґРµС‚ AttachObj(pObject) РІС‹Р·РІР°С‚СЊ, С‡С‚РѕР±С‹ РїСЂРёР»РёРЅРєРѕРІР°С‚СЊ РѕР±СЉРµРєС‚ Рє СЃС†РµРЅРµ.
 	cObject3dx* CreateObject3dxDetached(const char* fname,const char *TexturePath=0,bool interpolated=false);
 	cSimply3dx* CreateSimply3dxDetached(const char* fname,const char* visible_group=0,const char *TexturePath=0);
 	bool CreateDebrisesDetached(const c3dx* model,vector<cSimply3dx*>& debrises);
-	// функции для работы с источниками света, влияющими на освещение объектов текущей сцены
-	//Attribute - сумма флагов из eAttributeLight
+	// С„СѓРЅРєС†РёРё РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РёСЃС‚РѕС‡РЅРёРєР°РјРё СЃРІРµС‚Р°, РІР»РёСЏСЋС‰РёРјРё РЅР° РѕСЃРІРµС‰РµРЅРёРµ РѕР±СЉРµРєС‚РѕРІ С‚РµРєСѓС‰РµР№ СЃС†РµРЅС‹
+	//Attribute - СЃСѓРјРјР° С„Р»Р°РіРѕРІ РёР· eAttributeLight
 	cUnkLight* CreateLight(int Attribute=0, const char* TextureName = 0);
 	cUnkLight* CreateLight(int Attribute,cTexture *pTexture);
 
 	cUnkLight* CreateLightDetached(int Attribute=0, const char* TextureName = 0);
 	cUnkLight* CreateLightDetached(int Attribute,cTexture *pTexture);
-	// функции для работы с системой частиц
+	// С„СѓРЅРєС†РёРё РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ СЃРёСЃС‚РµРјРѕР№ С‡Р°СЃС‚РёС†
 	cEffect* CreateEffectDetached(EffectKey& el,c3dx* models,bool auto_delete_after_life=false);
 
-	// функции для работы с полигональным объектом
+	// С„СѓРЅРєС†РёРё РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РїРѕР»РёРіРѕРЅР°Р»СЊРЅС‹Рј РѕР±СЉРµРєС‚РѕРј
 	cPlane* CreatePlaneObj();
 
-	// функции для работы с картой мира
+	// С„СѓРЅРєС†РёРё РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РєР°СЂС‚РѕР№ РјРёСЂР°
 	virtual class cTileMap* CreateMap(bool isTrueColor = true);
 	virtual FogOfWar* CreateFogOfWar();
 	void EnableFogOfWar(bool enable);
 	bool IsFogOfWarEnabled(){return enable_fog_of_war;}
 	FogOfWar* GetFogOfWar(){return enable_fog_of_war?pFogOfWar:0;};
 
-	//Trace переименовали в TraceSegment
+	//Trace РїРµСЂРµРёРјРµРЅРѕРІР°Р»Рё РІ TraceSegment
 	virtual bool TraceSegment(const Vect3f& pStart,const Vect3f& pFinish,Vect3f *pTrace=0);
 	virtual bool TraceDir(const Vect3f& pStart,const Vect3f& pDir,Vect3f *pTrace=0);
 
-	//Добавить/удалить объект из сцены. 
+	//Р”РѕР±Р°РІРёС‚СЊ/СѓРґР°Р»РёС‚СЊ РѕР±СЉРµРєС‚ РёР· СЃС†РµРЅС‹. 
 	void AttachObj(BaseGraphObject *UObj);
 	void DetachObj(BaseGraphObject *UObj);
 
-	// доступ к переменным
+	// РґРѕСЃС‚СѓРї Рє РїРµСЂРµРјРµРЅРЅС‹Рј
 	inline int GetNumberLight()									{ return UnkLightArray.size(); }
 	inline cUnkLight* GetLight(int number)						{ return (cUnkLight*)UnkLightArray[number]; }
 
@@ -87,10 +87,10 @@ public:
 	const Color4f& GetSunAmbient()const{return sun_ambient;}
 	const Color4f& GetSunDiffuse()const{return sun_diffuse;}
 	const Color4f& GetSunSpecular()const{return sun_specular;}
-	Color4f GetPlainLitColor();//Для объектов, у которых нормаль направленна вверх, или они освещаются просто цветом.
+	Color4f GetPlainLitColor();//Р”Р»СЏ РѕР±СЉРµРєС‚РѕРІ, Сѓ РєРѕС‚РѕСЂС‹С… РЅРѕСЂРјР°Р»СЊ РЅР°РїСЂР°РІР»РµРЅРЅР° РІРІРµСЂС…, РёР»Рё РѕРЅРё РѕСЃРІРµС‰Р°СЋС‚СЃСЏ РїСЂРѕСЃС‚Рѕ С†РІРµС‚РѕРј.
 
-	void HideAllObjectLights(bool hide);//Днем ночные источники света не горят.
-	void HideSelfIllumination(bool hide);//Днем самосвечения не нужно.
+	void HideAllObjectLights(bool hide);//Р”РЅРµРј РЅРѕС‡РЅС‹Рµ РёСЃС‚РѕС‡РЅРёРєРё СЃРІРµС‚Р° РЅРµ РіРѕСЂСЏС‚.
+	void HideSelfIllumination(bool hide);//Р”РЅРµРј СЃР°РјРѕСЃРІРµС‡РµРЅРёСЏ РЅРµ РЅСѓР¶РЅРѕ.
 
 	void GetLighting(Color4f &Ambient,Color4f &Diffuse,Color4f &Specular,Vect3f &LightDirection);
 	void GetLighting(Vect3f *LightDirection);
@@ -131,8 +131,8 @@ private:
 	void Animate();
 	float				dTime;
 	int					dTimeInt;
-	Vect2i				Size;						// размер мира
-	sGrid2d				UnkLightArray;				// массив источников света сцены
+	Vect2i				Size;						// СЂР°Р·РјРµСЂ РјРёСЂР°
+	sGrid2d				UnkLightArray;				// РјР°СЃСЃРёРІ РёСЃС‚РѕС‡РЅРёРєРѕРІ СЃРІРµС‚Р° СЃС†РµРЅС‹
 	sGrid2d				grid;
 	QuatTree			tree;
 	bool in_update_list;
@@ -207,7 +207,7 @@ private:
 
 	Vect2f CalcZMinZMaxShadowReciver();
 
-	///////////// Для создания/удаления объектов в правильный момент при многопоточности.
+	///////////// Р”Р»СЏ СЃРѕР·РґР°РЅРёСЏ/СѓРґР°Р»РµРЅРёСЏ РѕР±СЉРµРєС‚РѕРІ РІ РїСЂР°РІРёР»СЊРЅС‹Р№ РјРѕРјРµРЅС‚ РїСЂРё РјРЅРѕРіРѕРїРѕС‚РѕС‡РЅРѕСЃС‚Рё.
 	MTSection critial_attach;
 
 	struct AddData

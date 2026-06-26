@@ -98,7 +98,7 @@ void SelectManager::Transaction::endTransaction()
 	UnitInterfaceList listForDeselect;
 
 	if(selection_.empty()){
-		// ñåëåêò áûë ïóñòîé, âîçìîæíî êîãî-òî çàñåëåêòèëè
+		// ÑÐµÐ»ÐµÐºÑ‚ Ð±Ñ‹Ð» Ð¿ÑƒÑÑ‚Ð¾Ð¹, Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾ ÐºÐ¾Ð³Ð¾-Ñ‚Ð¾ Ð·Ð°ÑÐµÐ»ÐµÐºÑ‚Ð¸Ð»Ð¸
 		if(!manager_->selection_.empty()){
 			UnitInterfaceList::iterator it;
 			FOR_EACH(manager_->selection_, it)
@@ -106,13 +106,13 @@ void SelectManager::Transaction::endTransaction()
 		}
 	}
 	else if(manager_->selection_.empty()){
-		// âñåõ äåñåëåêòèëè
+		// Ð²ÑÐµÑ… Ð´ÐµÑÐµÐ»ÐµÐºÑ‚Ð¸Ð»Ð¸
 		UnitInterfaceList::iterator it;
 		FOR_EACH(selection_, it)
 			listForDeselect.push_back(*it);
 	}
 	else {
-		// âîçìîæíî èçìåíèëñÿ ñîñòàâ ñåëåêòà
+		// Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾ Ð¸Ð·Ð¼ÐµÐ½Ð¸Ð»ÑÑ ÑÐ¾ÑÑ‚Ð°Ð² ÑÐµÐ»ÐµÐºÑ‚Ð°
 		UnitInterfaceList select = manager_->selection_;
 		sort(select.begin(), select.end());
 		
@@ -542,7 +542,7 @@ bool SelectManager::selectUnit(UnitInterface* p, bool shiftPressed, bool no_dese
 		if(it != selection_.end()){
 			if(!no_deselect)
 				erase(it);
-			else if(!p->selected()){ // íåçàñåëåê÷åííûé þíèò â çàñåëåê÷åííîì ñêâàäå
+			else if(!p->selected()){ // Ð½ÐµÐ·Ð°ÑÐµÐ»ÐµÐºÑ‡ÐµÐ½Ð½Ñ‹Ð¹ ÑŽÐ½Ð¸Ñ‚ Ð² Ð·Ð°ÑÐµÐ»ÐµÐºÑ‡ÐµÐ½Ð½Ð¾Ð¼ ÑÐºÐ²Ð°Ð´Ðµ
 				p->setSelected(true);
 				UnitCommand command(COMMAND_ID_UNIT_SELECTED, player_->teamIndex());
 				command.setShiftModifier(false);
@@ -985,12 +985,12 @@ int SelectManager::getTraficabilityCommonFlag()
 	
 	UnitInterfaceList::const_iterator ui;
 	if(GlobalAttributes::instance().uniformCursor)
-	{ // îáùèé äëÿ âñåõ òèï ïðîõîäèìîñòè
+	{ // Ð¾Ð±Ñ‰Ð¸Ð¹ Ð´Ð»Ñ Ð²ÑÐµÑ… Ñ‚Ð¸Ð¿ Ð¿Ñ€Ð¾Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ÑÑ‚Ð¸
 		traficabilityCommonFlag = 0;
 		FOR_EACH(selection_, ui)
 			traficabilityCommonFlag |= (*ui)->impassability();
 	}
-	else { // âñå äîñòóïíûå òèïû ïðîõîäèìîñòè
+	else { // Ð²ÑÐµ Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ñ‚Ð¸Ð¿Ñ‹ Ð¿Ñ€Ð¾Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ÑÑ‚Ð¸
 		traficabilityCommonFlag = 0xFFFFFFFF;
 		FOR_EACH(selection_, ui)
 			traficabilityCommonFlag &= (*ui)->impassability();
@@ -1008,14 +1008,14 @@ bool SelectManager::canPickItem(const UnitItemInventory* item) const
 
 	UnitInterfaceList::const_iterator ui;
 	if(GlobalAttributes::instance().uniformCursor)
-	{ // äîëæíû óäîâëåòâîðÿòü âñå
+	{ // Ð´Ð¾Ð»Ð¶Ð½Ñ‹ ÑƒÐ´Ð¾Ð²Ð»ÐµÑ‚Ð²Ð¾Ñ€ÑÑ‚ÑŒ Ð²ÑÐµ
 		FOR_EACH(selection_, ui)
 			if(!(*ui)->canPutToInventory(item))
 				return false;
 		return true;
 	
 	}
-	else { // äîñòàòî÷íî ÷òî áû óäîâëåòâîðÿë õîòü îäèí
+	else { // Ð´Ð¾ÑÑ‚Ð°Ñ‚Ð¾Ñ‡Ð½Ð¾ Ñ‡Ñ‚Ð¾ Ð±Ñ‹ ÑƒÐ´Ð¾Ð²Ð»ÐµÑ‚Ð²Ð¾Ñ€ÑÐ» Ñ…Ð¾Ñ‚ÑŒ Ð¾Ð´Ð¸Ð½
 		FOR_EACH(selection_, ui)
 			if((*ui)->canPutToInventory(item))
 					return true;

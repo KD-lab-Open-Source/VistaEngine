@@ -9,9 +9,9 @@ public:
 	SyncroTimer();
 	void set(int syncro_by_clock_, int  time_per_frame_, int max_time_interval_ = 0);
 
-	time_type operator()() const { return time; } // время
-	operator time_type() const { return time; } // время
-	time_type delta() const { return delta_; } // последнее изменение 
+	time_type operator()() const { return time; } // РІСЂРµРјСЏ
+	operator time_type() const { return time; } // РІСЂРµРјСЏ
+	time_type delta() const { return delta_; } // РїРѕСЃР»РµРґРЅРµРµ РёР·РјРµРЅРµРЅРёРµ 
 	
 	void adjust();
 	void next_frame();

@@ -24,7 +24,7 @@ float visibilityDistance2 = sqr(750.f);
 
 float HardwareCameraFocus = 0.8f;
 
-REGISTER_CLASS(CameraSpline, CameraSpline, "Сплайн камеры")
+REGISTER_CLASS(CameraSpline, CameraSpline, "РЎРїР»Р°Р№РЅ РєР°РјРµСЂС‹")
 
 float CUT_SCENE_TOP = -0.390625f;
 float CUT_SCENE_BOTTOM = 0.390625f;
@@ -367,10 +367,10 @@ void CameraManager::SetFrustumEditor(bool zFarInfinite)
       	
 	frustumClip_.set(-0.5f, -0.5f, 0.5f, 0.5f);
 
-	camera_->SetFrustum(								// устанавливается пирамида видимости
-		&Vect2f(0.5f,0.5f),							// центр камеры
-		&frustumClip_,								// видимая область камеры
-		&Vect2f(coordinate().focus(), coordinate().focus()),	// фокус камеры
+	camera_->SetFrustum(								// СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ РїРёСЂР°РјРёРґР° РІРёРґРёРјРѕСЃС‚Рё
+		&Vect2f(0.5f,0.5f),							// С†РµРЅС‚СЂ РєР°РјРµСЂС‹
+		&frustumClip_,								// РІРёРґРёРјР°СЏ РѕР±Р»Р°СЃС‚СЊ РєР°РјРµСЂС‹
+		&Vect2f(coordinate().focus(), coordinate().focus()),	// С„РѕРєСѓСЃ РєР°РјРµСЂС‹
 		&z
 		);
 }
@@ -395,10 +395,10 @@ void CameraManager::SetFrustumGame()
 
 	float focus = correctedFocus(coordinate().focus());
 
-	camera_->SetFrustum(			// устанавливается пирамида видимости
-		&Vect2f(0.5f,0.5f),		// центр камеры
-		&frustumClip_,			// видимая область камеры
-		&Vect2f(focus, focus),	// фокус камеры
+	camera_->SetFrustum(			// СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ РїРёСЂР°РјРёРґР° РІРёРґРёРјРѕСЃС‚Рё
+		&Vect2f(0.5f,0.5f),		// С†РµРЅС‚СЂ РєР°РјРµСЂС‹
+		&frustumClip_,			// РІРёРґРёРјР°СЏ РѕР±Р»Р°СЃС‚СЊ РєР°РјРµСЂС‹
+		&Vect2f(focus, focus),	// С„РѕРєСѓСЃ РєР°РјРµСЂС‹
 		&z
 		);
 }
@@ -633,7 +633,7 @@ void CameraManager::quant(float mouseDeltaX, float mouseDeltaY, float delta_time
 	MTAuto lock(cameraLock_);
 
 	xassert(delta_time < 0.1f + FLT_COMPARE_TOLERANCE);
-	float timeFactor = delta_time*20.f; // !!! PerimeterCameraControlFPS  - убрать теперь сложно 
+	float timeFactor = delta_time*20.f; // !!! PerimeterCameraControlFPS  - СѓР±СЂР°С‚СЊ С‚РµРїРµСЂСЊ СЃР»РѕР¶РЅРѕ 
 
 	if(isAutoRotationMode())
 		coordinate_.psi() = coordinate().psi() + _debugRotationAngleDelta;
@@ -696,7 +696,7 @@ void CameraManager::quant(float mouseDeltaX, float mouseDeltaY, float delta_time
 			coordinate_.position() += Vect3f(cameraZoomVelocity.x / 2.f, cameraZoomVelocity.y / 2.f, 0)*delta_time;
 		
 		if(restricted() && !directControl_ && cameraZoomVelocity.z < -1.0f)
-			cameraThetaForce += cameraRestriction_.CAMERA_KBD_ANGLE_SPEED_DELTA; //при зуме камера должна принимать макс. допустимый наклон
+			cameraThetaForce += cameraRestriction_.CAMERA_KBD_ANGLE_SPEED_DELTA; //РїСЂРё Р·СѓРјРµ РєР°РјРµСЂР° РґРѕР»Р¶РЅР° РїСЂРёРЅРёРјР°С‚СЊ РјР°РєСЃ. РґРѕРїСѓСЃС‚РёРјС‹Р№ РЅР°РєР»РѕРЅ
 		
 		//move
 		cameraPositionVelocity += cameraPositionForce * timeFactor * 3.0f;
@@ -758,7 +758,7 @@ void CameraManager::followQuant(float timeFactor)
 	coordinateNew.position() += offset;
 
 	if(unitFollowDown_) {
-		// Держим юнита в нижней части экрана.
+		// Р”РµСЂР¶РёРј СЋРЅРёС‚Р° РІ РЅРёР¶РЅРµР№ С‡Р°СЃС‚Рё СЌРєСЂР°РЅР°.
 		Vect3f offset(-100,0,0);
 		QuatF(coordinateNew.psi(), Vect3f::K).xform(offset);
 		coordinateNew.position() += offset;
@@ -1000,7 +1000,7 @@ void CameraManager::setPath(int index)
 { 
 	xassert(!spline_.empty());
 
-	if(replayIndexMax_ >= spline_.size()){ // Зацикленное повторение последовательности
+	if(replayIndexMax_ >= spline_.size()){ // Р—Р°С†РёРєР»РµРЅРЅРѕРµ РїРѕРІС‚РѕСЂРµРЅРёРµ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё
 		if(firstPointAdded_){
 			interpolationPoints_[0] = spline_[skipFirstIndex(index - 1)];
 			interpolationPoints_[1] = spline_[skipFirstIndex(index)];
@@ -1392,12 +1392,12 @@ void CameraSpline::addPointAfter(int index, const CameraCoordinate& coord)
 
 void CameraCoordinate::serialize(Archive& ar) 
 {
-	ar.serialize(position_, "position", "Позиция");
-	ar.serialize(psi_, "psi", "Поворот вокруг X");
-	ar.serialize(theta_, "theta", "Поворот вокруг Z");
-	ar.serialize(fi_, "fi", "Поворот вокруг Y");
-	ar.serialize(distance_, "distance", "Дистанция");
-	ar.serialize(focus_, "focus", "Фокус");
+	ar.serialize(position_, "position", "РџРѕР·РёС†РёСЏ");
+	ar.serialize(psi_, "psi", "РџРѕРІРѕСЂРѕС‚ РІРѕРєСЂСѓРі X");
+	ar.serialize(theta_, "theta", "РџРѕРІРѕСЂРѕС‚ РІРѕРєСЂСѓРі Z");
+	ar.serialize(fi_, "fi", "РџРѕРІРѕСЂРѕС‚ РІРѕРєСЂСѓРі Y");
+	ar.serialize(distance_, "distance", "Р”РёСЃС‚Р°РЅС†РёСЏ");
+	ar.serialize(focus_, "focus", "Р¤РѕРєСѓСЃ");
 	ar.serialize(dofParams_, "dofParams", 0);
 }
 
@@ -1408,10 +1408,10 @@ void CameraSpline::setPose(const Se3f& pose, bool init)
 
 void CameraSpline::serialize(Archive& ar) 
 {
-	ar.serialize(name_, "name", "&Имя");
-	ar.serialize(stepDuration_, "stepDuration", "Длительность");
-	ar.serialize(cycled, "cycled", "Замкнутый");
-	ar.serialize(coordinates_, "spline", "Координаты");
+	ar.serialize(name_, "name", "&РРјСЏ");
+	ar.serialize(stepDuration_, "stepDuration", "Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ");
+	ar.serialize(cycled, "cycled", "Р—Р°РјРєРЅСѓС‚С‹Р№");
+	ar.serialize(coordinates_, "spline", "РљРѕРѕСЂРґРёРЅР°С‚С‹");
 	ar.serialize(pose_, "pose", 0);
 }
 
@@ -1431,12 +1431,12 @@ CameraSpline::CameraSpline() : name_("splineXX")
 void CameraManager::serialize(Archive& ar) 
 {
 	if(ar.filter(SERIALIZE_WORLD_DATA))
-		ar.serialize(splines_, "cameraSplines", "Камеры");
+		ar.serialize(splines_, "cameraSplines", "РљР°РјРµСЂС‹");
 
-	ar.serialize(ownCameraRestriction_, "selfCameraRestriction", "&использовать собственные ограничения камеры");
-	ar.serialize(cameraBorder_, "cameraBorder", "границы выезда за край миры");
+	ar.serialize(ownCameraRestriction_, "selfCameraRestriction", "&РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ СЃРѕР±СЃС‚РІРµРЅРЅС‹Рµ РѕРіСЂР°РЅРёС‡РµРЅРёСЏ РєР°РјРµСЂС‹");
+	ar.serialize(cameraBorder_, "cameraBorder", "РіСЂР°РЅРёС†С‹ РІС‹РµР·РґР° Р·Р° РєСЂР°Р№ РјРёСЂС‹");
 	if(ownCameraRestriction_){
-		ar.serialize(cameraRestriction_, "cameraRestriction", "Ограничения камеры");
+		ar.serialize(cameraRestriction_, "cameraRestriction", "РћРіСЂР°РЅРёС‡РµРЅРёСЏ РєР°РјРµСЂС‹");
 	}
 	else if(ar.isInput()){
 		cameraRestriction_ = GlobalAttributes::instance().cameraRestriction;

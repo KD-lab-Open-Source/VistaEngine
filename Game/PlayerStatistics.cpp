@@ -5,37 +5,37 @@
 #include "Player.h"
 #include "GlobalAttributes.h"
 
-BEGIN_ENUM_DESCRIPTOR(StatisticType, "Тип статистики")
-REGISTER_ENUM(STAT_UNIT_MY_KILLED,"кол-во своих убитых юнитов")
-REGISTER_ENUM(STAT_BUILDING_MY_KILLED, "кол-во своих убитых зданий") 
-REGISTER_ENUM(STAT_OBJECTS_MY_KILLED, "кол-во своих убитых юнитов и зданий") 
-REGISTER_ENUM(STAT_UNIT_ENEMY_KILLED, "кол-во вражеских убитых юнитов")
-REGISTER_ENUM(STAT_BUILDING_ENEMY_KILLED, "кол-во вражеских убитых зданий")
-REGISTER_ENUM(STAT_OBJECTS_ENEMY_KILLED, "кол-во вражеских убитых юнитов и зданий")
-REGISTER_ENUM(STAT_UNIT_ENEMY_CAPTURED, "кол-во захваченных вражеских юнитов")
-REGISTER_ENUM(STAT_BUILDING_ENEMY_CAPTURED, "кол-во захваченных вражеских зданий")
-REGISTER_ENUM(STAT_OBJECTS_ENEMY_CAPTURED, "кол-во захваченных вражеских юнитов и зданий")
-REGISTER_ENUM(STAT_UNIT_MY_CAPTURED, "кол-во своих захваченных юнитов")
-REGISTER_ENUM(STAT_BUILDING_MY_CAPTURED, "кол-во своих захваченных зданий")
-REGISTER_ENUM(STAT_OBJECTS_MY_CAPTURED, "кол-во своих захваченных юнитов и зданий")
-REGISTER_ENUM(STAT_UNIT_MY_BUILT, "кол-во своих построенных юнитов")
-REGISTER_ENUM(STAT_BUILDING_MY_BUILT, "кол-во своих построенных зданий")
-REGISTER_ENUM(STAT_OBJECTS_MY_BUILT, "кол-во своих построенных юнитов и зданий")
-REGISTER_ENUM(STAT_KEYPOINTS_CAPTURED, "кол-во захваченных ключевых точек")
-REGISTER_ENUM(STAT_KEYPOINTS_LOST, "кол-во потерянных ключевых точек")
-REGISTER_ENUM(STAT_HEROES_ENEMY_KILLED, "кол-во вражеских убитых героев")
-REGISTER_ENUM(STAT_HEROES_MY_KILLED, "кол-во моих убитых героев")
-REGISTER_ENUM(STAT_RESOURCES_COLLECTED, "всего собранных ресурсов")
-REGISTER_ENUM(STAT_RESOURCES_SPENT, "всего потраченных ресурсов")
-REGISTER_ENUM(STAT_OBJECTS_MY_KILLED_RESOURCES, "стоимость всех моих убитых юнитов")
-REGISTER_ENUM(STAT_OBJECTS_ENEMY_KILLED_RESOURCES, "стоимость всех вражеских убитых юнитов")
-REGISTER_ENUM(STAT_PICKED_ITEMS, "Количество собранных предметов")
-REGISTER_ENUM(TOTAL_TIME_PLAYED, "Общее время игры")
-REGISTER_ENUM(TOTAL_GAMES_PLAYED, "Количество сыгранных игр")
-REGISTER_ENUM(TOTAL_WINS, "Всего побед")
-REGISTER_ENUM(TOTAL_LOSSES, "Всего поражений")
-REGISTER_ENUM(TOTAL_DISCONNECTIONS, "Всего обрывов соединения")
-REGISTER_ENUM(STAT_RATING, "Рейтинг")
+BEGIN_ENUM_DESCRIPTOR(StatisticType, "РўРёРї СЃС‚Р°С‚РёСЃС‚РёРєРё")
+REGISTER_ENUM(STAT_UNIT_MY_KILLED,"РєРѕР»-РІРѕ СЃРІРѕРёС… СѓР±РёС‚С‹С… СЋРЅРёС‚РѕРІ")
+REGISTER_ENUM(STAT_BUILDING_MY_KILLED, "РєРѕР»-РІРѕ СЃРІРѕРёС… СѓР±РёС‚С‹С… Р·РґР°РЅРёР№") 
+REGISTER_ENUM(STAT_OBJECTS_MY_KILLED, "РєРѕР»-РІРѕ СЃРІРѕРёС… СѓР±РёС‚С‹С… СЋРЅРёС‚РѕРІ Рё Р·РґР°РЅРёР№") 
+REGISTER_ENUM(STAT_UNIT_ENEMY_KILLED, "РєРѕР»-РІРѕ РІСЂР°Р¶РµСЃРєРёС… СѓР±РёС‚С‹С… СЋРЅРёС‚РѕРІ")
+REGISTER_ENUM(STAT_BUILDING_ENEMY_KILLED, "РєРѕР»-РІРѕ РІСЂР°Р¶РµСЃРєРёС… СѓР±РёС‚С‹С… Р·РґР°РЅРёР№")
+REGISTER_ENUM(STAT_OBJECTS_ENEMY_KILLED, "РєРѕР»-РІРѕ РІСЂР°Р¶РµСЃРєРёС… СѓР±РёС‚С‹С… СЋРЅРёС‚РѕРІ Рё Р·РґР°РЅРёР№")
+REGISTER_ENUM(STAT_UNIT_ENEMY_CAPTURED, "РєРѕР»-РІРѕ Р·Р°С…РІР°С‡РµРЅРЅС‹С… РІСЂР°Р¶РµСЃРєРёС… СЋРЅРёС‚РѕРІ")
+REGISTER_ENUM(STAT_BUILDING_ENEMY_CAPTURED, "РєРѕР»-РІРѕ Р·Р°С…РІР°С‡РµРЅРЅС‹С… РІСЂР°Р¶РµСЃРєРёС… Р·РґР°РЅРёР№")
+REGISTER_ENUM(STAT_OBJECTS_ENEMY_CAPTURED, "РєРѕР»-РІРѕ Р·Р°С…РІР°С‡РµРЅРЅС‹С… РІСЂР°Р¶РµСЃРєРёС… СЋРЅРёС‚РѕРІ Рё Р·РґР°РЅРёР№")
+REGISTER_ENUM(STAT_UNIT_MY_CAPTURED, "РєРѕР»-РІРѕ СЃРІРѕРёС… Р·Р°С…РІР°С‡РµРЅРЅС‹С… СЋРЅРёС‚РѕРІ")
+REGISTER_ENUM(STAT_BUILDING_MY_CAPTURED, "РєРѕР»-РІРѕ СЃРІРѕРёС… Р·Р°С…РІР°С‡РµРЅРЅС‹С… Р·РґР°РЅРёР№")
+REGISTER_ENUM(STAT_OBJECTS_MY_CAPTURED, "РєРѕР»-РІРѕ СЃРІРѕРёС… Р·Р°С…РІР°С‡РµРЅРЅС‹С… СЋРЅРёС‚РѕРІ Рё Р·РґР°РЅРёР№")
+REGISTER_ENUM(STAT_UNIT_MY_BUILT, "РєРѕР»-РІРѕ СЃРІРѕРёС… РїРѕСЃС‚СЂРѕРµРЅРЅС‹С… СЋРЅРёС‚РѕРІ")
+REGISTER_ENUM(STAT_BUILDING_MY_BUILT, "РєРѕР»-РІРѕ СЃРІРѕРёС… РїРѕСЃС‚СЂРѕРµРЅРЅС‹С… Р·РґР°РЅРёР№")
+REGISTER_ENUM(STAT_OBJECTS_MY_BUILT, "РєРѕР»-РІРѕ СЃРІРѕРёС… РїРѕСЃС‚СЂРѕРµРЅРЅС‹С… СЋРЅРёС‚РѕРІ Рё Р·РґР°РЅРёР№")
+REGISTER_ENUM(STAT_KEYPOINTS_CAPTURED, "РєРѕР»-РІРѕ Р·Р°С…РІР°С‡РµРЅРЅС‹С… РєР»СЋС‡РµРІС‹С… С‚РѕС‡РµРє")
+REGISTER_ENUM(STAT_KEYPOINTS_LOST, "РєРѕР»-РІРѕ РїРѕС‚РµСЂСЏРЅРЅС‹С… РєР»СЋС‡РµРІС‹С… С‚РѕС‡РµРє")
+REGISTER_ENUM(STAT_HEROES_ENEMY_KILLED, "РєРѕР»-РІРѕ РІСЂР°Р¶РµСЃРєРёС… СѓР±РёС‚С‹С… РіРµСЂРѕРµРІ")
+REGISTER_ENUM(STAT_HEROES_MY_KILLED, "РєРѕР»-РІРѕ РјРѕРёС… СѓР±РёС‚С‹С… РіРµСЂРѕРµРІ")
+REGISTER_ENUM(STAT_RESOURCES_COLLECTED, "РІСЃРµРіРѕ СЃРѕР±СЂР°РЅРЅС‹С… СЂРµСЃСѓСЂСЃРѕРІ")
+REGISTER_ENUM(STAT_RESOURCES_SPENT, "РІСЃРµРіРѕ РїРѕС‚СЂР°С‡РµРЅРЅС‹С… СЂРµСЃСѓСЂСЃРѕРІ")
+REGISTER_ENUM(STAT_OBJECTS_MY_KILLED_RESOURCES, "СЃС‚РѕРёРјРѕСЃС‚СЊ РІСЃРµС… РјРѕРёС… СѓР±РёС‚С‹С… СЋРЅРёС‚РѕРІ")
+REGISTER_ENUM(STAT_OBJECTS_ENEMY_KILLED_RESOURCES, "СЃС‚РѕРёРјРѕСЃС‚СЊ РІСЃРµС… РІСЂР°Р¶РµСЃРєРёС… СѓР±РёС‚С‹С… СЋРЅРёС‚РѕРІ")
+REGISTER_ENUM(STAT_PICKED_ITEMS, "РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРѕР±СЂР°РЅРЅС‹С… РїСЂРµРґРјРµС‚РѕРІ")
+REGISTER_ENUM(TOTAL_TIME_PLAYED, "РћР±С‰РµРµ РІСЂРµРјСЏ РёРіСЂС‹")
+REGISTER_ENUM(TOTAL_GAMES_PLAYED, "РљРѕР»РёС‡РµСЃС‚РІРѕ СЃС‹РіСЂР°РЅРЅС‹С… РёРіСЂ")
+REGISTER_ENUM(TOTAL_WINS, "Р’СЃРµРіРѕ РїРѕР±РµРґ")
+REGISTER_ENUM(TOTAL_LOSSES, "Р’СЃРµРіРѕ РїРѕСЂР°Р¶РµРЅРёР№")
+REGISTER_ENUM(TOTAL_DISCONNECTIONS, "Р’СЃРµРіРѕ РѕР±СЂС‹РІРѕРІ СЃРѕРµРґРёРЅРµРЅРёСЏ")
+REGISTER_ENUM(STAT_RATING, "Р РµР№С‚РёРЅРі")
 END_ENUM_DESCRIPTOR(StatisticType)
  
 PlayerStatistics::PlayerStatistics()
@@ -62,8 +62,8 @@ void PlayerStatistics::registerEvent(const Event& event, Player* player)
 				const EventUnitPlayer& eventUnit = safe_cast_ref<const EventUnitPlayer&>(event);
 				if(eventUnit.unit()->player() == player)
 					if(eventUnit.unit()->attr().isObjective() && eventUnit.unit()->attr().isLegionary()){
-						statistics_[STAT_UNIT_MY_BUILT]++; // построился мой юнит (не здание!)
-						statistics_[STAT_OBJECTS_MY_BUILT]++; // построился мой юнит (не здание!)
+						statistics_[STAT_UNIT_MY_BUILT]++; // РїРѕСЃС‚СЂРѕРёР»СЃСЏ РјРѕР№ СЋРЅРёС‚ (РЅРµ Р·РґР°РЅРёРµ!)
+						statistics_[STAT_OBJECTS_MY_BUILT]++; // РїРѕСЃС‚СЂРѕРёР»СЃСЏ РјРѕР№ СЋРЅРёС‚ (РЅРµ Р·РґР°РЅРёРµ!)
 					}
 			}
 			break;
@@ -81,10 +81,10 @@ void PlayerStatistics::registerEvent(const Event& event, Player* player)
 						statistics_[STAT_OBJECTS_MY_KILLED_RESOURCES] += unitMy->attr().installValue.dot(GlobalAttributes::instance().resourseStatisticsFactors) 
 							+ unitMy->attr().creationValue.dot(GlobalAttributes::instance().resourseStatisticsFactors);
 						if(unitMy->attr().isBuilding()){
-							statistics_[STAT_BUILDING_MY_KILLED]++; // мое здание убили
+							statistics_[STAT_BUILDING_MY_KILLED]++; // РјРѕРµ Р·РґР°РЅРёРµ СѓР±РёР»Рё
 						}
 						else if(unitMy->attr().isLegionary()){
-							statistics_[STAT_UNIT_MY_KILLED]++; // моего юнита убили
+							statistics_[STAT_UNIT_MY_KILLED]++; // РјРѕРµРіРѕ СЋРЅРёС‚Р° СѓР±РёР»Рё
 							if(unitMy->attr().isHero){
 								statistics_[STAT_HEROES_MY_KILLED]++;
 							}
@@ -100,10 +100,10 @@ void PlayerStatistics::registerEvent(const Event& event, Player* player)
 						statistics_[STAT_OBJECTS_ENEMY_KILLED_RESOURCES] += unitMy->attr().installValue.dot(GlobalAttributes::instance().resourseStatisticsFactors) 
 							+ unitMy->attr().creationValue.dot(GlobalAttributes::instance().resourseStatisticsFactors);
 						if(unitMy->attr().isBuilding()){
-							statistics_[STAT_BUILDING_ENEMY_KILLED]++; // я убил вражеское здание 
+							statistics_[STAT_BUILDING_ENEMY_KILLED]++; // СЏ СѓР±РёР» РІСЂР°Р¶РµСЃРєРѕРµ Р·РґР°РЅРёРµ 
 						}
 						else if(unitMy->attr().isLegionary()){
-							statistics_[STAT_UNIT_ENEMY_KILLED]++; // я убил вражеского юнита
+							statistics_[STAT_UNIT_ENEMY_KILLED]++; // СЏ СѓР±РёР» РІСЂР°Р¶РµСЃРєРѕРіРѕ СЋРЅРёС‚Р°
 							if(unitMy->attr().isHero){
 								statistics_[STAT_HEROES_ENEMY_KILLED]++;
 							}
@@ -116,7 +116,7 @@ void PlayerStatistics::registerEvent(const Event& event, Player* player)
 			{
 				const EventUnitPlayer& eventUnit = safe_cast_ref<const EventUnitPlayer&>(event);
 				if (eventUnit.unit() && eventUnit.unit()->player() == player && eventUnit.unit()->attr().isBuilding()) {
-					statistics_[STAT_BUILDING_MY_BUILT]++; // построилось мое здание
+					statistics_[STAT_BUILDING_MY_BUILT]++; // РїРѕСЃС‚СЂРѕРёР»РѕСЃСЊ РјРѕРµ Р·РґР°РЅРёРµ
 					statistics_[STAT_OBJECTS_MY_BUILT]++; 
 				}
 			}
@@ -125,7 +125,7 @@ void PlayerStatistics::registerEvent(const Event& event, Player* player)
 			//{
 			//	const EventUnitUnitAttributePlayer& eventUnit = safe_cast_ref<const EventUnitUnitAttributePlayer&>(event);
 			//	if (eventUnit.unit() && eventUnit.player() == player && eventUnit.unit()->attr().isBuilding()) {
-			//		statistics_[STAT_BUILDING_MY_BUILT]++; // построилось мое здание
+			//		statistics_[STAT_BUILDING_MY_BUILT]++; // РїРѕСЃС‚СЂРѕРёР»РѕСЃСЊ РјРѕРµ Р·РґР°РЅРёРµ
 			//		statistics_[STAT_OBJECTS_MY_BUILT]++; 
 			//	}
 			//}
@@ -137,10 +137,10 @@ void PlayerStatistics::registerEvent(const Event& event, Player* player)
 					if (eventUnit.unitMy()->player() == player){ 
 						statistics_[STAT_OBJECTS_MY_CAPTURED]++;
 						if(eventUnit.unitMy()->attr().isBuilding()){
-							statistics_[STAT_BUILDING_MY_CAPTURED]++; // мое здание захватили
+							statistics_[STAT_BUILDING_MY_CAPTURED]++; // РјРѕРµ Р·РґР°РЅРёРµ Р·Р°С…РІР°С‚РёР»Рё
 						}
 						if(eventUnit.unitMy()->attr().isLegionary()){
-							statistics_[STAT_UNIT_MY_CAPTURED]++; // моего юнита захватили
+							statistics_[STAT_UNIT_MY_CAPTURED]++; // РјРѕРµРіРѕ СЋРЅРёС‚Р° Р·Р°С…РІР°С‚РёР»Рё
 						}
 						if(eventUnit.unitMy()->attr().isStrategicPoint){
 							statistics_[STAT_KEYPOINTS_LOST]++;
@@ -150,10 +150,10 @@ void PlayerStatistics::registerEvent(const Event& event, Player* player)
 					if(eventUnit.unitEnemy()->player() == player){
 						statistics_[STAT_OBJECTS_ENEMY_CAPTURED]++;
 						if(eventUnit.unitMy()->attr().isBuilding()){ 
-							statistics_[STAT_BUILDING_ENEMY_CAPTURED]++; // я захватил вражеское здание
+							statistics_[STAT_BUILDING_ENEMY_CAPTURED]++; // СЏ Р·Р°С…РІР°С‚РёР» РІСЂР°Р¶РµСЃРєРѕРµ Р·РґР°РЅРёРµ
 						}	
 						if(eventUnit.unitMy()->attr().isLegionary()){
-							statistics_[STAT_UNIT_ENEMY_CAPTURED]++; // я захватил вражеского юнита
+							statistics_[STAT_UNIT_ENEMY_CAPTURED]++; // СЏ Р·Р°С…РІР°С‚РёР» РІСЂР°Р¶РµСЃРєРѕРіРѕ СЋРЅРёС‚Р°
 						}
 						if(eventUnit.unitMy()->attr().isStrategicPoint){
 							statistics_[STAT_KEYPOINTS_CAPTURED]++;

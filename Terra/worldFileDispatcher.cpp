@@ -39,8 +39,8 @@ void BitmapDispatcher::Bitmap::load(const char* name, int _uid)
 	if(tgahead.loadHeader(name)){
 		if( (tgahead.PixelDepth!=24 && tgahead.PixelDepth!=32)  || tgahead.ImageType != 2 
 			|| !checkSize(tgahead.Width) || !checkSize(tgahead.Height)) {
-			//AfxMessageBox("Не поддерживаемый тип TGA (необходим 24bit не компрессованный, с размерами, кратными степени 2)");
-			xassert(0&&"Не поддерживаемый тип TGA (необходим 32/24bit не компрессованный, с размерами, кратными степени 2)");
+			//AfxMessageBox("РќРµ РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹Р№ С‚РёРї TGA (РЅРµРѕР±С…РѕРґРёРј 24bit РЅРµ РєРѕРјРїСЂРµСЃСЃРѕРІР°РЅРЅС‹Р№, СЃ СЂР°Р·РјРµСЂР°РјРё, РєСЂР°С‚РЅС‹РјРё СЃС‚РµРїРµРЅРё 2)");
+			xassert(0&&"РќРµ РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹Р№ С‚РёРї TGA (РЅРµРѕР±С…РѕРґРёРј 32/24bit РЅРµ РєРѕРјРїСЂРµСЃСЃРѕРІР°РЅРЅС‹Р№, СЃ СЂР°Р·РјРµСЂР°РјРё, РєСЂР°С‚РЅС‹РјРё СЃС‚РµРїРµРЅРё 2)");
 			bitmap=0;
 		}
 		else {

@@ -22,20 +22,20 @@ public:
 	float length() const { return max_ - min_; }
 	float center() const { return (max_ + min_) / 2.f; }
 
-	/// Корректен ли интервал (нет - в случае когда minimum > maximum);
+	/// РљРѕСЂСЂРµРєС‚РµРЅ Р»Рё РёРЅС‚РµСЂРІР°Р» (РЅРµС‚ - РІ СЃР»СѓС‡Р°Рµ РєРѕРіРґР° minimum > maximum);
 	bool is_valid() const { return min_ <= max_; }
 
-	/// Включает ли отрезок (закрытый интервал) точку \c _value.
+	/// Р’РєР»СЋС‡Р°РµС‚ Р»Рё РѕС‚СЂРµР·РѕРє (Р·Р°РєСЂС‹С‚С‹Р№ РёРЅС‚РµСЂРІР°Р») С‚РѕС‡РєСѓ \c _value.
 	bool include(float _value) const { return (min_ <= _value) && (max_ >= _value);	}
-	/// Включает ли интервал в себя \c _range.
+	/// Р’РєР»СЋС‡Р°РµС‚ Р»Рё РёРЅС‚РµСЂРІР°Р» РІ СЃРµР±СЏ \c _range.
 	bool include(const Rangef& _range) const { return min_ <= _range.min_ && max_ >= _range.max_; }
 	
-	/// Возвращает пересечение интервала *this и \c _range.
+	/// Р’РѕР·РІСЂР°С‰Р°РµС‚ РїРµСЂРµСЃРµС‡РµРЅРёРµ РёРЅС‚РµСЂРІР°Р»Р° *this Рё \c _range.
 	Rangef intersection(const Rangef& _range) const;
-	/// Возвращает интервал включающий в себя оба интервала (*this и \c _range).
+	/// Р’РѕР·РІСЂР°С‰Р°РµС‚ РёРЅС‚РµСЂРІР°Р» РІРєР»СЋС‡Р°СЋС‰РёР№ РІ СЃРµР±СЏ РѕР±Р° РёРЅС‚РµСЂРІР°Р»Р° (*this Рё \c _range).
 	Rangef merge(const Rangef& _range) const;
 
-	/// Возвращает \c _value в пределах интервала [minimum, maximum].
+	/// Р’РѕР·РІСЂР°С‰Р°РµС‚ \c _value РІ РїСЂРµРґРµР»Р°С… РёРЅС‚РµСЂРІР°Р»Р° [minimum, maximum].
 	float clip(float& _value) const;
 
 	void serialize(Archive& ar);
@@ -66,20 +66,20 @@ public:
 	int length() const { return max_ - min_; }
 	int center() const { return (max_ + min_) / 2; }
 
-	/// Корректен ли интервал (нет - в случае когда minimum > maximum);
+	/// РљРѕСЂСЂРµРєС‚РµРЅ Р»Рё РёРЅС‚РµСЂРІР°Р» (РЅРµС‚ - РІ СЃР»СѓС‡Р°Рµ РєРѕРіРґР° minimum > maximum);
 	bool is_valid() const { return min_ <= max_; }
 
-	/// Включает ли отрезок (закрытый интервал) точку \c _value.
+	/// Р’РєР»СЋС‡Р°РµС‚ Р»Рё РѕС‚СЂРµР·РѕРє (Р·Р°РєСЂС‹С‚С‹Р№ РёРЅС‚РµСЂРІР°Р») С‚РѕС‡РєСѓ \c _value.
 	bool include(int _value) const { return (min_ <= _value) && (max_ >= _value);	}
-	/// Включает ли интервал в себя \c _range.
+	/// Р’РєР»СЋС‡Р°РµС‚ Р»Рё РёРЅС‚РµСЂРІР°Р» РІ СЃРµР±СЏ \c _range.
 	bool include(const Rangei& _range) const { return min_ <= _range.min_ && max_ >= _range.max_; }
 
-	/// Возвращает пересечение интервала *this и \c _range.
+	/// Р’РѕР·РІСЂР°С‰Р°РµС‚ РїРµСЂРµСЃРµС‡РµРЅРёРµ РёРЅС‚РµСЂРІР°Р»Р° *this Рё \c _range.
 	Rangei intersection(const Rangei& _range) const;
-	/// Возвращает интервал включающий в себя оба интервала (*this и \c _range).
+	/// Р’РѕР·РІСЂР°С‰Р°РµС‚ РёРЅС‚РµСЂРІР°Р» РІРєР»СЋС‡Р°СЋС‰РёР№ РІ СЃРµР±СЏ РѕР±Р° РёРЅС‚РµСЂРІР°Р»Р° (*this Рё \c _range).
 	Rangei merge(const Rangei& _range) const;
 
-	/// Возвращает \c _value в пределах интервала [minimum, maximum].
+	/// Р’РѕР·РІСЂР°С‰Р°РµС‚ \c _value РІ РїСЂРµРґРµР»Р°С… РёРЅС‚РµСЂРІР°Р»Р° [minimum, maximum].
 	int clip(int& _value);
 
 	void serialize(Archive& ar);

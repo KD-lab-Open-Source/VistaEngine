@@ -4,7 +4,7 @@
 #include "Serialization/Serialization.h"
 #include "kdw/PropertyRowReference.h"
 
-WRAP_LIBRARY(StyleLibrary, "StyleLibrary", "Стили", "StyleLibrary", 1, LIBRARY_EDITABLE);
+WRAP_LIBRARY(StyleLibrary, "StyleLibrary", "РЎС‚РёР»Рё", "StyleLibrary", 1, LIBRARY_EDITABLE);
 REGISTER_REFERENCE(StyleReference);
 
 Style::Style(const char* name)
@@ -16,11 +16,11 @@ Style::Style(const char* name)
 void Style::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(color_, "color", "Цвет");
+	ar.serialize(color_, "color", "Р¦РІРµС‚");
 }
 
 // --------------------------------------------------------------------------------
-WRAP_LIBRARY(ParameterLibrary, "ParameterLibrary", "Параметры", "ParameterLibrary", 1, LIBRARY_EDITABLE);
+WRAP_LIBRARY(ParameterLibrary, "ParameterLibrary", "РџР°СЂР°РјРµС‚СЂС‹", "ParameterLibrary", 1, LIBRARY_EDITABLE);
 REGISTER_REFERENCE(ParameterReference);
 
 Parameter::Parameter(const char* name)
@@ -32,13 +32,13 @@ Parameter::Parameter(const char* name)
 void Parameter::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(value_, "value", "Значение");
-	ar.serialize(type_, "type", "Тип");
+	ar.serialize(value_, "value", "Р—РЅР°С‡РµРЅРёРµ");
+	ar.serialize(type_, "type", "РўРёРї");
 }
 
 // --------------------------------------------------------------------------------
 
-WRAP_LIBRARY(ParameterTypeLibrary, "ParameterTypeLibrary", "Типы параметров", "ParameterTypeLibrary", 1, LIBRARY_EDITABLE);
+WRAP_LIBRARY(ParameterTypeLibrary, "ParameterTypeLibrary", "РўРёРїС‹ РїР°СЂР°РјРµС‚СЂРѕРІ", "ParameterTypeLibrary", 1, LIBRARY_EDITABLE);
 REGISTER_REFERENCE(ParameterTypeReference);
 
 ParameterType::ParameterType(const char* name)
@@ -50,8 +50,8 @@ ParameterType::ParameterType(const char* name)
 void ParameterType::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(description_, "description", "Описание");
-	ar.serialize(style_, "style", "Стиль");
+	ar.serialize(description_, "description", "РћРїРёСЃР°РЅРёРµ");
+	ar.serialize(style_, "style", "РЎС‚РёР»СЊ");
 }
 
 

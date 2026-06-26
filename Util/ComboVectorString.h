@@ -4,7 +4,7 @@
 #include "Serialization/SerializationTypes.h"
 #include <vector>
 
-// выбор строки из вектора строк с возвратом индекса
+// РІС‹Р±РѕСЂ СЃС‚СЂРѕРєРё РёР· РІРµРєС‚РѕСЂР° СЃС‚СЂРѕРє СЃ РІРѕР·РІСЂР°С‚РѕРј РёРЅРґРµРєСЃР°
 struct ComboVectorString : public ComboListString
 {
 	ComboVectorString(vector<string> strings, int value = 0, bool zeroValue = false);

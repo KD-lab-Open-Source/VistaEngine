@@ -11,8 +11,8 @@ class cWaterSpeedInterface
 {
 public:
 	virtual int GetTriggerSpeed()=0;
-	virtual void AddSpeedWater(int x,int y,int speed_x,int speed_y)=0;//Вызывается для всех узлов, в которых быстро течёт вода
-	virtual void ProcessSpeedWater()=0;//Определяет, что вода ускорилась выше порога срабатывания либо замедлилась.
+	virtual void AddSpeedWater(int x,int y,int speed_x,int speed_y)=0;//Р’С‹Р·С‹РІР°РµС‚СЃСЏ РґР»СЏ РІСЃРµС… СѓР·Р»РѕРІ, РІ РєРѕС‚РѕСЂС‹С… Р±С‹СЃС‚СЂРѕ С‚РµС‡С‘С‚ РІРѕРґР°
+	virtual void ProcessSpeedWater()=0;//РћРїСЂРµРґРµР»СЏРµС‚, С‡С‚Рѕ РІРѕРґР° СѓСЃРєРѕСЂРёР»Р°СЃСЊ РІС‹С€Рµ РїРѕСЂРѕРіР° СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ Р»РёР±Рѕ Р·Р°РјРµРґР»РёР»Р°СЃСЊ.
 };
 
 typedef void (*cWaterChangeTile)(int tilex,int tiley);
@@ -41,24 +41,24 @@ public:
 
 	void Init();
 	Vect2f GetVelocity(int x,int y);
-	float GetZ(int x,int y) const;//Высота воды над уровнем 0
+	float GetZ(int x,int y) const;//Р’С‹СЃРѕС‚Р° РІРѕРґС‹ РЅР°Рґ СѓСЂРѕРІРЅРµРј 0
 	float GetZFast(int x,int y) const;
 	Vect3f GetNormalFast(int x,int y) const;
-	//Вода меняется плавно, а земля резко, не надо об этом забывать, лучше плользоваться GetZFast
-	float GetDeepWaterFast(int x,int y) const;//Высота воды над землей (Неточная)
+	//Р’РѕРґР° РјРµРЅСЏРµС‚СЃСЏ РїР»Р°РІРЅРѕ, Р° Р·РµРјР»СЏ СЂРµР·РєРѕ, РЅРµ РЅР°РґРѕ РѕР± СЌС‚РѕРј Р·Р°Р±С‹РІР°С‚СЊ, Р»СѓС‡С€Рµ РїР»РѕР»СЊР·РѕРІР°С‚СЊСЃСЏ GetZFast
+	float GetDeepWaterFast(int x,int y) const;//Р’С‹СЃРѕС‚Р° РІРѕРґС‹ РЅР°Рґ Р·РµРјР»РµР№ (РќРµС‚РѕС‡РЅР°СЏ)
 
-	/// возвращает true если область частично или полностью под водой
-	/// уровень воды сравнивается с \a pos.z
+	/// РІРѕР·РІСЂР°С‰Р°РµС‚ true РµСЃР»Рё РѕР±Р»Р°СЃС‚СЊ С‡Р°СЃС‚РёС‡РЅРѕ РёР»Рё РїРѕР»РЅРѕСЃС‚СЊСЋ РїРѕРґ РІРѕРґРѕР№
+	/// СѓСЂРѕРІРµРЅСЊ РІРѕРґС‹ СЃСЂР°РІРЅРёРІР°РµС‚СЃСЏ СЃ \a pos.z
 	bool isUnderWater(const Vect3f& pos, float radius) const;
 	bool isUnderWater(const Vect3f& pos) const;
-	/// возвращает true если в области в центе или где либо вообще есть вода,
-	/// удобно для уточнения карты льда, например
+	/// РІРѕР·РІСЂР°С‰Р°РµС‚ true РµСЃР»Рё РІ РѕР±Р»Р°СЃС‚Рё РІ С†РµРЅС‚Рµ РёР»Рё РіРґРµ Р»РёР±Рѕ РІРѕРѕР±С‰Рµ РµСЃС‚СЊ РІРѕРґР°,
+	/// СѓРґРѕР±РЅРѕ РґР»СЏ СѓС‚РѕС‡РЅРµРЅРёСЏ РєР°СЂС‚С‹ Р»СЊРґР°, РЅР°РїСЂРёРјРµСЂ
 	bool isWater(const Vect3f& pos, float radius = 0.f) const;
 
-	/// "относительную" воду за воду не считаем, должно быть налито "как следует"
+	/// "РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅСѓСЋ" РІРѕРґСѓ Р·Р° РІРѕРґСѓ РЅРµ СЃС‡РёС‚Р°РµРј, РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РЅР°Р»РёС‚Рѕ "РєР°Рє СЃР»РµРґСѓРµС‚"
 	bool isFullWater(const Vect3f& pos) const;
 
-	/// возвращает минимальную глубину,
+	/// РІРѕР·РІСЂР°С‰Р°РµС‚ РјРёРЅРёРјР°Р»СЊРЅСѓСЋ РіР»СѓР±РёРЅСѓ,
 	float waterDeep(const Vect3f& pos, float radius = 0.f) const;
 
 	void SetWaterRect(int x,int y,float z,int size);
@@ -66,11 +66,11 @@ public:
 
 	void updateMap(const Vect2i& pos1, const Vect2i& pos2, UpdateMapType type = UPDATEMAP_ALL);
 
-	//SetRainConstant - Больше нуля - идёт дождь, меньше нуля - вода высыхает.
-	//Реально дождь нельзя чтобы шел, артефакты получаются.
+	//SetRainConstant - Р‘РѕР»СЊС€Рµ РЅСѓР»СЏ - РёРґС‘С‚ РґРѕР¶РґСЊ, РјРµРЅСЊС€Рµ РЅСѓР»СЏ - РІРѕРґР° РІС‹СЃС‹С…Р°РµС‚.
+	//Р РµР°Р»СЊРЅРѕ РґРѕР¶РґСЊ РЅРµР»СЊР·СЏ С‡С‚РѕР±С‹ С€РµР», Р°СЂС‚РµС„Р°РєС‚С‹ РїРѕР»СѓС‡Р°СЋС‚СЃСЏ.
 	void SetRainConstant(float dz);
 	float GetRainConstant() const;
-	void SetEnvironmentWater(float z);//Высота воды за пределами мира
+	void SetEnvironmentWater(float z);//Р’С‹СЃРѕС‚Р° РІРѕРґС‹ Р·Р° РїСЂРµРґРµР»Р°РјРё РјРёСЂР°
 	float GetEnvironmentWater() const;
 	void ShowEnvironmentWater(bool sh);
 	bool IsShowEnvironmentWater(){return border.isInit();}
@@ -95,11 +95,11 @@ public:
 	void SetOpacity(const KeysColor& gradient);
 	const KeysColor& GetOpacity() const { return opacityGradient_; }
 
-	int sortIndex()const{return -2;}//Потом на enum быть может переделать
+	int sortIndex()const{return -2;}//РџРѕС‚РѕРј РЅР° enum Р±С‹С‚СЊ РјРѕР¶РµС‚ РїРµСЂРµРґРµР»Р°С‚СЊ
 	void SetChangeTile(cWaterChangeTile change_function_){change_function=change_function_;};
 
-	float analyzeArea(const Vect2i& center, int radius, Vect3f& normalNonNormalized); // возвращаемая средняя высота абсолютная
-	void findMinMaxInArea(const Vect2i& center, int radius, int& zMin, int& zMax); // высоты zMin, zMax относительные
+	float analyzeArea(const Vect2i& center, int radius, Vect3f& normalNonNormalized); // РІРѕР·РІСЂР°С‰Р°РµРјР°СЏ СЃСЂРµРґРЅСЏСЏ РІС‹СЃРѕС‚Р° Р°Р±СЃРѕР»СЋС‚РЅР°СЏ
+	void findMinMaxInArea(const Vect2i& center, int radius, int& zMin, int& zMax); // РІС‹СЃРѕС‚С‹ zMin, zMax РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅС‹Рµ
 
 	void serialize(Archive& ar);
 
@@ -120,8 +120,8 @@ public:
 	int GetGridSizeX() const {return grid_size.x;}
 	int GetGridSizeY() const {return grid_size.y;}
 	int GetCoordShift() const {return grid_shift;}
-	void SetWater(int x,int y,float z);//Во внутренних координатах
-	void AddWater(int x,int y,float dz);//Во внутренних координатах
+	void SetWater(int x,int y,float z);//Р’Рѕ РІРЅСѓС‚СЂРµРЅРЅРёС… РєРѕРѕСЂРґРёРЅР°С‚Р°С…
+	void AddWater(int x,int y,float dz);//Р’Рѕ РІРЅСѓС‚СЂРµРЅРЅРёС… РєРѕРѕСЂРґРёРЅР°С‚Р°С…
 	void GetVelocity(Vect2f& vel,int x,int y);
 	Vect3f GetVelocity(const Vect3f& pos) const;
 
@@ -185,7 +185,7 @@ public:
 		return x+y*grid_size.x;
 	}
 
-	void DrawPolygons(Camera* camera);//Без всяких изначальных сетапов
+	void DrawPolygons(Camera* camera);//Р‘РµР· РІСЃСЏРєРёС… РёР·РЅР°С‡Р°Р»СЊРЅС‹С… СЃРµС‚Р°РїРѕРІ
 	typedef sVertexXYZD VType;
 
 protected:
@@ -205,8 +205,8 @@ protected:
 
 	enum
 	{
-		visible_tile_size=8,//Количесво в ширину и высоту квадов
-		visible_tile_width=visible_tile_size<<grid_shift,//Ширина и высота в пикселях
+		visible_tile_size=8,//РљРѕР»РёС‡РµСЃРІРѕ РІ С€РёСЂРёРЅСѓ Рё РІС‹СЃРѕС‚Сѓ РєРІР°РґРѕРІ
+		visible_tile_width=visible_tile_size<<grid_shift,//РЁРёСЂРёРЅР° Рё РІС‹СЃРѕС‚Р° РІ РїРёРєСЃРµР»СЏС…
 	};
 	void CalcVisibleLine(Camera* camera);
 	struct VisibleLine

@@ -3,11 +3,11 @@
 typedef vector<string> ComboStrings;
 typedef vector<wstring> ComboWStrings;
 
-/// Вспомогательная функция для работы с комбо-листами
+/// Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅР°СЏ С„СѓРЅРєС†РёСЏ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РєРѕРјР±Рѕ-Р»РёСЃС‚Р°РјРё
 string cutTokenFromComboList(string& comboList);
 void joinComboList(string& outComboList, const ComboStrings& strings, char delimeter = '|');
 void splitComboList(ComboStrings& outComboStrings, const char* comboList, char delimeter = '|');
-// TODO: переписать
+// TODO: РїРµСЂРµРїРёСЃР°С‚СЊ
 int indexInComboListString(const char* comboList, const char* value);
 
 void splitComboListW(ComboWStrings& combo_array, const wchar_t* ptr, wchar_t delimeter);

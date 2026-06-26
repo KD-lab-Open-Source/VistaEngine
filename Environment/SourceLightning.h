@@ -70,21 +70,21 @@ private:
 	void setTarget(cEffect* eff, const Vect3f& center, const Vect3fVect& ends);
 	void turnOff(cEffect*& eff);
 
-	/// постоянная молния в зоне
+	/// РїРѕСЃС‚РѕСЏРЅРЅР°СЏ РјРѕР»РЅРёСЏ РІ Р·РѕРЅРµ
 	EffectReference permanent_effect_;
 	cEffect* lightning_;
-	/// количество отвилок молнии
+	/// РєРѕР»РёС‡РµСЃС‚РІРѕ РѕС‚РІРёР»РѕРє РјРѕР»РЅРёРё
 	int num_lights_;
-	/// высота образования молнии
+	/// РІС‹СЃРѕС‚Р° РѕР±СЂР°Р·РѕРІР°РЅРёСЏ РјРѕР»РЅРёРё
 	float height_;
-	/// принцип размещения
+	/// РїСЂРёРЅС†РёРї СЂР°Р·РјРµС‰РµРЅРёСЏ
 	AllocationType alloc_type_;
 	Vect3f center_;
 	Vect3fVect light_ends_;
 
-	/// выключать молнии в зоне при входе врага
+	/// РІС‹РєР»СЋС‡Р°С‚СЊ РјРѕР»РЅРёРё РІ Р·РѕРЅРµ РїСЂРё РІС…РѕРґРµ РІСЂР°РіР°
 	bool turnOfByTarget_;
-	/// параметры отдельной молнии для атаки
+	/// РїР°СЂР°РјРµС‚СЂС‹ РѕС‚РґРµР»СЊРЅРѕР№ РјРѕР»РЅРёРё РґР»СЏ Р°С‚Р°РєРё
 	EffectReference  strike_effect_;
 	cEffect* strike_;
 

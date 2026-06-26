@@ -10,7 +10,7 @@
 class Camera;
 
 /////////////////////////////////////////////////////////////////////////////////
-//		Отладочный вывод 3D с кэшированием
+//		РћС‚Р»Р°РґРѕС‡РЅС‹Р№ РІС‹РІРѕРґ 3D СЃ РєСЌС€РёСЂРѕРІР°РЅРёРµРј
 /////////////////////////////////////////////////////////////////////////////////
 class ShowDispatcher
 {
@@ -103,7 +103,7 @@ inline void show_vector(const Vect3f &vg0, const Vect3f &vg1, const Vect3f &vg2,
 inline void show_vector(const Vect3f &vg0, const Vect3f &vg1, const Vect3f &vg2, const Vect3f &vg3, Color4c color){ show_dispatcher.quadrangle(vg0, vg1, vg2, vg3, color); }
 inline void show_convex(int n_points, const Vect3f* points, Color4c color){ show_dispatcher.convex(n_points, points, color); }
 inline void show_line(const Vect3f &vg0, const Vect3f &vg1, Color4c color){ show_dispatcher.line(vg0, vg1, color); }
-void show_terrain_line(const Vect2f& p1, const Vect2f& p2, Color4c color); // Медленная очень.
+void show_terrain_line(const Vect2f& p1, const Vect2f& p2, Color4c color); // РњРµРґР»РµРЅРЅР°СЏ РѕС‡РµРЅСЊ.
 inline void show_text(const Vect3f& vg, const char* text, Color4c color){ show_dispatcher.text(vg, text, color); }
 inline void show_text2d(const Vect2f& vg, const char* text, Color4c color){ show_dispatcher.text2d(vg, text, color); }
 
@@ -187,7 +187,7 @@ Vect2f clampWorldPosition(const Vect2f& pos, float radius);
 Vect3f clampWorldPosition(const Vect3f& pos, float radius);
 
 //--------------------------------------
-extern RandomGenerator effectRND;//В графике используется graphRnd.
+extern RandomGenerator effectRND;//Р’ РіСЂР°С„РёРєРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ graphRnd.
 __declspec(selectany) RandomGenerator logicRnd;
 
 #ifndef _FINAL_VERSION_

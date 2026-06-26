@@ -365,7 +365,7 @@ SpaceEmpty::SpaceEmpty()
 
 
 
-REGISTER_CLASS(Space, SpaceEmpty, "Пустая область");
+REGISTER_CLASS(Space, SpaceEmpty, "РџСѓСЃС‚Р°СЏ РѕР±Р»Р°СЃС‚СЊ");
 
 // ---------------------------------------------------------------------------
 #pragma warning(push)
@@ -468,7 +468,7 @@ void Workspace::_setParent(Container* container)
 
 void Workspace::serialize(Archive& ar)
 {
-	ar.serialize(rootSpace_, "rootSpace", "Корневая область");
+	ar.serialize(rootSpace_, "rootSpace", "РљРѕСЂРЅРµРІР°СЏ РѕР±Р»Р°СЃС‚СЊ");
 }
 
 void Workspace::_setFocus()
@@ -738,7 +738,7 @@ void SpaceBox::serialize(Archive& ar)
 				}
 			}
 		}
-		ar.serialize(spaces_, "spaces", "Области");
+		ar.serialize(spaces_, "spaces", "РћР±Р»Р°СЃС‚Рё");
 		if(ar.isInput()){
 			splitter_->clear();
 			Spaces::iterator it;
@@ -1055,8 +1055,8 @@ void SpaceSplitterImpl::onMessageRButtonDown(UINT button, int x, int y)
 		if(splitterIndex >= 0){
 			PopupMenu menu(100);
 
-			menu.root().add(TRANSLATE("Разделить"), splitterIndex).connect(this, &Self::onMenuSplit);
-			menu.root().add(TRANSLATE("Объеденить"), splitterIndex).connect(this, &Self::onMenuJoin);
+			menu.root().add(TRANSLATE("Р Р°Р·РґРµР»РёС‚СЊ"), splitterIndex).connect(this, &Self::onMenuSplit);
+			menu.root().add(TRANSLATE("РћР±СЉРµРґРµРЅРёС‚СЊ"), splitterIndex).connect(this, &Self::onMenuJoin);
 
 			menu.spawn(owner_);
 		}
@@ -1213,7 +1213,7 @@ void SpaceHeaderImpl::onMessageLButtonDown(UINT button, int x, int y)
 void SpaceHeaderImpl::onMessageRButtonDown(UINT button, int x, int y)
 {
 	PopupMenu menu(100);
-	menu.root().add(TRANSLATE("Разделить")).connect(owner_, &SpaceHeader::onMenuSplit);
+	menu.root().add(TRANSLATE("Р Р°Р·РґРµР»РёС‚СЊ")).connect(owner_, &SpaceHeader::onMenuSplit);
 
 	menu.spawn(owner_);
 	Win32::Window32::onMessageRButtonDown(button, x, y);

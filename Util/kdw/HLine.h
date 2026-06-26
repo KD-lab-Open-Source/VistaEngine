@@ -12,7 +12,7 @@ namespace kdw{
 		HLine(int border = 0);
 		bool _focusable() const{ return false; }
 	protected:
-		// внутренние функции
+		// РІРЅСѓС‚СЂРµРЅРЅРёРµ С„СѓРЅРєС†РёРё
 		HLineImpl* window() const{ return reinterpret_cast<HLineImpl*>(_window()); }
 	};
 

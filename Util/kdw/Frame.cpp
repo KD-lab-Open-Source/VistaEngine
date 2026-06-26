@@ -11,7 +11,7 @@
 
 namespace kdw{
 
-REGISTER_CLASS(Container, Frame, "Кнопка");
+REGISTER_CLASS(Container, Frame, "РљРЅРѕРїРєР°");
 
 #pragma warning(push)
 #pragma warning(disable: 4355) // 'this' : used in base member initializer list
@@ -177,7 +177,7 @@ void Frame::setText(const char* text)
 
 void Frame::serialize(Archive& ar)
 {
-	ar.serialize(text_, "text", "&Текст");
+	ar.serialize(text_, "text", "&РўРµРєСЃС‚");
 	Widget::serialize(ar);
 }
 

@@ -10,11 +10,11 @@
 #include "Squad.h"
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(SourceLightning, AllocationType, "LightingZoneAllocationType");
-REGISTER_ENUM_ENCLOSED(SourceLightning, TERRA_CENTER, "В центр зоны");
-REGISTER_ENUM_ENCLOSED(SourceLightning, TERRA_ROUND, "Равномерно по окружности");
-REGISTER_ENUM_ENCLOSED(SourceLightning, TERRA_RANDOM, "Случайно по зоне");
-REGISTER_ENUM_ENCLOSED(SourceLightning, SPHERE_SPHERE, "Случайно по сфере");
-REGISTER_ENUM_ENCLOSED(SourceLightning, SPHERE_RANDOM, "Случайно по шару");
+REGISTER_ENUM_ENCLOSED(SourceLightning, TERRA_CENTER, "Р’ С†РµРЅС‚СЂ Р·РѕРЅС‹");
+REGISTER_ENUM_ENCLOSED(SourceLightning, TERRA_ROUND, "Р Р°РІРЅРѕРјРµСЂРЅРѕ РїРѕ РѕРєСЂСѓР¶РЅРѕСЃС‚Рё");
+REGISTER_ENUM_ENCLOSED(SourceLightning, TERRA_RANDOM, "РЎР»СѓС‡Р°Р№РЅРѕ РїРѕ Р·РѕРЅРµ");
+REGISTER_ENUM_ENCLOSED(SourceLightning, SPHERE_SPHERE, "РЎР»СѓС‡Р°Р№РЅРѕ РїРѕ СЃС„РµСЂРµ");
+REGISTER_ENUM_ENCLOSED(SourceLightning, SPHERE_RANDOM, "РЎР»СѓС‡Р°Р№РЅРѕ РїРѕ С€Р°СЂСѓ");
 END_ENUM_DESCRIPTOR_ENCLOSED(SourceLightning, AllocationType);
 
 #pragma warning(disable: 4355)
@@ -78,19 +78,19 @@ SourceLightning::~SourceLightning()
 void SourceLightning::serialize(Archive& ar){
 	__super::serialize(ar);
 
-	ar.serialize(alloc_type_, "alloc_type", "размещение по зоне");
+	ar.serialize(alloc_type_, "alloc_type", "СЂР°Р·РјРµС‰РµРЅРёРµ РїРѕ Р·РѕРЅРµ");
 
-	ar.serialize(height_, "height", "высота образования молний");
+	ar.serialize(height_, "height", "РІС‹СЃРѕС‚Р° РѕР±СЂР°Р·РѕРІР°РЅРёСЏ РјРѕР»РЅРёР№");
 	if(alloc_type_ != TERRA_CENTER)
-		ar.serialize(num_lights_, "num_lights", "количество молний");
+		ar.serialize(num_lights_, "num_lights", "РєРѕР»РёС‡РµСЃС‚РІРѕ РјРѕР»РЅРёР№");
 
-	ar.serialize(permanent_effect_, "permanent_effect", "постоянная молния в зоне");
-	ar.serialize(strike_effect_, "strike_effect", "атака юнита в зоне");
-	ar.serialize(turnOfByTarget_, "turnOfByTarget", "выключать постоянный эффект молнии при атаке");
+	ar.serialize(permanent_effect_, "permanent_effect", "РїРѕСЃС‚РѕСЏРЅРЅР°СЏ РјРѕР»РЅРёСЏ РІ Р·РѕРЅРµ");
+	ar.serialize(strike_effect_, "strike_effect", "Р°С‚Р°РєР° СЋРЅРёС‚Р° РІ Р·РѕРЅРµ");
+	ar.serialize(turnOfByTarget_, "turnOfByTarget", "РІС‹РєР»СЋС‡Р°С‚СЊ РїРѕСЃС‚РѕСЏРЅРЅС‹Р№ СЌС„С„РµРєС‚ РјРѕР»РЅРёРё РїСЂРё Р°С‚Р°РєРµ");
 	
-	ar.serialize(useChainLightning_, "useChainLightning_", "использовать цепной эффект");
+	ar.serialize(useChainLightning_, "useChainLightning_", "РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ С†РµРїРЅРѕР№ СЌС„С„РµРєС‚");
 	if(useChainLightning_){
-		ar.serialize(chainLightningAttribute_, "chainLightningAttribute", "настройки цепной молнии");
+		ar.serialize(chainLightningAttribute_, "chainLightningAttribute", "РЅР°СЃС‚СЂРѕР№РєРё С†РµРїРЅРѕР№ РјРѕР»РЅРёРё");
 		if(!chainLightningAttribute_.strike_effect_.get())
 			chainLightningAttribute_.strike_effect_ = strike_effect_;
 	}

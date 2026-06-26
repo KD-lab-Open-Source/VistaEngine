@@ -3,7 +3,7 @@ typedef	unsigned char	Pixel;
 #ifdef __cplusplus
 extern "C" {
 #endif __cplusplus
-// c - тип ильтрации:
+// c - С‚РёРї РёР»СЊС‚СЂР°С†РёРё:
 //'b': box_filter
 //'t': triangle_filter
 //'q': bell_filter

@@ -220,7 +220,7 @@ struct Image {
 	//virtual void resizeV(const ContribList& contribListV, Image* dst)=0;
 };
 
-//GET_A Íàäîëè &0xFF
+//GET_A ÐÐ°Ð´Ð¾Ð»Ð¸ &0xFF
 #define GET_A(c) (((c)>>24)&0xFF)
 #define GET_R(c) (((c)>>16)&0xFF)
 #define GET_G(c) (((c)>>8)&0xFF)

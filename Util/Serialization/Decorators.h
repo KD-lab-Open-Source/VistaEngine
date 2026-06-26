@@ -52,7 +52,7 @@ struct NotDecorator{
 	bool serialize(Archive& ar, const char* name, const char* nameAlt){		
 		if(ar.isEdit()){
 			if(ar.openStruct(*this, name, nameAlt)){
-				ar.serialize(value_, "value", "��������");
+				ar.serialize(value_, "value", "Значение");
 				ar.closeStruct(name);
 			}
 			return true;

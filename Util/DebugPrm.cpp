@@ -137,7 +137,7 @@ void ShowDebugUnitBase::serialize(Archive& ar)
 	ar.serialize(producedPlacementZone, "producedPlacementZone", 0);
 	ar.serialize(lodDistance_,"lodDistance",0);
 	ar.serialize(showGraphicsBound, "showGraphicsBound", "showGraphicsBound");
-	ar.serialize(visibleUnit, "visibleUnit", "видимость на экране");
+	ar.serialize(visibleUnit, "visibleUnit", "РІРёРґРёРјРѕСЃС‚СЊ РЅР° СЌРєСЂР°РЅРµ");
 }
 
 ShowDebugUnitInterface::ShowDebugUnitInterface()
@@ -197,13 +197,13 @@ void ShowDebugUnitReal::serialize(Archive& ar)
 	ar.serialize(earthDamage, "earthDamage", 0);
 	ar.serialize(attackModes, "attackModes", 0);
 	ar.serialize(currentChain, "currentChain", 0);
-	ar.serialize(sightSector, "sightSector", "Сектор обзора");
-	ar.serialize(noiseRadius, "noiseRadius", "Радиус создаваемого шума");
-	ar.serialize(noiseTarget, "noiseTarget", "Услышанный шум");
-	ar.serialize(hearingRadius, "hearingRadius", "Радиус слышимости");
-	ar.serialize(directControlWeapon, "directControlWeapon", "Выбранное оружие в прямом управлении");
-	ar.serialize(modelLogicNode, "modelLogicNode", "Логический узел");
-	ar.serialize(modelNode, "modelNode", "Графический узел");
+	ar.serialize(sightSector, "sightSector", "РЎРµРєС‚РѕСЂ РѕР±Р·РѕСЂР°");
+	ar.serialize(noiseRadius, "noiseRadius", "Р Р°РґРёСѓСЃ СЃРѕР·РґР°РІР°РµРјРѕРіРѕ С€СѓРјР°");
+	ar.serialize(noiseTarget, "noiseTarget", "РЈСЃР»С‹С€Р°РЅРЅС‹Р№ С€СѓРј");
+	ar.serialize(hearingRadius, "hearingRadius", "Р Р°РґРёСѓСЃ СЃР»С‹С€РёРјРѕСЃС‚Рё");
+	ar.serialize(directControlWeapon, "directControlWeapon", "Р’С‹Р±СЂР°РЅРЅРѕРµ РѕСЂСѓР¶РёРµ РІ РїСЂСЏРјРѕРј СѓРїСЂР°РІР»РµРЅРёРё");
+	ar.serialize(modelLogicNode, "modelLogicNode", "Р›РѕРіРёС‡РµСЃРєРёР№ СѓР·РµР»");
+	ar.serialize(modelNode, "modelNode", "Р“СЂР°С„РёС‡РµСЃРєРёР№ СѓР·РµР»");
 }
 
 
@@ -337,9 +337,9 @@ ShowDebugSource::ShowDebugSource()
 
 void ShowDebugSource::serialize(Archive& ar)
 {
-	ar.serialize(enable, "enable", "Включить");
+	ar.serialize(enable, "enable", "Р’РєР»СЋС‡РёС‚СЊ");
 	ar.serialize(name, "name", 0);
-	ar.serialize(state, "state", "Состояние");
+	ar.serialize(state, "state", "РЎРѕСЃС‚РѕСЏРЅРёРµ");
 	ar.serialize(label, "label", 0);
 	ar.serialize(radius, "radius", 0);
 	ar.serialize(axis, "axis", 0);
@@ -391,11 +391,11 @@ void ShowDebugWeapon::serialize(Archive& ar)
 	ar.serialize(parameters, "parameters", 0);
 	ar.serialize(damage, "damage", 0);
 	ar.serialize(load, "load", 0);
-	ar.serialize(fireRadius, "fireRadius", "Дальность стрельбы");
+	ar.serialize(fireRadius, "fireRadius", "Р”Р°Р»СЊРЅРѕСЃС‚СЊ СЃС‚СЂРµР»СЊР±С‹");
 	ar.serialize(showWeaponID, "showWeaponID", 0);
 	ar.serialize(showWeaponSlotID, "showWeaponSlotID", 0);
-	ar.serialize(showChainLightning, "showLightning", "Цепной эффект");
-	ar.serialize(showLightningUnitChainRadius, "showLightningUnitChainRadius", "Радиус цепного эффекта вторичных эммитеров");
+	ar.serialize(showChainLightning, "showLightning", "Р¦РµРїРЅРѕР№ СЌС„С„РµРєС‚");
+	ar.serialize(showLightningUnitChainRadius, "showLightningUnitChainRadius", "Р Р°РґРёСѓСЃ С†РµРїРЅРѕРіРѕ СЌС„С„РµРєС‚Р° РІС‚РѕСЂРёС‡РЅС‹С… СЌРјРјРёС‚РµСЂРѕРІ");
 }				   
 
 ShowDebugInterface::ShowDebugInterface()
@@ -425,28 +425,28 @@ ShowDebugInterface::ShowDebugInterface()
 
 void ShowDebugInterface::serialize(Archive& ar)
 {
-	ar.serialize(showDebug, "showDebug", "Показывать интерфейсную информацию");
-	ar.serialize(writeLog, "writeLogMode", "Писать в лог");
-	ar.serialize(disableTextures, "disableTextures", "Не выводить текстуры");
-	ar.serialize(background, "background", "Информация о фоновых 3D моделях");
-	ar.serialize(bgeffects, "bgeffects", "Фоновые эффекты");
-	ar.serialize(screens, "screens", "Информация о текущих экранах");
-	ar.serialize(controlBorder, "controlBorder", "Показывать границы контролов");
-	ar.serialize(hoveredControlBorder, "hoveredControlBorder", "Показывать границу и имя контрола под мышкой");
-	ar.serialize(hoveredControlExtInfo, "hoveredControlExtInfo", "Показывать расширенную информацию по контролу под мышкой");
-	ar.serialize(showTransformInfo, "showTransformInfo", "Информация о трансформации кнопки");
-	ar.serialize(showInventoryItemInfo, "showInventoryItemInfo", "Информация об элементе инвентаря");
-	ar.serialize(focusedControlBorder, "focusedControlBorder", "Показывать границу контрола с фокусом ввода");
-	ar.serialize(enableAllNetControls, "enableAllNetControls", "Разрешить менять все настройки миссии");
-	ar.serialize(showSelectManager, "selectManager", "Информация о селекте");
-	ar.serialize(marks, "marks", "Пометки");
-	ar.serialize(hoverUnitBound, "hoverUnitBound", "Показать баунд юнита под мышкой");
-	ar.serialize(showUpMarksCount, "showUpMarksCount", "Количество обработчиков взлетающих значений");
-	ar.serialize(showAimPosition, "showAimPosition", "Точка прицеливания");
-	ar.serialize(cursorReason, "cursorReason", "Причина выбора курсора");
-	ar.serialize(logicDispatcher, "logicDispatcher", "Временная инфорация интерфейса");
-	ar.serialize(showDebugJoystick, "showDebugJoystick", "Состояние джойстика");
-	ar.serialize(showDebugSpriteScale, "showDebugSpriteScale", "Маштаб спрайтиков");
+	ar.serialize(showDebug, "showDebug", "РџРѕРєР°Р·С‹РІР°С‚СЊ РёРЅС‚РµСЂС„РµР№СЃРЅСѓСЋ РёРЅС„РѕСЂРјР°С†РёСЋ");
+	ar.serialize(writeLog, "writeLogMode", "РџРёСЃР°С‚СЊ РІ Р»РѕРі");
+	ar.serialize(disableTextures, "disableTextures", "РќРµ РІС‹РІРѕРґРёС‚СЊ С‚РµРєСЃС‚СѓСЂС‹");
+	ar.serialize(background, "background", "РРЅС„РѕСЂРјР°С†РёСЏ Рѕ С„РѕРЅРѕРІС‹С… 3D РјРѕРґРµР»СЏС…");
+	ar.serialize(bgeffects, "bgeffects", "Р¤РѕРЅРѕРІС‹Рµ СЌС„С„РµРєС‚С‹");
+	ar.serialize(screens, "screens", "РРЅС„РѕСЂРјР°С†РёСЏ Рѕ С‚РµРєСѓС‰РёС… СЌРєСЂР°РЅР°С…");
+	ar.serialize(controlBorder, "controlBorder", "РџРѕРєР°Р·С‹РІР°С‚СЊ РіСЂР°РЅРёС†С‹ РєРѕРЅС‚СЂРѕР»РѕРІ");
+	ar.serialize(hoveredControlBorder, "hoveredControlBorder", "РџРѕРєР°Р·С‹РІР°С‚СЊ РіСЂР°РЅРёС†Сѓ Рё РёРјСЏ РєРѕРЅС‚СЂРѕР»Р° РїРѕРґ РјС‹С€РєРѕР№");
+	ar.serialize(hoveredControlExtInfo, "hoveredControlExtInfo", "РџРѕРєР°Р·С‹РІР°С‚СЊ СЂР°СЃС€РёСЂРµРЅРЅСѓСЋ РёРЅС„РѕСЂРјР°С†РёСЋ РїРѕ РєРѕРЅС‚СЂРѕР»Сѓ РїРѕРґ РјС‹С€РєРѕР№");
+	ar.serialize(showTransformInfo, "showTransformInfo", "РРЅС„РѕСЂРјР°С†РёСЏ Рѕ С‚СЂР°РЅСЃС„РѕСЂРјР°С†РёРё РєРЅРѕРїРєРё");
+	ar.serialize(showInventoryItemInfo, "showInventoryItemInfo", "РРЅС„РѕСЂРјР°С†РёСЏ РѕР± СЌР»РµРјРµРЅС‚Рµ РёРЅРІРµРЅС‚Р°СЂСЏ");
+	ar.serialize(focusedControlBorder, "focusedControlBorder", "РџРѕРєР°Р·С‹РІР°С‚СЊ РіСЂР°РЅРёС†Сѓ РєРѕРЅС‚СЂРѕР»Р° СЃ С„РѕРєСѓСЃРѕРј РІРІРѕРґР°");
+	ar.serialize(enableAllNetControls, "enableAllNetControls", "Р Р°Р·СЂРµС€РёС‚СЊ РјРµРЅСЏС‚СЊ РІСЃРµ РЅР°СЃС‚СЂРѕР№РєРё РјРёСЃСЃРёРё");
+	ar.serialize(showSelectManager, "selectManager", "РРЅС„РѕСЂРјР°С†РёСЏ Рѕ СЃРµР»РµРєС‚Рµ");
+	ar.serialize(marks, "marks", "РџРѕРјРµС‚РєРё");
+	ar.serialize(hoverUnitBound, "hoverUnitBound", "РџРѕРєР°Р·Р°С‚СЊ Р±Р°СѓРЅРґ СЋРЅРёС‚Р° РїРѕРґ РјС‹С€РєРѕР№");
+	ar.serialize(showUpMarksCount, "showUpMarksCount", "РљРѕР»РёС‡РµСЃС‚РІРѕ РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ РІР·Р»РµС‚Р°СЋС‰РёС… Р·РЅР°С‡РµРЅРёР№");
+	ar.serialize(showAimPosition, "showAimPosition", "РўРѕС‡РєР° РїСЂРёС†РµР»РёРІР°РЅРёСЏ");
+	ar.serialize(cursorReason, "cursorReason", "РџСЂРёС‡РёРЅР° РІС‹Р±РѕСЂР° РєСѓСЂСЃРѕСЂР°");
+	ar.serialize(logicDispatcher, "logicDispatcher", "Р’СЂРµРјРµРЅРЅР°СЏ РёРЅС„РѕСЂР°С†РёСЏ РёРЅС‚РµСЂС„РµР№СЃР°");
+	ar.serialize(showDebugJoystick, "showDebugJoystick", "РЎРѕСЃС‚РѕСЏРЅРёРµ РґР¶РѕР№СЃС‚РёРєР°");
+	ar.serialize(showDebugSpriteScale, "showDebugSpriteScale", "РњР°С€С‚Р°Р± СЃРїСЂР°Р№С‚РёРєРѕРІ");
 }
 
 ShowDebugEffects::ShowDebugEffects()
@@ -457,8 +457,8 @@ ShowDebugEffects::ShowDebugEffects()
 
 void ShowDebugEffects::serialize(Archive& ar)
 {
-	ar.serialize(showName, "showName", "Показывать библиотечное имя");
-	ar.serialize(axis, "axis", "Рисовать оси");
+	ar.serialize(showName, "showName", "РџРѕРєР°Р·С‹РІР°С‚СЊ Р±РёР±Р»РёРѕС‚РµС‡РЅРѕРµ РёРјСЏ");
+	ar.serialize(axis, "axis", "Р РёСЃРѕРІР°С‚СЊ РѕСЃРё");
 }
 
 ShowDebugTerrain::ShowDebugTerrain()
@@ -505,17 +505,17 @@ PanoScreenshotSetup::PanoScreenshotSetup()
 
 void PanoScreenshotSetup::serialize(Archive& ar)
 {
-	ar.serialize(count_psi, "count_psi", "шагов по горизонтали");
-	ar.serialize(count_theta, "count_theta", "шагов по вертикали");
+	ar.serialize(count_psi, "count_psi", "С€Р°РіРѕРІ РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё");
+	ar.serialize(count_theta, "count_theta", "С€Р°РіРѕРІ РїРѕ РІРµСЂС‚РёРєР°Р»Рё");
 
-	ar.serialize(delta_psi, "delta_psi", "шаг угла по горизонтали");
-	ar.serialize(delta_theta, "delta_theta", "шаг угла по вертикали");
+	ar.serialize(delta_psi, "delta_psi", "С€Р°Рі СѓРіР»Р° РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё");
+	ar.serialize(delta_theta, "delta_theta", "С€Р°Рі СѓРіР»Р° РїРѕ РІРµСЂС‚РёРєР°Р»Рё");
 
-	ar.serialize(add_theta, "add_theta", "смещение по вертикали");
+	ar.serialize(add_theta, "add_theta", "СЃРјРµС‰РµРЅРёРµ РїРѕ РІРµСЂС‚РёРєР°Р»Рё");
 
-	ar.serialize(aeroZ, "aeroZ", "высота камеры для аэропанорам");
-	ar.serialize(aeroDX, "aeroDX", "шаг по x для аэропанорам");
-	ar.serialize(aeroDY, "aeroDY", "шаг по y для аэропанорам");
+	ar.serialize(aeroZ, "aeroZ", "РІС‹СЃРѕС‚Р° РєР°РјРµСЂС‹ РґР»СЏ Р°СЌСЂРѕРїР°РЅРѕСЂР°Рј");
+	ar.serialize(aeroDX, "aeroDX", "С€Р°Рі РїРѕ x РґР»СЏ Р°СЌСЂРѕРїР°РЅРѕСЂР°Рј");
+	ar.serialize(aeroDY, "aeroDY", "С€Р°Рі РїРѕ y РґР»СЏ Р°СЌСЂРѕРїР°РЅРѕСЂР°Рј");
 }
 
 DebugPrm::DebugPrm()
@@ -584,7 +584,7 @@ void DebugPrm::serialize(Archive& ar)
 	ar.serialize(showDebugEffects, "showDebugEffects", 0);
 	ar.serialize(showDebugTerrain, "showDebugTerrain", 0);
 
-	ar.serialize(panoScreenshotSetup, "panoScreenshotSetup", "Настройки съемки панорам");
+	ar.serialize(panoScreenshotSetup, "panoScreenshotSetup", "РќР°СЃС‚СЂРѕР№РєРё СЃСЉРµРјРєРё РїР°РЅРѕСЂР°Рј");
 	
 	ar.serialize(debugWireFrame, "debugWireFrame", 0);
 	ar.serialize(showCurrentAI, "showCurrentAI", 0);
@@ -615,13 +615,13 @@ void DebugPrm::serialize(Archive& ar)
 	
 	ar.serialize(debugDamage, "debugDamage", 0);
 	ar.serialize(debugDamageArmor, "debugDamageArmor", 0);
-	ar.serialize(debugDisableDamage, "debugDisableDamage", "запретить повреждения");
-	ar.serialize(debugClickKillMode, "debugClickKillMode", "убивать юнитов по клику");
+	ar.serialize(debugDisableDamage, "debugDisableDamage", "Р·Р°РїСЂРµС‚РёС‚СЊ РїРѕРІСЂРµР¶РґРµРЅРёСЏ");
+	ar.serialize(debugClickKillMode, "debugClickKillMode", "СѓР±РёРІР°С‚СЊ СЋРЅРёС‚РѕРІ РїРѕ РєР»РёРєСѓ");
 	ar.serialize(showNetStat, "showNetStat", 0);
 	ar.serialize(showFieldOfViewMap, "showFieldOfViewMap", "showFieldOfViewMap");
 	ar.serialize(showDebugNumSounds,"showDebugNumSounds",0);
 	ar.serialize(debugLoadTime, "debugLoadTime", 0);
-	ar.serialize(debugFontSize, "debugFontSize", "Размер шрифта по умолчанию");
+	ar.serialize(debugFontSize, "debugFontSize", "Р Р°Р·РјРµСЂ С€СЂРёС„С‚Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ");
 
 	ar.serialize(debugDisableSpecialExitProcess, "disableTriggeredExit", 0);
 		

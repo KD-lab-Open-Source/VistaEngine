@@ -14,15 +14,15 @@ struct SNDOneBuffer
 	float volume;
 
 	LPDIRECTSOUNDBUFFER buffer;
-	DWORD nSamplesPerSec;//Частота сэмпла см. WAVEFORMATEX
-	DWORD nAvgBytesPerSec;//Количество байтов в секунду
+	DWORD nSamplesPerSec;//Р§Р°СЃС‚РѕС‚Р° СЃСЌРјРїР»Р° СЃРј. WAVEFORMATEX
+	DWORD nAvgBytesPerSec;//РљРѕР»РёС‡РµСЃС‚РІРѕ Р±Р°Р№С‚РѕРІ РІ СЃРµРєСѓРЅРґСѓ
 
 	VirtualSound3D* p3DBuffer;
 
-	void* pSound;//SND2DSound или SND3DSound
+	void* pSound;//SND2DSound РёР»Рё SND3DSound
 	bool used,played_cycled;
 
-	int pause_level;//Если не 0, то звук остановлен функцией SNDPausePush();
+	int pause_level;//Р•СЃР»Рё РЅРµ 0, С‚Рѕ Р·РІСѓРє РѕСЃС‚Р°РЅРѕРІР»РµРЅ С„СѓРЅРєС†РёРµР№ SNDPausePush();
 
 	double begin_play_time;
 
@@ -32,7 +32,7 @@ struct SNDOneBuffer
 	inline HRESULT RecalculatePos();
 	inline void RecalculateVolume();
 
-	//Автоматическое задание нестандартной частоты
+	//РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРµ Р·Р°РґР°РЅРёРµ РЅРµСЃС‚Р°РЅРґР°СЂС‚РЅРѕР№ С‡Р°СЃС‚РѕС‚С‹
 	HRESULT PlayPreprocessing();
 
 	bool SetFrequency(float frequency);
@@ -59,7 +59,7 @@ struct ScriptParam
 
 	void Release();
 
-	//Рассчитывает, какой должна быть ClipDistance, чтобы звучало не более max_num_sound
+	//Р Р°СЃСЃС‡РёС‚С‹РІР°РµС‚, РєР°РєРѕР№ РґРѕР»Р¶РЅР° Р±С‹С‚СЊ ClipDistance, С‡С‚РѕР±С‹ Р·РІСѓС‡Р°Р»Рѕ РЅРµ Р±РѕР»РµРµ max_num_sound
 	void RecalculateClipDistance();
 
 	MTSection* GetLock(){return &mtlock;};
@@ -67,7 +67,7 @@ struct ScriptParam
 	vector<SNDOneBuffer>& GetBuffer(){ASSERT(mtlock.is_lock());return soundbuffer;}
 protected:
 	MTSection mtlock;
-	//Звуки, которые выбираются при загрузке по RND
+	//Р—РІСѓРєРё, РєРѕС‚РѕСЂС‹Рµ РІС‹Р±РёСЂР°СЋС‚СЃСЏ РїСЂРё Р·Р°РіСЂСѓР·РєРµ РїРѕ RND
 	vector<LPDIRECTSOUNDBUFFER> sounds;
 	vector<SNDOneBuffer> soundbuffer;
 };

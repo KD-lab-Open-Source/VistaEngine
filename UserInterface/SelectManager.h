@@ -50,21 +50,21 @@ public:
 	void setPlayer(Player* player) { player_ = player; }
 	void clearPlayer() { player_ = 0; }
 
-	// ����� ��������� �����
+	// номер активного слота
 	int selectedSlot() const { return selectedSlot_; }
-	// ����� ���� �� ��������� �����
+	// любой юнит из активного слота
 	UnitInterface* selectedUnit();
-	// ���� �� �����, �� ������ ���� ��� �� �����, (-1) - �� ��������� �����
+	// юнит из слота, но только если там не пачка, (-1) - из активного слота
 	UnitInterface* getUnitIfOne(int slotIndex = -1);
-	// selectionAttribute ����� � �������� �����
+	// selectionAttribute юнита в активном слоте
 	const AttributeBase* selectedAttribute() const { return selectedAttribute_; }
-	// ������ ������ �������
+	// список слотов селекта
 	void getSelectList(Slots& out);
-	// � ������� ������ � ������ ���
+	// в селекте никого и ничего нет
 	bool isSelectionEmpty() const { return selectionSize_ == 0; }
-	// ���������� ������ � �������
+	// количество юнитов в селекте
 	int selectionSize() const { return selectionSize_; }
-	/// ���� ������������ ������� (��� ����� ������ ���� (������� ������ ������) � ������ ������)
+	/// флаг однородности селекта (все юниты одного типа (включая внутри сквада) и одного уровня)
 	bool uniform();
 
 	bool selectArea(const Vect2f& p0, const Vect2f& p1, bool multi, UnitInterface* startTrakingUnit);
@@ -106,7 +106,7 @@ public:
 
 	bool isSelected(const AttributeBase* attribute, bool singleOnly, bool needUniform);
 	bool isSquadSelected(const AttributeBase* attribute, bool singleOnly) const;
-	/// ���������� true, ���� ���������� ��������� � ������ ������������ ���� �� �����
+	/// возвращает true, если заселекчен транспорт с юнитом определённого типа на борту
 	bool isInTransport(const AttributeBase* attribute, bool singleOnly) const;
 
 	bool squadsMerge();
@@ -137,7 +137,7 @@ private:
 	const AttributeBase* selectedAttribute_;
 	int selectedSlot_;
 
-	// �������� ����
+	// активный слот
 	void validateSelectedObject();
 
 	UnitInterfaceListsContainer savedSelections_;

@@ -35,7 +35,7 @@ UI_Render::UI_Render()
 {
 	self_ = this;
 	defaultFont_ = new UI_Font();
-	UI_GlobalAttributes::instance(); // загрузка параметров UI_Render
+	UI_GlobalAttributes::instance(); // Р·Р°РіСЂСѓР·РєР° РїР°СЂР°РјРµС‚СЂРѕРІ UI_Render
 }
 
 UI_Render::~UI_Render()
@@ -195,7 +195,7 @@ Vect2f UI_Render::outText(const Rectf& pos, const UI_TextParser& parser, OutNode
 
 	int hSize = parser.font()->lineHeight();
 	int fSize = parser.font()->size();
-	y -= hSize; // первым тегом идет служебный перенос строки
+	y -= hSize; // РїРµСЂРІС‹Рј С‚РµРіРѕРј РёРґРµС‚ СЃР»СѓР¶РµР±РЅС‹Р№ РїРµСЂРµРЅРѕСЃ СЃС‚СЂРѕРєРё
 
 	if((textAlign & UI_TEXT_VALIGN) != UI_TEXT_VALIGN_TOP){
 
@@ -506,7 +506,7 @@ const UI_Font* UI_Render::defaultFont() const
 			}
 	}
 
-	xxassert(defaultFont_->font(), "Не удалось создать фонт по умолчанию");
+	xxassert(defaultFont_->font(), "РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕР·РґР°С‚СЊ С„РѕРЅС‚ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ");
 	return defaultFont_;
 }
 
@@ -532,7 +532,7 @@ void UI_Render::serialize(Archive& ar)
 	xassert(defaultFont_);
 	if(ar.isInput())
 		defaultFont_->releaseFont();
-	ar.serialize(*defaultFont_, "defaultFont", "Фонт по умолчанию");
+	ar.serialize(*defaultFont_, "defaultFont", "Р¤РѕРЅС‚ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ");
 }
 
 // --------------------------------------------------------------------------

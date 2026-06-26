@@ -19,15 +19,15 @@
 #include "GlobalAttributes.h"
 
 DECLARE_SEGMENT(Projectile)
-REGISTER_CLASS(UnitBase, ProjectileBase, "�������");
-REGISTER_CLASS(UnitBase, ProjectileBullet, "����");
-REGISTER_CLASS(UnitBase, ProjectileMissile, "������");
+REGISTER_CLASS(UnitBase, ProjectileBase, "снаряды");
+REGISTER_CLASS(UnitBase, ProjectileBullet, "пули");
+REGISTER_CLASS(UnitBase, ProjectileMissile, "ракеты");
 
 REGISTER_CLASS_IN_FACTORY(UnitFactory, UNIT_CLASS_PROJECTILE, ProjectileBase);
 REGISTER_CLASS_IN_FACTORY(UnitFactory, UNIT_CLASS_PROJECTILE_BULLET, ProjectileBullet);
 REGISTER_CLASS_IN_FACTORY(UnitFactory, UNIT_CLASS_PROJECTILE_MISSILE, ProjectileMissile);
 
-WRAP_LIBRARY(AttributeProjectileTable, "AttributeProjectile", "�������", "Scripts\\Content\\AttributeProjectile", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(AttributeProjectileTable, "AttributeProjectile", "Снаряды", "Scripts\\Content\\AttributeProjectile", 0, LIBRARY_EDITABLE);
 
 struct RigidBodyPrmProjectileReference : RigidBodyPrmReference
 {
@@ -76,14 +76,14 @@ void AttributeProjectile::serialize(Archive& ar)
 
 	AttributeBase::serialize(ar);
 
-	ar.serialize(dockedVisibilityGroup_, "dockedVisibilityGroup", "������ ��������� � ������");
-	ar.serialize(firingVisibilityGroup_, "firingVisibilityGroup", "������ ��������� ��� ��������");
+	ar.serialize(dockedVisibilityGroup_, "dockedVisibilityGroup", "Группа видимости в оружие");
+	ar.serialize(firingVisibilityGroup_, "firingVisibilityGroup", "Группа видимости при выстреле");
 
 	RigidBodyPrmProjectileReference rigidBodyProjectile = rigidBodyPrm;
-	ar.serialize(rigidBodyProjectile, "rigidBodyPrm", "��� �������");
+	ar.serialize(rigidBodyProjectile, "rigidBodyPrm", "Тип снаряда");
 	rigidBodyPrm = rigidBodyProjectile;
 
-	ar.serialize(forwardVelocity, "forwardVelocity", "�������� ������");
+	ar.serialize(forwardVelocity, "forwardVelocity", "Скорость полета");
 	if(!forwardVelocity)
 		forwardVelocity = rigidBodyPrm->forward_velocity_max;
 
@@ -106,40 +106,40 @@ void AttributeProjectile::serialize(Archive& ar)
 		}
 	}
 	
-	ar.serialize(exactCollision, "exactCollision", "������ ���������");
+	ar.serialize(exactCollision, "exactCollision", "Точное попадание");
 	if(!exactCollision)
-		ar.serialize(radiusToExplode, "radiusToExplode", "��������� �� ���� ��� ������");
+		ar.serialize(radiusToExplode, "radiusToExplode", "Дистанция до цели для взрыва");
 
-	ar.serialize(applyImpulse, "applyImpulse", "����������� ���� ��� ���������");
+	ar.serialize(applyImpulse, "applyImpulse", "Отбрасывать цель при попадании");
 
 	if(applyImpulse)
-		ar.serialize(impulseStrength, "impulseStrength", "���� ��������");
+		ar.serialize(impulseStrength, "impulseStrength", "Сила импульса");
 
-    ar.serialize(damage_, "damage", "�����������");
-	ar.serialize(environmentDestruction, "environmentDestruction", "���������� �������� ���������");
-	ar.serialize(environmentStop, "environmentStop", "������� ��������� ������������ ������");
+    ar.serialize(damage_, "damage", "повреждения");
+	ar.serialize(environmentDestruction, "environmentDestruction", "Разрушение объектов окружения");
+	ar.serialize(environmentStop, "environmentStop", "Объекты окружения уничтожающие снаряд");
 
-	if(!ar.serialize(hitExplosionEffects_, "hitExplosionEffects", "������� ��� ��������� � ����")){ // conversion 26.12.07
+	if(!ar.serialize(hitExplosionEffects_, "hitExplosionEffects", "Эффекты при попадании в цель")){ // conversion 26.12.07
 		EffectAttribute eff;
-		ar.serialize(eff, "hitExplosionEffect", "���������� ��������� � ����");
+		ar.serialize(eff, "hitExplosionEffect", "Спецэффект попадания в цель");
 		hitExplosionEffects_.push_back(TargetEffect());
 		hitExplosionEffects_[0].setEffect(eff);
 	}
 
-	ar.serialize(shildExplosionEffect_, "shildExplosionEffect", "���������� ��������� � �������� ����");
-	ar.serialize(explosionState_, "explosionState", "����������� �� ���� ��� ���������");
+	ar.serialize(shildExplosionEffect_, "shildExplosionEffect", "спецэффект попадания в защитное поле");
+	ar.serialize(explosionState_, "explosionState", "воздействие на цель при попадании");
 
-	ar.serialize(sourcesCreationMode_, "sourcesCreationMode", "��������� ���������");
+	ar.serialize(sourcesCreationMode_, "sourcesCreationMode", "создавать источники");
 
-	ar.serialize(LifeTime, "LifeTime", "����� �����, �������");
+	ar.serialize(LifeTime, "LifeTime", "Время жизни, секунды");
 	if(!LifeTime)
 		LifeTime = 10;
 	if(rigidBodyPrm->unit_type == RigidBodyPrm::DEBRIS && rigidBodyPrm->ground_collision_enabled)
-		ar.serialize(collisionCounter, "collisionCounter", "����� ��������");
+		ar.serialize(collisionCounter, "collisionCounter", "Число отскоков");
 	if(rigidBodyPrm->unit_type == RigidBodyPrm::ROCKET && rigidBodyPrm->undergroundMode)
-		ar.serialize(traceTerTool, "traceTerTool", "����");
+		ar.serialize(traceTerTool, "traceTerTool", "след");
 
-	ar.serialize(mass, "mass", "�����");
+	ar.serialize(mass, "mass", "Масса");
 
 	collisionGroup = COLLISION_GROUP_ACTIVE_COLLIDER;
 }

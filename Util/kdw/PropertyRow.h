@@ -51,7 +51,7 @@ class PopupMenuItem;
 
 class KDW_API PropertyRow: public TreeRow{
 public:
-	static const int ROW_DEFAULT_HEIGHT = 19; // FIXME: DEFAULT_HEIGHT занят дефайном в TreeListCtrl-е
+	static const int ROW_DEFAULT_HEIGHT = 19; // FIXME: DEFAULT_HEIGHT Р·Р°РЅСЏС‚ РґРµС„Р°Р№РЅРѕРј РІ TreeListCtrl-Рµ
 	static const bool Custom = true;
 	//enum { Custom = true; }
 	enum WidgetPosition{
@@ -109,11 +109,11 @@ public:
 	virtual bool onSelect(PropertyTreeModel* model) { return true; }
 	virtual bool onActivateIcon(PropertyTree* tree) { return false; }
 	
-	// возвращает изменилось ли значение строчки
+	// РІРѕР·РІСЂР°С‰Р°РµС‚ РёР·РјРµРЅРёР»РѕСЃСЊ Р»Рё Р·РЅР°С‡РµРЅРёРµ СЃС‚СЂРѕС‡РєРё
 	virtual bool onActivate(PropertyTree* tree) { return onActivateWidget(tree, this); }
 	virtual bool onActivateWidget(PropertyTree* tree, PropertyRow* hostRow);
 	
-	// возваращает, нужно ли capture-ить мышь
+	// РІРѕР·РІР°СЂР°С‰Р°РµС‚, РЅСѓР¶РЅРѕ Р»Рё capture-РёС‚СЊ РјС‹С€СЊ
 	virtual bool onMouseDown(PropertyTree* tree, Vect2i point, bool& changed) { return false; }
 
 	virtual bool onKeyDown(PropertyTree* tree, sKey key);
@@ -136,8 +136,8 @@ public:
 	bool fullRow() const{ return fullRow_; }
 	void setFullRow(bool fullRow){ fullRow_ = fullRow; }
 
-	// pulledRow - это та, что "вытягивается" на уровень вверх
-	// (по символу '^' в начале nameAlt)
+	// pulledRow - СЌС‚Рѕ С‚Р°, С‡С‚Рѕ "РІС‹С‚СЏРіРёРІР°РµС‚СЃСЏ" РЅР° СѓСЂРѕРІРµРЅСЊ РІРІРµСЂС…
+	// (РїРѕ СЃРёРјРІРѕР»Сѓ '^' РІ РЅР°С‡Р°Р»Рµ nameAlt)
 	void setPulledRow(PropertyRow* row){ pulledRow_ = row; }
 	void setPulledContainer(PropertyRow* container){ pulledContainer_ = container; }
 
@@ -333,8 +333,8 @@ public:
 		ar.serialize(value_, "value", "Value");
 	}
 	PropertyRow* clone() const{
-		// если здесь возникла ошибка "error C2440: 'static_cast' : cannot convert from..."
-		// скорее всего вы забыли указать Derived аргумент при наследовании от PropertyRowImpl
+		// РµСЃР»Рё Р·РґРµСЃСЊ РІРѕР·РЅРёРєР»Р° РѕС€РёР±РєР° "error C2440: 'static_cast' : cannot convert from..."
+		// СЃРєРѕСЂРµРµ РІСЃРµРіРѕ РІС‹ Р·Р°Р±С‹Р»Рё СѓРєР°Р·Р°С‚СЊ Derived Р°СЂРіСѓРјРµРЅС‚ РїСЂРё РЅР°СЃР»РµРґРѕРІР°РЅРёРё РѕС‚ PropertyRowImpl
 		return cloneChildren(new Derived((void*)(&value_), sizeof(value_), name_, nameAlt_, typeName_), static_cast<const Derived* const>(this));
 	}
 protected:

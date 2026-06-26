@@ -301,7 +301,7 @@ void cScene::Animate()
 
 	MTAuto enter(lock_draw);
 
-	// �������� ��������
+	// анимация объектов
 	for(sGrid2d::iterator it=grid.begin();it!=grid.end();++it){
 		BaseGraphObject* p=*it;
 		if(p && p->getAttribute(ATTRUNKOBJ_DELETED)==0) 
@@ -310,7 +310,7 @@ void cScene::Animate()
 	if(tileMap_)
 		tileMap_->Animate(dTime);
 
-	// �������� ���������� �����
+	// анимация источников света
 	for(int i=0;i<GetNumberLight();i++)
 		if(GetLight(i)&&GetLight(i)->getAttribute(ATTRUNKOBJ_DELETED)==0) 
 			GetLight(i)->Animate(dTime);
@@ -340,14 +340,14 @@ void cScene::Draw(Camera* camera)
 
 	RemoveEmptyStaticSimply3dx();
 
-	//������� �� ���������������� ���� ������� ��� ���� child �����.
+	//Неплохо бы автоматизировать этот процесс для всех child камер.
 	if(shadowCamera_)
 		shadowCamera_->ClearParent();
 
 	//D3DSURFACE_DESC desc;
 	//gb_RenderDevice3D->lpBackBuffer->GetDesc(&desc);
 	//gb_RenderDevice3D->dtAdvance->CreateMirageMap(desc.Width,desc.Height);
-	camera->SetSecondRT(gb_RenderDevice3D->GetAccessibleZBuffer());//�����, ��� ����.
+	camera->SetSecondRT(gb_RenderDevice3D->GetAccessibleZBuffer());//Криво, для демы.
 
 //	unsigned int fp=_controlfp(0,0);
 //	_controlfp( _PC_24,  _MCW_PC ); 
@@ -358,8 +358,8 @@ void cScene::Draw(Camera* camera)
 	}
 
 /*
-���� ������������ ������� �������� ����� ��������� ���������� �������, �� ����� ������� ������������,
-����� ������� ��� ���������� ������� � ������� �� ��������.
+Если используется вариант удаления через несколько логических квантов, то когда счетчик сбрасывается,
+нужно удалить все предыдущие объекты в очереди на удаление.
 */
 	int graph_logic_quant=gb_VisGeneric->GetGraphLogicQuant();
 	if(graph_logic_quant>=prev_graph_logic_quant)
@@ -373,7 +373,7 @@ void cScene::Draw(Camera* camera)
 	Animate();
 	int i;
 
-	camera->PreDrawScene();//������� ������� � ��������.
+	camera->PreDrawScene();//Очистка буферов в основном.
 	if(shadowCamera_)
 		shadowCamera_->PreDrawScene();
 	if(lightCamera_)
@@ -533,7 +533,7 @@ bool cScene::TraceDir(const Vect3f& pStart,const Vect3f& pDir,Vect3f *pTrace)
 }
 
 bool cScene::TraceSegment(const Vect3f& pStart,const Vect3f& pFinish,Vect3f *pTrace)
-{//��� ������� �������� �����������, ��� ��� � TraceUnified ������������ ������� ������ �� �����.
+{//Эта функция работает некорректно, так как в TraceUnified неправильное условие выхода из цикла.
 	//xassert(0);
 	return TraceUnified(pStart,pFinish-pStart,pTrace,true);
 }
@@ -560,7 +560,7 @@ bool cScene::TraceUnified(const Vect3f& in_start,const Vect3f& in_dir,Vect3f *pT
 			  box,pStart,pFinish,clamp_by_dir))
 			  return false;
 
-	// �������� �������
+	// Алгоритм прохода
 	float dx = pFinish.x-pStart.x, dy = pFinish.y-pStart.y, dz = pFinish.z-pStart.z;
 	float dxAbs = fabsf(dx), dyAbs = fabsf(dy), dzAbs=fabsf(dz);
 	int dx_,dy_,dz_;
@@ -580,15 +580,15 @@ bool cScene::TraceUnified(const Vect3f& in_start,const Vect3f& in_dir,Vect3f *pT
 	}
 
 	int xb_=round(pStart.x*(1<<PREC_TRACE_RAY)),yb_=round(pStart.y*(1<<PREC_TRACE_RAY)),zb_=round(pStart.z*(1<<PREC_TRACE_RAY));
-	// ��������� ������� � fixed-point ������
-	int z_size = 512<<PREC_TRACE_RAY; // +1 ����� ��������� ��������� ��������� � �����������
+	// Переводим размеры в fixed-point формат
+	int z_size = 512<<PREC_TRACE_RAY; // +1 чтобы корректно учитывать сравнение с округленным
 	if (!clamp_by_dir)
-	{// ���
+	{// Луч
 		int x_size = vMap.H_SIZE<<PREC_TRACE_RAY; 
 		int y_size = vMap.V_SIZE<<PREC_TRACE_RAY;
 		for(;xb_>=0 && xb_<x_size && yb_>=0 && yb_<y_size && zb_<z_size;
 			xb_+=dx_,yb_+=dy_,zb_+=dz_)
-			// ��������������, ��� ������ ��������� ��� �����
+			// Предполагается, что камера находится над миром
 			if(vMap.getZ(xb_>>PREC_TRACE_RAY,yb_>>PREC_TRACE_RAY)>=(zb_>>PREC_TRACE_RAY))
 			{
 				int ix=xb_>>PREC_TRACE_RAY,iy=yb_>>PREC_TRACE_RAY;
@@ -597,13 +597,13 @@ bool cScene::TraceUnified(const Vect3f& in_start,const Vect3f& in_dir,Vect3f *pT
 			}
 	}
 	else
-	{// �������
+	{// Отрезок
 		int xe_=round(pFinish.x*(1<<PREC_TRACE_RAY)),ye_=round(pFinish.y*(1<<PREC_TRACE_RAY)),ze_=round(pFinish.z*(1<<PREC_TRACE_RAY));
 		int x_le = min(xb_, xe_), x_ri = max(xb_, xe_);
 		int y_le = min(yb_, ye_), y_ri = max(yb_, ye_);
 		for(;xb_>=x_le && xb_<=x_ri && yb_>=y_le && yb_<=y_ri && zb_<z_size;
 			xb_+=dx_,yb_+=dy_,zb_+=dz_)
-			// ��������������, ��� ������ ��������� ��� �����
+			// Предполагается, что камера находится над миром
 			if(vMap.getZ((xb_>>PREC_TRACE_RAY),(yb_>>PREC_TRACE_RAY))>=(zb_>>PREC_TRACE_RAY))
 			{
 				int ix=xb_>>PREC_TRACE_RAY,iy=yb_>>PREC_TRACE_RAY;
@@ -673,8 +673,8 @@ cUnkLight* cScene::CreateLightDetached(int Attribute,cTexture *pTexture)
 }
 
 cUnkLight* cScene::CreateLightDetached(int Attribute, const char* TextureName)
-{ // ���������� cUnkLight
-	xassert(!(Attribute&ATTRLIGHT_DIRECTION));//������ ���������� �������� ����� ������� ��� ������ ������� SetSun
+{ // реализация cUnkLight
+	xassert(!(Attribute&ATTRLIGHT_DIRECTION));//Теперь глобальный источник света задаётся при помощи функции SetSun
 	cUnkLight *Light=new cUnkLight();
 	Light->setAttribute(Attribute);
 
@@ -804,8 +804,8 @@ void cScene::CreateShadowmap()
 Vect2f cScene::CalcZMinZMaxShadowReciver()
 {
 	Vect2f objectz=shadowCamera_->CalcZMinZMaxShadowReciver();
-/*	//������� ��� ���������. ������ ��-�� ���� ��� ���������� ����� ������� �� ���� �����.
-	//�� ��� ��� ��� ������� ������ ��� ������, �� �������������� �� ���� ������. 
+/*	//Падение уже исправили. Падало из-за того что вызывалось когда реально не было теней.
+	//Но так как это слишком мелкий баг правит, то закомментарили на всяк случай. 
 	for(vector<ListSimply3dx>::iterator it=simply_objects.begin();it!=simply_objects.end();it++)
 	{
 		it->pStatic->AddZMinZMaxShadowReciver(shadowCamera_->GetMatrix(),objectz);
@@ -946,7 +946,7 @@ float buildTrapezoid(const Vect2f& origin, const Vect2f& yAxis, const Vect2f f[8
 		yMax = max(yMax, y);
 	}
 
-	if(yMax > 0.2f) // ������� ����������� ���� ������ (near-plane ������� � far-plane ��� ��������� ������������)
+	if(yMax > 0.2f) // Сильное отодвигание зоны фокуса (near-plane вписана в far-plane или неудачная конфигурация)
 		return FLT_INF;
 
 	Vect2f pf = origin + yAxis*yMin;
@@ -1029,7 +1029,7 @@ void cScene::fixShadowMapCameraTSM(Camera* camera, Camera* shadowCamera)
 	Vect2f pn = (f[0] + f[1] + f[2] + f[3])/4;
 	Vect2f pf = (f[4] + f[5] + f[6] + f[7])/4;
 	Vect2f yAxis = pn - pf;
-	if(yAxis.norm2() < 0.1f){ // �������� ������ ����������� ������, ������� ������
+	if(yAxis.norm2() < 0.1f){ // Отсекает совсем вырожденный случай, который падает
 		FixShadowMapCamera(camera, shadowCamera);
 		return;
 	}
@@ -1064,7 +1064,7 @@ void cScene::fixShadowMapCameraTSM(Camera* camera, Camera* shadowCamera)
 
 	stop_timer(1);
 
-	if(k < 0.2f){ // �������� ������� ����� ��������� frustrum (�� �������)
+	if(k < 0.2f){ // Трапеция слишком плохо описывает frustrum (по площади)
 		FixShadowMapCamera(camera, shadowCamera);
 		return;
 	}
@@ -1106,9 +1106,9 @@ void cScene::CalcShadowMapCamera(Camera* camera, Camera *shadowCamera)
 		&Focus, &Vect2f(0,box.max.z-box.min.z));
 	shadowCamera->SetPosition(LightMatrix);
 
-//� ����� ������� ��� ������ ������ ���� ��������� �� ���� �������
-//����� ������ ������������, ����� ������� ������. � ������ ������� ��� ������ ����
-//���������� �����, ��� ��� ���������� CalculateZMinMax
+//С одной стороны эта камера должна быть посчитана до того момента
+//когда начнёт определяться, какие объекты видимы. С другой стороны она должна быть
+//посчитанна позже, так как вызывается CalculateZMinMax
 	fixShadowBox = box;
 	fixShaddowLightMatrix = LightMatrix;
 }
@@ -1153,7 +1153,7 @@ void cScene::AddPlanarCamera(Camera* camera, bool light, bool toObjects)
 						   &Focus, &Vect2f(10,1e6f));
 	
 	planarCamera->SetPosition(LightMatrix);
-	planarCamera->Attach(SCENENODE_OBJECT,tileMap_); // �������� ��������� �����							   
+	planarCamera->Attach(SCENENODE_OBJECT,tileMap_); // рисовать источники света							   
 }
 
 void cScene::AddShadowCamera(Camera* camera)
@@ -1560,7 +1560,7 @@ void cScene::DetachSimply3dx(cSimply3dx* pObj)
 }
 
 void cScene::RemoveEmptyStaticSimply3dx()
-{//��� �������� StaticSimply3dx � ������� simply_objects ���������� ���������� ������.
+{//При удалении StaticSimply3dx в массиве simply_objects получается потерянная ссылка.
 	for(int i=0;i<simply_objects.size();)
 	{
 		ListSimply3dx& cur=simply_objects[i];
@@ -1596,7 +1596,7 @@ void cScene::AttachObj(BaseGraphObject *UnkObj)
 		if(MT_IS_GRAPH())
 			data.quant=gb_VisGeneric->GetGraphLogicQuant();
 		else
-			data.quant=gb_VisGeneric->GetLogicQuant()+1;//��������� �� ��������� �����.
+			data.quant=gb_VisGeneric->GetLogicQuant()+1;//Добавляем на следующий квант.
 	}else
 	{
 		data.quant=0;
@@ -1613,7 +1613,7 @@ void cScene::DetachObj(BaseGraphObject *UnkObj)
 	int quant=0;
 	if(gb_VisGeneric->GetUseLogicQuant())
 	{
-		quant=gb_VisGeneric->GetLogicQuant()+3;//������� ����� �����.
+		quant=gb_VisGeneric->GetLogicQuant()+3;//Удаляем через квант.
 	}
 
 	if(erase_list.empty() || erase_list.back().quant!=quant)
@@ -1656,7 +1656,7 @@ void cScene::mtUpdate(int cur_quant)
 					BaseGraphObject* obj=*itl;
 					if(false)
 					{
-						obj->Release();//������� ������ ��� �� ����������� � ������.
+						obj->Release();//Удаляем объект еще не добавленный в список.
 					}else
 					{
 						xassert(obj->GetRef()==1);
@@ -1734,7 +1734,7 @@ void cScene::BuildTree()
 {
 	if(!tileMap_)
 	{
-		//���� ��� ����� - ������������ ����������� ��������� �����.
+		//Если нет карты - использовать сферические источники света.
 		tree.clear();
 
 		bool is_spherical=false;

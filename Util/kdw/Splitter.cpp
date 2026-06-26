@@ -19,10 +19,10 @@
 #pragma warning(disable: 4355) // 'this' : used in base member initializer list
 
 namespace kdw{
-REGISTER_CLASS(Widget, HSplitter, "Разметка\\Разделитель, горизонтальный")
-REGISTER_CLASS(Widget, VSplitter, "Разметка\\Разделитель, вертикальный")
-REGISTER_CLASS(Container, HSplitter, "Разделитель, горизонтальный")
-REGISTER_CLASS(Container, VSplitter, "Разделитель, вертикальный")
+REGISTER_CLASS(Widget, HSplitter, "Р Р°Р·РјРµС‚РєР°\\Р Р°Р·РґРµР»РёС‚РµР»СЊ, РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹Р№")
+REGISTER_CLASS(Widget, VSplitter, "Р Р°Р·РјРµС‚РєР°\\Р Р°Р·РґРµР»РёС‚РµР»СЊ, РІРµСЂС‚РёРєР°Р»СЊРЅС‹Р№")
+REGISTER_CLASS(Container, HSplitter, "Р Р°Р·РґРµР»РёС‚РµР»СЊ, РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹Р№")
+REGISTER_CLASS(Container, VSplitter, "Р Р°Р·РґРµР»РёС‚РµР»СЊ, РІРµСЂС‚РёРєР°Р»СЊРЅС‹Р№")
 
 SplitterImpl::SplitterImpl(kdw::Splitter* owner)
 : owner_(owner)
@@ -506,15 +506,15 @@ void Splitter::_setFocus()
 
 void Splitter::Element::serialize(Archive& ar)
 {
-	ar.serialize(position, "position", "&Положение");
-	ar.serialize(widget, "widget", "&Контрол");
+	ar.serialize(position, "position", "&РџРѕР»РѕР¶РµРЅРёРµ");
+	ar.serialize(widget, "widget", "&РљРѕРЅС‚СЂРѕР»");
 }
 
 void Splitter::serialize(Archive& ar)
 {
 	if(ar.filter(SERIALIZE_DESIGN)){
 		Container::serialize(ar);
-		ar.serialize(elements_, "elements", "Элементы");
+		ar.serialize(elements_, "elements", "Р­Р»РµРјРµРЅС‚С‹");
 		if(ar.isInput()){
 			Elements::iterator it;
 			FOR_EACH(elements_, it)

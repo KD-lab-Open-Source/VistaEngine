@@ -15,4 +15,4 @@
 // color=r2*att2+att0
 // r2=0 color=c, att0=c
 // r2=r2 color=0, att2=-c/r2
-// как правило c=1
+// РєР°Рє РїСЂР°РІРёР»Рѕ c=1

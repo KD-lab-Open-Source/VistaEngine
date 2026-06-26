@@ -25,7 +25,7 @@ public:
 	PropertyRow* root();
 	void onUpdated();
 
-	// для defaultArchive
+	// РґР»СЏ defaultArchive
 	const ComboStrings& typeComboStrings(const char* baseTypeName) const;
 
 	bool defaultTypeRegistered(const char* typeName) const;

@@ -79,10 +79,10 @@ bool UI_UnitView::setPosition(const Rectf& pos)
 		windowPosition_ = pos;
 		Rectf rect = UI_Render::instance().relative2deviceCoords(pos) + Vect2f(0.5f, 0.5f);
 		camera_->SetFrustum(                         
-			&rect.center(), // центр камеры
-			&sRectangle4f(-rect.width()/2, -rect.height()/2, rect.width()/2, rect.height()/2), // видимая область камеры
-			&Vect2f(focus, focus),                        // фокус камеры
-			&Vect2f(30.0f, 10000.0f)                    // ближайший и дальний z-плоскости отсечения
+			&rect.center(), // С†РµРЅС‚СЂ РєР°РјРµСЂС‹
+			&sRectangle4f(-rect.width()/2, -rect.height()/2, rect.width()/2, rect.height()/2), // РІРёРґРёРјР°СЏ РѕР±Р»Р°СЃС‚СЊ РєР°РјРµСЂС‹
+			&Vect2f(focus, focus),                        // С„РѕРєСѓСЃ РєР°РјРµСЂС‹
+			&Vect2f(30.0f, 10000.0f)                    // Р±Р»РёР¶Р°Р№С€РёР№ Рё РґР°Р»СЊРЅРёР№ z-РїР»РѕСЃРєРѕСЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ
 			);
 
 		return true;
@@ -101,7 +101,7 @@ bool UI_UnitView::setAttribute(const AttributeBase* attribute)
 			model_ = 0;
 		}
 		
-		if(attribute_ && attribute_->modelName.empty()) // деревья имеют пустой modelName
+		if(attribute_ && attribute_->modelName.empty()) // РґРµСЂРµРІСЊСЏ РёРјРµСЋС‚ РїСѓСЃС‚РѕР№ modelName
 			attribute_ = 0;
 
 		if(attribute_){

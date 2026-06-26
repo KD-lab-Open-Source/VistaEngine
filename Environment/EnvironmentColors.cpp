@@ -13,11 +13,11 @@ WaterPlumeAttribute::WaterPlumeAttribute()
 void WaterPlumeAttribute::serialize(Archive& ar)
 {
 	float circle_time = 1.0f / waterPlumeFrequency;
-	ar.serialize(circle_time, "circle_time", "Время кругов");
+	ar.serialize(circle_time, "circle_time", "Р’СЂРµРјСЏ РєСЂСѓРіРѕРІ");
 	waterPlumeFrequency = 1.0f / circle_time;
 
 	static ResourceSelector::Options textureOptions("*.tga", "Resource\\TerrainData\\Textures");
-	ar.serialize(ResourceSelector(waterPlumeTextureName, textureOptions), "cyrcle_texture_name", "ШЛЕЙФ : Текстура кругов");
+	ar.serialize(ResourceSelector(waterPlumeTextureName, textureOptions), "cyrcle_texture_name", "РЁР›Р•Р™Р¤ : РўРµРєСЃС‚СѓСЂР° РєСЂСѓРіРѕРІ");
 }
 
 

@@ -497,7 +497,7 @@ bool Sound::CreateSoundFromFile(const char* filename, DWORD mode)
 	hr = waveFile.Open( filename, NULL, WAVEFILE_READ );
 	if (FAILED(hr))
 	{
-		kdWarning("&SoundSystem",XBuffer(1024, 1) < /*TRANSLATE*/("Íåâîçìîæíî îòêðûòü ôàéë : ") < filename);
+		kdWarning("&SoundSystem",XBuffer(1024, 1) < /*TRANSLATE*/("ÐÐµÐ²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾ Ð¾Ñ‚ÐºÑ€Ñ‹Ñ‚ÑŒ Ñ„Ð°Ð¹Ð» : ") < filename);
 		return false;
 	}
 
@@ -523,7 +523,7 @@ bool Sound::CreateSoundFromFile(const char* filename, DWORD mode)
 	hr = DSound()->CreateSoundBuffer( &dsbd, &dsBuffer, NULL );
 	if( FAILED(hr) )
 	{
-		kdWarning("&SoundSystem",XBuffer(1024, 1) < /*TRANSLATE*/("Íå âîçìîæíî ñîçäàòü DirectSound áóôôåð : ") < filename < " ErrorCode: " <= hr);
+		kdWarning("&SoundSystem",XBuffer(1024, 1) < /*TRANSLATE*/("ÐÐµ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾ ÑÐ¾Ð·Ð´Ð°Ñ‚ÑŒ DirectSound Ð±ÑƒÑ„Ñ„ÐµÑ€ : ") < filename < " ErrorCode: " <= hr);
 		return false;
 	}
 

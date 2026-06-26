@@ -33,12 +33,12 @@ public:
 	StringTableReference<AttributeSquad, true> squad;
 	AttributeItemReferences pickedItems;
 
-	/// максимальный радиус выбрасывания предмета из инвентаря
+	/// РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°РґРёСѓСЃ РІС‹Р±СЂР°СЃС‹РІР°РЅРёСЏ РїСЂРµРґРјРµС‚Р° РёР· РёРЅРІРµРЅС‚Р°СЂСЏ
 	float itemDropRadius;
 
 	ParameterCustom runningConsumption;
 	
-	// Строительство 
+	// РЎС‚СЂРѕРёС‚РµР»СЊСЃС‚РІРѕ 
 	AttributeBuildingReferences constructedBuildings;
 	ParameterCustom constructionPower;
 	ParameterCustom constructionCost;
@@ -63,7 +63,7 @@ public:
 	typedef vector<Level> Levels;
 	Levels levels;
 
-	// Сборка ресурсов
+	// РЎР±РѕСЂРєР° СЂРµСЃСѓСЂСЃРѕРІ
 	bool resourcer;
 	vector<ParameterCustom> resourcerCapacities;
 	AttributeReferences resourceCollectors;
@@ -75,7 +75,7 @@ public:
 	float sprayEffectScale;
 	bool sprayEffectOnWater;
 
-	/// автоматическая посадка в транспорт
+	/// Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєР°СЏ РїРѕСЃР°РґРєР° РІ С‚СЂР°РЅСЃРїРѕСЂС‚
 	bool autoFindTransport;
 
 	float directControlSightRadiusFactor;
@@ -87,13 +87,13 @@ public:
 	bool canPick(const UnitBase* item) const;
 	bool canBuild(const UnitBase* unit) const;
 	
-	int resourcerCapacity(const ParameterSet& itemParameters) const; // -1, если не находит
+	int resourcerCapacity(const ParameterSet& itemParameters) const; // -1, РµСЃР»Рё РЅРµ РЅР°С…РѕРґРёС‚
 	bool canPickResource(const ParameterTypeReference& type) const;
 
 	float radius() const;
 };
 
-/// следы от юнита
+/// СЃР»РµРґС‹ РѕС‚ СЋРЅРёС‚Р°
 class TraceController
 {
 public:
@@ -113,7 +113,7 @@ private:
 
 	//unsigned surfaceKind_;
 
-	/// узел для получения координат
+	/// СѓР·РµР» РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РєРѕРѕСЂРґРёРЅР°С‚
 	int nodeIndex_;
 	TerToolCtrl  traceCtrl_;
 
@@ -127,7 +127,7 @@ private:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-//	Интерфейс с юнитами
+//	РРЅС‚РµСЂС„РµР№СЃ СЃ СЋРЅРёС‚Р°РјРё
 ////////////////////////////////////////////////////////////////////////////////
 enum LegionFireStatus
 {
@@ -251,13 +251,13 @@ public:
 
 	bool gatheringResource() const {return resourceItem_ != 0; }
 
-	/// может ли добывать из этого ресурса
+	/// РјРѕР¶РµС‚ Р»Рё РґРѕР±С‹РІР°С‚СЊ РёР· СЌС‚РѕРіРѕ СЂРµСЃСѓСЂСЃР°
 	bool canExtractResource(const UnitItemResource* item) const;
 
-	/// может ли построить или достроить это здание
+	/// РјРѕР¶РµС‚ Р»Рё РїРѕСЃС‚СЂРѕРёС‚СЊ РёР»Рё РґРѕСЃС‚СЂРѕРёС‚СЊ СЌС‚Рѕ Р·РґР°РЅРёРµ
 	bool canBuild(const UnitReal* building) const;
 
-	/// может ли продолжать бежать или перейти на бег
+	/// РјРѕР¶РµС‚ Р»Рё РїСЂРѕРґРѕР»Р¶Р°С‚СЊ Р±РµР¶Р°С‚СЊ РёР»Рё РїРµСЂРµР№С‚Рё РЅР° Р±РµРі
 	bool canRun() const;
 
 	bool runMode() const { return (manualMovementMode & MODE_RUN) != 0; }
@@ -265,12 +265,12 @@ public:
 	bool uniform(const UnitReal* unit) const;
 	bool prior(const UnitInterface* unit) const;
 
-	// Работа с инвентарём
+	// Р Р°Р±РѕС‚Р° СЃ РёРЅРІРµРЅС‚Р°СЂС‘Рј
 
-	/// Проверка, влезет ли предмет в инвентарь.
+	/// РџСЂРѕРІРµСЂРєР°, РІР»РµР·РµС‚ Р»Рё РїСЂРµРґРјРµС‚ РІ РёРЅРІРµРЅС‚Р°СЂСЊ.
 	bool canPutToInventory(const UnitItemInventory* item) const;
-	/// Кладёт предмет в инвентарь.
-	/// Если не влез, возвращает false.
+	/// РљР»Р°РґС‘С‚ РїСЂРµРґРјРµС‚ РІ РёРЅРІРµРЅС‚Р°СЂСЊ.
+	/// Р•СЃР»Рё РЅРµ РІР»РµР·, РІРѕР·РІСЂР°С‰Р°РµС‚ false.
 	bool putToInventory(const UnitItemInventory* item);
 	bool putToInventory(const InventoryItem& item);
 
@@ -280,8 +280,8 @@ public:
 	bool removeInventoryWeapon(int slot_index);
 	bool updateInventoryWeapon(int slot_index);
 
-	/// Устанавливает предмет, который надо подобрать.
-	/// Если подобрать нельзя (не лезет в инвентарь), возвращает false.
+	/// РЈСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ РїСЂРµРґРјРµС‚, РєРѕС‚РѕСЂС‹Р№ РЅР°РґРѕ РїРѕРґРѕР±СЂР°С‚СЊ.
+	/// Р•СЃР»Рё РїРѕРґРѕР±СЂР°С‚СЊ РЅРµР»СЊР·СЏ (РЅРµ Р»РµР·РµС‚ РІ РёРЅРІРµРЅС‚Р°СЂСЊ), РІРѕР·РІСЂР°С‰Р°РµС‚ false.
 	bool setItemToPick(UnitBase* item, bool checkInventory);
 
 	void serialize(Archive& ar);
@@ -346,11 +346,11 @@ private:
 	bool selectAble_;
 	bool isForceMainUnit_;
 
-	/// true если цель для атаки выбрана
+	/// true РµСЃР»Рё С†РµР»СЊ РґР»СЏ Р°С‚Р°РєРё РІС‹Р±СЂР°РЅР°
 	bool manualAttackTarget_;
 	LogicTimer targetEventTimer_;
 
-	/// true если цель для атаки - точка на мире
+	/// true РµСЃР»Рё С†РµР»СЊ РґР»СЏ Р°С‚Р°РєРё - С‚РѕС‡РєР° РЅР° РјРёСЂРµ
 	bool hasAttackPosition_;
 	Vect3f attackPosition_;
 
@@ -389,10 +389,10 @@ private:
 	typedef vector<UnitLink<UnitReal> > ConstructedBuildings;
 	ConstructedBuildings constructedBuildings_;
 
-	/// инвентарь
+	/// РёРЅРІРµРЅС‚Р°СЂСЊ
 	InventorySet inventory_;
 
-	/// предмет, который надо подобрать
+	/// РїСЂРµРґРјРµС‚, РєРѕС‚РѕСЂС‹Р№ РЅР°РґРѕ РїРѕРґРѕР±СЂР°С‚СЊ
 	UnitLink<UnitItemInventory> itemToPick_;
 
 	typedef std::vector<TraceController> TraceControllers;

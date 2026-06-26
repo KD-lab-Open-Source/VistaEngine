@@ -24,7 +24,7 @@ public:
 	void Detach(BaseGraphObject *UnkObj);
 };
 
-///Нет лишним темплейтам!!!!
+///РќРµС‚ Р»РёС€РЅРёРј С‚РµРјРїР»РµР№С‚Р°Рј!!!!
 class RENDER_API QuatTreeVoid
 {
 public:

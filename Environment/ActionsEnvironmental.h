@@ -147,8 +147,8 @@ public:
 	void serialize(Archive& ar)
 	{
 		__super::serialize(ar);
-		ar.serialize(waterHeight, "waterHeight", "Уровень воды");
-		ar.serialize(RangedWrapperi(water_dampf_k,1,15), "water_dampf_k", "Скорость течения");
+		ar.serialize(waterHeight, "waterHeight", "РЈСЂРѕРІРµРЅСЊ РІРѕРґС‹");
+		ar.serialize(RangedWrapperi(water_dampf_k,1,15), "water_dampf_k", "РЎРєРѕСЂРѕСЃС‚СЊ С‚РµС‡РµРЅРёСЏ");
 	}
 };
 

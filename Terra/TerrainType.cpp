@@ -2,7 +2,7 @@
 #include "TerrainType.h"
 #include "Serialization/Serialization.h"
 
-WRAP_LIBRARY(TerrainTypeDescriptor, "TerrainTypeDescriptor", "Типы поверхности", "Scripts\\Content\\TerrainTypeDescriptor", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(TerrainTypeDescriptor, "TerrainTypeDescriptor", "РўРёРїС‹ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё", "Scripts\\Content\\TerrainTypeDescriptor", 0, LIBRARY_EDITABLE);
 
 const EnumDescriptor& getEnumDescriptor(const TerrainType& key)
 {
@@ -17,7 +17,7 @@ TerrainTypeDescriptor::TerrainTypeDescriptor()
 		buf <= i;
 		terrainTypeNames_[i] = buf;
 		buf.init();
-		buf < "Поверхность" <= i;
+		buf < "РџРѕРІРµСЂС…РЅРѕСЃС‚СЊ" <= i;
 		terrainTypeNamesAlt_[i] = buf;
 	}
 	refresh();
@@ -27,7 +27,7 @@ void TerrainTypeDescriptor::serialize(Archive& ar)
 {
 	pair<string, Color4c> terrainTypeNameAndColor[TERRAIN_TYPES_NUMBER];
 	if(ar.isInput()){
-		ar.serializeArray(terrainTypeNameAndColor, "terrainTypeNameAndColor", "Имена и служебный цвет");
+		ar.serializeArray(terrainTypeNameAndColor, "terrainTypeNameAndColor", "РРјРµРЅР° Рё СЃР»СѓР¶РµР±РЅС‹Р№ С†РІРµС‚");
 		for(int i = 0; i < TERRAIN_TYPES_NUMBER; i++){
 			terrainTypeNamesAlt_[i] = terrainTypeNameAndColor[i].first;
 			terrainTypeColors_[i] = terrainTypeNameAndColor[i].second;
@@ -38,7 +38,7 @@ void TerrainTypeDescriptor::serialize(Archive& ar)
 			terrainTypeNameAndColor[i].first=terrainTypeNamesAlt_[i];
 			terrainTypeNameAndColor[i].second=terrainTypeColors_[i];
 		}
-		ar.serializeArray(terrainTypeNameAndColor, "terrainTypeNameAndColor", "Имена и служебный цвет");
+		ar.serializeArray(terrainTypeNameAndColor, "terrainTypeNameAndColor", "РРјРµРЅР° Рё СЃР»СѓР¶РµР±РЅС‹Р№ С†РІРµС‚");
 	}
 	if(ar.isInput())
 		refresh();

@@ -473,14 +473,14 @@ void cWaves::Animate(float dt)
 
 void cWaves::serialize (Archive& ar)
 {
-	ar.serialize(T, "Period", "������");
-//	ar.serialize(RangedWrapperf(Fmax, 0, 1, 0.01f), "Wave_velocity", "�������� ����");
+	ar.serialize(T, "Period", "Период");
+//	ar.serialize(RangedWrapperf(Fmax, 0, 1, 0.01f), "Wave_velocity", "Скорость волн");
 	string texture;
 	if (Texture)
 		texture = Texture->name();
 	static ResourceSelector::Options textureOptions("*.tga", "Resource\\TerrainData\\Textures");
-	ar.serialize(ResourceSelector (texture, textureOptions), "wave_tga_texture", "��������");
-	ar.serialize(active, "waves_on", "��������");
+	ar.serialize(ResourceSelector (texture, textureOptions), "wave_tga_texture", "Текстура");
+	ar.serialize(active, "waves_on", "Включить");
 	if (ar.isInput())
 		SetTexture(texture.c_str());
 }

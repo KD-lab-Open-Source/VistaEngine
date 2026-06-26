@@ -9,9 +9,9 @@
 #include "CameraManager.h"
 #include "VistaRender/Flash.h"
 
-BEGIN_ENUM_DESCRIPTOR_ENCLOSED(SourceFlash, EvolutionType, "��� ������")
-REGISTER_ENUM_ENCLOSED(SourceFlash, LINEAR, "��������")
-REGISTER_ENUM_ENCLOSED(SourceFlash, EXPONENTIAL, "����������")
+BEGIN_ENUM_DESCRIPTOR_ENCLOSED(SourceFlash, EvolutionType, "тип кривой")
+REGISTER_ENUM_ENCLOSED(SourceFlash, LINEAR, "линейная")
+REGISTER_ENUM_ENCLOSED(SourceFlash, EXPONENTIAL, "экспонента")
 END_ENUM_DESCRIPTOR_ENCLOSED(SourceFlash, EvolutionType)
 
 SourceFlash::SourceFlash()
@@ -44,29 +44,29 @@ SourceFlash::~SourceFlash()
 
 void SourceFlash::EvolutionPrm::serialize(Archive &ar){
 	ar.serialize(increase_, "increase_", 0);
-	ar.serialize(time_, "time", "������������");
-	ar.serialize(type_, "type", "��� ������ �������������");
+	ar.serialize(time_, "time", "длительность");
+	ar.serialize(type_, "type", "тип кривой интенсивности");
 	if(type_ == EXPONENTIAL){
-		ar.serialize(RangedWrapperf(naklon_, 0.2f, 8.f), "naklon", "�������� ������ �������������");
-		ar.serialize(vipuclaya_, "vipuclaya", "������ �������� �������������");
+		ar.serialize(RangedWrapperf(naklon_, 0.2f, 8.f), "naklon", "крутизна кривой интенсивности");
+		ar.serialize(vipuclaya_, "vipuclaya", "кривая выпуклая интенсивности");
 	}
 }
 
 void SourceFlash::serialize(Archive &ar){
 	__super::serialize(ar);
 
-	ar.serialize(color_, "color", "���� �������");
-	ar.serialize(decByDistance_, "decByDistancer", "��������� �������� ��� ���������");
+	ar.serialize(color_, "color", "цвет вспышки");
+	ar.serialize(decByDistance_, "decByDistancer", "уменьшать засветку при отдалении");
 	if(decByDistance_){
-		ar.serialize(maxDistance_, "maxDistance", "������������ ��������� �� �����������");
+		ar.serialize(maxDistance_, "maxDistance", "максимальная дистанция до наблюдателя");
 	}
-	ar.serialize(autoKill_, "autoKill", "������������� ������� �������� ����� ���������");
-	ar.serialize(increase_, "increase", "��������� ���������� �������");
+	ar.serialize(autoKill_, "autoKill", "автоматически удалять источник после затухания");
+	ar.serialize(increase_, "increase", "параметры нарастания вспышки");
 	increase_.increase_ = true;
-	ar.serialize(decrease_, "decrease", "��������� �������� �������");
+	ar.serialize(decrease_, "decrease", "параметры убывания вспышки");
 	decrease_.increase_ = false;
 
-	// ��� ���������
+	// для редактора
 	if(ar.isInput() && enabled()){
 		setActivity(active_);
 	}
@@ -170,7 +170,7 @@ void SourceFlash::quant(){
 			intensive_ *= (1.f - dist2 / max2);
 	}
 	
-	// ��� ����� ������, ���� ����� �������
+	// так плохо делать, надо через команды
 	environment->flash()->addIntensity(intensive_);
 }
 

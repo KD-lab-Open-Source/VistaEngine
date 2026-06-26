@@ -741,7 +741,7 @@ void cWater::ChangeBorderZ()
 	}
 }
 
-//Заполняет квадратную сетку треугольниками.
+//Р—Р°РїРѕР»РЅСЏРµС‚ РєРІР°РґСЂР°С‚РЅСѓСЋ СЃРµС‚РєСѓ С‚СЂРµСѓРіРѕР»СЊРЅРёРєР°РјРё.
 template<class VertexType>
 int SetBoxBorder(Vect3f base_pos, Vect2i count, Vect2f add, VertexType* vertex, int offset, sPolygon* polygons)
 {
@@ -1305,7 +1305,7 @@ bool cWater::isUnderWater(const Vect3f& pos, float radius) const
 	int xx=pos.xi()>>GetCoordShift(),yy=pos.yi()>>GetCoordShift();
 	if(xx < 0 || xx >= grid_size.x || yy < 0 || yy >= grid_size.y)
 	{
-		//xxassert(false, "выход за пределы карты воды в isUnderWater");
+		//xxassert(false, "РІС‹С…РѕРґ Р·Р° РїСЂРµРґРµР»С‹ РєР°СЂС‚С‹ РІРѕРґС‹ РІ isUnderWater");
 		return GetEnvironmentWater()> pos.z;
 	}
 
@@ -1486,7 +1486,7 @@ static Vect2i ambient[8]=
 	Vect2i(+1,+1),
 };
 
-void cWater::ChangeType(int x,int y,bool include)//Переписать нахрен!
+void cWater::ChangeType(int x,int y,bool include)//РџРµСЂРµРїРёСЃР°С‚СЊ РЅР°С…СЂРµРЅ!
 {
 	change_type_statistic++;
 	CheckType(x-1,y-1);
@@ -1504,18 +1504,18 @@ void cWater::ChangeType(int x,int y,bool include)//Переписать нахрен!
 }
 
 /*
-  Настраивать alpha_delta в зависимости от минимальной прозрачности.
+  РќР°СЃС‚СЂР°РёРІР°С‚СЊ alpha_delta РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РјРёРЅРёРјР°Р»СЊРЅРѕР№ РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚Рё.
 
-  Есть 3 причины, почему высота воды может дёргаться.
-  1. Изменение cur.type (заполнена/незаполнена) водой.
-  2. Изменение cur.ambient_type - заполнены ли соседи водой
-  3. Изменение mid_num - сколько соседей заполнены водой.
+  Р•СЃС‚СЊ 3 РїСЂРёС‡РёРЅС‹, РїРѕС‡РµРјСѓ РІС‹СЃРѕС‚Р° РІРѕРґС‹ РјРѕР¶РµС‚ РґС‘СЂРіР°С‚СЊСЃСЏ.
+  1. РР·РјРµРЅРµРЅРёРµ cur.type (Р·Р°РїРѕР»РЅРµРЅР°/РЅРµР·Р°РїРѕР»РЅРµРЅР°) РІРѕРґРѕР№.
+  2. РР·РјРµРЅРµРЅРёРµ cur.ambient_type - Р·Р°РїРѕР»РЅРµРЅС‹ Р»Рё СЃРѕСЃРµРґРё РІРѕРґРѕР№
+  3. РР·РјРµРЅРµРЅРёРµ mid_num - СЃРєРѕР»СЊРєРѕ СЃРѕСЃРµРґРµР№ Р·Р°РїРѕР»РЅРµРЅС‹ РІРѕРґРѕР№.
 
-  cur.underground_z - нужно для того, чтобы вода по краям земли была плоская, 
-                      а не взбиралась на горку из-за больших треугольников.
+  cur.underground_z - РЅСѓР¶РЅРѕ РґР»СЏ С‚РѕРіРѕ, С‡С‚РѕР±С‹ РІРѕРґР° РїРѕ РєСЂР°СЏРј Р·РµРјР»Рё Р±С‹Р»Р° РїР»РѕСЃРєР°СЏ, 
+                      Р° РЅРµ РІР·Р±РёСЂР°Р»Р°СЃСЊ РЅР° РіРѕСЂРєСѓ РёР·-Р·Р° Р±РѕР»СЊС€РёС… С‚СЂРµСѓРіРѕР»СЊРЅРёРєРѕРІ.
 
-  Попробовать такой вариант - нулевой цвет всегда прозрачный.
-  Значит можно без анимации обойтись прозрасности.
+  РџРѕРїСЂРѕР±РѕРІР°С‚СЊ С‚Р°РєРѕР№ РІР°СЂРёР°РЅС‚ - РЅСѓР»РµРІРѕР№ С†РІРµС‚ РІСЃРµРіРґР° РїСЂРѕР·СЂР°С‡РЅС‹Р№.
+  Р—РЅР°С‡РёС‚ РјРѕР¶РЅРѕ Р±РµР· Р°РЅРёРјР°С†РёРё РѕР±РѕР№С‚РёСЃСЊ РїСЂРѕР·СЂР°СЃРЅРѕСЃС‚Рё.
 */
 
 void cWater::CheckType(int x,int y)
@@ -1721,35 +1721,35 @@ void cWater::serialize(Archive& ar)
 {
 	if(ar.filter(SERIALIZE_PRESET_DATA)){
 		static ResourceSelector::Options textureOptions("*.tga", "Resource\\TerrainData\\Textures");
-		ar.serialize(isLava_, "isLava", "Включить режим лавы");
+		ar.serialize(isLava_, "isLava", "Р’РєР»СЋС‡РёС‚СЊ СЂРµР¶РёРј Р»Р°РІС‹");
 		if(!ar.isEdit() || isLava_){
-			ar.serialize(ResourceSelector(lavaTextureName_, textureOptions), "|lavaTexture|lava_texture", "Текстура лавы");
-			ar.serialize(lava_color_,"|lavaColor|lava_color_", "Цвет лавы");
-			ar.serialize(lava_color_ambient_,"lava_color_ambient_", "Цвет лавы окружающий");
-			ar.serialize(lavaTextureScale_, "lavaTextureScale", "Масштаб текстуры лавы");
-			ar.serialize(lavaVolumeTextureScale_, "lavaVolumeTextureScale", "Масштаб 3D текстуры лавы");
+			ar.serialize(ResourceSelector(lavaTextureName_, textureOptions), "|lavaTexture|lava_texture", "РўРµРєСЃС‚СѓСЂР° Р»Р°РІС‹");
+			ar.serialize(lava_color_,"|lavaColor|lava_color_", "Р¦РІРµС‚ Р»Р°РІС‹");
+			ar.serialize(lava_color_ambient_,"lava_color_ambient_", "Р¦РІРµС‚ Р»Р°РІС‹ РѕРєСЂСѓР¶Р°СЋС‰РёР№");
+			ar.serialize(lavaTextureScale_, "lavaTextureScale", "РњР°СЃС€С‚Р°Р± С‚РµРєСЃС‚СѓСЂС‹ Р»Р°РІС‹");
+			ar.serialize(lavaVolumeTextureScale_, "lavaVolumeTextureScale", "РњР°СЃС€С‚Р°Р± 3D С‚РµРєСЃС‚СѓСЂС‹ Р»Р°РІС‹");
 		}
 
-		ar.serialize(anywhereIce,"anywhereIce","Лед на всей карте");
+		ar.serialize(anywhereIce,"anywhereIce","Р›РµРґ РЅР° РІСЃРµР№ РєР°СЂС‚Рµ");
 
 		int waterHeight = GetEnvironmentWater();
-		ar.serialize(RangedWrapperi(waterHeight, 0, 255), "waterHeight", "Высота воды");
-		ar.serialize(RangedWrapperf(relativeWaterLevel_, 2.f, 250.f), "relativeWaterLevel", "Относительный уровень глубокой воды");
+		ar.serialize(RangedWrapperi(waterHeight, 0, 255), "waterHeight", "Р’С‹СЃРѕС‚Р° РІРѕРґС‹");
+		ar.serialize(RangedWrapperf(relativeWaterLevel_, 2.f, 250.f), "relativeWaterLevel", "РћС‚РЅРѕСЃРёС‚РµР»СЊРЅС‹Р№ СѓСЂРѕРІРµРЅСЊ РіР»СѓР±РѕРєРѕР№ РІРѕРґС‹");
 
-		ar.serialize(reflection_color, "reflection_color1", "Цвет и прозрачность отражения");
-		ar.serialize(reflection_brightnes, "reflection_brightnes", "Коэффициент яркости отражения неба");
+		ar.serialize(reflection_color, "reflection_color1", "Р¦РІРµС‚ Рё РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ РѕС‚СЂР°Р¶РµРЅРёСЏ");
+		ar.serialize(reflection_brightnes, "reflection_brightnes", "РљРѕСЌС„С„РёС†РёРµРЅС‚ СЏСЂРєРѕСЃС‚Рё РѕС‚СЂР°Р¶РµРЅРёСЏ РЅРµР±Р°");
 		
-		ar.serialize(reinterpret_cast<Color3c&>(earth_color), "border_color", "Цвет земли за границей мира");
+		ar.serialize(reinterpret_cast<Color3c&>(earth_color), "border_color", "Р¦РІРµС‚ Р·РµРјР»Рё Р·Р° РіСЂР°РЅРёС†РµР№ РјРёСЂР°");
 
 		KeysColor opacityGradient(GetOpacity());
-		ar.serialize(static_cast<WaterGradient&>(opacityGradient), "zLevelOpacityGradient", "Прозрачность воды на разной глубине");
+		ar.serialize(static_cast<WaterGradient&>(opacityGradient), "zLevelOpacityGradient", "РџСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ РІРѕРґС‹ РЅР° СЂР°Р·РЅРѕР№ РіР»СѓР±РёРЅРµ");
 
-		ar.serialize(rainConstant_, "rainConstant", "Параметр высыхания");
-		ar.serialize(RangedWrapperi(water_dampf_k_, 1, 15), "water_dampf_k", "Скорость течения");
-		ar.serialize(flashIntensity_, "flashIntensity", "Интенсивность блика на воде");
+		ar.serialize(rainConstant_, "rainConstant", "РџР°СЂР°РјРµС‚СЂ РІС‹СЃС‹С…Р°РЅРёСЏ");
+		ar.serialize(RangedWrapperi(water_dampf_k_, 1, 15), "water_dampf_k", "РЎРєРѕСЂРѕСЃС‚СЊ С‚РµС‡РµРЅРёСЏ");
+		ar.serialize(flashIntensity_, "flashIntensity", "РРЅС‚РµРЅСЃРёРІРЅРѕСЃС‚СЊ Р±Р»РёРєР° РЅР° РІРѕРґРµ");
 
-		ar.serialize(ResourceSelector(bumpTextureName_, textureOptions), "bumpTextureName", "Текстура бампа");
-		ar.serialize(ResourceSelector(bumpTextureName1_, textureOptions), "bumpTextureName1", "Текстура бампа 1");
+		ar.serialize(ResourceSelector(bumpTextureName_, textureOptions), "bumpTextureName", "РўРµРєСЃС‚СѓСЂР° Р±Р°РјРїР°");
+		ar.serialize(ResourceSelector(bumpTextureName1_, textureOptions), "bumpTextureName1", "РўРµРєСЃС‚СѓСЂР° Р±Р°РјРїР° 1");
 
 		if(ar.isInput()){
 			setRelativeWaterLevel(relativeWaterLevel_);
@@ -1805,9 +1805,9 @@ ShadowingOptions::ShadowingOptions(float _user_ambient_factor, float _user_ambie
 
 void ShadowingOptions::serialize (Archive& ar)
 {
-	ar.serialize(RangedWrapperf(ambientFactor,0,10), "ambient_factor",   "Ambient умножение");
-	ar.serialize(RangedWrapperf(ambientMax,0,1), "ambient_maximal",  "Ambient максиум");
-	ar.serialize(RangedWrapperf(diffuseFactor,0,1),  "diffuse_factor",   "Diffuse умножение");
+	ar.serialize(RangedWrapperf(ambientFactor,0,10), "ambient_factor",   "Ambient СѓРјРЅРѕР¶РµРЅРёРµ");
+	ar.serialize(RangedWrapperf(ambientMax,0,1), "ambient_maximal",  "Ambient РјР°РєСЃРёСѓРј");
+	ar.serialize(RangedWrapperf(diffuseFactor,0,1),  "diffuse_factor",   "Diffuse СѓРјРЅРѕР¶РµРЅРёРµ");
 }
 
 void cWater::SetOpacity(const KeysColor& gradient)
@@ -1901,7 +1901,7 @@ void cWater::CalcWaterTextures()
 
 	int pitch_reflection=0;
 	//BYTE* pDataReflection = scene()->IsReflection() ? pWaterZ->LockTexture(pitch_reflection) : 0;
-	BYTE* pDataReflection = pWaterZ->LockTexture(pitch_reflection); // Полю нужна текстура для обрезки
+	BYTE* pDataReflection = pWaterZ->LockTexture(pitch_reflection); // РџРѕР»СЋ РЅСѓР¶РЅР° С‚РµРєСЃС‚СѓСЂР° РґР»СЏ РѕР±СЂРµР·РєРё
 
 	swap(textureMiniMap_, textureMiniMap2_);
 	int pitch_minimap;

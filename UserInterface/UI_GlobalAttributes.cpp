@@ -41,16 +41,16 @@ void UI_GlobalAttributes::serialize(Archive& ar)
 
 	UI_Task::serializeColors(ar);
 
-	ar.serialize(privateMessage_, "privateMessage", "Цвет личного/кланового сообщения");
-	ar.serialize(systemMessage_, "systemMessage", "Цвет системного сообщения");
-	ar.serialize(chatDelay_, "chatMessageDelay", "Время отображения игрового чат-сообщения (сек)");
+	ar.serialize(privateMessage_, "privateMessage", "Р¦РІРµС‚ Р»РёС‡РЅРѕРіРѕ/РєР»Р°РЅРѕРІРѕРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ");
+	ar.serialize(systemMessage_, "systemMessage", "Р¦РІРµС‚ СЃРёСЃС‚РµРјРЅРѕРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ");
+	ar.serialize(chatDelay_, "chatMessageDelay", "Р’СЂРµРјСЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РёРіСЂРѕРІРѕРіРѕ С‡Р°С‚-СЃРѕРѕР±С‰РµРЅРёСЏ (СЃРµРє)");
 
-	ar.serialize(cursors_, "cursors", "Курсоры");
+	ar.serialize(cursors_, "cursors", "РљСѓСЂСЃРѕСЂС‹");
 
-	ar.serialize(messageSetups_, "messageSetups", "Сообщения");
+	ar.serialize(messageSetups_, "messageSetups", "РЎРѕРѕР±С‰РµРЅРёСЏ");
 
-	ar.serialize(hintAttributes_, "hintAttributes", "Отображение подсказок для лежащих предметов");
+	ar.serialize(hintAttributes_, "hintAttributes", "РћС‚РѕР±СЂР°Р¶РµРЅРёРµ РїРѕРґСЃРєР°Р·РѕРє РґР»СЏ Р»РµР¶Р°С‰РёС… РїСЂРµРґРјРµС‚РѕРІ");
 
 	if(ar.isEdit())
-		ar.serialize(CommonLocText::instance(), "locTexts", "Общие тексты для локализации");
+		ar.serialize(CommonLocText::instance(), "locTexts", "РћР±С‰РёРµ С‚РµРєСЃС‚С‹ РґР»СЏ Р»РѕРєР°Р»РёР·Р°С†РёРё");
 }

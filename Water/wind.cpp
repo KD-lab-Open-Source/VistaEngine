@@ -12,9 +12,9 @@
 
 //==================================================================
 BEGIN_ENUM_DESCRIPTOR(ListTypeQuant, "ListTypeQuant");
-REGISTER_ENUM(LINEAR_WIND, "Линейный ветер");
-REGISTER_ENUM(TWISTING_WIND, "Крутящийся ветер");
-REGISTER_ENUM(BLAST_WIND, "Взрывная волна");
+REGISTER_ENUM(LINEAR_WIND, "Р›РёРЅРµР№РЅС‹Р№ РІРµС‚РµСЂ");
+REGISTER_ENUM(TWISTING_WIND, "РљСЂСѓС‚СЏС‰РёР№СЃСЏ РІРµС‚РµСЂ");
+REGISTER_ENUM(BLAST_WIND, "Р’Р·СЂС‹РІРЅР°СЏ РІРѕР»РЅР°");
 END_ENUM_DESCRIPTOR(ListTypeQuant);
 
 //==================================================================
@@ -119,7 +119,7 @@ bool WindQuantInfo::SetEffectName(const string& filename)
 			effect = *lib->begin();
 		else 
 		{
-			xassert(0&&"пустая библиотека спецэффектов");
+			xassert(0&&"РїСѓСЃС‚Р°СЏ Р±РёР±Р»РёРѕС‚РµРєР° СЃРїРµС†СЌС„С„РµРєС‚РѕРІ");
 			effect = NULL;
 			return false;
 		}
@@ -183,19 +183,19 @@ void SourceWind::serialize(Archive& ar)
 	radius_ = prototype.r;
 	__super::serialize(ar);
 	prototype.r = radius_;
-	ar.serialize(interval, "interval", "Интервал");
+	ar.serialize(interval, "interval", "РРЅС‚РµСЂРІР°Р»");
 	prototype.pos = pose_.trans();
 	
 	ar.serialize(prototype.type, "Type", 0);
 
 	windVelocity_ = prototype.vel.norm();
-	ar.serialize(windVelocity_, "WindAbsVelocity", "Скорость ветра");
+	ar.serialize(windVelocity_, "WindAbsVelocity", "РЎРєРѕСЂРѕСЃС‚СЊ РІРµС‚СЂР°");
 
-	ar.serialize(prototype.dr, "dr", "Изменение радиуса со временем");
-	ar.serialize(prototype.k_fading, "Fading", "Коэффициент затухания");
-	ar.serialize(prototype.maxz, "Max_Z", "Максимальная высота");
+	ar.serialize(prototype.dr, "dr", "РР·РјРµРЅРµРЅРёРµ СЂР°РґРёСѓСЃР° СЃРѕ РІСЂРµРјРµРЅРµРј");
+	ar.serialize(prototype.k_fading, "Fading", "РљРѕСЌС„С„РёС†РёРµРЅС‚ Р·Р°С‚СѓС…Р°РЅРёСЏ");
+	ar.serialize(prototype.maxz, "Max_Z", "РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ РІС‹СЃРѕС‚Р°");
 	if (prototype.type==TWISTING_WIND)
-		ar.serialize(prototype.w, "Angular", "Угловая скорость ветра");
+		ar.serialize(prototype.w, "Angular", "РЈРіР»РѕРІР°СЏ СЃРєРѕСЂРѕСЃС‚СЊ РІРµС‚СЂР°");
 
 	if(enabled())
 		effect_filename = prototype.GetEffectName();
@@ -206,9 +206,9 @@ void SourceWind::serialize(Archive& ar)
 		case TWISTING_WIND: effect_filename = "Scripts\\Resource\\FX\\twister.effect"; break;
 		}
 	ar.TRANSLATE_NAME(ModelSelector (effect_filename, ModelSelector::EFFECT_OPTIONS),
-						"Effect_name", "Сопутствующий эффект");
-	ar.serialize(prototype.scale , "scale_wind_effect", "Маштаб спецэффекта");
-	ar.serialize(prototype.add_z , "fx_height", "Высота спецэффекта над землей");
+						"Effect_name", "РЎРѕРїСѓС‚СЃС‚РІСѓСЋС‰РёР№ СЌС„С„РµРєС‚");
+	ar.serialize(prototype.scale , "scale_wind_effect", "РњР°С€С‚Р°Р± СЃРїРµС†СЌС„С„РµРєС‚Р°");
+	ar.serialize(prototype.add_z , "fx_height", "Р’С‹СЃРѕС‚Р° СЃРїРµС†СЌС„С„РµРєС‚Р° РЅР°Рґ Р·РµРјР»РµР№");
 	if (ar.isInput()){
 		Vect3f dir(Vect3f::J);
 		orientation().xform(dir);
@@ -223,7 +223,7 @@ void SourceWind::serialize(Archive& ar)
 			environment->getWind()->updateWindQuantum(this);
 		}
 	}
-	ar.serialize(prototype.toolser, "toolser", "Тулзер");
+	ar.serialize(prototype.toolser, "toolser", "РўСѓР»Р·РµСЂ");
 }
 
 //------------------------------------------------------------------------------------------
@@ -330,11 +330,11 @@ void cMapWind::serialize(Archive& ar)
 void cMapWind::serializeParameters(Archive& ar)
 {
 /*
-	ar.openBlock("Wind", "Ветер");
+	ar.openBlock("Wind", "Р’РµС‚РµСЂ");
 		ar.TRANSLATE_NAME(ModelSelector (default_wind, ModelSelector::EFFECT_OPTIONS),
-							"default_wind", "Эффект ветра по умолчанию");
+							"default_wind", "Р­С„С„РµРєС‚ РІРµС‚СЂР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ");
 		ar.TRANSLATE_NAME(ModelSelector (default_tornado, ModelSelector::EFFECT_OPTIONS),
-							"default_tornado", "Эффект смерча по умолчанию");
+							"default_tornado", "Р­С„С„РµРєС‚ СЃРјРµСЂС‡Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ");
 		if (ar.isInput())
 			LoadDefaultEffect();
 	ar.closeBlock();
@@ -440,7 +440,7 @@ void cMapWind::Animate(float dt)
 	float wind_force_dt = wind_force*dt;
 	float k_dt = k*dt;
 	float min_kr_dt = min(kr*dt,0.9f);
-	float wind_effect = /*graphRnd.frand()**/phase;//Общее колыхание для всех объектов.
+	float wind_effect = /*graphRnd.frand()**/phase;//РћР±С‰РµРµ РєРѕР»С‹С…Р°РЅРёРµ РґР»СЏ РІСЃРµС… РѕР±СЉРµРєС‚РѕРІ.
 	FOR_EACH(objects, obj)
 	{
 		vector<NodeObj>::iterator i;
@@ -455,7 +455,7 @@ void cMapWind::Animate(float dt)
 				MatXf mx;
 				mx.set(obj->obj->GetNodePosition(i->ix));
 				Vect3f v = mx.trans();
-				//Общее колыхание*Колыхание ноды*Отношение размеров*Фазa движения*Вектор ветра
+				//РћР±С‰РµРµ РєРѕР»С‹С…Р°РЅРёРµ*РљРѕР»С‹С…Р°РЅРёРµ РЅРѕРґС‹*РћС‚РЅРѕС€РµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ*Р¤Р°Р·a РґРІРёР¶РµРЅРёСЏ*Р’РµРєС‚РѕСЂ РІРµС‚СЂР°
 				v = graphRnd.frand()*BoundK*GetVelocity(v);//scale*T*GetVelocity(v)
 				i->vel+= v*(wind_force_dt) - i->dis*(k_dt);
 				i->vel-=i->vel*min_kr_dt;

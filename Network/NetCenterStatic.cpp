@@ -89,7 +89,7 @@ void PNetCenter::startMPWithoutInterface(const char* missionName)
 			//instance()->JoinGame(ipstr.c_str(), playerName.c_str(), Race(), 1, "");
 		}
 		instance()->implementingENT(&entGame);
-		while(instance()->getCurrentMissionDescription().playersAmount() < 1){ //Hint-îâàÿ ïðîâåðêà íà òî, ÷òî ïîäêëþ÷èëèñü
+		while(instance()->getCurrentMissionDescription().playersAmount() < 1){ //Hint-Ð¾Ð²Ð°Ñ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° Ð½Ð° Ñ‚Ð¾, Ñ‡Ñ‚Ð¾ Ð¿Ð¾Ð´ÐºÐ»ÑŽÑ‡Ð¸Ð»Ð¸ÑÑŒ
 			PNetCenter::netQuant();
 			::Sleep(40);
 		}
@@ -148,7 +148,7 @@ void PNetCenter::startDWMPWithoutInterface(const char* missionName)
 			//instance()->JoinGame(ipstr.c_str(), playerName, Race(), 1, "");
 		}
 		instance()->implementingENT(&entGame);
-		while(instance()->getCurrentMissionDescription().playersAmount() < 1){ //Hint-îâàÿ ïðîâåðêà íà òî, ÷òî ïîäêëþ÷èëèñü
+		while(instance()->getCurrentMissionDescription().playersAmount() < 1){ //Hint-Ð¾Ð²Ð°Ñ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° Ð½Ð° Ñ‚Ð¾, Ñ‡Ñ‚Ð¾ Ð¿Ð¾Ð´ÐºÐ»ÑŽÑ‡Ð¸Ð»Ð¸ÑÑŒ
 			PNetCenter::netQuant();
 			::Sleep(40);
 		}

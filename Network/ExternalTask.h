@@ -3,7 +3,7 @@
 
 #include "CommonLocText.h"
 #include "Units/AttributeReference.h"
-#include "FileUtils/XGUID.h" //����������� XGUID
+#include "FileUtils/XGUID.h" //определение XGUID
 #include "GlobalStatistics.h"
 
 #define caseR(a) case a: return #a;
@@ -43,7 +43,7 @@ enum ScoresID {
 	SCORESR3 = (10u)
 };
 
-// flag_end ������������ ������ ��������������� ���������! ��� ��������� CriticalSection
+// flag_end сбрасывается первым устанавливается последним! для избежания CriticalSection
 class ExternalNetTaskBase {
 public:
 	ExternalNetTaskBase  (){
@@ -277,7 +277,7 @@ public:
 		xassert(buf4File); 
 		if(!buf4File){
 			__super::start(); 
-			setErr();//����������� ������ � ������ �� ���������� ������
+			setErr();//выставление ошибкм в случае не указанного буфера
 		}
 		flag_setuped=true;
 	}

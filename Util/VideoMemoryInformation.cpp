@@ -298,7 +298,7 @@ bool CheckDeviceType(IDirect3D9* lpD3D, int xscr,int yscr, bool fullscreen, bool
 
 		//for(DWORD nsample=D3DMULTISAMPLE_2_SAMPLES;nsample<=D3DMULTISAMPLE_16_SAMPLES;nsample++)
 		// FIXME!
-		for(DWORD nsample=D3DMULTISAMPLE_2_SAMPLES;nsample<=D3DMULTISAMPLE_8_SAMPLES;nsample++)//Îãðàíè÷èëè, ÷òîáû íå áûëî ïðîáëåì ñ íåäîñòàòêîì âèäåîïàìÿòè.
+		for(DWORD nsample=D3DMULTISAMPLE_2_SAMPLES;nsample<=D3DMULTISAMPLE_8_SAMPLES;nsample++)//ÐžÐ³Ñ€Ð°Ð½Ð¸Ñ‡Ð¸Ð»Ð¸, Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð½Ðµ Ð±Ñ‹Ð»Ð¾ Ð¿Ñ€Ð¾Ð±Ð»ÐµÐ¼ Ñ Ð½ÐµÐ´Ð¾ÑÑ‚Ð°Ñ‚ÐºÐ¾Ð¼ Ð²Ð¸Ð´ÐµÐ¾Ð¿Ð°Ð¼ÑÑ‚Ð¸.
 		{
 			DWORD QualityLevels;
 			HRESULT hr=lpD3D->CheckDeviceMultiSampleType(Adapter,

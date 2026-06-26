@@ -7,7 +7,7 @@
 
 class NormalMapTile {
 public:
-	enum { tileShift = 4 }; // Горизонтальный масштаб.(смещение)
+	enum { tileShift = 4 }; // Р“РѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹Р№ РјР°СЃС€С‚Р°Р±.(СЃРјРµС‰РµРЅРёРµ)
 	Vect3f& normal() { return normal_; }
 	NormalMapTile():normal_(Vect3f::K) { }
 private:
@@ -30,7 +30,7 @@ public:
 	float heightLinear(float x, float y);
 	Vect3f normalLinear(float x, float y);
 	
-	// Параметры - в координитах карты.
+	// РџР°СЂР°РјРµС‚СЂС‹ - РІ РєРѕРѕСЂРґРёРЅРёС‚Р°С… РєР°СЂС‚С‹.
 	float height(int x, int y) {
 		x <<= NormalMapTile::tileShift;
 		y <<= NormalMapTile::tileShift;
@@ -42,7 +42,7 @@ public:
 		return max((float)vMap.getApproxAlt(x, y),iceH); 
 	}
 	
-	// Лед. надо соптимизить.
+	// Р›РµРґ. РЅР°РґРѕ СЃРѕРїС‚РёРјРёР·РёС‚СЊ.
 	bool ice(int x, int y) {
 		x <<= NormalMapTile::tileShift;
 		y <<= NormalMapTile::tileShift;
@@ -51,7 +51,7 @@ public:
 		return environment->temperature() && environment->temperature()->checkTileWorld(x,y);
 	}
 	
-	// Параметры - в координитах карты.
+	// РџР°СЂР°РјРµС‚СЂС‹ - РІ РєРѕРѕСЂРґРёРЅРёС‚Р°С… РєР°СЂС‚С‹.
 	Vect3f& normal(int x, int y) { return data[y * sizeX_ + x].normal(); };
 
 	int sizeX() const {return sizeX_;};

@@ -23,8 +23,8 @@ public:
 	void serialize(Archive& ar);
 	void serializeForModel(Archive& ar, const char* modelName);
 
-	HandleFallLeaves createHandle(c3dx* model, float intensityScale = 1.0f); //Предполагается что объект не движется, если объект подвинулся, нужно пересоздать.
-	void deleteHandle(HandleFallLeaves& handle); //Записывает в handle невалидное значение.
+	HandleFallLeaves createHandle(c3dx* model, float intensityScale = 1.0f); //РџСЂРµРґРїРѕР»Р°РіР°РµС‚СЃСЏ С‡С‚Рѕ РѕР±СЉРµРєС‚ РЅРµ РґРІРёР¶РµС‚СЃСЏ, РµСЃР»Рё РѕР±СЉРµРєС‚ РїРѕРґРІРёРЅСѓР»СЃСЏ, РЅСѓР¶РЅРѕ РїРµСЂРµСЃРѕР·РґР°С‚СЊ.
+	void deleteHandle(HandleFallLeaves& handle); //Р—Р°РїРёСЃС‹РІР°РµС‚ РІ handle РЅРµРІР°Р»РёРґРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ.
 	//void setIntensity(HandleFallLeaves& handle, float intensity);
 	void setBlow(HandleFallLeaves& handle);
 
@@ -56,9 +56,9 @@ protected:
 
 	struct OneObject{
 		c3dx* model;
-		/// индекс текстуры
+		/// РёРЅРґРµРєСЃ С‚РµРєСЃС‚СѓСЂС‹
 		int texture_index;
-		/// Листиков в секунду
+		/// Р›РёСЃС‚РёРєРѕРІ РІ СЃРµРєСѓРЅРґСѓ
 		float scale;
 		float intensity;
 		float intensity_remainder;
@@ -68,11 +68,11 @@ protected:
 	void updateObjectTexture(OneObject& object);
 
 	enum ParticleState{
-		/// Начинает падать
+		/// РќР°С‡РёРЅР°РµС‚ РїР°РґР°С‚СЊ
 		P_BEGIN_FALL,
-		/// Падает 
+		/// РџР°РґР°РµС‚ 
 		P_FALL,
-		/// Лежит на земле
+		/// Р›РµР¶РёС‚ РЅР° Р·РµРјР»Рµ
 		P_END_FALL,
 	};
 
@@ -80,7 +80,7 @@ protected:
 		Vect3f pos;
 		ParticleState state;
 		int texture_index;
-		float alpha;//Прозрачность спрайта.
+		float alpha;//РџСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ СЃРїСЂР°Р№С‚Р°.
 		float z_angle, rotate_angle;
 		float rotate_speed;
 		float scale;

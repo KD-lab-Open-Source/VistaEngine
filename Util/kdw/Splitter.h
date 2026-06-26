@@ -17,17 +17,17 @@ public:
 	~Splitter();
 	static const int SPLITTER_WIDTH = 6;
 
-    /// удалить все дочерние котролы
+    /// СѓРґР°Р»РёС‚СЊ РІСЃРµ РґРѕС‡РµСЂРЅРёРµ РєРѕС‚СЂРѕР»С‹
     void clear();
-    /// изменить количество секций (мест для контролов)
+    /// РёР·РјРµРЅРёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРµРєС†РёР№ (РјРµСЃС‚ РґР»СЏ РєРѕРЅС‚СЂРѕР»РѕРІ)
     void resize(int newSize);
-    /// добавить перед элементом beforeIndex (-1 = добавить в конец) 
+    /// РґРѕР±Р°РІРёС‚СЊ РїРµСЂРµРґ СЌР»РµРјРµРЅС‚РѕРј beforeIndex (-1 = РґРѕР±Р°РІРёС‚СЊ РІ РєРѕРЅРµС†) 
     void add(Widget* widget, float position = 0.5f, bool fold = true, int beforeIndex = -1);
-    /// удалить контрол по индексу
+    /// СѓРґР°Р»РёС‚СЊ РєРѕРЅС‚СЂРѕР» РїРѕ РёРЅРґРµРєСЃСѓ
     void remove(int index, bool inFavourOfPrevious);
-	/// заменить контрол
+	/// Р·Р°РјРµРЅРёС‚СЊ РєРѕРЅС‚СЂРѕР»
 	void replace(Widget* oldWidget, Widget* newWidget);
-	/// установить положение сплиттера
+	/// СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РїРѕР»РѕР¶РµРЅРёРµ СЃРїР»РёС‚С‚РµСЂР°
 	void setSplitterPosition(float position, int splitterIndex = 0);
 
 	int splitterSpacing() const{ return splitterSpacing_; }

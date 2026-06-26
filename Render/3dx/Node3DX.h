@@ -6,10 +6,10 @@
 #include "XMath/Mats.h"
 #include "Render/Src/Leaves.h"
 /*
-	Ограничения cObject3dx. 
-	65536 вертексов суммарно может быть в модели. 
-	максимум 256 нод. (Это то что передаётся например в GetNodePosition)
-	Максимум 32 группы видимости в одном set. (SetVisibilityGroup)
+	РћРіСЂР°РЅРёС‡РµРЅРёСЏ cObject3dx. 
+	65536 РІРµСЂС‚РµРєСЃРѕРІ СЃСѓРјРјР°СЂРЅРѕ РјРѕР¶РµС‚ Р±С‹С‚СЊ РІ РјРѕРґРµР»Рё. 
+	РјР°РєСЃРёРјСѓРј 256 РЅРѕРґ. (Р­С‚Рѕ С‚Рѕ С‡С‚Рѕ РїРµСЂРµРґР°С‘С‚СЃСЏ РЅР°РїСЂРёРјРµСЂ РІ GetNodePosition)
+	РњР°РєСЃРёРјСѓРј 32 РіСЂСѓРїРїС‹ РІРёРґРёРјРѕСЃС‚Рё РІ РѕРґРЅРѕРј set. (SetVisibilityGroup)
 */
 
 struct cNode3dx
@@ -20,7 +20,7 @@ struct cNode3dx
 	BYTE index_scale;
 	BYTE index_position;
 	BYTE index_rotation;
-	BYTE additional_transform;//255 - нет добавки
+	BYTE additional_transform;//255 - РЅРµС‚ РґРѕР±Р°РІРєРё
 	bool IsAdditionalTransform() const { return additional_transform != 255; }
 
 	inline void calculatePos(StaticNodeAnimations& animations, Mats& pos);
@@ -38,7 +38,7 @@ class RENDER_API cObject3dxAnimation
 public:
 	cObject3dxAnimation(cStatic3dx* pStatic);
 	cObject3dxAnimation(cObject3dxAnimation* obj);
-	cStatic3dx* GetStatic(){return pStatic;}//только для чтения
+	cStatic3dx* GetStatic(){return pStatic;}//С‚РѕР»СЊРєРѕ РґР»СЏ С‡С‚РµРЅРёСЏ
 
 	void SetPhase(float phase);
 	void SetAnimationGroupPhase(int ianimationgroup,float phase);
@@ -52,11 +52,11 @@ public:
 	StaticAnimationChain* GetChain(int i);
 	bool SetChain(const char* chain);
 	void SetChain(int chain_index);
-	int GetChainIndex(const char* chain_name);//Возвращает индекс, который используется как chain_index
+	int GetChainIndex(const char* chain_name);//Р’РѕР·РІСЂР°С‰Р°РµС‚ РёРЅРґРµРєСЃ, РєРѕС‚РѕСЂС‹Р№ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РєР°Рє chain_index
 
-	//nodeindex - индекс из массива cStatic3dx::nodes
-	int FindNode(const char* node_name) const;//индекс в cStatic3dx::nodes (-1=не нашли)
-	const Se3f& GetNodePosition(int nodeindex) const;//Валидные данные только после первого Update, возвращает положение относительно глобальной системы координат
+	//nodeindex - РёРЅРґРµРєСЃ РёР· РјР°СЃСЃРёРІР° cStatic3dx::nodes
+	int FindNode(const char* node_name) const;//РёРЅРґРµРєСЃ РІ cStatic3dx::nodes (-1=РЅРµ РЅР°С€Р»Рё)
+	const Se3f& GetNodePosition(int nodeindex) const;//Р’Р°Р»РёРґРЅС‹Рµ РґР°РЅРЅС‹Рµ С‚РѕР»СЊРєРѕ РїРѕСЃР»Рµ РїРµСЂРІРѕРіРѕ Update, РІРѕР·РІСЂР°С‰Р°РµС‚ РїРѕР»РѕР¶РµРЅРёРµ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РіР»РѕР±Р°Р»СЊРЅРѕР№ СЃРёСЃС‚РµРјС‹ РєРѕРѕСЂРґРёРЅР°С‚
 	const Mats& GetNodePositionMats(int nodeindex) const;
 	const MatXf& GetNodePositionMat(int nodeindex) const;
 	int GetNodeNumber() const;
@@ -75,8 +75,8 @@ protected:
 	cStatic3dx* pStatic;
 	bool updated_;
 	bool treeUpdated_;
-	//порядок хранения cNode3dx таков, что 
-	//child всегда находится после parent
+	//РїРѕСЂСЏРґРѕРє С…СЂР°РЅРµРЅРёСЏ cNode3dx С‚Р°РєРѕРІ, С‡С‚Рѕ 
+	//child РІСЃРµРіРґР° РЅР°С…РѕРґРёС‚СЃСЏ РїРѕСЃР»Рµ parent
 	vector<cNode3dx> nodes_;
 
 	struct  MaterialAnim
@@ -106,7 +106,7 @@ protected:
 };
 
 class RENDER_API cObject3dx : public c3dx, public cObject3dxAnimation
-{//root объект через который происходит всё взаимодействие
+{//root РѕР±СЉРµРєС‚ С‡РµСЂРµР· РєРѕС‚РѕСЂС‹Р№ РїСЂРѕРёСЃС…РѕРґРёС‚ РІСЃС‘ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёРµ
 public:
 	cObject3dx(cStatic3dx* pStatic,bool interpolate);
 	cObject3dx(cObject3dx* pObj);
@@ -133,7 +133,7 @@ public:
 	void DrawLine(Camera* camera);
 
 	int GetAnimationGroupNumber();
-	int GetAnimationGroup(const char* name);//Возвращает индекс, который используется как ianimationgroup
+	int GetAnimationGroup(const char* name);//Р’РѕР·РІСЂР°С‰Р°РµС‚ РёРЅРґРµРєСЃ, РєРѕС‚РѕСЂС‹Р№ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РєР°Рє ianimationgroup
 	const char* GetAnimationGroupName(int ianimationgroup);
 
 	int GetVisibilityGroupNumber(VisibilitySetIndex iset = VisibilitySetIndex::ZERO){return GetVisibilitySet(iset).GetVisibilityGroupNumber();};
@@ -154,22 +154,22 @@ public:
 	const VoxelBox& voxelBox() const { return pStatic->voxelBox; }
 	const char* GetFileName() const;
 
-	//SetNodePosition можно применять только при флаге ATTR3DX_NOUPDATEMATRIX
-	//Эта функция неприятна в том смысле, что любая функция, требующая для своей работы UpdateMatrix изменит положение объекта
+	//SetNodePosition РјРѕР¶РЅРѕ РїСЂРёРјРµРЅСЏС‚СЊ С‚РѕР»СЊРєРѕ РїСЂРё С„Р»Р°РіРµ ATTR3DX_NOUPDATEMATRIX
+	//Р­С‚Р° С„СѓРЅРєС†РёСЏ РЅРµРїСЂРёСЏС‚РЅР° РІ С‚РѕРј СЃРјС‹СЃР»Рµ, С‡С‚Рѕ Р»СЋР±Р°СЏ С„СѓРЅРєС†РёСЏ, С‚СЂРµР±СѓСЋС‰Р°СЏ РґР»СЏ СЃРІРѕРµР№ СЂР°Р±РѕС‚С‹ UpdateMatrix РёР·РјРµРЅРёС‚ РїРѕР»РѕР¶РµРЅРёРµ РѕР±СЉРµРєС‚Р°
 	void SetNodePosition(int nodeindex,const Se3f& pos);
 
 	void SetNodePositionMats(int nodeindex,const Mats& pos);
 
-	void SetUserTransform(int nodeindex,const Se3f& pos);//Не оптимально написанна, если трансформация будет для многих node
+	void SetUserTransform(int nodeindex,const Se3f& pos);//РќРµ РѕРїС‚РёРјР°Р»СЊРЅРѕ РЅР°РїРёСЃР°РЅРЅР°, РµСЃР»Рё С‚СЂР°РЅСЃС„РѕСЂРјР°С†РёСЏ Р±СѓРґРµС‚ РґР»СЏ РјРЅРѕРіРёС… node
 
-	//Возвращает значение видимости, заданное художником в треке видимости объекта в 3DS Max
-	//Не влияет ни на что, кроме эффектов, автоматически привязанных к объекту.
+	//Р’РѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ РІРёРґРёРјРѕСЃС‚Рё, Р·Р°РґР°РЅРЅРѕРµ С…СѓРґРѕР¶РЅРёРєРѕРј РІ С‚СЂРµРєРµ РІРёРґРёРјРѕСЃС‚Рё РѕР±СЉРµРєС‚Р° РІ 3DS Max
+	//РќРµ РІР»РёСЏРµС‚ РЅРё РЅР° С‡С‚Рѕ, РєСЂРѕРјРµ СЌС„С„РµРєС‚РѕРІ, Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РїСЂРёРІСЏР·Р°РЅРЅС‹С… Рє РѕР±СЉРµРєС‚Сѓ.
 	bool GetVisibilityTrack(int nodeindex) const;
 
-	//Возвращает true если на этом интервале есть переход от невидимого к видимому.
+	//Р’РѕР·РІСЂР°С‰Р°РµС‚ true РµСЃР»Рё РЅР° СЌС‚РѕРј РёРЅС‚РµСЂРІР°Р»Рµ РµСЃС‚СЊ РїРµСЂРµС…РѕРґ РѕС‚ РЅРµРІРёРґРёРјРѕРіРѕ Рє РІРёРґРёРјРѕРјСѓ.
 	bool GetVisibilityTrackInterval(int nodeindex,float begin_phase,float end_phase) const;
 
-	//RestoreNodeMatrix отменяет действие SetUserTransform
+	//RestoreNodeMatrix РѕС‚РјРµРЅСЏРµС‚ РґРµР№СЃС‚РІРёРµ SetUserTransform
 	void RestoreUserTransform(int nodeindex);
 	bool HasUserTransform(int node_index) const;
 
@@ -179,23 +179,23 @@ public:
 	void SetSilhouetteIndex(int index);
 	int GetSilhouetteIndex() const { return silhouette_index; }
 
-	void SetSkinColor(Color4c skin_color, const char* emblem_name_ = "");//Дорогая функция, грузит текстуры (если только не вызвали PreloadElement c нужными параметрами)
+	void SetSkinColor(Color4c skin_color, const char* emblem_name_ = "");//Р”РѕСЂРѕРіР°СЏ С„СѓРЅРєС†РёСЏ, РіСЂСѓР·РёС‚ С‚РµРєСЃС‚СѓСЂС‹ (РµСЃР»Рё С‚РѕР»СЊРєРѕ РЅРµ РІС‹Р·РІР°Р»Рё PreloadElement c РЅСѓР¶РЅС‹РјРё РїР°СЂР°РјРµС‚СЂР°РјРё)
 	Color4c GetSkinColor() const {return skin_color;};
 
-	//ambient.a,specular.a  коэффициэнты интерполяции с цветами из материала заданного в редакторе.
-	//!diffuse.a - прозрачность объекта
+	//ambient.a,specular.a  РєРѕСЌС„С„РёС†РёСЌРЅС‚С‹ РёРЅС‚РµСЂРїРѕР»СЏС†РёРё СЃ С†РІРµС‚Р°РјРё РёР· РјР°С‚РµСЂРёР°Р»Р° Р·Р°РґР°РЅРЅРѕРіРѕ РІ СЂРµРґР°РєС‚РѕСЂРµ.
+	//!diffuse.a - РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ РѕР±СЉРµРєС‚Р°
 	void SetColorOld(const Color4f *ambient,const Color4f *diffuse,const Color4f *specular=0);
 	void GetColorOld(Color4f *ambient,Color4f *diffuse,Color4f *specular=0) const;
 
-	//ambient.a,specular.a,diffuse.a  коэффициэнты интерполяции с цветами из материала заданного в редакторе.
+	//ambient.a,specular.a,diffuse.a  РєРѕСЌС„С„РёС†РёСЌРЅС‚С‹ РёРЅС‚РµСЂРїРѕР»СЏС†РёРё СЃ С†РІРµС‚Р°РјРё РёР· РјР°С‚РµСЂРёР°Р»Р° Р·Р°РґР°РЅРЅРѕРіРѕ РІ СЂРµРґР°РєС‚РѕСЂРµ.
 	void SetColorMaterial(const Color4f *ambient,const Color4f *diffuse,const Color4f *specular=0);
 	void GetColorMaterial(Color4f *ambient,Color4f *diffuse,Color4f *specular=0) const;
 
-	//Прозрачность объекта.
+	//РџСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ РѕР±СЉРµРєС‚Р°.
 	virtual void SetOpacity(float opacity);
 	virtual float GetOpacity()const;
 
-	//Цвет текстуры в зависимости от параметра lerp_color.а меняется. 0 - цвет текстуры, 1 - цвет lerp_color.
+	//Р¦РІРµС‚ С‚РµРєСЃС‚СѓСЂС‹ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РїР°СЂР°РјРµС‚СЂР° lerp_color.Р° РјРµРЅСЏРµС‚СЃСЏ. 0 - С†РІРµС‚ С‚РµРєСЃС‚СѓСЂС‹, 1 - С†РІРµС‚ lerp_color.
 	void SetTextureLerpColor(const Color4f& lerp_color);
 	Color4f GetTextureLerpColor() const;
 
@@ -204,21 +204,21 @@ public:
 	void DrawBound() const;
 	void drawBoundSpheres() const;
 
-	//Пересчитывает местоположение объекта.
-	//Нужно вызывать, если хочется узнать положение одного из узлов
+	//РџРµСЂРµСЃС‡РёС‚С‹РІР°РµС‚ РјРµСЃС‚РѕРїРѕР»РѕР¶РµРЅРёРµ РѕР±СЉРµРєС‚Р°.
+	//РќСѓР¶РЅРѕ РІС‹Р·С‹РІР°С‚СЊ, РµСЃР»Рё С…РѕС‡РµС‚СЃСЏ СѓР·РЅР°С‚СЊ РїРѕР»РѕР¶РµРЅРёРµ РѕРґРЅРѕРіРѕ РёР· СѓР·Р»РѕРІ
 	void Update();
 
 	void AddLink(ObserverLink* link){observer.AddLink(link);}
 	void BreakLink(ObserverLink* link){observer.BreakLink(link);}
 
-	//Прилинковать один объект к другому.
-	//Если object=0 - отлинковать.
+	//РџСЂРёР»РёРЅРєРѕРІР°С‚СЊ РѕРґРёРЅ РѕР±СЉРµРєС‚ Рє РґСЂСѓРіРѕРјСѓ.
+	//Р•СЃР»Рё object=0 - РѕС‚Р»РёРЅРєРѕРІР°С‚СЊ.
 	void LinkTo(cObject3dx* object,int inode,bool set_scale=true);
 
-	//Выдают для соответствующей группы видимости треугольники и точки.
+	//Р’С‹РґР°СЋС‚ РґР»СЏ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµР№ РіСЂСѓРїРїС‹ РІРёРґРёРјРѕСЃС‚Рё С‚СЂРµСѓРіРѕР»СЊРЅРёРєРё Рё С‚РѕС‡РєРё.
 	void GetEmitterMaterial(struct cObjMaterial& material);
 
-	//Выдает все точки, определить какие видимы из них можно только по triangles либо по visible_points
+	//Р’С‹РґР°РµС‚ РІСЃРµ С‚РѕС‡РєРё, РѕРїСЂРµРґРµР»РёС‚СЊ РєР°РєРёРµ РІРёРґРёРјС‹ РёР· РЅРёС… РјРѕР¶РЅРѕ С‚РѕР»СЊРєРѕ РїРѕ triangles Р»РёР±Рѕ РїРѕ visible_points
 	void GetTriangleInfo(TriangleInfo& all,DWORD tif_flags,int selected_node=-1);
 	void GetVisibilityVertex(vector<Vect3f> &pos, vector<Vect3f> &norm);
 
@@ -232,8 +232,8 @@ public:
 	static void SetUseLod(bool enable);
 	static bool GetUseLod();
 
-	//SetCircleShadow,EnableSelfShadow() - Параметры общие для всех объектов с таким названием (GetFileName())
-	//height -Высота, когда исчезает тень
+	//SetCircleShadow,EnableSelfShadow() - РџР°СЂР°РјРµС‚СЂС‹ РѕР±С‰РёРµ РґР»СЏ РІСЃРµС… РѕР±СЉРµРєС‚РѕРІ СЃ С‚Р°РєРёРј РЅР°Р·РІР°РЅРёРµРј (GetFileName())
+	//height -Р’С‹СЃРѕС‚Р°, РєРѕРіРґР° РёСЃС‡РµР·Р°РµС‚ С‚РµРЅСЊ
 	void SetCircleShadowParam(float radius,float height=-1);
 	void SetShadowType(ObjectShadowType type);
 	ObjectShadowType getShadowType();
@@ -255,17 +255,17 @@ public:
 	const char* GetNodeName(int node_index) const{return cObject3dxAnimation::GetNodeName(node_index);}
 
 	void DrawAll(Camera *camera);
-	void AddLight(cUnkLight* light);//Для SceneLightProc
+	void AddLight(cUnkLight* light);//Р”Р»СЏ SceneLightProc
 
 	bool QueryVisibleIsVisible();
 	void QueryVisible(Camera* camera);
-	void DisableDetailLevel();//Его нельзя выключить, потому как противоречие тогда будет.
+	void DisableDetailLevel();//Р•РіРѕ РЅРµР»СЊР·СЏ РІС‹РєР»СЋС‡РёС‚СЊ, РїРѕС‚РѕРјСѓ РєР°Рє РїСЂРѕС‚РёРІРѕСЂРµС‡РёРµ С‚РѕРіРґР° Р±СѓРґРµС‚.
 
 	void SetSilouetteCenter(Vect3f center){silouette_center=center;}
 	const Vect3f& GetSilouetteCenter()const{return silouette_center;}
 	void GetTextureNames(vector<string>& texture_names);
 
-	sBox6f CalcDynamicBoundBox(const MatXf& world_view);//Только для силуэтов! В глобальных координатах.
+	sBox6f CalcDynamicBoundBox(const MatXf& world_view);//РўРѕР»СЊРєРѕ РґР»СЏ СЃРёР»СѓСЌС‚РѕРІ! Р’ РіР»РѕР±Р°Р»СЊРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚Р°С….
 	StaticVisibilitySet& GetVisibilitySet(VisibilitySetIndex iset);
 
 	bool IsLogicBound(int nodeindex);
@@ -274,8 +274,8 @@ public:
 	int GetNumOutputPolygons()const{return num_out_polygons;}
 	cTexture* GetDiffuseTexture(int num_mat)const;
 
-	//Нужно не забывать, что SetSkinColor выставляет тоже текстуру
-	//Делает внутри AddRef
+	//РќСѓР¶РЅРѕ РЅРµ Р·Р°Р±С‹РІР°С‚СЊ, С‡С‚Рѕ SetSkinColor РІС‹СЃС‚Р°РІР»СЏРµС‚ С‚РѕР¶Рµ С‚РµРєСЃС‚СѓСЂСѓ
+	//Р”РµР»Р°РµС‚ РІРЅСѓС‚СЂРё AddRef
 	void SetDiffuseTexture(int num_mat,cTexture* texture);
 	float GetFov(){return pStatic->cameraParams.fov;}
 	void SetFurScalePhase(float phase);
@@ -289,7 +289,7 @@ protected:
 		cEffect* pEffect;
 		BYTE index_visibility;
 		float prev_phase;
-		EffectData():pEffect(0),index_visibility(255){}//255 - неинициализированн.
+		EffectData():pEffect(0),index_visibility(255){}//255 - РЅРµРёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°РЅРЅ.
 	};
 	float distance_alpha;
 	int iLOD;
@@ -342,11 +342,11 @@ protected:
 	} link3dx;
 
 	typedef vector<cUnkLight*> Lights;
-	Lights point_light;//Источники, которые светят на объект
-	Lights lights;//Источники внутри объекта.
+	Lights point_light;//РСЃС‚РѕС‡РЅРёРєРё, РєРѕС‚РѕСЂС‹Рµ СЃРІРµС‚СЏС‚ РЅР° РѕР±СЉРµРєС‚
+	Lights lights;//РСЃС‚РѕС‡РЅРёРєРё РІРЅСѓС‚СЂРё РѕР±СЉРµРєС‚Р°.
 	Leaves* leaves_;
 
-	cObject3dxAnimationSecond* pAnimSecond;//Для интерполяции анимационных цепочек.
+	cObject3dxAnimationSecond* pAnimSecond;//Р”Р»СЏ РёРЅС‚РµСЂРїРѕР»СЏС†РёРё Р°РЅРёРјР°С†РёРѕРЅРЅС‹С… С†РµРїРѕС‡РµРє.
 	unsigned char silhouette_index;
 
 	void CalcBoundingBox();

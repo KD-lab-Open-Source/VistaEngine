@@ -106,17 +106,17 @@ universeObjectAction(0)
 
 	enableEventChecking_ = false;
 
-	global_time.setTime(mission.globalTime); // Нужно установить время до загрузки spg
+	global_time.setTime(mission.globalTime); // РќСѓР¶РЅРѕ СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РІСЂРµРјСЏ РґРѕ Р·Р°РіСЂСѓР·РєРё spg
 
 	if(ia){
 		missionSignature = ia->crc();
-		ia->serialize(MissionDescription(), "header", 0); // для избежания скипования при загрузке
+		ia->serialize(MissionDescription(), "header", 0); // РґР»СЏ РёР·Р±РµР¶Р°РЅРёСЏ СЃРєРёРїРѕРІР°РЅРёСЏ РїСЂРё Р·Р°РіСЂСѓР·РєРµ
 		vMap.loadGameMap(*ia);
 	}
 	
     RigidBodyPhysics::initConstraintHandler(&constraintHandler_);
 
-	// Создание игроков
+	// РЎРѕР·РґР°РЅРёРµ РёРіСЂРѕРєРѕРІ
 	int actActivePlayerID=0, actActiveCoopIdx=0;
 	for(int i = 0; i < mission.playersAmountMax(); i++){
 		SlotData& playerData = mission.changePlayerData(i);
@@ -488,7 +488,7 @@ void Universe::Quant()
 	FOR_EACH(vMap.getChangedAreas(),rc){
 		normalMap->updateRect(rc->x,rc->y,rc->sx,rc->sy);
 		windMap->updateRect(rc->x,rc->y,rc->sx,rc->sy);
-		pathFinder->updateRect(rc->x,rc->y,rc->sx,rc->sy); // Наверно необязательно обновлять тут..!
+		pathFinder->updateRect(rc->x,rc->y,rc->sx,rc->sy); // РќР°РІРµСЂРЅРѕ РЅРµРѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РѕР±РЅРѕРІР»СЏС‚СЊ С‚СѓС‚..!
 		crashSystem->updateRegion(rc->x,rc->y,rc->x+rc->sx,rc->y+rc->sy);
 
 		MapUpdateOperator unit_op((int)(rc->x),(int)(rc->y),(int)(rc->x + rc->sx),(int)(rc->y + rc->sy));
@@ -641,8 +641,8 @@ void Universe::serialize(Archive& ar)
 {
 	start_timer_auto();
 
-	ar.serialize(enableTransparencyTracking_, "enableTransparencyTracking", "Включить прозрачность объектов");
-	ar.serialize(minimapAngle_, "minimapAngle", "Угол поворота миникарты");
+	ar.serialize(enableTransparencyTracking_, "enableTransparencyTracking", "Р’РєР»СЋС‡РёС‚СЊ РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ РѕР±СЉРµРєС‚РѕРІ");
+	ar.serialize(minimapAngle_, "minimapAngle", "РЈРіРѕР» РїРѕРІРѕСЂРѕС‚Р° РјРёРЅРёРєР°СЂС‚С‹");
 
 	if(!ar.filter(SERIALIZE_WORLD_DATA))
 		return;
@@ -845,8 +845,8 @@ void Universe::deleteUnit(UnitBase* unit)
 
 void Universe::clearDeletedUnits(bool delete_all)
 {
-	const int wait_to_delete=10;//Количество квантов, котороё ждётся
-							//в логическом кванте, прежде, чем удалить объект
+	const int wait_to_delete=10;//РљРѕР»РёС‡РµСЃС‚РІРѕ РєРІР°РЅС‚РѕРІ, РєРѕС‚РѕСЂРѕС‘ Р¶РґС‘С‚СЃСЏ
+							//РІ Р»РѕРіРёС‡РµСЃРєРѕРј РєРІР°РЅС‚Рµ, РїСЂРµР¶РґРµ, С‡РµРј СѓРґР°Р»РёС‚СЊ РѕР±СЉРµРєС‚
 
 	if(!delete_all){
 		if(useHT_){

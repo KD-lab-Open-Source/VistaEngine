@@ -17,7 +17,7 @@ class cOneCirceData
 public:
 	enum
 	{
-		quality=2,//��� ���� ������ ������� �����
+		quality=2,//Два бита меньше размера сетки
 		quality_mul=1<<quality,
 		quality_and=quality_mul-1,
 	};
@@ -195,7 +195,7 @@ void FogOfWarMap::calcSummaryMap()
 
 void FogOfWarMap::calcScoutMap()
 {
-	//�� ������ ��� ������, ����� scout_area_alpha==0, � ����������� ������������ ����� ��������.
+	//Не забыть про случай, когда scout_area_alpha==0, и разведанное тождественно равно видимому.
 /*
 	for(int y=0;y<size.y;y++)
 	{
@@ -380,9 +380,9 @@ FogOfWarMap* FogOfWar::CreateMap()
 
 void FogOfWar::serialize(Archive& ar)
 {
-	ar.serialize(fogColor_, "fogColor", "���� ������ �����");
-	ar.serialize(RangedWrapperi(scoutAreaAlpha_, 0, 255), "scoutAreaAlpha", "������������ ������������");
-	ar.serialize(RangedWrapperi(fogMinimapAlpha_, 0, 255), "fogMinimapAlpha", "������������ ������ ����� �� ���������");
+	ar.serialize(fogColor_, "fogColor", "Цвет тумана войны");
+	ar.serialize(RangedWrapperi(scoutAreaAlpha_, 0, 255), "scoutAreaAlpha", "Прозрачность разведанного");
+	ar.serialize(RangedWrapperi(fogMinimapAlpha_, 0, 255), "fogMinimapAlpha", "Прозрачность тумана войны на миникарте");
 
 	if(ar.isInput()){
 		invAlpha = fogColor_.a > 0 ? (float)fogMinimapAlpha_/fogColor_.a : 0;
@@ -398,11 +398,11 @@ FogOfWarMap::FogOfWarMap(FogOfWar *const fogOfWar, const Vect2i& size)
 , fogOfWar_(fogOfWar)
 {
 	xassert(size.x%8==0 && size.y%8==0);
-	int size_array=(size.x*size.y+8);/*8-��� MMX*/
-	size_array=((size_array>>4)+1)<<4;//��������� �� 16 � ������� �������.
+	int size_array=(size.x*size.y+8);/*8-для MMX*/
+	size_array=((size_array>>4)+1)<<4;//Округляем до 16 в верхнюю сторону.
 
 
-	raw_data=new char[size_array*3];//����� �������� ������.
+	raw_data=new char[size_array*3];//Чтобы локально лежало.
 	tilemap = raw_data;
 	scoutmap = raw_data+size_array;
 	summarymap = raw_data+2*size_array;
@@ -454,7 +454,7 @@ void FogOfWarMap::moveVisibleOuterRadius(FOW_HANDLE handle, int x, int y, int ra
 {
 	int delta_radius=min(radius,FogOfWar::fade_delta_radius>>FogOfWar::shift)<<FogOfWar::shift;
 //	delta_radius/=2;
-	moveVisible(handle,x,y,radius+delta_radius);//����� ��������� ��� ������� ����������� ������������
+	moveVisible(handle,x,y,radius+delta_radius);//Можно подбирать для лучшего визуального соответствия
 }
 
 

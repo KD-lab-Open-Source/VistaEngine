@@ -30,7 +30,7 @@ public:
 	const LegionariesLinks& units() const { return MT_IS_LOGIC() ? units_ : graphUnits(); }
 
 	bool canAttackTarget(const WeaponTarget& target, bool check_fow = false) const;
-	/// все тоже, что что и canAttackTarget, но "прямо сейчас", т.е. с учетом активации оружия и дистанции атаки
+	/// РІСЃРµ С‚РѕР¶Рµ, С‡С‚Рѕ С‡С‚Рѕ Рё canAttackTarget, РЅРѕ "РїСЂСЏРјРѕ СЃРµР№С‡Р°СЃ", С‚.Рµ. СЃ СѓС‡РµС‚РѕРј Р°РєС‚РёРІР°С†РёРё РѕСЂСѓР¶РёСЏ Рё РґРёСЃС‚Р°РЅС†РёРё Р°С‚Р°РєРё
 	bool fireDistanceCheck(const WeaponTarget& target, bool check_fow = false) const;
 	
 	bool canDetonateMines() const;
@@ -46,9 +46,9 @@ public:
 	bool uniform(const UnitReal* unit = 0) const;
 	bool prior(const UnitInterface* unit) const;
 
-	// Работа с инвентарём
+	// Р Р°Р±РѕС‚Р° СЃ РёРЅРІРµРЅС‚Р°СЂС‘Рј
 
-	/// Проверка, влезет ли предмет в инвентарь.
+	/// РџСЂРѕРІРµСЂРєР°, РІР»РµР·РµС‚ Р»Рё РїСЂРµРґРјРµС‚ РІ РёРЅРІРµРЅС‚Р°СЂСЊ.
 	bool canPutToInventory(const UnitItemInventory* item) const;
 
 	bool putToInventory(const UnitItemInventory* item);
@@ -85,7 +85,7 @@ public:
 
 	void graphQuant(float dt);
 	void setInterpolatedPose(const Se3f& pos) { interpolatedPose_ = pos; }
-	const Se3f& interpolatedPose() const { return interpolatedPose_; } // использовать только внутри graphQuant()
+	const Se3f& interpolatedPose() const { return interpolatedPose_; } // РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ РІРЅСѓС‚СЂРё graphQuant()
 
 	const UI_ShowModeSprite* getSelectSprite() const;
 
@@ -114,7 +114,7 @@ public:
 
 	bool patrolMode() const { return patrolPoints_.size() > 1; }
 	
-	// Стрельба
+	// РЎС‚СЂРµР»СЊР±Р°
 	void clearTargets();
 	void addTarget(UnitInterface* target, bool moveToTarget = true);
 	void addTarget(const Vect3f& v, bool moveToTarget = true);
@@ -170,7 +170,7 @@ public:
 	bool isWorking() const;
 
 	bool addUnitsFromArea(AttributeUnitReferences attrUnits, float radius, bool testOnly = false); 
-	// при testOnly == true добавление в скад не происходит, возращает результат возможности добавления в сквад
+	// РїСЂРё testOnly == true РґРѕР±Р°РІР»РµРЅРёРµ РІ СЃРєР°Рґ РЅРµ РїСЂРѕРёСЃС…РѕРґРёС‚, РІРѕР·СЂР°С‰Р°РµС‚ СЂРµР·СѓР»СЊС‚Р°С‚ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РґРѕР±Р°РІР»РµРЅРёСЏ РІ СЃРєРІР°Рґ
 
 	void setUsedByTrigger(int priority, const void* action = 0, int time = 0);
 

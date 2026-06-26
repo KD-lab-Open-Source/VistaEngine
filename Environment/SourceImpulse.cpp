@@ -35,13 +35,13 @@ void SourceImpulse::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(instantaneous, "instantaneous", "Мгновенный (для снарядов - сразу исчезает)");
-	ar.serialize(applyOnFlying, "applyOnFlying", "Воздействовать на летные юниты");
-	ar.serialize(horizontalImpulse, "horizontalImpulse", "Горизонтальный импульс");
-	ar.serialize(verticalImpulse, "verticalImpulse", "Вертикальный импульс");
-	ar.serialize(torqueImpulse, "torqueImpulse", "Вращающий импульс (не действует на людей)");
-	ar.serialize(environmentTorqueImpulse, "environmentTorqueImpulse", "Вращающий импульс (для камней)");
-    ar.serialize(abnormalState_, "abnormalState", "воздействие на юниты");
+	ar.serialize(instantaneous, "instantaneous", "РњРіРЅРѕРІРµРЅРЅС‹Р№ (РґР»СЏ СЃРЅР°СЂСЏРґРѕРІ - СЃСЂР°Р·Сѓ РёСЃС‡РµР·Р°РµС‚)");
+	ar.serialize(applyOnFlying, "applyOnFlying", "Р’РѕР·РґРµР№СЃС‚РІРѕРІР°С‚СЊ РЅР° Р»РµС‚РЅС‹Рµ СЋРЅРёС‚С‹");
+	ar.serialize(horizontalImpulse, "horizontalImpulse", "Р“РѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹Р№ РёРјРїСѓР»СЊСЃ");
+	ar.serialize(verticalImpulse, "verticalImpulse", "Р’РµСЂС‚РёРєР°Р»СЊРЅС‹Р№ РёРјРїСѓР»СЊСЃ");
+	ar.serialize(torqueImpulse, "torqueImpulse", "Р’СЂР°С‰Р°СЋС‰РёР№ РёРјРїСѓР»СЊСЃ (РЅРµ РґРµР№СЃС‚РІСѓРµС‚ РЅР° Р»СЋРґРµР№)");
+	ar.serialize(environmentTorqueImpulse, "environmentTorqueImpulse", "Р’СЂР°С‰Р°СЋС‰РёР№ РёРјРїСѓР»СЊСЃ (РґР»СЏ РєР°РјРЅРµР№)");
+    ar.serialize(abnormalState_, "abnormalState", "РІРѕР·РґРµР№СЃС‚РІРёРµ РЅР° СЋРЅРёС‚С‹");
 	serializationApply(ar);
 }
 

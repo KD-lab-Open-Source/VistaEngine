@@ -125,7 +125,7 @@ void StateController::stateQuant()
 	States::const_iterator istate(posibleStates_->begin());
 	int statePriority(max(currentState() ? currentState_->priority() : 0, desiredState_ ? desiredState_->priority() : 0));
 	while((*istate)->priority() >= statePriority){
-		xxassert(istate < posibleStates_->end(), "Нет действия по умолчанию");
+		xxassert(istate < posibleStates_->end(), "РќРµС‚ РґРµР№СЃС‚РІРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ");
 		if((*istate)->canStart(owner_)){
 			if(prevState_){
 				prevState_->finish(owner_, false);
@@ -149,7 +149,7 @@ void StateController::stateQuant()
 		currentState_->start(owner_);
 		prevState_ = 0;
 	}
-	xxassert(currentState_, "Нет действия по умолчанию");
+	xxassert(currentState_, "РќРµС‚ РґРµР№СЃС‚РІРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ");
 }
 
 void StateController::serialize(Archive& ar)
@@ -1227,7 +1227,7 @@ StateBase* UnitAllPosibleStates::find(ChainID id)
 	FOR_EACH(*this, i)
 		if((*i)->id() == id)
 			return *i;
-	xxassert(false, "Неизвестное состояние");
+	xxassert(false, "РќРµРёР·РІРµСЃС‚РЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ");
 	return StateBase::instance();
 }
 

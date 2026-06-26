@@ -10,7 +10,7 @@
 
 namespace kdw{
 
-REGISTER_CLASS(Widget, RadioButton, "Радио галочка");
+REGISTER_CLASS(Widget, RadioButton, "Р Р°РґРёРѕ РіР°Р»РѕС‡РєР°");
 
 class RadioButtonGroup: public ShareHandleBase{
 public:
@@ -221,8 +221,8 @@ void RadioButton::onChanged()
 void RadioButton::serialize(Archive& ar)
 {
 	if(ar.filter(SERIALIZE_DESIGN)){
-		ar.serialize(text_, "text", "&Текст");
-		ar.serialize(status_, "status", "&Статус");
+		ar.serialize(text_, "text", "&РўРµРєСЃС‚");
+		ar.serialize(status_, "status", "&РЎС‚Р°С‚СѓСЃ");
 	}
 	Widget::serialize(ar);
 }

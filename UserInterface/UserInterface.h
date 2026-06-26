@@ -51,26 +51,26 @@ public:
 
 	bool releaseResources();
 
-	/// возвращает время смены экрана
+	/// РІРѕР·РІСЂР°С‰Р°РµС‚ РІСЂРµРјСЏ СЃРјРµРЅС‹ СЌРєСЂР°РЅР°
 	float getSelectScreenTime(const UI_Screen* scr) const;
-	/// предзагружает экран, следующий выбранный должен быть строго тем, что предзагружен
+	/// РїСЂРµРґР·Р°РіСЂСѓР¶Р°РµС‚ СЌРєСЂР°РЅ, СЃР»РµРґСѓСЋС‰РёР№ РІС‹Р±СЂР°РЅРЅС‹Р№ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ СЃС‚СЂРѕРіРѕ С‚РµРј, С‡С‚Рѕ РїСЂРµРґР·Р°РіСЂСѓР¶РµРЅ
 	void preloadScreen(UI_Screen* scr, cScene* scene = 0, const Player* player = 0);
-	/// переключает текущий экран
+	/// РїРµСЂРµРєР»СЋС‡Р°РµС‚ С‚РµРєСѓС‰РёР№ СЌРєСЂР°РЅ
 	void selectScreen(UI_Screen* scr);
 	void setLoadingScreen();
 	bool isScreenActive(const UI_Screen* screen) const { return screen == currentScreen_; }
 
 	void convertInputEvent(UI_InputEvent& event);
-	/// обработка ввода с клавиатуры или мыши
+	/// РѕР±СЂР°Р±РѕС‚РєР° РІРІРѕРґР° СЃ РєР»Р°РІРёР°С‚СѓСЂС‹ РёР»Рё РјС‹С€Рё
 	/**
-	возвращает true если событие было обработано
+	РІРѕР·РІСЂР°С‰Р°РµС‚ true РµСЃР»Рё СЃРѕР±С‹С‚РёРµ Р±С‹Р»Рѕ РѕР±СЂР°Р±РѕС‚Р°РЅРѕ
 	*/
 	bool handleInput(const UI_InputEvent& event);
 
-	/// обрабатывает и посылает прямое низкоуровневое событие теукущему экрану
+	/// РѕР±СЂР°Р±Р°С‚С‹РІР°РµС‚ Рё РїРѕСЃС‹Р»Р°РµС‚ РїСЂСЏРјРѕРµ РЅРёР·РєРѕСѓСЂРѕРІРЅРµРІРѕРµ СЃРѕР±С‹С‚РёРµ С‚РµСѓРєСѓС‰РµРјСѓ СЌРєСЂР°РЅСѓ
 	void handleMessage(const ControlMessage& msg);
 
-	/// поиск экрана по имени
+	/// РїРѕРёСЃРє СЌРєСЂР°РЅР° РїРѕ РёРјРµРЅРё
 	UI_Screen* screen(const char* screen_name);
 	UI_Screen* screen(UI_Screen::ScreenType type_);
 	const UI_Screen* currentScreen() const { return currentScreen_; }
@@ -78,7 +78,7 @@ public:
 	bool addScreen (const char* name);
 	bool removeScreen (const char* name);
 
-	// Для UIEditor-а:
+	// Р”Р»СЏ UIEditor-Р°:
 	typedef std::list<UI_Screen> ScreenContainer;
     ScreenContainer& screens () { return screens_; }
 
@@ -89,9 +89,9 @@ public:
 
 	bool hasFocusedControl() const { return focusedControl_ != 0; }
 
-	/// Курсоры
+	/// РљСѓСЂСЃРѕСЂС‹
 
-	/// Бэкграундная сцена
+	/// Р‘СЌРєРіСЂР°СѓРЅРґРЅР°СЏ СЃС†РµРЅР°
 	void initBgScene();
 	void finitBgScene();
 
@@ -101,11 +101,11 @@ public:
 
 	void showDebugInfo() const; //MTL
 	void drawDebugInfo() const; //MTG 3D
-	// дебаговая информация контролов
+	// РґРµР±Р°РіРѕРІР°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ РєРѕРЅС‚СЂРѕР»РѕРІ
 	void drawDebug2D() const;
 	void updateDebugControl();
 
-	/// Задачи и сообщения
+	/// Р—Р°РґР°С‡Рё Рё СЃРѕРѕР±С‰РµРЅРёСЏ
 
 	void setTask(UI_TaskStateID state, const UI_MessageSetup& message_setup, bool is_secondary = false);
 	bool getTaskList(std::wstring& str, bool reverse = false) const;
@@ -139,11 +139,11 @@ public:
 private:
 
 	UI_Screen* currentScreen_;
-	/// указатель на текущий экран для обращения из графического потока
+	/// СѓРєР°Р·Р°С‚РµР»СЊ РЅР° С‚РµРєСѓС‰РёР№ СЌРєСЂР°РЅ РґР»СЏ РѕР±СЂР°С‰РµРЅРёСЏ РёР· РіСЂР°С„РёС‡РµСЃРєРѕРіРѕ РїРѕС‚РѕРєР°
 	UI_Screen* graphCurrentScreen_;
-	/// экран для вывода модальных сообщений
+	/// СЌРєСЂР°РЅ РґР»СЏ РІС‹РІРѕРґР° РјРѕРґР°Р»СЊРЅС‹С… СЃРѕРѕР±С‰РµРЅРёР№
 	UI_Screen* messageScreen_;
-	/// блокировка обновления контролов
+	/// Р±Р»РѕРєРёСЂРѕРІРєР° РѕР±РЅРѕРІР»РµРЅРёСЏ РєРѕРЅС‚СЂРѕР»РѕРІ
 	MTSection lockUISection_;
 
 	bool isEnabled_;
@@ -160,35 +160,35 @@ private:
 
 	UI_ControlBase* focusedControl_;
 
-	/// разрешать перезапись сэйвов/реплеев/профайлов автоматом
+	/// СЂР°Р·СЂРµС€Р°С‚СЊ РїРµСЂРµР·Р°РїРёСЃСЊ СЃСЌР№РІРѕРІ/СЂРµРїР»РµРµРІ/РїСЂРѕС„Р°Р№Р»РѕРІ Р°РІС‚РѕРјР°С‚РѕРј
 	bool autoConfirmDiskOp_;
 
-	/// Задачи
+	/// Р—Р°РґР°С‡Рё
 	UI_Tasks tasks_;
-	/// очередь сообщений, первое выводится на экран
+	/// РѕС‡РµСЂРµРґСЊ СЃРѕРѕР±С‰РµРЅРёР№, РїРµСЂРІРѕРµ РІС‹РІРѕРґРёС‚СЃСЏ РЅР° СЌРєСЂР°РЅ
 	MessageQueue messageQueue_;
-	/// пока активен нельзя запустить голосоове сообщение
+	/// РїРѕРєР° Р°РєС‚РёРІРµРЅ РЅРµР»СЊР·СЏ Р·Р°РїСѓСЃС‚РёС‚СЊ РіРѕР»РѕСЃРѕРѕРІРµ СЃРѕРѕР±С‰РµРЅРёРµ
 	LogicTimer voiceLockTimer_;
 
 	wchar_t privateMessageColor_[8];
 	wchar_t systemMessageColor_[8];
 
-	/// Экран, который должен быть выбран следующим, служит для индикации неправильной сборки
+	/// Р­РєСЂР°РЅ, РєРѕС‚РѕСЂС‹Р№ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РІС‹Р±СЂР°РЅ СЃР»РµРґСѓСЋС‰РёРј, СЃР»СѓР¶РёС‚ РґР»СЏ РёРЅРґРёРєР°С†РёРё РЅРµРїСЂР°РІРёР»СЊРЅРѕР№ СЃР±РѕСЂРєРё
 	UI_Screen* preloadedScreen_;
-	/// Нужно сменить экран (после деактивации текущего экрана)
+	/// РќСѓР¶РЅРѕ СЃРјРµРЅРёС‚СЊ СЌРєСЂР°РЅ (РїРѕСЃР»Рµ РґРµР°РєС‚РёРІР°С†РёРё С‚РµРєСѓС‰РµРіРѕ СЌРєСЂР°РЅР°)
 	bool needChangeScreen_;
-	/// Экран, который устанавливается после деактивации текущего экрана
+	/// Р­РєСЂР°РЅ, РєРѕС‚РѕСЂС‹Р№ СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ РїРѕСЃР»Рµ РґРµР°РєС‚РёРІР°С†РёРё С‚РµРєСѓС‰РµРіРѕ СЌРєСЂР°РЅР°
 	UI_ScreenReference nextScreen_;
 
-	/// текущее состояние кнопки атаки
+	/// С‚РµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ РєРЅРѕРїРєРё Р°С‚Р°РєРё
 	bool currentClickAttackState_;
-	/// количество квантов со времени отсылки координат
+	/// РєРѕР»РёС‡РµСЃС‚РІРѕ РєРІР°РЅС‚РѕРІ СЃРѕ РІСЂРµРјРµРЅРё РѕС‚СЃС‹Р»РєРё РєРѕРѕСЂРґРёРЅР°С‚
 	unsigned short attackCoordTime_;
 
 	typedef std::vector<sKey> KeyList;
 	KeyList ingameHotKeyList_;
 
-	/// сообщение для модального диалога
+	/// СЃРѕРѕР±С‰РµРЅРёРµ РґР»СЏ РјРѕРґР°Р»СЊРЅРѕРіРѕ РґРёР°Р»РѕРіР°
 	wstring messageBoxMessage_;
 
 	void screenComboListUpdate();
@@ -210,7 +210,7 @@ private:
 	friend void logUIState(int line, const char* func, const UI_ControlBase* control, const wchar_t* str);
 };
 
-// все обращение к экранам из графики под этим локом
+// РІСЃРµ РѕР±СЂР°С‰РµРЅРёРµ Рє СЌРєСЂР°РЅР°Рј РёР· РіСЂР°С„РёРєРё РїРѕРґ СЌС‚РёРј Р»РѕРєРѕРј
 #define UI_AUTOLOCK() MTAuto ui_autolock(UI_Dispatcher::instance().getLock())
 
 #endif /* __USER_INTERFACE_H__ */

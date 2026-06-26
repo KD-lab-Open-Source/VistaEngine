@@ -26,7 +26,7 @@ public:
 //	void FillPlayerList(RoomType roomType);
 //	SBServer GetCurrentServer();
 
-	////PEER m_peer; //необходимый элемент связи!
+	////PEER m_peer; //РЅРµРѕР±С…РѕРґРёРјС‹Р№ СЌР»РµРјРµРЅС‚ СЃРІСЏР·Рё!
 
 	int m_count;
 //	CString m_selectedNick;

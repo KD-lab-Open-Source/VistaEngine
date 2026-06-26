@@ -60,7 +60,7 @@ bool PropertyRowHotkey::onContextMenu(PopupMenuItem& root, PropertyTree* tree)
 {
 	if(!root.empty())
 		root.addSeparator();
-	root.add(TRANSLATE("Î÷èñòèòü"), tree->model()).connect(this, &PropertyRowHotkey::onMenuClear);
+	root.add(TRANSLATE("ÐžÑ‡Ð¸ÑÑ‚Ð¸Ñ‚ÑŒ"), tree->model()).connect(this, &PropertyRowHotkey::onMenuClear);
 	return __super::onContextMenu(root, tree);
 }
 

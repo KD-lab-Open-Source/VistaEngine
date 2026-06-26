@@ -6,7 +6,7 @@ ConstStringList globalConstStringList;
 
 const char* ConstStringList::findOrAdd(const char* string)
 {
-	// TODO: попробовать вектор стрингов по указателям с сортировкой
+	// TODO: РїРѕРїСЂРѕР±РѕРІР°С‚СЊ РІРµРєС‚РѕСЂ СЃС‚СЂРёРЅРіРѕРІ РїРѕ СѓРєР°Р·Р°С‚РµР»СЏРј СЃ СЃРѕСЂС‚РёСЂРѕРІРєРѕР№
 	Strings::iterator it = std::find(strings_.begin(), strings_.end(), string);
 	if(it == strings_.end()){
 		strings_.push_back(string);

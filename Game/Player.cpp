@@ -31,22 +31,22 @@
 #include "Render/src/Scene.h"
 
 BEGIN_ENUM_DESCRIPTOR(AuxPlayerType, "AuxPlayerType")
-REGISTER_ENUM(AUX_PLAYER_TYPE_ORDINARY_PLAYER, "Обычный игрок");
-REGISTER_ENUM(AUX_PLAYER_TYPE_COMMON_FRIEND, "Общий союзник");
-REGISTER_ENUM(AUX_PLAYER_TYPE_COMMON_ENEMY, "Общий враг");
+REGISTER_ENUM(AUX_PLAYER_TYPE_ORDINARY_PLAYER, "РћР±С‹С‡РЅС‹Р№ РёРіСЂРѕРє");
+REGISTER_ENUM(AUX_PLAYER_TYPE_COMMON_FRIEND, "РћР±С‰РёР№ СЃРѕСЋР·РЅРёРє");
+REGISTER_ENUM(AUX_PLAYER_TYPE_COMMON_ENEMY, "РћР±С‰РёР№ РІСЂР°Рі");
 END_ENUM_DESCRIPTOR(AuxPlayerType)
 
 BEGIN_ENUM_DESCRIPTOR(RequestResourceType, "RequestResourceType")
-REGISTER_ENUM(NEED_RESOURCE_TO_ACCESS_UNIT_OR_BUILDING, "Доступность юнита или здания");
-REGISTER_ENUM(NEED_RESOURCE_TO_INSTALL_BUILDING, "Установка здания");
-REGISTER_ENUM(NEED_RESOURCE_TO_BUILD_BUILDING, "Строительство здания");
-REGISTER_ENUM(NEED_RESOURCE_TO_PRODUCE_UNIT, "Производство юнита");
-REGISTER_ENUM(NEED_RESOURCE_TO_ACCESS_PARAMETER, "Доступность параметра");
-REGISTER_ENUM(NEED_RESOURCE_TO_PRODUCE_PARAMETER, "Производство параметра");
-REGISTER_ENUM(NEED_RESOURCE_TO_UPGRADE, "Апгрейд");
-REGISTER_ENUM(NEED_RESOURCE_TO_MOVE, "Движение юнита");
-REGISTER_ENUM(NEED_RESOURCE_TO_ACCESS_WEAPON, "Доступность оружия - выключен");
-REGISTER_ENUM(NEED_RESOURCE_TO_FIRE, "Стрельба оружием");
+REGISTER_ENUM(NEED_RESOURCE_TO_ACCESS_UNIT_OR_BUILDING, "Р”РѕСЃС‚СѓРїРЅРѕСЃС‚СЊ СЋРЅРёС‚Р° РёР»Рё Р·РґР°РЅРёСЏ");
+REGISTER_ENUM(NEED_RESOURCE_TO_INSTALL_BUILDING, "РЈСЃС‚Р°РЅРѕРІРєР° Р·РґР°РЅРёСЏ");
+REGISTER_ENUM(NEED_RESOURCE_TO_BUILD_BUILDING, "РЎС‚СЂРѕРёС‚РµР»СЊСЃС‚РІРѕ Р·РґР°РЅРёСЏ");
+REGISTER_ENUM(NEED_RESOURCE_TO_PRODUCE_UNIT, "РџСЂРѕРёР·РІРѕРґСЃС‚РІРѕ СЋРЅРёС‚Р°");
+REGISTER_ENUM(NEED_RESOURCE_TO_ACCESS_PARAMETER, "Р”РѕСЃС‚СѓРїРЅРѕСЃС‚СЊ РїР°СЂР°РјРµС‚СЂР°");
+REGISTER_ENUM(NEED_RESOURCE_TO_PRODUCE_PARAMETER, "РџСЂРѕРёР·РІРѕРґСЃС‚РІРѕ РїР°СЂР°РјРµС‚СЂР°");
+REGISTER_ENUM(NEED_RESOURCE_TO_UPGRADE, "РђРїРіСЂРµР№Рґ");
+REGISTER_ENUM(NEED_RESOURCE_TO_MOVE, "Р”РІРёР¶РµРЅРёРµ СЋРЅРёС‚Р°");
+REGISTER_ENUM(NEED_RESOURCE_TO_ACCESS_WEAPON, "Р”РѕСЃС‚СѓРїРЅРѕСЃС‚СЊ РѕСЂСѓР¶РёСЏ - РІС‹РєР»СЋС‡РµРЅ");
+REGISTER_ENUM(NEED_RESOURCE_TO_FIRE, "РЎС‚СЂРµР»СЊР±Р° РѕСЂСѓР¶РёРµРј");
 END_ENUM_DESCRIPTOR(RequestResourceType)
 
 //-------------------------------------
@@ -54,7 +54,7 @@ END_ENUM_DESCRIPTOR(RequestResourceType)
 class PlayerFactoryArg0 
 {
 protected:
-	Player* createArg() { // заглушка - игроки создаются addPlayer
+	Player* createArg() { // Р·Р°РіР»СѓС€РєР° - РёРіСЂРѕРєРё СЃРѕР·РґР°СЋС‚СЃСЏ addPlayer
 		xassert(0);
 		return 0;
 	}
@@ -179,7 +179,7 @@ void Player::addCooperativePlayer(const PlayerData& playerData)
 
 Player::~Player()
 {
-	xassert(units_.empty()); // Юниты удаляются в деструкторе Universe
+	xassert(units_.empty()); // Р®РЅРёС‚С‹ СѓРґР°Р»СЏСЋС‚СЃСЏ РІ РґРµСЃС‚СЂСѓРєС‚РѕСЂРµ Universe
 	if(fieldDispatcher_)
 		fieldDispatcher_->Release();
 }
@@ -250,22 +250,22 @@ PlayerDataEdit::PlayerDataEdit()
 
 void PlayerDataEdit::serialize(Archive& ar) 
 {
-	ar.serialize(auxPlayerType, "auxPlayerType", "Тип игрока");
+	ar.serialize(auxPlayerType, "auxPlayerType", "РўРёРї РёРіСЂРѕРєР°");
 	PlayerData::serialize(ar);
 
-	ar.serialize(hasAutomaticAttackMode, "hasAutomaticAttackMode", "Собственные настройки режимов атаки");
+	ar.serialize(hasAutomaticAttackMode, "hasAutomaticAttackMode", "РЎРѕР±СЃС‚РІРµРЅРЅС‹Рµ РЅР°СЃС‚СЂРѕР№РєРё СЂРµР¶РёРјРѕРІ Р°С‚Р°РєРё");
 	if(hasAutomaticAttackMode)
-		ar.serialize(attackMode, "attackMode", "Настройки режимов атаки");
+		ar.serialize(attackMode, "attackMode", "РќР°СЃС‚СЂРѕР№РєРё СЂРµР¶РёРјРѕРІ Р°С‚Р°РєРё");
 
-	ar.serialize(startCamera, "startCamera", "Камера при старте");
-	ar.serialize(triggerChainNames, "triggerChainNames", "Триггера для сингла");
+	ar.serialize(startCamera, "startCamera", "РљР°РјРµСЂР° РїСЂРё СЃС‚Р°СЂС‚Рµ");
+	ar.serialize(triggerChainNames, "triggerChainNames", "РўСЂРёРіРіРµСЂР° РґР»СЏ СЃРёРЅРіР»Р°");
 }
 
 void TriggerChainName::serialize(Archive& ar)
 {
 	static ResourceSelector::Options triggerOptions("*.scr", "Scripts\\Content\\Triggers", "Trigger Chain Name", false);
-	ar.serialize(ResourceSelector(*this, triggerOptions), "name", "&Имя");
-	ar.serialize(restartAlways, "restartAlways", "&Перезапускать в игровом сейве");
+	ar.serialize(ResourceSelector(*this, triggerOptions), "name", "&РРјСЏ");
+	ar.serialize(restartAlways, "restartAlways", "&РџРµСЂРµР·Р°РїСѓСЃРєР°С‚СЊ РІ РёРіСЂРѕРІРѕРј СЃРµР№РІРµ");
 }	
 
 string TriggerChainName::shortName() const
@@ -420,7 +420,7 @@ STARFORCE_API void Player::serialize(Archive& ar)
 	}
 	
 	if(universe()->userSave())
-		ar.serialize(resourceCapacity_, "resourceCapacity", 0); // Считается по зданиям, но может измениться по арифметике
+		ar.serialize(resourceCapacity_, "resourceCapacity", 0); // РЎС‡РёС‚Р°РµС‚СЃСЏ РїРѕ Р·РґР°РЅРёСЏРј, РЅРѕ РјРѕР¶РµС‚ РёР·РјРµРЅРёС‚СЊСЃСЏ РїРѕ Р°СЂРёС„РјРµС‚РёРєРµ
 
 	TriggerChains::iterator saveIter = triggerChains_.begin();
 	TriggerChainNames::const_iterator ti;
@@ -702,7 +702,7 @@ void Player::checkEvent(const Event& event)
 
 void Player::calculateResourceDelta()
 {
-	const float tau = 0.05f; // параметр сглаживания для resourceDelta_
+	const float tau = 0.05f; // РїР°СЂР°РјРµС‚СЂ СЃРіР»Р°Р¶РёРІР°РЅРёСЏ РґР»СЏ resourceDelta_
 
 	ParameterSet resourceDelta;
 	resourceDelta = resource_;
@@ -1034,7 +1034,7 @@ int Player::countSquads(const AttributeSquad* attribute) const
 
 bool Player::isEnemy(const Player* player) const 
 { 
-	//if(player->isWorld()) // всем друг
+	//if(player->isWorld()) // РІСЃРµРј РґСЂСѓРі
 	//	return false;
 	if(player->auxPlayerType() == AUX_PLAYER_TYPE_COMMON_FRIEND || auxPlayerType() == AUX_PLAYER_TYPE_COMMON_FRIEND)
 		return false;
@@ -1412,7 +1412,7 @@ int Player::checkUnitNumber(const AttributeBase* attribute, const AttributeBase*
 				if(squad->unitNumberMaxType == upgradingSquad->unitNumberMaxType && squad->accountingNumber == upgradingSquad->accountingNumber)
 					squadNumber = 100;
 			}
-			else if(upgradingAttribute == squad) // Добавление в сквад
+			else if(upgradingAttribute == squad) // Р”РѕР±Р°РІР»РµРЅРёРµ РІ СЃРєРІР°Рґ
 				squadNumber += squad->accountingNumber;
 		}
 		if(squadNumber < squad->accountingNumber)
@@ -1522,10 +1522,10 @@ void Player::drawDebug2D(XBuffer& buffer)
 		buffer < "\nActive player capacity:\n" < resourceCapacity().debugStr();
 
 	if(showDebugPlayer.unitNumber)
-		buffer < "\nActive player unitNumber:\nОбщее: " <= unitNumber_ < "\n" < unitNumberByType_.debugStr();
+		buffer < "\nActive player unitNumber:\nРћР±С‰РµРµ: " <= unitNumber_ < "\n" < unitNumberByType_.debugStr();
 
 	if(showDebugPlayer.unitNumberReserved)
-		buffer < "\nActive player unitNumberReserved:\nОбщее: " <= unitNumberReserved_ < "\n" < unitNumberReservedByType_.debugStr();
+		buffer < "\nActive player unitNumberReserved:\nРћР±С‰РµРµ: " <= unitNumberReserved_ < "\n" < unitNumberReservedByType_.debugStr();
 }
 
 void Player::startUsedByTriggerAttack(int time)
@@ -1542,13 +1542,13 @@ void UnitSerializer::serialize(Archive& ar)
 			AttributeReference attribute = unit_ ? &unit_->attr() : 0;
 			ar.serialize(attribute, "attribute", 0);
 			UnitSerializationFactory::setAttribute(attribute);
-			xassertStr(ar.isOutput() || attribute, (string("Не найден юнит в библиотеке: ") + attribute.c_str()).c_str());
+			xassertStr(ar.isOutput() || attribute, (string("РќРµ РЅР°Р№РґРµРЅ СЋРЅРёС‚ РІ Р±РёР±Р»РёРѕС‚РµРєРµ: ") + attribute.c_str()).c_str());
 			break; }
 		case ATTRIBUTE_AUX_LIBRARY: {
 			AuxAttributeReference auxAttribute = AuxAttributeReference(unit_ ? &unit_->attr() : 0);
 			ar.serialize(auxAttribute, "auxAttribute", 0);
 			UnitSerializationFactory::setAttribute(auxAttribute);
-			xassertStr(ar.isOutput() || auxAttribute, (string("Не найден юнит в библиотеке: ") + auxAttribute.c_str()).c_str());
+			xassertStr(ar.isOutput() || auxAttribute, (string("РќРµ РЅР°Р№РґРµРЅ СЋРЅРёС‚ РІ Р±РёР±Р»РёРѕС‚РµРєРµ: ") + auxAttribute.c_str()).c_str());
 			break; }
 		case ATTRIBUTE_SQUAD: {
 			AttributeSquadReference attributeSquad(unit_ ? safe_cast_ref<const AttributeSquad&>(unit_->attr()).c_str() : "");
@@ -1561,7 +1561,7 @@ void UnitSerializer::serialize(Archive& ar)
 			UnitSerializationFactory::setAttribute(&*attributeProjectile);
 			break; }
 		case ATTRIBUTE_NONE: 
-			xassert(0 && "Неизвестный юнит на мире");
+			xassert(0 && "РќРµРёР·РІРµСЃС‚РЅС‹Р№ СЋРЅРёС‚ РЅР° РјРёСЂРµ");
 			break; 
 	}
 

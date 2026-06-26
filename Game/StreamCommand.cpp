@@ -19,18 +19,18 @@ struct TimerContainer
 StreamDataManager uiStreamCommand(true);
 StreamDataManager uiStreamGraph2LogicCommand(false);
 
-// команды из логики для исполнения в графике, заполняется в конце логики из uiStreamCommand
+// РєРѕРјР°РЅРґС‹ РёР· Р»РѕРіРёРєРё РґР»СЏ РёСЃРїРѕР»РЅРµРЅРёСЏ РІ РіСЂР°С„РёРєРµ, Р·Р°РїРѕР»РЅСЏРµС‚СЃСЏ РІ РєРѕРЅС†Рµ Р»РѕРіРёРєРё РёР· uiStreamCommand
 StreamDataManager uiStreamLogicCommand(true);
 
-// команды из графики для исполнения в логике, заполняется в конце графического кванта из uiStreamGraph2LogicCommand
+// РєРѕРјР°РЅРґС‹ РёР· РіСЂР°С„РёРєРё РґР»СЏ РёСЃРїРѕР»РЅРµРЅРёСЏ РІ Р»РѕРіРёРєРµ, Р·Р°РїРѕР»РЅСЏРµС‚СЃСЏ РІ РєРѕРЅС†Рµ РіСЂР°С„РёС‡РµСЃРєРѕРіРѕ РєРІР°РЅС‚Р° РёР· uiStreamGraph2LogicCommand
 StreamDataManager uiStreamGraphCommand(false);
 
 #ifndef _FINAL_VERSION_
 #define THREAD_TEST(isPut)	\
 	if(MT_IS_LOGIC()){		\
-		xxassert(logic2graph_ == (isPut) || MT_IS_GRAPH(), "Обращение к StreamDataManager не из того потока"); \
+		xxassert(logic2graph_ == (isPut) || MT_IS_GRAPH(), "РћР±СЂР°С‰РµРЅРёРµ Рє StreamDataManager РЅРµ РёР· С‚РѕРіРѕ РїРѕС‚РѕРєР°"); \
 	} else {				\
-		xxassert(logic2graph_ != (isPut), "Обращение к StreamDataManager не из того потока"); \
+		xxassert(logic2graph_ != (isPut), "РћР±СЂР°С‰РµРЅРёРµ Рє StreamDataManager РЅРµ РёР· С‚РѕРіРѕ РїРѕС‚РѕРєР°"); \
 	}
 #else
 #define THREAD_TEST(isPut)
@@ -83,7 +83,7 @@ void StreamDataManager::execute()
 			
 			cur += realSize;
 		}
-		// HINT!!! команды очищаются после исполнения!
+		// HINT!!! РєРѕРјР°РЅРґС‹ РѕС‡РёС‰Р°СЋС‚СЃСЏ РїРѕСЃР»Рµ РёСЃРїРѕР»РЅРµРЅРёСЏ!
 		clear();
 	}
 }

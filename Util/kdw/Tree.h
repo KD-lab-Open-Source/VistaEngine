@@ -45,7 +45,7 @@ public:
 	void setTrackHovered(bool track) { trackHovered_ = track; }
 	bool trackHovered() const{ return trackHovered_; }
 
-	/// нужно вызыывать после изменения модели
+	/// РЅСѓР¶РЅРѕ РІС‹Р·С‹С‹РІР°С‚СЊ РїРѕСЃР»Рµ РёР·РјРµРЅРµРЅРёСЏ РјРѕРґРµР»Рё
 	void update();
 
 	void setImageStore(ImageStore* store);

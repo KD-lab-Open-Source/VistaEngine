@@ -28,7 +28,7 @@ public:
 	Box(int spacing, int border);
 	~Box();
 
-	/// добавить контрол
+	/// РґРѕР±Р°РІРёС‚СЊ РєРѕРЅС‚СЂРѕР»
 	void add(Widget* widget, bool placeInEnd = true, bool expand = false, bool fill = false, int padding = 0);
 	void remove(Widget* widget);
 	void remove(int index);
@@ -38,7 +38,7 @@ public:
 	int spacing() const{ return spacing_; }
 	void setClipChildren(bool clipChildren);
 
-	/// удалить все контролы
+	/// СѓРґР°Р»РёС‚СЊ РІСЃРµ РєРѕРЅС‚СЂРѕР»С‹
 	void clear();
 	
 	// virtuals

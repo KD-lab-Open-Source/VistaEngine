@@ -30,7 +30,7 @@ public:
 
 	virtual eDrawID GetID()=0;
 	void BeginDraw();
-	virtual void BeginDrawShadow()=0;//������ ���������� �� ��� ��� �����, � �� ����� ������� ������!
+	virtual void BeginDrawShadow()=0;//Сейчас вызываются не там где нужно, и не имеют особого смысла!
 	virtual void EndDrawShadow()=0;
 
 	virtual void SetMaterialTilemap(const Color4f& shadowIntensity, cTexture* miniDetailTexture, float miniDetailResolution);

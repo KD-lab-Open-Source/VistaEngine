@@ -250,7 +250,7 @@ void RigidBodyBox::checkGround()
 			onLowWater_ = false;
 	} else
 		onWater_ = false;
-	// Ïðîâåðêè íà çàìåðçàíèå.
+	// ÐŸÑ€Ð¾Ð²ÐµÑ€ÐºÐ¸ Ð½Ð° Ð·Ð°Ð¼ÐµÑ€Ð·Ð°Ð½Ð¸Ðµ.
 	if(colliding() && onAnyWaterPrev && onIce() 
 		&& environment->temperature()->isOnIce(posePrev().trans(), radius())){
 		bool fullIce = iceMapCheck(position_x, position_y, round(radius()));

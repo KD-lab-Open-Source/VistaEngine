@@ -11,7 +11,7 @@ public:
 	virtual ~LayoutElement() {};
 
 	
-	virtual void relayout() {}; // вызывается дочерними элементами
+	virtual void relayout() {}; // РІС‹Р·С‹РІР°РµС‚СЃСЏ РґРѕС‡РµСЂРЅРёРјРё СЌР»РµРјРµРЅС‚Р°РјРё
 
 	virtual void setParent(LayoutElement* parent);
 

@@ -26,21 +26,21 @@ public:
 
 	const HintAttributes& hintAttributes() const { return hintAttributes_; }
 private:
-	/// время отображения чат-строки в игре
+	/// РІСЂРµРјСЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ С‡Р°С‚-СЃС‚СЂРѕРєРё РІ РёРіСЂРµ
 	float chatDelay_;
-	/// Курсоры
+	/// РљСѓСЂСЃРѕСЂС‹
 	typedef EnumTable<UI_CursorType, UI_CursorReference> CursorVector;
 	CursorVector cursors_;
-	/// цвет личного сообщения в чате
+	/// С†РІРµС‚ Р»РёС‡РЅРѕРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ РІ С‡Р°С‚Рµ
 	Color4f privateMessage_;
-	/// Цвет системного сообщения в чате
+	/// Р¦РІРµС‚ СЃРёСЃС‚РµРјРЅРѕРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ РІ С‡Р°С‚Рµ
 	Color4f systemMessage_;
 	
-	/// параметры подсказок для предметов на земле
+	/// РїР°СЂР°РјРµС‚СЂС‹ РїРѕРґСЃРєР°Р·РѕРє РґР»СЏ РїСЂРµРґРјРµС‚РѕРІ РЅР° Р·РµРјР»Рµ
 	HintAttributes hintAttributes_;
 
 	typedef EnumTable<UI_MessageID, UI_MessageSetup> MessageSetups;
-	/// предопределённые сообщения, выборка по UI_MessageID
+	/// РїСЂРµРґРѕРїСЂРµРґРµР»С‘РЅРЅС‹Рµ СЃРѕРѕР±С‰РµРЅРёСЏ, РІС‹Р±РѕСЂРєР° РїРѕ UI_MessageID
 	MessageSetups messageSetups_;
 };
 

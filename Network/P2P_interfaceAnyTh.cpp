@@ -5,8 +5,8 @@
 #include "LogMsg.h"
 
 
-//Запускается из 1 2 3-го потока
-//Может вызываться с флагом waitExecuted только из одного потока (сейчас 1-го)
+//Р—Р°РїСѓСЃРєР°РµС‚СЃСЏ РёР· 1 2 3-РіРѕ РїРѕС‚РѕРєР°
+//РњРѕР¶РµС‚ РІС‹Р·С‹РІР°С‚СЊСЃСЏ СЃ С„Р»Р°РіРѕРј waitExecuted С‚РѕР»СЊРєРѕ РёР· РѕРґРЅРѕРіРѕ РїРѕС‚РѕРєР° (СЃРµР№С‡Р°СЃ 1-РіРѕ)
 bool PNetCenter::ExecuteInternalCommand(e_PNCInternalCommand _ic, bool waitExecuted)
 {
 	if( WaitForSingleObject(hSecondThread, 0) == WAIT_OBJECT_0) {
@@ -40,10 +40,10 @@ bool PNetCenter::ExecuteInternalCommand(e_PNCInternalCommand _ic, bool waitExecu
 
 
 
-//Запускается из 2 3-го потока
+//Р—Р°РїСѓСЃРєР°РµС‚СЃСЏ РёР· 2 3-РіРѕ РїРѕС‚РѕРєР°
 int PNetCenter::AddClient(ConnectPlayerData& pd, const UNetID& unid, bool flag_quickStart)
 {
-	MTAuto _lock(m_GeneralLock); //В этой функции в некоторых вызовах будет вложенный
+	MTAuto _lock(m_GeneralLock); //Р’ СЌС‚РѕР№ С„СѓРЅРєС†РёРё РІ РЅРµРєРѕС‚РѕСЂС‹С… РІС‹Р·РѕРІР°С… Р±СѓРґРµС‚ РІР»РѕР¶РµРЅРЅС‹Р№
 
 	int userIdx=USER_IDX_NONE;
 	if(hostMissionDescription.gameType()==GAME_TYPE_MULTIPLAYER || hostMissionDescription.gameType()==GAME_TYPE_MULTIPLAYER_COOPERATIVE){
@@ -61,7 +61,7 @@ int PNetCenter::AddClient(ConnectPlayerData& pd, const UNetID& unid, bool flag_q
 
 }
 
-////Запускается из 1-го(деструктор) и 2-го потока
+////Р—Р°РїСѓСЃРєР°РµС‚СЃСЏ РёР· 1-РіРѕ(РґРµСЃС‚СЂСѓРєС‚РѕСЂ) Рё 2-РіРѕ РїРѕС‚РѕРєР°
 //void PNetCenter::ClearClients()
 //{
 //	ClientMapType::iterator i;
@@ -70,10 +70,10 @@ int PNetCenter::AddClient(ConnectPlayerData& pd, const UNetID& unid, bool flag_q
 //	m_clients.clear();
 //}
 
-//Запускается из 1 и 2-го потока
+//Р—Р°РїСѓСЃРєР°РµС‚СЃСЏ РёР· 1 Рё 2-РіРѕ РїРѕС‚РѕРєР°
 void PNetCenter::clearInternalFoundHostList() 
 {
-	MTAuto _lock(m_GeneralLock); //В этой функции в некоторых вызовах будет вложенный
+	MTAuto _lock(m_GeneralLock); //Р’ СЌС‚РѕР№ С„СѓРЅРєС†РёРё РІ РЅРµРєРѕС‚РѕСЂС‹С… РІС‹Р·РѕРІР°С… Р±СѓРґРµС‚ РІР»РѕР¶РµРЅРЅС‹Р№
 	vector<INTERNAL_HOST_ENUM_INFO*>::iterator p;
 	for(p=internalFoundHostList.begin(); p!=internalFoundHostList.end(); p++){
 		delete *p;

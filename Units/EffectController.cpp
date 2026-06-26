@@ -29,7 +29,7 @@ EffectController::EffectController(const BaseUniverseObject* owner, const Vect2f
 
 EffectController::~EffectController()
 {
-	// ïåðåä óíè÷òîæåíèåì íàäî âûçûâàòü release()
+	// Ð¿ÐµÑ€ÐµÐ´ ÑƒÐ½Ð¸Ñ‡Ñ‚Ð¾Ð¶ÐµÐ½Ð¸ÐµÐ¼ Ð½Ð°Ð´Ð¾ Ð²Ñ‹Ð·Ñ‹Ð²Ð°Ñ‚ÑŒ release()
 }
 
 void EffectController::release()
@@ -63,10 +63,10 @@ void EffectController::initEffect(cEffect* eff)
 	if(effectAttribute_->ignoreFogOfWar())
 		eff->SetUseFogOfWar(false);
 
-	// HINT: äî ñëåäóþùåãî êâàíòà ñ ýòèì ãðàôè÷åñêèì îáúåêòîì ìîæíî ðàáîòàòü èç ëîãèêè, åñëè íå òàê - ïåðåñïðîñèòå ó Áàëìåðà
+	// HINT: Ð´Ð¾ ÑÐ»ÐµÐ´ÑƒÑŽÑ‰ÐµÐ³Ð¾ ÐºÐ²Ð°Ð½Ñ‚Ð° Ñ ÑÑ‚Ð¸Ð¼ Ð³Ñ€Ð°Ñ„Ð¸Ñ‡ÐµÑÐºÐ¸Ð¼ Ð¾Ð±ÑŠÐµÐºÑ‚Ð¾Ð¼ Ð¼Ð¾Ð¶Ð½Ð¾ Ñ€Ð°Ð±Ð¾Ñ‚Ð°Ñ‚ÑŒ Ð¸Ð· Ð»Ð¾Ð³Ð¸ÐºÐ¸, ÐµÑÐ»Ð¸ Ð½Ðµ Ñ‚Ð°Ðº - Ð¿ÐµÑ€ÐµÑÐ¿Ñ€Ð¾ÑÐ¸Ñ‚Ðµ Ñƒ Ð‘Ð°Ð»Ð¼ÐµÑ€Ð°
 	eff->setCycled(effectAttribute_->isCycled());
 	eff->SetAutoDeleteAfterLife(false);
-	// HINT: ýôôåêò ìîæåò ñîçäàòüñÿ âûêëþ÷åííûì, âêëþ÷àåòñÿ ïðè íåîáõîäèìîñòè íà îáùèõ îñíîâàíèÿõ
+	// HINT: ÑÑ„Ñ„ÐµÐºÑ‚ Ð¼Ð¾Ð¶ÐµÑ‚ ÑÐ¾Ð·Ð´Ð°Ñ‚ÑŒÑÑ Ð²Ñ‹ÐºÐ»ÑŽÑ‡ÐµÐ½Ð½Ñ‹Ð¼, Ð²ÐºÐ»ÑŽÑ‡Ð°ÐµÑ‚ÑÑ Ð¿Ñ€Ð¸ Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ÑÑ‚Ð¸ Ð½Ð° Ð¾Ð±Ñ‰Ð¸Ñ… Ð¾ÑÐ½Ð¾Ð²Ð°Ð½Ð¸ÑÑ…
 	eff->SetParticleRate(.0f);
 
 	if(effectAttribute_->ignoreDistanceCheck())
@@ -77,8 +77,8 @@ void EffectController::initEffect(cEffect* eff)
 
 	eff->SetPosition(MatXf(pos));
 
-	// òàê êàê functor âëèÿåò òîëüêî íà òèï ýìèòòåðà "Ïîâåðõíîñòü", à òîò âñåãäà
-	// äîëæåí âûâîäèòüñÿ íà ïîâåðõíîñòè âîäû, òî âñåãäà ýôôåêòó ïåðåäàòñÿ functor âîäû
+	// Ñ‚Ð°Ðº ÐºÐ°Ðº functor Ð²Ð»Ð¸ÑÐµÑ‚ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð½Ð° Ñ‚Ð¸Ð¿ ÑÐ¼Ð¸Ñ‚Ñ‚ÐµÑ€Ð° "ÐŸÐ¾Ð²ÐµÑ€Ñ…Ð½Ð¾ÑÑ‚ÑŒ", Ð° Ñ‚Ð¾Ñ‚ Ð²ÑÐµÐ³Ð´Ð°
+	// Ð´Ð¾Ð»Ð¶ÐµÐ½ Ð²Ñ‹Ð²Ð¾Ð´Ð¸Ñ‚ÑŒÑÑ Ð½Ð° Ð¿Ð¾Ð²ÐµÑ€Ñ…Ð½Ð¾ÑÑ‚Ð¸ Ð²Ð¾Ð´Ñ‹, Ñ‚Ð¾ Ð²ÑÐµÐ³Ð´Ð° ÑÑ„Ñ„ÐµÐºÑ‚Ñƒ Ð¿ÐµÑ€ÐµÐ´Ð°Ñ‚ÑÑ functor Ð²Ð¾Ð´Ñ‹
 	eff->SetFunctorGetZ(environment->water()->GetFunctorZ());
 
 	effect_ = eff;
@@ -94,7 +94,7 @@ bool EffectController::createEffect(EffectKey* key)
 
 	initEffect(eff);
 
-	// HINT: äëÿ âêëþ÷åíèÿ ýôôåêòà
+	// HINT: Ð´Ð»Ñ Ð²ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ñ ÑÑ„Ñ„ÐµÐºÑ‚Ð°
 	if(logicQuant())
 		eff->SetParticleRate(1.0f);
 
@@ -104,9 +104,9 @@ bool EffectController::createEffect(EffectKey* key)
 
 bool EffectController::checkEnvironment(float radius)
 {
-	// ìîæíî âûçûâàòü èç ãðàôè÷åñêîãî êâàíòà
+	// Ð¼Ð¾Ð¶Ð½Ð¾ Ð²Ñ‹Ð·Ñ‹Ð²Ð°Ñ‚ÑŒ Ð¸Ð· Ð³Ñ€Ð°Ñ„Ð¸Ñ‡ÐµÑÐºÐ¾Ð³Ð¾ ÐºÐ²Ð°Ð½Ñ‚Ð°
 	
-	// äëÿ þíèòîâ ïðîâåðÿåòñÿ ïî RigidBody - èçìåíåíèÿ â ëîãèêó âíîñèòü ïàðàëëåëüíî!
+	// Ð´Ð»Ñ ÑŽÐ½Ð¸Ñ‚Ð¾Ð² Ð¿Ñ€Ð¾Ð²ÐµÑ€ÑÐµÑ‚ÑÑ Ð¿Ð¾ RigidBody - Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ñ Ð² Ð»Ð¾Ð³Ð¸ÐºÑƒ Ð²Ð½Ð¾ÑÐ¸Ñ‚ÑŒ Ð¿Ð°Ñ€Ð°Ð»Ð»ÐµÐ»ÑŒÐ½Ð¾!
 
 	if(!isEnabled())
 		return true;
@@ -117,8 +117,8 @@ bool EffectController::checkEnvironment(float radius)
 		switchedOff = true;
 	
 	Vect3f pos = position();
-	// êàðòà ëüäà ãðóáåå, ÷åì êàðòà âîäû, íî ëåä ìîæåò áûòü òîëüêî íàä âîäîé, ïîýòîìó ïðè
-	// ïîïàäàíèè íà ëåä åùå ïðîâåðÿåì è ïîïàäàíèå â âîäó
+	// ÐºÐ°Ñ€Ñ‚Ð° Ð»ÑŒÐ´Ð° Ð³Ñ€ÑƒÐ±ÐµÐµ, Ñ‡ÐµÐ¼ ÐºÐ°Ñ€Ñ‚Ð° Ð²Ð¾Ð´Ñ‹, Ð½Ð¾ Ð»ÐµÐ´ Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð½Ð°Ð´ Ð²Ð¾Ð´Ð¾Ð¹, Ð¿Ð¾ÑÑ‚Ð¾Ð¼Ñƒ Ð¿Ñ€Ð¸
+	// Ð¿Ð¾Ð¿Ð°Ð´Ð°Ð½Ð¸Ð¸ Ð½Ð° Ð»ÐµÐ´ ÐµÑ‰Ðµ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÑÐµÐ¼ Ð¸ Ð¿Ð¾Ð¿Ð°Ð´Ð°Ð½Ð¸Ðµ Ð² Ð²Ð¾Ð´Ñƒ
 	bool onIce = false;
 	if(!switchedOff && environment->temperature()){
 		onIce = (environment->temperature()->isOnIce(pos, radius) && environment->water()->isWater(pos, radius)) ? true : false;
@@ -126,8 +126,8 @@ bool EffectController::checkEnvironment(float radius)
 				switchedOff = true;
 	}
 
-	// åñëè ýôôåêò ïîñòàâëåí íà ïîâåðõíîñòü âîäû, òî ïîä âîäîé îí îêàçàòüñÿ íå ìîæåò
-	// åñëè ýôôåêò íà ëüäó, òî ýòî íå âîäà
+	// ÐµÑÐ»Ð¸ ÑÑ„Ñ„ÐµÐºÑ‚ Ð¿Ð¾ÑÑ‚Ð°Ð²Ð»ÐµÐ½ Ð½Ð° Ð¿Ð¾Ð²ÐµÑ€Ñ…Ð½Ð¾ÑÑ‚ÑŒ Ð²Ð¾Ð´Ñ‹, Ñ‚Ð¾ Ð¿Ð¾Ð´ Ð²Ð¾Ð´Ð¾Ð¹ Ð¾Ð½ Ð¾ÐºÐ°Ð·Ð°Ñ‚ÑŒÑÑ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚
+	// ÐµÑÐ»Ð¸ ÑÑ„Ñ„ÐµÐºÑ‚ Ð½Ð° Ð»ÑŒÐ´Ñƒ, Ñ‚Ð¾ ÑÑ‚Ð¾ Ð½Ðµ Ð²Ð¾Ð´Ð°
 	if(!switchedOff && !onIce && !effectAttribute_->onWaterSurface() &&
 		(!water->isLava() && effectAttribute_->switchOffUnderWater() ||
 		water->isLava() && effectAttribute_->switchOffUnderLava()))
@@ -264,7 +264,7 @@ bool UnitEffectController::createEffect(EffectKey* key)
 
 	effect_->LinkToNode(owner()->get3dx(), inode);
 
-	// HINT: äëÿ âêëþ÷åíèÿ ýôôåêòà
+	// HINT: Ð´Ð»Ñ Ð²ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ñ ÑÑ„Ñ„ÐµÐºÑ‚Ð°
 	if(logicQuant())
 		eff->SetParticleRate(1.0f);
 
@@ -275,7 +275,7 @@ bool UnitEffectController::createEffect(EffectKey* key)
 bool UnitEffectController::logicQuant(float radius)
 {
 	MTL();
-	// äëÿ þíèòîâ âñ¸ ïðîâåðÿåì ïî rigidBody, åñëè rigidBody îòñóòñòâóåò - ïðîâåðÿåì ïî ñåòêàì
+	// Ð´Ð»Ñ ÑŽÐ½Ð¸Ñ‚Ð¾Ð² Ð²ÑÑ‘ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÑÐµÐ¼ Ð¿Ð¾ rigidBody, ÐµÑÐ»Ð¸ rigidBody Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚ - Ð¿Ñ€Ð¾Ð²ÐµÑ€ÑÐµÐ¼ Ð¿Ð¾ ÑÐµÑ‚ÐºÐ°Ð¼
 	RigidBodyBase* rb = owner()->rigidBody();
 	if(!rb)
 		return __super::logicQuant(radius);
@@ -292,15 +292,15 @@ bool UnitEffectController::logicQuant(float radius)
 	if(!switchedOff && (onIce && effectAttribute_->switchOffOnIce()) || (!onIce && effectAttribute_->switchOnOnIce()))
 		switchedOff = true;
 
-	// åñëè ýôôåêò ïîñòàâëåí íà ïîâåðõíîñòü âîäû, òî ïîä âîäîé îí îêàçàòüñÿ íå ìîæåò
-	// åñëè þíèò íà ëüäó, òî ýòî íå âîäà
+	// ÐµÑÐ»Ð¸ ÑÑ„Ñ„ÐµÐºÑ‚ Ð¿Ð¾ÑÑ‚Ð°Ð²Ð»ÐµÐ½ Ð½Ð° Ð¿Ð¾Ð²ÐµÑ€Ñ…Ð½Ð¾ÑÑ‚ÑŒ Ð²Ð¾Ð´Ñ‹, Ñ‚Ð¾ Ð¿Ð¾Ð´ Ð²Ð¾Ð´Ð¾Ð¹ Ð¾Ð½ Ð¾ÐºÐ°Ð·Ð°Ñ‚ÑŒÑÑ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚
+	// ÐµÑÐ»Ð¸ ÑŽÐ½Ð¸Ñ‚ Ð½Ð° Ð»ÑŒÐ´Ñƒ, Ñ‚Ð¾ ÑÑ‚Ð¾ Ð½Ðµ Ð²Ð¾Ð´Ð°
 	if(!switchedOff && !onIce && !effectAttribute_->onWaterSurface() &&
 		(!water->isLava() && effectAttribute_->switchOffUnderWater() ||
 		water->isLava() && effectAttribute_->switchOffUnderLava()))
 			switchedOff = rb->onWater() || rb->onLowWater();
 
 
-	// åñëè þíèò ñêðûò (òðàíñïîðò, òåëåïîðò è ò.ä.), òî ýôôåêòû òîæå ñêðûâàòü
+	// ÐµÑÐ»Ð¸ ÑŽÐ½Ð¸Ñ‚ ÑÐºÑ€Ñ‹Ñ‚ (Ñ‚Ñ€Ð°Ð½ÑÐ¿Ð¾Ñ€Ñ‚, Ñ‚ÐµÐ»ÐµÐ¿Ð¾Ñ€Ñ‚ Ð¸ Ñ‚.Ð´.), Ñ‚Ð¾ ÑÑ„Ñ„ÐµÐºÑ‚Ñ‹ Ñ‚Ð¾Ð¶Ðµ ÑÐºÑ€Ñ‹Ð²Ð°Ñ‚ÑŒ
 	if(!switchedOff &&
 		(owner()->attr().isObjective() && (safe_cast<const UnitReal*>(owner())->hiddenLogic())  
 		|| owner()->attr().isActing() && (!effectAttribute_->ignoreInvisibility() && safe_cast<const UnitActing*>(owner())->isInvisible()))) 
@@ -367,7 +367,7 @@ SoundController::SoundController() :
 
 SoundController::~SoundController()
 {
-	// ïåðåä óíè÷òîæåíèåì íàäî âûçûâàòü release()
+	// Ð¿ÐµÑ€ÐµÐ´ ÑƒÐ½Ð¸Ñ‡Ñ‚Ð¾Ð¶ÐµÐ½Ð¸ÐµÐ¼ Ð½Ð°Ð´Ð¾ Ð²Ñ‹Ð·Ñ‹Ð²Ð°Ñ‚ÑŒ release()
 }
 
 void SoundController::release()
@@ -466,7 +466,7 @@ void SoundController::stop(bool immediately)
 	if(isInited())
 		if(soundAttribute_->cycled())
 			sound_->Stop();
-		else if(immediately) // åñëè íå çàöèêëåí òî ìîæíî äàòü äîèãðàòü
+		else if(immediately) // ÐµÑÐ»Ð¸ Ð½Ðµ Ð·Ð°Ñ†Ð¸ÐºÐ»ÐµÐ½ Ñ‚Ð¾ Ð¼Ð¾Ð¶Ð½Ð¾ Ð´Ð°Ñ‚ÑŒ Ð´Ð¾Ð¸Ð³Ñ€Ð°Ñ‚ÑŒ
 			sound_->Stop(immediately);
 }
 

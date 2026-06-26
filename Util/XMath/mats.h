@@ -24,7 +24,7 @@ public:
 	
 	Mats() {}
 	Mats(const Se3f& _se, float _scale) { se() = _se; s = _scale; }
-	void operator=(MatXf mat);//Предполагается что в матрице изотропный скэйлинг.
+	void operator=(MatXf mat);//РџСЂРµРґРїРѕР»Р°РіР°РµС‚СЃСЏ С‡С‚Рѕ РІ РјР°С‚СЂРёС†Рµ РёР·РѕС‚СЂРѕРїРЅС‹Р№ СЃРєСЌР№Р»РёРЅРі.
 
 	void interpolate(const Mats& u, const Mats& v, float t) { se().interpolateExact(u.se(), v.se(), t); s = u.s + (v.s - u.s)*t; }
 

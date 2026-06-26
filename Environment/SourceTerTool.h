@@ -7,12 +7,12 @@
 struct SourceTerTool : SourceEffect{
 	TerToolBase* pCurTerTool;
 	TerToolReference terToolReference;
-	//int period; //0-не периодичный
+	//int period; //0-РЅРµ РїРµСЂРёРѕРґРёС‡РЅС‹Р№
 	bool flag_autoKill;
 	bool flag_dispersion;
 	bool flag_end;
 	//DurationTimer sleepTimer;
-	/// задержка включения источника
+	/// Р·Р°РґРµСЂР¶РєР° РІРєР»СЋС‡РµРЅРёСЏ РёСЃС‚РѕС‡РЅРёРєР°
 	LogicTimer sleepTimer_;
 	int sleepTime_;
 	SourceTerTool()

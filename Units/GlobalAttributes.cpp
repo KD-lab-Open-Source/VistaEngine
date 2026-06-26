@@ -11,15 +11,15 @@
 #include "UnicodeConverter.h"
 
 
-WRAP_LIBRARY(GlobalAttributes, "GlobalAttributes", "Глобальные параметры", "Scripts\\Content\\GlobalAttributes", 0, 0);
+WRAP_LIBRARY(GlobalAttributes, "GlobalAttributes", "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹", "Scripts\\Content\\GlobalAttributes", 0, 0);
 
 BEGIN_ENUM_DESCRIPTOR(ObjectLodPredefinedType, "ObjectLodPredefinedType")
-REGISTER_ENUM(OBJECT_LOD_DEFAULT, "LOD: По умолчанию")
-REGISTER_ENUM(OBJECT_LOD_VERY_SMALL, "LOD: Очень маленький объект")
-REGISTER_ENUM(OBJECT_LOD_SMALL, "LOD: Маленький объект")
-REGISTER_ENUM(OBJECT_LOD_NORMAL, "LOD: Средний объект")
-REGISTER_ENUM(OBJECT_LOD_BIG, "LOD: Большой объект")
-REGISTER_ENUM(OBJECT_LOD_VERY_BIG, "LOD: Очень большой объект")
+REGISTER_ENUM(OBJECT_LOD_DEFAULT, "LOD: РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ")
+REGISTER_ENUM(OBJECT_LOD_VERY_SMALL, "LOD: РћС‡РµРЅСЊ РјР°Р»РµРЅСЊРєРёР№ РѕР±СЉРµРєС‚")
+REGISTER_ENUM(OBJECT_LOD_SMALL, "LOD: РњР°Р»РµРЅСЊРєРёР№ РѕР±СЉРµРєС‚")
+REGISTER_ENUM(OBJECT_LOD_NORMAL, "LOD: РЎСЂРµРґРЅРёР№ РѕР±СЉРµРєС‚")
+REGISTER_ENUM(OBJECT_LOD_BIG, "LOD: Р‘РѕР»СЊС€РѕР№ РѕР±СЉРµРєС‚")
+REGISTER_ENUM(OBJECT_LOD_VERY_BIG, "LOD: РћС‡РµРЅСЊ Р±РѕР»СЊС€РѕР№ РѕР±СЉРµРєС‚")
 END_ENUM_DESCRIPTOR(ObjectLodPredefinedType)	
 
 
@@ -33,10 +33,10 @@ CameraBorder::CameraBorder()
 
 void CameraBorder::serialize(Archive& ar)
 {
-	ar.serialize(CAMERA_WORLD_BORDER_TOP,    "CAMERA_WORLD_BORDER_TOP",    "сверху");
-	ar.serialize(CAMERA_WORLD_BORDER_BOTTOM, "CAMERA_WORLD_BORDER_BOTTOM", "снизу");
-	ar.serialize(CAMERA_WORLD_BORDER_LEFT,   "CAMERA_WORLD_BORDER_LEFT",   "слева");
-	ar.serialize(CAMERA_WORLD_BORDER_RIGHT,  "CAMERA_WORLD_BORDER_RIGHT",  "справа");
+	ar.serialize(CAMERA_WORLD_BORDER_TOP,    "CAMERA_WORLD_BORDER_TOP",    "СЃРІРµСЂС…Сѓ");
+	ar.serialize(CAMERA_WORLD_BORDER_BOTTOM, "CAMERA_WORLD_BORDER_BOTTOM", "СЃРЅРёР·Сѓ");
+	ar.serialize(CAMERA_WORLD_BORDER_LEFT,   "CAMERA_WORLD_BORDER_LEFT",   "СЃР»РµРІР°");
+	ar.serialize(CAMERA_WORLD_BORDER_RIGHT,  "CAMERA_WORLD_BORDER_RIGHT",  "СЃРїСЂР°РІР°");
 	clampRect();
 }
 
@@ -45,7 +45,7 @@ CameraRestriction::CameraRestriction()
 {
 	aboveWater = true;
 
-	//горизонтальное перемещение камеры
+	//РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅРѕРµ РїРµСЂРµРјРµС‰РµРЅРёРµ РєР°РјРµСЂС‹
 	CAMERA_SCROLL_SPEED_DELTA = 10.0f;
 	CAMERA_BORDER_SCROLL_SPEED_DELTA = 10.0f;
 	CAMERA_SCROLL_SPEED_DAMP = 0.7f;
@@ -54,7 +54,7 @@ CameraRestriction::CameraRestriction()
 	CAMERA_BORDER_SCROLL_AREA_DN = 0.014f;
 	CAMERA_BORDER_SCROLL_AREA_HORZ = 0.008f;
 
-	//вращение и наклон
+	//РІСЂР°С‰РµРЅРёРµ Рё РЅР°РєР»РѕРЅ
 	CAMERA_KBD_ANGLE_SPEED_DELTA = M_PI/30.f;
 	CAMERA_MOUSE_ANGLE_SPEED_DELTA = M_PI;
 	CAMERA_ANGLE_SPEED_DAMP = 0.7f;
@@ -66,7 +66,7 @@ CameraRestriction::CameraRestriction()
 
 	CAMERA_FOLLOW_AVERAGE_TAU = 0.1f;
 
-	//ограничения
+	//РѕРіСЂР°РЅРёС‡РµРЅРёСЏ
 	CAMERA_MOVE_ZOOM_SCALE = 500.0f;
 
 	zoomMaxTheta = zoomMax = 1000.0f;
@@ -104,81 +104,81 @@ void CameraBorder::clampRect()
 
 void CameraRestriction::serialize(Archive &ar)
 {
-	ar.serialize(CAMERA_SCROLL_SPEED_DELTA, "CAMERA_SCROLL_SPEED_DELTA", "скорость сдвига камеры");
+	ar.serialize(CAMERA_SCROLL_SPEED_DELTA, "CAMERA_SCROLL_SPEED_DELTA", "СЃРєРѕСЂРѕСЃС‚СЊ СЃРґРІРёРіР° РєР°РјРµСЂС‹");
 	CAMERA_SCROLL_SPEED_DELTA = clamp(CAMERA_SCROLL_SPEED_DELTA, 0.f, 100.f);
 	
-	ar.serialize(CAMERA_BORDER_SCROLL_SPEED_DELTA, "CAMERA_BORDER_SCROLL_SPEED_DELTA", "скорость сдвига камеры при смещении указателя за край");
+	ar.serialize(CAMERA_BORDER_SCROLL_SPEED_DELTA, "CAMERA_BORDER_SCROLL_SPEED_DELTA", "СЃРєРѕСЂРѕСЃС‚СЊ СЃРґРІРёРіР° РєР°РјРµСЂС‹ РїСЂРё СЃРјРµС‰РµРЅРёРё СѓРєР°Р·Р°С‚РµР»СЏ Р·Р° РєСЂР°Р№");
 	CAMERA_BORDER_SCROLL_SPEED_DELTA = clamp(CAMERA_BORDER_SCROLL_SPEED_DELTA, 0.f, 100.f);
 	
 	float tmp = 1 / CAMERA_SCROLL_SPEED_DAMP;
-	ar.serialize(tmp, "CAMERA_SCROLL_SPEED_DAMP", "инерция сдвига камеры");
+	ar.serialize(tmp, "CAMERA_SCROLL_SPEED_DAMP", "РёРЅРµСЂС†РёСЏ СЃРґРІРёРіР° РєР°РјРµСЂС‹");
 	if(tmp >= 1.0f) CAMERA_SCROLL_SPEED_DAMP = 1 / tmp;
 	CAMERA_SCROLL_SPEED_DAMP = clamp(CAMERA_SCROLL_SPEED_DAMP, 0.1f, 10.f);
 
 	tmp = CAMERA_BORDER_SCROLL_AREA_UP * 100.f;
-	ar.serialize(tmp, "CAMERA_BORDER_SCROLL_AREA_UP", "бордюр сверху для скрола мышью (%)");
+	ar.serialize(tmp, "CAMERA_BORDER_SCROLL_AREA_UP", "Р±РѕСЂРґСЋСЂ СЃРІРµСЂС…Сѓ РґР»СЏ СЃРєСЂРѕР»Р° РјС‹С€СЊСЋ (%)");
 	CAMERA_BORDER_SCROLL_AREA_UP = clamp(tmp, 0.f, 20.f) / 100.f;
 
 	tmp = CAMERA_BORDER_SCROLL_AREA_DN * 100.f;
-	ar.serialize(tmp, "CAMERA_BORDER_SCROLL_AREA_DN", "бордюр снизу для скрола мышью (%)");
+	ar.serialize(tmp, "CAMERA_BORDER_SCROLL_AREA_DN", "Р±РѕСЂРґСЋСЂ СЃРЅРёР·Сѓ РґР»СЏ СЃРєСЂРѕР»Р° РјС‹С€СЊСЋ (%)");
 	CAMERA_BORDER_SCROLL_AREA_DN = clamp(tmp, 0.f, 20.f) / 100.f;
 
 	tmp = CAMERA_BORDER_SCROLL_AREA_HORZ * 100.f;
-	ar.serialize(tmp, "CAMERA_BORDER_SCROLL_AREA_HORZ", "бордюр по бокам для скрола мышью (%)");
+	ar.serialize(tmp, "CAMERA_BORDER_SCROLL_AREA_HORZ", "Р±РѕСЂРґСЋСЂ РїРѕ Р±РѕРєР°Рј РґР»СЏ СЃРєСЂРѕР»Р° РјС‹С€СЊСЋ (%)");
 	CAMERA_BORDER_SCROLL_AREA_HORZ = clamp(tmp, 0.f, 20.f) / 100.f;
 
 	tmp = CAMERA_KBD_ANGLE_SPEED_DELTA / M_PI * 180.f;
-	ar.serialize(tmp, "CAMERA_KBD_ANGLE_SPEED_DELTA", "скорость поворота камеры клавиатурой");
+	ar.serialize(tmp, "CAMERA_KBD_ANGLE_SPEED_DELTA", "СЃРєРѕСЂРѕСЃС‚СЊ РїРѕРІРѕСЂРѕС‚Р° РєР°РјРµСЂС‹ РєР»Р°РІРёР°С‚СѓСЂРѕР№");
 	CAMERA_KBD_ANGLE_SPEED_DELTA = clamp(tmp, 0.f, 280.f) / 180.f * M_PI;
 
 	tmp = CAMERA_MOUSE_ANGLE_SPEED_DELTA / M_PI * 180.f;
-	ar.serialize(tmp, "CAMERA_MOUSE_ANGLE_SPEED_DELTA", "скорость поворота камеры мышью");
+	ar.serialize(tmp, "CAMERA_MOUSE_ANGLE_SPEED_DELTA", "СЃРєРѕСЂРѕСЃС‚СЊ РїРѕРІРѕСЂРѕС‚Р° РєР°РјРµСЂС‹ РјС‹С€СЊСЋ");
 	CAMERA_MOUSE_ANGLE_SPEED_DELTA = clamp(tmp, 0.f, 280.f) / 180.f * M_PI;
 
 	tmp = 1 / CAMERA_ANGLE_SPEED_DAMP;
-	ar.serialize(tmp, "CAMERA_ANGLE_SPEED_DAMP", "инерция камеры при повороте");
+	ar.serialize(tmp, "CAMERA_ANGLE_SPEED_DAMP", "РёРЅРµСЂС†РёСЏ РєР°РјРµСЂС‹ РїСЂРё РїРѕРІРѕСЂРѕС‚Рµ");
 	if(tmp >= 1.0f) CAMERA_ANGLE_SPEED_DAMP = 1 / tmp;
 	CAMERA_ANGLE_SPEED_DAMP = clamp(CAMERA_ANGLE_SPEED_DAMP, 0.1f, 10.f);
 
-	ar.serialize(zoomKeyAcceleration, "zoomKeyAcceleration", "Скорость зума клавишами");
-	ar.serialize(zoomWheelImpulse, "zoomWheelImpulse", "Скорость зума колесом");
-	ar.serialize(RangedWrapperf(zoomDamping, 0, 10.f) , "zoomDamping", "Дампинг зума");
+	ar.serialize(zoomKeyAcceleration, "zoomKeyAcceleration", "РЎРєРѕСЂРѕСЃС‚СЊ Р·СѓРјР° РєР»Р°РІРёС€Р°РјРё");
+	ar.serialize(zoomWheelImpulse, "zoomWheelImpulse", "РЎРєРѕСЂРѕСЃС‚СЊ Р·СѓРјР° РєРѕР»РµСЃРѕРј");
+	ar.serialize(RangedWrapperf(zoomDamping, 0, 10.f) , "zoomDamping", "Р”Р°РјРїРёРЅРі Р·СѓРјР°");
 	
-	ar.serialize(RangedWrapperf(CAMERA_FOLLOW_AVERAGE_TAU, 0.0001f, 0.01f), "CAMERA_FOLLOW_AVERAGE_TAU", "жесткость привязки к юниту");
+	ar.serialize(RangedWrapperf(CAMERA_FOLLOW_AVERAGE_TAU, 0.0001f, 0.01f), "CAMERA_FOLLOW_AVERAGE_TAU", "Р¶РµСЃС‚РєРѕСЃС‚СЊ РїСЂРёРІСЏР·РєРё Рє СЋРЅРёС‚Сѓ");
 
-	ar.serialize(RangedWrapperf(CAMERA_MOVE_ZOOM_SCALE, 0.f, 5000.f), "CAMERA_MOVE_ZOOM_SCALE", "масштабирование движения");
+	ar.serialize(RangedWrapperf(CAMERA_MOVE_ZOOM_SCALE, 0.f, 5000.f), "CAMERA_MOVE_ZOOM_SCALE", "РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёРµ РґРІРёР¶РµРЅРёСЏ");
 
-	ar.serialize(RangedWrapperf(heightMax, 0.f, 5000.f), "heightMax", "максимальная высота над миром");
-	ar.serialize(RangedWrapperf(heightMin, 0.f, 5000.f), "heightMin", "минимальная высота над миром");
+	ar.serialize(RangedWrapperf(heightMax, 0.f, 5000.f), "heightMax", "РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ РІС‹СЃРѕС‚Р° РЅР°Рґ РјРёСЂРѕРј");
+	ar.serialize(RangedWrapperf(heightMin, 0.f, 5000.f), "heightMin", "РјРёРЅРёРјР°Р»СЊРЅР°СЏ РІС‹СЃРѕС‚Р° РЅР°Рґ РјРёСЂРѕРј");
 
-	ar.serialize(RangedWrapperf(zoomMax, 20.f, 5000.f), "zoomMax", "максимальное удаление от точки наблюдения");
-	ar.serialize(RangedWrapperf(zoomMin, 20.f, 0.95f*zoomMax), "zoomMin", "минимальное удаление от точки наблюдения");
-	ar.serialize(RangedWrapperf(zoomDefault, zoomMin, zoomMax), "zoomDefault", "удаление от точки наблюдения по умолчанию");
-	ar.serialize(RangedWrapperf(zoomMaxTheta, 0.f, 5000.f), "zoomMaxTheta", "максимальное удаление от точки наблюдения для наклона");
+	ar.serialize(RangedWrapperf(zoomMax, 20.f, 5000.f), "zoomMax", "РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ СѓРґР°Р»РµРЅРёРµ РѕС‚ С‚РѕС‡РєРё РЅР°Р±Р»СЋРґРµРЅРёСЏ");
+	ar.serialize(RangedWrapperf(zoomMin, 20.f, 0.95f*zoomMax), "zoomMin", "РјРёРЅРёРјР°Р»СЊРЅРѕРµ СѓРґР°Р»РµРЅРёРµ РѕС‚ С‚РѕС‡РєРё РЅР°Р±Р»СЋРґРµРЅРёСЏ");
+	ar.serialize(RangedWrapperf(zoomDefault, zoomMin, zoomMax), "zoomDefault", "СѓРґР°Р»РµРЅРёРµ РѕС‚ С‚РѕС‡РєРё РЅР°Р±Р»СЋРґРµРЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ");
+	ar.serialize(RangedWrapperf(zoomMaxTheta, 0.f, 5000.f), "zoomMaxTheta", "РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ СѓРґР°Р»РµРЅРёРµ РѕС‚ С‚РѕС‡РєРё РЅР°Р±Р»СЋРґРµРЅРёСЏ РґР»СЏ РЅР°РєР»РѕРЅР°");
 
 	float angleMax = G2R(80);
-	ar.serialize(RadianWrapper(thetaMinLow, 0, angleMax), "thetaMinLow", "минимальный угол наклона камеры на минимальной высоте");
-	ar.serialize(RadianWrapper(thetaMinHigh, 0, angleMax), "thetaMinHigh", "минимальный угол наклона камеры на максимальной высоте");
+	ar.serialize(RadianWrapper(thetaMinLow, 0, angleMax), "thetaMinLow", "РјРёРЅРёРјР°Р»СЊРЅС‹Р№ СѓРіРѕР» РЅР°РєР»РѕРЅР° РєР°РјРµСЂС‹ РЅР° РјРёРЅРёРјР°Р»СЊРЅРѕР№ РІС‹СЃРѕС‚Рµ");
+	ar.serialize(RadianWrapper(thetaMinHigh, 0, angleMax), "thetaMinHigh", "РјРёРЅРёРјР°Р»СЊРЅС‹Р№ СѓРіРѕР» РЅР°РєР»РѕРЅР° РєР°РјРµСЂС‹ РЅР° РјР°РєСЃРёРјР°Р»СЊРЅРѕР№ РІС‹СЃРѕС‚Рµ");
 
-	ar.serialize(RadianWrapper(thetaMaxLow, 0, angleMax), "thetaMaxLow", "максимальный угол наклона камеры на минимальной высоте");
-	ar.serialize(RadianWrapper(thetaMaxHigh, 0, angleMax), "thetaMaxHigh", "максимальный угол наклона камеры на максимальной высоте");
+	ar.serialize(RadianWrapper(thetaMaxLow, 0, angleMax), "thetaMaxLow", "РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СѓРіРѕР» РЅР°РєР»РѕРЅР° РєР°РјРµСЂС‹ РЅР° РјРёРЅРёРјР°Р»СЊРЅРѕР№ РІС‹СЃРѕС‚Рµ");
+	ar.serialize(RadianWrapper(thetaMaxHigh, 0, angleMax), "thetaMaxHigh", "РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СѓРіРѕР» РЅР°РєР»РѕРЅР° РєР°РјРµСЂС‹ РЅР° РјР°РєСЃРёРјР°Р»СЊРЅРѕР№ РІС‹СЃРѕС‚Рµ");
 
-	ar.serialize(RadianWrapper(thetaDefault, 0, angleMax), "thetaDefault", "угол наклона камеры по умолчанию");
+	ar.serialize(RadianWrapper(thetaDefault, 0, angleMax), "thetaDefault", "СѓРіРѕР» РЅР°РєР»РѕРЅР° РєР°РјРµСЂС‹ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ");
 
-	ar.serialize(RangedWrapperf(CAMERA_WORLD_SCROLL_BORDER, -50.f, 1000.f), "CAMERA_WORLD_SCROLL_BORDER", "ограничение выезда точки наблюдения за край при максимальном удалении");
+	ar.serialize(RangedWrapperf(CAMERA_WORLD_SCROLL_BORDER, -50.f, 1000.f), "CAMERA_WORLD_SCROLL_BORDER", "РѕРіСЂР°РЅРёС‡РµРЅРёРµ РІС‹РµР·РґР° С‚РѕС‡РєРё РЅР°Р±Р»СЋРґРµРЅРёСЏ Р·Р° РєСЂР°Р№ РїСЂРё РјР°РєСЃРёРјР°Р»СЊРЅРѕРј СѓРґР°Р»РµРЅРёРё");
 	
 	ar.serialize(unitFollowDistance, "unitFollowDistance", 0);
 	ar.serialize(unitFollowTheta, "unitFollowTheta", 0);
 	ar.serialize(unitHumanFollowDistance, "unitHumanFollowDistance", 0);
 	ar.serialize(unitHumanFollowTheta, "unitHumanFollowTheta", 0);
 
-	ar.serialize(directControlThetaFactor, "directControlThetaFactor", "Коэффициент для скорости поворота камеры в прямом управление");
+	ar.serialize(directControlThetaFactor, "directControlThetaFactor", "РљРѕСЌС„С„РёС†РёРµРЅС‚ РґР»СЏ СЃРєРѕСЂРѕСЃС‚Рё РїРѕРІРѕСЂРѕС‚Р° РєР°РјРµСЂС‹ РІ РїСЂСЏРјРѕРј СѓРїСЂР°РІР»РµРЅРёРµ");
 	tmp = directControlPsiMax / M_PI * 180.f;
-	ar.serialize(tmp, "directControlPsiMax", "Ограничение камеры в прямом управлении");
+	ar.serialize(tmp, "directControlPsiMax", "РћРіСЂР°РЅРёС‡РµРЅРёРµ РєР°РјРµСЂС‹ РІ РїСЂСЏРјРѕРј СѓРїСЂР°РІР»РµРЅРёРё");
 	directControlPsiMax = clamp(tmp, 5.0f, 120.0f) / 180.f * M_PI;
-	ar.serialize(directControlRelaxation, "directControlRelaxation", "Жесткость камеры в прямом управлении");
+	ar.serialize(directControlRelaxation, "directControlRelaxation", "Р–РµСЃС‚РєРѕСЃС‚СЊ РєР°РјРµСЂС‹ РІ РїСЂСЏРјРѕРј СѓРїСЂР°РІР»РµРЅРёРё");
 
-	ar.serialize(aboveWater, "aboveWater", "Над водой");
+	ar.serialize(aboveWater, "aboveWater", "РќР°Рґ РІРѕРґРѕР№");
 }
 
 void CameraBorder::setRect(const Recti& rect)
@@ -203,7 +203,7 @@ Recti CameraBorder::rect() const
 
 bool ShowHeadName::serialize(Archive& ar, const char* name, const char* nameAlt) 
 {
-	static ModelSelector::Options headOptions("*.3dx", "Resource\\UI\\Models", "Голова");
+	static ModelSelector::Options headOptions("*.3dx", "Resource\\UI\\Models", "Р“РѕР»РѕРІР°");
 	return ar.serialize(ModelSelector(fileName_, headOptions), name, nameAlt);
 }
 
@@ -211,7 +211,7 @@ bool ShowHeadName::serialize(Archive& ar, const char* name, const char* nameAlt)
 
 void MapSizeName::serialize(Archive& ar)
 {
-	ar.serialize(size, "size", "Максимальная площадь карты в (тыс.ед)^2");
+	ar.serialize(size, "size", "РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ РїР»РѕС‰Р°РґСЊ РєР°СЂС‚С‹ РІ (С‚С‹СЃ.РµРґ)^2");
 	ar.serialize(name, "name", "name");
 }
 
@@ -288,22 +288,22 @@ GlobalAttributes::GlobalAttributes()
 
 void GlobalAttributes::serializeHeadLibrary (Archive& ar) 
 {
-	ar.serialize(showHeadNames, "showHeadNames", "Головы"); 
+	ar.serialize(showHeadNames, "showHeadNames", "Р“РѕР»РѕРІС‹"); 
 }
 
 void GlobalAttributes::Sign::serialize(Archive& ar)
 {
 	static ResourceSelector::Options textureOptions("*.tga", "Resource\\Models\\Textures");
-	ar.serialize(ResourceSelector(unitTexture, textureOptions), "unitTexture", "Текстура на модель");
-	ar.serialize(sprite, "sprite", "Спрайт для интрефейса");
+	ar.serialize(ResourceSelector(unitTexture, textureOptions), "unitTexture", "РўРµРєСЃС‚СѓСЂР° РЅР° РјРѕРґРµР»СЊ");
+	ar.serialize(sprite, "sprite", "РЎРїСЂР°Р№С‚ РґР»СЏ РёРЅС‚СЂРµС„РµР№СЃР°");
 }
 
 void GlobalAttributes::LodBorder::serialize(Archive& ar)
 {
-	ar.serialize(radius,"radius","Радиус объекта");
-	ar.serialize(lod12,"lod12","Переход от lod1 к lod2");
-	ar.serialize(lod23,"lod23","Переход от lod2 к lod3");
-	ar.serialize(hideDistance,"hideDistance","Расстояние исчезновения");
+	ar.serialize(radius,"radius","Р Р°РґРёСѓСЃ РѕР±СЉРµРєС‚Р°");
+	ar.serialize(lod12,"lod12","РџРµСЂРµС…РѕРґ РѕС‚ lod1 Рє lod2");
+	ar.serialize(lod23,"lod23","РџРµСЂРµС…РѕРґ РѕС‚ lod2 Рє lod3");
+	ar.serialize(hideDistance,"hideDistance","Р Р°СЃСЃС‚РѕСЏРЅРёРµ РёСЃС‡РµР·РЅРѕРІРµРЅРёСЏ");
 }
 
 ///  CONVERSION 2008-1-17
@@ -316,7 +316,7 @@ struct LanguageConversion
 };
 void LanguageConversion::serialize(Archive& ar)
 {
-	ar.serialize(language, "language", "Язык");
+	ar.serialize(language, "language", "РЇР·С‹Рє");
 }
 typedef vector<LanguageConversion> LanguageConversionList;
 /// ^^^
@@ -342,26 +342,26 @@ bool LanguageCombo::valid() const
 
 void GlobalAttributes::serializeGameScenario(Archive& ar) 
 {
-	ar.serialize(windowTitle, "windowTitle", "Название окна игры");
-	ar.serialize(savePath, "savePath", "Папка для сохранения");
-	static ResourceSelector::Options iconOptions("*.ico", "Resource\\Cursors", "Иконки");
-	ar.serialize(ResourceSelector(icon, iconOptions), "icon", "Иконка игры");
+	ar.serialize(windowTitle, "windowTitle", "РќР°Р·РІР°РЅРёРµ РѕРєРЅР° РёРіСЂС‹");
+	ar.serialize(savePath, "savePath", "РџР°РїРєР° РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ");
+	static ResourceSelector::Options iconOptions("*.ico", "Resource\\Cursors", "РРєРѕРЅРєРё");
+	ar.serialize(ResourceSelector(icon, iconOptions), "icon", "РРєРѕРЅРєР° РёРіСЂС‹");
 
-	ar.serialize(directControlMode, "directControlMode", "Режим прямого управления по умолчанию");
+	ar.serialize(directControlMode, "directControlMode", "Р РµР¶РёРј РїСЂСЏРјРѕРіРѕ СѓРїСЂР°РІР»РµРЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ");
 
 	static ResourceSelector::Options uiTextureOptions("*.tga; *.dds; *.avi", "Resource\\UI\\Textures");
-	ar.serialize(ResourceSelector(startScreenPicture_, uiTextureOptions), "startScreenPicture", "Стартовый банер");
-	ar.serialize(enableSilhouettes, "enableSilhouettes", "Включить поддержку силуэтов");
-	ar.serialize(terrainSelfShadowing, "terrainSelfShadowing", "Включить тень от поверхности");
-	ar.serialize(enableFogOfWar, "enableFogOfWar", "Включить туман войны");
-	ar.serialize(enableFieldDispatcher, "enableFieldDispatcher", "Включить силовые поля");
+	ar.serialize(ResourceSelector(startScreenPicture_, uiTextureOptions), "startScreenPicture", "РЎС‚Р°СЂС‚РѕРІС‹Р№ Р±Р°РЅРµСЂ");
+	ar.serialize(enableSilhouettes, "enableSilhouettes", "Р’РєР»СЋС‡РёС‚СЊ РїРѕРґРґРµСЂР¶РєСѓ СЃРёР»СѓСЌС‚РѕРІ");
+	ar.serialize(terrainSelfShadowing, "terrainSelfShadowing", "Р’РєР»СЋС‡РёС‚СЊ С‚РµРЅСЊ РѕС‚ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё");
+	ar.serialize(enableFogOfWar, "enableFogOfWar", "Р’РєР»СЋС‡РёС‚СЊ С‚СѓРјР°РЅ РІРѕР№РЅС‹");
+	ar.serialize(enableFieldDispatcher, "enableFieldDispatcher", "Р’РєР»СЋС‡РёС‚СЊ СЃРёР»РѕРІС‹Рµ РїРѕР»СЏ");
 
 	if(ar.isInput())
-	{//Конверсия
-		float lod12=200; /// переход от lod1 к lod2
-		float lod23=600; /// переход от lod2 к lod3
-		if(ar.serialize(lod12, "lod12", "Переход от lod1 к lod2") &&
-		 ar.serialize(lod23, "lod23", "Переход от lod2 к lod3"))
+	{//РљРѕРЅРІРµСЂСЃРёСЏ
+		float lod12=200; /// РїРµСЂРµС…РѕРґ РѕС‚ lod1 Рє lod2
+		float lod23=600; /// РїРµСЂРµС…РѕРґ РѕС‚ lod2 Рє lod3
+		if(ar.serialize(lod12, "lod12", "РџРµСЂРµС…РѕРґ РѕС‚ lod1 Рє lod2") &&
+		 ar.serialize(lod23, "lod23", "РџРµСЂРµС…РѕРґ РѕС‚ lod2 Рє lod3"))
 		{
 			for(int i=0;i<OBJECT_LOD_SIZE;i++)
 			{
@@ -378,66 +378,66 @@ void GlobalAttributes::serializeGameScenario(Archive& ar)
 		{
 			lod_border[i].radius = lod_border[i-1].radius;
 			XBuffer buf;
-			buf < "Радиус \"" <  getEnumNameAlt(ObjectLodPredefinedType(i)) < "\" должен быть больше радиуса предыдущего лода ";
+			buf < "Р Р°РґРёСѓСЃ \"" <  getEnumNameAlt(ObjectLodPredefinedType(i)) < "\" РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ СЂР°РґРёСѓСЃР° РїСЂРµРґС‹РґСѓС‰РµРіРѕ Р»РѕРґР° ";
 			xxassert(false,buf);
 		}
 	}
 
 	if(ar.openBlock("PathTracking", "PathTracking")){
-		ar.serialize(moveToImpassabilities, "moveToImpassabilities", "Двигаться если точка на непроходимости");
-		ar.serialize(enablePathTrackingRadiusCheck, "enablePathTrackingRadiusCheck", "PathTracking:Большые юниты игнорируют меньших");
-		ar.serialize(enemyRadiusCheck, "enemyRadiusCheck", "PathTracking:Враги игнорируют меньших");
-		ar.serialize(minRadiusCheck, "minRadiusCheck", "PathTracking:Минимальный игнорируемый радиус");
-		ar.serialize(enableMakeWay, "enableMakeWay", "PathTracking:Уступать дорогу");
-		ar.serialize(enableEnemyMakeWay, "enableEnemyMakeWay", "PathTracking:Уступать дорогу врагу");
-		ar.serialize(pathTrackingStopRadius, "pathTrackingStopRadius", "PathTracking:Радиус остановки");
-		ar.serialize(analyzeAreaRadius, "analyzeAreaRadius", "Радиус для точного анализа поверхности");
-		ar.serialize(checkImpassabilityInDC, "checkImpassabilityInDC", "Учитывать непроходимость в прямом управлении");
-		ar.serialize(enableAutoImpassability, "enableAutoImpassability", "Включить автоматическую генерацию зон непроходимости");
+		ar.serialize(moveToImpassabilities, "moveToImpassabilities", "Р”РІРёРіР°С‚СЊСЃСЏ РµСЃР»Рё С‚РѕС‡РєР° РЅР° РЅРµРїСЂРѕС…РѕРґРёРјРѕСЃС‚Рё");
+		ar.serialize(enablePathTrackingRadiusCheck, "enablePathTrackingRadiusCheck", "PathTracking:Р‘РѕР»СЊС€С‹Рµ СЋРЅРёС‚С‹ РёРіРЅРѕСЂРёСЂСѓСЋС‚ РјРµРЅСЊС€РёС…");
+		ar.serialize(enemyRadiusCheck, "enemyRadiusCheck", "PathTracking:Р’СЂР°РіРё РёРіРЅРѕСЂРёСЂСѓСЋС‚ РјРµРЅСЊС€РёС…");
+		ar.serialize(minRadiusCheck, "minRadiusCheck", "PathTracking:РњРёРЅРёРјР°Р»СЊРЅС‹Р№ РёРіРЅРѕСЂРёСЂСѓРµРјС‹Р№ СЂР°РґРёСѓСЃ");
+		ar.serialize(enableMakeWay, "enableMakeWay", "PathTracking:РЈСЃС‚СѓРїР°С‚СЊ РґРѕСЂРѕРіСѓ");
+		ar.serialize(enableEnemyMakeWay, "enableEnemyMakeWay", "PathTracking:РЈСЃС‚СѓРїР°С‚СЊ РґРѕСЂРѕРіСѓ РІСЂР°РіСѓ");
+		ar.serialize(pathTrackingStopRadius, "pathTrackingStopRadius", "PathTracking:Р Р°РґРёСѓСЃ РѕСЃС‚Р°РЅРѕРІРєРё");
+		ar.serialize(analyzeAreaRadius, "analyzeAreaRadius", "Р Р°РґРёСѓСЃ РґР»СЏ С‚РѕС‡РЅРѕРіРѕ Р°РЅР°Р»РёР·Р° РїРѕРІРµСЂС…РЅРѕСЃС‚Рё");
+		ar.serialize(checkImpassabilityInDC, "checkImpassabilityInDC", "РЈС‡РёС‚С‹РІР°С‚СЊ РЅРµРїСЂРѕС…РѕРґРёРјРѕСЃС‚СЊ РІ РїСЂСЏРјРѕРј СѓРїСЂР°РІР»РµРЅРёРё");
+		ar.serialize(enableAutoImpassability, "enableAutoImpassability", "Р’РєР»СЋС‡РёС‚СЊ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєСѓСЋ РіРµРЅРµСЂР°С†РёСЋ Р·РѕРЅ РЅРµРїСЂРѕС…РѕРґРёРјРѕСЃС‚Рё");
 		ar.closeBlock();
 	}
 
-	ar.serialize(cameraRestriction, "cameraRestriction", "Ограничения камеры");
-	ar.serialize(mapSizeNames, "mapSizeNames", "Названия размеров карт");
+	ar.serialize(cameraRestriction, "cameraRestriction", "РћРіСЂР°РЅРёС‡РµРЅРёСЏ РєР°РјРµСЂС‹");
+	ar.serialize(mapSizeNames, "mapSizeNames", "РќР°Р·РІР°РЅРёСЏ СЂР°Р·РјРµСЂРѕРІ РєР°СЂС‚");
 
 	ar.serialize(cameraDefaultTheta_, "cameraDefaultTheta", 0);
 	ar.serialize(cameraDefaultDistance_, "cameraDefaultDistance", 0);
-	ar.serialize(unitSpriteMaxDistance, "unitSpriteMaxDistance", "Дистанция пропадания спрайтов юнитов при горизонтальной камере");
+	ar.serialize(unitSpriteMaxDistance, "unitSpriteMaxDistance", "Р”РёСЃС‚Р°РЅС†РёСЏ РїСЂРѕРїР°РґР°РЅРёСЏ СЃРїСЂР°Р№С‚РѕРІ СЋРЅРёС‚РѕРІ РїСЂРё РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅРѕР№ РєР°РјРµСЂРµ");
 
-	ar.serialize(playerColors, "playerColors", "Цвета игроков"); 
-	ar.serialize(playerSigns, "playerSignes", "Эмблемы игроков");
-	ar.serialize(silhouetteColors, "silhouetteColors", "Цвета силуэтов"); 
-	ar.serialize(serverCanChangeClientOptions, "serverCanChangeClientOptions", "Сервер сетевой игры может менять настройки клиентов");
+	ar.serialize(playerColors, "playerColors", "Р¦РІРµС‚Р° РёРіСЂРѕРєРѕРІ"); 
+	ar.serialize(playerSigns, "playerSignes", "Р­РјР±Р»РµРјС‹ РёРіСЂРѕРєРѕРІ");
+	ar.serialize(silhouetteColors, "silhouetteColors", "Р¦РІРµС‚Р° СЃРёР»СѓСЌС‚РѕРІ"); 
+	ar.serialize(serverCanChangeClientOptions, "serverCanChangeClientOptions", "РЎРµСЂРІРµСЂ СЃРµС‚РµРІРѕР№ РёРіСЂС‹ РјРѕР¶РµС‚ РјРµРЅСЏС‚СЊ РЅР°СЃС‚СЂРѕР№РєРё РєР»РёРµРЅС‚РѕРІ");
 
-	ar.serialize(underwaterColors, "underwaterUnitColors", "Цвета игроков под водой");
+	ar.serialize(underwaterColors, "underwaterUnitColors", "Р¦РІРµС‚Р° РёРіСЂРѕРєРѕРІ РїРѕРґ РІРѕРґРѕР№");
 
-	ar.serialize(uniformCursor,	"uniformCursor",	"Курсоры действий показывать если все в селекте могут");
-	ar.serialize(useStackSelect, "useStackSelect", "Использовать стековый селект");
+	ar.serialize(uniformCursor,	"uniformCursor",	"РљСѓСЂСЃРѕСЂС‹ РґРµР№СЃС‚РІРёР№ РїРѕРєР°Р·С‹РІР°С‚СЊ РµСЃР»Рё РІСЃРµ РІ СЃРµР»РµРєС‚Рµ РјРѕРіСѓС‚");
+	ar.serialize(useStackSelect, "useStackSelect", "РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ СЃС‚РµРєРѕРІС‹Р№ СЃРµР»РµРєС‚");
 
-	ar.serialize(drawUnitSideSpritesAfterInterface, "drawUnitSideSpritesAfterInterface", "Рисовать знак юнита за экраном поверх интерфейса");
+	ar.serialize(drawUnitSideSpritesAfterInterface, "drawUnitSideSpritesAfterInterface", "Р РёСЃРѕРІР°С‚СЊ Р·РЅР°Рє СЋРЅРёС‚Р° Р·Р° СЌРєСЂР°РЅРѕРј РїРѕРІРµСЂС… РёРЅС‚РµСЂС„РµР№СЃР°");
 	
-	ar.serialize(languagesList, "avaiableLanguages", "Доступные языки");
+	ar.serialize(languagesList, "avaiableLanguages", "Р”РѕСЃС‚СѓРїРЅС‹Рµ СЏР·С‹РєРё");
 
-	ar.serialize(resourseStatisticsFactors, "resourseStatisticsFactors", "Коэффициенты для статистики ресурсов (умножаются на соответствующие параметры и складываются)");
-	ar.serialize(worldTriggers, "worldTriggers", "Триггера для мира");
-	ar.serialize(assistantDifficulty, "assistantDifficulty", "Сложность АИ ассистента");
-	ar.serialize(applyArithmeticsOnCreation, "applyArithmeticsOnCreation", "Применять арифметику уровня при создании героя");
+	ar.serialize(resourseStatisticsFactors, "resourseStatisticsFactors", "РљРѕСЌС„С„РёС†РёРµРЅС‚С‹ РґР»СЏ СЃС‚Р°С‚РёСЃС‚РёРєРё СЂРµСЃСѓСЂСЃРѕРІ (СѓРјРЅРѕР¶Р°СЋС‚СЃСЏ РЅР° СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёРµ РїР°СЂР°РјРµС‚СЂС‹ Рё СЃРєР»Р°РґС‹РІР°СЋС‚СЃСЏ)");
+	ar.serialize(worldTriggers, "worldTriggers", "РўСЂРёРіРіРµСЂР° РґР»СЏ РјРёСЂР°");
+	ar.serialize(assistantDifficulty, "assistantDifficulty", "РЎР»РѕР¶РЅРѕСЃС‚СЊ РђР Р°СЃСЃРёСЃС‚РµРЅС‚Р°");
+	ar.serialize(applyArithmeticsOnCreation, "applyArithmeticsOnCreation", "РџСЂРёРјРµРЅСЏС‚СЊ Р°СЂРёС„РјРµС‚РёРєСѓ СѓСЂРѕРІРЅСЏ РїСЂРё СЃРѕР·РґР°РЅРёРё РіРµСЂРѕСЏ");
 
-	ar.serialize(debrisLyingTime, "debrisLyingTime", "Время, которое осколки лежат после взрыва");
-	ar.serialize(debrisProjectileLyingTime, "debrisProjectileLyingTime", "Время, которое осколки снарядов лежат после взрыва");
-	ar.serialize(MillisecondsWrapper(treeLyingTime), "treeLyingTimeMiliseconds", "Время, которое деревья лежат после падения");
+	ar.serialize(debrisLyingTime, "debrisLyingTime", "Р’СЂРµРјСЏ, РєРѕС‚РѕСЂРѕРµ РѕСЃРєРѕР»РєРё Р»РµР¶Р°С‚ РїРѕСЃР»Рµ РІР·СЂС‹РІР°");
+	ar.serialize(debrisProjectileLyingTime, "debrisProjectileLyingTime", "Р’СЂРµРјСЏ, РєРѕС‚РѕСЂРѕРµ РѕСЃРєРѕР»РєРё СЃРЅР°СЂСЏРґРѕРІ Р»РµР¶Р°С‚ РїРѕСЃР»Рµ РІР·СЂС‹РІР°");
+	ar.serialize(MillisecondsWrapper(treeLyingTime), "treeLyingTimeMiliseconds", "Р’СЂРµРјСЏ, РєРѕС‚РѕСЂРѕРµ РґРµСЂРµРІСЊСЏ Р»РµР¶Р°С‚ РїРѕСЃР»Рµ РїР°РґРµРЅРёСЏ");
 	
-	ar.serialize(enableAnimationInterpolation, "enableAnimationInterpolation", "Разрешить интерполяцию анимации");
+	ar.serialize(enableAnimationInterpolation, "enableAnimationInterpolation", "Р Р°Р·СЂРµС€РёС‚СЊ РёРЅС‚РµСЂРїРѕР»СЏС†РёСЋ Р°РЅРёРјР°С†РёРё");
 	if(enableAnimationInterpolation)
-		ar.serialize(animationInterpolationTime, "animationInterpolationTime", "Время интерполяции анимации");
+		ar.serialize(animationInterpolationTime, "animationInterpolationTime", "Р’СЂРµРјСЏ РёРЅС‚РµСЂРїРѕР»СЏС†РёРё Р°РЅРёРјР°С†РёРё");
 
-	ar.serialize(enableUnitVisibilityTrace, "enableUnitVisibilityTrace", "Разрешить трассировку видимости юнитов");
+	ar.serialize(enableUnitVisibilityTrace, "enableUnitVisibilityTrace", "Р Р°Р·СЂРµС€РёС‚СЊ С‚СЂР°СЃСЃРёСЂРѕРІРєСѓ РІРёРґРёРјРѕСЃС‚Рё СЋРЅРёС‚РѕРІ");
 
-	ar.serialize(circleManagerDrawOrder, "circleManagerDrawOrder", "Момент отрисовки селектов юнитов");
-	ar.serialize(cheatTypeSpeed, "cheatTypeSpeed", "Минимальная скорость ввода читов, знаков в минуту");
-	ar.serialize(profileParameters, "profileParameters", "Типы параметров, которые будут сохраняться в профиле (используется только тип)");
+	ar.serialize(circleManagerDrawOrder, "circleManagerDrawOrder", "РњРѕРјРµРЅС‚ РѕС‚СЂРёСЃРѕРІРєРё СЃРµР»РµРєС‚РѕРІ СЋРЅРёС‚РѕРІ");
+	ar.serialize(cheatTypeSpeed, "cheatTypeSpeed", "РњРёРЅРёРјР°Р»СЊРЅР°СЏ СЃРєРѕСЂРѕСЃС‚СЊ РІРІРѕРґР° С‡РёС‚РѕРІ, Р·РЅР°РєРѕРІ РІ РјРёРЅСѓС‚Сѓ");
+	ar.serialize(profileParameters, "profileParameters", "РўРёРїС‹ РїР°СЂР°РјРµС‚СЂРѕРІ, РєРѕС‚РѕСЂС‹Рµ Р±СѓРґСѓС‚ СЃРѕС…СЂР°РЅСЏС‚СЊСЃСЏ РІ РїСЂРѕС„РёР»Рµ (РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ С‚РѕР»СЊРєРѕ С‚РёРї)");
 
-	if(ar.openBlock("Opacity", "Параметры прозрачности объектов")){
+	if(ar.openBlock("Opacity", "РџР°СЂР°РјРµС‚СЂС‹ РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚Рё РѕР±СЉРµРєС‚РѕРІ")){
 		ar.serialize(opacityMin, "opacityMin", "opacityMin");
 		ar.serialize(opacitySpeed, "opacitySpeed", "opacitySpeed");
 		ar.serialize(opacityRestoreSpeed, "opacityRestoreSpeed", "opacityRestoreSpeed");
@@ -446,11 +446,11 @@ void GlobalAttributes::serializeGameScenario(Archive& ar)
 		ar.closeBlock();
 	}
 	ar.serialize(frameTimeAvrTau, "frameTimeAvrTau", "frameTimeAvrTau");
-	ar.serialize(RangedWrapperi(installerOffset, 0, 50), "installerOffset", "Отступ инсталлера");
+	ar.serialize(RangedWrapperi(installerOffset, 0, 50), "installerOffset", "РћС‚СЃС‚СѓРї РёРЅСЃС‚Р°Р»Р»РµСЂР°");
 
-	ar.serialize(RangedWrapperf(assemblyCommandShowTime, 1.f, 180.f), "assemblyCommandShowTime", "Время показа отметки на карте союзникам");
+	ar.serialize(RangedWrapperf(assemblyCommandShowTime, 1.f, 180.f), "assemblyCommandShowTime", "Р’СЂРµРјСЏ РїРѕРєР°Р·Р° РѕС‚РјРµС‚РєРё РЅР° РєР°СЂС‚Рµ СЃРѕСЋР·РЅРёРєР°Рј");
     
-	if(ar.openBlock("Show up attributes", "Параметры взлетающего текста")){
+	if(ar.openBlock("Show up attributes", "РџР°СЂР°РјРµС‚СЂС‹ РІР·Р»РµС‚Р°СЋС‰РµРіРѕ С‚РµРєСЃС‚Р°")){
 		ShowUpAttribute::serializeStatic(ar);
 		ar.closeBlock();	
 	}

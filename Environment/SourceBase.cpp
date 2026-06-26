@@ -23,53 +23,53 @@
 UNIT_LINK_GET(SourceBase)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(SourceBase, TargetClass, "ZoneEffectType");
-REGISTER_ENUM_ENCLOSED(SourceBase, SOURCE_ATTACK_ALL, "Реагировать на все виды юнитов");
-REGISTER_ENUM_ENCLOSED(SourceBase, SOURCE_ATTACK_GROUND, "Реагировать только на наземных");
-REGISTER_ENUM_ENCLOSED(SourceBase, SOURCE_ATTACK_AIR, "Реагировать только на летающих");
+REGISTER_ENUM_ENCLOSED(SourceBase, SOURCE_ATTACK_ALL, "Р РµР°РіРёСЂРѕРІР°С‚СЊ РЅР° РІСЃРµ РІРёРґС‹ СЋРЅРёС‚РѕРІ");
+REGISTER_ENUM_ENCLOSED(SourceBase, SOURCE_ATTACK_GROUND, "Р РµР°РіРёСЂРѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ РЅР° РЅР°Р·РµРјРЅС‹С…");
+REGISTER_ENUM_ENCLOSED(SourceBase, SOURCE_ATTACK_AIR, "Р РµР°РіРёСЂРѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ РЅР° Р»РµС‚Р°СЋС‰РёС…");
 END_ENUM_DESCRIPTOR_ENCLOSED(SourceBase, TargetClass);
 
 BEGIN_ENUM_DESCRIPTOR(SourceType, "SourceType");
-REGISTER_ENUM(SOURCE_WATER,     "Источник воды");
-REGISTER_ENUM(SOURCE_BUBBLE,    "Источник пузырьков");
-REGISTER_ENUM(SOURCE_LIGHT,     "Источник света");
-REGISTER_ENUM(SOURCE_BREAK,     "Источник трещин");
-REGISTER_ENUM(SOURCE_GEOWAVE,   "Источник гео волн");
-REGISTER_ENUM(SOURCE_TERROOL,   "Источник тулзеров");
-REGISTER_ENUM(SOURCE_ICE,       "Источник льда");
-REGISTER_ENUM(SOURCE_FREEZE,    "Источник заморозки");
-REGISTER_ENUM(SOURCE_ZONE,      "Зона на мире");
-REGISTER_ENUM(SOURCE_IMPULSE,   "Источник импульсов");
-REGISTER_ENUM(SOURCE_TORNADO,   "Источник торнадо");
-REGISTER_ENUM(SOURCE_BLAST,     "Источник взрывной волны");
-REGISTER_ENUM(SOURCE_LIGHTING,  "Источник молний");
-REGISTER_ENUM(SOURCE_CAMERA_SHAKING, "Источник тряски камеры");
-REGISTER_ENUM(SOURCE_FLASH,     "Источник вспышки");
-REGISTER_ENUM(SOURCE_DETECTOR,  "Источник обнаружения");
-REGISTER_ENUM(SOURCE_WATER_WAVE,"Источник волны на воде");
-REGISTER_ENUM(SOURCE_SHIELD,	"Источник защитного поля");
-REGISTER_ENUM(SOURCE_TELEPORT,	"Источник телепортатор");
-REGISTER_ENUM(SOURCE_DELETE_GRASS, "Источник удаления травы");
-REGISTER_ENUM(SOURCE_FLOCK,     "Источник - стая на мире");
+REGISTER_ENUM(SOURCE_WATER,     "РСЃС‚РѕС‡РЅРёРє РІРѕРґС‹");
+REGISTER_ENUM(SOURCE_BUBBLE,    "РСЃС‚РѕС‡РЅРёРє РїСѓР·С‹СЂСЊРєРѕРІ");
+REGISTER_ENUM(SOURCE_LIGHT,     "РСЃС‚РѕС‡РЅРёРє СЃРІРµС‚Р°");
+REGISTER_ENUM(SOURCE_BREAK,     "РСЃС‚РѕС‡РЅРёРє С‚СЂРµС‰РёРЅ");
+REGISTER_ENUM(SOURCE_GEOWAVE,   "РСЃС‚РѕС‡РЅРёРє РіРµРѕ РІРѕР»РЅ");
+REGISTER_ENUM(SOURCE_TERROOL,   "РСЃС‚РѕС‡РЅРёРє С‚СѓР»Р·РµСЂРѕРІ");
+REGISTER_ENUM(SOURCE_ICE,       "РСЃС‚РѕС‡РЅРёРє Р»СЊРґР°");
+REGISTER_ENUM(SOURCE_FREEZE,    "РСЃС‚РѕС‡РЅРёРє Р·Р°РјРѕСЂРѕР·РєРё");
+REGISTER_ENUM(SOURCE_ZONE,      "Р—РѕРЅР° РЅР° РјРёСЂРµ");
+REGISTER_ENUM(SOURCE_IMPULSE,   "РСЃС‚РѕС‡РЅРёРє РёРјРїСѓР»СЊСЃРѕРІ");
+REGISTER_ENUM(SOURCE_TORNADO,   "РСЃС‚РѕС‡РЅРёРє С‚РѕСЂРЅР°РґРѕ");
+REGISTER_ENUM(SOURCE_BLAST,     "РСЃС‚РѕС‡РЅРёРє РІР·СЂС‹РІРЅРѕР№ РІРѕР»РЅС‹");
+REGISTER_ENUM(SOURCE_LIGHTING,  "РСЃС‚РѕС‡РЅРёРє РјРѕР»РЅРёР№");
+REGISTER_ENUM(SOURCE_CAMERA_SHAKING, "РСЃС‚РѕС‡РЅРёРє С‚СЂСЏСЃРєРё РєР°РјРµСЂС‹");
+REGISTER_ENUM(SOURCE_FLASH,     "РСЃС‚РѕС‡РЅРёРє РІСЃРїС‹С€РєРё");
+REGISTER_ENUM(SOURCE_DETECTOR,  "РСЃС‚РѕС‡РЅРёРє РѕР±РЅР°СЂСѓР¶РµРЅРёСЏ");
+REGISTER_ENUM(SOURCE_WATER_WAVE,"РСЃС‚РѕС‡РЅРёРє РІРѕР»РЅС‹ РЅР° РІРѕРґРµ");
+REGISTER_ENUM(SOURCE_SHIELD,	"РСЃС‚РѕС‡РЅРёРє Р·Р°С‰РёС‚РЅРѕРіРѕ РїРѕР»СЏ");
+REGISTER_ENUM(SOURCE_TELEPORT,	"РСЃС‚РѕС‡РЅРёРє С‚РµР»РµРїРѕСЂС‚Р°С‚РѕСЂ");
+REGISTER_ENUM(SOURCE_DELETE_GRASS, "РСЃС‚РѕС‡РЅРёРє СѓРґР°Р»РµРЅРёСЏ С‚СЂР°РІС‹");
+REGISTER_ENUM(SOURCE_FLOCK,     "РСЃС‚РѕС‡РЅРёРє - СЃС‚Р°СЏ РЅР° РјРёСЂРµ");
 END_ENUM_DESCRIPTOR(SourceType);
 
 BEGIN_ENUM_DESCRIPTOR(SurfaceClass, "SurfaceClass")
-REGISTER_ENUM(SOURCE_SURFACE_GROUND, "на земле")
-REGISTER_ENUM(SOURCE_SURFACE_WATER, "на воде")
-REGISTER_ENUM(SOURCE_SURFACE_ICE, "на льду")
-REGISTER_ENUM(SOURCE_SURFACE_ANY, "на любой поверхности")
+REGISTER_ENUM(SOURCE_SURFACE_GROUND, "РЅР° Р·РµРјР»Рµ")
+REGISTER_ENUM(SOURCE_SURFACE_WATER, "РЅР° РІРѕРґРµ")
+REGISTER_ENUM(SOURCE_SURFACE_ICE, "РЅР° Р»СЊРґСѓ")
+REGISTER_ENUM(SOURCE_SURFACE_ANY, "РЅР° Р»СЋР±РѕР№ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё")
 END_ENUM_DESCRIPTOR(SurfaceClass)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(SourceBase, PlacementMode, "SourceBase::PlacementMode")
-REGISTER_ENUM_ENCLOSED(SourceBase, PLACE_NONE, "Оставить где положили")
-REGISTER_ENUM_ENCLOSED(SourceBase, PLACE_TO_GROUND, "Ставить на землю")
-REGISTER_ENUM_ENCLOSED(SourceBase, PLACE_TO_WATER,  "Ставить на воду")
+REGISTER_ENUM_ENCLOSED(SourceBase, PLACE_NONE, "РћСЃС‚Р°РІРёС‚СЊ РіРґРµ РїРѕР»РѕР¶РёР»Рё")
+REGISTER_ENUM_ENCLOSED(SourceBase, PLACE_TO_GROUND, "РЎС‚Р°РІРёС‚СЊ РЅР° Р·РµРјР»СЋ")
+REGISTER_ENUM_ENCLOSED(SourceBase, PLACE_TO_WATER,  "РЎС‚Р°РІРёС‚СЊ РЅР° РІРѕРґСѓ")
 END_ENUM_DESCRIPTOR_ENCLOSED(SourceBase, PlacementMode)
 
 BEGIN_ENUM_DESCRIPTOR(SurfaceKind, "SurfaceKind")
-REGISTER_ENUM(SURFACE_KIND_1, "Поверхность 1 рода")
-REGISTER_ENUM(SURFACE_KIND_2, "Поверхность 2 рода")
-REGISTER_ENUM(SURFACE_KIND_3, "Поверхность 3 рода")
-REGISTER_ENUM(SURFACE_KIND_4, "Поверхность 4 рода")
+REGISTER_ENUM(SURFACE_KIND_1, "РџРѕРІРµСЂС…РЅРѕСЃС‚СЊ 1 СЂРѕРґР°")
+REGISTER_ENUM(SURFACE_KIND_2, "РџРѕРІРµСЂС…РЅРѕСЃС‚СЊ 2 СЂРѕРґР°")
+REGISTER_ENUM(SURFACE_KIND_3, "РџРѕРІРµСЂС…РЅРѕСЃС‚СЊ 3 СЂРѕРґР°")
+REGISTER_ENUM(SURFACE_KIND_4, "РџРѕРІРµСЂС…РЅРѕСЃС‚СЊ 4 СЂРѕРґР°")
 END_ENUM_DESCRIPTOR(SurfaceKind)
 
 void fCircleSourceAdd(XBuffer& stream)
@@ -92,79 +92,79 @@ void SourceBase::serialize(Archive& ar)
 	}
 	
 	if(enabled() || !ar.isEdit())
-		ar.serialize(active_, "active", "Активный");
+		ar.serialize(active_, "active", "РђРєС‚РёРІРЅС‹Р№");
 	
 	if(ar.isOutput())
 		libraryKey_ = SourceReference(this).c_str();
 	ar.serialize(libraryKey_, "libraryKey", 0);
 
-	ar.serialize(label_, "label", "Имя метки");
+	ar.serialize(label_, "label", "РРјСЏ РјРµС‚РєРё");
 	if(!ar.isEdit())
-		ar.serialize(pose_, "pose", "Позиция");
-	ar.serialize(RangedWrapperf (radius_, 1.0f, 2000.0f, 1.0f), "radius", "Радиус");
+		ar.serialize(pose_, "pose", "РџРѕР·РёС†РёСЏ");
+	ar.serialize(RangedWrapperf (radius_, 1.0f, 2000.0f, 1.0f), "radius", "Р Р°РґРёСѓСЃ");
 
-	if(ar.openBlock("", "Взаимодействие со средой")){
-		ar.serialize(surfaceInstallClass_, "surfaceClass", "Можно поставить");
-		ar.serialize(surfaceClass_, "workSurfaceClasses", "Работает на");
-		if(!ar.serialize(surfaceKind_, "surfaceKind16", "Можно поставить (род поверхности)")){
+	if(ar.openBlock("", "Р’Р·Р°РёРјРѕРґРµР№СЃС‚РІРёРµ СЃРѕ СЃСЂРµРґРѕР№")){
+		ar.serialize(surfaceInstallClass_, "surfaceClass", "РњРѕР¶РЅРѕ РїРѕСЃС‚Р°РІРёС‚СЊ");
+		ar.serialize(surfaceClass_, "workSurfaceClasses", "Р Р°Р±РѕС‚Р°РµС‚ РЅР°");
+		if(!ar.serialize(surfaceKind_, "surfaceKind16", "РњРѕР¶РЅРѕ РїРѕСЃС‚Р°РІРёС‚СЊ (СЂРѕРґ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё)")){
 			BitVector<SurfaceKind> tmp;
-			ar.serialize(tmp, "surfaceKind", "Можно поставить (род поверхности)");
+			ar.serialize(tmp, "surfaceKind", "РњРѕР¶РЅРѕ РїРѕСЃС‚Р°РІРёС‚СЊ (СЂРѕРґ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё)");
 			surfaceKind_=SurfaceKindBitVector((int)tmp);
 		}
-		ar.serialize(placementMode_, "placementMode", "Установка на поверхность");
-		ar.serialize(move_by_wind_, "move_by_wind", "Сносится ветром");
-		ar.serialize(windSensitivity_, "windSensitivity", "Коэффициент скорости по ветру");
-		ar.serialize(move_by_water_, "move_by_water", "Сносится водой");
-		ar.serialize(mapUpdateDeactivate_, "mapUpdateDeactivate", "Выключать при изменении поверхности");
-		ar.serialize(mapUpdateActivate_, "mapUpdateActivate", "Включать при изменении поверхности");
+		ar.serialize(placementMode_, "placementMode", "РЈСЃС‚Р°РЅРѕРІРєР° РЅР° РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ");
+		ar.serialize(move_by_wind_, "move_by_wind", "РЎРЅРѕСЃРёС‚СЃСЏ РІРµС‚СЂРѕРј");
+		ar.serialize(windSensitivity_, "windSensitivity", "РљРѕСЌС„С„РёС†РёРµРЅС‚ СЃРєРѕСЂРѕСЃС‚Рё РїРѕ РІРµС‚СЂСѓ");
+		ar.serialize(move_by_water_, "move_by_water", "РЎРЅРѕСЃРёС‚СЃСЏ РІРѕРґРѕР№");
+		ar.serialize(mapUpdateDeactivate_, "mapUpdateDeactivate", "Р’С‹РєР»СЋС‡Р°С‚СЊ РїСЂРё РёР·РјРµРЅРµРЅРёРё РїРѕРІРµСЂС…РЅРѕСЃС‚Рё");
+		ar.serialize(mapUpdateActivate_, "mapUpdateActivate", "Р’РєР»СЋС‡Р°С‚СЊ РїСЂРё РёР·РјРµРЅРµРЅРёРё РїРѕРІРµСЂС…РЅРѕСЃС‚Рё");
 		if(mapUpdateDeactivate_){
 			mapUpdateActivate_ = false;
 			waiting_height_ = false;
 		}
 		if(!mapUpdateDeactivate_)
-			ar.serialize(waiting_height_, "waiting_height", "активироваться если выше или ниже заданной высоты");
+			ar.serialize(waiting_height_, "waiting_height", "Р°РєС‚РёРІРёСЂРѕРІР°С‚СЊСЃСЏ РµСЃР»Рё РІС‹С€Рµ РёР»Рё РЅРёР¶Рµ Р·Р°РґР°РЅРЅРѕР№ РІС‹СЃРѕС‚С‹");
 		else
 			waiting_height_ = false;
 		if(waiting_height_){
-			ar.serialize(activationHeight_, "activationHeight", "активируется, если центр выше");
-			ar.serialize(activationBottomHeight_, "activationBottomHeight", "активируется, если центр ниже");
+			ar.serialize(activationHeight_, "activationHeight", "Р°РєС‚РёРІРёСЂСѓРµС‚СЃСЏ, РµСЃР»Рё С†РµРЅС‚СЂ РІС‹С€Рµ");
+			ar.serialize(activationBottomHeight_, "activationBottomHeight", "Р°РєС‚РёРІРёСЂСѓРµС‚СЃСЏ, РµСЃР»Рё С†РµРЅС‚СЂ РЅРёР¶Рµ");
 		}
 		ar.closeBlock();
 	}
 
-	if(ar.openBlock("", "Автоактивация")){
-		ar.serialize(waiting_target_, "waiting_target", "Активироваться при цели в зоне");
+	if(ar.openBlock("", "РђРІС‚РѕР°РєС‚РёРІР°С†РёСЏ")){
+		ar.serialize(waiting_target_, "waiting_target", "РђРєС‚РёРІРёСЂРѕРІР°С‚СЊСЃСЏ РїСЂРё С†РµР»Рё РІ Р·РѕРЅРµ");
 		if(waiting_target_){
-			ar.serialize(activate_by_detonator_, "activate_by_detonator", "Активироваться только детонатором");
+			ar.serialize(activate_by_detonator_, "activate_by_detonator", "РђРєС‚РёРІРёСЂРѕРІР°С‚СЊСЃСЏ С‚РѕР»СЊРєРѕ РґРµС‚РѕРЅР°С‚РѕСЂРѕРј");
 			if(!activate_by_detonator_){
-				ar.serialize(activatorMode_, "activatorMode", "Тип цели для активации");
-				ar.serialize(activate_by_projectile_, "activate_by_projectile", "Активироваться при попадании ракеты");
+				ar.serialize(activatorMode_, "activatorMode", "РўРёРї С†РµР»Рё РґР»СЏ Р°РєС‚РёРІР°С†РёРё");
+				ar.serialize(activate_by_projectile_, "activate_by_projectile", "РђРєС‚РёРІРёСЂРѕРІР°С‚СЊСЃСЏ РїСЂРё РїРѕРїР°РґР°РЅРёРё СЂР°РєРµС‚С‹");
 			}
-			ar.serialize(killOwner_, "killOwner", "Убивать хозяина при активации");
+			ar.serialize(killOwner_, "killOwner", "РЈР±РёРІР°С‚СЊ С…РѕР·СЏРёРЅР° РїСЂРё Р°РєС‚РёРІР°С†РёРё");
 		}
-		ar.serialize(waitingEffectAttribute_, "waitingEffectAttribute", "Эффект в режиме ожидания");
-		ar.serialize(visibleTime_, "visibleTime", "Время затухания после обнаружения");
+		ar.serialize(waitingEffectAttribute_, "waitingEffectAttribute", "Р­С„С„РµРєС‚ РІ СЂРµР¶РёРјРµ РѕР¶РёРґР°РЅРёСЏ");
+		ar.serialize(visibleTime_, "visibleTime", "Р’СЂРµРјСЏ Р·Р°С‚СѓС…Р°РЅРёСЏ РїРѕСЃР»Рµ РѕР±РЅР°СЂСѓР¶РµРЅРёСЏ");
 		ar.closeBlock();
 	}
 	
-	ar.serialize(targetClass_, "targetClass_", "Класс атакуемых юнитов");
+	ar.serialize(targetClass_, "targetClass_", "РљР»Р°СЃСЃ Р°С‚Р°РєСѓРµРјС‹С… СЋРЅРёС‚РѕРІ");
 
-	ar.serialize(radiusCircle_, "radiusCircle", "Отображение радиуса на мире");
+	ar.serialize(radiusCircle_, "radiusCircle", "РћС‚РѕР±СЂР°Р¶РµРЅРёРµ СЂР°РґРёСѓСЃР° РЅР° РјРёСЂРµ");
 
-	ar.serialize(soundReference_, "soundReference", "звук");
+	ar.serialize(soundReference_, "soundReference", "Р·РІСѓРє");
 
-	ar.serialize(followPath_, "followPath", "Следовать по траектории");
+	ar.serialize(followPath_, "followPath", "РЎР»РµРґРѕРІР°С‚СЊ РїРѕ С‚СЂР°РµРєС‚РѕСЂРёРё");
 	if(!ar.isEdit()) {
-		ar.serialize(path_, "path", "Траектория");
-		ar.serialize(origin_, "origin", "Сдвиг траектории");
+		ar.serialize(path_, "path", "РўСЂР°РµРєС‚РѕСЂРёСЏ");
+		ar.serialize(origin_, "origin", "РЎРґРІРёРі С‚СЂР°РµРєС‚РѕСЂРёРё");
 	} else {
-        ar.serialize(path_.cycled_, "cycledPath", "Зациклить траекторию");
-        ar.serialize(path_.speed_, "speed", "Скорость на траектории");
+        ar.serialize(path_.cycled_, "cycledPath", "Р—Р°С†РёРєР»РёС‚СЊ С‚СЂР°РµРєС‚РѕСЂРёСЋ");
+        ar.serialize(path_.speed_, "speed", "РЎРєРѕСЂРѕСЃС‚СЊ РЅР° С‚СЂР°РµРєС‚РѕСЂРёРё");
 	}
 
-	ar.serialize(childSources_, "childSources_", "производимые источники");
+	ar.serialize(childSources_, "childSources_", "РїСЂРѕРёР·РІРѕРґРёРјС‹Рµ РёСЃС‚РѕС‡РЅРёРєРё");
 
-	ar.serialize(interfaceLightIndex_, "interfaceLightIndex", "Источник света в интерфейсе");
+	ar.serialize(interfaceLightIndex_, "interfaceLightIndex", "РСЃС‚РѕС‡РЅРёРє СЃРІРµС‚Р° РІ РёРЅС‚РµСЂС„РµР№СЃРµ");
 
 	if(ar.isOutput() && isUnderEditor())
 		activation_started_ = false;
@@ -178,7 +178,7 @@ void SourceBase::serialize(Archive& ar)
 	ar.serialize(affectMode_, "affectMode_", 0);
 
 	int player_id = player_ ? player_->playerID() : -1;
-	ar.serialize(player_id, "player_id", "Игрок");
+	ar.serialize(player_id, "player_id", "РРіСЂРѕРє");
 	if(ar.isInput()){
 		if(!universe() || player_id >= universe()->Players.size() || player_id < 0)
 			player_id = -1;
@@ -194,7 +194,7 @@ void SourceBase::serialize(Archive& ar)
 
 	ar.serialize(velocity_, "velocity_", 0);
 
-	ar.serialize(breakWhenApply_, "breakWhenAffect", "Выводить сообщение для отладки при воздействии");
+	ar.serialize(breakWhenApply_, "breakWhenAffect", "Р’С‹РІРѕРґРёС‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ РґР»СЏ РѕС‚Р»Р°РґРєРё РїСЂРё РІРѕР·РґРµР№СЃС‚РІРёРё");
 }
 
 void SourceBase::enable()
@@ -397,8 +397,8 @@ void SourceBase::environmentAnalysis()
 	xassert(environmentPoints_);
 	xassert(move_by_wind_ || move_by_water_);
 
-	Vect3f V = Vect3f::ZERO; // линейная скорость
-	Vect3f Rot = Vect3f::ZERO; //вращение
+	Vect3f V = Vect3f::ZERO; // Р»РёРЅРµР№РЅР°СЏ СЃРєРѕСЂРѕСЃС‚СЊ
+	Vect3f Rot = Vect3f::ZERO; //РІСЂР°С‰РµРЅРёРµ
 
 	Se3f currPose = pose();
 
@@ -457,18 +457,18 @@ bool SourceBase::checkTarget(AffectMode mode, const UnitBase* target) const
 
 bool SourceBase::isDetonator(const UnitBase* target) const
 {
-	// если активация только по детонатору, то его и ждем
+	// РµСЃР»Рё Р°РєС‚РёРІР°С†РёСЏ С‚РѕР»СЊРєРѕ РїРѕ РґРµС‚РѕРЅР°С‚РѕСЂСѓ, С‚Рѕ РµРіРѕ Рё Р¶РґРµРј
 	bool thisDetonator = (target->attr().unitClass() == UNIT_CLASS_ZONE && player() == target->player());
 	if(activate_by_detonator_ || thisDetonator)
 		return thisDetonator;
 
-	if(target->attr().isProjectile()) // со снарядами разбираемся отдельно
+	if(target->attr().isProjectile()) // СЃРѕ СЃРЅР°СЂСЏРґР°РјРё СЂР°Р·Р±РёСЂР°РµРјСЃСЏ РѕС‚РґРµР»СЊРЅРѕ
 		if(activate_by_projectile_)
-			return !target->alive(); // попавшая ракета - мертвая ракета
+			return !target->alive(); // РїРѕРїР°РІС€Р°СЏ СЂР°РєРµС‚Р° - РјРµСЂС‚РІР°СЏ СЂР°РєРµС‚Р°
 		else
-			return false; // снаряд не ждем или уже дождались
+			return false; // СЃРЅР°СЂСЏРґ РЅРµ Р¶РґРµРј РёР»Рё СѓР¶Рµ РґРѕР¶РґР°Р»РёСЃСЊ
 
-	if(target->attr().isActing()) // на декорации не реагируем
+	if(target->attr().isActing()) // РЅР° РґРµРєРѕСЂР°С†РёРё РЅРµ СЂРµР°РіРёСЂСѓРµРј
 		return checkTarget(activatorMode_, target);
 	
 	return false;
@@ -557,16 +557,16 @@ void SourceBase::Path::quant()
 void SourceBase::PathPosition::serialize(Archive& ar)
 {
     Vect3f::serialize(ar);
-    ar.serialize(velocity_, "velocity", "Скорость");
+    ar.serialize(velocity_, "velocity", "РЎРєРѕСЂРѕСЃС‚СЊ");
 }
 
 void SourceBase::Path::serialize(Archive& ar)
 {
-	ar.serialize(static_cast< std::vector<SourceBase::PathPosition>& >(*this), "nodes", "Узлы");
-    ar.serialize(cycled_, "cycled", "Зациклен");
-    ar.serialize(speed_, "speed", "Скорость");
-    ar.serialize(position_, "segmentPosition", "Позиция на отрезке");
-    ar.serialize(segment_, "segment", "Отрезок");
+	ar.serialize(static_cast< std::vector<SourceBase::PathPosition>& >(*this), "nodes", "РЈР·Р»С‹");
+    ar.serialize(cycled_, "cycled", "Р—Р°С†РёРєР»РµРЅ");
+    ar.serialize(speed_, "speed", "РЎРєРѕСЂРѕСЃС‚СЊ");
+    ar.serialize(position_, "segmentPosition", "РџРѕР·РёС†РёСЏ РЅР° РѕС‚СЂРµР·РєРµ");
+    ar.serialize(segment_, "segment", "РћС‚СЂРµР·РѕРє");
 }
 
 string SourceBase::getDisplayName(SourceType type)
@@ -584,7 +584,7 @@ void SourceBase::soundInit(){
 
 void SourceBase::start()
 {
-	xxassert(pose_.trans().xi() || pose_.trans().yi(), "Источник в нуле");
+	xxassert(pose_.trans().xi() || pose_.trans().yi(), "РСЃС‚РѕС‡РЅРёРє РІ РЅСѓР»Рµ");
 	if(!sound_.isInited())
 		soundInit();
 	else
@@ -611,8 +611,8 @@ void SourceBase::stop()
 }
 
 void SourceBase::setActivity(bool _active){
-	xxassert(enabled_ || !_active, "запуск не разрешенного источника");
-	xxassert(isAlive() || !_active, "запуск мертвого источника");
+	xxassert(enabled_ || !_active, "Р·Р°РїСѓСЃРє РЅРµ СЂР°Р·СЂРµС€РµРЅРЅРѕРіРѕ РёСЃС‚РѕС‡РЅРёРєР°");
+	xxassert(isAlive() || !_active, "Р·Р°РїСѓСЃРє РјРµСЂС‚РІРѕРіРѕ РёСЃС‚РѕС‡РЅРёРєР°");
 	if(active_ != _active){
 		active_ = _active;
 		if(active_)
@@ -791,7 +791,7 @@ SourceBase::SourceBase() : waitingEffectController_(this)
 
 SourceBase::~SourceBase()
 {
-	dassert(!active() && "убийство не остановленного источника");
+	dassert(!active() && "СѓР±РёР№СЃС‚РІРѕ РЅРµ РѕСЃС‚Р°РЅРѕРІР»РµРЅРЅРѕРіРѕ РёСЃС‚РѕС‡РЅРёРєР°");
 	sound_.release();
 	waitingEffectController_.release();
 	if(inserted())
@@ -858,7 +858,7 @@ void SourceBase::mapUpdate(float x0,float y0,float x1,float y1)
 }
 
 void SourceBase::ChildSource::serialize(Archive &ar){
-	ar.serialize(generationDelay_, "generationDelay", "интервал появления");
+	ar.serialize(generationDelay_, "generationDelay", "РёРЅС‚РµСЂРІР°Р» РїРѕСЏРІР»РµРЅРёСЏ");
 	
 	source_.serialize(ar);
 	
@@ -881,10 +881,10 @@ SourceAttribute::SourceAttribute()
 
 void SourceAttribute::serialize(Archive& ar)
 {
-	ar.serialize(activationDelay_, "activationDelay", "задержка старта");
-	ar.serialize(lifeTime_, "lifeTime", "время действия");
-	ar.serialize(key_, "key", "Ключ для типсов");
-	ar.serialize(sourceReference_, "sourceReference", "&источник");
+	ar.serialize(activationDelay_, "activationDelay", "Р·Р°РґРµСЂР¶РєР° СЃС‚Р°СЂС‚Р°");
+	ar.serialize(lifeTime_, "lifeTime", "РІСЂРµРјСЏ РґРµР№СЃС‚РІРёСЏ");
+	ar.serialize(key_, "key", "РљР»СЋС‡ РґР»СЏ С‚РёРїСЃРѕРІ");
+	ar.serialize(sourceReference_, "sourceReference", "&РёСЃС‚РѕС‡РЅРёРє");
 }
 
 SourceWeaponAttribute::SourceWeaponAttribute()
@@ -905,7 +905,7 @@ const SourceAttribute* SourceAttribute::getByKey(const char* key) const
 void SourceWeaponAttribute::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(showColor_, "showColor", "Отображение радиуса источника");
-	ar.serialize(isAutonomous_, "isAutonomous", "не выключать до окончания времени действия источника");
-	ar.serialize(positionDelta_, "positionDelta", "смещение");
+	ar.serialize(showColor_, "showColor", "РћС‚РѕР±СЂР°Р¶РµРЅРёРµ СЂР°РґРёСѓСЃР° РёСЃС‚РѕС‡РЅРёРєР°");
+	ar.serialize(isAutonomous_, "isAutonomous", "РЅРµ РІС‹РєР»СЋС‡Р°С‚СЊ РґРѕ РѕРєРѕРЅС‡Р°РЅРёСЏ РІСЂРµРјРµРЅРё РґРµР№СЃС‚РІРёСЏ РёСЃС‚РѕС‡РЅРёРєР°");
+	ar.serialize(positionDelta_, "positionDelta", "СЃРјРµС‰РµРЅРёРµ");
 }

@@ -544,9 +544,9 @@ bool UnitActing::isInvisible() const
 
 void UnitActing::setVisibility(bool visible, float time)
 {
-	// ���� ���� ���-�� ������������, �� ���� �����
-	// ���� ����� �� ������������, �� ���� ���� ��������� ��� ���-�� �����, �� �� �������
-	// ����� �������� �� ��������, �.�. ����� �������� �� ������� ������ ����������� �����������/����������
+	// если хоть кто-то подсвечивает, то юнит виден
+	// если никто не подсвечивает, то если юнит невидимка или кем-то скрыт, то он невидим
+	// одним таймером не обойтись, т.к. будет зависеть от порядка обхода действующих скрывателей/детекторов
 
 	if(!attr().canChangeVisibility)
 		return;
@@ -861,7 +861,7 @@ MovementState UnitActing::getMovementState()
 {
 	MovementState state;
 
-	// ���������� �������� ������������.
+	// Выставляем признаки поверхностей.
 	if(rigidBody()->onDeepWater())
 		if(water->isLava())
 			state.terrainType() |= ANIMATION_ON_LAVA;
@@ -1528,7 +1528,7 @@ void UnitActing::targetController()
 		break;
 
 	case ATTACK_MODE:
-		// ���� ����� ��������� ���� - �������� � ���� ������.
+		// Если убили указанную цель - работаем в авто режиме.
 		if(!fireTargetExist() || (targetUnit_ && !canAttackTarget(WeaponTarget(targetUnit_)))){
 			setUnitState(AUTO_MODE);
 			wayPointsClear();
@@ -2017,7 +2017,7 @@ void UnitActing::finishUpgrade()
 	
 	if(selected()){
 		universe()->changeSelection(this, unit);
-		unit->setSelected(true); // ������� ������� �������
+		unit->setSelected(true); // убирает мигание селекта
 		if(cameraManager->isVisible(position()))
 			universe()->addVisibleUnit(unit);
 	}
@@ -2036,7 +2036,7 @@ void UnitActing::finishUpgrade()
 	finishUpgradeTime_ = 0;
 	hide(HIDE_BY_UPGRADE, true);
 	Kill(); 
-	unit->setPose(pose(), true); // ��� �������������� ���������� ������
+	unit->setPose(pose(), true); // Для восстановления фундамента здания
 	if(attr().isBuilding())
 		unit->setShipmentPosition(shipmentPosition());
 }
@@ -2105,7 +2105,7 @@ void UnitActing::setDamage(const ParameterSet& damage, UnitBase* agressor, const
 	healthDamage.subPositiveOnly(armor);
 	parameters.subClamped(healthDamage);
 	
-	parameters.clamp(parametersMax()); // ���� ���� ������������� �������� - �������
+	parameters.clamp(parametersMax()); // Если были отрицательные величины - лечение
 
 	if(agressor && agressor->attr().isProjectile())
 		agressor = agressor->ignoredUnit();
@@ -2113,7 +2113,7 @@ void UnitActing::setDamage(const ParameterSet& damage, UnitBase* agressor, const
 	float healthMax = parametersMax().health();
 	if(prevHealth > 1.f && parameters.health() < 1.f){
 		unregisterInPlayerStatistics(agressor);
-		//xassert(agressor && "�� ���������� ���� ��� �������� ���������� �� ������");
+		//xassert(agressor && "Не установлен юнит для передачи параметров за гибель");
 		if(agressor){
 			ParameterArithmetics arithmetics = attr().deathGainArithmetics;
 			UnitActing* unit = safe_cast<UnitActing*>(agressor);
@@ -2141,7 +2141,7 @@ void UnitActing::setDamage(const ParameterSet& damage, UnitBase* agressor, const
 	}
 
 	if(wasPossessed && parameters.possession() < FLT_EPS){
-		//xassert(agressor && "�� ���������� ���� ��� ������ �������");
+		//xassert(agressor && "Не установлен юнит для оружия захвата");
 		if(agressor && player() != agressor->player()){
 			player()->checkEvent(EventUnitMyUnitEnemy(Event::CAPTURE_UNIT, this, agressor));
 			agressor->player()->checkEvent(EventUnitMyUnitEnemy(Event::CAPTURE_UNIT, this, agressor));
@@ -2359,7 +2359,7 @@ inline bool UnitActing::fireWeaponModeCheck(const WeaponBase* weapon) const
 		return weapon->isShortRange();
 	case LONG_RANGE:
 		return weapon->isLongRange();
-	case ANY_RANGE: // � ���� ������ ������ ��������� ����������� ���� ��������������.
+	case ANY_RANGE: // В этом режиме оружие считается недоступным если перезарежается.
 		return !weapon->weaponPrm()->clearTargetOnLoading() || !weapon->isLoading();
 	}
 
@@ -2809,7 +2809,7 @@ void UnitActing::weaponQuant()
 		weapon->moveQuant();
 	}
 
-	// ��������� �������� ���� �������� ������������� �������.
+	// Запретить движение если стреляет непрерываемым оружием.
 	makeDynamicXY(STATIC_DUE_TO_WEAPON);
 	if(!isDirectControl())
 		for(WeaponSlots::const_iterator it = weaponSlots_.begin(); it != weaponSlots_.end(); ++it){
@@ -2924,7 +2924,7 @@ Vect3f UnitActing::specialFirePosition() const
 	else if(specialTargetUnit_)
 		return specialTargetUnit_->position();
 
-	return position(); // ���� ��������� �� ������
+	return position(); // сюда приходить не должно
 }
 
 bool UnitActing::fireDistanceCheck() const

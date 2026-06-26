@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "KeysBase.h"
 
-float KeyBase::time_delta=0.05f;//в секундах
+float KeyBase::time_delta=0.05f;//РІ СЃРµРєСѓРЅРґР°С…
 KeyColor::value KeyColor::none(0,0,0,0);
 
 void KeyBase::serialize(Archive& ar)
@@ -13,7 +13,7 @@ void KeyColor::serialize(Archive& ar)
 {
 	KeyBase::serialize(ar);
 	Color4f color (r, g, b, a);
-	ar.serialize(color, "color", "Цвет");
+	ar.serialize(color, "color", "Р¦РІРµС‚");
 	r = color.r;
 	g = color.g;
 	b = color.b;

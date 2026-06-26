@@ -31,32 +31,32 @@ UI_MarkObjectAttribute::UI_MarkObjectAttribute()
 
 void UI_MarkObjectAttribute::serialize(Archive& ar)
 {
-	if(ar.openBlock("model", "модель")){
-		ar.serialize(ModelSelector(modelName_), "modelName", "имя модели");
+	if(ar.openBlock("model", "РјРѕРґРµР»СЊ")){
+		ar.serialize(ModelSelector(modelName_), "modelName", "РёРјСЏ РјРѕРґРµР»Рё");
 		linkNode_.setName(modelName_.c_str());
 		if(ar.isInput())
 			setComboList(modelName_.c_str());
-		ar.serialize(modelScale_, "modelScale", "масштаб модели");
-		ar.serialize(animationName_, "animationName", "анимация");
-		ar.serialize(linkNode_, "linkNode", "место линковки связи");
-		ar.serialize(animationPeriod_, "animationPeriod", "период анимации (секунды)");
-		ar.serialize(animateByAttack_, "animateByAttack", "анимировать при нажатой атаке");
+		ar.serialize(modelScale_, "modelScale", "РјР°СЃС€С‚Р°Р± РјРѕРґРµР»Рё");
+		ar.serialize(animationName_, "animationName", "Р°РЅРёРјР°С†РёСЏ");
+		ar.serialize(linkNode_, "linkNode", "РјРµСЃС‚Рѕ Р»РёРЅРєРѕРІРєРё СЃРІСЏР·Рё");
+		ar.serialize(animationPeriod_, "animationPeriod", "РїРµСЂРёРѕРґ Р°РЅРёРјР°С†РёРё (СЃРµРєСѓРЅРґС‹)");
+		ar.serialize(animateByAttack_, "animateByAttack", "Р°РЅРёРјРёСЂРѕРІР°С‚СЊ РїСЂРё РЅР°Р¶Р°С‚РѕР№ Р°С‚Р°РєРµ");
 		if(!animateByAttack_ && animationPeriod_ > 0.1f)
-			ar.serialize(finishAnimation_, "finishAnimation", "доигрывать анимацию");
+			ar.serialize(finishAnimation_, "finishAnimation", "РґРѕРёРіСЂС‹РІР°С‚СЊ Р°РЅРёРјР°С†РёСЋ");
 		ar.closeBlock();
 	}
 
-	ar.serialize(effect_, "effect", "спецэффект");
-	ar.serialize(synchronizeWithModel_, "synchronizeWithModel", "синхронизировать эффект с анимацией модели");
+	ar.serialize(effect_, "effect", "СЃРїРµС†СЌС„С„РµРєС‚");
+	ar.serialize(synchronizeWithModel_, "synchronizeWithModel", "СЃРёРЅС…СЂРѕРЅРёР·РёСЂРѕРІР°С‚СЊ СЌС„С„РµРєС‚ СЃ Р°РЅРёРјР°С†РёРµР№ РјРѕРґРµР»Рё");
 
 	static ResourceSelector::Options options("*.cur", "Resource\\Cursors", "Cursors");
-	ar.serialize(ResourceSelector(cursorfileName_, options), "cursorfileName", "Имя файла с курсором");
+	ar.serialize(ResourceSelector(cursorfileName_, options), "cursorfileName", "РРјСЏ С„Р°Р№Р»Р° СЃ РєСѓСЂСЃРѕСЂРѕРј");
 	if(ar.isInput())
 		cursorProxy_.createCursor(cursorfileName_.c_str());
 
-	ar.serialize(rotateWithCamera_, "rotateWithCamera", "поворачивать отметку вместе с камерой");
+	ar.serialize(rotateWithCamera_, "rotateWithCamera", "РїРѕРІРѕСЂР°С‡РёРІР°С‚СЊ РѕС‚РјРµС‚РєСѓ РІРјРµСЃС‚Рµ СЃ РєР°РјРµСЂРѕР№");
 
-	ar.serialize(lifeTime_, "lifeTime", "время жизни в секундах");
+	ar.serialize(lifeTime_, "lifeTime", "РІСЂРµРјСЏ Р¶РёР·РЅРё РІ СЃРµРєСѓРЅРґР°С…");
 }
 
 void UI_MarkObjectAttribute::setComboList(const char* model_name)

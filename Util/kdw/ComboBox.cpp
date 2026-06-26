@@ -14,7 +14,7 @@
 
 namespace kdw{
 
-REGISTER_CLASS(Widget, ComboBox, "Выпадающий список")
+REGISTER_CLASS(Widget, ComboBox, "Р’С‹РїР°РґР°СЋС‰РёР№ СЃРїРёСЃРѕРє")
 
 class ComboBoxImpl : public _WidgetWindow{
 public:
@@ -313,10 +313,10 @@ void ComboBox::_setFocus()
 }
 void ComboBox::serialize(Archive& ar)
 {
-	ar.serialize(items_, "items", "Элементы");
-	ar.serialize(selectedIndex_, "selectedIndex", "&Выбранный элемент");
-	ar.serialize(dropDownHeight_, "dropDownHeight_", "Высота списка");
-	ar.serialize(expandByContent_, "expandByContent", "Расширять по содержимому");
+	ar.serialize(items_, "items", "Р­Р»РµРјРµРЅС‚С‹");
+	ar.serialize(selectedIndex_, "selectedIndex", "&Р’С‹Р±СЂР°РЅРЅС‹Р№ СЌР»РµРјРµРЅС‚");
+	ar.serialize(dropDownHeight_, "dropDownHeight_", "Р’С‹СЃРѕС‚Р° СЃРїРёСЃРєР°");
+	ar.serialize(expandByContent_, "expandByContent", "Р Р°СЃС€РёСЂСЏС‚СЊ РїРѕ СЃРѕРґРµСЂР¶РёРјРѕРјСѓ");
 	Widget::serialize(ar);
 }
 

@@ -164,7 +164,7 @@ private:
 
 void FormulaString::serialize (Archive& ar) 
 {
-    ar.serialize(formula_, "formula", "^<Ôîðìóëà");
+    ar.serialize(formula_, "formula", "^<Ð¤Ð¾Ñ€Ð¼ÑƒÐ»Ð°");
 }
 
 

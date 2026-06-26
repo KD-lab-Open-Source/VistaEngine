@@ -41,7 +41,7 @@ void ChainName::update()
 	index_ = model->GetChainIndex(name_);
 	if(index_ == -1){
 		if(strcmp(name_, "main") != 0)
-			kdWarning("&units", XBuffer(1024, 1) < /*TRANSLATE*/("Анимационная цепочка не найдена : ") < model->GetFileName() < " : " < name_);
+			kdWarning("&units", XBuffer(1024, 1) < /*TRANSLATE*/("РђРЅРёРјР°С†РёРѕРЅРЅР°СЏ С†РµРїРѕС‡РєР° РЅРµ РЅР°Р№РґРµРЅР° : ") < model->GetFileName() < " : " < name_);
 
 		name_ = model->GetChain(index_ = 0)->name.c_str();
 	}

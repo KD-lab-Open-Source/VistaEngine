@@ -130,7 +130,7 @@ void RenderWindow::setListenForMessage(bool listen)
 
 void RenderWindow::onIdle()
 {
-	// вызывается, когда приложение не получает сообщений
+	// РІС‹Р·С‹РІР°РµС‚СЃСЏ, РєРѕРіРґР° РїСЂРёР»РѕР¶РµРЅРёРµ РЅРµ РїРѕР»СѓС‡Р°РµС‚ СЃРѕРѕР±С‰РµРЅРёР№
 	if(owner_->parent() && owner_->parent()->isActive() && renderWindow_ && ::IsWindowVisible(*this)){
 		redraw();
 	}
@@ -476,9 +476,9 @@ void Viewport::serialize(Archive& ar)
 {
 	if(ar.filter(SERIALIZE_DESIGN)){
 		ar.serialize(_property(continuousUpdate_, this, &Viewport::setContinuousUpdate),
-							"continuousUpdate", "Непрерывно обновлять");
-		ar.serialize(fillColor_, "fillColor", "Цвет фона");
-		ar.serialize(showFocusFrame_, "showFocusFrame", "Показывать рамку фокуса");
+							"continuousUpdate", "РќРµРїСЂРµСЂС‹РІРЅРѕ РѕР±РЅРѕРІР»СЏС‚СЊ");
+		ar.serialize(fillColor_, "fillColor", "Р¦РІРµС‚ С„РѕРЅР°");
+		ar.serialize(showFocusFrame_, "showFocusFrame", "РџРѕРєР°Р·С‹РІР°С‚СЊ СЂР°РјРєСѓ С„РѕРєСѓСЃР°");
 	}
 	Widget::serialize(ar);
 }

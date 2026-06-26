@@ -22,22 +22,22 @@ enum eShowType
 class RENDER_API cVisGeneric : public UnknownClass
 {
 public:
-	// инициализационная часть 
+	// РёРЅРёС†РёР°Р»РёР·Р°С†РёРѕРЅРЅР°СЏ С‡Р°СЃС‚СЊ 
 	cVisGeneric(bool multiThread);
 	virtual ~cVisGeneric();
 	cInterfaceRenderDevice* GetRenderDevice();
-	// функции для работы со сценой
+	// С„СѓРЅРєС†РёРё РґР»СЏ СЂР°Р±РѕС‚С‹ СЃРѕ СЃС†РµРЅРѕР№
 	virtual cScene* CreateScene();
 
 	void serialize(Archive& ar);
 	void editOption();
 
-	// функции для работы со спрайтами
+	// С„СѓРЅРєС†РёРё РґР»СЏ СЂР°Р±РѕС‚С‹ СЃРѕ СЃРїСЂР°Р№С‚Р°РјРё
 	virtual cTexture* CreateTexture(const char *TextureName);
-	virtual cTexture* CreateTexture(int sizex,int sizey,bool alpha);//Всегда 32 битная текстура
+	virtual cTexture* CreateTexture(int sizex,int sizey,bool alpha);//Р’СЃРµРіРґР° 32 Р±РёС‚РЅР°СЏ С‚РµРєСЃС‚СѓСЂР°
 	virtual cTexture* CreateRenderTexture(int width,int height,int attr=0,bool enable_assert=true);
 
-	//Возвращает 32 битную текстуру, в которой хранится изображение экрана.
+	//Р’РѕР·РІСЂР°С‰Р°РµС‚ 32 Р±РёС‚РЅСѓСЋ С‚РµРєСЃС‚СѓСЂСѓ, РІ РєРѕС‚РѕСЂРѕР№ С…СЂР°РЅРёС‚СЃСЏ РёР·РѕР±СЂР°Р¶РµРЅРёРµ СЌРєСЂР°РЅР°.
 	virtual cTexture* CreateTextureScreen();
 
 	void SetEffectLibraryPath(const char* effect_path,const char* texture_path);
@@ -51,8 +51,8 @@ public:
 	int GetAnisotropic();
 	int GetMaxAnisotropyLevel();
 
-	//Уровень детализации трехмерных текстур. 
-	//0 - просто читается с диска. 1 - в 2 раза меньше, и т.д.
+	//РЈСЂРѕРІРµРЅСЊ РґРµС‚Р°Р»РёР·Р°С†РёРё С‚СЂРµС…РјРµСЂРЅС‹С… С‚РµРєСЃС‚СѓСЂ. 
+	//0 - РїСЂРѕСЃС‚Рѕ С‡РёС‚Р°РµС‚СЃСЏ СЃ РґРёСЃРєР°. 1 - РІ 2 СЂР°Р·Р° РјРµРЅСЊС€Рµ, Рё С‚.Рґ.
 	void SetTextureDetailLevel(int level);
 	int GetTextureDetailLevel();
 
@@ -61,25 +61,25 @@ public:
 	bool PossibilityShadowMapSelf4x4();
 	void SetShadowMapSelf4x4(bool b4x4);
 
-	//Выбирает тени для объектов - OST_SHADOW_NONE - нет теней, 
-	//OST_SHADOW_CIRCLE - есть тени кружочками для всех объектов, для которых OST_SHADOW_CIRCLE или OST_SHADOW_REAL
-	//OST_SHADOW_REAL - тени как они указаны в параметрах объекта.
+	//Р’С‹Р±РёСЂР°РµС‚ С‚РµРЅРё РґР»СЏ РѕР±СЉРµРєС‚РѕРІ - OST_SHADOW_NONE - РЅРµС‚ С‚РµРЅРµР№, 
+	//OST_SHADOW_CIRCLE - РµСЃС‚СЊ С‚РµРЅРё РєСЂСѓР¶РѕС‡РєР°РјРё РґР»СЏ РІСЃРµС… РѕР±СЉРµРєС‚РѕРІ, РґР»СЏ РєРѕС‚РѕСЂС‹С… OST_SHADOW_CIRCLE РёР»Рё OST_SHADOW_REAL
+	//OST_SHADOW_REAL - С‚РµРЅРё РєР°Рє РѕРЅРё СѓРєР°Р·Р°РЅС‹ РІ РїР°СЂР°РјРµС‚СЂР°С… РѕР±СЉРµРєС‚Р°.
 	void SetMaximalShadowObject(ObjectShadowType type);
 	ObjectShadowType GetMaximalShadowObject()const{return maximal_shadow_object;}
 
 
-	//Попиксельно либо повертексно вычислять освещение для земли.
+	//РџРѕРїРёРєСЃРµР»СЊРЅРѕ Р»РёР±Рѕ РїРѕРІРµСЂС‚РµРєСЃРЅРѕ РІС‹С‡РёСЃР»СЏС‚СЊ РѕСЃРІРµС‰РµРЅРёРµ РґР»СЏ Р·РµРјР»Рё.
 	void setTileMapVertexLight(bool vertexLight);
 
-	//Включить мелкодетальную текстуру.
+	//Р’РєР»СЋС‡РёС‚СЊ РјРµР»РєРѕРґРµС‚Р°Р»СЊРЅСѓСЋ С‚РµРєСЃС‚СѓСЂСѓ.
 	void SetTilemapDetail(bool b);
 	bool GetTilemapDetail();
 
-	void SetMapLevel(float);//0..100 Детализация карты.
+	void SetMapLevel(float);//0..100 Р”РµС‚Р°Р»РёР·Р°С†РёСЏ РєР°СЂС‚С‹.
 
-	//Силуэты у объектов. Если центр объекта не видим, 
-	//и он закрывается землёй либо оъкектом, который не может генерировать силуэт,
-	//то силуэт видим.
+	//РЎРёР»СѓСЌС‚С‹ Сѓ РѕР±СЉРµРєС‚РѕРІ. Р•СЃР»Рё С†РµРЅС‚СЂ РѕР±СЉРµРєС‚Р° РЅРµ РІРёРґРёРј, 
+	//Рё РѕРЅ Р·Р°РєСЂС‹РІР°РµС‚СЃСЏ Р·РµРјР»С‘Р№ Р»РёР±Рѕ РѕСЉРєРµРєС‚РѕРј, РєРѕС‚РѕСЂС‹Р№ РЅРµ РјРѕР¶РµС‚ РіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ СЃРёР»СѓСЌС‚,
+	//С‚Рѕ СЃРёР»СѓСЌС‚ РІРёРґРёРј.
 	void EnableSilhouettes(bool enable); 
 	bool IsSilhouettesEnabled() const { return silhouettes_enabled; }
 	void SetSilhouetteColor(int index, Color4c color);
@@ -111,29 +111,29 @@ public:
 	void SetUseLogicQuant(bool use){use_logic_quant=use;}
 	bool GetUseLogicQuant(){return use_logic_quant;}
 
-	//Только в логическом потоке
+	//РўРѕР»СЊРєРѕ РІ Р»РѕРіРёС‡РµСЃРєРѕРј РїРѕС‚РѕРєРµ
 	void SetLogicQuant(int quant){logic_quant=quant;}
 	int GetLogicQuant(){return logic_quant;};
 
-	//Только в графическом потоке
+	//РўРѕР»СЊРєРѕ РІ РіСЂР°С„РёС‡РµСЃРєРѕРј РїРѕС‚РѕРєРµ
 	void SetGraphLogicQuant(int quant){graph_logic_quant=quant;}
 	int GetGraphLogicQuant(){return graph_logic_quant;};
 
 	void SetGlobalParticleRate(float r);
 
-	//Для эффектов, которые автоматически аттачатся к моделям.
+	//Р”Р»СЏ СЌС„С„РµРєС‚РѕРІ, РєРѕС‚РѕСЂС‹Рµ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё Р°С‚С‚Р°С‡Р°С‚СЃСЏ Рє РјРѕРґРµР»СЏРј.
 	const char* GetEffectPath()const{return effect_path.c_str();};
 	const char* GetEffectTexturePath()const{return effect_texture_path.c_str();};
 
 	class cLib3dx* GetObjLib(){return Lib3dx;}
 
-	//Модель может исчезать в зависимости от расстояния.
+	//РњРѕРґРµР»СЊ РјРѕР¶РµС‚ РёСЃС‡РµР·Р°С‚СЊ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ СЂР°СЃСЃС‚РѕСЏРЅРёСЏ.
 	float GetHideFactor();
 	void SetHideFactor(float hide_factor);
 	bool GetHideSmoothly();
-	void SetHideSmoothly(bool hideSmoothly);//true - модель исчезает становясь постепенно прозрачной.
+	void SetHideSmoothly(bool hideSmoothly);//true - РјРѕРґРµР»СЊ РёСЃС‡РµР·Р°РµС‚ СЃС‚Р°РЅРѕРІСЏСЃСЊ РїРѕСЃС‚РµРїРµРЅРЅРѕ РїСЂРѕР·СЂР°С‡РЅРѕР№.
 	float GetHideRange();
-	void SetHideRange(float hide_range);//Только если HideSmoothly=true. За какой промежуток расстояния модель исчезает.
+	void SetHideRange(float hide_range);//РўРѕР»СЊРєРѕ РµСЃР»Рё HideSmoothly=true. Р—Р° РєР°РєРѕР№ РїСЂРѕРјРµР¶СѓС‚РѕРє СЂР°СЃСЃС‚РѕСЏРЅРёСЏ РјРѕРґРµР»СЊ РёСЃС‡РµР·Р°РµС‚.
 
 	bool GetShadowTSM();
 	void SetShadowTSM(bool enable);

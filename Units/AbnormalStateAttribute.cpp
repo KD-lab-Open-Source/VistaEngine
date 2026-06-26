@@ -4,9 +4,9 @@
 #include "UnitAttribute.h"
 #include "Serialization/SerializationFactory.h"
 
-WRAP_LIBRARY(ExplodeTable, "ExplodeTable", "Типы взрывов", "Scripts\\Engine\\ExplodeTable", 0, 0);
+WRAP_LIBRARY(ExplodeTable, "ExplodeTable", "РўРёРїС‹ РІР·СЂС‹РІРѕРІ", "Scripts\\Engine\\ExplodeTable", 0, 0);
 
-WRAP_LIBRARY(AbnormalStateTypeTable, "AbnormalStateType", "Типы воздействий", "Scripts\\Content\\AbnormalStateType", 1, LIBRARY_EDITABLE);
+WRAP_LIBRARY(AbnormalStateTypeTable, "AbnormalStateType", "РўРёРїС‹ РІРѕР·РґРµР№СЃС‚РІРёР№", "Scripts\\Content\\AbnormalStateType", 1, LIBRARY_EDITABLE);
 
 REGISTER_CLASS(DeathAttribute, DeathAttribute, "DeathAttribute")
 
@@ -38,11 +38,11 @@ void AbnormalStateType::serialize(Archive& ar)
 {
 	if(ar.isInput() && !ar.isEdit()){
 		mask_ = 1 << maskCounter_++;
-		xassert(maskCounter_ <= 31 && "Общее количество воздействий должно быть меньше 32");
+		xassert(maskCounter_ <= 31 && "РћР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РІРѕР·РґРµР№СЃС‚РІРёР№ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РјРµРЅСЊС€Рµ 32");
 	}
 
 	StringTableBase::serialize(ar);
-	ar.serialize(priority, "priority", "&Приоритет");
+	ar.serialize(priority, "priority", "&РџСЂРёРѕСЂРёС‚РµС‚");
 }
 
 // -----------------------------------------
@@ -55,13 +55,13 @@ DeathAttribute::DeathAttribute()
 
 void DeathAttribute::serialize(Archive& ar)
 {
-	ar.serialize(explodeReference, "explodeReference", "Тип смерти");
-	ar.serialize(explodeFactor, "explodeFactor", "Коэффициент мощности взрыва");
-	ar.serialize(effectAttr, "effectAttr", "Эффект для осколков");
-	ar.serialize(effectAttrFly, "effectAttrFly", "Эффект на трупе");
-	ar.serialize(enableExplodeFantom, "enableExplodeFantom", "Оставлять осколки на мире");
+	ar.serialize(explodeReference, "explodeReference", "РўРёРї СЃРјРµСЂС‚Рё");
+	ar.serialize(explodeFactor, "explodeFactor", "РљРѕСЌС„С„РёС†РёРµРЅС‚ РјРѕС‰РЅРѕСЃС‚Рё РІР·СЂС‹РІР°");
+	ar.serialize(effectAttr, "effectAttr", "Р­С„С„РµРєС‚ РґР»СЏ РѕСЃРєРѕР»РєРѕРІ");
+	ar.serialize(effectAttrFly, "effectAttrFly", "Р­С„С„РµРєС‚ РЅР° С‚СЂСѓРїРµ");
+	ar.serialize(enableExplodeFantom, "enableExplodeFantom", "РћСЃС‚Р°РІР»СЏС‚СЊ РѕСЃРєРѕР»РєРё РЅР° РјРёСЂРµ");
 
-	ar.serialize(sources, "sources", "Источники, остающиеся после гибели");
+	ar.serialize(sources, "sources", "РСЃС‚РѕС‡РЅРёРєРё, РѕСЃС‚Р°СЋС‰РёРµСЃСЏ РїРѕСЃР»Рµ РіРёР±РµР»Рё");
 }
 
 // -----------------------------------------
@@ -79,15 +79,15 @@ AbnormalStateEffect::~AbnormalStateEffect()
 
 void AbnormalStateEffect::serialize(Archive& ar)
 {
-	ar.serialize(type_, "type", "&тип");
+	ar.serialize(type_, "type", "&С‚РёРї");
 
-	ar.serialize(effectColor_, "effectColor", "цвет юнита");
-	ar.serialize(effectAttribute_, "effectAttribute", "эффект");
-	ar.serialize(soundReference_, "soundReference", "звук");
+	ar.serialize(effectColor_, "effectColor", "С†РІРµС‚ СЋРЅРёС‚Р°");
+	ar.serialize(effectAttribute_, "effectAttribute", "СЌС„С„РµРєС‚");
+	ar.serialize(soundReference_, "soundReference", "Р·РІСѓРє");
 
 	if(!ar.inPlace()){
 		bool hasDeathAttribute = deathAttribute_ != 0;
-		ar.serialize(hasDeathAttribute, "hasDeathAttribute", "свои настройки гибели");
+		ar.serialize(hasDeathAttribute, "hasDeathAttribute", "СЃРІРѕРё РЅР°СЃС‚СЂРѕР№РєРё РіРёР±РµР»Рё");
 		if(hasDeathAttribute && !deathAttribute_)
 			deathAttribute_ = new DeathAttribute;
 		else if(!hasDeathAttribute && deathAttribute_){
@@ -95,10 +95,10 @@ void AbnormalStateEffect::serialize(Archive& ar)
 			deathAttribute_ = 0;
 		}
 		if(deathAttribute_)
-			ar.serialize(*deathAttribute_, "deathAttribute", "Гибель");
+			ar.serialize(*deathAttribute_, "deathAttribute", "Р“РёР±РµР»СЊ");
 	}
 	else
-		ar.serializePolymorphic(deathAttribute_, "deathAttribute", "Гибель");
+		ar.serializePolymorphic(deathAttribute_, "deathAttribute", "Р“РёР±РµР»СЊ");
 }
 
 // -----------------------------------------
@@ -114,21 +114,21 @@ AbnormalStateAttribute::AbnormalStateAttribute()
 
 void AbnormalStateAttribute::serialize(Archive& ar)
 {
-	ar.serialize(type_, "type", "&тип");
+	ar.serialize(type_, "type", "&С‚РёРї");
 
-	ar.serialize(duration_, "duration", "длительность действия");
-	ar.serialize(durationRnd_, "durationRnd", "разброс длительности действия");
+	ar.serialize(duration_, "duration", "РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ РґРµР№СЃС‚РІРёСЏ");
+	ar.serialize(durationRnd_, "durationRnd", "СЂР°Р·Р±СЂРѕСЃ РґР»РёС‚РµР»СЊРЅРѕСЃС‚Рё РґРµР№СЃС‚РІРёСЏ");
 
 	damage_ *= 1.f/logicPeriodSeconds;
-	ar.serialize(damage_, "damage", "повреждения в секунду");
+	ar.serialize(damage_, "damage", "РїРѕРІСЂРµР¶РґРµРЅРёСЏ РІ СЃРµРєСѓРЅРґСѓ");
 	damage_ *= logicPeriodSeconds;
 
-	ar.serialize(useArithmetics_, "useArithmetics", "Использовать арифметику");
+	ar.serialize(useArithmetics_, "useArithmetics", "РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ Р°СЂРёС„РјРµС‚РёРєСѓ");
 	if(useArithmetics_ || ar.inPlace())
-		ar.serialize(arithmetics_, "arithmetics", "Арифметика");
+		ar.serialize(arithmetics_, "arithmetics", "РђСЂРёС„РјРµС‚РёРєР°");
 	
-	ar.serialize(freeze_, "freeze", "Замораживать");
-	ar.serialize(freezeAttack_, "freezeAttack", "Замороженный юнит может двигаться");
+	ar.serialize(freeze_, "freeze", "Р—Р°РјРѕСЂР°Р¶РёРІР°С‚СЊ");
+	ar.serialize(freezeAttack_, "freezeAttack", "Р—Р°РјРѕСЂРѕР¶РµРЅРЅС‹Р№ СЋРЅРёС‚ РјРѕР¶РµС‚ РґРІРёРіР°С‚СЊСЃСЏ");
 }
 
 void AbnormalStateAttribute::applyParameterArithmetics(const ArithmeticsData& arithmetics)

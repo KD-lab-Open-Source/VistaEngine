@@ -15,7 +15,7 @@ struct sPolygon
 	void serialize(Archive& ar);
 };
 
-//Если число - степень двойки, возвращает эту степень.
+//Р•СЃР»Рё С‡РёСЃР»Рѕ - СЃС‚РµРїРµРЅСЊ РґРІРѕР№РєРё, РІРѕР·РІСЂР°С‰Р°РµС‚ СЌС‚Сѓ СЃС‚РµРїРµРЅСЊ.
 inline int ReturnBit(int a)
 {
 	int count=0;
@@ -23,13 +23,13 @@ inline int ReturnBit(int a)
 	return count;
 }
 
-//Проверяет - является ли число степенью двойки и больше нуля.
+//РџСЂРѕРІРµСЂСЏРµС‚ - СЏРІР»СЏРµС‚СЃСЏ Р»Рё С‡РёСЃР»Рѕ СЃС‚РµРїРµРЅСЊСЋ РґРІРѕР№РєРё Рё Р±РѕР»СЊС€Рµ РЅСѓР»СЏ.
 inline bool IsPositivePower2(int a)
 {
 	return !((a-1)&a) && a>0;
 }
 
-//Возвращает минимальное число,являющееся степенью двойки и не меньше, чем n
+//Р’РѕР·РІСЂР°С‰Р°РµС‚ РјРёРЅРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ,СЏРІР»СЏСЋС‰РµРµСЃСЏ СЃС‚РµРїРµРЅСЊСЋ РґРІРѕР№РєРё Рё РЅРµ РјРµРЅСЊС€Рµ, С‡РµРј n
 inline int Power2up(int n)
 {
 	int i=1;
@@ -90,7 +90,7 @@ inline float bilinear(const float p00, const float p01, const float p10, const f
 	return p;
 }
 
-//Разница в том, что считать единицей = 255 или 256
+//Р Р°Р·РЅРёС†Р° РІ С‚РѕРј, С‡С‚Рѕ СЃС‡РёС‚Р°С‚СЊ РµРґРёРЅРёС†РµР№ = 255 РёР»Рё 256
 inline BYTE ByteInterpolate256(BYTE a,BYTE b,BYTE factor)
 {
 	return a+((int(b-a))*int(factor)>>8);
@@ -108,8 +108,8 @@ inline BYTE bilinear(BYTE p00,BYTE p01,BYTE p10,BYTE p11,BYTE cx,BYTE cy)
 	return p;
 }
 
-//Строит ортогональную матрицу, ось y которой совпадает с direction_front
-//ось z практически перпендикулярна direction_up
+//РЎС‚СЂРѕРёС‚ РѕСЂС‚РѕРіРѕРЅР°Р»СЊРЅСѓСЋ РјР°С‚СЂРёС†Сѓ, РѕСЃСЊ y РєРѕС‚РѕСЂРѕР№ СЃРѕРІРїР°РґР°РµС‚ СЃ direction_front
+//РѕСЃСЊ z РїСЂР°РєС‚РёС‡РµСЃРєРё РїРµСЂРїРµРЅРґРёРєСѓР»СЏСЂРЅР° direction_up
 void MatrixGrandSmittNormalizationYZ(Mat3f& out,Vect3f direction_front,Vect3f direction_up);
 
 #endif // __UMATH_H__

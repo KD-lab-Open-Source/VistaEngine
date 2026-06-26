@@ -31,7 +31,7 @@ void Player::UpdateStructureAccessible()
 			const AttributeBuilding& attr = *safe_cast<const AttributeBuilding*>(unitAttribute(evolution_id));
 			EnableData& evolution = GetEvolutionBuildingData(evolution_id);
 			bool enabled = true;
-			// Если уже есть построенная структура, то не требуется иметь downgrade
+			// Р•СЃР»Рё СѓР¶Рµ РµСЃС‚СЊ РїРѕСЃС‚СЂРѕРµРЅРЅР°СЏ СЃС‚СЂСѓРєС‚СѓСЂР°, С‚Рѕ РЅРµ С‚СЂРµР±СѓРµС‚СЃСЏ РёРјРµС‚СЊ downgrade
 			terUnitAttributeID downgrade_id = countUnits(evolution_id) ? attr.downgrade() : UNIT_ATTRIBUTE_NONE;
 			for(int j = 0; j < attr.EnableStructure.size(); j++){
 				terUnitAttributeID id = attr.EnableStructure[j];
@@ -58,7 +58,7 @@ void Player::UpdateStructureAccessible()
 				}
 			}
 			
-			// Устанавливаем Requested и Construction независимо от Enable
+			// РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј Requested Рё Construction РЅРµР·Р°РІРёСЃРёРјРѕ РѕС‚ Enable
 			Buildings::iterator bi;
 			int downgrades_constructed = 0;
 			FOR_EACH(BuildingList[i], bi){
@@ -96,7 +96,7 @@ UnitBuilding* Player::buildStructure(const AttributeBuilding* buildingAttr, cons
 	//		return 0;
 	//}
 	if(resource_.empty()){
-		//xassert(0 && "Нет ресурса у игрока");
+		//xassert(0 && "РќРµС‚ СЂРµСЃСѓСЂСЃР° Сѓ РёРіСЂРѕРєР°");
 		return 0;
 	}
 

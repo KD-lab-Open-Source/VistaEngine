@@ -87,7 +87,7 @@ private:
 };
 
 /////////////////////////////////////////////////
-//		Регистрация enums
+//		Р РµРіРёСЃС‚СЂР°С†РёСЏ enums
 /////////////////////////////////////////////////
 template<class Enum>
 const EnumDescriptor& getEnumDescriptor(const Enum& key);
@@ -108,7 +108,7 @@ const EnumDescriptor& getEnumDescriptor(const Enum& key);
 		return descriptor;	\
 	}
 
-// Для enums, закрытых классами
+// Р”Р»СЏ enums, Р·Р°РєСЂС‹С‚С‹С… РєР»Р°СЃСЃР°РјРё
 #define BEGIN_ENUM_DESCRIPTOR_ENCLOSED(nameSpace, enumType, enumName)	\
 	struct Enum##nameSpace##enumType : EnumDescriptor { Enum##nameSpace##enumType(); }; \
 	Enum##nameSpace##enumType::Enum##nameSpace##enumType() : EnumDescriptor(typeid(nameSpace::enumType).name(), enumName) {
@@ -125,7 +125,7 @@ const EnumDescriptor& getEnumDescriptor(const Enum& key);
 
 
 /////////////////////////////////////////////////
-//	Вспомогательные функции для отображения
+//	Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
 /////////////////////////////////////////////////
 template<class Enum>
 const char* getEnumName(const Enum& key) {

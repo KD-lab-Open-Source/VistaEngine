@@ -25,9 +25,9 @@ public:
     FOW_HANDLE createVisible();
     void deleteVisible(FOW_HANDLE handle);
 
-    void moveVisible(FOW_HANDLE handle, int x, int y, int radius);//������ �������� ����� ���������� �������
+    void moveVisible(FOW_HANDLE handle, int x, int y, int radius);//Радиус включает всебя переходную область
 
-	//moveVisibleOuterRadius ���������� ������� ��� �������
+	//moveVisibleOuterRadius Переходная область вне радиуса
 	void moveVisibleOuterRadius(FOW_HANDLE handle, int x, int y, int radius);
 
 	static int maxSightRadius();
@@ -61,16 +61,16 @@ private:
 
 	Vect2i size;
 	char* raw_data;
-	char* tilemap;//������� �� ������� ����
-	char* scoutmap;//������� �� ���������� �����
-	char* summarymap;//����� ��������� ��� �������
+	char* tilemap;//Видимое на текущий кадр
+	char* scoutmap;//Видимое на предыдущие кадры
+	char* summarymap;//Карта видимости для графики
 	BackVector<One> objects_;
 	FogOfWar* fogOfWar_;
 
 	mutable MTSection lock_;
 };
 
-/// ����� ����� - ��������� �������� ������ �����. ������ ��� �������� ����������� � �������� ��� ������� �������.
+/// Туман войны - заполняет текстуру тумана войны. Дальше это текстура применяется в шейдерах для каждого объекта.
 class FogOfWar : public BaseGraphObject
 {
 public:
@@ -99,8 +99,8 @@ public:
 	const FogOfWarMap* GetSelectedMap() const{ return selected_map; }
 
 	float GetInvFogAlpha(){return invAlpha;}
-	Color4c GetFogColor(){ return fogColor_; } // ���� � ������������ ������ � ������������� �������.
-	int scoutAreaAlpha() const { return scoutAreaAlpha_; } // ������������� ������������ �������, ������� ����������.
+	Color4c GetFogColor(){ return fogColor_; } // Цвет и прозрачность тумана в неразведанной области.
+	int scoutAreaAlpha() const { return scoutAreaAlpha_; } // Относительная прозрачность области, которая разведанна.
 
 	cTexture* GetTexture(){return texture_;}
 

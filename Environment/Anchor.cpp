@@ -12,9 +12,9 @@
 UNIT_LINK_GET(Anchor);
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(Anchor, Type, "Type")
-REGISTER_ENUM_ENCLOSED(Anchor, GENERAL, "Общий");
-REGISTER_ENUM_ENCLOSED(Anchor, START_LOCATION, "Стартовая точка");
-REGISTER_ENUM_ENCLOSED(Anchor, MINIMAP_MARK, "Отметка на миникарте");
+REGISTER_ENUM_ENCLOSED(Anchor, GENERAL, "РћР±С‰РёР№");
+REGISTER_ENUM_ENCLOSED(Anchor, START_LOCATION, "РЎС‚Р°СЂС‚РѕРІР°СЏ С‚РѕС‡РєР°");
+REGISTER_ENUM_ENCLOSED(Anchor, MINIMAP_MARK, "РћС‚РјРµС‚РєР° РЅР° РјРёРЅРёРєР°СЂС‚Рµ");
 END_ENUM_DESCRIPTOR_ENCLOSED(Anchor, Type)
 
 struct UI_MinimapSymbolPolymorphic : public UI_MinimapSymbol, public PolymorphicBase {
@@ -23,7 +23,7 @@ struct UI_MinimapSymbolPolymorphic : public UI_MinimapSymbol, public Polymorphic
 	}
 };
 
-REGISTER_CLASS(UI_MinimapSymbolPolymorphic, UI_MinimapSymbolPolymorphic, "Символ на миникарте");
+REGISTER_CLASS(UI_MinimapSymbolPolymorphic, UI_MinimapSymbolPolymorphic, "РЎРёРјРІРѕР» РЅР° РјРёРЅРёРєР°СЂС‚Рµ");
 
 Anchor::Anchor(bool doNotRegister)
 : type_(GENERAL)
@@ -73,16 +73,16 @@ void Anchor::serialize(Archive& ar)
 
 	ar.serialize(type_, "type", 0);
 	if(!ar.isEdit())
-		ar.serialize(pose_, "pose", "Позиция");
+		ar.serialize(pose_, "pose", "РџРѕР·РёС†РёСЏ");
 	ar.serialize(selected_, "active", 0);
-	ar.serialize(label_, "label", type_ == START_LOCATION ? 0 : "Имя метки");
-	ar.serialize(radius_, "radius", "Радиус");
+	ar.serialize(label_, "label", type_ == START_LOCATION ? 0 : "РРјСЏ РјРµС‚РєРё");
+	ar.serialize(radius_, "radius", "Р Р°РґРёСѓСЃ");
 	if(ar.isEdit()){
 		typedef OptionalPtr<UI_MinimapSymbolPolymorphic,
 			                PolymorphicHandle<UI_MinimapSymbolPolymorphic> > OptionalPtrType;
 		ar.serialize(static_cast<OptionalPtrType&>(symbol_),
-		             "uisymbol", "Символ на миникарте");
+		             "uisymbol", "РЎРёРјРІРѕР» РЅР° РјРёРЅРёРєР°СЂС‚Рµ");
 	}
 	else
-		ar.serialize(symbol_, "uisymbol", "Символ на миникарте");
+		ar.serialize(symbol_, "uisymbol", "РЎРёРјРІРѕР» РЅР° РјРёРЅРёРєР°СЂС‚Рµ");
 }

@@ -13,87 +13,87 @@
 #include "Player.h"
 
 BEGIN_ENUM_DESCRIPTOR(UI_MarkObjectModeID, "UI_MarkObjectModeID")
-REGISTER_ENUM(UI_MARK_NONE, "По умолчанию")
-REGISTER_ENUM(UI_MARK_CAN_ATTACK_ENEMY, "может атаковать")
-REGISTER_ENUM(UI_MARK_CAN_PICK_UNIT, "может взять юнит")
-REGISTER_ENUM(UI_MARK_CAN_PICK_RESOURCE, "может подобрать предмет")
+REGISTER_ENUM(UI_MARK_NONE, "РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ")
+REGISTER_ENUM(UI_MARK_CAN_ATTACK_ENEMY, "РјРѕР¶РµС‚ Р°С‚Р°РєРѕРІР°С‚СЊ")
+REGISTER_ENUM(UI_MARK_CAN_PICK_UNIT, "РјРѕР¶РµС‚ РІР·СЏС‚СЊ СЋРЅРёС‚")
+REGISTER_ENUM(UI_MARK_CAN_PICK_RESOURCE, "РјРѕР¶РµС‚ РїРѕРґРѕР±СЂР°С‚СЊ РїСЂРµРґРјРµС‚")
 END_ENUM_DESCRIPTOR(UI_MarkObjectModeID)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(WeaponPrm, WeaponClass, "WeaponPrm::WeaponClass")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, WEAPON_BEAM, "лучевое оружие")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, WEAPON_PROJECTILE, "стреляющее снарядами оружие")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, WEAPON_AREA_EFFECT, "действующее на зону оружие")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, WEAPON_PAD, "Лапа оружие")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, WEAPON_WAITING_SOURCE, "источники с отложенной активацией")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, WEAPON_GRIP, "оружие - захват")
-//REGISTER_ENUM_ENCLOSED(WeaponPrm, WEAPON_TELEPORT, "оружие телепортации")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, WEAPON_BEAM, "Р»СѓС‡РµРІРѕРµ РѕСЂСѓР¶РёРµ")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, WEAPON_PROJECTILE, "СЃС‚СЂРµР»СЏСЋС‰РµРµ СЃРЅР°СЂСЏРґР°РјРё РѕСЂСѓР¶РёРµ")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, WEAPON_AREA_EFFECT, "РґРµР№СЃС‚РІСѓСЋС‰РµРµ РЅР° Р·РѕРЅСѓ РѕСЂСѓР¶РёРµ")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, WEAPON_PAD, "Р›Р°РїР° РѕСЂСѓР¶РёРµ")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, WEAPON_WAITING_SOURCE, "РёСЃС‚РѕС‡РЅРёРєРё СЃ РѕС‚Р»РѕР¶РµРЅРЅРѕР№ Р°РєС‚РёРІР°С†РёРµР№")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, WEAPON_GRIP, "РѕСЂСѓР¶РёРµ - Р·Р°С…РІР°С‚")
+//REGISTER_ENUM_ENCLOSED(WeaponPrm, WEAPON_TELEPORT, "РѕСЂСѓР¶РёРµ С‚РµР»РµРїРѕСЂС‚Р°С†РёРё")
 END_ENUM_DESCRIPTOR_ENCLOSED(WeaponPrm, WeaponClass)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(WeaponPrm, ShootingMode, "WeaponPrm::ShootingMode")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, SHOOT_MODE_DEFAULT, "обычный режим")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, SHOOT_MODE_INTERFACE, "по команде из интерфейса")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, SHOOT_MODE_ALWAYS, "всегда")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, SHOOT_MODE_SQUAD_LEADER, "когда главный в скваде")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, SHOOT_MODE_DEFAULT, "РѕР±С‹С‡РЅС‹Р№ СЂРµР¶РёРј")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, SHOOT_MODE_INTERFACE, "РїРѕ РєРѕРјР°РЅРґРµ РёР· РёРЅС‚РµСЂС„РµР№СЃР°")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, SHOOT_MODE_ALWAYS, "РІСЃРµРіРґР°")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, SHOOT_MODE_SQUAD_LEADER, "РєРѕРіРґР° РіР»Р°РІРЅС‹Р№ РІ СЃРєРІР°РґРµ")
 END_ENUM_DESCRIPTOR_ENCLOSED(WeaponPrm, ShootingMode)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(WeaponPrm, UnitMode, "WeaponPrm::UnitMode")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, ON_WATER_BOTTOM, "на дне")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, ON_WATER, "на воде")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, ON_GROUND, "на земле")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, ON_AIR, "в воздухе")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, ON_GROUND_LYING, "лежа на земле")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, ON_WATER_BOTTOM, "РЅР° РґРЅРµ")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, ON_WATER, "РЅР° РІРѕРґРµ")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, ON_GROUND, "РЅР° Р·РµРјР»Рµ")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, ON_AIR, "РІ РІРѕР·РґСѓС…Рµ")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, ON_GROUND_LYING, "Р»РµР¶Р° РЅР° Р·РµРјР»Рµ")
 END_ENUM_DESCRIPTOR_ENCLOSED(WeaponPrm, UnitMode)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(WeaponPrm, TargetUnitMode, "WeaponPrm::TargetUnitMode")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, TARGET_ON_WATER_BOTTOM, "цели на дне")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, TARGET_ON_WATER, "плавающие цели")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, TARGET_ON_GROUND, "наземные цели")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, TARGET_ON_AIR, "воздушные цели")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, TARGET_ON_GROUND_LYING, "лежащие на земле цели")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, TARGET_ON_WATER_BOTTOM, "С†РµР»Рё РЅР° РґРЅРµ")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, TARGET_ON_WATER, "РїР»Р°РІР°СЋС‰РёРµ С†РµР»Рё")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, TARGET_ON_GROUND, "РЅР°Р·РµРјРЅС‹Рµ С†РµР»Рё")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, TARGET_ON_AIR, "РІРѕР·РґСѓС€РЅС‹Рµ С†РµР»Рё")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, TARGET_ON_GROUND_LYING, "Р»РµР¶Р°С‰РёРµ РЅР° Р·РµРјР»Рµ С†РµР»Рё")
 END_ENUM_DESCRIPTOR_ENCLOSED(WeaponPrm, TargetUnitMode)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(WeaponPrm, RangeType, "WeaponPrm::RangeType")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, LONG_RANGE, "оружие дальнего боя")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, SHORT_RANGE, "оружие ближнего боя")
-REGISTER_ENUM_ENCLOSED(WeaponPrm, ANY_RANGE, "универсальное оружие")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, LONG_RANGE, "РѕСЂСѓР¶РёРµ РґР°Р»СЊРЅРµРіРѕ Р±РѕСЏ")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, SHORT_RANGE, "РѕСЂСѓР¶РёРµ Р±Р»РёР¶РЅРµРіРѕ Р±РѕСЏ")
+REGISTER_ENUM_ENCLOSED(WeaponPrm, ANY_RANGE, "СѓРЅРёРІРµСЂСЃР°Р»СЊРЅРѕРµ РѕСЂСѓР¶РёРµ")
 END_ENUM_DESCRIPTOR_ENCLOSED(WeaponPrm, RangeType)
 
 BEGIN_ENUM_DESCRIPTOR(AffectMode, "AffectMode")
-REGISTER_ENUM(AFFECT_OWN_UNITS, "только на своих юнитов")
-REGISTER_ENUM(AFFECT_FRIENDLY_UNITS, "на своих и союзных юнитов")
-REGISTER_ENUM(AFFECT_ALLIED_UNITS, "на союзных юнитов")
-REGISTER_ENUM(AFFECT_ENEMY_UNITS, "на вражеских юнитов")
-REGISTER_ENUM(AFFECT_ALL_UNITS, "на всех юнитов")
-REGISTER_ENUM(AFFECT_NONE_UNITS, "не воздействует на юнитов")
+REGISTER_ENUM(AFFECT_OWN_UNITS, "С‚РѕР»СЊРєРѕ РЅР° СЃРІРѕРёС… СЋРЅРёС‚РѕРІ")
+REGISTER_ENUM(AFFECT_FRIENDLY_UNITS, "РЅР° СЃРІРѕРёС… Рё СЃРѕСЋР·РЅС‹С… СЋРЅРёС‚РѕРІ")
+REGISTER_ENUM(AFFECT_ALLIED_UNITS, "РЅР° СЃРѕСЋР·РЅС‹С… СЋРЅРёС‚РѕРІ")
+REGISTER_ENUM(AFFECT_ENEMY_UNITS, "РЅР° РІСЂР°Р¶РµСЃРєРёС… СЋРЅРёС‚РѕРІ")
+REGISTER_ENUM(AFFECT_ALL_UNITS, "РЅР° РІСЃРµС… СЋРЅРёС‚РѕРІ")
+REGISTER_ENUM(AFFECT_NONE_UNITS, "РЅРµ РІРѕР·РґРµР№СЃС‚РІСѓРµС‚ РЅР° СЋРЅРёС‚РѕРІ")
 END_ENUM_DESCRIPTOR(AffectMode)
 
 BEGIN_ENUM_DESCRIPTOR(WeaponDirectControlMode, "WeaponDirectMode")
-REGISTER_ENUM(WEAPON_DIRECT_CONTROL_DISABLE, "не стрелять")
-REGISTER_ENUM(WEAPON_DIRECT_CONTROL_NORMAL, "стрелять по нажатию левой кнопки мыши")
-REGISTER_ENUM(WEAPON_DIRECT_CONTROL_ALTERNATE, "стрелять по нажатию правой кнопки мыши")
-REGISTER_ENUM(WEAPON_DIRECT_CONTROL_AUTO, "автоматически выбирать цель")
+REGISTER_ENUM(WEAPON_DIRECT_CONTROL_DISABLE, "РЅРµ СЃС‚СЂРµР»СЏС‚СЊ")
+REGISTER_ENUM(WEAPON_DIRECT_CONTROL_NORMAL, "СЃС‚СЂРµР»СЏС‚СЊ РїРѕ РЅР°Р¶Р°С‚РёСЋ Р»РµРІРѕР№ РєРЅРѕРїРєРё РјС‹С€Рё")
+REGISTER_ENUM(WEAPON_DIRECT_CONTROL_ALTERNATE, "СЃС‚СЂРµР»СЏС‚СЊ РїРѕ РЅР°Р¶Р°С‚РёСЋ РїСЂР°РІРѕР№ РєРЅРѕРїРєРё РјС‹С€Рё")
+REGISTER_ENUM(WEAPON_DIRECT_CONTROL_AUTO, "Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РІС‹Р±РёСЂР°С‚СЊ С†РµР»СЊ")
 END_ENUM_DESCRIPTOR(WeaponDirectControlMode)
 
 BEGIN_ENUM_DESCRIPTOR(WeaponSyndicateControlMode, "WeaponSyndicateControlMode")
-REGISTER_ENUM(WEAPON_SYNDICATE_CONTROL_DISABLE, "не стрелять")
-REGISTER_ENUM(WEAPON_SYNDICATE_CONTROL_NORMAL, "стрелять куда указано из интерфейса")
-REGISTER_ENUM(WEAPON_SYNDICATE_CONTROL_FORCE, "стрелять по правому клику куда нацелено")
-REGISTER_ENUM(WEAPON_SYNDICATE_CONTROL_AUTO, "автоматически выбирать цель")
+REGISTER_ENUM(WEAPON_SYNDICATE_CONTROL_DISABLE, "РЅРµ СЃС‚СЂРµР»СЏС‚СЊ")
+REGISTER_ENUM(WEAPON_SYNDICATE_CONTROL_NORMAL, "СЃС‚СЂРµР»СЏС‚СЊ РєСѓРґР° СѓРєР°Р·Р°РЅРѕ РёР· РёРЅС‚РµСЂС„РµР№СЃР°")
+REGISTER_ENUM(WEAPON_SYNDICATE_CONTROL_FORCE, "СЃС‚СЂРµР»СЏС‚СЊ РїРѕ РїСЂР°РІРѕРјСѓ РєР»РёРєСѓ РєСѓРґР° РЅР°С†РµР»РµРЅРѕ")
+REGISTER_ENUM(WEAPON_SYNDICATE_CONTROL_AUTO, "Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РІС‹Р±РёСЂР°С‚СЊ С†РµР»СЊ")
 END_ENUM_DESCRIPTOR(WeaponSyndicateControlMode)
 
 BEGIN_ENUM_DESCRIPTOR(WeaponSourcesCreationMode, "WeaponSourcesCreationMode")
-REGISTER_ENUM(WEAPON_SOURCES_CREATE_ON_TARGET_HIT, "при попадании в цель")
-REGISTER_ENUM(WEAPON_SOURCES_CREATE_ON_GROUND_HIT, "при попадании в землю")
-REGISTER_ENUM(WEAPON_SOURCES_CREATE_ALWAYS, "всегда")
+REGISTER_ENUM(WEAPON_SOURCES_CREATE_ON_TARGET_HIT, "РїСЂРё РїРѕРїР°РґР°РЅРёРё РІ С†РµР»СЊ")
+REGISTER_ENUM(WEAPON_SOURCES_CREATE_ON_GROUND_HIT, "РїСЂРё РїРѕРїР°РґР°РЅРёРё РІ Р·РµРјР»СЋ")
+REGISTER_ENUM(WEAPON_SOURCES_CREATE_ALWAYS, "РІСЃРµРіРґР°")
 END_ENUM_DESCRIPTOR(WeaponSourcesCreationMode)
 
 BEGIN_ENUM_DESCRIPTOR(WeaponGroupShootingMode, "WeaponGroupShootingMode")
-REGISTER_ENUM(WEAPON_GROUP_INDEPENDENT, "независимо")
-REGISTER_ENUM(WEAPON_GROUP_MODE_PRIORITY, "в соответствии с приоритетом")
+REGISTER_ENUM(WEAPON_GROUP_INDEPENDENT, "РЅРµР·Р°РІРёСЃРёРјРѕ")
+REGISTER_ENUM(WEAPON_GROUP_MODE_PRIORITY, "РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРё СЃ РїСЂРёРѕСЂРёС‚РµС‚РѕРј")
 END_ENUM_DESCRIPTOR(WeaponGroupShootingMode)
 
-WRAP_LIBRARY(WeaponGroupTypeTable, "WeaponGroup", "Типы групп оружия", "Scripts\\Content\\WeaponGroup", 1, LIBRARY_EDITABLE);
-WRAP_LIBRARY(WeaponAmmoTypeTable, "WeaponAmmoType", "Типы патронов к оружию", "Scripts\\Content\\WeaponAmmoType", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(WeaponGroupTypeTable, "WeaponGroup", "РўРёРїС‹ РіСЂСѓРїРї РѕСЂСѓР¶РёСЏ", "Scripts\\Content\\WeaponGroup", 1, LIBRARY_EDITABLE);
+WRAP_LIBRARY(WeaponAmmoTypeTable, "WeaponAmmoType", "РўРёРїС‹ РїР°С‚СЂРѕРЅРѕРІ Рє РѕСЂСѓР¶РёСЋ", "Scripts\\Content\\WeaponAmmoType", 0, LIBRARY_EDITABLE);
 
 // ------------------------------
 
@@ -115,19 +115,19 @@ WeaponAimAnglePrm::WeaponAimAnglePrm()
 
 void WeaponAimAnglePrm::serialize(Archive& ar)
 {
-	ar.serialize(nodeGraphics_, "nodeGraphics", "&имя узла для управления поворотом");
-	ar.serialize(nodeLogic_, "nodeLogic", "&имя логического узла для управления поворотом");
+	ar.serialize(nodeGraphics_, "nodeGraphics", "&РёРјСЏ СѓР·Р»Р° РґР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ РїРѕРІРѕСЂРѕС‚РѕРј");
+	ar.serialize(nodeLogic_, "nodeLogic", "&РёРјСЏ Р»РѕРіРёС‡РµСЃРєРѕРіРѕ СѓР·Р»Р° РґР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ РїРѕРІРѕСЂРѕС‚РѕРј");
 
-	ar.serialize(rotateByLogic_, "rotateByLogic", "поворачивать графический узел по осям логического");
+	ar.serialize(rotateByLogic_, "rotateByLogic", "РїРѕРІРѕСЂР°С‡РёРІР°С‚СЊ РіСЂР°С„РёС‡РµСЃРєРёР№ СѓР·РµР» РїРѕ РѕСЃСЏРј Р»РѕРіРёС‡РµСЃРєРѕРіРѕ");
 
-	ar.serialize(precision_, "precision", "точность наведения");
+	ar.serialize(precision_, "precision", "С‚РѕС‡РЅРѕСЃС‚СЊ РЅР°РІРµРґРµРЅРёСЏ");
 
-	ar.serialize(turnSpeed_, "turnSpeed", "скорость поворота, градус/сек");
-	ar.serialize(turnSpeedDirectControl_, "turnSpeedDirectControl", "скорость поворота при прямом управлении, градус/сек");
+	ar.serialize(turnSpeed_, "turnSpeed", "СЃРєРѕСЂРѕСЃС‚СЊ РїРѕРІРѕСЂРѕС‚Р°, РіСЂР°РґСѓСЃ/СЃРµРє");
+	ar.serialize(turnSpeedDirectControl_, "turnSpeedDirectControl", "СЃРєРѕСЂРѕСЃС‚СЊ РїРѕРІРѕСЂРѕС‚Р° РїСЂРё РїСЂСЏРјРѕРј СѓРїСЂР°РІР»РµРЅРёРё, РіСЂР°РґСѓСЃ/СЃРµРє");
 
-	ar.serialize(valueMin_, "valueMin", "минимальное значение");
-	ar.serialize(valueMax_, "valueMax", "максимальное значение");
-	ar.serialize(valueDefault_, "valueDefault", "значение по умолчанию");
+	ar.serialize(valueMin_, "valueMin", "РјРёРЅРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ");
+	ar.serialize(valueMax_, "valueMax", "РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ");
+	ar.serialize(valueDefault_, "valueDefault", "Р·РЅР°С‡РµРЅРёРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ");
 
 	if(ar.isOutput())
 		updateOffsets();
@@ -185,7 +185,7 @@ const WeaponAimControllerPrm WeaponAimControllerPrm::EMPTY;
 
 void WeaponAimControllerPrm::serialize(Archive& ar)
 {
-	if(!ar.serialize(weaponAnimationType_, "weaponAnimationType", "&тип оружия для анимации")){//CONVERSION 5.11.07
+	if(!ar.serialize(weaponAnimationType_, "weaponAnimationType", "&С‚РёРї РѕСЂСѓР¶РёСЏ РґР»СЏ Р°РЅРёРјР°С†РёРё")){//CONVERSION 5.11.07
 		WeaponPrmReference weaponPrmReference;
 		ar.serialize(weaponPrmReference, "weaponPrmReference", 0);
 		if(const WeaponPrm* weaponPrm = weaponPrmReference){
@@ -194,23 +194,23 @@ void WeaponAimControllerPrm::serialize(Archive& ar)
 			weaponAnimationType_ = weaponPrm->animationType();
 		}
 	}
-	ar.serialize(alternativeWeaponAnimationType_, "alternativeWeaponAnimationType", "тип дополнителньго оружия для анимации");
+	ar.serialize(alternativeWeaponAnimationType_, "alternativeWeaponAnimationType", "С‚РёРї РґРѕРїРѕР»РЅРёС‚РµР»РЅСЊРіРѕ РѕСЂСѓР¶РёСЏ РґР»СЏ Р°РЅРёРјР°С†РёРё");
 
-	ar.serialize(isEnabled_, "isEnabled", "&включено");
-	ar.serialize(isCorrectionEnabled_, "isCorrectionEnabled", "разрешить коррекцию углов наведения");
+	ar.serialize(isEnabled_, "isEnabled", "&РІРєР»СЋС‡РµРЅРѕ");
+	ar.serialize(isCorrectionEnabled_, "isCorrectionEnabled", "СЂР°Р·СЂРµС€РёС‚СЊ РєРѕСЂСЂРµРєС†РёСЋ СѓРіР»РѕРІ РЅР°РІРµРґРµРЅРёСЏ");
 
-	ar.serialize(barrels_, "barrels", "стволы");
+	ar.serialize(barrels_, "barrels", "СЃС‚РІРѕР»С‹");
 	
-	ar.serialize(hasAnimation_, "hasAnimation", "&есть анимация");
+	ar.serialize(hasAnimation_, "hasAnimation", "&РµСЃС‚СЊ Р°РЅРёРјР°С†РёСЏ");
 	
-	ar.serialize(anglePsiPrm_, "anglePsiPrm", "горизонтальный угол");
-	ar.serialize(angleThetaPrm_, "angleThetaPrm", "вертикальный угол");
+	ar.serialize(anglePsiPrm_, "anglePsiPrm", "РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹Р№ СѓРіРѕР»");
+	ar.serialize(angleThetaPrm_, "angleThetaPrm", "РІРµСЂС‚РёРєР°Р»СЊРЅС‹Р№ СѓРіРѕР»");
 }
 
 void WeaponAimControllerPrm::Barrel::serialize(Archive& ar)
 {
-	ar.serialize(nodeLogic_, "nodeLogic", "&место вылета снаряда");
-	ar.serialize(nodeGraphics_, "nodeGraphics", "&место спецэффекта выстрела");
+	ar.serialize(nodeLogic_, "nodeLogic", "&РјРµСЃС‚Рѕ РІС‹Р»РµС‚Р° СЃРЅР°СЂСЏРґР°");
+	ar.serialize(nodeGraphics_, "nodeGraphics", "&РјРµСЃС‚Рѕ СЃРїРµС†СЌС„С„РµРєС‚Р° РІС‹СЃС‚СЂРµР»Р°");
 }
 
 // ------------------------------
@@ -240,31 +240,31 @@ const WeaponAimControllerPrm& WeaponSlotAttribute::aimControllerPrm(int index) c
 
 void WeaponSlotAttribute::serialize(Archive& ar)
 {
-	bool conversion = !ar.serialize(aimControllersPrm_, "aimControllersPrm", "управление наведением"); //CONVERSION 1.11.07
+	bool conversion = !ar.serialize(aimControllersPrm_, "aimControllersPrm", "СѓРїСЂР°РІР»РµРЅРёРµ РЅР°РІРµРґРµРЅРёРµРј"); //CONVERSION 1.11.07
 	
-	ar.serialize(weaponPrmReference_, "weaponPrmReference", "&название оружия");
+	ar.serialize(weaponPrmReference_, "weaponPrmReference", "&РЅР°Р·РІР°РЅРёРµ РѕСЂСѓР¶РёСЏ");
 
 	if(conversion && weaponPrmReference_){
 		aimControllersPrm_.resize(1);
-		ar.serialize(aimControllersPrm_[0], "aimControllerPrm", "управление наведением");
+		ar.serialize(aimControllersPrm_[0], "aimControllerPrm", "СѓРїСЂР°РІР»РµРЅРёРµ РЅР°РІРµРґРµРЅРёРµРј");
 		aimControllersPrm_[0].setWeaponAnimationType(weaponPrmReference_->animationType());
 	}
 
-	ar.serialize(equipmentSlotType_, "equipmentSlotType", "тип ячейки снаряжения");
-	ar.serialize(groupType_, "groupType", "группа оружия");
-	ar.serialize(priority_, "priority", "приоритет (чем больше, тем оружие важнее)");
+	ar.serialize(equipmentSlotType_, "equipmentSlotType", "С‚РёРї СЏС‡РµР№РєРё СЃРЅР°СЂСЏР¶РµРЅРёСЏ");
+	ar.serialize(groupType_, "groupType", "РіСЂСѓРїРїР° РѕСЂСѓР¶РёСЏ");
+	ar.serialize(priority_, "priority", "РїСЂРёРѕСЂРёС‚РµС‚ (С‡РµРј Р±РѕР»СЊС€Рµ, С‚РµРј РѕСЂСѓР¶РёРµ РІР°Р¶РЅРµРµ)");
 
-	ar.serialize(externalAnimationSettings_, "externalAnimationSettings", "брать настройки анимации из другого слота");
+	ar.serialize(externalAnimationSettings_, "externalAnimationSettings", "Р±СЂР°С‚СЊ РЅР°СЃС‚СЂРѕР№РєРё Р°РЅРёРјР°С†РёРё РёР· РґСЂСѓРіРѕРіРѕ СЃР»РѕС‚Р°");
 
 	if(externalAnimationSettings_)
-		ar.serialize(animationSlotID_, "animationSlotID", "номер слота, из которого берутся настройки анимации");
+		ar.serialize(animationSlotID_, "animationSlotID", "РЅРѕРјРµСЂ СЃР»РѕС‚Р°, РёР· РєРѕС‚РѕСЂРѕРіРѕ Р±РµСЂСѓС‚СЃСЏ РЅР°СЃС‚СЂРѕР№РєРё Р°РЅРёРјР°С†РёРё");
 }
 
 // ------------------------------
 
 void WeaponPrm::Upgrade::serialize(Archive& ar)
 {
-	ar.serialize(reference_, "reference", "&оружие");
+	ar.serialize(reference_, "reference", "&РѕСЂСѓР¶РёРµ");
 }
 
 WeaponPrm::WeaponPrm() : fireEffect_(false)
@@ -332,81 +332,81 @@ WeaponPrm::~WeaponPrm()
 void WeaponPrm::serialize(Archive& ar)
 {
 	ar.serialize(ID_, "ID", 0);
-	ar.serialize(tipsName_, "tipsName", "Имя оружия для интерфейса/метка для типсов");
+	ar.serialize(tipsName_, "tipsName", "РРјСЏ РѕСЂСѓР¶РёСЏ РґР»СЏ РёРЅС‚РµСЂС„РµР№СЃР°/РјРµС‚РєР° РґР»СЏ С‚РёРїСЃРѕРІ");
 
-	ar.serialize(animationType_, "animationType", "Тип оружия для анимации");
+	ar.serialize(animationType_, "animationType", "РўРёРї РѕСЂСѓР¶РёСЏ РґР»СЏ Р°РЅРёРјР°С†РёРё");
 
-	ar.serialize(disableAimReturn_, "disableAimReturn", "не возвращать в исходное положение");
+	ar.serialize(disableAimReturn_, "disableAimReturn", "РЅРµ РІРѕР·РІСЂР°С‰Р°С‚СЊ РІ РёСЃС…РѕРґРЅРѕРµ РїРѕР»РѕР¶РµРЅРёРµ");
 	if(!disableAimReturn_){
-		ar.serialize(aimLockTime_, "aimLockTime", "время возвращения в исходное положение");
+		ar.serialize(aimLockTime_, "aimLockTime", "РІСЂРµРјСЏ РІРѕР·РІСЂР°С‰РµРЅРёСЏ РІ РёСЃС…РѕРґРЅРѕРµ РїРѕР»РѕР¶РµРЅРёРµ");
 
-		ar.serialize(enableAutoScan_, "enableAutoScan", "автоматическое сканирование");
+		ar.serialize(enableAutoScan_, "enableAutoScan", "Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРµ СЃРєР°РЅРёСЂРѕРІР°РЅРёРµ");
 		if(enableAutoScan_)
-			ar.serialize(autoScanPeriod_, "autoScanPeriod", "период автоматического сканирования");
+			ar.serialize(autoScanPeriod_, "autoScanPeriod", "РїРµСЂРёРѕРґ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРіРѕ СЃРєР°РЅРёСЂРѕРІР°РЅРёСЏ");
 	}
 
-	ar.serialize(queueFire_, "queueFire", "стреляет очередями");
+	ar.serialize(queueFire_, "queueFire", "СЃС‚СЂРµР»СЏРµС‚ РѕС‡РµСЂРµРґСЏРјРё");
 	if(queueFire_){
 		float time = float(queueFireDelay_) / 1000.f;
-		ar.serialize(time, "queueFireDelay", "задержка между выстрелами в очереди");
+		ar.serialize(time, "queueFireDelay", "Р·Р°РґРµСЂР¶РєР° РјРµР¶РґСѓ РІС‹СЃС‚СЂРµР»Р°РјРё РІ РѕС‡РµСЂРµРґРё");
 		queueFireDelay_ = round(time * 1000.f);
 	}
 
 	if(weaponClass_ == WeaponPrm::WEAPON_BEAM)
-		ar.serialize(continuousFire_, "continuousFire", "непрерывная стрельба");
+		ar.serialize(continuousFire_, "continuousFire", "РЅРµРїСЂРµСЂС‹РІРЅР°СЏ СЃС‚СЂРµР»СЊР±Р°");
 
-	ar.serialize(clearTargets_, "clearTargets", "сбрасывать цель после выстрела");
-	ar.serialize(exclusiveTarget_, "exclusiveTarget", "не может делить цель с другим оружием");
-	ar.serialize(clearAttackClickMode_, "clearAttackClickMode", "сбрасывать курсор после указания цели");
-	ar.serialize(ignoreMouseDblClick_, "ignoreMouseDblClick", "не сбрасывать по двойным кликам");
+	ar.serialize(clearTargets_, "clearTargets", "СЃР±СЂР°СЃС‹РІР°С‚СЊ С†РµР»СЊ РїРѕСЃР»Рµ РІС‹СЃС‚СЂРµР»Р°");
+	ar.serialize(exclusiveTarget_, "exclusiveTarget", "РЅРµ РјРѕР¶РµС‚ РґРµР»РёС‚СЊ С†РµР»СЊ СЃ РґСЂСѓРіРёРј РѕСЂСѓР¶РёРµРј");
+	ar.serialize(clearAttackClickMode_, "clearAttackClickMode", "СЃР±СЂР°СЃС‹РІР°С‚СЊ РєСѓСЂСЃРѕСЂ РїРѕСЃР»Рµ СѓРєР°Р·Р°РЅРёСЏ С†РµР»Рё");
+	ar.serialize(ignoreMouseDblClick_, "ignoreMouseDblClick", "РЅРµ СЃР±СЂР°СЃС‹РІР°С‚СЊ РїРѕ РґРІРѕР№РЅС‹Рј РєР»РёРєР°Рј");
 
-	if(ar.openBlock("visualisation", "Визуализация")){
-		ar.serialize(targetMarks_, "targetMarks", "визуализация точки прицеливания");
-		ar.serialize(hideCursor_, "hideCursor", "прятать курсор во время прицеливания");
+	if(ar.openBlock("visualisation", "Р’РёР·СѓР°Р»РёР·Р°С†РёСЏ")){
+		ar.serialize(targetMarks_, "targetMarks", "РІРёР·СѓР°Р»РёР·Р°С†РёСЏ С‚РѕС‡РєРё РїСЂРёС†РµР»РёРІР°РЅРёСЏ");
+		ar.serialize(hideCursor_, "hideCursor", "РїСЂСЏС‚Р°С‚СЊ РєСѓСЂСЃРѕСЂ РІРѕ РІСЂРµРјСЏ РїСЂРёС†РµР»РёРІР°РЅРёСЏ");
 	
-		if(ar.openBlock("effects", "Спецэффекты")){
-			ar.serialize(fireEffect_, "fireEffect", "спецэффект выстрела");
-			ar.serialize(effect_, "effect", "спецэффект для обычного режима");
-			ar.serialize(disabledEffect_, "disabledEffect", "спецэффект для обычного режима при нехватке ресурсов для стрельбы");
-			ar.serialize(directControlEffect_, "directControlEffect", "спецэффект для прямого управления");
-			ar.serialize(directControlDisabledEffect_, "directControlDisabledEffect", "спецэффект для прямого управления при нехватке ресурсов для стрельбы");
+		if(ar.openBlock("effects", "РЎРїРµС†СЌС„С„РµРєС‚С‹")){
+			ar.serialize(fireEffect_, "fireEffect", "СЃРїРµС†СЌС„С„РµРєС‚ РІС‹СЃС‚СЂРµР»Р°");
+			ar.serialize(effect_, "effect", "СЃРїРµС†СЌС„С„РµРєС‚ РґР»СЏ РѕР±С‹С‡РЅРѕРіРѕ СЂРµР¶РёРјР°");
+			ar.serialize(disabledEffect_, "disabledEffect", "СЃРїРµС†СЌС„С„РµРєС‚ РґР»СЏ РѕР±С‹С‡РЅРѕРіРѕ СЂРµР¶РёРјР° РїСЂРё РЅРµС…РІР°С‚РєРµ СЂРµСЃСѓСЂСЃРѕРІ РґР»СЏ СЃС‚СЂРµР»СЊР±С‹");
+			ar.serialize(directControlEffect_, "directControlEffect", "СЃРїРµС†СЌС„С„РµРєС‚ РґР»СЏ РїСЂСЏРјРѕРіРѕ СѓРїСЂР°РІР»РµРЅРёСЏ");
+			ar.serialize(directControlDisabledEffect_, "directControlDisabledEffect", "СЃРїРµС†СЌС„С„РµРєС‚ РґР»СЏ РїСЂСЏРјРѕРіРѕ СѓРїСЂР°РІР»РµРЅРёСЏ РїСЂРё РЅРµС…РІР°С‚РєРµ СЂРµСЃСѓСЂСЃРѕРІ РґР»СЏ СЃС‚СЂРµР»СЊР±С‹");
 			ar.closeBlock();
 		}
 
-		if(ar.openBlock("circles", "Кружки")){
-			ar.serialize(fireMinRadiusCircle_, "fireMinRadiusCircle", "Кружок минимального радиуса атаки");
-			ar.serialize(fireRadiusCircle_, "fireRadiusCircle", "Кружок радиуса атаки без разброса");
-			ar.serialize(fireEffectiveRadiusCircle_, "fireEffectiveRadiusCircle", "Кружок радиуса атаки с разбросом");
+		if(ar.openBlock("circles", "РљСЂСѓР¶РєРё")){
+			ar.serialize(fireMinRadiusCircle_, "fireMinRadiusCircle", "РљСЂСѓР¶РѕРє РјРёРЅРёРјР°Р»СЊРЅРѕРіРѕ СЂР°РґРёСѓСЃР° Р°С‚Р°РєРё");
+			ar.serialize(fireRadiusCircle_, "fireRadiusCircle", "РљСЂСѓР¶РѕРє СЂР°РґРёСѓСЃР° Р°С‚Р°РєРё Р±РµР· СЂР°Р·Р±СЂРѕСЃР°");
+			ar.serialize(fireEffectiveRadiusCircle_, "fireEffectiveRadiusCircle", "РљСЂСѓР¶РѕРє СЂР°РґРёСѓСЃР° Р°С‚Р°РєРё СЃ СЂР°Р·Р±СЂРѕСЃРѕРј");
 			ar.closeBlock();
 		}
 		ar.closeBlock();
 	}
-	ar.serialize(fireSound_, "fireSound", "звук выстрела");
+	ar.serialize(fireSound_, "fireSound", "Р·РІСѓРє РІС‹СЃС‚СЂРµР»Р°");
 	
 	if(weaponClass_ == WeaponPrm::WEAPON_BEAM || weaponClass_ == WeaponPrm::WEAPON_GRIP || weaponClass_ == WeaponPrm::WEAPON_PAD){
-		ar.serialize(damage_, "damage", "повреждения");
+		ar.serialize(damage_, "damage", "РїРѕРІСЂРµР¶РґРµРЅРёСЏ");
 	}
 
-	ar.serialize(attackClass_, "attackClass", "класс атакуемых юнитов");
-	ar.serialize(affectMode_, "affectMode", "на кого действует");
+	ar.serialize(attackClass_, "attackClass", "РєР»Р°СЃСЃ Р°С‚Р°РєСѓРµРјС‹С… СЋРЅРёС‚РѕРІ");
+	ar.serialize(affectMode_, "affectMode", "РЅР° РєРѕРіРѕ РґРµР№СЃС‚РІСѓРµС‚");
 
-	ar.serialize(rangeType_, "rangeType", "тип оружия");
-	ar.serialize(shootingMode_, "shootingMode", "режим стрельбы");
-	ar.serialize(directControlMode_, "directControlMode", "режим стрельбы в прямом управлении");
-	ar.serialize(syndicateControlMode_, "syndicateControlMode", "режим стрельбы в синдикатном управлении");
+	ar.serialize(rangeType_, "rangeType", "С‚РёРї РѕСЂСѓР¶РёСЏ");
+	ar.serialize(shootingMode_, "shootingMode", "СЂРµР¶РёРј СЃС‚СЂРµР»СЊР±С‹");
+	ar.serialize(directControlMode_, "directControlMode", "СЂРµР¶РёРј СЃС‚СЂРµР»СЊР±С‹ РІ РїСЂСЏРјРѕРј СѓРїСЂР°РІР»РµРЅРёРё");
+	ar.serialize(syndicateControlMode_, "syndicateControlMode", "СЂРµР¶РёРј СЃС‚СЂРµР»СЊР±С‹ РІ СЃРёРЅРґРёРєР°С‚РЅРѕРј СѓРїСЂР°РІР»РµРЅРёРё");
 
-	ar.serialize(canShootThroughShield_, "canShootThroughShield", "стреляет сквозь защитные поля");
-	ar.serialize(canShootUnderFogOfWar_, "canShootUnderFogOfWar", "стреляет под туман войны");
+	ar.serialize(canShootThroughShield_, "canShootThroughShield", "СЃС‚СЂРµР»СЏРµС‚ СЃРєРІРѕР·СЊ Р·Р°С‰РёС‚РЅС‹Рµ РїРѕР»СЏ");
+	ar.serialize(canShootUnderFogOfWar_, "canShootUnderFogOfWar", "СЃС‚СЂРµР»СЏРµС‚ РїРѕРґ С‚СѓРјР°РЅ РІРѕР№РЅС‹");
 
-	ar.serialize(shootingOnMoveMode_, "shootingOnMoveMode", "может стрелять");
+	ar.serialize(shootingOnMoveMode_, "shootingOnMoveMode", "РјРѕР¶РµС‚ СЃС‚СЂРµР»СЏС‚СЊ");
 
-	ar.serialize(isInterrupt_, "isInterrupt", "прерываемая стрельба");
-	ar.serialize(clearTargetOnLoading_, "clearTargetOnLoading", "сбрасывать цель во время перезарядки");
-	ar.serialize(mainSquadUnitReload_, "mainSquadUnitReload", "мгновенная перезарядка для главного в скваде");
+	ar.serialize(isInterrupt_, "isInterrupt", "РїСЂРµСЂС‹РІР°РµРјР°СЏ СЃС‚СЂРµР»СЊР±Р°");
+	ar.serialize(clearTargetOnLoading_, "clearTargetOnLoading", "СЃР±СЂР°СЃС‹РІР°С‚СЊ С†РµР»СЊ РІРѕ РІСЂРµРјСЏ РїРµСЂРµР·Р°СЂСЏРґРєРё");
+	ar.serialize(mainSquadUnitReload_, "mainSquadUnitReload", "РјРіРЅРѕРІРµРЅРЅР°СЏ РїРµСЂРµР·Р°СЂСЏРґРєР° РґР»СЏ РіР»Р°РІРЅРѕРіРѕ РІ СЃРєРІР°РґРµ");
 
-	ar.serialize(disableOwnerMove_, "disableOwnerMove", "запретить подход и поворот юнита к цели");
+	ar.serialize(disableOwnerMove_, "disableOwnerMove", "Р·Р°РїСЂРµС‚РёС‚СЊ РїРѕРґС…РѕРґ Рё РїРѕРІРѕСЂРѕС‚ СЋРЅРёС‚Р° Рє С†РµР»Рё");
 
-	if(ar.openBlock("surfaceMode", "атакуемые цели")){
+	if(ar.openBlock("surfaceMode", "Р°С‚Р°РєСѓРµРјС‹Рµ С†РµР»Рё")){
 		for(int i = 0; i < UNIT_MODE_COUNT; i++){
 			UnitMode mode = UnitMode(i);
 			if(!ar.serialize(targetUnitMode_[i], getEnumName(mode), getEnumNameAlt(mode)))
@@ -415,29 +415,29 @@ void WeaponPrm::serialize(Archive& ar)
 		ar.closeBlock();
 	}
 
-	ar.serialize(fireDuringClick_, "fireDuringClick", "Стрелять пока нажата кнопка");
+	ar.serialize(fireDuringClick_, "fireDuringClick", "РЎС‚СЂРµР»СЏС‚СЊ РїРѕРєР° РЅР°Р¶Р°С‚Р° РєРЅРѕРїРєР°");
 
-	ar.serialize(fireCost_, "fireCost", "стоимость стрельбы");
-	ar.serialize(fireCostAtOnce_, "fireCostAtOnce", "снимать всю стоимость сразу");
+	ar.serialize(fireCost_, "fireCost", "СЃС‚РѕРёРјРѕСЃС‚СЊ СЃС‚СЂРµР»СЊР±С‹");
+	ar.serialize(fireCostAtOnce_, "fireCostAtOnce", "СЃРЅРёРјР°С‚СЊ РІСЃСЋ СЃС‚РѕРёРјРѕСЃС‚СЊ СЃСЂР°Р·Сѓ");
 	if(!fireCostAtOnce_)
-		ar.serialize(fireTimeMin_, "fireTimeMin", "минимальное время выстрела");
+		ar.serialize(fireTimeMin_, "fireTimeMin", "РјРёРЅРёРјР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ РІС‹СЃС‚СЂРµР»Р°");
 
-	ar.serialize(parameters_, "parameters", "Личные параметры (дальность, время выстрела, время перезарядки, точность, количество боеприпасов, максимальное количество боеприпасов, ресурс (количество выстрелов))");
+	ar.serialize(parameters_, "parameters", "Р›РёС‡РЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ (РґР°Р»СЊРЅРѕСЃС‚СЊ, РІСЂРµРјСЏ РІС‹СЃС‚СЂРµР»Р°, РІСЂРµРјСЏ РїРµСЂРµР·Р°СЂСЏРґРєРё, С‚РѕС‡РЅРѕСЃС‚СЊ, РєРѕР»РёС‡РµСЃС‚РІРѕ Р±РѕРµРїСЂРёРїР°СЃРѕРІ, РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р±РѕРµРїСЂРёРїР°СЃРѕРІ, СЂРµСЃСѓСЂСЃ (РєРѕР»РёС‡РµСЃС‚РІРѕ РІС‹СЃС‚СЂРµР»РѕРІ))");
 
-	ar.serialize(ammoType_, "ammoType", "Тип боеприпасов");
+	ar.serialize(ammoType_, "ammoType", "РўРёРї Р±РѕРµРїСЂРёРїР°СЃРѕРІ");
 
-	ar.serialize(visibleTimeOnShoot_, "visibleTimeOnShoot", "Время видимости при выстреле");
+	ar.serialize(visibleTimeOnShoot_, "visibleTimeOnShoot", "Р’СЂРµРјСЏ РІРёРґРёРјРѕСЃС‚Рё РїСЂРё РІС‹СЃС‚СЂРµР»Рµ");
 
 	if(weaponClass_ == WeaponPrm::WEAPON_BEAM || weaponClass_ == WeaponPrm::WEAPON_GRIP || weaponClass_ == WeaponPrm::WEAPON_PAD)
-		ar.serialize(abnormalState_, "abnormalState", "воздействие на цель");
+		ar.serialize(abnormalState_, "abnormalState", "РІРѕР·РґРµР№СЃС‚РІРёРµ РЅР° С†РµР»СЊ");
 
 
-	ar.serialize(upgrades_, "upgrades", "апгрейды");
+	ar.serialize(upgrades_, "upgrades", "Р°РїРіСЂРµР№РґС‹");
 
-	if(ar.openBlock("cost", "Стоимость апгрейда")){
-		ar.serialize(accessValue_, "accessValue", "необходимые параметры");
+	if(ar.openBlock("cost", "РЎС‚РѕРёРјРѕСЃС‚СЊ Р°РїРіСЂРµР№РґР°")){
+		ar.serialize(accessValue_, "accessValue", "РЅРµРѕР±С…РѕРґРёРјС‹Рµ РїР°СЂР°РјРµС‚СЂС‹");
 		
-		ar.serialize(accessBuildingsList_, "accessBuildingsList", "необходимые строения");
+		ar.serialize(accessBuildingsList_, "accessBuildingsList", "РЅРµРѕР±С…РѕРґРёРјС‹Рµ СЃС‚СЂРѕРµРЅРёСЏ");
 
 		ar.closeBlock();
 	}
@@ -539,13 +539,13 @@ AccessBuilding::AccessBuilding()
 
 void AccessBuilding::serialize(Archive& ar)
 {
-	ar.serialize(building, "building", "&Здание");
-	ar.serialize(needConstructed, "needConstructed", "&Должно быть построено");
+	ar.serialize(building, "building", "&Р—РґР°РЅРёРµ");
+	ar.serialize(needConstructed, "needConstructed", "&Р”РѕР»Р¶РЅРѕ Р±С‹С‚СЊ РїРѕСЃС‚СЂРѕРµРЅРѕ");
 }
 
 bool AccessBuildings::serialize(Archive& ar, const char* name, const char* nameAlt)
 {
-	return ar.serialize(static_cast<vector<AccessBuilding>&>(*this), name, "&ИЛИ");
+	return ar.serialize(static_cast<vector<AccessBuilding>&>(*this), name, "&РР›Р");
 }
 
 // ------------------------------
@@ -554,6 +554,6 @@ void WeaponGroupType::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(shootingMode_, "shootingMode", "режим стрельбы в группе");
+	ar.serialize(shootingMode_, "shootingMode", "СЂРµР¶РёРј СЃС‚СЂРµР»СЊР±С‹ РІ РіСЂСѓРїРїРµ");
 }
 

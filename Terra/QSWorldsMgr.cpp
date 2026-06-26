@@ -5,7 +5,7 @@
 #include "FileUtils/FileUtils.h"
 #include "FileUtils/XGUID.h"
 
-//Network/LogMsg.h // Недопустимая зависимость
+//Network/LogMsg.h // РќРµРґРѕРїСѓСЃС‚РёРјР°СЏ Р·Р°РІРёСЃРёРјРѕСЃС‚СЊ
 
 
 QSWorldsMgr qsWorldsMgr;
@@ -112,7 +112,7 @@ void QSWorldsMgr::getRandomMissionGuid(__int64& inLowFilterMap, XGUID& outMissio
 			cntMission++;
 		}
 	}
-	//на выходе missionnum
+	//РЅР° РІС‹С…РѕРґРµ missionnum
 	//LogMsg("QS - missionSelect:%u,%u\n", number, missionnum);
 	if(worldsLst.empty())
 		memset(&outMissionGuid, '\0', sizeof(outMissionGuid));

@@ -21,15 +21,15 @@ UI_MinimapSymbol::UI_MinimapSymbol()
 
 void UI_MinimapSymbol::serialize(Archive& ar)
 {
-	ar.serialize(type, "type", "тип");
-	ar.serialize(scaleByEvent, "scaleByEvent", "маштабировать по размеру события/юнита");
+	ar.serialize(type, "type", "С‚РёРї");
+	ar.serialize(scaleByEvent, "scaleByEvent", "РјР°С€С‚Р°Р±РёСЂРѕРІР°С‚СЊ РїРѕ СЂР°Р·РјРµСЂСѓ СЃРѕР±С‹С‚РёСЏ/СЋРЅРёС‚Р°");
 	if(!scaleByEvent)
-		ar.serialize(scale, "selfScale", "собственный масштаб символа");
-	ar.serialize(legionColor, "useLegionColor", "красить в цвет легиона");
+		ar.serialize(scale, "selfScale", "СЃРѕР±СЃС‚РІРµРЅРЅС‹Р№ РјР°СЃС€С‚Р°Р± СЃРёРјРІРѕР»Р°");
+	ar.serialize(legionColor, "useLegionColor", "РєСЂР°СЃРёС‚СЊ РІ С†РІРµС‚ Р»РµРіРёРѕРЅР°");
 	if(type == SYMBOL_SPRITE)
-		ar.serialize(sprite, "sprite", "изображение");
+		ar.serialize(sprite, "sprite", "РёР·РѕР±СЂР°Р¶РµРЅРёРµ");
 	else if(!legionColor)
-		ar.serialize(color, "color", "собственный цвет символа");
+		ar.serialize(color, "color", "СЃРѕР±СЃС‚РІРµРЅРЅС‹Р№ С†РІРµС‚ СЃРёРјРІРѕР»Р°");
 }
 
 int UI_MinimapSymbol::lifeTime() const
@@ -57,12 +57,12 @@ void UI_MinimapEventStatic::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(isImportant_, "isImportant", "Требует запоминания для перехода");
+	ar.serialize(isImportant_, "isImportant", "РўСЂРµР±СѓРµС‚ Р·Р°РїРѕРјРёРЅР°РЅРёСЏ РґР»СЏ РїРµСЂРµС…РѕРґР°");
 	if(isImportant_)
-		ar.serialize(validTime_, "validTime", "Время в течении которого можно перейти к точке возникновения");
+		ar.serialize(validTime_, "validTime", "Р’СЂРµРјСЏ РІ С‚РµС‡РµРЅРёРё РєРѕС‚РѕСЂРѕРіРѕ РјРѕР¶РЅРѕ РїРµСЂРµР№С‚Рё Рє С‚РѕС‡РєРµ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёСЏ");
 }
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(UI_MinimapSymbol, SymbolType, "UI_MinimapSymbol::Type")
-REGISTER_ENUM_ENCLOSED(UI_MinimapSymbol, SYMBOL_RECTANGLE, "прямоугольник")
-REGISTER_ENUM_ENCLOSED(UI_MinimapSymbol, SYMBOL_SPRITE, "изображение")
+REGISTER_ENUM_ENCLOSED(UI_MinimapSymbol, SYMBOL_RECTANGLE, "РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРє")
+REGISTER_ENUM_ENCLOSED(UI_MinimapSymbol, SYMBOL_SPRITE, "РёР·РѕР±СЂР°Р¶РµРЅРёРµ")
 END_ENUM_DESCRIPTOR_ENCLOSED(UI_MinimapSymbol, SymbolType)

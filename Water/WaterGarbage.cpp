@@ -223,7 +223,7 @@ void cWaterBubble::Draw(Camera* camera)
 				continue;
 			OneObject& p=objects[i];
 
-			//Добавить в массив
+			//Р”РѕР±Р°РІРёС‚СЊ РІ РјР°СЃСЃРёРІ
 			Vect3f sx,sy;
 			Vect2f rot(1,0);
 			rot*=p.size;
@@ -310,24 +310,24 @@ void cWaterBubbleCenter::serialize(Archive& ar)
 {
 	//__super::serialize(ar);
 	float speed=GetSpeed();
-	ar.serialize(RangedWrapperf (speed, 0.0f, 1000.0f, 5.0f), "speed", "Скорость генерации пузырьков");
+	ar.serialize(RangedWrapperf (speed, 0.0f, 1000.0f, 5.0f), "speed", "РЎРєРѕСЂРѕСЃС‚СЊ РіРµРЅРµСЂР°С†РёРё РїСѓР·С‹СЂСЊРєРѕРІ");
 
-	ar.serialize(RangedWrapperf (min_life_time, 0.1f, 1000.0f, 1.0f), "min_life_time", "Минимальное время жизни");
-	ar.serialize(RangedWrapperf (max_life_time, 0.1f, 1000.0f, 1.0f), "max_life_time", "Максимальное время жизни");
+	ar.serialize(RangedWrapperf (min_life_time, 0.1f, 1000.0f, 1.0f), "min_life_time", "РњРёРЅРёРјР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ Р¶РёР·РЅРё");
+	ar.serialize(RangedWrapperf (max_life_time, 0.1f, 1000.0f, 1.0f), "max_life_time", "РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ Р¶РёР·РЅРё");
 
 	ar.serialize(generate_interval, "generate_interval", 0);
 	ar.serialize(generate_sum, "generate_sum", 0);
 	static ResourceSelector::Options textureOptions("*.tga", "Resource\\TerrainData\\Textures");
-	ar.serialize(ResourceSelector(texture_name, textureOptions), "texture_name", "Текстура");
+	ar.serialize(ResourceSelector(texture_name, textureOptions), "texture_name", "РўРµРєСЃС‚СѓСЂР°");
 
 	//if(ar.isInput() && ar.isEdit() &&  parent)
-	//{	//Для редактора
+	//{	//Р”Р»СЏ СЂРµРґР°РєС‚РѕСЂР°
 	//	cWaterBubble* p=parent;
 	//	p->DeleteCenter(this);
 	//	p->AddCenter(this);
 	//}
 
-	ar.serialize(delete_on_up, "delete_on_up", "Пузырьки исчезают на поверхности");
+	ar.serialize(delete_on_up, "delete_on_up", "РџСѓР·С‹СЂСЊРєРё РёСЃС‡РµР·Р°СЋС‚ РЅР° РїРѕРІРµСЂС…РЅРѕСЃС‚Рё");
 
 	if(ar.isInput())
 		SetSpeed(speed);

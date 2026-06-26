@@ -40,7 +40,7 @@ public:
 	bool selected() const{ return selected_; }
 	void setSelected(bool selected) { selected_ = selected; }
     bool expanded() const{ return expanded_; }
-	// используйте Tree::expandRow
+	// РёСЃРїРѕР»СЊР·СѓР№С‚Рµ Tree::expandRow
 	void _setExpanded(bool expanded){ expanded_ = expanded; }
 	void expandAll(Tree* tree);
 	int height() const{ return height_; }
@@ -154,7 +154,7 @@ public:
 	virtual bool canBeToggled() const{ return true; }
 	virtual bool canBeDragged() const{ return false; }
 
-	// admix: не слишком ли много функций для drop-а?
+	// admix: РЅРµ СЃР»РёС€РєРѕРј Р»Рё РјРЅРѕРіРѕ С„СѓРЅРєС†РёР№ РґР»СЏ drop-Р°?
 	virtual bool canBeDroppedOn(const TreeRow* row, const TreeRow* beforeChild, const Tree* tree, bool direct) const{ return false; }
 	
 	virtual void dropInto(TreeRow* destination, TreeRow* beforeChild, Tree* tree);

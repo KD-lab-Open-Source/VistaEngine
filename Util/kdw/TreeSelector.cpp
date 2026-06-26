@@ -24,7 +24,7 @@ TreeSelectorDialog::TreeSelectorDialog(Widget* parent)
 
 void TreeSelectorDialog::init()
 {
-	setTitle(TRANSLATE("Выбор..."));
+	setTitle(TRANSLATE("Р’С‹Р±РѕСЂ..."));
 	setDefaultSize(Vect2i(400, 500));
 	setMinimizeable(false);
 	setResizeable(true);
@@ -37,8 +37,8 @@ void TreeSelectorDialog::init()
 	filterEntry_->signalChanged().connect(this, &TreeSelectorDialog::onFilterChanged);
 	box->add(filterEntry_, false, false, false);
 
-	addButton(TRANSLATE("ОК"), RESPONSE_OK);
-	addButton(TRANSLATE("Отмена"), RESPONSE_CANCEL);
+	addButton(TRANSLATE("РћРљ"), RESPONSE_OK);
+	addButton(TRANSLATE("РћС‚РјРµРЅР°"), RESPONSE_CANCEL);
 }
 
 #pragma warning(push)

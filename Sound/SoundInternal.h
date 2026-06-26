@@ -51,7 +51,7 @@ public:
 };
 
 namespace SND {
-//vol=0..1, учитывает глобальную громкость
+//vol=0..1, СѓС‡РёС‚С‹РІР°РµС‚ РіР»РѕР±Р°Р»СЊРЅСѓСЋ РіСЂРѕРјРєРѕСЃС‚СЊ
 long ToDirectVolumef(float vol);
 inline float frand(){return rand()/(float)0x7fff;}
 extern bool soft3d;

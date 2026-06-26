@@ -26,8 +26,8 @@ GradientDialog::GradientDialog(Widget* parent, const KeysColor& gradient, Positi
 	setResizeable(true);
 	setDefaultSize(Vect2i(720, 150));
 
-	addButton(TRANSLATE("Œ "), RESPONSE_OK);
-	addButton(TRANSLATE("ŒÚÏÂÌ‡"), RESPONSE_CANCEL);
+	addButton(TRANSLATE("–û–ö"), RESPONSE_OK);
+	addButton(TRANSLATE("–û—Ç–º–µ–Ω–∞"), RESPONSE_CANCEL);
 
 	VBox* vbox = new VBox(4);
 	add(vbox); {

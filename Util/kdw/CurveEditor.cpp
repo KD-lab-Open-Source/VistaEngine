@@ -450,13 +450,13 @@ void CurveEditorTimeline::redraw(HDC dc, const ViewTransform& view)
 		LineTo(dc, end.x, end.y);
 	}
 
-	// прямоугольник с рисочкой таймлайна
+	// РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРє СЃ СЂРёСЃРѕС‡РєРѕР№ С‚Р°Р№РјР»Р°Р№РЅР°
 	::SelectObject(dc, HGDIOBJ(timelinePen));
 
 	Recti timelineRect(this->timelineRect(view));
 	::Rectangle(dc, timelineRect.left(), timelineRect.top(), timelineRect.right(), timelineRect.bottom());
 
-	// сама рисочка
+	// СЃР°РјР° СЂРёСЃРѕС‡РєР°
 	Vect2i start(view.transformX(current_time), timelineRect.top());
 	Vect2i end(view.transformX(current_time), timelineRect.bottom());
 	MoveToEx(dc, start.x, start.y, 0);

@@ -262,10 +262,10 @@ void Widget::showAll()
 void Widget::serialize(Archive& ar)
 {
 	if(ar.filter(kdw::SERIALIZE_DESIGN)){
-		ar.serialize(_property(border_, this, &Widget::setBorder), "border", "Îòñòóïû");
-		ar.serialize(requestSize_, "requestSize", "Ðàçìåð");
-		ar.serialize(_property(sensitive_, this, &Widget::setSensitive), "sensitive", "Àêòèâíîñòü");
-		ar.serialize(_property(visible_, this, &Widget::setVisibility), "visible", "Âèäèìîñòü");
+		ar.serialize(_property(border_, this, &Widget::setBorder), "border", "ÐžÑ‚ÑÑ‚ÑƒÐ¿Ñ‹");
+		ar.serialize(requestSize_, "requestSize", "Ð Ð°Ð·Ð¼ÐµÑ€");
+		ar.serialize(_property(sensitive_, this, &Widget::setSensitive), "sensitive", "ÐÐºÑ‚Ð¸Ð²Ð½Ð¾ÑÑ‚ÑŒ");
+		ar.serialize(_property(visible_, this, &Widget::setVisibility), "visible", "Ð’Ð¸Ð´Ð¸Ð¼Ð¾ÑÑ‚ÑŒ");
 	}
 }
 
@@ -357,7 +357,7 @@ bool Container::isActive() const
 {
 	Win32::Window32* window = _findWindow(this);
 	if(window){
-		// ïîëó÷àåì ðîäèòåëüñêîå îêíî è ñìîòðèì àêòèâíî ëè îíî
+		// Ð¿Ð¾Ð»ÑƒÑ‡Ð°ÐµÐ¼ Ñ€Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑŒÑÐºÐ¾Ðµ Ð¾ÐºÐ½Ð¾ Ð¸ ÑÐ¼Ð¾Ñ‚Ñ€Ð¸Ð¼ Ð°ÐºÑ‚Ð¸Ð²Ð½Ð¾ Ð»Ð¸ Ð¾Ð½Ð¾
 		while(window->parent())
 			window = window->parent();
 		return (::GetActiveWindow() == *window);

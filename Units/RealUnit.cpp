@@ -24,37 +24,37 @@
 UNIT_LINK_GET(UnitReal)
 
 DECLARE_SEGMENT(UnitReal)
-REGISTER_CLASS(UnitBase, UnitReal, "Юнит");
+REGISTER_CLASS(UnitBase, UnitReal, "Р®РЅРёС‚");
 REGISTER_CLASS_IN_FACTORY(UnitFactory, UNIT_CLASS_REAL, UnitReal)
 
-BEGIN_ENUM_DESCRIPTOR(AutoAttackMode, "Режими атаки (без цели)")
-REGISTER_ENUM(ATTACK_MODE_DISABLE, "Не атаковать")
-REGISTER_ENUM(ATTACK_MODE_DEFENCE, "Защита")
-REGISTER_ENUM(ATTACK_MODE_OFFENCE, "Нападение")
+BEGIN_ENUM_DESCRIPTOR(AutoAttackMode, "Р РµР¶РёРјРё Р°С‚Р°РєРё (Р±РµР· С†РµР»Рё)")
+REGISTER_ENUM(ATTACK_MODE_DISABLE, "РќРµ Р°С‚Р°РєРѕРІР°С‚СЊ")
+REGISTER_ENUM(ATTACK_MODE_DEFENCE, "Р—Р°С‰РёС‚Р°")
+REGISTER_ENUM(ATTACK_MODE_OFFENCE, "РќР°РїР°РґРµРЅРёРµ")
 END_ENUM_DESCRIPTOR(AutoAttackMode)
 
-BEGIN_ENUM_DESCRIPTOR(WalkAttackMode, "Режими атаки при движении")
-REGISTER_ENUM(WALK_NOT_ATTACK, "Не останавливатся и не атаковать")
-REGISTER_ENUM(WALK_AND_ATTACK, "Атаковать на ходу")
-REGISTER_ENUM(WALK_STOP_AND_ATTACK, "Останавливатся и атаковать")
+BEGIN_ENUM_DESCRIPTOR(WalkAttackMode, "Р РµР¶РёРјРё Р°С‚Р°РєРё РїСЂРё РґРІРёР¶РµРЅРёРё")
+REGISTER_ENUM(WALK_NOT_ATTACK, "РќРµ РѕСЃС‚Р°РЅР°РІР»РёРІР°С‚СЃСЏ Рё РЅРµ Р°С‚Р°РєРѕРІР°С‚СЊ")
+REGISTER_ENUM(WALK_AND_ATTACK, "РђС‚Р°РєРѕРІР°С‚СЊ РЅР° С…РѕРґСѓ")
+REGISTER_ENUM(WALK_STOP_AND_ATTACK, "РћСЃС‚Р°РЅР°РІР»РёРІР°С‚СЃСЏ Рё Р°С‚Р°РєРѕРІР°С‚СЊ")
 END_ENUM_DESCRIPTOR(WalkAttackMode)
 
-BEGIN_ENUM_DESCRIPTOR(AutoTargetFilter, "Режим автоматического выбора целей")
-REGISTER_ENUM(AUTO_ATTACK_ALL, "Атаковать всех")
-REGISTER_ENUM(AUTO_ATTACK_BUILDINGS, "Атаковать только здания")
-REGISTER_ENUM(AUTO_ATTACK_UNITS, "Атаковать только юнитов")
+BEGIN_ENUM_DESCRIPTOR(AutoTargetFilter, "Р РµР¶РёРј Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРіРѕ РІС‹Р±РѕСЂР° С†РµР»РµР№")
+REGISTER_ENUM(AUTO_ATTACK_ALL, "РђС‚Р°РєРѕРІР°С‚СЊ РІСЃРµС…")
+REGISTER_ENUM(AUTO_ATTACK_BUILDINGS, "РђС‚Р°РєРѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ Р·РґР°РЅРёСЏ")
+REGISTER_ENUM(AUTO_ATTACK_UNITS, "РђС‚Р°РєРѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ СЋРЅРёС‚РѕРІ")
 END_ENUM_DESCRIPTOR(AutoTargetFilter)
 
-BEGIN_ENUM_DESCRIPTOR(WeaponMode, "Режими оружия")
-REGISTER_ENUM(LONG_RANGE, "Атаковать только оружием дальнего боя")
-REGISTER_ENUM(SHORT_RANGE, "Атаковать только оружием ближнего боя")
-REGISTER_ENUM(ANY_RANGE, "Атаковать любым оружием")
+BEGIN_ENUM_DESCRIPTOR(WeaponMode, "Р РµР¶РёРјРё РѕСЂСѓР¶РёСЏ")
+REGISTER_ENUM(LONG_RANGE, "РђС‚Р°РєРѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ РѕСЂСѓР¶РёРµРј РґР°Р»СЊРЅРµРіРѕ Р±РѕСЏ")
+REGISTER_ENUM(SHORT_RANGE, "РђС‚Р°РєРѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ РѕСЂСѓР¶РёРµРј Р±Р»РёР¶РЅРµРіРѕ Р±РѕСЏ")
+REGISTER_ENUM(ANY_RANGE, "РђС‚Р°РєРѕРІР°С‚СЊ Р»СЋР±С‹Рј РѕСЂСѓР¶РёРµРј")
 END_ENUM_DESCRIPTOR(WeaponMode)
 
-BEGIN_ENUM_DESCRIPTOR(ProduceType, "Тип производства")
-REGISTER_ENUM(PRODUCE_INVALID, "Нет производства")
-REGISTER_ENUM(PRODUCE_RESOURCE, "Производство ресурса")
-REGISTER_ENUM(PRODUCE_UNIT, "Производство юнита")
+BEGIN_ENUM_DESCRIPTOR(ProduceType, "РўРёРї РїСЂРѕРёР·РІРѕРґСЃС‚РІР°")
+REGISTER_ENUM(PRODUCE_INVALID, "РќРµС‚ РїСЂРѕРёР·РІРѕРґСЃС‚РІР°")
+REGISTER_ENUM(PRODUCE_RESOURCE, "РџСЂРѕРёР·РІРѕРґСЃС‚РІРѕ СЂРµСЃСѓСЂСЃР°")
+REGISTER_ENUM(PRODUCE_UNIT, "РџСЂРѕРёР·РІРѕРґСЃС‚РІРѕ СЋРЅРёС‚Р°")
 END_ENUM_DESCRIPTOR(ProduceType)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(UnitReal, UnitState, "UnitReal::UnitState")
@@ -83,7 +83,7 @@ UnitReal::UnitReal(const UnitTemplate& data)
 
 	setModel(attr().modelName.c_str());
 	if(!model()){
-		xassertStr(0 && "Не установлена или не найдена модель у юнита ", attr().libraryKey());
+		xassertStr(0 && "РќРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅР° РёР»Рё РЅРµ РЅР°Р№РґРµРЅР° РјРѕРґРµР»СЊ Сѓ СЋРЅРёС‚Р° ", attr().libraryKey());
 		Kill(); 
 		return;
 	}
@@ -105,7 +105,7 @@ void UnitReal::serialize (Archive& ar)
 {
     __super::serialize(ar);
 
-	ar.serialize(label_, "label", "Метка");
+	ar.serialize(label_, "label", "РњРµС‚РєР°");
 
 	if(universe()->userSave()){
 		ar.serialize(dockingController_, "dockingController", 0);
@@ -201,8 +201,8 @@ void UnitReal::setModelLogic(const char* name)
 
 void UnitReal::CalcSilouetteHeuristic()
 {
-//Проблема такова - нужно по видимости одной точки определить, рисуется ли силуэт оюъекта.
-//Здесь часть кода для определения, где расположенна точка.
+//РџСЂРѕР±Р»РµРјР° С‚Р°РєРѕРІР° - РЅСѓР¶РЅРѕ РїРѕ РІРёРґРёРјРѕСЃС‚Рё РѕРґРЅРѕР№ С‚РѕС‡РєРё РѕРїСЂРµРґРµР»РёС‚СЊ, СЂРёСЃСѓРµС‚СЃСЏ Р»Рё СЃРёР»СѓСЌС‚ РѕСЋСЉРµРєС‚Р°.
+//Р—РґРµСЃСЊ С‡Р°СЃС‚СЊ РєРѕРґР° РґР»СЏ РѕРїСЂРµРґРµР»РµРЅРёСЏ, РіРґРµ СЂР°СЃРїРѕР»РѕР¶РµРЅРЅР° С‚РѕС‡РєР°.
 	cObject3dx* pobj=modelLogic();
 	if(pobj==NULL)
 		pobj=model();
@@ -543,7 +543,7 @@ void UnitReal::interpolationQuant()
 		chainControllers_.quant(forwardVelocityFactor);
 	}
 
-	modelLogicUpdated_ = false; // у большинства объектов есть анимация, которая может изменить координаты
+	modelLogicUpdated_ = false; // Сѓ Р±РѕР»СЊС€РёРЅСЃС‚РІР° РѕР±СЉРµРєС‚РѕРІ РµСЃС‚СЊ Р°РЅРёРјР°С†РёСЏ, РєРѕС‚РѕСЂР°СЏ РјРѕР¶РµС‚ РёР·РјРµРЅРёС‚СЊ РєРѕРѕСЂРґРёРЅР°С‚С‹
 }
 
 void UnitReal::explode()

@@ -72,7 +72,7 @@ private:
 	ShareHandle<PropertyRow> currentNode_;
 	PropertyRow* lastNode_;
 
-	// для defaultArchive
+	// РґР»СЏ defaultArchive
 	ShareHandle<PropertyRow> rootNode_;
 	std::string typeName_;
 	const char* derivedTypeName_;

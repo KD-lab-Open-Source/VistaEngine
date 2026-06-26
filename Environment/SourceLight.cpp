@@ -118,14 +118,14 @@ void SourceLight::serialize(Archive& ar)
 
 	AnimKeys_[0].radius = radius();
 
-	//ar.serialize(AnimKeys_[0].rotate.x, "Radius1", "Радиус 1");
+	//ar.serialize(AnimKeys_[0].rotate.x, "Radius1", "Р Р°РґРёСѓСЃ 1");
 	//radius_ = AnimKeys_[0].rotate.x;
 	
-	ar.serialize(AnimKeys_[1].radius, "Radius2", "Радиус 2");
-	ar.serialize(AnimKeys_[0].diffuse, "Light_color1", "Цвет 1");
-	ar.serialize(AnimKeys_[1].diffuse, "Light_color2", "Цвет 2");
-	ar.serialize(frequency_, "frequency_", "Частота мерцания");
-	ar.serialize(toObjects_, "toObjects_", "На объеты");
+	ar.serialize(AnimKeys_[1].radius, "Radius2", "Р Р°РґРёСѓСЃ 2");
+	ar.serialize(AnimKeys_[0].diffuse, "Light_color1", "Р¦РІРµС‚ 1");
+	ar.serialize(AnimKeys_[1].diffuse, "Light_color2", "Р¦РІРµС‚ 2");
+	ar.serialize(frequency_, "frequency_", "Р§Р°СЃС‚РѕС‚Р° РјРµСЂС†Р°РЅРёСЏ");
+	ar.serialize(toObjects_, "toObjects_", "РќР° РѕР±СЉРµС‚С‹");
 	
 	serializationApply(ar);
 }

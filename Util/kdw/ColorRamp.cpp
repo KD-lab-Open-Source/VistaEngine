@@ -258,7 +258,7 @@ void ColorRampImpl::redraw(HDC dc)
 	SetStretchBltMode(dc, HALFTONE);
     StretchBlt(dc, 0, 0, ramp_width, ramp_height, tempDC, 0, 0, 255, 255, SRCCOPY);
     
-    // Курсор в Saturation/Brightness области
+    // РљСѓСЂСЃРѕСЂ РІ Saturation/Brightness РѕР±Р»Р°СЃС‚Рё
     int posY = round((1.0f - hlsColor_.brightness) * float(ramp_height));
     int posX = round((hlsColor_.saturation) * float(ramp_width));
 	Color4f colorf(1.0f, 1.0f, 1.0f, 1.0f);
@@ -285,7 +285,7 @@ void ColorRampImpl::redraw(HDC dc)
 	}
 	::SelectObject(dc, oldPen);
 
-    // Курсор на Hue полоске
+    // РљСѓСЂСЃРѕСЂ РЅР° Hue РїРѕР»РѕСЃРєРµ
 	int pos = round(hlsColor_.hue / 360.0f * rect.height());
 		
 	HBSColor(hlsColor_.hue, 1.0f, 1.0f).toRGB(colorf);

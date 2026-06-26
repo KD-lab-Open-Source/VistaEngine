@@ -103,7 +103,7 @@ public:
 	bool close();
 	bool findSection(const char* sectionName);
 
-	void setVersion(int version) { version_ = version; } // Для сложной конверсии: вручную записывать, выставлять и кастить архив к XPrmIArchive
+	void setVersion(int version) { version_ = version; } // Р”Р»СЏ СЃР»РѕР¶РЅРѕР№ РєРѕРЅРІРµСЂСЃРёРё: РІСЂСѓС‡РЅСѓСЋ Р·Р°РїРёСЃС‹РІР°С‚СЊ, РІС‹СЃС‚Р°РІР»СЏС‚СЊ Рё РєР°СЃС‚РёС‚СЊ Р°СЂС…РёРІ Рє XPrmIArchive
 	int version() const { return version_; }
 
 	unsigned int crc();

@@ -13,8 +13,8 @@ struct cBlobsSetting
 	cBlobsSetting():specularColor_(0.6875f,1.f,0.898f,1.0f), color_(0.0f, 0.0f, 0.0f, 0.7f) {}
 
 	void serialize(Archive& ar) {
-		ar.serialize(color_, "color", "÷‚ÂÚ");
-		ar.serialize(specularColor_, "specularColor", "÷‚ÂÚ ·ÎËÍ‡");
+		ar.serialize(color_, "color", "–¶–≤–µ—Ç");
+		ar.serialize(specularColor_, "specularColor", "–¶–≤–µ—Ç –±–ª–∏–∫–∞");
 	}
 
 };

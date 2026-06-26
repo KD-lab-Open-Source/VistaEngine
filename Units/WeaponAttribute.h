@@ -32,13 +32,13 @@ enum UI_MarkObjectModeID
 };
 
 
-enum EnvironmentType { // При изменении поправить convertEnvironmentType2Idx и AttackClass
+enum EnvironmentType { // РџСЂРё РёР·РјРµРЅРµРЅРёРё РїРѕРїСЂР°РІРёС‚СЊ convertEnvironmentType2Idx Рё AttackClass
 	ENVIRONMENT_PHANTOM = 0, 
-	ENVIRONMENT_PHANTOM2 = 1 << 0, // Фантом учитываемый в PathTracking-е
+	ENVIRONMENT_PHANTOM2 = 1 << 0, // Р¤Р°РЅС‚РѕРј СѓС‡РёС‚С‹РІР°РµРјС‹Р№ РІ PathTracking-Рµ
 	ENVIRONMENT_BUSH = 1 << 1, 
 	ENVIRONMENT_TREE = 1 << 2, 
 	ENVIRONMENT_FENCE = 1 << 3, 
-	ENVIRONMENT_FENCE2 = 1 << 4, // Забор, неразрушаемый при коллизии
+	ENVIRONMENT_FENCE2 = 1 << 4, // Р—Р°Р±РѕСЂ, РЅРµСЂР°Р·СЂСѓС€Р°РµРјС‹Р№ РїСЂРё РєРѕР»Р»РёР·РёРё
 	ENVIRONMENT_STONE = 1 << 5, 
 	ENVIRONMENT_ROCK = 1 << 6, 
 
@@ -60,7 +60,7 @@ inline bool isEnvironmentSimple(EnvironmentType environmentType)
 
 enum AttackClass
 {
-	ATTACK_CLASS_IGNORE = 0, // Никто
+	ATTACK_CLASS_IGNORE = 0, // РќРёРєС‚Рѕ
 
 	ATTACK_CLASS_ENVIRONMENT_BUSH = ENVIRONMENT_BUSH, 
 	ATTACK_CLASS_ENVIRONMENT_TREE = ENVIRONMENT_TREE, 
@@ -77,22 +77,22 @@ enum AttackClass
 		ATTACK_CLASS_ENVIRONMENT_BARN | ATTACK_CLASS_ENVIRONMENT_BUILDING | ATTACK_CLASS_ENVIRONMENT_BRIDGE |
 		ATTACK_CLASS_ENVIRONMENT_INDESTRUCTIBLE | ATTACK_CLASS_ENVIRONMENT_BIG_BUILDING,
 
-	ATTACK_CLASS_LIGHT = 1 << 13, // Легкие
-	ATTACK_CLASS_MEDIUM = 1 << 14, // Средние
-	ATTACK_CLASS_HEAVY = 1 << 15, // Тяжелые
-	ATTACK_CLASS_AIR = 1 << 16, // Воздушные
-	ATTACK_CLASS_AIR_MEDIUM = 1 << 17, // Воздушные тяжелые
-	ATTACK_CLASS_AIR_HEAVY = 1 << 18, // Воздушные средние
-	ATTACK_CLASS_UNDERGROUND = 1 << 19, // Подземные
+	ATTACK_CLASS_LIGHT = 1 << 13, // Р›РµРіРєРёРµ
+	ATTACK_CLASS_MEDIUM = 1 << 14, // РЎСЂРµРґРЅРёРµ
+	ATTACK_CLASS_HEAVY = 1 << 15, // РўСЏР¶РµР»С‹Рµ
+	ATTACK_CLASS_AIR = 1 << 16, // Р’РѕР·РґСѓС€РЅС‹Рµ
+	ATTACK_CLASS_AIR_MEDIUM = 1 << 17, // Р’РѕР·РґСѓС€РЅС‹Рµ С‚СЏР¶РµР»С‹Рµ
+	ATTACK_CLASS_AIR_HEAVY = 1 << 18, // Р’РѕР·РґСѓС€РЅС‹Рµ СЃСЂРµРґРЅРёРµ
+	ATTACK_CLASS_UNDERGROUND = 1 << 19, // РџРѕРґР·РµРјРЅС‹Рµ
 
-	ATTACK_CLASS_BUILDING = 1 << 20, // Здания
-	ATTACK_CLASS_MISSILE = 1 << 21, // Снаряды
+	ATTACK_CLASS_BUILDING = 1 << 20, // Р—РґР°РЅРёСЏ
+	ATTACK_CLASS_MISSILE = 1 << 21, // РЎРЅР°СЂСЏРґС‹
 
-	ATTACK_CLASS_TERRAIN_SOFT = 1 << 22, // Земля копаемая
-	ATTACK_CLASS_TERRAIN_HARD = 1 << 23, // Земля некопаемая
-	ATTACK_CLASS_WATER = 1 << 24, // Вода
-	ATTACK_CLASS_WATER_LOW = 1 << 25, // Относительная вода 
-	ATTACK_CLASS_ICE = 1 << 26, // Лёд
+	ATTACK_CLASS_TERRAIN_SOFT = 1 << 22, // Р—РµРјР»СЏ РєРѕРїР°РµРјР°СЏ
+	ATTACK_CLASS_TERRAIN_HARD = 1 << 23, // Р—РµРјР»СЏ РЅРµРєРѕРїР°РµРјР°СЏ
+	ATTACK_CLASS_WATER = 1 << 24, // Р’РѕРґР°
+	ATTACK_CLASS_WATER_LOW = 1 << 25, // РћС‚РЅРѕСЃРёС‚РµР»СЊРЅР°СЏ РІРѕРґР° 
+	ATTACK_CLASS_ICE = 1 << 26, // Р›С‘Рґ
 
 	ATTACK_CLASS_GROUND = ATTACK_CLASS_TERRAIN_SOFT | ATTACK_CLASS_TERRAIN_HARD | ATTACK_CLASS_WATER,
 	ATTACK_CLASS_GROUND_ALL = ATTACK_CLASS_TERRAIN_SOFT | ATTACK_CLASS_TERRAIN_HARD | ATTACK_CLASS_WATER | ATTACK_CLASS_WATER_LOW | ATTACK_CLASS_ICE,
@@ -131,30 +131,30 @@ public:
 
 private:
 
-	/// имя узла для управления поворотом
+	/// РёРјСЏ СѓР·Р»Р° РґР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ РїРѕРІРѕСЂРѕС‚РѕРј
 	Object3dxNode nodeGraphics_;
-	/// имя логического узла для управления поворотом
+	/// РёРјСЏ Р»РѕРіРёС‡РµСЃРєРѕРіРѕ СѓР·Р»Р° РґР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ РїРѕРІРѕСЂРѕС‚РѕРј
 	Logic3dxNode nodeLogic_;
 
 	Se3f nodeGraphicsOffset_;
 	Se3f nodeLogicOffset_;
 
-	/// поворачивать граф. узел по осям логического
+	/// РїРѕРІРѕСЂР°С‡РёРІР°С‚СЊ РіСЂР°С„. СѓР·РµР» РїРѕ РѕСЃСЏРј Р»РѕРіРёС‡РµСЃРєРѕРіРѕ
 	bool rotateByLogic_;
 
-	/// точность наведения
+	/// С‚РѕС‡РЅРѕСЃС‚СЊ РЅР°РІРµРґРµРЅРёСЏ
 	float precision_;
 
-	/// скорость поворота, градус/сек
+	/// СЃРєРѕСЂРѕСЃС‚СЊ РїРѕРІРѕСЂРѕС‚Р°, РіСЂР°РґСѓСЃ/СЃРµРє
 	float turnSpeed_;
-	/// скорость поворота при прямом управлении, градус/сек
+	/// СЃРєРѕСЂРѕСЃС‚СЊ РїРѕРІРѕСЂРѕС‚Р° РїСЂРё РїСЂСЏРјРѕРј СѓРїСЂР°РІР»РµРЅРёРё, РіСЂР°РґСѓСЃ/СЃРµРє
 	float turnSpeedDirectControl_;
 
-	/// минимальное значение 
+	/// РјРёРЅРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ 
 	float valueMin_;
-	/// максимальное значение 
+	/// РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ 
 	float valueMax_;
-	/// значение по умолчанию
+	/// Р·РЅР°С‡РµРЅРёРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 	float valueDefault_;
 
 	bool updateOffsets();
@@ -182,7 +182,7 @@ struct WeaponAnimationTypeString : StringTableBaseSimple
 typedef StringTable<WeaponAnimationTypeString> WeaponAnimationTypeTable;
 typedef StringTableReference<WeaponAnimationTypeString, false> WeaponAnimationType;
 
-// параметры управления наведением оружия
+// РїР°СЂР°РјРµС‚СЂС‹ СѓРїСЂР°РІР»РµРЅРёСЏ РЅР°РІРµРґРµРЅРёРµРј РѕСЂСѓР¶РёСЏ
 class WeaponAimControllerPrm
 {
 public:
@@ -215,7 +215,7 @@ private:
 	bool isEnabled_;
 	bool isCorrectionEnabled_;
 
-	/// дуло
+	/// РґСѓР»Рѕ
 	class Barrel
 	{
 	public:
@@ -234,16 +234,16 @@ private:
 
 	bool hasAnimation_;
 	
-	/// управление горизонтальным углом
+	/// СѓРїСЂР°РІР»РµРЅРёРµ РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹Рј СѓРіР»РѕРј
 	WeaponAimAnglePrm anglePsiPrm_;
-	/// управление вертикальным углом
+	/// СѓРїСЂР°РІР»РµРЅРёРµ РІРµСЂС‚РёРєР°Р»СЊРЅС‹Рј СѓРіР»РѕРј
 	WeaponAimAnglePrm angleThetaPrm_;
 
 public:
 	static const WeaponAimControllerPrm EMPTY;
 };
 
-/// Базовые параметры оружия.
+/// Р‘Р°Р·РѕРІС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ РѕСЂСѓР¶РёСЏ.
 class WeaponPrm : public PolymorphicBase
 {
 public:
@@ -252,65 +252,65 @@ public:
 
 	virtual void serialize(Archive& ar);
 
-	/// классы оружия
+	/// РєР»Р°СЃСЃС‹ РѕСЂСѓР¶РёСЏ
 	enum WeaponClass
 	{
-		/// лучевое оружие
+		/// Р»СѓС‡РµРІРѕРµ РѕСЂСѓР¶РёРµ
 		WEAPON_BEAM,
-		/// стреляющее снарядами оружие
+		/// СЃС‚СЂРµР»СЏСЋС‰РµРµ СЃРЅР°СЂСЏРґР°РјРё РѕСЂСѓР¶РёРµ
 		WEAPON_PROJECTILE,
-		/// действующее на зону оружие
+		/// РґРµР№СЃС‚РІСѓСЋС‰РµРµ РЅР° Р·РѕРЅСѓ РѕСЂСѓР¶РёРµ
 		WEAPON_AREA_EFFECT,
-		/// действующее на зону оружие (лапа)
+		/// РґРµР№СЃС‚РІСѓСЋС‰РµРµ РЅР° Р·РѕРЅСѓ РѕСЂСѓР¶РёРµ (Р»Р°РїР°)
 		WEAPON_PAD,
-		/// источники с отложенной активацией
+		/// РёСЃС‚РѕС‡РЅРёРєРё СЃ РѕС‚Р»РѕР¶РµРЅРЅРѕР№ Р°РєС‚РёРІР°С†РёРµР№
 		WEAPON_WAITING_SOURCE,
-		/// оружие телепортации
+		/// РѕСЂСѓР¶РёРµ С‚РµР»РµРїРѕСЂС‚Р°С†РёРё
 		//WEAPON_TELEPORT,
-		/// оружие - захват
+		/// РѕСЂСѓР¶РёРµ - Р·Р°С…РІР°С‚
 		WEAPON_GRIP
 	};
 
-	/// Тип оружия по дальнобойности.
+	/// РўРёРї РѕСЂСѓР¶РёСЏ РїРѕ РґР°Р»СЊРЅРѕР±РѕР№РЅРѕСЃС‚Рё.
 	enum RangeType
 	{
-		LONG_RANGE, ///< оружие дальнего боя
-		SHORT_RANGE, ///< оружие ближнего боя
-		ANY_RANGE, ///< универсальное оружие 
+		LONG_RANGE, ///< РѕСЂСѓР¶РёРµ РґР°Р»СЊРЅРµРіРѕ Р±РѕСЏ
+		SHORT_RANGE, ///< РѕСЂСѓР¶РёРµ Р±Р»РёР¶РЅРµРіРѕ Р±РѕСЏ
+		ANY_RANGE, ///< СѓРЅРёРІРµСЂСЃР°Р»СЊРЅРѕРµ РѕСЂСѓР¶РёРµ 
 	};
 
-	/// режимы стрельбы оружия
+	/// СЂРµР¶РёРјС‹ СЃС‚СЂРµР»СЊР±С‹ РѕСЂСѓР¶РёСЏ
 	enum ShootingMode
 	{
-		/// обычный режим
+		/// РѕР±С‹С‡РЅС‹Р№ СЂРµР¶РёРј
 		SHOOT_MODE_DEFAULT,
-		/// стрелять только по команде из интерфейса
+		/// СЃС‚СЂРµР»СЏС‚СЊ С‚РѕР»СЊРєРѕ РїРѕ РєРѕРјР°РЅРґРµ РёР· РёРЅС‚РµСЂС„РµР№СЃР°
 		SHOOT_MODE_INTERFACE,
-		/// стрелять всегда
+		/// СЃС‚СЂРµР»СЏС‚СЊ РІСЃРµРіРґР°
 		SHOOT_MODE_ALWAYS,
-		/// стрелять когда юнит главный в скваде
+		/// СЃС‚СЂРµР»СЏС‚СЊ РєРѕРіРґР° СЋРЅРёС‚ РіР»Р°РІРЅС‹Р№ РІ СЃРєРІР°РґРµ
 		SHOOT_MODE_SQUAD_LEADER
 	};
 
-	/// расположение юнита
+	/// СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ СЋРЅРёС‚Р°
 	enum UnitMode
 	{
-		ON_WATER_BOTTOM = 0,	///< на дне
-		ON_WATER,			///< на воде
-		ON_GROUND,			///< на земле
-		ON_AIR,				///< в воздухе
-		ON_GROUND_LYING		///< лежащий на земле
+		ON_WATER_BOTTOM = 0,	///< РЅР° РґРЅРµ
+		ON_WATER,			///< РЅР° РІРѕРґРµ
+		ON_GROUND,			///< РЅР° Р·РµРјР»Рµ
+		ON_AIR,				///< РІ РІРѕР·РґСѓС…Рµ
+		ON_GROUND_LYING		///< Р»РµР¶Р°С‰РёР№ РЅР° Р·РµРјР»Рµ
 	};
 
-	/// расположение цели
-	/// заведено для понятности при редактировании
+	/// СЂР°СЃРїРѕР»РѕР¶РµРЅРёРµ С†РµР»Рё
+	/// Р·Р°РІРµРґРµРЅРѕ РґР»СЏ РїРѕРЅСЏС‚РЅРѕСЃС‚Рё РїСЂРё СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРё
 	enum TargetUnitMode
 	{
-		TARGET_ON_WATER_BOTTOM	= 1, ///< на дне
-		TARGET_ON_WATER			= 2, ///< на воде
-		TARGET_ON_GROUND		= 4, ///< на земле
-		TARGET_ON_AIR			= 8,  ///< в воздухе
-		TARGET_ON_GROUND_LYING	= 16 ///< лежащий на земле
+		TARGET_ON_WATER_BOTTOM	= 1, ///< РЅР° РґРЅРµ
+		TARGET_ON_WATER			= 2, ///< РЅР° РІРѕРґРµ
+		TARGET_ON_GROUND		= 4, ///< РЅР° Р·РµРјР»Рµ
+		TARGET_ON_AIR			= 8,  ///< РІ РІРѕР·РґСѓС…Рµ
+		TARGET_ON_GROUND_LYING	= 16 ///< Р»РµР¶Р°С‰РёР№ РЅР° Р·РµРјР»Рµ
 	};
 
 	enum {
@@ -433,129 +433,129 @@ public:
 
 protected:
 
-	/// класс оружия
+	/// РєР»Р°СЃСЃ РѕСЂСѓР¶РёСЏ
 	WeaponClass weaponClass_;
-	/// Если true, то цели всегда ставятся в очередь
+	/// Р•СЃР»Рё true, С‚Рѕ С†РµР»Рё РІСЃРµРіРґР° СЃС‚Р°РІСЏС‚СЃСЏ РІ РѕС‡РµСЂРµРґСЊ
 	bool alwaysPutInQueue_;
 
 private:
 
-	/// уникальный ID оружия
-	/// пересчитывается при каждой записи библиотеки
+	/// СѓРЅРёРєР°Р»СЊРЅС‹Р№ ID РѕСЂСѓР¶РёСЏ
+	/// РїРµСЂРµСЃС‡РёС‚С‹РІР°РµС‚СЃСЏ РїСЂРё РєР°Р¶РґРѕР№ Р·Р°РїРёСЃРё Р±РёР±Р»РёРѕС‚РµРєРё
 	int ID_;
 	
 	LocString tipsName_;
 
 	WeaponAnimationType animationType_;
 
-	/// на кого действует - на своих/союзных/чужих/всех юнитов
+	/// РЅР° РєРѕРіРѕ РґРµР№СЃС‚РІСѓРµС‚ - РЅР° СЃРІРѕРёС…/СЃРѕСЋР·РЅС‹С…/С‡СѓР¶РёС…/РІСЃРµС… СЋРЅРёС‚РѕРІ
 	AffectMode affectMode_;
 
-	/// если true, то цели после выстрела сбрасываются
+	/// РµСЃР»Рё true, С‚Рѕ С†РµР»Рё РїРѕСЃР»Рµ РІС‹СЃС‚СЂРµР»Р° СЃР±СЂР°СЃС‹РІР°СЋС‚СЃСЏ
 	bool clearTargets_;
-	/// если true, то назначенная оружию цель не назначается другому оружию
+	/// РµСЃР»Рё true, С‚Рѕ РЅР°Р·РЅР°С‡РµРЅРЅР°СЏ РѕСЂСѓР¶РёСЋ С†РµР»СЊ РЅРµ РЅР°Р·РЅР°С‡Р°РµС‚СЃСЏ РґСЂСѓРіРѕРјСѓ РѕСЂСѓР¶РёСЋ
 	bool exclusiveTarget_;
-	/// если true, то после указания цели режим (\a UI_LogicDispatcher::clickMode_) сбрасывается
+	/// РµСЃР»Рё true, С‚Рѕ РїРѕСЃР»Рµ СѓРєР°Р·Р°РЅРёСЏ С†РµР»Рё СЂРµР¶РёРј (\a UI_LogicDispatcher::clickMode_) СЃР±СЂР°СЃС‹РІР°РµС‚СЃСЏ
 	bool clearAttackClickMode_;
 
-	/// запретить подход и поворот юнита к цели
+	/// Р·Р°РїСЂРµС‚РёС‚СЊ РїРѕРґС…РѕРґ Рё РїРѕРІРѕСЂРѕС‚ СЋРЅРёС‚Р° Рє С†РµР»Рё
 	bool disableOwnerMove_;
 
-	/// параметры оружия - дальность стрельбы, разброс и т.п.
+	/// РїР°СЂР°РјРµС‚СЂС‹ РѕСЂСѓР¶РёСЏ - РґР°Р»СЊРЅРѕСЃС‚СЊ СЃС‚СЂРµР»СЊР±С‹, СЂР°Р·Р±СЂРѕСЃ Рё С‚.Рї.
 	ParameterCustom parameters_;
 
 	WeaponAmmoTypeReference ammoType_;
 
-	/// параметры визуализации радиуса атаки
+	/// РїР°СЂР°РјРµС‚СЂС‹ РІРёР·СѓР°Р»РёР·Р°С†РёРё СЂР°РґРёСѓСЃР° Р°С‚Р°РєРё
 	CircleManagerParam fireRadiusCircle_;
 	CircleManagerParam fireMinRadiusCircle_;
 	CircleManagerParam fireEffectiveRadiusCircle_;
 
-	/// на какое время становится видимым при выстреле
+	/// РЅР° РєР°РєРѕРµ РІСЂРµРјСЏ СЃС‚Р°РЅРѕРІРёС‚СЃСЏ РІРёРґРёРјС‹Рј РїСЂРё РІС‹СЃС‚СЂРµР»Рµ
 	float visibleTimeOnShoot_;
 
-	/// не сбрасывать оружие по двойному клику
+	/// РЅРµ СЃР±СЂР°СЃС‹РІР°С‚СЊ РѕСЂСѓР¶РёРµ РїРѕ РґРІРѕР№РЅРѕРјСѓ РєР»РёРєСѓ
 	bool ignoreMouseDblClick_;
 
-	/// стреляет очередями
+	/// СЃС‚СЂРµР»СЏРµС‚ РѕС‡РµСЂРµРґСЏРјРё
 	bool queueFire_;
-	/// задержка между выстрелами в очереди
+	/// Р·Р°РґРµСЂР¶РєР° РјРµР¶РґСѓ РІС‹СЃС‚СЂРµР»Р°РјРё РІ РѕС‡РµСЂРµРґРё
 	int queueFireDelay_;
 
-	/// непрерывная стрельба - может переключаться между целями не прерываясь
+	/// РЅРµРїСЂРµСЂС‹РІРЅР°СЏ СЃС‚СЂРµР»СЊР±Р° - РјРѕР¶РµС‚ РїРµСЂРµРєР»СЋС‡Р°С‚СЊСЃСЏ РјРµР¶РґСѓ С†РµР»СЏРјРё РЅРµ РїСЂРµСЂС‹РІР°СЏСЃСЊ
 	bool continuousFire_;
 
-	/// время, в течении которого оружие после стрельбы остаётся наведённым на цель
+	/// РІСЂРµРјСЏ, РІ С‚РµС‡РµРЅРёРё РєРѕС‚РѕСЂРѕРіРѕ РѕСЂСѓР¶РёРµ РїРѕСЃР»Рµ СЃС‚СЂРµР»СЊР±С‹ РѕСЃС‚Р°С‘С‚СЃСЏ РЅР°РІРµРґС‘РЅРЅС‹Рј РЅР° С†РµР»СЊ
 	float aimLockTime_;
 
-	/// не возвращать в исходное положение
+	/// РЅРµ РІРѕР·РІСЂР°С‰Р°С‚СЊ РІ РёСЃС…РѕРґРЅРѕРµ РїРѕР»РѕР¶РµРЅРёРµ
 	bool disableAimReturn_;
 
-	/// когда нет целей поворачиваться по сторонам время от времени
+	/// РєРѕРіРґР° РЅРµС‚ С†РµР»РµР№ РїРѕРІРѕСЂР°С‡РёРІР°С‚СЊСЃСЏ РїРѕ СЃС‚РѕСЂРѕРЅР°Рј РІСЂРµРјСЏ РѕС‚ РІСЂРµРјРµРЅРё
 	bool enableAutoScan_;
 	float autoScanPeriod_;
 
-	/// наносимые повреждения
+	/// РЅР°РЅРѕСЃРёРјС‹Рµ РїРѕРІСЂРµР¶РґРµРЅРёСЏ
 	WeaponDamage damage_;
 
-	/// может ли стрелять когда стоит/идёт/бежит
+	/// РјРѕР¶РµС‚ Р»Рё СЃС‚СЂРµР»СЏС‚СЊ РєРѕРіРґР° СЃС‚РѕРёС‚/РёРґС‘С‚/Р±РµР¶РёС‚
 	BitVector<ShootingOnMoveMode> shootingOnMoveMode_;
 
-	/// прерываемая?
+	/// РїСЂРµСЂС‹РІР°РµРјР°СЏ?
 	bool isInterrupt_;
-	/// стрелять пока не отпустили кнопку
+	/// СЃС‚СЂРµР»СЏС‚СЊ РїРѕРєР° РЅРµ РѕС‚РїСѓСЃС‚РёР»Рё РєРЅРѕРїРєСѓ
 	bool fireDuringClick_;
-	/// стреляет сквозь защитные поля
+	/// СЃС‚СЂРµР»СЏРµС‚ СЃРєРІРѕР·СЊ Р·Р°С‰РёС‚РЅС‹Рµ РїРѕР»СЏ
 	bool canShootThroughShield_;
-	/// стреляет под туман войны
+	/// СЃС‚СЂРµР»СЏРµС‚ РїРѕРґ С‚СѓРјР°РЅ РІРѕР№РЅС‹
 	bool canShootUnderFogOfWar_;
 
-	/// где по кому может стрелять
+	/// РіРґРµ РїРѕ РєРѕРјСѓ РјРѕР¶РµС‚ СЃС‚СЂРµР»СЏС‚СЊ
 	std::vector<BitVector<TargetUnitMode> > targetUnitMode_;
 
-	/// Оружие активно при перезарядке
+	/// РћСЂСѓР¶РёРµ Р°РєС‚РёРІРЅРѕ РїСЂРё РїРµСЂРµР·Р°СЂСЏРґРєРµ
 	bool clearTargetOnLoading_;
-	/// Мгновенная перезарядка, если юнит главный в скваде
+	/// РњРіРЅРѕРІРµРЅРЅР°СЏ РїРµСЂРµР·Р°СЂСЏРґРєР°, РµСЃР»Рё СЋРЅРёС‚ РіР»Р°РІРЅС‹Р№ РІ СЃРєРІР°РґРµ
 	bool mainSquadUnitReload_;
 
-	/// воздействие на цель
+	/// РІРѕР·РґРµР№СЃС‚РІРёРµ РЅР° С†РµР»СЊ
 	AbnormalStateAttribute abnormalState_;
 
-	/// тип оружия - ближнего или дальнего действия
+	/// С‚РёРї РѕСЂСѓР¶РёСЏ - Р±Р»РёР¶РЅРµРіРѕ РёР»Рё РґР°Р»СЊРЅРµРіРѕ РґРµР№СЃС‚РІРёСЏ
 	RangeType rangeType_;
 
-	/// режим стрельбы
+	/// СЂРµР¶РёРј СЃС‚СЂРµР»СЊР±С‹
 	ShootingMode shootingMode_;
-	/// режим стрельбы в прямом управлении
+	/// СЂРµР¶РёРј СЃС‚СЂРµР»СЊР±С‹ РІ РїСЂСЏРјРѕРј СѓРїСЂР°РІР»РµРЅРёРё
 	WeaponDirectControlMode directControlMode_;
-	/// режим стрельбы в прямом управлении
+	/// СЂРµР¶РёРј СЃС‚СЂРµР»СЊР±С‹ РІ РїСЂСЏРјРѕРј СѓРїСЂР°РІР»РµРЅРёРё
 	WeaponSyndicateControlMode syndicateControlMode_;
-	/// спецэффект, который включается на юните когда оружие выбрано в прямом управлении
+	/// СЃРїРµС†СЌС„С„РµРєС‚, РєРѕС‚РѕСЂС‹Р№ РІРєР»СЋС‡Р°РµС‚СЃСЏ РЅР° СЋРЅРёС‚Рµ РєРѕРіРґР° РѕСЂСѓР¶РёРµ РІС‹Р±СЂР°РЅРѕ РІ РїСЂСЏРјРѕРј СѓРїСЂР°РІР»РµРЅРёРё
 	EffectAttributeAttachable directControlEffect_;
-	/// спецэффект, который включается на юните когда оружие выбрано в прямом управлении если для стрельбы недостаточно ресурсов
+	/// СЃРїРµС†СЌС„С„РµРєС‚, РєРѕС‚РѕСЂС‹Р№ РІРєР»СЋС‡Р°РµС‚СЃСЏ РЅР° СЋРЅРёС‚Рµ РєРѕРіРґР° РѕСЂСѓР¶РёРµ РІС‹Р±СЂР°РЅРѕ РІ РїСЂСЏРјРѕРј СѓРїСЂР°РІР»РµРЅРёРё РµСЃР»Рё РґР»СЏ СЃС‚СЂРµР»СЊР±С‹ РЅРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ СЂРµСЃСѓСЂСЃРѕРІ
 	EffectAttributeAttachable directControlDisabledEffect_;
 
-	/// спецэффект, который включается на юните когда оружие доступно
+	/// СЃРїРµС†СЌС„С„РµРєС‚, РєРѕС‚РѕСЂС‹Р№ РІРєР»СЋС‡Р°РµС‚СЃСЏ РЅР° СЋРЅРёС‚Рµ РєРѕРіРґР° РѕСЂСѓР¶РёРµ РґРѕСЃС‚СѓРїРЅРѕ
 	EffectAttributeAttachable effect_;
-	/// спецэффект, который включается на юните когда оружие доступно, но не хватает ресурсов для выстрела
+	/// СЃРїРµС†СЌС„С„РµРєС‚, РєРѕС‚РѕСЂС‹Р№ РІРєР»СЋС‡Р°РµС‚СЃСЏ РЅР° СЋРЅРёС‚Рµ РєРѕРіРґР° РѕСЂСѓР¶РёРµ РґРѕСЃС‚СѓРїРЅРѕ, РЅРѕ РЅРµ С…РІР°С‚Р°РµС‚ СЂРµСЃСѓСЂСЃРѕРІ РґР»СЏ РІС‹СЃС‚СЂРµР»Р°
 	EffectAttributeAttachable disabledEffect_;
 
-	/// классы атакуемых юнитов
+	/// РєР»Р°СЃСЃС‹ Р°С‚Р°РєСѓРµРјС‹С… СЋРЅРёС‚РѕРІ
 	BitVector<AttackClass> attackClass_;
 
-	/// стоимость стрельбы
+	/// СЃС‚РѕРёРјРѕСЃС‚СЊ СЃС‚СЂРµР»СЊР±С‹
 	ParameterCustom fireCost_;
-	/// снимать всю стоимость сразу
+	/// СЃРЅРёРјР°С‚СЊ РІСЃСЋ СЃС‚РѕРёРјРѕСЃС‚СЊ СЃСЂР°Р·Сѓ
 	bool fireCostAtOnce_;
-	/// минимальное время выстрела
+	/// РјРёРЅРёРјР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ РІС‹СЃС‚СЂРµР»Р°
 	float fireTimeMin_;
 
-	/// спецэффект выстрела
+	/// СЃРїРµС†СЌС„С„РµРєС‚ РІС‹СЃС‚СЂРµР»Р°
 	EffectAttributeAttachable fireEffect_;
-	/// звук выстрела
+	/// Р·РІСѓРє РІС‹СЃС‚СЂРµР»Р°
 	SoundReference fireSound_;
 
-	/// true если надо прятать курсор во время прицеливания
+	/// true РµСЃР»Рё РЅР°РґРѕ РїСЂСЏС‚Р°С‚СЊ РєСѓСЂСЃРѕСЂ РІРѕ РІСЂРµРјСЏ РїСЂРёС†РµР»РёРІР°РЅРёСЏ
 	bool hideCursor_;
 	typedef EnumTable<UI_MarkObjectModeID, UI_MarkObjectAttribute> MarkObjectAttributes;
 	MarkObjectAttributes targetMarks_;
@@ -568,11 +568,11 @@ private:
 	bool checkConditions(const UnitBase* owner_unit) const;
 };
 
-/// режимы работы оружия в группе
+/// СЂРµР¶РёРјС‹ СЂР°Р±РѕС‚С‹ РѕСЂСѓР¶РёСЏ РІ РіСЂСѓРїРїРµ
 enum WeaponGroupShootingMode
 {
-	WEAPON_GROUP_INDEPENDENT, ///< независимо
-	WEAPON_GROUP_MODE_PRIORITY ///< в соответствии с приоритетом
+	WEAPON_GROUP_INDEPENDENT, ///< РЅРµР·Р°РІРёСЃРёРјРѕ
+	WEAPON_GROUP_MODE_PRIORITY ///< РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРё СЃ РїСЂРёРѕСЂРёС‚РµС‚РѕРј
 };
 
 class WeaponGroupType : public StringTableBase
@@ -594,7 +594,7 @@ private:
 typedef StringTable<WeaponGroupType> WeaponGroupTypeTable;
 typedef StringTableReference<WeaponGroupType, true> WeaponGroupTypeReference;
 
-/// Атрибуты оружия
+/// РђС‚СЂРёР±СѓС‚С‹ РѕСЂСѓР¶РёСЏ
 class WeaponSlotAttribute
 {
 public:
@@ -627,12 +627,12 @@ private:
 	EquipmentSlotType equipmentSlotType_;
 
 	WeaponGroupTypeReference groupType_;
-	/// приоритет - чем больше, тем оружие важнее
+	/// РїСЂРёРѕСЂРёС‚РµС‚ - С‡РµРј Р±РѕР»СЊС€Рµ, С‚РµРј РѕСЂСѓР¶РёРµ РІР°Р¶РЅРµРµ
 	int priority_;
 
-	/// брать настройки анимации из другого слота
+	/// Р±СЂР°С‚СЊ РЅР°СЃС‚СЂРѕР№РєРё Р°РЅРёРјР°С†РёРё РёР· РґСЂСѓРіРѕРіРѕ СЃР»РѕС‚Р°
 	bool externalAnimationSettings_;
-	/// номер слота, из которого берутся настройки анимации
+	/// РЅРѕРјРµСЂ СЃР»РѕС‚Р°, РёР· РєРѕС‚РѕСЂРѕРіРѕ Р±РµСЂСѓС‚СЃСЏ РЅР°СЃС‚СЂРѕР№РєРё Р°РЅРёРјР°С†РёРё
 	int animationSlotID_;
 };
 

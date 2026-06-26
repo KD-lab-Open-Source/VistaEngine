@@ -80,7 +80,7 @@ CrashModel3dx::CrashModel3dx(const Vect3f& deltaPos, vector<cSimply3dx*>& debris
 		debris->setAttribute(ATTRUNKOBJ_HIDE_BY_DISTANCE);
 		string name = debris->GetNodeName(0);
 		int weight = (int)name[name.size() - 1] - (int)'0';
-		xassert("Веса для осколков не заданы или введена лишняя нода" && weight <= 9 && weight >= 0);
+		xassert("Р’РµСЃР° РґР»СЏ РѕСЃРєРѕР»РєРѕРІ РЅРµ Р·Р°РґР°РЅС‹ РёР»Рё РІРІРµРґРµРЅР° Р»РёС€РЅСЏСЏ РЅРѕРґР°" && weight <= 9 && weight >= 0);
 		CrashBody* body(new CrashBody(debris, weight ? 10000.0f : 0.0f, &property));
 		Se3f pose = debris->GetPositionSe();
 		pose.trans() += deltaPos;

@@ -111,7 +111,7 @@ bool ShowHead::LoadHead(const char* model_name, const char* main_chain, Color4c 
 	ix_main_group = head->GetAnimationGroup("main");
 	if (ix_main_group)
 	{
-		xassert(0&& "Не найдена анимационная группа main");
+		xassert(0&& "РќРµ РЅР°Р№РґРµРЅР° Р°РЅРёРјР°С†РёРѕРЅРЅР°СЏ РіСЂСѓРїРїР° main");
 		RELEASE(head);
 		return false;
 	}
@@ -119,7 +119,7 @@ bool ShowHead::LoadHead(const char* model_name, const char* main_chain, Color4c 
 	if (id_curren_chain ==-1)
 	{
 		current_chain_len = 0;
-		xassert(0&&"не найдена анимационная цепочка");
+		xassert(0&&"РЅРµ РЅР°Р№РґРµРЅР° Р°РЅРёРјР°С†РёРѕРЅРЅР°СЏ С†РµРїРѕС‡РєР°");
 		RELEASE(head);
 		return false;
 	}else

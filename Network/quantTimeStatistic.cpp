@@ -3,7 +3,7 @@
 #include "Network/P2P_interface.h"
 
 
-void QuantTimeStatistic::reset(bool isHT) //использовать до 2-х потоковости
+void QuantTimeStatistic::reset(bool isHT) //РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РґРѕ 2-С… РїРѕС‚РѕРєРѕРІРѕСЃС‚Рё
 {
 	isHT_ = isHT;
 	if(isHT_){

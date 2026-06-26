@@ -13,7 +13,7 @@ UI_ControlBase* UI_ControlReference::getControlByID(int id)
 {
 #ifndef _FINAL_VERSION_
 	if(!ui_ControlMapReference.exists(id)){
-		xxassert(0, XBuffer() < "Êíîïêà ñ ID=" <= id < " íå íàéäåíà");
+		xxassert(0, XBuffer() < "ÐšÐ½Ð¾Ð¿ÐºÐ° Ñ ID=" <= id < " Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð°");
 		return 0;
 	}
 #endif	

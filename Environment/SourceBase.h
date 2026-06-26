@@ -28,24 +28,24 @@ typedef StringTable<StringTableBasePolymorphic<SourceBase> > SourcesLibrary;
 typedef StringTableReferencePolymorphic<SourceBase, false> SourceReference;
 typedef vector<SourceReference> SourceReferences;
 enum SurfaceKind {
-	/// ����������� 1 ����
+	/// Поверхность 1 рода
 	SURFACE_KIND_1 = 1,
-	/// ����������� 2 ����
+	/// Поверхность 2 рода
 	SURFACE_KIND_2 = 1 << 1,
-	/// ����������� 3 ����
+	/// Поверхность 3 рода
 	SURFACE_KIND_3 = 1 << 2,
-	/// ����������� 4 ����
+	/// Поверхность 4 рода
 	SURFACE_KIND_4 = 1 << 3
 };
 
 enum SurfaceClass {
-	/// ������ �� �����
+	/// только на земле
 	SOURCE_SURFACE_GROUND	= 1 << 0,
-	/// ������ �� ����
+	/// только на воде
 	SOURCE_SURFACE_WATER	= 1 << 1,
-	/// ������ �� ����
+	/// только на льду
 	SOURCE_SURFACE_ICE		= 1 << 2,
-	/// ��� ���������
+	/// все возможные
 	SOURCE_SURFACE_ANY	= SOURCE_SURFACE_GROUND | SOURCE_SURFACE_WATER | SOURCE_SURFACE_ICE,
 };
 
@@ -93,14 +93,14 @@ public:
 	const SourceAttribute* getByKey(const char* key) const;
 
 protected:
-	/// ���� ��� ������ �� ������
+	/// ключ для ссылки из типсов
 	string key_;
 private:
-	/// �������� ������
+	/// задержка старта
 	float activationDelay_;
-	/// ����� �����
+	/// время жизни
 	float lifeTime_;
-	/// ������ �� �������� �� ����������
+	/// ссылка на источник из библиотеки
 	SourceReference sourceReference_;
 };
 
@@ -147,20 +147,20 @@ public:
 	};
 
 	enum {
-		/// ������������ ����� ����� ���������, ������������ �� ���������
+		/// максимальное время жизни источника, выставляемое по умолчанию
 		MAX_DEFAULT_LIFETIME = 10000
 	};
 
 	enum PlacementMode {
-		// �� �������
+		// не трогать
 		PLACE_NONE,
-		// ������� �� �����
+		// ставить на землю
 		PLACE_TO_GROUND,
-		// ������� �� ����
+		// ставить на воду
 		PLACE_TO_WATER
 	};
 
-	/// ��� � ��� �����������, ��� �������� ����� ��������
+	/// род и тип поверхности, где источник может работать
 	//typedef BitVector<SurfaceKind> SurfaceKindBitVector;
 	typedef BitVector<TerrainType> SurfaceKindBitVector;
 	typedef BitVector<SurfaceClass> SurfaceClassBitVector;
@@ -249,13 +249,13 @@ public:
 
 	const SourceAttribute* getChildSourceByKey(const char* key) const;
 
-	/// ���������� � ������������ ����������
+	/// информация о производимых источниках
 	struct ChildSource{
 		ChildSource() : generationDelay_(0.f) {}
-		/// ����� ����� �����������
+		/// время между появлениями
 		float generationDelay_;
 		LogicTimer activationTimer_;
-		/// ������ �� �������� �� ����������
+		/// ссылка на источник из библиотеки
 		SourceAttribute source_;
 
 		void serialize(Archive &ar);
@@ -272,7 +272,7 @@ protected:
 
 	bool isDetonator(const UnitBase* target) const;
 
-	/// �������� � �������� ����������� ������� � ����� ������������
+	/// вызывать в конечный производных классах в конце сериализации
 	void serializationApply(const Archive& ar);
 
 	void soundInit();
@@ -280,69 +280,69 @@ protected:
 	AffectMode affectMode_;
 	AffectMode activatorMode_;
 	bool active_;
-	/// � ���� ����
+	/// в зоне враг
 	bool targetInZone;
-	/// ���� ��������� ��� ��������� ����� � ����
+	/// флаг включения при попадании юнита в зону
 	bool waiting_target_;
-	/// ���� ��������� ��� ��������� ���� �� ������ ������
+	/// флаг включения при попадании зоны на нужную высоту
 	bool waiting_height_;
-	/// �������������� ������ �����������
+	/// активироваться только детонатором
 	bool activate_by_detonator_;
-	/// �������������� ��� ��������� �������
+	/// активироваться при попадании снаряда
 	bool activate_by_projectile_;
-	/// ��� ������������� ������� ������������ ��������
+	/// При автоактивации убивать поставившего источник
 	bool killOwner_;
-	/// �������� ���������
+	/// запущена активация
 	bool activation_started_;
-	/// �������� ������
+	/// Сносится ветром
 	bool move_by_wind_;
-	/// �������� �����
+	/// Сносится водой
 	bool move_by_water_;
-	/// ��������� ���������� �����������
+	/// Проверять измененния поверхности
 	bool mapUpdateDeactivate_;
 	bool mapUpdateActivate_;
 	bool breakWhenApply_;
-	/// ���� ������� �� �������� �����
+	/// флаг реакции на летающие юниты
 	TargetClass targetClass_;
-	/// ����, ����������� � ����
+	/// звук, привязанный к зоне
 	SoundReference soundReference_;
 	SoundController sound_;
 
 	Rangef windSensitivity_;
 	
 	Vect3f origin_;
-	/// ����������
+	/// траектория
 	Path path_;
-	/// �������� �� � ����������
+	/// привязан ли к траектории
 	bool followPath_;
-	/// ��������� �� �������� �� ����
+	/// находится ли источник на мире
 	bool enabled_;
-	/// ����� ���������
+	/// метка источника
 	string label_;
-	/// �������� ���
+	/// ключевое имя
 	string libraryKey_;
 
 	int deadQuant_;
-	/// �������� ��������� ���������
+	/// задержка включения источника
 	LogicTimer activationTimer_;
-	/// �������� �������� ���������
+	/// задержка удаления источника
 	LogicTimer killTimer_;
-	/// ����� �����, msec
+	/// время жизни, msec
 	int lifeTime_;
 
-	/// �������� ����� � ����������, -1 ���� ��������
+	/// источник света в интерфейсе, -1 если отключен
 	int interfaceLightIndex_;
 
-	/// ������ ���� ������� ������������
+	/// высота выше которой активируется
 	short activationHeight_;
-	/// ������ ���� ������� ������������
+	/// высота ниже которой активируется
 	short activationBottomHeight_;
 
-	/// ��� �����������, �� ������� ����� ���� ���������� ��������
+	/// тип поверхности, на которой может быть установлен источник
 	SurfaceClassBitVector surfaceInstallClass_;
-	/// ��� �����������, �� ������� ����� �������� ��������, ��� ���������/������ - ����������/�����������
+	/// тип поверхности, на которой может работать источник, при попадании/выходе - включается/выключается
 	SurfaceClassBitVector surfaceClass_;
-	/// ����������, �� ��� �����������
+	/// аналогично, но род поверхности
 	SurfaceKindBitVector surfaceKind_;
 
 	PlacementMode placementMode_;
@@ -367,12 +367,12 @@ private:
 
 	bool checkTarget(AffectMode mode, const UnitBase* target) const;
 
-	/// �����, � ������� �������� �������� ����� ����� "���������"
+	/// время, в течении которого источник виден после "подсветки"
 	float  visibleTime_;
-	/// ������ �� ���������� ���������
+	/// таймер на пропадание источника
 	LogicTimer showTimer_;
 
-	/// ������ ��� ������������ ��������� � ������ ��������
+	/// эффект для визуализации источника в режиме ожидания
 	EffectAttribute waitingEffectAttribute_;
 	EffectController waitingEffectController_;
 	void waitingEffectStart();
@@ -388,7 +388,7 @@ private:
 	friend class SourceManager;
 };
 
-/// �������� ����������, ������� ��������� �������.
+/// Атрибуты источников, которые создаются юнитами.
 class SourceWeaponAttribute: public SourceAttribute
 {
 public:
@@ -405,11 +405,11 @@ public:
 	const string& key() const { return key_; }
 
 private:
-	/// ����� ���������
+	/// сдвиг координат
 	Vect2f positionDelta_;
-	/// ���� true, �� �������� �� ��������� ������� �����
+	/// если true, то работает до окончания времени жизни
 	bool isAutonomous_;
-	/// ���� ��������� ��������� �� ������
+	/// цвет отрисовки источника из оружия
 	CircleManagerParam showColor_;
 };
 

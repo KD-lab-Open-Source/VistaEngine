@@ -125,9 +125,9 @@ protected:
 	EnvironmentTime* time;
 	cScene* pWorldScene;
 	cScene* pSkyScene;
-	cSkyCamera* pNormalCamera;//Камера
+	cSkyCamera* pNormalCamera;//РљР°РјРµСЂР°
 	cFogCircleEX* pFogCircle;
-	float CalcNormalScale();//Расчет увеличения нормалей?
+	float CalcNormalScale();//Р Р°СЃС‡РµС‚ СѓРІРµР»РёС‡РµРЅРёСЏ РЅРѕСЂРјР°Р»РµР№?
 	int sky_elements_count;
 	bool cur_is_day;
 	Vect3f sunPosition;
@@ -143,15 +143,15 @@ public:
 	~EnvironmentTime();
 
 	void logicQuant();
-	void Draw();//Рисовать cubemap
-	void DrawEnviroment(Camera* pGlobalCamera);//Рисовать на основной rendertarget
+	void Draw();//Р РёСЃРѕРІР°С‚СЊ cubemap
+	void DrawEnviroment(Camera* pGlobalCamera);//Р РёСЃРѕРІР°С‚СЊ РЅР° РѕСЃРЅРѕРІРЅРѕР№ rendertarget
 
 	void Save();
 	cTexture* GetCubeMap();
 	cSkyObj* skyObj(){ return skyObj_; }
 
 	void setTimeScale(float dayTimeScale, float nightTimeScale);
-	void SetTime(float time, bool init = false);//В часах
+	void SetTime(float time, bool init = false);//Р’ С‡Р°СЃР°С…
 	float GetTime(){return day_time;}
 	float GetLightAngle();
 	Color4c GetCurSunColor(){return cur_sun_color;}

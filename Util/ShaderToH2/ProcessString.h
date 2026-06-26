@@ -12,7 +12,7 @@ struct Definition
 struct ExcludeProfile
 {
 	string target_profile;
-	vector<Definition> def;//Имена должны быть обязательно в ShaderLine::def 
+	vector<Definition> def;//РРјРµРЅР° РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РІ ShaderLine::def 
 };
 
 struct ShaderLine

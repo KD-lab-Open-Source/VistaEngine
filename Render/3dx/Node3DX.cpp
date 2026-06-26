@@ -15,8 +15,8 @@ float AlphaMaxiumBlend=0.95f;
 float AlphaMiniumShadow=0.0f;
 
 /*
-�����������.
-!! �� ������ � ������� LOD - ��������� ���������� ������ �� 2 � 1
+Оптимизация.
+!! На втором и третьем LOD - уменьшать количество костей до 2 и 1
 */
 
 Shader3dx::Shader3dx()
@@ -174,7 +174,7 @@ void cObject3dx::QueryVisible(Camera* camera)
 	if(pOcclusionQuery)
 	{
 		Vect3f pos;
-		//camera->GetWorldK() ��� �� �� ������ ��, ��� ����������� �� ������ �� ����� �������, �� �� ������ ������� �����������.
+		//camera->GetWorldK() все же не совсем то, что направление от камеры на центр объекта, но во многих случаях прокатывает.
 		if(false)
 		{
 			Vect3f pos=position.trans()-(GetBoundRadius()*1.1f)*camera->GetWorldK();
@@ -264,7 +264,7 @@ cObject3dx::cObject3dx(cStatic3dx* pStatic_, bool interpolate)
 	pOcclusionQuery=0;
 	updated_=false;
 	treeUpdated_ = false;
-	isTree_ = false; // ��������, ����� ����������!!!!!!!!
+	isTree_ = false; // Временно, потом переделать!!!!!!!!
 	silhouette_index = 0;
 
 	link3dx.SetParent(this);
@@ -291,7 +291,7 @@ cObject3dx::cObject3dx(cStatic3dx* pStatic_, bool interpolate)
 	material_textures.resize(pStatic->materials.size());
 
 	pAnimSecond = 0;
-	if(interpolate)//���������� GetAllPoints
+	if(interpolate)//Переделать GetAllPoints
 		pAnimSecond = new cObject3dxAnimationSecond(pStatic);
 
 	if(!pStatic->isBoundBoxInited){
@@ -402,7 +402,7 @@ void cObject3dx::SetScale(float scale_)
 //	if(GetBoundRadius()>1000)
 //		console()<< cConsole::LOW << "&Balmer" << "Big object " <<pStatic->file_name << cConsole::END;
 
-	//���� (������) ��� ��������� �������������� ��������
+	//Фикс (кривой) для постоянно генерирующихся эффектов
 	vector<EffectData>::iterator it;
 	FOR_EACH(effects,it)
 	{
@@ -641,7 +641,7 @@ void cObject3dx::Draw(Camera* camera)
 		return;
 
 	if(!isSkinColorSet_ && IsHaveSkinColorMaterial()){
-		VisError << "��� ������ " << pStatic->fileName() << " �� �������� Skin Color.\n����� �������� Skin Color �� ���������" << VERR_END;
+		VisError << "Для модели " << pStatic->fileName() << " не назначен Skin Color.\nБудет назначен Skin Color по умолчанию" << VERR_END;
 		SetSkinColor(Color4c(255,255,255,255),0);
 	}
 
@@ -664,9 +664,9 @@ void cObject3dx::Draw(Camera* camera)
 	gb_RenderDevice3D->SetSamplerData(1,sampler_wrap_linear);
 	gb_RenderDevice3D->SetTextureBase(4,0);
 
-	//�� ������ - ������� ���������� ���������� ��������� ��� �����������
-	//�� ���������� �����������. �� ������� - ��� ������� �������� �� �������
-	//����������. indexed 14 mtrtis, nonindexed 26 mtris - ������� �������� �� FX 5950.
+	//Из плюсов - выводит стабильное количество полигонов вне зависимости
+	//от количества подобъектов. Из минусов - для больших объектов не слишком
+	//эффективен. indexed 14 mtrtis, nonindexed 26 mtris - пиковые значения на FX 5950.
 	bool is_shadow=camera->IsShadow();
 
 	DWORD old_zfunc;
@@ -681,7 +681,7 @@ void cObject3dx::Draw(Camera* camera)
 		old_color = gb_RenderDevice3D->GetRenderState(D3DRS_COLORWRITEENABLE);
 	}
 
-	//!!! �� ������ ���������� �� ����������.
+	//!!! Не забыть сортировку по материалам.
 	cStatic3dx::StaticLod& lod=pStatic->lods[iLOD];
 	int size=lod.bunches.size();
 	for(int iBunch=0;iBunch<size;iBunch++){
@@ -743,7 +743,7 @@ void cObject3dx::Draw(Camera* camera)
 		}
 
 		if(is_opacity_vg){
-			//�������� ���������� � ������������ �����. ����������.
+			//Рисовать прозрачную и непрозрачную часть. Выставлять.
 			if(draw_opacity)
 				blend=ALPHA_BLEND;
 		}
@@ -851,7 +851,7 @@ void cObject3dx::Draw(Camera* camera)
 		vs->SetReflectionZ(reflectionz);
 		ps->SetReflectionZ(reflectionz);
 
-		//������� �� � �����, ���� ������ �� ��������, ��� ���������.
+		//Немного не к месту, зато быстро по скорости, для отражений.
 		gb_RenderDevice3D->SetTexture(5,camera->GetZTexture());
 		gb_RenderDevice3D->SetSamplerData(5,sampler_clamp_linear);
 		
@@ -997,7 +997,7 @@ void cObject3dx::DrawMaterialGroupSelectively(StaticBunch& bunch,const Color4f& 
 			else if(group.alpha<AlphaMaxiumBlend)
 				continue;
 
-			//����!!! ���� ������ �� ���� �������� ��������!
+			//БЛИН!!! Этот подход не дает истинной гибкости!
 
 			gb_RenderDevice3D->DrawIndexedPrimitive(
 				lod.vb,bunch.offset_vertex,bunch.num_vertex,
@@ -1029,7 +1029,7 @@ void cObject3dx::DrawShadowAndZbuffer(Camera* camera,bool ZBuffer)
 {
 	gb_RenderDevice3D->SetTextureBase(1,0);
 
-	//!!! �� ������ ���������� �� ����������.
+	//!!! Не забыть сортировку по материалам.
 	cStatic3dx::StaticLod& lod=pStatic->lods[iLOD];
 	int size=lod.bunches.size();
 	for(int iBunch=0;iBunch<size;iBunch++){
@@ -1109,16 +1109,16 @@ void cObject3dx::DrawShadowAndZbuffer(Camera* camera,bool ZBuffer)
 }
 
 /*Scripts\Resource\balmer\furmap.dds
-������� - 
- 1 ������� �����									- ��� ������� ���������.
- 2 ������ ������ ������ � ������ ������				- grayscale ���������.
- 3 ����������� ��������� �� ����������� �������.	- ���������, ����� ��������� ����������, � ����� ����������.
- 4 ��������� ������????? ��, ��.					- ����� ����, ����� ��� ������ ������� ��������, ��.
+Хочется - 
+ 1 разного цвета									- это понятно текстурка.
+ 2 разной высоты шерсти в разных местах				- grayscale текстурка.
+ 3 направления отличного от направления нормали.	- непонятно, можно отдельной геометрией, а можно текстуркой.
+ 4 шевеления шерсти????? Хм, хм.					- нафиг надо, лучше про вторую нормаль подумать, да.
 
- //��� - ���� 2 ��������.
- ������ �������� - ���� � ������������ ��� furmap.
- ������ �������� RGB - ������� � tangent space. A - ������ ������ �������������.
- ��� ��� ��������� �������� � ��������� ������� ���_������.furinfo
+ //Так - есть 2 текстуры.
+ Первая текстура - цвет и прозрачность для furmap.
+ Вторая текстура RGB - нормаль в tangent space. A - высота шерсти относительная.
+ Все эти параметры задаются в текстовом файлике имя_модели.furinfo
 */
 
 void cObject3dx::DrawFur(Camera* camera)
@@ -1132,7 +1132,7 @@ void cObject3dx::DrawFur(Camera* camera)
 
 	bool is_shadow=camera->IsShadow();
 
-	//!!! �� ������ ���������� �� ����������.
+	//!!! Не забыть сортировку по материалам.
 	cStatic3dx::StaticLod& lod=pStatic->lods[iLOD];
 	int size=lod.bunches.size();
 	for(int iBunch=0;iBunch<size;iBunch++){
@@ -1207,7 +1207,7 @@ void cObject3dx::DrawFur(Camera* camera)
 		vs->SetReflectionZ(reflectionz);
 		ps->SetReflectionZ(reflectionz);
 
-		//������� �� � �����, ���� ������ �� ��������, ��� ���������.
+		//Немного не к месту, зато быстро по скорости, для отражений.
 		gb_RenderDevice3D->SetTexture(5,camera->GetZTexture());
 		gb_RenderDevice3D->SetSamplerData(5,sampler_clamp_linear);
 		
@@ -1227,9 +1227,9 @@ void cObject3dx::DrawFur(Camera* camera)
 		vs->SetMaterial(&material);
 
 /*
-	����� ��� ����������� - 
-	1. �������� ������������ �� ������ �������.
-	2. �������� ���� ��� �� ������������ �� ����.
+	Нужно ещё попробовать - 
+	1. изменять прозрачность по разным законам.
+	2. изменять цвет так же взависимости от слоя.
 */
 		const int max_ifur=10;
 		float basea=material.Diffuse.a;
@@ -1259,7 +1259,7 @@ int cObject3dx::GetAnimationGroup(const char* name)
 	}
 
 //	{
-//		string str="�� ������� ������������ ������. ��� �����, ����� ���� ������ �������� ��������������� � ���������. ����:";
+//		string str="Не найдена анимационная группа. Все имена, кроме имен файлов являются чувствительными к регистрам. Файл:";
 //		str+=pStatic->file_name;
 //		str+="  Animation Group:";
 //		str+=name;
@@ -1277,7 +1277,7 @@ const char* cObject3dx::GetAnimationGroupName(int igroup)
 {
 	if(!(igroup>=0 && igroup<pStatic->animationGroups_.size()))
 	{
-		string str="Bad group index. ����:";
+		string str="Bad group index. Файл:";
 		str+=pStatic->fileName();
 		xxassert(0 ,str.c_str());
 		return 0;
@@ -1307,7 +1307,7 @@ void cObject3dx::SetVisibilityGroup(VisibilityGroupIndex group, VisibilitySetInd
 {
 	if(iset==VisibilitySetIndex::BAD)
 	{
-		xassert(0);//������� �� ����� ����� ���������.
+		xassert(0);//Наверно не нужно такое поведение.
 		int size=GetVisibilitySetNumber();
 		for(int i=0;i<size;i++)
 			SetVisibilityGroup(group,VisibilitySetIndex(i));
@@ -1325,7 +1325,7 @@ void cObject3dx::SetVisibilityGroup(VisibilityGroupIndex group, VisibilitySetInd
 
 void cObject3dx::UpdateVisibilityGroup(VisibilitySetIndex iset)
 {
-	// !!! �� �����
+	// !!! не нужна
 	visibilityGroups_[iset].visibilityGroup = &pStatic->visibilitySets_[iset].visibilityGroups[visibilityGroups_[iset].visibilityGroupIndex];
 }
 
@@ -1479,7 +1479,7 @@ void cObject3dx::Animate(float dt)
 
 	point_light.clear();
 
-	Update();//��� ����� ��� ������ �������� ����.
+	Update();//Все равно там внутри проверка есть.
 	if(!observer.empty())
 		observer.UpdateLink();
 
@@ -1590,7 +1590,7 @@ const char* cObject3dx::GetFileName() const
 	return pStatic->fileName();
 }
 
-void cObject3dx::SetSkinColor(Color4c skin_color_, const char* logo_name_)//emblem_name - ������ ���� � �������. 
+void cObject3dx::SetSkinColor(Color4c skin_color_, const char* logo_name_)//emblem_name - хранит путь к эмблеме. 
 {
 	skin_color=skin_color_;
 
@@ -1922,7 +1922,7 @@ void cObject3dx::ProcessEffect(Camera* camera)
 				e.pEffect->SetParticleRate(visible?1.0f:0);
 		}
 		else if(is_group_visible){
-			///���� 
+			///Ищем 
 			float delta_plus,delta_minus;
 			if(node.phase>e.prev_phase){
 				delta_plus=node.phase-e.prev_phase;
@@ -2442,7 +2442,7 @@ void cObject3dxAnimation::SetAnimationGroupChain(int igroup,int chain_index)
 	updated_=false;
 	if(!(igroup>=0 && igroup<pStatic->animationGroups_.size()))
 	{
-		string str="������������ ����� ������ ��������. ����:";
+		string str="Неправильный номер группы анимации. Файл:";
 		str+=pStatic->fileName();
 		xxassert(0 ,str.c_str());
 		return;
@@ -2450,7 +2450,7 @@ void cObject3dxAnimation::SetAnimationGroupChain(int igroup,int chain_index)
 
 	if(chain_index<0 || chain_index>=pStatic->animationChains_.size())
 	{
-		string str="������������ ����� ������������ �������. ����:";
+		string str="Неправильный номер анимационной цепочки. Файл:";
 		str+=pStatic->fileName();
 		xxassert(0 ,str.c_str());
 		return;
@@ -2503,7 +2503,7 @@ int cObject3dxAnimation::FindChain(const char* chain_name)
 	}
 
 //	{
-//		string str="�� ������� �������. ��� �����, ����� ���� ������ �������� ��������������� � ���������. ����:";
+//		string str="Не найдена цепочка. Все имена, кроме имен файлов являются чувствительными к регистрам. Файл:";
 //		str+=pStatic->file_name;
 //		str+="  Chain:";
 //		str+=chain_name;
@@ -2547,7 +2547,7 @@ void cObject3dxAnimation::SetChain(int chain)
 	updated_=false;
 	if(chain<0 || chain>=pStatic->animationChains_.size())
 	{
-		string str="������������ ����� ������������ �������. ����:";
+		string str="Неправильный номер анимационной цепочки. Файл:";
 		str+=pStatic->fileName();
 		xxassert(0 ,str.c_str());
 	}
@@ -2660,7 +2660,7 @@ void cObject3dxAnimation::UpdateMatrix(Mats& position,vector<c3dxAdditionalTrans
 		cNode3dx& node = nodes_[i];
 		StaticNode& staticNode = pStatic->nodes[i];
 
-		if(staticNode.iparent < 0)//��������
+		if(staticNode.iparent < 0)//временно
 			continue;
 
 		xassert(staticNode.iparent>=0 && staticNode.iparent<size);
@@ -2704,7 +2704,7 @@ void cObject3dx::UpdateAndLerp()
 		cNode3dx& node1=pAnimSecond->nodes_[i];
 		StaticNode& sn=pStatic->nodes[i];
 
-		if(sn.iparent<0)//��������
+		if(sn.iparent<0)//временно
 			continue;
 
 		xassert(sn.iparent>=0 && sn.iparent<size);
@@ -3199,7 +3199,7 @@ void cObject3dx::AddLight(cUnkLight* light)
 {
 	if(getAttribute(ATTRUNKOBJ_IGNORE))
 		return;
-	//����� ������������� ����� ��������.
+	//Может пооптимальнее потом написать.
 	const int maxc=2;
 	if(point_light.size()>=maxc)
 	{

@@ -28,7 +28,7 @@ public:
 	void interpolateHermite(const CameraCoordinate coords[4], float t);
 
 	void cycle();
-	void uncycle(const CameraCoordinate& coord0); // расцикливает углы по coord0
+	void uncycle(const CameraCoordinate& coord0); // СЂР°СЃС†РёРєР»РёРІР°РµС‚ СѓРіР»С‹ РїРѕ coord0
 
 	const Vect3f& position() const { return position_; }
 	void setPosition(const Vect3f& position) { position_ = position; }
@@ -133,7 +133,7 @@ public:
 
 	bool isVisible(const Vect3f& position) const;
 
-	void getCameraAxis(Vect3f& axisZ, Vect3f& axisX, Vect3f& axisY); // Возвращает вектора камеры в глобальных координатах. X и Y - экраные.
+	void getCameraAxis(Vect3f& axisZ, Vect3f& axisX, Vect3f& axisY); // Р’РѕР·РІСЂР°С‰Р°РµС‚ РІРµРєС‚РѕСЂР° РєР°РјРµСЂС‹ РІ РіР»РѕР±Р°Р»СЊРЅС‹С… РєРѕРѕСЂРґРёРЅР°С‚Р°С…. X Рё Y - СЌРєСЂР°РЅС‹Рµ.
 
 	void SetFrustumGame();
 	void SetFrustumEditor(bool zFarInfinite);
@@ -205,7 +205,7 @@ public:
 
 	void drawBlackBars(float opacity = 1.f);
 
-	// Функции для работы редактора.
+	// Р¤СѓРЅРєС†РёРё РґР»СЏ СЂР°Р±РѕС‚С‹ СЂРµРґР°РєС‚РѕСЂР°.
 	void showEditor();
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -224,7 +224,7 @@ public:
 
 	void serialize(Archive& ar);
 	
-	// Камера вращается вокруг точки со скоростью _debugRotationAngleDelta;
+	// РљР°РјРµСЂР° РІСЂР°С‰Р°РµС‚СЃСЏ РІРѕРєСЂСѓРі С‚РѕС‡РєРё СЃРѕ СЃРєРѕСЂРѕСЃС‚СЊСЋ _debugRotationAngleDelta;
 	void enableAutoRotationMode(float angleDelta) { _debugRotation = true; _debugRotationAngleDelta = angleDelta; }
 	void disableAutoRotationMode() { _debugRotation = false; }
 	bool isAutoRotationMode() { return _debugRotation; }
@@ -256,7 +256,7 @@ private:
 	float flyingHeight_;
 
 	CameraCoordinate* selectedPoint;
-	int selectedSpline; // если (-1) ничего не выбранно.
+	int selectedSpline; // РµСЃР»Рё (-1) РЅРёС‡РµРіРѕ РЅРµ РІС‹Р±СЂР°РЅРЅРѕ.
 	
 	int interpolationDuration_;
 	int interpolationTimer_;

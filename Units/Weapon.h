@@ -65,7 +65,7 @@ public:
 	const WeaponDamage& damage() const { return damage_; }
 	void setDamage(const WeaponDamage& damage){ damage_ = damage; }
 
-	/// возвращает true, если оружие может нанести повреждения параметрам target_parameters
+	/// РІРѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё РѕСЂСѓР¶РёРµ РјРѕР¶РµС‚ РЅР°РЅРµСЃС‚Рё РїРѕРІСЂРµР¶РґРµРЅРёСЏ РїР°СЂР°РјРµС‚СЂР°Рј target_parameters
 	bool checkDamage(const ParameterSet& target_parameters) const;
 
 	const ParameterSet& fireCost() const { return fireCost_; }
@@ -81,16 +81,16 @@ public:
 	bool getParametersForUI(const wchar_t* &name, wchar_t type, ParameterSet& out) const;
 
 private:
-	/// наносимые повреждения
+	/// РЅР°РЅРѕСЃРёРјС‹Рµ РїРѕРІСЂРµР¶РґРµРЅРёСЏ
 	WeaponDamage damage_;
 
-	/// стоимость стрельбы
+	/// СЃС‚РѕРёРјРѕСЃС‚СЊ СЃС‚СЂРµР»СЊР±С‹
 	ParameterSet fireCost_;
 
-	/// параметры оружия - дальность стрельбы, разброс и т.п.
+	/// РїР°СЂР°РјРµС‚СЂС‹ РѕСЂСѓР¶РёСЏ - РґР°Р»СЊРЅРѕСЃС‚СЊ СЃС‚СЂРµР»СЊР±С‹, СЂР°Р·Р±СЂРѕСЃ Рё С‚.Рї.
 	ParameterSet parameters_;
 
-	/// воздействие на цель
+	/// РІРѕР·РґРµР№СЃС‚РІРёРµ РЅР° С†РµР»СЊ
 	AbnormalStateAttribute abnormalState_;
 
 	WeaponSourcePrms sources_;
@@ -104,15 +104,15 @@ class WeaponAimAngleController
 {
 public:
 
-	/// приоритеты поворотов
+	/// РїСЂРёРѕСЂРёС‚РµС‚С‹ РїРѕРІРѕСЂРѕС‚РѕРІ
 	enum RotationPriority {
-		/// возврат в состояние по-умолчанию
+		/// РІРѕР·РІСЂР°С‚ РІ СЃРѕСЃС‚РѕСЏРЅРёРµ РїРѕ-СѓРјРѕР»С‡Р°РЅРёСЋ
 		ROTATION_DEFAULT = 0,
-		/// прицеливание
+		/// РїСЂРёС†РµР»РёРІР°РЅРёРµ
 		ROTATION_AIM,
-		/// стрельба
+		/// СЃС‚СЂРµР»СЊР±Р°
 		ROTATION_FIRE,
-		/// сброс
+		/// СЃР±СЂРѕСЃ
 		ROTATION_RESET
 	};
 
@@ -184,22 +184,22 @@ private:
 	float speed_;
 	float speed2_;
 
-	/// индекс графического узла
+	/// РёРЅРґРµРєСЃ РіСЂР°С„РёС‡РµСЃРєРѕРіРѕ СѓР·Р»Р°
 	int nodeIndex_;
-	/// индекс логического узла
+	/// РёРЅРґРµРєСЃ Р»РѕРіРёС‡РµСЃРєРѕРіРѕ СѓР·Р»Р°
 	int nodeLogicIndex_;
 
-	/// поворачивать граф. объект по осям логического
+	/// РїРѕРІРѕСЂР°С‡РёРІР°С‚СЊ РіСЂР°С„. РѕР±СЉРµРєС‚ РїРѕ РѕСЃСЏРј Р»РѕРіРёС‡РµСЃРєРѕРіРѕ
 	bool rotateByLogic_;
 	eAxis rotationAxis_;
 
 	InterpolatorNodeTransform nodeInterpolator_;
 
-	/// Корректирующие оси смещения: invert(offset)*rotation*offset
+	/// РљРѕСЂСЂРµРєС‚РёСЂСѓСЋС‰РёРµ РѕСЃРё СЃРјРµС‰РµРЅРёСЏ: invert(offset)*rotation*offset
 	Se3f offset_; 
 	Se3f offsetLogic_;
 
-	/// возвращает значения в интервале \a [-speed_, speed_] или \a [-speed2_, speed2_]
+	/// РІРѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёСЏ РІ РёРЅС‚РµСЂРІР°Р»Рµ \a [-speed_, speed_] РёР»Рё \a [-speed2_, speed2_]
 	float getDelta(float target_angle, bool use_normal_speed = true) const
 	{
 		float delta = getDeltaAngle(target_angle, value_ + parentValue_);
@@ -238,7 +238,7 @@ private:
 	}
 };
 
-/// Управление наведением оружия.
+/// РЈРїСЂР°РІР»РµРЅРёРµ РЅР°РІРµРґРµРЅРёРµРј РѕСЂСѓР¶РёСЏ.
 class WeaponSlot
 {
 public:
@@ -283,8 +283,8 @@ public:
 	void aimReset();
 	void randomizeDefaultValue(){ psi_.randomizeDefaultValue(); }
 
-	/// координаты "дульного среза" оружия
-	/// откуда вылетают снаряды, бъют лучи и т.п.
+	/// РєРѕРѕСЂРґРёРЅР°С‚С‹ "РґСѓР»СЊРЅРѕРіРѕ СЃСЂРµР·Р°" РѕСЂСѓР¶РёСЏ
+	/// РѕС‚РєСѓРґР° РІС‹Р»РµС‚Р°СЋС‚ СЃРЅР°СЂСЏРґС‹, Р±СЉСЋС‚ Р»СѓС‡Рё Рё С‚.Рї.
 	Se3f muzzlePosition(int barrel_index = 0) const;
 	Se3f aimOrientation() const { return psi_.nodeLogicPose(false) * theta_.nodeLogicPose(false); }
 
@@ -321,7 +321,7 @@ private:
 	const WeaponSlotAttribute* attribute_;
 };
 
-/// Оружие - базовый класс.
+/// РћСЂСѓР¶РёРµ - Р±Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ.
 class WeaponBase
 {
 public:
@@ -356,7 +356,7 @@ public:
 	bool isShortRange() const;
 	bool isLongRange() const;
 
-	/// является ли наступательным
+	/// СЏРІР»СЏРµС‚СЃСЏ Р»Рё РЅР°СЃС‚СѓРїР°С‚РµР»СЊРЅС‹Рј
 	virtual bool isOffensive() const;
 
 	const WeaponGroupType* groupType() const { return attribute()->groupType(); }
@@ -372,7 +372,7 @@ public:
 	bool canAttack(const WeaponTarget& target, bool quick_check = false) const;
 	bool checkAttackClass(int attack_class) const;
 	bool fireDistanceCheck(const WeaponTarget& target, bool allow_dispersion = false) const;
-	/// проверяет, что повреждения могут быть применены к юниту
+	/// РїСЂРѕРІРµСЂСЏРµС‚, С‡С‚Рѕ РїРѕРІСЂРµР¶РґРµРЅРёСЏ РјРѕРіСѓС‚ Р±С‹С‚СЊ РїСЂРёРјРµРЅРµРЅС‹ Рє СЋРЅРёС‚Сѓ
 	bool checkDamage(const UnitInterface* unit) const;
 	bool checkTargetMode(UnitInterface* target) const;
 	bool checkTargetMode(const WeaponTarget& target) const;
@@ -387,9 +387,9 @@ public:
 	void reloadStart(int time = -1, bool from_inventory = false);
 	bool isLoaded() const;
 	bool isLoading() const { return (state_ == WEAPON_STATE_LOAD && !isLoaded()); }
-	// хватает ресурсов на выстрел
+	// С…РІР°С‚Р°РµС‚ СЂРµСЃСѓСЂСЃРѕРІ РЅР° РІС‹СЃС‚СЂРµР»
 	bool canFire(RequestResourceType triggerAction = NEED_RESOURCE_SILENT_CHECK) const;
-	// хватает ресурсов на минимальный выстрел
+	// С…РІР°С‚Р°РµС‚ СЂРµСЃСѓСЂСЃРѕРІ РЅР° РјРёРЅРёРјР°Р»СЊРЅС‹Р№ РІС‹СЃС‚СЂРµР»
 	virtual bool canFireMinTime(RequestResourceType triggerAction = NEED_RESOURCE_SILENT_CHECK) const;
 	bool hasAmmo() const;
 	bool reloadFromInventory() const { return reloadFromInventory_; }
@@ -413,18 +413,18 @@ public:
 	Vect3f firePositionCurrent() const;
 
 	bool isFiring() const { return state_ == WEAPON_STATE_FIRE; }
-	/// возвращает true если в данный момент оружие повёрнуто
+	/// РІРѕР·РІСЂР°С‰Р°РµС‚ true РµСЃР»Рё РІ РґР°РЅРЅС‹Р№ РјРѕРјРµРЅС‚ РѕСЂСѓР¶РёРµ РїРѕРІС‘СЂРЅСѓС‚Рѕ
 	bool isTargeting() const;
 
 	virtual void kill();
 
 	virtual void serialize(Archive& ar);
 
-	/// состояния оружия
+	/// СЃРѕСЃС‚РѕСЏРЅРёСЏ РѕСЂСѓР¶РёСЏ
 	enum WeaponState {
-		/// зарядка
+		/// Р·Р°СЂСЏРґРєР°
 		WEAPON_STATE_LOAD,
-		/// стрельба
+		/// СЃС‚СЂРµР»СЊР±Р°
 		WEAPON_STATE_FIRE
 	};
 
@@ -512,57 +512,57 @@ protected:
 
 private:
 
-	/// текущее состояние оружия
+	/// С‚РµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ РѕСЂСѓР¶РёСЏ
 	WeaponState state_;
-	/// время выполнения состояния
+	/// РІСЂРµРјСЏ РІС‹РїРѕР»РЅРµРЅРёСЏ СЃРѕСЃС‚РѕСЏРЅРёСЏ
 	LogicTimer stateTimer_;
 
-	/// координаты цели
+	/// РєРѕРѕСЂРґРёРЅР°С‚С‹ С†РµР»Рё
 	Vect3f firePosition_;
-	/// ошибка прицеливания
+	/// РѕС€РёР±РєР° РїСЂРёС†РµР»РёРІР°РЅРёСЏ
 	Vect3f fireDispersion_;
-	/// цель
+	/// С†РµР»СЊ
 	UnitLink<UnitInterface> fireTarget_;
 	bool hasFireTarget_;
 
-	/// задержка между выстрелами в очереди
+	/// Р·Р°РґРµСЂР¶РєР° РјРµР¶РґСѓ РІС‹СЃС‚СЂРµР»Р°РјРё РІ РѕС‡РµСЂРµРґРё
 	LogicTimer queueDelayTimer_;
 
-	/// текущий ствол
+	/// С‚РµРєСѓС‰РёР№ СЃС‚РІРѕР»
 	int currentBarrel_;
 
-	/// true, если цель установлена
-	/// используется для постоянно стреляющего оружия
+	/// true, РµСЃР»Рё С†РµР»СЊ СѓСЃС‚Р°РЅРѕРІР»РµРЅР°
+	/// РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ РїРѕСЃС‚РѕСЏРЅРЅРѕ СЃС‚СЂРµР»СЏСЋС‰РµРіРѕ РѕСЂСѓР¶РёСЏ
 	bool fireTargetSet_;
-	/// true, если оружие стреляет
+	/// true, РµСЃР»Рё РѕСЂСѓР¶РёРµ СЃС‚СЂРµР»СЏРµС‚
 	bool fireStarted_;
 	bool fireRequested_;
 
 	bool autoFire_;
 	bool autoFireOnce_;
 
-	/// время стрельбы, мс
+	/// РІСЂРµРјСЏ СЃС‚СЂРµР»СЊР±С‹, РјСЃ
 	int fireTime_;
-	/// время перезарядки, мс
+	/// РІСЂРµРјСЏ РїРµСЂРµР·Р°СЂСЏРґРєРё, РјСЃ
 	int reloadTime_;
-	/// время перезарядки из инвентаря, мс
+	/// РІСЂРµРјСЏ РїРµСЂРµР·Р°СЂСЏРґРєРё РёР· РёРЅРІРµРЅС‚Р°СЂСЏ, РјСЃ
 	int reloadTimeInventory_;
 
-	/// true если оружие заряжено
+	/// true РµСЃР»Рё РѕСЂСѓР¶РёРµ Р·Р°СЂСЏР¶РµРЅРѕ
 	bool reloaded_;
 	bool reloadFromInventory_;
 
-	/// дальность стрельбы
+	/// РґР°Р»СЊРЅРѕСЃС‚СЊ СЃС‚СЂРµР»СЊР±С‹
 	float fireRadius_;
-	/// минимальная дальность стрельбы
+	/// РјРёРЅРёРјР°Р»СЊРЅР°СЏ РґР°Р»СЊРЅРѕСЃС‚СЊ СЃС‚СЂРµР»СЊР±С‹
 	float fireRadiusMin_;
 
-	/// точность (максимальный разброс) стрельбы
+	/// С‚РѕС‡РЅРѕСЃС‚СЊ (РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·Р±СЂРѕСЃ) СЃС‚СЂРµР»СЊР±С‹
 	int fireDisp_;
 	float fireDispersionRadius_;
 
 	bool aimResetDisabled_;
-	/// true если оружие надо развернуть по-умолчанию
+	/// true РµСЃР»Рё РѕСЂСѓР¶РёРµ РЅР°РґРѕ СЂР°Р·РІРµСЂРЅСѓС‚СЊ РїРѕ-СѓРјРѕР»С‡Р°РЅРёСЋ
 	LogicTimer aimResetTimer_;
 	LogicTimer autoScanTimer_;
 
@@ -580,12 +580,12 @@ private:
 	UnitLink<UnitInterface> autoTarget_;
 	bool autoTargetAttacked_;
 
-	/// используется для расчёта углов при наведении
+	/// РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ СЂР°СЃС‡С‘С‚Р° СѓРіР»РѕРІ РїСЂРё РЅР°РІРµРґРµРЅРёРё
 	const AttributeBase* turnSuggestPrm_;
 
 	WeaponPrmCache prmCache_;
 
-	/// перекладывает значения параметров в переменные класса
+	/// РїРµСЂРµРєР»Р°РґС‹РІР°РµС‚ Р·РЅР°С‡РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РІ РїРµСЂРµРјРµРЅРЅС‹Рµ РєР»Р°СЃСЃР°
 	bool updateParameters();
 
 	enum FireDistanceStatus
@@ -599,11 +599,11 @@ private:
 	FireDistanceStatus targetDistanceStatus(const WeaponTarget& target) const;
 
 	bool needAutoFire() const;
-	/// устанавливает цель для атаки - точку на поверхности или юнита, стоящего в этой точке
+	/// СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ С†РµР»СЊ РґР»СЏ Р°С‚Р°РєРё - С‚РѕС‡РєСѓ РЅР° РїРѕРІРµСЂС…РЅРѕСЃС‚Рё РёР»Рё СЋРЅРёС‚Р°, СЃС‚РѕСЏС‰РµРіРѕ РІ СЌС‚РѕР№ С‚РѕС‡РєРµ
 	bool setGroundTarget(const Vect3f& ground_pos);
 };
 
-/// Управление поворотом логического узла модели из оружия.
+/// РЈРїСЂР°РІР»РµРЅРёРµ РїРѕРІРѕСЂРѕС‚РѕРј Р»РѕРіРёС‡РµСЃРєРѕРіРѕ СѓР·Р»Р° РјРѕРґРµР»Рё РёР· РѕСЂСѓР¶РёСЏ.
 class WeaponRotationNode
 {
 public:
@@ -645,27 +645,27 @@ public:
 
 private:
 
-	/// индекс логического узла
+	/// РёРЅРґРµРєСЃ Р»РѕРіРёС‡РµСЃРєРѕРіРѕ СѓР·Р»Р°
 	int nodeIndex_;
-	/// ось вращения
+	/// РѕСЃСЊ РІСЂР°С‰РµРЅРёСЏ
 	eAxis axis_;
 
-	/// текущий угол
+	/// С‚РµРєСѓС‰РёР№ СѓРіРѕР»
 	float angle_;
 
-	/// изменение угла за текущий логический кадр
+	/// РёР·РјРµРЅРµРЅРёРµ СѓРіР»Р° Р·Р° С‚РµРєСѓС‰РёР№ Р»РѕРіРёС‡РµСЃРєРёР№ РєР°РґСЂ
 	float angleDelta_;
-	/// приоритет текущего изменения
-	/// изменения с меньшим приоритетом игнорируются
+	/// РїСЂРёРѕСЂРёС‚РµС‚ С‚РµРєСѓС‰РµРіРѕ РёР·РјРµРЅРµРЅРёСЏ
+	/// РёР·РјРµРЅРµРЅРёСЏ СЃ РјРµРЅСЊС€РёРј РїСЂРёРѕСЂРёС‚РµС‚РѕРј РёРіРЅРѕСЂРёСЂСѓСЋС‚СЃСЏ
 	int changePriority_;
 };
 
-/// Управление поворотом логической модели из оружия.
+/// РЈРїСЂР°РІР»РµРЅРёРµ РїРѕРІРѕСЂРѕС‚РѕРј Р»РѕРіРёС‡РµСЃРєРѕР№ РјРѕРґРµР»Рё РёР· РѕСЂСѓР¶РёСЏ.
 /**
-Нужен для корректного управления наведением для случая нескольких
-оружий на один дамми. Отслеживает, какой дамми на сколько повёрнут,
-разрешает конфликты при попытке повернуть один и тот же дамми в
-разные стороны.
+РќСѓР¶РµРЅ РґР»СЏ РєРѕСЂСЂРµРєС‚РЅРѕРіРѕ СѓРїСЂР°РІР»РµРЅРёСЏ РЅР°РІРµРґРµРЅРёРµРј РґР»СЏ СЃР»СѓС‡Р°СЏ РЅРµСЃРєРѕР»СЊРєРёС…
+РѕСЂСѓР¶РёР№ РЅР° РѕРґРёРЅ РґР°РјРјРё. РћС‚СЃР»РµР¶РёРІР°РµС‚, РєР°РєРѕР№ РґР°РјРјРё РЅР° СЃРєРѕР»СЊРєРѕ РїРѕРІС‘СЂРЅСѓС‚,
+СЂР°Р·СЂРµС€Р°РµС‚ РєРѕРЅС„Р»РёРєС‚С‹ РїСЂРё РїРѕРїС‹С‚РєРµ РїРѕРІРµСЂРЅСѓС‚СЊ РѕРґРёРЅ Рё С‚РѕС‚ Р¶Рµ РґР°РјРјРё РІ
+СЂР°Р·РЅС‹Рµ СЃС‚РѕСЂРѕРЅС‹.
 */
 class WeaponRotationController
 {
@@ -723,22 +723,22 @@ private:
 
 namespace weapon_helpers {
 
-/// Трассировка луча, возвращает false если он упёрся в поверхность.
-/// out - координаты точки на поверхности, в которую попал луч
+/// РўСЂР°СЃСЃРёСЂРѕРІРєР° Р»СѓС‡Р°, РІРѕР·РІСЂР°С‰Р°РµС‚ false РµСЃР»Рё РѕРЅ СѓРїС‘СЂСЃСЏ РІ РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ.
+/// out - РєРѕРѕСЂРґРёРЅР°С‚С‹ С‚РѕС‡РєРё РЅР° РїРѕРІРµСЂС…РЅРѕСЃС‚Рё, РІ РєРѕС‚РѕСЂСѓСЋ РїРѕРїР°Р» Р»СѓС‡
 bool traceGround(const Vect3f& from, const Vect3f& to, Vect3f& out);
 
-/// Трассировка луча, возвращает false если он упёрся в поверхность.
-/// out - координаты высшей точки на поверхности по ходу луча
+/// РўСЂР°СЃСЃРёСЂРѕРІРєР° Р»СѓС‡Р°, РІРѕР·РІСЂР°С‰Р°РµС‚ false РµСЃР»Рё РѕРЅ СѓРїС‘СЂСЃСЏ РІ РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ.
+/// out - РєРѕРѕСЂРґРёРЅР°С‚С‹ РІС‹СЃС€РµР№ С‚РѕС‡РєРё РЅР° РїРѕРІРµСЂС…РЅРѕСЃС‚Рё РїРѕ С…РѕРґСѓ Р»СѓС‡Р°
 bool traceHeight(const Vect3f& from, const Vect3f& to, Vect3f& out);
 
-/// Трассировка луча, возвращает false если он упёрся в юнит.
-/// out - координаты пересечения луча с баундом юнита
+/// РўСЂР°СЃСЃРёСЂРѕРІРєР° Р»СѓС‡Р°, РІРѕР·РІСЂР°С‰Р°РµС‚ false РµСЃР»Рё РѕРЅ СѓРїС‘СЂСЃСЏ РІ СЋРЅРёС‚.
+/// out - РєРѕРѕСЂРґРёРЅР°С‚С‹ РїРµСЂРµСЃРµС‡РµРЅРёСЏ Р»СѓС‡Р° СЃ Р±Р°СѓРЅРґРѕРј СЋРЅРёС‚Р°
 bool traceUnit(const Vect3f& from, const Vect3f& to, Vect3f& out, const UnitReal* owner = 0, const UnitBase* target = 0, int environment_destruction = 0);
 
 bool traceAimPosition(const Vect3f& from, const Vect3f& to, const UnitReal* owner, Vect3f& aim_pos, const UnitBase*& aim_unit);
 
-/// трассировка видимости одного юнита другим с учетом ландшафта
-/// возвращает true, если \a target_unit видим
+/// С‚СЂР°СЃСЃРёСЂРѕРІРєР° РІРёРґРёРјРѕСЃС‚Рё РѕРґРЅРѕРіРѕ СЋРЅРёС‚Р° РґСЂСѓРіРёРј СЃ СѓС‡РµС‚РѕРј Р»Р°РЅРґС€Р°С„С‚Р°
+/// РІРѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё \a target_unit РІРёРґРёРј
 bool traceVisibility(const UnitBase* unit, const UnitBase* target_unit);
 
 }

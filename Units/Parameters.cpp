@@ -12,34 +12,34 @@
 string getStringTokenByIndex(const char*, int);
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ParameterType, Type, "Type")
-REGISTER_ENUM_ENCLOSED(ParameterType, HEALTH, "Здоровье")
-REGISTER_ENUM_ENCLOSED(ParameterType, HEALTH_RECOVERY, "Восстановление здоровья")
-REGISTER_ENUM_ENCLOSED(ParameterType, ARMOR, "Броня")
-REGISTER_ENUM_ENCLOSED(ParameterType, ARMOR_RECOVERY, "Восстановление брони")
-REGISTER_ENUM_ENCLOSED(ParameterType, POSSESSION, "Владение")
-REGISTER_ENUM_ENCLOSED(ParameterType, POSSESSION_RECOVERY, "Восстановление владения")
-REGISTER_ENUM_ENCLOSED(ParameterType, POSSESSION_RECOVERY_BACK, "Восстановление владения после захвата")
-REGISTER_ENUM_ENCLOSED(ParameterType, VELOCITY, "Скорость")
-REGISTER_ENUM_ENCLOSED(ParameterType, RESOURCE_PICKING_TIME, "Время сбора ресурса")
-REGISTER_ENUM_ENCLOSED(ParameterType, RESOURCE_PRODUCTIVITY_FACTOR, "Коэффициент производительности ресурсосборщиков (скорость сборки ресурса)")
-REGISTER_ENUM_ENCLOSED(ParameterType, FIRE_RANGE, "Дальность стрельбы без разброса")
-REGISTER_ENUM_ENCLOSED(ParameterType, FIRE_RANGE_MIN, "Минимальная дальность стрельбы")
-REGISTER_ENUM_ENCLOSED(ParameterType, FIRE_RANGE_EFFECTIVE, "Дальность стрельбы с разбросом")
-REGISTER_ENUM_ENCLOSED(ParameterType, FIRE_TIME, "Время стрельбы")
-REGISTER_ENUM_ENCLOSED(ParameterType, FIRE_DISPERSION, "Разброс стрельбы")
-REGISTER_ENUM_ENCLOSED(ParameterType, RELOAD_TIME, "Время перезарядки")
-REGISTER_ENUM_ENCLOSED(ParameterType, RELOAD_TIME_INVENTORY, "Время перезарядки из инвентаря")
-REGISTER_ENUM_ENCLOSED(ParameterType, SIGHT_RADIUS, "Радиус видимости")
-REGISTER_ENUM_ENCLOSED(ParameterType, NOISE_RADIUS, "Радиус создаваемого шума")
-REGISTER_ENUM_ENCLOSED(ParameterType, HEARING_RADIUS, "Радиус слышимости")
-REGISTER_ENUM_ENCLOSED(ParameterType, NUMBER_OF_UNITS, "Максимальное количество юнитов")
-REGISTER_ENUM_ENCLOSED(ParameterType, CONSTRUCTION_TIME_FACTOR_ON_WATER, "Коэффициент времени строительства на воде")
-REGISTER_ENUM_ENCLOSED(ParameterType, AMMO, "Количество боеприпасов")
-REGISTER_ENUM_ENCLOSED(ParameterType, AMMO_CAPACITY, "Максимальное количество боеприпасов")
-REGISTER_ENUM_ENCLOSED(ParameterType, WEAPON_DURABILITY, "Ресурс оружия (количество выстрелов)")
-REGISTER_ENUM_ENCLOSED(ParameterType, VARIABLE, "Переменная (равенство при проверке)")
-REGISTER_ENUM_ENCLOSED(ParameterType, OTHER, "Прочий")
-REGISTER_ENUM_ENCLOSED(ParameterType, OTHER_RECOVERY, "Восстановление прочего")
+REGISTER_ENUM_ENCLOSED(ParameterType, HEALTH, "Р—РґРѕСЂРѕРІСЊРµ")
+REGISTER_ENUM_ENCLOSED(ParameterType, HEALTH_RECOVERY, "Р’РѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ Р·РґРѕСЂРѕРІСЊСЏ")
+REGISTER_ENUM_ENCLOSED(ParameterType, ARMOR, "Р‘СЂРѕРЅСЏ")
+REGISTER_ENUM_ENCLOSED(ParameterType, ARMOR_RECOVERY, "Р’РѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ Р±СЂРѕРЅРё")
+REGISTER_ENUM_ENCLOSED(ParameterType, POSSESSION, "Р’Р»Р°РґРµРЅРёРµ")
+REGISTER_ENUM_ENCLOSED(ParameterType, POSSESSION_RECOVERY, "Р’РѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РІР»Р°РґРµРЅРёСЏ")
+REGISTER_ENUM_ENCLOSED(ParameterType, POSSESSION_RECOVERY_BACK, "Р’РѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РІР»Р°РґРµРЅРёСЏ РїРѕСЃР»Рµ Р·Р°С…РІР°С‚Р°")
+REGISTER_ENUM_ENCLOSED(ParameterType, VELOCITY, "РЎРєРѕСЂРѕСЃС‚СЊ")
+REGISTER_ENUM_ENCLOSED(ParameterType, RESOURCE_PICKING_TIME, "Р’СЂРµРјСЏ СЃР±РѕСЂР° СЂРµСЃСѓСЂСЃР°")
+REGISTER_ENUM_ENCLOSED(ParameterType, RESOURCE_PRODUCTIVITY_FACTOR, "РљРѕСЌС„С„РёС†РёРµРЅС‚ РїСЂРѕРёР·РІРѕРґРёС‚РµР»СЊРЅРѕСЃС‚Рё СЂРµСЃСѓСЂСЃРѕСЃР±РѕСЂС‰РёРєРѕРІ (СЃРєРѕСЂРѕСЃС‚СЊ СЃР±РѕСЂРєРё СЂРµСЃСѓСЂСЃР°)")
+REGISTER_ENUM_ENCLOSED(ParameterType, FIRE_RANGE, "Р”Р°Р»СЊРЅРѕСЃС‚СЊ СЃС‚СЂРµР»СЊР±С‹ Р±РµР· СЂР°Р·Р±СЂРѕСЃР°")
+REGISTER_ENUM_ENCLOSED(ParameterType, FIRE_RANGE_MIN, "РњРёРЅРёРјР°Р»СЊРЅР°СЏ РґР°Р»СЊРЅРѕСЃС‚СЊ СЃС‚СЂРµР»СЊР±С‹")
+REGISTER_ENUM_ENCLOSED(ParameterType, FIRE_RANGE_EFFECTIVE, "Р”Р°Р»СЊРЅРѕСЃС‚СЊ СЃС‚СЂРµР»СЊР±С‹ СЃ СЂР°Р·Р±СЂРѕСЃРѕРј")
+REGISTER_ENUM_ENCLOSED(ParameterType, FIRE_TIME, "Р’СЂРµРјСЏ СЃС‚СЂРµР»СЊР±С‹")
+REGISTER_ENUM_ENCLOSED(ParameterType, FIRE_DISPERSION, "Р Р°Р·Р±СЂРѕСЃ СЃС‚СЂРµР»СЊР±С‹")
+REGISTER_ENUM_ENCLOSED(ParameterType, RELOAD_TIME, "Р’СЂРµРјСЏ РїРµСЂРµР·Р°СЂСЏРґРєРё")
+REGISTER_ENUM_ENCLOSED(ParameterType, RELOAD_TIME_INVENTORY, "Р’СЂРµРјСЏ РїРµСЂРµР·Р°СЂСЏРґРєРё РёР· РёРЅРІРµРЅС‚Р°СЂСЏ")
+REGISTER_ENUM_ENCLOSED(ParameterType, SIGHT_RADIUS, "Р Р°РґРёСѓСЃ РІРёРґРёРјРѕСЃС‚Рё")
+REGISTER_ENUM_ENCLOSED(ParameterType, NOISE_RADIUS, "Р Р°РґРёСѓСЃ СЃРѕР·РґР°РІР°РµРјРѕРіРѕ С€СѓРјР°")
+REGISTER_ENUM_ENCLOSED(ParameterType, HEARING_RADIUS, "Р Р°РґРёСѓСЃ СЃР»С‹С€РёРјРѕСЃС‚Рё")
+REGISTER_ENUM_ENCLOSED(ParameterType, NUMBER_OF_UNITS, "РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЋРЅРёС‚РѕРІ")
+REGISTER_ENUM_ENCLOSED(ParameterType, CONSTRUCTION_TIME_FACTOR_ON_WATER, "РљРѕСЌС„С„РёС†РёРµРЅС‚ РІСЂРµРјРµРЅРё СЃС‚СЂРѕРёС‚РµР»СЊСЃС‚РІР° РЅР° РІРѕРґРµ")
+REGISTER_ENUM_ENCLOSED(ParameterType, AMMO, "РљРѕР»РёС‡РµСЃС‚РІРѕ Р±РѕРµРїСЂРёРїР°СЃРѕРІ")
+REGISTER_ENUM_ENCLOSED(ParameterType, AMMO_CAPACITY, "РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р±РѕРµРїСЂРёРїР°СЃРѕРІ")
+REGISTER_ENUM_ENCLOSED(ParameterType, WEAPON_DURABILITY, "Р РµСЃСѓСЂСЃ РѕСЂСѓР¶РёСЏ (РєРѕР»РёС‡РµСЃС‚РІРѕ РІС‹СЃС‚СЂРµР»РѕРІ)")
+REGISTER_ENUM_ENCLOSED(ParameterType, VARIABLE, "РџРµСЂРµРјРµРЅРЅР°СЏ (СЂР°РІРµРЅСЃС‚РІРѕ РїСЂРё РїСЂРѕРІРµСЂРєРµ)")
+REGISTER_ENUM_ENCLOSED(ParameterType, OTHER, "РџСЂРѕС‡РёР№")
+REGISTER_ENUM_ENCLOSED(ParameterType, OTHER_RECOVERY, "Р’РѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РїСЂРѕС‡РµРіРѕ")
 END_ENUM_DESCRIPTOR_ENCLOSED(ParameterType, Type)
 
 
@@ -52,81 +52,81 @@ REGISTER_ENUM_ENCLOSED(ArithmeticsData, SUB_PERCENT, "-%")
 END_ENUM_DESCRIPTOR_ENCLOSED(ArithmeticsData, Operation)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ArithmeticsData, CreationType, "CreationType")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, OLD, "Уже созданные")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, NEW, "Вновь создаваемые")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, ALL, "Все")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, OLD, "РЈР¶Рµ СЃРѕР·РґР°РЅРЅС‹Рµ")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, NEW, "Р’РЅРѕРІСЊ СЃРѕР·РґР°РІР°РµРјС‹Рµ")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, ALL, "Р’СЃРµ")
 END_ENUM_DESCRIPTOR_ENCLOSED(ArithmeticsData, CreationType)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ArithmeticsData, UnitType, "UnitType")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, TAKEN, "Юнит, получающий арифметику")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, TAKEN_TYPE, "Юниты того же типа, что и юнит, получающий арифметику")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, CHOSEN_TYPES, "Выбранные типы юнитов")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, ALL_TYPES, "Юниты всех типов")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, PLAYER, "Общие (игрока)")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, PLAYER_CAPACITY, "Емкость ресурсов игрока")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, TAKEN, "Р®РЅРёС‚, РїРѕР»СѓС‡Р°СЋС‰РёР№ Р°СЂРёС„РјРµС‚РёРєСѓ")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, TAKEN_TYPE, "Р®РЅРёС‚С‹ С‚РѕРіРѕ Р¶Рµ С‚РёРїР°, С‡С‚Рѕ Рё СЋРЅРёС‚, РїРѕР»СѓС‡Р°СЋС‰РёР№ Р°СЂРёС„РјРµС‚РёРєСѓ")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, CHOSEN_TYPES, "Р’С‹Р±СЂР°РЅРЅС‹Рµ С‚РёРїС‹ СЋРЅРёС‚РѕРІ")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, ALL_TYPES, "Р®РЅРёС‚С‹ РІСЃРµС… С‚РёРїРѕРІ")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, PLAYER, "РћР±С‰РёРµ (РёРіСЂРѕРєР°)")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, PLAYER_CAPACITY, "Р•РјРєРѕСЃС‚СЊ СЂРµСЃСѓСЂСЃРѕРІ РёРіСЂРѕРєР°")
 END_ENUM_DESCRIPTOR_ENCLOSED(ArithmeticsData, UnitType)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ArithmeticsData, WeaponType, "WeaponType")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, WEAPON_NONE, "Ни на какое оружие не влияет")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, WEAPON_ANY, "На все оружие")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, WEAPON_SHORT_RANGE, "На оружие ближнего боя")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, WEAPON_LONG_RANGE, "На оружие дальнего боя")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, WEAPON_TYPES, "На выбранные типы оружия")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, WEAPON_NONE, "РќРё РЅР° РєР°РєРѕРµ РѕСЂСѓР¶РёРµ РЅРµ РІР»РёСЏРµС‚")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, WEAPON_ANY, "РќР° РІСЃРµ РѕСЂСѓР¶РёРµ")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, WEAPON_SHORT_RANGE, "РќР° РѕСЂСѓР¶РёРµ Р±Р»РёР¶РЅРµРіРѕ Р±РѕСЏ")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, WEAPON_LONG_RANGE, "РќР° РѕСЂСѓР¶РёРµ РґР°Р»СЊРЅРµРіРѕ Р±РѕСЏ")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, WEAPON_TYPES, "РќР° РІС‹Р±СЂР°РЅРЅС‹Рµ С‚РёРїС‹ РѕСЂСѓР¶РёСЏ")
 END_ENUM_DESCRIPTOR_ENCLOSED(ArithmeticsData, WeaponType)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ArithmeticsData, Address, "Address")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, UNIT, "Параметры юнита")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, UNIT_MAX, "Максимальные параметры юнита")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, WEAPON, "Параметры оружия")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, SOURCE, "Источник оружия")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, DAMAGE, "Повреждения оружия")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, WATER_DAMAGE, "Повреждения от воды")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, LAVA_DAMAGE, "Повреждения от лавы")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, ICE_DAMAGE, "Повреждения от льда")
-REGISTER_ENUM_ENCLOSED(ArithmeticsData, EARTH_DAMAGE, "Повреждения от земли")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, UNIT, "РџР°СЂР°РјРµС‚СЂС‹ СЋРЅРёС‚Р°")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, UNIT_MAX, "РњР°РєСЃРёРјР°Р»СЊРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ СЋРЅРёС‚Р°")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, WEAPON, "РџР°СЂР°РјРµС‚СЂС‹ РѕСЂСѓР¶РёСЏ")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, SOURCE, "РСЃС‚РѕС‡РЅРёРє РѕСЂСѓР¶РёСЏ")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, DAMAGE, "РџРѕРІСЂРµР¶РґРµРЅРёСЏ РѕСЂСѓР¶РёСЏ")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, WATER_DAMAGE, "РџРѕРІСЂРµР¶РґРµРЅРёСЏ РѕС‚ РІРѕРґС‹")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, LAVA_DAMAGE, "РџРѕРІСЂРµР¶РґРµРЅРёСЏ РѕС‚ Р»Р°РІС‹")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, ICE_DAMAGE, "РџРѕРІСЂРµР¶РґРµРЅРёСЏ РѕС‚ Р»СЊРґР°")
+REGISTER_ENUM_ENCLOSED(ArithmeticsData, EARTH_DAMAGE, "РџРѕРІСЂРµР¶РґРµРЅРёСЏ РѕС‚ Р·РµРјР»Рё")
 END_ENUM_DESCRIPTOR_ENCLOSED(ArithmeticsData, Address)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ParameterShowSetting, ParameterClass, "ParameterType")
-REGISTER_ENUM_ENCLOSED(ParameterShowSetting, LOGIC, "логический")
-REGISTER_ENUM_ENCLOSED(ParameterShowSetting, PRODUCTION_PROGRESS, "прогресс производства")
-REGISTER_ENUM_ENCLOSED(ParameterShowSetting, UPGRADE_PROGRESS, "прогресс апгрейда")
-REGISTER_ENUM_ENCLOSED(ParameterShowSetting, FINISH_UPGRADE, "прогресс завершения апгрейда")
-REGISTER_ENUM_ENCLOSED(ParameterShowSetting, GROUND_PROGRESS, "прогресс забора земли")
-REGISTER_ENUM_ENCLOSED(ParameterShowSetting, RELOAD_PROGRESS, "прогресс перезарядки")
+REGISTER_ENUM_ENCLOSED(ParameterShowSetting, LOGIC, "Р»РѕРіРёС‡РµСЃРєРёР№")
+REGISTER_ENUM_ENCLOSED(ParameterShowSetting, PRODUCTION_PROGRESS, "РїСЂРѕРіСЂРµСЃСЃ РїСЂРѕРёР·РІРѕРґСЃС‚РІР°")
+REGISTER_ENUM_ENCLOSED(ParameterShowSetting, UPGRADE_PROGRESS, "РїСЂРѕРіСЂРµСЃСЃ Р°РїРіСЂРµР№РґР°")
+REGISTER_ENUM_ENCLOSED(ParameterShowSetting, FINISH_UPGRADE, "РїСЂРѕРіСЂРµСЃСЃ Р·Р°РІРµСЂС€РµРЅРёСЏ Р°РїРіСЂРµР№РґР°")
+REGISTER_ENUM_ENCLOSED(ParameterShowSetting, GROUND_PROGRESS, "РїСЂРѕРіСЂРµСЃСЃ Р·Р°Р±РѕСЂР° Р·РµРјР»Рё")
+REGISTER_ENUM_ENCLOSED(ParameterShowSetting, RELOAD_PROGRESS, "РїСЂРѕРіСЂРµСЃСЃ РїРµСЂРµР·Р°СЂСЏРґРєРё")
 END_ENUM_DESCRIPTOR_ENCLOSED(ParameterShowSetting, ParameterClass)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ParameterShowSetting, AlignType, "AlignType")
-REGISTER_ENUM_ENCLOSED(ParameterShowSetting, ALIGN_LEFT, "по левому краю")
-REGISTER_ENUM_ENCLOSED(ParameterShowSetting, ALIGN_CENTER, "по центру")
+REGISTER_ENUM_ENCLOSED(ParameterShowSetting, ALIGN_LEFT, "РїРѕ Р»РµРІРѕРјСѓ РєСЂР°СЋ")
+REGISTER_ENUM_ENCLOSED(ParameterShowSetting, ALIGN_CENTER, "РїРѕ С†РµРЅС‚СЂСѓ")
 END_ENUM_DESCRIPTOR_ENCLOSED(ParameterShowSetting, AlignType)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ParameterShowSetting, Shape, "ParameterShowSetting::Shape")
-REGISTER_ENUM_ENCLOSED(ParameterShowSetting, BAR, "полоска")
-REGISTER_ENUM_ENCLOSED(ParameterShowSetting, CIRCLE, "кольцо")
+REGISTER_ENUM_ENCLOSED(ParameterShowSetting, BAR, "РїРѕР»РѕСЃРєР°")
+REGISTER_ENUM_ENCLOSED(ParameterShowSetting, CIRCLE, "РєРѕР»СЊС†Рѕ")
 END_ENUM_DESCRIPTOR_ENCLOSED(ParameterShowSetting, Shape)
 
 BEGIN_ENUM_DESCRIPTOR(ShowEvent, "ShowEvent")
-REGISTER_ENUM(SHOW_AT_NOT_HOVER_OR_SELECT, "когда нет наведения и не выбран")
-REGISTER_ENUM(SHOW_AT_SELECT, "при выборе")
-REGISTER_ENUM(SHOW_AT_HOVER, "при наведении")
-REGISTER_ENUM(SHOW_AT_HOVER_OR_SELECT, "при наведении или выборе")
-REGISTER_ENUM(SHOW_AT_PARAMETER_CHANGE, "при изменении параметра")
-REGISTER_ENUM(SHOW_AT_PARAMETER_INCREASE, "при увеличении параметра")
-REGISTER_ENUM(SHOW_AT_PARAMETER_DECREASE, "при уменьшении параметра")
-REGISTER_ENUM(SHOW_AT_BUILD, "при строительстве")
-REGISTER_ENUM(SHOW_AT_BUILD_OR_UPGRADE, "при строительстве или апгрейде")
-REGISTER_ENUM(SHOW_AT_DIRECT_CONTROL, "в прямом управлении")
-REGISTER_ENUM(SHOW_AT_PRODUCTION, "при производстве")
-REGISTER_ENUM(SHOW_ALWAYS, "всегда")
+REGISTER_ENUM(SHOW_AT_NOT_HOVER_OR_SELECT, "РєРѕРіРґР° РЅРµС‚ РЅР°РІРµРґРµРЅРёСЏ Рё РЅРµ РІС‹Р±СЂР°РЅ")
+REGISTER_ENUM(SHOW_AT_SELECT, "РїСЂРё РІС‹Р±РѕСЂРµ")
+REGISTER_ENUM(SHOW_AT_HOVER, "РїСЂРё РЅР°РІРµРґРµРЅРёРё")
+REGISTER_ENUM(SHOW_AT_HOVER_OR_SELECT, "РїСЂРё РЅР°РІРµРґРµРЅРёРё РёР»Рё РІС‹Р±РѕСЂРµ")
+REGISTER_ENUM(SHOW_AT_PARAMETER_CHANGE, "РїСЂРё РёР·РјРµРЅРµРЅРёРё РїР°СЂР°РјРµС‚СЂР°")
+REGISTER_ENUM(SHOW_AT_PARAMETER_INCREASE, "РїСЂРё СѓРІРµР»РёС‡РµРЅРёРё РїР°СЂР°РјРµС‚СЂР°")
+REGISTER_ENUM(SHOW_AT_PARAMETER_DECREASE, "РїСЂРё СѓРјРµРЅСЊС€РµРЅРёРё РїР°СЂР°РјРµС‚СЂР°")
+REGISTER_ENUM(SHOW_AT_BUILD, "РїСЂРё СЃС‚СЂРѕРёС‚РµР»СЊСЃС‚РІРµ")
+REGISTER_ENUM(SHOW_AT_BUILD_OR_UPGRADE, "РїСЂРё СЃС‚СЂРѕРёС‚РµР»СЊСЃС‚РІРµ РёР»Рё Р°РїРіСЂРµР№РґРµ")
+REGISTER_ENUM(SHOW_AT_DIRECT_CONTROL, "РІ РїСЂСЏРјРѕРј СѓРїСЂР°РІР»РµРЅРёРё")
+REGISTER_ENUM(SHOW_AT_PRODUCTION, "РїСЂРё РїСЂРѕРёР·РІРѕРґСЃС‚РІРµ")
+REGISTER_ENUM(SHOW_ALWAYS, "РІСЃРµРіРґР°")
 END_ENUM_DESCRIPTOR(ShowEvent)
 
-WRAP_LIBRARY(ParameterTypeTable, "ParameterType", "Типы параметров", "Scripts\\Content\\ParameterType", 0, LIBRARY_EDITABLE | LIBRARY_IN_PLACE);
+WRAP_LIBRARY(ParameterTypeTable, "ParameterType", "РўРёРїС‹ РїР°СЂР°РјРµС‚СЂРѕРІ", "Scripts\\Content\\ParameterType", 0, LIBRARY_EDITABLE | LIBRARY_IN_PLACE);
 
-WRAP_LIBRARY(ParameterValueTable, "ParameterValue", "Параметры", "Scripts\\Content\\ParameterValue", 0, LIBRARY_EDITABLE | LIBRARY_IN_PLACE);
+WRAP_LIBRARY(ParameterValueTable, "ParameterValue", "РџР°СЂР°РјРµС‚СЂС‹", "Scripts\\Content\\ParameterValue", 0, LIBRARY_EDITABLE | LIBRARY_IN_PLACE);
 
-WRAP_LIBRARY(ParameterFormulaTable, "ParameterFormula", "Формулы параметров", "Scripts\\Content\\ParameterFormula", 0, LIBRARY_EDITABLE | LIBRARY_IN_PLACE);
+WRAP_LIBRARY(ParameterFormulaTable, "ParameterFormula", "Р¤РѕСЂРјСѓР»С‹ РїР°СЂР°РјРµС‚СЂРѕРІ", "Scripts\\Content\\ParameterFormula", 0, LIBRARY_EDITABLE | LIBRARY_IN_PLACE);
 
-WRAP_LIBRARY(ParameterGroupTable, "ParameterGroup", "Группа параметров", "Scripts\\Content\\ParameterGroup", 0, LIBRARY_IN_PLACE);
+WRAP_LIBRARY(ParameterGroupTable, "ParameterGroup", "Р“СЂСѓРїРїР° РїР°СЂР°РјРµС‚СЂРѕРІ", "Scripts\\Content\\ParameterGroup", 0, LIBRARY_IN_PLACE);
 
 /////////////////////////////////
 ParameterType::ParameterType(const char* name) : 
@@ -144,11 +144,11 @@ void ParameterType::serialize(Archive& ar)
 	}
 
 	StringTableBase::serialize(ar);
-	ar.serialize(type_, "type", "&Тип");
-	ar.serialize(counter_, "counter", "&Номер");
-	ar.serialize(comment_, "comment", "Комментарий");
+	ar.serialize(type_, "type", "&РўРёРї");
+	ar.serialize(counter_, "counter", "&РќРѕРјРµСЂ");
+	ar.serialize(comment_, "comment", "РљРѕРјРјРµРЅС‚Р°СЂРёР№");
 	//ar.serialize(fullName_, "fullName", 0);
-	ar.serialize(tipsName_, "tipsName", "Название параметра (лок, ключ является меткой)");
+	ar.serialize(tipsName_, "tipsName", "РќР°Р·РІР°РЅРёРµ РїР°СЂР°РјРµС‚СЂР° (Р»РѕРє, РєР»СЋС‡ СЏРІР»СЏРµС‚СЃСЏ РјРµС‚РєРѕР№)");
 }
 
 void ParameterType::setCounter()
@@ -173,7 +173,7 @@ void ParameterFormula::serialize(Archive& ar)
 		(FormulaString&)formula = formula_;
 		formula.group_ = ParameterFormulaString::parameterGroup_;
 		formula.value_ = ParameterFormulaString::parameterValue_;
-		ar.serialize(formula, "formula", "<Формула");
+		ar.serialize(formula, "formula", "<Р¤РѕСЂРјСѓР»Р°");
 		formula_ = (FormulaString&)formula;
 	}else{
 		ar.serialize(formula_, "formula", 0);
@@ -189,22 +189,22 @@ void ParameterValue::editorGroupMoveBefore(int index, int beforeIndex)
 void ParameterValue::serialize(Archive& ar) 
 {
 	StringTableBase::serialize(ar);
-	ar.serialize(value_, "value", "Значение (X)");
-	ar.serialize(type_, "type", "&Тип");
+	ar.serialize(value_, "value", "Р—РЅР°С‡РµРЅРёРµ (X)");
+	ar.serialize(type_, "type", "&РўРёРї");
 	if(ar.isEdit()){
 		ParameterFormulaString::parameterValue_ = value_;
 		ParameterFormulaString::parameterGroup_ = group_;
 	}
-	ar.serialize(formula_, "formula", "Формула");
+	ar.serialize(formula_, "formula", "Р¤РѕСЂРјСѓР»Р°");
 	ar.serialize(group_, "group", 0);
 	if (ar.isInput ()) {
 		state_ = NOT_CALCULATED;
 	} 
 	if (ar.isEdit()) {
 		float calculated_value = value();
-		ar.serialize(calculated_value, "calculated_value", "!Вычисленное значение");
+		ar.serialize(calculated_value, "calculated_value", "!Р’С‹С‡РёСЃР»РµРЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ");
 	}
-	ar.serialize(can_modify_, "can_modify", "Изменяемый в Excel");
+	ar.serialize(can_modify_, "can_modify", "РР·РјРµРЅСЏРµРјС‹Р№ РІ Excel");
 }
 
 float ParameterValue::rawValue() const
@@ -278,7 +278,7 @@ float ParameterValue::value () const
 		return calculated_value_;
 	case CALCULATING:
 	default:
-		xassertStr(0 && "Циклическое обращение к значениям параметров:", c_str());
+		xassertStr(0 && "Р¦РёРєР»РёС‡РµСЃРєРѕРµ РѕР±СЂР°С‰РµРЅРёРµ Рє Р·РЅР°С‡РµРЅРёСЏРј РїР°СЂР°РјРµС‚СЂРѕРІ:", c_str());
 		return 0;
 	};
 }
@@ -879,17 +879,17 @@ float ParameterSet::progress(const ParameterSet& resource1, const ParameterSet& 
 		while(is2 != is2end && is2->index < need->index)
 			++is2;
 		
-		if(is1 == is1end || is1->index > need->index){ // в первом наборе параметра нет, смотрим только во втором
+		if(is1 == is1end || is1->index > need->index){ // РІ РїРµСЂРІРѕРј РЅР°Р±РѕСЂРµ РїР°СЂР°РјРµС‚СЂР° РЅРµС‚, СЃРјРѕС‚СЂРёРј С‚РѕР»СЊРєРѕ РІРѕ РІС‚РѕСЂРѕРј
 			if(is2 == is2end || is2->index > need->index)
-				return 0.f; // не хватает некоторых типов параметров
+				return 0.f; // РЅРµ С…РІР°С‚Р°РµС‚ РЅРµРєРѕС‚РѕСЂС‹С… С‚РёРїРѕРІ РїР°СЂР°РјРµС‚СЂРѕРІ
 			else if(ParameterTypeTable::instance()[need->index].type() != ParameterType::VARIABLE){
 				if(need->value > is2->value)
 					progress = min(progress, ::clamp(is2->value / need->value, 0.f, 1.f));
 			}
 			else if(fabsf(need->value - is2->value) > eps)
-				return 0.f; // если хоть один параметр-переменная не равен, то общий прогресс 0
+				return 0.f; // РµСЃР»Рё С…РѕС‚СЊ РѕРґРёРЅ РїР°СЂР°РјРµС‚СЂ-РїРµСЂРµРјРµРЅРЅР°СЏ РЅРµ СЂР°РІРµРЅ, С‚Рѕ РѕР±С‰РёР№ РїСЂРѕРіСЂРµСЃСЃ 0
 		}
-		else if(is2 == is2end || is2->index > need->index){ // во втором наборе параметра нет, смотрим только в первом
+		else if(is2 == is2end || is2->index > need->index){ // РІРѕ РІС‚РѕСЂРѕРј РЅР°Р±РѕСЂРµ РїР°СЂР°РјРµС‚СЂР° РЅРµС‚, СЃРјРѕС‚СЂРёРј С‚РѕР»СЊРєРѕ РІ РїРµСЂРІРѕРј
 			if(ParameterTypeTable::instance()[need->index].type() != ParameterType::VARIABLE){
 				if(need->value > is1->value)
 					progress = min(progress, ::clamp(is1->value / need->value, 0.f, 1.f));
@@ -897,7 +897,7 @@ float ParameterSet::progress(const ParameterSet& resource1, const ParameterSet& 
 			else if(fabsf(need->value - is1->value) > eps)
 				return 0.f;
 		}
-		else { // параметр есть в обоих наборах
+		else { // РїР°СЂР°РјРµС‚СЂ РµСЃС‚СЊ РІ РѕР±РѕРёС… РЅР°Р±РѕСЂР°С…
 			if(ParameterTypeTable::instance()[need->index].type() != ParameterType::VARIABLE){
 				float val = max(is1->value, is2->value);
 				if(need->value > val)
@@ -1091,7 +1091,7 @@ bool ParameterCustom::serialize(Archive& ar, const char* name, const char* nameA
 			if(vi == values_.end())
 				values_.push_back(Value((*i)->value(), (*i)->type().key()));
 			else
-				xassertStr(0 && "Параметры одинакового типа:", (string(nameAlt ? nameAlt : "") + " - " + (*i)->c_str()).c_str());
+				xassertStr(0 && "РџР°СЂР°РјРµС‚СЂС‹ РѕРґРёРЅР°РєРѕРІРѕРіРѕ С‚РёРїР°:", (string(nameAlt ? nameAlt : "") + " - " + (*i)->c_str()).c_str());
 		}
 	}
 	return nodeExists;
@@ -1141,7 +1141,7 @@ void ArithmeticsData::apply(float& lvalue) const
 	else{
 		switch(operation){
 		case SET:
-			xassert("Операция = в арифметике необратима, ее нельзя использовать в воздействиях и арифметике транспорта" && 0);
+			xassert("РћРїРµСЂР°С†РёСЏ = РІ Р°СЂРёС„РјРµС‚РёРєРµ РЅРµРѕР±СЂР°С‚РёРјР°, РµРµ РЅРµР»СЊР·СЏ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РІ РІРѕР·РґРµР№СЃС‚РІРёСЏС… Рё Р°СЂРёС„РјРµС‚РёРєРµ С‚СЂР°РЅСЃРїРѕСЂС‚Р°" && 0);
 			break;
 		case ADD:
 			lvalue -= value;
@@ -1267,34 +1267,34 @@ bool ArithmeticsData::checkWeapon(const WeaponPrm* weaponPrm) const
 
 void ArithmeticsData::serialize(Archive& ar)
 {
-	ar.serialize(unitType, "unitType", "Юниты, на которые влияет");
+	ar.serialize(unitType, "unitType", "Р®РЅРёС‚С‹, РЅР° РєРѕС‚РѕСЂС‹Рµ РІР»РёСЏРµС‚");
 	if(unitType & ~(PLAYER | PLAYER_CAPACITY))
-		ar.serialize(creationType, "creationType", "Юниты созданные или новые");
+		ar.serialize(creationType, "creationType", "Р®РЅРёС‚С‹ СЃРѕР·РґР°РЅРЅС‹Рµ РёР»Рё РЅРѕРІС‹Рµ");
 
-	ar.serialize(weaponType, "weaponType", "Влияние на оружие");
+	ar.serialize(weaponType, "weaponType", "Р’Р»РёСЏРЅРёРµ РЅР° РѕСЂСѓР¶РёРµ");
 
 	if(unitType & CHOSEN_TYPES)
-		if(!ar.serialize(attribute, "attribute", "Тип юнита")) // CONVERSION 25.04.2007
+		if(!ar.serialize(attribute, "attribute", "РўРёРї СЋРЅРёС‚Р°")) // CONVERSION 25.04.2007
 		{
 			AttributeUnitOrBuildingReferences attributes;
-			ar.serialize(attributes, "attributes", "Типы юнитов");
+			ar.serialize(attributes, "attributes", "РўРёРїС‹ СЋРЅРёС‚РѕРІ");
 			//xassert(attributes.size() < 2);
 			if(attributes.size() > 0)
 				attribute = *attributes.begin();
 		}
 
 	if(weaponType == WEAPON_TYPES)
-		if(!ar.serialize(weapon, "weapon", "Тип оружия")) // CONVERSION 25.04.2007
+		if(!ar.serialize(weapon, "weapon", "РўРёРї РѕСЂСѓР¶РёСЏ")) // CONVERSION 25.04.2007
 		{
 			WeaponPrmReferences weapons;
-			ar.serialize(weapons, "weapons", "Типы оружия");
+			ar.serialize(weapons, "weapons", "РўРёРїС‹ РѕСЂСѓР¶РёСЏ");
 			//xassert(weapons.size() < 2);
 			if(weapons.size() > 0)
 				weapon = *weapons.begin();
 		}
 		
 	
-	ar.serialize(address, "address", "На что влиять");
+	ar.serialize(address, "address", "РќР° С‡С‚Рѕ РІР»РёСЏС‚СЊ");
 	
 	if((address & (WEAPON | SOURCE | DAMAGE)) && weaponType == WEAPON_NONE)
 		weaponType = WEAPON_ANY;
@@ -1306,14 +1306,14 @@ void ArithmeticsData::serialize(Archive& ar)
 	if(unitType & TAKEN_TYPE)
 		unitType &= ~TAKEN;
 
-	ar.serialize(parameterType, "parameterType", "&Тип параметра");
-	ar.serialize(operation, "operation", "&Операция");
-	ar.serialize(value, "value", "&Значение");
+	ar.serialize(parameterType, "parameterType", "&РўРёРї РїР°СЂР°РјРµС‚СЂР°");
+	ar.serialize(operation, "operation", "&РћРїРµСЂР°С†РёСЏ");
+	ar.serialize(value, "value", "&Р—РЅР°С‡РµРЅРёРµ");
 
 	if(universe() && universe()->userSave())
 		ar.serialize(inverted_, "inverted", 0);
 
-    ar.serialize(influenceInStatistic_, "influenceInStatistic", "Отражать в статистике");
+    ar.serialize(influenceInStatistic_, "influenceInStatistic", "РћС‚СЂР°Р¶Р°С‚СЊ РІ СЃС‚Р°С‚РёСЃС‚РёРєРµ");
 }
 
 
@@ -1330,7 +1330,7 @@ ParameterArithmetics::ParameterArithmetics(const ParameterArithmetics& origin, b
 
 void ParameterArithmetics::serialize(Archive& ar)
 {
-	ar.serialize(data, "data", "Список арифметики");
+	ar.serialize(data, "data", "РЎРїРёСЃРѕРє Р°СЂРёС„РјРµС‚РёРєРё");
 }
 
 void ParameterArithmetics::operator*=(float k) 
@@ -1393,8 +1393,8 @@ ParameterArithmeticsMultiplicator::Value::Value()
 
 void ParameterArithmeticsMultiplicator::Value::serialize(Archive& ar)
 {
-	ar.serialize(type, "type", "Тип");
-	ar.serialize(factor, "factor", "Коэффициент");
+	ar.serialize(type, "type", "РўРёРї");
+	ar.serialize(factor, "factor", "РљРѕСЌС„С„РёС†РёРµРЅС‚");
 }
 
 bool ParameterArithmeticsMultiplicator::serialize(Archive& ar, const char* name, const char* nameAlt) 
@@ -1489,7 +1489,7 @@ ParameterCustom* ParameterShowSetting::possibleParameters_ = 0;
 
 void ParameterShowSetting::serialize(Archive& ar)
 {
-	ar.serialize(type_, "type_", "&Тип параметра");
+	ar.serialize(type_, "type_", "&РўРёРї РїР°СЂР°РјРµС‚СЂР°");
 	
 	switch(type_){
 	case LOGIC:
@@ -1504,10 +1504,10 @@ void ParameterShowSetting::serialize(Archive& ar)
 					if((*it)->type() == paramTypeRef){
 						if(!comboList.value().empty()){
 							XBuffer msg;
-							msg < TRANSLATE("Следующие параметры имееют одинаковые типы:\n");
+							msg < TRANSLATE("РЎР»РµРґСѓСЋС‰РёРµ РїР°СЂР°РјРµС‚СЂС‹ РёРјРµРµСЋС‚ РѕРґРёРЅР°РєРѕРІС‹Рµ С‚РёРїС‹:\n");
 							msg < "\t" < comboList.value().c_str();
-							msg < "\n" < TRANSLATE("и") < "\t" < it->c_str();
-							msg < TRANSLATE("\nТип: ") < paramTypeRef.c_str(); 
+							msg < "\n" < TRANSLATE("Рё") < "\t" < it->c_str();
+							msg < TRANSLATE("\nРўРёРї: ") < paramTypeRef.c_str(); 
 							xassertStr(0, msg);
 						}
 						comboList = it->c_str();
@@ -1517,7 +1517,7 @@ void ParameterShowSetting::serialize(Archive& ar)
 				if(comboList.value().empty())
 					comboList = getStringTokenByIndex(combo.c_str(), 0);
 
-				ar.serialize(comboList, "comboList", "&Параметр");
+				ar.serialize(comboList, "comboList", "&РџР°СЂР°РјРµС‚СЂ");
 
 				int newIndex = clamp(indexInComboListString(comboList.comboList(), comboList),
 					                 0, possibleParameters_->vector_.size() - 1);
@@ -1525,56 +1525,56 @@ void ParameterShowSetting::serialize(Archive& ar)
 			}
 		}
 		else
-			ar.serialize(paramTypeRef, "paramTypeRef", "Параметр");
+			ar.serialize(paramTypeRef, "paramTypeRef", "РџР°СЂР°РјРµС‚СЂ");
 		break;
 	case UPGRADE_PROGRESS:
-		ar.serialize(dataType, "dataType", "Номер апгрейда");
+		ar.serialize(dataType, "dataType", "РќРѕРјРµСЂ Р°РїРіСЂРµР№РґР°");
 		break;
 	case FINISH_UPGRADE:
-		ar.serialize(dataType, "dataType", "Номер апгрейда юнита из которого апгрейдились");
+		ar.serialize(dataType, "dataType", "РќРѕРјРµСЂ Р°РїРіСЂРµР№РґР° СЋРЅРёС‚Р° РёР· РєРѕС‚РѕСЂРѕРіРѕ Р°РїРіСЂРµР№РґРёР»РёСЃСЊ");
 		break;
 	case RELOAD_PROGRESS:
-		ar.serialize(weaponPrmRef, "weaponPrmRef", "Оружие");
+		ar.serialize(weaponPrmRef, "weaponPrmRef", "РћСЂСѓР¶РёРµ");
 		break;
 	}
 	
-	ar.serialize(showEvent, "showEvent", "Когда выводить");
+	ar.serialize(showEvent, "showEvent", "РљРѕРіРґР° РІС‹РІРѕРґРёС‚СЊ");
 	if(showEvent == SHOW_AT_PARAMETER_INCREASE || showEvent == SHOW_AT_PARAMETER_DECREASE || showEvent == SHOW_AT_PARAMETER_CHANGE)
-		ar.serialize(delayShowTime, "delayShowTime", "Время показа параметра (мс) после изменения");
-	ar.serialize(notShowEmpty, "notShowEmpty", "не показывать пустой");
+		ar.serialize(delayShowTime, "delayShowTime", "Р’СЂРµРјСЏ РїРѕРєР°Р·Р° РїР°СЂР°РјРµС‚СЂР° (РјСЃ) РїРѕСЃР»Рµ РёР·РјРµРЅРµРЅРёСЏ");
+	ar.serialize(notShowEmpty, "notShowEmpty", "РЅРµ РїРѕРєР°Р·С‹РІР°С‚СЊ РїСѓСЃС‚РѕР№");
 
-	ar.serialize(paramOffset, "paramOffset", "Смещение");
-	ar.serialize(alignType, "alignType", "Выравнивание");
+	ar.serialize(paramOffset, "paramOffset", "РЎРјРµС‰РµРЅРёРµ");
+	ar.serialize(alignType, "alignType", "Р’С‹СЂР°РІРЅРёРІР°РЅРёРµ");
 	
 	///  CONVERSION 2008-3-19
-	if(!ar.serialize(minColor, "minColor", "Цвет при минимуме")){
+	if(!ar.serialize(minColor, "minColor", "Р¦РІРµС‚ РїСЂРё РјРёРЅРёРјСѓРјРµ")){
 		Color4f minValColor;
 		ar.serialize(minValColor, "minValColor", 0);
 		minColor = Color4c(minValColor);
 	}
-	if(!ar.serialize(maxColor, "maxColor", "Цвет при максимуме")){
+	if(!ar.serialize(maxColor, "maxColor", "Р¦РІРµС‚ РїСЂРё РјР°РєСЃРёРјСѓРјРµ")){
 		Color4f maxValColor;
 		ar.serialize(maxValColor, "maxValColor", 0);
 		maxColor = Color4c(maxValColor);
 	}
 	/// ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-	ar.serialize(shape, "shape", "Форма");
+	ar.serialize(shape, "shape", "Р¤РѕСЂРјР°");
 
 	if(shape == BAR){
-		ar.serialize(borderColor, "borderColor", "Цвет рамки");
-		ar.serialize(backgroundColor, "backgroundColor", "Цвет подложки");
-		ar.serialize(radius, "barLength", "Длина полоски");
+		ar.serialize(borderColor, "borderColor", "Р¦РІРµС‚ СЂР°РјРєРё");
+		ar.serialize(backgroundColor, "backgroundColor", "Р¦РІРµС‚ РїРѕРґР»РѕР¶РєРё");
+		ar.serialize(radius, "barLength", "Р”Р»РёРЅР° РїРѕР»РѕСЃРєРё");
 	}
 	else {
-		ar.serialize(direction, "direction", "По часовой стрелке");
-		ar.serialize(innerRadius, "innerRadius", "Внутренний радиус");
-		ar.serialize(radius, "radius", "Внешний радиус");
-		ar.serialize(RangedWrapperf(startAngle, 0, 360), "startAngle", "Начальный угол");
-		ar.serialize(RangedWrapperf(endAngle, 0, 360), "endAngle", "Конечный угол");
+		ar.serialize(direction, "direction", "РџРѕ С‡Р°СЃРѕРІРѕР№ СЃС‚СЂРµР»РєРµ");
+		ar.serialize(innerRadius, "innerRadius", "Р’РЅСѓС‚СЂРµРЅРЅРёР№ СЂР°РґРёСѓСЃ");
+		ar.serialize(radius, "radius", "Р’РЅРµС€РЅРёР№ СЂР°РґРёСѓСЃ");
+		ar.serialize(RangedWrapperf(startAngle, 0, 360), "startAngle", "РќР°С‡Р°Р»СЊРЅС‹Р№ СѓРіРѕР»");
+		ar.serialize(RangedWrapperf(endAngle, 0, 360), "endAngle", "РљРѕРЅРµС‡РЅС‹Р№ СѓРіРѕР»");
 	}
 
-	ar.serialize(showChangeSettings, "showChangeSettings", "Показ изменения параметров взлетающим текстом");
+	ar.serialize(showChangeSettings, "showChangeSettings", "РџРѕРєР°Р· РёР·РјРµРЅРµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РІР·Р»РµС‚Р°СЋС‰РёРј С‚РµРєСЃС‚РѕРј");
 }
 
 

@@ -14,9 +14,9 @@ class RENDER_API cSimply3dx : public c3dx
 {
 public:
 	/*
-	Не лежит в общем списке, поэтому PreDraw и Animate не вызываются.
-	Draw - вызывается только для полупрозрачных объектов, для остальных -
-	установка матриц и материала, а Draw глобальный.
+	РќРµ Р»РµР¶РёС‚ РІ РѕР±С‰РµРј СЃРїРёСЃРєРµ, РїРѕСЌС‚РѕРјСѓ PreDraw Рё Animate РЅРµ РІС‹Р·С‹РІР°СЋС‚СЃСЏ.
+	Draw - РІС‹Р·С‹РІР°РµС‚СЃСЏ С‚РѕР»СЊРєРѕ РґР»СЏ РїРѕР»СѓРїСЂРѕР·СЂР°С‡РЅС‹С… РѕР±СЉРµРєС‚РѕРІ, РґР»СЏ РѕСЃС‚Р°Р»СЊРЅС‹С… -
+	СѓСЃС‚Р°РЅРѕРІРєР° РјР°С‚СЂРёС† Рё РјР°С‚РµСЂРёР°Р»Р°, Р° Draw РіР»РѕР±Р°Р»СЊРЅС‹Р№.
 	*/
 	cSimply3dx(cStaticSimply3dx* pStatic);
 	~cSimply3dx();
@@ -29,7 +29,7 @@ public:
 	ObjectShadowType getShadowType();
 	void getCircleShadowParam(float& radius, float& height);
 
-	//Прозрачность объекта, остальные параметры не меняются.
+	//РџСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ РѕР±СЉРµРєС‚Р°, РѕСЃС‚Р°Р»СЊРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ РЅРµ РјРµРЅСЏСЋС‚СЃСЏ.
 	void SetOpacity(float opacity);
 	float GetOpacity()const{return opacity;};
 
@@ -39,7 +39,7 @@ public:
 	const Mats& GetPositionMats() const { return position; }
 	const Se3f& GetPositionSe() const { return position.se(); }
 
-	void SetScale(float scale);//Вызывать обязательнро до SetPosition
+	void SetScale(float scale);//Р’С‹Р·С‹РІР°С‚СЊ РѕР±СЏР·Р°С‚РµР»СЊРЅСЂРѕ РґРѕ SetPosition
 	float GetScale()const;
 
 	cStaticSimply3dx* GetStatic(){return pStatic;}
@@ -47,17 +47,17 @@ public:
 	void GetBoundBox(sBox6f& box_) const;
 	void GetBoundBoxUnscaled(sBox6f& box_);
 
-	int FindNode(const char* node_name) const;// (-1=не нашли)
+	int FindNode(const char* node_name) const;// (-1=РЅРµ РЅР°С€Р»Рё)
 	int GetNodeNum() {return node_position.size();};
-	const MatXf& GetNodePosition(int nodeindex) const;//Положение ноды в глобальном пространстве.
+	const MatXf& GetNodePosition(int nodeindex) const;//РџРѕР»РѕР¶РµРЅРёРµ РЅРѕРґС‹ РІ РіР»РѕР±Р°Р»СЊРЅРѕРј РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРµ.
 
-	//SetNodePosition - Положение ноды выстапляется пользователем, при этом оно не апдейтится в SetPosition
+	//SetNodePosition - РџРѕР»РѕР¶РµРЅРёРµ РЅРѕРґС‹ РІС‹СЃС‚Р°РїР»СЏРµС‚СЃСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»РµРј, РїСЂРё СЌС‚РѕРј РѕРЅРѕ РЅРµ Р°РїРґРµР№С‚РёС‚СЃСЏ РІ SetPosition
 	void SetNodePosition(int nodeindex,const MatXf& pos);
 	void SetNodePosition(int nodeindex,const Se3f& pos);
 	void SetNodePositionMats(int nodeindex,const Mats& pos);
 	void UseDefaultNodePosition(int nodeindex);
 
-	//Возвращает смещение ноды относительно начала координат.
+	//Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРјРµС‰РµРЅРёРµ РЅРѕРґС‹ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РЅР°С‡Р°Р»Р° РєРѕРѕСЂРґРёРЅР°С‚.
 	const MatXf& GetNodeInitialOffset(int nodeindex) const;
 
 	void clearAttribute(int attribute);
@@ -79,7 +79,7 @@ public:
 
 	const char* GetFileName() const;
 
-	// для осколков
+	// РґР»СЏ РѕСЃРєРѕР»РєРѕРІ
 	cTexture* GetDiffuseTexture(int num_mat)const;
 	void SetDiffuseTexture(cTexture* texture);
 	void SetLodDistance(float lod12,float lod23);
@@ -102,7 +102,7 @@ protected:
 	void SelectShadowMaterial();
 	void SelectZBufferMaterial();
 	void SelectMatrix(int offset_matrix);
-	__forceinline bool CalcDistanceAlpha(Camera* camera, bool alpha=true);//Возвращает - видим ли объект.
+	__forceinline bool CalcDistanceAlpha(Camera* camera, bool alpha=true);//Р’РѕР·РІСЂР°С‰Р°РµС‚ - РІРёРґРёРј Р»Рё РѕР±СЉРµРєС‚.
 	inline void CalcOpacityFlag();
 
 	friend void SortByLod(cSimply3dx** object,int num_visible_object,Camera* camera,cStaticSimply3dx* pStatic);
@@ -130,12 +130,12 @@ public:
 	{
 		sPtrIndexBuffer		ib;
 		sPtrVertexBuffer	vb;
-		int num_repeat_models;//Количество повторений модели, чтобы несколько моделий одним DIP вывести.
+		int num_repeat_models;//РљРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРІС‚РѕСЂРµРЅРёР№ РјРѕРґРµР»Рё, С‡С‚РѕР±С‹ РЅРµСЃРєРѕР»СЊРєРѕ РјРѕРґРµР»РёР№ РѕРґРЅРёРј DIP РІС‹РІРµСЃС‚Рё.
 		int ib_begin;
 		int vb_begin;
 		int	ib_polygon_one_models;
 		int	vb_vertex_one_models;
-		int blend_indices;//количество костей в vb
+		int blend_indices;//РєРѕР»РёС‡РµСЃС‚РІРѕ РєРѕСЃС‚РµР№ РІ vb
 
 		ONE_LOD()
 		{
@@ -153,11 +153,11 @@ public:
 		}
 	};
 
-	vector<ONE_LOD> lods;//1 или 3 лода.
+	vector<ONE_LOD> lods;//1 РёР»Рё 3 Р»РѕРґР°.
 
-	vector<MatXf>	node_offset;//Статическое смещение для дополнительных нод
+	vector<MatXf>	node_offset;//РЎС‚Р°С‚РёС‡РµСЃРєРѕРµ СЃРјРµС‰РµРЅРёРµ РґР»СЏ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹С… РЅРѕРґ
 
-	Mats debrisPos; // Специально для осколков
+	Mats debrisPos; // РЎРїРµС†РёР°Р»СЊРЅРѕ РґР»СЏ РѕСЃРєРѕР»РєРѕРІ
 
 	sBox6f bound_box;
 	float radius;
@@ -234,7 +234,7 @@ protected:
 		const struct StaticBunch* psi;
 		DWORD visibility;
 	};
-	// для осколков, номер материала (для извлечения текстуры)
+	// РґР»СЏ РѕСЃРєРѕР»РєРѕРІ, РЅРѕРјРµСЂ РјР°С‚РµСЂРёР°Р»Р° (РґР»СЏ РёР·РІР»РµС‡РµРЅРёСЏ С‚РµРєСЃС‚СѓСЂС‹)
 	int num_material;
 
 	struct TemporatyData

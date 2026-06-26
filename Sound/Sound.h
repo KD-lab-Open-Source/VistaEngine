@@ -3,15 +3,15 @@
 #include <string>
 
 class Channel;
-//Инициализация/деинициализация библиотеки
+//РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ/РґРµРёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Р±РёР±Р»РёРѕС‚РµРєРё
 bool SNDInitSound(HWND g_hWnd,bool bEnable3d,bool soft3d);
 void SNDReleaseSound();
-void* SNDGetDirectSound();//Возвращает указатель на LPDIRECTSOUND8
+void* SNDGetDirectSound();//Р’РѕР·РІСЂР°С‰Р°РµС‚ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° LPDIRECTSOUND8
 
 void SNDEnableSound(bool enable);
 bool SNDIsSoundEnabled();
 
-//Работа с ошибками
+//Р Р°Р±РѕС‚Р° СЃ РѕС€РёР±РєР°РјРё
 bool SNDEnableErrorLog(LPCSTR file);
 
 void SNDSetVolume(float volume);//volume=0..1
@@ -35,7 +35,7 @@ protected:
 	//MatXf mat;
 	Vect3f velocity;
 
-	//Дупликаты для software
+	//Р”СѓРїР»РёРєР°С‚С‹ РґР»СЏ software
 	float s_distance_factor;
 	float s_doppler_factor;
 	float s_rolloff_factor;
@@ -47,30 +47,30 @@ public:
 	SND3DListener();
 	~SND3DListener();
 
-	//Параметры изменяемые редко (скорее всего их менять и устанавливать не придётся никогда)
-	//К тому-же они не работают (уж не знаю по какой причине)
-	bool SetDistanceFactor(float);//1 - в метрах, 1000 - в километрах
-	bool SetDopplerFactor(float);//0..10, по умолчанию 1
+	//РџР°СЂР°РјРµС‚СЂС‹ РёР·РјРµРЅСЏРµРјС‹Рµ СЂРµРґРєРѕ (СЃРєРѕСЂРµРµ РІСЃРµРіРѕ РёС… РјРµРЅСЏС‚СЊ Рё СѓСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ РЅРµ РїСЂРёРґС‘С‚СЃСЏ РЅРёРєРѕРіРґР°)
+	//Рљ С‚РѕРјСѓ-Р¶Рµ РѕРЅРё РЅРµ СЂР°Р±РѕС‚Р°СЋС‚ (СѓР¶ РЅРµ Р·РЅР°СЋ РїРѕ РєР°РєРѕР№ РїСЂРёС‡РёРЅРµ)
+	bool SetDistanceFactor(float);//1 - РІ РјРµС‚СЂР°С…, 1000 - РІ РєРёР»РѕРјРµС‚СЂР°С…
+	bool SetDopplerFactor(float);//0..10, РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ 1
 	bool SetRolloffFactor(float);
 
-	//SetPos надо изменять каждый кадр
+	//SetPos РЅР°РґРѕ РёР·РјРµРЅСЏС‚СЊ РєР°Р¶РґС‹Р№ РєР°РґСЂ
 	bool SetPos(const MatXf& mat);
 
 	Vect3f GetPos(){return position;};
 
-	//SetVelocity - желательно изменять каждый кадр
-	//иначе не будет смысла в SetDopplerFactor,SetRolloffFactor
+	//SetVelocity - Р¶РµР»Р°С‚РµР»СЊРЅРѕ РёР·РјРµРЅСЏС‚СЊ РєР°Р¶РґС‹Р№ РєР°РґСЂ
+	//РёРЅР°С‡Рµ РЅРµ Р±СѓРґРµС‚ СЃРјС‹СЃР»Р° РІ SetDopplerFactor,SetRolloffFactor
 	bool SetVelocity(const Vect3f& velocity);
 
-	//Функция специально для Рубера
-	//Что-бы расстояние по Z было меньше.
-	//в реальном времени криво работает\
+	//Р¤СѓРЅРєС†РёСЏ СЃРїРµС†РёР°Р»СЊРЅРѕ РґР»СЏ Р СѓР±РµСЂР°
+	//Р§С‚Рѕ-Р±С‹ СЂР°СЃСЃС‚РѕСЏРЅРёРµ РїРѕ Z Р±С‹Р»Рѕ РјРµРЅСЊС€Рµ.
+	//РІ СЂРµР°Р»СЊРЅРѕРј РІСЂРµРјРµРЅРё РєСЂРёРІРѕ СЂР°Р±РѕС‚Р°РµС‚\
 	//zmul=0..1
 	void SetZMultiple(float zmul){zmultiple=zmul;};
 	float GetZMultiple(){return zmultiple;};
 
-	//Update - Вызывать после установки параметров (SetPos,...)
-	//(один раз на кадр!)
+	//Update - Р’С‹Р·С‹РІР°С‚СЊ РїРѕСЃР»Рµ СѓСЃС‚Р°РЅРѕРІРєРё РїР°СЂР°РјРµС‚СЂРѕРІ (SetPos,...)
+	//(РѕРґРёРЅ СЂР°Р· РЅР° РєР°РґСЂ!)
 	bool Update();
 };
 

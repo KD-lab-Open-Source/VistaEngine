@@ -2,7 +2,7 @@
 
 #include "Render/3dx/Saver.h"
 
-bool RenderFileRead(const char *fname,char *&buf,int &size);//Читает файл в буфер созданный new, размер файла - size
+bool RenderFileRead(const char *fname,char *&buf,int &size);//Р§РёС‚Р°РµС‚ С„Р°Р№Р» РІ Р±СѓС„РµСЂ СЃРѕР·РґР°РЅРЅС‹Р№ new, СЂР°Р·РјРµСЂ С„Р°Р№Р»Р° - size
 
 class CLoadDirectoryFileRender : public CLoadDirectory
 {

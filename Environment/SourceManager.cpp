@@ -16,7 +16,7 @@
 #include "Serialization/SerializationFactory.h"
 #include "Terra/vMap.h"
 
-REGISTER_CLASS(Anchor, Anchor, "����� �� ����");
+REGISTER_CLASS(Anchor, Anchor, "Якорь на мире");
 
 SourceManager* sourceManager;
 
@@ -66,7 +66,7 @@ void SourceManager::serialize(Archive& ar)
 	if(!ar.isEdit()) {
 		ar.serialize(sources_, "sources", 0);
 
-		// ������� ������� ���������
+		// удаляем нулевые источники
 		Sources::iterator it;
 		for(it = sources_.begin(); it != sources_.end();) {
 			if(!*it) {
@@ -165,7 +165,7 @@ void SourceManager::drawUI(float dt)
 
 void fCommandAddShowChangeController(XBuffer& stream)
 {
-	SharedShowChangeController share; // ������� share->decrRef() ��� ���������� ���������� �������
+	SharedShowChangeController share; // неявный share->decrRef() при разрушении локального объекта
 	stream.read(share);
 	sourceManager->showChangeControllers_.push_back(share);
 }
@@ -174,7 +174,7 @@ ShowChangeController* SourceManager::addShowChangeController(const ShowChangeCon
 {
 	MTL();
 	SharedShowChangeController share(new ShowChangeController(ctrl));
-	share->addRef(); // ��� �� �� ������ ���� ����� � ������
+	share->addRef(); // что бы не протух пока лежит в потоке
 	streamLogicCommand.set(fCommandAddShowChangeController) << share;
 	return share;
 }

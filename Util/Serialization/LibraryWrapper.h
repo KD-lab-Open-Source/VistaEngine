@@ -158,7 +158,7 @@ public:
 		return *t;																\
 	}																			\
 	template<> void LibraryWrapper<Type>::serializeLibrary(Archive& ar) {		\
-		ar.serialize(instance(), sectionName_, "Библиотека");					\
+		ar.serialize(instance(), sectionName_, "Р‘РёР±Р»РёРѕС‚РµРєР°");					\
 	}																			\
     namespace{                                                                  \
 		bool registered_##Type = LibrariesManager::instance().registerLibrary(sectionName, (LibraryInstanceFunc)(&LibraryWrapper<Type>::instance), flags & LIBRARY_EDITABLE);       \

@@ -50,10 +50,10 @@ bool UI_Key::serialize(Archive& ar, const char* name, const char* nameAlt)
 
 void UI_Key::serializeLocale(Archive& ar)
 {
-	xxassert(locNames_.size() == locStringsKeyNames_.size(), "не инициализирована локализация sKey");
-	ar.serialize(useLocalizedNames_, "useLocalizedNames", "&Использовать локализованные клавиши");
+	xxassert(locNames_.size() == locStringsKeyNames_.size(), "РЅРµ РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°РЅР° Р»РѕРєР°Р»РёР·Р°С†РёСЏ sKey");
+	ar.serialize(useLocalizedNames_, "useLocalizedNames", "&РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ Р»РѕРєР°Р»РёР·РѕРІР°РЅРЅС‹Рµ РєР»Р°РІРёС€Рё");
 	if(useLocalizedNames_ || !ar.isEdit()){
-		if(ar.openBlock("loc names", "локализация клавиш")){
+		if(ar.openBlock("loc names", "Р»РѕРєР°Р»РёР·Р°С†РёСЏ РєР»Р°РІРёС€")){
 			ar.serialize(nameCtrl_, "nameCtrl", "Control");
 			ar.serialize(nameShift_, "nameShift", "Shift");
 			ar.serialize(nameMenu_, "nameMenu", "Alt");

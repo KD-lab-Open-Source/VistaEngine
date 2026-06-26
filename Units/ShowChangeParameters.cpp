@@ -5,8 +5,8 @@
 
 void ShowChangeParameterSetting::serialize(Archive& ar)
 {
-	ar.serialize(typeRef_, "typeRef", "Тип параметра");
-	ar.serialize(changeSettings_, "changeSettings", "Визуализация изменения");
+	ar.serialize(typeRef_, "typeRef", "РўРёРї РїР°СЂР°РјРµС‚СЂР°");
+	ar.serialize(changeSettings_, "changeSettings", "Р’РёР·СѓР°Р»РёР·Р°С†РёСЏ РёР·РјРµРЅРµРЅРёСЏ");
 }
 
 void ShowChangeParametersController::create(const UnitInterface* owner, const ParameterSet& showDelta, CreateType createType)

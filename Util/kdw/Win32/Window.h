@@ -17,16 +17,16 @@ namespace Win32{
 
 void KDW_API _setGlobalInstance(HINSTANCE instance);
 HINSTANCE KDW_API _globalInstance();
-/// проверяет зарегиистрирован ли класс кна
+/// РїСЂРѕРІРµСЂСЏРµС‚ Р·Р°СЂРµРіРёРёСЃС‚СЂРёСЂРѕРІР°РЅ Р»Рё РєР»Р°СЃСЃ РєРЅР°
 bool KDW_API isClassRegistered(const char* className);
 bool KDW_API isKeyPressed(UINT keyCode);
 
 LRESULT CALLBACK universalWindowProcedure(HWND handle, UINT message, WPARAM wparam, LPARAM lparam);
 
-/// регистрирует класс окна использую обработчик сообщений библиотеки (вызывает метод onMessage)
+/// СЂРµРіРёСЃС‚СЂРёСЂСѓРµС‚ РєР»Р°СЃСЃ РѕРєРЅР° РёСЃРїРѕР»СЊР·СѓСЋ РѕР±СЂР°Р±РѕС‚С‡РёРє СЃРѕРѕР±С‰РµРЅРёР№ Р±РёР±Р»РёРѕС‚РµРєРё (РІС‹Р·С‹РІР°РµС‚ РјРµС‚РѕРґ onMessage)
 //bool KDW_API registerClass(const char* className);
 
-/// приступить к обработки сообщений вплоть до получения WM_QUIT 
+/// РїСЂРёСЃС‚СѓРїРёС‚СЊ Рє РѕР±СЂР°Р±РѕС‚РєРё СЃРѕРѕР±С‰РµРЅРёР№ РІРїР»РѕС‚СЊ РґРѕ РїРѕР»СѓС‡РµРЅРёСЏ WM_QUIT 
 int KDW_API basicMessageLoop(HACCEL acceleratorTable = 0);
 
 Vect2i calculateTextSize(HWND window, HFONT font, const char* text);
@@ -36,7 +36,7 @@ void initializeCommonControls();
 
 class Window32;
 
-/// инкапсуляция интерфейса BeginDeferWindowPos, DeferWindowPos, EndDeferWindowPos
+/// РёРЅРєР°РїСЃСѓР»СЏС†РёСЏ РёРЅС‚РµСЂС„РµР№СЃР° BeginDeferWindowPos, DeferWindowPos, EndDeferWindowPos
 class WindowPositionDeferer : public ShareHandleBase{
 public:
 	WindowPositionDeferer(Window32* parent, int numWindows = 1);
@@ -65,7 +65,7 @@ protected:
 	Window32* window_;
 };
 
-/// инкапсулирует Windows-окно
+/// РёРЅРєР°РїСЃСѓР»РёСЂСѓРµС‚ Windows-РѕРєРЅРѕ
 class KDW_API Window32 : public ShareHandleBase{
 public:
 	Window32(HWND handle = 0);

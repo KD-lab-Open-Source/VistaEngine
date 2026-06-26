@@ -57,11 +57,11 @@ REGISTER_CLASS_IN_FACTORY(EventFactory, Event::UI_BUTTON_CLICK_LOGIC, EventButto
 REGISTER_CLASS_IN_FACTORY(EventFactory, Event::STRING, EventStringPlayer);
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(Event, Type, "Type")
-REGISTER_ENUM_ENCLOSED(Event, END_REPLAY, "Конец реплея");
-REGISTER_ENUM_ENCLOSED(Event, NETWORK_DISCONNECT, "Разрыв сети или сессии");
-REGISTER_ENUM_ENCLOSED(Event, GAME_CLOSE, "Выход из игры");
-REGISTER_ENUM_ENCLOSED(Event, RESET_PROFILE, "Сменился профиль");
-REGISTER_ENUM_ENCLOSED(Event, CHANGE_ACTIVE_PLAYER, "Смена активного игрока");
+REGISTER_ENUM_ENCLOSED(Event, END_REPLAY, "РљРѕРЅРµС† СЂРµРїР»РµСЏ");
+REGISTER_ENUM_ENCLOSED(Event, NETWORK_DISCONNECT, "Р Р°Р·СЂС‹РІ СЃРµС‚Рё РёР»Рё СЃРµСЃСЃРёРё");
+REGISTER_ENUM_ENCLOSED(Event, GAME_CLOSE, "Р’С‹С…РѕРґ РёР· РёРіСЂС‹");
+REGISTER_ENUM_ENCLOSED(Event, RESET_PROFILE, "РЎРјРµРЅРёР»СЃСЏ РїСЂРѕС„РёР»СЊ");
+REGISTER_ENUM_ENCLOSED(Event, CHANGE_ACTIVE_PLAYER, "РЎРјРµРЅР° Р°РєС‚РёРІРЅРѕРіРѕ РёРіСЂРѕРєР°");
 END_ENUM_DESCRIPTOR_ENCLOSED(Event, Type)
 
 Event* Event::create(XBuffer& buffer)
@@ -83,7 +83,7 @@ void Trigger::quant(TriggerChain& triggerChain)
 	switch(state()){
 		case SLEEPING:
 		case DONE:{
-			// Входящие стрелки одного цвета - И, разных - ИЛИ
+			// Р’С…РѕРґСЏС‰РёРµ СЃС‚СЂРµР»РєРё РѕРґРЅРѕРіРѕ С†РІРµС‚Р° - Р, СЂР°Р·РЅС‹С… - РР›Р
 			vector<int> conditions(STRATEGY_COLOR_MAX, 0);
 			IncomingLinksList::iterator li;
 			FOR_EACH(incomingLinks_, li)
@@ -185,16 +185,16 @@ bool Trigger::checkCondition()
 			else{
 				action->setContextUnit(unit);
 				if(action->automaticCondition())
-					return true; // хороший контекст
+					return true; // С…РѕСЂРѕС€РёР№ РєРѕРЅС‚РµРєСЃС‚
 			}
 		}
 	} 
 	else{
 		start_timer_auto();
-		return (!condition || condition->checkDebug()) && (!action || action->automaticCondition()); // если не контекстн. то сразу результат
+		return (!condition || condition->checkDebug()) && (!action || action->automaticCondition()); // РµСЃР»Рё РЅРµ РєРѕРЅС‚РµРєСЃС‚РЅ. С‚Рѕ СЃСЂР°Р·Сѓ СЂРµР·СѓР»СЊС‚Р°С‚
 	}
 
-	return false; // не нашли нужный контекст
+	return false; // РЅРµ РЅР°С€Р»Рё РЅСѓР¶РЅС‹Р№ РєРѕРЅС‚РµРєСЃС‚
 }
 
 void Trigger::checkEvent(const Event& event)
@@ -214,7 +214,7 @@ void Trigger::activate(TriggerChain& triggerChain)
 
 #ifndef _FINAL_VERSION_
 	if(breakWhenActivate_){
-		xassertStr("Активировался триггер: " && 0, name());
+		xassertStr("РђРєС‚РёРІРёСЂРѕРІР°Р»СЃСЏ С‚СЂРёРіРіРµСЂ: " && 0, name());
 		checkCondition();
 	}
 #endif
@@ -398,7 +398,7 @@ void ContextFilter::addUnit(const AttributeBase* attr)
 void ContextFilter::addSquad(const AttributeSquad* attr)
 {
 	if(attr){
-		xassert(!attr->allowedUnitsAttributes.empty() && "В триггере указан сквад, к которому не может принадлежать ни один юнит (или нужно перезаписать редактор войск");
+		xassert(!attr->allowedUnitsAttributes.empty() && "Р’ С‚СЂРёРіРіРµСЂРµ СѓРєР°Р·Р°РЅ СЃРєРІР°Рґ, Рє РєРѕС‚РѕСЂРѕРјСѓ РЅРµ РјРѕР¶РµС‚ РїСЂРёРЅР°РґР»РµР¶Р°С‚СЊ РЅРё РѕРґРёРЅ СЋРЅРёС‚ (РёР»Рё РЅСѓР¶РЅРѕ РїРµСЂРµР·Р°РїРёСЃР°С‚СЊ СЂРµРґР°РєС‚РѕСЂ РІРѕР№СЃРє");
 		AttributeSquad::AllowedUnitsAttributes::const_iterator i;
 		FOR_EACH(attr->allowedUnitsAttributes, i)
 			attributes.add(*i);

@@ -25,13 +25,13 @@
 UNIT_LINK_GET(UnitSquad)
 
 DECLARE_SEGMENT(UnitSquad)
-REGISTER_CLASS(UnitBase, UnitSquad, "�����")
+REGISTER_CLASS(UnitBase, UnitSquad, "Сквад")
 REGISTER_CLASS_IN_FACTORY(UnitFactory, UNIT_CLASS_SQUAD, UnitSquad);
 
-BEGIN_ENUM_DESCRIPTOR_ENCLOSED(UnitSquad, WaitingMode, "����� ��������")
-REGISTER_ENUM_ENCLOSED(UnitSquad, WAITING_DISABLE, "�� �����")
-REGISTER_ENUM_ENCLOSED(UnitSquad, WAITING_FOR_MAIN_UNIT, "����� ��������")
-REGISTER_ENUM_ENCLOSED(UnitSquad, WAITING_ALL, "��� ����")
+BEGIN_ENUM_DESCRIPTOR_ENCLOSED(UnitSquad, WaitingMode, "Режим ожидания")
+REGISTER_ENUM_ENCLOSED(UnitSquad, WAITING_DISABLE, "не ждать")
+REGISTER_ENUM_ENCLOSED(UnitSquad, WAITING_FOR_MAIN_UNIT, "ждать главного")
+REGISTER_ENUM_ENCLOSED(UnitSquad, WAITING_ALL, "все ждут")
 END_ENUM_DESCRIPTOR_ENCLOSED(UnitSquad, WaitingMode);
 
 ///////////////////////////////////////////////
@@ -197,7 +197,7 @@ public:
 	void operator () (UnitBase* p) {
 
 		if(testOnly_ && canAdd_) 
-			return; // ��� ������ ���������� ���� => ������ ��� ������ ��� ������ 
+			return; // был найден подходящий юнит => искать еще одного нет смысла 
 
 		if(!p->alive() || !p->attr().isLegionary() || squad_->player() != p->player())
 			return;
@@ -218,7 +218,7 @@ public:
 			FOR_EACH(attrUnits_, i)
 				if(&unit->attr() == (*i))
 				{
-					// ��������� ������� ����� �����
+					// требуется создать новый сквад
 					if(unit->squad()->units().size() != 1) 
 					{
 						squadIn = safe_cast<UnitSquad*>(unit->player()->buildUnit(unit->attr().squad));
@@ -226,7 +226,7 @@ public:
 						unit->squad()->removeUnit(unit);
 						squadIn->addUnit(unit);
 					}
-					else // �� ��������� ��������� �����
+					else // не требуется создавать сквад
 						squadIn = unit->squad();
 
 					break;
@@ -235,7 +235,7 @@ public:
 				return;
 		}
 
-		if(!squad_->canAddWholeSquad(unit->squad(), joinRadius2_)) // ������ �� ����� �������?
+		if(!squad_->canAddWholeSquad(unit->squad(), joinRadius2_)) // влазит ли сквад целиком?
 			return;
 
 		if(testOnly_){
@@ -257,9 +257,9 @@ public:
 private:
 	UnitSquad* squad_;
 	float joinRadius2_;
-	bool testOnly_; // ��������� ��� ������ ��������� �� ����������� ���������� � �����
-	bool canAdd_; // ���� ����� ���� �������� ��� ��� �������� � �����
-	AttributeUnitReferences attrUnits_; // ������ ������ ������� ����� ���� ���������
+	bool testOnly_; // добавлять или просто проверить на возможность добавления в сквад
+	bool canAdd_; // юнит может быть добавлен или уже добавлен в сквад
+	AttributeUnitReferences attrUnits_; // список юнитов которые могут быть добавлены
 };
 
 bool UnitSquad::addUnitsFromArea(AttributeUnitReferences attrUnits, float radius, bool testOnly)
@@ -320,7 +320,7 @@ void UnitSquad::Quant()
 		}
 		bool internalProduction = false;		
 		LegionariesLinks::iterator ui;
-		FOR_EACH(units_, ui) // ������� �������� ���������� � ������ ������
+		FOR_EACH(units_, ui) // Сначала пытаемся произвести в юнитах сквада
 			if((*ui)->attr().canProduce(ri->unit())){ 
 				internalProduction = true;
 				if(!(*ui)->isProducing() && (*ui)->startProduction(ri->unit(), this, 1)){
@@ -1059,7 +1059,7 @@ void UnitSquad::addTarget(UnitInterface* target, bool moveToTarget)
 
 bool lineCircleIntersection(const Vect2f& p0, const Vect2f& p1, const Vect2f& pc, float radius, Vect2f& result)
 {
-	// ���� ������ ����������� ������� (0..1) � ����������� 
+	// Ищет первое пересечение отрезка (0..1) с окружностью 
 	Vect2f dp = p1 - p0;
 	Vect2f dc = p0 - pc;
 	float dp_2 = dp.norm2();

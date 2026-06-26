@@ -287,7 +287,7 @@ void vrtMap::laceLine(int hbeg, float a, int xBeg, int yBeg, int cntMax, int dx,
 	for(i=yBeg, j=xBeg, cnt=0; cnt < cntMax; i+=dy, j+=dx, cnt++){
         int h1 = hbeg + round(tangens*(double)cnt*VOXEL_MULTIPLIER);
         int h2 = hbeg - round(tangens*(double)cnt*VOXEL_MULTIPLIER);
-		if(flagUP){ //ñðåçàåì äî
+		if(flagUP){ //ÑÑ€ÐµÐ·Ð°ÐµÐ¼ Ð´Ð¾
 			if(vMap.getAlt(j,i) < h1) break;
 			vMap.putAlt(j, i, h1);
 		}
@@ -337,7 +337,7 @@ void vrtMap::autoLace(int laceH, float angle)
 //	if(hf != INVALID_HANDLE_VALUE){
 //		do{
 //			if ( FindFileData.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY ) {
-//				if(FindFileData.cFileName[0]=='.' && FindFileData.cFileName[1]=='\0' ) continue;//Ïðîâåðêà íà ñëóæåáíûå çàïèñè
+//				if(FindFileData.cFileName[0]=='.' && FindFileData.cFileName[1]=='\0' ) continue;//ÐŸÑ€Ð¾Ð²ÐµÑ€ÐºÐ° Ð½Ð° ÑÐ»ÑƒÐ¶ÐµÐ±Ð½Ñ‹Ðµ Ð·Ð°Ð¿Ð¸ÑÐ¸
 //				if(FindFileData.cFileName[0]=='.' && FindFileData.cFileName[1]=='.' && FindFileData.cFileName[2]=='\0' ) continue;
 //				vrtMapCreationParam vMapCParam;
 //				XBuffer str;

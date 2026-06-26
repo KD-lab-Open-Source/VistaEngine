@@ -37,17 +37,17 @@ UI_Font::UI_Font(const char* file, int size)
 void UI_Font::serialize(Archive& ar)
 {
 	static ResourceSelector::Options fontOptions("*.ttf", "Resource\\UI\\Fonts");
-	ar.serialize(ResourceSelector(fontFile_, fontOptions), "fontFile", "TTF фонт");
-	ar.serialize(fontSize_, "fontSize", "Размер (пикселей при высоте экрана 768)");
+	ar.serialize(ResourceSelector(fontFile_, fontOptions), "fontFile", "TTF С„РѕРЅС‚");
+	ar.serialize(fontSize_, "fontSize", "Р Р°Р·РјРµСЂ (РїРёРєСЃРµР»РµР№ РїСЂРё РІС‹СЃРѕС‚Рµ СЌРєСЂР°РЅР° 768)");
 
-	ar.serialize(hinting_, "hinting", "алгоритм подгонки");
+	ar.serialize(hinting_, "hinting", "Р°Р»РіРѕСЂРёС‚Рј РїРѕРґРіРѕРЅРєРё");
 
-	ar.serialize(aaMin_, "aaMin", "Включать сглаживание если меньше или равен");
-	ar.serialize(aaMax_, "aaMax", "Включать сглаживание если больше или равен");
+	ar.serialize(aaMin_, "aaMin", "Р’РєР»СЋС‡Р°С‚СЊ СЃРіР»Р°Р¶РёРІР°РЅРёРµ РµСЃР»Рё РјРµРЅСЊС€Рµ РёР»Рё СЂР°РІРµРЅ");
+	ar.serialize(aaMax_, "aaMax", "Р’РєР»СЋС‡Р°С‚СЊ СЃРіР»Р°Р¶РёРІР°РЅРёРµ РµСЃР»Рё Р±РѕР»СЊС€Рµ РёР»Рё СЂР°РІРµРЅ");
 
 
 #ifndef _FINAL_VERSION_
-	ar.serialize(inBox, "inBox", "во вписанной рамке");
+	ar.serialize(inBox, "inBox", "РІРѕ РІРїРёСЃР°РЅРЅРѕР№ СЂР°РјРєРµ");
 #endif
 }
 
@@ -85,12 +85,12 @@ bool UI_Font::createFont()
 void UI_LibFont::serialize(Archive& ar)
 {
 	StringTableBase::serialize(ar);
-	ar.serialize(static_cast<UI_Font&>(*this), "font", "Фонт");
+	ar.serialize(static_cast<UI_Font&>(*this), "font", "Р¤РѕРЅС‚");
 }
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(FontParam, HintMode, "FontParam::HintMode")
-REGISTER_ENUM_ENCLOSED(FontParam, DEFAULT, "автовыбор")
-REGISTER_ENUM_ENCLOSED(FontParam, BYTE_CODE_ONLY, "только встроенный")
-REGISTER_ENUM_ENCLOSED(FontParam, AUTO_HINT_ONLY, "только автоматический")
-REGISTER_ENUM_ENCLOSED(FontParam, NO_HINTING, "отсутствует")
+REGISTER_ENUM_ENCLOSED(FontParam, DEFAULT, "Р°РІС‚РѕРІС‹Р±РѕСЂ")
+REGISTER_ENUM_ENCLOSED(FontParam, BYTE_CODE_ONLY, "С‚РѕР»СЊРєРѕ РІСЃС‚СЂРѕРµРЅРЅС‹Р№")
+REGISTER_ENUM_ENCLOSED(FontParam, AUTO_HINT_ONLY, "С‚РѕР»СЊРєРѕ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРёР№")
+REGISTER_ENUM_ENCLOSED(FontParam, NO_HINTING, "РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚")
 END_ENUM_DESCRIPTOR_ENCLOSED(FontParam, HintMode)

@@ -61,7 +61,7 @@ void UI_Minimap::logic2GraphQuant()
 				updateEvent(UI_MinimapEvent(*symbol, squad->position2D(), 1.f, squad->player()->unitColor(), squad->angleZ(), (int)squad), UNITS);
 		}
 		else {
-			xxassert(false, "������������ ���� �� ���������");
+			xxassert(false, "Некорректный юнит на миникарте");
 		}
 	}
 
@@ -362,13 +362,13 @@ void UI_Minimap::eraseZone(const UnitBuilding* building)
 }
 
 BEGIN_ENUM_DESCRIPTOR(MinimapAlign, "MinimapAlign")
-REGISTER_ENUM(UI_ALIGN_CENTER, "�� ������")
-REGISTER_ENUM(UI_ALIGN_LEFT, "�� ������ ����")
-REGISTER_ENUM(UI_ALIGN_RIGHT, "�� ������� ����")
-REGISTER_ENUM(UI_ALIGN_TOP, "�� ������� �������")
-REGISTER_ENUM(UI_ALIGN_BOTTOM, "�� ������ �������")
-REGISTER_ENUM(UI_ALIGN_TOP_LEFT, "����� ������� ����")
-REGISTER_ENUM(UI_ALIGN_TOP_RIGHT, "������ ������� ����")
-REGISTER_ENUM(UI_ALIGN_BOTTOM_LEFT, "����� ������ ����")
-REGISTER_ENUM(UI_ALIGN_BOTTOM_RIGHT, "������ ������ ����")
+REGISTER_ENUM(UI_ALIGN_CENTER, "По центру")
+REGISTER_ENUM(UI_ALIGN_LEFT, "По левому краю")
+REGISTER_ENUM(UI_ALIGN_RIGHT, "По правому краю")
+REGISTER_ENUM(UI_ALIGN_TOP, "По верхней границе")
+REGISTER_ENUM(UI_ALIGN_BOTTOM, "По нижней границе")
+REGISTER_ENUM(UI_ALIGN_TOP_LEFT, "Левый верхний угол")
+REGISTER_ENUM(UI_ALIGN_TOP_RIGHT, "Правый верхний угол")
+REGISTER_ENUM(UI_ALIGN_BOTTOM_LEFT, "Левый нижний угол")
+REGISTER_ENUM(UI_ALIGN_BOTTOM_RIGHT, "Правый нижний угол")
 END_ENUM_DESCRIPTOR(MinimapAlign)

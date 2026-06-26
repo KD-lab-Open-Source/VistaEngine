@@ -37,7 +37,7 @@ private:
 };
 
 //--------------------------------
-// Очередь производства
+// РћС‡РµСЂРµРґСЊ РїСЂРѕРёР·РІРѕРґСЃС‚РІР°
 //--------------------------------
 enum ProduceType {
 	PRODUCE_INVALID,
@@ -64,17 +64,17 @@ typedef vector<ProduceItem> ProducedQueue;
 class UnitReal : public UnitInterface
 {
 public:
-	// Причины остановки анимации.
+	// РџСЂРёС‡РёРЅС‹ РѕСЃС‚Р°РЅРѕРІРєРё Р°РЅРёРјР°С†РёРё.
 	enum AnimationStopReason {
 		ANIMATION_FROZEN = 1,
 		ANIMATION_DISCONNECTED = 2
 	};
 
 	enum UnitState {
-		AUTO_MODE, // У юнита нет внешних команд к исполнению. Автоматический режим.
-		ATTACK_MODE, // Выполняет внешние команды. Атака.
-		MOVE_MODE, // Выполняет внешние команды. Движение.
-		TRIGGER_MODE // При включении анимации из триггера
+		AUTO_MODE, // РЈ СЋРЅРёС‚Р° РЅРµС‚ РІРЅРµС€РЅРёС… РєРѕРјР°РЅРґ Рє РёСЃРїРѕР»РЅРµРЅРёСЋ. РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРёР№ СЂРµР¶РёРј.
+		ATTACK_MODE, // Р’С‹РїРѕР»РЅСЏРµС‚ РІРЅРµС€РЅРёРµ РєРѕРјР°РЅРґС‹. РђС‚Р°РєР°.
+		MOVE_MODE, // Р’С‹РїРѕР»РЅСЏРµС‚ РІРЅРµС€РЅРёРµ РєРѕРјР°РЅРґС‹. Р”РІРёР¶РµРЅРёРµ.
+		TRIGGER_MODE // РџСЂРё РІРєР»СЋС‡РµРЅРёРё Р°РЅРёРјР°С†РёРё РёР· С‚СЂРёРіРіРµСЂР°
  	};
 
 	UnitReal(const UnitTemplate& data);
@@ -104,7 +104,7 @@ public:
 	const char* label() const { return label_.c_str(); }
 	void setLabel(const char* label) { label_ = label; }
 
-	// Графическая модель Object3dx;
+	// Р“СЂР°С„РёС‡РµСЃРєР°СЏ РјРѕРґРµР»СЊ Object3dx;
 	cObject3dx* model() const { return model_; }
 	c3dx* get3dx() const { return model_; }
 
@@ -138,7 +138,7 @@ public:
 	bool isChainFinished(int animationGroup = 0) const;
 	bool animationChainEffectMode();
 
-	// Логическая модель
+	// Р›РѕРіРёС‡РµСЃРєР°СЏ РјРѕРґРµР»СЊ
 	cObject3dx* modelLogic() const { return modelLogic_; }
 	void setModelLogic(const char* name);
 	
@@ -165,7 +165,7 @@ public:
 	void updateDock(UnitActing* dock) { dockingController_.setDock(dock); }
 	void updateDockPose();
 
-	const Se3f& interpolatedPose() const { MTG(); return model()->GetPositionSe(); }// использовать только внутри graphQuant()
+	const Se3f& interpolatedPose() const { MTG(); return model()->GetPositionSe(); }// РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ РІРЅСѓС‚СЂРё graphQuant()
     	
 	void explode();
 
@@ -176,7 +176,7 @@ public:
 	virtual bool inTransport() const { return false; }
 	virtual bool canFireInCurentState() const { return false; }
 
-	// в кванте счетчик уменьшается на единицу, при frozeCounter_ > 0 юнит заморожен.
+	// РІ РєРІР°РЅС‚Рµ СЃС‡РµС‚С‡РёРє СѓРјРµРЅСЊС€Р°РµС‚СЃСЏ РЅР° РµРґРёРЅРёС†Сѓ, РїСЂРё frozeCounter_ > 0 СЋРЅРёС‚ Р·Р°РјРѕСЂРѕР¶РµРЅ.
 	void freezeAnimation(bool frozenAttack = false) { freezeAnimationCounter_ = 2; frozenAttack_ = frozenAttack; }
 	void makeFrozen(bool frozenAttack = false) { frozenCounter_ = 2; frozenAttack_ = frozenAttack; }
 	bool isFrozen() { return !frozenAttack_ && (frozenCounter_ > 0 || freezeAnimationCounter_ > 0); }
@@ -185,7 +185,7 @@ public:
 	void disableAnimation(AnimationStopReason reason) { animationStopReason_ |= reason; }
 	void enableAnimation(AnimationStopReason reason) { animationStopReason_ &= ~reason; }
 
-	// Работа с автоматическими режимами.
+	// Р Р°Р±РѕС‚Р° СЃ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРёРјРё СЂРµР¶РёРјР°РјРё.
 	bool checkInPathTracking(const UnitBase* tracker) const;
 	UnitState unitState() const { return unitState_; }
 	void setUnitState(UnitState state) { unitState_ = state; }
@@ -220,7 +220,7 @@ protected:
 	void setFurPhase(float phase);
 
 
-	// Таймер текущей анимационной цепочки
+	// РўР°Р№РјРµСЂ С‚РµРєСѓС‰РµР№ Р°РЅРёРјР°С†РёРѕРЅРЅРѕР№ С†РµРїРѕС‡РєРё
 	LogicTimer chainDelayTimer;
 
 	cObject3dx* model_;
@@ -234,7 +234,7 @@ protected:
 	InterpolationLogicTimer furTimer_;
 	bool riseFur_;
 
-	// Автоматическое поведение..
+	// РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРµ РїРѕРІРµРґРµРЅРёРµ..
 		
 	UnitState unitState_;
 	int freezeAnimationCounter_;

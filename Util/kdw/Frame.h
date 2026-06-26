@@ -24,9 +24,9 @@ public:
 	bool emphasis() const{ return emphasis_; }
 
 	void visitChildren(WidgetVisitor& visitor) const;
-	/// добавить контрол в окно
+	/// РґРѕР±Р°РІРёС‚СЊ РєРѕРЅС‚СЂРѕР» РІ РѕРєРЅРѕ
 	void add(Widget* widget);
-	/// убирает единственный дочерний виджет
+	/// СѓР±РёСЂР°РµС‚ РµРґРёРЅСЃС‚РІРµРЅРЅС‹Р№ РґРѕС‡РµСЂРЅРёР№ РІРёРґР¶РµС‚
 	void remove();
 
 	void serialize(Archive& ar);

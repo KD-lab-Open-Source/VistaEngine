@@ -12,15 +12,15 @@ class ScanningShape
 
 public:
 	typedef vector<Vect2i> Vect2iVect;
-	void setCircle(int radius); // Симметрично относительно начала координат
-	void setRectangle(int xSize, int ySize); // Симметрично или +1,+1
+	void setCircle(int radius); // РЎРёРјРјРµС‚СЂРёС‡РЅРѕ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РЅР°С‡Р°Р»Р° РєРѕРѕСЂРґРёРЅР°С‚
+	void setRectangle(int xSize, int ySize); // РЎРёРјРјРµС‚СЂРёС‡РЅРѕ РёР»Рё +1,+1
 	void setPolygon(const Vect2i* points, int n);
 
 	typedef vector<Interval> Intervals;
 	typedef Intervals::const_iterator const_iterator;
 	const Intervals& intervals() const { return intervals_; }
 
-	const sRect& rect() const { return rect_; } // Описанный прямоугольник
+	const sRect& rect() const { return rect_; } // РћРїРёСЃР°РЅРЅС‹Р№ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРє
 	int area() const { return area_; } 
 
 private:

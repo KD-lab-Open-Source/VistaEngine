@@ -39,7 +39,7 @@ public:
 	void backNetCommand();//in
 	unsigned long getQuantAmount();//in
 	bool isEmpty(){
-		return filled_size <= 0; // ïîäðàçóìåâàåòñÿ ==
+		return filled_size <= 0; // Ð¿Ð¾Ð´Ñ€Ð°Ð·ÑƒÐ¼ÐµÐ²Ð°ÐµÑ‚ÑÑ ==
 	}
 
 };

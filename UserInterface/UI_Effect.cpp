@@ -38,11 +38,11 @@ void UI_EffectAttribute::serialize(Archive& ar)
 {
 	ar.serialize(effectReference_, "effectReference", "&<");
 
-	ar.serialize(isCycled_, "isCycled", "çàöèêëèâàòü");
-	ar.serialize(stopImmediately_, "stopImmediately", "Îáðûâàòü ïðè îêîí÷àíèè");
-	ar.serialize(legionColor_, "legionColor", "îêðàøèâàòü â öâåò ìîäåëè");
+	ar.serialize(isCycled_, "isCycled", "Ð·Ð°Ñ†Ð¸ÐºÐ»Ð¸Ð²Ð°Ñ‚ÑŒ");
+	ar.serialize(stopImmediately_, "stopImmediately", "ÐžÐ±Ñ€Ñ‹Ð²Ð°Ñ‚ÑŒ Ð¿Ñ€Ð¸ Ð¾ÐºÐ¾Ð½Ñ‡Ð°Ð½Ð¸Ð¸");
+	ar.serialize(legionColor_, "legionColor", "Ð¾ÐºÑ€Ð°ÑˆÐ¸Ð²Ð°Ñ‚ÑŒ Ð² Ñ†Ð²ÐµÑ‚ Ð¼Ð¾Ð´ÐµÐ»Ð¸");
 
-	ar.serialize(scale_, "scale", "ìàñøòàá");
+	ar.serialize(scale_, "scale", "Ð¼Ð°ÑÑˆÑ‚Ð°Ð±");
 }
 
 // --------------------------------------------------------------------------
@@ -53,7 +53,7 @@ void UI_EffectAttributeAttachable::serialize(Archive& ar)
 	
 	if(ar.isEdit()){
 		ComboListString nodes(UI_BackgroundScene::instance().nodeComboList(), nodeLink_.c_str());
-		ar.serialize(nodes, "nodeLink", "Óçåë ïðèâÿçêè");
+		ar.serialize(nodes, "nodeLink", "Ð£Ð·ÐµÐ» Ð¿Ñ€Ð¸Ð²ÑÐ·ÐºÐ¸");
 		if(ar.isInput())
 			nodeLink_ = nodes;
 	}

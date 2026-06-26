@@ -41,7 +41,7 @@ void netCommandGame::baseWrite(XBuffer& out) const
 
 netCommand4G_Event::netCommand4G_Event(const Event& event) 
 {
-	xassert(event.numRef() && "Для отправки по сети события должны создаваться по new и передаваться через временный EventHandle");
+	xassert(event.numRef() && "Р”Р»СЏ РѕС‚РїСЂР°РІРєРё РїРѕ СЃРµС‚Рё СЃРѕР±С‹С‚РёСЏ РґРѕР»Р¶РЅС‹ СЃРѕР·РґР°РІР°С‚СЊСЃСЏ РїРѕ new Рё РїРµСЂРµРґР°РІР°С‚СЊСЃСЏ С‡РµСЂРµР· РІСЂРµРјРµРЅРЅС‹Р№ EventHandle");
 	event_ = &event;
 }
 

@@ -3,45 +3,45 @@
 #include "UnitInterface.h"
 
 BEGIN_ENUM_DESCRIPTOR(CommandID, "CommandID")
-REGISTER_ENUM(COMMAND_ID_POINT, "Идти в точку");
-REGISTER_ENUM(COMMAND_ID_ATTACK, "Атаковать точку");
-REGISTER_ENUM(COMMAND_ID_OBJECT, "Исследовать объект");
-REGISTER_ENUM(COMMAND_ID_FIRE, "Стрелять в точку");
-REGISTER_ENUM(COMMAND_ID_FIRE_OBJECT, "Стрелять в объект");
-REGISTER_ENUM(COMMAND_ID_TALK, "Говорить речь");
+REGISTER_ENUM(COMMAND_ID_POINT, "РРґС‚Рё РІ С‚РѕС‡РєСѓ");
+REGISTER_ENUM(COMMAND_ID_ATTACK, "РђС‚Р°РєРѕРІР°С‚СЊ С‚РѕС‡РєСѓ");
+REGISTER_ENUM(COMMAND_ID_OBJECT, "РСЃСЃР»РµРґРѕРІР°С‚СЊ РѕР±СЉРµРєС‚");
+REGISTER_ENUM(COMMAND_ID_FIRE, "РЎС‚СЂРµР»СЏС‚СЊ РІ С‚РѕС‡РєСѓ");
+REGISTER_ENUM(COMMAND_ID_FIRE_OBJECT, "РЎС‚СЂРµР»СЏС‚СЊ РІ РѕР±СЉРµРєС‚");
+REGISTER_ENUM(COMMAND_ID_TALK, "Р“РѕРІРѕСЂРёС‚СЊ СЂРµС‡СЊ");
 
-REGISTER_ENUM(COMMAND_ID_UPGRADE, "Апгрейд");
-REGISTER_ENUM(COMMAND_ID_PRODUCE, "Производство юнитов");
-REGISTER_ENUM(COMMAND_ID_CANCEL_PRODUCTION, "Отмена производства юнитов");
-REGISTER_ENUM(COMMAND_ID_PRODUCE_PARAMETER, "Производство параметров");
-REGISTER_ENUM(COMMAND_ID_PRODUCTION_INC, "Заказать юнита в сквад");
-REGISTER_ENUM(COMMAND_ID_PRODUCTION_DEC, "Удалить заказанного юнита из сквада");
+REGISTER_ENUM(COMMAND_ID_UPGRADE, "РђРїРіСЂРµР№Рґ");
+REGISTER_ENUM(COMMAND_ID_PRODUCE, "РџСЂРѕРёР·РІРѕРґСЃС‚РІРѕ СЋРЅРёС‚РѕРІ");
+REGISTER_ENUM(COMMAND_ID_CANCEL_PRODUCTION, "РћС‚РјРµРЅР° РїСЂРѕРёР·РІРѕРґСЃС‚РІР° СЋРЅРёС‚РѕРІ");
+REGISTER_ENUM(COMMAND_ID_PRODUCE_PARAMETER, "РџСЂРѕРёР·РІРѕРґСЃС‚РІРѕ РїР°СЂР°РјРµС‚СЂРѕРІ");
+REGISTER_ENUM(COMMAND_ID_PRODUCTION_INC, "Р—Р°РєР°Р·Р°С‚СЊ СЋРЅРёС‚Р° РІ СЃРєРІР°Рґ");
+REGISTER_ENUM(COMMAND_ID_PRODUCTION_DEC, "РЈРґР°Р»РёС‚СЊ Р·Р°РєР°Р·Р°РЅРЅРѕРіРѕ СЋРЅРёС‚Р° РёР· СЃРєРІР°РґР°");
 
-REGISTER_ENUM(COMMAND_ID_SELF_ATTACK_MODE, "Сменить режим атаки");
-REGISTER_ENUM(COMMAND_ID_WALK_ATTACK_MODE, "Сменить режим движения");
-REGISTER_ENUM(COMMAND_ID_WEAPON_MODE, "Сменить режим оружия");
-REGISTER_ENUM(COMMAND_ID_AUTO_TARGET_FILTER, "Сменить режим автоматического выбора целей");
-REGISTER_ENUM(COMMAND_ID_AUTO_TRANSPORT_FIND, "Сменить режим автоматического поиска транспорта");
-REGISTER_ENUM(COMMAND_ID_SET_FORMATION, "Установить формацию скваду");
-REGISTER_ENUM(COMMAND_ID_SET_MAIN_UNIT, "Установить главного юнита в скваде");
-REGISTER_ENUM(COMMAND_ID_SET_MAIN_UNIT_BY_INDEX, "Установить главного юнита в скваде по номеру");
-REGISTER_ENUM(COMMAND_ID_MAKE_STATIC, "Включить одиночный режим");
-REGISTER_ENUM(COMMAND_ID_MAKE_DYNAMIC, "Выключить одиночный режим");
-REGISTER_ENUM(COMMAND_ID_CHANGE_MOVEMENT_MODE, "Бег/Ходьба/На корточках/Лежа");
+REGISTER_ENUM(COMMAND_ID_SELF_ATTACK_MODE, "РЎРјРµРЅРёС‚СЊ СЂРµР¶РёРј Р°С‚Р°РєРё");
+REGISTER_ENUM(COMMAND_ID_WALK_ATTACK_MODE, "РЎРјРµРЅРёС‚СЊ СЂРµР¶РёРј РґРІРёР¶РµРЅРёСЏ");
+REGISTER_ENUM(COMMAND_ID_WEAPON_MODE, "РЎРјРµРЅРёС‚СЊ СЂРµР¶РёРј РѕСЂСѓР¶РёСЏ");
+REGISTER_ENUM(COMMAND_ID_AUTO_TARGET_FILTER, "РЎРјРµРЅРёС‚СЊ СЂРµР¶РёРј Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРіРѕ РІС‹Р±РѕСЂР° С†РµР»РµР№");
+REGISTER_ENUM(COMMAND_ID_AUTO_TRANSPORT_FIND, "РЎРјРµРЅРёС‚СЊ СЂРµР¶РёРј Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРіРѕ РїРѕРёСЃРєР° С‚СЂР°РЅСЃРїРѕСЂС‚Р°");
+REGISTER_ENUM(COMMAND_ID_SET_FORMATION, "РЈСЃС‚Р°РЅРѕРІРёС‚СЊ С„РѕСЂРјР°С†РёСЋ СЃРєРІР°РґСѓ");
+REGISTER_ENUM(COMMAND_ID_SET_MAIN_UNIT, "РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РіР»Р°РІРЅРѕРіРѕ СЋРЅРёС‚Р° РІ СЃРєРІР°РґРµ");
+REGISTER_ENUM(COMMAND_ID_SET_MAIN_UNIT_BY_INDEX, "РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РіР»Р°РІРЅРѕРіРѕ СЋРЅРёС‚Р° РІ СЃРєРІР°РґРµ РїРѕ РЅРѕРјРµСЂСѓ");
+REGISTER_ENUM(COMMAND_ID_MAKE_STATIC, "Р’РєР»СЋС‡РёС‚СЊ РѕРґРёРЅРѕС‡РЅС‹Р№ СЂРµР¶РёРј");
+REGISTER_ENUM(COMMAND_ID_MAKE_DYNAMIC, "Р’С‹РєР»СЋС‡РёС‚СЊ РѕРґРёРЅРѕС‡РЅС‹Р№ СЂРµР¶РёРј");
+REGISTER_ENUM(COMMAND_ID_CHANGE_MOVEMENT_MODE, "Р‘РµРі/РҐРѕРґСЊР±Р°/РќР° РєРѕСЂС‚РѕС‡РєР°С…/Р›РµР¶Р°");
 
-REGISTER_ENUM(COMMAND_ID_CAMERA_FOCUS, "Позиционировать камеру на юнита");
-REGISTER_ENUM(COMMAND_ID_CAMERA_MOVE, "Позиционировать камеру на якорь");
-REGISTER_ENUM(COMMAND_ID_SELECT_SELF, "Заселектить себя");
-REGISTER_ENUM(COMMAND_ID_DIRECT_CONTROL, "Прямое управление");
-REGISTER_ENUM(COMMAND_ID_SYNDICAT_CONTROL, "Прямое управление имени Карла")
-REGISTER_ENUM(COMMAND_ID_DIRECT_KEYS, "Клавиши прямого управления");
+REGISTER_ENUM(COMMAND_ID_CAMERA_FOCUS, "РџРѕР·РёС†РёРѕРЅРёСЂРѕРІР°С‚СЊ РєР°РјРµСЂСѓ РЅР° СЋРЅРёС‚Р°");
+REGISTER_ENUM(COMMAND_ID_CAMERA_MOVE, "РџРѕР·РёС†РёРѕРЅРёСЂРѕРІР°С‚СЊ РєР°РјРµСЂСѓ РЅР° СЏРєРѕСЂСЊ");
+REGISTER_ENUM(COMMAND_ID_SELECT_SELF, "Р—Р°СЃРµР»РµРєС‚РёС‚СЊ СЃРµР±СЏ");
+REGISTER_ENUM(COMMAND_ID_DIRECT_CONTROL, "РџСЂСЏРјРѕРµ СѓРїСЂР°РІР»РµРЅРёРµ");
+REGISTER_ENUM(COMMAND_ID_SYNDICAT_CONTROL, "РџСЂСЏРјРѕРµ СѓРїСЂР°РІР»РµРЅРёРµ РёРјРµРЅРё РљР°СЂР»Р°")
+REGISTER_ENUM(COMMAND_ID_DIRECT_KEYS, "РљР»Р°РІРёС€Рё РїСЂСЏРјРѕРіРѕ СѓРїСЂР°РІР»РµРЅРёСЏ");
 
-REGISTER_ENUM(COMMAND_ID_EXPLODE_UNIT, "Убей себя");
-REGISTER_ENUM(COMMAND_ID_KILL_UNIT, "Убить юнита тихо");
-REGISTER_ENUM(COMMAND_ID_UNINSTALL, "Деинсталлировать здание");
+REGISTER_ENUM(COMMAND_ID_EXPLODE_UNIT, "РЈР±РµР№ СЃРµР±СЏ");
+REGISTER_ENUM(COMMAND_ID_KILL_UNIT, "РЈР±РёС‚СЊ СЋРЅРёС‚Р° С‚РёС…Рѕ");
+REGISTER_ENUM(COMMAND_ID_UNINSTALL, "Р”РµРёРЅСЃС‚Р°Р»Р»РёСЂРѕРІР°С‚СЊ Р·РґР°РЅРёРµ");
 
-REGISTER_ENUM(COMMAND_ID_PUT_OUT_TRANSPORT, "Выгнать юнитов из транспорта");
-REGISTER_ENUM(COMMAND_ID_PUT_UNIT_OUT_TRANSPORT, "Выгнать юнита из транспорта");
+REGISTER_ENUM(COMMAND_ID_PUT_OUT_TRANSPORT, "Р’С‹РіРЅР°С‚СЊ СЋРЅРёС‚РѕРІ РёР· С‚СЂР°РЅСЃРїРѕСЂС‚Р°");
+REGISTER_ENUM(COMMAND_ID_PUT_UNIT_OUT_TRANSPORT, "Р’С‹РіРЅР°С‚СЊ СЋРЅРёС‚Р° РёР· С‚СЂР°РЅСЃРїРѕСЂС‚Р°");
 
 END_ENUM_DESCRIPTOR(CommandID)
 
@@ -200,59 +200,59 @@ void UnitCommand::serialize(Archive& ar)
 	WeaponMode unitWeaponMode;
 	AutoTargetFilter unitTargetFilter;
 	MovementMode movementMode;
-	ar.serialize(commandID_, "commandID", "&Команда");
+	ar.serialize(commandID_, "commandID", "&РљРѕРјР°РЅРґР°");
 	switch(commandID_){
 		case COMMAND_ID_SELF_ATTACK_MODE:
 			unitAttackMode = (AutoAttackMode)commandData_;
-			ar.serialize(unitAttackMode, "commandData", "Режим атаки");
+			ar.serialize(unitAttackMode, "commandData", "Р РµР¶РёРј Р°С‚Р°РєРё");
 			commandData_ = unitAttackMode;
 			break;
 		case COMMAND_ID_WALK_ATTACK_MODE:
 			unitWalkMode = (WalkAttackMode)commandData_;
-			ar.serialize(unitWalkMode, "commandData", "Режим движения");
+			ar.serialize(unitWalkMode, "commandData", "Р РµР¶РёРј РґРІРёР¶РµРЅРёСЏ");
 			commandData_ = unitWalkMode;
 			break;
 		case COMMAND_ID_WEAPON_MODE:
 			unitWeaponMode = (WeaponMode)commandData_;
-			ar.serialize(unitWeaponMode, "commandData", "Режим оружия");
+			ar.serialize(unitWeaponMode, "commandData", "Р РµР¶РёРј РѕСЂСѓР¶РёСЏ");
 			commandData_ = unitWeaponMode;
 			break;
 		case COMMAND_ID_WEAPON_ACTIVATE:
 			ar.serialize(commandData_, "weaponID", 0);
-			ar.serialize(shiftModifier_, "shiftModifier", "Однократное включение");
+			ar.serialize(shiftModifier_, "shiftModifier", "РћРґРЅРѕРєСЂР°С‚РЅРѕРµ РІРєР»СЋС‡РµРЅРёРµ");
 			break;
 		case COMMAND_ID_AUTO_TARGET_FILTER:
 			unitTargetFilter = (AutoTargetFilter)commandData_;
-			ar.serialize(unitTargetFilter, "commandData", "Режим автоматического выбора целей");
+			ar.serialize(unitTargetFilter, "commandData", "Р РµР¶РёРј Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРіРѕ РІС‹Р±РѕСЂР° С†РµР»РµР№");
 			commandData_ = unitTargetFilter;
 			break;
 		case COMMAND_ID_AUTO_TRANSPORT_FIND:{
 			bool setAutoFind = commandData_;
-			ar.serialize(setAutoFind, "commandData", "Искать транспорт автоматически");
+			ar.serialize(setAutoFind, "commandData", "РСЃРєР°С‚СЊ С‚СЂР°РЅСЃРїРѕСЂС‚ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё");
 			commandData_ = setAutoFind;
 			break;
 											}
 		case COMMAND_ID_UPGRADE:
-			ar.serialize(commandData_, "commandData", "Номер апгрейда");
+			ar.serialize(commandData_, "commandData", "РќРѕРјРµСЂ Р°РїРіСЂРµР№РґР°");
 			break;
 		case COMMAND_ID_PRODUCE:
-			ar.serialize(commandData_, "commandData", "Номер производства");
-			ar.serialize(shiftModifier_, "shiftModifier", "Заказать много");
+			ar.serialize(commandData_, "commandData", "РќРѕРјРµСЂ РїСЂРѕРёР·РІРѕРґСЃС‚РІР°");
+			ar.serialize(shiftModifier_, "shiftModifier", "Р—Р°РєР°Р·Р°С‚СЊ РјРЅРѕРіРѕ");
 			break;
 		case COMMAND_ID_PRODUCE_PARAMETER:
-			ar.serialize(commandData_, "commandData", "Номер производства");
+			ar.serialize(commandData_, "commandData", "РќРѕРјРµСЂ РїСЂРѕРёР·РІРѕРґСЃС‚РІР°");
 			break;
 		case COMMAND_ID_SET_FORMATION:
-			ar.serialize(commandData_, "commandData", "Номер формации");
+			ar.serialize(commandData_, "commandData", "РќРѕРјРµСЂ С„РѕСЂРјР°С†РёРё");
 			break;
 		case COMMAND_ID_SET_MAIN_UNIT_BY_INDEX:
-			ar.serialize(commandData_, "commandData", "Номер юнита в скваде");
+			ar.serialize(commandData_, "commandData", "РќРѕРјРµСЂ СЋРЅРёС‚Р° РІ СЃРєРІР°РґРµ");
 			break;
 		case COMMAND_ID_SET_MAIN_UNIT:
 		case COMMAND_ID_PRODUCTION_INC:
 		case COMMAND_ID_PRODUCTION_DEC:{
 			AttributeUnitReference reference = attributeReference_;
-			ar.serialize(reference, "attribute", "Юнит");
+			ar.serialize(reference, "attribute", "Р®РЅРёС‚");
 			attributeReference_ = reference;
 			break; }
 		//case COMMAND_ID_OBJECT:
@@ -263,11 +263,11 @@ void UnitCommand::serialize(Archive& ar)
 			ar.serialize(commandData_, "weaponID", 0);
 			break;
 		case COMMAND_ID_TALK:
-			ar.serialize(commandData_, "commandData", "Номер цепочки");
+			ar.serialize(commandData_, "commandData", "РќРѕРјРµСЂ С†РµРїРѕС‡РєРё");
 			break;
 		case COMMAND_ID_CHANGE_MOVEMENT_MODE:
 			movementMode  = (MovementMode)commandData_;
-			if(ar.serialize(movementMode, "commandData", "Режим движения"))
+			if(ar.serialize(movementMode, "commandData", "Р РµР¶РёРј РґРІРёР¶РµРЅРёСЏ"))
 				commandData_ = movementMode;
 			else
 				commandData_ = MODE_WALK;

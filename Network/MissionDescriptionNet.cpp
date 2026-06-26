@@ -291,11 +291,11 @@ int MissionDescriptionNet::connectNewUser(ConnectPlayerData& pd, const UNetID& u
 				if(colorNewPlayer!=-1)  
 					slotsData[i].colorIndex = colorNewPlayer;
 				else 
-					xassert(0 && "Невозможный цвет");
+					xassert(0 && "РќРµРІРѕР·РјРѕР¶РЅС‹Р№ С†РІРµС‚");
 				if(newClan!=-1) 
 					slotsData[i].clan=newClan;
 				else 
-					xassert(0 && "Невозможный клан");
+					xassert(0 && "РќРµРІРѕР·РјРѕР¶РЅС‹Р№ РєР»Р°РЅ");
 				break;
 			}
 		}
@@ -307,7 +307,7 @@ int MissionDescriptionNet::connectNewUser(ConnectPlayerData& pd, const UNetID& u
 			ud.setName(pd.playerName);
 			ud.unid=unid;
 			//ud.compAndUserID=pd.compAndUserID;
-			ud.backGameInf2List.reserve(20000);//резерв под 20000 квантов
+			ud.backGameInf2List.reserve(20000);//СЂРµР·РµСЂРІ РїРѕРґ 20000 РєРІР°РЅС‚РѕРІ
 			result=freeUserIdx;
 
 			ud.lagQuant=0;

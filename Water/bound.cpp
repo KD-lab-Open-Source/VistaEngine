@@ -89,7 +89,7 @@ void Bound::Compress(int flag)
 			}
 			xassert(a_nn>=0);
 			a.resize(a_nn);
-			//тут возможно swap сделать для реальной очистки памяти.
+			//С‚СѓС‚ РІРѕР·РјРѕР¶РЅРѕ swap СЃРґРµР»Р°С‚СЊ РґР»СЏ СЂРµР°Р»СЊРЅРѕР№ РѕС‡РёСЃС‚РєРё РїР°РјСЏС‚Рё.
 		}
 	}
 
@@ -124,9 +124,9 @@ bool Bound::Realloc(int _basey,int _dy,bool proverka)
 	xassert(dy>0);
 //	xassert(_basey+_dy<=480);
 //	xassert(heavy<20);
-	//Можно ли корректно переаллокировать
+	//РњРѕР¶РЅРѕ Р»Рё РєРѕСЂСЂРµРєС‚РЅРѕ РїРµСЂРµР°Р»Р»РѕРєРёСЂРѕРІР°С‚СЊ
 	if(IsEmpty()) goto Ok;
-	//Не теряется ли что по нижней границе ymin
+	//РќРµ С‚РµСЂСЏРµС‚СЃСЏ Р»Рё С‡С‚Рѕ РїРѕ РЅРёР¶РЅРµР№ РіСЂР°РЅРёС†Рµ ymin
 	if(_basey>basey)
 	{
 		if(_basey>=basey+dy)
@@ -139,7 +139,7 @@ bool Bound::Realloc(int _basey,int _dy,bool proverka)
 		}
 	}
 		
-	//Не теряется ли что по верхней границе ymax	
+	//РќРµ С‚РµСЂСЏРµС‚СЃСЏ Р»Рё С‡С‚Рѕ РїРѕ РІРµСЂС…РЅРµР№ РіСЂР°РЅРёС†Рµ ymax	
 	if(_basey+_dy<basey+dy)
 	{
 		if(_basey+_dy<=basey)
@@ -181,15 +181,15 @@ Ok:
 	return true;
 }
 
-void Bound::CopyLine(int i,//Куда копировать
-		vBoundRange& from//Откуда копировать
+void Bound::CopyLine(int i,//РљСѓРґР° РєРѕРїРёСЂРѕРІР°С‚СЊ
+		vBoundRange& from//РћС‚РєСѓРґР° РєРѕРїРёСЂРѕРІР°С‚СЊ
 		)
 {
 	xassert(i>=0 && i<dy);
 	yrange[i]=from;
 }
-void Bound::CopyLine(int i,//Куда копировать
-		Bound& b,int j//Откуда копировать
+void Bound::CopyLine(int i,//РљСѓРґР° РєРѕРїРёСЂРѕРІР°С‚СЊ
+		Bound& b,int j//РћС‚РєСѓРґР° РєРѕРїРёСЂРѕРІР°С‚СЊ
 		)
 {
 	xassert(j>=0 && j<b.dy);
@@ -245,7 +245,7 @@ void Bound::OnLineOr(int ii,vBoundRange& b)
 					j++;
 				} else
 				{
-					//j & k пересекаются
+					//j & k РїРµСЂРµСЃРµРєР°СЋС‚СЃСЏ
 					flag=1;
 				}
 			} else
@@ -258,7 +258,7 @@ void Bound::OnLineOr(int ii,vBoundRange& b)
 					k++;
 				} else
 				{
-					//j & k пересекаются
+					//j & k РїРµСЂРµСЃРµРєР°СЋС‚СЃСЏ
 					flag=1;
 				}
 			}
@@ -300,13 +300,13 @@ Bound& Bound::operator |=(Bound& bnd)
 
 
 	if(yii<a_ymin || yaa>a_ymax)
-	{//Маловато
+	{//РњР°Р»РѕРІР°С‚Рѕ
 		VERIFY(Realloc(yii,yaa-yii));
 	}
 
 	if(a_ymin>b_ymin)
 	{
-		//Значит b_ymin==yii
+		//Р—РЅР°С‡РёС‚ b_ymin==yii
 		int max=min(yi,b_ymax);
 		for(i=yii;i<max;i++)
 		{
@@ -316,7 +316,7 @@ Bound& Bound::operator |=(Bound& bnd)
 	
 	if(a_ymax<b_ymax)
 	{
-		//Значит b_ymax==yaa
+		//Р—РЅР°С‡РёС‚ b_ymax==yaa
 		int min=max(ya,b_ymin);
 		for(i=min;i<yaa;i++)
 		{
@@ -324,7 +324,7 @@ Bound& Bound::operator |=(Bound& bnd)
 		}
 	}
 
-	//Случай не пересекающихся по y областей
+	//РЎР»СѓС‡Р°Р№ РЅРµ РїРµСЂРµСЃРµРєР°СЋС‰РёС…СЃСЏ РїРѕ y РѕР±Р»Р°СЃС‚РµР№
 	if(a_ymin>b_ymax || a_ymax<b_ymin)
 	{
 		int imin,imax;
@@ -425,7 +425,7 @@ Bound& Bound::operator &=(Bound& bnd)
 
 	int yii=min(a_ymin,b_ymin);
 	int yaa=max(a_ymax,b_ymax);
-	//Остальное затереть
+	//РћСЃС‚Р°Р»СЊРЅРѕРµ Р·Р°С‚РµСЂРµС‚СЊ
 	for(i=basey;i<yi;i++)
 		yrange[i-basey].clear();
 	for(i=ya;i<a_ymax;i++)
@@ -709,7 +709,7 @@ void Bound::OnLineOrAdd(int ii,vBoundRange& b,int move_x)
 					j++;
 				} else
 				{
-					//j & k пересекаются
+					//j & k РїРµСЂРµСЃРµРєР°СЋС‚СЃСЏ
 					flag=1;
 				}
 			} else
@@ -722,7 +722,7 @@ void Bound::OnLineOrAdd(int ii,vBoundRange& b,int move_x)
 					k++;
 				} else
 				{
-					//j & k пересекаются
+					//j & k РїРµСЂРµСЃРµРєР°СЋС‚СЃСЏ
 					flag=1;
 				}
 			}
@@ -750,8 +750,8 @@ void Bound::OnLineOrAdd(int ii,vBoundRange& b,int move_x)
 	CopyLine(ii,temp);
 }
 
-void Bound::CopyLinePlus(int i,//Куда копировать
-		Bound& bnd,int j,//Откуда копировать
+void Bound::CopyLinePlus(int i,//РљСѓРґР° РєРѕРїРёСЂРѕРІР°С‚СЊ
+		Bound& bnd,int j,//РћС‚РєСѓРґР° РєРѕРїРёСЂРѕРІР°С‚СЊ
 		int move_x
 		)
 {
@@ -773,7 +773,7 @@ Bound& Bound::OrMove(Bound& bnd,int move_x,int move_y,RECT r)
 {
 	int a_ymin=basey,a_ymax=basey+dy;
 	int b_ymin=bnd.basey+move_y,b_ymax=bnd.basey+move_y+bnd.dy;
-	//Обрезаем b
+	//РћР±СЂРµР·Р°РµРј b
 	b_ymin=max(b_ymin,r.top);
 	b_ymax=min(b_ymax,r.bottom);
 
@@ -795,7 +795,7 @@ Bound& Bound::OrMove(Bound& bnd,int move_x,int move_y,RECT r)
 
 	if(a_ymin>b_ymin)
 	{
-		//Значит b_ymin==yii
+		//Р—РЅР°С‡РёС‚ b_ymin==yii
 		int max=min(yi,b_ymax);
 		for(i=yii;i<max;i++)
 		{
@@ -806,7 +806,7 @@ Bound& Bound::OrMove(Bound& bnd,int move_x,int move_y,RECT r)
 	
 	if(a_ymax<b_ymax)
 	{
-		//Значит b_ymax==yaa
+		//Р—РЅР°С‡РёС‚ b_ymax==yaa
 		int min=max(ya,b_ymin);
 		for(i=min;i<yaa;i++)
 		{
@@ -815,7 +815,7 @@ Bound& Bound::OrMove(Bound& bnd,int move_x,int move_y,RECT r)
 		}
 	}
 
-	//Случай не пересекающихся по y областей
+	//РЎР»СѓС‡Р°Р№ РЅРµ РїРµСЂРµСЃРµРєР°СЋС‰РёС…СЃСЏ РїРѕ y РѕР±Р»Р°СЃС‚РµР№
 	if(a_ymin>b_ymax || a_ymax<b_ymin)
 	{
 		int imin,imax;

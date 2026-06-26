@@ -125,11 +125,11 @@ void SourceShield::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(height_, "height", "высота купола");
+	ar.serialize(height_, "height", "РІС‹СЃРѕС‚Р° РєСѓРїРѕР»Р°");
 	float tmp = logicPeriodSeconds / min(0.05f, activateDTime_);
-	ar.serialize(RangedWrapperf(tmp, 0.1f, 3.f), "activateTime", "Время активации/деактивации");
+	ar.serialize(RangedWrapperf(tmp, 0.1f, 3.f), "activateTime", "Р’СЂРµРјСЏ Р°РєС‚РёРІР°С†РёРё/РґРµР°РєС‚РёРІР°С†РёРё");
 	activateDTime_ = logicPeriodSeconds / tmp;
-	ar.serialize(color_, "color", "Цвет купола");
+	ar.serialize(color_, "color", "Р¦РІРµС‚ РєСѓРїРѕР»Р°");
 
 	serializationApply(ar);
 }
@@ -250,7 +250,7 @@ private:
 	Shields sources_;
 };
 
-// ищет ближайшее к началу отрезка пересечение
+// РёС‰РµС‚ Р±Р»РёР¶Р°Р№С€РµРµ Рє РЅР°С‡Р°Р»Сѓ РѕС‚СЂРµР·РєР° РїРµСЂРµСЃРµС‡РµРЅРёРµ
 Vect3f crossLineSpheres(const Vect3f& st, const Vect3f& fin, const Shields& spheres, Vect3f* shieldCenter = 0)
 {
 	float t_cros = 2.f;
@@ -346,9 +346,9 @@ bool SourceShield::traceShieldsCoherence(const Vect3f& point_start, const Vect3f
 	}
 			
 	    
-	//Определяем внутри каких враждебных полей исходная точка (без учета своих, так как на вылет из своих полей нет влияния)
-	//Определяем внутри каких враждебных полей конечная точка (без учета своих, так как свои не препятствуют подлету)
-	//убираем пересечения, т.к. это означает, что точки внутри одного и того же поля
+	//РћРїСЂРµРґРµР»СЏРµРј РІРЅСѓС‚СЂРё РєР°РєРёС… РІСЂР°Р¶РґРµР±РЅС‹С… РїРѕР»РµР№ РёСЃС…РѕРґРЅР°СЏ С‚РѕС‡РєР° (Р±РµР· СѓС‡РµС‚Р° СЃРІРѕРёС…, С‚Р°Рє РєР°Рє РЅР° РІС‹Р»РµС‚ РёР· СЃРІРѕРёС… РїРѕР»РµР№ РЅРµС‚ РІР»РёСЏРЅРёСЏ)
+	//РћРїСЂРµРґРµР»СЏРµРј РІРЅСѓС‚СЂРё РєР°РєРёС… РІСЂР°Р¶РґРµР±РЅС‹С… РїРѕР»РµР№ РєРѕРЅРµС‡РЅР°СЏ С‚РѕС‡РєР° (Р±РµР· СѓС‡РµС‚Р° СЃРІРѕРёС…, С‚Р°Рє РєР°Рє СЃРІРѕРё РЅРµ РїСЂРµРїСЏС‚СЃС‚РІСѓСЋС‚ РїРѕРґР»РµС‚Сѓ)
+	//СѓР±РёСЂР°РµРј РїРµСЂРµСЃРµС‡РµРЅРёСЏ, С‚.Рє. СЌС‚Рѕ РѕР·РЅР°С‡Р°РµС‚, С‡С‚Рѕ С‚РѕС‡РєРё РІРЅСѓС‚СЂРё РѕРґРЅРѕРіРѕ Рё С‚РѕРіРѕ Р¶Рµ РїРѕР»СЏ
 
 	sort2(start.sources());
 	sort2(finish.sources());
@@ -375,8 +375,8 @@ bool SourceShield::traceShieldsCoherence(const Vect3f& point_start, const Vect3f
 	start.sources().erase(remove(start.sources().begin(), start.sources().end(), (Shields::value_type)0), start.sources().end());
 	finish.sources().erase(remove(finish.sources().begin(), finish.sources().end(), (Shields::value_type)0), finish.sources().end());
 
-	//теперь у нас ест список преград чужих полей из которых нужно вылететь /start.sources()/ 
-	//и список чужих полей в которые нужно влететь /finish.sources()/
+	//С‚РµРїРµСЂСЊ Сѓ РЅР°СЃ РµСЃС‚ СЃРїРёСЃРѕРє РїСЂРµРіСЂР°Рґ С‡СѓР¶РёС… РїРѕР»РµР№ РёР· РєРѕС‚РѕСЂС‹С… РЅСѓР¶РЅРѕ РІС‹Р»РµС‚РµС‚СЊ /start.sources()/ 
+	//Рё СЃРїРёСЃРѕРє С‡СѓР¶РёС… РїРѕР»РµР№ РІ РєРѕС‚РѕСЂС‹Рµ РЅСѓР¶РЅРѕ РІР»РµС‚РµС‚СЊ /finish.sources()/
 	
 	if(finish.sources().empty() && start.sources().empty())
 		return true;

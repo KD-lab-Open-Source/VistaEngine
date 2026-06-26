@@ -35,13 +35,13 @@ void UnitEnvironment::serialize(Archive& ar)
 	__super::serialize(ar);
 
 	float _radius = radius();
-	ar.serialize(_radius, "radius", "Ðàäèóñ");
-	ar.serialize(ptBoundCheck_, "ptBoundCheck", "Ó÷èòûâàòü áàóíä â ïîèñêå ïóòè");
+	ar.serialize(_radius, "radius", "Ð Ð°Ð´Ð¸ÑƒÑ");
+	ar.serialize(ptBoundCheck_, "ptBoundCheck", "Ð£Ñ‡Ð¸Ñ‚Ñ‹Ð²Ð°Ñ‚ÑŒ Ð±Ð°ÑƒÐ½Ð´ Ð² Ð¿Ð¾Ð¸ÑÐºÐµ Ð¿ÑƒÑ‚Ð¸");
 	string modelName = modelName_;
-	static ModelSelector::Options options("*.3dx", "RESOURCE\\TerrainData\\Models", "Ìîäåëü");
-	ar.serialize(ModelSelector(modelName, options), "modelName", "Èìÿ ìîäåëè");
-	ar.serialize(environmentType_, "environmentType", "Òèï");
-	ar.serialize(lodDistance_,"distanceLod","ËÎÄ: Äèñòàíöèÿ ïåðåêëþ÷åíèÿ");
+	static ModelSelector::Options options("*.3dx", "RESOURCE\\TerrainData\\Models", "ÐœÐ¾Ð´ÐµÐ»ÑŒ");
+	ar.serialize(ModelSelector(modelName, options), "modelName", "Ð˜Ð¼Ñ Ð¼Ð¾Ð´ÐµÐ»Ð¸");
+	ar.serialize(environmentType_, "environmentType", "Ð¢Ð¸Ð¿");
+	ar.serialize(lodDistance_,"distanceLod","Ð›ÐžÐ”: Ð”Ð¸ÑÑ‚Ð°Ð½Ñ†Ð¸Ñ Ð¿ÐµÑ€ÐµÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ñ");
 	if(environmentType_ != ENVIRONMENT_TREE && environmentType_ != ENVIRONMENT_BUSH &&
 	   environmentType_ != ENVIRONMENT_FENCE && environmentType_ != ENVIRONMENT_FENCE2 && 
 	   environmentType_ != ENVIRONMENT_STONE){
@@ -49,13 +49,13 @@ void UnitEnvironment::serialize(Archive& ar)
 			environmentType_ = ENVIRONMENT_INDESTRUCTIBLE;
 			checkGround_ = false;
 		}
-		ar.serialize(checkGround_, "checkGround", "Ðåàãèðîâàòü íà èçìåíåíèå ïîâåðõíîñòè");
+		ar.serialize(checkGround_, "checkGround", "Ð ÐµÐ°Ð³Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð½Ð° Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ðµ Ð¿Ð¾Ð²ÐµÑ€Ñ…Ð½Ð¾ÑÑ‚Ð¸");
 		if(environmentType_ == ENVIRONMENT_PHANTOM2){
 			environmentType_ = ENVIRONMENT_INDESTRUCTIBLE;
 			checkGround_ = false;
 		}
 		if(checkGround_)
-			ar.serialize(checkGroundPoint_, "checkGroundPoint", "Àíàëèçèðîâàòü ïîâåðõíîñòü òîëüêî ïî öåíòðó");
+			ar.serialize(checkGroundPoint_, "checkGroundPoint", "ÐÐ½Ð°Ð»Ð¸Ð·Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð¿Ð¾Ð²ÐµÑ€Ñ…Ð½Ð¾ÑÑ‚ÑŒ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð¿Ð¾ Ñ†ÐµÐ½Ñ‚Ñ€Ñƒ");
 		else
 			checkGroundPoint_ = false;
 	} else {
@@ -64,9 +64,9 @@ void UnitEnvironment::serialize(Archive& ar)
 	}
 
 	if(environmentType_ == ENVIRONMENT_TREE){
-		ar.serialize(holdOrientation_, "holdOrientation", "Ñîõðàíÿòü îðèåíòàöèþ");
+		ar.serialize(holdOrientation_, "holdOrientation", "Ð¡Ð¾Ñ…Ñ€Ð°Ð½ÑÑ‚ÑŒ Ð¾Ñ€Ð¸ÐµÐ½Ñ‚Ð°Ñ†Ð¸ÑŽ");
 		if(holdOrientation_)
-			ar.serialize(verticalOrientation_, "verticalOrientation", "Îðèåíòèðîâàòü âåðòèêàëüíî");
+			ar.serialize(verticalOrientation_, "verticalOrientation", "ÐžÑ€Ð¸ÐµÐ½Ñ‚Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð²ÐµÑ€Ñ‚Ð¸ÐºÐ°Ð»ÑŒÐ½Ð¾");
 		else
 			verticalOrientation_ = false;
 	}else{
@@ -74,15 +74,15 @@ void UnitEnvironment::serialize(Archive& ar)
 		verticalOrientation_ = false;
 	}
 
-	ar.serialize(lighted_, "lighted", "Îñâåùåí");
-	ar.serialize(burnt_, "burnt", "Ãîðåëûé");
+	ar.serialize(lighted_, "lighted", "ÐžÑÐ²ÐµÑ‰ÐµÐ½");
+	ar.serialize(burnt_, "burnt", "Ð“Ð¾Ñ€ÐµÐ»Ñ‹Ð¹");
 
-	ar.serialize(destroyInWater_, "destroyInWater", "Ðàçðóøàåòñÿ â âîäå");
-	ar.serialize(destroyInAbnormalState_, "destroyInAbnormalState", "Ðàçðóøàåòñÿ ïðè ëþáîì âîçäåéñòâèè");
+	ar.serialize(destroyInWater_, "destroyInWater", "Ð Ð°Ð·Ñ€ÑƒÑˆÐ°ÐµÑ‚ÑÑ Ð² Ð²Ð¾Ð´Ðµ");
+	ar.serialize(destroyInAbnormalState_, "destroyInAbnormalState", "Ð Ð°Ð·Ñ€ÑƒÑˆÐ°ÐµÑ‚ÑÑ Ð¿Ñ€Ð¸ Ð»ÑŽÐ±Ð¾Ð¼ Ð²Ð¾Ð·Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ð¸");
 
-	ar.serialize(hideByDistance, "hideByDistance", "Èñ÷åçàåò ïðè óäàëåíèè");
-	ar.serialize(canBeTransparent_, "canBeTransparent", "Ñòàíîâèòñÿ ïðîçðà÷íûì åñëè ïîçàäè þíèò");
-	ar.serialize(fieldOfViewMapAdd_, "fieldOfViewMapAdd", "Äîáàâëÿòü â êàðòó ïðåïÿòñòâèé");
+	ar.serialize(hideByDistance, "hideByDistance", "Ð˜ÑÑ‡ÐµÐ·Ð°ÐµÑ‚ Ð¿Ñ€Ð¸ ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ð¸");
+	ar.serialize(canBeTransparent_, "canBeTransparent", "Ð¡Ñ‚Ð°Ð½Ð¾Ð²Ð¸Ñ‚ÑÑ Ð¿Ñ€Ð¾Ð·Ñ€Ð°Ñ‡Ð½Ñ‹Ð¼ ÐµÑÐ»Ð¸ Ð¿Ð¾Ð·Ð°Ð´Ð¸ ÑŽÐ½Ð¸Ñ‚");
+	ar.serialize(fieldOfViewMapAdd_, "fieldOfViewMapAdd", "Ð”Ð¾Ð±Ð°Ð²Ð»ÑÑ‚ÑŒ Ð² ÐºÐ°Ñ€Ñ‚Ñƒ Ð¿Ñ€ÐµÐ¿ÑÑ‚ÑÑ‚Ð²Ð¸Ð¹");
 	
 	if(ar.isInput()){
 		setModel(modelName.c_str());
@@ -98,9 +98,9 @@ void UnitEnvironment::serialize(Archive& ar)
 	float shadowRadius, shadowHeight;
 	get3dx()->getCircleShadowParam(shadowRadius, shadowHeight);
 	
-	ar.serialize(shadowType, "shadowType", "Òèï òåíè");
+	ar.serialize(shadowType, "shadowType", "Ð¢Ð¸Ð¿ Ñ‚ÐµÐ½Ð¸");
 	if(shadowType == OST_SHADOW_CIRCLE)
-		ar.serialize(shadowRadius, "shadowRadius", "Ðàäèóñ êðóãëîé òåíè");
+		ar.serialize(shadowRadius, "shadowRadius", "Ð Ð°Ð´Ð¸ÑƒÑ ÐºÑ€ÑƒÐ³Ð»Ð¾Ð¹ Ñ‚ÐµÐ½Ð¸");
 	
 	if(ar.isInput()){
 		get3dx()->SetShadowType(shadowType);

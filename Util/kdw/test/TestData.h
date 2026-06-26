@@ -31,7 +31,7 @@ class TestReference
 public:
 	const char* c_str() const { return "Test"; }
 	void serialize(Archive& ar) {
-		ar.serialize(key, "key", "Ключ");
+		ar.serialize(key, "key", "РљР»СЋС‡");
 	}
 	int key;
 };
@@ -66,8 +66,8 @@ public:
 		ar.serialize(NotDecorator(base_flag), "base_flag", "^");
 		/*
 		if(base_flag){
-			ar.serialize(base_member, "base_member", "Название");
-			ar.serialize(base_float,  "base_float", "Флоат в базовом класе");
+			ar.serialize(base_member, "base_member", "РќР°Р·РІР°РЅРёРµ");
+			ar.serialize(base_float,  "base_float", "Р¤Р»РѕР°С‚ РІ Р±Р°Р·РѕРІРѕРј РєР»Р°СЃРµ");
 		}
 		*/
 	}
@@ -84,7 +84,7 @@ public:
 	std::string derived_a_member;
 
 	virtual void serialize (Archive& ar) {
-		ar.serialize(derived_a_member, "derived_a_member", "&Строка в производном классе");
+		ar.serialize(derived_a_member, "derived_a_member", "&РЎС‚СЂРѕРєР° РІ РїСЂРѕРёР·РІРѕРґРЅРѕРј РєР»Р°СЃСЃРµ");
 		__super::serialize (ar);
 	}
 };
@@ -256,23 +256,23 @@ struct TestData
 	void serialize (Archive& ar) {
 		bool order = mega_boolean;
 		ar.serialize(HLineDecorator(), "hline1", "<");
-		ar.serialize(single_child, "single_child", "<Условие");
+		ar.serialize(single_child, "single_child", "<РЈСЃР»РѕРІРёРµ");
 		ar.serialize(HLineDecorator(), "hline2", "<");
-		ar.serialize(ButtonDecorator("Срочно нажми меня!"), "button", "1: ");
-		ButtonDecorator button("Вторая кнопочка!");
+		ar.serialize(ButtonDecorator("РЎСЂРѕС‡РЅРѕ РЅР°Р¶РјРё РјРµРЅСЏ!"), "button", "1: ");
+		ButtonDecorator button("Р’С‚РѕСЂР°СЏ РєРЅРѕРїРѕС‡РєР°!");
 		ar.serialize(button, "button", "2: ");
 		if(button){
 			kdw::edit(Serializer(*this), "testStateNested");
 		}
 		if(order)
-			ar.serialize(ButtonDecorator("Третья кнопочка!"), "button", "3: ");
+			ar.serialize(ButtonDecorator("РўСЂРµС‚СЊСЏ РєРЅРѕРїРѕС‡РєР°!"), "button", "3: ");
 
 		ar.serialize(hotkey, "hotkey", "<");
 		ar.serialize(base, "base", "Base");
-		ar.serialize(enableSerialization_, "enableSerialization", "Включить");
+		ar.serialize(enableSerialization_, "enableSerialization", "Р’РєР»СЋС‡РёС‚СЊ");
 		if(enableSerialization_){
-			ar.serialize(comboList_, "comboList", "^КомбоЛистСтринг");
-			ar.serialize(childs, "childs", "Дочерние элементы");
+			ar.serialize(comboList_, "comboList", "^РљРѕРјР±РѕР›РёСЃС‚РЎС‚СЂРёРЅРі");
+			ar.serialize(childs, "childs", "Р”РѕС‡РµСЂРЅРёРµ СЌР»РµРјРµРЅС‚С‹");
 
 			TestBases::iterator it;
 			for(it = poly_vector.begin(); it != poly_vector.end(); ++it){
@@ -282,17 +282,17 @@ struct TestData
 			}
 
 			ar.serialize(uniName, "uniName", "uniName");
-			ar.serialize(poly_vector, "poly_vector", "Вектор полиморфных элементов");
-			ar.serialize(childsBase, "childsBase", "Вектор простых элементов");
-			ar.serialize(RangedWrapperf (fvalue, -15.0f, 15.0f, 0.5f), "fvalue", "Значение");
+			ar.serialize(poly_vector, "poly_vector", "Р’РµРєС‚РѕСЂ РїРѕР»РёРјРѕСЂС„РЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ");
+			ar.serialize(childsBase, "childsBase", "Р’РµРєС‚РѕСЂ РїСЂРѕСЃС‚С‹С… СЌР»РµРјРµРЅС‚РѕРІ");
+			ar.serialize(RangedWrapperf (fvalue, -15.0f, 15.0f, 0.5f), "fvalue", "Р—РЅР°С‡РµРЅРёРµ");
 			ar.serialize(mega_boolean, "mega_boolean", 0);
-			ar.serialize(name, "name", "Имя");
-			ar.serialize(position, "position", "Положение");
-			ar.serialize(size, "size", "Размер");
+			ar.serialize(name, "name", "РРјСЏ");
+			ar.serialize(position, "position", "РџРѕР»РѕР¶РµРЅРёРµ");
+			ar.serialize(size, "size", "Р Р°Р·РјРµСЂ");
 
-			ar.serialize(flags, "flags", "!Флаги");
+			ar.serialize(flags, "flags", "!Р¤Р»Р°РіРё");
 
-			ar.serialize(type, "type", "Тип");
+			ar.serialize(type, "type", "РўРёРї");
 
 			vector<Color4f> comboList;
 			comboList.push_back(Color4f::BLACK);
@@ -301,30 +301,30 @@ struct TestData
 			color_ = ComboListColor(comboList, Color4f::GREEN);
 			ar.serialize(color_, "color_", "color_");
 
-			//ar.serialize(gradient, "gradient", "Градиент");
+			//ar.serialize(gradient, "gradient", "Р“СЂР°РґРёРµРЅС‚");
 
 			ar.serialize(back_color, "backColor", 0);
 			ar.serialize(fore_color, "foreColor", 0);
 			ar.serialize(comboListColor, "comboListColor", 0);
 
 			if(ar.isInput() || !ar.isEdit() || type == ZONE_GENERATOR) {
-				ar.serialize(char_value, "char_value", "Символ");
-				ar.serialize(short_value, "short_value", "Короткое целое");
-				ar.serialize(int_value, "int_value", "Целое");
-				ar.serialize(long_value, "long_value", "!Длинное целое");
-				ar.serialize(float_value, "float_value", "С плавающей запятой");
-				ar.serialize(double_value, "double_value", "С плавающей запятой, двойной точности");
+				ar.serialize(char_value, "char_value", "РЎРёРјРІРѕР»");
+				ar.serialize(short_value, "short_value", "РљРѕСЂРѕС‚РєРѕРµ С†РµР»РѕРµ");
+				ar.serialize(int_value, "int_value", "Р¦РµР»РѕРµ");
+				ar.serialize(long_value, "long_value", "!Р”Р»РёРЅРЅРѕРµ С†РµР»РѕРµ");
+				ar.serialize(float_value, "float_value", "РЎ РїР»Р°РІР°СЋС‰РµР№ Р·Р°РїСЏС‚РѕР№");
+				ar.serialize(double_value, "double_value", "РЎ РїР»Р°РІР°СЋС‰РµР№ Р·Р°РїСЏС‚РѕР№, РґРІРѕР№РЅРѕР№ С‚РѕС‡РЅРѕСЃС‚Рё");
 			}
 
 			if(!order)
-				ar.serialize(ButtonDecorator("Третья кнопочка!"), "button", "3: ");
+				ar.serialize(ButtonDecorator("РўСЂРµС‚СЊСЏ РєРЅРѕРїРѕС‡РєР°!"), "button", "3: ");
 
 			if(ar.isInput() || !ar.isEdit() || type == ZONE_WALKING_EFFECT) {
-				ar.serialize(labels, "labels", "Метки");
+				ar.serialize(labels, "labels", "РњРµС‚РєРё");
 			}
 
 			if(ar.isInput() || !ar.isEdit() || type == ZONE_SIMPLE) {
-				ar.serialize(enum_value, "enum_value", "Значение перечисления");
+				ar.serialize(enum_value, "enum_value", "Р—РЅР°С‡РµРЅРёРµ РїРµСЂРµС‡РёСЃР»РµРЅРёСЏ");
 				//ar.serialize(test_reference, "test_reference", "Reference");
 			}
 		}

@@ -1,4 +1,4 @@
 #include "stdafx.h"
 #include "GenericFileSelector.h"
 
-GenericFileSelector::Options GenericFileSelector::DEFAULT_OPTIONS ("Βρε τΰιλϋ||*.*", ".");
+GenericFileSelector::Options GenericFileSelector::DEFAULT_OPTIONS ("Π’ΡΠµ Ρ„Π°ΠΉΠ»Ρ‹||*.*", ".");

@@ -47,8 +47,8 @@ float Rangef::clip(float& _value) const
 
 void Rangef::serialize(Archive& ar)
 {
-	ar.serialize(min_, "min_", "Минимум");
-	ar.serialize(max_, "max_", "Максимум");
+	ar.serialize(min_, "min_", "РњРёРЅРёРјСѓРј");
+	ar.serialize(max_, "max_", "РњР°РєСЃРёРјСѓРј");
 }
 
 
@@ -94,8 +94,8 @@ int Rangei::clip(int& _value)
 
 void Rangei::serialize(Archive& ar)
 {
-	ar.serialize(min_, "min_", "Минимум");
-	ar.serialize(max_, "max_", "Максимум");
+	ar.serialize(min_, "min_", "РњРёРЅРёРјСѓРј");
+	ar.serialize(max_, "max_", "РњР°РєСЃРёРјСѓРј");
 }
 
 

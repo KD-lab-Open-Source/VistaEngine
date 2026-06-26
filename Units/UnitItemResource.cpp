@@ -6,16 +6,16 @@
 #include "Serialization/SerializationFactory.h"
 
 DECLARE_SEGMENT(UnitItemResource)
-REGISTER_CLASS(AttributeBase, AttributeItemResource, "Предмет-ресурс")
-REGISTER_CLASS(UnitBase, UnitItemResource, "Предмет-ресурс");
+REGISTER_CLASS(AttributeBase, AttributeItemResource, "РџСЂРµРґРјРµС‚-СЂРµСЃСѓСЂСЃ")
+REGISTER_CLASS(UnitBase, UnitItemResource, "РџСЂРµРґРјРµС‚-СЂРµСЃСѓСЂСЃ");
 REGISTER_CLASS_IN_FACTORY(UnitFactory, UNIT_CLASS_ITEM_RESOURCE, UnitItemResource)
 
-BEGIN_ENUM_DESCRIPTOR_ENCLOSED(AttributeItemResource, ItemType, "Типы предметов-ресурсов")
-REGISTER_ENUM_ENCLOSED(AttributeItemResource,ITEM_DEFAULT, "Простой предмет")
-REGISTER_ENUM_ENCLOSED(AttributeItemResource,ITEM_TREE, "Дерево")
-REGISTER_ENUM_ENCLOSED(AttributeItemResource,ITEM_FENCE, "Забор")
-REGISTER_ENUM_ENCLOSED(AttributeItemResource,ITEM_BUSH, "Куст")
-REGISTER_ENUM_ENCLOSED(AttributeItemResource,ITEM_STONE, "Камень")
+BEGIN_ENUM_DESCRIPTOR_ENCLOSED(AttributeItemResource, ItemType, "РўРёРїС‹ РїСЂРµРґРјРµС‚РѕРІ-СЂРµСЃСѓСЂСЃРѕРІ")
+REGISTER_ENUM_ENCLOSED(AttributeItemResource,ITEM_DEFAULT, "РџСЂРѕСЃС‚РѕР№ РїСЂРµРґРјРµС‚")
+REGISTER_ENUM_ENCLOSED(AttributeItemResource,ITEM_TREE, "Р”РµСЂРµРІРѕ")
+REGISTER_ENUM_ENCLOSED(AttributeItemResource,ITEM_FENCE, "Р—Р°Р±РѕСЂ")
+REGISTER_ENUM_ENCLOSED(AttributeItemResource,ITEM_BUSH, "РљСѓСЃС‚")
+REGISTER_ENUM_ENCLOSED(AttributeItemResource,ITEM_STONE, "РљР°РјРµРЅСЊ")
 END_ENUM_DESCRIPTOR_ENCLOSED(AttributeItemResource,ItemType)
 
 
@@ -46,26 +46,26 @@ void AttributeItemResource::serialize(Archive& ar)
 	collisionGroup = COLLISION_GROUP_REAL;
 	excludeCollision = unitClass() == UNIT_CLASS_ITEM_RESOURCE ? EXCLUDE_COLLISION_BULLET : 0;
 
-	ar.serialize(itemType, "itemType", "Тип предмета");
-	ar.serialize(barrierUpgrade, "barrierUpgrade", "Помеха при апгрейде");
+	ar.serialize(itemType, "itemType", "РўРёРї РїСЂРµРґРјРµС‚Р°");
+	ar.serialize(barrierUpgrade, "barrierUpgrade", "РџРѕРјРµС…Р° РїСЂРё Р°РїРіСЂРµР№РґРµ");
 	unitClass_ = UNIT_CLASS_ITEM_RESOURCE;
 
 	switch (itemType) {
 	case ITEM_DEFAULT: 
-		ar.serialize(enablePathTracking, "enablePathTracking", "Включить объезд юнитов");
-//		ar.serialize(enablePathFind, "enablePathFinding", "Участвует в поиске пути");
+		ar.serialize(enablePathTracking, "enablePathTracking", "Р’РєР»СЋС‡РёС‚СЊ РѕР±СЉРµР·Рґ СЋРЅРёС‚РѕРІ");
+//		ar.serialize(enablePathFind, "enablePathFinding", "РЈС‡Р°СЃС‚РІСѓРµС‚ РІ РїРѕРёСЃРєРµ РїСѓС‚Рё");
 		rigidBodyPrm = RigidBodyPrmReference("Item");
 		break;
 	case ITEM_TREE: 
-		ar.serialize(enablePathTracking, "enablePathTracking", "Включить объезд юнитов");
+		ar.serialize(enablePathTracking, "enablePathTracking", "Р’РєР»СЋС‡РёС‚СЊ РѕР±СЉРµР·Рґ СЋРЅРёС‚РѕРІ");
 		rigidBodyPrm = RigidBodyPrmReference("Environment Tree");
 		break;
 	case ITEM_FENCE: 
-		ar.serialize(enablePathTracking, "enablePathTracking", "Включить объезд юнитов");
+		ar.serialize(enablePathTracking, "enablePathTracking", "Р’РєР»СЋС‡РёС‚СЊ РѕР±СЉРµР·Рґ СЋРЅРёС‚РѕРІ");
 		rigidBodyPrm = RigidBodyPrmReference("Environment Fence");
 		break;
 	case ITEM_STONE: 
-		ar.serialize(enablePathTracking, "enablePathTracking", "Включить объезд юнитов");
+		ar.serialize(enablePathTracking, "enablePathTracking", "Р’РєР»СЋС‡РёС‚СЊ РѕР±СЉРµР·Рґ СЋРЅРёС‚РѕРІ");
 		rigidBodyPrm = RigidBodyPrmReference("Environment Stone");
 		break;
 	case ITEM_BUSH: 
@@ -76,20 +76,20 @@ void AttributeItemResource::serialize(Archive& ar)
 	}
 
 	if(itemType == ITEM_DEFAULT){
-		ar.serialize(enableHiding, "enableHiding", "Скрывать под зданием");
-		ar.serialize(producedPlacementZone, "producedPlacementZone", "Создаваемая зона");
-		ar.serialize(producedPlacementZoneRadius, "producedPlacementZoneRadius", "Радиус создаваемой зоны");
+		ar.serialize(enableHiding, "enableHiding", "РЎРєСЂС‹РІР°С‚СЊ РїРѕРґ Р·РґР°РЅРёРµРј");
+		ar.serialize(producedPlacementZone, "producedPlacementZone", "РЎРѕР·РґР°РІР°РµРјР°СЏ Р·РѕРЅР°");
+		ar.serialize(producedPlacementZoneRadius, "producedPlacementZoneRadius", "Р Р°РґРёСѓСЃ СЃРѕР·РґР°РІР°РµРјРѕР№ Р·РѕРЅС‹");
 		if(ar.isInput() && producedPlacementZoneRadiusMax_ < producedPlacementZoneRadius)
 			producedPlacementZoneRadiusMax_ = producedPlacementZoneRadius;
 
 	}
 
-	ar.serialize(appearanceDelay, "appearanceDelay", "Задержка появления");
-	ar.serialize(useLifeTime, "useLifeTime", "Ограничивать время жизни");
+	ar.serialize(appearanceDelay, "appearanceDelay", "Р—Р°РґРµСЂР¶РєР° РїРѕСЏРІР»РµРЅРёСЏ");
+	ar.serialize(useLifeTime, "useLifeTime", "РћРіСЂР°РЅРёС‡РёРІР°С‚СЊ РІСЂРµРјСЏ Р¶РёР·РЅРё");
 	if(useLifeTime)
-		ar.serialize(lifeTime, "lifeTime", "Время жизни");
+		ar.serialize(lifeTime, "lifeTime", "Р’СЂРµРјСЏ Р¶РёР·РЅРё");
 
-	ar.serialize(mass, "mass", "Масса");
+	ar.serialize(mass, "mass", "РњР°СЃСЃР°");
 
 }
 

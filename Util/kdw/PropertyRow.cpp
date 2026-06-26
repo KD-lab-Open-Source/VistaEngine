@@ -304,11 +304,11 @@ bool PropertyRow::onContextMenu(PopupMenuItem &root, PropertyTree* tree)
 		if(!root.empty())
 			root.addSeparator();
 		PropertyRowContainer* container = safe_cast<PropertyRowContainer*>(parent());
-		root.add(TRANSLATE("Добавить перед элементом"), this, tree)
+		root.add(TRANSLATE("Р”РѕР±Р°РІРёС‚СЊ РїРµСЂРµРґ СЌР»РµРјРµРЅС‚РѕРј"), this, tree)
 			.connect(container, &PropertyRowContainer::onMenuChildInsertBefore)
 			.setHotkey(sKey(VK_INSERT | sKey::SHIFT))
 			.enable(!container->readOnly());
-		root.add(TRANSLATE("Удалить"), this, tree->model())
+		root.add(TRANSLATE("РЈРґР°Р»РёС‚СЊ"), this, tree->model())
 			.connect(container, &PropertyRowContainer::onMenuChildRemove)
 			.setHotkey(sKey(VK_DELETE))
 			.enable(!container->readOnly());
@@ -316,17 +316,17 @@ bool PropertyRow::onContextMenu(PopupMenuItem &root, PropertyTree* tree)
 	if(tree->canSearch()){
 		if(!root.empty())
 			root.addSeparator();
-		root.add(TRANSLATE("Искать в библиотеках..."), static_cast<PropertyRow*>(this))
+		root.add(TRANSLATE("РСЃРєР°С‚СЊ РІ Р±РёР±Р»РёРѕС‚РµРєР°С…..."), static_cast<PropertyRow*>(this))
 			.connect(tree, &PropertyTree::onSearch);
 	}
 	{
 		if(!root.empty())
 			root.addSeparator();
 		if(tree->rowHasVisibleChildren(this)){
-			root.add(expanded() ? TRANSLATE("Свернуть") : TRANSLATE("Развернуть"), static_cast<TreeRow*>(this), !expanded())
+			root.add(expanded() ? TRANSLATE("РЎРІРµСЂРЅСѓС‚СЊ") : TRANSLATE("Р Р°Р·РІРµСЂРЅСѓС‚СЊ"), static_cast<TreeRow*>(this), !expanded())
 				.connect(static_cast<Tree*>(tree), &Tree::expandRow);
 		}
-		root.add(TRANSLATE("Развернуть все"), static_cast<TreeRow*>(this))
+		root.add(TRANSLATE("Р Р°Р·РІРµСЂРЅСѓС‚СЊ РІСЃРµ"), static_cast<TreeRow*>(this))
 				.connect(static_cast<Tree*>(tree), &Tree::expandAll);
 	}
 
@@ -529,7 +529,7 @@ void TreeNode::intersect(const TreeNode* node)
 }
 */
 
-REGISTER_CLASS(PropertyRow, PropertyRow, "Структура");
+REGISTER_CLASS(PropertyRow, PropertyRow, "РЎС‚СЂСѓРєС‚СѓСЂР°");
 // ---------------------------------------------------------------------------
 
 PropertyRowWidget::~PropertyRowWidget()

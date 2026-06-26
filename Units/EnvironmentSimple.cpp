@@ -26,10 +26,10 @@ REGISTER_ENUM_ENCLOSED(UnitEnvironmentSimple, TREE_FLOATING, "TREE_FLOATING");
 END_ENUM_DESCRIPTOR_ENCLOSED(UnitEnvironmentSimple, TreeMode)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(UnitEnvironmentSimple, TreeType, "TreeType")
-REGISTER_ENUM_ENCLOSED(UnitEnvironmentSimple, FALL_AND_DISAPPEAR, "Падает и исчезает");
-REGISTER_ENUM_ENCLOSED(UnitEnvironmentSimple, FALL_AND_LIE, "Падает и лежит на земле");
-REGISTER_ENUM_ENCLOSED(UnitEnvironmentSimple, FALL_AND_LIE_OR_FLOAT, "Падает и лежит или плавает");
-REGISTER_ENUM_ENCLOSED(UnitEnvironmentSimple, FALL_AND_GROW, "Падает, исчезает и вырастает заново");
+REGISTER_ENUM_ENCLOSED(UnitEnvironmentSimple, FALL_AND_DISAPPEAR, "РџР°РґР°РµС‚ Рё РёСЃС‡РµР·Р°РµС‚");
+REGISTER_ENUM_ENCLOSED(UnitEnvironmentSimple, FALL_AND_LIE, "РџР°РґР°РµС‚ Рё Р»РµР¶РёС‚ РЅР° Р·РµРјР»Рµ");
+REGISTER_ENUM_ENCLOSED(UnitEnvironmentSimple, FALL_AND_LIE_OR_FLOAT, "РџР°РґР°РµС‚ Рё Р»РµР¶РёС‚ РёР»Рё РїР»Р°РІР°РµС‚");
+REGISTER_ENUM_ENCLOSED(UnitEnvironmentSimple, FALL_AND_GROW, "РџР°РґР°РµС‚, РёСЃС‡РµР·Р°РµС‚ Рё РІС‹СЂР°СЃС‚Р°РµС‚ Р·Р°РЅРѕРІРѕ");
 END_ENUM_DESCRIPTOR_ENCLOSED(UnitEnvironmentSimple, TreeType)
 
 UnitEnvironmentSimple::UnitEnvironmentSimple(const UnitTemplate& data)
@@ -80,7 +80,7 @@ void UnitEnvironmentSimple::showEditor()
 				modelSimple()->clearAttribute(ATTRUNKOBJ_IGNORE);
 	}
 
-	// Конверсия из симпл
+	// РљРѕРЅРІРµСЂСЃРёСЏ РёР· СЃРёРјРїР»
 	if(!dead() && !isEnvironmentSimple(environmentType_)){
 		UnitBase* unit = player()->buildUnit(AuxAttributeReference(AUX_ATTRIBUTE_ENVIRONMENT));
 		BinaryOArchive oa;
@@ -233,7 +233,7 @@ void UnitEnvironmentSimple::treeRebirth()
 void UnitEnvironmentSimple::serialize(Archive& ar) 
 {
 	if(environmentType_ == ENVIRONMENT_TREE){
-		ar.serialize(fallLeavesEnabled_, "enableFallingLeaves", "Включить падающие листья");
+		ar.serialize(fallLeavesEnabled_, "enableFallingLeaves", "Р’РєР»СЋС‡РёС‚СЊ РїР°РґР°СЋС‰РёРµ Р»РёСЃС‚СЊСЏ");
 		if(ar.isEdit() && environment->fallLeaves())
 			environment->fallLeaves()->serializeForModel(ar, modelName());
 	}
@@ -249,22 +249,22 @@ void UnitEnvironmentSimple::serialize(Archive& ar)
 
 	if(ar.isEdit() && environmentType_ != ENVIRONMENT_PHANTOM){
 		bool fenceFalling = treeMode_ == TREE_FALLING;
-		ar.serialize(fenceFalling, "fenceFalling", "Упавший забор");
+		ar.serialize(fenceFalling, "fenceFalling", "РЈРїР°РІС€РёР№ Р·Р°Р±РѕСЂ");
 		if(fenceFalling && treeMode_ != TREE_FALLING){
 			startFall(Vect3f::ZERO);
 			treeQuant();
 		}
 	}
 
-	ar.serialize(waterWeight_, "waterWeight", "Коэффициент воздействия течения воды [0..100]");
+	ar.serialize(waterWeight_, "waterWeight", "РљРѕСЌС„С„РёС†РёРµРЅС‚ РІРѕР·РґРµР№СЃС‚РІРёСЏ С‚РµС‡РµРЅРёСЏ РІРѕРґС‹ [0..100]");
 	if(environmentType_ == ENVIRONMENT_TREE)
-		ar.serialize(treeType_, "treeType", "Тип взаимодействия дерева");
+		ar.serialize(treeType_, "treeType", "РўРёРї РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ РґРµСЂРµРІР°");
 
 	if(environmentType_ == ENVIRONMENT_FENCE || environmentType_ == ENVIRONMENT_FENCE2)	
-		ar.serialize(destructibleFence_, "destructibleFence_", "Разрушаемый забор");
+		ar.serialize(destructibleFence_, "destructibleFence_", "Р Р°Р·СЂСѓС€Р°РµРјС‹Р№ Р·Р°Р±РѕСЂ");
 
 	if(environmentType_ == ENVIRONMENT_STONE)	
-		ar.serialize(stoneMass_, "stoneMass_", "Масса камня");
+		ar.serialize(stoneMass_, "stoneMass_", "РњР°СЃСЃР° РєР°РјРЅСЏ");
 
 	if((environmentType_ == ENVIRONMENT_FENCE || environmentType_ == ENVIRONMENT_FENCE2) && destructibleFence_) 
 		deathParameters_.serializeEnvironment(ar);
@@ -321,7 +321,7 @@ void UnitEnvironmentSimple::setModel(const char* name)
 			modelIn = terScene->CreateSimply3dxDetached(name, "burnt");
 		
 		if(!modelIn){
-			xassertStr(!"Модель или группа видимости не найденна", name);
+			xassertStr(!"РњРѕРґРµР»СЊ РёР»Рё РіСЂСѓРїРїР° РІРёРґРёРјРѕСЃС‚Рё РЅРµ РЅР°Р№РґРµРЅРЅР°", name);
 			modelName_ = name;
 			Kill();
 			return;
@@ -470,7 +470,7 @@ void UnitEnvironmentSimple::collision(UnitBase* p, const ContactInfo& contactInf
 	if(environmentType_ & (ENVIRONMENT_BUSH | ENVIRONMENT_STONE | ENVIRONMENT_FENCE | ENVIRONMENT_FENCE2 | ENVIRONMENT_TREE))
 		__super::collision(p, contactInfo);
 	
-	// Шевеление куста
+	// РЁРµРІРµР»РµРЅРёРµ РєСѓСЃС‚Р°
 	if(environmentType_ == ENVIRONMENT_BUSH  && springDamping3DX_ && p->rigidBody() && p->attr().isLegionary() && safe_cast<UnitLegionary*>(p)->formationUnit_.unitMove()){
 		Vect3f direction(0.0f, float(logicRNDinterval(-60, 60)), 0.0f);
 		p->pose().xformVect(direction);
@@ -642,7 +642,7 @@ void UnitEnvironmentSimple::enableBoxMode()
 			return;
 
 		default:
-			xxassert(0, "Неизвестный environmentType");
+			xxassert(0, "РќРµРёР·РІРµСЃС‚РЅС‹Р№ environmentType");
 			return;
 	}
 
@@ -690,7 +690,7 @@ void UnitEnvironmentSimple::stopFall()
 			return;
 
 		default:
-			xxassert(0, "Неизвестный environmentType");
+			xxassert(0, "РќРµРёР·РІРµСЃС‚РЅС‹Р№ environmentType");
 			return;
 	}
 

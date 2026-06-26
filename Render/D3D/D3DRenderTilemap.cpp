@@ -204,7 +204,7 @@ void cTileMapRender::restoreManagedResource()
 		int ys = TileSize.y >> bumpGeoScale[iLod];
 
 		index_offset[iLod]=cur_offset;
-		index_size[iLod]=6*xs*ys;//?????? может 2 а не 6
+		index_size[iLod]=6*xs*ys;//?????? РјРѕР¶РµС‚ 2 Р° РЅРµ 6
 		cur_offset+=index_size[iLod];
 	}
 
@@ -336,7 +336,7 @@ sTilemapTexturePool::sTilemapTexturePool(int width, int height, D3DFORMAT format
 		0, format, D3DPOOL_MANAGED, &pTex,0));
 	texture = pTex;
 	//D3DFMT_A8R8G8B8
-/* Этот кусок теоретически лучше, но надо проверить на Geforce 2
+/* Р­С‚РѕС‚ РєСѓСЃРѕРє С‚РµРѕСЂРµС‚РёС‡РµСЃРєРё Р»СѓС‡С€Рµ, РЅРѕ РЅР°РґРѕ РїСЂРѕРІРµСЂРёС‚СЊ РЅР° Geforce 2
 	RDCALL(renderer->lpD3DDevice->CreateTexture(
 		texture_width, texture_height, 1,
 		D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture,0));
@@ -694,8 +694,8 @@ void cTileMapRender::SetTilesToRender(Camera* camera)
 				sTile& Tile = tileMap_->GetTile(x, y);
 				int& bumpTileID = Tile.bumpTileID;
 
-				// calc LOD считается всегда по отношению к прямой камере для 
-				// избежания случая 2 разных LOD в одно время 
+				// calc LOD СЃС‡РёС‚Р°РµС‚СЃСЏ РІСЃРµРіРґР° РїРѕ РѕС‚РЅРѕС€РµРЅРёСЋ Рє РїСЂСЏРјРѕР№ РєР°РјРµСЂРµ РґР»СЏ 
+				// РёР·Р±РµР¶Р°РЅРёСЏ СЃР»СѓС‡Р°СЏ 2 СЂР°Р·РЅС‹С… LOD РІ РѕРґРЅРѕ РІСЂРµРјСЏ 
 				float dist = camera->GetPos().distance(coord + dcoord/2);
 				int iLod;
 				for(iLod = 0; iLod < TILEMAP_LOD; iLod++)
@@ -802,7 +802,7 @@ void cTileMapRender::DrawBump(Camera* camera,eBlendMode MatMode,bool shadow,bool
 			for(int j = 0; j < bumpTile->index.size(); j++){
 				sPlayerIB& pib=bumpTile->index[j];
 
-				if(drawBump){ //не оптимально
+				if(drawBump){ //РЅРµ РѕРїС‚РёРјР°Р»СЊРЅРѕ
 					bool isIce = tileMap_->setMaterial(pib.material, MatMode);
 					if(isIce){
 						zReflection += bumpTile->zavr;
@@ -870,10 +870,10 @@ void cTileMapRender::DrawBump(Camera* camera,eBlendMode MatMode,bool shadow,bool
 }
 
 /*
- Ищет граничные точки у полигона в квадрате xmin,ymin,xmin+dx,ymin+dy.
+ РС‰РµС‚ РіСЂР°РЅРёС‡РЅС‹Рµ С‚РѕС‡РєРё Сѓ РїРѕР»РёРіРѕРЅР° РІ РєРІР°РґСЂР°С‚Рµ xmin,ymin,xmin+dx,ymin+dy.
 
- В Interval xr - включается в интервал. 
- Линия считается "толстой", то есть от точки y до y+1
+ Р’ Interval xr - РІРєР»СЋС‡Р°РµС‚СЃСЏ РІ РёРЅС‚РµСЂРІР°Р». 
+ Р›РёРЅРёСЏ СЃС‡РёС‚Р°РµС‚СЃСЏ "С‚РѕР»СЃС‚РѕР№", С‚Рѕ РµСЃС‚СЊ РѕС‚ С‚РѕС‡РєРё y РґРѕ y+1
 */
 RENDER_API void EdgeDetection(MultiRegion& region,int xmin,int ymin,int dx,int dy,vector<Vect2i>& edge_point)
 {
@@ -893,8 +893,8 @@ RENDER_API void EdgeDetection(MultiRegion& region,int xmin,int ymin,int dx,int d
 		MultiRegion::Line& linem=(y-1>=0)?lines[y-1]:line;
 		MultiRegion::Line& linep=(y+1<lines.size())?lines[y+1]:line;
 	
-		//Двигаемся по линии вперед, и смотрим
-		//Если сверху и снизу все закрыто - значит не граничная.
+		//Р”РІРёРіР°РµРјСЃСЏ РїРѕ Р»РёРЅРёРё РІРїРµСЂРµРґ, Рё СЃРјРѕС‚СЂРёРј
+		//Р•СЃР»Рё СЃРІРµСЂС…Сѓ Рё СЃРЅРёР·Сѓ РІСЃРµ Р·Р°РєСЂС‹С‚Рѕ - Р·РЅР°С‡РёС‚ РЅРµ РіСЂР°РЅРёС‡РЅР°СЏ.
 		MultiRegion::Line::iterator it,itm,itp;
 		it=line.begin();
 		itm=linem.begin();
@@ -930,7 +930,7 @@ RENDER_API void EdgeDetection(MultiRegion& region,int xmin,int ymin,int dx,int d
 				break;
 
 			MultiRegion::Interval& i=*it;
-			if(type)//Есть точка
+			if(type)//Р•СЃС‚СЊ С‚РѕС‡РєР°
 			{
 				bool add_up=false,add_down=false;
 				if(i.x0==x)
@@ -1016,10 +1016,10 @@ void sBumpTile::CalcVertex(cTileMap *TileMap)
 //	if(tile_pos.x==20 && tile_pos.y==23)
 //		TestPoint(Vect2i(1280,1536));
 
-//if(columns[player]->filled(xx,yy)) //Эта операция должна ускориться с переходом на мультирегион.
-//EdgeDetection - Ускорится, потому как будет в 2 раза меньше точек.
-//Добавление в регион с одной стороны ускорится, потому как будет меньше регионов, с другой стороны замедлится, 
-// потому как регионы будут более сложной формы, но в среднем должна ускориться.
+//if(columns[player]->filled(xx,yy)) //Р­С‚Р° РѕРїРµСЂР°С†РёСЏ РґРѕР»Р¶РЅР° СѓСЃРєРѕСЂРёС‚СЊСЃСЏ СЃ РїРµСЂРµС…РѕРґРѕРј РЅР° РјСѓР»СЊС‚РёСЂРµРіРёРѕРЅ.
+//EdgeDetection - РЈСЃРєРѕСЂРёС‚СЃСЏ, РїРѕС‚РѕРјСѓ РєР°Рє Р±СѓРґРµС‚ РІ 2 СЂР°Р·Р° РјРµРЅСЊС€Рµ С‚РѕС‡РµРє.
+//Р”РѕР±Р°РІР»РµРЅРёРµ РІ СЂРµРіРёРѕРЅ СЃ РѕРґРЅРѕР№ СЃС‚РѕСЂРѕРЅС‹ СѓСЃРєРѕСЂРёС‚СЃСЏ, РїРѕС‚РѕРјСѓ РєР°Рє Р±СѓРґРµС‚ РјРµРЅСЊС€Рµ СЂРµРіРёРѕРЅРѕРІ, СЃ РґСЂСѓРіРѕР№ СЃС‚РѕСЂРѕРЅС‹ Р·Р°РјРµРґР»РёС‚СЃСЏ, 
+// РїРѕС‚РѕРјСѓ РєР°Рє СЂРµРіРёРѕРЅС‹ Р±СѓРґСѓС‚ Р±РѕР»РµРµ СЃР»РѕР¶РЅРѕР№ С„РѕСЂРјС‹, РЅРѕ РІ СЃСЂРµРґРЅРµРј РґРѕР»Р¶РЅР° СѓСЃРєРѕСЂРёС‚СЊСЃСЏ.
 
 
 	int ymin=tile_pos.y*TILEMAP_SIZE;
@@ -1375,8 +1375,8 @@ U_E* InitPosToU()
 }
 
 
-//Как переделать. Если точка снаружи, проверяем тайл.
-//Генерим border_lod для нее ищем точку, а потом сдвигаем обратно.
+//РљР°Рє РїРµСЂРµРґРµР»Р°С‚СЊ. Р•СЃР»Рё С‚РѕС‡РєР° СЃРЅР°СЂСѓР¶Рё, РїСЂРѕРІРµСЂСЏРµРј С‚Р°Р№Р».
+//Р“РµРЅРµСЂРёРј border_lod РґР»СЏ РЅРµРµ РёС‰РµРј С‚РѕС‡РєСѓ, Р° РїРѕС‚РѕРј СЃРґРІРёРіР°РµРј РѕР±СЂР°С‚РЅРѕ.
 
 enum E_COLLAPSE
 {
@@ -1394,13 +1394,13 @@ E_COLLAPSE CollapsePointIn(Vect2i& pround,int dx,int dy,int LOD,char* border_lod
 	pround.y=(dy+xstep2)>>step;
 
 	if(pround.x>0 && pround.x<dd && 
-		pround.y>0 && pround.y<dd)//Точка внктри тайла и не соприкасается с внешними.
+		pround.y>0 && pround.y<dd)//РўРѕС‡РєР° РІРЅРєС‚СЂРё С‚Р°Р№Р»Р° Рё РЅРµ СЃРѕРїСЂРёРєР°СЃР°РµС‚СЃСЏ СЃ РІРЅРµС€РЅРёРјРё.
 	{
 		return E_IN;
 	}
 
-	//Граничные точки.
-	//Если точка внутри, смотрим с какими граничит по осям x и y, и округляем.
+	//Р“СЂР°РЅРёС‡РЅС‹Рµ С‚РѕС‡РєРё.
+	//Р•СЃР»Рё С‚РѕС‡РєР° РІРЅСѓС‚СЂРё, СЃРјРѕС‚СЂРёРј СЃ РєР°РєРёРјРё РіСЂР°РЅРёС‡РёС‚ РїРѕ РѕСЃСЏРј x Рё y, Рё РѕРєСЂСѓРіР»СЏРµРј.
 	if(dx>=0 && dx<=TILEMAP_SIZE && dy>=0 && dy<=TILEMAP_SIZE)
 	{
 		int xstep=1<<step;
@@ -1442,9 +1442,9 @@ bool sBumpTile::CollapsePoint(Vect2i& pround,int dx,int dy)
 		return true;
 	}
 
-	//Если точка снаружи, смотрим в какой тайл она попала, 
-	//проверяем, граничная ли она, если не граничная - false,
-	//если граничная, приводим к границе.
+	//Р•СЃР»Рё С‚РѕС‡РєР° СЃРЅР°СЂСѓР¶Рё, СЃРјРѕС‚СЂРёРј РІ РєР°РєРѕР№ С‚Р°Р№Р» РѕРЅР° РїРѕРїР°Р»Р°, 
+	//РїСЂРѕРІРµСЂСЏРµРј, РіСЂР°РЅРёС‡РЅР°СЏ Р»Рё РѕРЅР°, РµСЃР»Рё РЅРµ РіСЂР°РЅРёС‡РЅР°СЏ - false,
+	//РµСЃР»Рё РіСЂР°РЅРёС‡РЅР°СЏ, РїСЂРёРІРѕРґРёРј Рє РіСЂР°РЅРёС†Рµ.
 	int side=-1;
 	if(dy<0)
 	{
@@ -1477,7 +1477,7 @@ bool sBumpTile::CollapsePoint(Vect2i& pround,int dx,int dy)
 	}
 //	xassert(side>=0);
 
-	char side_border_lod[4];//Для уменьшения количества расчетов.
+	char side_border_lod[4];//Р”Р»СЏ СѓРјРµРЅСЊС€РµРЅРёСЏ РєРѕР»РёС‡РµСЃС‚РІР° СЂР°СЃС‡РµС‚РѕРІ.
 	char side_lod=border_lod[side];
 
 	for(int u=0;u<4;u++)
@@ -1561,7 +1561,7 @@ bool sBumpTile::CollapsePoint(Vect2i& pround,int dx,int dy)
 	char dd=TILEMAP_SIZE>>step;
 
 	if(pround.x>=0 && pround.x<=dd && 
-		pround.y>=0 && pround.y<=dd)//Точка внктри тайла и не соприкасается с внешними.
+		pround.y>=0 && pround.y<=dd)//РўРѕС‡РєР° РІРЅРєС‚СЂРё С‚Р°Р№Р»Р° Рё РЅРµ СЃРѕРїСЂРёРєР°СЃР°РµС‚СЃСЏ СЃ РІРЅРµС€РЅРёРјРё.
 	{
 		return true;
 	}
@@ -1570,28 +1570,28 @@ bool sBumpTile::CollapsePoint(Vect2i& pround,int dx,int dy)
 }
 
 /*
-1) Убрать Fixed pipeline.
-2) Написать шейдер для Geforce FX c с освещением. С тенями и без.
-   4 текстуры - diffuse, light map, bump map, shadow map.
-   миниум - diffuse, bump map.
-3) Распространить результаты на Radeon 9800, Geforce 3, Radeon 8500.
+1) РЈР±СЂР°С‚СЊ Fixed pipeline.
+2) РќР°РїРёСЃР°С‚СЊ С€РµР№РґРµСЂ РґР»СЏ Geforce FX c СЃ РѕСЃРІРµС‰РµРЅРёРµРј. РЎ С‚РµРЅСЏРјРё Рё Р±РµР·.
+   4 С‚РµРєСЃС‚СѓСЂС‹ - diffuse, light map, bump map, shadow map.
+   РјРёРЅРёСѓРј - diffuse, bump map.
+3) Р Р°СЃРїСЂРѕСЃС‚СЂР°РЅРёС‚СЊ СЂРµР·СѓР»СЊС‚Р°С‚С‹ РЅР° Radeon 9800, Geforce 3, Radeon 8500.
 
-Варианты вывода.
-Два варианта освещением на pixel shader и vertex shader.
+Р’Р°СЂРёР°РЅС‚С‹ РІС‹РІРѕРґР°.
+Р”РІР° РІР°СЂРёР°РЅС‚Р° РѕСЃРІРµС‰РµРЅРёРµРј РЅР° pixel shader Рё vertex shader.
 
-Минимальный - без теней, с освещением на vertex shader. 
-              Будет работать более менее быстро на всём заявленном оборудовании.
+РњРёРЅРёРјР°Р»СЊРЅС‹Р№ - Р±РµР· С‚РµРЅРµР№, СЃ РѕСЃРІРµС‰РµРЅРёРµРј РЅР° vertex shader. 
+              Р‘СѓРґРµС‚ СЂР°Р±РѕС‚Р°С‚СЊ Р±РѕР»РµРµ РјРµРЅРµРµ Р±С‹СЃС‚СЂРѕ РЅР° РІСЃС‘Рј Р·Р°СЏРІР»РµРЅРЅРѕРј РѕР±РѕСЂСѓРґРѕРІР°РЅРёРё.
 
-Средний без теней - освещение + light map.
+РЎСЂРµРґРЅРёР№ Р±РµР· С‚РµРЅРµР№ - РѕСЃРІРµС‰РµРЅРёРµ + light map.
 
-Максимальный - освещение на pixel shader + тени + light map.
-               Разные варианты для Geforce FX и Radeon 9800.
-			   4 и 16 сэмплов.
+РњР°РєСЃРёРјР°Р»СЊРЅС‹Р№ - РѕСЃРІРµС‰РµРЅРёРµ РЅР° pixel shader + С‚РµРЅРё + light map.
+               Р Р°Р·РЅС‹Рµ РІР°СЂРёР°РЅС‚С‹ РґР»СЏ Geforce FX Рё Radeon 9800.
+			   4 Рё 16 СЃСЌРјРїР»РѕРІ.
 
-Варианты под Geforce 3 и Radeon 8500 делать потом.
+Р’Р°СЂРёР°РЅС‚С‹ РїРѕРґ Geforce 3 Рё Radeon 8500 РґРµР»Р°С‚СЊ РїРѕС‚РѕРј.
 
 
-Настройки (влияющие на выбор шейдера)-
+РќР°СЃС‚СЂРѕР№РєРё (РІР»РёСЏСЋС‰РёРµ РЅР° РІС‹Р±РѕСЂ С€РµР№РґРµСЂР°)-
    Shadow map - on,off
    Normal detail - vertex shader, pixel shader
    Shadow map quality - 2x2, 4x4

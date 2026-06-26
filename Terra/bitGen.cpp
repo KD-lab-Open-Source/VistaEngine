@@ -8,7 +8,7 @@ BitGenDispatcher bitGenDispatcher;
 void sBitGenMetodExp::generate(sTerrainBitmapBase& tb)
 {
 	unsigned int storeRnd=XRndGet();
-	XRndSet(rndVal); //!Важно
+	XRndSet(rndVal); //!Р’Р°Р¶РЅРѕ
 	float fMaxHeight=abs(maxHeight);
 	if(fMaxHeight < 1e-5f) fMaxHeight=1e-5f;
 	float kExpF=-1.f/logf(1.f/(34.f*(fMaxHeight*VOXEL_DIVIDER)));
@@ -38,7 +38,7 @@ extern float turbulence(float point[3], float lofreq, float hifreq);
 void sBitGenMetodPN::generate(sTerrainBitmapBase& tb)
 {
 	unsigned int storeRnd=XRndGet();
-	XRndSet(rndVal); //!Важно
+	XRndSet(rndVal); //!Р’Р°Р¶РЅРѕ
 	float fMaxHeight=abs(maxHeight);
 	if(fMaxHeight < 1e-5f) fMaxHeight=1e-5f;
 	float kExpF=-1.f/logf(1.f/(34.f*(fMaxHeight*VOXEL_DIVIDER)));
@@ -76,7 +76,7 @@ void sBitGenMetodPN::generate(sTerrainBitmapBase& tb)
 void sBitGenMetodMPD::generate(sTerrainBitmapBase& tb)
 {
 	unsigned int storeRnd=XRndGet();
-	XRndSet(rndVal); //!Важно
+	XRndSet(rndVal); //!Р’Р°Р¶РЅРѕ
 	float fMaxHeight=abs(maxHeight);
 	if(fMaxHeight < 1e-5f) fMaxHeight=1e-5f;
 	float kExpF=-1.f/logf(1.f/(34.f*(fMaxHeight*VOXEL_DIVIDER)));
@@ -366,7 +366,7 @@ sTerrainBitmap* BitGenDispatcher::getTerrainBitmap(int sx, int sy, sBitGenMetod*
 		}
 	}
 	if(p==bitmaps_.end()){
-		//добавление нового битмапа
+		//РґРѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕРіРѕ Р±РёС‚РјР°РїР°
 		if(bitmaps_.size() >= CASH_MAX){
 			delete bitmaps_.front();
 			bitmaps_.pop_front();

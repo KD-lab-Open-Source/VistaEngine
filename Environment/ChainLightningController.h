@@ -27,23 +27,23 @@ struct ChainLightningOwnerInterface
 
 
 struct ChainLightningAttribute{
-	/// сколько раз молния может переотразится
+	/// СЃРєРѕР»СЊРєРѕ СЂР°Р· РјРѕР»РЅРёСЏ РјРѕР¶РµС‚ РїРµСЂРµРѕС‚СЂР°Р·РёС‚СЃСЏ
 	int chainFactor_;
-	/// сколько отвилок может быть от одного юнита 
+	/// СЃРєРѕР»СЊРєРѕ РѕС‚РІРёР»РѕРє РјРѕР¶РµС‚ Р±С‹С‚СЊ РѕС‚ РѕРґРЅРѕРіРѕ СЋРЅРёС‚Р° 
 	int unitChainFactor_;
 
-	/// в каком радиусе действует цепной эффект
+	/// РІ РєР°РєРѕРј СЂР°РґРёСѓСЃРµ РґРµР№СЃС‚РІСѓРµС‚ С†РµРїРЅРѕР№ СЌС„С„РµРєС‚
 	float chainRadius_;
-	/// максимальная длина отраженной молнии
+	/// РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ РґР»РёРЅР° РѕС‚СЂР°Р¶РµРЅРЅРѕР№ РјРѕР»РЅРёРё
 	float unitChainRadius_;
 
-	/// параметры отдельной молнии для атаки
+	/// РїР°СЂР°РјРµС‚СЂС‹ РѕС‚РґРµР»СЊРЅРѕР№ РјРѕР»РЅРёРё РґР»СЏ Р°С‚Р°РєРё
 	EffectReference  strike_effect_;
 
-	/// время распространения молнии на все доступные уровни
+	/// РІСЂРµРјСЏ СЂР°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёСЏ РјРѕР»РЅРёРё РЅР° РІСЃРµ РґРѕСЃС‚СѓРїРЅС‹Рµ СѓСЂРѕРІРЅРё
 	float spreadingTime_;
 
-	/// воздействие на юниты
+	/// РІРѕР·РґРµР№СЃС‚РІРёРµ РЅР° СЋРЅРёС‚С‹
 	AbnormalStateAttribute abnormalState_;
 
 	ChainLightningAttribute();
@@ -56,19 +56,19 @@ public:
 	ChainLightningController(ChainLightningOwnerInterface* owner = 0);
 	~ChainLightningController();
 
-	// update можно на каждом кванте не вызывать
+	// update РјРѕР¶РЅРѕ РЅР° РєР°Р¶РґРѕРј РєРІР°РЅС‚Рµ РЅРµ РІС‹Р·С‹РІР°С‚СЊ
 	bool needChainUpdate() const { return !grafValid_ || chainUpdateTimer_.finished(); }
-	// перестроить дерево молний
+	// РїРµСЂРµСЃС‚СЂРѕРёС‚СЊ РґРµСЂРµРІРѕ РјРѕР»РЅРёР№
 	void update(const UnitActingList& lightningsEmitters);
 
 	void start(const ChainLightningAttribute* attr);
 	void stop();
 	bool active() const { return phase_ != NOT_STARTED; }
 
-	// отрисовка и нанесение урона
+	// РѕС‚СЂРёСЃРѕРІРєР° Рё РЅР°РЅРµСЃРµРЅРёРµ СѓСЂРѕРЅР°
 	void quant();
 
-	// немедленная остановка
+	// РЅРµРјРµРґР»РµРЅРЅР°СЏ РѕСЃС‚Р°РЅРѕРІРєР°
 	void release();
 
 	void showDebug() const;
@@ -77,7 +77,7 @@ private:
 	const ChainLightningAttribute* attr_;
 	ChainLightningOwnerInterface* owner_;
 
-	/// повреждения, наносимые за квант
+	/// РїРѕРІСЂРµР¶РґРµРЅРёСЏ, РЅР°РЅРѕСЃРёРјС‹Рµ Р·Р° РєРІР°РЅС‚
 	ParameterSet damage_;
 
 	bool grafValid_;

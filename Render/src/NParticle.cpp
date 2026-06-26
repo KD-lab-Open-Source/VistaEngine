@@ -115,7 +115,7 @@ bool cEmitterColumnLight::isAlive()
 }
 bool cEmitterColumnLight::isVisible(Camera* camera)
 {
-	return true;//!!!!!������������� ��������� � �������������������, ���������!
+	return true;//!!!!!Потенциальная проблемма с производительностью, исправить!
 }
 void cEmitterColumnLight::setDummyTime(float t)
 {
@@ -212,7 +212,7 @@ void cEmitterColumnLight::Draw(Camera* camera)
 	gb_RenderDevice->SetSamplerDataVirtual(1,sampler_wrap_linear);
 
 	bool reflectionz = camera->getAttribute(ATTRCAMERA_REFLECTION) != 0;
-	{//������� �� � �����, ���� ������ �� ��������, ��� ���������.
+	{//Немного не к месту, зато быстро по скорости, для отражений.
 		gb_RenderDevice3D->SetTexture(5,camera->GetZTexture());
 		gb_RenderDevice3D->SetSamplerData(5,sampler_clamp_linear);
 	}
@@ -1065,7 +1065,7 @@ bool cPlume::PutToBuf(Vect3f& npos, float& dt,
 					const UCHAR mode,float PlumeInterval,float time_summary)
 {
 	float InvPlumeInterval=1/PlumeInterval;
-	//��������� ����� �����.
+	//Добавляем новые точки.
 	float time_one_segment=PlumeInterval/(plumes.size()-2);
 	{
 		if(plumes_size==0)
@@ -1126,9 +1126,9 @@ bool cPlume::PutToBuf(Vect3f& npos, float& dt,
 		Tangent.normalize();
 
 		float phase=(time_summary-p.time_summary)*InvPlumeInterval;
-		//�� �������� ���� ��������� phase � �������� ��������� �����,
-		//����� ����� ����� ��������� ������������ sRectangle4f& rt
-		//����� ������ �������� �� ����� ������ ��������.
+		//По хорошему надо клиповать phase и сдвигать начальную точку,
+		//тогда можно будет корректно пользоваться sRectangle4f& rt
+		//Нужно только тестиков по этому поводу написать.
 		
 		p1.u1()=p2.u1()=phase;
 		p1.v1()=0;p2.v1()=1;
@@ -1152,7 +1152,7 @@ bool cPlume::PutToBuf(Vect3f& npos, float& dt,
 		p2.pos.add(p.pos,Orientation);
 
 		if(counter>0)
-		{//��������� ������� �����.
+		{//Эмулируем квадами стрип.
 			v[2]=p1;
 			v[3]=p2;
 		}
@@ -1207,7 +1207,7 @@ void cEmitterInt::Draw(Camera* camera)
 
 	gb_RenderDevice->SetSamplerDataVirtual(0,emitterKey()->chPlume?sampler_clamp_linear:sampler_wrap_linear);
 	bool reflectionz = camera->getAttribute(ATTRCAMERA_REFLECTION) != 0;
-	{//������� �� � �����, ���� ������ �� ��������, ��� ���������.
+	{//Немного не к месту, зато быстро по скорости, для отражений.
 		gb_RenderDevice3D->SetTexture(5,camera->GetZTexture());
 		gb_RenderDevice3D->SetSamplerData(5,sampler_clamp_linear);
 	}
@@ -1242,9 +1242,9 @@ void cEmitterInt::Draw(Camera* camera)
 
 	int keys_size2 = keys.size()-2;
 	int size=Particle.size();
-//#define SHORT_SORT  //���� ������ ��� �����!!!!!! �� ��������!
+//#define SHORT_SORT  //Этот макрос для теста!!!!!! НЕ включать!
 #ifdef SHORT_SORT
-	//���� ���� � ��������, ������ ��� ����� �������� ������������ ��������.
+	//Тупо пока и медленно, просто для теста качества получающейся картинки.
 	vector<SHORT_INDEX> sort_index(size);
 	vector<float> zfloat_index(size);
 	float zfloat_index_min=0,zfloat_index_max=1;
@@ -1371,7 +1371,7 @@ void cEmitterInt::Draw(Camera* camera)
 			mat.xformVect(-p.vdir,dir);
 			angle += atan2(dir.x,dir.y)*INV_2_PI;
 		}
-		//�������� � ������
+		//Добавить в массив
 		Vect3f sx(Vect3f::ID),sy(Vect3f::ID);
 		Vect2f rot=rotate_angle[int(round(angle*rotate_angle_size))&rotate_angle_mask];
 		Vect2f sincos = rot;
@@ -1634,7 +1634,7 @@ void cEmitterInt::EmitInstantly(float tmin, float tmax)
 				parent->RecalcBeginPos(num);
 				num = parent->GetPos().size();
 			}
-			Particle.resize(prevsize + num);//������������ ������ ������� ����, ��������� ����� ���� �������� ���� ������.
+			Particle.resize(prevsize + num);//Потенциально кривой участок кода, некоторый может быть излишний рост буфера.
 			for(int i=0; i< num; i++){
 //				dprintf("EmitOne tmin=%f, tmax=%f\n",tmin,tmax);
 				if(particle_position.type == EMP_3DMODEL)
@@ -1656,8 +1656,8 @@ void cEffect::RecalcBeginPos(int num)
 
 	model->GetVisibilityVertex(begin_position,normal_position);
 
-	mat.rot().xrow().normalize(); // ������� ��� cSimply3dx
-	mat.rot().yrow().normalize(); // ����� ������ ��� ������� �����
+	mat.rot().xrow().normalize(); // Сделано для cSimply3dx
+	mat.rot().yrow().normalize(); // потом думать как сделать лучше
 	mat.rot().zrow().normalize();
 	mat.Invert();
 	for (int i=0; i<begin_position.size(); i++)
@@ -2041,7 +2041,7 @@ void cEmitterSpline::Draw(Camera* camera)
 
 	gb_RenderDevice->SetSamplerDataVirtual(0,emitterKey()->chPlume?sampler_clamp_linear:sampler_wrap_linear);
 	bool reflectionz = camera->getAttribute(ATTRCAMERA_REFLECTION) != 0;
-	{//������� �� � �����, ���� ������ �� ��������, ��� ���������.
+	{//Немного не к месту, зато быстро по скорости, для отражений.
 		gb_RenderDevice3D->SetTexture(5,camera->GetZTexture());
 		gb_RenderDevice3D->SetSamplerData(5,sampler_clamp_linear);
 	}
@@ -2120,7 +2120,7 @@ void cEmitterSpline::Draw(Camera* camera)
 				Bound.addPoint(pos);
 		}
 
-		//�������� � ������
+		//Добавить в массив
 		Vect3f sx,sy;
 		Vect2f rot=rotate_angle[int(round(angle*rotate_angle_size))&rotate_angle_mask];
 		Vect2f sincos = rot;
@@ -3242,7 +3242,7 @@ void cEffect::SetTime(float t)
 }
 void cEffect::MoveToTime(float t)
 {
-	const float dt=1.0f;//����������
+	const float dt=1.0f;//милисекунд
 	vector<cEmitterInterface*>::iterator it;
 	FOR_EACH(emitters,it)
 		(*it)->setDummyTime(dt);
@@ -3504,7 +3504,7 @@ void cEmitterZ::Draw(Camera* camera)
 	}
 	gb_RenderDevice->SetSamplerDataVirtual(0,sampler_wrap_linear);
 	bool reflectionz=camera->getAttribute(ATTRCAMERA_REFLECTION);
-	{//������� �� � �����, ���� ������ �� ��������, ��� ���������.
+	{//Немного не к месту, зато быстро по скорости, для отражений.
 		gb_RenderDevice3D->SetTexture(5,camera->GetZTexture());
 		gb_RenderDevice3D->SetSamplerData(5,sampler_clamp_linear);
 	}
@@ -3542,7 +3542,7 @@ void cEmitterZ::Draw(Camera* camera)
 		KeyParticleInt& k1=keys[p.key+1];
 		float& t=p.time;
 
-		if (p.key==keys_size2&&t+dtime>k0.dtime)//�������� ������� � ��������� �����, ������ ��� ��� �������� ����������� ������� ����� ������ �� ������������.
+		if (p.key==keys_size2&&t+dtime>k0.dtime)//Рисовать частицу в последний квант, потому как при коротких промежутках времени может вообще не нарисоваться.
 		{
 //			dprintf("Free time=%f, t=%f, dtime=%f\n",time,t,dtime);
 			if(SetFreeOrCycle(i))
@@ -3574,7 +3574,7 @@ void cEmitterZ::Draw(Camera* camera)
 		else
 			Bound.addPoint(pos);
 
-		//�������� � ������
+		//Добавить в массив
 		Vect3f sx,sy;
 		Vect2f rot=rotate_angle[int(round(angle*rotate_angle_size))&rotate_angle_mask];
 		rot*=psize*=p.begin_size;
@@ -4158,7 +4158,7 @@ EffectKey* EffectLibrary2::Copy(EffectKey* ref,float scale,const char* texture_p
 	list.push_back(entry);
 
 	*ek=*ref;
-//	ek->changeTexturePath(texture_path); ��� ������ ������, ������ ��������� � �����������.
+//	ek->changeTexturePath(texture_path); Тут нельзя менять, должно совпадать с загруженным.
 	ek->preloadTexture();
 
 	if(!FLOAT_EQUAL(scale, 1.0f))

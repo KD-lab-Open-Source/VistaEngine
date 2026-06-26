@@ -425,7 +425,7 @@ public:
 	}
 	void operator delete(void*)
 	{
-		xxassert(false, "попытка удаления объекта из PhysicsPool");
+		xxassert(false, "РїРѕРїС‹С‚РєР° СѓРґР°Р»РµРЅРёСЏ РѕР±СЉРµРєС‚Р° РёР· PhysicsPool");
 	}
 	
 protected:

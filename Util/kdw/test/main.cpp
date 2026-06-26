@@ -97,7 +97,7 @@ MainWindow::MainWindow(kdw::Application& app)
 	add(pages); 
 	{	
 		kdw::VBox* vbox = new kdw::VBox;
-		pages->add("“ÂÒÚ ËÌÚÂÙÂÈÒ‡", vbox);
+		pages->add("–¢–µ—Å—Ç –∏–Ω—Ç–µ—Ä—Ñ–µ–π—Å–∞", vbox);
 		{
 			kdw::CommandManager* commands = new kdw::CommandManager();
 			kdw::Toolbar* toolbar = new kdw::Toolbar(commands);
@@ -106,9 +106,9 @@ MainWindow::MainWindow(kdw::Application& app)
 			imageStore->addFromFile("res\\FX_PAN_256.bmp", RGB(255, 0, 255));
 			toolbar->setImageStore(imageStore);
 
-			commands->get("main.test1", "œÓ‚ÂÍ‡");
-			commands->get("main.test2", "¬ÚÓÓÈ");
-			commands->get("main.test3", "“ÂÚËÈ");
+			commands->get("main.test1", "–ü—Ä–æ–≤–µ—Ä–∫–∞");
+			commands->get("main.test2", "–í—Ç–æ—Ä–æ–π");
+			commands->get("main.test3", "–¢—Ä–µ—Ç–∏–π");
 			toolbar->addButton("main.test1", 0);
 			toolbar->addButton("main.test2", 1);
 			toolbar->addButton("main.test3", 2);
@@ -123,15 +123,15 @@ MainWindow::MainWindow(kdw::Application& app)
 					kdw::VBox* vbox = new kdw::VBox(4, 6);
 					//vsplitter->add(vbox);
 					{
-						vbox->add(new kdw::Label("√ÛÔÔ‡ 1:", true));
+						vbox->add(new kdw::Label("–ì—Ä—É–ø–ø–∞ 1:", true));
 
 						kdw::ComboBox* comboBox = new kdw::ComboBox;
-						comboBox->add("¬‡Ë‡ÌÚ 1");
-						comboBox->add("¬‡Ë‡ÌÚ 2");
-						comboBox->add("¬‡Ë‡ÌÚ 3");
+						comboBox->add("–í–∞—Ä–∏–∞–Ω—Ç 1");
+						comboBox->add("–í–∞—Ä–∏–∞–Ω—Ç 2");
+						comboBox->add("–í–∞—Ä–∏–∞–Ω—Ç 3");
 						vbox->add(comboBox);
 
-						kdw::Button* button = new kdw::Button("¬&˚ıÓ‰");
+						kdw::Button* button = new kdw::Button("–í&—ã—Ö–æ–¥");
 						button->signalPressed().connect((Win32::MessageLoop*)&app, &Win32::MessageLoop::quit);
 						vbox->add(button, false, false, false);
 
@@ -154,16 +154,16 @@ MainWindow::MainWindow(kdw::Application& app)
 						vbox->add(rBtn1, false, false, false);
 						//delete rBtn1;
 
-						buttonChangeText_ = new kdw::Button("ƒÓ·‡‚ËÚ¸ ÍÌÓÔÓÍ");
+						buttonChangeText_ = new kdw::Button("–î–æ–±–∞–≤–∏—Ç—å –∫–Ω–æ–ø–æ–∫");
 						buttonChangeText_->signalPressed().connect(this, &MainWindow::onChangeTextButton);
 						vbox->add(buttonChangeText_, false, true, true);
 
 						
-						button = new kdw::Button("–Â‰‡ÍÚËÓ‚‡Ú¸");
+						button = new kdw::Button("–†–µ–¥–∞–∫—Ç–∏—Ä–æ–≤–∞—Ç—å");
 						button->signalPressed().connect(this, MainWindow::onEditButton);
 						vbox->add(button, false, false, false);
 
-						kdw::Label* label = new kdw::Label("“ÂÍÒÚÓ‚ÓÂ &ÔÓÎÂ:", true);
+						kdw::Label* label = new kdw::Label("–¢–µ–∫—Å—Ç–æ–≤–æ–µ &–ø–æ–ª–µ:", true);
 						vbox->add(label, false);
 
 						kdw::RadioButton* rBtn2 = new kdw::RadioButton(rBtn1, "RadioButton 2");
@@ -176,9 +176,9 @@ MainWindow::MainWindow(kdw::Application& app)
 
 						kdw::HBox* hbox = new kdw::HBox(4, 0);
 						{
-							button = new kdw::Button(" ÌÓÔÍ‡ 3");
+							button = new kdw::Button("–ö–Ω–æ–ø–∫–∞ 3");
 							button->setSensitive(false);
-							button = new kdw::Button(" ÌÓÔÓ˜Í‡ 4");
+							button = new kdw::Button("–ö–Ω–æ–ø–æ—á–∫–∞ 4");
 						}
 
 					}
@@ -193,7 +193,7 @@ MainWindow::MainWindow(kdw::Application& app)
 						scrolledWindow->add(vbox_);
 						scrolledWindow->setPolicy(kdw::SCROLL_NEVER, kdw::SCROLL_AUTOMATIC);
 						{
-							kdw::Label* label = new kdw::Label("—‰ÂÒ¸ ·Û‰ÂÚ ÏÌÓ„Ó ÍÌÓÔÓ˜ÂÍ");
+							kdw::Label* label = new kdw::Label("–°–¥–µ—Å—å –±—É–¥–µ—Ç –º–Ω–æ–≥–æ –∫–Ω–æ–ø–æ—á–µ–∫");
 							label->setAlignment(kdw::ALIGN_CENTER, kdw::ALIGN_MIDDLE);
 							vbox_->add(label, false, true, true);
 						}
@@ -211,11 +211,11 @@ MainWindow::MainWindow(kdw::Application& app)
 				splitter_->add(box);
 			}
 
-			vbox->add(new kdw::Label("—Ú‡ÚÛÒÌ‡ˇ ÒÚÓÍ‡", false, 2), true, false, false);
+			vbox->add(new kdw::Label("–°—Ç–∞—Ç—É—Å–Ω–∞—è —Å—Ç—Ä–æ–∫–∞", false, 2), true, false, false);
 		}
 
 		libraryEditor_ = new kdw::LibraryEditor();
-		pages->add("–Â‰‡ÍÚÓ ·Ë·ÎËÓÚÂÍ", libraryEditor_);
+		pages->add("–†–µ–¥–∞–∫—Ç–æ—Ä –±–∏–±–ª–∏–æ—Ç–µ–∫", libraryEditor_);
 	}
 
 	propertyTree_->attach(Serializer(testData));
@@ -241,7 +241,7 @@ void MainWindow::pressShowModal()
 void MainWindow::onIntButtonPressed(int index)
 {
 	//XBuffer buf;
-	//buf < "Õ‡Ê‡Ú‡ ÍÌÓÔÍ‡ Ò ËÌ‰ÂÍÒÓÏ: " <= index;
+	//buf < "–ù–∞–∂–∞—Ç–∞ –∫–Ω–æ–ø–∫–∞ —Å –∏–Ω–¥–µ–∫—Å–æ–º: " <= index;
 	//const char* message = buf;
 	const char* buf = "Button pressed";
 
@@ -255,11 +255,11 @@ void MainWindow::onChangeCheckBox()
 
 void MainWindow::onChangeTextButton()
 {
-	//buttonChangeText_->setText("“ÂÍÒÚ ËÁÏÂÌËÎÒˇ Ì‡ Ó˜ÂÌ¸ ‰ÎËÌÌÛ˛ ÒÚÓÍÛ");
+	//buttonChangeText_->setText("–¢–µ–∫—Å—Ç –∏–∑–º–µ–Ω–∏–ª—Å—è –Ω–∞ –æ—á–µ–Ω—å –¥–ª–∏–Ω–Ω—É—é —Å—Ç—Ä–æ–∫—É");
 	static int counter = 0;
 	//XBuffer buf;
-	//buf < " ÌÓÔÍ‡ Òˇ! " <= counter;
-	const char* buf = " ÌÓÔÍ‡ Òˇ";
+	//buf < "–ö–Ω–æ–ø–∫–∞ —Å—è! " <= counter;
+	const char* buf = "–ö–Ω–æ–ø–∫–∞ —Å—è";
 
 	IntButton* newButton = new IntButton(buf, counter++);
 	newButton->signalPressed().connect(this, &MainWindow::onIntButtonPressed);

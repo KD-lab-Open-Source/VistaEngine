@@ -551,7 +551,7 @@ bool BuildHLSL(ShaderLine& sl,const char* out_filename)
 		}
 	}
 
-	{//пересекающиеся константы
+	{//РїРµСЂРµСЃРµРєР°СЋС‰РёРµСЃСЏ РєРѕРЅСЃС‚Р°РЅС‚С‹
 		for(int i=0;i<(int)global_desc.size();i++)
 		{
 			ConstDesc& di=global_desc[i];

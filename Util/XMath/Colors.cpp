@@ -65,7 +65,7 @@ void Color3c::serialize(Archive& ar)
 
 
 // HSV
-//Y = 0.30*R + 0.59*G + 0.11*B перевод цветного в чёрно-белый
+//Y = 0.30*R + 0.59*G + 0.11*B РїРµСЂРµРІРѕРґ С†РІРµС‚РЅРѕРіРѕ РІ С‡С‘СЂРЅРѕ-Р±РµР»С‹Р№
 //h=0..360,s=0..1,v=0..1
 
 inline void HSVtoRGB(float h,float s,float v,

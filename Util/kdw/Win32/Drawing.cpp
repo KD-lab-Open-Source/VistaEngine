@@ -94,7 +94,7 @@ void drawNotCheck(HDC dc, const RECT& checkRect, bool checked)
 		COLORREF oldColor = ::SetTextColor(dc, RGB(128, 0, 0));
 		int oldBkMode = ::SetBkMode(dc, TRANSPARENT);
 			
-		const char* text = "νε";
+		const char* text = "Π½Πµ";
 		rect.top -= 1;
 		rect.bottom -= 1;
 		rect.left += 1;

@@ -25,39 +25,39 @@
 UNIT_LINK_GET(UnitBuilding)
 
 DECLARE_SEGMENT(UnitBuilding)
-REGISTER_CLASS(AttributeBase, AttributeBuilding, "Здание");
-REGISTER_CLASS(UnitBase, UnitBuilding, "Здание")
+REGISTER_CLASS(AttributeBase, AttributeBuilding, "Р—РґР°РЅРёРµ");
+REGISTER_CLASS(UnitBase, UnitBuilding, "Р—РґР°РЅРёРµ")
 REGISTER_CLASS_IN_FACTORY(UnitFactory, UNIT_CLASS_BUILDING, UnitBuilding)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(AttributeBuilding, PlacementMode, "PlacementMode")
-REGISTER_ENUM_ENCLOSED(AttributeBuilding, PLACE_ON_GROUND_OR_WATER, "Устанавливать на поверхность или воду")
-REGISTER_ENUM_ENCLOSED(AttributeBuilding, PLACE_ON_GROUND, "Устанавливать на поверхность")
-REGISTER_ENUM_ENCLOSED(AttributeBuilding, PLACE_ON_GROUND_DELTA, "Устанавливать на поверхность с дельтой")
-REGISTER_ENUM_ENCLOSED(AttributeBuilding, PLACE_ON_GROUND_DELTA_HEIGTH, "Устанавливать на поверхность с дельтой на определенной высоте")
-REGISTER_ENUM_ENCLOSED(AttributeBuilding, PLACE_ON_WATER_DEPTH, "Устанавливать на воду с определенной глубиной (и глубже)")
-REGISTER_ENUM_ENCLOSED(AttributeBuilding, PLACE_ON_GROUND_OR_UNDERWATER, "Устанавливать на поверхность, можно под водой")
-REGISTER_ENUM_ENCLOSED(AttributeBuilding, PLACE_ON_GROUND_DELTA_UNDERWATER, "Устанавливать на поверхность с дельтой, здания остаются под водой")
+REGISTER_ENUM_ENCLOSED(AttributeBuilding, PLACE_ON_GROUND_OR_WATER, "РЈСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ РЅР° РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ РёР»Рё РІРѕРґСѓ")
+REGISTER_ENUM_ENCLOSED(AttributeBuilding, PLACE_ON_GROUND, "РЈСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ РЅР° РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ")
+REGISTER_ENUM_ENCLOSED(AttributeBuilding, PLACE_ON_GROUND_DELTA, "РЈСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ РЅР° РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ СЃ РґРµР»СЊС‚РѕР№")
+REGISTER_ENUM_ENCLOSED(AttributeBuilding, PLACE_ON_GROUND_DELTA_HEIGTH, "РЈСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ РЅР° РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ СЃ РґРµР»СЊС‚РѕР№ РЅР° РѕРїСЂРµРґРµР»РµРЅРЅРѕР№ РІС‹СЃРѕС‚Рµ")
+REGISTER_ENUM_ENCLOSED(AttributeBuilding, PLACE_ON_WATER_DEPTH, "РЈСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ РЅР° РІРѕРґСѓ СЃ РѕРїСЂРµРґРµР»РµРЅРЅРѕР№ РіР»СѓР±РёРЅРѕР№ (Рё РіР»СѓР±Р¶Рµ)")
+REGISTER_ENUM_ENCLOSED(AttributeBuilding, PLACE_ON_GROUND_OR_UNDERWATER, "РЈСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ РЅР° РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ, РјРѕР¶РЅРѕ РїРѕРґ РІРѕРґРѕР№")
+REGISTER_ENUM_ENCLOSED(AttributeBuilding, PLACE_ON_GROUND_DELTA_UNDERWATER, "РЈСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ РЅР° РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ СЃ РґРµР»СЊС‚РѕР№, Р·РґР°РЅРёСЏ РѕСЃС‚Р°СЋС‚СЃСЏ РїРѕРґ РІРѕРґРѕР№")
 END_ENUM_DESCRIPTOR_ENCLOSED(AttributeBuilding, PlacementMode)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(AttributeBuilding, InteractionType, "InteractionType")
-REGISTER_ENUM_ENCLOSED(AttributeBuilding, INTERACTION_NORMAL, "Неразрушаемое здание")
-REGISTER_ENUM_ENCLOSED(AttributeBuilding, INTERACTION_TREE, "Дерево")
-REGISTER_ENUM_ENCLOSED(AttributeBuilding, INTERACTION_FENCE, "Забор")
-REGISTER_ENUM_ENCLOSED(AttributeBuilding, INTERACTION_BARN, "Сарай")
-REGISTER_ENUM_ENCLOSED(AttributeBuilding, INTERACTION_BUILDING, "Здание")
-REGISTER_ENUM_ENCLOSED(AttributeBuilding, INTERACTION_PHANTOM, "Фантом")
-REGISTER_ENUM_ENCLOSED(AttributeBuilding, INTERACTION_BIG_BUILDING, "Большое здание")
+REGISTER_ENUM_ENCLOSED(AttributeBuilding, INTERACTION_NORMAL, "РќРµСЂР°Р·СЂСѓС€Р°РµРјРѕРµ Р·РґР°РЅРёРµ")
+REGISTER_ENUM_ENCLOSED(AttributeBuilding, INTERACTION_TREE, "Р”РµСЂРµРІРѕ")
+REGISTER_ENUM_ENCLOSED(AttributeBuilding, INTERACTION_FENCE, "Р—Р°Р±РѕСЂ")
+REGISTER_ENUM_ENCLOSED(AttributeBuilding, INTERACTION_BARN, "РЎР°СЂР°Р№")
+REGISTER_ENUM_ENCLOSED(AttributeBuilding, INTERACTION_BUILDING, "Р—РґР°РЅРёРµ")
+REGISTER_ENUM_ENCLOSED(AttributeBuilding, INTERACTION_PHANTOM, "Р¤Р°РЅС‚РѕРј")
+REGISTER_ENUM_ENCLOSED(AttributeBuilding, INTERACTION_BIG_BUILDING, "Р‘РѕР»СЊС€РѕРµ Р·РґР°РЅРёРµ")
 END_ENUM_DESCRIPTOR_ENCLOSED(AttributeBuilding, InteractionType)
 
 BEGIN_ENUM_DESCRIPTOR(BuildingStatus, "BuildingStatus")
-REGISTER_ENUM(BUILDING_STATUS_CONSTRUCTED, "Построено")
-REGISTER_ENUM(BUILDING_STATUS_PLUGGED_IN, "Включен в интерфейсе")
-REGISTER_ENUM(BUILDING_STATUS_CONNECTED, "Здание подключено по зоне")
-REGISTER_ENUM(BUILDING_STATUS_ENABLED, "Разрешено деревом развития")
-REGISTER_ENUM(BUILDING_STATUS_POWERED, "Получает энергию, не выводится иконка отсутствия энергии")
-REGISTER_ENUM(BUILDING_STATUS_UPGRADING, "Апгрейдится в данный момент")
-REGISTER_ENUM(BUILDING_STATUS_MOUNTED, "Разложено")
-REGISTER_ENUM(BUILDING_STATUS_HOLD_CONSTRUCTION, "Остановлено строительство")
+REGISTER_ENUM(BUILDING_STATUS_CONSTRUCTED, "РџРѕСЃС‚СЂРѕРµРЅРѕ")
+REGISTER_ENUM(BUILDING_STATUS_PLUGGED_IN, "Р’РєР»СЋС‡РµРЅ РІ РёРЅС‚РµСЂС„РµР№СЃРµ")
+REGISTER_ENUM(BUILDING_STATUS_CONNECTED, "Р—РґР°РЅРёРµ РїРѕРґРєР»СЋС‡РµРЅРѕ РїРѕ Р·РѕРЅРµ")
+REGISTER_ENUM(BUILDING_STATUS_ENABLED, "Р Р°Р·СЂРµС€РµРЅРѕ РґРµСЂРµРІРѕРј СЂР°Р·РІРёС‚РёСЏ")
+REGISTER_ENUM(BUILDING_STATUS_POWERED, "РџРѕР»СѓС‡Р°РµС‚ СЌРЅРµСЂРіРёСЋ, РЅРµ РІС‹РІРѕРґРёС‚СЃСЏ РёРєРѕРЅРєР° РѕС‚СЃСѓС‚СЃС‚РІРёСЏ СЌРЅРµСЂРіРёРё")
+REGISTER_ENUM(BUILDING_STATUS_UPGRADING, "РђРїРіСЂРµР№РґРёС‚СЃСЏ РІ РґР°РЅРЅС‹Р№ РјРѕРјРµРЅС‚")
+REGISTER_ENUM(BUILDING_STATUS_MOUNTED, "Р Р°Р·Р»РѕР¶РµРЅРѕ")
+REGISTER_ENUM(BUILDING_STATUS_HOLD_CONSTRUCTION, "РћСЃС‚Р°РЅРѕРІР»РµРЅРѕ СЃС‚СЂРѕРёС‚РµР»СЊСЃС‚РІРѕ")
 END_ENUM_DESCRIPTOR(BuildingStatus)
 
 void fCommandFieldOfViewMapAdd(XBuffer& stream)
@@ -112,67 +112,67 @@ void AttributeBuilding::serialize(Archive& ar)
 	
 	excludeCollision = EXCLUDE_COLLISION_ENVIRONMENT;
 
-	ar.serialize(enablePathTracking, "enablePathTracking", "Включить объезд юнитами");
-	ar.serialize(interactionType, "interactionType", "Тип взаимодействия");
+	ar.serialize(enablePathTracking, "enablePathTracking", "Р’РєР»СЋС‡РёС‚СЊ РѕР±СЉРµР·Рґ СЋРЅРёС‚Р°РјРё");
+	ar.serialize(interactionType, "interactionType", "РўРёРї РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ");
 
-	if(ar.openBlock("placement", "Установка на поверхность")){
-		ar.serialize(basementExtent, "basementExtent", "Размер площадки (половина от центра)");
+	if(ar.openBlock("placement", "РЈСЃС‚Р°РЅРѕРІРєР° РЅР° РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ")){
+		ar.serialize(basementExtent, "basementExtent", "Р Р°Р·РјРµСЂ РїР»РѕС‰Р°РґРєРё (РїРѕР»РѕРІРёРЅР° РѕС‚ С†РµРЅС‚СЂР°)");
 
-		ar.serialize(placementMode, "placementMode", "Способ установки");
+		ar.serialize(placementMode, "placementMode", "РЎРїРѕСЃРѕР± СѓСЃС‚Р°РЅРѕРІРєРё");
 		if(placementMode == PLACE_ON_GROUND_DELTA || placementMode == PLACE_ON_GROUND_DELTA_HEIGTH || placementMode == PLACE_ON_GROUND_DELTA_UNDERWATER)
-			ar.serialize(placementDeltaHeight, "placementDeltaHeight", "Дельта поверхности в месте установки");
+			ar.serialize(placementDeltaHeight, "placementDeltaHeight", "Р”РµР»СЊС‚Р° РїРѕРІРµСЂС…РЅРѕСЃС‚Рё РІ РјРµСЃС‚Рµ СѓСЃС‚Р°РЅРѕРІРєРё");
 		if(placementMode == PLACE_ON_GROUND_DELTA_HEIGTH)
-			ar.serialize(placementHeight, "placementHeight", "Высота поверхности в месте установки");
+			ar.serialize(placementHeight, "placementHeight", "Р’С‹СЃРѕС‚Р° РїРѕРІРµСЂС…РЅРѕСЃС‚Рё РІ РјРµСЃС‚Рµ СѓСЃС‚Р°РЅРѕРІРєРё");
 		if(placementMode == PLACE_ON_WATER_DEPTH)
-			ar.serialize(placementHeight, "placementHeight", "Глубина воды в месте установки");
+			ar.serialize(placementHeight, "placementHeight", "Р“Р»СѓР±РёРЅР° РІРѕРґС‹ РІ РјРµСЃС‚Рµ СѓСЃС‚Р°РЅРѕРІРєРё");
 		if(placementMode != PLACE_ON_WATER_DEPTH)
-			ar.serialize(terrainType4Placement, "terrainType4Placement", "Устанавливать на поверхности:");
+			ar.serialize(terrainType4Placement, "terrainType4Placement", "РЈСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ РЅР° РїРѕРІРµСЂС…РЅРѕСЃС‚Рё:");
 
-		ar.serialize(analyzeTerrain, "analyzeTerrain", "Анализировать изменения поверхности под зданием каждый квант");
+		ar.serialize(analyzeTerrain, "analyzeTerrain", "РђРЅР°Р»РёР·РёСЂРѕРІР°С‚СЊ РёР·РјРµРЅРµРЅРёСЏ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё РїРѕРґ Р·РґР°РЅРёРµРј РєР°Р¶РґС‹Р№ РєРІР°РЅС‚");
 		if(analyzeTerrain && !ar.inPlace()){
 			int angle = round(R2G(acosf(deviationCosMin)));
-			ar.serialize(angle, "angleMax", "Максимальное отклонение, градусы");
+			ar.serialize(angle, "angleMax", "РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ РѕС‚РєР»РѕРЅРµРЅРёРµ, РіСЂР°РґСѓСЃС‹");
 			deviationCosMin = cosf(G2R(angle));
 			terrainDamage *= 1.f/logicPeriodSeconds;
-			ar.serialize(terrainDamage, "terrainDamage", "Повреждения при наклоне в секунду");
+			ar.serialize(terrainDamage, "terrainDamage", "РџРѕРІСЂРµР¶РґРµРЅРёСЏ РїСЂРё РЅР°РєР»РѕРЅРµ РІ СЃРµРєСѓРЅРґСѓ");
 			terrainDamage *= logicPeriodSeconds;
 		}
 
-		ar.serialize(RangedWrapperi(cancelConstructionTime, 0, 10000), "cancelConstructionTime", "Максимальное время, которое недостроенное здание ожидает строителя, секунды");
+		ar.serialize(RangedWrapperi(cancelConstructionTime, 0, 10000), "cancelConstructionTime", "РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ, РєРѕС‚РѕСЂРѕРµ РЅРµРґРѕСЃС‚СЂРѕРµРЅРЅРѕРµ Р·РґР°РЅРёРµ РѕР¶РёРґР°РµС‚ СЃС‚СЂРѕРёС‚РµР»СЏ, СЃРµРєСѓРЅРґС‹");
 		cancelConstructionTime = clamp(cancelConstructionTime, 60, 10000);
-		ar.serialize(placementZone, "placementZone", "Зона установки");
+		ar.serialize(placementZone, "placementZone", "Р—РѕРЅР° СѓСЃС‚Р°РЅРѕРІРєРё");
 		if(placementZone){
-			ar.serialize(connectionEffect, "connectionEffect", "Эффект подключения");
-			ar.serialize(connectionEffectNoDistanceCheck, "connectionEffectNoDistanceCheck", "Не прятать эффект подключения при удалении камеры");
-			ar.serialize(connectionEffectLegionColor, "connectionEffectLegionColor", "Красить эффект подключения в цвет легиона");
-			ar.serialize(connectionNode, "connectionNode", "Точка подключения");
-			ar.serialize(connectionArithmetics, "connectionArithmetics", "Арифметика при подключении");
+			ar.serialize(connectionEffect, "connectionEffect", "Р­С„С„РµРєС‚ РїРѕРґРєР»СЋС‡РµРЅРёСЏ");
+			ar.serialize(connectionEffectNoDistanceCheck, "connectionEffectNoDistanceCheck", "РќРµ РїСЂСЏС‚Р°С‚СЊ СЌС„С„РµРєС‚ РїРѕРґРєР»СЋС‡РµРЅРёСЏ РїСЂРё СѓРґР°Р»РµРЅРёРё РєР°РјРµСЂС‹");
+			ar.serialize(connectionEffectLegionColor, "connectionEffectLegionColor", "РљСЂР°СЃРёС‚СЊ СЌС„С„РµРєС‚ РїРѕРґРєР»СЋС‡РµРЅРёСЏ РІ С†РІРµС‚ Р»РµРіРёРѕРЅР°");
+			ar.serialize(connectionNode, "connectionNode", "РўРѕС‡РєР° РїРѕРґРєР»СЋС‡РµРЅРёСЏ");
+			ar.serialize(connectionArithmetics, "connectionArithmetics", "РђСЂРёС„РјРµС‚РёРєР° РїСЂРё РїРѕРґРєР»СЋС‡РµРЅРёРё");
 		}
-		ar.serialize(producedPlacementZone, "producedPlacementZone", "Создаваемая зона");
-		ar.serialize(producedPlacementZoneRadius, "producedPlacementZoneRadius", "Радиус создаваемой зоны");
-		ar.serialize(RangedWrapperi(placementZoneMaterial, -1, cTileMap::placementZoneMaterialNumber), "placementZoneMaterial", "Номер материала создаваемой зоны (-1 - отключен)");
+		ar.serialize(producedPlacementZone, "producedPlacementZone", "РЎРѕР·РґР°РІР°РµРјР°СЏ Р·РѕРЅР°");
+		ar.serialize(producedPlacementZoneRadius, "producedPlacementZoneRadius", "Р Р°РґРёСѓСЃ СЃРѕР·РґР°РІР°РµРјРѕР№ Р·РѕРЅС‹");
+		ar.serialize(RangedWrapperi(placementZoneMaterial, -1, cTileMap::placementZoneMaterialNumber), "placementZoneMaterial", "РќРѕРјРµСЂ РјР°С‚РµСЂРёР°Р»Р° СЃРѕР·РґР°РІР°РµРјРѕР№ Р·РѕРЅС‹ (-1 - РѕС‚РєР»СЋС‡РµРЅ)");
 		if(ar.isInput() && producedPlacementZoneRadiusMax_ < producedPlacementZoneRadius)
 			producedPlacementZoneRadiusMax_ = producedPlacementZoneRadius;
 
-		ar.serialize(toolzer, "toolzer", "Тулзер");
-		ar.serialize(killAfterToolzerFinished, "killAfterToolzerFinished", "Уничтожать объект после отработки тулзера");
-		ar.serialize(mass, "mass", "Масса");
-		ar.serialize(RadianWrapper(sightSector), "sightSector", "Сектор обзора");
-		ar.serialize(sightSectorColorIndex, "sightSectorColorIndex", "Номер цвета сектора обзора");
-		ar.serialize(showSightSector, "showSightSector", "Показывать сектор обзора");
-		ar.serialize(sightRadiusNightFactor, "sightRadiusNightFactor", "Коэффициент для радиуса видимости ночью");
-		ar.serialize(sightFogOfWarFactor, "sightFogOfWarFactor", "Коэффициент для радиуса открытия тумана войны");
-		ar.serialize(fieldOfViewMapAdd, "fieldOfViewMapAdd", "Добавлять в карту препятствий");
+		ar.serialize(toolzer, "toolzer", "РўСѓР»Р·РµСЂ");
+		ar.serialize(killAfterToolzerFinished, "killAfterToolzerFinished", "РЈРЅРёС‡С‚РѕР¶Р°С‚СЊ РѕР±СЉРµРєС‚ РїРѕСЃР»Рµ РѕС‚СЂР°Р±РѕС‚РєРё С‚СѓР»Р·РµСЂР°");
+		ar.serialize(mass, "mass", "РњР°СЃСЃР°");
+		ar.serialize(RadianWrapper(sightSector), "sightSector", "РЎРµРєС‚РѕСЂ РѕР±Р·РѕСЂР°");
+		ar.serialize(sightSectorColorIndex, "sightSectorColorIndex", "РќРѕРјРµСЂ С†РІРµС‚Р° СЃРµРєС‚РѕСЂР° РѕР±Р·РѕСЂР°");
+		ar.serialize(showSightSector, "showSightSector", "РџРѕРєР°Р·С‹РІР°С‚СЊ СЃРµРєС‚РѕСЂ РѕР±Р·РѕСЂР°");
+		ar.serialize(sightRadiusNightFactor, "sightRadiusNightFactor", "РљРѕСЌС„С„РёС†РёРµРЅС‚ РґР»СЏ СЂР°РґРёСѓСЃР° РІРёРґРёРјРѕСЃС‚Рё РЅРѕС‡СЊСЋ");
+		ar.serialize(sightFogOfWarFactor, "sightFogOfWarFactor", "РљРѕСЌС„С„РёС†РёРµРЅС‚ РґР»СЏ СЂР°РґРёСѓСЃР° РѕС‚РєСЂС‹С‚РёСЏ С‚СѓРјР°РЅР° РІРѕР№РЅС‹");
+		ar.serialize(fieldOfViewMapAdd, "fieldOfViewMapAdd", "Р”РѕР±Р°РІР»СЏС‚СЊ РІ РєР°СЂС‚Сѓ РїСЂРµРїСЏС‚СЃС‚РІРёР№");
 		ar.closeBlock();
 	}
 
-	ar.serialize(teleport, "teleport", "Телепорт");
+	ar.serialize(teleport, "teleport", "РўРµР»РµРїРѕСЂС‚");
 	if(teleport){
-		ar.serialize(teleportedUnits, "teleportedUnits", "Телепортируемые юниты");
-		ar.serialize(teleportationTime, "teleportationTime", "Время телепортации, секунды");
+		ar.serialize(teleportedUnits, "teleportedUnits", "РўРµР»РµРїРѕСЂС‚РёСЂСѓРµРјС‹Рµ СЋРЅРёС‚С‹");
+		ar.serialize(teleportationTime, "teleportationTime", "Р’СЂРµРјСЏ С‚РµР»РµРїРѕСЂС‚Р°С†РёРё, СЃРµРєСѓРЅРґС‹");
 	}
 
-	ar.serialize(includeBase, "includeBase", "Входит в базу");
+	ar.serialize(includeBase, "includeBase", "Р’С…РѕРґРёС‚ РІ Р±Р°Р·Сѓ");
 	ar.serialize(selectAble, "selectAble", 0);
 
 	if(ar.isInput()){
@@ -470,7 +470,7 @@ void UnitBuilding::serialize(Archive& ar)
 	}
 
 	if(attr().teleport)
-		ar.serialize(teleportID_, "teleportID", "Номер телепорта для пары");
+		ar.serialize(teleportID_, "teleportID", "РќРѕРјРµСЂ С‚РµР»РµРїРѕСЂС‚Р° РґР»СЏ РїР°СЂС‹");
 	
 	if(universe()->userSave()){
 		ar.serialize(toolzerFinished_, "toolzerFinished", 0);

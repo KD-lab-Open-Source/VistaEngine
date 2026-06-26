@@ -6,7 +6,7 @@
 class AttributeItemResource : public AttributeBase
 {
 public:
-	// элементы неживой природы
+	// СЌР»РµРјРµРЅС‚С‹ РЅРµР¶РёРІРѕР№ РїСЂРёСЂРѕРґС‹
 	enum ItemType {
 		ITEM_DEFAULT,
 		ITEM_TREE,
@@ -19,7 +19,7 @@ public:
 	bool useLifeTime;
 	int lifeTime;
 
-	/// прятать при установки здания
+	/// РїСЂСЏС‚Р°С‚СЊ РїСЂРё СѓСЃС‚Р°РЅРѕРІРєРё Р·РґР°РЅРёСЏ
 	bool enableHiding;
 
 	bool barrierUpgrade;

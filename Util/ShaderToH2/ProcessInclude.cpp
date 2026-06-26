@@ -43,7 +43,7 @@ void ProcessInclude(const char* filename,vector<Include>& include)
 		{
 			if(ic.once)
 			{
-				//Рекурсивный инклюд
+				//Р РµРєСѓСЂСЃРёРІРЅС‹Р№ РёРЅРєР»СЋРґ
 				return;
 			}else
 			{

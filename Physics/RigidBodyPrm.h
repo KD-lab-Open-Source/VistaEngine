@@ -41,20 +41,20 @@ struct RigidBodyPrm : PolymorphicBase
 	bool moveVertical;
 
 	//=======================================================
-	// Флаги проходимости...
+	// Р¤Р»Р°РіРё РїСЂРѕС…РѕРґРёРјРѕСЃС‚Рё...
 	//=======================================================
 	bool waterPass;
 	bool groundPass;
 	bool fieldPass;
 	
-	bool waterAnalysis;  // Анализировать воду?
+	bool waterAnalysis;  // РђРЅР°Р»РёР·РёСЂРѕРІР°С‚СЊ РІРѕРґСѓ?
 
 	////////////////////////////////////////////////
 	//		General Controls
 	////////////////////////////////////////////////
-	// Не перемещается по x, y. Перемещается по z и ориентация.
+	// РќРµ РїРµСЂРµРјРµС‰Р°РµС‚СЃСЏ РїРѕ x, y. РџРµСЂРµРјРµС‰Р°РµС‚СЃСЏ РїРѕ z Рё РѕСЂРёРµРЅС‚Р°С†РёСЏ.
 	bool unmovable; 
-	// Управляется точками, иначе свободный объект
+	// РЈРїСЂР°РІР»СЏРµС‚СЃСЏ С‚РѕС‡РєР°РјРё, РёРЅР°С‡Рµ СЃРІРѕР±РѕРґРЅС‹Р№ РѕР±СЉРµРєС‚
 	bool controled_by_points;
 	
 	//  Steering
@@ -104,7 +104,7 @@ struct RigidBodyPrm : PolymorphicBase
 	float upper_theta; // degrees
 	float lower_theta; // degrees
 	float targetCorrectionZ;
-	float distance_correction_factor; // из-за ошибки интегрирования снаряды чуть-чуть перелетают.
+	float distance_correction_factor; // РёР·-Р·Р° РѕС€РёР±РєРё РёРЅС‚РµРіСЂРёСЂРѕРІР°РЅРёСЏ СЃРЅР°СЂСЏРґС‹ С‡СѓС‚СЊ-С‡СѓС‚СЊ РїРµСЂРµР»РµС‚Р°СЋС‚.
 	int ground_colliding_delay;
 	bool ground_collision_enabled; 
 

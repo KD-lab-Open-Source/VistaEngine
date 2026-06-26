@@ -57,7 +57,7 @@ private:
 	int inventoryIndex_;
 };
 
-/// предмет в инвентаре
+/// РїСЂРµРґРјРµС‚ РІ РёРЅРІРµРЅС‚Р°СЂРµ
 class InventoryItem
 {
 public:
@@ -103,14 +103,14 @@ public:
 	bool isActivated() const { return isActivated_; }
 	void setActivated(bool state){ isActivated_ = state; }
 
-	/// сериализация-"сэйв"
+	/// СЃРµСЂРёР°Р»РёР·Р°С†РёСЏ-"СЃСЌР№РІ"
 	void serialize(Archive& ar);
 
 	void showDebugInfo() const;
 
 private:
 
-	/// координаты предмета в ячейках
+	/// РєРѕРѕСЂРґРёРЅР°С‚С‹ РїСЂРµРґРјРµС‚Р° РІ СЏС‡РµР№РєР°С…
 	InventoryPosition position_;
 
 	InventoryPosition parentPosition_;
@@ -118,7 +118,7 @@ private:
 
 	bool isActivated_;
 
-	/// арифметика, которую надо применить при снятии предмета из снаряжения
+	/// Р°СЂРёС„РјРµС‚РёРєР°, РєРѕС‚РѕСЂСѓСЋ РЅР°РґРѕ РїСЂРёРјРµРЅРёС‚СЊ РїСЂРё СЃРЅСЏС‚РёРё РїСЂРµРґРјРµС‚Р° РёР· СЃРЅР°СЂСЏР¶РµРЅРёСЏ
 	ParameterArithmetics arithmetics_;
 
 	ParameterSet parameters_;
@@ -173,12 +173,12 @@ public:
 	UI_InventoryType inventoryType() const;
 
 	int cellType() const; 
-	/// размер инвентаря в ячейках
+	/// СЂР°Р·РјРµСЂ РёРЅРІРµРЅС‚Р°СЂСЏ РІ СЏС‡РµР№РєР°С…
 	Vect2i size() const;
 
 	void updateControl() const;
 
-	/// сериализация-"сэйв"
+	/// СЃРµСЂРёР°Р»РёР·Р°С†РёСЏ-"СЃСЌР№РІ"
 	void serialize(Archive& ar);
 
 private:
@@ -190,7 +190,7 @@ private:
 
 	int index_;
 
-	/// номер оружейного слота, для снаряжения
+	/// РЅРѕРјРµСЂ РѕСЂСѓР¶РµР№РЅРѕРіРѕ СЃР»РѕС‚Р°, РґР»СЏ СЃРЅР°СЂСЏР¶РµРЅРёСЏ
 	int weaponSlotIndex_;
 
 	bool checkItemPosition(const Vect2i& pos, const InventoryItem& item) const;
@@ -206,7 +206,7 @@ private:
 
 typedef SwapVector<Inventory> Inventories;
 
-/// Составной инвентарь
+/// РЎРѕСЃС‚Р°РІРЅРѕР№ РёРЅРІРµРЅС‚Р°СЂСЊ
 class InventorySet
 {
 public:
@@ -219,21 +219,21 @@ public:
 	bool add(UI_ControlInventory* control);
 
 	const InventoryItem* getItem(int position) const;
-	/// Возвращает true, если ячейка с координатами \a position пустая.
+	/// Р’РѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё СЏС‡РµР№РєР° СЃ РєРѕРѕСЂРґРёРЅР°С‚Р°РјРё \a position РїСѓСЃС‚Р°СЏ.
 	bool isCellEmpty(int position) const;
 
-	/// Проверка, влезет ли предмет в инвентарь.
+	/// РџСЂРѕРІРµСЂРєР°, РІР»РµР·РµС‚ Р»Рё РїСЂРµРґРјРµС‚ РІ РёРЅРІРµРЅС‚Р°СЂСЊ.
 	bool canPutItem(const UnitItemInventory* item, int position = -1) const;
 	bool canPutItem(const InventoryItem& item, int position = -1) const;
-	/// Кладёт предмет в инвентарь.
-	/// Если не влез, возвращает false.
+	/// РљР»Р°РґС‘С‚ РїСЂРµРґРјРµС‚ РІ РёРЅРІРµРЅС‚Р°СЂСЊ.
+	/// Р•СЃР»Рё РЅРµ РІР»РµР·, РІРѕР·РІСЂР°С‰Р°РµС‚ false.
 	bool putItem(const UnitItemInventory* item, int position = -1);
-	/// Кладёт предмет в инвентарь.
-	/// Если не влез, возвращает false.
+	/// РљР»Р°РґС‘С‚ РїСЂРµРґРјРµС‚ РІ РёРЅРІРµРЅС‚Р°СЂСЊ.
+	/// Р•СЃР»Рё РЅРµ РІР»РµР·, РІРѕР·РІСЂР°С‰Р°РµС‚ false.
 	bool putItem(const InventoryItem& item, int position = -1);
 	bool putItem(const InventoryItem& item, UI_InventoryType inventory_type);
 
-	/// Удаляет предмет, лежащий в ячейке номер \a position
+	/// РЈРґР°Р»СЏРµС‚ РїСЂРµРґРјРµС‚, Р»РµР¶Р°С‰РёР№ РІ СЏС‡РµР№РєРµ РЅРѕРјРµСЂ \a position
 	bool removeItem(int position);
 	bool removeItem(const InventoryPosition& pos);
 
@@ -244,11 +244,11 @@ public:
 	bool removeWeapon(int slot_index);
 	bool updateWeapon(int slot_index);
 
-	/// Вынуть предмет, лежащий в ячейке номер \a position
+	/// Р’С‹РЅСѓС‚СЊ РїСЂРµРґРјРµС‚, Р»РµР¶Р°С‰РёР№ РІ СЏС‡РµР№РєРµ РЅРѕРјРµСЂ \a position
 	bool takeItem(int position);
-	/// Вернуть вынутый предмет в ячейку номер \a position
-	/** Если ячейка не указана, то попытается положить в ячейку,
-	 отуда предмет взят, если не получится, то положит куда влезет.
+	/// Р’РµСЂРЅСѓС‚СЊ РІС‹РЅСѓС‚С‹Р№ РїСЂРµРґРјРµС‚ РІ СЏС‡РµР№РєСѓ РЅРѕРјРµСЂ \a position
+	/** Р•СЃР»Рё СЏС‡РµР№РєР° РЅРµ СѓРєР°Р·Р°РЅР°, С‚Рѕ РїРѕРїС‹С‚Р°РµС‚СЃСЏ РїРѕР»РѕР¶РёС‚СЊ РІ СЏС‡РµР№РєСѓ,
+	 РѕС‚СѓРґР° РїСЂРµРґРјРµС‚ РІР·СЏС‚, РµСЃР»Рё РЅРµ РїРѕР»СѓС‡РёС‚СЃСЏ, С‚Рѕ РїРѕР»РѕР¶РёС‚ РєСѓРґР° РІР»РµР·РµС‚.
 	*/
 	bool returnItem(int position = -1);
 	bool removeTakenItem(){ takenItem_.clear(); return true; }
@@ -259,12 +259,12 @@ public:
 
 	const Inventories& getList() const { return inventories_; }
 
-	/// возвращает индекс ячейки
+	/// РІРѕР·РІСЂР°С‰Р°РµС‚ РёРЅРґРµРєСЃ СЏС‡РµР№РєРё
 	int getPosition(const UI_ControlInventory* control, const Vect2i& pos) const;
 
 	void updateUI() const;
 
-	/// сериализация-"сэйв"
+	/// СЃРµСЂРёР°Р»РёР·Р°С†РёСЏ-"СЃСЌР№РІ"
 	void serialize(Archive& ar);
 
 	static UI_QuickAccessMode quickAccessMode(){ return quickAccessMode_; }
@@ -279,14 +279,14 @@ private:
 
 	UnitActing* owner_;
 
-	/// возвращает координаты ячейки по индексу
+	/// РІРѕР·РІСЂР°С‰Р°РµС‚ РєРѕРѕСЂРґРёРЅР°С‚С‹ СЏС‡РµР№РєРё РїРѕ РёРЅРґРµРєСЃСѓ
 	bool parsePosition(int position, InventoryPosition& out_position) const;
 
 	bool removeClonedItems(const InventoryItem* item);
 	bool putToEquipmentSlot(const InventoryItem& item);
 	InventoryItem* getItem(const InventoryPosition& pos);
 
-	/// поиск боеприпасов по иныентарю, возвращает позицию соответствующего предмета или -1
+	/// РїРѕРёСЃРє Р±РѕРµРїСЂРёРїР°СЃРѕРІ РїРѕ РёРЅС‹РµРЅС‚Р°СЂСЋ, РІРѕР·РІСЂР°С‰Р°РµС‚ РїРѕР·РёС†РёСЋ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРіРѕ РїСЂРµРґРјРµС‚Р° РёР»Рё -1
 	bool findWeaponAmmo(const WeaponAmmoType* ammo_type, InventoryPosition& pos);
 
 	static UI_QuickAccessMode quickAccessMode_;

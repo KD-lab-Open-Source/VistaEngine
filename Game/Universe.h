@@ -28,7 +28,7 @@ typedef UniqueVector<UI_MessageTypeReference> DisabledMessages;
 typedef UniqueVector<Action*> ActiveMessages;
 
 ///////////////////////////////////////
-//		Игровая вселенная
+//		РРіСЂРѕРІР°СЏ РІСЃРµР»РµРЅРЅР°СЏ
 ///////////////////////////////////////
 class Universe 
 {
@@ -54,7 +54,7 @@ public:
 
 	virtual void setActivePlayer(int playerID, int cooperativeIndex = 0);
 
-	int playersNumber() const; // Только живые и неслужебные
+	int playersNumber() const; // РўРѕР»СЊРєРѕ Р¶РёРІС‹Рµ Рё РЅРµСЃР»СѓР¶РµР±РЅС‹Рµ
 	Player* findPlayer(int playerID) { xassert(playerID >= 0 && playerID < Players.size()); return Players[playerID]; }
 	Player* worldPlayer() const { xassert(!Players.empty() && Players.back()->isWorld()); return Players.back(); }
 
@@ -134,7 +134,7 @@ public:
 
 	bool isRandomScenario() const { return randomScenario_; }
 	GameType gameType() const { return gameType_; }
-	bool userSave() const { return userSave_; } // выставляется при записи и чтении
+	bool userSave() const { return userSave_; } // РІС‹СЃС‚Р°РІР»СЏРµС‚СЃСЏ РїСЂРё Р·Р°РїРёСЃРё Рё С‡С‚РµРЅРёРё
 
 	CircleManager* circleManager() { return circleManager_; }
 	SoundEnvironmentManager* soundEnvironmentManager() { return soundEnvironmentManager_; }

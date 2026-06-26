@@ -27,7 +27,7 @@ UNIT_LINK_GET(BaseUniverseObject)
 UNIT_LINK_GET(const BaseUniverseObject)
 UNIT_LINK_GET(UnitBase)
 
-REGISTER_CLASS(UnitBase, UnitBase, "������� ����");
+REGISTER_CLASS(UnitBase, UnitBase, "Базовый юнит");
 
 FORCE_SEGMENT(UnitItemInventory)
 FORCE_SEGMENT(UnitItemResource)
@@ -213,7 +213,7 @@ void UnitBase::Quant()
 			}
 
 			if(it->isActive()){
-				// ���� �������� ������ ����� ����� �������� �������
+				// цвет держится лишний квант чтобы избежать мигания
 				if(eff->needColorChange())
 					setColor(eff->color());
 				if(it->end()){
@@ -240,7 +240,7 @@ void UnitBase::Quant()
 			++it;
 	}
 
-	if(opacity() < 0.999f) // �������������� ����� ������������
+	if(opacity() < 0.999f) // Восстановление после прозрачности
 		setOpacity(min(1.f, opacity() + GlobalAttributes::instance().opacityRestoreSpeed));
 }
 

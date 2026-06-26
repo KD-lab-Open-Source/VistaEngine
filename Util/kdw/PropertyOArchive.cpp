@@ -30,7 +30,7 @@ namespace kdw{
 void ClassMenuItemAdder::generateMenu(PopupMenuItem& createItem, const ComboStrings& comboStrings, bool includeEmpty)
 {
 	if(includeEmpty)
-		(*this)(createItem, -1, TRANSLATE("[ Пустое значение ]"));
+		(*this)(createItem, -1, TRANSLATE("[ РџСѓСЃС‚РѕРµ Р·РЅР°С‡РµРЅРёРµ ]"));
 	ComboStrings::const_iterator it;
 	int index = 0;
 	FOR_EACH(comboStrings, it){
@@ -54,7 +54,7 @@ void ClassMenuItemAdder::generateMenu(PopupMenuItem& createItem, const ComboStri
 }
 
 // ---------------------------------------------------------------------------
-REGISTER_CLASS(PropertyRow, PropertyRowContainer, "Список");
+REGISTER_CLASS(PropertyRow, PropertyRowContainer, "РЎРїРёСЃРѕРє");
 
 PropertyRowContainer::PropertyRowContainer(const char* name = "", const char* nameAlt = "", const char* typeName = "", const char* elementTypeName = "", bool readOnly = false)
 : PropertyRow(name, nameAlt, typeName)
@@ -99,7 +99,7 @@ bool PropertyRowContainer::onContextMenu(PopupMenuItem& root, PropertyTree* tree
 	if(!root.empty())
 		root.addSeparator();
 
-	PopupMenuItem& createItem = root.add(TRANSLATE("Добавить"), tree)
+	PopupMenuItem& createItem = root.add(TRANSLATE("Р”РѕР±Р°РІРёС‚СЊ"), tree)
 		.connect(this, &PropertyRowContainer::onMenuAppendElement)
 		.setHotkey(sKey(VK_INSERT));
 
@@ -114,7 +114,7 @@ bool PropertyRowContainer::onContextMenu(PopupMenuItem& root, PropertyTree* tree
 	else
 		createItem.enable(false);
 
-	root.add(TRANSLATE("Удалить все"), tree->model()).connect(this, &PropertyRowContainer::onMenuClear)
+	root.add(TRANSLATE("РЈРґР°Р»РёС‚СЊ РІСЃРµ"), tree->model()).connect(this, &PropertyRowContainer::onMenuClear)
 		.setHotkey(sKey(VK_DELETE | sKey::SHIFT))
 		.enable(!readOnly());
 	return PropertyRow::onContextMenu(root, tree);
@@ -159,7 +159,7 @@ void PropertyRowContainer::onMenuAppendElement(PropertyTree* tree)
 	}
 	tree->expandRow(clonedRow);
 	if(clonedRow->activateOnAdd()){
-		tree->update(); // только для обновления indent-а новой строчки
+		tree->update(); // С‚РѕР»СЊРєРѕ РґР»СЏ РѕР±РЅРѕРІР»РµРЅРёСЏ indent-Р° РЅРѕРІРѕР№ СЃС‚СЂРѕС‡РєРё
 		if(clonedRow->onActivate(tree))
 			return;
 	}
@@ -192,7 +192,7 @@ void PropertyRowContainer::onMenuChildInsertBefore(PropertyRow* child, PropertyT
 	addBefore(clonedRow, child);
 	tree->model()->setFocusedRow(clonedRow);
 	if(clonedRow->activateOnAdd()){
-		tree->update(); // только для обновления indent-а новой строчки
+		tree->update(); // С‚РѕР»СЊРєРѕ РґР»СЏ РѕР±РЅРѕРІР»РµРЅРёСЏ indent-Р° РЅРѕРІРѕР№ СЃС‚СЂРѕС‡РєРё
 		if(clonedRow->onActivate(tree))
 			return;
 	}
@@ -214,7 +214,7 @@ void PropertyRowContainer::redraw(HDC dc, const RECT& iconRect, const RECT& widg
 	HFONT oldFont = (HFONT)::SelectObject(dc, Win32::defaultFont());
 	int oldBkMode = ::SetBkMode(dc, TRANSPARENT);
 	char buffer[14];
-	sprintf(buffer, TRANSLATE("%i шт."), int(size()));
+	sprintf(buffer, TRANSLATE("%i С€С‚."), int(size()));
 	const char* text = buffer;
 	COLORREF textColor = selected() ? GetSysColor(COLOR_HIGHLIGHTTEXT) : GetSysColor(COLOR_BTNTEXT);
 	COLORREF oldTextColor = ::SetTextColor(dc, textColor);
@@ -326,7 +326,7 @@ void PropertyRowEnum::redraw(HDC dc, const RECT& iconRect, const RECT& widgetRec
 
 void PropertyRowEnum::serializeValue(Archive& ar)
 {
-	ar.serialize(value_, "value", "Значение");
+	ar.serialize(value_, "value", "Р—РЅР°С‡РµРЅРёРµ");
 }
 
 void PropertyRowEnum::serialize(Archive& ar)
@@ -466,7 +466,7 @@ int PropertyRowPointer::factoryIndex()
 void PropertyRowPointer::onMenuCreateByIndex(int index, PropertyTree* tree)
 {
 	clear();
-	if(index < 0){ // пустое значение
+	if(index < 0){ // РїСѓСЃС‚РѕРµ Р·РЅР°С‡РµРЅРёРµ
 		derivedName_ = "";
 	}
 	else{
@@ -530,7 +530,7 @@ void PropertyRowPointer::redraw(HDC dc, const RECT& iconRect, const RECT& widget
 		}
 	}
 	else
-		text = TRANSLATE("[ Пустое значение ]");
+		text = TRANSLATE("[ РџСѓСЃС‚РѕРµ Р·РЅР°С‡РµРЅРёРµ ]");
 	
 	DrawText(dc, text, strlen(text), &textRect, DT_VCENTER | DT_LEFT | DT_END_ELLIPSIS | DT_SINGLELINE);
 	::SelectObject(dc, oldBrush);
@@ -554,7 +554,7 @@ bool PropertyRowPointer::onContextMenu(PopupMenuItem &menu, PropertyTree* tree)
 {
 	if(!menu.empty())
 		menu.addSeparator();
-	PopupMenuItem0& createItem = menu.add(TRANSLATE("Заменить на"));
+	PopupMenuItem0& createItem = menu.add(TRANSLATE("Р—Р°РјРµРЅРёС‚СЊ РЅР°"));
 	ClassMenuItemAdderRowPointer(this, tree).generateMenu(createItem, tree->model()->typeComboStrings(typeName()));
 
 	return PropertyRow::onContextMenu(menu, tree);
@@ -858,7 +858,7 @@ void PropertyOArchive::enterNode(PropertyRow* row)
 PropertyRow* PropertyOArchive::addRow(ShareHandle<PropertyRow> newRow, bool block, PropertyRow* previousNode)
 {
 	const char* nameAlt = newRow->nameAlt();
-	if(!previousNode) // FIXME перенести в место вызова
+	if(!previousNode) // FIXME РїРµСЂРµРЅРµСЃС‚Рё РІ РјРµСЃС‚Рѕ РІС‹Р·РѕРІР°
 		previousNode = lastNode_;
 
 	PropertyRow* result = 0;
@@ -887,7 +887,7 @@ PropertyRow* PropertyOArchive::addRow(ShareHandle<PropertyRow> newRow, bool bloc
 		if(updateMode_ || block){
 			PropertyRow* row = currentNode_->find(newRow->name(), 0, newRow->typeName(), !block);
 
-			// нужно для сохранения порядка, при внезапном его изменении порядка
+			// РЅСѓР¶РЅРѕ РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ РїРѕСЂСЏРґРєР°, РїСЂРё РІРЅРµР·Р°РїРЅРѕРј РµРіРѕ РёР·РјРµРЅРµРЅРёРё РїРѕСЂСЏРґРєР°
 			if(row && previousNode && previousNode->parent() == currentNode_){
 				if(currentNode_->childrenIndex(row) != currentNode_->childrenIndex(previousNode) + 1){
 					//newRow = row;

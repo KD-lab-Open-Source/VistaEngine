@@ -9,7 +9,7 @@ cD3DRender::VertexDeclarations& cD3DRender::vertexDeclarations(){
 	return declarations;
 }
 #define D3D_SDK_VERSION_MY D3D_SDK_VERSION
-//		lpD3D=Direct3DCreate9(D3D9b_SDK_VERSION);//Временно, когда появится специфичное для 9.0c переправить обратно
+//		lpD3D=Direct3DCreate9(D3D9b_SDK_VERSION);//Р’СЂРµРјРµРЅРЅРѕ, РєРѕРіРґР° РїРѕСЏРІРёС‚СЃСЏ СЃРїРµС†РёС„РёС‡РЅРѕРµ РґР»СЏ 9.0c РїРµСЂРµРїСЂР°РІРёС‚СЊ РѕР±СЂР°С‚РЅРѕ
 
 RENDER_API SAMPLER_DATA sampler_wrap_point;
 RENDER_API SAMPLER_DATA sampler_clamp_point;
@@ -221,7 +221,7 @@ bool cD3DRender::Initialize(int xscr,int yscr,int Mode,HWND lphWnd,int RefreshRa
 		if(SUCCEEDED(D3DDevice_->GetDisplayMode(0, &mode)))
 		{
 			if(!(mode.Format==D3DFMT_X8R8G8B8||mode.Format==D3DFMT_R8G8B8||mode.Format==D3DFMT_A8R8G8B8))
-				return false;//Запускаемся только в true color
+				return false;//Р—Р°РїСѓСЃРєР°РµРјСЃСЏ С‚РѕР»СЊРєРѕ РІ true color
 		}
 
 	}
@@ -630,7 +630,7 @@ int cD3DRender::Fill(int r,int g,int b,int a)
 //	if(bActiveScene) EndScene();
 	if(D3DDevice_==0) return -1;
 	RestoreDeviceIfLost();
-	a=0;//Затычка для ATTRUNKOBJ_SHOW_FLAT_SILHOUETTE 
+	a=0;//Р—Р°С‚С‹С‡РєР° РґР»СЏ ATTRUNKOBJ_SHOW_FLAT_SILHOUETTE 
 
 	D3DVIEWPORT9 vp={0,0,GetSizeX(),GetSizeY(),0.0f,1.0f};
 	RDCALL(D3DDevice_->SetViewport(&vp));
@@ -2010,7 +2010,7 @@ BYTE* cVertexBufferInternal::Lock(int minvertex)
 	}
 
 #ifndef _FINAL_VERSION
-	xassert(!isLocked_ && "Не вызван Unlock() для VertexBuffer");
+	xassert(!isLocked_ && "РќРµ РІС‹Р·РІР°РЅ Unlock() РґР»СЏ VertexBuffer");
 	isLocked_ = true;
 #endif
 

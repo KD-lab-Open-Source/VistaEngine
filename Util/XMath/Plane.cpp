@@ -26,7 +26,7 @@ float Plane::calcCross(const Vect3f& a,const Vect3f& b) const
 {
 	Vect3f v=a-b;
 	float t=A*v.x+B*v.y+C*v.z;
-	if(t==0) return 0;			// прямая и плоскость параллельны
+	if(t==0) return 0;			// РїСЂСЏРјР°СЏ Рё РїР»РѕСЃРєРѕСЃС‚СЊ РїР°СЂР°Р»Р»РµР»СЊРЅС‹
 	t=(A*a.x+B*a.y+C*a.z+D)/t;
 	return t;
 }

@@ -237,9 +237,9 @@ ShaderSceneWaterLava::ShaderSceneWaterLava(bool convertZ)
 
 void ShaderSceneWaterLava::SetTime(double time_)
 {
-	time=time_;//Тут бы невредно время обрезать, чтобы во float нормально интерполировалось.
+	time=time_;//РўСѓС‚ Р±С‹ РЅРµРІСЂРµРґРЅРѕ РІСЂРµРјСЏ РѕР±СЂРµР·Р°С‚СЊ, С‡С‚РѕР±С‹ РІРѕ float РЅРѕСЂРјР°Р»СЊРЅРѕ РёРЅС‚РµСЂРїРѕР»РёСЂРѕРІР°Р»РѕСЃСЊ.
 	float ftime=(float)time;
-	gb_RenderDevice3D->SetPixelShaderConstant(0, Vect4f(ftime,ftime,ftime,ftime));//Криво это.
+	gb_RenderDevice3D->SetPixelShaderConstant(0, Vect4f(ftime,ftime,ftime,ftime));//РљСЂРёРІРѕ СЌС‚Рѕ.
 	setVectorVS(fTime, Vect4f(ftime,ftime,ftime,ftime));
 }
 

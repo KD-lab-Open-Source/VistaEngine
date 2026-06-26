@@ -53,7 +53,7 @@ namespace XmlRpc {
 		//! Modify the types of events to watch for on this source
 		void setSourceEvents(XmlRpcSource* source, unsigned eventMask);
 
-		//! Текущее количество источников для мониторинга и обработки
+		//! РўРµРєСѓС‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РёСЃС‚РѕС‡РЅРёРєРѕРІ РґР»СЏ РјРѕРЅРёС‚РѕСЂРёРЅРіР° Рё РѕР±СЂР°Р±РѕС‚РєРё
 		size_t sourceCount() const { return sourceListSize_; }
 
 		//! Watch current set of sources and process events for the specified
@@ -86,7 +86,7 @@ namespace XmlRpc {
 		// Sources being monitored
 		SourceList _sources;
 
-		// Количество обрабатываемых соединений в данный момент
+		// РљРѕР»РёС‡РµСЃС‚РІРѕ РѕР±СЂР°Р±Р°С‚С‹РІР°РµРјС‹С… СЃРѕРµРґРёРЅРµРЅРёР№ РІ РґР°РЅРЅС‹Р№ РјРѕРјРµРЅС‚
 		size_t sourceListSize_;
 
 

@@ -82,8 +82,8 @@ bool KeyboardDriver::win32KeyToUKey(LONG vKey, LONG flags, utf32_char& extVKey, 
 		extVKey = EXT_KEY(flags) ? VK_RSHIFT : VK_LSHIFT;
 		return true;
 	case VK_UP:
-		//странность клавиш стрелок: если стоит флаг расширенной клавиши, - это блок курсорных клавиш
-		//если не стоит, то калькулятор с выключенным num lock
+		//СЃС‚СЂР°РЅРЅРѕСЃС‚СЊ РєР»Р°РІРёС€ СЃС‚СЂРµР»РѕРє: РµСЃР»Рё СЃС‚РѕРёС‚ С„Р»Р°Рі СЂР°СЃС€РёСЂРµРЅРЅРѕР№ РєР»Р°РІРёС€Рё, - СЌС‚Рѕ Р±Р»РѕРє РєСѓСЂСЃРѕСЂРЅС‹С… РєР»Р°РІРёС€
+		//РµСЃР»Рё РЅРµ СЃС‚РѕРёС‚, С‚Рѕ РєР°Р»СЊРєСѓР»СЏС‚РѕСЂ СЃ РІС‹РєР»СЋС‡РµРЅРЅС‹Рј num lock
 		extVKey = EXT_KEY(flags) ? VK_UP : VK_NUMPAD8;
 		return true;
 	case VK_DOWN:

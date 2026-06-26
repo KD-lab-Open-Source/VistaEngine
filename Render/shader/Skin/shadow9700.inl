@@ -21,7 +21,7 @@ float Shadow9700(sampler2D sh_sampler,float4 sh)
 {
 	float4 shadow = sh;
 	shadow.xy /= shadow.w;	
-	//shadow.z -= 0.001; // bias нельзя передавать через матрицу из за TSM
+	//shadow.z -= 0.001; // bias РЅРµР»СЊР·СЏ РїРµСЂРµРґР°РІР°С‚СЊ С‡РµСЂРµР· РјР°С‚СЂРёС†Сѓ РёР· Р·Р° TSM
 #ifdef FILTER_SHADOW
 	return Shadow97002x2(sh_sampler, shadow);
 #else

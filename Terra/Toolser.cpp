@@ -12,8 +12,8 @@ Toolser::Toolser()
 
 void Toolser::serialize(Archive& ar)
 {
-	ar.serialize(controllers_, "controllers", "Обработчики тулзеров");
-	ar.serialize(RangedWrapperf(scale_, 0.5f, 5.f), "scale", "Общий маштаб");
+	ar.serialize(controllers_, "controllers", "РћР±СЂР°Р±РѕС‚С‡РёРєРё С‚СѓР»Р·РµСЂРѕРІ");
+	ar.serialize(RangedWrapperf(scale_, 0.5f, 5.f), "scale", "РћР±С‰РёР№ РјР°С€С‚Р°Р±");
 
 	//bool vscale = false;
 	//if(ar.isEdit()){
@@ -27,7 +27,7 @@ void Toolser::serialize(Archive& ar)
 	//else
 	//	vscale = true;
 	//if(vscale)
-	//	ar.serialize(RangedWrapperf(vscale_, 0.2f, 5.f), "vscale", "Маштаб глубины");
+	//	ar.serialize(RangedWrapperf(vscale_, 0.2f, 5.f), "vscale", "РњР°С€С‚Р°Р± РіР»СѓР±РёРЅС‹");
 }
 
 void Toolser::start(const Se3f& pos)

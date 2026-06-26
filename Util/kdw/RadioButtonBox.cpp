@@ -5,7 +5,7 @@
 
 
 namespace kdw {
-REGISTER_CLASS(Widget, RadioButtonBox, "Группа радиокнопок");
+REGISTER_CLASS(Widget, RadioButtonBox, "Р“СЂСѓРїРїР° СЂР°РґРёРѕРєРЅРѕРїРѕРє");
 
 	RadioButtonBox::RadioButtonBox(const char* text, int border)
 	{
@@ -40,8 +40,8 @@ REGISTER_CLASS(Widget, RadioButtonBox, "Группа радиокнопок");
 
 	void RadioButtonBox::serialize(Archive& ar)
 	{
-		//ar.serialize(radioButtons_, "radioButtons", "Кнопки");
-		ar.serialize(text_, "text", "Заголовок");
+		//ar.serialize(radioButtons_, "radioButtons", "РљРЅРѕРїРєРё");
+		ar.serialize(text_, "text", "Р—Р°РіРѕР»РѕРІРѕРє");
 	}
 
 	void RadioButtonBox::addRadioButton(const char * name)

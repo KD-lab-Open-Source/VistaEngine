@@ -27,11 +27,11 @@ void UI_TextAnimation::release()
 
 void UI_TextAnimation::serialize(Archive& ar)
 {
-	ar.serialize(cursor_, "cursor", "������ � �����");
-	ar.serialize(blinkDuringOut_, "blinkDuringOut", "������� ��� ������");
-	ar.serialize(RangedWrapperf(blinkPeriodDuringOut_, 0.05f, 2.f), "blinkPeriodDuringOut", "������ �������� ��� ������");
-	ar.serialize(blinkAfterOut_, "blinkAfterOut", "������� ����� ������");
-	ar.serialize(RangedWrapperf(blinkPeriodAfterOut_, 0.05f, 2.f), "blinkPeriodAfterOut", "������ �������� ����� ������");
+	ar.serialize(cursor_, "cursor", "Курсор в конце");
+	ar.serialize(blinkDuringOut_, "blinkDuringOut", "Мерцать при выводе");
+	ar.serialize(RangedWrapperf(blinkPeriodDuringOut_, 0.05f, 2.f), "blinkPeriodDuringOut", "Период мерцания при выводе");
+	ar.serialize(blinkAfterOut_, "blinkAfterOut", "Мерцать после вывода");
+	ar.serialize(RangedWrapperf(blinkPeriodAfterOut_, 0.05f, 2.f), "blinkPeriodAfterOut", "Период мерцания после вывода");
 }
 
 void UI_TextAnimation::start()

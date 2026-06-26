@@ -8,7 +8,7 @@
 #include "Environment/SourceShield.h"
 #include "GlobalAttributes.h"
 
-// веса параметров для расчёта приоритета цели
+// РІРµСЃР° РїР°СЂР°РјРµС‚СЂРѕРІ РґР»СЏ СЂР°СЃС‡С‘С‚Р° РїСЂРёРѕСЂРёС‚РµС‚Р° С†РµР»Рё
 const float WEIGHT_MILITARY = 1.f;
 const float WEIGHT_OFFENSIVE = 3.f;
 const float WEIGHT_UNIT_CLASS = 1.f;

@@ -7,8 +7,8 @@
 #include "Serialization/SerializationFactory.h"
 
 BEGIN_ENUM_DESCRIPTOR(SwitcherType, "SwitcherType")
-    REGISTER_ENUM(SWITCHER_AND, "И")
-    REGISTER_ENUM(SWITCHER_OR, "ИЛИ")
+    REGISTER_ENUM(SWITCHER_AND, "Р")
+    REGISTER_ENUM(SWITCHER_OR, "РР›Р")
 END_ENUM_DESCRIPTOR(SwitcherType)
 
 BEGIN_ENUM_DESCRIPTOR(USELESS_ENUM, "Enumeration")
@@ -18,10 +18,10 @@ BEGIN_ENUM_DESCRIPTOR(USELESS_ENUM, "Enumeration")
     REGISTER_ENUM(LAST_VALUE, "Last Value")
 END_ENUM_DESCRIPTOR(USELESS_ENUM)
 
-BEGIN_ENUM_DESCRIPTOR(ZoneType, "Тип зоны")
-	REGISTER_ENUM(ZONE_GENERATOR, "Генератор")
-	REGISTER_ENUM(ZONE_SIMPLE, "Простая зона")
-	REGISTER_ENUM(ZONE_WALKING_EFFECT, "Блуждающий эффект")
+BEGIN_ENUM_DESCRIPTOR(ZoneType, "РўРёРї Р·РѕРЅС‹")
+	REGISTER_ENUM(ZONE_GENERATOR, "Р“РµРЅРµСЂР°С‚РѕСЂ")
+	REGISTER_ENUM(ZONE_SIMPLE, "РџСЂРѕСЃС‚Р°СЏ Р·РѕРЅР°")
+	REGISTER_ENUM(ZONE_WALKING_EFFECT, "Р‘Р»СѓР¶РґР°СЋС‰РёР№ СЌС„С„РµРєС‚")
 END_ENUM_DESCRIPTOR(ZoneType)
 
 BEGIN_ENUM_DESCRIPTOR(USELESS_FLAGS, "Flags")
@@ -30,17 +30,17 @@ BEGIN_ENUM_DESCRIPTOR(USELESS_FLAGS, "Flags")
     REGISTER_ENUM(THIRD_FLAG, "Third Flag")
 END_ENUM_DESCRIPTOR(USELESS_FLAGS)
 
-REGISTER_CLASS(TestBase, TestSwitcher, "И/ИЛИ");
-REGISTER_CLASS(TestBase, TestBase, "Базовый класс");
-REGISTER_CLASS(TestBase, TestDerivedA, "Производный класс A");
-REGISTER_CLASS(TestBase, TestDerivedB, "Производный класс B");
+REGISTER_CLASS(TestBase, TestSwitcher, "Р/РР›Р");
+REGISTER_CLASS(TestBase, TestBase, "Р‘Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ");
+REGISTER_CLASS(TestBase, TestDerivedA, "РџСЂРѕРёР·РІРѕРґРЅС‹Р№ РєР»Р°СЃСЃ A");
+REGISTER_CLASS(TestBase, TestDerivedB, "РџСЂРѕРёР·РІРѕРґРЅС‹Р№ РєР»Р°СЃСЃ B");
 
 /*
 KeyFloat::value KeyFloat::none=0;
 KeyPos::value KeyPos::none=Vect3f::ZERO;
 KeyRotate::value KeyRotate::none=QuatF::ID;
 KeyColor::value KeyColor::none=sColor4f(0,0,0,0);
-float KeyGeneral::time_delta=0.05f;//в секундах
+float KeyGeneral::time_delta=0.05f;//РІ СЃРµРєСѓРЅРґР°С…
 
 
 void KeyGeneral::serialize(Archive& ar)
@@ -52,7 +52,7 @@ void KeyColor::serialize(Archive& ar)
 {
 	KeyGeneral::serialize(ar);
 	sColor4f color (r, g, b, a);
-	ar.serialize(color, "color", "Цвет");
+	ar.serialize(color, "color", "Р¦РІРµС‚");
 	r = color.r;
 	g = color.g;
 	b = color.b;

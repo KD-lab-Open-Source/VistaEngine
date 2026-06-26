@@ -23,12 +23,12 @@ bool TextureMiniDetail::reload()
 	in_data = new Color4c[sizeX_*sizeY_];
 	fileImage->GetTexture(in_data, 0, sizeX_, sizeY_);
 	if(!normalize()){
-		xassertStr("Плохая мелкодетальная текстура: ", name());
+		xassertStr("РџР»РѕС…Р°СЏ РјРµР»РєРѕРґРµС‚Р°Р»СЊРЅР°СЏ С‚РµРєСЃС‚СѓСЂР°: ", name());
 		return false;
 	}
 
 	if(!buildDDS()){
-		xassertStr("Плохая мелкодетальная текстура: ", name());
+		xassertStr("РџР»РѕС…Р°СЏ РјРµР»РєРѕРґРµС‚Р°Р»СЊРЅР°СЏ С‚РµРєСЃС‚СѓСЂР°: ", name());
 		return false;
 	}
 

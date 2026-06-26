@@ -13,10 +13,10 @@
 #include "Render/Src/Scene.h"
 
 /*
-  О листопаде.
-  1) Необходимо регистрировать и удалять объекты (с lock для многопоточности).
-  2) Только видимые на экране объекты должны генерировать листья.
-  3) Листья падают из треугольников ближе к вершине дерева.
+  Рћ Р»РёСЃС‚РѕРїР°РґРµ.
+  1) РќРµРѕР±С…РѕРґРёРјРѕ СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊ Рё СѓРґР°Р»СЏС‚СЊ РѕР±СЉРµРєС‚С‹ (СЃ lock РґР»СЏ РјРЅРѕРіРѕРїРѕС‚РѕС‡РЅРѕСЃС‚Рё).
+  2) РўРѕР»СЊРєРѕ РІРёРґРёРјС‹Рµ РЅР° СЌРєСЂР°РЅРµ РѕР±СЉРµРєС‚С‹ РґРѕР»Р¶РЅС‹ РіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ Р»РёСЃС‚СЊСЏ.
+  3) Р›РёСЃС‚СЊСЏ РїР°РґР°СЋС‚ РёР· С‚СЂРµСѓРіРѕР»СЊРЅРёРєРѕРІ Р±Р»РёР¶Рµ Рє РІРµСЂС€РёРЅРµ РґРµСЂРµРІР°.
 */
 
 cFallLeaves::cFallLeaves()
@@ -178,7 +178,7 @@ b && (c || a)
 void cFallLeaves::AnimateObjects(Camera* camera)
 {
 	MTAuto lock(objects_lock);
-	//Пока деревьев меньше 2000-3000, выгоднее по всем пробежаться, с быстрой проверкой видимости.
+	//РџРѕРєР° РґРµСЂРµРІСЊРµРІ РјРµРЅСЊС€Рµ 2000-3000, РІС‹РіРѕРґРЅРµРµ РїРѕ РІСЃРµРј РїСЂРѕР±РµР¶Р°С‚СЊСЃСЏ, СЃ Р±С‹СЃС‚СЂРѕР№ РїСЂРѕРІРµСЂРєРѕР№ РІРёРґРёРјРѕСЃС‚Рё.
 	int size=objects.size();
 	for(int index=0;index<size;index++)
 	{
@@ -225,12 +225,12 @@ void cFallLeaves::AnimateObjects(Camera* camera)
 }
 
 /*
-   О падении лисьев -
-     листья равномерно вращаются вокруг определённой оси,
-	 а перемещаются перпендикулярно оси вращения.
+   Рћ РїР°РґРµРЅРёРё Р»РёСЃСЊРµРІ -
+     Р»РёСЃС‚СЊСЏ СЂР°РІРЅРѕРјРµСЂРЅРѕ РІСЂР°С‰Р°СЋС‚СЃСЏ РІРѕРєСЂСѓРі РѕРїСЂРµРґРµР»С‘РЅРЅРѕР№ РѕСЃРё,
+	 Р° РїРµСЂРµРјРµС‰Р°СЋС‚СЃСЏ РїРµСЂРїРµРЅРґРёРєСѓР»СЏСЂРЅРѕ РѕСЃРё РІСЂР°С‰РµРЅРёСЏ.
 
-   Когда лист - параллельно земле - он восновном в сторону летит, 
-						когда перпендикулярно - вниз.
+   РљРѕРіРґР° Р»РёСЃС‚ - РїР°СЂР°Р»Р»РµР»СЊРЅРѕ Р·РµРјР»Рµ - РѕРЅ РІРѕСЃРЅРѕРІРЅРѕРј РІ СЃС‚РѕСЂРѕРЅСѓ Р»РµС‚РёС‚, 
+						РєРѕРіРґР° РїРµСЂРїРµРЅРґРёРєСѓР»СЏСЂРЅРѕ - РІРЅРёР·.
 					
 */
 
@@ -306,7 +306,7 @@ void cFallLeaves::serializeForModel(Archive& ar, const char* modelName)
 	
 	ComboListString fallingTexture(comboList.c_str(), value.c_str());
 
-	ar.serialize(fallingTexture, "fallingLeavesTexture", "Текстура листьев (для всех моделей)"); 
+	ar.serialize(fallingTexture, "fallingLeavesTexture", "РўРµРєСЃС‚СѓСЂР° Р»РёСЃС‚СЊРµРІ (РґР»СЏ РІСЃРµС… РјРѕРґРµР»РµР№)"); 
 
 	if(ar.isInput()){
 		int textureIndex = indexInComboListString(fallingTexture.comboList(), fallingTexture.value().c_str());
@@ -333,13 +333,13 @@ void cFallLeaves::serializeForModel(Archive& ar, const char* modelName)
 
 void cFallLeaves::serialize(Archive& ar)
 {
-	ar.serialize(intensity_, "intensity", "Минимальная интенсивность");
-	ar.serialize(intensityWindMult_, "intensityWindMult", "Коэф. интенсивности от ветра");
-	ar.serialize(intensityBlow_, "intensityBlow", "Интенсивность падающего дерева");
+	ar.serialize(intensity_, "intensity", "РњРёРЅРёРјР°Р»СЊРЅР°СЏ РёРЅС‚РµРЅСЃРёРІРЅРѕСЃС‚СЊ");
+	ar.serialize(intensityWindMult_, "intensityWindMult", "РљРѕСЌС„. РёРЅС‚РµРЅСЃРёРІРЅРѕСЃС‚Рё РѕС‚ РІРµС‚СЂР°");
+	ar.serialize(intensityBlow_, "intensityBlow", "РРЅС‚РµРЅСЃРёРІРЅРѕСЃС‚СЊ РїР°РґР°СЋС‰РµРіРѕ РґРµСЂРµРІР°");
 	
-	ar.serialize(rotationSpeedMax_, "rotationSpeedMax", "Максимальная скорость вращения");
+	ar.serialize(rotationSpeedMax_, "rotationSpeedMax", "РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ СЃРєРѕСЂРѕСЃС‚СЊ РІСЂР°С‰РµРЅРёСЏ");
 
-    ar.serialize(textureAttributes_, "textureModelList", "Текстуры");
+    ar.serialize(textureAttributes_, "textureModelList", "РўРµРєСЃС‚СѓСЂС‹");
 
 	if(ar.isInput()){
 		TextureAttributes::iterator it;
@@ -382,10 +382,10 @@ void cFallLeaves::initTextures()
 void cFallLeaves::TextureAttribute::serialize(Archive& ar)
 {
 	static ResourceSelector::Options options("*.tga", ".\\RESOURCE\\TerrainData\\Textures", "");
-	ar.serialize(ResourceSelector(texture, options), "texture", "&Текстура");
-	ar.serialize(scale, "scale", "Масштаб");
-	ar.serialize(intensity, "intensity", "Коэф. интенсивности");
-	ar.serialize(static_cast<std::vector<std::string>&>(*this), "models", "Назначать на модели");
+	ar.serialize(ResourceSelector(texture, options), "texture", "&РўРµРєСЃС‚СѓСЂР°");
+	ar.serialize(scale, "scale", "РњР°СЃС€С‚Р°Р±");
+	ar.serialize(intensity, "intensity", "РљРѕСЌС„. РёРЅС‚РµРЅСЃРёРІРЅРѕСЃС‚Рё");
+	ar.serialize(static_cast<std::vector<std::string>&>(*this), "models", "РќР°Р·РЅР°С‡Р°С‚СЊ РЅР° РјРѕРґРµР»Рё");
 	if(ar.isInput() && ar.isEdit()){
 		std::string copyOfString = normalizePath(texture.c_str());
 		iterator it;

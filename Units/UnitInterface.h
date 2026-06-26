@@ -7,8 +7,8 @@
 #include "Units/AttributeCache.h"
 
 ////////////////////////////////////////////////
-// Интерфейс для игрового интерфейса
-// Объединяет юниты, здания, предметы и сквады
+// РРЅС‚РµСЂС„РµР№СЃ РґР»СЏ РёРіСЂРѕРІРѕРіРѕ РёРЅС‚РµСЂС„РµР№СЃР°
+// РћР±СЉРµРґРёРЅСЏРµС‚ СЋРЅРёС‚С‹, Р·РґР°РЅРёСЏ, РїСЂРµРґРјРµС‚С‹ Рё СЃРєРІР°РґС‹
 ////////////////////////////////////////////////
 
 typedef vector<UnitCommand> CommandList;
@@ -30,7 +30,7 @@ public:
 	void graphQuant(float dt);
 
 	//------------------------------------------------
-	// Команды
+	// РљРѕРјР°РЅРґС‹
 	void sendCommand(const UnitCommand& command); // MTG
 	void receiveCommand(const UnitCommand& command); // MTL
 	
@@ -62,24 +62,24 @@ public:
 	virtual bool selectAble() const { return false; }
 	virtual int impassability() const { return 0; }
 
-	virtual const Se3f& interpolatedPose() const = 0;// использовать только внутри graphQuant()
+	virtual const Se3f& interpolatedPose() const = 0;// РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ РІРЅСѓС‚СЂРё graphQuant()
 	
 	virtual const UI_ShowModeSprite* getSelectSprite() const = 0;
 
 	//------------------------------------------------
-	// юнит невидим
+	// СЋРЅРёС‚ РЅРµРІРёРґРёРј
 	virtual bool isUnseen() const { return false; }
 
-	/// Юнит занят выполнением назначенных действий?
+	/// Р®РЅРёС‚ Р·Р°РЅСЏС‚ РІС‹РїРѕР»РЅРµРЅРёРµРј РЅР°Р·РЅР°С‡РµРЅРЅС‹С… РґРµР№СЃС‚РІРёР№?
 	virtual bool isWorking() const { return false; }
 
 	//------------------------------------------------
 
-	/// уровень зарядки оружия, [0, 1]
+	/// СѓСЂРѕРІРµРЅСЊ Р·Р°СЂСЏРґРєРё РѕСЂСѓР¶РёСЏ, [0, 1]
 	virtual float weaponChargeLevel(int weapon_id = 0) const { return 0; }
-	/// прогресс производства, [0, 1]
+	/// РїСЂРѕРіСЂРµСЃСЃ РїСЂРѕРёР·РІРѕРґСЃС‚РІР°, [0, 1]
 	virtual float productionProgress() const { return 0; }
-	/// прогресс производства параметров, [0, 1]
+	/// РїСЂРѕРіСЂРµСЃСЃ РїСЂРѕРёР·РІРѕРґСЃС‚РІР° РїР°СЂР°РјРµС‚СЂРѕРІ, [0, 1]
 	virtual float productionParameterProgress() const { return 0; }
 
 	//------------------------------------------------
@@ -132,7 +132,7 @@ protected:
 	int selectingTeamIndex_;
 
 private:
-	CommandList suspendCommandList_; // Очередь отложенных комманд.
+	CommandList suspendCommandList_; // РћС‡РµСЂРµРґСЊ РѕС‚Р»РѕР¶РµРЅРЅС‹С… РєРѕРјРјР°РЅРґ.
 
 	int usedByTriggerPriority_;
 	int usedByTriggerResetCounter_;

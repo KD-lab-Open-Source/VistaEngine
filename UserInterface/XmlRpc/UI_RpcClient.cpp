@@ -73,7 +73,7 @@ void UI_RpcClient::registerUser(const char* n, const char* p)
 {
 	if(!setCallLock(LOCK1))
 		return;
-	LogMsg((XBuffer() < "UI_RpcClient:: �����������: " < n < ", " < p < "\n").c_str());
+	LogMsg((XBuffer() < "UI_RpcClient:: Регистрация: " < n < ", " < p < "\n").c_str());
 
 	RpcClient::instance()->rpcAsynchCall(&MethodRegister("Register", this, &UI_RpcClient::registerUserHandler, LoginData(n, p)));
 }
@@ -82,7 +82,7 @@ void UI_RpcClient::login(const char* n, const char* p)
 {
 	if(!setCallLock(LOCK1))
 		return;
-	LogMsg((XBuffer() < "UI_RpcClient:: ����: " < n < ", " < p < "\n").c_str());
+	LogMsg((XBuffer() < "UI_RpcClient:: Вход: " < n < ", " < p < "\n").c_str());
 
 	RpcClient::instance()->rpcAsynchCall(&MethodLogin("Login", this, &UI_RpcClient::loginHandler, LoginData(n, p, &session_)));
 }
@@ -91,7 +91,7 @@ void UI_RpcClient::logout()
 {
 	if(!setCallLock(LOCK1))
 		return;
-	LogMsg("UI_RpcClient:: �����\n");
+	LogMsg("UI_RpcClient:: Выход\n");
 
 	RpcClient::instance()->rpcAsynchCall(&MethodLogout("Logout", this, &UI_RpcClient::logoutHandler, session_));
 }
@@ -100,13 +100,13 @@ void UI_RpcClient::registerUserHandler(int status)
 {
 	switch(status){
 	case STATUS_GOOD:
-		LogMsg("UI_RpcClient::registerUserHandler: ����������� ������ �������\n");
+		LogMsg("UI_RpcClient::registerUserHandler: Регистрация прошла успешно\n");
 		break;
 	case STATUS_USER_NAME_EXIST:
-		LogMsg("UI_RpcClient::registerUserHandler: ����� ��� ����\n");
+		LogMsg("UI_RpcClient::registerUserHandler: Такой уже есть\n");
 		break;
 	default:
-		LogMsg("UI_RpcClient::registerUserHandler: ������\n");
+		LogMsg("UI_RpcClient::registerUserHandler: Ошибка\n");
 		break;
 	}
 
@@ -118,13 +118,13 @@ void UI_RpcClient::loginHandler(int status)
 {
 	switch(status){
 	case STATUS_GOOD:
-		LogMsg("UI_RpcClient::loginHandler: �������� ����\n");
+		LogMsg("UI_RpcClient::loginHandler: Успешный вход\n");
 		break;
 	case STATUS_BAD_USER_OR_PASSWORD:
-		LogMsg("UI_RpcClient::loginHandler: ��� ������ ������������ ��� �������� ������\n");
+		LogMsg("UI_RpcClient::loginHandler: Нет такого пользователя или неверный пароль\n");
 		break;
 	default:
-		LogMsg("UI_RpcClient::loginHandler: ������\n");
+		LogMsg("UI_RpcClient::loginHandler: Ошибка\n");
 		break;
 	}
 
@@ -136,13 +136,13 @@ void UI_RpcClient::logoutHandler(int status)
 {
 	switch(status){
 	case STATUS_GOOD:
-		LogMsg("UI_RpcClient::logoutHandler: �������� �����\n");
+		LogMsg("UI_RpcClient::logoutHandler: Успешный выход\n");
 		break;
 	case STATUS_DOUBLE_OR_NOT_LOGON:
-		LogMsg("UI_RpcClient::logoutHandler: ���� � ���� ������ �� ����������\n");
+		LogMsg("UI_RpcClient::logoutHandler: Вход в этой сессии не произведен\n");
 		break;
 	default:
-		LogMsg("UI_RpcClient::logoutHandler: ������\n");
+		LogMsg("UI_RpcClient::logoutHandler: Ошибка\n");
 		break;
 	}
 

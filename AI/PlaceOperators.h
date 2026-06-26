@@ -35,8 +35,8 @@ protected:
 class WeaponUnitScanOp
 {
 public:
-	// aimUnit - true = мой юнит, false = вражеский юнит
-	// health - true = учитывать здоровье, false = не учитывать здоровье
+	// aimUnit - true = РјРѕР№ СЋРЅРёС‚, false = РІСЂР°Р¶РµСЃРєРёР№ СЋРЅРёС‚
+	// health - true = СѓС‡РёС‚С‹РІР°С‚СЊ Р·РґРѕСЂРѕРІСЊРµ, false = РЅРµ СѓС‡РёС‚С‹РІР°С‚СЊ Р·РґРѕСЂРѕРІСЊРµ
 	WeaponUnitScanOp(const UnitActing* unit, Player& aiPlayer, WeaponPrmReference weaponPrm, bool aimUnit, bool health);
 
 	void checkPosition(const Vect2f& pos);

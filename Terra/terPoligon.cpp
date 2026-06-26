@@ -124,11 +124,11 @@ bool putModel2VBitmap(const char* fName, const Se3f& pos, sVoxelBitmap& voxelBit
 
 void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 {
-	//float -алгоритм
+	//float -Р°Р»РіРѕСЂРёС‚Рј
 	if(a->y > b->y) swap(a, b);
 	if(a->y > c->y) swap(a, c);
 	if(b->y > c->y) swap(b, c);
-	// грань нулевой высоты рисовать не будем( а надо, для того-чтоб не пропадали точки когда очень много полигонов на точку)
+	// РіСЂР°РЅСЊ РЅСѓР»РµРІРѕР№ РІС‹СЃРѕС‚С‹ СЂРёСЃРѕРІР°С‚СЊ РЅРµ Р±СѓРґРµРј( Р° РЅР°РґРѕ, РґР»СЏ С‚РѕРіРѕ-С‡С‚РѕР± РЅРµ РїСЂРѕРїР°РґР°Р»Рё С‚РѕС‡РєРё РєРѕРіРґР° РѕС‡РµРЅСЊ РјРЅРѕРіРѕ РїРѕР»РёРіРѕРЅРѕРІ РЅР° С‚РѕС‡РєСѓ)
 	///if (round(c->y) <= round(a->y)) continue;
 
 	int current_sx, current_sy;
@@ -139,8 +139,8 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 	int length;
 	//unsigned short *dest;
 
-	// посчитаем du/dsx, dv/dsx, d(1/z)/dsx
-	// считаем по самой длинной линии (т.е. проходящей через вершину B)
+	// РїРѕСЃС‡РёС‚Р°РµРј du/dsx, dv/dsx, d(1/z)/dsx
+	// СЃС‡РёС‚Р°РµРј РїРѕ СЃР°РјРѕР№ РґР»РёРЅРЅРѕР№ Р»РёРЅРёРё (С‚.Рµ. РїСЂРѕС…РѕРґСЏС‰РµР№ С‡РµСЂРµР· РІРµСЂС€РёРЅСѓ B)
 	float divisor;
 	divisor=(c->y - a->y);
 	if(divisor) k = (b->y - a->y) / divisor;
@@ -195,7 +195,7 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 
 ////////////////////////////////
 
-	// построчная отрисовка грани
+	// РїРѕСЃС‚СЂРѕС‡РЅР°СЏ РѕС‚СЂРёСЃРѕРІРєР° РіСЂР°РЅРё
 	for (current_sy = ceilf(a->y); current_sy <= floorf(c->y); current_sy++) { //current_sy < ceilf(c->y)
 		if((current_sy) >= voxelBitmap.sy) break; //-iminY
 		//if((current_sy-minY) < 0 ) break;//continue;
@@ -215,7 +215,7 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 #endif
 		}
 
-		// x_start должен находиться левее x_end
+		// x_start РґРѕР»Р¶РµРЅ РЅР°С…РѕРґРёС‚СЊСЃСЏ Р»РµРІРµРµ x_end
 		if (x_start > x_end) {
 			x = x_end;
 			z1 = z1_end;
@@ -226,11 +226,11 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 			length = ceilf(x_end) - ceilf(x_start);
 		}
 
-		// считаем адрес начала строки в видеопамяти
+		// СЃС‡РёС‚Р°РµРј Р°РґСЂРµСЃ РЅР°С‡Р°Р»Р° СЃС‚СЂРѕРєРё РІ РІРёРґРµРѕРїР°РјСЏС‚Рё
 		//dest = GB;
 		//dest += current_sy * sizeX05*2 + (int)ceilf(x);
 
-		// текстурируем строку
+		// С‚РµРєСЃС‚СѓСЂРёСЂСѓРµРј СЃС‚СЂРѕРєСѓ
 		current_sx = round(ceilf(x));//-iminX;
 
 		if((current_sy) >= 0 ) if (length) { //-iminY
@@ -239,7 +239,7 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 			z1 += dz1* tmp;
 	#endif
 			while (length--) {
-			// используем z-буфер для определения видимости текущей точки
+			// РёСЃРїРѕР»СЊР·СѓРµРј z-Р±СѓС„РµСЂ РґР»СЏ РѕРїСЂРµРґРµР»РµРЅРёСЏ РІРёРґРёРјРѕСЃС‚Рё С‚РµРєСѓС‰РµР№ С‚РѕС‡РєРё
 				if( (current_sx<voxelBitmap.sx) && (current_sx >= 0)) {
 					//if (zBuffer[(current_sy-iminY)*voxelBitmap.sx + current_sx] <= z1) {
 					//	//*dest = palLight[round(cc)];
@@ -256,7 +256,7 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 			}
 		}
 
-		// сдвигаем начальные и конечные значения x/u/v/(1/z)
+		// СЃРґРІРёРіР°РµРј РЅР°С‡Р°Р»СЊРЅС‹Рµ Рё РєРѕРЅРµС‡РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ x/u/v/(1/z)
 		x_start += dx_start;
 		z1_start += dz1_start;
 		x_end += dx_end;
@@ -265,9 +265,9 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 
 
 /*
-	//1-й целочисленный алгоритм - на балистик- 1 точка
+	//1-Р№ С†РµР»РѕС‡РёСЃР»РµРЅРЅС‹Р№ Р°Р»РіРѕСЂРёС‚Рј - РЅР° Р±Р°Р»РёСЃС‚РёРє- 1 С‚РѕС‡РєР°
 
-	const Vect3i* a = &iPntArr[p->p1]; // Для сортировки по Y.
+	const Vect3i* a = &iPntArr[p->p1]; // Р”Р»СЏ СЃРѕСЂС‚РёСЂРѕРІРєРё РїРѕ Y.
 	const Vect3i* b = &iPntArr[p->p2];
 	const Vect3i* c = &iPntArr[p->p3];
 	if(a->y > b->y) swap(a, b);
@@ -298,8 +298,8 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 	int length;
 	//unsigned short *dest;
 
-	// посчитаем du/dsx, dv/dsx, d(1/z)/dsx
-	// считаем по самой длинной линии (т.е. проходящей через вершину B)
+	// РїРѕСЃС‡РёС‚Р°РµРј du/dsx, dv/dsx, d(1/z)/dsx
+	// СЃС‡РёС‚Р°РµРј РїРѕ СЃР°РјРѕР№ РґР»РёРЅРЅРѕР№ Р»РёРЅРёРё (С‚.Рµ. РїСЂРѕС…РѕРґСЏС‰РµР№ С‡РµСЂРµР· РІРµСЂС€РёРЅСѓ B)
 	int divisor;
 	divisor=(c->y - a->y);
 	//if(roundFIntF0(divisor)) k = ((__int64)(b->y - a->y)<<PN_HALF_FRACTION) / divisor;// F8
@@ -308,7 +308,7 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 	//z1_start = a->z + (cvrtFIntF8(c->z - a->z))*(k);
 	if(roundFIntF0(divisor)) k = ((__int64)(b->y - a->y)<<PN_FRACTION) / divisor;// F16
 	else k=0;
-	x_start = a->x + (int)mroundFIntF0((__int64)(c->x - a->x)*(k));//На самом деле F16(F18)!
+	x_start = a->x + (int)mroundFIntF0((__int64)(c->x - a->x)*(k));//РќР° СЃР°РјРѕРј РґРµР»Рµ F16(F18)!
 	z1_start = a->z + (int)mroundFIntF0((__int64)(c->z - a->z)*(k));
 	x_end = b->x;
 	z1_end = b->z;
@@ -329,8 +329,8 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 	else { dx_start=0; dz1_start=0;}
 #ifdef SUBPIXEL
 	tmp = ceilFIntF16(a->y) - a->y;
-	x_start += (__int64)dx_start*tmp>>PN_FRACTION;//(dx_start>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //Норма
-	z1_start += (__int64)dz1_start*tmp>>PN_FRACTION;//(dz1_start>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //Норма
+	x_start += (__int64)dx_start*tmp>>PN_FRACTION;//(dx_start>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //РќРѕСЂРјР°
+	z1_start += (__int64)dz1_start*tmp>>PN_FRACTION;//(dz1_start>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //РќРѕСЂРјР°
 #endif
 	if (ceilFIntF16(b->y) > ceilFIntF16(a->y)) {
 		tmp = ceilFIntF16(a->y) - (a->y);
@@ -354,13 +354,13 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 		else{ dx_end=0; dz1_end=0; }
 	}
 #ifdef SUBPIXEL
-	x_end += (__int64)dx_end*tmp>>PN_FRACTION;//(dx_end>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //Норма
-	z1_end += (__int64)dz1_end*tmp>>PN_FRACTION;//(dz1_end>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //Норма
+	x_end += (__int64)dx_end*tmp>>PN_FRACTION;//(dx_end>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //РќРѕСЂРјР°
+	z1_end += (__int64)dz1_end*tmp>>PN_FRACTION;//(dz1_end>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //РќРѕСЂРјР°
 #endif
 
 ////////////////////////////////
 //loc_scip01:;
-	// построчная отрисовка грани
+	// РїРѕСЃС‚СЂРѕС‡РЅР°СЏ РѕС‚СЂРёСЃРѕРІРєР° РіСЂР°РЅРё
 	for (current_sy = ceilFIntF0(a->y); current_sy <= floorFIntF0(c->y); current_sy++) { //ceilFIntF0(c->y)
 		if((current_sy) >= voxelBitmap.sy ) break;
 		if (current_sy == ceilFIntF0(b->y)) {
@@ -374,8 +374,8 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 			else { dx_end=0; dz1_end=0; }
 #ifdef SUBPIXEL
 			tmp = ceilFIntF16(b->y) - b->y;
-			x_end += (__int64)dx_end*tmp>>PN_FRACTION;//(dx_end>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //Норма
-			z1_end += (__int64)dz1_end*tmp>>PN_FRACTION;//(dz1_end>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //Норма
+			x_end += (__int64)dx_end*tmp>>PN_FRACTION;//(dx_end>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //РќРѕСЂРјР°
+			z1_end += (__int64)dz1_end*tmp>>PN_FRACTION;//(dz1_end>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //РќРѕСЂРјР°
 #endif
 		}
 
@@ -385,7 +385,7 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 		//xassert(x_end <= curMaxX +(1<<16));
 		//x_start=clamp(x_start, curMinX, curMaxX);
 		//x_end=clamp(x_end, curMinX, curMaxX);
-		// x_start должен находиться левее x_end
+		// x_start РґРѕР»Р¶РµРЅ РЅР°С…РѕРґРёС‚СЊСЃСЏ Р»РµРІРµРµ x_end
 		if (x_start > x_end) {
 			x = x_end;
 			z1 = z1_end;
@@ -397,7 +397,7 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 		}
 		length++;
 
-		// текстурируем строку
+		// С‚РµРєСЃС‚СѓСЂРёСЂСѓРµРј СЃС‚СЂРѕРєСѓ
 		current_sx = ceilFIntF0(x);
 
 		if((current_sy) >= 0 ) if (length) {
@@ -407,7 +407,7 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 			z1 += (__int64)dz1*tmp>>PN_FRACTION;//(dz1>>PN_HALF_FRACTION)* (tmp>>PN_HALF_FRACTION);
 	#endif
 			while (length--) {
-			// используем z-буфер для определения видимости текущей точки
+			// РёСЃРїРѕР»СЊР·СѓРµРј z-Р±СѓС„РµСЂ РґР»СЏ РѕРїСЂРµРґРµР»РµРЅРёСЏ РІРёРґРёРјРѕСЃС‚Рё С‚РµРєСѓС‰РµР№ С‚РѕС‡РєРё
 				//xassert(current_sx <= ceilFIntF0(a->x)-iminX+10 || current_sx <= ceilFIntF0(b->x)-iminX+10 || current_sx <= ceilFIntF0(c->x)-iminX+10);
 				//xassert(current_sx >= ceilFIntF0(a->x)-iminX-10 || current_sx >= ceilFIntF0(b->x)-iminX-10 || current_sx >= ceilFIntF0(c->x)-iminX-10);
 				//xassert(z1 <= a->z+(20<<16) || z1 <= b->z+(20<<16) || z1 <= c->z+(20<<16));
@@ -423,7 +423,7 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 			}
 		}
 
-		// сдвигаем начальные и конечные значения x/u/v/(1/z)
+		// СЃРґРІРёРіР°РµРј РЅР°С‡Р°Р»СЊРЅС‹Рµ Рё РєРѕРЅРµС‡РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ x/u/v/(1/z)
 		x_start += dx_start;
 		z1_start += dz1_start;
 		x_end += dx_end;
@@ -432,10 +432,10 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 */
 
 /*
-	//2-й целочисленный алгоритм - баги на wall на балистик- 1 точка
+	//2-Р№ С†РµР»РѕС‡РёСЃР»РµРЅРЅС‹Р№ Р°Р»РіРѕСЂРёС‚Рј - Р±Р°РіРё РЅР° wall РЅР° Р±Р°Р»РёСЃС‚РёРє- 1 С‚РѕС‡РєР°
 #undef SUBPIXEL
 #undef SUBTEXEL
-	const Vect3i* a = &iPntArr[p->p1]; // Для сортировки по Y.
+	const Vect3i* a = &iPntArr[p->p1]; // Р”Р»СЏ СЃРѕСЂС‚РёСЂРѕРІРєРё РїРѕ Y.
 	const Vect3i* b = &iPntArr[p->p2];
 	const Vect3i* c = &iPntArr[p->p3];
 	if(a->y > b->y) swap(a, b);
@@ -464,8 +464,8 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 
 	//unsigned short *dest;
 
-	// посчитаем du/dsx, dv/dsx, d(1/z)/dsx
-	// считаем по самой длинной линии (т.е. проходящей через вершину B)
+	// РїРѕСЃС‡РёС‚Р°РµРј du/dsx, dv/dsx, d(1/z)/dsx
+	// СЃС‡РёС‚Р°РµРј РїРѕ СЃР°РјРѕР№ РґР»РёРЅРЅРѕР№ Р»РёРЅРёРё (С‚.Рµ. РїСЂРѕС…РѕРґСЏС‰РµР№ С‡РµСЂРµР· РІРµСЂС€РёРЅСѓ B)
 	int divisor;
 	divisor=(c->y - a->y);
 	//if(roundFIntF0(divisor)) k = ((__int64)(b->y - a->y)<<PN_HALF_FRACTION) / divisor;// F8
@@ -474,7 +474,7 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 	//z1_start = a->z + (cvrtFIntF8(c->z - a->z))*(k);
 	if(roundFIntF0(divisor)) k = ((__int64)(b->y - a->y)<<PN_FRACTION) / divisor;// F16
 	else k=0;
-	x_start = a->x + (int)mroundFIntF0((__int64)(c->x - a->x)*(k));//На самом деле F16(F18)!
+	x_start = a->x + (int)mroundFIntF0((__int64)(c->x - a->x)*(k));//РќР° СЃР°РјРѕРј РґРµР»Рµ F16(F18)!
 	z1_start = a->z + (int)mroundFIntF0((__int64)(c->z - a->z)*(k));
 	x_end = b->x;
 	z1_end = b->z;
@@ -495,8 +495,8 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 	else { dx_start=0; dz1_start=0;}
 #ifdef SUBPIXEL
 	tmp = ceilFIntF16(a->y) - a->y;
-	x_start += (__int64)dx_start*tmp>>PN_FRACTION;//(dx_start>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //Норма
-	z1_start += (__int64)dz1_start*tmp>>PN_FRACTION;//(dz1_start>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //Норма
+	x_start += (__int64)dx_start*tmp>>PN_FRACTION;//(dx_start>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //РќРѕСЂРјР°
+	z1_start += (__int64)dz1_start*tmp>>PN_FRACTION;//(dz1_start>>PN_HALF_FRACTION) * (tmp>>PN_HALF_FRACTION); //РќРѕСЂРјР°
 #endif
 
 	int current_sy=mroundFIntF0(a->y);
@@ -512,12 +512,12 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 #ifdef SUBPIXEL
 		//tmp = ceilFIntF16(a->y) - (a->y);
 		tmp = mroundFIntF0(a->y) - (a->y);
-		x_end += (dx_end>>8) * (tmp>>8); //Норма
-		z1_end += (dz1_end>>8) * (tmp>>8); //Норма
+		x_end += (dx_end>>8) * (tmp>>8); //РќРѕСЂРјР°
+		z1_end += (dz1_end>>8) * (tmp>>8); //РќРѕСЂРјР°
 #endif
-		// построчная отрисовка грани
+		// РїРѕСЃС‚СЂРѕС‡РЅР°СЏ РѕС‚СЂРёСЃРѕРІРєР° РіСЂР°РЅРё
 		do {
-			// x_start должен находиться левее x_end
+			// x_start РґРѕР»Р¶РµРЅ РЅР°С…РѕРґРёС‚СЊСЃСЏ Р»РµРІРµРµ x_end
 			x_start=clamp(x_start, curMinX, curMaxX);
 			x_end=clamp(x_end, curMinX, curMaxX);
 			int x,z1;
@@ -535,7 +535,7 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 				//xe = ceilFIntF0(x_end);
 				xe = mroundFIntF0(x_end);
 			}
-			// текстурируем строку
+			// С‚РµРєСЃС‚СѓСЂРёСЂСѓРµРј СЃС‚СЂРѕРєСѓ
 			//int current_sx = ceilFIntF0(x);
 			int current_sx = mroundFIntF0(x);
 			xassert(current_sy>=0 && current_sy < voxelBitmap.sy);
@@ -552,7 +552,7 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 					z1 += dz1;
 				}
 			//}
-			// сдвигаем начальные и конечные значения x/u/v/(1/z)
+			// СЃРґРІРёРіР°РµРј РЅР°С‡Р°Р»СЊРЅС‹Рµ Рё РєРѕРЅРµС‡РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ x/u/v/(1/z)
 			x_start += dx_start;
 			x_end += dx_end;
 			z1_start += dz1_start;
@@ -573,13 +573,13 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 	#ifdef SUBPIXEL
 		//tmp = ceilFIntF16(b->y) - b->y;
 		tmp = mroundFIntF0(b->y) - b->y;
-		x_end += (dx_end>>8) * (tmp>>8); //Норма
-		z1_end += (dz1_end>>8) * (tmp>>8); //Норма
+		x_end += (dx_end>>8) * (tmp>>8); //РќРѕСЂРјР°
+		z1_end += (dz1_end>>8) * (tmp>>8); //РќРѕСЂРјР°
 	#endif
-		// построчная отрисовка грани
-		// построчная отрисовка грани
+		// РїРѕСЃС‚СЂРѕС‡РЅР°СЏ РѕС‚СЂРёСЃРѕРІРєР° РіСЂР°РЅРё
+		// РїРѕСЃС‚СЂРѕС‡РЅР°СЏ РѕС‚СЂРёСЃРѕРІРєР° РіСЂР°РЅРё
 		do {
-			// x_start должен находиться левее x_end
+			// x_start РґРѕР»Р¶РµРЅ РЅР°С…РѕРґРёС‚СЊСЃСЏ Р»РµРІРµРµ x_end
 			x_start=clamp(x_start, curMinX, curMaxX);
 			x_end=clamp(x_end, curMinX, curMaxX);
 			int x,z1;
@@ -597,7 +597,7 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 				//xe = ceilFIntF0(x_end);
 				xe = mroundFIntF0(x_end);
 			}
-			// текстурируем строку
+			// С‚РµРєСЃС‚СѓСЂРёСЂСѓРµРј СЃС‚СЂРѕРєСѓ
 			//int current_sx = ceilFIntF0(x);
 			int current_sx = mroundFIntF0(x);
 			xassert(current_sy>=0 && current_sy < voxelBitmap.sy);
@@ -614,7 +614,7 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 					z1 += dz1;
 				}
 			//}
-			// сдвигаем начальные и конечные значения x/u/v/(1/z)
+			// СЃРґРІРёРіР°РµРј РЅР°С‡Р°Р»СЊРЅС‹Рµ Рё РєРѕРЅРµС‡РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ x/u/v/(1/z)
 			x_start += dx_start;
 			x_end += dx_end;
 			z1_start += dz1_start;

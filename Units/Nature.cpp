@@ -17,20 +17,20 @@ REGISTER_CLASS(UnitBase, UnitEnvironmentBuilding, "UnitEnvironmentBuilding")
 REGISTER_CLASS_IN_FACTORY(UnitFactory, UNIT_CLASS_ENVIRONMENT, UnitEnvironmentBuilding);
 
 BEGIN_ENUM_DESCRIPTOR(EnvironmentType, "Type")
-REGISTER_ENUM(ENVIRONMENT_PHANTOM, "Фантом")
-REGISTER_ENUM(ENVIRONMENT_PHANTOM2, "Никогда неразрушаемое здание")
-REGISTER_ENUM(ENVIRONMENT_BUSH, "Куст")
-REGISTER_ENUM(ENVIRONMENT_TREE, "Дерево")
-REGISTER_ENUM(ENVIRONMENT_FENCE, "Забор")
-REGISTER_ENUM(ENVIRONMENT_FENCE2, "Неразрушаемый забор")
-REGISTER_ENUM(ENVIRONMENT_STONE, "Камень")
-REGISTER_ENUM(ENVIRONMENT_ROCK, "Скала")
-REGISTER_ENUM(ENVIRONMENT_BASEMENT, "Фундамент здания")
-REGISTER_ENUM(ENVIRONMENT_BARN, "Сарай")
-REGISTER_ENUM(ENVIRONMENT_BUILDING, "Здание")
-REGISTER_ENUM(ENVIRONMENT_BRIDGE, "Мост")
-REGISTER_ENUM(ENVIRONMENT_INDESTRUCTIBLE, "Неразрушаемое строение")
-REGISTER_ENUM(ENVIRONMENT_BIG_BUILDING, "Большое здание")
+REGISTER_ENUM(ENVIRONMENT_PHANTOM, "Р¤Р°РЅС‚РѕРј")
+REGISTER_ENUM(ENVIRONMENT_PHANTOM2, "РќРёРєРѕРіРґР° РЅРµСЂР°Р·СЂСѓС€Р°РµРјРѕРµ Р·РґР°РЅРёРµ")
+REGISTER_ENUM(ENVIRONMENT_BUSH, "РљСѓСЃС‚")
+REGISTER_ENUM(ENVIRONMENT_TREE, "Р”РµСЂРµРІРѕ")
+REGISTER_ENUM(ENVIRONMENT_FENCE, "Р—Р°Р±РѕСЂ")
+REGISTER_ENUM(ENVIRONMENT_FENCE2, "РќРµСЂР°Р·СЂСѓС€Р°РµРјС‹Р№ Р·Р°Р±РѕСЂ")
+REGISTER_ENUM(ENVIRONMENT_STONE, "РљР°РјРµРЅСЊ")
+REGISTER_ENUM(ENVIRONMENT_ROCK, "РЎРєР°Р»Р°")
+REGISTER_ENUM(ENVIRONMENT_BASEMENT, "Р¤СѓРЅРґР°РјРµРЅС‚ Р·РґР°РЅРёСЏ")
+REGISTER_ENUM(ENVIRONMENT_BARN, "РЎР°СЂР°Р№")
+REGISTER_ENUM(ENVIRONMENT_BUILDING, "Р—РґР°РЅРёРµ")
+REGISTER_ENUM(ENVIRONMENT_BRIDGE, "РњРѕСЃС‚")
+REGISTER_ENUM(ENVIRONMENT_INDESTRUCTIBLE, "РќРµСЂР°Р·СЂСѓС€Р°РµРјРѕРµ СЃС‚СЂРѕРµРЅРёРµ")
+REGISTER_ENUM(ENVIRONMENT_BIG_BUILDING, "Р‘РѕР»СЊС€РѕРµ Р·РґР°РЅРёРµ")
 END_ENUM_DESCRIPTOR(EnvironmentType)
 
 #pragma warning(disable: 4355)
@@ -59,7 +59,7 @@ void UnitEnvironmentBuilding::showEditor()
 				streamLogicPostCommand.set(fCommandSetIgnored, model()) << false;
 	}
 
-	// Конверсия в симпл
+	// РљРѕРЅРІРµСЂСЃРёСЏ РІ СЃРёРјРїР»
 	if(!dead() && isEnvironmentSimple(environmentType_)){
 		UnitBase* unit = player()->buildUnit(AuxAttributeReference(AUX_ATTRIBUTE_ENVIRONMENT_SIMPLE));
 		BinaryOArchive oa;
@@ -120,20 +120,20 @@ void UnitEnvironmentBuilding::serialize(Archive& ar)
 	if(!alive())
 		return;
 
-	ar.serialize(permanentColor_, "color", "Цвет");
+	ar.serialize(permanentColor_, "color", "Р¦РІРµС‚");
 
 	if(ar.isOutput()){
 		AttributeBase::setModel(model(), 0);
 		AttributeBase::setCurrentAttribute(0);
 	}
 
-	ar.serialize(animationChain_, "animationChain", "Анимационная цепочка");
-	ar.serialize(animationChainBurnt_, "animationChainBurnt", "Анимационная цепочка горения");
+	ar.serialize(animationChain_, "animationChain", "РђРЅРёРјР°С†РёРѕРЅРЅР°СЏ С†РµРїРѕС‡РєР°");
+	ar.serialize(animationChainBurnt_, "animationChainBurnt", "РђРЅРёРјР°С†РёРѕРЅРЅР°СЏ С†РµРїРѕС‡РєР° РіРѕСЂРµРЅРёСЏ");
 	animationChain_.cycled = true;
 	animationChainBurnt_.cycled = false;
 
 	int angle = round(R2G(acosf(deviationCosMin_)));
-	ar.serialize(angle, "angle", "Угол при котором разрушать здание");
+	ar.serialize(angle, "angle", "РЈРіРѕР» РїСЂРё РєРѕС‚РѕСЂРѕРј СЂР°Р·СЂСѓС€Р°С‚СЊ Р·РґР°РЅРёРµ");
 	deviationCosMin_ = cosf(G2R(angle));
 
 	if(environmentType_ == ENVIRONMENT_BARN || environmentType_ == ENVIRONMENT_BUILDING || environmentType_ == ENVIRONMENT_BIG_BUILDING)

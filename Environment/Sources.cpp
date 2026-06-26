@@ -26,28 +26,28 @@
 
 #pragma warning(disable: 4355)
 
-WRAP_LIBRARY(SourcesLibrary, "SourcesLibrary", "���������", "Scripts\\Content\\SourcesLibrary", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(SourcesLibrary, "SourcesLibrary", "Источники", "Scripts\\Content\\SourcesLibrary", 0, LIBRARY_EDITABLE);
 
 DECLARE_SEGMENT(Sources)
-REGISTER_CLASS(SourceBase, SourceZone, "���� �� ����");
-REGISTER_CLASS(SourceBase, SourceLightning, "���� � ��������");
-REGISTER_CLASS(SourceBase, SourceWater, "�������� ����");
-REGISTER_CLASS(SourceBase, SourceBubble, "�������� ���������");
-REGISTER_CLASS(SourceBase, SourceIce, "�������� ����");
-REGISTER_CLASS(SourceBase, SourceFreeze, "�������� ���������");
-REGISTER_CLASS(SourceBase, SourceLight, "�������� �����");
-REGISTER_CLASS(SourceBase, SourceTerTool, "�������� ��������");
-REGISTER_CLASS(SourceBase, SourceImpulse, "�������� ��������");
-REGISTER_CLASS(SourceBase, SourceTornado, "�������� �������");
-REGISTER_CLASS(SourceBase, SourceBlast, "�������� �������� �����");
-REGISTER_CLASS(SourceBase, SourceCameraShaking, "�������� ������ ������");
-REGISTER_CLASS(SourceBase, SourceFlash, "������� ������");
-REGISTER_CLASS(SourceBase, SourceDetector, "��������");
-REGISTER_CLASS(SourceBase, SourceWaterWave, "�������� ����� �� ����");
-REGISTER_CLASS(SourceBase, SourceShield, "�������� ��������� ����");
-REGISTER_CLASS(SourceBase, SourceTeleport, "�������� ������������");
-REGISTER_CLASS(SourceBase, SourceDeleteGrass, "�������� �������� �����");
-REGISTER_CLASS(SourceBase, SourceFlock, "������� - ���� �� ����");
+REGISTER_CLASS(SourceBase, SourceZone, "Зона на мире");
+REGISTER_CLASS(SourceBase, SourceLightning, "Зона с молниями");
+REGISTER_CLASS(SourceBase, SourceWater, "Источник воды");
+REGISTER_CLASS(SourceBase, SourceBubble, "Источник пузырьков");
+REGISTER_CLASS(SourceBase, SourceIce, "Источник льда");
+REGISTER_CLASS(SourceBase, SourceFreeze, "Источник заморозки");
+REGISTER_CLASS(SourceBase, SourceLight, "Источник света");
+REGISTER_CLASS(SourceBase, SourceTerTool, "Источник тулзеров");
+REGISTER_CLASS(SourceBase, SourceImpulse, "Источник импульса");
+REGISTER_CLASS(SourceBase, SourceTornado, "Источник торнадо");
+REGISTER_CLASS(SourceBase, SourceBlast, "Источник взрывной волны");
+REGISTER_CLASS(SourceBase, SourceCameraShaking, "Источник тряски камеры");
+REGISTER_CLASS(SourceBase, SourceFlash, "Вспышка экрана");
+REGISTER_CLASS(SourceBase, SourceDetector, "Детектор");
+REGISTER_CLASS(SourceBase, SourceWaterWave, "Источник волны на воде");
+REGISTER_CLASS(SourceBase, SourceShield, "Источник защитного поля");
+REGISTER_CLASS(SourceBase, SourceTeleport, "Источник телепортатор");
+REGISTER_CLASS(SourceBase, SourceDeleteGrass, "Источник удаления травы");
+REGISTER_CLASS(SourceBase, SourceFlock, "Истоник - стая на мире");
 
 void SourceIce::quant()
 {
@@ -60,7 +60,7 @@ void SourceIce::quant()
 void SourceIce::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(RangedWrapperf(deltaTemperature_, -10.0f, 10.0f, 0.1f), "deltaTemparature", "������� �����������");
+	ar.serialize(RangedWrapperf(deltaTemperature_, -10.0f, 10.0f, 0.1f), "deltaTemparature", "Разница температуры");
 	serializationApply(ar);
 }
 
@@ -100,7 +100,7 @@ void SourceWater::stop()
 void SourceWater::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(RangedWrapperf (deltaHeight_, -10.0f, 10.0f, 0.1f), "deltaHeight", "������� ������");
+	ar.serialize(RangedWrapperf (deltaHeight_, -10.0f, 10.0f, 0.1f), "deltaHeight", "Разница высоты");
 	serializationApply(ar);
 }
 
@@ -117,7 +117,7 @@ void SourceEffect::serialize(Archive& ar)
 		if(ar.isInput())
 			effectTime_ = effectTime;
 	}
-	ar.serialize(effectAttribute_, "effectAttribute", "������");
+	ar.serialize(effectAttribute_, "effectAttribute", "Эффект");
 }
 
 void SourceEffect::quant()
@@ -135,7 +135,7 @@ void SourceEffect::showDebug() const
 
 void SourceEffect::effectStart()
 {
-	xassert(enabled() && "�������� ������� ��� ��������� �� �� ����");
+	xassert(enabled() && "Создание эффекта для источника не на мире");
 	effectStop();
 	if (!effectPause_){
 		start_timer_auto();
@@ -191,8 +191,8 @@ void SourceDamage::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(damage_, "Damage", "�����������");
-	ar.serialize(abnormalState_, "abnormalState", "����������� �� �����");
+	ar.serialize(damage_, "Damage", "повреждения");
+	ar.serialize(abnormalState_, "abnormalState", "воздействие на юниты");
 	if(enabled() && ar.isInput())
 		setScanEnvironment(active());
 }
@@ -365,16 +365,16 @@ SourceWaterWave::~SourceWaterWave()
 void SourceWaterWave::serialize(Archive& ar)
 {
     __super::serialize(ar);
-    ar.serialize(flatWave_, "flatWave", "������ �����");
+    ar.serialize(flatWave_, "flatWave", "Прямая волна");
     if (flatWave_)
-        ar.serialize(sizeWave_, "sizeWave", "������ �����");
-    ar.serialize(beginRadius_, "beginRadius", "��������� ������");
-    ar.serialize(maxRadius_, "maxRadius", "������������ ������");
-    ar.serialize(fadeRadius_, "fadeRadius", "��������� ������ ���������");
-    ar.serialize(RangedWrapperi(waveLenght_,32,maxRadius_/2), "waveLenght", "������ �����");
-    ar.serialize(RangedWrapperf(amplitude_,1,waveLenght_/10,1.0f), "amplitude", "��������� �����");
-    ar.serialize(speed_, "speed", "�������� �����");
-    ar.serialize(autoKill_, "autokill", "������������");
+        ar.serialize(sizeWave_, "sizeWave", "Размер волны");
+    ar.serialize(beginRadius_, "beginRadius", "Начальный радиус");
+    ar.serialize(maxRadius_, "maxRadius", "Максимальный Радиус");
+    ar.serialize(fadeRadius_, "fadeRadius", "Начальный радиус затухания");
+    ar.serialize(RangedWrapperi(waveLenght_,32,maxRadius_/2), "waveLenght", "Длинна волны");
+    ar.serialize(RangedWrapperf(amplitude_,1,waveLenght_/10,1.0f), "amplitude", "Амплитуда волны");
+    ar.serialize(speed_, "speed", "Скорость волны");
+    ar.serialize(autoKill_, "autokill", "Автоудаление");
     curRadius_ = beginRadius_;
 }
 

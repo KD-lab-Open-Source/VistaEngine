@@ -101,7 +101,7 @@ std::string makeName(const char* reservedComboList, const char* nameBase)
 		return std::string(nameBase);
 	std::string name_base = nameBase;
 
-	// обрезаем циферки
+	// РѕР±СЂРµР·Р°РµРј С†РёС„РµСЂРєРё
 	std::string::iterator ptr = name_base.end() - 1;
 	if(name_base.size() > 1){
 		while(ptr != name_base.begin() && isDigit(*ptr))
@@ -109,7 +109,7 @@ std::string makeName(const char* reservedComboList, const char* nameBase)
 		name_base = std::string(name_base.begin(), ptr + 1);
 	}
 
-	// обрезаем завершающие пробелы
+	// РѕР±СЂРµР·Р°РµРј Р·Р°РІРµСЂС€Р°СЋС‰РёРµ РїСЂРѕР±РµР»С‹
 	ptr = name_base.end() - 1;
 	if(name_base.size() > 1){
 		while(ptr != name_base.begin() && (*ptr) == ' ')
@@ -151,14 +151,14 @@ void LibraryGroupTreeObject::onRightClick(ObjectsTree* _tree)
 	LibraryTree* tree = safe_cast<LibraryTree*>(_tree);
 	kdw::PopupMenu menu(300);
 	kdw::PopupMenuItem& root = menu.root();
-	root.add(TRANSLATE("Добавить"), tree)
+	root.add(TRANSLATE("Р”РѕР±Р°РІРёС‚СЊ"), tree)
 		.connect(this, &LibraryGroupTreeObject::onMenuCreate);
 
 	onMenuConstruction(root, _tree);
 
 	if(groupName_ == "" && customEditor_->library()->editorDynamicGroups()){
 		root.addSeparator();
-		root.add(TRANSLATE("Добавить группу"), tree)
+		root.add(TRANSLATE("Р”РѕР±Р°РІРёС‚СЊ РіСЂСѓРїРїСѓ"), tree)
 			.connect(this, &LibraryGroupTreeObject::onMenuCreateGroup);
 	}
 
@@ -186,7 +186,7 @@ void LibraryGroupTreeObject::onMenuCreateGroup(LibraryTree* tree)
 	if(customEditor_){
 		const char* groupsComboList = customEditor_->library()->editorGroupsComboList();
 
-		kdw::LibraryElementCreateDialog createDialog(tree, false, false, makeName(groupsComboList, TRANSLATE("Новая группа")).c_str());
+		kdw::LibraryElementCreateDialog createDialog(tree, false, false, makeName(groupsComboList, TRANSLATE("РќРѕРІР°СЏ РіСЂСѓРїРїР°")).c_str());
 		if(createDialog.showModal() == RESPONSE_OK){
 			std::string attribName = makeName(groupsComboList, createDialog.name());
 			customEditor_->library()->editorAddGroup(attribName.c_str());
@@ -201,7 +201,7 @@ void LibraryGroupTreeObject::onMenuCreate(LibraryTree* tree)
 	if(customEditor_){
 		std::string groupName = fullGroupName();
 		bool canBePasted = true;
-		LibraryElementCreateDialog createDialog(tree, canBePasted, true, TRANSLATE("Новый элемент"));
+		LibraryElementCreateDialog createDialog(tree, canBePasted, true, TRANSLATE("РќРѕРІС‹Р№ СЌР»РµРјРµРЅС‚"));
 
 		if(createDialog.showModal() == RESPONSE_OK){
 			std::string attribName = makeName(customEditor_->library()->editorComboList(), createDialog.name());
@@ -276,11 +276,11 @@ void LibraryElementTreeObject::onRightClick(ObjectsTree* _tree)
 		root.addSeparator();
 
 	if(customEditor_->library()->editorAllowRename()){
-		root.add(TRANSLATE("Переименовать"), tree)
+		root.add(TRANSLATE("РџРµСЂРµРёРјРµРЅРѕРІР°С‚СЊ"), tree)
 			.connect(this, &LibraryElementTreeObject::onMenuRename);
 	}
 
-	root.add(TRANSLATE("Копировать"), tree)
+	root.add(TRANSLATE("РљРѕРїРёСЂРѕРІР°С‚СЊ"), tree)
 		.connect(this, &LibraryElementTreeObject::onMenuCopy);
 
 
@@ -290,16 +290,16 @@ void LibraryElementTreeObject::onRightClick(ObjectsTree* _tree)
 	kdw::Clipboard clipboard(tree);
 	bool canBePasted = typeName ? clipboard.canBePastedOn(typeName) : false;
 
-	root.add(TRANSLATE("Вставить"), tree)
+	root.add(TRANSLATE("Р’СЃС‚Р°РІРёС‚СЊ"), tree)
 	.connect(this, &LibraryElementTreeObject::onMenuPaste)
 	.enable(canBePasted);
 
 	root.addSeparator();
-	root.add(TRANSLATE("Искать ссылку"), tree)
+	root.add(TRANSLATE("РСЃРєР°С‚СЊ СЃСЃС‹Р»РєСѓ"), tree)
 	.connect(this, &LibraryElementTreeObject::onMenuSearch);
 
 	root.addSeparator();
-	root.add(TRANSLATE("Удалить"), tree)
+	root.add(TRANSLATE("РЈРґР°Р»РёС‚СЊ"), tree)
 	.connect(this, &LibraryElementTreeObject::onMenuDelete)
 	.setHotkey(sKey(VK_DELETE));
 
@@ -415,7 +415,7 @@ void LibraryElementTreeObject::onMenuRename(LibraryTree* tree)
 {
 	EditorLibraryInterface* library = customEditor_->library();
 
-	LibraryElementCreateDialog dlg(false, false, TRANSLATE("Переименновать"), elementName_.c_str());
+	LibraryElementCreateDialog dlg(false, false, TRANSLATE("РџРµСЂРµРёРјРµРЅРЅРѕРІР°С‚СЊ"), elementName_.c_str());
 	if(dlg.showModal() == RESPONSE_OK){
 		std::string newName = makeName(library->editorComboList(), dlg.name());
 		library->editorElementSetName(elementName_.c_str(), newName.c_str());
@@ -502,7 +502,7 @@ void LibraryCustomEditorFactory::queueRegistration(CreatorBase& creator_op, Libr
 void LibraryCustomEditorFactory::add(const char* libraryName, CreatorBase& creator_op)
 {
 	if(creators_.find(libraryName) != creators_.end())
-		xassertStr(0 && "Повторная регистрация в фабрике", libraryName);
+		xassertStr(0 && "РџРѕРІС‚РѕСЂРЅР°СЏ СЂРµРіРёСЃС‚СЂР°С†РёСЏ РІ С„Р°Р±СЂРёРєРµ", libraryName);
 
 	creators_[libraryName] = &creator_op;
 }
@@ -513,7 +513,7 @@ const LibraryCustomEditorFactory::CreatorBase* LibraryCustomEditorFactory::find(
 	if(it != creators_.end())
 		return it->second;
 
-	xassert(silent && "Неопознанный идентификатор класса");
+	xassert(silent && "РќРµРѕРїРѕР·РЅР°РЅРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РєР»Р°СЃСЃР°");
 	return 0;
 }
 
@@ -583,7 +583,7 @@ void LibraryTabEditable::buildLibraryTree(LibraryTree* tree, TreeObject* rootObj
 	xassert(customEditor);
 	if(customEditor && customEditor->library()){
 		//if(fixDuplicates(library))
-		//	::AfxMessageBox(TRANSLATE("Библиотека содержала дубликаты, некоторые элементы были переименнованы"), MB_ICONWARNING | MB_OK);
+		//	::AfxMessageBox(TRANSLATE("Р‘РёР±Р»РёРѕС‚РµРєР° СЃРѕРґРµСЂР¶Р°Р»Р° РґСѓР±Р»РёРєР°С‚С‹, РЅРµРєРѕС‚РѕСЂС‹Рµ СЌР»РµРјРµРЅС‚С‹ Р±С‹Р»Рё РїРµСЂРµРёРјРµРЅРЅРѕРІР°РЅС‹"), MB_ICONWARNING | MB_OK);
 
 		TreeObject* root = groups[""] = rootObject->add(customEditor->createGroupTreeObject(""));
 
@@ -778,8 +778,8 @@ void LibraryTabEditable::onMenuSort()
 
 void LibraryTabEditable::onMenuConstruction(PopupMenuItem& root)
 {
-	root.add(TRANSLATE("Отсортировать")).connect(this, &Self::onMenuSort);
-	root.add(TRANSLATE("Найти неиспользуемые...")).connect(this, &Self::onMenuFindUnused);
+	root.add(TRANSLATE("РћС‚СЃРѕСЂС‚РёСЂРѕРІР°С‚СЊ")).connect(this, &Self::onMenuSort);
+	root.add(TRANSLATE("РќР°Р№С‚Рё РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹Рµ...")).connect(this, &Self::onMenuFindUnused);
 }
 
 EditorLibraryInterface* LibraryTabEditable::library() const
@@ -1006,11 +1006,11 @@ public:
 
 		kdw::PopupMenuItem& menu = m.root();
 
-		menu.add(TRANSLATE("Следовать по ссылке..."), tree)
+		menu.add(TRANSLATE("РЎР»РµРґРѕРІР°С‚СЊ РїРѕ СЃСЃС‹Р»РєРµ..."), tree)
 			.connect(this, &LibraryBookmarkTreeObject::onMenuFollowReference);
 		//	.setDefault();		
 		menu.addSeparator();
-		menu.add(TRANSLATE("Удалить элемент библиотеки"), tree)
+		menu.add(TRANSLATE("РЈРґР°Р»РёС‚СЊ СЌР»РµРјРµРЅС‚ Р±РёР±Р»РёРѕС‚РµРєРё"), tree)
 			.connect(this, &LibraryBookmarkTreeObject::onMenuRemoveLibraryElement);
 
 		m.spawn(tree);
@@ -1018,7 +1018,7 @@ public:
 
 	bool onDoubleClick(ObjectsTree* tree){
 		editor_->openBookmark(bookmark_, true);
-		return true; // значит что дерево изменили и этим объектом пользоваться нельзя
+		return true; // Р·РЅР°С‡РёС‚ С‡С‚Рѕ РґРµСЂРµРІРѕ РёР·РјРµРЅРёР»Рё Рё СЌС‚РёРј РѕР±СЉРµРєС‚РѕРј РїРѕР»СЊР·РѕРІР°С‚СЊСЃСЏ РЅРµР»СЊР·СЏ
 	}
 
 	const LibraryBookmark& bookmark() const{ return bookmark_; }
@@ -1189,10 +1189,10 @@ void LibraryTabSearch::onMenuDeleteAll()
 
 void LibraryTabSearch::onMenuConstruction(PopupMenuItem& root)
 {
-	root.add(TRANSLATE("Сохранить список как текст..."))
+	root.add(TRANSLATE("РЎРѕС…СЂР°РЅРёС‚СЊ СЃРїРёСЃРѕРє РєР°Рє С‚РµРєСЃС‚..."))
 		.connect(this, &LibraryTabSearch::onMenuSaveAsText);
 	root.addSeparator();
-	root.add(TRANSLATE("Удалить все найденные элементы"))
+	root.add(TRANSLATE("РЈРґР°Р»РёС‚СЊ РІСЃРµ РЅР°Р№РґРµРЅРЅС‹Рµ СЌР»РµРјРµРЅС‚С‹"))
 		.connect(this, &LibraryTabSearch::onMenuDeleteAll);
 }
 
@@ -1398,7 +1398,7 @@ LibraryTabSearch::LibraryTabSearch(LibraryEditor* editor, const LibraryBookmark&
 , selectedIndex_(-1)
 {
 	setBookmark(bookmark);
-	title_ = "Результаты поиска";
+	title_ = "Р РµР·СѓР»СЊС‚Р°С‚С‹ РїРѕРёСЃРєР°";
 	XBuffer buf;
 	buf < "Search_" <= reinterpret_cast<unsigned int>(this);
 	bookmark_.setLibraryName(buf);
@@ -1416,7 +1416,7 @@ void LibraryTabSearch::onMenuSaveAsText()
 	string result;
 	const char* filter = "(*.txt)|*.txt||";
 	CFileDialog dlg(FALSE, filter, "search_results.txt", OFN_LONGNAMES|OFN_HIDEREADONLY|OFN_NOCHANGEDIR, filter);
-	dlg.m_ofn.lpstrTitle = TRANSLATE("Сохранить результаты поиска...");
+	dlg.m_ofn.lpstrTitle = TRANSLATE("РЎРѕС…СЂР°РЅРёС‚СЊ СЂРµР·СѓР»СЊС‚Р°С‚С‹ РїРѕРёСЃРєР°...");
 	dlg.m_ofn.lpstrInitialDir = ".";
 	int response = dlg.DoModal();
 	if(response == IDOK){

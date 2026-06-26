@@ -313,7 +313,7 @@ public:
 	void SetUVTrans(float mat[6]);
 	virtual void SetAlphaColor(const Color4f& color);
 
-	void SetWorldMatrix(MatXf* world,int world_offset,int world_num);//Для cSimply3dx
+	void SetWorldMatrix(MatXf* world,int world_offset,int world_num);//Р”Р»СЏ cSimply3dx
 protected:
 	virtual void GetHandle();
 	virtual void RestoreShader();
@@ -370,7 +370,7 @@ protected:
 	INDEX_HANDLE REFLECTION;
 	INDEX_HANDLE LIGHTMAP;
 	INDEX_HANDLE SELF_ILLUMINATION;
-	INDEX_HANDLE SPECULARMAP;//Только для bump
+	INDEX_HANDLE SPECULARMAP;//РўРѕР»СЊРєРѕ РґР»СЏ bump
 	INDEX_HANDLE FILTER_SHADOW;
 	INDEX_HANDLE ZREFLECTION;
 	INDEX_HANDLE LERP_TEXTURE_COLOR;
@@ -382,7 +382,7 @@ public:
 	void SetSelfIllumination(bool on);
 	void SetAlphaColor(const Color4f& color);
 
-	void SelectSpecularMap(cTexture* pSpecularmap,float phase);//Только для bump, обязательно вызывать в bump шейдерах, потому как выставляет SPECULARMAP
+	void SelectSpecularMap(cTexture* pSpecularmap,float phase);//РўРѕР»СЊРєРѕ РґР»СЏ bump, РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РІС‹Р·С‹РІР°С‚СЊ РІ bump С€РµР№РґРµСЂР°С…, РїРѕС‚РѕРјСѓ РєР°Рє РІС‹СЃС‚Р°РІР»СЏРµС‚ SPECULARMAP
 	void SetReflectionZ(bool reflection)
 	{
 		if(ZREFLECTION.is())
@@ -969,7 +969,7 @@ protected:
 	SHADER_HANDLE terraColor;
 	SHADER_HANDLE additionAlpha;
 	INDEX_HANDLE USE_WATER;
-	INDEX_HANDLE ADDITION_TEXTURE; // 1 - туман войны, 2 - занятая зона
+	INDEX_HANDLE ADDITION_TEXTURE; // 1 - С‚СѓРјР°РЅ РІРѕР№РЅС‹, 2 - Р·Р°РЅСЏС‚Р°СЏ Р·РѕРЅР°
 	INDEX_HANDLE USE_TERRA_COLOR;
 	INDEX_HANDLE USE_BORDER;
 	float additionAlpha_;

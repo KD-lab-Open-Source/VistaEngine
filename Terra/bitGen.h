@@ -153,7 +153,7 @@ public:
 				return *p;
 			}
 		}
-		//добавление нового битмапа
+		//РґРѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕРіРѕ Р±РёС‚РјР°РїР°
 		if(bitmaps_.size() >= CASH_MAX){
 			delete bitmaps_.front();
 			bitmaps_.pop_front();
@@ -189,7 +189,7 @@ public:
 				return *p;
 			}
 		}
-		//добавление нового битмапа
+		//РґРѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕРіРѕ Р±РёС‚РјР°РїР°
 		if(bitmaps_.size() >= CASH_MAX){
 			delete bitmaps_.front();
 			bitmaps_.pop_front();

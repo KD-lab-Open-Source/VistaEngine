@@ -26,7 +26,7 @@ void DrawTile::InitVertex(int bladeCount_)
 {
 	DeleteVertex();
 	bladeCount = bladeCount_;
-	int vertexCount = bladeCount*4;// 4 вершины на травинку
+	int vertexCount = bladeCount*4;// 4 РІРµСЂС€РёРЅС‹ РЅР° С‚СЂР°РІРёРЅРєСѓ
 	//gb_RenderDevice3D->GetVertexPool()->CreatePage(vtx,VertexPoolParameter(vertexCount,GetVertexDeclaration()));
 	gb_RenderDevice3D->CreateVertexBuffer(vertexBuffer,vertexCount,GetVertexDeclaration());
 	InitIndex(bladeCount_);
@@ -34,7 +34,7 @@ void DrawTile::InitVertex(int bladeCount_)
 void DrawTile::InitIndex(int bladeCount)
 {
 	DeleteIndex();
-	int indexCount = bladeCount*2;// 2 полигона на травинку
+	int indexCount = bladeCount*2;// 2 РїРѕР»РёРіРѕРЅР° РЅР° С‚СЂР°РІРёРЅРєСѓ
 	gb_RenderDevice3D->CreateIndexBuffer(forwardIndex,indexCount);
 	gb_RenderDevice3D->CreateIndexBuffer(backwardIndex,indexCount);
 }
@@ -878,28 +878,28 @@ void GrassMap::serialize(Archive& ar)
 	const ResourceSelector::Options textureOpts("*.tga", "Resource\\TerrainData\\Textures");
 
 	xassert(textureNames_.size()==textureCount_);
-	ar.serialize(hideDistance_,"hideDistance","Расстояние исчезновения");
-	ar.serialize(oldLighting,"oldLighting","Старая модель освещения");
+	ar.serialize(hideDistance_,"hideDistance","Р Р°СЃСЃС‚РѕСЏРЅРёРµ РёСЃС‡РµР·РЅРѕРІРµРЅРёСЏ");
+	ar.serialize(oldLighting,"oldLighting","РЎС‚Р°СЂР°СЏ РјРѕРґРµР»СЊ РѕСЃРІРµС‰РµРЅРёСЏ");
 
-	if(ar.filter(SERIALIZE_WORLD_DATA)){ // пишется только в spg
-		ar.openBlock("Textures","Текстуры");
-		ar.serialize(ResourceSelector(textureNames_[0], textureOpts),"textureName0","Текстура травы - 1");
-		ar.serialize(ResourceSelector(textureNames_[1], textureOpts),"textureName1","Текстура травы - 2");
-		ar.serialize(ResourceSelector(textureNames_[2], textureOpts),"textureName2","Текстура травы - 3");
-		ar.serialize(ResourceSelector(textureNames_[3], textureOpts),"textureName3","Текстура травы - 4");
-		ar.serialize(ResourceSelector(textureNames_[4], textureOpts),"textureName4","Текстура травы - 5");
-		ar.serialize(ResourceSelector(textureNames_[5], textureOpts),"textureName5","Текстура травы - 6");
-		ar.serialize(ResourceSelector(textureNames_[6], textureOpts),"textureName6","Текстура травы - 7");
+	if(ar.filter(SERIALIZE_WORLD_DATA)){ // РїРёС€РµС‚СЃСЏ С‚РѕР»СЊРєРѕ РІ spg
+		ar.openBlock("Textures","РўРµРєСЃС‚СѓСЂС‹");
+		ar.serialize(ResourceSelector(textureNames_[0], textureOpts),"textureName0","РўРµРєСЃС‚СѓСЂР° С‚СЂР°РІС‹ - 1");
+		ar.serialize(ResourceSelector(textureNames_[1], textureOpts),"textureName1","РўРµРєСЃС‚СѓСЂР° С‚СЂР°РІС‹ - 2");
+		ar.serialize(ResourceSelector(textureNames_[2], textureOpts),"textureName2","РўРµРєСЃС‚СѓСЂР° С‚СЂР°РІС‹ - 3");
+		ar.serialize(ResourceSelector(textureNames_[3], textureOpts),"textureName3","РўРµРєСЃС‚СѓСЂР° С‚СЂР°РІС‹ - 4");
+		ar.serialize(ResourceSelector(textureNames_[4], textureOpts),"textureName4","РўРµРєСЃС‚СѓСЂР° С‚СЂР°РІС‹ - 5");
+		ar.serialize(ResourceSelector(textureNames_[5], textureOpts),"textureName5","РўРµРєСЃС‚СѓСЂР° С‚СЂР°РІС‹ - 6");
+		ar.serialize(ResourceSelector(textureNames_[6], textureOpts),"textureName6","РўРµРєСЃС‚СѓСЂР° С‚СЂР°РІС‹ - 7");
 		ar.closeBlock();
 	}
-	ar.openBlock("bushHeights","Размер травы");
-		ar.serialize(bushHights_[0],"bushHeight0","Размер травы 0");
-		ar.serialize(bushHights_[1],"bushHeight1","Размер травы 1");
-		ar.serialize(bushHights_[2],"bushHeight2","Размер травы 2");
-		ar.serialize(bushHights_[3],"bushHeight3","Размер травы 3");
-		ar.serialize(bushHights_[4],"bushHeight4","Размер травы 4");
-		ar.serialize(bushHights_[5],"bushHeight5","Размер травы 5");
-		ar.serialize(bushHights_[6],"bushHeight6","Размер травы 6");
+	ar.openBlock("bushHeights","Р Р°Р·РјРµСЂ С‚СЂР°РІС‹");
+		ar.serialize(bushHights_[0],"bushHeight0","Р Р°Р·РјРµСЂ С‚СЂР°РІС‹ 0");
+		ar.serialize(bushHights_[1],"bushHeight1","Р Р°Р·РјРµСЂ С‚СЂР°РІС‹ 1");
+		ar.serialize(bushHights_[2],"bushHeight2","Р Р°Р·РјРµСЂ С‚СЂР°РІС‹ 2");
+		ar.serialize(bushHights_[3],"bushHeight3","Р Р°Р·РјРµСЂ С‚СЂР°РІС‹ 3");
+		ar.serialize(bushHights_[4],"bushHeight4","Р Р°Р·РјРµСЂ С‚СЂР°РІС‹ 4");
+		ar.serialize(bushHights_[5],"bushHeight5","Р Р°Р·РјРµСЂ С‚СЂР°РІС‹ 5");
+		ar.serialize(bushHights_[6],"bushHeight6","Р Р°Р·РјРµСЂ С‚СЂР°РІС‹ 6");
 	ar.closeBlock();
 	hideDistance2_ = hideDistance_*hideDistance_;
 	invHideDistance2_ = 1/hideDistance2_;

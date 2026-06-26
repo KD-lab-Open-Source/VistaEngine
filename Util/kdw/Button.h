@@ -22,7 +22,7 @@ public:
 	virtual bool canBeDefault() const { return true; }
 	virtual void setDefaultFrame(bool enable);
 protected:
-	// внутренние функции
+	// РІРЅСѓС‚СЂРµРЅРЅРёРµ С„СѓРЅРєС†РёРё
 	ButtonImpl* window() const{ return reinterpret_cast<ButtonImpl*>(_window()); }
 
 	sigslot::signal0 signalPressed_;

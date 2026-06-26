@@ -33,8 +33,8 @@ public:
 
 #endif C_CHECK_DELETE
 
-// базовый класс для всех
-// любой класс наследованный как TYPE_CLASS_POINTER, должен уметь удаляться по обращению к Release()
+// Р±Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ РґР»СЏ РІСЃРµС…
+// Р»СЋР±РѕР№ РєР»Р°СЃСЃ РЅР°СЃР»РµРґРѕРІР°РЅРЅС‹Р№ РєР°Рє TYPE_CLASS_POINTER, РґРѕР»Р¶РµРЅ СѓРјРµС‚СЊ СѓРґР°Р»СЏС‚СЊСЃСЏ РїРѕ РѕР±СЂР°С‰РµРЅРёСЋ Рє Release()
 class RENDER_API  UnknownClass
 #ifdef C_CHECK_DELETE
 : public cCheckDelete

@@ -278,104 +278,104 @@ bool cObjStatistic::CreateWnd()
 	TCITEM pitem;
 	pitem.mask = TCIF_TEXT;
 
-	pitem.pszText = "Îáùàÿ ñòàòèñòèêà";
+	pitem.pszText = "ÐžÐ±Ñ‰Ð°Ñ ÑÑ‚Ð°Ñ‚Ð¸ÑÑ‚Ð¸ÐºÐ°";
 	TabCtrl_InsertItem(hTabControl,0,&pitem);
 
-	pitem.pszText = "Òåêñòóðû";
+	pitem.pszText = "Ð¢ÐµÐºÑÑ‚ÑƒÑ€Ñ‹";
 	TabCtrl_InsertItem(hTabControl,1,&pitem);
 
-	pitem.pszText = "Òåêñòóðû ïî ìîäåëÿì";
+	pitem.pszText = "Ð¢ÐµÐºÑÑ‚ÑƒÑ€Ñ‹ Ð¿Ð¾ Ð¼Ð¾Ð´ÐµÐ»ÑÐ¼";
 	TabCtrl_InsertItem(hTabControl,2,&pitem);
 
-	pitem.pszText = "Ìîäåëè";
+	pitem.pszText = "ÐœÐ¾Ð´ÐµÐ»Ð¸";
 	TabCtrl_InsertItem(hTabControl,3,&pitem);
 
-	pitem.pszText = "Ýôôåêòû";
+	pitem.pszText = "Ð­Ñ„Ñ„ÐµÐºÑ‚Ñ‹";
 	TabCtrl_InsertItem(hTabControl,4,&pitem);
 
-	pitem.pszText = "Simply Ìîäåëè";
+	pitem.pszText = "Simply ÐœÐ¾Ð´ÐµÐ»Ð¸";
 	TabCtrl_InsertItem(hTabControl,5,&pitem);
 
-	pitem.pszText = "Post Ýôôåêòû";
+	pitem.pszText = "Post Ð­Ñ„Ñ„ÐµÐºÑ‚Ñ‹";
 	TabCtrl_InsertItem(hTabControl,6,&pitem);
 
-	pitem.pszText = "Îñêîëêè";
+	pitem.pszText = "ÐžÑÐºÐ¾Ð»ÐºÐ¸";
 	TabCtrl_InsertItem(hTabControl,7,&pitem);
 
-	pitem.pszText = "Âèäèìûå îáúåêòû";
+	pitem.pszText = "Ð’Ð¸Ð´Ð¸Ð¼Ñ‹Ðµ Ð¾Ð±ÑŠÐµÐºÑ‚Ñ‹";
 	TabCtrl_InsertItem(hTabControl,8,&pitem);
 
 	hPostEffects = CreateListView();
 
-	InsertColumn(hPostEffects,0,255,"Ýôôåêò");
-	InsertColumn(hPostEffects,1,255,"Ðàçìåð òåêñòóð");
+	InsertColumn(hPostEffects,0,255,"Ð­Ñ„Ñ„ÐµÐºÑ‚");
+	InsertColumn(hPostEffects,1,255,"Ð Ð°Ð·Ð¼ÐµÑ€ Ñ‚ÐµÐºÑÑ‚ÑƒÑ€");
 
 	hListView = CreateListView();
-	InsertColumn(hListView,0,255,"Îáúåêòû");
-	InsertColumn(hListView,1,255,"Êîëè÷åñòâî");
+	InsertColumn(hListView,0,255,"ÐžÐ±ÑŠÐµÐºÑ‚Ñ‹");
+	InsertColumn(hListView,1,255,"ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾");
 
 	hEffectListView = CreateListView();
 
-	InsertColumn(hEffectListView,0,166,"Íàçâàíèå ýôôåêòà");
-	InsertColumn(hEffectListView,1,166,"Êîëè÷åñòâî");
-	InsertColumn(hEffectListView,2,166,"Ìèíèìóì ÷àñòèö");
-	InsertColumn(hEffectListView,3,166,"Ìàêñèìóì ÷àñòèö");
-	InsertColumn(hEffectListView,4,166,"Â ñðåäíåì ÷àñòèö íà ýôôåêò");
-	InsertColumn(hEffectListView,5,166,"Âñåãî ÷àñòèö");
+	InsertColumn(hEffectListView,0,166,"ÐÐ°Ð·Ð²Ð°Ð½Ð¸Ðµ ÑÑ„Ñ„ÐµÐºÑ‚Ð°");
+	InsertColumn(hEffectListView,1,166,"ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾");
+	InsertColumn(hEffectListView,2,166,"ÐœÐ¸Ð½Ð¸Ð¼ÑƒÐ¼ Ñ‡Ð°ÑÑ‚Ð¸Ñ†");
+	InsertColumn(hEffectListView,3,166,"ÐœÐ°ÐºÑÐ¸Ð¼ÑƒÐ¼ Ñ‡Ð°ÑÑ‚Ð¸Ñ†");
+	InsertColumn(hEffectListView,4,166,"Ð’ ÑÑ€ÐµÐ´Ð½ÐµÐ¼ Ñ‡Ð°ÑÑ‚Ð¸Ñ† Ð½Ð° ÑÑ„Ñ„ÐµÐºÑ‚");
+	InsertColumn(hEffectListView,5,166,"Ð’ÑÐµÐ³Ð¾ Ñ‡Ð°ÑÑ‚Ð¸Ñ†");
 
 	hObjectListView	 = CreateListView(imageList);
 
-	InsertColumn(hObjectListView,0,450,"Èìÿ ìîäåëè");
-	InsertColumn(hObjectListView,1,50,"Êîë-âî");
-	InsertColumn(hObjectListView,2,70,"Òåêñòóðû");
-	InsertColumn(hObjectListView,3,80,"Ðàçìåð Òåêñòóð");
-	InsertColumn(hObjectListView,4,70,"Âåðøèíû");
-	InsertColumn(hObjectListView,5,80,"Ðàçìåð âåðøèí");
+	InsertColumn(hObjectListView,0,450,"Ð˜Ð¼Ñ Ð¼Ð¾Ð´ÐµÐ»Ð¸");
+	InsertColumn(hObjectListView,1,50,"ÐšÐ¾Ð»-Ð²Ð¾");
+	InsertColumn(hObjectListView,2,70,"Ð¢ÐµÐºÑÑ‚ÑƒÑ€Ñ‹");
+	InsertColumn(hObjectListView,3,80,"Ð Ð°Ð·Ð¼ÐµÑ€ Ð¢ÐµÐºÑÑ‚ÑƒÑ€");
+	InsertColumn(hObjectListView,4,70,"Ð’ÐµÑ€ÑˆÐ¸Ð½Ñ‹");
+	InsertColumn(hObjectListView,5,80,"Ð Ð°Ð·Ð¼ÐµÑ€ Ð²ÐµÑ€ÑˆÐ¸Ð½");
 	InsertColumn(hObjectListView,6,50,"Nodes");
-	InsertColumn(hObjectListView,7,80,"Ìàòåðèàëû");
-	InsertColumn(hObjectListView,8,50,"Àíèìàöèÿ");
-	InsertColumn(hObjectListView,9,50,"Ïîëèãîíû");
+	InsertColumn(hObjectListView,7,80,"ÐœÐ°Ñ‚ÐµÑ€Ð¸Ð°Ð»Ñ‹");
+	InsertColumn(hObjectListView,8,50,"ÐÐ½Ð¸Ð¼Ð°Ñ†Ð¸Ñ");
+	InsertColumn(hObjectListView,9,50,"ÐŸÐ¾Ð»Ð¸Ð³Ð¾Ð½Ñ‹");
 
 	hObjectNamesListView = 	CreateWindow(WC_LISTVIEW,NULL,WS_CHILD /*| WS_VISIBLE*/ | WS_VSCROLL | WS_HSCROLL | LVS_REPORT | WS_BORDER |  WS_TABSTOP , 0, 30, rcl.right/2, rcl.bottom-30, hWnd_, NULL, NULL, NULL);
 	ListView_SetExtendedListViewStyle(hObjectNamesListView,LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
 
-	InsertColumn(hObjectNamesListView,0,520,"Èìÿ ìîäåëè");
+	InsertColumn(hObjectNamesListView,0,520,"Ð˜Ð¼Ñ Ð¼Ð¾Ð´ÐµÐ»Ð¸");
 
 	hTexturesByObjectListView=CreateWindow(WC_LISTVIEW,NULL,WS_CHILD /*| WS_VISIBLE*/ | WS_VSCROLL | WS_HSCROLL | LVS_REPORT | WS_BORDER |  WS_TABSTOP , rcl.right/2, 30, rcl.right/2, rcl.bottom-30, hWnd_, NULL, NULL, NULL);
 	ListView_SetExtendedListViewStyle(hTexturesByObjectListView,LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
 
-	InsertColumn(hTexturesByObjectListView,0,400,"Èìÿ òåêñòóðû");
-	InsertColumn(hTexturesByObjectListView,1,200,"Ðàçìåð");
+	InsertColumn(hTexturesByObjectListView,0,400,"Ð˜Ð¼Ñ Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ñ‹");
+	InsertColumn(hTexturesByObjectListView,1,200,"Ð Ð°Ð·Ð¼ÐµÑ€");
 
 	hTextureListView=CreateListView(imageList);
 
-	InsertColumn(hTextureListView,0,500,"Èìÿ òåêñòóðû");
-	InsertColumn(hTextureListView,1,200,"Ðàçìåð");
-	InsertColumn(hTextureListView,2,200,"Òèï");
+	InsertColumn(hTextureListView,0,500,"Ð˜Ð¼Ñ Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ñ‹");
+	InsertColumn(hTextureListView,1,200,"Ð Ð°Ð·Ð¼ÐµÑ€");
+	InsertColumn(hTextureListView,2,200,"Ð¢Ð¸Ð¿");
 
 	hSimplyObjectListView=CreateListView(imageList);
 
-	InsertColumn(hSimplyObjectListView,0,520,"Èìÿ ìîäåëè");
-	InsertColumn(hSimplyObjectListView,1,50,"Êîë-âî");
-	InsertColumn(hSimplyObjectListView,2,80,"Ðàçìåð Òåêñòóð");
-	InsertColumn(hSimplyObjectListView,3,70,"Âåðøèíû");
-	InsertColumn(hSimplyObjectListView,4,80,"Ðàçìåð âåðøèí");
+	InsertColumn(hSimplyObjectListView,0,520,"Ð˜Ð¼Ñ Ð¼Ð¾Ð´ÐµÐ»Ð¸");
+	InsertColumn(hSimplyObjectListView,1,50,"ÐšÐ¾Ð»-Ð²Ð¾");
+	InsertColumn(hSimplyObjectListView,2,80,"Ð Ð°Ð·Ð¼ÐµÑ€ Ð¢ÐµÐºÑÑ‚ÑƒÑ€");
+	InsertColumn(hSimplyObjectListView,3,70,"Ð’ÐµÑ€ÑˆÐ¸Ð½Ñ‹");
+	InsertColumn(hSimplyObjectListView,4,80,"Ð Ð°Ð·Ð¼ÐµÑ€ Ð²ÐµÑ€ÑˆÐ¸Ð½");
 	InsertColumn(hSimplyObjectListView,5,50,"Nodes");
 
 	hDebrisObjectListView=CreateListView(imageList);
 
-	InsertColumn(hDebrisObjectListView,0,520,"Èìÿ ìîäåëè");
-	InsertColumn(hDebrisObjectListView,1,50,"Êîë-âî");
-	InsertColumn(hDebrisObjectListView,2,80,"Ðàçìåð Òåêñòóð");
-	InsertColumn(hDebrisObjectListView,3,70,"Âåðøèíû");
-	InsertColumn(hDebrisObjectListView,4,80,"Ðàçìåð âåðøèí");
+	InsertColumn(hDebrisObjectListView,0,520,"Ð˜Ð¼Ñ Ð¼Ð¾Ð´ÐµÐ»Ð¸");
+	InsertColumn(hDebrisObjectListView,1,50,"ÐšÐ¾Ð»-Ð²Ð¾");
+	InsertColumn(hDebrisObjectListView,2,80,"Ð Ð°Ð·Ð¼ÐµÑ€ Ð¢ÐµÐºÑÑ‚ÑƒÑ€");
+	InsertColumn(hDebrisObjectListView,3,70,"Ð’ÐµÑ€ÑˆÐ¸Ð½Ñ‹");
+	InsertColumn(hDebrisObjectListView,4,80,"Ð Ð°Ð·Ð¼ÐµÑ€ Ð²ÐµÑ€ÑˆÐ¸Ð½");
 
 	hVisibleObjects=CreateListView();
-	InsertColumn(hVisibleObjects,0,500,"Èìÿ îáúåêòà");
-	InsertColumn(hVisibleObjects,1,100,"Òèï");
-	InsertColumn(hVisibleObjects,2,150,"Âèäèìûõ ïîëèãîíîâ");
-	InsertColumn(hVisibleObjects,3,100,"Êîëè÷åñòâî");
-	InsertColumn(hVisibleObjects,4,150,"Cóììà âèäèìûõ ïîëèãîíîâ");
+	InsertColumn(hVisibleObjects,0,500,"Ð˜Ð¼Ñ Ð¾Ð±ÑŠÐµÐºÑ‚Ð°");
+	InsertColumn(hVisibleObjects,1,100,"Ð¢Ð¸Ð¿");
+	InsertColumn(hVisibleObjects,2,150,"Ð’Ð¸Ð´Ð¸Ð¼Ñ‹Ñ… Ð¿Ð¾Ð»Ð¸Ð³Ð¾Ð½Ð¾Ð²");
+	InsertColumn(hVisibleObjects,3,100,"ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾");
+	InsertColumn(hVisibleObjects,4,150,"CÑƒÐ¼Ð¼Ð° Ð²Ð¸Ð´Ð¸Ð¼Ñ‹Ñ… Ð¿Ð¾Ð»Ð¸Ð³Ð¾Ð½Ð¾Ð²");
 	return true;
 }
 
@@ -427,33 +427,33 @@ void cObjStatistic::RecalculateAndShow()
 
 	Recalculate();
 
-	InsetFormattedNum("ÐÀÇÌÅÐ ÂÑÅÃÎ:",totalSize);
-	InsetFormattedNum("Ðàçìåð backBuffer",backBufferSize);
-	InsetFormattedNum("Ðàçìåð òåêñòóð",totalTextureSize);
-	InsetFormattedNum("Ðàçìåð òåêñòóð êàðòû",totalTextureMapSize);
-	InsetFormattedNum("Ðàçìåð âåøèí êàðòû",totalVertexMapSize);
-	InsetFormattedNum("Ðàçìåð èíäåêñîâ êàðòû",totalIndexMapSize);
-	InsetFormattedNum("Ðàçìåð âñåõ âåðøèí",totalVertexOtherSize);
-	InsetFormattedNum("Ðàçìåð âñåõ èíäåêñîâ ",totalIndexOtherSize);
-	if(environment)InsetFormattedNum("Ðàçìåð âåðøèí òðàâû",environment->grass()->GetVertexSize());
-	InsetFormattedNum("Ðàçìåð âåðøèí ïðîñòûõ îáúåêòîâ",totalSimplyVertexSize);
-	InsetFormattedNum("Êîëè÷åñòâî âåðøèí ïðîñòûõ îáúåêòîâ",totalSimplyVertexCount);
-	InsetFormattedNum("Êîëè÷åñòâî ïðîñòûõ îáúåêòîâ",totalSimplyObjectCount);
-	InsetFormattedNum("Êîëè÷åñòâî óíèêàëüíûõ ïðîñòûõ îáúåêòîâ",totalSimplyUniqObjectCount);
-	InsetFormattedNum("Êîëè÷åñòâî óíèêàëüíûõ îñêîëêîâ",totalSimplyUniqDebrisCount);
+	InsetFormattedNum("Ð ÐÐ—ÐœÐ•Ð  Ð’Ð¡Ð•Ð“Ðž:",totalSize);
+	InsetFormattedNum("Ð Ð°Ð·Ð¼ÐµÑ€ backBuffer",backBufferSize);
+	InsetFormattedNum("Ð Ð°Ð·Ð¼ÐµÑ€ Ñ‚ÐµÐºÑÑ‚ÑƒÑ€",totalTextureSize);
+	InsetFormattedNum("Ð Ð°Ð·Ð¼ÐµÑ€ Ñ‚ÐµÐºÑÑ‚ÑƒÑ€ ÐºÐ°Ñ€Ñ‚Ñ‹",totalTextureMapSize);
+	InsetFormattedNum("Ð Ð°Ð·Ð¼ÐµÑ€ Ð²ÐµÑˆÐ¸Ð½ ÐºÐ°Ñ€Ñ‚Ñ‹",totalVertexMapSize);
+	InsetFormattedNum("Ð Ð°Ð·Ð¼ÐµÑ€ Ð¸Ð½Ð´ÐµÐºÑÐ¾Ð² ÐºÐ°Ñ€Ñ‚Ñ‹",totalIndexMapSize);
+	InsetFormattedNum("Ð Ð°Ð·Ð¼ÐµÑ€ Ð²ÑÐµÑ… Ð²ÐµÑ€ÑˆÐ¸Ð½",totalVertexOtherSize);
+	InsetFormattedNum("Ð Ð°Ð·Ð¼ÐµÑ€ Ð²ÑÐµÑ… Ð¸Ð½Ð´ÐµÐºÑÐ¾Ð² ",totalIndexOtherSize);
+	if(environment)InsetFormattedNum("Ð Ð°Ð·Ð¼ÐµÑ€ Ð²ÐµÑ€ÑˆÐ¸Ð½ Ñ‚Ñ€Ð°Ð²Ñ‹",environment->grass()->GetVertexSize());
+	InsetFormattedNum("Ð Ð°Ð·Ð¼ÐµÑ€ Ð²ÐµÑ€ÑˆÐ¸Ð½ Ð¿Ñ€Ð¾ÑÑ‚Ñ‹Ñ… Ð¾Ð±ÑŠÐµÐºÑ‚Ð¾Ð²",totalSimplyVertexSize);
+	InsetFormattedNum("ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð²ÐµÑ€ÑˆÐ¸Ð½ Ð¿Ñ€Ð¾ÑÑ‚Ñ‹Ñ… Ð¾Ð±ÑŠÐµÐºÑ‚Ð¾Ð²",totalSimplyVertexCount);
+	InsetFormattedNum("ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð¿Ñ€Ð¾ÑÑ‚Ñ‹Ñ… Ð¾Ð±ÑŠÐµÐºÑ‚Ð¾Ð²",totalSimplyObjectCount);
+	InsetFormattedNum("ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ ÑƒÐ½Ð¸ÐºÐ°Ð»ÑŒÐ½Ñ‹Ñ… Ð¿Ñ€Ð¾ÑÑ‚Ñ‹Ñ… Ð¾Ð±ÑŠÐµÐºÑ‚Ð¾Ð²",totalSimplyUniqObjectCount);
+	InsetFormattedNum("ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ ÑƒÐ½Ð¸ÐºÐ°Ð»ÑŒÐ½Ñ‹Ñ… Ð¾ÑÐºÐ¾Ð»ÐºÐ¾Ð²",totalSimplyUniqDebrisCount);
 	
 
-	InsetFormattedNum("Ðàçìåð âåðøèí îáúåêòîâ",totalVertexSize);
-	InsetFormattedNum("Êîëè÷åñòâî âåðøèí îáúåêòîâ",totalVertexCount);
-	InsetFormattedNum("Âñåãî îáúåêòîâ",totalObjectsCount);
-	InsetFormattedNum("Êîëè÷åñòâî óíèêàëüíûõ îáúåêòîâ",uniqueObjects.size());
-	InsetFormattedNum("Êîëè÷åòñâî ÷àñòèö",totalParticleCount);
-	InsetFormattedNum("Êîëè÷åñòâî ýôôåêòîâ",totalEffects);
-	InsetFormattedNum("Êîëè÷åñòâî óíèêàëüíûõ ýôôåêòîâ",uniqueEffects.size());
+	InsetFormattedNum("Ð Ð°Ð·Ð¼ÐµÑ€ Ð²ÐµÑ€ÑˆÐ¸Ð½ Ð¾Ð±ÑŠÐµÐºÑ‚Ð¾Ð²",totalVertexSize);
+	InsetFormattedNum("ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð²ÐµÑ€ÑˆÐ¸Ð½ Ð¾Ð±ÑŠÐµÐºÑ‚Ð¾Ð²",totalVertexCount);
+	InsetFormattedNum("Ð’ÑÐµÐ³Ð¾ Ð¾Ð±ÑŠÐµÐºÑ‚Ð¾Ð²",totalObjectsCount);
+	InsetFormattedNum("ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ ÑƒÐ½Ð¸ÐºÐ°Ð»ÑŒÐ½Ñ‹Ñ… Ð¾Ð±ÑŠÐµÐºÑ‚Ð¾Ð²",uniqueObjects.size());
+	InsetFormattedNum("ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑ‚ÑÐ²Ð¾ Ñ‡Ð°ÑÑ‚Ð¸Ñ†",totalParticleCount);
+	InsetFormattedNum("ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ ÑÑ„Ñ„ÐµÐºÑ‚Ð¾Ð²",totalEffects);
+	InsetFormattedNum("ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ ÑƒÐ½Ð¸ÐºÐ°Ð»ÑŒÐ½Ñ‹Ñ… ÑÑ„Ñ„ÐµÐºÑ‚Ð¾Ð²",uniqueEffects.size());
 
-	InsetFormattedNum("Êîëè÷åñòâî òåêñòóð",GetTexLibrary()->GetNumberTexture());
-	if(environment)InsetFormattedNum("Êîëè÷åñòâî äâèæóùèõñÿ ïðèáðåæíûõ ñïðàéòîâ",environment->GetCoastSprites()->GetMovingCoastSpritesCount());
-	if(environment)InsetFormattedNum("Êîëè÷åñòâî ïðîñòûõ ïðèáðåæíûõ ñïðàéòîâ",environment->GetCoastSprites()->GetSimpleCoastSpritesCount());
+	InsetFormattedNum("ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ñ‚ÐµÐºÑÑ‚ÑƒÑ€",GetTexLibrary()->GetNumberTexture());
+	if(environment)InsetFormattedNum("ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð´Ð²Ð¸Ð¶ÑƒÑ‰Ð¸Ñ…ÑÑ Ð¿Ñ€Ð¸Ð±Ñ€ÐµÐ¶Ð½Ñ‹Ñ… ÑÐ¿Ñ€Ð°Ð¹Ñ‚Ð¾Ð²",environment->GetCoastSprites()->GetMovingCoastSpritesCount());
+	if(environment)InsetFormattedNum("ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð¿Ñ€Ð¾ÑÑ‚Ñ‹Ñ… Ð¿Ñ€Ð¸Ð±Ñ€ÐµÐ¶Ð½Ñ‹Ñ… ÑÐ¿Ñ€Ð°Ð¹Ñ‚Ð¾Ð²",environment->GetCoastSprites()->GetSimpleCoastSpritesCount());
 
 
 	string str;
@@ -545,7 +545,7 @@ void cObjStatistic::RecalculateAndShow()
 	//PostEffects
 	if (environment)
 	{
-		// Çàìåíèòü òóò âñå ïîñëå äîïèñàíèÿ êëàññà PostEffectManager
+		// Ð—Ð°Ð¼ÐµÐ½Ð¸Ñ‚ÑŒ Ñ‚ÑƒÑ‚ Ð²ÑÐµ Ð¿Ð¾ÑÐ»Ðµ Ð´Ð¾Ð¿Ð¸ÑÐ°Ð½Ð¸Ñ ÐºÐ»Ð°ÑÑÐ° PostEffectManager
 		if(environment->PEManager())
 		{
 			newitem=InsertItem(hPostEffects,0,"Main textures");

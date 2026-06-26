@@ -102,8 +102,8 @@ public:
 	friend class cShaderStorage;
 };
 
-//Класс хранящий в себе информацию о шейдере с разными дефайнами (функциф Select)
-//см ShaderBath.exe shaders.txt
+//РљР»Р°СЃСЃ С…СЂР°РЅСЏС‰РёР№ РІ СЃРµР±Рµ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ С€РµР№РґРµСЂРµ СЃ СЂР°Р·РЅС‹РјРё РґРµС„Р°Р№РЅР°РјРё (С„СѓРЅРєС†РёС„ Select)
+//СЃРј ShaderBath.exe shaders.txt
 class RENDER_API cShaderStorage : public UnknownClass
 {
 public:

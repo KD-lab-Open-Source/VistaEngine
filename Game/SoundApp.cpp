@@ -21,9 +21,9 @@ bool terMusicEnable = true;
 float terSoundVolume = 1;
 float terMusicVolume = 1;
 float terVoiceVolume = 1;
-float fSoundZMultiple = 0.5f; // 0..1 коэффициэнт масштабирования громкости по оси Z
+float fSoundZMultiple = 0.5f; // 0..1 РєРѕСЌС„С„РёС†РёСЌРЅС‚ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ РіСЂРѕРјРєРѕСЃС‚Рё РїРѕ РѕСЃРё Z
 
-// Добавляет слэш в конце пути к дирректории если нужно
+// Р”РѕР±Р°РІР»СЏРµС‚ СЃР»СЌС€ РІ РєРѕРЅС†Рµ РїСѓС‚Рё Рє РґРёСЂСЂРµРєС‚РѕСЂРёРё РµСЃР»Рё РЅСѓР¶РЅРѕ
 void SlashFixup(string& dir)
 {
 	if ((0 != dir.size()) && ('\\' != dir[dir.size()-1]))
@@ -32,10 +32,10 @@ void SlashFixup(string& dir)
 
 void LoadAllSound(const char* localeDataPath,const char* sound_directory)
 {
-	// Дирректория общих звуков (не зависящих от локализации)
+	// Р”РёСЂСЂРµРєС‚РѕСЂРёСЏ РѕР±С‰РёС… Р·РІСѓРєРѕРІ (РЅРµ Р·Р°РІРёСЃСЏС‰РёС… РѕС‚ Р»РѕРєР°Р»РёР·Р°С†РёРё)
 	string common_dir = sound_directory;
 	SlashFixup(common_dir);	
-	// Дирректория локализованных звуков
+	// Р”РёСЂСЂРµРєС‚РѕСЂРёСЏ Р»РѕРєР°Р»РёР·РѕРІР°РЅРЅС‹С… Р·РІСѓРєРѕРІ
 	string locale_dir = localeDataPath;
 	SlashFixup(locale_dir);
 
@@ -64,7 +64,7 @@ void InitSound(bool sound, bool music, HWND hwnd, const char* localeDataPath)
 	terSoundEnable = sound;
 	terMusicEnable = music;
 
-	// инициализировать в любом случае, т.к. могут включить потом из интерфейса
+	// РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊ РІ Р»СЋР±РѕРј СЃР»СѓС‡Р°Рµ, С‚.Рє. РјРѕРіСѓС‚ РІРєР»СЋС‡РёС‚СЊ РїРѕС‚РѕРј РёР· РёРЅС‚РµСЂС„РµР№СЃР°
 	static int inited = 0;
 	if(!inited){
 		inited = 1;
@@ -245,7 +245,7 @@ bool VoiceManager::Play(const char* soundTrack, bool cycled, bool canPaused, boo
 	test.open(soundTrack, XZS_IN);
 
 	if(!test.isOpen()){
-		kdWarning("&VoiceManager",XBuffer(1024, 1) < /*TRANSLATE*/("Невозможно открыть файл : ") < soundTrack);
+		kdWarning("&VoiceManager",XBuffer(1024, 1) < /*TRANSLATE*/("РќРµРІРѕР·РјРѕР¶РЅРѕ РѕС‚РєСЂС‹С‚СЊ С„Р°Р№Р» : ") < soundTrack);
 		return false;
 	}
 
@@ -256,7 +256,7 @@ bool VoiceManager::Play(const char* soundTrack, bool cycled, bool canPaused, boo
 
 	SetVolume(terVoiceVolume);
 	bool b = mpeg->play(soundTrack, cycled, &stream_);
-	// из-за открытия файла позже в другом потоке, говорит лишь о невозможности создания потока
+	// РёР·-Р·Р° РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р° РїРѕР·Р¶Рµ РІ РґСЂСѓРіРѕРј РїРѕС‚РѕРєРµ, РіРѕРІРѕСЂРёС‚ Р»РёС€СЊ Рѕ РЅРµРІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЃРѕР·РґР°РЅРёСЏ РїРѕС‚РѕРєР°
 	xassertStr(b && "Cannot open music: ", soundTrack); 
 	return b;
 }
@@ -343,7 +343,7 @@ bool MusicManager::Play(const char* soundTrack)
 	if(!soundTrack || extractFileName(soundTrack) == "")
 		return false;
 
-	soundTrack_ = soundTrack; // специально для проигрывания при смене опции вкл./выкл. саундтрек 
+	soundTrack_ = soundTrack; // СЃРїРµС†РёР°Р»СЊРЅРѕ РґР»СЏ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ РїСЂРё СЃРјРµРЅРµ РѕРїС†РёРё РІРєР»./РІС‹РєР». СЃР°СѓРЅРґС‚СЂРµРє 
 
 	if(!terMusicEnable)
 		return false;
@@ -351,7 +351,7 @@ bool MusicManager::Play(const char* soundTrack)
 #ifndef _FINAL_VERSION_
 	FILE* file=fopen(soundTrack,"r");
 	if(file==NULL){
-		kdWarning("&VoiceManager",XBuffer(1024, 1) < /*TRANSLATE*/("Невозможно открыть файл : ") < soundTrack);
+		kdWarning("&VoiceManager",XBuffer(1024, 1) < /*TRANSLATE*/("РќРµРІРѕР·РјРѕР¶РЅРѕ РѕС‚РєСЂС‹С‚СЊ С„Р°Р№Р» : ") < soundTrack);
 		return false;
 	}
 	fclose(file);

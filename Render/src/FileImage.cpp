@@ -202,7 +202,7 @@ void cFileImage_GetFrame(void *pDst, int xDst, int yDst,
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
-// ���������� ���������� cTGAImage
+// реализация интерфейса cTGAImage
 //////////////////////////////////////////////////////////////////////////////////////////
 #pragma pack(push,1)
 
@@ -469,7 +469,7 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
-// ���������� ���������� cAVIImage
+// реализация интерфейса cAVIImage
 //////////////////////////////////////////////////////////////////////////////////////////
 // Video-for-Windows AVI reader/writer — Windows-only multimedia backend.
 // Excluded on other platforms (no AVI image support); a cross-platform video
@@ -578,7 +578,7 @@ public:
 };
 #endif // _WIN32
 //////////////////////////////////////////////////////////////////////////////////////////
-// ���������� ���������� cJPGImage
+// реализация интерфейса cJPGImage
 //////////////////////////////////////////////////////////////////////////////////////////
 #ifdef USE_JPEG
 struct my_error_mgr
@@ -796,7 +796,7 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
-// ���������� ���������� cFileImage
+// реализация интерфейса cFileImage
 cFileImage* cFileImage::Create(const char* fname)
 {
 	string ext = extractFileExt(fname);
@@ -883,7 +883,7 @@ void cFileImage::DoneFileImage()
 #endif
 }
 
-////////////////////// ���������� cAviScaleFileImage ///////////////////////////
+////////////////////// Реализация cAviScaleFileImage ///////////////////////////
 
 cAviScaleFileImage::cAviScaleFileImage():cFileImage()
 {
@@ -910,8 +910,8 @@ bool cAviScaleFileImage::Init(const char* fName)
 		GetDimTexture(t1,t2,t3);//change parameters
 		if (t3 < FileImage->GetLength())
 		{
-//			VisError<<"������� ����� ������!!!\r\n"<<"������� ������� - "<<FileImage->GetLength()
-//				<<",� �������� - "<<t3<<" ������\r\n"<<fName<<VERR_END;
+//			VisError<<"Слишком много кадров!!!\r\n"<<"Попытка создать - "<<FileImage->GetLength()
+//				<<",а доступно - "<<t3<<" кадров\r\n"<<fName<<VERR_END;
 			n_count = t3;
 		}else
 		{
@@ -968,8 +968,8 @@ bool cAviScaleFileImage::Init(const char* fName)
 		vector<Vect2i> texture_size(FileImage->GetLength(),Vect2i(dx,dy));
 		if(!atlas.Init(texture_size))
 		{
-//			VisError<<"������� ����� ������!!!\r\n"<<"������� ������� - "<<FileImage->GetLength()
-//				<<",� �������� - "<<t3<<" ������\r\n"<<fName<<VERR_END;
+//			VisError<<"Слишком много кадров!!!\r\n"<<"Попытка создать - "<<FileImage->GetLength()
+//				<<",а доступно - "<<t3<<" кадров\r\n"<<fName<<VERR_END;
 //			n_count = t3;
 			xassert(0);
 		}
@@ -1038,7 +1038,7 @@ void BikeRotateBilinearAndApply(BYTE* buffer,int dx,int dy,int pitch,
 		in_offsety-=(-iy*in_dx/2+ix*in_dy/2);
 	}
 
-	//xx=( x*ix+y*iy>>shift)+in_offsetx;������
+	//xx=( x*ix+y*iy>>shift)+in_offsetx;Прямая
 	//yy=(-x*iy+y*ix>>shift)+in_offsety;
 	int offx=-(in_offsetx*ix-in_offsety*iy)>>shift;
 	int offy=-(in_offsetx*iy+in_offsety*ix)>>shift;
@@ -1248,9 +1248,9 @@ cCompositeImage::cCompositeImage(cFileImage* pMainImage_,
 
 int cCompositeImage::GetTexture(void *pointer,int time, int xSize,int ySize)
 {
-	if (pMainImage == 0)//���� �������� �������� �� �����������, ���������� 0
+	if (pMainImage == 0)//Если основная текстура не загрузилась, возвращаем 0
 		return 0;
-	//���� � ������ ����������� �������� ��������
+	//Суем в буффер изображение основной текстуры
 	pMainImage->GetTexture(pointer,time,xSize,ySize);
 
 	if(skin_color.a==255)
@@ -1275,7 +1275,7 @@ int cCompositeImage::GetTexture(void *pointer,int time, int xSize,int ySize)
 
 
 	if (pEmblemImage != 0 && logo_pos != 0)
-	{		//���� ������� �����������, �� ������� ������, ���� � ���� ������� � ����������� �� �� �������� ��������
+	{		//Если эмблема загрузилась, то создаем буффер, суем в него эмблему и накладываем ее на основную текстуру
 			int edx = (int)((logo_pos->max.x -logo_pos->min.x)*xSize);
 			int edy = (int)((logo_pos->max.y -logo_pos->min.y)*ySize);
 			int minx= (int)((logo_pos->min.x+(logo_pos->max.x -logo_pos->min.x)*.5f)*xSize);
@@ -1295,7 +1295,7 @@ int cCompositeImage::GetTexture(void *pointer,int time, int xSize,int ySize)
 	}
 
 	if (pSelfIlluminationImage != 0)
-	{		//���� ������������ �����������, �� ������� ������, ���� � ���� ������������ � ����������� �� �� �������� ��������
+	{		//Если самосвечение загрузилось, то создаем буффер, суем в него самосвечение и накладываем ее на основную текстуру
 			unsigned int *lpBuf = new unsigned int [xSize*ySize];
 			memset(lpBuf,0xFF,xSize*ySize*sizeof(lpBuf[0]));
 			pSelfIlluminationImage->GetTexture(lpBuf,time,xSize,ySize);

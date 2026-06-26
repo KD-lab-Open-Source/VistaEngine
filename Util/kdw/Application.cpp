@@ -27,11 +27,11 @@ extern "C" int APIENTRY DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpRe
    UNREFERENCED_PARAMETER(lpReserved);
 
    if(dwReason == DLL_PROCESS_ATTACH){
-	   // загрузка DLL
+	   // Р·Р°РіСЂСѓР·РєР° DLL
 	   Win32::_setGlobalInstance(hInstance);
    }
    else if (dwReason == DLL_PROCESS_DETACH){
-	   // выгрузка DLL
+	   // РІС‹РіСЂСѓР·РєР° DLL
    }
    return TRUE;
 }

@@ -44,7 +44,7 @@ struct ShowChangeSettings
 };
 
 
-//! поднимающийся вверх текст
+//! РїРѕРґРЅРёРјР°СЋС‰РёР№СЃСЏ РІРІРµСЂС… С‚РµРєСЃС‚
 class ShowUpController
 {
 	const ShowUpAttribute* attr_;
@@ -57,7 +57,7 @@ public:
 	bool draw(Vect3f position);
 };
 
-//! Отображение изменения значения у объекта
+//! РћС‚РѕР±СЂР°Р¶РµРЅРёРµ РёР·РјРµРЅРµРЅРёСЏ Р·РЅР°С‡РµРЅРёСЏ Сѓ РѕР±СЉРµРєС‚Р°
 class ShowChangeController : public ShareHandleBase
 {
 	typedef SwapVector<ShowUpController> ShowUpControllers;

@@ -1,10 +1,10 @@
 #ifndef __OBSERVER_H_INCLUDED__
 #define __OBSERVER_H_INCLUDED__
 
-//Позволяет оповещать объекты о смене состояния.
-//ObserverLink - принимает оповещение.
-//Observer - шлет оповещение
-//А в остальном стандартная реализация weak pointer
+//РџРѕР·РІРѕР»СЏРµС‚ РѕРїРѕРІРµС‰Р°С‚СЊ РѕР±СЉРµРєС‚С‹ Рѕ СЃРјРµРЅРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ.
+//ObserverLink - РїСЂРёРЅРёРјР°РµС‚ РѕРїРѕРІРµС‰РµРЅРёРµ.
+//Observer - С€Р»РµС‚ РѕРїРѕРІРµС‰РµРЅРёРµ
+//Рђ РІ РѕСЃС‚Р°Р»СЊРЅРѕРј СЃС‚Р°РЅРґР°СЂС‚РЅР°СЏ СЂРµР°Р»РёР·Р°С†РёСЏ weak pointer
 
 class Observer;
 class ObserverLink
@@ -12,7 +12,7 @@ class ObserverLink
 public:
 	ObserverLink():observer(0){ }
 	~ObserverLink();
-	virtual void Update()=0;//Принимает оповещение от Observer
+	virtual void Update()=0;//РџСЂРёРЅРёРјР°РµС‚ РѕРїРѕРІРµС‰РµРЅРёРµ РѕС‚ Observer
 protected:
 	Observer* observer;
 	friend class Observer;
@@ -31,7 +31,7 @@ public:
 
 	void AddLink(ObserverLink* link);
 	void BreakLink(ObserverLink* link);
-	void UpdateLink();//Посылает оповещение ObserverLink
+	void UpdateLink();//РџРѕСЃС‹Р»Р°РµС‚ РѕРїРѕРІРµС‰РµРЅРёРµ ObserverLink
 
 	bool empty()const{return links.empty();}
 };

@@ -10,7 +10,7 @@
 
 namespace kdw{
 
-REGISTER_CLASS(Widget, Label, "Метка")
+REGISTER_CLASS(Widget, Label, "РњРµС‚РєР°")
 class LabelImpl: public _WidgetWindow{
 public:
 	LabelImpl(Label* owner, bool emphasis);
@@ -157,9 +157,9 @@ void Label::setExpandByContent(bool expand)
 void Label::serialize(Archive& ar)
 {
 	if(ar.filter(SERIALIZE_DESIGN)){
-		ar.serialize(text_, "text", "&Текст");
-		ar.serialize(emphasis_, "emphasis", "Выделить");
-		ar.serialize(expandByContent_, "expandByContent", "Растягивать под содержимое");
+		ar.serialize(text_, "text", "&РўРµРєСЃС‚");
+		ar.serialize(emphasis_, "emphasis", "Р’С‹РґРµР»РёС‚СЊ");
+		ar.serialize(expandByContent_, "expandByContent", "Р Р°СЃС‚СЏРіРёРІР°С‚СЊ РїРѕРґ СЃРѕРґРµСЂР¶РёРјРѕРµ");
 	}
 	Widget::serialize(ar);
 }

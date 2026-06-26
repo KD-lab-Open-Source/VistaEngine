@@ -55,7 +55,7 @@ class cFallout : public BaseGraphObject
 	string snow_texture;
 	string rain_texture;
 	void LoadSnowTexture();
-	float snow_kc, rain_kc;//Относительное расстояние до ближайшей плоскости отсечения, при которой начинает дождь/снег рисоваться.
+	float snow_kc, rain_kc;//РћС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕРµ СЂР°СЃСЃС‚РѕСЏРЅРёРµ РґРѕ Р±Р»РёР¶Р°Р№С€РµР№ РїР»РѕСЃРєРѕСЃС‚Рё РѕС‚СЃРµС‡РµРЅРёСЏ, РїСЂРё РєРѕС‚РѕСЂРѕР№ РЅР°С‡РёРЅР°РµС‚ РґРѕР¶РґСЊ/СЃРЅРµРі СЂРёСЃРѕРІР°С‚СЊСЃСЏ.
 	cCircles circles;
 	int minimal_water_height;
 

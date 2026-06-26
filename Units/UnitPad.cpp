@@ -7,14 +7,14 @@
 UNIT_LINK_GET(UnitPad)
 
 DECLARE_SEGMENT(UnitPad)
-REGISTER_CLASS(AttributeBase, AttributePad, "Лапа");
-REGISTER_CLASS(UnitBase, UnitPad, "Лапа")
+REGISTER_CLASS(AttributeBase, AttributePad, "Р›Р°РїР°");
+REGISTER_CLASS(UnitBase, UnitPad, "Р›Р°РїР°")
 REGISTER_CLASS_IN_FACTORY(UnitFactory, UNIT_CLASS_PAD, UnitPad)
 
 UNIT_LINK_GET(UnitPlayer);
 
-REGISTER_CLASS(AttributeBase, AttributePlayer, "Юнит-игрок");
-REGISTER_CLASS(UnitBase, UnitPlayer, "Юнит-игрок")
+REGISTER_CLASS(AttributeBase, AttributePlayer, "Р®РЅРёС‚-РёРіСЂРѕРє");
+REGISTER_CLASS(UnitBase, UnitPlayer, "Р®РЅРёС‚-РёРіСЂРѕРє")
 REGISTER_CLASS_IN_FACTORY(UnitFactory, UNIT_CLASS_PLAYER, UnitPlayer)
 
 AttributePad::AttributePad()
@@ -39,7 +39,7 @@ UnitPad::UnitPad(const UnitTemplate& data)
 void AttributePad::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(nodes, "nodes", "Узлы линковки для юнитов при переноске");
+	ar.serialize(nodes, "nodes", "РЈР·Р»С‹ Р»РёРЅРєРѕРІРєРё РґР»СЏ СЋРЅРёС‚РѕРІ РїСЂРё РїРµСЂРµРЅРѕСЃРєРµ");
 }
 
 // --------------------------------------------------------------------------
@@ -54,7 +54,7 @@ void AttributePlayer::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(padRespawnTime, "padRespawnTime", "Время восстановления лапы");
+	ar.serialize(padRespawnTime, "padRespawnTime", "Р’СЂРµРјСЏ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ Р»Р°РїС‹");
 	
 	if(ar.isInput()){
 		unitClass_ = UNIT_CLASS_PLAYER;
@@ -104,7 +104,7 @@ void UnitPlayer::executeCommand(const UnitCommand& command)
 
 void UnitPlayer::validatePad()
 {
-	if(!pad_ && padWeaponId_){ // отстрелили лапу
+	if(!pad_ && padWeaponId_){ // РѕС‚СЃС‚СЂРµР»РёР»Рё Р»Р°РїСѓ
 		padWeaponId_ = 0;
 		padWaitRespawn_.start(attr().padRespawnTime * 1000);
 

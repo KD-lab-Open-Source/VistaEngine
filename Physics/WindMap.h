@@ -29,7 +29,7 @@ public:
 	Vect2f getDirection() { return direction_; }
 
 	void quant();
-	void updateRect(int x, int y, int dx, int dy); // Обновлять после обновления NormalMap-а.
+	void updateRect(int x, int y, int dx, int dy); // РћР±РЅРѕРІР»СЏС‚СЊ РїРѕСЃР»Рµ РѕР±РЅРѕРІР»РµРЅРёСЏ NormalMap-Р°.
 
 	void showDebugInfo();
 	void serialize(Archive& ar);
@@ -41,14 +41,14 @@ public:
 	}
 
 private:
-	// Заполняет карту ветра статическим ветром.
+	// Р—Р°РїРѕР»РЅСЏРµС‚ РєР°СЂС‚Сѓ РІРµС‚СЂР° СЃС‚Р°С‚РёС‡РµСЃРєРёРј РІРµС‚СЂРѕРј.
 	void clearMap() { memcpy(map(), staticMap(), sizeX() * sizeY() * sizeof(Vect2f)); }
 	void updateStaticMapTile(const Vect2f& prevWind, int x, int y, float terrainFactor);
 
 	Vect2f* staticMap_;
 
 	WindType windType_;
-	Vect2f direction_; // direction - направление ветра + длина вектора=сила ветра
+	Vect2f direction_; // direction - РЅР°РїСЂР°РІР»РµРЅРёРµ РІРµС‚СЂР° + РґР»РёРЅР° РІРµРєС‚РѕСЂР°=СЃРёР»Р° РІРµС‚СЂР°
 
 	Perlin2d perlin;
 	float perlin_time;

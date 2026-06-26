@@ -145,14 +145,14 @@ void RoadTool::recalcHeightNodeParabolic(int maxSphericHeight)
 	float R=(L*L + 4*h*h)/(8*h);
 	//QuatF Vect3f
 	Vect3f firstV=nodeArr.front().pos-midPnt;
-	Vect3f rotate90V(firstV.y, -firstV.x, 0);//повернутый на 90градусов
+	Vect3f rotate90V(firstV.y, -firstV.x, 0);//РїРѕРІРµСЂРЅСѓС‚С‹Р№ РЅР° 90РіСЂР°РґСѓСЃРѕРІ
 	Vect3f vect2centerSph;
 	vect2centerSph.cross(firstV, rotate90V);
 	vect2centerSph.normalize();
 	vect2centerSph*=(R-h);
 	Vect3f centerSphers=midPnt+vect2centerSph;
 
-	//Для окружность
+	//Р”Р»СЏ РѕРєСЂСѓР¶РЅРѕСЃС‚СЊ
 	Vect3f N;
 	N.cross(nodeArr.front().pos-centerSphers, nodeArr.back().pos-centerSphers);
 
@@ -161,9 +161,9 @@ void RoadTool::recalcHeightNodeParabolic(int maxSphericHeight)
 	++p;
 	for(p; p!=nodeArr.end(); ++p){
 		float z, z2;
-		//Для Честная сфера
+		//Р”Р»СЏ Р§РµСЃС‚РЅР°СЏ СЃС„РµСЂР°
 		//Vect3f curPnt=p->pos-centerSphers;
-		//Для окружность
+		//Р”Р»СЏ РѕРєСЂСѓР¶РЅРѕСЃС‚СЊ
 		Vect3f cp=p->pos-centerSphers;
 		float x,y;
 		x = (-N.y*N.x*cp.y + sqr(N.y)*cp.x - N.z*N.x*cp.z + sqr(N.z)*cp.x)/(sqr(N.x)+sqr(N.y)+sqr(N.z));
@@ -260,7 +260,7 @@ sRect RoadTool::recalcSpline(TypeNodeIterator ni)
 	TypeNodeIterator endi=begi;
 	endi++;
 	if(endi==nodeArr.end())
-		return retval;//У посленей ноды нет сплайна
+		return retval;//РЈ РїРѕСЃР»РµРЅРµР№ РЅРѕРґС‹ РЅРµС‚ СЃРїР»Р°Р№РЅР°
 	Vect3f P1L,P2L,P3L,P4L;
 	Vect3f P1R,P2R,P3R,P4R;
 	//Vect2f P1LE,P4LE;
@@ -276,7 +276,7 @@ sRect RoadTool::recalcSpline(TypeNodeIterator ni)
 	//Vect2f& P3LE=endi->leftPntEdge;
 	//Vect2f& P2RE=begi->rightPntEdge;
 	//Vect2f& P3RE=endi->rightPntEdge;
-	const float MAX_K_DIST=30.f; //Коэффициент расстояния после которого перестает действовать HermitSpline
+	const float MAX_K_DIST=30.f; //РљРѕСЌС„С„РёС†РёРµРЅС‚ СЂР°СЃСЃС‚РѕСЏРЅРёСЏ РїРѕСЃР»Рµ РєРѕС‚РѕСЂРѕРіРѕ РїРµСЂРµСЃС‚Р°РµС‚ РґРµР№СЃС‚РІРѕРІР°С‚СЊ HermitSpline
 	if(begi!=nodeArr.begin()){
 		begi--;
 		P1=begi->pos;
@@ -291,7 +291,7 @@ sRect RoadTool::recalcSpline(TypeNodeIterator ni)
 		P1R=Vect3f(begi->rightPnt.x, begi->rightPnt.y, begi->pos.z);
 		//P1LE=begi->leftPntEdge;
 		//P1RE=begi->rightPntEdge;
-		begi++; //Используется дальше
+		begi++; //РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР°Р»СЊС€Рµ
 	}
 	else {
 		P1=P2;
@@ -322,12 +322,12 @@ sRect RoadTool::recalcSpline(TypeNodeIterator ni)
 		//P4LE=P3LE;
 		//P4RE=P3RE;
 	}
-	endi--; // //Используется дальше
+	endi--; // //РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР°Р»СЊС€Рµ
 
 	//int lenghL=round(Vect2f(P2L).distance(Vect2f(P3L)));
 	//int lenghR=round(Vect2f(P2R).distance(Vect2f(P3R)));
 	//int lenght=lenghL > lenghR ? lenghL : lenghR;
-	//lenght/=2;//для более гладких полигонов
+	//lenght/=2;//РґР»СЏ Р±РѕР»РµРµ РіР»Р°РґРєРёС… РїРѕР»РёРіРѕРЅРѕРІ
 	int lenght=round(Vect2f(endi->pos).distance(Vect2f(begi->pos)));
 	lenght/=4;
 	float dt;
@@ -499,7 +499,7 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 	vector<sPolygon>::iterator p;
 	for(p=poligonArr.begin(); p!=poligonArr.end(); p++){
 
-		const VertexI* a = &iPntArr[p->p1]; // Для сортировки по Y.
+		const VertexI* a = &iPntArr[p->p1]; // Р”Р»СЏ СЃРѕСЂС‚РёСЂРѕРІРєРё РїРѕ Y.
 		const VertexI* b = &iPntArr[p->p2];
 		const VertexI* c = &iPntArr[p->p3];
 
@@ -519,7 +519,7 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 		int du_start, du_end, dv_start, dv_end;
 		int u, v, du, dv;
 
-		// считаем по самой длинной линии (т.е. проходящей через вершину B)
+		// СЃС‡РёС‚Р°РµРј РїРѕ СЃР°РјРѕР№ РґР»РёРЅРЅРѕР№ Р»РёРЅРёРё (С‚.Рµ. РїСЂРѕС…РѕРґСЏС‰РµР№ С‡РµСЂРµР· РІРµСЂС€РёРЅСѓ B)
 		double k;
 		int divisor;
 		divisor=(c->y - a->y);
@@ -556,14 +556,14 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 #ifdef SUBPIXEL
 		int tmp;
 		tmp = (accurRoundFIntF0(a->y)<<16) - a->y;
-		x_start += (dx_start>>8) * (tmp>>8); //Норма
-		z1_start += (dz1_start>>8) * (tmp>>8); //Норма
-		u_start += (du_start>>8) * (tmp>>8); //Норма
-		v_start += (dv_start>>8) * (tmp>>8); //Норма
+		x_start += (dx_start>>8) * (tmp>>8); //РќРѕСЂРјР°
+		z1_start += (dz1_start>>8) * (tmp>>8); //РќРѕСЂРјР°
+		u_start += (du_start>>8) * (tmp>>8); //РќРѕСЂРјР°
+		v_start += (dv_start>>8) * (tmp>>8); //РќРѕСЂРјР°
 #endif
 
 		int current_sx, current_sy;
-		//1-я часть полигона
+		//1-СЏ С‡Р°СЃС‚СЊ РїРѕР»РёРіРѕРЅР°
 		if(accurRoundFIntF0(b->y) - accurRoundFIntF0(a->y) ){
 			x_end = a->x;
 			z1_end = a->z;
@@ -579,14 +579,14 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 			else {dx_end =0; dz1_end =0; du_end=0; dv_end=0; }
 #ifdef SUBPIXEL
 			tmp = (accurRoundFIntF0(a->y)<<16) - (a->y);
-			x_end += (dx_end>>8) * (tmp>>8); //Норма
-			z1_end += (dz1_end>>8) * (tmp>>8); //Норма
-			u_end += (du_end>>8) * (tmp>>8); //Норма
-			v_end += (dv_end>>8) * (tmp>>8); //Норма
+			x_end += (dx_end>>8) * (tmp>>8); //РќРѕСЂРјР°
+			z1_end += (dz1_end>>8) * (tmp>>8); //РќРѕСЂРјР°
+			u_end += (du_end>>8) * (tmp>>8); //РќРѕСЂРјР°
+			v_end += (dv_end>>8) * (tmp>>8); //РќРѕСЂРјР°
 #endif
 			for (current_sy = accurRoundFIntF0(a->y); current_sy < accurRoundFIntF0(b->y); current_sy++) {
 				if((current_sy) >= imaxY ) break; ///!!!!
-				// x_start должен находиться левее x_end
+				// x_start РґРѕР»Р¶РµРЅ РЅР°С…РѕРґРёС‚СЊСЃСЏ Р»РµРІРµРµ x_end
 				//if(x_start > curMaxX) x_start=curMaxX;
 				//if(x_end > curMaxX) x_end=curMaxX;
 				//if(x_start < curMinX) x_start=curMinX;
@@ -612,10 +612,10 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 				u += (du>>8)* (tmp>>8);
 				v += (dv>>8)* (tmp>>8);
 #endif
-				// текстурируем строку
+				// С‚РµРєСЃС‚СѓСЂРёСЂСѓРµРј СЃС‚СЂРѕРєСѓ
 				if((current_sy) >= 0 ) {
 					while(current_sx <= ceilxend) {
-					// используем z-буфер для определения видимости текущей точки
+					// РёСЃРїРѕР»СЊР·СѓРµРј z-Р±СѓС„РµСЂ РґР»СЏ РѕРїСЂРµРґРµР»РµРЅРёСЏ РІРёРґРёРјРѕСЃС‚Рё С‚РµРєСѓС‰РµР№ С‚РѕС‡РєРё
 						if( (current_sx<=imaxX) && (current_sx >= 0)) {
 							register int bufoff=vMap.offsetBuf(current_sx,current_sy);//(current_sy)*voxelBitmap.sx + current_sx;
 							if(flag_onlyTextured){
@@ -667,7 +667,7 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 					}
 				}
 
-				// сдвигаем начальные и конечные значения x/u/v/(1/z)
+				// СЃРґРІРёРіР°РµРј РЅР°С‡Р°Р»СЊРЅС‹Рµ Рё РєРѕРЅРµС‡РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ x/u/v/(1/z)
 				x_start += dx_start;
 				z1_start += dz1_start;
 				x_end += dx_end;
@@ -679,7 +679,7 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 			}
 		}
 
-		//2-я часть полигона
+		//2-СЏ С‡Р°СЃС‚СЊ РїРѕР»РёРіРѕРЅР°
 		x_end = b->x;
 		z1_end = b->z;
 		u_end = b->u;
@@ -694,15 +694,15 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 		else{ dx_end=0; dz1_end=0; du_end=0; dv_end=0; }
 #ifdef SUBPIXEL
 		tmp = (accurRoundFIntF0(b->y)<<16) - (b->y);
-		x_end += (dx_end>>8) * (tmp>>8); //Норма
-		z1_end += (dz1_end>>8) * (tmp>>8); //Норма
-		u_end += (du_end>>8) * (tmp>>8); //Норма
-		v_end += (dv_end>>8) * (tmp>>8); //Норма
+		x_end += (dx_end>>8) * (tmp>>8); //РќРѕСЂРјР°
+		z1_end += (dz1_end>>8) * (tmp>>8); //РќРѕСЂРјР°
+		u_end += (du_end>>8) * (tmp>>8); //РќРѕСЂРјР°
+		v_end += (dv_end>>8) * (tmp>>8); //РќРѕСЂРјР°
 #endif
-		// построчная отрисовка грани
+		// РїРѕСЃС‚СЂРѕС‡РЅР°СЏ РѕС‚СЂРёСЃРѕРІРєР° РіСЂР°РЅРё
 		for (current_sy = accurRoundFIntF0(b->y); current_sy <= accurRoundFIntF0(c->y); current_sy++) {
 			if((current_sy) >= imaxY ) break;
-			// x_start должен находиться левее x_end
+			// x_start РґРѕР»Р¶РµРЅ РЅР°С…РѕРґРёС‚СЊСЃСЏ Р»РµРІРµРµ x_end
 			//if(x_start > curMaxX) x_start=curMaxX;
 			//if(x_end > curMaxX) x_end=curMaxX;
 			//if(x_start < curMinX) x_start=curMinX;
@@ -728,10 +728,10 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 			u += (du>>8)* (tmp>>8);
 			v += (dv>>8)* (tmp>>8);
 #endif
-			// текстурируем строку
+			// С‚РµРєСЃС‚СѓСЂРёСЂСѓРµРј СЃС‚СЂРѕРєСѓ
 			if((current_sy) >= 0 ) {
 				while(current_sx <= ceilxend) {
-					// используем z-буфер для определения видимости текущей точки
+					// РёСЃРїРѕР»СЊР·СѓРµРј z-Р±СѓС„РµСЂ РґР»СЏ РѕРїСЂРµРґРµР»РµРЅРёСЏ РІРёРґРёРјРѕСЃС‚Рё С‚РµРєСѓС‰РµР№ С‚РѕС‡РєРё
 					if( (current_sx<=imaxX) && (current_sx >= 0)) {
 						register int bufoff=vMap.offsetBuf(current_sx,current_sy);//(current_sy)*voxelBitmap.sx + current_sx;
 						if(flag_onlyTextured){
@@ -783,7 +783,7 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 				}
 			}
 
-			// сдвигаем начальные и конечные значения x/u/v/(1/z)
+			// СЃРґРІРёРіР°РµРј РЅР°С‡Р°Р»СЊРЅС‹Рµ Рё РєРѕРЅРµС‡РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ x/u/v/(1/z)
 			x_start += dx_start;
 			z1_start += dz1_start;
 			x_end += dx_end;
@@ -823,8 +823,8 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 		int length;
 		//unsigned short *dest;
 
-		// посчитаем du/dsx, dv/dsx, d(1/z)/dsx
-		// считаем по самой длинной линии (т.е. проходящей через вершину B)
+		// РїРѕСЃС‡РёС‚Р°РµРј du/dsx, dv/dsx, d(1/z)/dsx
+		// СЃС‡РёС‚Р°РµРј РїРѕ СЃР°РјРѕР№ РґР»РёРЅРЅРѕР№ Р»РёРЅРёРё (С‚.Рµ. РїСЂРѕС…РѕРґСЏС‰РµР№ С‡РµСЂРµР· РІРµСЂС€РёРЅСѓ B)
 		int divisor;
 		//divisor=cvrtFIntF8(c->y - a->y);
 		//if(divisor) k = (b->y - a->y) / divisor;
@@ -872,10 +872,10 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 #ifdef SUBPIXEL
 		//tmp = ceil(a->sy) - a->sy;
 		tmp = ceilFIntF16(a->y) - a->y;
-		x_start += (dx_start>>8) * (tmp>>8); //Норма
-		z1_start += (dz1_start>>8) * (tmp>>8); //Норма
-		u_start += (du_start>>8) * (tmp>>8); //Норма
-		v_start += (dv_start>>8) * (tmp>>8); //Норма
+		x_start += (dx_start>>8) * (tmp>>8); //РќРѕСЂРјР°
+		z1_start += (dz1_start>>8) * (tmp>>8); //РќРѕСЂРјР°
+		u_start += (du_start>>8) * (tmp>>8); //РќРѕСЂРјР°
+		v_start += (dv_start>>8) * (tmp>>8); //РќРѕСЂРјР°
 #endif
 
 		//if(roundFIntF0(b->y - a->y) ==0) goto loc_scip01;
@@ -921,15 +921,15 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 			else{ dx_end=0; dz1_end=0; du_end=0; dv_end=0; }
 		}
 #ifdef SUBPIXEL
-		x_end += (dx_end>>8) * (tmp>>8); //Норма
-		z1_end += (dz1_end>>8) * (tmp>>8); //Норма
-		u_end += (du_end>>8) * (tmp>>8); //Норма
-		v_end += (dv_end>>8) * (tmp>>8); //Норма
+		x_end += (dx_end>>8) * (tmp>>8); //РќРѕСЂРјР°
+		z1_end += (dz1_end>>8) * (tmp>>8); //РќРѕСЂРјР°
+		u_end += (du_end>>8) * (tmp>>8); //РќРѕСЂРјР°
+		v_end += (dv_end>>8) * (tmp>>8); //РќРѕСЂРјР°
 #endif
 
 ////////////////////////////////
 //loc_scip01:;
-		// построчная отрисовка грани
+		// РїРѕСЃС‚СЂРѕС‡РЅР°СЏ РѕС‚СЂРёСЃРѕРІРєР° РіСЂР°РЅРё
 		int drawMaxY = min(ceilFIntF0(c->y), imaxY);
 		int drawBegY = max(0, ceilFIntF0(a->y));
 		MultiRegion::Line mrLine;
@@ -958,14 +958,14 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 #ifdef SUBPIXEL
 				//tmp = ceil(b->sy) - b->sy;
 				tmp = ceilFIntF16(b->y) - b->y;
-				x_end += (dx_end>>8) * (tmp>>8); //Норма
-				z1_end += (dz1_end>>8) * (tmp>>8); //Норма
-				u_end += (du_end>>8) * (tmp>>8); //Норма
-				v_end += (dv_end>>8) * (tmp>>8); //Норма
+				x_end += (dx_end>>8) * (tmp>>8); //РќРѕСЂРјР°
+				z1_end += (dz1_end>>8) * (tmp>>8); //РќРѕСЂРјР°
+				u_end += (du_end>>8) * (tmp>>8); //РќРѕСЂРјР°
+				v_end += (dv_end>>8) * (tmp>>8); //РќРѕСЂРјР°
 #endif
 			}
 
-			// x_start должен находиться левее x_end
+			// x_start РґРѕР»Р¶РµРЅ РЅР°С…РѕРґРёС‚СЊСЃСЏ Р»РµРІРµРµ x_end
 			if(x_start > curMaxX) x_start=curMaxX;
 			if(x_end > curMaxX) x_end=curMaxX;
 			if(x_start < curMinX) x_start=curMinX;
@@ -986,7 +986,7 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 			  length = ceilFIntF0(x_end) - ceilFIntF0(x_start);
 			}
 
-			// текстурируем строку
+			// С‚РµРєСЃС‚СѓСЂРёСЂСѓРµРј СЃС‚СЂРѕРєСѓ
 			//current_sx = (int)ceil(x)-minX;
 			current_sx = ceilFIntF0(x);
 	
@@ -1010,7 +1010,7 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 			}
 
 				while (length--) {
-				// используем z-буфер для определения видимости текущей точки
+				// РёСЃРїРѕР»СЊР·СѓРµРј z-Р±СѓС„РµСЂ РґР»СЏ РѕРїСЂРµРґРµР»РµРЅРёСЏ РІРёРґРёРјРѕСЃС‚Рё С‚РµРєСѓС‰РµР№ С‚РѕС‡РєРё
 					//xassert(current_sx <= ceilFIntF0(a->x)-iminX+10 || current_sx <= ceilFIntF0(b->x)-iminX+10 || current_sx <= ceilFIntF0(c->x)-iminX+10);
 					//xassert(current_sx >= ceilFIntF0(a->x)-iminX-10 || current_sx >= ceilFIntF0(b->x)-iminX-10 || current_sx >= ceilFIntF0(c->x)-iminX-10);
 					//xassert(z1 <= a->z+(20<<16) || z1 <= b->z+(20<<16) || z1 <= c->z+(20<<16));
@@ -1082,7 +1082,7 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 				}
 			}
 
-			// сдвигаем начальные и конечные значения x/u/v/(1/z)
+			// СЃРґРІРёРіР°РµРј РЅР°С‡Р°Р»СЊРЅС‹Рµ Рё РєРѕРЅРµС‡РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ x/u/v/(1/z)
 			x_start += dx_start;
 			z1_start += dz1_start;
 			x_end += dx_end;
@@ -1128,7 +1128,7 @@ void RoadTool::putSpline(TypeNodeIterator ni, int numPass)
 	}
 	//const float kVScale=(float)texture->size.y/2.f;
 
-	if(ni->spline2NextLeft.empty()) return; //проверка ni < (nodeArr.end()-1)
+	if(ni->spline2NextLeft.empty()) return; //РїСЂРѕРІРµСЂРєР° ni < (nodeArr.end()-1)
 	xassert(ni->spline2NextLeft.size()==ni->spline2NextRight.size());
 	int sizeSpline=ni->spline2NextLeft.size();
 	vector<sPolygon> poligonArr;
@@ -1180,7 +1180,7 @@ void RoadTool::putSpline(TypeNodeIterator ni, int numPass)
 			curLengtTrackF+=ni->spline2NextSectionLenght[i];
 	}
 	ni++;
-	if(ni!=nodeArr.end() && !ni->spline2NextLeft.empty() ){ //Внимание - используется i !
+	if(ni!=nodeArr.end() && !ni->spline2NextLeft.empty() ){ //Р’РЅРёРјР°РЅРёРµ - РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ i !
 		curU=round( fmod(curLengtTrackF, (float)(SHRT_MAX+1))*(float)(1<<16) );
 		Vect3f& lp=ni->spline2NextLeft[0];
 		Vect3f& rp=ni->spline2NextRight[0];
@@ -1249,7 +1249,7 @@ void RoadTool::putSpline(TypeNodeIterator ni, int numPass)
 		iPntArr2.push_back(VertexI(rp2*(1<<16)));
 		iPntArr2.back().u=curU;
 		iPntArr2.back().v=0;
-		//poligons можно не заполнять
+		//poligons РјРѕР¶РЅРѕ РЅРµ Р·Р°РїРѕР»РЅСЏС‚СЊ
 		int idx=i*2;
 		poligonArr.push_back(sPolygon());
 		poligonArr.back().set(idx, idx+2, idx+3); //(idx-2, idx, idx+1);
@@ -1258,7 +1258,7 @@ void RoadTool::putSpline(TypeNodeIterator ni, int numPass)
 		curLengtTrackF+=ni->spline2NextSectionLenght[i];
 	}
 	ni++;
-	if(ni!=nodeArr.end() && !ni->spline2NextLeft.empty() ){ //Внимание - используется i !
+	if(ni!=nodeArr.end() && !ni->spline2NextLeft.empty() ){ //Р’РЅРёРјР°РЅРёРµ - РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ i !
 		curU=round( fmod(curLengtTrackF, (float)(SHRT_MAX+1))*(float)(1<<16) );
 		//left edge
 		Vect3f& lp=ni->spline2NextLeftEdge[0];

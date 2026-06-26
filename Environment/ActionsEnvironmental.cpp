@@ -22,45 +22,45 @@ STARFORCE_API void initActionsEnvironmental()
 {
 SECUROM_MARKER_HIGH_SECURITY_ON(12);
 
-REGISTER_CLASS(Action, ActionActivateSources, "Глобальные действия\\Активировать источники")
-REGISTER_CLASS(Action, ActionKillSource, "Глобальные действия\\Уничтожить источник")
-REGISTER_CLASS(Action, ActionDeactivateSources, "Глобальные действия\\Деактивировать источники")
-REGISTER_CLASS(Action, ActionActivateMinimapMark, "Глобальные действия\\Активировать пометку на миникарте")
-REGISTER_CLASS(Action, ActionDeactivateMinimapMarks, "Глобальные действия\\Деактивировать пометку на миникарте")
-REGISTER_CLASS(Action, ActionSetFogOfWar, "Глобальные действия\\Туман войны(обязательно восстанавливать)")
-REGISTER_CLASS(Action, ActionSetSilhouette, "Глобальные действия\\Силуэты(не использовать!!!)") 
+REGISTER_CLASS(Action, ActionActivateSources, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РђРєС‚РёРІРёСЂРѕРІР°С‚СЊ РёСЃС‚РѕС‡РЅРёРєРё")
+REGISTER_CLASS(Action, ActionKillSource, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РЈРЅРёС‡С‚РѕР¶РёС‚СЊ РёСЃС‚РѕС‡РЅРёРє")
+REGISTER_CLASS(Action, ActionDeactivateSources, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р”РµР°РєС‚РёРІРёСЂРѕРІР°С‚СЊ РёСЃС‚РѕС‡РЅРёРєРё")
+REGISTER_CLASS(Action, ActionActivateMinimapMark, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РђРєС‚РёРІРёСЂРѕРІР°С‚СЊ РїРѕРјРµС‚РєСѓ РЅР° РјРёРЅРёРєР°СЂС‚Рµ")
+REGISTER_CLASS(Action, ActionDeactivateMinimapMarks, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р”РµР°РєС‚РёРІРёСЂРѕРІР°С‚СЊ РїРѕРјРµС‚РєСѓ РЅР° РјРёРЅРёРєР°СЂС‚Рµ")
+REGISTER_CLASS(Action, ActionSetFogOfWar, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РўСѓРјР°РЅ РІРѕР№РЅС‹(РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ)")
+REGISTER_CLASS(Action, ActionSetSilhouette, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РЎРёР»СѓСЌС‚С‹(РЅРµ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ!!!)") 
 
-REGISTER_CLASS(Action, ActionSetFallout, "Погода\\Установить параметры осадков")
-REGISTER_CLASS(Action, ActionSetFalloutType, "Погода\\Параметры осадков (Только визуальные)")
-REGISTER_CLASS(Action, ActionSetFalloutFlood, "Погода\\Параметры осадков (Заполнение водой)")
+REGISTER_CLASS(Action, ActionSetFallout, "РџРѕРіРѕРґР°\\РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РїР°СЂР°РјРµС‚СЂС‹ РѕСЃР°РґРєРѕРІ")
+REGISTER_CLASS(Action, ActionSetFalloutType, "РџРѕРіРѕРґР°\\РџР°СЂР°РјРµС‚СЂС‹ РѕСЃР°РґРєРѕРІ (РўРѕР»СЊРєРѕ РІРёР·СѓР°Р»СЊРЅС‹Рµ)")
+REGISTER_CLASS(Action, ActionSetFalloutFlood, "РџРѕРіРѕРґР°\\РџР°СЂР°РјРµС‚СЂС‹ РѕСЃР°РґРєРѕРІ (Р—Р°РїРѕР»РЅРµРЅРёРµ РІРѕРґРѕР№)")
 
 
-REGISTER_CLASS(Action, ActionSetWaterOpacity, "Погода\\Установить прозрачность воды")
-REGISTER_CLASS(Action, ActionSetWind, "Погода\\Установить направление ветра")
-REGISTER_CLASS(Action, ActionSetFog, "Погода\\Установить туман")
-REGISTER_CLASS(Action, ActionSetEnvironmentTime, "Погода\\Установить время суток")
-REGISTER_CLASS(Action, ActionSetWaterColor, "Погода\\Установить цвет воды")
-REGISTER_CLASS(Action, ActionSetReflectSkyColor, "Погода\\Установить цвет отражённого неба")
-REGISTER_CLASS(Action, ActionSetTimeScale, "Погода\\Скорость течения времени суток на мире")
-REGISTER_CLASS(Action, ActionSetWaterLevel, "Погода\\Установить уровень воды")
+REGISTER_CLASS(Action, ActionSetWaterOpacity, "РџРѕРіРѕРґР°\\РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ РІРѕРґС‹")
+REGISTER_CLASS(Action, ActionSetWind, "РџРѕРіРѕРґР°\\РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РЅР°РїСЂР°РІР»РµРЅРёРµ РІРµС‚СЂР°")
+REGISTER_CLASS(Action, ActionSetFog, "РџРѕРіРѕРґР°\\РЈСЃС‚Р°РЅРѕРІРёС‚СЊ С‚СѓРјР°РЅ")
+REGISTER_CLASS(Action, ActionSetEnvironmentTime, "РџРѕРіРѕРґР°\\РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РІСЂРµРјСЏ СЃСѓС‚РѕРє")
+REGISTER_CLASS(Action, ActionSetWaterColor, "РџРѕРіРѕРґР°\\РЈСЃС‚Р°РЅРѕРІРёС‚СЊ С†РІРµС‚ РІРѕРґС‹")
+REGISTER_CLASS(Action, ActionSetReflectSkyColor, "РџРѕРіРѕРґР°\\РЈСЃС‚Р°РЅРѕРІРёС‚СЊ С†РІРµС‚ РѕС‚СЂР°Р¶С‘РЅРЅРѕРіРѕ РЅРµР±Р°")
+REGISTER_CLASS(Action, ActionSetTimeScale, "РџРѕРіРѕРґР°\\РЎРєРѕСЂРѕСЃС‚СЊ С‚РµС‡РµРЅРёСЏ РІСЂРµРјРµРЅРё СЃСѓС‚РѕРє РЅР° РјРёСЂРµ")
+REGISTER_CLASS(Action, ActionSetWaterLevel, "РџРѕРіРѕРґР°\\РЈСЃС‚Р°РЅРѕРІРёС‚СЊ СѓСЂРѕРІРµРЅСЊ РІРѕРґС‹")
 
-REGISTER_CLASS(Action, ActionSetEffect, "Глобальные действия\\Включить/выключить эффект");
+REGISTER_CLASS(Action, ActionSetEffect, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р’РєР»СЋС‡РёС‚СЊ/РІС‹РєР»СЋС‡РёС‚СЊ СЌС„С„РµРєС‚");
 
 SECUROM_MARKER_HIGH_SECURITY_OFF(12);
 }
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ActionSetFallout, TypeFallout, "TypeFallout")
-REGISTER_ENUM_ENCLOSED(ActionSetFallout, NONE, "Нет осадков")
-REGISTER_ENUM_ENCLOSED(ActionSetFallout, RAIN, "Дождь")
-REGISTER_ENUM_ENCLOSED(ActionSetFallout, SNOW, "Снег")
+REGISTER_ENUM_ENCLOSED(ActionSetFallout, NONE, "РќРµС‚ РѕСЃР°РґРєРѕРІ")
+REGISTER_ENUM_ENCLOSED(ActionSetFallout, RAIN, "Р”РѕР¶РґСЊ")
+REGISTER_ENUM_ENCLOSED(ActionSetFallout, SNOW, "РЎРЅРµРі")
 END_ENUM_DESCRIPTOR_ENCLOSED(ActionSetFallout, TypeFallout)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ActionSetEffect, Effects, "Effects")
-REGISTER_ENUM_ENCLOSED(ActionSetEffect, EFFECT_MONOCHROME, "Монохромный")
-REGISTER_ENUM_ENCLOSED(ActionSetEffect, EFFECT_BLOOM, "Свечение")
-REGISTER_ENUM_ENCLOSED(ActionSetEffect, EFFECT_UNDER_WATER, "Подводный")
-REGISTER_ENUM_ENCLOSED(ActionSetEffect, EFFECT_DOF, "Глубина резкости(Floating Z-Buffer)")
-REGISTER_ENUM_ENCLOSED(ActionSetEffect, EFFECT_COLORDODGE, "Наблюдатель")
+REGISTER_ENUM_ENCLOSED(ActionSetEffect, EFFECT_MONOCHROME, "РњРѕРЅРѕС…СЂРѕРјРЅС‹Р№")
+REGISTER_ENUM_ENCLOSED(ActionSetEffect, EFFECT_BLOOM, "РЎРІРµС‡РµРЅРёРµ")
+REGISTER_ENUM_ENCLOSED(ActionSetEffect, EFFECT_UNDER_WATER, "РџРѕРґРІРѕРґРЅС‹Р№")
+REGISTER_ENUM_ENCLOSED(ActionSetEffect, EFFECT_DOF, "Р“Р»СѓР±РёРЅР° СЂРµР·РєРѕСЃС‚Рё(Floating Z-Buffer)")
+REGISTER_ENUM_ENCLOSED(ActionSetEffect, EFFECT_COLORDODGE, "РќР°Р±Р»СЋРґР°С‚РµР»СЊ")
 END_ENUM_DESCRIPTOR_ENCLOSED(ActionSetEffect, Effects)
 
 ActionSetTimeScale::ActionSetTimeScale()
@@ -72,9 +72,9 @@ ActionSetTimeScale::ActionSetTimeScale()
 void ActionSetTimeScale::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	if(ar.openBlock("Time scale", "Масштаб времени суток")){
-		ar.serialize(dayTimeScale_, "dayTimeScale", "Масштаб времени днем");
-		ar.serialize(nightTimeScale_, "nightTimeScale", "Масштаб времени ночью");
+	if(ar.openBlock("Time scale", "РњР°СЃС€С‚Р°Р± РІСЂРµРјРµРЅРё СЃСѓС‚РѕРє")){
+		ar.serialize(dayTimeScale_, "dayTimeScale", "РњР°СЃС€С‚Р°Р± РІСЂРµРјРµРЅРё РґРЅРµРј");
+		ar.serialize(nightTimeScale_, "nightTimeScale", "РњР°СЃС€С‚Р°Р± РІСЂРµРјРµРЅРё РЅРѕС‡СЊСЋ");
 		ar.closeBlock();
 	}
 }
@@ -101,9 +101,9 @@ ActionSetWind::ActionSetWind()
 void ActionSetWind::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(windType, "windType", "Тип ветра");
-	ar.serialize(angleDirection, "angleDirection", "Угол направления ветра");
-	ar.serialize(windPower, "windPower", "Сила ветра");
+	ar.serialize(windType, "windType", "РўРёРї РІРµС‚СЂР°");
+	ar.serialize(angleDirection, "angleDirection", "РЈРіРѕР» РЅР°РїСЂР°РІР»РµРЅРёСЏ РІРµС‚СЂР°");
+	ar.serialize(windPower, "windPower", "РЎРёР»Р° РІРµС‚СЂР°");
 }
 
 void ActionSetWind::activate()
@@ -124,8 +124,8 @@ ActionSetEffect::ActionSetEffect()
 void ActionSetEffect::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(switchMode, "switchMode", "Действие");
-	ar.serialize(effects, "effects", "Эффект");
+	ar.serialize(switchMode, "switchMode", "Р”РµР№СЃС‚РІРёРµ");
+	ar.serialize(effects, "effects", "Р­С„С„РµРєС‚");
 }
 
 bool ActionSetEffect::automaticCondition() const
@@ -215,7 +215,7 @@ void ActionKillSource::activate()
 void ActionKillSource::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(source_, "source_", "Источник");
+	ar.serialize(source_, "source_", "РСЃС‚РѕС‡РЅРёРє");
 }
 
 void ActionActivateSources::activate() 
@@ -223,7 +223,7 @@ void ActionActivateSources::activate()
 	Sources::iterator i;
 	FOR_EACH(sources_, i){
 		if(!*i){
-			xassertStr(0 && "Источник по метке не найден: ", i->c_str());
+			xassertStr(0 && "РСЃС‚РѕС‡РЅРёРє РїРѕ РјРµС‚РєРµ РЅРµ РЅР°Р№РґРµРЅ: ", i->c_str());
 		}
 		else
 			(*i)->setActivity(active_);
@@ -239,7 +239,7 @@ ActionDeactivateSources::ActionDeactivateSources()
 void ActionActivateMinimapMark::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(anchor_, "|anchor|anchorName", "Имя пометки");
+	ar.serialize(anchor_, "|anchor|anchorName", "РРјСЏ РїРѕРјРµС‚РєРё");
 }
 
 void ActionActivateMinimapMark::activate()
@@ -280,10 +280,10 @@ void ActionSetFallout::activate()
 void ActionSetFallout::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(type, "type", "Тип осадков");
-	ar.serialize(RangedWrapperf(intencity, 0, 100, 0.01f), "intensity", "Интенсивность (0-100)");
-	ar.serialize(time, "time", "Время перехода");
-	ar.serialize(rainConstant, "rainConstant", "ВОДА: Параметр высыхания");
+	ar.serialize(type, "type", "РўРёРї РѕСЃР°РґРєРѕРІ");
+	ar.serialize(RangedWrapperf(intencity, 0, 100, 0.01f), "intensity", "РРЅС‚РµРЅСЃРёРІРЅРѕСЃС‚СЊ (0-100)");
+	ar.serialize(time, "time", "Р’СЂРµРјСЏ РїРµСЂРµС…РѕРґР°");
+	ar.serialize(rainConstant, "rainConstant", "Р’РћР”Рђ: РџР°СЂР°РјРµС‚СЂ РІС‹СЃС‹С…Р°РЅРёСЏ");
 }
 
 ActionSetFalloutType::ActionSetFalloutType()
@@ -312,9 +312,9 @@ void ActionSetFalloutType::activate()
 void ActionSetFalloutType::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(type, "type", "Тип осадков");
-	ar.serialize(RangedWrapperf(intencity, 0, 100, 0.01f), "intensity", "Интенсивность (0-100)");
-	ar.serialize(time, "time", "Время перехода");
+	ar.serialize(type, "type", "РўРёРї РѕСЃР°РґРєРѕРІ");
+	ar.serialize(RangedWrapperf(intencity, 0, 100, 0.01f), "intensity", "РРЅС‚РµРЅСЃРёРІРЅРѕСЃС‚СЊ (0-100)");
+	ar.serialize(time, "time", "Р’СЂРµРјСЏ РїРµСЂРµС…РѕРґР°");
 }
 
 ActionSetFalloutFlood::ActionSetFalloutFlood()
@@ -331,7 +331,7 @@ void ActionSetFalloutFlood::activate()
 void ActionSetFalloutFlood::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(rainConstant, "rainConstant", "ВОДА: Параметр высыхания");
+	ar.serialize(rainConstant, "rainConstant", "Р’РћР”Рђ: РџР°СЂР°РјРµС‚СЂ РІС‹СЃС‹С…Р°РЅРёСЏ");
 }
 /////////////////////////////////////////////////////
 
@@ -348,7 +348,7 @@ void ActionSetEnvironmentTime::activate()
 void ActionSetEnvironmentTime::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(time, "time", "Время суток");
+	ar.serialize(time, "time", "Р’СЂРµРјСЏ СЃСѓС‚РѕРє");
 }
 
 ////////////////////////////////////////////////////
@@ -370,9 +370,9 @@ void ActionSetFog::activate()
 void ActionSetFog::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(fog_enable, "fog_enable", "Включить туман");
-	ar.serialize(fog_start, "fog_start", "Ближняя граница тумана");
-	ar.serialize(fog_end, "fog_end", "Дальняя граница тумана");
+	ar.serialize(fog_enable, "fog_enable", "Р’РєР»СЋС‡РёС‚СЊ С‚СѓРјР°РЅ");
+	ar.serialize(fog_start, "fog_start", "Р‘Р»РёР¶РЅСЏСЏ РіСЂР°РЅРёС†Р° С‚СѓРјР°РЅР°");
+	ar.serialize(fog_end, "fog_end", "Р”Р°Р»СЊРЅСЏСЏ РіСЂР°РЅРёС†Р° С‚СѓРјР°РЅР°");
 }
 
 ////////////////////////////////////////////////////
@@ -410,7 +410,7 @@ void ActionSetWaterOpacity::serialize(Archive& ar)
 	if(environment){
 		cWater* water = environment->water(); 
 	}
-	ar.serialize(static_cast<WaterGradient&>(opacityGradient_), "zLevelOpacityGradient", "Прозрачность воды на разной глубине");
+	ar.serialize(static_cast<WaterGradient&>(opacityGradient_), "zLevelOpacityGradient", "РџСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ РІРѕРґС‹ РЅР° СЂР°Р·РЅРѕР№ РіР»СѓР±РёРЅРµ");
 }
 
 void ActionSetWaterOpacity::activate()
@@ -431,8 +431,8 @@ ActionSetReflectSkyColor::ActionSetReflectSkyColor()
 void ActionSetReflectSkyColor::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(reflectSkyColor_, "reflectSkyColor", "Цвет");
-	ar.serialize(switchMode_, "switchMode", "Действие");
+	ar.serialize(reflectSkyColor_, "reflectSkyColor", "Р¦РІРµС‚");
+	ar.serialize(switchMode_, "switchMode", "Р”РµР№СЃС‚РІРёРµ");
 }
 
 void ActionSetReflectSkyColor::activate()
@@ -450,7 +450,7 @@ void ActionSetReflectSkyColor::activate()
 void ActionSetFogOfWar::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(mode_, "mode", "Операция");
+	ar.serialize(mode_, "mode", "РћРїРµСЂР°С†РёСЏ");
 }
 
 ActionSetWaterColor::ActionSetWaterColor()
@@ -462,9 +462,9 @@ ActionSetWaterColor::ActionSetWaterColor()
 void ActionSetWaterColor::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(riverColor_, "riverColor", "Цвет неглубокой воды");
-	ar.serialize(seaColor_, "seaColor", "Цвет глубокой воды");
-	ar.serialize(transitionTime_, "transitionTime", "Время перехода, секунды");
+	ar.serialize(riverColor_, "riverColor", "Р¦РІРµС‚ РЅРµРіР»СѓР±РѕРєРѕР№ РІРѕРґС‹");
+	ar.serialize(seaColor_, "seaColor", "Р¦РІРµС‚ РіР»СѓР±РѕРєРѕР№ РІРѕРґС‹");
+	ar.serialize(transitionTime_, "transitionTime", "Р’СЂРµРјСЏ РїРµСЂРµС…РѕРґР°, СЃРµРєСѓРЅРґС‹");
 }
 
 void ActionSetWaterColor::activate()

@@ -51,7 +51,7 @@ struct PlayerDataEdit : PlayerData
 };
 
 ///////////////////////////////////////
-//			Игрок
+//			РРіСЂРѕРє
 ///////////////////////////////////////
 class Player
 {
@@ -102,7 +102,7 @@ public:
 	const ParameterSet& resourceDelta() const { return resourceDelta_; }
 	const ParameterSet& resourceCapacity() const { return resourceCapacity_; }
 	void addResource(const ParameterSet& resource, bool registerEvent = false);
-	bool requestResource(const ParameterSet& resource, RequestResourceType requestResourceType) const; // проверка на наличие ресурса 
+	bool requestResource(const ParameterSet& resource, RequestResourceType requestResourceType) const; // РїСЂРѕРІРµСЂРєР° РЅР° РЅР°Р»РёС‡РёРµ СЂРµСЃСѓСЂСЃР° 
 	void subResource(const ParameterSet& resource); 
 
 	SquadList& squads() { return squads_; }
@@ -117,7 +117,7 @@ public:
 	bool accessible(const AttributeBase* attribute) const;
 	bool accessibleByBuildings(const AttributeBase* attribute) const;
 	void printAccessible(WBuffer& out, const AccessBuildingsList& buildingsList, const wchar_t* enabledColor, const wchar_t* disabledColor) const;
-	const RealUnits& realUnits(const AttributeBase* attribute) const; // Юниты и здания
+	const RealUnits& realUnits(const AttributeBase* attribute) const; // Р®РЅРёС‚С‹ Рё Р·РґР°РЅРёСЏ
 	UnitActing* findFreeFactory(const AttributeBase* unitAttribute, int priority = 0);
 	
 	bool accessibleByBuildings(const ProducedParameters& parameter) const;
@@ -153,7 +153,7 @@ public:
 	void addResourceCapacity(const ParameterSet& capacity) { resourceCapacity_ += capacity; }
 	void subClampedResourceCapacity(const ParameterSet& capacity);
 
-	const AttributeCache* attributeCache(const AttributeBase* attribute) const; // Кешируются только юниты, здания, предметы и сквады
+	const AttributeCache* attributeCache(const AttributeBase* attribute) const; // РљРµС€РёСЂСѓСЋС‚СЃСЏ С‚РѕР»СЊРєРѕ СЋРЅРёС‚С‹, Р·РґР°РЅРёСЏ, РїСЂРµРґРјРµС‚С‹ Рё СЃРєРІР°РґС‹
 	void applyParameterArithmetics(const AttributeBase* attribute, const ParameterArithmetics& arithmetics);
 
 	const WeaponPrmCache* weaponPrmCache(const WeaponPrm* prm) const;
@@ -328,31 +328,31 @@ private:
 	typedef vector<WeaponPrmCache> WeaponPrmCacheVector;
 	WeaponPrmCacheVector weaponPrmCache_;
 
-	// нажата кнопка стрельбы
+	// РЅР°Р¶Р°С‚Р° РєРЅРѕРїРєР° СЃС‚СЂРµР»СЊР±С‹
 	bool shootKeyDown_;
-	// предыдущее и текущее положение стрельбы
+	// РїСЂРµРґС‹РґСѓС‰РµРµ Рё С‚РµРєСѓС‰РµРµ РїРѕР»РѕР¶РµРЅРёРµ СЃС‚СЂРµР»СЊР±С‹
 	Vect3f shootPosition_[2];
-	// время с момента обновления в логических квантах
+	// РІСЂРµРјСЏ СЃ РјРѕРјРµРЅС‚Р° РѕР±РЅРѕРІР»РµРЅРёСЏ РІ Р»РѕРіРёС‡РµСЃРєРёС… РєРІР°РЅС‚Р°С…
 	unsigned short shootPositionUpdateTime_;
-	// надо слать координаты мышикаждый квант
+	// РЅР°РґРѕ СЃР»Р°С‚СЊ РєРѕРѕСЂРґРёРЅР°С‚С‹ РјС‹С€РёРєР°Р¶РґС‹Р№ РєРІР°РЅС‚
 	unsigned short shootPositionNeedUpdate_;
-	// время показа точки сбора
+	// РІСЂРµРјСЏ РїРѕРєР°Р·Р° С‚РѕС‡РєРё СЃР±РѕСЂР°
 	LogicTimer showAssemblyCommandTimer_;
-	// точка сбора
+	// С‚РѕС‡РєР° СЃР±РѕСЂР°
 	UnitLink<Anchor> assemblyPosition_;
-	/// нельзя стрельнуть с нажатой кнопкой
+	/// РЅРµР»СЊР·СЏ СЃС‚СЂРµР»СЊРЅСѓС‚СЊ СЃ РЅР°Р¶Р°С‚РѕР№ РєРЅРѕРїРєРѕР№
 	bool shootFailed_;
 
-	/// индекс юнита, для которого вызывать квант microAI
+	/// РёРЅРґРµРєСЃ СЋРЅРёС‚Р°, РґР»СЏ РєРѕС‚РѕСЂРѕРіРѕ РІС‹Р·С‹РІР°С‚СЊ РєРІР°РЅС‚ microAI
 	int aiUpdateIndex_;
 
 	void calculateResourceDelta();
 
-	// время с момента обновления в логических квантах
+	// РІСЂРµРјСЏ СЃ РјРѕРјРµРЅС‚Р° РѕР±РЅРѕРІР»РµРЅРёСЏ РІ Р»РѕРіРёС‡РµСЃРєРёС… РєРІР°РЅС‚Р°С…
 	unsigned short centerPositionUpdateTime_;
-	// центр базы игрока
+	// С†РµРЅС‚СЂ Р±Р°Р·С‹ РёРіСЂРѕРєР°
 	Vect2f centerPosition_;
-	// максимальный радиус базы
+	// РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°РґРёСѓСЃ Р±Р°Р·С‹
 	float maxDistance_;
 
 	void centerPositionQuant();

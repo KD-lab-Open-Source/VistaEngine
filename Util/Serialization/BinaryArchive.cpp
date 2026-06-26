@@ -5,7 +5,7 @@
 #include "crc.h"
 #include "EnumDescriptor.h"
 
-const short int CONTAINER_ID = 8383; // подстраховка при слитии блоков
+const short int CONTAINER_ID = 8383; // РїРѕРґСЃС‚СЂР°С…РѕРІРєР° РїСЂРё СЃР»РёС‚РёРё Р±Р»РѕРєРѕРІ
 const char* fileHeader = "KDV";
 
 ///////////////////////////////////////////////////////
@@ -547,7 +547,7 @@ bool BinaryIArchive::openContainer(void* array, int& number, const char* name, c
 		unsigned short int sizeShort, id;
 		currentBlock().read(id);
 		currentBlock().read(sizeShort);
-		xassert(id == CONTAINER_ID && "Неправильно прочитан размер массива");
+		xassert(id == CONTAINER_ID && "РќРµРїСЂР°РІРёР»СЊРЅРѕ РїСЂРѕС‡РёС‚Р°РЅ СЂР°Р·РјРµСЂ РјР°СЃСЃРёРІР°");
 		number = sizeShort;
 		return true;
 	}

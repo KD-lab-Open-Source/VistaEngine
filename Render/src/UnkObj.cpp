@@ -5,7 +5,7 @@ RENDER_API RandomGenerator graphRnd;
 
 #ifdef C_CHECK_DELETE
 cCheckExit cCheckDelete::root;
-static MTSection gb_checkexit_lock;//������ ���������.
+static MTSection gb_checkexit_lock;//Кривой синглетон.
 
 void SaveKindObjNotFree();
 cCheckExit::~cCheckExit()

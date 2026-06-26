@@ -195,7 +195,7 @@ void cStatic3dx::releaseTextures()
 		RELEASE(iLeaf->pTexture);
 }
 
-//!!!! Если furinfo поменялось, перегенерировать кешь.
+//!!!! Р•СЃР»Рё furinfo РїРѕРјРµРЅСЏР»РѕСЃСЊ, РїРµСЂРµРіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ РєРµС€СЊ.
 void cStatic3dx::loadFur()
 {
 	typedef vector<FurInfo> FurInfos;
@@ -231,7 +231,7 @@ void StaticMaterial::loadFur(const FurInfo& furInfo, cStatic3dx* object)
 void StaticMaterial::createTextures(cStatic3dx* object)
 {
 	texturesCreated = true;
-	gb_RenderDevice3D->SetCurrentConvertDot3Mul(10.0f);//Потом читать из файла
+	gb_RenderDevice3D->SetCurrentConvertDot3Mul(10.0f);//РџРѕС‚РѕРј С‡РёС‚Р°С‚СЊ РёР· С„Р°Р№Р»Р°
 
 	if(!tex_bump.empty() && gb_RenderDevice3D->IsPS20())
 		pBumpTexture = object->LoadTexture(tex_bump.c_str(),"Bump");
@@ -479,8 +479,8 @@ void cStatic3dx::BuildMeshes()
 
 	BuildMeshesLod(tempMesh_, 0, true);
 
-	//Ноды относятся ко всем, а меши - к определенным группам видимости.
-	//Вместо temp_invisible_object, нужно temp_visible_object.
+	//РќРѕРґС‹ РѕС‚РЅРѕСЃСЏС‚СЃСЏ РєРѕ РІСЃРµРј, Р° РјРµС€Рё - Рє РѕРїСЂРµРґРµР»РµРЅРЅС‹Рј РіСЂСѓРїРїР°Рј РІРёРґРёРјРѕСЃС‚Рё.
+	//Р’РјРµСЃС‚Рѕ temp_invisible_object, РЅСѓР¶РЅРѕ temp_visible_object.
 	FOR_EACH(visibilitySets_, iSet){
 		StaticVisibilitySet& set = *iSet;
 		StaticVisibilityGroups::iterator iGroup;
@@ -514,9 +514,9 @@ void cStatic3dx::BuildMeshesLod(const TempMeshes& tempMeshesIn, int ilod, bool i
 		if(isDebris ? !is_debris : !is_no_debris)
 			continue;
 		/*
-		Нужно ещё 
-		читать/писать кэш
-		строить debrises и simply 3dx не создавая vb под эти данные.
+		РќСѓР¶РЅРѕ РµС‰С‘ 
+		С‡РёС‚Р°С‚СЊ/РїРёСЃР°С‚СЊ РєСЌС€
+		СЃС‚СЂРѕРёС‚СЊ debrises Рё simply 3dx РЅРµ СЃРѕР·РґР°РІР°СЏ vb РїРѕРґ СЌС‚Рё РґР°РЅРЅС‹Рµ.
 		*/
 
 		temp_mesh.push_back(*iMesh);
@@ -533,7 +533,7 @@ void cStatic3dx::BuildMeshesLod(const TempMeshes& tempMeshesIn, int ilod, bool i
 
 	TempMeshes material_mesh;
 	MergeMaterialMesh(temp_mesh,material_mesh,!isDebris);
-	int max_bones=4;//К сожалению на заметили ускорения от ограничения количества костей. Нужно дальше разбираться.
+	int max_bones=4;//Рљ СЃРѕР¶Р°Р»РµРЅРёСЋ РЅР° Р·Р°РјРµС‚РёР»Рё СѓСЃРєРѕСЂРµРЅРёСЏ РѕС‚ РѕРіСЂР°РЅРёС‡РµРЅРёСЏ РєРѕР»РёС‡РµСЃС‚РІР° РєРѕСЃС‚РµР№. РќСѓР¶РЅРѕ РґР°Р»СЊС€Рµ СЂР°Р·Р±РёСЂР°С‚СЊСЃСЏ.
 	BuildBuffers(material_mesh, isDebris ? debris : lods[ilod], max_bones);
 }
 
@@ -587,7 +587,7 @@ void cStatic3dx::BuildBuffers(TempMeshes& temp_mesh,StaticLod& lod,int max_bones
 {
 	if(temp_mesh.empty())
 	{
-		//		errlog()<<"Нет ни одного объекта"<<VERR_END;
+		//		errlog()<<"РќРµС‚ РЅРё РѕРґРЅРѕРіРѕ РѕР±СЉРµРєС‚Р°"<<VERR_END;
 		return;
 	}
 
@@ -620,7 +620,7 @@ void cStatic3dx::BuildBuffers(TempMeshes& temp_mesh,StaticLod& lod,int max_bones
 	max_bones_per_vertex=min(max_bones,max_bones_per_vertex);
 
 	if(vertex_size>65535)
-		errlog()<<"Количество вертексов "<<vertex_size<<" превышает максимально допустимые 65535"<<VERR_END;
+		errlog()<<"РљРѕР»РёС‡РµСЃС‚РІРѕ РІРµСЂС‚РµРєСЃРѕРІ "<<vertex_size<<" РїСЂРµРІС‹С€Р°РµС‚ РјР°РєСЃРёРјР°Р»СЊРЅРѕ РґРѕРїСѓСЃС‚РёРјС‹Рµ 65535"<<VERR_END;
 	xassert(polygon_size<65535);
 
 	vector<sVertexXYZINT1> vertex(vertex_size);
@@ -894,7 +894,7 @@ void cStatic3dx::CalcBumpSTNorm(StaticLod& lod)
 		}
 	}
 
-	//Блин! по материалам разбивка нужна
+	//Р‘Р»РёРЅ! РїРѕ РјР°С‚РµСЂРёР°Р»Р°Рј СЂР°Р·Р±РёРІРєР° РЅСѓР¶РЅР°
 	cAccessTexture tex;
 	if(enableFur)
 	{
@@ -942,7 +942,7 @@ void cStatic3dx::CalcBumpSTNorm(StaticLod& lod)
 					ntc.normalize();
 
 					Vect3f tc_global;
-					//Надо из tangent space в глобальное перевести.
+					//РќР°РґРѕ РёР· tangent space РІ РіР»РѕР±Р°Р»СЊРЅРѕРµ РїРµСЂРµРІРµСЃС‚Рё.
 					tc_global.x=ntc.x*t.x+ntc.y*s.x+ntc.z*n.x;
 					tc_global.y=ntc.x*t.y+ntc.y*s.y+ntc.z*n.y;
 					tc_global.z=ntc.x*t.z+ntc.y*s.z+ntc.z*n.z;
@@ -1018,38 +1018,38 @@ void cStatic3dx::ParseEffect()
 }
 
 /*
-1. Не правильный.
-Берем все объекты, относящиеся с одному материалу.
-Ищем с какой нодой больше треугольников.
-Ищем, какие 2ноды с ней контачат, и выбираем те, в которых больше треугольников.
-Теперь у нас 3 ноды.
-Ищем с какой из оставшихся нод больше треугольников, причем отдаем предпочтение 
-тем треугольникам, в которых уже есть ноды из списка.
-Копируем найденные треугольники в новую ноду, и помечаем их, как пустые.
+1. РќРµ РїСЂР°РІРёР»СЊРЅС‹Р№.
+Р‘РµСЂРµРј РІСЃРµ РѕР±СЉРµРєС‚С‹, РѕС‚РЅРѕСЃСЏС‰РёРµСЃСЏ СЃ РѕРґРЅРѕРјСѓ РјР°С‚РµСЂРёР°Р»Сѓ.
+РС‰РµРј СЃ РєР°РєРѕР№ РЅРѕРґРѕР№ Р±РѕР»СЊС€Рµ С‚СЂРµСѓРіРѕР»СЊРЅРёРєРѕРІ.
+РС‰РµРј, РєР°РєРёРµ 2РЅРѕРґС‹ СЃ РЅРµР№ РєРѕРЅС‚Р°С‡Р°С‚, Рё РІС‹Р±РёСЂР°РµРј С‚Рµ, РІ РєРѕС‚РѕСЂС‹С… Р±РѕР»СЊС€Рµ С‚СЂРµСѓРіРѕР»СЊРЅРёРєРѕРІ.
+РўРµРїРµСЂСЊ Сѓ РЅР°СЃ 3 РЅРѕРґС‹.
+РС‰РµРј СЃ РєР°РєРѕР№ РёР· РѕСЃС‚Р°РІС€РёС…СЃСЏ РЅРѕРґ Р±РѕР»СЊС€Рµ С‚СЂРµСѓРіРѕР»СЊРЅРёРєРѕРІ, РїСЂРёС‡РµРј РѕС‚РґР°РµРј РїСЂРµРґРїРѕС‡С‚РµРЅРёРµ 
+С‚РµРј С‚СЂРµСѓРіРѕР»СЊРЅРёРєР°Рј, РІ РєРѕС‚РѕСЂС‹С… СѓР¶Рµ РµСЃС‚СЊ РЅРѕРґС‹ РёР· СЃРїРёСЃРєР°.
+РљРѕРїРёСЂСѓРµРј РЅР°Р№РґРµРЅРЅС‹Рµ С‚СЂРµСѓРіРѕР»СЊРЅРёРєРё РІ РЅРѕРІСѓСЋ РЅРѕРґСѓ, Рё РїРѕРјРµС‡Р°РµРј РёС…, РєР°Рє РїСѓСЃС‚С‹Рµ.
 
-2. Добавляем все ноды первого попавшегося треугольника в список.
+2. Р”РѕР±Р°РІР»СЏРµРј РІСЃРµ РЅРѕРґС‹ РїРµСЂРІРѕРіРѕ РїРѕРїР°РІС€РµРіРѕСЃСЏ С‚СЂРµСѓРіРѕР»СЊРЅРёРєР° РІ СЃРїРёСЃРѕРє.
 
-Эмпирически ищем еще одну ноду, которая входит в максимальное 
-количество треугольников, но в для тех, в которых есть уже выбранные - большой бонус.
-Добавляем ноду к списку выбранных.
-Добавляем, если есть треугольники к списку выбранных.
-И так по кругу, пока не будет 20 нод.
+Р­РјРїРёСЂРёС‡РµСЃРєРё РёС‰РµРј РµС‰Рµ РѕРґРЅСѓ РЅРѕРґСѓ, РєРѕС‚РѕСЂР°СЏ РІС…РѕРґРёС‚ РІ РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ 
+РєРѕР»РёС‡РµСЃС‚РІРѕ С‚СЂРµСѓРіРѕР»СЊРЅРёРєРѕРІ, РЅРѕ РІ РґР»СЏ С‚РµС…, РІ РєРѕС‚РѕСЂС‹С… РµСЃС‚СЊ СѓР¶Рµ РІС‹Р±СЂР°РЅРЅС‹Рµ - Р±РѕР»СЊС€РѕР№ Р±РѕРЅСѓСЃ.
+Р”РѕР±Р°РІР»СЏРµРј РЅРѕРґСѓ Рє СЃРїРёСЃРєСѓ РІС‹Р±СЂР°РЅРЅС‹С….
+Р”РѕР±Р°РІР»СЏРµРј, РµСЃР»Рё РµСЃС‚СЊ С‚СЂРµСѓРіРѕР»СЊРЅРёРєРё Рє СЃРїРёСЃРєСѓ РІС‹Р±СЂР°РЅРЅС‹С….
+Р С‚Р°Рє РїРѕ РєСЂСѓРіСѓ, РїРѕРєР° РЅРµ Р±СѓРґРµС‚ 20 РЅРѕРґ.
 
 ...
-Тут надо в целом переделывать все связанное со Split/BuildSkinGroup/заполнением вертекс и индекс буферов.
+РўСѓС‚ РЅР°РґРѕ РІ С†РµР»РѕРј РїРµСЂРµРґРµР»С‹РІР°С‚СЊ РІСЃРµ СЃРІСЏР·Р°РЅРЅРѕРµ СЃРѕ Split/BuildSkinGroup/Р·Р°РїРѕР»РЅРµРЅРёРµРј РІРµСЂС‚РµРєСЃ Рё РёРЅРґРµРєСЃ Р±СѓС„РµСЂРѕРІ.
 
-1 - убираем split
-2 - скидываем все cTempMesh3dx с одинаковыми материалами в один.
-3 - применяем процедуру для разбиения по 20 к этим мешам.
+1 - СѓР±РёСЂР°РµРј split
+2 - СЃРєРёРґС‹РІР°РµРј РІСЃРµ cTempMesh3dx СЃ РѕРґРёРЅР°РєРѕРІС‹РјРё РјР°С‚РµСЂРёР°Р»Р°РјРё РІ РѕРґРёРЅ.
+3 - РїСЂРёРјРµРЅСЏРµРј РїСЂРѕС†РµРґСѓСЂСѓ РґР»СЏ СЂР°Р·Р±РёРµРЅРёСЏ РїРѕ 20 Рє СЌС‚РёРј РјРµС€Р°Рј.
 
-Дописать !!!!!
-Объекты , которые ведут себя по разному в разных группах видимости, не должны мержиться.
-Пронумеровать их разными индексами и отсортировать по ним.
-В выходные данные указать на то в каких группах видимости эти меши видны.
+Р”РѕРїРёСЃР°С‚СЊ !!!!!
+РћР±СЉРµРєС‚С‹ , РєРѕС‚РѕСЂС‹Рµ РІРµРґСѓС‚ СЃРµР±СЏ РїРѕ СЂР°Р·РЅРѕРјСѓ РІ СЂР°Р·РЅС‹С… РіСЂСѓРїРїР°С… РІРёРґРёРјРѕСЃС‚Рё, РЅРµ РґРѕР»Р¶РЅС‹ РјРµСЂР¶РёС‚СЊСЃСЏ.
+РџСЂРѕРЅСѓРјРµСЂРѕРІР°С‚СЊ РёС… СЂР°Р·РЅС‹РјРё РёРЅРґРµРєСЃР°РјРё Рё РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°С‚СЊ РїРѕ РЅРёРј.
+Р’ РІС‹С…РѕРґРЅС‹Рµ РґР°РЅРЅС‹Рµ СѓРєР°Р·Р°С‚СЊ РЅР° С‚Рѕ РІ РєР°РєРёС… РіСЂСѓРїРїР°С… РІРёРґРёРјРѕСЃС‚Рё СЌС‚Рё РјРµС€Рё РІРёРґРЅС‹.
 
-Потом переключать бОльшим количеством DIP их.
-Это сэкономит сильно размеры, и 
-множества видимости - это всего лишь разные if при DIP.
+РџРѕС‚РѕРј РїРµСЂРµРєР»СЋС‡Р°С‚СЊ Р±РћР»СЊС€РёРј РєРѕР»РёС‡РµСЃС‚РІРѕРј DIP РёС….
+Р­С‚Рѕ СЃСЌРєРѕРЅРѕРјРёС‚ СЃРёР»СЊРЅРѕ СЂР°Р·РјРµСЂС‹, Рё 
+РјРЅРѕР¶РµСЃС‚РІР° РІРёРґРёРјРѕСЃС‚Рё - СЌС‚Рѕ РІСЃРµРіРѕ Р»РёС€СЊ СЂР°Р·РЅС‹Рµ if РїСЂРё DIP.
 */
 void cStatic3dx::MergeMaterialMesh(TempMeshes& temp_mesh, TempMeshes& material_mesh, bool merge_mesh)
 {
@@ -1201,9 +1201,9 @@ void cTempMesh3dx::Merge(TempMeshes& meshes,cStatic3dx* pStatic)
 }
 
 /*
-Дописать!!!
-Учитывать разбиение на cTempVisibleGroup.
-Перемещать треугольники внутри ноды только.
+Р”РѕРїРёСЃР°С‚СЊ!!!
+РЈС‡РёС‚С‹РІР°С‚СЊ СЂР°Р·Р±РёРµРЅРёРµ РЅР° cTempVisibleGroup.
+РџРµСЂРµРјРµС‰Р°С‚СЊ С‚СЂРµСѓРіРѕР»СЊРЅРёРєРё РІРЅСѓС‚СЂРё РЅРѕРґС‹ С‚РѕР»СЊРєРѕ.
 */
 void cStatic3dx::BuildSkinGroupSortedNormal(TempMeshes& temp_mesh,TempMeshes& out_mesh)
 {
@@ -1211,7 +1211,7 @@ void cStatic3dx::BuildSkinGroupSortedNormal(TempMeshes& temp_mesh,TempMeshes& ou
 	FOR_EACH(temp_mesh,it_mesh)
 	{
 		TempMesh tm=*it_mesh;
-		vector<char> selected_polygon(tm->polygons.size());//0 - свободный, 1 - текущий, 2 - предыдущий меш.
+		vector<char> selected_polygon(tm->polygons.size());//0 - СЃРІРѕР±РѕРґРЅС‹Р№, 1 - С‚РµРєСѓС‰РёР№, 2 - РїСЂРµРґС‹РґСѓС‰РёР№ РјРµС€.
 		vector<bool> selected_node(nodes.size());
 		int ipolygon;
 		for(ipolygon=0;ipolygon<tm->polygons.size();ipolygon++)
@@ -1243,7 +1243,7 @@ void cStatic3dx::BuildSkinGroupSortedNormal(TempMeshes& temp_mesh,TempMeshes& ou
 			while(cur_visible_group<tm->visible_group.size())
 			{
 				cur_vg=&tm->visible_group[cur_visible_group];
-				//Выходим, если нет больше полигонов, иначе выбираем первый свободный.
+				//Р’С‹С…РѕРґРёРј, РµСЃР»Рё РЅРµС‚ Р±РѕР»СЊС€Рµ РїРѕР»РёРіРѕРЅРѕРІ, РёРЅР°С‡Рµ РІС‹Р±РёСЂР°РµРј РїРµСЂРІС‹Р№ СЃРІРѕР±РѕРґРЅС‹Р№.
 				for(int ipolygon=cur_vg->begin_polygon;ipolygon<cur_vg->begin_polygon+cur_vg->num_polygon;ipolygon++)
 				{
 					if(!selected_polygon[ipolygon])
@@ -1299,8 +1299,8 @@ void cStatic3dx::BuildSkinGroupSortedNormal(TempMeshes& temp_mesh,TempMeshes& ou
 				}
 			}
 
-			//Если больше нет полигонов или индексов уже 20 штук, то
-			//добавляем помеченные в меш (делаем SplitMesh)
+			//Р•СЃР»Рё Р±РѕР»СЊС€Рµ РЅРµС‚ РїРѕР»РёРіРѕРЅРѕРІ РёР»Рё РёРЅРґРµРєСЃРѕРІ СѓР¶Рµ 20 С€С‚СѓРє, С‚Рѕ
+			//РґРѕР±Р°РІР»СЏРµРј РїРѕРјРµС‡РµРЅРЅС‹Рµ РІ РјРµС€ (РґРµР»Р°РµРј SplitMesh)
 			if(node_index.size()==StaticBunch::max_index ||
 				node_index.size()+first_additional_node>StaticBunch::max_index
 				|| first_polygon==-1)
@@ -1364,7 +1364,7 @@ void cStatic3dx::BuildSkinGroupSortedNormal(TempMeshes& temp_mesh,TempMeshes& ou
 			if(first_polygon==-1)
 				break;
 
-			//смотрим, на какие ноды в first_polygon
+			//СЃРјРѕС‚СЂРёРј, РЅР° РєР°РєРёРµ РЅРѕРґС‹ РІ first_polygon
 			if(next_mesh)
 			{
 				sPolygon& p=tm->polygons[first_polygon];
@@ -1386,7 +1386,7 @@ void cStatic3dx::BuildSkinGroupSortedNormal(TempMeshes& temp_mesh,TempMeshes& ou
 				next_mesh=false;
 			}
 
-			//Ищем ноду чаще всего встречающююся
+			//РС‰РµРј РЅРѕРґСѓ С‡Р°С‰Рµ РІСЃРµРіРѕ РІСЃС‚СЂРµС‡Р°СЋС‰СЋСЋСЃСЏ
 			vector<float> cur_nodes(nodes.size());
 			for(inode=0;inode<cur_nodes.size();inode++)
 				cur_nodes[inode]=0;
@@ -1408,7 +1408,7 @@ void cStatic3dx::BuildSkinGroupSortedNormal(TempMeshes& temp_mesh,TempMeshes& ou
 						if(bone.weight[ibone]>0)
 						{
 							int node=bone.inode[ibone];
-							xassert("Баг со скином" && node>=0 && node<selected_node.size());
+							xassert("Р‘Р°Рі СЃРѕ СЃРєРёРЅРѕРј" && node>=0 && node<selected_node.size());
 							sum_used+=10;
 						}
 					}
@@ -1454,7 +1454,7 @@ void cStatic3dx::BuildSkinGroupSortedNormal(TempMeshes& temp_mesh,TempMeshes& ou
 			{
 				xassert(max_node==-1);
 			}
-			//Помечаем новые треугольники
+			//РџРѕРјРµС‡Р°РµРј РЅРѕРІС‹Рµ С‚СЂРµСѓРіРѕР»СЊРЅРёРєРё
 			for(int ipolygon=cur_vg->begin_polygon;ipolygon<cur_vg->begin_polygon+cur_vg->num_polygon;ipolygon++)
 			{
 				if(selected_polygon[ipolygon])
@@ -1496,7 +1496,7 @@ void cStatic3dx::BuildSkinGroupSortedNormal(TempMeshes& temp_mesh,TempMeshes& ou
 void cStatic3dx::ExtractMesh(TempMesh mesh,TempMesh& out_mesh,
 							 vector<char>& selected_polygon,vector<int>& node_index)
 {
-	//Выбираем соответствующие полигоны, и копируем их в новый mesh
+	//Р’С‹Р±РёСЂР°РµРј СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёРµ РїРѕР»РёРіРѕРЅС‹, Рё РєРѕРїРёСЂСѓРµРј РёС… РІ РЅРѕРІС‹Р№ mesh
 	out_mesh=new cTempMesh3dx;
 	out_mesh->inode_array=node_index;
 	out_mesh->inode=mesh->inode;
@@ -1815,4 +1815,4 @@ void StaticBunch::serialize(Archive& ar)
 }
 
 
-//Может быть несколько объектов с одним именем, но разными материалами.
+//РњРѕР¶РµС‚ Р±С‹С‚СЊ РЅРµСЃРєРѕР»СЊРєРѕ РѕР±СЉРµРєС‚РѕРІ СЃ РѕРґРЅРёРј РёРјРµРЅРµРј, РЅРѕ СЂР°Р·РЅС‹РјРё РјР°С‚РµСЂРёР°Р»Р°РјРё.

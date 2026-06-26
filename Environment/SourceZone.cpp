@@ -18,20 +18,20 @@
 // ------------------- SourceZone
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(SourceZone, ZoneEditType, "ZoneEffectType");
-REGISTER_ENUM_ENCLOSED(SourceZone, ZONE_AFFECT, "Зона гоздействия");
-REGISTER_ENUM_ENCLOSED(SourceZone, ZONE_WALK_EFFECT, "Луч света");
-REGISTER_ENUM_ENCLOSED(SourceZone, ZONE_GENERATOR, "Зона генерации");
+REGISTER_ENUM_ENCLOSED(SourceZone, ZONE_AFFECT, "Р—РѕРЅР° РіРѕР·РґРµР№СЃС‚РІРёСЏ");
+REGISTER_ENUM_ENCLOSED(SourceZone, ZONE_WALK_EFFECT, "Р›СѓС‡ СЃРІРµС‚Р°");
+REGISTER_ENUM_ENCLOSED(SourceZone, ZONE_GENERATOR, "Р—РѕРЅР° РіРµРЅРµСЂР°С†РёРё");
 END_ENUM_DESCRIPTOR_ENCLOSED(SourceZone, ZoneEditType);
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(SourceDetector, ZoneEditType, "ZoneDetectorType");
-REGISTER_ENUM_ENCLOSED(SourceDetector, ZONE_DETECTOR, "Детектор");
-REGISTER_ENUM_ENCLOSED(SourceDetector, ZONE_HIDER, "Генератор невидимости");
+REGISTER_ENUM_ENCLOSED(SourceDetector, ZONE_DETECTOR, "Р”РµС‚РµРєС‚РѕСЂ");
+REGISTER_ENUM_ENCLOSED(SourceDetector, ZONE_HIDER, "Р“РµРЅРµСЂР°С‚РѕСЂ РЅРµРІРёРґРёРјРѕСЃС‚Рё");
 END_ENUM_DESCRIPTOR_ENCLOSED(SourceDetector, ZoneEditType);
 
-BEGIN_ENUM_DESCRIPTOR_ENCLOSED(SourceZone, UnitGenerationMode, "Появление объектов");
-REGISTER_ENUM_ENCLOSED(SourceZone, GENERATION_MODE_TERRAIN, "Выброс из центра");
-REGISTER_ENUM_ENCLOSED(SourceZone, GENERATION_MODE_ZONE, "Равномерно по зоне");
-REGISTER_ENUM_ENCLOSED(SourceZone, GENERATION_MODE_SKY, "На заданной высоте");
+BEGIN_ENUM_DESCRIPTOR_ENCLOSED(SourceZone, UnitGenerationMode, "РџРѕСЏРІР»РµРЅРёРµ РѕР±СЉРµРєС‚РѕРІ");
+REGISTER_ENUM_ENCLOSED(SourceZone, GENERATION_MODE_TERRAIN, "Р’С‹Р±СЂРѕСЃ РёР· С†РµРЅС‚СЂР°");
+REGISTER_ENUM_ENCLOSED(SourceZone, GENERATION_MODE_ZONE, "Р Р°РІРЅРѕРјРµСЂРЅРѕ РїРѕ Р·РѕРЅРµ");
+REGISTER_ENUM_ENCLOSED(SourceZone, GENERATION_MODE_SKY, "РќР° Р·Р°РґР°РЅРЅРѕР№ РІС‹СЃРѕС‚Рµ");
 END_ENUM_DESCRIPTOR_ENCLOSED(SourceZone, UnitGenerationMode);
 
 SourceZone::SourceZone()
@@ -124,45 +124,45 @@ void SourceZone::serialize(Archive& ar)
 		if(ar.isInput())
 			effectTime_ = effectTime;
 	}
-	ar.serialize(effectAttribute_, "effectAttribute", "эффект");
+	ar.serialize(effectAttribute_, "effectAttribute", "СЌС„С„РµРєС‚");
 
 	if(editType_ != ZONE_WALK_EFFECT){
-		ar.serialize(effectScale_, "effectScale", "масштаб эффектов");
-		ar.serialize(effectRadius_, "effectRadius", "радиус эффектов");
+		ar.serialize(effectScale_, "effectScale", "РјР°СЃС€С‚Р°Р± СЌС„С„РµРєС‚РѕРІ");
+		ar.serialize(effectRadius_, "effectRadius", "СЂР°РґРёСѓСЃ СЌС„С„РµРєС‚РѕРІ");
 	}
     
     if(editType_ == ZONE_GENERATOR){
-		if(ar.openBlock("unitGeneration", "генерация объектов")){
-			ar.serialize(unitGenerationMode_, "generationMode", "место появления");
+		if(ar.openBlock("unitGeneration", "РіРµРЅРµСЂР°С†РёСЏ РѕР±СЉРµРєС‚РѕРІ")){
+			ar.serialize(unitGenerationMode_, "generationMode", "РјРµСЃС‚Рѕ РїРѕСЏРІР»РµРЅРёСЏ");
 
 			if(unitGenerationMode_ == GENERATION_MODE_ZONE){
-				ar.serialize(unitReference_, "unitReference", "&Юнит");
+				ar.serialize(unitReference_, "unitReference", "&Р®РЅРёС‚");
 				if(ar.isEdit() && unitReference_ && unitReference_->isBuilding())			
-					ar.serialize(createBuiltBuilding_, "createBuiltBuilding", "Создавать достроенные здания");
+					ar.serialize(createBuiltBuilding_, "createBuiltBuilding", "РЎРѕР·РґР°РІР°С‚СЊ РґРѕСЃС‚СЂРѕРµРЅРЅС‹Рµ Р·РґР°РЅРёСЏ");
 			}
 			else
-				ar.serialize(projectileReference_, "projectile", "&Снаряд");
+				ar.serialize(projectileReference_, "projectile", "&РЎРЅР°СЂСЏРґ");
 
-			ar.serialize(unitGenerationOnce_, "unitGenerationOnce", "Однократно");
+			ar.serialize(unitGenerationOnce_, "unitGenerationOnce", "РћРґРЅРѕРєСЂР°С‚РЅРѕ");
 			if(!unitGenerationOnce_)
-				ar.serialize(unitGenerationPeriod_, "unitGenerationPeriod", "периодичность появления группы юнитов");
-			ar.serialize(unitCount_, "unitCount", "&количество юнитов");
+				ar.serialize(unitGenerationPeriod_, "unitGenerationPeriod", "РїРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ РїРѕСЏРІР»РµРЅРёСЏ РіСЂСѓРїРїС‹ СЋРЅРёС‚РѕРІ");
+			ar.serialize(unitCount_, "unitCount", "&РєРѕР»РёС‡РµСЃС‚РІРѕ СЋРЅРёС‚РѕРІ");
 			if(unitCount_ < 1) 
 				unitCount_ = 1;
 			unitCur_ = 0;
 			switch(unitGenerationMode_){
 			case GENERATION_MODE_SKY:
-				ar.serialize(unitGenerationHeight_, "unitGenerationHeight", "высота появления");
+				ar.serialize(unitGenerationHeight_, "unitGenerationHeight", "РІС‹СЃРѕС‚Р° РїРѕСЏРІР»РµРЅРёСЏ");
 			case GENERATION_MODE_TERRAIN:
-				ar.serialize(unitAnglePsi_, "unitAnglePsi", "направление");
-				ar.serialize(unitAngleTheta_, "unitAngleTheta", "отклонение от вертикали");
-				ar.serialize(unitVelocity_, "unitVelocity", "начальная скорость");
-				ar.serialize(unitAngularVelocity_, "unitAngularVelocity", "скорость вращения");
+				ar.serialize(unitAnglePsi_, "unitAnglePsi", "РЅР°РїСЂР°РІР»РµРЅРёРµ");
+				ar.serialize(unitAngleTheta_, "unitAngleTheta", "РѕС‚РєР»РѕРЅРµРЅРёРµ РѕС‚ РІРµСЂС‚РёРєР°Р»Рё");
+				ar.serialize(unitVelocity_, "unitVelocity", "РЅР°С‡Р°Р»СЊРЅР°СЏ СЃРєРѕСЂРѕСЃС‚СЊ");
+				ar.serialize(unitAngularVelocity_, "unitAngularVelocity", "СЃРєРѕСЂРѕСЃС‚СЊ РІСЂР°С‰РµРЅРёСЏ");
 				break;
 			case GENERATION_MODE_ZONE:
-				ar.serialize(MillisecondsWrapper(unitGenerationInterval_), "unitGenerationInterval", "интервал появления отдельных юнитов (0 - появляются все сразу)");
-				ar.serialize(unitGenerationHeight_, "unitGenerationHeight", "высота появления");
-				ar.serialize(generateByRadius_, "generateByRadius", "генерировать по радиусу");
+				ar.serialize(MillisecondsWrapper(unitGenerationInterval_), "unitGenerationInterval", "РёРЅС‚РµСЂРІР°Р» РїРѕСЏРІР»РµРЅРёСЏ РѕС‚РґРµР»СЊРЅС‹С… СЋРЅРёС‚РѕРІ (0 - РїРѕСЏРІР»СЏСЋС‚СЃСЏ РІСЃРµ СЃСЂР°Р·Сѓ)");
+				ar.serialize(unitGenerationHeight_, "unitGenerationHeight", "РІС‹СЃРѕС‚Р° РїРѕСЏРІР»РµРЅРёСЏ");
+				ar.serialize(generateByRadius_, "generateByRadius", "РіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ РїРѕ СЂР°РґРёСѓСЃСѓ");
 				unitCur_ = unitCount_;
 			default:
 				;
@@ -172,11 +172,11 @@ void SourceZone::serialize(Archive& ar)
 		}
     } else {
 		if(editType_ == ZONE_WALK_EFFECT){
-			ar.serialize(RangedWrapperi(wander_time, 5, 60) , "wander_time", "Период блуждания");
-			ar.serialize(walk_effect_range, "walk_effect_range", "Радиус действия блуждающего эффекта");
+			ar.serialize(RangedWrapperi(wander_time, 5, 60) , "wander_time", "РџРµСЂРёРѕРґ Р±Р»СѓР¶РґР°РЅРёСЏ");
+			ar.serialize(walk_effect_range, "walk_effect_range", "Р Р°РґРёСѓСЃ РґРµР№СЃС‚РІРёСЏ Р±Р»СѓР¶РґР°СЋС‰РµРіРѕ СЌС„С„РµРєС‚Р°");
 		}
-        ar.serialize(damage_, "Damage", "повреждения");
-        ar.serialize(abnormalState_, "abnormalState", "воздействие на юниты");
+        ar.serialize(damage_, "Damage", "РїРѕРІСЂРµР¶РґРµРЅРёСЏ");
+        ar.serialize(abnormalState_, "abnormalState", "РІРѕР·РґРµР№СЃС‚РІРёРµ РЅР° СЋРЅРёС‚С‹");
     }
 
 
@@ -253,7 +253,7 @@ void SourceZone::quant()
 					it->angle = angle;
 			}
 		}
-		if(!effectControllers_.empty() && !eff_count) // эффектов не осталось - надо прибить;
+		if(!effectControllers_.empty() && !eff_count) // СЌС„С„РµРєС‚РѕРІ РЅРµ РѕСЃС‚Р°Р»РѕСЃСЊ - РЅР°РґРѕ РїСЂРёР±РёС‚СЊ;
 			kill();
 	}
 	
@@ -563,7 +563,7 @@ SourceDetector::SourceDetector()
 
 void SourceDetector::serialize(Archive& ar)
 {
-	ar.serialize(editType_, "editType", "Режим работы");
+	ar.serialize(editType_, "editType", "Р РµР¶РёРј СЂР°Р±РѕС‚С‹");
 	__super::serialize(ar);
 }
 
@@ -642,5 +642,5 @@ void SourceFreeze::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(freezeAttack_, "freezeAttack", "замороженный юнит может двигаться");
+	ar.serialize(freezeAttack_, "freezeAttack", "Р·Р°РјРѕСЂРѕР¶РµРЅРЅС‹Р№ СЋРЅРёС‚ РјРѕР¶РµС‚ РґРІРёРіР°С‚СЊСЃСЏ");
 }

@@ -77,7 +77,7 @@ public:
 	{
 		LibraryBookmark bookmark;
 		if(getBookmark(bookmark)){
-			root.add(TRANSLATE("Следовать по ссылке..."), bookmark)
+			root.add(TRANSLATE("РЎР»РµРґРѕРІР°С‚СЊ РїРѕ СЃСЃС‹Р»РєРµ..."), bookmark)
 				.connect(tree, &PropertyTree::onFollowReference);
 		}
 		return __super::onContextMenu(root, tree);

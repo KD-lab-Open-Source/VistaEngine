@@ -14,7 +14,7 @@
 #include "Serialization/SerializationFactory.h"
 
 namespace kdw{
-REGISTER_CLASS(Container, Window, "Окно приложения")
+REGISTER_CLASS(Container, Window, "РћРєРЅРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ")
 
 class WindowImpl : public Win32::Window32{
 public:
@@ -89,17 +89,17 @@ LRESULT WindowImpl::onMessage(UINT message, WPARAM wparam, LPARAM lparam)
 		}
 	case WM_SIZING: 
 		{
-			// здесь будем проверять чтобы окно не сделали меньше размера
-			UINT edge = (UINT)wparam;   // угол/ребро за которое тянет пользователь
-			RECT* rect = (RECT*)lparam; // прямоугольник содержащий координаты окна
-										// (не клиентской области - а внешней рамки), меняем ниже
+			// Р·РґРµСЃСЊ Р±СѓРґРµРј РїСЂРѕРІРµСЂСЏС‚СЊ С‡С‚РѕР±С‹ РѕРєРЅРѕ РЅРµ СЃРґРµР»Р°Р»Рё РјРµРЅСЊС€Рµ СЂР°Р·РјРµСЂР°
+			UINT edge = (UINT)wparam;   // СѓРіРѕР»/СЂРµР±СЂРѕ Р·Р° РєРѕС‚РѕСЂРѕРµ С‚СЏРЅРµС‚ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ
+			RECT* rect = (RECT*)lparam; // РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРє СЃРѕРґРµСЂР¶Р°С‰РёР№ РєРѕРѕСЂРґРёРЅР°С‚С‹ РѕРєРЅР°
+										// (РЅРµ РєР»РёРµРЅС‚СЃРєРѕР№ РѕР±Р»Р°СЃС‚Рё - Р° РІРЅРµС€РЅРµР№ СЂР°РјРєРё), РјРµРЅСЏРµРј РЅРёР¶Рµ
 			RECT windowRect;
 			RECT clientRect;
 			::GetWindowRect(*this, &windowRect);
 			::GetClientRect(*this, &clientRect);
 
-			POINT borderSize; // размер рамок и TitleBar-а с обоих сторон
-							  // (точнее разница в полном размере окна и клиетнской области)
+			POINT borderSize; // СЂР°Р·РјРµСЂ СЂР°РјРѕРє Рё TitleBar-Р° СЃ РѕР±РѕРёС… СЃС‚РѕСЂРѕРЅ
+							  // (С‚РѕС‡РЅРµРµ СЂР°Р·РЅРёС†Р° РІ РїРѕР»РЅРѕРј СЂР°Р·РјРµСЂРµ РѕРєРЅР° Рё РєР»РёРµС‚РЅСЃРєРѕР№ РѕР±Р»Р°СЃС‚Рё)
 			borderSize.x = windowRect.right - windowRect.left - (clientRect.right - clientRect.left);
 			borderSize.y = windowRect.bottom - windowRect.top - (clientRect.bottom - clientRect.top);
 
@@ -463,14 +463,14 @@ void Window::serialize(Archive& ar)
 		}
 	}
 	if(ar.filter(SERIALIZE_DESIGN)){
-		ar.serialize(_property(title_, this, &Window::setTitle), "title", "Заголовок");
-		ar.serialize(_property(defaultSize_, this, &Window::setDefaultSize), "defaultSize", "Начальный размер");
-		ar.serialize(resizeable_, "resizeable", "Разрешить масштабирование");
+		ar.serialize(_property(title_, this, &Window::setTitle), "title", "Р—Р°РіРѕР»РѕРІРѕРє");
+		ar.serialize(_property(defaultSize_, this, &Window::setDefaultSize), "defaultSize", "РќР°С‡Р°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ");
+		ar.serialize(resizeable_, "resizeable", "Р Р°Р·СЂРµС€РёС‚СЊ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёРµ");
 		if(resizeable_){
-			ar.serialize(minimizeable_, "resizeable", "Разрешить сворачивание");
-			ar.serialize(showTitleBar_, "showTitleBar", "Показывать строку заголовка");
+			ar.serialize(minimizeable_, "resizeable", "Р Р°Р·СЂРµС€РёС‚СЊ СЃРІРѕСЂР°С‡РёРІР°РЅРёРµ");
+			ar.serialize(showTitleBar_, "showTitleBar", "РџРѕРєР°Р·С‹РІР°С‚СЊ СЃС‚СЂРѕРєСѓ Р·Р°РіРѕР»РѕРІРєР°");
 		}
-		ar.serialize(child_, "widget", "Контрол");
+		ar.serialize(child_, "widget", "РљРѕРЅС‚СЂРѕР»");
 	}
 }
 

@@ -5,7 +5,7 @@
 #include "Serialization/LibraryBookmark.h"
 #include "XTL/sigslot.h"
 #include "XTL/Functor.h"
-#include "kdw/TreePath.h" // TreeState, не такой жирный header, как Tree.h
+#include "kdw/TreePath.h" // TreeState, РЅРµ С‚Р°РєРѕР№ Р¶РёСЂРЅС‹Р№ header, РєР°Рє Tree.h
 #include "kdw/Plug.h" 
 
 class EditorLibraryInterface;

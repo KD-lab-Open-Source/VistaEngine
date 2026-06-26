@@ -22,7 +22,7 @@
 
 namespace kdw{
 
-REGISTER_CLASS(Widget, Tree, "Дерево");
+REGISTER_CLASS(Widget, Tree, "Р”РµСЂРµРІРѕ");
 
 KDW_API DragManager dragManager;
 
@@ -630,7 +630,7 @@ void TreeImpl::onMessageLButtonDown(UINT button, int x, int y)
 		if(owner_->onRowLMBDown(row, rowRecti, Vect2i(x, y)))
 			capturedRow_ = row;
 		else{
-			// row могла уже быть пересоздана	
+			// row РјРѕРіР»Р° СѓР¶Рµ Р±С‹С‚СЊ РїРµСЂРµСЃРѕР·РґР°РЅР°	
 			row = rowByPoint(point, rowRect);
 			//if(!owner_->hitActivationRect(row, point, rowRecti, column)){
 				POINT cursorPos;
@@ -1070,7 +1070,7 @@ struct AdjustHeightVisitor : TreeRowVisitor{
 			if(parent){
 				row->inheritIndent(indent, tree_->rootIndent());
 				if(tree_->compact()){
-					// может быть не лучшим местом для этого
+					// РјРѕР¶РµС‚ Р±С‹С‚СЊ РЅРµ Р»СѓС‡С€РёРј РјРµСЃС‚РѕРј РґР»СЏ СЌС‚РѕРіРѕ
 					if(tree_->rowVisible(row)){
 						if(parent == tree_->model()->root())
 							row->_setExpanded(true);
@@ -1435,7 +1435,7 @@ void Tree::expandRow(TreeRow* row, bool expanded)
 			f = f->parent();
 		}
 	}
-	updateHeights(); // FIXME вызывается тут т.к. сломалось
+	updateHeights(); // FIXME РІС‹Р·С‹РІР°РµС‚СЃСЏ С‚СѓС‚ С‚.Рє. СЃР»РѕРјР°Р»РѕСЃСЊ
 }
 
 void Tree::setModel(TreeModel* model)
@@ -1601,10 +1601,10 @@ void Tree::serialize(Archive& ar)
 			setState(state);
 	}
 	if(ar.filter(SERIALIZE_DESIGN)){
-		ar.serialize(model_, "model", "Модель");
-		ar.serialize(*columns_, "columns", "Колонки");
-		ar.serialize(emphasizeFolders_, "emphasizeFolders", "Выделить папки");
-		ar.serialize(childIndent_, "childIndent", "Отступ дочернего элемента");
+		ar.serialize(model_, "model", "РњРѕРґРµР»СЊ");
+		ar.serialize(*columns_, "columns", "РљРѕР»РѕРЅРєРё");
+		ar.serialize(emphasizeFolders_, "emphasizeFolders", "Р’С‹РґРµР»РёС‚СЊ РїР°РїРєРё");
+		ar.serialize(childIndent_, "childIndent", "РћС‚СЃС‚СѓРї РґРѕС‡РµСЂРЅРµРіРѕ СЌР»РµРјРµРЅС‚Р°");
 		if(ar.isInput()){
 			TreeColumns::iterator it;
 			FOR_EACH(*columns_, it){
@@ -1702,7 +1702,7 @@ void Tree::setImageStore(ImageStore* store)
 }
 
 // ---------------------------------------------------------------------------------
-REGISTER_CLASS(TreeModel, StringTreeModel, "Модель дерева строк");
+REGISTER_CLASS(TreeModel, StringTreeModel, "РњРѕРґРµР»СЊ РґРµСЂРµРІР° СЃС‚СЂРѕРє");
 
 struct SelectionCollector : TreeRowVisitor{
 	SelectionCollector(TreeModel* model, TreeModel::Selection& selection)
@@ -1871,7 +1871,7 @@ void TreeModel::serialize(Archive& ar)
 		//StringTreeModel model;
 		//model.serialize(ar); // instantiate
 	}
-	ar.serialize(focusedRow_, "focusedRow", "Активная строка");
+	ar.serialize(focusedRow_, "focusedRow", "РђРєС‚РёРІРЅР°СЏ СЃС‚СЂРѕРєР°");
 }
 
 bool TreeColumns::serialize(Archive& ar, const char* name, const char* nameAlt)
@@ -1881,9 +1881,9 @@ bool TreeColumns::serialize(Archive& ar, const char* name, const char* nameAlt)
 
 void TreeColumn::serialize(Archive& ar)
 {
-	ar.serialize(caption_, "caption", "&Заголовок");
-	ar.serialize(rightCornerPosition_, "rightCornerPosition", "Ширина");
-	ar.serialize(drawer_, "drawer", "&Отрисовщик");
+	ar.serialize(caption_, "caption", "&Р—Р°РіРѕР»РѕРІРѕРє");
+	ar.serialize(rightCornerPosition_, "rightCornerPosition", "РЁРёСЂРёРЅР°");
+	ar.serialize(drawer_, "drawer", "&РћС‚СЂРёСЃРѕРІС‰РёРє");
 }
 
 /*
@@ -2043,7 +2043,7 @@ void StringTreeColumnDrawer::drawRow(TreeRow* row, int column, HDC dc, const REC
 	::SetBkColor(dc, oldBkColor);
 }
 
-REGISTER_CLASS(TreeColumnDrawer, StringTreeColumnDrawer, "Отрисовщик колонки дерева строк");
+REGISTER_CLASS(TreeColumnDrawer, StringTreeColumnDrawer, "РћС‚СЂРёСЃРѕРІС‰РёРє РєРѕР»РѕРЅРєРё РґРµСЂРµРІР° СЃС‚СЂРѕРє");
 // ---------------------------------------------------------------------------------
 
 TreeColumnDrawer* Tree::autoCreateColumnDrawer(const char* typeName)

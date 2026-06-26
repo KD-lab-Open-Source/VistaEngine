@@ -8,7 +8,7 @@
 #include "break.h"
 
 ////////////////////////////////////////////////////////////////////////////////////
-// Служебные функции
+// РЎР»СѓР¶РµР±РЅС‹Рµ С„СѓРЅРєС†РёРё
 //static float FRnd()
 //{
 //	return (float)XRnd(0xFFF)/(float)(0xFFF);//(float)(RAND_MAX+1);
@@ -16,7 +16,7 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-//                                     ТРЕЩИНЫ(РАЗЛОМЫ)
+//                                     РўР Р•Р©РРќР«(Р РђР—Р›РћРњР«)
 ///////////////////////////////////////////////////////////////////////////////////////////////
 const int DELTA_H_BREAK_GEOBREAK=20;
 const int DELTA_H_STEP_BREAK_GEOBREAK=3;
@@ -33,7 +33,7 @@ struct elementGeoBreak {
 
 	GeoBreakParam* pGeoBreakParam;
 
-	static int unengagedID; //инициализируется в cpp
+	static int unengagedID; //РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµС‚СЃСЏ РІ cpp
 	int ownerID;
 	int ID;
 	//int bLong;
@@ -51,11 +51,11 @@ struct elementGeoBreak {
 	unsigned int quantCnt;
 	elementGeoBreak(Vect2f& _begPoint, float _alpha, float _lenght, GeoBreakParam* _pGBP, int _generation, int _ownerID=0){//
 		pGeoBreakParam=_pGBP;
-		//_ownerID=0 означает что нет родителей
+		//_ownerID=0 РѕР·РЅР°С‡Р°РµС‚ С‡С‚Рѕ РЅРµС‚ СЂРѕРґРёС‚РµР»РµР№
 		generation=_generation;
 		ID=unengagedID++;
 		ownerID=_ownerID;
-		if(_lenght<pGeoBreakParam->density_noise)_lenght=pGeoBreakParam->density_noise; //Минимальная длинна
+		if(_lenght<pGeoBreakParam->density_noise)_lenght=pGeoBreakParam->density_noise; //РњРёРЅРёРјР°Р»СЊРЅР°СЏ РґР»РёРЅРЅР°
 
 		alpha=_alpha;
 		begPoint=endPoint=_begPoint;
@@ -65,11 +65,11 @@ struct elementGeoBreak {
 		//dy_step=round(_lenght*sinf(alpha))*(1<<16)/numSections;//sy*(1<<16)/numSections;
 		dStep.x=_lenght*cosf(alpha)/numSections;
 		dStep.y=_lenght*sinf(alpha)/numSections;
-		//xp=new int [numSections+1];//1 это начальная точка
+		//xp=new int [numSections+1];//1 СЌС‚Рѕ РЅР°С‡Р°Р»СЊРЅР°СЏ С‚РѕС‡РєР°
 		//yp=new int [numSections+1];
 		//xp[0]=xbeg;
 		//yp[0]=ybeg;
-		gp = new Vect3f[numSections+1];//1 это начальная точка
+		gp = new Vect3f[numSections+1];//1 СЌС‚Рѕ РЅР°С‡Р°Р»СЊРЅР°СЏ С‚РѕС‡РєР°
 		gpn = new Vect2f[numSections+1];
 		gpw05 = new float[numSections+1];
 		gp[0]=Vect3f(begPoint, vMap.getApproxAlt(vMap.XCYCL(begPoint.xi()), vMap.YCYCL(begPoint.yi())));
@@ -180,7 +180,7 @@ struct elementGeoBreak {
 
 	eReturnQuantResult quant(){
 		headSection+=1;
-		if(headSection <= numSections){//Идет рост трещины
+		if(headSection <= numSections){//РРґРµС‚ СЂРѕСЃС‚ С‚СЂРµС‰РёРЅС‹
 			//int x_recomend=xbeg+(dx_step*headSection>>16);
 			//int y_recomend=ybeg+(dy_step*headSection>>16);
 			Vect2f pnt_recomended=begPoint + dStep*headSection;
@@ -241,7 +241,7 @@ struct elementGeoBreak {
 			//geoLine(headSection-1, 1*0.5f);
 		}
 
-		// расширение трещины
+		// СЂР°СЃС€РёСЂРµРЅРёРµ С‚СЂРµС‰РёРЅС‹
 		float dwidth=pGeoBreakParam->max_width/(float)pGeoBreakParam->lenght_tail;
 		float ddeep=pGeoBreakParam->max_deep/(float)pGeoBreakParam->lenght_tail;
 		//int width=(1<<16);/// + ((quantCnt<<16)/12);
@@ -279,7 +279,7 @@ struct elementGeoBreak {
 
 };
 
-int elementGeoBreak::unengagedID=1; //Инициализация уникального ида элемента трещины для поиска родителей при завершении
+int elementGeoBreak::unengagedID=1; //РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СѓРЅРёРєР°Р»СЊРЅРѕРіРѕ РёРґР° СЌР»РµРјРµРЅС‚Р° С‚СЂРµС‰РёРЅС‹ РґР»СЏ РїРѕРёСЃРєР° СЂРѕРґРёС‚РµР»РµР№ РїСЂРё Р·Р°РІРµСЂС€РµРЅРёРё
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -327,10 +327,10 @@ void GeoBreak::setPosition(const Se3f& _pos)
 void GeoBreak::init()
 {
 	maxLenghtElement=(float)rad/(float)maxGeneration;
-	elGB.erase(elGB.begin(), elGB.end());//очистка списка элементов трещин
+	elGB.erase(elGB.begin(), elGB.end());//РѕС‡РёСЃС‚РєР° СЃРїРёСЃРєР° СЌР»РµРјРµРЅС‚РѕРІ С‚СЂРµС‰РёРЅ
 	int begBreak;
 	if(maxBegBreak==0) 
-		begBreak= logicRNDinterval(3, MAX_BEGIN_BREAKS);//Диапазон от 3 до MAX_BEGIN_BREAKS
+		begBreak= logicRNDinterval(3, MAX_BEGIN_BREAKS);//Р”РёР°РїР°Р·РѕРЅ РѕС‚ 3 РґРѕ MAX_BEGIN_BREAKS
 	if(maxBegBreak==1 || maxBegBreak==2){
 		float lenght= logicRNDfabsRndInterval(0.75f*maxLenghtElement, 1.25f*maxLenghtElement);
 		const int generation=0;
@@ -393,7 +393,7 @@ bool GeoBreak::quant()
 		if(result==HEAD_IN_FINAL_POINT) {
 			//int branhings=1+XRnd(MAX_BRANCHINGS_BREAKS);
 			//for(int i=0; i<branhings; i++)
-			//выбор количества разломо(такой способ используется для того что-бы MAX_BRANCHINGS_BREAKS выбор был наименее вероятен)
+			//РІС‹Р±РѕСЂ РєРѕР»РёС‡РµСЃС‚РІР° СЂР°Р·Р»РѕРјРѕ(С‚Р°РєРѕР№ СЃРїРѕСЃРѕР± РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ С‚РѕРіРѕ С‡С‚Рѕ-Р±С‹ MAX_BRANCHINGS_BREAKS РІС‹Р±РѕСЂ Р±С‹Р» РЅР°РёРјРµРЅРµРµ РІРµСЂРѕСЏС‚РµРЅ)
 			const int generation=(*pp)->generation + 1;
 			//float dx2=(*pp)->xend-(*pp)->xbeg;
 			//dx2=dx2*dx2;
@@ -433,7 +433,7 @@ bool GeoBreak::quant()
 			//	pp=delEementGeoBreak(pp);
 			//}
 		}
-		else if(result==END_QUANT) { //Удаление элемента трещины
+		else if(result==END_QUANT) { //РЈРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° С‚СЂРµС‰РёРЅС‹
 				//delete (*pp);
 				//pp=elGB.erase(pp);
 				pp=delEementGeoBreak(pp);
@@ -449,20 +449,20 @@ bool GeoBreak::quant()
 
 void GeoBreakParam::serialize(Archive& ar)
 {
-	ar.serialize(max_width, "max_width", "Максимальная ширина");
-	ar.serialize(max_deep, "max_deep", "Максимальная глубина");
-	ar.serialize(lenght_tail, "lenght_tail", "Время расширения(кванты)");
-	ar.serialize(density_noise, "density_noise", "Крупнота");
+	ar.serialize(max_width, "max_width", "РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ С€РёСЂРёРЅР°");
+	ar.serialize(max_deep, "max_deep", "РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ РіР»СѓР±РёРЅР°");
+	ar.serialize(lenght_tail, "lenght_tail", "Р’СЂРµРјСЏ СЂР°СЃС€РёСЂРµРЅРёСЏ(РєРІР°РЅС‚С‹)");
+	ar.serialize(density_noise, "density_noise", "РљСЂСѓРїРЅРѕС‚Р°");
 	if(density_noise < 1.f) density_noise=1.f;
 }
 
 void GeoBreak::serialize(Archive& ar)
 {
-	ar.serialize(pos, "pos", "Позиция");
-	ar.serialize(rad, "rad", "Радиус");
-	ar.serialize(minBegBreak, "minBegBreak", "Min начальное количество");
-	ar.serialize(maxBegBreak, "maxBegBreak", "Max начальное количество");
-	ar.serialize(maxGeneration, "maxGeneration", "Ветвистось");
+	ar.serialize(pos, "pos", "РџРѕР·РёС†РёСЏ");
+	ar.serialize(rad, "rad", "Р Р°РґРёСѓСЃ");
+	ar.serialize(minBegBreak, "minBegBreak", "Min РЅР°С‡Р°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ");
+	ar.serialize(maxBegBreak, "maxBegBreak", "Max РЅР°С‡Р°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ");
+	ar.serialize(maxGeneration, "maxGeneration", "Р’РµС‚РІРёСЃС‚РѕСЃСЊ");
 	geoBreakParam.serialize(ar);
 	
 	if(ar.isInput()){
@@ -491,8 +491,8 @@ void elementGeoBreak::putPolygon(Vect3f* a, Vect3f* b, Vect3f* c)
 	int length;
 	//unsigned short *dest;
 
-	// посчитаем du/dsx, dv/dsx, d(1/z)/dsx
-	// считаем по самой длинной линии (т.е. проходящей через вершину B)
+	// РїРѕСЃС‡РёС‚Р°РµРј du/dsx, dv/dsx, d(1/z)/dsx
+	// СЃС‡РёС‚Р°РµРј РїРѕ СЃР°РјРѕР№ РґР»РёРЅРЅРѕР№ Р»РёРЅРёРё (С‚.Рµ. РїСЂРѕС…РѕРґСЏС‰РµР№ С‡РµСЂРµР· РІРµСЂС€РёРЅСѓ B)
 	float divisor;
 	divisor=(c->y - a->y);
 	if(divisor) k = (b->y - a->y) / divisor;
@@ -547,7 +547,7 @@ void elementGeoBreak::putPolygon(Vect3f* a, Vect3f* b, Vect3f* c)
 
 ////////////////////////////////
 
-	// построчная отрисовка грани
+	// РїРѕСЃС‚СЂРѕС‡РЅР°СЏ РѕС‚СЂРёСЃРѕРІРєР° РіСЂР°РЅРё
 	for (current_sy = ceilf(a->y); current_sy <= floorf(c->y); current_sy++) { //current_sy < ceilf(c->y)
 		if((current_sy) >= vMap.V_SIZE) break;
 		//if((current_sy-minY) < 0 ) break;//continue;
@@ -567,7 +567,7 @@ void elementGeoBreak::putPolygon(Vect3f* a, Vect3f* b, Vect3f* c)
 //#endif
 		}
 
-		// x_start должен находиться левее x_end
+		// x_start РґРѕР»Р¶РµРЅ РЅР°С…РѕРґРёС‚СЊСЃСЏ Р»РµРІРµРµ x_end
 		if (x_start > x_end) {
 			x = x_end;
 			z1 = z1_end;
@@ -578,7 +578,7 @@ void elementGeoBreak::putPolygon(Vect3f* a, Vect3f* b, Vect3f* c)
 			length = ceilf(x_end) - ceilf(x_start);
 		}
 
-		// текстурируем строку
+		// С‚РµРєСЃС‚СѓСЂРёСЂСѓРµРј СЃС‚СЂРѕРєСѓ
 		current_sx = round(ceilf(x));
 
 		if((current_sy) >= 0 ) if (length) {
@@ -587,7 +587,7 @@ void elementGeoBreak::putPolygon(Vect3f* a, Vect3f* b, Vect3f* c)
 			z1 += dz1* tmp;
 //	#endif
 			while (length--) {
-			// используем z-буфер для определения видимости текущей точки
+			// РёСЃРїРѕР»СЊР·СѓРµРј z-Р±СѓС„РµСЂ РґР»СЏ РѕРїСЂРµРґРµР»РµРЅРёСЏ РІРёРґРёРјРѕСЃС‚Рё С‚РµРєСѓС‰РµР№ С‚РѕС‡РєРё
 				if( (current_sx< vMap.H_SIZE) && (current_sx >= 0)) {
 					register int bufoff=vMap.offsetBuf(current_sx, current_sy);
 					if(vMap.getAlt(bufoff) > round(z1*(1<<VX_FRACTION)))
@@ -598,7 +598,7 @@ void elementGeoBreak::putPolygon(Vect3f* a, Vect3f* b, Vect3f* c)
 			}
 		}
 
-		// сдвигаем начальные и конечные значения x/u/v/(1/z)
+		// СЃРґРІРёРіР°РµРј РЅР°С‡Р°Р»СЊРЅС‹Рµ Рё РєРѕРЅРµС‡РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ x/u/v/(1/z)
 		x_start += dx_start;
 		z1_start += dz1_start;
 		x_end += dx_end;

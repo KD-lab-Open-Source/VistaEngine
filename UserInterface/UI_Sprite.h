@@ -8,7 +8,7 @@
 #include "Serialization/StringTableBase.h"
 
 class cTexture;
-/// текстура
+/// С‚РµРєСЃС‚СѓСЂР°
 class UI_Texture : public PolymorphicBase
 {
 public:
@@ -25,11 +25,11 @@ public:
 	bool createTexture() const;
 	void releaseTexture() const;
 
-	/// текстура локализована
+	/// С‚РµРєСЃС‚СѓСЂР° Р»РѕРєР°Р»РёР·РѕРІР°РЅР°
 	bool localized() const { return localized_; }
-	/// менялись ли пропорции текстуры
+	/// РјРµРЅСЏР»РёСЃСЊ Р»Рё РїСЂРѕРїРѕСЂС†РёРё С‚РµРєСЃС‚СѓСЂС‹
 	bool needRemapCoords() const;
-	/// пересчёт координат после изменения пропорций текстуры
+	/// РїРµСЂРµСЃС‡С‘С‚ РєРѕРѕСЂРґРёРЅР°С‚ РїРѕСЃР»Рµ РёР·РјРµРЅРµРЅРёСЏ РїСЂРѕРїРѕСЂС†РёР№ С‚РµРєСЃС‚СѓСЂС‹
 	Rectf remapCoords(const Rectf& coords) const;
 	void initSize();
 
@@ -46,9 +46,9 @@ private:
 	bool hasRaceVersion_;
 
 	bool textureSizeInit_;
-	/// запомненный размер текстуры, сериализуется
+	/// Р·Р°РїРѕРјРЅРµРЅРЅС‹Р№ СЂР°Р·РјРµСЂ С‚РµРєСЃС‚СѓСЂС‹, СЃРµСЂРёР°Р»РёР·СѓРµС‚СЃСЏ
 	Vect2i textureSize_;
-	/// вычисленный при загрузке размер текстуры
+	/// РІС‹С‡РёСЃР»РµРЅРЅС‹Р№ РїСЂРё Р·Р°РіСЂСѓР·РєРµ СЂР°Р·РјРµСЂ С‚РµРєСЃС‚СѓСЂС‹
 	Vect2i textureSizeCurrent_;
 
 	mutable cTexture* texture_;
@@ -59,7 +59,7 @@ private:
 typedef StringTable<StringTableBasePolymorphic<UI_Texture> > UI_TextureLibrary;
 typedef StringTableReferencePolymorphic<UI_Texture, false> UI_TextureReference;
 
-/// спрайт
+/// СЃРїСЂР°Р№С‚
 class UI_Sprite
 {
 public:
@@ -73,7 +73,7 @@ public:
 
 	bool isEmpty() const { return !texture(); }
 	bool isAnimated() const;
-	// передается текущее время в секундах с начала проигрывания - вычисляется фаза
+	// РїРµСЂРµРґР°РµС‚СЃСЏ С‚РµРєСѓС‰РµРµ РІСЂРµРјСЏ РІ СЃРµРєСѓРЅРґР°С… СЃ РЅР°С‡Р°Р»Р° РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ - РІС‹С‡РёСЃР»СЏРµС‚СЃСЏ С„Р°Р·Р°
 	float phase(float time, bool cycled) const;
 
 	cTexture* texture(bool noCreate = false) const;

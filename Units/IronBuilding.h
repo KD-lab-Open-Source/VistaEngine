@@ -8,14 +8,14 @@ class Archive;
 
 enum BuildingStatus
 {
-	BUILDING_STATUS_CONSTRUCTED = 1, // Построено
-	BUILDING_STATUS_PLUGGED_IN = 2, // Включен в интерфейсе
-	BUILDING_STATUS_CONNECTED = 4, // Здание подключено: Я-Т посредством воздушных связей, остальные - через зеропласт
-	BUILDING_STATUS_ENABLED = 8, // Разрешено деревом развития
-	BUILDING_STATUS_POWERED = 16, // Получает энергию, не выводится иконка отсутствия энергии
-	BUILDING_STATUS_UPGRADING = 32, // Апгрейдится в данный момент
-	BUILDING_STATUS_MOUNTED = 64, // Разложено
-	BUILDING_STATUS_HOLD_CONSTRUCTION = 128 // Остановлено строительство
+	BUILDING_STATUS_CONSTRUCTED = 1, // РџРѕСЃС‚СЂРѕРµРЅРѕ
+	BUILDING_STATUS_PLUGGED_IN = 2, // Р’РєР»СЋС‡РµРЅ РІ РёРЅС‚РµСЂС„РµР№СЃРµ
+	BUILDING_STATUS_CONNECTED = 4, // Р—РґР°РЅРёРµ РїРѕРґРєР»СЋС‡РµРЅРѕ: РЇ-Рў РїРѕСЃСЂРµРґСЃС‚РІРѕРј РІРѕР·РґСѓС€РЅС‹С… СЃРІСЏР·РµР№, РѕСЃС‚Р°Р»СЊРЅС‹Рµ - С‡РµСЂРµР· Р·РµСЂРѕРїР»Р°СЃС‚
+	BUILDING_STATUS_ENABLED = 8, // Р Р°Р·СЂРµС€РµРЅРѕ РґРµСЂРµРІРѕРј СЂР°Р·РІРёС‚РёСЏ
+	BUILDING_STATUS_POWERED = 16, // РџРѕР»СѓС‡Р°РµС‚ СЌРЅРµСЂРіРёСЋ, РЅРµ РІС‹РІРѕРґРёС‚СЃСЏ РёРєРѕРЅРєР° РѕС‚СЃСѓС‚СЃС‚РІРёСЏ СЌРЅРµСЂРіРёРё
+	BUILDING_STATUS_UPGRADING = 32, // РђРїРіСЂРµР№РґРёС‚СЃСЏ РІ РґР°РЅРЅС‹Р№ РјРѕРјРµРЅС‚
+	BUILDING_STATUS_MOUNTED = 64, // Р Р°Р·Р»РѕР¶РµРЅРѕ
+	BUILDING_STATUS_HOLD_CONSTRUCTION = 128 // РћСЃС‚Р°РЅРѕРІР»РµРЅРѕ СЃС‚СЂРѕРёС‚РµР»СЊСЃС‚РІРѕ
 };
 
 class AttributeBuilding : public AttributeBase
@@ -134,13 +134,13 @@ public:
 
 	void serialize(Archive& ar);
 
-	/// может ли произвести кого-то для добычи из этого ресурса
+	/// РјРѕР¶РµС‚ Р»Рё РїСЂРѕРёР·РІРµСЃС‚Рё РєРѕРіРѕ-С‚Рѕ РґР»СЏ РґРѕР±С‹С‡Рё РёР· СЌС‚РѕРіРѕ СЂРµСЃСѓСЂСЃР°
 	bool canExtractResource(const UnitItemResource* item) const;
 
-	/// может ли произвести кого-то для достройки здания
+	/// РјРѕР¶РµС‚ Р»Рё РїСЂРѕРёР·РІРµСЃС‚Рё РєРѕРіРѕ-С‚Рѕ РґР»СЏ РґРѕСЃС‚СЂРѕР№РєРё Р·РґР°РЅРёСЏ
 	bool canBuild(const UnitReal* building) const;
 
-	bool constructionInProgress() const { return constructionInProgressTimer_.busy(); } // идет строительство и вкачивается ресурс
+	bool constructionInProgress() const { return constructionInProgressTimer_.busy(); } // РёРґРµС‚ СЃС‚СЂРѕРёС‚РµР»СЊСЃС‚РІРѕ Рё РІРєР°С‡РёРІР°РµС‚СЃСЏ СЂРµСЃСѓСЂСЃ
 
 	UnitReal* findTeleport() const;
 

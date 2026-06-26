@@ -161,7 +161,7 @@ int QSStateAndCondition::addPlayers(ConnectPlayerData _connectPlayerData, const 
 	int cntUser=0;
 	for(int i=0; i<MAX_QSUSERS; i++) 
 		if(qsUserState[i].flag_userConnected) cntUser++;
-	if( cntUser >= (int) gameOrder ) // подразумевается ==
+	if( cntUser >= (int) gameOrder ) // РїРѕРґСЂР°Р·СѓРјРµРІР°РµС‚СЃСЏ ==
 		return USER_IDX_NONE;
 	for(int i=0; i<MAX_QSUSERS; i++){
 		QSUserState& qsus = qsUserState[i];

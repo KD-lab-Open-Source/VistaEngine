@@ -74,7 +74,7 @@ bool PropertyRowFileSelector::onContextMenu(PopupMenuItem& root, PropertyTree* t
 {
 	if(!root.empty())
 		root.addSeparator();
-	root.add(TRANSLATE("Î÷èñòèòü"), tree->model()).connect(this, &PropertyRowFileSelector::onMenuClear);
+	root.add(TRANSLATE("ÐžÑ‡Ð¸ÑÑ‚Ð¸Ñ‚ÑŒ"), tree->model()).connect(this, &PropertyRowFileSelector::onMenuClear);
 	return __super::onContextMenu(root, tree);
 }
 
@@ -145,7 +145,7 @@ bool PropertyRowResourceSelector::onContextMenu(PopupMenuItem& root, PropertyTre
 {
 	if(!root.empty())
 		root.addSeparator();
-	root.add(TRANSLATE("Î÷èñòèòü"), tree->model()).connect(this, &PropertyRowResourceSelector::onMenuClear);
+	root.add(TRANSLATE("ÐžÑ‡Ð¸ÑÑ‚Ð¸Ñ‚ÑŒ"), tree->model()).connect(this, &PropertyRowResourceSelector::onMenuClear);
 	return __super::onContextMenu(root, tree);
 }
 
@@ -216,7 +216,7 @@ bool PropertyRowModelSelector::onContextMenu(PopupMenuItem& root, PropertyTree* 
 {
 	if(!root.empty())
 		root.addSeparator();
-	root.add(TRANSLATE("Î÷èñòèòü"), tree->model()).connect(this, &PropertyRowModelSelector::onMenuClear);
+	root.add(TRANSLATE("ÐžÑ‡Ð¸ÑÑ‚Ð¸Ñ‚ÑŒ"), tree->model()).connect(this, &PropertyRowModelSelector::onMenuClear);
 	return __super::onContextMenu(root, tree);
 }
 

@@ -12,7 +12,7 @@
 
 namespace kdw{
 
-REGISTER_CLASS(Widget, CheckBox, "Галочка");
+REGISTER_CLASS(Widget, CheckBox, "Р“Р°Р»РѕС‡РєР°");
 
 class CheckBoxImpl: public _WidgetWindow{
 public:
@@ -178,8 +178,8 @@ void CheckBox::onChanged()
 void CheckBox::serialize(Archive& ar)
 {
 	if(ar.filter(SERIALIZE_DESIGN)){
-		ar.serialize(text_, "text", "&Текст");
-		ar.serialize(status_, "status", "&Статус");
+		ar.serialize(text_, "text", "&РўРµРєСЃС‚");
+		ar.serialize(status_, "status", "&РЎС‚Р°С‚СѓСЃ");
 	}
 	Widget::serialize(ar);
 }

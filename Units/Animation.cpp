@@ -65,7 +65,7 @@ bool PhaseController::quant(bool reversed,bool cycled,bool sound_finished,float 
 					phase_ = cycle(phase_, 1.0f);
 				else
 					phase_ = 0.0f;
-				return true; // рестарт анимации true
+				return true; // СЂРµСЃС‚Р°СЂС‚ Р°РЅРёРјР°С†РёРё true
 			}
 		}
 	}
@@ -81,11 +81,11 @@ bool PhaseController::quant(bool reversed,bool cycled,bool sound_finished,float 
 					phase_ = cycle(phase_, 1.0f);
 				else
 					phase_ = 1.0f;
-				return true; // рестарт анимации true
+				return true; // СЂРµСЃС‚Р°СЂС‚ Р°РЅРёРјР°С†РёРё true
 			}
 		}
 	}
-	return false; // рестарт анимации false
+	return false; // СЂРµСЃС‚Р°СЂС‚ Р°РЅРёРјР°С†РёРё false
 }
 
 void PhaseController::serialize(Archive& ar) 
@@ -204,7 +204,7 @@ void ChainController::setChain(const AnimationChain& chain,UnitBase* owner_, cOb
 
 bool ChainController::stop(UnitBase* owner, bool interrupt)
 {
-	//xxassert(!chain_ || !prevIsInited_, "Повторное переключение состояния юнита");
+	//xxassert(!chain_ || !prevIsInited_, "РџРѕРІС‚РѕСЂРЅРѕРµ РїРµСЂРµРєР»СЋС‡РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ СЋРЅРёС‚Р°");
 	if(chain_ && !prevIsInited_){
 		prevIsInited_ = true;
 		chainPrev_ = chain_;

@@ -15,7 +15,7 @@ class UnitInterface;
 typedef UnitLink<const UnitInterface> UnitInterfaceConstLink;
 typedef UnitLink<const BaseUniverseObject> BaseUniverseObjectConstLink;
 
-/// Данные для создания/обновления пометки.
+/// Р”Р°РЅРЅС‹Рµ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ/РѕР±РЅРѕРІР»РµРЅРёСЏ РїРѕРјРµС‚РєРё.
 class UI_MarkObjectInfo
 {
 public:
@@ -42,10 +42,10 @@ private:
 	UnitInterfaceConstLink target_;
 };
 
-/// Объект-пометка.
+/// РћР±СЉРµРєС‚-РїРѕРјРµС‚РєР°.
 /**
-Ставится на поверхность для визуализации области 
-поражения оружия, места сборки юнитов с завода и т.п.
+РЎС‚Р°РІРёС‚СЃСЏ РЅР° РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ РґР»СЏ РІРёР·СѓР°Р»РёР·Р°С†РёРё РѕР±Р»Р°СЃС‚Рё 
+РїРѕСЂР°Р¶РµРЅРёСЏ РѕСЂСѓР¶РёСЏ, РјРµСЃС‚Р° СЃР±РѕСЂРєРё СЋРЅРёС‚РѕРІ СЃ Р·Р°РІРѕРґР° Рё С‚.Рї.
 */
 class UI_MarkObject : public BaseUniverseObject
 {
@@ -89,10 +89,10 @@ private:
 
 	float lifeTime_;
 
-	/// параметры метки
+	/// РїР°СЂР°РјРµС‚СЂС‹ РјРµС‚РєРё
 	const UI_MarkObjectAttribute* attribute_;
 
-	/// объект - владелец метки
+	/// РѕР±СЉРµРєС‚ - РІР»Р°РґРµР»РµС† РјРµС‚РєРё
 	BaseUniverseObjectConstLink owner_;
 	UnitInterfaceConstLink target_;
 

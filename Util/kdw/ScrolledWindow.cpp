@@ -9,8 +9,8 @@
 
 namespace kdw{
 
-REGISTER_CLASS(Widget, ScrolledWindow, "Разметка\\Окно прокрутки")
-REGISTER_CLASS(Container, ScrolledWindow, "Окно прокрутки")
+REGISTER_CLASS(Widget, ScrolledWindow, "Р Р°Р·РјРµС‚РєР°\\РћРєРЅРѕ РїСЂРѕРєСЂСѓС‚РєРё")
+REGISTER_CLASS(Container, ScrolledWindow, "РћРєРЅРѕ РїСЂРѕРєСЂСѓС‚РєРё")
 
 class ScrolledWindowImpl: public _ContainerWindow{
 public:
@@ -268,7 +268,7 @@ Widget* ScrolledWindow::_nextWidget(Widget* last, FocusDirection direction)
 
 void ScrolledWindow::serialize(Archive& ar)
 {
-    ar.serialize(child_, "widget", "Контрол");
+    ar.serialize(child_, "widget", "РљРѕРЅС‚СЂРѕР»");
 }
 
 }

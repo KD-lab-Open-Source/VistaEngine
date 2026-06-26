@@ -13,9 +13,9 @@ void SourceCameraShaking::serialize(Archive& ar)
 {
 	SourceBase::serialize(ar);
 
-	ar.serialize(time, "time", "Время тряски камеры");
-	ar.serialize(factor, "factor", "Сила тряски камеры");
-	ar.serialize(instantaneous, "instantaneous", "Мгновенный источник");
+	ar.serialize(time, "time", "Р’СЂРµРјСЏ С‚СЂСЏСЃРєРё РєР°РјРµСЂС‹");
+	ar.serialize(factor, "factor", "РЎРёР»Р° С‚СЂСЏСЃРєРё РєР°РјРµСЂС‹");
+	ar.serialize(instantaneous, "instantaneous", "РњРіРЅРѕРІРµРЅРЅС‹Р№ РёСЃС‚РѕС‡РЅРёРє");
 }
 
 void SourceCameraShaking::quant()

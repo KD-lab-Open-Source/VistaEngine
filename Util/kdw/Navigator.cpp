@@ -194,7 +194,7 @@ void NavigatorNode::build(TreeModel* model)
 		for(int i = 0; i < count; ++i){
 			ModelNode* child = node_->child(i);
 
-			// не используем TreeNode::add, т.к. нам нужно сохранять состояние элементов
+			// РЅРµ РёСЃРїРѕР»СЊР·СѓРµРј TreeNode::add, С‚.Рє. РЅР°Рј РЅСѓР¶РЅРѕ СЃРѕС…СЂР°РЅСЏС‚СЊ СЃРѕСЃС‚РѕСЏРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ
 			NavigatorNode* navNode = addNode(new NavigatorNode(child), model);
 			if(navNode->modelNode()->hasChangedChildren())
 				navNode->build(model);

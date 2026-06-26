@@ -305,7 +305,7 @@ void sGrid2d::Detach(BaseGraphObject *UnkObj)
 	{
 		slot.erase(it);
 
-		if(false)//áóäå äåä ëîê ñ MTAuto lock(gb_VisGeneric->GetReleaseLock()); MTAuto mtauto(&critial_attach);
+		if(false)//Ð±ÑƒÐ´Ðµ Ð´ÐµÐ´ Ð»Ð¾Ðº Ñ MTAuto lock(gb_VisGeneric->GetReleaseLock()); MTAuto mtauto(&critial_attach);
 		{
 			UnkObj->Release();
 		}else

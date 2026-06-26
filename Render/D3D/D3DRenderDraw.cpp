@@ -74,7 +74,7 @@ void cD3DRender::setCamera(Camera *camera)
 		DWORD color=0;
 		if(camera->getAttribute(ATTRCAMERA_SHADOWMAP))
 			color=D3DCOLOR_RGBA(0,0,0,255);//test TSM
-			//color=D3DCOLOR_RGBA(255,255,255,255);//Для Radeon 9700
+			//color=D3DCOLOR_RGBA(255,255,255,255);//Р”Р»СЏ Radeon 9700
 		else
 			color=camera->GetFoneColor().RGBA();
 		if(camera->getAttribute(ATTRCAMERA_REFLECTION))
@@ -95,7 +95,7 @@ void cD3DRender::setCamera(Camera *camera)
 
 	SetDrawTransform(camera);
 
-	{//Немного не к месту, зато быстро по скорости, для отражений.
+	{//РќРµРјРЅРѕРіРѕ РЅРµ Рє РјРµСЃС‚Сѓ, Р·Р°С‚Рѕ Р±С‹СЃС‚СЂРѕ РїРѕ СЃРєРѕСЂРѕСЃС‚Рё, РґР»СЏ РѕС‚СЂР°Р¶РµРЅРёР№.
 		SetTexture(5,camera->GetZTexture());
 		SetSamplerData(5,sampler_clamp_linear);
 	}
@@ -115,9 +115,9 @@ void cD3DRender::SetDrawTransform(Camera *camera)
 
 	RDCALL(D3DDevice_->SetViewport((D3DVIEWPORT9*)&camera->vp));
 	if(camera->getAttribute(ATTRCAMERA_REFLECTION)==0)
-		SetRenderState(D3DRS_CULLMODE,CurrentCullMode=D3DCULL_CW);	// прямое изображение
+		SetRenderState(D3DRS_CULLMODE,CurrentCullMode=D3DCULL_CW);	// РїСЂСЏРјРѕРµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ
 	else
-		SetRenderState(D3DRS_CULLMODE,CurrentCullMode=D3DCULL_CCW);	// отраженное изображение
+		SetRenderState(D3DRS_CULLMODE,CurrentCullMode=D3DCULL_CCW);	// РѕС‚СЂР°Р¶РµРЅРЅРѕРµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ
 }
 
 void cD3DRender::drawCircle(const Vect3f& vc, float radius, Color4c color)
@@ -361,41 +361,41 @@ int cD3DRender::OutTextLine(int x, int y, const FT::Font& font, const wchar_t *t
 		
 		const FT::OneChar& one = font.getChar(symbol);
 
-		// сдвиг позиции рисования по X для отрисовки следующего символа
+		// СЃРґРІРёРі РїРѕР·РёС†РёРё СЂРёСЃРѕРІР°РЅРёСЏ РїРѕ X РґР»СЏ РѕС‚СЂРёСЃРѕРІРєРё СЃР»РµРґСѓСЋС‰РµРіРѕ СЃРёРјРІРѕР»Р°
 		int advance = one.advance;
 
-		// субпиксельный контроль сдвига
+		// СЃСѓР±РїРёРєСЃРµР»СЊРЅС‹Р№ РєРѕРЅС‚СЂРѕР»СЊ СЃРґРІРёРіР°
 		if(prev_rh - one.lh >= 32)
 			--advance;
 		else if(prev_rh - one.lh < -32)
 			++advance;
 		prev_rh = one.rh;
 
-		// реальная правая граница символа
+		// СЂРµР°Р»СЊРЅР°СЏ РїСЂР°РІР°СЏ РіСЂР°РЅРёС†Р° СЃРёРјРІРѕР»Р°
 		int right = x + max(advance, one.su + one.du);
 
-		// не находимся ли левее левой границы рисования
+		// РЅРµ РЅР°С…РѕРґРёРјСЃСЏ Р»Рё Р»РµРІРµРµ Р»РµРІРѕР№ РіСЂР°РЅРёС†С‹ СЂРёСЃРѕРІР°РЅРёСЏ
 		if(xRangeMin >= 0 && x < xRangeMin){
 			prev_right = right;
 			x += advance;
 			continue;
 		}
 		
-		// не уперлись ли в правую границу рисования
+		// РЅРµ СѓРїРµСЂР»РёСЃСЊ Р»Рё РІ РїСЂР°РІСѓСЋ РіСЂР°РЅРёС†Сѓ СЂРёСЃРѕРІР°РЅРёСЏ
 		if(xRangeMax >= 0 && right > xRangeMax)
 			break;
 
 		sVertexXYZWDT1* v = QuadBufferXYZWDT1.Get();
 		sVertexXYZWDT1 &v1 = v[1], &v2 = v[0], &v3 = v[2], &v4 = v[3];
 
-		// т.к. в текстуре пустоты вокруг символов сжаты - их нужно учитывать отдельно
+		// С‚.Рє. РІ С‚РµРєСЃС‚СѓСЂРµ РїСѓСЃС‚РѕС‚С‹ РІРѕРєСЂСѓРі СЃРёРјРІРѕР»РѕРІ СЃР¶Р°С‚С‹ - РёС… РЅСѓР¶РЅРѕ СѓС‡РёС‚С‹РІР°С‚СЊ РѕС‚РґРµР»СЊРЅРѕ
 		v1.x = v4.x = float(x + one.su) - 0.5f;
 		v3.x = v2.x = v1.x + float(one.du);
 
 		v1.y = v2.y = float(y + one.sv) - 0.5f;
 		v3.y = v4.y = v1.y + float(one.dv);
 		
-		// выводим пиксель-в-пиксель из текстуры на экран
+		// РІС‹РІРѕРґРёРј РїРёРєСЃРµР»СЊ-РІ-РїРёРєСЃРµР»СЊ РёР· С‚РµРєСЃС‚СѓСЂС‹ РЅР° СЌРєСЂР°РЅ
 		v1.u1() = v4.u1() = float(one.u) / txWidth;
 		v3.u1() = v2.u1() = v1.u1() + float(one.du) / txWidth;
 

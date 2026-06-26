@@ -37,7 +37,7 @@ LibraryEditor::LibraryEditor(int border)
 	HBox* topBox = new HBox();
 	add(topBox);
 	{
-		backButton_ = new Button(TRANSLATE("<< &Назад"));
+		backButton_ = new Button(TRANSLATE("<< &РќР°Р·Р°Рґ"));
 		backButton_->signalPressed().connect(this, &LibraryEditor::onBackButton);
 		backButton_->setSensitive(false);
 		topBox->add(backButton_);
@@ -47,27 +47,27 @@ LibraryEditor::LibraryEditor(int border)
 		tabs_->signalChanged().connect(this, &LibraryEditor::onTabChange);
 		topBox->add(tabs_, true, true, true);
 
-		selectLibraryButton_ = new Button(TRANSLATE("&Добавить библиотеку..."));
+		selectLibraryButton_ = new Button(TRANSLATE("&Р”РѕР±Р°РІРёС‚СЊ Р±РёР±Р»РёРѕС‚РµРєСѓ..."));
 		selectLibraryButton_->signalPressed().connect(this, LibraryEditor::onSelectLibraryButton);
 		topBox->add(selectLibraryButton_);
 	}
 
 
-	layoutBox_ = new HBox(); // будет только один элемент, H или V - не важно
+	layoutBox_ = new HBox(); // Р±СѓРґРµС‚ С‚РѕР»СЊРєРѕ РѕРґРёРЅ СЌР»РµРјРµРЅС‚, H РёР»Рё V - РЅРµ РІР°Р¶РЅРѕ
 	add(layoutBox_, true, true, true);
 	{
 		progressBar_ = new ProgressBar();
-		// add вызываем в setLayout
+		// add РІС‹Р·С‹РІР°РµРј РІ setLayout
 
 		splitter_ = new HSplitter();
-		// add вызываем в setLayout
+		// add РІС‹Р·С‹РІР°РµРј РІ setLayout
 		{
 			tree_ = new LibraryTree();
-			// add вызываем в setLayout
+			// add РІС‹Р·С‹РІР°РµРј РІ setLayout
 
 			propertyTree_ = new PropertyTree();
 			propertyTree_->setHasLibrarySupport(true);
-			// add вызываем в setLayout
+			// add РІС‹Р·С‹РІР°РµРј РІ setLayout
 		}
 	}
 
@@ -189,9 +189,9 @@ void LibraryEditor::onTabMouseButtonDown(MouseButton button, int tabIndex)
 		tab->onMenuConstruction(root);
 		if(!root.empty())
 			root.addSeparator();
-        root.add(TRANSLATE("Закрыть"), tab)
+        root.add(TRANSLATE("Р—Р°РєСЂС‹С‚СЊ"), tab)
             .connect(this, &LibraryEditor::onTabClose);
-        root.add(TRANSLATE("Закрыть другие"))
+        root.add(TRANSLATE("Р—Р°РєСЂС‹С‚СЊ РґСЂСѓРіРёРµ"))
             .enable(false);
 
         menu.spawn(this);
@@ -499,16 +499,16 @@ int LibraryEditorDialog::showModal(const char* libraryName)
 void LibraryEditorDialog::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(*libraryEditor_, "libraryEditor", "Редактор библиотек");
+	ar.serialize(*libraryEditor_, "libraryEditor", "Р РµРґР°РєС‚РѕСЂ Р±РёР±Р»РёРѕС‚РµРє");
 }
 
 void LibraryEditorDialog::init()
 {
-	setTitle(TRANSLATE("Редактор библиотек"));
+	setTitle(TRANSLATE("Р РµРґР°РєС‚РѕСЂ Р±РёР±Р»РёРѕС‚РµРє"));
 	setResizeable(true);
 	setDefaultSize(Vect2i(1000, 600));
-	addButton(TRANSLATE("Сохранить"), RESPONSE_OK);
-	addButton(TRANSLATE("Закрыть"), RESPONSE_CANCEL);
+	addButton(TRANSLATE("РЎРѕС…СЂР°РЅРёС‚СЊ"), RESPONSE_OK);
+	addButton(TRANSLATE("Р—Р°РєСЂС‹С‚СЊ"), RESPONSE_CANCEL);
 
 	libraryEditor_ = new LibraryEditor();
 	add(libraryEditor_);

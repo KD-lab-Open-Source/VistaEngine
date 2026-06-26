@@ -66,7 +66,7 @@ void cOcclusionQuery::Test(const Vect3f* point, int numPoints)
 		gb_RenderDevice3D->SetRenderState(D3DRS_DESTBLEND,D3DBLEND_ONE);
 		gb_RenderDevice3D->SetRenderState(D3DRS_BLENDOP,D3DBLENDOP_ADD);
 	}else
-	{//òåñòîâûé êîä
+	{//Ñ‚ÐµÑÑ‚Ð¾Ð²Ñ‹Ð¹ ÐºÐ¾Ð´
 		gb_RenderDevice3D->SetNoMaterial(ALPHA_NONE,MatXf::ID,0,0);
 	}
 
@@ -120,7 +120,7 @@ int cOcclusionQuery::VisibleCount()
 		Sleep(1);//FOR Radeon 7500, 8500
 	}
 
-	//Â ñëó÷åàå âêëþ÷åíèÿ multisampling'à íà Radeon 9700 âîçâðàùàåòñÿ íåïîíÿòíîå çíà÷åíèå
+	//Ð’ ÑÐ»ÑƒÑ‡ÐµÐ°Ðµ Ð²ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ñ multisampling'Ð° Ð½Ð° Radeon 9700 Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ÑÑ Ð½ÐµÐ¿Ð¾Ð½ÑÑ‚Ð½Ð¾Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ
 	// point> 1 && point < gb_RenderDevice3D->GetMultisampleNum()
 	if(testedCount_==1)
 	{

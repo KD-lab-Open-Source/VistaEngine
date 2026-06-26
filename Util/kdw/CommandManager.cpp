@@ -68,8 +68,8 @@ CommandHotkey::CommandHotkey()
 
 void CommandHotkey::serialize(Archive& ar)
 {
-	ar.serialize(key_, "key", "Хоткей");
-	ar.serialize(sticky_, "sticky", "Липкий");
+	ar.serialize(key_, "key", "РҐРѕС‚РєРµР№");
+	ar.serialize(sticky_, "sticky", "Р›РёРїРєРёР№");
 }
 
 
@@ -135,7 +135,7 @@ CommandTemplate* CommandTemplate::find(const char* path)
 CommandTemplate& CommandTemplate::get(const char* path)
 {
 	CommandTemplate* result = find(path);
-	ASSERT(result && "Комманда не найдена!");
+	ASSERT(result && "РљРѕРјРјР°РЅРґР° РЅРµ РЅР°Р№РґРµРЅР°!");
 	return *result;
 }
 
@@ -159,13 +159,13 @@ void CommandTemplate::serialize(Archive& ar)
 	if(ar.isInput() || name_ != ""){
 		ar.serialize(name_, "name", "&!");
 		ar.serialize(label_, "label", "^");
-		ar.serialize(separated_, "separate", "Отделять");
+		ar.serialize(separated_, "separate", "РћС‚РґРµР»СЏС‚СЊ");
 		if(ar.isEdit())
 			hotkey_.serialize(ar);
 		else
-			ar.serialize(hotkey_, "hotkey", "Хоткей");
+			ar.serialize(hotkey_, "hotkey", "РҐРѕС‚РєРµР№");
 	}
-	ar.serialize(children_, "children", "^!Элементы");
+	ar.serialize(children_, "children", "^!Р­Р»РµРјРµРЅС‚С‹");
 	if(ar.isEdit())
 		ar.serialize(index_, "index", 0);
 }

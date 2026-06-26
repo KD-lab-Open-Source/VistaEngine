@@ -390,7 +390,7 @@ void Camera::Update()
 	WorldI=GetMatrix().rot().xrow();
 	WorldJ=getAttribute(ATTRCAMERA_REFLECTION)?-GetMatrix().rot().yrow():GetMatrix().rot().yrow();
 	WorldK=GetMatrix().rot().zrow();
-	// ����������� �������������� ������ � ������� ������������
+	// определение местоположения камеры в мировом пространстве
 	Vect3f camOrigin(0,0,0);
 	GetPos() = GetMatrix().invXformPoint(camOrigin);
 
@@ -614,7 +614,7 @@ void Camera::GetFrustum(Vect2f *center,sRectangle4f *clip,Vect2f *focus,Vect2f *
 
 void Camera::UpdateViewport()
 {
-	// ���������� ������ ViewPort
+	// обновление данных ViewPort
 	if(RenderSurface==0 && RenderTarget==0)
 		RenderSize.set(float(gb_RenderDevice->GetSizeX()),float(gb_RenderDevice->GetSizeY()));
 
@@ -818,9 +818,9 @@ void Camera::SetGrass(BaseGraphObject* grass)
 void Camera::DrawSilhouettePlane()
 {
 /*
-	������� � ATTRUNKOBJ_SHOW_FLAT_SILHOUETTE �������� �����.
-	����������� �� ����� ��������.
-	���� ���� ����� �������, �������� ����� DrawShadowPlane()
+	Объекты с ATTRUNKOBJ_SHOW_FLAT_SILHOUETTE выводить после.
+	Сортировать по этому признаку.
+	Если есть такие объекты, вызывать потом DrawShadowPlane()
 */
 	gb_RenderDevice3D->SetVertexShader(0);
 	gb_RenderDevice3D->SetPixelShader(0);
@@ -853,7 +853,7 @@ void Camera::DrawSilhouettePlane()
 		rd->SetRenderState( D3DRS_STENCILPASS, D3DSTENCILOP_REPLACE );
 	}
 
-	//!!! ��������������� ��������� ������, ���� ����� �� ����������, ������ ����� ������ ���� �� occlusion query � ������� fillrate ����������.
+	//!!! Прямоугольнички выводятся всегда, хотя могли бы выводиться, только когда прошёл тест на occlusion query и немного fillrate сэкономить.
 
     FOR_EACH(drawList, it) {
         xassert((*it)->GetKind() == KIND_OBJ_3DX);
@@ -1029,7 +1029,7 @@ eTestVisible Camera::GridTest(Vect3f p[8])
 }
 
 eTestVisible Camera::TestVisible(const MatXf &matrix,const Vect3f &min,const Vect3f &max)
-{ // ��� BoundingBox � ��������� min && max
+{ // для BoundingBox с границами min && max
 	Vect3f	p[8];
 	matrix.xformPoint(Vect3f(min.x,min.y,min.z),p[0]);
 	matrix.xformPoint(Vect3f(max.x,min.y,min.z),p[1]);
@@ -1060,7 +1060,7 @@ eTestVisible Camera::TestVisible(const MatXf &matrix,const Vect3f &min,const Vec
 
 //*
 eTestVisible Camera::TestVisible(const Vect3f &min,const Vect3f &max)
-{ // ��� BoundingBox � ��������� min && max, ��������� � ���������� �����������
+{ // для BoundingBox с границами min && max, заданными в глобальным координатах
 	for(int i=0;i<GetNumberPlaneClip3d();i++)
 	{
 		Plane& p=GetPlaneClip3d(i);
@@ -1345,7 +1345,7 @@ void CameraPlanarLight::drawLights()
 				sVertexXYZDT1 *v=quad->Get();
 				Vect3f& p=c.pos;
 				float r=c.radius;
-				Color4c Diffuse=c.color;//���������, ��� 0.5 - ��� ���������� �������.
+				Color4c Diffuse=c.color;//Учитываем, что 0.5 - это нормальная яркость.
 				Diffuse.r=Diffuse.r>>1;
 				Diffuse.g=Diffuse.g>>1;
 				Diffuse.b=Diffuse.b>>1;
@@ -1537,14 +1537,14 @@ void Camera::DrawObject2Pass()
 	vector<BaseGraphObject*>& obj=DrawArray[SCENENODE_OBJECT_2PASS];
 	vector<BaseGraphObject*>::iterator it;
 	//gb_RenderDevice->SetRenderState( RS_CULLMODE,D3DCULL_CW);
-	// 1 pass - ��������� � Z ������
+	// 1 pass - отрисовка в Z буффер
 	gb_RenderDevice3D->SetRenderState(RS_ZWRITEENABLE,FALSE);
 	
 	FOR_EACH(obj,it)
 		(*it)->Draw(this);
 
 	gb_RenderDevice3D->SetRenderState(RS_ZWRITEENABLE,TRUE);
-	// 2 pass - ��������� � Color ������
+	// 2 pass - отрисовка в Color буффер
 	//camerapass=SCENENODE_OBJECT_2PASS;
 	//FOR_EACH(obj,it)
 	//{
@@ -1717,7 +1717,7 @@ void CameraShadowMap::DrawScene()
 		return;
 
 	DWORD old_cullmode=gb_RenderDevice3D->GetRenderState(D3DRS_CULLMODE);
-//	gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE,D3DCULL_CCW);//bias ������ � ������ ������� ��������.
+//	gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE,D3DCULL_CCW);//bias должен в другую сторону смотреть.
 
 	gb_RenderDevice3D->SetRenderState(D3DRS_ALPHAREF,0);
 	DrawObjectFirst();
@@ -1771,7 +1771,7 @@ void CameraShadowMap::DrawScene()
 
 Vect2f Camera::CalcZMinZMaxShadowReciver()
 {
-    Vect2f all(zPlane.y,zPlane.x);//��� ���������.
+    Vect2f all(zPlane.y,zPlane.x);//Тут правильно.
 
     SceneNode nType[]={SCENENODE_OBJECT,SCENENODE_FLAT_SILHOUETTE};
     for(int itype=0;itype<sizeof(nType)/sizeof(nType[0]);itype++)

@@ -3,7 +3,7 @@
 #include "XMath/fastMath.h"
 #include "Render/3dx/UMath.h"
 
-inline int remainder(float x,int dx,float& cx)//x - число, dx - цикл, return - целая часть цикла, cx - дробная часть
+inline int remainder(float x,int dx,float& cx)//x - С‡РёСЃР»Рѕ, dx - С†РёРєР», return - С†РµР»Р°СЏ С‡Р°СЃС‚СЊ С†РёРєР»Р°, cx - РґСЂРѕР±РЅР°СЏ С‡Р°СЃС‚СЊ
 {
 	float f=fmodFast(x,(float)dx);
 	if(f<0)

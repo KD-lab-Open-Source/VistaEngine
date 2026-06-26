@@ -44,7 +44,7 @@ struct ExplodeProperty : public StringTableBase
 typedef StringTable<ExplodeProperty> ExplodeTable;
 typedef StringTableReference<ExplodeProperty, true> ExplodeReference;
 
-/// параметры гибели
+/// РїР°СЂР°РјРµС‚СЂС‹ РіРёР±РµР»Рё
 struct DeathAttribute
 {
 	ExplodeReference explodeReference;
@@ -53,7 +53,7 @@ struct DeathAttribute
 	bool enableExplodeFantom;
 	float explodeFactor;
 
-	/// источники, остающиеся после гибели юнита
+	/// РёСЃС‚РѕС‡РЅРёРєРё, РѕСЃС‚Р°СЋС‰РёРµСЃСЏ РїРѕСЃР»Рµ РіРёР±РµР»Рё СЋРЅРёС‚Р°
 	SourceWeaponAttributes sources;
 
 	DeathAttribute();
@@ -137,20 +137,20 @@ public:
 private:
 	AbnormalStateTypeReference type_;
 
-	/// цвет состояния
+	/// С†РІРµС‚ СЃРѕСЃС‚РѕСЏРЅРёСЏ
 	UnitColor effectColor_;
 
-	/// спецэффект состояния
+	/// СЃРїРµС†СЌС„С„РµРєС‚ СЃРѕСЃС‚РѕСЏРЅРёСЏ
 	EffectAttributeAttachable effectAttribute_;
 
-	/// звук состояния
+	/// Р·РІСѓРє СЃРѕСЃС‚РѕСЏРЅРёСЏ
 	SoundReference soundReference_;
 
-	/// собственные настройки гибели
+	/// СЃРѕР±СЃС‚РІРµРЅРЅС‹Рµ РЅР°СЃС‚СЂРѕР№РєРё РіРёР±РµР»Рё
 	DeathAttribute* deathAttribute_;
 };
 
-/// параметры ненормального состояния юнита (горение, дымление и т.п.)
+/// РїР°СЂР°РјРµС‚СЂС‹ РЅРµРЅРѕСЂРјР°Р»СЊРЅРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ СЋРЅРёС‚Р° (РіРѕСЂРµРЅРёРµ, РґС‹РјР»РµРЅРёРµ Рё С‚.Рї.)
 class AbnormalStateAttribute
 {
 public:
@@ -181,12 +181,12 @@ private:
 
 	AbnormalStateTypeReference type_;
 
-	/// время действия в секундах
+	/// РІСЂРµРјСЏ РґРµР№СЃС‚РІРёСЏ РІ СЃРµРєСѓРЅРґР°С…
 	float duration_;
-	/// случайная добавка к времени действия, плюс-минус
+	/// СЃР»СѓС‡Р°Р№РЅР°СЏ РґРѕР±Р°РІРєР° Рє РІСЂРµРјРµРЅРё РґРµР№СЃС‚РІРёСЏ, РїР»СЋСЃ-РјРёРЅСѓСЃ
 	float durationRnd_;
 
-	/// наносимые за секунду повреждения
+	/// РЅР°РЅРѕСЃРёРјС‹Рµ Р·Р° СЃРµРєСѓРЅРґСѓ РїРѕРІСЂРµР¶РґРµРЅРёСЏ
 	WeaponDamage damage_;
 	bool freeze_;
 	bool freezeAttack_;

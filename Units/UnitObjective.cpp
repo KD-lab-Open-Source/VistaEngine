@@ -62,7 +62,7 @@ void UnitObjective::Quant()
 	if(!hiddenLogic() && (!attr().isActing() || player() == universe()->activePlayer() || !safe_cast<const UnitActing*>(this)->isInvisible()))
 		minimap().addUnit(this);
 
-	// обработка изменения параметров
+	// РѕР±СЂР°Р±РѕС‚РєР° РёР·РјРµРЅРµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ
 	xassert(showChangeControllers_.size() == attr().parameterShowSettings.size());
 	xassert(parameterShowTimers_.size() == attr().parameterShowSettings.size());
 
@@ -194,7 +194,7 @@ bool UnitObjective::checkShowEvent(ShowEvent event)
 			return safe_cast<const UnitActing*>(this)->isProducing();
 		break;
 	case SHOW_AT_DIRECT_CONTROL:
-		if(attr().isActing()) // FIXME - rigidBody() обещали переписать
+		if(attr().isActing()) // FIXME - rigidBody() РѕР±РµС‰Р°Р»Рё РїРµСЂРµРїРёСЃР°С‚СЊ
 			return safe_cast<const UnitActing*>(this)->directControl();
 		break;
 	}
@@ -447,11 +447,11 @@ void UnitObjective::graphQuant(float dt)
 				else
 					x -= len;
 
-				rd.drawRectangle( // Подложка
+				rd.drawRectangle( // РџРѕРґР»РѕР¶РєР°
 					rd.relativeCoords(Recti(x, y, len, 2)), cur.backgroundColor);
-				rd.drawRectangle( // Значение
+				rd.drawRectangle( // Р—РЅР°С‡РµРЅРёРµ
 					rd.relativeCoords(Recti(x, y, round(phase * len), 2)), phase_clr);
-				rd.drawRectangle( // Рамка
+				rd.drawRectangle( // Р Р°РјРєР°
 					rd.relativeCoords(Recti(x - 1, y - 1, len + 1, 3)), cur.borderColor, true);
 			}
 		}

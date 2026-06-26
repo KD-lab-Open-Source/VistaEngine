@@ -45,7 +45,7 @@ public:
 */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-//                                         ЧЕРВЯК
+//                                         Р§Р•Р Р’РЇРљ
 ///////////////////////////////////////////////////////////////////////////////////////////////
 class CWormOut {
 	short x_,y_;
@@ -85,7 +85,7 @@ class CGeoWorm {
 	Vect3f tPosition;
 	float cDirection;
 	float cSpeed;
-	int xOld, yOld;//данные для step-а
+	int xOld, yOld;//РґР°РЅРЅС‹Рµ РґР»СЏ step-Р°
 	int counter;
 public:
 	CGeoWorm(int xBeg, int yBeg, int xTrgt=0, int yTrgt=0);
@@ -100,7 +100,7 @@ public:
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-//                                     ОПОЛЗЕНЬ
+//                                     РћРџРћР›Р—Р•РќР¬
 ///////////////////////////////////////////////////////////////////////////////////////////////
 struct srBmp{
 	int stpX, stpY;
@@ -149,7 +149,7 @@ struct CLandslip {
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-//                                Разломы
+//                                Р Р°Р·Р»РѕРјС‹
 ///////////////////////////////////////////////////////////////////////////////////////////
 struct point4UP{
 	short x;
@@ -196,7 +196,7 @@ struct AETRecord {
 
 const int SUPOLIGONN_MAX_BASE_POINT=3;
 const int SUPOLIGONN_MAX_ADDING_POINT=20;
-const int SUPOLIGONN_ALL_POINT_IN_POLIGON=SUPOLIGONN_MAX_ADDING_POINT+2;//(2-это 3 минус 1)
+const int SUPOLIGONN_ALL_POINT_IN_POLIGON=SUPOLIGONN_MAX_ADDING_POINT+2;//(2-СЌС‚Рѕ 3 РјРёРЅСѓСЃ 1)
 struct sUPoligonN {
 	point4UP basePntArr[SUPOLIGONN_MAX_BASE_POINT];
 	point4UP addPntArr[SUPOLIGONN_MAX_ADDING_POINT];
@@ -205,7 +205,7 @@ struct sUPoligonN {
 	int nElAllPntArr;
 	int critPntArr[SUPOLIGONN_ALL_POINT_IN_POLIGON];
 	int nElCritPntArr;
-	AETRecord AET[SUPOLIGONN_ALL_POINT_IN_POLIGON]; //после отладки поменять на list
+	AETRecord AET[SUPOLIGONN_ALL_POINT_IN_POLIGON]; //РїРѕСЃР»Рµ РѕС‚Р»Р°РґРєРё РїРѕРјРµРЅСЏС‚СЊ РЅР° list
 	int nElAET;
 
 	int leftBorder, rightBorder;
@@ -261,7 +261,7 @@ struct sGeoSwelling {
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-//                   Появление моделей из земли
+//                   РџРѕСЏРІР»РµРЅРёРµ РјРѕРґРµР»РµР№ РёР· Р·РµРјР»Рё
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 struct faceM2VM{
@@ -450,7 +450,7 @@ struct s_Mesh2VMapDispather {
 extern s_Mesh2VMapDispather mesh2VMapDispather;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-//                   Муравей
+//                   РњСѓСЂР°РІРµР№
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 const int ANT_MAX_MESH2VMAPDATE=36;
@@ -532,8 +532,8 @@ public:
 
 	static c3DSGeoAction* Build(short xc, short yc, float orientation,
 		s3DSGeoParameter* command
-		//Для разных адресов command образуется разный кеш 
-		//Предполагается что это будет лежать в prm
+		//Р”Р»СЏ СЂР°Р·РЅС‹С… Р°РґСЂРµСЃРѕРІ command РѕР±СЂР°Р·СѓРµС‚СЃСЏ СЂР°Р·РЅС‹Р№ РєРµС€ 
+		//РџСЂРµРґРїРѕР»Р°РіР°РµС‚СЃСЏ С‡С‚Рѕ СЌС‚Рѕ Р±СѓРґРµС‚ Р»РµР¶Р°С‚СЊ РІ prm
 		);
 
 	static c3DSGeoActionCreator* instance();
@@ -636,7 +636,7 @@ struct s_HeadGeoAction {
 
 extern s_HeadGeoAction headGeoAction;
 ///////////////////////////////////////////////////////////////////////////////////////////////
-//                   Оса
+//                   РћСЃР°
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /*
 const int WASP_QUANT_FOR_GEOBREAK=25;

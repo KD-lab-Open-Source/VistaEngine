@@ -85,7 +85,7 @@ void cBlobs::DrawBlobsSimply(int x,int y)
 
 void cBlobs::DrawBlobsShader(int x,int y, float phase, cTexture* texture, const cBlobsSetting& setting)
 {
-	//Íå çàáûòü âûêëþ÷èòü áèîèíåéíóþ èíòåðïîëÿöèþ íàâåðíî, äëÿ ñêîðîñòè ïîòîì.
+	//ÐÐµ Ð·Ð°Ð±Ñ‹Ñ‚ÑŒ Ð²Ñ‹ÐºÐ»ÑŽÑ‡Ð¸Ñ‚ÑŒ Ð±Ð¸Ð¾Ð¸Ð½ÐµÐ¹Ð½ÑƒÑŽ Ð¸Ð½Ñ‚ÐµÑ€Ð¿Ð¾Ð»ÑÑ†Ð¸ÑŽ Ð½Ð°Ð²ÐµÑ€Ð½Ð¾, Ð´Ð»Ñ ÑÐºÐ¾Ñ€Ð¾ÑÑ‚Ð¸ Ð¿Ð¾Ñ‚Ð¾Ð¼.
 	gb_RenderDevice3D->SetBlendStateAlphaRef(ALPHA_NONE);
 	gb_RenderDevice3D->SetVertexShader(NULL);
 	

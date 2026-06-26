@@ -10,7 +10,7 @@ class Archive;
 
 typedef bool (*UI_ControlFilterFunc)(const UI_ControlBase* p);
 
-/// Ссылка на кнопку интерфейса.
+/// РЎСЃС‹Р»РєР° РЅР° РєРЅРѕРїРєСѓ РёРЅС‚РµСЂС„РµР№СЃР°.
 class UI_ControlReferenceBase
 {
 public:
@@ -38,7 +38,7 @@ protected:
 
 private:
 
-	/// имена экрана и всех кнопок-родителей через точку (пример - "Ingame interface.Group0.Button1")
+	/// РёРјРµРЅР° СЌРєСЂР°РЅР° Рё РІСЃРµС… РєРЅРѕРїРѕРє-СЂРѕРґРёС‚РµР»РµР№ С‡РµСЂРµР· С‚РѕС‡РєСѓ (РїСЂРёРјРµСЂ - "Ingame interface.Group0.Button1")
 	std::string reference_;
 };
 
@@ -82,7 +82,7 @@ public:
 	static bool controlFilter(const UI_ControlBase* p){ return (dynamic_cast<const T*>(p) != 0); }
 };
 
-/// Ссылка на экран интерфейса.
+/// РЎСЃС‹Р»РєР° РЅР° СЌРєСЂР°РЅ РёРЅС‚РµСЂС„РµР№СЃР°.
 class UI_ScreenReference
 {
 public:
@@ -102,7 +102,7 @@ public:
 
 private:
 
-	/// имя экрана
+	/// РёРјСЏ СЌРєСЂР°РЅР°
 	std::string screenName_;
 };
 

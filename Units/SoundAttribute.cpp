@@ -13,21 +13,21 @@
 #include "Serialization/SerializationFactory.h"
 #include "FileUtils/FileUtils.h"
 
-REGISTER_CLASS(SoundAttribute, Sound2DAttribute, "2D звук");
-REGISTER_CLASS(SoundAttribute, Sound3DAttribute, "3D звук");
-WRAP_LIBRARY(SoundAttributeLibrary, "SoundLibrary", "Звуки", "Scripts\\Content\\SoundLibrary", 0, LIBRARY_EDITABLE);
+REGISTER_CLASS(SoundAttribute, Sound2DAttribute, "2D Р·РІСѓРє");
+REGISTER_CLASS(SoundAttribute, Sound3DAttribute, "3D Р·РІСѓРє");
+WRAP_LIBRARY(SoundAttributeLibrary, "SoundLibrary", "Р—РІСѓРєРё", "Scripts\\Content\\SoundLibrary", 0, LIBRARY_EDITABLE);
 
 VoiceAttribute::VoiceFile::VoiceFileDurations VoiceAttribute::VoiceFile::voiceFileDurations_;
 bool VoiceAttribute::deterministic_ = false;
 
 void SoundLogoAttributes::serialize(Archive& ar)
 {
-	ar.serialize(mouseMove_,"mouseMove","Движение мыши");
-	ar.serialize(fishSwim_,"fishSwim","Рыба плывет");
-	ar.serialize(fishStop_,"fishStop","Рыба остановилась");
-	ar.serialize(fishRise_,"fishRise","Рыба растет");
-	ar.serialize(waterOut_,"waterOut","Вода убывает");
-	ar.serialize(backGround_,"backGround","Фоновый звук");
+	ar.serialize(mouseMove_,"mouseMove","Р”РІРёР¶РµРЅРёРµ РјС‹С€Рё");
+	ar.serialize(fishSwim_,"fishSwim","Р С‹Р±Р° РїР»С‹РІРµС‚");
+	ar.serialize(fishStop_,"fishStop","Р С‹Р±Р° РѕСЃС‚Р°РЅРѕРІРёР»Р°СЃСЊ");
+	ar.serialize(fishRise_,"fishRise","Р С‹Р±Р° СЂР°СЃС‚РµС‚");
+	ar.serialize(waterOut_,"waterOut","Р’РѕРґР° СѓР±С‹РІР°РµС‚");
+	ar.serialize(backGround_,"backGround","Р¤РѕРЅРѕРІС‹Р№ Р·РІСѓРє");
 }
 
 bool SoundAttribute::SoundFile::serialize(Archive& ar, const char* name, const char* nameAlt) 
@@ -56,22 +56,22 @@ SoundAttribute::SoundAttribute()
 
 void SoundAttribute::serialize(Archive& ar)
 {
-	ar.serialize(volume_, "volume", "громкость");
-	ar.serialize(volumeMin_, "volumeMin", "минимальная громкость");
-	ar.serialize(maxCount_, "maxCount", "макс. количество одновременно слышимых звуков");
+	ar.serialize(volume_, "volume", "РіСЂРѕРјРєРѕСЃС‚СЊ");
+	ar.serialize(volumeMin_, "volumeMin", "РјРёРЅРёРјР°Р»СЊРЅР°СЏ РіСЂРѕРјРєРѕСЃС‚СЊ");
+	ar.serialize(maxCount_, "maxCount", "РјР°РєСЃ. РєРѕР»РёС‡РµСЃС‚РІРѕ РѕРґРЅРѕРІСЂРµРјРµРЅРЅРѕ СЃР»С‹С€РёРјС‹С… Р·РІСѓРєРѕРІ");
 
-	ar.serialize(frequencyRnd_, "frequencyRnd", "случайное изменение частоты");
-	ar.serialize(frequencyRndMin_, "frequencyRndMin", "макс. коэфф. уменьшения частоты");
-	ar.serialize(frequencyRndMax_, "frequencyRndMax", "макс. коэфф. увеличения частоты");
+	ar.serialize(frequencyRnd_, "frequencyRnd", "СЃР»СѓС‡Р°Р№РЅРѕРµ РёР·РјРµРЅРµРЅРёРµ С‡Р°СЃС‚РѕС‚С‹");
+	ar.serialize(frequencyRndMin_, "frequencyRndMin", "РјР°РєСЃ. РєРѕСЌС„С„. СѓРјРµРЅСЊС€РµРЅРёСЏ С‡Р°СЃС‚РѕС‚С‹");
+	ar.serialize(frequencyRndMax_, "frequencyRndMax", "РјР°РєСЃ. РєРѕСЌС„С„. СѓРІРµР»РёС‡РµРЅРёСЏ С‡Р°СЃС‚РѕС‚С‹");
 
-	ar.serialize(soundFiles_, "soundFiles", "файлы");
+	ar.serialize(soundFiles_, "soundFiles", "С„Р°Р№Р»С‹");
 
-	ar.serialize(surfKind_, "surfKind", "Тип поверхности");
-	ar.serialize(cycled_, "cycled", "зацикливать");
-	ar.serialize(fadeIn_, "fadeIn", "FadeIn (милисекунд)");
-	ar.serialize(fadeOut_, "fadeOut", "FadeOut (милисекунд)");
-	ar.serialize(stopInFogOfWar_,"stopInFogOfWar","Выключать в тумане войны");
-	ar.serialize(useGlobalFade_,"useGlobalFade","Учитывать глобальный FadeIn\\FadeOut");
+	ar.serialize(surfKind_, "surfKind", "РўРёРї РїРѕРІРµСЂС…РЅРѕСЃС‚Рё");
+	ar.serialize(cycled_, "cycled", "Р·Р°С†РёРєР»РёРІР°С‚СЊ");
+	ar.serialize(fadeIn_, "fadeIn", "FadeIn (РјРёР»РёСЃРµРєСѓРЅРґ)");
+	ar.serialize(fadeOut_, "fadeOut", "FadeOut (РјРёР»РёСЃРµРєСѓРЅРґ)");
+	ar.serialize(stopInFogOfWar_,"stopInFogOfWar","Р’С‹РєР»СЋС‡Р°С‚СЊ РІ С‚СѓРјР°РЅРµ РІРѕР№РЅС‹");
+	ar.serialize(useGlobalFade_,"useGlobalFade","РЈС‡РёС‚С‹РІР°С‚СЊ РіР»РѕР±Р°Р»СЊРЅС‹Р№ FadeIn\\FadeOut");
 }
 
 const char* SoundAttribute::convertFileName(const char* file_name) const
@@ -90,9 +90,9 @@ void Sound3DAttribute::serialize(Archive& ar)
 {
 	SoundAttribute::serialize(ar);
 
-	ar.serialize(radius_, "radius", "радиус объекта");
-	ar.serialize(radiusMax_, "radiusMax", "максимальный радиус слышимости");
-	ar.serialize(muteByMaxDistance_, "muteByMaxDistance", "Обрывать за предeлaми макс. радиуса");
+	ar.serialize(radius_, "radius", "СЂР°РґРёСѓСЃ РѕР±СЉРµРєС‚Р°");
+	ar.serialize(radiusMax_, "radiusMax", "РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°РґРёСѓСЃ СЃР»С‹С€РёРјРѕСЃС‚Рё");
+	ar.serialize(muteByMaxDistance_, "muteByMaxDistance", "РћР±СЂС‹РІР°С‚СЊ Р·Р° РїСЂРµРґeР»aРјРё РјР°РєСЃ. СЂР°РґРёСѓСЃР°");
 }
 
 Sound* Sound3DAttribute::CreateSound(const char* name) const
@@ -179,10 +179,10 @@ VoiceAttribute::VoiceAttribute()
 
 void VoiceAttribute::serialize(Archive& ar)
 {
-	ar.serialize(fileNames_, "fileNames", "&Файлы");
-	ar.serialize(randomSelect_, "randomSelect", "Случайный выбор звука");
+	ar.serialize(fileNames_, "fileNames", "&Р¤Р°Р№Р»С‹");
+	ar.serialize(randomSelect_, "randomSelect", "РЎР»СѓС‡Р°Р№РЅС‹Р№ РІС‹Р±РѕСЂ Р·РІСѓРєР°");
 	if(!randomSelect_)
-		ar.serialize(timeToFun_, "timeToFun", "Время при котором возможно проигрывание всей цепочки файлов"); 
+		ar.serialize(timeToFun_, "timeToFun", "Р’СЂРµРјСЏ РїСЂРё РєРѕС‚РѕСЂРѕРј РІРѕР·РјРѕР¶РЅРѕ РїСЂРѕРёРіСЂС‹РІР°РЅРёРµ РІСЃРµР№ С†РµРїРѕС‡РєРё С„Р°Р№Р»РѕРІ"); 
 	if(ar.isInput() && !ar.isEdit())
 		for(FileNames::iterator i = fileNames_.begin(); i != fileNames_.end();){
 			if(!i->fileName())
@@ -204,7 +204,7 @@ void VoiceAttribute::VoiceFile::serialize(Archive& ar)
 		voiceFileDurations_[fileName_] = 1.f;
 
 	static ResourceSelector::Options options("*.ogg", getLocDataPath("Voice\\").c_str(), "Will select location of voice file");
-	ar.serialize(ResourceSelector(fileName_, options), "fileName", "&Имя файла");
+	ar.serialize(ResourceSelector(fileName_, options), "fileName", "&РРјСЏ С„Р°Р№Р»Р°");
 
 	if(ar.isInput()){
 		static bool loaded;
@@ -329,8 +329,8 @@ SoundMarker::SoundMarker()
 
 void SoundMarker::serialize(Archive& ar)
 {
-	ar.serialize(phase_, "phase", "&Фаза");
-	ar.serialize(soundReferences_,"soundReferences","Звуки");
+	ar.serialize(phase_, "phase", "&Р¤Р°Р·Р°");
+	ar.serialize(soundReferences_,"soundReferences","Р—РІСѓРєРё");
 }
 
 

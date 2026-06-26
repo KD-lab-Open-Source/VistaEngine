@@ -30,24 +30,24 @@ enum ScopeType : int
 
 enum CompareOperator : int
 {
-	COMPARE_LESS,	// ������
-	COMPARE_LESS_EQ, // ������ ���� �����
-	COMPARE_EQ, // �����
-	COMPARE_NOT_EQ, // �� �����
-	COMPARE_GREATER, // ������
-	COMPARE_GREATER_EQ // ������ ���� �����		 
+	COMPARE_LESS,	// Меньше
+	COMPARE_LESS_EQ, // Меньше либо равно
+	COMPARE_EQ, // Равно
+	COMPARE_NOT_EQ, // Не равно
+	COMPARE_GREATER, // Больше
+	COMPARE_GREATER_EQ // Больше либо равно		 
 };
 
 enum Activity 
 {
-	ACTIVITY_MOVING = 1, // ��������� ����-��
-	ACTIVITY_ATTACKING = 2, //�������
-	ACTIVITY_PRODUCING = 4, // ���������� ���-��
-	ACTIVITY_CONSTRUCTING = 8, // �������� ���
-	ACTIVITY_BUILDING = 16, // ������ ����-��
-	ACTIVITY_UPGRADING = 32, //�����������
-	ACTIVITY_PICKING_RESOURCE = 64, //�������� ������
-	ACTIVITY_TELEPORTATING = 128, //���������������
+	ACTIVITY_MOVING = 1, // двигается куда-то
+	ACTIVITY_ATTACKING = 2, //атакует
+	ACTIVITY_PRODUCING = 4, // производит что-то
+	ACTIVITY_CONSTRUCTING = 8, // строится сам
+	ACTIVITY_BUILDING = 16, // строит кого-то
+	ACTIVITY_UPGRADING = 32, //апгрейдится
+	ACTIVITY_PICKING_RESOURCE = 64, //собирает ресурс
+	ACTIVITY_TELEPORTATING = 128, //телепортируется
 	ACTIVITY_MOVING_TO_TRANSPORT = 256,
 	ACTIVITY_WAITING_FOR_PASSENGER = 512
 };
@@ -77,7 +77,7 @@ public:
 
 	bool checkDebug(UnitActing* unit);
 	bool check() const { xassert(0); return false; }
-	bool check(UnitActing* unit) const { xassert(0); return false; } // �� ���� �������� �� ����������� �������, �� check - ��� ��������
+	bool check(UnitActing* unit) const { xassert(0); return false; } // не надо вызывать из производных классов, их check - это предикат
 	bool isContext(ContextFilter& filter) const;
 	void serialize(Archive& ar);
 
@@ -93,7 +93,7 @@ protected:
 	int ignoreContextCounter_;
 };
 
-class ConditionContextSquad : public ConditionContext // ����������� ������ ��� ��������� �������!!!
+class ConditionContextSquad : public ConditionContext // Наследовать только для сквадовых условий!!!
 {
 public:
 	ConditionContextSquad() { squadFilter_ = true; }
@@ -260,7 +260,7 @@ public:
 	AIPlayerScanner(AIPlayerType playerType = AI_PLAYER_TYPE_ME);
 	bool serialize(Archive& ar, const char* name, const char* nameAlt);
 	Player& player(Player& aiPlayer);
-	bool next(Player& aiPlayer); // true, ���� _��_ ��� ������ ��������������
+	bool next(Player& aiPlayer); // true, если _не_ все игроки просканированы
 private:
 	AIPlayerType playerType_;
 	Player* player_;
@@ -806,7 +806,7 @@ private:
 };
 
 //---------------------------------------
-class ConditionSquadSufficientUnits : public ConditionContextSquad // C���� ������� �� ������ � ��������� ����������
+class ConditionSquadSufficientUnits : public ConditionContextSquad // Cквад состоит из юнитов в указанном количестве
 {
 public:
     ConditionSquadSufficientUnits();
@@ -829,7 +829,7 @@ private:
 };
 
 //---------------------------------------
-struct ConditionObjectByLabelExists : Condition // ������ �� ����� ����������
+struct ConditionObjectByLabelExists : Condition // Объект по метке существует
 {
 	bool check() const;
 	void serialize(Archive& ar);
@@ -838,7 +838,7 @@ private:
 	LabelObject anchor_;
 };	
 
-struct ConditionKillObjectByLabel : ConditionEvent // ������ �� ����� ���������
+struct ConditionKillObjectByLabel : ConditionEvent // Объект по метке уничтожен
 {
 	ConditionKillObjectByLabel() 
 	{
@@ -983,7 +983,7 @@ private:
 	mutable UnitReal* unit1_;
 };
 
-struct ConditionTimeMatched : ConditionEvent // �������� ������� ������, ��� �������
+struct ConditionTimeMatched : ConditionEvent // Осталось времени меньше, чем указано
 {
 	int time; 
 	
@@ -995,7 +995,7 @@ struct ConditionTimeMatched : ConditionEvent // �������� ���
 	void serialize(Archive& ar);
 };
 
-struct ConditionNetworkDisconnect : ConditionEvent // ��������� ���������� � ������� ��������
+struct ConditionNetworkDisconnect : ConditionEvent // Разорвано соединение с игровым сервером
 {
 	ConditionNetworkDisconnect() { timeOut_ = 1; hardDisconnect_ = true; }
 	void checkEvent(const Event& event);
@@ -1016,7 +1016,7 @@ private:
 	Keys keys_;
 };
 
-struct ConditionClickOnButton : ConditionEvent // ���� �� ������
+struct ConditionClickOnButton : ConditionEvent // Клик по кнопке
 {
 	ConditionClickOnButton();
 
@@ -1051,7 +1051,7 @@ struct ConditionStatusTimeBase : Condition
 	mutable LogicTimer timer_;
 };
 
-struct ConditionFocusOnButton : ConditionStatusTimeBase // ���� ��� �������
+struct ConditionFocusOnButton : ConditionStatusTimeBase // Мышь над кнопкой
 {
 	ConditionFocusOnButton() : controlPtr_(0) {}
 
@@ -1064,7 +1064,7 @@ private:
 	mutable UI_ControlBase* controlPtr_;
 };
 
-struct ConditionButtonFocus : ConditionEvent // ���� �������� �� ������
+struct ConditionButtonFocus : ConditionEvent // Мышь навелась на кнопку
 {
 	ConditionButtonFocus() : controlPtr_(0), onFocus_(true) {}
 
@@ -1147,7 +1147,7 @@ private:
 	bool pausedByMenu_;
 };
 
-class ConditionUI_ControlState : public ConditionStatusTimeBase // �������� ���������� ��������� ������
+class ConditionUI_ControlState : public ConditionStatusTimeBase // включено оределённое состояние кнопки
 {
 public:
 	ConditionUI_ControlState() : controlPtr_(0), state_(0) { }
@@ -1163,7 +1163,7 @@ private:
 	mutable UI_ControlBase* controlPtr_;
 };
 
-class ConditionUI_StringSelected : public Condition // � ������ ������� ������
+class ConditionUI_StringSelected : public Condition // в списке выбрана строка
 {
 public:
 	ConditionUI_StringSelected() :
@@ -1184,7 +1184,7 @@ private:
 	mutable UI_ControlBase* controlPtr_;
 };
 
-class ConditionUI_ProfilesEmpty : public Condition // ��� �� ������ �������
+class ConditionUI_ProfilesEmpty : public Condition // нет ни одного профиля
 {
 public:
 	ConditionUI_ProfilesEmpty() { }
@@ -1193,7 +1193,7 @@ public:
 	bool allowable(bool forLogic) const { return !forLogic; }
 };
 
-class ConditionUI_ProfileSelected : public Condition // ��� �� ������ �������
+class ConditionUI_ProfileSelected : public Condition // нет ни одного профиля
 {
 public:
 	ConditionUI_ProfileSelected() { }
@@ -1202,7 +1202,7 @@ public:
 	bool allowable(bool forLogic) const { return !forLogic; }
 };
 
-class ConditionUI_NeedDiskOpConfirmation : public Condition // ���� ����������� ���������� �����, ������ ��� ��������.
+class ConditionUI_NeedDiskOpConfirmation : public Condition // надо подтвердить перезапись сэйва, реплея или профайла.
 {
 public:
 	ConditionUI_NeedDiskOpConfirmation(){ }
@@ -1211,7 +1211,7 @@ public:
 };
 
 
-class ConditionNeedCommitSettings : public Condition // ����� ����������� ����� ���������
+class ConditionNeedCommitSettings : public Condition // нужно подтвердить новые настройки
 {
 public:
 	ConditionNeedCommitSettings() { }
@@ -1219,7 +1219,7 @@ public:
 	bool check() const;
 };
 
-struct ConditionOnlyMyClan : Condition // ������� ������ ��� ����
+struct ConditionOnlyMyClan : Condition // Остался только мой клан
 {
 	bool checkAuxPlayers;
 
@@ -1239,7 +1239,7 @@ struct ConditionNoUnitsLeft : Condition
 };
 
 
-struct ConditionDifficultyLevel : Condition // ������� ���������
+struct ConditionDifficultyLevel : Condition // Уровень сложности
 {
 	Difficulty difficulty; 
 
@@ -1313,8 +1313,8 @@ public:
 
 private:
 	AttributeUnitOrBuildingReferences objects_;
-	bool singleOnly; // ������ ����
-	bool uniform; // ������ ������ ����
+	bool singleOnly; // только один
+	bool uniform; // только одного типа
 };
 
 class ConditionUnitSelecting : public ConditionContextEvent
@@ -1342,7 +1342,7 @@ public:
 
 private:
 	AttributeSquadReference attribute;
-	bool singleOnly; // ������ ����
+	bool singleOnly; // только один
 };
 
 

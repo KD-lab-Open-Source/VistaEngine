@@ -22,7 +22,7 @@ public:
 	
 	void setEnabled(bool enable);
 	void SetVolume(float f);
-	/// new_volume - относительная громкость, [0, 1]
+	/// new_volume - РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅР°СЏ РіСЂРѕРјРєРѕСЃС‚СЊ, [0, 1]
 	bool FadeVolume(float time, float newVolume);
 	
 	bool enabled() const { return enabled_; }
@@ -106,16 +106,16 @@ public:
 	bool Stop(bool immediately = false);
 	bool IsPlayed();
 
-	void SetPos(const Vect3f& pos);//Обязательно вызвать до Play
+	void SetPos(const Vect3f& pos);//РћР±СЏР·Р°С‚РµР»СЊРЅРѕ РІС‹Р·РІР°С‚СЊ РґРѕ Play
 	void SetVelocity(const Vect3f& velocity);
-	void SetVolume(float vol);//0..1 учитывает volmin и volume
+	void SetVolume(float vol);//0..1 СѓС‡РёС‚С‹РІР°РµС‚ volmin Рё volume
 	void SetPan(float pan);
 	void SetMute(bool mute);
 
-	////ScriptFrequency - установить относительную 
-	//bool SetFrequency(float frequency);//0..2 - 0 - минимальная, 1 - по умолчанию
+	////ScriptFrequency - СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅСѓСЋ 
+	//bool SetFrequency(float frequency);//0..2 - 0 - РјРёРЅРёРјР°Р»СЊРЅР°СЏ, 1 - РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
-	////SetFrequency - frequency=1..44100 Гц, оригинальная - 0
+	////SetFrequency - frequency=1..44100 Р“С†, РѕСЂРёРіРёРЅР°Р»СЊРЅР°СЏ - 0
 	//bool SetRealFrequency(DWORD frequency);
 	void Destroy();
 protected:

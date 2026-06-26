@@ -27,7 +27,7 @@ namespace kdw{
 	protected:
 		friend class RadioButtonImpl;
 		RadioButtonImpl* window() const;
-		// внутренние функции
+		// РІРЅСѓС‚СЂРµРЅРЅРёРµ С„СѓРЅРєС†РёРё
 		sigslot::signal0 signalChanged_;
 		std::string text_;
 		bool status_;

@@ -26,7 +26,7 @@ public:
 
 	void serialize(Archive& ar);
 protected:
-	// внутренние функции
+	// РІРЅСѓС‚СЂРµРЅРЅРёРµ С„СѓРЅРєС†РёРё
 	CheckBoxImpl* window() const{ return reinterpret_cast<CheckBoxImpl*>(_window()); }
 
 	sigslot::signal0 signalChanged_;

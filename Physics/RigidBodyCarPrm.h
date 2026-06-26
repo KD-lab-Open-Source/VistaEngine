@@ -23,9 +23,9 @@ struct WheelDescriptor
 
 	WheelDescriptor() : frontWheel(false) {}
 	void serialize(Archive& ar) {
-		ar.serialize(nodeLogic, "nodeLogic", "Имя логической ноды");
-		ar.serialize(nodeGraphics, "nodeGraphics", "Имя графической ноды");
-		ar.serialize(frontWheel, "frontWheel", "Переднее колесо");
+		ar.serialize(nodeLogic, "nodeLogic", "РРјСЏ Р»РѕРіРёС‡РµСЃРєРѕР№ РЅРѕРґС‹");
+		ar.serialize(nodeGraphics, "nodeGraphics", "РРјСЏ РіСЂР°С„РёС‡РµСЃРєРѕР№ РЅРѕРґС‹");
+		ar.serialize(frontWheel, "frontWheel", "РџРµСЂРµРґРЅРµРµ РєРѕР»РµСЃРѕ");
 	}
 };
 
@@ -101,18 +101,18 @@ public:
 	}
 	void serialize(Archive& ar) 
 	{
-		ar.serialize(nodeGraphicsSuspension, "nodeGraphicsSuspension", "Имя графической ноды для подвески");
-		ar.serialize(nodeGraphicsWheel, "nodeGraphicsWheel", "Имя графической ноды для колеса");
-		ar.serialize(nodeLogic, "nodeLogic", "Имя логической ноды");
-		ar.serialize(suspentionMovement, "suspentionMovement", "ход подвески (относительно радиуса колеса)");
+		ar.serialize(nodeGraphicsSuspension, "nodeGraphicsSuspension", "РРјСЏ РіСЂР°С„РёС‡РµСЃРєРѕР№ РЅРѕРґС‹ РґР»СЏ РїРѕРґРІРµСЃРєРё");
+		ar.serialize(nodeGraphicsWheel, "nodeGraphicsWheel", "РРјСЏ РіСЂР°С„РёС‡РµСЃРєРѕР№ РЅРѕРґС‹ РґР»СЏ РєРѕР»РµСЃР°");
+		ar.serialize(nodeLogic, "nodeLogic", "РРјСЏ Р»РѕРіРёС‡РµСЃРєРѕР№ РЅРѕРґС‹");
+		ar.serialize(suspentionMovement, "suspentionMovement", "С…РѕРґ РїРѕРґРІРµСЃРєРё (РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ СЂР°РґРёСѓСЃР° РєРѕР»РµСЃР°)");
 		ar.serialize(radius, "radius", 0);
 		ar.serialize(displacement, "displacement", 0);
 		ar.serialize(wheelType, "wheelType", 0);
 		if(ar.isEdit()){
 			bool steeringWheel = (wheelType & STEERING_WHEEL) != 0;
 			bool drivingWheel = (wheelType & DRIVING_WHEEL) != 0;
-			ar.serialize(steeringWheel, "steeringWheel", "Управляемое колесо");
-			ar.serialize(drivingWheel, "drivingWheel", "Ведущее колесо");
+			ar.serialize(steeringWheel, "steeringWheel", "РЈРїСЂР°РІР»СЏРµРјРѕРµ РєРѕР»РµСЃРѕ");
+			ar.serialize(drivingWheel, "drivingWheel", "Р’РµРґСѓС‰РµРµ РєРѕР»РµСЃРѕ");
 			if(steeringWheel)
 				wheelType |= STEERING_WHEEL;
 			else

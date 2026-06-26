@@ -24,14 +24,14 @@ const char* gameOptionsFileName()
 		return "Scripts\\Content\\GameOptions";
 }
 
-WRAP_LIBRARY(GameOptions, "GameOptions", "Игровые опции", gameOptionsFileName(), 0, 0);
+WRAP_LIBRARY(GameOptions, "GameOptions", "РРіСЂРѕРІС‹Рµ РѕРїС†РёРё", gameOptionsFileName(), 0, 0);
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(GameOptions, KindType, "GameOptions::KindType")
-REGISTER_ENUM_ENCLOSED(GameOptions, SYSTEM, "Системные опции");
-REGISTER_ENUM_ENCLOSED(GameOptions, GAME, "Общеигровые опции");
-REGISTER_ENUM_ENCLOSED(GameOptions, GRAPHICS, "Графические настройки");
-REGISTER_ENUM_ENCLOSED(GameOptions, SOUND, "Звуковые настройки");
-REGISTER_ENUM_ENCLOSED(GameOptions, CAMERA, "Опции камеры");
+REGISTER_ENUM_ENCLOSED(GameOptions, SYSTEM, "РЎРёСЃС‚РµРјРЅС‹Рµ РѕРїС†РёРё");
+REGISTER_ENUM_ENCLOSED(GameOptions, GAME, "РћР±С‰РµРёРіСЂРѕРІС‹Рµ РѕРїС†РёРё");
+REGISTER_ENUM_ENCLOSED(GameOptions, GRAPHICS, "Р“СЂР°С„РёС‡РµСЃРєРёРµ РЅР°СЃС‚СЂРѕР№РєРё");
+REGISTER_ENUM_ENCLOSED(GameOptions, SOUND, "Р—РІСѓРєРѕРІС‹Рµ РЅР°СЃС‚СЂРѕР№РєРё");
+REGISTER_ENUM_ENCLOSED(GameOptions, CAMERA, "РћРїС†РёРё РєР°РјРµСЂС‹");
 END_ENUM_DESCRIPTOR_ENCLOSED(GameOptions, KindType)
 
 GameOptions::GameOptions()
@@ -110,7 +110,7 @@ GameOptions::GameOptions()
 	anisatropicFiltering_.push_back(8);
 	anisatropicFiltering_.push_back(16);
 
-	// настройки опций, должны быть заполнены для каждой опции, не сериализуются, не меняются
+	// РЅР°СЃС‚СЂРѕР№РєРё РѕРїС†РёР№, РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ Р·Р°РїРѕР»РЅРµРЅС‹ РґР»СЏ РєР°Р¶РґРѕР№ РѕРїС†РёРё, РЅРµ СЃРµСЂРёР°Р»РёР·СѓСЋС‚СЃСЏ, РЅРµ РјРµРЅСЏСЋС‚СЃСЏ
 	
 	gameOptionPrms_.clear();
 	gameOptionPrms_.resize(OPTION_ENUM_SIZE);
@@ -158,7 +158,7 @@ GameOptions::GameOptions()
 
 	gameOptionPrms_[OPTION_DEBUG_WINDOW]			.set(SYSTEM,	TYPE_BOOL);
 
-	// значения опций по умолчанию, значения сериализуются (новые добавлять нельзя), тип остается неизменным
+	// Р·РЅР°С‡РµРЅРёСЏ РѕРїС†РёР№ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ, Р·РЅР°С‡РµРЅРёСЏ СЃРµСЂРёР°Р»РёР·СѓСЋС‚СЃСЏ (РЅРѕРІС‹Рµ РґРѕР±Р°РІР»СЏС‚СЊ РЅРµР»СЊР·СЏ), С‚РёРї РѕСЃС‚Р°РµС‚СЃСЏ РЅРµРёР·РјРµРЅРЅС‹Рј
 	
 	options_.clear();
 
@@ -174,7 +174,7 @@ GameOptions::GameOptions()
 	options_.push_back(Option(OPTION_CAMERA_UNIT_FOLLOW, true));
 	options_.push_back(Option(OPTION_CAMERA_INVERT_MOUSE, false));
 
-	options_.push_back(Option(OPTION_GAMMA, 0.5f)); // 0.5 при границах (0.25, 1.75) соответствует гамме = 1.0
+	options_.push_back(Option(OPTION_GAMMA, 0.5f)); // 0.5 РїСЂРё РіСЂР°РЅРёС†Р°С… (0.25, 1.75) СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ РіР°РјРјРµ = 1.0
 	options_.push_back(Option(OPTION_MAP_LEVEL_LOD, 0.8f));
 	options_.push_back(Option(OPTION_SHADOW, 2));
 	options_.push_back(Option(OPTION_TILEMAP_DETAIL, true));
@@ -319,7 +319,7 @@ void GameOptions::filterBaseGraphOptions()
 }
 
 void GameOptions::filterGameOptions()
-{ // тут проверять независимые ни от чего настройки, например список языков
+{ // С‚СѓС‚ РїСЂРѕРІРµСЂСЏС‚СЊ РЅРµР·Р°РІРёСЃРёРјС‹Рµ РЅРё РѕС‚ С‡РµРіРѕ РЅР°СЃС‚СЂРѕР№РєРё, РЅР°РїСЂРёРјРµСЂ СЃРїРёСЃРѕРє СЏР·С‹РєРѕРІ
 	OptionPrm& prmLang = gameOptionPrms_[OPTION_LANGUAGE];
 	dassert(locDatas_.size() == prmLang.valid_.size());
 
@@ -353,7 +353,7 @@ void GameOptions::filterGameOptions()
 void GameOptions::Option::serialize(Archive& ar)
 {
 	if(!ar.isEdit())
-		ar.serialize(type_, "type", "&Параметр");
+		ar.serialize(type_, "type", "&РџР°СЂР°РјРµС‚СЂ");
 	else if(GameOptions::instance().presetSerialization_){
 		XBuffer buf(256, 1);
 		int data = 0;
@@ -367,7 +367,7 @@ void GameOptions::Option::serialize(Archive& ar)
 			}
 		--buf; buf < '\0';
 		ComboVectorString lst(buf, data);
-		ar.serialize(lst, "type", "&Параметр");
+		ar.serialize(lst, "type", "&РџР°СЂР°РјРµС‚СЂ");
 		data = lst.value();
 		for(int i = 0; i < OPTION_ENUM_SIZE; ++i)
 			if(GameOptions::instance().gameOptionPrms_[i].type() == GRAPHICS)
@@ -384,7 +384,7 @@ void GameOptions::Option::serialize(Archive& ar)
 		case TYPE_PHASA:{
 			float tmp = data_ / 1000.f;
 			if(GameOptions::instance().presetSerialization_ || !ar.isEdit())
-				ar.serialize(RangedWrapperf(tmp, 0.f, 1.f), "phase", "Значение");
+				ar.serialize(RangedWrapperf(tmp, 0.f, 1.f), "phase", "Р—РЅР°С‡РµРЅРёРµ");
 			else
 				ar.serialize(RangedWrapperf(tmp, 0.f, 1.f), getEnumName(type_), getEnumNameAlt(type_));
 			data_ = round(tmp * 1000.0f);
@@ -400,7 +400,7 @@ void GameOptions::Option::serialize(Archive& ar)
 			}
 			else {
 				bool tmp = data_ ? false : true;
-				ar.serialize(tmp, "flag", "Значение");
+				ar.serialize(tmp, "flag", "Р—РЅР°С‡РµРЅРёРµ");
 				data_ = tmp ? 0 : 1;
 			}
 			break;
@@ -409,7 +409,7 @@ void GameOptions::Option::serialize(Archive& ar)
 			if(ar.isEdit()){
 				if(GameOptions::instance().presetSerialization_){
 					ComboVectorWString lst(GameOptions::instance().gameOptionPrms_[type_].valueList_.c_str(), data_);
-					ar.serialize(lst, "number", "Значение");
+					ar.serialize(lst, "number", "Р—РЅР°С‡РµРЅРёРµ");
 					data_ = max(0, lst.value());
 				}
 				else {
@@ -434,21 +434,21 @@ void GameOptions::Option::serialize(Archive& ar)
 			break;
 
 		default:
-			xxassert(false, "Супер бага");
+			xxassert(false, "РЎСѓРїРµСЂ Р±Р°РіР°");
 		}
 	}
 }
 
 void GameOptions::GameOptionsPreset::serialize(Archive& ar)
 {
-	ar.serialize(locName_, "locName", "(loc) Название пресета");
-	ar.serialize(preset_, "preset", "значения");
+	ar.serialize(locName_, "locName", "(loc) РќР°Р·РІР°РЅРёРµ РїСЂРµСЃРµС‚Р°");
+	ar.serialize(preset_, "preset", "Р·РЅР°С‡РµРЅРёСЏ");
 }
 
 void GameOptions::serializePresets(Archive& ar)
 {
 	presetSerialization_ = true;
-	ar.serialize(presets_, "presets", "Наборы графических настроек");
+	ar.serialize(presets_, "presets", "РќР°Р±РѕСЂС‹ РіСЂР°С„РёС‡РµСЃРєРёС… РЅР°СЃС‚СЂРѕРµРє");
 }
 
 void GameOptions::loadPresets()
@@ -479,7 +479,7 @@ void GameOptions::serializeForEditor(Archive& ar, int groupsMask)
 		const char* nameAlt = groupIt->c_str();
 		int key = descriptor.keyByNameAlt(nameAlt);
 		if(groupsMask & key){
-			if(ar.openBlock(getEnumName<KindType>(KindType(key)), getEnumNameAlt<KindType>(KindType(key)))){ // использовать nameAlt НЕЛЬЗЯ, т.к. openBlock не сохраняет копию строки, только const char*
+			if(ar.openBlock(getEnumName<KindType>(KindType(key)), getEnumNameAlt<KindType>(KindType(key)))){ // РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ nameAlt РќР•Р›Р¬Р—РЇ, С‚.Рє. openBlock РЅРµ СЃРѕС…СЂР°РЅСЏРµС‚ РєРѕРїРёСЋ СЃС‚СЂРѕРєРё, С‚РѕР»СЊРєРѕ const char*
 				Options::iterator it;
 				FOR_EACH(options_, it)
 				if(gameOptionPrms_[it->type_].type() == key)
@@ -531,7 +531,7 @@ int GameOptions::raw2filtered(GameOptionType type, int data) const
 	if(gameOptionPrms_[type].isIndexed()){
 		const OptionPrm& opt = gameOptionPrms_[type];
 
-		// вернуть количество разрешенных настроек вплоть до data 
+		// РІРµСЂРЅСѓС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ СЂР°Р·СЂРµС€РµРЅРЅС‹С… РЅР°СЃС‚СЂРѕРµРє РІРїР»РѕС‚СЊ РґРѕ data 
 		int filtered = 0;
 		for(int raw = 0; raw < opt.valid_.size(); ++raw){
 			if(opt.valid_[raw])
@@ -549,7 +549,7 @@ int GameOptions::raw2filtered(GameOptionType type, int data) const
 int GameOptions::filtered2raw(GameOptionType type, int data) const
 {
 	if(gameOptionPrms_[type].isIndexed()){
-		// вернуть номер N-ой разрешенной настройки
+		// РІРµСЂРЅСѓС‚СЊ РЅРѕРјРµСЂ N-РѕР№ СЂР°Р·СЂРµС€РµРЅРЅРѕР№ РЅР°СЃС‚СЂРѕР№РєРё
 		const OptionPrm& opt = gameOptionPrms_[type];
 		int raw = 0;
 		for(; raw < opt.valid_.size(); ++raw)
@@ -698,7 +698,7 @@ bool GameOptions::getBool(GameOptionType type) const
 	if(const Option *po = getOptionObject(type))
 		return !po->data_;
 
-	xxassert(false, "отсутствует значение для параметра игры");
+	xxassert(false, "РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ Р·РЅР°С‡РµРЅРёРµ РґР»СЏ РїР°СЂР°РјРµС‚СЂР° РёРіСЂС‹");
 	return false;
 }
 
@@ -722,46 +722,46 @@ float GameOptions::getFloat(GameOptionType type) const
 		}
 	}
 
-	xxassert(false, "отсутствует значение для параметра игры");
+	xxassert(false, "РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ Р·РЅР°С‡РµРЅРёРµ РґР»СЏ РїР°СЂР°РјРµС‚СЂР° РёРіСЂС‹");
 	return 0.f;
 }
 
 BEGIN_ENUM_DESCRIPTOR(GameOptionType, "GameOptionType")
-REGISTER_ENUM(OPTION_LANGUAGE, "язык")
-REGISTER_ENUM(OPTION_GAMMA, "гамма")
-REGISTER_ENUM(OPTION_FULL_SCREEN, "полный экран")
-REGISTER_ENUM(OPTION_DEBUG_WINDOW, "отладочное окно")
-REGISTER_ENUM(OPTION_SCREEN_SIZE, "размер экрана")
-REGISTER_ENUM(OPTION_MAP_LEVEL_LOD, "уровень детализации карты")
-REGISTER_ENUM(OPTION_TILEMAP_DETAIL, "использовать мелкодетальную текстуру")
-REGISTER_ENUM(OPTION_TEXTURE_DETAIL_LEVEL, "детальность текстур")
-REGISTER_ENUM(OPTION_SHADOW, "тени")
-REGISTER_ENUM(OPTION_TILEMAP_TYPE_NORMAL, "качество освещения")
-REGISTER_ENUM(OPTION_REFLECTION, "отражения")
-REGISTER_ENUM(OPTION_PARTICLE_RATE, "Интенсивность частиц")
-REGISTER_ENUM(OPTION_BUMP, "включить бамп")
-REGISTER_ENUM(OPTION_FOG_OF_WAR, "туман войны")
-REGISTER_ENUM(OPTION_ANTIALIAS, "качество антиалиасинга")
-REGISTER_ENUM(OPTION_ANISOTROPY, "анизотропная фильтрация")
-REGISTER_ENUM(OPTION_SILHOUETTE, "включить силуэты")
-REGISTER_ENUM(OPTION_SOFT_SMOKE, "сглаживание эффектов")
-REGISTER_ENUM(OPTION_CAMERA_RESTRICTION, "включить ограничение камеры")
-REGISTER_ENUM(OPTION_CAMERA_UNIT_FOLLOW, "привязать камеру к юниту при прямом управлении")
-REGISTER_ENUM(OPTION_CAMERA_UNIT_DOWN_FOLLOW, "привязанный юнит внизу экрана")
-REGISTER_ENUM(OPTION_CAMERA_UNIT_ROTATE, "поворачивать камеру за юнитом")
-REGISTER_ENUM(OPTION_CAMERA_ZOOM_TO_CURSOR, "зум в курсор")
-REGISTER_ENUM(OPTION_CAMERA_INVERT_MOUSE, "инвертировать мышь в прямом управление");
-REGISTER_ENUM(OPTION_SOUND_ENABLE, "включить звуки")
-REGISTER_ENUM(OPTION_SOUND_VOLUME, "громкость звуков")
-REGISTER_ENUM(OPTION_MUSIC_ENABLE, "включить музыку")
-REGISTER_ENUM(OPTION_MUSIC_VOLUME, "громкость музыки")
-REGISTER_ENUM(OPTION_VOICE_ENABLE, "включить звуковые сообщения")
-REGISTER_ENUM(OPTION_VOICE_VOLUME, "громкость звуковых сообщений")
-REGISTER_ENUM(OPTION_SHOW_HINTS, "показывать подсказки")
-REGISTER_ENUM(OPTION_SHOW_MESSAGES, "показывать сообщения")
-REGISTER_ENUM(OPTION_BLOOM,"включить эффект свечения")
-REGISTER_ENUM(OPTION_GRASSDENSITY,"плотность травы")
-REGISTER_ENUM(OPTION_UNIT_SPRITE_SCALE, "маштаб стратегических значков")
-REGISTER_ENUM(OPTION_MIRAGE,"включить эффект миража/подводного колебания")
-REGISTER_ENUM(OPTION_WEATHER,"включить погодные эффекты")
+REGISTER_ENUM(OPTION_LANGUAGE, "СЏР·С‹Рє")
+REGISTER_ENUM(OPTION_GAMMA, "РіР°РјРјР°")
+REGISTER_ENUM(OPTION_FULL_SCREEN, "РїРѕР»РЅС‹Р№ СЌРєСЂР°РЅ")
+REGISTER_ENUM(OPTION_DEBUG_WINDOW, "РѕС‚Р»Р°РґРѕС‡РЅРѕРµ РѕРєРЅРѕ")
+REGISTER_ENUM(OPTION_SCREEN_SIZE, "СЂР°Р·РјРµСЂ СЌРєСЂР°РЅР°")
+REGISTER_ENUM(OPTION_MAP_LEVEL_LOD, "СѓСЂРѕРІРµРЅСЊ РґРµС‚Р°Р»РёР·Р°С†РёРё РєР°СЂС‚С‹")
+REGISTER_ENUM(OPTION_TILEMAP_DETAIL, "РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РјРµР»РєРѕРґРµС‚Р°Р»СЊРЅСѓСЋ С‚РµРєСЃС‚СѓСЂСѓ")
+REGISTER_ENUM(OPTION_TEXTURE_DETAIL_LEVEL, "РґРµС‚Р°Р»СЊРЅРѕСЃС‚СЊ С‚РµРєСЃС‚СѓСЂ")
+REGISTER_ENUM(OPTION_SHADOW, "С‚РµРЅРё")
+REGISTER_ENUM(OPTION_TILEMAP_TYPE_NORMAL, "РєР°С‡РµСЃС‚РІРѕ РѕСЃРІРµС‰РµРЅРёСЏ")
+REGISTER_ENUM(OPTION_REFLECTION, "РѕС‚СЂР°Р¶РµРЅРёСЏ")
+REGISTER_ENUM(OPTION_PARTICLE_RATE, "РРЅС‚РµРЅСЃРёРІРЅРѕСЃС‚СЊ С‡Р°СЃС‚РёС†")
+REGISTER_ENUM(OPTION_BUMP, "РІРєР»СЋС‡РёС‚СЊ Р±Р°РјРї")
+REGISTER_ENUM(OPTION_FOG_OF_WAR, "С‚СѓРјР°РЅ РІРѕР№РЅС‹")
+REGISTER_ENUM(OPTION_ANTIALIAS, "РєР°С‡РµСЃС‚РІРѕ Р°РЅС‚РёР°Р»РёР°СЃРёРЅРіР°")
+REGISTER_ENUM(OPTION_ANISOTROPY, "Р°РЅРёР·РѕС‚СЂРѕРїРЅР°СЏ С„РёР»СЊС‚СЂР°С†РёСЏ")
+REGISTER_ENUM(OPTION_SILHOUETTE, "РІРєР»СЋС‡РёС‚СЊ СЃРёР»СѓСЌС‚С‹")
+REGISTER_ENUM(OPTION_SOFT_SMOKE, "СЃРіР»Р°Р¶РёРІР°РЅРёРµ СЌС„С„РµРєС‚РѕРІ")
+REGISTER_ENUM(OPTION_CAMERA_RESTRICTION, "РІРєР»СЋС‡РёС‚СЊ РѕРіСЂР°РЅРёС‡РµРЅРёРµ РєР°РјРµСЂС‹")
+REGISTER_ENUM(OPTION_CAMERA_UNIT_FOLLOW, "РїСЂРёРІСЏР·Р°С‚СЊ РєР°РјРµСЂСѓ Рє СЋРЅРёС‚Сѓ РїСЂРё РїСЂСЏРјРѕРј СѓРїСЂР°РІР»РµРЅРёРё")
+REGISTER_ENUM(OPTION_CAMERA_UNIT_DOWN_FOLLOW, "РїСЂРёРІСЏР·Р°РЅРЅС‹Р№ СЋРЅРёС‚ РІРЅРёР·Сѓ СЌРєСЂР°РЅР°")
+REGISTER_ENUM(OPTION_CAMERA_UNIT_ROTATE, "РїРѕРІРѕСЂР°С‡РёРІР°С‚СЊ РєР°РјРµСЂСѓ Р·Р° СЋРЅРёС‚РѕРј")
+REGISTER_ENUM(OPTION_CAMERA_ZOOM_TO_CURSOR, "Р·СѓРј РІ РєСѓСЂСЃРѕСЂ")
+REGISTER_ENUM(OPTION_CAMERA_INVERT_MOUSE, "РёРЅРІРµСЂС‚РёСЂРѕРІР°С‚СЊ РјС‹С€СЊ РІ РїСЂСЏРјРѕРј СѓРїСЂР°РІР»РµРЅРёРµ");
+REGISTER_ENUM(OPTION_SOUND_ENABLE, "РІРєР»СЋС‡РёС‚СЊ Р·РІСѓРєРё")
+REGISTER_ENUM(OPTION_SOUND_VOLUME, "РіСЂРѕРјРєРѕСЃС‚СЊ Р·РІСѓРєРѕРІ")
+REGISTER_ENUM(OPTION_MUSIC_ENABLE, "РІРєР»СЋС‡РёС‚СЊ РјСѓР·С‹РєСѓ")
+REGISTER_ENUM(OPTION_MUSIC_VOLUME, "РіСЂРѕРјРєРѕСЃС‚СЊ РјСѓР·С‹РєРё")
+REGISTER_ENUM(OPTION_VOICE_ENABLE, "РІРєР»СЋС‡РёС‚СЊ Р·РІСѓРєРѕРІС‹Рµ СЃРѕРѕР±С‰РµРЅРёСЏ")
+REGISTER_ENUM(OPTION_VOICE_VOLUME, "РіСЂРѕРјРєРѕСЃС‚СЊ Р·РІСѓРєРѕРІС‹С… СЃРѕРѕР±С‰РµРЅРёР№")
+REGISTER_ENUM(OPTION_SHOW_HINTS, "РїРѕРєР°Р·С‹РІР°С‚СЊ РїРѕРґСЃРєР°Р·РєРё")
+REGISTER_ENUM(OPTION_SHOW_MESSAGES, "РїРѕРєР°Р·С‹РІР°С‚СЊ СЃРѕРѕР±С‰РµРЅРёСЏ")
+REGISTER_ENUM(OPTION_BLOOM,"РІРєР»СЋС‡РёС‚СЊ СЌС„С„РµРєС‚ СЃРІРµС‡РµРЅРёСЏ")
+REGISTER_ENUM(OPTION_GRASSDENSITY,"РїР»РѕС‚РЅРѕСЃС‚СЊ С‚СЂР°РІС‹")
+REGISTER_ENUM(OPTION_UNIT_SPRITE_SCALE, "РјР°С€С‚Р°Р± СЃС‚СЂР°С‚РµРіРёС‡РµСЃРєРёС… Р·РЅР°С‡РєРѕРІ")
+REGISTER_ENUM(OPTION_MIRAGE,"РІРєР»СЋС‡РёС‚СЊ СЌС„С„РµРєС‚ РјРёСЂР°Р¶Р°/РїРѕРґРІРѕРґРЅРѕРіРѕ РєРѕР»РµР±Р°РЅРёСЏ")
+REGISTER_ENUM(OPTION_WEATHER,"РІРєР»СЋС‡РёС‚СЊ РїРѕРіРѕРґРЅС‹Рµ СЌС„С„РµРєС‚С‹")
 END_ENUM_DESCRIPTOR(GameOptionType)

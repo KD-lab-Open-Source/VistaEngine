@@ -10,7 +10,7 @@ inline void BaseGraphObject::MTAccess()
 }
 
 class cIUnkObj : public BaseGraphObject
-{ // базовый класс объектов
+{ // Р±Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ РѕР±СЉРµРєС‚РѕРІ
 public:
 	cIUnkObj(int kind);
 	virtual ~cIUnkObj();
@@ -19,11 +19,11 @@ public:
 	void SetPosition(const Se3f& pos){MatXf m(pos);SetPosition(m);}
 	const MatXf& GetPosition() const { return GlobalMatrix; }
 
-	// инлайновые функции доступа к переменным
+	// РёРЅР»Р°Р№РЅРѕРІС‹Рµ С„СѓРЅРєС†РёРё РґРѕСЃС‚СѓРїР° Рє РїРµСЂРµРјРµРЅРЅС‹Рј
 	const MatXf& GetGlobalMatrix() const						{ return GlobalMatrix; }
 
 protected:
-	// глобальная матрица объекта, относительно мировых координат
+	// РіР»РѕР±Р°Р»СЊРЅР°СЏ РјР°С‚СЂРёС†Р° РѕР±СЉРµРєС‚Р°, РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РјРёСЂРѕРІС‹С… РєРѕРѕСЂРґРёРЅР°С‚
 	MatXf			GlobalMatrix;	
 
 };

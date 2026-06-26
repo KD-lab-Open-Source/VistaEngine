@@ -223,9 +223,9 @@ void FreeDirectInput()
 
 void JoystickControlSetup::serialize(Archive& ar)
 {
-	ar.serialize(controlID_, "controlID", "контрол");
+	ar.serialize(controlID_, "controlID", "РєРѕРЅС‚СЂРѕР»");
 	if(JoystickSetup::isAxisControl(controlID_))
-		ar.serialize(pressMode_, "pressMode", "режим обработки");
+		ar.serialize(pressMode_, "pressMode", "СЂРµР¶РёРј РѕР±СЂР°Р±РѕС‚РєРё");
 }
 
 JoystickState::JoystickState()
@@ -290,57 +290,57 @@ JoystickSetup::JoystickSetup()
 
 void JoystickSetup::serialize(Archive& ar)
 {
-	ar.serialize(enable_, "enable", "Разрешить управление джойстиком");
+	ar.serialize(enable_, "enable", "Р Р°Р·СЂРµС€РёС‚СЊ СѓРїСЂР°РІР»РµРЅРёРµ РґР¶РѕР№СЃС‚РёРєРѕРј");
 
-	if(ar.openBlock("Controls", "Настройки управления")){
+	if(ar.openBlock("Controls", "РќР°СЃС‚СЂРѕР№РєРё СѓРїСЂР°РІР»РµРЅРёСЏ")){
 		for(int i = 0; i < JOY_GAME_CONTROL_MAX; i++)
 			ar.serialize(controls_[i], getEnumName(JoystickGameControlID(i)), getEnumNameAlt(JoystickGameControlID(i)));
 		ar.closeBlock();
 	}
 
-	ar.serialize(RangedWrapperi(axisDeltaMin_, 0, 1000), "axisDeltaMin", "минимальное фиксируемое отклонение оси");
-	ar.serialize(cameraTurnSpeed_, "cameraTurnSpeed", "коэффициент скорости поворота камеры");
+	ar.serialize(RangedWrapperi(axisDeltaMin_, 0, 1000), "axisDeltaMin", "РјРёРЅРёРјР°Р»СЊРЅРѕРµ С„РёРєСЃРёСЂСѓРµРјРѕРµ РѕС‚РєР»РѕРЅРµРЅРёРµ РѕСЃРё");
+	ar.serialize(cameraTurnSpeed_, "cameraTurnSpeed", "РєРѕСЌС„С„РёС†РёРµРЅС‚ СЃРєРѕСЂРѕСЃС‚Рё РїРѕРІРѕСЂРѕС‚Р° РєР°РјРµСЂС‹");
 }
 
 BEGIN_ENUM_DESCRIPTOR(JoystickControlID, "JoystickControlID")
-REGISTER_ENUM(JOY_AXIS_X, "Ось X");
-REGISTER_ENUM(JOY_AXIS_Y, "Ось Y");
-REGISTER_ENUM(JOY_AXIS_Z, "Ось Z");
-REGISTER_ENUM(JOY_AXIS_X_ROT, "Вращение вокруг оси X");
-REGISTER_ENUM(JOY_AXIS_Y_ROT, "Вращение вокруг оси Y");
-REGISTER_ENUM(JOY_AXIS_Z_ROT, "Вращение вокруг оси Z");
-REGISTER_ENUM(JOY_BUTTON_01, "Кнопка 1");
-REGISTER_ENUM(JOY_BUTTON_02, "Кнопка 2");
-REGISTER_ENUM(JOY_BUTTON_03, "Кнопка 3");
-REGISTER_ENUM(JOY_BUTTON_04, "Кнопка 4");
-REGISTER_ENUM(JOY_BUTTON_05, "Кнопка 5");
-REGISTER_ENUM(JOY_BUTTON_06, "Кнопка 6");
-REGISTER_ENUM(JOY_BUTTON_07, "Кнопка 7");
-REGISTER_ENUM(JOY_BUTTON_08, "Кнопка 8");
-REGISTER_ENUM(JOY_BUTTON_09, "Кнопка 9");
-REGISTER_ENUM(JOY_BUTTON_10, "Кнопка 10");
-REGISTER_ENUM(JOY_BUTTON_11, "Кнопка 11");
-REGISTER_ENUM(JOY_BUTTON_12, "Кнопка 12");
-REGISTER_ENUM(JOY_BUTTON_13, "Кнопка 13");
-REGISTER_ENUM(JOY_BUTTON_14, "Кнопка 14");
-REGISTER_ENUM(JOY_BUTTON_15, "Кнопка 15");
-REGISTER_ENUM(JOY_BUTTON_16, "Кнопка 16");
+REGISTER_ENUM(JOY_AXIS_X, "РћСЃСЊ X");
+REGISTER_ENUM(JOY_AXIS_Y, "РћСЃСЊ Y");
+REGISTER_ENUM(JOY_AXIS_Z, "РћСЃСЊ Z");
+REGISTER_ENUM(JOY_AXIS_X_ROT, "Р’СЂР°С‰РµРЅРёРµ РІРѕРєСЂСѓРі РѕСЃРё X");
+REGISTER_ENUM(JOY_AXIS_Y_ROT, "Р’СЂР°С‰РµРЅРёРµ РІРѕРєСЂСѓРі РѕСЃРё Y");
+REGISTER_ENUM(JOY_AXIS_Z_ROT, "Р’СЂР°С‰РµРЅРёРµ РІРѕРєСЂСѓРі РѕСЃРё Z");
+REGISTER_ENUM(JOY_BUTTON_01, "РљРЅРѕРїРєР° 1");
+REGISTER_ENUM(JOY_BUTTON_02, "РљРЅРѕРїРєР° 2");
+REGISTER_ENUM(JOY_BUTTON_03, "РљРЅРѕРїРєР° 3");
+REGISTER_ENUM(JOY_BUTTON_04, "РљРЅРѕРїРєР° 4");
+REGISTER_ENUM(JOY_BUTTON_05, "РљРЅРѕРїРєР° 5");
+REGISTER_ENUM(JOY_BUTTON_06, "РљРЅРѕРїРєР° 6");
+REGISTER_ENUM(JOY_BUTTON_07, "РљРЅРѕРїРєР° 7");
+REGISTER_ENUM(JOY_BUTTON_08, "РљРЅРѕРїРєР° 8");
+REGISTER_ENUM(JOY_BUTTON_09, "РљРЅРѕРїРєР° 9");
+REGISTER_ENUM(JOY_BUTTON_10, "РљРЅРѕРїРєР° 10");
+REGISTER_ENUM(JOY_BUTTON_11, "РљРЅРѕРїРєР° 11");
+REGISTER_ENUM(JOY_BUTTON_12, "РљРЅРѕРїРєР° 12");
+REGISTER_ENUM(JOY_BUTTON_13, "РљРЅРѕРїРєР° 13");
+REGISTER_ENUM(JOY_BUTTON_14, "РљРЅРѕРїРєР° 14");
+REGISTER_ENUM(JOY_BUTTON_15, "РљРЅРѕРїРєР° 15");
+REGISTER_ENUM(JOY_BUTTON_16, "РљРЅРѕРїРєР° 16");
 REGISTER_ENUM(JOY_BUTTON_POV1, "POV");
 END_ENUM_DESCRIPTOR(JoystickControlID)
 
 BEGIN_ENUM_DESCRIPTOR(JoystickGameControlID, "JoystickGameControls")
-REGISTER_ENUM(JOY_MOVEMENT_X, "движение вправо/влево")
-REGISTER_ENUM(JOY_MOVEMENT_Y, "движение вперёд/назад")
-REGISTER_ENUM(JOY_CAMERA_X, "поворот камеры по горизонтали")
-REGISTER_ENUM(JOY_CAMERA_Y, "поворот камеры по вертикали")
-REGISTER_ENUM(JOY_PRIMARY_WEAPON, "выстрел основным оружием")
-REGISTER_ENUM(JOY_SECONDARY_WEAPON, "выстрел второстепенным оружием")
-REGISTER_ENUM(JOY_PREV_WEAPON, "предыдущее оружие")
-REGISTER_ENUM(JOY_NEXT_WEAPON, "следующее оружие")
+REGISTER_ENUM(JOY_MOVEMENT_X, "РґРІРёР¶РµРЅРёРµ РІРїСЂР°РІРѕ/РІР»РµРІРѕ")
+REGISTER_ENUM(JOY_MOVEMENT_Y, "РґРІРёР¶РµРЅРёРµ РІРїРµСЂС‘Рґ/РЅР°Р·Р°Рґ")
+REGISTER_ENUM(JOY_CAMERA_X, "РїРѕРІРѕСЂРѕС‚ РєР°РјРµСЂС‹ РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё")
+REGISTER_ENUM(JOY_CAMERA_Y, "РїРѕРІРѕСЂРѕС‚ РєР°РјРµСЂС‹ РїРѕ РІРµСЂС‚РёРєР°Р»Рё")
+REGISTER_ENUM(JOY_PRIMARY_WEAPON, "РІС‹СЃС‚СЂРµР» РѕСЃРЅРѕРІРЅС‹Рј РѕСЂСѓР¶РёРµРј")
+REGISTER_ENUM(JOY_SECONDARY_WEAPON, "РІС‹СЃС‚СЂРµР» РІС‚РѕСЂРѕСЃС‚РµРїРµРЅРЅС‹Рј РѕСЂСѓР¶РёРµРј")
+REGISTER_ENUM(JOY_PREV_WEAPON, "РїСЂРµРґС‹РґСѓС‰РµРµ РѕСЂСѓР¶РёРµ")
+REGISTER_ENUM(JOY_NEXT_WEAPON, "СЃР»РµРґСѓСЋС‰РµРµ РѕСЂСѓР¶РёРµ")
 END_ENUM_DESCRIPTOR(JoystickGameControlID)
 
 BEGIN_ENUM_DESCRIPTOR(JoystickAxisMode, "JoystickAxisMode")
-REGISTER_ENUM(JOY_AXIS_NORMAL, "отклонение в любую сторону")
-REGISTER_ENUM(JOY_AXIS_NEGATIVE, "отклонение в минус")
-REGISTER_ENUM(JOY_AXIS_POSITIVE, "отклонение в плюс")
+REGISTER_ENUM(JOY_AXIS_NORMAL, "РѕС‚РєР»РѕРЅРµРЅРёРµ РІ Р»СЋР±СѓСЋ СЃС‚РѕСЂРѕРЅСѓ")
+REGISTER_ENUM(JOY_AXIS_NEGATIVE, "РѕС‚РєР»РѕРЅРµРЅРёРµ РІ РјРёРЅСѓСЃ")
+REGISTER_ENUM(JOY_AXIS_POSITIVE, "РѕС‚РєР»РѕРЅРµРЅРёРµ РІ РїР»СЋСЃ")
 END_ENUM_DESCRIPTOR(JoystickAxisMode)

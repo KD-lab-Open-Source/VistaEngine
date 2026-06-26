@@ -42,7 +42,7 @@ public:
 	void updateTile(int x, int y);
 	void updateRect(int x1, int y1, int dx, int dy);
 
-	//Callback для воды
+	//Callback РґР»СЏ РІРѕРґС‹
 	friend void waterChangePF(int x, int y);
 	friend void iceChangePF(int x, int y);
 

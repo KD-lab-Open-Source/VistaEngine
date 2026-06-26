@@ -7,7 +7,7 @@
 const float MAX_MEGA_PROCEDUR_MAP_OPERATION=1000.f;
 class Archive;
 
-enum PMOperationID { // не забывайте регистрировать!
+enum PMOperationID { // РЅРµ Р·Р°Р±С‹РІР°Р№С‚Рµ СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊ!
 	PMO_ID_NONE,
 	PMO_ID_TOOLZER,
 	PMO_ID_SQUARE_TOOLZER,

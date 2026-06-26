@@ -175,11 +175,11 @@ void UI_ActionDataBase<controlMode>::serialize(Archive& ar)
 {
 	if(controlMode & UI_USER_ACTION_MASK){
 		BitVector<UI_UserSelectEvent> events = actionModeTypes_ & UI_USER_ACTION_MASK;
-		ar.serialize(events, "mouseEvents", "События");
+		ar.serialize(events, "mouseEvents", "РЎРѕР±С‹С‚РёСЏ");
 		actionModeTypes_ = actionModeTypes_ & ~UI_USER_ACTION_MASK | events;
 
 		BitVector<UI_UserEventMouseModifers> modifers = actionModeModifers_;
-		ar.serialize(modifers, "mouseEventsModifers", "Модификаторы");
+		ar.serialize(modifers, "mouseEventsModifers", "РњРѕРґРёС„РёРєР°С‚РѕСЂС‹");
 		actionModeModifers_ = modifers;
 	}
 }
@@ -190,35 +190,35 @@ void UI_DataStateMark::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(type_, "type", "Тип пометки");
+	ar.serialize(type_, "type", "РўРёРї РїРѕРјРµС‚РєРё");
 	switch(type_){
 	case UI_STATE_MARK_UNIT_SELF_ATTACK:{
 		AutoAttackMode mode = AutoAttackMode(enumValue_);
-		ar.serialize(mode, "mode", "Режим");
+		ar.serialize(mode, "mode", "Р РµР¶РёРј");
 		enumValue_ = mode;
 		break;
 										}
 	case UI_STATE_MARK_UNIT_WEAPON_MODE:{
 		WeaponMode mode = WeaponMode(enumValue_);
-		ar.serialize(mode, "mode", "Режим");
+		ar.serialize(mode, "mode", "Р РµР¶РёРј");
 		enumValue_ = mode;
 		break;
 										}
 	case UI_STATE_MARK_UNIT_WALK_ATTACK_MODE:{
 		WalkAttackMode mode = WalkAttackMode(enumValue_);
-		ar.serialize(mode, "mode", "Режим");
+		ar.serialize(mode, "mode", "Р РµР¶РёРј");
 		enumValue_ = mode;
 		break;
 											 }
 	case UI_STATE_MARK_UNIT_AUTO_TARGET_FILTER:{
 		AutoTargetFilter mode = AutoTargetFilter(enumValue_);
-		ar.serialize(mode, "mode", "Режим");
+		ar.serialize(mode, "mode", "Р РµР¶РёРј");
 		enumValue_ = mode;
 		break;
 											   }
 	case UI_STATE_MARK_DIRECT_CONTROL_CURSOR:{
 		UI_DirectControlCursorType mode = UI_DirectControlCursorType(enumValue_);
-		ar.serialize(mode, "mode", "Режим");
+		ar.serialize(mode, "mode", "Р РµР¶РёРј");
 		enumValue_ = mode;
 		break;
 											 }
@@ -229,12 +229,12 @@ void UI_ActionDataHoverInfo::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(type_, "type", "тип подсказки");
+	ar.serialize(type_, "type", "С‚РёРї РїРѕРґСЃРєР°Р·РєРё");
 	if(ar.isEdit())
-		ar.serialize(text_, "text", "Ключ");
+		ar.serialize(text_, "text", "РљР»СЋС‡");
 	else
 		text_.serialize(ar);
-	ar.serialize(cursor_, "cursor", "курсор при наведении");
+	ar.serialize(cursor_, "cursor", "РєСѓСЂСЃРѕСЂ РїСЂРё РЅР°РІРµРґРµРЅРёРё");
 }
 
 
@@ -242,16 +242,16 @@ void UI_ActionDataLinkToAnchor::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(linkToSelected_, "linkToSelected", "Привязать к выделенному");
+	ar.serialize(linkToSelected_, "linkToSelected", "РџСЂРёРІСЏР·Р°С‚СЊ Рє РІС‹РґРµР»РµРЅРЅРѕРјСѓ");
 	if(!linkToSelected_)
-		ar.serialize(linkName_, "linkName", "Метка объекта для привязки");
+		ar.serialize(linkName_, "linkName", "РњРµС‚РєР° РѕР±СЉРµРєС‚Р° РґР»СЏ РїСЂРёРІСЏР·РєРё");
 }
 
 void UI_ActionDataLinkToMouse::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(shift_, "shift", "Сдвиг в пикселах");
+	ar.serialize(shift_, "shift", "РЎРґРІРёРі РІ РїРёРєСЃРµР»Р°С…");
 }
 
 void UI_ActionDataLinkToParent::serialize(Archive& ar)
@@ -264,8 +264,8 @@ void UI_ActionDataHotKey::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(hotKey_, "hotKey", "Кнопка");
-	ar.serialize(compatibleHotKey_, "compatibleHotKey", "Mожет совпадать с кнопками управления");
+	ar.serialize(hotKey_, "hotKey", "РљРЅРѕРїРєР°");
+	ar.serialize(compatibleHotKey_, "compatibleHotKey", "MРѕР¶РµС‚ СЃРѕРІРїР°РґР°С‚СЊ СЃ РєРЅРѕРїРєР°РјРё СѓРїСЂР°РІР»РµРЅРёСЏ");
 }
 
 // ------------------- UI_ActionDataSaveGameList
@@ -282,14 +282,14 @@ void UI_ActionDataSaveGameList::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(shareList_, "shareList", "Общий список");
+	ar.serialize(shareList_, "shareList", "РћР±С‰РёР№ СЃРїРёСЃРѕРє");
 	if(shareList_)
 		autoType_ = false;
 	else
-		ar.serialize(autoType_, "autoType", "Автоматический тип сейва");
+		ar.serialize(autoType_, "autoType", "РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРёР№ С‚РёРї СЃРµР№РІР°");
 	if(!autoType_)
-		ar.serialize(gameType_, "gameType", "тип игры");
-	ar.serialize(resetSaveGameName_, "resetSaveGameName", "При выборе копировать в поле ввода имени");
+		ar.serialize(gameType_, "gameType", "С‚РёРї РёРіСЂС‹");
+	ar.serialize(resetSaveGameName_, "resetSaveGameName", "РџСЂРё РІС‹Р±РѕСЂРµ РєРѕРїРёСЂРѕРІР°С‚СЊ РІ РїРѕР»Рµ РІРІРѕРґР° РёРјРµРЅРё");
 }
 
 UI_ActionDataSaveGameListFixed::UI_ActionDataSaveGameListFixed()
@@ -304,9 +304,9 @@ void UI_ActionDataSaveGameListFixed::serialize(Archive& ar)
 	__super::serialize(ar);
 
 	if(!autoType_){
-		ar.serialize(inheritPredefine_, "inheritPredefine", "Наследовать фиксацию настроек");
+		ar.serialize(inheritPredefine_, "inheritPredefine", "РќР°СЃР»РµРґРѕРІР°С‚СЊ С„РёРєСЃР°С†РёСЋ РЅР°СЃС‚СЂРѕРµРє");
 		if(!inheritPredefine_)
-			ar.serialize(setPredefine_, "setPredefine", "Выставить predefine настройки при выборе");
+			ar.serialize(setPredefine_, "setPredefine", "Р’С‹СЃС‚Р°РІРёС‚СЊ predefine РЅР°СЃС‚СЂРѕР№РєРё РїСЂРё РІС‹Р±РѕСЂРµ");
 	}
 	else
 		inheritPredefine_ = true;
@@ -318,8 +318,8 @@ void UI_ActionDataHostList::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(format_, "showGameListFormat", "Столбцы информации об играх");
-	ar.serialize(startedGameColor_, "startedGameColor", "Цвет строчки с запущенной игрой");
+	ar.serialize(format_, "showGameListFormat", "РЎС‚РѕР»Р±С†С‹ РёРЅС„РѕСЂРјР°С†РёРё РѕР± РёРіСЂР°С…");
+	ar.serialize(startedGameColor_, "startedGameColor", "Р¦РІРµС‚ СЃС‚СЂРѕС‡РєРё СЃ Р·Р°РїСѓС‰РµРЅРЅРѕР№ РёРіСЂРѕР№");
 }
 
 
@@ -338,11 +338,11 @@ void UI_ActionDataPlayer::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(useLoadedMission_, "useLoadedMission", "Использовать загруженную миссию");
-	ar.serialize(playerIndex_, "playerIndex", "&Номер команды");
-	ar.serialize(RangedWrapperi(teamIndex_, 0, NETWORK_TEAM_MAX), "teamIndex", "&Номер в команде");
+	ar.serialize(useLoadedMission_, "useLoadedMission", "РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ Р·Р°РіСЂСѓР¶РµРЅРЅСѓСЋ РјРёСЃСЃРёСЋ");
+	ar.serialize(playerIndex_, "playerIndex", "&РќРѕРјРµСЂ РєРѕРјР°РЅРґС‹");
+	ar.serialize(RangedWrapperi(teamIndex_, 0, NETWORK_TEAM_MAX), "teamIndex", "&РќРѕРјРµСЂ РІ РєРѕРјР°РЅРґРµ");
 	ar.serialize(readOnly_, "nameInput", "Read only");
-	ar.serialize(onlyOperateControl_, "onlyOperateControl", "Только управлять видимостью кнопки");
+	ar.serialize(onlyOperateControl_, "onlyOperateControl", "РўРѕР»СЊРєРѕ СѓРїСЂР°РІР»СЏС‚СЊ РІРёРґРёРјРѕСЃС‚СЊСЋ РєРЅРѕРїРєРё");
 }
 
 // -------------------  UI_ActionPlayerStatistic
@@ -356,10 +356,10 @@ UI_ActionPlayerStatistic::UI_ActionPlayerStatistic()
 
 void UI_ActionPlayerStatistic::serialize(Archive& ar)
 {
-	ar.serialize(statisticType_, "statisticType", "источник статистики");
+	ar.serialize(statisticType_, "statisticType", "РёСЃС‚РѕС‡РЅРёРє СЃС‚Р°С‚РёСЃС‚РёРєРё");
 	if(statisticType_ == LOCAL)
-		ar.serialize(playerIndex_, "playerIndex", "&номер игрока");
-	ar.serialize(type_, "type", "&параметр статистики");
+		ar.serialize(playerIndex_, "playerIndex", "&РЅРѕРјРµСЂ РёРіСЂРѕРєР°");
+	ar.serialize(type_, "type", "&РїР°СЂР°РјРµС‚СЂ СЃС‚Р°С‚РёСЃС‚РёРєРё");
 }
 
 // -------------------  UI_ActionDataSelectPlayer
@@ -368,7 +368,7 @@ void UI_ActionDataSelectPlayer::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(byRaceName_, "byRaceName", "Выбирать по имени расы");
+	ar.serialize(byRaceName_, "byRaceName", "Р’С‹Р±РёСЂР°С‚СЊ РїРѕ РёРјРµРЅРё СЂР°СЃС‹");
 }
 
 // -------------------  UI_ActionDataPlayerParameter
@@ -377,8 +377,8 @@ void UI_ActionDataPlayerParameter::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(parameter_, "parameter", "&параметр");
-	ar.serialize(maxValue_, "maxValue", "максимальное значение для рассчета фазы");
+	ar.serialize(parameter_, "parameter", "&РїР°СЂР°РјРµС‚СЂ");
+	ar.serialize(maxValue_, "maxValue", "РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РґР»СЏ СЂР°СЃСЃС‡РµС‚Р° С„Р°Р·С‹");
 }
 
 // -------------------  UI_ActionDataPlayerDefParameter
@@ -387,7 +387,7 @@ void UI_ActionDataPlayerDefParameter::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(parameter_, "parameter", "&параметр");
+	ar.serialize(parameter_, "parameter", "&РїР°СЂР°РјРµС‚СЂ");
 }
 
 // -------------------  UI_ActionDataUnitParameter
@@ -438,15 +438,15 @@ void UI_ActionDataUnitParameter::serialize(Archive& ar)
 	__super::serialize(ar);
 
 	///  CONVERSION 2007-10-16
-	if(!ar.serialize(unitType_, "unitType", "У кого берем значение")){
-		ar.serialize(attributeReference_, "attributeReference", "&юнит");
+	if(!ar.serialize(unitType_, "unitType", "РЈ РєРѕРіРѕ Р±РµСЂРµРј Р·РЅР°С‡РµРЅРёРµ")){
+		ar.serialize(attributeReference_, "attributeReference", "&СЋРЅРёС‚");
 	
 		if(!attributeReference_.get()){
 			bool forPlayerUnit;
-			ar.serialize(forPlayerUnit, "forPlayerUnit", "Для юнита-игрока");
+			ar.serialize(forPlayerUnit, "forPlayerUnit", "Р”Р»СЏ СЋРЅРёС‚Р°-РёРіСЂРѕРєР°");
 			if(!forPlayerUnit){
 				bool useUnitList;
-				ar.serialize(useUnitList, "useUnitList", "брать юнита из списка селекта");
+				ar.serialize(useUnitList, "useUnitList", "Р±СЂР°С‚СЊ СЋРЅРёС‚Р° РёР· СЃРїРёСЃРєР° СЃРµР»РµРєС‚Р°");
 				if(useUnitList)
 					unitType_ = UNIT_LIST;
 				else
@@ -461,18 +461,18 @@ void UI_ActionDataUnitParameter::serialize(Archive& ar)
 	else 
 	/// ^^^^^
 		if(unitType_ == SPECIFIC)
-			ar.serialize(attributeReference_, "attributeReference", "&юнит");
+			ar.serialize(attributeReference_, "attributeReference", "&СЋРЅРёС‚");
 	
-	ar.serialize(type_, "type", "&вид параметра");
+	ar.serialize(type_, "type", "&РІРёРґ РїР°СЂР°РјРµС‚СЂР°");
 	if(type_ == LOGIC){
-		ar.serialize(parameter_, "parameter", "&личный параметр");
-		ar.serialize(maxValue_, "maxValue", "максимальное значение для рассчета фазы");
+		ar.serialize(parameter_, "parameter", "&Р»РёС‡РЅС‹Р№ РїР°СЂР°РјРµС‚СЂ");
+		ar.serialize(maxValue_, "maxValue", "РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РґР»СЏ СЂР°СЃСЃС‡РµС‚Р° С„Р°Р·С‹");
 	}
 
-	ar.serialize(onIncrease_, "onIncrease", "Показывать при увеличении");
-	ar.serialize(onDecrease_, "onDecrease", "Показывать при уменьшении");
+	ar.serialize(onIncrease_, "onIncrease", "РџРѕРєР°Р·С‹РІР°С‚СЊ РїСЂРё СѓРІРµР»РёС‡РµРЅРёРё");
+	ar.serialize(onDecrease_, "onDecrease", "РџРѕРєР°Р·С‹РІР°С‚СЊ РїСЂРё СѓРјРµРЅСЊС€РµРЅРёРё");
 	if(onIncrease_ || onDecrease_)
-		ar.serialize(showTime_, "showTime", "Время показа после события");
+		ar.serialize(showTime_, "showTime", "Р’СЂРµРјСЏ РїРѕРєР°Р·Р° РїРѕСЃР»Рµ СЃРѕР±С‹С‚РёСЏ");
 }
 
 // -------------------  UI_ActionDataUnitHint
@@ -480,10 +480,10 @@ void UI_ActionDataUnitParameter::serialize(Archive& ar)
 void UI_ActionDataUnitHint::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(hintType_, "hintType", "тип подсказки");
-	ar.serialize(unitType_, "unitType", "тип юнита");
-	ar.serialize(showDelay, "showDelay", "Задержка показа");
-	ar.serialize(line_, "line", "Номер строки описания");
+	ar.serialize(hintType_, "hintType", "С‚РёРї РїРѕРґСЃРєР°Р·РєРё");
+	ar.serialize(unitType_, "unitType", "С‚РёРї СЋРЅРёС‚Р°");
+	ar.serialize(showDelay, "showDelay", "Р—Р°РґРµСЂР¶РєР° РїРѕРєР°Р·Р°");
+	ar.serialize(line_, "line", "РќРѕРјРµСЂ СЃС‚СЂРѕРєРё РѕРїРёСЃР°РЅРёСЏ");
 }
 
 // -------------------  UI_ActionDataControlHint
@@ -491,8 +491,8 @@ void UI_ActionDataUnitHint::serialize(Archive& ar)
 void UI_ActionDataControlHint::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(type_, "type", "тип подсказки");
-	ar.serialize(showDelay, "showDelay", "Задержка показа");
+	ar.serialize(type_, "type", "С‚РёРї РїРѕРґСЃРєР°Р·РєРё");
+	ar.serialize(showDelay, "showDelay", "Р—Р°РґРµСЂР¶РєР° РїРѕРєР°Р·Р°");
 }
 
 // -------------------  UI_ActionDataBindGameType
@@ -500,8 +500,8 @@ void UI_ActionDataControlHint::serialize(Archive& ar)
 void UI_ActionDataBindGameType::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(gameType_, "type", "тип игры");
-	ar.serialize(replay_, "replay_", "это реплей");
+	ar.serialize(gameType_, "type", "С‚РёРї РёРіСЂС‹");
+	ar.serialize(replay_, "replay_", "СЌС‚Рѕ СЂРµРїР»РµР№");
 }
 
 // -------------------  UI_ActionDataPause
@@ -509,7 +509,7 @@ void UI_ActionDataBindGameType::serialize(Archive& ar)
 void UI_ActionDataPause::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(type_, "type", "Типы пауз");
+	ar.serialize(type_, "type", "РўРёРїС‹ РїР°СѓР·");
 }
 
 // -------------------  UI_ActionDataBindErrorStatus
@@ -517,7 +517,7 @@ void UI_ActionDataPause::serialize(Archive& ar)
 void UI_ActionDataBindErrorStatus::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(type_, "type", "результат последнего действия");
+	ar.serialize(type_, "type", "СЂРµР·СѓР»СЊС‚Р°С‚ РїРѕСЃР»РµРґРЅРµРіРѕ РґРµР№СЃС‚РІРёСЏ");
 }
 
 // -------------------  UI_ActionDataClickMode
@@ -526,9 +526,9 @@ void UI_ActionDataClickMode::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(modeID_, "modeID", "&режим");
+	ar.serialize(modeID_, "modeID", "&СЂРµР¶РёРј");
 	if(modeID_ == UI_CLICK_MODE_ATTACK || modeID_ == UI_CLICK_MODE_PLAYER_ATTACK)
-		ar.serialize(weaponPrmReference_, "weaponPrmReference", "тип оружия (для атаки)");
+		ar.serialize(weaponPrmReference_, "weaponPrmReference", "С‚РёРї РѕСЂСѓР¶РёСЏ (РґР»СЏ Р°С‚Р°РєРё)");
 }
 
 // -------------------  UI_ActionDataUnitRef
@@ -542,22 +542,22 @@ void UI_ActionDataUnitRef<mode, refEditType>::serialize(Archive& ar)
 		switch(refEditType){
 		case 1:{
 			AttributeUnitReference unit = attributeReference_;
-			ar.serialize(unit, "attributeReference", "&юнит");
+			ar.serialize(unit, "attributeReference", "&СЋРЅРёС‚");
 			attributeReference_ = unit;
 			break;
 			   }
 		case 2:{
 			AttributeBuildingReference building = attributeReference_;
-			ar.serialize(building, "attributeReference", "&юнит");
+			ar.serialize(building, "attributeReference", "&СЋРЅРёС‚");
 			attributeReference_ = building;
 			break;
 			   }
 		case 3:
-			ar.serialize(attributeReference_, "attributeReference", "&юнит");
+			ar.serialize(attributeReference_, "attributeReference", "&СЋРЅРёС‚");
 			break;
 		}
 	else
-		ar.serialize(attributeReference_, "attributeReference", "&юнит");
+		ar.serialize(attributeReference_, "attributeReference", "&СЋРЅРёС‚");
 
 }
 
@@ -567,7 +567,7 @@ void UI_ActiobDataUnitHovered::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(ownUnit_, "ownUnit", "Только собственный");
+	ar.serialize(ownUnit_, "ownUnit", "РўРѕР»СЊРєРѕ СЃРѕР±СЃС‚РІРµРЅРЅС‹Р№");
 }
 
 // -------------------  UI_ActionDataUnitOrBuildingUpdate
@@ -576,10 +576,10 @@ void UI_ActionDataUnitOrBuildingUpdate::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(attributeReference_, "attributeReference", "&юнит");
+	ar.serialize(attributeReference_, "attributeReference", "&СЋРЅРёС‚");
 
-	ar.serialize(singleSelect_, "singleSelect_", "Одиночный селект");
-	ar.serialize(uniformSelection_, "uniformSelection", "Однородный селект");
+	ar.serialize(singleSelect_, "singleSelect_", "РћРґРёРЅРѕС‡РЅС‹Р№ СЃРµР»РµРєС‚");
+	ar.serialize(uniformSelection_, "uniformSelection", "РћРґРЅРѕСЂРѕРґРЅС‹Р№ СЃРµР»РµРєС‚");
 }
 
 // -------------------  UI_ActionDataSelectUnit
@@ -588,10 +588,10 @@ void UI_ActionDataSelectUnit::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(attributeReference_, "attributeReference", "&Юнит");
+	ar.serialize(attributeReference_, "attributeReference", "&Р®РЅРёС‚");
 	if(attributeReference_.key() < 0)
-		ar.serialize(squadRef_, "squadRef", "Тип сквада");
-	ar.serialize(onlyPowered_, "onlyPowered", "Только подключенные");
+		ar.serialize(squadRef_, "squadRef", "РўРёРї СЃРєРІР°РґР°");
+	ar.serialize(onlyPowered_, "onlyPowered", "РўРѕР»СЊРєРѕ РїРѕРґРєР»СЋС‡РµРЅРЅС‹Рµ");
 }
 
 // -------------------  UI_ActionDataFindUnit
@@ -609,10 +609,10 @@ void UI_ActionDataFindUnit::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(unitReferences_, "unitReferences", "Типы юнитов");
-	ar.serialize(select_, "select", "Выделять");
-	ar.serialize(targeting_, "targeting", "Переносить камеру");
-	ar.serialize(showCount_, "showCount", "Выводить количество на мире, прятать когда нету");
+	ar.serialize(unitReferences_, "unitReferences", "РўРёРїС‹ СЋРЅРёС‚РѕРІ");
+	ar.serialize(select_, "select", "Р’С‹РґРµР»СЏС‚СЊ");
+	ar.serialize(targeting_, "targeting", "РџРµСЂРµРЅРѕСЃРёС‚СЊ РєР°РјРµСЂСѓ");
+	ar.serialize(showCount_, "showCount", "Р’С‹РІРѕРґРёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ РЅР° РјРёСЂРµ, РїСЂСЏС‚Р°С‚СЊ РєРѕРіРґР° РЅРµС‚Сѓ");
 }
 
 // -------------------  UI_ActionDataSquadRef
@@ -621,8 +621,8 @@ void UI_ActionDataSquadRef::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(squadRef_, "squadRef", "&Тип сквада");
-	ar.serialize(showCount_, "showCount", "Выводить количество сквадов на мире");
+	ar.serialize(squadRef_, "squadRef", "&РўРёРї СЃРєРІР°РґР°");
+	ar.serialize(showCount_, "showCount", "Р’С‹РІРѕРґРёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРєРІР°РґРѕРІ РЅР° РјРёСЂРµ");
 }
 
 // -------------------  UI_ActionUnitState
@@ -639,31 +639,31 @@ void UI_ActionUnitState::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(type_, "type", "тип состояния");
+	ar.serialize(type_, "type", "С‚РёРї СЃРѕСЃС‚РѕСЏРЅРёСЏ");
 	switch(type_) {
 	case UI_UNITSTATE_CAN_UPGRADE:
 	case UI_UNITSTATE_IS_UPGRADING:
-		ar.serialize(data_, "data", "номер апгрейда");
+		ar.serialize(data_, "data", "РЅРѕРјРµСЂ Р°РїРіСЂРµР№РґР°");
 		break;
 	case UI_UNITSTATE_SQUAD_CAN_QUERY_UNITS:
 	case UI_UNITSTATE_IS_BUILDING:
-		ar.serialize(attributeReference_, "attributeReference", "производимый юнит");
+		ar.serialize(attributeReference_, "attributeReference", "РїСЂРѕРёР·РІРѕРґРёРјС‹Р№ СЋРЅРёС‚");
 		break;
 	case UI_UNITSTATE_CAN_BUILD:
 	case UI_UNITSTATE_CAN_PRODUCE_PARAMETER:
-		ar.serialize(data_, "data", "номер производства");
+		ar.serialize(data_, "data", "РЅРѕРјРµСЂ РїСЂРѕРёР·РІРѕРґСЃС‚РІР°");
 		break;
 	}
 	
 	switch(type_){
 	case UI_UNITSTATE_CAN_BUILD:
 	case UI_UNITSTATE_CAN_PRODUCE_PARAMETER:
-		ar.serialize(forPlayerUnit_, "forPlayerUnit", "Для юнита-игрока");
+		ar.serialize(forPlayerUnit_, "forPlayerUnit", "Р”Р»СЏ СЋРЅРёС‚Р°-РёРіСЂРѕРєР°");
 	case UI_UNITSTATE_CAN_DETONATE_MINES:
 	case UI_UNITSTATE_IS_IDLE:
 	case UI_UNITSTATE_CAN_UPGRADE:
 		if(!forPlayerUnit_)
-			ar.serialize(checkOnlyMainUnitInSquad_, "checkOnlyMainUnitInSquad", "Проверять только главного юнита в скваде");
+			ar.serialize(checkOnlyMainUnitInSquad_, "checkOnlyMainUnitInSquad", "РџСЂРѕРІРµСЂСЏС‚СЊ С‚РѕР»СЊРєРѕ РіР»Р°РІРЅРѕРіРѕ СЋРЅРёС‚Р° РІ СЃРєРІР°РґРµ");
 	}
 }
 
@@ -696,9 +696,9 @@ UI_ActionDataParams::UI_ActionDataParams()
 void UI_ActionDataParams::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(type_, "type", "кого проверяем");
-	ar.serialize(thatDoThanExist_, "thatDoThanExist", "что делаем");
-	ar.serialize(param_, "prms", "Параметры");
+	ar.serialize(type_, "type", "РєРѕРіРѕ РїСЂРѕРІРµСЂСЏРµРј");
+	ar.serialize(thatDoThanExist_, "thatDoThanExist", "С‡С‚Рѕ РґРµР»Р°РµРј");
+	ar.serialize(param_, "prms", "РџР°СЂР°РјРµС‚СЂС‹");
 }
 
 // -------------------  UI_ActionDataIdleUnits
@@ -707,7 +707,7 @@ void UI_ActionDataIdleUnits::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(type_, "type", "тип юнита");
+	ar.serialize(type_, "type", "С‚РёРї СЋРЅРёС‚Р°");
 }
 
 // -------------------  UI_ActionDataUnitCommand
@@ -722,10 +722,10 @@ void UI_ActionDataUnitCommand::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(command_, "command", "команда");
-	ar.serialize(forPlayerUnit_, "forPlayerUnit", "Для юнита-игрока");
+	ar.serialize(command_, "command", "РєРѕРјР°РЅРґР°");
+	ar.serialize(forPlayerUnit_, "forPlayerUnit", "Р”Р»СЏ СЋРЅРёС‚Р°-РёРіСЂРѕРєР°");
 	if(!forPlayerUnit_)
-		ar.serialize(sendForAll_, "sendForAll", "посылать всем в селекте");
+		ar.serialize(sendForAll_, "sendForAll", "РїРѕСЃС‹Р»Р°С‚СЊ РІСЃРµРј РІ СЃРµР»РµРєС‚Рµ");
 }
 
 // -------------------  UI_ActionDataWeaponRef
@@ -739,8 +739,8 @@ void UI_ActionDataWeaponRef::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(forPlayerUnit_, "forPlayerUnit", "Для юнита-игрока");
-	ar.serialize(weaponPrmReference_, "weaponPrmReference", "тип оружия");
+	ar.serialize(forPlayerUnit_, "forPlayerUnit", "Р”Р»СЏ СЋРЅРёС‚Р°-РёРіСЂРѕРєР°");
+	ar.serialize(weaponPrmReference_, "weaponPrmReference", "С‚РёРї РѕСЂСѓР¶РёСЏ");
 }
 
 // -------------------  UI_ActionDataWeapon
@@ -754,8 +754,8 @@ void UI_ActionDataWeapon::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(forPlayerUnit_, "forPlayerUnit", "Для юнита-игрока");
-	ar.serialize(weaponPrmReference_, "weaponPrmReference", "тип оружия");
+	ar.serialize(forPlayerUnit_, "forPlayerUnit", "Р”Р»СЏ СЋРЅРёС‚Р°-РёРіСЂРѕРєР°");
+	ar.serialize(weaponPrmReference_, "weaponPrmReference", "С‚РёРї РѕСЂСѓР¶РёСЏ");
 }
 
 // -------------------  UI_ActionDataWeaponActivate
@@ -764,7 +764,7 @@ void UI_ActionDataWeaponActivate::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(fireOnce_, "fireOnce", "Применить однократно");
+	ar.serialize(fireOnce_, "fireOnce", "РџСЂРёРјРµРЅРёС‚СЊ РѕРґРЅРѕРєСЂР°С‚РЅРѕ");
 }
 
 // -------------------  UI_ActionDataWeaponReload
@@ -773,9 +773,9 @@ void UI_ActionDataWeaponReload::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(weaponPrmReference_, "weaponPrmReference", "тип оружия");
-	ar.serialize(forPlayerUnit_, "forPlayerUnit", "Для юнита-игрока");
-	ar.serialize(show_only_not_full_, "show_only_not_full_", "показывать только не полностью заряженное");
+	ar.serialize(weaponPrmReference_, "weaponPrmReference", "С‚РёРї РѕСЂСѓР¶РёСЏ");
+	ar.serialize(forPlayerUnit_, "forPlayerUnit", "Р”Р»СЏ СЋРЅРёС‚Р°-РёРіСЂРѕРєР°");
+	ar.serialize(show_only_not_full_, "show_only_not_full_", "РїРѕРєР°Р·С‹РІР°С‚СЊ С‚РѕР»СЊРєРѕ РЅРµ РїРѕР»РЅРѕСЃС‚СЊСЋ Р·Р°СЂСЏР¶РµРЅРЅРѕРµ");
 }
 
 
@@ -795,7 +795,7 @@ void UI_ActionOption::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(option_, "option_", "Настройка");
+	ar.serialize(option_, "option_", "РќР°СЃС‚СЂРѕР№РєР°");
 
 }
 
@@ -815,9 +815,9 @@ void UI_ActionKeys::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(action_type_, "action_type", "Тип команды");
+	ar.serialize(action_type_, "action_type", "РўРёРї РєРѕРјР°РЅРґС‹");
 	if(action_type_ == UI_OPTION_UPDATE)
-		ar.serialize(option_, "option", "Команда"); 
+		ar.serialize(option_, "option", "РљРѕРјР°РЅРґР°"); 
 
 }
 
@@ -827,13 +827,13 @@ void UI_ActionTriggerVariable::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(type_, "type", "Тип переменной");
+	ar.serialize(type_, "type", "РўРёРї РїРµСЂРµРјРµРЅРЅРѕР№");
 	if(type_ == MISSION_DESCRIPTION){
-		ar.serialize(number_, "variableNumber", "Номер переменной");
+		ar.serialize(number_, "variableNumber", "РќРѕРјРµСЂ РїРµСЂРµРјРµРЅРЅРѕР№");
 		number_ = clamp(number_, 0, 31);
 	}
 	else
-		ar.serialize(variableName_, "variableName", "Имя переменной");
+		ar.serialize(variableName_, "variableName", "РРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№");
 		
 }
 
@@ -851,13 +851,13 @@ void UI_ActionBindEx::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 	
-	ar.serialize(type_, "type_", "Тип привязки");
+	ar.serialize(type_, "type_", "РўРёРї РїСЂРёРІСЏР·РєРё");
 
 	if(type_ != UI_BIND_ANY)
-		ar.serialize(queueSize_, "queueSize_", "состояние очереди");
+		ar.serialize(queueSize_, "queueSize_", "СЃРѕСЃС‚РѕСЏРЅРёРµ РѕС‡РµСЂРµРґРё");
 	
-	ar.serialize(selSize_, "selSize_", "список выделения");
-	ar.serialize(uniformSelection_, "uniformSelection", "однородное выделение");
+	ar.serialize(selSize_, "selSize_", "СЃРїРёСЃРѕРє РІС‹РґРµР»РµРЅРёСЏ");
+	ar.serialize(uniformSelection_, "uniformSelection", "РѕРґРЅРѕСЂРѕРґРЅРѕРµ РІС‹РґРµР»РµРЅРёРµ");
 }
 
 // -------------------  UI_ActionDataStateChange
@@ -866,7 +866,7 @@ void UI_ActionDataStateChange::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(reverseDirection_, "reverseDirection_", "Переключать в обратную сторону");
+	ar.serialize(reverseDirection_, "reverseDirection_", "РџРµСЂРµРєР»СЋС‡Р°С‚СЊ РІ РѕР±СЂР°С‚РЅСѓСЋ СЃС‚РѕСЂРѕРЅСѓ");
 }
 
 // -------------------  UI_ActionDataProduction
@@ -875,8 +875,8 @@ void UI_ActionDataProduction::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(forPlayerUnit_, "forPlayerUnit", "Для юнита-игрока");
-	ar.serialize(productionNumber_, "productionNumber", "Номер производства"); 
+	ar.serialize(forPlayerUnit_, "forPlayerUnit", "Р”Р»СЏ СЋРЅРёС‚Р°-РёРіСЂРѕРєР°");
+	ar.serialize(productionNumber_, "productionNumber", "РќРѕРјРµСЂ РїСЂРѕРёР·РІРѕРґСЃС‚РІР°"); 
 }
 
 // -------------------  UI_ActionDataProduction
@@ -891,8 +891,8 @@ void UI_ActionDataSelectionOperate::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(command_, "command", "Команда"); 
-	ar.serialize(RangedWrapperi(selectonID_, 0, SAVED_SELECTION_MAX, 1), "selectonID", "Номер слота сохранения/восстановления селекта"); 
+	ar.serialize(command_, "command", "РљРѕРјР°РЅРґР°"); 
+	ar.serialize(RangedWrapperi(selectonID_, 0, SAVED_SELECTION_MAX, 1), "selectonID", "РќРѕРјРµСЂ СЃР»РѕС‚Р° СЃРѕС…СЂР°РЅРµРЅРёСЏ/РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ СЃРµР»РµРєС‚Р°"); 
 }
 
 // -------------------  UI_ActionAutochangeState
@@ -901,7 +901,7 @@ void UI_ActionAutochangeState::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(interval_, "interval", "Время показа");
+	ar.serialize(interval_, "interval", "Р’СЂРµРјСЏ РїРѕРєР°Р·Р°");
 }
 
 // -------------------  UI_ActionDataLocString
@@ -911,12 +911,12 @@ void UI_ActionDataLocString::serialize(Archive& ar)
 	__super::serialize(ar);
 
 	if(ar.isEdit())
-		ar.serialize(locText_, "key", "Ключ");
+		ar.serialize(locText_, "key", "РљР»СЋС‡");
 	else
 		locText_.serialize(ar);
 
-	ar.serialize(expand_, "expand_", "раскрывать шаблоны");
-	ar.serialize(forHovered_, "forHovered", "использовать юнита под мышкой");
+	ar.serialize(expand_, "expand_", "СЂР°СЃРєСЂС‹РІР°С‚СЊ С€Р°Р±Р»РѕРЅС‹");
+	ar.serialize(forHovered_, "forHovered", "РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ СЋРЅРёС‚Р° РїРѕРґ РјС‹С€РєРѕР№");
 }
 
 // -------------------  UI_ActionExternalControl
@@ -925,7 +925,7 @@ void UI_ActionExternalControl::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(actions_, "actions", "Действия с кнопками");
+	ar.serialize(actions_, "actions", "Р”РµР№СЃС‚РІРёСЏ СЃ РєРЅРѕРїРєР°РјРё");
 }
 
 // -------------------  UI_ActionDataSourceOnMouse
@@ -934,7 +934,7 @@ void UI_ActionDataSourceOnMouse::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(sourceReference_, "sourceReference", "Источник");
+	ar.serialize(sourceReference_, "sourceReference", "РСЃС‚РѕС‡РЅРёРє");
 }
 
 // -------------------  UI_ActionDataModalMessage
@@ -943,7 +943,7 @@ void UI_ActionDataModalMessage::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(type_, "type", "Действие");
+	ar.serialize(type_, "type", "Р”РµР№СЃС‚РІРёРµ");
 }
 
 // -------------------  UI_ActionDataMessageList
@@ -952,10 +952,10 @@ void UI_ActionDataMessageList::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(reverse_, "reverse", "Выводить в обратном порядке");
-	ar.serialize(firstOnly_, "firstOnly", "Выводить только первое");
-	ar.serialize(ignoreMessageDisabling_, "ignoreMessageDisabling", "Игнорировать запрет на сообщения");
-	ar.serialize(types_, "types", "Типы выводимых собщений");
+	ar.serialize(reverse_, "reverse", "Р’С‹РІРѕРґРёС‚СЊ РІ РѕР±СЂР°С‚РЅРѕРј РїРѕСЂСЏРґРєРµ");
+	ar.serialize(firstOnly_, "firstOnly", "Р’С‹РІРѕРґРёС‚СЊ С‚РѕР»СЊРєРѕ РїРµСЂРІРѕРµ");
+	ar.serialize(ignoreMessageDisabling_, "ignoreMessageDisabling", "РРіРЅРѕСЂРёСЂРѕРІР°С‚СЊ Р·Р°РїСЂРµС‚ РЅР° СЃРѕРѕР±С‰РµРЅРёСЏ");
+	ar.serialize(types_, "types", "РўРёРїС‹ РІС‹РІРѕРґРёРјС‹С… СЃРѕР±С‰РµРЅРёР№");
 }
 
 // -------------------  UI_ActionDataTaskList
@@ -964,7 +964,7 @@ void UI_ActionDataTaskList::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(reverse_, "reverse", "Выводить в обратном порядке");
+	ar.serialize(reverse_, "reverse", "Р’С‹РІРѕРґРёС‚СЊ РІ РѕР±СЂР°С‚РЅРѕРј РїРѕСЂСЏРґРєРµ");
 }
 
 // -------------------  UI_ActionDataUnitFace
@@ -973,7 +973,7 @@ void UI_ActionDataUnitFace::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(num_, "face_num", "Номер портрета");
+	ar.serialize(num_, "face_num", "РќРѕРјРµСЂ РїРѕСЂС‚СЂРµС‚Р°");
 }
 
 // -------------------  UI_ActionDataDirectControlCursor
@@ -987,8 +987,8 @@ void UI_ActionDataDirectControlCursor::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(scale_, "scale", "Диапазон изменения размера курсора");
-	ar.serialize(scaleDist_, "scaleDist", "Диапазон расстояний для изменения размера курсора");
+	ar.serialize(scale_, "scale", "Р”РёР°РїР°Р·РѕРЅ РёР·РјРµРЅРµРЅРёСЏ СЂР°Р·РјРµСЂР° РєСѓСЂСЃРѕСЂР°");
+	ar.serialize(scaleDist_, "scaleDist", "Р”РёР°РїР°Р·РѕРЅ СЂР°СЃСЃС‚РѕСЏРЅРёР№ РґР»СЏ РёР·РјРµРЅРµРЅРёСЏ СЂР°Р·РјРµСЂР° РєСѓСЂСЃРѕСЂР°");
 }
 
 float UI_ActionDataDirectControlCursor::cursorScale(float aim_distance) const
@@ -1006,8 +1006,8 @@ float UI_ActionDataDirectControlCursor::cursorScale(float aim_distance) const
 // -------------------  UI_ActionDataDirectControlWeaponLoad
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(UI_ActionDataDirectControlWeaponLoad, WeaponType, "UI_ActionDataDirectControlWeaponLoad::WeaponType")
-REGISTER_ENUM_ENCLOSED(UI_ActionDataDirectControlWeaponLoad, WEAPON_PRIMARY, "Основное оружие")
-REGISTER_ENUM_ENCLOSED(UI_ActionDataDirectControlWeaponLoad, WEAPON_SECONDARY, "Второстепенное оружие")
+REGISTER_ENUM_ENCLOSED(UI_ActionDataDirectControlWeaponLoad, WEAPON_PRIMARY, "РћСЃРЅРѕРІРЅРѕРµ РѕСЂСѓР¶РёРµ")
+REGISTER_ENUM_ENCLOSED(UI_ActionDataDirectControlWeaponLoad, WEAPON_SECONDARY, "Р’С‚РѕСЂРѕСЃС‚РµРїРµРЅРЅРѕРµ РѕСЂСѓР¶РёРµ")
 END_ENUM_DESCRIPTOR_ENCLOSED(UI_ActionDataDirectControlWeaponLoad, WeaponType)
 
 UI_ActionDataDirectControlWeaponLoad::UI_ActionDataDirectControlWeaponLoad() : weaponType_(WEAPON_PRIMARY)
@@ -1018,7 +1018,7 @@ void UI_ActionDataDirectControlWeaponLoad::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(weaponType_, "weaponType", "Оружие");
+	ar.serialize(weaponType_, "weaponType", "РћСЂСѓР¶РёРµ");
 }
 
 // ------------------- UI_ActionDataConfirmDiskOp
@@ -1027,7 +1027,7 @@ void UI_ActionDataConfirmDiskOp::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(confirmDiskOp_, "confirmDiskOp", "Подтвердить перезапись");
+	ar.serialize(confirmDiskOp_, "confirmDiskOp", "РџРѕРґС‚РІРµСЂРґРёС‚СЊ РїРµСЂРµР·Р°РїРёСЃСЊ");
 }
 
 
@@ -1035,7 +1035,7 @@ void UI_ActionDataConfirmDiskOp::serialize(Archive& ar)
 
 void UI_ActionDataStatBoard::serialize(Archive& ar)
 {
-	ar.serialize(format_, "format", "Столбцы");
+	ar.serialize(format_, "format", "РЎС‚РѕР»Р±С†С‹");
 }
 
 // ------------------- UI_ActionDataPostEffect
@@ -1050,8 +1050,8 @@ void UI_ActionDataPostEffect::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(type_, "type", "Эффект");
-	ar.serialize(enable_, "enable", "Включить");
+	ar.serialize(type_, "type", "Р­С„С„РµРєС‚");
+	ar.serialize(enable_, "enable", "Р’РєР»СЋС‡РёС‚СЊ");
 }
 
 // ------------------- UI_ActionDataPauseGame
@@ -1060,8 +1060,8 @@ void UI_ActionDataPauseGame::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(enable_, "enable", "Включить");
-	ar.serialize(onlyLocal_, "onlyLocal", "Пропускать при сетевой игре");
+	ar.serialize(enable_, "enable", "Р’РєР»СЋС‡РёС‚СЊ");
+	ar.serialize(onlyLocal_, "onlyLocal", "РџСЂРѕРїСѓСЃРєР°С‚СЊ РїСЂРё СЃРµС‚РµРІРѕР№ РёРіСЂРµ");
 }
 
 // ------------------- UI_ActionDataGlobalStats
@@ -1070,6 +1070,6 @@ void UI_ActionDataGlobalStats::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(task_, "task", "Операция");
+	ar.serialize(task_, "task", "РћРїРµСЂР°С†РёСЏ");
 }
 

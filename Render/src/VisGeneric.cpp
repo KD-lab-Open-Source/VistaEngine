@@ -11,12 +11,12 @@
 void Init3dxshader();
 void Done3dxshader();
 
-// ���������� ����������
+// глобальные переменные
 RENDER_API cVisGeneric	*gb_VisGeneric=0;
 
 bool Option_VSync = true;
 int Option_MipMapLevel = 5;
-int Option_TextureDetailLevel(0);//������� ����������� �������, 0 - ����� �������
+int Option_TextureDetailLevel(0);//Уровень детализации текстур, 0 - самый высокий
 bool Option_DrawNumberPolygon = false;
 int Option_ShadowSizePower = 4;
 float Option_MapLevel = 0.8f;
@@ -101,13 +101,13 @@ cVisGeneric::cVisGeneric(bool multiThread)
 	maximal_shadow_object=ObjectShadowType(OST_SHADOW_REAL);
 	is_multithread=multiThread;
 	logic_quant=0;
-	graph_logic_quant=0;//� ������, ����� ��� ���������� ������ �� ������������, ������ ����� ��������� ��� ������ ��������.
+	graph_logic_quant=0;//В случае, когда эти переменные вообще не выставляются, пускай сразу удаляется как только возможно.
 	use_logic_quant=false;
 
 	for(int i=0;i<SHOW_MAX;i++)
 		Option_ShowType[i]=true;
 	Option_ShowType[SHOW_INFO]=false;
-	// ������������� ���������� ���������
+	// инициализация глобальных переменых
 	shaders=0;
 	Lib3dx=new cLib3dx;
 	LibSimply3dx=new cLibSimply3dx;
@@ -202,7 +202,7 @@ void cVisGeneric::serialize(Archive& ar)
 
 void cVisGeneric::editOption()
 {
-	// TODO: ���������� ����� filter
+	// TODO: переделать через filter
 	Serializer visGenericSerializer(*this);
 	if(kdw::edit(visGenericSerializer, "Scripts\\TreeControlSetups\\cVisGenericState")){
 		XPrmOArchive oa(optionFileName_.c_str());
@@ -275,14 +275,14 @@ void cVisGeneric::SetShadowType(bool shadowEnabled, int shadow_size)
 cScene* cVisGeneric::CreateScene()
 {
 	if(file_dprintf)
-		fflush(file_dprintf);//����� ������ �����������.
+		fflush(file_dprintf);//Чтобы иногда сбрасывался.
 
 	cScene *Scene=new cScene;
 	return Scene;
 }
 //////////////////////////////////////////////////////////////////////////////////////////
-void cVisGeneric::SetData(cInterfaceRenderDevice *pData)//����������, ���� protected �������.
-{ // ������� ��� ������ � ����� ������
+void cVisGeneric::SetData(cInterfaceRenderDevice *pData)//Анахронизм, надо protected сделать.
+{ // функция для работы с окном вывода
 	cInterfaceRenderDevice *IRenderDevice=pData;
 	InitShaders();
 	Init3dxshader();

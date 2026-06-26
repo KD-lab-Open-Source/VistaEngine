@@ -3,13 +3,13 @@
 
 enum AttributeCamera
 {
-	ATTRCAMERA_PERSPECTIVE			=	1<<4,	// ïåðñïåêòèâà
+	ATTRCAMERA_PERSPECTIVE			=	1<<4,	// Ð¿ÐµÑ€ÑÐ¿ÐµÐºÑ‚Ð¸Ð²Ð°
 	ATTRCAMERA_WRITE_ALPHA			=	1<<5, 			
 	ATTRCAMERA_ZBUFFER				=	1<<6, 	
 	ATTRCAMERA_FLOAT_ZBUFFER		=	1<<7, 	
 	ATTRCAMERA_MIRAGE				=   1<<13,
-	ATTRCAMERA_REFLECTION			=	1<<16,	// êàìåðà ðåíäåðèò ïîðòàë-îòðàæåíèå
-	ATTRCAMERA_SHADOW				=	1<<17,	// êàìåðà ðåíäåðèò ïîðòàë-òåíü
+	ATTRCAMERA_REFLECTION			=	1<<16,	// ÐºÐ°Ð¼ÐµÑ€Ð° Ñ€ÐµÐ½Ð´ÐµÑ€Ð¸Ñ‚ Ð¿Ð¾Ñ€Ñ‚Ð°Ð»-Ð¾Ñ‚Ñ€Ð°Ð¶ÐµÐ½Ð¸Ðµ
+	ATTRCAMERA_SHADOW				=	1<<17,	// ÐºÐ°Ð¼ÐµÑ€Ð° Ñ€ÐµÐ½Ð´ÐµÑ€Ð¸Ñ‚ Ð¿Ð¾Ñ€Ñ‚Ð°Ð»-Ñ‚ÐµÐ½ÑŒ
 	ATTRCAMERA_CLEARZBUFFER			=	1<<19,
 	ATTRCAMERA_SHOWCLIP				=	1<<20,
 	ATTRCAMERA_SHADOWMAP			=	1<<21,
@@ -23,50 +23,50 @@ enum AttributeCamera
 enum eAttributeUnkObj
 {
 // general
-	ATTRUNKOBJ_IGNORE				=	1<<0,	// îáúåêò èãíîðèðóåòñÿ = ÿâëÿåòñÿ íåâèäèìûìû = íå âûâîäèòñÿ
+	ATTRUNKOBJ_IGNORE				=	1<<0,	// Ð¾Ð±ÑŠÐµÐºÑ‚ Ð¸Ð³Ð½Ð¾Ñ€Ð¸Ñ€ÑƒÐµÑ‚ÑÑ = ÑÐ²Ð»ÑÐµÑ‚ÑÑ Ð½ÐµÐ²Ð¸Ð´Ð¸Ð¼Ñ‹Ð¼Ñ‹ = Ð½Ðµ Ð²Ñ‹Ð²Ð¾Ð´Ð¸Ñ‚ÑÑ
 	ATTRUNKOBJ_DELETED				=	1<<1,
 	ATTRUNKOBJ_ATTACHED				=	1<<2,		
-	ATTRUNKOBJ_CREATED_IN_LOGIC		=	1<<3,	//Îáúåêòû ñîçäàííûå â ëîãè÷åñêîì ïîòîêå äîëæíû óäàëÿòüñÿ ïîñëå òîãî êàê íà íèõ íåò ññûëîê â èíòåðïîëÿöèè
+	ATTRUNKOBJ_CREATED_IN_LOGIC		=	1<<3,	//ÐžÐ±ÑŠÐµÐºÑ‚Ñ‹ ÑÐ¾Ð·Ð´Ð°Ð½Ð½Ñ‹Ðµ Ð² Ð»Ð¾Ð³Ð¸Ñ‡ÐµÑÐºÐ¾Ð¼ Ð¿Ð¾Ñ‚Ð¾ÐºÐµ Ð´Ð¾Ð»Ð¶Ð½Ñ‹ ÑƒÐ´Ð°Ð»ÑÑ‚ÑŒÑÑ Ð¿Ð¾ÑÐ»Ðµ Ñ‚Ð¾Ð³Ð¾ ÐºÐ°Ðº Ð½Ð° Ð½Ð¸Ñ… Ð½ÐµÑ‚ ÑÑÑ‹Ð»Ð¾Ðº Ð² Ð¸Ð½Ñ‚ÐµÑ€Ð¿Ð¾Ð»ÑÑ†Ð¸Ð¸
 
-	ATTRUNKOBJ_ADDBLEND				=	1<<7,	// ñëîæåíèå öâåòîâ, äîëæåí ñîâïàäàòü ñ MAT_ALPHA_ADDBLEND
-	ATTRUNKOBJ_COLLISIONTRACE		=	1<<9,	// ó÷èòûâàòü ïðè òðàññèðîâêå
+	ATTRUNKOBJ_ADDBLEND				=	1<<7,	// ÑÐ»Ð¾Ð¶ÐµÐ½Ð¸Ðµ Ñ†Ð²ÐµÑ‚Ð¾Ð², Ð´Ð¾Ð»Ð¶ÐµÐ½ ÑÐ¾Ð²Ð¿Ð°Ð´Ð°Ñ‚ÑŒ Ñ MAT_ALPHA_ADDBLEND
+	ATTRUNKOBJ_COLLISIONTRACE		=	1<<9,	// ÑƒÑ‡Ð¸Ñ‚Ñ‹Ð²Ð°Ñ‚ÑŒ Ð¿Ñ€Ð¸ Ñ‚Ñ€Ð°ÑÑÐ¸Ñ€Ð¾Ð²ÐºÐµ
 	ATTRUNKOBJ_NO_USELOD			=	1<<12,
 	ATTRUNKOBJ_MIRAGE				=	ATTRCAMERA_MIRAGE,
 
-	ATTRUNKOBJ_REFLECTION			=	ATTRCAMERA_REFLECTION,//==16 îáúåêò ìîæåò îòðàæàòüñÿ
-	ATTRUNKOBJ_SHADOW				=	ATTRCAMERA_SHADOW,	//==17 îáúåêò îòêèäûâàåò ïðàâèëüíóþ òåíü (Íå ôàêò ÷òî ïðàâèëüíî, ñì ATTRCAMERA_SHADOWMAP)
-	ATTR3DX_NOUPDATEMATRIX			=	1<<18,  //Äëÿ 3dx íå ïåðåñ÷èòûâàòü ìàòðèöû
-	ATTRUNKOBJ_IGNORE_NORMALCAMERA	=	1<<20,	// îáúåêò íå âûâîäèòñÿ â íîðìàëüíîé êàìåðå
+	ATTRUNKOBJ_REFLECTION			=	ATTRCAMERA_REFLECTION,//==16 Ð¾Ð±ÑŠÐµÐºÑ‚ Ð¼Ð¾Ð¶ÐµÑ‚ Ð¾Ñ‚Ñ€Ð°Ð¶Ð°Ñ‚ÑŒÑÑ
+	ATTRUNKOBJ_SHADOW				=	ATTRCAMERA_SHADOW,	//==17 Ð¾Ð±ÑŠÐµÐºÑ‚ Ð¾Ñ‚ÐºÐ¸Ð´Ñ‹Ð²Ð°ÐµÑ‚ Ð¿Ñ€Ð°Ð²Ð¸Ð»ÑŒÐ½ÑƒÑŽ Ñ‚ÐµÐ½ÑŒ (ÐÐµ Ñ„Ð°ÐºÑ‚ Ñ‡Ñ‚Ð¾ Ð¿Ñ€Ð°Ð²Ð¸Ð»ÑŒÐ½Ð¾, ÑÐ¼ ATTRCAMERA_SHADOWMAP)
+	ATTR3DX_NOUPDATEMATRIX			=	1<<18,  //Ð”Ð»Ñ 3dx Ð½Ðµ Ð¿ÐµÑ€ÐµÑÑ‡Ð¸Ñ‚Ñ‹Ð²Ð°Ñ‚ÑŒ Ð¼Ð°Ñ‚Ñ€Ð¸Ñ†Ñ‹
+	ATTRUNKOBJ_IGNORE_NORMALCAMERA	=	1<<20,	// Ð¾Ð±ÑŠÐµÐºÑ‚ Ð½Ðµ Ð²Ñ‹Ð²Ð¾Ð´Ð¸Ñ‚ÑÑ Ð² Ð½Ð¾Ñ€Ð¼Ð°Ð»ÑŒÐ½Ð¾Ð¹ ÐºÐ°Ð¼ÐµÑ€Ðµ
 
 	//3dx
 	ATTR3DX_UNDERWATER				=   1<<22,
 	ATTR3DX_NO_RESIZE_TEXTURES		=   1<<23,  // 
-	ATTRUNKOBJ_2PASS_ZBUFFER		=   1<<24,  // äëÿ ïîëóïðîçðà÷íûõ îáúåêòîâ, èäåò îòðèñîâêà ñíà÷àëà â Z áóôôåð áåç îòðèñîâêè â ColorBuffer,
-												// à âòîðûì ïðîõîäîì îòðèñîâêà â ColorBuffer, áåç îòðèñîâêè â Z áóôôåð
-	ATTRUNKOBJ_SHOW_FLAT_SILHOUETTE	=	1<<26,  // Äëÿ îáúåêòîâ, êîòîðûå áóäóò âèäíû, çà äðóãèìè îáúåêòàìè  â âèäå îäíîöâåòíî çàêðàøåííîãî ñèëóýòà.
-												// Âûñòàâëÿòü òîëüêî ïðè âêëþ÷åííîì RENDERDEVICE_MODE_STENCIL
-	ATTRUNKOBJ_HIDE_BY_DISTANCE		=	1<<27,  // Îáúåêò ïåðåñòàåò áûòü âèäèìûì, êîãäà ñòàíîâèòñÿ ñëèøêîì ìàëåíüêèì.
-	ATTR3DX_HIDE_LIGHTS				=   1<<28,  // Èñòî÷íèêè ñâåòà ïåðåñòàþò áûòü âèäèìûìè.
-	ATTR3DX_NO_SELFILLUMINATION		=   1<<29,  // Âûêëþ÷àåòñÿ òåêñòóðà ñàìîñâå÷åíèÿ (ïîëüçîâàòüñÿ ôóíêöèåé EnableSelfIllumination)
+	ATTRUNKOBJ_2PASS_ZBUFFER		=   1<<24,  // Ð´Ð»Ñ Ð¿Ð¾Ð»ÑƒÐ¿Ñ€Ð¾Ð·Ñ€Ð°Ñ‡Ð½Ñ‹Ñ… Ð¾Ð±ÑŠÐµÐºÑ‚Ð¾Ð², Ð¸Ð´ÐµÑ‚ Ð¾Ñ‚Ñ€Ð¸ÑÐ¾Ð²ÐºÐ° ÑÐ½Ð°Ñ‡Ð°Ð»Ð° Ð² Z Ð±ÑƒÑ„Ñ„ÐµÑ€ Ð±ÐµÐ· Ð¾Ñ‚Ñ€Ð¸ÑÐ¾Ð²ÐºÐ¸ Ð² ColorBuffer,
+												// Ð° Ð²Ñ‚Ð¾Ñ€Ñ‹Ð¼ Ð¿Ñ€Ð¾Ñ…Ð¾Ð´Ð¾Ð¼ Ð¾Ñ‚Ñ€Ð¸ÑÐ¾Ð²ÐºÐ° Ð² ColorBuffer, Ð±ÐµÐ· Ð¾Ñ‚Ñ€Ð¸ÑÐ¾Ð²ÐºÐ¸ Ð² Z Ð±ÑƒÑ„Ñ„ÐµÑ€
+	ATTRUNKOBJ_SHOW_FLAT_SILHOUETTE	=	1<<26,  // Ð”Ð»Ñ Ð¾Ð±ÑŠÐµÐºÑ‚Ð¾Ð², ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ðµ Ð±ÑƒÐ´ÑƒÑ‚ Ð²Ð¸Ð´Ð½Ñ‹, Ð·Ð° Ð´Ñ€ÑƒÐ³Ð¸Ð¼Ð¸ Ð¾Ð±ÑŠÐµÐºÑ‚Ð°Ð¼Ð¸  Ð² Ð²Ð¸Ð´Ðµ Ð¾Ð´Ð½Ð¾Ñ†Ð²ÐµÑ‚Ð½Ð¾ Ð·Ð°ÐºÑ€Ð°ÑˆÐµÐ½Ð½Ð¾Ð³Ð¾ ÑÐ¸Ð»ÑƒÑÑ‚Ð°.
+												// Ð’Ñ‹ÑÑ‚Ð°Ð²Ð»ÑÑ‚ÑŒ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð¿Ñ€Ð¸ Ð²ÐºÐ»ÑŽÑ‡ÐµÐ½Ð½Ð¾Ð¼ RENDERDEVICE_MODE_STENCIL
+	ATTRUNKOBJ_HIDE_BY_DISTANCE		=	1<<27,  // ÐžÐ±ÑŠÐµÐºÑ‚ Ð¿ÐµÑ€ÐµÑÑ‚Ð°ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð²Ð¸Ð´Ð¸Ð¼Ñ‹Ð¼, ÐºÐ¾Ð³Ð´Ð° ÑÑ‚Ð°Ð½Ð¾Ð²Ð¸Ñ‚ÑÑ ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ Ð¼Ð°Ð»ÐµÐ½ÑŒÐºÐ¸Ð¼.
+	ATTR3DX_HIDE_LIGHTS				=   1<<28,  // Ð˜ÑÑ‚Ð¾Ñ‡Ð½Ð¸ÐºÐ¸ ÑÐ²ÐµÑ‚Ð° Ð¿ÐµÑ€ÐµÑÑ‚Ð°ÑŽÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð²Ð¸Ð´Ð¸Ð¼Ñ‹Ð¼Ð¸.
+	ATTR3DX_NO_SELFILLUMINATION		=   1<<29,  // Ð’Ñ‹ÐºÐ»ÑŽÑ‡Ð°ÐµÑ‚ÑÑ Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ð° ÑÐ°Ð¼Ð¾ÑÐ²ÐµÑ‡ÐµÐ½Ð¸Ñ (Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÑŒÑÑ Ñ„ÑƒÐ½ÐºÑ†Ð¸ÐµÐ¹ EnableSelfIllumination)
 	ATTR3DX_ALWAYS_FLAT_SILUETTE	=	1<<30,
-	ATTRUNKOBJ_NOLIGHT				=	1<<31,	// îáúåêò íå îñâåùàåòñÿ èñòî÷íèêàìè ñâåòà ñöåíû
+	ATTRUNKOBJ_NOLIGHT				=	1<<31,	// Ð¾Ð±ÑŠÐµÐºÑ‚ Ð½Ðµ Ð¾ÑÐ²ÐµÑ‰Ð°ÐµÑ‚ÑÑ Ð¸ÑÑ‚Ð¾Ñ‡Ð½Ð¸ÐºÐ°Ð¼Ð¸ ÑÐ²ÐµÑ‚Ð° ÑÑ†ÐµÐ½Ñ‹
 };
 
 enum eAttributeLight
 {
 // general
-	ATTRLIGHT_IGNORE				=	1<<0,	// èñòî÷íèê ñâåòà èãíîðèðóåòñÿ = ÿâëÿåòñÿ íåâèäèìûìû = íå âûâîäèòñÿ
+	ATTRLIGHT_IGNORE				=	1<<0,	// Ð¸ÑÑ‚Ð¾Ñ‡Ð½Ð¸Ðº ÑÐ²ÐµÑ‚Ð° Ð¸Ð³Ð½Ð¾Ñ€Ð¸Ñ€ÑƒÐµÑ‚ÑÑ = ÑÐ²Ð»ÑÐµÑ‚ÑÑ Ð½ÐµÐ²Ð¸Ð´Ð¸Ð¼Ñ‹Ð¼Ñ‹ = Ð½Ðµ Ð²Ñ‹Ð²Ð¾Ð´Ð¸Ñ‚ÑÑ
 // private
-	ATTRLIGHT_DIRECTION				=	1<<4,	// íàïðâëåííûé èñòî÷íèê ñâåòà
-	ATTRLIGHT_SPHERICAL_SPRITE		=	1<<5,	// èñòî÷íèê ñâåòà ðèñóåòñÿ êó÷åé ñïðàéòîâ
-	//ATTRLIGHT_SPHERICAL_OBJECT è ATTRLIGHT_SPHERICAL_TERRAIN ìîæíî êîìáèíèðîâàòü âìåñòå ïðè ñîçäàíèè.
-	ATTRLIGHT_SPHERICAL_OBJECT		=	1<<6,	// ñôåðè÷åñêèé èñòî÷íèê ñâåòà, îòáðàñûâàåò ñâåò òîëüêî(!!!!)íà îáúåêòû
-	ATTRLIGHT_SPHERICAL_TERRAIN		=   1<<7,	// ñôåðè÷åñêèé èñòî÷íèê ñâåòà, îòáðàñûâàåò ñâåò òîëüêî íà çåìëþ
+	ATTRLIGHT_DIRECTION				=	1<<4,	// Ð½Ð°Ð¿Ñ€Ð²Ð»ÐµÐ½Ð½Ñ‹Ð¹ Ð¸ÑÑ‚Ð¾Ñ‡Ð½Ð¸Ðº ÑÐ²ÐµÑ‚Ð°
+	ATTRLIGHT_SPHERICAL_SPRITE		=	1<<5,	// Ð¸ÑÑ‚Ð¾Ñ‡Ð½Ð¸Ðº ÑÐ²ÐµÑ‚Ð° Ñ€Ð¸ÑÑƒÐµÑ‚ÑÑ ÐºÑƒÑ‡ÐµÐ¹ ÑÐ¿Ñ€Ð°Ð¹Ñ‚Ð¾Ð²
+	//ATTRLIGHT_SPHERICAL_OBJECT Ð¸ ATTRLIGHT_SPHERICAL_TERRAIN Ð¼Ð¾Ð¶Ð½Ð¾ ÐºÐ¾Ð¼Ð±Ð¸Ð½Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð²Ð¼ÐµÑÑ‚Ðµ Ð¿Ñ€Ð¸ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ð¸.
+	ATTRLIGHT_SPHERICAL_OBJECT		=	1<<6,	// ÑÑ„ÐµÑ€Ð¸Ñ‡ÐµÑÐºÐ¸Ð¹ Ð¸ÑÑ‚Ð¾Ñ‡Ð½Ð¸Ðº ÑÐ²ÐµÑ‚Ð°, Ð¾Ñ‚Ð±Ñ€Ð°ÑÑ‹Ð²Ð°ÐµÑ‚ ÑÐ²ÐµÑ‚ Ñ‚Ð¾Ð»ÑŒÐºÐ¾(!!!!)Ð½Ð° Ð¾Ð±ÑŠÐµÐºÑ‚Ñ‹
+	ATTRLIGHT_SPHERICAL_TERRAIN		=   1<<7,	// ÑÑ„ÐµÑ€Ð¸Ñ‡ÐµÑÐºÐ¸Ð¹ Ð¸ÑÑ‚Ð¾Ñ‡Ð½Ð¸Ðº ÑÐ²ÐµÑ‚Ð°, Ð¾Ñ‚Ð±Ñ€Ð°ÑÑ‹Ð²Ð°ÐµÑ‚ ÑÐ²ÐµÑ‚ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð½Ð° Ð·ÐµÐ¼Ð»ÑŽ
 };
 
 enum eAttributeSimply
 {
-	ATTRSIMPLY3DX_OPACITY				=	1<<26,  //Âíóòðåííèé ôëàã, íå óñòàíàâëèâàòü.
+	ATTRSIMPLY3DX_OPACITY				=	1<<26,  //Ð’Ð½ÑƒÑ‚Ñ€ÐµÐ½Ð½Ð¸Ð¹ Ñ„Ð»Ð°Ð³, Ð½Ðµ ÑƒÑÑ‚Ð°Ð½Ð°Ð²Ð»Ð¸Ð²Ð°Ñ‚ÑŒ.
 };
 
 #endif // _VISGENERIC_DEFINE_H_

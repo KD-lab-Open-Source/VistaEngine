@@ -14,7 +14,7 @@ public:
 	bool evolve(float dt);
 	void createEffect( const EffectAttribute* effect) { effectController.effectStart(effect); }
 	void removeEffect() { effectController.release(); }
-	void updateRegion(float x1, float y1, float x2, float y2); // Разбудить осколок если регион изменился.
+	void updateRegion(float x1, float y1, float x2, float y2); // Р Р°Р·Р±СѓРґРёС‚СЊ РѕСЃРєРѕР»РѕРє РµСЃР»Рё СЂРµРіРёРѕРЅ РёР·РјРµРЅРёР»СЃСЏ.
 	void setOpacity(float opacity);
 	cSimply3dx* model() { return model_; }
 	RigidBodyBox* rigidBody() { return body; }
@@ -28,8 +28,8 @@ private:
 };
 
 //=======================================================
-// Разрушает модель на осколки и отвечает за их отображение.
-// Сильно привязан к классу 3DX модели..
+// Р Р°Р·СЂСѓС€Р°РµС‚ РјРѕРґРµР»СЊ РЅР° РѕСЃРєРѕР»РєРё Рё РѕС‚РІРµС‡Р°РµС‚ Р·Р° РёС… РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ.
+// РЎРёР»СЊРЅРѕ РїСЂРёРІСЏР·Р°РЅ Рє РєР»Р°СЃСЃСѓ 3DX РјРѕРґРµР»Рё..
 //=======================================================
 class CrashModel3dx {
 	
@@ -40,7 +40,7 @@ class CrashModel3dx {
 
 	ExplodeProperty property;
 
-	float liveTime_; // Обратный осчет жизни. Если 0 то пора удалять...
+	float liveTime_; // РћР±СЂР°С‚РЅС‹Р№ РѕСЃС‡РµС‚ Р¶РёР·РЅРё. Р•СЃР»Рё 0 С‚Рѕ РїРѕСЂР° СѓРґР°Р»СЏС‚СЊ...
 	float liveTimeMax_;
 	bool enableFantomMode_;
 	float explodeFactor_;
@@ -59,14 +59,14 @@ public:
 };
 
 //=======================================================
-// Диспетчер для CrashModel3dx..
+// Р”РёСЃРїРµС‚С‡РµСЂ РґР»СЏ CrashModel3dx..
 //=======================================================
 class CrashSystem {
 public:
 	CrashSystem() {}
 	~CrashSystem();
-	// В параметрах: Юнит, Точка и мощность внешнего взрыва воздействующего на него.
-	// Если использовать парам. по умолчанию получится только внутренний взрыв.
+	// Р’ РїР°СЂР°РјРµС‚СЂР°С…: Р®РЅРёС‚, РўРѕС‡РєР° Рё РјРѕС‰РЅРѕСЃС‚СЊ РІРЅРµС€РЅРµРіРѕ РІР·СЂС‹РІР° РІРѕР·РґРµР№СЃС‚РІСѓСЋС‰РµРіРѕ РЅР° РЅРµРіРѕ.
+	// Р•СЃР»Рё РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РїР°СЂР°Рј. РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РїРѕР»СѓС‡РёС‚СЃСЏ С‚РѕР»СЊРєРѕ РІРЅСѓС‚СЂРµРЅРЅРёР№ РІР·СЂС‹РІ.
 	void addCrashModel(const DeathAttribute& deathAttribute, const c3dx* model, const Vect3f& position, const Vect3f& point, float power, float liveTime, const Vect3f& velocity = Vect3f::ZERO);
 	void moveQuant(float dt);
 	void updateRegion(float x1, float y1, float x2, float y2);

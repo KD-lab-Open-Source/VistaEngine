@@ -64,13 +64,13 @@ public:
 	void Draw(Camera* camera);
 
 	//speed particle/sec
-	//return - возвращает указатель объекта
-	cWaterBubbleCenter* AddCenter(int x,int y,int radius,float speed,cTexture* pTexture);//Удалять функцией delete
-	cWaterBubbleCenter* AddCenter(int x,int y,int radius,float speed,const char* textureName);//Удалять функцией delete
+	//return - РІРѕР·РІСЂР°С‰Р°РµС‚ СѓРєР°Р·Р°С‚РµР»СЊ РѕР±СЉРµРєС‚Р°
+	cWaterBubbleCenter* AddCenter(int x,int y,int radius,float speed,cTexture* pTexture);//РЈРґР°Р»СЏС‚СЊ С„СѓРЅРєС†РёРµР№ delete
+	cWaterBubbleCenter* AddCenter(int x,int y,int radius,float speed,const char* textureName);//РЈРґР°Р»СЏС‚СЊ С„СѓРЅРєС†РёРµР№ delete
 	void AddCenter(cWaterBubbleCenter* center);
 	void DeleteCenter(cWaterBubbleCenter* center);
 
-	void DeleteNearCenter(int x,int y);//Для отладки функция
+	void DeleteNearCenter(int x,int y);//Р”Р»СЏ РѕС‚Р»Р°РґРєРё С„СѓРЅРєС†РёСЏ
 
 	Centers& GetAllCenters(){return centers;}
 	void serialize(Archive& ar);

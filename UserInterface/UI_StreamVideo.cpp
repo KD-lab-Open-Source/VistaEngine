@@ -146,7 +146,7 @@ DWORD WINAPI BinkSimplePlayerImpl::threadProc(LPVOID lpParameter)
 	{
 		{
 			if(!pPlayer->getPause() && applicationHasFocus()){
-				// åñëè âûêëþ÷åí çâóê
+				// ÐµÑÐ»Ð¸ Ð²Ñ‹ÐºÐ»ÑŽÑ‡ÐµÐ½ Ð·Ð²ÑƒÐº
 				if(!GameOptions::instance().getBool(OPTION_VOICE_ENABLE))
 					pPlayer->setVolume(0.f);
 				else

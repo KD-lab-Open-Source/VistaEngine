@@ -187,14 +187,14 @@ void UI_Minimap::reposition()
 		float mainScaleY = scaleView;
 
 		if(scaleMinimap > scaleControl)
-		{	// вытянут вверх, пустые места по бокам
+		{	// РІС‹С‚СЏРЅСѓС‚ РІРІРµСЂС…, РїСѓСЃС‚С‹Рµ РјРµСЃС‚Р° РїРѕ Р±РѕРєР°Рј
 			mainScaleY = bound.height() / controlPose_.height();
 			mainScaleX = mainScaleY / scaleView;
 			bound.height(controlPose_.height());
 			bound.width(bound.height() * scaleView / scaleMinimap);
 		}
 		else{
-			// вытянут горизонтально, пустые места сверху и снизу
+			// РІС‹С‚СЏРЅСѓС‚ РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅРѕ, РїСѓСЃС‚С‹Рµ РјРµСЃС‚Р° СЃРІРµСЂС…Сѓ Рё СЃРЅРёР·Сѓ
 			mainScaleX = bound.width() / controlPose_.width();
 			mainScaleY = mainScaleX * scaleView;
 			bound.width(controlPose_.width());
@@ -523,7 +523,7 @@ void UI_Minimap::drawMiniMap(float alpha)
 	v[3].u1() = v[3].u2() = v[3].u3() = 1;
 	v[3].v1() = v[3].v2() = v[3].v3() = 1;
 
-	// координаты для рамки обрезки миникарты
+	// РєРѕРѕСЂРґРёРЅР°С‚С‹ РґР»СЏ СЂР°РјРєРё РѕР±СЂРµР·РєРё РјРёРЅРёРєР°СЂС‚С‹
 	if(mask_){
 		for(int i = 0; i < 4; i++)
 			setMaskUV(c[i], v[i].u4(), v[i].v4());

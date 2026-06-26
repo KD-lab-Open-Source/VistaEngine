@@ -17,7 +17,7 @@ namespace kdw{
 
 class RenderWindow;
 class ViewportImpl;
-/// сигналов
+/// СЃРёРіРЅР°Р»РѕРІ
 class KDW_API Viewport : public _WidgetWithWindow{
 public:
 	explicit Viewport(cInterfaceRenderDevice* renderDevice, bool continuousUpdate = false, int border = 0);
@@ -26,12 +26,12 @@ public:
 	void redraw(bool updateNow = false);
 	
 	virtual void onRedraw() {}
-	/// обычно нужно только для перещета Frustum-а камеры
+	/// РѕР±С‹С‡РЅРѕ РЅСѓР¶РЅРѕ С‚РѕР»СЊРєРѕ РґР»СЏ РїРµСЂРµС‰РµС‚Р° Frustum-Р° РєР°РјРµСЂС‹
 	virtual void onInitialize() {}
 	virtual void onResize(int width, int height) { size_.set(width, height); } 
 
 
-	/// для получения координат используется mousePosition()
+	/// РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РєРѕРѕСЂРґРёРЅР°С‚ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ mousePosition()
 	virtual void onMouseMove();
 	virtual void onMouseWheel(int delta){}
 	virtual void onMouseButtonDown(MouseButton button) {}

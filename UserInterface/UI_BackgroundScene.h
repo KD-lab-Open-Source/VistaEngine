@@ -21,15 +21,15 @@ class UI_BackgroundAnimation
 public:
 	UI_BackgroundAnimation();
 
-	/// режимы проигрывания анимации
+	/// СЂРµР¶РёРјС‹ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ Р°РЅРёРјР°С†РёРё
 	enum PlayMode {
-		/// при заходе на экран, выходе с экрана, при появлении и исчезновении кнопок
+		/// РїСЂРё Р·Р°С…РѕРґРµ РЅР° СЌРєСЂР°РЅ, РІС‹С…РѕРґРµ СЃ СЌРєСЂР°РЅР°, РїСЂРё РїРѕСЏРІР»РµРЅРёРё Рё РёСЃС‡РµР·РЅРѕРІРµРЅРёРё РєРЅРѕРїРѕРє
 		PLAY_STARTUP,
-		/// всё время в фоне
+		/// РІСЃС‘ РІСЂРµРјСЏ РІ С„РѕРЅРµ
 		PLAY_PERMANENT,
-		/// при наведении мыши
+		/// РїСЂРё РЅР°РІРµРґРµРЅРёРё РјС‹С€Рё
 		PLAY_HOVER_STARTUP,
-		/// постоянно при наведении мыши
+		/// РїРѕСЃС‚РѕСЏРЅРЅРѕ РїСЂРё РЅР°РІРµРґРµРЅРёРё РјС‹С€Рё
 		PLAY_HOVER_PERMANENT
 	};
 
@@ -51,8 +51,8 @@ private:
 	std::string animationGroupName_;
 	std::string chainName_;
 
-	float duration_; // Длительность (в с)
-	bool reversed_;	// Проигрывать в прямом или обратном порядке
+	float duration_; // Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ (РІ СЃ)
+	bool reversed_;	// РџСЂРѕРёРіСЂС‹РІР°С‚СЊ РІ РїСЂСЏРјРѕРј РёР»Рё РѕР±СЂР°С‚РЅРѕРј РїРѕСЂСЏРґРєРµ
 
 	UI_EffectAttributeAttachable effect_;
 };
@@ -150,9 +150,9 @@ public:
 	bool isPlaying(UI_BackgroundAnimation::PlayMode mode) const;
 	bool isPlaying(const UI_BackgroundAnimation* animation) const;
 	
-	//! Запустить анимацию объекта с начала, если она еще не запущена
+	//! Р—Р°РїСѓСЃС‚РёС‚СЊ Р°РЅРёРјР°С†РёСЋ РѕР±СЉРµРєС‚Р° СЃ РЅР°С‡Р°Р»Р°, РµСЃР»Рё РѕРЅР° РµС‰Рµ РЅРµ Р·Р°РїСѓС‰РµРЅР°
 	bool play(const UI_BackgroundAnimation* animation, bool reverse = false);
-	//! Остановить анимацию объекта в текущем состоянии
+	//! РћСЃС‚Р°РЅРѕРІРёС‚СЊ Р°РЅРёРјР°С†РёСЋ РѕР±СЉРµРєС‚Р° РІ С‚РµРєСѓС‰РµРј СЃРѕСЃС‚РѕСЏРЅРёРё
 	bool stop(const UI_BackgroundAnimation* animation);
 
 	void quant(float dt);
@@ -201,7 +201,7 @@ public:
 	UI_BackgroundLightController();
 
 	bool start(const UI_BackgroundLight* prm, const Vect3f& position);
-	/// возвращает true если источник живой
+	/// РІРѕР·РІСЂР°С‰Р°РµС‚ true РµСЃР»Рё РёСЃС‚РѕС‡РЅРёРє Р¶РёРІРѕР№
 	bool quant(float dt);
 
 	void release();
@@ -247,9 +247,9 @@ public:
 
 	bool addLight(int light_index, const Vect2f& position);
 	
-	//! Запустить анимацию объекта с начала, если она еще не запущена
+	//! Р—Р°РїСѓСЃС‚РёС‚СЊ Р°РЅРёРјР°С†РёСЋ РѕР±СЉРµРєС‚Р° СЃ РЅР°С‡Р°Р»Р°, РµСЃР»Рё РѕРЅР° РµС‰Рµ РЅРµ Р·Р°РїСѓС‰РµРЅР°
 	bool play(const UI_BackgroundAnimation* animation, bool reverse = false);
-	//! Остановить анимацию объекта в текущем состоянии
+	//! РћСЃС‚Р°РЅРѕРІРёС‚СЊ Р°РЅРёРјР°С†РёСЋ РѕР±СЉРµРєС‚Р° РІ С‚РµРєСѓС‰РµРј СЃРѕСЃС‚РѕСЏРЅРёРё
 	bool stop(const UI_BackgroundAnimation* animation);
 
 	bool startEffect(const UI_EffectAttribute* attr, const class UI_ControlBase* owner);

@@ -15,7 +15,7 @@ public:
 	
 	void build(const RigidBodyPrm& prm, const Vect3f& center, const Vect3f& extent, float mass);
 	
-	bool evolve(float dt); // возвращает, было ли перемещение
+	bool evolve(float dt); // РІРѕР·РІСЂР°С‰Р°РµС‚, Р±С‹Р»Рѕ Р»Рё РїРµСЂРµРјРµС‰РµРЅРёРµ
 
 	void setPose(const Se3f& pose);
 	

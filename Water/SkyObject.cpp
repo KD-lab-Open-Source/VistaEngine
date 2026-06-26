@@ -18,14 +18,14 @@
 #include "DebugUtil.h"
 #include "Environment/Environment.h"
 
-//cRenderSky потомок от cRenderCubemap отвечает за отражения неба в воде.
+//cRenderSky РїРѕС‚РѕРјРѕРє РѕС‚ cRenderCubemap РѕС‚РІРµС‡Р°РµС‚ Р·Р° РѕС‚СЂР°Р¶РµРЅРёСЏ РЅРµР±Р° РІ РІРѕРґРµ.
 
-//Конструктор, в качестве параметра передается указатель на cSkyObj
+//РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ, РІ РєР°С‡РµСЃС‚РІРµ РїР°СЂР°РјРµС‚СЂР° РїРµСЂРµРґР°РµС‚СЃСЏ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° cSkyObj
 
-BEGIN_ENUM_DESCRIPTOR(SkyElementType, "Тип элемента неба")
-REGISTER_ENUM(SKY_ELEMENT_DAY, "Дневной")
-REGISTER_ENUM(SKY_ELEMENT_NIGHT, "Ночной")
-REGISTER_ENUM(SKY_ELEMENT_DAYNIGHT, "Круглосуточный")
+BEGIN_ENUM_DESCRIPTOR(SkyElementType, "РўРёРї СЌР»РµРјРµРЅС‚Р° РЅРµР±Р°")
+REGISTER_ENUM(SKY_ELEMENT_DAY, "Р”РЅРµРІРЅРѕР№")
+REGISTER_ENUM(SKY_ELEMENT_NIGHT, "РќРѕС‡РЅРѕР№")
+REGISTER_ENUM(SKY_ELEMENT_DAYNIGHT, "РљСЂСѓРіР»РѕСЃСѓС‚РѕС‡РЅС‹Р№")
 END_ENUM_DESCRIPTOR(SkyElementType)
 
 cSunMoonObj::cSunMoonObj()
@@ -55,10 +55,10 @@ SunMoonAttribute::SunMoonAttribute()
 void SunMoonAttribute::serialize(Archive& ar)
 {
 	static ResourceSelector::Options textureOptions("*.tga", "Resource\\TerrainData\\Textures");
-	ar.serialize(ResourceSelector(SunName, textureOptions), "sunTextureName", "Текстура Cолнца");
-	ar.serialize(ResourceSelector(MoonName, textureOptions), "moonTextureName", "Текстура Луны");
-	ar.serialize(sunSize, "sunSize", "Размер солнца");
-	ar.serialize(moonSize, "sunSize", "Размер луны");
+	ar.serialize(ResourceSelector(SunName, textureOptions), "sunTextureName", "РўРµРєСЃС‚СѓСЂР° CРѕР»РЅС†Р°");
+	ar.serialize(ResourceSelector(MoonName, textureOptions), "moonTextureName", "РўРµРєСЃС‚СѓСЂР° Р›СѓРЅС‹");
+	ar.serialize(sunSize, "sunSize", "Р Р°Р·РјРµСЂ СЃРѕР»РЅС†Р°");
+	ar.serialize(moonSize, "sunSize", "Р Р°Р·РјРµСЂ Р»СѓРЅС‹");
 }
 
 void cSunMoonObj::serialize(Archive& ar)
@@ -162,7 +162,7 @@ cRenderSky::cRenderSky(cSkyObj* pSkyObj_)
 	pSkyObj = pSkyObj_;
 }
 
-//Отрисовка отражения с помощью камеры с указанным индексом
+//РћС‚СЂРёСЃРѕРІРєР° РѕС‚СЂР°Р¶РµРЅРёСЏ СЃ РїРѕРјРѕС‰СЊСЋ РєР°РјРµСЂС‹ СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРЅРґРµРєСЃРѕРј
 void cRenderSky::DrawOne(int i)
 {
 	pSkyObj->DrawSky(camera[i],true);
@@ -171,12 +171,12 @@ void cRenderSky::DrawOne(int i)
 void SkyName::serialize(Archive& ar)
 {
 	static ModelSelector::Options    skyOptions("*.3dx", "Resource\\TerrainData\\Sky", "Will select location of 3DX model");
-	ar.serialize(ModelSelector(Name, skyOptions), "name", "&Модель");
-	ar.serialize(type,"SkyElemntType","Тип элемента");
+	ar.serialize(ModelSelector(Name, skyOptions), "name", "&РњРѕРґРµР»СЊ");
+	ar.serialize(type,"SkyElemntType","РўРёРї СЌР»РµРјРµРЅС‚Р°");
 }
-//cSkyObj отвечает за загрузку и отрисовку неба
+//cSkyObj РѕС‚РІРµС‡Р°РµС‚ Р·Р° Р·Р°РіСЂСѓР·РєСѓ Рё РѕС‚СЂРёСЃРѕРІРєСѓ РЅРµР±Р°
 
-//Конструктор cSkyObj, в качестве параметров передается глобальная сцена и cEnvironmentTime для получения цвета тумана
+//РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ cSkyObj, РІ РєР°С‡РµСЃС‚РІРµ РїР°СЂР°РјРµС‚СЂРѕРІ РїРµСЂРµРґР°РµС‚СЃСЏ РіР»РѕР±Р°Р»СЊРЅР°СЏ СЃС†РµРЅР° Рё cEnvironmentTime РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ С†РІРµС‚Р° С‚СѓРјР°РЅР°
 cSkyObj::cSkyObj(cScene* pScene_, EnvironmentTime* pEnviromentTime)
 :pWorldScene(pScene_)
 {
@@ -211,7 +211,7 @@ SkyObjAttribute::SkyObjAttribute() // CONVERSION
 
 void SkyObjAttribute::serialize(Archive& ar)
 {
-	ar.serialize(sky_elements_names, "sky_elements", "Элементы неба");
+	ar.serialize(sky_elements_names, "sky_elements", "Р­Р»РµРјРµРЅС‚С‹ РЅРµР±Р°");
 }
 
 void cSkyObj::serialize(Archive& ar)
@@ -241,7 +241,7 @@ void cSkyObj::SetDay(bool is_day)
 	sunMoonObj.SetDay(is_day);
 }
 
-//Загрузка моделей неба
+//Р—Р°РіСЂСѓР·РєР° РјРѕРґРµР»РµР№ РЅРµР±Р°
 void cSkyObj::SetSkyModel()
 {
 	Se3f pos=Se3f::ID;
@@ -331,7 +331,7 @@ void cSkyObj::DrawSky(Camera* pGlobalCamera,bool hdr_alpha)
 
 	rd->SetRenderState(D3DRS_FOGENABLE,old_fogenable);
 
-	if(!hdr_alpha)///Непонятно - правильно ли?
+	if(!hdr_alpha)///РќРµРїРѕРЅСЏС‚РЅРѕ - РїСЂР°РІРёР»СЊРЅРѕ Р»Рё?
 	{
 		rd->SetDrawTransform(pNormalCamera);
 		DWORD old_fogenable=rd->GetRenderState(D3DRS_FOGENABLE);
@@ -347,7 +347,7 @@ void cSkyObj::DrawSky(Camera* pGlobalCamera,bool hdr_alpha)
 	pNormalCamera->SetRenderTarget((IDirect3DSurface9*)0,0);
 }
 
-//Отрисовка неба
+//РћС‚СЂРёСЃРѕРІРєР° РЅРµР±Р°
 void cSkyObj::DrawSkyAndAnimate(Camera* pGlobalCamera)
 {
 	float dt=pWorldScene->GetDeltaTime();
@@ -431,14 +431,14 @@ ib
 */
 
 #define FOG_CENTER
-//Инициализация тумана
+//РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С‚СѓРјР°РЅР°
 cFogCircleEX::cFogCircleEX(EnvironmentTime* time_)
 {
 	cD3DRender* rd=gb_RenderDevice3D;
 	time = time_;
 
-	//Две полосы одна - одна из прозрачного в непрозрачное, другая полностью непрозрачная.
-	//И снизу шатёр из треугольников.
+	//Р”РІРµ РїРѕР»РѕСЃС‹ РѕРґРЅР° - РѕРґРЅР° РёР· РїСЂРѕР·СЂР°С‡РЅРѕРіРѕ РІ РЅРµРїСЂРѕР·СЂР°С‡РЅРѕРµ, РґСЂСѓРіР°СЏ РїРѕР»РЅРѕСЃС‚СЊСЋ РЅРµРїСЂРѕР·СЂР°С‡РЅР°СЏ.
+	//Р СЃРЅРёР·Сѓ С€Р°С‚С‘СЂ РёР· С‚СЂРµСѓРіРѕР»СЊРЅРёРєРѕРІ.
 
 	size_vb = (hord_count+1)*3;
 	size_ib = hord_count*4;
@@ -512,7 +512,7 @@ void cFogCircleEX::SetHeight(int height_)
 	rd->UnlockIndexBuffer(cborder_ib);
 }
 
-//Отрисовка тумана
+//РћС‚СЂРёСЃРѕРІРєР° С‚СѓРјР°РЅР°
 void cFogCircleEX::Draw(Camera* camera)
 {
 	if (cborder_vb.IsInit())
@@ -647,19 +647,19 @@ void EnvironmentTimeColors::mergeColor(KeysColor& out/*0.00-24.00*/,const KeysCo
 
 void EnvironmentTimeColors::serialize(Archive& ar)
 {
-	ar.serialize(static_cast<SkyGradient&>(fone_color),"fone_color","Цвет неба");
-	ar.serialize(static_cast<SkyGradient&>(reflect_sky_color),"reflect_sky_color","Цвет отраженного неба в воде");
-	ar.serialize(static_cast<SkyGradient&>(sun_color),"sun_color","Цвет солнца");
-	ar.serialize(static_cast<SkyGradient&>(fog_color),"fog_color","Цвет тумана");
-	ar.serialize(static_cast<SkyGradient&>(shadow_color),"shadow_color","Цвет теней (!!! нормальный серый около 0.5 )");
-	ar.serialize(static_cast<SkyAlphaGradient&>(circle_shadow_color),"circle_shadow_color","Цвет теней кружками");
+	ar.serialize(static_cast<SkyGradient&>(fone_color),"fone_color","Р¦РІРµС‚ РЅРµР±Р°");
+	ar.serialize(static_cast<SkyGradient&>(reflect_sky_color),"reflect_sky_color","Р¦РІРµС‚ РѕС‚СЂР°Р¶РµРЅРЅРѕРіРѕ РЅРµР±Р° РІ РІРѕРґРµ");
+	ar.serialize(static_cast<SkyGradient&>(sun_color),"sun_color","Р¦РІРµС‚ СЃРѕР»РЅС†Р°");
+	ar.serialize(static_cast<SkyGradient&>(fog_color),"fog_color","Р¦РІРµС‚ С‚СѓРјР°РЅР°");
+	ar.serialize(static_cast<SkyGradient&>(shadow_color),"shadow_color","Р¦РІРµС‚ С‚РµРЅРµР№ (!!! РЅРѕСЂРјР°Р»СЊРЅС‹Р№ СЃРµСЂС‹Р№ РѕРєРѕР»Рѕ 0.5 )");
+	ar.serialize(static_cast<SkyAlphaGradient&>(circle_shadow_color),"circle_shadow_color","Р¦РІРµС‚ С‚РµРЅРµР№ РєСЂСѓР¶РєР°РјРё");
 
-	ar.serialize(RangedWrapperf(shadow_intensity, 0.0f, 1.0f), "shadow_intensity", "Интенсивность теней");
-	ar.serialize(RangedWrapperf(shadowDecay, 0.0f, 1.0f), "shadowDecay", "Ослабление теней с наклоном солнца");
-	ar.serialize(shadowing, "shadowing", "Освещение поверхности");
-	ar.serialize(objectShadowing, "objectShadowing", "Освещение объектов");
-	ar.serialize(RangedWrapperf(latitude_angle, 0.0f, 70.0f), "latitude_angle", "Широта местности (0-экватор, 90-полюс)");
-	ar.serialize(RangedWrapperf(slant_angle, -180.0f, 180.0f), "slant_angle", "Поворот солнца (-180..+180)");
+	ar.serialize(RangedWrapperf(shadow_intensity, 0.0f, 1.0f), "shadow_intensity", "РРЅС‚РµРЅСЃРёРІРЅРѕСЃС‚СЊ С‚РµРЅРµР№");
+	ar.serialize(RangedWrapperf(shadowDecay, 0.0f, 1.0f), "shadowDecay", "РћСЃР»Р°Р±Р»РµРЅРёРµ С‚РµРЅРµР№ СЃ РЅР°РєР»РѕРЅРѕРј СЃРѕР»РЅС†Р°");
+	ar.serialize(shadowing, "shadowing", "РћСЃРІРµС‰РµРЅРёРµ РїРѕРІРµСЂС…РЅРѕСЃС‚Рё");
+	ar.serialize(objectShadowing, "objectShadowing", "РћСЃРІРµС‰РµРЅРёРµ РѕР±СЉРµРєС‚РѕРІ");
+	ar.serialize(RangedWrapperf(latitude_angle, 0.0f, 70.0f), "latitude_angle", "РЁРёСЂРѕС‚Р° РјРµСЃС‚РЅРѕСЃС‚Рё (0-СЌРєРІР°С‚РѕСЂ, 90-РїРѕР»СЋСЃ)");
+	ar.serialize(RangedWrapperf(slant_angle, -180.0f, 180.0f), "slant_angle", "РџРѕРІРѕСЂРѕС‚ СЃРѕР»РЅС†Р° (-180..+180)");
 }
 
 EnvironmentTime::EnvironmentTime(cScene* pScene_)
@@ -899,16 +899,16 @@ void cSkyObj::setFogHeight(int height)
 void EnvironmentTime::serialize(Archive& ar)
 {
 	if(ar.filter(SERIALIZE_PRESET_DATA)){
-		ar.serialize(dayTimeScale_, "dayTimeScale", "Масштаб времени днем");
-		ar.serialize(nightTimeScale_, "nightTimeScale", "Масштаб времени ночью");
+		ar.serialize(dayTimeScale_, "dayTimeScale", "РњР°СЃС€С‚Р°Р± РІСЂРµРјРµРЅРё РґРЅРµРј");
+		ar.serialize(nightTimeScale_, "nightTimeScale", "РњР°СЃС€С‚Р°Р± РІСЂРµРјРµРЅРё РЅРѕС‡СЊСЋ");
 
 		__super::serialize(ar);
 
-		ar.serialize(*skyObj_, "Sky", "Небо");
+		ar.serialize(*skyObj_, "Sky", "РќРµР±Рѕ");
 	}
 
 	if(ar.filter(SERIALIZE_WORLD_DATA)){
-		ar.serialize(RangedWrapperf(day_time, 0.0f, 24.0f), "dayTime", "Время суток");
+		ar.serialize(RangedWrapperf(day_time, 0.0f, 24.0f), "dayTime", "Р’СЂРµРјСЏ СЃСѓС‚РѕРє");
 		if(ar.isInput())
 			SetTime(day_time, true);
 	}

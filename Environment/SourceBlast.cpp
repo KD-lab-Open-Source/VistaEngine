@@ -30,15 +30,15 @@ void SourceBlast::quant()
 void SourceBlast::serialize( Archive& ar )
 {
 	SourceBase::serialize(ar);
-	ar.serialize(radiusSpeed, "radiusSpeed", "�������� [100..300]");
-	ar.serialize(blastPower, "blastPower", "�������� [100..300]");
+	ar.serialize(radiusSpeed, "radiusSpeed", "Скорость [100..300]");
+	ar.serialize(blastPower, "blastPower", "Мощность [100..300]");
 
 	radius_ = 500;
 }
 
 void SourceBlast::windMapQuant()
 {
-	// ������������ ����� ����� ��������� ���� �� ������ ������.
+	// Динамическая карта ветра очищается сама на каждом кванте.
 	float heightCur = blastPower - radiusCur/radius() * blastPower;
 	
 	int xl = max(int(round(position().x - radiusCur)) >> windMap->tileSizeShl, 0);

@@ -41,18 +41,18 @@
 #include "WeaponPrms.h"
 #include "WBuffer.h"
 
-// параметры поиска для установки здания
+// РїР°СЂР°РјРµС‚СЂС‹ РїРѕРёСЃРєР° РґР»СЏ СѓСЃС‚Р°РЅРѕРІРєРё Р·РґР°РЅРёСЏ
 int ai_building_pause = 200; // ms
 int ai_scan_step = 64;
 float ai_scan_size_of_step_factor = 2;
-int ai_scan_step_unable_to_find = 16; // При этом шаге прекращается сканирование, считая, что нужной позиции нет
+int ai_scan_step_unable_to_find = 16; // РџСЂРё СЌС‚РѕРј С€Р°РіРµ РїСЂРµРєСЂР°С‰Р°РµС‚СЃСЏ СЃРєР°РЅРёСЂРѕРІР°РЅРёРµ, СЃС‡РёС‚Р°СЏ, С‡С‚Рѕ РЅСѓР¶РЅРѕР№ РїРѕР·РёС†РёРё РЅРµС‚
 int ai_placement_iterations_per_quant = 15;
 
-// параметры атаки спец оружием 
+// РїР°СЂР°РјРµС‚СЂС‹ Р°С‚Р°РєРё СЃРїРµС† РѕСЂСѓР¶РёРµРј 
 float scanRadiusAim = 20.f;
 int maxWeaponSpecialScan = 5;
 
-// параметры апгрейда
+// РїР°СЂР°РјРµС‚СЂС‹ Р°РїРіСЂРµР№РґР°
 const float stepOnConvexSide = 20.f;
 
 string editSignalVariableDialog();
@@ -64,129 +64,129 @@ STARFORCE_API void initActions()
 {
 SECUROM_MARKER_HIGH_SECURITY_ON(2);
 
-REGISTER_CLASS(Action, Action, "Глобальные действия\\Пустое действие")
-REGISTER_CLASS(Action, ActionDelay, "Глобальные действия\\Задержка времени")
-REGISTER_CLASS(Action, ActionRestartTriggers, "Глобальные действия\\Сделать неактивными все стрелки триггера")
-REGISTER_CLASS(Action, ActionStartTrigger, "Глобальные действия\\Запустить триггер")
-REGISTER_CLASS(Action, ActionExitFromMission, "Глобальные действия\\Выход из миссии")
-REGISTER_CLASS(Action, ActionGameQuit, "Глобальные действия\\Выход из игры")
-REGISTER_CLASS(Action, ActionOnlineLogout, "Глобальные действия\\Выход из online (logout)")
-REGISTER_CLASS(Action, ActionGameUpdateOpen, "Глобальные действия\\Открыть страницу для загрузки обновления")
-REGISTER_CLASS(Action, ActionShowReel, "Глобальные действия\\Показать ролик")
-REGISTER_CLASS(Action, ActionShowLogoReel, "Глобальные действия\\Показать программный ролик")
-REGISTER_CLASS(Action, ActionStartMission, "Глобальные действия\\Запустить миссию")
-REGISTER_CLASS(Action, ActionSetCurrentMission, "Глобальные действия\\Установить текущую миссию")
-REGISTER_CLASS_CONVERSION(Action, ActionResetCurrentMission, "Глобальные действия\\Очистить текущую миссию", "struct ActionReseCurrentMission")
-REGISTER_CLASS(Action, ActionSetCurrentMissionAsPassed, "Глобальные действия\\Считать текущую миссию пройденной")
-REGISTER_CLASS(Action, ActionSwitchTriggers, "Глобальные действия\\Включить/Выключить триггера")
-REGISTER_CLASS(Action, ActionSetPlayerWin, "Глобальные действия\\Считать игрока выигравшим");
-REGISTER_CLASS(Action, ActionSetPlayerDefeat, "Глобальные действия\\Считать игрока проигравшим");
-REGISTER_CLASS(Action, ActionSetInt, "Глобальные действия\\Установка целочисленной переменной")
-REGISTER_CLASS(Action, ActionSetSignalVariable, "Глобальные действия\\Сигнальная переменная");
-REGISTER_CLASS(Action, ActionSetCutScene, "Глобальные действия\\Включить/выключить кат-сцену (убирает игровую информацию)");
-REGISTER_CLASS(Action, ActionReadPlayerParameters, "Глобальные действия\\Прочитать параметры профиля");
-REGISTER_CLASS(Action, ActionWritePlayerParameters, "Глобальные действия\\Записать параметры профиля");
+REGISTER_CLASS(Action, Action, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РџСѓСЃС‚РѕРµ РґРµР№СЃС‚РІРёРµ")
+REGISTER_CLASS(Action, ActionDelay, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р—Р°РґРµСЂР¶РєР° РІСЂРµРјРµРЅРё")
+REGISTER_CLASS(Action, ActionRestartTriggers, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РЎРґРµР»Р°С‚СЊ РЅРµР°РєС‚РёРІРЅС‹РјРё РІСЃРµ СЃС‚СЂРµР»РєРё С‚СЂРёРіРіРµСЂР°")
+REGISTER_CLASS(Action, ActionStartTrigger, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р—Р°РїСѓСЃС‚РёС‚СЊ С‚СЂРёРіРіРµСЂ")
+REGISTER_CLASS(Action, ActionExitFromMission, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р’С‹С…РѕРґ РёР· РјРёСЃСЃРёРё")
+REGISTER_CLASS(Action, ActionGameQuit, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р’С‹С…РѕРґ РёР· РёРіСЂС‹")
+REGISTER_CLASS(Action, ActionOnlineLogout, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р’С‹С…РѕРґ РёР· online (logout)")
+REGISTER_CLASS(Action, ActionGameUpdateOpen, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РћС‚РєСЂС‹С‚СЊ СЃС‚СЂР°РЅРёС†Сѓ РґР»СЏ Р·Р°РіСЂСѓР·РєРё РѕР±РЅРѕРІР»РµРЅРёСЏ")
+REGISTER_CLASS(Action, ActionShowReel, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РџРѕРєР°Р·Р°С‚СЊ СЂРѕР»РёРє")
+REGISTER_CLASS(Action, ActionShowLogoReel, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РџРѕРєР°Р·Р°С‚СЊ РїСЂРѕРіСЂР°РјРјРЅС‹Р№ СЂРѕР»РёРє")
+REGISTER_CLASS(Action, ActionStartMission, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р—Р°РїСѓСЃС‚РёС‚СЊ РјРёСЃСЃРёСЋ")
+REGISTER_CLASS(Action, ActionSetCurrentMission, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РЈСЃС‚Р°РЅРѕРІРёС‚СЊ С‚РµРєСѓС‰СѓСЋ РјРёСЃСЃРёСЋ")
+REGISTER_CLASS_CONVERSION(Action, ActionResetCurrentMission, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РћС‡РёСЃС‚РёС‚СЊ С‚РµРєСѓС‰СѓСЋ РјРёСЃСЃРёСЋ", "struct ActionReseCurrentMission")
+REGISTER_CLASS(Action, ActionSetCurrentMissionAsPassed, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РЎС‡РёС‚Р°С‚СЊ С‚РµРєСѓС‰СѓСЋ РјРёСЃСЃРёСЋ РїСЂРѕР№РґРµРЅРЅРѕР№")
+REGISTER_CLASS(Action, ActionSwitchTriggers, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р’РєР»СЋС‡РёС‚СЊ/Р’С‹РєР»СЋС‡РёС‚СЊ С‚СЂРёРіРіРµСЂР°")
+REGISTER_CLASS(Action, ActionSetPlayerWin, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РЎС‡РёС‚Р°С‚СЊ РёРіСЂРѕРєР° РІС‹РёРіСЂР°РІС€РёРј");
+REGISTER_CLASS(Action, ActionSetPlayerDefeat, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РЎС‡РёС‚Р°С‚СЊ РёРіСЂРѕРєР° РїСЂРѕРёРіСЂР°РІС€РёРј");
+REGISTER_CLASS(Action, ActionSetInt, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РЈСЃС‚Р°РЅРѕРІРєР° С†РµР»РѕС‡РёСЃР»РµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№")
+REGISTER_CLASS(Action, ActionSetSignalVariable, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РЎРёРіРЅР°Р»СЊРЅР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ");
+REGISTER_CLASS(Action, ActionSetCutScene, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р’РєР»СЋС‡РёС‚СЊ/РІС‹РєР»СЋС‡РёС‚СЊ РєР°С‚-СЃС†РµРЅСѓ (СѓР±РёСЂР°РµС‚ РёРіСЂРѕРІСѓСЋ РёРЅС„РѕСЂРјР°С†РёСЋ)");
+REGISTER_CLASS(Action, ActionReadPlayerParameters, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РџСЂРѕС‡РёС‚Р°С‚СЊ РїР°СЂР°РјРµС‚СЂС‹ РїСЂРѕС„РёР»СЏ");
+REGISTER_CLASS(Action, ActionWritePlayerParameters, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р—Р°РїРёСЃР°С‚СЊ РїР°СЂР°РјРµС‚СЂС‹ РїСЂРѕС„РёР»СЏ");
 
-REGISTER_CLASS(Action, ActionUpgradeUnit, "Контекстные действия\\Апгрейд юнита определенного типа")
-REGISTER_CLASS(Action, ActionAttackLabel, "Контекстные действия\\Копать в метке на мире")
-REGISTER_CLASS(Action, ActionAttackBySpecialWeapon, "Контекстные действия\\Атаковать специальным оружием")
-REGISTER_CLASS(Action, ActionActivateSpecialWeapon, "Контекстные действия\\Активировать/Деактивировать спец. оружие")
-REGISTER_CLASS(Action, ActionAttack, "Контекстные действия\\Атаковать юнитами")
-REGISTER_CLASS(Action, ActionEscapeUnderShield, "Контекстные действия\\Выйти из под поля")
-REGISTER_CLASS(Action, ActionAttackMyUnit, "Контекстные действия\\Атаковать юнитами своих юнитов")
-REGISTER_CLASS(Action, ActionGuardUnit, "Контекстные действия\\Охранять юнита")
-REGISTER_CLASS(Action, ActionSetWalkMode, "Контекстные действия\\Режим движения сквада")
-REGISTER_CLASS(Action, ActionSetUnitAttackMode, "Контекстные действия\\Включить режим атаки юнита");
-REGISTER_CLASS(Action, ActionReturnToBase, "Контекстные действия\\Отходить на базу");
-REGISTER_CLASS(Action, ActionEscapeWater, "Контекстные действия\\Отходить на сушу")
-REGISTER_CLASS(Action, ActionAIUnitCommand, "Контекстные действия\\Послать команду")
-REGISTER_CLASS(Action, ActionPickResource, "Контекстные действия\\Добывать ресурс");
-REGISTER_CLASS(Action, ActionSquadMoveToItem, "Контекстные действия\\Послать сквад к предмету")
-REGISTER_CLASS(Action, ActionSquadMoveToObject, "Контекстные действия\\Послать сквад к объекту")
-REGISTER_CLASS(Action, ActionFollowSquad, "Контекстные действия\\Следовать за сквадом на расстоянии") 
-REGISTER_CLASS(Action, ActionJoinSquads, "Контекстные действия\\Объединить сквады") 
-REGISTER_CLASS(Action, ActionSplitSquad, "Контекстные действия\\Разъединить сквад") 
-REGISTER_CLASS(Action, ActionExploreArea, "Контекстные действия\\Разведать территорию")
-REGISTER_CLASS(Action, ActionPutUnitInTransport, "Контекстные действия\\Садиться в транспорт")
-REGISTER_CLASS(Action, ActionOutUnitFromTransport, "Контекстные действия\\Освободить транспорт от юнитов")
-REGISTER_CLASS(Action, ActionUnitClearOrders, "Контекстные действия\\Отменить все приказы данные юниту");
-REGISTER_CLASS(Action, ActionOrderUnitsInSquad, "Контекстные действия\\Заказать юнита в сквад")
-REGISTER_CLASS(Action, ActionSetUnitInvisible, "Контекстные действия\\Сделать юнита невидимым")
-REGISTER_CLASS(Action, ActionSetUnitSelectAble, "Контекстные действия\\Вкл./выкл. возможность селекта юнита")
-REGISTER_CLASS(Action, ActionSellBuilding, "Контекстные действия\\Продать здание")
-REGISTER_CLASS(Action, ActionOrderBuildings, "Контекстные действия\\Заказать здание")
-REGISTER_CLASS(Action, ActionContinueConstruction, "Контекстные действия\\Достроить здания")
-REGISTER_CLASS(Action, ActionSquadMoveToAnchor, "Контекстные действия\\Отправить сквад в метку на якоре")
-REGISTER_CLASS(Action, ActionSquadMoveToAssemblyPoint, "Контекстные действия\\Отправить сквад в точку поддержки")
-REGISTER_CLASS(Action, ActionPutSquadToAnchor, "Контекстные действия\\Переместить сквад в метку на якоре")
-REGISTER_CLASS(Action, ActionSetCameraAtObject, "Контекстные действия\\Установить камеру на объект")
-REGISTER_CLASS(Action, ActionSetObjectAnimation, "Контекстные действия\\Вкл./выкл. анимацию объекта")
-REGISTER_CLASS(Action, ActionSetIgnoreFreezedByTrigger, "Контекстные действия\\Вкл./выкл. игнорирование общей заморозки для отдельного объекта")
-REGISTER_CLASS(Action, ActionObjectParameterArithmetics, "Контекстные действия\\Арифметика параметров юнита")
-REGISTER_CLASS(Action, ActionSetUnitLevel, "Контекстные действия\\Установить уровень юнита(не влияет на параметры)")
-REGISTER_CLASS(Action, ActionSetUnitMinimapMark, "Контекстные действия\\Включить/выключить специальную пометку юнита")
+REGISTER_CLASS(Action, ActionUpgradeUnit, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РђРїРіСЂРµР№Рґ СЋРЅРёС‚Р° РѕРїСЂРµРґРµР»РµРЅРЅРѕРіРѕ С‚РёРїР°")
+REGISTER_CLASS(Action, ActionAttackLabel, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РљРѕРїР°С‚СЊ РІ РјРµС‚РєРµ РЅР° РјРёСЂРµ")
+REGISTER_CLASS(Action, ActionAttackBySpecialWeapon, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РђС‚Р°РєРѕРІР°С‚СЊ СЃРїРµС†РёР°Р»СЊРЅС‹Рј РѕСЂСѓР¶РёРµРј")
+REGISTER_CLASS(Action, ActionActivateSpecialWeapon, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РђРєС‚РёРІРёСЂРѕРІР°С‚СЊ/Р”РµР°РєС‚РёРІРёСЂРѕРІР°С‚СЊ СЃРїРµС†. РѕСЂСѓР¶РёРµ")
+REGISTER_CLASS(Action, ActionAttack, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РђС‚Р°РєРѕРІР°С‚СЊ СЋРЅРёС‚Р°РјРё")
+REGISTER_CLASS(Action, ActionEscapeUnderShield, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р’С‹Р№С‚Рё РёР· РїРѕРґ РїРѕР»СЏ")
+REGISTER_CLASS(Action, ActionAttackMyUnit, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РђС‚Р°РєРѕРІР°С‚СЊ СЋРЅРёС‚Р°РјРё СЃРІРѕРёС… СЋРЅРёС‚РѕРІ")
+REGISTER_CLASS(Action, ActionGuardUnit, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РћС…СЂР°РЅСЏС‚СЊ СЋРЅРёС‚Р°")
+REGISTER_CLASS(Action, ActionSetWalkMode, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р РµР¶РёРј РґРІРёР¶РµРЅРёСЏ СЃРєРІР°РґР°")
+REGISTER_CLASS(Action, ActionSetUnitAttackMode, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р’РєР»СЋС‡РёС‚СЊ СЂРµР¶РёРј Р°С‚Р°РєРё СЋРЅРёС‚Р°");
+REGISTER_CLASS(Action, ActionReturnToBase, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РћС‚С…РѕРґРёС‚СЊ РЅР° Р±Р°Р·Сѓ");
+REGISTER_CLASS(Action, ActionEscapeWater, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РћС‚С…РѕРґРёС‚СЊ РЅР° СЃСѓС€Сѓ")
+REGISTER_CLASS(Action, ActionAIUnitCommand, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РџРѕСЃР»Р°С‚СЊ РєРѕРјР°РЅРґСѓ")
+REGISTER_CLASS(Action, ActionPickResource, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р”РѕР±С‹РІР°С‚СЊ СЂРµСЃСѓСЂСЃ");
+REGISTER_CLASS(Action, ActionSquadMoveToItem, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РџРѕСЃР»Р°С‚СЊ СЃРєРІР°Рґ Рє РїСЂРµРґРјРµС‚Сѓ")
+REGISTER_CLASS(Action, ActionSquadMoveToObject, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РџРѕСЃР»Р°С‚СЊ СЃРєРІР°Рґ Рє РѕР±СЉРµРєС‚Сѓ")
+REGISTER_CLASS(Action, ActionFollowSquad, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РЎР»РµРґРѕРІР°С‚СЊ Р·Р° СЃРєРІР°РґРѕРј РЅР° СЂР°СЃСЃС‚РѕСЏРЅРёРё") 
+REGISTER_CLASS(Action, ActionJoinSquads, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РћР±СЉРµРґРёРЅРёС‚СЊ СЃРєРІР°РґС‹") 
+REGISTER_CLASS(Action, ActionSplitSquad, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р Р°Р·СЉРµРґРёРЅРёС‚СЊ СЃРєРІР°Рґ") 
+REGISTER_CLASS(Action, ActionExploreArea, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р Р°Р·РІРµРґР°С‚СЊ С‚РµСЂСЂРёС‚РѕСЂРёСЋ")
+REGISTER_CLASS(Action, ActionPutUnitInTransport, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РЎР°РґРёС‚СЊСЃСЏ РІ С‚СЂР°РЅСЃРїРѕСЂС‚")
+REGISTER_CLASS(Action, ActionOutUnitFromTransport, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РћСЃРІРѕР±РѕРґРёС‚СЊ С‚СЂР°РЅСЃРїРѕСЂС‚ РѕС‚ СЋРЅРёС‚РѕРІ")
+REGISTER_CLASS(Action, ActionUnitClearOrders, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РћС‚РјРµРЅРёС‚СЊ РІСЃРµ РїСЂРёРєР°Р·С‹ РґР°РЅРЅС‹Рµ СЋРЅРёС‚Сѓ");
+REGISTER_CLASS(Action, ActionOrderUnitsInSquad, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р—Р°РєР°Р·Р°С‚СЊ СЋРЅРёС‚Р° РІ СЃРєРІР°Рґ")
+REGISTER_CLASS(Action, ActionSetUnitInvisible, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РЎРґРµР»Р°С‚СЊ СЋРЅРёС‚Р° РЅРµРІРёРґРёРјС‹Рј")
+REGISTER_CLASS(Action, ActionSetUnitSelectAble, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р’РєР»./РІС‹РєР». РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ СЃРµР»РµРєС‚Р° СЋРЅРёС‚Р°")
+REGISTER_CLASS(Action, ActionSellBuilding, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РџСЂРѕРґР°С‚СЊ Р·РґР°РЅРёРµ")
+REGISTER_CLASS(Action, ActionOrderBuildings, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р—Р°РєР°Р·Р°С‚СЊ Р·РґР°РЅРёРµ")
+REGISTER_CLASS(Action, ActionContinueConstruction, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р”РѕСЃС‚СЂРѕРёС‚СЊ Р·РґР°РЅРёСЏ")
+REGISTER_CLASS(Action, ActionSquadMoveToAnchor, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РћС‚РїСЂР°РІРёС‚СЊ СЃРєРІР°Рґ РІ РјРµС‚РєСѓ РЅР° СЏРєРѕСЂРµ")
+REGISTER_CLASS(Action, ActionSquadMoveToAssemblyPoint, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РћС‚РїСЂР°РІРёС‚СЊ СЃРєРІР°Рґ РІ С‚РѕС‡РєСѓ РїРѕРґРґРµСЂР¶РєРё")
+REGISTER_CLASS(Action, ActionPutSquadToAnchor, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РџРµСЂРµРјРµСЃС‚РёС‚СЊ СЃРєРІР°Рґ РІ РјРµС‚РєСѓ РЅР° СЏРєРѕСЂРµ")
+REGISTER_CLASS(Action, ActionSetCameraAtObject, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РєР°РјРµСЂСѓ РЅР° РѕР±СЉРµРєС‚")
+REGISTER_CLASS(Action, ActionSetObjectAnimation, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р’РєР»./РІС‹РєР». Р°РЅРёРјР°С†РёСЋ РѕР±СЉРµРєС‚Р°")
+REGISTER_CLASS(Action, ActionSetIgnoreFreezedByTrigger, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р’РєР»./РІС‹РєР». РёРіРЅРѕСЂРёСЂРѕРІР°РЅРёРµ РѕР±С‰РµР№ Р·Р°РјРѕСЂРѕР·РєРё РґР»СЏ РѕС‚РґРµР»СЊРЅРѕРіРѕ РѕР±СЉРµРєС‚Р°")
+REGISTER_CLASS(Action, ActionObjectParameterArithmetics, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РђСЂРёС„РјРµС‚РёРєР° РїР°СЂР°РјРµС‚СЂРѕРІ СЋРЅРёС‚Р°")
+REGISTER_CLASS(Action, ActionSetUnitLevel, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\РЈСЃС‚Р°РЅРѕРІРёС‚СЊ СѓСЂРѕРІРµРЅСЊ СЋРЅРёС‚Р°(РЅРµ РІР»РёСЏРµС‚ РЅР° РїР°СЂР°РјРµС‚СЂС‹)")
+REGISTER_CLASS(Action, ActionSetUnitMinimapMark, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ РґРµР№СЃС‚РІРёСЏ\\Р’РєР»СЋС‡РёС‚СЊ/РІС‹РєР»СЋС‡РёС‚СЊ СЃРїРµС†РёР°Р»СЊРЅСѓСЋ РїРѕРјРµС‚РєСѓ СЋРЅРёС‚Р°")
 
-REGISTER_CLASS(Action, ActionOrderBuildingsOnZone, "АИ\\Заказать здание на зоне")
-REGISTER_CLASS(Action, ActionOrderBuildingCloseToEnemy, "АИ\\Заказать здание ближе к врагу или откл. зданию")
-REGISTER_CLASS(Action, ActionOrderUnits, "АИ\\Заказать юнитов на заводе")
-REGISTER_CLASS(Action, ActionOrderParameters, "АИ\\Производство параметров")
-REGISTER_CLASS(Action, ActionUnitParameterArithmetics, "АИ\\Арифметика параметров")
+REGISTER_CLASS(Action, ActionOrderBuildingsOnZone, "РђР\\Р—Р°РєР°Р·Р°С‚СЊ Р·РґР°РЅРёРµ РЅР° Р·РѕРЅРµ")
+REGISTER_CLASS(Action, ActionOrderBuildingCloseToEnemy, "РђР\\Р—Р°РєР°Р·Р°С‚СЊ Р·РґР°РЅРёРµ Р±Р»РёР¶Рµ Рє РІСЂР°РіСѓ РёР»Рё РѕС‚РєР». Р·РґР°РЅРёСЋ")
+REGISTER_CLASS(Action, ActionOrderUnits, "РђР\\Р—Р°РєР°Р·Р°С‚СЊ СЋРЅРёС‚РѕРІ РЅР° Р·Р°РІРѕРґРµ")
+REGISTER_CLASS(Action, ActionOrderParameters, "РђР\\РџСЂРѕРёР·РІРѕРґСЃС‚РІРѕ РїР°СЂР°РјРµС‚СЂРѕРІ")
+REGISTER_CLASS(Action, ActionUnitParameterArithmetics, "РђР\\РђСЂРёС„РјРµС‚РёРєР° РїР°СЂР°РјРµС‚СЂРѕРІ")
 
-REGISTER_CLASS(Action, ActionCommandsQueue, "Миссии\\Запустить очередь команд на выполнение")
-REGISTER_CLASS(Action, ActionInterruptCommandsQueue, "Миссии\\Прервать очередь команд")
-REGISTER_CLASS(Action, ActionCreateUnit, "Миссии\\Создать объект в точке якоря")
-REGISTER_CLASS(Action, ActionKillUnits, "Миссии\\Удалить объекты")
-REGISTER_CLASS(Action, ActionSwitchPlayer, "Миссии\\Переключиться на игрока")
-REGISTER_CLASS(Action, ActionActivateObjectByLabel, "Миссии\\Активировать объект по метке")
-REGISTER_CLASS(Action, ActionDeactivateObjectByLabel, "Миссии\\Деактивировать объект по метке")
-REGISTER_CLASS(Action, ActionSetControlEnabled, "Миссии\\Запретить/разрешить управление игрока")
-REGISTER_CLASS(Action, ActionSetFreezedByTrigger, "Миссии\\Заморозить/разморозить юнитов для кат-сцены")
-REGISTER_CLASS(Action, ActionEnableMessage, "Миссии\\Запретить/разрешить сообщения определенного типа")
-REGISTER_CLASS(Action, ActionEnableSounds, "Миссии\\Управление звуком")
-REGISTER_CLASS(Action, ActionMessage, "Миссии\\Сообщение")
-REGISTER_CLASS(Action, ActionInterrruptMessage, "Миссии\\Прервать сообщение")
-REGISTER_CLASS(Action, ActionInterruptAnimation, "Миссии\\Прервать анимацию")
-REGISTER_CLASS(Action, ActionTask, "Миссии\\Задача")
-REGISTER_CLASS(Action, ActionSelectUnit, "Миссии\\Селектировать юнита")
-REGISTER_CLASS(Action, ActionDeselect, "Миссии\\Сброс селекта")
-REGISTER_CLASS(Action, ActionSoundMessage, "Миссии\\Звуковое сообщение(2D)")
-REGISTER_CLASS(Action, ActionShowHead, "Миссии\\Включить анимацию головы")
+REGISTER_CLASS(Action, ActionCommandsQueue, "РњРёСЃСЃРёРё\\Р—Р°РїСѓСЃС‚РёС‚СЊ РѕС‡РµСЂРµРґСЊ РєРѕРјР°РЅРґ РЅР° РІС‹РїРѕР»РЅРµРЅРёРµ")
+REGISTER_CLASS(Action, ActionInterruptCommandsQueue, "РњРёСЃСЃРёРё\\РџСЂРµСЂРІР°С‚СЊ РѕС‡РµСЂРµРґСЊ РєРѕРјР°РЅРґ")
+REGISTER_CLASS(Action, ActionCreateUnit, "РњРёСЃСЃРёРё\\РЎРѕР·РґР°С‚СЊ РѕР±СЉРµРєС‚ РІ С‚РѕС‡РєРµ СЏРєРѕСЂСЏ")
+REGISTER_CLASS(Action, ActionKillUnits, "РњРёСЃСЃРёРё\\РЈРґР°Р»РёС‚СЊ РѕР±СЉРµРєС‚С‹")
+REGISTER_CLASS(Action, ActionSwitchPlayer, "РњРёСЃСЃРёРё\\РџРµСЂРµРєР»СЋС‡РёС‚СЊСЃСЏ РЅР° РёРіСЂРѕРєР°")
+REGISTER_CLASS(Action, ActionActivateObjectByLabel, "РњРёСЃСЃРёРё\\РђРєС‚РёРІРёСЂРѕРІР°С‚СЊ РѕР±СЉРµРєС‚ РїРѕ РјРµС‚РєРµ")
+REGISTER_CLASS(Action, ActionDeactivateObjectByLabel, "РњРёСЃСЃРёРё\\Р”РµР°РєС‚РёРІРёСЂРѕРІР°С‚СЊ РѕР±СЉРµРєС‚ РїРѕ РјРµС‚РєРµ")
+REGISTER_CLASS(Action, ActionSetControlEnabled, "РњРёСЃСЃРёРё\\Р—Р°РїСЂРµС‚РёС‚СЊ/СЂР°Р·СЂРµС€РёС‚СЊ СѓРїСЂР°РІР»РµРЅРёРµ РёРіСЂРѕРєР°")
+REGISTER_CLASS(Action, ActionSetFreezedByTrigger, "РњРёСЃСЃРёРё\\Р—Р°РјРѕСЂРѕР·РёС‚СЊ/СЂР°Р·РјРѕСЂРѕР·РёС‚СЊ СЋРЅРёС‚РѕРІ РґР»СЏ РєР°С‚-СЃС†РµРЅС‹")
+REGISTER_CLASS(Action, ActionEnableMessage, "РњРёСЃСЃРёРё\\Р—Р°РїСЂРµС‚РёС‚СЊ/СЂР°Р·СЂРµС€РёС‚СЊ СЃРѕРѕР±С‰РµРЅРёСЏ РѕРїСЂРµРґРµР»РµРЅРЅРѕРіРѕ С‚РёРїР°")
+REGISTER_CLASS(Action, ActionEnableSounds, "РњРёСЃСЃРёРё\\РЈРїСЂР°РІР»РµРЅРёРµ Р·РІСѓРєРѕРј")
+REGISTER_CLASS(Action, ActionMessage, "РњРёСЃСЃРёРё\\РЎРѕРѕР±С‰РµРЅРёРµ")
+REGISTER_CLASS(Action, ActionInterrruptMessage, "РњРёСЃСЃРёРё\\РџСЂРµСЂРІР°С‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ")
+REGISTER_CLASS(Action, ActionInterruptAnimation, "РњРёСЃСЃРёРё\\РџСЂРµСЂРІР°С‚СЊ Р°РЅРёРјР°С†РёСЋ")
+REGISTER_CLASS(Action, ActionTask, "РњРёСЃСЃРёРё\\Р—Р°РґР°С‡Р°")
+REGISTER_CLASS(Action, ActionSelectUnit, "РњРёСЃСЃРёРё\\РЎРµР»РµРєС‚РёСЂРѕРІР°С‚СЊ СЋРЅРёС‚Р°")
+REGISTER_CLASS(Action, ActionDeselect, "РњРёСЃСЃРёРё\\РЎР±СЂРѕСЃ СЃРµР»РµРєС‚Р°")
+REGISTER_CLASS(Action, ActionSoundMessage, "РњРёСЃСЃРёРё\\Р—РІСѓРєРѕРІРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ(2D)")
+REGISTER_CLASS(Action, ActionShowHead, "РњРёСЃСЃРёРё\\Р’РєР»СЋС‡РёС‚СЊ Р°РЅРёРјР°С†РёСЋ РіРѕР»РѕРІС‹")
 
-REGISTER_CLASS(Action, ActionSetCamera, "Камера\\Установка Камеры")
-REGISTER_CLASS(Action, ActionSetDefaultCamera, "Камера\\Установка стандартной камеры")
-REGISTER_CLASS(Action, ActionOscillateCamera, "Камера\\Тряска Камеры")
-REGISTER_CLASS(Action, ActionSetCameraFromObject, "Камера\\Отключать камеру от объекта")
-REGISTER_CLASS(Action, ActionSetCameraAtSquad, "Камера\\Установить камеру на сквад")
-REGISTER_CLASS(Action, ActionSetCameraRestriction, "Камера\\Ограничения камеры")
+REGISTER_CLASS(Action, ActionSetCamera, "РљР°РјРµСЂР°\\РЈСЃС‚Р°РЅРѕРІРєР° РљР°РјРµСЂС‹")
+REGISTER_CLASS(Action, ActionSetDefaultCamera, "РљР°РјРµСЂР°\\РЈСЃС‚Р°РЅРѕРІРєР° СЃС‚Р°РЅРґР°СЂС‚РЅРѕР№ РєР°РјРµСЂС‹")
+REGISTER_CLASS(Action, ActionOscillateCamera, "РљР°РјРµСЂР°\\РўСЂСЏСЃРєР° РљР°РјРµСЂС‹")
+REGISTER_CLASS(Action, ActionSetCameraFromObject, "РљР°РјРµСЂР°\\РћС‚РєР»СЋС‡Р°С‚СЊ РєР°РјРµСЂСѓ РѕС‚ РѕР±СЉРµРєС‚Р°")
+REGISTER_CLASS(Action, ActionSetCameraAtSquad, "РљР°РјРµСЂР°\\РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РєР°РјРµСЂСѓ РЅР° СЃРєРІР°Рґ")
+REGISTER_CLASS(Action, ActionSetCameraRestriction, "РљР°РјРµСЂР°\\РћРіСЂР°РЅРёС‡РµРЅРёСЏ РєР°РјРµСЂС‹")
 
-REGISTER_CLASS(Action, ActionSetDirectControl, "Интерфейс\\Включить/Выключить прямое/синдикатное управление")
-REGISTER_CLASS(Action, ActionSetGamePause, "Интерфейс\\Включить/Выключить паузу игры")
-REGISTER_CLASS(Action, ActionSave, "Интерфейс\\Сохранить игру")
-REGISTER_CLASS(Action, ActionSaveAuto, "Интерфейс\\Сохранить игру (автосейв)")
-REGISTER_CLASS(Action, ActionLoadGameAuto, "Интерфейс\\Загрузить игру (автосейв)")
-REGISTER_CLASS(Action, ActionSetInterface, "Интерфейс\\Включить/выключить интерфейс")
-REGISTER_CLASS(Action, ActionSelectInterfaceScreen, "Интерфейс\\Включить экран интерфейса")
-REGISTER_CLASS(Action, ActionUI_ScreenSwitchOff, "Интерфейс\\Выключить экран интерфейса")
-REGISTER_CLASS(Action, ActionInterfaceHideControl, "Интерфейс\\Спрятать кнопку мягко, ПЕРЕДЕЛАТЬ на /Операции над кнопками/")
-REGISTER_CLASS(Action, ActionInterfaceHideControlTrigger, "Интерфейс\\Спрятать кнопку жестко, ПЕРЕДЕЛАТЬ на /Операции над кнопками/")
-REGISTER_CLASS(Action, ActionInterfaceControlOperate, "Интерфейс\\Операции над кнопками")
-REGISTER_CLASS(Action, ActionInterfaceTogglAccessibility, "Интерфейс\\Переключить доступность кнопки")
-REGISTER_CLASS(Action, ActionInterfaceSetControlState, "Интерфейс\\Переключить состояние кнопки")
-REGISTER_CLASS(Action, ActionCreateNetClient, "Интерфейс\\Создать сетевой клиент")
-REGISTER_CLASS(Action, ActionUI_GameStart, "Интерфейс\\Старт игры")
-REGISTER_CLASS(Action, ActionUI_LanGameStart, "Интерфейс\\Старт сетевой игры")
-REGISTER_CLASS(Action, ActionUI_LanGameJoin, "Интерфейс\\Присоединение к сетевой игре")
-REGISTER_CLASS(Action, ActionUI_LanGameCreate, "Интерфейс\\Создание сетевой игры")
-REGISTER_CLASS(Action, ActionUI_UnitCommand, "Интерфейс\\Контекстная команда заселекченным юнитам")
-REGISTER_CLASS(Action, ActionResetNetCenter, "Интерфейс\\Завершить сетевую игру")
-REGISTER_CLASS(Action, ActionKillNetCenter, "Интерфейс\\Завершить работу с сетью")
-REGISTER_CLASS(Action, ActionToggleBuildingInstaller, "Интерфейс\\Включить режим установки здания")
-REGISTER_CLASS(Action, ActionUI_ConfirmDiskOp, "Интерфейс\\Подтверждение перезаписи или удаления")
-REGISTER_CLASS(Action, ActionUI_InventoryQuickAccessMode, "Интерфейс\\Режим работы инвентаря быстрого доступа")
+REGISTER_CLASS(Action, ActionSetDirectControl, "РРЅС‚РµСЂС„РµР№СЃ\\Р’РєР»СЋС‡РёС‚СЊ/Р’С‹РєР»СЋС‡РёС‚СЊ РїСЂСЏРјРѕРµ/СЃРёРЅРґРёРєР°С‚РЅРѕРµ СѓРїСЂР°РІР»РµРЅРёРµ")
+REGISTER_CLASS(Action, ActionSetGamePause, "РРЅС‚РµСЂС„РµР№СЃ\\Р’РєР»СЋС‡РёС‚СЊ/Р’С‹РєР»СЋС‡РёС‚СЊ РїР°СѓР·Сѓ РёРіСЂС‹")
+REGISTER_CLASS(Action, ActionSave, "РРЅС‚РµСЂС„РµР№СЃ\\РЎРѕС…СЂР°РЅРёС‚СЊ РёРіСЂСѓ")
+REGISTER_CLASS(Action, ActionSaveAuto, "РРЅС‚РµСЂС„РµР№СЃ\\РЎРѕС…СЂР°РЅРёС‚СЊ РёРіСЂСѓ (Р°РІС‚РѕСЃРµР№РІ)")
+REGISTER_CLASS(Action, ActionLoadGameAuto, "РРЅС‚РµСЂС„РµР№СЃ\\Р—Р°РіСЂСѓР·РёС‚СЊ РёРіСЂСѓ (Р°РІС‚РѕСЃРµР№РІ)")
+REGISTER_CLASS(Action, ActionSetInterface, "РРЅС‚РµСЂС„РµР№СЃ\\Р’РєР»СЋС‡РёС‚СЊ/РІС‹РєР»СЋС‡РёС‚СЊ РёРЅС‚РµСЂС„РµР№СЃ")
+REGISTER_CLASS(Action, ActionSelectInterfaceScreen, "РРЅС‚РµСЂС„РµР№СЃ\\Р’РєР»СЋС‡РёС‚СЊ СЌРєСЂР°РЅ РёРЅС‚РµСЂС„РµР№СЃР°")
+REGISTER_CLASS(Action, ActionUI_ScreenSwitchOff, "РРЅС‚РµСЂС„РµР№СЃ\\Р’С‹РєР»СЋС‡РёС‚СЊ СЌРєСЂР°РЅ РёРЅС‚РµСЂС„РµР№СЃР°")
+REGISTER_CLASS(Action, ActionInterfaceHideControl, "РРЅС‚РµСЂС„РµР№СЃ\\РЎРїСЂСЏС‚Р°С‚СЊ РєРЅРѕРїРєСѓ РјСЏРіРєРѕ, РџР•Р Р•Р”Р•Р›РђРўР¬ РЅР° /РћРїРµСЂР°С†РёРё РЅР°Рґ РєРЅРѕРїРєР°РјРё/")
+REGISTER_CLASS(Action, ActionInterfaceHideControlTrigger, "РРЅС‚РµСЂС„РµР№СЃ\\РЎРїСЂСЏС‚Р°С‚СЊ РєРЅРѕРїРєСѓ Р¶РµСЃС‚РєРѕ, РџР•Р Р•Р”Р•Р›РђРўР¬ РЅР° /РћРїРµСЂР°С†РёРё РЅР°Рґ РєРЅРѕРїРєР°РјРё/")
+REGISTER_CLASS(Action, ActionInterfaceControlOperate, "РРЅС‚РµСЂС„РµР№СЃ\\РћРїРµСЂР°С†РёРё РЅР°Рґ РєРЅРѕРїРєР°РјРё")
+REGISTER_CLASS(Action, ActionInterfaceTogglAccessibility, "РРЅС‚РµСЂС„РµР№СЃ\\РџРµСЂРµРєР»СЋС‡РёС‚СЊ РґРѕСЃС‚СѓРїРЅРѕСЃС‚СЊ РєРЅРѕРїРєРё")
+REGISTER_CLASS(Action, ActionInterfaceSetControlState, "РРЅС‚РµСЂС„РµР№СЃ\\РџРµСЂРµРєР»СЋС‡РёС‚СЊ СЃРѕСЃС‚РѕСЏРЅРёРµ РєРЅРѕРїРєРё")
+REGISTER_CLASS(Action, ActionCreateNetClient, "РРЅС‚РµСЂС„РµР№СЃ\\РЎРѕР·РґР°С‚СЊ СЃРµС‚РµРІРѕР№ РєР»РёРµРЅС‚")
+REGISTER_CLASS(Action, ActionUI_GameStart, "РРЅС‚РµСЂС„РµР№СЃ\\РЎС‚Р°СЂС‚ РёРіСЂС‹")
+REGISTER_CLASS(Action, ActionUI_LanGameStart, "РРЅС‚РµСЂС„РµР№СЃ\\РЎС‚Р°СЂС‚ СЃРµС‚РµРІРѕР№ РёРіСЂС‹")
+REGISTER_CLASS(Action, ActionUI_LanGameJoin, "РРЅС‚РµСЂС„РµР№СЃ\\РџСЂРёСЃРѕРµРґРёРЅРµРЅРёРµ Рє СЃРµС‚РµРІРѕР№ РёРіСЂРµ")
+REGISTER_CLASS(Action, ActionUI_LanGameCreate, "РРЅС‚РµСЂС„РµР№СЃ\\РЎРѕР·РґР°РЅРёРµ СЃРµС‚РµРІРѕР№ РёРіСЂС‹")
+REGISTER_CLASS(Action, ActionUI_UnitCommand, "РРЅС‚РµСЂС„РµР№СЃ\\РљРѕРЅС‚РµРєСЃС‚РЅР°СЏ РєРѕРјР°РЅРґР° Р·Р°СЃРµР»РµРєС‡РµРЅРЅС‹Рј СЋРЅРёС‚Р°Рј")
+REGISTER_CLASS(Action, ActionResetNetCenter, "РРЅС‚РµСЂС„РµР№СЃ\\Р—Р°РІРµСЂС€РёС‚СЊ СЃРµС‚РµРІСѓСЋ РёРіСЂСѓ")
+REGISTER_CLASS(Action, ActionKillNetCenter, "РРЅС‚РµСЂС„РµР№СЃ\\Р—Р°РІРµСЂС€РёС‚СЊ СЂР°Р±РѕС‚Сѓ СЃ СЃРµС‚СЊСЋ")
+REGISTER_CLASS(Action, ActionToggleBuildingInstaller, "РРЅС‚РµСЂС„РµР№СЃ\\Р’РєР»СЋС‡РёС‚СЊ СЂРµР¶РёРј СѓСЃС‚Р°РЅРѕРІРєРё Р·РґР°РЅРёСЏ")
+REGISTER_CLASS(Action, ActionUI_ConfirmDiskOp, "РРЅС‚РµСЂС„РµР№СЃ\\РџРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ РїРµСЂРµР·Р°РїРёСЃРё РёР»Рё СѓРґР°Р»РµРЅРёСЏ")
+REGISTER_CLASS(Action, ActionUI_InventoryQuickAccessMode, "РРЅС‚РµСЂС„РµР№СЃ\\Р РµР¶РёРј СЂР°Р±РѕС‚С‹ РёРЅРІРµРЅС‚Р°СЂСЏ Р±С‹СЃС‚СЂРѕРіРѕ РґРѕСЃС‚СѓРїР°")
 
-REGISTER_CLASS(Action, ActionSetCursor, "Курсоры\\Установить курсор")
-REGISTER_CLASS(Action, ActionFreeCursor, "Курсоры\\Отменить установленный курсор")
-REGISTER_CLASS(Action, ActionChangeUnitCursor, "Курсоры\\Сменить курсор юнита")
+REGISTER_CLASS(Action, ActionSetCursor, "РљСѓСЂСЃРѕСЂС‹\\РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РєСѓСЂСЃРѕСЂ")
+REGISTER_CLASS(Action, ActionFreeCursor, "РљСѓСЂСЃРѕСЂС‹\\РћС‚РјРµРЅРёС‚СЊ СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅС‹Р№ РєСѓСЂСЃРѕСЂ")
+REGISTER_CLASS(Action, ActionChangeUnitCursor, "РљСѓСЂСЃРѕСЂС‹\\РЎРјРµРЅРёС‚СЊ РєСѓСЂСЃРѕСЂ СЋРЅРёС‚Р°")
 
 SECUROM_MARKER_HIGH_SECURITY_OFF(2);
 }
@@ -194,82 +194,82 @@ SECUROM_MARKER_HIGH_SECURITY_OFF(2);
 ////////////////////////////////////////////////////
 
 BEGIN_ENUM_DESCRIPTOR(AttackCondition, "AttackCondition")
-REGISTER_ENUM(ATTACK_GROUND, "Атаковать поверхность")
-REGISTER_ENUM(ATTACK_ENEMY_UNIT, "Атаковать юнитов врага(с учетом здоровья)")
-REGISTER_ENUM(ATTACK_GROUND_NEAR_ENEMY_UNIT, "Атаковать поверхность рядом с юнитом врага")
-REGISTER_ENUM(ATTACK_GROUND_NEAR_MY_UNIT, "Атаковать поверхность рядом с моим юнитом")
-REGISTER_ENUM(ATTACK_GROUND_NEAR_ENEMY_UNIT_LASTING, "Атаковать поверхность рядом с юнитом врага продолжительное")
-REGISTER_ENUM(ATTACK_MY_UNIT, "Атаковать своих поврежденных юнитов")
+REGISTER_ENUM(ATTACK_GROUND, "РђС‚Р°РєРѕРІР°С‚СЊ РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ")
+REGISTER_ENUM(ATTACK_ENEMY_UNIT, "РђС‚Р°РєРѕРІР°С‚СЊ СЋРЅРёС‚РѕРІ РІСЂР°РіР°(СЃ СѓС‡РµС‚РѕРј Р·РґРѕСЂРѕРІСЊСЏ)")
+REGISTER_ENUM(ATTACK_GROUND_NEAR_ENEMY_UNIT, "РђС‚Р°РєРѕРІР°С‚СЊ РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ СЂСЏРґРѕРј СЃ СЋРЅРёС‚РѕРј РІСЂР°РіР°")
+REGISTER_ENUM(ATTACK_GROUND_NEAR_MY_UNIT, "РђС‚Р°РєРѕРІР°С‚СЊ РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ СЂСЏРґРѕРј СЃ РјРѕРёРј СЋРЅРёС‚РѕРј")
+REGISTER_ENUM(ATTACK_GROUND_NEAR_ENEMY_UNIT_LASTING, "РђС‚Р°РєРѕРІР°С‚СЊ РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ СЂСЏРґРѕРј СЃ СЋРЅРёС‚РѕРј РІСЂР°РіР° РїСЂРѕРґРѕР»Р¶РёС‚РµР»СЊРЅРѕРµ")
+REGISTER_ENUM(ATTACK_MY_UNIT, "РђС‚Р°РєРѕРІР°С‚СЊ СЃРІРѕРёС… РїРѕРІСЂРµР¶РґРµРЅРЅС‹С… СЋРЅРёС‚РѕРІ")
 END_ENUM_DESCRIPTOR(AttackCondition)
 
 BEGIN_ENUM_DESCRIPTOR(UpgradeOption, "UpgradeOption")
-REGISTER_ENUM(UPGRADE_HERE, "В любой обстановке")
-REGISTER_ENUM(UPGRADE_ON_THE_DISTANCE, "На расстоянии от любого здания")
-REGISTER_ENUM(UPGRADE_ON_THE_DISTANCE_TO_ENEMY, "На расстоянии от базы в сторону врага")
-REGISTER_ENUM(UPGRADE_NEAR_OBJECT, "Юнит находится рядом с объектом")
-REGISTER_ENUM(UPGRADE_ON_THE_DISTANCE_FROM_ENEMY, "На расстоянии от базы врага")
-REGISTER_ENUM(UPGRADE_ON_THE_ENEMY_DIRECTION, "На расстоянии от границы базы строго к центру базы врага")
-REGISTER_ENUM(UPGRADE_FROM_UNIT_ON_THE_ENEMY_DIRECTION, "В направлении к центру базы врага с текущего положения")
-REGISTER_ENUM(UPGRADE_ON_THE_DISCONNECTED_DIRECTION, "В направлении отключенного здания с текущего положения")
+REGISTER_ENUM(UPGRADE_HERE, "Р’ Р»СЋР±РѕР№ РѕР±СЃС‚Р°РЅРѕРІРєРµ")
+REGISTER_ENUM(UPGRADE_ON_THE_DISTANCE, "РќР° СЂР°СЃСЃС‚РѕСЏРЅРёРё РѕС‚ Р»СЋР±РѕРіРѕ Р·РґР°РЅРёСЏ")
+REGISTER_ENUM(UPGRADE_ON_THE_DISTANCE_TO_ENEMY, "РќР° СЂР°СЃСЃС‚РѕСЏРЅРёРё РѕС‚ Р±Р°Р·С‹ РІ СЃС‚РѕСЂРѕРЅСѓ РІСЂР°РіР°")
+REGISTER_ENUM(UPGRADE_NEAR_OBJECT, "Р®РЅРёС‚ РЅР°С…РѕРґРёС‚СЃСЏ СЂСЏРґРѕРј СЃ РѕР±СЉРµРєС‚РѕРј")
+REGISTER_ENUM(UPGRADE_ON_THE_DISTANCE_FROM_ENEMY, "РќР° СЂР°СЃСЃС‚РѕСЏРЅРёРё РѕС‚ Р±Р°Р·С‹ РІСЂР°РіР°")
+REGISTER_ENUM(UPGRADE_ON_THE_ENEMY_DIRECTION, "РќР° СЂР°СЃСЃС‚РѕСЏРЅРёРё РѕС‚ РіСЂР°РЅРёС†С‹ Р±Р°Р·С‹ СЃС‚СЂРѕРіРѕ Рє С†РµРЅС‚СЂСѓ Р±Р°Р·С‹ РІСЂР°РіР°")
+REGISTER_ENUM(UPGRADE_FROM_UNIT_ON_THE_ENEMY_DIRECTION, "Р’ РЅР°РїСЂР°РІР»РµРЅРёРё Рє С†РµРЅС‚СЂСѓ Р±Р°Р·С‹ РІСЂР°РіР° СЃ С‚РµРєСѓС‰РµРіРѕ РїРѕР»РѕР¶РµРЅРёСЏ")
+REGISTER_ENUM(UPGRADE_ON_THE_DISCONNECTED_DIRECTION, "Р’ РЅР°РїСЂР°РІР»РµРЅРёРё РѕС‚РєР»СЋС‡РµРЅРЅРѕРіРѕ Р·РґР°РЅРёСЏ СЃ С‚РµРєСѓС‰РµРіРѕ РїРѕР»РѕР¶РµРЅРёСЏ")
 END_ENUM_DESCRIPTOR(UpgradeOption)
 
 BEGIN_ENUM_DESCRIPTOR(AIPlayerType, "AIPlayerType")
-REGISTER_ENUM(AI_PLAYER_TYPE_ME, "Я")
-REGISTER_ENUM(AI_PLAYER_TYPE_ENEMY, "Враг")
-REGISTER_ENUM(AI_PLAYER_TYPE_WORLD, "Мир")
-REGISTER_ENUM(AI_PLAYER_TYPE_ANY, "Любой")
+REGISTER_ENUM(AI_PLAYER_TYPE_ME, "РЇ")
+REGISTER_ENUM(AI_PLAYER_TYPE_ENEMY, "Р’СЂР°Рі")
+REGISTER_ENUM(AI_PLAYER_TYPE_WORLD, "РњРёСЂ")
+REGISTER_ENUM(AI_PLAYER_TYPE_ANY, "Р›СЋР±РѕР№")
 END_ENUM_DESCRIPTOR(AIPlayerType)
 
 BEGIN_ENUM_DESCRIPTOR(SwitchMode, "SwitchMode")
-REGISTER_ENUM(ON, "Включить")
-REGISTER_ENUM(OFF, "Выключить")
+REGISTER_ENUM(ON, "Р’РєР»СЋС‡РёС‚СЊ")
+REGISTER_ENUM(OFF, "Р’С‹РєР»СЋС‡РёС‚СЊ")
 END_ENUM_DESCRIPTOR(SwitchMode)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ActionSetSignalVariable, Acting, "Acting")
-REGISTER_ENUM_ENCLOSED(ActionSetSignalVariable, ACTION_ADD, "Добавить")
-REGISTER_ENUM_ENCLOSED(ActionSetSignalVariable, ACTION_REMOVE, "Удалить")
+REGISTER_ENUM_ENCLOSED(ActionSetSignalVariable, ACTION_ADD, "Р”РѕР±Р°РІРёС‚СЊ")
+REGISTER_ENUM_ENCLOSED(ActionSetSignalVariable, ACTION_REMOVE, "РЈРґР°Р»РёС‚СЊ")
 END_ENUM_DESCRIPTOR_ENCLOSED(ActionSetSignalVariable, Acting)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ActionAttack, AimObject, "AimObject")
-REGISTER_ENUM_ENCLOSED(ActionAttack, AIM_UNIT, "Юниты")
-REGISTER_ENUM_ENCLOSED(ActionAttack, AIM_BUILDING, "Здания")
-REGISTER_ENUM_ENCLOSED(ActionAttack, AIM_ANY, "Все")
+REGISTER_ENUM_ENCLOSED(ActionAttack, AIM_UNIT, "Р®РЅРёС‚С‹")
+REGISTER_ENUM_ENCLOSED(ActionAttack, AIM_BUILDING, "Р—РґР°РЅРёСЏ")
+REGISTER_ENUM_ENCLOSED(ActionAttack, AIM_ANY, "Р’СЃРµ")
 END_ENUM_DESCRIPTOR_ENCLOSED(ActionAttack, AimObject)
 
 BEGIN_ENUM_DESCRIPTOR(SwitchModeTriple, "SwitchModeTriple")
-REGISTER_ENUM(MODE_ON, "Включить")
-REGISTER_ENUM(MODE_OFF, "Выключить")
-REGISTER_ENUM(MODE_RESTORE, "Восстановить")
+REGISTER_ENUM(MODE_ON, "Р’РєР»СЋС‡РёС‚СЊ")
+REGISTER_ENUM(MODE_OFF, "Р’С‹РєР»СЋС‡РёС‚СЊ")
+REGISTER_ENUM(MODE_RESTORE, "Р’РѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ")
 END_ENUM_DESCRIPTOR(SwitchModeTriple)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ActionEnableSounds, SoundType, "SoundType")
-REGISTER_ENUM_ENCLOSED(ActionEnableSounds, TYPE_SOUND, "Звуки")
-REGISTER_ENUM_ENCLOSED(ActionEnableSounds, TYPE_VOICE, "Голосовые сообщения")
-REGISTER_ENUM_ENCLOSED(ActionEnableSounds, TYPE_MUSIC, "Музыка")
+REGISTER_ENUM_ENCLOSED(ActionEnableSounds, TYPE_SOUND, "Р—РІСѓРєРё")
+REGISTER_ENUM_ENCLOSED(ActionEnableSounds, TYPE_VOICE, "Р“РѕР»РѕСЃРѕРІС‹Рµ СЃРѕРѕР±С‰РµРЅРёСЏ")
+REGISTER_ENUM_ENCLOSED(ActionEnableSounds, TYPE_MUSIC, "РњСѓР·С‹РєР°")
 END_ENUM_DESCRIPTOR_ENCLOSED(ActionEnableSounds, SoundType)
 
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ActionSwitchTriggers, Mode, "Mode")
-REGISTER_ENUM_ENCLOSED(ActionSwitchTriggers, SWITCH_ON_CURRENT_PLAYER_AI, "Включить АИ триггера для текущего игрока")
-REGISTER_ENUM_ENCLOSED(ActionSwitchTriggers, SWITCH_OFF_CURRENT_PLAYER_AI, "Выключить АИ триггера для текущего игрока")
-REGISTER_ENUM_ENCLOSED(ActionSwitchTriggers, SWITCH_OFF_ALL_PLAYERS_AI, "Выключить АИ триггера для всех игроков")
-REGISTER_ENUM_ENCLOSED(ActionSwitchTriggers, SWITCH_OFF_CURRENT_PLAYER_TRIGGERS, "Выключить для текущего игрока все триггера")
+REGISTER_ENUM_ENCLOSED(ActionSwitchTriggers, SWITCH_ON_CURRENT_PLAYER_AI, "Р’РєР»СЋС‡РёС‚СЊ РђР С‚СЂРёРіРіРµСЂР° РґР»СЏ С‚РµРєСѓС‰РµРіРѕ РёРіСЂРѕРєР°")
+REGISTER_ENUM_ENCLOSED(ActionSwitchTriggers, SWITCH_OFF_CURRENT_PLAYER_AI, "Р’С‹РєР»СЋС‡РёС‚СЊ РђР С‚СЂРёРіРіРµСЂР° РґР»СЏ С‚РµРєСѓС‰РµРіРѕ РёРіСЂРѕРєР°")
+REGISTER_ENUM_ENCLOSED(ActionSwitchTriggers, SWITCH_OFF_ALL_PLAYERS_AI, "Р’С‹РєР»СЋС‡РёС‚СЊ РђР С‚СЂРёРіРіРµСЂР° РґР»СЏ РІСЃРµС… РёРіСЂРѕРєРѕРІ")
+REGISTER_ENUM_ENCLOSED(ActionSwitchTriggers, SWITCH_OFF_CURRENT_PLAYER_TRIGGERS, "Р’С‹РєР»СЋС‡РёС‚СЊ РґР»СЏ С‚РµРєСѓС‰РµРіРѕ РёРіСЂРѕРєР° РІСЃРµ С‚СЂРёРіРіРµСЂР°")
 END_ENUM_DESCRIPTOR_ENCLOSED(ActionSwitchTriggers, Mode)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ActionMessage, Type, "ActionMessage::Type")
-REGISTER_ENUM_ENCLOSED(ActionMessage, MESSAGE_ADD, "Добавить в список")
-REGISTER_ENUM_ENCLOSED(ActionMessage, MESSAGE_REMOVE, "Удалить из списка")
+REGISTER_ENUM_ENCLOSED(ActionMessage, MESSAGE_ADD, "Р”РѕР±Р°РІРёС‚СЊ РІ СЃРїРёСЃРѕРє")
+REGISTER_ENUM_ENCLOSED(ActionMessage, MESSAGE_REMOVE, "РЈРґР°Р»РёС‚СЊ РёР· СЃРїРёСЃРєР°")
 END_ENUM_DESCRIPTOR_ENCLOSED(ActionMessage, Type)
 
 BEGIN_ENUM_DESCRIPTOR(SquadMoveMode, "SquadMoveMode")
-REGISTER_ENUM(DO_NOT_WAIT, "Не ждать")
-REGISTER_ENUM(WAIT_FOR_ONE, "Ждать пока дойдет хотя бы один юнит")
-REGISTER_ENUM(WAIT_FOR_ALL, "Ждать пока дойдут все юниты")
+REGISTER_ENUM(DO_NOT_WAIT, "РќРµ Р¶РґР°С‚СЊ")
+REGISTER_ENUM(WAIT_FOR_ONE, "Р–РґР°С‚СЊ РїРѕРєР° РґРѕР№РґРµС‚ С…РѕС‚СЏ Р±С‹ РѕРґРёРЅ СЋРЅРёС‚")
+REGISTER_ENUM(WAIT_FOR_ALL, "Р–РґР°С‚СЊ РїРѕРєР° РґРѕР№РґСѓС‚ РІСЃРµ СЋРЅРёС‚С‹")
 END_ENUM_DESCRIPTOR(SquadMoveMode)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ActionOrderBuildingCloseToEnemy, BuildState, "ActionOrderBuildingCloseToEnemy::BuildState")
-REGISTER_ENUM_ENCLOSED(ActionOrderBuildingCloseToEnemy, BuildToEnemyCenter, "В направлении центра базы врага")
-REGISTER_ENUM_ENCLOSED(ActionOrderBuildingCloseToEnemy, BuildToDisconnected, "В направлении отключенного здания")
+REGISTER_ENUM_ENCLOSED(ActionOrderBuildingCloseToEnemy, BuildToEnemyCenter, "Р’ РЅР°РїСЂР°РІР»РµРЅРёРё С†РµРЅС‚СЂР° Р±Р°Р·С‹ РІСЂР°РіР°")
+REGISTER_ENUM_ENCLOSED(ActionOrderBuildingCloseToEnemy, BuildToDisconnected, "Р’ РЅР°РїСЂР°РІР»РµРЅРёРё РѕС‚РєР»СЋС‡РµРЅРЅРѕРіРѕ Р·РґР°РЅРёСЏ")
 END_ENUM_DESCRIPTOR_ENCLOSED(ActionOrderBuildingCloseToEnemy, BuildState)
 
 //SNDSound ActionSoundMessage::ctrl;
@@ -387,11 +387,11 @@ void ActionOrderBuildingCloseToEnemy::createOrientBuildingsList(Vect2f& aimPos) 
 void ActionOrderBuildingCloseToEnemy::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(attrBuildingToOrient_, "attrBuildingToOrient", "Тип здания рядом с которым заказывать");
-	ar.serialize(attrBuildingToOrder_, "attrBuildingToOrder", "Тип заказываемого здания");
-	ar.serialize(buildState_, "buildState", "Критерий близости");
-	ar.serialize(attrBuildingToDisconnected_, "attrBuildingToDisconnected", "Тип отключенного здания");
-	ar.serialize(playerType_ , "playerType_", "Владелец отключенного здания");
+	ar.serialize(attrBuildingToOrient_, "attrBuildingToOrient", "РўРёРї Р·РґР°РЅРёСЏ СЂСЏРґРѕРј СЃ РєРѕС‚РѕСЂС‹Рј Р·Р°РєР°Р·С‹РІР°С‚СЊ");
+	ar.serialize(attrBuildingToOrder_, "attrBuildingToOrder", "РўРёРї Р·Р°РєР°Р·С‹РІР°РµРјРѕРіРѕ Р·РґР°РЅРёСЏ");
+	ar.serialize(buildState_, "buildState", "РљСЂРёС‚РµСЂРёР№ Р±Р»РёР·РѕСЃС‚Рё");
+	ar.serialize(attrBuildingToDisconnected_, "attrBuildingToDisconnected", "РўРёРї РѕС‚РєР»СЋС‡РµРЅРЅРѕРіРѕ Р·РґР°РЅРёСЏ");
+	ar.serialize(playerType_ , "playerType_", "Р’Р»Р°РґРµР»РµС† РѕС‚РєР»СЋС‡РµРЅРЅРѕРіРѕ Р·РґР°РЅРёСЏ");
 }
 
 bool ActionOrderBuildingCloseToEnemy::automaticCondition() const
@@ -421,7 +421,7 @@ bool ActionOrderBuildingCloseToEnemy::automaticCondition() const
 			return false;
 	}
 
-	// проверка условий возможности строительства по ресурсам
+	// РїСЂРѕРІРµСЂРєР° СѓСЃР»РѕРІРёР№ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЃС‚СЂРѕРёС‚РµР»СЊСЃС‚РІР° РїРѕ СЂРµСЃСѓСЂСЃР°Рј
 	if(!aiPlayer().checkUnitNumber(attrBuildingToOrder_))
 		return false;
 	if(!aiPlayer().accessible(attrBuildingToOrder_))
@@ -497,8 +497,8 @@ void ActionEnableMessage::activate()
 void ActionEnableMessage::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(messageType_, "messageType", "Тип сообщения");
-	ar.serialize(mode_, "mode", "Действие");
+	ar.serialize(messageType_, "messageType", "РўРёРї СЃРѕРѕР±С‰РµРЅРёСЏ");
+	ar.serialize(mode_, "mode", "Р”РµР№СЃС‚РІРёРµ");
 }
 
 void ActionGameUpdateOpen::activate()
@@ -529,7 +529,7 @@ void ActionSwitchPlayer::activate()
 void ActionSwitchPlayer::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(playerID, "playerID", "Номер игрока");
+	ar.serialize(playerID, "playerID", "РќРѕРјРµСЂ РёРіСЂРѕРєР°");
 }
 
 ActionSetCameraRestriction::ActionSetCameraRestriction()
@@ -548,7 +548,7 @@ void ActionSetCameraRestriction::serialize(Archive& ar)
 			switchMode_ = MODE_OFF;
 	}
 	else
-		ar.serialize(switchMode_, "switchMode_", "Действие");
+		ar.serialize(switchMode_, "switchMode_", "Р”РµР№СЃС‚РІРёРµ");
 }
 
 void ActionSetCameraRestriction::activate()
@@ -573,7 +573,7 @@ void ActionSetDefaultCamera::activate()
 void ActionSetDefaultCamera::serialize( Archive& ar )
 {
 	__super::serialize(ar);
-	ar.serialize(duration_, "duration", "Время перехода");
+	ar.serialize(duration_, "duration", "Р’СЂРµРјСЏ РїРµСЂРµС…РѕРґР°");
 }
 
 class NearestFreeTransportScanOp
@@ -621,7 +621,7 @@ ActionCreateUnit::ActionCreateUnit()
 void ActionCreateUnit::activate()
 {
 	if(!anchor_){
-		xassertStr(0 && "Якорь по метке не найден: ", anchor_.c_str());
+		xassertStr(0 && "РЇРєРѕСЂСЊ РїРѕ РјРµС‚РєРµ РЅРµ РЅР°Р№РґРµРЅ: ", anchor_.c_str());
 		return;
 	}												
 	else{
@@ -632,7 +632,7 @@ void ActionCreateUnit::activate()
 			player = universe()->findPlayer(player_);
 		if(player){
 			if(!attr_){
-				xassert(0 && "Создать объект в точке якоря, не указан тип юнита!!!");
+				xassert(0 && "РЎРѕР·РґР°С‚СЊ РѕР±СЉРµРєС‚ РІ С‚РѕС‡РєРµ СЏРєРѕСЂСЏ, РЅРµ СѓРєР°Р·Р°РЅ С‚РёРї СЋРЅРёС‚Р°!!!");
 				return;
 			}
 			UnitSquad* squad = 0;
@@ -658,17 +658,17 @@ void ActionCreateUnit::activate()
 void ActionCreateUnit::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(anchor_, "|anchor|anchorLabel_", "&Метка(на якоре)");
-	ar.serialize(attr_, "attr", "Тип юнита");
-	ar.serialize(count_, "count", "Количество");
-	ar.serialize(inTheSameSquad_, "inTheSameSquad", "В одном скваде");
-	ar.serialize(player_, "player", "Номер игрока");
+	ar.serialize(anchor_, "|anchor|anchorLabel_", "&РњРµС‚РєР°(РЅР° СЏРєРѕСЂРµ)");
+	ar.serialize(attr_, "attr", "РўРёРї СЋРЅРёС‚Р°");
+	ar.serialize(count_, "count", "РљРѕР»РёС‡РµСЃС‚РІРѕ");
+	ar.serialize(inTheSameSquad_, "inTheSameSquad", "Р’ РѕРґРЅРѕРј СЃРєРІР°РґРµ");
+	ar.serialize(player_, "player", "РќРѕРјРµСЂ РёРіСЂРѕРєР°");
 }
 
 void ActionKillUnits::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(units_, "units", "Юниты");
+	ar.serialize(units_, "units", "Р®РЅРёС‚С‹");
 }
 
 void ActionKillUnits::activate()
@@ -685,14 +685,14 @@ void ActionKillUnits::activate()
 void ActionSquadMoveToItem::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(attrItem, "attrItem", "Тип предмета");
+	ar.serialize(attrItem, "attrItem", "РўРёРї РїСЂРµРґРјРµС‚Р°");
 }
 
 void ActionSquadMoveToObject::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(attrObject_, "attrObject", "Тип объекта");
-	ar.serialize(aiPlayerType_, "aiPlayerType", "Владелец объекта");
+	ar.serialize(attrObject_, "attrObject", "РўРёРї РѕР±СЉРµРєС‚Р°");
+	ar.serialize(aiPlayerType_, "aiPlayerType", "Р’Р»Р°РґРµР»РµС† РѕР±СЉРµРєС‚Р°");
 }
 
 bool ActionSquadMoveToItem::checkContextUnit(UnitActing* unit) const
@@ -868,8 +868,8 @@ void ActionSoundMessage::activate()
 void ActionSoundMessage::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(switchMode_, "switchMode", "Действие");
-	ar.serialize(soundReference, "soundReference", "Звук");
+	ar.serialize(switchMode_, "switchMode", "Р”РµР№СЃС‚РІРёРµ");
+	ar.serialize(soundReference, "soundReference", "Р—РІСѓРє");
 }
 
 void ActionUnitClearOrders::activate()
@@ -881,13 +881,13 @@ void ActionUnitClearOrders::activate()
 void ActionSetUnitSelectAble::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(switchMode_, "switchMode_", "Режим");
+	ar.serialize(switchMode_, "switchMode_", "Р РµР¶РёРј");
 }
 
 void ActionSetUnitInvisible::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(switchMode_, "switchMode_", "Режим");
+	ar.serialize(switchMode_, "switchMode_", "Р РµР¶РёРј");
 }
 
 bool ActionSetUnitSelectAble::checkContextUnit(UnitActing* unit) const
@@ -954,8 +954,8 @@ void ActionSetUnitInvisible::activate()
 void ActionSetDirectControl::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(attr, "attr", "Тип юнита");
-	ar.serialize(controlMode_, "controlMode", "Режим прямого управления");
+	ar.serialize(attr, "attr", "РўРёРї СЋРЅРёС‚Р°");
+	ar.serialize(controlMode_, "controlMode", "Р РµР¶РёРј РїСЂСЏРјРѕРіРѕ СѓРїСЂР°РІР»РµРЅРёСЏ");
 }
 
 bool ActionSetDirectControl::automaticCondition() const
@@ -1017,27 +1017,27 @@ ActionSwitchTriggers::ActionSwitchTriggers()
 void ActionSwitchTriggers::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(mode, "mode", "Режим");
+	ar.serialize(mode, "mode", "Р РµР¶РёРј");
 }
 
 void ActionAttackBySpecialWeapon::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(weapons_, "|weapons|weaponref_", "Апгрейды спецоружия");
+	ar.serialize(weapons_, "|weapons|weaponref_", "РђРїРіСЂРµР№РґС‹ СЃРїРµС†РѕСЂСѓР¶РёСЏ");
 	removeZeros(weapons_);
-	ar.serialize(attackCondition, "attackCondition", "Условие атаки");
-	ar.serialize(minDistance, "minDistance", "Мин. расстояние от хозяина");  
-	ar.serialize(passAbility, "passAbility", "Можно атаковать непроходимую поверхность");
-	ar.serialize(timeToAttack_, "timeToAttack", "Продолжительность атаки");
-	ar.serialize(unitsToAttack, "unitsToAttack", "Типы своих юнитов для атаки поверхности рядом");
+	ar.serialize(attackCondition, "attackCondition", "РЈСЃР»РѕРІРёРµ Р°С‚Р°РєРё");
+	ar.serialize(minDistance, "minDistance", "РњРёРЅ. СЂР°СЃСЃС‚РѕСЏРЅРёРµ РѕС‚ С…РѕР·СЏРёРЅР°");  
+	ar.serialize(passAbility, "passAbility", "РњРѕР¶РЅРѕ Р°С‚Р°РєРѕРІР°С‚СЊ РЅРµРїСЂРѕС…РѕРґРёРјСѓСЋ РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ");
+	ar.serialize(timeToAttack_, "timeToAttack", "РџСЂРѕРґРѕР»Р¶РёС‚РµР»СЊРЅРѕСЃС‚СЊ Р°С‚Р°РєРё");
+	ar.serialize(unitsToAttack, "unitsToAttack", "РўРёРїС‹ СЃРІРѕРёС… СЋРЅРёС‚РѕРІ РґР»СЏ Р°С‚Р°РєРё РїРѕРІРµСЂС…РЅРѕСЃС‚Рё СЂСЏРґРѕРј");
 }
 
 void ActionExploreArea::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(mainBuilding, "mainBuilding", "Главное строение");
-	ar.serialize(exploringRadius, "exploringRadius", "Радиус разведки");
+	ar.serialize(mainBuilding, "mainBuilding", "Р“Р»Р°РІРЅРѕРµ СЃС‚СЂРѕРµРЅРёРµ");
+	ar.serialize(exploringRadius, "exploringRadius", "Р Р°РґРёСѓСЃ СЂР°Р·РІРµРґРєРё");
 }
 
 bool ActionAttackBySpecialWeapon::checkContextUnit(UnitActing* unit) const
@@ -1204,9 +1204,9 @@ bool ActionAttackBySpecialWeapon::checkContextUnit(UnitActing* unit) const
 void ActionActivateSpecialWeapon::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(weaponref_, "weaponref", "Спец. оружия");
+	ar.serialize(weaponref_, "weaponref", "РЎРїРµС†. РѕСЂСѓР¶РёСЏ");
 	removeZeros(weaponref_);
-	ar.serialize(mode_, "mode", "Действие");
+	ar.serialize(mode_, "mode", "Р”РµР№СЃС‚РІРёРµ");
 }
 
 bool ActionActivateSpecialWeapon::checkContextUnit(UnitActing* unit) const
@@ -1427,7 +1427,7 @@ bool ActionAttackBySpecialWeapon::workedOut()
 void ActionPickResource::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(parameterType_, "parameterType", "Тип ресурса");
+	ar.serialize(parameterType_, "parameterType", "РўРёРї СЂРµСЃСѓСЂСЃР°");
 }
 
 bool ActionPickResource::checkContextUnit(UnitActing* unit) const
@@ -1504,7 +1504,7 @@ bool ActionOrderBuildings::checkContextUnit(UnitActing* unit) const
 	if(!unit->attr().isBuilding() || !safe_cast_ref<const AttributeBuilding&>(unit->attr()).includeBase)
 		return false;
 
-	// проверка условий возможности строительства по ресурсам
+	// РїСЂРѕРІРµСЂРєР° СѓСЃР»РѕРІРёР№ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЃС‚СЂРѕРёС‚РµР»СЊСЃС‚РІР° РїРѕ СЂРµСЃСѓСЂСЃР°Рј
 	if(!aiPlayer().checkUnitNumber(attrBuilding))
 		return false;
 	if(!aiPlayer().accessible(attrBuilding))
@@ -1517,7 +1517,7 @@ bool ActionOrderBuildings::checkContextUnit(UnitActing* unit) const
 
 	bool check = true;
 
-	// если требуется строитель
+	// РµСЃР»Рё С‚СЂРµР±СѓРµС‚СЃСЏ СЃС‚СЂРѕРёС‚РµР»СЊ
 	if(attrBuilding->needBuilders) {
 		
 		check = false;
@@ -1607,7 +1607,7 @@ bool ActionContinueConstruction::checkContextUnit(UnitActing* unit) const
 
 void ActionOrderBuildingsOnZone::placeBuildingSpecial() const
 {	
-	// рассматриваются все юниты
+	// СЂР°СЃСЃРјР°С‚СЂРёРІР°СЋС‚СЃСЏ РІСЃРµ СЋРЅРёС‚С‹
 	RealUnits resourceList;
 	PlayerVect::iterator pi;
 	const RealUnits& myUnits = aiPlayer().realUnits();
@@ -1689,21 +1689,21 @@ void ActionOrderBuildingsOnZone::findWhereToBuildQuantSpecial() const
 			if((placement_coords.y += scanStep_) >= scanMax_.y || found_) {
 				placement_coords.y = scanMin_.y;
                 if(found_) {
-					/* шаг сканирования меньше минимального значения и считаем что дальше продолжать поиск
-						нет смысла ввиду его дороговизны и считаем что место для строительства здания найдено */
+					/* С€Р°Рі СЃРєР°РЅРёСЂРѕРІР°РЅРёСЏ РјРµРЅСЊС€Рµ РјРёРЅРёРјР°Р»СЊРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ Рё СЃС‡РёС‚Р°РµРј С‡С‚Рѕ РґР°Р»СЊС€Рµ РїСЂРѕРґРѕР»Р¶Р°С‚СЊ РїРѕРёСЃРє
+						РЅРµС‚ СЃРјС‹СЃР»Р° РІРІРёРґСѓ РµРіРѕ РґРѕСЂРѕРіРѕРІРёР·РЅС‹ Рё СЃС‡РёС‚Р°РµРј С‡С‚Рѕ РјРµСЃС‚Рѕ РґР»СЏ СЃС‚СЂРѕРёС‚РµР»СЊСЃС‚РІР° Р·РґР°РЅРёСЏ РЅР°Р№РґРµРЅРѕ */
 					builder_state = FoundWhereToBuild;
 					best_position = foundPosition_;
 					return;
 				}
 				else{
 					if(scanStep_ > ai_scan_step_unable_to_find){
-						/* если шаг больше чем шаг остановки сканирования при условии что не найдено подходящей позиции
-						   пытаемся уменьшить шаг сканирования */
+						/* РµСЃР»Рё С€Р°Рі Р±РѕР»СЊС€Рµ С‡РµРј С€Р°Рі РѕСЃС‚Р°РЅРѕРІРєРё СЃРєР°РЅРёСЂРѕРІР°РЅРёСЏ РїСЂРё СѓСЃР»РѕРІРёРё С‡С‚Рѕ РЅРµ РЅР°Р№РґРµРЅРѕ РїРѕРґС…РѕРґСЏС‰РµР№ РїРѕР·РёС†РёРё
+						   РїС‹С‚Р°РµРјСЃСЏ СѓРјРµРЅСЊС€РёС‚СЊ С€Р°Рі СЃРєР°РЅРёСЂРѕРІР°РЅРёСЏ */
 						startPlace(scanMin_, scanMax_, scanStep_/2);
 					}
 					else{
-						/* если шаг меньше чем шаг остановки сканирования при условии что не найдено подходящей позиции
-						   поиск закончен и место не найдено, пытаемся взять координаты следующего ресурса */
+						/* РµСЃР»Рё С€Р°Рі РјРµРЅСЊС€Рµ С‡РµРј С€Р°Рі РѕСЃС‚Р°РЅРѕРІРєРё СЃРєР°РЅРёСЂРѕРІР°РЅРёСЏ РїСЂРё СѓСЃР»РѕРІРёРё С‡С‚Рѕ РЅРµ РЅР°Р№РґРµРЅРѕ РїРѕРґС…РѕРґСЏС‰РµР№ РїРѕР·РёС†РёРё
+						   РїРѕРёСЃРє Р·Р°РєРѕРЅС‡РµРЅ Рё РјРµСЃС‚Рѕ РЅРµ РЅР°Р№РґРµРЅРѕ, РїС‹С‚Р°РµРјСЃСЏ РІР·СЏС‚СЊ РєРѕРѕСЂРґРёРЅР°С‚С‹ СЃР»РµРґСѓСЋС‰РµРіРѕ СЂРµСЃСѓСЂСЃР° */
 						placeBuildingSpecial();
 					}
 				}
@@ -1790,7 +1790,7 @@ void ActionOrderBuildingsOnZone::activate()
 		}
 	}
 
-	// если произошел срыв (позиция не валидная, или не смог построить)
+	// РµСЃР»Рё РїСЂРѕРёР·РѕС€РµР» СЃСЂС‹РІ (РїРѕР·РёС†РёСЏ РЅРµ РІР°Р»РёРґРЅР°СЏ, РёР»Рё РЅРµ СЃРјРѕРі РїРѕСЃС‚СЂРѕРёС‚СЊ)
 	if(builder_)
 		builder_->setUsedByTrigger(0, this);
 	builder_state = BuildingPause;
@@ -1825,7 +1825,7 @@ bool ActionOrderBuildingsOnZone::automaticCondition() const
 	if(!attrBuilding)
 		return false;
 
-	// проверка условий возможности строительства по ресурсам
+	// РїСЂРѕРІРµСЂРєР° СѓСЃР»РѕРІРёР№ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЃС‚СЂРѕРёС‚РµР»СЊСЃС‚РІР° РїРѕ СЂРµСЃСѓСЂСЃР°Рј
 	if(!aiPlayer().checkUnitNumber(attrBuilding))
 		return false;
 	if(!aiPlayer().accessible(attrBuilding))
@@ -1873,8 +1873,8 @@ bool ActionOrderBuildingsOnZone::automaticCondition() const
 void ActionOrderBuildingsOnZone::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(attrBuilding, "attrBuilding", "Тип здания");
-	ar.serialize(onlyMyZone,"onlyMyZone", "Зону генерит мой юнит");
+	ar.serialize(attrBuilding, "attrBuilding", "РўРёРї Р·РґР°РЅРёСЏ");
+	ar.serialize(onlyMyZone,"onlyMyZone", "Р—РѕРЅСѓ РіРµРЅРµСЂРёС‚ РјРѕР№ СЋРЅРёС‚");
 }
 
 void ActionOrderBuildings::activate()
@@ -1905,9 +1905,9 @@ void ActionOrderBuildings::clearContext()
 void ActionOrderBuildings::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(attrBuilding, "attrBuilding", "Тип здания");
-	ar.serialize(radius_, "radius_", "Радиус");
-	ar.serialize(closeToEnemy_, "closeToEnemy_", "В направлении врага");
+	ar.serialize(attrBuilding, "attrBuilding", "РўРёРї Р·РґР°РЅРёСЏ");
+	ar.serialize(radius_, "radius_", "Р Р°РґРёСѓСЃ");
+	ar.serialize(closeToEnemy_, "closeToEnemy_", "Р’ РЅР°РїСЂР°РІР»РµРЅРёРё РІСЂР°РіР°");
 }
 
 ActionUpgradeUnit::ActionUpgradeUnit()
@@ -1927,15 +1927,15 @@ void ActionUpgradeUnit::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(upgradeNumber, "upgradeNumber", "Номер апгрейда");
-	ar.serialize(upgradeOption, "upgradeOption", "Произвести апгрейд");
-	ar.serialize(extraRadius, "extraRadius", "Расстояние до объектов");
-	ar.serialize(objects_, "objects", "Рядом объекты");
+	ar.serialize(upgradeNumber, "upgradeNumber", "РќРѕРјРµСЂ Р°РїРіСЂРµР№РґР°");
+	ar.serialize(upgradeOption, "upgradeOption", "РџСЂРѕРёР·РІРµСЃС‚Рё Р°РїРіСЂРµР№Рґ");
+	ar.serialize(extraRadius, "extraRadius", "Р Р°СЃСЃС‚РѕСЏРЅРёРµ РґРѕ РѕР±СЉРµРєС‚РѕРІ");
+	ar.serialize(objects_, "objects", "Р СЏРґРѕРј РѕР±СЉРµРєС‚С‹");
 	removeZeros(objects_);
-	ar.serialize(interrupt_, "interrupt", "Прерывать производство");
-	ar.serialize(notInWater_, "notInWater", "Не в воде");
-	ar.serialize(attrBuildingToDisconnected_, "attrBuildingToDisconnected", "Тип отключенного здания");
-	ar.serialize(playerType_, "playerType", "Владелец отключенного здания");
+	ar.serialize(interrupt_, "interrupt", "РџСЂРµСЂС‹РІР°С‚СЊ РїСЂРѕРёР·РІРѕРґСЃС‚РІРѕ");
+	ar.serialize(notInWater_, "notInWater", "РќРµ РІ РІРѕРґРµ");
+	ar.serialize(attrBuildingToDisconnected_, "attrBuildingToDisconnected", "РўРёРї РѕС‚РєР»СЋС‡РµРЅРЅРѕРіРѕ Р·РґР°РЅРёСЏ");
+	ar.serialize(playerType_, "playerType", "Р’Р»Р°РґРµР»РµС† РѕС‚РєР»СЋС‡РµРЅРЅРѕРіРѕ Р·РґР°РЅРёСЏ");
 }
 
 ConvexHull::ConvexHull(const Polygon& points)
@@ -1945,14 +1945,14 @@ ConvexHull::ConvexHull(const Polygon& points)
 	Polygon::iterator it;
 	Polygon::iterator pointToErase;
 	FOR_EACH(polygon_, it)
-		if((*it).y > downRightPoint_.y || // нижняя
-		   (isEq((*it).y, downRightPoint_.y) && (*it).x > downRightPoint_.x) ){ // нижняя-правая
+		if((*it).y > downRightPoint_.y || // РЅРёР¶РЅСЏСЏ
+		   (isEq((*it).y, downRightPoint_.y) && (*it).x > downRightPoint_.x) ){ // РЅРёР¶РЅСЏСЏ-РїСЂР°РІР°СЏ
 				downRightPoint_ = (*it);
 				pointToErase = it;
 		} 
 	polygon_.erase(pointToErase);	
 
-	// обычная сортировка обменами (кол-во элементов мало)
+	// РѕР±С‹С‡РЅР°СЏ СЃРѕСЂС‚РёСЂРѕРІРєР° РѕР±РјРµРЅР°РјРё (РєРѕР»-РІРѕ СЌР»РµРјРµРЅС‚РѕРІ РјР°Р»Рѕ)
 	Polygon::iterator i;
 	Polygon::iterator j;
 	for(i = polygon_.begin(); i < polygon_.end() - 1; ++i)
@@ -2228,7 +2228,7 @@ bool ActionUpgradeUnit::checkContextUnit(UnitActing* unit) const
 	if(!__super::checkContextUnit(unit))
 		return false;
 
-	// юнит не рядом со списком зданий => не подходит
+	// СЋРЅРёС‚ РЅРµ СЂСЏРґРѕРј СЃРѕ СЃРїРёСЃРєРѕРј Р·РґР°РЅРёР№ => РЅРµ РїРѕРґС…РѕРґРёС‚
 	if(upgradeOption == UPGRADE_NEAR_OBJECT){
 		CountObjectsScanOp op = CountObjectsScanOp(&aiPlayer(), objects_, extraRadius);
 		op.checkInRadius(unit->position2D());
@@ -2513,7 +2513,7 @@ bool ActionUpgradeUnit::workedOut()
 						}
 					}
 					squad->setUsedByTrigger(0, this);
-					return true; // если не нашли
+					return true; // РµСЃР»Рё РЅРµ РЅР°С€Р»Рё
 				}
 				else
 					if(contextUnit_->unitState() != UnitReal::MOVE_MODE){
@@ -2593,7 +2593,7 @@ bool ActionUpgradeUnit::workedOut()
 							}
 						}
 						squad->setUsedByTrigger(0, this);
-						return true; // если не нашли
+						return true; // РµСЃР»Рё РЅРµ РЅР°С€Р»Рё
 				}
 				else
 					if(contextUnit_->unitState() != UnitReal::MOVE_MODE){
@@ -2645,14 +2645,14 @@ bool ActionForAI::automaticCondition() const
 void ActionForAI::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(onlyIfAi_, "onlyIfAi", "Запускать только для АИ");
-	ar.serialize(RangedWrapperi(priority_, 1, 5), "priority", "Приоритет");
+	ar.serialize(onlyIfAi_, "onlyIfAi", "Р—Р°РїСѓСЃРєР°С‚СЊ С‚РѕР»СЊРєРѕ РґР»СЏ РђР");
+	ar.serialize(RangedWrapperi(priority_, 1, 5), "priority", "РџСЂРёРѕСЂРёС‚РµС‚");
 }
 
 void ActionEscapeWater::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(nearBase_, "nearBase" , "Радиус поиска возле базы(не более 500)");
+	ar.serialize(nearBase_, "nearBase" , "Р Р°РґРёСѓСЃ РїРѕРёСЃРєР° РІРѕР·Р»Рµ Р±Р°Р·С‹(РЅРµ Р±РѕР»РµРµ 500)");
 }
 
 bool ActionEscapeWater::automaticCondition() const
@@ -2680,29 +2680,29 @@ void ActionEscapeWater::activate()
 void ActionSetCamera::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(cameraSplineName, "cameraSplineName", "Имя сплайна камеры");
-	ar.serialize(cycles, "cycles", "Количество циклов");
-	ar.serialize(smoothTransition, "smoothTransition", "Плавный переход");
+	ar.serialize(cameraSplineName, "cameraSplineName", "РРјСЏ СЃРїР»Р°Р№РЅР° РєР°РјРµСЂС‹");
+	ar.serialize(cycles, "cycles", "РљРѕР»РёС‡РµСЃС‚РІРѕ С†РёРєР»РѕРІ");
+	ar.serialize(smoothTransition, "smoothTransition", "РџР»Р°РІРЅС‹Р№ РїРµСЂРµС…РѕРґ");
 	ar.serialize(timer_, "timer", 0);
 }	
 
 void ActionSquadMoveToAnchor::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(anchor_, "|anchor|label", "Метка якоря");
-	ar.serialize(mode, "mode", "Критерий завершения");
+	ar.serialize(anchor_, "|anchor|label", "РњРµС‚РєР° СЏРєРѕСЂСЏ");
+	ar.serialize(mode, "mode", "РљСЂРёС‚РµСЂРёР№ Р·Р°РІРµСЂС€РµРЅРёСЏ");
 }	
 
 void ActionPutSquadToAnchor::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(anchor_, "|anchor|label", "Метка якоря");
+	ar.serialize(anchor_, "|anchor|label", "РњРµС‚РєР° СЏРєРѕСЂСЏ");
 }	
 
 void ActionSetControlEnabled::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(controlEnabled, "controlEnabled", "Разрешить");
+	ar.serialize(controlEnabled, "controlEnabled", "Р Р°Р·СЂРµС€РёС‚СЊ");
 }	
 
 void ActionSetFreezedByTrigger::activate()
@@ -2713,17 +2713,17 @@ void ActionSetFreezedByTrigger::activate()
 void ActionSetFreezedByTrigger::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(freeze, "freeze", "Заморозить");
+	ar.serialize(freeze, "freeze", "Р—Р°РјРѕСЂРѕР·РёС‚СЊ");
 }	
 
 void ActionMessage::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
 
-	ar.serialize(messageSetup_, "messageSetup", "&Сообщение");
-	ar.serialize(type_, "type", "Действие");
-	ar.serialize(pause_, "pause", "Пауза после сообщения, секунды");
-	ar.serialize(fadeTime_, "fadeTime", "Фейд, секунды");
+	ar.serialize(messageSetup_, "messageSetup", "&РЎРѕРѕР±С‰РµРЅРёРµ");
+	ar.serialize(type_, "type", "Р”РµР№СЃС‚РІРёРµ");
+	ar.serialize(pause_, "pause", "РџР°СѓР·Р° РїРѕСЃР»Рµ СЃРѕРѕР±С‰РµРЅРёСЏ, СЃРµРєСѓРЅРґС‹");
+	ar.serialize(fadeTime_, "fadeTime", "Р¤РµР№Рґ, СЃРµРєСѓРЅРґС‹");
 
 	ar.serialize(workTimer_, "workTimer", 0);
 	ar.serialize(fadeTimer_, "fadeTimer", 0);
@@ -2736,11 +2736,11 @@ void ActionTask::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(state_, "state", "Состояние");
+	ar.serialize(state_, "state", "РЎРѕСЃС‚РѕСЏРЅРёРµ");
 	if(state_ == UI_TASK_ASSIGNED)
-		ar.serialize(isSecondary_, "isSecondary", "Второстепенная задача");
+		ar.serialize(isSecondary_, "isSecondary", "Р’С‚РѕСЂРѕСЃС‚РµРїРµРЅРЅР°СЏ Р·Р°РґР°С‡Р°");
 
-	ar.serialize(messageSetup_, "messageSetup", "Сообщение");
+	ar.serialize(messageSetup_, "messageSetup", "РЎРѕРѕР±С‰РµРЅРёРµ");
 
 	ar.serialize(durationTimer_, "durationTimer_", 0);
 }	
@@ -2748,10 +2748,10 @@ void ActionTask::serialize(Archive& ar)
 void ActionSetCameraAtObject::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(transitionTime, "transitionTime", "Время перехода, секунды");
-	ar.serialize(setFollow, "setFollow", "Установить слежение");
-	ar.serialize(turnTime, "turnTime", "Время поворота");
-	ar.serialize(cameraSplineName, "cameraSplineName", "Имя сплайна камеры");
+	ar.serialize(transitionTime, "transitionTime", "Р’СЂРµРјСЏ РїРµСЂРµС…РѕРґР°, СЃРµРєСѓРЅРґС‹");
+	ar.serialize(setFollow, "setFollow", "РЈСЃС‚Р°РЅРѕРІРёС‚СЊ СЃР»РµР¶РµРЅРёРµ");
+	ar.serialize(turnTime, "turnTime", "Р’СЂРµРјСЏ РїРѕРІРѕСЂРѕС‚Р°");
+	ar.serialize(cameraSplineName, "cameraSplineName", "РРјСЏ СЃРїР»Р°Р№РЅР° РєР°РјРµСЂС‹");
 	ar.serialize(timer_, "timer", 0);
 	ar.serialize(turnStarted_, "turnStarted", 0);
 }
@@ -2764,14 +2764,14 @@ bool ActionSelectUnit::automaticCondition() const
 void ActionSelectUnit::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(unitID, "unitID", "Идентификатор юнита");
-	ar.serialize(onlyConnected_, "onlyConnected", "Только подключенные");
+	ar.serialize(unitID, "unitID", "РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЋРЅРёС‚Р°");
+	ar.serialize(onlyConnected_, "onlyConnected", "РўРѕР»СЊРєРѕ РїРѕРґРєР»СЋС‡РµРЅРЅС‹Рµ");
 }	
 
 void ActionSetInterface::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(enableInterface, "enableInterface", "Включить интерфейс");
+	ar.serialize(enableInterface, "enableInterface", "Р’РєР»СЋС‡РёС‚СЊ РёРЅС‚РµСЂС„РµР№СЃ");
 }	
 
 //------------------------------------------------------
@@ -2780,7 +2780,7 @@ void ActionCreateNetClient::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 	
-	ar.serialize(type_, "type", "Тип сетевой подсистемы");
+	ar.serialize(type_, "type", "РўРёРї СЃРµС‚РµРІРѕР№ РїРѕРґСЃРёСЃС‚РµРјС‹");
 }
 
 //------------------------------------------------------
@@ -2805,7 +2805,7 @@ void ActionSelectInterfaceScreen::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(screenReference_, "screenReference", "Экран");
+	ar.serialize(screenReference_, "screenReference", "Р­РєСЂР°РЅ");
 }	
 
 void ActionInterfaceHideControl::activate()
@@ -2822,8 +2822,8 @@ void ActionInterfaceHideControl::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(controlReference_, "controlReference", "Кнопка");
-	ar.serialize(hideControl_, "hideControl", "Спрятать кнопку");
+	ar.serialize(controlReference_, "controlReference", "РљРЅРѕРїРєР°");
+	ar.serialize(hideControl_, "hideControl", "РЎРїСЂСЏС‚Р°С‚СЊ РєРЅРѕРїРєСѓ");
 }
 
 //------------------------------------------------------
@@ -2842,8 +2842,8 @@ void ActionInterfaceHideControlTrigger::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(controlReference_, "controlReference", "Кнопка");
-	ar.serialize(hideControl_, "hideControl", "Спрятать кнопку");
+	ar.serialize(controlReference_, "controlReference", "РљРЅРѕРїРєР°");
+	ar.serialize(hideControl_, "hideControl", "РЎРїСЂСЏС‚Р°С‚СЊ РєРЅРѕРїРєСѓ");
 }
 
 //------------------------------------------------------
@@ -2866,7 +2866,7 @@ void ActionInterfaceControlOperate::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(actions_, "actions", "Действия с кнопками");
+	ar.serialize(actions_, "actions", "Р”РµР№СЃС‚РІРёСЏ СЃ РєРЅРѕРїРєР°РјРё");
 }
 
 //------------------------------------------------------
@@ -2881,8 +2881,8 @@ void ActionInterfaceSetControlState::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(controlReference_, "controlReference", "Кнопка");
-	ar.serialize(state_, "state", "номер состояния");
+	ar.serialize(controlReference_, "controlReference", "РљРЅРѕРїРєР°");
+	ar.serialize(state_, "state", "РЅРѕРјРµСЂ СЃРѕСЃС‚РѕСЏРЅРёСЏ");
 }
 
 //------------------------------------------------------
@@ -2901,8 +2901,8 @@ void ActionInterfaceTogglAccessibility::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(controlReference_, "controlReference", "Кнопка");
-	ar.serialize(enableControl_, "enableControl", "разрешить кнопку");
+	ar.serialize(controlReference_, "controlReference", "РљРЅРѕРїРєР°");
+	ar.serialize(enableControl_, "enableControl", "СЂР°Р·СЂРµС€РёС‚СЊ РєРЅРѕРїРєСѓ");
 }
 
 //------------------------------------------------------
@@ -2923,7 +2923,7 @@ void ActionUI_ConfirmDiskOp::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(confirmDiskOp_, "confirmDiskOp", "разрешить перезапись");
+	ar.serialize(confirmDiskOp_, "confirmDiskOp", "СЂР°Р·СЂРµС€РёС‚СЊ РїРµСЂРµР·Р°РїРёСЃСЊ");
 }
 
 void ActionUI_ConfirmDiskOp::activate()
@@ -2941,7 +2941,7 @@ void ActionUI_InventoryQuickAccessMode::activate()
 void ActionUI_InventoryQuickAccessMode::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(quickAccessMode_, "quickAccessMode", "Режим работы инвентаря быстрого доступа");
+	ar.serialize(quickAccessMode_, "quickAccessMode", "Р РµР¶РёРј СЂР°Р±РѕС‚С‹ РёРЅРІРµРЅС‚Р°СЂСЏ Р±С‹СЃС‚СЂРѕРіРѕ РґРѕСЃС‚СѓРїР°");
 }
 
 //------------------------------------------------------
@@ -2950,7 +2950,7 @@ void ActionToggleBuildingInstaller::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(attributeReference_, "attributeReference", "здание");
+	ar.serialize(attributeReference_, "attributeReference", "Р·РґР°РЅРёРµ");
 }
 
 //------------------------------------------------------
@@ -2991,11 +2991,11 @@ bool ActionDelay::workedOut()
 void ActionDelay::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(duration, "duration", "Время, секунды");
-	ar.serialize(showTimer, "showTimer", "Показывать таймер");
-	ar.serialize(scaleByDifficulty, "scaleByDifficulty", "Влияние уровня сложности");
-	ar.serialize(useNonStopTimer, "useNonStopTimer", "Использовать неостанавливаемый во время паузу таймер (только для неповторяемых триггреров!)");
-	ar.serialize(randomTime, "randomTime", "Случайное время в диапазоне 0..указанное");
+	ar.serialize(duration, "duration", "Р’СЂРµРјСЏ, СЃРµРєСѓРЅРґС‹");
+	ar.serialize(showTimer, "showTimer", "РџРѕРєР°Р·С‹РІР°С‚СЊ С‚Р°Р№РјРµСЂ");
+	ar.serialize(scaleByDifficulty, "scaleByDifficulty", "Р’Р»РёСЏРЅРёРµ СѓСЂРѕРІРЅСЏ СЃР»РѕР¶РЅРѕСЃС‚Рё");
+	ar.serialize(useNonStopTimer, "useNonStopTimer", "РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РЅРµРѕСЃС‚Р°РЅР°РІР»РёРІР°РµРјС‹Р№ РІРѕ РІСЂРµРјСЏ РїР°СѓР·Сѓ С‚Р°Р№РјРµСЂ (С‚РѕР»СЊРєРѕ РґР»СЏ РЅРµРїРѕРІС‚РѕСЂСЏРµРјС‹С… С‚СЂРёРіРіСЂРµСЂРѕРІ!)");
+	ar.serialize(randomTime, "randomTime", "РЎР»СѓС‡Р°Р№РЅРѕРµ РІСЂРµРјСЏ РІ РґРёР°РїР°Р·РѕРЅРµ 0..СѓРєР°Р·Р°РЅРЅРѕРµ");
 	if(!useNonStopTimer)
 		ar.serialize(timer, "timer", 0);
 }	
@@ -3069,8 +3069,8 @@ bool ActionOrderParameters::workedOut()
 void ActionOrderParameters::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(attrFactory, "attrFactory", "Тип фабрики");
-	ar.serialize(numberOfParameter, "numberOfParameter", "Номер параметра");
+	ar.serialize(attrFactory, "attrFactory", "РўРёРї С„Р°Р±СЂРёРєРё");
+	ar.serialize(numberOfParameter, "numberOfParameter", "РќРѕРјРµСЂ РїР°СЂР°РјРµС‚СЂР°");
 }
 
 
@@ -3121,8 +3121,8 @@ void ActionPutUnitInTransport::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(attrTransport, "attrTransport", "Тип транспорта/здания");
-	ar.serialize(distance, "distance", "Максимальная дистанция до транспорта");
+	ar.serialize(attrTransport, "attrTransport", "РўРёРї С‚СЂР°РЅСЃРїРѕСЂС‚Р°/Р·РґР°РЅРёСЏ");
+	ar.serialize(distance, "distance", "РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ РґРёСЃС‚Р°РЅС†РёСЏ РґРѕ С‚СЂР°РЅСЃРїРѕСЂС‚Р°");
 }
 
 ActionEnableSounds::ActionEnableSounds()
@@ -3134,8 +3134,8 @@ ActionEnableSounds::ActionEnableSounds()
 void ActionEnableSounds::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(soundType_, "soundType", "Тип звука");
-	ar.serialize(switchMode_, "switchMode", "Действие");
+	ar.serialize(soundType_, "soundType", "РўРёРї Р·РІСѓРєР°");
+	ar.serialize(switchMode_, "switchMode", "Р”РµР№СЃС‚РІРёРµ");
 }
 
 void ActionEnableSounds::activate()
@@ -3234,8 +3234,8 @@ bool ActionOrderUnits::workedOut()
 void ActionOrderUnits::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(unitAttribute_, "|unitAttribute|attrUnit", "Тип юнита");
-	ar.serialize(unitsNumber_, "|unitsNumber|countUnits", "Количество");
+	ar.serialize(unitAttribute_, "|unitAttribute|attrUnit", "РўРёРї СЋРЅРёС‚Р°");
+	ar.serialize(unitsNumber_, "|unitsNumber|countUnits", "РљРѕР»РёС‡РµСЃС‚РІРѕ");
 }
 
 ActionFollowSquad::ActionFollowSquad()
@@ -3246,8 +3246,8 @@ ActionFollowSquad::ActionFollowSquad()
 void ActionFollowSquad::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(squadsToFollow_, "squadsToFollow", "Сквады, за которым следовать");
-	ar.serialize(radius_, "radius", "Расстояние");
+	ar.serialize(squadsToFollow_, "squadsToFollow", "РЎРєРІР°РґС‹, Р·Р° РєРѕС‚РѕСЂС‹Рј СЃР»РµРґРѕРІР°С‚СЊ");
+	ar.serialize(radius_, "radius", "Р Р°СЃСЃС‚РѕСЏРЅРёРµ");
 }
 
 bool ActionFollowSquad::automaticCondition() const
@@ -3297,8 +3297,8 @@ ActionJoinSquads::ActionJoinSquads()
 void ActionJoinSquads::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(radius_, "radius", "Расстояние сканирования");
-	ar.serialize(attrUnits_, "attrUnits", "Типы присоединяемых юнитов");
+	ar.serialize(radius_, "radius", "Р Р°СЃСЃС‚РѕСЏРЅРёРµ СЃРєР°РЅРёСЂРѕРІР°РЅРёСЏ");
+	ar.serialize(attrUnits_, "attrUnits", "РўРёРїС‹ РїСЂРёСЃРѕРµРґРёРЅСЏРµРјС‹С… СЋРЅРёС‚РѕРІ");
 	removeZeros(attrUnits_);
 }
 
@@ -3336,7 +3336,7 @@ void ActionJoinSquads::activate()
 void ActionSetUnitAttackMode::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(attackMode_, "attackMode", "Режим атаки");
+	ar.serialize(attackMode_, "attackMode", "Р РµР¶РёРј Р°С‚Р°РєРё");
 }
 
 bool ActionSetUnitAttackMode::checkContextUnit(UnitActing* unit) const
@@ -3345,7 +3345,7 @@ bool ActionSetUnitAttackMode::checkContextUnit(UnitActing* unit) const
 		return false;
 
 	if(squad_ && !unit->attr().isLegionary())
-		xassert(0 && "У здания нет сквада");
+		xassert(0 && "РЈ Р·РґР°РЅРёСЏ РЅРµС‚ СЃРєРІР°РґР°");
 
 	if(unit->attackMode().autoAttackMode() == attackMode_.autoAttackMode() &&
 	   unit->attackMode().autoTargetFilter() == attackMode_.autoTargetFilter() &&
@@ -3373,7 +3373,7 @@ ActionSetGamePause::ActionSetGamePause()
 void ActionSetGamePause::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(switchType, "switchType", "Действие");
+	ar.serialize(switchType, "switchType", "Р”РµР№СЃС‚РІРёРµ");
 }
 
 ActionReturnToBase::ActionReturnToBase()
@@ -3409,12 +3409,12 @@ UnitReal* ActionReturnToBase::findNearestHeadquater(const Vect2f& positionSquad)
 void ActionReturnToBase::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(headquaters_, "headquaters", "&Типы штаба");
+	ar.serialize(headquaters_, "headquaters", "&РўРёРїС‹ С€С‚Р°Р±Р°");
 	removeZeros(headquaters_);
-	ar.serialize(radius_, "radius", "Радиус");
-	ar.serialize(attackMode_, "attackMode", "Режим атаки");
-	ar.serialize(mode_, "mode", "Движение");
-	ar.serialize(returnTime_, "returnTime", "Время возвращения");
+	ar.serialize(radius_, "radius", "Р Р°РґРёСѓСЃ");
+	ar.serialize(attackMode_, "attackMode", "Р РµР¶РёРј Р°С‚Р°РєРё");
+	ar.serialize(mode_, "mode", "Р”РІРёР¶РµРЅРёРµ");
+	ar.serialize(returnTime_, "returnTime", "Р’СЂРµРјСЏ РІРѕР·РІСЂР°С‰РµРЅРёСЏ");
 }
 ActionSetWalkMode::ActionSetWalkMode()
 {
@@ -3446,7 +3446,7 @@ bool ActionSetWalkMode::checkContextUnit(UnitActing* unit) const
 void ActionSetWalkMode::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(mode_, "mode", "Режим движения");
+	ar.serialize(mode_, "mode", "Р РµР¶РёРј РґРІРёР¶РµРЅРёСЏ");
 }
 
 void ActionSetWalkMode::activate()
@@ -3476,7 +3476,7 @@ ActionContinueConstruction::ActionContinueConstruction()
 void ActionContinueConstruction::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(mode_, "mode", "Режим движения");
+	ar.serialize(mode_, "mode", "Р РµР¶РёРј РґРІРёР¶РµРЅРёСЏ");
 }
 
 void ActionReturnToBase::activate()
@@ -3559,7 +3559,7 @@ bool ActionPutSquadToAnchor::checkContextUnit(UnitActing* unit) const
 		return false;
 
 	if(!anchor_){
-		xassert(0 && "Метка не найдена" && anchor_.c_str());
+		xassert(0 && "РњРµС‚РєР° РЅРµ РЅР°Р№РґРµРЅР°" && anchor_.c_str());
 		return false;
 	}
 
@@ -3587,7 +3587,7 @@ bool ActionOrderUnitsInSquad::checkContextUnit(UnitActing* unit) const
 void ActionOrderUnitsInSquad::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(attr_, "attr", "Тип заказываемого юнита");
+	ar.serialize(attr_, "attr", "РўРёРї Р·Р°РєР°Р·С‹РІР°РµРјРѕРіРѕ СЋРЅРёС‚Р°");
 }
 
 void ActionOrderUnitsInSquad::activate() 
@@ -3656,7 +3656,7 @@ bool ActionSquadMoveToAnchor::checkContextUnit(UnitActing* unit) const
 		return false;
 
 	if(!anchor_){
-		xassert(0 && "Метка не найдена" && anchor_.c_str());
+		xassert(0 && "РњРµС‚РєР° РЅРµ РЅР°Р№РґРµРЅР°" && anchor_.c_str());
 		return false;
 	}
 
@@ -3708,8 +3708,8 @@ void ActionOscillateCamera::activate()
 void ActionOscillateCamera::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(duration, "duration", "Длительность, секунды");
-	ar.serialize(factor, "factor", "Амплитуда");
+	ar.serialize(duration, "duration", "Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ, СЃРµРєСѓРЅРґС‹");
+	ar.serialize(factor, "factor", "РђРјРїР»РёС‚СѓРґР°");
 }
 
 ActionSaveAuto::ActionSaveAuto() : name_("")
@@ -3719,7 +3719,7 @@ ActionSaveAuto::ActionSaveAuto() : name_("")
 void ActionSaveAuto::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(name_, "name", "Имя для сейва");
+	ar.serialize(name_, "name", "РРјСЏ РґР»СЏ СЃРµР№РІР°");
 }
 
 void ActionSaveAuto::activate()
@@ -3745,7 +3745,7 @@ void ActionSave::activate()
 void ActionActivateObjectByLabel::activate()
 {
 	if(!label_){
-		xassertStr(0 && "Объект по метке не найден: ", label_.c_str());
+		xassertStr(0 && "РћР±СЉРµРєС‚ РїРѕ РјРµС‚РєРµ РЅРµ РЅР°Р№РґРµРЅ: ", label_.c_str());
 	}
 	else
 		label_->hide(UnitReal::HIDE_BY_TRIGGER, !active_);
@@ -3754,7 +3754,7 @@ void ActionActivateObjectByLabel::activate()
 void ActionActivateObjectByLabel::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(label_, "label", "Имя объекта");
+	ar.serialize(label_, "label", "РРјСЏ РѕР±СЉРµРєС‚Р°");
 }	
 
 ShowHeadData::ShowHeadData(bool camera)
@@ -3831,22 +3831,22 @@ void ActionShowHead::activate()
 void ActionShowHead::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(enable_,"Enable","Включить");
-	ar.serialize(mainChain_, "mainChain", "Анимация");
-	ar.serialize(cycled_,"Cycled","Зациклить");
+	ar.serialize(enable_,"Enable","Р’РєР»СЋС‡РёС‚СЊ");
+	ar.serialize(mainChain_, "mainChain", "РђРЅРёРјР°С†РёСЏ");
+	ar.serialize(cycled_,"Cycled","Р—Р°С†РёРєР»РёС‚СЊ");
 	ar.serialize(skinColor_,"SkinColor","Skin Color");
 }
 
 void ActionInterrruptMessage::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(messageType_, "messageType", "Тип сообщения");
+	ar.serialize(messageType_, "messageType", "РўРёРї СЃРѕРѕР±С‰РµРЅРёСЏ");
 }
 
 void ActionInterruptAnimation::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(messageType_, "messageType", "Тип сообщения");
+	ar.serialize(messageType_, "messageType", "РўРёРї СЃРѕРѕР±С‰РµРЅРёСЏ");
 }
 
 void ActionInterrruptMessage::activate()
@@ -3889,10 +3889,10 @@ bool ActionInterruptAnimation::automaticCondition() const
 void ActionSetSignalVariable::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(acting_, "acting", "Действие");
+	ar.serialize(acting_, "acting", "Р”РµР№СЃС‚РІРёРµ");
 	if(ar.isOutput() && ar.isEdit())
 		signalVariable.setComboList(editSignalVariableDialog().c_str());
-	ar.serialize(signalVariable, "signalVariable", "&Имя сигнальной переменной");
+	ar.serialize(signalVariable, "signalVariable", "&РРјСЏ СЃРёРіРЅР°Р»СЊРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№");
 }
 
 void ActionSetSignalVariable::activate()
@@ -4068,8 +4068,8 @@ bool ActionSetCameraAtSquad::workedOut()
 void ActionSetCameraAtSquad::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(attrSquad, "attrSquad", "Тип сквада");
-	//ar.serialize(transitionTime, "transitionTime", "Время перехода, секунды");
+	ar.serialize(attrSquad, "attrSquad", "РўРёРї СЃРєРІР°РґР°");
+	//ar.serialize(transitionTime, "transitionTime", "Р’СЂРµРјСЏ РїРµСЂРµС…РѕРґР°, СЃРµРєСѓРЅРґС‹");
 }
 
 void ActionSetCameraAtObject::activate()
@@ -4184,9 +4184,9 @@ bool ActionSetObjectAnimation::workedOut()
 void ActionSetObjectAnimation::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(counter, "counter", "Номер цепочки триггера");
-	ar.serialize(switchMode, "switchMode", "Действие");
-	ar.serialize(messageSetup_, "messageSetup", "&Сообщение");
+	ar.serialize(counter, "counter", "РќРѕРјРµСЂ С†РµРїРѕС‡РєРё С‚СЂРёРіРіРµСЂР°");
+	ar.serialize(switchMode, "switchMode", "Р”РµР№СЃС‚РІРёРµ");
+	ar.serialize(messageSetup_, "messageSetup", "&РЎРѕРѕР±С‰РµРЅРёРµ");
 	ar.serialize(timer, "timer", 0);
 }
 
@@ -4245,33 +4245,33 @@ void ActionShowReel::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 	static ResourceSelector::Options optionsVideo("*.bik", "Resource\\", "Will select location of video file");
-	ar.serialize(ResourceSelector(binkFileName, optionsVideo), "binkFileName", "&Имя видеофайла");
+	ar.serialize(ResourceSelector(binkFileName, optionsVideo), "binkFileName", "&РРјСЏ РІРёРґРµРѕС„Р°Р№Р»Р°");
 	static ResourceSelector::Options optionsVoice("*.ogg", "Resource\\", "Will select location of voice file");
-	ar.serialize(ResourceSelector(soundFileName, optionsVoice), "soundFileName", "&Имя звукового файла");
-	ar.serialize(localizedVideo, "localizedVideo", "Локализация видео");
-	ar.serialize(localizedVoice, "localizedVoice", "Локализация звука");
-	ar.serialize(stopBGMusic, "stopBGMusic", "Выключать фоновую музыку");
-	ar.serialize(alpha, "alpha", "Альфа");
-	ar.serialize(skip, "skip", "Возможность пропуска ролика");
+	ar.serialize(ResourceSelector(soundFileName, optionsVoice), "soundFileName", "&РРјСЏ Р·РІСѓРєРѕРІРѕРіРѕ С„Р°Р№Р»Р°");
+	ar.serialize(localizedVideo, "localizedVideo", "Р›РѕРєР°Р»РёР·Р°С†РёСЏ РІРёРґРµРѕ");
+	ar.serialize(localizedVoice, "localizedVoice", "Р›РѕРєР°Р»РёР·Р°С†РёСЏ Р·РІСѓРєР°");
+	ar.serialize(stopBGMusic, "stopBGMusic", "Р’С‹РєР»СЋС‡Р°С‚СЊ С„РѕРЅРѕРІСѓСЋ РјСѓР·С‹РєСѓ");
+	ar.serialize(alpha, "alpha", "РђР»СЊС„Р°");
+	ar.serialize(skip, "skip", "Р’РѕР·РјРѕР¶РЅРѕСЃС‚СЊ РїСЂРѕРїСѓСЃРєР° СЂРѕР»РёРєР°");
 }
 
 void ActionShowLogoReel::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(ModelSelector(groundName, ModelSelector::DEFAULT_OPTIONS), "groundName", "Модель дна");
-	ar.serialize(ModelSelector(fishName, ModelSelector::DEFAULT_OPTIONS), "modelName", "Модель рыбки");
-	ar.serialize(ModelSelector(logoName, ModelSelector::DEFAULT_OPTIONS), "logoName", "Модель логотипа");
+	ar.serialize(ModelSelector(groundName, ModelSelector::DEFAULT_OPTIONS), "groundName", "РњРѕРґРµР»СЊ РґРЅР°");
+	ar.serialize(ModelSelector(fishName, ModelSelector::DEFAULT_OPTIONS), "modelName", "РњРѕРґРµР»СЊ СЂС‹Р±РєРё");
+	ar.serialize(ModelSelector(logoName, ModelSelector::DEFAULT_OPTIONS), "logoName", "РњРѕРґРµР»СЊ Р»РѕРіРѕС‚РёРїР°");
 	float tmp = fishAlpha*100;
-	ar.serialize(tmp,"fishAlpha","Прозрачность рыбки при наведении (%)");
+	ar.serialize(tmp,"fishAlpha","РџСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ СЂС‹Р±РєРё РїСЂРё РЅР°РІРµРґРµРЅРёРё (%)");
 	fishAlpha = tmp*0.01f;
 	tmp = logoAlpha*100;
-	ar.serialize(tmp,"logoAlpha","Прозрачность логотипа при наведении (%)");
+	ar.serialize(tmp,"logoAlpha","РџСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ Р»РѕРіРѕС‚РёРїР° РїСЂРё РЅР°РІРµРґРµРЅРёРё (%)");
 	logoAlpha = tmp*0.01f;
-	ar.serialize(fadeTime,"fadeTime","Время изменения прозрачности");
-	ar.serialize(soundAttributes,"soundAttributes","Звуки");
-	ar.serialize(blobsSetting, "blobsSetting", "Параметры шариков");
-	ar.serialize(localized, "localized", "Локализация");
-	ar.serialize(workTime, "workTime", "Время показа (мс)");
+	ar.serialize(fadeTime,"fadeTime","Р’СЂРµРјСЏ РёР·РјРµРЅРµРЅРёСЏ РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚Рё");
+	ar.serialize(soundAttributes,"soundAttributes","Р—РІСѓРєРё");
+	ar.serialize(blobsSetting, "blobsSetting", "РџР°СЂР°РјРµС‚СЂС‹ С€Р°СЂРёРєРѕРІ");
+	ar.serialize(localized, "localized", "Р›РѕРєР°Р»РёР·Р°С†РёСЏ");
+	ar.serialize(workTime, "workTime", "Р’СЂРµРјСЏ РїРѕРєР°Р·Р° (РјСЃ)");
 }
 
 bool ActionLoadGameAuto::checkMissionExistence(const string& missionName, GameType gameType) const
@@ -4440,10 +4440,10 @@ bool ActionAttackLabel::operator()(SourceBase* source)
 void ActionAttackLabel::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(crystal_, "crystal", "Тип кристалла (Метка на мире должна содержать 'CRYSTAL'!)");
-	ar.serialize(weaponDig_, "|weaponDig|weapon", "Оружие для копания");
-	ar.serialize(weaponThrow_, "|weaponThrow|weapon1", "Оружие для высыпания");
-	ar.serialize(timeToAttack_, "timeToAttack", "Время атаки");
+	ar.serialize(crystal_, "crystal", "РўРёРї РєСЂРёСЃС‚Р°Р»Р»Р° (РњРµС‚РєР° РЅР° РјРёСЂРµ РґРѕР»Р¶РЅР° СЃРѕРґРµСЂР¶Р°С‚СЊ 'CRYSTAL'!)");
+	ar.serialize(weaponDig_, "|weaponDig|weapon", "РћСЂСѓР¶РёРµ РґР»СЏ РєРѕРїР°РЅРёСЏ");
+	ar.serialize(weaponThrow_, "|weaponThrow|weapon1", "РћСЂСѓР¶РёРµ РґР»СЏ РІС‹СЃС‹РїР°РЅРёСЏ");
+	ar.serialize(timeToAttack_, "timeToAttack", "Р’СЂРµРјСЏ Р°С‚Р°РєРё");
 }
 
 bool ActionLoadGameAuto::automaticCondition() const
@@ -4467,38 +4467,38 @@ bool ActionStartMission::automaticCondition() const
 void ActionLoadGameAuto::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(missionName, "missionName", "Имя сейва для загрузки");
-	ar.serialize(gameType_, "gameType", "Режим загрузки");
+	ar.serialize(missionName, "missionName", "РРјСЏ СЃРµР№РІР° РґР»СЏ Р·Р°РіСЂСѓР·РєРё");
+	ar.serialize(gameType_, "gameType", "Р РµР¶РёРј Р·Р°РіСЂСѓР·РєРё");
 }
 
 void ActionUI_GameStart::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(paused_, "paused", "На паузе");
-	ar.serialize(isBattle_, "isBattle", "Запускать как сражение");
+	ar.serialize(paused_, "paused", "РќР° РїР°СѓР·Рµ");
+	ar.serialize(isBattle_, "isBattle", "Р—Р°РїСѓСЃРєР°С‚СЊ РєР°Рє СЃСЂР°Р¶РµРЅРёРµ");
 }
 
 void ActionStartMission::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 	static ResourceSelector::Options missionOptions("*.spg; *.rpl", "Resource\\Worlds", "Will select location of mission file", false);
-	ar.serialize(ResourceSelector(missionName, missionOptions), "missionName", "Имя миссии");
-	ar.serialize(gameType_, "gameType", "Режим загрузки");
-	ar.serialize(paused_, "paused", "На паузе");
-	ar.serialize(preloadScreen_, "preloadScreen", "Экран для предзагрузки");
+	ar.serialize(ResourceSelector(missionName, missionOptions), "missionName", "РРјСЏ РјРёСЃСЃРёРё");
+	ar.serialize(gameType_, "gameType", "Р РµР¶РёРј Р·Р°РіСЂСѓР·РєРё");
+	ar.serialize(paused_, "paused", "РќР° РїР°СѓР·Рµ");
+	ar.serialize(preloadScreen_, "preloadScreen", "Р­РєСЂР°РЅ РґР»СЏ РїСЂРµРґР·Р°РіСЂСѓР·РєРё");
 }
 
 void ActionSetCursor::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(cursor, "cursor", "Курсор");
+	ar.serialize(cursor, "cursor", "РљСѓСЂСЃРѕСЂ");
 }
 
 void ActionChangeUnitCursor::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(attribute, "attribute", "Юнит");
-	ar.serialize(cursor, "cursor", "Курсор");
+	ar.serialize(attribute, "attribute", "Р®РЅРёС‚");
+	ar.serialize(cursor, "cursor", "РљСѓСЂСЃРѕСЂ");
 }
 
 void ActionUnitParameterArithmetics::activate()
@@ -4520,7 +4520,7 @@ void ActionObjectParameterArithmetics::serialize(Archive& ar)
 void ActionUnitParameterArithmetics::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(unit, "unit", "Тип юнита");
+	ar.serialize(unit, "unit", "РўРёРї СЋРЅРёС‚Р°");
 	arithmetics.serialize(ar);
 }
 
@@ -4590,7 +4590,7 @@ bool ActionSellBuilding::checkContextUnit(UnitActing* unit) const
 void ActionSellBuilding::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(onlyConnected_, "onlyConnected", "Только подключенные");
+	ar.serialize(onlyConnected_, "onlyConnected", "РўРѕР»СЊРєРѕ РїРѕРґРєР»СЋС‡РµРЅРЅС‹Рµ");
 }
 
 bool ActionEscapeUnderShield::checkContextUnit(UnitActing* unit) const
@@ -4648,7 +4648,7 @@ bool ActionAttack::checkContextUnit(UnitActing* unit) const
 
 	const float Check_Radius = 100.f;
 
-	// список приоритетных объектов для атаки
+	// СЃРїРёСЃРѕРє РїСЂРёРѕСЂРёС‚РµС‚РЅС‹С… РѕР±СЉРµРєС‚РѕРІ РґР»СЏ Р°С‚Р°РєРё
 	AttributeUnitOrBuildingReferences::const_iterator ai;
 	FOR_EACH(attrPriorityTarget_, ai){
 		FOR_EACH(universe()->Players, pi)
@@ -4685,7 +4685,7 @@ bool ActionAttack::checkContextUnit(UnitActing* unit) const
 			}
 	}
 	if(!target_){
-		// конкретный объект для атаки или все юниты
+		// РєРѕРЅРєСЂРµС‚РЅС‹Р№ РѕР±СЉРµРєС‚ РґР»СЏ Р°С‚Р°РєРё РёР»Рё РІСЃРµ СЋРЅРёС‚С‹
 		FOR_EACH(universe()->Players, pi)
 			if(!(*pi)->isWorld() || !ignoreWorldPlayer_)
 				if(aiPlayer().isEnemy(*pi)){
@@ -4859,7 +4859,7 @@ bool ActionSetUnitLevel::checkContextUnit(UnitActing* unit) const
 void ActionSetUnitLevel::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(level_, "level", "Уровень");
+	ar.serialize(level_, "level", "РЈСЂРѕРІРµРЅСЊ");
 }
 
 void ActionSetUnitLevel::activate()
@@ -4883,39 +4883,39 @@ void ActionSetUnitMinimapMark::activate()
 void ActionSetUnitMinimapMark::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(enable_, "enable", "Действие с пометкой юнита на миникарте");
+	ar.serialize(enable_, "enable", "Р”РµР№СЃС‚РІРёРµ СЃ РїРѕРјРµС‚РєРѕР№ СЋРЅРёС‚Р° РЅР° РјРёРЅРёРєР°СЂС‚Рµ");
 }
 
 void ActionGuardUnit::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(maxDistance_, "maxDistance", "Максимальное растояние до охраняемого юнита");
-	ar.serialize(attackMode_, "attackMode", "Режим атаки");
-	ar.serialize(attrTargets_, "attrTargets_", "&Типы юнитов для охраны");
+	ar.serialize(maxDistance_, "maxDistance", "РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ СЂР°СЃС‚РѕСЏРЅРёРµ РґРѕ РѕС…СЂР°РЅСЏРµРјРѕРіРѕ СЋРЅРёС‚Р°");
+	ar.serialize(attackMode_, "attackMode", "Р РµР¶РёРј Р°С‚Р°РєРё");
+	ar.serialize(attrTargets_, "attrTargets_", "&РўРёРїС‹ СЋРЅРёС‚РѕРІ РґР»СЏ РѕС…СЂР°РЅС‹");
 	removeZeros(attrTargets_);
-	ar.serialize(attackTime_, "attackTime", "Время атаки, секунды");
+	ar.serialize(attackTime_, "attackTime", "Р’СЂРµРјСЏ Р°С‚Р°РєРё, СЃРµРєСѓРЅРґС‹");
 }
 
 void ActionAttack::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(attackMode_, "attackMode", "Режим атаки");
-	ar.serialize(attrPriorityTarget_, "attrPriorityTarget", "Приоритетные цели");
+	ar.serialize(attackMode_, "attackMode", "Р РµР¶РёРј Р°С‚Р°РєРё");
+	ar.serialize(attrPriorityTarget_, "attrPriorityTarget", "РџСЂРёРѕСЂРёС‚РµС‚РЅС‹Рµ С†РµР»Рё");
 	removeZeros(attrPriorityTarget_);
-	ar.serialize(attrTarget_, "attrTarget", "Тип цели");
-	ar.serialize(attackTime_, "attackTime", "Время атаки, секунды");
-	ar.serialize(aimObject_, "aimObject", "Цель");
-	ar.serialize(ignoreWorldPlayer_, "ignoreWorldPlayer", "Игнорировать игрока Мир");
+	ar.serialize(attrTarget_, "attrTarget", "РўРёРї С†РµР»Рё");
+	ar.serialize(attackTime_, "attackTime", "Р’СЂРµРјСЏ Р°С‚Р°РєРё, СЃРµРєСѓРЅРґС‹");
+	ar.serialize(aimObject_, "aimObject", "Р¦РµР»СЊ");
+	ar.serialize(ignoreWorldPlayer_, "ignoreWorldPlayer", "РРіРЅРѕСЂРёСЂРѕРІР°С‚СЊ РёРіСЂРѕРєР° РњРёСЂ");
 }
 
 void ActionAttackMyUnit::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(attackMode_, "attackMode", "Режим атаки");
-	ar.serialize(attrTargets_, "attrTargets_", "&Типы цели");
+	ar.serialize(attackMode_, "attackMode", "Р РµР¶РёРј Р°С‚Р°РєРё");
+	ar.serialize(attrTargets_, "attrTargets_", "&РўРёРїС‹ С†РµР»Рё");
 	removeZeros(attrTargets_);
-	ar.serialize(attackTime_, "attackTime", "Время атаки, секунды");
-	ar.serialize(maxDistance_, "maxDistance", "Максимальное расстояние до цели");
+	ar.serialize(attackTime_, "attackTime", "Р’СЂРµРјСЏ Р°С‚Р°РєРё, СЃРµРєСѓРЅРґС‹");
+	ar.serialize(maxDistance_, "maxDistance", "РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ СЂР°СЃСЃС‚РѕСЏРЅРёРµ РґРѕ С†РµР»Рё");
 }
 
 ActionSetInt::ActionSetInt()
@@ -4928,15 +4928,15 @@ ActionSetInt::ActionSetInt()
 void ActionSetInt::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(scope_, "scope", "Область действия переменной");
+	ar.serialize(scope_, "scope", "РћР±Р»Р°СЃС‚СЊ РґРµР№СЃС‚РІРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№");
 	if(scope_ != SCOPE_MISSION_DESCRIPTION){
-		ar.serialize(name_, "name", "Имя переменной");
-		ar.serialize(value_, "value", "Значение");
+		ar.serialize(name_, "name", "РРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№");
+		ar.serialize(value_, "value", "Р—РЅР°С‡РµРЅРёРµ");
 	}
 	else{
 		missionDescription.serialize(ar);
-		ar.serialize(RangedWrapperi(value_, 0, 31), "value", "&Номер переменной");
-		ar.serialize(valueBool_, "valueBool", "Значение");
+		ar.serialize(RangedWrapperi(value_, 0, 31), "value", "&РќРѕРјРµСЂ РїРµСЂРµРјРµРЅРЅРѕР№");
+		ar.serialize(valueBool_, "valueBool", "Р—РЅР°С‡РµРЅРёРµ");
 	}
 }
 
@@ -4949,7 +4949,7 @@ bool ActionContext::isContext(ContextFilter& filter) const
 void ActionContext::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(object_, "object", "Тип юнита");
+	ar.serialize(object_, "object", "РўРёРї СЋРЅРёС‚Р°");
 }
 
 bool ActionContextSquad::isContext(ContextFilter& filter) const 
@@ -4989,7 +4989,7 @@ void ActionContextSquad::setContextUnit(UnitActing* unit)
 void ActionContextSquad::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(squad_, "squad", "Тип сквада");
+	ar.serialize(squad_, "squad", "РўРёРї СЃРєРІР°РґР°");
 }
 
 ActionSetIgnoreFreezedByTrigger::ActionSetIgnoreFreezedByTrigger() 
@@ -5005,7 +5005,7 @@ void ActionSetIgnoreFreezedByTrigger::activate()
 void ActionSetIgnoreFreezedByTrigger::serialize( Archive& ar ) 
 {
 	__super::serialize(ar);
-	ar.serialize(switchMode_, "switchMode", "Включить");
+	ar.serialize(switchMode_, "switchMode", "Р’РєР»СЋС‡РёС‚СЊ");
 }
 
 ActionRestartTriggers::ActionRestartTriggers()
@@ -5016,13 +5016,13 @@ ActionRestartTriggers::ActionRestartTriggers()
 void ActionRestartTriggers::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(resetToStart_, "resetToStart", "Перезапустить с начала (нет - продолжить от текущего триггера)");
+	ar.serialize(resetToStart_, "resetToStart", "РџРµСЂРµР·Р°РїСѓСЃС‚РёС‚СЊ СЃ РЅР°С‡Р°Р»Р° (РЅРµС‚ - РїСЂРѕРґРѕР»Р¶РёС‚СЊ РѕС‚ С‚РµРєСѓС‰РµРіРѕ С‚СЂРёРіРіРµСЂР°)");
 }
 
 void ActionStartTrigger::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(triggerChainName_, "triggerChainName", "Имя триггера");
+	ar.serialize(triggerChainName_, "triggerChainName", "РРјСЏ С‚СЂРёРіРіРµСЂР°");
 }
 
 void ActionStartTrigger::activate()
@@ -5038,7 +5038,7 @@ ActionSetCutScene::ActionSetCutScene()
 void ActionSetCutScene::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(switchMode, "switchMode", "Режим");
+	ar.serialize(switchMode, "switchMode", "Р РµР¶РёРј");
 }
 
 void ActionReadPlayerParameters::activate()
@@ -5054,7 +5054,7 @@ void ActionReadPlayerParameters::activate()
 void ActionCommandsQueue::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(commandsQueue_, "commandsQueue", "Очередь команд");
+	ar.serialize(commandsQueue_, "commandsQueue", "РћС‡РµСЂРµРґСЊ РєРѕРјР°РЅРґ");
 }
 
 void ActionCommandsQueue::activate() 
@@ -5098,5 +5098,5 @@ ActionDeselect::ActionDeselect()
 void ActionDeselect::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(stopPlayerUnit_, "stopPlayerUnit", "Выключать оружие игрока");
+	ar.serialize(stopPlayerUnit_, "stopPlayerUnit", "Р’С‹РєР»СЋС‡Р°С‚СЊ РѕСЂСѓР¶РёРµ РёРіСЂРѕРєР°");
 }

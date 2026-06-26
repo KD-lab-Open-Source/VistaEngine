@@ -23,7 +23,7 @@ class UI_TextParser;
 struct OutNode;
 typedef vector<OutNode> OutNodes;
 
-/// Интерфейс для UI к графическим объектам.
+/// РРЅС‚РµСЂС„РµР№СЃ РґР»СЏ UI Рє РіСЂР°С„РёС‡РµСЃРєРёРј РѕР±СЉРµРєС‚Р°Рј.
 class UI_Render : public UI_RenderBase
 {
 public:
@@ -38,8 +38,8 @@ public:
 	void drawSprite(const Rectf& pos, cTexture* texture, const Color4f& color = Color4f::WHITE, UI_BlendMode blend_mode = UI_BLEND_NORMAL, float phase = 0.f) const;
 	void drawSprite(const Rectf& pos, cTexture* texture, const Rectf& txt_pos, const Color4f& color, UI_BlendMode blend_mode) const;
 
-	/// dir == true, продублировать wild chars, для корректного отображения
-	/// dir == false, убрать продублированные wild chars для возможности редактирования
+	/// dir == true, РїСЂРѕРґСѓР±Р»РёСЂРѕРІР°С‚СЊ wild chars, РґР»СЏ РєРѕСЂСЂРµРєС‚РЅРѕРіРѕ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+	/// dir == false, СѓР±СЂР°С‚СЊ РїСЂРѕРґСѓР±Р»РёСЂРѕРІР°РЅРЅС‹Рµ wild chars РґР»СЏ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ
 	Vect2f outText(const Rectf& pos, const wchar_t* text, const UI_TextFormat* = 0, int textAlign = 0, const UI_Font* font = 0, float alpha = 1.f, bool formatText = false) const;
 	Vect2f outText(const Rectf& pos, const UI_TextParser& parser, OutNodes::const_iterator begin, OutNodes::const_iterator end, const UI_TextFormat* format, int textAlign, float alpha, bool clampInRange = false) const;
 	void outDebugText(const Vect2f& pos, const char* text, const Color4c* color = 0) const;
@@ -54,9 +54,9 @@ public:
 	void setWindowPosition(const Recti& window_pos);
 	void setWindowPosition(const Vect2i& window_size){ setWindowPosition(Recti(window_size)); }
 
-	/// возвращает координаты краев экрана, в относительных координах
+	/// РІРѕР·РІСЂР°С‰Р°РµС‚ РєРѕРѕСЂРґРёРЅР°С‚С‹ РєСЂР°РµРІ СЌРєСЂР°РЅР°, РІ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅС‹С… РєРѕРѕСЂРґРёРЅР°С…
 	Rectf entireScreenCoords() const;
-	/// возвращает отступ до края экрана, в относительных координах
+	/// РІРѕР·РІСЂР°С‰Р°РµС‚ РѕС‚СЃС‚СѓРї РґРѕ РєСЂР°СЏ СЌРєСЂР°РЅР°, РІ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅС‹С… РєРѕРѕСЂРґРёРЅР°С…
 	float screenBorderLeft() const;
 	float screenBorderTop() const;
 	float screenBorderRight() const;

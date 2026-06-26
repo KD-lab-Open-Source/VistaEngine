@@ -85,8 +85,8 @@ public:
 	bool serialize(Archive& ar, const char* name, const char* nameAlt) {
         if(ar.isEdit()) {
 			if(ar.openStruct(*this, name, nameAlt)){
-				ar.serialize(fileName_, "fileName", "Имя файла");
-				ar.serialize(options_, "options_", 0); // нужно для совместимости со старым EditArchive-ов
+				ar.serialize(fileName_, "fileName", "РРјСЏ С„Р°Р№Р»Р°");
+				ar.serialize(options_, "options_", 0); // РЅСѓР¶РЅРѕ РґР»СЏ СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё СЃРѕ СЃС‚Р°СЂС‹Рј EditArchive-РѕРІ
 				ar.closeStruct(name);
 			}
 			return true;

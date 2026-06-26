@@ -44,12 +44,12 @@ struct APolygons
 {
 	vector<Vect3f> points;
 
-	//������ ����� ������� ��� ���� int - ���������� ��������� � �������� (N).
-	//����� N ��������� - ������� ����� � points
+	//формат такой сначала идёт один int - количество элементов в полигоне (N).
+	//потом N элементов - индексы точек в points
 	vector<int> faces_flat;
 };
 
-///����� ��� �������� ��������� ���������� �������� �����������.
+///Класс для усечения выпуклого техмерного полигона плоскостями.
 struct ClippingMesh
 {
 public:
@@ -62,7 +62,7 @@ public:
 
 	int clip(const Plane& clipplane);
 
-	//�������� visMap ������ ���� TileMap->GetTileNumber().x*visMapDy=TileMap->GetTileNumber().y
+	//Величина visMap должна быть TileMap->GetTileNumber().x*visMapDy=TileMap->GetTileNumber().y
 	void calcVisMap(Camera* camera, Vect2i TileNumber,Vect2i TileSize,BYTE* visMap,bool clear);
 	void calcVisBox(Camera* camera, Vect2i TileNumber,Vect2i TileSize,const Mat4f& direction,sBox6f& box);
 

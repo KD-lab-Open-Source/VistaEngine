@@ -31,7 +31,7 @@ cTexture::~cTexture()
 		rd->TexLibrary.DeleteFromDefaultPool(this);
 
 	}else
-		xassert(0 && "�������� ������� ������� ������");
+		xassert(0 && "Текстура удалена слишком поздно");
 }
 
 bool cTexture::reload()
@@ -50,7 +50,7 @@ bool cTexture::reload()
 	ExportInterface::exportFile(GetSkinColorName());
 
 	if(getExtention(name()) == "dds")
-		return reloadDDS();//�� ������� ��������� ��������, ��� ��� ��� ����������� ������, �������������� �� ��������.
+		return reloadDDS();//Не слишком корректно работает, так как нет возможности узнать, полупрозрачная ли текстура.
 
 	cFileImage* fileImage = createFileImage();
 	if(!fileImage)
@@ -238,7 +238,7 @@ IDirect3DTexture9* ResizeCopy(int level,IDirect3DTexture9* pIn)
 	return lpD3DTextureDst;
 }
 
-//��������� ������, � ResizeCopy ������������!
+//Постирать внутри, и ResizeCopy использовать!
 void cTexture::Resize(int level)
 {
 	if(level <= 0 || level >= mipmapNumber_ || 
@@ -275,7 +275,7 @@ void cTexture::saveDDS(const char* file_name, int level)
 
 	HRESULT hr = D3DXSaveTextureToFile(file_name, D3DXIFF_DDS, pOut, 0);
 	if(hr != DD_OK)
-		kdError("3d", XBuffer() < "������ ��� ���������� �����: " < file_name < " Error: " <= hr);
+		kdError("3d", XBuffer() < "Ошибка при сохранении файла: " < file_name < " Error: " <= hr);
 	
 	RELEASE(pOut);
 }

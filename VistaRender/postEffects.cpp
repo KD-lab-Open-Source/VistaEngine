@@ -696,7 +696,7 @@ void PostEffectDOF::setDofParams(Vect2f &params)
 {
 	dofParams_.x = params.x;
 	if((params.y-params.x)>FLT_EPS)
-		//dofParams_.y = 2.f/params.y; //������� ��� ���������� ������ (����������)
+		//dofParams_.y = 2.f/params.y; //формула для размывания вблизи (правильная)
 		dofParams_.y = 1.f/(params.y-params.x); 
 	else
 		dofParams_.y=1;

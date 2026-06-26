@@ -15,7 +15,7 @@ extern bool isUnderEditor();
 const char* getLocDataPath();
 
 DECLARE_SEGMENT(UI_Sprite)
-REGISTER_CLASS(UI_Texture, UI_Texture, "��������");
+REGISTER_CLASS(UI_Texture, UI_Texture, "текстура");
 WRAP_LIBRARY(UI_TextureLibrary, "UI_TextureLibrary", "UI_TextureLibrary", "Scripts\\Content\\UI_TextureLibrary", 0, 0);
 
 // ------------------- UI_Texture
@@ -64,8 +64,8 @@ void UI_Texture::updateFileNameProxy()
 		fileNameProxy_ = fileName_;
 }
 
-// ���� ���� ����� � ����� � ��������, ��
-// ���� ����� �������� �� ����� � ��������� �����, ��� �������� ��������������
+// если файл лежит в папке с локкитом, то
+// путь нужно обрезать до имени и выставить галку, что текстура локализованная
 void UI_Texture::setFileName(const char* name)
 {
 	xassert(name);
@@ -86,14 +86,14 @@ const char* UI_Texture::textureFileName() const
 void UI_Texture::serialize(Archive& ar)
 {
 	ar.serialize(localized_, "localized", 0);
-	ar.serialize(fileName_, "fileName_", "&��� �����");
+	ar.serialize(fileName_, "fileName_", "&имя файла");
 	if(ar.isInput())
 		updateFileNameProxy();
 	else 
 		ExportInterface::exportFile(fileNameProxy_.c_str());
 
-	ar.serialize(hasResolutionVersion_, "hasResolutionVersion_", "��������� ������ ����������");
-	ar.serialize(hasRaceVersion_, "hasRaceVersion_", "��������� ������ ���");
+	ar.serialize(hasResolutionVersion_, "hasResolutionVersion_", "поддержка разных разрешений");
+	ar.serialize(hasRaceVersion_, "hasRaceVersion_", "поддержка разных рас");
 
 	if(isUnderEditor()){
 		if(ar.isOutput() && !ar.isEdit() && textureSizeInit_){
@@ -226,7 +226,7 @@ void UI_Sprite::decRef()
 {
 	if(cTexture* tex = texture(true)){
 #ifndef _FINAL_VERSION
-		xassert(addRefCount_ && "������������ ����� UI_Sprite::decRef()");
+		xassert(addRefCount_ && "Некорректный вызов UI_Sprite::decRef()");
 		addRefCount_--;
 #endif
 		tex->DecRef();
@@ -243,11 +243,11 @@ void UI_Sprite::release()
 
 void UI_Sprite::serialize(Archive& ar)
 {
-	ar.serialize(texture_, "texture_", "&��������");
+	ar.serialize(texture_, "texture_", "&текстура");
 	if(texture_.key() >= 0){
-		ar.serialize(textureCoords_, "textureCoords_", "���������� ����������");
-		ar.serialize(diffuseColor_, "diffuseColor", "����");
-		ar.serialize(saturation_, "saturation", "������������");
+		ar.serialize(textureCoords_, "textureCoords_", "текстурные координаты");
+		ar.serialize(diffuseColor_, "diffuseColor", "цвет");
+		ar.serialize(saturation_, "saturation", "насыщенность");
 	}
 
 	if(isUnderEditor()){
@@ -301,7 +301,7 @@ float UI_Sprite::phase(float time, bool cycled) const
 void UI_LibSprite::serialize(Archive& ar)
 {
 	StringTableBase::serialize(ar);
-	ar.serialize(static_cast<UI_Sprite&>(*this), "sprite", "������");
+	ar.serialize(static_cast<UI_Sprite&>(*this), "sprite", "Спрайт");
 }
 
 // ------------------- UI_UnitSprite
@@ -322,14 +322,14 @@ UI_UnitSprite::~UI_UnitSprite()
 
 void UI_UnitSprite::serialize(Archive& ar)
 {
-	ar.serialize(static_cast<UI_Sprite&>(*this), "sprite", "������");
-	ar.serialize(useLegionColor_, "useLegionColor", "������� � ���� �������");
-	ar.serialize(spriteOffset_, "spriteOffset", "�������� ������");
-	ar.serialize(spriteScale_, "spriteScale", "������� ������");
-	if(ar.openBlock("perspective", "�����������")){
-		ar.serialize(RangedWrapperf(minPerspectiveScale_, 0.f, 1.f), "minPerspectiveScale", "����������� ������ ���������� ��� ���������");
-		ar.serialize(RangedWrapperf(maxPerspectiveScale_, minPerspectiveScale_, 10.f), "maxPerspectiveScale", "������������ ������ ���������� ��� �����������");
-		ar.serialize(RangedWrapperf(hideScale_, 0.f, minPerspectiveScale_), "hideScale", "������ ������������ ��� ���������");
+	ar.serialize(static_cast<UI_Sprite&>(*this), "sprite", "Спрайт");
+	ar.serialize(useLegionColor_, "useLegionColor", "Красить в цвет легиона");
+	ar.serialize(spriteOffset_, "spriteOffset", "Смещение значка");
+	ar.serialize(spriteScale_, "spriteScale", "Масштаб значка");
+	if(ar.openBlock("perspective", "перспектива")){
+		ar.serialize(RangedWrapperf(minPerspectiveScale_, 0.f, 1.f), "minPerspectiveScale", "Минимальный маштаб уменьшения при отдалении");
+		ar.serialize(RangedWrapperf(maxPerspectiveScale_, minPerspectiveScale_, 10.f), "maxPerspectiveScale", "Максимальный маштаб увеличения при приближении");
+		ar.serialize(RangedWrapperf(hideScale_, 0.f, minPerspectiveScale_), "hideScale", "Маштаб исчезновения при отдалении");
 		ar.closeBlock();
 	}	
 }

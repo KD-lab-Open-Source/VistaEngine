@@ -22,15 +22,15 @@ CoastSpriteSimpleAttributes::CoastSpriteSimpleAttributes()
 
 void CoastSpriteSimpleAttributes::serialize(Archive& ar)
 {
-	ar.serialize(minSize_, "minSize", "Минимальный размер");
-	ar.serialize(maxSize_, "maxSize", "Максимальный размер");
-	ar.serialize(deltaPos_, "deltaPos", "Разброс позиции появления");
-	ar.serialize(beginDeep_ , "beginDeep", "Начальная глубина генерации");
-	ar.serialize(endDeep_ , "endDeep", "Конечная глубина генерации");
-	ar.serialize(intensity1_ , "intensity1", "Интенсивность генерации 1");
-	ar.serialize(intensity2_ , "intensity2", "Интенсивность генерации 2");
+	ar.serialize(minSize_, "minSize", "РњРёРЅРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ");
+	ar.serialize(maxSize_, "maxSize", "РњР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ");
+	ar.serialize(deltaPos_, "deltaPos", "Р Р°Р·Р±СЂРѕСЃ РїРѕР·РёС†РёРё РїРѕСЏРІР»РµРЅРёСЏ");
+	ar.serialize(beginDeep_ , "beginDeep", "РќР°С‡Р°Р»СЊРЅР°СЏ РіР»СѓР±РёРЅР° РіРµРЅРµСЂР°С†РёРё");
+	ar.serialize(endDeep_ , "endDeep", "РљРѕРЅРµС‡РЅР°СЏ РіР»СѓР±РёРЅР° РіРµРЅРµСЂР°С†РёРё");
+	ar.serialize(intensity1_ , "intensity1", "РРЅС‚РµРЅСЃРёРІРЅРѕСЃС‚СЊ РіРµРЅРµСЂР°С†РёРё 1");
+	ar.serialize(intensity2_ , "intensity2", "РРЅС‚РµРЅСЃРёРІРЅРѕСЃС‚СЊ РіРµРЅРµСЂР°С†РёРё 2");
 	static ResourceSelector::Options tgaAviOptions("*.tga; *.avi", "Resource\\TerrainData\\Textures");
-	ar.serialize(ResourceSelector(textureName_, tgaAviOptions), "tex_name_stay", "Текстура спрайтов");
+	ar.serialize(ResourceSelector(textureName_, tgaAviOptions), "tex_name_stay", "РўРµРєСЃС‚СѓСЂР° СЃРїСЂР°Р№С‚РѕРІ");
 }
 
 CoastSpriteMovingAttributes::CoastSpriteMovingAttributes()
@@ -48,7 +48,7 @@ CoastSpriteMovingAttributes::CoastSpriteMovingAttributes()
 
 void CoastSpriteMovingAttributes::serialize(Archive& ar)
 {
-	ar.serialize(speed_,"speed","Скорость Движения");
+	ar.serialize(speed_,"speed","РЎРєРѕСЂРѕСЃС‚СЊ Р”РІРёР¶РµРЅРёСЏ");
 	__super::serialize(ar);
 }
 
@@ -61,12 +61,12 @@ CoastSpritesAttributes::CoastSpritesAttributes()
 }
 void CoastSpritesAttributes::serialize(Archive& ar)
 {
-	ar.serialize(modeStay_, "modeStay", "Показывать простые спрайты");
-	ar.serialize(modeMove_, "modeMove", "Показывать движущиеся спрайты");
-	ar.serialize(heightOverWater_ , "heightOverWater", "Высота над водой");
-	ar.serialize(dieInCoast_ , "dieInCoast", "Исчезать на берегу");
-	ar.serialize(simpleSprites_,"simpleSprites","Стоящие спрайты");
-	ar.serialize(movingSprites_,"movingSprites","Движущиеся спрайты");
+	ar.serialize(modeStay_, "modeStay", "РџРѕРєР°Р·С‹РІР°С‚СЊ РїСЂРѕСЃС‚С‹Рµ СЃРїСЂР°Р№С‚С‹");
+	ar.serialize(modeMove_, "modeMove", "РџРѕРєР°Р·С‹РІР°С‚СЊ РґРІРёР¶СѓС‰РёРµСЃСЏ СЃРїСЂР°Р№С‚С‹");
+	ar.serialize(heightOverWater_ , "heightOverWater", "Р’С‹СЃРѕС‚Р° РЅР°Рґ РІРѕРґРѕР№");
+	ar.serialize(dieInCoast_ , "dieInCoast", "РСЃС‡РµР·Р°С‚СЊ РЅР° Р±РµСЂРµРіСѓ");
+	ar.serialize(simpleSprites_,"simpleSprites","РЎС‚РѕСЏС‰РёРµ СЃРїСЂР°Р№С‚С‹");
+	ar.serialize(movingSprites_,"movingSprites","Р”РІРёР¶СѓС‰РёРµСЃСЏ СЃРїСЂР°Р№С‚С‹");
 }
 
 cCoastSprites::cCoastSprites(cWater* pWater_, cTemperature* pTemperature_):BaseGraphObject(0)
@@ -412,7 +412,7 @@ void cCoastSprites::DrawMovingCoastSprite(Camera* camera)
 			 xmy, xpy
 			-xmy,-xpy
 			 xpy,-xmy
-		    //Преобразовать к такому виду и учитывать aspect ratio у спрайтика.
+		    //РџСЂРµРѕР±СЂР°Р·РѕРІР°С‚СЊ Рє С‚Р°РєРѕРјСѓ РІРёРґСѓ Рё СѓС‡РёС‚С‹РІР°С‚СЊ aspect ratio Сѓ СЃРїСЂР°Р№С‚РёРєР°.
 */
 
 			v[0].pos.set(s.pos.x-sx_x-sy_x,s.pos.y-sx_y-sy_y,s.pos.z);	v[0].diffuse=diff; v[0].GetTexel().set(rt.min.x,rt.min.y);	

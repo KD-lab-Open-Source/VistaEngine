@@ -4,7 +4,7 @@
 
 void StringTableBase::serialize(Archive& ar) 
 {
-	ar.serialize(name_, "|name|first", "&»Ïˇ"); // CONVERSION 31.07.07
+	ar.serialize(name_, "|name|first", "&–ò–º—è"); // CONVERSION 31.07.07
 	if(ar.isEdit())
 		ar.serialize(index_, "index", 0);
 }
@@ -13,7 +13,7 @@ bool StringTableBaseSimple::serialize(Archive& ar, const char* name, const char*
 {
 	if(ar.isEdit()){
 		if(ar.openStruct((StringTableBase&)(*this), name, nameAlt)){
-			ar.serialize(name_, "name", "&»Ïˇ");
+			ar.serialize(name_, "name", "&–ò–º—è");
 			ar.serialize(index_, "index", 0);
 			ar.closeStruct(name);
 		}

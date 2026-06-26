@@ -14,27 +14,27 @@ enum StatisticType {
 	TOTAL_LOSSES, 
 	TOTAL_DISCONNECTIONS,
 
-	STAT_UNIT_MY_KILLED, // количество !своих! убитых юнитов
-	STAT_BUILDING_MY_KILLED, // количество !своих! убитых зданий 
+	STAT_UNIT_MY_KILLED, // РєРѕР»РёС‡РµСЃС‚РІРѕ !СЃРІРѕРёС…! СѓР±РёС‚С‹С… СЋРЅРёС‚РѕРІ
+	STAT_BUILDING_MY_KILLED, // РєРѕР»РёС‡РµСЃС‚РІРѕ !СЃРІРѕРёС…! СѓР±РёС‚С‹С… Р·РґР°РЅРёР№ 
 	STAT_OBJECTS_MY_KILLED,
 	
-	STAT_UNIT_ENEMY_KILLED, // количество !вражеских! убитых юнитов мной
-	STAT_BUILDING_ENEMY_KILLED, // количество !вражеских! зданий убитых мной
+	STAT_UNIT_ENEMY_KILLED, // РєРѕР»РёС‡РµСЃС‚РІРѕ !РІСЂР°Р¶РµСЃРєРёС…! СѓР±РёС‚С‹С… СЋРЅРёС‚РѕРІ РјРЅРѕР№
+	STAT_BUILDING_ENEMY_KILLED, // РєРѕР»РёС‡РµСЃС‚РІРѕ !РІСЂР°Р¶РµСЃРєРёС…! Р·РґР°РЅРёР№ СѓР±РёС‚С‹С… РјРЅРѕР№
 	STAT_OBJECTS_ENEMY_KILLED,
 	
-	STAT_UNIT_ENEMY_CAPTURED, // количество захваченных !вражеских! юнитов мной
-	STAT_BUILDING_ENEMY_CAPTURED, // количество захваченных !вражеских! зданий мной
+	STAT_UNIT_ENEMY_CAPTURED, // РєРѕР»РёС‡РµСЃС‚РІРѕ Р·Р°С…РІР°С‡РµРЅРЅС‹С… !РІСЂР°Р¶РµСЃРєРёС…! СЋРЅРёС‚РѕРІ РјРЅРѕР№
+	STAT_BUILDING_ENEMY_CAPTURED, // РєРѕР»РёС‡РµСЃС‚РІРѕ Р·Р°С…РІР°С‡РµРЅРЅС‹С… !РІСЂР°Р¶РµСЃРєРёС…! Р·РґР°РЅРёР№ РјРЅРѕР№
 	STAT_OBJECTS_ENEMY_CAPTURED,
 	
-	STAT_UNIT_MY_CAPTURED, // количество !своих! захваченных юнитов
-	STAT_BUILDING_MY_CAPTURED, // количесво !своих! захваченных зданий
+	STAT_UNIT_MY_CAPTURED, // РєРѕР»РёС‡РµСЃС‚РІРѕ !СЃРІРѕРёС…! Р·Р°С…РІР°С‡РµРЅРЅС‹С… СЋРЅРёС‚РѕРІ
+	STAT_BUILDING_MY_CAPTURED, // РєРѕР»РёС‡РµСЃРІРѕ !СЃРІРѕРёС…! Р·Р°С…РІР°С‡РµРЅРЅС‹С… Р·РґР°РЅРёР№
 	STAT_OBJECTS_MY_CAPTURED, 
 	
-	STAT_UNIT_MY_BUILT, // количество !своих! построенных юнитов
-	STAT_BUILDING_MY_BUILT, // количество !своих! построенных зданий
+	STAT_UNIT_MY_BUILT, // РєРѕР»РёС‡РµСЃС‚РІРѕ !СЃРІРѕРёС…! РїРѕСЃС‚СЂРѕРµРЅРЅС‹С… СЋРЅРёС‚РѕРІ
+	STAT_BUILDING_MY_BUILT, // РєРѕР»РёС‡РµСЃС‚РІРѕ !СЃРІРѕРёС…! РїРѕСЃС‚СЂРѕРµРЅРЅС‹С… Р·РґР°РЅРёР№
 	STAT_OBJECTS_MY_BUILT, 
 	
-	STAT_KEYPOINTS_CAPTURED, // количество захваченных ключевых точек мной
+	STAT_KEYPOINTS_CAPTURED, // РєРѕР»РёС‡РµСЃС‚РІРѕ Р·Р°С…РІР°С‡РµРЅРЅС‹С… РєР»СЋС‡РµРІС‹С… С‚РѕС‡РµРє РјРЅРѕР№
 	STAT_KEYPOINTS_LOST, // 
 
 	STAT_HEROES_ENEMY_KILLED, // 
@@ -50,7 +50,7 @@ enum StatisticType {
 
 	STAT_RATING,
 
-	STAT_LAST_ENUM //просто enum, который в конце
+	STAT_LAST_ENUM //РїСЂРѕСЃС‚Рѕ enum, РєРѕС‚РѕСЂС‹Р№ РІ РєРѕРЅС†Рµ
 };
 
 class PlayerStatistics

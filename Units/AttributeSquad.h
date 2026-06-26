@@ -19,7 +19,7 @@ public:
 	};
 	typedef vector<Cell> Cells;
 
-	explicit FormationPattern(const char* name = "Свободная формация") : StringTableBase(name) {}
+	explicit FormationPattern(const char* name = "РЎРІРѕР±РѕРґРЅР°СЏ С„РѕСЂРјР°С†РёСЏ") : StringTableBase(name) {}
 	const Cells& cells() const { return cells_; }
 	void serialize(Archive& ar);
 

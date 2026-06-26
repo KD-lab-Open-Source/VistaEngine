@@ -1,6 +1,6 @@
 #ifndef __N_PARTICLE_ID_H_INCLUDED__
 #define __N_PARTICLE_ID_H_INCLUDED__
-//типы блоков в .effect файле
+//С‚РёРїС‹ Р±Р»РѕРєРѕРІ РІ .effect С„Р°Р№Р»Рµ
 const int IDS_EMITTERLIST			=1;
 const int IDS_EMITTERLIST_HEAD		=2;
 const int IDS_EMITTER				=10;

@@ -10,14 +10,14 @@
 
 /*
 
-cSimply3dx - ������������ ��� ������ ��������, ������� ����� ���� ����� �� ����.
-� ������ - �����, �������, �����.
+cSimply3dx - предназначен для мелких объектов, которых может быть много на мире.
+А именно - кусты, деревья, мусор.
 
-����������� cSimply3dx:
-��� ��������.
-������������ ������ ������������ �������.
-��� ������ ���, ��� ���� ������� ������ ������ ���� ���������� � group_center.
-������ ����������� �������/�����������.
+Ограничения cSimply3dx:
+Нет анимации.
+Выставляется только прозрачность объекта.
+Нет дерева нод, все ноды второго уровня должны быть привязанны к group_center.
+Нельзя привязывать объекты/спецэффекты.
 */
 
 cSimply3dx::cSimply3dx(cStaticSimply3dx* pStatic_)
@@ -221,7 +221,7 @@ void cSimply3dx::SelectMaterial(Camera* camera)
 	vs->SetReflectionZ(reflectionz);
 	ps->SetReflectionZ(reflectionz);
 
-	{//������� �� � �����, ���� ������ �� ��������, ��� ���������.
+	{//Немного не к месту, зато быстро по скорости, для отражений.
 		gb_RenderDevice3D->SetSamplerData(5,sampler_clamp_linear);
 		gb_RenderDevice3D->SetTexture(5,camera->GetZTexture());
 	}
@@ -515,34 +515,34 @@ void cStaticSimply3dx::DrawModels(int num_models,ONE_LOD& lod)
 }
 
 /*
-  ��� ����, ����� ��������� ������ ������ ���������, ����������.
-  1. ���������� ����� cStaticIndex �������������.
-  2. ���������� cTempVisibleGroup � ����� ������ ������������.
-  3. ����������� vertex buffer � ������� ��������.
+  Для того, чтобы загрузить нужную группу видимости, необходимо.
+  1. Определить какую cStaticIndex рассматривать.
+  2. Распарсить cTempVisibleGroup и взять нужные треугольники.
+  3. Пересобрать vertex buffer и индексы поменять.
 
-  1 - ������ ������ �������� � ����� �����.
-  2 - �������, ����� �������� ������������.
-  3 - ������� ����� ������� �����
-  4 - ������ ������ �����
-  5 - ���������.
+  1 - пихаем нужные полигоны в новый буфер.
+  2 - смотрим, какие вертексы используются.
+  3 - создаем новый вертекс буфер
+  4 - фиксим индекс буфер
+  5 - сортируем.
 
-  ��������� LOD.
-     ����� ���� ��� ���� LOD�� ����� �����������.
-	 ����� ������ 3 ����� vb, ������� �������������.
-	 ������ - ��� ����� ������� �������������.
-	 ������� - ������ �������� ���������� ������� �����, ������ �������� � ������ ����� ������ � ��� �� ������.
+  Несколько LOD.
+     Пусть ноды для всех LODов будут одинаковыми.
+	 Будут просто 3 куска vb, которые переключаются.
+	 Задача - как можно быстрее отсортировать.
+	 вариант - первым проходом определяем сколько каких, вторым проходом в нужный кусок пихаем в том же буфере.
 
-	 ����� ������� 3 ������ ��� ������� ����.
-	 ������� ���������� ����� ����� �����.
-	 � ����������� � ����������� �� ����.
+	 Можно сделать 3 буфера для каждого лода.
+	 Заранее определить какие кости будут.
+	 И сортировать в зависимости от лода.
 
-  ���� ��������� vb,ib,node_index ����� ����� � ���� � �������������� node_index
+  Есть несколько vb,ib,node_index нужно слить в один и перенумеровать node_index
 */
 
-// ������������ ����� ����� ������� ������ ���� � ��������������������� ������� ������.
+// Рассчитывает какие новые индексы должны быть у компактифицированного вертекс буфера.
 //  polygons_new[i][j]=old_to_new[polygons[i][j]]
 //  vertex_new[k]=vertex[new_to_old[k]]
-//  new_to_old.size() - ������ ������ ������� ������.
+//  new_to_old.size() - размер нового вертекс буфера.
 void CompactVertexBuffer(sPolygon* polygons,int polygon_num,
 						 vector<int>& old_to_new,vector<int>& new_to_old)
 {
@@ -693,7 +693,7 @@ bool cStaticSimply3dx::BuildAllBuffers(vector<PsiVisible>& groups,cStatic3dx* pS
 	}
 	if(num_actual_nodes>=StaticBunch::max_index)
 	{
-		xxassert(0,"!!!��� �������� Simply3dx ������������ ������������ ���������� ���, max = 20");
+		xxassert(0,"!!!При создании Simply3dx используется недопустимое количество нод, max = 20");
 		return false;
 	}
 	int one_index=num_actual_nodes;
@@ -857,7 +857,7 @@ bool cStaticSimply3dx::BuildLods(cStatic3dx* pStatic,const char* visible_group)
 
 		if(isi==static_lod.bunches.size())
 		{
-			xassert(0 && "�� ����� ��������� � ������ ���������");
+			xassert(0 && "Не нашли полигонов в группе видимости");
 			return false;
 		}
 
@@ -942,7 +942,7 @@ bool cStaticSimply3dx::BuildFromNode(cStatic3dx* pStatic,int iNode, VisibilityGr
 
 	if(!found){
 #ifndef _FINAL_VERSION_
-		string error="�� ����� ��������� � ������ ���������: ";
+		string error="Не нашли полигонов в группе видимости: ";
 		error+=file_name;
 		xassertStr(0,error.c_str());
 #endif _FINAL_VERSION_
@@ -1035,7 +1035,7 @@ void cStaticSimply3dx::BuildBuffersOneNode(vector<PsiVisible>& groups,cStatic3dx
 			for(int i=s.offset_vertex;i<s.offset_vertex+s.num_vertex;i++)
 			{
 				skin_vertex_in.Select(i);
-				BYTE idx=skin_vertex_in.GetIndex()[0];//<<�������� ����� �����
+				BYTE idx=skin_vertex_in.GetIndex()[0];//<<Особенно здесь криво
 				xassert(idx<s.nodeIndices.size());
 				int node=s.nodeIndices[idx];
 				if(node==nNode)
@@ -1238,7 +1238,7 @@ void SortByLod(cSimply3dx** object,int num_visible_object,Camera* camera,cStatic
 		}
 	}
 
-	{//���� ��������.
+	{//Куча проверок.
 		for(int ilod=0;ilod<StaticVisibilitySet::num_lod;ilod++)
 			xassert(offset_by_lod[ilod]<=end_offset_by_lod[ilod]);
 		for(int i=offset_by_lod[0];i<offset_by_lod[1];i++)
@@ -1256,8 +1256,8 @@ void cStaticSimply3dx::PreDraw(Camera* camera)
 	num_out_objects=0;
 	num_visible_object=0;
 	num_visible_opacity_object=0;
-	//�������� �� ���������.
-	//���������� ������� ������� ������� ������.
+	//Проверка на видимость.
+	//Складываем видимые объекты вначало списка.
 	vector<cSimply3dx*>& active_list=*pActiveSceneList;
 	bool is_lod=lods.size()==StaticVisibilitySet::num_lod;
 
@@ -1276,7 +1276,7 @@ void cStaticSimply3dx::PreDraw(Camera* camera)
 				continue;
 			swap(active_list[i],active_list[num_visible_object]);
 
-			if(p->getAttribute(ATTRSIMPLY3DX_OPACITY))//� ������ ������ �������������� �������.
+			if(p->getAttribute(ATTRSIMPLY3DX_OPACITY))//В начале списка полупрозрачные объекты.
 			{
 				swap(active_list[num_visible_object],active_list[num_visible_opacity_object]);
 				num_visible_opacity_object++;
@@ -1317,7 +1317,7 @@ void cStaticSimply3dx::PreDraw(Camera* camera)
 			camera->AttachNoRecursive(SCENENODE_OBJECTSORT,p);
 	}
 
-	//��������� ����� - ��������� ������.
+	//Видимость теней - отдельный список.
 	Camera* pShadow=camera->FindChildCamera(ATTRCAMERA_SHADOWMAP);
 	if(pShadow)
 	{
@@ -1365,7 +1365,7 @@ void cStaticSimply3dx::PreDraw(Camera* camera)
 }
 
 void cStaticSimply3dx::AddZMinZMaxShadowReciver(MatXf& camera_matrix,Vect2f& all)
-{//����� PreDraw ����������� ������ �������� ���������.
+{//После PreDraw естественно только работает нормально.
 
 	for(vector<cSimply3dx*>::iterator it=shadow_visible_list.begin();it!=shadow_visible_list.end();++it)
 	{
@@ -1382,13 +1382,13 @@ void cStaticSimply3dx::AddZMinZMaxShadowReciver(MatXf& camera_matrix,Vect2f& all
 
 void cStaticSimply3dx::DrawObjects(Camera* camera,cSimply3dx** objects,int num_object)
 {
-/*����� Draw
+/*Тупой Draw
 	for(int i=0;i<num_object;i++)
 	{
 		objects[i]->Draw(camera);
 	}
 /*/
-	//bool zbuffer = camera->getAttribute(ATTRCAMERA_ZBUFFER);//�������� ������������� ���������.
+	//bool zbuffer = camera->getAttribute(ATTRCAMERA_ZBUFFER);//Довольно пренеприятная сточенция.
 	//bool floatZBuffer =camera->getAttribute(ATTRCAMERA_FLOAT_ZBUFFER);
 	int num_matrix=node_offset.size();
 

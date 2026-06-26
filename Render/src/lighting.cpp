@@ -292,7 +292,7 @@ void Lighting::OneLight::GenerateInterpolate(vector<float>& pos,int size,float a
 
 }
 
-float Lighting::OneLight::get(vector<float>& p,float t)//линейная интерполяция
+float Lighting::OneLight::get(vector<float>& p,float t)//Р»РёРЅРµР№РЅР°СЏ РёРЅС‚РµСЂРїРѕР»СЏС†РёСЏ
 {
 
 	int size=p.size()+2;

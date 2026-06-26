@@ -12,7 +12,7 @@
 
 struct CameraRestriction
 {
-	//горизонтальное перемещение камеры
+	//РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅРѕРµ РїРµСЂРµРјРµС‰РµРЅРёРµ РєР°РјРµСЂС‹
 	float CAMERA_SCROLL_SPEED_DELTA;
 	float CAMERA_BORDER_SCROLL_SPEED_DELTA;
 	float CAMERA_SCROLL_SPEED_DAMP;
@@ -21,7 +21,7 @@ struct CameraRestriction
 	float CAMERA_BORDER_SCROLL_AREA_DN;
 	float CAMERA_BORDER_SCROLL_AREA_HORZ;
 
-	//вращение и наклон
+	//РІСЂР°С‰РµРЅРёРµ Рё РЅР°РєР»РѕРЅ
 	float CAMERA_KBD_ANGLE_SPEED_DELTA;
 	float CAMERA_MOUSE_ANGLE_SPEED_DELTA;
 	float CAMERA_ANGLE_SPEED_DAMP;
@@ -33,7 +33,7 @@ struct CameraRestriction
 
 	float CAMERA_FOLLOW_AVERAGE_TAU;
 
-	//ограничения
+	//РѕРіСЂР°РЅРёС‡РµРЅРёСЏ
 	float heightMax;
 	float heightMin;
 	float CAMERA_MOVE_ZOOM_SCALE;
@@ -50,7 +50,7 @@ struct CameraRestriction
 
 	float CAMERA_WORLD_SCROLL_BORDER;
 
-	// прямое управление.
+	// РїСЂСЏРјРѕРµ СѓРїСЂР°РІР»РµРЅРёРµ.
 	float unitFollowDistance;
 	float unitFollowTheta;
 	float unitHumanFollowDistance;
@@ -140,7 +140,7 @@ struct GlobalAttributes : public LibraryWrapper<GlobalAttributes>
 	string windowTitle;
 	string savePath;
 	string icon;
-	AvaiableLanguages languagesList;//список экспортируемых/импортируемых языков в Excel
+	AvaiableLanguages languagesList;//СЃРїРёСЃРѕРє СЌРєСЃРїРѕСЂС‚РёСЂСѓРµРјС‹С…/РёРјРїРѕСЂС‚РёСЂСѓРµРјС‹С… СЏР·С‹РєРѕРІ РІ Excel
 
 	MapSizeNames mapSizeNames;
 
@@ -152,7 +152,7 @@ struct GlobalAttributes : public LibraryWrapper<GlobalAttributes>
 
 	struct LodBorder
 	{
-		float lod12,lod23;/// переход от lod1 к lod2, переход от lod2 к lod3
+		float lod12,lod23;/// РїРµСЂРµС…РѕРґ РѕС‚ lod1 Рє lod2, РїРµСЂРµС…РѕРґ РѕС‚ lod2 Рє lod3
 		float radius;
 		float hideDistance;
 		void serialize(Archive& ar);

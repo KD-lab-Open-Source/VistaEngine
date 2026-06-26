@@ -30,7 +30,7 @@ protected:
 
 		if(!ReferenceType::canAlwaysBeDerefenced()){
 			static int temp;
-			Object* o = root->add(new Object(TRANSLATE("[ œÛÒÚ‡ˇ ÒÒ˚ÎÍ‡ ]"), ""));
+			Object* o = root->add(new Object(TRANSLATE("[ –ü—É—Å—Ç–∞—è —Å—Å—ã–ª–∫–∞ ]"), ""));
 			if(strcmp(reference_.c_str(), "") == 0)
 				result = o; 
 		}

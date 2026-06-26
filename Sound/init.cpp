@@ -138,7 +138,7 @@ bool SND3DListener::Update()
 	if(sndSystem.pListener)
 	{
 		/*
-		Ñèëüíî òîðìîçèò, ïîýòîìó ïîêà çàðåìèë*/
+		Ð¡Ð¸Ð»ÑŒÐ½Ð¾ Ñ‚Ð¾Ñ€Ð¼Ð¾Ð·Ð¸Ñ‚, Ð¿Ð¾ÑÑ‚Ð¾Ð¼Ñƒ Ð¿Ð¾ÐºÐ° Ð·Ð°Ñ€ÐµÐ¼Ð¸Ð»*/
 		hr=sndSystem.pListener->SetPosition(position.x,position.y,position.z,DS3D_DEFERRED);
 		hr=sndSystem.pListener->SetVelocity(velocity.x,velocity.y,velocity.z,DS3D_DEFERRED);
 		hr=sndSystem.pListener->SetOrientation(

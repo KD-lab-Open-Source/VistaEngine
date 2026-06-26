@@ -6,7 +6,7 @@
 //#include "Timers.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-//                                     ТРЕЩИНЫ(РАЗЛОМЫ)
+//                                     РўР Р•Р©РРќР«(Р РђР—Р›РћРњР«)
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 enum eReturnQuantResult{
@@ -15,8 +15,8 @@ enum eReturnQuantResult{
 	CONTINUE_QUANT=2
 };
 
-const float DENSITY_NOISE=6.f; //один излом на 4-е точки
-const int LENGHT_TAIL=50; //Длинна хвоста(в сегментах)
+const float DENSITY_NOISE=6.f; //РѕРґРёРЅ РёР·Р»РѕРј РЅР° 4-Рµ С‚РѕС‡РєРё
+const int LENGHT_TAIL=50; //Р”Р»РёРЅРЅР° С…РІРѕСЃС‚Р°(РІ СЃРµРіРјРµРЅС‚Р°С…)
 const float MAX_WIDTH=20.f;
 const float MAX_DEEP=20.f;
 
@@ -36,7 +36,7 @@ struct GeoBreakParam {
 };
 
 struct elementGeoBreak;
-struct GeoBreak { //точечный разлом
+struct GeoBreak { //С‚РѕС‡РµС‡РЅС‹Р№ СЂР°Р·Р»РѕРј
 	//Vect2i pos;
 	Vect2f pos;
 	float angle;
@@ -47,7 +47,7 @@ struct GeoBreak { //точечный разлом
 	bool flag_beginInitialization;
 	list<elementGeoBreak*> elGB;
 	GeoBreak();
-	//GeoBreak(Vect2f _pos, int _rad=100, int _begNumBreak=0){ //0-случайное кол-во
+	//GeoBreak(Vect2f _pos, int _rad=100, int _begNumBreak=0){ //0-СЃР»СѓС‡Р°Р№РЅРѕРµ РєРѕР»-РІРѕ
 	//	pos=_pos;
 	//	rad=_rad; maxBegBreak=_begNumBreak;
 	//	flag_beginInitialization=false;

@@ -20,8 +20,8 @@ RigidBodyCarPrm::RigidBodyCarPrm() :
 
 void RigidBodyCarPrm::serialize(Archive& ar)
 {
-	ar.serialize(rigidBodyPrm, "rigidBodyPrm", "Тип подвески");
-	ar.serialize(static_cast<vector<RigidBodyWheelPrm>&>(*this), "carPrm", "Колеса");
+	ar.serialize(rigidBodyPrm, "rigidBodyPrm", "РўРёРї РїРѕРґРІРµСЃРєРё");
+	ar.serialize(static_cast<vector<RigidBodyWheelPrm>&>(*this), "carPrm", "РљРѕР»РµСЃР°");
 	ar.serialize(turnInPosition, "turnInPosition", 0);
 }
 

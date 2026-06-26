@@ -10,7 +10,7 @@
 #include "Sound/SoundSystem.h"
 #include "Serialization/SerializationFactory.h"
 
-WRAP_LIBRARY(SoundTrackTable, "SoundTrackTable", "Звуковые треки", "Scripts\\Content\\SoundTrackTable", 0, 0);
+WRAP_LIBRARY(SoundTrackTable, "SoundTrackTable", "Р—РІСѓРєРѕРІС‹Рµ С‚СЂРµРєРё", "Scripts\\Content\\SoundTrackTable", 0, 0);
 
 bool SoundTrack::Name::serialize(Archive& ar, const char* name, const char* nameAlt) 
 {
@@ -22,8 +22,8 @@ void SoundTrack::serialize(Archive& ar)
 {
 	StringTableBase::serialize(ar);
 
-	ar.serialize(fileNames, "fileNames", "Имена музыкальных треков");
-	ar.serialize(randomChoice, "randomChoice", "Случайный выбор трека");
+	ar.serialize(fileNames, "fileNames", "РРјРµРЅР° РјСѓР·С‹РєР°Р»СЊРЅС‹С… С‚СЂРµРєРѕРІ");
+	ar.serialize(randomChoice, "randomChoice", "РЎР»СѓС‡Р°Р№РЅС‹Р№ РІС‹Р±РѕСЂ С‚СЂРµРєР°");
 }
 
 const char* SoundTrack::fileName() const
@@ -61,8 +61,8 @@ public:
 
 	void serialize(Archive& ar) {
 		__super::serialize(ar);
-		ar.serialize(type, "type", "Тип отключения");
-		ar.serialize(fadeTime, "fadeTime", "Время затихания звука(сек.)");
+		ar.serialize(type, "type", "РўРёРї РѕС‚РєР»СЋС‡РµРЅРёСЏ");
+		ar.serialize(fadeTime, "fadeTime", "Р’СЂРµРјСЏ Р·Р°С‚РёС…Р°РЅРёСЏ Р·РІСѓРєР°(СЃРµРє.)");
 		ar.serialize(durationTimer, "durationTimer", 0);
 	}
 
@@ -121,9 +121,9 @@ public:
 	{
 		__super::serialize(ar);
 
-		ar.serialize(actionType_, "actionType", "Что сделать");
-		ar.serialize(volume_, "volume", "Громкость(0..1)");
-		ar.serialize(fadeTime_, "fadeTime", "Время фейда");
+		ar.serialize(actionType_, "actionType", "Р§С‚Рѕ СЃРґРµР»Р°С‚СЊ");
+		ar.serialize(volume_, "volume", "Р“СЂРѕРјРєРѕСЃС‚СЊ(0..1)");
+		ar.serialize(fadeTime_, "fadeTime", "Р’СЂРµРјСЏ С„РµР№РґР°");
 
 		ar.serialize(timer_, "timer", 0);
 	}
@@ -180,7 +180,7 @@ struct ActionMute3DSound : Action
 	void serialize(Archive& ar)
 	{
 		__super::serialize(ar);
-		ar.serialize(switchMode_, "switchMode", "Действие");
+		ar.serialize(switchMode_, "switchMode", "Р”РµР№СЃС‚РІРёРµ");
 	}
 
 	void activate()
@@ -202,29 +202,29 @@ struct ActionPlaySoundTrack : Action
 
 	void serialize(Archive& ar) {
 		__super::serialize(ar);
-		ar.serialize(soundTrack, "soundTrack", "Музыкальный трек");
+		ar.serialize(soundTrack, "soundTrack", "РњСѓР·С‹РєР°Р»СЊРЅС‹Р№ С‚СЂРµРє");
 	}
 };
 
 STARFORCE_API void initActionsSound()
 {
 SECUROM_MARKER_HIGH_SECURITY_ON(6);
-REGISTER_CLASS(Action, ActionPlaySoundTrack, "Интерфейс\\Включить музыкальный трек (Неповторяемое!!!)")
-REGISTER_CLASS(Action, ActionStopSoundTrack, "Интерфейс\\Выключить музыкальный трек (Неповторяемое!!!)")
+REGISTER_CLASS(Action, ActionPlaySoundTrack, "РРЅС‚РµСЂС„РµР№СЃ\\Р’РєР»СЋС‡РёС‚СЊ РјСѓР·С‹РєР°Р»СЊРЅС‹Р№ С‚СЂРµРє (РќРµРїРѕРІС‚РѕСЂСЏРµРјРѕРµ!!!)")
+REGISTER_CLASS(Action, ActionStopSoundTrack, "РРЅС‚РµСЂС„РµР№СЃ\\Р’С‹РєР»СЋС‡РёС‚СЊ РјСѓР·С‹РєР°Р»СЊРЅС‹Р№ С‚СЂРµРє (РќРµРїРѕРІС‚РѕСЂСЏРµРјРѕРµ!!!)")
 SECUROM_MARKER_HIGH_SECURITY_OFF(6);
 }
 
-REGISTER_CLASS(Action, ActionMusicVolume, "Интерфейс\\Громкость музыки")
-REGISTER_CLASS(Action, ActionMute3DSound, "Интерфейс\\Включить/выключить 3D звуки")
+REGISTER_CLASS(Action, ActionMusicVolume, "РРЅС‚РµСЂС„РµР№СЃ\\Р“СЂРѕРјРєРѕСЃС‚СЊ РјСѓР·С‹РєРё")
+REGISTER_CLASS(Action, ActionMute3DSound, "РРЅС‚РµСЂС„РµР№СЃ\\Р’РєР»СЋС‡РёС‚СЊ/РІС‹РєР»СЋС‡РёС‚СЊ 3D Р·РІСѓРєРё")
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ActionMusicVolume, ActionType, "ActionType")
-REGISTER_ENUM_ENCLOSED(ActionMusicVolume, SET_VOLUME_IMMEDIATELY, "Установить немедленно")
-REGISTER_ENUM_ENCLOSED(ActionMusicVolume, SET_VOLUME_FADE, "Установить с фейдом")
-REGISTER_ENUM_ENCLOSED(ActionMusicVolume, SET_VOLUME_RESTORE, "Восстановить немедленно")
-REGISTER_ENUM_ENCLOSED(ActionMusicVolume, SET_VOLUME_RESTORE_FADE, "Восстановить с фейдом")
+REGISTER_ENUM_ENCLOSED(ActionMusicVolume, SET_VOLUME_IMMEDIATELY, "РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РЅРµРјРµРґР»РµРЅРЅРѕ")
+REGISTER_ENUM_ENCLOSED(ActionMusicVolume, SET_VOLUME_FADE, "РЈСЃС‚Р°РЅРѕРІРёС‚СЊ СЃ С„РµР№РґРѕРј")
+REGISTER_ENUM_ENCLOSED(ActionMusicVolume, SET_VOLUME_RESTORE, "Р’РѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ РЅРµРјРµРґР»РµРЅРЅРѕ")
+REGISTER_ENUM_ENCLOSED(ActionMusicVolume, SET_VOLUME_RESTORE_FADE, "Р’РѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ СЃ С„РµР№РґРѕРј")
 END_ENUM_DESCRIPTOR_ENCLOSED(ActionMusicVolume, ActionType)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ActionStopSoundTrack, Type, "Type")
-REGISTER_ENUM_ENCLOSED(ActionStopSoundTrack, STOP_IMMEDIATELY, "Немедленно")
-REGISTER_ENUM_ENCLOSED(ActionStopSoundTrack, STOP_FADE_OUT_VOLUME, "С фейдом")
+REGISTER_ENUM_ENCLOSED(ActionStopSoundTrack, STOP_IMMEDIATELY, "РќРµРјРµРґР»РµРЅРЅРѕ")
+REGISTER_ENUM_ENCLOSED(ActionStopSoundTrack, STOP_FADE_OUT_VOLUME, "РЎ С„РµР№РґРѕРј")
 END_ENUM_DESCRIPTOR_ENCLOSED(ActionStopSoundTrack, Type)

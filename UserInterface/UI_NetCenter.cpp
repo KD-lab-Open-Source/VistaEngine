@@ -110,7 +110,7 @@ void UI_NetCenter::quant()
 	}
 	else if(extNetTask_Login.isRunCompleted() || extNetTask_Login.isRunAndEnd()){
 		curNT=&extNetTask_Login;
-		if(extNetTask_Login.isRunCompleted() /*&& !extNetTask_Login.isErr()*/){ //ïîäðàçóìåâàåòñÿ ÷òî íåò îøèáêè åñëè isRunCompleted
+		if(extNetTask_Login.isRunCompleted() /*&& !extNetTask_Login.isErr()*/){ //Ð¿Ð¾Ð´Ñ€Ð°Ð·ÑƒÐ¼ÐµÐ²Ð°ÐµÑ‚ÑÑ Ñ‡Ñ‚Ð¾ Ð½ÐµÑ‚ Ð¾ÑˆÐ¸Ð±ÐºÐ¸ ÐµÑÐ»Ð¸ isRunCompleted
 			UI_LogicDispatcher::instance().profileSystem().newOnlineLogin();
 			UI_LogicDispatcher::instance().handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_ONLINE_LOGIN_LIST, UI_ActionDataControlCommand::RE_INIT)));
 			onlineLogined_ = true;
@@ -218,7 +218,7 @@ void UI_NetCenter::quant()
 		//setStatus(UI_NET_ERROR);
 		flag_lastNetCommandOk=false;
 		//reset(true);
-		reset(); //âûçûâàòñÿ è FinishGame
+		reset(); //Ð²Ñ‹Ð·Ñ‹Ð²Ð°Ñ‚ÑÑ Ð¸ FinishGame
 		UI_LogicDispatcher::instance().networkDisconnect(false);
 		break;
 	}
@@ -727,7 +727,7 @@ void UI_NetCenter::logout()
 
 	resetChatBoard(false);
 	
-	//commit(UI_NET_OK); // âñåãäà çàâåðøàåòñÿ óñïåøíî
+	//commit(UI_NET_OK); // Ð²ÑÐµÐ³Ð´Ð° Ð·Ð°Ð²ÐµÑ€ÑˆÐ°ÐµÑ‚ÑÑ ÑƒÑÐ¿ÐµÑˆÐ½Ð¾
 	flag_lastNetCommandOk = true;
 
 	//demonware()->logout();
@@ -1002,7 +1002,7 @@ void UI_NetCenter::createGame()
 					if(sufix > 0){
 						XBuffer suf; 
 						suf <= sufix;
-						xxassert(suf.tell() < MAX_MULTIPALYER_GAME_NAME, "Íó íè õðåíà ñåáå!");
+						xxassert(suf.tell() < MAX_MULTIPALYER_GAME_NAME, "ÐÑƒ Ð½Ð¸ Ñ…Ñ€ÐµÐ½Ð° ÑÐµÐ±Ðµ!");
 						gameName = originalGameName.substr(0, MAX_MULTIPALYER_GAME_NAME - suf.tell());
 						gameName += suf.c_str();
 					}
@@ -1709,7 +1709,7 @@ void UI_NetCenter::updateFilter()
 
 void UI_NetCenter::queryGameVersion()
 {
-	xassert(acyncEventWaiting() && "íåñèíõðîííûé çàïðîñ âåðñèè èãðû");
+	xassert(acyncEventWaiting() && "Ð½ÐµÑÐ¸Ð½Ñ…Ñ€Ð¾Ð½Ð½Ñ‹Ð¹ Ð·Ð°Ð¿Ñ€Ð¾Ñ Ð²ÐµÑ€ÑÐ¸Ð¸ Ð¸Ð³Ñ€Ñ‹");
 	LogMsg("UI_NetCenter: GET GAME VERSION ");
 	if(PNetCenter::isNCConfigured(PNCWM_ONLINE_DW)){
 		LogMsg("started\n");
@@ -1725,7 +1725,7 @@ void UI_NetCenter::queryGameVersion()
 
 bool UI_NetCenter::setGameVersion()
 {
-	xassert(acyncEventWaiting() && "íåñèíõðîííàÿ îáðàáîòêà âåðñèè èãðû");
+	xassert(acyncEventWaiting() && "Ð½ÐµÑÐ¸Ð½Ñ…Ñ€Ð¾Ð½Ð½Ð°Ñ Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐ° Ð²ÐµÑ€ÑÐ¸Ð¸ Ð¸Ð³Ñ€Ñ‹");
 	
 	version_ < '\0';
 
@@ -1739,7 +1739,7 @@ bool UI_NetCenter::setGameVersion()
 class ChanelSortRule{
 public:
 	bool operator()(const ChatChanelInfo& c1, const ChatChanelInfo& c2) const{
-		//return c1.name < c2.name; //ïî àëôàâèòó
+		//return c1.name < c2.name; //Ð¿Ð¾ Ð°Ð»Ñ„Ð°Ð²Ð¸Ñ‚Ñƒ
 		return c1.id < c2.id;
 	}
 };
@@ -1900,13 +1900,13 @@ void UI_NetCenter::autoSubscribeChatChannel()
 			return;
 		}
 
-		if(autoSubscribeMode_){ // ïðåäûäóùàÿ ïîäïèñêà çàâåðøèëàñü íåóäà÷íî, âûáèðàåì ñëåäóþùèé êàíàë
-			if(lastChannelSubscribeAttemptMode_){ // ïûòàëèñü ïîäïèñàòüñÿ íà ïðåäûäóùèé, òåïåðü ïîïðîáóåì ãëàâíûé (ïåðâûé â ñïèñêå)
+		if(autoSubscribeMode_){ // Ð¿Ñ€ÐµÐ´Ñ‹Ð´ÑƒÑ‰Ð°Ñ Ð¿Ð¾Ð´Ð¿Ð¸ÑÐºÐ° Ð·Ð°Ð²ÐµÑ€ÑˆÐ¸Ð»Ð°ÑÑŒ Ð½ÐµÑƒÐ´Ð°Ñ‡Ð½Ð¾, Ð²Ñ‹Ð±Ð¸Ñ€Ð°ÐµÐ¼ ÑÐ»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ ÐºÐ°Ð½Ð°Ð»
+			if(lastChannelSubscribeAttemptMode_){ // Ð¿Ñ‹Ñ‚Ð°Ð»Ð¸ÑÑŒ Ð¿Ð¾Ð´Ð¿Ð¸ÑÐ°Ñ‚ÑŒÑÑ Ð½Ð° Ð¿Ñ€ÐµÐ´Ñ‹Ð´ÑƒÑ‰Ð¸Ð¹, Ñ‚ÐµÐ¿ÐµÑ€ÑŒ Ð¿Ð¾Ð¿Ñ€Ð¾Ð±ÑƒÐµÐ¼ Ð³Ð»Ð°Ð²Ð½Ñ‹Ð¹ (Ð¿ÐµÑ€Ð²Ñ‹Ð¹ Ð² ÑÐ¿Ð¸ÑÐºÐµ)
 				lastChannelSubscribeAttemptMode_ = false;
 				LogMsg("main channel attempt.\n");
 				sid = chatChanelInfos_.front().id;
 			}
-			else { // ïðîáóåì ïîäïèñàòüñÿ íà ñëåäóþùèé ïî ñïèñêó
+			else { // Ð¿Ñ€Ð¾Ð±ÑƒÐµÐ¼ Ð¿Ð¾Ð´Ð¿Ð¸ÑÐ°Ñ‚ÑŒÑÑ Ð½Ð° ÑÐ»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ Ð¿Ð¾ ÑÐ¿Ð¸ÑÐºÑƒ
 				ChatChanelInfos::const_iterator info = find(chatChanelInfos_.begin(), chatChanelInfos_.end(), lastSubscribeAttempt_);
 				if(info != chatChanelInfos_.end()){
 					++info;
@@ -1926,10 +1926,10 @@ void UI_NetCenter::autoSubscribeChatChannel()
 				}
 			}
 		}
-		else { // íà÷èíàåì àâòîïîäïèñêó
+		else { // Ð½Ð°Ñ‡Ð¸Ð½Ð°ÐµÐ¼ Ð°Ð²Ñ‚Ð¾Ð¿Ð¾Ð´Ð¿Ð¸ÑÐºÑƒ
 			autoSubscribeMode_ = true;
 			lastChannelSubscribeAttemptMode_ = false;
-			// ïðîáóåì íà÷àòü ñ êàíàëà, íà êîòîðîì áûëè â ïðåäûäóùèé ðàç
+			// Ð¿Ñ€Ð¾Ð±ÑƒÐµÐ¼ Ð½Ð°Ñ‡Ð°Ñ‚ÑŒ Ñ ÐºÐ°Ð½Ð°Ð»Ð°, Ð½Ð° ÐºÐ¾Ñ‚Ð¾Ñ€Ð¾Ð¼ Ð±Ñ‹Ð»Ð¸ Ð² Ð¿Ñ€ÐµÐ´Ñ‹Ð´ÑƒÑ‰Ð¸Ð¹ Ñ€Ð°Ð·
 			if(!UI_LogicDispatcher::instance().currentProfile().chatChannel.empty()){
 				ChatChanelInfos::const_iterator info = find(chatChanelInfos_.begin(), chatChanelInfos_.end(), w2a(UI_LogicDispatcher::instance().currentProfile().chatChannel).c_str());
 				if(info != chatChanelInfos_.end()){
@@ -1942,7 +1942,7 @@ void UI_NetCenter::autoSubscribeChatChannel()
 			if(lastChannelSubscribeAttemptMode_){
 				LogMsg("last channel attempt.\n");
 			}
-			else { // åñëè ïîäïèñàííûé â ïðîøëûé ðàç êàíàë íå íàéäåí, íà÷èíàåì ñ ãëàâíîãî (âñåãäà ïåðâûé â ñïèñêå)
+			else { // ÐµÑÐ»Ð¸ Ð¿Ð¾Ð´Ð¿Ð¸ÑÐ°Ð½Ð½Ñ‹Ð¹ Ð² Ð¿Ñ€Ð¾ÑˆÐ»Ñ‹Ð¹ Ñ€Ð°Ð· ÐºÐ°Ð½Ð°Ð» Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½, Ð½Ð°Ñ‡Ð¸Ð½Ð°ÐµÐ¼ Ñ Ð³Ð»Ð°Ð²Ð½Ð¾Ð³Ð¾ (Ð²ÑÐµÐ³Ð´Ð° Ð¿ÐµÑ€Ð²Ñ‹Ð¹ Ð² ÑÐ¿Ð¸ÑÐºÐµ)
 				LogMsg("main channel attempt.\n");
 				sid = chatChanelInfos_.front().id;
 			}
@@ -2019,7 +2019,7 @@ void UI_NetCenter::chatSubscribeOK()
 
 		if(subscribeWaitingChannel_ == -1 || !onlineLogined_){
 			LogMsg(" ERROR, not waiting subscribe or not logined\n");
-			xassert(false && "ñåðüåçíàÿ îøèáêà ïîäïèñûâàíèÿ íà êàíàë");
+			xassert(false && "ÑÐµÑ€ÑŒÐµÐ·Ð½Ð°Ñ Ð¾ÑˆÐ¸Ð±ÐºÐ° Ð¿Ð¾Ð´Ð¿Ð¸ÑÑ‹Ð²Ð°Ð½Ð¸Ñ Ð½Ð° ÐºÐ°Ð½Ð°Ð»");
 			return;
 		}
 
@@ -2041,7 +2041,7 @@ void UI_NetCenter::chatSubscribeOK()
 		autoSubscribeMode_ = false;
 	}
 
-	// îòêëþ÷àåìñÿ îò ñòàðîãî êàíàëà
+	// Ð¾Ñ‚ÐºÐ»ÑŽÑ‡Ð°ÐµÐ¼ÑÑ Ð¾Ñ‚ ÑÑ‚Ð°Ñ€Ð¾Ð³Ð¾ ÐºÐ°Ð½Ð°Ð»Ð°
 	if(sid != -1){ //if(demonware() && sid != -1)
 		LogMsg(XBuffer() < "UI_NetCenter: UNSUBSCRIBE PREV: " <= (unsigned int)sid < "\n");
 		//demonware()->subUnsub2ChatChanel(false, sid);

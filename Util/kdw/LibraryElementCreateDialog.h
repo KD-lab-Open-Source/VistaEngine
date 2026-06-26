@@ -14,14 +14,14 @@ public:
 	: kdw::Dialog(parent)
 	, paste_(paste)
 	{
-		addButton(TRANSLATE("ÎÊ"), RESPONSE_OK);
-		addButton(TRANSLATE("Îòìåíà"), RESPONSE_CANCEL);
+		addButton(TRANSLATE("ÐžÐš"), RESPONSE_OK);
+		addButton(TRANSLATE("ÐžÑ‚Ð¼ÐµÐ½Ð°"), RESPONSE_CANCEL);
 
-		add(new Label(TRANSLATE("Íàçâàíèå"), true));
+		add(new Label(TRANSLATE("ÐÐ°Ð·Ð²Ð°Ð½Ð¸Ðµ"), true));
 		nameEntry_ = new Entry(title);
 		add(nameEntry_);
 
-		pasteCheck_ = new CheckBox(TRANSLATE("Âñòàâèòü èç áóôôåðà îáìåíà"));
+		pasteCheck_ = new CheckBox(TRANSLATE("Ð’ÑÑ‚Ð°Ð²Ð¸Ñ‚ÑŒ Ð¸Ð· Ð±ÑƒÑ„Ñ„ÐµÑ€Ð° Ð¾Ð±Ð¼ÐµÐ½Ð°"));
 		pasteCheck_->setSensitive(canBePasted);
 		add(pasteCheck_);
 	}

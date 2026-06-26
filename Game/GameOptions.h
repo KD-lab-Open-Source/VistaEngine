@@ -15,28 +15,28 @@ enum GameOptionType
 	OPTION_DEBUG_WINDOW, // bool
 	OPTION_SCREEN_SIZE, // predefine list
 	OPTION_MAP_LEVEL_LOD, // 00..100, def 50
-	OPTION_SHADOW, // выкл, плохие, хорошие
-	OPTION_TILEMAP_DETAIL, // использовать мелкодетальную текстуру, bool
+	OPTION_SHADOW, // РІС‹РєР», РїР»РѕС…РёРµ, С…РѕСЂРѕС€РёРµ
+	OPTION_TILEMAP_DETAIL, // РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РјРµР»РєРѕРґРµС‚Р°Р»СЊРЅСѓСЋ С‚РµРєСЃС‚СѓСЂСѓ, bool
 	OPTION_TEXTURE_DETAIL_LEVEL, // Low|Medium|Good
-	OPTION_TILEMAP_TYPE_NORMAL, // качественное освещение, bool
+	OPTION_TILEMAP_TYPE_NORMAL, // РєР°С‡РµСЃС‚РІРµРЅРЅРѕРµ РѕСЃРІРµС‰РµРЅРёРµ, bool
 	OPTION_REFLECTION,
 	OPTION_PARTICLE_RATE, //0..1
-	OPTION_BUMP, // включить bumpMapping, bool
-	OPTION_FOG_OF_WAR, // включить туман войны, bool
-	OPTION_ANTIALIAS, // качество антиалиасинга, predefine list
-	OPTION_ANISOTROPY, // анизатропная фильтрация, predefine list
-	OPTION_SILHOUETTE, // включить силуэты
-	OPTION_SOFT_SMOKE, // сглаживание эффектов
-	OPTION_BLOOM, // включить эффект свечения
-	OPTION_MIRAGE,//включить эффект миража/подводного колебания
-	OPTION_GRASSDENSITY, // плотность травы, при 0 - трава выключена
-	OPTION_UNIT_SPRITE_SCALE, // маштаб стратегических знаков юнита
-	OPTION_CAMERA_RESTRICTION, // включить ограничение камеры
-	OPTION_CAMERA_UNIT_FOLLOW, // привязать камеру к юниту
-	OPTION_CAMERA_UNIT_DOWN_FOLLOW, // привязанный юнит внизу экрана
-	OPTION_CAMERA_UNIT_ROTATE, // поворачивать камеру за юнитом
-	OPTION_CAMERA_ZOOM_TO_CURSOR, // зум в курсор
-	OPTION_CAMERA_INVERT_MOUSE, // инвертировать мышь в прямом управление
+	OPTION_BUMP, // РІРєР»СЋС‡РёС‚СЊ bumpMapping, bool
+	OPTION_FOG_OF_WAR, // РІРєР»СЋС‡РёС‚СЊ С‚СѓРјР°РЅ РІРѕР№РЅС‹, bool
+	OPTION_ANTIALIAS, // РєР°С‡РµСЃС‚РІРѕ Р°РЅС‚РёР°Р»РёР°СЃРёРЅРіР°, predefine list
+	OPTION_ANISOTROPY, // Р°РЅРёР·Р°С‚СЂРѕРїРЅР°СЏ С„РёР»СЊС‚СЂР°С†РёСЏ, predefine list
+	OPTION_SILHOUETTE, // РІРєР»СЋС‡РёС‚СЊ СЃРёР»СѓСЌС‚С‹
+	OPTION_SOFT_SMOKE, // СЃРіР»Р°Р¶РёРІР°РЅРёРµ СЌС„С„РµРєС‚РѕРІ
+	OPTION_BLOOM, // РІРєР»СЋС‡РёС‚СЊ СЌС„С„РµРєС‚ СЃРІРµС‡РµРЅРёСЏ
+	OPTION_MIRAGE,//РІРєР»СЋС‡РёС‚СЊ СЌС„С„РµРєС‚ РјРёСЂР°Р¶Р°/РїРѕРґРІРѕРґРЅРѕРіРѕ РєРѕР»РµР±Р°РЅРёСЏ
+	OPTION_GRASSDENSITY, // РїР»РѕС‚РЅРѕСЃС‚СЊ С‚СЂР°РІС‹, РїСЂРё 0 - С‚СЂР°РІР° РІС‹РєР»СЋС‡РµРЅР°
+	OPTION_UNIT_SPRITE_SCALE, // РјР°С€С‚Р°Р± СЃС‚СЂР°С‚РµРіРёС‡РµСЃРєРёС… Р·РЅР°РєРѕРІ СЋРЅРёС‚Р°
+	OPTION_CAMERA_RESTRICTION, // РІРєР»СЋС‡РёС‚СЊ РѕРіСЂР°РЅРёС‡РµРЅРёРµ РєР°РјРµСЂС‹
+	OPTION_CAMERA_UNIT_FOLLOW, // РїСЂРёРІСЏР·Р°С‚СЊ РєР°РјРµСЂСѓ Рє СЋРЅРёС‚Сѓ
+	OPTION_CAMERA_UNIT_DOWN_FOLLOW, // РїСЂРёРІСЏР·Р°РЅРЅС‹Р№ СЋРЅРёС‚ РІРЅРёР·Сѓ СЌРєСЂР°РЅР°
+	OPTION_CAMERA_UNIT_ROTATE, // РїРѕРІРѕСЂР°С‡РёРІР°С‚СЊ РєР°РјРµСЂСѓ Р·Р° СЋРЅРёС‚РѕРј
+	OPTION_CAMERA_ZOOM_TO_CURSOR, // Р·СѓРј РІ РєСѓСЂСЃРѕСЂ
+	OPTION_CAMERA_INVERT_MOUSE, // РёРЅРІРµСЂС‚РёСЂРѕРІР°С‚СЊ РјС‹С€СЊ РІ РїСЂСЏРјРѕРј СѓРїСЂР°РІР»РµРЅРёРµ
 	OPTION_SOUND_ENABLE,
 	OPTION_SOUND_VOLUME,
 	OPTION_MUSIC_ENABLE,
@@ -45,7 +45,7 @@ enum GameOptionType
 	OPTION_VOICE_VOLUME,
 	OPTION_SHOW_HINTS,
 	OPTION_SHOW_MESSAGES,
-	OPTION_WEATHER, //вкл/выкл погодных эффектов
+	OPTION_WEATHER, //РІРєР»/РІС‹РєР» РїРѕРіРѕРґРЅС‹С… СЌС„С„РµРєС‚РѕРІ
 	OPTION_ENUM_SIZE
 };
 
@@ -81,7 +81,7 @@ public:
 private:
 	enum ValueType{
 		TYPE_PHASA,
-		TYPE_BOOL, // первое значение из списка- истина, любое другое ложь
+		TYPE_BOOL, // РїРµСЂРІРѕРµ Р·РЅР°С‡РµРЅРёРµ РёР· СЃРїРёСЃРєР°- РёСЃС‚РёРЅР°, Р»СЋР±РѕРµ РґСЂСѓРіРѕРµ Р»РѕР¶СЊ
 		TYPE_LIST,
 		TYPE_NONE
 	};
@@ -141,7 +141,7 @@ public:
 	
 	void serializeForEditor(Archive& ar, int groupsMask = GRAPHICS | SOUND);
 
-	/// получение реальных значений параметров
+	/// РїРѕР»СѓС‡РµРЅРёРµ СЂРµР°Р»СЊРЅС‹С… Р·РЅР°С‡РµРЅРёР№ РїР°СЂР°РјРµС‚СЂРѕРІ
 	bool getBool(GameOptionType type) const;
 	float getFloat(GameOptionType type) const;
 	int getInt(GameOptionType type) const{ return round(getFloat(type)); }
@@ -152,28 +152,28 @@ public:
 	const char* getLocDataPath() const { return locDataPath_.c_str(); }
 	const char* getLaguagesList() const { return locDataComboPaths_.c_str(); }
 
-	// акцессеры только для UI 
-	/// получить строку разделенную | значений для выбора
+	// Р°РєС†РµСЃСЃРµСЂС‹ С‚РѕР»СЊРєРѕ РґР»СЏ UI 
+	/// РїРѕР»СѓС‡РёС‚СЊ СЃС‚СЂРѕРєСѓ СЂР°Р·РґРµР»РµРЅРЅСѓСЋ | Р·РЅР°С‡РµРЅРёР№ РґР»СЏ РІС‹Р±РѕСЂР°
 	const wchar_t* getList(class WBuffer& buf, GameOptionType type) const;
-	/// получить строку с названиями пресетов разделенную |
+	/// РїРѕР»СѓС‡РёС‚СЊ СЃС‚СЂРѕРєСѓ СЃ РЅР°Р·РІР°РЅРёСЏРјРё РїСЂРµСЃРµС‚РѕРІ СЂР°Р·РґРµР»РµРЅРЅСѓСЋ |
 	const wchar_t* getPresetList(class WBuffer& out) const;
-	/// получить comboList всех возможных(включая недоступные) значения списка
+	/// РїРѕР»СѓС‡РёС‚СЊ comboList РІСЃРµС… РІРѕР·РјРѕР¶РЅС‹С…(РІРєР»СЋС‡Р°СЏ РЅРµРґРѕСЃС‚СѓРїРЅС‹Рµ) Р·РЅР°С‡РµРЅРёСЏ СЃРїРёСЃРєР°
 	const wchar_t* getUnfilteredList(GameOptionType type) const;
-	/// номер пресета из списка с которым совпадают текущие опции
+	/// РЅРѕРјРµСЂ РїСЂРµСЃРµС‚Р° РёР· СЃРїРёСЃРєР° СЃ РєРѕС‚РѕСЂС‹Рј СЃРѕРІРїР°РґР°СЋС‚ С‚РµРєСѓС‰РёРµ РѕРїС†РёРё
 	int getCurrentPreset() const;
-	/// акцессер для получения значения параметра, float'ы домножены на 1000
+	/// Р°РєС†РµСЃСЃРµСЂ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ Р·РЅР°С‡РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂР°, float'С‹ РґРѕРјРЅРѕР¶РµРЅС‹ РЅР° 1000
 	int getOption(GameOptionType type) const;
-	/// установка значения параметра. float'ы домножить на 1000
+	/// СѓСЃС‚Р°РЅРѕРІРєР° Р·РЅР°С‡РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂР°. float'С‹ РґРѕРјРЅРѕР¶РёС‚СЊ РЅР° 1000
 	void setOption(GameOptionType type, int data);
-	/// загрузка предустановленных значений из вектора пресетов
+	/// Р·Р°РіСЂСѓР·РєР° РїСЂРµРґСѓСЃС‚Р°РЅРѕРІР»РµРЅРЅС‹С… Р·РЅР°С‡РµРЅРёР№ РёР· РІРµРєС‚РѕСЂР° РїСЂРµСЃРµС‚РѕРІ
 	void loadPresets(int number);
-	/// надо ли применять изменения параметра сразу
+	/// РЅР°РґРѕ Р»Рё РїСЂРёРјРµРЅСЏС‚СЊ РёР·РјРµРЅРµРЅРёСЏ РїР°СЂР°РјРµС‚СЂР° СЃСЂР°Р·Сѓ
 	bool needInstantApply(GameOptionType type) const { return gameOptionPrms_[type].needInstantApply(); }
-	/// надо применить временные настройки
+	/// РЅР°РґРѕ РїСЂРёРјРµРЅРёС‚СЊ РІСЂРµРјРµРЅРЅС‹Рµ РЅР°СЃС‚СЂРѕР№РєРё
 	void setPartialOptionsApply();
 
 
-	/// применить значения параметров к текущей игре
+	/// РїСЂРёРјРµРЅРёС‚СЊ Р·РЅР°С‡РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ Рє С‚РµРєСѓС‰РµР№ РёРіСЂРµ
 	void userApply(bool silent = false);
 
 

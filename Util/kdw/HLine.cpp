@@ -9,7 +9,7 @@
 
 namespace kdw{
 
-REGISTER_CLASS(Widget, HLine, "Горизонтальная линия");
+REGISTER_CLASS(Widget, HLine, "Р“РѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅР°СЏ Р»РёРЅРёСЏ");
 #pragma warning(push)
 #pragma warning(disable: 4355) // 'this' : used in base member initializer list
 

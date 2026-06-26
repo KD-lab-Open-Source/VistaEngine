@@ -13,7 +13,7 @@
 
 class UnitInterface;
 
-/// обычная кнопка
+/// РѕР±С‹С‡РЅР°СЏ РєРЅРѕРїРєР°
 class UI_ControlButton : public UI_ControlBase
 {
 public:
@@ -32,22 +32,22 @@ public:
 	void setAutoResize(bool val) { autoResize_ = val; }
 
 private:
-	/// выставляет размер контрола по тексту
+	/// РІС‹СЃС‚Р°РІР»СЏРµС‚ СЂР°Р·РјРµСЂ РєРѕРЅС‚СЂРѕР»Р° РїРѕ С‚РµРєСЃС‚Сѓ
 	bool adjustSize();
 
-	/// автоматически подгонять размер контрола под содержимое
+	/// Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РїРѕРґРіРѕРЅСЏС‚СЊ СЂР°Р·РјРµСЂ РєРѕРЅС‚СЂРѕР»Р° РїРѕРґ СЃРѕРґРµСЂР¶РёРјРѕРµ
 	bool autoResize_;
 
 	ResizeShiftHorizontal resizeShiftHorizontal_;
 	ResizeShiftVertical resizeShiftVertical_;
 
-	/// резервная копия размеров контрола
+	/// СЂРµР·РµСЂРІРЅР°СЏ РєРѕРїРёСЏ СЂР°Р·РјРµСЂРѕРІ РєРѕРЅС‚СЂРѕР»Р°
 	Rectf positionOriginal_;
 
 	float data_;
 };
 
-/// кнопка - регулятор
+/// РєРЅРѕРїРєР° - СЂРµРіСѓР»СЏС‚РѕСЂ
 class UI_ControlSlider : public UI_ControlBase
 {
 public:
@@ -85,14 +85,14 @@ protected:
 
 private:
 
-	/// положение регулятора, [0, 1]
+	/// РїРѕР»РѕР¶РµРЅРёРµ СЂРµРіСѓР»СЏС‚РѕСЂР°, [0, 1]
 	float value_;
 	float step_;
 
-	/// шаг изменения значения
+	/// С€Р°Рі РёР·РјРµРЅРµРЅРёСЏ Р·РЅР°С‡РµРЅРёСЏ
 	float valueDelta_;
 
-	/// true если принимает только дискретные значения, кратные valueDelta_
+	/// true РµСЃР»Рё РїСЂРёРЅРёРјР°РµС‚ С‚РѕР»СЊРєРѕ РґРёСЃРєСЂРµС‚РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ, РєСЂР°С‚РЅС‹Рµ valueDelta_
 	bool isDiscrete_;
 
 	UI_SliderOrientation orientation_;
@@ -160,7 +160,7 @@ private:
 	UI_TextAnimation animation_;
 };
 
-// ввод комбинаций клавиш
+// РІРІРѕРґ РєРѕРјР±РёРЅР°С†РёР№ РєР»Р°РІРёС€
 class UI_ControlHotKeyInput : public UI_ControlBase
 {
 public:
@@ -188,7 +188,7 @@ protected:
 
 private:
 	bool waitingInput_;
-	/// может пересекаться с хоткеями на кнопках
+	/// РјРѕР¶РµС‚ РїРµСЂРµСЃРµРєР°С‚СЊСЃСЏ СЃ С…РѕС‚РєРµСЏРјРё РЅР° РєРЅРѕРїРєР°С…
 	bool compatible_;
 	
 	UI_Key key_;
@@ -197,7 +197,7 @@ private:
 	void done(const sKey& key, bool force);
 };
 
-/// поле ввода
+/// РїРѕР»Рµ РІРІРѕРґР°
 class UI_ControlEdit : public UI_ControlBase
 {
 public:
@@ -233,7 +233,7 @@ protected:
 	bool checkSymbol(wchar_t chr);
 
 private:
-	/// максимальная длина редактируемой строки, 0 - без ограничений
+	/// РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ РґР»РёРЅР° СЂРµРґР°РєС‚РёСЂСѓРµРјРѕР№ СЃС‚СЂРѕРєРё, 0 - Р±РµР· РѕРіСЂР°РЅРёС‡РµРЅРёР№
 	int textLengthMax_;
 
 	bool isEditing_;
@@ -253,7 +253,7 @@ private:
 	UI_ControlReference next_;
 };
 
-/// таб
+/// С‚Р°Р±
 class UI_ControlTab : public UI_ControlBase
 {
 public:
@@ -270,23 +270,23 @@ public:
 
 private:
 
-	/// делает страницу активной
+	/// РґРµР»Р°РµС‚ СЃС‚СЂР°РЅРёС†Сѓ Р°РєС‚РёРІРЅРѕР№
 	void selectSheet(int index);
 
-	/// номер активной страницы
+	/// РЅРѕРјРµСЂ Р°РєС‚РёРІРЅРѕР№ СЃС‚СЂР°РЅРёС†С‹
 	int currentSheetIndex_;
 
-	/// возвращает активную страницу
+	/// РІРѕР·РІСЂР°С‰Р°РµС‚ Р°РєС‚РёРІРЅСѓСЋ СЃС‚СЂР°РЅРёС†Сѓ
 	UI_ControlBase* currentSheet(){ return (*this)[currentSheetIndex_]; }
 };
 
-/// список строк
+/// СЃРїРёСЃРѕРє СЃС‚СЂРѕРє
 class UI_ControlStringList : public UI_ControlBase
 {
 public:
 	struct Column {
 		Column() : width(100), align(UI_TEXT_ALIGN_LEFT) {}
-		int width; // в процентах
+		int width; // РІ РїСЂРѕС†РµРЅС‚Р°С…
 		UI_TextAlign align;
 		void serialize(Archive& ar);
 	};
@@ -310,7 +310,7 @@ public:
 	int listSize() const { return getList().size(); }
 	float stringHeight() const { return stringHeight_; }
 
-	/// возвращает выбранную строку или 0 если ничего не выбрано
+	/// РІРѕР·РІСЂР°С‰Р°РµС‚ РІС‹Р±СЂР°РЅРЅСѓСЋ СЃС‚СЂРѕРєСѓ РёР»Рё 0 РµСЃР»Рё РЅРёС‡РµРіРѕ РЅРµ РІС‹Р±СЂР°РЅРѕ
 	const wchar_t* selectedString() const;
 	int selectedStringIndex() const { return selectedString_; }
 	void setSelectedString(int index){ 
@@ -340,19 +340,19 @@ protected:
 	ComboWStrings strings_;
 	ComboWStrings newStrings_;
 
-	/// высота одной строки, в относительных экранных коодинатах
+	/// РІС‹СЃРѕС‚Р° РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё, РІ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅС‹С… СЌРєСЂР°РЅРЅС‹С… РєРѕРѕРґРёРЅР°С‚Р°С…
 	mutable float stringHeight_;
-	/// высота одной строки, коэффициент от размера шрифта
+	/// РІС‹СЃРѕС‚Р° РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё, РєРѕСЌС„С„РёС†РёРµРЅС‚ РѕС‚ СЂР°Р·РјРµСЂР° С€СЂРёС„С‚Р°
 	float stringHeightFactor_;
-	/// номер первой видимой строки
+	/// РЅРѕРјРµСЂ РїРµСЂРІРѕР№ РІРёРґРёРјРѕР№ СЃС‚СЂРѕРєРё
 	int firstVisibleString_;
-	/// номер выбранной строки
+	/// РЅРѕРјРµСЂ РІС‹Р±СЂР°РЅРЅРѕР№ СЃС‚СЂРѕРєРё
 	int selectedString_;
-	/// максимальное количество строк, до которого можно автоматически растягивать
+	/// РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕРє, РґРѕ РєРѕС‚РѕСЂРѕРіРѕ РјРѕР¶РЅРѕ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё СЂР°СЃС‚СЏРіРёРІР°С‚СЊ
 	int stringMax_;
-	/// подстройка размеров списка
+	/// РїРѕРґСЃС‚СЂРѕР№РєР° СЂР°Р·РјРµСЂРѕРІ СЃРїРёСЃРєР°
 	bool autoResizeList_;
-	/// скрывать slider если недего слайдить
+	/// СЃРєСЂС‹РІР°С‚СЊ slider РµСЃР»Рё РЅРµРґРµРіРѕ СЃР»Р°Р№РґРёС‚СЊ
 	bool autoHideSlider_;
 
 	bool listChanged_;
@@ -406,7 +406,7 @@ public:
 
 	void quant(float dt);
 	
-	/// выпадающий список
+	/// РІС‹РїР°РґР°СЋС‰РёР№ СЃРїРёСЃРѕРє
 	UI_ControlStringList* dropList() const { return safe_cast<UI_ControlStringList*>((*this)[0]); }
 
 	static UI_ControlStringList* getList(UI_ControlBase* control);
@@ -418,7 +418,7 @@ private:
 	void showChildControls();
 
 	bool dropListVisible_;
-	/// автоматически выбирать первое значение из списка
+	/// Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РІС‹Р±РёСЂР°С‚СЊ РїРµСЂРІРѕРµ Р·РЅР°С‡РµРЅРёРµ РёР· СЃРїРёСЃРєР°
 	bool autoSetValue_;
 };
 
@@ -447,9 +447,9 @@ private:
 	bool changeColor_;
 	bool vertical_;
 
-	bool showProgressChange_; // менять цвет при изменении значения
-	float changePeriod_; // время, за которое измеряется изменение
-	float changeMin_; // минимальное показываемое изменение
+	bool showProgressChange_; // РјРµРЅСЏС‚СЊ С†РІРµС‚ РїСЂРё РёР·РјРµРЅРµРЅРёРё Р·РЅР°С‡РµРЅРёСЏ
+	float changePeriod_; // РІСЂРµРјСЏ, Р·Р° РєРѕС‚РѕСЂРѕРµ РёР·РјРµСЂСЏРµС‚СЃСЏ РёР·РјРµРЅРµРЅРёРµ
+	float changeMin_; // РјРёРЅРёРјР°Р»СЊРЅРѕРµ РїРѕРєР°Р·С‹РІР°РµРјРѕРµ РёР·РјРµРЅРµРЅРёРµ
 	float changeTimer_;
 	float lastProgress_;
 
@@ -462,8 +462,8 @@ private:
 
 	Color4f colorDoneFull_;
 
-	Color4f colorInc_; // цвет при увеличении значения
-	Color4f colorDec_; // цвет при уменьшении значения
+	Color4f colorInc_; // С†РІРµС‚ РїСЂРё СѓРІРµР»РёС‡РµРЅРёРё Р·РЅР°С‡РµРЅРёСЏ
+	Color4f colorDec_; // С†РІРµС‚ РїСЂРё СѓРјРµРЅСЊС€РµРЅРёРё Р·РЅР°С‡РµРЅРёСЏ
 	float changeColorPhase_;
 	float changeColorPhaseTarget_;
 
@@ -478,7 +478,7 @@ private:
 	}
 };
 
-/// кнопка для вывода разной игровой информации
+/// РєРЅРѕРїРєР° РґР»СЏ РІС‹РІРѕРґР° СЂР°Р·РЅРѕР№ РёРіСЂРѕРІРѕР№ РёРЅС„РѕСЂРјР°С†РёРё
 class UI_ControlCustom : public UI_ControlBase
 {
 public:
@@ -500,40 +500,40 @@ protected:
 
 private:
 
-	/// типы выводимой информации
+	/// С‚РёРїС‹ РІС‹РІРѕРґРёРјРѕР№ РёРЅС„РѕСЂРјР°С†РёРё
 	BitVector<UI_ControlCustomType> type_;
 
-	/// прозрачность миникарты, [0, 1]
+	/// РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ РјРёРЅРёРєР°СЂС‚С‹, [0, 1]
 	float mapAlpha_;
 	
 	bool clickAction_;
 	bool drawViewZone_;
 	bool drawFogOfWar_;
 	bool drawInstallZones_;
-	// брать миникарту из текущей выделенной в списке игры, а не с мира
+	// Р±СЂР°С‚СЊ РјРёРЅРёРєР°СЂС‚Сѓ РёР· С‚РµРєСѓС‰РµР№ РІС‹РґРµР»РµРЅРЅРѕР№ РІ СЃРїРёСЃРєРµ РёРіСЂС‹, Р° РЅРµ СЃ РјРёСЂР°
 	bool useSelectedMap_;
 
 	bool drawWindDirection_;
 
 	bool rotateByCamera_;
 	bool rotateByCameraInitial_;
-	/// масштабировать под размер окна при повороте карты
+	/// РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°С‚СЊ РїРѕРґ СЂР°Р·РјРµСЂ РѕРєРЅР° РїСЂРё РїРѕРІРѕСЂРѕС‚Рµ РєР°СЂС‚С‹
 	bool rotationScale_;
 	bool getAngleFromWorld_;
 	float minimapAngle_;
 	Color4f viewZoneColor_;
 	Color4f miniMapBorderColor_;
 
-	/// текстура маски миникарты
+	/// С‚РµРєСЃС‚СѓСЂР° РјР°СЃРєРё РјРёРЅРёРєР°СЂС‚С‹
 	UI_TextureReference maskTexture_;
 
-	/// маштабировать мышкой
+	/// РјР°С€С‚Р°Р±РёСЂРѕРІР°С‚СЊ РјС‹С€РєРѕР№
 	bool scaleMinimap_;
-	/// двигать мышкой
+	/// РґРІРёРіР°С‚СЊ РјС‹С€РєРѕР№
 	bool dragMinimap_;
-	/// сдвигать миникарту, что бы выделенный юнит был в центре
+	/// СЃРґРІРёРіР°С‚СЊ РјРёРЅРёРєР°СЂС‚Сѓ, С‡С‚Рѕ Р±С‹ РІС‹РґРµР»РµРЅРЅС‹Р№ СЋРЅРёС‚ Р±С‹Р» РІ С†РµРЅС‚СЂРµ
 	bool minimapToSelect_;
-	/// маштаб вывода миникарты
+	/// РјР°С€С‚Р°Р± РІС‹РІРѕРґР° РјРёРЅРёРєР°СЂС‚С‹
 	float minimapScale_;
 
 	bool viewStartLocations_;
@@ -544,7 +544,7 @@ private:
 	mutable LogicTimer headDelayTimer_;
 };
 
-/// список юнитов
+/// СЃРїРёСЃРѕРє СЋРЅРёС‚РѕРІ
 class UI_ControlUnitList : public UI_ControlBase
 {
 public:

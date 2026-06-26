@@ -91,7 +91,7 @@ public:
 };
 
 class cFixedWavesContainer;
-// ����� �������� ����
+// Класс источник волн
 class cFixedWaves
 {
 	struct OneWave

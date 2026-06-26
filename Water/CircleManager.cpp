@@ -8,9 +8,9 @@
 #include "Serialization/EnumDescriptor.h"
 
 BEGIN_ENUM_DESCRIPTOR(CircleManagerDrawOrder, "CircleManagerDrawOrder")
-REGISTER_ENUM(CIRCLE_MANAGER_DRAW_AFTER_GRASS_NOZ, "Выше травы без Z")
-REGISTER_ENUM(CIRCLE_MANAGER_DRAW_BEFORE_GRASS_NOZ, "Ниже травы без Z")
-REGISTER_ENUM(CIRCLE_MANAGER_DRAW_NORMAL_ALPHA, "Обычная прозрачность (использовать Z)")
+REGISTER_ENUM(CIRCLE_MANAGER_DRAW_AFTER_GRASS_NOZ, "Р’С‹С€Рµ С‚СЂР°РІС‹ Р±РµР· Z")
+REGISTER_ENUM(CIRCLE_MANAGER_DRAW_BEFORE_GRASS_NOZ, "РќРёР¶Рµ С‚СЂР°РІС‹ Р±РµР· Z")
+REGISTER_ENUM(CIRCLE_MANAGER_DRAW_NORMAL_ALPHA, "РћР±С‹С‡РЅР°СЏ РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ (РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ Z)")
 END_ENUM_DESCRIPTOR(CircleManagerDrawOrder)
 
 CircleManagerDrawOrder CircleManager::currentDrawOrder_;
@@ -181,22 +181,22 @@ void CircleManagerParam::serialize(Archive& ar)
 {
 	static ResourceSelector::Options textureOptions("*.tga", "Resource\\TerrainData\\Textures");
 	// CONVERSION 23.04.07
-	if(ar.isInput() && !ar.isEdit() && ar.serialize(useLegionColor, "CircleManager_useLegionColor", "Использовать цвет легиона")){
+	if(ar.isInput() && !ar.isEdit() && ar.serialize(useLegionColor, "CircleManager_useLegionColor", "РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ С†РІРµС‚ Р»РµРіРёРѕРЅР°")){
 		if(!useLegionColor)
-			ar.serialize(color, "CircleManager_diffuse", "Цвет");
-		ar.serialize(ResourceSelector(texture, textureOptions), "CircleManager_texture_name", "Имя текстуры");
+			ar.serialize(color, "CircleManager_diffuse", "Р¦РІРµС‚");
+		ar.serialize(ResourceSelector(texture, textureOptions), "CircleManager_texture_name", "РРјСЏ С‚РµРєСЃС‚СѓСЂС‹");
 
-		ar.serialize(length, "CircleManager_length", "Длина линии");
-		ar.serialize(width, "CircleManager_width", "Ширина линии");
-		ar.serialize(segmentLength, "CircleManager_segment_len", "Длина сегмента разбиения");
+		ar.serialize(length, "CircleManager_length", "Р”Р»РёРЅР° Р»РёРЅРёРё");
+		ar.serialize(width, "CircleManager_width", "РЁРёСЂРёРЅР° Р»РёРЅРёРё");
+		ar.serialize(segmentLength, "CircleManager_segment_len", "Р”Р»РёРЅР° СЃРµРіРјРµРЅС‚Р° СЂР°Р·Р±РёРµРЅРёСЏ");
 	}
 
-	ar.serialize(useLegionColor, "useLegionColor", "Использовать цвет легиона");
+	ar.serialize(useLegionColor, "useLegionColor", "РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ С†РІРµС‚ Р»РµРіРёРѕРЅР°");
 	if(!useLegionColor)
-		ar.serialize(color, "color", "Цвет");
-	ar.serialize(ResourceSelector(texture, textureOptions), "texture", "Имя текстуры");
+		ar.serialize(color, "color", "Р¦РІРµС‚");
+	ar.serialize(ResourceSelector(texture, textureOptions), "texture", "РРјСЏ С‚РµРєСЃС‚СѓСЂС‹");
 
-	ar.serialize(length, "length", "Длина линии");
-	ar.serialize(width, "width", "Ширина линии");
-	ar.serialize(segmentLength, "segmentLength", "Длина сегмента разбиения");
+	ar.serialize(length, "length", "Р”Р»РёРЅР° Р»РёРЅРёРё");
+	ar.serialize(width, "width", "РЁРёСЂРёРЅР° Р»РёРЅРёРё");
+	ar.serialize(segmentLength, "segmentLength", "Р”Р»РёРЅР° СЃРµРіРјРµРЅС‚Р° СЂР°Р·Р±РёРµРЅРёСЏ");
 }

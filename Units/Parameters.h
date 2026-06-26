@@ -130,7 +130,7 @@ public:
 
 	float value() const;
 
-	// неподсчитанное значение:
+	// РЅРµРїРѕРґСЃС‡РёС‚Р°РЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ:
 	float rawValue() const;
 	void setRawValue(float value) 
 	{ 
@@ -149,7 +149,7 @@ public:
 	void setFormula(ParameterFormulaReference _formula) { formula_ = _formula; }
 	void serialize(Archive& ar);
 
-	// для редактора:
+	// РґР»СЏ СЂРµРґР°РєС‚РѕСЂР°:
 	void			editorGroupMoveBefore(int index, int beforeIndex);
 	string			editorGroupName() const{ return group_.c_str(); }
 	static void     editorAddGroup(const char* name);
@@ -188,25 +188,25 @@ struct LookupParameter
 };
 
 ////////////////////////////////////////////////////////////////////
-// 1. Предполагается, что все исходные значения и результаты >= 0, 
-// поэтому при вычитании значения ограничиваются снизу.
-// 2. Теперь хранятся не все значения, большинство операций работает на 
-// пересечении множеств.
-// 3. Аккуратно пользоваться конструкторами: пустой создает пустое множество,
-// с одним параметром - все типы, копирования - только те, что были.
+// 1. РџСЂРµРґРїРѕР»Р°РіР°РµС‚СЃСЏ, С‡С‚Рѕ РІСЃРµ РёСЃС…РѕРґРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ Рё СЂРµР·СѓР»СЊС‚Р°С‚С‹ >= 0, 
+// РїРѕСЌС‚РѕРјСѓ РїСЂРё РІС‹С‡РёС‚Р°РЅРёРё Р·РЅР°С‡РµРЅРёСЏ РѕРіСЂР°РЅРёС‡РёРІР°СЋС‚СЃСЏ СЃРЅРёР·Сѓ.
+// 2. РўРµРїРµСЂСЊ С…СЂР°РЅСЏС‚СЃСЏ РЅРµ РІСЃРµ Р·РЅР°С‡РµРЅРёСЏ, Р±РѕР»СЊС€РёРЅСЃС‚РІРѕ РѕРїРµСЂР°С†РёР№ СЂР°Р±РѕС‚Р°РµС‚ РЅР° 
+// РїРµСЂРµСЃРµС‡РµРЅРёРё РјРЅРѕР¶РµСЃС‚РІ.
+// 3. РђРєРєСѓСЂР°С‚РЅРѕ РїРѕР»СЊР·РѕРІР°С‚СЊСЃСЏ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂР°РјРё: РїСѓСЃС‚РѕР№ СЃРѕР·РґР°РµС‚ РїСѓСЃС‚РѕРµ РјРЅРѕР¶РµСЃС‚РІРѕ,
+// СЃ РѕРґРЅРёРј РїР°СЂР°РјРµС‚СЂРѕРј - РІСЃРµ С‚РёРїС‹, РєРѕРїРёСЂРѕРІР°РЅРёСЏ - С‚РѕР»СЊРєРѕ С‚Рµ, С‡С‚Рѕ Р±С‹Р»Рё.
 class ParameterSet 
 {
 public:
 	struct Value {
 		float value;
-		int index; // индекс в ParameterTypeTable
+		int index; // РёРЅРґРµРєСЃ РІ ParameterTypeTable
 
 		Value(){}
 		Value(float val, int idx) : value(val), index(idx) {}
 		void serialize(Archive& ar);
 	};
 
-	ParameterSet(); // Не создает значений, даже нулевых
+	ParameterSet(); // РќРµ СЃРѕР·РґР°РµС‚ Р·РЅР°С‡РµРЅРёР№, РґР°Р¶Рµ РЅСѓР»РµРІС‹С…
 
 	const ParameterSet& operator=(const ParameterSet& set) {
 		values_ = set.values_;
@@ -217,49 +217,49 @@ public:
 	void set(float value, ParameterType::Type type); 
 	void set(const ParameterSet& set);
 	void addByIndex(float value, int index);
-	void mask(ParameterType::Type type); // Зануляет все, кроме type
-	void mask(const ParameterSet& set); // Зануляет все, кроме типов в set
+	void mask(ParameterType::Type type); // Р—Р°РЅСѓР»СЏРµС‚ РІСЃРµ, РєСЂРѕРјРµ type
+	void mask(const ParameterSet& set); // Р—Р°РЅСѓР»СЏРµС‚ РІСЃРµ, РєСЂРѕРјРµ С‚РёРїРѕРІ РІ set
 	
 	ParameterSet& operator+=(const ParameterSet& rhs);
 	ParameterSet& operator*=(float k);
 
-	void sub(const ParameterSet& rhs); // Может быть ниже нуля
-	bool subClamped(const ParameterSet& rhs); // Обрезает все, что ниже 0,  true при обрезании
+	void sub(const ParameterSet& rhs); // РњРѕР¶РµС‚ Р±С‹С‚СЊ РЅРёР¶Рµ РЅСѓР»СЏ
+	bool subClamped(const ParameterSet& rhs); // РћР±СЂРµР·Р°РµС‚ РІСЃРµ, С‡С‚Рѕ РЅРёР¶Рµ 0,  true РїСЂРё РѕР±СЂРµР·Р°РЅРёРё
 	void scaleAdd(const ParameterSet& parameters, float k);
 
 	float dot(const ParameterSet& rhs) const;
 
 	void clamp(const ParameterSet& upperBound);
-	void setArmor(const ParameterSet& currentSet, const ParameterSet& maxSet); // Выставляет maxSet[ARMOR], где currentSet[ARMOR] != 0 в *this[HEALTH]
-	void subPositiveOnly(const ParameterSet& rhs); // Не вычитает броню из отрицательных значений
-	void setRecovery(const ParameterSet& parameters); // Выставляет [HEALTH_RECOVERY], [ARMOR_RECOVERY], [OTHER_RECOVERY] в [HEALTH], [ARMOR], [OTHER] соответственно
-	void setPossessionRecovery(const ParameterSet& parameters, const ParameterSet& parametersMax); // Выставляет this[POSESSION] = parameters[POSESSION_RECOVERY]
-	void setPossessionRecoveryBack(const ParameterSet& parameters); // Выставляет this[POSESSION] = parameters[POSESSION_RECOVERY_BACK]
-	bool restorePossessionRecoveryBack(const ParameterSet& parametersMax); // Выставляет this[POSSESSION_RECOVERY_BACK] = parametersMax[POSSESSION_RECOVERY_BACK] по минимальному POSSESSION
-	void updateRange(ParameterSet& prm_min, ParameterSet& prm_max) const; // Вычисляет диапазон [HEALTH], [ARMOR], расширяет его в min, max если надо
+	void setArmor(const ParameterSet& currentSet, const ParameterSet& maxSet); // Р’С‹СЃС‚Р°РІР»СЏРµС‚ maxSet[ARMOR], РіРґРµ currentSet[ARMOR] != 0 РІ *this[HEALTH]
+	void subPositiveOnly(const ParameterSet& rhs); // РќРµ РІС‹С‡РёС‚Р°РµС‚ Р±СЂРѕРЅСЋ РёР· РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹С… Р·РЅР°С‡РµРЅРёР№
+	void setRecovery(const ParameterSet& parameters); // Р’С‹СЃС‚Р°РІР»СЏРµС‚ [HEALTH_RECOVERY], [ARMOR_RECOVERY], [OTHER_RECOVERY] РІ [HEALTH], [ARMOR], [OTHER] СЃРѕРѕС‚РІРµС‚СЃС‚РІРµРЅРЅРѕ
+	void setPossessionRecovery(const ParameterSet& parameters, const ParameterSet& parametersMax); // Р’С‹СЃС‚Р°РІР»СЏРµС‚ this[POSESSION] = parameters[POSESSION_RECOVERY]
+	void setPossessionRecoveryBack(const ParameterSet& parameters); // Р’С‹СЃС‚Р°РІР»СЏРµС‚ this[POSESSION] = parameters[POSESSION_RECOVERY_BACK]
+	bool restorePossessionRecoveryBack(const ParameterSet& parametersMax); // Р’С‹СЃС‚Р°РІР»СЏРµС‚ this[POSSESSION_RECOVERY_BACK] = parametersMax[POSSESSION_RECOVERY_BACK] РїРѕ РјРёРЅРёРјР°Р»СЊРЅРѕРјСѓ POSSESSION
+	void updateRange(ParameterSet& prm_min, ParameterSet& prm_max) const; // Р’С‹С‡РёСЃР»СЏРµС‚ РґРёР°РїР°Р·РѕРЅ [HEALTH], [ARMOR], СЂР°СЃС€РёСЂСЏРµС‚ РµРіРѕ РІ min, max РµСЃР»Рё РЅР°РґРѕ
 
 	float sum() const;
-	float health() const; // Находит наименьшее здоровье
-	float armor() const; // Находит наименьшую броню
-	float possession() const; // Находит наименьшее владение
+	float health() const; // РќР°С…РѕРґРёС‚ РЅР°РёРјРµРЅСЊС€РµРµ Р·РґРѕСЂРѕРІСЊРµ
+	float armor() const; // РќР°С…РѕРґРёС‚ РЅР°РёРјРµРЅСЊС€СѓСЋ Р±СЂРѕРЅСЋ
+	float possession() const; // РќР°С…РѕРґРёС‚ РЅР°РёРјРµРЅСЊС€РµРµ РІР»Р°РґРµРЅРёРµ
 	float maxByType(ParameterType::Type type) const;
 
 	float minFraction(const ParameterSet& parametersMax) const;
-	void scaleByProgress(float factor); // Умножает на factor здоровье, броню и владение, которые растут при строительстве
+	void scaleByProgress(float factor); // РЈРјРЅРѕР¶Р°РµС‚ РЅР° factor Р·РґРѕСЂРѕРІСЊРµ, Р±СЂРѕРЅСЋ Рё РІР»Р°РґРµРЅРёРµ, РєРѕС‚РѕСЂС‹Рµ СЂР°СЃС‚СѓС‚ РїСЂРё СЃС‚СЂРѕРёС‚РµР»СЊСЃС‚РІРµ
 	void scaleType(ParameterType::Type type, float factor);
 
 	bool contain(const ParameterTypeReference& type) const; 
-	bool contain(const ParameterSet& subSet) const; // все типы из subSet содержаться в this
-	bool containAny(const ParameterSet& subSet) const; // хотя бы один тип из subSet содержится в this
+	bool contain(const ParameterSet& subSet) const; // РІСЃРµ С‚РёРїС‹ РёР· subSet СЃРѕРґРµСЂР¶Р°С‚СЊСЃСЏ РІ this
+	bool containAny(const ParameterSet& subSet) const; // С…РѕС‚СЏ Р±С‹ РѕРґРёРЅ С‚РёРї РёР· subSet СЃРѕРґРµСЂР¶РёС‚СЃСЏ РІ this
 	bool above(const ParameterSet& level) const; // this >= any values of level
-	float progress(const ParameterSet& resource1, const ParameterSet& resource2) const; // минимальный из clamp(max{ resource1, resource2 }  / this, 0, 1)
+	float progress(const ParameterSet& resource1, const ParameterSet& resource2) const; // РјРёРЅРёРјР°Р»СЊРЅС‹Р№ РёР· clamp(max{ resource1, resource2 }  / this, 0, 1)
 	bool below(const ParameterSet& resource1, const ParameterSet& resource2) const; // this < any value { resource1, resource2 }
 	bool empty() const { return values_.empty(); }
 	bool zero() const; // all zero
-	bool zero(const ParameterSet& filter) const; // все, где filter > 0, == 0
+	bool zero(const ParameterSet& filter) const; // РІСЃРµ, РіРґРµ filter > 0, == 0
 
 	float findByType(ParameterType::Type type, float defaultValue) const;
-	float findByIndex(int index, float defaultValue = 0.f) const; // Линейный поиск, индекс в ParameterTypeTable
+	float findByIndex(int index, float defaultValue = 0.f) const; // Р›РёРЅРµР№РЅС‹Р№ РїРѕРёСЃРє, РёРЅРґРµРєСЃ РІ ParameterTypeTable
 	float findByLabel(const char* label) const;
 	float findByName(const char* name, float defaultValue) const;
 
@@ -286,7 +286,7 @@ protected:
 	friend class ArithmeticsData;
 };
 
-class ParameterCustom : public ParameterSet // Использовать только в местах редактирования, для временных переменных - ParameterSet
+class ParameterCustom : public ParameterSet // РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ РІ РјРµСЃС‚Р°С… СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ, РґР»СЏ РІСЂРµРјРµРЅРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С… - ParameterSet
 {
 public:
 	bool serialize(Archive& ar, const char* name, const char* nameAlt);
@@ -370,7 +370,7 @@ public:
 	void serialize(Archive& ar);
 	void apply(ParameterSet& parameters) const;
 	void apply(ParameterSet& parameters, const ParameterSet& parametersMax) const;
-	void reserve(ParameterSet& parameters) const; // зарезервировать нулевые значения, иначе apply ничего не добавит
+	void reserve(ParameterSet& parameters) const; // Р·Р°СЂРµР·РµСЂРІРёСЂРѕРІР°С‚СЊ РЅСѓР»РµРІС‹Рµ Р·РЅР°С‡РµРЅРёСЏ, РёРЅР°С‡Рµ apply РЅРёС‡РµРіРѕ РЅРµ РґРѕР±Р°РІРёС‚
 	void setInverted() { inverted_ = true; }
 	void operator*=(float k);
 	bool checkWeapon(const WeaponPrm* weaponPrm) const;
@@ -431,9 +431,9 @@ class ShowChangeParametersController
 
 public:
 	enum CreateType {
-		SET, // взять только множество для накопления и забить значения нулями
-		VALUES, // взять множество со значениями параметров
-		SHOW // показать текущие значения параметров
+		SET, // РІР·СЏС‚СЊ С‚РѕР»СЊРєРѕ РјРЅРѕР¶РµСЃС‚РІРѕ РґР»СЏ РЅР°РєРѕРїР»РµРЅРёСЏ Рё Р·Р°Р±РёС‚СЊ Р·РЅР°С‡РµРЅРёСЏ РЅСѓР»СЏРјРё
+		VALUES, // РІР·СЏС‚СЊ РјРЅРѕР¶РµСЃС‚РІРѕ СЃРѕ Р·РЅР°С‡РµРЅРёСЏРјРё РїР°СЂР°РјРµС‚СЂРѕРІ
+		SHOW // РїРѕРєР°Р·Р°С‚СЊ С‚РµРєСѓС‰РёРµ Р·РЅР°С‡РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ
 	};
 	void create(const UnitInterface* owner, const ParameterSet& showDelta, CreateType createType);
 
@@ -449,7 +449,7 @@ public:
 };
 
 
-class ParameterConsumer // на смену EnergyConsumer
+class ParameterConsumer // РЅР° СЃРјРµРЅСѓ EnergyConsumer
 {
 public:
 	ParameterConsumer();
@@ -493,7 +493,7 @@ struct ParameterShowSetting
         LOGIC,
 		PRODUCTION_PROGRESS,
 		UPGRADE_PROGRESS,
-		FINISH_UPGRADE, // стадия окончания апгрейда
+		FINISH_UPGRADE, // СЃС‚Р°РґРёСЏ РѕРєРѕРЅС‡Р°РЅРёСЏ Р°РїРіСЂРµР№РґР°
 		GROUND_PROGRESS,
 		RELOAD_PROGRESS
 	};
@@ -525,11 +525,11 @@ struct ParameterShowSetting
 
 	Shape shape;
 
-	/// Полоска
+	/// РџРѕР»РѕСЃРєР°
 	Color4f borderColor;
 	Color4f backgroundColor;
 
-	/// Круг
+	/// РљСЂСѓРі
 	float innerRadius;
 	float startAngle;
 	float endAngle;
@@ -557,7 +557,7 @@ private:
 
 typedef vector<ShowChangeParameterSetting> ShowChangeParameterSettings;
 
-// параметры наносимых юнитом повреждений
+// РїР°СЂР°РјРµС‚СЂС‹ РЅР°РЅРѕСЃРёРјС‹С… СЋРЅРёС‚РѕРј РїРѕРІСЂРµР¶РґРµРЅРёР№
 struct WeaponDamage : ParameterCustom
 {
 	WeaponDamage() {

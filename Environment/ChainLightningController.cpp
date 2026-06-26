@@ -12,13 +12,13 @@
 
 void ChainLightningAttribute::serialize(Archive& ar)
 {
-	ar.serialize(RangedWrapperf(chainRadius_, 1.f, 2000.f), "chainRadius", "радиус цепного эффекта");
-	ar.serialize(RangedWrapperi(chainFactor_, 1, 10), "chainFactor", "максимальная глубина развилок");
-	ar.serialize(RangedWrapperf(unitChainRadius_, 1.f, 500.f), "unitChainRadius", "радиус отскока от юнита");
-	ar.serialize(RangedWrapperi(unitChainFactor_, 1, 10), "unitChainFactor", "максимально количество вторичных молний от юнита");
-	ar.serialize(strike_effect_, "strike_effect", "атака юнита в зоне");
-	ar.serialize(RangedWrapperf(spreadingTime_, 0.f, 120.f), "spreadingTime", "время распространения");
-	ar.serialize(abnormalState_, "abnormalState", "воздействие на юниты");
+	ar.serialize(RangedWrapperf(chainRadius_, 1.f, 2000.f), "chainRadius", "СЂР°РґРёСѓСЃ С†РµРїРЅРѕРіРѕ СЌС„С„РµРєС‚Р°");
+	ar.serialize(RangedWrapperi(chainFactor_, 1, 10), "chainFactor", "РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ РіР»СѓР±РёРЅР° СЂР°Р·РІРёР»РѕРє");
+	ar.serialize(RangedWrapperf(unitChainRadius_, 1.f, 500.f), "unitChainRadius", "СЂР°РґРёСѓСЃ РѕС‚СЃРєРѕРєР° РѕС‚ СЋРЅРёС‚Р°");
+	ar.serialize(RangedWrapperi(unitChainFactor_, 1, 10), "unitChainFactor", "РјР°РєСЃРёРјР°Р»СЊРЅРѕ РєРѕР»РёС‡РµСЃС‚РІРѕ РІС‚РѕСЂРёС‡РЅС‹С… РјРѕР»РЅРёР№ РѕС‚ СЋРЅРёС‚Р°");
+	ar.serialize(strike_effect_, "strike_effect", "Р°С‚Р°РєР° СЋРЅРёС‚Р° РІ Р·РѕРЅРµ");
+	ar.serialize(RangedWrapperf(spreadingTime_, 0.f, 120.f), "spreadingTime", "РІСЂРµРјСЏ СЂР°СЃРїСЂРѕСЃС‚СЂР°РЅРµРЅРёСЏ");
+	ar.serialize(abnormalState_, "abnormalState", "РІРѕР·РґРµР№СЃС‚РІРёРµ РЅР° СЋРЅРёС‚С‹");
 }
 
 ChainLightningAttribute::ChainLightningAttribute()
@@ -56,7 +56,7 @@ void ChainLightningController::start(const ChainLightningAttribute* attr)
 
 
 	if(!attr_->strike_effect_.get()){
-		xxassert(!damage_.empty() || attr_->abnormalState_.isEnabled(), "без назначенного эффекта урон цепной молнией наносится не будет");
+		xxassert(!damage_.empty() || attr_->abnormalState_.isEnabled(), "Р±РµР· РЅР°Р·РЅР°С‡РµРЅРЅРѕРіРѕ СЌС„С„РµРєС‚Р° СѓСЂРѕРЅ С†РµРїРЅРѕР№ РјРѕР»РЅРёРµР№ РЅР°РЅРѕСЃРёС‚СЃСЏ РЅРµ Р±СѓРґРµС‚");
 		return;
 	}
 
@@ -187,7 +187,7 @@ void ChainLightningController::update(const UnitActingList& units)
 				if(UnitActing* target = scanOperator.nearestUnit(node->unitNode->position(), attr_->unitChainRadius_)){
 					unitCache_.insert(target->unitID().index());
 					node->graf.push_back(target);
-					++node->size; // в list size() дорогой
+					++node->size; // РІ list size() РґРѕСЂРѕРіРѕР№
 					nextLevelTargets.push_back(&node->graf.back());
 					hasChanges = true;
 				}
@@ -240,8 +240,8 @@ void ChainLightningController::apply(UnitActing* target, int level)
 	if(isUnderEditor())
 		return;
 
-	// начальным эмитерам повреждения наносятся самим оружием
-	// выключенный эффект урон не наносит
+	// РЅР°С‡Р°Р»СЊРЅС‹Рј СЌРјРёС‚РµСЂР°Рј РїРѕРІСЂРµР¶РґРµРЅРёСЏ РЅР°РЅРѕСЃСЏС‚СЃСЏ СЃР°РјРёРј РѕСЂСѓР¶РёРµРј
+	// РІС‹РєР»СЋС‡РµРЅРЅС‹Р№ СЌС„С„РµРєС‚ СѓСЂРѕРЅ РЅРµ РЅР°РЅРѕСЃРёС‚
 	if(level == 0 || phase_ == FADE_OFF)
 		return;
 
@@ -255,18 +255,18 @@ void ChainLightningController::apply(UnitActing* target, int level)
 
 bool ChainLightningController::chainStrikeRecurse(ChainNode& node, int deep, bool release)
 {
-	if(node.strikeIndex < 0){ // конец графа
-		xassert(node.size == 0 && "отвилок быть не должно");
-		return node.unitNode; // возможно юнит умер, тогда нужно оторвать узел
+	if(node.strikeIndex < 0){ // РєРѕРЅРµС† РіСЂР°С„Р°
+		xassert(node.size == 0 && "РѕС‚РІРёР»РѕРє Р±С‹С‚СЊ РЅРµ РґРѕР»Р¶РЅРѕ");
+		return node.unitNode; // РІРѕР·РјРѕР¶РЅРѕ СЋРЅРёС‚ СѓРјРµСЂ, С‚РѕРіРґР° РЅСѓР¶РЅРѕ РѕС‚РѕСЂРІР°С‚СЊ СѓР·РµР»
 	}
 
 	xassert(node.strikeIndex < effects.size());
-	cEffect*& effect = effects[node.strikeIndex]; // эффект для узла из пула
+	cEffect*& effect = effects[node.strikeIndex]; // СЌС„С„РµРєС‚ РґР»СЏ СѓР·Р»Р° РёР· РїСѓР»Р°
 
-	if(!node.unitNode || release){ // узел умер или должен быть оторван от дерева
+	if(!node.unitNode || release){ // СѓР·РµР» СѓРјРµСЂ РёР»Рё РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РѕС‚РѕСЂРІР°РЅ РѕС‚ РґРµСЂРµРІР°
 		turnOff(effect);
 
-		if(node.size){ // появились живые оторванные узлы, нужно перестроить дерево
+		if(node.size){ // РїРѕСЏРІРёР»РёСЃСЊ Р¶РёРІС‹Рµ РѕС‚РѕСЂРІР°РЅРЅС‹Рµ СѓР·Р»С‹, РЅСѓР¶РЅРѕ РїРµСЂРµСЃС‚СЂРѕРёС‚СЊ РґРµСЂРµРІРѕ
 			ChainNodes::iterator it;
 			FOR_EACH(node.graf, it)
 				chainStrikeRecurse(*it, deep + 1, true);
@@ -285,7 +285,7 @@ bool ChainLightningController::chainStrikeRecurse(ChainNode& node, int deep, boo
 			--node.size;
 		}
 
-	if(!node.size){ // бить дальше не в кого, эффект без концов тоже не нужен
+	if(!node.size){ // Р±РёС‚СЊ РґР°Р»СЊС€Рµ РЅРµ РІ РєРѕРіРѕ, СЌС„С„РµРєС‚ Р±РµР· РєРѕРЅС†РѕРІ С‚РѕР¶Рµ РЅРµ РЅСѓР¶РµРЅ
 		turnOff(effect);
 		return true;
 	}
@@ -316,7 +316,7 @@ bool ChainLightningController::chainStrikeRecurse(ChainNode& node, int deep, boo
 			attachSmart(effect);
 		}
 
-		FOR_EACH(node.graf, cit) // в один цикл нельзя, внутри apply может быть обращение к streamLogicCommand или обнуление линка
+		FOR_EACH(node.graf, cit) // РІ РѕРґРёРЅ С†РёРєР» РЅРµР»СЊР·СЏ, РІРЅСѓС‚СЂРё apply РјРѕР¶РµС‚ Р±С‹С‚СЊ РѕР±СЂР°С‰РµРЅРёРµ Рє streamLogicCommand РёР»Рё РѕР±РЅСѓР»РµРЅРёРµ Р»РёРЅРєР°
 			apply(cit->unitNode, deep + 1);
 	}
 	else

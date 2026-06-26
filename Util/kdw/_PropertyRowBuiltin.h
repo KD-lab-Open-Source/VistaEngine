@@ -135,7 +135,7 @@ class PropertyRowBool : public PropertyRowImpl<bool, PropertyRowBool>{
 public:
 	enum { Custom = false };
 	PropertyRowBool(const char* name = "", const char* nameAlt = "", bool value = false);
-	PropertyRowBool(void* object, int size, const char* name, const char* nameAlt, const char* typeName); // понадобился из за PropertyRowImpl
+	PropertyRowBool(void* object, int size, const char* name, const char* nameAlt, const char* typeName); // РїРѕРЅР°РґРѕР±РёР»СЃСЏ РёР· Р·Р° PropertyRowImpl
 
 	void redraw(HDC dc, const RECT& iconRect, const RECT& widgetRect, const RECT& lineRect, PropertyRow* hostRow);
 	bool assignTo(void* object, int size);
@@ -145,7 +145,7 @@ public:
 	std::string valueAsString() const
 	{
 		return value_ ? nameAlt() : "";
-	//	return value_ ? TRANSLATE("Да") : TRANSLATE("Нет");
+	//	return value_ ? TRANSLATE("Р”Р°") : TRANSLATE("РќРµС‚");
 	}
 	bool hasIcon() const{ return true; }
 	WidgetPosition widgetPosition() const{ return WIDGET_POSITION_ROW_AUTOHIDE; }
@@ -157,7 +157,7 @@ class PropertyRowString : public PropertyRowImpl<std::string, PropertyRowString>
 public:
 	enum { Custom = false };
 	PropertyRowString(const char* name = "", const char* nameAlt = "", const std::string& value = std::string());
-	PropertyRowString(void* object, int size, const char* name, const char* nameAlt, const char* typeName); // понадобился из за PropertyRowImpl
+	PropertyRowString(void* object, int size, const char* name, const char* nameAlt, const char* typeName); // РїРѕРЅР°РґРѕР±РёР»СЃСЏ РёР· Р·Р° PropertyRowImpl
 	bool assignTo(void* object, int size);
 	PropertyRowWidget* createWidget(PropertyTreeModel* model);
 	std::string valueAsString() const;
@@ -169,7 +169,7 @@ class PropertyRowComboListString : public PropertyRowImpl<ComboListString, Prope
 public:
 	enum { Custom = false };
 	PropertyRowComboListString(const char* name = "", const char* nameAlt = "", const ComboListString& value = ComboListString());
-	PropertyRowComboListString(void* object, int size, const char* name, const char* nameAlt, const char* typeName); // понадобился из за PropertyRowImpl
+	PropertyRowComboListString(void* object, int size, const char* name, const char* nameAlt, const char* typeName); // РїРѕРЅР°РґРѕР±РёР»СЃСЏ РёР· Р·Р° PropertyRowImpl
 
 	// virtuals:
 	//void redraw(HDC dc, const RECT& iconRect, const RECT& widgetRect, const RECT& lineRect, PropertyRowState state);
@@ -183,7 +183,7 @@ public:
 	// ^^^
 };
 
-// используется widget-ом редактриования
+// РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ widget-РѕРј СЂРµРґР°РєС‚СЂРёРѕРІР°РЅРёСЏ
 class PropertyRowNumericInterface{
 public:
 	virtual void setValueFromString(const char* str) = 0;

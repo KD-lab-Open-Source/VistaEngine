@@ -5,7 +5,7 @@
 #include "VoxelBox.h"
 #include "Render/Inc/IRenderDevice.h"
 
-// Кусок объекта, состоящий из нескольких нодов, но одного материала
+// РљСѓСЃРѕРє РѕР±СЉРµРєС‚Р°, СЃРѕСЃС‚РѕСЏС‰РёР№ РёР· РЅРµСЃРєРѕР»СЊРєРёС… РЅРѕРґРѕРІ, РЅРѕ РѕРґРЅРѕРіРѕ РјР°С‚РµСЂРёР°Р»Р°
 struct StaticBunch
 {
 	int	offset_polygon;
@@ -18,10 +18,10 @@ struct StaticBunch
 
 	enum
 	{
-		max_index=20,//Максимальное количество матриц
+		max_index=20,//РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РјР°С‚СЂРёС†
 	};
 	
-	vector<int> nodeIndices; // с какими матрицами связанны текущие полигоны, не более max_index
+	vector<int> nodeIndices; // СЃ РєР°РєРёРјРё РјР°С‚СЂРёС†Р°РјРё СЃРІСЏР·Р°РЅРЅС‹ С‚РµРєСѓС‰РёРµ РїРѕР»РёРіРѕРЅС‹, РЅРµ Р±РѕР»РµРµ max_index
 	TempVisibleGroups visibleGroups;
 
 	void serialize(Archive& ar);
@@ -63,7 +63,7 @@ public:
 
 	class cVisError& errlog();
 
-	cTexture* LoadTexture(const char* name,char* mode=0);//То же что и GetTexLibrary()->GetElement, но с более развернутым сообщением об ошибке.
+	cTexture* LoadTexture(const char* name,char* mode=0);//РўРѕ Р¶Рµ С‡С‚Рѕ Рё GetTexLibrary()->GetElement, РЅРѕ СЃ Р±РѕР»РµРµ СЂР°Р·РІРµСЂРЅСѓС‚С‹Рј СЃРѕРѕР±С‰РµРЅРёРµРј РѕР± РѕС€РёР±РєРµ.
 	void GetTextureNames(TextureNames& names) const;
 	string fixTextureName(const char* name) const;
 
@@ -91,7 +91,7 @@ public:
 	{
 		sPtrIndexBuffer		ib;
 		sPtrVertexBuffer	vb;
-		int					blend_indices;//количество костей в vb
+		int					blend_indices;//РєРѕР»РёС‡РµСЃС‚РІРѕ РєРѕСЃС‚РµР№ РІ vb
 		StaticBunches bunches;
 
 		cSkinVertexSysMem* sys_vb;
@@ -105,7 +105,7 @@ public:
 	};
 
 	typedef vector<StaticLod> Lods;
-	Lods lods;//1 или 3 лода.
+	Lods lods;//1 РёР»Рё 3 Р»РѕРґР°.
 
 	StaticLod	debris;
 	typedef vector<cStaticSimply3dx*> Debrises;
@@ -141,7 +141,7 @@ private:
 	void ExtractMesh(TempMesh mesh,TempMesh& extracted_mesh,
 					  vector<char>& selected_polygon,vector<int>& node_index);
 
-	void CalcBumpSTNorm(StaticLod& lod);//Нормаль равна SxT вектору.
+	void CalcBumpSTNorm(StaticLod& lod);//РќРѕСЂРјР°Р»СЊ СЂР°РІРЅР° SxT РІРµРєС‚РѕСЂСѓ.
 
 	void CreateDebrises();
 };

@@ -8,14 +8,14 @@
 #include "Inventory.h"
 
 BEGIN_ENUM_DESCRIPTOR(UI_InventoryType, "UI_InventoryType")
-REGISTER_ENUM(UI_INVENTORY, "просто инвентарь")
-REGISTER_ENUM(UI_INVENTORY_EQUIPMENT, "снаряжение")
-REGISTER_ENUM(UI_INVENTORY_QUICK_ACCESS, "снаряжение с активацией")
+REGISTER_ENUM(UI_INVENTORY, "РїСЂРѕСЃС‚Рѕ РёРЅРІРµРЅС‚Р°СЂСЊ")
+REGISTER_ENUM(UI_INVENTORY_EQUIPMENT, "СЃРЅР°СЂСЏР¶РµРЅРёРµ")
+REGISTER_ENUM(UI_INVENTORY_QUICK_ACCESS, "СЃРЅР°СЂСЏР¶РµРЅРёРµ СЃ Р°РєС‚РёРІР°С†РёРµР№")
 END_ENUM_DESCRIPTOR(UI_InventoryType)
 
 BEGIN_ENUM_DESCRIPTOR(UI_QuickAccessMode, "UI_QuickAccessMode")
-REGISTER_ENUM(UI_INVENTORY_QUICK_ACCESS_OFF, "Активация по клику выключена")
-REGISTER_ENUM(UI_INVENTORY_QUICK_ACCESS_ON, "Активация по клику включена")
+REGISTER_ENUM(UI_INVENTORY_QUICK_ACCESS_OFF, "РђРєС‚РёРІР°С†РёСЏ РїРѕ РєР»РёРєСѓ РІС‹РєР»СЋС‡РµРЅР°")
+REGISTER_ENUM(UI_INVENTORY_QUICK_ACCESS_ON, "РђРєС‚РёРІР°С†РёСЏ РїРѕ РєР»РёРєСѓ РІРєР»СЋС‡РµРЅР°")
 END_ENUM_DESCRIPTOR(UI_QuickAccessMode)
 
 // ----------------------------- UI_InventoryItem
@@ -191,21 +191,21 @@ void UI_ControlInventory::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(inventoryType_, "inventoryType", "тип инвентаря");
+	ar.serialize(inventoryType_, "inventoryType", "С‚РёРї РёРЅРІРµРЅС‚Р°СЂСЏ");
 
 	if(inventoryType_ == UI_INVENTORY_EQUIPMENT)
-		ar.serialize(equipmentSlotType_, "equipmentSlotTypeReference", "тип слота снаряжения");
+		ar.serialize(equipmentSlotType_, "equipmentSlotTypeReference", "С‚РёРї СЃР»РѕС‚Р° СЃРЅР°СЂСЏР¶РµРЅРёСЏ");
 	else if(inventoryType_ == UI_INVENTORY_QUICK_ACCESS)
-		ar.serialize(quickAccessSlotType_, "quickAccessSlotTypeReference", "тип слота снаряжения с активацией");
+		ar.serialize(quickAccessSlotType_, "quickAccessSlotTypeReference", "С‚РёРї СЃР»РѕС‚Р° СЃРЅР°СЂСЏР¶РµРЅРёСЏ СЃ Р°РєС‚РёРІР°С†РёРµР№");
 	else
-		ar.serialize(cellType_, "cellTypeReference", "тип ячейки");
+		ar.serialize(cellType_, "cellTypeReference", "С‚РёРї СЏС‡РµР№РєРё");
 
-	ar.serialize(size_, "size", "количество ячеек");
+	ar.serialize(size_, "size", "РєРѕР»РёС‡РµСЃС‚РІРѕ СЏС‡РµРµРє");
 
-	ar.serialize(cellEmptySprite_, "cellEmptySprite", "вид пустой ячейки");
-	ar.serialize(cellSprite_, "cellSprite", "вид заполненной ячейки");
+	ar.serialize(cellEmptySprite_, "cellEmptySprite", "РІРёРґ РїСѓСЃС‚РѕР№ СЏС‡РµР№РєРё");
+	ar.serialize(cellSprite_, "cellSprite", "РІРёРґ Р·Р°РїРѕР»РЅРµРЅРЅРѕР№ СЏС‡РµР№РєРё");
 	if(inventoryType_ == UI_INVENTORY_QUICK_ACCESS)
-		ar.serialize(cellActiveSprite_, "cellActiveSprite", "вид активированной ячейки");
+		ar.serialize(cellActiveSprite_, "cellActiveSprite", "РІРёРґ Р°РєС‚РёРІРёСЂРѕРІР°РЅРЅРѕР№ СЏС‡РµР№РєРё");
 
 	if(ar.isInput()){
 		if(size_.x <= 0) size_.x = 1;

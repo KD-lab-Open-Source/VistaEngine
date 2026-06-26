@@ -13,7 +13,7 @@
 
 namespace kdw{
 
-REGISTER_CLASS(Widget, ProgressBar, "Прогресс");
+REGISTER_CLASS(Widget, ProgressBar, "РџСЂРѕРіСЂРµСЃСЃ");
 #pragma warning(push)
 #pragma warning(disable: 4355) // 'this' : used in base member initializer list
 

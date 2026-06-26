@@ -60,7 +60,7 @@ void HotkeyButtonImpl::redraw(HDC dc)
 	
 	RECT rt;
 	GetClientRect(*this, &rt);
-	const char* str = TRANSLATE("Ïîæàëóéñòà, íàæìèòå êíîïêó...");
+	const char* str = TRANSLATE("ÐŸÐ¾Ð¶Ð°Ð»ÑƒÐ¹ÑÑ‚Ð°, Ð½Ð°Ð¶Ð¼Ð¸Ñ‚Ðµ ÐºÐ½Ð¾Ð¿ÐºÑƒ...");
 	::DrawText(dc, str, strlen(str), &rt, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
 
 	::SelectObject(dc, oldFont);
@@ -117,7 +117,7 @@ int HotkeyButtonImpl::onMessageKillFocus(HWND focusedWindow)
 
 int HotkeyButtonImpl::onMessageKeyDown(UINT keyCode, USHORT count, USHORT flags)
 {
-	if(((flags >> 14) & 1) == 0){ // êíîïêà íå áûëà íàæàòà
+	if(((flags >> 14) & 1) == 0){ // ÐºÐ½Ð¾Ð¿ÐºÐ° Ð½Ðµ Ð±Ñ‹Ð»Ð° Ð½Ð°Ð¶Ð°Ñ‚Ð°
 		pressed_ = true;
 		owner_->key_ = sKey(addModifiers(keyCode));
 		if(keyCode != VK_SHIFT &&

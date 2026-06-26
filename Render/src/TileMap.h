@@ -13,7 +13,7 @@ const int TILEMAP_SHL  = 6;
 const int TILEMAP_SIZE = 1<<TILEMAP_SHL;
 const int TILEMAP_LOD=5;
 
-//TILEMAP_LOD â ñîîòâåòñòâèè ñ íèì íóæíî èñïðàâèòü ATTRTILE_DRAWLODxxx
+//TILEMAP_LOD Ð² ÑÐ¾Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²Ð¸Ð¸ Ñ Ð½Ð¸Ð¼ Ð½ÑƒÐ¶Ð½Ð¾ Ð¸ÑÐ¿Ñ€Ð°Ð²Ð¸Ñ‚ÑŒ ATTRTILE_DRAWLODxxx
 enum eAttributeTile
 {
 	ATTRTILE_DRAW_VERTEX	=   1<<0,
@@ -65,7 +65,7 @@ public:
 	virtual void PreDraw(Camera* camera);
 	virtual void Draw(Camera* camera);
 	void Animate(float dt);
-	// îáùèå èíòåðôåéñíûå ôóíêöèè cTileMap
+	// Ð¾Ð±Ñ‰Ð¸Ðµ Ð¸Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹ÑÐ½Ñ‹Ðµ Ñ„ÑƒÐ½ÐºÑ†Ð¸Ð¸ cTileMap
 	const Vect2i& tileSize()const					{ return tileSize_; }
 	const Vect2i& tileNumber()const					{ return tileNumber_; }
 	sTile& GetTile(int i,int j)							{ return tiles_[i+j*tileNumber().x]; }
@@ -147,8 +147,8 @@ public:
 
 protected:
 	sTile*			tiles_;
-	Vect2i			tileSize_;		// ðàçìåð îäíîãî òàéëà
-	Vect2i			tileNumber_;		// ÷èñëî òàéëîâ ïî îñÿì
+	Vect2i			tileSize_;		// Ñ€Ð°Ð·Ð¼ÐµÑ€ Ð¾Ð´Ð½Ð¾Ð³Ð¾ Ñ‚Ð°Ð¹Ð»Ð°
+	Vect2i			tileNumber_;		// Ñ‡Ð¸ÑÐ»Ð¾ Ñ‚Ð°Ð¹Ð»Ð¾Ð² Ð¿Ð¾ Ð¾ÑÑÐ¼
 	int zMax_;
 
 	cTileMapRender* tileMapRender_;

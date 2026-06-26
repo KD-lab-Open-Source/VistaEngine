@@ -34,7 +34,7 @@ cVisError& cVisError::operator << (const char *a)
 	if(in_message_box)
 		return *this;
 	if(strcmp(a,VERR_END)==0)
-	{// ����� ������
+	{// конец потока
 		kdError("3d", buf.c_str());
 		if(!no_message_box)
 		{

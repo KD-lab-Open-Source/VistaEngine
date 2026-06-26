@@ -35,32 +35,32 @@ ShowChangeSettings::ShowChangeSettings()
 
 void ShowUpAttribute::serializeStatic(Archive& ar)
 {
-	ar.serialize(RangedWrapperf(minDrawSize, 8, 20), "minDrawSize", "Минимальный размер шрифта");
-	ar.serialize(distanceFade, "distanceFade", "Исчезать при удалении");
+	ar.serialize(RangedWrapperf(minDrawSize, 8, 20), "minDrawSize", "РњРёРЅРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ С€СЂРёС„С‚Р°");
+	ar.serialize(distanceFade, "distanceFade", "РСЃС‡РµР·Р°С‚СЊ РїСЂРё СѓРґР°Р»РµРЅРёРё");
 }
 
 void ShowUpAttribute::serialize(Archive& ar)
 {
-	ar.serialize(font_, "font", "Шрифт");
-	ar.serialize(scale_, "scale", "Масштаб");
-	ar.serialize(color, "color", "цвет текста");
+	ar.serialize(font_, "font", "РЁСЂРёС„С‚");
+	ar.serialize(scale_, "scale", "РњР°СЃС€С‚Р°Р±");
+	ar.serialize(color, "color", "С†РІРµС‚ С‚РµРєСЃС‚Р°");
 	float seconds = 0.001f * time;
 	if(!ar.inPlace())
-		ar.serialize(RangedWrapperf(seconds, 0.2f, 10.f), "time", "время показа");
+		ar.serialize(RangedWrapperf(seconds, 0.2f, 10.f), "time", "РІСЂРµРјСЏ РїРѕРєР°Р·Р°");
 	time = seconds * 1000;
-	ar.serialize(height, "height", "высота поднятия");
-	ar.serialize(fadeSpeed, "fadeSpeed", "скорость затухания");
+	ar.serialize(height, "height", "РІС‹СЃРѕС‚Р° РїРѕРґРЅСЏС‚РёСЏ");
+	ar.serialize(fadeSpeed, "fadeSpeed", "СЃРєРѕСЂРѕСЃС‚СЊ Р·Р°С‚СѓС…Р°РЅРёСЏ");
 	if(fadeSpeed < 1.f)
 		fadeSpeed = 1.f;
 }
 
 void ShowChangeSettings::serialize(Archive& ar)
 {
-	ar.serialize(showFlyParameters, "showFlyParameters", "&Показывать взлетающий текст");
+	ar.serialize(showFlyParameters, "showFlyParameters", "&РџРѕРєР°Р·С‹РІР°С‚СЊ РІР·Р»РµС‚Р°СЋС‰РёР№ С‚РµРєСЃС‚");
 	if(showFlyParameters){
-		ar.serialize(showIncAttribute, "showIncAttribute", "Увеличение значения");
-		ar.serialize(showDecAttribute, "showDecAttribute", "Уменьшение значения");
-		ar.serialize(spawnFreq, "spawnMinFreq", "Минимальльная периодичность появления");
+		ar.serialize(showIncAttribute, "showIncAttribute", "РЈРІРµР»РёС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ");
+		ar.serialize(showDecAttribute, "showDecAttribute", "РЈРјРµРЅСЊС€РµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏ");
+		ar.serialize(spawnFreq, "spawnMinFreq", "РњРёРЅРёРјР°Р»СЊР»СЊРЅР°СЏ РїРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ РїРѕСЏРІР»РµРЅРёСЏ");
 	}
 }
 

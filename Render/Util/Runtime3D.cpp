@@ -58,13 +58,13 @@ void Runtime3D::createScene()
 {
 	scene_ = gb_VisGeneric->CreateScene(); 
 	camera_ = scene_->CreateCamera();
-	camera_->setAttribute(ATTRCAMERA_PERSPECTIVE); // перспектива
+	camera_->setAttribute(ATTRCAMERA_PERSPECTIVE); // РїРµСЂСЃРїРµРєС‚РёРІР°
 	setCameraPosition(MatXf(Mat3f::ID, Vect3f(0,0,-512)));
 
-	camera_->SetFrustum(							// устанавливается пирамида видимости
-		&Vect2f(0.5f,0.5f),							// центр камеры
-		&sRectangle4f(-0.5f,-0.5f,0.5f,0.5f),		// видимая область камеры
-		&Vect2f(1.f,1.f),							// фокус камеры
+	camera_->SetFrustum(							// СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ РїРёСЂР°РјРёРґР° РІРёРґРёРјРѕСЃС‚Рё
+		&Vect2f(0.5f,0.5f),							// С†РµРЅС‚СЂ РєР°РјРµСЂС‹
+		&sRectangle4f(-0.5f,-0.5f,0.5f,0.5f),		// РІРёРґРёРјР°СЏ РѕР±Р»Р°СЃС‚СЊ РєР°РјРµСЂС‹
+		&Vect2f(1.f,1.f),							// С„РѕРєСѓСЃ РєР°РјРµСЂС‹
 		&Vect2f(30.0f,1200.0f)
 		);
 
@@ -92,12 +92,12 @@ void Runtime3D::setCameraPosition(const MatXf &Matrix)
 }
 
 
-//Функция обработки сообщений Windows
+//Р¤СѓРЅРєС†РёСЏ РѕР±СЂР°Р±РѕС‚РєРё СЃРѕРѕР±С‰РµРЅРёР№ Windows
 LRESULT WINAPI MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
     switch( msg )
     {
-        case WM_DESTROY://выйти из приложения, если нажали на крестик
+        case WM_DESTROY://РІС‹Р№С‚Рё РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ, РµСЃР»Рё РЅР°Р¶Р°Р»Рё РЅР° РєСЂРµСЃС‚РёРє
             PostQuitMessage( 0 );
             return 0;
 		case WM_SETCURSOR:

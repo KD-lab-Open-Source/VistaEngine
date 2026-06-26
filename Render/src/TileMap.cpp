@@ -19,8 +19,8 @@ ResourceSelector::Options textureOptions("*.tga", "Resource\\TerrainData\\Textur
 }
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(cTileMap, ShaderType, "ShaderType")
-REGISTER_ENUM_ENCLOSED(cTileMap, LAVA, "Ëàâà")
-REGISTER_ENUM_ENCLOSED(cTileMap, ICE, "Ëåä")
+REGISTER_ENUM_ENCLOSED(cTileMap, LAVA, "Ð›Ð°Ð²Ð°")
+REGISTER_ENUM_ENCLOSED(cTileMap, ICE, "Ð›ÐµÐ´")
 END_ENUM_DESCRIPTOR_ENCLOSED(cTileMap, ShaderType)
 
 cTileMap* tileMap;
@@ -104,17 +104,17 @@ cTileMap::~cTileMap()
 STARFORCE_API void cTileMap::serialize(Archive& ar)
 {
 	if(ar.filter(SERIALIZE_WORLD_DATA)){
-		ar.serialize(RangedWrapperi(miniDetailTextureResolutionPower_, 1, 5), "miniDetailTextureResolution", "Ðàçðåøåíèå ìåëêîäåòàëüíîé òåêñòóðû");
+		ar.serialize(RangedWrapperi(miniDetailTextureResolutionPower_, 1, 5), "miniDetailTextureResolution", "Ð Ð°Ð·Ñ€ÐµÑˆÐµÐ½Ð¸Ðµ Ð¼ÐµÐ»ÐºÐ¾Ð´ÐµÑ‚Ð°Ð»ÑŒÐ½Ð¾Ð¹ Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ñ‹");
 		MiniDetailTexture::resolution = miniDetailTextureResolution();
 		ar.serializeArray(miniDetailTextures_, "miniDetailTextureArray", 0);
 	}
 	if(ar.filter(SERIALIZE_GLOBAL_DATA)){
-		ar.serializeArray(placementZoneMaterials_, "placementZoneMaterials", "Ìàòåðèàëû çîí óñòàíîâêè");
+		ar.serializeArray(placementZoneMaterials_, "placementZoneMaterials", "ÐœÐ°Ñ‚ÐµÑ€Ð¸Ð°Ð»Ñ‹ Ð·Ð¾Ð½ ÑƒÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ¸");
 	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
-// ðåàëèçàöèÿ èíòåðôåéñà cIUnkObj
+// Ñ€ÐµÐ°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ñ Ð¸Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹ÑÐ° cIUnkObj
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void cTileMap::PreDraw(Camera* camera)
@@ -138,7 +138,7 @@ void cTileMap::Draw(Camera* camera)
 
 //	cD3DRender *Render=gb_RenderDevice3D;
 //	if(camera->getAttribute(ATTRCAMERA_SHADOW)){
-//		Render->Draw(scene()); // ðèñîâàòü èñòî÷íèêè ñâåòà
+//		Render->Draw(scene()); // Ñ€Ð¸ÑÐ¾Ð²Ð°Ñ‚ÑŒ Ð¸ÑÑ‚Ð¾Ñ‡Ð½Ð¸ÐºÐ¸ ÑÐ²ÐµÑ‚Ð°
 //	}
 //	else 
 	if(camera->getAttribute(ATTRCAMERA_SHADOWMAP)){
@@ -154,7 +154,7 @@ void cTileMap::Draw(Camera* camera)
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
-// ðåàëèçàöèÿ cTileMap
+// Ñ€ÐµÐ°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ñ cTileMap
 //////////////////////////////////////////////////////////////////////////////////////////
 void cTileMap::updateMap(const Vect2i& pos1,const Vect2i& pos2,UpdateMapType type)
 {
@@ -173,7 +173,7 @@ void cTileMap::updateMap(const Vect2i& pos1,const Vect2i& pos2,UpdateMapType typ
 		debug_rect.push_back(rc);
 	}
 
-	//point_offset Íà ñòîëüêî òî÷êà ìîæåò âûñòóïàòü çà ãðàíèöû òàéëà (ðåàëüíî íà 16 ìîæåò äëÿ ñàìîãî ãðóáîãî òàéëà)
+	//point_offset ÐÐ° ÑÑ‚Ð¾Ð»ÑŒÐºÐ¾ Ñ‚Ð¾Ñ‡ÐºÐ° Ð¼Ð¾Ð¶ÐµÑ‚ Ð²Ñ‹ÑÑ‚ÑƒÐ¿Ð°Ñ‚ÑŒ Ð·Ð° Ð³Ñ€Ð°Ð½Ð¸Ñ†Ñ‹ Ñ‚Ð°Ð¹Ð»Ð° (Ñ€ÐµÐ°Ð»ÑŒÐ½Ð¾ Ð½Ð° 16 Ð¼Ð¾Ð¶ÐµÑ‚ Ð´Ð»Ñ ÑÐ°Ð¼Ð¾Ð³Ð¾ Ð³Ñ€ÑƒÐ±Ð¾Ð³Ð¾ Ñ‚Ð°Ð¹Ð»Ð°)
 	const int point_offset=8;
 	Vect2i sz(tileSize_.x*tileNumber_.x, tileSize_.y*tileNumber_.y);
 	rc.p1.x=max(rc.p1.x-point_offset,0);
@@ -230,7 +230,7 @@ Vect2f cTileMap::CalcZ(Camera* camera)
 		c1.y=c0.y+ty;
 		c1.z=s.zmax;
 
-		if(camera->TestVisible(c0,c1))//Íå îïòèìàëüíî, ëó÷øå ÷åðàç îáðàùåíèå ê pTestGrid
+		if(camera->TestVisible(c0,c1))//ÐÐµ Ð¾Ð¿Ñ‚Ð¸Ð¼Ð°Ð»ÑŒÐ½Ð¾, Ð»ÑƒÑ‡ÑˆÐµ Ñ‡ÐµÑ€Ð°Ð· Ð¾Ð±Ñ€Ð°Ñ‰ÐµÐ½Ð¸Ðµ Ðº pTestGrid
 		{
 			Vect3f p[8]=
 			{
@@ -487,22 +487,22 @@ cTileMap::PlacementZoneMaterial::PlacementZoneMaterial()
 
 void cTileMap::PlacementZoneMaterial::serialize(Archive& ar)
 {
-	ar.serialize(shaderType, "shaderType", "Òèï øåéäåðà");
-	if(!ar.serialize(ResourceSelector(textureName, textureOptions), "textureName", "Èìÿ òåêñòóðû")){ // CONVERSION
+	ar.serialize(shaderType, "shaderType", "Ð¢Ð¸Ð¿ ÑˆÐµÐ¹Ð´ÐµÑ€Ð°");
+	if(!ar.serialize(ResourceSelector(textureName, textureOptions), "textureName", "Ð˜Ð¼Ñ Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ñ‹")){ // CONVERSION
 		ar.openStruct(*this, "miniDetailTexture", 0);
 		ar.serialize(textureName, "textureName", 0);
 		ar.closeStruct("miniDetailTexture");
 	}
-	ar.serialize(minimapColor, "minimapColor", "Öâåò çîíû íà ìèíèêàðòå");
+	ar.serialize(minimapColor, "minimapColor", "Ð¦Ð²ÐµÑ‚ Ð·Ð¾Ð½Ñ‹ Ð½Ð° Ð¼Ð¸Ð½Ð¸ÐºÐ°Ñ€Ñ‚Ðµ");
 	if(shaderType == LAVA){
-		ar.serialize(lavaColor, "color", "Öâåò");
-		ar.serialize(colorAmbient, "colorAmbient", "Öâåò àìáèåíò");
-		ar.serialize(textureScale, "textureScale", "Ìàñøòàá òåêñòóðû");
-		ar.serialize(volumeTextureScale, "volumeTextureScale", "Ìàñøòàá îáúåìíîé òåêñòóðû");
+		ar.serialize(lavaColor, "color", "Ð¦Ð²ÐµÑ‚");
+		ar.serialize(colorAmbient, "colorAmbient", "Ð¦Ð²ÐµÑ‚ Ð°Ð¼Ð±Ð¸ÐµÐ½Ñ‚");
+		ar.serialize(textureScale, "textureScale", "ÐœÐ°ÑÑˆÑ‚Ð°Ð± Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ñ‹");
+		ar.serialize(volumeTextureScale, "volumeTextureScale", "ÐœÐ°ÑÑˆÑ‚Ð°Ð± Ð¾Ð±ÑŠÐµÐ¼Ð½Ð¾Ð¹ Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ñ‹");
 	}
 	else{
-	    ar.serialize(ResourceSelector(textureBumpName, textureOptions), "textureBump", "Bump òåêñòóðà");
-	    ar.serialize(ResourceSelector(textureCleftName, textureOptions), "textureCleft", "Òåêñòóðà òðåùèí");
+	    ar.serialize(ResourceSelector(textureBumpName, textureOptions), "textureBump", "Bump Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ð°");
+	    ar.serialize(ResourceSelector(textureCleftName, textureOptions), "textureCleft", "Ð¢ÐµÐºÑÑ‚ÑƒÑ€Ð° Ñ‚Ñ€ÐµÑ‰Ð¸Ð½");
 		if(ar.isInput()){
 			textureBump = GetTexLibrary()->GetElement3D(textureBumpName.c_str(), "Bump");
 			textureCleft = GetTexLibrary()->GetElement3D(textureCleftName.c_str());

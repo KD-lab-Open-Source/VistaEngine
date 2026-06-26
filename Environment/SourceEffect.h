@@ -47,9 +47,9 @@ private:
 
 class SourceDamage : public SourceEffect
 {
-	/// повреждения, наносимые зоной
+	/// РїРѕРІСЂРµР¶РґРµРЅРёСЏ, РЅР°РЅРѕСЃРёРјС‹Рµ Р·РѕРЅРѕР№
 	ParameterCustom damage_;
-	/// воздействие на юниты
+	/// РІРѕР·РґРµР№СЃС‚РІРёРµ РЅР° СЋРЅРёС‚С‹
 	AbnormalStateAttribute abnormalState_;
 
 public:

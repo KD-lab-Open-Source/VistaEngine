@@ -5,7 +5,7 @@
 #include "Render/src/FogOfWar.h"
 
 //////////////////////////////////////////
-// Юнит-цель: легионер, здание и предмет
+// Р®РЅРёС‚-С†РµР»СЊ: Р»РµРіРёРѕРЅРµСЂ, Р·РґР°РЅРёРµ Рё РїСЂРµРґРјРµС‚
 //////////////////////////////////////////
 class UnitObjective : public UnitReal
 {
@@ -47,7 +47,7 @@ public:
 	void unregisterInPlayerStatistics(UnitBase* agressor = 0);
 	
 private:
-	// Время принудительного показа параметра
+	// Р’СЂРµРјСЏ РїСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕРіРѕ РїРѕРєР°Р·Р° РїР°СЂР°РјРµС‚СЂР°
 	typedef SwapVector<LogicTimer> ParameterShowTimerContainer;
 	ParameterShowTimerContainer parameterShowTimers_;
 

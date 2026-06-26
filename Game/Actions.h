@@ -32,7 +32,7 @@ typedef  vector<AttributeSquadReference> AttributeSquadReferences;
 class CommandsQueueProcessor;
 
 //---------------------------------
-// ��������					
+// Действия					
 //---------------------------------
 
 struct ActionForAI : Action 
@@ -81,7 +81,7 @@ protected:
 	friend Trigger;
 };
 
-struct ActionDelay : Action // �������� �������
+struct ActionDelay : Action // Задержка времени
 {
 	float duration; 
 	bool showTimer; 
@@ -124,7 +124,7 @@ private:
 };
 
 
-class ActionSetCameraRestriction : public Action // ����������� ������
+class ActionSetCameraRestriction : public Action // ограничения камеры
 {
 public:
 	ActionSetCameraRestriction();
@@ -134,7 +134,7 @@ private:
 	SwitchModeTriple switchMode_;
 };
 
-struct ActionSetCamera : Action // ��������� ������
+struct ActionSetCamera : Action // Установка Камеры
 {
 	CameraSplineName cameraSplineName;
 	bool smoothTransition; 
@@ -148,7 +148,7 @@ struct ActionSetCamera : Action // ��������� ������
 	void serialize(Archive& ar);
 };
 
-struct ActionSetDefaultCamera : Action // ��������� ������
+struct ActionSetDefaultCamera : Action // Установка Камеры
 {
 	float duration_;
 
@@ -192,7 +192,7 @@ private:
 	mutable UnitLink<UnitReal> unit_;
 };
 
-struct ActionOscillateCamera : Action // ������ ������
+struct ActionOscillateCamera : Action // Тряска Камеры
 {
 	int duration; 
 	float factor; 
@@ -227,7 +227,7 @@ private:
 	string name_;
 };
 
-struct ActionSave : Action // ��������� ����
+struct ActionSave : Action // Сохранить игру
 {
 	void activate();
 	void serialize(Archive& ar);
@@ -291,7 +291,7 @@ protected:
 	mutable Vect2i placement_coords;
 	mutable Vect2i scanMin_, scanMax_; // world's scale
 
-	// ����������� ��� ��� ������ ����� ��������� ������ � ��������� � ��������� ����������
+	// сканирующий код для поиска места установки здания и связанные с операцией переменные
 	enum BuilderState
 	{	
 		BuildingIdle, 
@@ -448,7 +448,7 @@ private:
 	Vect2f intersect(const Vect2f& l1p0, const Vect2f& l1p1, const Vect2f& l2p0, const Vect2f& l2p1);
 	bool pointIn(const Vect2f& l1p0, const Vect2f& l1p1, const Vect2f& ptCheck) const; 
 	Vect2f normal(const Vect2f& p0, const Vect2f& p1);
-	Vect2f getPointInSection(const Vect2f& p0, const Vect2f& p1, float alfa); // 0<=alfa<=1 ����� ������������ �������
+	Vect2f getPointInSection(const Vect2f& p0, const Vect2f& p1, float alfa); // 0<=alfa<=1 чтобы принадлежала отрезку
 	Vect2f getPointOnDistance(const Vect2f& guide, const Vect2f& point, float distance); 
 
 };
@@ -458,7 +458,7 @@ class ConvexHull
 public:
     typedef std::vector<Vect2f> Polygon;
 
-	ConvexHull(const Polygon& points); // �� ������ ������ �������� ��������
+	ConvexHull(const Polygon& points); // по точкам строит выпуклую оболочку
 
 	const Polygon& getPolygon() { return polygon_; }
 
@@ -916,7 +916,7 @@ private:
 	mutable bool firstTime;
 };
 
-struct ActionActivateObjectByLabel : Action // ������������ ������ �� �����
+struct ActionActivateObjectByLabel : Action // Активировать объект по метке
 {
 	ActionActivateObjectByLabel() : active_(true) {}
 
@@ -928,14 +928,14 @@ protected:
 	LabelUnit label_;
 };
 
-struct ActionDeactivateObjectByLabel : ActionActivateObjectByLabel // �������������� ������ �� �����
+struct ActionDeactivateObjectByLabel : ActionActivateObjectByLabel // Деактивировать объект по метке
 {
 	ActionDeactivateObjectByLabel(){
 		active_ = false;
 	}
 };
 
-struct ActionSetControlEnabled : Action // ���������/��������� ���������� ������
+struct ActionSetControlEnabled : Action // Запретить/разрешить управление игрока
 {
 	bool controlEnabled; 
 
@@ -1053,7 +1053,7 @@ private:
 	UI_MessageTypeReference messageType_;
 };
 
-class ActionMessage : public Action // C��������
+class ActionMessage : public Action // Cообщение
 {
 public:
 	enum Type {
@@ -1087,7 +1087,7 @@ private:
 	InterpolationLogicTimer fadeTimer_;
 };
 
-class ActionTask : public Action // ������
+class ActionTask : public Action // Задача
 {
 public:
 	ActionTask();
@@ -1102,7 +1102,7 @@ private:
 	UI_TaskStateID state_;
 	UI_MessageSetup messageSetup_;
 
-	/// �������������� ������ ������������ ������ ������
+	/// второстепенные задачи отображаются другим цветом
 	bool isSecondary_;
 
 	LogicTimer durationTimer_;
@@ -1120,7 +1120,7 @@ protected:
 	SwitchMode switchType;
 };
 
-class ActionSetCameraAtSquad : public Action // ���������� ������ �� ����� (� ������������ ��������)
+class ActionSetCameraAtSquad : public Action // Установить камеру на сквад (с возможностью слежения)
 {
 public:
 	LogicTimer timer;
@@ -1157,7 +1157,7 @@ public:
 	void activate();
 };
 
-struct ActionSetCameraAtObject : ActionContext // ���������� ������ �� ������
+struct ActionSetCameraAtObject : ActionContext // Установить камеру на объект
 {
 	int transitionTime; 
 	bool setFollow;
@@ -1222,7 +1222,7 @@ public:
 	SoundReference soundReference;
 };
 
-struct ActionSelectUnit : Action // ������������� �����
+struct ActionSelectUnit : Action // Селектировать юнита
 {
 	AttributeReference unitID; 
 	bool onlyConnected_;
@@ -1233,7 +1233,7 @@ struct ActionSelectUnit : Action // ������������� ��
 	void serialize(Archive& ar);
 };
 
-class ActionDeselect : public Action // ��������
+class ActionDeselect : public Action // Деселект
 {
 public:
 	ActionDeselect();
@@ -1243,21 +1243,21 @@ private:
 	bool stopPlayerUnit_;
 };
 
-/// ����� �� ����
+/// выход из игры
 class ActionGameQuit : public Action 
 {
 public:
 	void activate();
 };
 
-/// ����� �� ����
+/// выход из игры
 class ActionGameUpdateOpen : public Action 
 {
 public:
 	void activate();
 };
 
-struct ActionSetInterface : Action // ��������/��������� ���������
+struct ActionSetInterface : Action // Включить/выключить интерфейс
 {
 	bool enableInterface; 
 
@@ -1269,7 +1269,7 @@ struct ActionSetInterface : Action // ��������/������
 	void serialize(Archive& ar);
 };
 
-/// ������� ���������� ��� ���� �� ����
+/// Создать подсистему для игры по сети
 struct ActionCreateNetClient : Action 
 {
 	ActionCreateNetClient() : type_(UI_NetCenter::LAN) { }
@@ -1283,7 +1283,7 @@ private:
 
 class UI_Screen;
 
-/// �������� ����������� ����� ����������
+/// включить определённый экран интерфейса
 struct ActionSelectInterfaceScreen : Action 
 {
 	ActionSelectInterfaceScreen(){ }
@@ -1298,7 +1298,7 @@ private:
 	GraphicsTimer nonStopTimer_;
 };
 
-/// ��������/�������� �������
+/// спрятать/показать контрол
 class ActionInterfaceHideControl : public Action
 {
 public:
@@ -1312,7 +1312,7 @@ private:
 	bool hideControl_;
 };
 
-/// ��������/�������� �������, �� ���������� �� �������������
+/// спрятать/показать контрол, из интерфейса не перекрывается
 class ActionInterfaceHideControlTrigger : public Action
 {
 public:
@@ -1338,7 +1338,7 @@ private:
 	AtomActions actions_;
 };
 
-/// �������� ��������� �������� �� ������
+/// включить состояние контрола по номеру
 class ActionInterfaceSetControlState : public Action
 {
 public:
@@ -1352,7 +1352,7 @@ private:
 	int state_;
 };
 
-/// ���������/��������� �������
+/// запретить/разрешить контрол
 class ActionInterfaceTogglAccessibility : public Action
 {
 public:
@@ -1366,7 +1366,7 @@ private:
 	bool enableControl_;
 };
 
-/// ������� ������� �������������� �����
+/// отсылка команды заселекченному юниту
 class ActionUI_UnitCommand : public ActionContext
 {
 public:
@@ -1379,7 +1379,7 @@ protected:
 	UnitCommand& unitCommand;
 };
 
-/// ����� ����
+/// старт игры
 class ActionUI_GameStart : public Action
 {
 public:
@@ -1392,7 +1392,7 @@ private:
 	bool isBattle_;
 };
 
-/// logoff �� online
+/// logoff из online
 class ActionOnlineLogout : public Action
 {
 public:
@@ -1400,7 +1400,7 @@ public:
 	void activate();
 };
 
-/// ����� ������� ����
+/// старт сетевой игры
 class ActionUI_LanGameStart : public Action
 {
 public:
@@ -1408,7 +1408,7 @@ public:
 	void activate();
 };
 
-/// ������������� � ������� ����
+/// присоединение к сетевой игре
 class ActionUI_LanGameJoin : public Action
 {
 public:
@@ -1416,7 +1416,7 @@ public:
 	void activate();
 };
 
-/// �������� ������� ����
+/// создание сетевой игры
 class ActionUI_LanGameCreate : public Action
 {
 public:
@@ -1424,7 +1424,7 @@ public:
 	void activate();
 };
 
-/// ��������� ������������ �����
+/// выключить интерфейсный экран
 class ActionUI_ScreenSwitchOff : public Action
 {
 public:
@@ -1433,7 +1433,7 @@ public:
 	bool workedOut();
 };
 
-/// ����������� ��� ��������� ���������� �����, ������ ��� �������
+/// подтвердить или отклонить перезапись сэйва, реплея или профиля
 class ActionUI_ConfirmDiskOp : public Action
 {
 public:
@@ -1665,7 +1665,7 @@ struct ActionAIUnitCommand : public ActionUI_UnitCommand
 	void activate();
 };
 
-/// ���������� ������, ������� ����� �����������, ���� �� ��������� ActionFreeCursor
+/// Установить курсор, который будет действовать, пока не вызовется ActionFreeCursor
 struct ActionSetCursor : Action
 {
 	UI_CursorReference cursor;
@@ -1674,13 +1674,13 @@ struct ActionSetCursor : Action
 	void serialize(Archive& ar);
 };
 
-/// �������� ��������� �������
+/// Отменить установку курсора
 struct ActionFreeCursor : Action
 {
 	void activate();
 };
 
-/// ������� ������ ��� ������ ����� ������� ����
+/// Сменить курсор для выбора юнита данного типа
 struct ActionChangeUnitCursor : Action
 {
 	AttributeReference attribute;

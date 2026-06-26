@@ -119,7 +119,7 @@ private:
 
 	//Command History
 	vector<netCommandGame*> fullListGameCommands;
-	unsigned int lastQuant_inFullListGameCommands; //Кванты считаются с 1-го!
+	unsigned int lastQuant_inFullListGameCommands; //РљРІР°РЅС‚С‹ СЃС‡РёС‚Р°СЋС‚СЃСЏ СЃ 1-РіРѕ!
 	unsigned int curGameComPosition;
 
 	vector<netCommandGame*> replayListGameCommands;
@@ -199,8 +199,8 @@ private:
 		}
 	}
 
-	unsigned long clientGeneralCommandCounterInListCommand;// аналог fullListGameCommands.size()
-	unsigned long lastRealizedQuant; //по идее это currentQuant
+	unsigned long clientGeneralCommandCounterInListCommand;// Р°РЅР°Р»РѕРі fullListGameCommands.size()
+	unsigned long lastRealizedQuant; //РїРѕ РёРґРµРµ СЌС‚Рѕ currentQuant
 	unsigned long allowedRealizingQuant;
 	unsigned long nextQuantInterval;
 	float speedDelta_;

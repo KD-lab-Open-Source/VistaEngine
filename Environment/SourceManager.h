@@ -32,15 +32,15 @@ public:
 
 	void serialize(Archive& ar);
 
-	/// ������, ������������� � ��������� ��������
-	/// ��� ��������� �������� ����� ������� ����
+	/// создаёт, устанавливает и запускает источник
+	/// при некоторых условиях может вернуть ноль
 	SourceBase* createSource(const SourceAttribute* attribute, const Se3f& pose, bool allow_limited_lifetime = true, bool* startFlag = 0);
 	SourceBase* addSource (const SourceBase* original);
 	void flushNewSources();
 
 	void setSourceOnMouse(const SourceBase* source);
 
-	/// ��������� �� ��� ����� ��� ��������
+	/// добавляет на мир якорь для привязки
 	Anchor* addAnchor();
 	Anchor* addAnchor(const Anchor* original);
 
@@ -75,7 +75,7 @@ public:
 
 	int changeControllersSize() const { return showChangeControllers_.size(); }
 
-	// ��������� ������� �� ����������������� SurfaceClass
+	// проверяет позицию на удовлетворяемость SurfaceClass
 	bool checkEnvironment(const Vect3f& pos, int types) const;
 
 	void clearSources();
@@ -86,7 +86,7 @@ private:
 
 	ShowChangeControllers showChangeControllers_;
 
-	// ��� ������ �� ���2006
+	// для показа на КРИ2006
 	UnitLink<SourceBase> sourceOnMouse_;
 
 	Anchors anchors_;

@@ -10,7 +10,7 @@
 //=======================================================
 namespace {
 
-	Vect2f temp_localwpoint; // Для функции sort()
+	Vect2f temp_localwpoint; // Р”Р»СЏ С„СѓРЅРєС†РёРё sort()
 	
 	int maxLineNum;
 	const Vect2f* maxLinePointer;
@@ -31,7 +31,7 @@ void ImpassabilityCheck(RigidBody * vehicle);
 
 //=======================================================
 //	PathTracking functor.
-//	Обработка препятствий + заставляет юнитов уступать дорогу.
+//	РћР±СЂР°Р±РѕС‚РєР° РїСЂРµРїСЏС‚СЃС‚РІРёР№ + Р·Р°СЃС‚Р°РІР»СЏРµС‚ СЋРЅРёС‚РѕРІ СѓСЃС‚СѓРїР°С‚СЊ РґРѕСЂРѕРіСѓ.
 //=======================================================
 class UnitMovePlaner 
 {
@@ -209,7 +209,7 @@ void RigidBody::tracking_analysis()
 }
 
 //=======================================================
-//  Разварот а месте...
+//  Р Р°Р·РІР°СЂРѕС‚ Р° РјРµСЃС‚Рµ...
 //=======================================================
 void RigidBody::ptRotationMode()
 {
@@ -245,7 +245,7 @@ void RigidBody::ptRotationMode()
 }
 
 //=======================================================
-// Пересечение точка-сфера. true - если не пересекает..
+// РџРµСЂРµСЃРµС‡РµРЅРёРµ С‚РѕС‡РєР°-СЃС„РµСЂР°. true - РµСЃР»Рё РЅРµ РїРµСЂРµСЃРµРєР°РµС‚..
 //=======================================================
 __forceinline bool pointInCircle(const Vect2f& point, const Vect2f & circleCenter, float circleRadius = 1.0f)
 {
@@ -253,7 +253,7 @@ __forceinline bool pointInCircle(const Vect2f& point, const Vect2f & circleCente
 }
 
 //=======================================================
-// Пересечение точка-box. false - если не пересекает..
+// РџРµСЂРµСЃРµС‡РµРЅРёРµ С‚РѕС‡РєР°-box. false - РµСЃР»Рё РЅРµ РїРµСЂРµСЃРµРєР°РµС‚..
 //=======================================================
 __forceinline bool pointInBox(const Vect2f& point, const Vect2f & box_min, const Vect2f & box_max)
 {
@@ -261,7 +261,7 @@ __forceinline bool pointInBox(const Vect2f& point, const Vect2f & box_min, const
 }
 
 //=======================================================
-// Пересечение линия-сфера. false - если не пересекает..
+// РџРµСЂРµСЃРµС‡РµРЅРёРµ Р»РёРЅРёСЏ-СЃС„РµСЂР°. false - РµСЃР»Рё РЅРµ РїРµСЂРµСЃРµРєР°РµС‚..
 //=======================================================
 inline bool CheckLine(const Vect3f & l1, const Vect3f & l2, const Vect3f & center, float radius = 1.0)
 {
@@ -289,7 +289,7 @@ inline bool CheckLine(const Vect3f & l1, const Vect3f & l2, const Vect3f & cente
 }
 
 //=======================================================
-// Расчет радиуса разворота.
+// Р Р°СЃС‡РµС‚ СЂР°РґРёСѓСЃР° СЂР°Р·РІРѕСЂРѕС‚Р°.
 //=======================================================
 __forceinline float callcVehicleRadius(float angle, float lineLen)
 {
@@ -297,14 +297,14 @@ __forceinline float callcVehicleRadius(float angle, float lineLen)
 }
 
 //=======================================================
-// Обработка движения. Логика выбора линий движения.
+// РћР±СЂР°Р±РѕС‚РєР° РґРІРёР¶РµРЅРёСЏ. Р›РѕРіРёРєР° РІС‹Р±РѕСЂР° Р»РёРЅРёР№ РґРІРёР¶РµРЅРёСЏ.
 //=======================================================
 void RigidBody::ptGetVelocityDir()
 {
 
 	start_timer_auto(ptGetVelocityDir, STATISTICS_GROUP_PHYSICS);
 	
-	// Заехал на горку - езжай назад.
+	// Р—Р°РµС…Р°Р» РЅР° РіРѕСЂРєСѓ - РµР·Р¶Р°Р№ РЅР°Р·Р°Рґ.
 	if(prm().path_tracking_back && forwardVelocity() < 0.001f){
 		if(prm().path_tracking_back){
 			moveback = !moveback;
@@ -316,7 +316,7 @@ void RigidBody::ptGetVelocityDir()
 		}
 	}
 
-	// Если остановился, стоит stop_quants.
+	// Р•СЃР»Рё РѕСЃС‚Р°РЅРѕРІРёР»СЃСЏ, СЃС‚РѕРёС‚ stop_quants.
 	if(stop_quants && stop_quants < STOP) {
 		stop_quants++;	
 		return;
@@ -389,7 +389,7 @@ void RigidBody::ptGetVelocityDir()
 			return;
 		}
 
-	// Логика выбора линии движения...
+	// Р›РѕРіРёРєР° РІС‹Р±РѕСЂР° Р»РёРЅРёРё РґРІРёР¶РµРЅРёСЏ...
 	if(!manualMoving)
 		if (moveback)
 			if (temp_localwpoint.x > 0) ptUnsortBackLines();
@@ -417,7 +417,7 @@ void RigidBody::ptGetVelocityDir()
 		else
 			move_line = NULL;
 
-	// Если линия долго не свободна - пробует изменить направление (взад/вперед)
+	// Р•СЃР»Рё Р»РёРЅРёСЏ РґРѕР»РіРѕ РЅРµ СЃРІРѕР±РѕРґРЅР° - РїСЂРѕР±СѓРµС‚ РёР·РјРµРЅРёС‚СЊ РЅР°РїСЂР°РІР»РµРЅРёРµ (РІР·Р°Рґ/РІРїРµСЂРµРґ)
 	if ((stop_quants>STOP)&&(move_line == NULL)){
 		stop_quants = 0;
 		ptVelocity = 0;
@@ -429,7 +429,7 @@ void RigidBody::ptGetVelocityDir()
 		return;
 	}
 
-	// Предотвращает верчение вокруг (.)
+	// РџСЂРµРґРѕС‚РІСЂР°С‰Р°РµС‚ РІРµСЂС‡РµРЅРёРµ РІРѕРєСЂСѓРі (.)
 	if (!moveback && (back_quants < BACK)&&(wpoint.distance(ptPose_.trans) < 2.5f * callcVehicleRadius(path_tracking_angle, ptVelocity * DT))&&(wpoint.distance(ptPose_.trans) > callcVehicleRadius(path_tracking_angle, ptVelocity * DT))&&(temp_localwpoint.x<0)) {
 		if(prm().path_tracking_back) {
 			moveback = true;
@@ -441,13 +441,13 @@ void RigidBody::ptGetVelocityDir()
 		}
 	}
 
-	// Если близко к (.) то останавливать
+	// Р•СЃР»Рё Р±Р»РёР·РєРѕ Рє (.) С‚Рѕ РѕСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ
 	if ((wpoint.distance(ptPose_.trans) < 0.5f * callcVehicleRadius(path_tracking_angle, ptVelocity * DT)) && (fabs(temp_localwpoint.x)<0.3)) {
 		pointCanNotByReached = true;
 		return;
 	}
 
-	// Ждет - если нет свободных линий
+	// Р–РґРµС‚ - РµСЃР»Рё РЅРµС‚ СЃРІРѕР±РѕРґРЅС‹С… Р»РёРЅРёР№
 	if (move_line == NULL){
 		if(prm().path_tracking_back) {
 			stop_quants++;	
@@ -459,7 +459,7 @@ void RigidBody::ptGetVelocityDir()
 	}
 
 
-	// Если назад дальше нельзя - переключается на перед.
+	// Р•СЃР»Рё РЅР°Р·Р°Рґ РґР°Р»СЊС€Рµ РЅРµР»СЊР·СЏ - РїРµСЂРµРєР»СЋС‡Р°РµС‚СЃСЏ РЅР° РїРµСЂРµРґ.
 	if ((moveback)&&(move_line == NULL)&&(back_quants!=0)){
 		moveback = false;
 		ptVelocity = 0;
@@ -467,7 +467,7 @@ void RigidBody::ptGetVelocityDir()
 		return;
 	}
 
-	// Назад ненужно ехать всегда.. вперед лучше 
+	// РќР°Р·Р°Рґ РЅРµРЅСѓР¶РЅРѕ РµС…Р°С‚СЊ РІСЃРµРіРґР°.. РІРїРµСЂРµРґ Р»СѓС‡С€Рµ 
 	if (moveback) back_quants++;
 	if (!manualMoving && back_quants > BACK && temp_localwpoint.x > 0){
 		moveback = false;
@@ -481,7 +481,7 @@ void RigidBody::ptGetVelocityDir()
 
 	if(ptVelocity > FLT_EPS) {
 		
-		// Движение по найденной линии - простейшая модель
+		// Р”РІРёР¶РµРЅРёРµ РїРѕ РЅР°Р№РґРµРЅРЅРѕР№ Р»РёРЅРёРё - РїСЂРѕСЃС‚РµР№С€Р°СЏ РјРѕРґРµР»СЊ
 		float ang = atan2(move_line->y, move_line->x);
 
 		if(moveback)
@@ -614,7 +614,7 @@ void RigidBody::ptUnsortLines()
 }
 
 //=======================================================
-//	Проверяет пересечение юнита с несколькими препятствиями.
+//	РџСЂРѕРІРµСЂСЏРµС‚ РїРµСЂРµСЃРµС‡РµРЅРёРµ СЋРЅРёС‚Р° СЃ РЅРµСЃРєРѕР»СЊРєРёРјРё РїСЂРµРїСЏС‚СЃС‚РІРёСЏРјРё.
 //=======================================================
 __forceinline bool pointInObstacleList(Vect2f& vehiclePose, float vehicleRadius, vector<RigidBody*>& obstacleList, bool firstStep)
 {
@@ -627,14 +627,14 @@ __forceinline bool pointInObstacleList(Vect2f& vehiclePose, float vehicleRadius,
 }
 
 //=======================================================
-//	проверка с другими юнитами.. true - если линия свободна.
+//	РїСЂРѕРІРµСЂРєР° СЃ РґСЂСѓРіРёРјРё СЋРЅРёС‚Р°РјРё.. true - РµСЃР»Рё Р»РёРЅРёСЏ СЃРІРѕР±РѕРґРЅР°.
 //=======================================================
 inline bool isFreeLine(RigidBody * vehicle, vector<RigidBody*>& obstacleList,  int index)
 {
 	if(!vehicle->sortlines[index]) return false;
 
 	float vel = vehicle->forwardVelocity() * DT;
-//	float vel = vehicle->ptVelocity * DT; // Если сделать так, то юнит подьезжая к дрогому - дергается.
+//	float vel = vehicle->ptVelocity * DT; // Р•СЃР»Рё СЃРґРµР»Р°С‚СЊ С‚Р°Рє, С‚Рѕ СЋРЅРёС‚ РїРѕРґСЊРµР·Р¶Р°СЏ Рє РґСЂРѕРіРѕРјСѓ - РґРµСЂРіР°РµС‚СЃСЏ.
 	
 	Vect2f temp = *vehicle->sortlines[index];
 	temp.Normalize(vel);
@@ -644,7 +644,7 @@ inline bool isFreeLine(RigidBody * vehicle, vector<RigidBody*>& obstacleList,  i
 	MatX2f ppose = vehicle->ptPose();
 	Vect2f temp_v;
 
-	// Подстраховка на проникновения
+	// РџРѕРґСЃС‚СЂР°С…РѕРІРєР° РЅР° РїСЂРѕРЅРёРєРЅРѕРІРµРЅРёСЏ
 //	vector<RigidBody*>::iterator it;
 //	FOR_EACH(obstacleList, it){
 //		float distance1 = sqr(vehicle->pose().trans().x - (*it)->pose().trans().x) + sqr(vehicle->pose().trans().y - (*it)->pose().trans().y);
@@ -682,7 +682,7 @@ inline bool isFreeLine(RigidBody * vehicle, vector<RigidBody*>& obstacleList,  i
 }
 
 //=======================================================
-// Проверка на пересечение с зонами непроходимости.
+// РџСЂРѕРІРµСЂРєР° РЅР° РїРµСЂРµСЃРµС‡РµРЅРёРµ СЃ Р·РѕРЅР°РјРё РЅРµРїСЂРѕС…РѕРґРёРјРѕСЃС‚Рё.
 //=======================================================
 inline bool ImpassabilityLine(RigidBody * vehicle, int index)
 {
@@ -758,7 +758,7 @@ void ImpassabilityCheck(RigidBody * vehicle)
 }
 
 //=======================================================
-// Прямое управление.
+// РџСЂСЏРјРѕРµ СѓРїСЂР°РІР»РµРЅРёРµ.
 //=======================================================
 void RigidBody::ptManualLines()
 {

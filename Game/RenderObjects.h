@@ -15,7 +15,7 @@ void loadAllLibraries();
 void saveAllLibraries();
 
 ////////////////////////////////////////////////////////
-// Устаревшие функции для совместимости с редактором
+// РЈСЃС‚Р°СЂРµРІС€РёРµ С„СѓРЅРєС†РёРё РґР»СЏ СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё СЃ СЂРµРґР°РєС‚РѕСЂРѕРј
 void createRenderContext(bool multiThread);
 bool initRenderObjects(int renderMode, HWND hwnd);
 void finitRenderObjects();

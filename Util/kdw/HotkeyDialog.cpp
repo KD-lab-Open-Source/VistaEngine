@@ -39,12 +39,12 @@ void HotkeyDialog::onChanged()
 
 void HotkeyDialog::onKeyDefault()
 {
-	// не вызываем __super::onKeyDefault
+	// РЅРµ РІС‹Р·С‹РІР°РµРј __super::onKeyDefault
 }
 
 void HotkeyDialog::onKeyCancel()
 {
-	// не вызываем __super::onKeyCancel
+	// РЅРµ РІС‹Р·С‹РІР°РµРј __super::onKeyCancel
 }
 
 }

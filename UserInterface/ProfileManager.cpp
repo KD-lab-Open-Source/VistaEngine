@@ -201,7 +201,7 @@ int ProfileManager::updateProfile(const wstring& name)
 void ProfileManager::removeDirRecursive(const string& dir)
 {
 	if(dir.substr(0, 1) == "."){
-		xassert(false && "¿-¿-¿-¿-¿-¿-¿-¿-¿-¿ !!!!!");
+		xassert(false && "–ê-–ê-–ê-–ê-–ê-–ê-–ê-–ê-–ê-–ê !!!!!");
 		ErrH.Exit();
 		return;
 	}

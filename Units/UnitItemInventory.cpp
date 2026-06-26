@@ -16,16 +16,16 @@ extern class CameraManager* cameraManager;
 UNIT_LINK_GET(UnitItemInventory)
 
 DECLARE_SEGMENT(UnitItemInventory)
-REGISTER_CLASS(AttributeBase, AttributeItemInventory, "Предмет-инвентарь")
-REGISTER_CLASS(UnitBase, UnitItemInventory, "Предмет-инвентарь");
+REGISTER_CLASS(AttributeBase, AttributeItemInventory, "РџСЂРµРґРјРµС‚-РёРЅРІРµРЅС‚Р°СЂСЊ")
+REGISTER_CLASS(UnitBase, UnitItemInventory, "РџСЂРµРґРјРµС‚-РёРЅРІРµРЅС‚Р°СЂСЊ");
 REGISTER_CLASS_IN_FACTORY(UnitFactory, UNIT_CLASS_ITEM_INVENTORY, UnitItemInventory)
 
-BEGIN_ENUM_DESCRIPTOR_ENCLOSED(AttributeItemInventory, EquipmentType, "Типы снаряжения")
-REGISTER_ENUM_ENCLOSED(AttributeItemInventory, EQUIPMENT_NONE, "Не снаряжение")
-REGISTER_ENUM_ENCLOSED(AttributeItemInventory, EQUIPMENT_GENERAL, "Снаряжение")
-REGISTER_ENUM_ENCLOSED(AttributeItemInventory, EQUIPMENT_WEAPON, "Оружие")
-REGISTER_ENUM_ENCLOSED(AttributeItemInventory, EQUIPMENT_AMMO, "Боеприпасы")
-REGISTER_ENUM_ENCLOSED(AttributeItemInventory, EQUIPMENT_HEALTH, "Аптечка")
+BEGIN_ENUM_DESCRIPTOR_ENCLOSED(AttributeItemInventory, EquipmentType, "РўРёРїС‹ СЃРЅР°СЂСЏР¶РµРЅРёСЏ")
+REGISTER_ENUM_ENCLOSED(AttributeItemInventory, EQUIPMENT_NONE, "РќРµ СЃРЅР°СЂСЏР¶РµРЅРёРµ")
+REGISTER_ENUM_ENCLOSED(AttributeItemInventory, EQUIPMENT_GENERAL, "РЎРЅР°СЂСЏР¶РµРЅРёРµ")
+REGISTER_ENUM_ENCLOSED(AttributeItemInventory, EQUIPMENT_WEAPON, "РћСЂСѓР¶РёРµ")
+REGISTER_ENUM_ENCLOSED(AttributeItemInventory, EQUIPMENT_AMMO, "Р‘РѕРµРїСЂРёРїР°СЃС‹")
+REGISTER_ENUM_ENCLOSED(AttributeItemInventory, EQUIPMENT_HEALTH, "РђРїС‚РµС‡РєР°")
 END_ENUM_DESCRIPTOR_ENCLOSED(AttributeItemInventory, EquipmentType)
 
 AttributeItemInventory::AttributeItemInventory()
@@ -59,9 +59,9 @@ void AttributeItemInventory::serialize(Archive& ar)
 {
     __super::serialize(ar);
 
-	if(ar.openBlock("tips", "подсказки для лежащих на земле")){
-		ar.serialize(initialHeightUIParam, "initialHeightUIParam", "высота предмета для вывода значений");
-		ar.serialize(tipText, "tipText", "Текст подсказки");
+	if(ar.openBlock("tips", "РїРѕРґСЃРєР°Р·РєРё РґР»СЏ Р»РµР¶Р°С‰РёС… РЅР° Р·РµРјР»Рµ")){
+		ar.serialize(initialHeightUIParam, "initialHeightUIParam", "РІС‹СЃРѕС‚Р° РїСЂРµРґРјРµС‚Р° РґР»СЏ РІС‹РІРѕРґР° Р·РЅР°С‡РµРЅРёР№");
+		ar.serialize(tipText, "tipText", "РўРµРєСЃС‚ РїРѕРґСЃРєР°Р·РєРё");
 		ar.closeBlock();
 	}
 
@@ -69,39 +69,39 @@ void AttributeItemInventory::serialize(Archive& ar)
 	unitClass_ = UNIT_CLASS_ITEM_INVENTORY;
 	excludeCollision = unitClass() == UNIT_CLASS_ITEM_INVENTORY ? EXCLUDE_COLLISION_BULLET : 0;
 
-	ar.serialize(parametersInitial, "parametersInitial", "Добавляемые параметры (расходуемые)");
-	ar.serialize(parametersArithmetics, "parametersArithmetics", "Арифметика при надевании");
+	ar.serialize(parametersInitial, "parametersInitial", "Р”РѕР±Р°РІР»СЏРµРјС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ (СЂР°СЃС…РѕРґСѓРµРјС‹Рµ)");
+	ar.serialize(parametersArithmetics, "parametersArithmetics", "РђСЂРёС„РјРµС‚РёРєР° РїСЂРё РЅР°РґРµРІР°РЅРёРё");
 
-	ar.serialize(inventorySize, "inventorySize", "Занимаемое пространство");
-	ar.serialize(inventorySprite, "inventorySprite", "Картинка");
-	ar.serialize(quickAccessSprite, "quickAccessSprite", "Картинка для инвентаря быстрого доступа");
-	ar.serialize(inventoryCellType, "inventoryCellTypeReference", "Тип ячейки инвентаря");
-	ar.serialize(equipmentType, "equipmentType", "Тип снаряжения");
+	ar.serialize(inventorySize, "inventorySize", "Р—Р°РЅРёРјР°РµРјРѕРµ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРѕ");
+	ar.serialize(inventorySprite, "inventorySprite", "РљР°СЂС‚РёРЅРєР°");
+	ar.serialize(quickAccessSprite, "quickAccessSprite", "РљР°СЂС‚РёРЅРєР° РґР»СЏ РёРЅРІРµРЅС‚Р°СЂСЏ Р±С‹СЃС‚СЂРѕРіРѕ РґРѕСЃС‚СѓРїР°");
+	ar.serialize(inventoryCellType, "inventoryCellTypeReference", "РўРёРї СЏС‡РµР№РєРё РёРЅРІРµРЅС‚Р°СЂСЏ");
+	ar.serialize(equipmentType, "equipmentType", "РўРёРї СЃРЅР°СЂСЏР¶РµРЅРёСЏ");
 
 	if(isEquipment()){
-		ar.serialize(accessValue, "accessValue", "Необходимые параметры");
+		ar.serialize(accessValue, "accessValue", "РќРµРѕР±С…РѕРґРёРјС‹Рµ РїР°СЂР°РјРµС‚СЂС‹");
 
-		ar.serialize(equipmentSlotType, "equipmentSlotTypeReference", "Слот снаряжения");
-		ar.serialize(quickAccessSlotType, "quickAccessSlotType", "Слот быстрого доступа");
+		ar.serialize(equipmentSlotType, "equipmentSlotTypeReference", "РЎР»РѕС‚ СЃРЅР°СЂСЏР¶РµРЅРёСЏ");
+		ar.serialize(quickAccessSlotType, "quickAccessSlotType", "РЎР»РѕС‚ Р±С‹СЃС‚СЂРѕРіРѕ РґРѕСЃС‚СѓРїР°");
 
 		switch(equipmentType){
 		case EQUIPMENT_WEAPON:
-			ar.serialize(weaponReference, "weaponReference", "Оружие");
+			ar.serialize(weaponReference, "weaponReference", "РћСЂСѓР¶РёРµ");
 			break;
 		case EQUIPMENT_AMMO:
-			ar.serialize(ammoTypeReference, "ammoTypeReference", "Тип боеприпасов");
+			ar.serialize(ammoTypeReference, "ammoTypeReference", "РўРёРї Р±РѕРµРїСЂРёРїР°СЃРѕРІ");
 			break;
 		}
 	}
 
-	ar.serialize(appearanceDelay, "appearanceDelay", "Задержка появления");
-	ar.serialize(useLifeTime, "useLifeTime", "Ограничивать время жизни");
+	ar.serialize(appearanceDelay, "appearanceDelay", "Р—Р°РґРµСЂР¶РєР° РїРѕСЏРІР»РµРЅРёСЏ");
+	ar.serialize(useLifeTime, "useLifeTime", "РћРіСЂР°РЅРёС‡РёРІР°С‚СЊ РІСЂРµРјСЏ Р¶РёР·РЅРё");
 	if(useLifeTime)
-		ar.serialize(lifeTime, "lifeTime", "Время жизни");
+		ar.serialize(lifeTime, "lifeTime", "Р’СЂРµРјСЏ Р¶РёР·РЅРё");
 
-	ar.serialize(mass, "mass", "Масса");
-	ar.serialize(jumpImpulse, "jumpImpulse", "Импульс прыжка если не влезает в инвентарь");
-	ar.serialize(jumpAngularSpeed, "jumpAngularSpeed", "Угловая скорость в прыжке если не влезает в инвентарь");
+	ar.serialize(mass, "mass", "РњР°СЃСЃР°");
+	ar.serialize(jumpImpulse, "jumpImpulse", "РРјРїСѓР»СЊСЃ РїСЂС‹Р¶РєР° РµСЃР»Рё РЅРµ РІР»РµР·Р°РµС‚ РІ РёРЅРІРµРЅС‚Р°СЂСЊ");
+	ar.serialize(jumpAngularSpeed, "jumpAngularSpeed", "РЈРіР»РѕРІР°СЏ СЃРєРѕСЂРѕСЃС‚СЊ РІ РїСЂС‹Р¶РєРµ РµСЃР»Рё РЅРµ РІР»РµР·Р°РµС‚ РІ РёРЅРІРµРЅС‚Р°СЂСЊ");
 }
 
 int AttributeItemInventory::getInventoryCellType(UI_InventoryType inventory_type) const
@@ -180,7 +180,7 @@ void UnitItemInventory::graphQuant(float dt)
 
 		parser.parseString(text.c_str(), format.textColor(), UI_Render::instance().screenSize(Vect2f(prm.tipTextMaxWidth, 0)).x);
 
-		// посчитаннуая экранная точка должна лежать на середине нижней границы
+		// РїРѕСЃС‡РёС‚Р°РЅРЅСѓР°СЏ СЌРєСЂР°РЅРЅР°СЏ С‚РѕС‡РєР° РґРѕР»Р¶РЅР° Р»РµР¶Р°С‚СЊ РЅР° СЃРµСЂРµРґРёРЅРµ РЅРёР¶РЅРµР№ РіСЂР°РЅРёС†С‹
 		Recti txtpos(Vect2i(scr.x - parser.size().x / 2, scr.y - parser.size().y), parser.size());
 		
 		Recti realout = UI_Render::instance().windowPosition().intersection(txtpos);

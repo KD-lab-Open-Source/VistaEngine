@@ -25,8 +25,8 @@ public:
 
 	void operator()(UnitBase* unit);
 
-	/// Раскидывание целей по оружию.
-	/// Возвращает лучщую цель, которая используется для выставления way point'ов.
+	/// Р Р°СЃРєРёРґС‹РІР°РЅРёРµ С†РµР»РµР№ РїРѕ РѕСЂСѓР¶РёСЋ.
+	/// Р’РѕР·РІСЂР°С‰Р°РµС‚ Р»СѓС‡С‰СѓСЋ С†РµР»СЊ, РєРѕС‚РѕСЂР°СЏ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ РІС‹СЃС‚Р°РІР»РµРЅРёСЏ way point'РѕРІ.
 	UnitInterface* processTargets();
 
 private:
@@ -87,7 +87,7 @@ private:
 	bool canAttack(UnitInterface* unit) const;
 
 	UnitInterface* assignTargets(bool add_targets_to_list);
-	/// возвращает наилучшую цель для назначенного через weaponID_ оружия
+	/// РІРѕР·РІСЂР°С‰Р°РµС‚ РЅР°РёР»СѓС‡С€СѓСЋ С†РµР»СЊ РґР»СЏ РЅР°Р·РЅР°С‡РµРЅРЅРѕРіРѕ С‡РµСЂРµР· weaponID_ РѕСЂСѓР¶РёСЏ
 	UnitInterface* selectedWeaponTarget();
 };
 

@@ -79,7 +79,7 @@ void UnitID::registerUnit(BaseUniverseObject* unit)
 {
 	MTL();
 	if(map_[index_].unit){
-		xassert(0 && "Уникальный ид уже занят, нужно перезаписать этот мир");
+		xassert(0 && "РЈРЅРёРєР°Р»СЊРЅС‹Р№ РёРґ СѓР¶Рµ Р·Р°РЅСЏС‚, РЅСѓР¶РЅРѕ РїРµСЂРµР·Р°РїРёСЃР°С‚СЊ СЌС‚РѕС‚ РјРёСЂ");
 		index_ = 0;
 	}
 
@@ -92,7 +92,7 @@ void UnitID::registerUnit(BaseUniverseObject* unit)
 					forceRealloc = true; 
 				}
 				else{
-					xassert(0 && "Не хватает unitID");
+					xassert(0 && "РќРµ С…РІР°С‚Р°РµС‚ unitID");
 					return;
 				}
 			}
@@ -109,7 +109,7 @@ void UnitID::registerUnit(BaseUniverseObject* unit)
 		}
 		index_ = totalIndex_++;
 	}
-	xassert(!map_[index_].unit && "Уникальный ид уже занят, нужно перезаписать этот мир");
+	xassert(!map_[index_].unit && "РЈРЅРёРєР°Р»СЊРЅС‹Р№ РёРґ СѓР¶Рµ Р·Р°РЅСЏС‚, РЅСѓР¶РЅРѕ РїРµСЂРµР·Р°РїРёСЃР°С‚СЊ СЌС‚РѕС‚ РјРёСЂ");
 	
 	incrRef();
 	map_[index_].unit = unit;
@@ -211,7 +211,7 @@ void UnitID::serializeCounter(Archive& ar)
 bool UnitID::setMergeOffset()
 {
 	if(mergeOffset_){
-		xassert(0 && "Допускается только одна операция импорта, затем мир нужно записать и перезагрудить. Старые миры необходимо вначале перезаписать");
+		xassert(0 && "Р”РѕРїСѓСЃРєР°РµС‚СЃСЏ С‚РѕР»СЊРєРѕ РѕРґРЅР° РѕРїРµСЂР°С†РёСЏ РёРјРїРѕСЂС‚Р°, Р·Р°С‚РµРј РјРёСЂ РЅСѓР¶РЅРѕ Р·Р°РїРёСЃР°С‚СЊ Рё РїРµСЂРµР·Р°РіСЂСѓРґРёС‚СЊ. РЎС‚Р°СЂС‹Рµ РјРёСЂС‹ РЅРµРѕР±С…РѕРґРёРјРѕ РІРЅР°С‡Р°Р»Рµ РїРµСЂРµР·Р°РїРёСЃР°С‚СЊ");
 		return false;
 	}
 	mapSize_ = MAP_SIZE + MERGE_SIZE;

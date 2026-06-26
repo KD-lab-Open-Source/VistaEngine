@@ -11,11 +11,11 @@
 
 namespace kdw{
 
-REGISTER_CLASS(Widget, _DummyWidget, "Ğàçìåòêà\\Çàãëóøêà");
-REGISTER_CLASS(Widget, VBox, "Ğàçìåòêà\\Áîêñ, âåğòèêàëüíûé");
-REGISTER_CLASS(Widget, HBox, "Ğàçìåòêà\\Áîêñ, ãîğèçîíòàëüíûé");
-REGISTER_CLASS(Container, VBox, "Áîêñ, âåğòèêàëüíûé");
-REGISTER_CLASS(Container, HBox, "Áîêñ, ãîğèçîíòàëüíûé");
+REGISTER_CLASS(Widget, _DummyWidget, "Ğ Ğ°Ğ·Ğ¼ĞµÑ‚ĞºĞ°\\Ğ—Ğ°Ğ³Ğ»ÑƒÑˆĞºĞ°");
+REGISTER_CLASS(Widget, VBox, "Ğ Ğ°Ğ·Ğ¼ĞµÑ‚ĞºĞ°\\Ğ‘Ğ¾ĞºÑ, Ğ²ĞµÑ€Ñ‚Ğ¸ĞºĞ°Ğ»ÑŒĞ½Ñ‹Ğ¹");
+REGISTER_CLASS(Widget, HBox, "Ğ Ğ°Ğ·Ğ¼ĞµÑ‚ĞºĞ°\\Ğ‘Ğ¾ĞºÑ, Ğ³Ğ¾Ñ€Ğ¸Ğ·Ğ¾Ğ½Ñ‚Ğ°Ğ»ÑŒĞ½Ñ‹Ğ¹");
+REGISTER_CLASS(Container, VBox, "Ğ‘Ğ¾ĞºÑ, Ğ²ĞµÑ€Ñ‚Ğ¸ĞºĞ°Ğ»ÑŒĞ½Ñ‹Ğ¹");
+REGISTER_CLASS(Container, HBox, "Ğ‘Ğ¾ĞºÑ, Ğ³Ğ¾Ñ€Ğ¸Ğ·Ğ¾Ğ½Ñ‚Ğ°Ğ»ÑŒĞ½Ñ‹Ğ¹");
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -154,7 +154,7 @@ void Box::_arrangeChildren()
 	float fixed_length = 0.0f;
 	Elements::iterator it;
 
-	int sizeable_elements = int(elements_.size()) - 1; // áåç dummy
+	int sizeable_elements = int(elements_.size()) - 1; // Ğ±ĞµĞ· dummy
 	Elements::iterator dummyIt = elements_.end();
 	FOR_EACH(elements_, it){
 		if(it->widget){
@@ -238,8 +238,8 @@ void Box::clear()
 			widget->_setParent(0);
 	}
 
-	// ïğîñòî òàê âûçâàòü clear ó ñïèñêîâ íåëüçÿ, ò.ê. ïğè óäàëåíèå êîíòğîëîâ âûçûâåòñÿ êîä àïäåéòà ğàñêëàäêè
-	// è êòî-íèáóäü îáÿçàòåëüíî ïğîèòåğèğóåòñÿ ïî óäàëåííûì children-àì ıòîãî îáúåêòà
+	// Ğ¿Ñ€Ğ¾ÑÑ‚Ğ¾ Ñ‚Ğ°Ğº Ğ²Ñ‹Ğ·Ğ²Ğ°Ñ‚ÑŒ clear Ñƒ ÑĞ¿Ğ¸ÑĞºĞ¾Ğ² Ğ½ĞµĞ»ÑŒĞ·Ñ, Ñ‚.Ğº. Ğ¿Ñ€Ğ¸ ÑƒĞ´Ğ°Ğ»ĞµĞ½Ğ¸Ğµ ĞºĞ¾Ğ½Ñ‚Ñ€Ğ¾Ğ»Ğ¾Ğ² Ğ²Ñ‹Ğ·Ñ‹Ğ²ĞµÑ‚ÑÑ ĞºĞ¾Ğ´ Ğ°Ğ¿Ğ´ĞµĞ¹Ñ‚Ğ° Ñ€Ğ°ÑĞºĞ»Ğ°Ğ´ĞºĞ¸
+	// Ğ¸ ĞºÑ‚Ğ¾-Ğ½Ğ¸Ğ±ÑƒĞ´ÑŒ Ğ¾Ğ±ÑĞ·Ğ°Ñ‚ĞµĞ»ÑŒĞ½Ğ¾ Ğ¿Ñ€Ğ¾Ğ¸Ñ‚ĞµÑ€Ğ¸Ñ€ÑƒĞµÑ‚ÑÑ Ğ¿Ğ¾ ÑƒĞ´Ğ°Ğ»ĞµĞ½Ğ½Ñ‹Ğ¼ children-Ğ°Ğ¼ ÑÑ‚Ğ¾Ğ³Ğ¾ Ğ¾Ğ±ÑŠĞµĞºÑ‚Ğ°
 
 	dummy_->addRef();
 	Elements temp;
@@ -255,23 +255,23 @@ void Box::_setFocus()
 
 void BoxPacking::serialize(Archive& ar)
 {
-	ar.serialize(expand, "expand", "Ğàñøèğÿòü");
-	ar.serialize(fill, "fill", "Çàïîëíÿòü");
-	ar.serialize(padding, "padding", "Èíòåğâàë");
+	ar.serialize(expand, "expand", "Ğ Ğ°ÑÑˆĞ¸Ñ€ÑÑ‚ÑŒ");
+	ar.serialize(fill, "fill", "Ğ—Ğ°Ğ¿Ğ¾Ğ»Ğ½ÑÑ‚ÑŒ");
+	ar.serialize(padding, "padding", "Ğ˜Ğ½Ñ‚ĞµÑ€Ğ²Ğ°Ğ»");
 }
 
 void Box::Element::serialize(Archive& ar)
 {
 	packing.serialize(ar);
-	ar.serialize(widget, "widget", "&Êîíòğîë");
+	ar.serialize(widget, "widget", "&ĞšĞ¾Ğ½Ñ‚Ñ€Ğ¾Ğ»");
 }
 
 void Box::serialize(Archive& ar)
 {
-	ar.serialize(_property(spacing_, this, &Box::setSpacing), "spacing", "Èíòåğâàë");
+	ar.serialize(_property(spacing_, this, &Box::setSpacing), "spacing", "Ğ˜Ğ½Ñ‚ĞµÑ€Ğ²Ğ°Ğ»");
 	Container::serialize(ar);
 
-	ar.serialize(elements_, "elementsStart", "İëåìåíòû");
+	ar.serialize(elements_, "elementsStart", "Ğ­Ğ»ĞµĞ¼ĞµĞ½Ñ‚Ñ‹");
 	Elements::iterator it;
 	FOR_EACH(elements_, it)
 		_ensureChildren(this, it->widget);

@@ -82,7 +82,7 @@ public:
 	virtual void SetRenderState(eRenderStateOption option,int value);
 	virtual unsigned int GetRenderState(eRenderStateOption option);
 
-	// вспомогательные функции, могут быть не реализованы
+	// РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё, РјРѕРіСѓС‚ Р±С‹С‚СЊ РЅРµ СЂРµР°Р»РёР·РѕРІР°РЅС‹
 	virtual void DrawLine(int x1,int y1,int x2,int y2,Color4c color);
 	virtual void DrawPixel(int x1,int y1,Color4c color);
 	virtual void DrawRectangle(int x,int y,int dx,int dy,Color4c color,bool outline=false);
@@ -145,7 +145,7 @@ public:
 	bool IsPS20(){return DeviceCaps.PixelShaderVersion>= D3DPS_VERSION(2,0);};
 	bool IsVS20(){return DeviceCaps.VertexShaderVersion>= D3DVS_VERSION(2,0);};
 
-	//параметры для самозаттенения
+	//РїР°СЂР°РјРµС‚СЂС‹ РґР»СЏ СЃР°РјРѕР·Р°С‚С‚РµРЅРµРЅРёСЏ
 	int GetShadowMapSize(){return shadow_map_size;}
 	void SetShadowMapSize(int i){shadow_map_size=i;inv_shadow_map_size=1.0f/shadow_map_size;}
 	float GetInvShadowMapSize(){return inv_shadow_map_size;}
@@ -199,7 +199,7 @@ public:
 	Vect4f fog_of_war_color;
 	Vect4f tilemap_inv_size;
 
-	//Применяется ли туман войны в шейдере.
+	//РџСЂРёРјРµРЅСЏРµС‚СЃСЏ Р»Рё С‚СѓРјР°РЅ РІРѕР№РЅС‹ РІ С€РµР№РґРµСЂРµ.
 	void SetFogOfWar(bool b){is_fog_of_war=b;};
 	bool GetFogOfWar(){return is_fog_of_war;}
 
@@ -373,7 +373,7 @@ public:
 	virtual void DrawLine(const Vect3f &v1,const Vect3f &v2,Color4c color);
 	virtual void DrawPoint(const Vect3f &v1,Color4c color);
 	void FlushPrimitive3D();
-	void FlushPrimitive3DWorld();//Дебаговая функция
+	void FlushPrimitive3DWorld();//Р”РµР±Р°РіРѕРІР°СЏ С„СѓРЅРєС†РёСЏ
 
 	sPtrIndexBuffer& GetStandartIB(){return standart_ib;}
 
@@ -417,8 +417,8 @@ public:
 
 	void FlushLine3D(bool world=false,bool check_zbuffer=false);
 
-	//SetSamplerData - высокоуровневая замена SetSamplerState
-	//Обычно хватает sampler_clamp_linear..sampler_clamp_point
+	//SetSamplerData - РІС‹СЃРѕРєРѕСѓСЂРѕРІРЅРµРІР°СЏ Р·Р°РјРµРЅР° SetSamplerState
+	//РћР±С‹С‡РЅРѕ С…РІР°С‚Р°РµС‚ sampler_clamp_linear..sampler_clamp_point
 	void SetSamplerData(DWORD stage,SAMPLER_DATA& data)
 	{
 		xassert(stage<TEXTURE_MAX);
@@ -437,7 +437,7 @@ public:
 
 protected:
 	void SetSamplerDataReal(DWORD stage,SAMPLER_DATA& data);
-	//Пользоваться SetSamplerData
+	//РџРѕР»СЊР·РѕРІР°С‚СЊСЃСЏ SetSamplerData
 	void SetSamplerState(DWORD stage,D3DSAMPLERSTATETYPE type,DWORD value)
 	{
 		xassert(stage<TEXTURE_MAX);
@@ -602,7 +602,7 @@ protected:
 	void InitSamplerConstants();
 
 	Vect2i original_screen_size;
-	void ClampDeviceSize(int& x,int& y,int mode);//Не давать выставить разрешение в оконном режиме больше чем разрешение экрана.
+	void ClampDeviceSize(int& x,int& y,int mode);//РќРµ РґР°РІР°С‚СЊ РІС‹СЃС‚Р°РІРёС‚СЊ СЂР°Р·СЂРµС€РµРЅРёРµ РІ РѕРєРѕРЅРЅРѕРј СЂРµР¶РёРјРµ Р±РѕР»СЊС€Рµ С‡РµРј СЂР°Р·СЂРµС€РµРЅРёРµ СЌРєСЂР°РЅР°.
 
 	bool flag_restore_shader;
 	void RestoreShaderReal();

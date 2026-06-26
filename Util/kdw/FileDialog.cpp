@@ -81,7 +81,7 @@ bool FileDialog::showModal()
 
 	openFileName.hwndOwner = ownerWnd_;
 	openFileName.hInstance = Win32::_globalInstance();
-	openFileName.lpstrTitle = save_ ? "Сохранить файл" : "Открыть файл";
+	openFileName.lpstrTitle = save_ ? "РЎРѕС…СЂР°РЅРёС‚СЊ С„Р°Р№Р»" : "РћС‚РєСЂС‹С‚СЊ С„Р°Р№Р»";
 	openFileName.lpstrFilter = 0/*filter*/; 
 	openFileName.nFilterIndex = 1;
 	openFileName.lpstrCustomFilter = filter;

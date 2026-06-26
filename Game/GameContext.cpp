@@ -28,7 +28,7 @@
 
 EditorVisual::Interface& editorVisual()
 {
-	xassert(0 && "EditorVisual можно использовать только в редакторе!");
+	xassert(0 && "EditorVisual РјРѕР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ РІ СЂРµРґР°РєС‚РѕСЂРµ!");
 	return *reinterpret_cast<EditorVisual::Interface*>(0);
 }
 

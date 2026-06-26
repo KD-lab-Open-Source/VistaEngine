@@ -33,24 +33,24 @@ string editSignalVariableDialog();
 //		Conditions
 /////////////////////////////////////////////////////
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ConditionCheckOutWater, OutWater, "OutWater")
-REGISTER_ENUM_ENCLOSED(ConditionCheckOutWater, WATER_IS_WATER, "Вода")
-REGISTER_ENUM_ENCLOSED(ConditionCheckOutWater, WATER_IS_ICE, "Лед")
-REGISTER_ENUM_ENCLOSED(ConditionCheckOutWater, WATER_IS_LAVA, "Лава")
+REGISTER_ENUM_ENCLOSED(ConditionCheckOutWater, WATER_IS_WATER, "Р’РѕРґР°")
+REGISTER_ENUM_ENCLOSED(ConditionCheckOutWater, WATER_IS_ICE, "Р›РµРґ")
+REGISTER_ENUM_ENCLOSED(ConditionCheckOutWater, WATER_IS_LAVA, "Р›Р°РІР°")
 END_ENUM_DESCRIPTOR_ENCLOSED(ConditionCheckOutWater, OutWater)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ConditionCaptureBuilding, PlayerType, "PlayerType")
-REGISTER_ENUM_ENCLOSED(ConditionCaptureBuilding, MY_PLAYER, "Агрессор")
-REGISTER_ENUM_ENCLOSED(ConditionCaptureBuilding, ENEMY_PLAYER, "Жертва")
+REGISTER_ENUM_ENCLOSED(ConditionCaptureBuilding, MY_PLAYER, "РђРіСЂРµСЃСЃРѕСЂ")
+REGISTER_ENUM_ENCLOSED(ConditionCaptureBuilding, ENEMY_PLAYER, "Р–РµСЂС‚РІР°")
 END_ENUM_DESCRIPTOR_ENCLOSED(ConditionCaptureBuilding, PlayerType)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ConditionCaptureBuilding, Participators, "Participators")
-REGISTER_ENUM_ENCLOSED(ConditionCaptureBuilding, FRIENDS, "Союзники")
-REGISTER_ENUM_ENCLOSED(ConditionCaptureBuilding, ENEMIES, "Враги")
-REGISTER_ENUM_ENCLOSED(ConditionCaptureBuilding, ALL, "Все")
+REGISTER_ENUM_ENCLOSED(ConditionCaptureBuilding, FRIENDS, "РЎРѕСЋР·РЅРёРєРё")
+REGISTER_ENUM_ENCLOSED(ConditionCaptureBuilding, ENEMIES, "Р’СЂР°РіРё")
+REGISTER_ENUM_ENCLOSED(ConditionCaptureBuilding, ALL, "Р’СЃРµ")
 END_ENUM_DESCRIPTOR_ENCLOSED(ConditionCaptureBuilding, Participators)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ConditionIsMultiplayer, Mode, "Mode")
-REGISTER_ENUM_ENCLOSED(ConditionIsMultiplayer, ANY, "Любой режим мультиплеера")
+REGISTER_ENUM_ENCLOSED(ConditionIsMultiplayer, ANY, "Р›СЋР±РѕР№ СЂРµР¶РёРј РјСѓР»СЊС‚РёРїР»РµРµСЂР°")
 REGISTER_ENUM_ENCLOSED(ConditionIsMultiplayer, LAN, "LAN")
 REGISTER_ENUM_ENCLOSED(ConditionIsMultiplayer, ONLINE, "ONLINE")
 REGISTER_ENUM_ENCLOSED(ConditionIsMultiplayer, DIRECT, "Direct")
@@ -60,182 +60,182 @@ STARFORCE_API void initConditions()
 {
 SECUROM_MARKER_HIGH_SECURITY_ON(3);
 
-REGISTER_CLASS(Condition, ConditionSwitcher, "И/ИЛИ");
-REGISTER_CLASS(Condition, Condition, "Не выполняется никогда (для выключения триггеров)");
+REGISTER_CLASS(Condition, ConditionSwitcher, "Р/РР›Р");
+REGISTER_CLASS(Condition, Condition, "РќРµ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ РЅРёРєРѕРіРґР° (РґР»СЏ РІС‹РєР»СЋС‡РµРЅРёСЏ С‚СЂРёРіРіРµСЂРѕРІ)");
 
-REGISTER_CLASS(Condition, ConditionIsPlayerActive, "Глобальные условия\\Игрок активный")
-REGISTER_CLASS(Condition, ConditionEnvironmentTime, "Глобальные условия\\Время суток")
-REGISTER_CLASS(Condition, ConditionIsPlayerAI, "Глобальные условия\\АИ ли Игрок")
-REGISTER_CLASS(Condition, ConditionMissionSelected, "Глобальные условия\\Миссия выбрана")
-REGISTER_CLASS(Condition, ConditionNeedUpdate, "Глобальные условия\\Есть свежее обновление")
-REGISTER_CLASS(Condition, ConditionCheckGameType, "Глобальные условия\\Проверка типа игры")
-REGISTER_CLASS(Condition, ConditionCheckPause, "Глобальные условия\\Проверка паузы")
-REGISTER_CLASS(Condition, ConditionIsMultiplayer, "Глобальные условия\\Мультиплеер")
-REGISTER_CLASS(Condition, ConditionPredefineGame, "Глобальные условия\\Режим custom/predefined и командный в текущей миссии")
-REGISTER_CLASS(Condition, ConditionCheckRace, "Глобальные условия\\Проверка расы")
-REGISTER_CLASS(Condition, ConditionOnlyMyClan, "Глобальные условия\\!!! Устарело !!! Остался только мой клан")
-REGISTER_CLASS(Condition, ConditionNoUnitsLeft, "Глобальные условия\\У игрока не осталось дееспособных юнитов")
-REGISTER_CLASS(Condition, ConditionDifficultyLevel, "Глобальные условия\\Уровень сложности")
-REGISTER_CLASS(Condition, ConditionUserSave, "Глобальные условия\\Игровой сейв")
-REGISTER_CLASS(Condition, ConditionCheckDirectControl, "Глобальные условия\\Проверка прямого управления")
-REGISTER_CLASS(Condition, ConditionPlayerWin, "Глобальные условия\\Игрок выиграл, потому что все другие кланы проиграли") 
-REGISTER_CLASS(Condition, ConditionPlayerDefeat, "Глобальные условия\\Игрок проиграл, потому что другой клан выиграл") 
-REGISTER_CLASS(Condition, ConditionPlayerByNumberDefeat, "Глобальные условия\\Игрок по номеру проиграл (выствляется действием игрок проиграл)") 
-REGISTER_CLASS(Condition, ConditionCheckInt, "Глобальные условия\\Проверка целочисленной переменной")
-REGISTER_CLASS(Condition, ConditionCheckOutWater, "Глобальные условия\\Проверка внешней среды")
-REGISTER_CLASS(Condition, ConditionTimeMatched, "Глобальные условия\\Осталось времени меньше, чем указано")
-REGISTER_CLASS(Condition, ConditionScreenRatio, "Глобальные условия\\Соотнощение сторон экрана")
-REGISTER_CLASS(Condition, ConditionEventString, "Глобальные условия\\Проверка чита")
-REGISTER_CLASS(Condition, ConditionWeatherEnabled, "Глобальные условия\\Осадки разрешены")
-REGISTER_CLASS(Condition, ConditionUnderWater, "Глобальные условия\\Область в радиусе от якоря под водой")
-REGISTER_CLASS(Condition, ConditionAnchorOnScreen, "Глобальные условия\\В поле зрения камеры находится якорь")
+REGISTER_CLASS(Condition, ConditionIsPlayerActive, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РРіСЂРѕРє Р°РєС‚РёРІРЅС‹Р№")
+REGISTER_CLASS(Condition, ConditionEnvironmentTime, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р’СЂРµРјСЏ СЃСѓС‚РѕРє")
+REGISTER_CLASS(Condition, ConditionIsPlayerAI, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РђР Р»Рё РРіСЂРѕРє")
+REGISTER_CLASS(Condition, ConditionMissionSelected, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РњРёСЃСЃРёСЏ РІС‹Р±СЂР°РЅР°")
+REGISTER_CLASS(Condition, ConditionNeedUpdate, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р•СЃС‚СЊ СЃРІРµР¶РµРµ РѕР±РЅРѕРІР»РµРЅРёРµ")
+REGISTER_CLASS(Condition, ConditionCheckGameType, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РџСЂРѕРІРµСЂРєР° С‚РёРїР° РёРіСЂС‹")
+REGISTER_CLASS(Condition, ConditionCheckPause, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РџСЂРѕРІРµСЂРєР° РїР°СѓР·С‹")
+REGISTER_CLASS(Condition, ConditionIsMultiplayer, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РњСѓР»СЊС‚РёРїР»РµРµСЂ")
+REGISTER_CLASS(Condition, ConditionPredefineGame, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р РµР¶РёРј custom/predefined Рё РєРѕРјР°РЅРґРЅС‹Р№ РІ С‚РµРєСѓС‰РµР№ РјРёСЃСЃРёРё")
+REGISTER_CLASS(Condition, ConditionCheckRace, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РџСЂРѕРІРµСЂРєР° СЂР°СЃС‹")
+REGISTER_CLASS(Condition, ConditionOnlyMyClan, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\!!! РЈСЃС‚Р°СЂРµР»Рѕ !!! РћСЃС‚Р°Р»СЃСЏ С‚РѕР»СЊРєРѕ РјРѕР№ РєР»Р°РЅ")
+REGISTER_CLASS(Condition, ConditionNoUnitsLeft, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РЈ РёРіСЂРѕРєР° РЅРµ РѕСЃС‚Р°Р»РѕСЃСЊ РґРµРµСЃРїРѕСЃРѕР±РЅС‹С… СЋРЅРёС‚РѕРІ")
+REGISTER_CLASS(Condition, ConditionDifficultyLevel, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РЈСЂРѕРІРµРЅСЊ СЃР»РѕР¶РЅРѕСЃС‚Рё")
+REGISTER_CLASS(Condition, ConditionUserSave, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РРіСЂРѕРІРѕР№ СЃРµР№РІ")
+REGISTER_CLASS(Condition, ConditionCheckDirectControl, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РџСЂРѕРІРµСЂРєР° РїСЂСЏРјРѕРіРѕ СѓРїСЂР°РІР»РµРЅРёСЏ")
+REGISTER_CLASS(Condition, ConditionPlayerWin, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РРіСЂРѕРє РІС‹РёРіСЂР°Р», РїРѕС‚РѕРјСѓ С‡С‚Рѕ РІСЃРµ РґСЂСѓРіРёРµ РєР»Р°РЅС‹ РїСЂРѕРёРіСЂР°Р»Рё") 
+REGISTER_CLASS(Condition, ConditionPlayerDefeat, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РРіСЂРѕРє РїСЂРѕРёРіСЂР°Р», РїРѕС‚РѕРјСѓ С‡С‚Рѕ РґСЂСѓРіРѕР№ РєР»Р°РЅ РІС‹РёРіСЂР°Р»") 
+REGISTER_CLASS(Condition, ConditionPlayerByNumberDefeat, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РРіСЂРѕРє РїРѕ РЅРѕРјРµСЂСѓ РїСЂРѕРёРіСЂР°Р» (РІС‹СЃС‚РІР»СЏРµС‚СЃСЏ РґРµР№СЃС‚РІРёРµРј РёРіСЂРѕРє РїСЂРѕРёРіСЂР°Р»)") 
+REGISTER_CLASS(Condition, ConditionCheckInt, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РџСЂРѕРІРµСЂРєР° С†РµР»РѕС‡РёСЃР»РµРЅРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№")
+REGISTER_CLASS(Condition, ConditionCheckOutWater, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РџСЂРѕРІРµСЂРєР° РІРЅРµС€РЅРµР№ СЃСЂРµРґС‹")
+REGISTER_CLASS(Condition, ConditionTimeMatched, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РћСЃС‚Р°Р»РѕСЃСЊ РІСЂРµРјРµРЅРё РјРµРЅСЊС€Рµ, С‡РµРј СѓРєР°Р·Р°РЅРѕ")
+REGISTER_CLASS(Condition, ConditionScreenRatio, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РЎРѕРѕС‚РЅРѕС‰РµРЅРёРµ СЃС‚РѕСЂРѕРЅ СЌРєСЂР°РЅР°")
+REGISTER_CLASS(Condition, ConditionEventString, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РџСЂРѕРІРµСЂРєР° С‡РёС‚Р°")
+REGISTER_CLASS(Condition, ConditionWeatherEnabled, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РћСЃР°РґРєРё СЂР°Р·СЂРµС€РµРЅС‹")
+REGISTER_CLASS(Condition, ConditionUnderWater, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РћР±Р»Р°СЃС‚СЊ РІ СЂР°РґРёСѓСЃРµ РѕС‚ СЏРєРѕСЂСЏ РїРѕРґ РІРѕРґРѕР№")
+REGISTER_CLASS(Condition, ConditionAnchorOnScreen, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р’ РїРѕР»Рµ Р·СЂРµРЅРёСЏ РєР°РјРµСЂС‹ РЅР°С…РѕРґРёС‚СЃСЏ СЏРєРѕСЂСЊ")
 
-REGISTER_CLASS(Condition, ConditionNetworkDisconnect, "Глобальные событийные условия\\Разрыв сети")
-REGISTER_CLASS(Condition, ConditionEndReplay, "Глобальные событийные условия\\Реплей завершен")
-REGISTER_CLASS(Condition, ConditionEventComing, "Глобальные событийные условия\\Пришло событие")
+REGISTER_CLASS(Condition, ConditionNetworkDisconnect, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СЃРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р Р°Р·СЂС‹РІ СЃРµС‚Рё")
+REGISTER_CLASS(Condition, ConditionEndReplay, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СЃРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р РµРїР»РµР№ Р·Р°РІРµСЂС€РµРЅ")
+REGISTER_CLASS(Condition, ConditionEventComing, "Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СЃРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РџСЂРёС€Р»Рѕ СЃРѕР±С‹С‚РёРµ")
 
-REGISTER_CLASS(Condition, ConditionContext, "Контекстные условия\\Юнит определенного типа"); 
-REGISTER_CLASS(Condition, ConditionObjectOnWater, "Контекстные условия\\Объект в воде(над водой)")
-REGISTER_CLASS(Condition, ConditionObjectOnIce, "Контекстные условия\\Объект на льду(не заморожен в нем)")
-REGISTER_CLASS(Condition, ConditionObjectDemaged, "Контекстные условия\\Объект поврежден на X процентов")
-REGISTER_CLASS(Condition, ConditionDistanceBetweenObjects, "Контекстные условия\\Типы юнитов на расстоянии меньшем от объектов")
-REGISTER_CLASS(Condition, ConditionObjectIsNotUnderAttack, "Контекстные условия\\Объект никем не атакован");
-REGISTER_CLASS(Condition, ConditionObjectAimed, "Контекстные условия\\Объект собираются атаковать");
-REGISTER_CLASS(Condition, ConditionSquadSufficientUnits, "Контекстные условия\\В скваде юнита определенного типа определенное количество юнитов")
-REGISTER_CLASS(Condition, ConditionUnitLevel, "Контекстные условия\\Уровень юнита")
-REGISTER_CLASS(Condition, ConditionObjectWorking, "Контекстные условия\\Юнит занят");
-REGISTER_CLASS(Condition, ConditionMyObjectNearAnchorByLabel, "Контекстные условия\\Возле якоря по метке находится мой юнит")
-REGISTER_CLASS(Condition, ConditionCountObjectsInRadius, "Контекстные условия\\Количество юнитов в радиусе от списка типов юнита, меньше указанного количества")
-REGISTER_CLASS(Condition, ConditionObjectsInRadiusAimed, "Контекстные условия\\Юниты в радиусе от списка типов юнита, собираются атаковать врага")
-REGISTER_CLASS(Condition, ConditionCompareCountObjectsInRadius, "Контекстные условия\\Количество юнитов в радиусе от списка типов юнита, в первой группе меньше чем во второй")
-REGISTER_CLASS(Condition, ConditionObjectBuildingInProgress, "Контекстные условия\\Здание строится")
-REGISTER_CLASS(Condition, ConditionObjectByLabel, "Контекстные условия\\Юнит по метке")
-REGISTER_CLASS(Condition, ConditionUnitInTransport, "Контекстные условия\\Юнит сидит в транспорте")
-REGISTER_CLASS(Condition, ConditionCheckUnitsInTransport, "Контекстные условия\\Юниты определенного типа в транспорте в количестве")
-REGISTER_CLASS(Condition, ConditionCheckPersonalParameter, "Контекстные условия\\Параметер юнита равен величине")
-REGISTER_CLASS(Condition, ConditionCheckParameterProducing, "Контекстные условия\\Юнит производит параметр")
-REGISTER_CLASS(Condition, ConditionUnitUnseen, "Контекстные условия\\Юнит невидимый");
-REGISTER_CLASS(Condition, ConditionUnitCaptured, "Контекстные условия\\Юнит захваченный мной")
-REGISTER_CLASS(Condition, ConditionCheckSurface, "Контекстные условия\\Поверхность под зданием повреждена")
-REGISTER_CLASS(Condition, ConditionCheckSurfaceProducedZone, "Контекстные условия\\Зона производимая зданием повреждена")
-REGISTER_CLASS(Condition, ConditionBuildingsConnected, "Контекстные условия\\К зданию подключены другие здания (является источником)")
-REGISTER_CLASS(Condition, ConditionBuildingsConnectedMinimal, "Контекстные условия\\К зданию подключено минимальное количество зданий")
-REGISTER_CLASS(Condition, ConditionCheckSourceNearUnit, "Контекстные условия\\В радиусе юнита находится источник")
-REGISTER_CLASS(Condition, ConditionObjectHearNoise, "Контекстные условия\\Юнит слышит юнитов врага")
-REGISTER_CLASS(Condition, ConditionObjectUnderShield, "Контекстные условия\\Юнит под полем врага")
+REGISTER_CLASS(Condition, ConditionContext, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р®РЅРёС‚ РѕРїСЂРµРґРµР»РµРЅРЅРѕРіРѕ С‚РёРїР°"); 
+REGISTER_CLASS(Condition, ConditionObjectOnWater, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РћР±СЉРµРєС‚ РІ РІРѕРґРµ(РЅР°Рґ РІРѕРґРѕР№)")
+REGISTER_CLASS(Condition, ConditionObjectOnIce, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РћР±СЉРµРєС‚ РЅР° Р»СЊРґСѓ(РЅРµ Р·Р°РјРѕСЂРѕР¶РµРЅ РІ РЅРµРј)")
+REGISTER_CLASS(Condition, ConditionObjectDemaged, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РћР±СЉРµРєС‚ РїРѕРІСЂРµР¶РґРµРЅ РЅР° X РїСЂРѕС†РµРЅС‚РѕРІ")
+REGISTER_CLASS(Condition, ConditionDistanceBetweenObjects, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РўРёРїС‹ СЋРЅРёС‚РѕРІ РЅР° СЂР°СЃСЃС‚РѕСЏРЅРёРё РјРµРЅСЊС€РµРј РѕС‚ РѕР±СЉРµРєС‚РѕРІ")
+REGISTER_CLASS(Condition, ConditionObjectIsNotUnderAttack, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РћР±СЉРµРєС‚ РЅРёРєРµРј РЅРµ Р°С‚Р°РєРѕРІР°РЅ");
+REGISTER_CLASS(Condition, ConditionObjectAimed, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РћР±СЉРµРєС‚ СЃРѕР±РёСЂР°СЋС‚СЃСЏ Р°С‚Р°РєРѕРІР°С‚СЊ");
+REGISTER_CLASS(Condition, ConditionSquadSufficientUnits, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р’ СЃРєРІР°РґРµ СЋРЅРёС‚Р° РѕРїСЂРµРґРµР»РµРЅРЅРѕРіРѕ С‚РёРїР° РѕРїСЂРµРґРµР»РµРЅРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЋРЅРёС‚РѕРІ")
+REGISTER_CLASS(Condition, ConditionUnitLevel, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РЈСЂРѕРІРµРЅСЊ СЋРЅРёС‚Р°")
+REGISTER_CLASS(Condition, ConditionObjectWorking, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р®РЅРёС‚ Р·Р°РЅСЏС‚");
+REGISTER_CLASS(Condition, ConditionMyObjectNearAnchorByLabel, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р’РѕР·Р»Рµ СЏРєРѕСЂСЏ РїРѕ РјРµС‚РєРµ РЅР°С…РѕРґРёС‚СЃСЏ РјРѕР№ СЋРЅРёС‚")
+REGISTER_CLASS(Condition, ConditionCountObjectsInRadius, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РљРѕР»РёС‡РµСЃС‚РІРѕ СЋРЅРёС‚РѕРІ РІ СЂР°РґРёСѓСЃРµ РѕС‚ СЃРїРёСЃРєР° С‚РёРїРѕРІ СЋРЅРёС‚Р°, РјРµРЅСЊС€Рµ СѓРєР°Р·Р°РЅРЅРѕРіРѕ РєРѕР»РёС‡РµСЃС‚РІР°")
+REGISTER_CLASS(Condition, ConditionObjectsInRadiusAimed, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р®РЅРёС‚С‹ РІ СЂР°РґРёСѓСЃРµ РѕС‚ СЃРїРёСЃРєР° С‚РёРїРѕРІ СЋРЅРёС‚Р°, СЃРѕР±РёСЂР°СЋС‚СЃСЏ Р°С‚Р°РєРѕРІР°С‚СЊ РІСЂР°РіР°")
+REGISTER_CLASS(Condition, ConditionCompareCountObjectsInRadius, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РљРѕР»РёС‡РµСЃС‚РІРѕ СЋРЅРёС‚РѕРІ РІ СЂР°РґРёСѓСЃРµ РѕС‚ СЃРїРёСЃРєР° С‚РёРїРѕРІ СЋРЅРёС‚Р°, РІ РїРµСЂРІРѕР№ РіСЂСѓРїРїРµ РјРµРЅСЊС€Рµ С‡РµРј РІРѕ РІС‚РѕСЂРѕР№")
+REGISTER_CLASS(Condition, ConditionObjectBuildingInProgress, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р—РґР°РЅРёРµ СЃС‚СЂРѕРёС‚СЃСЏ")
+REGISTER_CLASS(Condition, ConditionObjectByLabel, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р®РЅРёС‚ РїРѕ РјРµС‚РєРµ")
+REGISTER_CLASS(Condition, ConditionUnitInTransport, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р®РЅРёС‚ СЃРёРґРёС‚ РІ С‚СЂР°РЅСЃРїРѕСЂС‚Рµ")
+REGISTER_CLASS(Condition, ConditionCheckUnitsInTransport, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р®РЅРёС‚С‹ РѕРїСЂРµРґРµР»РµРЅРЅРѕРіРѕ С‚РёРїР° РІ С‚СЂР°РЅСЃРїРѕСЂС‚Рµ РІ РєРѕР»РёС‡РµСЃС‚РІРµ")
+REGISTER_CLASS(Condition, ConditionCheckPersonalParameter, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РџР°СЂР°РјРµС‚РµСЂ СЋРЅРёС‚Р° СЂР°РІРµРЅ РІРµР»РёС‡РёРЅРµ")
+REGISTER_CLASS(Condition, ConditionCheckParameterProducing, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р®РЅРёС‚ РїСЂРѕРёР·РІРѕРґРёС‚ РїР°СЂР°РјРµС‚СЂ")
+REGISTER_CLASS(Condition, ConditionUnitUnseen, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р®РЅРёС‚ РЅРµРІРёРґРёРјС‹Р№");
+REGISTER_CLASS(Condition, ConditionUnitCaptured, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р®РЅРёС‚ Р·Р°С…РІР°С‡РµРЅРЅС‹Р№ РјРЅРѕР№")
+REGISTER_CLASS(Condition, ConditionCheckSurface, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РџРѕРІРµСЂС…РЅРѕСЃС‚СЊ РїРѕРґ Р·РґР°РЅРёРµРј РїРѕРІСЂРµР¶РґРµРЅР°")
+REGISTER_CLASS(Condition, ConditionCheckSurfaceProducedZone, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р—РѕРЅР° РїСЂРѕРёР·РІРѕРґРёРјР°СЏ Р·РґР°РЅРёРµРј РїРѕРІСЂРµР¶РґРµРЅР°")
+REGISTER_CLASS(Condition, ConditionBuildingsConnected, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Рљ Р·РґР°РЅРёСЋ РїРѕРґРєР»СЋС‡РµРЅС‹ РґСЂСѓРіРёРµ Р·РґР°РЅРёСЏ (СЏРІР»СЏРµС‚СЃСЏ РёСЃС‚РѕС‡РЅРёРєРѕРј)")
+REGISTER_CLASS(Condition, ConditionBuildingsConnectedMinimal, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Рљ Р·РґР°РЅРёСЋ РїРѕРґРєР»СЋС‡РµРЅРѕ РјРёРЅРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р·РґР°РЅРёР№")
+REGISTER_CLASS(Condition, ConditionCheckSourceNearUnit, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р’ СЂР°РґРёСѓСЃРµ СЋРЅРёС‚Р° РЅР°С…РѕРґРёС‚СЃСЏ РёСЃС‚РѕС‡РЅРёРє")
+REGISTER_CLASS(Condition, ConditionObjectHearNoise, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р®РЅРёС‚ СЃР»С‹С€РёС‚ СЋРЅРёС‚РѕРІ РІСЂР°РіР°")
+REGISTER_CLASS(Condition, ConditionObjectUnderShield, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р®РЅРёС‚ РїРѕРґ РїРѕР»РµРј РІСЂР°РіР°")
 
-REGISTER_CLASS(Condition, ConditionObjectUnderAttack, "Контекстные событийные условия\\Объект атакован")
-REGISTER_CLASS(Condition, ConditionUnitSelecting, "Контекстные событийные условия\\Произошел селект юнита или здания")
+REGISTER_CLASS(Condition, ConditionObjectUnderAttack, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СЃРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РћР±СЉРµРєС‚ Р°С‚Р°РєРѕРІР°РЅ")
+REGISTER_CLASS(Condition, ConditionUnitSelecting, "РљРѕРЅС‚РµРєСЃС‚РЅС‹Рµ СЃРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РџСЂРѕРёР·РѕС€РµР» СЃРµР»РµРєС‚ СЋРЅРёС‚Р° РёР»Рё Р·РґР°РЅРёСЏ")
 
-REGISTER_CLASS(Condition, ConditionObjectsExists, "Объекты\\Объекты существуют")
-REGISTER_CLASS(Condition, ConditionCompareObjectsCount, "Объекты\\Количество юнитов в первой группе сравнивается со второй согласно критерию")
-REGISTER_CLASS(Condition, ConditionCompareSquadsCount, "Объекты\\Количество сквадов в первой группе сравнивается со второй согласно критерию")
-REGISTER_CLASS(Condition, ConditionObjectUnseen, "Объекты\\Процент скрытых предметов на мире");
-REGISTER_CLASS(Condition, ConditionObjectPercentOwner, "Объекты\\Процент существующих на мире объектов (общее количество фиксируется)")
-REGISTER_CLASS(Condition, ConditionBuildingsConnectedToZone, "Объекты\\Здания подключены");
-REGISTER_CLASS(Condition, ConditionUnitProducing, "Объекты\\Юнит производится");
-REGISTER_CLASS(Condition, ConditionAllBuildingsConnected, "Объекты\\Все здания из списка типов подключены")
+REGISTER_CLASS(Condition, ConditionObjectsExists, "РћР±СЉРµРєС‚С‹\\РћР±СЉРµРєС‚С‹ СЃСѓС‰РµСЃС‚РІСѓСЋС‚")
+REGISTER_CLASS(Condition, ConditionCompareObjectsCount, "РћР±СЉРµРєС‚С‹\\РљРѕР»РёС‡РµСЃС‚РІРѕ СЋРЅРёС‚РѕРІ РІ РїРµСЂРІРѕР№ РіСЂСѓРїРїРµ СЃСЂР°РІРЅРёРІР°РµС‚СЃСЏ СЃРѕ РІС‚РѕСЂРѕР№ СЃРѕРіР»Р°СЃРЅРѕ РєСЂРёС‚РµСЂРёСЋ")
+REGISTER_CLASS(Condition, ConditionCompareSquadsCount, "РћР±СЉРµРєС‚С‹\\РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРєРІР°РґРѕРІ РІ РїРµСЂРІРѕР№ РіСЂСѓРїРїРµ СЃСЂР°РІРЅРёРІР°РµС‚СЃСЏ СЃРѕ РІС‚РѕСЂРѕР№ СЃРѕРіР»Р°СЃРЅРѕ РєСЂРёС‚РµСЂРёСЋ")
+REGISTER_CLASS(Condition, ConditionObjectUnseen, "РћР±СЉРµРєС‚С‹\\РџСЂРѕС†РµРЅС‚ СЃРєСЂС‹С‚С‹С… РїСЂРµРґРјРµС‚РѕРІ РЅР° РјРёСЂРµ");
+REGISTER_CLASS(Condition, ConditionObjectPercentOwner, "РћР±СЉРµРєС‚С‹\\РџСЂРѕС†РµРЅС‚ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёС… РЅР° РјРёСЂРµ РѕР±СЉРµРєС‚РѕРІ (РѕР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ С„РёРєСЃРёСЂСѓРµС‚СЃСЏ)")
+REGISTER_CLASS(Condition, ConditionBuildingsConnectedToZone, "РћР±СЉРµРєС‚С‹\\Р—РґР°РЅРёСЏ РїРѕРґРєР»СЋС‡РµРЅС‹");
+REGISTER_CLASS(Condition, ConditionUnitProducing, "РћР±СЉРµРєС‚С‹\\Р®РЅРёС‚ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ");
+REGISTER_CLASS(Condition, ConditionAllBuildingsConnected, "РћР±СЉРµРєС‚С‹\\Р’СЃРµ Р·РґР°РЅРёСЏ РёР· СЃРїРёСЃРєР° С‚РёРїРѕРІ РїРѕРґРєР»СЋС‡РµРЅС‹")
 
-REGISTER_CLASS(Condition, ConditionProducedParameter, "Параметры\\Параметр произведен")
-REGISTER_CLASS(Condition, ConditionProducedAllParameters, "Параметры\\Все параметры произведены")
-REGISTER_CLASS(Condition, ConditionPlayerParameters, "Параметры\\Значение общего параметра")
-REGISTER_CLASS(Condition, ConditionPercentOfPlayerResource, "Параметры\\Процент общего параметра от емкости")
-REGISTER_CLASS(Condition, ConditionGetResourceLevel, "Параметры\\Добывается ресурса в секунду")
-REGISTER_CLASS(Condition, ConditionPercentOfMaxUnits, "Параметры\\Кол-во юнитов меньше/больше процента от разрешенного количества")
+REGISTER_CLASS(Condition, ConditionProducedParameter, "РџР°СЂР°РјРµС‚СЂС‹\\РџР°СЂР°РјРµС‚СЂ РїСЂРѕРёР·РІРµРґРµРЅ")
+REGISTER_CLASS(Condition, ConditionProducedAllParameters, "РџР°СЂР°РјРµС‚СЂС‹\\Р’СЃРµ РїР°СЂР°РјРµС‚СЂС‹ РїСЂРѕРёР·РІРµРґРµРЅС‹")
+REGISTER_CLASS(Condition, ConditionPlayerParameters, "РџР°СЂР°РјРµС‚СЂС‹\\Р—РЅР°С‡РµРЅРёРµ РѕР±С‰РµРіРѕ РїР°СЂР°РјРµС‚СЂР°")
+REGISTER_CLASS(Condition, ConditionPercentOfPlayerResource, "РџР°СЂР°РјРµС‚СЂС‹\\РџСЂРѕС†РµРЅС‚ РѕР±С‰РµРіРѕ РїР°СЂР°РјРµС‚СЂР° РѕС‚ РµРјРєРѕСЃС‚Рё")
+REGISTER_CLASS(Condition, ConditionGetResourceLevel, "РџР°СЂР°РјРµС‚СЂС‹\\Р”РѕР±С‹РІР°РµС‚СЃСЏ СЂРµСЃСѓСЂСЃР° РІ СЃРµРєСѓРЅРґСѓ")
+REGISTER_CLASS(Condition, ConditionPercentOfMaxUnits, "РџР°СЂР°РјРµС‚СЂС‹\\РљРѕР»-РІРѕ СЋРЅРёС‚РѕРІ РјРµРЅСЊС€Рµ/Р±РѕР»СЊС€Рµ РїСЂРѕС†РµРЅС‚Р° РѕС‚ СЂР°Р·СЂРµС€РµРЅРЅРѕРіРѕ РєРѕР»РёС‡РµСЃС‚РІР°")
 
-REGISTER_CLASS(Condition, ConditionObjectByLabelExists, "Объект по метке\\Объект по метке существует")
-REGISTER_CLASS(Condition, ConditionKillObjectByLabel, "Объект по метке\\Объект по метке уничтожен")
-REGISTER_CLASS(Condition, ConditionObjectNearAnchorByLabel, "Объект по метке\\Возле якоря по метке находится объект указанного типа")
-REGISTER_CLASS(Condition, ConditionCheckSurfaceNearObjectByLabel, "Объект по метке\\Высота поверхности в радиусе объекта по метке")
+REGISTER_CLASS(Condition, ConditionObjectByLabelExists, "РћР±СЉРµРєС‚ РїРѕ РјРµС‚РєРµ\\РћР±СЉРµРєС‚ РїРѕ РјРµС‚РєРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚")
+REGISTER_CLASS(Condition, ConditionKillObjectByLabel, "РћР±СЉРµРєС‚ РїРѕ РјРµС‚РєРµ\\РћР±СЉРµРєС‚ РїРѕ РјРµС‚РєРµ СѓРЅРёС‡С‚РѕР¶РµРЅ")
+REGISTER_CLASS(Condition, ConditionObjectNearAnchorByLabel, "РћР±СЉРµРєС‚ РїРѕ РјРµС‚РєРµ\\Р’РѕР·Р»Рµ СЏРєРѕСЂСЏ РїРѕ РјРµС‚РєРµ РЅР°С…РѕРґРёС‚СЃСЏ РѕР±СЉРµРєС‚ СѓРєР°Р·Р°РЅРЅРѕРіРѕ С‚РёРїР°")
+REGISTER_CLASS(Condition, ConditionCheckSurfaceNearObjectByLabel, "РћР±СЉРµРєС‚ РїРѕ РјРµС‚РєРµ\\Р’С‹СЃРѕС‚Р° РїРѕРІРµСЂС…РЅРѕСЃС‚Рё РІ СЂР°РґРёСѓСЃРµ РѕР±СЉРµРєС‚Р° РїРѕ РјРµС‚РєРµ")
 
-REGISTER_CLASS(Condition, ConditionKeyboardClick, "Интерфейс\\Клик по клавиатуре или мыши")
-REGISTER_CLASS(Condition, ConditionClickOnButton, "Интерфейс\\Клик по кнопке")
-REGISTER_CLASS(Condition, ConditionFocusOnButton, "Интерфейс\\Мышь над кнопкой")
-REGISTER_CLASS(Condition, ConditionButtonFocus, "Интерфейс\\Кнопка получила/потеряла фокус")
-REGISTER_CLASS(Condition, ConditionUI_ControlState, "Интерфейс\\включено состояние кнопки")
-REGISTER_CLASS(Condition, ConditionUI_StringSelected, "Интерфейс\\в списке выбрана строка")
-REGISTER_CLASS(Condition, ConditionUI_ProfilesEmpty, "Интерфейс\\Список профайлов пуст")
-REGISTER_CLASS(Condition, ConditionUI_ProfileSelected, "Интерфейс\\Профайл выбран")
-REGISTER_CLASS(Condition, ConditionNeedCommitSettings, "Интерфейс\\Нужно подтвердить новые настройки")
-REGISTER_CLASS(Condition, ConditionSelected, "Интерфейс\\Селект юнита или здания")
-REGISTER_CLASS(Condition, ConditionSquadSelected, "Интерфейс\\Селект сквада")
-REGISTER_CLASS(Condition, ConditionLastNetStatus, "Интерфейс\\Последний статус работы с сетью")
-REGISTER_CLASS(Condition, ConditionUI_NeedDiskOpConfirmation, "Интерфейс\\Требуется подверждение перезаписи или удаления")
+REGISTER_CLASS(Condition, ConditionKeyboardClick, "РРЅС‚РµСЂС„РµР№СЃ\\РљР»РёРє РїРѕ РєР»Р°РІРёР°С‚СѓСЂРµ РёР»Рё РјС‹С€Рё")
+REGISTER_CLASS(Condition, ConditionClickOnButton, "РРЅС‚РµСЂС„РµР№СЃ\\РљР»РёРє РїРѕ РєРЅРѕРїРєРµ")
+REGISTER_CLASS(Condition, ConditionFocusOnButton, "РРЅС‚РµСЂС„РµР№СЃ\\РњС‹С€СЊ РЅР°Рґ РєРЅРѕРїРєРѕР№")
+REGISTER_CLASS(Condition, ConditionButtonFocus, "РРЅС‚РµСЂС„РµР№СЃ\\РљРЅРѕРїРєР° РїРѕР»СѓС‡РёР»Р°/РїРѕС‚РµСЂСЏР»Р° С„РѕРєСѓСЃ")
+REGISTER_CLASS(Condition, ConditionUI_ControlState, "РРЅС‚РµСЂС„РµР№СЃ\\РІРєР»СЋС‡РµРЅРѕ СЃРѕСЃС‚РѕСЏРЅРёРµ РєРЅРѕРїРєРё")
+REGISTER_CLASS(Condition, ConditionUI_StringSelected, "РРЅС‚РµСЂС„РµР№СЃ\\РІ СЃРїРёСЃРєРµ РІС‹Р±СЂР°РЅР° СЃС‚СЂРѕРєР°")
+REGISTER_CLASS(Condition, ConditionUI_ProfilesEmpty, "РРЅС‚РµСЂС„РµР№СЃ\\РЎРїРёСЃРѕРє РїСЂРѕС„Р°Р№Р»РѕРІ РїСѓСЃС‚")
+REGISTER_CLASS(Condition, ConditionUI_ProfileSelected, "РРЅС‚РµСЂС„РµР№СЃ\\РџСЂРѕС„Р°Р№Р» РІС‹Р±СЂР°РЅ")
+REGISTER_CLASS(Condition, ConditionNeedCommitSettings, "РРЅС‚РµСЂС„РµР№СЃ\\РќСѓР¶РЅРѕ РїРѕРґС‚РІРµСЂРґРёС‚СЊ РЅРѕРІС‹Рµ РЅР°СЃС‚СЂРѕР№РєРё")
+REGISTER_CLASS(Condition, ConditionSelected, "РРЅС‚РµСЂС„РµР№СЃ\\РЎРµР»РµРєС‚ СЋРЅРёС‚Р° РёР»Рё Р·РґР°РЅРёСЏ")
+REGISTER_CLASS(Condition, ConditionSquadSelected, "РРЅС‚РµСЂС„РµР№СЃ\\РЎРµР»РµРєС‚ СЃРєРІР°РґР°")
+REGISTER_CLASS(Condition, ConditionLastNetStatus, "РРЅС‚РµСЂС„РµР№СЃ\\РџРѕСЃР»РµРґРЅРёР№ СЃС‚Р°С‚СѓСЃ СЂР°Р±РѕС‚С‹ СЃ СЃРµС‚СЊСЋ")
+REGISTER_CLASS(Condition, ConditionUI_NeedDiskOpConfirmation, "РРЅС‚РµСЂС„РµР№СЃ\\РўСЂРµР±СѓРµС‚СЃСЏ РїРѕРґРІРµСЂР¶РґРµРЅРёРµ РїРµСЂРµР·Р°РїРёСЃРё РёР»Рё СѓРґР°Р»РµРЅРёСЏ")
 
-REGISTER_CLASS(Condition, ConditionUnableToBuild, "Событийные условия\\АИ не смог построить здание")
-REGISTER_CLASS(Condition, ConditionCommandMove, "Событийные условия\\Юниту отдана команда двигаться")
-REGISTER_CLASS(Condition, ConditionCommandMoveSquad, "Событийные условия\\Скваду отдана команда двигаться")
-REGISTER_CLASS(Condition, ConditionCommandAttack, "Событийные условия\\Юниту отдана команда атаковать")
-REGISTER_CLASS_CONVERSION(Condition, ConditionObjectAttacking, "Событийные условия\\Объект атакует", "class ConditionBuildingAttacking")
-REGISTER_CLASS(Condition, ConditionObjectByLabelAttacking, "Событийные условия\\Объект по метке атакует")
-REGISTER_CLASS(Condition, ConditionCommandAttackSquad, "Событийные условия\\Скваду отдана команда атаковать")
-REGISTER_CLASS(Condition, ConditionCaptureBuilding, "Событийные условия\\Юнит захвачен")
-REGISTER_CLASS(Condition, ConditionStartUpgrade, "Событийные условия\\Апгрейд начат")
-REGISTER_CLASS(Condition, ConditionCompleteUpgrade, "Событийные условия\\Апгрейд завершен")
-REGISTER_CLASS(Condition, ConditionSoldBuilding, "Событийные условия\\Здание продано")
-REGISTER_CLASS(Condition, ConditionStartProduction, "Событийные условия\\Производство юнита начато")
-REGISTER_CLASS(Condition, ConditionStartProductionParameter, "Событийные условия\\Производство параметров юнитом начато")
-REGISTER_CLASS(Condition, ConditionStartBuild, "Событийные условия\\Строительство здания началось")
-REGISTER_CLASS(Condition, ConditionCompleteBuild, "Событийные условия\\Строительство здания завершилось")
-REGISTER_CLASS(Condition, ConditionCompleteCure, "Событийные условия\\Ремонт объекта завершен")
-REGISTER_CLASS(Condition, ConditionCheckResource, "Событийные условия\\Нехватка ресурса")
-REGISTER_CLASS(Condition, ConditionCreateSource, "Событийные условия\\Источник создан")
-REGISTER_CLASS(Condition, ConditionSourceActivated, "Событийные условия\\Источник по метке активирован")
-REGISTER_CLASS(Condition, ConditionCreateObject, "Событийные условия\\Объект создан")
-REGISTER_CLASS(Condition, ConditionKillObject, "Событийные условия\\Объект уничтожен")
-REGISTER_CLASS(Condition, ConditionProduceParameterFinish, "Событийные условия\\Параметер произведен")
-REGISTER_CLASS(Condition, ConditionRequestedAssembly, "Событийные условия\\Союзник запросил поддержку")
+REGISTER_CLASS(Condition, ConditionUnableToBuild, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РђР РЅРµ СЃРјРѕРі РїРѕСЃС‚СЂРѕРёС‚СЊ Р·РґР°РЅРёРµ")
+REGISTER_CLASS(Condition, ConditionCommandMove, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р®РЅРёС‚Сѓ РѕС‚РґР°РЅР° РєРѕРјР°РЅРґР° РґРІРёРіР°С‚СЊСЃСЏ")
+REGISTER_CLASS(Condition, ConditionCommandMoveSquad, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РЎРєРІР°РґСѓ РѕС‚РґР°РЅР° РєРѕРјР°РЅРґР° РґРІРёРіР°С‚СЊСЃСЏ")
+REGISTER_CLASS(Condition, ConditionCommandAttack, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р®РЅРёС‚Сѓ РѕС‚РґР°РЅР° РєРѕРјР°РЅРґР° Р°С‚Р°РєРѕРІР°С‚СЊ")
+REGISTER_CLASS_CONVERSION(Condition, ConditionObjectAttacking, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РћР±СЉРµРєС‚ Р°С‚Р°РєСѓРµС‚", "class ConditionBuildingAttacking")
+REGISTER_CLASS(Condition, ConditionObjectByLabelAttacking, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РћР±СЉРµРєС‚ РїРѕ РјРµС‚РєРµ Р°С‚Р°РєСѓРµС‚")
+REGISTER_CLASS(Condition, ConditionCommandAttackSquad, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РЎРєРІР°РґСѓ РѕС‚РґР°РЅР° РєРѕРјР°РЅРґР° Р°С‚Р°РєРѕРІР°С‚СЊ")
+REGISTER_CLASS(Condition, ConditionCaptureBuilding, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р®РЅРёС‚ Р·Р°С…РІР°С‡РµРЅ")
+REGISTER_CLASS(Condition, ConditionStartUpgrade, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РђРїРіСЂРµР№Рґ РЅР°С‡Р°С‚")
+REGISTER_CLASS(Condition, ConditionCompleteUpgrade, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РђРїРіСЂРµР№Рґ Р·Р°РІРµСЂС€РµРЅ")
+REGISTER_CLASS(Condition, ConditionSoldBuilding, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р—РґР°РЅРёРµ РїСЂРѕРґР°РЅРѕ")
+REGISTER_CLASS(Condition, ConditionStartProduction, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РџСЂРѕРёР·РІРѕРґСЃС‚РІРѕ СЋРЅРёС‚Р° РЅР°С‡Р°С‚Рѕ")
+REGISTER_CLASS(Condition, ConditionStartProductionParameter, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РџСЂРѕРёР·РІРѕРґСЃС‚РІРѕ РїР°СЂР°РјРµС‚СЂРѕРІ СЋРЅРёС‚РѕРј РЅР°С‡Р°С‚Рѕ")
+REGISTER_CLASS(Condition, ConditionStartBuild, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РЎС‚СЂРѕРёС‚РµР»СЊСЃС‚РІРѕ Р·РґР°РЅРёСЏ РЅР°С‡Р°Р»РѕСЃСЊ")
+REGISTER_CLASS(Condition, ConditionCompleteBuild, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РЎС‚СЂРѕРёС‚РµР»СЊСЃС‚РІРѕ Р·РґР°РЅРёСЏ Р·Р°РІРµСЂС€РёР»РѕСЃСЊ")
+REGISTER_CLASS(Condition, ConditionCompleteCure, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\Р РµРјРѕРЅС‚ РѕР±СЉРµРєС‚Р° Р·Р°РІРµСЂС€РµРЅ")
+REGISTER_CLASS(Condition, ConditionCheckResource, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РќРµС…РІР°С‚РєР° СЂРµСЃСѓСЂСЃР°")
+REGISTER_CLASS(Condition, ConditionCreateSource, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РСЃС‚РѕС‡РЅРёРє СЃРѕР·РґР°РЅ")
+REGISTER_CLASS(Condition, ConditionSourceActivated, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РСЃС‚РѕС‡РЅРёРє РїРѕ РјРµС‚РєРµ Р°РєС‚РёРІРёСЂРѕРІР°РЅ")
+REGISTER_CLASS(Condition, ConditionCreateObject, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РћР±СЉРµРєС‚ СЃРѕР·РґР°РЅ")
+REGISTER_CLASS(Condition, ConditionKillObject, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РћР±СЉРµРєС‚ СѓРЅРёС‡С‚РѕР¶РµРЅ")
+REGISTER_CLASS(Condition, ConditionProduceParameterFinish, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РџР°СЂР°РјРµС‚РµСЂ РїСЂРѕРёР·РІРµРґРµРЅ")
+REGISTER_CLASS(Condition, ConditionRequestedAssembly, "РЎРѕР±С‹С‚РёР№РЅС‹Рµ СѓСЃР»РѕРІРёСЏ\\РЎРѕСЋР·РЅРёРє Р·Р°РїСЂРѕСЃРёР» РїРѕРґРґРµСЂР¶РєСѓ")
 
 SECUROM_MARKER_HIGH_SECURITY_OFF(3);
 }
 
 /////////////////////////////////////////////////////
 BEGIN_ENUM_DESCRIPTOR(ScopeType, "ScopeType")
-REGISTER_ENUM(SCOPE_GLOBAL, "Глобальная переменная (сохраняется между миссиями, но не записывается)")
-REGISTER_ENUM(SCOPE_PROFILE, "Переменная профиля текущего игрока (сохраняется между миссиями, записывается)")
-REGISTER_ENUM(SCOPE_PLAYER, "Переменная текущего игрока (существует в течении миссии, записывается в игровой сейв)")
-REGISTER_ENUM(SCOPE_UNIVERSE, "Переменная текущего мира (существует в течении миссии, записывается в игровой сейв)")
-REGISTER_ENUM(SCOPE_MISSION_DESCRIPTION, "Переменная описания миссии (0 - 31)")
+REGISTER_ENUM(SCOPE_GLOBAL, "Р“Р»РѕР±Р°Р»СЊРЅР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ (СЃРѕС…СЂР°РЅСЏРµС‚СЃСЏ РјРµР¶РґСѓ РјРёСЃСЃРёСЏРјРё, РЅРѕ РЅРµ Р·Р°РїРёСЃС‹РІР°РµС‚СЃСЏ)")
+REGISTER_ENUM(SCOPE_PROFILE, "РџРµСЂРµРјРµРЅРЅР°СЏ РїСЂРѕС„РёР»СЏ С‚РµРєСѓС‰РµРіРѕ РёРіСЂРѕРєР° (СЃРѕС…СЂР°РЅСЏРµС‚СЃСЏ РјРµР¶РґСѓ РјРёСЃСЃРёСЏРјРё, Р·Р°РїРёСЃС‹РІР°РµС‚СЃСЏ)")
+REGISTER_ENUM(SCOPE_PLAYER, "РџРµСЂРµРјРµРЅРЅР°СЏ С‚РµРєСѓС‰РµРіРѕ РёРіСЂРѕРєР° (СЃСѓС‰РµСЃС‚РІСѓРµС‚ РІ С‚РµС‡РµРЅРёРё РјРёСЃСЃРёРё, Р·Р°РїРёСЃС‹РІР°РµС‚СЃСЏ РІ РёРіСЂРѕРІРѕР№ СЃРµР№РІ)")
+REGISTER_ENUM(SCOPE_UNIVERSE, "РџРµСЂРµРјРµРЅРЅР°СЏ С‚РµРєСѓС‰РµРіРѕ РјРёСЂР° (СЃСѓС‰РµСЃС‚РІСѓРµС‚ РІ С‚РµС‡РµРЅРёРё РјРёСЃСЃРёРё, Р·Р°РїРёСЃС‹РІР°РµС‚СЃСЏ РІ РёРіСЂРѕРІРѕР№ СЃРµР№РІ)")
+REGISTER_ENUM(SCOPE_MISSION_DESCRIPTION, "РџРµСЂРµРјРµРЅРЅР°СЏ РѕРїРёСЃР°РЅРёСЏ РјРёСЃСЃРёРё (0 - 31)")
 END_ENUM_DESCRIPTOR(ScopeType)
 
 BEGIN_ENUM_DESCRIPTOR(CompareOperator, "CompareOperator")
-REGISTER_ENUM(COMPARE_LESS, "Меньше")
-REGISTER_ENUM(COMPARE_LESS_EQ, "Меньше либо равно")
-REGISTER_ENUM(COMPARE_EQ, "Равно")
-REGISTER_ENUM(COMPARE_NOT_EQ, "Не равно")
-REGISTER_ENUM(COMPARE_GREATER, "Больше")
-REGISTER_ENUM(COMPARE_GREATER_EQ, "Больше либо равно")
+REGISTER_ENUM(COMPARE_LESS, "РњРµРЅСЊС€Рµ")
+REGISTER_ENUM(COMPARE_LESS_EQ, "РњРµРЅСЊС€Рµ Р»РёР±Рѕ СЂР°РІРЅРѕ")
+REGISTER_ENUM(COMPARE_EQ, "Р Р°РІРЅРѕ")
+REGISTER_ENUM(COMPARE_NOT_EQ, "РќРµ СЂР°РІРЅРѕ")
+REGISTER_ENUM(COMPARE_GREATER, "Р‘РѕР»СЊС€Рµ")
+REGISTER_ENUM(COMPARE_GREATER_EQ, "Р‘РѕР»СЊС€Рµ Р»РёР±Рѕ СЂР°РІРЅРѕ")
 END_ENUM_DESCRIPTOR(CompareOperator)
 
 BEGIN_ENUM_DESCRIPTOR(UnitsConstruction, "UnitsConstruction")
-REGISTER_ENUM(CONSTRUCTED, "Построенные")
-REGISTER_ENUM(CONSTRUCTING, "Строящиеся")
+REGISTER_ENUM(CONSTRUCTED, "РџРѕСЃС‚СЂРѕРµРЅРЅС‹Рµ")
+REGISTER_ENUM(CONSTRUCTING, "РЎС‚СЂРѕСЏС‰РёРµСЃСЏ")
 END_ENUM_DESCRIPTOR(UnitsConstruction)
 
 BEGIN_ENUM_DESCRIPTOR(UnitsTransformation, "UnitsTransformation")
-REGISTER_ENUM(UNIT_STATE_CONSTRUCTED, "Построенные")
-REGISTER_ENUM(UNIT_STATE_CONSTRUCTING, "Строящиеся")
-REGISTER_ENUM(UNIT_STATE_UPGRADING, "Апгрейдищиеся")
+REGISTER_ENUM(UNIT_STATE_CONSTRUCTED, "РџРѕСЃС‚СЂРѕРµРЅРЅС‹Рµ")
+REGISTER_ENUM(UNIT_STATE_CONSTRUCTING, "РЎС‚СЂРѕСЏС‰РёРµСЃСЏ")
+REGISTER_ENUM(UNIT_STATE_UPGRADING, "РђРїРіСЂРµР№РґРёС‰РёРµСЃСЏ")
 END_ENUM_DESCRIPTOR(UnitsTransformation)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ConditionObjectUnderAttack, WeaponType, "WeaponType")
-REGISTER_ENUM_ENCLOSED(ConditionObjectUnderAttack, SHORT_RANGE, "Ближний бой")
-REGISTER_ENUM_ENCLOSED(ConditionObjectUnderAttack, LONG_RANGE, "Дальний бой")
-REGISTER_ENUM_ENCLOSED(ConditionObjectUnderAttack, FROM_INTERFACE, "Из интерфейса")
-REGISTER_ENUM_ENCLOSED(ConditionObjectUnderAttack, ANY_TYPE, "Любой тип")
+REGISTER_ENUM_ENCLOSED(ConditionObjectUnderAttack, SHORT_RANGE, "Р‘Р»РёР¶РЅРёР№ Р±РѕР№")
+REGISTER_ENUM_ENCLOSED(ConditionObjectUnderAttack, LONG_RANGE, "Р”Р°Р»СЊРЅРёР№ Р±РѕР№")
+REGISTER_ENUM_ENCLOSED(ConditionObjectUnderAttack, FROM_INTERFACE, "РР· РёРЅС‚РµСЂС„РµР№СЃР°")
+REGISTER_ENUM_ENCLOSED(ConditionObjectUnderAttack, ANY_TYPE, "Р›СЋР±РѕР№ С‚РёРї")
 END_ENUM_DESCRIPTOR_ENCLOSED(ConditionObjectUnderAttack, WeaponType)
 
 BEGIN_ENUM_DESCRIPTOR(Activity, "Activity")
-REGISTER_ENUM(ACTIVITY_PRODUCING, "Производит что-то")
-REGISTER_ENUM(ACTIVITY_CONSTRUCTING, "Строится сам")
-REGISTER_ENUM(ACTIVITY_BUILDING, "Cтроит что-то")
-REGISTER_ENUM(ACTIVITY_MOVING, "Двигается куда-то")
-REGISTER_ENUM(ACTIVITY_UPGRADING, "Апгрейдится")
-REGISTER_ENUM(ACTIVITY_PICKING_RESOURCE, "Собирает ресурс")
-REGISTER_ENUM(ACTIVITY_TELEPORTATING, "Телепортируется")
-REGISTER_ENUM(ACTIVITY_ATTACKING, "Атакует")
-REGISTER_ENUM(ACTIVITY_MOVING_TO_TRANSPORT, "Садится в транспорт")
-REGISTER_ENUM(ACTIVITY_WAITING_FOR_PASSENGER, "Ожидает пассажира")
+REGISTER_ENUM(ACTIVITY_PRODUCING, "РџСЂРѕРёР·РІРѕРґРёС‚ С‡С‚Рѕ-С‚Рѕ")
+REGISTER_ENUM(ACTIVITY_CONSTRUCTING, "РЎС‚СЂРѕРёС‚СЃСЏ СЃР°Рј")
+REGISTER_ENUM(ACTIVITY_BUILDING, "CС‚СЂРѕРёС‚ С‡С‚Рѕ-С‚Рѕ")
+REGISTER_ENUM(ACTIVITY_MOVING, "Р”РІРёРіР°РµС‚СЃСЏ РєСѓРґР°-С‚Рѕ")
+REGISTER_ENUM(ACTIVITY_UPGRADING, "РђРїРіСЂРµР№РґРёС‚СЃСЏ")
+REGISTER_ENUM(ACTIVITY_PICKING_RESOURCE, "РЎРѕР±РёСЂР°РµС‚ СЂРµСЃСѓСЂСЃ")
+REGISTER_ENUM(ACTIVITY_TELEPORTATING, "РўРµР»РµРїРѕСЂС‚РёСЂСѓРµС‚СЃСЏ")
+REGISTER_ENUM(ACTIVITY_ATTACKING, "РђС‚Р°РєСѓРµС‚")
+REGISTER_ENUM(ACTIVITY_MOVING_TO_TRANSPORT, "РЎР°РґРёС‚СЃСЏ РІ С‚СЂР°РЅСЃРїРѕСЂС‚")
+REGISTER_ENUM(ACTIVITY_WAITING_FOR_PASSENGER, "РћР¶РёРґР°РµС‚ РїР°СЃСЃР°Р¶РёСЂР°")
 END_ENUM_DESCRIPTOR(Activity)
 
 /////////////////////////////////////////////////////
@@ -250,10 +250,10 @@ ConditionContext::ConditionContext()
 void ConditionCheckSurfaceNearObjectByLabel::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(anchor_, "|anchor|label", "Метка якоря");
-	ar.serialize(radius_, "radius", "Радиус");
-	ar.serialize(compareOperator_, "compareOperator", "Оператор сравнения");
-	ar.serialize(height_, "height", "Высота");
+	ar.serialize(anchor_, "|anchor|label", "РњРµС‚РєР° СЏРєРѕСЂСЏ");
+	ar.serialize(radius_, "radius", "Р Р°РґРёСѓСЃ");
+	ar.serialize(compareOperator_, "compareOperator", "РћРїРµСЂР°С‚РѕСЂ СЃСЂР°РІРЅРµРЅРёСЏ");
+	ar.serialize(height_, "height", "Р’С‹СЃРѕС‚Р°");
 }
 
 ConditionCheckSurfaceNearObjectByLabel::ConditionCheckSurfaceNearObjectByLabel()
@@ -266,7 +266,7 @@ ConditionCheckSurfaceNearObjectByLabel::ConditionCheckSurfaceNearObjectByLabel()
 bool ConditionCheckSurfaceNearObjectByLabel::check() const
 {
 	if(!anchor_){
-		xassertStr(0 && "Якорь по метке не найден: ", anchor_.c_str());
+		xassertStr(0 && "РЇРєРѕСЂСЊ РїРѕ РјРµС‚РєРµ РЅРµ РЅР°Р№РґРµРЅ: ", anchor_.c_str());
 		return false;
 	}												
 	else{
@@ -313,10 +313,10 @@ ConditionCheckUnitsInTransport::ConditionCheckUnitsInTransport()
 void ConditionCheckUnitsInTransport::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(units_, "units", "Типы юнитов(в транспорте)");
+	ar.serialize(units_, "units", "РўРёРїС‹ СЋРЅРёС‚РѕРІ(РІ С‚СЂР°РЅСЃРїРѕСЂС‚Рµ)");
 	removeZeros(units_);
-	ar.serialize(compareOperator_, "compareOperator_", "Критерий сравнения");
-    ar.serialize(count_, "count_", "Общее количество");
+	ar.serialize(compareOperator_, "compareOperator_", "РљСЂРёС‚РµСЂРёР№ СЃСЂР°РІРЅРµРЅРёСЏ");
+    ar.serialize(count_, "count_", "РћР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ");
 }
 
 bool ConditionCheckUnitsInTransport::check(UnitActing* unit) const
@@ -417,7 +417,7 @@ void ConditionCheckSurface::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 	int angle = round(R2G(acosf(deviationCosMin_)));
-	ar.serialize(angle, "angleMax", "Максимальное отклонение, градусы");
+	ar.serialize(angle, "angleMax", "РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ РѕС‚РєР»РѕРЅРµРЅРёРµ, РіСЂР°РґСѓСЃС‹");
 	deviationCosMin_ = cosf(G2R(angle));
 }
 
@@ -429,7 +429,7 @@ ConditionCheckSurfaceProducedZone::ConditionCheckSurfaceProducedZone()
 void ConditionCheckSurfaceProducedZone::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(percent_, "percent", "Процент разрушения");
+	ar.serialize(percent_, "percent", "РџСЂРѕС†РµРЅС‚ СЂР°Р·СЂСѓС€РµРЅРёСЏ");
 }
 
 bool ConditionCheckSurfaceProducedZone::check(UnitActing* unit) const
@@ -457,7 +457,7 @@ bool ConditionCheckSurfaceProducedZone::check(UnitActing* unit) const
 bool ConditionUnderWater::check() const
 {
 	if(!anchor_){
-		xassertStr(0 && "Метка не найдена", anchor_.c_str());
+		xassertStr(0 && "РњРµС‚РєР° РЅРµ РЅР°Р№РґРµРЅР°", anchor_.c_str());
 		return false;
 	}
 	if(onlyDeep_)
@@ -475,17 +475,17 @@ ConditionUnderWater::ConditionUnderWater()
 void ConditionUnderWater::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(anchor_, "|anchor|label", "Метка якоря");
-	ar.serialize(radius_, "radius", "Радиус");
-	ar.serialize(onlyDeep_, "onlyDeep", "Учитывать только глубокую воду");
+	ar.serialize(anchor_, "|anchor|label", "РњРµС‚РєР° СЏРєРѕСЂСЏ");
+	ar.serialize(radius_, "radius", "Р Р°РґРёСѓСЃ");
+	ar.serialize(onlyDeep_, "onlyDeep", "РЈС‡РёС‚С‹РІР°С‚СЊ С‚РѕР»СЊРєРѕ РіР»СѓР±РѕРєСѓСЋ РІРѕРґСѓ");
 }
 
 void ConditionObjectUnseen::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(attrItem, "attrItem", "Тип предмета");
-	ar.serialize(compareOperator, "compareOperator", "Условие сравнения");
-	ar.serialize(percent, "percent", "Процент");
+	ar.serialize(attrItem, "attrItem", "РўРёРї РїСЂРµРґРјРµС‚Р°");
+	ar.serialize(compareOperator, "compareOperator", "РЈСЃР»РѕРІРёРµ СЃСЂР°РІРЅРµРЅРёСЏ");
+	ar.serialize(percent, "percent", "РџСЂРѕС†РµРЅС‚");
 }
 
 ConditionCheckResource::ConditionCheckResource() 
@@ -510,8 +510,8 @@ bool ConditionUnitInTransport::check(UnitActing* unit) const
 void ConditionCheckResource::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(parameterType, "parameterType", "Тип ресурса");
-	ar.serialize(requestResourceType, "requestResourceType", "Причина нехватки");
+	ar.serialize(parameterType, "parameterType", "РўРёРї СЂРµСЃСѓСЂСЃР°");
+	ar.serialize(requestResourceType, "requestResourceType", "РџСЂРёС‡РёРЅР° РЅРµС…РІР°С‚РєРё");
 }
 
 bool ConditionPercentOfMaxUnits::check() const
@@ -522,9 +522,9 @@ bool ConditionPercentOfMaxUnits::check() const
 void ConditionPercentOfMaxUnits::serialize(Archive &ar)
 {
 	__super::serialize(ar);
-	ar.serialize(type_, "|type|typeRef", "Тип максимального количества юнитов");
-	ar.serialize(compareOperator, "compareOperator", "&Условие сравнения");
-	ar.serialize(percent, "percent", "&Процент от максимального кол-ва");
+	ar.serialize(type_, "|type|typeRef", "РўРёРї РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ РєРѕР»РёС‡РµСЃС‚РІР° СЋРЅРёС‚РѕРІ");
+	ar.serialize(compareOperator, "compareOperator", "&РЈСЃР»РѕРІРёРµ СЃСЂР°РІРЅРµРЅРёСЏ");
+	ar.serialize(percent, "percent", "&РџСЂРѕС†РµРЅС‚ РѕС‚ РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ РєРѕР»-РІР°");
 }
 
 ConditionObjectDemaged::ConditionObjectDemaged()
@@ -541,8 +541,8 @@ bool ConditionObjectDemaged::check(UnitActing* unit) const
 void ConditionObjectDemaged::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(parameterType_, "parameterType", "Тип параметра");
-	ar.serialize(percent_, "percent", "Процент");
+	ar.serialize(parameterType_, "parameterType", "РўРёРї РїР°СЂР°РјРµС‚СЂР°");
+	ar.serialize(percent_, "percent", "РџСЂРѕС†РµРЅС‚");
 }
 
 ConditionPlayerWin::ConditionPlayerWin()
@@ -573,7 +573,7 @@ bool ConditionPlayerWin::check() const
 void ConditionPlayerWin::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(checkAuxPlayers, "checkAuxPlayers", "Учитывать служебных игроков");
+	ar.serialize(checkAuxPlayers, "checkAuxPlayers", "РЈС‡РёС‚С‹РІР°С‚СЊ СЃР»СѓР¶РµР±РЅС‹С… РёРіСЂРѕРєРѕРІ");
 }
 
 bool ConditionPlayerDefeat::check() const
@@ -597,11 +597,11 @@ ConditionObjectPercentOwner::ConditionObjectPercentOwner()
 void ConditionObjectPercentOwner::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(attrSet, "attrSet", "Множество типов");
+	ar.serialize(attrSet, "attrSet", "РњРЅРѕР¶РµСЃС‚РІРѕ С‚РёРїРѕРІ");
 	removeZeros(attrSet);
-	ar.serialize(compareOperator, "compareOperator", "Критерий сравнения");
-	ar.serialize(percent, "percent", "Процент объектов");
-	ar.serialize(countFriends, "countFriends", "Считать союзников");
+	ar.serialize(compareOperator, "compareOperator", "РљСЂРёС‚РµСЂРёР№ СЃСЂР°РІРЅРµРЅРёСЏ");
+	ar.serialize(percent, "percent", "РџСЂРѕС†РµРЅС‚ РѕР±СЉРµРєС‚РѕРІ");
+	ar.serialize(countFriends, "countFriends", "РЎС‡РёС‚Р°С‚СЊ СЃРѕСЋР·РЅРёРєРѕРІ");
 }
 
 bool ConditionObjectPercentOwner::check() const
@@ -629,24 +629,24 @@ bool ConditionObjectPercentOwner::check() const
 void ConditionCreateObject::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(objects_, "objects_", "&Типы объектов");
+	ar.serialize(objects_, "objects_", "&РўРёРїС‹ РѕР±СЉРµРєС‚РѕРІ");
 	removeZeros(objects_);
-	ar.serialize(playerType, "playerType", "&Игрок");
+	ar.serialize(playerType, "playerType", "&РРіСЂРѕРє");
 }
 
 void ConditionUnableToBuild::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(objects_, "objects_", "&Типы зданий");
+	ar.serialize(objects_, "objects_", "&РўРёРїС‹ Р·РґР°РЅРёР№");
 	removeZeros(objects_);
 }
 
 void ConditionKillObject::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(objects_, "objects_", "&Типы объектов");
+	ar.serialize(objects_, "objects_", "&РўРёРїС‹ РѕР±СЉРµРєС‚РѕРІ");
 	removeZeros(objects_);
-	ar.serialize(playerType, "playerType", "&Игрок");
+	ar.serialize(playerType, "playerType", "&РРіСЂРѕРє");
 }
 ConditionBuildingsConnectedToZone::ConditionBuildingsConnectedToZone()
 {
@@ -665,7 +665,7 @@ bool ConditionObjectUnderShield::check(UnitActing* unit) const
 void ConditionAllBuildingsConnected::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(objects, "objects", "&Объекты");
+	ar.serialize(objects, "objects", "&РћР±СЉРµРєС‚С‹");
 	removeZeros(objects);
 }
 
@@ -698,11 +698,11 @@ bool ConditionAllBuildingsConnected::check() const
 void ConditionBuildingsConnectedToZone::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(objects, "objects", "&Объекты");
+	ar.serialize(objects, "objects", "&РћР±СЉРµРєС‚С‹");
 	removeZeros(objects);
-	ar.serialize(counter, "counter", "&Количество общее");
-	ar.serialize(compareOperator, "compareOperator", "Критерий сравнения");
-	ar.serialize(playerType, "playerType", "&Владелец объектов");
+	ar.serialize(counter, "counter", "&РљРѕР»РёС‡РµСЃС‚РІРѕ РѕР±С‰РµРµ");
+	ar.serialize(compareOperator, "compareOperator", "РљСЂРёС‚РµСЂРёР№ СЃСЂР°РІРЅРµРЅРёСЏ");
+	ar.serialize(playerType, "playerType", "&Р’Р»Р°РґРµР»РµС† РѕР±СЉРµРєС‚РѕРІ");
 }
 
 int ConditionBuildingsConnectedToZone::countBuildingsConnected(const Player* player, const AttributeBase* building) const
@@ -770,21 +770,21 @@ ConditionObjectsExists::ConditionObjectsExists()
 void ConditionObjectsExists::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(objects, "objects", "&Объекты");
+	ar.serialize(objects, "objects", "&РћР±СЉРµРєС‚С‹");
 	removeZeros(objects);
-	ar.serialize(counter, "counter", "&Количество общее");
-	ar.serialize(compareOperator, "compareOperator", "Критерий сравнения");
-	ar.serialize(playerType, "playerType", "&Владелец объектов");
-	ar.serialize(constructedAndConstructing, "constructedAndConstructing", "Построенные или недостроенные");
+	ar.serialize(counter, "counter", "&РљРѕР»РёС‡РµСЃС‚РІРѕ РѕР±С‰РµРµ");
+	ar.serialize(compareOperator, "compareOperator", "РљСЂРёС‚РµСЂРёР№ СЃСЂР°РІРЅРµРЅРёСЏ");
+	ar.serialize(playerType, "playerType", "&Р’Р»Р°РґРµР»РµС† РѕР±СЉРµРєС‚РѕРІ");
+	ar.serialize(constructedAndConstructing, "constructedAndConstructing", "РџРѕСЃС‚СЂРѕРµРЅРЅС‹Рµ РёР»Рё РЅРµРґРѕСЃС‚СЂРѕРµРЅРЅС‹Рµ");
 }
 
 void ConditionCaptureBuilding::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(playerType_, "playerType", "Текущий игрок");
-	ar.serialize(objects_, "objects_", "&Типы юнитов");
+	ar.serialize(playerType_, "playerType", "РўРµРєСѓС‰РёР№ РёРіСЂРѕРє");
+	ar.serialize(objects_, "objects_", "&РўРёРїС‹ СЋРЅРёС‚РѕРІ");
 	removeZeros(objects_);
-	ar.serialize(participators_, "participators", "Участники захвата"); 
+	ar.serialize(participators_, "participators", "РЈС‡Р°СЃС‚РЅРёРєРё Р·Р°С…РІР°С‚Р°"); 
 }
 
 void ConditionProduceParameterFinish::serialize(Archive& ar) 
@@ -792,7 +792,7 @@ void ConditionProduceParameterFinish::serialize(Archive& ar)
 	__super::serialize(ar);
 	if(ar.isOutput() && ar.isEdit())
 		signalVariable.setComboList(editSignalVariableDialog().c_str());
-	ar.serialize(signalVariable, "signalVariable", "&Имя сигнальной переменной параметра");
+	ar.serialize(signalVariable, "signalVariable", "&РРјСЏ СЃРёРіРЅР°Р»СЊРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ РїР°СЂР°РјРµС‚СЂР°");
 }
 
 void ConditionProducedParameter::serialize(Archive& ar) 
@@ -800,8 +800,8 @@ void ConditionProducedParameter::serialize(Archive& ar)
 	__super::serialize(ar);
 	if(ar.isOutput() && ar.isEdit())
 		signalVariable_.setComboList(editSignalVariableDialog().c_str());
-	ar.serialize(signalVariable_, "signalVariable", "&Имя сигнальной переменной");
-	ar.serialize(playerScanner_, "playerScanner", "Игрок");
+	ar.serialize(signalVariable_, "signalVariable", "&РРјСЏ СЃРёРіРЅР°Р»СЊРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№");
+	ar.serialize(playerScanner_, "playerScanner", "РРіСЂРѕРє");
 }
 
 void ConditionProduceParameterFinish::checkEvent(const Event& event)
@@ -826,30 +826,30 @@ bool ConditionProducedParameter::check() const
 void ConditionObjectByLabelExists::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(anchor_, "|anchor|label", "&Метка объекта");
+	ar.serialize(anchor_, "|anchor|label", "&РњРµС‚РєР° РѕР±СЉРµРєС‚Р°");
 }
 
 void ConditionKillObjectByLabel::serialize(Archive& ar) 
 { 
 	__super::serialize(ar);
-	ar.serialize(label_, "label", "&Метка объекта");
-	ar.serialize(playerType, "playerType", "&Игрок");
+	ar.serialize(label_, "label", "&РњРµС‚РєР° РѕР±СЉРµРєС‚Р°");
+	ar.serialize(playerType, "playerType", "&РРіСЂРѕРє");
 }
 
 void ConditionTimeMatched::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(time, "time", "&Время, секунды");
+	ar.serialize(time, "time", "&Р’СЂРµРјСЏ, СЃРµРєСѓРЅРґС‹");
 }
 
 void ConditionClickOnButton::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(control_, "control", "&Кнопка");
-	ar.serialize(events_, "events", "Тип клика");
-	ar.serialize(modifiers_, "modifiers", "Модификатор");
-	ar.serialize(onlyEnabled_, "onlyEnabled", "Только по разрешенной");
-	ar.serialize(ignorePause_, "ignorePause", "Работать во время паузы");
+	ar.serialize(control_, "control", "&РљРЅРѕРїРєР°");
+	ar.serialize(events_, "events", "РўРёРї РєР»РёРєР°");
+	ar.serialize(modifiers_, "modifiers", "РњРѕРґРёС„РёРєР°С‚РѕСЂ");
+	ar.serialize(onlyEnabled_, "onlyEnabled", "РўРѕР»СЊРєРѕ РїРѕ СЂР°Р·СЂРµС€РµРЅРЅРѕР№");
+	ar.serialize(ignorePause_, "ignorePause", "Р Р°Р±РѕС‚Р°С‚СЊ РІРѕ РІСЂРµРјСЏ РїР°СѓР·С‹");
 	if(ar.isInput())
 		controlPtr_ = 0;
 }
@@ -867,7 +867,7 @@ void ConditionFocusOnButton::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(control_, "control", "&Кнопка");
+	ar.serialize(control_, "control", "&РљРЅРѕРїРєР°");
 	if(ar.isInput())
 		controlPtr_ = 0;
 }
@@ -890,8 +890,8 @@ void ConditionButtonFocus::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(control_, "control", "&Кнопка");
-	ar.serialize(onFocus_, "onFocus", "&При наведении");
+	ar.serialize(control_, "control", "&РљРЅРѕРїРєР°");
+	ar.serialize(onFocus_, "onFocus", "&РџСЂРё РЅР°РІРµРґРµРЅРёРё");
 	if(ar.isInput())
 		controlPtr_ = 0;
 }
@@ -900,7 +900,7 @@ void ConditionLastNetStatus::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(status_, "status", "Статус");
+	ar.serialize(status_, "status", "РЎС‚Р°С‚СѓСЃ");
 }
 
 MissionDescriptionForTrigger::MissionDescriptionForTrigger()
@@ -909,7 +909,7 @@ MissionDescriptionForTrigger::MissionDescriptionForTrigger()
 
 void MissionDescriptionForTrigger::serialize(Archive& ar)
 {
-	ar.serialize(useLoadedMission_, "useLoadedMission", "Использовать загруженную миссию");
+	ar.serialize(useLoadedMission_, "useLoadedMission", "РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ Р·Р°РіСЂСѓР¶РµРЅРЅСѓСЋ РјРёСЃСЃРёСЋ");
 }
 
 ConditionPredefineGame::ConditionPredefineGame() 
@@ -922,8 +922,8 @@ void ConditionPredefineGame::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 	missionDescription.serialize(ar);
-	ar.serialize(scenarioGameType_, "predefineGameType", "Тип настроек игры");
-	ar.serialize(teamGameType_, "teamGameType", "Тип командной игры");
+	ar.serialize(scenarioGameType_, "predefineGameType", "РўРёРї РЅР°СЃС‚СЂРѕРµРє РёРіСЂС‹");
+	ar.serialize(teamGameType_, "teamGameType", "РўРёРї РєРѕРјР°РЅРґРЅРѕР№ РёРіСЂС‹");
 }
 
 bool ConditionPredefineGame::check() const
@@ -960,8 +960,8 @@ void ConditionUI_ControlState::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 	
-	ar.serialize(control_, "control", "&Кнопка");
-	ar.serialize(state_, "state", "&Состояние");
+	ar.serialize(control_, "control", "&РљРЅРѕРїРєР°");
+	ar.serialize(state_, "state", "&РЎРѕСЃС‚РѕСЏРЅРёРµ");
 	if(ar.isInput())
 		controlPtr_ = 0;
 }
@@ -990,10 +990,10 @@ void ConditionUI_StringSelected::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 	
-	ar.serialize(control_, "control", "&Кнопка");
-	ar.serialize(anyStringSelected_, "anyStringSelected", "Любая строка выбрана");
+	ar.serialize(control_, "control", "&РљРЅРѕРїРєР°");
+	ar.serialize(anyStringSelected_, "anyStringSelected", "Р›СЋР±Р°СЏ СЃС‚СЂРѕРєР° РІС‹Р±СЂР°РЅР°");
 	if(!anyStringSelected_)
-		ar.serialize(selectedStringIndex_, "selectedStringIndex", "Индекс выбранной строки");
+		ar.serialize(selectedStringIndex_, "selectedStringIndex", "РРЅРґРµРєСЃ РІС‹Р±СЂР°РЅРЅРѕР№ СЃС‚СЂРѕРєРё");
 	if(ar.isInput())
 		controlPtr_ = 0;
 }
@@ -1022,7 +1022,7 @@ bool ConditionNeedCommitSettings::check() const
 void ConditionDifficultyLevel::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(difficulty, "difficulty", "&Уровень");
+	ar.serialize(difficulty, "difficulty", "&РЈСЂРѕРІРµРЅСЊ");
 }
 
 //---------------------------------------
@@ -1104,7 +1104,7 @@ bool ConditionCheckRace::check() const
 void ConditionCheckRace::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(race, "race", "&Раса");
+	ar.serialize(race, "race", "&Р Р°СЃР°");
 }
 
 bool ConditionObjectsExists::check() const 
@@ -1232,8 +1232,8 @@ ConditionCheckSourceNearUnit::ConditionCheckSourceNearUnit()
 void ConditionCheckSourceNearUnit::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(sources_, "sources", "Типы источников");
-	ar.serialize(radius_, "radius", "Радиус");
+	ar.serialize(sources_, "sources", "РўРёРїС‹ РёСЃС‚РѕС‡РЅРёРєРѕРІ");
+	ar.serialize(radius_, "radius", "Р Р°РґРёСѓСЃ");
 }
 
 bool ConditionCheckSourceNearUnit::check(UnitActing* unit) const
@@ -1259,7 +1259,7 @@ void ConditionCheckSourceNearUnit::operator()(SourceBase* source) const
 void ConditionSourceActivated::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(source_, "source", "Источник");
+	ar.serialize(source_, "source", "РСЃС‚РѕС‡РЅРёРє");
 }
 
 void ConditionSourceActivated::checkEvent(const Event& event)
@@ -1274,7 +1274,7 @@ void ConditionSourceActivated::checkEvent(const Event& event)
 void ConditionCreateSource::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(sourceref, "sourceref", "Тип источника");
+	ar.serialize(sourceref, "sourceref", "РўРёРї РёСЃС‚РѕС‡РЅРёРєР°");
 }
 
 void ConditionCreateSource::checkEvent(const Event& event)
@@ -1332,7 +1332,7 @@ void ConditionUnitSelecting::serialize(Archive& ar)
 		unitState_ |= UNIT_STATE_UPGRADING;
 	}
 	else
-		ar.serialize(unitState_, "unitState", "Состояние юнита");
+		ar.serialize(unitState_, "unitState", "РЎРѕСЃС‚РѕСЏРЅРёРµ СЋРЅРёС‚Р°");
 }
 
 void ConditionCreateObject::checkEvent(const Event& event) 
@@ -1359,14 +1359,14 @@ bool ConditionEnvironmentTime::check() const
 {
 	float curTime = environment->environmentTime()->GetTime();
 
-	return compare(curTime, time_, compareOperator_, 0.083f); // 0.083f - соответствует 5-ти минутам
+	return compare(curTime, time_, compareOperator_, 0.083f); // 0.083f - СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ 5-С‚Рё РјРёРЅСѓС‚Р°Рј
 }
 
 void ConditionEnvironmentTime::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(compareOperator_, "compareOperator", "Оператор сравнения");
-	ar.serialize(time_, "time", "Время");
+	ar.serialize(compareOperator_, "compareOperator", "РћРїРµСЂР°С‚РѕСЂ СЃСЂР°РІРЅРµРЅРёСЏ");
+	ar.serialize(time_, "time", "Р’СЂРµРјСЏ");
 }
 
 void ConditionUnableToBuild::checkEvent(const Event& event)
@@ -1450,9 +1450,9 @@ bool ConditionUnitProducing::check() const
 void ConditionUnitProducing::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(objects_,"objects", "Типы юнитов");
+	ar.serialize(objects_,"objects", "РўРёРїС‹ СЋРЅРёС‚РѕРІ");
 	removeZeros(objects_);
-	ar.serialize(playerScanner_, "playerScanner", "Игрок");
+	ar.serialize(playerScanner_, "playerScanner", "РРіСЂРѕРє");
 }
 
 void ConditionCommandMoveSquad::checkEvent(const Event& event)
@@ -1533,7 +1533,7 @@ void ConditionCommandAttackSquad::checkEvent(const Event& event)
 void ConditionCommandAttackSquad::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(attr , "attr", "Тип сквада");
+	ar.serialize(attr , "attr", "РўРёРї СЃРєРІР°РґР°");
 }
 
 void ConditionSoldBuilding::checkEvent(const Event& event)
@@ -1555,7 +1555,7 @@ void ConditionSoldBuilding::checkEvent(const Event& event)
 void ConditionSoldBuilding::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(objects_, "objects_", "&Типы зданий");
+	ar.serialize(objects_, "objects_", "&РўРёРїС‹ Р·РґР°РЅРёР№");
 	removeZeros(objects_);
 }
 
@@ -1590,14 +1590,14 @@ void ConditionCompleteCure::checkEvent(const Event& event)
 void ConditionCompleteCure::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(objects_, "objects_", "&Типы юнитов");
+	ar.serialize(objects_, "objects_", "&РўРёРїС‹ СЋРЅРёС‚РѕРІ");
 	removeZeros(objects_);
 }
 
 void ConditionCompleteBuild::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(objects_, "objects_", "&Типы зданий");
+	ar.serialize(objects_, "objects_", "&РўРёРїС‹ Р·РґР°РЅРёР№");
 	removeZeros(objects_);
 }
 
@@ -1630,9 +1630,9 @@ void ConditionCompleteUpgrade::checkEvent(const Event& event)
 void ConditionCompleteUpgrade::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(objectsBefore_, "objectsBefore_", "&Типы юнитов (до апгрейда)");
+	ar.serialize(objectsBefore_, "objectsBefore_", "&РўРёРїС‹ СЋРЅРёС‚РѕРІ (РґРѕ Р°РїРіСЂРµР№РґР°)");
 	removeZeros(objectsBefore_);
-	ar.serialize(objects_, "objects_", "&Типы юнитов (после апгрейда)");
+	ar.serialize(objects_, "objects_", "&РўРёРїС‹ СЋРЅРёС‚РѕРІ (РїРѕСЃР»Рµ Р°РїРіСЂРµР№РґР°)");
 	removeZeros(objects_);
 }
 
@@ -1664,16 +1664,16 @@ void ConditionStartUpgrade::checkEvent(const Event& event)
 void ConditionStartUpgrade::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(objectsBefore_, "objectsBefore_", "&Типы юнитов (до апгрейда)");
+	ar.serialize(objectsBefore_, "objectsBefore_", "&РўРёРїС‹ СЋРЅРёС‚РѕРІ (РґРѕ Р°РїРіСЂРµР№РґР°)");
 	removeZeros(objectsBefore_);
-	ar.serialize(objects_, "objects_", "&Типы юнитов (после апгрейда)");
+	ar.serialize(objects_, "objects_", "&РўРёРїС‹ СЋРЅРёС‚РѕРІ (РїРѕСЃР»Рµ Р°РїРіСЂРµР№РґР°)");
 	removeZeros(objects_);
 }
 
 void ConditionStartProduction::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(objects_, "objects_", "&Типы юнитов");
+	ar.serialize(objects_, "objects_", "&РўРёРїС‹ СЋРЅРёС‚РѕРІ");
 	removeZeros(objects_);
 }
 
@@ -1694,7 +1694,7 @@ void ConditionStartProduction::checkEvent(const Event& event)
 void ConditionStartProductionParameter::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(producer_, "producer", "&Производитель");
+	ar.serialize(producer_, "producer", "&РџСЂРѕРёР·РІРѕРґРёС‚РµР»СЊ");
 }
 
 void ConditionStartProductionParameter::checkEvent(const Event& event)
@@ -1801,55 +1801,55 @@ bool ConditionCompareCountObjectsInRadius::check(UnitActing* unit) const
 void ConditionCompareCountObjectsInRadius::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(attributesLess_, "attributesLess", "Первая группа(типы объектов чье количество меньше)");
+	ar.serialize(attributesLess_, "attributesLess", "РџРµСЂРІР°СЏ РіСЂСѓРїРїР°(С‚РёРїС‹ РѕР±СЉРµРєС‚РѕРІ С‡СЊРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РјРµРЅСЊС€Рµ)");
 	removeZeros(attributesLess_);
-	ar.serialize(attributesGreater_, "attributesGreater", "Вторая группа(типы объектов чье количество больше)");
+	ar.serialize(attributesGreater_, "attributesGreater", "Р’С‚РѕСЂР°СЏ РіСЂСѓРїРїР°(С‚РёРїС‹ РѕР±СЉРµРєС‚РѕРІ С‡СЊРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р±РѕР»СЊС€Рµ)");
 	removeZeros(attributesGreater_);
-	ar.serialize(radius_, "radius", "Радиус поиска");
+	ar.serialize(radius_, "radius", "Р Р°РґРёСѓСЃ РїРѕРёСЃРєР°");
 }
 
 void ConditionObjectsInRadiusAimed::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(attributes_, "attributes", "Типы объектов, которые собираются атаковать");
+	ar.serialize(attributes_, "attributes", "РўРёРїС‹ РѕР±СЉРµРєС‚РѕРІ, РєРѕС‚РѕСЂС‹Рµ СЃРѕР±РёСЂР°СЋС‚СЃСЏ Р°С‚Р°РєРѕРІР°С‚СЊ");
 	removeZeros(attributes_);
-	ar.serialize(radius_, "radius", "Радиус поиска");
+	ar.serialize(radius_, "radius", "Р Р°РґРёСѓСЃ РїРѕРёСЃРєР°");
 }
 
 void ConditionCountObjectsInRadius::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(attributes_, "attributes", "Типы объектов, для которых считается количество");
+	ar.serialize(attributes_, "attributes", "РўРёРїС‹ РѕР±СЉРµРєС‚РѕРІ, РґР»СЏ РєРѕС‚РѕСЂС‹С… СЃС‡РёС‚Р°РµС‚СЃСЏ РєРѕР»РёС‡РµСЃС‚РІРѕ");
 	removeZeros(attributes_);
-	ar.serialize(radius_, "radius", "Радиус поиска");
-	ar.serialize(count_, "count", "Количество");
+	ar.serialize(radius_, "radius", "Р Р°РґРёСѓСЃ РїРѕРёСЃРєР°");
+	ar.serialize(count_, "count", "РљРѕР»РёС‡РµСЃС‚РІРѕ");
 }
 
 void ConditionCommandMove::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(objects_, "objects_", "&Типы юнитов");
+	ar.serialize(objects_, "objects_", "&РўРёРїС‹ СЋРЅРёС‚РѕРІ");
 	removeZeros(objects_);
 }
 
 void ConditionCommandMoveSquad::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(attr, "attr", "Тип сквада");
+	ar.serialize(attr, "attr", "РўРёРї СЃРєРІР°РґР°");
 }
 
 void ConditionObjectAttacking::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(objects_, "objects_", "&Типы юнитов");
+	ar.serialize(objects_, "objects_", "&РўРёРїС‹ СЋРЅРёС‚РѕРІ");
 	removeZeros(objects_);
-	ar.serialize(weapon_, "weapon", "Тип оружия");
+	ar.serialize(weapon_, "weapon", "РўРёРї РѕСЂСѓР¶РёСЏ");
 }
 
 void ConditionObjectByLabelAttacking::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(label_, "label", "Метка юнита");
+	ar.serialize(label_, "label", "РњРµС‚РєР° СЋРЅРёС‚Р°");
 }
 
 void ConditionObjectByLabelAttacking::checkEvent(const Event& event)
@@ -1864,15 +1864,15 @@ void ConditionObjectByLabelAttacking::checkEvent(const Event& event)
 void ConditionCommandAttack::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(objects_, "objects_", "&Типы юнитов");
+	ar.serialize(objects_, "objects_", "&РўРёРїС‹ СЋРЅРёС‚РѕРІ");
 	removeZeros(objects_);
-	ar.serialize(weaponref_, "weaponref", "&Типы оружия");
+	ar.serialize(weaponref_, "weaponref", "&РўРёРїС‹ РѕСЂСѓР¶РёСЏ");
 }
 
 void ConditionStartBuild::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(objects_, "objects_", "&Типы зданий");
+	ar.serialize(objects_, "objects_", "&РўРёРїС‹ Р·РґР°РЅРёР№");
 	removeZeros(objects_);
 }
 
@@ -1969,7 +1969,7 @@ void ConditionNetworkDisconnect::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(hardDisconnect_, "hardDisconnect", "Полная потеря связи, требуется перелогин");
+	ar.serialize(hardDisconnect_, "hardDisconnect", "РџРѕР»РЅР°СЏ РїРѕС‚РµСЂСЏ СЃРІСЏР·Рё, С‚СЂРµР±СѓРµС‚СЃСЏ РїРµСЂРµР»РѕРіРёРЅ");
 }
 
 void ConditionNetworkDisconnect::checkEvent(const Event& event)
@@ -1982,7 +1982,7 @@ void ConditionNetworkDisconnect::checkEvent(const Event& event)
 void ConditionKeyboardClick::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(keys_, "keys", "Набор клавиш");
+	ar.serialize(keys_, "keys", "РќР°Р±РѕСЂ РєР»Р°РІРёС€");
 }
 
 void ConditionKeyboardClick::checkEvent(const Event& event) 
@@ -2031,22 +2031,22 @@ void ConditionClickOnButton::checkEvent(const Event& event)
 void ConditionMyObjectNearAnchorByLabel::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(anchor_, "|anchor|label", "&Метка(на якоре)");
-	ar.serialize(distance, "distance", "&Максимальное расстояние");
-	ar.serialize(onlyVisible_, "onlyVisible", "Только видимые юниты");
+	ar.serialize(anchor_, "|anchor|label", "&РњРµС‚РєР°(РЅР° СЏРєРѕСЂРµ)");
+	ar.serialize(distance, "distance", "&РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ СЂР°СЃСЃС‚РѕСЏРЅРёРµ");
+	ar.serialize(onlyVisible_, "onlyVisible", "РўРѕР»СЊРєРѕ РІРёРґРёРјС‹Рµ СЋРЅРёС‚С‹");
 }
 
 void ConditionObjectNearAnchorByLabel::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(anchor_, "|anchor|label", "&Метка(на якоре)");
-	ar.serialize(objects_, "objects", "&Указанные объекты");
+	ar.serialize(anchor_, "|anchor|label", "&РњРµС‚РєР°(РЅР° СЏРєРѕСЂРµ)");
+	ar.serialize(objects_, "objects", "&РЈРєР°Р·Р°РЅРЅС‹Рµ РѕР±СЉРµРєС‚С‹");
 	removeZeros(objects_);
-	ar.serialize(playerType, "playerType", "Владелец объекта");
-	ar.serialize(distance, "distance", "&Максимальное расстояние");
-	ar.serialize(constructedAndConstructing, "constructedAndConstructing", "Построенные или недостроенные");
-	ar.serialize(onlyVisible_, "onlyVisible", "Учитывать только видимые объекты");
-	ar.serialize(count_, "count", "Минимальное количество");
+	ar.serialize(playerType, "playerType", "Р’Р»Р°РґРµР»РµС† РѕР±СЉРµРєС‚Р°");
+	ar.serialize(distance, "distance", "&РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ СЂР°СЃСЃС‚РѕСЏРЅРёРµ");
+	ar.serialize(constructedAndConstructing, "constructedAndConstructing", "РџРѕСЃС‚СЂРѕРµРЅРЅС‹Рµ РёР»Рё РЅРµРґРѕСЃС‚СЂРѕРµРЅРЅС‹Рµ");
+	ar.serialize(onlyVisible_, "onlyVisible", "РЈС‡РёС‚С‹РІР°С‚СЊ С‚РѕР»СЊРєРѕ РІРёРґРёРјС‹Рµ РѕР±СЉРµРєС‚С‹");
+	ar.serialize(count_, "count", "РњРёРЅРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ");
 }
 
 bool ConditionObjectByLabel::check(UnitActing* unit) const
@@ -2062,14 +2062,14 @@ bool ConditionCheckPersonalParameter::check(UnitActing* unit) const
 void ConditionCheckPersonalParameter::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(parameterType_, "parameterType", "Параметр");
-	ar.serialize(value_, "value", "Величина");
+	ar.serialize(parameterType_, "parameterType", "РџР°СЂР°РјРµС‚СЂ");
+	ar.serialize(value_, "value", "Р’РµР»РёС‡РёРЅР°");
 }
 
 void ConditionObjectByLabel::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(label_, "label", "Метка юнита");
+	ar.serialize(label_, "label", "РњРµС‚РєР° СЋРЅРёС‚Р°");
 }
 
 ConditionObjectNearAnchorByLabel::ConditionObjectNearAnchorByLabel() 
@@ -2090,7 +2090,7 @@ ConditionMyObjectNearAnchorByLabel::ConditionMyObjectNearAnchorByLabel()
 bool ConditionMyObjectNearAnchorByLabel::check(UnitActing* unit) const
 {
 	if(!anchor_){
-		xassertStr(0 && "Якорь по метке не найден: ", anchor_.c_str());
+		xassertStr(0 && "РЇРєРѕСЂСЊ РїРѕ РјРµС‚РєРµ РЅРµ РЅР°Р№РґРµРЅ: ", anchor_.c_str());
 		return false;
 	}												
 	else{
@@ -2107,14 +2107,14 @@ bool ConditionMyObjectNearAnchorByLabel::check(UnitActing* unit) const
 void ConditionAnchorOnScreen::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(anchor_, "|anchor|label", "&Метка(на якоре)");
-	ar.serialize(distance_, "distance", "Макс. расстояние до камеры");
+	ar.serialize(anchor_, "|anchor|label", "&РњРµС‚РєР°(РЅР° СЏРєРѕСЂРµ)");
+	ar.serialize(distance_, "distance", "РњР°РєСЃ. СЂР°СЃСЃС‚РѕСЏРЅРёРµ РґРѕ РєР°РјРµСЂС‹");
 }
 
 bool ConditionAnchorOnScreen::check() const
 {
 	if(!anchor_){
-		xassertStr(0 && "Якорь по метке не найден: ", anchor_.c_str());
+		xassertStr(0 && "РЇРєРѕСЂСЊ РїРѕ РјРµС‚РєРµ РЅРµ РЅР°Р№РґРµРЅ: ", anchor_.c_str());
 		return false;
 	}												
 	else{
@@ -2181,7 +2181,7 @@ void NoiseScaner::operator()(UnitBase* unit)
 void ConditionObjectHearNoise::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(attrTargets_, "attrTargets", "Типы юнитов, которые слышны");
+	ar.serialize(attrTargets_, "attrTargets", "РўРёРїС‹ СЋРЅРёС‚РѕРІ, РєРѕС‚РѕСЂС‹Рµ СЃР»С‹С€РЅС‹");
 }
 
 bool ConditionObjectHearNoise::check(UnitActing* unit) const
@@ -2238,7 +2238,7 @@ int ConditionObjectNearAnchorByLabel::countfindUnit(Player* player, const Attrib
 bool ConditionObjectNearAnchorByLabel::check() const
 {
 	if(!anchor_){
-		xassertStr(0 && "Якорь по метке не найден: ", anchor_.c_str());
+		xassertStr(0 && "РЇРєРѕСЂСЊ РїРѕ РјРµС‚РєРµ РЅРµ РЅР°Р№РґРµРЅ: ", anchor_.c_str());
 		return false;
 	}												
 	else{
@@ -2324,7 +2324,7 @@ void ConditionObjectWorking::serialize(Archive& ar)
 {
 	start_timer_auto();
 	__super::serialize(ar);
-	ar.serialize(activity_, "activity", "Производимые действия");
+	ar.serialize(activity_, "activity", "РџСЂРѕРёР·РІРѕРґРёРјС‹Рµ РґРµР№СЃС‚РІРёСЏ");
 }
 
 ConditionCompareObjectsCount::ConditionCompareObjectsCount()
@@ -2336,13 +2336,13 @@ ConditionCompareObjectsCount::ConditionCompareObjectsCount()
 void ConditionCompareObjectsCount::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(group1_, "group1", "Группа типов 1");
+	ar.serialize(group1_, "group1", "Р“СЂСѓРїРїР° С‚РёРїРѕРІ 1");
 	removeZeros(group1_);
-	ar.serialize(group2_, "group2", "Группа типов 2");
+	ar.serialize(group2_, "group2", "Р“СЂСѓРїРїР° С‚РёРїРѕРІ 2");
 	removeZeros(group2_);
-	ar.serialize(playerScanner_, "|playerScanner|playerType", "Владелец объектов");
-	ar.serialize(connectedOnly_, "connectedOnly", "Только подключенные");
-	ar.serialize(compare_, "compare", "Критерий сравнения");
+	ar.serialize(playerScanner_, "|playerScanner|playerType", "Р’Р»Р°РґРµР»РµС† РѕР±СЉРµРєС‚РѕРІ");
+	ar.serialize(connectedOnly_, "connectedOnly", "РўРѕР»СЊРєРѕ РїРѕРґРєР»СЋС‡РµРЅРЅС‹Рµ");
+	ar.serialize(compare_, "compare", "РљСЂРёС‚РµСЂРёР№ СЃСЂР°РІРЅРµРЅРёСЏ");
 }
 
 bool ConditionCompareObjectsCount::check() const
@@ -2423,7 +2423,7 @@ bool ConditionObjectWorking::check(UnitActing* unit) const
 void ConditionCheckOutWater::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(outWater_, "outWater", "Тип внешней среды");
+	ar.serialize(outWater_, "outWater", "РўРёРї РІРЅРµС€РЅРµР№ СЃСЂРµРґС‹");
 }
 
 bool ConditionCheckOutWater::check() const
@@ -2512,19 +2512,19 @@ void ConditionObjectUnderAttack::checkEvent(const Event& event)
 void ConditionObjectUnderAttack::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(damagePercent_, "damagePercent_", "&Процент урона");
-	if(!ar.serialize(objectsEnemy_, "objectsEnemy_", "&Типы атакующих объектов")) // CONVERSION 11.06.2007
+	ar.serialize(damagePercent_, "damagePercent_", "&РџСЂРѕС†РµРЅС‚ СѓСЂРѕРЅР°");
+	if(!ar.serialize(objectsEnemy_, "objectsEnemy_", "&РўРёРїС‹ Р°С‚Р°РєСѓСЋС‰РёС… РѕР±СЉРµРєС‚РѕРІ")) // CONVERSION 11.06.2007
 	{
 		AttributeUnitOrBuildingReference objectEnemy;
-		ar.serialize(objectEnemy, "objectEnemy_", "&Тип атакующего объекта");
+		ar.serialize(objectEnemy, "objectEnemy_", "&РўРёРї Р°С‚Р°РєСѓСЋС‰РµРіРѕ РѕР±СЉРµРєС‚Р°");
 		if(objectEnemy)
 			objectsEnemy_.push_back(objectEnemy);
 	}	
 	removeZeros(objectsEnemy_);
-	ar.serialize(weapons_, "weapons", "&Виды оружия");
+	ar.serialize(weapons_, "weapons", "&Р’РёРґС‹ РѕСЂСѓР¶РёСЏ");
 	removeZeros(weapons_);
-	ar.serialize(weaponType_, "weaponType_", "&Тип оружия");
-	ar.serialize(checkUnit_, "checkUnit", "Учитывать только атаки вражеских юнитов");
+	ar.serialize(weaponType_, "weaponType_", "&РўРёРї РѕСЂСѓР¶РёСЏ");
+	ar.serialize(checkUnit_, "checkUnit", "РЈС‡РёС‚С‹РІР°С‚СЊ С‚РѕР»СЊРєРѕ Р°С‚Р°РєРё РІСЂР°Р¶РµСЃРєРёС… СЋРЅРёС‚РѕРІ");
 }
 
 bool ConditionContext::checkDebug(UnitActing* unit) 
@@ -2545,9 +2545,9 @@ bool ConditionContext::checkDebug(UnitActing* unit)
 		found = false;
 
 	if(!ignoreContext_)
-		state_ = found ? (check(unit) ? !inverted() : inverted()) : false; // инвертируется предикат
+		state_ = found ? (check(unit) ? !inverted() : inverted()) : false; // РёРЅРІРµСЂС‚РёСЂСѓРµС‚СЃСЏ РїСЂРµРґРёРєР°С‚
 	else{ 
-		if(found && check(unit)) // инвертируется все условие
+		if(found && check(unit)) // РёРЅРІРµСЂС‚РёСЂСѓРµС‚СЃСЏ РІСЃРµ СѓСЃР»РѕРІРёРµ
 			ignoreContextCounter_ = 2;
 		state_ = ignoreContextCounter_ ? !inverted() : inverted();
 	}
@@ -2579,11 +2579,11 @@ bool ConditionContext::isContext(ContextFilter& filter) const
 void ConditionContext::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(objects_, "objects_", "&Типы юнитов");
+	ar.serialize(objects_, "objects_", "&РўРёРїС‹ СЋРЅРёС‚РѕРІ");
 	removeZeros(objects_);
 	if(squadFilter_)
-		ar.serialize(squad_, "squad", "Тип сквада");
-	ar.serialize(ignoreContext_, "ignoreContext", "&Игнорировать контекст условия");
+		ar.serialize(squad_, "squad", "РўРёРї СЃРєРІР°РґР°");
+	ar.serialize(ignoreContext_, "ignoreContext", "&РРіРЅРѕСЂРёСЂРѕРІР°С‚СЊ РєРѕРЅС‚РµРєСЃС‚ СѓСЃР»РѕРІРёСЏ");
 }
 
 bool ConditionProducedAllParameters::check() const
@@ -2602,7 +2602,7 @@ bool ConditionProducedAllParameters::check() const
 void ConditionProducedAllParameters::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(object_, "object", "Тип юнита");
+	ar.serialize(object_, "object", "РўРёРї СЋРЅРёС‚Р°");
 }
 
 bool ConditionObjectOnWater::check(UnitActing* unit)  const
@@ -2649,8 +2649,8 @@ bool ConditionSquadSufficientUnits::check(UnitActing* unit) const
 void ConditionSquadSufficientUnits::serialize(Archive& ar) 
 {
 	__super::serialize(ar);
-	ar.serialize(compareOperator_, "compareOperator", "Условие сравнения");
-	ar.serialize(counter_, "counter", "Количество");
+	ar.serialize(compareOperator_, "compareOperator", "РЈСЃР»РѕРІРёРµ СЃСЂР°РІРЅРµРЅРёСЏ");
+	ar.serialize(counter_, "counter", "РљРѕР»РёС‡РµСЃС‚РІРѕ");
 }
 
 ConditionOnlyMyClan::ConditionOnlyMyClan()
@@ -2674,13 +2674,13 @@ bool ConditionOnlyMyClan::check() const
 void ConditionOnlyMyClan::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(checkAuxPlayers, "checkAuxPlayers", "Учитывать служебных игроков");
+	ar.serialize(checkAuxPlayers, "checkAuxPlayers", "РЈС‡РёС‚С‹РІР°С‚СЊ СЃР»СѓР¶РµР±РЅС‹С… РёРіСЂРѕРєРѕРІ");
 }
 
 void ConditionNoUnitsLeft::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(playerNum_, "playerNum", "Номер игрока");
+	ar.serialize(playerNum_, "playerNum", "РќРѕРјРµСЂ РёРіСЂРѕРєР°");
 }
 
 bool ConditionNoUnitsLeft::check() const
@@ -2731,8 +2731,8 @@ void ConditionUnitLevel::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-    ar.serialize(compareOperator_, "compareOperator", "&Критерий сравнения");
-	ar.serialize(level_, "level", "&Уровень");
+    ar.serialize(compareOperator_, "compareOperator", "&РљСЂРёС‚РµСЂРёР№ СЃСЂР°РІРЅРµРЅРёСЏ");
+	ar.serialize(level_, "level", "&РЈСЂРѕРІРµРЅСЊ");
 }
 
 ConditionSelected::ConditionSelected()
@@ -2745,10 +2745,10 @@ void ConditionSelected::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(objects_, "objects_", "&Типы юнитов");
+	ar.serialize(objects_, "objects_", "&РўРёРїС‹ СЋРЅРёС‚РѕРІ");
 	removeZeros(objects_);
-	ar.serialize(singleOnly, "singleOnly", "&Только один объект в селекте");
-	ar.serialize(uniform, "uniform", "&Только один тип объекта в селекте");
+	ar.serialize(singleOnly, "singleOnly", "&РўРѕР»СЊРєРѕ РѕРґРёРЅ РѕР±СЉРµРєС‚ РІ СЃРµР»РµРєС‚Рµ");
+	ar.serialize(uniform, "uniform", "&РўРѕР»СЊРєРѕ РѕРґРёРЅ С‚РёРї РѕР±СЉРµРєС‚Р° РІ СЃРµР»РµРєС‚Рµ");
 }
 
 ConditionSquadSelected::ConditionSquadSelected()
@@ -2760,8 +2760,8 @@ void ConditionSquadSelected::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(attribute, "attribute", "&Тип сквада");
-	ar.serialize(singleOnly, "singleOnly", "&Только один объект в селекте");
+	ar.serialize(attribute, "attribute", "&РўРёРї СЃРєРІР°РґР°");
+	ar.serialize(singleOnly, "singleOnly", "&РўРѕР»СЊРєРѕ РѕРґРёРЅ РѕР±СЉРµРєС‚ РІ СЃРµР»РµРєС‚Рµ");
 }
 
 ConditionDistanceBetweenObjects::ConditionDistanceBetweenObjects()
@@ -2782,9 +2782,9 @@ ConditionGetResourceLevel::ConditionGetResourceLevel()
 void ConditionGetResourceLevel::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(parameterType_, "parameterType", "Тип ресурса");
-	ar.serialize(compareOperator_, "compareOperator", "Критерий сравнения");
-	ar.serialize(counter_, "counter", "Количество");
+	ar.serialize(parameterType_, "parameterType", "РўРёРї СЂРµСЃСѓСЂСЃР°");
+	ar.serialize(compareOperator_, "compareOperator", "РљСЂРёС‚РµСЂРёР№ СЃСЂР°РІРЅРµРЅРёСЏ");
+	ar.serialize(counter_, "counter", "РљРѕР»РёС‡РµСЃС‚РІРѕ");
 }
 
 bool ConditionGetResourceLevel::check() const
@@ -2836,12 +2836,12 @@ bool ConditionDistanceBetweenObjects::operator()(UnitBase* unit2)
 void ConditionDistanceBetweenObjects::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(objects, "objects", "&Объекты");
+	ar.serialize(objects, "objects", "&РћР±СЉРµРєС‚С‹");
 	removeZeros(objects);
-	ar.serialize(distance, "distance", "&Расстояние");
-	ar.serialize(aiPlayerType_, "aiPlayerType", "Владелец объектов");
-	ar.serialize(onlyLegionaries_, "onlyLegionaries", "Учитывать только юнитов");
-	ar.serialize(onlyVisible_, "onlyVisible", "Учитывать только видимых юнитов");
+	ar.serialize(distance, "distance", "&Р Р°СЃСЃС‚РѕСЏРЅРёРµ");
+	ar.serialize(aiPlayerType_, "aiPlayerType", "Р’Р»Р°РґРµР»РµС† РѕР±СЉРµРєС‚РѕРІ");
+	ar.serialize(onlyLegionaries_, "onlyLegionaries", "РЈС‡РёС‚С‹РІР°С‚СЊ С‚РѕР»СЊРєРѕ СЋРЅРёС‚РѕРІ");
+	ar.serialize(onlyVisible_, "onlyVisible", "РЈС‡РёС‚С‹РІР°С‚СЊ С‚РѕР»СЊРєРѕ РІРёРґРёРјС‹С… СЋРЅРёС‚РѕРІ");
 }
 
 ConditionPlayerParameters::Data::Data()
@@ -2852,15 +2852,15 @@ ConditionPlayerParameters::Data::Data()
 
 void ConditionPlayerParameters::Data::serialize(Archive& ar)
 {
-	ar.serialize(type, "type", "&Тип");
-	ar.serialize(operation, "operation", "&Операция");
-	ar.serialize(value, "value", "&Значение");
+	ar.serialize(type, "type", "&РўРёРї");
+	ar.serialize(operation, "operation", "&РћРїРµСЂР°С†РёСЏ");
+	ar.serialize(value, "value", "&Р—РЅР°С‡РµРЅРёРµ");
 }
 
 void ConditionPlayerParameters::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(vector_, "vector", "Список");
+	ar.serialize(vector_, "vector", "РЎРїРёСЃРѕРє");
 }
 
 bool ConditionPlayerParameters::check() const
@@ -2888,9 +2888,9 @@ bool ConditionPercentOfPlayerResource::check() const
 void ConditionPercentOfPlayerResource::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(type_, "type", "Тип параметра");
-	ar.serialize(operation_, "operation", "&Условие сравнения");
-	ar.serialize(percent_, "percent", "&Процент от максимального кол-ва");
+	ar.serialize(type_, "type", "РўРёРї РїР°СЂР°РјРµС‚СЂР°");
+	ar.serialize(operation_, "operation", "&РЈСЃР»РѕРІРёРµ СЃСЂР°РІРЅРµРЅРёСЏ");
+	ar.serialize(percent_, "percent", "&РџСЂРѕС†РµРЅС‚ РѕС‚ РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ РєРѕР»-РІР°");
 }
 
 ConditionCheckInt::ConditionCheckInt()
@@ -2933,15 +2933,15 @@ bool ConditionCheckInt::check() const
 void ConditionCheckInt::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(scope_, "scope", "&Область действия переменной");
+	ar.serialize(scope_, "scope", "&РћР±Р»Р°СЃС‚СЊ РґРµР№СЃС‚РІРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№");
 	if(scope_ != SCOPE_MISSION_DESCRIPTION){
-		ar.serialize(name_, "name", "&Имя переменной");
-		ar.serialize(op_, "operator", "&Операция сравнения");
-		ar.serialize(value_, "value", "&Значение");
+		ar.serialize(name_, "name", "&РРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№");
+		ar.serialize(op_, "operator", "&РћРїРµСЂР°С†РёСЏ СЃСЂР°РІРЅРµРЅРёСЏ");
+		ar.serialize(value_, "value", "&Р—РЅР°С‡РµРЅРёРµ");
 	}
 	else{
 		missionDescription.serialize(ar);
-		ar.serialize(RangedWrapperi(value_, 0, 31), "value", "&Номер переменной");
+		ar.serialize(RangedWrapperi(value_, 0, 31), "value", "&РќРѕРјРµСЂ РїРµСЂРµРјРµРЅРЅРѕР№");
 	}
 }
 
@@ -2953,7 +2953,7 @@ ConditionEvent::ConditionEvent()
 void ConditionEvent::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(timeOut_, "timeOut", "Время удержания события, секунды");
+	ar.serialize(timeOut_, "timeOut", "Р’СЂРµРјСЏ СѓРґРµСЂР¶Р°РЅРёСЏ СЃРѕР±С‹С‚РёСЏ, СЃРµРєСѓРЅРґС‹");
 	ar.serialize(timer_, "timer", 0);
 }
 
@@ -2965,9 +2965,9 @@ ConditionContextEvent::ConditionContextEvent()
 
 void ConditionContextEvent::serialize(Archive& ar)
 {
-	//inverted_ = false; // насильный запрет инвертирования
+	//inverted_ = false; // РЅР°СЃРёР»СЊРЅС‹Р№ Р·Р°РїСЂРµС‚ РёРЅРІРµСЂС‚РёСЂРѕРІР°РЅРёСЏ
 	__super::serialize(ar);
-	ar.serialize(timeOut_, "timeOut", "Время удержания события, секунды");
+	ar.serialize(timeOut_, "timeOut", "Р’СЂРµРјСЏ СѓРґРµСЂР¶Р°РЅРёСЏ СЃРѕР±С‹С‚РёСЏ, СЃРµРєСѓРЅРґС‹");
 	ar.serialize(timer_, "timer", 0);
 	//ar.serialize(eventContextUnit_, "eventContextUnit", 0);
 }
@@ -3012,7 +3012,7 @@ ConditionIsMultiplayer::ConditionIsMultiplayer()
 void ConditionIsMultiplayer::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(mode, "mode", "Режим");
+	ar.serialize(mode, "mode", "Р РµР¶РёРј");
 }
 
 
@@ -3031,8 +3031,8 @@ bool ConditionScreenRatio::check() const
 void ConditionScreenRatio::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(op_, "op", "Операция сравнения");
-	ar.serialize(ratio_, "ratio", "Отношение ширины к высоте");
+	ar.serialize(op_, "op", "РћРїРµСЂР°С†РёСЏ СЃСЂР°РІРЅРµРЅРёСЏ");
+	ar.serialize(ratio_, "ratio", "РћС‚РЅРѕС€РµРЅРёРµ С€РёСЂРёРЅС‹ Рє РІС‹СЃРѕС‚Рµ");
 }
 
 ConditionCheckDirectControl::ConditionCheckDirectControl()
@@ -3059,7 +3059,7 @@ bool ConditionCheckDirectControl::check() const
 void ConditionCheckDirectControl::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(syndicateControl_, "syndicateControl", "Синдикат-контрол");
+	ar.serialize(syndicateControl_, "syndicateControl", "РЎРёРЅРґРёРєР°С‚-РєРѕРЅС‚СЂРѕР»");
 }
 
 bool ConditionMissionSelected::check() const
@@ -3093,7 +3093,7 @@ void ConditionCheckGameType::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 	missionDescription_.serialize(ar);
-	ar.serialize(gameType_, "gameType", "Тип игры");
+	ar.serialize(gameType_, "gameType", "РўРёРї РёРіСЂС‹");
 }
 
 ConditionEventComing::ConditionEventComing()
@@ -3110,7 +3110,7 @@ void ConditionEventComing::checkEvent(const Event& event)
 void ConditionEventComing::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(eventType_, "eventType", "Тип события");
+	ar.serialize(eventType_, "eventType", "РўРёРї СЃРѕР±С‹С‚РёСЏ");
 }
 
 ConditionPlayerByNumberDefeat::ConditionPlayerByNumberDefeat()
@@ -3121,7 +3121,7 @@ ConditionPlayerByNumberDefeat::ConditionPlayerByNumberDefeat()
 void ConditionPlayerByNumberDefeat::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(playerIndex, "playerIndex", "Номер игрока");
+	ar.serialize(playerIndex, "playerIndex", "РќРѕРјРµСЂ РёРіСЂРѕРєР°");
 }
 
 void ConditionEventString::checkEvent(const Event& event)
@@ -3136,7 +3136,7 @@ void ConditionEventString::checkEvent(const Event& event)
 void ConditionEventString::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(name_, "name", "Строка");
+	ar.serialize(name_, "name", "РЎС‚СЂРѕРєР°");
 	if(ar.isInput()){
 		strlwr((char*)name_.c_str());
 		cheatManager.addString(name_.c_str());
@@ -3152,19 +3152,19 @@ ConditionCheckPause::ConditionCheckPause()
 void ConditionCheckPause::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(pausedByUser_, "pausedByUser", "Пауза игрока");
-	ar.serialize(pausedByMenu_, "pausedByMenu", "Пауза меню");
+	ar.serialize(pausedByUser_, "pausedByUser", "РџР°СѓР·Р° РёРіСЂРѕРєР°");
+	ar.serialize(pausedByMenu_, "pausedByMenu", "РџР°СѓР·Р° РјРµРЅСЋ");
 }
 
 void ConditionCompareSquadsCount::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(squads1_, "squads1", "Сквады1");
+	ar.serialize(squads1_, "squads1", "РЎРєРІР°РґС‹1");
 	removeZeros(squads1_);
-	ar.serialize(squads2_, "squads2", "Сквады2");
+	ar.serialize(squads2_, "squads2", "РЎРєРІР°РґС‹2");
 	removeZeros(squads2_);
-	ar.serialize(playerScanner_, "playerScanner", "Владелец объектов");
-	ar.serialize(compare_, "compare", "Критерий сравнения");
+	ar.serialize(playerScanner_, "playerScanner", "Р’Р»Р°РґРµР»РµС† РѕР±СЉРµРєС‚РѕРІ");
+	ar.serialize(compare_, "compare", "РљСЂРёС‚РµСЂРёР№ СЃСЂР°РІРЅРµРЅРёСЏ");
 }
 
 ConditionCompareSquadsCount::ConditionCompareSquadsCount()
@@ -3249,7 +3249,7 @@ bool ConditionStatusTimeBase::check() const
 void ConditionStatusTimeBase::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(time_, "time", "Время проверки статуса (сек.)");
+	ar.serialize(time_, "time", "Р’СЂРµРјСЏ РїСЂРѕРІРµСЂРєРё СЃС‚Р°С‚СѓСЃР° (СЃРµРє.)");
 }
 
 void ConditionCheckParameterProducing::serialize(Archive& ar)
@@ -3257,7 +3257,7 @@ void ConditionCheckParameterProducing::serialize(Archive& ar)
 	__super::serialize(ar);
 	if(ar.isOutput() && ar.isEdit())
 		signalVariable_.setComboList(editSignalVariableDialog().c_str());
-	ar.serialize(signalVariable_, "signalVariable", "&Имя сигнальной переменной");
+	ar.serialize(signalVariable_, "signalVariable", "&РРјСЏ СЃРёРіРЅР°Р»СЊРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№");
 }
 
 bool ConditionCheckParameterProducing::check(UnitActing* unit) const

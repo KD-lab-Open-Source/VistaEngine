@@ -398,7 +398,7 @@ void Runtime::logic_thread(const MissionDescription* mission)
 		MT_SET_TLS(MT_GRAPH_THREAD | MT_LOGIC_THREAD);
 		GameLoad(*mission);
 
-		load_finish = CreateEvent(0, false, false, 0); // ñòðîãî îäíîïîòîêîâûå äåéñòâèÿ ïîñëå çàãðóçêè
+		load_finish = CreateEvent(0, false, false, 0); // ÑÑ‚Ñ€Ð¾Ð³Ð¾ Ð¾Ð´Ð½Ð¾Ð¿Ð¾Ñ‚Ð¾ÐºÐ¾Ð²Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð¿Ð¾ÑÐ»Ðµ Ð·Ð°Ð³Ñ€ÑƒÐ·ÐºÐ¸
 		DWORD ret = WaitForSingleObject(load_finish, INFINITE);
 		xassert(ret == WAIT_OBJECT_0);
 		CloseHandle(load_finish);
@@ -439,7 +439,7 @@ bool Runtime::quant()
 		}
 	}
 	else{
-		MT_SET_TLS(MT_LOGIC_THREAD);//Äëÿ MTG, MTL àññåðòîâ.
+		MT_SET_TLS(MT_LOGIC_THREAD);//Ð”Ð»Ñ MTG, MTL Ð°ÑÑÐµÑ€Ñ‚Ð¾Ð².
 
 		logicQuantST();
 
@@ -503,11 +503,11 @@ void Runtime::setWindowPicture(const char* file)
 
 			if(size.x > screenWidth || size.y > screenHeight){
 				float textureRatio = (float)size.x / (float)size.y;
-				if(textureRatio < (float)screenWidth / (float)screenHeight){ // ïóñòûå ìåñòà ïî áîêàì
+				if(textureRatio < (float)screenWidth / (float)screenHeight){ // Ð¿ÑƒÑÑ‚Ñ‹Ðµ Ð¼ÐµÑÑ‚Ð° Ð¿Ð¾ Ð±Ð¾ÐºÐ°Ð¼
 					size.y = screenHeight;
 					size.x = textureRatio * size.y;
 				}
-				else { // ïóñòîå ïîëå ñâåðõó è ñíèçó
+				else { // Ð¿ÑƒÑÑ‚Ð¾Ðµ Ð¿Ð¾Ð»Ðµ ÑÐ²ÐµÑ€Ñ…Ñƒ Ð¸ ÑÐ½Ð¸Ð·Ñƒ
 					size.x = screenWidth;
 					size.y = size.x / textureRatio;
 				}

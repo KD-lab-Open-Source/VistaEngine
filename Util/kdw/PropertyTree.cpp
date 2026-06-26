@@ -16,7 +16,7 @@
 #include "kdw/PopupMenu.h"
 
 #include "kdw/Win32/Handle.h"
-#include "kdw/Win32/Window.h" // только для defaultFont
+#include "kdw/Win32/Window.h" // С‚РѕР»СЊРєРѕ РґР»СЏ defaultFont
 #include "kdw/Win32/Rectangle.h"
 #include <crtdbg.h>
 
@@ -26,11 +26,11 @@
 
 namespace kdw{
 
-REGISTER_CLASS(Widget, PropertyTree, "Дерево свойств")
+REGISTER_CLASS(Widget, PropertyTree, "Р”РµСЂРµРІРѕ СЃРІРѕР№СЃС‚РІ")
 
 // --------------------------------------------------------------------------------
 
-REGISTER_CLASS(TreeColumnDrawer, PropertyTreeColumnDrawer, "Отрисовщик колонки дерева свойств");
+REGISTER_CLASS(TreeColumnDrawer, PropertyTreeColumnDrawer, "РћС‚СЂРёСЃРѕРІС‰РёРє РєРѕР»РѕРЅРєРё РґРµСЂРµРІР° СЃРІРѕР№СЃС‚РІ");
 
 
 // --------------------------------------------------------------------------------
@@ -224,7 +224,7 @@ void PropertyTreeColumnDrawer::getSubRectText(TreeRow* treeRow, const Recti& row
 	std::string text = rowText(row);
 	HFONT font = rowFont(row);
 
-	// считаем прямоугольник текста
+	// СЃС‡РёС‚Р°РµРј РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРє С‚РµРєСЃС‚Р°
 	Vect2i textSize = calculateTextSize(*Win32::_globalDummyWindow, font, text.c_str());
 	int indent = 2 + row->indent();
 	if(rowHasIcon(row))
@@ -257,7 +257,7 @@ void PropertyTreeColumnDrawer::drawRow(TreeRow* treeRow, int column, HDC dc, con
 
 	COLORREF textColor = ::GetSysColor(COLOR_BTNTEXT);
 	if(row->selected()){
-		// заливаем фон цветом выделения
+		// Р·Р°Р»РёРІР°РµРј С„РѕРЅ С†РІРµС‚РѕРј РІС‹РґРµР»РµРЅРёСЏ
 		if(tree()->isFocused())
 			::FillRect(dc, &selectionRect, ::GetSysColorBrush(COLOR_HIGHLIGHT));
 		else
@@ -269,7 +269,7 @@ void PropertyTreeColumnDrawer::drawRow(TreeRow* treeRow, int column, HDC dc, con
 		Recti plusRect(0, 0, 0, 0);
 		getSubRectPlus(row, rowRect, plusRect);
 		/*
-		// вертикальные линии
+		// РІРµСЂС‚РёРєР°Р»СЊРЅС‹Рµ Р»РёРЅРёРё
 		if(!tree_->compact()){
 			Vect2i center(plusRect.center());
 
@@ -289,7 +289,7 @@ void PropertyTreeColumnDrawer::drawRow(TreeRow* treeRow, int column, HDC dc, con
 				PropertyRow* parent = row;
 				while(parent && parent->parent() && parent->parent()->parent()){
 					Recti plusRect(0, 0, 0, 0);
-					// вертикальные линии
+					// РІРµСЂС‚РёРєР°Р»СЊРЅС‹Рµ Р»РёРЅРёРё
 					getSubRectPlus(parent, rowRect, plusRect);
 					Vect2i center(plusRect.center());
 
@@ -302,7 +302,7 @@ void PropertyTreeColumnDrawer::drawRow(TreeRow* treeRow, int column, HDC dc, con
 			}
 		}
 		*/
-		// рисуем плюсик
+		// СЂРёСЃСѓРµРј РїР»СЋСЃРёРє
 		if(tree()->rowHasVisibleChildren(row)){
 			getSubRectPlus(row, rowRect, plusRect);
 			drawPlus(dc, plusRect, row->expanded(), row->selected(), row->expanded());
@@ -310,7 +310,7 @@ void PropertyTreeColumnDrawer::drawRow(TreeRow* treeRow, int column, HDC dc, con
 	}
 
 
-	// рисуем custom-ную часть
+	// СЂРёСЃСѓРµРј custom-РЅСѓСЋ С‡Р°СЃС‚СЊ
 	Recti iconRect;
 	getSubRectIcon(row, rowRect, iconRect);
 	Recti editorRect;
@@ -322,7 +322,7 @@ void PropertyTreeColumnDrawer::drawRow(TreeRow* treeRow, int column, HDC dc, con
 		row->redraw(dc, Win32::Rect(iconRect), Win32::Rect(editorRect), Win32::Rect(floorRect), row);
 	}
 
-	// рисуем текст
+	// СЂРёСЃСѓРµРј С‚РµРєСЃС‚
 	Recti textRect;
 	getSubRectText(row, rowRect, textRect);
 	textRect.left(textRect.left() + 2);
@@ -337,7 +337,7 @@ void PropertyTreeColumnDrawer::drawRow(TreeRow* treeRow, int column, HDC dc, con
 	::DrawText(dc, text.c_str(), int(strlen(text.c_str())), &Win32::Rect(textRect), DT_LEFT | DT_END_ELLIPSIS | DT_SINGLELINE | DT_VCENTER);
 	
 	int textRight = textRect.right();
-	// краткое содержание
+	// РєСЂР°С‚РєРѕРµ СЃРѕРґРµСЂР¶Р°РЅРёРµ
 	if(row->digest()[0]){
 		const char* text = row->digest();
 
@@ -351,7 +351,7 @@ void PropertyTreeColumnDrawer::drawRow(TreeRow* treeRow, int column, HDC dc, con
 		}
 	}
 
-	// рисуем пунктирную линию
+	// СЂРёСЃСѓРµРј РїСѓРЅРєС‚РёСЂРЅСѓСЋ Р»РёРЅРёСЋ
 	if(!row->isStatic() && overridenWidgetPosition(row) != PropertyRow::WIDGET_POSITION_ROW_AUTOHIDE){
 		Vect2i textSize(textRect.size());
 		HPEN dotPen = CreatePen(PS_DOT, 1, GetSysColor(COLOR_3DSHADOW));
@@ -603,7 +603,7 @@ bool PropertyTree::onRowLMBDown(TreeRow* treeRow, const Recti& rowRect, Vect2i p
 		bool changed = false;
 		bool capture = row->onMouseDown(this, point, changed);
 		
-		if(!changed && !widget_){ // FIXME: осмысленный метод для проверки
+		if(!changed && !widget_){ // FIXME: РѕСЃРјС‹СЃР»РµРЅРЅС‹Р№ РјРµС‚РѕРґ РґР»СЏ РїСЂРѕРІРµСЂРєРё
 			Base::onRowLMBDown(treeRow, rowRect, point);
 			if(capture){
 				return true;
@@ -645,17 +645,17 @@ bool PropertyTree::onContextMenu(PropertyRow* row, PopupMenuItem& menu)
 	row->onContextMenu(menu, this);
 	if(!menu.empty())
 		menu.addSeparator();
-	menu.add(TRANSLATE("Копировать"), row)
+	menu.add(TRANSLATE("РљРѕРїРёСЂРѕРІР°С‚СЊ"), row)
 		.connect(this, &Self::onRowMenuCopy)
 		.setHotkey(sKey('C' | sKey::CONTROL));
-	menu.add(TRANSLATE("Вставить"), row)
+	menu.add(TRANSLATE("Р’СЃС‚Р°РІРёС‚СЊ"), row)
 		.connect(this, &Self::onRowMenuPaste)
 		.enable(!row->readOnly())
 		.setHotkey(sKey('V' | sKey::CONTROL))
 		.enable(canBePasted(row));
 #ifdef NDEBUG
 	menu.addSeparator();
-	menu.add(TRANSLATE("Разобрать"), row).connect(this, &Self::onRowMenuDecompose);
+	menu.add(TRANSLATE("Р Р°Р·РѕР±СЂР°С‚СЊ"), row).connect(this, &Self::onRowMenuDecompose);
 #endif
 	return true;
 }
@@ -707,7 +707,7 @@ void PropertyTree::onRowMenuPaste(PropertyRow* row)
 	if(clipboard.paste(row))
 		model()->rowChanged(parent ? parent : model()->root());
 	else
-		ASSERT(0 && "Unable to paste element!"); // TODO: осмысленное сообщение
+		ASSERT(0 && "Unable to paste element!"); // TODO: РѕСЃРјС‹СЃР»РµРЅРЅРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ
 }
 
 bool PropertyTree::canBePasted(PropertyRow* destination)

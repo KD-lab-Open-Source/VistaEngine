@@ -91,10 +91,10 @@ void SourceTornado::apply( UnitBase* unit )
 void SourceTornado::serialize( Archive& ar )
 {
 	__super::serialize(ar);
-    ar.serialize(height_, "height", "высота");
-    ar.serialize(tornadoFactor_, "tornadoFactor", "мощность");
+    ar.serialize(height_, "height", "РІС‹СЃРѕС‚Р°");
+    ar.serialize(tornadoFactor_, "tornadoFactor", "РјРѕС‰РЅРѕСЃС‚СЊ");
 
-    ar.serialize(toolser_, "toolser", "тулзер");
+    ar.serialize(toolser_, "toolser", "С‚СѓР»Р·РµСЂ");
 
 	serializationApply(ar);
 }

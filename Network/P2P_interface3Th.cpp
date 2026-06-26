@@ -39,15 +39,15 @@ HRESULT PNetCenter::DirectPlayMessageHandler_th3(DWORD dwMessageId, PVOID pMsgBu
 			if(!clientConnectInfo.checkOwnCorrect()) 
 				return E_FAIL;
 
-			static sDigitalGameVersion hostDGV(true);//создание версии игры
+			static sDigitalGameVersion hostDGV(true);//СЃРѕР·РґР°РЅРёРµ РІРµСЂСЃРёРё РёРіСЂС‹
 			static sReplyConnectInfo replyConnectInfo;
 			pMsg->pvReplyData=&replyConnectInfo;
 			pMsg->dwReplyDataSize=sizeof(replyConnectInfo);
-			if(hostDGV!=clientConnectInfo.dgv){ //Несоответствующая версия игры
+			if(hostDGV!=clientConnectInfo.dgv){ //РќРµСЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰Р°СЏ РІРµСЂСЃРёСЏ РёРіСЂС‹
 				replyConnectInfo.set(sReplyConnectInfo::CR_ERR_INCORRECT_VERSION, hostDGV);
 				return E_FAIL;
 			}
-			if(flag_StartedLoadGame) { // Игра запущена
+			if(flag_StartedLoadGame) { // РРіСЂР° Р·Р°РїСѓС‰РµРЅР°
 				replyConnectInfo.set(sReplyConnectInfo::CR_ERR_GAME_STARTED, hostDGV);
 				return E_FAIL;
 			}
@@ -56,12 +56,12 @@ HRESULT PNetCenter::DirectPlayMessageHandler_th3(DWORD dwMessageId, PVOID pMsgBu
 				return E_FAIL;
 			}
 			int resultIdx=AddClient(clientConnectInfo.perimeterConnectPlayerData, 0);
-			if(resultIdx==USER_IDX_NONE) {// Игра полная
+			if(resultIdx==USER_IDX_NONE) {// РРіСЂР° РїРѕР»РЅР°СЏ
 				replyConnectInfo.set(sReplyConnectInfo::CR_ERR_GAME_FULL, hostDGV);
 				return E_FAIL;
 			}
 
-			pMsg->pvPlayerContext=(void*)resultIdx; //для корректного удаления в DPN_MSGID_INDICATED_CONNECT_ABORTED 
+			pMsg->pvPlayerContext=(void*)resultIdx; //РґР»СЏ РєРѕСЂСЂРµРєС‚РЅРѕРіРѕ СѓРґР°Р»РµРЅРёСЏ РІ DPN_MSGID_INDICATED_CONNECT_ABORTED 
 			replyConnectInfo.set(sReplyConnectInfo::CR_OK, hostDGV);
 		}
 		break;
@@ -175,8 +175,8 @@ HRESULT PNetCenter::DirectPlayMessageHandler_th3(DWORD dwMessageId, PVOID pMsgBu
                         m_localUNID=UNetID(dpnid);
 					if( pdpPlayerInfo->dwPlayerFlags & DPNPLAYER_HOST )
 						m_hostUNID=UNetID(dpnid);
-					//Дополнительно
-					if( (pdpPlayerInfo->dwPlayerFlags&DPNPLAYER_LOCAL)==0 && isHost()){//Кривоватое условие
+					//Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕ
+					if( (pdpPlayerInfo->dwPlayerFlags&DPNPLAYER_LOCAL)==0 && isHost()){//РљСЂРёРІРѕРІР°С‚РѕРµ СѓСЃР»РѕРІРёРµ
 						th3_setDPNIDInClientsDate((unsigned int)pCreatePlayerMsg->pvPlayerContext, dpnid);
 					}
 
@@ -265,7 +265,7 @@ LErrorReturn:
 				finitExtTask_Err(extNetTask_Game, ENTGame::ErrCode::ConnectionFailed);
 			}
 			else {
-				//Не распознанная ситуация
+				//РќРµ СЂР°СЃРїРѕР·РЅР°РЅРЅР°СЏ СЃРёС‚СѓР°С†РёСЏ
 				//ExecuteInterfaceCommand_thA(NetGEC_ConnectionFailed);
 				finitExtTask_Err(extNetTask_Game, ENTGame::ErrCode::ConnectionFailed);
 			}
@@ -281,7 +281,7 @@ LErrorReturn:
 				m_DPPacketList.push_back(XDPacket());
 				m_DPPacketList.back().set(UNetID(pReceiveMsg->dpnidSender), pReceiveMsg->dwReceiveDataSize, pReceiveMsg->pReceiveData);
 
-				//Отлов необходимой передаваемой информации
+				//РћС‚Р»РѕРІ РЅРµРѕР±С…РѕРґРёРјРѕР№ РїРµСЂРµРґР°РІР°РµРјРѕР№ РёРЅС„РѕСЂРјР°С†РёРё
 				//InOutNetComBuffer tmp(2048, true);
 				//tmp.putBufferPacket(pReceiveMsg->pReceiveData, pReceiveMsg->dwReceiveDataSize);
 				//if(tmp.currentNetCommandID()==NETCOM4C_CurMissionDescriptionInfo){
@@ -305,7 +305,7 @@ LErrorReturn:
 	case DPN_MSGID_HOST_MIGRATE:
         {
 			if((nCState_th2!=PNC_STATE__CLIENT_LOADING_GAME) && (nCState_th2!=PNC_STATE__CLIENT_GAME)){
-				//Нужно запустить abort
+				//РќСѓР¶РЅРѕ Р·Р°РїСѓСЃС‚РёС‚СЊ abort
 				//ExecuteInterfaceCommand_thA(NetGEC_HostTerminatedSession);//PNC_INTERFACE_COMMAND_CONNECTION_FAILED);
 				finitExtTask_Err(extNetTask_Game, ENTGame::ErrCode::HostTerminatedSession);
 				break;
@@ -316,9 +316,9 @@ LErrorReturn:
 
 
 			m_hostUNID=UNetID(pHostMigrateMsg->dpnidNewHost);
-			//if( m_hostUNID == m_localUNID )//Host Я
+			//if( m_hostUNID == m_localUNID )//Host РЇ
 			//	ExecuteInternalCommand(PNC_COMMAND__STOP_GAME_AND_ASSIGN_HOST_2_MY, false);
-			//else  // Host не Я
+			//else  // Host РЅРµ РЇ
 			//	ExecuteInternalCommand(PNC_COMMAND__STOP_GAME_AND_WAIT_ASSIGN_OTHER_HOST, false);
 			ExecuteInternalCommand(PNC_COMMAND__STOP_GAME_AND_MIGRATION_HOST, false);
 
@@ -440,7 +440,7 @@ void PNetCenter::th3_DeleteClientByMissionDescriptionIdx(const int missionDescri
 //		int idx=clientMissionDescription.findUserIdx(UNetID(dpnid));
 //		xassert(idx!=USER_IDX_NONE);
 //		if(idx!=USER_IDX_NONE){
-//			//отсылка сообщения о том, что игрок вышел
+//			//РѕС‚СЃС‹Р»РєР° СЃРѕРѕР±С‰РµРЅРёСЏ Рѕ С‚РѕРј, С‡С‚Рѕ РёРіСЂРѕРє РІС‹С€РµР»
 //			if(dwReason & DPNDESTROYPLAYERREASON_NORMAL){
 //				ExecuteInterfaceCommand_thA(NetMsg_PlayerExit, clientMissionDescription.usersData[idx].playerNameE);
 //			}
@@ -448,7 +448,7 @@ void PNetCenter::th3_DeleteClientByMissionDescriptionIdx(const int missionDescri
 //				ExecuteInterfaceCommand_thA(NetMsg_PlayerDisconnected, clientMissionDescription.usersData[idx].playerNameE);
 //			}
 //		}
-//		//Удаление игрока из clientMD
+//		//РЈРґР°Р»РµРЅРёРµ РёРіСЂРѕРєР° РёР· clientMD
 //		clientMissionDescription.disconnectUser(clientMissionDescription.findUserIdx(UNetID(dpnid)));
 //	}
 //

@@ -19,7 +19,7 @@
 const unsigned int MAX_TIME_INTERVAL_HOST_RESPOND=10000;
 const UNetID UNetID::UNID_ALL_PLAYERS(0,0);
 
-char* terCurrentServerName; //Из ini файла
+char* terCurrentServerName; //РР· ini С„Р°Р№Р»Р°
 
 GameSpyInterface* GameSpyInterface::instance_=0;
 
@@ -55,7 +55,7 @@ STARFORCE_API PNetCenter::PNetCenter(ExternalNetTask_Init* entInit) //(e_PNCWork
 
 	LogMsg("---Creating PNetCenter---\n");
 
-	//инитятся один раз!
+	//РёРЅРёС‚СЏС‚СЃСЏ РѕРґРёРЅ СЂР°Р·!
 	workMode=entInit->workMode;//_workMode;
 	nextQuantTime_th2=0;
 	TIMEOUT_CLIENT_OR_SERVER_RECEIVE_INFORMATION=iniFile.network.TimeOutClientOrServerReceive;
@@ -195,7 +195,7 @@ PNetCenter::~PNetCenter()
 
 	ClearDeletePlayerGameCommand();
 
-	hostMissionDescription.clearAllUsersData();//вместо	ClearClients();
+	hostMissionDescription.clearAllUsersData();//РІРјРµСЃС‚Рѕ	ClearClients();
 
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	m_DPPacketList.clear();
@@ -348,7 +348,7 @@ void PNetCenter::createGame(const char* gameName, const MissionDescription* md, 
 	//internalPlayerData.setCompAndUserID(cname, username);
 	ExecuteInternalCommand(PNC_COMMAND__START_HOST_AND_CREATE_GAME_AND_STOP_FIND_HOST, true);
 
-	//GameSpy тоже нужен hostMissionDescription и GameName
+	//GameSpy С‚РѕР¶Рµ РЅСѓР¶РµРЅ hostMissionDescription Рё GameName
 	if(gameSpyInterface)gameSpyInterface->CreateStagingRoom(gameName, password);
 	return;
 }
@@ -411,7 +411,7 @@ void PNetCenter::joinGameP2P(const char* _gameHostIPAndPort, const char* playerN
 //	//Argument  PNC_COMMAND__CONNECT_2_HOST_AND_STOP_FIND_HOST
 //	internalConnectPlayerData.set(playerName);
 //	//internalPlayerData.setCompAndUserID(cname, username);
-//	//internalIP установлен ранее
+//	//internalIP СѓСЃС‚Р°РЅРѕРІР»РµРЅ СЂР°РЅРµРµ
 //	ExecuteInternalCommand(PNC_COMMAND__CONNECT_2_HOST_AND_STOP_FIND_HOST, false /*true*/);
 //}
 
@@ -460,7 +460,7 @@ void PNetCenter::th1_HandlerInputNetCommand()
 				netCommand4C_RequestLastQuantsCommands nc(in_ClientBuf);
 
 				if(universeX()){
-					//По идее вызов корректный т.к. reJoin не пошлется пока игра не остановлена(stopGame_HostMigrate)
+					//РџРѕ РёРґРµРµ РІС‹Р·РѕРІ РєРѕСЂСЂРµРєС‚РЅС‹Р№ С‚.Рє. reJoin РЅРµ РїРѕС€Р»РµС‚СЃСЏ РїРѕРєР° РёРіСЂР° РЅРµ РѕСЃС‚Р°РЅРѕРІР»РµРЅР°(stopGame_HostMigrate)
 					universeX()->sendListGameCommand2Host(nc.beginQunat_);
 				}
 			}
@@ -545,12 +545,12 @@ void PNetCenter::th1_HandlerInputNetCommand()
 		case NETCOM4C_ContinueGameAfterHostMigrate:
 			{
 				netCommand4C_ContinueGameAfterHostMigrate nc(in_ClientBuf);
-				flag_SkipProcessingGameCommand=0; //Возобновление после миграции Hosta
+				flag_SkipProcessingGameCommand=0; //Р’РѕР·РѕР±РЅРѕРІР»РµРЅРёРµ РїРѕСЃР»Рµ РјРёРіСЂР°С†РёРё Hosta
 			}
 			break;
 		case NETCOM4C_SendLog2Host:
 			{
-				// !!! передается HiperSpace
+				// !!! РїРµСЂРµРґР°РµС‚СЃСЏ HiperSpace
 				xassert(flag_SkipProcessingGameCommand);
 				if(universeX()) 
 					universeX()->ReceiveEvent(event, in_ClientBuf);
@@ -574,15 +574,15 @@ void PNetCenter::th1_HandlerInputNetCommand()
 			break;
 		default: 
 			{
-				// !!! передается HiperSpace
+				// !!! РїРµСЂРµРґР°РµС‚СЃСЏ HiperSpace
 				if(0) {
 					SetConnectionTimeout(30000);
 					int c=GetConnectionTimeout();
 				}
-				if(flag_SkipProcessingGameCommand) in_ClientBuf.ignoreNetCommand(); //Нужно при миграции Host-а
+				if(flag_SkipProcessingGameCommand) in_ClientBuf.ignoreNetCommand(); //РќСѓР¶РЅРѕ РїСЂРё РјРёРіСЂР°С†РёРё Host-Р°
 				else {
 					if(gameShell->GameActive){
-//						if(in_ClientBuf.getQuantAmount()>=1){ //Отсылать на выполнение только ПОЛНОСТЬЮ законченный квант!!!
+//						if(in_ClientBuf.getQuantAmount()>=1){ //РћС‚СЃС‹Р»Р°С‚СЊ РЅР° РІС‹РїРѕР»РЅРµРЅРёРµ С‚РѕР»СЊРєРѕ РџРћР›РќРћРЎРўР¬Р® Р·Р°РєРѕРЅС‡РµРЅРЅС‹Р№ РєРІР°РЅС‚!!!
 							if(universeX()->ReceiveEvent(event, in_ClientBuf)==false) {
 								in_ClientBuf.backNetCommand();
 								goto loc_end_quant;
@@ -626,7 +626,7 @@ void PNetCenter::quant_th1()
 	{
 		MTAuto p_Lock(m_GeneralLock);
 		if(!interfaceCommandList.empty()){
-			////Сейчас сделано так, что нельзя поместить команду если другая выполняется
+			////РЎРµР№С‡Р°СЃ СЃРґРµР»Р°РЅРѕ С‚Р°Рє, С‡С‚Рѕ РЅРµР»СЊР·СЏ РїРѕРјРµСЃС‚РёС‚СЊ РєРѕРјР°РЅРґСѓ РµСЃР»Рё РґСЂСѓРіР°СЏ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ
 			curInterfaceCommand=*interfaceCommandList.begin();
 			interfaceCommandList.pop_front();
 		}
@@ -868,7 +868,7 @@ void PNetCenter::setGameHostFilter(int gameTypeFilter, std::vector<XGUID> missio
 	startGameParam.setNS(gameTypeFilter, missionFilter, maxPlayersFilter, StartGameParamBase::NO_FILTER);
 
 	//if(isDemonWareMode())
-	//else { //not реализованна
+	//else { //not СЂРµР°Р»РёР·РѕРІР°РЅРЅР°
 	//}
 }
 
@@ -972,15 +972,15 @@ void PNetCenter::refreshLanGameHostList_th1()
 			nResult = WideCharToMultiByte( CP_ACP, 0, (*p)->pAppDesc->pwszSessionName, -1, txtBufGameName, MAX_PATH, NULL, NULL );
 			txtBufGameName[MAX_PATH-1]=0;
 
-			//поиск среди первых необходимых hostName-ов
+			//РїРѕРёСЃРє СЃСЂРµРґРё РїРµСЂРІС‹С… РЅРµРѕР±С…РѕРґРёРјС‹С… hostName-РѕРІ
 			//vector<sGameHostInfo*>::iterator m;
 			int m;
 			for(m=0; m<needHostList.size(); m++){
 			}
-			if(m!=needHostList.size()){ //адрес нашелся - m индекс
+			if(m!=needHostList.size()){ //Р°РґСЂРµСЃ РЅР°С€РµР»СЃСЏ - m РёРЅРґРµРєСЃ
 				gameHostListDP[m].set( (*p)->pAppDesc->guidInstance, txtBufHostName, txtBufPort, txtBufGameName, (*p)->gameStatusInfo);
 			}
-			else { //вставляем
+			else { //РІСЃС‚Р°РІР»СЏРµРј
 				gameHostListDP.push_back(sGameHostInfo( (*p)->pAppDesc->guidInstance, txtBufHostName, txtBufPort, txtBufGameName, (*p)->gameStatusInfo));//sGameStatusInfo(4,1, false, 10, 1)
 			}
 
@@ -1011,7 +1011,7 @@ void PNetCenter::ResetAndStartFindHost()
 	ExecuteInternalCommand(NCmd_Parking, true);
 	resetAllVariable_th1();
 	ExecuteInternalCommand(PNCCmd_Reset2FindHost, true); 
-	//сброс прошел !
+	//СЃР±СЂРѕСЃ РїСЂРѕС€РµР» !
 }
 void PNetCenter::resetAllVariable_th1()
 {
@@ -1027,12 +1027,12 @@ void PNetCenter::resetAllVariable_th1()
 	//interfaceCommandList.clear()
 	hostMissionDescription.clearAllUsersData();
 	clientMissionDescription.clearAllUsersData();
-	//internalConnectPlayerData //нет необходимости - имеет смысл только в пределах комманды создания игры
-	m_GameName.clear(); //нет необходимости 
+	//internalConnectPlayerData //РЅРµС‚ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё - РёРјРµРµС‚ СЃРјС‹СЃР» С‚РѕР»СЊРєРѕ РІ РїСЂРµРґРµР»Р°С… РєРѕРјРјР°РЅРґС‹ СЃРѕР·РґР°РЅРёСЏ РёРіСЂС‹
+	m_GameName.clear(); //РЅРµС‚ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё 
 	flag_StartedLoadGame = false;
 	//flag_StartedGame=false;
-	ClearCommandList(); //нет необходимости
-	ClearDeletePlayerGameCommand(); //нет необходимости
+	ClearCommandList(); //РЅРµС‚ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё
+	ClearDeletePlayerGameCommand(); //РЅРµС‚ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё
 	//m_gameHostID=0;
 
 	deleteUsersSuspended.clear();
@@ -1052,11 +1052,11 @@ void PNetCenter::resetAllVariable_th1()
 	//clearInternalFoundHostList();
 	needHostList.clear();
 
-	m_numberGameQuant = 1; //нет необходимости - сбрасываеться при загрузке
-	m_nQuantCommandCounter = 0; //нет необходимости - сбрасываеться при загрузке
+	m_numberGameQuant = 1; //РЅРµС‚ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё - СЃР±СЂР°СЃС‹РІР°РµС‚СЊСЃСЏ РїСЂРё Р·Р°РіСЂСѓР·РєРµ
+	m_nQuantCommandCounter = 0; //РЅРµС‚ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё - СЃР±СЂР°СЃС‹РІР°РµС‚СЊСЃСЏ РїСЂРё Р·Р°РіСЂСѓР·РєРµ
 	hostGeneralCommandCounter=0;
 	quantConfirmation=netCommandNextQuant::NOT_QUANT_CONFIRMATION;
-	unidClientWhichWeWait.setEmpty(); //нет необходимости 
+	unidClientWhichWeWait.setEmpty(); //РЅРµС‚ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё 
 
 	gamePassword="";
 
@@ -1074,7 +1074,7 @@ void PNetCenter::immediatelyRefreshGameHostList()
 }
 
 
-// !!!!!!!!!!!!!!! Вызывает много вопросов !!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!! Р’С‹Р·С‹РІР°РµС‚ РјРЅРѕРіРѕ РІРѕРїСЂРѕСЃРѕРІ !!!!!!!!!!!!!!!!!!!
 // ONLY GAME SPY!
 #define IP1(x) (x & 0xff)
 #define IP2(x) ((x>>8) & 0xff)

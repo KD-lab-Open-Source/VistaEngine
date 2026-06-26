@@ -2,7 +2,7 @@
 
 void ShaderSceneTileMap9700::RestoreShader()
 {
-	LoadShaderVS("Minimal\\tile_map_scene_shadowFX.vsl");//Потом поменять на такой же но без фога
+	LoadShaderVS("Minimal\\tile_map_scene_shadowFX.vsl");//РџРѕС‚РѕРј РїРѕРјРµРЅСЏС‚СЊ РЅР° С‚Р°РєРѕР№ Р¶Рµ РЅРѕ Р±РµР· С„РѕРіР°
 	LoadShaderPS("Minimal\\tile_map_scene_shadow9700.psl");
 }
 

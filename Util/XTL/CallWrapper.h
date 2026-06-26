@@ -17,7 +17,7 @@ public:
 		func_(pF) {}
 	
 	virtual bool call() const {
-		xxassert(object_, "нулевой объект в CallWrapper");
+		xxassert(object_, "РЅСѓР»РµРІРѕР№ РѕР±СЉРµРєС‚ РІ CallWrapper");
 		return (object_->*func_)();
 	}
 
@@ -30,7 +30,7 @@ private:
 	pFunc func_;
 };
 
-/* пример использования:
+/* РїСЂРёРјРµСЂ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ:
 class cTest{
 public:
 	cTest() : a(0) {}
@@ -71,7 +71,7 @@ private:
 	ClassType *object_;
 	pFunc func_;
 
-	// параметр call
+	// РїР°СЂР°РјРµС‚СЂ call
 	PType par_;
 };
 

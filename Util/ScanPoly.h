@@ -107,11 +107,11 @@ void scanPolyByLineOp(const Vect2i points[], int n, LineOp& line_op)
 }
 
 //---------------------------------
-// Гуро
+// Р“СѓСЂРѕ
 template<class LineOp, class ColorType>
 void scanPolyByLineOp(const Vect2i points[], const ColorType colors[], int n, LineOp& line_op)
 {
-	// ColorType должен иметь -, /=(int) и быть сдинутым заранее, если используется фп
+	// ColorType РґРѕР»Р¶РµРЅ РёРјРµС‚СЊ -, /=(int) Рё Р±С‹С‚СЊ СЃРґРёРЅСѓС‚С‹Рј Р·Р°СЂР°РЅРµРµ, РµСЃР»Рё РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ С„Рї
 
 	#define DIV(a,b)	(((a) << 16)/(b))
 	#define CCW(i)		(i == 0 ? n - 1 : i - 1)

@@ -32,12 +32,12 @@ void LensFlareSprite::init()
 //////////////////////////////////////////////////////////////////////////////
 void LensFlareSprite::serialize(Archive& ar)
 {
-    ar.serialize(position_, "position", "&���������");
-    ar.serialize(radius_, "radius", "&������");
-    ar.serialize(color_, "color", "&����");
-    ar.serialize(additiveBlending_, "additiveBlending", "��������� ��������");
+    ar.serialize(position_, "position", "&Положение");
+    ar.serialize(radius_, "radius", "&Радиус");
+    ar.serialize(color_, "color", "&Цвет");
+    ar.serialize(additiveBlending_, "additiveBlending", "Адитивный блендинг");
 	static ResourceSelector::Options options("*.tga", "Resource\\FX\\Textures", "Please, select texture", true);
-	ar.serialize(ResourceSelector(filename_, options), "filename", "��������");
+	ar.serialize(ResourceSelector(filename_, options), "filename", "Текстура");
     //if(ar.isInput() && ar.isEdit())
     //    init();
 }
@@ -306,10 +306,10 @@ void LensFlareRenderer::init()
 //////////////////////////////////////////////////////////////////////////////
 void LensFlareRenderer::serialize(Archive& ar)
 {
-	ar.serialize(isEnabled_, "isEnabled", "��������");
-	ar.serialize(showGlowSprite_, "showGlowSprite", "���������� �����");
-	ar.serialize(glowSprite_, "glowSprite", showGlowSprite_ ? "�����" : 0);
-	ar.serialize(lensFlare_, "sprites", "�������");
+	ar.serialize(isEnabled_, "isEnabled", "Включить");
+	ar.serialize(showGlowSprite_, "showGlowSprite", "Показывать ореол");
+	ar.serialize(glowSprite_, "glowSprite", showGlowSprite_ ? "Ореол" : 0);
+	ar.serialize(lensFlare_, "sprites", "Спрайты");
 	if(ar.isInput() && isEnabled_)
 		init();
 }

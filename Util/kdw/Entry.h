@@ -48,7 +48,7 @@ public:
 	virtual void onChanged() { signalChanged_.emit(); }
 	sigslot::signal0& signalChanged() { return signalChanged_; }
 
-	void commit(); // вызывает onEdited, если есть изменения
+	void commit(); // РІС‹Р·С‹РІР°РµС‚ onEdited, РµСЃР»Рё РµСЃС‚СЊ РёР·РјРµРЅРµРЅРёСЏ
 	virtual void onEdited() { signalEdited_.emit(); }
 	sigslot::signal0& signalEdited() { return signalEdited_; }
 

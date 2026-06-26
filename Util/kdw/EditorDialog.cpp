@@ -51,10 +51,10 @@ void EditorDialog::init(Serializer& serializer, const char* stateFileName, int f
 	}
 
 	if(!(flags & kdw::IMMEDIATE_UPDATE))
-		addButton(TRANSLATE("Перегрузить"), kdw::RESPONSE_RETRY, false);
+		addButton(TRANSLATE("РџРµСЂРµРіСЂСѓР·РёС‚СЊ"), kdw::RESPONSE_RETRY, false);
 
-	addButton(TRANSLATE("ОК"), kdw::RESPONSE_OK);
-	addButton(TRANSLATE("Отмена"), kdw::RESPONSE_CANCEL);
+	addButton(TRANSLATE("РћРљ"), kdw::RESPONSE_OK);
+	addButton(TRANSLATE("РћС‚РјРµРЅР°"), kdw::RESPONSE_CANCEL);
 }
 
 void EditorDialog::onResponse(int response)

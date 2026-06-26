@@ -7,15 +7,15 @@
 struct AITile
 {
 	enum { 
-		kmGrid_ = 2, // одноименный параметр из vMap
-		tile_size_world_shl = 4, // размер тайла в мировых координатах
-		tile_size = 1 << (tile_size_world_shl - kmGrid_), // размер тайла в масштабе карты атрибутов
-		tile_area = tile_size*tile_size // нормировка
+		kmGrid_ = 2, // РѕРґРЅРѕРёРјРµРЅРЅС‹Р№ РїР°СЂР°РјРµС‚СЂ РёР· vMap
+		tile_size_world_shl = 4, // СЂР°Р·РјРµСЂ С‚Р°Р№Р»Р° РІ РјРёСЂРѕРІС‹С… РєРѕРѕСЂРґРёРЅР°С‚Р°С…
+		tile_size = 1 << (tile_size_world_shl - kmGrid_), // СЂР°Р·РјРµСЂ С‚Р°Р№Р»Р° РІ РјР°СЃС€С‚Р°Р±Рµ РєР°СЂС‚С‹ Р°С‚СЂРёР±СѓС‚РѕРІ
+		tile_area = tile_size*tile_size // РЅРѕСЂРјРёСЂРѕРІРєР°
 		};
 
-	unsigned char height_min; // Средняя высота точки 
-	int dig_work;	// Работа по выравниванию
-	bool dig_less; // Не копается
+	unsigned char height_min; // РЎСЂРµРґРЅСЏСЏ РІС‹СЃРѕС‚Р° С‚РѕС‡РєРё 
+	int dig_work;	// Р Р°Р±РѕС‚Р° РїРѕ РІС‹СЂР°РІРЅРёРІР°РЅРёСЋ
+	bool dig_less; // РќРµ РєРѕРїР°РµС‚СЃСЏ
 
 	bool impassability;
 	bool water;
@@ -23,7 +23,7 @@ struct AITile
 
 	AITile() : building(false), impassability(false), water(false) {}
 	bool update(int x,int y); // returns whether the state (completeness) was changed
-	bool completed() const { return !dig_work; } // обработан
+	bool completed() const { return !dig_work; } // РѕР±СЂР°Р±РѕС‚Р°РЅ
 };
 
 class AITileMap : public Map2D<AITile, AITile::tile_size_world_shl>
@@ -36,14 +36,14 @@ public:
 	void InitialUpdate();
 	void UpdateRect(int x,int y,int dx,int dy); // world coords
 
-	// Установка зданий 
+	// РЈСЃС‚Р°РЅРѕРІРєР° Р·РґР°РЅРёР№ 
 	void placeBuilding(const Vect2i& v1, const Vect2i& size, bool place); // map coords
 	bool readyForBuilding(const Vect2i& v1, const Vect2i& size); // map coords
 
-	//Работа с водой
+	//Р Р°Р±РѕС‚Р° СЃ РІРѕРґРѕР№
 	friend void waterTileChange(int x, int y);
 
-	// Поиск пути
+	// РџРѕРёСЃРє РїСѓС‚Рё
 	bool findPath(const Vect2i& from, const Vect2i& to, vector<Vect2i>& out_path, AStarTile flags);
 	void recalcPathFind();
 

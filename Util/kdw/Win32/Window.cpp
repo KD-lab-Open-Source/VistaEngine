@@ -117,9 +117,9 @@ int KDW_API basicMessageLoop(HACCEL acceleratorTable)
 {
 	MSG msg;
 	
-	while(GetMessage(&msg, 0, 0, 0)){ // бегает в цикле пока не получит WM_QUIT
+	while(GetMessage(&msg, 0, 0, 0)){ // Р±РµРіР°РµС‚ РІ С†РёРєР»Рµ РїРѕРєР° РЅРµ РїРѕР»СѓС‡РёС‚ WM_QUIT
 		if(!TranslateAccelerator(msg.hwnd, acceleratorTable, &msg)){ 
-			TranslateMessage(&msg); // генерит WM_CHAR из WM_KEYDOWN и т.п.
+			TranslateMessage(&msg); // РіРµРЅРµСЂРёС‚ WM_CHAR РёР· WM_KEYDOWN Рё С‚.Рї.
 			DispatchMessage(&msg);
 		}
 	}
@@ -368,7 +368,7 @@ void Window32::onMessageTimer(int id)
 			timer->onTimer();
 	}
 	
-	defaultWindowProcedure(WM_TIMER, id, 0); // упускаем callback
+	defaultWindowProcedure(WM_TIMER, id, 0); // СѓРїСѓСЃРєР°РµРј callback
 }
 
 LRESULT Window32::onMessage(UINT message, WPARAM wparam, LPARAM lparam)
@@ -418,7 +418,7 @@ LRESULT Window32::onMessage(UINT message, WPARAM wparam, LPARAM lparam)
 			USHORT command = HIWORD(wparam);
 			USHORT id = LOWORD(wparam);
 			HWND wnd = HWND(lparam);
-			// возвращаем WM_COMMAND обратно
+			// РІРѕР·РІСЂР°С‰Р°РµРј WM_COMMAND РѕР±СЂР°С‚РЅРѕ
 			if(wnd != handle_)
 				::SendMessage(wnd, message, wparam, lparam);
 			return onMessageCommand(command, id, wnd);

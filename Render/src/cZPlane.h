@@ -9,7 +9,7 @@ class cPlane : public cUnkObj
 	Vect3f size;
 public:
 	cPlane();
-	/*  Что можно применять
+	/*  Р§С‚Рѕ РјРѕР¶РЅРѕ РїСЂРёРјРµРЅСЏС‚СЊ
 		SetTexture(0,...)
 		setAttribute ATTRUNKOBJ_IGNORE
 		SetScale

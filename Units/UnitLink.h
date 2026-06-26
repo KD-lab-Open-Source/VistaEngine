@@ -28,7 +28,7 @@ private:
 #endif
 };
 
-// ���������� ���� �������������� ������� get
+// Необходимо явно инстанцировать функцию get
 #ifdef _FINAL_VERSION_
 #define UNIT_LINK_GET(Unit)	
 #else

@@ -13,7 +13,7 @@ class KDW_API Label : public _WidgetWithWindow{
 public:
 	Label(const char* text = "Label", bool emphasis = false, int border = 0);
 
-	/// виджет, которму передается фокус при нажатии хоткея из лейбла или клику по нему
+	/// РІРёРґР¶РµС‚, РєРѕС‚РѕСЂРјСѓ РїРµСЂРµРґР°РµС‚СЃСЏ С„РѕРєСѓСЃ РїСЂРё РЅР°Р¶Р°С‚РёРё С…РѕС‚РєРµСЏ РёР· Р»РµР№Р±Р»Р° РёР»Рё РєР»РёРєСѓ РїРѕ РЅРµРјСѓ
 	//void setMnemonicWidget(Widget* mnemonicWidget);
 
 	void setAlignment(TextAlignHorizontal alignh, TextAlignVertical alignv = ALIGN_MIDDLE);

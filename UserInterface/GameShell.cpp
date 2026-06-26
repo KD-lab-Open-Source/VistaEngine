@@ -599,7 +599,7 @@ void GameShell::GameClose()
 
 	//SNDSetFade(false,1000);
 	SNDStopAll();
-	SNDSetFade(false,0); // ����� ���� ��� �������� ����� ��� �������� ������� �������� �������
+	SNDSetFade(false,0); // после того как появится поток для загрузки вернуть значение времени
 	SNDSetGameActive(false);
 	UI_LogicDispatcher::instance().setCursor(UI_GlobalAttributes::instance().cursor(UI_CURSOR_WAITING));
 	UI_LogicDispatcher::instance().profileSystem().saveState();
@@ -899,9 +899,9 @@ void GameShell::graphicsQuant()
 		if(terminateMission_ && UI_Dispatcher::instance().canExit())
 			GameClose();	
 	}
-	else if(!loadFpsTimer_.busy()){ // MainMenu, ������ ����������� �����
+	else if(!loadFpsTimer_.busy()){ // MainMenu, только графический поток
 		MT_SET_TLS(MT_GRAPH_THREAD | MT_LOGIC_THREAD);
-		loadFpsTimer_.start(1000 / 15); // 15 fps ��� ���������� ����������� ������
+		loadFpsTimer_.start(1000 / 15); // 15 fps при отсутствии логического потока
 
 		interpolation_timer_ += scale_time.delta();
 		if(interpolation_timer_ > logicTimePeriod){
@@ -1074,7 +1074,7 @@ void GameShell::Show(float realGraphDT)
 
 		environment->graphQuant(realGraphDT, cameraManager->GetCamera());
 
-		cameraManager->GetCamera()->setAttribute(ATTRCAMERA_CLEARZBUFFER);//������ ��� � ���� ����� ���������� ������� � z buffer.
+		cameraManager->GetCamera()->setAttribute(ATTRCAMERA_CLEARZBUFFER);//Потому как в небе могут рисоваться планеты в z buffer.
 		terScene->Draw(cameraManager->GetCamera());
 
 		environment->drawPostEffects(realGraphDT, cameraManager->GetCamera());
@@ -1323,7 +1323,7 @@ void GameShell::EventParser(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;			}
 	case WM_KEYUP:
 	case WM_SYSKEYUP:	{
-		if(wParam == VK_SNAPSHOT){ // WM_KEYDOWN ��� PrintScreen �� �������� �������
+		if(wParam == VK_SNAPSHOT){ // WM_KEYDOWN для PrintScreen не приходит никогда
 			sKey key(addModifiersState(wParam));
 			if(isKeyEnabled(key))
 				KeyPressed(key, false);
@@ -1387,10 +1387,10 @@ public:
 		mousePosition_ = mousePosition;
 	}
 	void serialize(Archive& ar){
-		ar.serialize(attr_, "attr", "����");
-		ar.serialize(playerID_,"playerID","�����");
-		ar.serialize(number_,"number","����������");
-		ar.serialize(inTheSameSquad_,"inTheSameSquad","� ����� ������");
+		ar.serialize(attr_, "attr", "Юнит");
+		ar.serialize(playerID_,"playerID","Игрок");
+		ar.serialize(number_,"number","Количество");
+		ar.serialize(inTheSameSquad_,"inTheSameSquad","В одном скваде");
 	}
 	void generate(){
 		playerID_ = clamp(playerID_, 0, universe()->Players.size()-1);
@@ -1571,7 +1571,7 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 			Player* player = universe()->activePlayer();
 			if(isShiftPressed()){
 				XBuffer nameAlt;
-				nameAlt < "����� (0-" <= universe()->Players.size() - 1 < ")";
+				nameAlt < "Игрок (0-" <= universe()->Players.size() - 1 < ")";
 				int playerID = player->playerID();
 				Serializer playerIDSerializer(playerID, "playerID", nameAlt);
 				if(kdw::edit(playerIDSerializer, "Scripts\\TreeControlSetups\\chooseTrigger", 0, hWnd())){
@@ -1686,7 +1686,7 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 		//	UnitActing* unit = dynamic_cast<UnitActing*>(selectManager->selectedUnit());
 		//	if(unit){
 		//		static CommandsQueueReference queue;
-		//		if(kdw::edit(Serializer(queue, "queue", "������� ������"), "Scripts\\TreeControlSetups\\commandsQueueState", 0, hWnd()))
+		//		if(kdw::edit(Serializer(queue, "queue", "Очередь команд"), "Scripts\\TreeControlSetups\\commandsQueueState", 0, hWnd()))
 		//			unit->executeCommandsQueue(*queue);
 		//	}
 		//}
@@ -1727,7 +1727,7 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 			return false;
 	}
 
-	// ������������� �������
+	// Конфликтующие клавиши
 	switch(Key.fullkey){
 	case 'D':
 		if(selectManager)
@@ -2172,7 +2172,7 @@ void GameShell::cameraQuant(float frameDeltaTime)
 		}
 	}
 
-	//����� ����� ������ � ���� ����
+	//сдвиг когда курсор у края окна
 	if(!selectMouseTrack && !cameraMouseTrack && cameraCursorInWindow && controlEnabled()){
 		if(int dir = cameraManager->mouseQuant(mousePosition()))
 			cameraCursor_ = UI_GlobalAttributes::instance().getMoveCursor(dir);
@@ -2182,7 +2182,7 @@ void GameShell::cameraQuant(float frameDeltaTime)
 	bool needLockMouse = false;
 	
 	static int lockState;
-	//������� �����
+	//поворот мышью
 	if(cameraMouseTrack && (MouseMoveFlag || lockState)){
 		if(MouseMoveFlag && controlEnabled()){
 			needLockMouse = true;
@@ -2347,19 +2347,19 @@ void GameShell::editParameters()
 	gb_RenderDevice->Flush();
 	ShowCursor(1);
 
-	const char* libraryEditor = "�������� ��������� (�����)";
+	const char* libraryEditor = "Редактор библиотек (войск)";
 	const char* enginePrm = "EnginePrm";
 	const char* visGeneric = "VisGeneric";
 	const char* debugPrmTitle = "Debug.prm";
-	const char* globalAttribute = "���������� ���������";
-	const char* globalEnvironment = "���������� ��������� ���������";
-	const char* sounds = "�����";
-	const char* interfaceAttribute = "���������";
-	const char* physics = "���������� ���������";
-	const char* explode = "��������� �������";
+	const char* globalAttribute = "Глобальные параметры";
+	const char* globalEnvironment = "Глобальные параметры окружения";
+	const char* sounds = "Звуки";
+	const char* interfaceAttribute = "Интерфейс";
+	const char* physics = "Физические параметры";
+	const char* explode = "Параметры взрывов";
 	const char* gameSettings = "Game settins";
-	const char* keySettings = "��������� ����������";
-	const char* joystickSettings = "��������� ���������";
+	const char* keySettings = "Настройки клавиатуры";
+	const char* joystickSettings = "Настройки джойстика";
 	const char* separator = "--------------";
 
 	vector<const char*> items;
@@ -2541,7 +2541,7 @@ UnitReal* GameShell::unitHover(const Vect3f& v0, const Vect3f& v1, float& distMi
 	bool exactHit = underFullDirectControl();
 	Player* player = universe()->activePlayer();
 	UnitReal* unitMin = 0;
-	// visibleUnits_ ������������� �� �������� �������, ������������ ��������� ������� � ���������
+	// visibleUnits_ отсортированы по убыванию глубины, эффективннее проверять начиная с ближайших
 	VisibleUnits::const_reverse_iterator ui = visibleUnits_.rbegin();
 	VisibleUnits::const_reverse_iterator ui_end = visibleUnits_.rend();
 	for(; ui != ui_end; ++ui){

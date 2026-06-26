@@ -11,9 +11,9 @@ ColorChooserDialog::ColorChooserDialog(kdw::Widget* parent, const Color4f& color
 	xassert(showColor || showAlpha);
 
 	if(showColor)
-		setTitle(TRANSLATE("Выбор цвета"));
+		setTitle(TRANSLATE("Р’С‹Р±РѕСЂ С†РІРµС‚Р°"));
 	else
-		setTitle(TRANSLATE("Выбор альфы"));
+		setTitle(TRANSLATE("Р’С‹Р±РѕСЂ Р°Р»СЊС„С‹"));
 
 	if(showColor)
 		setDefaultSize(Vect2i(350, 400));
@@ -27,8 +27,8 @@ ColorChooserDialog::ColorChooserDialog(kdw::Widget* parent, const Color4f& color
 	chooser_->setShowAlpha(showAlpha);
 	add(chooser_);
 
-	addButton(TRANSLATE("ОК"),     RESPONSE_OK);
-	addButton(TRANSLATE("Отмена"), RESPONSE_CANCEL);
+	addButton(TRANSLATE("РћРљ"),     RESPONSE_OK);
+	addButton(TRANSLATE("РћС‚РјРµРЅР°"), RESPONSE_CANCEL);
 
 	set(color);
 }

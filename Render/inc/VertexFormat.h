@@ -7,11 +7,11 @@
 struct IDirect3DVertexDeclaration9;
 
 #pragma pack(push,1)
-/// ×òîáû ïîëíåå ïîíèìàòü âîðìàòû - ñì. õýëï DirectX
+/// Ð§Ñ‚Ð¾Ð±Ñ‹ Ð¿Ð¾Ð»Ð½ÐµÐµ Ð¿Ð¾Ð½Ð¸Ð¼Ð°Ñ‚ÑŒ Ð²Ð¾Ñ€Ð¼Ð°Ñ‚Ñ‹ - ÑÐ¼. Ñ…ÑÐ»Ð¿ DirectX
 
 struct RENDER_API sVertexXYZ
 {
-	Vect3f	pos;/// ïîëîæåíèå îáúåêòà â òðåõìåðíîì ïðîñòðàíñòâå
+	Vect3f	pos;/// Ð¿Ð¾Ð»Ð¾Ð¶ÐµÐ½Ð¸Ðµ Ð¾Ð±ÑŠÐµÐºÑ‚Ð° Ð² Ñ‚Ñ€ÐµÑ…Ð¼ÐµÑ€Ð½Ð¾Ð¼ Ð¿Ñ€Ð¾ÑÑ‚Ñ€Ð°Ð½ÑÑ‚Ð²Ðµ
 	static IDirect3DVertexDeclaration9* declaration;
 };
 
@@ -23,7 +23,7 @@ struct RENDER_API sVertexXYZD : public sVertexXYZ
 
 struct RENDER_API sVertexXYZT1: public sVertexXYZ
 { 
-	float			uv[2];/// êîîðèäèíàòû íà òåêñòóðå0
+	float			uv[2];/// ÐºÐ¾Ð¾Ñ€Ð¸Ð´Ð¸Ð½Ð°Ñ‚Ñ‹ Ð½Ð° Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ðµ0
 	inline float& u1()					{ return uv[0]; }
 	inline float& v1()					{ return uv[1]; }
 	inline Vect2f& GetTexel()			{ return *((Vect2f*)&uv[0]); }
@@ -32,7 +32,7 @@ struct RENDER_API sVertexXYZT1: public sVertexXYZ
 };
 struct RENDER_API sVertexXYZDT1 : public sVertexXYZD
 {
-	float			uv[2];/// êîîðèäèíàòû íà òåêñòóðå1
+	float			uv[2];/// ÐºÐ¾Ð¾Ñ€Ð¸Ð´Ð¸Ð½Ð°Ñ‚Ñ‹ Ð½Ð° Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ðµ1
 	inline float& u1()					{ return uv[0]; }
 	inline float& v1()					{ return uv[1]; }
 	inline Vect2f& GetTexel()			{ return *((Vect2f*)&uv[0]); }
@@ -41,7 +41,7 @@ struct RENDER_API sVertexXYZDT1 : public sVertexXYZD
 };
 struct RENDER_API sVertexXYZDT2 : public sVertexXYZDT1
 {
-	float			uv2[2];/// êîîðèäèíàòû íà òåêñòóðå2
+	float			uv2[2];/// ÐºÐ¾Ð¾Ñ€Ð¸Ð´Ð¸Ð½Ð°Ñ‚Ñ‹ Ð½Ð° Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ðµ2
 	inline float& u2()					{ return uv2[0]; }
 	inline float& v2()					{ return uv2[1]; }
 	inline Vect2f& GetTexel2()			{ return *((Vect2f*)&uv2[0]); }
@@ -73,7 +73,7 @@ struct RENDER_API sVertexXYZDST2 : public sVertexXYZDST1
 
 struct RENDER_API sVertexXYZWT1
 {
-	float			x,y,z,w;/// ïðåîáðàçîâàííîå â äâóõìåðíîå ïðîñòðàíñòâî ïîëîæåíèå îáúåêòà. Ñ òàêèìè ôîðìàòàìè íå ïðèìåíÿåòñÿ âåðòåêñ øåéäåð.
+	float			x,y,z,w;/// Ð¿Ñ€ÐµÐ¾Ð±Ñ€Ð°Ð·Ð¾Ð²Ð°Ð½Ð½Ð¾Ðµ Ð² Ð´Ð²ÑƒÑ…Ð¼ÐµÑ€Ð½Ð¾Ðµ Ð¿Ñ€Ð¾ÑÑ‚Ñ€Ð°Ð½ÑÑ‚Ð²Ð¾ Ð¿Ð¾Ð»Ð¾Ð¶ÐµÐ½Ð¸Ðµ Ð¾Ð±ÑŠÐµÐºÑ‚Ð°. Ð¡ Ñ‚Ð°ÐºÐ¸Ð¼Ð¸ Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚Ð°Ð¼Ð¸ Ð½Ðµ Ð¿Ñ€Ð¸Ð¼ÐµÐ½ÑÐµÑ‚ÑÑ Ð²ÐµÑ€Ñ‚ÐµÐºÑ ÑˆÐµÐ¹Ð´ÐµÑ€.
 	float			uv[2];
 	Vect3f& GetVect3f()					{ return *(Vect3f*)&x; }
 	inline float& u1()					{ return uv[0]; }
@@ -133,7 +133,7 @@ struct RENDER_API sVertexXYZWDT4 : public sVertexXYZWDT3
 };
 struct RENDER_API sVertexXYZN : public sVertexXYZ
 {
-	Vect3f	n;/// íîðìàëü
+	Vect3f	n;/// Ð½Ð¾Ñ€Ð¼Ð°Ð»ÑŒ
 	static IDirect3DVertexDeclaration9* declaration;
 };
 struct RENDER_API sVertexXYZND : public sVertexXYZN
@@ -184,8 +184,8 @@ struct RENDER_API sVertexXYZINT1 : public sVertexXYZ
 
 class RENDER_API cSkinVertex
 {
-/*ïëàâàþùèé ôîðìàò äëÿ ñêèíèíãà ñ 1..4 êîñòÿìè è ïîääåðæêîé áàìïà.
-  êàê âåñà òàê è èíäåêñû ìàòðèö âåñîâ õðàíÿòñÿ â âèäå áàéòèêîâ.
+/*Ð¿Ð»Ð°Ð²Ð°ÑŽÑ‰Ð¸Ð¹ Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚ Ð´Ð»Ñ ÑÐºÐ¸Ð½Ð¸Ð½Ð³Ð° Ñ 1..4 ÐºÐ¾ÑÑ‚ÑÐ¼Ð¸ Ð¸ Ð¿Ð¾Ð´Ð´ÐµÑ€Ð¶ÐºÐ¾Ð¹ Ð±Ð°Ð¼Ð¿Ð°.
+  ÐºÐ°Ðº Ð²ÐµÑÐ° Ñ‚Ð°Ðº Ð¸ Ð¸Ð½Ð´ÐµÐºÑÑ‹ Ð¼Ð°Ñ‚Ñ€Ð¸Ñ† Ð²ÐµÑÐ¾Ð² Ñ…Ñ€Ð°Ð½ÑÑ‚ÑÑ Ð² Ð²Ð¸Ð´Ðµ Ð±Ð°Ð¹Ñ‚Ð¸ÐºÐ¾Ð².
 	Vect3f	pos;
 	BYTE index[4];
 	Vect3f	n;
@@ -216,7 +216,7 @@ public:
 	BYTE& GetWeight(int idx);
 	Vect2f& GetTexel(){return *(Vect2f*)(offset_texel+cur);}
 
-	/// S,T,SxT=N - ìàòðèöà ïðåîáðàçîâàíèÿ â ïðîñòðàíñòâî òðåóãîëüíèêà äëÿ áàìïà.
+	/// S,T,SxT=N - Ð¼Ð°Ñ‚Ñ€Ð¸Ñ†Ð° Ð¿Ñ€ÐµÐ¾Ð±Ñ€Ð°Ð·Ð¾Ð²Ð°Ð½Ð¸Ñ Ð² Ð¿Ñ€Ð¾ÑÑ‚Ñ€Ð°Ð½ÑÑ‚Ð²Ð¾ Ñ‚Ñ€ÐµÑƒÐ³Ð¾Ð»ÑŒÐ½Ð¸ÐºÐ° Ð´Ð»Ñ Ð±Ð°Ð¼Ð¿Ð°.
 	Vect3f& GetBumpS(){return *(Vect3f*)(offset_bump_s+cur);}
 	Vect3f& GetBumpT(){return *(Vect3f*)(offset_bump_t+cur);}
 
@@ -230,13 +230,13 @@ public:
 protected:
 };
 /*
-Êàê ìîæíî ýêîíîìèòü.
-Áûëî 4*3*4=48 áàéò íà äàííûõ, êîòîðûå ðåàëüíî ñýêîíîìèòü. GetPos, GetNorm, GetBumpS, GetBumpT
-+ GetIndex, GetWeight, GetTexel -> 16 áàéò íà êîòîðûõ íåðåàëüíî ñýêîíîìèòü
-1) GetPos, GetNorm, GetBumpS, GetBumpT -> short -> 3*4*2=24 áàéòà, 3 óìíîæåíèÿ + 3 êîïèðîâàíèÿ. (âîçìîæíî êîïèðîâàíèÿ íå íóæíû åñëè àêêóðàòíî êîä íàïèñàòü).
-2) GetTexel -> short -> 4 áàéòà , +1 óìíîæåíèå.
-3) GetNorm, GetBumpS, GetBumpT -> color -> 3*4=12 áàéò, íåò äîïîëíèòåëüíûõ óìíîæåíèé, íî òî÷íîñòü íèçêà, õîòÿ è ñîïîñòàâèìà ñ òî÷íîñòüþ êàðòû íîðìàëåé.
-4) T=cross(N,S) -> 2 îïåðàöèè, -12 áàéò
+ÐšÐ°Ðº Ð¼Ð¾Ð¶Ð½Ð¾ ÑÐºÐ¾Ð½Ð¾Ð¼Ð¸Ñ‚ÑŒ.
+Ð‘Ñ‹Ð»Ð¾ 4*3*4=48 Ð±Ð°Ð¹Ñ‚ Ð½Ð° Ð´Ð°Ð½Ð½Ñ‹Ñ…, ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ðµ Ñ€ÐµÐ°Ð»ÑŒÐ½Ð¾ ÑÑÐºÐ¾Ð½Ð¾Ð¼Ð¸Ñ‚ÑŒ. GetPos, GetNorm, GetBumpS, GetBumpT
++ GetIndex, GetWeight, GetTexel -> 16 Ð±Ð°Ð¹Ñ‚ Ð½Ð° ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ñ… Ð½ÐµÑ€ÐµÐ°Ð»ÑŒÐ½Ð¾ ÑÑÐºÐ¾Ð½Ð¾Ð¼Ð¸Ñ‚ÑŒ
+1) GetPos, GetNorm, GetBumpS, GetBumpT -> short -> 3*4*2=24 Ð±Ð°Ð¹Ñ‚Ð°, 3 ÑƒÐ¼Ð½Ð¾Ð¶ÐµÐ½Ð¸Ñ + 3 ÐºÐ¾Ð¿Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ñ. (Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾ ÐºÐ¾Ð¿Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ñ Ð½Ðµ Ð½ÑƒÐ¶Ð½Ñ‹ ÐµÑÐ»Ð¸ Ð°ÐºÐºÑƒÑ€Ð°Ñ‚Ð½Ð¾ ÐºÐ¾Ð´ Ð½Ð°Ð¿Ð¸ÑÐ°Ñ‚ÑŒ).
+2) GetTexel -> short -> 4 Ð±Ð°Ð¹Ñ‚Ð° , +1 ÑƒÐ¼Ð½Ð¾Ð¶ÐµÐ½Ð¸Ðµ.
+3) GetNorm, GetBumpS, GetBumpT -> color -> 3*4=12 Ð±Ð°Ð¹Ñ‚, Ð½ÐµÑ‚ Ð´Ð¾Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ñ… ÑƒÐ¼Ð½Ð¾Ð¶ÐµÐ½Ð¸Ð¹, Ð½Ð¾ Ñ‚Ð¾Ñ‡Ð½Ð¾ÑÑ‚ÑŒ Ð½Ð¸Ð·ÐºÐ°, Ñ…Ð¾Ñ‚Ñ Ð¸ ÑÐ¾Ð¿Ð¾ÑÑ‚Ð°Ð²Ð¸Ð¼Ð° Ñ Ñ‚Ð¾Ñ‡Ð½Ð¾ÑÑ‚ÑŒÑŽ ÐºÐ°Ñ€Ñ‚Ñ‹ Ð½Ð¾Ñ€Ð¼Ð°Ð»ÐµÐ¹.
+4) T=cross(N,S) -> 2 Ð¾Ð¿ÐµÑ€Ð°Ñ†Ð¸Ð¸, -12 Ð±Ð°Ð¹Ñ‚
 */
 
 struct sVertexD

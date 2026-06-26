@@ -15,9 +15,9 @@
 #include "UnicodeConverter.h"
 #include "WBuffer.h"
 
-WRAP_LIBRARY(InventoryCellTypeTable, "InventoryCellType", "Типы ячеек инвентаря", "Scripts\\Content\\InventoryCellType", 0, LIBRARY_EDITABLE);
-WRAP_LIBRARY(EquipmentSlotTypeTable, "EquipmentSlotType", "Типы слотов снаряжения", "Scripts\\Content\\EquipmentSlotType", 0, LIBRARY_EDITABLE);
-WRAP_LIBRARY(QuickAccessSlotTypeTable, "QuickAccessSlotType", "Типы слотов быстрого доступа", "Scripts\\Content\\QuickAccessSlotType", 0, true);
+WRAP_LIBRARY(InventoryCellTypeTable, "InventoryCellType", "РўРёРїС‹ СЏС‡РµРµРє РёРЅРІРµРЅС‚Р°СЂСЏ", "Scripts\\Content\\InventoryCellType", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(EquipmentSlotTypeTable, "EquipmentSlotType", "РўРёРїС‹ СЃР»РѕС‚РѕРІ СЃРЅР°СЂСЏР¶РµРЅРёСЏ", "Scripts\\Content\\EquipmentSlotType", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(QuickAccessSlotTypeTable, "QuickAccessSlotType", "РўРёРїС‹ СЃР»РѕС‚РѕРІ Р±С‹СЃС‚СЂРѕРіРѕ РґРѕСЃС‚СѓРїР°", "Scripts\\Content\\QuickAccessSlotType", 0, true);
 
 UI_QuickAccessMode InventorySet::quickAccessMode_ = UI_INVENTORY_QUICK_ACCESS_ON;
 
@@ -128,9 +128,9 @@ void InventoryItem::serialize(Archive& ar)
 void InventoryItem::showDebugInfo() const
 {
 	XBuffer buf(1024, 1);
-	buf < "Предмет: " < (attribute() ? attribute()->libraryKey() : "NONE");
-	buf < "\nПараметры:\n" < parameters().debugStr();
-	buf < "\nАрифметика:\n";
+	buf < "РџСЂРµРґРјРµС‚: " < (attribute() ? attribute()->libraryKey() : "NONE");
+	buf < "\nРџР°СЂР°РјРµС‚СЂС‹:\n" < parameters().debugStr();
+	buf < "\nРђСЂРёС„РјРµС‚РёРєР°:\n";
 	
 	WBuffer out;
 	arithmetics().getUIData(out);

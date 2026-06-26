@@ -8,15 +8,15 @@ class AttributeItemInventory : public AttributeBase
 {
 public:
 
-	/// типы снаряжения
+	/// С‚РёРїС‹ СЃРЅР°СЂСЏР¶РµРЅРёСЏ
 	enum EquipmentType {
-		/// не снаряжение
+		/// РЅРµ СЃРЅР°СЂСЏР¶РµРЅРёРµ
 		EQUIPMENT_NONE,
-		/// снаряжение
+		/// СЃРЅР°СЂСЏР¶РµРЅРёРµ
 		EQUIPMENT_GENERAL,
-		/// оружие
+		/// РѕСЂСѓР¶РёРµ
 		EQUIPMENT_WEAPON,
-		/// боеприпасы
+		/// Р±РѕРµРїСЂРёРїР°СЃС‹
 		EQUIPMENT_AMMO,
 		
 		EQUIPMENT_HEALTH
@@ -30,28 +30,28 @@ public:
 	bool useLifeTime;
 	int lifeTime;
 
-	/// импульс прыжка если не влезает в инвентарь
+	/// РёРјРїСѓР»СЊСЃ РїСЂС‹Р¶РєР° РµСЃР»Рё РЅРµ РІР»РµР·Р°РµС‚ РІ РёРЅРІРµРЅС‚Р°СЂСЊ
 	float jumpImpulse;
 	float jumpAngularSpeed;
 
-	/// занимаемое в инвентаре пространство, в ячейках
+	/// Р·Р°РЅРёРјР°РµРјРѕРµ РІ РёРЅРІРµРЅС‚Р°СЂРµ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРѕ, РІ СЏС‡РµР№РєР°С…
 	Vect2i inventorySize;
-	/// тип ячейки инвентаря
+	/// С‚РёРї СЏС‡РµР№РєРё РёРЅРІРµРЅС‚Р°СЂСЏ
 	InventoryCellType inventoryCellType;
-	/// вид предмета в инвентаре
+	/// РІРёРґ РїСЂРµРґРјРµС‚Р° РІ РёРЅРІРµРЅС‚Р°СЂРµ
 	UI_Sprite inventorySprite;
-	/// вид предмета в инвентаре быстрого доступа
+	/// РІРёРґ РїСЂРµРґРјРµС‚Р° РІ РёРЅРІРµРЅС‚Р°СЂРµ Р±С‹СЃС‚СЂРѕРіРѕ РґРѕСЃС‚СѓРїР°
 	UI_Sprite quickAccessSprite;
-	/// является ли снаряжением
+	/// СЏРІР»СЏРµС‚СЃСЏ Р»Рё СЃРЅР°СЂСЏР¶РµРЅРёРµРј
 	EquipmentType equipmentType;
-	/// слот снаряжения
+	/// СЃР»РѕС‚ СЃРЅР°СЂСЏР¶РµРЅРёСЏ
 	EquipmentSlotType equipmentSlotType;
-	/// слот быстрого доступа
+	/// СЃР»РѕС‚ Р±С‹СЃС‚СЂРѕРіРѕ РґРѕСЃС‚СѓРїР°
 	QuickAccessSlotType quickAccessSlotType;
 
-	/// тип оружия (для снаряжения-оружия)
+	/// С‚РёРї РѕСЂСѓР¶РёСЏ (РґР»СЏ СЃРЅР°СЂСЏР¶РµРЅРёСЏ-РѕСЂСѓР¶РёСЏ)
 	WeaponPrmReference weaponReference;
-	/// тип боеприпасов (для снаряжения-боеприпасов)
+	/// С‚РёРї Р±РѕРµРїСЂРёРїР°СЃРѕРІ (РґР»СЏ СЃРЅР°СЂСЏР¶РµРЅРёСЏ-Р±РѕРµРїСЂРёРїР°СЃРѕРІ)
 	WeaponAmmoTypeReference ammoTypeReference;
     
 	AttributeItemInventory();
@@ -59,7 +59,7 @@ public:
 	bool isEquipment() const { return (equipmentType != EQUIPMENT_NONE); }
 	int getInventoryCellType(UI_InventoryType inventory_type = UI_INVENTORY) const;
 
-	/// вывод описания на земле
+	/// РІС‹РІРѕРґ РѕРїРёСЃР°РЅРёСЏ РЅР° Р·РµРјР»Рµ
 	LocString tipText;
 };
 
@@ -77,7 +77,7 @@ public:
 	void executeCommand(const UnitCommand& command) {}
 	float parametersSum() const { return parametersSum_; }
 
-	/// Подпрыгивание когда не влезает в инвентарь.
+	/// РџРѕРґРїСЂС‹РіРёРІР°РЅРёРµ РєРѕРіРґР° РЅРµ РІР»РµР·Р°РµС‚ РІ РёРЅРІРµРЅС‚Р°СЂСЊ.
 	void jump();
 
 	void setPose(const Se3f& poseIn, bool initPose);

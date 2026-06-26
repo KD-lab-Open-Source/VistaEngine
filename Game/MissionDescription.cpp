@@ -67,9 +67,9 @@ END_ENUM_DESCRIPTOR(BitFlag)
 
 
 BEGIN_ENUM_DESCRIPTOR(GameType, "GameType")
-REGISTER_ENUM(GAME_TYPE_SCENARIO, "Прохождение")
-REGISTER_ENUM(GAME_TYPE_BATTLE, "Сражения")
-REGISTER_ENUM(GAME_TYPE_REEL, "Ролик")
+REGISTER_ENUM(GAME_TYPE_SCENARIO, "РџСЂРѕС…РѕР¶РґРµРЅРёРµ")
+REGISTER_ENUM(GAME_TYPE_BATTLE, "РЎСЂР°Р¶РµРЅРёСЏ")
+REGISTER_ENUM(GAME_TYPE_REEL, "Р РѕР»РёРє")
 END_ENUM_DESCRIPTOR(GameType)
 
 PlayerData::PlayerData(int playerIDIn, RealPlayerType realPlayerTypeIn)
@@ -142,24 +142,24 @@ void PlayerData::serialize(Archive& ar)
 	ar.serialize(playerID, "playerID", 0);
 	ar.serialize(shuffleIndex, "shuffleIndex", 0);
 	ar.serialize(realPlayerType, "realPlayerType", 0);
-	ar.serialize(race, "race", "Раса");
+	ar.serialize(race, "race", "Р Р°СЃР°");
 	if(ar.isEdit()){
 		ComboListColor color(GlobalAttributes::instance().playerColors, GlobalAttributes::instance().playerColors[colorIndex]);
-		ar.serialize(color, "color", "Цвет");
+		ar.serialize(color, "color", "Р¦РІРµС‚");
 		colorIndex = color.index();
 	}
 	else
-		ar.serialize(colorIndex, "colorIndex", "Цвет");
+		ar.serialize(colorIndex, "colorIndex", "Р¦РІРµС‚");
 	
 	if(colorIndex >= (int)GlobalAttributes::instance().playerColors.size())
 		colorIndex = GlobalAttributes::instance().playerAllowedColorSize();
 
 	if(ar.isEdit()) {
 		ComboListColor color(GlobalAttributes::instance().silhouetteColors, GlobalAttributes::instance().silhouetteColors[silhouetteColorIndex]);
-		ar.serialize(color, "silhouetteColor", "Цвет силуэтов");
+		ar.serialize(color, "silhouetteColor", "Р¦РІРµС‚ СЃРёР»СѓСЌС‚РѕРІ");
 		silhouetteColorIndex = color.index();
 	} else {
-		ar.serialize(silhouetteColorIndex, "silhouetteColorIndex", "Цвет силуэтов");
+		ar.serialize(silhouetteColorIndex, "silhouetteColorIndex", "Р¦РІРµС‚ СЃРёР»СѓСЌС‚РѕРІ");
 	}
 
 	if(ar.isEdit()) {
@@ -168,10 +168,10 @@ void PlayerData::serialize(Archive& ar)
 		FOR_EACH(GlobalAttributes::instance().underwaterColors, it)
 			colors.push_back(Color4f(it->color));
 		ComboListColor color(colors, colors[underwaterColorIndex]);
-		ar.serialize(color, "underwaterColor", "Цвет под водой");
+		ar.serialize(color, "underwaterColor", "Р¦РІРµС‚ РїРѕРґ РІРѕРґРѕР№");
 		underwaterColorIndex = color.index();
 	} else {
-		ar.serialize(underwaterColorIndex, "underwaterColorIndex", "Цвет под водой");
+		ar.serialize(underwaterColorIndex, "underwaterColorIndex", "Р¦РІРµС‚ РїРѕРґ РІРѕРґРѕР№");
 	}
 
 	if(underwaterColorIndex >= (int)GlobalAttributes::instance().underwaterColors.size())
@@ -183,22 +183,22 @@ void PlayerData::serialize(Archive& ar)
 		FOR_EACH(GlobalAttributes::instance().playerSigns, it)
 			tmp.push_back(string(it->unitTexture));
 		ComboVectorString emblem(tmp, signIndex, true);
-		ar.serialize(emblem, "emblem", "Эмблема");
+		ar.serialize(emblem, "emblem", "Р­РјР±Р»РµРјР°");
 		signIndex = emblem.value() - 1;
 	}else
-		ar.serialize(signIndex, "signIndex", "Эмблема");
+		ar.serialize(signIndex, "signIndex", "Р­РјР±Р»РµРјР°");
 
 	if(signIndex >= (int)GlobalAttributes::instance().playerSigns.size())
 		signIndex = GlobalAttributes::instance().playerAllowedSignSize();
 
-	ar.serialize(clan, "clan", "Клан");
-	ar.serialize(difficulty, "difficulty", "Сложность");
+	ar.serialize(clan, "clan", "РљР»Р°РЅ");
+	ar.serialize(difficulty, "difficulty", "РЎР»РѕР¶РЅРѕСЃС‚СЊ");
 
 	//ar.serialize(flag_playerStartReady, "flag_playerStartReady", 0);
 	//ar.serialize(flag_playerGameReady, "flag_playerGameReady", 0);
 	//ar.serialize(compAndUserID, "compAndUserID", 0);
 	string name = playerName;
-	ar.serialize(name, "name", "Имя игрока");
+	ar.serialize(name, "name", "РРјСЏ РёРіСЂРѕРєР°");
 	setName(name.c_str());
 }
 
@@ -306,24 +306,24 @@ void SlotData::serialize(Archive& ar)
 	ar.serialize(shuffleIndex, "shuffleIndex", 0); //WRAP_OBJECT(shuffleIndex);
 	ar.serialize(realPlayerType, "realPlayerType", 0); //WRAP_OBJECT(realPlayerType);
 	ar.serializeArray(usersIdxArr, "usersIdxArr", 0);
-	ar.serialize(race, "race", "Раса"); //TRANSLATE_OBJECT(race, "Раса");
+	ar.serialize(race, "race", "Р Р°СЃР°"); //TRANSLATE_OBJECT(race, "Р Р°СЃР°");
 	if(ar.isEdit()){
 		ComboListColor color(GlobalAttributes::instance().playerColors, GlobalAttributes::instance().playerColors[colorIndex]);
-		ar.serialize(color, "color", "Цвет");//TRANSLATE_OBJECT(color, "Цвет");
+		ar.serialize(color, "color", "Р¦РІРµС‚");//TRANSLATE_OBJECT(color, "Р¦РІРµС‚");
 		colorIndex = color.index();
 	}
 	else
-		ar.serialize(colorIndex, "colorIndex", "Цвет");//TRANSLATE_OBJECT(colorIndex, "Цвет");
+		ar.serialize(colorIndex, "colorIndex", "Р¦РІРµС‚");//TRANSLATE_OBJECT(colorIndex, "Р¦РІРµС‚");
 	
 	if(colorIndex >= (int)GlobalAttributes::instance().playerColors.size())
 		colorIndex = GlobalAttributes::instance().playerAllowedColorSize();
 
 	if(ar.isEdit()) {
 		ComboListColor color(GlobalAttributes::instance().silhouetteColors, GlobalAttributes::instance().silhouetteColors[silhouetteColorIndex]);
-		ar.serialize(color, "silhouetteColor", "Цвет силуэтов");//TRANSLATE_NAME(color, "silhouetteColor", "Цвет силуэтов");
+		ar.serialize(color, "silhouetteColor", "Р¦РІРµС‚ СЃРёР»СѓСЌС‚РѕРІ");//TRANSLATE_NAME(color, "silhouetteColor", "Р¦РІРµС‚ СЃРёР»СѓСЌС‚РѕРІ");
 		silhouetteColorIndex = color.index();
 	} else {
-		ar.serialize(silhouetteColorIndex, "silhouetteColorIndex", "Цвет силуэтов");//TRANSLATE_NAME(silhouetteColorIndex, "silhouetteColorIndex", "Цвет силуэтов");
+		ar.serialize(silhouetteColorIndex, "silhouetteColorIndex", "Р¦РІРµС‚ СЃРёР»СѓСЌС‚РѕРІ");//TRANSLATE_NAME(silhouetteColorIndex, "silhouetteColorIndex", "Р¦РІРµС‚ СЃРёР»СѓСЌС‚РѕРІ");
 	}
 
 	if(ar.isEdit()) {
@@ -332,10 +332,10 @@ void SlotData::serialize(Archive& ar)
 		FOR_EACH(GlobalAttributes::instance().underwaterColors, it)
 			colors.push_back(Color4f(it->color));
 		ComboListColor color(colors, colors[underwaterColorIndex]);
-		ar.serialize(color, "underwaterColor", "Цвет под водой");//TRANSLATE_NAME(color, "underwaterColor", "Цвет под водой");
+		ar.serialize(color, "underwaterColor", "Р¦РІРµС‚ РїРѕРґ РІРѕРґРѕР№");//TRANSLATE_NAME(color, "underwaterColor", "Р¦РІРµС‚ РїРѕРґ РІРѕРґРѕР№");
 		underwaterColorIndex = color.index();
 	} else {
-		ar.serialize(underwaterColorIndex, "underwaterColorIndex", "Цвет под водой");//TRANSLATE_NAME(underwaterColorIndex, "underwaterColorIndex", "Цвет под водой");
+		ar.serialize(underwaterColorIndex, "underwaterColorIndex", "Р¦РІРµС‚ РїРѕРґ РІРѕРґРѕР№");//TRANSLATE_NAME(underwaterColorIndex, "underwaterColorIndex", "Р¦РІРµС‚ РїРѕРґ РІРѕРґРѕР№");
 	}
 
 	if(underwaterColorIndex >= (int)GlobalAttributes::instance().underwaterColors.size())
@@ -347,21 +347,21 @@ void SlotData::serialize(Archive& ar)
 		FOR_EACH(GlobalAttributes::instance().playerSigns, it)
 			tmp.push_back(string(it->unitTexture));
 		ComboVectorString emblem(tmp, signIndex, true);
-		ar.serialize(emblem, "emblem","Эмблема");//TRANSLATE_OBJECT(emblem, "Эмблема");
+		ar.serialize(emblem, "emblem","Р­РјР±Р»РµРјР°");//TRANSLATE_OBJECT(emblem, "Р­РјР±Р»РµРјР°");
 		signIndex = emblem.value() - 1;
 	}else
-		ar.serialize(signIndex, "signIndex", "Эмблема");//TRANSLATE_OBJECT(signIndex, "Эмблема");
+		ar.serialize(signIndex, "signIndex", "Р­РјР±Р»РµРјР°");//TRANSLATE_OBJECT(signIndex, "Р­РјР±Р»РµРјР°");
 
 	if(signIndex >= (int)GlobalAttributes::instance().playerSigns.size())
 		signIndex = GlobalAttributes::instance().playerAllowedSignSize();
 
-	ar.serialize(clan, "clan", "Клан");//TRANSLATE_OBJECT(clan, "Клан");
-	ar.serialize(difficulty, "difficulty", "Сложность");//TRANSLATE_OBJECT(difficulty, "Сложность");
+	ar.serialize(clan, "clan", "РљР»Р°РЅ");//TRANSLATE_OBJECT(clan, "РљР»Р°РЅ");
+	ar.serialize(difficulty, "difficulty", "РЎР»РѕР¶РЅРѕСЃС‚СЊ");//TRANSLATE_OBJECT(difficulty, "РЎР»РѕР¶РЅРѕСЃС‚СЊ");
 }
 ///////////////////////////////////////////////////
 void UserData::readNet(XBuffer& in) 
 {
-	in.read(&flag_userConnected, sizeof(flag_userConnected)); //при миграции необходимо знать кто первоначально был подключен
+	in.read(&flag_userConnected, sizeof(flag_userConnected)); //РїСЂРё РјРёРіСЂР°С†РёРё РЅРµРѕР±С…РѕРґРёРјРѕ Р·РЅР°С‚СЊ РєС‚Рѕ РїРµСЂРІРѕРЅР°С‡Р°Р»СЊРЅРѕ Р±С‹Р» РїРѕРґРєР»СЋС‡РµРЅ
 	in.read(&flag_playerStartReady, sizeof(flag_playerStartReady));
 	in.read(&flag_playerGameLoaded, sizeof(flag_playerGameLoaded));
 	//in.read(compAndUserID);
@@ -371,7 +371,7 @@ void UserData::readNet(XBuffer& in)
 
 void UserData::writeNet(XBuffer& out) const 
 { 
-	out.write(&flag_userConnected, sizeof(flag_userConnected)); //при миграции необходимо знать кто первоначально был подключен
+	out.write(&flag_userConnected, sizeof(flag_userConnected)); //РїСЂРё РјРёРіСЂР°С†РёРё РЅРµРѕР±С…РѕРґРёРјРѕ Р·РЅР°С‚СЊ РєС‚Рѕ РїРµСЂРІРѕРЅР°С‡Р°Р»СЊРЅРѕ Р±С‹Р» РїРѕРґРєР»СЋС‡РµРЅ
 	out.write(&flag_playerStartReady, sizeof(flag_playerStartReady));
 	out.write(&flag_playerGameLoaded, sizeof(flag_playerGameLoaded));
 	//out.write(compAndUserID);
@@ -383,7 +383,7 @@ void UserData::serialize(Archive& ar)
 {
 	ar.serialize(flag_userConnected, "flag_userConnected", 0);
 	string name = playerNameE;
-	ar.serialize(name, "name", "Имя игрока");
+	ar.serialize(name, "name", "РРјСЏ РёРіСЂРѕРєР°");
 }
 
 //-------------------------------------------------
@@ -705,7 +705,7 @@ bool MissionDescription::valid() const
 
 void MissionDescription::deleteSave() const 
 {
-	// удаляем все файлы с таким именем (назависимо от расширения)
+	// СѓРґР°Р»СЏРµРј РІСЃРµ С„Р°Р№Р»С‹ СЃ С‚Р°РєРёРј РёРјРµРЅРµРј (РЅР°Р·Р°РІРёСЃРёРјРѕ РѕС‚ СЂР°СЃС€РёСЂРµРЅРёСЏ)
 	string mask = gameType() & GAME_TYPE_REEL ? setExtention(reelName(), "*") : saveData("*");
 	int pos = mask.rfind("\\");
 	string dir(mask, 0, pos != string::npos ? pos + 1 : 0); 
@@ -789,27 +789,27 @@ void MissionDescription::setByWorldName(const char* worldName)
 void MissionDescription::serialize(Archive& ar)
 {
 	ar.serialize(revision_, "revision", 0);
-	ar.serialize(interfaceName_, "interfaceName", "Интерфейсное имя мира");
-	ar.serialize(enableInterface, "enableInterface", "Интерфейс включен");
-	ar.serialize(enablePause, "enablePause", "Пауза разрешена");
+	ar.serialize(interfaceName_, "interfaceName", "РРЅС‚РµСЂС„РµР№СЃРЅРѕРµ РёРјСЏ РјРёСЂР°");
+	ar.serialize(enableInterface, "enableInterface", "РРЅС‚РµСЂС„РµР№СЃ РІРєР»СЋС‡РµРЅ");
+	ar.serialize(enablePause, "enablePause", "РџР°СѓР·Р° СЂР°Р·СЂРµС€РµРЅР°");
 	if(GlobalAttributes::instance().enableFogOfWar)
-		ar.serialize(is_fog_of_war, "is_fog_of_war", "Включить туман войны");
+		ar.serialize(is_fog_of_war, "is_fog_of_war", "Р’РєР»СЋС‡РёС‚СЊ С‚СѓРјР°РЅ РІРѕР№РЅС‹");
 	else
 		is_fog_of_war = false;
-	ar.serialize(silhouettesEnabled, "silhouettesEnabled", "Разрешить силуэты");
-	ar.serialize(saveMiniMap, "saveMiniMap", "Записывать миникарту в редакторе");
+	ar.serialize(silhouettesEnabled, "silhouettesEnabled", "Р Р°Р·СЂРµС€РёС‚СЊ СЃРёР»СѓСЌС‚С‹");
+	ar.serialize(saveMiniMap, "saveMiniMap", "Р—Р°РїРёСЃС‹РІР°С‚СЊ РјРёРЅРёРєР°СЂС‚Сѓ РІ СЂРµРґР°РєС‚РѕСЂРµ");
 	if(ar.isEdit() && !saveMiniMap){
 		string path = string(vMap.getWorldsDir()) + "\\" + vMap.getWorldName();
 		ResourceSelector::Options options("*.tga", path.c_str(), "Will select location of texture file", false);
 		path += "\\map.tga";
 		string texture = path;
-		ar.serialize(ResourceSelector(texture, options), "Texture", "текстура");
+		ar.serialize(ResourceSelector(texture, options), "Texture", "С‚РµРєСЃС‚СѓСЂР°");
 		if(ar.isInput())
 			rename(texture.c_str(), path.c_str());
 	}
-	ar.serialize(is_water, "is_water", "Включить воду");
-	ar.serialize(is_temperature, "is_temperature", "Включить замерзание жидкости");
-	ar.serialize(isBattle_, "isBattle_", "Мир для сражений");
+	ar.serialize(is_water, "is_water", "Р’РєР»СЋС‡РёС‚СЊ РІРѕРґСѓ");
+	ar.serialize(is_temperature, "is_temperature", "Р’РєР»СЋС‡РёС‚СЊ Р·Р°РјРµСЂР·Р°РЅРёРµ Р¶РёРґРєРѕСЃС‚Рё");
+	ar.serialize(isBattle_, "isBattle_", "РњРёСЂ РґР»СЏ СЃСЂР°Р¶РµРЅРёР№");
 	ar.serialize(worldName_, "worldName", 0);
 	
 	if(ar.isOutput() && !ar.isEdit())
@@ -818,7 +818,7 @@ void MissionDescription::serialize(Archive& ar)
 
 	is_water = true; // !!!
 	
-	ar.serialize(missionDescription_, "missionDescriptionLoc", "Описание миссии (лок)");
+	ar.serialize(missionDescription_, "missionDescriptionLoc", "РћРїРёСЃР°РЅРёРµ РјРёСЃСЃРёРё (Р»РѕРє)");
 
 	ar.serialize(playersAmountMax_, "playersAmountMax", 0);
 	ar.serialize(auxPlayersAmount_, "auxPlayersAmount", 0);
@@ -832,7 +832,7 @@ void MissionDescription::serialize(Archive& ar)
 	ar.serialize(useMapSettings_, "useMapSettings", 0); 
 	if(ar.isEdit()){
 		BitVector<BitFlag> flags = triggerFlags_;
-		ar.serialize(flags, "triggerFlags", "Переменные условий победы/поражения"); 
+		ar.serialize(flags, "triggerFlags", "РџРµСЂРµРјРµРЅРЅС‹Рµ СѓСЃР»РѕРІРёР№ РїРѕР±РµРґС‹/РїРѕСЂР°Р¶РµРЅРёСЏ"); 
 		triggerFlags_ = flags;
 	}
 	else

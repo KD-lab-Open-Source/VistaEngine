@@ -90,7 +90,7 @@ PropertyRowGradient<GradientType, style, type>::PropertyRowGradient(void* object
 template<class GradientType, PositionStyle style, int type>
 void PropertyRowGradient<GradientType, style, type>::redraw(HDC dc, const RECT& iconRect, const RECT& widgetRect, const RECT& floorRect, PropertyRow* hostRow)
 {
-	if(true){ // с ClipRgn получается медленно 
+	if(true){ // СЃ ClipRgn РїРѕР»СѓС‡Р°РµС‚СЃСЏ РјРµРґР»РµРЅРЅРѕ 
 		RECT rect = floorRect;
 		int roundness = 7;
 		::SelectObject(dc, GetStockObject(NULL_PEN));

@@ -43,12 +43,12 @@ public:
     // ^^^
 
 
-	/// добавить контрол в окно
+	/// РґРѕР±Р°РІРёС‚СЊ РєРѕРЅС‚СЂРѕР» РІ РѕРєРЅРѕ
 	void add(Widget* widget);
-    /// убирает единственный дочерний виджет
+    /// СѓР±РёСЂР°РµС‚ РµРґРёРЅСЃС‚РІРµРЅРЅС‹Р№ РґРѕС‡РµСЂРЅРёР№ РІРёРґР¶РµС‚
     void remove();
 
-	/// устанавливает заголок окна (тот, что в TitleBar-е)
+	/// СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ Р·Р°РіРѕР»РѕРє РѕРєРЅР° (С‚РѕС‚, С‡С‚Рѕ РІ TitleBar-Рµ)
     //void setTitle(const char* title);
 	void setTitle(std::string str);
 	void setShowTitleBar(bool showTitleBar);
@@ -58,10 +58,10 @@ public:
 	void setDefaultPosition(WindowPosition position);
 	void setDefaultSize(Vect2i size);
 
-    /// разрешает/запрещает изменение размеров окна
+    /// СЂР°Р·СЂРµС€Р°РµС‚/Р·Р°РїСЂРµС‰Р°РµС‚ РёР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ РѕРєРЅР°
 	void setResizeable(bool allowResize);
 	bool resizeable() const{ return resizeable_; }
-    /// разрешает/запрещает сворачивание окна
+    /// СЂР°Р·СЂРµС€Р°РµС‚/Р·Р°РїСЂРµС‰Р°РµС‚ СЃРІРѕСЂР°С‡РёРІР°РЅРёРµ РѕРєРЅР°
 	void setMinimizeable(bool allowMinimize);
 	bool minimizeable() const{ return minimizeable_; }
 

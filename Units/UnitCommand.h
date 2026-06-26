@@ -82,13 +82,13 @@ enum CommandID : int
 	COMMAND_ID_WEAPON_DEACTIVATE,
 
 	//---------------------------
-	// Interface, �� �����������
+	// Interface, не повторяемые
 	COMMAND_ID_CAMERA_FOCUS,
 	COMMAND_ID_CAMERA_MOVE,
 	COMMAND_ID_SELECT_SELF,
 
 	//---------------------------
-	// ������ ����������
+	// Прямое управление
 	COMMAND_ID_DIRECT_CONTROL,
 	COMMAND_ID_SYNDICAT_CONTROL,
 	COMMAND_ID_DIRECT_KEYS,
@@ -97,35 +97,35 @@ enum CommandID : int
 	COMMAND_ID_DIRECT_PUT_OUT_TRANSPORT,
 
 	//---------------------------
-	// ������ ���������
+	// прямое наведение
 	COMMAND_ID_DIRECT_SHOOT,
 	COMMAND_ID_DIRECT_SHOOT_MOUSE,
 	COMMAND_ID_DIRECT_MOUSE_SET,
 
 	//---------------------------
-	// ���������
-	/// ������� �������
+	// Инвентарь
+	/// удалить предмет
 	COMMAND_ID_ITEM_REMOVE,
-	/// �������� ������� �� ���
+	/// выкинуть предмет на мир
 	COMMAND_ID_ITEM_DROP,
-	/// ������������ �������
+	/// активировать предмет
 	COMMAND_ID_ITEM_ACTIVATE,
-	/// ������ ������� �� ����
+	/// вынуть предмет на мышь
 	COMMAND_ID_ITEM_TAKE,
-	/// �������� ������� �������
+	/// положить предмет обратно
 	COMMAND_ID_ITEM_RETURN,
-	/// �������� ������� ������� �� ���
+	/// выкинуть вынутый предмет на мир
 	COMMAND_ID_ITEM_TAKEN_DROP,
-	/// �������� ������� ������� �����
+	/// передать предмет другому юниту
 	COMMAND_ID_ITEM_TAKEN_TRANSFER,
 
 	COMMAND_ID_TALK,
 
-	// ��������� �����
+	// Командный режим
 	COMMAND_ID_UNIT_SELECTED, // cooperativeIndex
 	COMMAND_ID_UNIT_DESELECTED,
 
-	COMMAND_MAX, // ���������
+	COMMAND_MAX, // последний
 };
 
 class UnitCommand
@@ -142,11 +142,11 @@ public:
 	
 	void setPosition(const Vect3f& pos) { position_ = pos; }
 	const Vect3f& position() const { return position_; }
-	UnitInterface* unit() const; // ��������� �� 0, �.�. ������ ����� ���������, ���� ���� �������
+	UnitInterface* unit() const; // проверять на 0, т.к. объект может погибнуть, пока идет команда
 	const AttributeBase* attribute() const { return attributeReference_; }
 	bool isUnitValid() const; 
 	
-	bool shiftModifier() const { return shiftModifier_; } // ��� isSuspendCommand()-������ �������� ���������� � �������, ��� ������ - �������������� �����������
+	bool shiftModifier() const { return shiftModifier_; } // Для isSuspendCommand()-команд означает постановку в очередь, для других - дополнительный модификатор
 	void setShiftModifier(bool flag = true) { shiftModifier_ = flag; }
 	
 	int commandData() const { return commandData_; }

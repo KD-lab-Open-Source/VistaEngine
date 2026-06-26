@@ -50,8 +50,8 @@ protected:
 	bool onIce_;
 
 private:
-    bool iceMapCheck( int xc, int yc, int r ); // true если лед присетствует во всем радиусе.
-	bool iceMapCheckPrev( int xc, int yc, int r ); // true если лед присетствует во всем радиусе.
+    bool iceMapCheck( int xc, int yc, int r ); // true РµСЃР»Рё Р»РµРґ РїСЂРёСЃРµС‚СЃС‚РІСѓРµС‚ РІРѕ РІСЃРµРј СЂР°РґРёСѓСЃРµ.
+	bool iceMapCheckPrev( int xc, int yc, int r ); // true РµСЃР»Рё Р»РµРґ РїСЂРёСЃРµС‚СЃС‚РІСѓРµС‚ РІРѕ РІСЃРµРј СЂР°РґРёСѓСЃРµ.
 
 	MovementDirection angle_;
 	JointSimple* joint_;

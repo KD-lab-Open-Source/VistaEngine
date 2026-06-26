@@ -60,22 +60,22 @@ void loadAllLibraries();
 template<>
 struct PairSerializationTraits<pair<int, AttributeBase::Upgrade> >
 {
-	static const char* firstName() { return "&����� ��������"; }
-	static const char* secondName() { return "&�������"; }
+	static const char* firstName() { return "&Номер апгрейда"; }
+	static const char* secondName() { return "&Апгрейд"; }
 };
 
 template<>
 struct PairSerializationTraits<pair<int, AttributeBase::ProducedUnits> >
 {
-	static const char* firstName() { return "&����� ������������"; }
-	static const char* secondName() { return "&������������"; }
+	static const char* firstName() { return "&Номер производства"; }
+	static const char* secondName() { return "&Производство"; }
 };
 
 template<>
 struct PairSerializationTraits<pair<int, ProducedParameters> >
 {
-	static const char* firstName() { return "&����� ������������"; }
-	static const char* secondName() { return "&������������"; }
+	static const char* firstName() { return "&Номер производства"; }
+	static const char* secondName() { return "&Производство"; }
 };
 
 template<class Map>
@@ -99,30 +99,30 @@ void fixIntMap(Map& map)
 //////////////////////////////////////////////////////
 RandomGenerator effectRND(time(0));
 
-REGISTER_CLASS(AttributeBase, AttributeBase, "������� ��������")
+REGISTER_CLASS(AttributeBase, AttributeBase, "Базовые свойства")
 
-WRAP_LIBRARY(AttributeLibrary, "AttributeLibrary", "�����", "Scripts\\Content\\AttributeLibrary", 3, LIBRARY_EDITABLE | LIBRARY_IN_PLACE);
+WRAP_LIBRARY(AttributeLibrary, "AttributeLibrary", "Юниты", "Scripts\\Content\\AttributeLibrary", 3, LIBRARY_EDITABLE | LIBRARY_IN_PLACE);
 WRAP_LIBRARY(AuxAttributeLibrary, "AuxAttributeLibrary", "AuxAttributeLibrary", "Scripts\\Engine\\AuxAttributeLibrary", 0, 0);
 
 WRAP_LIBRARY(RigidBodyPrmLibrary, "RigidBodyPrmLibrary", "RigidBodyPrmLibrary", "Scripts\\Engine\\RigidBodyPrmLibrary", 0, LIBRARY_IN_PLACE);
 
-WRAP_LIBRARY(RaceTable, "RaceTable", "����", "Scripts\\Content\\RaceTable", 0, LIBRARY_EDITABLE | LIBRARY_IN_PLACE);
+WRAP_LIBRARY(RaceTable, "RaceTable", "Расы", "Scripts\\Content\\RaceTable", 0, LIBRARY_EDITABLE | LIBRARY_IN_PLACE);
 
-WRAP_LIBRARY(CommandsQueueLibrary, "CommandsQueueLibrary", "������� ������", "Scripts\\Content\\CommandsQueueLibrary", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(CommandsQueueLibrary, "CommandsQueueLibrary", "Очереди команд", "Scripts\\Content\\CommandsQueueLibrary", 0, LIBRARY_EDITABLE);
 
-WRAP_LIBRARY(UnitNameTable, "UnitName", "�������� ������", "Scripts\\Content\\UnitName", 0, 0);
+WRAP_LIBRARY(UnitNameTable, "UnitName", "Названия юнитов", "Scripts\\Content\\UnitName", 0, 0);
 
-WRAP_LIBRARY(BodyPartTypeTable, "BodyPartType", "���� ������ ����", "Scripts\\Content\\BodyPartType", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(BodyPartTypeTable, "BodyPartType", "Типы частей тела", "Scripts\\Content\\BodyPartType", 0, LIBRARY_EDITABLE);
 
-WRAP_LIBRARY(WeaponAnimationTypeTable, "WeaponAnimationType", "���� ������ ��� ��������", "Scripts\\Content\\WeaponAnimationType", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(WeaponAnimationTypeTable, "WeaponAnimationType", "Типы оружия для анимации", "Scripts\\Content\\WeaponAnimationType", 0, LIBRARY_EDITABLE);
 
-WRAP_LIBRARY(DifficultyTable, "DifficultyTable", "������ ���������", "Scripts\\Content\\DifficultyTable", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(DifficultyTable, "DifficultyTable", "Уровни сложности", "Scripts\\Content\\DifficultyTable", 0, LIBRARY_EDITABLE);
 
-REGISTER_CLASS(EffectContainer, EffectContainer, "������");
+REGISTER_CLASS(EffectContainer, EffectContainer, "Эффект");
 
-WRAP_LIBRARY(EffectLibrary, "EffectContainerLibrary", "�������", "Scripts\\Content\\EffectContainerLibrary", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(EffectLibrary, "EffectContainerLibrary", "Эффекты", "Scripts\\Content\\EffectContainerLibrary", 0, LIBRARY_EDITABLE);
 
-WRAP_LIBRARY(PlacementZoneTable, "PlacementZone", "���� ��������� (������ ���� ������ ���� \"��� ����\"!)", "Scripts\\Content\\PlacementZone", 1, LIBRARY_EDITABLE);
+WRAP_LIBRARY(PlacementZoneTable, "PlacementZone", "Зоны установки (первая зона должна быть \"Нет зоны\"!)", "Scripts\\Content\\PlacementZone", 1, LIBRARY_EDITABLE);
 
 BEGIN_ENUM_DESCRIPTOR(AttributeType, "AttributeType");
 REGISTER_ENUM(ATTRIBUTE_NONE, "ATTRIBUTE_NONE");
@@ -133,111 +133,111 @@ REGISTER_ENUM(ATTRIBUTE_PROJECTILE, "ATTRIBUTE_PROJECTILE");
 END_ENUM_DESCRIPTOR(AttributeType);
 
 BEGIN_ENUM_DESCRIPTOR(FOWVisibleMode, "FOWVisibleMode");
-REGISTER_ENUM(FVM_ALLWAYS,"������ �����");
-REGISTER_ENUM(FVM_HISTORY_TRACK,"����� ��� � ��������� ���");
-REGISTER_ENUM(FVM_NO_FOG,"����� � ������� ����");
+REGISTER_ENUM(FVM_ALLWAYS,"Всегда видим");
+REGISTER_ENUM(FVM_HISTORY_TRACK,"Виден как в последний раз");
+REGISTER_ENUM(FVM_NO_FOG,"Виден в видимой зоне");
 END_ENUM_DESCRIPTOR(FOWVisibleMode);
 
-BEGIN_ENUM_DESCRIPTOR(AuxAttributeID, "��������� ���������")
-REGISTER_ENUM(AUX_ATTRIBUTE_NONE, "�����")
-REGISTER_ENUM(AUX_ATTRIBUTE_ENVIRONMENT, "������ ���������")
-REGISTER_ENUM(AUX_ATTRIBUTE_ENVIRONMENT_SIMPLE, "������� ������ ���������")
-REGISTER_ENUM(AUX_ATTRIBUTE_DETONATOR, "���������")
-REGISTER_ENUM(AUX_ATTRIBUTE_ZONE, "����")
-REGISTER_ENUM(AUX_ATTRIBUTE_PLAYER_UNIT, "����-�����")
+BEGIN_ENUM_DESCRIPTOR(AuxAttributeID, "Служебные аттрибуты")
+REGISTER_ENUM(AUX_ATTRIBUTE_NONE, "Никто")
+REGISTER_ENUM(AUX_ATTRIBUTE_ENVIRONMENT, "Объект окружения")
+REGISTER_ENUM(AUX_ATTRIBUTE_ENVIRONMENT_SIMPLE, "Простой объект окружения")
+REGISTER_ENUM(AUX_ATTRIBUTE_DETONATOR, "Детонатор")
+REGISTER_ENUM(AUX_ATTRIBUTE_ZONE, "Зона")
+REGISTER_ENUM(AUX_ATTRIBUTE_PLAYER_UNIT, "Юнит-игрок")
 END_ENUM_DESCRIPTOR(AuxAttributeID)
 
-BEGIN_ENUM_DESCRIPTOR(AttackClass, "����� ������")
-REGISTER_ENUM(ATTACK_CLASS_IGNORE, "�����")
-REGISTER_ENUM(ATTACK_CLASS_LIGHT, "������")
-REGISTER_ENUM(ATTACK_CLASS_MEDIUM, "�������")
-REGISTER_ENUM(ATTACK_CLASS_HEAVY, "�������")
-REGISTER_ENUM(ATTACK_CLASS_AIR, "���������")
-REGISTER_ENUM(ATTACK_CLASS_AIR_MEDIUM, "��������� �������")
-REGISTER_ENUM(ATTACK_CLASS_AIR_HEAVY, "��������� �������")
-REGISTER_ENUM(ATTACK_CLASS_UNDERGROUND, "���������")
-REGISTER_ENUM(ATTACK_CLASS_BUILDING, "������")
-REGISTER_ENUM(ATTACK_CLASS_MISSILE, "������")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BUSH, "��������� ����")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_TREE, "��������� ������")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_FENCE, "��������� �����")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_FENCE2, "��������� ������������� �����")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BARN, "��������� �����")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BUILDING, "��������� ������")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BRIDGE, "��������� ����")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_STONE, "��������� ������")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_INDESTRUCTIBLE, "��������� ������������� ��������")
-REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BIG_BUILDING, "��������� ������� ������")
-REGISTER_ENUM(ATTACK_CLASS_TERRAIN_SOFT, "����� ��������")
-REGISTER_ENUM(ATTACK_CLASS_TERRAIN_HARD, "����� ����������")
-REGISTER_ENUM(ATTACK_CLASS_WATER, "����")
-REGISTER_ENUM(ATTACK_CLASS_WATER_LOW, "���� �������������")
-REGISTER_ENUM(ATTACK_CLASS_ICE, "˸�")
-//REGISTER_ENUM(ATTACK_CLASS_ALL, "���")
+BEGIN_ENUM_DESCRIPTOR(AttackClass, "Класс юнитов")
+REGISTER_ENUM(ATTACK_CLASS_IGNORE, "Никто")
+REGISTER_ENUM(ATTACK_CLASS_LIGHT, "Легкий")
+REGISTER_ENUM(ATTACK_CLASS_MEDIUM, "Средний")
+REGISTER_ENUM(ATTACK_CLASS_HEAVY, "Тяжелый")
+REGISTER_ENUM(ATTACK_CLASS_AIR, "Воздушный")
+REGISTER_ENUM(ATTACK_CLASS_AIR_MEDIUM, "Воздушный средний")
+REGISTER_ENUM(ATTACK_CLASS_AIR_HEAVY, "Воздушный тяжелый")
+REGISTER_ENUM(ATTACK_CLASS_UNDERGROUND, "Подземный")
+REGISTER_ENUM(ATTACK_CLASS_BUILDING, "Здание")
+REGISTER_ENUM(ATTACK_CLASS_MISSILE, "Снаряд")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BUSH, "Декорация куст")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_TREE, "Декорация дерево")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_FENCE, "Декорация забор")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_FENCE2, "Декорация неразрушаемый забор")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BARN, "Декорация сарай")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BUILDING, "Декорация здание")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BRIDGE, "Декорация мост")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_STONE, "Декорация камень")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_INDESTRUCTIBLE, "Декорация неразрушаемое строение")
+REGISTER_ENUM(ATTACK_CLASS_ENVIRONMENT_BIG_BUILDING, "Декорация большое здание")
+REGISTER_ENUM(ATTACK_CLASS_TERRAIN_SOFT, "Земля копаемая")
+REGISTER_ENUM(ATTACK_CLASS_TERRAIN_HARD, "Земля некопаемая")
+REGISTER_ENUM(ATTACK_CLASS_WATER, "Вода")
+REGISTER_ENUM(ATTACK_CLASS_WATER_LOW, "Вода относительная")
+REGISTER_ENUM(ATTACK_CLASS_ICE, "Лёд")
+//REGISTER_ENUM(ATTACK_CLASS_ALL, "Все")
 END_ENUM_DESCRIPTOR(AttackClass)
 
 
 BEGIN_ENUM_DESCRIPTOR(ChainID, "ChainID")
 REGISTER_ENUM(CHAIN_NONE, "")
-REGISTER_ENUM(CHAIN_STAND, "������ ��� �������� � ���������")
-REGISTER_ENUM(CHAIN_WALK, "��������� ��� ��������")
-REGISTER_ENUM(CHAIN_MOVEMENTS, "��������");
+REGISTER_ENUM(CHAIN_STAND, "Стоять для снарядов и предметов")
+REGISTER_ENUM(CHAIN_WALK, "Двигаться для снарядов")
+REGISTER_ENUM(CHAIN_MOVEMENTS, "Движения");
 REGISTER_ENUM(CHAIN_BUILDING_STAND, 0)
 REGISTER_ENUM(CHAIN_ATTACK, 0)
-REGISTER_ENUM(CHAIN_FIRE, "��������")
-REGISTER_ENUM(CHAIN_AIM, "��������")
-REGISTER_ENUM(CHAIN_RELOAD, "�����������")
-REGISTER_ENUM(CHAIN_RELOAD_INVENTORY, "����������� �� ���������")
-REGISTER_ENUM(CHAIN_FROZEN, "���������")
+REGISTER_ENUM(CHAIN_FIRE, "Стрелять")
+REGISTER_ENUM(CHAIN_AIM, "Целиться")
+REGISTER_ENUM(CHAIN_RELOAD, "Перезарядка")
+REGISTER_ENUM(CHAIN_RELOAD_INVENTORY, "Перезарядка из инвентаря")
+REGISTER_ENUM(CHAIN_FROZEN, "Заморожен")
 
-REGISTER_ENUM(CHAIN_TRANSITION, "�������")
+REGISTER_ENUM(CHAIN_TRANSITION, "Переход")
 
-REGISTER_ENUM(CHAIN_BIRTH, "��������")
-REGISTER_ENUM(CHAIN_ITEM_BIRTH, "�������� (��� ���������)")
+REGISTER_ENUM(CHAIN_BIRTH, "Рождение")
+REGISTER_ENUM(CHAIN_ITEM_BIRTH, "Рождение (для предметов)")
 REGISTER_ENUM(CHAIN_BIRTH_IN_AIR, 0)
-REGISTER_ENUM(CHAIN_DEATH, "������")
-REGISTER_ENUM(CHAIN_FALL, "������")
-REGISTER_ENUM(CHAIN_RISE, "��������")
-REGISTER_ENUM(CHAIN_LANDING, "���������� � ���������")
-REGISTER_ENUM(CHAIN_UNLANDING, "������������ �� ����������")
-REGISTER_ENUM(CHAIN_IN_TRANSPORT, "������ � ����������")
+REGISTER_ENUM(CHAIN_DEATH, "Смерть")
+REGISTER_ENUM(CHAIN_FALL, "Падать")
+REGISTER_ENUM(CHAIN_RISE, "Вставать")
+REGISTER_ENUM(CHAIN_LANDING, "Загужаться в транспорт")
+REGISTER_ENUM(CHAIN_UNLANDING, "Высаживаться из транспорта")
+REGISTER_ENUM(CHAIN_IN_TRANSPORT, "Сидеть в транспорте")
 REGISTER_ENUM(CHAIN_WORK, 0)
-REGISTER_ENUM(CHAIN_PICKING, "�������� ������")
-REGISTER_ENUM(CHAIN_WITH_RESOURCE, "C ������ ��������")
-REGISTER_ENUM(CHAIN_GIVE_RESOURCE, "�������� ������ (�������� � ��������)")
-REGISTER_ENUM(CHAIN_PICK_ITEM, "������ ���������")
-REGISTER_ENUM(CHAIN_BUILD, "������� (��� ������)")
-REGISTER_ENUM(CHAIN_BE_BUILT, "��������� (��� ������)")
-REGISTER_ENUM(CHAIN_UPGRADE, "�������")
+REGISTER_ENUM(CHAIN_PICKING, "Собирать ресурс")
+REGISTER_ENUM(CHAIN_WITH_RESOURCE, "C полным ресурсом")
+REGISTER_ENUM(CHAIN_GIVE_RESOURCE, "Отдавать ресурс (предметы и сборщики)")
+REGISTER_ENUM(CHAIN_PICK_ITEM, "Подбор предметов")
+REGISTER_ENUM(CHAIN_BUILD, "Строить (для юнитов)")
+REGISTER_ENUM(CHAIN_BE_BUILT, "Строиться (для зданий)")
+REGISTER_ENUM(CHAIN_UPGRADE, "Апгрейд")
 REGISTER_ENUM(CHAIN_CONSTRUCTION, 0);
-REGISTER_ENUM(CHAIN_PRODUCTION, "������������")
-REGISTER_ENUM(CHAIN_OPEN, "�������")
-REGISTER_ENUM(CHAIN_CLOSE, "�������")
-REGISTER_ENUM(CHAIN_HOLOGRAM, "���������� ������")
-REGISTER_ENUM(CHAIN_CONNECT, "������ ����������")
-REGISTER_ENUM(CHAIN_DISCONNECT, "������ ���������")
-REGISTER_ENUM(CHAIN_UNINSTALL, "�������� (�������) ������")
-REGISTER_ENUM(CHAIN_MOVE, "����������")
-REGISTER_ENUM(CHAIN_TRIGGER, "������� ��������")
-REGISTER_ENUM(CHAIN_PAD_STAND, "������(����)")
-REGISTER_ENUM(CHAIN_PAD_GET_SMTH, "����� ���-��(����)")
-REGISTER_ENUM(CHAIN_PAD_PUT_SMTH, "�������� ���-��(����)")
-REGISTER_ENUM(CHAIN_PAD_CARRY, "�����(����)")
-REGISTER_ENUM(CHAIN_PAD_ATTACK, "���������(����)")
-REGISTER_ENUM(CHAIN_FLY_DOWN, "���������� � ������")
-REGISTER_ENUM(CHAIN_TOUCH_DOWN, "�����������")
-REGISTER_ENUM(CHAIN_FLY_UP, "����������� �� ������")
-REGISTER_ENUM(CHAIN_WEAPON_GRIP, "�����������")
-REGISTER_ENUM(CHAIN_NIGHT, "������ �������")
-REGISTER_ENUM(CHAIN_OPEN_FOR_LANDING, "������� � ��������� �������")
-REGISTER_ENUM(CHAIN_CLOSE_FOR_LANDING, "������� � ��������� �������")
+REGISTER_ENUM(CHAIN_PRODUCTION, "Производство")
+REGISTER_ENUM(CHAIN_OPEN, "Открыть")
+REGISTER_ENUM(CHAIN_CLOSE, "Закрыть")
+REGISTER_ENUM(CHAIN_HOLOGRAM, "Голограмма здания")
+REGISTER_ENUM(CHAIN_CONNECT, "Здание подключено")
+REGISTER_ENUM(CHAIN_DISCONNECT, "Здание отключено")
+REGISTER_ENUM(CHAIN_UNINSTALL, "Демонтаж (продажа) здания")
+REGISTER_ENUM(CHAIN_MOVE, "Шевелиться")
+REGISTER_ENUM(CHAIN_TRIGGER, "Цепочка триггера")
+REGISTER_ENUM(CHAIN_PAD_STAND, "Стоять(лапа)")
+REGISTER_ENUM(CHAIN_PAD_GET_SMTH, "Взять что-то(лапа)")
+REGISTER_ENUM(CHAIN_PAD_PUT_SMTH, "Положить что-то(лапа)")
+REGISTER_ENUM(CHAIN_PAD_CARRY, "Нести(лапа)")
+REGISTER_ENUM(CHAIN_PAD_ATTACK, "Атаковать(лапа)")
+REGISTER_ENUM(CHAIN_FLY_DOWN, "Спускаться с высоты")
+REGISTER_ENUM(CHAIN_TOUCH_DOWN, "Приземление")
+REGISTER_ENUM(CHAIN_FLY_UP, "Подниматься на высоту")
+REGISTER_ENUM(CHAIN_WEAPON_GRIP, "Захваченный")
+REGISTER_ENUM(CHAIN_NIGHT, "Ночная цепочка")
+REGISTER_ENUM(CHAIN_OPEN_FOR_LANDING, "Посадка в транспорт открыть")
+REGISTER_ENUM(CHAIN_CLOSE_FOR_LANDING, "Посадка в транспорт закрыть")
 REGISTER_ENUM(CHAIN_LAND_TO_LOAD, 0)
 REGISTER_ENUM(CHAIN_MOVE_TO_CARGO, 0)
-REGISTER_ENUM(CHAIN_CARGO_LOADED, "���� ��������")
-REGISTER_ENUM(CHAIN_SLOT_IS_EMPTY, "���� ����")
+REGISTER_ENUM(CHAIN_CARGO_LOADED, "Груз погружен")
+REGISTER_ENUM(CHAIN_SLOT_IS_EMPTY, "Слот пуст")
 REGISTER_ENUM(CHAIN_IS_UPGRADED, 0)
-REGISTER_ENUM(CHAIN_UPGRADED_FROM_BUILDING, "������� �� ������")
-REGISTER_ENUM(CHAIN_UPGRADED_FROM_LEGIONARY, "������� �� �����")
+REGISTER_ENUM(CHAIN_UPGRADED_FROM_BUILDING, "Апгрейд из здания")
+REGISTER_ENUM(CHAIN_UPGRADED_FROM_LEGIONARY, "Апгрейд из юнита")
 REGISTER_ENUM(CHAIN_TELEPORTING, 0)
 END_ENUM_DESCRIPTOR(ChainID)
 
@@ -258,71 +258,71 @@ REGISTER_ENUM(ANIMATION_TERRAIN_TYPE12, TerrainTypeDescriptor::instance().nameAl
 REGISTER_ENUM(ANIMATION_TERRAIN_TYPE13, TerrainTypeDescriptor::instance().nameAlt(TERRAIN_TYPE13))
 REGISTER_ENUM(ANIMATION_TERRAIN_TYPE14, TerrainTypeDescriptor::instance().nameAlt(TERRAIN_TYPE14))
 REGISTER_ENUM(ANIMATION_TERRAIN_TYPE15, TerrainTypeDescriptor::instance().nameAlt(TERRAIN_TYPE15))
-REGISTER_ENUM(ANIMATION_ON_GROUND, "�� �����")
-REGISTER_ENUM(ANIMATION_ON_LOW_WATER, "�� ���������� ����")
-REGISTER_ENUM(ANIMATION_ON_WATER, "�� ����")
-REGISTER_ENUM(ANIMATION_ON_LAVA, "� ����")
-REGISTER_ENUM(ANIMATION_ALL_SURFACES, "�� ����� �����������")
+REGISTER_ENUM(ANIMATION_ON_GROUND, "На земле")
+REGISTER_ENUM(ANIMATION_ON_LOW_WATER, "На неглубокой воде")
+REGISTER_ENUM(ANIMATION_ON_WATER, "На воде")
+REGISTER_ENUM(ANIMATION_ON_LAVA, "В лаве")
+REGISTER_ENUM(ANIMATION_ALL_SURFACES, "На любой поверхности")
 END_ENUM_DESCRIPTOR(AnimationTerrainTypeID)
 
 BEGIN_ENUM_DESCRIPTOR(AnimationStateID, "AnimationStateID")
-REGISTER_ENUM(ANIMATION_STATE_LEFT, "���� �����")
-REGISTER_ENUM(ANIMATION_STATE_RIGHT, "���� ������")
-REGISTER_ENUM(ANIMATION_STATE_FORWARD, "���� ������")
-REGISTER_ENUM(ANIMATION_STATE_BACKWARD, "���� �����")
+REGISTER_ENUM(ANIMATION_STATE_LEFT, "идти влево")
+REGISTER_ENUM(ANIMATION_STATE_RIGHT, "идти вправо")
+REGISTER_ENUM(ANIMATION_STATE_FORWARD, "идти вперед")
+REGISTER_ENUM(ANIMATION_STATE_BACKWARD, "идти назад")
 REGISTER_ENUM(ANIMATION_STATE_ALL_SIDES, 0)
-REGISTER_ENUM(ANIMATION_STATE_CRAWL, "����� �������� \"����\"")
-REGISTER_ENUM(ANIMATION_STATE_GRABBLE, "����� �������� \"�� ���������\"")
-REGISTER_ENUM(ANIMATION_STATE_WALK, "����� �������� \"����\"")
-REGISTER_ENUM(ANIMATION_STATE_RUN, "���������� ����� ��������")
+REGISTER_ENUM(ANIMATION_STATE_CRAWL, "режим движения \"Лежа\"")
+REGISTER_ENUM(ANIMATION_STATE_GRABBLE, "режим движения \"На корточках\"")
+REGISTER_ENUM(ANIMATION_STATE_WALK, "режим движения \"Стоя\"")
+REGISTER_ENUM(ANIMATION_STATE_RUN, "ускоренный режим движения")
 REGISTER_ENUM(ANIMATION_STATE_ALL_POSE, 0)
-REGISTER_ENUM(ANIMATION_STATE_STAND, "c�����")
-REGISTER_ENUM(ANIMATION_STATE_MOVE, "����")
-REGISTER_ENUM(ANIMATION_STATE_TURN, "������������ �� �����")
-REGISTER_ENUM(ANIMATION_STATE_WAIT, "�����")
-REGISTER_ENUM(ANIMATION_STATE_ATTACK, "���������")
+REGISTER_ENUM(ANIMATION_STATE_STAND, "cтоять")
+REGISTER_ENUM(ANIMATION_STATE_MOVE, "идти")
+REGISTER_ENUM(ANIMATION_STATE_TURN, "поворачивать на месте")
+REGISTER_ENUM(ANIMATION_STATE_WAIT, "ждать")
+REGISTER_ENUM(ANIMATION_STATE_ATTACK, "атаковать")
 REGISTER_ENUM(ANIMATION_STATE_ALL_MOVEMENTS, 0)
 END_ENUM_DESCRIPTOR(AnimationStateID)
 
 BEGIN_ENUM_DESCRIPTOR(MovementStateID, "MovementStateID")
-REGISTER_ENUM(MOVEMENT_STATE_LEFT, "�����")
-REGISTER_ENUM(MOVEMENT_STATE_RIGHT, "������")
-REGISTER_ENUM(MOVEMENT_STATE_FORWARD, "������")
-REGISTER_ENUM(MOVEMENT_STATE_BACKWARD, "�����")
-REGISTER_ENUM(MOVEMENT_STATE_ON_GROUND, "�� �����")
-REGISTER_ENUM(MOVEMENT_STATE_ON_LOW_WATER, "�� ���������� ����")
-REGISTER_ENUM(MOVEMENT_STATE_ON_WATER, "�� ����")
-REGISTER_ENUM(MOVEMENT_STATE_ON_LAVA, "� ����")
+REGISTER_ENUM(MOVEMENT_STATE_LEFT, "Влево")
+REGISTER_ENUM(MOVEMENT_STATE_RIGHT, "Вправо")
+REGISTER_ENUM(MOVEMENT_STATE_FORWARD, "Вперед")
+REGISTER_ENUM(MOVEMENT_STATE_BACKWARD, "Назад")
+REGISTER_ENUM(MOVEMENT_STATE_ON_GROUND, "На земле")
+REGISTER_ENUM(MOVEMENT_STATE_ON_LOW_WATER, "На неглубокой воде")
+REGISTER_ENUM(MOVEMENT_STATE_ON_WATER, "На воде")
+REGISTER_ENUM(MOVEMENT_STATE_ON_LAVA, "В лаве")
 REGISTER_ENUM(MOVEMENT_STATE_ALL_SIDES, 0)
 REGISTER_ENUM(MOVEMENT_STATE_ALL_SURFACES, 0)
-REGISTER_ENUM(MOVEMENT_STATE_CRAWL, "����")
-REGISTER_ENUM(MOVEMENT_STATE_GRABBLE, "�� ���������")
-REGISTER_ENUM(MOVEMENT_STATE_WALK, "����")
-REGISTER_ENUM(MOVEMENT_STATE_RUN, "������")
+REGISTER_ENUM(MOVEMENT_STATE_CRAWL, "Лежа")
+REGISTER_ENUM(MOVEMENT_STATE_GRABBLE, "На корточках")
+REGISTER_ENUM(MOVEMENT_STATE_WALK, "Стоя")
+REGISTER_ENUM(MOVEMENT_STATE_RUN, "Бежать")
 REGISTER_ENUM(MOVEMENT_STATE_ALL_POSE, 0)
-REGISTER_ENUM(MOVEMENT_STATE_STAND, "������")
-REGISTER_ENUM(MOVEMENT_STATE_MOVE, "���������")
-REGISTER_ENUM(MOVEMENT_STATE_TURN, "������������")
-REGISTER_ENUM(MOVEMENT_STATE_WAIT, "�����")
+REGISTER_ENUM(MOVEMENT_STATE_STAND, "Стоять")
+REGISTER_ENUM(MOVEMENT_STATE_MOVE, "Двигаться")
+REGISTER_ENUM(MOVEMENT_STATE_TURN, "Поворачивать")
+REGISTER_ENUM(MOVEMENT_STATE_WAIT, "Ждать")
 REGISTER_ENUM(MOVEMENT_STATE_ALL_MOVEMENTS, 0)
 END_ENUM_DESCRIPTOR(MovementStateID)
 
 BEGIN_ENUM_DESCRIPTOR(MovementMode, "MovementMode")
-REGISTER_ENUM(MODE_CRAWL, "˸��")
-REGISTER_ENUM(MODE_GRABBLE, "�� ���������")
-REGISTER_ENUM(MODE_WALK, "����")
-REGISTER_ENUM(MODE_RUN, "������")
+REGISTER_ENUM(MODE_CRAWL, "Лёжа")
+REGISTER_ENUM(MODE_GRABBLE, "На корточках")
+REGISTER_ENUM(MODE_WALK, "Стоя")
+REGISTER_ENUM(MODE_RUN, "Бежать")
 END_ENUM_DESCRIPTOR(MovementMode)
 
 BEGIN_ENUM_DESCRIPTOR(ShootingOnMoveMode, "ShootingOnMoveMode")
-REGISTER_ENUM(SHOOT_WHILE_STANDING, "����� �����")
-REGISTER_ENUM(SHOOT_WHILE_MOVING, "�� ����")
-REGISTER_ENUM(SHOOT_WHILE_RUNNING, "�� ����")
-REGISTER_ENUM(SHOOT_WHILE_IN_TRANSPORT, "� ����������")
-REGISTER_ENUM(SHOOT_WHILE_LYING, "����� �����")
-REGISTER_ENUM(SHOOT_WHILE_CRAWLING, "����� ������")
-REGISTER_ENUM(SHOOT_WHILE_ON_ALL_FOURS, "����� ������ �� ��������")
-REGISTER_ENUM(SHOOT_WHILE_GRABBLING, "����� ��� �� ���������")
+REGISTER_ENUM(SHOOT_WHILE_STANDING, "когда стоит")
+REGISTER_ENUM(SHOOT_WHILE_MOVING, "на ходу")
+REGISTER_ENUM(SHOOT_WHILE_RUNNING, "на бегу")
+REGISTER_ENUM(SHOOT_WHILE_IN_TRANSPORT, "в транспорте")
+REGISTER_ENUM(SHOOT_WHILE_LYING, "когда лежит")
+REGISTER_ENUM(SHOOT_WHILE_CRAWLING, "когда ползет")
+REGISTER_ENUM(SHOOT_WHILE_ON_ALL_FOURS, "когда присел на корточки")
+REGISTER_ENUM(SHOOT_WHILE_GRABBLING, "когда идёт на корточках")
 END_ENUM_DESCRIPTOR(ShootingOnMoveMode)
 
 BEGIN_ENUM_DESCRIPTOR(ExcludeCollision, "ExcludeCollision")
@@ -332,20 +332,20 @@ REGISTER_ENUM(EXCLUDE_COLLISION_LEGIONARY, "EXCLUDE_COLLISION_LEGIONARY")
 END_ENUM_DESCRIPTOR(ExcludeCollision)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(AttributeBase, ProductionRequirement, "ProductionRequirement")
-REGISTER_ENUM_ENCLOSED(AttributeBase, PRODUCE_EVERYWHERE, "����������� �����");
-REGISTER_ENUM_ENCLOSED(AttributeBase, PRODUCE_ON_WATER, "����������� �� ����");
-REGISTER_ENUM_ENCLOSED(AttributeBase, PRODUCE_ON_TERRAIN, "����������� �� �����");
+REGISTER_ENUM_ENCLOSED(AttributeBase, PRODUCE_EVERYWHERE, "Производить везде");
+REGISTER_ENUM_ENCLOSED(AttributeBase, PRODUCE_ON_WATER, "Производить на воде");
+REGISTER_ENUM_ENCLOSED(AttributeBase, PRODUCE_ON_TERRAIN, "Производить на земле");
 END_ENUM_DESCRIPTOR_ENCLOSED(AttributeBase, ProductionRequirement)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(AttributeBase, UnitUI_StateType, "UnitUI_StateType")
-REGISTER_ENUM_ENCLOSED(AttributeBase, UI_STATE_TYPE_NORMAL, "������� ���������")
-REGISTER_ENUM_ENCLOSED(AttributeBase, UI_STATE_TYPE_SELECTED, "�������")
-REGISTER_ENUM_ENCLOSED(AttributeBase, UI_STATE_TYPE_WAITING, "��������")
+REGISTER_ENUM_ENCLOSED(AttributeBase, UI_STATE_TYPE_NORMAL, "Обычное состояние")
+REGISTER_ENUM_ENCLOSED(AttributeBase, UI_STATE_TYPE_SELECTED, "Выделен")
+REGISTER_ENUM_ENCLOSED(AttributeBase, UI_STATE_TYPE_WAITING, "Ожидание")
 END_ENUM_DESCRIPTOR_ENCLOSED(AttributeBase, UnitUI_StateType)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(AttributeBase, AttackTargetNotificationMode, "AttackTargetNotificationMode")
-REGISTER_ENUM_ENCLOSED(AttributeBase, TARGET_NOTIFY_SQUAD, "��������� ���� �����");
-REGISTER_ENUM_ENCLOSED(AttributeBase, TARGET_NOTIFY_ALL, "��������� ���� � �������� �������");
+REGISTER_ENUM_ENCLOSED(AttributeBase, TARGET_NOTIFY_SQUAD, "оповещать свой сквад");
+REGISTER_ENUM_ENCLOSED(AttributeBase, TARGET_NOTIFY_ALL, "оповещать всех в заданном радиусе");
 END_ENUM_DESCRIPTOR_ENCLOSED(AttributeBase, AttackTargetNotificationMode)
 
 BEGIN_ENUM_DESCRIPTOR(UnitClass, "UnitClass")
@@ -375,36 +375,36 @@ REGISTER_ENUM(COLLISION_GROUP_REAL, "COLLISION_GROUP_REAL");
 END_ENUM_DESCRIPTOR(CollisionGroupID)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(EffectAttribute, WaterPlacementMode, "EffectAttribute::WaterPlacementMode")
-REGISTER_ENUM_ENCLOSED(EffectAttribute, WATER_BOTTOM, "������� �� ���")
-REGISTER_ENUM_ENCLOSED(EffectAttribute, WATER_SURFACE, "������� �� ����������� ����")
+REGISTER_ENUM_ENCLOSED(EffectAttribute, WATER_BOTTOM, "ставить на дно")
+REGISTER_ENUM_ENCLOSED(EffectAttribute, WATER_SURFACE, "ставить на поверхность воды")
 END_ENUM_DESCRIPTOR_ENCLOSED(EffectAttribute, WaterPlacementMode)
 
 BEGIN_ENUM_DESCRIPTOR(ObjectShadowType, "ObjectShadowType")
-REGISTER_ENUM(OST_SHADOW_NONE, "��� ����");
-REGISTER_ENUM(OST_SHADOW_CIRCLE, "������� ����");
-REGISTER_ENUM(OST_SHADOW_REAL, "�������� ����");
+REGISTER_ENUM(OST_SHADOW_NONE, "нет тени");
+REGISTER_ENUM(OST_SHADOW_CIRCLE, "круглая тень");
+REGISTER_ENUM(OST_SHADOW_REAL, "реальная тень");
 END_ENUM_DESCRIPTOR(ObjectShadowType)
 
 BEGIN_ENUM_DESCRIPTOR(SoundSurfKind, "SoundSurfKind")
-REGISTER_ENUM(SOUND_SURF_ALL, "��� ���� �����������");
-REGISTER_ENUM(SOUND_SURF_KIND1, "����������� 1 ����");
-REGISTER_ENUM(SOUND_SURF_KIND2, "����������� 2 ����");
-REGISTER_ENUM(SOUND_SURF_KIND3, "����������� 3 ����");
-REGISTER_ENUM(SOUND_SURF_KIND4, "����������� 4 ����");
+REGISTER_ENUM(SOUND_SURF_ALL, "Все типы поверхности");
+REGISTER_ENUM(SOUND_SURF_KIND1, "Поверхность 1 рода");
+REGISTER_ENUM(SOUND_SURF_KIND2, "Поверхность 2 рода");
+REGISTER_ENUM(SOUND_SURF_KIND3, "Поверхность 3 рода");
+REGISTER_ENUM(SOUND_SURF_KIND4, "Поверхность 4 рода");
 END_ENUM_DESCRIPTOR(SoundSurfKind)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(BodyPartAttribute, Functionality, "BodyPartAttribute::Functionality")
-REGISTER_ENUM_ENCLOSED(BodyPartAttribute, LIFE, "�����")
-REGISTER_ENUM_ENCLOSED(BodyPartAttribute, MOVEMENT, "��������")
-REGISTER_ENUM_ENCLOSED(BodyPartAttribute, PRODUCTION, "������������")
-REGISTER_ENUM_ENCLOSED(BodyPartAttribute, UPGRADE, "�������")
-REGISTER_ENUM_ENCLOSED(BodyPartAttribute, FIRE, "��������")
+REGISTER_ENUM_ENCLOSED(BodyPartAttribute, LIFE, "Жизнь")
+REGISTER_ENUM_ENCLOSED(BodyPartAttribute, MOVEMENT, "Движение")
+REGISTER_ENUM_ENCLOSED(BodyPartAttribute, PRODUCTION, "Производство")
+REGISTER_ENUM_ENCLOSED(BodyPartAttribute, UPGRADE, "Апгрейд")
+REGISTER_ENUM_ENCLOSED(BodyPartAttribute, FIRE, "Стрельба")
 END_ENUM_DESCRIPTOR_ENCLOSED(BodyPartAttribute, Functionality)
 
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(AttributeBase, SelectSpriteTypes, "BodyPartAttribute::Functionality")
-REGISTER_ENUM_ENCLOSED(AttributeBase, ORDINARY, "�������")
-REGISTER_ENUM_ENCLOSED(AttributeBase, UNPOWERED, "���������")
+REGISTER_ENUM_ENCLOSED(AttributeBase, ORDINARY, "Обычный")
+REGISTER_ENUM_ENCLOSED(AttributeBase, UNPOWERED, "Отключено")
 END_ENUM_DESCRIPTOR_ENCLOSED(AttributeBase, SelectSpriteTypes)
 
 MovementState MovementState::DEFAULT(ANIMATION_STATE_DEFAULT, ANIMATION_ALL_SURFACES);
@@ -444,21 +444,21 @@ MovementState MovementState::operator = (const BitVector<MovementStateID>& state
 
 void MovementState::serialize(Archive& ar) 
 {
-	ar.serialize(state_, "state", "&���������");
-	ar.serialize(terrainType_, "terrainType", "&��� �����������");
+	ar.serialize(state_, "state", "&Состояние");
+	ar.serialize(terrainType_, "terrainType", "&Тип поверхности");
 }
 
 void AttributeBase::SelectSprite::serialize(Archive& ar)
 {
-	ar.serialize(selectSpriteNormal, "selectSpriteNormal", "�������");
-	ar.serialize(selectSpriteHover, "selectSpriteHover", "��� ���������");
-	ar.serialize(selectSpriteSelected, "selectSpriteSelected", "����������");
-	ar.serialize(showSelectSpritesForOthers, "showSelectSpritesForOthers", "���������� ����������");
+	ar.serialize(selectSpriteNormal, "selectSpriteNormal", "Обычный");
+	ar.serialize(selectSpriteHover, "selectSpriteHover", "При наведении");
+	ar.serialize(selectSpriteSelected, "selectSpriteSelected", "Выделенный");
+	ar.serialize(showSelectSpritesForOthers, "showSelectSpritesForOthers", "Показывать противнику");
 	if(showSelectSpritesForOthers){
-		ar.serialize(ownSelectSpritesForOthers, "ownSelectSpritesForOthers", "����������� ������� ��� ������ ������ �������");
+		ar.serialize(ownSelectSpritesForOthers, "ownSelectSpritesForOthers", "Собственные спрайты для показа другим игрокам");
 		if(ownSelectSpritesForOthers){
-			ar.serialize(unitSpriteForOthers, "unitSpriteForOthers", "������ ��� ��������� �������");
-			ar.serialize(unitSpriteForOthersHovered, "unitSpriteForOthersHovered", "������ ��� ��������� ������� ��� ���������");
+			ar.serialize(unitSpriteForOthers, "unitSpriteForOthers", "Спрайт для остальных игроков");
+			ar.serialize(unitSpriteForOthersHovered, "unitSpriteForOthersHovered", "Спрайт для остальных игроков при наведении");
 		}
 	}
 }
@@ -557,7 +557,7 @@ AttributeBase::AttributeBase() : modelName("")
 	canBeTransparent = false;
 	fow_mode = FVM_ALLWAYS;
 
-	selectCircleRelativeRadius = 1.0f; // �� ��������� ����. ������ �������� � radius()
+	selectCircleRelativeRadius = 1.0f; // По умолчанию граф. радиус размером с radius()
 	showSelectRadius = true;
 	selectRadius = 0;
 	fireRadiusCircle.color = Color4c(150, 0, 0, 0);
@@ -660,7 +660,7 @@ void AttributeBase::serialize(Archive& ar)
 	if(ar.isOutput()){
 		setCurrentAttribute(this);
 		createModel(modelName.c_str());
-		if(!ar.isEdit()){	// ������� ������� - ������ ����� �������
+		if(!ar.isEdit()){	// Сложные расчеты - только перед записью
 			refreshChains();
 			initGeometryAttribute();
 			producedThisFactories.clear();
@@ -688,70 +688,70 @@ void AttributeBase::serialize(Archive& ar)
 	setCurrentLibraryKey(libraryKey());
 
 	ar.serialize(unitClass_, "unitClass", 0);
-	ar.serialize(ModelSelector(modelName), "modelName", "��� ������");
-	ar.serialize(boundHeight, "boundHeight", "������ ������ (�� ������)");
-	ar.serialize(accurateBound, "accurateBound", "������������ ������ �����");
+	ar.serialize(ModelSelector(modelName), "modelName", "Имя модели");
+	ar.serialize(boundHeight, "boundHeight", "Высота модели (по баунду)");
+	ar.serialize(accurateBound, "accurateBound", "Использовать точный баунд");
 	if(isBuilding() || isResourceItem() || isInventoryItem())
-		ar.serialize(radius_, "radius", "���������� ������");
+		ar.serialize(radius_, "radius", "Логический радиус");
 	ar.serialize(boundScale, "boundScale", 0);
 	ar.serialize(boundRadius, "boundRadius", 0);
 	ar.serialize(modelTime_, "modelTime", 0);
-	//xassertStr("������ ��������� ��� ���������� ��������� �����" && (ar.isEdit() || modelName.empty() || modelTime_ == FileTime(modelName.c_str())), modelName.c_str());
+	//xassertStr("Модель обновлена без перезаписи редактора войск" && (ar.isEdit() || modelName.empty() || modelTime_ == FileTime(modelName.c_str())), modelName.c_str());
 
 	if(!ar.isEdit() || GlobalAttributes::instance().enableSilhouettes)
-		ar.serialize(showSilhouette, "showSilhouette", "�������� ������");
-	ar.serialize(hideByDistance, "hideByDistance", "�������� ��� ��������");
+		ar.serialize(showSilhouette, "showSilhouette", "Выводить силуэт");
+	ar.serialize(hideByDistance, "hideByDistance", "Исчезает при удалении");
 
-	ar.serialize(canBeTransparent, "|canBeTransparent|mode_transparent", "���������� ���������� ���� ������ ����");
-	ar.serialize(fow_mode, "fow_mode", "����� ��������� ��� ������ �����");
-	ar.serialize(permanentEffects, "permanentEffects", "���������� �������");
+	ar.serialize(canBeTransparent, "|canBeTransparent|mode_transparent", "Становится прозрачным если позади юнит");
+	ar.serialize(fow_mode, "fow_mode", "Режим видимости при тумане войны");
+	ar.serialize(permanentEffects, "permanentEffects", "постоянные эффекты");
 	
 	ar.serialize(animationChains, "animationChainsNew", 0);
 
 	if(isActing()){
-		if(ar.openBlock("lights", "��������")){
-			ar.serialize(nightVisibilitySet, "nightVisibilitySet", "����� ������ ��� ��������"); 
+		if(ar.openBlock("lights", "Лампочки")){
+			ar.serialize(nightVisibilitySet, "nightVisibilitySet", "Часть модели для лампочек"); 
 			VisibilityGroupOfSet::setVisibilitySet(nightVisibilitySet);
-			ar.serialize(dayVisibilityGroup, "dayVisibilityGroup", "������ ��������� ����");
-			ar.serialize(nightVisibilityGroup, "nightVisibilityGroup", "������ ��������� �����");
+			ar.serialize(dayVisibilityGroup, "dayVisibilityGroup", "Группа видимости днем");
+			ar.serialize(nightVisibilityGroup, "nightVisibilityGroup", "Группа видимости ночью");
 			ar.closeBlock();
 		}
 
-		ar.serialize(parametersInitial, "parametersInitial", "������ (���������) ��������� �����");
+		ar.serialize(parametersInitial, "parametersInitial", "Личные (начальные) параметры юнита");
 		if(parametersInitial.possession())
 			canBeCaptured = true;
 
-		ar.serialize(ptBoundCheck, "ptBoundCheck", "��������� ����� � ������ ����");
+		ar.serialize(ptBoundCheck, "ptBoundCheck", "Учитывать баунд в поиске пути");
 
-		ar.serialize(bodyParts, "bodyParts", "����� ����");
+		ar.serialize(bodyParts, "bodyParts", "Части тела");
 		
 		if(!ar.isEdit() && ar.isOutput() && !bodyParts.empty())
 			RigidBodyModelPrmBuilder(rigidBodyModelPrm, bodyParts, model());
 		
 		ar.serialize(rigidBodyModelPrm, "rigidBodyModelPrm", 0);
 
-		if(ar.openBlock("cost", "���������")){
-			ar.serialize(dockNodeNumber, "dockNodeNumber", "����� ���� � ������");
-			ar.serialize(creationTime, "creationTime", "����� ������������, �������");
-			ar.serialize(creationValue, "creationValue", "��������� ������������");
-			ar.serialize(installValue, "installValue", "��������� ���������� ������");
+		if(ar.openBlock("cost", "Стоимость")){
+			ar.serialize(dockNodeNumber, "dockNodeNumber", "Номер ноды у завода");
+			ar.serialize(creationTime, "creationTime", "Время производства, секунды");
+			ar.serialize(creationValue, "creationValue", "Стоимость производства");
+			ar.serialize(installValue, "installValue", "Стоимость начального заказа");
 			if(isBuilding()){
-				ar.serialize(cancelConstructionValue, "cancelConstructionValue", "������������ �� �������������� ������");
-				ar.serialize(uninstallValue, "uninstallValue", "������������ ����� �������������");
-				ar.serialize(needBuilders, "needBuilders", "���������� ���������");
+				ar.serialize(cancelConstructionValue, "cancelConstructionValue", "Возвращаемое от недостроенного здания");
+				ar.serialize(uninstallValue, "uninstallValue", "Возвращаемое после деинсталляции");
+				ar.serialize(needBuilders, "needBuilders", "Необходимы строители");
 			}
-			ar.serialize(accessValue, "accessValue", "����������� ��������� ��� ������������ � ��������");
-			ar.serialize(accessBuildingsList, "accessBuildingsList", "����������� �������� ��� ������������ � ��������");
+			ar.serialize(accessValue, "accessValue", "Необходимые параметры для производства и апгрейда");
+			ar.serialize(accessBuildingsList, "accessBuildingsList", "Необходимые строения для производства и апгрейда");
 
-			ar.serialize(formationType, "formationType", "��� ����� � ��������");
-			ar.serialize(accountingNumber, "accountingNumber", "�����, ����������� � ������������ ���������� ������");
-			ar.serialize(unitNumberMaxType, "unitNumberMaxType", "��� ������������� ���������� ������");
+			ar.serialize(formationType, "formationType", "Тип юнита в формации");
+			ar.serialize(accountingNumber, "accountingNumber", "Число, учитываемое в максимальном количестве юнитов");
+			ar.serialize(unitNumberMaxType, "unitNumberMaxType", "Тип максимального количества юнитов");
 
-			ar.serialize(inheritHealthArmor, "inheritHealthArmor", "����������� �������� � ����� ��� ��������");
+			ar.serialize(inheritHealthArmor, "inheritHealthArmor", "Наследовать здоровье и броню при апгрейде");
 			ar.closeBlock();
 		}
 
-		ar.serialize(upgrades, "upgrades", "��������");
+		ar.serialize(upgrades, "upgrades", "Апгрейды");
 		if(ar.isInput())
 			fixIntMap(upgrades);
 
@@ -762,10 +762,10 @@ void AttributeBase::serialize(Archive& ar)
 				upgradeAutomatically |= i->second.automatic;
 		}
 		
-		if(ar.openBlock("transport", "���������")){
-			ar.serialize(transportSlots, "transportSlots", "�����");
-			ar.serialize(transportLoadRadius, "transportLoadRadius", "������ ������� ��� ������ ������");
-			ar.serialize(transportLoadDirectControlRadius, "transportLoadDirectControlRadius", "������ ������� � ������ ����������");
+		if(ar.openBlock("transport", "Транспорт")){
+			ar.serialize(transportSlots, "transportSlots", "Слоты");
+			ar.serialize(transportLoadRadius, "transportLoadRadius", "Радиус подбора для летных юнитов");
+			ar.serialize(transportLoadDirectControlRadius, "transportLoadDirectControlRadius", "Радиус подбора в прямом управлении");
 			if(ar.isInput()){
 				checkRequirementForMovement = false;
 				TransportSlots::iterator i;
@@ -773,111 +773,111 @@ void AttributeBase::serialize(Archive& ar)
 					checkRequirementForMovement |= i->requiredForMovement;
 			}
 			if(isLegionary()){
-				ar.serialize(additionToTransport, "additionToTransport", "���������, ����������� ����������");
-				ar.serialize(transportSlotsRequired, "transportSlotsRequired", "����������� ���������� ������ ��� ���������� � ����������");
+				ar.serialize(additionToTransport, "additionToTransport", "Параметры, добавляемые транспорту");
+				ar.serialize(transportSlotsRequired, "transportSlotsRequired", "Необходимое количество слотов для размещения в транспорте");
 			}
 			ar.closeBlock();
 		}
 	}
 	else if(isResourceItem()){
-		if(ar.openBlock("parameters", "���������")){
-			ar.serialize(parametersInitial, "parametersInitial", "������ (���������) ��������� �����");
+		if(ar.openBlock("parameters", "Параметры")){
+			ar.serialize(parametersInitial, "parametersInitial", "Личные (начальные) параметры юнита");
 			parametersArithmetics.serialize(ar);
 			ar.closeBlock();
 		}
 	}
 	
 	if(isObjective()){
-		if(ar.openBlock("Interface", "���������")){
+		if(ar.openBlock("Interface", "Интерфейс")){
 
-			ar.serialize(tipsName, "tipsName", "��� ����� ��� ���������� (���)");
+			ar.serialize(tipsName, "tipsName", "Имя юнита для интерфейса (Лок)");
 			
-			ar.serialize(interfaceName_, "interfaceNames", "������� �������� ��� ���������� (���)");
-			ar.serialize(interfaceDescription_, "interfaceDescriptions", "������ �������� ��� ���������� (���)");
+			ar.serialize(interfaceName_, "interfaceNames", "Краткое описание для интерфейса (Лок)");
+			ar.serialize(interfaceDescription_, "interfaceDescriptions", "Полное описание для интерфейса (Лок)");
 
-			ar.serialize(selectSprites_, "Miniatures", "���������");
-			ar.serialize(ui_faces_, "ui_faces", "��������");
+			ar.serialize(selectSprites_, "Miniatures", "Миниатюры");
+			ar.serialize(ui_faces_, "ui_faces", "Портреты");
 
-			if(ar.openBlock("minimap", "����������� �� ���������")){
-				ar.serialize(minimapScale_, "minimapScale", "������������� ������� ����� ��� ������� �� ���������");
-				ar.serialize(minimapSymbolType_, "symbolType", "��� �������");
+			if(ar.openBlock("minimap", "Обозначение на миникарте")){
+				ar.serialize(minimapScale_, "minimapScale", "относительный масштаб юнита для отметки на миникарте");
+				ar.serialize(minimapSymbolType_, "symbolType", "тип пометки");
 				if(minimapSymbolType_ == UI_MINIMAP_SYMBOLTYPE_SELF){
-					ar.serialize(minimapSymbol_, "minimapSymbol", "����������� ������");
+					ar.serialize(minimapSymbol_, "minimapSymbol", "Собственный символ");
 					if(isLegionary())
-						ar.serialize(minimapSymbolWaiting_, "minimapSymbolWaiting", "����������� ������ ��� ������� �����");
+						ar.serialize(minimapSymbolWaiting_, "minimapSymbolWaiting", "Собственный символ для ждущего юнита");
 				}
-				ar.serialize(hasPermanentSymbol_, "hasPermanentSymbol", "�������� ���������� ������");
+				ar.serialize(hasPermanentSymbol_, "hasPermanentSymbol", "Выводить постоянный символ");
 				if(hasPermanentSymbol_)
-					ar.serialize(minimapPermanentSymbol_, "minimapPermamentSymbol", "���������� ������");
-				ar.serialize(minimapSymbolSpecial_, "minimapSymbolSpecial", "����������� ������� �����");
-				ar.serialize(showUpgradeEvent_, "showUpgradeEvent", "���������� ������� ��������");
+					ar.serialize(minimapPermanentSymbol_, "minimapPermamentSymbol", "Постоянный символ");
+				ar.serialize(minimapSymbolSpecial_, "minimapSymbolSpecial", "Специальная пометка юнита");
+				ar.serialize(showUpgradeEvent_, "showUpgradeEvent", "Показывать событие апгрейда");
 				ar.closeBlock();
 			}
 
-			ar.serialize(isHero, "isHero", "����� (��� ����������)");
-			ar.serialize(isStrategicPoint, "isStrategicPoint", "�������������� ����� (��� ����������)");
-			ar.serialize(accountInCondition, "accountInCondition", "��������� � ������� '� ������ �� �������� ������������ ������'");
+			ar.serialize(isHero, "isHero", "Герой (для статистики)");
+			ar.serialize(isStrategicPoint, "isStrategicPoint", "Стратегическая точка (для статистики)");
+			ar.serialize(accountInCondition, "accountInCondition", "Учитывать в условии 'У игрока не осталось дееспособных юнитов'");
 
-			ar.serialize(inventories, "inventories", "���������");
-			ar.serialize(equipment, "equipment", "��������� ����������");
+			ar.serialize(inventories, "inventories", "Инвентарь");
+			ar.serialize(equipment, "equipment", "Начальное снаряжение");
 
-			ar.serialize(selectBySphere, "selectBySphere", "��������� �� ��������� �����");
-			ar.serialize(selectionCursor_, "selection_cursor", "������ ������");
+			ar.serialize(selectBySphere, "selectBySphere", "Селектить по описанной сфере");
+			ar.serialize(selectionCursor_, "selection_cursor", "Курсор выбора");
 			selectionCursorProxy_ = selectionCursor_;
-			ar.serialize(selectionListPriority, "selectionListPriority", "��������� � ������ �������");
+			ar.serialize(selectionListPriority, "selectionListPriority", "Приоритет в списке селекта");
 
-			ar.serialize(initialHeightUIParam, "initialHeightUIParam", "������ ����� ��� ������ ��������");
+			ar.serialize(initialHeightUIParam, "initialHeightUIParam", "высота юнита для вывода значений");
 
-			if(ar.openBlock("unitSign", "����� �����")){
-				ar.serialize(showSpriteForUnvisible, "showSpriteForUnvisible", "�������� ����� ����� �� �����");
-				ar.serialize(selectBySprite, "selectBySprite", "��������� �� �����");
-				ar.serialize(selectSprites, "selectSprites", "��������� �������");
-				ar.serialize(offscreenSprite, "offsideSprite", "���� �� ���� ������");
-				ar.serialize(offscreenSpriteForEnemy, "offsideSpriteForEnemy", "���� �� ���� ������ ��� ������");
+			if(ar.openBlock("unitSign", "Знаки юнита")){
+				ar.serialize(showSpriteForUnvisible, "showSpriteForUnvisible", "Выводить когда юнита не видно");
+				ar.serialize(selectBySprite, "selectBySprite", "Селектить по знаку");
+				ar.serialize(selectSprites, "selectSprites", "Выводимые спрайты");
+				ar.serialize(offscreenSprite, "offsideSprite", "Знак на краю экрана");
+				ar.serialize(offscreenSpriteForEnemy, "offsideSpriteForEnemy", "Знак на краю экрана для врагов");
 				useOffscreenSprites = (offscreenSprite.key() >= 0 || offscreenSpriteForEnemy.key() >= 0);
 				if(useOffscreenSprites){
-					ar.serialize(offscreenMultiSprite, "offsideMultiSprite", "���� �� ���� ������ ��� ����������� ������");
-					ar.serialize(offscreenMultiSpriteForEnemy, "offsideMultiSpriteForEnemy", "���� �� ���� ������ ��� ������ ��� ����������� ������");
+					ar.serialize(offscreenMultiSprite, "offsideMultiSprite", "Знак на краю экрана при пересечении знаков");
+					ar.serialize(offscreenMultiSpriteForEnemy, "offsideMultiSpriteForEnemy", "Знак на краю экрана для врагов при пересечении знаков");
 				}
 				ar.closeBlock();
 			}
 
 			if(isTransport()){
-				if(ar.openBlock("TransportSlots", "������������ ������������ ������")){
-					ar.serialize(transportSlotShowEvent, "transportSlotShowEvent", "����� ����������");
+				if(ar.openBlock("TransportSlots", "Визуализация транспортных слотов")){
+					ar.serialize(transportSlotShowEvent, "transportSlotShowEvent", "Когда показывать");
 					if(transportSlotShowEvent == SHOW_AT_PARAMETER_INCREASE || transportSlotShowEvent == SHOW_AT_PARAMETER_DECREASE || transportSlotShowEvent == SHOW_AT_PARAMETER_CHANGE)
 						transportSlotShowEvent = SHOW_ALWAYS;
-					ar.serialize(transportSlotEmpty, "transportSlotEmpty", "������ ����");
-					ar.serialize(transportSlotFill, "transportSlotFill", "����������� ����");
+					ar.serialize(transportSlotEmpty, "transportSlotEmpty", "Пустой слот");
+					ar.serialize(transportSlotFill, "transportSlotFill", "Заполненный слот");
 					ar.closeBlock();
 				}
 			}
 
 			ParameterShowSetting::possibleParameters_ = &parametersInitial;
-			ar.serialize(parameterShowSettings, "parameterShowSettings", "��������� ���������");
-			ar.serialize(showChangeParameterSettings, "showChangeParameterSettings", "������������ ��������� ����� ����������");
+			ar.serialize(parameterShowSettings, "parameterShowSettings", "Выводимые параметры");
+			ar.serialize(showChangeParameterSettings, "showChangeParameterSettings", "Визуализация изменения общих параметров");
 
-			if(ar.openBlock("selection", "��� �������")){
-				ar.serialize(showSelectRadius, "showSelectRadius", "���������� ������");
-				ar.serialize(selectCircleRelativeRadius, "selectCircleRelativeRadius", "������������� ������ ����������");
+			if(ar.openBlock("selection", "При селекте")){
+				ar.serialize(showSelectRadius, "showSelectRadius", "Показывать селект");
+				ar.serialize(selectCircleRelativeRadius, "selectCircleRelativeRadius", "Относительный радиус окружности");
 				ar.serialize(selectRadius, "selectRadius", 0);
-				ar.serialize(fireRadiusCircle, "fireRadiusCircle", "������ ������� ����� ��� ��������");
-				ar.serialize(fireMinRadiusCircle, "fireMinRadiusCircle", "������ ������������ ������� �����");
-				ar.serialize(fireDispRadiusCircle, "fireDispRadiusCircle", "������ ������� ����� � ���������");
-				ar.serialize(signRadiusCircle, "signRadiusCircle", "������ ������� ���������");
-				ar.serialize(noiseRadiusCircle, "noiseRadiusCircle", "������ ������� ����");
-				ar.serialize(hearingRadiusCircle, "hearingRadiusCircle", "������ ������� ����������");
+				ar.serialize(fireRadiusCircle, "fireRadiusCircle", "Кружок радиуса атаки без разброса");
+				ar.serialize(fireMinRadiusCircle, "fireMinRadiusCircle", "Кружок минимального радиуса атаки");
+				ar.serialize(fireDispRadiusCircle, "fireDispRadiusCircle", "Кружок радиуса атаки с разбросом");
+				ar.serialize(signRadiusCircle, "signRadiusCircle", "Кружок радиуса видимости");
+				ar.serialize(noiseRadiusCircle, "noiseRadiusCircle", "Кружок радиуса шума");
+				ar.serialize(hearingRadiusCircle, "hearingRadiusCircle", "Кружок радиуса слышимости");
 				ar.closeBlock();
 			}
 
-			ar.serialize(interfaceTV, "interfaceTV", "�����������");
+			ar.serialize(interfaceTV, "interfaceTV", "ИнтерфейсТВ");
 
 			ar.closeBlock();
 		}
 	}
 	
 	if(isActing()){
-		if(!ar.serialize(weaponAttributes, "weaponAttributesMap", "������")){ // ��������� 30.01.2008
+		if(!ar.serialize(weaponAttributes, "weaponAttributesMap", "Оружие")){ // конверсия 30.01.2008
 			vector<WeaponSlotAttribute> vect;
 			ar.serialize(vect, "weaponAttributes", 0);
 			for(int i = 0; i < vect.size(); i++)
@@ -887,39 +887,39 @@ void AttributeBase::serialize(Archive& ar)
 			fixIntMap(weaponAttributes);
 
 		bool no_conversion = false;
-		if(ar.openBlock("attack", "�����")){
-			ar.serialize(hasAutomaticAttackMode, "hasAutomaticAttackMode", "����������� ��������� ������� �����");
+		if(ar.openBlock("attack", "Атака")){
+			ar.serialize(hasAutomaticAttackMode, "hasAutomaticAttackMode", "Собственные настройки режимов атаки");
 			if(hasAutomaticAttackMode){
 				attackModeAttribute.setTransport(isTransport());
-				ar.serialize(attackModeAttribute, "attackModeAttribute", "��������� ������� �����");
+				ar.serialize(attackModeAttribute, "attackModeAttribute", "Настройки режимов атаки");
 			}
 
-			ar.serialize(attackTargetNotificationMode, "attackTargetNotificationMode", "����� ���������� � ���������� ������");
+			ar.serialize(attackTargetNotificationMode, "attackTargetNotificationMode", "Режим оповещения о замеченных врагах");
 
 			if(attackTargetNotificationMode & TARGET_NOTIFY_ALL)
-				ar.serialize(attackTargetNotificationRadius, "attackTargetNotificationRadius", "������ ���������� � ���������� ������ (������������ ������� ���������)");
+				ar.serialize(attackTargetNotificationRadius, "attackTargetNotificationRadius", "Радиус оповещения о замеченных врагах (относительно радиуса видимости)");
 
-			ar.serialize(noiseTargetEffect, "noiseTargetEffect", "������ ���� ������� ���");
+			ar.serialize(noiseTargetEffect, "noiseTargetEffect", "Эффект если услышал шум");
 
 			ar.closeBlock();
 		}
 
-		if(ar.openBlock("directControl", "������ ����������")){
+		if(ar.openBlock("directControl", "Прямое управление")){
 			if(GlobalAttributes::instance().directControlMode)
-				ar.serialize(defaultDirectControlEnabled, "defaultDirectControlEnabled", "�������� ������ ���������� �� ���������");
-			ar.serialize(syndicateControlAimEnabled, "syndicateControlAimEnabled", "�������� � ����������� ����������");
-			ar.serialize(disablePathTrackingInSyndicateControl, "disablePathTrackingInSyndicateControl", "��������� ����� ���� � ����������� ����������");
-			ar.serialize(syndicatControlCameraRestrictionFactor, "syndicatControlCameraRestrictionFactor", "����������� ��������� ������");
-			ar.serialize(syndicateControlOffset, "syndicateControlOffset", "�������� ������ ��� ������������ ����������");
-			ar.serialize(directControlNode, "directControlNode", "���� ��� �������� ������");
-			ar.serialize(directControlOffset, "directControlOffset", "�������� ������");
-			ar.serialize(directControlOffsetWater, "directControlOffsetWater", "�������� ������ ��� ��������");
+				ar.serialize(defaultDirectControlEnabled, "defaultDirectControlEnabled", "Включать прямое управление по умолчанию");
+			ar.serialize(syndicateControlAimEnabled, "syndicateControlAimEnabled", "Целиться в синдикатном управлении");
+			ar.serialize(disablePathTrackingInSyndicateControl, "disablePathTrackingInSyndicateControl", "запретить поиск пути в синдикатном управлении");
+			ar.serialize(syndicatControlCameraRestrictionFactor, "syndicatControlCameraRestrictionFactor", "Коэффициент отдаления камеры");
+			ar.serialize(syndicateControlOffset, "syndicateControlOffset", "Смещение камеры для синдикатного управления");
+			ar.serialize(directControlNode, "directControlNode", "Узел для линковки камеры");
+			ar.serialize(directControlOffset, "directControlOffset", "Смещение камеры");
+			ar.serialize(directControlOffsetWater, "directControlOffsetWater", "Смещение камеры для плавания");
 			if(!ar.inPlace()){
 				float tmp = directControlThetaMin / M_PI * 180.f;
-				ar.serialize(tmp, "directControlThetaMin", "����������� ����");
+				ar.serialize(tmp, "directControlThetaMin", "Минимальный угол");
 				directControlThetaMin = clamp(tmp / 180.f * M_PI, 0.f, M_PI) ;
 				tmp = directControlThetaMax / M_PI * 180.f;
-				ar.serialize(tmp, "directControlThetaMax", "������������ ����");
+				ar.serialize(tmp, "directControlThetaMax", "Максимальный угол");
 				directControlThetaMax = clamp(tmp / 180.f * M_PI, directControlThetaMin, M_PI) ;
 			}
 			ar.closeBlock();
@@ -927,43 +927,43 @@ void AttributeBase::serialize(Archive& ar)
 	}
 
 	if(isObjective() || isProjectile()){
-		if(ar.openBlock("Death", "������")){
+		if(ar.openBlock("Death", "Гибель")){
 			if(!ar.inPlace()){
-				ar.serialize(waterEffect, "waterEffect", "����������� �� ����");
-				ar.serialize(lavaEffect, "lavaEffect", "����������� �� ����");
-				ar.serialize(iceEffect, "iceEffect", "����������� �� ���������");
-				ar.serialize(earthEffect, "earthEffect", "����������� �� �����");
+				ar.serialize(waterEffect, "waterEffect", "воздействие от воды");
+				ar.serialize(lavaEffect, "lavaEffect", "воздействие от лавы");
+				ar.serialize(iceEffect, "iceEffect", "воздействие от заморозки");
+				ar.serialize(earthEffect, "earthEffect", "воздействие от земли");
 			}
    			harmAttr.serialize(ar);
-			ar.serialize(contactWeight, "contactWeight", "���� ����������� ��� ��������");
+			ar.serialize(contactWeight, "contactWeight", "Сила воздействия при контакте");
 
 			if(isBuilding() || isLegionary() || isPad()){
-				ar.serialize(unitAttackClass, "unitAttackClass", "����� ����� �����");
+				ar.serialize(unitAttackClass, "unitAttackClass", "класс атаки юнита");
 				if(unitAttackClass == ATTACK_CLASS_ENVIRONMENT_BIG_BUILDING)
 					unitAttackClass = ATTACK_CLASS_LIGHT;
 
-				ar.serialize(excludeFromAutoAttack, "excludeFromAutoAttack", "��������� �� ���������������� ������ ����� ��� �����");
+				ar.serialize(excludeFromAutoAttack, "excludeFromAutoAttack", "Исключить из автоматичекского поиска целей для атаки");
 				
-				ar.serialize(leavingItems, "leavingItems", "����������� ��������");
-				ar.serialize(leavingItemsRandom, "leavingItemsRandom", "�������� �������� ���� ������� �� ������");
-				ar.serialize(dropInventoryItems, "dropInventoryItems", "��������� �������� �� ���������");
-				ar.serialize(deathGainArithmetics, "deathGainArithmetics", "���������� �� ������");
+				ar.serialize(leavingItems, "leavingItems", "Оставляемые предметы");
+				ar.serialize(leavingItemsRandom, "leavingItemsRandom", "Случайно выбирать один предмет из списка");
+				ar.serialize(dropInventoryItems, "dropInventoryItems", "Оставлять предметы из инвентаря");
+				ar.serialize(deathGainArithmetics, "deathGainArithmetics", "Арифметика за гибель");
 
 				if(isLegionary())
-					ar.serialize(armorFactors, "armorFactors", "������������ �����");
+					ar.serialize(armorFactors, "armorFactors", "Коэффициенты брони");
 			}
 			ar.closeBlock();
 		}
 	}
 
 	if(isActing()){
-		if(ar.openBlock("Production", "������������")){
-			ar.serialize(producedUnits, "producedUnits", "������������ �����");
+		if(ar.openBlock("Production", "Производство")){
+			ar.serialize(producedUnits, "producedUnits", "Производимые юниты");
 			if(ar.isInput())
 				fixIntMap(producedUnits);
 
-			ar.serialize(producedUnitQueueSize, "producedUnitQueueSize", "������������ ����� �������");
-			ar.serialize(dockNodes, "dockNodes", "��� ����");
+			ar.serialize(producedUnitQueueSize, "producedUnitQueueSize", "Максимальная длина очереди");
+			ar.serialize(dockNodes, "dockNodes", "Имя дока");
 					
 			if(isBuilding()){
 				if(!ar.isEdit() && ar.isOutput()){
@@ -973,18 +973,18 @@ void AttributeBase::serialize(Archive& ar)
 						impassability |= it->second.unit->impassability;
 				}
 				ar.serialize(impassability, "impassibility", 0);
-				ar.serialize(automaticProduction, "automaticProduction", "�������������� ������������ ������");
-				ar.serialize(totalProductionNumber, "totalProductionNumber", "������������ ���������� ������������� ������ ��� ����������");
+				ar.serialize(automaticProduction, "automaticProduction", "Автоматическое производство юнитов");
+				ar.serialize(totalProductionNumber, "totalProductionNumber", "Максимальное количество произведенных юнитов или параметров");
 			}
 
 			productivity *= 1.f/logicPeriodSeconds;
-			ar.serialize(productivity, "productivity", "��������������� - ������������������ � �������");
+			ar.serialize(productivity, "productivity", "Ресурсодобытчик - производительность в секунду");
 			productivity *= logicPeriodSeconds;
-			ar.serialize(productivityTotal, "productivityTotal", "��������������� - ������������ ������������������");
-			ar.serialize(productionRequirement, "productionRequirement", "���������� ��� ������������������ �������");
-			ar.serialize(productionNightFactor, "productionNightFactor", "����������� �����");
+			ar.serialize(productivityTotal, "productivityTotal", "Ресурсодобытчик - максимальная производительность");
+			ar.serialize(productionRequirement, "productionRequirement", "Требования для производительности ресурса");
+			ar.serialize(productionNightFactor, "productionNightFactor", "Коэффициент ночью");
 
-			ar.serialize(producedParameters, "producedParameters", "������������ ���������");
+			ar.serialize(producedParameters, "producedParameters", "Производимые параметры");
 			if(ar.isInput())
 				fixIntMap(producedParameters);
 
@@ -996,8 +996,8 @@ void AttributeBase::serialize(Archive& ar)
 			}
 
 	        		
-			ar.serialize(resourceCapacity, "resourceCapacity", "������� ��� �������");
-			ar.serialize(putInIdleList, "putInIdleList", "�������� � ������ �������������� ������");
+			ar.serialize(resourceCapacity, "resourceCapacity", "Емкость для ресурса");
+			ar.serialize(putInIdleList, "putInIdleList", "Помещать в список бездействующих юнитов");
 
 			ar.closeBlock();
 		}
@@ -1014,57 +1014,57 @@ void AttributeBase::serialize(Archive& ar)
 	ar.serialize(producedThisFactories, "producedThisFactories", 0);
 
 	if(isObjective()){
-		if(ar.openBlock("chainTimes", "������� ������� ��������")){
-			ar.serialize(MillisecondsWrapper(chainTransitionTime), "chainTransitionTime", "�������� �� ������ �����������");
+		if(ar.openBlock("chainTimes", "Времена цепочек анимаций")){
+			ar.serialize(MillisecondsWrapper(chainTransitionTime), "chainTransitionTime", "Переходы на другую поверхность");
 			if(isLegionary()){
-				ar.serialize(MillisecondsWrapper(chainChangeMovementMode), "chainChangeMovementMode", "�������� ����� ���������");
-				ar.serialize(MillisecondsWrapper(chainLandingTime), "chainLandingTime", "�������� � ���������");
-				ar.serialize(MillisecondsWrapper(chainUnlandingTime), "chainUnlandingTime", "������������ �� ����������");
-				ar.serialize(MillisecondsWrapper(chainTouchDownTime), "chainTouchDownTime", "������������");
-				ar.serialize(MillisecondsWrapper(chainPickItemTime), "chainPickItemTime", "��������� ��������");
+				ar.serialize(MillisecondsWrapper(chainChangeMovementMode), "chainChangeMovementMode", "Переходы между цепочками");
+				ar.serialize(MillisecondsWrapper(chainLandingTime), "chainLandingTime", "Садиться в транспорт");
+				ar.serialize(MillisecondsWrapper(chainUnlandingTime), "chainUnlandingTime", "Высаживаться из транспорта");
+				ar.serialize(MillisecondsWrapper(chainTouchDownTime), "chainTouchDownTime", "Приземляться");
+				ar.serialize(MillisecondsWrapper(chainPickItemTime), "chainPickItemTime", "Подбирать предметы");
 			}
 			if(isResourceItem() || isInventoryItem())
-				ar.serialize(MillisecondsWrapper(chainGiveResourceTime), "chainGiveResourceTime", "�������� ������");
-			ar.serialize(MillisecondsWrapper(chainBirthTime), "chainBirthTime", "��������");
+				ar.serialize(MillisecondsWrapper(chainGiveResourceTime), "chainGiveResourceTime", "Отдавать ресурс");
+			ar.serialize(MillisecondsWrapper(chainBirthTime), "chainBirthTime", "Рождение");
 			if(isActing()){
-				ar.serialize(MillisecondsWrapper(chainRiseTime), "chainRiseTime", "��������");
-				ar.serialize(MillisecondsWrapper(chainOpenTime), "chainOpenTime", "�������");
-				ar.serialize(MillisecondsWrapper(chainCloseTime), "chainCloseTime", "�������");
-				ar.serialize(MillisecondsWrapper(chainOpenForLandingTime), "chainOpenForLandingTime", "������� ��� �������");
-				ar.serialize(MillisecondsWrapper(chainCloseForLandingTime), "chainCloseForLandingTime", "������� ��� �������");
-				ar.serialize(MillisecondsWrapper(chainFlyDownTime), "chainFlyDownTime", "���������� � ������");
+				ar.serialize(MillisecondsWrapper(chainRiseTime), "chainRiseTime", "Вставать");
+				ar.serialize(MillisecondsWrapper(chainOpenTime), "chainOpenTime", "Открыть");
+				ar.serialize(MillisecondsWrapper(chainCloseTime), "chainCloseTime", "Закрыть");
+				ar.serialize(MillisecondsWrapper(chainOpenForLandingTime), "chainOpenForLandingTime", "Открыть для посадки");
+				ar.serialize(MillisecondsWrapper(chainCloseForLandingTime), "chainCloseForLandingTime", "Закрыть для посадки");
+				ar.serialize(MillisecondsWrapper(chainFlyDownTime), "chainFlyDownTime", "Спускаться с высоты");
 
 				if(ar.isInput()){
-					ar.serialize(MillisecondsWrapper(chainUpgradedFromBuilding), "chainIsUpgraded", "������� �� ������");
-					ar.serialize(MillisecondsWrapper(chainUpgradedFromBuilding), "chainUpgradedFromBuilding", "������� �� ������");
+					ar.serialize(MillisecondsWrapper(chainUpgradedFromBuilding), "chainIsUpgraded", "Апгрейд из здания");
+					ar.serialize(MillisecondsWrapper(chainUpgradedFromBuilding), "chainUpgradedFromBuilding", "Апгрейд из здания");
 				}
 				else{
-					ar.serialize(MillisecondsWrapper(chainUpgradedFromBuilding), "chainUpgradedFromBuilding", "������� �� ������");
+					ar.serialize(MillisecondsWrapper(chainUpgradedFromBuilding), "chainUpgradedFromBuilding", "Апгрейд из здания");
 				}
 				
-				ar.serialize(MillisecondsWrapper(chainUpgradedFromLegionary), "chainUpgradedFromLegionary", "������� �� �����");
+				ar.serialize(MillisecondsWrapper(chainUpgradedFromLegionary), "chainUpgradedFromLegionary", "Апгрейд из юнита");
 			}
 			if(isBuilding()){
-				ar.serialize(MillisecondsWrapper(chainUninsatalTime), "chainUninsatalTime", "�������� ������");
-				ar.serialize(killAfterDisconnect, "killAfterDisconnect", "������� ����� ����������");
+				ar.serialize(MillisecondsWrapper(chainUninsatalTime), "chainUninsatalTime", "Демонтаж здания");
+				ar.serialize(killAfterDisconnect, "killAfterDisconnect", "Убивать после отключения");
 				if(killAfterDisconnect)
-					ar.serialize(MillisecondsWrapper(chainDisconnectTime), "chainDisconnectTime", "������ ���������");
+					ar.serialize(MillisecondsWrapper(chainDisconnectTime), "chainDisconnectTime", "Здание отключено");
 			}
 			ar.closeBlock();
 		}
 	}
 
 	if(isActing()){
-		if(ar.openBlock("Invisibility", "�����������")){
-			ar.serialize(invisible, "invisible", "���� �������");
-			ar.serialize(canChangeVisibility, "canChangeVisibility", "���� ����� ������ ����� ���������");
-			ar.serialize(transparenceDiffuseForAlien, "invisibleColorForAlien", "��������� ��� ������");
-			ar.serialize(transparenceDiffuseForClan, "invisibleColorForClan", "��������� ��� �����");
+		if(ar.openBlock("Invisibility", "Невидимость")){
+			ar.serialize(invisible, "invisible", "Юнит невидим");
+			ar.serialize(canChangeVisibility, "canChangeVisibility", "Юнит может менять режим видимости");
+			ar.serialize(transparenceDiffuseForAlien, "invisibleColorForAlien", "Видимость для врагов");
+			ar.serialize(transparenceDiffuseForClan, "invisibleColorForClan", "Видимость для своих");
 			ar.closeBlock();
 		}
 	}
 
-	ar.serialize(lodDistance,"distanceLod","���: ��������� ������������");
+	ar.serialize(lodDistance,"distanceLod","ЛОД: Дистанция переключения");
 
 	if(ar.inPlace()){
 		ar.serialize(waterEffect, "waterEffect", 0);
@@ -1210,7 +1210,7 @@ void AttributeBase::initGeometryAttribute()
 	cObject3dx* logic = logicModel();
 	if(!logic){
         logic = model();
-		kdWarning("GAV", XBuffer() < TRANSLATE("����������� ���������� ����� � ������ ") < modelName.c_str());
+		kdWarning("GAV", XBuffer() < TRANSLATE("Отсутствует логический баунд в моделе ") < modelName.c_str());
 	}
 	xassert(logic);
 	logic->SetPosition(Se3f::ID);
@@ -1229,7 +1229,7 @@ void AttributeBase::initGeometryAttribute()
 	logic->GetBoundBox(boundBox);
 
 	Vect3f deltaBound = boundBox.max - boundBox.min;
-	xassertStr(deltaBound.x > FLT_EPS && deltaBound.y > FLT_EPS && deltaBound.z > FLT_EPS && "������ ������� ��������� ��� �� ����� ����������� ������: ", modelName.c_str());
+	xassertStr(deltaBound.x > FLT_EPS && deltaBound.y > FLT_EPS && deltaBound.z > FLT_EPS && "Объект слишком маленький или не имеет логического баунда: ", modelName.c_str());
 	float radiusMin = 3;
 	for(int i = 0; i < 2; i++)
 		if(deltaBound[i] < 2*radiusMin){
@@ -1323,14 +1323,14 @@ AnimationChainsInterval AttributeBase::findAnimationChainInterval(ChainID chainI
 						break;
 				}
 			}
-			if(i != end){ // � �����������
+			if(i != end){ // с состояниями
 				AnimationChains::const_iterator begin = i;
 				for(; i != end; ++i)
 					if(i->chainID != chainID || i->weapon.animationType() != weapon || !i->checkAbnormalState(astate) || (i->movementState & movementState) != movementState)
 						break;
 				return AnimationChainsInterval(begin, i);
 			}
-			if(iAstateNone != end){ // ��� ���������
+			if(iAstateNone != end){ // без состояний
 				AnimationChains::const_iterator begin = i = iAstateNone;
 				for(; i != end; ++i)
 					if(i->chainID != chainID || i->weapon.animationType() != weapon || !i->checkAbnormalState(0) || (i->movementState & movementState) != movementState)
@@ -1367,7 +1367,7 @@ AnimationChainsInterval AttributeBase::findTransitionChainInterval(const Abnorma
 						break;
 				}
 			}
-			if(i != end){ // � �����������
+			if(i != end){ // с состояниями
 				AnimationChains::const_iterator begin = i;
 				for(; i != end; ++i)
 					if(i->chainID != CHAIN_TRANSITION || i->weapon.animationType() != weapon || !i->checkAbnormalState(astate)
@@ -1375,7 +1375,7 @@ AnimationChainsInterval AttributeBase::findTransitionChainInterval(const Abnorma
 						break;
 				return AnimationChainsInterval(begin, i);
 			}
-			else if(iAstateNone != end){ // ��� ���������
+			else if(iAstateNone != end){ // без состояний
 				AnimationChains::const_iterator begin = i = iAstateNone;
 				for(; i != end; ++i)
 					if(i->chainID != CHAIN_TRANSITION || i->weapon.animationType() != weapon 
@@ -1431,8 +1431,8 @@ AttributeType AttributeBase::attributeType() const
 
 void AttributeBase::TraceInfo::serialize(Archive& ar)
 {
-	ar.serialize(surfaceKind_, "surfaceKind", "��� �����������");
-	ar.serialize(traceTerTool_, "traceTerTool", "����");
+	ar.serialize(surfaceKind_, "surfaceKind", "Тип поверхности");
+	ar.serialize(traceTerTool_, "traceTerTool", "След");
 }
 
 //--------------------------------------------
@@ -1520,43 +1520,43 @@ AnimationChain::AnimationChain()
 
 void AnimationChain::serialize(Archive& ar) 
 {
-	ar.serialize(name_, "name", "&���������������� ���");
-	ar.serialize(chainID, "chainID", "&������������� �������");
-	if(!ar.serialize(movementState, "animationMovementState", "&��������")){ // conversion 15.02.08
+	ar.serialize(name_, "name", "&Пользовательское имя");
+	ar.serialize(chainID, "chainID", "&Идентификатор цепочки");
+	if(!ar.serialize(movementState, "animationMovementState", "&Движение")){ // conversion 15.02.08
 		BitVector<MovementStateID> state;
 		ar.serialize(state, "movementState", 0);
 		movementState = state;
 	}
-	ar.serialize(weapon, "weapon", "&������");
+	ar.serialize(weapon, "weapon", "&Оружие");
 	if(chainID == CHAIN_TRANSITION){
-		if(!ar.serialize(transitionToState, "transitionToMovementState", "������� � ���������")){ // conversion 15.02.08
+		if(!ar.serialize(transitionToState, "transitionToMovementState", "Переход в состояние")){ // conversion 15.02.08
 			BitVector<MovementStateID> state;
 			ar.serialize(state, "transitionToState", 0);
 			transitionToState = state;
 		}
 
 	}
-	ar.serialize(counter, "counter", "!&�����");
-	ar.serialize(RangedWrapperi(possibility, 0, 100), "possibility", "�����������");
+	ar.serialize(counter, "counter", "!&Номер");
+	ar.serialize(RangedWrapperi(possibility, 0, 100), "possibility", "Вероятность");
 
-	ar.serialize(chainIndex_, "ChainIndex", "&��� ������� � ������");
-	ar.serialize(animationGroup_, "AnimationGroup", "&��� ������������ ������");
-	ar.serialize(visibilityGroup_, "VisibilityGroup", "&��� ������ ���������");
+	ar.serialize(chainIndex_, "ChainIndex", "&Имя цепочки в модели");
+	ar.serialize(animationGroup_, "AnimationGroup", "&Имя анимационной группы");
+	ar.serialize(visibilityGroup_, "VisibilityGroup", "&Имя группы видимости");
 
-	ar.serialize(animationAcceleration, "animationAcceleration", "��������� ��������, %");
-	ar.serialize(cycled, "cycled", "�����������");
+	ar.serialize(animationAcceleration, "animationAcceleration", "Ускорение анимации, %");
+	ar.serialize(cycled, "cycled", "Зацикленная");
 	ar.serialize(supportedByLogic, "supportedByLogic", 0);
-	ar.serialize(reversed, "reversed", "����������� � �������� �������");
-	ar.serialize(syncBySound, "syncBySound", "���������������� �� �����");
-	ar.serialize(randomPhase, "randomPhase", "������������� ��������� ����");
-	ar.serialize(effects, "effects", "�����������");
-	ar.serialize(stopPermanentEffects, "stopPermanentEffects", "��������� ���������� �������");
+	ar.serialize(reversed, "reversed", "Проигрывать в обратную сторону");
+	ar.serialize(syncBySound, "syncBySound", "Синхронизировать по звуку");
+	ar.serialize(randomPhase, "randomPhase", "Устанавливать случайную фазу");
+	ar.serialize(effects, "effects", "Спецэффекты");
+	ar.serialize(stopPermanentEffects, "stopPermanentEffects", "Выключать постоянные эффекты");
 	
-	ar.serialize(soundReferences, "soundReferences", "�����");
-	ar.serialize(soundMarkers, "soundMarkers", "�������� �����");
-	ar.serialize(noiseRadiusFactor, "noiseRadiusFactor", "����������� ��� ������� ������������ ����");
+	ar.serialize(soundReferences, "soundReferences", "Звуки");
+	ar.serialize(soundMarkers, "soundMarkers", "Звуковые метки");
+	ar.serialize(noiseRadiusFactor, "noiseRadiusFactor", "Коэффициент для радиуса создаваемого шума");
 
-	ar.serialize(abnormalStateTypes, "abnormalStateTypes", "&���� �����������");
+	ar.serialize(abnormalStateTypes, "abnormalStateTypes", "&Типы воздействия");
 
 	if(ar.isOutput()){
 		cObject3dx* model = AttributeBase::model();
@@ -1567,7 +1567,7 @@ void AnimationChain::serialize(Archive& ar)
 	ar.serialize(period, "period", 0);
 	float periodSeconds = period/1000.f;
 	if(!ar.inPlace())
-		ar.serialize(periodSeconds, "periodSeconds", "������ �������� (��� ���������), �������");
+		ar.serialize(periodSeconds, "periodSeconds", "Период анимации (для просмотра), секунды");
 
 	if(ar.isInput()){
 		abnormalStateMask = 0;
@@ -1641,8 +1641,8 @@ const char* AnimationChain::name() const
 /////////////////////////////////////
 void UnitColor::serialize(Archive& ar)
 {
-	ar.serialize(color, "color", "����");
-	ar.serialize(isBrightColor, "isBrightColor", "���������� ����");
+	ar.serialize(color, "color", "Цвет");
+	ar.serialize(isBrightColor, "isBrightColor", "Раскрасить ярко");
 }
 
 void UnitColorEffective::apply(cObject3dx* model, float phase)
@@ -1668,11 +1668,11 @@ void UnitColorEffective::apply(cObject3dx* model, float phase)
 
 
 void UnitColorEffective::setColor(const UnitColor& clr, bool reset)
-{	// ����� ������ ����� � �� �����
-	// ����� ����� ������ ��������� �� �������� (���������) � ��� ����� �����������, ��� �� �����
-	// ����� ������ ����� - ��� ������� ������� �������� ������
-	// �� ����� ����� ������������, ����� �� ������ ����� ��� ������ ������������ ������, ���������� �� ���� ������ ������
-	// ������������ ������� ���������� �� �����������
+{	// цвета бывают яркие и не яркие
+	// яркие цвета всегда действуют по одиночке (последний) и они более приоритетны, чем не яркие
+	// альфа яркого цвета - это степень заливки текстуры модели
+	// не яркие цвета складываются, альфа не яркого цвета это всегда прозрачность модели, независимо от типа других цветов
+	// прозрачность берется наименьшая из действующих
 
 	if(reset){
 		color = clr.color;
@@ -1730,10 +1730,10 @@ AttackMode::AttackMode()
 
 void AttackMode::serialize(Archive& ar)
 {
-	ar.serialize(autoAttackMode_, "autoAttackMode", "����� �����");
-	ar.serialize(autoTargetFilter_, "autoTargetFilter", "����� ��������������� ������ �����");
-//	ar.serialize(walkAttackMode_, "walkAttackMode", "����� ����� ��� ��������");
-	ar.serialize(weaponMode_, "weaponMode", "����� ������");
+	ar.serialize(autoAttackMode_, "autoAttackMode", "Режим атаки");
+	ar.serialize(autoTargetFilter_, "autoTargetFilter", "Режим автоматического выбора целей");
+//	ar.serialize(walkAttackMode_, "walkAttackMode", "Режим атаки при движении");
+	ar.serialize(weaponMode_, "weaponMode", "Режим оружия");
 }
 
 AttackModeAttribute::AttackModeAttribute()
@@ -1744,11 +1744,11 @@ AttackModeAttribute::AttackModeAttribute()
 
 void AttackModeAttribute::serialize(Archive& ar)
 {
-	ar.serialize(attackMode_, "attackMode", "��������� ��������� ������� �����");
-	ar.serialize(targetInsideSightRadius_, "targetInsideSightRadius", "������ ���� ��� ������ �� ������� ���������");
+	ar.serialize(attackMode_, "attackMode", "Начальные установки режимов атаки");
+	ar.serialize(targetInsideSightRadius_, "targetInsideSightRadius", "Терять цель при выходе из радиуса видимости");
 
 	if(isTransport_)
-		ar.serialize(disableEmptyTransportAttack_, "disableEmptyTransportAttack", "��������� ����� ���� � ���������� �����");
+		ar.serialize(disableEmptyTransportAttack_, "disableEmptyTransportAttack", "Запретить атаку если в транспорте пусто");
 }
 
 //////////////////////////////////////////////////
@@ -1774,67 +1774,67 @@ RaceProperty::RaceProperty(const char* name) :
 void RaceProperty::serialize(Archive& ar) 
 {
 	StringTableBase::serialize(ar); 
-	ar.serialize(locName_, "locName", "��� ����");
-	ar.serialize(fileNameAddition_, "fileNameAddition", "������� � ������ ������");
-	ar.serialize(instrumentary_, "instrumentary", "���������");
-	ar.serialize(usedAlways_, "usedAlways", "��������� ������");
+	ar.serialize(locName_, "locName", "Имя расы");
+	ar.serialize(fileNameAddition_, "fileNameAddition", "Добавка к именам файлов");
+	ar.serialize(instrumentary_, "instrumentary", "Служебная");
+	ar.serialize(usedAlways_, "usedAlways", "Загружать всегда");
 
-	ar.serialize(shipmentPositionMark_, "shipmentPositionMark", "������ ����� ����� ������������ ������");
+	ar.serialize(shipmentPositionMark_, "shipmentPositionMark", "Флажок точки сбора производимых юнитов");
 
-	ar.serialize(anchorForAssemblyPoint_, "anchorForAssemblyPoint", "���� ������ ����� �������");
+	ar.serialize(anchorForAssemblyPoint_, "anchorForAssemblyPoint", "Зона общего сбора альянса");
 
-	ar.serialize(orderMarks_, "orderMarks", "������������ ������ ��������");
+	ar.serialize(orderMarks_, "orderMarks", "Визуализация отдачи приказов");
 
-//	ar.serialize(unitAttackEffect_, "unitAttackEffect", "������������ ����� �� �����");
-	ar.serialize(weaponUpgradeEffect_, "weaponUpgradeEffect", "������������ �������� ������");
+//	ar.serialize(unitAttackEffect_, "unitAttackEffect", "Визуализация атаки по юниту");
+	ar.serialize(weaponUpgradeEffect_, "weaponUpgradeEffect", "Визуализация апгрейда оружия");
 
-	ar.serialize(minimapMarks_, "minimapMarks", "������������ ������� � ������ �� ���������");
-	ar.serialize(windMarks_, "windMarks", "������������ ����������� ����� �� ���������");
+	ar.serialize(minimapMarks_, "minimapMarks", "Визуализация событий и юнитов на миникарте");
+	ar.serialize(windMarks_, "windMarks", "Визуализация направления ветра на миникарте");
 
-	if(ar.openBlock("controlAI", "��� ����������� AI")){
-		ar.serialize(workForAISprite_, "workForAISprite", "������� ��� ������ ��� AI");
-		ar.serialize(workForAIEffect_, "workForAIEffect", "������ ��� ������ ��� AI");
+	if(ar.openBlock("controlAI", "Под управлением AI")){
+		ar.serialize(workForAISprite_, "workForAISprite", "Пометка над юнитом при AI");
+		ar.serialize(workForAIEffect_, "workForAIEffect", "Эффект над юнитом при AI");
 		ar.closeBlock();
 	}
-	ar.serialize(runModeSprite_, "runModeSprite", "������� ��� ������ ��� ������ ����");
+	ar.serialize(runModeSprite_, "runModeSprite", "Пометка над юнитом при режиме бега");
 
-	if(ar.openBlock("unitSign", "���� ����� ��� ������")){
-		ar.serialize(squadSpriteForOthers_, "squadSpriteForOthers", "������ ������ ��� ��������� �������");
-		ar.serialize(squadSpriteForOthersHovered_, "squadSpriteForOthersHovered", "������ ������ ��� ��������� ������� ��� ���������");
+	if(ar.openBlock("unitSign", "Знак юнита или сквада")){
+		ar.serialize(squadSpriteForOthers_, "squadSpriteForOthers", "Спрайт сквада для остальных игроков");
+		ar.serialize(squadSpriteForOthersHovered_, "squadSpriteForOthersHovered", "Спрайт сквада для остальных игроков при наведении");
 		ar.closeBlock();
 	}
 
-	ar.serialize(initialResource, "initialResource", "�������������� ������");
-	ar.serialize(resourceCapacity, "resourceCapacity", "�������������� �������");
-	ar.serialize(initialUnits, "initialUnits", "�������������� ����� ������");
+	ar.serialize(initialResource, "initialResource", "Первоначальный ресурс");
+	ar.serialize(resourceCapacity, "resourceCapacity", "Первоначальная емкость");
+	ar.serialize(initialUnits, "initialUnits", "Первоначальный набор юнитов");
 	
 	ar.serialize(commonTriggers, "commonTriggers", 0);
-	ar.serialize(scenarioTriggers, "scenarioTriggers", "�������� ��� ������");
-	ar.serialize(battleTriggers, "battleTriggers", "�������� ��� ������");
-	ar.serialize(multiplayerTriggers, "multiplayerTriggers", "�������� ��� ������������");
+	ar.serialize(scenarioTriggers, "scenarioTriggers", "Триггера для сингла");
+	ar.serialize(battleTriggers, "battleTriggers", "Триггера для баттла");
+	ar.serialize(multiplayerTriggers, "multiplayerTriggers", "Триггера для мультиплеера");
 	if(ar.isInput() && !ar.isEdit()){
 		if(scenarioTriggers.empty())
 			scenarioTriggers = commonTriggers;
 	}
 
-	ar.serialize(selectQuantityMax, "selectQuantityMax", "������������ ���������� ������ � �������");
+	ar.serialize(selectQuantityMax, "selectQuantityMax", "Максимальное количество юнитов в селекте");
 	
-	ar.serialize(playerUnitAttribute_, "playerUnitAttribute", "����-�����");
+	ar.serialize(playerUnitAttribute_, "playerUnitAttribute", "Юнит-игрок");
 
-	ar.serialize(startConstructionSound, "startConstructionSound", "���� �� ������ ������������� ������");
-	ar.serialize(unableToConstructSound, "unableToConstructSound", "����, ����� ������ ������ ����������");
+	ar.serialize(startConstructionSound, "startConstructionSound", "Звук на начало строительства здания");
+	ar.serialize(unableToConstructSound, "unableToConstructSound", "Звук, когда здания нельзя установить");
 
-	ar.serialize(attackModeAttribute_, "attackModeAttribute", "��������� ������� �����");
+	ar.serialize(attackModeAttribute_, "attackModeAttribute", "Настройки режимов атаки");
 
-	ar.serialize(produceMultyAmount, "produceMultyAmount", "���������� ������������ ������ � ������");
+	ar.serialize(produceMultyAmount, "produceMultyAmount", "Количество заказываемых юнитов с шифтом");
 
-	ar.serialize(circle, "circle", "��������� ������������ �������");
-	ar.serialize(circleTeam, "circleTeam", "��������� ������������ ������� ���������� � ��������� ������");
-	ar.serialize(placementZoneCircle, "placementZoneCircle", "��������� ������������ ���� ���������");
+	ar.serialize(circle, "circle", "Настройки визуализации селекта");
+	ar.serialize(circleTeam, "circleTeam", "Настройки визуализации селекта напарников в командном режиме");
+	ar.serialize(placementZoneCircle, "placementZoneCircle", "Настройки визуализации зоны установки");
 
 	selection_param.serialize(ar);
 
-	ar.serialize(screenToPreload, "screenToPreload", "����� ��� ������������");
+	ar.serialize(screenToPreload, "screenToPreload", "Экран для предзагрузки");
 }
 
 void RaceProperty::setUsed(Color4c skinColor, const char* emblemName) const 
@@ -1896,23 +1896,23 @@ string UnitAttributeID::nameRace() const
 
 void UnitAttributeID::serialize(Archive& ar) 
 {
-	ar.serialize(unitName_, "name", "&���");
-	ar.serialize(race_, "race", "&����");
+	ar.serialize(unitName_, "name", "&имя");
+	ar.serialize(race_, "race", "&раса");
 }
 
 ///////////////////////////////////////////////
 void InterfaceTV::serialize(Archive& ar) 
 {
-	ar.serialize(radius_, "radius", "������ ������");
-	ar.serialize(position_, "position", "��������");
-	ar.serialize(orientation_, "orientation", "�������");
-	ar.serialize(chain_, "chain", "������������ �������");
+	ar.serialize(radius_, "radius", "размер модели");
+	ar.serialize(position_, "position", "смещение");
+	ar.serialize(orientation_, "orientation", "поворот");
+	ar.serialize(chain_, "chain", "анимационная цепочка");
 }
 
 //////////////////////////////////////////
 void WeaponDamage::serialize(Archive& ar) 
 {
-	ar.serialize(static_cast<ParameterCustom&>(*this), "MainDamage", "�������� �����������");
+	ar.serialize(static_cast<ParameterCustom&>(*this), "MainDamage", "Основные повреждения");
 }
 
 ArmorFactors::ArmorFactors() 
@@ -1921,11 +1921,11 @@ ArmorFactors::ArmorFactors()
 
 void ArmorFactors::serialize(Archive& ar)
 {
-	ar.serialize(front, "front", "�����");
-	ar.serialize(back, "back", "���");
-	ar.serialize(left, "left", "�����");
-	ar.serialize(right, "right", "������");
-	ar.serialize(top, "top", "������");
+	ar.serialize(front, "front", "Перед");
+	ar.serialize(back, "back", "Зад");
+	ar.serialize(left, "left", "Слева");
+	ar.serialize(right, "right", "Справа");
+	ar.serialize(top, "top", "Сверху");
 	if(ar.isInput())
 		used_ = fabs(front - 1.f) > FLT_EPS || fabs(back - 1.f) > FLT_EPS || fabs(left - 1.f) > FLT_EPS
 			|| fabs(right - 1.f) > FLT_EPS || fabs(top - 1.f) < FLT_EPS;
@@ -1962,12 +1962,12 @@ DifficultyPrm::DifficultyPrm(const char* name)
 void DifficultyPrm::serialize(Archive& ar) 
 {
 	StringTableBase::serialize(ar); 
-	ar.serialize(locName, "locName", "�������������� ���");
-	ar.serialize(triggerDelayFactor, "triggerDelayFactor", "����������� �������� ��������");
-	ar.serialize(orderBuildingsDelay, "orderBuildingsDelay", "�������� ������������� ������");
-	ar.serialize(orderUnitsDelay, "orderUnitsDelay", "�������� ������������ ������");
-	ar.serialize(orderParametersDelay, "orderParametersDelay", "�������� ������������ ����������");
-	ar.serialize(upgradeUnitDelay, "upgradeUnitDelay", "�������� �������� ����� � ������");
+	ar.serialize(locName, "locName", "Локализованное имя");
+	ar.serialize(triggerDelayFactor, "triggerDelayFactor", "Коэффициент триггера задержка");
+	ar.serialize(orderBuildingsDelay, "orderBuildingsDelay", "Задержка строительства зданий");
+	ar.serialize(orderUnitsDelay, "orderUnitsDelay", "Задержка производства юнитов");
+	ar.serialize(orderParametersDelay, "orderParametersDelay", "Задержка производства параметров");
+	ar.serialize(upgradeUnitDelay, "upgradeUnitDelay", "Задержка апгрейда юнита в здание");
 }
 
 // -----------------------------------------
@@ -1983,8 +1983,8 @@ EffectContainer::~EffectContainer()
 
 void EffectContainer::serialize(Archive& ar)
 {
-	ModelSelector::Options effectOptions("*.effect", "Resource\\Fx", "������");
-	ar.serialize(ModelSelector(fileName_, effectOptions), "fileName_", "��� �����");
+	ModelSelector::Options effectOptions("*.effect", "Resource\\Fx", "Эффект");
+	ar.serialize(ModelSelector(fileName_, effectOptions), "fileName_", "имя файла");
 }
 
 EffectKey* EffectContainer::getEffect(float scale, Color4c skin_color) const
@@ -2040,23 +2040,23 @@ EffectAttribute::EffectAttribute (const EffectReference& effectReference, bool i
 
 void EffectAttribute::serialize(Archive& ar)
 {
-	ar.serialize(isCycled_, "isCycled", "�����������");
-	ar.serialize(stopImmediately_, "stopImmediately", "�������� ��� ���������");
-	ar.serialize(bindOrientation_, "bindOrientation", "������������� �� �������");
-	ar.serialize(legionColor_, "legionColor", "���������� � ���� �������");
-	ar.serialize(switchOffByInterface_, "switchOffByInterface", "������ ��� ���������� ����������");
-	ar.serialize(switchOffUnderWater_, "switchOffUnderWater", "��������� � ����");
-	ar.serialize(switchOffUnderLava_, "switchOffUnderLava", "��������� � ����");
-	ar.serialize(switchOffByDay_, "switchOffByDay", "�������� �����");
-	ar.serialize(switchOffOnIce_, "switchOffOnIce", "��������� �� ����");
-	ar.serialize(switchOnIce_, "switchOnIce", "�������� ������ �� ����");
-	ar.serialize(ignoreFogOfWar_, "ignoreFogOfWar", "����� � ������ �����");
-	ar.serialize(ignoreInvisibility_, "ignoreInvisibility", "����� �� ��������� �����");
-	ar.serialize(ignoreDistanceCheck_, "ignoreDistanceCheck", "�� ��������� ��� �������� ������");
+	ar.serialize(isCycled_, "isCycled", "зацикливать");
+	ar.serialize(stopImmediately_, "stopImmediately", "Обрывать при окончании");
+	ar.serialize(bindOrientation_, "bindOrientation", "ориентировать по объекту");
+	ar.serialize(legionColor_, "legionColor", "окрашивать в цвет легиона");
+	ar.serialize(switchOffByInterface_, "switchOffByInterface", "Гасить при отключении интерфейса");
+	ar.serialize(switchOffUnderWater_, "switchOffUnderWater", "выключать в воде");
+	ar.serialize(switchOffUnderLava_, "switchOffUnderLava", "выключать в лаве");
+	ar.serialize(switchOffByDay_, "switchOffByDay", "включать ночью");
+	ar.serialize(switchOffOnIce_, "switchOffOnIce", "выключать на льду");
+	ar.serialize(switchOnIce_, "switchOnIce", "включать только на льду");
+	ar.serialize(ignoreFogOfWar_, "ignoreFogOfWar", "виден в тумане войны");
+	ar.serialize(ignoreInvisibility_, "ignoreInvisibility", "виден на невидимом юните");
+	ar.serialize(ignoreDistanceCheck_, "ignoreDistanceCheck", "не пропадает при удалении камеры");
 
-	ar.serialize(waterPlacementMode_, "waterPlacementMode", "����� ������ �� ����");
+	ar.serialize(waterPlacementMode_, "waterPlacementMode", "режим вывода на воде");
 
-	ar.serialize(scale_, "scale", "�������");
+	ar.serialize(scale_, "scale", "масштаб");
 
 	ar.serialize(effectReference_, "effectReference", "^");
 }
@@ -2083,23 +2083,23 @@ void EffectAttributeAttachable::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(scaleByModel_, "scaleByModel", "�������������� �� ������� �������");
-	ar.serialize(onlyForActivePlayer_, "onlyForActivePlayer", "���������� ������ ��������� ������");
+	ar.serialize(scaleByModel_, "scaleByModel", "масштабировать по размеру объекта");
+	ar.serialize(onlyForActivePlayer_, "onlyForActivePlayer", "показывать только активному игроку");
 
 	if (!isCycled_)
-		ar.serialize(synchronizationWithModelAnimation_,"synchronizationWithModelAnimation","���������������� � ���������");
-	ar.serialize(switchOffByAnimationChain_, "switchOffByAnimationChain", "����������� ��������� ��� ����������");
+		ar.serialize(synchronizationWithModelAnimation_,"synchronizationWithModelAnimation","синхронизировать с анимацией");
+	ar.serialize(switchOffByAnimationChain_, "switchOffByAnimationChain", "выключается анимацией как постоянный");
 	if(needNodeName_)
-		ar.serialize(node_, "node", "���� ��������");
+		ar.serialize(node_, "node", "Узел привязки");
 }
 
 // -------------------------------------------
 void AttributeBase::ProducedUnits::serialize(Archive& ar)
 {
-	xassertStr(!(ar.isOutput() && !ar.isEdit() && !unit) && "������ ������������ ���� � ", currentLibraryKey());
-	ar.serialize(unit, "unit", "&����");
-	ar.serialize(number, "number", "&����������");
-	ar.serialize(accessValue, "accessValue", "����������� ��������� ��� ������������");
+	xassertStr(!(ar.isOutput() && !ar.isEdit() && !unit) && "Пустой производимый юнит у ", currentLibraryKey());
+	ar.serialize(unit, "unit", "&Юнит");
+	ar.serialize(number, "number", "&Количество");
+	ar.serialize(accessValue, "accessValue", "Необходимые параметры для производства");
 }
 
 ProducedParameters::ProducedParameters() 
@@ -2111,13 +2111,13 @@ ProducedParameters::ProducedParameters()
 void ProducedParameters::serialize(Archive& ar)
 {
 	arithmetics.serialize(ar);
-	ar.serialize(time, "time", "�����, �������");
-	ar.serialize(cost, "cost", "���������");
-	ar.serialize(accessValue, "accessValue", "����������� ��������� ��� ������������");
-	ar.serialize(accessBuildingsList, "accessBuildingsList", "����������� �������� ��� ������������");
-	ar.serialize(sprites_, "sprites", "������� ��� �������");
-	ar.serialize(signalVariable, "signalVariable", "��� ���������� ���������� (����� �������� ��� ���������� ���������� ����������)");
-	ar.serialize(automatic, "automatic", "����������� �������������");
+	ar.serialize(time, "time", "Время, секунды");
+	ar.serialize(cost, "cost", "Стоимость");
+	ar.serialize(accessValue, "accessValue", "Необходимые параметры для производства");
+	ar.serialize(accessBuildingsList, "accessBuildingsList", "Необходимые строения для производства");
+	ar.serialize(sprites_, "sprites", "Спрайты для очереди");
+	ar.serialize(signalVariable, "signalVariable", "Имя сигнальной переменной (нужно задавать для различения уникальных параметров)");
+	ar.serialize(automatic, "automatic", "Производить автоматически");
 }
 
 // -------------------------------------------
@@ -2137,16 +2137,16 @@ const AbnormalStateEffect* HarmAttribute::abnormalStateEffect(const AbnormalStat
 
 void HarmAttribute::serializeAbnormalStateEffects(Archive& ar)
 {
-	ar.serialize(abnormalStateEffects, "abnormalStateEffects", "������� �� �����������");
+	ar.serialize(abnormalStateEffects, "abnormalStateEffects", "эффекты от воздействий");
 #ifndef _FINAL_VERSION_
 	AbnormalStateEffects::const_iterator it;
 	FOR_EACH(abnormalStateEffects, it)
 		if(it->effectAttribute().switchOffByInterface()){
 			XBuffer buf;
-			buf < "����: " < AttributeBase::currentLibraryKey()
-				< "\n������: " < it->effectAttribute().effectReference().c_str()
-				< "\n�� �����������: \"" < it->typeRef().c_str() < "\""
-				< "\n����������� ������ � �����������";
+			buf < "Юнит: " < AttributeBase::currentLibraryKey()
+				< "\nЭффект: " < it->effectAttribute().effectReference().c_str()
+				< "\nиз воздействия: \"" < it->typeRef().c_str() < "\""
+				< "\nвыключается вместе с интерфейсом";
 			xxassert(false, buf.c_str());
 			kdError("Effects", buf.c_str());
 		}
@@ -2155,7 +2155,7 @@ void HarmAttribute::serializeAbnormalStateEffects(Archive& ar)
 
 void HarmAttribute::serializeSources(Archive& ar)
 {
-	ar.serialize(deathAttribute_.sources, "sources", "���������, ���������� ����� ������");
+	ar.serialize(deathAttribute_.sources, "sources", "Источники, остающиеся после гибели");
 }
 
 void HarmAttribute::serialize(Archive& ar)
@@ -2193,17 +2193,17 @@ chainUpgradeTime(2000)
 
 void AttributeBase::Upgrade::serialize(Archive& ar)
 {
-	xassertStr(!(ar.isOutput() && !ar.isEdit() && !upgrade) && "������ ������� � ", currentLibraryKey());
-	ar.serialize(upgrade, "upgrade", "&�������");
-	ar.serialize(automatic, "automatic", "&��������������");
-	ar.serialize(upgradeValue, "upgradeValue", "��������� ��������");
-	ar.serialize(accessParameters, "accessParameters", "����������� ������ ���������");
-	ar.serialize(chainUpgradeNumber, "chainUpgradeNumber", "����� ������� ��������");
-	ar.serialize(MillisecondsWrapper(chainUpgradeTime), "chainUpgradeTime", "����� ��������");
+	xassertStr(!(ar.isOutput() && !ar.isEdit() && !upgrade) && "Пустой апгрейд у ", currentLibraryKey());
+	ar.serialize(upgrade, "upgrade", "&Апгрейд");
+	ar.serialize(automatic, "automatic", "&Автоматический");
+	ar.serialize(upgradeValue, "upgradeValue", "Стоимость апгрейда");
+	ar.serialize(accessParameters, "accessParameters", "Необходимые личные параметры");
+	ar.serialize(chainUpgradeNumber, "chainUpgradeNumber", "Номер цепочки анимации");
+	ar.serialize(MillisecondsWrapper(chainUpgradeTime), "chainUpgradeTime", "Время апгрейда");
 	if(!ar.isEdit() || upgrade && upgrade->isBuilding())
-		ar.serialize(built, "built", "���������� � ����������� ������");
+		ar.serialize(built, "built", "Апгрейдить в достроенное здание");
 	if(!ar.isEdit() || upgrade && upgrade->isLegionary())
-		ar.serialize(level, "level", "������� �����");
+		ar.serialize(level, "level", "Уровень юнита");
 }
 
 const ShowChangeSettings* AttributeBase::getShowChangeSettings(int idx) const
@@ -2237,7 +2237,7 @@ AttributeBase::RigidBodyModelPrmBuilder::RigidBodyModelPrmBuilder(RigidBodyModel
 		++i;
 	}
 	if(!baseNodeInited){
-		xxassert(bodyParts.empty() || modelPrm.size() == 1, "�� ����� ������� ����");
+		xxassert(bodyParts.empty() || modelPrm.size() == 1, "не задан базовый узел");
 		modelPrm.clear();
 		return;
 	}
@@ -2268,7 +2268,7 @@ PlacementZoneData::PlacementZoneData(const char* name)
 void PlacementZoneData::serialize(Archive& ar)
 {
 	StringTableBase::serialize(ar);
-	ar.serialize(showRadius, "showRadius", "������, �� ������� ���������� ���� �����������");
+	ar.serialize(showRadius, "showRadius", "Радиус, на котором показывать зоны подключения");
 }
 
 void loadAllLibraries()
@@ -2311,12 +2311,12 @@ void loadAllLibraries()
 	CommandColorManager::instance();
     TextDB::instance();
 
-    // ������������� ����� ComboBox:
+    // редактируесть через ComboBox:
 	FormationPatterns::instance();
 	UnitFormationTypes::instance();
 	PlacementZoneTable::instance();
 
-    // ��� ����� ���� ������������� ���
+    // Для общей кучи перезагружаем все
 	GlobalAttributes::instance();
 	EffectLibrary::instance();
 
@@ -2407,12 +2407,12 @@ void saveAllLibraries()
 	CommandColorManager::instance().saveLibrary();
     TextDB::instance().saveLanguage();
 
-    // ������������� ����� ComboBox:
+    // редактируесть через ComboBox:
 	FormationPatterns::instance().saveLibrary();
 	UnitFormationTypes::instance().saveLibrary();
 	PlacementZoneTable::instance().saveLibrary();
 
-    // ��� ����� ���� �������������� ���
+    // Для общей кучи перезаписываем все
 	GlobalAttributes::instance().saveLibrary();
 	GameOptions::instance().saveLibrary();
 	GameOptions::instance().savePresets();
@@ -2452,7 +2452,7 @@ void AuxAttribute::serialize(Archive& ar)
 {
 	StringTableBase::serialize(ar);
 
-	ar.serialize(type_, "|type|second", "��������"); // CONVERSION 31.07.07
+	ar.serialize(type_, "|type|second", "Значение"); // CONVERSION 31.07.07
 }
 
 AuxAttributeReference::AuxAttributeReference(const AttributeBase* attribute)
@@ -2503,7 +2503,7 @@ void UnitAttribute::serialize(Archive& ar)
 		else
 			ar.serialize(name_, "|name|first", 0);
 	}
-	ar.serialize(type_, "|type|second", "��������"); // CONVERSION 31.07.07
+	ar.serialize(type_, "|type|second", "Значение"); // CONVERSION 31.07.07
 }
 
 void UnitAttribute::setKey(const UnitAttributeID& key)
@@ -2536,7 +2536,7 @@ void UnitAttribute::editorCreate(const char* name, const char* groupName)
 	if(p != groupName + strlen(groupName)){
 		string race(groupName, p);
 		if(!RaceTable::instance().exists(race.c_str())){
-			xassertStr(0 && "����� ���� �� ����������", race.c_str());
+			xassertStr(0 && "Такой расы не существует", race.c_str());
 			return;
 		}
 
@@ -2671,29 +2671,29 @@ BodyPartAttribute::BodyPartAttribute()
 
 void BodyPartAttribute::serialize(Archive& ar)
 {
-	ar.serialize(bodyPartType, "bodyPartType", "&��� ����� ����");
-	ar.serialize(functionality, "functionality", "����������");
+	ar.serialize(bodyPartType, "bodyPartType", "&Тип части тела");
+	ar.serialize(functionality, "functionality", "Функционал");
 	if(functionality & FIRE)
-		ar.serialize(weapons, "weapons", "������ �� ������");
-	ar.serialize(percent, "percent", "������� �� ������ ��������");
-	ar.serialize(visibilitySet_, "visibilitySetName", "&����� ������");
+		ar.serialize(weapons, "weapons", "Влияет на оружие");
+	ar.serialize(percent, "percent", "Процент от общего здоровья");
+	ar.serialize(visibilitySet_, "visibilitySetName", "&Часть модели");
 	VisibilityGroupOfSet::setVisibilitySet(visibilitySet_);
-	ar.serialize(defaultGarment, "defaultGarment", "&������ �� ���������");
-	ar.serialize(possibleGarments, "possibleGarments", "��������� ������");
-	ar.serialize(automaticGarments, "automaticGarments", "�������������� ������");
-	ar.serialize(rigidBodyBodyPartPrm, "rigidBodyBodyPartPrm", "���������� ������");
+	ar.serialize(defaultGarment, "defaultGarment", "&Одежда по умолчанию");
+	ar.serialize(possibleGarments, "possibleGarments", "Возможные одежды");
+	ar.serialize(automaticGarments, "automaticGarments", "Автоматические одежды");
+	ar.serialize(rigidBodyBodyPartPrm, "rigidBodyBodyPartPrm", "Физическая модель");
 }
 
 void BodyPartAttribute::Garment::serialize(Archive& ar)
 {
-	ar.serialize(visibilityGroup, "visibilityGroup", "������ ���������");
-	ar.serialize(item, "item", "�������");
+	ar.serialize(visibilityGroup, "visibilityGroup", "Группа видимости");
+	ar.serialize(item, "item", "Предмет");
 }
 
 void BodyPartAttribute::AutomaticGarment::serialize(Archive& ar)
 {
 	Garment::serialize(ar);
-	ar.serialize(parameters, "parameters", "��������� ���������");
+	ar.serialize(parameters, "parameters", "Требуемые параметры");
 }
 
 RigidBodyNodePrm::RigidBodyNodePrm() :
@@ -2707,15 +2707,15 @@ RigidBodyNodePrm::RigidBodyNodePrm() :
 
 void RigidBodyNodePrm::serialize(Archive& ar)
 {
-	ar.serialize(logicNode, "logicNode", "&���������� ����");
-	ar.serialize(graphicNode, "graphicNode", "&����������� ����");
+	ar.serialize(logicNode, "logicNode", "&Логический узел");
+	ar.serialize(graphicNode, "graphicNode", "&Графический узел");
 	upperLimits.set(R2G(upperLimits.x), R2G(upperLimits.y), R2G(upperLimits.z));
 	lowerLimits.set(R2G(lowerLimits.x), R2G(lowerLimits.y), R2G(lowerLimits.z));
-	ar.serialize(upperLimits, "upperLimits", "������� ������ �������");
-	ar.serialize(lowerLimits, "lowerLimits", "������ ������ �������");
+	ar.serialize(upperLimits, "upperLimits", "Верхний предел джоинта");
+	ar.serialize(lowerLimits, "lowerLimits", "Нижний предел джоинта");
 	upperLimits.set(G2R(upperLimits.x), G2R(upperLimits.y), G2R(upperLimits.z));
 	lowerLimits.set(G2R(lowerLimits.x), G2R(lowerLimits.y), G2R(lowerLimits.z));
-	ar.serialize(mass, "mass", "�����");
+	ar.serialize(mass, "mass", "Масса");
 	ar.serialize(parent, "parent", 0);
 	ar.serialize(bodyPartID, "bodyPartID", 0);
 }

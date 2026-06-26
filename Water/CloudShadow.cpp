@@ -160,9 +160,9 @@ void cCloudShadow::SetTexture(const string& tex1)
 void cCloudShadow::serialize(Archive& ar)
 {
 	static ResourceSelector::Options textureOptions("*.tga", "Resource\\TerrainData\\Textures");
-	ar.serialize(ResourceSelector(tex1_name, textureOptions), "cloudShadowTexture1", "Текстура теней облаков");
-	ar.serialize(color, "cloudShadowAlpha", "Интенсивность теней облаков (0-255)");
-	ar.serialize(rotate_angle, "rotate_angle", "Угол вращения движения облаков (0-360)");
+	ar.serialize(ResourceSelector(tex1_name, textureOptions), "cloudShadowTexture1", "РўРµРєСЃС‚СѓСЂР° С‚РµРЅРµР№ РѕР±Р»Р°РєРѕРІ");
+	ar.serialize(color, "cloudShadowAlpha", "РРЅС‚РµРЅСЃРёРІРЅРѕСЃС‚СЊ С‚РµРЅРµР№ РѕР±Р»Р°РєРѕРІ (0-255)");
+	ar.serialize(rotate_angle, "rotate_angle", "РЈРіРѕР» РІСЂР°С‰РµРЅРёСЏ РґРІРёР¶РµРЅРёСЏ РѕР±Р»Р°РєРѕРІ (0-360)");
 	
 	if (ar.isInput())
 		SetTexture(tex1_name);
@@ -170,7 +170,7 @@ void cCloudShadow::serialize(Archive& ar)
 
 //void cCloudShadow::serializeColor(Archive& ar)
 //{
-//	ar.serialize(color, "cloudShadowColor", "Цвет теней облаков");
+//	ar.serialize(color, "cloudShadowColor", "Р¦РІРµС‚ С‚РµРЅРµР№ РѕР±Р»Р°РєРѕРІ");
 //	if (ar.isInput())
 //		SetColor(color);
 //}

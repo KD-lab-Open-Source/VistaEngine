@@ -5,7 +5,7 @@
 #include "Squad.h"
 #include "UserInterface/UserInterface.h"
 
-WRAP_LIBRARY(CommandColorManager, "CommandColorManager", "Цвета команд", "Scripts\\Content\\CommandColorManager", 0, 0);
+WRAP_LIBRARY(CommandColorManager, "CommandColorManager", "Р¦РІРµС‚Р° РєРѕРјР°РЅРґ", "Scripts\\Content\\CommandColorManager", 0, 0);
 
 LogicTimer CommandsQueueProcessor::interruptTimer_;
 
@@ -24,17 +24,17 @@ void UnitCommandExtended::serialize(Archive& ar)
 
 	ar.serialize(actorID_, "actorID", 0);
 
-	ar.serialize(anchor_, "anchor", "Якорь");
+	ar.serialize(anchor_, "anchor", "РЇРєРѕСЂСЊ");
 
-	if(ar.openBlock("camera", "Камера")){
-		ar.serialize(cameraSplineName, "cameraSplineName", "&Имя сплайна камеры");
-		ar.serialize(cycles, "cycles", "Количество циклов");
-		ar.serialize(smoothTransition, "smoothTransition", "Плавный переход");
+	if(ar.openBlock("camera", "РљР°РјРµСЂР°")){
+		ar.serialize(cameraSplineName, "cameraSplineName", "&РРјСЏ СЃРїР»Р°Р№РЅР° РєР°РјРµСЂС‹");
+		ar.serialize(cycles, "cycles", "РљРѕР»РёС‡РµСЃС‚РІРѕ С†РёРєР»РѕРІ");
+		ar.serialize(smoothTransition, "smoothTransition", "РџР»Р°РІРЅС‹Р№ РїРµСЂРµС…РѕРґ");
 		ar.closeBlock();
 	}
 
 	if(commandID() == COMMAND_ID_TALK)
-		ar.serialize(messageSetup_, "messageSetup", "Сообщение");
+		ar.serialize(messageSetup_, "messageSetup", "РЎРѕРѕР±С‰РµРЅРёРµ");
 }
 
 void UnitCommandExtended::setCamera() const
@@ -51,8 +51,8 @@ void UnitCommandExtended::setCamera() const
 void CommandsQueue::serialize(Archive& ar) 
 {
 	StringTableBase::serialize(ar); 
-	ar.serialize(actors, "actors", "Актеры");
-	ar.serialize(static_cast<vector<UnitCommandExtended>&>(*this), "queue", "Команды");
+	ar.serialize(actors, "actors", "РђРєС‚РµСЂС‹");
+	ar.serialize(static_cast<vector<UnitCommandExtended>&>(*this), "queue", "РљРѕРјР°РЅРґС‹");
 }
 
 /////////////////////////////////////////////////////////////////////

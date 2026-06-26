@@ -404,7 +404,7 @@ void VSSkinShadow::Select(MatXf* world,int world_num,int blend_num)
 
 void VSSkinSceneShadow::Select(MatXf* world,int world_num,int blend_num)
 {
-	//{//Ýòîìó êóñêó çäåñü íå ìåñòî, êîãäà áóäåò îïòèìèçèðîâàòüñÿ, ïåðåíåñ¸òñÿ â íà÷àëî áëîêà îòðèñîâêè îáúåêòîâ.
+	//{//Ð­Ñ‚Ð¾Ð¼Ñƒ ÐºÑƒÑÐºÑƒ Ð·Ð´ÐµÑÑŒ Ð½Ðµ Ð¼ÐµÑÑ‚Ð¾, ÐºÐ¾Ð³Ð´Ð° Ð±ÑƒÐ´ÐµÑ‚ Ð¾Ð¿Ñ‚Ð¸Ð¼Ð¸Ð·Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒÑÑ, Ð¿ÐµÑ€ÐµÐ½ÐµÑÑ‘Ñ‚ÑÑ Ð² Ð½Ð°Ñ‡Ð°Ð»Ð¾ Ð±Ð»Ð¾ÐºÐ° Ð¾Ñ‚Ñ€Ð¸ÑÐ¾Ð²ÐºÐ¸ Ð¾Ð±ÑŠÐµÐºÑ‚Ð¾Ð².
 	//	if(gb_RenderDevice3D->dtAdvanceOriginal->GetID()==DT_RADEON9700)
 	//	{
 	//		gb_RenderDevice3D->SetSamplerData(2,sampler_clamp_point);

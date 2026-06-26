@@ -125,12 +125,12 @@ bool Static3dxBase::loadOld(CLoadDirectory& dir)
 
 	if(!loaded){
 		if(is_logic){
-			//xassertStr("���������� ������ 3dx, ���������� ������������������: " && 0, file_name);
+			//xassertStr("Устаревший формат 3dx, необходимо переэкспортировать: " && 0, file_name);
 			return false;
 		}
 		else{
 			dir.rewind();
-			LoadInternal(dir);//��������� ������� �������, ����� �������.
+			LoadInternal(dir);//Поддержка старого формата, потом стереть.
 		}
 	}
 
@@ -350,11 +350,11 @@ StaticAnimationChain::StaticAnimationChain()
 
 void StaticAnimationChain::serialize(Archive& ar)
 {
-	ar.serialize(name, "name", "&���");
-	ar.serialize(time, "time", "������������");
-	ar.serialize(begin_frame, "begin_frame", "&��������� ����");
-	ar.serialize(end_frame, "end_frame", "�������� ����");
-	ar.serialize(cycled, "cycled", "�����������");
+	ar.serialize(name, "name", "&Имя");
+	ar.serialize(time, "time", "Длительность");
+	ar.serialize(begin_frame, "begin_frame", "&Начальный кадр");
+	ar.serialize(end_frame, "end_frame", "Конечный кадр");
+	ar.serialize(cycled, "cycled", "Зацикленная");
 }
 
 void Static3dxBase::LoadChain(CLoadDirectory rd)
@@ -813,7 +813,7 @@ void cTempMesh3dx::Load(CLoadDirectory rd)
 							xassert(p.weight[ibone]==0);
 					}
 
-					//				xassert(sum>=0.999f && sum<1.001f);//����� ����� ��������, ���������������� ��� ����
+					//				xassert(sum>=0.999f && sum<1.001f);//Потом опять вставить, закомментировано для демы
 
 					sum=1/sum;
 					for(ibone=0;ibone<MAX_BONES;ibone++)
@@ -1254,7 +1254,7 @@ StaticVisibilitySet::StaticVisibilitySet()
 void StaticVisibilitySet::serialize(Archive& ar)
 {
 	ar.serialize(name, "name", "^");
-	ar.serialize(visibilityGroups, "visibilityGroups", "������ ���������");
+	ar.serialize(visibilityGroups, "visibilityGroups", "Группы видимости");
 }
 
 void StaticVisibilitySet::DummyVisibilityGroup()
@@ -1364,7 +1364,7 @@ void Static3dxBase::serialize(Archive& ar)
 	ar.serialize(version, "version", "version");
 
 	if(ar.inPlace())
-		ar.serialize(fileName_, "fileName", "fileName"); // ��� ������ ���� ����� �� ������
+		ar.serialize(fileName_, "fileName", "fileName"); // Имя самого себя лучше не писать
 
 	ar.serialize(maxWeights, "maxWeights", "maxWeights");
 	ar.serialize(nonDeleteNodes, "nonDeleteNodes", "nonDeleteNodes");
@@ -1474,7 +1474,7 @@ bool Static3dxBase::load(const char* fileName)
 	fileName_ = fileName;
 	BinaryIArchive ia(0);
 	if(ia.open((setExtention(fileName_.c_str(), fileExtention).c_str())))
-		return ia.serialize(*this, is_logic ? "logic3dx" : "graphics3dx", 0); // � ���������� �� ������� ������� ����� �� ���� logic3dx
+		return ia.serialize(*this, is_logic ? "logic3dx" : "graphics3dx", 0); // В конверсиях из старого формата может не быть logic3dx
 
 	CLoadDirectoryFileRender rd;
 	if(rd.Load(fileName_.c_str()) && loadOld(rd))

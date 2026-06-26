@@ -44,8 +44,8 @@ void SourceTeleport::quant()
 void SourceTeleport::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(notTeleportOwner_, "notTeleportOwner", "Себя не телепортировать (для оружия)");
-	ar.serialize(squadTypes_, "squadTypes", "Переносимые сквады");
+	ar.serialize(notTeleportOwner_, "notTeleportOwner", "РЎРµР±СЏ РЅРµ С‚РµР»РµРїРѕСЂС‚РёСЂРѕРІР°С‚СЊ (РґР»СЏ РѕСЂСѓР¶РёСЏ)");
+	ar.serialize(squadTypes_, "squadTypes", "РџРµСЂРµРЅРѕСЃРёРјС‹Рµ СЃРєРІР°РґС‹");
 }
 
 bool SourceTeleport::setParameters(const WeaponSourcePrm& prm, const WeaponTarget* target)

@@ -159,12 +159,12 @@ Vect2f cCircles::GetPtOnZ(Vect3f& p1,Vect3f& p2, Plane& back)
 	Vect3f v = p1-p2;
 	Plane zero(Vect3f(1,0,z), Vect3f(0,1,z), Vect3f(1,1,z));
 	float t = zero.calcCross(p2,p1);
-	if (t==0) // прямая v || плоскости
+	if (t==0) // РїСЂСЏРјР°СЏ v || РїР»РѕСЃРєРѕСЃС‚Рё
 	{
 		if (round(p1.z)<=round(z)) 
 			return Vect2f(p1);
 	}
-	if (t>1||t<=0)		// точка пересечения не лежит в зоне видимости
+	if (t>1||t<=0)		// С‚РѕС‡РєР° РїРµСЂРµСЃРµС‡РµРЅРёСЏ РЅРµ Р»РµР¶РёС‚ РІ Р·РѕРЅРµ РІРёРґРёРјРѕСЃС‚Рё
 		t = back.calcCross(p2, p1);
 	Vect2f cross(p2.x+t*v.x, p2.y+t*v.y);
 	return cross;

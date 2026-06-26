@@ -81,11 +81,11 @@ void cRenderCubemap::Init(int linear_size_,Vect3f camera_pos)
 	float far_zplane=20000.0f;
 	for(int i=0;i<num_camera;i++)
 	{
-		camera[i]->SetFrustum(							// ÛÒÚ‡Ì‡‚ÎË‚‡ÂÚÒˇ ÔË‡ÏË‰‡ ‚Ë‰ËÏÓÒÚË
-			&Vect2f(0.5f,0.5f),							// ˆÂÌÚ Í‡ÏÂ˚
-			&sRectangle4f(-0.5f,-0.5f,0.5f,0.5f),		// ‚Ë‰ËÏ‡ˇ Ó·Î‡ÒÚ¸ Í‡ÏÂ˚
-			//&Vect2f(1.f,1.f),							// ÙÓÍÛÒ Í‡ÏÂ˚
-			&Vect2f(0.5f,0.5f),							// ÙÓÍÛÒ Í‡ÏÂ˚
+		camera[i]->SetFrustum(							// —É—Å—Ç–∞–Ω–∞–≤–ª–∏–≤–∞–µ—Ç—Å—è –ø–∏—Ä–∞–º–∏–¥–∞ –≤–∏–¥–∏–º–æ—Å—Ç–∏
+			&Vect2f(0.5f,0.5f),							// —Ü–µ–Ω—Ç—Ä –∫–∞–º–µ—Ä—ã
+			&sRectangle4f(-0.5f,-0.5f,0.5f,0.5f),		// –≤–∏–¥–∏–º–∞—è –æ–±–ª–∞—Å—Ç—å –∫–∞–º–µ—Ä—ã
+			//&Vect2f(1.f,1.f),							// —Ñ–æ–∫—É—Å –∫–∞–º–µ—Ä—ã
+			&Vect2f(0.5f,0.5f),							// —Ñ–æ–∫—É—Å –∫–∞–º–µ—Ä—ã
 			&Vect2f(30.0f,far_zplane)
 			);
 	}

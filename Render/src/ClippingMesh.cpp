@@ -147,7 +147,7 @@ bool ClippingMesh::GetOpenPolyline(const CFace& face,int& start,int& final)
 
 
 void ClippingMesh::BuildPolygon(APolygons& p)
-{//����� ������� �����, ��������� ����� ����� �� ��������������.
+{//Самый простой метод, некоторые точки могут не использоваться.
 	p.points.resize(V.size());
 	int i;
 	for(i=0;i<V.size();i++)
@@ -315,7 +315,7 @@ void ClippingMesh::calcBoundTransformed(const Mat4f& m, sBox6f& box)
 void ClippingMesh::fillVisPoly(BYTE *buf,Vect2f* vert,int vert_size,int VISMAP_W,int VISMAP_H)
 {
 	MTG(); 
-	//�������� ��� ��������� xassert(!MT_IS_LOGIC());
+	//Временно для редактора xassert(!MT_IS_LOGIC());
 	if(vert_size==0)return;
 	const int VISMAP_W_MAX=128,VISMAP_H_MAX=128;
 	xassert(VISMAP_W<=VISMAP_W_MAX && VISMAP_H<=VISMAP_H_MAX);

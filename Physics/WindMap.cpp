@@ -7,9 +7,9 @@
 #include "DebugUtil.h"
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(WindMap, WindType, "WindType")
-REGISTER_ENUM_ENCLOSED(WindMap, DIRECTION_TO_CENTER_MAP, "Ветер направлен к центру мира")
-REGISTER_ENUM_ENCLOSED(WindMap, DIRECTION_FROM_CENTER_MAP, "Ветер направлен от центра мира")
-REGISTER_ENUM_ENCLOSED(WindMap, DIRECTION_THROUGH_MAP, "Ветер направлен через весь мир")
+REGISTER_ENUM_ENCLOSED(WindMap, DIRECTION_TO_CENTER_MAP, "Р’РµС‚РµСЂ РЅР°РїСЂР°РІР»РµРЅ Рє С†РµРЅС‚СЂСѓ РјРёСЂР°")
+REGISTER_ENUM_ENCLOSED(WindMap, DIRECTION_FROM_CENTER_MAP, "Р’РµС‚РµСЂ РЅР°РїСЂР°РІР»РµРЅ РѕС‚ С†РµРЅС‚СЂР° РјРёСЂР°")
+REGISTER_ENUM_ENCLOSED(WindMap, DIRECTION_THROUGH_MAP, "Р’РµС‚РµСЂ РЅР°РїСЂР°РІР»РµРЅ С‡РµСЂРµР· РІРµСЃСЊ РјРёСЂ")
 END_ENUM_DESCRIPTOR_ENCLOSED(WindMap, WindType)
 
 WindMap * windMap = 0;
@@ -144,16 +144,16 @@ WindMapAttributes::WindMapAttributes()
 
 void WindMapAttributes::serialize(Archive& ar)
 {
-	ar.serialize(windType_, "windType", "Тип ветра");
-	ar.serialize(RangedWrapperf(windPower_, 0.01f, 20.0f), "windPower", "Сила ветра");
+	ar.serialize(windType_, "windType", "РўРёРї РІРµС‚СЂР°");
+	ar.serialize(RangedWrapperf(windPower_, 0.01f, 20.0f), "windPower", "РЎРёР»Р° РІРµС‚СЂР°");
 }
 
 void WindMap::serialize(Archive& ar)
 {
 	float windPower = direction_.norm();
 
-	ar.serialize(windType_, "windType_", "Тип ветра");
-	ar.serialize(RangedWrapperf(windPower, 0.01f, 20.0f), "windPower", "Сила ветра");
+	ar.serialize(windType_, "windType_", "РўРёРї РІРµС‚СЂР°");
+	ar.serialize(RangedWrapperf(windPower, 0.01f, 20.0f), "windPower", "РЎРёР»Р° РІРµС‚СЂР°");
 
 	if(ar.isInput()){
 		direction_.normalize(windPower);	

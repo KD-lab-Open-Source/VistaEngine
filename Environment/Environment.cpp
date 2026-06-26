@@ -44,17 +44,17 @@ namespace{
 	ResourceSelector::Options textureOptions("*.tga", "Resource\\TerrainData\\Textures");
 }
 
-BEGIN_ENUM_DESCRIPTOR(CoastSpritesMode, "Ðåæèìû ïðèáðåæíûõ ñïðàéòîâ")
-REGISTER_ENUM(CSM_NOTHING, "Îòêëþ÷åíî")
-REGISTER_ENUM(CSM_MOVING, "Äâèãàþùèåñÿ ñïðàéòû")
-REGISTER_ENUM(CSM_SIMPLE, "Íåïîäâèæíûå ñïðàéòû")
+BEGIN_ENUM_DESCRIPTOR(CoastSpritesMode, "Ð ÐµÐ¶Ð¸Ð¼Ñ‹ Ð¿Ñ€Ð¸Ð±Ñ€ÐµÐ¶Ð½Ñ‹Ñ… ÑÐ¿Ñ€Ð°Ð¹Ñ‚Ð¾Ð²")
+REGISTER_ENUM(CSM_NOTHING, "ÐžÑ‚ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¾")
+REGISTER_ENUM(CSM_MOVING, "Ð”Ð²Ð¸Ð³Ð°ÑŽÑ‰Ð¸ÐµÑÑ ÑÐ¿Ñ€Ð°Ð¹Ñ‚Ñ‹")
+REGISTER_ENUM(CSM_SIMPLE, "ÐÐµÐ¿Ð¾Ð´Ð²Ð¸Ð¶Ð½Ñ‹Ðµ ÑÐ¿Ñ€Ð°Ð¹Ñ‚Ñ‹")
 END_ENUM_DESCRIPTOR(CoastSpritesMode)
 
-BEGIN_ENUM_DESCRIPTOR(Outside_Environment, "Âíåøíÿÿ ñðåäà")
-REGISTER_ENUM(ENVIRONMENT_NO, "íè÷åãî")
-REGISTER_ENUM(ENVIRONMENT_WATER, "âîäà")
-REGISTER_ENUM(ENVIRONMENT_CHAOS, "õàîñ")
-REGISTER_ENUM(ENVIRONMENT_EARTH, "çåìëÿ")
+BEGIN_ENUM_DESCRIPTOR(Outside_Environment, "Ð’Ð½ÐµÑˆÐ½ÑÑ ÑÑ€ÐµÐ´Ð°")
+REGISTER_ENUM(ENVIRONMENT_NO, "Ð½Ð¸Ñ‡ÐµÐ³Ð¾")
+REGISTER_ENUM(ENVIRONMENT_WATER, "Ð²Ð¾Ð´Ð°")
+REGISTER_ENUM(ENVIRONMENT_CHAOS, "Ñ…Ð°Ð¾Ñ")
+REGISTER_ENUM(ENVIRONMENT_EARTH, "Ð·ÐµÐ¼Ð»Ñ")
 END_ENUM_DESCRIPTOR(Outside_Environment)
 
 Environment* environment=0;
@@ -311,29 +311,29 @@ void Environment::serialize(Archive& ar)
 	start_timer_auto();
 
 	if(ar.filter(SERIALIZE_WORLD_DATA))
-		ar.serialize(ResourceSelector(presetName_, presetOptions), "presetName", "Èìÿ ôàéëà äëÿ ñîõðàíåíèÿ íàñòðîåê");
+		ar.serialize(ResourceSelector(presetName_, presetOptions), "presetName", "Ð˜Ð¼Ñ Ñ„Ð°Ð¹Ð»Ð° Ð´Ð»Ñ ÑÐ¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð¸Ñ Ð½Ð°ÑÑ‚Ñ€Ð¾ÐµÐº");
 
-	ar.serialize(*tileMap_, "tileMap", "Íàñòðîéêè ïîâåðõíîñòè");
+	ar.serialize(*tileMap_, "tileMap", "ÐÐ°ÑÑ‚Ñ€Ð¾Ð¹ÐºÐ¸ Ð¿Ð¾Ð²ÐµÑ€Ñ…Ð½Ð¾ÑÑ‚Ð¸");
 
 	if(ar.filter(SERIALIZE_WORLD_DATA))
 		GameLoadManager::instance().setProgress(0.5f);
 
 	if(ar.filter(SERIALIZE_WORLD_DATA | SERIALIZE_PRESET_DATA)){
 		if(water_)
-			ar.serialize(*water_, "Water", "Âîäà");
+			ar.serialize(*water_, "Water", "Ð’Ð¾Ð´Ð°");
 
-		ar.serialize(minimapWaterColor_, "minimapWaterColor", "Öâåò âîäû íà ìèíèêàðòå");
+		ar.serialize(minimapWaterColor_, "minimapWaterColor", "Ð¦Ð²ÐµÑ‚ Ð²Ð¾Ð´Ñ‹ Ð½Ð° Ð¼Ð¸Ð½Ð¸ÐºÐ°Ñ€Ñ‚Ðµ");
 
-		ar.serialize(minimapZonesAlpha_, "minimapZonesAlpha", "Ïðîçðà÷íîñòü çîí íà ìèíèêàðòå");
+		ar.serialize(minimapZonesAlpha_, "minimapZonesAlpha", "ÐŸÑ€Ð¾Ð·Ñ€Ð°Ñ‡Ð½Ð¾ÑÑ‚ÑŒ Ð·Ð¾Ð½ Ð½Ð° Ð¼Ð¸Ð½Ð¸ÐºÐ°Ñ€Ñ‚Ðµ");
 
-		ar.serialize(*environmentTime_, "environmentTime", "Âðåìÿ");
+		ar.serialize(*environmentTime_, "environmentTime", "Ð’Ñ€ÐµÐ¼Ñ");
 
 		if(grassMap)
-			ar.serialize(*grassMap, "Grass", "Òðàâà");
+			ar.serialize(*grassMap, "Grass", "Ð¢Ñ€Ð°Ð²Ð°");
 	}
 
 	if(ar.filter(SERIALIZE_GLOBAL_DATA))
-		ar.serialize(*fieldOfViewMap_, "fieldOfViewMap", "Ñåêòîðà âèäèìîñòè");
+		ar.serialize(*fieldOfViewMap_, "fieldOfViewMap", "Ð¡ÐµÐºÑ‚Ð¾Ñ€Ð° Ð²Ð¸Ð´Ð¸Ð¼Ð¾ÑÑ‚Ð¸");
 
 	if(ar.filter(SERIALIZE_WORLD_DATA)){
 		if(water_)
@@ -348,41 +348,41 @@ void Environment::serialize(Archive& ar)
 
 	if(ar.filter(SERIALIZE_PRESET_DATA)){
 		if(fogOfWar_)
-			ar.serialize(*fogOfWar_, "fogOfWar", "Òóìàí âîéíû");
+			ar.serialize(*fogOfWar_, "fogOfWar", "Ð¢ÑƒÐ¼Ð°Ð½ Ð²Ð¾Ð¹Ð½Ñ‹");
 
-		if(ar.openBlock("Environment fog", "Òóìàí íà ìèðå")){
-			ar.serialize(fog_enable_, "fog_enable", "Âêëþ÷èòü òóìàí");
-			ar.serialize(fog_start_, "fog_start", "Áëèæíÿÿ ãðàíèöà òóìàíà");
-			ar.serialize(fog_end_, "fog_end", "Äàëüíÿÿ ãðàíèöà òóìàíà");
-			ar.serialize(RangedWrapperi(height_fog_circle_, 0, 2000), "height_fog_circle", "Âûñîòà ïåðåõîäà ê òóìàíó");
+		if(ar.openBlock("Environment fog", "Ð¢ÑƒÐ¼Ð°Ð½ Ð½Ð° Ð¼Ð¸Ñ€Ðµ")){
+			ar.serialize(fog_enable_, "fog_enable", "Ð’ÐºÐ»ÑŽÑ‡Ð¸Ñ‚ÑŒ Ñ‚ÑƒÐ¼Ð°Ð½");
+			ar.serialize(fog_start_, "fog_start", "Ð‘Ð»Ð¸Ð¶Ð½ÑÑ Ð³Ñ€Ð°Ð½Ð¸Ñ†Ð° Ñ‚ÑƒÐ¼Ð°Ð½Ð°");
+			ar.serialize(fog_end_, "fog_end", "Ð”Ð°Ð»ÑŒÐ½ÑÑ Ð³Ñ€Ð°Ð½Ð¸Ñ†Ð° Ñ‚ÑƒÐ¼Ð°Ð½Ð°");
+			ar.serialize(RangedWrapperi(height_fog_circle_, 0, 2000), "height_fog_circle", "Ð’Ñ‹ÑÐ¾Ñ‚Ð° Ð¿ÐµÑ€ÐµÑ…Ð¾Ð´Ð° Ðº Ñ‚ÑƒÐ¼Ð°Ð½Ñƒ");
 			ar.closeBlock();
 		}
 
-		if(ar.openBlock("Efects", "Ýôôåêòû")){
-			ar.serialize(effectHideByDistance_, "effectHideByDistance", "Ñêðûâàòü ýôôåêòû ïðè óäàëåíèè");
-			ar.serialize(effectNearDistance_, "effectNearDistance", "Áëèæíÿÿ ãðàíèöà ýôôåêòîâ");
-			ar.serialize(effectFarDistance_, "effectFarDistance", "Äàëüíÿÿ ãðàíèöà ýôôåêòîâ");
+		if(ar.openBlock("Efects", "Ð­Ñ„Ñ„ÐµÐºÑ‚Ñ‹")){
+			ar.serialize(effectHideByDistance_, "effectHideByDistance", "Ð¡ÐºÑ€Ñ‹Ð²Ð°Ñ‚ÑŒ ÑÑ„Ñ„ÐµÐºÑ‚Ñ‹ Ð¿Ñ€Ð¸ ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ð¸");
+			ar.serialize(effectNearDistance_, "effectNearDistance", "Ð‘Ð»Ð¸Ð¶Ð½ÑÑ Ð³Ñ€Ð°Ð½Ð¸Ñ†Ð° ÑÑ„Ñ„ÐµÐºÑ‚Ð¾Ð²");
+			ar.serialize(effectFarDistance_, "effectFarDistance", "Ð”Ð°Ð»ÑŒÐ½ÑÑ Ð³Ñ€Ð°Ð½Ð¸Ñ†Ð° ÑÑ„Ñ„ÐµÐºÑ‚Ð¾Ð²");
 			ar.closeBlock();
 		}
 
-		if(ar.openBlock("Camera frustrum", "Îáðåçêà êàäðà")){
-			ar.serialize(RangedWrapperf(game_frustrum_z_min_, 1.0f, 100.0f), "game_frustrum_z_min", "Áëèæíÿÿ ãðàíèöà êàìåðû");
-			ar.serialize(RangedWrapperf(game_frustrum_z_max_vertical_, 100.0f, 13000.0f), "game_frustrum_z_max", "Äàëüíÿÿ ãðàíèöà êàìåðû (â âåðòèêàëüíîì ïîëîæåíèè)");
+		if(ar.openBlock("Camera frustrum", "ÐžÐ±Ñ€ÐµÐ·ÐºÐ° ÐºÐ°Ð´Ñ€Ð°")){
+			ar.serialize(RangedWrapperf(game_frustrum_z_min_, 1.0f, 100.0f), "game_frustrum_z_min", "Ð‘Ð»Ð¸Ð¶Ð½ÑÑ Ð³Ñ€Ð°Ð½Ð¸Ñ†Ð° ÐºÐ°Ð¼ÐµÑ€Ñ‹");
+			ar.serialize(RangedWrapperf(game_frustrum_z_max_vertical_, 100.0f, 13000.0f), "game_frustrum_z_max", "Ð”Ð°Ð»ÑŒÐ½ÑÑ Ð³Ñ€Ð°Ð½Ð¸Ñ†Ð° ÐºÐ°Ð¼ÐµÑ€Ñ‹ (Ð² Ð²ÐµÑ€Ñ‚Ð¸ÐºÐ°Ð»ÑŒÐ½Ð¾Ð¼ Ð¿Ð¾Ð»Ð¾Ð¶ÐµÐ½Ð¸Ð¸)");
 			if(ar.isInput())
 				game_frustrum_z_max_horizontal_ = game_frustrum_z_max_vertical_;
-			ar.serialize(RangedWrapperf(game_frustrum_z_max_horizontal_, 100.0f, 13000.0f), "game_frustrum_z_max_horizontal", "Äàëüíÿÿ ãðàíèöà êàìåðû (â ãîðèçîíòàëüíîì ïîëîæåíèè)");
-			ar.serialize(hideSmoothly_, "hideSmoothly", "Èñ÷åçàòü ïëàâíî");
+			ar.serialize(RangedWrapperf(game_frustrum_z_max_horizontal_, 100.0f, 13000.0f), "game_frustrum_z_max_horizontal", "Ð”Ð°Ð»ÑŒÐ½ÑÑ Ð³Ñ€Ð°Ð½Ð¸Ñ†Ð° ÐºÐ°Ð¼ÐµÑ€Ñ‹ (Ð² Ð³Ð¾Ñ€Ð¸Ð·Ð¾Ð½Ñ‚Ð°Ð»ÑŒÐ½Ð¾Ð¼ Ð¿Ð¾Ð»Ð¾Ð¶ÐµÐ½Ð¸Ð¸)");
+			ar.serialize(hideSmoothly_, "hideSmoothly", "Ð˜ÑÑ‡ÐµÐ·Ð°Ñ‚ÑŒ Ð¿Ð»Ð°Ð²Ð½Ð¾");
 			ar.closeBlock();
 		}
 
 		if(water_){	
-			if(ar.openBlock("undegroundEffect","Ïîäâîäíûé ýôôåêò")){
-				ar.serialize(underWaterAlways, "underWaterAlways", "Âñåãäà âêëþ÷åííûé");
-				ar.serialize(underWaterColor, "underWaterColor", "Öâåò ïîäâîäíîãî ýôôåêòà");
-				ar.serialize(underWaterFogPlanes.x,"underWaterFogStart","áëèæíÿÿ ãðàíèöà ïîäâîäíîãî òóìàíà");
-				ar.serialize(underWaterFogPlanes.y,"underWaterFogEnd","äàëüíÿÿ ãðàíèöà ïîäâîäíîãî òóìàíà");
-				ar.serialize(underWaterSpeedDistortion, "underWaterSpeedDistortion", "Ñêîðîñòü èñêàæåíèÿ");
-				ar.serialize(ResourceSelector(underWaterTextureName, textureOptions),"underWaterTextureName","Òåêñòóðà äëÿ èñêàæåíèÿ");
+			if(ar.openBlock("undegroundEffect","ÐŸÐ¾Ð´Ð²Ð¾Ð´Ð½Ñ‹Ð¹ ÑÑ„Ñ„ÐµÐºÑ‚")){
+				ar.serialize(underWaterAlways, "underWaterAlways", "Ð’ÑÐµÐ³Ð´Ð° Ð²ÐºÐ»ÑŽÑ‡ÐµÐ½Ð½Ñ‹Ð¹");
+				ar.serialize(underWaterColor, "underWaterColor", "Ð¦Ð²ÐµÑ‚ Ð¿Ð¾Ð´Ð²Ð¾Ð´Ð½Ð¾Ð³Ð¾ ÑÑ„Ñ„ÐµÐºÑ‚Ð°");
+				ar.serialize(underWaterFogPlanes.x,"underWaterFogStart","Ð±Ð»Ð¸Ð¶Ð½ÑÑ Ð³Ñ€Ð°Ð½Ð¸Ñ†Ð° Ð¿Ð¾Ð´Ð²Ð¾Ð´Ð½Ð¾Ð³Ð¾ Ñ‚ÑƒÐ¼Ð°Ð½Ð°");
+				ar.serialize(underWaterFogPlanes.y,"underWaterFogEnd","Ð´Ð°Ð»ÑŒÐ½ÑÑ Ð³Ñ€Ð°Ð½Ð¸Ñ†Ð° Ð¿Ð¾Ð´Ð²Ð¾Ð´Ð½Ð¾Ð³Ð¾ Ñ‚ÑƒÐ¼Ð°Ð½Ð°");
+				ar.serialize(underWaterSpeedDistortion, "underWaterSpeedDistortion", "Ð¡ÐºÐ¾Ñ€Ð¾ÑÑ‚ÑŒ Ð¸ÑÐºÐ°Ð¶ÐµÐ½Ð¸Ñ");
+				ar.serialize(ResourceSelector(underWaterTextureName, textureOptions),"underWaterTextureName","Ð¢ÐµÐºÑÑ‚ÑƒÑ€Ð° Ð´Ð»Ñ Ð¸ÑÐºÐ°Ð¶ÐµÐ½Ð¸Ñ");
 				ar.closeBlock();
 			}
 			if(ar.isInput()){
@@ -396,17 +396,17 @@ void Environment::serialize(Archive& ar)
 				}
 			}
 
-			if(ar.openBlock("bloomEffect","Ýôôåêò ñâå÷åíèÿ")){
-				ar.serialize(enableBloom, "enableBloom", "Âêëþ÷èòü ýôôåêò");
-				ar.serialize(bloomLuminance, "bloomLuminance", "Èíòåíñèâíîñòü ñâå÷åíèÿ");
+			if(ar.openBlock("bloomEffect","Ð­Ñ„Ñ„ÐµÐºÑ‚ ÑÐ²ÐµÑ‡ÐµÐ½Ð¸Ñ")){
+				ar.serialize(enableBloom, "enableBloom", "Ð’ÐºÐ»ÑŽÑ‡Ð¸Ñ‚ÑŒ ÑÑ„Ñ„ÐµÐºÑ‚");
+				ar.serialize(bloomLuminance, "bloomLuminance", "Ð˜Ð½Ñ‚ÐµÐ½ÑÐ¸Ð²Ð½Ð¾ÑÑ‚ÑŒ ÑÐ²ÐµÑ‡ÐµÐ½Ð¸Ñ");
 				ar.closeBlock();
 			}
-			if(ar.openBlock("DofEffect","DOF ýôôåêò")){
-				ar.serialize(enableDOF,"EnaleDOF","Âêëþ÷èòü");
+			if(ar.openBlock("DofEffect","DOF ÑÑ„Ñ„ÐµÐºÑ‚")){
+				ar.serialize(enableDOF,"EnaleDOF","Ð’ÐºÐ»ÑŽÑ‡Ð¸Ñ‚ÑŒ");
 				gb_VisGeneric->SetEnableDOF(enableDOF);
-				ar.serialize(DofParams.x,"NearPlane","Äèñòàíöèÿ ôîêóñà");
-				ar.serialize(DofParams.y,"FarPlane","Ðàçìåð ôîêóñà");
-				ar.serialize(dofPower,"dofPower","Ñèëà ðàçìûòèÿ");
+				ar.serialize(DofParams.x,"NearPlane","Ð”Ð¸ÑÑ‚Ð°Ð½Ñ†Ð¸Ñ Ñ„Ð¾ÐºÑƒÑÐ°");
+				ar.serialize(DofParams.y,"FarPlane","Ð Ð°Ð·Ð¼ÐµÑ€ Ñ„Ð¾ÐºÑƒÑÐ°");
+				ar.serialize(dofPower,"dofPower","Ð¡Ð¸Ð»Ð° Ñ€Ð°Ð·Ð¼Ñ‹Ñ‚Ð¸Ñ");
 				if (ar.isInput()){
 					if(PostEffectDOF* dof = (PostEffectDOF*)PEManager()->getEffect(PE_DOF)){
 						dof->setDofPower(dofPower);
@@ -424,14 +424,14 @@ void Environment::serialize(Archive& ar)
 
 			if(!ar.isEdit() && ar.isInput()){ // CONVERSION 30.10.07
 				float waterPFHeight = 2;
-				ar.serialize(RangedWrapperf(waterPFHeight, 2.f, 250.f), "waterPFHeight", "Îòíîñèòåëüíûé óðîâåíü ãëóáîêîé âîäû");
+				ar.serialize(RangedWrapperf(waterPFHeight, 2.f, 250.f), "waterPFHeight", "ÐžÑ‚Ð½Ð¾ÑÐ¸Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ð¹ ÑƒÑ€Ð¾Ð²ÐµÐ½ÑŒ Ð³Ð»ÑƒÐ±Ð¾ÐºÐ¾Ð¹ Ð²Ð¾Ð´Ñ‹");
 				water()->setRelativeWaterLevel(waterPFHeight);
 			}
 		}
 
-		ar.serialize(outside_, "Outside", "Âíåøíÿÿ ñðåäà");
+		ar.serialize(outside_, "Outside", "Ð’Ð½ÐµÑˆÐ½ÑÑ ÑÑ€ÐµÐ´Ð°");
 		if(outside_ == ENVIRONMENT_EARTH)
-			ar.serialize(outsideHeight_, "outsideHeight", "Âûñîòà âíåøíåé ñðåäû");
+			ar.serialize(outsideHeight_, "outsideHeight", "Ð’Ñ‹ÑÐ¾Ñ‚Ð° Ð²Ð½ÐµÑˆÐ½ÐµÐ¹ ÑÑ€ÐµÐ´Ñ‹");
 
 		cEffect::setVisibleRange(effectHideByDistance_, sqr(effectNearDistance_), sqr(effectFarDistance_));
 
@@ -439,29 +439,29 @@ void Environment::serialize(Archive& ar)
 		gb_VisGeneric->SetHideRange(hideByDistanceRange_);
 		gb_VisGeneric->SetHideSmoothly(hideSmoothly_);
 
-		ar.serialize(*fallout_, "fallout", "Îñàäêè");
-		ar.serialize(*windMap, "windMap", "Âåòåð");
+		ar.serialize(*fallout_, "fallout", "ÐžÑÐ°Ð´ÐºÐ¸");
+		ar.serialize(*windMap, "windMap", "Ð’ÐµÑ‚ÐµÑ€");
 
 		if(water_){
-			ar.serialize(*pCoastSprite, "coastSprites", "Ïðèáðåæíûå ñïðàéòû");
-			ar.serialize(waterPlumeAtribute_, "|waterPlumeAtribute|waterPlume", "Ñëåäû íà âîäå");
+			ar.serialize(*pCoastSprite, "coastSprites", "ÐŸÑ€Ð¸Ð±Ñ€ÐµÐ¶Ð½Ñ‹Ðµ ÑÐ¿Ñ€Ð°Ð¹Ñ‚Ñ‹");
+			ar.serialize(waterPlumeAtribute_, "|waterPlumeAtribute|waterPlume", "Ð¡Ð»ÐµÐ´Ñ‹ Ð½Ð° Ð²Ð¾Ð´Ðµ");
 		}
 
-		ar.serialize(*lensFlare_, "lensFlare_", "Áëèê êàìåðû");
-		ar.serialize(*fallLeaves_, "fallLeaves", "Ïàäàþùèå ëèñòüÿ");
+		ar.serialize(*lensFlare_, "lensFlare_", "Ð‘Ð»Ð¸Ðº ÐºÐ°Ð¼ÐµÑ€Ñ‹");
+		ar.serialize(*fallLeaves_, "fallLeaves", "ÐŸÐ°Ð´Ð°ÑŽÑ‰Ð¸Ðµ Ð»Ð¸ÑÑ‚ÑŒÑ");
 
-		ar.serialize(ResourceSelector(ice_snow_texture, textureOptions),"ice_snow_texture","ËÅÄ: Òåêñòóðà ñíåãà");
-		ar.serialize(ResourceSelector(ice_bump_texture, textureOptions),"ice_bump_texture","ËÅÄ: Òåêñòóðà áàìïà");
+		ar.serialize(ResourceSelector(ice_snow_texture, textureOptions),"ice_snow_texture","Ð›Ð•Ð”: Ð¢ÐµÐºÑÑ‚ÑƒÑ€Ð° ÑÐ½ÐµÐ³Ð°");
+		ar.serialize(ResourceSelector(ice_bump_texture, textureOptions),"ice_bump_texture","Ð›Ð•Ð”: Ð¢ÐµÐºÑÑ‚ÑƒÑ€Ð° Ð±Ð°Ð¼Ð¿Ð°");
 
-		ar.serialize(ResourceSelector(env_earth_texture, textureOptions), "env_earth_texture", "Òåêñòóðà îêðóæàþùåé çåìëè");
+		ar.serialize(ResourceSelector(env_earth_texture, textureOptions), "env_earth_texture", "Ð¢ÐµÐºÑÑ‚ÑƒÑ€Ð° Ð¾ÐºÑ€ÑƒÐ¶Ð°ÑŽÑ‰ÐµÐ¹ Ð·ÐµÐ¼Ð»Ð¸");
 
-		ar.serialize(ResourceSelector(chaosWorldGround0, textureOptions), "chaosWorldGround0", "ÕÀÎÑ: Òåêñòóðà 1");
-		ar.serialize(ResourceSelector(chaosWorldGround1, textureOptions), "chaosWorldGround1", "ÕÀÎÑ: Òåêñòóðà 2");
-		ar.serialize(ResourceSelector(chaosOceanBump, textureOptions), "chaosOceanBump", "ÕÀÎÑ: Bump òåêñòóðà");
+		ar.serialize(ResourceSelector(chaosWorldGround0, textureOptions), "chaosWorldGround0", "Ð¥ÐÐžÐ¡: Ð¢ÐµÐºÑÑ‚ÑƒÑ€Ð° 1");
+		ar.serialize(ResourceSelector(chaosWorldGround1, textureOptions), "chaosWorldGround1", "Ð¥ÐÐžÐ¡: Ð¢ÐµÐºÑÑ‚ÑƒÑ€Ð° 2");
+		ar.serialize(ResourceSelector(chaosOceanBump, textureOptions), "chaosOceanBump", "Ð¥ÐÐžÐ¡: Bump Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ð°");
 
-		ar.serialize(ResourceSelector(water_ice_snow_texture, textureOptions), "water_ice_snow_texture", "ËÅÄ ÍÀ ÂÎÄÅ: Òåêñòóðà ñíåãà");
-		ar.serialize(ResourceSelector(water_ice_bump_texture, textureOptions), "water_ice_bump_texture", "ËÅÄ ÍÀ ÂÎÄÅ: Bump òåêñòóðà");
-		ar.serialize(ResourceSelector(water_ice_cleft_texture, textureOptions), "water_ice_cleft_texture", "ËÅÄ ÍÀ ÂÎÄÅ: Òåêñòóðà òðåùèí");
+		ar.serialize(ResourceSelector(water_ice_snow_texture, textureOptions), "water_ice_snow_texture", "Ð›Ð•Ð” ÐÐ Ð’ÐžÐ”Ð•: Ð¢ÐµÐºÑÑ‚ÑƒÑ€Ð° ÑÐ½ÐµÐ³Ð°");
+		ar.serialize(ResourceSelector(water_ice_bump_texture, textureOptions), "water_ice_bump_texture", "Ð›Ð•Ð” ÐÐ Ð’ÐžÐ”Ð•: Bump Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ð°");
+		ar.serialize(ResourceSelector(water_ice_cleft_texture, textureOptions), "water_ice_cleft_texture", "Ð›Ð•Ð” ÐÐ Ð’ÐžÐ”Ð•: Ð¢ÐµÐºÑÑ‚ÑƒÑ€Ð° Ñ‚Ñ€ÐµÑ‰Ð¸Ð½");
 		if(cloud_shadow)
 			cloud_shadow->serialize(ar);
 

@@ -11,10 +11,10 @@ PlugDialog::PlugDialog(Widget* widget, PlugBase* plug)
 	xassert(plug_);
 	xassert(plug_->asWidget());
 
-	setTitle(TRANSLATE("Ğåäàêòîğ"));
+	setTitle(TRANSLATE("Ğ ĞµĞ´Ğ°ĞºÑ‚Ğ¾Ñ€"));
 	setDefaultSize(Vect2i(1024, 768));
 	addButton(TRANSLATE("OK"), kdw::RESPONSE_OK);
-	addButton(TRANSLATE("Îòìåíà"), kdw::RESPONSE_CANCEL);
+	addButton(TRANSLATE("ĞÑ‚Ğ¼ĞµĞ½Ğ°"), kdw::RESPONSE_CANCEL);
 	setResizeable(true);
 
 	add(plug_->asWidget());
@@ -27,10 +27,10 @@ PlugDialog::PlugDialog(HWND widget, PlugBase* plug)
 	xassert(plug_);
 	xassert(plug_->asWidget());
 
-	setTitle(TRANSLATE("Ğåäàêòîğ"));
+	setTitle(TRANSLATE("Ğ ĞµĞ´Ğ°ĞºÑ‚Ğ¾Ñ€"));
 	setDefaultSize(Vect2i(1024, 768));
 	addButton(TRANSLATE("OK"), kdw::RESPONSE_OK);
-	addButton(TRANSLATE("Îòìåíà"), kdw::RESPONSE_CANCEL);
+	addButton(TRANSLATE("ĞÑ‚Ğ¼ĞµĞ½Ğ°"), kdw::RESPONSE_CANCEL);
 	setResizeable(true);
 
 	add(plug_->asWidget());

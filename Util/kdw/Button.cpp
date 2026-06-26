@@ -11,7 +11,7 @@
 #pragma warning(disable: 4355) // 'this' : used in base member initializer list
 
 namespace kdw{
-REGISTER_CLASS(Widget, Button, "Кнопка");
+REGISTER_CLASS(Widget, Button, "РљРЅРѕРїРєР°");
 
 class ButtonImpl: public _WidgetWindow{
 public:
@@ -164,7 +164,7 @@ void Button::onPressed()
 void Button::serialize(Archive& ar)
 {
 	if(ar.filter(SERIALIZE_DESIGN)){
-		ar.serialize(text_, "text", "&Текст");
+		ar.serialize(text_, "text", "&РўРµРєСЃС‚");
 	}
 	Widget::serialize(ar);
 }

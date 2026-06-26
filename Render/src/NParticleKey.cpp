@@ -19,26 +19,26 @@ KeyPos::value KeyPos::none=Vect3f::ZERO;
 KeyRotate::value KeyRotate::none=QuatF::ID;
 
 BEGIN_ENUM_DESCRIPTOR(EMITTER_BLEND, "EMITTER_BLEND")
-REGISTER_ENUM(EMITTER_BLEND_MULTIPLY, "���������")
-REGISTER_ENUM(EMITTER_BLEND_ADD, "��������")
-REGISTER_ENUM(EMITTER_BLEND_SUBSTRACT, "���������")
+REGISTER_ENUM(EMITTER_BLEND_MULTIPLY, "Умножение")
+REGISTER_ENUM(EMITTER_BLEND_ADD, "Сложение")
+REGISTER_ENUM(EMITTER_BLEND_SUBSTRACT, "Вычитание")
 END_ENUM_DESCRIPTOR(EMITTER_BLEND)
 
 BEGIN_ENUM_DESCRIPTOR(EmitterZMode, "EmitterZMode")
-REGISTER_ENUM(EMITTER_USE_ZBUFFER, "������������ Z")
-REGISTER_ENUM(EMITTER_DRAW_AFTER_GRASS, "���� �����")
-REGISTER_ENUM(EMITTER_DRAW_BEFORE_GRASS, "���� �����")
+REGISTER_ENUM(EMITTER_USE_ZBUFFER, "Использовать Z")
+REGISTER_ENUM(EMITTER_DRAW_AFTER_GRASS, "Выше травы")
+REGISTER_ENUM(EMITTER_DRAW_BEFORE_GRASS, "Ниже травы")
 END_ENUM_DESCRIPTOR(EmitterZMode)
 
 BEGIN_ENUM_DESCRIPTOR(EMITTER_TYPE_POSITION, "EMITTER_TYPE_POSITION")
-REGISTER_ENUM(EMP_BOX, "��������������")
-REGISTER_ENUM(EMP_CYLINDER, "�������")
-REGISTER_ENUM(EMP_SPHERE, "�����")
-REGISTER_ENUM(EMP_LINE, "�����")
-REGISTER_ENUM(EMP_RING, "������")
-REGISTER_ENUM(EMP_3DMODEL, "�� ��������")
-REGISTER_ENUM(EMP_3DMODEL_INSIDE, "��������� ������")
-REGISTER_ENUM(EMP_OTHER_EMITTER, "�� ������� ��������")
+REGISTER_ENUM(EMP_BOX, "Параллелепипед")
+REGISTER_ENUM(EMP_CYLINDER, "Цилиндр")
+REGISTER_ENUM(EMP_SPHERE, "Сфера")
+REGISTER_ENUM(EMP_LINE, "Линия")
+REGISTER_ENUM(EMP_RING, "Кольцо")
+REGISTER_ENUM(EMP_3DMODEL, "По нормалям")
+REGISTER_ENUM(EMP_3DMODEL_INSIDE, "Нормалями внутрь")
+REGISTER_ENUM(EMP_OTHER_EMITTER, "По другому эмиттеру")
 END_ENUM_DESCRIPTOR(EMITTER_TYPE_POSITION);
 
 BEGIN_ENUM_DESCRIPTOR(EMITTER_TYPE_ROTATION_DIRECTION, "EMITTER_TYPE_ROTATION_DIRECTION")
@@ -48,21 +48,21 @@ REGISTER_ENUM(ETRD_RANDOM, "ETRD_RANDOM")
 END_ENUM_DESCRIPTOR(EMITTER_TYPE_ROTATION_DIRECTION)
 
 BEGIN_ENUM_DESCRIPTOR(EMITTER_TYPE_DIRECTION_SPLINE, "EMITTER_TYPE_DIRECTION_SPLINE")
-REGISTER_ENUM(ETDS_ID, "�����������")
-REGISTER_ENUM(ETDS_ROTATEZ, "������ ��������")
-REGISTER_ENUM(ETDS_BURST1, "������ 1")
-REGISTER_ENUM(ETDS_BURST2, "������ 2")
+REGISTER_ENUM(ETDS_ID, "Перемещение")
+REGISTER_ENUM(ETDS_ROTATEZ, "Фигура вращения")
+REGISTER_ENUM(ETDS_BURST1, "Фигура 1")
+REGISTER_ENUM(ETDS_BURST2, "Фигура 2")
 END_ENUM_DESCRIPTOR(EMITTER_TYPE_DIRECTION_SPLINE)
 
-REGISTER_CLASS(EffectKey, EffectKey, "������");
-WRAP_LIBRARY(EffectKeyTable, "EffectKeyTable", "���������� ��������", "Scripts\\Content\\EffectKeyTable", 0, LIBRARY_EDITABLE);
+REGISTER_CLASS(EffectKey, EffectKey, "эффект");
+WRAP_LIBRARY(EffectKeyTable, "EffectKeyTable", "Библиотека эффектов", "Scripts\\Content\\EffectKeyTable", 0, LIBRARY_EDITABLE);
 
-REGISTER_CLASS(EmitterKeyInterface, EmitterKeyInt, "�������");
-REGISTER_CLASS(EmitterKeyInterface, EmitterKeyZ, "�����������");
-REGISTER_CLASS(EmitterKeyInterface, EmitterKeySpline, "������");
-REGISTER_CLASS(EmitterKeyInterface, EmitterKeyLight, "����");
-REGISTER_CLASS(EmitterKeyInterface, EmitterKeyColumnLight, "����� �����");
-REGISTER_CLASS(EmitterKeyInterface, EmitterKeyLighting, "������");
+REGISTER_CLASS(EmitterKeyInterface, EmitterKeyInt, "Базовый");
+REGISTER_CLASS(EmitterKeyInterface, EmitterKeyZ, "Поверхность");
+REGISTER_CLASS(EmitterKeyInterface, EmitterKeySpline, "Сплайн");
+REGISTER_CLASS(EmitterKeyInterface, EmitterKeyLight, "Свет");
+REGISTER_CLASS(EmitterKeyInterface, EmitterKeyColumnLight, "Столб света");
+REGISTER_CLASS(EmitterKeyInterface, EmitterKeyLighting, "Молния");
 
 
 void resizeKey(int points, KeysFloat& key)
@@ -163,15 +163,15 @@ struct Amplitude{
 
 void NoiseParams::serialize(Archive& ar)
 {
- 	ar.serialize(onlyPositive, "onlyPositive", "������ ������������� ��������");
-	ar.serialize(RangedWrapperf(amplitude, 0.001f, 100.0f), "amplitude", "���������");
-	ar.serialize(RangedWrapperf(frequency, 0.001f, 100.0f), "frequency", "�������");
+ 	ar.serialize(onlyPositive, "onlyPositive", "Только положительные значения");
+	ar.serialize(RangedWrapperf(amplitude, 0.001f, 100.0f), "amplitude", "Амплитуда");
+	ar.serialize(RangedWrapperf(frequency, 0.001f, 100.0f), "frequency", "Частота");
 	if(ar.isEdit()){
 		std::vector<Amplitude> amplitudes;
 		amplitudes.resize(octaveAmplitudes.size());
 		for(int i = 0; i < octaveAmplitudes.size(); ++i)
 			amplitudes[i] = Amplitude(octaveAmplitudes[i].f);
-		ar.serialize(amplitudes, "octaveAmplitudes", "��������� �����");
+		ar.serialize(amplitudes, "octaveAmplitudes", "Амплитуды октав");
 		if(ar.isInput()){
 			octaveAmplitudes.resize(amplitudes.size());
 			for(int i = 0; i < octaveAmplitudes.size(); ++i)
@@ -179,7 +179,7 @@ void NoiseParams::serialize(Archive& ar)
 		}        
 	}
 	else
-		ar.serialize(octaveAmplitudes, "octaveAmplitudes", "��������� �����");
+		ar.serialize(octaveAmplitudes, "octaveAmplitudes", "Амплитуды октав");
 	if(octaveAmplitudes.empty())
 		octaveAmplitudes.push_back(KeyFloat(0.5f, 0.5f));
 }
@@ -188,11 +188,11 @@ void EmitterNoise::serialize(Archive& ar)
 {
 	ar.serialize(enabled, "enabled", "^");
 	if(!ar.isEdit() || enabled){
-		ar.serialize(fromOtherEmitter, "fromOtherEmitter", "�� ������� ��������");
+		ar.serialize(fromOtherEmitter, "fromOtherEmitter", "Из другого эмиттера");
 		if(!ar.isEdit() || fromOtherEmitter)
-			ar.serialize(otherEmitterName, "otherEmitterName", "�������");
+			ar.serialize(otherEmitterName, "otherEmitterName", "Эмиттер");
 		if(!ar.isEdit() || !fromOtherEmitter)
-			ar.serialize(params, "params", "���������");
+			ar.serialize(params, "params", "Параметры");
 	}
 }
 
@@ -200,10 +200,10 @@ void EmitterNoiseBlockable::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 	if(!ar.isEdit() || enabled){
-		ar.serialize(blockX, "blockX", "����������� �� X");
-		ar.serialize(blockY, "blockY", "����������� �� Y");
-		ar.serialize(blockZ, "blockZ", "����������� �� Z");
-		ar.serialize(replace, "replace", "��������");
+		ar.serialize(blockX, "blockX", "Блокировать по X");
+		ar.serialize(blockY, "blockY", "Блокировать по Y");
+		ar.serialize(blockZ, "blockZ", "Блокировать по Z");
+		ar.serialize(replace, "replace", "Заменить");
 	}
 }
 
@@ -725,23 +725,23 @@ void EmitterType::CountXYZ::serialize(Archive& ar)
 
 void EmitterType::serialize(Archive& ar)
 {
-	ar.serialize(type, "type", "�������������");
+	ar.serialize(type, "type", "Распределение");
 
-	//ar.serialize(size, "size", "������");
+	//ar.serialize(size, "size", "Размер");
 	ar.serialize(size.x, "sizeX", "X");
 	if(type == EMP_BOX){
 		ar.serialize(size.y, "sizeY", "Y");
 		ar.serialize(size.z, "sizeZ", "Z");
 	}
-	// admix: �� ���� ������ ��� �� ����� �� ar.isEdit() �.�.
-	// � ���� �� ��� ����������� ����� �������� ���-���� ��������
+	// admix: не хочу делить все на ветки по ar.isEdit() т.к.
+	// в одну из них обязательно будут забывать что-нить добавить
 	if(!ar.isEdit() || type == EMP_RING){ 
 		ar.serialize(alpha_min, "alpha_min", "Alpha min");
 		ar.serialize(alpha_max, "alpha_max", "Alpha max");
 		ar.serialize(teta_min, "teta_min", "Teta min");
 		ar.serialize(teta_max, "teta_max", "Teta max");
 	}
-	ar.serialize(fix_pos, "fix_pos", "�����������");
+	ar.serialize(fix_pos, "fix_pos", "Фиксировать");
 	// ar.serialize(num, "num", "num");
 	if(!ar.isEdit() || fix_pos){
 		ar.serialize(num.x, "numX", "dx");
@@ -1161,11 +1161,11 @@ float EmitterKeyInterface::GlobalTime(float t)
 
 void EmitterKeyInterface::serialize(Archive& ar)
 {
-	if(ar.openBlock("common", "�����")){
-		ar.serialize(randomFrame, "randomFrame", "��������� ����");
-		ar.serialize(zMode_, "zMode", "������ �����");
+	if(ar.openBlock("common", "Общие")){
+		ar.serialize(randomFrame, "randomFrame", "Случайный кадр");
+		ar.serialize(zMode_, "zMode", "Сквозь землю");
 
-		// ����
+		// жуть
 		static ComboStrings textureName;
 		static ComboStrings textureNameAlt;
 		if(textureName.empty()){
@@ -1176,14 +1176,14 @@ void EmitterKeyInterface::serialize(Archive& ar)
 				buf <= i;
 				textureName[i] = "texture";
 				textureName[i] += buf;
-				textureNameAlt[i] = "�������� ";
+				textureNameAlt[i] = "Текстура ";
 				textureNameAlt[i] += buf;
 			}
 		}
 
 		static GenericFileSelector::Options options("*.tga", "");
 		if(ar.isEdit() && !randomFrame){
-			ar.serialize(GenericFileSelector(textureNames[0], options), "texture", "��������");
+			ar.serialize(GenericFileSelector(textureNames[0], options), "texture", "Текстура");
 		}
 		else{
 			for(int i = 0; i < num_texture_names; ++i){
@@ -1192,7 +1192,7 @@ void EmitterKeyInterface::serialize(Archive& ar)
 		}
 		ar.closeBlock();
 	}
-	//ar.serialize() ��������
+	//ar.serialize() Текстура
 
 }
 
@@ -1294,11 +1294,11 @@ void EmitterKeyLight::BuildKey()
 
 void EmitterKeyLight::serialize(Archive& ar)
 {
-	ar.serialize(wrapCurve(emitter_size, true, 1.0f), "emitter_size", "������");
+	ar.serialize(wrapCurve(emitter_size, true, 1.0f), "emitter_size", "Размер");
 	ar.serialize(emitter_color, "emitter_color", 0);
-	// ����
-	ar.serialize(toObjects, "toObjects", "�� �������");
-	ar.serialize(toTerrain, "toTerrain", "�� �����");
+	// свет
+	ar.serialize(toObjects, "toObjects", "На объекты");
+	ar.serialize(toTerrain, "toTerrain", "На Землю");
 	ar.serialize(light_blend, "light_blend", "Blending");
 }
 
@@ -1341,7 +1341,7 @@ EmitterKeyBase::EmitterKeyBase()
 	rot0.time=0;
 	emitter_rotation.push_back(rot0);
 
-	///����� ��������� ������
+	///Общие параметры частиц
 	life_time.push_back(KeyFloat(0,1));
 	life_time_delta.push_back(KeyFloat(0,0));
 	begin_size.push_back(KeyFloat(0,1));
@@ -1367,7 +1367,7 @@ EmitterKeyBase::EmitterKeyBase()
 //	PlumeTimeScaling = 1.0f;
 //	PlumeSizeScaling = 1.0f;
 
-	//��������� ��������� �������
+	//Параметры отдельной частицы
 	p_size.push_back(KeyFloat(0,0.5f));
 	KeyColor c;
 	c.r=c.g=c.b=c.a=1;
@@ -1431,7 +1431,7 @@ void EmitterKeyBase::end_sort(vector<float>& xsort)
 
 void EmitterKeyBase::GetParticleLifeTime(float t,float& mid_t,float& min_t,float& max_t)
 {
-	//��. EmitOne
+	//см. EmitOne
 	float inv_particle_life_time=1/max(particle_life_time,1e-3f);
 	float inv_life=inv_life_time.Get(t);
 	float dlife=life_time_delta.Get(t);
@@ -1479,54 +1479,54 @@ void EmitterKeyBase::Load3DModelPos(c3dx* model)
 
 void EmitterKeyBase::serialize(Archive& ar)
 {
-	if(ar.openBlock("emitter", "�������")){
-		ar.serialize(mirage, "mirage", "�����");
-		ar.serialize(softSmoke, "softSmoke", "���������");
+	if(ar.openBlock("emitter", "Эмиттер")){
+		ar.serialize(mirage, "mirage", "Мираж");
+		ar.serialize(softSmoke, "softSmoke", "Размывать");
 
 
 		int generationPointCount = this->generationPointCount();
-		ar.serialize(generationPointCount, "generationPointCount", "���-�� �����");
+		ar.serialize(generationPointCount, "generationPointCount", "Кол-во точек");
 		if(ar.isInput()){
 			if(generationPointCount != this->generationPointCount())
 				setGenerationPointCount(generationPointCount);
 		}
 
-		ar.serialize(emitter_life_time, "emitter_life_time", "����� �����");
+		ar.serialize(emitter_life_time, "emitter_life_time", "Время жизни");
 
 		ar.serialize(life_time, "life_time", 0);
 		ar.serialize(inv_life_time, "inv_life_time", 0);
 
-		ar.serialize(wrapCurve(num_particle, true, 100.0f), "num_particle", "���-�� ������");
-		ar.serialize(generate_prolonged, "generate_prolonged", "����������");
-		ar.serialize(cycled, "cycled", "���������");
+		ar.serialize(wrapCurve(num_particle, true, 100.0f), "num_particle", "Кол-во частиц");
+		ar.serialize(generate_prolonged, "generate_prolonged", "Непрерывно");
+		ar.serialize(cycled, "cycled", "Зациклить");
 
-		ar.serialize(relative, "relative", "������� ��������");
-		ar.serialize(need_wind, "need_wind", "��������� ������");
+		ar.serialize(relative, "relative", "Жесткая привязка");
+		ar.serialize(need_wind, "need_wind", "Сночиться ветром");
 		if(need_wind || !ar.isEdit() || ar.isInput()){
-			ar.serialize(k_wind_min, "k_wind_min", "���������� min");
-			ar.serialize(k_wind_max, "k_wind_max", "���������� max");
+			ar.serialize(k_wind_min, "k_wind_min", "Инертность min");
+			ar.serialize(k_wind_max, "k_wind_max", "Инертность max");
 		}
 
-		ar.serialize(chPlume, "chPlume", "�����");
+		ar.serialize(chPlume, "chPlume", "Шлейф");
 		if(chPlume || !ar.isEdit() || ar.isInput()){
-			ar.serialize(TraceCount, "TraceCount", "��������");
-			ar.serialize(PlumeInterval, "PlumeInterval", "��������");
-			ar.serialize(smooth, "smooth", "����������");
+			ar.serialize(TraceCount, "TraceCount", "Гибкость");
+			ar.serialize(PlumeInterval, "PlumeInterval", "Интервал");
+			ar.serialize(smooth, "smooth", "Сглаживать");
 		}
 
 
-		ar.serialize(planar, "planar", "�������");
+		ar.serialize(planar, "planar", "Плоский");
 		if(!ar.isEdit() || planar)
-			ar.serialize(turn, "turn", "��������������");
+			ar.serialize(turn, "turn", "Поворачиваться");
 		if(!ar.isEdit() || !planar)
-			ar.serialize(oriented, "oriented", "���������������");
+			ar.serialize(oriented, "oriented", "Ориентированный");
 
-		ar.serialize(orientedCenter, "orientedCenter", "������. �����");
+		ar.serialize(orientedCenter, "orientedCenter", "Ориент. центр");
 		if(orientedCenter || !ar.isEdit() || ar.isInput())
-			ar.serialize(orientedAxis, "orientedAxis", "������. ���");
+			ar.serialize(orientedAxis, "orientedAxis", "Ориент. ось");
 
-		ar.serialize(wrapCurve(emitter_scale, true), "emitter_scale", "�������");
-		ar.serialize(base_angle, "base_angle", "����");
+		ar.serialize(wrapCurve(emitter_scale, true), "emitter_scale", "Масштаб");
+		ar.serialize(base_angle, "base_angle", "Угол");
 
 
 
@@ -1534,54 +1534,54 @@ void EmitterKeyBase::serialize(Archive& ar)
 		ar.closeBlock();
 	}
 
-	ar.serialize(velocityNoise, "velocityNoise", "��� ��������");
-	ar.serialize(directionNoise, "directionNoise", "��� �����������");
+	ar.serialize(velocityNoise, "velocityNoise", "Шум скорости");
+	ar.serialize(directionNoise, "directionNoise", "Шум направления");
 
 
-	if(ar.openBlock("noise", "�������")){
+	if(ar.openBlock("noise", "Разброс")){
 		bool angleChaos = rotation_direction == ETRD_RANDOM;
-		ar.serialize(angleChaos, "angleChaos", "�����");
+		ar.serialize(angleChaos, "angleChaos", "Ротор");
 		rotation_direction = angleChaos ? ETRD_RANDOM : ETRD_CW;
 
-		ar.serialize(wrapCurve(begin_size_delta, true), "begin_size_delta", "������");
-		ar.serialize(wrapCurve(life_time_delta, true), "life_time_delta", "�����");
+		ar.serialize(wrapCurve(begin_size_delta, true), "begin_size_delta", "Размер");
+		ar.serialize(wrapCurve(life_time_delta, true), "life_time_delta", "Время");
 		ar.closeBlock();
 	}
-	if(ar.openBlock("particle", "�������")){
+	if(ar.openBlock("particle", "Частица")){
 		ar.serialize(begin_position, "begin_position", 0);
 		ar.serialize(normal_position, "normal_position", 0);
 		ar.serialize(particle_life_time, "particle_life_time", 0);
-		ar.serialize(wrapCurve(p_size), "p_size", "������");
-		ar.serialize(wrapCurve(p_angle_velocity), "p_angle_velocity", "��������");
+		ar.serialize(wrapCurve(p_size), "p_size", "Размер");
+		ar.serialize(wrapCurve(p_angle_velocity), "p_angle_velocity", "Вращение");
 		ar.closeBlock();
 	}
 
-	if(ar.openBlock("common", "�����")){
+	if(ar.openBlock("common", "Общие")){
 		ar.serialize(emitter_rotation, "emitter_rotation", 0);
 		ar.serialize(wrapCurve(begin_size), "begin_size", 0);
 
-		ar.serialize(ignoreParticleRate, "ignoreParticleRate", "������������ ParticleRate");
-		ar.serialize(preciseBound_, "preciseBound", "������� Bound �����");
+		ar.serialize(ignoreParticleRate, "ignoreParticleRate", "Игнорировать ParticleRate");
+		ar.serialize(preciseBound_, "preciseBound", "Считать Bound точно");
 		ar.serialize(sprite_blend, "sprite_blend", "Blending");
 	
 		if(ar.isEdit())
 			particle_position.serialize(ar);
 		else
-			ar.serialize(particle_position, "particle_position", "�������������");
+			ar.serialize(particle_position, "particle_position", "Распределение");
 
-		if(!ar.isEdit() || particle_position.type == EMP_OTHER_EMITTER) // ���� ������� � particle_position
-			ar.serialize(other, "other", "�������");
-		if(!ar.isEdit() || particle_position.type != EMP_OTHER_EMITTER) // ���� ������� � particle_position
-			ar.serialize(chFill, "chFill", "����������");
+		if(!ar.isEdit() || particle_position.type == EMP_OTHER_EMITTER) // надо занести в particle_position
+			ar.serialize(other, "other", "Эмиттер");
+		if(!ar.isEdit() || particle_position.type != EMP_OTHER_EMITTER) // надо занести в particle_position
+			ar.serialize(chFill, "chFill", "Заполнение");
 		if(!ar.isEdit() || particle_position.type == EMP_CYLINDER){
-			ar.serialize(cone, "cone", "�����");
-			ar.serialize(bottom, "bottom", "������� �� ���");
+			ar.serialize(cone, "cone", "Конус");
+			ar.serialize(bottom, "bottom", "Ставить на дно");
 		}
 
-		ar.serialize(ignoreDistanceCheck_, "ignoreDistanceCheck", "�� �������� ��� �������� ������");
+		ar.serialize(ignoreDistanceCheck_, "ignoreDistanceCheck", "Не исчезать при удалении камеры");
 
 
-		ar.serialize(sizeByTexture, "sizeByTexture", "������ �� ��������");
+		ar.serialize(sizeByTexture, "sizeByTexture", "Размер по текстуре");
 		ar.closeBlock();
 	}
 	ar.serialize(p_color, "p_color", 0);
@@ -1999,7 +1999,7 @@ void EmitterKeyBase::LoadInternal(CLoadData* ld)
 	case IDS_BUILDKEY_NUM_PARTICLE:
 		{
 			{ CLoadIterator __cli(ld); num_particle.Load(__cli); }
-//����� ������� ��������� ����� ������� ��� ��������� �������!
+//Дикие строчки наверняка тупая затычка для редактора какаято!
 //			if (num_particle.size() != emitter_position.size())
 //				emitter_scale.resize(num_particle.size());
 		}
@@ -2218,7 +2218,7 @@ void EffectKey::Clear()
 void EffectKey::operator= (const EffectKey& effect_key)
 {
 	name = effect_key.name;
-	filename=effect_key.filename;///������ ������� �� ������������. ����� ���-�� ��������� � ��������� ��������.
+	filename=effect_key.filename;///Совсем недавно не копировалось. Может что-то сломается в редакторе эффектов.
 	delete_assert = effect_key.delete_assert;
 	need_tilemap = effect_key.need_tilemap;
 
@@ -2554,8 +2554,8 @@ void EmitterKeyZ::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(add_z, "add_z", "������");
-	ar.serialize(use_force_field, "use_force_field", "����");
+	ar.serialize(add_z, "add_z", "Высота");
+	ar.serialize(use_force_field, "use_force_field", "Поле");
 	ar.serialize(use_water_plane, "use_water_plane", "use_water_plane");
 }
 
@@ -2579,20 +2579,20 @@ void EmitterKeyInt::serialize(Archive& ar)
 
 	ar.serialize(g, "g", 0);
 
-	if(ar.openBlock("emitter", "�������")){
-		ar.serialize(angle_by_center, "angle_by_center", "�����");
+	if(ar.openBlock("emitter", "Эмиттер")){
+		ar.serialize(angle_by_center, "angle_by_center", "Центр");
 		ar.closeBlock();
 	}
 
-	if(ar.openBlock("particle", "�������")){
-		ar.serialize(wrapCurve(p_velocity, false), "p_velocity", "��������");
-		ar.serialize(wrapCurve(begin_speed, false), "begin_speed", "����. ��������");
-		ar.serialize(wrapCurve(p_gravity, false), "p_gravity", "����������");
-		ar.serialize(use_light, "use_light", "���������");
+	if(ar.openBlock("particle", "Частица")){
+		ar.serialize(wrapCurve(p_velocity, false), "p_velocity", "Скорость");
+		ar.serialize(wrapCurve(begin_speed, false), "begin_speed", "Коэф. скорости");
+		ar.serialize(wrapCurve(p_gravity, false), "p_gravity", "Гравитация");
+		ar.serialize(use_light, "use_light", "Освещение");
 		ar.closeBlock();
 	}
-	if(ar.openBlock("noise", "�������")){
-		ar.serialize(wrapCurve(velocity_delta, true), "velocity_delta", "��������");
+	if(ar.openBlock("noise", "Разброс")){
+		ar.serialize(wrapCurve(velocity_delta, true), "velocity_delta", "Скорость");
 		ar.closeBlock();
 	}
 }
@@ -2644,10 +2644,10 @@ void EmitterKeySpline::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 
-	ar.serialize(p_position_auto_time, "p_position_auto_time", 0); // ����� ����������� �������� ������
+	ar.serialize(p_position_auto_time, "p_position_auto_time", 0); // более равномерная скорость частиц
 	ar.serialize(p_position, "p_position", 0);
 
-	ar.serialize(direction, "direction", "��������");
+	ar.serialize(direction, "direction", "Движение");
 }
 
 void EmitterKeySpline::setParticleKeyTime(int keyIndex, float time)
@@ -2782,26 +2782,26 @@ void EmitterKeyColumnLight::serialize(Archive& ar)
 {
 	ar.serialize(texture2_name, "texture2_name", "texture2_name");
 
-	ar.serialize(sprite_blend, "sprite_blend", "Blending �������");
+	ar.serialize(sprite_blend, "sprite_blend", "Blending текстур");
 	ar.serialize(color_mode, "color_mode", "Blending");
 
-	ar.serialize(wrapCurve(emitter_size), "emitter_size", "������ 1");
-	ar.serialize(wrapCurve(emitter_size2), "emitter_size2", "������ 2");
+	ar.serialize(wrapCurve(emitter_size), "emitter_size", "Ширина 1");
+	ar.serialize(wrapCurve(emitter_size2), "emitter_size2", "Ширина 2");
 	ar.serialize(emitter_color, "emitter_color", 0);
 	ar.serialize(emitter_alpha, "emitter_alpha", 0);
 
-	ar.serialize(wrapCurve(u_vel), "u_vel", "�������� �������� �� X");
-	ar.serialize(wrapCurve(v_vel), "v_vel", "�������� �������� �� Y");
-	ar.serialize(wrapCurve(height), "height", "�����");
+	ar.serialize(wrapCurve(u_vel), "u_vel", "Скорость текстуры по X");
+	ar.serialize(wrapCurve(v_vel), "v_vel", "Скорость текстуры по Y");
+	ar.serialize(wrapCurve(height), "height", "Длина");
 
-	ar.serialize(turn, "turn", "���������");
-	ar.serialize(plane, "plane", "���������");
-	ar.serialize(laser, "laser", "�����");
-	ar.serialize(discrete_laser, "discrete_laser", "���������� �����");
+	ar.serialize(turn, "turn", "Зациклить");
+	ar.serialize(plane, "plane", "Плоскость");
+	ar.serialize(laser, "laser", "Лазер");
+	ar.serialize(discrete_laser, "discrete_laser", "Дискретный лазер");
 
 	if(discrete_laser){
-		ar.serialize(wrapCurve(length), "length", "����� ������� ������");
-		ar.serialize(missileSpeed, "missileSpeed", "�������� ����� ������� ������");
+		ar.serialize(wrapCurve(length), "length", "Длина отрезка лазера");
+		ar.serialize(missileSpeed, "missileSpeed", "Скорость полёта отрезка лазера");
 	}
 
 	ar.serialize(rot, "rot", 0);

@@ -5,7 +5,7 @@
 #include "Serialization/EnumDescriptor.h"
 #include "Serialization/RangedWrapper.h"
 
-REGISTER_CLASS(RigidBodyPrm, RigidBodyPrm, "Базовая физика");
+REGISTER_CLASS(RigidBodyPrm, RigidBodyPrm, "Р‘Р°Р·РѕРІР°СЏ С„РёР·РёРєР°");
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(RigidBodyPrm, RigidBodyTypeOld, "RigidBodyType")
 REGISTER_ENUM_ENCLOSED(RigidBodyPrm, UNIT, "UNIT");
@@ -62,7 +62,7 @@ RigidBodyPrm::RigidBodyPrm()
 	upper_theta = 90; // degrees
 	lower_theta = -45; // degrees
 	targetCorrectionZ = 0;
-	distance_correction_factor = 0.96f; // из-за ошибки интегрирования снаряды чуть-чуть перелетают.
+	distance_correction_factor = 0.96f; // РёР·-Р·Р° РѕС€РёР±РєРё РёРЅС‚РµРіСЂРёСЂРѕРІР°РЅРёСЏ СЃРЅР°СЂСЏРґС‹ С‡СѓС‚СЊ-С‡СѓС‚СЊ РїРµСЂРµР»РµС‚Р°СЋС‚.
 	ground_colliding_delay = 100;
 	ground_collision_enabled = false;
 
@@ -129,14 +129,14 @@ void RigidBodyPrm::serialize(Archive& ar)
 	ar.serialize(unit_type, "unit_type", "unit_type");
 	ar.serialize(rigidBodyType, "rigidBodyType", "rigidBodyType");
 	
-	if(ar.openBlock("Общие параметры", "Общие параметры")){
+	if(ar.openBlock("РћР±С‰РёРµ РїР°СЂР°РјРµС‚СЂС‹", "РћР±С‰РёРµ РїР°СЂР°РјРµС‚СЂС‹")){
 		ar.serialize(linear_damping, "linear_damping", "linear_damping");
 		ar.serialize(angular_damping, "angular_damping", "angular_damping");
 		
 		ar.closeBlock();
 	}
 
-	if(ar.openBlock("", "Управление")){
+	if(ar.openBlock("", "РЈРїСЂР°РІР»РµРЅРёРµ")){
 		ar.serialize(unmovable, "unmovable", "unmovable");
 		ar.serialize(controled_by_points, "controled_by_points", "controled_by_points");
 
@@ -160,15 +160,15 @@ void RigidBodyPrm::serialize(Archive& ar)
 		ar.closeBlock();
 	}
 
-	if(ar.openBlock("", "Подземные")){
+	if(ar.openBlock("", "РџРѕРґР·РµРјРЅС‹Рµ")){
 		ar.serialize(digging_depth, "digging_depth", "digging_depth");
 		ar.serialize(digging_depth_velocity, "digging_depth_velocity", "digging_depth_velocity");
 		ar.serialize(undergroundMode, "undergroundMode", "underground mode");
 		ar.closeBlock();
 	}
 
-	if(ar.openBlock("", "Летные")){
-		ar.serialize(flyingMode, "flyingMode", "Летный тип");
+	if(ar.openBlock("", "Р›РµС‚РЅС‹Рµ")){
+		ar.serialize(flyingMode, "flyingMode", "Р›РµС‚РЅС‹Р№ С‚РёРї");
 		ar.serialize(hoverMode, "hoverMode", "hoverMode");
 		ar.serialize(flying_height_relative, "flying_height_relative", "flying_height_relative");
 		ar.serialize(flying_height, "flying_height", "flying_height");
@@ -176,7 +176,7 @@ void RigidBodyPrm::serialize(Archive& ar)
 		ar.closeBlock();
 	}
 
-	if(ar.openBlock("", "Снаряды")){
+	if(ar.openBlock("", "РЎРЅР°СЂСЏРґС‹")){
 		ar.serialize(minimize_theta, "minimize_theta", "minimize_theta");
 		ar.serialize(upper_theta, "upper_theta", "upper_theta");
 		ar.serialize(lower_theta, "lower_theta", "lower_theta");
@@ -187,7 +187,7 @@ void RigidBodyPrm::serialize(Archive& ar)
 		ar.closeBlock();
 	}
 
-	if(ar.openBlock("", "Ракеты")){
+	if(ar.openBlock("", "Р Р°РєРµС‚С‹")){
 		ar.serialize(rocket_vertical_control_distance, "rocket_vertical_control_distance", "rocket_vertical_control_distance");
 		ar.serialize(rocket_forward_analysis_distance, "rocket_forward_analysis_distance", "rocket_forward_analysis_distance");
 		ar.serialize(rocket_target_offset_z, "rocket_target_offset_z", "rocket_target_offset_z");
@@ -195,12 +195,12 @@ void RigidBodyPrm::serialize(Archive& ar)
 		ar.closeBlock();
 	}
 
-	if(ar.openBlock("", "Падающие деревья и заборы")){
+	if(ar.openBlock("", "РџР°РґР°СЋС‰РёРµ РґРµСЂРµРІСЊСЏ Рё Р·Р°Р±РѕСЂС‹")){
 		ar.serialize(fence, "fence", "fence");
 		ar.closeBlock();
 	}
     
-	if(ar.openBlock("", "Поиск пути")){
+	if(ar.openBlock("", "РџРѕРёСЃРє РїСѓС‚Рё")){
 		ar.serialize(waterPass, "waterPass", "WaterPass");
 		ar.serialize(groundPass, "groundPass", "GroundPass");
 		ar.serialize(fieldPass, "fieldPass", "fieldPass");

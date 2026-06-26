@@ -6,7 +6,7 @@
 #include "Units/Object3dxInterface.h"
 #include "EffectContainer.h"
 
-/// параметры спецэффекта
+/// РїР°СЂР°РјРµС‚СЂС‹ СЃРїРµС†СЌС„С„РµРєС‚Р°
 class EffectAttribute
 {
 public:
@@ -44,63 +44,63 @@ public:
 	EffectKey* effect(float scale = -1.f, Color4c skin_color = Color4c(255,255,255,255)) const { return isEmpty() ? 0 : effectReference_->getEffect(scale > 0.f ? scale : scale_, skin_color); }
 
 	enum WaterPlacementMode {
-		/// ставить на дно
+		/// СЃС‚Р°РІРёС‚СЊ РЅР° РґРЅРѕ
 		WATER_BOTTOM,
-		/// ставить на поверхность воды
+		/// СЃС‚Р°РІРёС‚СЊ РЅР° РїРѕРІРµСЂС…РЅРѕСЃС‚СЊ РІРѕРґС‹
 		WATER_SURFACE
 	};
 
 protected:
 
-	/// зацикливать эффект или нет
+	/// Р·Р°С†РёРєР»РёРІР°С‚СЊ СЌС„С„РµРєС‚ РёР»Рё РЅРµС‚
 	bool isCycled_;
-	/// обрывать
+	/// РѕР±СЂС‹РІР°С‚СЊ
 	bool stopImmediately_;
 
-	/// ориентировать эффект по объекту
+	/// РѕСЂРёРµРЅС‚РёСЂРѕРІР°С‚СЊ СЌС„С„РµРєС‚ РїРѕ РѕР±СЉРµРєС‚Сѓ
 	bool bindOrientation_;
 
-	/// окрашивать в цвет легиона
+	/// РѕРєСЂР°С€РёРІР°С‚СЊ РІ С†РІРµС‚ Р»РµРіРёРѕРЅР°
 	bool legionColor_;
 
-	/// выключать в воде
+	/// РІС‹РєР»СЋС‡Р°С‚СЊ РІ РІРѕРґРµ
 	bool switchOffUnderWater_;
-	/// выключать в лаве
+	/// РІС‹РєР»СЋС‡Р°С‚СЊ РІ Р»Р°РІРµ
 	bool switchOffUnderLava_;
-	/// выключать днем
+	/// РІС‹РєР»СЋС‡Р°С‚СЊ РґРЅРµРј
 	bool switchOffByDay_;
-	/// выключать на льду
+	/// РІС‹РєР»СЋС‡Р°С‚СЊ РЅР° Р»СЊРґСѓ
 	bool switchOffOnIce_;
-	/// включать только на льду
+	/// РІРєР»СЋС‡Р°С‚СЊ С‚РѕР»СЊРєРѕ РЅР° Р»СЊРґСѓ
 	bool switchOnIce_;
-	/// true если виден в тумане войны
+	/// true РµСЃР»Рё РІРёРґРµРЅ РІ С‚СѓРјР°РЅРµ РІРѕР№РЅС‹
 	bool ignoreFogOfWar_;
-	/// true если виден на невидимом юните
+	/// true РµСЃР»Рё РІРёРґРµРЅ РЅР° РЅРµРІРёРґРёРјРѕРј СЋРЅРёС‚Рµ
 	bool ignoreInvisibility_;
-	/// true если не должен пропадать при удалении камеры
+	/// true РµСЃР»Рё РЅРµ РґРѕР»Р¶РµРЅ РїСЂРѕРїР°РґР°С‚СЊ РїСЂРё СѓРґР°Р»РµРЅРёРё РєР°РјРµСЂС‹
 	bool ignoreDistanceCheck_;
-	/// отключать вместе с интерфейсом
+	/// РѕС‚РєР»СЋС‡Р°С‚СЊ РІРјРµСЃС‚Рµ СЃ РёРЅС‚РµСЂС„РµР№СЃРѕРј
 	bool switchOffByInterface_;
 
-	/// режим устаноки эффекта на воду
+	/// СЂРµР¶РёРј СѓСЃС‚Р°РЅРѕРєРё СЌС„С„РµРєС‚Р° РЅР° РІРѕРґСѓ
 	WaterPlacementMode waterPlacementMode_;
 
-	/// масштаб эффекта
+	/// РјР°СЃС€С‚Р°Р± СЌС„С„РµРєС‚Р°
 	float scale_;
 
-	/// ссылка на эффект из библиотеки эффектов
+	/// СЃСЃС‹Р»РєР° РЅР° СЌС„С„РµРєС‚ РёР· Р±РёР±Р»РёРѕС‚РµРєРё СЌС„С„РµРєС‚РѕРІ
 	EffectReference effectReference_;
 };
 
 class EffectAttributeAttachable : public EffectAttribute
 {
 	bool onlyForActivePlayer_;
-	///масштабировать ли спецэффект по размеру объекта
+	///РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°С‚СЊ Р»Рё СЃРїРµС†СЌС„С„РµРєС‚ РїРѕ СЂР°Р·РјРµСЂСѓ РѕР±СЉРµРєС‚Р°
 	bool scaleByModel_;
 
 	bool needNodeName_;
 	bool synchronizationWithModelAnimation_;
-	/// прерывается анимацией
+	/// РїСЂРµСЂС‹РІР°РµС‚СЃСЏ Р°РЅРёРјР°С†РёРµР№
 	bool switchOffByAnimationChain_;
 	Object3dxNode node_;
 

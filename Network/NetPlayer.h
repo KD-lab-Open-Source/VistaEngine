@@ -25,7 +25,7 @@ enum {
 	NETWORK_RACE_NUMBER = 3, 
 	PERIMETER_CLIENT_DESCR_SIZE = 64,
 	PERIMETER_CONTROL_NAME_SIZE = 64,
-	MAX_MULTIPALYER_GAME_NAME = 19, // синхронизить с GAME_NAME_SIZE в GameInfo.h , BD_MAX_SESSIONNAME_LENGTH в CustomMatchMakingInfo.h и классом bdfindByGameTypeAndModeResultRow
+	MAX_MULTIPALYER_GAME_NAME = 19, // СЃРёРЅС…СЂРѕРЅРёР·РёС‚СЊ СЃ GAME_NAME_SIZE РІ GameInfo.h , BD_MAX_SESSIONNAME_LENGTH РІ CustomMatchMakingInfo.h Рё РєР»Р°СЃСЃРѕРј bdfindByGameTypeAndModeResultRow
 
 	PLAYER_ID_NONE = -1,
 	USER_IDX_NONE=-1
@@ -90,7 +90,7 @@ struct BackGameInformation2 {
 	unsigned int state_;
 	unsigned int accessibleLogicQuantPeriod_;
 	bool operator == (const BackGameInformation2 &secop) const {
-		//lagQuant не сравнивается !
+		//lagQuant РЅРµ СЃСЂР°РІРЅРёРІР°РµС‚СЃСЏ !
 		return ( (quant_ == secop.quant_) && 
 			(signature_== secop.signature_) );
 	}
@@ -203,9 +203,9 @@ public:
 	void writeNet(XBuffer& out) const;
 
 	int revision() const { return revision_; }
-	const char* worldName() const { return worldName_.c_str(); } // Имя мира без пути
-	const char* saveName() const { return saveName_.c_str(); } // Путь + имя spg
-	const char* interfaceName() const { return interfaceName_.c_str(); } // Имя сейва или реплея без расширения и пути
+	const char* worldName() const { return worldName_.c_str(); } // РРјСЏ РјРёСЂР° Р±РµР· РїСѓС‚Рё
+	const char* saveName() const { return saveName_.c_str(); } // РџСѓС‚СЊ + РёРјСЏ spg
+	const char* interfaceName() const { return interfaceName_.c_str(); } // РРјСЏ СЃРµР№РІР° РёР»Рё СЂРµРїР»РµСЏ Р±РµР· СЂР°СЃС€РёСЂРµРЅРёСЏ Рё РїСѓС‚Рё
 	const GUID& missionGUID() const { return missionGUID_; }
 	const wchar_t* missionDescription() const { return missionDescription_.c_str(); }
 	const char* reelName() const { return reelName_.c_str(); }

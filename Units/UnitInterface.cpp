@@ -43,7 +43,7 @@ void UnitInterface::applyParameterArithmeticsImpl(const ArithmeticsData& arithme
 void UnitInterface::sendCommand(const UnitCommand& command)
 {
 	switch(command.commandID()) {
-	// исполняются непосредственно, на повторяемость не влияет
+	// РёСЃРїРѕР»РЅСЏСЋС‚СЃСЏ РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕ, РЅР° РїРѕРІС‚РѕСЂСЏРµРјРѕСЃС‚СЊ РЅРµ РІР»РёСЏРµС‚
 	case COMMAND_ID_CAMERA_FOCUS:
 	case COMMAND_ID_SELECT_SELF:
 		if(player()->active())
@@ -295,8 +295,8 @@ void UnitInterface::setUsedByTrigger(int priority, const void* action, int time)
 			startEffect(&player()->race()->workForAIEffect());
 		
 		XBuffer buffer;
-		buffer < "Предыдущий триггер: " < usedTriggerName_.c_str() < ", новый: " < Trigger::currentTriggerName();
-		xassertStr((!usedByTriggerPriority_ || priority < usedByTriggerPriority_) && "Повторное включение usedByTrigger в триггере", buffer);
+		buffer < "РџСЂРµРґС‹РґСѓС‰РёР№ С‚СЂРёРіРіРµСЂ: " < usedTriggerName_.c_str() < ", РЅРѕРІС‹Р№: " < Trigger::currentTriggerName();
+		xassertStr((!usedByTriggerPriority_ || priority < usedByTriggerPriority_) && "РџРѕРІС‚РѕСЂРЅРѕРµ РІРєР»СЋС‡РµРЅРёРµ usedByTrigger РІ С‚СЂРёРіРіРµСЂРµ", buffer);
 		usedTriggerName_ = Trigger::currentTriggerName();
 		usedByTriggerPriority_ = priority;
 		usedByTriggerAction_ = action;
@@ -308,7 +308,7 @@ void UnitInterface::setUsedByTrigger(int priority, const void* action, int time)
 		if(universe()->interfaceEnabled() && player()->active())
 			stopEffect(&player()->race()->workForAIEffect());
 
-		xassertStr((usedByTriggerPriority_ || action && action != usedByTriggerAction_) && "Повторное выключение usedByTrigger в триггере", Trigger::currentTriggerName());
+		xassertStr((usedByTriggerPriority_ || action && action != usedByTriggerAction_) && "РџРѕРІС‚РѕСЂРЅРѕРµ РІС‹РєР»СЋС‡РµРЅРёРµ usedByTrigger РІ С‚СЂРёРіРіРµСЂРµ", Trigger::currentTriggerName());
 		usedByTriggerPriority_ = 0;
 		usedByTriggerAction_ = 0;
 		usedByTriggerTimer_.stop();

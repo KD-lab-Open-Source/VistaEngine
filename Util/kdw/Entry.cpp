@@ -9,7 +9,7 @@
 #include "Serialization/SerializationFactory.h"
 
 namespace kdw{
-REGISTER_CLASS(Widget, Entry, "Поле ввода");
+REGISTER_CLASS(Widget, Entry, "РџРѕР»Рµ РІРІРѕРґР°");
 
 #pragma warning(push)
 #pragma warning(disable: 4355) // 'this' : used in base member initializer list
@@ -189,7 +189,7 @@ void Entry::setText(const char* text)
 void Entry::serialize(Archive& ar)
 {
 	if(ar.filter(SERIALIZE_DESIGN)){
-		ar.serialize(text_, "text", "&Текст");
+		ar.serialize(text_, "text", "&РўРµРєСЃС‚");
 	}
 	Widget::serialize(ar);
 }

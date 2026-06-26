@@ -16,7 +16,7 @@ public:
 	bool inited(const char* binkFileName) const;
 	void release();
 
-	/// запустить/перезапустить проигрывание
+	/// Р·Р°РїСѓСЃС‚РёС‚СЊ/РїРµСЂРµР·Р°РїСѓСЃС‚РёС‚СЊ РїСЂРѕРёРіСЂС‹РІР°РЅРёРµ
 	void play();
 	void stop();
 	
@@ -36,7 +36,7 @@ public:
 	void setUpdated();
 	void ui_quant();
 	
-	/// текущий кадр
+	/// С‚РµРєСѓС‰РёР№ РєР°РґСЂ
 	cTexture* texture() const;
 	Vect2f size() const;
 

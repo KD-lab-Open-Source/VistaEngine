@@ -728,14 +728,14 @@ void UI_ControlBase::actionExecute(UI_ControlActionID action_id, const UI_Action
 				
 				if(p->playerUnit())
 					commandUnit = UI_LogicDispatcher::instance().player()->playerUnit();
-				else if(const UI_ControlUnitList* own = dynamic_cast<const UI_ControlUnitList*>(owner())){ // ��� ������ ������ ����� ������ ������ ��������� ��������
+				else if(const UI_ControlUnitList* own = dynamic_cast<const UI_ControlUnitList*>(owner())){ // для списка юнитов нужно узнать индекс дочернего контрола
 					xassert(std::find(own->controlList().begin(), own->controlList().end(), this) != own->controlList().end());
 					int child_index = std::distance(own->controlList().begin(), std::find(own->controlList().begin(), own->controlList().end(), this));
 					switch(own->GetType()){
-					case UI_UNITLIST_SELECTED: // ��� ������ ���������� ����� ����� ����������� �����
+					case UI_UNITLIST_SELECTED: // для списка выделенных нужно найти конкретного юнита
 						selectedSlot = child_index;
 						break;
-					case UI_UNITLIST_PRODUCTION: // ���������������� �������
+					case UI_UNITLIST_PRODUCTION: // конкретизировать команду
 					case UI_UNITLIST_TRANSPORT:					
 						command = UnitCommand(command.commandID(), child_index);
 						break;
@@ -750,7 +750,7 @@ void UI_ControlBase::actionExecute(UI_ControlActionID action_id, const UI_Action
 						break;
 													  }
 					default:
-						xassert(0 && "����� ��� ������ �������");
+						xassert(0 && "новый тип списка селекта");
 					}
 					uniform = false;
 				}
@@ -1631,7 +1631,7 @@ void UI_ControlEdit::quant(float dt)
 
 		if(caretTimer_ <= 0.f){
 			caretVisible_ = !caretVisible_;
-			caretTimer_ = 0.5f; // ������ ������� �������
+			caretTimer_ = 0.5f; // Период мигания курсора
 		}
 	}
 }
@@ -1994,10 +1994,10 @@ bool UI_ControlCustom::inputEventHandler(const UI_InputEvent& ev)
 
 void UI_ControlUnitList::controlUpdate(ControlState& cs){
 	start_timer_auto();
-	// �������� ���:
-	// ���� ������ �������� ��������� (������� ������) �� ����� ������ ��������� ��� ����������� ������
-	// ��������� �� ���������� ��������������� � �������, ������� ������ � selectManager, ��������� ������
-	// �������������� � ������ �����: ������ �������� � ������ �������� ������������� ������� ����� � selectManager
+	// работаем так:
+	// есть список дочерних контролов (простых кнопок) по числу слотов доступных для отображения юнитов
+	// заполняем их текстурами асоциированными с юнитами, которые сейчас в selectManager, остальные чистим
+	// отождествление с юнитом такое: индекс контрола в списке дочерних соответствует индексу юнита в selectManager
 	if(!UI_LogicDispatcher::instance().isGameActive())
 		return;
 

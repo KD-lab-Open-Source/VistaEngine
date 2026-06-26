@@ -13,7 +13,7 @@ public:
 	void setBorder(int border);
 	// ^^^
 
-	// методы для внутреннего пользования:
+	// РјРµС‚РѕРґС‹ РґР»СЏ РІРЅСѓС‚СЂРµРЅРЅРµРіРѕ РїРѕР»СЊР·РѕРІР°РЅРёСЏ:
 	virtual void _arrangeChildren() {}
 	void _setFocus();
 	Widget* _nextWidget(Widget* last, FocusDirection direction);

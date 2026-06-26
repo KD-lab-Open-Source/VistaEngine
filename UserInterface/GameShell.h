@@ -145,18 +145,18 @@ public:
 	bool GameActive;
 	bool mainMenuEnabled_;
 
-	/// ������� ������ ������������ �����
+	/// отсылка команд управляемому юниту
 	void directControlQuant();
 
 	void setDirectControl(DirectControlMode mode, UnitInterface* unit, int transitionTime);
 
-	// ������������������� �������, ������������ � �������������
+	// недетерминированные функции, пользоваться с осторожностью
 	bool directControl() const { return directControl_; }
 	bool underHalfDirectControl() const { return directControl_ & SYNDICATE_CONTROL_ENABLED; }
 	bool underFullDirectControl() const { return directControl_ & DIRECT_CONTROL_ENABLED; }
 	
 	UnitReal* unitHover(const Vect3f& v0, const Vect3f& v1, float& distMin) const;
-	// ���������� deviceCoords (-0.5f, -0.5f)-(0.5f, 0.5f)
+	// передается deviceCoords (-0.5f, -0.5f)-(0.5f, 0.5f)
 	void unitsInArea(const Rectf& dev, UnitInterfaceList& out_list, UnitInterface* preferendUnit = 0, const AttributeBase* attr_filter = 0) const;
 
 	int MouseMoveFlag;
@@ -297,7 +297,7 @@ private:
 	QuantTimeStatistic quantTimeStatistic;
 	int gameReadyCounter_;
 
-	/// ������ ���������� ������
+	/// прямое управление юнитом
 	DirectControlMode directControl_;
 
 	//---------------------------------

@@ -349,7 +349,7 @@ struct netCommandNextQuant : NetCommandGeneral<NETCOM4G_NextQuant>
 
 
 //------------------------------
-//Сейчас фактически не используется т.к. запускается её внутренний аналог - ExecuteInternalCommand(PNC_COMMAND__START_HOST_AND_CREATE_GAME_AND_STOP_FIND_HOST, true);
+//РЎРµР№С‡Р°СЃ С„Р°РєС‚РёС‡РµСЃРєРё РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ С‚.Рє. Р·Р°РїСѓСЃРєР°РµС‚СЃСЏ РµС‘ РІРЅСѓС‚СЂРµРЅРЅРёР№ Р°РЅР°Р»РѕРі - ExecuteInternalCommand(PNC_COMMAND__START_HOST_AND_CREATE_GAME_AND_STOP_FIND_HOST, true);
 //struct netCommand4H_CreateGame : NetCommandGeneral<NETCOM4H_CreateGame> {
 //	MissionDescription missionDescription_;
 //	PlayerData createPlayerData_;

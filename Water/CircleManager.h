@@ -18,13 +18,13 @@ public:
 	void PreDraw(Camera* camera);
 	void Draw(Camera* camera);
 
-	void addCircle(const Vect2f& pos, float radius, const CircleManagerParam& param); // Выбор слоя идет по адресу параметра, т.е. сливаются круги одного цвета
+	void addCircle(const Vect2f& pos, float radius, const CircleManagerParam& param); // Р’С‹Р±РѕСЂ СЃР»РѕСЏ РёРґРµС‚ РїРѕ Р°РґСЂРµСЃСѓ РїР°СЂР°РјРµС‚СЂР°, С‚.Рµ. СЃР»РёРІР°СЋС‚СЃСЏ РєСЂСѓРіРё РѕРґРЅРѕРіРѕ С†РІРµС‚Р°
 
 	void SetLegionColor(Color4c color);
 	int sortIndex()const{return 1;}
 
 	void clear();
-	void clearLayers(); // Чистит круги в слоях, но сами слои не чистит
+	void clearLayers(); // Р§РёСЃС‚РёС‚ РєСЂСѓРіРё РІ СЃР»РѕСЏС…, РЅРѕ СЃР°РјРё СЃР»РѕРё РЅРµ С‡РёСЃС‚РёС‚
 
 	CircleManagerDrawOrder GetDrawOrder(){return drawOrder_;}
 	void SetDrawOrder(CircleManagerDrawOrder order){drawOrder_=order;}

@@ -13,8 +13,8 @@
 #include "Render/Src/TexLibrary.h"
 
 BEGIN_ENUM_DESCRIPTOR(ModeFall,"ModeFall");
-REGISTER_ENUM(FALLOUT_RAIN, "Дождь");
-REGISTER_ENUM(FALLOUT_SNOW, "Снег");
+REGISTER_ENUM(FALLOUT_RAIN, "Р”РѕР¶РґСЊ");
+REGISTER_ENUM(FALLOUT_SNOW, "РЎРЅРµРі");
 END_ENUM_DESCRIPTOR(ModeFall);
 
 
@@ -550,18 +550,18 @@ FallaoutSnowAttributes::FallaoutSnowAttributes()
 }
 void FallaoutSnowAttributes::serialize(Archive& ar)
 {
-	ar.serialize(enable_, "enable", "Вкл.");
+	ar.serialize(enable_, "enable", "Р’РєР».");
 	if (ar.isEdit())
 	{
 		float sz = size_*100.f;
-		ar.serialize(RangedWrapperf(sz, 0, 100, 0.01f), "size", "Размер");
+		ar.serialize(RangedWrapperf(sz, 0, 100, 0.01f), "size", "Р Р°Р·РјРµСЂ");
 		size_ = sz/100.f;
 	}else
 	{
-		ar.serialize(RangedWrapperf(size_, 0, 1, 0.01f), "size", "Размер");
+		ar.serialize(RangedWrapperf(size_, 0, 1, 0.01f), "size", "Р Р°Р·РјРµСЂ");
 	}
 	static ResourceSelector::Options textureOptions("*.tga", "Resource\\TerrainData\\Textures");
-	ar.serialize(ResourceSelector (textureName_, textureOptions), "textureName", "Текстура");
+	ar.serialize(ResourceSelector (textureName_, textureOptions), "textureName", "РўРµРєСЃС‚СѓСЂР°");
 }
 
 FalloutRainRipplesAttributes::FalloutRainRipplesAttributes()
@@ -574,10 +574,10 @@ FalloutRainRipplesAttributes::FalloutRainRipplesAttributes()
 void FalloutRainRipplesAttributes::serialize(Archive& ar)
 {
 	static ResourceSelector::Options aviOptions("*.avi", "Resource\\TerrainData\\Textures");
-	ar.serialize(size_, "size", "Размер");
-	ar.serialize(time_, "time", "Время цикла");
-	ar.serialize(minWaterHeight_, "minWaterHeight", "Минимальная глубина");
-	ar.serialize(ResourceSelector (textureName_, aviOptions), "textureName", "Текстура");
+	ar.serialize(size_, "size", "Р Р°Р·РјРµСЂ");
+	ar.serialize(time_, "time", "Р’СЂРµРјСЏ С†РёРєР»Р°");
+	ar.serialize(minWaterHeight_, "minWaterHeight", "РњРёРЅРёРјР°Р»СЊРЅР°СЏ РіР»СѓР±РёРЅР°");
+	ar.serialize(ResourceSelector (textureName_, aviOptions), "textureName", "РўРµРєСЃС‚СѓСЂР°");
 }
 FalloutRainAttributes::FalloutRainAttributes()
 {
@@ -589,8 +589,8 @@ FalloutRainAttributes::FalloutRainAttributes()
 void FalloutRainAttributes::serialize(Archive& ar)
 {
 	__super::serialize(ar);
-	ar.serialize(color_, "color", "Цвет дождя");
-	ar.serialize(ripples_,"ripples","Круги на воде");
+	ar.serialize(color_, "color", "Р¦РІРµС‚ РґРѕР¶РґСЏ");
+	ar.serialize(ripples_,"ripples","РљСЂСѓРіРё РЅР° РІРѕРґРµ");
 }
 
 FalloutAttributes::FalloutAttributes()
@@ -600,9 +600,9 @@ FalloutAttributes::FalloutAttributes()
 
 void FalloutAttributes::serialize(Archive& ar)
 {
-	ar.serialize(rain_,"rain","Дождь");
-	ar.serialize(snow_,"snow","Снег");
-	ar.serialize(intensity_,"intensity","Интенсивность осадков");
+	ar.serialize(rain_,"rain","Р”РѕР¶РґСЊ");
+	ar.serialize(snow_,"snow","РЎРЅРµРі");
+	ar.serialize(intensity_,"intensity","РРЅС‚РµРЅСЃРёРІРЅРѕСЃС‚СЊ РѕСЃР°РґРєРѕРІ");
 }
 
 void cFallout::serialize(Archive& ar)

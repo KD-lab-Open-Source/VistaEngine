@@ -27,7 +27,7 @@ struct OneChar
 		uint16 v; //top
 		uint8 du; // width
 		uint8 dv; // height
-		int8 su; // �������� �� ������ �������� ����
+		int8 su; // смещение от левого верхнего угла
 		int8 sv;
 		int8 lh; //left hinding
 		int8 rh; //right hinding
@@ -39,7 +39,7 @@ struct OneChar
 struct FontParam
 {
 	enum HintMode {
-		DEFAULT, //���� ����, �� ttf native hinting, ���� ����, �� FreeType auto hinting
+		DEFAULT, //если есть, то ttf native hinting, если нету, то FreeType auto hinting
 		BYTE_CODE_ONLY, //ttf native hinting
 		AUTO_HINT_ONLY, //FreeType auto hinting
 		NO_HINTING
@@ -47,9 +47,9 @@ struct FontParam
 
 	FontParam() : nonPow2(false), inBox(false), antialiasing(false), hinting(DEFAULT) {}
 	
-	bool nonPow2; // �� ������ �������� ����� ����������� �� ��������� �������
-	bool inBox; // ���������� ��������� ������
-	bool antialiasing; // 256 �������� ������, ����� 1 ������
+	bool nonPow2; // по высоте текстура точно поджимается по реальному размеру
+	bool inBox; // окружается вписанной рамкой
+	bool antialiasing; // 256 градаций серого, иначе 1 битный
 	HintMode hinting;
 };
 
@@ -61,9 +61,9 @@ class Font
 	friend class FontManager;
 public:
 
-	// �������� ������ ������ � ��������
+	// заданный размер шрифта в пикселах
 	uint16 size() const { return size_; }
-	// ������������ ���������� ����� ������� � ������ ������ ������
+	// максимальное расстояние между верхней и нижней точкой шрифта
 	uint16 lineHeight() const { return lineHeight_; }
 
 	const FontParam& param() const { return param_; }
@@ -110,12 +110,12 @@ private:
 
 	class FT_Render* render_;
 	
-	// ������� �������� utf16 ���� ������� � ������ (Font::charTable_) ���������� ������� ������������� � ��������.
-	// ���, ��� ���� ��� ������������ ������� � ��������, ��������� �� ������ � ������� ��������
+	// таблица перевода utf16 кода символа в индекс (Font::charTable_) имеющегося символа отрендереного в текстуру.
+	// все, для кого нет собственного символа в текстуре, ссылаются на символ с нулевым индексом
 	uint16 index_[0xFFFF + 1];
 
 	typedef std::vector<uint16> Chars;
-	// ������������ �������. ������ ��� ������� ���������� � �������� ��� �������� ������ � ������� � Font::charTable_
+	// Используемые символы. Только эти символы рендерятся в текстуру при создании шрифта и пишутся в Font::charTable_
 	Chars chars_;
 
 	ShortSize calcTextureSize(bool nonPow2);

@@ -27,76 +27,76 @@
 #include "Util/Serialization/RangedWrapper.h"
 
 BEGIN_ENUM_DESCRIPTOR(ActivationMove, "ActivationMove")
-REGISTER_ENUM(ACTIVATION_MOVE_LEFT, "Слева");
-REGISTER_ENUM(ACTIVATION_MOVE_BOTTOM, "Снизу");
-REGISTER_ENUM(ACTIVATION_MOVE_RIGHT, "Справа");
-REGISTER_ENUM(ACTIVATION_MOVE_TOP, "Сверху");
-REGISTER_ENUM(ACTIVATION_MOVE_CENTER, "Из центра");
+REGISTER_ENUM(ACTIVATION_MOVE_LEFT, "РЎР»РµРІР°");
+REGISTER_ENUM(ACTIVATION_MOVE_BOTTOM, "РЎРЅРёР·Сѓ");
+REGISTER_ENUM(ACTIVATION_MOVE_RIGHT, "РЎРїСЂР°РІР°");
+REGISTER_ENUM(ACTIVATION_MOVE_TOP, "РЎРІРµСЂС…Сѓ");
+REGISTER_ENUM(ACTIVATION_MOVE_CENTER, "РР· С†РµРЅС‚СЂР°");
 END_ENUM_DESCRIPTOR(ActivationMove)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(UI_ControlBase, ResizeShiftHorizontal, "UI_ControlBase::ResizeShiftHorizontal")
-REGISTER_ENUM_ENCLOSED(UI_ControlBase, RESIZE_SHIFT_LEFT, "влево");
-REGISTER_ENUM_ENCLOSED(UI_ControlBase, RESIZE_SHIFT_CENTER_H, "в центр");
-REGISTER_ENUM_ENCLOSED(UI_ControlBase, RESIZE_SHIFT_RIGHT, "вправо");
+REGISTER_ENUM_ENCLOSED(UI_ControlBase, RESIZE_SHIFT_LEFT, "РІР»РµРІРѕ");
+REGISTER_ENUM_ENCLOSED(UI_ControlBase, RESIZE_SHIFT_CENTER_H, "РІ С†РµРЅС‚СЂ");
+REGISTER_ENUM_ENCLOSED(UI_ControlBase, RESIZE_SHIFT_RIGHT, "РІРїСЂР°РІРѕ");
 END_ENUM_DESCRIPTOR_ENCLOSED(UI_ControlBase, ResizeShiftHorizontal)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(UI_ControlBase, ResizeShiftVertical, "UI_ControlBase::ResizeShiftVertical")
-REGISTER_ENUM_ENCLOSED(UI_ControlBase, RESIZE_SHIFT_UP, "вверх");
-REGISTER_ENUM_ENCLOSED(UI_ControlBase, RESIZE_SHIFT_CENTER_V, "в центр");
-REGISTER_ENUM_ENCLOSED(UI_ControlBase, RESIZE_SHIFT_DOWN, "вниз");
+REGISTER_ENUM_ENCLOSED(UI_ControlBase, RESIZE_SHIFT_UP, "РІРІРµСЂС…");
+REGISTER_ENUM_ENCLOSED(UI_ControlBase, RESIZE_SHIFT_CENTER_V, "РІ С†РµРЅС‚СЂ");
+REGISTER_ENUM_ENCLOSED(UI_ControlBase, RESIZE_SHIFT_DOWN, "РІРЅРёР·");
 END_ENUM_DESCRIPTOR_ENCLOSED(UI_ControlBase, ResizeShiftVertical)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(UI_Transform, Type, "UI_Transform::Type")
-REGISTER_ENUM_ENCLOSED(UI_Transform, TRANSFORM_COORDS, "Перемещение")
-REGISTER_ENUM_ENCLOSED(UI_Transform, TRANSFORM_SCALE_X, "Масштабирование по горизонтали")
-REGISTER_ENUM_ENCLOSED(UI_Transform, TRANSFORM_SCALE_Y, "Масштабирование по вертикали")
-REGISTER_ENUM_ENCLOSED(UI_Transform, TRANSFORM_ALPHA, "Прозрачность")
+REGISTER_ENUM_ENCLOSED(UI_Transform, TRANSFORM_COORDS, "РџРµСЂРµРјРµС‰РµРЅРёРµ")
+REGISTER_ENUM_ENCLOSED(UI_Transform, TRANSFORM_SCALE_X, "РњР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёРµ РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё")
+REGISTER_ENUM_ENCLOSED(UI_Transform, TRANSFORM_SCALE_Y, "РњР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёРµ РїРѕ РІРµСЂС‚РёРєР°Р»Рё")
+REGISTER_ENUM_ENCLOSED(UI_Transform, TRANSFORM_ALPHA, "РџСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ")
 END_ENUM_DESCRIPTOR_ENCLOSED(UI_Transform, Type)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(UI_Transform, ScaleMode, "UI_Transform::ScaleMode")
-REGISTER_ENUM_ENCLOSED(UI_Transform, SCALE_CENTER, "от центра")
-REGISTER_ENUM_ENCLOSED(UI_Transform, SCALE_LEFT, "от левого края")
-REGISTER_ENUM_ENCLOSED(UI_Transform, SCALE_TOP, "от верхнего края")
-REGISTER_ENUM_ENCLOSED(UI_Transform, SCALE_RIGHT, "от правого края")
-REGISTER_ENUM_ENCLOSED(UI_Transform, SCALE_BOTTOM, "от нижнего края")
+REGISTER_ENUM_ENCLOSED(UI_Transform, SCALE_CENTER, "РѕС‚ С†РµРЅС‚СЂР°")
+REGISTER_ENUM_ENCLOSED(UI_Transform, SCALE_LEFT, "РѕС‚ Р»РµРІРѕРіРѕ РєСЂР°СЏ")
+REGISTER_ENUM_ENCLOSED(UI_Transform, SCALE_TOP, "РѕС‚ РІРµСЂС…РЅРµРіРѕ РєСЂР°СЏ")
+REGISTER_ENUM_ENCLOSED(UI_Transform, SCALE_RIGHT, "РѕС‚ РїСЂР°РІРѕРіРѕ РєСЂР°СЏ")
+REGISTER_ENUM_ENCLOSED(UI_Transform, SCALE_BOTTOM, "РѕС‚ РЅРёР¶РЅРµРіРѕ РєСЂР°СЏ")
 END_ENUM_DESCRIPTOR_ENCLOSED(UI_Transform, ScaleMode)
 
-REGISTER_CLASS(UI_Text, UI_Text, "текст");
-WRAP_LIBRARY(UI_TextLibrary, "UI_TextLibrary", "Сообщения", "Scripts\\Content\\UI_TextLibrary", 0, LIBRARY_EDITABLE);
+REGISTER_CLASS(UI_Text, UI_Text, "С‚РµРєСЃС‚");
+WRAP_LIBRARY(UI_TextLibrary, "UI_TextLibrary", "РЎРѕРѕР±С‰РµРЅРёСЏ", "Scripts\\Content\\UI_TextLibrary", 0, LIBRARY_EDITABLE);
 
-REGISTER_CLASS(UI_Font, UI_Font, "шрифт");
-WRAP_LIBRARY(UI_FontLibrary, "UI_FontLibrary", "Шрифты", "Scripts\\Content\\UI_FontAttributes", 0, LIBRARY_EDITABLE);
+REGISTER_CLASS(UI_Font, UI_Font, "С€СЂРёС„С‚");
+WRAP_LIBRARY(UI_FontLibrary, "UI_FontLibrary", "РЁСЂРёС„С‚С‹", "Scripts\\Content\\UI_FontAttributes", 0, LIBRARY_EDITABLE);
 
-REGISTER_CLASS(UI_Cursor, UI_Cursor, "курсор");
-WRAP_LIBRARY(UI_CursorLibrary, "UI_CursorLibrary", "Курсоры", "Scripts\\Content\\UI_CursorLibrary", 0, LIBRARY_EDITABLE);
+REGISTER_CLASS(UI_Cursor, UI_Cursor, "РєСѓСЂСЃРѕСЂ");
+WRAP_LIBRARY(UI_CursorLibrary, "UI_CursorLibrary", "РљСѓСЂСЃРѕСЂС‹", "Scripts\\Content\\UI_CursorLibrary", 0, LIBRARY_EDITABLE);
 
-WRAP_LIBRARY(UI_ShowModeSpriteTable, "UI_ShowModeSpriteTable", "Спрайты для кнопки", "Scripts\\Content\\UI_ShowModeSpriteTable", 0, LIBRARY_EDITABLE);
+WRAP_LIBRARY(UI_ShowModeSpriteTable, "UI_ShowModeSpriteTable", "РЎРїСЂР°Р№С‚С‹ РґР»СЏ РєРЅРѕРїРєРё", "Scripts\\Content\\UI_ShowModeSpriteTable", 0, LIBRARY_EDITABLE);
 
-REGISTER_CLASS(UI_SpriteLibrary, UI_SpriteLibrary, "Спрайт");
-WRAP_LIBRARY(UI_SpriteLibrary, "UI_SpriteLibrary", "Картинки для вставки в текст", "Scripts\\Content\\UI_TextSprite", 0, LIBRARY_EDITABLE);
+REGISTER_CLASS(UI_SpriteLibrary, UI_SpriteLibrary, "РЎРїСЂР°Р№С‚");
+WRAP_LIBRARY(UI_SpriteLibrary, "UI_SpriteLibrary", "РљР°СЂС‚РёРЅРєРё РґР»СЏ РІСЃС‚Р°РІРєРё РІ С‚РµРєСЃС‚", "Scripts\\Content\\UI_TextSprite", 0, LIBRARY_EDITABLE);
 
-REGISTER_CLASS(UI_MessageTypeLibrary, UI_MessageTypeLibrary, "Тип сообщения");
-WRAP_LIBRARY(UI_MessageTypeLibrary, "UI_MessageTypeLibrary", "Типы выводимых сообщений", "Scripts\\Content\\UI_MessageTypes", 0, LIBRARY_EDITABLE);
+REGISTER_CLASS(UI_MessageTypeLibrary, UI_MessageTypeLibrary, "РўРёРї СЃРѕРѕР±С‰РµРЅРёСЏ");
+WRAP_LIBRARY(UI_MessageTypeLibrary, "UI_MessageTypeLibrary", "РўРёРїС‹ РІС‹РІРѕРґРёРјС‹С… СЃРѕРѕР±С‰РµРЅРёР№", "Scripts\\Content\\UI_MessageTypes", 0, LIBRARY_EDITABLE);
 
-REGISTER_CLASS(UI_ControlShowMode, UI_ControlShowMode, "режим отрисовки");
+REGISTER_CLASS(UI_ControlShowMode, UI_ControlShowMode, "СЂРµР¶РёРј РѕС‚СЂРёСЃРѕРІРєРё");
 
-REGISTER_CLASS(UI_EffectAttribute, UI_EffectAttribute, "привязанный эффект");
+REGISTER_CLASS(UI_EffectAttribute, UI_EffectAttribute, "РїСЂРёРІСЏР·Р°РЅРЅС‹Р№ СЌС„С„РµРєС‚");
 
-REGISTER_CLASS(UI_ControlBase, UI_ControlButton, "обычная кнопка");
-REGISTER_CLASS(UI_ControlBase, UI_ControlSlider, "регулятор");
-REGISTER_CLASS(UI_ControlBase, UI_ControlTab, "набор вкладок");
-REGISTER_CLASS(UI_ControlBase, UI_ControlStringList, "список");
-REGISTER_CLASS(UI_ControlBase, UI_ControlStringCheckedList, "список с пометками");
-REGISTER_CLASS(UI_ControlBase, UI_ControlComboList, "выпадающий список");
-REGISTER_CLASS(UI_ControlBase, UI_ControlEdit, "поле ввода");
-REGISTER_CLASS(UI_ControlBase, UI_ControlHotKeyInput, "ввод горячей клавиши");
-REGISTER_CLASS(UI_ControlBase, UI_ControlProgressBar, "индикатор прогресса");
-REGISTER_CLASS(UI_ControlBase, UI_ControlCustom, "специальная кнопка");
-REGISTER_CLASS(UI_ControlBase, UI_ControlTextList, "список текстов");
-REGISTER_CLASS(UI_ControlBase, UI_ControlUnitList, "список юнитов");
-REGISTER_CLASS(UI_ControlBase, UI_ControlCustomList, "список сообщений");
-REGISTER_CLASS(UI_ControlBase, UI_ControlInventory, "инвентарь");
-REGISTER_CLASS(UI_ControlBase, UI_ControlVideo, "видео");
+REGISTER_CLASS(UI_ControlBase, UI_ControlButton, "РѕР±С‹С‡РЅР°СЏ РєРЅРѕРїРєР°");
+REGISTER_CLASS(UI_ControlBase, UI_ControlSlider, "СЂРµРіСѓР»СЏС‚РѕСЂ");
+REGISTER_CLASS(UI_ControlBase, UI_ControlTab, "РЅР°Р±РѕСЂ РІРєР»Р°РґРѕРє");
+REGISTER_CLASS(UI_ControlBase, UI_ControlStringList, "СЃРїРёСЃРѕРє");
+REGISTER_CLASS(UI_ControlBase, UI_ControlStringCheckedList, "СЃРїРёСЃРѕРє СЃ РїРѕРјРµС‚РєР°РјРё");
+REGISTER_CLASS(UI_ControlBase, UI_ControlComboList, "РІС‹РїР°РґР°СЋС‰РёР№ СЃРїРёСЃРѕРє");
+REGISTER_CLASS(UI_ControlBase, UI_ControlEdit, "РїРѕР»Рµ РІРІРѕРґР°");
+REGISTER_CLASS(UI_ControlBase, UI_ControlHotKeyInput, "РІРІРѕРґ РіРѕСЂСЏС‡РµР№ РєР»Р°РІРёС€Рё");
+REGISTER_CLASS(UI_ControlBase, UI_ControlProgressBar, "РёРЅРґРёРєР°С‚РѕСЂ РїСЂРѕРіСЂРµСЃСЃР°");
+REGISTER_CLASS(UI_ControlBase, UI_ControlCustom, "СЃРїРµС†РёР°Р»СЊРЅР°СЏ РєРЅРѕРїРєР°");
+REGISTER_CLASS(UI_ControlBase, UI_ControlTextList, "СЃРїРёСЃРѕРє С‚РµРєСЃС‚РѕРІ");
+REGISTER_CLASS(UI_ControlBase, UI_ControlUnitList, "СЃРїРёСЃРѕРє СЋРЅРёС‚РѕРІ");
+REGISTER_CLASS(UI_ControlBase, UI_ControlCustomList, "СЃРїРёСЃРѕРє СЃРѕРѕР±С‰РµРЅРёР№");
+REGISTER_CLASS(UI_ControlBase, UI_ControlInventory, "РёРЅРІРµРЅС‚Р°СЂСЊ");
+REGISTER_CLASS(UI_ControlBase, UI_ControlVideo, "РІРёРґРµРѕ");
 
 // ------------------- UI_Text
 
@@ -106,8 +106,8 @@ UI_Text::UI_Text()
 
 void UI_Text::serialize(Archive& ar)
 {
-	ar.serialize(text_, "text", "&Текст (Лок)");
-	ar.serialize(voice_, "voiceAttribute", "Голосовое сообщение");
+	ar.serialize(text_, "text", "&РўРµРєСЃС‚ (Р›РѕРє)");
+	ar.serialize(voice_, "voiceAttribute", "Р“РѕР»РѕСЃРѕРІРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ");
 }
 
 // ------------------- UI_Mask
@@ -122,7 +122,7 @@ UI_Mask::~UI_Mask()
 
 void UI_Mask::serialize(Archive& ar)
 {
-	ar.serialize(polygon_, "polygon", "контур");
+	ar.serialize(polygon_, "polygon", "РєРѕРЅС‚СѓСЂ");
 }
 
 bool UI_Mask::hitTest(const Vect2f& p) const
@@ -179,16 +179,16 @@ UI_Cursor::~UI_Cursor()
 void UI_Cursor::serialize(Archive& ar)
 {
 	static ResourceSelector::Options options("*.cur", "Resource\\Cursors", "Cursors");
-	ar.serialize(ResourceSelector(fileName_, options), "fileName", "Имя файла");
-	ar.serialize(effectRef_, "effect", "Эффект");
+	ar.serialize(ResourceSelector(fileName_, options), "fileName", "РРјСЏ С„Р°Р№Р»Р°");
+	ar.serialize(effectRef_, "effect", "Р­С„С„РµРєС‚");
 }
 
 bool UI_Cursor::createCursor(const char* fname/*=*/)
 {
 	releaseCursor();
-	// Обновляем путь к файлу только если он не NULL
+	// РћР±РЅРѕРІР»СЏРµРј РїСѓС‚СЊ Рє С„Р°Р№Р»Сѓ С‚РѕР»СЊРєРѕ РµСЃР»Рё РѕРЅ РЅРµ NULL
 	if (NULL != fname) fileName_ = fname;
-	if (fileName_.empty()) return true; // Путь пустой => курсор NULL - все как надо
+	if (fileName_.empty()) return true; // РџСѓС‚СЊ РїСѓСЃС‚РѕР№ => РєСѓСЂСЃРѕСЂ NULL - РІСЃРµ РєР°Рє РЅР°РґРѕ
 
 	releaseCursor();
 	cursor_ = (HCURSOR)LoadImage(0, fileName_.c_str(), IMAGE_CURSOR, 0, 0, LR_LOADFROMFILE);
@@ -222,16 +222,16 @@ UI_TextFormat::UI_TextFormat(const Color4c& color, const Color4c& shadow)
 
 void UI_TextFormat::serialize(Archive& ar)
 {
-	ar.serialize(textColor_, "textColor", "Цвет текста");
-	ar.serialize(shadowColor_, "shadowColor", "Цвет тени");
+	ar.serialize(textColor_, "textColor", "Р¦РІРµС‚ С‚РµРєСЃС‚Р°");
+	ar.serialize(shadowColor_, "shadowColor", "Р¦РІРµС‚ С‚РµРЅРё");
 }
 
 // ------------------- UI_ControlShowMode
 
 void UI_ControlShowMode::ActivateSound::serialize(Archive& ar)
 {
-	ar.serialize(sourceMode_, "sourceModes", "Из какого переключилось");
-	ar.serialize(soundReference_, "soundReference", "Звук активации");
+	ar.serialize(sourceMode_, "sourceModes", "РР· РєР°РєРѕРіРѕ РїРµСЂРµРєР»СЋС‡РёР»РѕСЃСЊ");
+	ar.serialize(soundReference_, "soundReference", "Р—РІСѓРє Р°РєС‚РёРІР°С†РёРё");
 }
 
 UI_ControlShowMode::UI_ControlShowMode()
@@ -260,17 +260,17 @@ void UI_ControlShowMode::release()
 
 void UI_ControlShowMode::serialize(Archive& ar)
 {
-	ar.serialize(sprite_, "sprite_", "<текстура");
-	ar.serialize(spriteTiled_, "spriteTiled", "зациклить текстуру");
+	ar.serialize(sprite_, "sprite_", "<С‚РµРєСЃС‚СѓСЂР°");
+	ar.serialize(spriteTiled_, "spriteTiled", "Р·Р°С†РёРєР»РёС‚СЊ С‚РµРєСЃС‚СѓСЂСѓ");
 	if(ar.isEdit()){
-		ar.serialize(static_cast<OptionalPtr<UI_EffectAttribute>&>(effect_), "effect", "Эффект");
+		ar.serialize(static_cast<OptionalPtr<UI_EffectAttribute>&>(effect_), "effect", "Р­С„С„РµРєС‚");
 		textFormat_.serialize(ar);
 	}
 	else{
-		ar.serialize(effect_, "effect", "Эффект");
-		ar.serialize(textFormat_, "textFormat", "Параметры текста");
+		ar.serialize(effect_, "effect", "Р­С„С„РµРєС‚");
+		ar.serialize(textFormat_, "textFormat", "РџР°СЂР°РјРµС‚СЂС‹ С‚РµРєСЃС‚Р°");
 	}
-	ar.serialize(activateSounds_, "activateSounds", "Звуки активации");
+	ar.serialize(activateSounds_, "activateSounds", "Р—РІСѓРєРё Р°РєС‚РёРІР°С†РёРё");
 }
 
 const SoundAttribute* UI_ControlShowMode::sound(UI_ControlShowModeID srcID) const
@@ -310,7 +310,7 @@ void UI_ControlState::release()
 
 void UI_ControlState::serialize(Archive& ar)
 {
-	ar.serialize(name_, "name_", "&имя");
+	ar.serialize(name_, "name_", "&РёРјСЏ");
 
 
 	if(ar.isEdit()){
@@ -318,8 +318,8 @@ void UI_ControlState::serialize(Archive& ar)
 		reinterpret_cast<ShowModesOptional&>(showModes_).serialize(ar); // HINT
 	}
 	else
-		ar.serialize(showModes_, "showModes", "Режимы отрисовки");
-	ar.serialize(actions_, "actions", "назначения");
+		ar.serialize(showModes_, "showModes", "Р РµР¶РёРјС‹ РѕС‚СЂРёСЃРѕРІРєРё");
+	ar.serialize(actions_, "actions", "РЅР°Р·РЅР°С‡РµРЅРёСЏ");
 }
 
 
@@ -356,13 +356,13 @@ const UI_ShowModeSprite UI_ShowModeSprite::EMPTY;
 
 void UI_ShowModeSprite::StateSprite::serialize(Archive& ar)
 {
-	ar.serialize(mode_, "mode", "&Режим кнопки");
-	ar.serialize(sprite_, "sprite", "Спрайт");
+	ar.serialize(mode_, "mode", "&Р РµР¶РёРј РєРЅРѕРїРєРё");
+	ar.serialize(sprite_, "sprite", "РЎРїСЂР°Р№С‚");
 }
 
 void UI_ShowModeSprite::serialize(Archive& ar)
 {
-	ar.serialize(sprites_, "sprites", "Спрайты");
+	ar.serialize(sprites_, "sprites", "РЎРїСЂР°Р№С‚С‹");
 }
 
 void UI_ShowModeSprite::preLoad()
@@ -542,17 +542,17 @@ float UI_MessageSetup::voiceDuration() const
 
 void UI_MessageSetup::serialize(Archive& ar)
 {
-	ar.serialize(messageType_, "messageType", "Тип сообщения");
-	ar.serialize(textReference_, "textReference", "Сообщение");
-	ar.serialize(syncroBySound_, "syncroBySound", "Синхронизировать со звуком");
-	ar.serialize(isVoiceInterruptable_, "isVoiceInterruptable", "Можно прервать голос");
-	ar.serialize(isInterruptOnDestroy_, "isInterruptOnDestroy", "Прерывать при разрушении мира");
-	ar.serialize(isCanInterruptVoice_, "isCanInterruptVoice", "НЕ Ждать окончания играемого сообщения");
-	ar.serialize(isCanPaused_, "isCanPaused", "Ставить на паузу во время паузы");
-	ar.serialize(isPlayVoiceAlways_, "isPlayVoiceAlways", "Проигрывать звук всегда");
+	ar.serialize(messageType_, "messageType", "РўРёРї СЃРѕРѕР±С‰РµРЅРёСЏ");
+	ar.serialize(textReference_, "textReference", "РЎРѕРѕР±С‰РµРЅРёРµ");
+	ar.serialize(syncroBySound_, "syncroBySound", "РЎРёРЅС…СЂРѕРЅРёР·РёСЂРѕРІР°С‚СЊ СЃРѕ Р·РІСѓРєРѕРј");
+	ar.serialize(isVoiceInterruptable_, "isVoiceInterruptable", "РњРѕР¶РЅРѕ РїСЂРµСЂРІР°С‚СЊ РіРѕР»РѕСЃ");
+	ar.serialize(isInterruptOnDestroy_, "isInterruptOnDestroy", "РџСЂРµСЂС‹РІР°С‚СЊ РїСЂРё СЂР°Р·СЂСѓС€РµРЅРёРё РјРёСЂР°");
+	ar.serialize(isCanInterruptVoice_, "isCanInterruptVoice", "РќР• Р–РґР°С‚СЊ РѕРєРѕРЅС‡Р°РЅРёСЏ РёРіСЂР°РµРјРѕРіРѕ СЃРѕРѕР±С‰РµРЅРёСЏ");
+	ar.serialize(isCanPaused_, "isCanPaused", "РЎС‚Р°РІРёС‚СЊ РЅР° РїР°СѓР·Сѓ РІРѕ РІСЂРµРјСЏ РїР°СѓР·С‹");
+	ar.serialize(isPlayVoiceAlways_, "isPlayVoiceAlways", "РџСЂРѕРёРіСЂС‹РІР°С‚СЊ Р·РІСѓРє РІСЃРµРіРґР°");
     if(!syncroBySound_){
-		ar.serialize(displayTime_, "displayTime", "Время показа, секунды");
-		ar.serialize(enableVoice_, "enableVoice", "Проигрывать звук");
+		ar.serialize(displayTime_, "displayTime", "Р’СЂРµРјСЏ РїРѕРєР°Р·Р°, СЃРµРєСѓРЅРґС‹");
+		ar.serialize(enableVoice_, "enableVoice", "РџСЂРѕРёРіСЂС‹РІР°С‚СЊ Р·РІСѓРє");
 	}		
 }
 
@@ -614,8 +614,8 @@ void UI_Message::serialize(Archive& ar)
 
 void UI_TaskColor::serialize(Archive& ar)
 {
-	ar.serialize(color, "color", "Цвет задачи");
-	ar.serialize(tag, "tag", "Пометка задачи");
+	ar.serialize(color, "color", "Р¦РІРµС‚ Р·Р°РґР°С‡Рё");
+	ar.serialize(tag, "tag", "РџРѕРјРµС‚РєР° Р·Р°РґР°С‡Рё");
 }
 
 // ------------------- UI_Task
@@ -625,25 +625,25 @@ UI_TaskColor UI_Task::taskColors_[UI_TASK_STATE_COUNT * 4];
 void UI_Task::serializeColors(Archive& ar)
 {
 	if(ar.isEdit()){
-		if(ar.openBlock("taskColors", "Цвет текста задач")){
+		if(ar.openBlock("taskColors", "Р¦РІРµС‚ С‚РµРєСЃС‚Р° Р·Р°РґР°С‡")){
 			for(int i = 0; i < UI_TASK_STATE_COUNT; i++)
 				ar.serialize(taskColors_[i], getEnumName(UI_TaskStateID(i)), getEnumNameAlt(UI_TaskStateID(i)));
 			ar.closeBlock();
 		}
 
-		if(ar.openBlock("secondaryTaskColors", "Цвет текста второстепенных задач")){
+		if(ar.openBlock("secondaryTaskColors", "Р¦РІРµС‚ С‚РµРєСЃС‚Р° РІС‚РѕСЂРѕСЃС‚РµРїРµРЅРЅС‹С… Р·Р°РґР°С‡")){
 			for(int i = 0; i < UI_TASK_STATE_COUNT; i++)
 				ar.serialize(taskColors_[i + UI_TASK_STATE_COUNT], getEnumName(UI_TaskStateID(i)), getEnumNameAlt(UI_TaskStateID(i)));
 			ar.closeBlock();
 		}
 
-		if(ar.openBlock("taskColorsOnScreen", "Цвет текста задач в списке сообщений")){
+		if(ar.openBlock("taskColorsOnScreen", "Р¦РІРµС‚ С‚РµРєСЃС‚Р° Р·Р°РґР°С‡ РІ СЃРїРёСЃРєРµ СЃРѕРѕР±С‰РµРЅРёР№")){
 			for(int i = 0; i < UI_TASK_STATE_COUNT; i++)
 				ar.serialize(taskColors_[i + UI_TASK_STATE_COUNT * 2], getEnumName(UI_TaskStateID(i)), getEnumNameAlt(UI_TaskStateID(i)));
 			ar.closeBlock();
 		}
 
-		if(ar.openBlock("secondaryTaskColorsOnScreen", "Цвет текста второстепенных задач в списке сообщений")){
+		if(ar.openBlock("secondaryTaskColorsOnScreen", "Р¦РІРµС‚ С‚РµРєСЃС‚Р° РІС‚РѕСЂРѕСЃС‚РµРїРµРЅРЅС‹С… Р·Р°РґР°С‡ РІ СЃРїРёСЃРєРµ СЃРѕРѕР±С‰РµРЅРёР№")){
 			for(int i = 0; i < UI_TASK_STATE_COUNT; i++)
 				ar.serialize(taskColors_[i + UI_TASK_STATE_COUNT * 3], getEnumName(UI_TaskStateID(i)), getEnumNameAlt(UI_TaskStateID(i)));
 			ar.closeBlock();
@@ -716,8 +716,8 @@ bool UI_Task::getText(wstring& out, bool message_mode) const
 
 void AtomAction::serialize(Archive& ar)
 {
-	ar.serialize(type_, "type", "Что сделать");
-	ar.serialize(control_, "control", "С чем сделать");
+	ar.serialize(type_, "type", "Р§С‚Рѕ СЃРґРµР»Р°С‚СЊ");
+	ar.serialize(control_, "control", "РЎ С‡РµРј СЃРґРµР»Р°С‚СЊ");
 }
 
 void AtomAction::apply() const
@@ -758,7 +758,7 @@ void AtomAction::apply() const
 			ctrl->activate();
 			break;
 		default:
-			xassert(false && "забыли добавить case AtomAction::apply()");
+			xassert(false && "Р·Р°Р±С‹Р»Рё РґРѕР±Р°РІРёС‚СЊ case AtomAction::apply()");
 		}
 	}
 }
@@ -782,9 +782,9 @@ bool AtomAction::workedOut() const
 
 void ShowStatisticType::serialize(Archive& ar)
 {
-	ar.serialize(type, "type", "Тип значения");
+	ar.serialize(type, "type", "РўРёРї Р·РЅР°С‡РµРЅРёСЏ");
 	if(type == STAT_VALUE)
-		ar.serialize(statValueType, "statValueType", "Параметр");
+		ar.serialize(statValueType, "statValueType", "РџР°СЂР°РјРµС‚СЂ");
 }
 
 void ShowStatisticType::getValue(WBuffer& buf, const StatisticsEntry& val) const
@@ -818,12 +818,12 @@ HintAttributes::HintAttributes()
 
 void HintAttributes::serialize(Archive& ar)
 {
-	ar.serialize(tipFill, "tipFill", "Заливка фона");
-	ar.serialize(tipBorder, "tipBorder", "Окантовка");
-	ar.serialize(tipFont, "tipFont", "Шрифт");
-	ar.serialize(tipTextFormat, "tipTextFormat", "Формат обычного");
-	ar.serialize(tipTextFormatHover, "tipTextFormatHover", "Формат наведенного");
-	ar.serialize(RangedWrapperf(tipTextMaxWidth, 0.1f, 0.7f), "tipTextMaxWidth", "Максимальная относительная ширина текста");
+	ar.serialize(tipFill, "tipFill", "Р—Р°Р»РёРІРєР° С„РѕРЅР°");
+	ar.serialize(tipBorder, "tipBorder", "РћРєР°РЅС‚РѕРІРєР°");
+	ar.serialize(tipFont, "tipFont", "РЁСЂРёС„С‚");
+	ar.serialize(tipTextFormat, "tipTextFormat", "Р¤РѕСЂРјР°С‚ РѕР±С‹С‡РЅРѕРіРѕ");
+	ar.serialize(tipTextFormatHover, "tipTextFormatHover", "Р¤РѕСЂРјР°С‚ РЅР°РІРµРґРµРЅРЅРѕРіРѕ");
+	ar.serialize(RangedWrapperf(tipTextMaxWidth, 0.1f, 0.7f), "tipTextMaxWidth", "РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅР°СЏ С€РёСЂРёРЅР° С‚РµРєСЃС‚Р°");
 }
 
 // --------------------------------------------------------------------------

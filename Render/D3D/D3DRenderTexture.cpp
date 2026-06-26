@@ -133,7 +133,7 @@ void FillMip(int mip,unsigned int* in_buf,int dx,int dy)
 }
 
 int cD3DRender::CreateTexture(cTexture *Texture,cFileImage *FileImage,int dxout,int dyout,bool enable_assert)
- { // только создает в памяти поверхности 
+ { // С‚РѕР»СЊРєРѕ СЃРѕР·РґР°РµС‚ РІ РїР°РјСЏС‚Рё РїРѕРІРµСЂС…РЅРѕСЃС‚Рё 
 	D3DFORMAT &tfd = TexFmtData[Texture->format()];
 
 	if(Texture->GetWidth()>dwSuportMaxSizeTextureX) Texture->SetWidth(dwSuportMaxSizeTextureX);
@@ -176,7 +176,7 @@ int cD3DRender::CreateTexture(cTexture *Texture,cFileImage *FileImage,int dxout,
 			memset(lpBuf,0xFF,dxy*sizeof(lpBuf[0]));
 			FileImage->GetTexture(lpBuf,i,dx,dy);
 			
-			if(Texture->isAlpha() || Texture->isAlphaTest()){// загрузка только прозрачности
+			if(Texture->isAlpha() || Texture->isAlphaTest()){// Р·Р°РіСЂСѓР·РєР° С‚РѕР»СЊРєРѕ РїСЂРѕР·СЂР°С‡РЅРѕСЃС‚Рё
 				int num_0=0,num_alpha=0;
 				for(int i=0; i < dxy; i++){
 					BYTE a=lpBuf[i]>>24;
@@ -228,7 +228,7 @@ int cD3DRender::CreateTexture(cTexture *Texture,cFileImage *FileImage,int dxout,
 
 		if(Texture->getAttribute(TEXTURE_BUMP)){
 			bool is_height_map=true;
-			for( int n=0; n<dxy; n++ ){//Если всё чёрно белое, то это высоты
+			for( int n=0; n<dxy; n++ ){//Р•СЃР»Рё РІСЃС‘ С‡С‘СЂРЅРѕ Р±РµР»РѕРµ, С‚Рѕ СЌС‚Рѕ РІС‹СЃРѕС‚С‹
 				Color4c c=((Color4c*)lpBuf)[n];
 				if( c.r!=c.g || c.r!=c.b ){
 					is_height_map=false;
@@ -267,7 +267,7 @@ int cD3DRender::CreateTexture(cTexture *Texture,cFileImage *FileImage,int dxout,
 			lpSurface->Release();
 		}
 
-		if(Texture->mipmapNumber()>1) // построение мип мапов
+		if(Texture->mipmapNumber()>1) // РїРѕСЃС‚СЂРѕРµРЅРёРµ РјРёРї РјР°РїРѕРІ
 			for(int nMipMap=1;nMipMap<Texture->mipmapNumber();nMipMap++)
 			{
 				RECT rect={0,0,dx>>nMipMap,dy>>nMipMap};
@@ -344,7 +344,7 @@ void cD3DRender::BuildNormalMap(cTexture *Texture,Vect3f* normals)
 		NormalsToSurface(lpSurface,normals,dx,dy);
 
 		Vect3f* cur=normals;
-		if(Texture->mipmapNumber()>1) // построение мип мапов
+		if(Texture->mipmapNumber()>1) // РїРѕСЃС‚СЂРѕРµРЅРёРµ РјРёРї РјР°РїРѕРІ
 			for(int nMipMap=1;nMipMap<Texture->mipmapNumber();nMipMap++)
 			{
 				IDirect3DSurface9* lpSurfaceNext = 0;
@@ -424,7 +424,7 @@ int cD3DRender::CreateTextureU16V16(class cTexture *Texture,bool defaultpool)
 
 
 int cD3DRender::DeleteTexture(cTexture *Texture)
-{ // только освобождает в памяти поверхности 
+{ // С‚РѕР»СЊРєРѕ РѕСЃРІРѕР±РѕР¶РґР°РµС‚ РІ РїР°РјСЏС‚Рё РїРѕРІРµСЂС…РЅРѕСЃС‚Рё 
 	for(int nFrame=0;nFrame<Texture->frameNumber();nFrame++)
 		if(Texture->GetDDSurface(nFrame)) 
 		{
@@ -478,7 +478,7 @@ void cD3DRender::UnlockTexture(cTexture *Texture)
 	RDCALL(lpSurface->UnlockRect(0));
 }
 
-unsigned int ColorByNormalRGBA(Vect3f n)//Возможно бамп покорежился, теперь в inv_light_dir вравильно вектор выставляется (раньше x,y были местами поменяны)
+unsigned int ColorByNormalRGBA(Vect3f n)//Р’РѕР·РјРѕР¶РЅРѕ Р±Р°РјРї РїРѕРєРѕСЂРµР¶РёР»СЃСЏ, С‚РµРїРµСЂСЊ РІ inv_light_dir РІСЂР°РІРёР»СЊРЅРѕ РІРµРєС‚РѕСЂ РІС‹СЃС‚Р°РІР»СЏРµС‚СЃСЏ (СЂР°РЅСЊС€Рµ x,y Р±С‹Р»Рё РјРµСЃС‚Р°РјРё РїРѕРјРµРЅСЏРЅС‹)
 {
 	unsigned int x=round(((n.x+1)*127.5f));
 	unsigned int y=round(((n.y+1)*127.5f));

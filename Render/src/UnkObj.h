@@ -6,7 +6,7 @@
 class cTexture;
 
 class RENDER_API cUnkObj : public cIUnkObj
-{ /// базовый класс объектов растеризации
+{ /// Р±Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ РѕР±СЉРµРєС‚РѕРІ СЂР°СЃС‚РµСЂРёР·Р°С†РёРё
 public:
 	cUnkObj(int kind);
 	virtual ~cUnkObj();
@@ -14,7 +14,7 @@ public:
 	const float GetScale() const 			{ return scale_; }
 	void SetScale(const float scale);
 
-	/// Функции несклько хинтовые, нужно будет тщательно посмотреть, и если нигде не используются - стереть.
+	/// Р¤СѓРЅРєС†РёРё РЅРµСЃРєР»СЊРєРѕ С…РёРЅС‚РѕРІС‹Рµ, РЅСѓР¶РЅРѕ Р±СѓРґРµС‚ С‚С‰Р°С‚РµР»СЊРЅРѕ РїРѕСЃРјРѕС‚СЂРµС‚СЊ, Рё РµСЃР»Рё РЅРёРіРґРµ РЅРµ РёСЃРїРѕР»СЊР·СѓСЋС‚СЃСЏ - СЃС‚РµСЂРµС‚СЊ.
 	virtual float GetBoundRadius() const {return scale_;}
 	virtual void GetBoundBox(sBox6f& Box) const {Box.min.set(-scale_,-scale_,-scale_);Box.max.set(scale_,scale_,scale_);}
 

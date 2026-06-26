@@ -18,7 +18,7 @@ namespace kdw{
 		void serialize(Archive& ar);
 		bool _focusable() const{ return false; }
 	protected:
-		// внутренние функции
+		// РІРЅСѓС‚СЂРµРЅРЅРёРµ С„СѓРЅРєС†РёРё
 		ProgressBarImpl* window() const{ return reinterpret_cast<ProgressBarImpl*>(_window()); }
 
 		float pos_;

@@ -682,7 +682,7 @@ cTexture* cTexLibrary::FindTexture(const char* name)
 cTexture* cTexLibrary::GetElement2D(const char *pTextureName)
 {
 	MTAuto mtenter(lock);
-	if(pTextureName==0||pTextureName[0]==0) return 0; // ��� �������� ������
+	if(pTextureName==0||pTextureName[0]==0) return 0; // имя текстуры пустое
 
 	string texture_name = normalizePath(pTextureName);
 
@@ -712,7 +712,7 @@ cTexture* cTexLibrary::GetElement2D(const char *pTextureName)
 cTexture* cTexLibrary::GetElement2DAviScale(const char *pTextureName)
 {
 	MTAuto mtenter(lock);
-	if(pTextureName==0||pTextureName[0]==0) return 0; // ��� �������� ������
+	if(pTextureName==0||pTextureName[0]==0) return 0; // имя текстуры пустое
 
 	string texture_name = normalizePath(pTextureName);
 	xassert(strstr(texture_name.c_str(), ".AVI"));
@@ -781,7 +781,7 @@ cTextureComplex* cTexLibrary::GetElement2DComplex(vector<string>& textureNames)
 cTexture* cTexLibrary::GetElement2DScale(const char *pTextureName,Vect2f scale)
 {
 	MTAuto mtenter(lock);
-	if(pTextureName==0||pTextureName[0]==0) return 0; // ��� �������� ������
+	if(pTextureName==0||pTextureName[0]==0) return 0; // имя текстуры пустое
 
 	string texture_name = normalizePath(pTextureName);
 
@@ -812,7 +812,7 @@ cTexture* cTexLibrary::GetElement3D(const char *pTextureName,char *pMode)
 	MTAuto mtenter(lock);
 	bool bump = pMode && strstr(pMode,"Bump");
 	
-	if(pTextureName==0||pTextureName[0]==0) return 0; // ��� �������� ������
+	if(pTextureName==0||pTextureName[0]==0) return 0; // имя текстуры пустое
 	
 	string texture_name = normalizePath(pTextureName);
 
@@ -885,7 +885,7 @@ cTexture* cTexLibrary::GetElement3DColor(const char *pTextureName,const char* sk
 {
 
 	MTAuto mtenter(lock);
-	if(pTextureName==0||pTextureName[0]==0) return 0; // ��� �������� ������
+	if(pTextureName==0||pTextureName[0]==0) return 0; // имя текстуры пустое
 	string texture_name = normalizePath(pTextureName);
 	string self_illumination_name = normalizePath(SelfIlluminationName);
 	string logo_name = normalizePath(logoName);
@@ -967,7 +967,7 @@ cTexture* cTexLibrary::GetElement3DComplex(vector<string>& textureNames, bool al
 cTexture* cTexLibrary::GetElement3DAviScale(const char *pTextureName)
 {
 	MTAuto mtenter(lock);
-	if(pTextureName==0||pTextureName[0]==0) return 0; // ��� �������� ������
+	if(pTextureName==0||pTextureName[0]==0) return 0; // имя текстуры пустое
 
 	string texture_name = normalizePath(pTextureName);
 	xassert(strstr(texture_name.c_str(), ".AVI"));
@@ -1085,8 +1085,8 @@ bool cComplexFileImage::Init(vector<string>& names,bool line)
 
 		if(!atlas.Init(texture_size,line))
 		{
-			VisError<<"������� ����� ������!!!\r\n"<<"������� ������� - "<<(int)tempImages.size()
-				<<",� �������� - "<<atlas.GetNumTextures()<<" ������\r\n";
+			VisError<<"Слишком много кадров!!!\r\n"<<"Попытка создать - "<<(int)tempImages.size()
+				<<",а доступно - "<<atlas.GetNumTextures()<<" кадров\r\n";
 			for(int i=0;i<names.size();i++)
 			{
 				VisError<<names[i].c_str()<<",\r\n";

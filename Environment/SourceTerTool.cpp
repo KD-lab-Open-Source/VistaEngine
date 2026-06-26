@@ -9,15 +9,15 @@
 
 void SourceTerTool::serialize(Archive& ar)
 {
-	ar.serialize(terToolReference, "terToolReference", "Òóëçåð");
+	ar.serialize(terToolReference, "terToolReference", "Ð¢ÑƒÐ»Ð·ÐµÑ€");
 	SourceEffect::serialize(ar);
-	//ar.serialize(period, "period", "Ïåðèîä");
-	ar.serialize(MillisecondsWrapper(sleepTime_), "sleepTime_", "Çàäåðæêà òóëçåðà");
-	ar.serialize(flag_autoKill, "flag_autoKill", "Àâòîóäàëåíèå(íå ïî òàéìåðó)");
-	//ar.serialize(angle_disp_, "angle_disp", "ðàçáðîñ ïîâîðîòà");
-	ar.serialize(flag_dispersion, "flag_dispersion", "ñëó÷àéíûé ïîâîðîò");
+	//ar.serialize(period, "period", "ÐŸÐµÑ€Ð¸Ð¾Ð´");
+	ar.serialize(MillisecondsWrapper(sleepTime_), "sleepTime_", "Ð—Ð°Ð´ÐµÑ€Ð¶ÐºÐ° Ñ‚ÑƒÐ»Ð·ÐµÑ€Ð°");
+	ar.serialize(flag_autoKill, "flag_autoKill", "ÐÐ²Ñ‚Ð¾ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ(Ð½Ðµ Ð¿Ð¾ Ñ‚Ð°Ð¹Ð¼ÐµÑ€Ñƒ)");
+	//ar.serialize(angle_disp_, "angle_disp", "Ñ€Ð°Ð·Ð±Ñ€Ð¾Ñ Ð¿Ð¾Ð²Ð¾Ñ€Ð¾Ñ‚Ð°");
+	ar.serialize(flag_dispersion, "flag_dispersion", "ÑÐ»ÑƒÑ‡Ð°Ð¹Ð½Ñ‹Ð¹ Ð¿Ð¾Ð²Ð¾Ñ€Ð¾Ñ‚");
 	//if(!ar.isEdit())
-	//	ar.serialize(pose_.trans(), "pos", "Ïîçèöèÿ");
+	//	ar.serialize(pose_.trans(), "pos", "ÐŸÐ¾Ð·Ð¸Ñ†Ð¸Ñ");
 	serializationApply(ar);
 }
 
@@ -43,13 +43,13 @@ void SourceTerTool::quant()
         return/* false*/;
     }
 	if(!terToolReference) {//
-		kill(); //íàäî ïåðåíåñòè â start!
+		kill(); //Ð½Ð°Ð´Ð¾ Ð¿ÐµÑ€ÐµÐ½ÐµÑÑ‚Ð¸ Ð² start!
 		return;
 	}
     if(!pCurTerTool){
         if(!active_)
             return;
-//			effectStart();//Ïðè ïåðâîì çàïóñêå
+//			effectStart();//ÐŸÑ€Ð¸ Ð¿ÐµÑ€Ð²Ð¾Ð¼ Ð·Ð°Ð¿ÑƒÑÐºÐµ
         int xg=position().xi()>>kmGrid;
         int yg=position().yi()>>kmGrid;
         pose_.trans().z = vMap.getApproxAlt(position().xi(), position().yi());

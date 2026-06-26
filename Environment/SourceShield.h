@@ -18,7 +18,7 @@ public:
 	void serialize(Archive& ar);
 
 	bool inZone(const Vect3f& coord) const{
-		xxassert(height_ <= radius(), "âûñîòà çàùèòíîãî êóïîëà íå ìîæåò áûòü áîëüøå ðàäèóñà èñòî÷íèêà");
+		xxassert(height_ <= radius(), "Ð²Ñ‹ÑÐ¾Ñ‚Ð° Ð·Ð°Ñ‰Ð¸Ñ‚Ð½Ð¾Ð³Ð¾ ÐºÑƒÐ¿Ð¾Ð»Ð° Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð±Ð¾Ð»ÑŒÑˆÐµ Ñ€Ð°Ð´Ð¸ÑƒÑÐ° Ð¸ÑÑ‚Ð¾Ñ‡Ð½Ð¸ÐºÐ°");
 		return sqr(position().x - coord.x) + sqr(position().y - coord.y) + sqr(position().z - centerDeep_ - coord.z) < sqr(centerDeep_ + height_);
 	}
 	
@@ -32,14 +32,14 @@ public:
 	float sphereRadius() const { return centerDeep_ + height_; }
 	Vect3f sphereCenter() const { return Vect3f(position().x, position().y, position().z - centerDeep_); }
 
-	/** óñêîðåííàÿ ïðîâåðêà íà íàõîæäåíèå íà÷àëüíîé è êîíå÷íîé òî÷êè â ñâÿçíîé (îòíîñèòåëüíî ÷óæèõ ïîëåé) îáëàñòè.
-	ïðè ýòîì ïðÿìîé ïóòü ìîæåò îòñóòñòâîâàòü */
+	/** ÑƒÑÐºÐ¾Ñ€ÐµÐ½Ð½Ð°Ñ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° Ð½Ð° Ð½Ð°Ñ…Ð¾Ð¶Ð´ÐµÐ½Ð¸Ðµ Ð½Ð°Ñ‡Ð°Ð»ÑŒÐ½Ð¾Ð¹ Ð¸ ÐºÐ¾Ð½ÐµÑ‡Ð½Ð¾Ð¹ Ñ‚Ð¾Ñ‡ÐºÐ¸ Ð² ÑÐ²ÑÐ·Ð½Ð¾Ð¹ (Ð¾Ñ‚Ð½Ð¾ÑÐ¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾ Ñ‡ÑƒÐ¶Ð¸Ñ… Ð¿Ð¾Ð»ÐµÐ¹) Ð¾Ð±Ð»Ð°ÑÑ‚Ð¸.
+	Ð¿Ñ€Ð¸ ÑÑ‚Ð¾Ð¼ Ð¿Ñ€ÑÐ¼Ð¾Ð¹ Ð¿ÑƒÑ‚ÑŒ Ð¼Ð¾Ð¶ÐµÑ‚ Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²Ð¾Ð²Ð°Ñ‚ÑŒ */
 	static bool traceShieldsCoherence(const Vect3f& point_start, const Vect3f& point_finish, const Player* owner, Vect3f* intersect = 0);
-	//! òðàññèðîâêà ïðÿìîãî ïóòè ìåæäó òî÷êàìè
+	//! Ñ‚Ñ€Ð°ÑÑÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð¿Ñ€ÑÐ¼Ð¾Ð³Ð¾ Ð¿ÑƒÑ‚Ð¸ Ð¼ÐµÐ¶Ð´Ñƒ Ñ‚Ð¾Ñ‡ÐºÐ°Ð¼Ð¸
 	static bool traceShieldsThrough(const Vect3f& point_start, const Vect3f& point_finish, const Player* owner, Vect3f* intersect = 0, Vect3f* sphereCenter = 0);
-	//! òðàññèðîâêà ïðÿìîãî ïóòè ìåæäó òî÷êàìè, ïðè ýòîì ñ÷èòàåòñÿ ÷òî òî÷êè ðÿäîì è ñêàíèðóþòñÿ ïîëÿ òîëüêî â îêðåñòíîñòè êîíå÷íîé òî÷êè
+	//! Ñ‚Ñ€Ð°ÑÑÐ¸Ñ€Ð¾Ð²ÐºÐ° Ð¿Ñ€ÑÐ¼Ð¾Ð³Ð¾ Ð¿ÑƒÑ‚Ð¸ Ð¼ÐµÐ¶Ð´Ñƒ Ñ‚Ð¾Ñ‡ÐºÐ°Ð¼Ð¸, Ð¿Ñ€Ð¸ ÑÑ‚Ð¾Ð¼ ÑÑ‡Ð¸Ñ‚Ð°ÐµÑ‚ÑÑ Ñ‡Ñ‚Ð¾ Ñ‚Ð¾Ñ‡ÐºÐ¸ Ñ€ÑÐ´Ð¾Ð¼ Ð¸ ÑÐºÐ°Ð½Ð¸Ñ€ÑƒÑŽÑ‚ÑÑ Ð¿Ð¾Ð»Ñ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð² Ð¾ÐºÑ€ÐµÑÑ‚Ð½Ð¾ÑÑ‚Ð¸ ÐºÐ¾Ð½ÐµÑ‡Ð½Ð¾Ð¹ Ñ‚Ð¾Ñ‡ÐºÐ¸
 	static bool traceShieldsDelta(const Vect3f& start, const Vect3f& finish, const Player* owner, Vect3f& intersection, Vect3f& center);
-	//! âûâîäèò îðèåíòèðîâàííûé ýôôåêò íà ïîâåðõíîñòè êóïîëà
+	//! Ð²Ñ‹Ð²Ð¾Ð´Ð¸Ñ‚ Ð¾Ñ€Ð¸ÐµÐ½Ñ‚Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð½Ñ‹Ð¹ ÑÑ„Ñ„ÐµÐºÑ‚ Ð½Ð° Ð¿Ð¾Ð²ÐµÑ€Ñ…Ð½Ð¾ÑÑ‚Ð¸ ÐºÑƒÐ¿Ð¾Ð»Ð°
 	static void shieldExplodeEffect(const Vect3f& center, const Vect3f& pos, const EffectAttribute& effect);
 
 protected:
@@ -47,12 +47,12 @@ protected:
 	void stop();
 	bool killRequest();
 private:
-	// âûñîòà êóïîëà íàä çåìëåé(öåíòðîì èñòî÷íèêà), íå ìîæåò áûòü áîëüøå ðàäèóñà
+	// Ð²Ñ‹ÑÐ¾Ñ‚Ð° ÐºÑƒÐ¿Ð¾Ð»Ð° Ð½Ð°Ð´ Ð·ÐµÐ¼Ð»ÐµÐ¹(Ñ†ÐµÐ½Ñ‚Ñ€Ð¾Ð¼ Ð¸ÑÑ‚Ð¾Ñ‡Ð½Ð¸ÐºÐ°), Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð±Ð¾Ð»ÑŒÑˆÐµ Ñ€Ð°Ð´Ð¸ÑƒÑÐ°
 	float height_;
-	// ãëóáèíà(ñìåùåíèå) öåíòðà çàùèòíîé ñôåðû îò öåíòðà èñòî÷íèêà
+	// Ð³Ð»ÑƒÐ±Ð¸Ð½Ð°(ÑÐ¼ÐµÑ‰ÐµÐ½Ð¸Ðµ) Ñ†ÐµÐ½Ñ‚Ñ€Ð° Ð·Ð°Ñ‰Ð¸Ñ‚Ð½Ð¾Ð¹ ÑÑ„ÐµÑ€Ñ‹ Ð¾Ñ‚ Ñ†ÐµÐ½Ñ‚Ñ€Ð° Ð¸ÑÑ‚Ð¾Ñ‡Ð½Ð¸ÐºÐ°
 	float centerDeep_;
 
-	// Öâåò êóïîëà
+	// Ð¦Ð²ÐµÑ‚ ÐºÑƒÐ¿Ð¾Ð»Ð°
 	Color4c color_;
 	float activateDTime_;
 	float activatePhase_;

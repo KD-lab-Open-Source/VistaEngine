@@ -53,12 +53,12 @@ private:
 
 	WeaponDamage damage_;
 
-	/// эффекты попадания по целям
+	/// СЌС„С„РµРєС‚С‹ РїРѕРїР°РґР°РЅРёСЏ РїРѕ С†РµР»СЏРј
 	TargetEffects hitExplosionEffects_;
 
-	/// эффект взрыва при попадании в защитное поле
+	/// СЌС„С„РµРєС‚ РІР·СЂС‹РІР° РїСЂРё РїРѕРїР°РґР°РЅРёРё РІ Р·Р°С‰РёС‚РЅРѕРµ РїРѕР»Рµ
 	EffectAttribute shildExplosionEffect_;
-	/// воздействие на цель при попадании
+	/// РІРѕР·РґРµР№СЃС‚РІРёРµ РЅР° С†РµР»СЊ РїСЂРё РїРѕРїР°РґР°РЅРёРё
 	AbnormalStateAttribute explosionState_;
 	WeaponSourcesCreationMode sourcesCreationMode_;
 };
@@ -66,7 +66,7 @@ private:
 typedef StringTable<AttributeProjectile> AttributeProjectileTable;
 typedef StringTableReference<AttributeProjectile, true> AttributeProjectileReference;
 
-/// Базовый класс для снарядов, ракет, бомб и т.д.
+/// Р‘Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ РґР»СЏ СЃРЅР°СЂСЏРґРѕРІ, СЂР°РєРµС‚, Р±РѕРјР± Рё С‚.Рґ.
 class ProjectileBase : public UnitReal
 {
 public:
@@ -92,7 +92,7 @@ public:
 	void explode();
 	bool isExplosionSourcesEnabled() const;
 
-	virtual void setSource(UnitActing* ownerUnit, const Se3f& pose); // Вызывать перед setTarget
+	virtual void setSource(UnitActing* ownerUnit, const Se3f& pose); // Р’С‹Р·С‹РІР°С‚СЊ РїРµСЂРµРґ setTarget
 	virtual void setTarget(UnitInterface* targetUnit, const Vect3f& targetPosition, float targetDelta = 0.0f);
 	bool checkInPathTracking(const UnitBase* tracker) const { return false; } 
 
@@ -107,7 +107,7 @@ public:
 protected:
 	UnitLink<UnitActing> ownerUnit_;
 
-	/// подтверждение столкновения - надо ли взрываться
+	/// РїРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ СЃС‚РѕР»РєРЅРѕРІРµРЅРёСЏ - РЅР°РґРѕ Р»Рё РІР·СЂС‹РІР°С‚СЊСЃСЏ
 	virtual bool confirmCollision(const UnitBase* p) const;
 
 	const UnitInterface* target() const { return target_; }
@@ -123,7 +123,7 @@ protected:
 private:
 	AffectMode affectMode_;
 
-	/// Параметры выстрелившего снаряд оружия.
+	/// РџР°СЂР°РјРµС‚СЂС‹ РІС‹СЃС‚СЂРµР»РёРІС€РµРіРѕ СЃРЅР°СЂСЏРґ РѕСЂСѓР¶РёСЏ.
 	WeaponPrmCache weaponParameters_;
 
 	UnitBase* collisionUnit_;

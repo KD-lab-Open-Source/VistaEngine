@@ -16,7 +16,7 @@ public:
 	void saveCacheInfo(bool exported);
 
 	bool PreloadElement(const char* filename, bool isLogic);
-	bool PreloadElement(const char* filename, Color4c skin_color, const char* emblem_name_);//Только для графических моделей.
+	bool PreloadElement(const char* filename, Color4c skin_color, const char* emblem_name_);//РўРѕР»СЊРєРѕ РґР»СЏ РіСЂР°С„РёС‡РµСЃРєРёС… РјРѕРґРµР»РµР№.
 
 	cStatic3dx* GetElement(const char* fname,const char* TexturePath,bool is_logic);
 	void GetAllElements(vector<cStatic3dx*>& elements) const;

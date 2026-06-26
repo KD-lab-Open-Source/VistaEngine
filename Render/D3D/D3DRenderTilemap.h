@@ -34,7 +34,7 @@ class sTilemapTexturePool
 	float ustep,vstep;
 	D3DFORMAT format;
 public:
-	vector<sBumpTile*> tileRenderList;//Сюда записываются тайлы, которые рендерят нормальное/отраженное изображение.
+	vector<sBumpTile*> tileRenderList;//РЎСЋРґР° Р·Р°РїРёСЃС‹РІР°СЋС‚СЃСЏ С‚Р°Р№Р»С‹, РєРѕС‚РѕСЂС‹Рµ СЂРµРЅРґРµСЂСЏС‚ РЅРѕСЂРјР°Р»СЊРЅРѕРµ/РѕС‚СЂР°Р¶РµРЅРЅРѕРµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ.
 
 	sTilemapTexturePool(int width, int height,D3DFORMAT format);
 	~sTilemapTexturePool();
@@ -61,7 +61,7 @@ class cTexPools
 public:
 	vector<sTilemapTexturePool*> bumpTexPools;
 
-	vector<sBumpTile*> shadowTiles;//Сюда записываются тайлы, которые рендерят тень.
+	vector<sBumpTile*> shadowTiles;//РЎСЋРґР° Р·Р°РїРёСЃС‹РІР°СЋС‚СЃСЏ С‚Р°Р№Р»С‹, РєРѕС‚РѕСЂС‹Рµ СЂРµРЅРґРµСЂСЏС‚ С‚РµРЅСЊ.
 
 	cTexPools(){};
 	~cTexPools(){clear();}
