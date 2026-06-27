@@ -240,12 +240,69 @@ struct SIZE   { LONG cx, cy; };
 // ─── Directory / file utilities ───────────────────────────────────────────────
 #include <sys/stat.h>
 #include <unistd.h>
-#define _mkdir(path)    mkdir(path, 0755)
-#define _rmdir          rmdir
-#define _chdir          chdir
+#include <dirent.h>
+#include <string>
+
+// ─── Path normalization ───────────────────────────────────────────────────────
+// Windows paths are case-insensitive and use '\' separators; the engine hard-codes
+// both. On case-sensitive POSIX filesystems (Linux, and case-sensitive macOS
+// volumes) such a path won't resolve unless every component matches on disk
+// exactly. NormalizePath rewrites a Windows-style path into a real POSIX path:
+//   * '\' separators become '/';
+//   * each existing component is replaced with its real on-disk spelling, found
+//     by a case-insensitive scan of the parent directory.
+// Components that don't exist on disk (e.g. the leaf of a file/dir about to be
+// created, or a wildcard pattern) are kept verbatim. All path-consuming wrappers
+// below funnel their argument through this first.
+inline std::string NormalizePath(const char* path) {
+    if (!path || !*path) return std::string(path ? path : "");
+
+    std::string in(path);
+    for (char& c : in) if (c == '\\') c = '/';
+
+    std::string out = (in[0] == '/') ? "/" : "";  // preserve absolute root
+
+    size_t pos = 0;
+    while (pos < in.size()) {
+        while (pos < in.size() && in[pos] == '/') ++pos;   // skip separators
+        if (pos >= in.size()) break;
+        size_t end = in.find('/', pos);
+        if (end == std::string::npos) end = in.size();
+        std::string comp = in.substr(pos, end - pos);
+        pos = end;
+
+        std::string matched = comp;  // default: keep verbatim
+        if (comp != "." && comp != "..") {
+            std::string candidate = out;
+            if (!candidate.empty() && candidate.back() != '/') candidate += '/';
+            candidate += comp;
+            struct stat st;
+            if (::stat(candidate.c_str(), &st) != 0) {
+                // No exact match — scan the parent for a case-insensitive one.
+                const char* dirToScan = out.empty() ? "." : out.c_str();
+                if (DIR* d = ::opendir(dirToScan)) {
+                    for (struct dirent* ent; (ent = ::readdir(d)) != nullptr; ) {
+                        if (::strcasecmp(ent->d_name, comp.c_str()) == 0) {
+                            matched = ent->d_name;
+                            break;
+                        }
+                    }
+                    ::closedir(d);
+                }
+            }
+        }
+        if (!out.empty() && out.back() != '/') out += '/';
+        out += matched;
+    }
+    return out;
+}
+
+inline int _mkdir(const char* path)              { return mkdir(NormalizePath(path).c_str(), 0755); }
+inline int _rmdir(const char* path)              { return rmdir(NormalizePath(path).c_str()); }
+inline int _chdir(const char* path)              { return chdir(NormalizePath(path).c_str()); }
 #define _getcwd         getcwd
-#define _unlink         unlink
-#define _access         access
+inline int _unlink(const char* path)             { return unlink(NormalizePath(path).c_str()); }
+inline int _access(const char* path, int mode)   { return access(NormalizePath(path).c_str(), mode); }
 
 // ─── File attribute / access constants ───────────────────────────────────────
 #define FILE_ATTRIBUTE_NORMAL      0x00000080
@@ -605,7 +662,7 @@ inline void* GlobalFree(void* p) { free(p); return 0; }
 #define OF_DELETE 0x00000200
 typedef struct _OFSTRUCT { unsigned char cBytes; } OFSTRUCT;
 inline HFILE OpenFile(const char* path, OFSTRUCT*, unsigned style) {
-    if (style & OF_DELETE) remove(path);
+    if (style & OF_DELETE) remove(NormalizePath(path).c_str());
     return 0;
 }
 
@@ -613,7 +670,7 @@ inline HANDLE CreateFileA(const char* path, DWORD access, DWORD, void*, DWORD cr
     const char* mode = (access & GENERIC_WRITE) ? "r+b" : "rb";
     if (creation == CREATE_ALWAYS) mode = "w+b";
     else if (creation == CREATE_NEW) mode = "w+bx";
-    FILE* f = fopen(path, mode);
+    FILE* f = fopen(NormalizePath(path).c_str(), mode);
     return f ? (HANDLE)f : INVALID_HANDLE_VALUE;
 }
 #define CreateFile CreateFileA
@@ -638,7 +695,7 @@ inline BOOL CloseFileHandle(HANDLE h) { return fclose((FILE*)h) == 0; }
 #define GetFileSize(h, high) ((DWORD)({ long p=ftell((FILE*)(h)); fseek((FILE*)(h),0,SEEK_END); long s=ftell((FILE*)(h)); fseek((FILE*)(h),p,SEEK_SET); if(high)*(DWORD*)(high)=0; s; }))
 
 inline char* _fullpath(char* absPath, const char* relPath, size_t) {
-    return realpath(relPath, absPath);
+    return realpath(NormalizePath(relPath).c_str(), absPath);
 }
 
 inline void _splitpath(const char* path, char* drive, char* dir, char* fname, char* ext) {
@@ -679,7 +736,9 @@ typedef WIN32_FIND_DATAA WIN32_FIND_DATA;
 
 struct _FindContext { DIR* dir; char pattern[MAX_PATH]; char path[MAX_PATH]; };
 
-inline HANDLE FindFirstFileA(const char* pattern, WIN32_FIND_DATAA* fd) {
+inline HANDLE FindFirstFileA(const char* rawPattern, WIN32_FIND_DATAA* fd) {
+    std::string pattern_s = NormalizePath(rawPattern);
+    const char* pattern = pattern_s.c_str();
     char dir_path[MAX_PATH]; strncpy(dir_path, pattern, MAX_PATH-1);
     char* slash = strrchr(dir_path, '/'); if (!slash) slash = strrchr(dir_path, '\\');
     if (slash) *slash = '\0'; else { dir_path[0]='.'; dir_path[1]='\0'; }
@@ -758,8 +817,8 @@ inline BOOL FileTimeToDosDateTime(const FILETIME*, WORD* date, WORD* time_) {
     if (date) *date = 0; if (time_) *time_ = 0; return FALSE;
 }
 
-#define DeleteFile(path)   (remove(path) == 0)
-#define DeleteFileA(path)  (remove(path) == 0)
+inline BOOL DeleteFileA(const char* path) { return remove(NormalizePath(path).c_str()) == 0; }
+#define DeleteFile DeleteFileA
 
 // ─── File time stubs ──────────────────────────────────────────────────────────
 inline void GetSystemTimeAsFileTime(FILETIME* ft) {
@@ -799,16 +858,16 @@ inline BOOL SystemTimeToTzSpecificLocalTime(void* /*tz*/, const SYSTEMTIME* src,
 #include <sys/stat.h>
 #include <unistd.h>
 inline BOOL CreateDirectoryA(const char* path, void*) {
-    return mkdir(path, 0755) == 0 ? TRUE : FALSE;
+    return mkdir(NormalizePath(path).c_str(), 0755) == 0 ? TRUE : FALSE;
 }
 #ifndef CreateDirectory
 #  define CreateDirectory CreateDirectoryA
 #endif
-inline BOOL RemoveDirectoryA(const char* path) { return rmdir(path) == 0 ? TRUE : FALSE; }
+inline BOOL RemoveDirectoryA(const char* path) { return rmdir(NormalizePath(path).c_str()) == 0 ? TRUE : FALSE; }
 #ifndef RemoveDirectory
 #  define RemoveDirectory RemoveDirectoryA
 #endif
-inline BOOL SetCurrentDirectoryA(const char* path) { return chdir(path) == 0 ? TRUE : FALSE; }
+inline BOOL SetCurrentDirectoryA(const char* path) { return chdir(NormalizePath(path).c_str()) == 0 ? TRUE : FALSE; }
 #ifndef SetCurrentDirectory
 #  define SetCurrentDirectory SetCurrentDirectoryA
 #endif
