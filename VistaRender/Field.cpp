@@ -1,4 +1,7 @@
 #include "StdAfx.h"
+// Serialization.h first: Field.h pulls UniqueVector.h, whose template
+// serialize() needs a complete Archive type at instantiation (clang).
+#include "Serialization/Serialization.h"
 #include "Field.h"
 #include "DebugUtil.h"
 #include "d3dx9.h"
@@ -371,7 +374,7 @@ void FieldDispatcher::Draw(Camera* camera)
 	gb_RenderDevice3D->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 	gb_RenderDevice3D->SetWorldMaterial(ALPHA_ADDBLENDALPHA, MatXf::ID, phase_, GetTexture(0), GetTexture(1), COLOR_ADD, false, true);
 
-	{//Немного не к месту, зато быстро по скорости, для отражений.
+	{//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 		gb_RenderDevice3D->SetTexture(5,water->reflectionTexture());
 		gb_RenderDevice3D->SetSamplerData(5,sampler_clamp_linear);
 	}

@@ -101,8 +101,14 @@ const EnumDescriptor& getEnumDescriptor(const Enum& key);
 
 #define ENUM_DESCRIPTOR_IGNORE_ERRORS	ignoreErrors(true);
 
+// NB: defined as an explicit specialization of the getEnumDescriptor<> template
+// (not a plain overload). Call sites in other TUs see only the template
+// declaration and so reference the specialization symbol; under clang's two-phase
+// lookup a plain overload in this TU would not match that reference (it does under
+// MSVC's lax lookup), leaving the specialization undefined at link.
 #define END_ENUM_DESCRIPTOR(enumType)	\
 	}  \
+	template<>	\
 	const EnumDescriptor& getEnumDescriptor(const enumType& key){	\
 		static Enum##enumType descriptor;	\
 		return descriptor;	\
@@ -118,6 +124,7 @@ const EnumDescriptor& getEnumDescriptor(const Enum& key);
 
 #define END_ENUM_DESCRIPTOR_ENCLOSED(nameSpace, enumType)	\
 	}  \
+	template<>	\
 	const EnumDescriptor& getEnumDescriptor(const nameSpace::enumType& key){	\
 		static Enum##nameSpace##enumType descriptor;	\
 		return descriptor;	\

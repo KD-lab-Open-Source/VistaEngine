@@ -69,7 +69,8 @@ void FieldOfViewMap::add(c3dx* model)
 			colors[i] = pos.z;
 		}
 		
-		scanPolyByPointOp(points, colors, 3, AddOp(map_));
+		AddOp addOp(map_);
+		scanPolyByPointOp(points, colors, 3, addOp);
 	}
 }
 
@@ -88,7 +89,8 @@ void FieldOfViewMap::remove(c3dx* model)
 			colors[i] = pos.z;
 		}
 		
-		scanPolyByPointOp(points, colors, 3, RemoveOp(map_));
+		RemoveOp removeOp(map_);
+		scanPolyByPointOp(points, colors, 3, removeOp);
 	}
 }
 
@@ -201,10 +203,10 @@ void FieldOfViewMap::updateTexture()
 	start_timer_auto();
 
 	Vect4f transform = gb_RenderDevice3D->planarTransform();
-	int x0 = max(0, map_.w2m(round(transform.x)));
-	int y0 = max(0, map_.w2m(round(transform.y)));
-	int x1 = min(map_.sizeX(), x0 + map_.w2m(round(1.f/transform.z)));
-	int y1 = min(map_.sizeY(), y0 + map_.w2m(round(1.f/transform.w)));
+	int x0 = max(0, map_.w2m(int(round(transform.x))));
+	int y0 = max(0, map_.w2m(int(round(transform.y))));
+	int x1 = min(map_.sizeX(), x0 + map_.w2m(int(round(1.f/transform.z))));
+	int y1 = min(map_.sizeY(), y0 + map_.w2m(int(round(1.f/transform.w))));
 
 	for(int y = y0 + 1; y < y1 - 1; y++)
 		for(int x = x0 + 1; x < x1 - 1; x++){
@@ -259,9 +261,9 @@ void FieldOfViewMap::Draw(Camera* camera)
 
 void FieldOfViewMap::serialize(Archive& ar)
 {
-	ar.serialize(colors_, "colors", "Цвета секторов видимости");
-	ar.serialize(radiusFactor_, "radiusFactor", "Множитель радиуса");
-	ar.serialize(sectorFactor_, "sectorFactor", "Множитель сектора");
+	ar.serialize(colors_, "colors", "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(radiusFactor_, "radiusFactor", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(sectorFactor_, "sectorFactor", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 void FieldOfViewMap::debugDraw(Camera* camera)

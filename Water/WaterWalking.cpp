@@ -153,7 +153,7 @@ void cWaterPlume::Draw(Camera* camera)
 		if (it->phase <= 1){
 			sVertexXYZDT1* v = pBuf->Get();
 			float size = it->phase * it->max_size;
-			color.a = unsigned char((1 - it->phase) * 255);
+			color.a = (unsigned char)((1 - it->phase) * 255);
 			Vect3f sx(Vect3f::I); sx *= size;
 			Vect3f sy(Vect3f::J); sy *= size;
 			v[0].pos = it->pos - sx - sy; v[0].diffuse = color; v[0].GetTexel().set(0, 0);	

@@ -32,7 +32,7 @@ int vrtMap::convertVMapTryColor2TerClrT()
 	return 0;
 }
 template<>
-int vrtMap::convertVMapTryColor2TerClrT<unsigned char>()
+inline int vrtMap::convertVMapTryColor2TerClrT<unsigned char>()
 {
 	xassert(supBuf);
 	ColorQuantizer cq;
@@ -59,7 +59,7 @@ int vrtMap::convertVMapTryColor2TerClrT<unsigned char>()
 	return result;
 }
 template<>
-int vrtMap::convertVMapTryColor2TerClrT<unsigned short>()
+inline int vrtMap::convertVMapTryColor2TerClrT<unsigned short>()
 {
 	int i,j;
 	for(i=0; i < V_SIZE; i++){
@@ -75,7 +75,7 @@ int vrtMap::convertVMapTryColor2TerClrT<unsigned short>()
 }
 
 template <>
-unsigned int vrtMap::getColor32<int>(int x, int y)
+inline unsigned int vrtMap::getColor32<int>(int x, int y)
 {
 	int off=offsetBuf(x,y);
 	unsigned int col32;
@@ -121,7 +121,7 @@ unsigned int vrtMap::getColor32<int>(int x, int y)
 }
 
 template <>	
-unsigned short vrtMap::getColor16<int>(int x, int y)
+inline unsigned short vrtMap::getColor16<int>(int x, int y)
 {
 	int off=offsetBuf(x,y);
 	unsigned short col16;

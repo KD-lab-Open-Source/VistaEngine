@@ -439,7 +439,7 @@ bool ConditionCheckSurfaceProducedZone::check(UnitActing* unit) const
 
 	ScanGroundDamagedLineOp line_op;
 	ScanningShape shape;
-	shape.setCircle(round(unit->attr().producedPlacementZoneRadius) >> kmGrid);
+	shape.setCircle(int(round(unit->attr().producedPlacementZoneRadius)) >> kmGrid);
 	ScanningShape::const_iterator i;
 	int y = shape.rect().y + (unit->position2D().yi() >> kmGrid);
 	int xCenter = unit->position2D().xi() >> kmGrid;
@@ -623,7 +623,7 @@ bool ConditionObjectPercentOwner::check() const
 	}
 
 	totalMax = max(total, totalMax);
-	return compare(total ? round(part * 100.f / totalMax) : 0, percent, compareOperator); 
+	return compare(total ? int(round(part * 100.f / totalMax)) : 0, percent, compareOperator);
 }
 
 void ConditionCreateObject::serialize(Archive& ar) 

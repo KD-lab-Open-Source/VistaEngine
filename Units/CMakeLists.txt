@@ -42,6 +42,8 @@ add_library(Units STATIC
     Weapon.cpp
     WeaponAttribute.cpp
     stdafx.cpp
+    # Anchors for the editor-only data segments referenced via FORCE_SEGMENT.
+    EditorSegmentStub.cpp
 )
 
 target_include_directories(Units PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

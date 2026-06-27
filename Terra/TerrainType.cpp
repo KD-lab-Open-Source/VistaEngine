@@ -4,6 +4,10 @@
 
 WRAP_LIBRARY(TerrainTypeDescriptor, "TerrainTypeDescriptor", "Типы поверхности", "Scripts\\Content\\TerrainTypeDescriptor", 0, LIBRARY_EDITABLE);
 
+// Explicit specialization (not a plain overload) so call sites in other TUs,
+// which see only the getEnumDescriptor<> template declaration, resolve to this
+// definition under clang's two-phase lookup. See EnumDescriptor.h.
+template<>
 const EnumDescriptor& getEnumDescriptor(const TerrainType& key)
 {
 	return TerrainTypeDescriptor::instance();

@@ -171,6 +171,8 @@ extern list<Rectf> tileMapUpdateRegions;
 extern PathFinder* pathFinder;
 void waterTileChange(int x, int y);
 void iceTileChange(int x, int y);
+void waterChangePF(int x, int y);
+void iceChangePF(int x, int y);
 
 
 #endif

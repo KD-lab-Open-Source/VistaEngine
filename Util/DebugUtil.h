@@ -188,7 +188,14 @@ Vect3f clampWorldPosition(const Vect3f& pos, float radius);
 
 //--------------------------------------
 extern RandomGenerator effectRND;//В графике используется graphRnd.
+#ifdef _CROSS_PLATFORM_
+// __declspec(selectany) is stripped to nothing off-Windows (WindowsAPI.h), which
+// would make this a strong global defined in every TU. A C++17 inline variable
+// gives the same COMDAT-merge semantics selectany provided.
+inline RandomGenerator logicRnd;
+#else
 __declspec(selectany) RandomGenerator logicRnd;
+#endif
 
 #ifndef _FINAL_VERSION_
 

@@ -67,7 +67,13 @@ public:
 	char logFileName[MAX_PATH];
 };
 
+#ifdef _CROSS_PLATFORM_
+// __declspec(selectany) is stripped off-Windows; a C++17 inline variable keeps
+// the COMDAT-merge semantics so this isn't redefined in every including TU.
+inline LogMsgCenter logMsgCenter;
+#else
 __declspec(selectany) LogMsgCenter logMsgCenter;
+#endif
 
 
 extern LogMsgCenter logMsgCenter;

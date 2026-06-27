@@ -567,8 +567,9 @@ RECT Bound::CalcRect()
 	}
 
 	RECT r;
-	r.left=_xmin; 
+	r.left=_xmin;
 	r.right=_xmax;
+	int i;
 	//Find MinY
 	for(i=0;i<dy;i++)
 	{

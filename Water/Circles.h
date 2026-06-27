@@ -39,7 +39,7 @@ class cCircles
 		Vect2f v[3];
 		Vect2f& operator[](int i){xassert((UINT)i<3);return v[i];}
 	};
-	void SetCirclePos(cWaterCircle& circle, Vect2f& p);
+	void SetCirclePos(cWaterCircle& circle, const Vect2f& p);
 
 	Vect2f trapeze_beg;
 	float trapeze_beg_r;

@@ -634,7 +634,7 @@ bool vrtMap::deleteWorld(const char* _worldName)
 			}
 			else {
 				filemask=path2world + "\\" + FindFileData.cFileName;
-				result&=::DeleteFile(filemask.c_str());
+				result&=DeleteFile(filemask.c_str());
 			}
 		} while(::FindNextFile( hf, &FindFileData ));
 		::FindClose( hf );
@@ -1759,6 +1759,9 @@ bool vrtMap::sVmpHeader::cmpID(const char* pVmpID)
 }
 inline int clampX(const int x, const int xmax)
 {
+#ifdef _CROSS_PLATFORM_
+	return x < 0 ? 0 : (x > xmax ? xmax : x);
+#else
 	__asm {
 		mov eax, x
 		xor ecx, ecx
@@ -1766,6 +1769,7 @@ inline int clampX(const int x, const int xmax)
 		mov ecx, xmax
 		cmova eax, ecx
 	}
+#endif
 }
 
 void vrtMap::getTileZ(char* Texture,int pitch,int xstart,int ystart,int xend,int yend,int step)

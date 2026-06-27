@@ -164,7 +164,7 @@ universeObjectAction(0)
 		universe()->setShowFogOfWar(false);
 
 	if(environment->fogOfWar())
-		std::for_each(Players.begin(), Players.end(), std::mem_fun(&Player::initFogOfWarMap));
+		std::for_each(Players.begin(), Players.end(), [](Player* p){ p->initFogOfWarMap(); });
 
 	sourceManager = new SourceManager;
 

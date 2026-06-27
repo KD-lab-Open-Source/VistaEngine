@@ -234,7 +234,10 @@ unsigned char flags;
 };
 #pragma pack(pop)
 
-static bool saveFileSmart(const char* fname, const char* buffer, int size)
+// Renamed from saveFileSmart: Serialization.h declares an external saveFileSmart
+// (defined in XPrmArchive.cpp), which promotes this file-local copy to external
+// linkage and collides at link. A distinct name keeps it truly local.
+static bool saveFileSmartLocal(const char* fname, const char* buffer, int size)
 {
 	XStream testf(0);
 	if(testf.open(fname, XS_IN)){
@@ -286,7 +289,7 @@ bool SaveTga(const char* filename,int width,int height,unsigned char* buf,int by
 	buffer.write(&Hdr,18);
 	buffer.write(buf,Numbytes);
 
-	return saveFileSmart(filename, buffer, buffer.tell());
+	return saveFileSmartLocal(filename, buffer, buffer.tell());
 }
 
 RENDER_API bool LoadTGA(const char* filename,int& dx,int& dy,unsigned char*& buf,

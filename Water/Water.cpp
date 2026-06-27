@@ -156,8 +156,8 @@ cWater::~cWater()
 #define PREC_TRACE_RAY	17
 bool cWater::Trace(const Vect3f& begin, const Vect3f& end, Vect3f& intersection)
 {
-	if ((round(end.x) >> grid_shift) < 0 || (round(end.x) >> grid_shift) > grid_size.x ||
-		(round(end.y) >> grid_shift) < 0 || (round(end.y) >> grid_shift) > grid_size.y)
+	if ((int(round(end.x)) >> grid_shift) < 0 || (int(round(end.x)) >> grid_shift) > grid_size.x ||
+		(int(round(end.y)) >> grid_shift) < 0 || (int(round(end.y)) >> grid_shift) > grid_size.y)
 		return false;
 	float dx = end.x - begin.x;
 	float dy = end.y - begin.y;
@@ -600,14 +600,14 @@ void cWater::UpdateVB()
 			{
 				for(j=0; j<grid_size.x; j++)
 					SetVertexBorder(v+j,
-					(round(v[j].pos.x)>>grid_shift), 
-					(round(v[j].pos.y)>>grid_shift));
+					(int(round(v[j].pos.x))>>grid_shift), 
+					(int(round(v[j].pos.y))>>grid_shift));
 			}else
 			{
 				for(j=0; j<grid_size.y; j++)
 					SetVertexBorder(v+j,
-					(round(v[j].pos.x)>>grid_shift), 
-					(round(v[j].pos.y)>>grid_shift));
+					(int(round(v[j].pos.x))>>grid_shift), 
+					(int(round(v[j].pos.y))>>grid_shift));
 			}
 			for(int k=j; k<border.tiles[i].vertexBuffer.GetNumberVertex();k++)
 			{
@@ -1314,10 +1314,10 @@ bool cWater::isUnderWater(const Vect3f& pos, float radius) const
 		return true;
 
 	if(radius > FLT_EPS){
-		int xL=round(pos.x-radius)>>GetCoordShift();
-		int xR=round(pos.x+radius)>>GetCoordShift();
-		int yT=round(pos.y-radius)>>GetCoordShift();
-		int yD=round(pos.y+radius)>>GetCoordShift();
+		int xL=int(round(pos.x-radius))>>GetCoordShift();
+		int xR=int(round(pos.x+radius))>>GetCoordShift();
+		int yT=int(round(pos.y-radius))>>GetCoordShift();
+		int yD=int(round(pos.y+radius))>>GetCoordShift();
 
 		xassert(xL >= 0 && xR < grid_size.x && yT >= 0 && yD < grid_size.y);
 
@@ -1369,10 +1369,10 @@ bool cWater::isWater(const Vect3f& pos, float radius) const
 		return true;
 
 	if(radius > FLT_EPS){
-		int xL=round(pos.x-radius)>>GetCoordShift();
-		int xR=round(pos.x+radius)>>GetCoordShift();
-		int yT=round(pos.y-radius)>>GetCoordShift();
-		int yD=round(pos.y+radius)>>GetCoordShift();
+		int xL=int(round(pos.x-radius))>>GetCoordShift();
+		int xR=int(round(pos.x+radius))>>GetCoordShift();
+		int yT=int(round(pos.y-radius))>>GetCoordShift();
+		int yD=int(round(pos.y+radius))>>GetCoordShift();
 
 		xassert(xL >= 0 && xR < grid_size.x && yT >= 0 && yD < grid_size.y);
 
@@ -1396,10 +1396,10 @@ float cWater::waterDeep(const Vect3f& pos, float radius) const
 	float minRelativeZ(GetRelativeZ(xx, yy));
 
 	if(radius > FLT_EPS){
-		int xL=round(pos.x-radius)>>GetCoordShift();
-		int xR=round(pos.x+radius)>>GetCoordShift();
-		int yT=round(pos.y-radius)>>GetCoordShift();
-		int yD=round(pos.y+radius)>>GetCoordShift();
+		int xL=int(round(pos.x-radius))>>GetCoordShift();
+		int xR=int(round(pos.x+radius))>>GetCoordShift();
+		int yT=int(round(pos.y-radius))>>GetCoordShift();
+		int yD=int(round(pos.y+radius))>>GetCoordShift();
 
 		xassert(xL >= 0 && xR < grid_size.x && yT >= 0 && yD < grid_size.y);
 

@@ -1,4 +1,6 @@
 add_library(Terra STATIC
+    LAND.CPP
+    VMAP.CPP
     QSWorldsMgr.cpp
     TerrainType.cpp
     Toolser.cpp

@@ -1,7 +1,9 @@
 #include "StdAfx.h"
 #include "shlwapi.h"
-#include "TriggerExport.h"
+// Serialization.h first: TriggerExport.h pulls UniqueVector.h, whose template
+// serialize() needs a complete Archive type at instantiation (clang).
 #include "Serialization/Serialization.h"
+#include "TriggerExport.h"
 #include "Serialization/Dictionary.h"
 #include "Serialization/SerializationFactory.h"
 #include "Serialization/EnumDescriptor.h"
@@ -9,15 +11,15 @@
 #include "Serialization/MultiArchive.h"
 #include "XMath/ComboListColor.h"
 
-// Для StrStrI
+// пїЅпїЅпїЅ StrStrI
 #pragma message("Automatically linking with shlwapi.lib") 
 #pragma comment(lib, "shlwapi.lib") 
 
 BEGIN_ENUM_DESCRIPTOR(ColorType, "StrategyColor")
-REGISTER_ENUM(STRATEGY_RED, "Красный")
-REGISTER_ENUM(STRATEGY_GREEN, "Зеленый")
-REGISTER_ENUM(STRATEGY_BLUE, "Синий")
-REGISTER_ENUM(STRATEGY_YELLOW, "Желтый")
+REGISTER_ENUM(STRATEGY_RED, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(STRATEGY_GREEN, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(STRATEGY_BLUE, "пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM(STRATEGY_YELLOW, "пїЅпїЅпїЅпїЅпїЅпїЅ")
 REGISTER_ENUM(STRATEGY_COLOR_0, "STRATEGY_COLOR_0")
 REGISTER_ENUM(STRATEGY_COLOR_1, "STRATEGY_COLOR_1")
 REGISTER_ENUM(STRATEGY_COLOR_2, "STRATEGY_COLOR_2")
@@ -28,27 +30,27 @@ REGISTER_ENUM(STRATEGY_COLOR_MAX, "STRATEGY_COLOR_MAX")
 END_ENUM_DESCRIPTOR(ColorType)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(TriggerLink, Type, "Type")
-REGISTER_ENUM_ENCLOSED(TriggerLink, THIN, "Тонкая")
-REGISTER_ENUM_ENCLOSED(TriggerLink, THICK, "Толстая")
+REGISTER_ENUM_ENCLOSED(TriggerLink, THIN, "пїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TriggerLink, THICK, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(TriggerLink, Type)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(Trigger, State, "State")
-REGISTER_ENUM_ENCLOSED(Trigger, SLEEPING, "Проверяет входные связи")
-REGISTER_ENUM_ENCLOSED(Trigger, CHECKING, "Проверяет условия")
-REGISTER_ENUM_ENCLOSED(Trigger, WORKING, "Выполняется")
-REGISTER_ENUM_ENCLOSED(Trigger, DONE, "Выполнен")
+REGISTER_ENUM_ENCLOSED(Trigger, SLEEPING, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(Trigger, CHECKING, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(Trigger, WORKING, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(Trigger, DONE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(Trigger, State)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(TriggerChain, CheckType, "CheckType")
-REGISTER_ENUM_ENCLOSED(TriggerChain, LOGIC_TRIGGER, "Логический триггер")
-REGISTER_ENUM_ENCLOSED(TriggerChain, INTERFACE_TRIGGER, "Интерфейсный триггер")
-REGISTER_ENUM_ENCLOSED(TriggerChain, IGNORE_PAUSE, "Интерфейсный триггер с игнорировнием паузы")
-REGISTER_ENUM_ENCLOSED(TriggerChain, NO_CHECK, "Проверка отключена (только для главного меню!!!)")
+REGISTER_ENUM_ENCLOSED(TriggerChain, LOGIC_TRIGGER, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TriggerChain, INTERFACE_TRIGGER, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TriggerChain, IGNORE_PAUSE, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ")
+REGISTER_ENUM_ENCLOSED(TriggerChain, NO_CHECK, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ!!!)")
 END_ENUM_DESCRIPTOR_ENCLOSED(TriggerChain, CheckType)
 
 BEGIN_ENUM_DESCRIPTOR_ENCLOSED(ConditionSwitcher, Type, "Type")
-REGISTER_ENUM_ENCLOSED(ConditionSwitcher, AND, "И")
-REGISTER_ENUM_ENCLOSED(ConditionSwitcher, OR, "ИЛИ")
+REGISTER_ENUM_ENCLOSED(ConditionSwitcher, AND, "пїЅ")
+REGISTER_ENUM_ENCLOSED(ConditionSwitcher, OR, "пїЅпїЅпїЅ")
 END_ENUM_DESCRIPTOR_ENCLOSED(ConditionSwitcher, Type)
 
 const TriggerChain* Action::triggerChain_;
@@ -62,7 +64,7 @@ void Condition::serialize(Archive& ar)
 	if(ar.isEdit())
 		ar.serialize(NotDecorator(inverted_), "inverted", "^");
 	else
-		ar.serialize(inverted_, "inverted", "Инвертировано");
+		ar.serialize(inverted_, "inverted", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	ar.serialize(state_, "state", 0);
 	ar.serialize(internalColor_, "internalColor", 0);
 }
@@ -85,7 +87,7 @@ void ConditionSwitcher::serialize(Archive& ar)
 {
 	__super::serialize(ar);
 	ar.serialize(type, "type", "&<");
-	ar.serialize(conditions, "conditions", "^Условия");
+	ar.serialize(conditions, "conditions", "^пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	if(ar.isInput()){
 		Conditions::iterator ci;
 		FOR_EACH(conditions, ci)
@@ -256,13 +258,13 @@ void ConditionSwitcher::writeInfo(XBuffer& buffer, string offset, bool debug) co
 
 	buffer < offset.c_str();
 	if(inverted())
-		buffer < TRANSLATE("НЕ") < " ";
+		buffer < TRANSLATE("пїЅпїЅ") < " ";
 
 	if(conditions.size() == 1){
 		conditions.front()->writeInfo(buffer, offset, debug);
 		return;
 	}
-	buffer < (type == AND ? TRANSLATE("И") : TRANSLATE("ИЛИ"));
+	buffer < (type == AND ? TRANSLATE("пїЅ") : TRANSLATE("пїЅпїЅпїЅ"));
 	if(debug)
 		buffer < " = " < (state() ? "1" : "0");
 	buffer < "\r\n";
@@ -282,7 +284,7 @@ void Condition::writeInfo(XBuffer& buffer, string offset, bool debug) const
 {
 	buffer < offset.c_str();
 	if(inverted())
-		buffer < TRANSLATE("НЕ") < " ";
+		buffer < TRANSLATE("пїЅпїЅ") < " ";
 
 	const char* name = TRANSLATE(FactorySelector<Condition>::Factory::instance().find(this).nameAlt());
 	const char* str = name;
@@ -352,12 +354,12 @@ void TriggerLink::serialize(Archive& ar)
 		for(int i = 0; i < STRATEGY_COLOR_MAX; i++)
 			comboList.push_back(Color4f(colors[i]));
 		ComboListColor color(comboList, Color4f(colors[colorType_]));
-		ar.serialize(color, "color", "Цвет");
+		ar.serialize(color, "color", "пїЅпїЅпїЅпїЅ");
 		colorType_ = (ColorType)color.index();
 	}
 	else
-		ar.serialize(colorType_, "color", "Цвет");
-	ar.serialize(autoRestarted_, "type", "Тип");
+		ar.serialize(colorType_, "color", "пїЅпїЅпїЅпїЅ");
+	ar.serialize(autoRestarted_, "type", "пїЅпїЅпїЅ");
 	ar.serialize(active_, "active_", 0);
 	
 	ar.serialize(parentOffset_, "parentOffset", 0);
@@ -382,7 +384,7 @@ Vect2f TriggerLink::childPoint() const
 	return child->leftTop() + Trigger::gridSize()*.5f + Vect2f(childOffset_); 
 }
 
-static bool cut(Vect2f& p0, Vect2f& p1, Vect2f& u0, Vect2f& u1)
+static bool cut(Vect2f& p0, Vect2f& p1, const Vect2f& u0, const Vect2f& u1)
 {
 	Vect2f d12 = p0 - u0;
 	Vect2f d1 = p1 - p0;
@@ -478,27 +480,27 @@ Trigger::Trigger()
 
 void Trigger::serialize(Archive& ar) 
 {
-	ar.serialize(name_, "name", "&Имя");
+	ar.serialize(name_, "name", "&пїЅпїЅпїЅ");
 	
-	if(!ar.serialize(color_, "color", "Цвет")){ // CONVERSION
+	if(!ar.serialize(color_, "color", "пїЅпїЅпїЅпїЅ")){ // CONVERSION
 		int internalColor_;
 		ar.serialize(internalColor_, "internalColor_", 0);
 		color_.setGDI(internalColor_); 
 	}
 
 	if(!ar.isEdit() || isContext_){
-		ar.serialize(unitsPerQuant_, "unitsPerQuant", "Обрабатывать юнитов за квант для контекстных условий");
-		ar.serialize(extendedScan_, "extendedScan", "Сканирование контекста по всем игрокам");
+		ar.serialize(unitsPerQuant_, "unitsPerQuant", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(extendedScan_, "extendedScan", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	}
-	xassert("BUG: Проблема с копированием триггеров!" && (!condition || condition->numRef() == 1));
-	ar.serialize(condition, "condition", "<Условие");
-	xassert("BUG: Проблема с копированием триггеров!" && (!action || action->numRef() == 1));
-	ar.serialize(action, "action", "<Действие");
+	xassert("BUG: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ!" && (!condition || condition->numRef() == 1));
+	ar.serialize(condition, "condition", "<пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	xassert("BUG: пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ!" && (!action || action->numRef() == 1));
+	ar.serialize(action, "action", "<пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 	ar.serialize(outcomingLinks_, "outcomingLinks", 0);
 	ar.serialize(state_, "state_", 0);
 	ar.serialize(executionCounter_, "executionCounter_", 0);
-	ar.serialize(randomizeOutcomingLinks_, "randomizeOutcomingLinks", "Рандомизировать исходящие стрелки");
-	ar.serialize(breakWhenActivate_, "breakWhenActivate", "Остановиться при активации (дебаг)");
+	ar.serialize(randomizeOutcomingLinks_, "randomizeOutcomingLinks", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+	ar.serialize(breakWhenActivate_, "breakWhenActivate", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅ)");
 		
 	ar.serialize(cellIndex_, "cellIndex", 0);
 	if(ar.isInput()){
@@ -553,19 +555,19 @@ void Trigger::setState(State state, TriggerChain& triggerChain, int activateOffs
 	case WORKING: {
 		IncomingLinksList::iterator li;
 		FOR_EACH(incomingLinks_, li){
-			if((*li)->active()){ // Деактивировать связи из родительского триггера других цветов
+			if((*li)->active()){ // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 				Trigger* trigger = (*li)->parent;
 				OutcomingLinksList::iterator lj;
 				FOR_EACH(trigger->outcomingLinks_, lj){
 					if(lj->colorType() != (*li)->colorType()){
 						if(!lj->autoRestarted()){
-							if(lj->child->state() == CHECKING) // Выключить другие триггера
+							if(lj->child->state() == CHECKING) // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 								lj->child->state_ = lj->child->executionCounter_ ? DONE : SLEEPING;
 							lj->deactivate(triggerChain);
 						}
 					}
 				}
-				if(!(*li)->autoRestarted()) // Деактивировать, если тонкая
+				if(!(*li)->autoRestarted()) // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 					(*li)->deactivate(triggerChain);
 			}
 		}
@@ -621,8 +623,8 @@ bool Trigger::removeLinkByChild(Trigger * child)
 		if (link.child == child)
 		{
 /*!
-	раскоментировать, если 
-	из remove_link удален вызов метода initialize()
+	пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ 
+	пїЅпїЅ remove_link пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ initialize()
 
 //			typedef IncomingLinksList::iterator Iterator;
 //			Iterator res = find(child->incomingLinks_.begin(), 
@@ -686,8 +688,8 @@ void TriggerChain::serializeProperties(Archive& ar)
 {
 	if(ar.isInput() && !ar.isEdit()){
 		bool ignorePause, checkDeterminism;
-		ar.serialize(ignorePause, "ignorePause", "Игнорировать паузу");
-		ar.serialize(checkDeterminism, "checkDeterminism", "Проверять на повторяемость");
+		ar.serialize(ignorePause, "ignorePause", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
+		ar.serialize(checkDeterminism, "checkDeterminism", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 		if(checkDeterminism)
 			checkType_ = LOGIC_TRIGGER;
 		else if(ignorePause)
@@ -695,7 +697,7 @@ void TriggerChain::serializeProperties(Archive& ar)
 		else
 			checkType_ = INTERFACE_TRIGGER;
 	}
-	ar.serialize(checkType_, "checkType", "Тип проверки триггера");
+	ar.serialize(checkType_, "checkType", "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 }
 
 void TriggerChain::serialize(Archive& ar) 
@@ -759,7 +761,7 @@ void TriggerChain::initialize()
 			if(ti->condition && !ti->condition->allowable(checkType_ == LOGIC_TRIGGER)){
 				XBuffer message;
 				message < name.c_str() < " - " < ti->name();
-				xassertStr("Недопустимое условие в триггере" && 0, message);
+				xassertStr("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ" && 0, message);
 			}
 		}
 	}

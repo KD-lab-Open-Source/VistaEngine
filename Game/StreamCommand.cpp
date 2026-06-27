@@ -66,7 +66,7 @@ void StreamDataManager::execute()
 				TimerContainer& data = timerMap->operator []((int)func);
 				if(data.timer == 0){
 					string name;
-					debugSymbolManager->getProcName(func, name);
+					debugSymbolManager->getProcName((void*)func, name);
 					xassert(!name.empty());
 					data.name = new char[name.size()+1];
 					strcpy(data.name, name.c_str());

@@ -78,7 +78,10 @@ const float FLT_COMPARE_TOLERANCE = 1.e-5f;
 
 const int INT_INF = 0x7fffffff;
 
-#if _MSC_VER == 1100 /* if MSVisual C++ 5.0 */
+#if defined(_CROSS_PLATFORM_) || _MSC_VER == 1100 /* clang, or MSVisual C++ 5.0 */
+// clang's __forceinline (always_inline) lacks the `inline` keyword's ODR/COMDAT
+// linkage, so at -O0 these header-defined functions emit in every TU and clash
+// at link. Plain `inline` gives the right linkage (and still allows inlining).
 #define xm_inline inline
 #else
 #define xm_inline __forceinline

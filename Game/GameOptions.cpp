@@ -67,7 +67,7 @@ void GameOptions::graphSetup()
 
 	gb_VisGeneric->SetShadowType(shadowEnable, shadowSize);
 	gb_VisGeneric->SetShadowMapSelf4x4(shadow4x4);
-	gb_VisGeneric->SetMaximalShadowObject(shadowEnable ? OST_SHADOW_REAL : OST_SHADOW_NONE);
+	gb_VisGeneric->SetMaximalShadowObject(static_cast<ObjectShadowType>(shadowEnable ? OST_SHADOW_REAL : OST_SHADOW_NONE));
 
 	gb_VisGeneric->SetEnableBump(gb_VisGeneric->PossibilityBump() ? getBool(OPTION_BUMP) : false);
 

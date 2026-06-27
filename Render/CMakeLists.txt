@@ -45,12 +45,11 @@ set(RENDER_SOURCES
 
 if(WIN32)
     list(APPEND RENDER_SOURCES
-        # Win32 application host (WinMain + message loop) and DbgHelp stack
-        # walkers. The cross-platform entry point / windowing is the eventual
-        # SDL3 replacement (Track B).
-        Util/Runtime3D.cpp
-        Util/stack.cpp
-        Util/stackwalker.cpp
+        # The D3D9 backend: these .cpp drive IDirect3DDevice9 / IDirect3D9 (device
+        # creation, GDI text) directly. Off-Windows the fake d3d9.h only makes the
+        # headers parse, not the device-creation call sites, so the real backend is
+        # Windows-only. The cross-platform renderer is the SDL GPU backend (Track B);
+        # off-Windows the referenced symbols come from RenderStub.cpp below.
         D3D/AdapterMode.cpp
         D3D/D3DRender.cpp
         D3D/D3DRenderDraw.cpp
@@ -62,8 +61,23 @@ if(WIN32)
         D3D/RenderDevice.cpp
         D3D/StdAfxRD.cpp
         D3D/VertexDeclaration.cpp
+
+        # Win32 application host (WinMain + message loop) and DbgHelp stack
+        # walkers. The cross-platform entry point / windowing is the eventual
+        # SDL3 replacement (Track B).
+        Util/Runtime3D.cpp
+        Util/stack.cpp
+        Util/stackwalker.cpp
         src/WinVideo.cpp
     )
+else()
+    # Off-Windows: no-op definitions for the render-backend symbols the engine
+    # references (gb_RenderDevice + the D3D device/buffer classes), so the game
+    # links with a silent renderer until the SDL GPU backend (Track B).
+    list(APPEND RENDER_SOURCES RenderStub.cpp)
+    # FreeType stubs (the vendored lib isn't built yet) — font rasterization is
+    # disabled until FreeType is wired in.
+    list(APPEND RENDER_SOURCES FreeTypeStub.cpp)
 endif()
 
 add_library(Render STATIC ${RENDER_SOURCES})

@@ -2,10 +2,12 @@ add_library(Physics STATIC
     CD/CD2D.cpp
     CD/CDConvex.cpp
     CD/CDSphere.cpp
-    # Crash/CrashSystem.cpp and RigidBodyNode.cpp are real (listed in Core.vcproj)
-    # but depend on the Render layer (Render/3dx/Simply3dx.h, Render/src/Scene.h,
-    # Game/RenderObjects.h) — the D3D9 renderer that is excluded for now (Track B).
-    # Restore these once the SDL GPU render backend is in place.
+    # Crash/CrashSystem.cpp and RigidBodyNode.cpp depend on the Render layer
+    # (Render/3dx/Simply3dx.h, Render/src/Scene.h, Game/RenderObjects.h); they
+    # compile against the render headers and link against the render-backend stub
+    # (Render/RenderStub.cpp) until the SDL GPU backend (Track B).
+    Crash/CrashSystem.cpp
+    RigidBodyNode.cpp
     #
     # Missile.cpp, MultiBodyDispatcher.cpp, Rocket.cpp and PathTracking.cpp are
     # omitted as orphans: none are listed in Core.vcproj (the build's source of

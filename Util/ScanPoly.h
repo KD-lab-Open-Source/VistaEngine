@@ -260,13 +260,15 @@ public:
 template<class PointOp>
 void scanPolyByPointOp(const Vect2i points[], int n, PointOp& point_op)
 {
-	scanPolyByLineOp(points, n, GenericLineOp<PointOp>(point_op));
+	GenericLineOp<PointOp> line_op(point_op);
+	scanPolyByLineOp(points, n, line_op);
 }
 
 template<class PointOp, class ColorType>
 void scanPolyByPointOp(const Vect2i points[], const ColorType colors[], int n, PointOp& point_op)
 {
-	scanPolyByLineOp(points, colors, n, GenericLineOp<PointOp>(point_op));
+	GenericLineOp<PointOp> line_op(point_op);
+	scanPolyByLineOp(points, colors, n, line_op);
 }
 
 #endif //__SCANPOLY_H__

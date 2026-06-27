@@ -34,7 +34,8 @@ IniFile::~IniFile()
 
 void IniFile::save()
 {
-	serialize(XPrmOArchive("iniFile.cfg"));
+	XPrmOArchive oa("iniFile.cfg");
+	serialize(oa);
 }
 
 void IniFile::serialize(Archive& ar)

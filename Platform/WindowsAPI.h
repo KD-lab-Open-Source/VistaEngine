@@ -232,6 +232,9 @@ struct SIZE   { LONG cx, cy; };
 #define _itoa(v, buf, r) (sprintf(buf, (r)==16 ? "%x" : "%d", v), buf)
 #define _ltoa(v, buf, r) (sprintf(buf, (r)==16 ? "%lx" : "%ld", (long)(v)), buf)
 #define _ultoa(v, buf, r) (sprintf(buf, (r)==16 ? "%lx" : "%lu", (unsigned long)(v)), buf)
+#define itoa  _itoa
+#define ltoa  _ltoa
+#define ultoa _ultoa
 #define _gcvt(v, d, buf) (sprintf(buf, "%.*g", d, (double)(v)), buf)
 
 // ─── Directory / file utilities ───────────────────────────────────────────────
@@ -579,6 +582,32 @@ inline BOOL QueryPerformanceFrequency(LARGE_INTEGER* f) {
 
 #define FILE_FLAG_RANDOM_ACCESS  0x10000000
 #define FILE_FLAG_SEQUENTIAL_SCAN 0x08000000
+#define FILE_FLAG_NO_BUFFERING   0x20000000
+#define FILE_FLAG_WRITE_THROUGH  0x80000000
+
+inline BOOL FlushFileBuffers(HANDLE h) { return fflush((FILE*)h) == 0; }
+
+// Legacy global-heap allocators — the Win32 GlobalAlloc family maps to the C
+// heap (flat memory model; the GMEM_* flags only matter under 16-bit segmented
+// memory).
+#define GMEM_FIXED    0x0000
+#define GMEM_ZEROINIT 0x0040
+#define GMEM_MOVEABLE 0x0002
+inline void* GlobalAlloc(unsigned flags, size_t sz) {
+    void* p = malloc(sz);
+    if (p && (flags & GMEM_ZEROINIT)) memset(p, 0, sz);
+    return p;
+}
+inline void* GlobalReAlloc(void* p, size_t sz, unsigned) { return realloc(p, sz); }
+inline void* GlobalFree(void* p) { free(p); return 0; }
+
+// Legacy OpenFile (16-bit-era API): the engine only uses it with OF_DELETE.
+#define OF_DELETE 0x00000200
+typedef struct _OFSTRUCT { unsigned char cBytes; } OFSTRUCT;
+inline HFILE OpenFile(const char* path, OFSTRUCT*, unsigned style) {
+    if (style & OF_DELETE) remove(path);
+    return 0;
+}
 
 inline HANDLE CreateFileA(const char* path, DWORD access, DWORD, void*, DWORD creation, DWORD, HANDLE) {
     const char* mode = (access & GENERIC_WRITE) ? "r+b" : "rb";
@@ -589,15 +618,20 @@ inline HANDLE CreateFileA(const char* path, DWORD access, DWORD, void*, DWORD cr
 }
 #define CreateFile CreateFileA
 
-inline BOOL ReadFile(HANDLE h, void* buf, DWORD n, DWORD* read, void*) {
-    size_t r = fread(buf, 1, n, (FILE*)h);
-    if (read) *read = (DWORD)r;
+// Templated on the byte-count and out-param types: Win32 uses DWORD (==unsigned
+// long under LLP64), but callers like XStream use `unsigned long` for the
+// out-param, which is 64-bit under LP64 and so won't bind to DWORD* here.
+template<class CountT, class OutT>
+inline BOOL ReadFile(HANDLE h, void* buf, CountT n, OutT* read, void*) {
+    size_t r = fread(buf, 1, (size_t)n, (FILE*)h);
+    if (read) *read = (OutT)r;
     return r > 0 || n == 0;
 }
-inline BOOL WriteFile(HANDLE h, const void* buf, DWORD n, DWORD* written, void*) {
-    size_t w = fwrite(buf, 1, n, (FILE*)h);
-    if (written) *written = (DWORD)w;
-    return w == n;
+template<class CountT, class OutT>
+inline BOOL WriteFile(HANDLE h, const void* buf, CountT n, OutT* written, void*) {
+    size_t w = fwrite(buf, 1, (size_t)n, (FILE*)h);
+    if (written) *written = (OutT)w;
+    return w == (size_t)n;
 }
 inline BOOL CloseFileHandle(HANDLE h) { return fclose((FILE*)h) == 0; }
 

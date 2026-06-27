@@ -20,12 +20,14 @@ set(UTIL_SOURCES
     TextDB.cpp
     Timers.cpp
     ZipConfig.cpp
+    # Portable debug-draw geometry helpers (clampWorldPosition, clip_circle_3D,
+    # show_terrain_line, G2S, To3D); includes render/Terra interfaces only.
+    DebugUtil.cpp
 )
 
 if(WIN32)
     list(APPEND UTIL_SOURCES
         ConsoleWindow.cpp
-        DebugUtil.cpp
         FormulaString.cpp
         SplashScreen.cpp
         mfc/PopupMenu.cpp
@@ -40,6 +42,27 @@ if(WIN32)
         ObjStatistic.cpp
         # DirectInput8 joystick; SDL3 provides cross-platform joystick input.
         joystick.cpp
+    )
+else()
+    # Portable display-capability queries (the real VideoMemoryInformation.cpp
+    # uses D3D9 + WMI): permissive defaults until the SDL GPU backend (Track B).
+    list(APPEND UTIL_SOURCES VideoMemoryInformationStub.cpp)
+    # Portable SystemUtil subset (time formatting, loc-data path); the Win32 GUI
+    # dialogs (file/popup/editText) are no-op off-Windows.
+    list(APPEND UTIL_SOURCES SystemUtilPortable.cpp)
+    # No-op stubs for the Win32 tooling / DirectInput leaves whose real sources
+    # are gated above (debug console, symbol resolver, joystick, keyboard,
+    # formula evaluator, profiler).
+    list(APPEND UTIL_SOURCES
+        ConsoleWindowStub.cpp
+        FormulaStringStub.cpp
+        ProfilerStub.cpp
+        joystickStub.cpp
+        Win32/DebugSymbolManagerStub.cpp
+        Win32/KeyboardDriverStub.cpp
+        # kdw editor toolkit (Win32 widgets): property-editor entry points and
+        # the editor dialogs the game references are no-op off-Windows.
+        kdwStub.cpp
     )
 endif()
 

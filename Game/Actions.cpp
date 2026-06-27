@@ -1354,7 +1354,7 @@ bool ActionAttackBySpecialWeapon::workedOut()
 						while(anglex < M_PI * 2.0f){
 							anglex += M_PI * 10.f / dist;
 							Vect2f position = Vect2f(firePosition_.x + cos(anglex)* dist, firePosition_.y + sin(anglex)* dist);
-							WeaponTarget& weaponTarget = WeaponTarget(To3D(position), weaponID_);
+							WeaponTarget weaponTarget = WeaponTarget(To3D(position), weaponID_);
 							contextUnit_->setUsedByTrigger(priority_, this);
 							if(contextUnit_->position2D().distance(position) < maxDistance && contextUnit_->fireCheck(weaponTarget) &&	weapon->checkFogOfWar(weaponTarget) && weapon->canAttack(weaponTarget)){
 								if(contextUnit_->getSquadPoint())
@@ -2850,7 +2850,7 @@ void ActionInterfaceHideControlTrigger::serialize(Archive& ar)
 
 void ActionInterfaceControlOperate::activate()
 {
-	for_each(actions_.begin(), actions_.end(), mem_fun_ref(&AtomAction::apply));
+	for_each(actions_.begin(), actions_.end(), [](AtomAction& a){ a.apply(); });
 }
 
 bool ActionInterfaceControlOperate::workedOut()

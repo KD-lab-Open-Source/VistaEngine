@@ -77,7 +77,7 @@ void cCircles::SetCircle(const Vect3f& dr_pos0)
 }
 
 const float cir_delta_time = 0.3f;
-void cCircles::SetCirclePos(cWaterCircle& circle, Vect2f& p)
+void cCircles::SetCirclePos(cWaterCircle& circle, const Vect2f& p)
 {
 	
 	circle.time = 1.0f/(time + rnd.frand()*cir_delta_time);
@@ -89,15 +89,15 @@ void cCircles::SetCirclePos(cWaterCircle& circle, Vect2f& p)
 		circle.visible = true;
 	}else if (p.x>max_size&&p.x<size.x-max_size&&p.y>max_size&&p.y<size.y-max_size)
 	{
-		int size = round(max_size)>>pWater->GetCoordShift();
-		int xs = round(p.x)>>pWater->GetCoordShift();
-		int ys = round(p.y)>>pWater->GetCoordShift();
+		int size = int(round(max_size))>>pWater->GetCoordShift();
+		int xs = int(round(p.x))>>pWater->GetCoordShift();
+		int ys = int(round(p.y))>>pWater->GetCoordShift();
 		if (pWater->Get(xs-size,ys).z>0 && pWater->Get(xs+size,ys).z>0
 			&& pWater->Get(xs,ys-size).z>0&& pWater->Get(xs,ys+size).z>0)
 		{
 			if (pTemperature) 
 			{
-				if (pTemperature->checkTile(round(p.x)>>pTemperature->gridShift(),round(p.y)>>pTemperature->gridShift()))
+				if (pTemperature->checkTile(int(round(p.x))>>pTemperature->gridShift(),int(round(p.y))>>pTemperature->gridShift()))
 					return;
 			}
 			circle.pos.set(p.x,p.y,pWater->GetZ(round(p.x),round(p.y)));
@@ -142,9 +142,9 @@ void cCircles::SetCirclePos(cWaterCircle& circle)
 		circle.visible = true;
 	}else if (p.x>max_size&&p.x<size.x-max_size&&p.y>max_size&&p.y<size.y-max_size)
 	{
-		int size = round(max_size)>>pWater->GetCoordShift();
-		int xs = round(p.x)>>pWater->GetCoordShift();
-		int ys = round(p.y)>>pWater->GetCoordShift();
+		int size = int(round(max_size))>>pWater->GetCoordShift();
+		int xs = int(round(p.x))>>pWater->GetCoordShift();
+		int ys = int(round(p.y))>>pWater->GetCoordShift();
 		if (pWater->Get(xs-size,ys).z>0 && pWater->Get(xs+size,ys).z>0
 			&& pWater->Get(xs,ys-size).z>0&& pWater->Get(xs,ys+size).z>0)
 		{

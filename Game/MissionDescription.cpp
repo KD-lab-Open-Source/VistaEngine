@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <random>
 #include "NetPlayer.h"
 #include "crc.h"
 #include "NetCommands.h"
@@ -716,7 +717,7 @@ void MissionDescription::deleteSave() const
 		do{
 			mask = dir;
 			mask += FindFileData.cFileName;
-			::DeleteFile(mask.c_str());
+			DeleteFile(mask.c_str());
 		}while(::FindNextFile(hf, &FindFileData));
 		::FindClose(hf);
 	}
@@ -1053,7 +1054,7 @@ void MissionDescription::shufflePlayers()
 		for(int i = 0; i < playersAmountMax(); i++)
 			indices[i] = i;
 		srand(timeGetTime());
-		random_shuffle(&indices[0], &indices[0] + playersAmountMax());
+		std::shuffle(&indices[0], &indices[0] + playersAmountMax(), std::mt19937(timeGetTime()));
 		//for(int i = 0; i < playersAmountMax(); i++)
 		//	playersData_[i].shuffleIndex = indices[i];
 		for(int i = 0; i < playersAmountMax(); i++)

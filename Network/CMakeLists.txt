@@ -27,6 +27,10 @@ if(WIN32)
         P2P_interface3Th.cpp
         P2P_interfaceAux.cpp
     )
+else()
+    # Off-Windows: no-op PNetCenter methods otherwise defined by the gated
+    # DirectPlay files above, so the game links (silent networking).
+    list(APPEND NETWORK_SOURCES NetCenterStub.cpp)
 endif()
 
 add_library(Network STATIC ${NETWORK_SOURCES})

@@ -4,6 +4,8 @@
 #include "Water.h"
 #include "Serialization/Serialization.h"
 
+class cWaterBubble;
+
 class cWaterBubbleCenter
 {
 protected:

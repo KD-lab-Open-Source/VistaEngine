@@ -3,10 +3,35 @@ set(GAME_SOURCES
     GameContext.cpp
     Runtime.cpp
     StdAfx.cpp
+    Actions.cpp
+    CameraManager.cpp
+    CheatManager.cpp
+    Conditions.cpp
+    GameOptions.cpp
+    GameOptionsSerialization.cpp
+    IniFile.cpp
+    MissionDescription.cpp
+    Player.cpp
+    PlayerStatistics.cpp
+    RenderObjects.cpp
+    ShowHead.cpp
+    SoundApp.cpp
+    SoundTrack.cpp
+    StreamCommand.cpp
+    TransparentTracking.cpp
+    Universe.cpp
+    # Core.vcproj engine source that happens to live in the TriggerEditor dir
+    # (defines TriggerChain runtime methods load/save/buildLinks/serialize/...).
+    ../TriggerEditor/TriggerExport.cpp
 )
 
 if(WIN32)
     list(APPEND GAME_SOURCES PlayBink.cpp)
+else()
+    # main() entry forwarding to WinMain + portable licensing stub.
+    list(APPEND GAME_SOURCES PlatformStub.cpp)
+    # TriggerEditor (kdw editor dialog) is Win32-only; no-op off-Windows.
+    list(APPEND GAME_SOURCES ../TriggerEditor/TriggerEditorStub.cpp)
 endif()
 
 add_executable(Game ${GAME_SOURCES})
@@ -22,5 +47,6 @@ target_link_libraries(Game PRIVATE
     Water
     UserInterface
     Render
+    VistaRender
     SDL3::SDL3
 )

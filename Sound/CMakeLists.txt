@@ -5,6 +5,12 @@ set(SOUND_SOURCES
     StdAfx.cpp
 )
 
+if(NOT WIN32)
+    # No-op audio backend (real C++ stubs for SoundSystem/Sound/Channel/OggPlayer
+    # + the SND* functions). The DirectSound backend below is WIN32-only.
+    list(APPEND SOUND_SOURCES SoundStub.cpp)
+endif()
+
 if(WIN32)
     # The DirectSound / Windows-multimedia backend. Stubbed out on other
     # platforms (no-op audio); real cross-platform audio is the eventual SDL3

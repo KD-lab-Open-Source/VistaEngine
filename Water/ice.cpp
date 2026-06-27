@@ -120,10 +120,10 @@ bool cTemperature::isOnIce(const Vect3f& pos, float radius) const
 		return true;
 
 	if(radius > FLT_EPS){
-		int xL=round(pos.x-radius)>>gridShift();
-		int xR=round(pos.x+radius)>>gridShift();
-		int yT=round(pos.y-radius)>>gridShift();
-		int yD=round(pos.y+radius)>>gridShift();
+		int xL=int(round(pos.x-radius))>>gridShift();
+		int xR=int(round(pos.x+radius))>>gridShift();
+		int yT=int(round(pos.y-radius))>>gridShift();
+		int yD=int(round(pos.y+radius))>>gridShift();
 		xL=max(xL,0);
 		xR=min(xR,grid_size.x-1);
 

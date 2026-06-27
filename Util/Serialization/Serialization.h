@@ -346,11 +346,11 @@ public:
     }
 
     template<class T> // ��� ������������� ����������
-    bool serializePointer(const T*& t, const char* name, const char* nameAlt) {
+    bool serializePointer(T*& t, const char* name, const char* nameAlt) {
 		xassert(!inPlace_);
         if(isInput()) {
             if(!t)
-				const_cast<T*&>(t) = FactorySelector<T>::Factory::instance().template createArg<T>(); // FIXME: ��������� �������� �������
+				t = FactorySelector<T>::Factory::instance().template createArg<T>(); // FIXME: ��������� �������� �������
       		serialize(*t, name, nameAlt);
 			return true;
         }

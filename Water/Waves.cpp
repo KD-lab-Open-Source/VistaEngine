@@ -192,7 +192,7 @@ void cWaves::CalcContour(vector<ContourPt>& contour, vector<WaveLine>& front)
 		w.rect[1].set(p2->pos.x<<shift, p2->pos.y<<shift, z);
 		Vect2f t((w.rect[0].x + p1->dir.x), (w.rect[0].y + p1->dir.y));
 		float dz = z;
-		z = pWater->GetZ(round(t.x)>>shift, round(t.y)>>shift);
+		z = pWater->GetZ(int(round(t.x))>>shift, int(round(t.y))>>shift);
 		w.rect[2].set(t.x, t.y, z);
 		t.set((w.rect[1].x + p2->dir.x), (w.rect[1].y + p2->dir.y));
 		w.rect[3].set(t.x, t.y, z);
