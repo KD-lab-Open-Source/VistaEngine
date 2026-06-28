@@ -183,7 +183,15 @@ void Runtime::init()
 		renderMode |= RENDERDEVICE_MODE_WINDOW;
 
 	gb_VisGeneric->SetUseTextureCache(true);
+	// The mesh cache (CacheData/Models/*.3dx{G,L,GB}) is an InPlaceArchive raw
+	// memory image baked at 32-bit Windows widths (4-byte pointers, 12-byte
+	// std::vector headers). It is unreadable on 64-bit and corrupts node vectors
+	// (giant sizes -> OOM). Off-Windows we load originals via BinaryIArchive instead.
+#ifdef _WIN32
 	gb_VisGeneric->SetUseMeshCache(true);
+#else
+	gb_VisGeneric->SetUseMeshCache(false);
+#endif
 	gb_VisGeneric->SetFavoriteLoadDDS(true);
 	gb_VisGeneric->SetEffectLibraryPath("RESOURCE\\FX","RESOURCE\\FX\\TEXTURES");
 

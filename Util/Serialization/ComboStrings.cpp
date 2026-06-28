@@ -1,5 +1,53 @@
 #include "StdAfx.h"
 #include "ComboStrings.h"
+#include <set>
+#include <mutex>
+#if defined(__GNUC__) || defined(__clang__)
+#include <cxxabi.h>
+#include <cstdlib>
+#endif
+
+const char* normalizeTypeName(const char* rawName)
+{
+	if(!rawName)
+		return "";
+
+	string name;
+#if defined(__GNUC__) || defined(__clang__)
+	// clang/gcc typeid().name() is Itanium-mangled; demangle to the C++ name.
+	int status = 0;
+	char* demangled = abi::__cxa_demangle(rawName, 0, 0, &status);
+	if(status == 0 && demangled){
+		name = demangled;
+		free(demangled);
+	}
+	else
+		// Not a mangled name (already-normalised key or MSVC-style stored string).
+		name = rawName;
+#else
+	name = rawName;
+#endif
+
+	// Strip MSVC elaborated-type keywords (each followed by a space, so plain
+	// identifiers like "structure" are never touched). Handles nested template
+	// args too, e.g. "class std::vector<struct Foo,...>".
+	static const char* const keywords[] = { "struct ", "class ", "enum ", "union " };
+	for(const char* kw : keywords){
+		size_t klen = strlen(kw);
+		size_t pos;
+		while((pos = name.find(kw)) != string::npos)
+			name.erase(pos, klen);
+	}
+	// Drop all whitespace so spacing differences ("> >" vs ">>") don't matter.
+	name.erase(std::remove(name.begin(), name.end(), ' '), name.end());
+
+	// Intern: the factory stores keys as StaticString (a bare const char*), so
+	// the pointer must outlive every caller. A program-lifetime set does that.
+	static std::set<string> pool;
+	static std::mutex poolMutex;
+	std::lock_guard<std::mutex> lock(poolMutex);
+	return pool.insert(name).first->c_str();
+}
 
 string cutTokenFromComboList(string& comboList) {
 	int pos = comboList.find("|");

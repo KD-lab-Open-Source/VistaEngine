@@ -8,6 +8,7 @@
 //#include <my_STL.h>
 #include <vector>
 #include <string>
+#include <cstdint>
 #include "XMath/xmath.h"
 
 #include <stdio.h>
@@ -45,8 +46,10 @@ public:
 	Saver& operator<<(unsigned int x)  {write(x); return *this;};
 	Saver& operator<<(short x)         {write(x); return *this;};
 	Saver& operator<<(unsigned short x){write(x); return *this;};
-	Saver& operator<<(long x)          {write(x); return *this;};
-	Saver& operator<<(unsigned long x) {write(x);return *this;};
+	// long/unsigned long are pinned to 4 bytes on the wire (32-bit Windows
+	// layout) so the format is identical across 32/64-bit hosts.
+	Saver& operator<<(long x)          {int32_t v=(int32_t)x; write(v); return *this;};
+	Saver& operator<<(unsigned long x) {uint32_t v=(uint32_t)x; write(v); return *this;};
 	Saver& operator<<(const float& x)  {write(x);return *this;};
 	Saver& operator<<(const double& x) {write(x);return *this;};
 
@@ -361,11 +364,13 @@ public:
 	inline void operator>>(unsigned short& i){read(i);}
 	inline void operator>>(int& i){read(i);}
 	inline void operator>>(unsigned int& i){read(i);}
-	inline void operator>>(long& i){read(i);}
-	inline void operator>>(unsigned long& i){read(i);}
+	// long/unsigned long/pointer are 4 bytes on the wire (32-bit Windows layout);
+	// read 4 bytes and widen so the stream stays aligned on 64-bit hosts.
+	inline void operator>>(long& i){int32_t v=0; read(&v,sizeof(v)); i=v;}
+	inline void operator>>(unsigned long& i){uint32_t v=0; read(&v,sizeof(v)); i=v;}
 	inline void operator>>(float& i){read(i);}
 	inline void operator>>(double& i){read(i);}
-	inline void operator>>(void *& i){read(i);}
+	inline void operator>>(void *& i){uint32_t v=0; read(&v,sizeof(v)); i=(void*)(uintptr_t)v;}
 
 	const char* LoadString()
 	{

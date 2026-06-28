@@ -12,6 +12,7 @@
 // Flush. Slice 1b implements only Fill/BeginScene/EndScene/Flush (window clear).
 
 #include "IRenderDevice.h"
+#include <vector>
 
 // SDL opaque handles, forward-declared so SDL stays out of engine headers.
 struct SDL_Window;
@@ -19,6 +20,10 @@ struct SDL_GPUDevice;
 struct SDL_GPUCommandBuffer;
 struct SDL_GPURenderPass;
 struct SDL_GPUTexture;
+struct SDL_GPUGraphicsPipeline;
+struct SDL_GPUSampler;
+struct SDL_GPUBuffer;
+struct SDL_GPUTransferBuffer;
 
 class cSDLRenderDevice : public cInterfaceRenderDevice
 {
@@ -97,8 +102,8 @@ public:
 	void OutText(int, int, const char*, int, int, int) override {}
 	void OutText(int, int, const char*, int, int, int, char*, int, int, int, int) override {}
 
-	// --- Sprites (no-op until slice 2) -----------------------------------
-	void DrawSprite(int, int, int, int, float, float, float, float, cTexture*, const Color4c&, float, eBlendMode, float) override {}
+	// --- Sprites ---------------------------------------------------------
+	void DrawSprite(int, int, int, int, float, float, float, float, cTexture*, const Color4c&, float, eBlendMode, float) override;
 	void DrawSpriteSolid(int, int, int, int, float, float, float, float, cTexture*, const Color4c&, float, eBlendMode) override {}
 	void DrawSprite2(int, int, int, int, float, float, float, float, cTexture*, cTexture*, const Color4c&, float) override {}
 	void DrawSprite2(int, int, int, int, float, float, float, float, float, float, float, float, cTexture*, cTexture*, const Color4c&, float, eColorMode, eBlendMode) override {}
@@ -134,11 +139,31 @@ public:
 	cVertexBuffer<sVertexXYZWDT2>* GetBufferXYZWDT2() override { return nullptr; }
 
 private:
+	// CPU-side 2D vertex, byte-compatible with the UI vertex input layout
+	// (matches sVertexXYZWDT1: float4 pos, BGRA u8 colour, float2 uv = 28 bytes).
+	struct UIVertex { float x, y, z, w; unsigned int color; float u, v; };
+
+	void createUIPipeline();             // lazy one-time pipeline/sampler/buffers
+	void ensureVertexCapacity(int verts);
+	void pushQuad(int x, int y, int dx, int dy,
+	              float u, float v, float du, float dv, unsigned int color);
+
 	SDL_Window*            window_           = nullptr;
 	SDL_GPUDevice*         device_           = nullptr;
 	SDL_GPUCommandBuffer*  commandBuffer_    = nullptr;
 	SDL_GPURenderPass*     renderPass_       = nullptr;
 	SDL_GPUTexture*        swapchainTexture_ = nullptr;
+
+	// UI pipeline (slice 2)
+	SDL_GPUGraphicsPipeline* uiPipeline_     = nullptr;
+	SDL_GPUSampler*          sampler_        = nullptr;
+	SDL_GPUTexture*          whiteTexture_   = nullptr;
+	SDL_GPUBuffer*           vertexBuffer_   = nullptr;
+	SDL_GPUTransferBuffer*   transferBuffer_ = nullptr;
+	int   vertexCapacity_ = 0;
+	bool  pipelineTried_  = false;
+	std::vector<UIVertex> batch_;
+
 	DWORD multisample_ = 0;
 	bool  bActiveScene_ = false;
 	bool  hasClear_     = false;

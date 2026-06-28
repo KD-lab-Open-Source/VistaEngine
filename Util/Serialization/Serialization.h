@@ -377,7 +377,7 @@ public:
 		const char* derivedName = 0;
 		const char* derivedNameAlt = 0;
 		if(ptr) {
-			derivedName = typeid(*ptr).name();
+			derivedName = normalizeTypeName(typeid(*ptr).name());
 			derivedNameAlt = factory.nameAlt(derivedName, true);
 		}
 

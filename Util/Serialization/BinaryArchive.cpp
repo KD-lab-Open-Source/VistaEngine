@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+#include <cstdint>
 #include "BinaryArchive.h"
 #include "XMath/xmath.h"
 #include "Dictionary.h"
@@ -99,10 +100,12 @@ bool BinaryOArchive::processValue(signed int& value, const char* name, const cha
 	return true;
 }
 
-bool BinaryOArchive::processValue(signed long& value, const char* name, const char* nameAlt) 
+bool BinaryOArchive::processValue(signed long& value, const char* name, const char* nameAlt)
 {
+	// long is 4 bytes on the wire (32-bit Windows layout), portable to 64-bit.
 	openNode(name);
-	saver_.write(value);
+	int32_t v32 = (int32_t)value;
+	saver_.write(v32);
 	closeNode();
 	return true;
 }
@@ -131,10 +134,11 @@ bool BinaryOArchive::processValue(unsigned int& value, const char* name, const c
 	return true;
 }
 
-bool BinaryOArchive::processValue(unsigned long& value, const char* name, const char* nameAlt) 
+bool BinaryOArchive::processValue(unsigned long& value, const char* name, const char* nameAlt)
 {
 	openNode(name);
-	saver_.write(value);
+	uint32_t v32 = (uint32_t)value;
+	saver_.write(v32);
 	closeNode();
 	return true;
 }
@@ -377,7 +381,7 @@ int BinaryIArchive::openPointer(void*& object, const char* name, const char* nam
 			closeBlockInternal();
 			return NULL_POINTER;
 		}
-		int result = indexInComboListString(typeName, type_name.c_str());
+		int result = indexInComboListString(typeName, normalizeTypeName(type_name.c_str()));
 		if(result == NULL_POINTER) {
 			if(!ignoreUnregisteredClasses_){
 				XBuffer msg;
@@ -429,11 +433,14 @@ bool BinaryIArchive::processValue(signed int& value, const char* name, const cha
 	return true;
 }
 
-bool BinaryIArchive::processValue(signed long& value, const char* name, const char* nameAlt) 
+bool BinaryIArchive::processValue(signed long& value, const char* name, const char* nameAlt)
 {
+	// long is 4 bytes on the wire (32-bit Windows layout); read and sign-extend.
 	if(!openNode(name))
 		return false;
-	currentBlock().read(value);
+	int32_t v32 = 0;
+	currentBlock().read(v32);
+	value = v32;
 	closeNode();
 	return true;
 }
@@ -465,11 +472,13 @@ bool BinaryIArchive::processValue(unsigned int& value, const char* name, const c
 	return true;
 }
 
-bool BinaryIArchive::processValue(unsigned long& value, const char* name, const char* nameAlt) 
+bool BinaryIArchive::processValue(unsigned long& value, const char* name, const char* nameAlt)
 {
 	if(!openNode(name))
 		return false;
-	currentBlock().read(value);
+	uint32_t v32 = 0;
+	currentBlock().read(v32);
+	value = v32;
 	closeNode();
 	return true;
 }

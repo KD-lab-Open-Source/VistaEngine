@@ -184,7 +184,13 @@ GameShell::GameShell(HINSTANCE hInstance, bool useHT) :
 	soundPushedPushLevel=INT_MIN;
 
 	gb_VisGeneric->SetUseTextureCache(true);
+	// See Runtime.cpp: the InPlaceArchive mesh cache is a 32-bit raw memory image,
+	// unportable to 64-bit. Off-Windows fall back to loading originals.
+#ifdef _WIN32
 	gb_VisGeneric->SetUseMeshCache(true);
+#else
+	gb_VisGeneric->SetUseMeshCache(false);
+#endif
 
 	globalTrigger_.load("Scripts\\Content\\Triggers\\GlobalTrigger.scr");
 

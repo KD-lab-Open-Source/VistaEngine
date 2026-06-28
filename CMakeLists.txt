@@ -14,6 +14,22 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(SDL3)
 
+# FreeType — font rasterizer for the UI text (Render/src/FT_Font.cpp, ftrender.cpp).
+# Replaces the vendored 2.2 tree (XLibs.Net/FreeType) and the link-time stub.
+# Disable optional external deps so it's self-contained and needs no system libs.
+set(FT_DISABLE_HARFBUZZ ON  CACHE BOOL "" FORCE)
+set(FT_DISABLE_PNG      ON  CACHE BOOL "" FORCE)
+set(FT_DISABLE_ZLIB     ON  CACHE BOOL "" FORCE)
+set(FT_DISABLE_BZIP2    ON  CACHE BOOL "" FORCE)
+set(FT_DISABLE_BROTLI   ON  CACHE BOOL "" FORCE)
+FetchContent_Declare(
+    freetype
+    GIT_REPOSITORY https://github.com/freetype/freetype.git
+    GIT_TAG        VER-2-13-3
+    GIT_SHALLOW    TRUE
+)
+FetchContent_MakeAvailable(freetype)
+
 # Interface target that gives every module common include paths
 add_library(EngineIncludes INTERFACE)
 target_include_directories(EngineIncludes INTERFACE

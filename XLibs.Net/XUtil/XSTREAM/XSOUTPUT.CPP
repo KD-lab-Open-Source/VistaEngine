@@ -1,4 +1,5 @@
 #include "xglobal.h"
+#include <cstdint>
 
 XStream& XStream::operator> (char& v)
 {
@@ -38,13 +39,19 @@ XStream& XStream::operator> (unsigned& v)
 
 XStream& XStream::operator> (long& v)
 {
-	read(&v,(unsigned)sizeof(long));
+	// long is stored as 4 bytes on the wire (32-bit Windows layout); read and
+	// sign-extend. On 32-bit this is identical to reading sizeof(long).
+	int32_t v32 = 0;
+	read(&v32,(unsigned)sizeof(v32));
+	v = v32;
 	return *this;
 }
 
 XStream& XStream::operator> (unsigned long& v)
 {
-	read(&v,(unsigned)sizeof(unsigned long));
+	uint32_t v32 = 0;
+	read(&v32,(unsigned)sizeof(v32));
+	v = v32;
 	return *this;
 }
 
@@ -62,7 +69,10 @@ XStream& XStream::operator> (float& v)
 
 XStream& XStream::operator> (long double& v)
 {
-	read(&v,(unsigned)sizeof(long double));
+	// long double is 8 bytes on the wire (32-bit MSVC layout), 16 on clang.
+	double v64 = 0;
+	read(&v64,(unsigned)sizeof(v64));
+	v = v64;
 	return *this;
 }
 

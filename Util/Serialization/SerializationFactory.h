@@ -81,7 +81,7 @@ public:
     }
 
     ClassCreatorBase& find(const BaseType* ptr) {
-        const char* name = typeid(*ptr).name();
+        const char* name = normalizeTypeName(typeid(*ptr).name());
         return static_cast <ClassCreatorBase&>(*this->creators_ [name]);
     }
 
@@ -162,11 +162,11 @@ private:
 
 // ����� ����� ��������� <>, ::
 #define REGISTER_CLASS(baseClass, derivedClass, classNameAlt) \
-  static FactorySelector<baseClass>::Factory::ClassCreator<derivedClass > INTERNAL_UNIQUE_NAME(typeid(derivedClass).name(), classNameAlt);
+  static FactorySelector<baseClass>::Factory::ClassCreator<derivedClass > INTERNAL_UNIQUE_NAME(normalizeTypeName(typeid(derivedClass).name()), classNameAlt);
 
 #define REGISTER_CLASS_CONVERSION(baseClass, derivedClass, classNameAlt, oldName) \
-  static FactorySelector<baseClass>::Factory::ClassCreator<derivedClass > INTERNAL_UNIQUE_NAME(oldName, classNameAlt); \
-  static FactorySelector<baseClass>::Factory::ClassCreator<derivedClass > INTERNAL_UNIQUE_NAME(typeid(derivedClass).name(), classNameAlt); 
+  static FactorySelector<baseClass>::Factory::ClassCreator<derivedClass > INTERNAL_UNIQUE_NAME(normalizeTypeName(oldName), classNameAlt); \
+  static FactorySelector<baseClass>::Factory::ClassCreator<derivedClass > INTERNAL_UNIQUE_NAME(normalizeTypeName(typeid(derivedClass).name()), classNameAlt);
 
 
 #endif

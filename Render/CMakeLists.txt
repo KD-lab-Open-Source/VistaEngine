@@ -77,12 +77,11 @@ else()
     list(APPEND RENDER_SOURCES RenderStub.cpp)
     # The cross-platform SDL GPU render device (replaces the D3D9 cD3DRender).
     list(APPEND RENDER_SOURCES SDLRenderDevice.cpp)
-    # FreeType stubs (the vendored lib isn't built yet) — font rasterization is
-    # disabled until FreeType is wired in.
-    list(APPEND RENDER_SOURCES FreeTypeStub.cpp)
 endif()
 
 add_library(Render STATIC ${RENDER_SOURCES})
-# FreeType (vendored) — used by the font rasterizer (FT_Font.cpp, ftrender.cpp).
-target_include_directories(Render PRIVATE ${CMAKE_SOURCE_DIR}/XLibs.Net/FreeType/include)
+# FreeType (FetchContent) — used by the font rasterizer (FT_Font.cpp, ftrender.cpp).
+# Replaces the old vendored include dir + FreeTypeStub.cpp; the freetype target
+# propagates its own include paths.
 target_link_libraries(Render PUBLIC EngineIncludes Util 3dx SDL3::SDL3)
+target_link_libraries(Render PRIVATE freetype)

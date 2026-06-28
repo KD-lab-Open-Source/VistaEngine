@@ -1162,7 +1162,9 @@ int XPrmIArchive::openPointer(void*& object, const char* name, const char* nameA
 	}
 	else{
 		openBracket(false);
-		int result = indexInComboListString(typeName, str.c_str());
+		// Stored names use the writer's typeid().name() spelling (MSVC for legacy
+		// data); normalise so they match the factory's registered names.
+		int result = indexInComboListString(typeName, normalizeTypeName(str.c_str()));
 		if(result == -1){
 			XBuffer msg(256, 1);
 			msg < "ERROR! no such class registered: ";

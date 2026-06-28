@@ -336,6 +336,12 @@ void cScene::Draw(Camera* camera)
 {
 	start_timer_auto();
 
+	// The SDL GPU backend has no concrete cD3DRender (gb_RenderDevice3D), and the
+	// 3D scene path below is entirely D3D9. Until the scene path is ported, skip
+	// it so the 2D UI can still draw. Guards every scene-draw caller in one place.
+	if(!gb_RenderDevice3D)
+		return;
+
 	MTAuto enter(lock_draw);
 
 	RemoveEmptyStaticSimply3dx();

@@ -57,7 +57,9 @@ void StreamDataManager::execute()
 		while(cur < end)
 		{
 			StreamDataFunction func = *(StreamDataFunction*)cur;
-			cur += 4;
+			// set() writes the pointer via stream_.write(func), i.e. sizeof bytes
+			// (8 on 64-bit, 4 on 32-bit). The old hardcoded 4 desynced on 64-bit.
+			cur += sizeof(StreamDataFunction);
 			
 			DataSize realSize = *(DataSize*)cur;
 			cur += sizeof(DataSize);

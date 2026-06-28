@@ -34,8 +34,17 @@ bool FT_Render::loadFont(const char* ttf)
 	if(!ttf || !*ttf)
 		return false;
 
+	// FT_New_Face opens the file with stdio, bypassing the engine's VFS shim.
+	// Off-Windows, rewrite the legacy backslash path into a real POSIX path
+	// (NormalizePath also resolves component case on case-sensitive volumes).
+#ifdef _WIN32
+	string path(ttf);
+#else
+	string path = NormalizePath(ttf);
+#endif
+
 	FT_Face newFace;
-	if(FT_New_Face(library_, ttf, 0, &newFace) == 0){
+	if(FT_New_Face(library_, path.c_str(), 0, &newFace) == 0){
 		if(FT_IS_SCALABLE(newFace) == 0){
 			FT_Done_Face(newFace);
 			return false;
