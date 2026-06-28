@@ -274,8 +274,8 @@ Vect2f UI_Render::outText(const Rectf& pos, const UI_TextParser& parser, OutNode
 					break;
 				if(clampInRange){
 					if(shadow.a)
-						gb_RenderDevice3D->OutTextLine(cur_x+1, y+1, ftfont, it->begin, it->end, shadow, ALPHA_BLEND, x, rightRange + 1);
-					int posx = gb_RenderDevice3D->OutTextLine(cur_x, y, ftfont, it->begin, it->end, diffuse, alphaBlend, x, rightRange);
+						gb_RenderDevice->OutTextLine(cur_x+1, y+1, ftfont, it->begin, it->end, shadow, ALPHA_BLEND, x, rightRange + 1);
+					int posx = gb_RenderDevice->OutTextLine(cur_x, y, ftfont, it->begin, it->end, diffuse, alphaBlend, x, rightRange);
 					cur_x += it->width;
 					if(cur_x >= rightRange){
 						cur_x = posx;
@@ -284,8 +284,8 @@ Vect2f UI_Render::outText(const Rectf& pos, const UI_TextParser& parser, OutNode
 				}
 				else {
 					if(shadow.a)
-						gb_RenderDevice3D->OutTextLine(cur_x+1, y+1, ftfont, it->begin, it->end, shadow, ALPHA_BLEND);
-					gb_RenderDevice3D->OutTextLine(cur_x, y, ftfont, it->begin, it->end, diffuse, alphaBlend);
+						gb_RenderDevice->OutTextLine(cur_x+1, y+1, ftfont, it->begin, it->end, shadow, ALPHA_BLEND);
+					gb_RenderDevice->OutTextLine(cur_x, y, ftfont, it->begin, it->end, diffuse, alphaBlend);
 					cur_x += it->width;
 				}
 				break;

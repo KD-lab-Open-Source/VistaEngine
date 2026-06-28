@@ -26,10 +26,12 @@ cTexture::~cTexture()
 	xassert(!getAttribute(TEXTURE_NONDELETE));
 	if(gb_RenderDevice)
 	{
-		cD3DRender* rd=(cD3DRender*)gb_RenderDevice;
-		rd->DeleteTexture(this);
-		rd->TexLibrary.DeleteFromDefaultPool(this);
-
+		gb_RenderDevice->DeleteTexture(this);
+#ifdef _WIN32
+		// D3D default-pool bookkeeping (lost-device handling) lives on cD3DRender.
+		// The SDL backend has no default pool, so skip it off-Windows.
+		((cD3DRender*)gb_RenderDevice)->TexLibrary.DeleteFromDefaultPool(this);
+#endif
 	}else
 		xassert(0 && "Текстура удалена слишком поздно");
 }
@@ -59,7 +61,7 @@ bool cTexture::reload()
 	if(fileImage->GetBitPerPixel()==32)
 		setAttribute(TEXTURE_ALPHA_BLEND);
 
-	bool result = !gb_RenderDevice3D->CreateTexture(this, fileImage, -1, -1);
+	bool result = !gb_RenderDevice->CreateTexture(this, fileImage, -1, -1);
 	delete fileImage;
 	return result;
 }
@@ -149,18 +151,18 @@ bool cTexture::reloadDDS()
 BYTE* cTexture::LockTexture(int& Pitch)
 {
 	xassert(getAttribute(TEXTURE_NODDS));
-	return (BYTE*)gb_RenderDevice3D->LockTexture(this,Pitch);
+	return (BYTE*)gb_RenderDevice->LockTexture(this,Pitch);
 }
 
 BYTE* cTexture::LockTexture(int& Pitch,Vect2i lock_min,Vect2i lock_size)
 {
 	xassert(getAttribute(TEXTURE_NODDS));
-	return (BYTE*)gb_RenderDevice3D->LockTexture(this,Pitch,lock_min,lock_size);
+	return (BYTE*)gb_RenderDevice->LockTexture(this,Pitch,lock_min,lock_size);
 }
 
 void cTexture::UnlockTexture()
 {
-	gb_RenderDevice3D->UnlockTexture(this);
+	gb_RenderDevice->UnlockTexture(this);
 }
 
 IDirect3DTexture9*& cTexture::GetDDSurface(int n)

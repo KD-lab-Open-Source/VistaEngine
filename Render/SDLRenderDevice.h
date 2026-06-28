@@ -12,7 +12,9 @@
 // Flush. Slice 1b implements only Fill/BeginScene/EndScene/Flush (window clear).
 
 #include "IRenderDevice.h"
+#include "MTSection.h"
 #include <vector>
+#include <unordered_map>
 
 // SDL opaque handles, forward-declared so SDL stays out of engine headers.
 struct SDL_Window;
@@ -48,6 +50,14 @@ public:
 	bool IsFullScreen() override { return false; }
 	int GetAvailableTextureMem() override { return 0; }
 	HWND GetWindowHandle() override { return (HWND)window_; }
+
+	// --- Textures (slice 2b): real SDL GPU textures + CPU staging ----------
+	int   CreateTexture(cTexture* Texture, cFileImage* FileImage, int dxout, int dyout, bool enable_assert) override;
+	int   DeleteTexture(cTexture* Texture) override;
+	void* LockTexture(cTexture* Texture, int& Pitch) override;
+	void* LockTexture(cTexture* Texture, int& Pitch, Vect2i lock_min, Vect2i lock_size) override;
+	void  UnlockTexture(cTexture* Texture) override;
+	MTSection& resetDeviceLock() override { return resetDeviceLock_; }
 
 	int SetClipRect(int xmin, int ymin, int xmax, int ymax) override
 		{ xScrMin = xmin; yScrMin = ymin; xScrMax = xmax; yScrMax = ymax; return 0; }
@@ -103,6 +113,7 @@ public:
 	void OutText(int, int, const char*, int, int, int, char*, int, int, int, int) override {}
 
 	// --- Sprites ---------------------------------------------------------
+	void DrawQuad(float, float, float, float, float, float, float, float, Color4c) override;
 	void DrawSprite(int, int, int, int, float, float, float, float, cTexture*, const Color4c&, float, eBlendMode, float) override;
 	void DrawSpriteSolid(int, int, int, int, float, float, float, float, cTexture*, const Color4c&, float, eBlendMode) override {}
 	void DrawSprite2(int, int, int, int, float, float, float, float, cTexture*, cTexture*, const Color4c&, float) override {}
@@ -112,8 +123,9 @@ public:
 	void DrawSpriteScale2(int, int, int, int, float, float, cTextureScale*, cTextureScale*, const Color4c&, float) override {}
 	void DrawSpriteScale2(int, int, int, int, float, float, float, float, cTextureScale*, cTextureScale*, const Color4c&, float, eColorMode) override {}
 
-	// --- Materials (no-op) -----------------------------------------------
-	void SetNoMaterial(eBlendMode, const MatXf&, float, cTexture*, cTexture*, eColorMode) override {}
+	// --- Materials -------------------------------------------------------
+	// Records the current texture/blend for the following DrawQuad calls.
+	void SetNoMaterial(eBlendMode, const MatXf&, float, cTexture*, cTexture*, eColorMode) override;
 	void SetWorldMaterial(eBlendMode, const MatXf&, float, cTexture*, cTexture*, eColorMode, bool, bool) override {}
 
 	// --- Vertex/index buffers (no-op until slice 2) ----------------------
@@ -145,8 +157,27 @@ private:
 
 	void createUIPipeline();             // lazy one-time pipeline/sampler/buffers
 	void ensureVertexCapacity(int verts);
-	void pushQuad(int x, int y, int dx, int dy,
-	              float u, float v, float du, float dv, unsigned int color);
+	// Append a quad (6 verts) bound to tex, extending or starting a draw run.
+	void emitQuad(float x, float y, float dx, float dy,
+	              float u, float v, float du, float dv, unsigned int color, SDL_GPUTexture* tex);
+
+	// CPU-staged GPU texture: keyed by the SDL_GPUTexture* stored in cTexture's
+	// BitMap[0]. staging is the lockable CPU image; UnlockTexture uploads it.
+	// expand=true means 8-bit coverage staging uploaded into a BGRA texture as
+	// (255,255,255,coverage), so the one UI shader handles both font and images.
+	struct TextureData {
+		SDL_GPUTexture* tex = nullptr;
+		int w = 0, h = 0, bpp = 0, pitch = 0;
+		bool expand = false;
+		std::vector<unsigned char> staging;
+	};
+	std::unordered_map<SDL_GPUTexture*, TextureData> textures_;
+	void uploadTexture(const TextureData& td);  // staging -> GPU (copy pass)
+
+	// One draw call per contiguous run of quads sharing a texture.
+	struct DrawRun { SDL_GPUTexture* tex; int first; int count; };
+	std::vector<DrawRun> runs_;
+	SDL_GPUTexture* currentTexture_ = nullptr;  // set by SetNoMaterial
 
 	SDL_Window*            window_           = nullptr;
 	SDL_GPUDevice*         device_           = nullptr;
@@ -164,6 +195,7 @@ private:
 	bool  pipelineTried_  = false;
 	std::vector<UIVertex> batch_;
 
+	MTSection resetDeviceLock_;          // dummy lock (no device loss on SDL)
 	DWORD multisample_ = 0;
 	bool  bActiveScene_ = false;
 	bool  hasClear_     = false;

@@ -190,13 +190,13 @@ void cTexLibrary::DeleteDefaultTextures()
 	FOR_EACH(textures,it)
 	{
 		if(it->second&&it->second->getAttribute(TEXTURE_D3DPOOL_DEFAULT))
-			gb_RenderDevice3D->DeleteTexture(it->second);
+			gb_RenderDevice->DeleteTexture(it->second);
 	}
 	for(int i=0;i<default_texture.size();i++)
 	{
 		cTexture* pTexture=default_texture[i];
 		xassert(pTexture->getAttribute(TEXTURE_D3DPOOL_DEFAULT));
-		gb_RenderDevice3D->DeleteTexture(pTexture);
+		gb_RenderDevice->DeleteTexture(pTexture);
 	}
 
 }
@@ -208,13 +208,13 @@ void cTexLibrary::CreateDefaultTextures()
 		if(it->second&&it->second->getAttribute(TEXTURE_D3DPOOL_DEFAULT)){
 			xassert(0);
 			if(it->second->GetRef()>1)
-				gb_RenderDevice3D->CreateTexture(it->second,0,-1,-1);
+				gb_RenderDevice->CreateTexture(it->second,0,-1,-1);
 		}
 	}
 	for(int i=0;i<default_texture.size();i++){
 		cTexture* pTexture=default_texture[i];
 		xassert(pTexture->getAttribute(TEXTURE_D3DPOOL_DEFAULT));
-		gb_RenderDevice3D->CreateTexture(pTexture,0,-1,-1);
+		gb_RenderDevice->CreateTexture(pTexture,0,-1,-1);
 	}
 }
 
@@ -232,7 +232,7 @@ cTexture* cTexLibrary::CreateRenderTexture(int width,int height,DWORD attr,bool 
 	Texture->setMipmapNumber(1);
 	Texture->setAttribute(attr);
 
-	int err=gb_RenderDevice3D->CreateTexture(Texture,0,-1,-1,enable_assert);
+	int err=gb_RenderDevice->CreateTexture(Texture,0,-1,-1,enable_assert);
 	if(err){ 
 		Texture->Release(); 
 		return 0; 
@@ -255,7 +255,7 @@ cTexture* cTexLibrary::CreateTexture(int sizex,int sizey,bool alpha,bool default
 	Texture->SetWidth(sizex);
 	Texture->SetHeight(sizey);
 
-	if(gb_RenderDevice3D->CreateTexture(Texture,0,-1,-1))
+	if(gb_RenderDevice->CreateTexture(Texture,0,-1,-1))
 	{
 		delete Texture;
 		return 0;
@@ -481,7 +481,7 @@ cTexture* cTexLibrary::CreateNormalMap(int sizex,int sizey)
 	Texture->SetTimePerFrame(0);
 	Texture->SetWidth(sizex);
 	Texture->SetHeight(sizey);
-	int err=gb_RenderDevice3D->CreateTexture(Texture,0,-1,-1);
+	int err=gb_RenderDevice->CreateTexture(Texture,0,-1,-1);
 	if(err)
 	{
 		Error(Texture);
@@ -527,7 +527,7 @@ cTexture* cTexLibrary::GetSpericalTexture()
 
 		cFileImageData fid(size,size,data);
 
-		if(gb_RenderDevice3D->CreateTexture(Texture,&fid,-1,-1))
+		if(gb_RenderDevice->CreateTexture(Texture,&fid,-1,-1))
 		{
 			delete data;
 			delete Texture;
@@ -571,7 +571,7 @@ cTexture* cTexLibrary::GetWhileTexture()
 		// Original used SEH __try/__finally for cleanup; CreateTexture returns an
 		// error code (not an SEH exception), so plain control flow is equivalent
 		// and portable.
-		bool createFailed = gb_RenderDevice3D->CreateTexture(Texture,fid,-1,-1);
+		bool createFailed = gb_RenderDevice->CreateTexture(Texture,fid,-1,-1);
 		delete data;
 		delete fid;
 		if(createFailed)
@@ -607,7 +607,7 @@ cTexture* cTexLibrary::CreateAlphaTexture(int sizex,int sizey,cFileImage* image,
 	}
 
 	bool err=false;
-	err=err || gb_RenderDevice3D->CreateTexture(pTexture,image,-1,-1)!=0;
+	err=err || gb_RenderDevice->CreateTexture(pTexture,image,-1,-1)!=0;
 
 	if(err)
 	{
@@ -631,7 +631,7 @@ cTexture* cTexLibrary::CreateTexture(int sizex,int sizey,eSurfaceFormat format,b
 	pTexture->SetHeight(sizey);
 	pTexture->setFormat(format);
 
-	int err=gb_RenderDevice3D->CreateTexture(pTexture,0,-1,-1,true);
+	int err=gb_RenderDevice->CreateTexture(pTexture,0,-1,-1,true);
 	if(err) { pTexture->Release(); return 0; }
 /*
 	int Usage=0;
@@ -1029,7 +1029,7 @@ bool cTexLibrary::ResizeTexture(cTexture* Texture, cTexture* outTexture)
 	outTexture->setMipmapNumber(mm);
 	outTexture->setAttribute(Texture->getAttribute());
 	outTexture->New(1);
-	if(gb_RenderDevice3D->CreateTexture(outTexture,0,-1,-1))
+	if(gb_RenderDevice->CreateTexture(outTexture,0,-1,-1))
 	{
 		delete outTexture;
 		return false;

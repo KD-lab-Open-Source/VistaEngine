@@ -657,7 +657,7 @@ void GameShell::sendStats(bool final, bool win)
 
 bool GameShell::universalSave(const char* name, bool userSave)
 {
-	MTAuto lock(gb_RenderDevice3D->resetDeviceLock());
+	MTAuto lock(gb_RenderDevice->resetDeviceLock());
 	MTAutoSkipAssert skip_assert;
 
 	MissionDescription mission(CurrentMission);
@@ -704,7 +704,7 @@ bool GameShell::logicQuant()
 
 	setLogicFp();
 
-	MTAuto lock(gb_RenderDevice3D->resetDeviceLock());
+	MTAuto lock(gb_RenderDevice->resetDeviceLock());
 
 	int begQuantTime = xclock();
 	if(universeX()->PrimaryQuant()){
@@ -1372,7 +1372,7 @@ void GameShell::charInput(int chr)
 
 void GameShell::ShowStatistic()
 {
-	MTAuto lock(gb_RenderDevice3D->resetDeviceLock());
+	MTAuto lock(gb_RenderDevice->resetDeviceLock());
 	void ShowGraphicsStatistic();
 	ShowGraphicsStatistic();
 }
@@ -1606,7 +1606,7 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 		else{
 			gb_RenderDevice->Flush();
 			{
-				MTAuto lock(gb_RenderDevice3D->resetDeviceLock());
+				MTAuto lock(gb_RenderDevice->resetDeviceLock());
 				profiler_start_stop();
 			}
 			restoreFocus();
@@ -2238,7 +2238,7 @@ void GameShell::cameraQuant(float frameDeltaTime)
 //------------------------------------------
 void GameShell::setSpeed(float d)
 {
-	MTAuto mtlock(gb_RenderDevice3D->resetDeviceLock());
+	MTAuto mtlock(gb_RenderDevice->resetDeviceLock());
 	game_speed = clamp(d, 0, 10);
 	scale_time.setSpeed(game_speed);
 

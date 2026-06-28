@@ -443,7 +443,10 @@ void vrtMap::createBeginSurface(unsigned short* vxbuf, unsigned long* rgbbuf)
 				int offb=offsetBuf(x,y);
 				vxaBuf[offb]=vxbuf ? vxbuf[offb] : Vm_prepHeighAtr(initialHeight<<VX_FRACTION, VmAt_Nrml);
 				clrBuf[offb]=0;
-				supBuf[offb]=rgbbuf ? rgbbuf[offb] : 0x007f7f7f;//Sur2Col32[SurBuf[offb]][255];
+				// supBuf (the try-color buffer) is only allocated when
+				// flag_useTryColorBuffer is set; skip it otherwise.
+				if(supBuf)
+					supBuf[offb]=rgbbuf ? rgbbuf[offb] : 0x007f7f7f;//Sur2Col32[SurBuf[offb]][255];
 			}
 		}
 	}
@@ -1333,7 +1336,9 @@ unsigned long vrtMap::getVxABufCRC()
 
 unsigned long vrtMap::getDamSurBufCRC()
 {
-	xassert(supBuf);
+	// supBuf is absent when the try-color buffer is disabled; no buffer to CRC.
+	if(!supBuf)
+		return 0;
 	unsigned int y;
 	unsigned int offB=0;
 	unsigned int crc=startCRC32;

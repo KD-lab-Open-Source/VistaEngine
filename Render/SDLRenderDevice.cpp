@@ -7,6 +7,9 @@
 #include <SDL3/SDL.h>
 #include <cstdio>
 
+#include "Texture.h"     // cTexture (BitMap / GetDDSurface / attributes)
+#include "FileImage.h"   // cFileImage::GetTexture
+
 // Cross-compiled UI shader blobs (SPIR-V + MSL); see Render/SDLShaders.
 #include "SDLShaders/ui_shaders.h"
 
@@ -107,6 +110,9 @@ int cSDLRenderDevice::Done()
 	swapchainTexture_ = nullptr;
 
 	if(device_){
+		for(auto& kv : textures_)
+			if(kv.second.tex) SDL_ReleaseGPUTexture(device_, kv.second.tex);
+		textures_.clear();
 		if(vertexBuffer_)   SDL_ReleaseGPUBuffer(device_, vertexBuffer_);
 		if(transferBuffer_) SDL_ReleaseGPUTransferBuffer(device_, transferBuffer_);
 		if(whiteTexture_)   SDL_ReleaseGPUTexture(device_, whiteTexture_);
@@ -175,6 +181,8 @@ int cSDLRenderDevice::BeginScene()
 	}
 
 	batch_.clear();
+	runs_.clear();
+	currentTexture_ = nullptr;
 	bActiveScene_ = true;
 	NumberPolygon = 0;
 	NumDrawObject = 0;
@@ -229,12 +237,14 @@ int cSDLRenderDevice::EndScene()
 			vb.buffer = vertexBuffer_;
 			vb.offset = 0;
 			SDL_BindGPUVertexBuffers(pass, 0, &vb, 1);
-			// 2a: all sprites sample a 1x1 white texture, so colour = vertex colour.
-			SDL_GPUTextureSamplerBinding ts = {};
-			ts.texture = whiteTexture_;
-			ts.sampler = sampler_;
-			SDL_BindGPUFragmentSamplers(pass, 0, &ts, 1);
-			SDL_DrawGPUPrimitives(pass, vcount, 1, 0, 0);
+			// One draw per run; bind the run's texture (white for untextured quads).
+			for(const DrawRun& run : runs_){
+				SDL_GPUTextureSamplerBinding ts = {};
+				ts.texture = run.tex ? run.tex : whiteTexture_;
+				ts.sampler = sampler_;
+				SDL_BindGPUFragmentSamplers(pass, 0, &ts, 1);
+				SDL_DrawGPUPrimitives(pass, run.count, 1, run.first, 0);
+			}
 		}
 		SDL_EndGPURenderPass(pass);
 	}
@@ -405,31 +415,203 @@ void cSDLRenderDevice::ensureVertexCapacity(int verts)
 	vertexCapacity_ = (vertexBuffer_ && transferBuffer_) ? cap : 0;
 }
 
-void cSDLRenderDevice::pushQuad(int x, int y, int dx, int dy,
-                                float u, float v, float du, float dv, unsigned int color)
+void cSDLRenderDevice::emitQuad(float x, float y, float dx, float dy,
+                                float u, float v, float du, float dv, unsigned int color, SDL_GPUTexture* tex)
 {
+	// Extend the current run if it uses the same texture, else start a new one.
+	if(runs_.empty() || runs_.back().tex != tex)
+		runs_.push_back(DrawRun{ tex, (int)batch_.size(), 0 });
+
 	// Two triangles (the D3D path used a tri-strip of 4 verts; here, 6 verts).
-	const float x1 = (float)x, y1 = (float)y, x2 = (float)(x + dx), y2 = (float)(y + dy);
+	const float x1 = x, y1 = y, x2 = x + dx, y2 = y + dy;
 	const UIVertex tl = { x1, y1, 0, 1, color, u,      v      };
 	const UIVertex tr = { x2, y1, 0, 1, color, u + du, v      };
 	const UIVertex bl = { x1, y2, 0, 1, color, u,      v + dv };
 	const UIVertex br = { x2, y2, 0, 1, color, u + du, v + dv };
 	batch_.push_back(tl); batch_.push_back(bl); batch_.push_back(tr);
 	batch_.push_back(tr); batch_.push_back(bl); batch_.push_back(br);
+	runs_.back().count += 6;
+}
+
+// Look up the SDL texture a cTexture is backed by (null => untextured/white).
+static SDL_GPUTexture* sdlTextureOf(cTexture* t)
+{
+	if(t && t->frameNumber() >= 1)
+		return reinterpret_cast<SDL_GPUTexture*>(t->GetDDSurface(0));
+	return nullptr;
+}
+
+void cSDLRenderDevice::SetNoMaterial(eBlendMode /*blend*/, const MatXf&, float /*phase*/,
+                                     cTexture* Texture0, cTexture* /*Texture1*/, eColorMode /*mode*/)
+{
+	// Record the texture for the following DrawQuad calls. (Blend state is baked
+	// into the single alpha pipeline for now; per-blend pipelines come later.)
+	currentTexture_ = sdlTextureOf(Texture0);
+}
+
+void cSDLRenderDevice::DrawQuad(float x1, float y1, float dx, float dy,
+                                float u1, float v1, float du, float dv, Color4c color)
+{
+	if(!bActiveScene_) return;
+	unsigned int c = (unsigned)color.b | ((unsigned)color.g << 8)
+	               | ((unsigned)color.r << 16) | ((unsigned)color.a << 24);
+	emitQuad(x1, y1, dx, dy, u1, v1, du, dv, c, currentTexture_);
+	NumberPolygon += 2;
+}
+
+// ---------------------------------------------------------------------------
+// Textures (slice 2b): real SDL GPU textures backed by a lockable CPU staging
+// image. The SDL_GPUTexture* is handed to cTexture via BitMap[0] (the fake
+// IDirect3DTexture9 Release() is a no-op, so storing a non-D3D pointer is safe);
+// TextureData (staging + dims) is kept here, keyed by that handle.
+// ---------------------------------------------------------------------------
+void cSDLRenderDevice::uploadTexture(const TextureData& td)
+{
+	if(!device_ || !td.tex || td.staging.empty()) return;
+
+	// The GPU texture is always BGRA8. For coverage (expand) textures the staging
+	// is 1 byte/px, widened here to (255,255,255,coverage).
+	const Uint32 bytes = (Uint32)(td.w * td.h * 4);
+	SDL_GPUTransferBufferCreateInfo tbi = {};
+	tbi.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+	tbi.size = bytes;
+	SDL_GPUTransferBuffer* tb = SDL_CreateGPUTransferBuffer(device_, &tbi);
+	if(!tb) return;
+
+	unsigned char* map = (unsigned char*)SDL_MapGPUTransferBuffer(device_, tb, false);
+	if(td.expand){
+		const int n = td.w * td.h;
+		for(int i = 0; i < n; ++i){
+			map[i*4+0] = 255; map[i*4+1] = 255; map[i*4+2] = 255;  // B,G,R
+			map[i*4+3] = td.staging[i];                            // A = coverage
+		}
+	} else {
+		SDL_memcpy(map, td.staging.data(), bytes);
+	}
+	SDL_UnmapGPUTransferBuffer(device_, tb);
+
+	SDL_GPUCommandBuffer* cb = SDL_AcquireGPUCommandBuffer(device_);
+	SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(cb);
+	SDL_GPUTextureTransferInfo src = {};
+	src.transfer_buffer = tb;
+	src.offset = 0;
+	src.pixels_per_row = (Uint32)td.w;
+	src.rows_per_layer = (Uint32)td.h;
+	SDL_GPUTextureRegion dst = {};
+	dst.texture = td.tex;
+	dst.w = (Uint32)td.w; dst.h = (Uint32)td.h; dst.d = 1;
+	SDL_UploadToGPUTexture(copy, &src, &dst, false);
+	SDL_EndGPUCopyPass(copy);
+	SDL_SubmitGPUCommandBuffer(cb);
+	SDL_ReleaseGPUTransferBuffer(device_, tb);
+}
+
+int cSDLRenderDevice::CreateTexture(cTexture* Texture, cFileImage* FileImage, int /*dxout*/, int /*dyout*/, bool /*enable_assert*/)
+{
+	if(!device_ || !Texture) return 1;
+
+	const int w = Texture->GetWidth();
+	const int h = Texture->GetHeight();
+	if(w <= 0 || h <= 0) return 1;
+
+	// GPU texture is always BGRA8 so one UI shader/sampler covers everything.
+	// Gray/alpha-only (the font atlas) keeps 1-byte coverage staging (so the font
+	// code's LockTexture pitch is right) and is widened to BGRA on upload; colour
+	// textures stage as 32-bit BGRA, matching cFileImage::GetTexture's byte order.
+	const bool gray = Texture->getAttribute(TEXTURE_GRAY) != 0;
+	const int bpp = gray ? 1 : 4;
+
+	SDL_GPUTextureCreateInfo ti = {};
+	ti.type = SDL_GPU_TEXTURETYPE_2D;
+	ti.format = SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM;
+	ti.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER;
+	ti.width = (Uint32)w; ti.height = (Uint32)h;
+	ti.layer_count_or_depth = 1; ti.num_levels = 1;
+	SDL_GPUTexture* tex = SDL_CreateGPUTexture(device_, &ti);
+	if(!tex) return 1;
+
+	TextureData td;
+	td.tex = tex; td.w = w; td.h = h; td.bpp = bpp; td.pitch = w * bpp;
+	td.expand = gray;
+	td.staging.assign((size_t)w * h * bpp, 0);
+
+	if(FileImage){
+		// GetTexture writes 32-bit BGRA pixels; meaningful for the colour path.
+		FileImage->GetTexture(td.staging.data(), 0, w, h);
+		uploadTexture(td);
+	}
+
+	textures_[tex] = std::move(td);
+
+	// Release any texture we previously parked in slot 0, then hand over the new
+	// handle. (Single-frame; animated multi-frame textures keep only frame 0.)
+	if(Texture->frameNumber() < 1)
+		Texture->New(1);
+	else if(SDL_GPUTexture* old = reinterpret_cast<SDL_GPUTexture*>(Texture->GetDDSurface(0))){
+		auto it = textures_.find(old);
+		if(it != textures_.end() && old != tex){
+			SDL_ReleaseGPUTexture(device_, old);
+			textures_.erase(it);
+		}
+	}
+	Texture->GetDDSurface(0) = reinterpret_cast<IDirect3DTexture9*>(tex);
+	return 0;  // 0 == success (matches the D3D contract)
+}
+
+int cSDLRenderDevice::DeleteTexture(cTexture* Texture)
+{
+	if(!Texture) return 0;
+	for(int i = 0; i < Texture->frameNumber(); ++i){
+		SDL_GPUTexture* tex = reinterpret_cast<SDL_GPUTexture*>(Texture->GetDDSurface(i));
+		if(!tex) continue;
+		auto it = textures_.find(tex);
+		if(it != textures_.end()){
+			if(device_) SDL_ReleaseGPUTexture(device_, tex);
+			textures_.erase(it);
+		}
+		Texture->GetDDSurface(i) = 0;
+	}
+	return 0;
+}
+
+void* cSDLRenderDevice::LockTexture(cTexture* Texture, int& Pitch)
+{
+	Pitch = 0;
+	if(!Texture || Texture->frameNumber() < 1) return nullptr;
+	auto it = textures_.find(reinterpret_cast<SDL_GPUTexture*>(Texture->GetDDSurface(0)));
+	if(it == textures_.end()) return nullptr;
+	Pitch = it->second.pitch;
+	return it->second.staging.data();
+}
+
+void* cSDLRenderDevice::LockTexture(cTexture* Texture, int& Pitch, Vect2i lock_min, Vect2i /*lock_size*/)
+{
+	Pitch = 0;
+	if(!Texture || Texture->frameNumber() < 1) return nullptr;
+	auto it = textures_.find(reinterpret_cast<SDL_GPUTexture*>(Texture->GetDDSurface(0)));
+	if(it == textures_.end()) return nullptr;
+	Pitch = it->second.pitch;
+	return it->second.staging.data() + lock_min.y * it->second.pitch + lock_min.x * it->second.bpp;
+}
+
+void cSDLRenderDevice::UnlockTexture(cTexture* Texture)
+{
+	if(!Texture || Texture->frameNumber() < 1) return;
+	auto it = textures_.find(reinterpret_cast<SDL_GPUTexture*>(Texture->GetDDSurface(0)));
+	if(it != textures_.end())
+		uploadTexture(it->second);
 }
 
 void cSDLRenderDevice::DrawSprite(int x, int y, int dx, int dy,
                                   float u, float v, float du, float dv,
-                                  cTexture* /*Texture*/, const Color4c& ColorMul,
+                                  cTexture* Texture, const Color4c& ColorMul,
                                   float /*phase*/, eBlendMode /*mode*/, float /*saturate*/)
 {
 	if(!bActiveScene_) return;
-	// 2a: ignore the texture (sampled as white); just rasterize the quad with the
-	// modulation colour. Real cTexture->SDL_GPUTexture upload comes in slice 2b.
 	// Pack BGRA bytes (matches UBYTE4_NORM read order; the shader swizzles to RGBA).
 	unsigned int color = (unsigned)ColorMul.b | ((unsigned)ColorMul.g << 8)
 	                   | ((unsigned)ColorMul.r << 16) | ((unsigned)ColorMul.a << 24);
-	pushQuad(x, y, dx, dy, u, v, du, dv, color);
+	emitQuad((float)x, (float)y, (float)dx, (float)dy, u, v, du, dv, color, sdlTextureOf(Texture));
 	NumberPolygon += 2;
 }
 

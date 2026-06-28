@@ -14,6 +14,8 @@ class Camera;
 
 class cTexture;
 class cTextureScale;
+class cFileImage;
+class MTSection;
 
 namespace FT { class Font; };
 
@@ -173,6 +175,20 @@ public:
 
 	virtual int GetAvailableTextureMem()=0;//� ������ ����������
 
+	// Texture lifecycle / CPU access. Implemented by the concrete backend
+	// (cD3DRender on Windows, cSDLRenderDevice on the SDL GPU backend); cTexture
+	// and cTexLibrary route through the interface rather than a concrete device.
+	virtual int CreateTexture(cTexture* Texture, cFileImage* FileImage, int dxout, int dyout, bool enable_assert = true) = 0;
+	virtual int DeleteTexture(cTexture* Texture) = 0;
+	virtual void* LockTexture(cTexture* Texture, int& Pitch) = 0;
+	virtual void* LockTexture(cTexture* Texture, int& Pitch, Vect2i lock_min, Vect2i lock_size) = 0;
+	virtual void UnlockTexture(cTexture* Texture) = 0;
+
+	// Serialises device-reset against draws (D3D9 lost-device handling). The SDL
+	// backend has no device loss, but UI code locks it, so it stays on the
+	// interface with a backend-owned section.
+	virtual MTSection& resetDeviceLock() = 0;
+
 	///ChangeSize � ������������ ������ ��������� �� �����������. �������� ������ ������� ��� ������ �� �����.
 	virtual bool ChangeSize(int xScr,int yScr,int mode)=0;
 
@@ -269,6 +285,11 @@ public:
 	/// x,y - ��������� �� ������, dx,dy - ������ �� ������, 
 	/// u,v,du,dv - ����� ����� �������� ��������� �� ����� (0,0,1,1) - ��� ��������
 	/// phase=0..1 ����� ����� � ������������� Texture
+	// Textured quad in screen space using the texture/blend set by SetNoMaterial.
+	// The UI 2D layer (UI_RenderBase) draws through this; promoted to the interface
+	// so the SDL backend can implement it (was cD3DRender-only).
+	virtual void DrawQuad(float x1,float y1,float dx,float dy,float u1,float v1,float du,float dv,Color4c color=Color4c(255,255,255,255))=0;
+
 	virtual void DrawSprite(int x,int y,int dx,int dy,float u,float v,float du,float dv,
 		cTexture *Texture,const Color4c &ColorMul=Color4c(255,255,255,255),float phase=0,eBlendMode mode=ALPHA_NONE, float saturate=1.f)=0;
 	virtual void DrawSpriteSolid(int x,int y,int dx,int dy,float u,float v,float du,float dv,

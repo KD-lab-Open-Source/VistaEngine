@@ -55,13 +55,14 @@ void UI_RenderBase::drawSprite(int left, int top, int width, int height, float u
 	if(blendMode <= ALPHA_TEST && (color.a < 255 || (texture && texture->isAlpha())))
 		blendMode = ALPHA_BLEND;
 
-	gb_RenderDevice3D->SetNoMaterial(blendMode, MatXf::ID, phase, texture);
+	gb_RenderDevice->SetNoMaterial(blendMode, MatXf::ID, phase, texture);
 
 	xassert(saturation <= 1.f);
-	if(1.f - saturation > 0.01f)
+	// psMonochrome is a cD3DRender pixel-shader effect; absent on the SDL backend.
+	if(1.f - saturation > 0.01f && gb_RenderDevice3D)
 		gb_RenderDevice3D->psMonochrome->Select(1.f - saturation);
 
-	gb_RenderDevice3D->DrawQuad(left, top, width, height, u, v, du, dv, color);
+	gb_RenderDevice->DrawQuad(left, top, width, height, u, v, du, dv, color);
 }
 
 void UI_RenderBase::drawSpriteTiled(int left, int top, int width, int height, float u, float v, float du, float dv, cTexture* texture, Color4c color, float saturation, eBlendMode blendMode, float phase) const
@@ -86,10 +87,11 @@ void UI_RenderBase::drawSpriteTiled(int left, int top, int width, int height, fl
 	if(blendMode <= ALPHA_TEST && (color.a < 255 || (texture && texture->isAlpha())))
 		blendMode = ALPHA_BLEND;
 
-	gb_RenderDevice3D->SetNoMaterial(blendMode, MatXf::ID, phase, texture);
+	gb_RenderDevice->SetNoMaterial(blendMode, MatXf::ID, phase, texture);
 
 	xassert(saturation <= 1.f);
-	if(1.f - saturation > 0.01f)
+	// psMonochrome is a cD3DRender pixel-shader effect; absent on the SDL backend.
+	if(1.f - saturation > 0.01f && gb_RenderDevice3D)
 		gb_RenderDevice3D->psMonochrome->Select(1.f - saturation);
 
 	int tx_w = round(du * (float)texture->GetWidth());
@@ -113,7 +115,7 @@ void UI_RenderBase::drawSpriteTiled(int left, int top, int width, int height, fl
 		float curDU = (float)(w) / (float)texture->GetWidth();
 		float curDV = (float)(h) / (float)texture->GetHeight();
 
-		gb_RenderDevice3D->DrawQuad(x, y, w, h, u, v, curDU, curDV, color);
+		gb_RenderDevice->DrawQuad(x, y, w, h, u, v, curDU, curDV, color);
 
 		if(curR >= right){
 			x = left;
@@ -146,10 +148,11 @@ void UI_RenderBase::drawSpriteSolid(int left, int top, int width, int height, fl
 	if(blendMode <= ALPHA_TEST && (color.a < 255 || (texture && texture->isAlpha())))
 		blendMode = ALPHA_BLEND;
 
-	gb_RenderDevice3D->SetNoMaterial(blendMode, MatXf::ID, phase, texture);
-	gb_RenderDevice3D->psSolidColor->Select();
+	gb_RenderDevice->SetNoMaterial(blendMode, MatXf::ID, phase, texture);
+	if(gb_RenderDevice3D)
+		gb_RenderDevice3D->psSolidColor->Select();
 
-	gb_RenderDevice3D->DrawQuad(left, top, width, height, u, v, du, dv, color);
+	gb_RenderDevice->DrawQuad(left, top, width, height, u, v, du, dv, color);
 }
 
 
@@ -158,15 +161,15 @@ void UI_RenderBase::drawLine(const Vect2f& p0, const Vect2f& p1, const Color4f& 
 	Vect2i pos0 = screenCoords(p0);
 	Vect2i pos1 = screenCoords(p1);
 
-	gb_RenderDevice3D->DrawLine(pos0.x, pos0.y, pos1.x, pos1.y, color);
+	gb_RenderDevice->DrawLine(pos0.x, pos0.y, pos1.x, pos1.y, color);
 }
 
 void UI_RenderBase::drawRectangle(const Rectf& rect, const Color4f& color, bool outlined/*, UI_BlendMode blend_mode*/) const
 {
 	Recti r = screenCoords(rect);
 
-	gb_RenderDevice3D->DrawRectangle(r.left(), r.top(), r.width(), r.height(), Color4c(color), outlined);
-	gb_RenderDevice3D->FlushPrimitive2D();
+	gb_RenderDevice->DrawRectangle(r.left(), r.top(), r.width(), r.height(), Color4c(color), outlined);
+	gb_RenderDevice->FlushPrimitive2D();
 }
 
 Vect2f UI_RenderBase::deviceCoords(const Vect2i& screen_coords) const
