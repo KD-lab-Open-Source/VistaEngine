@@ -1,6 +1,7 @@
 #ifndef __LIBRARY_WRAPPER_H__
 #define __LIBRARY_WRAPPER_H__
 
+#include <new>
 #include "Serializer.h"
 #include "LibrariesManager.h"
 
@@ -146,8 +147,15 @@ public:
 	template<> Type& LibraryWrapper<Type>::instance() {							\
 		static Type* t;															\
 		if(!t){																	\
-			static Type tt;														\
-			t = &tt;															\
+			/* Publish the pointer to storage BEFORE running the constructor: */\
+			/* the Type ctor serializes the library, which re-enters instance()*/\
+			/* (e.g. GameOptions::loadPresets). With t already set, that nested*/\
+			/* call returns the under-construction object instead of recursing */\
+			/* into the local-static guard. MSVC tolerated such recursion;     */\
+			/* libc++ aborts on it (__cxa_guard_acquire recursive init).        */\
+			alignas(Type) static unsigned char storage_[sizeof(Type)];			\
+			t = reinterpret_cast<Type*>(storage_);								\
+			::new (static_cast<void*>(storage_)) Type();						\
 			t->sectionName_ = sectionName;										\
 			t->flags_ = flags;										\
 			t->editName_ = editName;											\
