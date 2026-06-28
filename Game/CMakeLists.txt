@@ -36,6 +36,8 @@ else()
     # helpers). Compiled into the executable itself so the single definition is
     # always present at the final link, regardless of static-archive order.
     list(APPEND GAME_SOURCES ${CMAKE_SOURCE_DIR}/Platform/WindowsAPI.cpp)
+    # SDL3 windowing — creates the real OS window the SDL GPU device claims.
+    list(APPEND GAME_SOURCES ${CMAKE_SOURCE_DIR}/Platform/Window.cpp)
 endif()
 
 add_executable(Game ${GAME_SOURCES})

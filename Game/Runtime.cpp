@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+#include "Platform/Window.h"
 #include "CDKey.h"
 #include "GameOptions.h"
 #include "SoundApp.h"
@@ -566,6 +567,13 @@ void Runtime::calcRealWindowPos(int xPos,int yPos,int xScr,int yScr,bool fullscr
 
 HWND Runtime::createWindow(const char* title, const char* icon, int xPos,int yPos,int xScr,int yScr,WNDPROC lpfnWndProc,int dwStyle)
 {
+#ifndef _WIN32
+	// Cross-platform path: create a real SDL3 window. The engine's HWND is a
+	// void* (Platform/WindowsAPI.h), so the SDL_Window* travels through it and is
+	// handed to the SDL GPU device in cSDLRenderDevice::Initialize. The Win32
+	// window class / icon / message-proc machinery below is a no-op off-Windows.
+	return (HWND)PlatformWindow::create(title, xScr, yScr);
+#else
 	HICON hIconSm, hIcon;
 	if(!strlen(icon)){
 		hIconSm = (HICON)LoadImage(hInstance_, "GAME", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
@@ -602,6 +610,7 @@ HWND Runtime::createWindow(const char* title, const char* icon, int xPos,int yPo
 	}
 	ShowWindow(hWnd,SW_SHOWNORMAL);
 	return hWnd;
+#endif
 }
 
 void Runtime::onSetFocus(bool focus)
@@ -702,6 +711,11 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 
 	MSG msg;
 	while(true){
+#ifndef _WIN32
+		// Drain SDL events so the window stays responsive; quit on close.
+		if(!PlatformWindow::pumpEvents())
+			break;
+#endif
 		if(PeekMessage(&msg, 0, 0, 0, PM_NOREMOVE)){
 			if(!GetMessage(&msg, 0, 0, 0))
 				break;
