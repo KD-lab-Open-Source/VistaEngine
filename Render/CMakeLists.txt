@@ -75,6 +75,8 @@ else()
     # references (gb_RenderDevice + the D3D device/buffer classes), so the game
     # links with a silent renderer until the SDL GPU backend (Track B).
     list(APPEND RENDER_SOURCES RenderStub.cpp)
+    # The cross-platform SDL GPU render device (replaces the D3D9 cD3DRender).
+    list(APPEND RENDER_SOURCES SDLRenderDevice.cpp)
     # FreeType stubs (the vendored lib isn't built yet) — font rasterization is
     # disabled until FreeType is wired in.
     list(APPEND RENDER_SOURCES FreeTypeStub.cpp)
