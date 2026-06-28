@@ -228,7 +228,7 @@ bool cVisGeneric::GetUseMeshCache()
 }
 void cVisGeneric::SetEnableDOF(bool enable)
 {
-	if(gb_RenderDevice3D->IsPS20()&&GetFloatZBufferType()==2)
+	if(gb_RenderDevice3D && gb_RenderDevice3D->IsPS20()&&GetFloatZBufferType()==2)
 		Option_UseDOF = enable;
 	else
 		Option_UseDOF = false;
@@ -262,7 +262,7 @@ void cVisGeneric::SetFavoriteLoadDDS(bool p)
 
 void cVisGeneric::SetShadowType(bool shadowEnabled, int shadow_size)
 {
-	if(!gb_RenderDevice3D->IsPS20() || !gb_RenderDevice->IsEnableSelfShadow())
+	if(!gb_RenderDevice3D || !gb_RenderDevice3D->IsPS20() || !gb_RenderDevice->IsEnableSelfShadow())
 		shadow_size = 0;
 	if(shadow_size==0)
 		shadowEnabled = false;
@@ -342,12 +342,12 @@ int cVisGeneric::GetFloatZBufferType()
 
 bool cVisGeneric::PossibilityBump()
 {
-	return gb_RenderDevice3D->PossibilityBump();
+	return gb_RenderDevice3D ? gb_RenderDevice3D->PossibilityBump() : false;
 }
 
 void cVisGeneric::SetEnableBump(bool enable)
 {
-	if(gb_RenderDevice3D->IsPS20())
+	if(gb_RenderDevice3D && gb_RenderDevice3D->IsPS20())
 		Option_EnableBump=enable;
 	else
 		Option_EnableBump=false;
@@ -375,20 +375,21 @@ void cVisGeneric::SetEffectLibraryPath(const char* effect_path_,const char* text
 
 void cVisGeneric::SetAnisotropic(int b)
 {
-	gb_RenderDevice3D->SetAnisotropic(b+1);
+	if(gb_RenderDevice3D)
+		gb_RenderDevice3D->SetAnisotropic(b+1);
 }
 
 int cVisGeneric::GetAnisotropic()
 {
-	return gb_RenderDevice3D->GetAnisotropic();
+	return gb_RenderDevice3D ? gb_RenderDevice3D->GetAnisotropic() : 0;
 }
 int cVisGeneric::GetMaxAnisotropyLevel()
 {
-	return gb_RenderDevice3D->GetMaxAnisotropicLevels();
+	return gb_RenderDevice3D ? gb_RenderDevice3D->GetMaxAnisotropicLevels() : 0;
 }
 void cVisGeneric::EnableSilhouettes(bool enable)
 {
-	if(gb_RenderDevice3D->IsPS20())
+	if(gb_RenderDevice3D && gb_RenderDevice3D->IsPS20())
 		silhouettes_enabled = enable;
 	else
 		silhouettes_enabled =false;
@@ -402,11 +403,13 @@ void cVisGeneric::EnableOcclusion(bool b)
 }
 bool cVisGeneric::PossibilityOcclusion()
 {
-	return gb_RenderDevice3D->PossibilityOcclusion();
+	return gb_RenderDevice3D ? gb_RenderDevice3D->PossibilityOcclusion() : false;
 }
 
 cTexture* cVisGeneric::CreateTextureScreen()
 {
+	if(!gb_RenderDevice3D)
+		return 0;
 	IDirect3DDevice9* device=gb_RenderDevice3D->D3DDevice_;
 	HRESULT hr;
 	int dx=gb_RenderDevice3D->GetSizeX();
@@ -475,7 +478,7 @@ void cVisGeneric::SetGlobalParticleRate(float r)
 
 bool cVisGeneric::PossibilityShadowMapSelf4x4()
 {
-	if(gb_RenderDevice3D->dtAdvanceOriginal)
+	if(gb_RenderDevice3D && gb_RenderDevice3D->dtAdvanceOriginal)
 	{
 		eDrawID id=gb_RenderDevice3D->dtAdvanceOriginal->GetID();
 		return id==DT_RADEON9700 || id==DT_GEFORCEFX;
@@ -486,12 +489,13 @@ bool cVisGeneric::PossibilityShadowMapSelf4x4()
 void cVisGeneric::SetShadowMapSelf4x4(bool b4x4)
 {
 	Option_filterShadow=b4x4;
-	gb_RenderDevice3D->RestoreShader();
+	if(gb_RenderDevice3D)
+		gb_RenderDevice3D->RestoreShader();
 }
 
 void cVisGeneric::SetTilemapDetail(bool b)
 {
-	if(gb_RenderDevice3D->IsPS20())
+	if(gb_RenderDevice3D && gb_RenderDevice3D->IsPS20())
 	{
 		Option_DetailTexture=b;
 		gb_RenderDevice3D->RestoreShader();
@@ -508,7 +512,7 @@ bool cVisGeneric::GetTilemapDetail()
 
 void cVisGeneric::setTileMapVertexLight(bool vertexLight)
 {
-	if(gb_RenderDevice3D->IsPS20())
+	if(gb_RenderDevice3D && gb_RenderDevice3D->IsPS20())
 	{
 		Option_tileMapVertexLight=vertexLight;
 		gb_RenderDevice3D->RestoreShader();
@@ -519,7 +523,7 @@ void cVisGeneric::setTileMapVertexLight(bool vertexLight)
 
 bool cVisGeneric::PossibilityBumpChaos()
 {
-	return gb_RenderDevice3D->DeviceCaps.TextureOpCaps|D3DTEXOPCAPS_BUMPENVMAP;
+	return gb_RenderDevice3D ? (gb_RenderDevice3D->DeviceCaps.TextureOpCaps|D3DTEXOPCAPS_BUMPENVMAP) : false;
 }
 
 RENDER_API bool GetAllTriangle3dx(const char* filename,vector<Vect3f>& point,vector<sPolygon>& polygon)

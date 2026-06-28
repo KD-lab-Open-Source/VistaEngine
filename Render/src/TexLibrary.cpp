@@ -10,7 +10,15 @@
 
 RENDER_API cTexLibrary* GetTexLibrary()
 {
+#ifdef _WIN32
 	return &gb_RenderDevice3D->TexLibrary;
+#else
+	// Off-Windows there is no cD3DRender to host the texture library, so keep a
+	// standalone instance. (On Windows it lives inside cD3DRender so it resets on
+	// device loss; the SDL backend has no such reset yet.)
+	static cTexLibrary texLibrary;
+	return &texLibrary;
+#endif
 }
 
 cTexLibrary::cTexLibrary()
