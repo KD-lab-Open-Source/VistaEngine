@@ -11,6 +11,7 @@
 // Only the symbols actually referenced by the compiled (non-WIN32) sources are
 // stubbed here — see the undefined-symbol set at the final Game link.
 #include "StdAfxRD.h"
+#include "VisGeneric.h"
 #include "D3DRender.h"
 #include "D3DRenderTilemap.h"
 #include "src/WinVideo.h"
@@ -28,9 +29,19 @@ RENDER_API SAMPLER_DATA sampler_clamp_point;
 RENDER_API SAMPLER_DATA sampler_clamp_linear;
 RENDER_API SAMPLER_DATA sampler_clamp_anisotropic;
 
-RENDER_API cInterfaceRenderDevice* CreateIRenderDevice(bool /*multiThread*/)
+RENDER_API cInterfaceRenderDevice* CreateIRenderDevice(bool multiThread)
 {
-	return 0;
+	// Half 1 of the real CreateIRenderDevice (RenderDevice.cpp): construct the
+	// backend-agnostic cVisGeneric so gb_VisGeneric is non-null. Its constructor
+	// is pure file-IO/config (no GPU device), and VisGeneric.cpp is compiled into
+	// this library off-Windows, so this links and runs today.
+	//
+	// Half 2 — gb_RenderDevice = new cD3DRender — is the D3D backend (Windows-only).
+	// Off-Windows gb_RenderDevice stays null until the SDL GPU device (Track B),
+	// so the next call site (Runtime::init's gb_RenderDevice->SetMultisample) is
+	// the remaining blocker.
+	gb_VisGeneric = new cVisGeneric(multiThread);
+	return gb_RenderDevice;
 }
 
 // ---------------------------------------------------------------------------
