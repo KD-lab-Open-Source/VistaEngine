@@ -32,6 +32,10 @@ else()
     list(APPEND GAME_SOURCES PlatformStub.cpp)
     # TriggerEditor (kdw editor dialog) is Win32-only; no-op off-Windows.
     list(APPEND GAME_SOURCES ../TriggerEditor/TriggerEditorStub.cpp)
+    # Out-of-line bodies for the force-included WindowsAPI.h shim (path/dir-iteration
+    # helpers). Compiled into the executable itself so the single definition is
+    # always present at the final link, regardless of static-archive order.
+    list(APPEND GAME_SOURCES ${CMAKE_SOURCE_DIR}/Platform/WindowsAPI.cpp)
 endif()
 
 add_executable(Game ${GAME_SOURCES})

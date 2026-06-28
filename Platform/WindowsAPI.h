@@ -254,48 +254,11 @@ struct SIZE   { LONG cx, cy; };
 // Components that don't exist on disk (e.g. the leaf of a file/dir about to be
 // created, or a wildcard pattern) are kept verbatim. All path-consuming wrappers
 // below funnel their argument through this first.
-inline std::string NormalizePath(const char* path) {
-    if (!path || !*path) return std::string(path ? path : "");
-
-    std::string in(path);
-    for (char& c : in) if (c == '\\') c = '/';
-
-    std::string out = (in[0] == '/') ? "/" : "";  // preserve absolute root
-
-    size_t pos = 0;
-    while (pos < in.size()) {
-        while (pos < in.size() && in[pos] == '/') ++pos;   // skip separators
-        if (pos >= in.size()) break;
-        size_t end = in.find('/', pos);
-        if (end == std::string::npos) end = in.size();
-        std::string comp = in.substr(pos, end - pos);
-        pos = end;
-
-        std::string matched = comp;  // default: keep verbatim
-        if (comp != "." && comp != "..") {
-            std::string candidate = out;
-            if (!candidate.empty() && candidate.back() != '/') candidate += '/';
-            candidate += comp;
-            struct stat st;
-            if (::stat(candidate.c_str(), &st) != 0) {
-                // No exact match — scan the parent for a case-insensitive one.
-                const char* dirToScan = out.empty() ? "." : out.c_str();
-                if (DIR* d = ::opendir(dirToScan)) {
-                    for (struct dirent* ent; (ent = ::readdir(d)) != nullptr; ) {
-                        if (::strcasecmp(ent->d_name, comp.c_str()) == 0) {
-                            matched = ent->d_name;
-                            break;
-                        }
-                    }
-                    ::closedir(d);
-                }
-            }
-        }
-        if (!out.empty() && out.back() != '/') out += '/';
-        out += matched;
-    }
-    return out;
-}
+//
+// Defined out-of-line in Platform/WindowsAPI.cpp: this header is force-included
+// into every translation unit, so keeping the body here would make every edit to
+// the path logic trigger a full rebuild.
+std::string NormalizePath(const char* path);
 
 inline int _mkdir(const char* path)              { return mkdir(NormalizePath(path).c_str(), 0755); }
 inline int _rmdir(const char* path)              { return rmdir(NormalizePath(path).c_str()); }
@@ -661,18 +624,8 @@ inline void* GlobalFree(void* p) { free(p); return 0; }
 // Legacy OpenFile (16-bit-era API): the engine only uses it with OF_DELETE.
 #define OF_DELETE 0x00000200
 typedef struct _OFSTRUCT { unsigned char cBytes; } OFSTRUCT;
-inline HFILE OpenFile(const char* path, OFSTRUCT*, unsigned style) {
-    if (style & OF_DELETE) remove(NormalizePath(path).c_str());
-    return 0;
-}
-
-inline HANDLE CreateFileA(const char* path, DWORD access, DWORD, void*, DWORD creation, DWORD, HANDLE) {
-    const char* mode = (access & GENERIC_WRITE) ? "r+b" : "rb";
-    if (creation == CREATE_ALWAYS) mode = "w+b";
-    else if (creation == CREATE_NEW) mode = "w+bx";
-    FILE* f = fopen(NormalizePath(path).c_str(), mode);
-    return f ? (HANDLE)f : INVALID_HANDLE_VALUE;
-}
+HFILE  OpenFile(const char* path, OFSTRUCT*, unsigned style);   // defined in WindowsAPI.cpp
+HANDLE CreateFileA(const char* path, DWORD access, DWORD, void*, DWORD creation, DWORD, HANDLE);
 #define CreateFile CreateFileA
 
 // Templated on the byte-count and out-param types: Win32 uses DWORD (==unsigned
@@ -694,19 +647,8 @@ inline BOOL CloseFileHandle(HANDLE h) { return fclose((FILE*)h) == 0; }
 
 #define GetFileSize(h, high) ((DWORD)({ long p=ftell((FILE*)(h)); fseek((FILE*)(h),0,SEEK_END); long s=ftell((FILE*)(h)); fseek((FILE*)(h),p,SEEK_SET); if(high)*(DWORD*)(high)=0; s; }))
 
-inline char* _fullpath(char* absPath, const char* relPath, size_t) {
-    return realpath(NormalizePath(relPath).c_str(), absPath);
-}
-
-inline void _splitpath(const char* path, char* drive, char* dir, char* fname, char* ext) {
-    if (drive) drive[0] = '\0';
-    char tmp[MAX_PATH]; strncpy(tmp, path, MAX_PATH-1); tmp[MAX_PATH-1]='\0';
-    if (dir)   { char* d = dirname(tmp);  strncpy(dir, d, MAX_PATH); strncat(dir, "/", MAX_PATH); }
-    strncpy(tmp, path, MAX_PATH-1);
-    if (fname) { char* b = basename(tmp); char* dot = strrchr(b, '.'); size_t n = dot ? (size_t)(dot-b) : strlen(b); strncpy(fname, b, n); fname[n] = '\0'; }
-    strncpy(tmp, path, MAX_PATH-1);
-    if (ext)   { char* b = basename(tmp); char* dot = strrchr(b, '.'); strncpy(ext, dot ? dot : "", MAX_PATH); }
-}
+char* _fullpath(char* absPath, const char* relPath, size_t);   // defined in WindowsAPI.cpp
+void  _splitpath(const char* path, char* drive, char* dir, char* fname, char* ext);
 
 #define _makepath(path,d,dir,fn,ext) snprintf(path,MAX_PATH,"%s%s%s%s",(dir)?(dir):"",(fn)?(fn):"",(ext)?(ext):"","")
 
@@ -736,48 +678,15 @@ typedef WIN32_FIND_DATAA WIN32_FIND_DATA;
 
 struct _FindContext { DIR* dir; char pattern[MAX_PATH]; char path[MAX_PATH]; };
 
-inline HANDLE FindFirstFileA(const char* rawPattern, WIN32_FIND_DATAA* fd) {
-    std::string pattern_s = NormalizePath(rawPattern);
-    const char* pattern = pattern_s.c_str();
-    char dir_path[MAX_PATH]; strncpy(dir_path, pattern, MAX_PATH-1);
-    char* slash = strrchr(dir_path, '/'); if (!slash) slash = strrchr(dir_path, '\\');
-    if (slash) *slash = '\0'; else { dir_path[0]='.'; dir_path[1]='\0'; }
-    DIR* d = opendir(dir_path);
-    if (!d) return INVALID_HANDLE_VALUE;
-    auto* ctx = new _FindContext; ctx->dir = d;
-    strncpy(ctx->path, dir_path, MAX_PATH-1);
-    struct dirent* ent;
-    while ((ent = readdir(d)) != nullptr) {
-        if (ent->d_name[0] == '.') continue;
-        strncpy(fd->cFileName, ent->d_name, MAX_PATH-1);
-        fd->dwFileAttributes = (ent->d_type == DT_DIR) ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL;
-        fd->nFileSizeHigh = fd->nFileSizeLow = 0;
-        return (HANDLE)ctx;
-    }
-    closedir(d); delete ctx; return INVALID_HANDLE_VALUE;
-}
+// Directory iteration — defined in WindowsAPI.cpp (the empty-pattern handling and
+// case-correcting scan are non-trivial and shouldn't live in this app-wide header).
+HANDLE FindFirstFileA(const char* rawPattern, WIN32_FIND_DATAA* fd);
 #define FindFirstFile FindFirstFileA
 
-inline BOOL FindNextFileA(HANDLE h, WIN32_FIND_DATAA* fd) {
-    if (h == INVALID_HANDLE_VALUE) return FALSE;
-    auto* ctx = (_FindContext*)h;
-    struct dirent* ent;
-    while ((ent = readdir(ctx->dir)) != nullptr) {
-        if (ent->d_name[0] == '.') continue;
-        strncpy(fd->cFileName, ent->d_name, MAX_PATH-1);
-        fd->dwFileAttributes = (ent->d_type == DT_DIR) ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL;
-        fd->nFileSizeHigh = fd->nFileSizeLow = 0;
-        return TRUE;
-    }
-    return FALSE;
-}
+BOOL FindNextFileA(HANDLE h, WIN32_FIND_DATAA* fd);
 #define FindNextFile FindNextFileA
 
-inline BOOL FindCloseHandle(HANDLE h) {
-    if (h == INVALID_HANDLE_VALUE) return FALSE;
-    auto* ctx = (_FindContext*)h;
-    closedir(ctx->dir); delete ctx; return TRUE;
-}
+BOOL FindCloseHandle(HANDLE h);
 #define FindClose FindCloseHandle
 
 // ─── SYSTEMTIME ───────────────────────────────────────────────────────────────
