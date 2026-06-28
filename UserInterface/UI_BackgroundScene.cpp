@@ -138,6 +138,10 @@ void UI_BackgroundModel::load(cScene* scene, const UI_BackgroundModelSetup& setu
 		return;
 
 	model_ = scene->CreateObject3dx(setup.modelName(), NULL);
+	// CreateObject3dx can return null (e.g. off-Windows the 3DX mesh/GPU-buffer
+	// path isn't ported yet — slice 3). Tolerate it so the 2D UI still renders.
+	if(!model_)
+		return;
 	model_->DisableDetailLevel();
 	if(player){
 		Color4f color(setup.ownSkinColor() ? setup.skinColor() : player->unitColor());

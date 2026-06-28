@@ -937,7 +937,23 @@ void GameShell::graphicsQuant()
 			UI_Dispatcher::instance().exitMissionPrepare();
 		if(startMissionSuspended_ && UI_Dispatcher::instance().canExit()){
 			startMissionSuspended_ = false;
+#ifndef _WIN32
+			// TEMP (cross-platform bring-up): the mission's world build (UniverseX ->
+			// FieldDispatcher -> TileStrip) needs the not-yet-ported game-world GPU
+			// buffer path (slice 3). Skip the world but still activate the preloaded
+			// 2D UI screen (e.g. "Main Menu") so the menu renders for validation.
+			// Pass a null background scene so no world model is required.
+			if(!preloadScreen_.empty()){
+				UI_Screen* scr = UI_ScreenReference(preloadScreen_).screen();
+				if(scr){
+					UI_Dispatcher::instance().preloadScreen(scr, 0, 0);
+					UI_Dispatcher::instance().selectScreen(scr);
+				}
+				preloadScreen_.clear();
+			}
+#else
 			GameStart(missionToStart_);
+#endif
 			gameReadyCounter_ = 5;
 		}
 

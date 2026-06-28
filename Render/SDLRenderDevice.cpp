@@ -9,6 +9,7 @@
 
 #include "Texture.h"     // cTexture (BitMap / GetDDSurface / attributes)
 #include "FileImage.h"   // cFileImage::GetTexture
+#include "FT_Font.h"     // FT::Font glyph atlas (OutTextLine)
 
 // Cross-compiled UI shader blobs (SPIR-V + MSL); see Render/SDLShaders.
 #include "SDLShaders/ui_shaders.h"
@@ -613,6 +614,70 @@ void cSDLRenderDevice::DrawSprite(int x, int y, int dx, int dy,
 	                   | ((unsigned)ColorMul.r << 16) | ((unsigned)ColorMul.a << 24);
 	emitQuad((float)x, (float)y, (float)dx, (float)dy, u, v, du, dv, color, sdlTextureOf(Texture));
 	NumberPolygon += 2;
+}
+
+// ---------------------------------------------------------------------------
+// Text: emit one textured quad per glyph from the FreeType atlas. Mirrors the
+// D3D cD3DRender::OutTextLine glyph-placement math. The atlas is a GRAY texture
+// uploaded as BGRA (255,255,255,coverage), so sampling gives white with the
+// coverage in alpha; the vertex colour tints it (handled by the UI shader).
+// ---------------------------------------------------------------------------
+int cSDLRenderDevice::OutTextLine(int x, int y, const FT::Font& font, const wchar_t* textline, const wchar_t* end,
+                                  const Color4c& color, eBlendMode /*blend_mode*/, int xRangeMin, int xRangeMax)
+{
+	if(!bActiveScene_ || !font.texture())
+		return x;
+
+	SDL_GPUTexture* tex = sdlTextureOf(const_cast<cTexture*>(font.texture()));
+	const float txWidth  = float(font.texture()->GetWidth());
+	const float txHeight = float(font.texture()->GetHeight());
+	if(txWidth <= 0 || txHeight <= 0)
+		return x;
+
+	const unsigned int c = (unsigned)color.b | ((unsigned)color.g << 8)
+	                     | ((unsigned)color.r << 16) | ((unsigned)color.a << 24);
+
+	int prev_rh = 0;
+	int prev_right = x;
+	for(const wchar_t* str = textline; str != end; ++str){
+		wchar_t symbol = *str;
+		if(symbol < 32)
+			continue;
+
+		const FT::OneChar& one = font.getChar(symbol);
+
+		int advance = one.advance;
+		if(prev_rh - one.lh >= 32)
+			--advance;
+		else if(prev_rh - one.lh < -32)
+			++advance;
+		prev_rh = one.rh;
+
+		int right = x + max(advance, (int)one.su + (int)one.du);
+
+		if(xRangeMin >= 0 && x < xRangeMin){
+			prev_right = right;
+			x += advance;
+			continue;
+		}
+		if(xRangeMax >= 0 && right > xRangeMax)
+			break;
+
+		// Empty space around glyphs is compressed in the atlas, so apply the
+		// per-glyph offsets (su,sv) and the glyph extent (du,dv).
+		float px = float(x + one.su) - 0.5f;
+		float py = float(y + one.sv) - 0.5f;
+		float u  = float(one.u) / txWidth;
+		float v  = float(one.v) / txHeight;
+		float du = float(one.du) / txWidth;
+		float dv = float(one.dv) / txHeight;
+		emitQuad(px, py, float(one.du), float(one.dv), u, v, du, dv, c, tex);
+		NumberPolygon += 2;
+
+		prev_right = right;
+		x += advance;
+	}
+	return prev_right;
 }
 
 #endif // !_WIN32

@@ -350,6 +350,14 @@ void Runtime::checkSingleRunning()
 
 void Runtime::GameStart(const MissionDescription& mission)
 {
+#ifndef _WIN32
+	// TEMP (cross-platform bring-up): the main menu auto-starts a background
+	// mission ("Menu") whose world build (UniverseX -> FieldDispatcher ->
+	// TileStrip) needs the not-yet-ported game-world GPU buffer path. Skip it so
+	// the 2D menu UI keeps rendering for visual validation. Remove once vertex/
+	// index buffers + terrain field rendering are implemented (slice 3).
+	return;
+#endif
 	setLogicFp();
 	MT_SET_TLS(MT_GRAPH_THREAD | MT_LOGIC_THREAD);
 

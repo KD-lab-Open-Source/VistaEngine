@@ -82,7 +82,7 @@ void UI_Render::drawSprite(const Rectf& pos, const UI_Sprite& sprite, const Colo
 							round(color.b * sprite.diffuseColor().b),
 							round(color.a * sprite.diffuseColor().a));
 
-	gb_RenderDevice3D->SetSamplerData(0, sampler_clamp_linear);
+	if(gb_RenderDevice3D) gb_RenderDevice3D->SetSamplerData(0, sampler_clamp_linear);
 
 	if(tiled)
 		drawSpriteTiled(scr_pos.left(), scr_pos.top(), scr_pos.width(), scr_pos.height(), 
@@ -99,7 +99,7 @@ void UI_Render::drawSprite(const Rectf& pos, cTexture* texture, const Color4f& c
 {
 	Recti scr_pos = screenCoords(pos);
 
-	gb_RenderDevice3D->SetSamplerData(0, sampler_clamp_linear);
+	if(gb_RenderDevice3D) gb_RenderDevice3D->SetSamplerData(0, sampler_clamp_linear);
 
 	UI_RenderBase::drawSprite(scr_pos.left(), scr_pos.top(), scr_pos.width(), scr_pos.height(),
 				0.0f, 0.0f, 1.0f, 1.0f,
@@ -111,7 +111,7 @@ void UI_Render::drawSprite(const Rectf& pos, cTexture* texture, const Rectf& txt
 {
 	Recti scr_pos = screenCoords(pos);
 
-	gb_RenderDevice3D->SetSamplerData(0, sampler_clamp_linear);
+	if(gb_RenderDevice3D) gb_RenderDevice3D->SetSamplerData(0, sampler_clamp_linear);
 
 	UI_RenderBase::drawSprite(scr_pos.left(), scr_pos.top(), scr_pos.width(), scr_pos.height(),
 				txt_pos.left(), txt_pos.top(), txt_pos.width(), txt_pos.height(),
@@ -320,10 +320,10 @@ Vect2f UI_Render::outText(const Rectf& pos, const UI_TextParser& parser, OutNode
 				if(size.xi() != it->width){
 					size.y *= float(it->width) / size.x;
 					size.x = it->width;
-					gb_RenderDevice3D->SetSamplerData(0, sampler_clamp_linear);
+					if(gb_RenderDevice3D) gb_RenderDevice3D->SetSamplerData(0, sampler_clamp_linear);
 				}
 				else
-					gb_RenderDevice3D->SetSamplerData(0, sampler_clamp_point);
+					if(gb_RenderDevice3D) gb_RenderDevice3D->SetSamplerData(0, sampler_clamp_point);
 
 				int yPos;
 				if((it->style & 0x03) == 1)

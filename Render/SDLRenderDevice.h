@@ -106,9 +106,9 @@ public:
 	void drawCircle(const Vect3f&, float, Color4c) override {}
 	void DrawBound(const MatXf&, Vect3f&, Vect3f&, bool, Color4c) override {}
 
-	// --- Text (no-op; needs FreeType, still stubbed) ---------------------
+	// --- Text ------------------------------------------------------------
 	void OutText(int, int, const char*, const Color4f&, ALIGN_TEXT, eBlendMode, Vect2f) override {}
-	int  OutTextLine(int, int, const FT::Font&, const wchar_t*, const wchar_t*, const Color4c&, eBlendMode, int, int) override { return 0; }
+	int  OutTextLine(int x, int y, const FT::Font& font, const wchar_t* textline, const wchar_t* end, const Color4c& color, eBlendMode blend_mode, int xRangeMin, int xRangeMax) override;
 	void OutText(int, int, const char*, int, int, int) override {}
 	void OutText(int, int, const char*, int, int, int, char*, int, int, int, int) override {}
 

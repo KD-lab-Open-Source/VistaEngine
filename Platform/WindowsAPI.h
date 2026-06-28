@@ -422,8 +422,18 @@ inline HANDLE GetCurrentThread()              { return nullptr; }
 inline BOOL   SetThreadPriority(HANDLE, int)  { return TRUE; }
 
 // ─── Critical section stubs ───────────────────────────────────────────────────
+// Win32 CRITICAL_SECTION is recursive (a thread may re-enter a section it already
+// owns). Mirror that with a RECURSIVE pthread mutex, else re-entrant locks (e.g.
+// ControlManager::registerHotKey -> unRegisterHotKey) self-deadlock.
 struct CRITICAL_SECTION { pthread_mutex_t mutex; };
-inline void InitializeCriticalSection(CRITICAL_SECTION* cs) { pthread_mutex_init(&cs->mutex, nullptr); }
+inline void InitializeCriticalSection(CRITICAL_SECTION* cs)
+{
+	pthread_mutexattr_t attr;
+	pthread_mutexattr_init(&attr);
+	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+	pthread_mutex_init(&cs->mutex, &attr);
+	pthread_mutexattr_destroy(&attr);
+}
 inline void DeleteCriticalSection(CRITICAL_SECTION* cs)     { pthread_mutex_destroy(&cs->mutex); }
 inline void EnterCriticalSection(CRITICAL_SECTION* cs)      { pthread_mutex_lock(&cs->mutex); }
 inline void LeaveCriticalSection(CRITICAL_SECTION* cs)      { pthread_mutex_unlock(&cs->mutex); }
