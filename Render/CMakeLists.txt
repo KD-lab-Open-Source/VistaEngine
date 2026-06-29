@@ -77,6 +77,8 @@ else()
     list(APPEND RENDER_SOURCES RenderStub.cpp)
     # The cross-platform SDL GPU render device (replaces the D3D9 cD3DRender).
     list(APPEND RENDER_SOURCES SDLRenderDevice.cpp)
+    # Portable DDS decoder (D3DX is Windows-only); model textures ship as DDS.
+    list(APPEND RENDER_SOURCES src/DDSImage.cpp)
 endif()
 
 add_library(Render STATIC ${RENDER_SOURCES})

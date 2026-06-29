@@ -2,6 +2,9 @@
 #include "Texture.h"
 #include "D3DRender.h"
 #include "FileImage.h"
+#ifndef _WIN32
+#include "DDSImage.h"   // portable DDS decode for the cross-platform backend
+#endif
 #include "Serialization/ResourceSelector.h"
 #include "FileUtils/FileUtils.h"
 #include <ddraw.h>
@@ -284,6 +287,18 @@ void cTexture::saveDDS(const char* file_name, int level)
 
 bool cTexture::loadDDS(const char* file_name)
 {
+#ifndef _WIN32
+	// Off-Windows there is no D3DX: decode the cached DDS (DXT1/3/5) to BGRA and
+	// create the texture through the cross-platform device's CreateTexture.
+	cDDSImage img;
+	if(img.load(file_name) != 0)
+		return false;
+	SetWidth(img.GetX());
+	SetHeight(img.GetY());
+	if(frameNumber() < 1)
+		New(1);
+	return gb_RenderDevice->CreateTexture(this, &img, -1, -1) == 0;
+#else
 	xassert(!BitMap.empty());
 	char* buf=0;
 	int size;
@@ -298,6 +313,7 @@ bool cTexture::loadDDS(const char* file_name)
 
 	BitMap[0] = pTex;
 	return true;
+#endif
 }
 
 int cTexture::bitsPerPixel() const

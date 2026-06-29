@@ -83,13 +83,23 @@ char* _fullpath(char* absPath, const char* relPath, size_t) {
 }
 
 void _splitpath(const char* path, char* drive, char* dir, char* fname, char* ext) {
+    // The Windows contract sizes the caller's buffers as _MAX_DRIVE/_MAX_DIR/
+    // _MAX_FNAME/_MAX_EXT — NOT MAX_PATH. strncpy zero-pads to its full count, so
+    // copying MAX_PATH bytes into a _MAX_EXT(256)-byte buffer smashed the stack.
     if (drive) drive[0] = '\0';
-    char tmp[MAX_PATH]; strncpy(tmp, path, MAX_PATH-1); tmp[MAX_PATH-1]='\0';
-    if (dir)   { char* d = dirname(tmp);  strncpy(dir, d, MAX_PATH); strncat(dir, "/", MAX_PATH); }
-    strncpy(tmp, path, MAX_PATH-1);
-    if (fname) { char* b = basename(tmp); char* dot = strrchr(b, '.'); size_t n = dot ? (size_t)(dot-b) : strlen(b); strncpy(fname, b, n); fname[n] = '\0'; }
-    strncpy(tmp, path, MAX_PATH-1);
-    if (ext)   { char* b = basename(tmp); char* dot = strrchr(b, '.'); strncpy(ext, dot ? dot : "", MAX_PATH); }
+    char tmp[MAX_PATH];
+    if (dir)   { strncpy(tmp, path, MAX_PATH-1); tmp[MAX_PATH-1]='\0';
+                 char* d = dirname(tmp);
+                 strncpy(dir, d, _MAX_DIR-1); dir[_MAX_DIR-1]='\0';
+                 strncat(dir, "/", _MAX_DIR - strlen(dir) - 1); }
+    if (fname) { strncpy(tmp, path, MAX_PATH-1); tmp[MAX_PATH-1]='\0';
+                 char* b = basename(tmp); char* dot = strrchr(b, '.');
+                 size_t n = dot ? (size_t)(dot-b) : strlen(b);
+                 if (n > _MAX_FNAME-1) n = _MAX_FNAME-1;
+                 strncpy(fname, b, n); fname[n] = '\0'; }
+    if (ext)   { strncpy(tmp, path, MAX_PATH-1); tmp[MAX_PATH-1]='\0';
+                 char* b = basename(tmp); char* dot = strrchr(b, '.');
+                 strncpy(ext, dot ? dot : "", _MAX_EXT-1); ext[_MAX_EXT-1]='\0'; }
 }
 
 HANDLE FindFirstFileA(const char* rawPattern, WIN32_FIND_DATAA* fd) {

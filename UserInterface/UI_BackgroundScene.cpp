@@ -9,7 +9,12 @@
 #include "Render/src/Scene.h"
 #include "Render/src/cCamera.h"
 #include "Render/3dx/Node3dx.h"
+#include "Render/3dx/MeshCacheGeometry.h"
 #include "Render/src/VisGeneric.h"
+#ifndef _WIN32
+#include "Render/SDLRenderDevice.h"   // slice-3 fallback: draw raw .3dxGB geometry
+#include "TexLibrary.h"               // GetTexLibrary()->GetElement3D for submesh textures
+#endif
 
 #include "Environment/Environment.h"
 #include "Game/Universe.h"
@@ -120,7 +125,7 @@ void UI_BackgroundModelSetup::preLoad(cScene* scene, const Player* player) const
 
 // ------------------------------- UI_BackgroundModel
 
-UI_BackgroundModel::UI_BackgroundModel() : model_(0)
+UI_BackgroundModel::UI_BackgroundModel() : model_(0), meshHandle_(-1)
 {
 
 }
@@ -140,8 +145,35 @@ void UI_BackgroundModel::load(cScene* scene, const UI_BackgroundModelSetup& setu
 	model_ = scene->CreateObject3dx(setup.modelName(), NULL);
 	// CreateObject3dx can return null (e.g. off-Windows the 3DX mesh/GPU-buffer
 	// path isn't ported yet — slice 3). Tolerate it so the 2D UI still renders.
-	if(!model_)
+	if(!model_){
+#ifndef _WIN32
+		// Slice 3: the InPlace cStatic3dx is unportable, so recover the raw geometry
+		// from the baked .3dxGB cache and upload it straight to the SDL GPU device
+		// (drawn as a lit, auto-framed background mesh until the full 3dx path lands).
+		MeshCacheGeometry::Geometry geo;
+		cSDLRenderDevice* dev = dynamic_cast<cSDLRenderDevice*>(gb_RenderDevice);
+		if(dev && MeshCacheGeometry::readForModel(setup.modelName(), geo) && !geo.lods.empty()){
+			const MeshCacheGeometry::Lod& lod = geo.lods[0];
+			if(!lod.empty()){
+				meshHandle_ = dev->uploadMesh(lod.vertexData.data(), (int)lod.vertexData.size(),
+				                              lod.vertexSize, lod.indexData.data(), lod.polygonNumber * 3);
+				// Per-material textured sub-draws (from the .3dxG object cache).
+				if(meshHandle_ >= 0){
+					cTexLibrary* texLib = GetTexLibrary();
+					for(size_t i = 0; i < geo.submeshes.size(); ++i){
+						const MeshCacheGeometry::SubMesh& sm = geo.submeshes[i];
+						cTexture* tex = (texLib && !sm.texture.empty())
+						              ? texLib->GetElement3D(sm.texture.c_str()) : 0;
+						if(tex)
+							meshTextures_.push_back(tex);  // held until release()
+						dev->addMeshSubmesh(meshHandle_, sm.firstIndex, sm.indexCount, tex);
+					}
+				}
+			}
+		}
+#endif
 		return;
+	}
 	model_->DisableDetailLevel();
 	if(player){
 		Color4f color(setup.ownSkinColor() ? setup.skinColor() : player->unitColor());
@@ -173,6 +205,18 @@ void UI_BackgroundModel::release()
 		model_->Release();
 		model_ = 0;
 	}
+
+#ifndef _WIN32
+	if(meshHandle_ >= 0){
+		if(cSDLRenderDevice* dev = dynamic_cast<cSDLRenderDevice*>(gb_RenderDevice))
+			dev->releaseMesh(meshHandle_);
+		meshHandle_ = -1;
+	}
+	for(size_t i = 0; i < meshTextures_.size(); ++i)
+		if(meshTextures_[i])
+			meshTextures_[i]->Release();
+	meshTextures_.clear();
+#endif
 }
 
 void UI_BackgroundModel::setPosition(const MatXf& pos)

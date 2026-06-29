@@ -167,6 +167,10 @@ private:
 	void stopEffect(const UI_EffectAttributeAttachable* attr);
 
 	cObject3dx* model_;
+	// Slice 3 (off-Windows): when CreateObject3dx fails, we fall back to drawing the
+	// raw .3dxGB geometry through the SDL GPU device directly. -1 == no fallback mesh.
+	int meshHandle_;
+	std::vector<cTexture*> meshTextures_;   // diffuse textures held for the fallback mesh
 	UI_BackgroundAnimationControllers animations_;
 
 	typedef SwapVector<UI_EffectControllerAttachable3D> Effects;

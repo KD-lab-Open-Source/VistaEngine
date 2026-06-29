@@ -51,6 +51,17 @@ public:
 	int GetAvailableTextureMem() override { return 0; }
 	HWND GetWindowHandle() override { return (HWND)window_; }
 
+	// --- Slice 3: minimal static-mesh rendering (geometry-only path) -------
+	// Not part of cInterfaceRenderDevice: the off-Windows 3D models ship only as
+	// the 32-bit InPlace cache, so we render raw VB/IB recovered from .3dxGB
+	// (see Render/3dx/MeshCacheGeometry). Returns a handle, -1 on failure.
+	int  uploadMesh(const void* vb, int vbBytes, int stride, const void* ib, int indexCount);
+	void setMeshTexture(int handle, cTexture* tex);
+	// Append a textured sub-range (firstIndex/indexCount into the mesh's index
+	// buffer). Once any sub-range is set, the whole-mesh draw is replaced by them.
+	void addMeshSubmesh(int handle, int firstIndex, int indexCount, cTexture* tex);
+	void releaseMesh(int handle);
+
 	// --- Textures (slice 2b): real SDL GPU textures + CPU staging ----------
 	int   CreateTexture(cTexture* Texture, cFileImage* FileImage, int dxout, int dyout, bool enable_assert) override;
 	int   DeleteTexture(cTexture* Texture) override;
@@ -178,6 +189,28 @@ private:
 	struct DrawRun { SDL_GPUTexture* tex; int first; int count; };
 	std::vector<DrawRun> runs_;
 	SDL_GPUTexture* currentTexture_ = nullptr;  // set by SetNoMaterial
+
+	// Slice 3: static meshes uploaded from raw .3dxGB geometry.
+	struct SubDraw { int firstIndex; int indexCount; SDL_GPUTexture* tex; };
+	struct Mesh {
+		SDL_GPUBuffer* vbuf = nullptr;
+		SDL_GPUBuffer* ibuf = nullptr;
+		int indexCount = 0;
+		int stride = 0;
+		float bmin[3] = {0,0,0};
+		float bmax[3] = {0,0,0};
+		SDL_GPUTexture* tex = nullptr;        // whole-mesh texture (if no subdraws)
+		std::vector<SubDraw> subdraws;        // per-material textured ranges
+		bool active = false;
+	};
+	std::vector<Mesh> meshes_;
+	SDL_GPUGraphicsPipeline* meshPipeline_ = nullptr;
+	SDL_GPUTexture*          depthTexture_ = nullptr;
+	int depthW_ = 0, depthH_ = 0;
+	bool meshPipelineTried_ = false;
+	void createMeshPipeline();
+	void ensureDepth(int w, int h);
+	void drawMeshes(SDL_GPURenderPass* pass);  // 3D pass: build MVP + draw meshes
 
 	SDL_Window*            window_           = nullptr;
 	SDL_GPUDevice*         device_           = nullptr;
