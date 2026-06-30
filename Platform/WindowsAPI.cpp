@@ -21,6 +21,34 @@
 #include <cstdio>
 #include <cstdlib>
 #include <strings.h>
+#include <unordered_set>
+#include <mutex>
+
+// CreateFileA returns a FILE* (cast to HANDLE). CloseHandle must fclose those, but
+// it is also called on event/thread handles (CreateEvent/_beginthread) that are NOT
+// FILE*. Track the file handles we hand out so CloseHandle closes only those and is
+// a harmless no-op for everything else. Without this every CreateFile leaks an fd
+// (isFileExists, terrain VMAP, ...), which exhausts the 256-fd limit fast.
+static std::unordered_set<void*>& fileHandleSet() { static std::unordered_set<void*> s; return s; }
+static std::mutex&                fileHandleMutex() { static std::mutex m; return m; }
+
+static void registerFileHandle(void* h)
+{
+    std::lock_guard<std::mutex> lk(fileHandleMutex());
+    fileHandleSet().insert(h);
+}
+
+BOOL CloseHandle(HANDLE h)
+{
+    if(!h || h == INVALID_HANDLE_VALUE) return FALSE;
+    std::lock_guard<std::mutex> lk(fileHandleMutex());
+    auto it = fileHandleSet().find(h);
+    if(it != fileHandleSet().end()){
+        fclose((FILE*)h);
+        fileHandleSet().erase(it);
+    }
+    return TRUE;
+}
 
 std::string NormalizePath(const char* path) {
     if (!path || !*path) return std::string(path ? path : "");
@@ -75,7 +103,9 @@ HANDLE CreateFileA(const char* path, DWORD access, DWORD, void*, DWORD creation,
     if (creation == CREATE_ALWAYS) mode = "w+b";
     else if (creation == CREATE_NEW) mode = "w+bx";
     FILE* f = fopen(NormalizePath(path).c_str(), mode);
-    return f ? (HANDLE)f : INVALID_HANDLE_VALUE;
+    if(!f) return INVALID_HANDLE_VALUE;
+    registerFileHandle(f);   // so CloseHandle actually fcloses it
+    return (HANDLE)f;
 }
 
 char* _fullpath(char* absPath, const char* relPath, size_t) {

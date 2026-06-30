@@ -33,6 +33,9 @@ struct SubMesh
 	int indexCount = 0;   // num_polygon*3
 	int material   = 0;   // imaterial
 	std::string texture;  // fixed diffuse texture path for GetElement3D ("" if none)
+	float diffuse[4] = {1,1,1,1};  // material diffuse Color4f (rgb tint, a == opacity)
+	float opacity = 1.0f;          // material opacity multiplier (StaticMaterial.opacity)
+	int transparency = 2;          // transparencyType: 0=SUBSTRACTIVE, 1=ADDITIVE, 2=FILTER
 };
 
 struct Geometry

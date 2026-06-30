@@ -45,6 +45,15 @@ cTexLibrary::cTexLibrary()
 	BinaryIArchive ia(0);
 	if(ia.open(cacheInfo.c_str()))
 		serialize(ia);
+
+#ifndef _WIN32
+	// Cross-platform port runs against the shipped, frozen texture cache; the
+	// original source .tga assets aren't bundled, so the file-time validation in
+	// LoadCache (valid(): textureTime_ vs FileTime(source)) rejects perfectly good
+	// cached DDS (e.g. the menu's menu_button/rectangle_01/Map_Future). Treat the
+	// cache as exported so cached textures load without the source-time check.
+	exported_ = true;
+#endif
 }
 
 cTexLibrary::~cTexLibrary()
@@ -404,7 +413,7 @@ bool cTexLibrary::LoadCache(cTexture* texture)
 		cacheDataTable_.erase(texture->GetUniqueName());
 		return false;
 	}
-	
+
 	if(!texture->IsTexture2D()){
 		texture->SetWidth(max(data.x>>Option_TextureDetailLevel,1));
 		texture->SetHeight(max(data.y>>Option_TextureDetailLevel,1));
@@ -819,9 +828,9 @@ cTexture* cTexLibrary::GetElement3D(const char *pTextureName,char *pMode)
 	start_timer_auto();
 	MTAuto mtenter(lock);
 	bool bump = pMode && strstr(pMode,"Bump");
-	
+
 	if(pTextureName==0||pTextureName[0]==0) return 0; // имя текстуры пустое
-	
+
 	string texture_name = normalizePath(pTextureName);
 
 	string uniqName = CreateUniqueName(texture_name.c_str());

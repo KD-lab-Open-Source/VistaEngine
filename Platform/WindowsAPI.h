@@ -317,7 +317,10 @@ inline DWORD   GetLastError()                   { return 0; }
 inline void    SetLastError(DWORD)              {}
 inline DWORD   GetCurrentThreadId()             { return (DWORD)(uintptr_t)pthread_self(); }
 inline DWORD   GetCurrentProcessId()            { return (DWORD)getpid(); }
-inline BOOL    CloseHandle(HANDLE)              { return TRUE; }
+// CreateFileA hands out FILE* handles; CloseHandle must fclose those (it's a real
+// out-of-line function, not a no-op stub, or every CreateFile leaks an fd). It is a
+// no-op for non-file handles (events/threads). See WindowsAPI.cpp.
+BOOL           CloseHandle(HANDLE);
 inline LPVOID  GlobalLock(HGLOBAL h)            { return h; }
 inline BOOL    GlobalUnlock(HGLOBAL)            { return TRUE; }
 inline BOOL    FreeLibrary(HMODULE)             { return TRUE; }

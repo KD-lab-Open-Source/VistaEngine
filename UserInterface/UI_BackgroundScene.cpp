@@ -166,7 +166,18 @@ void UI_BackgroundModel::load(cScene* scene, const UI_BackgroundModelSetup& setu
 						              ? texLib->GetElement3D(sm.texture.c_str()) : 0;
 						if(tex)
 							meshTextures_.push_back(tex);  // held until release()
-						dev->addMeshSubmesh(meshHandle_, sm.firstIndex, sm.indexCount, tex);
+						// Match Node3DX::Draw material setup: the modulation color is
+						// lerp(WHITE, diffuse.rgb, diffuse.a) and the blend alpha is the
+						// separate material opacity (not diffuse.a). See Node3DX.cpp:711.
+						const float da = sm.diffuse[3];
+						float tint[4] = {
+							1.f*(1.f - da) + sm.diffuse[0]*da,
+							1.f*(1.f - da) + sm.diffuse[1]*da,
+							1.f*(1.f - da) + sm.diffuse[2]*da,
+							sm.opacity
+						};
+						dev->addMeshSubmesh(meshHandle_, sm.firstIndex, sm.indexCount, tex,
+						                    tint, sm.transparency);
 					}
 				}
 			}
@@ -225,6 +236,16 @@ void UI_BackgroundModel::setPosition(const MatXf& pos)
 	if(model_)
 		model_->SetPosition(pos);
 }
+
+#ifndef _WIN32
+void UI_BackgroundModel::setMeshTransform(const Mat4f& mvp)
+{
+	if(meshHandle_ < 0)
+		return;
+	if(cSDLRenderDevice* dev = dynamic_cast<cSDLRenderDevice*>(gb_RenderDevice))
+		dev->setMeshTransform(meshHandle_, (const float*)mvp);
+}
+#endif
 
 bool UI_BackgroundModel::isPlaying() const
 {
@@ -576,6 +597,10 @@ void UI_BackgroundScene::init(cVisGeneric* visGeneric)
 			Mat3f(G2R(modelAngles_.z), Z_AXIS), modelPosition_);
 
 		models_[currentModelIndex_].setPosition(pos);
+#ifndef _WIN32
+		// init()'s setCamera() ran before the mesh loaded; push the MVP now.
+		updateMeshTransform();
+#endif
 	}
 }
 
@@ -630,7 +655,25 @@ void UI_BackgroundScene::setCamera()
 
 	Vect2f frustumFocus(size.x * focus, size.x * focus);
 	camera_->SetFrustum(&center, &clip, &frustumFocus, 0);
+
+#ifndef _WIN32
+	// The camera's view-projection just changed; refresh the fallback mesh's MVP.
+	updateMeshTransform();
+#endif
 }
+
+#ifndef _WIN32
+void UI_BackgroundScene::updateMeshTransform()
+{
+	if(currentModelIndex_ < 0 || currentModelIndex_ >= (int)models_.size() || !camera_)
+		return;
+	// Model world matrix (same transform the D3D path feeds cObject3dx::SetPosition),
+	// composed with the camera view-projection: clip = pos_local * World * matViewProj.
+	MatXf world(Mat3f(G2R(modelAngles_.x), X_AXIS) * Mat3f(G2R(modelAngles_.y), Y_AXIS) *
+	            Mat3f(G2R(modelAngles_.z), Z_AXIS), modelPosition_);
+	models_[currentModelIndex_].setMeshTransform(Mat4f(world) * camera_->matViewProj);
+}
+#endif
 
 void UI_BackgroundScene::setFocus(float focus)
 {

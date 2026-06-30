@@ -32,6 +32,14 @@ static int32_t rd32(const std::vector<uint8_t>& b, size_t off)
 	return v;
 }
 
+static float rdf32(const std::vector<uint8_t>& b, size_t off)
+{
+	float v = 0.f;
+	if(off + 4 <= b.size())
+		memcpy(&v, b.data() + off, 4);
+	return v;
+}
+
 static bool readBlock(const std::vector<uint8_t>& blob, size_t structOff,
                       std::vector<uint8_t>& out)
 {
@@ -102,7 +110,10 @@ std::string objectCachePath(const char* modelFileName)
 static const int OBJ_MATERIALS_HDR = 100;
 static const int OBJ_LODS_HDR      = 296;
 static const int SZ_MATERIAL       = 252;
+static const int MAT_DIFFUSE       = 28;  // diffuse Color4f (rgba floats)
+static const int MAT_OPACITY       = 60;  // opacity float
 static const int MAT_TEXDIFFUSE    = 72;
+static const int MAT_TRANSPARENCY  = 88;  // transparencyType enum int
 static const int SZ_STATICLOD      = 32;
 static const int LOD_BUNCHES       = 12;
 static const int SZ_BUNCH          = 44;
@@ -150,10 +161,18 @@ static void parseObjectMaterials(const std::vector<uint8_t>& blob, const char* m
 	// fixTextureName: extractFilePath(model) + "Textures\\" + extractFileName(tex).
 	const std::string texDir = filePath(modelFileName) + "Textures\\";
 	std::vector<std::string> matTex((size_t)numMat);
+	struct MatProps { float diffuse[4]; float opacity; int transparency; };
+	std::vector<MatProps> matProps((size_t)numMat);
 	for(int i = 0; i < numMat; ++i){
-		std::string diffuse = readImageString(blob, (size_t)mBegin + (size_t)i * SZ_MATERIAL + MAT_TEXDIFFUSE);
+		const size_t base = (size_t)mBegin + (size_t)i * SZ_MATERIAL;
+		std::string diffuse = readImageString(blob, base + MAT_TEXDIFFUSE);
 		if(!diffuse.empty())
 			matTex[i] = texDir + fileLeaf(diffuse);
+		MatProps& mp = matProps[(size_t)i];
+		for(int c = 0; c < 4; ++c)
+			mp.diffuse[c] = rdf32(blob, base + MAT_DIFFUSE + (size_t)c * 4);
+		mp.opacity = rdf32(blob, base + MAT_OPACITY);
+		mp.transparency = rd32(blob, base + MAT_TRANSPARENCY);
 	}
 
 	// lods[0] bunches: each maps a polygon range to a material.
@@ -186,6 +205,11 @@ static void parseObjectMaterials(const std::vector<uint8_t>& blob, const char* m
 		s.indexCount = np * 3;
 		s.material   = im;
 		s.texture    = matTex[(size_t)im];
+		const MatProps& mp = matProps[(size_t)im];
+		for(int c = 0; c < 4; ++c)
+			s.diffuse[c] = mp.diffuse[c];
+		s.opacity      = mp.opacity;
+		s.transparency = mp.transparency;
 		subs.push_back(s);
 	}
 	// Must exactly partition the LOD's triangles to trust the parse.

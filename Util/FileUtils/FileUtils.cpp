@@ -254,8 +254,11 @@ DirIterator::DirIterator(const char* path)
 		handle_ = FindFirstFile(path, &findFileData_);
 		while(handle_ != INVALID_HANDLE_VALUE){
 			if(strcmp(c_str(), "..") == 0 || strcmp(c_str(), ".") == 0){
-				if(FindNextFile (handle_, &findFileData_) == false)
+				if(FindNextFile (handle_, &findFileData_) == false){
+					// End of directory: release the search handle, don't leak it.
+					FindClose(handle_);
 					handle_ = INVALID_HANDLE_VALUE;
+				}
 			}
 			else
 				break;
@@ -279,6 +282,10 @@ DirIterator& DirIterator::operator++()
 {
 	xassert(handle_ && handle_ != INVALID_HANDLE_VALUE && "Incrementing bad DirIterator!");
 	if (FindNextFile (handle_, &findFileData_) == false) {
+		// End of directory: release the search handle, don't leak it. The original
+		// only nulled the handle, so FindClose/closedir never ran and each fully
+		// iterated directory leaked one OS fd (FindFirstFileA -> opendir).
+		FindClose(handle_);
 		handle_ = INVALID_HANDLE_VALUE;
 	}
 	return *this;

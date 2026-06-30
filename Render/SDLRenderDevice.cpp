@@ -125,6 +125,7 @@ int cSDLRenderDevice::Done()
 		}
 		meshes_.clear();
 		if(meshPipeline_)   SDL_ReleaseGPUGraphicsPipeline(device_, meshPipeline_);
+		if(meshPipelineAdd_) SDL_ReleaseGPUGraphicsPipeline(device_, meshPipelineAdd_);
 		if(depthTexture_)   SDL_ReleaseGPUTexture(device_, depthTexture_);
 		if(vertexBuffer_)   SDL_ReleaseGPUBuffer(device_, vertexBuffer_);
 		if(transferBuffer_) SDL_ReleaseGPUTransferBuffer(device_, transferBuffer_);
@@ -138,7 +139,7 @@ int cSDLRenderDevice::Done()
 	}
 	vertexBuffer_ = nullptr; transferBuffer_ = nullptr; whiteTexture_ = nullptr;
 	sampler_ = nullptr; uiPipeline_ = nullptr; vertexCapacity_ = 0; pipelineTried_ = false;
-	meshPipeline_ = nullptr; depthTexture_ = nullptr; depthW_ = depthH_ = 0; meshPipelineTried_ = false;
+	meshPipeline_ = nullptr; meshPipelineAdd_ = nullptr; depthTexture_ = nullptr; depthW_ = depthH_ = 0; meshPipelineTried_ = false;
 	window_ = nullptr;
 
 	// Reset base state so ~cInterfaceRenderDevice's invariants hold.
@@ -848,6 +849,7 @@ void cSDLRenderDevice::createMeshPipeline()
 	fsi.code = fsCode; fsi.code_size = fsSize; fsi.entrypoint = entry;
 	fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
 	fsi.num_samplers = 1;
+	fsi.num_uniform_buffers = 1;   // per-submesh diffuse tint (rgb + opacity)
 	SDL_GPUShader* fs = SDL_CreateGPUShader(device_, &fsi);
 
 	if(!vs || !fs){
@@ -869,17 +871,17 @@ void cSDLRenderDevice::createMeshPipeline()
 	attrs[1].location = 1; attrs[1].buffer_slot = 0; attrs[1].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3; attrs[1].offset = 16;
 	attrs[2].location = 2; attrs[2].buffer_slot = 0; attrs[2].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2; attrs[2].offset = 28;
 
-	// The model's materials are layered, alpha-blended decals (lines/buttons over
-	// a base panel), drawn in bunch order (= paint order). Enable alpha blending
-	// and disable depth write so coplanar layers composite back-to-front instead
-	// of z-fighting / showing transparent areas as opaque grey.
+	// The model's materials are layered decals (lines/buttons over a base panel),
+	// drawn in bunch order (= paint order). The DDS decoder premultiplies alpha, so
+	// blend is (ONE, ONE_MINUS_SRC_ALPHA); depth write is off so coplanar layers
+	// composite in paint order instead of z-fighting / showing grey halos.
 	SDL_GPUColorTargetDescription colorTarget = {};
 	colorTarget.format = SDL_GetGPUSwapchainTextureFormat(device_, window_);
 	colorTarget.blend_state.enable_blend = true;
-	colorTarget.blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
+	colorTarget.blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
 	colorTarget.blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
 	colorTarget.blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
-	colorTarget.blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
+	colorTarget.blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
 	colorTarget.blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
 	colorTarget.blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
 
@@ -902,12 +904,23 @@ void cSDLRenderDevice::createMeshPipeline()
 	pci.target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
 
 	meshPipeline_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
-	SDL_ReleaseGPUShader(device_, vs);
-	SDL_ReleaseGPUShader(device_, fs);
 	if(!meshPipeline_){
 		fprintf(stderr, "cSDLRenderDevice: mesh CreateGPUGraphicsPipeline failed: %s\n", SDL_GetError());
+		SDL_ReleaseGPUShader(device_, vs);
+		SDL_ReleaseGPUShader(device_, fs);
 		return;
 	}
+
+	// Additive variant for transparencyType ADDITIVE materials (glow lines/bars):
+	// premultiplied src added onto the target (ONE, ONE). Same shaders/state.
+	colorTarget.blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+	colorTarget.blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+	meshPipelineAdd_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
+	if(!meshPipelineAdd_)
+		fprintf(stderr, "cSDLRenderDevice: mesh additive pipeline failed: %s\n", SDL_GetError());
+
+	SDL_ReleaseGPUShader(device_, vs);
+	SDL_ReleaseGPUShader(device_, fs);
 	fprintf(stderr, "cSDLRenderDevice: mesh pipeline ready\n");
 }
 
@@ -1017,12 +1030,23 @@ void cSDLRenderDevice::setMeshTexture(int handle, cTexture* tex)
 	meshes_[handle].tex = sdlTextureOf(tex);
 }
 
-void cSDLRenderDevice::addMeshSubmesh(int handle, int firstIndex, int indexCount, cTexture* tex)
+void cSDLRenderDevice::addMeshSubmesh(int handle, int firstIndex, int indexCount, cTexture* tex,
+                                      const float* tint, int transparency)
 {
 	if(handle < 0 || handle >= (int)meshes_.size() || indexCount <= 0) return;
 	Mesh& m = meshes_[handle];
 	if(firstIndex < 0 || firstIndex + indexCount > m.indexCount) return;
-	m.subdraws.push_back(SubDraw{ firstIndex, indexCount, sdlTextureOf(tex) });
+	SubDraw sd{ firstIndex, indexCount, sdlTextureOf(tex), {1,1,1,1}, transparency };
+	if(tint)
+		for(int i = 0; i < 4; ++i) sd.tint[i] = tint[i];
+	m.subdraws.push_back(sd);
+}
+
+void cSDLRenderDevice::setMeshTransform(int handle, const float* mvp16)
+{
+	if(handle < 0 || handle >= (int)meshes_.size() || !mvp16) return;
+	std::memcpy(meshes_[handle].mvp, mvp16, 16 * sizeof(float));
+	meshes_[handle].hasTransform = true;
 }
 
 void cSDLRenderDevice::releaseMesh(int handle)
@@ -1040,7 +1064,13 @@ void cSDLRenderDevice::drawMeshes(SDL_GPURenderPass* pass)
 {
 	if(!pass || !meshPipeline_) return;
 
-	SDL_BindGPUGraphicsPipeline(pass, meshPipeline_);
+	SDL_GPUGraphicsPipeline* boundPipeline = nullptr;  // track to avoid redundant binds
+	auto bindPipeline = [&](int transparency){
+		// Additive (1) -> additive blend; everything else -> filter (alpha-over).
+		SDL_GPUGraphicsPipeline* want = (transparency == 1 && meshPipelineAdd_)
+		                                ? meshPipelineAdd_ : meshPipeline_;
+		if(want != boundPipeline){ SDL_BindGPUGraphicsPipeline(pass, want); boundPipeline = want; }
+	};
 
 	const float fovY = 50.f * 3.14159265f / 180.f;
 	const float aspect = (xScr && yScr) ? float(xScr) / float(yScr) : 1.f;
@@ -1049,24 +1079,30 @@ void cSDLRenderDevice::drawMeshes(SDL_GPURenderPass* pass)
 	for(const Mesh& m : meshes_){
 		if(!m.active || !m.vbuf || !m.ibuf || m.indexCount <= 0) continue;
 
-		float center[3] = { (m.bmin[0]+m.bmax[0])*0.5f,
-		                    (m.bmin[1]+m.bmax[1])*0.5f,
-		                    (m.bmin[2]+m.bmax[2])*0.5f };
-		float ext[3] = { m.bmax[0]-m.bmin[0], m.bmax[1]-m.bmin[1], m.bmax[2]-m.bmin[2] };
-		float radius = 0.5f * std::sqrt(ext[0]*ext[0]+ext[1]*ext[1]+ext[2]*ext[2]);
-		if(radius < 1e-4f) radius = 1.f;
+		if(m.hasTransform){
+			// Caller-supplied MVP (the real menu camera).
+			SDL_PushGPUVertexUniformData(commandBuffer_, 0, m.mvp, sizeof(m.mvp));
+		} else {
+			// Fallback: auto-frame the mesh (perspective, slow Z-spin).
+			float center[3] = { (m.bmin[0]+m.bmax[0])*0.5f,
+			                    (m.bmin[1]+m.bmax[1])*0.5f,
+			                    (m.bmin[2]+m.bmax[2])*0.5f };
+			float ext[3] = { m.bmax[0]-m.bmin[0], m.bmax[1]-m.bmin[1], m.bmax[2]-m.bmin[2] };
+			float radius = 0.5f * std::sqrt(ext[0]*ext[0]+ext[1]*ext[1]+ext[2]*ext[2]);
+			if(radius < 1e-4f) radius = 1.f;
 
-		float d = radius / std::tan(fovY * 0.5f) * 1.4f;
-		float eye[3] = { center[0], center[1] - d, center[2] };
-		float up[3]  = { 0.f, 0.f, 1.f };
+			float d = radius / std::tan(fovY * 0.5f) * 1.4f;
+			float eye[3] = { center[0], center[1] - d, center[2] };
+			float up[3]  = { 0.f, 0.f, 1.f };
 
-		M4 world = matMul(matMul(matTranslate(-center[0], -center[1], -center[2]), matRotZ(angle)),
-		                  matTranslate(center[0], center[1], center[2]));
-		M4 view  = matLookAtLH(eye, center, up);
-		M4 proj  = matPerspectiveFovLH(fovY, aspect, std::max(0.05f, d - radius*1.5f), d + radius*1.5f);
-		M4 mvp   = matMul(matMul(world, view), proj);
+			M4 world = matMul(matMul(matTranslate(-center[0], -center[1], -center[2]), matRotZ(angle)),
+			                  matTranslate(center[0], center[1], center[2]));
+			M4 view  = matLookAtLH(eye, center, up);
+			M4 proj  = matPerspectiveFovLH(fovY, aspect, std::max(0.05f, d - radius*1.5f), d + radius*1.5f);
+			M4 mvp   = matMul(matMul(world, view), proj);
 
-		SDL_PushGPUVertexUniformData(commandBuffer_, 0, mvp.m, sizeof(mvp.m));
+			SDL_PushGPUVertexUniformData(commandBuffer_, 0, mvp.m, sizeof(mvp.m));
+		}
 
 		SDL_GPUBufferBinding vbb = {}; vbb.buffer = m.vbuf; vbb.offset = 0;
 		SDL_BindGPUVertexBuffers(pass, 0, &vbb, 1);
@@ -1074,8 +1110,11 @@ void cSDLRenderDevice::drawMeshes(SDL_GPURenderPass* pass)
 		SDL_BindGPUIndexBuffer(pass, &ibb, SDL_GPU_INDEXELEMENTSIZE_16BIT);
 
 		if(!m.subdraws.empty()){
-			// One textured draw per material range.
+			// One textured draw per material range, with its diffuse tint/opacity
+			// and blend mode (filter vs additive).
 			for(const SubDraw& sd : m.subdraws){
+				bindPipeline(sd.transparency);
+				SDL_PushGPUFragmentUniformData(commandBuffer_, 0, sd.tint, sizeof(sd.tint));
 				SDL_GPUTextureSamplerBinding ts = {};
 				ts.texture = sd.tex ? sd.tex : whiteTexture_;
 				ts.sampler = sampler_;
@@ -1083,6 +1122,9 @@ void cSDLRenderDevice::drawMeshes(SDL_GPURenderPass* pass)
 				SDL_DrawGPUIndexedPrimitives(pass, sd.indexCount, 1, sd.firstIndex, 0, 0);
 			}
 		} else {
+			bindPipeline(2 /*filter*/);
+			const float whiteTint[4] = {1,1,1,1};
+			SDL_PushGPUFragmentUniformData(commandBuffer_, 0, whiteTint, sizeof(whiteTint));
 			SDL_GPUTextureSamplerBinding ts = {};
 			ts.texture = m.tex ? m.tex : whiteTexture_;
 			ts.sampler = sampler_;

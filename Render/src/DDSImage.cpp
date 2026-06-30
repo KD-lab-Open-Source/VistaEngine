@@ -44,6 +44,19 @@ void decodeColor(const uint8_t* blk, int r[16], int g[16], int b[16], int a[16],
 	}
 }
 
+// Premultiply RGB by alpha. Pair with a (ONE, ONE_MINUS_SRC_ALPHA) blend so that
+// bilinear filtering at edges doesn't bleed the (often grey) transparent-texel
+// RGB into opaque edges — the cause of grey halos around alpha-cutout decals.
+void premultiply(std::vector<uint8_t>& bgra)
+{
+	for(size_t i = 0; i + 3 < bgra.size(); i += 4){
+		const int a = bgra[i+3];
+		bgra[i+0] = (uint8_t)(bgra[i+0] * a / 255);
+		bgra[i+1] = (uint8_t)(bgra[i+1] * a / 255);
+		bgra[i+2] = (uint8_t)(bgra[i+2] * a / 255);
+	}
+}
+
 } // namespace
 
 int cDDSImage::load(const char* fname)
@@ -122,6 +135,7 @@ int cDDSImage::load(void* pointer, int size)
 				src += blockBytes;
 			}
 		}
+		premultiply(bgra_);
 		return 0;
 	}
 
@@ -148,6 +162,7 @@ int cDDSImage::load(void* pointer, int size)
 				src += bytespp;
 			}
 		}
+		premultiply(bgra_);
 		return 0;
 	}
 

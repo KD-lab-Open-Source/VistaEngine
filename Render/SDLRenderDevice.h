@@ -59,7 +59,13 @@ public:
 	void setMeshTexture(int handle, cTexture* tex);
 	// Append a textured sub-range (firstIndex/indexCount into the mesh's index
 	// buffer). Once any sub-range is set, the whole-mesh draw is replaced by them.
-	void addMeshSubmesh(int handle, int firstIndex, int indexCount, cTexture* tex);
+	// tint = material diffuse rgba (rgb color, a opacity); transparency selects the
+	// blend pipeline (0=substractive, 1=additive, 2=filter).
+	void addMeshSubmesh(int handle, int firstIndex, int indexCount, cTexture* tex,
+	                    const float* tint = nullptr, int transparency = 2);
+	// Supply the model-view-projection matrix (16 floats, row-major, row-vector
+	// v*M, D3D clip convention) for the mesh. Replaces the built-in auto-frame.
+	void setMeshTransform(int handle, const float* mvp16);
 	void releaseMesh(int handle);
 
 	// --- Textures (slice 2b): real SDL GPU textures + CPU staging ----------
@@ -191,7 +197,11 @@ private:
 	SDL_GPUTexture* currentTexture_ = nullptr;  // set by SetNoMaterial
 
 	// Slice 3: static meshes uploaded from raw .3dxGB geometry.
-	struct SubDraw { int firstIndex; int indexCount; SDL_GPUTexture* tex; };
+	struct SubDraw {
+		int firstIndex; int indexCount; SDL_GPUTexture* tex;
+		float tint[4];      // material diffuse rgba (rgb color, a opacity)
+		int transparency;   // 0=substractive, 1=additive, 2=filter
+	};
 	struct Mesh {
 		SDL_GPUBuffer* vbuf = nullptr;
 		SDL_GPUBuffer* ibuf = nullptr;
@@ -201,10 +211,13 @@ private:
 		float bmax[3] = {0,0,0};
 		SDL_GPUTexture* tex = nullptr;        // whole-mesh texture (if no subdraws)
 		std::vector<SubDraw> subdraws;        // per-material textured ranges
+		float mvp[16] = {0};                  // supplied transform (row-major)
+		bool hasTransform = false;            // false -> use the auto-frame fallback
 		bool active = false;
 	};
 	std::vector<Mesh> meshes_;
-	SDL_GPUGraphicsPipeline* meshPipeline_ = nullptr;
+	SDL_GPUGraphicsPipeline* meshPipeline_ = nullptr;     // filter (alpha-over) blend
+	SDL_GPUGraphicsPipeline* meshPipelineAdd_ = nullptr;  // additive blend
 	SDL_GPUTexture*          depthTexture_ = nullptr;
 	int depthW_ = 0, depthH_ = 0;
 	bool meshPipelineTried_ = false;

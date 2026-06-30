@@ -8,6 +8,7 @@
 
 class cScene;
 class Camera;
+class Mat4f;
 class cTexture;
 class cObject3dx;
 class cVisGeneric;
@@ -145,6 +146,10 @@ public:
 	void release();
 
 	void setPosition(const MatXf& pos);
+#ifndef _WIN32
+	// Push the model-view-projection matrix to the SDL fallback mesh (slice 3).
+	void setMeshTransform(const Mat4f& mvp);
+#endif
 
 	bool isPlaying() const;
 	bool isPlaying(UI_BackgroundAnimation::PlayMode mode) const;
@@ -285,6 +290,11 @@ public:
 	}
 
 private:
+#ifndef _WIN32
+	// Recompute the current model's MVP from the menu camera + model transform and
+	// push it to the SDL fallback mesh (slice 3). No-op until the mesh is loaded.
+	void updateMeshTransform();
+#endif
 
 	cScene* scene_;
 	Camera* camera_;
