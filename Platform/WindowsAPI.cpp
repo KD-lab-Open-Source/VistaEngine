@@ -18,6 +18,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <cstring>
+#include <cwchar>
 #include <cstdio>
 #include <cstdlib>
 #include <strings.h>
@@ -48,6 +49,69 @@ BOOL CloseHandle(HANDLE h)
         fileHandleSet().erase(it);
     }
     return TRUE;
+}
+
+// ─── Unicode conversion ───────────────────────────────────────────────────────
+// See WindowsAPI.h for the honoured Win32 contract. wchar_t is 32-bit here, so
+// "wide" means UTF-32 code points. Only CP_UTF8 gets real multibyte decoding;
+// every other code page is a single-byte/Latin-1 passthrough (ASCII-correct).
+int MultiByteToWideChar(UINT codePage, DWORD, const char* src, int srcLen, wchar_t* dst, int dstLen) {
+    size_t srcBytes = srcLen < 0 ? strlen(src) : (size_t)srcLen;
+    const unsigned char* p = (const unsigned char*)src;
+    const unsigned char* end = p + srcBytes;
+    int produced = 0;
+    if (codePage == CP_UTF8) {
+        while (p < end) {
+            unsigned char c = *p++;
+            unsigned int cp; int extra;
+            if (c < 0x80)      { cp = c;        extra = 0; }
+            else if (c < 0xE0) { cp = c & 0x1F; extra = 1; }
+            else if (c < 0xF0) { cp = c & 0x0F; extra = 2; }
+            else               { cp = c & 0x07; extra = 3; }
+            while (extra-- > 0 && p < end && (*p & 0xC0) == 0x80)
+                cp = (cp << 6) | (*p++ & 0x3F);
+            if (dst) { if (produced >= dstLen) break; dst[produced] = (wchar_t)cp; }
+            ++produced;
+        }
+    } else {
+        while (p < end) {
+            if (dst) { if (produced >= dstLen) break; dst[produced] = (wchar_t)*p; }
+            ++p; ++produced;
+        }
+    }
+    if (srcLen < 0) { // include the terminator, like Win32
+        if (dst && produced < dstLen) dst[produced] = 0;
+        ++produced;
+    }
+    return produced;
+}
+
+int WideCharToMultiByte(UINT codePage, DWORD, const wchar_t* src, int srcLen, char* dst, int dstLen, const char*, BOOL*) {
+    size_t srcCount = srcLen < 0 ? wcslen(src) : (size_t)srcLen;
+    int produced = 0;
+    if (codePage == CP_UTF8) {
+        for (size_t i = 0; i < srcCount; ++i) {
+            unsigned int cp = (unsigned int)src[i];
+            char tmp[4]; int n;
+            if (cp < 0x80)        { tmp[0] = (char)cp; n = 1; }
+            else if (cp < 0x800)  { tmp[0] = (char)(0xC0 | (cp >> 6));  tmp[1] = (char)(0x80 | (cp & 0x3F)); n = 2; }
+            else if (cp < 0x10000){ tmp[0] = (char)(0xE0 | (cp >> 12)); tmp[1] = (char)(0x80 | ((cp >> 6) & 0x3F)); tmp[2] = (char)(0x80 | (cp & 0x3F)); n = 3; }
+            else                  { tmp[0] = (char)(0xF0 | (cp >> 18)); tmp[1] = (char)(0x80 | ((cp >> 12) & 0x3F)); tmp[2] = (char)(0x80 | ((cp >> 6) & 0x3F)); tmp[3] = (char)(0x80 | (cp & 0x3F)); n = 4; }
+            if (dst) { if (produced + n > dstLen) break; for (int k = 0; k < n; ++k) dst[produced + k] = tmp[k]; }
+            produced += n;
+        }
+    } else {
+        for (size_t i = 0; i < srcCount; ++i) {
+            unsigned int cp = (unsigned int)src[i];
+            if (dst) { if (produced >= dstLen) break; dst[produced] = cp < 0x100 ? (char)cp : '?'; }
+            ++produced;
+        }
+    }
+    if (srcLen < 0) { // include the terminator, like Win32
+        if (dst && produced < dstLen) dst[produced] = 0;
+        ++produced;
+    }
+    return produced;
 }
 
 std::string NormalizePath(const char* path) {

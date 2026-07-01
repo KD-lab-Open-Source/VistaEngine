@@ -866,18 +866,25 @@ inline int MessageBoxW(HWND, const wchar_t*, const wchar_t*, UINT) { return IDOK
 #define CP_OEMCP 1
 #define CP_UTF8  65001
 
-// ─── Unicode conversion stubs ─────────────────────────────────────────────────
-#include <cwchar>
-#include <clocale>
+// ─── Unicode conversion ───────────────────────────────────────────────────────
+// Faithful (enough) reimplementation of the Win32 MultiByteToWideChar /
+// WideCharToMultiByte contract that the engine's a2w/w2a helpers and the
+// serialization archives depend on. wchar_t is 32-bit here, so "wide" means
+// UTF-32 code points. Contract honoured:
+//   * dst == null  → query: return the number of wide/narrow units that would
+//                    be produced (NOT written), so a follow-up convert call
+//                    returns the same value.
+//   * srcLen >= 0  → consume exactly that many source units, count excludes the
+//                    terminator (none is appended unless room and requested).
+//   * srcLen <  0  → source is null-terminated; the terminator is converted and
+//                    INCLUDED in the returned count (matches Win32).
+// Only CP_UTF8 gets real multibyte decoding; every other code page (CP_ACP,
+// 1251/1252, …) is treated as a single-byte/Latin-1 passthrough — correct for
+// ASCII, which is all the non-UTF-8 callers here actually need.
+// Bodies live in WindowsAPI.cpp so edits don't rebuild the whole project.
 #define MB_PRECOMPOSED 0x00000001
-inline int MultiByteToWideChar(UINT, DWORD, const char* src, int, wchar_t* dst, int dstLen) {
-    if (!dst) return (int)strlen(src) + 1;
-    return (int)mbstowcs(dst, src, (size_t)dstLen);
-}
-inline int WideCharToMultiByte(UINT, DWORD, const wchar_t* src, int, char* dst, int dstLen, const char*, BOOL*) {
-    if (!dst) return (int)wcslen(src) + 1;
-    return (int)wcstombs(dst, src, (size_t)dstLen);
-}
+int MultiByteToWideChar(UINT codePage, DWORD, const char* src, int srcLen, wchar_t* dst, int dstLen);
+int WideCharToMultiByte(UINT codePage, DWORD, const wchar_t* src, int srcLen, char* dst, int dstLen, const char*, BOOL*);
 
 // Prevent xutil.h's xxassert from using MSVC __asm { int 3 } on non-Windows.
 // With NASSERT defined xutil.h takes the else branch (empty xassert macros).

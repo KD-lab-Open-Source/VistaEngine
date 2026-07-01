@@ -522,8 +522,19 @@ void GameOptions::serialize(Archive& ar)
 	if(ar.isEdit() && isUnderEditor())
 		serializePresets(ar);
 	
-	if(ar.isInput())
+	if(ar.isInput()){
 		defineGlobalVars();
+		// In the real game (non-editor) the localization DB must be loaded here.
+		// TextDB lives in the Util layer and no longer self-loads the language
+		// from GameOptions (the editor-only serializeForEditor() path does that
+		// for the editor). Without this, every menu LocString falls back to its
+		// raw key (e.g. "MM_..."), since getText() returns the id when not found.
+		if(!isUnderEditor()){
+			TextDB::instance().loadLanguage(getLanguage());
+			CommonLocText::instance().update();
+			setTranslate();
+		}
+	}
 }
 
 int GameOptions::raw2filtered(GameOptionType type, int data) const
