@@ -22,9 +22,15 @@ void* create(const char* title, int width, int height);
 // Destroy a window previously returned by create().
 void destroy(void* window);
 
-// Drain pending SDL events. Returns false when the user requested quit
-// (SDL_EVENT_QUIT), true otherwise.
-bool pumpEvents();
+// Sink for translated input events. Parameters mirror the Win32 window-procedure
+// message triple (uMsg, wParam, lParam) so the SDL events can be fed straight
+// into the engine's existing message path (runtimeWndProc -> eventHandler).
+typedef void (*WindowEventSink)(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+// Drain pending SDL events, translating mouse/keyboard/focus input into Win32
+// window messages delivered through `sink`. Returns false when the user
+// requested quit (SDL_EVENT_QUIT), true otherwise.
+bool pumpEvents(WindowEventSink sink);
 
 } // namespace PlatformWindow
 
