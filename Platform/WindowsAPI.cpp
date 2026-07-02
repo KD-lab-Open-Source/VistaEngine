@@ -157,6 +157,20 @@ std::string NormalizePath(const char* path) {
     return out;
 }
 
+// Locate the user's "My Documents" base directory (see fake_includes/shlobj.h).
+// The engine appends "\My Games\<savePath>\" and creates profile/save folders
+// there. Returning an empty base would make NormalizePath root that path at "/",
+// which is unwritable and silently breaks all profile scan/create — leaving the
+// first-launch menu permanently stuck on the profile screen.
+HRESULT SHGetFolderPathA(HWND, int, HANDLE, DWORD, char* path) {
+    if (!path) return E_FAIL;
+    const char* home = getenv("HOME");
+    if (!home || !*home) home = ".";
+    std::strncpy(path, home, MAX_PATH - 1);
+    path[MAX_PATH - 1] = '\0';
+    return S_OK;
+}
+
 HFILE OpenFile(const char* path, OFSTRUCT*, unsigned style) {
     if (style & OF_DELETE) remove(NormalizePath(path).c_str());
     return 0;
