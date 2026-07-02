@@ -2948,12 +2948,14 @@ void cObject3dx::GetVisibilityVertex(vector<Vect3f> &pos, vector<Vect3f> &norm)
 
 void cObject3dx::GetTriangleInfo(TriangleInfo& all,DWORD tif_flags,int selected_node)
 {
-	cStatic3dx::StaticLod& lod=pStatic->lods[0];
 	all.triangles.clear();
 	all.visible_points.clear();
 	all.positions.clear();
 	all.normals.clear();
 	all.uv.clear();
+	if(pStatic->lods.empty()) // no mesh built (SDL backend has no model VB/IB yet)
+		return;
+	cStatic3dx::StaticLod& lod=pStatic->lods[0];
 	if(!lod.vb.IsInit() || !lod.ib.IsInit())
 		return;
 

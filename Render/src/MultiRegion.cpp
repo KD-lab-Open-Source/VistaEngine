@@ -351,11 +351,11 @@ void MultiRegion::save(XBuffer& buffer) const
 {
 	buffer < width_;
 	buffer < height_;
-	buffer < lines_.size();
+	buffer < (uint32_t)lines_.size(); // fixed 32-bit wire format (original was 32-bit size_t)
 	Lines::const_iterator it;
 	FOR_EACH(lines_, it){
 		const Line& line = *it;
-		buffer < line.size();
+		buffer < (uint32_t)line.size(); // fixed 32-bit wire format
 
 		Line::const_iterator lit;
 		FOR_EACH(line, lit){
@@ -371,7 +371,7 @@ void MultiRegion::load(XBuffer& buffer)
 	buffer > height_;
 	xassert(width_ > 0 && height_ > 0 && width_ < 65536 && height_ < 65536);
 	
-	std::size_t lines_count = 0;
+	uint32_t lines_count = 0; // fixed 32-bit wire format (original was 32-bit size_t)
 	buffer > lines_count;
 	xassert(lines_count == height_);
 	lines_.clear();
@@ -380,7 +380,7 @@ void MultiRegion::load(XBuffer& buffer)
 	Lines::iterator it;
 	FOR_EACH(lines_, it){
 		Line& line = *it;
-		std::size_t line_size;
+		uint32_t line_size; // fixed 32-bit wire format
 		buffer > line_size;
 
 		line.resize(line_size);

@@ -138,6 +138,12 @@ void GrassMap::Init(const char* world_path)
 	grassMapSize_.set(hsize>>grassMapShift,vsize>>grassMapShift);
 
 	grassMap_ = new GrassTile[tileNumber_.x*tileNumber_.y];
+	textureNames_.resize(textureCount_);
+	bushHights_.resize(textureCount_,3);
+
+	if(!gb_RenderDevice3D) // no world-render GPU device on SDL backend yet
+		return;
+
 	vsGrass = new VSGrass;
 	vsGrass->Restore();
 	psGrass = new PSGrass;
@@ -155,8 +161,6 @@ void GrassMap::Init(const char* world_path)
 		psGrassShadow = new PSGrassShadowFX;
 		psGrassShadow->Restore();
 	}
-	textureNames_.resize(textureCount_);
-	bushHights_.resize(textureCount_,3);
 	//textureMap_ = GetTexLibrary()->CreateAlphaTexture(grassMapSize_.x,grassMapSize_.y);
 	textureMap_ = GetTexLibrary()->CreateTexture(grassMapSize_.x,grassMapSize_.y,true);
 	for(int y=0; y<tileNumber_.y; y++)

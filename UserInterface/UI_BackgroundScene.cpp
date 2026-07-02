@@ -109,7 +109,11 @@ void UI_BackgroundModelSetup::preLoad(cScene* scene, const Player* player) const
 	xassert(scene);
 	
 	cObject3dx* model = scene->CreateObject3dx(modelName(), NULL);
-	xassert(model);
+	// CreateObject3dx can return null off-Windows (the 3DX InPlace mesh/GPU-buffer path
+	// isn't ported yet — slice 3; UI_BackgroundModel::load recovers the geometry from the
+	// baked .3dxGB cache). Tolerate it here so screen preload doesn't crash.
+	if(!model)
+		return;
 
 	model->DisableDetailLevel();
 	

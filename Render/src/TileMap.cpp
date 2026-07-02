@@ -51,18 +51,26 @@ cTileMap::cTileMap(cScene* pScene, bool _tryColorEnable) : BaseGraphObject(0)
 	for(int i=0;i < miniDetailTexturesNumber;i++)
 		zeroplast_color[i].set(1,1,1,1);
 
-	gb_RenderDevice3D->tilemap_inv_size.x=1.0f/vMap.H_SIZE;
-	gb_RenderDevice3D->tilemap_inv_size.y=1.0f/vMap.V_SIZE;
+	// SDL backend has no world-render GPU device yet (gb_RenderDevice3D is null);
+	// build the tilemap CPU-side (tiles/borders needed by callers) and skip GPU-only state.
+	if(gb_RenderDevice3D){
+		gb_RenderDevice3D->tilemap_inv_size.x=1.0f/vMap.H_SIZE;
+		gb_RenderDevice3D->tilemap_inv_size.y=1.0f/vMap.V_SIZE;
+	}
 	update_zminmmax_time=1;
 
 	setScene(pScene);
 
 	trueColorEnable_=_tryColorEnable;
 
-	lavaShader_ = new ShaderSceneWaterLava(true);
-	lavaShader_->Restore();
-	iceShader_ = new ShaderSceneWaterIce;
-	iceShader_->Restore();
+	lavaShader_ = 0;
+	iceShader_ = 0;
+	if(gb_RenderDevice3D){
+		lavaShader_ = new ShaderSceneWaterLava(true);
+		lavaShader_->Restore();
+		iceShader_ = new ShaderSceneWaterIce;
+		iceShader_->Restore();
+	}
 
 	vMap.registerUpdateMapClient(this);
 
@@ -78,7 +86,8 @@ cTileMap::cTileMap(cScene* pScene, bool _tryColorEnable) : BaseGraphObject(0)
 	tileBordersShr_.set(vMap.V_SIZE_POWER - TILEMAP_SHL, vMap.H_SIZE_POWER - TILEMAP_SHL);
 	heightFractionInv_ = 1.0f/float(1<<VX_FRACTION);
 
-	tileMapRender_ = new cTileMapRender(this);
+	if(gb_RenderDevice3D)
+		tileMapRender_ = new cTileMapRender(this);
 
 	updateMap(Vect2i(0,0), Vect2i(size.x-1,size.y-1));
 }
@@ -121,7 +130,10 @@ void cTileMap::PreDraw(Camera* camera)
 {
 	start_timer_auto();
 
-	if(getAttribute(ATTRUNKOBJ_IGNORE) || debugShowSwitch.tilemap) 
+	if(getAttribute(ATTRUNKOBJ_IGNORE) || debugShowSwitch.tilemap)
+		return;
+
+	if(!tileMapRender_) // no world-render GPU device on SDL backend yet
 		return;
 
 	BuildRegionPoint();
@@ -133,6 +145,8 @@ void cTileMap::PreDraw(Camera* camera)
 void cTileMap::Draw(Camera* camera)
 {
 	if(!Option_ShowType[SHOW_TILEMAP])
+		return;
+	if(!tileMapRender_) // no world-render GPU device on SDL backend yet
 		return;
 	start_timer_auto();
 

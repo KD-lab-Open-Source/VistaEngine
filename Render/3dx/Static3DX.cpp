@@ -231,12 +231,13 @@ void StaticMaterial::loadFur(const FurInfo& furInfo, cStatic3dx* object)
 void StaticMaterial::createTextures(cStatic3dx* object)
 {
 	texturesCreated = true;
-	gb_RenderDevice3D->SetCurrentConvertDot3Mul(10.0f);//Потом читать из файла
+	if(gb_RenderDevice3D) // no world-render GPU device on SDL backend yet
+		gb_RenderDevice3D->SetCurrentConvertDot3Mul(10.0f);//Потом читать из файла
 
-	if(!tex_bump.empty() && gb_RenderDevice3D->IsPS20())
+	if(!tex_bump.empty() && gb_RenderDevice3D && gb_RenderDevice3D->IsPS20())
 		pBumpTexture = object->LoadTexture(tex_bump.c_str(),"Bump");
 
-	if(!tex_specularmap.empty() && gb_RenderDevice3D->IsPS20())
+	if(!tex_specularmap.empty() && gb_RenderDevice3D && gb_RenderDevice3D->IsPS20())
 		pSpecularmap = object->LoadTexture(tex_specularmap.c_str(),"Specular");
 
 	if(!tex_secondopacity.empty())
@@ -275,7 +276,7 @@ void cStatic3dx::prepareMesh()
 	PrepareIndices();
 	ParseEffect();
 
-	if(!is_logic){
+	if(!is_logic && gb_RenderDevice3D){ // no world-render GPU device on SDL backend yet (model VB/IB unsupported)
 		BuildMeshes();
 		CreateDebrises();
 	}

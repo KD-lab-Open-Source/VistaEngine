@@ -112,6 +112,9 @@ cFileImage* cTexture::createFileImage()
 
 bool cTexture::reloadDDS()
 {
+	if(!gb_RenderDevice3D) // no world-render GPU device on SDL backend yet; DDS load is D3D-only
+		return false;
+
 	char* buf = 0;
 	int size;
 

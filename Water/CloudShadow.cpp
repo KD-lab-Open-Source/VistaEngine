@@ -23,6 +23,9 @@ cCloudShadow::cCloudShadow() : BaseGraphObject(0)
 	dv=vMap.V_SIZE/2048;
 	rotate_angle=0;
 
+	vsCloudShadow=0;
+	psCloudShadow=0;
+	if(gb_RenderDevice3D){ // no world-render GPU device on SDL backend yet
 	cD3DRender* rd=gb_RenderDevice3D;
 	rd->CreateVertexBuffer(earth_vb, size_vb,VType::declaration);
 	rd->CreateIndexBuffer(earth_ib, size_ib);
@@ -55,6 +58,7 @@ cCloudShadow::cCloudShadow() : BaseGraphObject(0)
 	vsCloudShadow->Restore();
 	psCloudShadow=new PSCloudShadow;
 	psCloudShadow->Restore();
+	}
 
 	color=128;
 

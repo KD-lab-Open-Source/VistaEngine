@@ -48,14 +48,21 @@ TileStrip::TileStrip(int xSize, int ySize)
 	xsize = xSize;
 	ysize = ySize;
 
+	pagesize = (xsize+1)*(ysize+1);
+	pagenumber = 8;
+	curpage = 0;
+
+	// SDL backend has no terrain GPU buffer path yet (gb_RenderDevice3D is null);
+	// build the field logically without GPU buffers so the world loads. Terrain is
+	// not drawn (draw calls are guarded below).
+	if(!gb_RenderDevice3D)
+		return;
+
 	gb_RenderDevice3D->CreateIndexBuffer(ib, numIndices());
 	sPolygon* pIndex = gb_RenderDevice3D->LockIndexBuffer(ib);
 	setIB(pIndex);
 	gb_RenderDevice3D->UnlockIndexBuffer(ib);
 
-	pagesize = (xsize+1)*(ysize+1);
-	pagenumber = 8;
-	curpage = 0;
 	gb_RenderDevice3D->CreateVertexBuffer(vb, pagesize*pagenumber, sVertexXYZDT2::declaration, true);
 }
 

@@ -447,10 +447,12 @@ cFogCircleEX::cFogCircleEX(EnvironmentTime* time_)
 	size_ib+=hord_count;
 #endif
 
-	rd->CreateVertexBuffer(cborder_vb, size_vb,VType::declaration);
-	rd->CreateIndexBuffer(cborder_ib, size_ib);
+	if(rd){ // no world-render GPU device on SDL backend yet
+		rd->CreateVertexBuffer(cborder_vb, size_vb,VType::declaration);
+		rd->CreateIndexBuffer(cborder_ib, size_ib);
 
-	SetHeight(2000);
+		SetHeight(2000);
+	}
 }
 cFogCircleEX::~cFogCircleEX()
 {
@@ -459,6 +461,9 @@ cFogCircleEX::~cFogCircleEX()
 void cFogCircleEX::SetHeight(int height_)
 {
 	height=height_;
+
+	if(!gb_RenderDevice3D) // no world-render GPU device on SDL backend yet
+		return;
 
 	float radius = max(vMap.H_SIZE,vMap.V_SIZE)*2.5f*0.98f;
 	float z0 = -height;

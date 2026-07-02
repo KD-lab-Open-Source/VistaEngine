@@ -923,7 +923,19 @@ void GameShell::graphicsQuant()
 		}
 
 		processEvents();
+#ifndef _WIN32
+		// frame_time.delta() reflects the last (sub-millisecond) render iteration,
+		// not the time since the previous 15fps menu frame, so at our uncapped
+		// frame rate UI animations (e.g. screen activation) crawl and never finish
+		// — which permanently gates off menu hover/clicks. Use real elapsed time.
+		static unsigned lastMenuClock_ = 0;
+		unsigned nowClock = xclock();
+		float menuDt = lastMenuClock_ ? clamp(int(nowClock - lastMenuClock_), 0, 200) : 1000 / 15;
+		lastMenuClock_ = nowClock;
+		UI_Dispatcher::instance().quant(menuDt / 1000.0f, load_mode);
+#else
 		UI_Dispatcher::instance().quant(frame_time.delta()/1000.0f, load_mode);
+#endif
 		UI_Dispatcher::instance().logicQuant();
 		
 		if(!load_mode)
@@ -937,23 +949,7 @@ void GameShell::graphicsQuant()
 			UI_Dispatcher::instance().exitMissionPrepare();
 		if(startMissionSuspended_ && UI_Dispatcher::instance().canExit()){
 			startMissionSuspended_ = false;
-#ifndef _WIN32
-			// TEMP (cross-platform bring-up): the mission's world build (UniverseX ->
-			// FieldDispatcher -> TileStrip) needs the not-yet-ported game-world GPU
-			// buffer path (slice 3). Skip the world but still activate the preloaded
-			// 2D UI screen (e.g. "Main Menu") so the menu renders for validation.
-			// Pass a null background scene so no world model is required.
-			if(!preloadScreen_.empty()){
-				UI_Screen* scr = UI_ScreenReference(preloadScreen_).screen();
-				if(scr){
-					UI_Dispatcher::instance().preloadScreen(scr, 0, 0);
-					UI_Dispatcher::instance().selectScreen(scr);
-				}
-				preloadScreen_.clear();
-			}
-#else
 			GameStart(missionToStart_);
-#endif
 			gameReadyCounter_ = 5;
 		}
 
@@ -1094,12 +1090,14 @@ void GameShell::Show(float realGraphDT)
 		stop_timer(2);
 		start_timer(3);
 
-		environment->graphQuant(realGraphDT, cameraManager->GetCamera());
+		if(gb_RenderDevice3D){ // world 3D render (sky/terrain/post-effects) not ported to SDL backend yet (slice 3)
+			environment->graphQuant(realGraphDT, cameraManager->GetCamera());
 
-		cameraManager->GetCamera()->setAttribute(ATTRCAMERA_CLEARZBUFFER);//Потому как в небе могут рисоваться планеты в z buffer.
-		terScene->Draw(cameraManager->GetCamera());
+			cameraManager->GetCamera()->setAttribute(ATTRCAMERA_CLEARZBUFFER);//Потому как в небе могут рисоваться планеты в z buffer.
+			terScene->Draw(cameraManager->GetCamera());
 
-		environment->drawPostEffects(realGraphDT, cameraManager->GetCamera());
+			environment->drawPostEffects(realGraphDT, cameraManager->GetCamera());
+		}
 		
 		gb_RenderDevice->SetRenderState(RS_FILLMODE, FILL_SOLID);
 
@@ -1201,9 +1199,9 @@ inline int IsMapArea(const Vect2f& pos)
 	return 1;
 }
 
-Vect2f GameShell::convert(int x, int y) const 
+Vect2f GameShell::convert(int x, int y) const
 {
-	return Vect2f(windowClientSize().x ? float(x)/float(windowClientSize().x) - 0.5f : 0, 
+	return Vect2f(windowClientSize().x ? float(x)/float(windowClientSize().x) - 0.5f : 0,
 		windowClientSize().y ? float(y)/float(windowClientSize().y) - 0.5f : 0);
 }
 
@@ -1278,6 +1276,12 @@ void GameShell::eventHandler(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_KEYUP:
 	case WM_SYSKEYUP: 
 	case WM_CHAR:
+#ifndef _WIN32
+	// Off-Windows, SDL text input arrives as WM_UNICHAR (Platform/Window.cpp);
+	// let it reach EventParser->unicodeCharInput. Left untouched on Windows.
+	case WM_UNICHAR:
+	case WM_USER + WM_CHAR:
+#endif
 	case WM_MOUSEWHEEL:
     case WM_ACTIVATEAPP:
 		break;

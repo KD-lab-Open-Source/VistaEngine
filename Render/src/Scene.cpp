@@ -1333,7 +1333,7 @@ void cScene::DeleteReflectionSurface()
 
 void cScene::EnableReflection(bool enable)
 {
-	if(!gb_RenderDevice3D->IsPS20())
+	if(!gb_RenderDevice3D || !gb_RenderDevice3D->IsPS20()) // no world-render GPU device on SDL backend yet
 		enable = false;
 
 	enable_reflection = enable;

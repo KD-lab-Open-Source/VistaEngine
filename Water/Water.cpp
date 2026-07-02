@@ -70,23 +70,28 @@ cWater::cWater()
 	lavaVolumeTextureScale_ = 0.03f;
 	lavaTextureName_ = "Scripts\\Resource\\balmer\\lava.tga";
 
-	psShader=new PSWater;
-	vsShader=new VSWater;
-	if(gb_RenderDevice3D->IsPS20())
-	{
-		psShader->SetTechnique(WATER_REFLECTION);
-		vsShader->SetTechnique(WATER_REFLECTION);
-	}else
-	{
-		psShader->SetTechnique(WATER_EMPTY);
-		vsShader->SetTechnique(WATER_EMPTY);
-	}
-	
-	vsShader->Restore();
-	psShader->Restore();
+	psShader=0;
+	vsShader=0;
+	lavaShader_=0;
+	if(gb_RenderDevice3D){ // no world-render GPU device on SDL backend yet
+		psShader=new PSWater;
+		vsShader=new VSWater;
+		if(gb_RenderDevice3D->IsPS20())
+		{
+			psShader->SetTechnique(WATER_REFLECTION);
+			vsShader->SetTechnique(WATER_REFLECTION);
+		}else
+		{
+			psShader->SetTechnique(WATER_EMPTY);
+			vsShader->SetTechnique(WATER_EMPTY);
+		}
 
-	lavaShader_ = new ShaderSceneWaterLava;
-	lavaShader_->Restore();
+		vsShader->Restore();
+		psShader->Restore();
+
+		lavaShader_ = new ShaderSceneWaterLava;
+		lavaShader_->Restore();
+	}
 
 	bumpTextureName_ = "Scripts\\Resource\\balmer\\shader\\waves.dds";
 	bumpTextureName1_ = "Scripts\\Resource\\balmer\\shader\\waves1.dds";
@@ -633,6 +638,13 @@ void cWater::Init()
 	inv_delta.y=1.0f/delta.y;
 
 	number_vertex=grid_size.x*grid_size.y;
+
+	if(!rd){ // no world-render GPU device on SDL backend yet: keep CPU-only water state
+		InitZBuffer();
+		updateMap(Vect2i(0,0),Vect2i(grid_size.x<<grid_shift,grid_size.y<<grid_shift));
+		return;
+	}
+
 	if(number_vertex>max_vertex)
 	{
 		vb.resize(2);
@@ -839,6 +851,8 @@ void cWater::Border::destroy()
 
 void cWater::InitBorder()
 {
+	if(!gb_RenderDevice3D) // no world-render GPU device on SDL backend yet
+		return;
 	if(border.isInit()){
 		xassert(false);
 		border.destroy();
@@ -1705,6 +1719,8 @@ void cWater::AddWaterRect(int x,int y,float dz,int size)
 
 void cWater::setTechnique()
 {
+	if(!gb_RenderDevice3D) // no world-render GPU device on SDL backend yet (shaders not created)
+		return;
 	Technique set = WATER_EMPTY;
 	if(isLava()){
 		set = WATER_LAVA;

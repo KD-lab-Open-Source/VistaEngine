@@ -47,6 +47,8 @@ void cRenderCubemap::deleteManagedResource()
 void cRenderCubemap::restoreManagedResource()
 {
 	deleteManagedResource();
+	if(!gb_RenderDevice3D) // no world-render GPU device on SDL backend yet
+		return;
 	if(gb_RenderDevice3D->CreateCubeTexture(pTexture))
 	{
 		xassert(0 && "Low videomemory. Cannot create cubemap.");

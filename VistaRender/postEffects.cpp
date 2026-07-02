@@ -37,7 +37,7 @@ REGISTER_CLASS_IN_FACTORY(PostEffectFactory, PE_MONOCHROME, PostEffectMonochrome
 
 PostEffectManager::PostEffectManager()
 {
-	isPS20_ = gb_RenderDevice3D->IsPS20();
+	isPS20_ = gb_RenderDevice3D && gb_RenderDevice3D->IsPS20(); // no world-render GPU device on SDL backend yet
 	isEnabled_ = false;
 	width_ = 0;
 	height_ = 0;
@@ -66,6 +66,8 @@ PostEffectManager::~PostEffectManager()
 
 void PostEffectManager::init(PostEffectType type)
 {
+	if(!gb_RenderDevice3D) // no world-render GPU device on SDL backend yet
+		return;
 	if(type == PE_EFFECT_NUM){
 		for(int i = 0; i < PE_EFFECT_NUM; i++){
 			if(isEnabled(PostEffectType(i)))

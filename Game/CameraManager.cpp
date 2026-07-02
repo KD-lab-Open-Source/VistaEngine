@@ -1638,6 +1638,9 @@ void CameraManager::drawBlackBars(float opacity)
 	if(isUnderEditor() || aspect() - FLT_COMPARE_TOLERANCE > 4.0f / 3.0f)
 		return;
 
+	if(!gb_RenderDevice3D) // world 3D render not ported to SDL backend yet (slice 3)
+		return;
+
 	gb_RenderDevice->SetNoMaterial(ALPHA_BLEND, MatXf::ID);
 
 	int oldAlphaBlend = gb_RenderDevice3D->GetRenderState(D3DRS_ALPHABLENDENABLE);
