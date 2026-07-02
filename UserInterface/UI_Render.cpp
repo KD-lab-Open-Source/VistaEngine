@@ -428,7 +428,10 @@ void UI_Render::updateRenderSize()
 {
 	if(camera_ && camera_->GetRenderTarget())
         setRenderSize(Vect2i(camera_->GetRenderTarget()->GetWidth(), camera_->GetRenderTarget()->GetHeight()));
-	else if(gb_RenderDevice && gb_RenderDevice->currentRenderWindow())
+	// Key off the device's actual size, not currentRenderWindow(): that returns the
+	// D3D-only cRenderWindow which is null on the SDL backend, so this fell through
+	// to (1,1) and collapsed every UI coordinate (dead hover/clicks).
+	else if(gb_RenderDevice && gb_RenderDevice->GetSizeX() > 0 && gb_RenderDevice->GetSizeY() > 0)
 		setRenderSize(Vect2i(gb_RenderDevice->GetSizeX(), gb_RenderDevice->GetSizeY()));
 	else
 		setRenderSize(Vect2i(1, 1));

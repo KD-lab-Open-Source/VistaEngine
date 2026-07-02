@@ -205,7 +205,10 @@ Recti UI_RenderBase::device2screenCoords(const Rectf& device_coords) const
 
 Vect2f UI_RenderBase::device2relativeCoords(const Vect2f& device_coords) const
 {
-	if(!gb_RenderDevice3D)
+	// This only needs renderSize_; the original guard keyed on the D3D-only
+	// gb_RenderDevice3D global, which is null on the SDL backend and collapsed
+	// every mouse coordinate to (0,0) (dead hover/clicks).
+	if(!renderSize_.x || !renderSize_.y)
 		return Vect2f::ZERO;
 
 	return relativeCoords((device_coords + Vect2f(0.5f, 0.5f)) * Vect2f(renderSize_.x, renderSize_.y));
