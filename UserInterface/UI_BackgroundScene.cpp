@@ -159,8 +159,24 @@ void UI_BackgroundModel::load(cScene* scene, const UI_BackgroundModelSetup& setu
 		if(dev && MeshCacheGeometry::readForModel(setup.modelName(), geo) && !geo.lods.empty()){
 			const MeshCacheGeometry::Lod& lod = geo.lods[0];
 			if(!lod.empty()){
-				meshHandle_ = dev->uploadMesh(lod.vertexData.data(), (int)lod.vertexData.size(),
-				                              lod.vertexSize, lod.indexData.data(), lod.polygonNumber * 3);
+				// Feed the recovered geometry through the real VB/IB interface: create
+				// the buffers, fill them via Lock/Unlock, then hand ownership to the
+				// device (registerMesh), which redraws them each frame through the real
+				// DrawIndexedPrimitive. Menu meshes are all sVertexXYZINT1 (stride 36).
+				sPtrVertexBuffer vb;
+				sPtrIndexBuffer  ib;
+				dev->CreateVertexBuffer(vb, lod.vertexNumber, sVertexXYZINT1::declaration, 0);
+				if(void* vp = dev->LockVertexBuffer(vb, false)){
+					memcpy(vp, lod.vertexData.data(), lod.vertexData.size());
+					dev->UnlockVertexBuffer(vb);
+				}
+				dev->CreateIndexBuffer(ib, lod.polygonNumber);   // size defaults to sizeof(sPolygon)
+				if(sPolygon* ip = dev->LockIndexBuffer(ib, false)){
+					memcpy(ip, lod.indexData.data(), lod.indexData.size());
+					dev->UnlockIndexBuffer(ib);
+				}
+				// registerMesh steals vb/ib's slot pointers (the locals free nothing).
+				meshHandle_ = dev->registerMesh(vb, ib);
 				// Per-material textured sub-draws (from the .3dxG object cache).
 				if(meshHandle_ >= 0){
 					cTexLibrary* texLib = GetTexLibrary();

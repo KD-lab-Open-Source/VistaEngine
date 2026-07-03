@@ -115,15 +115,21 @@ int cSDLRenderDevice::Done()
 	}
 	swapchainTexture_ = nullptr;
 
+	// Release retained menu meshes while the device (and gb_RenderDevice==this) is
+	// still valid: ~MenuMesh -> sPtr dtors -> DeleteVertex/IndexBuffer, which erase
+	// the vbGpu_/ibGpu_ entries and release their SDL buffers.
+	menuMeshes_.clear();
+	meshDraws_.clear();
+
 	if(device_){
 		for(auto& kv : textures_)
 			if(kv.second.tex) SDL_ReleaseGPUTexture(device_, kv.second.tex);
 		textures_.clear();
-		for(Mesh& m : meshes_){
-			if(m.vbuf) SDL_ReleaseGPUBuffer(device_, m.vbuf);
-			if(m.ibuf) SDL_ReleaseGPUBuffer(device_, m.ibuf);
-		}
-		meshes_.clear();
+		// Any buffers not owned by a MenuMesh (defensive: normally all gone above).
+		for(auto& kv : vbGpu_) if(kv.second.buf) SDL_ReleaseGPUBuffer(device_, kv.second.buf);
+		for(auto& kv : ibGpu_) if(kv.second.buf) SDL_ReleaseGPUBuffer(device_, kv.second.buf);
+		vbGpu_.clear();
+		ibGpu_.clear();
 		if(meshPipeline_)   SDL_ReleaseGPUGraphicsPipeline(device_, meshPipeline_);
 		if(meshPipelineAdd_) SDL_ReleaseGPUGraphicsPipeline(device_, meshPipelineAdd_);
 		if(depthTexture_)   SDL_ReleaseGPUTexture(device_, depthTexture_);
@@ -237,11 +243,11 @@ int cSDLRenderDevice::EndScene()
 		// A 3D mesh pass runs first (clears colour + depth, draws the static meshes
 		// with depth testing); the 2D UI pass then loads that colour and draws over
 		// it. The UI pipeline has no depth target, so it needs its own pass anyway.
-		bool drawMesh = false;
-		if(meshPipeline_){
-			for(const Mesh& m : meshes_)
-				if(m.active && m.indexCount > 0){ drawMesh = true; break; }
-		}
+		// Redraw the retained menu meshes through the real DrawIndexedPrimitive path,
+		// which records into meshDraws_ (no GPU work yet).
+		meshDraws_.clear();
+		recordMenuMeshes();
+		bool drawMesh = meshPipeline_ && !meshDraws_.empty();
 
 		if(drawMesh){
 			ensureDepth(xScr, yScr);
@@ -268,7 +274,7 @@ int cSDLRenderDevice::EndScene()
 
 			SDL_GPURenderPass* mpass = SDL_BeginGPURenderPass(commandBuffer_, &ct, 1,
 			                                                  depthTexture_ ? &dt : nullptr);
-			drawMeshes(mpass);
+			flushMeshDraws(mpass);
 			SDL_EndGPURenderPass(mpass);
 		}
 
@@ -941,66 +947,218 @@ void cSDLRenderDevice::ensureDepth(int w, int h)
 	depthH_ = depthTexture_ ? h : 0;
 }
 
-int cSDLRenderDevice::uploadMesh(const void* vb, int vbBytes, int stride, const void* ib, int indexCount)
+// ---------------------------------------------------------------------------
+// Static VB/IB (the real cInterfaceRenderDevice buffer interface). Each slot is
+// backed by an SDL_GPUBuffer plus a CPU staging mirror keyed on the slot pointer;
+// Lock hands back the staging, Unlock uploads it. The sPtr wrappers' Destroy/dtor
+// route DeleteVertex/IndexBuffer here (see RenderStub.cpp).
+// ---------------------------------------------------------------------------
+int cSDLRenderDevice::strideFromDeclaration(IDirect3DVertexDeclaration9* decl)
 {
-	if(!device_ || !vb || !ib || vbBytes <= 0 || indexCount <= 0 || stride <= 0)
-		return -1;
-
-	const Uint32 ibBytes = (Uint32)(indexCount * 2);  // 16-bit indices
-
-	SDL_GPUBufferCreateInfo vbi = {};
-	vbi.usage = SDL_GPU_BUFFERUSAGE_VERTEX;
-	vbi.size = (Uint32)vbBytes;
-	SDL_GPUBuffer* vbuf = SDL_CreateGPUBuffer(device_, &vbi);
-
-	SDL_GPUBufferCreateInfo ibi = {};
-	ibi.usage = SDL_GPU_BUFFERUSAGE_INDEX;
-	ibi.size = ibBytes;
-	SDL_GPUBuffer* ibuf = SDL_CreateGPUBuffer(device_, &ibi);
-	if(!vbuf || !ibuf){
-		if(vbuf) SDL_ReleaseGPUBuffer(device_, vbuf);
-		if(ibuf) SDL_ReleaseGPUBuffer(device_, ibuf);
-		return -1;
+	// Sum of element type sizes (mirrors cD3DRender::GetSizeFromDeclaration); the
+	// menu vertex (sVertexXYZINT1) is packed, so this equals its stride (36).
+	if(!decl) return 0;
+	int size = 0;
+	for(unsigned int i = 0; i < decl->elementCount; ++i){
+		switch(decl->elements[i].Type){
+		case D3DDECLTYPE_FLOAT1:   size += 4;  break;
+		case D3DDECLTYPE_FLOAT2:   size += 8;  break;
+		case D3DDECLTYPE_FLOAT3:   size += 12; break;
+		case D3DDECLTYPE_FLOAT4:   size += 16; break;
+		case D3DDECLTYPE_UBYTE4:   size += 4;  break;
+		case D3DDECLTYPE_D3DCOLOR: size += 4;  break;
+		case D3DDECLTYPE_SHORT2:   size += 4;  break;
+		case D3DDECLTYPE_SHORT4:   size += 8;  break;
+		case D3DDECLTYPE_UNUSED:   break;
+		default: break;
+		}
 	}
+	return size;
+}
 
+void cSDLRenderDevice::uploadBuffer(GpuBuffer& gb)
+{
+	if(!device_ || !gb.buf || gb.staging.empty()) return;
 	SDL_GPUTransferBufferCreateInfo tbi = {};
 	tbi.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
-	tbi.size = (Uint32)vbBytes + ibBytes;
+	tbi.size = (Uint32)gb.staging.size();
 	SDL_GPUTransferBuffer* tb = SDL_CreateGPUTransferBuffer(device_, &tbi);
-	if(!tb){
-		SDL_ReleaseGPUBuffer(device_, vbuf);
-		SDL_ReleaseGPUBuffer(device_, ibuf);
-		return -1;
-	}
-	unsigned char* map = (unsigned char*)SDL_MapGPUTransferBuffer(device_, tb, false);
-	std::memcpy(map, vb, (size_t)vbBytes);
-	std::memcpy(map + vbBytes, ib, ibBytes);
+	if(!tb) return;
+	void* map = SDL_MapGPUTransferBuffer(device_, tb, false);
+	std::memcpy(map, gb.staging.data(), gb.staging.size());
 	SDL_UnmapGPUTransferBuffer(device_, tb);
 
 	SDL_GPUCommandBuffer* cb = SDL_AcquireGPUCommandBuffer(device_);
 	SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(cb);
-	SDL_GPUTransferBufferLocation src = {};
-	src.transfer_buffer = tb; src.offset = 0;
-	SDL_GPUBufferRegion dvb = {}; dvb.buffer = vbuf; dvb.offset = 0; dvb.size = (Uint32)vbBytes;
-	SDL_UploadToGPUBuffer(copy, &src, &dvb, false);
-	src.offset = (Uint32)vbBytes;
-	SDL_GPUBufferRegion dib = {}; dib.buffer = ibuf; dib.offset = 0; dib.size = ibBytes;
-	SDL_UploadToGPUBuffer(copy, &src, &dib, false);
+	SDL_GPUTransferBufferLocation src = {}; src.transfer_buffer = tb; src.offset = 0;
+	SDL_GPUBufferRegion dst = {}; dst.buffer = gb.buf; dst.offset = 0; dst.size = (Uint32)gb.staging.size();
+	SDL_UploadToGPUBuffer(copy, &src, &dst, false);
 	SDL_EndGPUCopyPass(copy);
 	SDL_SubmitGPUCommandBuffer(cb);
 	SDL_ReleaseGPUTransferBuffer(device_, tb);
+}
 
-	// Bounding box from the float3 position at offset 0 of each vertex.
-	Mesh mesh;
-	mesh.vbuf = vbuf; mesh.ibuf = ibuf;
-	mesh.indexCount = indexCount; mesh.stride = stride;
-	const int vcount = vbBytes / stride;
-	if(vcount > 0){
-		const unsigned char* p = (const unsigned char*)vb;
+void cSDLRenderDevice::CreateVertexBuffer(sPtrVertexBuffer& vb, int NumberVertex,
+                                          IDirect3DVertexDeclaration9* declaration, int dynamic)
+{
+	DeleteVertexBuffer(vb);
+	int size = strideFromDeclaration(declaration);
+
+	sSlotVB* slot = new sSlotVB();
+	slot->p = 0;
+	slot->init = 1;
+	slot->dynamic = (char)dynamic;
+	slot->declaration = declaration;
+	slot->VertexSize = (short)size;
+	slot->NumberVertex = NumberVertex;
+	vb.ptr = slot;
+
+	GpuBuffer gb;
+	if(device_ && NumberVertex > 0 && size > 0){
+		SDL_GPUBufferCreateInfo bi = {};
+		bi.usage = SDL_GPU_BUFFERUSAGE_VERTEX;
+		bi.size = (Uint32)(NumberVertex * size);
+		gb.buf = SDL_CreateGPUBuffer(device_, &bi);
+		gb.staging.resize((size_t)NumberVertex * size);
+	}
+	vbGpu_[slot] = std::move(gb);
+}
+
+void cSDLRenderDevice::DeleteVertexBuffer(sPtrVertexBuffer& vb)
+{
+	if(!vb.IsInit()) return;
+	sSlotVB& s = *vb.ptr;
+	xassert(s.init > 0);
+	s.init--;
+	if(s.init == 0){
+		auto it = vbGpu_.find(vb.ptr);
+		if(it != vbGpu_.end()){
+			if(it->second.buf && device_) SDL_ReleaseGPUBuffer(device_, it->second.buf);
+			vbGpu_.erase(it);
+		}
+		delete vb.ptr;
+	}
+	vb.ptr = 0;
+}
+
+void* cSDLRenderDevice::LockVertexBuffer(sPtrVertexBuffer& vb, bool /*readonly*/)
+{
+	if(!vb.IsInit()) return nullptr;
+	auto it = vbGpu_.find(vb.ptr);
+	if(it == vbGpu_.end() || it->second.staging.empty()) return nullptr;
+	return it->second.staging.data();
+}
+
+void cSDLRenderDevice::UnlockVertexBuffer(sPtrVertexBuffer& vb)
+{
+	if(!vb.IsInit()) return;
+	auto it = vbGpu_.find(vb.ptr);
+	if(it != vbGpu_.end()) uploadBuffer(it->second);
+}
+
+void cSDLRenderDevice::CreateIndexBuffer(sPtrIndexBuffer& ib, int NumberPolygon, int size)
+{
+	DeleteIndexBuffer(ib);
+
+	sSlotIB* slot = new sSlotIB();
+	slot->p = 0;
+	slot->init = 1;
+	slot->NumberPolygon = NumberPolygon;
+	slot->PolygonSize = size;
+	ib.ptr = slot;
+
+	GpuBuffer gb;
+	if(device_ && NumberPolygon > 0 && size > 0){
+		SDL_GPUBufferCreateInfo bi = {};
+		bi.usage = SDL_GPU_BUFFERUSAGE_INDEX;
+		bi.size = (Uint32)(NumberPolygon * size);
+		gb.buf = SDL_CreateGPUBuffer(device_, &bi);
+		gb.staging.resize((size_t)NumberPolygon * size);
+	}
+	ibGpu_[slot] = std::move(gb);
+}
+
+void cSDLRenderDevice::DeleteIndexBuffer(sPtrIndexBuffer& ib)
+{
+	if(!ib.IsInit()) return;
+	sSlotIB& s = *ib.ptr;
+	xassert(s.init > 0);
+	s.init--;
+	if(s.init == 0){
+		auto it = ibGpu_.find(ib.ptr);
+		if(it != ibGpu_.end()){
+			if(it->second.buf && device_) SDL_ReleaseGPUBuffer(device_, it->second.buf);
+			ibGpu_.erase(it);
+		}
+		delete ib.ptr;
+	}
+	ib.ptr = 0;
+}
+
+sPolygon* cSDLRenderDevice::LockIndexBuffer(sPtrIndexBuffer& ib, bool /*readonly*/)
+{
+	if(!ib.IsInit()) return nullptr;
+	auto it = ibGpu_.find(ib.ptr);
+	if(it == ibGpu_.end() || it->second.staging.empty()) return nullptr;
+	return (sPolygon*)it->second.staging.data();
+}
+
+void cSDLRenderDevice::UnlockIndexBuffer(sPtrIndexBuffer& ib)
+{
+	if(!ib.IsInit()) return;
+	auto it = ibGpu_.find(ib.ptr);
+	if(it != ibGpu_.end()) uploadBuffer(it->second);
+}
+
+void cSDLRenderDevice::DrawIndexedPrimitive(sPtrVertexBuffer& vb, int OfsVertex, int nVertex,
+                                            const sPtrIndexBuffer& ib, int nOfsPolygon, int nPolygon)
+{
+	if(!vb.IsInit() || !ib.ptr || nPolygon <= 0) return;   // ib is const: use ptr directly
+	auto vit = vbGpu_.find(vb.ptr);
+	auto iit = ibGpu_.find(ib.ptr);
+	if(vit == vbGpu_.end() || iit == ibGpu_.end() || !vit->second.buf || !iit->second.buf)
+		return;
+
+	// Record the draw with the current material/transform state; the actual GPU
+	// draw happens in flushMeshDraws inside the 3D render pass (SDL GPU can only
+	// draw inside a pass). D3D uses 3*nOfsPolygon / 3*nPolygon (16-bit tri list).
+	MeshDraw d;
+	d.vbuf = vit->second.buf;
+	d.ibuf = iit->second.buf;
+	d.baseVertex = OfsVertex;
+	d.startIndex = 3 * nOfsPolygon;
+	d.indexCount = 3 * nPolygon;
+	std::memcpy(d.mvp, curMVP_, sizeof(d.mvp));
+	d.tex = curMeshTexture_;
+	std::memcpy(d.tint, curMeshTint_, sizeof(d.tint));
+	d.transparency = curMeshTransparency_;
+	meshDraws_.push_back(d);
+
+	*PtrNumberPolygon += nPolygon;
+	NumDrawObject++;
+}
+
+int cSDLRenderDevice::registerMesh(sPtrVertexBuffer& vb, sPtrIndexBuffer& ib)
+{
+	if(!vb.IsInit() || !ib.IsInit()) return -1;
+
+	auto mm = std::make_unique<MenuMesh>();
+	// Take over the caller's single reference to each buffer (steal the slot
+	// pointers so the caller's dtors don't free them; MenuMesh now owns them).
+	mm->vb.ptr = vb.ptr;  vb.ptr = 0;
+	mm->ib.ptr = ib.ptr;  ib.ptr = 0;
+	mm->numVertex = mm->vb.GetNumberVertex();
+
+	// Bounding box from the float3 position @0 of each vertex (staging still holds
+	// the data after Unlock), for the auto-frame fallback when no MVP is supplied.
+	auto vit = vbGpu_.find(mm->vb.ptr);
+	const int stride = mm->vb.GetVertexSize();
+	if(vit != vbGpu_.end() && !vit->second.staging.empty() && stride > 0 && mm->numVertex > 0){
+		const unsigned char* p = vit->second.staging.data();
 		float lo[3], hi[3];
 		std::memcpy(lo, p, sizeof(lo));
 		std::memcpy(hi, p, sizeof(hi));
-		for(int i = 1; i < vcount; ++i){
+		for(int i = 1; i < mm->numVertex; ++i){
 			float pos[3];
 			std::memcpy(pos, p + (size_t)i * stride, sizeof(pos));
 			for(int k = 0; k < 3; ++k){
@@ -1008,34 +1166,23 @@ int cSDLRenderDevice::uploadMesh(const void* vb, int vbBytes, int stride, const 
 				if(pos[k] > hi[k]) hi[k] = pos[k];
 			}
 		}
-		std::memcpy(mesh.bmin, lo, sizeof(lo));
-		std::memcpy(mesh.bmax, hi, sizeof(hi));
+		std::memcpy(mm->bmin, lo, sizeof(lo));
+		std::memcpy(mm->bmax, hi, sizeof(hi));
 	}
-	mesh.active = true;
 
-	// Reuse a free slot if any, else append.
-	for(size_t i = 0; i < meshes_.size(); ++i){
-		if(!meshes_[i].active && !meshes_[i].vbuf){
-			meshes_[i] = mesh;
-			return (int)i;
-		}
+	for(size_t i = 0; i < menuMeshes_.size(); ++i){
+		if(!menuMeshes_[i]){ menuMeshes_[i] = std::move(mm); return (int)i; }
 	}
-	meshes_.push_back(mesh);
-	return (int)meshes_.size() - 1;
-}
-
-void cSDLRenderDevice::setMeshTexture(int handle, cTexture* tex)
-{
-	if(handle < 0 || handle >= (int)meshes_.size()) return;
-	meshes_[handle].tex = sdlTextureOf(tex);
+	menuMeshes_.push_back(std::move(mm));
+	return (int)menuMeshes_.size() - 1;
 }
 
 void cSDLRenderDevice::addMeshSubmesh(int handle, int firstIndex, int indexCount, cTexture* tex,
                                       const float* tint, int transparency)
 {
-	if(handle < 0 || handle >= (int)meshes_.size() || indexCount <= 0) return;
-	Mesh& m = meshes_[handle];
-	if(firstIndex < 0 || firstIndex + indexCount > m.indexCount) return;
+	if(handle < 0 || handle >= (int)menuMeshes_.size() || !menuMeshes_[handle] || indexCount <= 0)
+		return;
+	MenuMesh& m = *menuMeshes_[handle];
 	SubDraw sd{ firstIndex, indexCount, sdlTextureOf(tex), {1,1,1,1}, transparency };
 	if(tint)
 		for(int i = 0; i < 4; ++i) sd.tint[i] = tint[i];
@@ -1044,44 +1191,33 @@ void cSDLRenderDevice::addMeshSubmesh(int handle, int firstIndex, int indexCount
 
 void cSDLRenderDevice::setMeshTransform(int handle, const float* mvp16)
 {
-	if(handle < 0 || handle >= (int)meshes_.size() || !mvp16) return;
-	std::memcpy(meshes_[handle].mvp, mvp16, 16 * sizeof(float));
-	meshes_[handle].hasTransform = true;
+	if(handle < 0 || handle >= (int)menuMeshes_.size() || !menuMeshes_[handle] || !mvp16)
+		return;
+	std::memcpy(menuMeshes_[handle]->mvp, mvp16, 16 * sizeof(float));
+	menuMeshes_[handle]->hasTransform = true;
 }
 
 void cSDLRenderDevice::releaseMesh(int handle)
 {
-	if(handle < 0 || handle >= (int)meshes_.size()) return;
-	Mesh& m = meshes_[handle];
-	if(device_){
-		if(m.vbuf) SDL_ReleaseGPUBuffer(device_, m.vbuf);
-		if(m.ibuf) SDL_ReleaseGPUBuffer(device_, m.ibuf);
-	}
-	m = Mesh();  // active=false, buffers null -> slot becomes reusable
+	if(handle < 0 || handle >= (int)menuMeshes_.size()) return;
+	// ~MenuMesh -> sPtr dtors -> DeleteVertex/IndexBuffer (frees the SDL buffers).
+	menuMeshes_[handle].reset();
 }
 
-void cSDLRenderDevice::drawMeshes(SDL_GPURenderPass* pass)
+void cSDLRenderDevice::recordMenuMeshes()
 {
-	if(!pass || !meshPipeline_) return;
-
-	SDL_GPUGraphicsPipeline* boundPipeline = nullptr;  // track to avoid redundant binds
-	auto bindPipeline = [&](int transparency){
-		// Additive (1) -> additive blend; everything else -> filter (alpha-over).
-		SDL_GPUGraphicsPipeline* want = (transparency == 1 && meshPipelineAdd_)
-		                                ? meshPipelineAdd_ : meshPipeline_;
-		if(want != boundPipeline){ SDL_BindGPUGraphicsPipeline(pass, want); boundPipeline = want; }
-	};
-
 	const float fovY = 50.f * 3.14159265f / 180.f;
 	const float aspect = (xScr && yScr) ? float(xScr) / float(yScr) : 1.f;
 	const float angle = (float)(SDL_GetTicks() % 100000) * 0.001f * 0.6f;  // ~0.6 rad/s
 
-	for(const Mesh& m : meshes_){
-		if(!m.active || !m.vbuf || !m.ibuf || m.indexCount <= 0) continue;
+	for(auto& up : menuMeshes_){
+		if(!up) continue;
+		MenuMesh& m = *up;
+		if(!m.vb.IsInit() || !m.ib.IsInit() || m.numVertex <= 0) continue;
 
 		if(m.hasTransform){
 			// Caller-supplied MVP (the real menu camera).
-			SDL_PushGPUVertexUniformData(commandBuffer_, 0, m.mvp, sizeof(m.mvp));
+			std::memcpy(curMVP_, m.mvp, sizeof(curMVP_));
 		} else {
 			// Fallback: auto-frame the mesh (perspective, slow Z-spin).
 			float center[3] = { (m.bmin[0]+m.bmax[0])*0.5f,
@@ -1093,44 +1229,61 @@ void cSDLRenderDevice::drawMeshes(SDL_GPURenderPass* pass)
 
 			float d = radius / std::tan(fovY * 0.5f) * 1.4f;
 			float eye[3] = { center[0], center[1] - d, center[2] };
-			float up[3]  = { 0.f, 0.f, 1.f };
+			float up3[3] = { 0.f, 0.f, 1.f };
 
 			M4 world = matMul(matMul(matTranslate(-center[0], -center[1], -center[2]), matRotZ(angle)),
 			                  matTranslate(center[0], center[1], center[2]));
-			M4 view  = matLookAtLH(eye, center, up);
+			M4 view  = matLookAtLH(eye, center, up3);
 			M4 proj  = matPerspectiveFovLH(fovY, aspect, std::max(0.05f, d - radius*1.5f), d + radius*1.5f);
 			M4 mvp   = matMul(matMul(world, view), proj);
-
-			SDL_PushGPUVertexUniformData(commandBuffer_, 0, mvp.m, sizeof(mvp.m));
+			std::memcpy(curMVP_, mvp.m, sizeof(curMVP_));
 		}
 
-		SDL_GPUBufferBinding vbb = {}; vbb.buffer = m.vbuf; vbb.offset = 0;
+		if(m.subdraws.empty()){
+			// Whole-mesh draw, untextured/white (nPolygon = whole index buffer).
+			curMeshTexture_ = nullptr;
+			curMeshTint_[0] = curMeshTint_[1] = curMeshTint_[2] = curMeshTint_[3] = 1.f;
+			curMeshTransparency_ = 2;
+			DrawIndexedPrimitive(m.vb, 0, m.numVertex, m.ib, 0, m.ib.GetNumberPolygon());
+		} else {
+			// One draw per material range: firstIndex/indexCount are index counts,
+			// so convert to polygon offset/count for DrawIndexedPrimitive.
+			for(const SubDraw& sd : m.subdraws){
+				curMeshTexture_ = sd.tex;
+				std::memcpy(curMeshTint_, sd.tint, sizeof(curMeshTint_));
+				curMeshTransparency_ = sd.transparency;
+				DrawIndexedPrimitive(m.vb, 0, m.numVertex, m.ib,
+				                     sd.firstIndex / 3, sd.indexCount / 3);
+			}
+		}
+	}
+}
+
+void cSDLRenderDevice::flushMeshDraws(SDL_GPURenderPass* pass)
+{
+	if(!pass || !meshPipeline_) return;
+
+	SDL_GPUGraphicsPipeline* boundPipeline = nullptr;  // track to avoid redundant binds
+	for(const MeshDraw& d : meshDraws_){
+		// Additive (1) -> additive blend; everything else -> filter (alpha-over).
+		SDL_GPUGraphicsPipeline* want = (d.transparency == 1 && meshPipelineAdd_)
+		                                ? meshPipelineAdd_ : meshPipeline_;
+		if(want != boundPipeline){ SDL_BindGPUGraphicsPipeline(pass, want); boundPipeline = want; }
+
+		SDL_PushGPUVertexUniformData(commandBuffer_, 0, d.mvp, sizeof(d.mvp));
+		SDL_PushGPUFragmentUniformData(commandBuffer_, 0, d.tint, sizeof(d.tint));
+
+		SDL_GPUBufferBinding vbb = {}; vbb.buffer = d.vbuf; vbb.offset = 0;
 		SDL_BindGPUVertexBuffers(pass, 0, &vbb, 1);
-		SDL_GPUBufferBinding ibb = {}; ibb.buffer = m.ibuf; ibb.offset = 0;
+		SDL_GPUBufferBinding ibb = {}; ibb.buffer = d.ibuf; ibb.offset = 0;
 		SDL_BindGPUIndexBuffer(pass, &ibb, SDL_GPU_INDEXELEMENTSIZE_16BIT);
 
-		if(!m.subdraws.empty()){
-			// One textured draw per material range, with its diffuse tint/opacity
-			// and blend mode (filter vs additive).
-			for(const SubDraw& sd : m.subdraws){
-				bindPipeline(sd.transparency);
-				SDL_PushGPUFragmentUniformData(commandBuffer_, 0, sd.tint, sizeof(sd.tint));
-				SDL_GPUTextureSamplerBinding ts = {};
-				ts.texture = sd.tex ? sd.tex : whiteTexture_;
-				ts.sampler = sampler_;
-				SDL_BindGPUFragmentSamplers(pass, 0, &ts, 1);
-				SDL_DrawGPUIndexedPrimitives(pass, sd.indexCount, 1, sd.firstIndex, 0, 0);
-			}
-		} else {
-			bindPipeline(2 /*filter*/);
-			const float whiteTint[4] = {1,1,1,1};
-			SDL_PushGPUFragmentUniformData(commandBuffer_, 0, whiteTint, sizeof(whiteTint));
-			SDL_GPUTextureSamplerBinding ts = {};
-			ts.texture = m.tex ? m.tex : whiteTexture_;
-			ts.sampler = sampler_;
-			SDL_BindGPUFragmentSamplers(pass, 0, &ts, 1);
-			SDL_DrawGPUIndexedPrimitives(pass, m.indexCount, 1, 0, 0, 0);
-		}
+		SDL_GPUTextureSamplerBinding ts = {};
+		ts.texture = d.tex ? d.tex : whiteTexture_;
+		ts.sampler = sampler_;
+		SDL_BindGPUFragmentSamplers(pass, 0, &ts, 1);
+
+		SDL_DrawGPUIndexedPrimitives(pass, d.indexCount, 1, d.startIndex, d.baseVertex, 0);
 	}
 }
 

@@ -51,22 +51,53 @@ ManagedResource::ManagedResource() {}
 ManagedResource::~ManagedResource() {}
 
 // ---------------------------------------------------------------------------
-// sPtrVertexBuffer
+// sPtrVertexBuffer / sPtrIndexBuffer — lifetime routes through the interface
+// (mirrors the Windows D3DRender.cpp bodies), so the SDL backend owns the GPU
+// buffers behind the slot and releases them on Destroy/dtor.
 // ---------------------------------------------------------------------------
-void sPtrVertexBuffer::Destroy() { ptr = 0; }
-void sPtrVertexBuffer::CopyAddRef(const sPtrVertexBuffer& from) { ptr = from.ptr; }
+void sPtrVertexBuffer::Destroy()
+{
+	if(ptr)
+		gb_RenderDevice->DeleteVertexBuffer(*this);
+	ptr = 0;
+}
+void sPtrVertexBuffer::CopyAddRef(const sPtrVertexBuffer& from)
+{
+	xassert(ptr == 0);
+	ptr = from.ptr;
+	if(ptr) ptr->init++;
+}
 
-sPtrIndexBuffer::~sPtrIndexBuffer() {}
-void sPtrIndexBuffer::CopyAddRef(const sPtrIndexBuffer& from) { ptr = from.ptr; }
+sPtrIndexBuffer::~sPtrIndexBuffer()
+{
+	if(ptr)
+		gb_RenderDevice->DeleteIndexBuffer(*this);
+	ptr = 0;
+}
+void sPtrIndexBuffer::CopyAddRef(const sPtrIndexBuffer& from)
+{
+	xassert(ptr == 0);
+	ptr = from.ptr;
+	if(ptr) ptr->init++;
+}
 
 // ---------------------------------------------------------------------------
-// Vertex-format declaration statics (created by the D3D backend on Register()).
+// Vertex-format declaration registration. On Windows this queues (decl,elements)
+// pairs for CreateVertexDeclaration at device init; off-Windows there is no D3D
+// object, so we point the declaration at its immortal static element table (from
+// the BEGIN_VERTEX_DECLARATION macro) so the SDL backend can read the layout.
+// The vertex::declaration statics themselves are defined by VertexDeclaration.cpp.
 // ---------------------------------------------------------------------------
-IDirect3DVertexDeclaration9* sVertexXYZD::declaration = 0;
-IDirect3DVertexDeclaration9* sVertexXYZDT1::declaration = 0;
-IDirect3DVertexDeclaration9* sVertexXYZDT2::declaration = 0;
-IDirect3DVertexDeclaration9* sVertexXYZWD::declaration = 0;
-IDirect3DVertexDeclaration9* shortVertexGrass::declaration = 0;
+void cD3DRender::RegisterVertexDeclaration(LPDIRECT3DVERTEXDECLARATION9& declaration,
+                                           D3DVERTEXELEMENT9* elements)
+{
+	IDirect3DVertexDeclaration9* d = new IDirect3DVertexDeclaration9();
+	d->elements = elements;
+	unsigned int n = 0;
+	while(elements[n].Stream != 0xFF) ++n;   // count up to the D3DDECL_END() terminator
+	d->elementCount = n;
+	declaration = d;
+}
 
 // ---------------------------------------------------------------------------
 // DrawStrip / PoolManager
@@ -133,16 +164,8 @@ void  cQuadBufferInternal::EndDraw() {}
 void* cQuadBufferInternal::Get() { return 0; }
 void  cQuadBufferInternal::SetMatrix(const MatXf& /*m*/) {}
 
-// ---------------------------------------------------------------------------
-// cSkinVertex
-// ---------------------------------------------------------------------------
-cSkinVertex::cSkinVertex(int num_weight_, bool bump_, bool uv2_, bool fur_)
-	: num_weight(num_weight_), bump(bump_), uv2(uv2_), fur(fur_),
-	  vb_size(0), p(0), cur(0),
-	  offset_texel(0), offset_bump_s(0), offset_bump_t(0),
-	  offset_texel2(0), offset_fur(0) {}
-BYTE& cSkinVertex::GetWeight(int /*idx*/) { static BYTE dummy = 0; return dummy; }
-IDirect3DVertexDeclaration9* cSkinVertex::GetDeclaration() { return 0; }
+// cSkinVertex (ctor / GetWeight / GetDeclaration / declaration[] / Register) is
+// defined by VertexDeclaration.cpp, which is now compiled off-Windows too.
 
 // ---------------------------------------------------------------------------
 // cOcclusionQuery

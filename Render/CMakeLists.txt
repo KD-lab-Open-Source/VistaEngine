@@ -77,6 +77,10 @@ else()
     list(APPEND RENDER_SOURCES RenderStub.cpp)
     # The cross-platform SDL GPU render device (replaces the D3D9 cD3DRender).
     list(APPEND RENDER_SOURCES SDLRenderDevice.cpp)
+    # Vertex-format declaration tables (BEGIN_VERTEX_DECLARATION). Pure data — no
+    # device calls — so it's portable: it feeds vertex::declaration layouts to the
+    # SDL backend via the portable cD3DRender::RegisterVertexDeclaration (RenderStub).
+    list(APPEND RENDER_SOURCES D3D/VertexDeclaration.cpp)
     # Portable DDS decoder (D3DX is Windows-only); model textures ship as DDS.
     list(APPEND RENDER_SOURCES src/DDSImage.cpp)
 endif()

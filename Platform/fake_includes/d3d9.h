@@ -57,7 +57,17 @@ struct IDirect3DIndexBuffer9 : IDirect3DUnknown9 {
     template<class... A> HRESULT Lock(A...)   { return 0; }
     template<class... A> HRESULT Unlock(A...) { return 0; }
 };
-struct IDirect3DVertexDeclaration9  : IDirect3DUnknown9 {};
+// Off-Windows a vertex declaration must still carry its real element layout so the
+// SDL GPU backend can derive the vertex-input state and stride (on Windows this
+// info lived inside the opaque D3D driver object). cD3DRender::RegisterVertexDeclaration
+// points `elements` at the immortal static table from the BEGIN_VERTEX_DECLARATION
+// macro; the array is terminated by D3DDECL_END() (Stream==0xFF).
+struct D3DVERTEXELEMENT9;
+struct IDirect3DVertexDeclaration9  : IDirect3DUnknown9 {
+    const D3DVERTEXELEMENT9* elements;
+    unsigned int             elementCount;
+    IDirect3DVertexDeclaration9() : elements(0), elementCount(0) {}
+};
 struct IDirect3DVertexShader9       : IDirect3DUnknown9 {};
 struct IDirect3DPixelShader9        : IDirect3DUnknown9 {};
 struct IDirect3DStateBlock9         : IDirect3DUnknown9 {};
@@ -172,6 +182,44 @@ struct D3DPRESENT_PARAMETERS { UINT BackBufferWidth, BackBufferHeight;
 // Shader version encodings (vs_M_m / ps_M_m), as in d3d9types.h.
 #define D3DVS_VERSION(major,minor) (0xFFFE0000 | ((major) << 8) | (minor))
 #define D3DPS_VERSION(major,minor) (0xFFFF0000 | ((major) << 8) | (minor))
+
+// D3DDECLTYPE_* / D3DDECLMETHOD_* / D3DDECLUSAGE_* (real d3d9types.h numbering; the
+// values matter — the SDL backend maps Type/Usage to vertex-element formats/slots).
+#define D3DDECLTYPE_FLOAT1    0
+#define D3DDECLTYPE_FLOAT2    1
+#define D3DDECLTYPE_FLOAT3    2
+#define D3DDECLTYPE_FLOAT4    3
+#define D3DDECLTYPE_D3DCOLOR  4
+#define D3DDECLTYPE_UBYTE4    5
+#define D3DDECLTYPE_SHORT2    6
+#define D3DDECLTYPE_SHORT4    7
+#define D3DDECLTYPE_UBYTE4N   8
+#define D3DDECLTYPE_SHORT2N   9
+#define D3DDECLTYPE_SHORT4N   10
+#define D3DDECLTYPE_USHORT2N  11
+#define D3DDECLTYPE_USHORT4N  12
+#define D3DDECLTYPE_UDEC3     13
+#define D3DDECLTYPE_DEC3N     14
+#define D3DDECLTYPE_FLOAT16_2 15
+#define D3DDECLTYPE_FLOAT16_4 16
+#define D3DDECLTYPE_UNUSED    17
+
+#define D3DDECLMETHOD_DEFAULT 0
+
+#define D3DDECLUSAGE_POSITION     0
+#define D3DDECLUSAGE_BLENDWEIGHT  1
+#define D3DDECLUSAGE_BLENDINDICES 2
+#define D3DDECLUSAGE_NORMAL       3
+#define D3DDECLUSAGE_PSIZE        4
+#define D3DDECLUSAGE_TEXCOORD     5
+#define D3DDECLUSAGE_TANGENT      6
+#define D3DDECLUSAGE_BINORMAL     7
+#define D3DDECLUSAGE_TESSFACTOR   8
+#define D3DDECLUSAGE_POSITIONT    9
+#define D3DDECLUSAGE_COLOR        10
+#define D3DDECLUSAGE_FOG          11
+#define D3DDECLUSAGE_DEPTH        12
+#define D3DDECLUSAGE_SAMPLE       13
 
 #define D3DDECL_END() { 0xFF, 0, 0, 0, 0, 0 }
 #define D3DCLEAR_TARGET  0x1

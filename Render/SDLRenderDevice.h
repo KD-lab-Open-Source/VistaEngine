@@ -15,6 +15,7 @@
 #include "MTSection.h"
 #include <vector>
 #include <unordered_map>
+#include <memory>
 
 // SDL opaque handles, forward-declared so SDL stays out of engine headers.
 struct SDL_Window;
@@ -51,16 +52,18 @@ public:
 	int GetAvailableTextureMem() override { return 0; }
 	HWND GetWindowHandle() override { return (HWND)window_; }
 
-	// --- Slice 3: minimal static-mesh rendering (geometry-only path) -------
+	// --- Slice 4: static-mesh rendering via the real VB/IB interface -------
 	// Not part of cInterfaceRenderDevice: the off-Windows 3D models ship only as
-	// the 32-bit InPlace cache, so we render raw VB/IB recovered from .3dxGB
-	// (see Render/3dx/MeshCacheGeometry). Returns a handle, -1 on failure.
-	int  uploadMesh(const void* vb, int vbBytes, int stride, const void* ib, int indexCount);
-	void setMeshTexture(int handle, cTexture* tex);
+	// the 32-bit InPlace cache, so the menu background recovers raw VB/IB from
+	// .3dxGB and feeds them through the real CreateVertexBuffer/CreateIndexBuffer/
+	// DrawIndexedPrimitive path (which this exercises). registerMesh takes ownership
+	// of the caller's vb/ib (clearing the caller's handles) and retains the mesh so
+	// EndScene can redraw it every frame via DrawIndexedPrimitive. Returns a handle,
+	// -1 on failure.
+	int  registerMesh(sPtrVertexBuffer& vb, sPtrIndexBuffer& ib);
 	// Append a textured sub-range (firstIndex/indexCount into the mesh's index
-	// buffer). Once any sub-range is set, the whole-mesh draw is replaced by them.
-	// tint = material diffuse rgba (rgb color, a opacity); transparency selects the
-	// blend pipeline (0=substractive, 1=additive, 2=filter).
+	// buffer). tint = material diffuse rgba (rgb color, a opacity); transparency
+	// selects the blend pipeline (0=substractive, 1=additive, 2=filter).
 	void addMeshSubmesh(int handle, int firstIndex, int indexCount, cTexture* tex,
 	                    const float* tint = nullptr, int transparency = 2);
 	// Supply the model-view-projection matrix (16 floats, row-major, row-vector
@@ -145,16 +148,16 @@ public:
 	void SetNoMaterial(eBlendMode, const MatXf&, float, cTexture*, cTexture*, eColorMode) override;
 	void SetWorldMaterial(eBlendMode, const MatXf&, float, cTexture*, cTexture*, eColorMode, bool, bool) override {}
 
-	// --- Vertex/index buffers (no-op until slice 2) ----------------------
-	void DrawIndexedPrimitive(sPtrVertexBuffer&, int, int, const sPtrIndexBuffer&, int, int) override {}
-	void CreateVertexBuffer(sPtrVertexBuffer&, int, IDirect3DVertexDeclaration9*, int) override {}
-	void DeleteVertexBuffer(sPtrVertexBuffer&) override {}
-	void* LockVertexBuffer(sPtrVertexBuffer&, bool) override { return nullptr; }
-	void UnlockVertexBuffer(sPtrVertexBuffer&) override {}
-	void CreateIndexBuffer(sPtrIndexBuffer&, int, int) override {}
-	void DeleteIndexBuffer(sPtrIndexBuffer&) override {}
-	sPolygon* LockIndexBuffer(sPtrIndexBuffer&, bool) override { return nullptr; }
-	void UnlockIndexBuffer(sPtrIndexBuffer&) override {}
+	// --- Vertex/index buffers (slice 4): real SDL GPU static buffers ------
+	void DrawIndexedPrimitive(sPtrVertexBuffer&, int, int, const sPtrIndexBuffer&, int, int) override;
+	void CreateVertexBuffer(sPtrVertexBuffer&, int, IDirect3DVertexDeclaration9*, int) override;
+	void DeleteVertexBuffer(sPtrVertexBuffer&) override;
+	void* LockVertexBuffer(sPtrVertexBuffer&, bool) override;
+	void UnlockVertexBuffer(sPtrVertexBuffer&) override;
+	void CreateIndexBuffer(sPtrIndexBuffer&, int, int = sizeof(sPolygon)) override;
+	void DeleteIndexBuffer(sPtrIndexBuffer&) override;
+	sPolygon* LockIndexBuffer(sPtrIndexBuffer&, bool) override;
+	void UnlockIndexBuffer(sPtrIndexBuffer&) override;
 
 	// --- Internal shared dynamic buffers (no-op: none yet) ---------------
 	cVertexBuffer<sVertexXYZDT1>*  GetBufferXYZDT1() override { return nullptr; }
@@ -196,26 +199,55 @@ private:
 	std::vector<DrawRun> runs_;
 	SDL_GPUTexture* currentTexture_ = nullptr;  // set by SetNoMaterial
 
-	// Slice 3: static meshes uploaded from raw .3dxGB geometry.
+	// Slice 4: static VB/IB backed by SDL GPU buffers + a CPU staging mirror,
+	// keyed on the slot pointer (sSlotVB*/sSlotIB*) held by the sPtr wrappers.
+	// Lock hands back the staging; Unlock uploads it to the GPU buffer.
+	struct GpuBuffer {
+		SDL_GPUBuffer* buf = nullptr;
+		std::vector<unsigned char> staging;
+	};
+	std::unordered_map<sSlotVB*, GpuBuffer> vbGpu_;
+	std::unordered_map<sSlotIB*, GpuBuffer> ibGpu_;
+	static int strideFromDeclaration(IDirect3DVertexDeclaration9* decl);
+	void uploadBuffer(GpuBuffer& gb);          // staging -> GPU (own copy pass)
+
+	// One indexed draw recorded by DrawIndexedPrimitive and replayed inside the
+	// 3D render pass at EndScene (SDL GPU can only draw inside a pass).
+	struct MeshDraw {
+		SDL_GPUBuffer* vbuf; SDL_GPUBuffer* ibuf;
+		int baseVertex; int startIndex; int indexCount;
+		float mvp[16];
+		SDL_GPUTexture* tex; float tint[4]; int transparency;
+	};
+	std::vector<MeshDraw> meshDraws_;
+	// "Current" material/transform state that DrawIndexedPrimitive snapshots into
+	// each MeshDraw (the immediate-mode state the D3D backend reads from the device).
+	float           curMVP_[16] = {0};
+	SDL_GPUTexture* curMeshTexture_ = nullptr;
+	float           curMeshTint_[4] = {1,1,1,1};
+	int             curMeshTransparency_ = 2;
+	void flushMeshDraws(SDL_GPURenderPass* pass);   // replay meshDraws_ in the pass
+
+	// Retained menu-background meshes: they own the real VB/IB (held indirectly so
+	// the sPtr members never move -> no double free) and are redrawn every frame by
+	// recordMenuMeshes() through the real DrawIndexedPrimitive interface.
 	struct SubDraw {
 		int firstIndex; int indexCount; SDL_GPUTexture* tex;
 		float tint[4];      // material diffuse rgba (rgb color, a opacity)
 		int transparency;   // 0=substractive, 1=additive, 2=filter
 	};
-	struct Mesh {
-		SDL_GPUBuffer* vbuf = nullptr;
-		SDL_GPUBuffer* ibuf = nullptr;
-		int indexCount = 0;
-		int stride = 0;
+	struct MenuMesh {
+		sPtrVertexBuffer vb; sPtrIndexBuffer ib;   // own one reference to the buffers
+		int numVertex = 0;
 		float bmin[3] = {0,0,0};
 		float bmax[3] = {0,0,0};
-		SDL_GPUTexture* tex = nullptr;        // whole-mesh texture (if no subdraws)
-		std::vector<SubDraw> subdraws;        // per-material textured ranges
-		float mvp[16] = {0};                  // supplied transform (row-major)
-		bool hasTransform = false;            // false -> use the auto-frame fallback
-		bool active = false;
+		float mvp[16] = {0};
+		bool hasTransform = false;                 // false -> auto-frame fallback
+		std::vector<SubDraw> subdraws;
 	};
-	std::vector<Mesh> meshes_;
+	std::vector<std::unique_ptr<MenuMesh>> menuMeshes_;
+	void recordMenuMeshes();   // per frame: set curstate + call DrawIndexedPrimitive
+
 	SDL_GPUGraphicsPipeline* meshPipeline_ = nullptr;     // filter (alpha-over) blend
 	SDL_GPUGraphicsPipeline* meshPipelineAdd_ = nullptr;  // additive blend
 	SDL_GPUTexture*          depthTexture_ = nullptr;
@@ -223,7 +255,6 @@ private:
 	bool meshPipelineTried_ = false;
 	void createMeshPipeline();
 	void ensureDepth(int w, int h);
-	void drawMeshes(SDL_GPURenderPass* pass);  // 3D pass: build MVP + draw meshes
 
 	SDL_Window*            window_           = nullptr;
 	SDL_GPUDevice*         device_           = nullptr;
