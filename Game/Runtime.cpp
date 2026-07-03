@@ -243,6 +243,7 @@ void Runtime::done()
 
 void Runtime::updateWindowSize()
 {
+#ifdef _WIN32
 	if(!terFullScreen)
 	{
 		RECT rc;
@@ -252,6 +253,11 @@ void Runtime::updateWindowSize()
 	}
 	else
 		windowClientSize_.set(gb_RenderDevice->GetSizeX(),gb_RenderDevice->GetSizeY());
+#else
+	// No native Win32 client rect off-Windows (GetClientRect is a 0x0 shim); use
+	// the SDL swapchain size so mouse coords normalize correctly (GameShell::convert).
+	windowClientSize_.set(gb_RenderDevice->GetSizeX(), gb_RenderDevice->GetSizeY());
+#endif
 
 	UI_Render::instance().setWindowPosition(aspectedWorkArea(Rectf(0,0, gb_RenderDevice->GetSizeX(), gb_RenderDevice->GetSizeY()), 4.0f / 3.0f));
 }
@@ -350,14 +356,6 @@ void Runtime::checkSingleRunning()
 
 void Runtime::GameStart(const MissionDescription& mission)
 {
-#ifndef _WIN32
-	// TEMP (cross-platform bring-up): the main menu auto-starts a background
-	// mission ("Menu") whose world build (UniverseX -> FieldDispatcher ->
-	// TileStrip) needs the not-yet-ported game-world GPU buffer path. Skip it so
-	// the 2D menu UI keeps rendering for visual validation. Remove once vertex/
-	// index buffers + terrain field rendering are implemented (slice 3).
-	return;
-#endif
 	setLogicFp();
 	MT_SET_TLS(MT_GRAPH_THREAD | MT_LOGIC_THREAD);
 
@@ -365,6 +363,13 @@ void Runtime::GameStart(const MissionDescription& mission)
 	UI_Dispatcher::instance().setEnabled(true);
 	UI_Dispatcher::instance().quickRedraw();
 
+#ifndef _WIN32
+	// Cross-platform bring-up: _beginthread is a no-op off-Windows, so a threaded
+	// (useHT) load would never actually run GameLoad. Always load synchronously,
+	// single-threaded, so the world (and its trigger chains) actually build.
+	GameLoad(mission);
+	GameRelaxLoading();
+#else
 	if(useHT_){
 		xassert(logic_thread_id==bad_thread_id);
 		load_mode = true;
@@ -376,6 +381,7 @@ void Runtime::GameStart(const MissionDescription& mission)
 		GameLoad(mission);
 		GameRelaxLoading();
 	}
+#endif
 
 	MT_SET_TLS(MT_GRAPH_THREAD);
 }
@@ -717,6 +723,16 @@ LRESULT CALLBACK runtimeWndProc(HWND hWnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 }
 
 //------------------------------
+#ifndef _WIN32
+// Feed a translated SDL input event into the same path the Win32 window
+// procedure uses, so mouse/keyboard reach GameShell::eventHandler off-Windows.
+static void dispatchWindowEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	HWND hWnd = Runtime::instance() ? Runtime::instance()->hWnd() : 0;
+	runtimeWndProc(hWnd, uMsg, wParam, lParam);
+}
+#endif
+
 int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 {
 	Win32::_setGlobalInstance(hInst);
@@ -728,8 +744,8 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 	MSG msg;
 	while(true){
 #ifndef _WIN32
-		// Drain SDL events so the window stays responsive; quit on close.
-		if(!PlatformWindow::pumpEvents())
+		// Drain SDL events (translating input to Win32 messages); quit on close.
+		if(!PlatformWindow::pumpEvents(&dispatchWindowEvent))
 			break;
 #endif
 		if(PeekMessage(&msg, 0, 0, 0, PM_NOREMOVE)){
