@@ -66,9 +66,12 @@ public:
 	// selects the blend pipeline (0=substractive, 1=additive, 2=filter). light =
 	// 4 floats {dir.xyz toward the light (world space), strength}; null or w==0
 	// leaves the draw unlit/full-bright (menu default), w>0 adds relief lighting.
+	// water = 3 floats {strength, spatialScale, spare}; null or strength==0 leaves
+	// the draw foam-free, strength>0 adds the animated water-foam layer (time is
+	// injected per frame at draw time).
 	void addMeshSubmesh(int handle, int firstIndex, int indexCount, cTexture* tex,
 	                    const float* tint = nullptr, int transparency = 2,
-	                    const float* light = nullptr);
+	                    const float* light = nullptr, const float* water = nullptr);
 	// Supply the model-view-projection matrix (16 floats, row-major, row-vector
 	// v*M, D3D clip convention) for the mesh. Replaces the built-in auto-frame.
 	void setMeshTransform(int handle, const float* mvp16);
@@ -222,6 +225,7 @@ private:
 		float mvp[16];
 		SDL_GPUTexture* tex; float tint[4]; int transparency;
 		float light[4];   // xyz = dir toward light, w = strength (0 = unlit)
+		float water[4];   // x = foam strength (0 = none), y = scale, z spare, w = time
 	};
 	std::vector<MeshDraw> meshDraws_;
 	// "Current" material/transform state that DrawIndexedPrimitive snapshots into
@@ -231,6 +235,7 @@ private:
 	float           curMeshTint_[4] = {1,1,1,1};
 	int             curMeshTransparency_ = 2;
 	float           curMeshLight_[4] = {0,0,0,0};   // xyz dir, w strength (0 = unlit)
+	float           curMeshWater_[4] = {0,0,0,0};   // x strength (0 = no foam), y scale
 	void flushMeshDraws(SDL_GPURenderPass* pass);   // replay meshDraws_ in the pass
 
 	// Retained menu-background meshes: they own the real VB/IB (held indirectly so
@@ -241,6 +246,7 @@ private:
 		float tint[4];      // material diffuse rgba (rgb color, a opacity)
 		int transparency;   // 0=substractive, 1=additive, 2=filter
 		float light[4];     // xyz = dir toward light, w = strength (0 = unlit)
+		float water[4];     // x = foam strength (0 = none), y = scale, z spare, w unused
 	};
 	struct MenuMesh {
 		sPtrVertexBuffer vb; sPtrIndexBuffer ib;   // own one reference to the buffers
@@ -261,6 +267,26 @@ private:
 	bool meshPipelineTried_ = false;
 	void createMeshPipeline();
 	void ensureDepth(int w, int h);
+
+	// Water pipeline (P2 water slice): reuses the mesh3d vertex shader but a dedicated
+	// fragment shader (water.frag) that samples two scrolling bump textures + the baked
+	// depth-opacity texture for the animated wave surface + specular glint. A mesh draw
+	// with water[0] > 0 (set by WaterRenderSDL) is routed here instead of meshPipeline_.
+	SDL_GPUGraphicsPipeline* waterPipeline_ = nullptr;
+	bool waterPipelineTried_ = false;
+	void createWaterPipeline();
+	SDL_GPUTexture* waterBump0_ = nullptr;   // borrowed SDL handles (WaterRenderSDL owns
+	SDL_GPUTexture* waterBump1_ = nullptr;   // the cTextures); resolved via sdlTextureOf
+	SDL_GPUSampler* waterSampler_ = nullptr; // REPEAT/wrap: the wave bumps tile (worldXY UV)
+	float           waterFS_[12] = {0};      // {LightDir, CameraPos(.w=time), Params}
+public:
+	// Per-frame water shading state, supplied by WaterRenderSDL before the pass. camPos3
+	// and lightDir3 are 3 floats each; bump0/bump1 are the two wave textures; the scalars
+	// tune the bump sampling/glint. Time is injected each frame from SDL ticks.
+	void setWaterRenderState(cTexture* bump0, cTexture* bump1, const float* camPos3,
+	                         const float* lightDir3, float bumpScale, float scrollSpeed,
+	                         float rippleStrength, float specStrength);
+private:
 
 	SDL_Window*            window_           = nullptr;
 	SDL_GPUDevice*         device_           = nullptr;

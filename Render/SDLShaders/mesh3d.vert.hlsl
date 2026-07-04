@@ -23,6 +23,7 @@ struct VSOutput
     float4 Position : SV_Position;
     float3 Normal   : NORMAL;
     float2 UV       : TEXCOORD0;
+    float3 WorldPos : TEXCOORD1;   // pre-transform position; terrain/water build in world
 };
 
 VSOutput main(VSInput input)
@@ -31,5 +32,6 @@ VSOutput main(VSInput input)
     output.Position = mul(float4(input.Position, 1.0f), MVP);
     output.Normal = input.Normal;
     output.UV = input.UV;
+    output.WorldPos = input.Position;   // used by the water foam layer (fragment)
     return output;
 }

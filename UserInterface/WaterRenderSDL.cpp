@@ -31,8 +31,16 @@ sPtrVertexBuffer s_vb;
 sPtrIndexBuffer  s_ib;
 int              s_handle = -1;
 cTexture*        s_tex = nullptr;      // baked per-node depth-opacity sheet (premultiplied)
+cTexture*        s_bump0 = nullptr;    // waves.dds  (scrolling wave normal, layer 0)
+cTexture*        s_bump1 = nullptr;    // waves1.dds (scrolling wave normal, layer 1)
 bool             s_failed = false;     // build attempted, nothing to draw -> stop retrying
 std::string      s_builtWorld;         // vMap world the current mesh was built for
+
+// The original water shader (water_linear.psl) samples these two wave-normal DDS
+// textures at scrolling UVs; they are the game's real ripple content (default names,
+// set in cWater's ctor). Loaded once, shared for the process.
+const char* WAVES0 = "Scripts\\Resource\\balmer\\shader\\waves.dds";
+const char* WAVES1 = "Scripts\\Resource\\balmer\\shader\\waves1.dds";
 
 const float WATER_MIN_DEPTH = 2.f;     // GetRelativeZ threshold: below this = dry
 
@@ -169,9 +177,18 @@ bool buildWaterMesh(cSDLRenderDevice* dev)
 	// (Depth-write is off in the mesh pass, so water drawn after terrain blends over
 	// it; hills between camera and water won't occlude yet -- a later refinement.)
 	s_tex = buildWaterTexture(dev, w, gx, gy);
+	// Load the game's real wave-normal textures (shared; per-frame scroll + specular are
+	// supplied to the device via setWaterRenderState in renderWaterSDL).
+	if(!s_bump0) s_bump0 = GetTexLibrary()->GetElement3D(WAVES0);
+	if(!s_bump1) s_bump1 = GetTexLibrary()->GetElement3D(WAVES1);
+
+	// The baked premultiplied texture carries the depth-opacity water colour; the water
+	// pipeline (selected by water[0] > 0) layers the scrolling bumps + specular on top.
 	float white[4] = { 1.f, 1.f, 1.f, 1.f };
 	float purple[4] = { WATER_R, WATER_G, WATER_B, 0.6f };  // fallback if the bake fails
-	dev->addMeshSubmesh(s_handle, 0, nquads * 2 * 3, s_tex, s_tex ? white : purple, /*transparency*/2);
+	float water[3] = { 1.f, 0.f, 0.f };   // water[0]=1 flags the draw as water
+	dev->addMeshSubmesh(s_handle, 0, nquads * 2 * 3, s_tex, s_tex ? white : purple,
+	                    /*transparency*/2, /*light*/nullptr, water);
 	return true;
 }
 
@@ -218,6 +235,19 @@ void renderWaterSDL(Camera* camera)
 	}
 	Mat4f mvp = camera->matView * proj;
 	dev->setMeshTransform(s_handle, (const float*)&mvp);
+
+	// Per-frame water shading state for the dedicated water pipeline: the two wave
+	// textures, the world camera position (for the view-dependent specular glint), and
+	// the sun direction (matched to the terrain light). Scale maps world units into the
+	// tiling bump UV; scroll speed drifts the ripples; ripple/spec tune their strength.
+	const Vect3f& cp = camera->GetPos();
+	float camPos[3]   = { cp.x, cp.y, cp.z };
+	float lightDir[3] = { 0.35f, 0.45f, 0.82f };   // toward the sun (== TerrainRenderSDL)
+	// bumpScale 0.005 and scrollSpeed 0.03 match the original (Water.cpp: speed_scale=5e-3,
+	// offset = animate_time*0.03). Apparent drift = scroll/scale ~= 6 world units/sec.
+	dev->setWaterRenderState(s_bump0, s_bump1, camPos, lightDir,
+	                         /*bumpScale*/0.005f, /*scrollSpeed*/0.03f,
+	                         /*rippleStrength*/1.0f, /*specStrength*/0.25f);
 }
 
 #else  // _WIN32
