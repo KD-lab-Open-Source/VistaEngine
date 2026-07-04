@@ -8,6 +8,9 @@
 #include "Serialization/XPrmArchive.h"
 #include "Serialization/InPlaceArchive.h"
 #include "FileUtils/FileUtils.h"
+#ifndef _WIN32
+#include "MeshCacheGeometry.h"   // cross-platform spike: reconstruct from parsed cache
+#endif
 
 cStatic3dx::cStatic3dx(bool isLogic, const char* fname)
 : Static3dxBase(isLogic),
@@ -1718,6 +1721,68 @@ void cStatic3dx::StaticLod::initBuffersInPlace(const LodCache& cache, cStatic3dx
 		gb_RenderDevice->UnlockIndexBuffer(ib);
 	}
 }
+
+#ifndef _WIN32
+bool cStatic3dx::reconstructFromCacheGeometry(const MeshCacheGeometry::Geometry& geo)
+{
+	if(geo.lods.empty() || geo.lods[0].empty())
+		return false;
+
+	// The hand-parsed menu geometry is the base skin-vertex format (stride 36:
+	// position / blendindices / normal / uv). No bump / second-UV / fur.
+	bump = false;
+	isUV2 = false;
+	enableFur = false;
+
+	// Materials from the parsed .3dxG bunches (indexed by imaterial). We keep only
+	// what our SDL mesh pass reads: diffuse tint, opacity, blend, diffuse texture.
+	int maxMaterial = -1;
+	for(size_t i = 0; i < geo.submeshes.size(); ++i)
+		if(geo.submeshes[i].material > maxMaterial) maxMaterial = geo.submeshes[i].material;
+	materials.clear();
+	materials.resize(maxMaterial + 1);
+	for(size_t i = 0; i < geo.submeshes.size(); ++i){
+		const MeshCacheGeometry::SubMesh& sm = geo.submeshes[i];
+		StaticMaterial& mat = materials[sm.material];
+		mat.diffuse = Color4f(sm.diffuse[0], sm.diffuse[1], sm.diffuse[2], sm.diffuse[3]);
+		mat.opacity = sm.opacity;
+		mat.transparencyType = (StaticMaterial::TransparencyType)sm.transparency;
+		mat.tex_diffuse = sm.texture.c_str();   // already the resolved cache path
+	}
+
+	// Reconstruct lod 0: build the GPU buffers in place through the same portable
+	// path the InPlace loader uses (initBuffersInPlace -> gb_RenderDevice VB/IB).
+	lods.clear();
+	lods.resize(1);
+	StaticLod& lod = lods[0];
+	lod.blend_indices = 1;   // single bone -> GetBlendWeight()==0 -> base 36B format
+
+	const MeshCacheGeometry::Lod& glod = geo.lods[0];
+	LodCache cache;
+	cache.polygonNumber = glod.polygonNumber;
+	cache.vertexNumber  = glod.vertexNumber;
+	cache.vertexSize    = glod.vertexSize;
+	cache.vbBlock.alloc((int)glod.vertexData.size());
+	memcpy(cache.vbBlock.buffer(), glod.vertexData.data(), glod.vertexData.size());
+	cache.ibBlock.alloc((int)glod.indexData.size());
+	memcpy(cache.ibBlock.buffer(), glod.indexData.data(), glod.indexData.size());
+	lod.initBuffersInPlace(cache, this);
+
+	// Bunches (material ranges) from the parsed submeshes.
+	for(size_t i = 0; i < geo.submeshes.size(); ++i){
+		const MeshCacheGeometry::SubMesh& sm = geo.submeshes[i];
+		StaticBunch b;
+		b.offset_polygon = sm.firstIndex / 3;
+		b.num_polygon    = sm.indexCount / 3;
+		b.offset_vertex  = 0;
+		b.num_vertex     = glod.vertexNumber;
+		b.imaterial      = sm.material;
+		lod.bunches.push_back(b);
+	}
+
+	return lod.vb.IsInit() && lod.ib.IsInit();
+}
+#endif
 
 void cStatic3dx::serialize(Archive& ar)
 {

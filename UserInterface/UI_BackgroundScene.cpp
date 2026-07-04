@@ -151,55 +151,48 @@ void UI_BackgroundModel::load(cScene* scene, const UI_BackgroundModelSetup& setu
 	// path isn't ported yet — slice 3). Tolerate it so the 2D UI still renders.
 	if(!model_){
 #ifndef _WIN32
-		// Slice 3: the InPlace cStatic3dx is unportable, so recover the raw geometry
-		// from the baked .3dxGB cache and upload it straight to the SDL GPU device
-		// (drawn as a lit, auto-framed background mesh until the full 3dx path lands).
+		// Off-Windows the InPlace cStatic3dx cache is unportable, so CreateObject3dx
+		// returns null. Recover geometry + materials from the baked cache by hand
+		// (MeshCacheGeometry), then reconstruct a REAL cStatic3dx from those bytes
+		// (transcoding spike) and draw it from the object's own lods/bunches/materials
+		// through the SDL mesh pass. A correct reconstruction is pixel-identical to the
+		// former direct hand-parsed draw, so "menu looks the same" validates the spike.
 		MeshCacheGeometry::Geometry geo;
 		cSDLRenderDevice* dev = dynamic_cast<cSDLRenderDevice*>(gb_RenderDevice);
 		if(dev && MeshCacheGeometry::readForModel(setup.modelName(), geo) && !geo.lods.empty()){
-			const MeshCacheGeometry::Lod& lod = geo.lods[0];
-			if(!lod.empty()){
-				// Feed the recovered geometry through the real VB/IB interface: create
-				// the buffers, fill them via Lock/Unlock, then hand ownership to the
-				// device (registerMesh), which redraws them each frame through the real
-				// DrawIndexedPrimitive. Menu meshes are all sVertexXYZINT1 (stride 36).
-				sPtrVertexBuffer vb;
-				sPtrIndexBuffer  ib;
-				dev->CreateVertexBuffer(vb, lod.vertexNumber, sVertexXYZINT1::declaration, 0);
-				if(void* vp = dev->LockVertexBuffer(vb, false)){
-					memcpy(vp, lod.vertexData.data(), lod.vertexData.size());
-					dev->UnlockVertexBuffer(vb);
-				}
-				dev->CreateIndexBuffer(ib, lod.polygonNumber);   // size defaults to sizeof(sPolygon)
-				if(sPolygon* ip = dev->LockIndexBuffer(ib, false)){
-					memcpy(ip, lod.indexData.data(), lod.indexData.size());
-					dev->UnlockIndexBuffer(ib);
-				}
-				// registerMesh steals vb/ib's slot pointers (the locals free nothing).
-				meshHandle_ = dev->registerMesh(vb, ib);
-				// Per-material textured sub-draws (from the .3dxG object cache).
+			cStatic3dx* obj = new cStatic3dx(false, setup.modelName());
+			if(obj->reconstructFromCacheGeometry(geo)){
+				spikeStatic_ = obj;                       // owned; released in release()
+				cStatic3dx::StaticLod& lod = obj->lods[0];
+				// registerMesh shares the object's lod buffers (CopyAddRef); the object
+				// keeps ownership and the slot frees once when both refs are released.
+				meshHandle_ = dev->registerMesh(lod.vb, lod.ib);
 				if(meshHandle_ >= 0){
 					cTexLibrary* texLib = GetTexLibrary();
-					for(size_t i = 0; i < geo.submeshes.size(); ++i){
-						const MeshCacheGeometry::SubMesh& sm = geo.submeshes[i];
-						cTexture* tex = (texLib && !sm.texture.empty())
-						              ? texLib->GetElement3D(sm.texture.c_str()) : 0;
+					for(size_t i = 0; i < lod.bunches.size(); ++i){
+						const StaticBunch& b = lod.bunches[i];
+						if(b.imaterial < 0 || b.imaterial >= (int)obj->materials.size())
+							continue;
+						const StaticMaterial& mat = obj->materials[b.imaterial];
+						cTexture* tex = (texLib && !mat.tex_diffuse.empty())
+						              ? texLib->GetElement3D(mat.tex_diffuse.c_str()) : 0;
 						if(tex)
 							meshTextures_.push_back(tex);  // held until release()
-						// Match Node3DX::Draw material setup: the modulation color is
-						// lerp(WHITE, diffuse.rgb, diffuse.a) and the blend alpha is the
-						// separate material opacity (not diffuse.a). See Node3DX.cpp:711.
-						const float da = sm.diffuse[3];
+						// Node3DX::Draw material tint: lerp(WHITE, diffuse.rgb, diffuse.a);
+						// blend alpha = separate material opacity (not diffuse.a).
+						const float da = mat.diffuse.a;
 						float tint[4] = {
-							1.f*(1.f - da) + sm.diffuse[0]*da,
-							1.f*(1.f - da) + sm.diffuse[1]*da,
-							1.f*(1.f - da) + sm.diffuse[2]*da,
-							sm.opacity
+							1.f*(1.f - da) + mat.diffuse.r*da,
+							1.f*(1.f - da) + mat.diffuse.g*da,
+							1.f*(1.f - da) + mat.diffuse.b*da,
+							mat.opacity
 						};
-						dev->addMeshSubmesh(meshHandle_, sm.firstIndex, sm.indexCount, tex,
-						                    tint, sm.transparency);
+						dev->addMeshSubmesh(meshHandle_, b.offset_polygon*3, b.num_polygon*3,
+						                    tex, tint, (int)mat.transparencyType);
 					}
 				}
+			} else {
+				delete obj;
 			}
 		}
 #endif
@@ -247,6 +240,12 @@ void UI_BackgroundModel::release()
 		if(meshTextures_[i])
 			meshTextures_[i]->Release();
 	meshTextures_.clear();
+	if(spikeStatic_){
+		// Releases the object's reference to the lod buffers (releaseMesh above dropped
+		// the mesh pass's shared reference, so the slot frees here).
+		delete spikeStatic_;
+		spikeStatic_ = 0;
+	}
 #endif
 }
 

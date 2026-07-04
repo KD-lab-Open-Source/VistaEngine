@@ -28,6 +28,8 @@ struct StaticBunch
 };
 typedef vector<StaticBunch> StaticBunches;
 
+namespace MeshCacheGeometry { struct Geometry; }
+
 struct cSkinVertexSysMem
 {
 	Vect3f pos;
@@ -117,6 +119,14 @@ public:
 	void GetVBSize(int& vertex_count,int& vertex_size);
 
 	cSkinVertex GetSkinVertex(int num_weight){return cSkinVertex(num_weight,bump,isUV2,enableFur);}
+
+#ifndef _WIN32
+	// Cross-platform spike: reconstruct a static object from the hand-parsed
+	// InPlace-cache geometry (MeshCacheGeometry) instead of the 32-bit in-place
+	// cast — builds lods[0] via initBuffersInPlace plus materials/bunches, so a
+	// real cStatic3dx exists off-Windows. Returns false if the geometry is empty.
+	bool reconstructFromCacheGeometry(const MeshCacheGeometry::Geometry& geo);
+#endif
 
 private:
 	bool inPlace_;

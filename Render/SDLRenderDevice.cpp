@@ -102,6 +102,12 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND hWnd, int
 
 	createUIPipeline();
 	createMeshPipeline();
+
+	// Build the skinned-vertex declarations (on Windows cD3DRender does this at
+	// device init via CreateVertexDeclaration; cSkinVertex::Register is portable
+	// off-Windows). Needed so cStatic3dx buffers get a real vertex layout/stride.
+	static bool skinDeclRegistered = false;
+	if(!skinDeclRegistered){ cSkinVertex::Register(); skinDeclRegistered = true; }
 	return true;
 }
 
@@ -1143,10 +1149,11 @@ int cSDLRenderDevice::registerMesh(sPtrVertexBuffer& vb, sPtrIndexBuffer& ib)
 	if(!vb.IsInit() || !ib.IsInit()) return -1;
 
 	auto mm = std::make_unique<MenuMesh>();
-	// Take over the caller's single reference to each buffer (steal the slot
-	// pointers so the caller's dtors don't free them; MenuMesh now owns them).
-	mm->vb.ptr = vb.ptr;  vb.ptr = 0;
-	mm->ib.ptr = ib.ptr;  ib.ptr = 0;
+	// Share the caller's buffers by adding a reference (CopyAddRef bumps the slot's
+	// init count). The caller keeps its own reference, so a retained cStatic3dx can
+	// still own its lod.vb/.ib; the slot frees once when both refs are released.
+	mm->vb.CopyAddRef(vb);
+	mm->ib.CopyAddRef(ib);
 	mm->numVertex = mm->vb.GetNumberVertex();
 
 	// Bounding box from the float3 position @0 of each vertex (staging still holds
