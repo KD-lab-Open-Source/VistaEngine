@@ -54,10 +54,19 @@ ManagedResource::~ManagedResource() {}
 // sPtrVertexBuffer / sPtrIndexBuffer — lifetime routes through the interface
 // (mirrors the Windows D3DRender.cpp bodies), so the SDL backend owns the GPU
 // buffers behind the slot and releases them on Destroy/dtor.
+//
+// The gb_RenderDevice guard matters for handles with *static storage duration*
+// (e.g. TerrainRenderSDL.cpp's s_vb/s_ib): Runtime::done() releases the device
+// with RELEASE(gb_RenderDevice), which nulls the global, so by the time __cxa_
+// finalize runs these dtors at exit the device is already gone. cSDLRenderDevice::
+// Done() has by then released every GPU buffer and cleared vbGpu_/ibGpu_, so there
+// is nothing left to route -- skipping leaks only the tiny sSlot heap node, which
+// the process exit reclaims anyway. Without the guard the null-device virtual call
+// crashes in this dtor.
 // ---------------------------------------------------------------------------
 void sPtrVertexBuffer::Destroy()
 {
-	if(ptr)
+	if(ptr && gb_RenderDevice)
 		gb_RenderDevice->DeleteVertexBuffer(*this);
 	ptr = 0;
 }
@@ -70,7 +79,7 @@ void sPtrVertexBuffer::CopyAddRef(const sPtrVertexBuffer& from)
 
 sPtrIndexBuffer::~sPtrIndexBuffer()
 {
-	if(ptr)
+	if(ptr && gb_RenderDevice)
 		gb_RenderDevice->DeleteIndexBuffer(*this);
 	ptr = 0;
 }
