@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "CameraManager.h"
+#include "TerrainRenderSDL.h"
 #include "SoundApp.h"
 #include "GameShell.h"
 #include "Squad.h"
@@ -1098,6 +1099,11 @@ void GameShell::Show(float realGraphDT)
 
 			environment->drawPostEffects(realGraphDT, cameraManager->GetCamera());
 		}
+#ifndef _WIN32
+		// Base terrain: the D3D tilemap path above is null off-Windows, so draw the
+		// vMap heightfield directly through the SDL mesh pass (P2 slice 4).
+		renderTerrainSDL(cameraManager->GetCamera());
+#endif
 		
 		gb_RenderDevice->SetRenderState(RS_FILLMODE, FILL_SOLID);
 

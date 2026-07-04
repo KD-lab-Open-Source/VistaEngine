@@ -14,6 +14,7 @@
 
 #include <string>
 #include <dirent.h>
+#include <fnmatch.h>
 #include <libgen.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -210,45 +211,63 @@ void _splitpath(const char* path, char* drive, char* dir, char* fname, char* ext
                  strncpy(ext, dot ? dot : "", _MAX_EXT-1); ext[_MAX_EXT-1]='\0'; }
 }
 
+// Advance ctx->dir to the next entry matching ctx->pattern, filling `fd`. The Win32
+// wildcard is honoured (case-insensitive, matching the Windows FS): the original shim
+// discarded the mask and returned every entry with size 0. That broke callers that
+// filter by extension (DirIterator's "*.tga" etc.) and, worse, callers that gate on
+// nFileSizeLow -- MissionDescriptions::readFromDir skips any entry with size 0, so the
+// scenario mission list came back empty off-Windows (no campaign missions -> the
+// mission-select screen has nothing to select -> the Start button never appears).
+// "", "*" and "*.*" mean "everything" (classic Win32 semantics, incl. extensionless).
+static bool findNextMatch(_FindContext* ctx, WIN32_FIND_DATAA* fd) {
+    const bool matchAll = !ctx->pattern[0] ||
+                          !strcmp(ctx->pattern, "*") || !strcmp(ctx->pattern, "*.*");
+    struct dirent* ent;
+    while ((ent = readdir(ctx->dir)) != nullptr) {
+        if (ent->d_name[0] == '.') continue;   // skip ".", "..", dotfiles (as before)
+        if (!matchAll && fnmatch(ctx->pattern, ent->d_name, FNM_CASEFOLD) != 0) continue;
+        strncpy(fd->cFileName, ent->d_name, MAX_PATH-1); fd->cFileName[MAX_PATH-1] = '\0';
+        fd->dwFileAttributes = (ent->d_type == DT_DIR) ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL;
+        fd->nFileSizeHigh = fd->nFileSizeLow = 0;
+        // Report the real size so nFileSizeLow-gated callers (readFromDir) accept it.
+        std::string full = std::string(ctx->path) + "/" + ent->d_name;
+        struct stat st;
+        if (stat(full.c_str(), &st) == 0) {
+            fd->nFileSizeLow  = (DWORD)(st.st_size & 0xffffffff);
+            fd->nFileSizeHigh = (DWORD)(st.st_size >> 32);
+            if (S_ISDIR(st.st_mode)) fd->dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
+        }
+        return true;
+    }
+    return false;
+}
+
 HANDLE FindFirstFileA(const char* rawPattern, WIN32_FIND_DATAA* fd) {
     // Windows returns INVALID_HANDLE_VALUE for an empty pattern; callers rely on
     // this (e.g. DirIterator's default-constructed `end` sentinel passes "").
-    // Don't fall through to the no-slash "current directory" branch below, which
-    // would open "." and hand back a valid handle, breaking such sentinels.
     if (!rawPattern || !*rawPattern) return INVALID_HANDLE_VALUE;
     std::string pattern_s = NormalizePath(rawPattern);
-    const char* pattern = pattern_s.c_str();
-    if (!*pattern) return INVALID_HANDLE_VALUE;
-    char dir_path[MAX_PATH]; strncpy(dir_path, pattern, MAX_PATH-1);
-    char* slash = strrchr(dir_path, '/'); if (!slash) slash = strrchr(dir_path, '\\');
-    if (slash) *slash = '\0'; else { dir_path[0]='.'; dir_path[1]='\0'; }
-    DIR* d = opendir(dir_path);
+    if (pattern_s.empty()) return INVALID_HANDLE_VALUE;
+
+    // Split "<dir>/<mask>" at the last separator; no separator => current dir.
+    std::string dir_s, mask_s;
+    size_t sl = pattern_s.find_last_of("/\\");
+    if (sl == std::string::npos) { dir_s = "."; mask_s = pattern_s; }
+    else { dir_s = pattern_s.substr(0, sl); if (dir_s.empty()) dir_s = "/"; mask_s = pattern_s.substr(sl + 1); }
+
+    DIR* d = opendir(dir_s.c_str());
     if (!d) return INVALID_HANDLE_VALUE;
     auto* ctx = new _FindContext; ctx->dir = d;
-    strncpy(ctx->path, dir_path, MAX_PATH-1);
-    struct dirent* ent;
-    while ((ent = readdir(d)) != nullptr) {
-        if (ent->d_name[0] == '.') continue;
-        strncpy(fd->cFileName, ent->d_name, MAX_PATH-1);
-        fd->dwFileAttributes = (ent->d_type == DT_DIR) ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL;
-        fd->nFileSizeHigh = fd->nFileSizeLow = 0;
-        return (HANDLE)ctx;
-    }
+    strncpy(ctx->path, dir_s.c_str(), MAX_PATH-1);     ctx->path[MAX_PATH-1] = '\0';
+    strncpy(ctx->pattern, mask_s.c_str(), MAX_PATH-1); ctx->pattern[MAX_PATH-1] = '\0';
+
+    if (findNextMatch(ctx, fd)) return (HANDLE)ctx;
     closedir(d); delete ctx; return INVALID_HANDLE_VALUE;
 }
 
 BOOL FindNextFileA(HANDLE h, WIN32_FIND_DATAA* fd) {
     if (h == INVALID_HANDLE_VALUE) return FALSE;
-    auto* ctx = (_FindContext*)h;
-    struct dirent* ent;
-    while ((ent = readdir(ctx->dir)) != nullptr) {
-        if (ent->d_name[0] == '.') continue;
-        strncpy(fd->cFileName, ent->d_name, MAX_PATH-1);
-        fd->dwFileAttributes = (ent->d_type == DT_DIR) ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL;
-        fd->nFileSizeHigh = fd->nFileSizeLow = 0;
-        return TRUE;
-    }
-    return FALSE;
+    return findNextMatch((_FindContext*)h, fd) ? TRUE : FALSE;
 }
 
 BOOL FindCloseHandle(HANDLE h) {
