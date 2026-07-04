@@ -123,7 +123,15 @@ bool buildTerrainMesh(cSDLRenderDevice* dev)
 	s_tex = buildTerrainTexture(dev, H, V);
 	float white[4] = { 1.f, 1.f, 1.f, 1.f };
 	float earth[4] = { 0.55f, 0.40f, 0.22f, 1.f };
-	dev->addMeshSubmesh(s_handle, 0, pcount * 3, s_tex, s_tex ? white : earth, /*transparency*/2);
+
+	// Directional relief lighting: the per-vertex normal (vMap.getNormal, world
+	// space) is already flowing to the fragment shader; feed it a light so slopes
+	// shade and the heightfield reads as 3D instead of a flat colour field. dir is
+	// *toward* the light — a high sun slanted from the NW; strength 0.45 keeps a
+	// 0.55 ambient floor so the baked surface colour is modulated, not crushed.
+	Vect3f L(0.35f, 0.45f, 0.82f); L.normalize();
+	float light[4] = { L.x, L.y, L.z, 0.45f };
+	dev->addMeshSubmesh(s_handle, 0, pcount * 3, s_tex, s_tex ? white : earth, /*transparency*/2, light);
 	return true;
 }
 

@@ -63,9 +63,12 @@ public:
 	int  registerMesh(sPtrVertexBuffer& vb, sPtrIndexBuffer& ib);
 	// Append a textured sub-range (firstIndex/indexCount into the mesh's index
 	// buffer). tint = material diffuse rgba (rgb color, a opacity); transparency
-	// selects the blend pipeline (0=substractive, 1=additive, 2=filter).
+	// selects the blend pipeline (0=substractive, 1=additive, 2=filter). light =
+	// 4 floats {dir.xyz toward the light (world space), strength}; null or w==0
+	// leaves the draw unlit/full-bright (menu default), w>0 adds relief lighting.
 	void addMeshSubmesh(int handle, int firstIndex, int indexCount, cTexture* tex,
-	                    const float* tint = nullptr, int transparency = 2);
+	                    const float* tint = nullptr, int transparency = 2,
+	                    const float* light = nullptr);
 	// Supply the model-view-projection matrix (16 floats, row-major, row-vector
 	// v*M, D3D clip convention) for the mesh. Replaces the built-in auto-frame.
 	void setMeshTransform(int handle, const float* mvp16);
@@ -218,6 +221,7 @@ private:
 		int baseVertex; int startIndex; int indexCount;
 		float mvp[16];
 		SDL_GPUTexture* tex; float tint[4]; int transparency;
+		float light[4];   // xyz = dir toward light, w = strength (0 = unlit)
 	};
 	std::vector<MeshDraw> meshDraws_;
 	// "Current" material/transform state that DrawIndexedPrimitive snapshots into
@@ -226,6 +230,7 @@ private:
 	SDL_GPUTexture* curMeshTexture_ = nullptr;
 	float           curMeshTint_[4] = {1,1,1,1};
 	int             curMeshTransparency_ = 2;
+	float           curMeshLight_[4] = {0,0,0,0};   // xyz dir, w strength (0 = unlit)
 	void flushMeshDraws(SDL_GPURenderPass* pass);   // replay meshDraws_ in the pass
 
 	// Retained menu-background meshes: they own the real VB/IB (held indirectly so
@@ -235,6 +240,7 @@ private:
 		int firstIndex; int indexCount; SDL_GPUTexture* tex;
 		float tint[4];      // material diffuse rgba (rgb color, a opacity)
 		int transparency;   // 0=substractive, 1=additive, 2=filter
+		float light[4];     // xyz = dir toward light, w = strength (0 = unlit)
 	};
 	struct MenuMesh {
 		sPtrVertexBuffer vb; sPtrIndexBuffer ib;   // own one reference to the buffers

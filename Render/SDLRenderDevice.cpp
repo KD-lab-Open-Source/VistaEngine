@@ -1138,6 +1138,7 @@ void cSDLRenderDevice::DrawIndexedPrimitive(sPtrVertexBuffer& vb, int OfsVertex,
 	d.tex = curMeshTexture_;
 	std::memcpy(d.tint, curMeshTint_, sizeof(d.tint));
 	d.transparency = curMeshTransparency_;
+	std::memcpy(d.light, curMeshLight_, sizeof(d.light));
 	meshDraws_.push_back(d);
 
 	*PtrNumberPolygon += nPolygon;
@@ -1185,14 +1186,16 @@ int cSDLRenderDevice::registerMesh(sPtrVertexBuffer& vb, sPtrIndexBuffer& ib)
 }
 
 void cSDLRenderDevice::addMeshSubmesh(int handle, int firstIndex, int indexCount, cTexture* tex,
-                                      const float* tint, int transparency)
+                                      const float* tint, int transparency, const float* light)
 {
 	if(handle < 0 || handle >= (int)menuMeshes_.size() || !menuMeshes_[handle] || indexCount <= 0)
 		return;
 	MenuMesh& m = *menuMeshes_[handle];
-	SubDraw sd{ firstIndex, indexCount, sdlTextureOf(tex), {1,1,1,1}, transparency };
+	SubDraw sd{ firstIndex, indexCount, sdlTextureOf(tex), {1,1,1,1}, transparency, {0,0,0,0} };
 	if(tint)
 		for(int i = 0; i < 4; ++i) sd.tint[i] = tint[i];
+	if(light)
+		for(int i = 0; i < 4; ++i) sd.light[i] = light[i];
 	m.subdraws.push_back(sd);
 }
 
@@ -1251,6 +1254,7 @@ void cSDLRenderDevice::recordMenuMeshes()
 			curMeshTexture_ = nullptr;
 			curMeshTint_[0] = curMeshTint_[1] = curMeshTint_[2] = curMeshTint_[3] = 1.f;
 			curMeshTransparency_ = 2;
+			curMeshLight_[0] = curMeshLight_[1] = curMeshLight_[2] = curMeshLight_[3] = 0.f;
 			DrawIndexedPrimitive(m.vb, 0, m.numVertex, m.ib, 0, m.ib.GetNumberPolygon());
 		} else {
 			// One draw per material range: firstIndex/indexCount are index counts,
@@ -1259,6 +1263,7 @@ void cSDLRenderDevice::recordMenuMeshes()
 				curMeshTexture_ = sd.tex;
 				std::memcpy(curMeshTint_, sd.tint, sizeof(curMeshTint_));
 				curMeshTransparency_ = sd.transparency;
+				std::memcpy(curMeshLight_, sd.light, sizeof(curMeshLight_));
 				DrawIndexedPrimitive(m.vb, 0, m.numVertex, m.ib,
 				                     sd.firstIndex / 3, sd.indexCount / 3);
 			}
@@ -1278,7 +1283,10 @@ void cSDLRenderDevice::flushMeshDraws(SDL_GPURenderPass* pass)
 		if(want != boundPipeline){ SDL_BindGPUGraphicsPipeline(pass, want); boundPipeline = want; }
 
 		SDL_PushGPUVertexUniformData(commandBuffer_, 0, d.mvp, sizeof(d.mvp));
-		SDL_PushGPUFragmentUniformData(commandBuffer_, 0, d.tint, sizeof(d.tint));
+		// Fragment cbuffer layout: float4 Tint; float4 Light; (see mesh3d.frag.hlsl).
+		float frag[8] = { d.tint[0], d.tint[1], d.tint[2], d.tint[3],
+		                  d.light[0], d.light[1], d.light[2], d.light[3] };
+		SDL_PushGPUFragmentUniformData(commandBuffer_, 0, frag, sizeof(frag));
 
 		SDL_GPUBufferBinding vbb = {}; vbb.buffer = d.vbuf; vbb.offset = 0;
 		SDL_BindGPUVertexBuffers(pass, 0, &vbb, 1);
