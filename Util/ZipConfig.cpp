@@ -40,8 +40,19 @@ bool ZipConfig::initArchives()
 {
 	ZipConfigTable::Strings::const_iterator it;
 	for(it = ZipConfigTable::instance().strings().begin(); it != ZipConfigTable::instance().strings().end(); ++it){
-		if(!it->isEmpty())
-			XZipArchiveManager::instance().openArchive(it->zipName());
+		if(!it->isEmpty()){
+			// minizip (ioapi.c) opens the .pak with a raw fopen(). Off-Windows the
+			// config's "Resource\\worlds.pak" won't open: '\' is a literal filename
+			// character (not a separator) and component case may differ from disk, so
+			// the archive never mounts -- taking every pak-resident asset with it
+			// (world raster caches, models, textures, sounds). NormalizePath rewrites
+			// the path to its real POSIX spelling (separators + per-component case).
+			string zipName = it->zipName();
+#ifndef _WIN32
+			zipName = NormalizePath(zipName.c_str());
+#endif
+			XZipArchiveManager::instance().openArchive(zipName.c_str());
+		}
 	}
 
 	return true;
