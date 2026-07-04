@@ -7,6 +7,7 @@ add_library(UserInterface STATIC
     ReelManager.cpp
     SelectManager.cpp
     TerrainRenderSDL.cpp
+    WaterRenderSDL.cpp
     UI_Actions.cpp
     UI_BackgroundScene.cpp
     UI_Controls.cpp
