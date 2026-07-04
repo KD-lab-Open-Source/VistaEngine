@@ -302,8 +302,8 @@ cObject3dx::cObject3dx(cStatic3dx* pStatic_, bool interpolate)
 			pStatic->boundRadius=pStatic->boundBox.max.distance(pStatic->boundBox.min)*0.5f;
 	}
 
-	if(!pStatic->is_logic && !pStatic->voxelBox.valid())
-		pStatic->voxelBox.create(this);
+	if(gb_RenderDevice3D && !pStatic->is_logic && !pStatic->voxelBox.valid())
+		pStatic->voxelBox.create(this);   // voxel collision: skip on the SDL backend
 
 	silouette_center = pStatic->boundBox.center();
 

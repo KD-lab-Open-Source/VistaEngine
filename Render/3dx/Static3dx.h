@@ -126,6 +126,9 @@ public:
 	// cast — builds lods[0] via initBuffersInPlace plus materials/bunches, so a
 	// real cStatic3dx exists off-Windows. Returns false if the geometry is empty.
 	bool reconstructFromCacheGeometry(const MeshCacheGeometry::Geometry& geo);
+	// Portable transcoding-loader entry: read the model's cache (.3dxG/.3dxGB) and
+	// reconstruct this object from those bytes. Used by cLib3dx::GetElement.
+	bool reconstructFromCache(const char* modelName);
 #endif
 
 private:

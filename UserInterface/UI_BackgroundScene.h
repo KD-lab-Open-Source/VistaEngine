@@ -175,10 +175,7 @@ private:
 	// Slice 3 (off-Windows): when CreateObject3dx fails, we fall back to drawing the
 	// raw .3dxGB geometry through the SDL GPU device directly. -1 == no fallback mesh.
 	int meshHandle_;
-	std::vector<cTexture*> meshTextures_;   // diffuse textures held for the fallback mesh
-	// Spike (off-Windows): a real cStatic3dx reconstructed from the parsed cache
-	// bytes, whose lod buffers feed the mesh pass. Owned here; released in release().
-	class cStatic3dx* spikeStatic_ = nullptr;
+	std::vector<cTexture*> meshTextures_;   // diffuse textures held for the mesh-pass draw
 	UI_BackgroundAnimationControllers animations_;
 
 	typedef SwapVector<UI_EffectControllerAttachable3D> Effects;

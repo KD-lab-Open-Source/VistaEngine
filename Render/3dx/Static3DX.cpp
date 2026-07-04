@@ -1766,7 +1766,12 @@ bool cStatic3dx::reconstructFromCacheGeometry(const MeshCacheGeometry::Geometry&
 	memcpy(cache.vbBlock.buffer(), glod.vertexData.data(), glod.vertexData.size());
 	cache.ibBlock.alloc((int)glod.indexData.size());
 	memcpy(cache.ibBlock.buffer(), glod.indexData.data(), glod.indexData.size());
-	lod.initBuffersInPlace(cache, this);
+	// Only the base skin-vertex format (stride 36 == GetSkinVertex(0)) matches our
+	// SDL mesh pipeline; build GPU buffers only for it. Richer formats (skinned/bump/
+	// uv2) would trip initBuffersInPlace's stride assert, so leave them unbuilt and
+	// let the caller fall through (object not loaded) rather than crash.
+	if(glod.vertexSize == 36)
+		lod.initBuffersInPlace(cache, this);
 
 	// Bunches (material ranges) from the parsed submeshes.
 	for(size_t i = 0; i < geo.submeshes.size(); ++i){
@@ -1780,7 +1785,62 @@ bool cStatic3dx::reconstructFromCacheGeometry(const MeshCacheGeometry::Geometry&
 		lod.bunches.push_back(b);
 	}
 
+	// Minimal skeleton: one identity root node. The cache VB is already in model
+	// space (a single MVP renders it correctly), so no per-node transforms are
+	// needed — cObject3dx just needs a non-empty node list to construct.
+	nodes.clear();
+	StaticNode node;
+	node.name = "_root_";
+	node.inode = 0;
+	node.iparent = -1;
+	node.inv_begin_pos = MatXf::ID;
+	nodes.push_back(node);
+
+	// Bounds from lod0 positions (float3 @0), so cObject3dx skips CalcBoundingBox.
+	if(glod.vertexNumber > 0){
+		const uint8_t* p = glod.vertexData.data();
+		Vect3f lo, hi;
+		memcpy(&lo, p, sizeof(Vect3f));
+		hi = lo;
+		for(int i = 1; i < glod.vertexNumber; ++i){
+			Vect3f v;
+			memcpy(&v, p + (size_t)i * glod.vertexSize, sizeof(Vect3f));
+			lo.x = min(lo.x, v.x); lo.y = min(lo.y, v.y); lo.z = min(lo.z, v.z);
+			hi.x = max(hi.x, v.x); hi.y = max(hi.y, v.y); hi.z = max(hi.z, v.z);
+		}
+		boundBox.min = lo;
+		boundBox.max = hi;
+	}
+	boundRadius = boundBox.max.distance(boundBox.min) * 0.5f;
+	isBoundBoxInited = true;
+
+	// Minimal animation so consumers that dereference GetChain(0)/GetAnimationGroup
+	// (e.g. cSkyObj::SetSkyModel) don't index an empty vector. There is no real
+	// animation off-Windows — a single static "main" group + chain.
+	animationChains_.clear();
+	StaticAnimationChain chain;
+	chain.name = "main";
+	chain.time = 0.f;
+	chain.begin_frame = 0;
+	chain.end_frame = 0;
+	chain.cycled = false;
+	animationChains_.push_back(chain);
+
+	animationGroups_.clear();
+	AnimationGroup ag;
+	ag.name = "main";
+	ag.nodes.push_back(0);
+	animationGroups_.push_back(ag);
+
 	return lod.vb.IsInit() && lod.ib.IsInit();
+}
+
+bool cStatic3dx::reconstructFromCache(const char* modelName)
+{
+	MeshCacheGeometry::Geometry geo;
+	if(!MeshCacheGeometry::readForModel(modelName, geo) || geo.lods.empty())
+		return false;
+	return reconstructFromCacheGeometry(geo);
 }
 #endif
 

@@ -9,10 +9,9 @@
 #include "Render/src/Scene.h"
 #include "Render/src/cCamera.h"
 #include "Render/3dx/Node3dx.h"
-#include "Render/3dx/MeshCacheGeometry.h"
 #include "Render/src/VisGeneric.h"
 #ifndef _WIN32
-#include "Render/SDLRenderDevice.h"   // slice-3 fallback: draw raw .3dxGB geometry
+#include "Render/SDLRenderDevice.h"   // draw the reconstructed model via the mesh pass
 #include "TexLibrary.h"               // GetTexLibrary()->GetElement3D for submesh textures
 #endif
 
@@ -146,58 +145,13 @@ void UI_BackgroundModel::load(cScene* scene, const UI_BackgroundModelSetup& setu
 	if(setup.isEmpty())
 		return;
 
+	// Off-Windows the model is reconstructed from the cache bytes by the transcoding
+	// loader (cLib3dx::GetElement -> cStatic3dx::reconstructFromCache), so this now
+	// returns a real object for the base-format models it can rebuild; null otherwise.
 	model_ = scene->CreateObject3dx(setup.modelName(), NULL);
-	// CreateObject3dx can return null (e.g. off-Windows the 3DX mesh/GPU-buffer
-	// path isn't ported yet — slice 3). Tolerate it so the 2D UI still renders.
-	if(!model_){
-#ifndef _WIN32
-		// Off-Windows the InPlace cStatic3dx cache is unportable, so CreateObject3dx
-		// returns null. Recover geometry + materials from the baked cache by hand
-		// (MeshCacheGeometry), then reconstruct a REAL cStatic3dx from those bytes
-		// (transcoding spike) and draw it from the object's own lods/bunches/materials
-		// through the SDL mesh pass. A correct reconstruction is pixel-identical to the
-		// former direct hand-parsed draw, so "menu looks the same" validates the spike.
-		MeshCacheGeometry::Geometry geo;
-		cSDLRenderDevice* dev = dynamic_cast<cSDLRenderDevice*>(gb_RenderDevice);
-		if(dev && MeshCacheGeometry::readForModel(setup.modelName(), geo) && !geo.lods.empty()){
-			cStatic3dx* obj = new cStatic3dx(false, setup.modelName());
-			if(obj->reconstructFromCacheGeometry(geo)){
-				spikeStatic_ = obj;                       // owned; released in release()
-				cStatic3dx::StaticLod& lod = obj->lods[0];
-				// registerMesh shares the object's lod buffers (CopyAddRef); the object
-				// keeps ownership and the slot frees once when both refs are released.
-				meshHandle_ = dev->registerMesh(lod.vb, lod.ib);
-				if(meshHandle_ >= 0){
-					cTexLibrary* texLib = GetTexLibrary();
-					for(size_t i = 0; i < lod.bunches.size(); ++i){
-						const StaticBunch& b = lod.bunches[i];
-						if(b.imaterial < 0 || b.imaterial >= (int)obj->materials.size())
-							continue;
-						const StaticMaterial& mat = obj->materials[b.imaterial];
-						cTexture* tex = (texLib && !mat.tex_diffuse.empty())
-						              ? texLib->GetElement3D(mat.tex_diffuse.c_str()) : 0;
-						if(tex)
-							meshTextures_.push_back(tex);  // held until release()
-						// Node3DX::Draw material tint: lerp(WHITE, diffuse.rgb, diffuse.a);
-						// blend alpha = separate material opacity (not diffuse.a).
-						const float da = mat.diffuse.a;
-						float tint[4] = {
-							1.f*(1.f - da) + mat.diffuse.r*da,
-							1.f*(1.f - da) + mat.diffuse.g*da,
-							1.f*(1.f - da) + mat.diffuse.b*da,
-							mat.opacity
-						};
-						dev->addMeshSubmesh(meshHandle_, b.offset_polygon*3, b.num_polygon*3,
-						                    tex, tint, (int)mat.transparencyType);
-					}
-				}
-			} else {
-				delete obj;
-			}
-		}
-#endif
-		return;
-	}
+	if(!model_)
+		return;   // no cache / unbuildable format — leave the 3D background empty
+
 	model_->DisableDetailLevel();
 	if(player){
 		Color4f color(setup.ownSkinColor() ? setup.skinColor() : player->unitColor());
@@ -206,6 +160,43 @@ void UI_BackgroundModel::load(cScene* scene, const UI_BackgroundModelSetup& setu
 	else
 		model_->SetSkinColor(setup.skinColor(), 0);
 
+#ifndef _WIN32
+	// The model's normal draw path is cScene::Draw — the unportable D3D shadow/
+	// reflection pipeline — so draw the loaded model's geometry through the SDL mesh
+	// pass instead: register lod0's buffers and per-material sub-draws straight from
+	// the object's own lods/bunches/materials.
+	if(cSDLRenderDevice* dev = dynamic_cast<cSDLRenderDevice*>(gb_RenderDevice)){
+		cStatic3dx* stat = model_->GetStatic();
+		if(stat && !stat->lods.empty() && stat->lods[0].vb.IsInit()){
+			cStatic3dx::StaticLod& lod = stat->lods[0];
+			meshHandle_ = dev->registerMesh(lod.vb, lod.ib);  // shares via CopyAddRef
+			if(meshHandle_ >= 0){
+				cTexLibrary* texLib = GetTexLibrary();
+				for(size_t i = 0; i < lod.bunches.size(); ++i){
+					const StaticBunch& b = lod.bunches[i];
+					if(b.imaterial < 0 || b.imaterial >= (int)stat->materials.size())
+						continue;
+					const StaticMaterial& mat = stat->materials[b.imaterial];
+					cTexture* tex = (texLib && !mat.tex_diffuse.empty())
+					              ? texLib->GetElement3D(mat.tex_diffuse.c_str()) : 0;
+					if(tex)
+						meshTextures_.push_back(tex);  // held until release()
+					// Node3DX::Draw material tint: lerp(WHITE, diffuse.rgb, diffuse.a);
+					// blend alpha = separate material opacity (not diffuse.a).
+					const float da = mat.diffuse.a;
+					float tint[4] = {
+						1.f*(1.f - da) + mat.diffuse.r*da,
+						1.f*(1.f - da) + mat.diffuse.g*da,
+						1.f*(1.f - da) + mat.diffuse.b*da,
+						mat.opacity
+					};
+					dev->addMeshSubmesh(meshHandle_, b.offset_polygon*3, b.num_polygon*3,
+					                    tex, tint, (int)mat.transparencyType);
+				}
+			}
+		}
+	}
+#endif
 }
 
 void UI_BackgroundModel::release()
@@ -240,12 +231,6 @@ void UI_BackgroundModel::release()
 		if(meshTextures_[i])
 			meshTextures_[i]->Release();
 	meshTextures_.clear();
-	if(spikeStatic_){
-		// Releases the object's reference to the lod buffers (releaseMesh above dropped
-		// the mesh pass's shared reference, so the slot frees here).
-		delete spikeStatic_;
-		spikeStatic_ = 0;
-	}
 #endif
 }
 

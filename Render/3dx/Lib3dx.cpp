@@ -184,6 +184,18 @@ cStatic3dx* cLib3dx::GetElement(const char* fname_,const char* TexturePath,bool 
 		dprintf("Load %s\n",fname.c_str());
 
 	cStatic3dx* pStatic = new cStatic3dx(is_logic, fname.c_str());
+
+#ifndef _WIN32
+	// Off-Windows the 32-bit InPlace cache loader can't run and there are no portable
+	// .3dx originals, so transcode the cache bytes (.3dxG/.3dxGB) into a real object.
+	// Mesh objects only (logic objects carry no graphics mesh — fall through).
+	if(!is_logic && pStatic->reconstructFromCache(fname.c_str())){
+		obj_map.push_back(pStatic);
+		pStatic->AddRef();
+		return pStatic;
+	}
+#endif
+
 	if(!Option_UseMeshCache || !LoadCache(pStatic)){
 		if(!pStatic->load(fname.c_str())){
 			if(!is_logic)
