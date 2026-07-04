@@ -10,6 +10,8 @@
 #include "Render/3dx/umath.h"           // sPolygon
 #include "Render/src/cCamera.h"         // Camera::matViewProj
 #include "Render/SDLRenderDevice.h"     // mesh-pass API
+#include "Render/src/TexLibrary.h"      // GetTexLibrary() -> blank BGRA cTexture
+#include "Render/src/Texture.h"         // cTexture (Lock/Unlock via device, Release)
 
 #include <string>
 
@@ -25,8 +27,34 @@ namespace {
 sPtrVertexBuffer s_vb;
 sPtrIndexBuffer  s_ib;
 int              s_handle = -1;
+cTexture*        s_tex = nullptr;    // baked per-cell surface colour (vMap.clrBuf)
 bool             s_failed = false;   // build attempted and failed -> stop retrying
 std::string      s_builtWorld;       // vMap world the current mesh was built for
+
+// Bake the terrain's per-fine-cell surface colour into one BGRA texture spanning
+// the whole map. The colour is stored per cell in vMap.clrBuf (RGB565), the same
+// data the D3D tile renderer paints its tiles from; getTileColor32Layer expands it
+// via getColor32() to ARGB DWORDs (0xAARRGGBB == B,G,R,A bytes in memory == exactly
+// the device's BGRA staging order), so the surface colour lands correctly. The grid
+// is downsampled so the texture stays <= MAX_TEX on a side: maps up to 2048 keep
+// full per-cell resolution, larger maps are averaged down (the sampler interpolates).
+cTexture* buildTerrainTexture(cSDLRenderDevice* dev, int H, int V)
+{
+	const int MAX_TEX = 2048;
+	int step = 1;
+	while((H / step) > MAX_TEX || (V / step) > MAX_TEX) step *= 2;
+	const int tw = H / step, th = V / step;
+
+	cTexture* tex = GetTexLibrary()->CreateTexture(tw, th, /*alpha*/false);
+	if(!tex) return nullptr;
+
+	int pitch = 0;
+	void* px = dev->LockTexture(tex, pitch);   // staging is tightly packed (pitch == tw*4)
+	if(!px){ tex->Release(); return nullptr; }
+	vMap.getTileColor32Layer((unsigned char*)px, pitch, 0, 0, H, V, step);
+	dev->UnlockTexture(tex);                    // staging -> GPU (own copy pass)
+	return tex;
+}
 
 // Sample every STEP_BASE fine cells (512/4 = 128 quads/axis -> 129x129 = 16641 verts
 // on the Menu). The step is doubled as needed below so the vertex count stays under
@@ -66,7 +94,8 @@ bool buildTerrainMesh(cSDLRenderDevice* dev)
 			v.index[0] = v.index[1] = v.index[2] = v.index[3] = 0; // BLENDINDICES unused by the shader
 			Vect3f nrm; vMap.getNormal(x, y, nrm);
 			v.n = nrm;
-			v.uv[0] = 0.f; v.uv[1] = 0.f;                          // untextured (white) fill
+			v.uv[0] = (float)x / (float)H;                         // fine cell -> [0,1) across the
+			v.uv[1] = (float)y / (float)V;                         // baked surface-colour texture
 		}
 	}
 	dev->UnlockVertexBuffer(s_vb);
@@ -86,11 +115,15 @@ bool buildTerrainMesh(cSDLRenderDevice* dev)
 	s_handle = dev->registerMesh(s_vb, s_ib);   // shares the buffers via CopyAddRef
 	if(s_handle < 0){ dev->DeleteVertexBuffer(s_vb); dev->DeleteIndexBuffer(s_ib); return false; }
 
-	// Opaque warm-earth fill so terrain reads clearly against the cyan/teal menu art.
-	// transparency 2 == the alpha-over (filter) pipeline; null texture -> white, so
-	// the fragment output is just Tint.rgb (Tint.a == 1 -> fully opaque).
-	float tint[4] = { 0.55f, 0.40f, 0.22f, 1.f };
-	dev->addMeshSubmesh(s_handle, 0, pcount * 3, /*tex*/0, tint, /*transparency*/2);
+	// Base surface colour from vMap.clrBuf. A white tint passes the sampled colour
+	// through unchanged (shader out = tex.rgb * Tint.rgb * Tint.a); the texels are
+	// opaque (a==1), so with the filter pipeline (transparency 2, ONE/1-SRC_ALPHA)
+	// terrain fully replaces the backdrop. If the colour bake fails, fall back to the
+	// flat warm-earth tint (null texture -> white -> Tint.rgb).
+	s_tex = buildTerrainTexture(dev, H, V);
+	float white[4] = { 1.f, 1.f, 1.f, 1.f };
+	float earth[4] = { 0.55f, 0.40f, 0.22f, 1.f };
+	dev->addMeshSubmesh(s_handle, 0, pcount * 3, s_tex, s_tex ? white : earth, /*transparency*/2);
 	return true;
 }
 
@@ -111,6 +144,7 @@ void renderTerrainSDL(Camera* camera)
 		dev->releaseMesh(s_handle);          // drop the device's buffer reference
 		dev->DeleteVertexBuffer(s_vb);        // drop ours -> SDL buffers freed
 		dev->DeleteIndexBuffer(s_ib);
+		if(s_tex){ s_tex->Release(); s_tex = nullptr; }  // ~cTexture -> DeleteTexture
 		s_handle = -1;
 		s_failed = false;
 	}
