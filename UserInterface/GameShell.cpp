@@ -2,6 +2,7 @@
 #include "CameraManager.h"
 #include "TerrainRenderSDL.h"
 #include "WaterRenderSDL.h"
+#include "CoastFoamRenderSDL.h"
 #include "SoundApp.h"
 #include "GameShell.h"
 #include "Squad.h"
@@ -1107,6 +1108,9 @@ void GameShell::Show(float realGraphDT)
 		// Water surface: cWater::Draw (D3D shaders) is likewise null/unreached off-
 		// Windows; draw the water height field over the terrain through the same pass.
 		renderWaterSDL(cameraManager->GetCamera());
+		// Shoreline foam: cCoastSprites::Draw (D3D quad buffer) is dead off-Windows, so
+		// drive the real particle sim and draw its sprites on the water surface.
+		renderCoastFoamSDL(cameraManager->GetCamera(), realGraphDT);
 #endif
 		
 		gb_RenderDevice->SetRenderState(RS_FILLMODE, FILL_SOLID);

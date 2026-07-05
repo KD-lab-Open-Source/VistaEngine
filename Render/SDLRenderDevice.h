@@ -288,6 +288,37 @@ private:
 	SDL_GPUTexture* waterBump1_ = nullptr;   // the cTextures); resolved via sdlTextureOf
 	SDL_GPUSampler* waterSampler_ = nullptr; // REPEAT/wrap: the wave bumps tile (worldXY UV)
 	float           waterFS_[12] = {0};      // {LightDir, CameraPos(.w=time), Params}
+
+	// Coast-foam pipeline (shoreline coast-sprite slice): a dynamic world-space quad
+	// stream rebuilt each frame from the real cCoastSprites sim, drawn on the water
+	// surface. Its own pos/color/uv vertex format (stride 24) + shader, unlike the
+	// mesh3d pipeline; premultiplied filter blend, depth-test on / write off (foam
+	// sits on the water, occluded by nearer terrain but not writing depth itself).
+	SDL_GPUGraphicsPipeline* foamPipeline_ = nullptr;
+	bool foamPipelineTried_ = false;
+	void createFoamPipeline();
+	SDL_GPUBuffer*         foamVB_ = nullptr;      // dynamic, grown to hold the frame's quads
+	SDL_GPUTransferBuffer* foamXfer_ = nullptr;
+	int                    foamVBCap_ = 0;         // capacity in vertices
+	// The coast sim uses two bubble atlases: a "stay" atlas for the simple sprites and
+	// a "moving" atlas for the drifting arcs. Verts are packed [stay | moving]; the
+	// split selects which atlas binds for each draw range (both borrowed textures).
+	SDL_GPUTexture*        foamTexA_ = nullptr;    // stay/simple atlas
+	SDL_GPUTexture*        foamTexB_ = nullptr;    // moving/arc atlas
+	int                    foamSplitA_ = 0;        // vert count drawn with foamTexA_
+	float                  foamMVP_[16] = {0};
+	void flushFoam(SDL_GPURenderPass* pass);       // draw the frame's foam inside the mesh pass
+public:
+	// One foam quad vertex: world position, packed BGRA colour (premultiplied fade),
+	// uv. The foam renderer builds a triangle-list (6 verts/quad) and submits it once
+	// per frame before EndScene; the device uploads + draws it in the 3D mesh pass.
+	// verts are packed [countA verts for texA][rest for texB] so the two atlases draw
+	// from one buffer.
+	struct FoamVertex { float x, y, z; unsigned int color; float u, v; };
+	void submitFoam(const FoamVertex* verts, int vcount, cTexture* texA, int countA,
+	                cTexture* texB, const float* mvp16);
+private:
+	std::vector<FoamVertex> foamVerts_;            // this frame's quads (cleared each EndScene)
 public:
 	// Per-frame water shading state, supplied by WaterRenderSDL before the pass. camPos3
 	// and lightDir3 are 3 floats each; bump0/bump1 are the two wave textures; the scalars

@@ -427,6 +427,68 @@ void cCoastSprites::DrawMovingCoastSprite(Camera* camera)
 }
 
 
+void cCoastSprites::animateSDL(Camera* camera, float dtime_ms)
+{
+	// Animate() early-returns unless pSaveToAnimateCamera is set (normally by PreDraw,
+	// which also scene-attaches for the D3D draw that is dead off-Windows). Set it
+	// directly and run the real spawn pass.
+	pSaveToAnimateCamera = camera;
+	Animate(dtime_ms);
+}
+
+void cCoastSprites::collectSprites(vector<RenderSprite>& out)
+{
+	// Same per-sprite bookkeeping as DrawSimple/MovingCoastSprite (advance phase, retire
+	// when the phase runs out or the sprite drifts onto dry land, triangle-wave alpha),
+	// but emits flat quads for the SDL foam renderer instead of D3D vertices. dt and the
+	// *_scale_time are set by the preceding animateSDL -> Animate call.
+	MTAuto autolock(lock);
+	int grid_shift = pWater->GetCoordShift();
+
+	if(mode & CSM_SIMPLE){
+		bool avi = Texture_stay && Texture_stay->IsAviScaleTexture();
+		int phase_step = round(dt*simple_scale_time*INT_SIZE);
+		int n = coast_sprites.size();
+		for(int i = 0; i < n; i++){
+			if(coast_sprites.IsFree(i)) continue;
+			CoastSprite& s = coast_sprites[i];
+			if(s.phase >= INT_SIZE){ coast_sprites.SetFree(i); continue; }
+			if(dieInCoast && pWater->Get(s.cx >> grid_shift, s.cy >> grid_shift).z <= 0){ coast_sprites.SetFree(i); continue; }
+			RenderSprite r;
+			r.pos = s.pos; r.size = s.size;
+			r.alpha = (2 * ((s.phase < INT_SIZE_HALF) ? (s.phase >> 8) : 255 - (s.phase >> 8))) / 255.f;
+			const sRectangle4f& rt = avi ? ((cTextureAviScale*)Texture_stay)->GetFramePosInt(s.phase) : sRectangle4f::ID;
+			r.u0 = rt.min.x; r.v0 = rt.min.y; r.u1 = rt.max.x; r.v1 = rt.max.y;
+			r.dir.set(0, 0); r.moving = false;
+			out.push_back(r);
+			s.phase += phase_step;
+		}
+		coast_sprites.Compress();
+	}
+
+	if(mode & CSM_MOVING){
+		bool avi = Texture_mov && Texture_mov->IsAviScaleTexture();
+		int phase_step = round(dt*move_scale_time*INT_SIZE);
+		int n = mov_coast_sprites.size();
+		for(int i = 0; i < n; i++){
+			if(mov_coast_sprites.IsFree(i)) continue;
+			MovingCoastSprite& s = mov_coast_sprites[i];
+			if(s.phase > INT_SIZE){ mov_coast_sprites.SetFree(i); continue; }
+			if(dieInCoast && pWater->Get(s.cx >> grid_shift, s.cy >> grid_shift).z <= 0){ mov_coast_sprites.SetFree(i); continue; }
+			s.pos.x += s.speed_x; s.pos.y += s.speed_y;
+			RenderSprite r;
+			r.pos = s.pos; r.size = s.size;
+			r.alpha = (2 * ((s.phase < INT_SIZE_HALF) ? (s.phase >> 8) : 255 - (s.phase >> 8))) / 255.f;
+			const sRectangle4f& rt = avi ? ((cTextureAviScale*)Texture_mov)->GetFramePosInt(s.phase) : sRectangle4f::ID;
+			r.u0 = rt.min.x; r.v0 = rt.min.y; r.u1 = rt.max.x; r.v1 = rt.max.y;
+			r.dir = s.dir; r.moving = true;
+			out.push_back(r);
+			s.phase += phase_step;
+		}
+		mov_coast_sprites.Compress();
+	}
+}
+
 SpriteCenter* cCoastSprites::AddSpriteCenter(int x, int y,ContainerCenters &container)
 {
 	SpriteCenter t;
