@@ -69,9 +69,14 @@ public:
 	// water = 3 floats {strength, spatialScale, spare}; null or strength==0 leaves
 	// the draw foam-free, strength>0 adds the animated water-foam layer (time is
 	// injected per frame at draw time).
+	// depthWrite = true marks the draw as opaque base geometry (terrain): it writes
+	// depth so translucent things drawn after it (the water sheet, which keeps
+	// depth-write off) get occluded by geometry in front. Menu decals leave it false
+	// (they composite in paint order with depth-write off).
 	void addMeshSubmesh(int handle, int firstIndex, int indexCount, cTexture* tex,
 	                    const float* tint = nullptr, int transparency = 2,
-	                    const float* light = nullptr, const float* water = nullptr);
+	                    const float* light = nullptr, const float* water = nullptr,
+	                    bool depthWrite = false);
 	// Supply the model-view-projection matrix (16 floats, row-major, row-vector
 	// v*M, D3D clip convention) for the mesh. Replaces the built-in auto-frame.
 	void setMeshTransform(int handle, const float* mvp16);
@@ -226,6 +231,7 @@ private:
 		SDL_GPUTexture* tex; float tint[4]; int transparency;
 		float light[4];   // xyz = dir toward light, w = strength (0 = unlit)
 		float water[4];   // x = foam strength (0 = none), y = scale, z spare, w = time
+		bool depthWrite;  // opaque base geometry (terrain) writes depth; water/decals don't
 	};
 	std::vector<MeshDraw> meshDraws_;
 	// "Current" material/transform state that DrawIndexedPrimitive snapshots into
@@ -236,6 +242,7 @@ private:
 	int             curMeshTransparency_ = 2;
 	float           curMeshLight_[4] = {0,0,0,0};   // xyz dir, w strength (0 = unlit)
 	float           curMeshWater_[4] = {0,0,0,0};   // x strength (0 = no foam), y scale
+	bool            curMeshDepthWrite_ = false;     // true = opaque, write depth (terrain)
 	void flushMeshDraws(SDL_GPURenderPass* pass);   // replay meshDraws_ in the pass
 
 	// Retained menu-background meshes: they own the real VB/IB (held indirectly so
@@ -247,6 +254,7 @@ private:
 		int transparency;   // 0=substractive, 1=additive, 2=filter
 		float light[4];     // xyz = dir toward light, w = strength (0 = unlit)
 		float water[4];     // x = foam strength (0 = none), y = scale, z spare, w unused
+		bool depthWrite;    // opaque base geometry (terrain) writes depth; decals/water don't
 	};
 	struct MenuMesh {
 		sPtrVertexBuffer vb; sPtrIndexBuffer ib;   // own one reference to the buffers
@@ -260,8 +268,9 @@ private:
 	std::vector<std::unique_ptr<MenuMesh>> menuMeshes_;
 	void recordMenuMeshes();   // per frame: set curstate + call DrawIndexedPrimitive
 
-	SDL_GPUGraphicsPipeline* meshPipeline_ = nullptr;     // filter (alpha-over) blend
-	SDL_GPUGraphicsPipeline* meshPipelineAdd_ = nullptr;  // additive blend
+	SDL_GPUGraphicsPipeline* meshPipeline_ = nullptr;       // filter (alpha-over) blend, no depth write
+	SDL_GPUGraphicsPipeline* meshPipelineOpaque_ = nullptr; // filter blend + depth-write ON (terrain)
+	SDL_GPUGraphicsPipeline* meshPipelineAdd_ = nullptr;    // additive blend
 	SDL_GPUTexture*          depthTexture_ = nullptr;
 	int depthW_ = 0, depthH_ = 0;
 	bool meshPipelineTried_ = false;

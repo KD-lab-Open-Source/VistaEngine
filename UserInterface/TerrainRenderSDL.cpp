@@ -131,7 +131,11 @@ bool buildTerrainMesh(cSDLRenderDevice* dev)
 	// 0.55 ambient floor so the baked surface colour is modulated, not crushed.
 	Vect3f L(0.35f, 0.45f, 0.82f); L.normalize();
 	float light[4] = { L.x, L.y, L.z, 0.45f };
-	dev->addMeshSubmesh(s_handle, 0, pcount * 3, s_tex, s_tex ? white : earth, /*transparency*/2, light);
+	// depthWrite = true: the terrain is opaque base geometry, so it writes depth. The
+	// water sheet (drawn after, depth-write off) then depth-tests against it and gets
+	// occluded by hills in front of it -- matching the D3D water path.
+	dev->addMeshSubmesh(s_handle, 0, pcount * 3, s_tex, s_tex ? white : earth,
+	                    /*transparency*/2, light, /*water*/nullptr, /*depthWrite*/true);
 	return true;
 }
 

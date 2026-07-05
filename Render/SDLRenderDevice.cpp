@@ -139,6 +139,7 @@ int cSDLRenderDevice::Done()
 		vbGpu_.clear();
 		ibGpu_.clear();
 		if(meshPipeline_)   SDL_ReleaseGPUGraphicsPipeline(device_, meshPipeline_);
+		if(meshPipelineOpaque_) SDL_ReleaseGPUGraphicsPipeline(device_, meshPipelineOpaque_);
 		if(meshPipelineAdd_) SDL_ReleaseGPUGraphicsPipeline(device_, meshPipelineAdd_);
 		if(waterPipeline_)  SDL_ReleaseGPUGraphicsPipeline(device_, waterPipeline_);
 		if(waterSampler_)   SDL_ReleaseGPUSampler(device_, waterSampler_);
@@ -155,7 +156,7 @@ int cSDLRenderDevice::Done()
 	}
 	vertexBuffer_ = nullptr; transferBuffer_ = nullptr; whiteTexture_ = nullptr;
 	sampler_ = nullptr; uiPipeline_ = nullptr; vertexCapacity_ = 0; pipelineTried_ = false;
-	meshPipeline_ = nullptr; meshPipelineAdd_ = nullptr; depthTexture_ = nullptr; depthW_ = depthH_ = 0; meshPipelineTried_ = false;
+	meshPipeline_ = nullptr; meshPipelineOpaque_ = nullptr; meshPipelineAdd_ = nullptr; depthTexture_ = nullptr; depthW_ = depthH_ = 0; meshPipelineTried_ = false;
 	waterPipeline_ = nullptr; waterPipelineTried_ = false; waterBump0_ = waterBump1_ = nullptr;
 	waterSampler_ = nullptr;
 	window_ = nullptr;
@@ -929,6 +930,19 @@ void cSDLRenderDevice::createMeshPipeline()
 		return;
 	}
 
+	// Opaque variant (same filter blend + shaders) that WRITES depth. The base
+	// terrain draws with this so it populates the depth buffer; the water sheet then
+	// depth-tests against it (water keeps depth-write off, drawn after) and is
+	// occluded by hills in front of it -- exactly how the D3D water path relies on
+	// the opaque geometry's depth while RS_ZWRITEENABLE stays FALSE on the water
+	// itself. Menu decals keep depth-write off so coplanar layers composite in paint
+	// order instead of z-fighting.
+	pci.depth_stencil_state.enable_depth_write = true;
+	meshPipelineOpaque_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
+	if(!meshPipelineOpaque_)
+		fprintf(stderr, "cSDLRenderDevice: mesh opaque pipeline failed: %s\n", SDL_GetError());
+	pci.depth_stencil_state.enable_depth_write = false;   // restore for the additive variant
+
 	// Additive variant for transparencyType ADDITIVE materials (glow lines/bars):
 	// premultiplied src added onto the target (ONE, ONE). Same shaders/state.
 	colorTarget.blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
@@ -1267,6 +1281,7 @@ void cSDLRenderDevice::DrawIndexedPrimitive(sPtrVertexBuffer& vb, int OfsVertex,
 	d.transparency = curMeshTransparency_;
 	std::memcpy(d.light, curMeshLight_, sizeof(d.light));
 	std::memcpy(d.water, curMeshWater_, sizeof(d.water));
+	d.depthWrite = curMeshDepthWrite_;
 	meshDraws_.push_back(d);
 
 	*PtrNumberPolygon += nPolygon;
@@ -1315,12 +1330,12 @@ int cSDLRenderDevice::registerMesh(sPtrVertexBuffer& vb, sPtrIndexBuffer& ib)
 
 void cSDLRenderDevice::addMeshSubmesh(int handle, int firstIndex, int indexCount, cTexture* tex,
                                       const float* tint, int transparency, const float* light,
-                                      const float* water)
+                                      const float* water, bool depthWrite)
 {
 	if(handle < 0 || handle >= (int)menuMeshes_.size() || !menuMeshes_[handle] || indexCount <= 0)
 		return;
 	MenuMesh& m = *menuMeshes_[handle];
-	SubDraw sd{ firstIndex, indexCount, sdlTextureOf(tex), {1,1,1,1}, transparency, {0,0,0,0}, {0,0,0,0} };
+	SubDraw sd{ firstIndex, indexCount, sdlTextureOf(tex), {1,1,1,1}, transparency, {0,0,0,0}, {0,0,0,0}, depthWrite };
 	if(tint)
 		for(int i = 0; i < 4; ++i) sd.tint[i] = tint[i];
 	if(light)
@@ -1387,6 +1402,7 @@ void cSDLRenderDevice::recordMenuMeshes()
 			curMeshTransparency_ = 2;
 			curMeshLight_[0] = curMeshLight_[1] = curMeshLight_[2] = curMeshLight_[3] = 0.f;
 			curMeshWater_[0] = curMeshWater_[1] = curMeshWater_[2] = curMeshWater_[3] = 0.f;
+			curMeshDepthWrite_ = false;
 			DrawIndexedPrimitive(m.vb, 0, m.numVertex, m.ib, 0, m.ib.GetNumberPolygon());
 		} else {
 			// One draw per material range: firstIndex/indexCount are index counts,
@@ -1397,6 +1413,7 @@ void cSDLRenderDevice::recordMenuMeshes()
 				curMeshTransparency_ = sd.transparency;
 				std::memcpy(curMeshLight_, sd.light, sizeof(curMeshLight_));
 				std::memcpy(curMeshWater_, sd.water, sizeof(curMeshWater_));
+				curMeshDepthWrite_ = sd.depthWrite;
 				DrawIndexedPrimitive(m.vb, 0, m.numVertex, m.ib,
 				                     sd.firstIndex / 3, sd.indexCount / 3);
 			}
@@ -1416,6 +1433,7 @@ void cSDLRenderDevice::flushMeshDraws(SDL_GPURenderPass* pass)
 		const bool isWater = d.water[0] > 0.f && waterPipeline_;
 		SDL_GPUGraphicsPipeline* want = isWater ? waterPipeline_
 		                              : (d.transparency == 1 && meshPipelineAdd_) ? meshPipelineAdd_
+		                              : (d.depthWrite && meshPipelineOpaque_) ? meshPipelineOpaque_
 		                              : meshPipeline_;
 		if(want != boundPipeline){ SDL_BindGPUGraphicsPipeline(pass, want); boundPipeline = want; }
 
