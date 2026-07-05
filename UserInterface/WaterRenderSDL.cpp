@@ -73,14 +73,24 @@ cTexture* buildWaterTexture(cSDLRenderDevice* dev, cWater* w, int gx, int gy)
 	Color4f base = w->GetReflectedSurfaceColor();
 	const float WATER_R = base.r, WATER_G = base.g, WATER_B = base.b;
 
+	// Soft shoreline: fade the shallow near-shore band to transparent so the water
+	// blends into the coast instead of meeting the terrain at a hard ~0.7-opaque line
+	// (the original softens the edge with its FLOAT_ZBUFFER depth fade). The engine's
+	// depth-opacity ramps almost vertically -- ~0.73 already at depth 2 -- so multiply
+	// it by smoothstep(0, SHORE_BAND, depth). Water deeper than SHORE_BAND is untouched,
+	// preserving the authentic depth-opacity; only the coastal band feathers.
+	const float SHORE_BAND = 12.f;
 	const KeysColor& grad = w->GetOpacity();
 	for(int y = 0; y < gy; ++y){
 		unsigned char* row = px + y * pitch;
 		for(int x = 0; x < gx; ++x){
-			int depth = (int)w->GetRelativeZ(x, y);
+			float rz = w->GetRelativeZ(x, y);
+			int depth = (int)rz;
 			depth = std::max(0, std::min(depth, 255));
 			float a = grad.Get(depth / 255.f).a;
 			a = std::max(0.f, std::min(a, 1.f));
+			float df = std::max(0.f, std::min(rz / SHORE_BAND, 1.f));
+			a *= df * df * (3.f - 2.f * df);   // smoothstep(0, SHORE_BAND, rz)
 			unsigned char* p = row + x * 4;   // staging is tightly packed BGRA
 			p[0] = (unsigned char)(WATER_B * a * 255.f);
 			p[1] = (unsigned char)(WATER_G * a * 255.f);
@@ -118,14 +128,17 @@ bool buildWaterMesh(cSDLRenderDevice* dev)
 	auto nodeX = [&](int ix){ int n = ix * step; return n < gx ? n : gx - 1; };
 	auto nodeY = [&](int iy){ int n = iy * step; return n < gy ? n : gy - 1; };
 
-	// First pass: count water quads (all four corners submerged) for the index buffer.
+	// First pass: count water quads for the index buffer. A quad is emitted if ANY
+	// corner is submerged (not all four), so the mesh reaches right up to the shore;
+	// the dry corners carry ~0 baked alpha (see buildWaterTexture's shore-fade), which
+	// feathers the water/ground edge instead of cutting it off one node short.
 	int nquads = 0;
 	for(int iy = 0; iy < rows; ++iy)
 		for(int ix = 0; ix < cols; ++ix){
 			int x0 = nodeX(ix), x1 = nodeX(ix + 1);
 			int y0 = nodeY(iy), y1 = nodeY(iy + 1);
-			if(isWaterNode(w, x0, y0) && isWaterNode(w, x1, y0) &&
-			   isWaterNode(w, x0, y1) && isWaterNode(w, x1, y1))
+			if(isWaterNode(w, x0, y0) || isWaterNode(w, x1, y0) ||
+			   isWaterNode(w, x0, y1) || isWaterNode(w, x1, y1))
 				++nquads;
 		}
 
@@ -160,8 +173,8 @@ bool buildWaterMesh(cSDLRenderDevice* dev)
 		for(int ix = 0; ix < cols; ++ix){
 			int x0 = nodeX(ix), x1 = nodeX(ix + 1);
 			int y0 = nodeY(iy), y1 = nodeY(iy + 1);
-			if(!(isWaterNode(w, x0, y0) && isWaterNode(w, x1, y0) &&
-			     isWaterNode(w, x0, y1) && isWaterNode(w, x1, y1)))
+			if(!(isWaterNode(w, x0, y0) || isWaterNode(w, x1, y0) ||
+			     isWaterNode(w, x0, y1) || isWaterNode(w, x1, y1)))
 				continue;
 			WORD a = (WORD)(iy * gw + ix),  b = (WORD)(a + 1);
 			WORD c = (WORD)(a + gw),        d = (WORD)(c + 1);
