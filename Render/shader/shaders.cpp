@@ -77,6 +77,13 @@ void cShader::Delete()
 void cShader::Restore()
 {
 	Delete();
+	// Off-Windows there is no D3D device (gb_RenderDevice3D is null), so the whole
+	// shader stack -- RestoreShader() -> LoadShaderVS/PS -> GetShaderLib() and
+	// GetHandle() -- would dereference it and crash during world build (e.g. the
+	// Environment's cTemperature ice shader). Leave shaderVS_/shaderPS_ null; Select()
+	// already guards on them, so shader-driven draws simply no-op.
+	if(!gb_RenderDevice3D)
+		return;
 	RestoreShader();
 	GetHandle();
 }

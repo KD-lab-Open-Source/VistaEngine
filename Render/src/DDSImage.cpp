@@ -139,6 +139,24 @@ int cDDSImage::load(void* pointer, int size)
 		return 0;
 	}
 
+	// Signed 2-channel bump / normal-delta (D3DFMT_V8U8): DDPF_BUMPDUDV, 16bpp, the
+	// two bytes are signed dU (x) and dV (y). The water wave maps (waves.dds) use this.
+	// Store the deltas biased to unsigned [0,255] (0x80 == flat) in R,G; B=up, A=opaque.
+	// No premultiply -- it is a normal map, not a colour.
+	if((pfFlags & 0x80000 /* DDPF_BUMPDUDV */) && rd32(p + 88) == 16){
+		const uint8_t* src = data;
+		for(int py = 0; py < h; ++py){
+			for(int px = 0; px < w; ++px){
+				if(src + 2 > end) return 1;
+				int du = (int)(int8_t)src[0];   // signed x delta
+				int dv = (int)(int8_t)src[1];   // signed y delta
+				put(px, py, du + 128, dv + 128, 255, 255);
+				src += 2;
+			}
+		}
+		return 0;
+	}
+
 	// Uncompressed RGB(A): use the channel masks from the pixel format.
 	if(pfFlags & 0x40 /* DDPF_RGB */){
 		const int rgbBits = (int)rd32(p + 88);

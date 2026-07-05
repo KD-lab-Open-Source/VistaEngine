@@ -246,6 +246,36 @@ void cWater::PreDraw(Camera* camera)
 	UpdateVB();
 }
 
+// Portable reflected-sky base colour for the SDL water sheet (off-Windows). Mirrors
+// the D3D water shader's colour math (Water.cpp:272-276 + water_linear.psl:37-38):
+//   refColor.rgb = reflection_color.rgb * sceneLitColour;  refColor.a = 1 - reflection_color.a
+//   out.rgb = saturate( (sky.rgb*refColor.a + refColor.rgb) * ((1-sky.a)*brightness + 1) )
+// The one input we cannot produce off-Windows -- the planar-reflection render target
+// -- is replaced by cur_reflect_sky_color (time-of-day resolved; sky-blue by default),
+// exactly what the engine's own ps1.1 water path substitutes when there is no
+// reflection texture.
+Color4f cWater::GetReflectedSurfaceColor()
+{
+	Color4f lit;
+	lit.set(1.f, 1.f, 1.f, 1.f);
+	if(scene() && scene()->GetTileMap())
+		lit = scene()->GetPlainLitColor();
+
+	Color4f refl;
+	refl.mul3(reflection_color, lit);
+	float skyWeight = 1.f - reflection_color.a;
+
+	const Color4f& sky = cur_reflect_sky_color;
+	float boost = (1.f - sky.a)*reflection_brightnes + 1.f;
+
+	Color4f out;
+	out.set(clamp((sky.r*skyWeight + refl.r)*boost, 0.f, 1.f),
+			clamp((sky.g*skyWeight + refl.g)*boost, 0.f, 1.f),
+			clamp((sky.b*skyWeight + refl.b)*boost, 0.f, 1.f),
+			1.f);
+	return out;
+}
+
 void cWater::Draw(Camera* camera)
 {
 	start_timer_auto();

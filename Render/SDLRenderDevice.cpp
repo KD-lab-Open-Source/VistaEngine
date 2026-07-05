@@ -17,6 +17,8 @@
 #include "SDLShaders/ui_shaders.h"
 // Cross-compiled 3D static-mesh shader blobs (slice 3).
 #include "SDLShaders/mesh3d_shaders.h"
+#include "SDLShaders/water_shaders.h"
+#include "SDLShaders/foam_shaders.h"
 
 // ---------------------------------------------------------------------------
 // Base cInterfaceRenderDevice members. On Windows these live in
@@ -102,6 +104,8 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND hWnd, int
 
 	createUIPipeline();
 	createMeshPipeline();
+	createWaterPipeline();
+	createFoamPipeline();
 
 	// Build the skinned-vertex declarations (on Windows cD3DRender does this at
 	// device init via CreateVertexDeclaration; cSkinVertex::Register is portable
@@ -137,7 +141,13 @@ int cSDLRenderDevice::Done()
 		vbGpu_.clear();
 		ibGpu_.clear();
 		if(meshPipeline_)   SDL_ReleaseGPUGraphicsPipeline(device_, meshPipeline_);
+		if(meshPipelineOpaque_) SDL_ReleaseGPUGraphicsPipeline(device_, meshPipelineOpaque_);
 		if(meshPipelineAdd_) SDL_ReleaseGPUGraphicsPipeline(device_, meshPipelineAdd_);
+		if(waterPipeline_)  SDL_ReleaseGPUGraphicsPipeline(device_, waterPipeline_);
+		if(waterSampler_)   SDL_ReleaseGPUSampler(device_, waterSampler_);
+		if(foamPipeline_)   SDL_ReleaseGPUGraphicsPipeline(device_, foamPipeline_);
+		if(foamVB_)         SDL_ReleaseGPUBuffer(device_, foamVB_);
+		if(foamXfer_)       SDL_ReleaseGPUTransferBuffer(device_, foamXfer_);
 		if(depthTexture_)   SDL_ReleaseGPUTexture(device_, depthTexture_);
 		if(vertexBuffer_)   SDL_ReleaseGPUBuffer(device_, vertexBuffer_);
 		if(transferBuffer_) SDL_ReleaseGPUTransferBuffer(device_, transferBuffer_);
@@ -151,7 +161,10 @@ int cSDLRenderDevice::Done()
 	}
 	vertexBuffer_ = nullptr; transferBuffer_ = nullptr; whiteTexture_ = nullptr;
 	sampler_ = nullptr; uiPipeline_ = nullptr; vertexCapacity_ = 0; pipelineTried_ = false;
-	meshPipeline_ = nullptr; meshPipelineAdd_ = nullptr; depthTexture_ = nullptr; depthW_ = depthH_ = 0; meshPipelineTried_ = false;
+	meshPipeline_ = nullptr; meshPipelineOpaque_ = nullptr; meshPipelineAdd_ = nullptr; depthTexture_ = nullptr; depthW_ = depthH_ = 0; meshPipelineTried_ = false;
+	waterPipeline_ = nullptr; waterPipelineTried_ = false; waterBump0_ = waterBump1_ = nullptr;
+	foamPipeline_ = nullptr; foamPipelineTried_ = false; foamVB_ = nullptr; foamXfer_ = nullptr; foamVBCap_ = 0; foamTexA_ = nullptr; foamTexB_ = nullptr; foamSplitA_ = 0;
+	waterSampler_ = nullptr;
 	window_ = nullptr;
 
 	// Reset base state so ~cInterfaceRenderDevice's invariants hold.
@@ -246,6 +259,37 @@ int cSDLRenderDevice::EndScene()
 			}
 		}
 
+		// Upload the frame's coast-foam quads (copy pass, outside the render pass), growing
+		// the dynamic foam buffer as needed. Drawn inside the mesh pass below (on the water).
+		const int foamVCount = (int)foamVerts_.size();
+		if(foamVCount > 0 && foamPipeline_){
+			if(foamVCount > foamVBCap_){
+				if(foamVB_)   SDL_ReleaseGPUBuffer(device_, foamVB_);
+				if(foamXfer_) SDL_ReleaseGPUTransferBuffer(device_, foamXfer_);
+				int cap = foamVCount + foamVCount / 2 + 256;   // headroom to avoid churn
+				SDL_GPUBufferCreateInfo bi = {};
+				bi.usage = SDL_GPU_BUFFERUSAGE_VERTEX;
+				bi.size = (Uint32)(cap * sizeof(FoamVertex));
+				foamVB_ = SDL_CreateGPUBuffer(device_, &bi);
+				SDL_GPUTransferBufferCreateInfo tbi = {};
+				tbi.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+				tbi.size = bi.size;
+				foamXfer_ = SDL_CreateGPUTransferBuffer(device_, &tbi);
+				foamVBCap_ = (foamVB_ && foamXfer_) ? cap : 0;
+			}
+			if(foamVB_ && foamXfer_){
+				void* map = SDL_MapGPUTransferBuffer(device_, foamXfer_, true);
+				SDL_memcpy(map, foamVerts_.data(), foamVCount * sizeof(FoamVertex));
+				SDL_UnmapGPUTransferBuffer(device_, foamXfer_);
+				SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(commandBuffer_);
+				SDL_GPUTransferBufferLocation src = {}; src.transfer_buffer = foamXfer_; src.offset = 0;
+				SDL_GPUBufferRegion dst = {}; dst.buffer = foamVB_; dst.offset = 0;
+				dst.size = (Uint32)(foamVCount * sizeof(FoamVertex));
+				SDL_UploadToGPUBuffer(copy, &src, &dst, true);
+				SDL_EndGPUCopyPass(copy);
+			}
+		}
+
 		// A 3D mesh pass runs first (clears colour + depth, draws the static meshes
 		// with depth testing); the 2D UI pass then loads that colour and draws over
 		// it. The UI pipeline has no depth target, so it needs its own pass anyway.
@@ -253,7 +297,9 @@ int cSDLRenderDevice::EndScene()
 		// which records into meshDraws_ (no GPU work yet).
 		meshDraws_.clear();
 		recordMenuMeshes();
-		bool drawMesh = meshPipeline_ && !meshDraws_.empty();
+		// Foam draws in the mesh pass too, so run the pass if either has geometry.
+		bool drawMesh = (meshPipeline_ && !meshDraws_.empty()) ||
+		                (foamPipeline_ && foamVCount > 0 && foamVB_);
 
 		if(drawMesh){
 			ensureDepth(xScr, yScr);
@@ -281,8 +327,10 @@ int cSDLRenderDevice::EndScene()
 			SDL_GPURenderPass* mpass = SDL_BeginGPURenderPass(commandBuffer_, &ct, 1,
 			                                                  depthTexture_ ? &dt : nullptr);
 			flushMeshDraws(mpass);
+			flushFoam(mpass);          // coast foam on the water surface (depth-tested by terrain)
 			SDL_EndGPURenderPass(mpass);
 		}
+		foamVerts_.clear();            // consumed this frame; the renderer resubmits next frame
 
 		SDL_GPUColorTargetInfo target = {};
 		target.texture = swapchainTexture_;
@@ -923,6 +971,19 @@ void cSDLRenderDevice::createMeshPipeline()
 		return;
 	}
 
+	// Opaque variant (same filter blend + shaders) that WRITES depth. The base
+	// terrain draws with this so it populates the depth buffer; the water sheet then
+	// depth-tests against it (water keeps depth-write off, drawn after) and is
+	// occluded by hills in front of it -- exactly how the D3D water path relies on
+	// the opaque geometry's depth while RS_ZWRITEENABLE stays FALSE on the water
+	// itself. Menu decals keep depth-write off so coplanar layers composite in paint
+	// order instead of z-fighting.
+	pci.depth_stencil_state.enable_depth_write = true;
+	meshPipelineOpaque_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
+	if(!meshPipelineOpaque_)
+		fprintf(stderr, "cSDLRenderDevice: mesh opaque pipeline failed: %s\n", SDL_GetError());
+	pci.depth_stencil_state.enable_depth_write = false;   // restore for the additive variant
+
 	// Additive variant for transparencyType ADDITIVE materials (glow lines/bars):
 	// premultiplied src added onto the target (ONE, ONE). Same shaders/state.
 	colorTarget.blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
@@ -934,6 +995,256 @@ void cSDLRenderDevice::createMeshPipeline()
 	SDL_ReleaseGPUShader(device_, vs);
 	SDL_ReleaseGPUShader(device_, fs);
 	fprintf(stderr, "cSDLRenderDevice: mesh pipeline ready\n");
+}
+
+void cSDLRenderDevice::createWaterPipeline()
+{
+	if(waterPipelineTried_ || !device_) return;
+	waterPipelineTried_ = true;
+
+	SDL_GPUShaderFormat formats = SDL_GetGPUShaderFormats(device_);
+	SDL_GPUShaderFormat fmt;
+	const char* entry;
+	const unsigned char *vsCode, *fsCode;
+	unsigned int vsSize, fsSize;
+	if(formats & SDL_GPU_SHADERFORMAT_MSL){
+		fmt = SDL_GPU_SHADERFORMAT_MSL; entry = "main0";
+		vsCode = mesh3d_vert_msl; vsSize = mesh3d_vert_msl_len;   // reuse mesh3d vertex shader
+		fsCode = water_frag_msl;  fsSize = water_frag_msl_len;
+	} else if(formats & SDL_GPU_SHADERFORMAT_SPIRV){
+		fmt = SDL_GPU_SHADERFORMAT_SPIRV; entry = "main";
+		vsCode = mesh3d_vert_spv; vsSize = mesh3d_vert_spv_len;
+		fsCode = water_frag_spv;  fsSize = water_frag_spv_len;
+	} else {
+		fprintf(stderr, "cSDLRenderDevice: water pipeline: no supported shader format (0x%x)\n", formats);
+		return;
+	}
+
+	SDL_GPUShaderCreateInfo vsi = {};
+	vsi.code = vsCode; vsi.code_size = vsSize; vsi.entrypoint = entry;
+	vsi.format = fmt; vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+	vsi.num_uniform_buffers = 1;
+	SDL_GPUShader* vs = SDL_CreateGPUShader(device_, &vsi);
+
+	SDL_GPUShaderCreateInfo fsi = {};
+	fsi.code = fsCode; fsi.code_size = fsSize; fsi.entrypoint = entry;
+	fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+	fsi.num_samplers = 3;          // t0 baked colour/opacity, t1/t2 scrolling wave bumps
+	fsi.num_uniform_buffers = 1;   // WaterFS: light dir, camera pos + time, params
+	SDL_GPUShader* fs = SDL_CreateGPUShader(device_, &fsi);
+
+	if(!vs || !fs){
+		fprintf(stderr, "cSDLRenderDevice: water CreateGPUShader failed: %s\n", SDL_GetError());
+		if(vs) SDL_ReleaseGPUShader(device_, vs);
+		if(fs) SDL_ReleaseGPUShader(device_, fs);
+		return;
+	}
+
+	// Same sVertexXYZINT1 layout / filter blend / depth (test on, write off) as the
+	// mesh pipeline -- only the fragment shader (and its 3 samplers) differs.
+	SDL_GPUVertexBufferDescription vbDesc = {};
+	vbDesc.slot = 0; vbDesc.pitch = 36; vbDesc.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
+	SDL_GPUVertexAttribute attrs[3] = {};
+	attrs[0].location = 0; attrs[0].buffer_slot = 0; attrs[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3; attrs[0].offset = 0;
+	attrs[1].location = 1; attrs[1].buffer_slot = 0; attrs[1].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3; attrs[1].offset = 16;
+	attrs[2].location = 2; attrs[2].buffer_slot = 0; attrs[2].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2; attrs[2].offset = 28;
+
+	SDL_GPUColorTargetDescription colorTarget = {};
+	colorTarget.format = SDL_GetGPUSwapchainTextureFormat(device_, window_);
+	colorTarget.blend_state.enable_blend = true;
+	colorTarget.blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+	colorTarget.blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+	colorTarget.blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
+	colorTarget.blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+	colorTarget.blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+	colorTarget.blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
+
+	SDL_GPUGraphicsPipelineCreateInfo pci = {};
+	pci.vertex_shader = vs; pci.fragment_shader = fs;
+	pci.vertex_input_state.vertex_buffer_descriptions = &vbDesc;
+	pci.vertex_input_state.num_vertex_buffers = 1;
+	pci.vertex_input_state.vertex_attributes = attrs;
+	pci.vertex_input_state.num_vertex_attributes = 3;
+	pci.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
+	pci.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
+	pci.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
+	pci.depth_stencil_state.enable_depth_test = true;
+	pci.depth_stencil_state.enable_depth_write = false;
+	pci.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
+	pci.target_info.color_target_descriptions = &colorTarget;
+	pci.target_info.num_color_targets = 1;
+	pci.target_info.has_depth_stencil_target = true;
+	pci.target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
+
+	waterPipeline_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
+	if(!waterPipeline_)
+		fprintf(stderr, "cSDLRenderDevice: water CreateGPUGraphicsPipeline failed: %s\n", SDL_GetError());
+
+	SDL_ReleaseGPUShader(device_, vs);
+	SDL_ReleaseGPUShader(device_, fs);
+
+	// REPEAT sampler for the wave bumps: their UV is worldXY*scale (far outside [0,1]),
+	// so they must tile. (sampler_ is CLAMP, for the 0..1 baked colour/UI textures.)
+	SDL_GPUSamplerCreateInfo si = {};
+	si.min_filter = SDL_GPU_FILTER_LINEAR;
+	si.mag_filter = SDL_GPU_FILTER_LINEAR;
+	si.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
+	si.address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+	si.address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+	si.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+	waterSampler_ = SDL_CreateGPUSampler(device_, &si);
+
+	fprintf(stderr, "cSDLRenderDevice: water pipeline %s\n", waterPipeline_ ? "ready" : "FAILED");
+}
+
+void cSDLRenderDevice::setWaterRenderState(cTexture* bump0, cTexture* bump1, const float* camPos3,
+                                           const float* lightDir3, float bumpScale, float scrollSpeed,
+                                           float rippleStrength, float specStrength)
+{
+	waterBump0_ = sdlTextureOf(bump0);
+	waterBump1_ = sdlTextureOf(bump1);
+	// WaterFS cbuffer layout: float4 LightDir; float4 CameraPos; float4 Params;
+	waterFS_[0]  = lightDir3 ? lightDir3[0] : 0.f;
+	waterFS_[1]  = lightDir3 ? lightDir3[1] : 0.f;
+	waterFS_[2]  = lightDir3 ? lightDir3[2] : 1.f;
+	waterFS_[3]  = specStrength;
+	waterFS_[4]  = camPos3 ? camPos3[0] : 0.f;
+	waterFS_[5]  = camPos3 ? camPos3[1] : 0.f;
+	waterFS_[6]  = camPos3 ? camPos3[2] : 0.f;
+	waterFS_[7]  = 0.f;            // time (injected each frame in flushMeshDraws)
+	waterFS_[8]  = bumpScale;
+	waterFS_[9]  = scrollSpeed;
+	waterFS_[10] = rippleStrength;
+	waterFS_[11] = 0.f;
+}
+
+void cSDLRenderDevice::createFoamPipeline()
+{
+	if(foamPipelineTried_ || !device_) return;
+	foamPipelineTried_ = true;
+
+	SDL_GPUShaderFormat formats = SDL_GetGPUShaderFormats(device_);
+	SDL_GPUShaderFormat fmt;
+	const char* entry;
+	const unsigned char *vsCode, *fsCode;
+	unsigned int vsSize, fsSize;
+	if(formats & SDL_GPU_SHADERFORMAT_MSL){
+		fmt = SDL_GPU_SHADERFORMAT_MSL; entry = "main0";
+		vsCode = foam_vert_msl; vsSize = foam_vert_msl_len;
+		fsCode = foam_frag_msl; fsSize = foam_frag_msl_len;
+	} else if(formats & SDL_GPU_SHADERFORMAT_SPIRV){
+		fmt = SDL_GPU_SHADERFORMAT_SPIRV; entry = "main";
+		vsCode = foam_vert_spv; vsSize = foam_vert_spv_len;
+		fsCode = foam_frag_spv; fsSize = foam_frag_spv_len;
+	} else {
+		fprintf(stderr, "cSDLRenderDevice: foam pipeline: no supported shader format (0x%x)\n", formats);
+		return;
+	}
+
+	SDL_GPUShaderCreateInfo vsi = {};
+	vsi.code = vsCode; vsi.code_size = vsSize; vsi.entrypoint = entry;
+	vsi.format = fmt; vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+	vsi.num_uniform_buffers = 1;   // MVP
+	SDL_GPUShader* vs = SDL_CreateGPUShader(device_, &vsi);
+
+	SDL_GPUShaderCreateInfo fsi = {};
+	fsi.code = fsCode; fsi.code_size = fsSize; fsi.entrypoint = entry;
+	fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+	fsi.num_samplers = 1;          // the bubble texture
+	SDL_GPUShader* fs = SDL_CreateGPUShader(device_, &fsi);
+
+	if(!vs || !fs){
+		fprintf(stderr, "cSDLRenderDevice: foam CreateGPUShader failed: %s\n", SDL_GetError());
+		if(vs) SDL_ReleaseGPUShader(device_, vs);
+		if(fs) SDL_ReleaseGPUShader(device_, fs);
+		return;
+	}
+
+	// FoamVertex: float3 position @0, BGRA colour (UBYTE4_NORM) @12, float2 uv @16 (stride 24).
+	SDL_GPUVertexBufferDescription vbDesc = {};
+	vbDesc.slot = 0; vbDesc.pitch = sizeof(FoamVertex); vbDesc.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
+	SDL_GPUVertexAttribute attrs[3] = {};
+	attrs[0].location = 0; attrs[0].buffer_slot = 0; attrs[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;      attrs[0].offset = 0;
+	attrs[1].location = 1; attrs[1].buffer_slot = 0; attrs[1].format = SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4_NORM; attrs[1].offset = 12;
+	attrs[2].location = 2; attrs[2].buffer_slot = 0; attrs[2].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;      attrs[2].offset = 16;
+
+	// Premultiplied filter blend (foam texture + fade are premultiplied), same as the
+	// mesh/water pipelines: (ONE, ONE_MINUS_SRC_ALPHA).
+	SDL_GPUColorTargetDescription colorTarget = {};
+	colorTarget.format = SDL_GetGPUSwapchainTextureFormat(device_, window_);
+	colorTarget.blend_state.enable_blend = true;
+	colorTarget.blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+	colorTarget.blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+	colorTarget.blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
+	colorTarget.blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+	colorTarget.blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+	colorTarget.blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
+
+	SDL_GPUGraphicsPipelineCreateInfo pci = {};
+	pci.vertex_shader = vs; pci.fragment_shader = fs;
+	pci.vertex_input_state.vertex_buffer_descriptions = &vbDesc;
+	pci.vertex_input_state.num_vertex_buffers = 1;
+	pci.vertex_input_state.vertex_attributes = attrs;
+	pci.vertex_input_state.num_vertex_attributes = 3;
+	pci.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
+	pci.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
+	pci.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
+	pci.depth_stencil_state.enable_depth_test = true;
+	pci.depth_stencil_state.enable_depth_write = false;   // foam sits on the water; tests, doesn't write
+	pci.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
+	pci.target_info.color_target_descriptions = &colorTarget;
+	pci.target_info.num_color_targets = 1;
+	pci.target_info.has_depth_stencil_target = true;
+	pci.target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
+
+	foamPipeline_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
+	if(!foamPipeline_)
+		fprintf(stderr, "cSDLRenderDevice: foam CreateGPUGraphicsPipeline failed: %s\n", SDL_GetError());
+
+	SDL_ReleaseGPUShader(device_, vs);
+	SDL_ReleaseGPUShader(device_, fs);
+	fprintf(stderr, "cSDLRenderDevice: foam pipeline %s\n", foamPipeline_ ? "ready" : "FAILED");
+}
+
+void cSDLRenderDevice::submitFoam(const FoamVertex* verts, int vcount, cTexture* texA, int countA,
+                                  cTexture* texB, const float* mvp16)
+{
+	// Snapshot the frame's foam quads; the device uploads + draws them in the mesh pass.
+	// verts are packed [0,countA) -> texA (stay atlas), [countA,vcount) -> texB (moving).
+	foamVerts_.clear();
+	if(verts && vcount > 0)
+		foamVerts_.assign(verts, verts + vcount);
+	foamTexA_ = sdlTextureOf(texA);
+	foamTexB_ = sdlTextureOf(texB);
+	foamSplitA_ = (countA < 0) ? 0 : (countA > vcount ? vcount : countA);
+	if(mvp16) std::memcpy(foamMVP_, mvp16, sizeof(foamMVP_));
+}
+
+void cSDLRenderDevice::flushFoam(SDL_GPURenderPass* pass)
+{
+	if(!pass || !foamPipeline_ || foamVerts_.empty() || !foamVB_) return;
+
+	SDL_BindGPUGraphicsPipeline(pass, foamPipeline_);
+	SDL_PushGPUVertexUniformData(commandBuffer_, 0, foamMVP_, sizeof(foamMVP_));
+
+	SDL_GPUBufferBinding vbb = {}; vbb.buffer = foamVB_; vbb.offset = 0;
+	SDL_BindGPUVertexBuffers(pass, 0, &vbb, 1);
+
+	const int total = (int)foamVerts_.size();
+	const int nA = foamSplitA_, nB = total - foamSplitA_;
+
+	SDL_GPUTextureSamplerBinding ts = {};
+	ts.sampler = sampler_;
+	if(nA > 0){
+		ts.texture = foamTexA_ ? foamTexA_ : whiteTexture_;
+		SDL_BindGPUFragmentSamplers(pass, 0, &ts, 1);
+		SDL_DrawGPUPrimitives(pass, nA, 1, 0, 0);
+	}
+	if(nB > 0){
+		ts.texture = foamTexB_ ? foamTexB_ : whiteTexture_;
+		SDL_BindGPUFragmentSamplers(pass, 0, &ts, 1);
+		SDL_DrawGPUPrimitives(pass, nB, 1, nA, 0);
+	}
 }
 
 void cSDLRenderDevice::ensureDepth(int w, int h)
@@ -1138,6 +1449,9 @@ void cSDLRenderDevice::DrawIndexedPrimitive(sPtrVertexBuffer& vb, int OfsVertex,
 	d.tex = curMeshTexture_;
 	std::memcpy(d.tint, curMeshTint_, sizeof(d.tint));
 	d.transparency = curMeshTransparency_;
+	std::memcpy(d.light, curMeshLight_, sizeof(d.light));
+	std::memcpy(d.water, curMeshWater_, sizeof(d.water));
+	d.depthWrite = curMeshDepthWrite_;
 	meshDraws_.push_back(d);
 
 	*PtrNumberPolygon += nPolygon;
@@ -1185,14 +1499,19 @@ int cSDLRenderDevice::registerMesh(sPtrVertexBuffer& vb, sPtrIndexBuffer& ib)
 }
 
 void cSDLRenderDevice::addMeshSubmesh(int handle, int firstIndex, int indexCount, cTexture* tex,
-                                      const float* tint, int transparency)
+                                      const float* tint, int transparency, const float* light,
+                                      const float* water, bool depthWrite)
 {
 	if(handle < 0 || handle >= (int)menuMeshes_.size() || !menuMeshes_[handle] || indexCount <= 0)
 		return;
 	MenuMesh& m = *menuMeshes_[handle];
-	SubDraw sd{ firstIndex, indexCount, sdlTextureOf(tex), {1,1,1,1}, transparency };
+	SubDraw sd{ firstIndex, indexCount, sdlTextureOf(tex), {1,1,1,1}, transparency, {0,0,0,0}, {0,0,0,0}, depthWrite };
 	if(tint)
 		for(int i = 0; i < 4; ++i) sd.tint[i] = tint[i];
+	if(light)
+		for(int i = 0; i < 4; ++i) sd.light[i] = light[i];
+	if(water)
+		for(int i = 0; i < 3; ++i) sd.water[i] = water[i];   // w (time) filled at flush
 	m.subdraws.push_back(sd);
 }
 
@@ -1251,6 +1570,9 @@ void cSDLRenderDevice::recordMenuMeshes()
 			curMeshTexture_ = nullptr;
 			curMeshTint_[0] = curMeshTint_[1] = curMeshTint_[2] = curMeshTint_[3] = 1.f;
 			curMeshTransparency_ = 2;
+			curMeshLight_[0] = curMeshLight_[1] = curMeshLight_[2] = curMeshLight_[3] = 0.f;
+			curMeshWater_[0] = curMeshWater_[1] = curMeshWater_[2] = curMeshWater_[3] = 0.f;
+			curMeshDepthWrite_ = false;
 			DrawIndexedPrimitive(m.vb, 0, m.numVertex, m.ib, 0, m.ib.GetNumberPolygon());
 		} else {
 			// One draw per material range: firstIndex/indexCount are index counts,
@@ -1259,6 +1581,9 @@ void cSDLRenderDevice::recordMenuMeshes()
 				curMeshTexture_ = sd.tex;
 				std::memcpy(curMeshTint_, sd.tint, sizeof(curMeshTint_));
 				curMeshTransparency_ = sd.transparency;
+				std::memcpy(curMeshLight_, sd.light, sizeof(curMeshLight_));
+				std::memcpy(curMeshWater_, sd.water, sizeof(curMeshWater_));
+				curMeshDepthWrite_ = sd.depthWrite;
 				DrawIndexedPrimitive(m.vb, 0, m.numVertex, m.ib,
 				                     sd.firstIndex / 3, sd.indexCount / 3);
 			}
@@ -1270,25 +1595,52 @@ void cSDLRenderDevice::flushMeshDraws(SDL_GPURenderPass* pass)
 {
 	if(!pass || !meshPipeline_) return;
 
+	const float now = SDL_GetTicks() * 0.001f;
 	SDL_GPUGraphicsPipeline* boundPipeline = nullptr;  // track to avoid redundant binds
 	for(const MeshDraw& d : meshDraws_){
-		// Additive (1) -> additive blend; everything else -> filter (alpha-over).
-		SDL_GPUGraphicsPipeline* want = (d.transparency == 1 && meshPipelineAdd_)
-		                                ? meshPipelineAdd_ : meshPipeline_;
+		// water[0] > 0 routes the draw to the dedicated water pipeline (scrolling wave
+		// bumps + specular). Otherwise additive (1) -> additive blend, else filter.
+		const bool isWater = d.water[0] > 0.f && waterPipeline_;
+		SDL_GPUGraphicsPipeline* want = isWater ? waterPipeline_
+		                              : (d.transparency == 1 && meshPipelineAdd_) ? meshPipelineAdd_
+		                              : (d.depthWrite && meshPipelineOpaque_) ? meshPipelineOpaque_
+		                              : meshPipeline_;
 		if(want != boundPipeline){ SDL_BindGPUGraphicsPipeline(pass, want); boundPipeline = want; }
 
 		SDL_PushGPUVertexUniformData(commandBuffer_, 0, d.mvp, sizeof(d.mvp));
-		SDL_PushGPUFragmentUniformData(commandBuffer_, 0, d.tint, sizeof(d.tint));
+
+		if(isWater){
+			// WaterFS: float4 LightDir; float4 CameraPos(.w=time); float4 Params. Time is
+			// injected here each frame so the surface animates without a mesh rebuild.
+			float wf[12];
+			std::memcpy(wf, waterFS_, sizeof(wf));
+			wf[7] = now;
+			SDL_PushGPUFragmentUniformData(commandBuffer_, 0, wf, sizeof(wf));
+		} else {
+			// mesh3d.frag: float4 Tint; float4 Light;
+			float frag[8] = { d.tint[0], d.tint[1], d.tint[2], d.tint[3],
+			                  d.light[0], d.light[1], d.light[2], d.light[3] };
+			SDL_PushGPUFragmentUniformData(commandBuffer_, 0, frag, sizeof(frag));
+		}
 
 		SDL_GPUBufferBinding vbb = {}; vbb.buffer = d.vbuf; vbb.offset = 0;
 		SDL_BindGPUVertexBuffers(pass, 0, &vbb, 1);
 		SDL_GPUBufferBinding ibb = {}; ibb.buffer = d.ibuf; ibb.offset = 0;
 		SDL_BindGPUIndexBuffer(pass, &ibb, SDL_GPU_INDEXELEMENTSIZE_16BIT);
 
-		SDL_GPUTextureSamplerBinding ts = {};
-		ts.texture = d.tex ? d.tex : whiteTexture_;
-		ts.sampler = sampler_;
-		SDL_BindGPUFragmentSamplers(pass, 0, &ts, 1);
+		if(isWater){
+			// t0 = baked depth-opacity colour (clamp), t1/t2 = the two wave bumps (wrap).
+			SDL_GPUTextureSamplerBinding ts[3] = {};
+			ts[0].texture = d.tex ? d.tex : whiteTexture_;             ts[0].sampler = sampler_;
+			ts[1].texture = waterBump0_ ? waterBump0_ : whiteTexture_; ts[1].sampler = waterSampler_ ? waterSampler_ : sampler_;
+			ts[2].texture = waterBump1_ ? waterBump1_ : whiteTexture_; ts[2].sampler = waterSampler_ ? waterSampler_ : sampler_;
+			SDL_BindGPUFragmentSamplers(pass, 0, ts, 3);
+		} else {
+			SDL_GPUTextureSamplerBinding ts = {};
+			ts.texture = d.tex ? d.tex : whiteTexture_;
+			ts.sampler = sampler_;
+			SDL_BindGPUFragmentSamplers(pass, 0, &ts, 1);
+		}
 
 		SDL_DrawGPUIndexedPrimitives(pass, d.indexCount, 1, d.startIndex, d.baseVertex, 0);
 	}

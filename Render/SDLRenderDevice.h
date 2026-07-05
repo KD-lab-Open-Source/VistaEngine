@@ -63,9 +63,20 @@ public:
 	int  registerMesh(sPtrVertexBuffer& vb, sPtrIndexBuffer& ib);
 	// Append a textured sub-range (firstIndex/indexCount into the mesh's index
 	// buffer). tint = material diffuse rgba (rgb color, a opacity); transparency
-	// selects the blend pipeline (0=substractive, 1=additive, 2=filter).
+	// selects the blend pipeline (0=substractive, 1=additive, 2=filter). light =
+	// 4 floats {dir.xyz toward the light (world space), strength}; null or w==0
+	// leaves the draw unlit/full-bright (menu default), w>0 adds relief lighting.
+	// water = 3 floats {strength, spatialScale, spare}; null or strength==0 leaves
+	// the draw foam-free, strength>0 adds the animated water-foam layer (time is
+	// injected per frame at draw time).
+	// depthWrite = true marks the draw as opaque base geometry (terrain): it writes
+	// depth so translucent things drawn after it (the water sheet, which keeps
+	// depth-write off) get occluded by geometry in front. Menu decals leave it false
+	// (they composite in paint order with depth-write off).
 	void addMeshSubmesh(int handle, int firstIndex, int indexCount, cTexture* tex,
-	                    const float* tint = nullptr, int transparency = 2);
+	                    const float* tint = nullptr, int transparency = 2,
+	                    const float* light = nullptr, const float* water = nullptr,
+	                    bool depthWrite = false);
 	// Supply the model-view-projection matrix (16 floats, row-major, row-vector
 	// v*M, D3D clip convention) for the mesh. Replaces the built-in auto-frame.
 	void setMeshTransform(int handle, const float* mvp16);
@@ -218,6 +229,9 @@ private:
 		int baseVertex; int startIndex; int indexCount;
 		float mvp[16];
 		SDL_GPUTexture* tex; float tint[4]; int transparency;
+		float light[4];   // xyz = dir toward light, w = strength (0 = unlit)
+		float water[4];   // x = foam strength (0 = none), y = scale, z spare, w = time
+		bool depthWrite;  // opaque base geometry (terrain) writes depth; water/decals don't
 	};
 	std::vector<MeshDraw> meshDraws_;
 	// "Current" material/transform state that DrawIndexedPrimitive snapshots into
@@ -226,6 +240,9 @@ private:
 	SDL_GPUTexture* curMeshTexture_ = nullptr;
 	float           curMeshTint_[4] = {1,1,1,1};
 	int             curMeshTransparency_ = 2;
+	float           curMeshLight_[4] = {0,0,0,0};   // xyz dir, w strength (0 = unlit)
+	float           curMeshWater_[4] = {0,0,0,0};   // x strength (0 = no foam), y scale
+	bool            curMeshDepthWrite_ = false;     // true = opaque, write depth (terrain)
 	void flushMeshDraws(SDL_GPURenderPass* pass);   // replay meshDraws_ in the pass
 
 	// Retained menu-background meshes: they own the real VB/IB (held indirectly so
@@ -235,6 +252,9 @@ private:
 		int firstIndex; int indexCount; SDL_GPUTexture* tex;
 		float tint[4];      // material diffuse rgba (rgb color, a opacity)
 		int transparency;   // 0=substractive, 1=additive, 2=filter
+		float light[4];     // xyz = dir toward light, w = strength (0 = unlit)
+		float water[4];     // x = foam strength (0 = none), y = scale, z spare, w unused
+		bool depthWrite;    // opaque base geometry (terrain) writes depth; decals/water don't
 	};
 	struct MenuMesh {
 		sPtrVertexBuffer vb; sPtrIndexBuffer ib;   // own one reference to the buffers
@@ -248,13 +268,65 @@ private:
 	std::vector<std::unique_ptr<MenuMesh>> menuMeshes_;
 	void recordMenuMeshes();   // per frame: set curstate + call DrawIndexedPrimitive
 
-	SDL_GPUGraphicsPipeline* meshPipeline_ = nullptr;     // filter (alpha-over) blend
-	SDL_GPUGraphicsPipeline* meshPipelineAdd_ = nullptr;  // additive blend
+	SDL_GPUGraphicsPipeline* meshPipeline_ = nullptr;       // filter (alpha-over) blend, no depth write
+	SDL_GPUGraphicsPipeline* meshPipelineOpaque_ = nullptr; // filter blend + depth-write ON (terrain)
+	SDL_GPUGraphicsPipeline* meshPipelineAdd_ = nullptr;    // additive blend
 	SDL_GPUTexture*          depthTexture_ = nullptr;
 	int depthW_ = 0, depthH_ = 0;
 	bool meshPipelineTried_ = false;
 	void createMeshPipeline();
 	void ensureDepth(int w, int h);
+
+	// Water pipeline (P2 water slice): reuses the mesh3d vertex shader but a dedicated
+	// fragment shader (water.frag) that samples two scrolling bump textures + the baked
+	// depth-opacity texture for the animated wave surface + specular glint. A mesh draw
+	// with water[0] > 0 (set by WaterRenderSDL) is routed here instead of meshPipeline_.
+	SDL_GPUGraphicsPipeline* waterPipeline_ = nullptr;
+	bool waterPipelineTried_ = false;
+	void createWaterPipeline();
+	SDL_GPUTexture* waterBump0_ = nullptr;   // borrowed SDL handles (WaterRenderSDL owns
+	SDL_GPUTexture* waterBump1_ = nullptr;   // the cTextures); resolved via sdlTextureOf
+	SDL_GPUSampler* waterSampler_ = nullptr; // REPEAT/wrap: the wave bumps tile (worldXY UV)
+	float           waterFS_[12] = {0};      // {LightDir, CameraPos(.w=time), Params}
+
+	// Coast-foam pipeline (shoreline coast-sprite slice): a dynamic world-space quad
+	// stream rebuilt each frame from the real cCoastSprites sim, drawn on the water
+	// surface. Its own pos/color/uv vertex format (stride 24) + shader, unlike the
+	// mesh3d pipeline; premultiplied filter blend, depth-test on / write off (foam
+	// sits on the water, occluded by nearer terrain but not writing depth itself).
+	SDL_GPUGraphicsPipeline* foamPipeline_ = nullptr;
+	bool foamPipelineTried_ = false;
+	void createFoamPipeline();
+	SDL_GPUBuffer*         foamVB_ = nullptr;      // dynamic, grown to hold the frame's quads
+	SDL_GPUTransferBuffer* foamXfer_ = nullptr;
+	int                    foamVBCap_ = 0;         // capacity in vertices
+	// The coast sim uses two bubble atlases: a "stay" atlas for the simple sprites and
+	// a "moving" atlas for the drifting arcs. Verts are packed [stay | moving]; the
+	// split selects which atlas binds for each draw range (both borrowed textures).
+	SDL_GPUTexture*        foamTexA_ = nullptr;    // stay/simple atlas
+	SDL_GPUTexture*        foamTexB_ = nullptr;    // moving/arc atlas
+	int                    foamSplitA_ = 0;        // vert count drawn with foamTexA_
+	float                  foamMVP_[16] = {0};
+	void flushFoam(SDL_GPURenderPass* pass);       // draw the frame's foam inside the mesh pass
+public:
+	// One foam quad vertex: world position, packed BGRA colour (premultiplied fade),
+	// uv. The foam renderer builds a triangle-list (6 verts/quad) and submits it once
+	// per frame before EndScene; the device uploads + draws it in the 3D mesh pass.
+	// verts are packed [countA verts for texA][rest for texB] so the two atlases draw
+	// from one buffer.
+	struct FoamVertex { float x, y, z; unsigned int color; float u, v; };
+	void submitFoam(const FoamVertex* verts, int vcount, cTexture* texA, int countA,
+	                cTexture* texB, const float* mvp16);
+private:
+	std::vector<FoamVertex> foamVerts_;            // this frame's quads (cleared each EndScene)
+public:
+	// Per-frame water shading state, supplied by WaterRenderSDL before the pass. camPos3
+	// and lightDir3 are 3 floats each; bump0/bump1 are the two wave textures; the scalars
+	// tune the bump sampling/glint. Time is injected each frame from SDL ticks.
+	void setWaterRenderState(cTexture* bump0, cTexture* bump1, const float* camPos3,
+	                         const float* lightDir3, float bumpScale, float scrollSpeed,
+	                         float rippleStrength, float specStrength);
+private:
 
 	SDL_Window*            window_           = nullptr;
 	SDL_GPUDevice*         device_           = nullptr;

@@ -337,6 +337,8 @@ inline eTestVisible Camera::TestVisible(const Vect3f &center,float radius)
 
 inline bool Camera::TestVisible(int x,int y)
 {
+	if(!pTestGrid)		// grid not built yet -> cull (don't deref null). Off-Windows the grid is
+		return false;	// built explicitly each frame (EnableGridTest) before any TestVisible use.
 	x=x>>TestGridShl;
 	y=y>>TestGridShl;
 	if(x<0 || x>=TestGridSize.x || y<0 || y>=TestGridSize.y)

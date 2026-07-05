@@ -154,8 +154,16 @@ void UnitReal::setModel(const char* name)
 	
 	cObject3dx* modelIn = terScene->CreateObject3dxDetached(name, NULL, GlobalAttributes::instance().enableAnimationInterpolation);
 
-	if(!modelIn)
+	if(!modelIn){
+#ifndef _WIN32
+		// Off-Windows the 3D model may fail to load, but the unit still needs its rigid
+		// body for logic/physics -- setRadiusInternal() builds it from attributes (the
+		// model()-less branch), without which rigidBody_ stays null and formationUnit_
+		// dereferences it (FormationUnit::setOwnerUnit -> RigidBodyBase::prm()).
+		setRadiusInternal();
+#endif
 		return;
+	}
 
 	setModel(modelIn);
 	

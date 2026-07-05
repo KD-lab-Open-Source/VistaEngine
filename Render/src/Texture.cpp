@@ -112,13 +112,28 @@ cFileImage* cTexture::createFileImage()
 
 bool cTexture::reloadDDS()
 {
-	if(!gb_RenderDevice3D) // no world-render GPU device on SDL backend yet; DDS load is D3D-only
-		return false;
-
 	char* buf = 0;
 	int size;
 
 	if(!RenderFileRead(name(),buf,size))
+		return false;
+
+#ifndef _WIN32
+	// No D3DX off-Windows: decode the DDS bytes (DXT1/3/5, uncompressed RGB, and V8U8
+	// bump maps like the water waves) to BGRA via the portable decoder and upload
+	// through the cross-platform device. RenderFileRead already resolved the VFS path.
+	cDDSImage img;
+	int r = img.load(buf, size);
+	delete[] buf;
+	if(r != 0)
+		return false;
+	SetWidth(img.GetX());
+	SetHeight(img.GetY());
+	if(frameNumber() < 1)
+		New(1);
+	return gb_RenderDevice->CreateTexture(this, &img, -1, -1) == 0;
+#else
+	if(!gb_RenderDevice3D) // no world-render GPU device on SDL backend yet; DDS load is D3D-only
 		return false;
 
 	DDSURFACEDESC2* ddsd = (DDSURFACEDESC2*)(1+(DWORD*)buf);
@@ -152,6 +167,7 @@ bool cTexture::reloadDDS()
 
 	delete[] buf;
 	return false;
+#endif
 }
 
 BYTE* cTexture::LockTexture(int& Pitch)

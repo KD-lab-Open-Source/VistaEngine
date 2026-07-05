@@ -217,43 +217,26 @@ void BinkSimplePlayerImpl::release()
 	RELEASE(pTextureBink2_);
 }
 
-bool BinkSimplePlayerImpl::init(const char* bink_file) 
-{ 
-	pBinkInfo_ = 0;
-	return false;
-
-	EBinkWait w; 
-
+bool BinkSimplePlayerImpl::init(const char* bink_file)
+{
+	// No Bink decoder is linked in the cross-platform build, so instead of failing the
+	// load (which left every UI_ControlVideo un-inited) we EMULATE a loaded video:
+	// report success without allocating frame textures or spawning the decode thread.
+	// This makes UI_StreamVideo::inited() true, so the briefing screens' video-gated
+	// trigger chains run -- e.g. "Select Mission" reveals its mission nodes and the
+	// START ("Go") button, which were otherwise hidden behind a never-playing video.
+	// getTexture() stays null; UI_ControlVideo::redraw() null-guards it, so the video
+	// area draws nothing (blank) rather than crashing.
 	release();
-	binkFile_ = bink_file; 
-
-	try{
-	}catch(...){
-		pBinkInfo_ = 0;
-		return false;
-	}
-
-	if(pTextureBink1_ == NULL || pTextureBink2_ == NULL){
-		release();
-		return false;
-	}
-
+	binkFile_ = bink_file;
+	pBinkInfo_ = 1;   // non-null "loaded" sentinel; also satisfies the xassert(pBinkInfo_)s
 	return true;
 }
 
 bool BinkSimplePlayerImpl::open()
 {
-	EBinkWait w;
-
-	threadStopFlag_ = 2;
-
-	if(threadHandle_ == INVALID_HANDLE_VALUE){
-		threadStopFlag_ = 0;
-		DWORD ThreadId;
-		threadHandle_ = CreateThread(0, 0, threadProc, this, 0, &ThreadId);
-		waitEventHandle_ = CreateEvent(0, FALSE, TRUE, 0);
-	}
-
+	// Emulated player: no real Bink decode thread (threadProc would drive an absent
+	// decoder). play()/quant() only need us to report success here.
 	return true;
 }
 
