@@ -44,11 +44,6 @@ const char* WAVES1 = "Scripts\\Resource\\balmer\\shader\\waves1.dds";
 
 const float WATER_MIN_DEPTH = 2.f;     // GetRelativeZ threshold: below this = dry
 
-// Deep-water colour of the sheet. The engine tints water from the sky reflection;
-// for a first pass a fixed muted purple matches the reference screenshot's sea. The
-// visible strength comes from the per-node opacity below, not this constant.
-const float WATER_R = 0.30f, WATER_G = 0.13f, WATER_B = 0.45f;
-
 inline bool isWaterNode(cWater* w, int nx, int ny)
 {
 	return w->GetRelativeZ(nx, ny) > WATER_MIN_DEPTH;
@@ -69,6 +64,14 @@ cTexture* buildWaterTexture(cSDLRenderDevice* dev, cWater* w, int gx, int gy)
 	int pitch = 0;
 	unsigned char* px = (unsigned char*)dev->LockTexture(tex, pitch);
 	if(!px){ tex->Release(); return nullptr; }
+
+	// Deep-water colour = the reflected-sky base colour the D3D water shader derives
+	// (mission reflection_color * scene light + cur_reflect_sky_color), computed
+	// portably by cWater. Replaces the old fixed purple with the real per-mission
+	// sky tint; the waves shader perturbs it per-pixel and the per-node opacity below
+	// controls how much of it shows over the seabed.
+	Color4f base = w->GetReflectedSurfaceColor();
+	const float WATER_R = base.r, WATER_G = base.g, WATER_B = base.b;
 
 	const KeysColor& grad = w->GetOpacity();
 	for(int y = 0; y < gy; ++y){
@@ -185,9 +188,10 @@ bool buildWaterMesh(cSDLRenderDevice* dev)
 	// The baked premultiplied texture carries the depth-opacity water colour; the water
 	// pipeline (selected by water[0] > 0) layers the scrolling bumps + specular on top.
 	float white[4] = { 1.f, 1.f, 1.f, 1.f };
-	float purple[4] = { WATER_R, WATER_G, WATER_B, 0.6f };  // fallback if the bake fails
+	Color4f fb = w->GetReflectedSurfaceColor();
+	float fallback[4] = { fb.r, fb.g, fb.b, 0.6f };  // flat reflected-sky tint if the bake fails
 	float water[3] = { 1.f, 0.f, 0.f };   // water[0]=1 flags the draw as water
-	dev->addMeshSubmesh(s_handle, 0, nquads * 2 * 3, s_tex, s_tex ? white : purple,
+	dev->addMeshSubmesh(s_handle, 0, nquads * 2 * 3, s_tex, s_tex ? white : fallback,
 	                    /*transparency*/2, /*light*/nullptr, water);
 	return true;
 }

@@ -111,6 +111,10 @@ public:
 	cTexture* reflectionTexture() const {return pWaterZ; }
 
 	void SetCurReflectSkyColor(Color4c color){cur_reflect_sky_color=Color4f(color);}
+	// Portable reflected-sky base colour for the off-Windows SDL water sheet: the
+	// D3D path's tint math with the unavailable planar-reflection render target
+	// replaced by cur_reflect_sky_color (the engine's own ps1.1 sky stand-in).
+	Color4f GetReflectedSurfaceColor();
 
 	FunctorGetZ* GetFunctorZ() {return pFunctorZ;}
 
