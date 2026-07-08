@@ -123,6 +123,7 @@ cCoastSprites::~cCoastSprites()
 }
 void cCoastSprites::Draw(Camera* camera)
 {
+#ifdef _WIN32
 	start_timer_auto();
 	MTAuto autolock(lock);
 	DWORD old_zwrite=gb_RenderDevice->GetRenderState(RS_ZWRITEENABLE);
@@ -133,6 +134,7 @@ void cCoastSprites::Draw(Camera* camera)
 	if (mode & CSM_MOVING)
 		DrawMovingCoastSprite(camera);
 	gb_RenderDevice->SetRenderState(RS_ZWRITEENABLE,old_zwrite);
+#endif
 }
 
 void cCoastSprites::PreDraw(Camera* camera)

@@ -70,28 +70,25 @@ cWater::cWater()
 	lavaVolumeTextureScale_ = 0.03f;
 	lavaTextureName_ = "Scripts\\Resource\\balmer\\lava.tga";
 
-	psShader=0;
-	vsShader=0;
-	lavaShader_=0;
-	if(gb_RenderDevice3D){ // no world-render GPU device on SDL backend yet
-		psShader=new PSWater;
-		vsShader=new VSWater;
-		if(gb_RenderDevice3D->IsPS20())
-		{
-			psShader->SetTechnique(WATER_REFLECTION);
-			vsShader->SetTechnique(WATER_REFLECTION);
-		}else
-		{
-			psShader->SetTechnique(WATER_EMPTY);
-			vsShader->SetTechnique(WATER_EMPTY);
-		}
-
-		vsShader->Restore();
-		psShader->Restore();
-
-		lavaShader_ = new ShaderSceneWaterLava;
-		lavaShader_->Restore();
+#ifdef _WIN32
+	psShader=new PSWater;
+	vsShader=new VSWater;
+	if(gb_RenderDevice3D->IsPS20())
+	{
+		psShader->SetTechnique(WATER_REFLECTION);
+		vsShader->SetTechnique(WATER_REFLECTION);
+	}else
+	{
+		psShader->SetTechnique(WATER_EMPTY);
+		vsShader->SetTechnique(WATER_EMPTY);
 	}
+	
+	vsShader->Restore();
+	psShader->Restore();
+
+	lavaShader_ = new ShaderSceneWaterLava;
+	lavaShader_->Restore();
+#endif
 
 	bumpTextureName_ = "Scripts\\Resource\\balmer\\shader\\waves.dds";
 	bumpTextureName1_ = "Scripts\\Resource\\balmer\\shader\\waves1.dds";
@@ -150,9 +147,11 @@ cWater::~cWater()
 	RELEASE(pWaterZ);
 	delete[] zbuffer;
 	delete[] speed_buffer;
+#ifdef _WIN32
 	delete vsShader;
 	delete psShader;
 	delete lavaShader_;
+#endif
 	delete pFunctorZ;
 	RELEASE(textureMiniMap_);
 	RELEASE(textureMiniMap2_);
@@ -278,6 +277,7 @@ Color4f cWater::GetReflectedSurfaceColor()
 
 void cWater::Draw(Camera* camera)
 {
+#ifdef _WIN32
 	start_timer_auto();
 
 	cD3DRender* rd=gb_RenderDevice3D;
@@ -392,10 +392,12 @@ void cWater::Draw(Camera* camera)
 	}
 
 	rd->AddNumPolygonToNormal();
+#endif
 }
 
 void cWater::DrawPolygons(Camera* camera)
 {
+#ifdef _WIN32
 	cD3DRender* rd=gb_RenderDevice3D;
 	int num_draw_polygon=0;
 /*
@@ -432,10 +434,12 @@ void cWater::DrawPolygons(Camera* camera)
 
 	if(border.isInit())
 		border.Draw(camera);
+#endif
 }
 
 void cWater::DrawToZBuffer(Camera* camera)
 {
+#ifdef _WIN32
 	cD3DRender* rd=gb_RenderDevice3D;
 	rd->AddNumPolygonToTilemap();
 	DWORD old_cull=rd->GetRenderState( D3DRS_CULLMODE);
@@ -444,6 +448,7 @@ void cWater::DrawToZBuffer(Camera* camera)
 	DrawPolygons(camera);
 	rd->SetRenderState( D3DRS_CULLMODE, old_cull );
 	rd->AddNumPolygonToNormal();
+#endif
 }
 
 void cWater::Animate(float dt)
@@ -547,7 +552,6 @@ void cWater::CalcColor(Color4c& color, int z, unsigned char opacity_shallow)
 
 void cWater::UpdateVB()
 {
-	cD3DRender* rd=gb_RenderDevice3D;
 	float mul_texel=1/128.0f;
 
 	int tile_polygons=visible_tile_size*visible_tile_size*2;
@@ -555,7 +559,7 @@ void cWater::UpdateVB()
 	vector<VisibleLine>::iterator itv;
 
 	int cur_idx=0;
-	VType* vertex=(VType*)rd->LockVertexBuffer(vb[cur_idx]);
+	VType* vertex=(VType*)gb_RenderDevice->LockVertexBuffer(vb[cur_idx]);
 	const float tnt1 = 0.01f;
 	const int t1 = round(tnt1/z_int_to_float);
 	int zReflection = 0;
@@ -566,9 +570,9 @@ void cWater::UpdateVB()
 		int idx_vb=(vl.begin_tile_y*visible_tile_size)/dy;
 		xassert(idx_vb>=0 && idx_vb<vb.size());
 		if(idx_vb!=cur_idx){
-			rd->UnlockVertexBuffer(vb[cur_idx]);
+			gb_RenderDevice->UnlockVertexBuffer(vb[cur_idx]);
 			cur_idx=idx_vb;
-			vertex=(VType*)rd->LockVertexBuffer(vb[cur_idx]);
+			vertex=(VType*)gb_RenderDevice->LockVertexBuffer(vb[cur_idx]);
 		}
 
 		int offsety=(idx_vb*dy);
@@ -612,24 +616,24 @@ void cWater::UpdateVB()
 	if(counterReflection)
 		scene()->setZReflection(float(zReflection)/counterReflection, 0.0025f);
 
-	rd->UnlockVertexBuffer(vb[cur_idx]);
+	gb_RenderDevice->UnlockVertexBuffer(vb[cur_idx]);
 
 	if(border.isInit())
 	{
 		for(int i=0;i<4; i++)
 		{
-			VType* v = (VType*)gb_RenderDevice3D->LockVertexBuffer(border.tiles[i].vertexBuffer);
+			VType* v = (VType*)gb_RenderDevice->LockVertexBuffer(border.tiles[i].vertexBuffer);
 			for(int j=0; j<border.tiles[i].vertexBuffer.GetNumberVertex();j++)
 			{
 				Color4c color;
 				CalcColor(color,environment_water,255);
 				v[j].diffuse = color;
 			}
-			gb_RenderDevice3D->UnlockVertexBuffer(border.tiles[i].vertexBuffer);
+			gb_RenderDevice->UnlockVertexBuffer(border.tiles[i].vertexBuffer);
 		}
 		for(int i=4;i<8;i++)
 		{
-			VType* v = (VType*)gb_RenderDevice3D->LockVertexBuffer(border.tiles[i].vertexBuffer);
+			VType* v = (VType*)gb_RenderDevice->LockVertexBuffer(border.tiles[i].vertexBuffer);
 			int j;
 			if(i==4||i==7)
 			{
@@ -650,7 +654,7 @@ void cWater::UpdateVB()
 				CalcColor(color,environment_water,255);
 				v[k].diffuse = color;
 			}
-			gb_RenderDevice3D->UnlockVertexBuffer(border.tiles[i].vertexBuffer);
+			gb_RenderDevice->UnlockVertexBuffer(border.tiles[i].vertexBuffer);
 		}
 	}
 }
@@ -658,7 +662,6 @@ void cWater::UpdateVB()
 void cWater::Init()
 {
 	size.set((int)vMap.H_SIZE, (int)vMap.V_SIZE);
-	cD3DRender* rd=gb_RenderDevice3D;
 	const int max_vertex=65536;
 	grid_size.x=(size.x>>grid_shift)+1;
 	grid_size.y=(size.y>>grid_shift)+1;
@@ -668,13 +671,6 @@ void cWater::Init()
 	inv_delta.y=1.0f/delta.y;
 
 	number_vertex=grid_size.x*grid_size.y;
-
-	if(!rd){ // no world-render GPU device on SDL backend yet: keep CPU-only water state
-		InitZBuffer();
-		updateMap(Vect2i(0,0),Vect2i(grid_size.x<<grid_shift,grid_size.y<<grid_shift));
-		return;
-	}
-
 	if(number_vertex>max_vertex)
 	{
 		vb.resize(2);
@@ -682,11 +678,11 @@ void cWater::Init()
 		xassert(number_vertex<max_vertex);
 		xassert((grid_size.y-1)%vb.size()==0);
 		for(int i=0;i<vb.size();i++)
-			rd->CreateVertexBuffer(vb[i],number_vertex,VType::declaration,false);
+			gb_RenderDevice->CreateVertexBuffer(vb[i],number_vertex,VType::declaration,false);
 	}
 	else{
 		vb.resize(1);
-		rd->CreateVertexBuffer(vb[0],number_vertex,VType::declaration,false);
+		gb_RenderDevice->CreateVertexBuffer(vb[0],number_vertex,VType::declaration,false);
 	}
 	int dd_x=grid_size.x-1;
 	int dd_y=(grid_size.y-1)/vb.size();
@@ -694,8 +690,8 @@ void cWater::Init()
 	int ddv_y=dd_y+1;
 
 	number_polygon=2*dd_x*dd_y;
-	rd->CreateIndexBuffer(ib,number_polygon);
-	sPolygon* ptr=rd->LockIndexBuffer(ib);
+	gb_RenderDevice->CreateIndexBuffer(ib,number_polygon);
+	sPolygon* ptr=gb_RenderDevice->LockIndexBuffer(ib);
 
 	int num_tile_x=dd_x/visible_tile_size;
 	int num_tile_y=dd_y/visible_tile_size;
@@ -711,7 +707,7 @@ void cWater::Init()
 			}
 		}
 
-	rd->UnlockIndexBuffer(ib);
+	gb_RenderDevice->UnlockIndexBuffer(ib);
 
 	InitZBuffer();
 	updateMap(Vect2i(0,0),Vect2i(grid_size.x<<grid_shift,grid_size.y<<grid_shift));
@@ -767,7 +763,7 @@ void cWater::ChangeBorderZ()
 	{
 		for(int i=0; i<8; i++)
 		{
-			VType* v = (VType*)gb_RenderDevice3D->LockVertexBuffer(border.tiles[i].vertexBuffer);
+			VType* v = (VType*)gb_RenderDevice->LockVertexBuffer(border.tiles[i].vertexBuffer);
 			int offset=0;
 			if(i==4||i==7)
 				offset = grid_size.x;
@@ -777,7 +773,7 @@ void cWater::ChangeBorderZ()
 			float z = GetEnvironmentWater();
 			for(int j=offset; j<border.tiles[i].vertexBuffer.GetNumberVertex(); j++)
 				v[j].pos.z = z;
-			gb_RenderDevice3D->UnlockVertexBuffer(border.tiles[i].vertexBuffer);
+			gb_RenderDevice->UnlockVertexBuffer(border.tiles[i].vertexBuffer);
 		}
 
 	}
@@ -2005,8 +2001,7 @@ void cEnvironmentEarth::SetTexture(const char* texture)
 
 	if (earth_vb.IsInit())
 	{
-		cD3DRender* rd=gb_RenderDevice3D;
-		VType* cur_vertex=(VType*)rd->LockVertexBuffer(earth_vb);
+		VType* cur_vertex=(VType*)gb_RenderDevice->LockVertexBuffer(earth_vb);
 		Vect2f tex_beg(0,0);
 		Vect2f tex_size(500,500);
 		if(Texture)
@@ -2022,7 +2017,7 @@ void cEnvironmentEarth::SetTexture(const char* texture)
 			cur_vertex[i].GetTexel().set(u, v);	
 			cur_vertex[i].diffuse.set(255,255,255,255);
 		}
-		rd->UnlockVertexBuffer(earth_vb);
+		gb_RenderDevice->UnlockVertexBuffer(earth_vb);
 	}
 }
 
@@ -2056,7 +2051,6 @@ cEnvironmentEarth::cEnvironmentEarth(const char* texture, float height)
 //	this->time = time;
 	Texture = 0;
 	sur_z = height;
-	cD3DRender* rd=gb_RenderDevice3D;
 	Vect2i size((int)vMap.H_SIZE, (int)vMap.V_SIZE);
 	const int con = 0;
 	const int pr_size = 512;
@@ -2071,10 +2065,10 @@ cEnvironmentEarth::cEnvironmentEarth(const char* texture, float height)
 	float f_add = float (far_bord+con)/f_nn;
 	size_vb = (x_nn+1)*(f_nn+1)*2 + (y_nn+1)*(f_nn+1)*2 + (f_nn+1)*(f_nn+1)*4;
 	size_ib = (x_nn)*(f_nn)*4 + (y_nn)*(f_nn)*4 + (f_nn)*(f_nn)*8;
-	rd->CreateVertexBuffer(earth_vb, size_vb,VType::declaration);
-	rd->CreateIndexBuffer(earth_ib, size_ib);
-	VType* cur_vertex=(VType*)rd->LockVertexBuffer(earth_vb);
-	sPolygon* pt=rd->LockIndexBuffer(earth_ib);
+	gb_RenderDevice->CreateVertexBuffer(earth_vb, size_vb,VType::declaration);
+	gb_RenderDevice->CreateIndexBuffer(earth_ib, size_ib);
+	VType* cur_vertex=(VType*)gb_RenderDevice->LockVertexBuffer(earth_vb);
+	sPolygon* pt=gb_RenderDevice->LockIndexBuffer(earth_ib);
 	int offset = 0;
 	int j = 0;
 	float z = sur_z;
@@ -2101,8 +2095,8 @@ cEnvironmentEarth::cEnvironmentEarth(const char* texture, float height)
 	xassert(size_vb == offset);
 	xassert(size_ib == j);
 
-	rd->UnlockVertexBuffer(earth_vb);
-	rd->UnlockIndexBuffer(earth_ib);
+	gb_RenderDevice->UnlockVertexBuffer(earth_vb);
+	gb_RenderDevice->UnlockIndexBuffer(earth_ib);
 	SetTexture(texture);
 }
 
@@ -2119,6 +2113,7 @@ void cEnvironmentEarth::PreDraw(Camera* camera)
 
 void cEnvironmentEarth::Draw(Camera* camera)
 {
+#ifdef _WIN32
 	if(camera->getAttribute(ATTRCAMERA_REFLECTION))
 		return;
 
@@ -2143,6 +2138,7 @@ void cEnvironmentEarth::Draw(Camera* camera)
 
 		rd->DrawIndexedPrimitive(earth_vb,0,size_vb,earth_ib,0,size_ib);
 	}
+#endif
 }
 
 

@@ -255,6 +255,7 @@ void Environment::logicQuant()
 
 void Environment::graphQuant(float dt, Camera* camera)
 {
+#ifdef _WIN32
 	start_timer_auto();
 
 	if(water_)
@@ -287,10 +288,12 @@ void Environment::graphQuant(float dt, Camera* camera)
 	flash()->setIntensity();
 
 	fieldOfViewMap_->updateTexture();
+#endif
 }
 
 void Environment::drawPostEffects(float dt, Camera* camera)
 {
+#ifdef _WIN32
 	start_timer_auto();
 
 	flash()->draw();
@@ -298,6 +301,7 @@ void Environment::drawPostEffects(float dt, Camera* camera)
 		eff->setUnderWater(water_->isUnderWater(camera->GetPos()));
 
 	PEManager()->draw(dt);
+#endif
 }
 
 void Environment::showEditor()

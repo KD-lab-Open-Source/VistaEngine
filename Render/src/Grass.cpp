@@ -28,24 +28,24 @@ void DrawTile::InitVertex(int bladeCount_)
 	bladeCount = bladeCount_;
 	int vertexCount = bladeCount*4;// 4 вершины на травинку
 	//gb_RenderDevice3D->GetVertexPool()->CreatePage(vtx,VertexPoolParameter(vertexCount,GetVertexDeclaration()));
-	gb_RenderDevice3D->CreateVertexBuffer(vertexBuffer,vertexCount,GetVertexDeclaration());
+	gb_RenderDevice->CreateVertexBuffer(vertexBuffer,vertexCount,GetVertexDeclaration());
 	InitIndex(bladeCount_);
 }
 void DrawTile::InitIndex(int bladeCount)
 {
 	DeleteIndex();
 	int indexCount = bladeCount*2;// 2 полигона на травинку
-	gb_RenderDevice3D->CreateIndexBuffer(forwardIndex,indexCount);
-	gb_RenderDevice3D->CreateIndexBuffer(backwardIndex,indexCount);
+	gb_RenderDevice->CreateIndexBuffer(forwardIndex,indexCount);
+	gb_RenderDevice->CreateIndexBuffer(backwardIndex,indexCount);
 }
 void DrawTile::DeleteIndex()
 {
-	gb_RenderDevice3D->DeleteIndexBuffer(forwardIndex);
-	gb_RenderDevice3D->DeleteIndexBuffer(backwardIndex);
+	gb_RenderDevice->DeleteIndexBuffer(forwardIndex);
+	gb_RenderDevice->DeleteIndexBuffer(backwardIndex);
 }
 void DrawTile::DeleteVertex()
 {
-	gb_RenderDevice3D->DeleteVertexBuffer(vertexBuffer);
+	gb_RenderDevice->DeleteVertexBuffer(vertexBuffer);
 	DeleteIndex();
 }
 
@@ -56,28 +56,28 @@ void DrawTile::Init(int xpos, int ypos)
 
 BYTE *DrawTile::LockVB()
 {
-	return (BYTE*)gb_RenderDevice3D->LockVertexBuffer(vertexBuffer);
+	return (BYTE*)gb_RenderDevice->LockVertexBuffer(vertexBuffer);
 }
 
 void DrawTile::UnlockVB()
 {
-	gb_RenderDevice3D->UnlockVertexBuffer(vertexBuffer);
+	gb_RenderDevice->UnlockVertexBuffer(vertexBuffer);
 }
 sPolygon* DrawTile::LockForwardIB()
 {
-	return gb_RenderDevice3D->LockIndexBuffer(forwardIndex);
+	return gb_RenderDevice->LockIndexBuffer(forwardIndex);
 }
 sPolygon* DrawTile::LockBackwardIB()
 {
-	return gb_RenderDevice3D->LockIndexBuffer(backwardIndex);
+	return gb_RenderDevice->LockIndexBuffer(backwardIndex);
 }
 void DrawTile::UnlockForwardIB()
 {
-	gb_RenderDevice3D->UnlockIndexBuffer(forwardIndex);
+	gb_RenderDevice->UnlockIndexBuffer(forwardIndex);
 }
 void DrawTile::UnlockBackwardIB()
 {
-	gb_RenderDevice3D->UnlockIndexBuffer(backwardIndex);
+	gb_RenderDevice->UnlockIndexBuffer(backwardIndex);
 }
 
 //--------------------------------------------------------------------
@@ -115,10 +115,12 @@ GrassMap::~GrassMap()
 	delete [] grassMap_;
 	RELEASE(texture_);
 	RELEASE(textureMap_);
+#ifdef _WIN32
 	delete vsGrass;
 	delete psGrass;
 	delete psGrassShadow;
 	delete psSkinZBuffer;
+#endif
 	drawTileFreeAll();
 }
 
@@ -138,12 +140,7 @@ void GrassMap::Init(const char* world_path)
 	grassMapSize_.set(hsize>>grassMapShift,vsize>>grassMapShift);
 
 	grassMap_ = new GrassTile[tileNumber_.x*tileNumber_.y];
-	textureNames_.resize(textureCount_);
-	bushHights_.resize(textureCount_,3);
-
-	if(!gb_RenderDevice3D) // no world-render GPU device on SDL backend yet
-		return;
-
+#ifdef _WIN32
 	vsGrass = new VSGrass;
 	vsGrass->Restore();
 	psGrass = new PSGrass;
@@ -161,6 +158,9 @@ void GrassMap::Init(const char* world_path)
 		psGrassShadow = new PSGrassShadowFX;
 		psGrassShadow->Restore();
 	}
+#endif
+	textureNames_.resize(textureCount_);
+	bushHights_.resize(textureCount_,3);
 	//textureMap_ = GetTexLibrary()->CreateAlphaTexture(grassMapSize_.x,grassMapSize_.y);
 	textureMap_ = GetTexLibrary()->CreateTexture(grassMapSize_.x,grassMapSize_.y,true);
 	for(int y=0; y<tileNumber_.y; y++)
@@ -768,6 +768,7 @@ bool GrassMap::TestVisible(GrassTile& tile,Camera* camera)
 
 void GrassMap::DrawGrass(eBlendMode mode,Camera* camera)
 {
+#ifdef _WIN32
 	if (sortedTile_.size()==0)
 		return;
 	Color4c color(255,255,255,64);
@@ -840,11 +841,12 @@ void GrassMap::DrawGrass(eBlendMode mode,Camera* camera)
 	//	gb_RenderDevice3D->DrawIndexedPrimitive(tile.vertexBuffer,0,tile.bushes_.size()*4,tile.indexBuffer,0,tile.bushes_.size()*2);
 	//}
 	gb_RenderDevice3D->SetRenderState( D3DRS_ALPHAFUNC, oldAlphaFunc);
-
+#endif
 }
 
 void GrassMap::Draw(Camera* camera)
 {
+#ifdef _WIN32
 	start_timer_auto();
 	
 	if(!enable_ || debugShowSwitch.grass)
@@ -875,6 +877,7 @@ void GrassMap::Draw(Camera* camera)
 	//DrawGrass(ALPHA_BLEND,UCamera);
 	
 	//gb_RenderDevice3D->SetRenderState(D3DRS_ZWRITEENABLE,TRUE);
+#endif
 }
 
 void GrassMap::serialize(Archive& ar)

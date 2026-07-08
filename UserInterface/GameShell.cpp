@@ -187,13 +187,7 @@ GameShell::GameShell(HINSTANCE hInstance, bool useHT) :
 	soundPushedPushLevel=INT_MIN;
 
 	gb_VisGeneric->SetUseTextureCache(true);
-	// See Runtime.cpp: the InPlaceArchive mesh cache is a 32-bit raw memory image,
-	// unportable to 64-bit. Off-Windows fall back to loading originals.
-#ifdef _WIN32
 	gb_VisGeneric->SetUseMeshCache(true);
-#else
-	gb_VisGeneric->SetUseMeshCache(false);
-#endif
 
 	globalTrigger_.load("Scripts\\Content\\Triggers\\GlobalTrigger.scr");
 
@@ -1093,25 +1087,12 @@ void GameShell::Show(float realGraphDT)
 		stop_timer(2);
 		start_timer(3);
 
-		if(gb_RenderDevice3D){ // world 3D render (sky/terrain/post-effects) not ported to SDL backend yet (slice 3)
-			environment->graphQuant(realGraphDT, cameraManager->GetCamera());
+		environment->graphQuant(realGraphDT, cameraManager->GetCamera());
 
-			cameraManager->GetCamera()->setAttribute(ATTRCAMERA_CLEARZBUFFER);//Потому как в небе могут рисоваться планеты в z buffer.
-			terScene->Draw(cameraManager->GetCamera());
+		cameraManager->GetCamera()->setAttribute(ATTRCAMERA_CLEARZBUFFER);//Потому как в небе могут рисоваться планеты в z buffer.
+		terScene->Draw(cameraManager->GetCamera());
 
-			environment->drawPostEffects(realGraphDT, cameraManager->GetCamera());
-		}
-#ifndef _WIN32
-		// Base terrain: the D3D tilemap path above is null off-Windows, so draw the
-		// vMap heightfield directly through the SDL mesh pass (P2 slice 4).
-		renderTerrainSDL(cameraManager->GetCamera());
-		// Water surface: cWater::Draw (D3D shaders) is likewise null/unreached off-
-		// Windows; draw the water height field over the terrain through the same pass.
-		renderWaterSDL(cameraManager->GetCamera());
-		// Shoreline foam: cCoastSprites::Draw (D3D quad buffer) is dead off-Windows, so
-		// drive the real particle sim and draw its sprites on the water surface.
-		renderCoastFoamSDL(cameraManager->GetCamera(), realGraphDT);
-#endif
+		environment->drawPostEffects(realGraphDT, cameraManager->GetCamera());
 		
 		gb_RenderDevice->SetRenderState(RS_FILLMODE, FILL_SOLID);
 

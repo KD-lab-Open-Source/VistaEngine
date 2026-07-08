@@ -336,12 +336,6 @@ void cScene::Draw(Camera* camera)
 {
 	start_timer_auto();
 
-	// The SDL GPU backend has no concrete cD3DRender (gb_RenderDevice3D), and the
-	// 3D scene path below is entirely D3D9. Until the scene path is ported, skip
-	// it so the 2D UI can still draw. Guards every scene-draw caller in one place.
-	if(!gb_RenderDevice3D)
-		return;
-
 	MTAuto enter(lock_draw);
 
 	RemoveEmptyStaticSimply3dx();
@@ -353,14 +347,18 @@ void cScene::Draw(Camera* camera)
 	//D3DSURFACE_DESC desc;
 	//gb_RenderDevice3D->lpBackBuffer->GetDesc(&desc);
 	//gb_RenderDevice3D->dtAdvance->CreateMirageMap(desc.Width,desc.Height);
+#ifdef _WIN32
 	camera->SetSecondRT(gb_RenderDevice3D->GetAccessibleZBuffer());//Криво, для демы.
+#endif
 
 //	unsigned int fp=_controlfp(0,0);
 //	_controlfp( _PC_24,  _MCW_PC ); 
 	//PreDraw
 	if(GetFogOfWar()){
+#ifdef _WIN32
 		gb_RenderDevice3D->SetFogOfWar(true);
 		gb_RenderDevice3D->fog_of_war_color=Color4f(GetFogOfWar()->GetFogColor());
+#endif
 	}
 
 /*
@@ -455,9 +453,10 @@ void cScene::Draw(Camera* camera)
 
 	if(cameraToDebug)
 		cameraToStore.SetCopy(camera);
-
+#ifdef _WIN32
 	gb_RenderDevice3D->SetFogOfWar(false);
 	gb_RenderDevice->SetClipRect(0,0,gb_RenderDevice->GetSizeX(),gb_RenderDevice->GetSizeY());
+#endif
 	circle_shadow.clear();
 }
 
@@ -1164,6 +1163,7 @@ void cScene::AddPlanarCamera(Camera* camera, bool light, bool toObjects)
 
 void cScene::AddShadowCamera(Camera* camera)
 {
+#ifdef _WIN32
 	gb_RenderDevice3D->SetAdvance(true);
 	if((Option_shadowEnabled && gb_RenderDevice3D->GetShadowMap()==0) || (!Option_shadowEnabled && gb_RenderDevice3D->GetLightMap() == 0)){
 		CreateShadowmap();
@@ -1197,10 +1197,12 @@ void cScene::AddShadowCamera(Camera* camera)
 		else 
 			AddPlanarCamera(camera, false, false);
 	}
+#endif
 }
 
 void cScene::AddLightCamera(Camera* camera)
 {
+#ifdef _WIN32
 	camera->setAttribute(ATTRCAMERA_ZMINMAX);
 	camera->SetCopy(shadowCamera_);
 	camera->AttachChild(shadowCamera_);
@@ -1221,10 +1223,12 @@ void cScene::AddLightCamera(Camera* camera)
 	shadowCamera_->Attach(SCENENODE_OBJECT, tileMap_);
 
 //	camera->SetZPlaneTemp(zplane);
+#endif
 }
 
 void cScene::AddMirageCamera(Camera* camera)
 {
+#ifdef _WIN32
 	if(!gb_RenderDevice3D->GetMirageMap()){
 		D3DSURFACE_DESC desc;
 		gb_RenderDevice3D->backBuffer_->GetDesc(&desc);
@@ -1237,6 +1241,7 @@ void cScene::AddMirageCamera(Camera* camera)
 	mirageCamera_->SetFoneColor(Color4c(128,128,128,0));
 	mirageCamera_->setAttribute(ATTRCAMERA_NOCLEARTARGET);
 	mirageCamera_->Update();
+#endif
 }
 
 
@@ -1271,6 +1276,7 @@ void cScene::AddReflectionCamera(Camera* camera)
 }
 void cScene::AddFloatZBufferCamera(Camera* camera)
 {
+#ifdef _WIN32
 	if(!gb_RenderDevice3D->GetFloatMap()){
 		D3DSURFACE_DESC desc;
 		gb_RenderDevice3D->backBuffer_->GetDesc(&desc);
@@ -1286,7 +1292,7 @@ void cScene::AddFloatZBufferCamera(Camera* camera)
 	floatZBufferCamera_->setAttribute(ATTRCAMERA_FLOAT_ZBUFFER);
 	floatZBufferCamera_->Attach(SCENENODE_OBJECT, tileMap_);
 	floatZBufferCamera_->Update();
-
+#endif
 }
 
 void cScene::deleteManagedResource()

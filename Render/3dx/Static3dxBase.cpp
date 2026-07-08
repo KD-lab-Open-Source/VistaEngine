@@ -1473,7 +1473,8 @@ bool Static3dxBase::load(const char* fileName)
 {
 	fileName_ = fileName;
 	BinaryIArchive ia(0);
-	if(ia.open((setExtention(fileName_.c_str(), fileExtention).c_str())))
+	const auto temporaryFileName = setExtention(fileName_.c_str(), fileExtention);
+	if(ia.open(temporaryFileName.c_str()))
 		return ia.serialize(*this, is_logic ? "logic3dx" : "graphics3dx", 0); // В конверсиях из старого формата может не быть logic3dx
 
 	CLoadDirectoryFileRender rd;

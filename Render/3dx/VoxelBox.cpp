@@ -165,6 +165,25 @@ void VoxelBox::serialize(Archive& ar)
 	ar.serialize(buffer_, "buffer", "buffer");
 }
 
+#ifndef _WIN32
+void VoxelBox::reconstructInPlace(bool valid, int sizeLen, int size, int mask,
+	const Vect3f& scale, const Vect3f& scaleInv, const Vect3f& offset,
+	const void* buffer, int bufferSize)
+{
+	valid_    = valid;
+	sizeLen_  = sizeLen;
+	size_     = size;
+	mask_     = mask;
+	scale_    = scale;
+	scaleInv_ = scaleInv;
+	offset_   = offset;
+	if(bufferSize > 0 && buffer){
+		buffer_.alloc(bufferSize);
+		memcpy(buffer_.buffer(), buffer, bufferSize);
+	}
+}
+#endif
+
 void VoxelBox::draw(const Vect3f& pos, Color4c color)
 {
 	for(int z = 0; z < size_; z++)

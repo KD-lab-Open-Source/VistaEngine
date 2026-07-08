@@ -170,17 +170,47 @@ private:
 	const Node& back() const;
 };
 
+#ifndef _WIN32
+// Off-Windows customization point for InPlaceIArchive::construct(). The saved
+// image is a raw 32-bit memory dump, so it cannot be cast to a live 64-bit
+// object (offsets are 32-bit, struct strides/padding are 32-bit). Each concrete
+// type instead provides a reader `inPlaceReconstruct(T*, image, size)` (found by
+// ordinary lookup / ADL where T is complete) that rebuilds a real native object
+// from the raw image bytes. This primary template is the fallback for types
+// that have no portable reader yet.
+template<class T>
+T* inPlaceReconstruct(T*, const char* /*image*/, int /*size*/)
+{
+	xassert(!"InPlaceIArchive::construct: no portable in-place reader for this type");
+	return 0;
+}
+#endif
+
 class InPlaceIArchive
 {
 public:
 	InPlaceIArchive(const char* name);
 
 	bool open(const char* fname);  // true if file exists
-	
+#ifdef _WIN32
+	// 32-bit engine: open() has relocated the image, so it *is* the object.
 	template<class T>
 	void construct(T*& ptr) { ptr = (T*)data_; }
 
 	static void destruct(void* ptr) { delete ptr; }
+#else
+	// Reconstruction copies everything into native objects, so this archive owns
+	// the raw image and frees it on destruction.
+	~InPlaceIArchive() { delete[] data_; }
+
+	template<class T>
+	void construct(T*& ptr) { ptr = inPlaceReconstruct((T*)0, data_, size_); }
+
+	// Native objects: run the real destructor (unlike the Windows blob, whose
+	// members alias the image and must never be destructed field-by-field).
+	template<class T>
+	static void destruct(T* ptr) { delete ptr; }
+#endif
 
 private:
 	int version_;

@@ -660,9 +660,10 @@ void cObject3dx::Draw(Camera* camera)
 	sDataRenderMaterial material;
 	material.lerp_texture=lerp_color;
 	material.point_light=&point_light;
-
+#ifdef _WIN32
 	gb_RenderDevice3D->SetSamplerData(1,sampler_wrap_linear);
 	gb_RenderDevice3D->SetTextureBase(4,0);
+#endif
 
 	//Из плюсов - выводит стабильное количество полигонов вне зависимости
 	//от количества подобъектов. Из минусов - для больших объектов не слишком
@@ -676,9 +677,11 @@ void cObject3dx::Draw(Camera* camera)
 	bool draw_opacity=camera->GetCameraPass()==SCENENODE_OBJECTSORT;
 	bool draw2passes = getAttribute(ATTRUNKOBJ_2PASS_ZBUFFER);//(camera->GetCameraPass()==SCENENODE_OBJECT_2PASS)||(camera->GetCameraPass()==SCENENODE_ZPASS);
 	if((draw_opacity || draw2passes)){
+#ifdef _WIN32
 		old_zfunc = gb_RenderDevice3D->GetRenderState(D3DRS_ZFUNC);
 		old_zwriteble = gb_RenderDevice3D->GetRenderState(D3DRS_ZWRITEENABLE);
 		old_color = gb_RenderDevice3D->GetRenderState(D3DRS_COLORWRITEENABLE);
+#endif
 	}
 
 	//!!! Не забыть сортировку по материалам.
@@ -766,7 +769,7 @@ void cObject3dx::Draw(Camera* camera)
 				blend = ALPHA_SUBBLEND; /// dst=dst-src
 				break;
 		}
-
+#ifdef _WIN32
 		gb_RenderDevice3D->SetBlendStateAlphaRef(blend);
 		gb_RenderDevice3D->SetTexturePhase(0,material.Tex[0],texture_phase);
 		gb_RenderDevice3D->SetTexturePhase(1,material.Tex[1],texture_phase);
@@ -910,12 +913,15 @@ void cObject3dx::Draw(Camera* camera)
 		}
 		else
 			DrawMaterialGroup(bunch);
+#endif
 	}
 
 	if(draw_opacity || draw2passes){
+#ifdef _WIN32
 		gb_RenderDevice3D->SetRenderState(D3DRS_ZWRITEENABLE,old_zwriteble);
 		gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC,old_zfunc);
 		gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,old_color);
+#endif
 	}
 
 	if(pStatic->enableFur && camera->GetCameraPass()==SCENENODE_OBJECTSORT)

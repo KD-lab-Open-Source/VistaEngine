@@ -48,22 +48,15 @@ TileStrip::TileStrip(int xSize, int ySize)
 	xsize = xSize;
 	ysize = ySize;
 
+	gb_RenderDevice->CreateIndexBuffer(ib, numIndices());
+	sPolygon* pIndex = gb_RenderDevice->LockIndexBuffer(ib);
+	setIB(pIndex);
+	gb_RenderDevice->UnlockIndexBuffer(ib);
+
 	pagesize = (xsize+1)*(ysize+1);
 	pagenumber = 8;
 	curpage = 0;
-
-	// SDL backend has no terrain GPU buffer path yet (gb_RenderDevice3D is null);
-	// build the field logically without GPU buffers so the world loads. Terrain is
-	// not drawn (draw calls are guarded below).
-	if(!gb_RenderDevice3D)
-		return;
-
-	gb_RenderDevice3D->CreateIndexBuffer(ib, numIndices());
-	sPolygon* pIndex = gb_RenderDevice3D->LockIndexBuffer(ib);
-	setIB(pIndex);
-	gb_RenderDevice3D->UnlockIndexBuffer(ib);
-
-	gb_RenderDevice3D->CreateVertexBuffer(vb, pagesize*pagenumber, sVertexXYZDT2::declaration, true);
+	gb_RenderDevice->CreateVertexBuffer(vb, pagesize*pagenumber, sVertexXYZDT2::declaration, true);
 }
 
 TileStrip::~TileStrip()
@@ -363,6 +356,7 @@ void FieldDispatcher::PreDraw(Camera* camera)
 
 void FieldDispatcher::Draw(Camera* camera)
 {
+#ifdef _WIN32
 	start_timer_auto();
 
 	xassert(GetTexture(0) && GetTexture(1));
@@ -422,6 +416,7 @@ void FieldDispatcher::Draw(Camera* camera)
 	gb_RenderDevice3D->SetRenderState(D3DRS_ALPHATESTENABLE,AlphaTest);
 	gb_RenderDevice3D->SetRenderState(D3DRS_ALPHAREF,AlphaRef);
 	gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE, cullMode);
+#endif
 }
 
 void FieldDispatcher::debugDraw(Camera* camera)

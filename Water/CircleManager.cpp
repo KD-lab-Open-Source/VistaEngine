@@ -47,8 +47,9 @@ void CircleManager::Draw(Camera* camera)
 
 	currentDrawOrder_= drawOrder_;
 	currentLegionColor_ = legionColor_;
-
+#ifdef _WIN32
 	gb_RenderDevice3D->SetSamplerData(0,samplerCircle_);
+#endif
 
 	Layers::iterator i;
 	FOR_EACH(layers_, i)

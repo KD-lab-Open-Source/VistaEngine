@@ -143,24 +143,29 @@ void Camera::DrawScene()
 	if(!Parent) {
 		start_timer_auto1(1);
 		gb_RenderDevice->FlushPrimitive3D();
+#ifdef _WIN32
 		gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC,D3DCMP_LESSEQUAL);
   		gb_RenderDevice3D->SetSamplerData(0,sampler_wrap_anisotropic);
+#endif
 
 		Camera* pShadow=FindChildCamera(ATTRCAMERA_SHADOWMAP);
 		gb_RenderDevice3D->SetAdvance(pShadow!=0);
 		if(pShadow) {			
+#ifdef _WIN32			
 			gb_RenderDevice3D->SetShadowMatViewProj(pShadow->matViewProj); 
 			if(gb_RenderDevice3D->GetShadowMap())
 				gb_RenderDevice3D->SetShadowMapSize(gb_RenderDevice3D->GetShadowMap()->GetWidth());
+#endif
 		}
 		pShadow = FindChildCamera(ATTRCAMERA_FLOAT_ZBUFFER);
 		if (pShadow)
 		{
+#ifdef _WIN32
 			gb_RenderDevice3D->SetFloatZBufferMatViewProj(pShadow->matViewProj);
 			if(gb_RenderDevice3D->GetFloatMap())
 				gb_RenderDevice3D->SetFloatZBufferSize(gb_RenderDevice3D->GetFloatMap()->GetWidth(),
 													   gb_RenderDevice3D->GetFloatMap()->GetHeight());
-
+#endif
 		}
 		xassert(!in_draw_assert);
 		in_draw_assert=true;
@@ -175,11 +180,12 @@ void Camera::DrawScene()
 	Cameras::iterator it_c;
 	FOR_EACH(cameras_,it_c)
 		(*it_c)->DrawScene();
-
+#ifdef _WIN32
 	if(getAttribute(ATTRCAMERA_WRITE_ALPHA) && DrawArray[SCENENODE_FLAT_SILHOUETTE].empty()||getAttribute(ATTRCAMERA_REFLECTION))
 		gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,D3DCOLORWRITEENABLE_ALPHA|D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED);
 	else
 		gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED);
+#endif
 
 	gb_RenderDevice->setCamera(this);
 //	gb_RenderDevice3D->SetRenderTarget1(GetSecondRT());
@@ -191,25 +197,28 @@ void Camera::DrawScene()
 		Set2DRenderState();
 		return;
 	}
-
+#ifdef _WIN32
 	if(getAttribute(ATTRCAMERA_FLOAT_ZBUFFER))
 		ClearFloatZBuffer();
 	if(getAttribute(ATTRCAMERA_CLEARZBUFFER) )
 		ClearZBuffer();
+#endif
 	if(getAttribute(ATTRCAMERA_SHOWCLIP))
 		 ShowClip();
-
+#ifdef _WIN32
 	gb_RenderDevice3D->SetRenderState(D3DRS_ALPHAREF,0);
+#endif
 	DWORD fogenable;
 
 	DrawObjectFirst();
 
 	gb_RenderDevice->SetRenderState( RS_ZWRITEENABLE, getAttribute(ATTRCAMERA_NOZWRITE)?FALSE:TRUE );
-
+#ifdef _WIN32
 	float fBiasSlope=0;
 	gb_RenderDevice3D->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, *(DWORD*)&fBiasSlope);
 
 	fogenable=gb_RenderDevice3D->GetRenderState(D3DRS_FOGENABLE);
+#endif
 
 	DrawTilemapObject();
 	if(Option_ShowType[SHOW_OBJECT])
@@ -220,8 +229,10 @@ void Camera::DrawScene()
 
 	if(Option_ShowType[SHOW_OBJECT]) {
 		start_timer_auto1(3);
+#ifdef _WIN32
 		DrawType* draw=gb_RenderDevice3D->dtAdvance;
 		draw->BeginDraw();
+#endif
 
 		DrawObject(SCENENODE_OBJECT);
 		DrawSilhouetteObject();
@@ -240,8 +251,10 @@ void Camera::DrawScene()
 
 	//------
 	//DebugDrawFrustum();
+#ifdef _WIN32
 	if (scene()->GetMirageCamera())
 		scene()->GetMirageCamera()->DrawScene();
+#endif
 	gb_RenderDevice->FlushPrimitive3D();
 	gb_RenderDevice->SetRenderState(RS_FOGENABLE,fogenable);
 
@@ -270,8 +283,10 @@ void Camera::DrawScene()
 	if(!Parent && Option_ShowRenderTextureDBG==7)
 		TempDrawShadow(vp.Width,vp.Height);
 //	if(!Parent)DrawTestGrid();
+#ifdef _WIN32
 	for(int i=0;i<4;i++)
 		gb_RenderDevice3D->SetSamplerData(i,sampler_wrap_linear);
+#endif
 //???	gb_RenderDevice3D->RestoreRenderTarget();
 }
 
@@ -316,8 +331,10 @@ void Camera::DrawToZBuffer()
 
 void Camera::Set2DRenderState()
 {
+#ifdef _WIN32
 	gb_RenderDevice3D->SetSamplerData(0,sampler_wrap_point);
   	gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC,D3DCMP_ALWAYS);
+#endif
 	gb_RenderDevice->SetRenderState(RS_FOGENABLE,FALSE);
 }
 
@@ -731,14 +748,20 @@ void Camera::DrawSortObject()
 	start_timer_auto();
 	if(GetSecondRT())
 	{
+#ifdef _WIN32
 		gb_RenderDevice3D->SetRenderTarget1(0);
 		gb_RenderDevice3D->SetTexture(6,GetSecondRT());
+#endif
 	}
 
 	camerapass=SCENENODE_OBJECTSORT;
+#ifdef _WIN32
 	DWORD old_cullmode=gb_RenderDevice3D->GetRenderState(D3DRS_CULLMODE);
+#endif
 	gb_RenderDevice->SetRenderState( RS_ZWRITEENABLE, FALSE );
+#ifdef _WIN32
 	gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE);
+#endif
 	stable_sort(SortArray.begin(),SortArray.end(),ObjectSortByRadius());
 
 	vector<ObjectSort>::iterator it;
@@ -748,11 +771,15 @@ void Camera::DrawSortObject()
 	}
 
 	gb_RenderDevice->SetRenderState( RS_ZWRITEENABLE, TRUE );
+#ifdef _WIN32
 	gb_RenderDevice3D->SetRenderState( D3DRS_CULLMODE, old_cullmode );
+#endif
 
 	if(GetSecondRT())
 	{
+#ifdef _WIN32
 		gb_RenderDevice3D->SetTexture(6,0);
+#endif
 	}
 }
 

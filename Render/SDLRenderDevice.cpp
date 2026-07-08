@@ -795,8 +795,9 @@ int cSDLRenderDevice::OutTextLine(int x, int y, const FT::Font& font, const wcha
 
 // ---------------------------------------------------------------------------
 // Slice 3: static-mesh rendering. Geometry recovered from the baked .3dxGB
-// cache (see Render/3dx/MeshCacheGeometry) is uploaded to GPU vertex/index
-// buffers and drawn in a depth-tested pass before the 2D UI. Only the minimal
+// cache (rebuilt into a native cStatic3dx by InPlaceIArchive::construct) is
+// uploaded to GPU vertex/index buffers and drawn in a depth-tested pass before
+// the 2D UI. Only the minimal
 // path: one MVP, a directional light, optional texture. No skeleton/materials.
 // ---------------------------------------------------------------------------
 
