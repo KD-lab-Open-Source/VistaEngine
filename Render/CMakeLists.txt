@@ -75,8 +75,10 @@ else()
     # references (gb_RenderDevice + the D3D device/buffer classes), so the game
     # links with a silent renderer until the SDL GPU backend (Track B).
     list(APPEND RENDER_SOURCES RenderStub.cpp)
-    # The cross-platform SDL GPU render device (replaces the D3D9 cD3DRender).
+    # The cross-platform SDL GPU render device (replaces the D3D9 cD3DRender), plus
+    # the renderer classes it forwards drawing to (2D/UI so far).
     list(APPEND RENDER_SOURCES SDLRenderDevice.cpp)
+    list(APPEND RENDER_SOURCES SDLUIRenderer.cpp)
     # Vertex-format declaration tables (BEGIN_VERTEX_DECLARATION). Pure data — no
     # device calls — so it's portable: it feeds vertex::declaration layouts to the
     # SDL backend via the portable cD3DRender::RegisterVertexDeclaration (RenderStub).

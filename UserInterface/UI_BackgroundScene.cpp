@@ -10,10 +10,6 @@
 #include "Render/src/cCamera.h"
 #include "Render/3dx/Node3dx.h"
 #include "Render/src/VisGeneric.h"
-#ifndef _WIN32
-#include "Render/SDLRenderDevice.h"   // draw the reconstructed model via the mesh pass
-#include "TexLibrary.h"               // GetTexLibrary()->GetElement3D for submesh textures
-#endif
 
 #include "Environment/Environment.h"
 #include "Game/Universe.h"
