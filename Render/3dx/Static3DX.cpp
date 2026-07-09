@@ -1702,20 +1702,28 @@ void cStatic3dx::StaticLod::initBuffersInPlace(const LodCache& cache, cStatic3dx
 	ib = sPtrIndexBuffer();
 
 	if(cache.vertexNumber > 0){
-		xassert(cache.vbBlock.size() == cache.vertexNumber*cache.vertexSize);
 		cSkinVertex skin_vertex = object->GetSkinVertex(GetBlendWeight());
 		gb_RenderDevice->CreateVertexBuffer(vb, cache.vertexNumber, skin_vertex.GetDeclaration());
-		memcpy(gb_RenderDevice->LockVertexBuffer(vb), cache.vbBlock.buffer(), cache.vbBlock.size());
-		gb_RenderDevice->UnlockVertexBuffer(vb);
-		xassert(vb.GetVertexSize() == cache.vertexSize);
-
+		// Never copy more than the buffer we actually allocated (vertexNumber*stride).
+		// If the reconstructed cache disagrees with the declaration stride, a raw copy
+		// of cache.vbBlock.size() would overflow the vertex buffer's staging memory and
+		// corrupt the heap; clamp so a bad model fails cleanly instead.
+		size_t dstSize = (size_t)vb.GetNumberVertex() * vb.GetVertexSize();
+		if(void* dst = gb_RenderDevice->LockVertexBuffer(vb)){
+			xassert(cache.vbBlock.size() == dstSize && vb.GetVertexSize() == cache.vertexSize);
+			memcpy(dst, cache.vbBlock.buffer(), min(dstSize, (size_t)cache.vbBlock.size()));
+			gb_RenderDevice->UnlockVertexBuffer(vb);
+		}
 	}
 
 	if(cache.polygonNumber > 0){
-		xassert(cache.ibBlock.size() == cache.polygonNumber*sizeof(sPolygon));
 		gb_RenderDevice->CreateIndexBuffer(ib, cache.polygonNumber);
-		memcpy(gb_RenderDevice->LockIndexBuffer(ib), cache.ibBlock.buffer(), cache.ibBlock.size());
-		gb_RenderDevice->UnlockIndexBuffer(ib);
+		size_t dstSize = (size_t)ib.GetNumberPolygon() * sizeof(sPolygon);
+		if(sPolygon* dst = gb_RenderDevice->LockIndexBuffer(ib)){
+			xassert(cache.ibBlock.size() == dstSize);
+			memcpy(dst, cache.ibBlock.buffer(), min(dstSize, (size_t)cache.ibBlock.size()));
+			gb_RenderDevice->UnlockIndexBuffer(ib);
+		}
 	}
 }
 
@@ -2092,14 +2100,25 @@ void cStatic3dx::constructInPlace(const char* fileName)
 			ia.construct(cache);
 		xassert(cache);
 
-		int i = 0;
-		Lods::iterator iLod;
-		FOR_EACH(lods, iLod)
-			iLod->initBuffersInPlace(cache->lods[i++], this);
+		if(cache){
+			int i = 0;
+			Lods::iterator iLod;
+			FOR_EACH(lods, iLod){
+				// The .3dxG tree and the .3dxGB LodsCache are written with matching LOD
+				// counts (saveInPlace). If a reconstruction mismatch breaks that, stop
+				// rather than index cache->lods out of bounds and memcpy garbage blocks.
+				if(i >= (int)cache->lods.size()){
+					dprintf("cStatic3dx::constructInPlace: LOD/cache mismatch %s (%d vs %d)\n",
+						fileName, (int)lods.size(), (int)cache->lods.size());
+					break;
+				}
+				iLod->initBuffersInPlace(cache->lods[i++], this);
+			}
 
-		debris.initBuffersInPlace(cache->debris, this);
+			debris.initBuffersInPlace(cache->debris, this);
 
-		InPlaceIArchive::destruct(cache);
+			InPlaceIArchive::destruct(cache);
+		}
 
 		createTextures();
 		CreateDebrises();

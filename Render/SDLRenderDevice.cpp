@@ -593,11 +593,20 @@ void cSDLRenderDevice::uploadTexture(const TextureData& td)
 	if(!tb) return;
 
 	unsigned char* map = (unsigned char*)SDL_MapGPUTransferBuffer(device_, tb, false);
-	if(td.expand){
+	if(td.bpp == 1){
+		// 8-bit coverage -> (255,255,255, coverage)
 		const int n = td.w * td.h;
 		for(int i = 0; i < n; ++i){
 			map[i*4+0] = 255; map[i*4+1] = 255; map[i*4+2] = 255;  // B,G,R
 			map[i*4+3] = td.staging[i];                            // A = coverage
+		}
+	} else if(td.bpp == 2){
+		// A8L8 staging (byte0 = L, byte1 = A) -> (L,L,L,A)
+		const int n = td.w * td.h;
+		for(int i = 0; i < n; ++i){
+			const unsigned char l = td.staging[i*2+0], a = td.staging[i*2+1];
+			map[i*4+0] = l; map[i*4+1] = l; map[i*4+2] = l;
+			map[i*4+3] = a;
 		}
 	} else {
 		SDL_memcpy(map, td.staging.data(), bytes);
@@ -633,7 +642,13 @@ int cSDLRenderDevice::CreateTexture(cTexture* Texture, cFileImage* FileImage, in
 	// code's LockTexture pitch is right) and is widened to BGRA on upload; colour
 	// textures stage as 32-bit BGRA, matching cFileImage::GetTexture's byte order.
 	const bool gray = Texture->getAttribute(TEXTURE_GRAY) != 0;
-	const int bpp = gray ? 1 : 4;
+	// Staging bytes/pixel must match the format callers Lock and write to, or their
+	// writes overflow it. TEXTURE_GRAY is set for both 8-bit coverage (font/alpha)
+	// AND 16-bit A8L8 (the water Z/reflection texture, written 2 bytes/px in
+	// cWater::Init), so A8L8 must be 2 bpp -- otherwise that fill smashes the heap.
+	int bpp = gray ? 1 : 4;
+	if(Texture->format() == SURFMT_A8L8)
+		bpp = 2;
 
 	SDL_GPUTextureCreateInfo ti = {};
 	ti.type = SDL_GPU_TEXTURETYPE_2D;
@@ -646,7 +661,7 @@ int cSDLRenderDevice::CreateTexture(cTexture* Texture, cFileImage* FileImage, in
 
 	TextureData td;
 	td.tex = tex; td.w = w; td.h = h; td.bpp = bpp; td.pitch = w * bpp;
-	td.expand = gray;
+	td.expand = (bpp == 1);
 	td.staging.assign((size_t)w * h * bpp, 0);
 
 	if(FileImage){
