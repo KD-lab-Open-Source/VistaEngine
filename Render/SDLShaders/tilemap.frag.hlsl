@@ -29,10 +29,12 @@ SamplerState      ColorSampler : register(s0, space2);
 
 cbuffer Light : register(b0, space3)
 {
-    // The original's vColor (vsl c2): rgb = diffuse light colour, w = ambient.
+    // The original's vColor (vsl c2): rgb = diffuse light colour, w = ambient. Fed from
+    // the scene sun via cTileMap::GetDiffuse(); rgb may exceed 1 for a bright sun.
     float4 LightColor;
     // The original's vLightDirection (vsl c5): unit vector pointing the way the light
-    // travels, so a surface facing the light has dot(N, dir) == -1.
+    // travels, so a surface facing the light has dot(N, dir) == -1. This is the scene's
+    // sun_direction, read through Camera::GetLighting().
     float4 LightDirection;
 };
 

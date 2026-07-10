@@ -10,7 +10,8 @@
 #include <vector>
 
 #include "terra/vmap.h"   // vMap heightfield + baked per-cell surface colour
-#include "cCamera.h"      // Camera::matView / matProj
+#include "cCamera.h"      // Camera::matView / matProj / GetLighting
+#include "TileMap.h"      // cTileMap::GetDiffuse (the scene sun, per Environment)
 
 // Cross-compiled tilemap shader blobs (SPIR-V + MSL); see Render/SDLShaders.
 #include "SDLShaders/tilemap_shaders.h"
@@ -383,7 +384,7 @@ bool SDLTileMapRenderer::ensureMesh(SDL_GPUCommandBuffer* cmd)
 // ---------------------------------------------------------------------------
 bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
                               int screenW, int screenH, bool clear, const float clearColor[4],
-                              cTileMap* /*tileMap*/, Camera* camera, bool wireframe)
+                              cTileMap* tileMap, Camera* camera, bool wireframe)
 {
 	// Fall back to the solid pipeline if the LINE variant failed to build.
 	SDL_GPUGraphicsPipeline* pipeline = (wireframe && pipelineLine_) ? pipelineLine_ : pipelineFill_;
@@ -415,16 +416,29 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	vsu.uv[0] = 0.f; vsu.uv[1] = 0.f;             // UV.xy offset
 	vsu.uv[2] = uvScale_[0]; vsu.uv[3] = uvScale_[1];  // UV.zw scale
 
-	// The original's vColor (diffuse rgb, ambient w) and vLightDirection (the way the
-	// light travels, so a lit surface has dot(N,dir) == -1). A high sun slanted from the
-	// NW: 0.45 diffuse over a 0.55 ambient floor keeps the baked surface colour readable
-	// while slopes shade. TODO: take these from Environment's sun instead of hardcoding.
-	Vect3f L(0.35f, 0.45f, 0.82f);
-	L.normalize();
+	// The scene's sun, exactly as the original wires it up.
+	//
+	// vColor (rgb = diffuse, w = ambient): EnvironmentTime::SetTime takes the
+	// time-of-day sun colour, sets .a = shadowing.ambient() and scales the rgb by
+	// shadowing.scaleDiffuse(), then hands it to cTileMap::SetDiffuse
+	// (Water/SkyObject.cpp:821). DrawType::SetTileColor passes that through to the
+	// shader, having first multiplied rgb by the per-material zeroplast colour -- we
+	// draw one unmaterialed submesh, and zeroplast defaults to white, so we skip it.
+	// Note diffuse rgb may exceed 1 (SetDiffuse only asserts < 100): a bright sun
+	// brightens terrain past its baked texel, which the old hardcoded values could not.
+	//
+	// vLightDirection is the scene's sun_direction -- the way the light *travels*, so a
+	// lit surface has dot(N, dir) == -1, matching the shader's saturate(-dot(N, dir)).
 	FSUniform fsu;
-	fsu.lightColor[0] = fsu.lightColor[1] = fsu.lightColor[2] = 0.45f;
-	fsu.lightColor[3] = 0.55f;
-	fsu.lightDir[0] = -L.x; fsu.lightDir[1] = -L.y; fsu.lightDir[2] = -L.z; fsu.lightDir[3] = 0.f;
+	const Color4f diffuse = tileMap ? tileMap->GetDiffuse() : Color4f(0.45f, 0.45f, 0.45f, 0.55f);
+	fsu.lightColor[0] = diffuse.r;
+	fsu.lightColor[1] = diffuse.g;
+	fsu.lightColor[2] = diffuse.b;
+	fsu.lightColor[3] = diffuse.a;
+
+	Vect3f sun(0.f, 0.f, -1.f);   // straight down if the scene has no sun yet
+	camera->GetLighting(sun);
+	fsu.lightDir[0] = sun.x; fsu.lightDir[1] = sun.y; fsu.lightDir[2] = sun.z; fsu.lightDir[3] = 0.f;
 
 	// Wireframe is a diagnostic: kill the diffuse term and drive ambient to 1, so with
 	// the white texture bound below every edge comes out full white regardless of the
