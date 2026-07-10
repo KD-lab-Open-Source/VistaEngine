@@ -12,6 +12,7 @@
 #include "FileImage.h"   // cFileImage::GetTexture
 
 #include "SDLUIRenderer.h"
+#include "SDLTileMapRenderer.h"
 
 // ---------------------------------------------------------------------------
 // Base cInterfaceRenderDevice members. On Windows these live in
@@ -97,6 +98,8 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND hWnd, int
 
 	if(!uiRenderer_)
 		uiRenderer_ = std::make_unique<SDLUIRenderer>(device_, window_);
+	if(!tileMapRenderer_)
+		tileMapRenderer_ = std::make_unique<SDLTileMapRenderer>(device_, window_);
 
 	// Build the skinned-vertex declarations (on Windows cD3DRender does this at
 	// device init via CreateVertexDeclaration; cSkinVertex::Register is portable
@@ -118,6 +121,7 @@ int cSDLRenderDevice::Done()
 
 	// The renderers hold GPU objects built on device_, so they must go first.
 	uiRenderer_.reset();
+	tileMapRenderer_.reset();
 
 	if(device_){
 		for(auto& kv : textures_)
@@ -188,6 +192,7 @@ int cSDLRenderDevice::BeginScene()
 
 	if(uiRenderer_)
 		uiRenderer_->BeginFrame();
+	frameCleared_ = false;
 	bActiveScene_ = true;
 	NumberPolygon = 0;
 	NumDrawObject = 0;
@@ -200,9 +205,11 @@ int cSDLRenderDevice::EndScene()
 	if(!bActiveScene_) return 1;
 	bActiveScene_ = false;
 
-	// The UI pass is the only pass for now, so it carries the frame's clear.
+	// The UI pass runs last, over whatever the scene drew. It carries the frame's clear
+	// only if no earlier pass (the terrain) already took it.
 	if(swapchainTexture_ && commandBuffer_ && uiRenderer_)
-		uiRenderer_->Draw(commandBuffer_, swapchainTexture_, xScr, yScr, hasClear_, clearColor_);
+		uiRenderer_->Draw(commandBuffer_, swapchainTexture_, xScr, yScr,
+		                  hasClear_ && !frameCleared_, clearColor_);
 
 	if(commandBuffer_){
 		SDL_SubmitGPUCommandBuffer(commandBuffer_);
@@ -218,6 +225,36 @@ int cSDLRenderDevice::Flush()
 	if(bActiveScene_)
 		EndScene();
 	return 0;
+}
+
+// ---------------------------------------------------------------------------
+// Terrain: forwarded to the tilemap renderer, which draws immediately in its own
+// pass. Called mid-scene from cTileMap::Draw, so the frame's command buffer and
+// swapchain image are live and no render pass is open.
+// ---------------------------------------------------------------------------
+void cSDLRenderDevice::drawTileMap(cTileMap* tileMap, Camera* camera)
+{
+	if(!bActiveScene_ || !commandBuffer_ || !swapchainTexture_ || !tileMapRenderer_)
+		return;
+	const bool clear = hasClear_ && !frameCleared_;
+	if(tileMapRenderer_->Draw(commandBuffer_, swapchainTexture_, xScr, yScr,
+	                          clear, clearColor_, tileMap, camera,
+	                          fillMode_ == FILL_WIREFRAME) && clear)
+		frameCleared_ = true;
+}
+
+// GameShell sets this every frame from debugWireFrame (Scripts/TreeControlSetups/
+// Debug.dat). SDL GPU bakes fill mode into the pipeline, so renderers keep a line
+// variant and pick it up from here.
+void cSDLRenderDevice::SetRenderState(eRenderStateOption state, int value)
+{
+	if(state == RS_FILLMODE)
+		fillMode_ = value;
+}
+
+unsigned int cSDLRenderDevice::GetRenderState(eRenderStateOption state)
+{
+	return state == RS_FILLMODE ? (unsigned int)fillMode_ : 0u;
 }
 
 // ---------------------------------------------------------------------------

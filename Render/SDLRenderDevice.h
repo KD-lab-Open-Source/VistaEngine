@@ -30,12 +30,22 @@ struct SDL_GPUTexture;
 struct SDL_GPUBuffer;
 
 class SDLUIRenderer;
+class SDLTileMapRenderer;
+class cTileMap;
 
 class cSDLRenderDevice : public cInterfaceRenderDevice
 {
 public:
 	cSDLRenderDevice();
 	~cSDLRenderDevice();
+
+	// --- Terrain ----------------------------------------------------------
+	// Called from cTileMap::Draw, i.e. from inside the engine's own scene-draw
+	// delegation, part-way through BeginScene..EndScene. Forwards the frame's command
+	// buffer and swapchain image to SDLTileMapRenderer, which opens its own colour +
+	// depth pass there and then. The first pass of a frame performs Fill()'s clear, so
+	// if the terrain pass runs, the UI pass at EndScene loads instead of clearing.
+	void drawTileMap(cTileMap* tileMap, Camera* camera);
 
 	// --- Lifecycle (real) -------------------------------------------------
 	bool Initialize(int xScr, int yScr, int mode, HWND hWnd, int RefreshRateInHz, HWND fallbackWindow) override;
@@ -89,8 +99,10 @@ public:
 
 	// --- Misc state (no-op) ----------------------------------------------
 	int  SetGamma(float, float, float) override { return 0; }
-	void SetRenderState(eRenderStateOption, int) override {}
-	unsigned int GetRenderState(eRenderStateOption) override { return 0; }
+	// Only RS_FILLMODE is honoured (GameShell drives it from debugWireFrame); the rest
+	// of the D3D render states have no SDL GPU equivalent outside a pipeline object.
+	void SetRenderState(eRenderStateOption, int) override;
+	unsigned int GetRenderState(eRenderStateOption) override;
 	void SetGlobalFog(const Color4f&, const Vect2f&) override {}
 	void SetSamplerDataVirtual(DWORD, SAMPLER_DATA&) override {}
 	bool IsEnableSelfShadow() override { return false; }
@@ -191,9 +203,14 @@ private:
 	DWORD multisample_ = 0;
 	bool  bActiveScene_ = false;
 	bool  hasClear_     = false;
+	// Set once the frame's colour clear has been consumed by whichever renderer opened
+	// the first pass, so later passes load the target instead of wiping it.
+	bool  frameCleared_ = false;
+	int   fillMode_ = FILL_SOLID;   // RS_FILLMODE; FILL_WIREFRAME switches renderers to line pipelines
 	float clearColor_[4] = {0.f, 0.f, 0.f, 1.f};
 
-	std::unique_ptr<SDLUIRenderer> uiRenderer_;
+	std::unique_ptr<SDLUIRenderer>      uiRenderer_;
+	std::unique_ptr<SDLTileMapRenderer> tileMapRenderer_;
 };
 
 #endif // VISTA_SDL_RENDER_DEVICE_H

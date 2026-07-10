@@ -13,6 +13,10 @@
 #include "Serialization/EnumDescriptor.h"
 #include "Environment/Environment.h"
 #include "FileUtils/FileUtils.h"
+#ifndef _WIN32
+#include "Render/SDLTileMapRenderer.h"   // terrain is drawn by SDLTileMapRenderer,
+#include "Render/SDLRenderDevice.h"      // reached via cSDLRenderDevice::drawTileMap
+#endif
 
 namespace {
 ResourceSelector::Options textureOptions("*.tga", "Resource\\TerrainData\\Textures");
@@ -138,16 +142,16 @@ void cTileMap::PreDraw(Camera* camera)
 
 void cTileMap::Draw(Camera* camera)
 {
-#ifdef _WIN32
 	if(!Option_ShowType[SHOW_TILEMAP])
 		return;
 	start_timer_auto();
 
+#ifdef _WIN32
 //	cD3DRender *Render=gb_RenderDevice3D;
 //	if(camera->getAttribute(ATTRCAMERA_SHADOW)){
 //		Render->Draw(scene()); // рисовать источники света
 //	}
-//	else 
+//	else
 	if(camera->getAttribute(ATTRCAMERA_SHADOWMAP)){
 		if(Option_shadowEnabled)
 			tileMapRender_->DrawBump(camera, ALPHA_TEST, true, false);
@@ -158,6 +162,13 @@ void cTileMap::Draw(Camera* camera)
 		tileMapRender_->DrawBump(camera, ALPHA_NONE, false, false);
 
 	DrawLines();
+#else
+	// Only the main scene camera draws terrain: the shadow-map, float-Z and reflection
+	// passes have no SDL equivalent yet, and each would open a pass of its own.
+	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_SHADOWMAP|ATTRCAMERA_FLOAT_ZBUFFER|ATTRCAMERA_REFLECTION))
+		return;
+	if(cSDLRenderDevice* dev = dynamic_cast<cSDLRenderDevice*>(gb_RenderDevice))
+		dev->drawTileMap(this, camera);
 #endif
 }
 

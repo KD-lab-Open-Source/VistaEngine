@@ -79,6 +79,7 @@ else()
     # the renderer classes it forwards drawing to (2D/UI so far).
     list(APPEND RENDER_SOURCES SDLRenderDevice.cpp)
     list(APPEND RENDER_SOURCES SDLUIRenderer.cpp)
+    list(APPEND RENDER_SOURCES SDLTileMapRenderer.cpp)
     # Vertex-format declaration tables (BEGIN_VERTEX_DECLARATION). Pure data — no
     # device calls — so it's portable: it feeds vertex::declaration layouts to the
     # SDL backend via the portable cD3DRender::RegisterVertexDeclaration (RenderStub).
