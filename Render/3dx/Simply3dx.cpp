@@ -333,6 +333,7 @@ void cSimply3dx::SelectMatrix(int offset_matrix)
 
 void cSimply3dx::Draw(Camera* camera)
 {
+#ifdef _WIN32
 	start_timer_auto();
 	
 	if(debugShowSwitch.simplyObjects)
@@ -374,6 +375,7 @@ void cSimply3dx::Draw(Camera* camera)
 		gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,old_color);
 		gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE,old_cull);
 	}
+#endif
 }
 
 void cSimply3dx::PreDraw(Camera* camera)
@@ -1420,6 +1422,7 @@ void cStaticSimply3dx::DrawObjects(Camera* camera,cSimply3dx** objects,int num_o
 
 void cStaticSimply3dx::Draw(Camera* camera)
 {
+#ifdef _WIN32
 	if(debugShowSwitch.simplyObjects)
 		return;
 
@@ -1442,6 +1445,7 @@ void cStaticSimply3dx::Draw(Camera* camera)
 		return;
 	active_list[num_visible_opacity_object]->SelectMaterial(camera);
 	DrawObjects(camera,&active_list[num_visible_opacity_object],num_object);
+#endif
 }
 
 void cStaticSimply3dx::DrawShadow(Camera* camera)

@@ -718,8 +718,9 @@ void cObject3dx::Draw(Camera* camera)
 		material.Ambient.a = material.Diffuse.a = mat_anim.opacity*object_opacity*distance_alpha;
 
 		material.Tex[0]=diffuse_texture;
-
+#ifdef _WIN32
 		gb_RenderDevice3D->SetSamplerData(0,(mat.tiling_diffuse&StaticMaterial::TILING_U_WRAP)?sampler_wrap_anisotropic:sampler_clamp_anisotropic);
+#endif
 
 
 		if(mat.is_reflect_sky)

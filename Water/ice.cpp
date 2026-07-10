@@ -270,6 +270,7 @@ void cTemperature::DebugShow()
 
 void cTemperature::Draw(Camera* cameraX)
 {
+#ifdef _WIN32
 	UpdateColor();
 
 	iceShader_->beginDraw(texture_, textureBump_, textureAlpha_, textureCleft_, alpha_ref, out_temperature == 1 ? 0xFFFFFFFF : 0);
@@ -277,6 +278,7 @@ void cTemperature::Draw(Camera* cameraX)
 	pWater->DrawPolygons(gb_RenderDevice3D->camera());
 
 	iceShader_->endDraw();
+#endif
 }
 
 void cTemperature::SetT(int x,int y,float t,int size)

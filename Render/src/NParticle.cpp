@@ -2808,6 +2808,7 @@ void cEffect::PreDraw(Camera* camera)
 
 void cEffect::Draw(Camera* camera)
 {
+#ifdef _WIN32
 	start_timer_auto();
 
 	bool old_fog_of_war=gb_RenderDevice3D->GetFogOfWar();
@@ -2939,6 +2940,7 @@ void cEffect::Draw(Camera* camera)
 //	rd->DrawLine(p, p+r.xrow()*100, Color4c(255, 0, 0));
 //	rd->DrawLine(p, p+r.yrow()*100, Color4c(0, 255, 0));
 //	rd->DrawLine(p, p+r.zrow()*100, Color4c(0, 0, 255));
+#endif
 }
 
 void cEffect::setCycled(bool cycled)
