@@ -1,6 +1,6 @@
-// SDL GPU coast-sprites renderer. See header.
+// SDL GPU world-quad renderer. See header.
 #include "StdAfxRD.h"
-#include "SDLCoastSpritesRenderer.h"
+#include "SDLWorldQuadRenderer.h"
 
 #ifndef _WIN32
 
@@ -12,8 +12,8 @@
 #include "Texture.h"           // cTexture (GetDDSurface / frameNumber)
 #include "SDLRenderDevice.h"   // applyCameraViewport
 
-// Cross-compiled coast-sprite shader blobs (SPIR-V + MSL); see Render/SDLShaders.
-#include "SDLShaders/coastsprites_shaders.h"
+// Cross-compiled world-quad shader blobs (SPIR-V + MSL); see Render/SDLShaders.
+#include "SDLShaders/worldquad_shaders.h"
 
 namespace {
 
@@ -22,8 +22,8 @@ namespace {
 // four bytes wide.
 static_assert(sizeof(sVertexXYZDT1) == 24, "sVertexXYZDT1 must match its D3D declaration");
 
-// The quads start empty and settle around the sprite count cCoastSprites soft-clamps to
-// (~4000 per group); this only avoids the first few reallocations.
+// The quads start empty and settle around the caller's steady-state count (cCoastSprites
+// soft-clamps near 4000 per group); this only avoids the first few reallocations.
 const int INITIAL_QUADS = 1024;
 
 SDL_GPUTexture* sdlTextureOf(cTexture* t)
@@ -33,13 +33,13 @@ SDL_GPUTexture* sdlTextureOf(cTexture* t)
 
 } // namespace
 
-SDLCoastSpritesRenderer::SDLCoastSpritesRenderer(SDL_GPUDevice* device, SDL_Window* window)
+SDLWorldQuadRenderer::SDLWorldQuadRenderer(SDL_GPUDevice* device, SDL_Window* window)
 	: device_(device), window_(window)
 {
 	createPipelines();
 }
 
-SDLCoastSpritesRenderer::~SDLCoastSpritesRenderer()
+SDLWorldQuadRenderer::~SDLWorldQuadRenderer()
 {
 	if(!device_) return;
 	if(vertexBuffer_)  SDL_ReleaseGPUBuffer(device_, vertexBuffer_);
@@ -53,11 +53,12 @@ SDLCoastSpritesRenderer::~SDLCoastSpritesRenderer()
 // ---------------------------------------------------------------------------
 // Pipeline
 // ---------------------------------------------------------------------------
-void SDLCoastSpritesRenderer::createPipelines()
+void SDLWorldQuadRenderer::createPipelines()
 {
 	if(!device_ || !window_) return;
 
-	// cCoastSprites::Draw's SetSamplerDataVirtual(0, sampler_wrap_anisotropic). max_lod
+	// cCoastSprites::Draw's SetSamplerDataVirtual(0, sampler_wrap_anisotropic); the wave
+	// sources inherit the scene's sampler_wrap_linear, which this rounds up to. max_lod
 	// must be set: it defaults to 0, which pins sampling to the top level.
 	SDL_GPUSamplerCreateInfo si = {};
 	si.min_filter = SDL_GPU_FILTER_LINEAR;
@@ -107,14 +108,14 @@ void SDLCoastSpritesRenderer::createPipelines()
 	unsigned int vsSize, fsSize;
 	if(formats & SDL_GPU_SHADERFORMAT_MSL){
 		fmt = SDL_GPU_SHADERFORMAT_MSL; entry = "main0";
-		vsCode = coastsprites_vert_msl; vsSize = coastsprites_vert_msl_len;
-		fsCode = coastsprites_frag_msl; fsSize = coastsprites_frag_msl_len;
+		vsCode = worldquad_vert_msl; vsSize = worldquad_vert_msl_len;
+		fsCode = worldquad_frag_msl; fsSize = worldquad_frag_msl_len;
 	} else if(formats & SDL_GPU_SHADERFORMAT_SPIRV){
 		fmt = SDL_GPU_SHADERFORMAT_SPIRV; entry = "main";
-		vsCode = coastsprites_vert_spv; vsSize = coastsprites_vert_spv_len;
-		fsCode = coastsprites_frag_spv; fsSize = coastsprites_frag_spv_len;
+		vsCode = worldquad_vert_spv; vsSize = worldquad_vert_spv_len;
+		fsCode = worldquad_frag_spv; fsSize = worldquad_frag_spv_len;
 	} else {
-		fprintf(stderr, "SDLCoastSpritesRenderer: no supported shader format (0x%x)\n", formats);
+		fprintf(stderr, "SDLWorldQuadRenderer: no supported shader format (0x%x)\n", formats);
 		return;
 	}
 
@@ -131,7 +132,7 @@ void SDLCoastSpritesRenderer::createPipelines()
 	SDL_GPUShader* fs = SDL_CreateGPUShader(device_, &fsi);   // no uniforms
 
 	if(!vs || !fs){
-		fprintf(stderr, "SDLCoastSpritesRenderer: CreateGPUShader failed: %s\n", SDL_GetError());
+		fprintf(stderr, "SDLWorldQuadRenderer: CreateGPUShader failed: %s\n", SDL_GetError());
 		if(vs) SDL_ReleaseGPUShader(device_, vs);
 		if(fs) SDL_ReleaseGPUShader(device_, fs);
 		return;
@@ -148,10 +149,11 @@ void SDLCoastSpritesRenderer::createPipelines()
 	attrs[1].location = 1; attrs[1].buffer_slot = 0; attrs[1].format = SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4_NORM; attrs[1].offset = 12;
 	attrs[2].location = 2; attrs[2].buffer_slot = 0; attrs[2].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;      attrs[2].offset = 16;
 
-	// cCoastSprites::Draw forces RS_ZWRITEENABLE off around both sprite groups, and
-	// SetWorldMaterial(ALPHA_BLEND, ...) picks the blend. (ONE, 1-SRC_ALPHA) rather than
-	// the original's (SRC_ALPHA, 1-SRC_ALPHA) because the atlas decodes premultiplied and
-	// the shaders keep it that way -- see coastsprites.frag.hlsl.
+	// RS_ZWRITEENABLE is off for every caller -- cCoastSprites::Draw forces it around both
+	// sprite groups, Camera::DrawSortObject around the whole sorted pass the wave sources
+	// draw in -- and SetWorldMaterial(ALPHA_BLEND, ...) picks the blend. (ONE, 1-SRC_ALPHA)
+	// rather than the original's (SRC_ALPHA, 1-SRC_ALPHA) because the textures decode
+	// premultiplied and the shaders keep it that way -- see worldquad.frag.hlsl.
 	SDL_GPUColorTargetDescription colorTarget = {};
 	colorTarget.format = SDL_GetGPUSwapchainTextureFormat(device_, window_);
 	SDL_GPUColorTargetBlendState& bs = colorTarget.blend_state;
@@ -191,14 +193,14 @@ void SDLCoastSpritesRenderer::createPipelines()
 	SDL_ReleaseGPUShader(device_, vs);
 	SDL_ReleaseGPUShader(device_, fs);
 
-	fprintf(stderr, "SDLCoastSpritesRenderer: coastsprites pipeline %s (wireframe %s)\n",
+	fprintf(stderr, "SDLWorldQuadRenderer: worldquad pipeline %s (wireframe %s)\n",
 	        pipelineFill_ ? "ready" : "FAILED", pipelineLine_ ? "ready" : "FAILED");
 }
 
 // ---------------------------------------------------------------------------
 // Recording -- cQuadBuffer<sVertexXYZDT1>'s contract
 // ---------------------------------------------------------------------------
-void SDLCoastSpritesRenderer::BeginFrame()
+void SDLWorldQuadRenderer::BeginFrame()
 {
 	vertices_.clear();
 	groups_.clear();
@@ -206,7 +208,7 @@ void SDLCoastSpritesRenderer::BeginFrame()
 	cameraValid_ = false;
 }
 
-void SDLCoastSpritesRenderer::SetCamera(Camera* camera)
+void SDLWorldQuadRenderer::SetCamera(Camera* camera)
 {
 	if(!camera) return;
 	// The original's mWVP: mWorld is MatXf::ID for both sprite groups, so this is the
@@ -218,12 +220,12 @@ void SDLCoastSpritesRenderer::SetCamera(Camera* camera)
 	cameraValid_ = true;
 }
 
-void SDLCoastSpritesRenderer::SetTexture(cTexture* texture)
+void SDLWorldQuadRenderer::SetTexture(cTexture* texture)
 {
 	texture_ = sdlTextureOf(texture);
 }
 
-void SDLCoastSpritesRenderer::BeginDraw()
+void SDLWorldQuadRenderer::BeginDraw()
 {
 	current_.texture = texture_;
 	current_.firstQuad = (int)(vertices_.size() / 4);
@@ -231,7 +233,7 @@ void SDLCoastSpritesRenderer::BeginDraw()
 	drawing_ = cameraValid_;
 }
 
-sVertexXYZDT1* SDLCoastSpritesRenderer::Get()
+sVertexXYZDT1* SDLWorldQuadRenderer::Get()
 {
 	// Never null: a sprite loop that ran without a camera (BeginDraw refused to open a
 	// group) still writes its four vertices, and writes them here, to be discarded.
@@ -244,7 +246,7 @@ sVertexXYZDT1* SDLCoastSpritesRenderer::Get()
 	return &vertices_[vertices_.size() - 4];
 }
 
-void SDLCoastSpritesRenderer::EndDraw()
+void SDLWorldQuadRenderer::EndDraw()
 {
 	if(drawing_ && current_.quadCount > 0)
 		groups_.push_back(current_);
@@ -254,7 +256,7 @@ void SDLCoastSpritesRenderer::EndDraw()
 // ---------------------------------------------------------------------------
 // Frame
 // ---------------------------------------------------------------------------
-bool SDLCoastSpritesRenderer::ensureCapacity(SDL_GPUCommandBuffer* cmd, int quads)
+bool SDLWorldQuadRenderer::ensureCapacity(SDL_GPUCommandBuffer* cmd, int quads)
 {
 	if(quads <= capacityQuads_)
 		return true;
@@ -280,9 +282,10 @@ bool SDLCoastSpritesRenderer::ensureCapacity(SDL_GPUCommandBuffer* cmd, int quad
 	if(!vertexBuffer_ || !indexBuffer_)
 		return false;
 
-	// Two triangles per quad, over the four corners cCoastSprites writes: (0,1,2)+(2,1,3),
-	// where 0/1 are the +y edge and 2/3 the -y one. 32-bit indices, so the sprite count is
-	// bounded by the simulation's own soft clamp rather than by 65535 vertices.
+	// Two triangles per quad: (0,1,2)+(2,1,3). Every caller writes its four corners as two
+	// opposite edges -- 0,1 then 2,3 -- so that pattern covers the quad for all of them,
+	// and the pipeline culls nothing, so the winding is free. 32-bit indices, so the quad
+	// count is bounded by the callers' own limits rather than by 65535 vertices.
 	std::vector<Uint32> idx((size_t)capacity * 6);
 	for(int q = 0; q < capacity; ++q){
 		Uint32 base = (Uint32)(q * 4);
@@ -311,7 +314,7 @@ bool SDLCoastSpritesRenderer::ensureCapacity(SDL_GPUCommandBuffer* cmd, int quad
 	return true;
 }
 
-bool SDLCoastSpritesRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, SDL_GPUTexture* depth,
+bool SDLWorldQuadRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, SDL_GPUTexture* depth,
                                 int screenW, int screenH, bool clear, const float clearColor[4],
                                 bool clearDepth, bool wireframe)
 {
@@ -374,8 +377,8 @@ bool SDLCoastSpritesRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* ta
 	SDL_GPUBufferBinding ib = {}; ib.buffer = indexBuffer_; ib.offset = 0;
 	SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_32BIT);
 
-	// One group per BeginDraw..EndDraw run, in the order cCoastSprites::Draw made them:
-	// the stay sprites, then the moving ones.
+	// One group per BeginDraw..EndDraw run, replayed in the order the caller made them:
+	// cCoastSprites' stay sprites then its moving ones, or one group per wave source.
 	SDL_GPUTexture* boundTexture = nullptr;
 	for(const Group& g : groups_){
 		SDL_GPUTexture* texture = g.texture ? g.texture : whiteTexture_;

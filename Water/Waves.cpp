@@ -10,6 +10,8 @@
 #include "Render/Src/cCamera.h"
 #include "Render/Src/TexLibrary.h"
 #include "Render/Src/Scene.h"
+#include "Render/SDLWorldQuadRenderer.h"   // the wave quads are drawn by SDLWorldQuadRenderer,
+#include "Render/SDLRenderDevice.h"        // reached via cSDLRenderDevice::drawWorldQuads
 
 static float mz = 1;
 cWaves::cWaves() : BaseGraphObject(0)
@@ -338,11 +340,20 @@ void cWaves::CreateWave()
 	
 }
 void cWaves::Draw(Camera* camera)
-{	
+{
 	start_timer_auto();
+#ifdef _WIN32
 	cInterfaceRenderDevice* rd=gb_RenderDevice;
 	rd->SetWorldMaterial(ALPHA_BLEND,MatXf::ID, 0, Texture);
 	cQuadBuffer<sVertexXYZDT1>* pBuf=rd->GetQuadBufferXYZDT1();
+#else
+	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	if(!pBuf || !dev)
+		return;
+	pBuf->SetCamera(camera);
+	pBuf->SetTexture(Texture);
+#endif
 	pBuf->BeginDraw();
 //	vector<list<WAVE> >::iterator vl;
 //	list<WAVE>& con = points.back();
@@ -464,6 +475,11 @@ void cWaves::Draw(Camera* camera)
 	}
 */
 	pBuf->EndDraw();
+#ifndef _WIN32
+	// D3D drew as EndDraw went; SDL GPU only draws inside a render pass. (Unreached:
+	// nothing constructs a cWaves -- the live wave sources are cFixedWaves below.)
+	dev->drawWorldQuads();
+#endif
 }
 
 void cWaves::Animate(float dt)
@@ -687,11 +703,22 @@ void cFixedWaves::Draw(Camera* camera)
 
 	//CalcWaveLines();
 
+#ifdef _WIN32
 	cInterfaceRenderDevice* rd=gb_RenderDevice;
 	rd->SetWorldMaterial(ALPHA_BLEND,MatXf::ID, 0, texture_);
+	cQuadBuffer<sVertexXYZDT1>* pBuf=rd->GetQuadBufferXYZDT1();
+#else
+	// SetWorldMaterial selects vsStandart/psStandart with texture_ on stage 0; the
+	// renderer's pipeline is that shader pair, so naming the texture is all that is left
+	// of it. It answers to the quad buffer's BeginDraw/Get/EndDraw, so the loop below is
+	// the same code on both backends. The camera came from cFixedWavesContainer::Draw.
+	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
+	if(!pBuf)
+		return;
+	pBuf->SetTexture(texture_);
+#endif
 	bool avi_texture = texture_&&texture_->IsAviScaleTexture();
 
-	cQuadBuffer<sVertexXYZDT1>* pBuf=rd->GetQuadBufferXYZDT1();
 	pBuf->BeginDraw();
 
 	Color4f diff = camera->scene()->GetTileMap()->GetDiffuse();
@@ -1051,12 +1078,27 @@ void cFixedWavesContainer::PreDraw(Camera* camera)
 void cFixedWavesContainer::Draw(Camera* camera)
 {
 	start_timer_auto();
+#ifndef _WIN32
+	// Each wave source below records one group of quads, all under this camera. The
+	// depth-write and blend state the sorted pass sets around them is baked into the
+	// worldquad pipeline.
+	SDLWorldQuadRenderer* renderer = sdlWorldQuadRenderer();
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	if(!renderer || !dev)
+		return;
+	renderer->SetCamera(camera);
+#endif
 	ListWaves::iterator it;
 	FOR_EACH(listWaves_,it)
 	{
 		cFixedWaves* w = *it;
 		w->Draw(camera);
 	}
+#ifndef _WIN32
+	// D3D drew as each source's EndDraw went; SDL GPU only draws inside a render pass, so
+	// open one now, here in the sorted pass where the waves belong.
+	dev->drawWorldQuads();
+#endif
 }
 void cFixedWavesContainer::Animate(float dt)
 {

@@ -7,8 +7,8 @@
 #include "Render/Src/TileMap.h"
 #include "Render/Src/TexLibrary.h"
 #include "Render/Src/Scene.h"
-#include "Render/SDLCoastSpritesRenderer.h"   // the sprites are drawn by SDLCoastSpritesRenderer,
-#include "Render/SDLRenderDevice.h"           // reached via cSDLRenderDevice::drawCoastSprites
+#include "Render/SDLWorldQuadRenderer.h"   // the sprites are drawn by SDLWorldQuadRenderer,
+#include "Render/SDLRenderDevice.h"        // reached via cSDLRenderDevice::drawWorldQuads
 
 CoastSpriteSimpleAttributes::CoastSpriteSimpleAttributes()
 {
@@ -137,9 +137,9 @@ void cCoastSprites::Draw(Camera* camera)
 		DrawMovingCoastSprite(camera);
 	gb_RenderDevice->SetRenderState(RS_ZWRITEENABLE,old_zwrite);
 #else
-	// The depth-write and sampler state above is baked into the coastsprites pipeline;
+	// The depth-write and sampler state above is baked into the worldquad pipeline;
 	// what is left is the camera the two sprite groups are drawn under.
-	SDLCoastSpritesRenderer* renderer = sdlCoastSpritesRenderer();
+	SDLWorldQuadRenderer* renderer = sdlWorldQuadRenderer();
 	cSDLRenderDevice* dev = sdlRenderDevice();
 	if(!renderer || !dev)
 		return;
@@ -152,7 +152,7 @@ void cCoastSprites::Draw(Camera* camera)
 
 	// D3D drew as each group's EndDraw went; SDL GPU only draws inside a render pass, so
 	// open one now, here in the scene walk where the sprites belong.
-	dev->drawCoastSprites();
+	dev->drawWorldQuads();
 #endif
 }
 
@@ -326,7 +326,7 @@ void cCoastSprites::DrawSimpleCoastSprite(Camera* camera)
 	// renderer's pipeline is that shader pair, so naming the texture is all that is left
 	// of it. It answers to the quad buffer's BeginDraw/Get/EndDraw, so the loop below is
 	// the same code on both backends.
-	SDLCoastSpritesRenderer* pBuf = sdlCoastSpritesRenderer();
+	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
 	if(!pBuf)
 		return;
 	pBuf->SetTexture(Texture_stay);
@@ -387,7 +387,7 @@ void cCoastSprites::DrawMovingCoastSprite(Camera* camera)
 	//rd->SetWorldMaterial(ALPHA_BLEND,MatXf::ID, 0, 0);
 	cQuadBuffer<sVertexXYZDT1>* pBuf=rd->GetQuadBufferXYZDT1();
 #else
-	SDLCoastSpritesRenderer* pBuf = sdlCoastSpritesRenderer();
+	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
 	if(!pBuf)
 		return;
 	pBuf->SetTexture(Texture_mov);

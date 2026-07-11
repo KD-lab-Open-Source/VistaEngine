@@ -17,7 +17,7 @@
 #include "SDLTileMapRenderer.h"
 #include "SDLObject3dxRenderer.h"
 #include "SDLWaterRenderer.h"
-#include "SDLCoastSpritesRenderer.h"
+#include "SDLWorldQuadRenderer.h"
 
 // See the declarations in SDLRenderDevice.h.
 cSDLRenderDevice* sdlRenderDevice()
@@ -37,10 +37,10 @@ SDLWaterRenderer* sdlWaterRenderer()
 	return dev ? dev->waterRenderer() : nullptr;
 }
 
-SDLCoastSpritesRenderer* sdlCoastSpritesRenderer()
+SDLWorldQuadRenderer* sdlWorldQuadRenderer()
 {
 	cSDLRenderDevice* dev = sdlRenderDevice();
-	return dev ? dev->coastSpritesRenderer() : nullptr;
+	return dev ? dev->worldQuadRenderer() : nullptr;
 }
 
 void applyCameraViewport(SDL_GPURenderPass* pass, const sViewPort& vp, int targetW, int targetH)
@@ -156,8 +156,8 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND hWnd, int
 		objectRenderer_ = std::make_unique<SDLObject3dxRenderer>(this, device_, window_);
 	if(!waterRenderer_)
 		waterRenderer_ = std::make_unique<SDLWaterRenderer>(this, device_, window_);
-	if(!coastSpritesRenderer_)
-		coastSpritesRenderer_ = std::make_unique<SDLCoastSpritesRenderer>(device_, window_);
+	if(!worldQuadRenderer_)
+		worldQuadRenderer_ = std::make_unique<SDLWorldQuadRenderer>(device_, window_);
 
 	// Build the skinned-vertex declarations (on Windows cD3DRender does this at
 	// device init via CreateVertexDeclaration; cSkinVertex::Register is portable
@@ -186,7 +186,7 @@ int cSDLRenderDevice::Done()
 	tileMapRenderer_.reset();
 	objectRenderer_.reset();
 	waterRenderer_.reset();
-	coastSpritesRenderer_.reset();
+	worldQuadRenderer_.reset();
 
 	if(device_){
 		if(depthTexture_){
@@ -266,8 +266,8 @@ int cSDLRenderDevice::BeginScene()
 		objectRenderer_->BeginFrame();
 	if(waterRenderer_)
 		waterRenderer_->BeginFrame();
-	if(coastSpritesRenderer_)
-		coastSpritesRenderer_->BeginFrame();
+	if(worldQuadRenderer_)
+		worldQuadRenderer_->BeginFrame();
 	frameCleared_ = false;
 	depthCleared_ = false;
 	shadowPassRan_ = false;
@@ -359,9 +359,9 @@ void cSDLRenderDevice::drawTileMap(cTileMap* tileMap, Camera* camera)
 }
 
 // ---------------------------------------------------------------------------
-// Water and coast sprites: what cWater::DrawPolygons and cCoastSprites' two sprite loops
-// just recorded, drawn where the scene walk reached them. See the header for why the
-// object batch is flushed first.
+// Water and world quads: what cWater::DrawPolygons, cCoastSprites' sprite loops and the
+// wave sources just recorded, drawn where the scene walk reached them. See the header for
+// why the object batch is flushed first.
 // ---------------------------------------------------------------------------
 void cSDLRenderDevice::flushObjectPass()
 {
@@ -392,19 +392,20 @@ void cSDLRenderDevice::drawWater()
 	}
 }
 
-void cSDLRenderDevice::drawCoastSprites()
+void cSDLRenderDevice::drawWorldQuads()
 {
-	if(!bActiveScene_ || !commandBuffer_ || !swapchainTexture_ || !coastSpritesRenderer_)
+	if(!bActiveScene_ || !commandBuffer_ || !swapchainTexture_ || !worldQuadRenderer_)
 		return;
-	if(!coastSpritesRenderer_->hasDraws() || !ensureDepth(xScr, yScr))
+	if(!worldQuadRenderer_->hasDraws() || !ensureDepth(xScr, yScr))
 		return;
 
-	// A no-op once drawWater has run: it drained the batch. It has not, on a dry map.
+	// A no-op once an earlier caller drained the object batch. It has not, on a dry map,
+	// nor for whatever the sorted pass recorded before reaching the wave sources.
 	flushObjectPass();
 
 	const bool clear = hasClear_ && !frameCleared_;
-	if(coastSpritesRenderer_->Draw(commandBuffer_, swapchainTexture_, depthTexture_, xScr, yScr,
-	                               clear, clearColor_, !depthCleared_, fillMode_ == FILL_WIREFRAME)){
+	if(worldQuadRenderer_->Draw(commandBuffer_, swapchainTexture_, depthTexture_, xScr, yScr,
+	                            clear, clearColor_, !depthCleared_, fillMode_ == FILL_WIREFRAME)){
 		if(clear) frameCleared_ = true;
 		depthCleared_ = true;
 	}

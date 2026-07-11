@@ -14,8 +14,8 @@
 // vertex/index buffers — but no drawing pipeline of its own. Drawing lives in renderer
 // classes that record their own passes into the frame's command buffer: SDLUIRenderer
 // (2D text, sprites, quads), SDLTileMapRenderer (terrain), SDLObject3dxRenderer
-// (skinned .3dx meshes), SDLWaterRenderer (the water surface) and
-// SDLCoastSpritesRenderer (the shoreline foam).
+// (skinned .3dx meshes), SDLWaterRenderer (the water surface) and SDLWorldQuadRenderer
+// (world-space textured quads: the shoreline foam, the wave sources).
 
 #include "IRenderDevice.h"
 #include "MTSection.h"
@@ -37,7 +37,7 @@ class SDLUIRenderer;
 class SDLTileMapRenderer;
 class SDLObject3dxRenderer;
 class SDLWaterRenderer;
-class SDLCoastSpritesRenderer;
+class SDLWorldQuadRenderer;
 class cTileMap;
 
 // Restrict drawing to a camera's viewport, the way cD3DRender::SetDrawTransform hands
@@ -62,10 +62,10 @@ SDLObject3dxRenderer* sdlObjectRenderer();
 // it exactly as it drives VSWater/PSWater on Windows.
 SDLWaterRenderer* sdlWaterRenderer();
 
-// The SDL backend's coast-sprite renderer, or null under any other device.
-// cCoastSprites::Draw drives it exactly as it drives the device's shared quad buffer on
-// Windows -- it even answers to the same BeginDraw/Get/EndDraw.
-SDLCoastSpritesRenderer* sdlCoastSpritesRenderer();
+// The SDL backend's world-quad renderer, or null under any other device. cCoastSprites,
+// cFixedWaves and cWaves drive it exactly as they drive the device's shared quad buffer
+// on Windows -- it even answers to the same BeginDraw/Get/EndDraw.
+SDLWorldQuadRenderer* sdlWorldQuadRenderer();
 
 class cSDLRenderDevice : public cInterfaceRenderDevice
 {
@@ -81,23 +81,25 @@ public:
 	// if the terrain pass runs, the UI pass at EndScene loads instead of clearing.
 	void drawTileMap(cTileMap* tileMap, Camera* camera);
 
-	// --- Water and coast sprites ------------------------------------------
-	// cWater::Draw and cCoastSprites::Draw talk to their renderers directly (the way they
-	// talk to VSWater/PSWater and the shared quad buffer on Windows), then call these to
-	// put what they recorded on the screen.
+	// --- Water and world quads --------------------------------------------
+	// cWater::Draw, cCoastSprites::Draw and cFixedWavesContainer::Draw talk to their
+	// renderers directly (the way they talk to VSWater/PSWater and the shared quad buffer
+	// on Windows), then call these to put what they recorded on the screen.
 	//
-	// Neither is the first thing in the frame the way the terrain is: both belong after
-	// the opaque objects and before the sorted transparent ones, which is exactly where
-	// Camera::DrawScene's DrawObjectSpecial sits. That node is sorted by sortIndex(), so
-	// the water (-2) draws before the coast sprites (0). The object renderer batches, so
-	// each of these first replays what it has recorded so far -- the opaque objects --
-	// and only then opens its own pass over it. Whatever the scene walk records
-	// afterwards (SCENENODE_UNDERWATER, the sorted transparent pass) replays at EndScene,
-	// on top, as on D3D.
+	// None of them is the first thing in the frame the way the terrain is: each belongs
+	// where the scene walk reached it, over the opaque objects. Water and the coast
+	// sprites draw in DrawObjectSpecial, which sorts by sortIndex(), so the water (-2)
+	// lands under the sprites (0); the wave sources draw later still, in DrawSortObject's
+	// sorted transparent pass. The object renderer batches, so each of these first replays
+	// what it has recorded so far and only then opens its own pass over it. Whatever the
+	// walk records afterwards replays at EndScene, on top, as on D3D.
+	//
+	// drawWorldQuads is called by each of its renderer's callers in turn, and each call
+	// draws (and clears) only the quads recorded since the last one.
 	SDLWaterRenderer* waterRenderer() { return waterRenderer_.get(); }
 	void drawWater();
-	SDLCoastSpritesRenderer* coastSpritesRenderer() { return coastSpritesRenderer_.get(); }
-	void drawCoastSprites();
+	SDLWorldQuadRenderer* worldQuadRenderer() { return worldQuadRenderer_.get(); }
+	void drawWorldQuads();
 
 	// --- Shadow map -------------------------------------------------------
 	// Mirrors cD3DRender: cScene creates the map, the light camera renders the casters
@@ -318,7 +320,7 @@ private:
 	// The depth texture behind shadowMap_, or null if there is nothing to render into.
 	SDL_GPUTexture* shadowDepthTexture();
 	// Replay the object batch recorded so far, and take the frame's clears if they are
-	// still going. drawWater / drawCoastSprites call it to get the opaque objects onto the
+	// still going. drawWater / drawWorldQuads call it to get the opaque objects onto the
 	// screen before they blend over them.
 	void flushObjectPass();
 
@@ -348,7 +350,7 @@ private:
 	std::unique_ptr<SDLTileMapRenderer>   tileMapRenderer_;
 	std::unique_ptr<SDLObject3dxRenderer> objectRenderer_;
 	std::unique_ptr<SDLWaterRenderer>     waterRenderer_;
-	std::unique_ptr<SDLCoastSpritesRenderer> coastSpritesRenderer_;
+	std::unique_ptr<SDLWorldQuadRenderer> worldQuadRenderer_;
 };
 
 #endif // VISTA_SDL_RENDER_DEVICE_H
