@@ -13,6 +13,7 @@
 #include "cCamera.h"           // Camera::matView / matProj / GetLighting / vp
 #include "TileMap.h"           // cTileMap::GetDiffuse (the scene sun, per Environment)
 #include "Scene.h"             // cScene::GetShadowIntensity (the shader's vShade)
+#include "VisGeneric.h"        // Option_filterShadow (the original's FILTER_SHADOW)
 #include "SDLRenderDevice.h"   // applyCameraViewport, the shadow map
 
 // Cross-compiled tilemap shader blobs (SPIR-V + MSL); see Render/SDLShaders.
@@ -564,7 +565,9 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	                    ? tileMap->scene()->GetShadowIntensity() : Color4f(1.f, 1.f, 1.f, 1.f);
 	fsu.shade[0] = shade.r; fsu.shade[1] = shade.g; fsu.shade[2] = shade.b; fsu.shade[3] = shade.a;
 	fsu.params[0] = shadow ? 1.f : 0.f;
-	fsu.params[1] = fsu.params[2] = fsu.params[3] = 0.f;
+	// FILTER_SHADOW, a static shader define in the original; a uniform here.
+	fsu.params[1] = (shadow && Option_filterShadow) ? 1.f : 0.f;
+	fsu.params[2] = fsu.params[3] = 0.f;
 
 	// Wireframe is a diagnostic: kill the diffuse term and drive ambient to 1, so with
 	// the white texture bound below every edge comes out full white regardless of the

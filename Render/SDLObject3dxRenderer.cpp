@@ -10,6 +10,7 @@
 
 #include "cCamera.h"           // Camera::matViewProj / GetPos / GetLighting / IsShadow
 #include "Scene.h"             // cScene::GetShadowIntensity (the shader's vShade)
+#include "VisGeneric.h"        // Option_filterShadow (the original's FILTER_SHADOW)
 #include "VisGenericDefine.h"  // ATTRCAMERA_SHADOWMAP
 #include "Texture.h"           // cTexture (GetDDSurface / frameNumber)
 #include "SDLRenderDevice.h"   // owner: resolves sPtr buffers, holds RS_ZWRITEENABLE
@@ -486,7 +487,10 @@ void SDLObject3dxRenderer::SetState(const State& state, Camera* camera)
 		current_.fs.shade[0] = current_.fs.shade[1] = current_.fs.shade[2] = current_.fs.shade[3] = 1.f;
 	}
 	current_.fs.shadowParams[0] = current_.shadowTexture ? 1.f : 0.f;
-	current_.fs.shadowParams[1] = current_.fs.shadowParams[2] = current_.fs.shadowParams[3] = 0.f;
+	// FILTER_SHADOW. A static shader define in the original (PSSkin::Select hands
+	// Option_filterShadow to StaticSelect); a uniform here, so it costs no extra variant.
+	current_.fs.shadowParams[1] = (current_.shadowTexture && Option_filterShadow) ? 1.f : 0.f;
+	current_.fs.shadowParams[2] = current_.fs.shadowParams[3] = 0.f;
 
 	current_.blend = state.blend;
 	current_.skinned = boneCount > 1;

@@ -485,17 +485,26 @@ void cVisGeneric::SetGlobalParticleRate(float r)
 
 bool cVisGeneric::PossibilityShadowMapSelf4x4()
 {
+#ifdef _WIN32
 	if(gb_RenderDevice3D && gb_RenderDevice3D->dtAdvanceOriginal)
 	{
 		eDrawID id=gb_RenderDevice3D->dtAdvanceOriginal->GetID();
 		return id==DT_RADEON9700 || id==DT_GEFORCEFX;
 	}
 	return false;
+#else
+	// dtAdvanceOriginal is a D3D9 DrawType and gb_RenderDevice3D is null here, so the
+	// original test would read as "the hardware cannot filter". Ask the device instead,
+	// as SetShadowType does: the 2x2 filter is four taps on a texture we already sample.
+	return gb_RenderDevice && gb_RenderDevice->IsEnableSelfShadow();
+#endif
 }
 
 void cVisGeneric::SetShadowMapSelf4x4(bool b4x4)
 {
 	Option_filterShadow=b4x4;
+	// D3D recompiles: FILTER_SHADOW is a static shader define there. The SDL backend
+	// carries it in ShadowParams.y instead, so the next frame simply picks it up.
 	if(gb_RenderDevice3D)
 		gb_RenderDevice3D->RestoreShader();
 }

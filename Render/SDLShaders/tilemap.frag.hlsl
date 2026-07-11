@@ -19,9 +19,9 @@
 // facing away from the sun drives the light term below its ambient floor.
 //
 // The shadow is the SHADOW_9700 branch of the original's Shadow() (shader/Skin/
-// shadow9700.inl), unfiltered:
+// shadow9700.inl):
 //
-//     mul  = tex2D(sh_sampler, shadow.xy/shadow.w).x - shadow.z > 0 ? 1 : 0;
+//     mul  = Shadow9700(sh_sampler, shadow);   // one tap, or 2x2 under FILTER_SHADOW
 //     mul *= shadowFactor;
 //     mul  = vShade.rgb*(1-mul) + mul;
 //     ot.rgb *= mul;
@@ -58,7 +58,9 @@ cbuffer Light : register(b0, space3)
     // The original's vShade (psl c2): cScene::GetShadowIntensity(), the colour a fully
     // shadowed pixel is multiplied by.
     float4 ShadeIntensity;
-    float4 ShadowParams;   // x != 0: the shadow map holds this frame's casters
+    // x != 0: the shadow map holds this frame's casters. y != 0: 2x2 filter (the
+    // original's FILTER_SHADOW, a static shader define there, Option_filterShadow here).
+    float4 ShadowParams;
 };
 
 struct VSOutput
@@ -68,6 +70,43 @@ struct VSOutput
     float2 UV        : TEXCOORD0;
     float4 ShadowPos : TEXCOORD1;
 };
+
+// shadow9700.inl's `#define ccx 0.0005`: the 2x2 tap offset, in shadow-map uv. Almost
+// exactly one texel of a 2048 map, and 2048 is the only size the filter is ever on at --
+// GameOptions::graphSetup turns FILTER_SHADOW on and sets Option_ShadowSizePower to 4
+// together, both only when OPTION_SHADOW == 2 ("good").
+static const float SHADOW_TAP = 0.0005f;
+
+// Shadow9700. Returns 1 where the light reaches, 0 where it does not, or a quarter-step
+// between the two under the filter.
+//
+// Note z is divided by w, where the original divides only xy. Its caster stores the
+// pre-divide clip z in a colour target, so both sides stay pre-divide; ours stores
+// hardware depth, which is z/w. With Option_shadowTSM the light matrix is a perspective
+// warp and w != 1, so the difference is real.
+float shadowLit(float4 shadowPos)
+{
+    float3 sh = shadowPos.xyz / shadowPos.w;
+
+    // Outside the light's frustum there is no depth to compare against: the map is
+    // fitted to the view frustum each frame, so this is the far edge of the terrain.
+    // Treat it as lit rather than let the clamped edge texel smear a shadow outward.
+    if(!all(sh.xy == saturate(sh.xy)) || sh.z > 1.0f)
+        return 1.0f;
+
+    if(ShadowParams.y == 0.0f)
+        return (ShadowTexture.Sample(ShadowSampler, sh.xy) - sh.z > 0.0f) ? 1.0f : 0.0f;
+
+    // Shadow97002x2: the four corners of a texel, averaged. Its compare is `>=` where the
+    // unfiltered one is `>` -- step() gives exactly that.
+    const float c = SHADOW_TAP;
+    float4 taps;
+    taps.x = ShadowTexture.Sample(ShadowSampler, sh.xy + float2(-c, -c)) - sh.z;
+    taps.y = ShadowTexture.Sample(ShadowSampler, sh.xy + float2( c,  c)) - sh.z;
+    taps.z = ShadowTexture.Sample(ShadowSampler, sh.xy + float2(-c,  c)) - sh.z;
+    taps.w = ShadowTexture.Sample(ShadowSampler, sh.xy + float2( c, -c)) - sh.z;
+    return dot(step(0.0f, taps), 0.25f);
+}
 
 float4 main(VSOutput input) : SV_Target0
 {
@@ -80,19 +119,10 @@ float4 main(VSOutput input) : SV_Target0
 
     if(ShadowParams.x != 0.0f)
     {
-        // Note z is divided by w, where the original divides only xy. Its caster stores
-        // the pre-divide clip z in a colour target, so both sides stay pre-divide; ours
-        // stores hardware depth, which is z/w. With Option_shadowTSM the light matrix is
-        // a perspective warp and w != 1, so the difference is real.
-        float3 sh = input.ShadowPos.xyz / input.ShadowPos.w;
-
-        // Outside the light's frustum there is no depth to compare against: the map is
-        // fitted to the view frustum each frame, so this is the far edge of the terrain.
-        // Treat it as lit rather than let the clamped edge texel smear a shadow outward.
-        float lit = 1.0f;
-        if(all(sh.xy == saturate(sh.xy)) && sh.z <= 1.0f)
-            lit = (ShadowTexture.Sample(ShadowSampler, sh.xy) - sh.z > 0.0f) ? 1.0f : 0.0f;
-
+        // Shadow(ot.rgb, ShadowSampler, v.shadow, v.shadowFactor): the tilemap is the one
+        // caller that passes a real k, fading the shadow out on terrain already turned
+        // away from the sun. Objects pass 1.
+        float lit = shadowLit(input.ShadowPos);
         lit *= smoothstep(0.15f, 0.2f, ndlRaw);
         ot.rgb *= ShadeIntensity.rgb * (1.0f - lit) + lit;
     }

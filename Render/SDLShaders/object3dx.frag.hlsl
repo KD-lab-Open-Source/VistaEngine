@@ -81,8 +81,16 @@ cbuffer Material : register(b0, space3)
     // vShade (PSSkin::SetShadowIntensity, from cScene::GetShadowIntensity): what a fully
     // shadowed pixel's lit colour is multiplied by.
     float4 ShadeIntensity;
-    float4 ShadowParams;   // x != 0 = sample the shadow map
+    // x != 0 = sample the shadow map, y != 0 = 2x2 filter (the original's FILTER_SHADOW,
+    // a static shader define there, Option_filterShadow here).
+    float4 ShadowParams;
 };
+
+// shadow9700.inl's `#define ccx 0.0005`: the 2x2 tap offset, in shadow-map uv. That is
+// almost exactly one texel of a 2048 map, and 2048 is the only size the filter is ever
+// on at: GameOptions::graphSetup turns FILTER_SHADOW on and sets Option_ShadowSizePower
+// to 4 together, both only when OPTION_SHADOW == 2 ("good"). So it stays a literal.
+static const float SHADOW_TAP = 0.0005f;
 
 struct VSOutput
 {
@@ -104,13 +112,27 @@ struct VSOutput
 // the constant bias in shadowMatBias survive the divide as a constant -- exactly what
 // that file's "bias нельзя передавать через матрицу из за TSM" comment complains about.
 //
-// Returns 1 where the light reaches, 0 where it does not.
+// Returns 1 where the light reaches, 0 where it does not, or a quarter-step between the
+// two under the filter.
 float shadowLit(float4 shadowPos)
 {
     float3 sh = shadowPos.xyz / shadowPos.w;
     if(!all(sh.xy == saturate(sh.xy)) || sh.z > 1.0f)
         return 1.0f;   // outside the light's frustum: nothing recorded, so nothing casts
-    return (ShadowTexture.Sample(ShadowSampler, sh.xy) - sh.z > 0.0f) ? 1.0f : 0.0f;
+
+    if(ShadowParams.y == 0.0f)
+        return (ShadowTexture.Sample(ShadowSampler, sh.xy) - sh.z > 0.0f) ? 1.0f : 0.0f;
+
+    // Shadow97002x2: the four corners of a texel, averaged. Its compare is `>=` where the
+    // unfiltered one is `>` -- step() gives exactly that. The taps read the point/clamp
+    // sampler, so a tap that leaves the map repeats its edge, as the original's does.
+    const float c = SHADOW_TAP;
+    float4 taps;
+    taps.x = ShadowTexture.Sample(ShadowSampler, sh.xy + float2(-c, -c)) - sh.z;
+    taps.y = ShadowTexture.Sample(ShadowSampler, sh.xy + float2( c,  c)) - sh.z;
+    taps.z = ShadowTexture.Sample(ShadowSampler, sh.xy + float2(-c,  c)) - sh.z;
+    taps.w = ShadowTexture.Sample(ShadowSampler, sh.xy + float2( c, -c)) - sh.z;
+    return dot(step(0.0f, taps), 0.25f);
 }
 
 // shadow9700.inl's Shadow(), with its k == 1: the objects' call site passes a constant,
