@@ -13,9 +13,9 @@
 // and swapchain, the frame's command buffer, the depth buffer, textures and
 // vertex/index buffers — but no drawing pipeline of its own. Drawing lives in renderer
 // classes that record their own passes into the frame's command buffer: SDLUIRenderer
-// (2D text, sprites, quads), SDLTileMapRenderer (terrain) and SDLObject3dxRenderer
-// (skinned .3dx meshes). The water and coast-foam pipelines get their own renderers;
-// until then their entry points below are no-ops.
+// (2D text, sprites, quads), SDLTileMapRenderer (terrain), SDLObject3dxRenderer
+// (skinned .3dx meshes) and SDLWaterRenderer (the water surface). The coast-foam
+// pipeline gets its own renderer too; until then it is a no-op.
 
 #include "IRenderDevice.h"
 #include "MTSection.h"
@@ -36,6 +36,7 @@ struct sViewPort;
 class SDLUIRenderer;
 class SDLTileMapRenderer;
 class SDLObject3dxRenderer;
+class SDLWaterRenderer;
 class cTileMap;
 
 // Restrict drawing to a camera's viewport, the way cD3DRender::SetDrawTransform hands
@@ -56,6 +57,10 @@ cSDLRenderDevice* sdlRenderDevice();
 // on Windows.
 SDLObject3dxRenderer* sdlObjectRenderer();
 
+// The SDL backend's water renderer, or null under any other device. cWater::Draw drives
+// it exactly as it drives VSWater/PSWater on Windows.
+SDLWaterRenderer* sdlWaterRenderer();
+
 class cSDLRenderDevice : public cInterfaceRenderDevice
 {
 public:
@@ -69,6 +74,20 @@ public:
 	// depth pass there and then. The first pass of a frame performs Fill()'s clear, so
 	// if the terrain pass runs, the UI pass at EndScene loads instead of clearing.
 	void drawTileMap(cTileMap* tileMap, Camera* camera);
+
+	// --- Water ------------------------------------------------------------
+	// cWater::Draw talks to the water renderer directly (the way it talks to VSWater /
+	// PSWater on Windows), then calls this to put what it recorded on the screen.
+	//
+	// Water is not the first thing in the frame the way the terrain is: it belongs after
+	// the opaque objects and before the sorted transparent ones, which is exactly where
+	// cWater::Draw sits in the scene walk (Camera::DrawScene's DrawObjectSpecial). The
+	// object renderer batches, so this first replays what it has recorded so far -- the
+	// opaque objects -- and only then opens the water pass over it. Whatever the scene
+	// walk records afterwards (SCENENODE_UNDERWATER, the sorted transparent pass) replays
+	// at EndScene, over the water, as on D3D.
+	SDLWaterRenderer* waterRenderer() { return waterRenderer_.get(); }
+	void drawWater();
 
 	// --- Shadow map -------------------------------------------------------
 	// Mirrors cD3DRender: cScene creates the map, the light camera renders the casters
@@ -314,6 +333,7 @@ private:
 	std::unique_ptr<SDLUIRenderer>        uiRenderer_;
 	std::unique_ptr<SDLTileMapRenderer>   tileMapRenderer_;
 	std::unique_ptr<SDLObject3dxRenderer> objectRenderer_;
+	std::unique_ptr<SDLWaterRenderer>     waterRenderer_;
 };
 
 #endif // VISTA_SDL_RENDER_DEVICE_H

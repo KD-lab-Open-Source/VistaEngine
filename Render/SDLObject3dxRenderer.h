@@ -15,8 +15,10 @@
 // Unlike SDLTileMapRenderer, which draws the instant cTileMap::Draw calls it, this
 // renderer batches: SDL GPU can only draw inside a render pass, and objects are drawn
 // from all over the scene walk. Each DrawIndexedPrimitive records geometry + a snapshot
-// of the current state; Draw() replays them in one render pass at EndScene, in call
+// of the current state; Draw() replays them in a render pass at EndScene, in call
 // order -- which is what keeps the engine's opaque-then-sorted-transparent ordering.
+// The water surface, drawn between the two in the scene walk, splits that into two
+// passes (see Draw below).
 //
 // It owns no geometry: the vertex/index buffers are the engine's own, created through
 // cSDLRenderDevice::CreateVertexBuffer/CreateIndexBuffer and filled by cStatic3dx. The
@@ -118,9 +120,13 @@ public:
 	// pass has already taken it. Returns true if the pass ran.
 	bool DrawShadowPass(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* depth, int size, bool clearDepth);
 
-	// Replay the frame's draws into one colour+depth render pass. `clear`/`clearDepth`
-	// mean this pass owns the frame's colour/depth clear -- true only when no earlier
-	// pass (the terrain) already took it. Returns true if the pass ran.
+	// Replay the draws recorded so far into one colour+depth render pass, and clear them.
+	// `clear`/`clearDepth` mean this pass owns the frame's colour/depth clear -- true only
+	// when no earlier pass (the terrain) already took it. Returns true if the pass ran.
+	//
+	// Called at EndScene, and once more mid-scene from cSDLRenderDevice::drawWater, which
+	// has to get the opaque objects onto the screen before the water blends over them.
+	// The draws that follow that flush replay here, over the water, as on D3D.
 	bool Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, SDL_GPUTexture* depth,
 	          int screenW, int screenH, bool clear, const float clearColor[4],
 	          bool clearDepth, bool wireframe);

@@ -1,8 +1,5 @@
 #include "StdAfx.h"
 #include "CameraManager.h"
-#include "TerrainRenderSDL.h"
-#include "WaterRenderSDL.h"
-#include "CoastFoamRenderSDL.h"
 #include "SoundApp.h"
 #include "GameShell.h"
 #include "Squad.h"

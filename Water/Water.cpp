@@ -2,6 +2,8 @@
 #include "terra/vmap.h"
 #include "Water.h"
 #include "Render/D3D/D3DRender.h"
+#include "Render/SDLWaterRenderer.h"   // the surface is drawn by SDLWaterRenderer,
+#include "Render/SDLRenderDevice.h"    // reached via cSDLRenderDevice::drawWater
 #include "Render/shader/shaders.h"
 #include "Render/src/RenderCubemap.h"
 #include "Serialization/ResourceSelector.h"
@@ -245,46 +247,17 @@ void cWater::PreDraw(Camera* camera)
 	UpdateVB();
 }
 
-// Portable reflected-sky base colour for the SDL water sheet (off-Windows). Mirrors
-// the D3D water shader's colour math (Water.cpp:272-276 + water_linear.psl:37-38):
-//   refColor.rgb = reflection_color.rgb * sceneLitColour;  refColor.a = 1 - reflection_color.a
-//   out.rgb = saturate( (sky.rgb*refColor.a + refColor.rgb) * ((1-sky.a)*brightness + 1) )
-// The one input we cannot produce off-Windows -- the planar-reflection render target
-// -- is replaced by cur_reflect_sky_color (time-of-day resolved; sky-blue by default),
-// exactly what the engine's own ps1.1 water path substitutes when there is no
-// reflection texture.
-Color4f cWater::GetReflectedSurfaceColor()
-{
-	Color4f lit;
-	lit.set(1.f, 1.f, 1.f, 1.f);
-	if(scene() && scene()->GetTileMap())
-		lit = scene()->GetPlainLitColor();
-
-	Color4f refl;
-	refl.mul3(reflection_color, lit);
-	float skyWeight = 1.f - reflection_color.a;
-
-	const Color4f& sky = cur_reflect_sky_color;
-	float boost = (1.f - sky.a)*reflection_brightnes + 1.f;
-
-	Color4f out;
-	out.set(clamp((sky.r*skyWeight + refl.r)*boost, 0.f, 1.f),
-			clamp((sky.g*skyWeight + refl.g)*boost, 0.f, 1.f),
-			clamp((sky.b*skyWeight + refl.b)*boost, 0.f, 1.f),
-			1.f);
-	return out;
-}
-
 void cWater::Draw(Camera* camera)
 {
-#ifdef _WIN32
 	start_timer_auto();
 
-	cD3DRender* rd=gb_RenderDevice3D;
 	if(camera->getAttribute(ATTRCAMERA_REFLECTION)){
 	//	DrawToZBuffer(camera);
 		return;
 	}
+
+#ifdef _WIN32
+	cD3DRender* rd=gb_RenderDevice3D;
 
 	rd->AddNumPolygonToTilemap();
 
@@ -392,14 +365,50 @@ void cWater::Draw(Camera* camera)
 	}
 
 	rd->AddNumPolygonToNormal();
+#else
+	// WATER_EMPTY: the branch above's `else`, which setTechnique picks whenever the
+	// device is not PS2.0. It is the only one of the four whose inputs the SDL backend
+	// has -- the other three want the planar-reflection target, the sky cubemap or the
+	// lava shader pair. Everything the D3D path spreads across the render states, the
+	// vs/ps Select+SetSpeed calls and SetTexture, one State carries.
+	SDLWaterRenderer* renderer = sdlWaterRenderer();
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	if(!renderer || !dev)
+		return;
+
+	gb_RenderDevice->AddNumPolygonToTilemap();
+
+	float time_x=fmodf(animate_time*0.03,1.0f);
+	float time_y=fmodf(animate_time*0.02,1.0f);
+	float time_x1=fmodf(-animate_time*0.022,1.0f);
+	float time_y1=fmodf(-animate_time*0.033,1.0f);
+	const float speed_scale=5e-3f;
+	const float speed_scale1=7e-3f;
+
+	SDLWaterRenderer::State st;
+	st.uvScaleOffset[0]  = speed_scale;   st.uvScaleOffset[1]  = speed_scale;
+	st.uvScaleOffset[2]  = time_x;        st.uvScaleOffset[3]  = time_y;
+	st.uvScaleOffset1[0] = speed_scale1;  st.uvScaleOffset1[1] = speed_scale1;
+	st.uvScaleOffset1[2] = time_x1;       st.uvScaleOffset1[3] = time_y1;
+	st.ps11Color[0] = cur_reflect_sky_color.r;
+	st.ps11Color[1] = cur_reflect_sky_color.g;
+	st.ps11Color[2] = cur_reflect_sky_color.b;
+	st.ps11Color[3] = cur_reflect_sky_color.a;
+	st.texture0 = bumpTexture_;
+	st.texture1 = bumpTexture1_;
+	renderer->SetState(st, camera);
+
+	DrawPolygons(camera);
+	// D3D drew as DrawPolygons went; SDL GPU only draws inside a render pass, so open
+	// one now, here in the scene walk where the surface belongs.
+	dev->drawWater();
+
+	gb_RenderDevice->AddNumPolygonToNormal();
 #endif
 }
 
 void cWater::DrawPolygons(Camera* camera)
 {
-#ifdef _WIN32
-	cD3DRender* rd=gb_RenderDevice3D;
-	int num_draw_polygon=0;
 /*
 	const int max_polygon=65536;
 	for(int i=0;i<vb.size();i++)
@@ -408,11 +417,15 @@ void cWater::DrawPolygons(Camera* camera)
 		{
 			int cur_num=min(max_polygon,number_polygon-cur_polygon);
 			rd->DrawIndexedPrimitive(vb[i],0,number_vertex,ib,cur_polygon,cur_num);
-			num_draw_polygon+=cur_num;
 			cur_polygon+=cur_num;
 		}
 	}
 /*/
+#ifndef _WIN32
+	SDLWaterRenderer* renderer = sdlWaterRenderer();
+	if(!renderer)
+		return;
+#endif
 
 	int tile_polygons=visible_tile_size*visible_tile_size*2;
 	int num_tile_x=(grid_size.x-1)/visible_tile_size;
@@ -428,13 +441,16 @@ void cWater::DrawPolygons(Camera* camera)
 		xassert(cur_polygon>=0 && cur_polygon<65536);
 		xassert(cur_num>=0 && cur_num<65536);
 		xassert(cur_polygon+cur_num<=65536);
-		rd->DrawIndexedPrimitive(vb[idx_vb],0,number_vertex,ib,cur_polygon,cur_num);
-		num_draw_polygon += cur_num;
+#ifdef _WIN32
+		gb_RenderDevice3D->DrawIndexedPrimitive(vb[idx_vb],0,number_vertex,ib,cur_polygon,cur_num);
+#else
+		// Records the range against the state cWater::Draw set; it opens the pass after.
+		renderer->DrawIndexedPrimitive(vb[idx_vb],0,ib,cur_polygon,cur_num);
+#endif
 	}
 
 	if(border.isInit())
 		border.Draw(camera);
-#endif
 }
 
 void cWater::DrawToZBuffer(Camera* camera)

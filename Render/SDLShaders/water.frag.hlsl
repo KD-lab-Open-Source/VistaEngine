@@ -1,73 +1,71 @@
-// Water-surface fragment shader for the SDL GPU backend (P2 water slice).
+// Water-surface fragment shader for the SDL GPU backend.
 //
-// Faithful to the original P2 water shader (Render/shader/Water/water.vsl +
-// water_linear.psl): the surface detail comes from TWO scrolling bump textures
-// (waves.dds / waves1.dds), NOT procedural noise (summed sines make a regular
-// dotted lattice). The two layers drift in different directions; their combined
-// xy forms a surface normal that (a) ripples the water colour and (b) drives a
-// tight, view-dependent specular glint -- the bright "foam" sparkle. Base colour
-// and opacity come from the baked depth-opacity texture (our reflected-sky stand-
-// in). Reuses mesh3d.vert (POSITION/NORMAL/UV + world-space WorldPos).
+// Ported from the original P2 shader Render/shader/Water/water_easy.psl, whole:
 //
-// Authored in HLSL; cross-compiled to SPIR-V/MSL with SDL_shadercross.
+//     ot.rgb = vPS11Color;
+//     ot.a   = v.diffuse.a;
+//     float4 tex0 = tex2D(Tex0Sampler, v.uv_tex0);
+//     float4 tex1 = tex2D(Tex1Sampler, v.uv_tex1);
+//     ot.a += ot.a*saturate((tex0.x+tex1.x));
+//
+// So the surface is a flat colour whose *opacity* carries the waves: vPS11Color is
+// cWater's cur_reflect_sky_color (the reflected-sky colour for the current time of day,
+// which the engine itself substitutes for a reflection here), the vertex alpha is the
+// depth-derived opacity cWater::CalcColor bakes per grid node, and the wave maps then
+// thicken it along the crests -- shallow water reads through, deep water does not, and
+// the waves ripple across both.
+//
+// Two departures, both forced:
+//
+//  * tex0.x / tex1.x. The wave maps (waves.dds / waves1.dds) are D3DFMT_V8U8: two signed
+//    bytes, so the original's tex0.x is already a signed slope in [-1,1] and its
+//    saturate() clips the troughs to zero. The portable DDS decoder (Render/src/
+//    DDSImage.cpp) stores those bytes biased by 128 into R,G of a BGRA8 texture, so
+//    unbias here -- (raw*255 - 128)/127 -- exactly as object3dx.frag.hlsl does.
+//
+//  * No FOG_OF_WAR. That branch lerps to vFogOfWar by a lightmap alpha; the SDL backend
+//    has no lightmap yet, and the original compiles the branch out without one too.
+//
+// ot.a exceeds 1 on a crest (the original's `ot.a += ot.a*...` doubles it at most). Both
+// D3D9 and SDL GPU clamp a fragment's output to [0,1] before blending into a UNORM target,
+// so the saturation is the hardware's, there and here. Left unclamped, as the original.
+//
+// Authored in HLSL; cross-compiled to SPIR-V/MSL with SDL_shadercross. See
+// build-water-shaders.sh.
 
-Texture2D<float4> ColorTex : register(t0, space2);   // baked depth-opacity (premult BGRA)
-SamplerState      ColorSmp : register(s0, space2);
-Texture2D<float4> Bump0    : register(t1, space2);   // waves.dds
-SamplerState      Bump0Smp : register(s1, space2);
-Texture2D<float4> Bump1    : register(t2, space2);   // waves1.dds
-SamplerState      Bump1Smp : register(s2, space2);
+Texture2D<float4> Tex0        : register(t0, space2);
+SamplerState      Tex0Sampler : register(s0, space2);
+Texture2D<float4> Tex1        : register(t1, space2);
+SamplerState      Tex1Sampler : register(s1, space2);
 
-cbuffer WaterFS : register(b0, space3)
+cbuffer Water : register(b0, space3)
 {
-    float4 LightDir;    // xyz = unit dir *toward* the light, w = specular strength
-    float4 CameraPos;   // xyz = world camera position, w = time (seconds)
-    float4 Params;      // x = bump uv scale, y = scroll speed, z = ripple strength, w spare
+    // The original's vPS11Color (PSWater::SetPS11Color), fed cWater's
+    // cur_reflect_sky_color. Alpha unused: the surface's comes from the vertex.
+    float4 PS11Color;
 };
 
 struct VSOutput
 {
     float4 Position : SV_Position;
-    float3 Normal   : NORMAL;
-    float2 UV       : TEXCOORD0;
-    float3 WorldPos : TEXCOORD1;
+    float4 Diffuse  : COLOR0;
+    float2 UV0      : TEXCOORD0;
+    float2 UV1      : TEXCOORD1;
 };
+
+// One wave map's signed x slope, undoing the decoder's +128 bias.
+float slope(Texture2D<float4> tex, SamplerState samp, float2 uv)
+{
+    return (tex.Sample(samp, uv).r * 255.0f - 128.0f) / 127.0f;
+}
 
 float4 main(VSOutput input) : SV_Target0
 {
-    // Base water colour + opacity from the baked depth texture (premultiplied:
-    // rgb == waterColour * a, a == surface opacity). Dry/shallow areas -> a ~ 0.
-    float4 base = ColorTex.Sample(ColorSmp, input.UV);
-    float  a    = base.a;
+    float4 ot;
+    ot.rgb = PS11Color.rgb;
+    ot.a   = input.Diffuse.a;
 
-    // Two scrolling bump layers (original: t0 = pos.xy, t1 = pos.yx swapped, offsets
-    // scroll over time). World XY keeps the ripple scale constant regardless of mesh.
-    float  t     = CameraPos.w;
-    float  scale = Params.x;
-    float  speed = Params.y;
-    float2 uv0 = input.WorldPos.xy * scale        + float2( t * speed,        t * speed * 0.7f);
-    float2 uv1 = input.WorldPos.yx * scale * 1.3f + float2(-t * speed * 0.6f, t * speed * 0.9f);
-    float4 b0 = Bump0.Sample(Bump0Smp, uv0);
-    float4 b1 = Bump1.Sample(Bump1Smp, uv1);
-
-    // Surface normal from the two bumps. The V8U8 wave maps decode to [0,1] with 0.5
-    // == flat, so the signed delta is (b*2-1); summed over both layers this is exactly
-    // (b0.xy + b1.xy) - 1, matching the original's (t0.xy + t1.xy)*0.5 in signed space.
-    float2 nxy = (b0.xy + b1.xy) - 1.0f;                 // ~[-1,1] signed wave normal xy
-    float3 n = normalize(float3(nxy, 1.0f));
-
-    // Ripple the base colour brightness from the bump detail (organic, no lattice).
-    float ripple = nxy.x;
-    float3 rgb = base.rgb * (1.0f + ripple * 0.20f * Params.z);
-
-    // Tight specular glint (original: smoothstep(0.99,1,-dot(reflect(Ltravel,n),eye))).
-    float3 Ltravel = -normalize(LightDir.xyz);           // light travel = -(toward light)
-    float3 refl    = reflect(Ltravel, n);
-    float3 eye     = normalize(input.WorldPos - CameraPos.xyz);
-    // Tight threshold so only bump normals that align *exactly* sparkle -> sparse
-    // glints along the glitter path instead of one broad blown-out glare.
-    float  spec    = smoothstep(0.992f, 1.0f, -dot(refl, eye)) * LightDir.w;
-    rgb += spec * float3(0.90f, 0.90f, 1.0f) * a;        // premultiplied glints (water only)
-
-    return float4(rgb, a);
+    float wave = slope(Tex0, Tex0Sampler, input.UV0) + slope(Tex1, Tex1Sampler, input.UV1);
+    ot.a += ot.a * saturate(wave);
+    return ot;
 }

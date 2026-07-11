@@ -748,6 +748,9 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 	}
 
 	SDL_EndGPURenderPass(pass);
+	// Recorded. states_ and worldPool_ stay: the draws still to come this frame index
+	// into them, and a state that has not changed is not re-committed.
+	draws_.clear();
 	return true;
 }
 
