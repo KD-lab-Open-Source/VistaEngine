@@ -43,6 +43,7 @@ void cUnkLight::PreDraw(Camera* camera)
 
 void cUnkLight::Draw(Camera* camera)
 {
+#ifdef _WIN32
 	DrawStrip strip;
 	gb_RenderDevice3D->SetWorldMaterial(ALPHA_ADDBLENDALPHA,MatXf::ID,0,GetTexture());//???
 	Color4c Diffuse(GetDiffuse().a*GetDiffuse().r*255,
@@ -52,7 +53,7 @@ void cUnkLight::Draw(Camera* camera)
 	cVertexBuffer<sVertexXYZDT1>* buf=gb_RenderDevice->GetBufferXYZDT1();
 	sVertexXYZDT1 *v=buf->Lock(4);
 	Vect3f sx=GetRadius()*camera->GetWorldI(),sy=GetRadius()*camera->GetWorldJ();
-	v[0].pos=GetGlobalMatrix().trans()+sx+sy; v[0].u1()=0, v[0].v1()=0; 
+	v[0].pos=GetGlobalMatrix().trans()+sx+sy; v[0].u1()=0, v[0].v1()=0;
 	v[1].pos=GetGlobalMatrix().trans()+sx-sy; v[1].u1()=0, v[1].v1()=1;
 	v[2].pos=GetGlobalMatrix().trans()-sx+sy; v[2].u1()=1, v[2].v1()=0;
 	v[3].pos=GetGlobalMatrix().trans()-sx-sy; v[3].u1()=1, v[3].v1()=1;
@@ -60,6 +61,11 @@ void cUnkLight::Draw(Camera* camera)
 	buf->Unlock(4);
 
 	buf->DrawPrimitive(PT_TRIANGLESTRIP,2);
+#endif
+	// The billboard light sprite drives gb_RenderDevice3D and the device's shared dynamic
+	// vertex buffer, neither of which the SDL backend has. Only reachable since the UI's
+	// deviceCoords stopped collapsing the background scene's frustum to nothing, which
+	// had kept every light out of view; guarded off-Windows like the sibling scene nodes.
 }
 
 void cUnkLight::SetDirection(const Vect3f& direction)

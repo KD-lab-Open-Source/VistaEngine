@@ -29,11 +29,20 @@ struct SDL_GPUDevice;
 struct SDL_GPUCommandBuffer;
 struct SDL_GPUTexture;
 struct SDL_GPUBuffer;
+struct SDL_GPURenderPass;
 
+struct sViewPort;
 class SDLUIRenderer;
 class SDLTileMapRenderer;
 class SDLObject3dxRenderer;
 class cTileMap;
+
+// Restrict drawing to a camera's viewport, the way cD3DRender::SetDrawTransform hands
+// camera->vp to D3DDevice_->SetViewport. Camera::Update scales matProj to exactly that
+// rect, so a renderer that ignores it stretches the scene over the whole window and
+// loses the letterbox bars the 4:3 work area leaves. A render pass starts out with the
+// full target as its viewport, so this only ever needs setting, never restoring.
+void applyCameraViewport(SDL_GPURenderPass* pass, const sViewPort& vp, int targetW, int targetH);
 
 class cSDLRenderDevice : public cInterfaceRenderDevice
 {
@@ -104,9 +113,13 @@ public:
 	cRenderWindow* currentRenderWindow() override { return nullptr; }
 	void DeleteRenderWindow(cRenderWindow*) override {}
 
-	// --- Camera / transform (no-op) --------------------------------------
-	void SetDrawTransform(Camera*) override {}
-	void setCamera(Camera*) override {}
+	// --- Camera / transform ----------------------------------------------
+	// SDL GPU has no device-wide transform or viewport: matView/matProj reach the
+	// shaders as uniforms, and the viewport belongs to a render pass. So these only
+	// cache the camera, as cD3DRender does, and the renderers apply camera->vp when
+	// they open their pass (see applyCameraViewport).
+	void SetDrawTransform(Camera* camera) override { camera_ = camera; }
+	void setCamera(Camera* camera) override { SetDrawTransform(camera); }
 	void setWorldMatrix(const MatXf&) override {}
 
 	// --- Misc state (no-op) ----------------------------------------------
@@ -121,10 +134,12 @@ public:
 	bool IsEnableSelfShadow() override { return false; }
 	bool SetScreenShot(const char*) override { return false; }
 
-	// --- 2D primitives (no-op until the UI renderer grows them) ----------
-	void DrawLine(int, int, int, int, Color4c) override {}
-	void DrawPixel(int, int, Color4c) override {}
-	void DrawRectangle(int, int, int, int, Color4c, bool) override {}
+	// --- 2D primitives (forwarded to the UI renderer) --------------------
+	void DrawLine(int x1, int y1, int x2, int y2, Color4c color) override;
+	void DrawPixel(int x, int y, Color4c color) override;
+	void DrawRectangle(int x, int y, int dx, int dy, Color4c color, bool outline) override;
+	// Nothing to flush: the UI renderer already records these in call order alongside
+	// the sprites and text, and draws them all in its pass at EndScene.
 	void FlushPrimitive2D() override {}
 
 	// --- 3D primitives (no-op) -------------------------------------------
@@ -136,14 +151,20 @@ public:
 	void DrawBound(const MatXf&, Vect3f&, Vect3f&, bool, Color4c) override {}
 
 	// --- Text (forwarded to the UI renderer) ------------------------------
-	void OutText(int, int, const char*, const Color4f&, ALIGN_TEXT, eBlendMode, Vect2f) override {}
+	void OutText(int x, int y, const char* text, const Color4f& color, ALIGN_TEXT align, eBlendMode blend_mode, Vect2f scale) override;
 	int  OutTextLine(int x, int y, const FT::Font& font, const wchar_t* textline, const wchar_t* end, const Color4c& color, eBlendMode blend_mode, int xRangeMin, int xRangeMax) override;
+	// The D3D backend draws these straight onto the window's HDC with GDI (CreateFont /
+	// ExtTextOut), bypassing the renderer entirely. There is no equivalent here, and
+	// nothing in the game calls either.
 	void OutText(int, int, const char*, int, int, int) override {}
 	void OutText(int, int, const char*, int, int, int, char*, int, int, int, int) override {}
 
 	// --- Sprites (forwarded to the UI renderer) ---------------------------
 	void DrawQuad(float, float, float, float, float, float, float, float, Color4c) override;
 	void DrawSprite(int, int, int, int, float, float, float, float, cTexture*, const Color4c&, float, eBlendMode, float) override;
+	// Unimplemented, and unreached: nothing outside the D3D backend calls the solid,
+	// two-texture or cTextureScale sprite variants. DrawSprite2 is used only by the
+	// chaos post-process (Render/src/CChaos.cpp), which has no SDL path yet.
 	void DrawSpriteSolid(int, int, int, int, float, float, float, float, cTexture*, const Color4c&, float, eBlendMode) override {}
 	void DrawSprite2(int, int, int, int, float, float, float, float, cTexture*, cTexture*, const Color4c&, float) override {}
 	void DrawSprite2(int, int, int, int, float, float, float, float, float, float, float, float, cTexture*, cTexture*, const Color4c&, float, eColorMode, eBlendMode) override {}

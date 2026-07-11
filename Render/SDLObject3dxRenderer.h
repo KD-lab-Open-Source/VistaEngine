@@ -151,6 +151,10 @@ private:
 		eBlendMode blend;
 		bool skinned;               // vertex carries weight bytes (boneCount > 1)
 		bool bump;                  // bump path: tangent-frame vertex, per-pixel lambert
+		// The camera's viewport, captured at SetState. Draws are replayed in one pass at
+		// EndScene, long after the scene walk moved on, so it cannot be read back then.
+		int vpX, vpY, vpW, vpH;
+		float vpMinZ, vpMaxZ;
 	};
 
 	struct DrawCmd

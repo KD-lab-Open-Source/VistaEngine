@@ -9,9 +9,10 @@
 #include <cstring>
 #include <vector>
 
-#include "terra/vmap.h"   // vMap heightfield + baked per-cell surface colour
-#include "cCamera.h"      // Camera::matView / matProj / GetLighting
-#include "TileMap.h"      // cTileMap::GetDiffuse (the scene sun, per Environment)
+#include "terra/vmap.h"        // vMap heightfield + baked per-cell surface colour
+#include "cCamera.h"           // Camera::matView / matProj / GetLighting / vp
+#include "TileMap.h"           // cTileMap::GetDiffuse (the scene sun, per Environment)
+#include "SDLRenderDevice.h"   // applyCameraViewport
 
 // Cross-compiled tilemap shader blobs (SPIR-V + MSL); see Render/SDLShaders.
 #include "SDLShaders/tilemap_shaders.h"
@@ -364,7 +365,7 @@ bool SDLTileMapRenderer::ensureMesh(SDL_GPUCommandBuffer* cmd)
 // Frame
 // ---------------------------------------------------------------------------
 bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, SDL_GPUTexture* depth,
-                              int /*screenW*/, int /*screenH*/, bool clear, const float clearColor[4],
+                              int screenW, int screenH, bool clear, const float clearColor[4],
                               bool clearDepth, cTileMap* tileMap, Camera* camera, bool wireframe)
 {
 	// Fall back to the solid pipeline if the LINE variant failed to build.
@@ -431,6 +432,7 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	dt.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
 
 	SDL_GPURenderPass* pass = SDL_BeginGPURenderPass(cmd, &ct, 1, &dt);
+	applyCameraViewport(pass, camera->vp, screenW, screenH);
 
 	SDL_BindGPUGraphicsPipeline(pass, pipeline);
 	SDL_PushGPUVertexUniformData(cmd, 0, &vsu, sizeof(vsu));

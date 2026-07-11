@@ -10,10 +10,32 @@
 
 #include "Texture.h"     // cTexture (BitMap / GetDDSurface / attributes)
 #include "FileImage.h"   // cFileImage::GetTexture
+#include "cCamera.h"     // sViewPort
 
 #include "SDLUIRenderer.h"
 #include "SDLTileMapRenderer.h"
 #include "SDLObject3dxRenderer.h"
+
+// See the declaration in SDLRenderDevice.h.
+void applyCameraViewport(SDL_GPURenderPass* pass, const sViewPort& vp, int targetW, int targetH)
+{
+	if(!pass || vp.Width <= 0 || vp.Height <= 0)
+		return;   // camera never got a frustum: leave the pass's full-target viewport
+
+	const int x = vp.X < 0 ? 0 : vp.X;
+	const int y = vp.Y < 0 ? 0 : vp.Y;
+	const int w = vp.Width  > targetW - x ? targetW - x : vp.Width;
+	const int h = vp.Height > targetH - y ? targetH - y : vp.Height;
+	if(w <= 0 || h <= 0)
+		return;
+
+	SDL_GPUViewport v;
+	v.x = (float)x; v.y = (float)y;
+	v.w = (float)w; v.h = (float)h;
+	v.min_depth = vp.MinZ;
+	v.max_depth = vp.MaxZ;
+	SDL_SetGPUViewport(pass, &v);
+}
 
 // ---------------------------------------------------------------------------
 // Base cInterfaceRenderDevice members. On Windows these live in
@@ -353,6 +375,48 @@ void cSDLRenderDevice::DrawSprite(int x, int y, int dx, int dy,
 	if(!bActiveScene_ || !uiRenderer_) return;
 	uiRenderer_->DrawSprite(x, y, dx, dy, u, v, du, dv, Texture, ColorMul);
 	NumberPolygon += 2;
+}
+
+// The clip tests mirror cD3DRender's: reject before queueing anything, against the
+// scissor rect SetClipRect keeps.
+void cSDLRenderDevice::DrawLine(int x1, int y1, int x2, int y2, Color4c color)
+{
+	if(!bActiveScene_ || !uiRenderer_) return;
+	if(x1 <= x2){ if(x2 < xScrMin || x1 > xScrMax) return; }
+	else if(x1 < xScrMin || x2 > xScrMax) return;
+	if(y1 <= y2){ if(y2 < yScrMin || y1 > yScrMax) return; }
+	else if(y1 < yScrMin || y2 > yScrMax) return;
+	uiRenderer_->DrawLine(x1, y1, x2, y2, color);
+}
+
+void cSDLRenderDevice::DrawPixel(int x, int y, Color4c color)
+{
+	if(!bActiveScene_ || !uiRenderer_) return;
+	if(x < xScrMin || x > xScrMax || y < yScrMin || y > yScrMax) return;
+	uiRenderer_->DrawPixel(x, y, color);
+}
+
+void cSDLRenderDevice::DrawRectangle(int x, int y, int dx, int dy, Color4c color, bool outline)
+{
+	if(!bActiveScene_ || !uiRenderer_) return;
+	const int x2 = x + dx, y2 = y + dy;
+	if(dx >= 0){ if(x2 < xScrMin || x > xScrMax) return; }
+	else if(x < xScrMin || x2 > xScrMax) return;
+	if(dy >= 0){ if(y2 < yScrMin || y > yScrMax) return; }
+	else if(y < yScrMin || y2 > yScrMax) return;
+	uiRenderer_->DrawRectangle(x, y, dx, dy, color, outline);
+	if(!outline) NumberPolygon += 2;
+}
+
+void cSDLRenderDevice::OutText(int x, int y, const char* text, const Color4f& color,
+                               ALIGN_TEXT align, eBlendMode /*blend_mode*/, Vect2f scale)
+{
+	// Blend state is baked into the single alpha pipeline for now; every caller passes
+	// ALPHA_BLEND anyway.
+	if(!bActiveScene_ || !uiRenderer_ || !CurrentFont) return;
+	const int before = uiRenderer_->quadCount();
+	uiRenderer_->OutText(x, y, text, *CurrentFont, color, align, scale);
+	NumberPolygon += 2 * (uiRenderer_->quadCount() - before);
 }
 
 int cSDLRenderDevice::OutTextLine(int x, int y, const FT::Font& font, const wchar_t* textline, const wchar_t* end,

@@ -322,6 +322,10 @@ void SDLObject3dxRenderer::SetState(const State& state, Camera* camera)
 		worldPool_.insert(worldPool_.end(), rows, rows + 12);
 	}
 
+	current_.vpX = camera->vp.X;       current_.vpY = camera->vp.Y;
+	current_.vpW = camera->vp.Width;   current_.vpH = camera->vp.Height;
+	current_.vpMinZ = camera->vp.MinZ; current_.vpMaxZ = camera->vp.MaxZ;
+
 	std::memcpy(current_.vs.mvp, &camera->matViewProj, sizeof(current_.vs.mvp));
 	setVec4(current_.vs.ambient, state.ambient);
 	setVec4(current_.vs.diffuse, state.diffuse);
@@ -457,7 +461,7 @@ void SDLObject3dxRenderer::DrawIndexedPrimitive(sPtrVertexBuffer& vb, int OfsVer
 // Frame
 // ---------------------------------------------------------------------------
 bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, SDL_GPUTexture* depth,
-                                int /*screenW*/, int /*screenH*/, bool clear, const float clearColor[4],
+                                int screenW, int screenH, bool clear, const float clearColor[4],
                                 bool clearDepth, bool wireframe)
 {
 	if(!device_ || !cmd || !target || !depth || draws_.empty())
@@ -503,6 +507,12 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 		}
 
 		if(d.state != boundState){
+			// The camera's viewport, as SetDrawTransform would have set it at record time.
+			sViewPort vp;
+			vp.X = st.vpX; vp.Y = st.vpY; vp.Width = st.vpW; vp.Height = st.vpH;
+			vp.MinZ = st.vpMinZ; vp.MaxZ = st.vpMaxZ;
+			applyCameraViewport(pass, vp, screenW, screenH);
+
 			// Push the cbuffer whole so the shader's World[20] is always fully backed;
 			// only the leading worldRows rows carry this bunch's bones.
 			std::memcpy(vsUniform, &st.vs, sizeof(st.vs));

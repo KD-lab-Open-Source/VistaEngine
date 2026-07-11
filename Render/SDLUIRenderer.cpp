@@ -1,4 +1,4 @@
-// SDL GPU 2D/UI renderer — text, sprites and screen-space quads. See header.
+// SDL GPU 2D/UI renderer — text, sprites, screen-space quads, lines. See header.
 #include "StdAfxRD.h"
 #include "SDLUIRenderer.h"
 
@@ -6,9 +6,11 @@
 
 #include <SDL3/SDL.h>
 #include <cstdio>
+#include <cmath>
+#include <string>
 
 #include "Texture.h"     // cTexture (GetDDSurface / frameNumber)
-#include "FT_Font.h"     // FT::Font glyph atlas (OutTextLine)
+#include "FT_Font.h"     // FT::Font glyph atlas (OutText / OutTextLine)
 
 // Cross-compiled UI shader blobs (SPIR-V + MSL); see Render/SDLShaders.
 #include "SDLShaders/ui_shaders.h"
@@ -20,6 +22,13 @@ static SDL_GPUTexture* sdlTextureOf(const cTexture* t)
 	if(t && t->frameNumber() >= 1)
 		return reinterpret_cast<SDL_GPUTexture*>(const_cast<cTexture*>(t)->GetDDSurface(0));
 	return nullptr;
+}
+
+// The engine packs its Color4c as BGRA bytes; UBYTE4_NORM reads them in that order and
+// the UI shader swizzles to RGBA.
+static unsigned int packColor(const Color4c& c)
+{
+	return (unsigned)c.b | ((unsigned)c.g << 8) | ((unsigned)c.r << 16) | ((unsigned)c.a << 24);
 }
 
 SDLUIRenderer::SDLUIRenderer(SDL_GPUDevice* device, SDL_Window* window)
@@ -36,6 +45,7 @@ SDLUIRenderer::~SDLUIRenderer()
 	if(whiteTexture_)   SDL_ReleaseGPUTexture(device_, whiteTexture_);
 	if(sampler_)        SDL_ReleaseGPUSampler(device_, sampler_);
 	if(pipeline_)       SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
+	if(linePipeline_)   SDL_ReleaseGPUGraphicsPipeline(device_, linePipeline_);
 }
 
 // ---------------------------------------------------------------------------
@@ -157,12 +167,20 @@ void SDLUIRenderer::createPipeline()
 	pci.target_info.num_color_targets = 1;
 
 	pipeline_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
+
+	// The 2D primitive batches draw real line lists, as cD3DRender::FlushLine does.
+	// Same shaders and vertex layout; only the primitive type differs.
+	pci.primitive_type = SDL_GPU_PRIMITIVETYPE_LINELIST;
+	linePipeline_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
+
 	SDL_ReleaseGPUShader(device_, vs);
 	SDL_ReleaseGPUShader(device_, fs);
 	if(!pipeline_){
 		fprintf(stderr, "SDLUIRenderer: CreateGPUGraphicsPipeline failed: %s\n", SDL_GetError());
 		return;
 	}
+	if(!linePipeline_)
+		fprintf(stderr, "SDLUIRenderer: line pipeline failed: %s\n", SDL_GetError());
 
 	fprintf(stderr, "SDLUIRenderer: UI pipeline ready\n");
 }
@@ -192,9 +210,9 @@ void SDLUIRenderer::ensureVertexCapacity(int verts)
 void SDLUIRenderer::emitQuad(float x, float y, float dx, float dy,
                              float u, float v, float du, float dv, unsigned int color, SDL_GPUTexture* tex)
 {
-	// Extend the current run if it uses the same texture, else start a new one.
-	if(runs_.empty() || runs_.back().tex != tex)
-		runs_.push_back(DrawRun{ tex, (int)batch_.size(), 0 });
+	// Extend the current run if it uses the same texture and primitive, else start one.
+	if(runs_.empty() || runs_.back().tex != tex || runs_.back().lines)
+		runs_.push_back(DrawRun{ tex, (int)batch_.size(), 0, false });
 
 	// Two triangles (the D3D path used a tri-strip of 4 verts; here, 6 verts).
 	const float x1 = x, y1 = y, x2 = x + dx, y2 = y + dy;
@@ -205,6 +223,19 @@ void SDLUIRenderer::emitQuad(float x, float y, float dx, float dy,
 	batch_.push_back(tl); batch_.push_back(bl); batch_.push_back(tr);
 	batch_.push_back(tr); batch_.push_back(bl); batch_.push_back(br);
 	runs_.back().count += 6;
+	++quadCount_;
+}
+
+// Untextured: the run carries no texture, so Draw() binds the 1x1 white and the vertex
+// colour comes through unchanged.
+void SDLUIRenderer::emitLine(float x1, float y1, float x2, float y2, unsigned int color)
+{
+	if(runs_.empty() || !runs_.back().lines || runs_.back().tex != nullptr)
+		runs_.push_back(DrawRun{ nullptr, (int)batch_.size(), 0, true });
+
+	batch_.push_back(UIVertex{ x1, y1, 0, 1, color, 0.f, 0.f });
+	batch_.push_back(UIVertex{ x2, y2, 0, 1, color, 0.f, 0.f });
+	runs_.back().count += 2;
 }
 
 // ---------------------------------------------------------------------------
@@ -215,6 +246,7 @@ void SDLUIRenderer::BeginFrame()
 	batch_.clear();
 	runs_.clear();
 	currentTexture_ = nullptr;
+	quadCount_ = 0;
 }
 
 void SDLUIRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
@@ -259,15 +291,23 @@ void SDLUIRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 
 	SDL_GPURenderPass* pass = SDL_BeginGPURenderPass(cmd, &ct, 1, nullptr);
 	if(vcount > 0 && pipeline_ && vertexBuffer_){
-		SDL_BindGPUGraphicsPipeline(pass, pipeline_);
-		float invScreen[4] = { screenW ? 1.f / screenW : 0.f, screenH ? 1.f / screenH : 0.f, 0.f, 0.f };
-		SDL_PushGPUVertexUniformData(cmd, 0, invScreen, sizeof(invScreen));
+		const float invScreen[4] = { screenW ? 1.f / screenW : 0.f, screenH ? 1.f / screenH : 0.f, 0.f, 0.f };
 		SDL_GPUBufferBinding vb = {};
 		vb.buffer = vertexBuffer_;
 		vb.offset = 0;
-		SDL_BindGPUVertexBuffers(pass, 0, &vb, 1);
-		// One draw per run; bind the run's texture (white for untextured quads).
+
+		// One draw per run, in the order the engine issued them; bind the run's texture
+		// (white for untextured geometry) and swap pipelines when the primitive changes.
+		SDL_GPUGraphicsPipeline* bound = nullptr;
 		for(const DrawRun& run : runs_){
+			SDL_GPUGraphicsPipeline* want = run.lines ? linePipeline_ : pipeline_;
+			if(!want) continue;
+			if(want != bound){
+				SDL_BindGPUGraphicsPipeline(pass, want);
+				SDL_PushGPUVertexUniformData(cmd, 0, invScreen, sizeof(invScreen));
+				SDL_BindGPUVertexBuffers(pass, 0, &vb, 1);
+				bound = want;
+			}
 			SDL_GPUTextureSamplerBinding ts = {};
 			ts.texture = run.tex ? run.tex : whiteTexture_;
 			ts.sampler = sampler_;
@@ -289,19 +329,139 @@ void SDLUIRenderer::SetTexture(cTexture* texture)
 void SDLUIRenderer::DrawQuad(float x1, float y1, float dx, float dy,
                              float u1, float v1, float du, float dv, Color4c color)
 {
-	unsigned int c = (unsigned)color.b | ((unsigned)color.g << 8)
-	               | ((unsigned)color.r << 16) | ((unsigned)color.a << 24);
-	emitQuad(x1, y1, dx, dy, u1, v1, du, dv, c, currentTexture_);
+	emitQuad(x1, y1, dx, dy, u1, v1, du, dv, packColor(color), currentTexture_);
 }
 
 void SDLUIRenderer::DrawSprite(int x, int y, int dx, int dy,
                                float u, float v, float du, float dv,
                                cTexture* texture, const Color4c& colorMul)
 {
-	// Pack BGRA bytes (matches UBYTE4_NORM read order; the shader swizzles to RGBA).
-	unsigned int color = (unsigned)colorMul.b | ((unsigned)colorMul.g << 8)
-	                   | ((unsigned)colorMul.r << 16) | ((unsigned)colorMul.a << 24);
-	emitQuad((float)x, (float)y, (float)dx, (float)dy, u, v, du, dv, color, sdlTextureOf(texture));
+	emitQuad((float)x, (float)y, (float)dx, (float)dy, u, v, du, dv,
+	         packColor(colorMul), sdlTextureOf(texture));
+}
+
+void SDLUIRenderer::DrawLine(int x1, int y1, int x2, int y2, Color4c color)
+{
+	emitLine((float)x1, (float)y1, (float)x2, (float)y2, packColor(color));
+}
+
+// The D3D backend queues these as a point list. A 1x1 quad rasterizes to the same
+// pixel, and spares the backend a third pipeline for a call nothing currently makes.
+void SDLUIRenderer::DrawPixel(int x, int y, Color4c color)
+{
+	emitQuad((float)x, (float)y, 1.f, 1.f, 0.f, 0.f, 0.f, 0.f, packColor(color), nullptr);
+}
+
+void SDLUIRenderer::DrawRectangle(int x, int y, int dx, int dy, Color4c color, bool outline)
+{
+	const unsigned int c = packColor(color);
+	const float x1 = (float)x, y1 = (float)y, x2 = (float)(x + dx), y2 = (float)(y + dy);
+	if(outline){
+		emitLine(x1, y1, x2, y1, c);
+		emitLine(x2, y1, x2, y2, c);
+		emitLine(x2, y2, x1, y2, c);
+		emitLine(x1, y2, x1, y1, c);
+	}
+	else
+		emitQuad(x1, y1, (float)dx, (float)dy, 0.f, 0.f, 0.f, 0.f, c, nullptr);
+}
+
+// The engine's inline colour escape: "&rrggbb" sets the text colour from here on, and
+// "&&" is a literal ampersand. Advances str past whatever it consumed. Lifted from
+// ChangeTextColorW in Render/D3D/D3DRenderDraw.cpp, which is not built off-Windows.
+static void changeTextColor(const wchar_t*& str, Color4c& diffuse)
+{
+	while(*str == L'&'){
+		++str;
+		if(*str == L'&')
+			return;                       // "&&" -> draw one '&'
+		unsigned int s = 0;
+		int i = 0;
+		for(; i < 6; ++i, ++str){
+			const wchar_t k = *str;
+			if(k >= L'0' && k <= L'9')      s = (s << 4) + (k - L'0');
+			else if(k >= L'A' && k <= L'F') s = (s << 4) + (k - L'A' + 10);
+			else if(k >= L'a' && k <= L'f') s = (s << 4) + (k - L'a' + 10);
+			else break;                   // includes the terminator
+		}
+		if(i <= 5)
+			return;                       // not six hex digits: not an escape after all
+		diffuse.RGBA() &= 0xFF000000;     // keep alpha, replace rgb
+		diffuse.RGBA() |= s;
+	}
+}
+
+// Multi-line, aligned, scalable text. Mirrors cD3DRender::OutText, including its
+// half-pixel glyph offsets and the one-texel bleed it adds when scaling.
+void SDLUIRenderer::OutText(int x0, int y0, const char* text, const FT::Font& font,
+                            const Color4f& color, ALIGN_TEXT align, Vect2f scale)
+{
+	if(!text || !font.texture())
+		return;
+	SDL_GPUTexture* tex = sdlTextureOf(font.texture());
+	const float txWidth  = float(font.texture()->GetWidth());
+	const float txHeight = float(font.texture()->GetHeight());
+	if(txWidth <= 0.f || txHeight <= 0.f)
+		return;
+
+	// The D3D path widens through a2w(). Every caller passes ASCII, and this port's
+	// MultiByteToWideChar treats CP_ACP as a single-byte passthrough, so widening byte
+	// by byte gives the same code points without dragging in the conversion.
+	std::wstring out;
+	for(const char* p = text; *p; ++p)
+		out.push_back((wchar_t)(unsigned char)*p);
+
+	if(fabsf(scale.x - 1.0f) < 0.01f) scale.x = 1.f;
+	if(fabsf(scale.y - 1.0f) < 0.01f) scale.y = 1.f;
+	const bool scaled = (scale.x != 1.f || scale.y != 1.f);
+
+	Color4c diffuse(color);
+	const wchar_t* str = out.c_str();
+	float y = float(y0);
+
+	while(*str){
+		float x = float(x0);
+		if(align >= ALIGN_TEXT_CENTER){
+			const float width = scale.x * float(font.lineWidth(str));
+			x -= (align == ALIGN_TEXT_CENTER) ? width * 0.5f : width;
+		}
+		x = float(round(x));
+
+		for(; *str && *str != L'\n'; ++str){
+			changeTextColor(str, diffuse);   // may land on the terminator or a newline
+			const wchar_t symbol = *str;
+			if(!symbol || symbol == L'\n')
+				break;
+			if(symbol < 32)
+				continue;
+
+			const FT::OneChar& one = font.getChar(symbol);
+			const unsigned int c = packColor(diffuse);
+
+			if(scaled){
+				// Scaling samples between texels, so the glyph is grown by one texel on
+				// each axis and its source rect widened to match.
+				const float px = float(round(x + scale.x * float(one.su - 1))) - 0.5f;
+				const float py = float(round(y + scale.y * float(one.sv - 1))) - 0.5f;
+				emitQuad(px, py,
+				         float(round(scale.x * float(one.du + 1))), float(round(scale.y * float(one.dv + 1))),
+				         float(one.u - 1) / txWidth, float(one.v - 1) / txHeight,
+				         float(one.du + 1) / txWidth, float(one.dv + 1) / txHeight, c, tex);
+				x += scale.x * float(one.advance);
+			}
+			else{
+				emitQuad(float(x + one.su) - 0.5f, float(y + one.sv) - 0.5f,
+				         float(one.du), float(one.dv),
+				         float(one.u) / txWidth, float(one.v) / txHeight,
+				         float(one.du) / txWidth, float(one.dv) / txHeight, c, tex);
+				x += float(one.advance);
+			}
+		}
+
+		if(*str == L'\n')
+			++str;
+		y += scale.y * float(font.lineHeight());
+	}
 }
 
 // Emit one textured quad per glyph from the FreeType atlas. Mirrors the D3D
@@ -321,8 +481,7 @@ int SDLUIRenderer::OutTextLine(int x, int y, const FT::Font& font,
 	if(txWidth <= 0 || txHeight <= 0)
 		return x;
 
-	const unsigned int c = (unsigned)color.b | ((unsigned)color.g << 8)
-	                     | ((unsigned)color.r << 16) | ((unsigned)color.a << 24);
+	const unsigned int c = packColor(color);
 
 	int prev_rh = 0;
 	int prev_right = x;
