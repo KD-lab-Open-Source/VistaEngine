@@ -10,6 +10,9 @@
 #include "ClippingMesh.h"
 #include "Terra/vmap.h"
 #include "FileUtils/FileUtils.h"
+#ifndef _WIN32
+#include "Render/SDLRenderDevice.h"   // the shadow map lives on the SDL device
+#endif
 
 bool cScene::is_sky_cubemap=true;
 
@@ -786,8 +789,16 @@ void cScene::SetShadowIntensity(const Color4f& f)
 	shadow_intensity=f;
 }
 
+int cScene::shadowMapSize()
+{
+	// Option_ShadowSizePower 1..4 -> 256..2048. 0 means "smallest", not a 128 map.
+	int power = Option_ShadowSizePower > 0 ? Option_ShadowSizePower : 1;
+	return 256 << (power - 1);
+}
+
 void cScene::CreateShadowmap()
 {
+#ifdef _WIN32
 	gb_RenderDevice3D->SetAdvance(true);
 	gb_RenderDevice3D->deleteRenderTargets();
 
@@ -804,6 +815,22 @@ void cScene::CreateShadowmap()
 	float focus=1/SizeLightMap;
 
 	GetTexLibrary()->Compact();
+#else
+	// The SDL backend needs only the shadow map itself: the light map, the mirage map and
+	// the float z-buffer that createRenderTargets also builds belong to passes it doesn't
+	// have. A failure means no shadows at all, so mirror the D3D fallback and turn them off.
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	if(!dev)
+		return;
+
+	shadowEnabled_ = Option_shadowEnabled;
+	if(!dev->createShadowMap(shadowMapSize())){
+		gb_VisGeneric->SetShadowType(false, 0);
+		shadowEnabled_ = false;
+	}
+
+	GetTexLibrary()->Compact();
+#endif
 }
 
 Vect2f cScene::CalcZMinZMaxShadowReciver()
@@ -1194,9 +1221,23 @@ void cScene::AddShadowCamera(Camera* camera)
 				AddPlanarCamera(camera, true, true);
 			}
 		} 
-		else 
+		else
 			AddPlanarCamera(camera, false, false);
 	}
+#else
+	// Shadow maps only: the planar-shadow fallback (AddPlanarCamera) is a separate render
+	// target and shader path the SDL backend does not have, and unlike D3D9 it can always
+	// sample a depth texture, so there is nothing to fall back to.
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	if(!dev || !Option_shadowEnabled || !IsIntensityShadow())
+		return;
+
+	if(!dev->GetShadowMap() || dev->GetShadowMapSize() != shadowMapSize()
+	   || shadowEnabled_ != Option_shadowEnabled)
+		CreateShadowmap();
+
+	if(dev->GetShadowMap())
+		AddLightCamera(camera);
 #endif
 }
 
@@ -1219,10 +1260,29 @@ void cScene::AddLightCamera(Camera* camera)
 //	camera->SetZPlaneTemp(z);
 
 	CalcShadowMapCamera(camera, shadowCamera_);
-	
+
 	shadowCamera_->Attach(SCENENODE_OBJECT, tileMap_);
 
 //	camera->SetZPlaneTemp(zplane);
+#else
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	if(!dev || !dev->GetShadowMap())
+		return;
+
+	camera->setAttribute(ATTRCAMERA_ZMINMAX);
+	camera->SetCopy(shadowCamera_);
+	camera->AttachChild(shadowCamera_);
+	shadowCamera_->setAttribute(ATTRCAMERA_SHADOWMAP|ATTRUNKOBJ_NOLIGHT);
+	shadowCamera_->clearAttribute(ATTRCAMERA_PERSPECTIVE|ATTRCAMERA_ZMINMAX|ATTRCAMERA_SHOWCLIP);
+	// Portable: it only stores the texture and sizes the camera's viewport to it. The
+	// z-buffer surface is a D3D concept -- the map *is* the depth buffer here.
+	shadowCamera_->SetRenderTarget(dev->GetShadowMap(), 0);
+
+	CalcShadowMapCamera(camera, shadowCamera_);
+
+	// The terrain casts too: CameraShadowMap::DrawScene reaches it through
+	// DrawObject(SCENENODE_OBJECT), which is where the original puts it as well.
+	shadowCamera_->Attach(SCENENODE_OBJECT, tileMap_);
 #endif
 }
 

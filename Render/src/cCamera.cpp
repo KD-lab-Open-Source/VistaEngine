@@ -8,6 +8,9 @@
 #include "Render/Shader/Shaders.h"
 #include "D3DRender.h"
 #include "VisGeneric.h"
+#ifndef _WIN32
+#include "Render/SDLRenderDevice.h"   // the shadow map and its depth pass live here
+#endif
 
 class CameraShader
 {
@@ -150,11 +153,16 @@ void Camera::DrawScene()
 
 		Camera* pShadow=FindChildCamera(ATTRCAMERA_SHADOWMAP);
 		gb_RenderDevice3D->SetAdvance(pShadow!=0);
-		if(pShadow) {			
-#ifdef _WIN32			
-			gb_RenderDevice3D->SetShadowMatViewProj(pShadow->matViewProj); 
+		if(pShadow) {
+#ifdef _WIN32
+			gb_RenderDevice3D->SetShadowMatViewProj(pShadow->matViewProj);
 			if(gb_RenderDevice3D->GetShadowMap())
 				gb_RenderDevice3D->SetShadowMapSize(gb_RenderDevice3D->GetShadowMap()->GetWidth());
+#else
+			// The receivers' shadow matrix. The light camera has not drawn yet, but it has
+			// been fixed to the view frustum in cScene::Draw, so matViewProj is final.
+			if(cSDLRenderDevice* dev = sdlRenderDevice())
+				dev->SetShadowMatViewProj(pShadow->matViewProj);
 #endif
 		}
 		pShadow = FindChildCamera(ATTRCAMERA_FLOAT_ZBUFFER);
@@ -1725,7 +1733,7 @@ CameraShadowMap::CameraShadowMap(cScene* scene)
 
 void CameraShadowMap::DrawScene()
 {
-	if(!Option_shadowEnabled) 
+	if(!Option_shadowEnabled)
 		return;
 
 	xassert(getAttribute(ATTRCAMERA_SHADOW | ATTRCAMERA_SHADOWMAP));
@@ -1743,6 +1751,26 @@ void CameraShadowMap::DrawScene()
 	if(!Option_ShowType[SHOW_SHADOW])
 		return;
 
+#ifndef _WIN32
+	// The SDL caster pass. Everything the D3D path does with render states -- alpha ref,
+	// z-write, slope-scaled depth bias, fog off, the DrawType RT switch -- is baked into
+	// the caster pipelines instead (SDLObject3dxRenderer::pipelineFor and
+	// SDLTileMapRenderer::createShadowPipeline).
+	//
+	// SCENENODE_OBJECT holds what cObject3dx/cStaticSimply3dx::PreDraw attached, plus the
+	// tilemap that cScene::AddLightCamera attached -- exactly as on D3D. cTileMap::Draw
+	// runs its depth pass immediately; the objects only record, and replay below. So the
+	// terrain lands in the map first, and takes its clear. Silhouettes, special and sorted
+	// objects still do not cast.
+	if(Option_ShowType[SHOW_OBJECT])
+		DrawObject(SCENENODE_OBJECT);
+
+	// Where D3D calls DrawType::EndDrawShadow: record the depth pass now, so it lands in
+	// the command buffer before any pass that samples the map.
+	if(cSDLRenderDevice* dev = sdlRenderDevice())
+		dev->endShadowPass();
+	return;
+#else
 	DWORD old_cullmode=gb_RenderDevice3D->GetRenderState(D3DRS_CULLMODE);
 //	gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE,D3DCULL_CCW);//bias должен в другую сторону смотреть.
 
@@ -1789,11 +1817,12 @@ void CameraShadowMap::DrawScene()
 
 	if(Option_ShowRenderTextureDBG==3)
 		TempDrawShadow(vp.Width,vp.Height);
-	
+
 	gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE,old_cullmode);
 	gb_RenderDevice->SetRenderState(RS_FOGENABLE,fogenable);
 
 	gb_RenderDevice3D->RestoreRenderTarget();
+#endif
 }
 
 Vect2f Camera::CalcZMinZMaxShadowReciver()

@@ -271,8 +271,6 @@ void cSimply3dx::SelectMaterial(Camera* camera)
 
 void cSimply3dx::SelectShadowMaterial()
 {
-	gb_RenderDevice3D->SetTextureBase(1,0);
-
 	eBlendMode blend=ALPHA_NONE;
 	bool is_alphatest=false;
 	cTexture* pDiffuse=pStatic->pDiffuse;
@@ -285,6 +283,21 @@ void cSimply3dx::SelectShadowMaterial()
 			is_alphatest=true;
 		}
 	}
+
+#ifndef _WIN32
+	// The caster's state, as cObject3dx::DrawShadowAndZbuffer builds it: only the diffuse
+	// map matters, and only to clip cutout foliage. cStaticSimply3dx::DrawShadow supplies
+	// the camera; DrawModels supplies the batch's matrices through SelectMatrix.
+	SDLObject3dxRenderer::State& st = pStatic->sdlState_;
+	st = SDLObject3dxRenderer::State();
+	st.blend = blend;
+	st.tilingWrap = true;               // sampler_wrap_anisotropic in the D3D path
+	if(is_alphatest)
+		st.texture = pDiffuse;
+
+	pStatic->sdlWorld_.assign(node_position.begin(), node_position.end());
+#else
+	gb_RenderDevice3D->SetTextureBase(1,0);
 
 	gb_RenderDevice3D->SetSamplerData(0,sampler_wrap_anisotropic);
 
@@ -309,11 +322,12 @@ void cSimply3dx::SelectShadowMaterial()
 		pShader3dx->psSkinShadowAlpha->Select();
 	}else
 		pShader3dx->psSkinShadow->Select();
-	
+
 	vs->SetUVTrans(0);
 	vs->SetSecondOpacityUVTrans(0,SECOND_UV_NONE);
 	cStaticSimply3dx::ONE_LOD& lod=pStatic->lods[iLOD];
 	vs->Select(&node_position[0],node_position.size(),lod.blend_indices);
+#endif
 }
 void cSimply3dx::SelectZBufferMaterial()
 {
@@ -1498,12 +1512,12 @@ void cStaticSimply3dx::Draw(Camera* camera)
 	if(debugShowSwitch.simplyObjects)
 		return;
 
-#ifdef _WIN32
 	if(camera->getAttribute(ATTRCAMERA_SHADOWMAP))
 	{
 		DrawShadow(camera);
 		return;
 	}
+#ifdef _WIN32
 	if(camera->getAttribute(ATTRCAMERA_FLOAT_ZBUFFER))
 	{
 		if(Option_FloatZBufferType==2)
@@ -1511,9 +1525,9 @@ void cStaticSimply3dx::Draw(Camera* camera)
 		return;
 	}
 #else
-	// Only the main scene camera draws: the shadow-map, float-Z and reflection passes
-	// have no SDL equivalent yet (DrawShadow and DrawZBuffer are D3D-only).
-	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_SHADOWMAP|ATTRCAMERA_FLOAT_ZBUFFER|ATTRCAMERA_REFLECTION))
+	// The planar-shadow, float-Z and reflection passes have no SDL equivalent yet
+	// (DrawZBuffer is D3D-only).
+	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_FLOAT_ZBUFFER|ATTRCAMERA_REFLECTION))
 		return;
 #endif
 
@@ -1531,6 +1545,11 @@ void cStaticSimply3dx::DrawShadow(Camera* camera)
 {
 	if(shadow_visible_list.empty())
 		return;
+#ifndef _WIN32
+	// SelectShadowMaterial takes no camera; DrawModels reads this one, and SDLObject3dxRenderer
+	// routes the draws to the caster pass because it carries ATTRCAMERA_SHADOWMAP.
+	sdlCamera_ = camera;
+#endif
 	shadow_visible_list[0]->SelectShadowMaterial();
 	DrawObjects(camera, shadow_visible_list.empty()?0:&shadow_visible_list[0],shadow_visible_list.size());
 }

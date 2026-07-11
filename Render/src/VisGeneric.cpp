@@ -262,8 +262,15 @@ void cVisGeneric::SetFavoriteLoadDDS(bool p)
 
 void cVisGeneric::SetShadowType(bool shadowEnabled, int shadow_size)
 {
+#ifdef _WIN32
 	if(!gb_RenderDevice3D || !gb_RenderDevice3D->IsPS20() || !gb_RenderDevice->IsEnableSelfShadow())
 		shadow_size = 0;
+#else
+	// gb_RenderDevice3D is null under the SDL backend, and IsPS20 is a D3D9 cap: ask the
+	// device itself whether it can render a shadow map.
+	if(!gb_RenderDevice || !gb_RenderDevice->IsEnableSelfShadow())
+		shadow_size = 0;
+#endif
 	if(shadow_size==0)
 		shadowEnabled = false;
 

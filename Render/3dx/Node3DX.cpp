@@ -652,10 +652,10 @@ void cObject3dx::Draw(Camera* camera)
 	Update();
 
 #ifndef _WIN32
-	// Only the main scene camera draws objects: the shadow-map, float-Z and reflection
-	// passes have no SDL equivalent yet (DrawShadowAndZbuffer is D3D-only), and each
-	// would need a render target of its own.
-	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_SHADOWMAP|ATTRCAMERA_FLOAT_ZBUFFER|ATTRCAMERA_REFLECTION))
+	// The shadow-map camera is handled below, by DrawShadowAndZbuffer. The planar-shadow,
+	// float-Z and reflection passes have no SDL equivalent yet: each would need a render
+	// target of its own.
+	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_FLOAT_ZBUFFER|ATTRCAMERA_REFLECTION))
 		return;
 #endif
 
@@ -1130,7 +1130,15 @@ bool cObject3dx::isVisibleMaterialGroup(StaticBunch& bunch) const
 
 void cObject3dx::DrawShadowAndZbuffer(Camera* camera,bool ZBuffer)
 {
+#ifdef _WIN32
 	gb_RenderDevice3D->SetTextureBase(1,0);
+#else
+	// ZBuffer is the float-z pass, which the SDL backend does not have; only the shadow
+	// camera reaches here.
+	SDLObject3dxRenderer* renderer = sdlObjectRenderer();
+	if(!renderer || ZBuffer)
+		return;
+#endif
 
 	//!!! Не забыть сортировку по материалам.
 	cStatic3dx::StaticLod& lod=pStatic->lods[iLOD];
@@ -1150,8 +1158,6 @@ void cObject3dx::DrawShadowAndZbuffer(Camera* camera,bool ZBuffer)
 
 		float alpha=mat_anim.opacity*object_opacity*distance_alpha;
 
-		gb_RenderDevice3D->SetSamplerData(0,(mat.tiling_diffuse&StaticMaterial::TILING_U_WRAP)?sampler_wrap_anisotropic:sampler_clamp_anisotropic);
-
 		eBlendMode blend=ALPHA_NONE;
 		bool is_alphatest=false;
 		if(diffuse_texture){
@@ -1162,10 +1168,51 @@ void cObject3dx::DrawShadowAndZbuffer(Camera* camera,bool ZBuffer)
 			}
 		}
 
-		if(gb_RenderDevice3D->dtAdvance->GetID()!=DT_GEFORCEFX)
-			blend=ALPHA_NONE;
 		if(alpha<AlphaMiniumShadow)
 			continue;
+
+#ifndef _WIN32
+		// The caster's whole state: the light's matViewProj (from the camera), the bone
+		// poses, and -- for cutout foliage -- the diffuse map its fragment shader clips
+		// against. Everything else the lit path carries is dead here; the shadow shaders
+		// only read Params.x (the alpha reference) and Params.y (textured).
+		//
+		// This is the SHADOW_9700 branch of object_shadow.psl: the kill happens in the
+		// shader (its clip(o.a - 0.32); ours is D3DRS_ALPHAREF 80/255, the same threshold),
+		// which is why the D3D path zeroes `blend` off GeForceFX rather than alpha-testing.
+		{
+			static MatXf world[StaticBunch::max_index];
+			int world_num;
+			GetWorldPoses(bunch, world, world_num);
+
+			SDLObject3dxRenderer::State st;
+			st.world = world;
+			st.worldNum = world_num;
+			st.boneCount = lod.blend_indices;
+			st.blend = blend;
+			st.tilingWrap = (mat.tiling_diffuse & StaticMaterial::TILING_U_WRAP) != 0;
+			if(is_alphatest){
+				st.texture = diffuse_texture;
+				st.texturePhase = material_textures[bunch.imaterial].texture_phase;
+			}
+
+			if(!mat.chains.empty()){
+				StaticMaterialAnimation& mat_chain = mat.chains[mat_anim.chain];
+				if(!mat_chain.uv.values.empty()){
+					mat_chain.uv.InterpolateSlow(mat_anim.phase, st.uvTrans);
+					st.hasUVTrans = true;
+				}
+			}
+
+			renderer->SetState(st, camera);
+			DrawMaterialGroup(bunch);
+		}
+		continue;
+#else
+		gb_RenderDevice3D->SetSamplerData(0,(mat.tiling_diffuse&StaticMaterial::TILING_U_WRAP)?sampler_wrap_anisotropic:sampler_clamp_anisotropic);
+
+		if(gb_RenderDevice3D->dtAdvance->GetID()!=DT_GEFORCEFX)
+			blend=ALPHA_NONE;
 
 		gb_RenderDevice3D->SetBlendStateAlphaRef(blend);
 		if(is_alphatest){
@@ -1199,7 +1246,7 @@ void cObject3dx::DrawShadowAndZbuffer(Camera* camera,bool ZBuffer)
 		}
 		
 		SetSecondUVTrans(mat.pSecondOpacityTexture?true:false,vs,mat,mat_anim);
-		
+
 
 		static MatXf world[StaticBunch::max_index];
 		int world_num;
@@ -1208,6 +1255,7 @@ void cObject3dx::DrawShadowAndZbuffer(Camera* camera,bool ZBuffer)
 		vs->Select(world,world_num,lod.blend_indices);
 
 		DrawMaterialGroup(bunch);
+#endif
 	}
 }
 

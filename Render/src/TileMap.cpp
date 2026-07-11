@@ -163,11 +163,18 @@ void cTileMap::Draw(Camera* camera)
 
 	DrawLines();
 #else
-	// Only the main scene camera draws terrain: the shadow-map, float-Z and reflection
-	// passes have no SDL equivalent yet, and each would open a pass of its own.
-	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_SHADOWMAP|ATTRCAMERA_FLOAT_ZBUFFER|ATTRCAMERA_REFLECTION))
+	// The float-Z and reflection passes have no SDL equivalent yet, and each would open a
+	// pass of its own.
+	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_FLOAT_ZBUFFER|ATTRCAMERA_REFLECTION))
 		return;
-	if(cSDLRenderDevice* dev = dynamic_cast<cSDLRenderDevice*>(gb_RenderDevice))
+	cSDLRenderDevice* dev = dynamic_cast<cSDLRenderDevice*>(gb_RenderDevice);
+	if(!dev)
+		return;
+	if(camera->getAttribute(ATTRCAMERA_SHADOWMAP)){
+		if(Option_shadowEnabled)
+			dev->drawTileMapShadow(camera);   // the terrain as a caster
+	}
+	else
 		dev->drawTileMap(this, camera);
 #endif
 }

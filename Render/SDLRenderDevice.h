@@ -19,6 +19,7 @@
 
 #include "IRenderDevice.h"
 #include "MTSection.h"
+#include "XMath/Mat4f.h"   // Mat4f (the light's view-projection and its bias)
 #include <vector>
 #include <unordered_map>
 #include <memory>
@@ -44,6 +45,12 @@ class cTileMap;
 // full target as its viewport, so this only ever needs setting, never restoring.
 void applyCameraViewport(SDL_GPURenderPass* pass, const sViewPort& vp, int targetW, int targetH);
 
+// gb_RenderDevice as a cSDLRenderDevice, or null under any other device. Off-Windows
+// gb_RenderDevice3D stays null, so engine code that needs the backend (cScene's shadow
+// map, CameraShadowMap) asks for the SDL device through this instead.
+class cSDLRenderDevice;
+cSDLRenderDevice* sdlRenderDevice();
+
 // The SDL backend's 3dx renderer, or null under any other device. cObject3dx::Draw and
 // cSimply3dx::SelectMaterial drive it exactly as they drive pShader3dx's shader objects
 // on Windows.
@@ -62,6 +69,34 @@ public:
 	// depth pass there and then. The first pass of a frame performs Fill()'s clear, so
 	// if the terrain pass runs, the UI pass at EndScene loads instead of clearing.
 	void drawTileMap(cTileMap* tileMap, Camera* camera);
+
+	// --- Shadow map -------------------------------------------------------
+	// Mirrors cD3DRender: cScene creates the map, the light camera renders the casters
+	// into it, and receivers transform by shadowMatViewProj() * shadowMatBias().
+	//
+	// It is a plain depth texture here. D3D9 could not sample depth, so the original
+	// renders the light-space z into a float colour target (object_shadow.psl's
+	// `return (float4)v.tdepth`) and forks the whole path on DT_RADEON9700 vs
+	// DT_GEFORCEFX. SDL GPU samples depth directly, so neither is needed.
+	bool createShadowMap(int size);
+	void deleteShadowMap();
+	cTexture* GetShadowMap() { return shadowMap_; }
+	int  GetShadowMapSize() const { return shadowMapSize_; }
+	void SetShadowMatViewProj(const Mat4f& m) { shadowMatViewProj_ = m; }
+	const Mat4f& shadowMatViewProj() const { return shadowMatViewProj_; }
+	// Light clip space -> shadow map texture coordinates.
+	Mat4f shadowMatBias() const;
+	// The terrain caster, from cTileMap::Draw under the light camera -- where the D3D
+	// backend calls tileMapRender_->DrawBump(camera, ALPHA_TEST, true, false). Draws
+	// immediately, so it lands before the object casters, which then load its depth.
+	// It needs no cTileMap: the caster mesh is the one SDLTileMapRenderer built from vMap.
+	void drawTileMapShadow(Camera* camera);
+	// Record the depth pass the light camera accumulated, where the D3D backend calls
+	// DrawType::EndDrawShadow. It must land before any pass that samples the map.
+	void endShadowPass();
+	// True once a caster pass has filled the map this frame. Receivers must check it:
+	// cScene detaches the light camera whenever shadows are off, and the map outlives it.
+	bool shadowPassRan() const { return shadowPassRan_; }
 
 	// --- 3dx objects ------------------------------------------------------
 	// cObject3dx::Draw talks to the object renderer directly (the way it talks to
@@ -136,7 +171,9 @@ public:
 	unsigned int GetRenderState(eRenderStateOption) override;
 	void SetGlobalFog(const Color4f&, const Vect2f&) override {}
 	void SetSamplerDataVirtual(DWORD, SAMPLER_DATA&) override {}
-	bool IsEnableSelfShadow() override { return false; }
+	// D3D: "the advanced DrawType exists", i.e. the device can render a shadow map.
+	// cVisGeneric::SetShadowType turns shadows off without it. We always can.
+	bool IsEnableSelfShadow() override { return true; }
 	bool SetScreenShot(const char*) override { return false; }
 
 	// --- 2D primitives (forwarded to the UI renderer) --------------------
@@ -249,6 +286,18 @@ private:
 	SDL_GPUTexture* depthTexture_ = nullptr;
 	int depthW_ = 0, depthH_ = 0;
 	bool ensureDepth(int w, int h);
+	// The depth texture behind shadowMap_, or null if there is nothing to render into.
+	SDL_GPUTexture* shadowDepthTexture();
+
+	// The shadow map, held as a cTexture so Camera::SetRenderTarget can take it and the
+	// scene can ask its size. Its SDL depth texture lives in textures_ like any other.
+	cTexture* shadowMap_ = nullptr;
+	int shadowMapSize_ = 0;
+	Mat4f shadowMatViewProj_;
+	bool shadowPassRan_ = false;
+	// Which caster pass owns the map's clear this frame: the terrain's if it ran, else
+	// the objects'. Same bookkeeping as frameCleared_/depthCleared_ do for the screen.
+	bool shadowDepthCleared_ = false;
 
 	MTSection resetDeviceLock_;          // dummy lock (no device loss on SDL)
 	DWORD multisample_ = 0;

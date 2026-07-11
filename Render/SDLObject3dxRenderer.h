@@ -23,12 +23,13 @@
 // device stays their owner; this renderer asks it to resolve an sPtr wrapper to the
 // SDL_GPUBuffer behind it (and for the current RS_ZWRITEENABLE).
 //
-// Scope: the plain lit path (vsSkin/psSkin) and the bump path (vsSkinBump/psSkinBump,
-// with its optional specular map) -- skinning, diffuse texture, lambert + specular,
-// ambient, the skin-colour tint, the animated UV transform, and the five blend modes
-// cObject3dx::Draw selects between. Still to come, each a shader variant
-// cObject3dx::Draw picks in the original: reflection (planar and cube), the second
-// opacity map, scene shadows, the lightmap, fog of war, fog, point lights, and fur.
+// Scope: the plain lit path (vsSkin/psSkin), the bump path (vsSkinBump/psSkinBump, with
+// its optional specular map) and their scene-shadow variants -- skinning, diffuse texture,
+// lambert + specular, ambient, the skin-colour tint, the animated UV transform, casting
+// into and receiving from the shadow map, and the five blend modes cObject3dx::Draw
+// selects between. Still to come, each a shader variant cObject3dx::Draw picks in the
+// original: reflection (planar and cube), the second opacity map, the lightmap, fog of
+// war, fog, point lights, and fur.
 
 #include "IRenderDevice.h"    // Color4f, eBlendMode, cTexture, MatXf
 #include <unordered_map>
@@ -110,6 +111,13 @@ public:
 
 	bool hasDraws() const { return !draws_.empty(); }
 
+	// Replay the draws recorded under the light camera into the shadow map, in a
+	// depth-only pass (no colour target). Called from CameraShadowMap::DrawScene via
+	// cSDLRenderDevice::endShadowPass, so the map is complete before anything samples it.
+	// `clearDepth` means this pass owns the map's clear -- false once the terrain caster
+	// pass has already taken it. Returns true if the pass ran.
+	bool DrawShadowPass(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* depth, int size, bool clearDepth);
+
 	// Replay the frame's draws into one colour+depth render pass. `clear`/`clearDepth`
 	// mean this pass owns the frame's colour/depth clear -- true only when no earlier
 	// pass (the terrain) already took it. Returns true if the pass ran.
@@ -119,7 +127,7 @@ public:
 
 private:
 	// The vertex uniform block's fixed head, laid out to match object3dx.vert.hlsl up to
-	// (but not including) its World[] array: MVP, then eight float4s.
+	// (but not including) its World[] array: MVP, eight float4s, then the shadow matrix.
 	struct VSHead
 	{
 		float mvp[16];
@@ -127,6 +135,7 @@ private:
 		float cameraPos[4], lightDir[4];
 		float uTrans[4], vTrans[4];
 		float params[4];            // x = boneCount, y = noLight
+		float shadow[16];           // shadowMatViewProj() * shadowMatBias()
 	};
 	// The whole of object3dx.frag.hlsl's cbuffer.
 	struct FSUniform
@@ -137,6 +146,8 @@ private:
 		float lerpPre[4];
 		float params[4];            // x = alphaRef, y = textured, z = selfIllum, w = lerp
 		float params2[4];           // x = specular map present
+		float shade[4];             // vShade: a fully shadowed pixel's multiplier
+		float shadowParams[4];      // x = this material receives shadows
 	};
 
 	// A state snapshot shared by every draw recorded under it.
@@ -149,6 +160,7 @@ private:
 		SDL_GPUTexture* texture;    // null -> the 1x1 white stand-in
 		SDL_GPUTexture* bumpTexture;
 		SDL_GPUTexture* specularTexture;
+		SDL_GPUTexture* shadowTexture;   // null -> this material does not receive
 		SDL_GPUSampler* sampler;
 		eBlendMode blend;
 		bool skinned;               // vertex carries weight bytes (boneCount > 1)
@@ -173,8 +185,10 @@ private:
 	// Pipelines vary with the vertex stride (the .3dx vertex grows with bump/uv2/fur),
 	// whether it carries weights, whether it takes the bump path, the blend mode and
 	// depth write -- all baked into an SDL GPU pipeline. Built on demand and cached.
+	// `shadow` selects the caster pipeline: depth-only (no colour target), slope-scaled
+	// depth bias, and the shadow shaders, which ignore the tangent frame.
 	SDL_GPUGraphicsPipeline* pipelineFor(int stride, bool skinned, bool bump, eBlendMode blend,
-	                                     bool depthWrite, bool wireframe);
+	                                     bool depthWrite, bool wireframe, bool shadow);
 	// Append the current state to states_ if it changed since the last recorded draw.
 	int commitState();
 
@@ -182,12 +196,15 @@ private:
 	SDL_GPUDevice* device_ = nullptr;
 	SDL_Window*    window_ = nullptr;
 
-	SDL_GPUShader* vsRigid_     = nullptr;   // -DSKINNED=0 -DBUMP=0
-	SDL_GPUShader* vsSkin_      = nullptr;   // -DSKINNED=1 -DBUMP=0
-	SDL_GPUShader* vsRigidBump_ = nullptr;   // -DSKINNED=0 -DBUMP=1
-	SDL_GPUShader* vsSkinBump_  = nullptr;   // -DSKINNED=1 -DBUMP=1
-	SDL_GPUShader* fs_          = nullptr;   // -DBUMP=0
-	SDL_GPUShader* fsBump_      = nullptr;   // -DBUMP=1
+	SDL_GPUShader* vsRigid_       = nullptr;   // -DSKINNED=0 -DBUMP=0
+	SDL_GPUShader* vsSkin_        = nullptr;   // -DSKINNED=1 -DBUMP=0
+	SDL_GPUShader* vsRigidBump_   = nullptr;   // -DSKINNED=0 -DBUMP=1
+	SDL_GPUShader* vsSkinBump_    = nullptr;   // -DSKINNED=1 -DBUMP=1
+	SDL_GPUShader* fs_            = nullptr;   // -DBUMP=0
+	SDL_GPUShader* fsBump_        = nullptr;   // -DBUMP=1
+	SDL_GPUShader* vsShadowRigid_ = nullptr;   // object3dx_shadow, -DSKINNED=0
+	SDL_GPUShader* vsShadowSkin_  = nullptr;   // object3dx_shadow, -DSKINNED=1
+	SDL_GPUShader* fsShadow_      = nullptr;   // alpha-cutout clip, no colour output
 	bool shadersTried_ = false;
 
 	std::unordered_map<unsigned long long, SDL_GPUGraphicsPipeline*> pipelines_;
@@ -195,15 +212,23 @@ private:
 	// per material, from StaticMaterial::tiling_diffuse.
 	SDL_GPUSampler* samplerWrap_  = nullptr;
 	SDL_GPUSampler* samplerClamp_ = nullptr;
+	// Point + clamp, as the original's sampler_clamp_point on the shadow stage: the depth
+	// compare is done by hand on raw values, which must not be filtered.
+	SDL_GPUSampler* samplerShadow_ = nullptr;
 	SDL_GPUTexture* whiteTexture_ = nullptr;   // bound when a material has no texture
 
 	std::vector<StateBlock> states_;
 	std::vector<DrawCmd>    draws_;
+	// Draws recorded while the light camera walked the scene. They share states_ and
+	// worldPool_ with the main pass -- their StateBlock simply carries the light's MVP
+	// and viewport, because SetState reads whichever camera it is handed.
+	std::vector<DrawCmd>    shadowDraws_;
 	std::vector<float>      worldPool_;   // bone rows for every state this frame
 
 	StateBlock current_;         // set by SetState, committed lazily by AddDraw
 	bool currentValid_ = false;  // SetState has run this frame
 	bool currentDirty_ = true;   // current_ differs from states_.back()
+	bool currentShadow_ = false; // the state's camera is the shadow-map camera
 };
 
 #endif // VISTA_SDL_OBJECT3DX_RENDERER_H

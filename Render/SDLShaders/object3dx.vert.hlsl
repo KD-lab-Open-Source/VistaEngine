@@ -58,6 +58,12 @@ cbuffer Constants : register(b0, space1)
 
     float4 Params;               // x = bone count per vertex (1..4), y != 0 = NOLIGHT
 
+    // The original's mShadow (object_scene_light.vsl c70, under #ifdef SHADOW):
+    // shadowMatViewProj() * shadowMatBias(), i.e. world space -> the light's clip space
+    // -> shadow map texture coords. Zero when nothing casts; the fragment shader gates on
+    // ShadowParams.x, not on this.
+    row_major float4x4 Shadow;
+
     // mWorldM[20] as 20 x 3 rows of (R | T): world.k = dot(float4(pos,1), World[3i+k]).
     // The original ships the same 3 registers per bone (setMatrix4x3VS).
     float4 World[MAX_BONES * 3];
@@ -82,15 +88,16 @@ struct VSInput
 
 struct VSOutput
 {
-    float4 Position : SV_Position;
+    float4 Position  : SV_Position;
 #if BUMP
-    float3 LightObj : TEXCOORD1;   // light vector in tangent space
-    float3 HalfObj  : TEXCOORD2;   // half vector in tangent space
+    float3 LightObj  : TEXCOORD1;   // light vector in tangent space
+    float3 HalfObj   : TEXCOORD2;   // half vector in tangent space
 #else
-    float4 Diffuse  : COLOR0;
+    float4 Diffuse   : COLOR0;
 #endif
-    float3 Specular : COLOR1;
-    float2 UV       : TEXCOORD0;
+    float3 Specular  : COLOR1;
+    float2 UV        : TEXCOORD0;
+    float4 ShadowPos : TEXCOORD3;   // the original's o.tshadow
 };
 
 VSOutput main(VSInput input)
@@ -128,6 +135,10 @@ VSOutput main(VSInput input)
 
     VSOutput output;
     output.Position = mul(float4(worldPos, 1.0f), MVP);
+
+    // The original's `o.tshadow = mul(world_pos4, mShadow)`. Left unprojected: the
+    // fragment shader divides, so the TSM warp the light matrix may carry survives.
+    output.ShadowPos = mul(float4(worldPos, 1.0f), Shadow);
 
     // --- uv (uvtrans.inl) ---------------------------------------------------
     if(UTrans.w != 0.0f){

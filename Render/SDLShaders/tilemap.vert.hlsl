@@ -30,6 +30,10 @@ cbuffer Constants : register(b0, space1)
     // uv = pos.xy * UV.zw + UV.xy. The whole terrain colour map spans the world, so
     // zw is 1/H_SIZE, 1/V_SIZE and xy is zero -- but keep the original's affine form.
     float4 UV;
+    // The original's mShadow (vsl c10): shadowMatViewProj() * shadowMatBias(), i.e. world
+    // space -> the light's clip space -> shadow map texture coords. Identity when there
+    // is no shadow map; the fragment shader gates on ShadowParams.x, not on this.
+    row_major float4x4 Shadow;
 };
 
 struct VSInput
@@ -40,16 +44,21 @@ struct VSInput
 
 struct VSOutput
 {
-    float4 Position : SV_Position;
-    float3 Normal   : NORMAL;
-    float2 UV       : TEXCOORD0;
+    float4 Position  : SV_Position;
+    float3 Normal    : NORMAL;
+    float2 UV        : TEXCOORD0;
+    float4 ShadowPos : TEXCOORD1;
 };
 
 VSOutput main(VSInput input)
 {
     VSOutput output;
-    output.Position = mul(float4(input.Position, 1.0f), MVP);
-    output.Normal   = input.Normal;
-    output.UV       = input.Position.xy * UV.zw + UV.xy;
+    output.Position  = mul(float4(input.Position, 1.0f), MVP);
+    output.Normal    = input.Normal;
+    output.UV        = input.Position.xy * UV.zw + UV.xy;
+    // The original's `o.tshadow = mul(pos, mShadow)`. Its companion `o.shadowFactor` is
+    // computed per pixel instead: the fragment shader already has the normal and the
+    // light direction, so interpolating it would only cost a varying.
+    output.ShadowPos = mul(float4(input.Position, 1.0f), Shadow);
     return output;
 }

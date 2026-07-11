@@ -8,7 +8,9 @@
 #include <cstdio>
 #include <cstring>
 
-#include "cCamera.h"           // Camera::matViewProj / GetPos / GetLighting
+#include "cCamera.h"           // Camera::matViewProj / GetPos / GetLighting / IsShadow
+#include "Scene.h"             // cScene::GetShadowIntensity (the shader's vShade)
+#include "VisGenericDefine.h"  // ATTRCAMERA_SHADOWMAP
 #include "Texture.h"           // cTexture (GetDDSurface / frameNumber)
 #include "SDLRenderDevice.h"   // owner: resolves sPtr buffers, holds RS_ZWRITEENABLE
 
@@ -17,12 +19,14 @@
 
 namespace {
 
-// Matches MAX_BONES in object3dx.vert.hlsl and StaticBunch::max_index.
-const int MAX_BONES = 20;
+// The most bone poses one material group can reference: StaticBunch::max_index, and
+// MAX_BONES in object3dx.vert.hlsl. Not Static3dxBase.h's MAX_BONES, which is the 4 bones
+// a single *vertex* may be weighted to.
+const int MAX_BONE_POSES = 20;
 
 // The vertex cbuffer is always pushed whole, so the shader's World[60] is fully backed
-// even though a bunch rarely uses all 20 bones: 16 floats of MVP + 8 float4s + 60 float4s.
-const int VS_UNIFORM_FLOATS = 16 + 8 * 4 + MAX_BONES * 3 * 4;   // 288 -> 1152 bytes
+// even though a bunch rarely uses all 20 bones: MVP + 8 float4s + mShadow + 60 float4s.
+const int VS_UNIFORM_FLOATS = 16 + 8 * 4 + 16 + MAX_BONE_POSES * 3 * 4;   // 304 -> 1216 bytes
 
 // D3DRS_ALPHAREF the original sets for ALPHA_TEST (BLEND_STATE_ALPHA_REF in D3DRender.h).
 const float ALPHA_TEST_REF = 80.f / 255.f;
@@ -80,6 +84,17 @@ SDLObject3dxRenderer::SDLObject3dxRenderer(cSDLRenderDevice* owner, SDL_GPUDevic
 	si.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
 	samplerClamp_ = SDL_CreateGPUSampler(device_, &si);
 
+	// The shadow map is compared, not filtered: raw depth, and a receiver outside the map
+	// must read its edge rather than wrap. The original's sampler_clamp_point.
+	SDL_GPUSamplerCreateInfo ssi = {};
+	ssi.min_filter = SDL_GPU_FILTER_NEAREST;
+	ssi.mag_filter = SDL_GPU_FILTER_NEAREST;
+	ssi.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
+	ssi.address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
+	ssi.address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
+	ssi.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
+	samplerShadow_ = SDL_CreateGPUSampler(device_, &ssi);
+
 	// 1x1 white. The fragment shader ignores the sampler for an untextured material
 	// (Params.y == 0), but SDL GPU still requires the binding to exist.
 	SDL_GPUTextureCreateInfo wti = {};
@@ -115,15 +130,19 @@ SDLObject3dxRenderer::~SDLObject3dxRenderer()
 	if(!device_) return;
 	for(auto& p : pipelines_)
 		if(p.second) SDL_ReleaseGPUGraphicsPipeline(device_, p.second);
-	if(whiteTexture_) SDL_ReleaseGPUTexture(device_, whiteTexture_);
-	if(samplerWrap_)  SDL_ReleaseGPUSampler(device_, samplerWrap_);
-	if(samplerClamp_) SDL_ReleaseGPUSampler(device_, samplerClamp_);
-	if(vsRigid_)     SDL_ReleaseGPUShader(device_, vsRigid_);
-	if(vsSkin_)      SDL_ReleaseGPUShader(device_, vsSkin_);
-	if(vsRigidBump_) SDL_ReleaseGPUShader(device_, vsRigidBump_);
-	if(vsSkinBump_)  SDL_ReleaseGPUShader(device_, vsSkinBump_);
-	if(fs_)          SDL_ReleaseGPUShader(device_, fs_);
-	if(fsBump_)      SDL_ReleaseGPUShader(device_, fsBump_);
+	if(whiteTexture_)  SDL_ReleaseGPUTexture(device_, whiteTexture_);
+	if(samplerWrap_)   SDL_ReleaseGPUSampler(device_, samplerWrap_);
+	if(samplerClamp_)  SDL_ReleaseGPUSampler(device_, samplerClamp_);
+	if(samplerShadow_) SDL_ReleaseGPUSampler(device_, samplerShadow_);
+	if(vsRigid_)       SDL_ReleaseGPUShader(device_, vsRigid_);
+	if(vsSkin_)        SDL_ReleaseGPUShader(device_, vsSkin_);
+	if(vsRigidBump_)   SDL_ReleaseGPUShader(device_, vsRigidBump_);
+	if(vsSkinBump_)    SDL_ReleaseGPUShader(device_, vsSkinBump_);
+	if(fs_)            SDL_ReleaseGPUShader(device_, fs_);
+	if(fsBump_)        SDL_ReleaseGPUShader(device_, fsBump_);
+	if(vsShadowRigid_) SDL_ReleaseGPUShader(device_, vsShadowRigid_);
+	if(vsShadowSkin_)  SDL_ReleaseGPUShader(device_, vsShadowSkin_);
+	if(fsShadow_)      SDL_ReleaseGPUShader(device_, fsShadow_);
 }
 
 // ---------------------------------------------------------------------------
@@ -131,7 +150,8 @@ SDLObject3dxRenderer::~SDLObject3dxRenderer()
 // ---------------------------------------------------------------------------
 bool SDLObject3dxRenderer::createShaders()
 {
-	if(shadersTried_) return vsRigid_ && vsSkin_ && vsRigidBump_ && vsSkinBump_ && fs_ && fsBump_;
+	if(shadersTried_) return vsRigid_ && vsSkin_ && vsRigidBump_ && vsSkinBump_ && fs_ && fsBump_
+	                      && vsShadowRigid_ && vsShadowSkin_ && fsShadow_;
 	shadersTried_ = true;
 	if(!device_ || !window_) return false;
 
@@ -139,7 +159,9 @@ bool SDLObject3dxRenderer::createShaders()
 	SDL_GPUShaderFormat fmt;
 	const char* entry;
 	const unsigned char *rigidCode, *skinCode, *rigidBumpCode, *skinBumpCode, *fsCode, *fsBumpCode;
+	const unsigned char *shRigidCode, *shSkinCode, *shFsCode;
 	unsigned int rigidSize, skinSize, rigidBumpSize, skinBumpSize, fsSize, fsBumpSize;
+	unsigned int shRigidSize, shSkinSize, shFsSize;
 	if(formats & SDL_GPU_SHADERFORMAT_MSL){
 		fmt = SDL_GPU_SHADERFORMAT_MSL; entry = "main0";
 		rigidCode     = object3dx_rigid_vert_msl;      rigidSize     = object3dx_rigid_vert_msl_len;
@@ -148,6 +170,9 @@ bool SDLObject3dxRenderer::createShaders()
 		skinBumpCode  = object3dx_skin_bump_vert_msl;  skinBumpSize  = object3dx_skin_bump_vert_msl_len;
 		fsCode        = object3dx_frag_msl;            fsSize        = object3dx_frag_msl_len;
 		fsBumpCode    = object3dx_bump_frag_msl;       fsBumpSize    = object3dx_bump_frag_msl_len;
+		shRigidCode   = object3dx_shadow_rigid_vert_msl; shRigidSize = object3dx_shadow_rigid_vert_msl_len;
+		shSkinCode    = object3dx_shadow_skin_vert_msl;  shSkinSize  = object3dx_shadow_skin_vert_msl_len;
+		shFsCode      = object3dx_shadow_frag_msl;       shFsSize    = object3dx_shadow_frag_msl_len;
 	} else if(formats & SDL_GPU_SHADERFORMAT_SPIRV){
 		fmt = SDL_GPU_SHADERFORMAT_SPIRV; entry = "main";
 		rigidCode     = object3dx_rigid_vert_spv;      rigidSize     = object3dx_rigid_vert_spv_len;
@@ -156,6 +181,9 @@ bool SDLObject3dxRenderer::createShaders()
 		skinBumpCode  = object3dx_skin_bump_vert_spv;  skinBumpSize  = object3dx_skin_bump_vert_spv_len;
 		fsCode        = object3dx_frag_spv;            fsSize        = object3dx_frag_spv_len;
 		fsBumpCode    = object3dx_bump_frag_spv;       fsBumpSize    = object3dx_bump_frag_spv_len;
+		shRigidCode   = object3dx_shadow_rigid_vert_spv; shRigidSize = object3dx_shadow_rigid_vert_spv_len;
+		shSkinCode    = object3dx_shadow_skin_vert_spv;  shSkinSize  = object3dx_shadow_skin_vert_spv_len;
+		shFsCode      = object3dx_shadow_frag_spv;       shFsSize    = object3dx_shadow_frag_spv_len;
 	} else {
 		fprintf(stderr, "SDLObject3dxRenderer: no supported shader format (0x%x)\n", formats);
 		return false;
@@ -164,38 +192,55 @@ bool SDLObject3dxRenderer::createShaders()
 	SDL_GPUShaderCreateInfo vsi = {};
 	vsi.entrypoint = entry; vsi.format = fmt; vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
 	vsi.num_uniform_buffers = 1;    // MVP + material + bone matrices
-	vsi.code = rigidCode;     vsi.code_size = rigidSize;     vsRigid_     = SDL_CreateGPUShader(device_, &vsi);
-	vsi.code = skinCode;      vsi.code_size = skinSize;      vsSkin_      = SDL_CreateGPUShader(device_, &vsi);
-	vsi.code = rigidBumpCode; vsi.code_size = rigidBumpSize; vsRigidBump_ = SDL_CreateGPUShader(device_, &vsi);
-	vsi.code = skinBumpCode;  vsi.code_size = skinBumpSize;  vsSkinBump_  = SDL_CreateGPUShader(device_, &vsi);
+	vsi.code = rigidCode;     vsi.code_size = rigidSize;     vsRigid_       = SDL_CreateGPUShader(device_, &vsi);
+	vsi.code = skinCode;      vsi.code_size = skinSize;      vsSkin_        = SDL_CreateGPUShader(device_, &vsi);
+	vsi.code = rigidBumpCode; vsi.code_size = rigidBumpSize; vsRigidBump_   = SDL_CreateGPUShader(device_, &vsi);
+	vsi.code = skinBumpCode;  vsi.code_size = skinBumpSize;  vsSkinBump_    = SDL_CreateGPUShader(device_, &vsi);
+	vsi.code = shRigidCode;   vsi.code_size = shRigidSize;   vsShadowRigid_ = SDL_CreateGPUShader(device_, &vsi);
+	vsi.code = shSkinCode;    vsi.code_size = shSkinSize;    vsShadowSkin_  = SDL_CreateGPUShader(device_, &vsi);
 
 	SDL_GPUShaderCreateInfo fsi = {};
 	fsi.entrypoint = entry; fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
 	fsi.num_uniform_buffers = 1;    // material colours + skin-colour lerp + flags
 	fsi.code = fsCode; fsi.code_size = fsSize;
-	fsi.num_samplers = 1;           // diffuse
+	fsi.num_samplers = 2;           // diffuse + shadow map
 	fs_ = SDL_CreateGPUShader(device_, &fsi);
 	fsi.code = fsBumpCode; fsi.code_size = fsBumpSize;
-	fsi.num_samplers = 3;           // diffuse + bump + specular map
+	fsi.num_samplers = 4;           // diffuse + bump + specular map + shadow map
 	fsBump_ = SDL_CreateGPUShader(device_, &fsi);
+	fsi.code = shFsCode; fsi.code_size = shFsSize;
+	fsi.num_samplers = 1;           // diffuse, for the alpha-cutout clip
+	fsShadow_ = SDL_CreateGPUShader(device_, &fsi);
 
-	if(!vsRigid_ || !vsSkin_ || !vsRigidBump_ || !vsSkinBump_ || !fs_ || !fsBump_){
+	if(!vsRigid_ || !vsSkin_ || !vsRigidBump_ || !vsSkinBump_ || !fs_ || !fsBump_
+	   || !vsShadowRigid_ || !vsShadowSkin_ || !fsShadow_){
 		fprintf(stderr, "SDLObject3dxRenderer: CreateGPUShader failed: %s\n", SDL_GetError());
 		return false;
 	}
-	fprintf(stderr, "SDLObject3dxRenderer: object3dx shaders ready (plain + bump)\n");
+	fprintf(stderr, "SDLObject3dxRenderer: object3dx shaders ready (plain + bump + shadow)\n");
 	return true;
 }
 
 SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skinned, bool bump,
-                                                           eBlendMode blend, bool depthWrite, bool wireframe)
+                                                           eBlendMode blend, bool depthWrite,
+                                                           bool wireframe, bool shadow)
 {
+	// The caster shaders take no tangent frame and write no colour, so bump and the blend
+	// mode never reach them: fold them out of the key rather than build dead pipelines.
+	if(shadow){
+		bump = false;
+		blend = (blend == ALPHA_TEST) ? ALPHA_TEST : ALPHA_NONE;
+		depthWrite = true;
+		wireframe = false;
+	}
+
 	const unsigned long long key = (unsigned long long)(unsigned)stride
 	                             | ((unsigned long long)skinned    << 16)
 	                             | ((unsigned long long)blend      << 17)
 	                             | ((unsigned long long)depthWrite << 24)
 	                             | ((unsigned long long)wireframe  << 25)
-	                             | ((unsigned long long)bump       << 26);
+	                             | ((unsigned long long)bump       << 26)
+	                             | ((unsigned long long)shadow     << 27);
 	auto it = pipelines_.find(key);
 	if(it != pipelines_.end())
 		return it->second;
@@ -269,9 +314,10 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 	}
 
 	SDL_GPUGraphicsPipelineCreateInfo pci = {};
-	pci.vertex_shader = bump ? (skinned ? vsSkinBump_ : vsRigidBump_)
-	                         : (skinned ? vsSkin_ : vsRigid_);
-	pci.fragment_shader = bump ? fsBump_ : fs_;
+	pci.vertex_shader = shadow ? (skinned ? vsShadowSkin_ : vsShadowRigid_)
+	                  : bump   ? (skinned ? vsSkinBump_ : vsRigidBump_)
+	                           : (skinned ? vsSkin_ : vsRigid_);
+	pci.fragment_shader = shadow ? fsShadow_ : (bump ? fsBump_ : fs_);
 	pci.vertex_input_state.vertex_buffer_descriptions = &vbDesc;
 	pci.vertex_input_state.num_vertex_buffers = 1;
 	pci.vertex_input_state.vertex_attributes = attrs;
@@ -281,18 +327,27 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 	// The scene passes flip culling per node type (DrawObjectSpecial and DrawSortObject
 	// both force D3DCULL_NONE), and the SDL device does not track D3DRS_CULLMODE yet.
 	pci.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
+	if(shadow){
+		// D3DRS_SLOPESCALEDEPTHBIAS = 2 in CameraShadowMap::DrawScene: push a caster's
+		// depth away from the light in proportion to its slope, so a surface lit at a
+		// grazing angle does not shadow itself.
+		pci.rasterizer_state.enable_depth_bias = true;
+		pci.rasterizer_state.depth_bias_slope_factor = 2.f;
+		pci.rasterizer_state.depth_bias_constant_factor = 0.f;
+	}
 	pci.depth_stencil_state.enable_depth_test = true;
 	pci.depth_stencil_state.enable_depth_write = depthWrite;
 	pci.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
-	pci.target_info.color_target_descriptions = &colorTarget;
-	pci.target_info.num_color_targets = 1;
+	// The caster pass has no colour target at all: it only fills the depth texture.
+	pci.target_info.color_target_descriptions = shadow ? nullptr : &colorTarget;
+	pci.target_info.num_color_targets = shadow ? 0 : 1;
 	pci.target_info.has_depth_stencil_target = true;
 	pci.target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
 
 	SDL_GPUGraphicsPipeline* pipeline = SDL_CreateGPUGraphicsPipeline(device_, &pci);
 	if(!pipeline)
-		fprintf(stderr, "SDLObject3dxRenderer: pipeline (stride %d, skinned %d, bump %d, blend %d) failed: %s\n",
-		        stride, (int)skinned, (int)bump, (int)blend, SDL_GetError());
+		fprintf(stderr, "SDLObject3dxRenderer: pipeline (stride %d, skinned %d, bump %d, blend %d, shadow %d) failed: %s\n",
+		        stride, (int)skinned, (int)bump, (int)blend, (int)shadow, SDL_GetError());
 	pipelines_[key] = pipeline;
 	return pipeline;
 }
@@ -304,18 +359,25 @@ void SDLObject3dxRenderer::BeginFrame()
 {
 	states_.clear();
 	draws_.clear();
+	shadowDraws_.clear();
 	worldPool_.clear();
 	currentValid_ = false;
 	currentDirty_ = true;
+	currentShadow_ = false;
 }
 
 void SDLObject3dxRenderer::SetState(const State& state, Camera* camera)
 {
 	if(!camera) return;
 
+	// Which pass the draws that follow belong to. The light camera walks the scene first
+	// (Camera::DrawScene runs its children before its own draws), so the caster draws are
+	// recorded, and their pass replayed, before anything samples the map.
+	currentShadow_ = camera->getAttribute(ATTRCAMERA_SHADOWMAP) != 0;
+
 	// The bone poses, as VSSkin::Select uploads them: three float4 rows of (R | T) per
 	// bone, so the shader's world.k == dot(float4(pos,1), row k).
-	const int bones = state.world ? (state.worldNum < MAX_BONES ? state.worldNum : MAX_BONES) : 0;
+	const int bones = state.world ? (state.worldNum < MAX_BONE_POSES ? state.worldNum : MAX_BONE_POSES) : 0;
 	current_.worldOffset = (int)worldPool_.size();
 	current_.worldRows = bones * 3;
 	for(int i = 0; i < bones; i++){
@@ -399,6 +461,33 @@ void SDLObject3dxRenderer::SetState(const State& state, Camera* camera)
 	current_.fs.params2[0] = current_.specularTexture ? 1.f : 0.f;
 	current_.fs.params2[1] = current_.fs.params2[2] = current_.fs.params2[3] = 0.f;
 
+	// Whether this material takes the original's *SceneShadow shader variant, on the same
+	// terms cObject3dx::Draw and cSimply3dx::SelectMaterial pick it: the main camera has a
+	// light child (Camera::IsShadow), the material is lit, and it has a diffuse texture --
+	// an untextured one gets vsSkinSceneShadow but plain psSkin, which never samples.
+	//
+	// The map is already filled: Camera::DrawScene walks its child cameras, and so runs
+	// the light camera's whole caster pass, before drawing any of its own objects.
+	const bool receives = !currentShadow_ && !state.noLight && current_.texture
+	                   && camera->IsShadow() && owner_->shadowPassRan() && owner_->GetShadowMap();
+	if(receives){
+		const Mat4f mShadow = owner_->shadowMatViewProj() * owner_->shadowMatBias();
+		std::memcpy(current_.vs.shadow, &mShadow, sizeof(current_.vs.shadow));
+		current_.shadowTexture = reinterpret_cast<SDL_GPUTexture*>(owner_->GetShadowMap()->GetDDSurface(0));
+		// PSSkin::SetShadowIntensity(scene()->GetShadowIntensity()).
+		if(cScene* scene = camera->scene())
+			setVec4(current_.fs.shade, scene->GetShadowIntensity());
+		else
+			current_.fs.shade[0] = current_.fs.shade[1] = current_.fs.shade[2] = current_.fs.shade[3] = 1.f;
+	}
+	else{
+		std::memset(current_.vs.shadow, 0, sizeof(current_.vs.shadow));
+		current_.shadowTexture = nullptr;
+		current_.fs.shade[0] = current_.fs.shade[1] = current_.fs.shade[2] = current_.fs.shade[3] = 1.f;
+	}
+	current_.fs.shadowParams[0] = current_.shadowTexture ? 1.f : 0.f;
+	current_.fs.shadowParams[1] = current_.fs.shadowParams[2] = current_.fs.shadowParams[3] = 0.f;
+
 	current_.blend = state.blend;
 	current_.skinned = boneCount > 1;
 
@@ -456,8 +545,8 @@ void SDLObject3dxRenderer::DrawIndexedPrimitive(sPtrVertexBuffer& vb, int OfsVer
 	// offsets -- the same arithmetic cD3DRender::DrawIndexedPrimitive hands to D3D.
 	d.firstIndex = 3 * nOfsPolygon;
 	d.indexCount = 3 * nPolygon;
-	d.depthWrite = owner_->zWriteEnable();
-	draws_.push_back(d);
+	d.depthWrite = currentShadow_ ? true : owner_->zWriteEnable();
+	(currentShadow_ ? shadowDraws_ : draws_).push_back(d);
 
 	*gb_RenderDevice->PtrNumberPolygon += nPolygon;
 	gb_RenderDevice->NumDrawObject++;
@@ -466,6 +555,94 @@ void SDLObject3dxRenderer::DrawIndexedPrimitive(sPtrVertexBuffer& vb, int OfsVer
 // ---------------------------------------------------------------------------
 // Frame
 // ---------------------------------------------------------------------------
+bool SDLObject3dxRenderer::DrawShadowPass(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* depth, int size,
+                                          bool clearDepth)
+{
+	if(!device_ || !cmd || !depth)
+		return false;
+
+	// Runs even with nothing to cast: the clear alone leaves the map at far depth, i.e.
+	// every receiver lit. Skipping it would let them sample last frame's map, or on the
+	// first frame an undefined one. When the terrain caster pass already cleared and
+	// filled the map, load its depth instead and add the objects to it.
+	//
+	// Depth only: no colour attachment at all.
+	SDL_GPUDepthStencilTargetInfo dt = {};
+	dt.texture = depth;
+	dt.clear_depth = 1.0f;
+	dt.load_op = clearDepth ? SDL_GPU_LOADOP_CLEAR : SDL_GPU_LOADOP_LOAD;
+	dt.store_op = SDL_GPU_STOREOP_STORE;
+	dt.stencil_load_op = SDL_GPU_LOADOP_DONT_CARE;
+	dt.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
+
+	SDL_GPURenderPass* pass = SDL_BeginGPURenderPass(cmd, nullptr, 0, &dt);
+
+	SDL_GPUGraphicsPipeline* boundPipeline = nullptr;
+	SDL_GPUBuffer* boundVB = nullptr;
+	SDL_GPUBuffer* boundIB = nullptr;
+	int boundState = -1;
+	float vsUniform[VS_UNIFORM_FLOATS];
+
+	for(const DrawCmd& d : shadowDraws_){
+		const StateBlock& st = states_[d.state];
+
+		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, false, st.blend, true, false, true);
+		if(!pipeline) continue;
+		if(pipeline != boundPipeline){
+			SDL_BindGPUGraphicsPipeline(pass, pipeline);
+			boundPipeline = pipeline;
+			boundState = -1;
+			boundVB = boundIB = nullptr;
+		}
+
+		if(d.state != boundState){
+			// The light camera's viewport is the whole map (SetFrustum gives it the unit
+			// clip rect), but take it from the state like every other pass does.
+			sViewPort vp;
+			vp.X = st.vpX; vp.Y = st.vpY; vp.Width = st.vpW; vp.Height = st.vpH;
+			vp.MinZ = st.vpMinZ; vp.MaxZ = st.vpMaxZ;
+			applyCameraViewport(pass, vp, size, size);
+
+			// st.vs.mvp is the light's matViewProj: SetState read it from whichever
+			// camera it was handed, and the caster shader wants exactly that.
+			std::memcpy(vsUniform, &st.vs, sizeof(st.vs));
+			const int head = (int)(sizeof(st.vs) / sizeof(float));
+			if(st.worldRows > 0)
+				std::memcpy(vsUniform + head, worldPool_.data() + st.worldOffset,
+				            (size_t)st.worldRows * 4 * sizeof(float));
+			std::memset(vsUniform + head + st.worldRows * 4, 0,
+			            (size_t)(VS_UNIFORM_FLOATS - head - st.worldRows * 4) * sizeof(float));
+
+			SDL_PushGPUVertexUniformData(cmd, 0, vsUniform, sizeof(vsUniform));
+			SDL_PushGPUFragmentUniformData(cmd, 0, &st.fs, sizeof(st.fs));
+
+			// Only the diffuse map, for the cutout clip.
+			SDL_GPUTextureSamplerBinding ts = {};
+			ts.texture = st.texture ? st.texture : whiteTexture_;
+			ts.sampler = st.sampler ? st.sampler : samplerWrap_;
+			SDL_BindGPUFragmentSamplers(pass, 0, &ts, 1);
+			boundState = d.state;
+		}
+
+		if(d.vertexBuffer != boundVB){
+			SDL_GPUBufferBinding vb = {}; vb.buffer = d.vertexBuffer; vb.offset = 0;
+			SDL_BindGPUVertexBuffers(pass, 0, &vb, 1);
+			boundVB = d.vertexBuffer;
+		}
+		if(d.indexBuffer != boundIB){
+			SDL_GPUBufferBinding ib = {}; ib.buffer = d.indexBuffer; ib.offset = 0;
+			SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_16BIT);
+			boundIB = d.indexBuffer;
+		}
+
+		SDL_DrawGPUIndexedPrimitives(pass, d.indexCount, 1, d.firstIndex, 0, 0);
+	}
+
+	SDL_EndGPURenderPass(pass);
+	shadowDraws_.clear();   // recorded; a second endShadowPass this frame is a no-op
+	return true;
+}
+
 bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, SDL_GPUTexture* depth,
                                 int screenW, int screenH, bool clear, const float clearColor[4],
                                 bool clearDepth, bool wireframe)
@@ -503,7 +680,7 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 	for(const DrawCmd& d : draws_){
 		const StateBlock& st = states_[d.state];
 
-		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, st.bump, st.blend, d.depthWrite, wireframe);
+		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, st.bump, st.blend, d.depthWrite, wireframe, false);
 		if(!pipeline) continue;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);
@@ -532,10 +709,11 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 			SDL_PushGPUVertexUniformData(cmd, 0, vsUniform, sizeof(vsUniform));
 			SDL_PushGPUFragmentUniformData(cmd, 0, &st.fs, sizeof(st.fs));
 
-			// The bump fragment shader declares three samplers, so all three must be
-			// bound even when the material has no specular map (Params2.x gates the
-			// sample; the white stand-in is never read).
-			SDL_GPUTextureSamplerBinding ts[3] = {};
+			// Every sampler the fragment shader declares must be bound, even where a
+			// uniform gates the sample away (Params2.x for the specular map,
+			// ShadowParams.x for the shadow map): the white stand-in is never read.
+			// The shadow map is last -- slot 1 without bump, slot 3 with.
+			SDL_GPUTextureSamplerBinding ts[4] = {};
 			ts[0].texture = st.texture ? st.texture : whiteTexture_;
 			ts[0].sampler = st.sampler ? st.sampler : samplerWrap_;
 			if(st.bump){
@@ -544,7 +722,10 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 				ts[2].texture = st.specularTexture ? st.specularTexture : whiteTexture_;
 				ts[2].sampler = samplerWrap_;
 			}
-			SDL_BindGPUFragmentSamplers(pass, 0, ts, st.bump ? 3 : 1);
+			const int shadowSlot = st.bump ? 3 : 1;
+			ts[shadowSlot].texture = st.shadowTexture ? st.shadowTexture : whiteTexture_;
+			ts[shadowSlot].sampler = samplerShadow_;
+			SDL_BindGPUFragmentSamplers(pass, 0, ts, shadowSlot + 1);
 			boundState = d.state;
 		}
 

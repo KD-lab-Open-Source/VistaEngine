@@ -17,8 +17,9 @@
 // slots) because the mesh is built here, from vMap, and shared with nothing.
 //
 // Scope: the heightfield surface with its baked per-cell colour and one directional
-// light. The original's remaining layers -- bump, lightmap, detail texture, shadow,
-// fog of war, fog -- and the real tile/LOD streaming are still to come.
+// light, receiving the scene's shadow map and casting into it. The original's remaining
+// layers -- bump, lightmap, detail texture, fog of war, fog -- and the real tile/LOD
+// streaming are still to come.
 
 #include <string>
 
@@ -55,6 +56,14 @@ public:
 	          int screenW, int screenH, bool clear, const float clearColor[4],
 	          bool clearDepth, cTileMap* tileMap, Camera* camera, bool wireframe);
 
+	// Draw the terrain into the shadow map, from the light camera, in a depth-only pass
+	// (no colour target). Called from cTileMap::Draw under ATTRCAMERA_SHADOWMAP -- where
+	// the original calls tileMapRender_->DrawBump(camera, ALPHA_TEST, true, false) -- so
+	// it runs before the object casters, which then load the depth it wrote.
+	// `clearDepth` means this pass owns the map's clear. Returns true if the pass ran.
+	bool DrawShadowPass(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* depth, int size,
+	                    Camera* camera, bool clearDepth);
+
 private:
 	// World-space position + normal, matching tilemap.vert.hlsl's two attributes.
 	// The original tilemap vertex is the same pair (position, normal-in-COLOR0); UVs
@@ -62,6 +71,7 @@ private:
 	struct Vertex { float x, y, z; float nx, ny, nz; };
 
 	void createPipeline();
+	void createShadowPipeline();
 	// Rebuild when vMap is reloaded in place for a new mission. Returns false while
 	// the heightfield is not loaded yet (caller retries next frame) or on failure.
 	bool ensureMesh(SDL_GPUCommandBuffer* cmd);
@@ -75,7 +85,12 @@ private:
 	// Same shaders, differing only in fill mode. FILL/LINE mirrors RS_FILLMODE.
 	SDL_GPUGraphicsPipeline* pipelineFill_ = nullptr;
 	SDL_GPUGraphicsPipeline* pipelineLine_ = nullptr;
+	// Depth-only, position-only, slope-scale biased: the terrain as a shadow caster.
+	SDL_GPUGraphicsPipeline* pipelineShadow_ = nullptr;
 	SDL_GPUSampler*          sampler_      = nullptr;
+	// Point + clamp: the shadow compare is done by hand on raw depth values, which must
+	// not be filtered, and a receiver outside the map must read its edge, not wrap.
+	SDL_GPUSampler*          shadowSampler_ = nullptr;
 
 	SDL_GPUBuffer*  vertexBuffer_ = nullptr;
 	SDL_GPUBuffer*  indexBuffer_  = nullptr;

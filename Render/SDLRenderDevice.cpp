@@ -10,16 +10,22 @@
 
 #include "Texture.h"     // cTexture (BitMap / GetDDSurface / attributes)
 #include "FileImage.h"   // cFileImage::GetTexture
+#include "TexLibrary.h"  // GetTexLibrary()->CreateRenderTexture (the shadow map)
 #include "cCamera.h"     // sViewPort
 
 #include "SDLUIRenderer.h"
 #include "SDLTileMapRenderer.h"
 #include "SDLObject3dxRenderer.h"
 
-// See the declaration in SDLRenderDevice.h.
+// See the declarations in SDLRenderDevice.h.
+cSDLRenderDevice* sdlRenderDevice()
+{
+	return dynamic_cast<cSDLRenderDevice*>(gb_RenderDevice);
+}
+
 SDLObject3dxRenderer* sdlObjectRenderer()
 {
-	cSDLRenderDevice* dev = dynamic_cast<cSDLRenderDevice*>(gb_RenderDevice);
+	cSDLRenderDevice* dev = sdlRenderDevice();
 	return dev ? dev->objectRenderer() : nullptr;
 }
 
@@ -85,7 +91,10 @@ void cInterfaceRenderDevice::SetDefaultFont(FT::Font* pFont)
 // ---------------------------------------------------------------------------
 // cSDLRenderDevice
 // ---------------------------------------------------------------------------
-cSDLRenderDevice::cSDLRenderDevice() {}
+cSDLRenderDevice::cSDLRenderDevice()
+{
+	shadowMatViewProj_ = Mat4f::ID;   // Mat4f's default ctor leaves it uninitialized
+}
 
 cSDLRenderDevice::~cSDLRenderDevice()
 {
@@ -149,6 +158,10 @@ int cSDLRenderDevice::Done()
 		commandBuffer_ = nullptr;
 	}
 	swapchainTexture_ = nullptr;
+
+	// Release the shadow map while the device (and gb_RenderDevice == this) is still
+	// valid: ~cTexture routes through DeleteTexture, which needs textures_ and device_.
+	deleteShadowMap();
 
 	// The renderers hold GPU objects built on device_, so they must go first.
 	uiRenderer_.reset();
@@ -233,6 +246,8 @@ int cSDLRenderDevice::BeginScene()
 		objectRenderer_->BeginFrame();
 	frameCleared_ = false;
 	depthCleared_ = false;
+	shadowPassRan_ = false;
+	shadowDepthCleared_ = false;
 	bActiveScene_ = true;
 	NumberPolygon = 0;
 	NumDrawObject = 0;
@@ -314,6 +329,88 @@ void cSDLRenderDevice::drawTileMap(cTileMap* tileMap, Camera* camera)
 	                          fillMode_ == FILL_WIREFRAME)){
 		if(clear) frameCleared_ = true;
 		depthCleared_ = true;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Shadow map
+// ---------------------------------------------------------------------------
+bool cSDLRenderDevice::createShadowMap(int size)
+{
+	deleteShadowMap();
+	if(!device_ || size <= 0)
+		return false;
+	// Routed through the texture library, as cD3DRender::createRenderTargets is: the
+	// cTexture is what Camera::SetRenderTarget takes and what carries the map's size.
+	shadowMap_ = GetTexLibrary()->CreateRenderTexture(size, size, TEXTURE_RENDER_SHADOW_9700, false);
+	if(!shadowMap_)
+		return false;
+	shadowMapSize_ = size;
+	fprintf(stderr, "cSDLRenderDevice: shadow map %dx%d ready\n", size, size);
+	return true;
+}
+
+void cSDLRenderDevice::deleteShadowMap()
+{
+	RELEASE(shadowMap_);
+	shadowMapSize_ = 0;
+}
+
+Mat4f cSDLRenderDevice::shadowMatBias() const
+{
+	// Light clip space -> shadow map texture coords. SDL GPU normalizes clip space to
+	// D3D's (x,y in [-1,1] with y up, z in [0,1]), so this is cD3DRender::shadowMatBias
+	// without its half-texel offset: that corrects D3D9's pixel-centre convention, which
+	// SDL does not share. Row-vector convention, to match mul(world, mShadow).
+	//
+	// The constant depth bias sits in the last row, as the original's does, rather than in
+	// the rasterizer: it must not be scaled by the TSM warp the light matrix may carry.
+	// Same value as cD3DRender::shadowMatBias uses on DT_RADEON9700. The original's
+	// D3DRS_SLOPESCALEDEPTHBIAS never reached that path -- it biased the depth buffer,
+	// while the caster wrote its depth as *colour* -- but it does reach ours, so the
+	// slope-dependent part of the acne is handled in the caster pipeline.
+	const float bias = 0.0005f;
+	return Mat4f(0.5f,  0.0f,  0.0f, 0.0f,
+	             0.0f, -0.5f,  0.0f, 0.0f,
+	             0.0f,  0.0f,  1.0f, 0.0f,
+	             0.5f,  0.5f, -bias, 1.0f);
+}
+
+// The depth texture behind the shadow map, or null if there is none to render into.
+SDL_GPUTexture* cSDLRenderDevice::shadowDepthTexture()
+{
+	if(!bActiveScene_ || !commandBuffer_ || !shadowMap_ || shadowMap_->frameNumber() < 1)
+		return nullptr;
+	return reinterpret_cast<SDL_GPUTexture*>(shadowMap_->GetDDSurface(0));
+}
+
+void cSDLRenderDevice::drawTileMapShadow(Camera* camera)
+{
+	if(!tileMapRenderer_)
+		return;
+	SDL_GPUTexture* depth = shadowDepthTexture();
+	if(!depth)
+		return;
+	if(tileMapRenderer_->DrawShadowPass(commandBuffer_, depth, shadowMapSize_, camera,
+	                                    !shadowDepthCleared_)){
+		shadowDepthCleared_ = true;
+		shadowPassRan_ = true;
+	}
+}
+
+void cSDLRenderDevice::endShadowPass()
+{
+	if(!objectRenderer_)
+		return;
+	SDL_GPUTexture* depth = shadowDepthTexture();
+	if(!depth)
+		return;
+	// Runs even with no casters recorded: its clear is what leaves an empty map at far
+	// depth. Only skips the clear if the terrain caster already took it.
+	if(objectRenderer_->DrawShadowPass(commandBuffer_, depth, shadowMapSize_,
+	                                   !shadowDepthCleared_)){
+		shadowDepthCleared_ = true;
+		shadowPassRan_ = true;
 	}
 }
 
@@ -503,6 +600,30 @@ int cSDLRenderDevice::CreateTexture(cTexture* Texture, cFileImage* FileImage, in
 	const int w = Texture->GetWidth();
 	const int h = Texture->GetHeight();
 	if(w <= 0 || h <= 0) return 1;
+
+	// The shadow map (cScene::CreateShadowmap asks cTexLibrary::CreateRenderTexture for
+	// TEXTURE_RENDER_SHADOW_9700). A depth texture the light camera renders into and the
+	// receivers sample; no staging, no mip chain.
+	if(Texture->getAttribute(TEXTURE_RENDER_SHADOW_9700)){
+		SDL_GPUTextureCreateInfo ti = {};
+		ti.type = SDL_GPU_TEXTURETYPE_2D;
+		ti.format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
+		ti.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER | SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET;
+		ti.width = (Uint32)w; ti.height = (Uint32)h;
+		ti.layer_count_or_depth = 1; ti.num_levels = 1;
+		SDL_GPUTexture* tex = SDL_CreateGPUTexture(device_, &ti);
+		if(!tex){
+			fprintf(stderr, "cSDLRenderDevice: shadow map %dx%d failed: %s\n", w, h, SDL_GetError());
+			return 1;
+		}
+		TextureData td;
+		td.tex = tex; td.w = w; td.h = h;
+		textures_[tex] = std::move(td);
+		if(Texture->frameNumber() < 1)
+			Texture->New(1);
+		Texture->GetDDSurface(0) = reinterpret_cast<IDirect3DTexture9*>(tex);
+		return 0;
+	}
 
 	// GPU texture is always BGRA8 so one UI shader/sampler covers everything.
 	// Gray/alpha-only (the font atlas) keeps 1-byte coverage staging (so the font

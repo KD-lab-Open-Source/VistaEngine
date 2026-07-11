@@ -12,7 +12,8 @@
 #include "terra/vmap.h"        // vMap heightfield + baked per-cell surface colour
 #include "cCamera.h"           // Camera::matView / matProj / GetLighting / vp
 #include "TileMap.h"           // cTileMap::GetDiffuse (the scene sun, per Environment)
-#include "SDLRenderDevice.h"   // applyCameraViewport
+#include "Scene.h"             // cScene::GetShadowIntensity (the shader's vShade)
+#include "SDLRenderDevice.h"   // applyCameraViewport, the shadow map
 
 // Cross-compiled tilemap shader blobs (SPIR-V + MSL); see Render/SDLShaders.
 #include "SDLShaders/tilemap_shaders.h"
@@ -20,8 +21,10 @@
 namespace {
 
 // Uniform blocks, laid out to match tilemap.{vert,frag}.hlsl exactly.
-struct VSUniform { float mvp[16]; float uv[4]; };          // row_major float4x4 MVP; float4 UV
-struct FSUniform { float lightColor[4]; float lightDir[4]; };
+struct VSUniform { float mvp[16]; float uv[4]; float shadow[16]; };
+struct FSUniform { float lightColor[4]; float lightDir[4]; float shade[4]; float params[4]; };
+// tilemap_shadow.vert.hlsl's whole cbuffer: the light camera's view-projection.
+struct ShadowVSUniform { float mvp[16]; };
 
 // Sample every STEP_BASE fine cells (512/4 = 128 quads/axis -> 129x129 = 16641 verts
 // on the Menu). The step is doubled below as needed so the vertex count stays under
@@ -39,16 +42,19 @@ SDLTileMapRenderer::SDLTileMapRenderer(SDL_GPUDevice* device, SDL_Window* window
 	: device_(device), window_(window)
 {
 	createPipeline();
+	createShadowPipeline();
 }
 
 SDLTileMapRenderer::~SDLTileMapRenderer()
 {
 	if(!device_) return;
 	releaseMesh();
-	if(whiteTexture_) SDL_ReleaseGPUTexture(device_, whiteTexture_);
-	if(sampler_)      SDL_ReleaseGPUSampler(device_, sampler_);
-	if(pipelineFill_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineFill_);
-	if(pipelineLine_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineLine_);
+	if(whiteTexture_)   SDL_ReleaseGPUTexture(device_, whiteTexture_);
+	if(sampler_)        SDL_ReleaseGPUSampler(device_, sampler_);
+	if(shadowSampler_)  SDL_ReleaseGPUSampler(device_, shadowSampler_);
+	if(pipelineFill_)   SDL_ReleaseGPUGraphicsPipeline(device_, pipelineFill_);
+	if(pipelineLine_)   SDL_ReleaseGPUGraphicsPipeline(device_, pipelineLine_);
+	if(pipelineShadow_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineShadow_);
 }
 
 void SDLTileMapRenderer::releaseMesh()
@@ -76,8 +82,18 @@ void SDLTileMapRenderer::createPipeline()
 	si.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
 	sampler_ = SDL_CreateGPUSampler(device_, &si);
 
+	SDL_GPUSamplerCreateInfo ssi = {};
+	ssi.min_filter = SDL_GPU_FILTER_NEAREST;
+	ssi.mag_filter = SDL_GPU_FILTER_NEAREST;
+	ssi.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
+	ssi.address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
+	ssi.address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
+	ssi.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
+	shadowSampler_ = SDL_CreateGPUSampler(device_, &ssi);
+
 	// 1x1 white, bound instead of the surface colour in wireframe mode so the edges
-	// come out white whatever the map's baked colour is.
+	// come out white whatever the map's baked colour is. It also stands in for the shadow
+	// map when there is none: its .r reads 1.0, the far depth, i.e. everything lit.
 	SDL_GPUTextureCreateInfo wti = {};
 	wti.type = SDL_GPU_TEXTURETYPE_2D;
 	wti.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
@@ -126,14 +142,14 @@ void SDLTileMapRenderer::createPipeline()
 	SDL_GPUShaderCreateInfo vsi = {};
 	vsi.code = vsCode; vsi.code_size = vsSize; vsi.entrypoint = entry;
 	vsi.format = fmt; vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
-	vsi.num_uniform_buffers = 1;    // MVP + UV
+	vsi.num_uniform_buffers = 1;    // MVP + UV + Shadow
 	SDL_GPUShader* vs = SDL_CreateGPUShader(device_, &vsi);
 
 	SDL_GPUShaderCreateInfo fsi = {};
 	fsi.code = fsCode; fsi.code_size = fsSize; fsi.entrypoint = entry;
 	fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
-	fsi.num_samplers = 1;           // the baked surface-colour texture
-	fsi.num_uniform_buffers = 1;    // LightColor + LightDirection
+	fsi.num_samplers = 2;           // the baked surface-colour texture, the shadow map
+	fsi.num_uniform_buffers = 1;    // LightColor + LightDirection + ShadeIntensity + params
 	SDL_GPUShader* fs = SDL_CreateGPUShader(device_, &fsi);
 
 	if(!vs || !fs){
@@ -187,6 +203,89 @@ void SDLTileMapRenderer::createPipeline()
 
 	fprintf(stderr, "SDLTileMapRenderer: tilemap pipeline %s (wireframe %s)\n",
 	        pipelineFill_ ? "ready" : "FAILED", pipelineLine_ ? "ready" : "FAILED");
+}
+
+// The terrain as a shadow caster: the same vertex buffer, position only, into depth.
+void SDLTileMapRenderer::createShadowPipeline()
+{
+	if(!device_) return;
+
+	SDL_GPUShaderFormat formats = SDL_GetGPUShaderFormats(device_);
+	SDL_GPUShaderFormat fmt;
+	const char* entry;
+	const unsigned char *vsCode, *fsCode;
+	unsigned int vsSize, fsSize;
+	if(formats & SDL_GPU_SHADERFORMAT_MSL){
+		fmt = SDL_GPU_SHADERFORMAT_MSL; entry = "main0";
+		vsCode = tilemap_shadow_vert_msl; vsSize = tilemap_shadow_vert_msl_len;
+		fsCode = tilemap_shadow_frag_msl; fsSize = tilemap_shadow_frag_msl_len;
+	} else if(formats & SDL_GPU_SHADERFORMAT_SPIRV){
+		fmt = SDL_GPU_SHADERFORMAT_SPIRV; entry = "main";
+		vsCode = tilemap_shadow_vert_spv; vsSize = tilemap_shadow_vert_spv_len;
+		fsCode = tilemap_shadow_frag_spv; fsSize = tilemap_shadow_frag_spv_len;
+	} else
+		return;   // createPipeline already complained
+
+	SDL_GPUShaderCreateInfo vsi = {};
+	vsi.code = vsCode; vsi.code_size = vsSize; vsi.entrypoint = entry;
+	vsi.format = fmt; vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+	vsi.num_uniform_buffers = 1;    // the light's MVP
+	SDL_GPUShader* vs = SDL_CreateGPUShader(device_, &vsi);
+
+	SDL_GPUShaderCreateInfo fsi = {};
+	fsi.code = fsCode; fsi.code_size = fsSize; fsi.entrypoint = entry;
+	fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+	SDL_GPUShader* fs = SDL_CreateGPUShader(device_, &fsi);   // no samplers, no uniforms
+
+	if(!vs || !fs){
+		fprintf(stderr, "SDLTileMapRenderer: shadow CreateGPUShader failed: %s\n", SDL_GetError());
+		if(vs) SDL_ReleaseGPUShader(device_, vs);
+		if(fs) SDL_ReleaseGPUShader(device_, fs);
+		return;
+	}
+
+	// Same buffer, same stride; the caster reads only the position, so the normal is
+	// simply not declared.
+	SDL_GPUVertexBufferDescription vbDesc = {};
+	vbDesc.slot = 0;
+	vbDesc.pitch = sizeof(Vertex);
+	vbDesc.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
+
+	SDL_GPUVertexAttribute attr = {};
+	attr.location = 0; attr.buffer_slot = 0;
+	attr.format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3; attr.offset = 0;
+
+	SDL_GPUGraphicsPipelineCreateInfo pci = {};
+	pci.vertex_shader = vs;
+	pci.fragment_shader = fs;
+	pci.vertex_input_state.vertex_buffer_descriptions = &vbDesc;
+	pci.vertex_input_state.num_vertex_buffers = 1;
+	pci.vertex_input_state.vertex_attributes = &attr;
+	pci.vertex_input_state.num_vertex_attributes = 1;
+	pci.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
+	pci.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
+	pci.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
+	// D3DRS_SLOPESCALEDEPTHBIAS = 2, as CameraShadowMap::DrawScene sets for the whole
+	// caster pass. It matters most here: the terrain both casts and receives, so a slope
+	// lit at a grazing angle would otherwise shadow itself.
+	pci.rasterizer_state.enable_depth_bias = true;
+	pci.rasterizer_state.depth_bias_slope_factor = 2.f;
+	pci.rasterizer_state.depth_bias_constant_factor = 0.f;
+	pci.depth_stencil_state.enable_depth_test = true;
+	pci.depth_stencil_state.enable_depth_write = true;
+	pci.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
+	pci.target_info.num_color_targets = 0;
+	pci.target_info.color_target_descriptions = nullptr;
+	pci.target_info.has_depth_stencil_target = true;
+	pci.target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
+
+	pipelineShadow_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
+
+	SDL_ReleaseGPUShader(device_, vs);
+	SDL_ReleaseGPUShader(device_, fs);
+
+	fprintf(stderr, "SDLTileMapRenderer: terrain caster pipeline %s\n",
+	        pipelineShadow_ ? "ready" : "FAILED");
 }
 
 // ---------------------------------------------------------------------------
@@ -364,6 +463,44 @@ bool SDLTileMapRenderer::ensureMesh(SDL_GPUCommandBuffer* cmd)
 // ---------------------------------------------------------------------------
 // Frame
 // ---------------------------------------------------------------------------
+bool SDLTileMapRenderer::DrawShadowPass(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* depth, int size,
+                                        Camera* camera, bool clearDepth)
+{
+	if(!device_ || !pipelineShadow_ || !cmd || !depth || !camera)
+		return false;
+	// Builds the mesh if the light camera is the first to ask for it this mission. Safe
+	// here: ensureMesh opens a copy pass, and no render pass is open yet.
+	if(!ensureMesh(cmd))
+		return false;
+
+	ShadowVSUniform vsu;
+	std::memcpy(vsu.mvp, &camera->matViewProj, sizeof(vsu.mvp));
+
+	SDL_GPUDepthStencilTargetInfo dt = {};
+	dt.texture = depth;
+	dt.clear_depth = 1.0f;
+	dt.load_op = clearDepth ? SDL_GPU_LOADOP_CLEAR : SDL_GPU_LOADOP_LOAD;
+	dt.store_op = SDL_GPU_STOREOP_STORE;
+	dt.stencil_load_op = SDL_GPU_LOADOP_DONT_CARE;
+	dt.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
+
+	SDL_GPURenderPass* pass = SDL_BeginGPURenderPass(cmd, nullptr, 0, &dt);
+	// The light camera's viewport spans the whole map (SetRenderTarget sized it).
+	applyCameraViewport(pass, camera->vp, size, size);
+
+	SDL_BindGPUGraphicsPipeline(pass, pipelineShadow_);
+	SDL_PushGPUVertexUniformData(cmd, 0, &vsu, sizeof(vsu));
+
+	SDL_GPUBufferBinding vb = {}; vb.buffer = vertexBuffer_; vb.offset = 0;
+	SDL_BindGPUVertexBuffers(pass, 0, &vb, 1);
+	SDL_GPUBufferBinding ib = {}; ib.buffer = indexBuffer_; ib.offset = 0;
+	SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_16BIT);
+
+	SDL_DrawGPUIndexedPrimitives(pass, indexCount_, 1, 0, 0, 0);
+	SDL_EndGPURenderPass(pass);
+	return true;
+}
+
 bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, SDL_GPUTexture* depth,
                               int screenW, int screenH, bool clear, const float clearColor[4],
                               bool clearDepth, cTileMap* tileMap, Camera* camera, bool wireframe)
@@ -381,6 +518,21 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	std::memcpy(vsu.mvp, &camera->matViewProj, sizeof(vsu.mvp));
 	vsu.uv[0] = 0.f; vsu.uv[1] = 0.f;             // UV.xy offset
 	vsu.uv[2] = uvScale_[0]; vsu.uv[3] = uvScale_[1];  // UV.zw scale
+
+	// The shadow map, if the light camera filled one earlier this frame. shadowPassRan()
+	// is the gate, not the texture: the map outlives the light camera, which cScene
+	// detaches whenever shadows are off.
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	SDL_GPUTexture* shadowMap = nullptr;
+	const bool shadow = dev && dev->shadowPassRan() && dev->GetShadowMap();
+	if(shadow){
+		shadowMap = reinterpret_cast<SDL_GPUTexture*>(dev->GetShadowMap()->GetDDSurface(0));
+		// mShadow, as ShaderSkin.inl builds it: world -> light clip -> map texture coords.
+		const Mat4f mShadow = dev->shadowMatViewProj() * dev->shadowMatBias();
+		std::memcpy(vsu.shadow, &mShadow, sizeof(vsu.shadow));
+	}
+	else
+		std::memset(vsu.shadow, 0, sizeof(vsu.shadow));
 
 	// The scene's sun, exactly as the original wires it up.
 	//
@@ -405,6 +557,14 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	Vect3f sun(0.f, 0.f, -1.f);   // straight down if the scene has no sun yet
 	camera->GetLighting(sun);
 	fsu.lightDir[0] = sun.x; fsu.lightDir[1] = sun.y; fsu.lightDir[2] = sun.z; fsu.lightDir[3] = 0.f;
+
+	// vShade: what a fully shadowed pixel is multiplied by. Per mission, from the
+	// Environment's shadow intensity.
+	const Color4f shade = (shadow && tileMap && tileMap->scene())
+	                    ? tileMap->scene()->GetShadowIntensity() : Color4f(1.f, 1.f, 1.f, 1.f);
+	fsu.shade[0] = shade.r; fsu.shade[1] = shade.g; fsu.shade[2] = shade.b; fsu.shade[3] = shade.a;
+	fsu.params[0] = shadow ? 1.f : 0.f;
+	fsu.params[1] = fsu.params[2] = fsu.params[3] = 0.f;
 
 	// Wireframe is a diagnostic: kill the diffuse term and drive ambient to 1, so with
 	// the white texture bound below every edge comes out full white regardless of the
@@ -443,10 +603,14 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	SDL_GPUBufferBinding ib = {}; ib.buffer = indexBuffer_; ib.offset = 0;
 	SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_16BIT);
 
-	SDL_GPUTextureSamplerBinding ts = {};
-	ts.texture = (wireframe && whiteTexture_) ? whiteTexture_ : colorTexture_;
-	ts.sampler = sampler_;
-	SDL_BindGPUFragmentSamplers(pass, 0, &ts, 1);
+	SDL_GPUTextureSamplerBinding ts[2] = {};
+	ts[0].texture = (wireframe && whiteTexture_) ? whiteTexture_ : colorTexture_;
+	ts[0].sampler = sampler_;
+	// Slot 1 must always carry a texture, even with the shadow disabled; the white 1x1
+	// reads 1.0, which the shader would read as "nothing casts here" if it did sample it.
+	ts[1].texture = shadowMap ? shadowMap : whiteTexture_;
+	ts[1].sampler = shadowSampler_;
+	SDL_BindGPUFragmentSamplers(pass, 0, ts, 2);
 
 	SDL_DrawGPUIndexedPrimitives(pass, indexCount_, 1, 0, 0, 0);
 	SDL_EndGPURenderPass(pass);
