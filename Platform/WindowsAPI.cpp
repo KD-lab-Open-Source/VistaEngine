@@ -15,7 +15,6 @@
 #include <string>
 #include <dirent.h>
 #include <fnmatch.h>
-#include <libgen.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <cstring>
@@ -195,20 +194,37 @@ void _splitpath(const char* path, char* drive, char* dir, char* fname, char* ext
     // The Windows contract sizes the caller's buffers as _MAX_DRIVE/_MAX_DIR/
     // _MAX_FNAME/_MAX_EXT — NOT MAX_PATH. strncpy zero-pads to its full count, so
     // copying MAX_PATH bytes into a _MAX_EXT(256)-byte buffer smashed the stack.
+    //
+    // Both '\\' and '/' separate, as they do for the Windows CRT: the engine's data
+    // paths are backslashed ("Resource\Models\foo.3dx"), so POSIX dirname/basename —
+    // which only know '/' — used to report the whole path as the basename and "." as
+    // the directory. That silently emptied extractFilePath(), and every model texture
+    // resolved to ".\Textures\foo.tga" instead of "Resource\Models\Textures\foo.tga".
     if (drive) drive[0] = '\0';
-    char tmp[MAX_PATH];
-    if (dir)   { strncpy(tmp, path, MAX_PATH-1); tmp[MAX_PATH-1]='\0';
-                 char* d = dirname(tmp);
-                 strncpy(dir, d, _MAX_DIR-1); dir[_MAX_DIR-1]='\0';
-                 strncat(dir, "/", _MAX_DIR - strlen(dir) - 1); }
-    if (fname) { strncpy(tmp, path, MAX_PATH-1); tmp[MAX_PATH-1]='\0';
-                 char* b = basename(tmp); char* dot = strrchr(b, '.');
-                 size_t n = dot ? (size_t)(dot-b) : strlen(b);
-                 if (n > _MAX_FNAME-1) n = _MAX_FNAME-1;
-                 strncpy(fname, b, n); fname[n] = '\0'; }
-    if (ext)   { strncpy(tmp, path, MAX_PATH-1); tmp[MAX_PATH-1]='\0';
-                 char* b = basename(tmp); char* dot = strrchr(b, '.');
-                 strncpy(ext, dot ? dot : "", _MAX_EXT-1); ext[_MAX_EXT-1]='\0'; }
+
+    const char* lastSlash = nullptr;
+    for (const char* p = path; *p; ++p)
+        if (*p == '/' || *p == '\\')
+            lastSlash = p;
+
+    // The name starts after the last separator; the directory (if any) keeps it,
+    // matching _splitpath's "dir includes the trailing slash, else empty".
+    const char* base = lastSlash ? lastSlash + 1 : path;
+    const char* dot = strrchr(base, '.');
+
+    if (dir) {
+        size_t n = lastSlash ? (size_t)(lastSlash + 1 - path) : 0;
+        if (n > _MAX_DIR-1) n = _MAX_DIR-1;
+        memcpy(dir, path, n); dir[n] = '\0';
+    }
+    if (fname) {
+        size_t n = dot ? (size_t)(dot - base) : strlen(base);
+        if (n > _MAX_FNAME-1) n = _MAX_FNAME-1;
+        memcpy(fname, base, n); fname[n] = '\0';
+    }
+    if (ext) {
+        strncpy(ext, dot ? dot : "", _MAX_EXT-1); ext[_MAX_EXT-1]='\0';
+    }
 }
 
 // Advance ctx->dir to the next entry matching ctx->pattern, filling `fd`. The Win32
