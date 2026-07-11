@@ -23,12 +23,12 @@
 // device stays their owner; this renderer asks it to resolve an sPtr wrapper to the
 // SDL_GPUBuffer behind it (and for the current RS_ZWRITEENABLE).
 //
-// Scope: the plain lit path (vsSkin/psSkin) -- skinning, diffuse texture, per-vertex
-// lambert + specular, ambient, the skin-colour tint, the animated UV transform, and the
-// five blend modes cObject3dx::Draw selects between. Still to come, each a shader
-// variant cObject3dx::Draw picks in the original: bump, reflection (planar and cube),
-// the second opacity map, scene shadows, the lightmap, fog of war, fog, point lights,
-// and fur.
+// Scope: the plain lit path (vsSkin/psSkin) and the bump path (vsSkinBump/psSkinBump,
+// with its optional specular map) -- skinning, diffuse texture, lambert + specular,
+// ambient, the skin-colour tint, the animated UV transform, and the five blend modes
+// cObject3dx::Draw selects between. Still to come, each a shader variant
+// cObject3dx::Draw picks in the original: reflection (planar and cube), the second
+// opacity map, scene shadows, the lightmap, fog of war, fog, point lights, and fur.
 
 #include "IRenderDevice.h"    // Color4f, eBlendMode, cTexture, MatXf
 #include <unordered_map>
@@ -73,6 +73,10 @@ public:
 		Color4f lerpColor;              // material.lerp_texture (the unit's skin colour)
 
 		cTexture* texture = nullptr;    // material.Tex[0]
+		// Non-null selects the bump path. Only set when the vertex actually carries a
+		// tangent frame (cStatic3dx::bump) and the original would have picked vsSkinBump.
+		cTexture* bumpTexture = nullptr;    // mat.pBumpTexture
+		cTexture* specularMap = nullptr;    // mat.pSpecularmap (PSSkinBump::SelectSpecularMap)
 		float texturePhase = 0.f;       // animation phase for a multi-frame texture
 		bool tilingWrap = false;        // mat.tiling_diffuse & TILING_U_WRAP
 
@@ -126,8 +130,11 @@ private:
 	struct FSUniform
 	{
 		float ambient[4];
+		float diffuse[4];           // bumpDiffuse (bump path only)
+		float specular[4];          // bumpSpecular: rgb + power in w (bump path only)
 		float lerpPre[4];
 		float params[4];            // x = alphaRef, y = textured, z = selfIllum, w = lerp
+		float params2[4];           // x = specular map present
 	};
 
 	// A state snapshot shared by every draw recorded under it.
@@ -138,9 +145,12 @@ private:
 		int worldOffset;            // into worldPool_, in floats
 		int worldRows;              // 3 per bone; worldRows*4 floats
 		SDL_GPUTexture* texture;    // null -> the 1x1 white stand-in
+		SDL_GPUTexture* bumpTexture;
+		SDL_GPUTexture* specularTexture;
 		SDL_GPUSampler* sampler;
 		eBlendMode blend;
 		bool skinned;               // vertex carries weight bytes (boneCount > 1)
+		bool bump;                  // bump path: tangent-frame vertex, per-pixel lambert
 	};
 
 	struct DrawCmd
@@ -155,9 +165,9 @@ private:
 
 	bool createShaders();
 	// Pipelines vary with the vertex stride (the .3dx vertex grows with bump/uv2/fur),
-	// whether it carries weights, the blend mode and depth write -- all baked into an
-	// SDL GPU pipeline. Built on demand and cached.
-	SDL_GPUGraphicsPipeline* pipelineFor(int stride, bool skinned, eBlendMode blend,
+	// whether it carries weights, whether it takes the bump path, the blend mode and
+	// depth write -- all baked into an SDL GPU pipeline. Built on demand and cached.
+	SDL_GPUGraphicsPipeline* pipelineFor(int stride, bool skinned, bool bump, eBlendMode blend,
 	                                     bool depthWrite, bool wireframe);
 	// Append the current state to states_ if it changed since the last recorded draw.
 	int commitState();
@@ -166,9 +176,12 @@ private:
 	SDL_GPUDevice* device_ = nullptr;
 	SDL_Window*    window_ = nullptr;
 
-	SDL_GPUShader* vsRigid_ = nullptr;   // -DSKINNED=0
-	SDL_GPUShader* vsSkin_  = nullptr;   // -DSKINNED=1
-	SDL_GPUShader* fs_      = nullptr;
+	SDL_GPUShader* vsRigid_     = nullptr;   // -DSKINNED=0 -DBUMP=0
+	SDL_GPUShader* vsSkin_      = nullptr;   // -DSKINNED=1 -DBUMP=0
+	SDL_GPUShader* vsRigidBump_ = nullptr;   // -DSKINNED=0 -DBUMP=1
+	SDL_GPUShader* vsSkinBump_  = nullptr;   // -DSKINNED=1 -DBUMP=1
+	SDL_GPUShader* fs_          = nullptr;   // -DBUMP=0
+	SDL_GPUShader* fsBump_      = nullptr;   // -DBUMP=1
 	bool shadersTried_ = false;
 
 	std::unordered_map<unsigned long long, SDL_GPUGraphicsPipeline*> pipelines_;

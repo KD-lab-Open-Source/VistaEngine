@@ -941,13 +941,15 @@ void cObject3dx::Draw(Camera* camera)
 #else
 		// The SDL analogue of the shader/state block above: one State carries what the
 		// D3D path spreads across SetBlendStateAlphaRef, SetTexturePhase, the vs/ps
-		// Select+SetMaterial calls and VSSkin::Select's bone matrices. Only the plain
-		// lit shader exists so far, so bump/reflection/second-opacity materials draw
-		// through it too (see SDLObject3dxRenderer's header for what that costs).
+		// Select+SetMaterial calls and VSSkin::Select's bone matrices. Reflection and
+		// second-opacity materials have no shader of their own yet, so they fall through
+		// to the plain lit one (see SDLObject3dxRenderer's header for what that costs).
 		if(SDLObject3dxRenderer* renderer = sdlObjectRenderer()){
 			static MatXf world[StaticBunch::max_index];
 			int world_num;
 			GetWorldPoses(bunch, world, world_num);
+
+			const bool no_light_object = getAttribute(ATTRUNKOBJ_NOLIGHT) != 0;
 
 			SDLObject3dxRenderer::State st;
 			st.world = world;
@@ -961,8 +963,21 @@ void cObject3dx::Draw(Camera* camera)
 			st.texturePhase = texture_phase;
 			st.tilingWrap = (mat.tiling_diffuse & StaticMaterial::TILING_U_WRAP) != 0;
 			st.blend = blend;
-			st.noLight = mat.no_light || getAttribute(ATTRUNKOBJ_NOLIGHT) != 0;
+			// vsSkinNoLight is chosen by the object's attribute alone. A no_light *material*
+			// needs no flag: the code above already zeroed its Diffuse and Specular, which
+			// leaves the lit shader emitting exactly the ambient term.
+			st.noLight = no_light_object;
 			st.selfIllumination = !mat.tex_self_illumination.empty() && !getAttribute(ATTR3DX_NO_SELFILLUMINATION);
+
+			// The bump path, on the same terms the original picks vsSkinBump: after the
+			// second-opacity, NOLIGHT and reflection materials have had their turn. It also
+			// needs the tangent frame, which the vertex only carries when pStatic->bump.
+			if(!mat.pSecondOpacityTexture && !no_light_object
+			   && !mat.pReflectTexture && !mat.is_reflect_sky
+			   && mat.pBumpTexture && Option_EnableBump && pStatic->bump){
+				st.bumpTexture = mat.pBumpTexture;
+				st.specularMap = mat.pSpecularmap;   // PSSkinBump::SelectSpecularMap
+			}
 
 			// SetUVTrans, inlined: the animated UV matrix, when this material has one.
 			if(!mat.chains.empty()){

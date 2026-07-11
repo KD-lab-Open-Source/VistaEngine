@@ -1,29 +1,42 @@
 // Skinned-object (3dx) vertex shader for the SDL GPU backend.
 //
-// Ported from the original P2 shader Render/shader/Skin/object_scene_light.vsl --
-// specifically its plain lit path (the one cObject3dx::Draw selects as vsSkin when
-// the material has no bump, no reflection and no second opacity map). Kept:
+// Ported from two original P2 shaders, selected by cObject3dx::Draw per material:
 //
-//   * the same skinning: an index into mWorldM[] per vertex, and for WEIGHT>1 a
-//     weighted sum of the indexed 4x3 world matrices;
-//   * the same per-vertex lighting: lit(N.L, N.H, power) against the *negated*
-//     vLightDirection (which points the way the light travels), diffuse in COLOR0,
-//     specular in COLOR1, and NOLIGHT collapsing diffuse to the ambient colour;
-//   * the same affine UV transform (uvtrans.inl).
+//   BUMP=0  Render/shader/Skin/object_scene_light.vsl (vsSkin) -- the plain lit path,
+//           taken when the material has no bump, no reflection and no second opacity
+//           map. Per-vertex lit(N.L, N.H, power) against the *negated* vLightDirection
+//           (which points the way the light travels): diffuse to COLOR0, specular to
+//           COLOR1, NOLIGHT collapsing diffuse to the ambient colour.
+//
+//   BUMP=1  Render/shader/Skin/object_scene_bump.vsl (vsSkinBump). No per-vertex
+//           diffuse: instead the light and half vectors are pulled into the vertex's
+//           tangent space (T, S, N) and interpolated, and the fragment shader does the
+//           lambert against the bump map. Note the original's mul_trans(v, mWorld) is
+//           R^T*v -- a world vector taken *into* bone space -- which is v.x*r0 +
+//           v.y*r1 + v.z*r2 in our row-per-register layout. Only the specular COLOR1
+//           output (zero here, before point lights) survives.
+//
+// Both keep the same skinning (an index into mWorldM[] per vertex; for WEIGHT>1 a
+// weighted sum of the indexed 4x3 world matrices) and the same affine UV transform
+// (uvtrans.inl).
 //
 // Dropped for now, and each is a `#ifdef` in the original worth returning to: fog,
 // shadow projection, cube/planar reflection, the lightmap/fog-of-war planar UV, the
 // two dynamic point lights (pointcolor.inl), fur displacement and ZBUFFER output.
 //
-// Compiled twice, with -DSKINNED=0 and -DSKINNED=1, mirroring the original's
-// `#if(WEIGHT>1)`: cStatic3dx builds a vertex *without* the weight bytes when a lod
-// binds one bone per vertex, so the two vertex layouts need two shaders.
+// Compiled once per (SKINNED, BUMP) pair. SKINNED mirrors the original's `#if(WEIGHT>1)`:
+// cStatic3dx builds a vertex *without* the weight bytes when a lod binds one bone per
+// vertex. BUMP mirrors the two source files -- and the vertex only carries its tangent
+// frame when cStatic3dx::bump is set.
 //
 // Authored in HLSL; cross-compiled to SPIR-V/MSL with SDL_shadercross. See
 // build-object3dx-shaders.sh.
 
 #ifndef SKINNED
 #define SKINNED 0
+#endif
+#ifndef BUMP
+#define BUMP 0
 #endif
 
 // Matches StaticBunch::max_index -- the most bones one material group can reference.
@@ -58,12 +71,23 @@ struct VSInput
     float4 BlendWeight  : COLOR0;         // offset 28, D3DCOLOR -> UBYTE4_NORM (b,g,r,a)
 #endif
     float2 UV           : TEXCOORD0;      // offset 28 (rigid) / 32 (skinned)
+#if BUMP
+    // cSkinVertex's tangent frame, right after the uv: BINORMAL is GetBumpS, TANGENT is
+    // GetBumpT, and cStatic3dx::CalcBumpSTNorm makes the normal their cross product.
+    float3 Binormal     : BINORMAL;       // uv + 8
+    float3 Tangent      : TANGENT;        // uv + 20
+#endif
 };
 
 struct VSOutput
 {
     float4 Position : SV_Position;
+#if BUMP
+    float3 LightObj : TEXCOORD1;   // light vector in tangent space
+    float3 HalfObj  : TEXCOORD2;   // half vector in tangent space
+#else
     float4 Diffuse  : COLOR0;
+#endif
     float3 Specular : COLOR1;
     float2 UV       : TEXCOORD0;
 };
@@ -113,6 +137,26 @@ VSOutput main(VSInput input)
         output.UV = input.UV;
 
     // --- light --------------------------------------------------------------
+#if BUMP
+    // mul_trans(v, mWorld) == R^T*v: a world-space vector expressed in bone space,
+    // where the vertex's T/S/N frame lives. Then project onto that frame, in the
+    // original's axis order (x=T, y=S, z=N).
+    float3 light = -(LightDirection.x * r0.xyz + LightDirection.y * r1.xyz + LightDirection.z * r2.xyz);
+    output.LightObj = normalize(float3(dot(light, input.Tangent),
+                                       dot(light, input.Binormal),
+                                       dot(light, input.Normal)));
+
+    // The original leaves half_v unnormalized before the frame change, and normalizes
+    // only the tangent-space result.
+    float3 dir = normalize(CameraPos.xyz - worldPos);
+    float3 halfV = dir - LightDirection.xyz;
+    float3 halfObj = halfV.x * r0.xyz + halfV.y * r1.xyz + halfV.z * r2.xyz;
+    output.HalfObj = normalize(float3(dot(halfObj, input.Tangent),
+                                      dot(halfObj, input.Binormal),
+                                      dot(halfObj, input.Normal)));
+
+    output.Specular = 0.0f;   // the bump fragment shader computes its own specular
+#else
     if(Params.y != 0.0f){        // NOLIGHT
         output.Diffuse = Ambient;
         output.Specular = 0.0f;
@@ -130,5 +174,6 @@ VSOutput main(VSInput input)
         output.Diffuse.a = Diffuse.a;
         output.Specular = ret.z * Specular.rgb;
     }
+#endif
     return output;
 }

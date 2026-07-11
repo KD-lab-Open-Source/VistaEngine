@@ -29,12 +29,13 @@ const float ALPHA_TEST_REF = 80.f / 255.f;
 
 // The engine's .3dx vertex offsets, from cSkinVertex (Render/inc/VertexFormat.h):
 // pos float3 @0, blend indices D3DCOLOR @12, normal float3 @16, then -- only when the
-// lod binds more than one bone per vertex -- weights D3DCOLOR @28, then uv float2.
-// Everything after uv (bump S/T, uv2, fur) we don't read, but it does grow the stride.
+// lod binds more than one bone per vertex -- weights D3DCOLOR @28, then uv float2, then
+// -- only when cStatic3dx::bump -- binormal and tangent float3s. Anything past that
+// (uv2, fur) we don't read, but it does grow the stride.
 const int OFS_POSITION = 0;
 const int OFS_INDICES  = 12;
 const int OFS_NORMAL   = 16;
-const int OFS_WEIGHTS  = 28;
+const int OFS_WEIGHTS  = 28;   // uv sits here when the vertex has no weights
 
 // Look up the SDL texture a cTexture is backed by, picking the animation frame the way
 // cD3DRender::SetTexturePhase does. Null => untextured (the white stand-in).
@@ -111,9 +112,12 @@ SDLObject3dxRenderer::~SDLObject3dxRenderer()
 	if(whiteTexture_) SDL_ReleaseGPUTexture(device_, whiteTexture_);
 	if(samplerWrap_)  SDL_ReleaseGPUSampler(device_, samplerWrap_);
 	if(samplerClamp_) SDL_ReleaseGPUSampler(device_, samplerClamp_);
-	if(vsRigid_) SDL_ReleaseGPUShader(device_, vsRigid_);
-	if(vsSkin_)  SDL_ReleaseGPUShader(device_, vsSkin_);
-	if(fs_)      SDL_ReleaseGPUShader(device_, fs_);
+	if(vsRigid_)     SDL_ReleaseGPUShader(device_, vsRigid_);
+	if(vsSkin_)      SDL_ReleaseGPUShader(device_, vsSkin_);
+	if(vsRigidBump_) SDL_ReleaseGPUShader(device_, vsRigidBump_);
+	if(vsSkinBump_)  SDL_ReleaseGPUShader(device_, vsSkinBump_);
+	if(fs_)          SDL_ReleaseGPUShader(device_, fs_);
+	if(fsBump_)      SDL_ReleaseGPUShader(device_, fsBump_);
 }
 
 // ---------------------------------------------------------------------------
@@ -121,25 +125,31 @@ SDLObject3dxRenderer::~SDLObject3dxRenderer()
 // ---------------------------------------------------------------------------
 bool SDLObject3dxRenderer::createShaders()
 {
-	if(shadersTried_) return vsRigid_ && vsSkin_ && fs_;
+	if(shadersTried_) return vsRigid_ && vsSkin_ && vsRigidBump_ && vsSkinBump_ && fs_ && fsBump_;
 	shadersTried_ = true;
 	if(!device_ || !window_) return false;
 
 	SDL_GPUShaderFormat formats = SDL_GetGPUShaderFormats(device_);
 	SDL_GPUShaderFormat fmt;
 	const char* entry;
-	const unsigned char *rigidCode, *skinCode, *fsCode;
-	unsigned int rigidSize, skinSize, fsSize;
+	const unsigned char *rigidCode, *skinCode, *rigidBumpCode, *skinBumpCode, *fsCode, *fsBumpCode;
+	unsigned int rigidSize, skinSize, rigidBumpSize, skinBumpSize, fsSize, fsBumpSize;
 	if(formats & SDL_GPU_SHADERFORMAT_MSL){
 		fmt = SDL_GPU_SHADERFORMAT_MSL; entry = "main0";
-		rigidCode = object3dx_rigid_vert_msl; rigidSize = object3dx_rigid_vert_msl_len;
-		skinCode  = object3dx_skin_vert_msl;  skinSize  = object3dx_skin_vert_msl_len;
-		fsCode    = object3dx_frag_msl;       fsSize    = object3dx_frag_msl_len;
+		rigidCode     = object3dx_rigid_vert_msl;      rigidSize     = object3dx_rigid_vert_msl_len;
+		skinCode      = object3dx_skin_vert_msl;       skinSize      = object3dx_skin_vert_msl_len;
+		rigidBumpCode = object3dx_rigid_bump_vert_msl; rigidBumpSize = object3dx_rigid_bump_vert_msl_len;
+		skinBumpCode  = object3dx_skin_bump_vert_msl;  skinBumpSize  = object3dx_skin_bump_vert_msl_len;
+		fsCode        = object3dx_frag_msl;            fsSize        = object3dx_frag_msl_len;
+		fsBumpCode    = object3dx_bump_frag_msl;       fsBumpSize    = object3dx_bump_frag_msl_len;
 	} else if(formats & SDL_GPU_SHADERFORMAT_SPIRV){
 		fmt = SDL_GPU_SHADERFORMAT_SPIRV; entry = "main";
-		rigidCode = object3dx_rigid_vert_spv; rigidSize = object3dx_rigid_vert_spv_len;
-		skinCode  = object3dx_skin_vert_spv;  skinSize  = object3dx_skin_vert_spv_len;
-		fsCode    = object3dx_frag_spv;       fsSize    = object3dx_frag_spv_len;
+		rigidCode     = object3dx_rigid_vert_spv;      rigidSize     = object3dx_rigid_vert_spv_len;
+		skinCode      = object3dx_skin_vert_spv;       skinSize      = object3dx_skin_vert_spv_len;
+		rigidBumpCode = object3dx_rigid_bump_vert_spv; rigidBumpSize = object3dx_rigid_bump_vert_spv_len;
+		skinBumpCode  = object3dx_skin_bump_vert_spv;  skinBumpSize  = object3dx_skin_bump_vert_spv_len;
+		fsCode        = object3dx_frag_spv;            fsSize        = object3dx_frag_spv_len;
+		fsBumpCode    = object3dx_bump_frag_spv;       fsBumpSize    = object3dx_bump_frag_spv_len;
 	} else {
 		fprintf(stderr, "SDLObject3dxRenderer: no supported shader format (0x%x)\n", formats);
 		return false;
@@ -148,34 +158,38 @@ bool SDLObject3dxRenderer::createShaders()
 	SDL_GPUShaderCreateInfo vsi = {};
 	vsi.entrypoint = entry; vsi.format = fmt; vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
 	vsi.num_uniform_buffers = 1;    // MVP + material + bone matrices
-	vsi.code = rigidCode; vsi.code_size = rigidSize;
-	vsRigid_ = SDL_CreateGPUShader(device_, &vsi);
-	vsi.code = skinCode;  vsi.code_size = skinSize;
-	vsSkin_ = SDL_CreateGPUShader(device_, &vsi);
+	vsi.code = rigidCode;     vsi.code_size = rigidSize;     vsRigid_     = SDL_CreateGPUShader(device_, &vsi);
+	vsi.code = skinCode;      vsi.code_size = skinSize;      vsSkin_      = SDL_CreateGPUShader(device_, &vsi);
+	vsi.code = rigidBumpCode; vsi.code_size = rigidBumpSize; vsRigidBump_ = SDL_CreateGPUShader(device_, &vsi);
+	vsi.code = skinBumpCode;  vsi.code_size = skinBumpSize;  vsSkinBump_  = SDL_CreateGPUShader(device_, &vsi);
 
 	SDL_GPUShaderCreateInfo fsi = {};
-	fsi.code = fsCode; fsi.code_size = fsSize; fsi.entrypoint = entry;
-	fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+	fsi.entrypoint = entry; fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+	fsi.num_uniform_buffers = 1;    // material colours + skin-colour lerp + flags
+	fsi.code = fsCode; fsi.code_size = fsSize;
 	fsi.num_samplers = 1;           // diffuse
-	fsi.num_uniform_buffers = 1;    // ambient + skin-colour lerp + flags
 	fs_ = SDL_CreateGPUShader(device_, &fsi);
+	fsi.code = fsBumpCode; fsi.code_size = fsBumpSize;
+	fsi.num_samplers = 3;           // diffuse + bump + specular map
+	fsBump_ = SDL_CreateGPUShader(device_, &fsi);
 
-	if(!vsRigid_ || !vsSkin_ || !fs_){
+	if(!vsRigid_ || !vsSkin_ || !vsRigidBump_ || !vsSkinBump_ || !fs_ || !fsBump_){
 		fprintf(stderr, "SDLObject3dxRenderer: CreateGPUShader failed: %s\n", SDL_GetError());
 		return false;
 	}
-	fprintf(stderr, "SDLObject3dxRenderer: object3dx shaders ready\n");
+	fprintf(stderr, "SDLObject3dxRenderer: object3dx shaders ready (plain + bump)\n");
 	return true;
 }
 
-SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skinned, eBlendMode blend,
-                                                           bool depthWrite, bool wireframe)
+SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skinned, bool bump,
+                                                           eBlendMode blend, bool depthWrite, bool wireframe)
 {
 	const unsigned long long key = (unsigned long long)(unsigned)stride
 	                             | ((unsigned long long)skinned    << 16)
 	                             | ((unsigned long long)blend      << 17)
 	                             | ((unsigned long long)depthWrite << 24)
-	                             | ((unsigned long long)wireframe  << 25);
+	                             | ((unsigned long long)wireframe  << 25)
+	                             | ((unsigned long long)bump       << 26);
 	auto it = pipelines_.find(key);
 	if(it != pipelines_.end())
 		return it->second;
@@ -191,19 +205,25 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 	vbDesc.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
 
 	// Attribute locations follow the HLSL struct field order; the uv slides one slot
-	// down when the weights are present. Blend indices arrive as raw bytes (the shader
-	// takes them in memory order, as D3DCOLORtoUBYTE4 did); weights are normalized.
-	SDL_GPUVertexAttribute attrs[5] = {};
+	// down when the weights are present, and the tangent frame follows it. Blend indices
+	// arrive as raw bytes (the shader takes them in memory order, as D3DCOLORtoUBYTE4
+	// did); weights are normalized.
+	SDL_GPUVertexAttribute attrs[7] = {};
 	int n = 0;
-	attrs[n].location = 0; attrs[n].buffer_slot = 0; attrs[n].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3; attrs[n].offset = OFS_POSITION; n++;
-	attrs[n].location = 1; attrs[n].buffer_slot = 0; attrs[n].format = SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4; attrs[n].offset = OFS_INDICES; n++;
-	attrs[n].location = 2; attrs[n].buffer_slot = 0; attrs[n].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3; attrs[n].offset = OFS_NORMAL; n++;
+	int loc = 0;
+	attrs[n].location = loc++; attrs[n].buffer_slot = 0; attrs[n].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3; attrs[n].offset = OFS_POSITION; n++;
+	attrs[n].location = loc++; attrs[n].buffer_slot = 0; attrs[n].format = SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4; attrs[n].offset = OFS_INDICES; n++;
+	attrs[n].location = loc++; attrs[n].buffer_slot = 0; attrs[n].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3; attrs[n].offset = OFS_NORMAL; n++;
 	if(skinned){
-		attrs[n].location = 3; attrs[n].buffer_slot = 0; attrs[n].format = SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4_NORM; attrs[n].offset = OFS_WEIGHTS; n++;
-		attrs[n].location = 4; attrs[n].buffer_slot = 0; attrs[n].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2; attrs[n].offset = OFS_WEIGHTS + 4; n++;
+		attrs[n].location = loc++; attrs[n].buffer_slot = 0; attrs[n].format = SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4_NORM; attrs[n].offset = OFS_WEIGHTS; n++;
 	}
-	else{
-		attrs[n].location = 3; attrs[n].buffer_slot = 0; attrs[n].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2; attrs[n].offset = OFS_WEIGHTS; n++;
+	const int ofsUV = skinned ? OFS_WEIGHTS + 4 : OFS_WEIGHTS;
+	attrs[n].location = loc++; attrs[n].buffer_slot = 0; attrs[n].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2; attrs[n].offset = (Uint32)ofsUV; n++;
+	if(bump){
+		// cSkinVertex: offset_bump_s (BINORMAL) then offset_bump_t (TANGENT), the two
+		// float3s straight after the uv.
+		attrs[n].location = loc++; attrs[n].buffer_slot = 0; attrs[n].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3; attrs[n].offset = (Uint32)(ofsUV + 8); n++;
+		attrs[n].location = loc++; attrs[n].buffer_slot = 0; attrs[n].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3; attrs[n].offset = (Uint32)(ofsUV + 20); n++;
 	}
 
 	// The blend modes cObject3dx::Draw asks for, as cD3DRender::SetBlendState builds
@@ -243,8 +263,9 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 	}
 
 	SDL_GPUGraphicsPipelineCreateInfo pci = {};
-	pci.vertex_shader = skinned ? vsSkin_ : vsRigid_;
-	pci.fragment_shader = fs_;
+	pci.vertex_shader = bump ? (skinned ? vsSkinBump_ : vsRigidBump_)
+	                         : (skinned ? vsSkin_ : vsRigid_);
+	pci.fragment_shader = bump ? fsBump_ : fs_;
 	pci.vertex_input_state.vertex_buffer_descriptions = &vbDesc;
 	pci.vertex_input_state.num_vertex_buffers = 1;
 	pci.vertex_input_state.vertex_attributes = attrs;
@@ -264,8 +285,8 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 
 	SDL_GPUGraphicsPipeline* pipeline = SDL_CreateGPUGraphicsPipeline(device_, &pci);
 	if(!pipeline)
-		fprintf(stderr, "SDLObject3dxRenderer: pipeline (stride %d, skinned %d, blend %d) failed: %s\n",
-		        stride, (int)skinned, (int)blend, SDL_GetError());
+		fprintf(stderr, "SDLObject3dxRenderer: pipeline (stride %d, skinned %d, bump %d, blend %d) failed: %s\n",
+		        stride, (int)skinned, (int)bump, (int)blend, SDL_GetError());
 	pipelines_[key] = pipeline;
 	return pipeline;
 }
@@ -340,6 +361,11 @@ void SDLObject3dxRenderer::SetState(const State& state, Camera* camera)
 	else
 		setVec4(current_.fs.ambient, state.ambient);
 
+	// bumpDiffuse / bumpSpecular: read only by the bump path, which has no per-vertex
+	// diffuse to interpolate.
+	setVec4(current_.fs.diffuse, state.diffuse);
+	setVec4(current_.fs.specular, state.specular);   // .a = specular power
+
 	// PSSkin::SetMaterial's premultiplied skin-colour lerp: rgb = c.rgb*c.a, a = 1-c.a.
 	const bool lerp = state.lerpColor.a > 0.001f;
 	current_.fs.lerpPre[0] = state.lerpColor.r * state.lerpColor.a;
@@ -348,11 +374,20 @@ void SDLObject3dxRenderer::SetState(const State& state, Camera* camera)
 	current_.fs.lerpPre[3] = 1.f - state.lerpColor.a;
 
 	current_.texture = sdlTextureOf(state.texture, state.texturePhase);
+	current_.bumpTexture = sdlTextureOf(state.bumpTexture, state.texturePhase);
+	current_.specularTexture = sdlTextureOf(state.specularMap, state.texturePhase);
 	current_.sampler = state.tilingWrap ? samplerWrap_ : samplerClamp_;
+
+	// The bump fragment shader always samples the diffuse map (the original has no
+	// NOTEXTURE variant of psSkinBump), so an untextured material can't take that path.
+	current_.bump = current_.bumpTexture != nullptr && current_.texture != nullptr;
+
 	current_.fs.params[0] = state.blend == ALPHA_TEST ? ALPHA_TEST_REF : 0.f;
 	current_.fs.params[1] = current_.texture ? 1.f : 0.f;
 	current_.fs.params[2] = state.selfIllumination ? 1.f : 0.f;
 	current_.fs.params[3] = lerp ? 1.f : 0.f;
+	current_.fs.params2[0] = current_.specularTexture ? 1.f : 0.f;
+	current_.fs.params2[1] = current_.fs.params2[2] = current_.fs.params2[3] = 0.f;
 
 	current_.blend = state.blend;
 	current_.skinned = boneCount > 1;
@@ -364,7 +399,10 @@ void SDLObject3dxRenderer::SetState(const State& state, Camera* camera)
 void SDLObject3dxRenderer::SetAlphaColor(const Color4f& color)
 {
 	if(!currentValid_) return;
+	// The original writes both: VSSkin::SetAlphaColor sets vDiffuse (the per-vertex lit
+	// colour) and PSSkin::SetAlphaColor sets bumpDiffuse (what the bump path shades with).
 	setVec4(current_.vs.diffuse, color);
+	setVec4(current_.fs.diffuse, color);
 	currentDirty_ = true;
 }
 
@@ -455,7 +493,7 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 	for(const DrawCmd& d : draws_){
 		const StateBlock& st = states_[d.state];
 
-		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, st.blend, d.depthWrite, wireframe);
+		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, st.bump, st.blend, d.depthWrite, wireframe);
 		if(!pipeline) continue;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);
@@ -478,10 +516,19 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 			SDL_PushGPUVertexUniformData(cmd, 0, vsUniform, sizeof(vsUniform));
 			SDL_PushGPUFragmentUniformData(cmd, 0, &st.fs, sizeof(st.fs));
 
-			SDL_GPUTextureSamplerBinding ts = {};
-			ts.texture = st.texture ? st.texture : whiteTexture_;
-			ts.sampler = st.sampler ? st.sampler : samplerWrap_;
-			SDL_BindGPUFragmentSamplers(pass, 0, &ts, 1);
+			// The bump fragment shader declares three samplers, so all three must be
+			// bound even when the material has no specular map (Params2.x gates the
+			// sample; the white stand-in is never read).
+			SDL_GPUTextureSamplerBinding ts[3] = {};
+			ts[0].texture = st.texture ? st.texture : whiteTexture_;
+			ts[0].sampler = st.sampler ? st.sampler : samplerWrap_;
+			if(st.bump){
+				ts[1].texture = st.bumpTexture;
+				ts[1].sampler = samplerWrap_;   // the original's sampler_wrap_linear on stage 1
+				ts[2].texture = st.specularTexture ? st.specularTexture : whiteTexture_;
+				ts[2].sampler = samplerWrap_;
+			}
+			SDL_BindGPUFragmentSamplers(pass, 0, ts, st.bump ? 3 : 1);
 			boundState = d.state;
 		}
 

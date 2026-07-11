@@ -234,10 +234,18 @@ void StaticMaterial::createTextures(cStatic3dx* object)
 	if(gb_RenderDevice3D) // no world-render GPU device on SDL backend yet
 		gb_RenderDevice3D->SetCurrentConvertDot3Mul(10.0f);//Потом читать из файла
 
-	if(!tex_bump.empty() && gb_RenderDevice3D && gb_RenderDevice3D->IsPS20())
+	// Bump and its specular map need pixel shader 2.0. The SDL GPU backend is well past
+	// that, and has no cD3DRender to ask, so it takes them unconditionally.
+#ifdef _WIN32
+	const bool supportBump = gb_RenderDevice3D && gb_RenderDevice3D->IsPS20();
+#else
+	const bool supportBump = true;
+#endif
+
+	if(!tex_bump.empty() && supportBump)
 		pBumpTexture = object->LoadTexture(tex_bump.c_str(),"Bump");
 
-	if(!tex_specularmap.empty() && gb_RenderDevice3D && gb_RenderDevice3D->IsPS20())
+	if(!tex_specularmap.empty() && supportBump)
 		pSpecularmap = object->LoadTexture(tex_specularmap.c_str(),"Specular");
 
 	if(!tex_secondopacity.empty())
