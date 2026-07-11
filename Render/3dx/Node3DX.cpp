@@ -10,9 +10,25 @@
 #include "OcclusionQuery.h"
 #include "XMath/SafeMath.h"
 #include "Terra/vmap.h"
+#ifndef _WIN32
+#include "Render/SDLObject3dxRenderer.h"   // objects are drawn by SDLObject3dxRenderer,
+#include "Render/SDLRenderDevice.h"        // which the SDL device hands out
+#endif
 
 float AlphaMaxiumBlend=0.95f;
 float AlphaMiniumShadow=0.0f;
+
+#ifndef _WIN32
+namespace {
+// The SDL backend's 3dx renderer, or null under any other device. cObject3dx::Draw
+// drives it exactly as it drives pShader3dx's shader objects on Windows.
+SDLObject3dxRenderer* sdlObjectRenderer()
+{
+	cSDLRenderDevice* dev = dynamic_cast<cSDLRenderDevice*>(gb_RenderDevice);
+	return dev ? dev->objectRenderer() : 0;
+}
+} // namespace
+#endif
 
 /*
 Оптимизация.
@@ -647,6 +663,14 @@ void cObject3dx::Draw(Camera* camera)
 
 	Update();
 
+#ifndef _WIN32
+	// Only the main scene camera draws objects: the shadow-map, float-Z and reflection
+	// passes have no SDL equivalent yet (DrawShadowAndZbuffer is D3D-only), and each
+	// would need a render target of its own.
+	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_SHADOWMAP|ATTRCAMERA_FLOAT_ZBUFFER|ATTRCAMERA_REFLECTION))
+		return;
+#endif
+
 	if(camera->getAttribute(ATTRCAMERA_SHADOWMAP)){
 		DrawShadowAndZbuffer(camera,false);
 		return;
@@ -914,6 +938,51 @@ void cObject3dx::Draw(Camera* camera)
 		}
 		else
 			DrawMaterialGroup(bunch);
+#else
+		// The SDL analogue of the shader/state block above: one State carries what the
+		// D3D path spreads across SetBlendStateAlphaRef, SetTexturePhase, the vs/ps
+		// Select+SetMaterial calls and VSSkin::Select's bone matrices. Only the plain
+		// lit shader exists so far, so bump/reflection/second-opacity materials draw
+		// through it too (see SDLObject3dxRenderer's header for what that costs).
+		if(SDLObject3dxRenderer* renderer = sdlObjectRenderer()){
+			static MatXf world[StaticBunch::max_index];
+			int world_num;
+			GetWorldPoses(bunch, world, world_num);
+
+			SDLObject3dxRenderer::State st;
+			st.world = world;
+			st.worldNum = world_num;
+			st.boneCount = lod.blend_indices;
+			st.ambient = material.Ambient;
+			st.diffuse = material.Diffuse;
+			st.specular = material.Specular;      // .a = specular power
+			st.lerpColor = material.lerp_texture;
+			st.texture = diffuse_texture;
+			st.texturePhase = texture_phase;
+			st.tilingWrap = (mat.tiling_diffuse & StaticMaterial::TILING_U_WRAP) != 0;
+			st.blend = blend;
+			st.noLight = mat.no_light || getAttribute(ATTRUNKOBJ_NOLIGHT) != 0;
+			st.selfIllumination = !mat.tex_self_illumination.empty() && !getAttribute(ATTR3DX_NO_SELFILLUMINATION);
+
+			// SetUVTrans, inlined: the animated UV matrix, when this material has one.
+			if(!mat.chains.empty()){
+				StaticMaterialAnimation& mat_chain = mat.chains[mat_anim.chain];
+				if(!mat_chain.uv.values.empty()){
+					mat_chain.uv.InterpolateSlow(mat_anim.phase, st.uvTrans);
+					st.hasUVTrans = true;
+				}
+			}
+
+			renderer->SetState(st, camera);
+
+			// The 2-pass z prepass (draw_2pass) is pure D3D render-state work; the SDL
+			// pipelines carry their own depth state, so the transparent groups just draw
+			// in the sorted pass with depth write off.
+			if(is_opacity_vg)
+				DrawMaterialGroupSelectively(bunch, material.Diffuse, draw_opacity, 0, 0);
+			else
+				DrawMaterialGroup(bunch);
+		}
 #endif
 	}
 
@@ -976,12 +1045,21 @@ void cObject3dx::SetSecondUVTrans(bool use,class VSSkinBase* vs,StaticMaterial& 
 void cObject3dx::DrawMaterialGroup(StaticBunch& bunch)
 {
 	cStatic3dx::StaticLod& lod=pStatic->lods[iLOD];
+#ifndef _WIN32
+	SDLObject3dxRenderer* renderer = sdlObjectRenderer();
+	if(!renderer)
+		return;
+#endif
 	for(int ivg=0;ivg<bunch.visibleGroups.size();ivg++){
 		cTempVisibleGroup& vg = bunch.visibleGroups[ivg];
 		if(isVisible(vg)){
 			int num_polygon = vg.num_polygon;
 			num_out_polygons += num_polygon;
+#ifdef _WIN32
 			gb_RenderDevice3D->DrawIndexedPrimitive(lod.vb,bunch.offset_vertex,bunch.num_vertex,lod.ib,vg.begin_polygon + bunch.offset_polygon,num_polygon);
+#else
+			renderer->DrawIndexedPrimitive(lod.vb,bunch.offset_vertex,lod.ib,vg.begin_polygon + bunch.offset_polygon,num_polygon);
+#endif
 		}
 	}
 }
@@ -989,6 +1067,11 @@ void cObject3dx::DrawMaterialGroup(StaticBunch& bunch)
 void cObject3dx::DrawMaterialGroupSelectively(StaticBunch& bunch,const Color4f& color,bool draw_opacity,VSSkin* vs,PSSkin* ps)
 {
 	cStatic3dx::StaticLod& lod=pStatic->lods[iLOD];
+#ifndef _WIN32
+	SDLObject3dxRenderer* renderer = sdlObjectRenderer();
+	if(!renderer)
+		return;
+#endif
 	for(int ivg=0;ivg<bunch.visibleGroups.size();ivg++){
 		cTempVisibleGroup& vg=bunch.visibleGroups[ivg];
 		VisibilityGroup& group=visibilityGroups_[vg.visibilitySet];
@@ -998,17 +1081,27 @@ void cObject3dx::DrawMaterialGroupSelectively(StaticBunch& bunch,const Color4f& 
 					continue;
 				Color4f c(color);
 				c.a*=group.alpha;
+#ifdef _WIN32
 				vs->SetAlphaColor(c);
 				ps->SetAlphaColor(c);
+#else
+				renderer->SetAlphaColor(c);
+#endif
 			}
 			else if(group.alpha<AlphaMaxiumBlend)
 				continue;
 
 			//БЛИН!!! Этот подход не дает истинной гибкости!
 
+#ifdef _WIN32
 			gb_RenderDevice3D->DrawIndexedPrimitive(
 				lod.vb,bunch.offset_vertex,bunch.num_vertex,
 				lod.ib,vg.begin_polygon+bunch.offset_polygon,vg.num_polygon);
+#else
+			renderer->DrawIndexedPrimitive(
+				lod.vb,bunch.offset_vertex,
+				lod.ib,vg.begin_polygon+bunch.offset_polygon,vg.num_polygon);
+#endif
 
 		}
 	}

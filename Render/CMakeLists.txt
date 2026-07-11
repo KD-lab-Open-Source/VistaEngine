@@ -80,6 +80,7 @@ else()
     list(APPEND RENDER_SOURCES SDLRenderDevice.cpp)
     list(APPEND RENDER_SOURCES SDLUIRenderer.cpp)
     list(APPEND RENDER_SOURCES SDLTileMapRenderer.cpp)
+    list(APPEND RENDER_SOURCES SDLObject3dxRenderer.cpp)
     # Vertex-format declaration tables (BEGIN_VERTEX_DECLARATION). Pure data — no
     # device calls — so it's portable: it feeds vertex::declaration layouts to the
     # SDL backend via the portable cD3DRender::RegisterVertexDeclaration (RenderStub).

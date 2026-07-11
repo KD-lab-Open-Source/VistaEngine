@@ -7,10 +7,11 @@
 //
 // Reached through the engine's own delegation chain -- cScene::Draw ->
 // Camera::DrawScene -> Camera::DrawTilemapObject -> cTileMap::Draw -- which forwards
-// here via cSDLRenderDevice::drawTileMap. Unlike SDLUIRenderer, which batches during
-// the scene and draws once at EndScene, this renderer draws immediately: it opens its
-// own render pass (colour + depth) inside cTileMap::Draw, so its pass lands in the
-// frame's command buffer before the UI pass that EndScene records on top.
+// here via cSDLRenderDevice::drawTileMap. Unlike SDLUIRenderer and SDLObject3dxRenderer,
+// which batch during the scene and draw once at EndScene, this renderer draws
+// immediately: it opens its own render pass inside cTileMap::Draw, so its pass lands in
+// the frame's command buffer before the object and UI passes recorded on top of it.
+// Colour and depth targets belong to the device and are shared with those passes.
 //
 // It owns its GPU geometry outright (raw SDL_GPUBuffer, not the device's sPtr VB/IB
 // slots) because the mesh is built here, from vMap, and shared with nothing.
@@ -44,14 +45,15 @@ public:
 	SDLTileMapRenderer& operator=(const SDLTileMapRenderer&) = delete;
 
 	// Build the terrain mesh if needed (uploading through cmd), then draw it in its
-	// own colour+depth render pass. `clear` means this pass owns the frame's colour
-	// clear; depth is cleared every time regardless. `wireframe` follows the device's
-	// RS_FILLMODE (debugWireFrame): it draws unlit white edges instead of the shaded
-	// surface, so the grid is legible even where the map's baked colour is black.
-	// Returns true if the pass ran and the colour clear was consumed.
-	bool Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
+	// own render pass against the device's shared colour and depth targets. `clear` /
+	// `clearDepth` mean this pass owns the frame's colour / depth clear -- true only
+	// when no earlier pass took them. `wireframe` follows the device's RS_FILLMODE
+	// (debugWireFrame): it draws unlit white edges instead of the shaded surface, so
+	// the grid is legible even where the map's baked colour is black.
+	// Returns true if the pass ran.
+	bool Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, SDL_GPUTexture* depth,
 	          int screenW, int screenH, bool clear, const float clearColor[4],
-	          cTileMap* tileMap, Camera* camera, bool wireframe);
+	          bool clearDepth, cTileMap* tileMap, Camera* camera, bool wireframe);
 
 private:
 	// World-space position + normal, matching tilemap.vert.hlsl's two attributes.
@@ -60,7 +62,6 @@ private:
 	struct Vertex { float x, y, z; float nx, ny, nz; };
 
 	void createPipeline();
-	bool ensureDepth(int w, int h);
 	// Rebuild when vMap is reloaded in place for a new mission. Returns false while
 	// the heightfield is not loaded yet (caller retries next frame) or on failure.
 	bool ensureMesh(SDL_GPUCommandBuffer* cmd);
@@ -81,9 +82,6 @@ private:
 	int             indexCount_   = 0;
 	SDL_GPUTexture* colorTexture_ = nullptr;   // baked per-cell surface colour (vMap.clrBuf)
 	SDL_GPUTexture* whiteTexture_ = nullptr;   // 1x1, substituted in wireframe mode
-
-	SDL_GPUTexture* depthTexture_ = nullptr;
-	int depthW_ = 0, depthH_ = 0;
 
 	std::string builtWorld_;        // vMap world the current mesh was built for
 	bool        buildFailed_ = false;

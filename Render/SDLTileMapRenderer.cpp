@@ -45,7 +45,6 @@ SDLTileMapRenderer::~SDLTileMapRenderer()
 	if(!device_) return;
 	releaseMesh();
 	if(whiteTexture_) SDL_ReleaseGPUTexture(device_, whiteTexture_);
-	if(depthTexture_) SDL_ReleaseGPUTexture(device_, depthTexture_);
 	if(sampler_)      SDL_ReleaseGPUSampler(device_, sampler_);
 	if(pipelineFill_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineFill_);
 	if(pipelineLine_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineLine_);
@@ -187,24 +186,6 @@ void SDLTileMapRenderer::createPipeline()
 
 	fprintf(stderr, "SDLTileMapRenderer: tilemap pipeline %s (wireframe %s)\n",
 	        pipelineFill_ ? "ready" : "FAILED", pipelineLine_ ? "ready" : "FAILED");
-}
-
-bool SDLTileMapRenderer::ensureDepth(int w, int h)
-{
-	if(!device_ || w <= 0 || h <= 0) return false;
-	if(depthTexture_ && depthW_ == w && depthH_ == h) return true;
-	if(depthTexture_) SDL_ReleaseGPUTexture(device_, depthTexture_);
-
-	SDL_GPUTextureCreateInfo ti = {};
-	ti.type = SDL_GPU_TEXTURETYPE_2D;
-	ti.format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
-	ti.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET;
-	ti.width = (Uint32)w; ti.height = (Uint32)h;
-	ti.layer_count_or_depth = 1; ti.num_levels = 1;
-	depthTexture_ = SDL_CreateGPUTexture(device_, &ti);
-	depthW_ = depthTexture_ ? w : 0;
-	depthH_ = depthTexture_ ? h : 0;
-	return depthTexture_ != nullptr;
 }
 
 // ---------------------------------------------------------------------------
@@ -382,37 +363,21 @@ bool SDLTileMapRenderer::ensureMesh(SDL_GPUCommandBuffer* cmd)
 // ---------------------------------------------------------------------------
 // Frame
 // ---------------------------------------------------------------------------
-bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
-                              int screenW, int screenH, bool clear, const float clearColor[4],
-                              cTileMap* tileMap, Camera* camera, bool wireframe)
+bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, SDL_GPUTexture* depth,
+                              int /*screenW*/, int /*screenH*/, bool clear, const float clearColor[4],
+                              bool clearDepth, cTileMap* tileMap, Camera* camera, bool wireframe)
 {
 	// Fall back to the solid pipeline if the LINE variant failed to build.
 	SDL_GPUGraphicsPipeline* pipeline = (wireframe && pipelineLine_) ? pipelineLine_ : pipelineFill_;
-	if(!device_ || !pipeline || !cmd || !target || !camera)
+	if(!device_ || !pipeline || !cmd || !target || !depth || !camera)
 		return false;
-	if(!ensureMesh(cmd) || !ensureDepth(screenW, screenH))
+	if(!ensureMesh(cmd))
 		return false;
 
-	// The world camera's near plane (30 on the Menu mission) can sit *exactly* at a
-	// flat heightfield's view depth: the Menu terrain is a flat plane at world z==30
-	// with the camera looking straight down from z~60, so every terrain vertex lands
-	// right on the near plane and the whole grid is near-clipped. Real missions put the
-	// camera well beyond near, so terrain projects normally; rebuild the projection
-	// with a pulled-in near anyway so the Menu stays visible. TODO: drop this once the
-	// scene owns a proper near/far, since it also skews the depth range other renderers
-	// will share.
-	Mat4f proj = camera->matProj;
-	if(proj._33 != 0.f && proj._33 != 1.f){
-		const float n = -proj._43 / proj._33;             // near = -_43/_33
-		const float f = proj._33 * n / (proj._33 - 1.f);  // far  = _33*n/(_33-1)
-		const float nn = 1.f;                             // pulled-in near
-		proj._33 = f / (f - nn);
-		proj._43 = -proj._33 * nn;
-	}
-	Mat4f mvp = camera->matView * proj;
-
+	// The camera's own view-projection, unmodified. The depth this pass writes is then
+	// in the same space as every other renderer's, so they occlude each other correctly.
 	VSUniform vsu;
-	std::memcpy(vsu.mvp, &mvp, sizeof(vsu.mvp));
+	std::memcpy(vsu.mvp, &camera->matViewProj, sizeof(vsu.mvp));
 	vsu.uv[0] = 0.f; vsu.uv[1] = 0.f;             // UV.xy offset
 	vsu.uv[2] = uvScale_[0]; vsu.uv[3] = uvScale_[1];  // UV.zw scale
 
@@ -458,10 +423,10 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	ct.store_op = SDL_GPU_STOREOP_STORE;
 
 	SDL_GPUDepthStencilTargetInfo dt = {};
-	dt.texture = depthTexture_;
+	dt.texture = depth;
 	dt.clear_depth = 1.0f;
-	dt.load_op = SDL_GPU_LOADOP_CLEAR;
-	dt.store_op = SDL_GPU_STOREOP_STORE;   // kept: the water/object renderers will depth-test against it
+	dt.load_op = clearDepth ? SDL_GPU_LOADOP_CLEAR : SDL_GPU_LOADOP_LOAD;
+	dt.store_op = SDL_GPU_STOREOP_STORE;   // kept: the object/water renderers depth-test against it
 	dt.stencil_load_op = SDL_GPU_LOADOP_DONT_CARE;
 	dt.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
 

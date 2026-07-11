@@ -13,6 +13,7 @@
 
 #include "SDLUIRenderer.h"
 #include "SDLTileMapRenderer.h"
+#include "SDLObject3dxRenderer.h"
 
 // ---------------------------------------------------------------------------
 // Base cInterfaceRenderDevice members. On Windows these live in
@@ -100,6 +101,8 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND hWnd, int
 		uiRenderer_ = std::make_unique<SDLUIRenderer>(device_, window_);
 	if(!tileMapRenderer_)
 		tileMapRenderer_ = std::make_unique<SDLTileMapRenderer>(device_, window_);
+	if(!objectRenderer_)
+		objectRenderer_ = std::make_unique<SDLObject3dxRenderer>(this, device_, window_);
 
 	// Build the skinned-vertex declarations (on Windows cD3DRender does this at
 	// device init via CreateVertexDeclaration; cSkinVertex::Register is portable
@@ -122,8 +125,14 @@ int cSDLRenderDevice::Done()
 	// The renderers hold GPU objects built on device_, so they must go first.
 	uiRenderer_.reset();
 	tileMapRenderer_.reset();
+	objectRenderer_.reset();
 
 	if(device_){
+		if(depthTexture_){
+			SDL_ReleaseGPUTexture(device_, depthTexture_);
+			depthTexture_ = nullptr;
+			depthW_ = depthH_ = 0;
+		}
 		for(auto& kv : textures_)
 			if(kv.second.tex) SDL_ReleaseGPUTexture(device_, kv.second.tex);
 		textures_.clear();
@@ -192,7 +201,10 @@ int cSDLRenderDevice::BeginScene()
 
 	if(uiRenderer_)
 		uiRenderer_->BeginFrame();
+	if(objectRenderer_)
+		objectRenderer_->BeginFrame();
 	frameCleared_ = false;
+	depthCleared_ = false;
 	bActiveScene_ = true;
 	NumberPolygon = 0;
 	NumDrawObject = 0;
@@ -205,8 +217,19 @@ int cSDLRenderDevice::EndScene()
 	if(!bActiveScene_) return 1;
 	bActiveScene_ = false;
 
-	// The UI pass runs last, over whatever the scene drew. It carries the frame's clear
-	// only if no earlier pass (the terrain) already took it.
+	// The scene's objects were recorded during the walk; draw them now, over the terrain
+	// and against its depth. Then the UI pass, last, over everything. Each pass carries
+	// the frame's colour (and depth) clear only if no earlier one already took it.
+	if(swapchainTexture_ && commandBuffer_ && objectRenderer_ && objectRenderer_->hasDraws()
+	   && ensureDepth(xScr, yScr)){
+		const bool clear = hasClear_ && !frameCleared_;
+		if(objectRenderer_->Draw(commandBuffer_, swapchainTexture_, depthTexture_, xScr, yScr,
+		                         clear, clearColor_, !depthCleared_, fillMode_ == FILL_WIREFRAME)){
+			if(clear) frameCleared_ = true;
+			depthCleared_ = true;
+		}
+	}
+
 	if(swapchainTexture_ && commandBuffer_ && uiRenderer_)
 		uiRenderer_->Draw(commandBuffer_, swapchainTexture_, xScr, yScr,
 		                  hasClear_ && !frameCleared_, clearColor_);
@@ -218,6 +241,25 @@ int cSDLRenderDevice::EndScene()
 	swapchainTexture_ = nullptr;
 	hasClear_ = false;
 	return 0;
+}
+
+// The depth target every 3D pass shares. Sized to the swapchain, rebuilt on resize.
+bool cSDLRenderDevice::ensureDepth(int w, int h)
+{
+	if(!device_ || w <= 0 || h <= 0) return false;
+	if(depthTexture_ && depthW_ == w && depthH_ == h) return true;
+	if(depthTexture_) SDL_ReleaseGPUTexture(device_, depthTexture_);
+
+	SDL_GPUTextureCreateInfo ti = {};
+	ti.type = SDL_GPU_TEXTURETYPE_2D;
+	ti.format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
+	ti.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET;
+	ti.width = (Uint32)w; ti.height = (Uint32)h;
+	ti.layer_count_or_depth = 1; ti.num_levels = 1;
+	depthTexture_ = SDL_CreateGPUTexture(device_, &ti);
+	depthW_ = depthTexture_ ? w : 0;
+	depthH_ = depthTexture_ ? h : 0;
+	return depthTexture_ != nullptr;
 }
 
 int cSDLRenderDevice::Flush()
@@ -236,25 +278,50 @@ void cSDLRenderDevice::drawTileMap(cTileMap* tileMap, Camera* camera)
 {
 	if(!bActiveScene_ || !commandBuffer_ || !swapchainTexture_ || !tileMapRenderer_)
 		return;
+	if(!ensureDepth(xScr, yScr))
+		return;
 	const bool clear = hasClear_ && !frameCleared_;
-	if(tileMapRenderer_->Draw(commandBuffer_, swapchainTexture_, xScr, yScr,
-	                          clear, clearColor_, tileMap, camera,
-	                          fillMode_ == FILL_WIREFRAME) && clear)
-		frameCleared_ = true;
+	if(tileMapRenderer_->Draw(commandBuffer_, swapchainTexture_, depthTexture_, xScr, yScr,
+	                          clear, clearColor_, !depthCleared_, tileMap, camera,
+	                          fillMode_ == FILL_WIREFRAME)){
+		if(clear) frameCleared_ = true;
+		depthCleared_ = true;
+	}
 }
 
-// GameShell sets this every frame from debugWireFrame (Scripts/TreeControlSetups/
-// Debug.dat). SDL GPU bakes fill mode into the pipeline, so renderers keep a line
-// variant and pick it up from here.
+// Resolve the engine's buffer handles to the SDL GPU buffers behind them, for the
+// renderers that draw from geometry the engine filled.
+SDL_GPUBuffer* cSDLRenderDevice::gpuBuffer(const sPtrVertexBuffer& vb) const
+{
+	if(!vb.ptr) return nullptr;
+	auto it = vbGpu_.find(vb.ptr);
+	return it != vbGpu_.end() ? it->second.buf : nullptr;
+}
+
+SDL_GPUBuffer* cSDLRenderDevice::gpuBuffer(const sPtrIndexBuffer& ib) const
+{
+	if(!ib.ptr) return nullptr;
+	auto it = ibGpu_.find(ib.ptr);
+	return it != ibGpu_.end() ? it->second.buf : nullptr;
+}
+
+// GameShell sets RS_FILLMODE every frame from debugWireFrame (Scripts/TreeControlSetups/
+// Debug.dat), and Camera::DrawSortObject clears RS_ZWRITEENABLE around the transparent
+// pass. SDL GPU bakes both into the pipeline, so renderers keep variants and pick them
+// up from here.
 void cSDLRenderDevice::SetRenderState(eRenderStateOption state, int value)
 {
 	if(state == RS_FILLMODE)
 		fillMode_ = value;
+	else if(state == RS_ZWRITEENABLE)
+		zWriteEnable_ = value != 0;
 }
 
 unsigned int cSDLRenderDevice::GetRenderState(eRenderStateOption state)
 {
-	return state == RS_FILLMODE ? (unsigned int)fillMode_ : 0u;
+	if(state == RS_FILLMODE) return (unsigned int)fillMode_;
+	if(state == RS_ZWRITEENABLE) return zWriteEnable_ ? 1u : 0u;
+	return 0u;
 }
 
 // ---------------------------------------------------------------------------

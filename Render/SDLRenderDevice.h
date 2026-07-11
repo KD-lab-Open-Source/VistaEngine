@@ -10,11 +10,12 @@
 // Flush.
 //
 // The device owns what the whole backend shares — the SDL GPU device, the window
-// and swapchain, the frame's command buffer, textures and vertex/index buffers —
-// but no drawing pipeline of its own. Drawing lives in renderer classes that record
-// their own passes into the frame's command buffer; SDLUIRenderer (2D text, sprites,
-// quads) is the first. The 3D scene, water and coast-foam pipelines get their own
-// renderers; until then their entry points below are no-ops.
+// and swapchain, the frame's command buffer, the depth buffer, textures and
+// vertex/index buffers — but no drawing pipeline of its own. Drawing lives in renderer
+// classes that record their own passes into the frame's command buffer: SDLUIRenderer
+// (2D text, sprites, quads), SDLTileMapRenderer (terrain) and SDLObject3dxRenderer
+// (skinned .3dx meshes). The water and coast-foam pipelines get their own renderers;
+// until then their entry points below are no-ops.
 
 #include "IRenderDevice.h"
 #include "MTSection.h"
@@ -31,6 +32,7 @@ struct SDL_GPUBuffer;
 
 class SDLUIRenderer;
 class SDLTileMapRenderer;
+class SDLObject3dxRenderer;
 class cTileMap;
 
 class cSDLRenderDevice : public cInterfaceRenderDevice
@@ -46,6 +48,16 @@ public:
 	// depth pass there and then. The first pass of a frame performs Fill()'s clear, so
 	// if the terrain pass runs, the UI pass at EndScene loads instead of clearing.
 	void drawTileMap(cTileMap* tileMap, Camera* camera);
+
+	// --- 3dx objects ------------------------------------------------------
+	// cObject3dx::Draw talks to the object renderer directly (the way it talks to
+	// gb_RenderDevice3D's shaders on Windows); the device only hands it over, and
+	// resolves the engine's buffer handles to the SDL GPU buffers it owns.
+	SDLObject3dxRenderer* objectRenderer() { return objectRenderer_.get(); }
+	SDL_GPUBuffer* gpuBuffer(const sPtrVertexBuffer& vb) const;
+	SDL_GPUBuffer* gpuBuffer(const sPtrIndexBuffer& ib) const;
+	// RS_ZWRITEENABLE, as the scene passes set it around the transparent draw.
+	bool zWriteEnable() const { return zWriteEnable_; }
 
 	// --- Lifecycle (real) -------------------------------------------------
 	bool Initialize(int xScr, int yScr, int mode, HWND hWnd, int RefreshRateInHz, HWND fallbackWindow) override;
@@ -99,8 +111,9 @@ public:
 
 	// --- Misc state (no-op) ----------------------------------------------
 	int  SetGamma(float, float, float) override { return 0; }
-	// Only RS_FILLMODE is honoured (GameShell drives it from debugWireFrame); the rest
-	// of the D3D render states have no SDL GPU equivalent outside a pipeline object.
+	// Only RS_FILLMODE (GameShell drives it from debugWireFrame) and RS_ZWRITEENABLE
+	// (Camera::DrawSortObject turns it off for the transparent pass) are honoured; the
+	// rest of the D3D render states have no SDL GPU equivalent outside a pipeline object.
 	void SetRenderState(eRenderStateOption, int) override;
 	unsigned int GetRenderState(eRenderStateOption) override;
 	void SetGlobalFog(const Color4f&, const Vect2f&) override {}
@@ -145,8 +158,10 @@ public:
 	void SetWorldMaterial(eBlendMode, const MatXf&, float, cTexture*, cTexture*, eColorMode, bool, bool) override {}
 
 	// --- Vertex/index buffers: real SDL GPU static buffers ----------------
-	// Real buffers (the engine's 3dx/terrain code fills them), but nothing draws
-	// them yet: DrawIndexedPrimitive is a no-op until the 3D mesh renderer lands.
+	// The buffers live here (the engine's 3dx/terrain code fills them through the sPtr
+	// wrappers), but the device draws nothing: SDL GPU draws only inside a render pass,
+	// which is a renderer's business. cObject3dx::Draw calls the object renderer's
+	// DrawIndexedPrimitive instead of this one.
 	void DrawIndexedPrimitive(sPtrVertexBuffer&, int, int, const sPtrIndexBuffer&, int, int) override {}
 	void CreateVertexBuffer(sPtrVertexBuffer&, int, IDirect3DVertexDeclaration9*, int) override;
 	void DeleteVertexBuffer(sPtrVertexBuffer&) override;
@@ -199,18 +214,27 @@ private:
 	SDL_GPUCommandBuffer*  commandBuffer_    = nullptr;
 	SDL_GPUTexture*        swapchainTexture_ = nullptr;
 
+	// The scene depth buffer, shared by every 3D renderer so their passes occlude one
+	// another. Sized to the swapchain; owned here, like the swapchain image itself.
+	SDL_GPUTexture* depthTexture_ = nullptr;
+	int depthW_ = 0, depthH_ = 0;
+	bool ensureDepth(int w, int h);
+
 	MTSection resetDeviceLock_;          // dummy lock (no device loss on SDL)
 	DWORD multisample_ = 0;
 	bool  bActiveScene_ = false;
 	bool  hasClear_     = false;
-	// Set once the frame's colour clear has been consumed by whichever renderer opened
-	// the first pass, so later passes load the target instead of wiping it.
+	// Set once the frame's colour / depth clear has been consumed by whichever renderer
+	// opened the first pass, so later passes load the targets instead of wiping them.
 	bool  frameCleared_ = false;
+	bool  depthCleared_ = false;
 	int   fillMode_ = FILL_SOLID;   // RS_FILLMODE; FILL_WIREFRAME switches renderers to line pipelines
+	bool  zWriteEnable_ = true;     // RS_ZWRITEENABLE; picks the object pipeline's depth write
 	float clearColor_[4] = {0.f, 0.f, 0.f, 1.f};
 
-	std::unique_ptr<SDLUIRenderer>      uiRenderer_;
-	std::unique_ptr<SDLTileMapRenderer> tileMapRenderer_;
+	std::unique_ptr<SDLUIRenderer>        uiRenderer_;
+	std::unique_ptr<SDLTileMapRenderer>   tileMapRenderer_;
+	std::unique_ptr<SDLObject3dxRenderer> objectRenderer_;
 };
 
 #endif // VISTA_SDL_RENDER_DEVICE_H

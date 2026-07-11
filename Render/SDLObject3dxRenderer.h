@@ -1,0 +1,190 @@
+#ifndef VISTA_SDL_OBJECT3DX_RENDERER_H
+#define VISTA_SDL_OBJECT3DX_RENDERER_H
+
+// The 3D-object half of the SDL GPU backend: draws skinned .3dx meshes (units,
+// buildings, props, the menu's background models) with the object3dx pipeline
+// (Render/SDLShaders/object3dx.{vert,frag}.hlsl, ported from the original
+// Render/shader/Skin/object_scene_light.{vsl,psl}).
+//
+// Reached through the engine's own delegation chain -- cScene::Draw -> Camera::DrawScene
+// -> Camera::DrawObject -> cObject3dx::Draw -- which calls this renderer directly, just
+// as it calls gb_RenderDevice3D's shader objects on Windows: per material group it hands
+// SetState() the state it would have pushed into D3D shader constants, then issues the
+// group's draws through DrawIndexedPrimitive. Same immediate-mode contract, same order.
+//
+// Unlike SDLTileMapRenderer, which draws the instant cTileMap::Draw calls it, this
+// renderer batches: SDL GPU can only draw inside a render pass, and objects are drawn
+// from all over the scene walk. Each DrawIndexedPrimitive records geometry + a snapshot
+// of the current state; Draw() replays them in one render pass at EndScene, in call
+// order -- which is what keeps the engine's opaque-then-sorted-transparent ordering.
+//
+// It owns no geometry: the vertex/index buffers are the engine's own, created through
+// cSDLRenderDevice::CreateVertexBuffer/CreateIndexBuffer and filled by cStatic3dx. The
+// device stays their owner; this renderer asks it to resolve an sPtr wrapper to the
+// SDL_GPUBuffer behind it (and for the current RS_ZWRITEENABLE).
+//
+// Scope: the plain lit path (vsSkin/psSkin) -- skinning, diffuse texture, per-vertex
+// lambert + specular, ambient, the skin-colour tint, the animated UV transform, and the
+// five blend modes cObject3dx::Draw selects between. Still to come, each a shader
+// variant cObject3dx::Draw picks in the original: bump, reflection (planar and cube),
+// the second opacity map, scene shadows, the lightmap, fog of war, fog, point lights,
+// and fur.
+
+#include "IRenderDevice.h"    // Color4f, eBlendMode, cTexture, MatXf
+#include <unordered_map>
+#include <vector>
+
+struct SDL_Window;
+struct SDL_GPUDevice;
+struct SDL_GPUCommandBuffer;
+struct SDL_GPUTexture;
+struct SDL_GPUGraphicsPipeline;
+struct SDL_GPUSampler;
+struct SDL_GPUShader;
+struct SDL_GPUBuffer;
+
+class Camera;
+class cSDLRenderDevice;
+
+class SDLObject3dxRenderer
+{
+public:
+	// Builds the shaders and sampler. owner is the device that holds the vertex/index
+	// buffers this renderer draws from; window is needed only to query the swapchain
+	// format the pipelines render to. Must be destroyed before the SDL GPU device.
+	SDLObject3dxRenderer(cSDLRenderDevice* owner, SDL_GPUDevice* device, SDL_Window* window);
+	~SDLObject3dxRenderer();
+
+	SDLObject3dxRenderer(const SDLObject3dxRenderer&) = delete;
+	SDLObject3dxRenderer& operator=(const SDLObject3dxRenderer&) = delete;
+
+	// One material group's worth of state, straight out of cObject3dx::Draw: the same
+	// values it feeds to VSSkin::Select / VSSkin::SetMaterial / PSSkin::SetMaterial and
+	// to SetBlendStateAlphaRef, plus the bone poses from GetWorldPoses.
+	struct State
+	{
+		const MatXf* world = nullptr;   // GetWorldPoses output, copied by SetState
+		int worldNum = 0;               // bunch.nodeIndices.size(), <= StaticBunch::max_index
+		int boneCount = 1;              // lod.blend_indices: 1 = rigid, 2..4 = weighted
+
+		Color4f ambient;                // material.Ambient
+		Color4f diffuse;                // material.Diffuse (a = opacity)
+		Color4f specular;               // material.Specular (a = specular power)
+		Color4f lerpColor;              // material.lerp_texture (the unit's skin colour)
+
+		cTexture* texture = nullptr;    // material.Tex[0]
+		float texturePhase = 0.f;       // animation phase for a multi-frame texture
+		bool tilingWrap = false;        // mat.tiling_diffuse & TILING_U_WRAP
+
+		eBlendMode blend = ALPHA_NONE;
+		bool noLight = false;           // mat.no_light || ATTRUNKOBJ_NOLIGHT
+		bool selfIllumination = false;  // PSSkin::SetSelfIllumination
+
+		bool hasUVTrans = false;        // mat.chains' animated UV transform
+		float uvTrans[6] = {0,0,0,0,0,0};
+	};
+
+	// Drop the previous frame's draws. Called from BeginScene.
+	void BeginFrame();
+
+	// Snapshot the state the following draws are made with. camera supplies the
+	// view-projection, eye position and sun direction, read now rather than at flush:
+	// several cameras walk the scene and each sets state before its own draws.
+	void SetState(const State& state, Camera* camera);
+
+	// Override the diffuse colour mid-group, as the original's VSSkin/PSSkin::SetAlphaColor
+	// does when a visibility group fades (cObject3dx::DrawMaterialGroupSelectively).
+	void SetAlphaColor(const Color4f& color);
+
+	// Record one indexed draw against the current state, standing in for the D3D call of
+	// the same name (cObject3dx::DrawMaterialGroup issues one per visible group). The
+	// buffers are the engine's; the device resolves them. Ignored until SetState has run.
+	void DrawIndexedPrimitive(sPtrVertexBuffer& vb, int OfsVertex,
+	                          const sPtrIndexBuffer& ib, int nOfsPolygon, int nPolygon);
+
+	bool hasDraws() const { return !draws_.empty(); }
+
+	// Replay the frame's draws into one colour+depth render pass. `clear`/`clearDepth`
+	// mean this pass owns the frame's colour/depth clear -- true only when no earlier
+	// pass (the terrain) already took it. Returns true if the pass ran.
+	bool Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, SDL_GPUTexture* depth,
+	          int screenW, int screenH, bool clear, const float clearColor[4],
+	          bool clearDepth, bool wireframe);
+
+private:
+	// The vertex uniform block's fixed head, laid out to match object3dx.vert.hlsl up to
+	// (but not including) its World[] array: MVP, then eight float4s.
+	struct VSHead
+	{
+		float mvp[16];
+		float ambient[4], diffuse[4], specular[4];
+		float cameraPos[4], lightDir[4];
+		float uTrans[4], vTrans[4];
+		float params[4];            // x = boneCount, y = noLight
+	};
+	// The whole of object3dx.frag.hlsl's cbuffer.
+	struct FSUniform
+	{
+		float ambient[4];
+		float lerpPre[4];
+		float params[4];            // x = alphaRef, y = textured, z = selfIllum, w = lerp
+	};
+
+	// A state snapshot shared by every draw recorded under it.
+	struct StateBlock
+	{
+		VSHead vs;
+		FSUniform fs;
+		int worldOffset;            // into worldPool_, in floats
+		int worldRows;              // 3 per bone; worldRows*4 floats
+		SDL_GPUTexture* texture;    // null -> the 1x1 white stand-in
+		SDL_GPUSampler* sampler;
+		eBlendMode blend;
+		bool skinned;               // vertex carries weight bytes (boneCount > 1)
+	};
+
+	struct DrawCmd
+	{
+		int state;
+		SDL_GPUBuffer* vertexBuffer;
+		SDL_GPUBuffer* indexBuffer;
+		int stride;
+		int firstIndex, indexCount;   // indices are absolute: no base-vertex offset
+		bool depthWrite;
+	};
+
+	bool createShaders();
+	// Pipelines vary with the vertex stride (the .3dx vertex grows with bump/uv2/fur),
+	// whether it carries weights, the blend mode and depth write -- all baked into an
+	// SDL GPU pipeline. Built on demand and cached.
+	SDL_GPUGraphicsPipeline* pipelineFor(int stride, bool skinned, eBlendMode blend,
+	                                     bool depthWrite, bool wireframe);
+	// Append the current state to states_ if it changed since the last recorded draw.
+	int commitState();
+
+	cSDLRenderDevice* owner_  = nullptr;   // owns the vertex/index buffers we draw
+	SDL_GPUDevice* device_ = nullptr;
+	SDL_Window*    window_ = nullptr;
+
+	SDL_GPUShader* vsRigid_ = nullptr;   // -DSKINNED=0
+	SDL_GPUShader* vsSkin_  = nullptr;   // -DSKINNED=1
+	SDL_GPUShader* fs_      = nullptr;
+	bool shadersTried_ = false;
+
+	std::unordered_map<unsigned long long, SDL_GPUGraphicsPipeline*> pipelines_;
+	// The original picks between sampler_wrap_anisotropic and sampler_clamp_anisotropic
+	// per material, from StaticMaterial::tiling_diffuse.
+	SDL_GPUSampler* samplerWrap_  = nullptr;
+	SDL_GPUSampler* samplerClamp_ = nullptr;
+	SDL_GPUTexture* whiteTexture_ = nullptr;   // bound when a material has no texture
+
+	std::vector<StateBlock> states_;
+	std::vector<DrawCmd>    draws_;
+	std::vector<float>      worldPool_;   // bone rows for every state this frame
+
+	StateBlock current_;         // set by SetState, committed lazily by AddDraw
+	bool currentValid_ = false;  // SetState has run this frame
+	bool currentDirty_ = true;   // current_ differs from states_.back()
+};
+
+#endif // VISTA_SDL_OBJECT3DX_RENDERER_H
