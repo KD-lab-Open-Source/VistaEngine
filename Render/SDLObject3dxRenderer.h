@@ -67,10 +67,12 @@ public:
 		int worldNum = 0;               // bunch.nodeIndices.size(), <= StaticBunch::max_index
 		int boneCount = 1;              // lod.blend_indices: 1 = rigid, 2..4 = weighted
 
-		Color4f ambient;                // material.Ambient
-		Color4f diffuse;                // material.Diffuse (a = opacity)
-		Color4f specular;               // material.Specular (a = specular power)
-		Color4f lerpColor;              // material.lerp_texture (the unit's skin colour)
+		// Zero-initialized on purpose: Color4f's default constructor leaves its channels
+		// uninitialized, and a stray lerpColor.a tints the texture with garbage.
+		Color4f ambient   = Color4f(0,0,0,0);   // material.Ambient
+		Color4f diffuse   = Color4f(0,0,0,0);   // material.Diffuse (a = opacity)
+		Color4f specular  = Color4f(0,0,0,0);   // material.Specular (a = specular power)
+		Color4f lerpColor = Color4f(0,0,0,0);   // material.lerp_texture (the unit's skin colour)
 
 		cTexture* texture = nullptr;    // material.Tex[0]
 		// Non-null selects the bump path. Only set when the vertex actually carries a

@@ -6,7 +6,8 @@
 //           taken when the material has no bump, no reflection and no second opacity
 //           map. Per-vertex lit(N.L, N.H, power) against the *negated* vLightDirection
 //           (which points the way the light travels): diffuse to COLOR0, specular to
-//           COLOR1, NOLIGHT collapsing diffuse to the ambient colour.
+//           COLOR1, NOLIGHT collapsing diffuse to the ambient colour. The lit()
+//           intrinsic is spelled out by hand -- see the note at the lighting itself.
 //
 //   BUMP=1  Render/shader/Skin/object_scene_bump.vsl (vsSkinBump). No per-vertex
 //           diffuse: instead the light and half vectors are pulled into the vertex's
@@ -168,11 +169,19 @@ VSOutput main(VSInput input)
         float3 ldir = -LightDirection.xyz;
         float3 dir = normalize(CameraPos.xyz - worldPos);
         float3 halfV = normalize(dir + ldir);
-        float4 ret = lit(dot(n, ldir), dot(n, halfV), Specular.w);
 
-        output.Diffuse.rgb = ret.y * Diffuse.rgb;
+        // The original writes lit(N.L, N.H, power) and reads .y and .z. Do NOT use the
+        // lit() intrinsic here: shadercross lowers its specular term to `N.H * power`
+        // instead of `pow(N.H, power)`, which with power=10 blows the highlight out to
+        // white on every surface facing the eye. Spelled out, with lit()'s own semantics:
+        // the specular is zero unless both dot products are positive.
+        float ndl = dot(n, ldir);
+        float ndh = dot(n, halfV);
+
+        output.Diffuse.rgb = max(ndl, 0.0f) * Diffuse.rgb;
         output.Diffuse.a = Diffuse.a;
-        output.Specular = ret.z * Specular.rgb;
+        output.Specular = (ndl > 0.0f && ndh > 0.0f) ? pow(ndh, Specular.w) * Specular.rgb
+                                                     : float3(0.0f, 0.0f, 0.0f);
     }
 #endif
     return output;

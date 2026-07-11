@@ -18,18 +18,6 @@
 float AlphaMaxiumBlend=0.95f;
 float AlphaMiniumShadow=0.0f;
 
-#ifndef _WIN32
-namespace {
-// The SDL backend's 3dx renderer, or null under any other device. cObject3dx::Draw
-// drives it exactly as it drives pShader3dx's shader objects on Windows.
-SDLObject3dxRenderer* sdlObjectRenderer()
-{
-	cSDLRenderDevice* dev = dynamic_cast<cSDLRenderDevice*>(gb_RenderDevice);
-	return dev ? dev->objectRenderer() : 0;
-}
-} // namespace
-#endif
-
 /*
 Оптимизация.
 !! На втором и третьем LOD - уменьшать количество костей до 2 и 1

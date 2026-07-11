@@ -44,6 +44,11 @@ class cTileMap;
 // full target as its viewport, so this only ever needs setting, never restoring.
 void applyCameraViewport(SDL_GPURenderPass* pass, const sViewPort& vp, int targetW, int targetH);
 
+// The SDL backend's 3dx renderer, or null under any other device. cObject3dx::Draw and
+// cSimply3dx::SelectMaterial drive it exactly as they drive pShader3dx's shader objects
+// on Windows.
+SDLObject3dxRenderer* sdlObjectRenderer();
+
 class cSDLRenderDevice : public cInterfaceRenderDevice
 {
 public:
@@ -212,6 +217,10 @@ private:
 	struct TextureData {
 		SDL_GPUTexture* tex = nullptr;
 		int w = 0, h = 0, bpp = 0, pitch = 0;
+		// Mip levels the texture was created with. The engine's cached DDS ship full
+		// chains and D3D sampled them anisotropically; SDL GPU regenerates the chain
+		// from level 0 after each upload. 1 means no chain (font atlas, A8L8).
+		int levels = 1;
 		bool expand = false;
 		std::vector<unsigned char> staging;
 	};

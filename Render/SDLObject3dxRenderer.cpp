@@ -60,10 +60,16 @@ SDLObject3dxRenderer::SDLObject3dxRenderer(cSDLRenderDevice* owner, SDL_GPUDevic
 {
 	if(!device_) return;
 
+	// The original binds these with sampler_wrap_anisotropic / sampler_clamp_anisotropic,
+	// over the full mip chain the cached DDS ship. max_lod must be set: it defaults to 0,
+	// which pins sampling to the top level however many the texture has.
 	SDL_GPUSamplerCreateInfo si = {};
 	si.min_filter = SDL_GPU_FILTER_LINEAR;
 	si.mag_filter = SDL_GPU_FILTER_LINEAR;
-	si.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
+	si.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_LINEAR;
+	si.enable_anisotropy = true;
+	si.max_anisotropy = 4.f;
+	si.max_lod = 1000.f;
 	si.address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
 	si.address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
 	si.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;

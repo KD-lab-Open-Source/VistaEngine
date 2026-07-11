@@ -17,6 +17,12 @@
 #include "SDLObject3dxRenderer.h"
 
 // See the declaration in SDLRenderDevice.h.
+SDLObject3dxRenderer* sdlObjectRenderer()
+{
+	cSDLRenderDevice* dev = dynamic_cast<cSDLRenderDevice*>(gb_RenderDevice);
+	return dev ? dev->objectRenderer() : nullptr;
+}
+
 void applyCameraViewport(SDL_GPURenderPass* pass, const sViewPort& vp, int targetW, int targetH)
 {
 	if(!pass || vp.Width <= 0 || vp.Height <= 0)
@@ -483,6 +489,9 @@ void cSDLRenderDevice::uploadTexture(const TextureData& td)
 	dst.w = (Uint32)td.w; dst.h = (Uint32)td.h; dst.d = 1;
 	SDL_UploadToGPUTexture(copy, &src, &dst, false);
 	SDL_EndGPUCopyPass(copy);
+	// Rebuild the chain from the level we just wrote (outside any pass, as SDL requires).
+	if(td.levels > 1)
+		SDL_GenerateMipmapsForGPUTexture(cb, td.tex);
 	SDL_SubmitGPUCommandBuffer(cb);
 	SDL_ReleaseGPUTransferBuffer(device_, tb);
 }
@@ -508,17 +517,28 @@ int cSDLRenderDevice::CreateTexture(cTexture* Texture, cFileImage* FileImage, in
 	if(Texture->format() == SURFMT_A8L8)
 		bpp = 2;
 
+	// Give colour textures a mip chain. Every model and UI texture in the shipped cache
+	// has one, and D3D sampled them with sampler_wrap_anisotropic; with a single level
+	// the alpha-tested foliage aliases badly as the camera moves. The chain is generated
+	// from level 0 on each upload, which SDL requires COLOR_TARGET usage for. The 8-bit
+	// font atlas and the 16-bit A8L8 water texture are drawn 1:1 and stay single-level.
+	int levels = 1;
+	if(bpp == 4)
+		for(int m = (w > h ? w : h); m > 1; m >>= 1)
+			++levels;
+
 	SDL_GPUTextureCreateInfo ti = {};
 	ti.type = SDL_GPU_TEXTURETYPE_2D;
 	ti.format = SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM;
-	ti.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER;
+	ti.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER | (levels > 1 ? SDL_GPU_TEXTUREUSAGE_COLOR_TARGET : 0);
 	ti.width = (Uint32)w; ti.height = (Uint32)h;
-	ti.layer_count_or_depth = 1; ti.num_levels = 1;
+	ti.layer_count_or_depth = 1; ti.num_levels = (Uint32)levels;
 	SDL_GPUTexture* tex = SDL_CreateGPUTexture(device_, &ti);
 	if(!tex) return 1;
 
 	TextureData td;
 	td.tex = tex; td.w = w; td.h = h; td.bpp = bpp; td.pitch = w * bpp;
+	td.levels = levels;
 	td.expand = (bpp == 1);
 	td.staging.assign((size_t)w * h * bpp, 0);
 
