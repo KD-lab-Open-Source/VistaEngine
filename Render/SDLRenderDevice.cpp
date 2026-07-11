@@ -17,6 +17,7 @@
 #include "SDLTileMapRenderer.h"
 #include "SDLObject3dxRenderer.h"
 #include "SDLWaterRenderer.h"
+#include "SDLCoastSpritesRenderer.h"
 
 // See the declarations in SDLRenderDevice.h.
 cSDLRenderDevice* sdlRenderDevice()
@@ -34,6 +35,12 @@ SDLWaterRenderer* sdlWaterRenderer()
 {
 	cSDLRenderDevice* dev = sdlRenderDevice();
 	return dev ? dev->waterRenderer() : nullptr;
+}
+
+SDLCoastSpritesRenderer* sdlCoastSpritesRenderer()
+{
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	return dev ? dev->coastSpritesRenderer() : nullptr;
 }
 
 void applyCameraViewport(SDL_GPURenderPass* pass, const sViewPort& vp, int targetW, int targetH)
@@ -149,6 +156,8 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND hWnd, int
 		objectRenderer_ = std::make_unique<SDLObject3dxRenderer>(this, device_, window_);
 	if(!waterRenderer_)
 		waterRenderer_ = std::make_unique<SDLWaterRenderer>(this, device_, window_);
+	if(!coastSpritesRenderer_)
+		coastSpritesRenderer_ = std::make_unique<SDLCoastSpritesRenderer>(device_, window_);
 
 	// Build the skinned-vertex declarations (on Windows cD3DRender does this at
 	// device init via CreateVertexDeclaration; cSkinVertex::Register is portable
@@ -177,6 +186,7 @@ int cSDLRenderDevice::Done()
 	tileMapRenderer_.reset();
 	objectRenderer_.reset();
 	waterRenderer_.reset();
+	coastSpritesRenderer_.reset();
 
 	if(device_){
 		if(depthTexture_){
@@ -256,6 +266,8 @@ int cSDLRenderDevice::BeginScene()
 		objectRenderer_->BeginFrame();
 	if(waterRenderer_)
 		waterRenderer_->BeginFrame();
+	if(coastSpritesRenderer_)
+		coastSpritesRenderer_->BeginFrame();
 	frameCleared_ = false;
 	depthCleared_ = false;
 	shadowPassRan_ = false;
@@ -272,11 +284,11 @@ int cSDLRenderDevice::EndScene()
 	if(!bActiveScene_) return 1;
 	bActiveScene_ = false;
 
-	// Whatever objects the scene walk recorded and drawWater has not already replayed --
-	// everything from SCENENODE_OBJECTSPECIAL onwards, or the whole scene in a mission
-	// without water. Over the terrain and against its depth. Then the UI pass, last, over
-	// everything. Each pass carries the frame's colour (and depth) clear only if no
-	// earlier one already took it.
+	// Whatever objects the scene walk recorded and flushObjectPass has not already
+	// replayed -- everything past SCENENODE_OBJECTSPECIAL, or the whole scene in a mission
+	// with neither water nor coast sprites. Over the terrain and against its depth. Then
+	// the UI pass, last, over everything. Each pass carries the frame's colour (and depth)
+	// clear only if no earlier one already took it.
 	if(swapchainTexture_ && commandBuffer_ && objectRenderer_ && objectRenderer_->hasDraws()
 	   && ensureDepth(xScr, yScr)){
 		const bool clear = hasClear_ && !frameCleared_;
@@ -347,9 +359,22 @@ void cSDLRenderDevice::drawTileMap(cTileMap* tileMap, Camera* camera)
 }
 
 // ---------------------------------------------------------------------------
-// Water: the tiles cWater::DrawPolygons just recorded, drawn where the scene walk
-// reached them. See the header for why the object batch is flushed first.
+// Water and coast sprites: what cWater::DrawPolygons and cCoastSprites' two sprite loops
+// just recorded, drawn where the scene walk reached them. See the header for why the
+// object batch is flushed first.
 // ---------------------------------------------------------------------------
+void cSDLRenderDevice::flushObjectPass()
+{
+	if(!objectRenderer_ || !objectRenderer_->hasDraws())
+		return;
+	const bool clear = hasClear_ && !frameCleared_;
+	if(objectRenderer_->Draw(commandBuffer_, swapchainTexture_, depthTexture_, xScr, yScr,
+	                         clear, clearColor_, !depthCleared_, fillMode_ == FILL_WIREFRAME)){
+		if(clear) frameCleared_ = true;
+		depthCleared_ = true;
+	}
+}
+
 void cSDLRenderDevice::drawWater()
 {
 	if(!bActiveScene_ || !commandBuffer_ || !swapchainTexture_ || !waterRenderer_)
@@ -357,18 +382,29 @@ void cSDLRenderDevice::drawWater()
 	if(!waterRenderer_->hasDraws() || !ensureDepth(xScr, yScr))
 		return;
 
-	if(objectRenderer_ && objectRenderer_->hasDraws()){
-		const bool clear = hasClear_ && !frameCleared_;
-		if(objectRenderer_->Draw(commandBuffer_, swapchainTexture_, depthTexture_, xScr, yScr,
-		                         clear, clearColor_, !depthCleared_, fillMode_ == FILL_WIREFRAME)){
-			if(clear) frameCleared_ = true;
-			depthCleared_ = true;
-		}
-	}
+	flushObjectPass();
 
 	const bool clear = hasClear_ && !frameCleared_;
 	if(waterRenderer_->Draw(commandBuffer_, swapchainTexture_, depthTexture_, xScr, yScr,
 	                        clear, clearColor_, !depthCleared_, fillMode_ == FILL_WIREFRAME)){
+		if(clear) frameCleared_ = true;
+		depthCleared_ = true;
+	}
+}
+
+void cSDLRenderDevice::drawCoastSprites()
+{
+	if(!bActiveScene_ || !commandBuffer_ || !swapchainTexture_ || !coastSpritesRenderer_)
+		return;
+	if(!coastSpritesRenderer_->hasDraws() || !ensureDepth(xScr, yScr))
+		return;
+
+	// A no-op once drawWater has run: it drained the batch. It has not, on a dry map.
+	flushObjectPass();
+
+	const bool clear = hasClear_ && !frameCleared_;
+	if(coastSpritesRenderer_->Draw(commandBuffer_, swapchainTexture_, depthTexture_, xScr, yScr,
+	                               clear, clearColor_, !depthCleared_, fillMode_ == FILL_WIREFRAME)){
 		if(clear) frameCleared_ = true;
 		depthCleared_ = true;
 	}

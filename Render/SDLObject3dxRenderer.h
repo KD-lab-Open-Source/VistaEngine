@@ -17,8 +17,8 @@
 // from all over the scene walk. Each DrawIndexedPrimitive records geometry + a snapshot
 // of the current state; Draw() replays them in a render pass at EndScene, in call
 // order -- which is what keeps the engine's opaque-then-sorted-transparent ordering.
-// The water surface, drawn between the two in the scene walk, splits that into two
-// passes (see Draw below).
+// The water surface and the coast sprites, drawn between the two in the scene walk,
+// split that into two passes (see Draw below).
 //
 // It owns no geometry: the vertex/index buffers are the engine's own, created through
 // cSDLRenderDevice::CreateVertexBuffer/CreateIndexBuffer and filled by cStatic3dx. The
@@ -124,9 +124,10 @@ public:
 	// `clear`/`clearDepth` mean this pass owns the frame's colour/depth clear -- true only
 	// when no earlier pass (the terrain) already took it. Returns true if the pass ran.
 	//
-	// Called at EndScene, and once more mid-scene from cSDLRenderDevice::drawWater, which
-	// has to get the opaque objects onto the screen before the water blends over them.
-	// The draws that follow that flush replay here, over the water, as on D3D.
+	// Called at EndScene, and once more mid-scene from cSDLRenderDevice::flushObjectPass,
+	// which has to get the opaque objects onto the screen before the water and the coast
+	// sprites blend over them. The draws that follow that flush replay here, on top, as
+	// on D3D.
 	bool Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, SDL_GPUTexture* depth,
 	          int screenW, int screenH, bool clear, const float clearColor[4],
 	          bool clearDepth, bool wireframe);

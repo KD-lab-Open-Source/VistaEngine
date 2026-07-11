@@ -7,6 +7,8 @@
 #include "Render/Src/TileMap.h"
 #include "Render/Src/TexLibrary.h"
 #include "Render/Src/Scene.h"
+#include "Render/SDLCoastSpritesRenderer.h"   // the sprites are drawn by SDLCoastSpritesRenderer,
+#include "Render/SDLRenderDevice.h"           // reached via cSDLRenderDevice::drawCoastSprites
 
 CoastSpriteSimpleAttributes::CoastSpriteSimpleAttributes()
 {
@@ -123,9 +125,9 @@ cCoastSprites::~cCoastSprites()
 }
 void cCoastSprites::Draw(Camera* camera)
 {
-#ifdef _WIN32
 	start_timer_auto();
 	MTAuto autolock(lock);
+#ifdef _WIN32
 	DWORD old_zwrite=gb_RenderDevice->GetRenderState(RS_ZWRITEENABLE);
 	gb_RenderDevice->SetRenderState(RS_ZWRITEENABLE,FALSE);
 	gb_RenderDevice->SetSamplerDataVirtual(0,sampler_wrap_anisotropic);
@@ -134,6 +136,23 @@ void cCoastSprites::Draw(Camera* camera)
 	if (mode & CSM_MOVING)
 		DrawMovingCoastSprite(camera);
 	gb_RenderDevice->SetRenderState(RS_ZWRITEENABLE,old_zwrite);
+#else
+	// The depth-write and sampler state above is baked into the coastsprites pipeline;
+	// what is left is the camera the two sprite groups are drawn under.
+	SDLCoastSpritesRenderer* renderer = sdlCoastSpritesRenderer();
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	if(!renderer || !dev)
+		return;
+	renderer->SetCamera(camera);
+
+	if (mode & CSM_SIMPLE)
+		DrawSimpleCoastSprite(camera);
+	if (mode & CSM_MOVING)
+		DrawMovingCoastSprite(camera);
+
+	// D3D drew as each group's EndDraw went; SDL GPU only draws inside a render pass, so
+	// open one now, here in the scene walk where the sprites belong.
+	dev->drawCoastSprites();
 #endif
 }
 
@@ -298,10 +317,21 @@ Color4c cCoastSprites::GetDiffuseColor(Camera* camera)
 
 void cCoastSprites::DrawSimpleCoastSprite(Camera* camera)
 {
+#ifdef _WIN32
 	cInterfaceRenderDevice* rd=gb_RenderDevice;
 	rd->SetWorldMaterial(ALPHA_BLEND,MatXf::ID, 0, Texture_stay,0,COLOR_MOD,true);
-	bool avi_texture = Texture_stay&&Texture_stay->IsAviScaleTexture();
 	cQuadBuffer<sVertexXYZDT1>* pBuf=rd->GetQuadBufferXYZDT1();
+#else
+	// SetWorldMaterial selects vsStandart/psStandart with Texture_stay on stage 0; the
+	// renderer's pipeline is that shader pair, so naming the texture is all that is left
+	// of it. It answers to the quad buffer's BeginDraw/Get/EndDraw, so the loop below is
+	// the same code on both backends.
+	SDLCoastSpritesRenderer* pBuf = sdlCoastSpritesRenderer();
+	if(!pBuf)
+		return;
+	pBuf->SetTexture(Texture_stay);
+#endif
+	bool avi_texture = Texture_stay&&Texture_stay->IsAviScaleTexture();
 	int grid_shift = pWater->GetCoordShift();
 	int phase_step = round(dt*simple_scale_time*INT_SIZE);
 	Color4c diff = GetDiffuseColor(camera);
@@ -351,11 +381,18 @@ void cCoastSprites::DrawSimpleCoastSprite(Camera* camera)
 }
 void cCoastSprites::DrawMovingCoastSprite(Camera* camera)
 {
+#ifdef _WIN32
 	cInterfaceRenderDevice* rd=gb_RenderDevice;
 	rd->SetWorldMaterial(ALPHA_BLEND,MatXf::ID, 0, Texture_mov,0,COLOR_MOD,true);
 	//rd->SetWorldMaterial(ALPHA_BLEND,MatXf::ID, 0, 0);
-	bool avi_texture = Texture_mov&&Texture_mov->IsAviScaleTexture();
 	cQuadBuffer<sVertexXYZDT1>* pBuf=rd->GetQuadBufferXYZDT1();
+#else
+	SDLCoastSpritesRenderer* pBuf = sdlCoastSpritesRenderer();
+	if(!pBuf)
+		return;
+	pBuf->SetTexture(Texture_mov);
+#endif
+	bool avi_texture = Texture_mov&&Texture_mov->IsAviScaleTexture();
 	pBuf->BeginDraw();
 	int grid_shift = pWater->GetCoordShift();
 	int phase_step = round(dt*move_scale_time*INT_SIZE);
@@ -428,68 +465,6 @@ void cCoastSprites::DrawMovingCoastSprite(Camera* camera)
 	mov_coast_sprites.Compress();
 }
 
-
-void cCoastSprites::animateSDL(Camera* camera, float dtime_ms)
-{
-	// Animate() early-returns unless pSaveToAnimateCamera is set (normally by PreDraw,
-	// which also scene-attaches for the D3D draw that is dead off-Windows). Set it
-	// directly and run the real spawn pass.
-	pSaveToAnimateCamera = camera;
-	Animate(dtime_ms);
-}
-
-void cCoastSprites::collectSprites(vector<RenderSprite>& out)
-{
-	// Same per-sprite bookkeeping as DrawSimple/MovingCoastSprite (advance phase, retire
-	// when the phase runs out or the sprite drifts onto dry land, triangle-wave alpha),
-	// but emits flat quads for the SDL foam renderer instead of D3D vertices. dt and the
-	// *_scale_time are set by the preceding animateSDL -> Animate call.
-	MTAuto autolock(lock);
-	int grid_shift = pWater->GetCoordShift();
-
-	if(mode & CSM_SIMPLE){
-		bool avi = Texture_stay && Texture_stay->IsAviScaleTexture();
-		int phase_step = round(dt*simple_scale_time*INT_SIZE);
-		int n = coast_sprites.size();
-		for(int i = 0; i < n; i++){
-			if(coast_sprites.IsFree(i)) continue;
-			CoastSprite& s = coast_sprites[i];
-			if(s.phase >= INT_SIZE){ coast_sprites.SetFree(i); continue; }
-			if(dieInCoast && pWater->Get(s.cx >> grid_shift, s.cy >> grid_shift).z <= 0){ coast_sprites.SetFree(i); continue; }
-			RenderSprite r;
-			r.pos = s.pos; r.size = s.size;
-			r.alpha = (2 * ((s.phase < INT_SIZE_HALF) ? (s.phase >> 8) : 255 - (s.phase >> 8))) / 255.f;
-			const sRectangle4f& rt = avi ? ((cTextureAviScale*)Texture_stay)->GetFramePosInt(s.phase) : sRectangle4f::ID;
-			r.u0 = rt.min.x; r.v0 = rt.min.y; r.u1 = rt.max.x; r.v1 = rt.max.y;
-			r.dir.set(0, 0); r.moving = false;
-			out.push_back(r);
-			s.phase += phase_step;
-		}
-		coast_sprites.Compress();
-	}
-
-	if(mode & CSM_MOVING){
-		bool avi = Texture_mov && Texture_mov->IsAviScaleTexture();
-		int phase_step = round(dt*move_scale_time*INT_SIZE);
-		int n = mov_coast_sprites.size();
-		for(int i = 0; i < n; i++){
-			if(mov_coast_sprites.IsFree(i)) continue;
-			MovingCoastSprite& s = mov_coast_sprites[i];
-			if(s.phase > INT_SIZE){ mov_coast_sprites.SetFree(i); continue; }
-			if(dieInCoast && pWater->Get(s.cx >> grid_shift, s.cy >> grid_shift).z <= 0){ mov_coast_sprites.SetFree(i); continue; }
-			s.pos.x += s.speed_x; s.pos.y += s.speed_y;
-			RenderSprite r;
-			r.pos = s.pos; r.size = s.size;
-			r.alpha = (2 * ((s.phase < INT_SIZE_HALF) ? (s.phase >> 8) : 255 - (s.phase >> 8))) / 255.f;
-			const sRectangle4f& rt = avi ? ((cTextureAviScale*)Texture_mov)->GetFramePosInt(s.phase) : sRectangle4f::ID;
-			r.u0 = rt.min.x; r.v0 = rt.min.y; r.u1 = rt.max.x; r.v1 = rt.max.y;
-			r.dir = s.dir; r.moving = true;
-			out.push_back(r);
-			s.phase += phase_step;
-		}
-		mov_coast_sprites.Compress();
-	}
-}
 
 SpriteCenter* cCoastSprites::AddSpriteCenter(int x, int y,ContainerCenters &container)
 {
