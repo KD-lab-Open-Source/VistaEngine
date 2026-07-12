@@ -176,6 +176,9 @@ private:
 		eBlendMode blend;
 		bool skinned;               // vertex carries weight bytes (boneCount > 1)
 		bool bump;                  // bump path: tangent-frame vertex, per-pixel lambert
+		// The camera was the reflection camera, whose mirror matrix reverses every
+		// triangle's winding: cull the other face (see pipelineFor).
+		bool mirrored;
 		// The camera's viewport, captured at SetState. Draws are replayed in one pass at
 		// EndScene, long after the scene walk moved on, so it cannot be read back then.
 		int vpX, vpY, vpW, vpH;
@@ -198,7 +201,7 @@ private:
 	// depth write -- all baked into an SDL GPU pipeline. Built on demand and cached.
 	// `shadow` selects the caster pipeline: depth-only (no colour target), slope-scaled
 	// depth bias, and the shadow shaders, which ignore the tangent frame.
-	SDL_GPUGraphicsPipeline* pipelineFor(int stride, bool skinned, bool bump, eBlendMode blend,
+	SDL_GPUGraphicsPipeline* pipelineFor(int stride, bool skinned, bool bump, eBlendMode blend, bool mirrored,
 	                                     bool depthWrite, bool wireframe, bool shadow);
 	// Append the current state to states_ if it changed since the last recorded draw.
 	int commitState();

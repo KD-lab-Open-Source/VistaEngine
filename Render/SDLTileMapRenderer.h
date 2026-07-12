@@ -85,6 +85,9 @@ private:
 	// Same shaders, differing only in fill mode. FILL/LINE mirrors RS_FILLMODE.
 	SDL_GPUGraphicsPipeline* pipelineFill_ = nullptr;
 	SDL_GPUGraphicsPipeline* pipelineLine_ = nullptr;
+	// The reflection camera's: culls the face the mirror reversed, so the heightfield's
+	// underside does not roof over the reflection (see createPipeline).
+	SDL_GPUGraphicsPipeline* pipelineMirror_ = nullptr;
 	// Depth-only, position-only, slope-scale biased: the terrain as a shadow caster.
 	SDL_GPUGraphicsPipeline* pipelineShadow_ = nullptr;
 	SDL_GPUSampler*          sampler_      = nullptr;

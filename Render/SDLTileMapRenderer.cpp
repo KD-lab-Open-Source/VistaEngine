@@ -55,6 +55,7 @@ SDLTileMapRenderer::~SDLTileMapRenderer()
 	if(shadowSampler_)  SDL_ReleaseGPUSampler(device_, shadowSampler_);
 	if(pipelineFill_)   SDL_ReleaseGPUGraphicsPipeline(device_, pipelineFill_);
 	if(pipelineLine_)   SDL_ReleaseGPUGraphicsPipeline(device_, pipelineLine_);
+	if(pipelineMirror_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineMirror_);
 	if(pipelineShadow_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineShadow_);
 }
 
@@ -185,10 +186,9 @@ void SDLTileMapRenderer::createPipeline()
 	pci.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
 	pci.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
 	pci.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;   // grid winding isn't guaranteed
-	// Clip near/far, don't clamp -- D3D9's default. The reflection camera sits inside the
-	// terrain volume looking up, so the whole heightfield falls outside its frustum; with
-	// SDL's default depth *clamp* those triangles would rasterize as a full-screen smear
-	// (straddling w==0), where D3D9 silently clips them and lets the sky show through.
+	// Clip near/far, don't clamp -- D3D9's default. Under the reflection camera the parts of
+	// the heightfield behind the mirrored eye would otherwise be clamped and rasterized,
+	// straddling w==0, into a full-screen smear; D3D9 silently clips them.
 	pci.rasterizer_state.enable_depth_clip = true;
 	pci.depth_stencil_state.enable_depth_test = true;
 	pci.depth_stencil_state.enable_depth_write = true;
@@ -204,11 +204,23 @@ void SDLTileMapRenderer::createPipeline()
 	pci.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_LINE;
 	pipelineLine_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
 
+	// The reflection camera's variant. Its mirror matrix puts the eye below the terrain,
+	// so the heightfield is seen from underneath: drawn with no culling it becomes a
+	// ceiling over the whole reflection, and everything standing on it -- the palms, the
+	// islands -- fails the depth test behind it. cD3DRender::setCamera culls back faces
+	// and flips the winding for the reflection (D3DCULL_CW -> D3DCULL_CCW), the mirror
+	// having reversed every triangle; culling FRONT against SDL's counter-clockwise front
+	// face is that same D3DCULL_CCW, and it takes the underside away.
+	pci.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
+	pci.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_FRONT;
+	pipelineMirror_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
+
 	SDL_ReleaseGPUShader(device_, vs);
 	SDL_ReleaseGPUShader(device_, fs);
 
-	fprintf(stderr, "SDLTileMapRenderer: tilemap pipeline %s (wireframe %s)\n",
-	        pipelineFill_ ? "ready" : "FAILED", pipelineLine_ ? "ready" : "FAILED");
+	fprintf(stderr, "SDLTileMapRenderer: tilemap pipeline %s (wireframe %s, reflection %s)\n",
+	        pipelineFill_ ? "ready" : "FAILED", pipelineLine_ ? "ready" : "FAILED",
+	        pipelineMirror_ ? "ready" : "FAILED");
 }
 
 // The terrain as a shadow caster: the same vertex buffer, position only, into depth.
@@ -511,9 +523,15 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
                               int screenW, int screenH, bool clear, const float clearColor[4],
                               bool clearDepth, cTileMap* tileMap, Camera* camera, bool wireframe)
 {
-	// Fall back to the solid pipeline if the LINE variant failed to build.
-	SDL_GPUGraphicsPipeline* pipeline = (wireframe && pipelineLine_) ? pipelineLine_ : pipelineFill_;
-	if(!device_ || !pipeline || !cmd || !target || !depth || !camera)
+	if(!camera)
+		return false;
+	// Fall back to the solid pipeline if a variant failed to build.
+	SDL_GPUGraphicsPipeline* pipeline = pipelineFill_;
+	if(wireframe && pipelineLine_)
+		pipeline = pipelineLine_;
+	else if(camera->getAttribute(ATTRCAMERA_REFLECTION) && pipelineMirror_)
+		pipeline = pipelineMirror_;
+	if(!device_ || !pipeline || !cmd || !target || !depth)
 		return false;
 	if(!ensureMesh(cmd))
 		return false;

@@ -223,7 +223,7 @@ bool SDLObject3dxRenderer::createShaders()
 }
 
 SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skinned, bool bump,
-                                                           eBlendMode blend, bool depthWrite,
+                                                           eBlendMode blend, bool mirrored, bool depthWrite,
                                                            bool wireframe, bool shadow)
 {
 	// The caster shaders take no tangent frame and write no colour, so bump and the blend
@@ -241,7 +241,8 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 	                             | ((unsigned long long)depthWrite << 24)
 	                             | ((unsigned long long)wireframe  << 25)
 	                             | ((unsigned long long)bump       << 26)
-	                             | ((unsigned long long)shadow     << 27);
+	                             | ((unsigned long long)shadow     << 27)
+	                             | ((unsigned long long)mirrored   << 28);
 	auto it = pipelines_.find(key);
 	if(it != pipelines_.end())
 		return it->second;
@@ -326,8 +327,22 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 	pci.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
 	pci.rasterizer_state.fill_mode = wireframe ? SDL_GPU_FILLMODE_LINE : SDL_GPU_FILLMODE_FILL;
 	// The scene passes flip culling per node type (DrawObjectSpecial and DrawSortObject
-	// both force D3DCULL_NONE), and the SDL device does not track D3DRS_CULLMODE yet.
-	pci.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
+	// both force D3DCULL_NONE), and the SDL device does not track D3DRS_CULLMODE yet, so
+	// the ordinary cameras keep drawing both faces.
+	//
+	// The reflection camera cannot: its mirror matrix puts the eye below the terrain, so
+	// with nothing culled the heightfield's underside rasterizes as a ceiling between the
+	// eye and everything standing on it, and the palms never survive the depth test.
+	// cD3DRender::setCamera meets this by culling back faces throughout and flipping the
+	// winding for the reflection (D3DCULL_CW -> D3DCULL_CCW), the mirror having reversed
+	// every triangle. Cull FRONT here, which with SDL's counter-clockwise front face is
+	// that same D3DCULL_CCW.
+	pci.rasterizer_state.cull_mode = mirrored ? SDL_GPU_CULLMODE_FRONT : SDL_GPU_CULLMODE_NONE;
+	// Clip near/far like D3D9's default, not SDL's depth-clamp default, so an object behind
+	// a camera's near plane is clipped rather than clamped onto it (see
+	// SDLTileMapRenderer::createPipeline). The shadow caster keeps clamp so casters past the
+	// light's far plane still write max depth.
+	pci.rasterizer_state.enable_depth_clip = !shadow;
 	if(shadow){
 		// D3DRS_SLOPESCALEDEPTHBIAS = 2 in CameraShadowMap::DrawScene: push a caster's
 		// depth away from the light in proportion to its slope, so a surface lit at a
@@ -490,6 +505,7 @@ void SDLObject3dxRenderer::SetState(const State& state, Camera* camera)
 
 	current_.blend = state.blend;
 	current_.skinned = boneCount > 1;
+	current_.mirrored = camera->getAttribute(ATTRCAMERA_REFLECTION) != 0;
 
 	currentValid_ = true;
 	currentDirty_ = true;
@@ -587,7 +603,8 @@ bool SDLObject3dxRenderer::DrawShadowPass(SDL_GPUCommandBuffer* cmd, SDL_GPUText
 	for(const DrawCmd& d : draws_){
 		const StateBlock& st = states_[d.state];
 
-		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, false, st.blend, true, false, true);
+		// The caster pass draws for the light camera, which is never mirrored.
+		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, false, st.blend, false, true, false, true);
 		if(!pipeline) continue;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);
@@ -683,7 +700,8 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 	for(const DrawCmd& d : draws_){
 		const StateBlock& st = states_[d.state];
 
-		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, st.bump, st.blend, d.depthWrite, wireframe, false);
+		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, st.bump, st.blend, st.mirrored,
+		                                                d.depthWrite, wireframe, false);
 		if(!pipeline) continue;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);
