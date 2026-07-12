@@ -235,6 +235,14 @@ void LensFlareRenderer::Draw(Camera* camera)
 	if(!isVisible_ || !isEnabled_)
 		return;
 
+	// TODO(sdl-port): the lens flare does not draw. See Render/PORTING.md #6.
+	//
+	// isEnabled_ is serialized, so a world that switches the flare on gets here -- and the
+	// cast below is a lie now: gb_RenderDevice is a cSDLRenderDevice, not a cD3DRender. The
+	// D3D9 body is kept as the reference for the port (it also needs the occlusion query,
+	// PORTING.md #20, to decide whether the sun is hidden).
+	return;
+
 	cD3DRender* renderDevice = static_cast<cD3DRender*>(gb_RenderDevice);
 	
 	DWORD oldFogState = renderDevice->GetRenderState(D3DRS_FOGENABLE);

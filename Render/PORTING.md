@@ -55,6 +55,23 @@ grep -rn "TODO(sdl-port)" --include=*.cpp --include=*.h .
 | 21 | **Screenshots** (`SetScreenShot`), **gamma** (`SetGamma`) | `cSDLRenderDevice`, no-ops. |
 | 22 | **Fullscreen mode** | `PlatformWindow::create` always makes a windowed window; `IsFullScreen()` returns false. `OPTION_FULL_SCREEN` is ignored. |
 
+## The dead D3D9 source is kept on purpose — do not "tidy" it away
+
+`Render/shader/shaders.cpp`, `Render/shader/ShaderStorage.cpp`, `Render/src/CChaos.cpp`,
+`Render/src/RenderCubemap.cpp`, `Render/src/LensFlare.cpp` and `VistaRender/postEffects.cpp`
+still compile, and still contain their full D3D9 implementations. **This is deliberate**: they
+are the reference for the ports above, and `Environment` / `SkyObject` still construct and
+configure them (the settings come out of world data). Nothing in them runs.
+
+They are inert because `gb_RenderDevice3D` is permanently null and the draw entry points return
+early. If you add a new entry point into any of them, guard it the same way — a bare
+`gb_RenderDevice3D->` or a `static_cast<cD3DRender*>(gb_RenderDevice)` is a null dereference or
+a bad cast now, not a Windows-only path.
+
+Getting them out of the build means unpicking `Environment`'s `PostEffectManager` / `Flash` /
+`cChaos` plumbing and `SkyObject`'s cubemap, while keeping the serialization intact so world
+data still loads. Do that when the features are ported, not before.
+
 ## The `_WIN32` guards that are still there on purpose
 
 Every `#ifdef _WIN32` in the rendering code is gone, and so is the one in the in-place

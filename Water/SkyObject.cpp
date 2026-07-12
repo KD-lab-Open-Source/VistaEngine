@@ -716,6 +716,10 @@ float EnvironmentTime::CalcNormalScale()
 	return k_scale;
 }
 
+// TODO(sdl-port): nothing calls this any more -- Environment::graphQuant did, from a D3D-only
+// branch. cRenderCubemap::Init gives up without a device, so pCubeRender holds no cube texture
+// and this would render into nothing. See Render/PORTING.md #9 -- and note it records that the
+// cubemap had no consumer even on D3D, so check that before reviving it.
 void EnvironmentTime::Draw()
 {
 	pCubeRender->Animate(0);

@@ -17,7 +17,11 @@ cChaos::cChaos(Vect2f g_size,const char* str_tex0,const char* str_tex1,const cha
 	pVS=0;
 	pPS=0;
 
-	if(enablebump_)
+	// TODO(sdl-port): gb_RenderDevice3D is gone, so this capability probe -- and with it the
+	// VSChaos/PSChaos shaders and the render-target bump path it selects -- can never run.
+	// enablebump stays BUMP_NONE and the object builds its geometry but draws nothing.
+	// See Render/PORTING.md #6.
+	if(enablebump_ && gb_RenderDevice3D)
 	{
 		if(gb_RenderDevice3D->DeviceCaps.PixelShaderVersion>= D3DPS_VERSION(2,0))
 			enablebump=BUMP_PS14;
@@ -74,8 +78,8 @@ cChaos::~cChaos()
 {
 	delete pVS;
 	delete pPS;
-	gb_RenderDevice3D->DeleteIndexBuffer(ib);
-	gb_RenderDevice3D->DeleteVertexBuffer(vb);
+	gb_RenderDevice->DeleteIndexBuffer(ib);
+	gb_RenderDevice->DeleteVertexBuffer(vb);
 	RELEASE(pTex0);
 	RELEASE(pTexRender);
 	RELEASE(pTexBump);
@@ -112,6 +116,7 @@ void cChaos::Animate(float dt)
 
 void cChaos::RenderAllTexture()
 {
+	// Unreachable: enablebump can no longer become BUMP_RENDERTARGET (see the constructor).
 	if(enablebump==BUMP_RENDERTARGET)
 	{
 		cD3DRender* rd=gb_RenderDevice3D;
@@ -135,6 +140,13 @@ void cChaos::PreDraw(Camera* camera)
 
 void cChaos::Draw(Camera* camera)
 {
+	// TODO(sdl-port): the chaos terrain does not draw. See Render/PORTING.md #6.
+	//
+	// Everything below is D3D9: fixed-function bump-env-map texture stages, texture-transform
+	// matrices and the VSChaos/PSChaos shaders. It is kept as the reference for the port. The
+	// geometry above it is portable and still built, and Animate() still runs.
+	return;
+
 	cD3DRender* rd=gb_RenderDevice3D;
 	BOOL fog=rd->GetRenderState(D3DRS_FOGENABLE);
 //	rd->SetRenderState(D3DRS_FOGENABLE, FALSE);
@@ -271,8 +283,8 @@ void cChaos::Draw(Camera* camera)
 
 void cChaos::CreateIB()
 {
-	gb_RenderDevice3D->CreateIndexBuffer(ib,size*size*2);
-	sPolygon* p=gb_RenderDevice3D->LockIndexBuffer(ib);
+	gb_RenderDevice->CreateIndexBuffer(ib,size*size*2);
+	sPolygon* p=gb_RenderDevice->LockIndexBuffer(ib);
 
 	int vbwidth=size+1;
 	for(int y=0;y<size;y++)
@@ -289,14 +301,14 @@ void cChaos::CreateIB()
 		p++;
 	}
 	
-	gb_RenderDevice3D->UnlockIndexBuffer(ib);
+	gb_RenderDevice->UnlockIndexBuffer(ib);
 }
 
 void cChaos::CreateVB()
 {
-	gb_RenderDevice3D->CreateVertexBuffer(vb,(size+1)*(size+1),VTYPE::declaration,false);
+	gb_RenderDevice->CreateVertexBuffer(vb,(size+1)*(size+1),VTYPE::declaration,false);
 
-	VTYPE* pVertex=(VTYPE*)gb_RenderDevice3D->LockVertexBuffer(vb);
+	VTYPE* pVertex=(VTYPE*)gb_RenderDevice->LockVertexBuffer(vb);
 	xassert(sizeof(VTYPE)==vb.GetVertexSize());
 
 	int smin=-(size/sub_div/2),smax=size/sub_div+smin;
@@ -360,7 +372,7 @@ void cChaos::CreateVB()
 			vout->pos = center + dp;
 		}
 	}
-	gb_RenderDevice3D->UnlockVertexBuffer(vb);
+	gb_RenderDevice->UnlockVertexBuffer(vb);
 }
 
 void cChaos::RenderTexture()
