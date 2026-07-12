@@ -190,14 +190,6 @@ void cEmitterColumnLight::Animate(float dt)
 }
 void cEmitterColumnLight::Draw(Camera* camera)
 {
-#ifndef _WIN32
-	// Not ported: the light column is triangle strips through cVertexBuffer, not the quad
-	// buffer the sprite emitters share, and it takes SetWorldMaterial's second texture and
-	// colour operation, which worldquad.frag.hlsl has no path for. cEffect::Draw now
-	// dispatches to every emitter, so bail before the D3D-only body dereferences
-	// gb_RenderDevice3D (null off-Windows).
-	return;
-#else
 	if(no_show_obj_editor)
 		return;
 	if(parent->GetParticleRateReal()<=0)
@@ -215,10 +207,11 @@ void cEmitterColumnLight::Draw(Camera* camera)
 	cInterfaceRenderDevice* rd = gb_RenderDevice;
 	MatXf wm(GlobalMatrix);
 
-	cVertexBuffer<sVertexXYZDT2>* pBuf = rd->GetBufferXYZDT2();
-
 	float ut1 = 0;
 	float vt1 = 0;
+
+#ifdef _WIN32
+	cVertexBuffer<sVertexXYZDT2>* pBuf = rd->GetBufferXYZDT2();
 
 	gb_RenderDevice->SetSamplerDataVirtual(0,sampler_clamp_linear);
 	gb_RenderDevice->SetSamplerDataVirtual(1,sampler_wrap_linear);
@@ -235,6 +228,23 @@ void cEmitterColumnLight::Draw(Camera* camera)
 		ut1 = ut;
 		vt1 = vt;
 	}
+#else
+	// The world-quad renderer answers to cVertexBuffer's Lock/Unlock/DrawPrimitive as well
+	// as the quad buffer's, so the geometry below is the same code on both backends. The
+	// column is built in emitter space, so wm -- the emitter's GlobalMatrix -- is the
+	// shader's world matrix, exactly as SetWorldMaterial passes it.
+	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
+	if(!pBuf)
+		return;
+	pBuf->SetMaterial(blend_mode, GetTexture(0), true, wm, GetTexture(1), color_mode);
+	if(!GetTexture(0)){
+		// No first texture: the original moves the second onto stage 0 and drops the colour
+		// operation, and scrolls stage 0's uv instead.
+		pBuf->SetMaterial(blend_mode, GetTexture(1), true, wm);
+		ut1 = ut;
+		vt1 = vt;
+	}
+#endif
 #ifdef NEED_TREANGLE_COUNT
 	if(parent->drawOverDraw){
 		gb_RenderDevice3D->SetRenderState(D3DRS_SRCBLEND,D3DBLEND_ONE);
@@ -517,7 +527,6 @@ void cEmitterColumnLight::Draw(Camera* camera)
 			parent->AddCountTriangle(2);
 		#endif
 	}
-#endif   // !_WIN32 returned above
 }
 
 void cEmitterColumnLight::SetTarget(const Vect3f* pos_end,int pos_end_size)
