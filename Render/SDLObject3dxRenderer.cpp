@@ -2,7 +2,6 @@
 #include "StdAfxRD.h"
 #include "SDLObject3dxRenderer.h"
 
-#ifndef _WIN32
 
 #include <SDL3/SDL.h>
 #include <cstdio>
@@ -771,4 +770,3 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 	return true;
 }
 
-#endif // !_WIN32

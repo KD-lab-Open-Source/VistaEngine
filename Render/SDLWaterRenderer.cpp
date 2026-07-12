@@ -2,7 +2,6 @@
 #include "StdAfxRD.h"
 #include "SDLWaterRenderer.h"
 
-#ifndef _WIN32
 
 #include <SDL3/SDL.h>
 #include <cstdio>
@@ -362,4 +361,3 @@ bool SDLWaterRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, S
 	return true;
 }
 
-#endif // !_WIN32

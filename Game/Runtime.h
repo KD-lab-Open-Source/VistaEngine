@@ -73,8 +73,7 @@ protected:
 
 	void checkSingleRunning();
 
-	HWND createWindow(const char* title, const char* icon, int xPos,int yPos,int xScr,int yScr,WNDPROC lpfnWndProc,int dwStyle);
-	void calcRealWindowPos(int xPos,int yPos,int xScr,int yScr,bool fullscreen, unsigned int windowStyle, Vect2i& pos,Vect2i& size);
+	HWND createWindow(const char* title, int xScr, int yScr);
 	void repositionWindow(Vect2i size);
 	void setWindowPicture(const char* file);
 

@@ -2,7 +2,6 @@
 #include "StdAfxRD.h"
 #include "SDLUIRenderer.h"
 
-#ifndef _WIN32
 
 #include <SDL3/SDL.h>
 #include <cstdio>
@@ -631,4 +630,3 @@ int SDLUIRenderer::OutTextLine(int x, int y, const FT::Font& font,
 	return prev_right;
 }
 
-#endif // !_WIN32

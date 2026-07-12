@@ -2,7 +2,6 @@
 #include "StdAfxRD.h"
 #include "SDLWorldQuadRenderer.h"
 
-#ifndef _WIN32
 
 #include <SDL3/SDL.h>
 #include <cstdio>
@@ -676,4 +675,3 @@ bool SDLWorldQuadRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 	return true;
 }
 
-#endif // !_WIN32

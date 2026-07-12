@@ -222,7 +222,9 @@ public:
 	Vect2i GetOriginalScreenSize() override { return Vect2i(xScr, yScr); }
 	bool IsFullScreen() override { return false; }
 	int GetAvailableTextureMem() override { return 0; }
-	HWND GetWindowHandle() override { return (HWND)window_; }
+	// The OS window handle, not the SDL_Window: callers hand this to DirectSound,
+	// DirectInput and the kdw dialogs, which all want a real HWND on Windows.
+	HWND GetWindowHandle() override;
 
 	// --- Textures: real SDL GPU textures + CPU staging ----------------------
 	int   CreateTexture(cTexture* Texture, cFileImage* FileImage, int dxout, int dyout, bool enable_assert) override;

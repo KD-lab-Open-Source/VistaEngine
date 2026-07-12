@@ -2,7 +2,6 @@
 #include "StdAfxRD.h"
 #include "SDLTileMapRenderer.h"
 
-#ifndef _WIN32
 
 #include <SDL3/SDL.h>
 #include <cstdio>
@@ -750,4 +749,3 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	return true;
 }
 
-#endif // !_WIN32

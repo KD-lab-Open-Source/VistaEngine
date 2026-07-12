@@ -2,11 +2,11 @@
 #include "StdAfxRD.h"
 #include "SDLRenderDevice.h"
 
-#ifndef _WIN32
-
 #include <SDL3/SDL.h>
 #include <cstdio>
 #include <cstring>
+
+#include "Platform/Window.h"   // the SDL_Window we claim, and the OS handle beside it
 
 #include "Texture.h"     // cTexture (BitMap / GetDDSurface / attributes)
 #include "FileImage.h"   // cFileImage::GetTexture
@@ -167,10 +167,11 @@ cSDLRenderDevice::~cSDLRenderDevice()
 	Done();
 }
 
-bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND hWnd, int /*RefreshRateInHz*/, HWND /*fallbackWindow*/)
+bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND /*hWnd*/, int /*RefreshRateInHz*/, HWND /*fallbackWindow*/)
 {
-	// hWnd carries the SDL_Window* created by Platform/Window.cpp (HWND == void*).
-	window_ = static_cast<SDL_Window*>(hWnd);
+	// Not hWnd: that is the OS window handle, which on Windows is a real HWND and not
+	// an SDL_Window at all. The window we claim is SDL's own (Platform/Window.h).
+	window_ = static_cast<SDL_Window*>(PlatformWindow::current());
 	if(!window_){
 		fprintf(stderr, "cSDLRenderDevice::Initialize: no window\n");
 		return false;
@@ -224,6 +225,11 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND hWnd, int
 	static bool skinDeclRegistered = false;
 	if(!skinDeclRegistered){ cSkinVertex::Register(); skinDeclRegistered = true; }
 	return true;
+}
+
+HWND cSDLRenderDevice::GetWindowHandle()
+{
+	return PlatformWindow::nativeHandle();
 }
 
 int cSDLRenderDevice::Done()
@@ -1237,4 +1243,3 @@ void cSDLRenderDevice::UnlockIndexBuffer(sPtrIndexBuffer& ib)
 	if(it != ibGpu_.end()) uploadBuffer(it->second);
 }
 
-#endif // !_WIN32
