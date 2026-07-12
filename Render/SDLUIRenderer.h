@@ -29,6 +29,8 @@ struct SDL_GPUSampler;
 struct SDL_GPUBuffer;
 struct SDL_GPUTransferBuffer;
 
+class SDLMinimapRenderer;
+
 class SDLUIRenderer
 {
 public:
@@ -40,6 +42,15 @@ public:
 
 	SDLUIRenderer(const SDLUIRenderer&) = delete;
 	SDLUIRenderer& operator=(const SDLUIRenderer&) = delete;
+
+	// The minimap draws part-way through the UI -- panels behind it, its own start-location
+	// labels (ordinary UI text) in front -- so it cannot own a pass of its own without
+	// landing under or over the whole UI. Instead it records into SDLMinimapRenderer, drops
+	// a marker here with EmitMinimapRun, and this renderer replays it at that exact point of
+	// its own pass. The device wires the two together and owns both.
+	void setMinimapRenderer(SDLMinimapRenderer* minimap) { minimap_ = minimap; }
+	// Reserve the next slot in the draw order for minimap draw `index`.
+	void EmitMinimapRun(int index);
 
 	// Drop the previous frame's quads. Called from BeginScene.
 	void BeginFrame();
@@ -85,8 +96,10 @@ private:
 	struct UIVertex { float x, y, z, w; unsigned int color; float u, v; };
 
 	// One draw call per contiguous run of vertices sharing a texture and a primitive
-	// type. `lines` picks the line-list pipeline over the triangle-list one.
-	struct DrawRun { SDL_GPUTexture* tex; int first; int count; bool lines; };
+	// type. `lines` picks the line-list pipeline over the triangle-list one. `minimap`
+	// >= 0 instead means the run is a placeholder: it owns no vertices here, and drawing
+	// it hands off to SDLMinimapRenderer's draw of that index.
+	struct DrawRun { SDL_GPUTexture* tex; int first; int count; bool lines; int minimap; };
 
 	void createPipeline();               // pipelines + sampler + white texture
 	void ensureVertexCapacity(int verts);
@@ -111,6 +124,7 @@ private:
 	std::vector<DrawRun>  runs_;
 	SDL_GPUTexture*       currentTexture_ = nullptr;   // set by SetTexture
 	int                   quadCount_ = 0;
+	SDLMinimapRenderer*   minimap_ = nullptr;          // not owned; the device owns both
 };
 
 #endif // VISTA_SDL_UI_RENDERER_H

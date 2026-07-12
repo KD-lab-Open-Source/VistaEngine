@@ -366,6 +366,8 @@ private:
 	AnimatedSprites animatedSprites_;
 
 	void drawSprite(const Sprite& sprite, float time);
+	/// экранные углы спрайта, их UV на маске и его итоговый цвет
+	Color4c spriteQuad(const Sprite& data, Vect2i vi[4], Vect2f uv[4]) const;
 	void writeSprite(struct sVertexXYZWDT2* pv, const Sprite& data);
 	void flushSprites();
 

@@ -511,14 +511,19 @@ void cVisGeneric::SetShadowMapSelf4x4(bool b4x4)
 
 void cVisGeneric::SetTilemapDetail(bool b)
 {
+	Option_DetailTexture=b;
+#ifdef _WIN32
+	// A capability check, not a presence check: the detail layer needs ps2.0, and the
+	// D3D backend recompiles the tilemap shader for it (DETAIL_TEXTURE is a static define
+	// there). Off-Windows the SDL tilemap shader always carries the layer and reads the
+	// option straight out of a uniform, so there is nothing to gate and nothing to
+	// recompile -- and gating on the *device pointer*, which is null on SDL, would have
+	// forced the option off for good.
 	if(gb_RenderDevice3D && gb_RenderDevice3D->IsPS20())
-	{
-		Option_DetailTexture=b;
 		gb_RenderDevice3D->RestoreShader();
-	}else
-	{
+	else
 		Option_DetailTexture=false;
-	}
+#endif
 }
 
 bool cVisGeneric::GetTilemapDetail()

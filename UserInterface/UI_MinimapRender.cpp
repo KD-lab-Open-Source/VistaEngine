@@ -6,6 +6,22 @@
 #include "Water/Water.h"
 #include "Render/src/FogOfWar.h"
 
+#ifndef _WIN32
+// Off-Windows the minimap's two shaders (psMiniMap, psMiniMapBorder) and the device's typed
+// vertex buffers are SDLMinimapRenderer's. Everything above this line -- the layout, the
+// rotation, the event bookkeeping -- is shared; only the draw calls fork.
+#include "Render/SDLMinimapRenderer.h"
+#include <vector>
+
+namespace {
+// Color4c is already BGRA bytes, which is the order the minimap vertex layout reads them in.
+unsigned int packColor(const Color4c& c)
+{
+	return (unsigned)c.b | ((unsigned)c.g << 8) | ((unsigned)c.r << 16) | ((unsigned)c.a << 24);
+}
+} // namespace
+#endif
+
 Singleton<UI_Minimap> minimap;
 
 // --------------------------------------------------------------------------
@@ -383,6 +399,7 @@ void UI_Minimap::redraw(float alpha)
 	if(mapTexture_)
 		drawMiniMap(alpha);
 
+#ifdef _WIN32
 	gb_RenderDevice3D->SetNoMaterial(ALPHA_BLEND, MatXf::ID);
 
 	if(mask_){
@@ -392,6 +409,9 @@ void UI_Minimap::redraw(float alpha)
 	}
 	else
 		gb_RenderDevice3D->psMiniMapBorder->SetUseBorder(false);
+#endif
+	// Off-Windows there is no device state to set up front: alpha blending is baked into the
+	// minimap pipelines, and the mask travels with each batch (SDLMinimapRenderer::DrawPrims).
 
 	if(drawEvents_){
 		drawEvents(BACKGROUND, alpha);
@@ -451,8 +471,64 @@ void UI_Minimap::drawMiniMap(float alpha)
 		vi[cidx] = UI_RenderBase::instance().screenCoords(ci);
 	}
 
+#ifndef _WIN32
+	{
+	SDLMinimapRenderer* renderer = sdlMinimapRenderer();
+	if(!renderer)
+		return;
+
+	// One MapState carries what the D3D path spreads across psMiniMap's four Set* calls,
+	// its Select(), and the SetTexture/SetSamplerData pairs behind them.
+	SDLMinimapRenderer::MapState st;
+	st.base = mapTexture_;               // null -> the shader falls back to terraColor
+	st.mask = mask_;
+	st.waterColor = waterColor_;
+	st.terraColor = terra;
+
+	if(environment){
+		if(drawWater_ && environment->water())
+			st.water = environment->water()->GetTextureMiniMap();
+
+		if(isFogOfWar() && environment->fogOfWar()){
+			st.addition = environment->fogOfWar()->GetTexture();
+			st.additionMode = 1;
+			st.additionAlpha = environment->fogOfWar()->GetInvFogAlpha();
+		}
+		else if(isInstallZones() && placeZones_){
+			st.addition = placeZones_;
+			st.additionMode = 2;
+			st.additionAlpha = environment->minimapZonesAlpha();
+		}
+	}
+
+	// The same four corners, the same three coordinate sets: the map spans 0..1 across the
+	// quad, and the mask is sampled in the control's own box. (u1..u3 of sVertexXYZWDT4 are
+	// identical in the D3D path, so one UV covers the map, the water and the addition.)
+	SDLMinimapRenderer::Vertex v[4];
+	const unsigned int fogColor = packColor(Color4c(fog));
+	const float mapU[4] = { 0.f, 0.f, 1.f, 1.f };
+	const float mapV[4] = { 0.f, 1.f, 0.f, 1.f };
+	for(int i = 0; i < 4; ++i){
+		v[i].x = vi[i].x - 0.5f;
+		v[i].y = vi[i].y - 0.5f;
+		v[i].color = fogColor;   // only its alpha is read, by the fog-of-war branch
+		v[i].u = mapU[i];
+		v[i].v = mapV[i];
+		if(mask_)
+			setMaskUV(c[i], v[i].mu, v[i].mv);
+		else {
+			v[i].mu = mapU[i];
+			v[i].mv = mapV[i];
+		}
+	}
+
+	renderer->DrawMap(st, v);
+	return;
+	}
+#endif
+
 	gb_RenderDevice3D->SetBlendStateAlphaRef(ALPHA_BLEND);
-	
+
 	if(mapTexture_){
 		gb_RenderDevice3D->psMiniMap->SetUseTerraColor(false);
 		gb_RenderDevice3D->SetSamplerData(0, sampler_clamp_linear);
@@ -597,23 +673,62 @@ void UI_Minimap::drawViewZone(float alpha)
 void UI_Minimap::drawLine(Vect2f pos0, Vect2f pos1, const Color4c& color, bool noCLip)
 {
 	if(noCLip || position_.clipLine(pos0, pos1)){
-		if(mask_){
-			Line2d line;
-			line.c = color;
-			line.p0 = xformPoint(pos0);
-			line.p1 = xformPoint(pos1);
-			lines_.push_back(line);
-		}
-		else {
+#ifdef _WIN32
+		if(!mask_){
+			// Unmasked, the D3D backend needs no shader for these and draws them at once.
 			Vect2i pi0 = UI_RenderBase::instance().screenCoords(xformPoint(pos0));
 			Vect2i pi1 = UI_RenderBase::instance().screenCoords(xformPoint(pos1));
 			gb_RenderDevice3D->DrawLine(pi0.x, pi0.y, pi1.x, pi1.y, color);
+			return;
 		}
+#endif
+		// Off-Windows every line takes the batched path, masked or not: one route through
+		// flushLines, which is also what keeps them in the UI's draw order.
+		Line2d line;
+		line.c = color;
+		line.p0 = xformPoint(pos0);
+		line.p1 = xformPoint(pos1);
+		lines_.push_back(line);
 	}
 }
 
 void UI_Minimap::flushLines()
 {
+#ifndef _WIN32
+	{
+	SDLMinimapRenderer* renderer = sdlMinimapRenderer();
+	if(!renderer || lines_.empty()){
+		lines_.clear();
+		return;
+	}
+
+	std::vector<SDLMinimapRenderer::Vertex> verts;
+	verts.reserve(lines_.size() * 2);
+
+	Lines2d::const_iterator lit;
+	FOR_EACH(lines_, lit){
+		const Line2d& line = *lit;
+		Vect2i p0s = UI_RenderBase::instance().screenCoords(line.p0);
+		Vect2i p1s = UI_RenderBase::instance().screenCoords(line.p1);
+
+		SDLMinimapRenderer::Vertex v0, v1;
+		v0.x = (float)p0s.x; v0.y = (float)p0s.y;
+		v1.x = (float)p1s.x; v1.y = (float)p1s.y;
+		v0.color = v1.color = packColor(line.c);
+		setMaskUV(line.p0, v0.mu, v0.mv);
+		setMaskUV(line.p1, v1.mu, v1.mv);
+		v0.u = v0.v = v1.u = v1.v = 0.f;   // untextured: the shader reads only the colour
+
+		verts.push_back(v0);
+		verts.push_back(v1);
+	}
+
+	renderer->DrawPrims(mask_, 0, 0.f, /*lines*/true, &verts[0], (int)verts.size());
+	lines_.clear();
+	return;
+	}
+#endif
+
 	gb_RenderDevice3D->psMiniMapBorder->SetUseTexture(false);
 	gb_RenderDevice3D->psMiniMapBorder->Select();
 
@@ -671,7 +786,15 @@ void UI_Minimap::drawSprite(const Sprite& sprite, float time)
 		spritesmap_[sprite.sprite->texture()].push_back(sprite);
 }
 
-void UI_Minimap::writeSprite(sVertexXYZWDT2* pv, const Sprite& data)
+// The sprite's four screen corners and their UVs on the control's mask, plus the colour its
+// six vertices all carry. Split out of writeSprite so the SDL path builds the same quad.
+/*
+c0-----c3
+|      |
+|      |
+c1-----c2
+*/
+Color4c UI_Minimap::spriteQuad(const Sprite& data, Vect2i vi[4], Vect2f uv[4]) const
 {
 	const UI_Sprite& sprite = *data.sprite;
 
@@ -681,29 +804,15 @@ void UI_Minimap::writeSprite(sVertexXYZWDT2* pv, const Sprite& data)
 		round(data.color.b * sprite.diffuseColor().b / 255.f),
 		round(data.color.a * sprite.diffuseColor().a / 255.f));
 
-
 	Mat2f rot(data.rot + rotationAngle_);
 
-	/*
-	c0-----c3
-	|		|
-	|		|
-	c1-----c2
-	*/
 	Vect2f c[4] = {
 		Vect2f(-data.pos.width(), -data.pos.height()),
 		Vect2f(-data.pos.width(), +data.pos.height()),
 		Vect2f(+data.pos.width(), +data.pos.height()),
 		Vect2f(+data.pos.width(), -data.pos.height())
 	};
-	Vect2i vi[4];
-	Vect2f uv[4];
-	/*
-	v0,5----v4
-	|		|
-	|		|
-	v1------v2,3
-	*/
+
 	Vect2f pos = data.pos.center();
 	for(int idx = 0; idx < 4; ++idx){
 		Vect2f& ci = c[idx];
@@ -715,6 +824,22 @@ void UI_Minimap::writeSprite(sVertexXYZWDT2* pv, const Sprite& data)
 		vi[idx] = UI_RenderBase::instance().screenCoords(ci);
 		setMaskUV(ci, uv[idx].x, uv[idx].y);
 	}
+	return color;
+}
+
+void UI_Minimap::writeSprite(sVertexXYZWDT2* pv, const Sprite& data)
+{
+	const UI_Sprite& sprite = *data.sprite;
+
+	Vect2i vi[4];
+	Vect2f uv[4];
+	/*
+	v0,5----v4
+	|		|
+	|		|
+	v1------v2,3
+	*/
+	Color4c color = spriteQuad(data, vi, uv);
 	pv[0].diffuse = pv[1].diffuse = pv[2].diffuse = pv[3].diffuse = pv[4].diffuse = pv[5].diffuse = color;
 	pv[0].w = pv[0].z = pv[1].w = pv[1].z = pv[2].w = pv[2].z = pv[3].w = pv[3].z = pv[4].w = pv[4].z = pv[5].w = pv[5].z = 0.001f;
 
@@ -747,8 +872,94 @@ void UI_Minimap::writeSprite(sVertexXYZWDT2* pv, const Sprite& data)
 	pv[4].v2() = pv[2].v2() = pv[3].v2() = sprite.textureCoords().bottom();
 }
 
+#ifndef _WIN32
+// The six vertices of one sprite quad, in the same order writeSprite emits them:
+//
+//   v0,5----v4
+//   |        |
+//   v1------v2,3
+//
+// Note the atlas coordinates: v1 (bottom-left) takes (right, top) and v4 (top-right) takes
+// (left, bottom), where the geometry would have them the other way round -- the original
+// transposes the sprite across its main diagonal. Reproduced rather than corrected: the
+// minimap symbols are near enough symmetric for it not to show, and this is the picture the
+// game has always drawn.
+static void writeSpriteSDL(SDLMinimapRenderer::Vertex* pv, const Vect2i vi[4], const Vect2f uv[4],
+                           const Rectf& tc, const Color4c& color)
+{
+	const unsigned int c = packColor(color);
+	for(int i = 0; i < 6; ++i)
+		pv[i].color = c;
+
+	pv[5].mu = pv[0].mu = uv[0].x;  pv[5].mv = pv[0].mv = uv[0].y;
+	pv[3].mu = pv[2].mu = uv[2].x;  pv[3].mv = pv[2].mv = uv[2].y;
+	pv[1].mu = uv[1].x;             pv[1].mv = uv[1].y;
+	pv[4].mu = uv[3].x;             pv[4].mv = uv[3].y;
+
+	pv[5].x = pv[0].x = vi[0].x - 0.5f;  pv[5].y = pv[0].y = vi[0].y - 0.5f;
+	pv[3].x = pv[2].x = vi[2].x - 0.5f;  pv[3].y = pv[2].y = vi[2].y - 0.5f;
+	pv[1].x = vi[1].x - 0.5f;            pv[1].y = vi[1].y - 0.5f;
+	pv[4].x = vi[3].x - 0.5f;            pv[4].y = vi[3].y - 0.5f;
+
+	pv[0].u = pv[5].u = pv[4].u = tc.left();
+	pv[1].u = pv[2].u = pv[3].u = tc.right();
+	pv[0].v = pv[5].v = pv[1].v = tc.top();
+	pv[4].v = pv[2].v = pv[3].v = tc.bottom();
+}
+#endif
+
 void UI_Minimap::flushSprites()
 {
+#ifndef _WIN32
+	{
+	SDLMinimapRenderer* renderer = sdlMinimapRenderer();
+	if(!renderer){
+		spritesmap_.clear();
+		animatedSprites_.clear();
+		return;
+	}
+
+	// One batch per texture, as the D3D path does -- it is the texture that forces the break.
+	std::vector<SDLMinimapRenderer::Vertex> verts;
+	Spritesmap::iterator sit = spritesmap_.begin();
+	for(; sit != spritesmap_.end(); ++sit){
+		Sprites& sprites = sit->second;
+		if(sprites.empty())
+			continue;
+
+		verts.clear();
+		verts.resize(sprites.size() * 6);
+
+		int n = 0;
+		Sprites::const_iterator it;
+		FOR_EACH(sprites, it){
+			Vect2i vi[4];
+			Vect2f uv[4];
+			Color4c color = spriteQuad(*it, vi, uv);
+			writeSpriteSDL(&verts[n], vi, uv, it->sprite->textureCoords(), color);
+			n += 6;
+		}
+
+		renderer->DrawPrims(mask_, sit->first, 0.f, /*lines*/false, &verts[0], n);
+		sprites.clear();
+	}
+
+	// Animated ones each pick their own frame of the texture, so each is its own batch --
+	// again as on Windows, where SetTexturePhase forces a draw per sprite.
+	AnimatedSprites::const_iterator ait;
+	FOR_EACH(animatedSprites_, ait){
+		Vect2i vi[4];
+		Vect2f uv[4];
+		Color4c color = spriteQuad(*ait, vi, uv);
+		SDLMinimapRenderer::Vertex v[6];
+		writeSpriteSDL(v, vi, uv, ait->sprite->textureCoords(), color);
+		renderer->DrawPrims(mask_, ait->sprite->texture(), ait->phase, /*lines*/false, v, 6);
+	}
+	animatedSprites_.clear();
+	return;
+	}
+#endif
+
 	gb_RenderDevice3D->psMiniMapBorder->SetUseTexture(true);
 	gb_RenderDevice3D->SetSamplerData(1, sampler_clamp_linear);
 	gb_RenderDevice3D->psMiniMapBorder->Select();
@@ -805,6 +1016,48 @@ void UI_Minimap::flushRectangles()
 {
 	if(rectangles_.empty())
 		return;
+
+#ifndef _WIN32
+	{
+	SDLMinimapRenderer* renderer = sdlMinimapRenderer();
+	if(!renderer){
+		rectangles_.clear();
+		return;
+	}
+
+	// Six vertices each, in writeSprite's order (v0,5 / v1 / v2,3 / v4), untextured so the
+	// shader shows the vertex colour alone. `rot` is ignored, as it is on Windows.
+	std::vector<SDLMinimapRenderer::Vertex> verts(rectangles_.size() * 6);
+	int n = 0;
+
+	Rectangles::const_iterator rit;
+	FOR_EACH(rectangles_, rit){
+		SDLMinimapRenderer::Vertex* pv = &verts[n];
+
+		Vect2f v0 = UI_RenderBase::instance().screenCoords(rit->v1);
+		Vect2f v1 = UI_RenderBase::instance().screenCoords(rit->v2);
+		setMaskUV(rit->v1, pv[0].mu, pv[0].mv);
+		setMaskUV(rit->v2, pv[2].mu, pv[2].mv);
+
+		const unsigned int c = packColor(rit->color);
+		pv[0].color = pv[4].color = pv[2].color = pv[1].color = c;
+		pv[0].x = pv[1].x = v0.x - 0.5f;  pv[1].mu = pv[0].mu;
+		pv[4].x = pv[2].x = v1.x - 0.5f;  pv[4].mu = pv[2].mu;
+		pv[0].y = pv[4].y = v0.y - 0.5f;  pv[4].mv = pv[0].mv;
+		pv[2].y = pv[1].y = v1.y - 0.5f;  pv[1].mv = pv[2].mv;
+		pv[0].u = pv[1].u = pv[2].u = pv[4].u = 0.f;
+		pv[0].v = pv[1].v = pv[2].v = pv[4].v = 0.f;
+		pv[3] = pv[2];
+		pv[5] = pv[0];
+
+		n += 6;
+	}
+
+	renderer->DrawPrims(mask_, 0, 0.f, /*lines*/false, &verts[0], n);
+	rectangles_.clear();
+	return;
+	}
+#endif
 
 	gb_RenderDevice3D->psMiniMapBorder->SetUseTexture(false);
 	gb_RenderDevice3D->psMiniMapBorder->Select();

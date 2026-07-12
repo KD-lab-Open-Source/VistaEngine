@@ -19,6 +19,7 @@
 #include "SDLObject3dxRenderer.h"
 #include "SDLWaterRenderer.h"
 #include "SDLWorldQuadRenderer.h"
+#include "SDLMinimapRenderer.h"
 
 // See the declarations in SDLRenderDevice.h.
 cSDLRenderDevice* sdlRenderDevice()
@@ -42,6 +43,50 @@ SDLWorldQuadRenderer* sdlWorldQuadRenderer()
 {
 	cSDLRenderDevice* dev = sdlRenderDevice();
 	return dev ? dev->worldQuadRenderer() : nullptr;
+}
+
+SDLMinimapRenderer* sdlMinimapRenderer()
+{
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	return dev ? dev->minimapRenderer() : nullptr;
+}
+
+SDL_GPUTexture* createSolidGPUTexture(SDL_GPUDevice* device, unsigned int rgba)
+{
+	if(!device)
+		return nullptr;
+
+	SDL_GPUTextureCreateInfo ti = {};
+	ti.type = SDL_GPU_TEXTURETYPE_2D;
+	ti.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
+	ti.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER;
+	ti.width = 1; ti.height = 1; ti.layer_count_or_depth = 1; ti.num_levels = 1;
+	SDL_GPUTexture* tex = SDL_CreateGPUTexture(device, &ti);
+	if(!tex)
+		return nullptr;
+
+	SDL_GPUTransferBufferCreateInfo tbi = {};
+	tbi.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+	tbi.size = 4;
+	SDL_GPUTransferBuffer* tb = SDL_CreateGPUTransferBuffer(device, &tbi);
+	if(!tb)
+		return tex;   // the texture exists; it just has no contents
+
+	unsigned int* px = (unsigned int*)SDL_MapGPUTransferBuffer(device, tb, false);
+	*px = rgba;
+	SDL_UnmapGPUTransferBuffer(device, tb);
+
+	SDL_GPUCommandBuffer* cb = SDL_AcquireGPUCommandBuffer(device);
+	SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(cb);
+	SDL_GPUTextureTransferInfo src = {};
+	src.transfer_buffer = tb; src.offset = 0;
+	SDL_GPUTextureRegion dst = {};
+	dst.texture = tex; dst.w = 1; dst.h = 1; dst.d = 1;
+	SDL_UploadToGPUTexture(copy, &src, &dst, false);
+	SDL_EndGPUCopyPass(copy);
+	SDL_SubmitGPUCommandBuffer(cb);
+	SDL_ReleaseGPUTransferBuffer(device, tb);
+	return tex;
 }
 
 void applyCameraViewport(SDL_GPURenderPass* pass, const sViewPort& vp, int targetW, int targetH)
@@ -159,6 +204,13 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND hWnd, int
 		waterRenderer_ = std::make_unique<SDLWaterRenderer>(this, device_, window_);
 	if(!worldQuadRenderer_)
 		worldQuadRenderer_ = std::make_unique<SDLWorldQuadRenderer>(device_, window_);
+	if(!minimapRenderer_){
+		minimapRenderer_ = std::make_unique<SDLMinimapRenderer>(device_, window_);
+		// The minimap draws inside the UI's pass, at the point in its run list where the
+		// minimap control was reached; each needs the other to arrange that.
+		minimapRenderer_->setUIRenderer(uiRenderer_.get());
+		uiRenderer_->setMinimapRenderer(minimapRenderer_.get());
+	}
 
 	// Build the skinned-vertex declarations (on Windows cD3DRender does this at
 	// device init via CreateVertexDeclaration; cSkinVertex::Register is portable
@@ -183,8 +235,10 @@ int cSDLRenderDevice::Done()
 	deleteShadowMap();
 	deleteLightMap();
 
-	// The renderers hold GPU objects built on device_, so they must go first.
+	// The renderers hold GPU objects built on device_, so they must go first. The UI
+	// renderer holds a bare pointer to the minimap one, so it goes first of those two.
 	uiRenderer_.reset();
+	minimapRenderer_.reset();
 	tileMapRenderer_.reset();
 	objectRenderer_.reset();
 	waterRenderer_.reset();

@@ -79,6 +79,7 @@ else()
     # the renderer classes it forwards drawing to (2D/UI so far).
     list(APPEND RENDER_SOURCES SDLRenderDevice.cpp)
     list(APPEND RENDER_SOURCES SDLUIRenderer.cpp)
+    list(APPEND RENDER_SOURCES SDLMinimapRenderer.cpp)
     list(APPEND RENDER_SOURCES SDLTileMapRenderer.cpp)
     list(APPEND RENDER_SOURCES SDLObject3dxRenderer.cpp)
     list(APPEND RENDER_SOURCES SDLWaterRenderer.cpp)

@@ -42,6 +42,7 @@ class SDLTileMapRenderer;
 class SDLObject3dxRenderer;
 class SDLWaterRenderer;
 class SDLWorldQuadRenderer;
+class SDLMinimapRenderer;
 class cTileMap;
 
 // Restrict drawing to a camera's viewport, the way cD3DRender::SetDrawTransform hands
@@ -50,6 +51,12 @@ class cTileMap;
 // loses the letterbox bars the 4:3 work area leaves. A render pass starts out with the
 // full target as its viewport, so this only ever needs setting, never restoring.
 void applyCameraViewport(SDL_GPURenderPass* pass, const sViewPort& vp, int targetW, int targetH);
+
+// A 1x1 RGBA texture of one colour, uploaded on a command buffer of its own. Every renderer
+// needs a couple: SDL requires a sampler binding to be non-null even where the shader gates
+// the layer off, so a solid stand-in goes in the slot -- white where the sample must be
+// neutral to a multiply, mid-grey where it must be neutral to the terrain's `detail - 0.5`.
+SDL_GPUTexture* createSolidGPUTexture(SDL_GPUDevice* device, unsigned int rgba);
 
 // gb_RenderDevice as a cSDLRenderDevice, or null under any other device. Off-Windows
 // gb_RenderDevice3D stays null, so engine code that needs the backend (cScene's shadow
@@ -70,6 +77,11 @@ SDLWaterRenderer* sdlWaterRenderer();
 // cFixedWaves and cWaves drive it exactly as they drive the device's shared quad buffer
 // on Windows -- it even answers to the same BeginDraw/Get/EndDraw.
 SDLWorldQuadRenderer* sdlWorldQuadRenderer();
+
+// The SDL backend's minimap renderer, or null under any other device. UI_Minimap's draw
+// half drives it exactly as it drives psMiniMap / psMiniMapBorder on Windows. It draws
+// inside the UI renderer's pass -- see SDLMinimapRenderer.h.
+SDLMinimapRenderer* sdlMinimapRenderer();
 
 class cSDLRenderDevice : public cInterfaceRenderDevice
 {
@@ -105,6 +117,12 @@ public:
 	void drawWater();
 	SDLWorldQuadRenderer* worldQuadRenderer() { return worldQuadRenderer_.get(); }
 	void drawWorldQuads();
+
+	// --- Minimap ------------------------------------------------------------
+	// Unlike the above, this one has no draw call of its own: the minimap is a UI control,
+	// so its draws are sequenced into SDLUIRenderer's run list and replayed inside the UI
+	// pass. See SDLMinimapRenderer.h.
+	SDLMinimapRenderer* minimapRenderer() { return minimapRenderer_.get(); }
 
 	// Replay the object batch recorded so far into the current target, and take that
 	// target's clears if they are still going. drawWater / drawWorldQuads call it to get
@@ -433,6 +451,7 @@ private:
 	std::unique_ptr<SDLObject3dxRenderer> objectRenderer_;
 	std::unique_ptr<SDLWaterRenderer>     waterRenderer_;
 	std::unique_ptr<SDLWorldQuadRenderer> worldQuadRenderer_;
+	std::unique_ptr<SDLMinimapRenderer>   minimapRenderer_;
 };
 
 #endif // VISTA_SDL_RENDER_DEVICE_H

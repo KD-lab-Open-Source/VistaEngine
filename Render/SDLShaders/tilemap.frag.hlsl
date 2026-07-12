@@ -32,8 +32,8 @@
 // intensity. shadowFactor is the original's per-vertex `smoothstep(0.15, 0.2, N.L)`: it
 // fades the shadow out on terrain already turned away from the sun.
 //
-// The remaining layers (bump, lightmap, detail texture, fog of war, fog) come back as
-// this renderer grows; the original's structure is the map for that.
+// The remaining layers (bump, fog of war, fog) come back as this renderer grows; the
+// original's structure is the map for that.
 //
 // Authored in HLSL; cross-compiled to SPIR-V/MSL with SDL_shadercross. See
 // build-tilemap-shaders.sh.
@@ -51,6 +51,15 @@ SamplerState      ShadowSampler : register(s1, space2);
 // offset on the light term* rather than as a multiplier on the surface colour.
 Texture2D<float4> LightMapTexture : register(t2, space2);
 SamplerState      LightMapSampler : register(s2, space2);
+// The material's mini-detail texture (the original's ShadowMinitexture, s4): a small
+// noise tile -- grass, ground, mountain, sand -- wrapped many times across the map, which
+// adds the surface grain the baked per-cell colour is far too coarse to hold. cTileMap
+// keeps one per material and the terrain is drawn a material at a time, so which texture
+// is bound varies from draw to draw. Its sampler wraps and filters trilinearly: the mip
+// chain averages the noise to flat grey, which is what makes the grain fade out with
+// distance instead of aliasing into a shimmer.
+Texture2D<float4> DetailTexture : register(t3, space2);
+SamplerState      DetailSampler : register(s3, space2);
 
 cbuffer Light : register(b0, space3)
 {
@@ -71,6 +80,10 @@ cbuffer Light : register(b0, space3)
     // original -- LIGHTMAP is a shader define, and the map always exists once the device
     // is up. Here the map may not be created yet, or the pass may not have run.
     float4 LightMapParams;
+    // x != 0: this draw's material has a detail texture bound. The original's DETAIL_TEXTURE
+    // define, which it recompiles the shader for; Option_DetailTexture (the "detail texture"
+    // graphics option) turns it off, and so does a material with no texture of its own.
+    float4 DetailParams;
 };
 
 struct VSOutput
@@ -80,6 +93,7 @@ struct VSOutput
     float2 UV        : TEXCOORD0;
     float4 ShadowPos : TEXCOORD1;
     float2 LightmapUV : TEXCOORD2;
+    float2 MiniUV    : TEXCOORD3;
 };
 
 // shadow9700.inl's `#define ccx 0.0005`: the 2x2 tap offset, in shadow-map uv. Almost
@@ -141,6 +155,13 @@ float4 main(VSOutput input) : SV_Target0
 
     float4 ot = ColorTexture.Sample(ColorSampler, input.UV);
     ot.rgb *= light;
+
+    // `ot.rgb += tex2D(ShadowMinitexture, v.minitexture) - 0.5`, exactly where the original
+    // puts it: after the light has modulated the surface colour, before the shadow. A
+    // *signed* offset, so the tile's mid-grey adds nothing and only its deviation from grey
+    // shows -- which is why TextureMiniDetail equalises the tile's brightness on load.
+    if(DetailParams.x != 0.0f)
+        ot.rgb += DetailTexture.Sample(DetailSampler, input.MiniUV).rgb - 0.5f;
 
     if(ShadowParams.x != 0.0f)
     {

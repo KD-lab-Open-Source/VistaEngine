@@ -16,12 +16,19 @@
 // It owns its GPU geometry outright (raw SDL_GPUBuffer, not the device's sPtr VB/IB
 // slots) because the mesh is built here, from vMap, and shared with nothing.
 //
-// Scope: the heightfield surface with its baked per-cell colour and one directional
-// light, receiving the scene's shadow map and casting into it. The original's remaining
-// layers -- bump, lightmap, detail texture, fog of war, fog -- and the real tile/LOD
-// streaming are still to come.
+// Like the original, the surface is drawn a material at a time: vMap's MultiRegion paints
+// every fine cell with one of cTileMap's 16 materials, and each material carries its own
+// mini-detail texture. The index buffer is therefore grouped into one contiguous run per
+// material (the original's per-tile `index[material]` lists, hoisted to the whole map),
+// and Draw walks the runs, rebinding the detail texture between them.
+//
+// Scope: the heightfield surface with its baked per-cell colour, one directional light and
+// the per-material detail grain, receiving the scene's shadow map and casting into it. The
+// original's remaining layers -- bump, fog of war, fog -- the placement-zone (lava/ice)
+// materials, and the real tile/LOD streaming are still to come.
 
 #include <string>
+#include <vector>
 
 struct SDL_Window;
 struct SDL_GPUDevice;
@@ -70,6 +77,10 @@ private:
 	// are derived from world XY in the shader, so none are stored.
 	struct Vertex { float x, y, z; float nx, ny, nz; };
 
+	// One contiguous run of the index buffer, all of whose triangles vMap's region map
+	// assigns to the same cTileMap material. One draw call each.
+	struct MaterialRun { int material; int first; int count; };
+
 	void createPipeline();
 	void createShadowPipeline();
 	// Rebuild when vMap is reloaded in place for a new mission. Returns false while
@@ -94,12 +105,20 @@ private:
 	// Point + clamp: the shadow compare is done by hand on raw depth values, which must
 	// not be filtered, and a receiver outside the map must read its edge, not wrap.
 	SDL_GPUSampler*          shadowSampler_ = nullptr;
+	// Wrap + trilinear: the detail tile repeats across the map, and its mip chain is what
+	// fades the grain out with distance (the original's sampler_wrap_anisotropic).
+	SDL_GPUSampler*          detailSampler_ = nullptr;
 
 	SDL_GPUBuffer*  vertexBuffer_ = nullptr;
 	SDL_GPUBuffer*  indexBuffer_  = nullptr;
 	int             indexCount_   = 0;
+	std::vector<MaterialRun> runs_;            // the index buffer, grouped by material
 	SDL_GPUTexture* colorTexture_ = nullptr;   // baked per-cell surface colour (vMap.clrBuf)
 	SDL_GPUTexture* whiteTexture_ = nullptr;   // 1x1, substituted in wireframe mode
+	// Mid-grey 1x1, bound as the detail texture when a material has none: the shader adds
+	// `detail - 0.5`, so 128,128,128 contributes exactly nothing. (The DetailParams gate
+	// makes it unreachable; it is here so the binding is never null.)
+	SDL_GPUTexture* greyTexture_ = nullptr;
 
 	std::string builtWorld_;        // vMap world the current mesh was built for
 	bool        buildFailed_ = false;

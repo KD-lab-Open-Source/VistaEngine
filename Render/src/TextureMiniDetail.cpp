@@ -121,6 +121,33 @@ bool TextureMiniDetail::normalize()
 
 bool TextureMiniDetail::buildDDS()
 {
+#ifndef _WIN32
+	// No D3DX off-Windows: create the texture through the cross-platform device and hand
+	// it the equalised pixels. Color4c is b,g,r,a in memory, which is the device's staging
+	// order, so the rows copy straight in.
+	//
+	// The D3D path below builds the mip chain by hand, desaturating each level further than
+	// the last (s *= (num_bit-i)/num_bit) so the tile loses its colour with distance and
+	// only its luminance grain survives. The SDL device generates the chain on the GPU
+	// instead; box-filtering noise converges on flat grey, which the shader's `detail - 0.5`
+	// turns into nothing, so the grain still fades out -- it just keeps its hue on the way.
+	//
+	// In practice this path only runs on a texture-cache miss: off-Windows cTexLibrary
+	// treats the shipped cache as exported, so the game's own detail textures come back as
+	// pre-built DDS (mips and all) through loadDDS, and reload() is never called for them.
+	New(1);
+	if(gb_RenderDevice->CreateTexture(this, 0, -1, -1) != 0)
+		return false;
+
+	int pitch = 0;
+	BYTE* dst = LockTexture(pitch);
+	if(!dst)
+		return false;
+	for(int y = 0; y < sizeY_; y++)
+		memcpy(dst + y*pitch, in_data + y*sizeX_, sizeX_*sizeof(Color4c));
+	UnlockTexture();
+	return true;
+#else
 	New(1);
 	HRESULT hr=gb_RenderDevice3D->D3DDevice_->CreateTexture(sizeX_,sizeY_,0,0,D3DFMT_DXT1,D3DPOOL_MANAGED,&BitMap[0],0); // D3DPOOL_SCRATCH
 	if(FAILED(hr))
@@ -163,4 +190,5 @@ bool TextureMiniDetail::buildDDS()
 
 	delete out_data;
 	return true;
+#endif
 }

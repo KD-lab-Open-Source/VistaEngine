@@ -38,6 +38,10 @@ cbuffer Constants : register(b0, space1)
     // lightmap box's world origin, zw its inverse extent. cScene::AddPlanarCamera sets it
     // to the same box the lightmap camera renders, so this maps world xy onto its texels.
     float4 PlanarNode;
+    // The original's mulMiniTexture (vsl c18), from ShaderSceneTileMap::SetMiniTextureSize:
+    // xy is (resolution/width, resolution/height) of the material's detail texture, so the
+    // detail tiles every width/resolution world cells. zw unused.
+    float4 MiniTexture;
 };
 
 struct VSInput
@@ -53,6 +57,7 @@ struct VSOutput
     float2 UV        : TEXCOORD0;
     float4 ShadowPos : TEXCOORD1;
     float2 LightmapUV : TEXCOORD2;
+    float2 MiniUV    : TEXCOORD3;
 };
 
 VSOutput main(VSInput input)
@@ -61,6 +66,8 @@ VSOutput main(VSInput input)
     output.Position  = mul(float4(input.Position, 1.0f), MVP);
     output.Normal    = input.Normal;
     output.UV        = input.Position.xy * UV.zw + UV.xy;
+    // The original's `o.tminitexture = pos.xy*mulMiniTexture`.
+    output.MiniUV    = input.Position.xy * MiniTexture.xy;
     // The original's `o.tshadow = mul(pos, mShadow)`. Its companion `o.shadowFactor` is
     // computed per pixel instead: the fragment shader already has the normal and the
     // light direction, so interpolating it would only cost a varying.

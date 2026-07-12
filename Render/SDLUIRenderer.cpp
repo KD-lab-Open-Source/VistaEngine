@@ -11,6 +11,8 @@
 
 #include "Texture.h"     // cTexture (GetDDSurface / frameNumber)
 #include "FT_Font.h"     // FT::Font glyph atlas (OutText / OutTextLine)
+#include "SDLMinimapRenderer.h"   // replayed inside this renderer's pass, in draw order
+#include "SDLRenderDevice.h"       // createSolidGPUTexture
 
 // Cross-compiled UI shader blobs (SPIR-V + MSL); see Render/SDLShaders.
 #include "SDLShaders/ui_shaders.h"
@@ -67,33 +69,7 @@ void SDLUIRenderer::createPipeline()
 	sampler_ = SDL_CreateGPUSampler(device_, &si);
 
 	// 1x1 white texture so untextured quads show the vertex colour.
-	SDL_GPUTextureCreateInfo ti = {};
-	ti.type = SDL_GPU_TEXTURETYPE_2D;
-	ti.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
-	ti.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER;
-	ti.width = 1; ti.height = 1; ti.layer_count_or_depth = 1; ti.num_levels = 1;
-	whiteTexture_ = SDL_CreateGPUTexture(device_, &ti);
-	if(whiteTexture_){
-		SDL_GPUTransferBufferCreateInfo tbi = {};
-		tbi.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
-		tbi.size = 4;
-		SDL_GPUTransferBuffer* tb = SDL_CreateGPUTransferBuffer(device_, &tbi);
-		if(tb){
-			unsigned int* px = (unsigned int*)SDL_MapGPUTransferBuffer(device_, tb, false);
-			*px = 0xFFFFFFFFu;
-			SDL_UnmapGPUTransferBuffer(device_, tb);
-			SDL_GPUCommandBuffer* cb = SDL_AcquireGPUCommandBuffer(device_);
-			SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(cb);
-			SDL_GPUTextureTransferInfo src = {};
-			src.transfer_buffer = tb; src.offset = 0;
-			SDL_GPUTextureRegion dst = {};
-			dst.texture = whiteTexture_; dst.w = 1; dst.h = 1; dst.d = 1;
-			SDL_UploadToGPUTexture(copy, &src, &dst, false);
-			SDL_EndGPUCopyPass(copy);
-			SDL_SubmitGPUCommandBuffer(cb);
-			SDL_ReleaseGPUTransferBuffer(device_, tb);
-		}
-	}
+	whiteTexture_ = createSolidGPUTexture(device_, 0xFFFFFFFFu);
 
 	// Pick a shader format the backend supports (Metal->MSL, Vulkan->SPIRV).
 	SDL_GPUShaderFormat formats = SDL_GetGPUShaderFormats(device_);
@@ -207,12 +183,20 @@ void SDLUIRenderer::ensureVertexCapacity(int verts)
 	vertexCapacity_ = (vertexBuffer_ && transferBuffer_) ? cap : 0;
 }
 
+// Take the next slot in the draw order for a minimap draw. It carries no vertices of its
+// own, and it always starts a fresh run: the quads emitted after it must not be folded back
+// into the run that preceded it, or they would draw *before* the minimap.
+void SDLUIRenderer::EmitMinimapRun(int index)
+{
+	runs_.push_back(DrawRun{ nullptr, 0, 0, false, index });
+}
+
 void SDLUIRenderer::emitQuad(float x, float y, float dx, float dy,
                              float u, float v, float du, float dv, unsigned int color, SDL_GPUTexture* tex)
 {
 	// Extend the current run if it uses the same texture and primitive, else start one.
-	if(runs_.empty() || runs_.back().tex != tex || runs_.back().lines)
-		runs_.push_back(DrawRun{ tex, (int)batch_.size(), 0, false });
+	if(runs_.empty() || runs_.back().minimap >= 0 || runs_.back().tex != tex || runs_.back().lines)
+		runs_.push_back(DrawRun{ tex, (int)batch_.size(), 0, false, -1 });
 
 	// Two triangles (the D3D path used a tri-strip of 4 verts; here, 6 verts).
 	const float x1 = x, y1 = y, x2 = x + dx, y2 = y + dy;
@@ -230,8 +214,8 @@ void SDLUIRenderer::emitQuad(float x, float y, float dx, float dy,
 // colour comes through unchanged.
 void SDLUIRenderer::emitLine(float x1, float y1, float x2, float y2, unsigned int color)
 {
-	if(runs_.empty() || !runs_.back().lines || runs_.back().tex != nullptr)
-		runs_.push_back(DrawRun{ nullptr, (int)batch_.size(), 0, true });
+	if(runs_.empty() || runs_.back().minimap >= 0 || !runs_.back().lines || runs_.back().tex != nullptr)
+		runs_.push_back(DrawRun{ nullptr, (int)batch_.size(), 0, true, -1 });
 
 	batch_.push_back(UIVertex{ x1, y1, 0, 1, color, 0.f, 0.f });
 	batch_.push_back(UIVertex{ x2, y2, 0, 1, color, 0.f, 0.f });
@@ -247,6 +231,8 @@ void SDLUIRenderer::BeginFrame()
 	runs_.clear();
 	currentTexture_ = nullptr;
 	quadCount_ = 0;
+	if(minimap_)
+		minimap_->BeginFrame();   // its draws are sequenced by our run list, so they age with it
 }
 
 void SDLUIRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
@@ -278,6 +264,11 @@ void SDLUIRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 		}
 	}
 
+	// The minimap draws inside our pass, so its vertices have to be uploaded before that
+	// pass opens -- a copy pass cannot run inside a render pass.
+	if(minimap_)
+		minimap_->Upload(cmd);
+
 	// Opened unconditionally: with an empty batch this pass is still what carries
 	// the frame's clear.
 	SDL_GPUColorTargetInfo ct = {};
@@ -290,7 +281,7 @@ void SDLUIRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	ct.store_op = SDL_GPU_STOREOP_STORE;
 
 	SDL_GPURenderPass* pass = SDL_BeginGPURenderPass(cmd, &ct, 1, nullptr);
-	if(vcount > 0 && pipeline_ && vertexBuffer_){
+	if(!runs_.empty()){
 		const float invScreen[4] = { screenW ? 1.f / screenW : 0.f, screenH ? 1.f / screenH : 0.f, 0.f, 0.f };
 		SDL_GPUBufferBinding vb = {};
 		vb.buffer = vertexBuffer_;
@@ -300,8 +291,17 @@ void SDLUIRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 		// (white for untextured geometry) and swap pipelines when the primitive changes.
 		SDL_GPUGraphicsPipeline* bound = nullptr;
 		for(const DrawRun& run : runs_){
+			if(run.minimap >= 0){
+				// The minimap's own pipelines, vertex buffer and uniforms, drawn here in our
+				// pass so it lands between the panels behind it and the labels in front. It
+				// leaves all three bound to its own, so start the next UI run from scratch.
+				if(minimap_)
+					minimap_->DrawRun(pass, cmd, run.minimap, screenW, screenH);
+				bound = nullptr;
+				continue;
+			}
 			SDL_GPUGraphicsPipeline* want = run.lines ? linePipeline_ : pipeline_;
-			if(!want) continue;
+			if(!want || !vertexBuffer_) continue;
 			if(want != bound){
 				SDL_BindGPUGraphicsPipeline(pass, want);
 				SDL_PushGPUVertexUniformData(cmd, 0, invScreen, sizeof(invScreen));

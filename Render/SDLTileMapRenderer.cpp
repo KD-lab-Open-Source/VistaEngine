@@ -10,10 +10,12 @@
 #include <vector>
 
 #include "terra/vmap.h"        // vMap heightfield + baked per-cell surface colour
+#include "MultiRegion.h"       // vMap.region(): the per-cell material map
 #include "cCamera.h"           // Camera::matView / matProj / GetLighting / vp
-#include "TileMap.h"           // cTileMap::GetDiffuse (the scene sun, per Environment)
+#include "TileMap.h"           // cTileMap::GetDiffuse, miniDetailTexture (per material)
+#include "Texture.h"           // cTexture::GetDDSurface / GetWidth / GetHeight
 #include "Scene.h"             // cScene::GetShadowIntensity (the shader's vShade)
-#include "VisGeneric.h"        // Option_filterShadow (the original's FILTER_SHADOW)
+#include "VisGeneric.h"        // Option_filterShadow, Option_DetailTexture
 #include "SDLRenderDevice.h"   // applyCameraViewport, the shadow map
 
 // Cross-compiled tilemap shader blobs (SPIR-V + MSL); see Render/SDLShaders.
@@ -22,9 +24,10 @@
 namespace {
 
 // Uniform blocks, laid out to match tilemap.{vert,frag}.hlsl exactly.
-struct VSUniform { float mvp[16]; float uv[4]; float shadow[16]; float planarNode[4]; };
+struct VSUniform { float mvp[16]; float uv[4]; float shadow[16]; float planarNode[4];
+                   float miniTexture[4]; };
 struct FSUniform { float lightColor[4]; float lightDir[4]; float shade[4]; float params[4];
-                   float lightMapParams[4]; };
+                   float lightMapParams[4]; float detailParams[4]; };
 // tilemap_shadow.vert.hlsl's whole cbuffer: the light camera's view-projection.
 struct ShadowVSUniform { float mvp[16]; };
 
@@ -37,6 +40,22 @@ const int STEP_BASE = 4;
 // The baked surface-colour texture is capped on each side; larger maps are averaged
 // down by vMap.getTileColor32Layer's step (the sampler interpolates the rest).
 const int MAX_TEX = 2048;
+
+// The detail texture a material draws with, or null. This is exactly what
+// cTileMap::setMaterial hands to DrawType::SetMaterialTilemap: the material's own entry in
+// cTileMap's miniDetailTextures_ (loaded from the world data -- grass, ground, mountain,
+// sand, ... one per material), gated on Option_DetailTexture, the "detail texture" graphics
+// option. The placement-zone materials, which index past miniDetailTexturesNumber, have no
+// detail texture of their own: the original runs its lava/ice shader for them instead, and
+// until that is ported they draw as plain terrain.
+cTexture* materialDetailTexture(cTileMap* tileMap, int material)
+{
+	if(!tileMap || !Option_DetailTexture)
+		return nullptr;
+	if(material < 0 || material >= cTileMap::miniDetailTexturesNumber)
+		return nullptr;
+	return tileMap->miniDetailTexture(material).texture;
+}
 
 } // namespace
 
@@ -52,8 +71,10 @@ SDLTileMapRenderer::~SDLTileMapRenderer()
 	if(!device_) return;
 	releaseMesh();
 	if(whiteTexture_)   SDL_ReleaseGPUTexture(device_, whiteTexture_);
+	if(greyTexture_)    SDL_ReleaseGPUTexture(device_, greyTexture_);
 	if(sampler_)        SDL_ReleaseGPUSampler(device_, sampler_);
 	if(shadowSampler_)  SDL_ReleaseGPUSampler(device_, shadowSampler_);
+	if(detailSampler_)  SDL_ReleaseGPUSampler(device_, detailSampler_);
 	if(pipelineFill_)   SDL_ReleaseGPUGraphicsPipeline(device_, pipelineFill_);
 	if(pipelineLine_)   SDL_ReleaseGPUGraphicsPipeline(device_, pipelineLine_);
 	if(pipelineMirror_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineMirror_);
@@ -67,6 +88,7 @@ void SDLTileMapRenderer::releaseMesh()
 	if(indexBuffer_) { SDL_ReleaseGPUBuffer(device_, indexBuffer_);  indexBuffer_  = nullptr; }
 	if(colorTexture_){ SDL_ReleaseGPUTexture(device_, colorTexture_); colorTexture_ = nullptr; }
 	indexCount_ = 0;
+	runs_.clear();
 }
 
 // ---------------------------------------------------------------------------
@@ -94,35 +116,28 @@ void SDLTileMapRenderer::createPipeline()
 	ssi.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
 	shadowSampler_ = SDL_CreateGPUSampler(device_, &ssi);
 
-	// 1x1 white, bound instead of the surface colour in wireframe mode so the edges
-	// come out white whatever the map's baked colour is. It also stands in for the shadow
-	// map when there is none: its .r reads 1.0, the far depth, i.e. everything lit.
-	SDL_GPUTextureCreateInfo wti = {};
-	wti.type = SDL_GPU_TEXTURETYPE_2D;
-	wti.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
-	wti.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER;
-	wti.width = 1; wti.height = 1; wti.layer_count_or_depth = 1; wti.num_levels = 1;
-	whiteTexture_ = SDL_CreateGPUTexture(device_, &wti);
-	if(whiteTexture_){
-		SDL_GPUTransferBufferCreateInfo wtb = {};
-		wtb.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
-		wtb.size = 4;
-		if(SDL_GPUTransferBuffer* tb = SDL_CreateGPUTransferBuffer(device_, &wtb)){
-			unsigned int* px = (unsigned int*)SDL_MapGPUTransferBuffer(device_, tb, false);
-			*px = 0xFFFFFFFFu;
-			SDL_UnmapGPUTransferBuffer(device_, tb);
-			SDL_GPUCommandBuffer* cb = SDL_AcquireGPUCommandBuffer(device_);
-			SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(cb);
-			SDL_GPUTextureTransferInfo src = {};
-			src.transfer_buffer = tb; src.offset = 0;
-			SDL_GPUTextureRegion dst = {};
-			dst.texture = whiteTexture_; dst.w = 1; dst.h = 1; dst.d = 1;
-			SDL_UploadToGPUTexture(copy, &src, &dst, false);
-			SDL_EndGPUCopyPass(copy);
-			SDL_SubmitGPUCommandBuffer(cb);
-			SDL_ReleaseGPUTransferBuffer(device_, tb);
-		}
-	}
+	// The detail tile repeats across the whole map, so it wraps; and it is filtered
+	// trilinearly because its mip chain -- averaging the noise towards flat grey -- is
+	// what fades the grain out at distance instead of aliasing it into a shimmer. The
+	// original binds sampler_wrap_anisotropic here.
+	SDL_GPUSamplerCreateInfo dsi = {};
+	dsi.min_filter = SDL_GPU_FILTER_LINEAR;
+	dsi.mag_filter = SDL_GPU_FILTER_LINEAR;
+	dsi.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_LINEAR;
+	dsi.address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+	dsi.address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+	dsi.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+	dsi.enable_anisotropy = true;
+	dsi.max_anisotropy = 4.f;
+	dsi.max_lod = 1000.f;
+	detailSampler_ = SDL_CreateGPUSampler(device_, &dsi);
+
+	// 1x1 white, bound instead of the surface colour in wireframe mode so the edges come
+	// out white whatever the map's baked colour is. It also stands in for the shadow map
+	// when there is none: its .r reads 1.0, the far depth, i.e. everything lit.
+	whiteTexture_ = createSolidGPUTexture(device_, 0xFFFFFFFFu);
+	// 1x1 mid-grey, the detail texture's neutral: the shader adds `detail - 0.5`.
+	greyTexture_  = createSolidGPUTexture(device_, 0xFF808080u);
 
 	SDL_GPUShaderFormat formats = SDL_GetGPUShaderFormats(device_);
 	SDL_GPUShaderFormat fmt;
@@ -151,7 +166,7 @@ void SDLTileMapRenderer::createPipeline()
 	SDL_GPUShaderCreateInfo fsi = {};
 	fsi.code = fsCode; fsi.code_size = fsSize; fsi.entrypoint = entry;
 	fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
-	fsi.num_samplers = 3;           // surface colour, the shadow map, the lightmap
+	fsi.num_samplers = 4;           // surface colour, shadow map, lightmap, detail tile
 	fsi.num_uniform_buffers = 1;    // LightColor + LightDirection + ShadeIntensity + params
 	SDL_GPUShader* fs = SDL_CreateGPUShader(device_, &fsi);
 
@@ -399,15 +414,50 @@ bool SDLTileMapRenderer::buildMesh(SDL_GPUCommandBuffer* cmd)
 		}
 	}
 
-	std::vector<unsigned short> idx((size_t)tcount * 3);
-	size_t t = 0;
+	// vMap's MultiRegion paints every fine cell with one of cTileMap's materials, and the
+	// D3D tilemap reads it per triangle -- `region.filled(centroid) - 1` -- to bucket that
+	// triangle into a per-material index list. Do the same, once for the whole map: the
+	// buckets concatenate into one index buffer, and each becomes a MaterialRun that Draw
+	// issues with that material's detail texture bound.
+	//
+	// Our triangles span `step` fine cells where the original's span one, so a triangle
+	// straddling a material border takes the material under its centre and the border lands
+	// on the mesh grid rather than the region's true edge. Invisible in practice: the
+	// detail tile is grain, and the surface colour that carries the border is a texture.
+	MultiRegion& region = vMap.region();
+	auto materialAt = [&region](int x, int y) -> int {
+		const int m = (int)region.filled(x, y) - 1;   // filled() is 1-based; 0 == unpainted
+		return (m >= 0 && m < cTileMap::multiRegionLayersNumber) ? m : 0;
+	};
+
+	std::vector<std::vector<unsigned short> > buckets(cTileMap::multiRegionLayersNumber);
 	for(int gy = 0; gy < ny; ++gy)
 		for(int gx = 0; gx < nx; ++gx){
+			const int x0 = gx * step,       y0 = gy * step;
+			const int x1 = (gx + 1) * step > H - 1 ? H - 1 : (gx + 1) * step;
+			const int y1 = (gy + 1) * step > V - 1 ? V - 1 : (gy + 1) * step;
+
 			unsigned short a = (unsigned short)(gy * gw + gx), b = (unsigned short)(a + 1);
 			unsigned short c = (unsigned short)(a + gw),       d = (unsigned short)(c + 1);
-			idx[t++] = a; idx[t++] = c; idx[t++] = b;   // winding irrelevant (cull NONE)
-			idx[t++] = b; idx[t++] = c; idx[t++] = d;
+			// a=(x0,y0) b=(x1,y0) c=(x0,y1) d=(x1,y1). Winding is irrelevant (cull NONE).
+			std::vector<unsigned short>& bk0 = buckets[materialAt((x0 + x0 + x1) / 3, (y0 + y1 + y0) / 3)];
+			bk0.push_back(a); bk0.push_back(c); bk0.push_back(b);
+			std::vector<unsigned short>& bk1 = buckets[materialAt((x1 + x0 + x1) / 3, (y0 + y1 + y1) / 3)];
+			bk1.push_back(b); bk1.push_back(c); bk1.push_back(d);
 		}
+
+	std::vector<unsigned short> idx;
+	idx.reserve((size_t)tcount * 3);
+	for(int m = 0; m < (int)buckets.size(); ++m){
+		if(buckets[m].empty())
+			continue;
+		MaterialRun run;
+		run.material = m;
+		run.first = (int)idx.size();
+		run.count = (int)buckets[m].size();
+		runs_.push_back(run);
+		idx.insert(idx.end(), buckets[m].begin(), buckets[m].end());
+	}
 
 	const Uint32 vbytes = (Uint32)(verts.size() * sizeof(Vertex));
 	const Uint32 ibytes = (Uint32)(idx.size() * sizeof(unsigned short));
@@ -450,8 +500,8 @@ bool SDLTileMapRenderer::buildMesh(SDL_GPUCommandBuffer* cmd)
 	uvScale_[1] = 1.f / (float)V;
 	indexCount_ = (int)idx.size();
 
-	fprintf(stderr, "SDLTileMapRenderer: terrain mesh %dx%d step %d (%d verts, %d tris)\n",
-	        H, V, step, vcount, tcount);
+	fprintf(stderr, "SDLTileMapRenderer: terrain mesh %dx%d step %d (%d verts, %d tris, "
+	        "%d material runs)\n", H, V, step, vcount, tcount, (int)runs_.size());
 	return true;
 }
 
@@ -640,27 +690,62 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	applyCameraViewport(pass, camera->vp, screenW, screenH);
 
 	SDL_BindGPUGraphicsPipeline(pass, pipeline);
-	SDL_PushGPUVertexUniformData(cmd, 0, &vsu, sizeof(vsu));
-	SDL_PushGPUFragmentUniformData(cmd, 0, &fsu, sizeof(fsu));
 
 	SDL_GPUBufferBinding vb = {}; vb.buffer = vertexBuffer_; vb.offset = 0;
 	SDL_BindGPUVertexBuffers(pass, 0, &vb, 1);
 	SDL_GPUBufferBinding ib = {}; ib.buffer = indexBuffer_; ib.offset = 0;
 	SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_16BIT);
 
-	SDL_GPUTextureSamplerBinding ts[3] = {};
+	SDL_GPUTextureSamplerBinding ts[4] = {};
 	ts[0].texture = (wireframe && whiteTexture_) ? whiteTexture_ : colorTexture_;
 	ts[0].sampler = sampler_;
-	// Slots 1 and 2 must always carry a texture, even with the shadow or the lightmap
-	// disabled; the shader gates on ShadowParams.x / LightMapParams.x rather than on the
-	// binding, so the white 1x1 stands in and is never read.
+	// Slots 1..3 must always carry a texture, even with the shadow, the lightmap or the
+	// detail layer disabled; the shader gates on ShadowParams.x / LightMapParams.x /
+	// DetailParams.x rather than on the binding, so a 1x1 stands in and is never read.
 	ts[1].texture = shadowMap ? shadowMap : whiteTexture_;
 	ts[1].sampler = shadowSampler_;
 	ts[2].texture = lightMap ? lightMap : whiteTexture_;
 	ts[2].sampler = sampler_;   // linear + clamp: the lightmap is 256x256 over the whole box
-	SDL_BindGPUFragmentSamplers(pass, 0, ts, 3);
+	ts[3].sampler = detailSampler_;   // .texture varies per material, below
 
-	SDL_DrawGPUIndexedPrimitives(pass, indexCount_, 1, 0, 0, 0);
+	// The original changes material between tiles -- cTileMap::setMaterial binds that
+	// material's detail texture and its mulMiniTexture, then draws the tile's index list
+	// for it. Our index buffer is grouped by material for the whole map, so the same
+	// rebinding happens once per run instead of once per tile.
+	const float resolution = tileMap ? (float)tileMap->miniDetailTextureResolution() : 0.f;
+	for(size_t i = 0; i < runs_.size(); ++i){
+		const MaterialRun& run = runs_[i];
+
+		cTexture* detail = wireframe ? nullptr : materialDetailTexture(tileMap, run.material);
+		SDL_GPUTexture* detailTex = nullptr;
+		// frameNumber() first: GetDDSurface indexes BitMap unchecked, so a cTexture whose
+		// upload never happened would be read out of bounds.
+		if(detail && detail->frameNumber() >= 1 && detail->GetWidth() > 0 && detail->GetHeight() > 0)
+			detailTex = reinterpret_cast<SDL_GPUTexture*>(detail->GetDDSurface(0));
+
+		if(detailTex){
+			// SetMiniTextureSize: mul = (resolution/width, resolution/height), so the tile
+			// repeats every width/resolution world cells.
+			vsu.miniTexture[0] = resolution / (float)detail->GetWidth();
+			vsu.miniTexture[1] = resolution / (float)detail->GetHeight();
+			fsu.detailParams[0] = 1.f;
+		}
+		else{
+			vsu.miniTexture[0] = vsu.miniTexture[1] = 0.f;
+			fsu.detailParams[0] = 0.f;
+		}
+		vsu.miniTexture[2] = vsu.miniTexture[3] = 0.f;
+		fsu.detailParams[1] = fsu.detailParams[2] = fsu.detailParams[3] = 0.f;
+
+		SDL_PushGPUVertexUniformData(cmd, 0, &vsu, sizeof(vsu));
+		SDL_PushGPUFragmentUniformData(cmd, 0, &fsu, sizeof(fsu));
+
+		ts[3].texture = detailTex ? detailTex : greyTexture_;
+		SDL_BindGPUFragmentSamplers(pass, 0, ts, 4);
+
+		SDL_DrawGPUIndexedPrimitives(pass, run.count, 1, run.first, 0, 0);
+	}
+
 	SDL_EndGPURenderPass(pass);
 	return true;
 }
