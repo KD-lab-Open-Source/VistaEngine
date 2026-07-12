@@ -239,7 +239,6 @@ void FieldOfViewMap::PreDraw(Camera* camera)
 
 void FieldOfViewMap::Draw(Camera* camera)
 {
-#ifndef _WIN32
 	// Fog of war, not ported. This is one map-sized quad drawn into the terrain lightmap's
 	// ALPHA channel -- which is why CameraPlanarLight::drawLights masks alpha off, so the
 	// light quads that follow cannot clobber it, and why the terrain shader's FOG_OF_WAR
@@ -249,26 +248,6 @@ void FieldOfViewMap::Draw(Camera* camera)
 	// It attaches only to the planar light camera (ATTRUNKOBJ_IGNORE_NORMALCAMERA keeps it
 	// off the scene camera), so nothing reached it until that camera started drawing.
 	return;
-#else
-	int dx=vMap.H_SIZE;
-	int dy=vMap.V_SIZE;
-	Color4c diffuse(255,255,255);
-
-	cD3DRender* rd = gb_RenderDevice3D;
-	rd->SetNoMaterial(ALPHA_BLEND,MatXf::ID,0,texture_);
-	//gb_RenderDevice3D->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_SELECTARG2);
-	gb_RenderDevice3D->SetSamplerData(0, sampler_wrap_anisotropic);
-
-	cQuadBuffer<sVertexXYZDT1>* quad=rd->GetQuadBufferXYZDT1();
-	quad->BeginDraw();
-	sVertexXYZDT1 *v=quad->Get();
-	v[0].pos.x=0; v[0].pos.y=0; v[0].pos.z=0; v[0].u1()=0; v[0].v1()=0; v[0].diffuse=diffuse;
-	v[1].pos.x=0; v[1].pos.y=dy; v[1].pos.z=0; v[1].u1()=0; v[1].v1()=1; v[1].diffuse=diffuse;
-	v[2].pos.x=dx; v[2].pos.y=0; v[2].pos.z=0; v[2].u1()=1; v[2].v1()=0; v[2].diffuse=diffuse;
-	v[3].pos.x=dx; v[3].pos.y=dy; v[3].pos.z=0; v[3].u1()=1; v[3].v1()=1; v[3].diffuse=diffuse;
-
-	quad->EndDraw();
-#endif
 }
 
 void FieldOfViewMap::serialize(Archive& ar)

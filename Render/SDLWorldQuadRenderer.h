@@ -94,10 +94,17 @@ public:
 	// `selectDiffuse` is the fixed-function D3DTSS_COLOROP = D3DTOP_SELECTARG2 that
 	// CameraPlanarLight::drawLights sets for the lightmap's circle shadows: the colour comes
 	// from the vertex alone and the texture contributes only its alpha. Quad route only.
+	//
+	// `zReflection` is cD3DRender::SetWorldMaterial's `zreflection` flag, which selected the
+	// ZREFLECTION variant of standart.{vsl,psl} and expected the caller to have bound a height
+	// texture on stage 5. Here it IS that texture (null = the variant is off), because there is
+	// only ever one caller and one texture: FieldDispatcher::Draw, passing the water's A8L8
+	// height map. The fragment shader clips the dome away wherever it has sunk below the
+	// ground. Triangle route only.
 	void SetMaterial(eBlendMode blend, cTexture* texture, bool depthTest = true,
 	                 const MatXf& world = MatXf::ID,
 	                 cTexture* texture1 = nullptr, eColorMode colorMode = COLOR_MOD,
-	                 bool selectDiffuse = false);
+	                 bool selectDiffuse = false, cTexture* zReflection = nullptr);
 
 	// cQuadBuffer<sVertexXYZDT1>'s contract: BeginDraw opens a group, each Get hands back
 	// four vertices for one quad, EndDraw closes it. A group carries the material
@@ -121,6 +128,11 @@ public:
 	sVertexXYZDT2* Lock(int nVertex);
 	void Unlock(int nVertex);
 	void DrawPrimitive(PRIMITIVETYPE type, int nPolygon);
+	// The same contract for geometry that comes with an index buffer of its own, rather than
+	// a strip or list to unroll: FieldDispatcher's tile grid, whose vertices are shared
+	// between the quads around them. `indices` are relative to the vertices Lock just handed
+	// back, exactly as they index the D3D vertex buffer's current page.
+	void DrawIndexedPrimitive(const sPolygon* indices, int nPolygon);
 
 	bool hasDraws() const { return !groups_.empty(); }
 
@@ -134,11 +146,34 @@ public:
 	          bool clearDepth, bool wireframe);
 
 private:
-	// worldquad.vert.hlsl / worldtri.vert.hlsl's whole cbuffer: the original's mWVP.
-	struct VSUniform { float mvp[16]; };
-	// The fragment cbuffer of whichever shader the group takes. .x is worldtri's
+	// The vertex cbuffer. worldquad.vert.hlsl declares the HEAD of this (mvp, fogPlane);
+	// worldtri.vert.hlsl declares the whole thing. The order must match both -- a uniform
+	// block is a layout mirrored in C++ and in HLSL, and nothing cross-checks them.
+	//
+	// mvp is the original's mWVP. fogPlane is in the GROUP's space, not the world's -- the
+	// vertices are, so openGroup pushes cSDLRenderDevice::fogPlane through the same world
+	// matrix it folds into the mvp; (0,0,0,1) means fog is off. world and reflectionMul serve
+	// the ZREFLECTION variant alone: world is the original's mWorld (the group's own matrix,
+	// unfolded, because the height lookup needs a world position and not a group-space one)
+	// and reflectionMul is cSDLRenderDevice::tilemapInvSize -- vReflectionMul in standart.vsl.
+	struct VSUniform { float mvp[16]; float fogPlane[4]; float world[16]; float reflectionMul[4]; };
+	// The fragment cbuffer of whichever shader the group takes. colorOp.x is worldtri's
 	// COLOR_OPERATION on the triangle route, and worldquad's SelectDiffuse on the quad one.
-	struct FSUniform { float colorOp[4]; };
+	//
+	// fogParams.x picks which of the TWO ways a group meets the fog, because this renderer's
+	// output is premultiplied and its groups are not all occluders:
+	//
+	//   0 -- an occluder (ALPHA_NONE / ALPHA_TEST / ALPHA_BLEND / ALPHA_MUL). It hides what
+	//        is behind it, so it fades TOWARD the fog colour, as D3D9's fixed function did.
+	//   1 -- a contribution (ALPHA_ADDBLEND / ALPHA_ADDBLENDALPHA / ALPHA_SUBBLEND). It adds
+	//        to (or takes from) what is behind it, so it must fade to NOTHING. Lerping it
+	//        toward the fog colour would literally add the fog colour to the frame, and a
+	//        distant particle would glow. This is the original's FIX_FOG_ADD_BLEND -- see
+	//        the note in SDLWorldQuadRenderer.cpp's openGroup.
+	// Likewise: worldquad.frag.hlsl declares the head (colorOp -- which it reads as
+	// SelectDiffuse -- fogColor, fogParams), worldtri.frag.hlsl declares all of it.
+	// zReflection.x != 0 turns the height clip on.
+	struct FSUniform { float colorOp[4]; float fogColor[4]; float fogParams[4]; float zReflection[4]; };
 
 	// Which stream a group's geometry lives in, and so which shader, vertex layout and
 	// buffers replay it. They share one group list, so the two interleave in call order.
@@ -151,6 +186,7 @@ private:
 		GroupKind kind;
 		SDL_GPUTexture* texture;    // null -> the 1x1 white stand-in
 		SDL_GPUTexture* texture1;   // the colour operation's second texture (GROUP_TRI only)
+		SDL_GPUTexture* textureZ;   // the ZREFLECTION height map (GROUP_TRI only)
 		eBlendMode blend;
 		bool depthTest;
 		// GROUP_QUAD: quads into vertices_/the shared quad index pattern.
@@ -195,6 +231,9 @@ private:
 	// two agree -- except in the branch that has no first texture, which moves the scrolling
 	// one onto stage 0 and asks for wrap there anyway.
 	SDL_GPUSampler* sampler_ = nullptr;
+	// sampler_clamp_linear, which FieldDispatcher::Draw sets on the ZREFLECTION stage: the
+	// lookup spans the whole map, so wrapping it would clip the dome against the far edge.
+	SDL_GPUSampler* samplerClamp_ = nullptr;
 	SDL_GPUTexture* whiteTexture_ = nullptr;   // bound for an untextured group
 
 	// The quads accumulate on the CPU and upload once, at Draw. Grown, never shrunk:
@@ -225,6 +264,7 @@ private:
 	int lockFirst_ = 0, lockCount_ = 0;
 	std::vector<sVertexXYZDT2> scratchTri_;   // what Lock hands back when there is no camera
 
+	Camera* camera_ = nullptr;   // from SetCamera; the fog plane is built against its view matrix
 	Mat4f viewProj_;             // the camera's, from SetCamera; each group's mvp is world * this
 	int vpX_ = 0, vpY_ = 0, vpW_ = 0, vpH_ = 0;
 	float vpMinZ_ = 0.f, vpMaxZ_ = 1.f;

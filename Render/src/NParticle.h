@@ -37,11 +37,7 @@ class SDLWorldQuadRenderer;
 // What the emitters build their sprites into. Both offer the same BeginDraw/Get/EndDraw
 // contract, and the sprite loops only ever call Get(), so the loops themselves -- and
 // cPlume::PutToBuf below -- are the same code on either backend.
-#ifdef _WIN32
-typedef cQuadBuffer<sVertexXYZDT1> QuadSpriteBuffer;
-#else
 typedef SDLWorldQuadRenderer       QuadSpriteBuffer;
-#endif
 
 class PerlinNoise
 {

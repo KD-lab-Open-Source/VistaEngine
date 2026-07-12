@@ -6,6 +6,8 @@
 #include "DebugUtil.h"
 #include "d3dx9.h"
 #include "Render/D3d/D3DRender.h"
+#include "Render/SDLRenderDevice.h"
+#include "Render/SDLWorldQuadRenderer.h"
 #include "Terra/vmap.h"
 #include "XMath/SafeMath.h"
 #include "Water/Water.h"
@@ -48,20 +50,10 @@ TileStrip::TileStrip(int xSize, int ySize)
 	xsize = xSize;
 	ysize = ySize;
 
-	gb_RenderDevice->CreateIndexBuffer(ib, numIndices());
-	sPolygon* pIndex = gb_RenderDevice->LockIndexBuffer(ib);
-	setIB(pIndex);
-	gb_RenderDevice->UnlockIndexBuffer(ib);
-
-	pagesize = (xsize+1)*(ysize+1);
-	pagenumber = 8;
-	curpage = 0;
-	gb_RenderDevice->CreateVertexBuffer(vb, pagesize*pagenumber, sVertexXYZDT2::declaration, true);
-}
-
-TileStrip::~TileStrip()
-{
-	vb.Destroy();
+	// The index pattern, built once. It used to live in a device index buffer; the renderer
+	// wants it in memory, because it splices these into its own shared index stream.
+	indices_.resize((size_t)numPolygons());
+	setIB(indices_.data());
 }
 
 void TileStrip::setIB(sPolygon* pIndex)
@@ -82,31 +74,25 @@ void TileStrip::setIB(sPolygon* pIndex)
 		}
 	#undef RIDX
 	
-	xassert(ib - (WORD*)pIndex == numIndices());
+	xassert(ib - (WORD*)pIndex == 3*numPolygons());
 }
 
+// The vertices for one tile. Never null: with no camera the renderer hands back scratch it
+// then drops, exactly as it does for every other caller.
 sVertexXYZDT2* TileStrip::beginDraw()
 {
-	sVertexXYZDT2* pv;
-	if(curpage < pagenumber){
-		int size = pagesize*vb.GetVertexSize();
-		RDCALL(vb.ptr->p->Lock(curpage*size, size,(void**)&pv,D3DLOCK_NOOVERWRITE));
-	}
-	else{
-		RDCALL(vb.ptr->p->Lock(0,0,(void**)&pv,D3DLOCK_DISCARD));
-		curpage = 0;
-	}
-	return pv;
+	SDLWorldQuadRenderer* quad = sdlWorldQuadRenderer();
+	return quad ? quad->Lock((xsize + 1)*(ysize + 1)) : 0;
 }
 
 void TileStrip::endDraw()
 {
-	vb.ptr->p->Unlock();
-	gb_RenderDevice3D->SetVertexDeclaration(sVertexXYZDT2::declaration);
-	gb_RenderDevice3D->SetIndices(ib);
-	gb_RenderDevice3D->SetStreamSource(vb);
-	RDCALL(gb_RenderDevice3D->D3DDevice_->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, curpage*pagesize, 0, pagesize, 0, numIndices()-2));
-	curpage++;
+	SDLWorldQuadRenderer* quad = sdlWorldQuadRenderer();
+	if(!quad)
+		return;
+	const int nVertex = (xsize + 1)*(ysize + 1);
+	quad->Unlock(nVertex);
+	quad->DrawIndexedPrimitive(indices_.data(), numPolygons());
 }
 
 /////////////////////////////////////////////////////////
@@ -354,31 +340,47 @@ void FieldDispatcher::PreDraw(Camera* camera)
 	camera->Attach(SCENENODE_OBJECTSPECIAL,this);
 }
 
+// Ported to SDL GPU. The dome is a SetWorldMaterial caller with sVertexXYZDT2 geometry --
+// which is exactly what SDLWorldQuadRenderer's triangle route exists to serve -- so it needs
+// no renderer of its own: the material, the second texture's colour operation, the blend and
+// the pass all come from there. What it did need was the ZREFLECTION variant of the original's
+// standart.{vsl,psl}, which is now in worldtri.{vert,frag}.hlsl.
+//
+// The field simulation above (the cell grid, its heights, normals, colours) is portable and
+// has been running all along against an empty Draw().
 void FieldDispatcher::Draw(Camera* camera)
 {
-#ifdef _WIN32
 	start_timer_auto();
 
 	xassert(GetTexture(0) && GetTexture(1));
 
+	SDLWorldQuadRenderer* quad = sdlWorldQuadRenderer();
+	cSDLRenderDevice* device = sdlRenderDevice();
+	if(!quad || !device || !water)
+		return;
+
+	// The dome is shaded like a soap bubble: both texture coordinate sets are functions of the
+	// surface NORMAL, not of position, so the highlights slide over it as it wobbles.
+	//
+	// uv0 projects the normal onto the camera's right and up axes -- a sphere map, so the
+	// reflection stays put as the camera turns. uv1 pairs the normal's y and z with `phase_`
+	// scrolling through it, which is what makes the field shimmer while standing still.
 	Vect3f uv[2];
 	const Mat3f& mC = camera->GetMatrix().rot();
 	uv[0].set(0.5f*mC[0][0],0.5f*mC[0][1],0.5f*mC[0][2]);
 	uv[1].set(0.5f*mC[1][0],0.5f*mC[1][1],0.5f*mC[1][2]);
 
-	DWORD AlphaTest = gb_RenderDevice3D->GetRenderState(D3DRS_ALPHATESTENABLE);
-	DWORD AlphaRef = gb_RenderDevice3D->GetRenderState(D3DRS_ALPHAREF);
-	DWORD zwrite = gb_RenderDevice3D->GetRenderState(D3DRS_ZWRITEENABLE);
-	DWORD cullMode = gb_RenderDevice3D->GetRenderState(D3DRS_CULLMODE);
-	
-	gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-	gb_RenderDevice3D->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-	gb_RenderDevice3D->SetWorldMaterial(ALPHA_ADDBLENDALPHA, MatXf::ID, phase_, GetTexture(0), GetTexture(1), COLOR_ADD, false, true);
-
-	{//������� �� � �����, ���� ������ �� ��������, ��� ���������.
-		gb_RenderDevice3D->SetTexture(5,water->reflectionTexture());
-		gb_RenderDevice3D->SetSamplerData(5,sampler_clamp_linear);
-	}
+	quad->SetCamera(camera);
+	// ALPHA_ADDBLENDALPHA with COLOR_ADD over the two textures, and the water's height map for
+	// the ZREFLECTION clip -- the original bound it on stage 5 and set `zreflection` true.
+	// Depth-tests but writes no depth, as the original's ZWRITEENABLE FALSE asks and as every
+	// group in this renderer does anyway. CULLMODE_NONE likewise: the pipeline culls nothing.
+	//
+	// The texture `phase_` the original passed to SetWorldMaterial only picked an animation
+	// frame for an animated texture; this renderer always takes frame 0, as it does for every
+	// other caller. The phase that matters is the one in uv1 below.
+	quad->SetMaterial(ALPHA_ADDBLENDALPHA, GetTexture(0), true, MatXf::ID,
+	                  GetTexture(1), COLOR_ADD, false, water->reflectionTexture());
 
 	for(int yTile = 0; yTile < tileMap_.sizeY(); yTile++)
 		for(int xTile = 0; xTile < tileMap_.sizeX(); xTile++){
@@ -389,8 +391,10 @@ void FieldDispatcher::Draw(Camera* camera)
 			Vect3f boxMax(tileMap_.m2w(Vect2f(xTile + 1, yTile + 1)), tileHeight);
 			if(!camera->TestVisible(boxMin, boxMax))
 				continue;
-			
+
 			sVertexXYZDT2* pv = tileStrip_.beginDraw();
+			if(!pv)
+				return;
 			int x_begin = xTile << FIELD_2_TILE_SHIFT;
 			int y_begin = yTile << FIELD_2_TILE_SHIFT;
 			int tile_size = 1 << FIELD_2_TILE_SHIFT;
@@ -408,15 +412,13 @@ void FieldDispatcher::Draw(Camera* camera)
 					v.GetTexel().set(n.dot(uv[0]) + 0.5f, n.dot(uv[1]) + 0.5f);
 					v.GetTexel2().set((n.y + 1)*0.5f, (n.z + 1)*0.5f - phase_);
 				}
-				
-				tileStrip_.endDraw();
+
+			tileStrip_.endDraw();
 		}
-		
-	gb_RenderDevice3D->SetRenderState(D3DRS_ZWRITEENABLE,zwrite);
-	gb_RenderDevice3D->SetRenderState(D3DRS_ALPHATESTENABLE,AlphaTest);
-	gb_RenderDevice3D->SetRenderState(D3DRS_ALPHAREF,AlphaRef);
-	gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE, cullMode);
-#endif
+
+	// Where the walk reached us: SCENENODE_OBJECTSPECIAL, sortIndex 0, so over the water
+	// (-2) and alongside the coast sprites.
+	device->drawWorldQuads();
 }
 
 void FieldDispatcher::debugDraw(Camera* camera)

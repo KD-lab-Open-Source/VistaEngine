@@ -1,23 +1,23 @@
-// SDL3 windowing for the non-Windows build. See Platform/Window.h.
+// SDL3 windowing and input, on every platform. See Platform/Window.h.
 #include "Platform/Window.h"
 
-#ifndef _WIN32
-
-// We provide our own main() (Game/PlatformStub.cpp), so prevent SDL from
-// remapping main / supplying its own entry point.
+// We provide our own main()/WinMain, so prevent SDL from remapping main or
+// supplying its own entry point.
 #define SDL_MAIN_HANDLED
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <cstdio>
 
-// The engine's own WM_MOUSEWHEEL (Util/SystemUtil.h) is WM_MOUSELAST + 1, not the
-// native Win32 0x020A. Match that value so the message we synthesize here is the
-// same one GameShell::EventParser dispatches on.
+// The engine's own WM_MOUSEWHEEL (Util/SystemUtil.h) is WM_MOUSELAST + 1 where the
+// platform headers don't define one. Match that value so the message we synthesize
+// here is the same one GameShell::EventParser dispatches on.
 #ifndef WM_MOUSEWHEEL
 #define WM_MOUSEWHEEL (WM_MOUSELAST + 1)
 #endif
 
 namespace PlatformWindow {
+
+namespace { SDL_Window* g_window = nullptr; }
 
 void* create(const char* title, int width, int height)
 {
@@ -42,13 +42,57 @@ void* create(const char* title, int width, int height)
 	// Route keyboard text through SDL_EVENT_TEXT_INPUT so edit fields (profile
 	// name, multiplayer IP, ...) receive characters.
 	SDL_StartTextInput(window);
+	g_window = window;
 	return window;
 }
 
 void destroy(void* window)
 {
+	if(window == g_window)
+		g_window = nullptr;
 	if(window)
 		SDL_DestroyWindow(static_cast<SDL_Window*>(window));
+}
+
+void* current()
+{
+	return g_window;
+}
+
+HWND nativeHandle()
+{
+	if(!g_window)
+		return (HWND)0;
+#ifdef _WIN32
+	// The engine's HWND has to stay a real Win32 window handle here: DirectSound,
+	// DirectInput and the kdw editor dialogs are all handed it and mean it.
+	return (HWND)SDL_GetPointerProperty(SDL_GetWindowProperties(g_window),
+	                                    SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+#else
+	// HWND is a void* here and every Win32 call on it is a no-op shim, so the SDL
+	// window can stand in for it.
+	return (HWND)g_window;
+#endif
+}
+
+void setSize(int width, int height)
+{
+	if(!g_window || width <= 0 || height <= 0)
+		return;
+	SDL_SetWindowSize(g_window, width, height);
+	SDL_SetWindowPosition(g_window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+}
+
+void focus()
+{
+	if(g_window)
+		SDL_RaiseWindow(g_window);
+}
+
+void minimize()
+{
+	if(g_window)
+		SDL_MinimizeWindow(g_window);
 }
 
 namespace {
@@ -255,6 +299,12 @@ bool pumpEvents(WindowEventSink sink)
 	return true;
 }
 
-} // namespace PlatformWindow
+void waitEvents()
+{
+	// Leaves the event queued (SDL_WaitEventTimeout with a null event does not
+	// dequeue), so the pumpEvents call that follows still sees it. The timeout
+	// keeps a wedged event source from parking the loop forever.
+	SDL_WaitEventTimeout(nullptr, 100);
+}
 
-#endif // !_WIN32
+} // namespace PlatformWindow

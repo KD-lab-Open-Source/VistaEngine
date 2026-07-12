@@ -70,9 +70,10 @@ bool applicationHasFocus()
 
 void RestoreGDI()
 {
+	// Get the game out of the way before an error dialog goes up.
 	if(gb_RenderDevice && terFullScreen && Runtime::instance())
-		ShowWindow(Runtime::instance()->hWnd(),SW_MINIMIZE);
-}	
+		PlatformWindow::minimize();
+}
 
 void InternalErrorHandler()
 {
@@ -166,17 +167,9 @@ void Runtime::init()
 	CreateIRenderDevice(useHT());
 	GameOptions::instance().filterBaseGraphOptions();
 
-	DWORD overlap = WS_OVERLAPPED| WS_CAPTION| WS_SYSMENU | WS_MINIMIZEBOX;
-	if(GameOptions::instance().getBool(OPTION_DEBUG_WINDOW))
-		overlap |= WS_THICKFRAME | WS_MAXIMIZEBOX;
-	
 	hWnd_ = createWindow(
 		GlobalAttributes::instance().windowTitle.c_str(),
-		GlobalAttributes::instance().icon.c_str(),
-		0, 0,
-		GameOptions::instance().getScreenSize().x, GameOptions::instance().getScreenSize().y,
-		runtimeWndProc,
-		(GameOptions::instance().getBool(OPTION_FULL_SCREEN) ? 0 : overlap) | WS_POPUP | WS_VISIBLE);
+		GameOptions::instance().getScreenSize().x, GameOptions::instance().getScreenSize().y);
 
 	int renderMode = 0;
 	if(!GameOptions::instance().getBool(OPTION_FULL_SCREEN))
@@ -197,7 +190,7 @@ void Runtime::init()
 	if(!gb_RenderDevice->Initialize(GameOptions::instance().getScreenSize().x, GameOptions::instance().getScreenSize().y, renderMode, hWnd_, 0))
 	{
 		gb_RenderDevice->SetMultisample(0);
-		SetWindowPos(hWnd_,0,0,0,800,600,SWP_SHOWWINDOW| SWP_FRAMECHANGED);
+		PlatformWindow::setSize(800, 600);
 		if(!gb_RenderDevice->Initialize(800,600,renderMode,hWnd_, 0))
 			ErrH.Abort(w2a(GET_LOC_STR(UI_COMMON_TEXT_ERROR_GRAPH_INIT)).c_str());
 	}
@@ -235,56 +228,17 @@ void Runtime::done()
 
 void Runtime::updateWindowSize()
 {
-#ifdef _WIN32
-	if(!terFullScreen)
-	{
-		RECT rc;
-		GetClientRect(hWnd_, &rc);
-		windowClientSize_.x = rc.right - rc.left;
-		windowClientSize_.y = rc.bottom - rc.top;
-	}
-	else
-		windowClientSize_.set(gb_RenderDevice->GetSizeX(),gb_RenderDevice->GetSizeY());
-#else
-	// No native Win32 client rect off-Windows (GetClientRect is a 0x0 shim); use
-	// the SDL swapchain size so mouse coords normalize correctly (GameShell::convert).
+	// The swapchain size is the client size: SDL's window has no non-client frame of
+	// its own to subtract, and this is what mouse coords normalize against
+	// (GameShell::convert).
 	windowClientSize_.set(gb_RenderDevice->GetSizeX(), gb_RenderDevice->GetSizeY());
-#endif
 
 	UI_Render::instance().setWindowPosition(aspectedWorkArea(Rectf(0,0, gb_RenderDevice->GetSizeX(), gb_RenderDevice->GetSizeY()), 4.0f / 3.0f));
 }
 
 void Runtime::repositionWindow(Vect2i size)
 {
-	Vect2i real_pos;
-	Vect2i real_size;
-
-	DWORD style = WS_OVERLAPPED| WS_CAPTION| WS_SYSMENU | WS_MINIMIZEBOX;
-	if(GameOptions::instance().getBool(OPTION_DEBUG_WINDOW))
-		style |= WS_THICKFRAME | WS_MAXIMIZEBOX;
-
-	style = (terFullScreen ? 0 : style)|WS_POPUP|WS_VISIBLE;
-
-	SetWindowLong(gb_RenderDevice->GetWindowHandle(),GWL_STYLE, style);
-
-	calcRealWindowPos(
-		0, 0,
-		size.x, size.y,
-		terFullScreen,
-		style,
-		real_pos,
-		real_size
-		);
-
-	SetWindowPos(
-		gb_RenderDevice->GetWindowHandle(),
-		HWND_NOTOPMOST,
-		real_pos.x,
-		real_pos.y,
-		real_size.x,
-		real_size.y,
-		SWP_SHOWWINDOW | SWP_FRAMECHANGED
-		);
+	PlatformWindow::setSize(size.x, size.y);
 }
 
 void Runtime::updateDefaultFont()
@@ -497,8 +451,8 @@ void Runtime::destroyScene()
 }
 
 void Runtime::restoreFocus()
-{ 
-	SetFocus(gb_RenderDevice->GetWindowHandle()); 
+{
+	PlatformWindow::focus();
 }
 
 void Runtime::setWindowPicture(const char* file)
@@ -542,89 +496,16 @@ void Runtime::setWindowPicture(const char* file)
 	gb_RenderDevice->Flush();
 }
 
-void Runtime::calcRealWindowPos(int xPos,int yPos,int xScr,int yScr,bool fullscreen, unsigned int windowStyle, Vect2i& pos,Vect2i& size)
+HWND Runtime::createWindow(const char* title, int xScr, int yScr)
 {
-	Vect2i screenSize(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
-	if(xScr<0) xScr = screenSize.x;
-	if(yScr<0) yScr = screenSize.y;
-	if(!fullscreen){
-		if(!GameOptions::instance().getBool(OPTION_DEBUG_WINDOW)){
-			xPos = (screenSize.x-xScr)/2;
-			yPos = (screenSize.y-yScr)/2;
-		}
-		RECT rect = { xPos, yPos, xPos + xScr, yPos + yScr };
-		AdjustWindowRect(&rect, windowStyle, FALSE);
-		if(!GameOptions::instance().getBool(OPTION_DEBUG_WINDOW) &&
-		   (xScr != screenSize.x || yScr != screenSize.y))
-		{
-			if(rect.left < 0){
-				rect.right -= rect.left;
-				rect.left = 0;
-			}
-			if(rect.top < 0){
-				rect.bottom -= rect.top;
-				rect.top = 0;
-			}
-		}
-		pos.x = rect.left;
-		pos.y = rect.top;
-		size.x = rect.right - rect.left;
-		size.y = rect.bottom - rect.top;
-	}
-	else{
-		pos.x=xPos;
-		pos.y=yPos;
-		size.x=xScr;
-		size.y=yScr;
-	}
-}
-
-HWND Runtime::createWindow(const char* title, const char* icon, int xPos,int yPos,int xScr,int yScr,WNDPROC lpfnWndProc,int dwStyle)
-{
-#ifndef _WIN32
-	// Cross-platform path: create a real SDL3 window. The engine's HWND is a
-	// void* (Platform/WindowsAPI.h), so the SDL_Window* travels through it and is
-	// handed to the SDL GPU device in cSDLRenderDevice::Initialize. The Win32
-	// window class / icon / message-proc machinery below is a no-op off-Windows.
-	return (HWND)PlatformWindow::create(title, xScr, yScr);
-#else
-	HICON hIconSm, hIcon;
-	if(!strlen(icon)){
-		hIconSm = (HICON)LoadImage(hInstance_, "GAME", IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
-		hIcon = (HICON)LoadImage(hInstance_, "GAME", IMAGE_ICON, GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR);
-	}
-	else{
-		hIconSm = (HICON)LoadImage(0, icon, IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR | LR_LOADFROMFILE);
-		hIcon = (HICON)LoadImage(0, icon, IMAGE_ICON, GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR | LR_LOADFROMFILE);
-	}
-	
-	WNDCLASSEX wc = {
-		sizeof(WNDCLASSEX),
-		CS_DBLCLKS|CS_HREDRAW|CS_VREDRAW,
-		lpfnWndProc,
-		0,
-		0,
-		hInstance_,
-		hIcon,
-		0,
-		(HBRUSH)GetStockObject(BLACK_BRUSH),
-		0,
-		title, 
-		hIconSm
-	};
-    if(RegisterClassEx(&wc) == 0)
+	// One window, created by SDL3 on every platform: the SDL GPU device claims its
+	// swapchain on it, and its events are the engine's input. What we hold on to
+	// here is the OS handle -- a real HWND on Windows, since DirectSound,
+	// DirectInput and the kdw dialogs are handed it; the renderer takes the
+	// SDL_Window* from PlatformWindow::current() instead.
+	if(!PlatformWindow::create(title, xScr, yScr))
 		return 0;
-
-	Vect2i real_pos, real_size;
-	calcRealWindowPos(xPos, yPos, xScr, yScr, terFullScreen, dwStyle, real_pos, real_size);
-	HWND hWnd = CreateWindow(title, title, dwStyle, real_pos.x, real_pos.y, real_size.x, real_size.y, 0, 0, hInstance_, 0);
-	if(hWnd == 0){
-		UnregisterClass(title,hInstance_);
-		return 0;
-	}
-	ShowWindow(hWnd,SW_SHOWNORMAL);
-	return hWnd;
-#endif
+	return PlatformWindow::nativeHandle();
 }
 
 void Runtime::onSetFocus(bool focus)
@@ -715,15 +596,14 @@ LRESULT CALLBACK runtimeWndProc(HWND hWnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 }
 
 //------------------------------
-#ifndef _WIN32
-// Feed a translated SDL input event into the same path the Win32 window
-// procedure uses, so mouse/keyboard reach GameShell::eventHandler off-Windows.
+// Feed a translated SDL input event into the window procedure. It is no longer a
+// WNDPROC registered with Win32 -- SDL owns the window now -- but it is still the
+// function that turns a WM_* triple into a GameShell event. See Platform/Window.h.
 static void dispatchWindowEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	HWND hWnd = Runtime::instance() ? Runtime::instance()->hWnd() : 0;
 	runtimeWndProc(hWnd, uMsg, wParam, lParam);
 }
-#endif
 
 int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 {
@@ -733,27 +613,18 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
     Runtime* runtime = createRuntime(hInst);
 	//profiler_start_stop();
 
-	MSG msg;
+	// SDL's is the only pump: on Windows SDL_PollEvent drains the OS message queue
+	// itself, so a PeekMessage loop next to it would race it for messages.
 	while(true){
-#ifndef _WIN32
-		// Drain SDL events (translating input to Win32 messages); quit on close.
 		if(!PlatformWindow::pumpEvents(&dispatchWindowEvent))
 			break;
-#endif
-		if(PeekMessage(&msg, 0, 0, 0, PM_NOREMOVE)){
-			if(!GetMessage(&msg, 0, 0, 0))
+
+		if(runtime->applicationRuns()){
+			if(!runtime->quant())
 				break;
-			TranslateMessage( &msg );
-			DispatchMessage( &msg );
 		}
-		else{
-			if(runtime->applicationRuns()){
-				if(!runtime->quant())
-					break;
-			}
-			else
-				WaitMessage();
-		}
+		else
+			PlatformWindow::waitEvents();
 	}
 
 	delete runtime;

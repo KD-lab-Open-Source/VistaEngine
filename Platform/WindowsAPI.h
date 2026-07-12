@@ -11,6 +11,13 @@
 #  endif
 #  include <windows.h>
 
+// The SDL event pump (PlatformWindow::pumpEvents) records every key transition it
+// sees, because off-Windows that table *is* GetAsyncKeyState (see its declaration
+// below). Here the real GetAsyncKeyState reads the OS keyboard state directly and
+// needs no help, so the pump's bookkeeping calls fold away.
+inline void PlatformSetKeyState(int /*vk*/, bool /*down*/) {}
+inline void PlatformClearKeyStates() {}
+
 #else // !_WIN32
 
 #include <cstdint>

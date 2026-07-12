@@ -6,8 +6,7 @@
 #include "Water/Water.h"
 #include "Render/src/FogOfWar.h"
 
-#ifndef _WIN32
-// Off-Windows the minimap's two shaders (psMiniMap, psMiniMapBorder) and the device's typed
+// The minimap's two shaders (psMiniMap, psMiniMapBorder) and the device's typed
 // vertex buffers are SDLMinimapRenderer's. Everything above this line -- the layout, the
 // rotation, the event bookkeeping -- is shared; only the draw calls fork.
 #include "Render/SDLMinimapRenderer.h"
@@ -20,7 +19,6 @@ unsigned int packColor(const Color4c& c)
 	return (unsigned)c.b | ((unsigned)c.g << 8) | ((unsigned)c.r << 16) | ((unsigned)c.a << 24);
 }
 } // namespace
-#endif
 
 Singleton<UI_Minimap> minimap;
 
@@ -399,18 +397,7 @@ void UI_Minimap::redraw(float alpha)
 	if(mapTexture_)
 		drawMiniMap(alpha);
 
-#ifdef _WIN32
-	gb_RenderDevice3D->SetNoMaterial(ALPHA_BLEND, MatXf::ID);
-
-	if(mask_){
-		gb_RenderDevice3D->psMiniMapBorder->SetUseBorder(true);
-		gb_RenderDevice3D->SetTexture(0, mask_);
-		gb_RenderDevice3D->SetSamplerData(0, sampler_clamp_linear);
-	}
-	else
-		gb_RenderDevice3D->psMiniMapBorder->SetUseBorder(false);
-#endif
-	// Off-Windows there is no device state to set up front: alpha blending is baked into the
+	// There is no device state to set up front: alpha blending is baked into the
 	// minimap pipelines, and the mask travels with each batch (SDLMinimapRenderer::DrawPrims).
 
 	if(drawEvents_){
@@ -471,7 +458,6 @@ void UI_Minimap::drawMiniMap(float alpha)
 		vi[cidx] = UI_RenderBase::instance().screenCoords(ci);
 	}
 
-#ifndef _WIN32
 	{
 	SDLMinimapRenderer* renderer = sdlMinimapRenderer();
 	if(!renderer)
@@ -525,7 +511,6 @@ void UI_Minimap::drawMiniMap(float alpha)
 	renderer->DrawMap(st, v);
 	return;
 	}
-#endif
 
 	gb_RenderDevice3D->SetBlendStateAlphaRef(ALPHA_BLEND);
 
@@ -673,16 +658,7 @@ void UI_Minimap::drawViewZone(float alpha)
 void UI_Minimap::drawLine(Vect2f pos0, Vect2f pos1, const Color4c& color, bool noCLip)
 {
 	if(noCLip || position_.clipLine(pos0, pos1)){
-#ifdef _WIN32
-		if(!mask_){
-			// Unmasked, the D3D backend needs no shader for these and draws them at once.
-			Vect2i pi0 = UI_RenderBase::instance().screenCoords(xformPoint(pos0));
-			Vect2i pi1 = UI_RenderBase::instance().screenCoords(xformPoint(pos1));
-			gb_RenderDevice3D->DrawLine(pi0.x, pi0.y, pi1.x, pi1.y, color);
-			return;
-		}
-#endif
-		// Off-Windows every line takes the batched path, masked or not: one route through
+		// Every line takes the batched path, masked or not: one route through
 		// flushLines, which is also what keeps them in the UI's draw order.
 		Line2d line;
 		line.c = color;
@@ -694,7 +670,6 @@ void UI_Minimap::drawLine(Vect2f pos0, Vect2f pos1, const Color4c& color, bool n
 
 void UI_Minimap::flushLines()
 {
-#ifndef _WIN32
 	{
 	SDLMinimapRenderer* renderer = sdlMinimapRenderer();
 	if(!renderer || lines_.empty()){
@@ -727,7 +702,6 @@ void UI_Minimap::flushLines()
 	lines_.clear();
 	return;
 	}
-#endif
 
 	gb_RenderDevice3D->psMiniMapBorder->SetUseTexture(false);
 	gb_RenderDevice3D->psMiniMapBorder->Select();
@@ -872,7 +846,6 @@ void UI_Minimap::writeSprite(sVertexXYZWDT2* pv, const Sprite& data)
 	pv[4].v2() = pv[2].v2() = pv[3].v2() = sprite.textureCoords().bottom();
 }
 
-#ifndef _WIN32
 // The six vertices of one sprite quad, in the same order writeSprite emits them:
 //
 //   v0,5----v4
@@ -906,11 +879,9 @@ static void writeSpriteSDL(SDLMinimapRenderer::Vertex* pv, const Vect2i vi[4], c
 	pv[0].v = pv[5].v = pv[1].v = tc.top();
 	pv[4].v = pv[2].v = pv[3].v = tc.bottom();
 }
-#endif
 
 void UI_Minimap::flushSprites()
 {
-#ifndef _WIN32
 	{
 	SDLMinimapRenderer* renderer = sdlMinimapRenderer();
 	if(!renderer){
@@ -958,7 +929,6 @@ void UI_Minimap::flushSprites()
 	animatedSprites_.clear();
 	return;
 	}
-#endif
 
 	gb_RenderDevice3D->psMiniMapBorder->SetUseTexture(true);
 	gb_RenderDevice3D->SetSamplerData(1, sampler_clamp_linear);
@@ -1017,7 +987,6 @@ void UI_Minimap::flushRectangles()
 	if(rectangles_.empty())
 		return;
 
-#ifndef _WIN32
 	{
 	SDLMinimapRenderer* renderer = sdlMinimapRenderer();
 	if(!renderer){
@@ -1057,7 +1026,6 @@ void UI_Minimap::flushRectangles()
 	rectangles_.clear();
 	return;
 	}
-#endif
 
 	gb_RenderDevice3D->psMiniMapBorder->SetUseTexture(false);
 	gb_RenderDevice3D->psMiniMapBorder->Select();

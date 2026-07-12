@@ -2,7 +2,6 @@
 #include "StdAfxRD.h"
 #include "SDLWaterRenderer.h"
 
-#ifndef _WIN32
 
 #include <SDL3/SDL.h>
 #include <cstdio>
@@ -249,6 +248,14 @@ void SDLWaterRenderer::SetState(const State& state, Camera* camera)
 	else
 		std::memcpy(fs_.ps11Color, state.ps11Color, sizeof(fs_.ps11Color));
 
+	// Distance fog. Off -> (0,0,0,1), i.e. factor 1, and the shader's lerp is the identity.
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	const Vect4f fogPlane = dev ? dev->fogPlane(camera) : Vect4f(0.f, 0.f, 0.f, 1.f);
+	vs_.fogPlane[0] = fogPlane.x; vs_.fogPlane[1] = fogPlane.y;
+	vs_.fogPlane[2] = fogPlane.z; vs_.fogPlane[3] = fogPlane.w;
+	const Color4f fog = dev ? dev->fogColor() : Color4f(0.f, 0.f, 0.f, 0.f);
+	fs_.fogColor[0] = fog.r; fs_.fogColor[1] = fog.g; fs_.fogColor[2] = fog.b; fs_.fogColor[3] = fog.a;
+
 	vpX_ = camera->vp.X; vpY_ = camera->vp.Y;
 	vpW_ = camera->vp.Width; vpH_ = camera->vp.Height;
 	vpMinZ_ = camera->vp.MinZ; vpMaxZ_ = camera->vp.MaxZ;
@@ -362,4 +369,3 @@ bool SDLWaterRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, S
 	return true;
 }
 
-#endif // !_WIN32

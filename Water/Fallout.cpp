@@ -263,12 +263,7 @@ void cFallout::DrawSnow(Camera* camera)
 {
 	MTAuto mlock(lock);
 	Vect3f cp = camera->GetPos();
-#ifdef _WIN32
-	cInterfaceRenderDevice* rd=gb_RenderDevice;
-	rd->SetNoMaterial(ALPHA_BLEND, MatXf::ID, 0, Texture);
-	cQuadBuffer<sVertexXYZDT1>* pBuf=rd->GetQuadBufferXYZDT1();
-#else
-	// The device hands out no quad buffer off Windows; the world-quad renderer keeps it and
+	// The device hands out no quad buffer; the world-quad renderer keeps it and
 	// answers to the same BeginDraw/Get/EndDraw, so the loop below is shared code. SetMaterial
 	// is what is left of the SetNoMaterial above: the blend mode and the texture.
 	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
@@ -277,7 +272,6 @@ void cFallout::DrawSnow(Camera* camera)
 		return;
 	pBuf->SetCamera(camera);
 	pBuf->SetMaterial(ALPHA_BLEND, Texture);
-#endif
 	vector<cDrop>::iterator dr = drops.begin();
 	vector<cDrop>::iterator lim = drops.begin()+N;
 	Vect3f near_point = (near_point8[0]+near_point8[1]+near_point8[2]+near_point8[3])/4;
@@ -373,9 +367,7 @@ void cFallout::DrawSnow(Camera* camera)
 
 	}
 	pBuf->EndDraw();
-#ifndef _WIN32
 	dev->drawWorldQuads();   // open the pass where the scene walk reached us
-#endif
 }
 
 void cFallout::Draw(Camera* camera)
@@ -413,18 +405,12 @@ void cFallout::DrawRain(Camera* camera)
 	if(N==0) return;
 	xassert(N<=drops.size());
 	Vect3f cp = camera->GetPos();
-#ifdef _WIN32
-	cInterfaceRenderDevice* rd=gb_RenderDevice;
-	rd->SetNoMaterial(ALPHA_BLEND, MatXf::ID, 0,rainTexture);
-	cQuadBuffer<sVertexXYZDT1>* pBuf = rd->GetQuadBufferXYZDT1();
-#else
 	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
 	cSDLRenderDevice* dev = sdlRenderDevice();
 	if(!pBuf || !dev)
 		return;
 	pBuf->SetCamera(camera);
 	pBuf->SetMaterial(ALPHA_BLEND, rainTexture);
-#endif
 	Vect3f near_point = (near_point8[0]+near_point8[1]+near_point8[2]+near_point8[3])/4;
 	Vect3f focus = near_point - cp;
 	Vect3f cur_center = focus;
@@ -526,9 +512,7 @@ void cFallout::DrawRain(Camera* camera)
 		}
 	}
 	pBuf->EndDraw();
-#ifndef _WIN32
 	dev->drawWorldQuads();
-#endif
 	//dprintf("visible_num=%i\n",visible_num);
 }
 

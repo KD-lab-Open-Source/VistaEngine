@@ -127,16 +127,6 @@ void cCoastSprites::Draw(Camera* camera)
 {
 	start_timer_auto();
 	MTAuto autolock(lock);
-#ifdef _WIN32
-	DWORD old_zwrite=gb_RenderDevice->GetRenderState(RS_ZWRITEENABLE);
-	gb_RenderDevice->SetRenderState(RS_ZWRITEENABLE,FALSE);
-	gb_RenderDevice->SetSamplerDataVirtual(0,sampler_wrap_anisotropic);
-	if (mode & CSM_SIMPLE)
-		DrawSimpleCoastSprite(camera);
-	if (mode & CSM_MOVING)
-		DrawMovingCoastSprite(camera);
-	gb_RenderDevice->SetRenderState(RS_ZWRITEENABLE,old_zwrite);
-#else
 	// The depth-write and sampler state above is baked into the worldquad pipeline;
 	// what is left is the camera the two sprite groups are drawn under.
 	SDLWorldQuadRenderer* renderer = sdlWorldQuadRenderer();
@@ -153,7 +143,6 @@ void cCoastSprites::Draw(Camera* camera)
 	// D3D drew as each group's EndDraw went; SDL GPU only draws inside a render pass, so
 	// open one now, here in the scene walk where the sprites belong.
 	dev->drawWorldQuads();
-#endif
 }
 
 void cCoastSprites::PreDraw(Camera* camera)
@@ -317,11 +306,6 @@ Color4c cCoastSprites::GetDiffuseColor(Camera* camera)
 
 void cCoastSprites::DrawSimpleCoastSprite(Camera* camera)
 {
-#ifdef _WIN32
-	cInterfaceRenderDevice* rd=gb_RenderDevice;
-	rd->SetWorldMaterial(ALPHA_BLEND,MatXf::ID, 0, Texture_stay,0,COLOR_MOD,true);
-	cQuadBuffer<sVertexXYZDT1>* pBuf=rd->GetQuadBufferXYZDT1();
-#else
 	// SetWorldMaterial selects vsStandart/psStandart with Texture_stay on stage 0; the
 	// renderer's pipeline is that shader pair, so naming the texture is all that is left
 	// of it. It answers to the quad buffer's BeginDraw/Get/EndDraw, so the loop below is
@@ -330,7 +314,6 @@ void cCoastSprites::DrawSimpleCoastSprite(Camera* camera)
 	if(!pBuf)
 		return;
 	pBuf->SetMaterial(ALPHA_BLEND, Texture_stay);
-#endif
 	bool avi_texture = Texture_stay&&Texture_stay->IsAviScaleTexture();
 	int grid_shift = pWater->GetCoordShift();
 	int phase_step = round(dt*simple_scale_time*INT_SIZE);
@@ -381,17 +364,10 @@ void cCoastSprites::DrawSimpleCoastSprite(Camera* camera)
 }
 void cCoastSprites::DrawMovingCoastSprite(Camera* camera)
 {
-#ifdef _WIN32
-	cInterfaceRenderDevice* rd=gb_RenderDevice;
-	rd->SetWorldMaterial(ALPHA_BLEND,MatXf::ID, 0, Texture_mov,0,COLOR_MOD,true);
-	//rd->SetWorldMaterial(ALPHA_BLEND,MatXf::ID, 0, 0);
-	cQuadBuffer<sVertexXYZDT1>* pBuf=rd->GetQuadBufferXYZDT1();
-#else
 	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
 	if(!pBuf)
 		return;
 	pBuf->SetMaterial(ALPHA_BLEND, Texture_mov);
-#endif
 	bool avi_texture = Texture_mov&&Texture_mov->IsAviScaleTexture();
 	pBuf->BeginDraw();
 	int grid_shift = pWater->GetCoordShift();

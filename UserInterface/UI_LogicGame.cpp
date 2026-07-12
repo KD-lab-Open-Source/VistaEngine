@@ -2131,17 +2131,13 @@ bool UI_LogicDispatcher::drawSelection(const Vect2f& topLeft, const Vect2f& righ
 	cp.x-=wide.y/2;
 	cp.y-=wide.y/2;
 
-#ifdef _WIN32
-	cQuadBuffer<sVertexXYZWDT1>* buf= rd->GetQuadBufferXYZWDT1();
-#else
-	// The device has no quad buffer to hand out off Windows: SDL GPU draws only inside a
-	// render pass, which is a renderer's business. The UI renderer keeps the one the 2D
-	// callers share, and the SetNoMaterial calls below already reach it -- they are how it
-	// learns each strip's texture, on both backends.
+	// The device has no quad buffer to hand out: SDL GPU draws only inside a render pass,
+	// which is a renderer's business. The UI renderer keeps the one the 2D callers share,
+	// and the SetNoMaterial calls below already reach it -- they are how it learns each
+	// strip's texture.
 	SDLUIRenderer* buf = sdlUIRenderer();
 	if(!buf)
 		return false;
-#endif
 	rd->SetNoMaterial(ALPHA_NONE,MatXf::ID,0,selectionTexture_);
 	buf->BeginDraw();
 	float u = 1;

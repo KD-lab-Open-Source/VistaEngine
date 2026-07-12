@@ -84,6 +84,9 @@ cbuffer Light : register(b0, space3)
     // define, which it recompiles the shader for; Option_DetailTexture (the "detail texture"
     // graphics option) turns it off, and so does a material with no texture of its own.
     float4 DetailParams;
+    // Distance fog: D3DRS_FOGCOLOR, the colour a fully fogged pixel becomes. The factor
+    // itself arrives interpolated, in VSOutput::Fog. See the note in tilemap.vert.hlsl.
+    float4 FogColor;
 };
 
 struct VSOutput
@@ -94,6 +97,7 @@ struct VSOutput
     float4 ShadowPos : TEXCOORD1;
     float2 LightmapUV : TEXCOORD2;
     float2 MiniUV    : TEXCOORD3;
+    float  Fog       : TEXCOORD4;
 };
 
 // shadow9700.inl's `#define ccx 0.0005`: the 2x2 tap offset, in shadow-map uv. Almost
@@ -172,6 +176,11 @@ float4 main(VSOutput input) : SV_Target0
         lit *= smoothstep(0.15f, 0.2f, ndlRaw);
         ot.rgb *= ShadeIntensity.rgb * (1.0f - lit) + lit;
     }
+
+    // Distance fog, last -- where D3D9's fixed function applied it: to the finished pixel,
+    // after everything that shades it, before the blend. Fog off means Fog == 1, i.e. the
+    // identity, so there is nothing to branch on.
+    ot.rgb = lerp(FogColor.rgb, ot.rgb, saturate(input.Fog));
 
     // Terrain is opaque base geometry: it clears and writes depth, and nothing
     // blends against it, so the alpha it carries is irrelevant. Emit 1.

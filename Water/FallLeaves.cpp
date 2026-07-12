@@ -103,9 +103,6 @@ void cFallLeaves::Draw(Camera* camera)
 		return;
 	
 	MTAuto lock(objects_lock);
-#ifdef _WIN32
-	gb_RenderDevice->SetWorldMaterial(ALPHA_BLEND,MatXf::ID,0,pTexture);
-#else
 	// SetWorldMaterial selects vsStandart/psStandart with pTexture on stage 0; the renderer's
 	// pipeline is that shader pair, so naming the texture is all that is left of it. It
 	// answers to the quad buffer's BeginDraw/Get/EndDraw, so the loop below is shared code.
@@ -115,7 +112,6 @@ void cFallLeaves::Draw(Camera* camera)
 		return;
 	pBuf->SetCamera(camera);
 	pBuf->SetMaterial(ALPHA_BLEND, pTexture);
-#endif
 
 	Color4c tileMapColor(scene()->GetTileMap()->GetDiffuse());
 	Color4c sunColor(environment->environmentTime()->GetCurSunColor());
@@ -125,9 +121,6 @@ void cFallLeaves::Draw(Camera* camera)
 	lightDirection.normalize();
 
 	Mat3f mat=camera->GetMatrix().rot();
-#ifdef _WIN32
-	cQuadBuffer<sVertexXYZDT1>* pBuf=gb_RenderDevice->GetQuadBufferXYZDT1();
-#endif
 	pBuf->BeginDraw();
 	
 	int texturesCount = pTexture->GetFramesCount();
@@ -174,9 +167,7 @@ void cFallLeaves::Draw(Camera* camera)
 		v[3].GetTexel().x = rt.max.x;v[3].GetTexel().y = rt.max.y;//  (1,1);
 	}
 	pBuf->EndDraw();
-#ifndef _WIN32
 	dev->drawWorldQuads();
-#endif
 }
 /*
 ((!a && b) && c) || (a && b)

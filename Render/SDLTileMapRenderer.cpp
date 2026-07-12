@@ -2,7 +2,6 @@
 #include "StdAfxRD.h"
 #include "SDLTileMapRenderer.h"
 
-#ifndef _WIN32
 
 #include <SDL3/SDL.h>
 #include <cstdio>
@@ -25,9 +24,9 @@ namespace {
 
 // Uniform blocks, laid out to match tilemap.{vert,frag}.hlsl exactly.
 struct VSUniform { float mvp[16]; float uv[4]; float shadow[16]; float planarNode[4];
-                   float miniTexture[4]; };
+                   float miniTexture[4]; float fogPlane[4]; };
 struct FSUniform { float lightColor[4]; float lightDir[4]; float shade[4]; float params[4];
-                   float lightMapParams[4]; float detailParams[4]; };
+                   float lightMapParams[4]; float detailParams[4]; float fogColor[4]; };
 // tilemap_shadow.vert.hlsl's whole cbuffer: the light camera's view-projection.
 struct ShadowVSUniform { float mvp[16]; };
 
@@ -661,6 +660,15 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 		vsu.planarNode[2] = vsu.planarNode[3] = 1.f;
 	}
 
+	// Distance fog. The plane folds this camera's view matrix into the linear factor, so the
+	// reflection camera fogs by its own depth. It comes back (0,0,0,1) when fog is off --
+	// factor 1, and the shader's lerp is then the identity.
+	const Vect4f fogPlane = dev ? dev->fogPlane(camera) : Vect4f(0.f, 0.f, 0.f, 1.f);
+	vsu.fogPlane[0] = fogPlane.x; vsu.fogPlane[1] = fogPlane.y;
+	vsu.fogPlane[2] = fogPlane.z; vsu.fogPlane[3] = fogPlane.w;
+	const Color4f fog = dev ? dev->fogColor() : Color4f(0.f, 0.f, 0.f, 0.f);
+	fsu.fogColor[0] = fog.r; fsu.fogColor[1] = fog.g; fsu.fogColor[2] = fog.b; fsu.fogColor[3] = fog.a;
+
 	// Wireframe is a diagnostic: kill the diffuse term and drive ambient to 1, so with
 	// the white texture bound below every edge comes out full white regardless of the
 	// map's baked surface colour (the Menu world's is all zeros).
@@ -750,4 +758,3 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	return true;
 }
 
-#endif // !_WIN32

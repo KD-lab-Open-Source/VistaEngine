@@ -23,6 +23,10 @@ set(GAME_SOURCES
     # Core.vcproj engine source that happens to live in the TriggerEditor dir
     # (defines TriggerChain runtime methods load/save/buildLinks/serialize/...).
     ../TriggerEditor/TriggerExport.cpp
+
+    # SDL3 windowing and input — the engine's only window, on every platform, and
+    # the one the SDL GPU device claims its swapchain on.
+    ${CMAKE_SOURCE_DIR}/Platform/Window.cpp
 )
 
 if(WIN32)
@@ -36,8 +40,6 @@ else()
     # helpers). Compiled into the executable itself so the single definition is
     # always present at the final link, regardless of static-archive order.
     list(APPEND GAME_SOURCES ${CMAKE_SOURCE_DIR}/Platform/WindowsAPI.cpp)
-    # SDL3 windowing — creates the real OS window the SDL GPU device claims.
-    list(APPEND GAME_SOURCES ${CMAKE_SOURCE_DIR}/Platform/Window.cpp)
 endif()
 
 add_executable(Game ${GAME_SOURCES})

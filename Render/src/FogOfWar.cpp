@@ -319,37 +319,12 @@ void FogOfWar::PreDraw(Camera* camera)
 
 void FogOfWar::Draw(Camera* camera)
 {
-#ifndef _WIN32
-	// Fog of war, not ported -- the same alpha-only quad as FieldOfViewMap::Draw, which
-	// says why. It draws into the terrain lightmap's alpha channel (note the
-	// COLORWRITEENABLE = ALPHA below), and nothing off-Windows reads that channel yet.
-	// Only reachable since CameraPlanarLight started drawing.
+	// TODO(sdl-port): fog of war does not draw. See Render/PORTING.md #10.
+	//
+	// The same alpha-only quad as FieldOfViewMap::Draw. It drew into the terrain lightmap's
+	// alpha channel, which needs a colour-write mask we have no pipeline for, and nothing
+	// reads that channel yet.
 	return;
-#else
-	cD3DRender* rd=gb_RenderDevice3D;
-
-	DWORD old_colorwrite=rd->GetRenderState(D3DRS_COLORWRITEENABLE);
-	rd->SetRenderState(D3DRS_COLORWRITEENABLE,D3DCOLORWRITEENABLE_ALPHA);
-	int dx=vMap.H_SIZE;
-	int dy=vMap.V_SIZE;
-	Color4c diffuse(255,255,255);
-
-	rd->SetNoMaterial(ALPHA_NONE,MatXf::ID,0,texture_);
-	rd->SetBlendStateAlphaRef(ALPHA_NONE);
-	rd->psFont->Select();
-
-	cQuadBuffer<sVertexXYZDT1>* quad=rd->GetQuadBufferXYZDT1();
-	quad->BeginDraw();
-	sVertexXYZDT1 *v=quad->Get();
-	v[0].pos.x=0; v[0].pos.y=0; v[0].pos.z=0; v[0].u1()=0; v[0].v1()=0; v[0].diffuse=diffuse;
-	v[1].pos.x=0; v[1].pos.y=dy; v[1].pos.z=0; v[1].u1()=0; v[1].v1()=1; v[1].diffuse=diffuse;
-	v[2].pos.x=dx; v[2].pos.y=0; v[2].pos.z=0; v[2].u1()=1; v[2].v1()=0; v[2].diffuse=diffuse;
-	v[3].pos.x=dx; v[3].pos.y=dy; v[3].pos.z=0; v[3].u1()=1; v[3].v1()=1; v[3].diffuse=diffuse;
-	
-	quad->EndDraw();
-
-	rd->SetRenderState(D3DRS_COLORWRITEENABLE,old_colorwrite);
-#endif
 }
 
 void FogOfWar::Animate(float dt)

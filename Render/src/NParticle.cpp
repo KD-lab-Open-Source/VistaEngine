@@ -11,10 +11,8 @@
 #include "Serialization/Serialization.h"
 #include "XMath/SafeMath.h"
 #include "FileUtils/FileUtils.h"
-#ifndef _WIN32
 #include "Render/SDLRenderDevice.h"        // the emitters' sprites, reached via drawWorldQuads
 #include "Render/SDLWorldQuadRenderer.h"
-#endif
 
 bool enableMirage = false;
 static vector<Vect2f> rotate_angle;
@@ -210,25 +208,6 @@ void cEmitterColumnLight::Draw(Camera* camera)
 	float ut1 = 0;
 	float vt1 = 0;
 
-#ifdef _WIN32
-	cVertexBuffer<sVertexXYZDT2>* pBuf = rd->GetBufferXYZDT2();
-
-	gb_RenderDevice->SetSamplerDataVirtual(0,sampler_clamp_linear);
-	gb_RenderDevice->SetSamplerDataVirtual(1,sampler_wrap_linear);
-
-	bool reflectionz = camera->getAttribute(ATTRCAMERA_REFLECTION) != 0;
-	{//Немного не к месту, зато быстро по скорости, для отражений.
-		gb_RenderDevice3D->SetTexture(5,camera->GetZTexture());
-		gb_RenderDevice3D->SetSamplerData(5,sampler_clamp_linear);
-	}
-	gb_RenderDevice3D->SetWorldMaterial(blend_mode, wm, 0, GetTexture(0), GetTexture(1), color_mode,false,reflectionz);
-	if(!GetTexture(0)){
-		gb_RenderDevice3D->SetWorldMaterial(blend_mode, wm, 0, GetTexture(1), 0);
-		gb_RenderDevice->SetSamplerDataVirtual(0,sampler_wrap_linear);
-		ut1 = ut;
-		vt1 = vt;
-	}
-#else
 	// The world-quad renderer answers to cVertexBuffer's Lock/Unlock/DrawPrimitive as well
 	// as the quad buffer's, so the geometry below is the same code on both backends. The
 	// column is built in emitter space, so wm -- the emitter's GlobalMatrix -- is the
@@ -244,7 +223,6 @@ void cEmitterColumnLight::Draw(Camera* camera)
 		ut1 = ut;
 		vt1 = vt;
 	}
-#endif
 #ifdef NEED_TREANGLE_COUNT
 	if(parent->drawOverDraw){
 		gb_RenderDevice3D->SetRenderState(D3DRS_SRCBLEND,D3DBLEND_ONE);
@@ -1225,17 +1203,6 @@ void cEmitterInt::Draw(Camera* camera)
 	if (GetTexture(0) && GetTexture(0)->IsComplexTexture())
 		textureComplex = (cTextureComplex*)GetTexture(0);
 
-#ifdef _WIN32
-	cQuadBuffer<sVertexXYZDT1>* pBuf=rd->GetQuadBufferXYZDT1();
-
-	gb_RenderDevice->SetSamplerDataVirtual(0,emitterKey()->chPlume?sampler_clamp_linear:sampler_wrap_linear);
-	bool reflectionz = camera->getAttribute(ATTRCAMERA_REFLECTION) != 0;
-	{//Немного не к месту, зато быстро по скорости, для отражений.
-		gb_RenderDevice3D->SetTexture(5,camera->GetZTexture());
-		gb_RenderDevice3D->SetSamplerData(5,sampler_clamp_linear);
-	}
-	gb_RenderDevice3D->SetWorldMaterial(blend_mode, emitterKey()->relative ? GlobalMatrix:MatXf::ID, 0, GetTexture(0),0,COLOR_MOD,softSmoke,reflectionz);
-#else
 	// The world-quad renderer answers to the quad buffer's BeginDraw/Get/EndDraw, so the
 	// sprite loop below is the same code on both backends; only the material call differs.
 	// softSmoke and the z-reflection clip both sample camera->GetZTexture(), which nothing
@@ -1245,7 +1212,6 @@ void cEmitterInt::Draw(Camera* camera)
 		return;
 	pBuf->SetMaterial(blend_mode, GetTexture(0), true,
 	                  emitterKey()->relative ? GlobalMatrix : MatXf::ID);
-#endif
 #ifdef NEED_TREANGLE_COUNT
 	if (parent->drawOverDraw)
 	{
@@ -2071,18 +2037,6 @@ void cEmitterSpline::Draw(Camera* camera)
 	if (GetTexture(0) && GetTexture(0)->IsComplexTexture())
 		textureComplex = (cTextureComplex*)GetTexture(0);
 
-#ifdef _WIN32
-	cQuadBuffer<sVertexXYZDT1>* pBuf=rd->GetQuadBufferXYZDT1();
-
-	gb_RenderDevice->SetSamplerDataVirtual(0,emitterKey()->chPlume?sampler_clamp_linear:sampler_wrap_linear);
-	bool reflectionz = camera->getAttribute(ATTRCAMERA_REFLECTION) != 0;
-	{//Немного не к месту, зато быстро по скорости, для отражений.
-		gb_RenderDevice3D->SetTexture(5,camera->GetZTexture());
-		gb_RenderDevice3D->SetSamplerData(5,sampler_clamp_linear);
-	}
-	gb_RenderDevice3D->SetWorldMaterial(blend_mode, emitterKey()->relative ? GlobalMatrix:MatXf::ID, 0, GetTexture(0),0,COLOR_MOD,softSmoke,reflectionz);
-	rd->SetRenderState( RS_CULLMODE, D3DCULL_NONE );
-#else
 	// As cEmitterInt::Draw: the same sprite loop, a different material call. The quad
 	// pipeline is already CULLMODE_NONE.
 	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
@@ -2090,7 +2044,6 @@ void cEmitterSpline::Draw(Camera* camera)
 		return;
 	pBuf->SetMaterial(blend_mode, GetTexture(0), true,
 	                  emitterKey()->relative ? GlobalMatrix : MatXf::ID);
-#endif
 #ifdef NEED_TREANGLE_COUNT
 	if (parent->drawOverDraw)
 	{
@@ -2854,13 +2807,6 @@ void cEffect::Draw(Camera* camera)
 {
 	start_timer_auto();
 
-#ifdef _WIN32
-	bool old_fog_of_war=gb_RenderDevice3D->GetFogOfWar();
-	if(no_fog_of_war)
-		gb_RenderDevice3D->SetFogOfWar(false);
-
-	gb_RenderDevice3D->SetSamplerData(0,sampler_wrap_linear);
-#else
 	// The emitters build their sprites through the shared world-quad renderer, which wants
 	// the camera before the first group opens and a render pass of its own once they are
 	// all recorded -- SDL GPU cannot draw as each EndDraw goes, the way D3D did. The
@@ -2870,7 +2816,6 @@ void cEffect::Draw(Camera* camera)
 	if(!renderer || !dev)
 		return;
 	renderer->SetCamera(camera);
-#endif
 
 	vector<cEmitterInterface*>::iterator it;
 	if(camera->getAttribute(ATTRCAMERA_MIRAGE)){
@@ -2901,107 +2846,9 @@ void cEffect::Draw(Camera* camera)
 				(*it)->Draw(camera);
 	}
 
-#ifndef _WIN32
 	// D3D drew as each group's EndDraw went; open the pass here, where the effects belong
 	// in the scene walk (the sorted pass, over the opaque objects and the water).
 	dev->drawWorldQuads();
-#else
-	gb_RenderDevice3D->SetFogOfWar(old_fog_of_war);
-#ifdef NEED_TREANGLE_COUNT
-	int sum = 0;
-	int sumOverDraw = 0;
-	if (enableOverDraw && useOverDraw){
-		D3DSURFACE_DESC desc;
-		gb_RenderDevice3D->SetRenderTarget(pRenderTexture,0);
-		gb_RenderDevice3D->D3DDevice_->Clear(0,0,D3DCLEAR_TARGET,0,0,0);
-		drawOverDraw=true;
-		FOR_EACH(emitters,it)
-				(*it)->Draw(camera);
-		drawOverDraw=false;
-		gb_RenderDevice3D->SetRenderTarget(pRenderTextureCalc,0);
-		gb_RenderDevice3D->D3DDevice_->Clear(0,0,D3DCLEAR_TARGET,0,0,0);
-		gb_RenderDevice3D->SetTexture(0,pRenderTexture);
-		gb_RenderDevice3D->SetRenderState(D3DRS_ALPHABLENDENABLE,FALSE);
-		//gb_RenderDevice3D->SetPixelShader(0);
-		psOverdrawCalc->Select(pRenderTexture->GetWidth(),pRenderTexture->GetHeight());
-
-		gb_RenderDevice3D->backBuffer_->GetDesc(&desc);
-		{
-			cVertexBuffer<sVertexXYZWDT1>* pBuf=gb_RenderDevice3D->GetBufferXYZWDT1();
-			sVertexXYZWDT1* v=	pBuf->Lock(4);
-
-			v[0].z=v[1].z=v[2].z=v[3].z=0.001f;
-			v[0].w=v[1].w=v[2].w=v[3].w=0.001f;
-			v[0].diffuse=v[1].diffuse=v[2].diffuse=v[3].diffuse=Color4c(255,255,255,255);
-			v[0].x=v[1].x=-0.5f; v[0].y=v[2].y=-0.5f; 
-			v[3].x=v[2].x=-0.5f+pRenderTextureCalc->GetWidth(); v[1].y=v[3].y=-0.5f+pRenderTextureCalc->GetHeight(); 
-			v[0].u1()=0;    v[0].v1()=0;
-			v[1].u1()=0;    v[1].v1()=1;
-			v[2].u1()=1; v[2].v1()=0;
-			v[3].u1()=1; v[3].v1()=1;
-
-			pBuf->Unlock(4);
-			pBuf->DrawPrimitive(PT_TRIANGLESTRIP,2);
-		}
-		gb_RenderDevice3D->RestoreRenderTarget();
-
-		gb_RenderDevice3D->SetTexture(0,pRenderTexture);
-		gb_RenderDevice3D->SetRenderState(D3DRS_ALPHABLENDENABLE,FALSE);
-		//gb_RenderDevice3D->SetPixelShader(0);
-		psOverdrawColor->Select();
-
-		gb_RenderDevice3D->backBuffer_->GetDesc(&desc);
-		cVertexBuffer<sVertexXYZWDT1>* pBuf=gb_RenderDevice3D->GetBufferXYZWDT1();
-		sVertexXYZWDT1* v=	pBuf->Lock(4);
-
-		v[0].z=v[1].z=v[2].z=v[3].z=0.001f;
-		v[0].w=v[1].w=v[2].w=v[3].w=0.001f;
-		v[0].diffuse=v[1].diffuse=v[2].diffuse=v[3].diffuse=Color4c(255,255,255,255);
-		v[0].x=v[1].x=-0.5f; v[0].y=v[2].y=-0.5f; 
-		v[3].x=v[2].x=-0.5f+desc.Width; v[1].y=v[3].y=-0.5f+desc.Height; 
-		v[0].u1()=0;    v[0].v1()=0;
-		v[1].u1()=0;    v[1].v1()=1;
-		v[2].u1()=1; v[2].v1()=0;
-		v[3].u1()=1; v[3].v1()=1;
-
-		pBuf->Unlock(4);
-		pBuf->DrawPrimitive(PT_TRIANGLESTRIP,2);
-		IDirect3DSurface9 *pDestSurface=0;
-		RDCALL(pRenderTextureCalc->GetDDSurface(0)->GetSurfaceLevel(0,&pDestSurface));
-		RDCALL(gb_RenderDevice3D->D3DDevice_->GetRenderTargetData(pDestSurface,pSysSurface));
-		pSysSurface->GetDesc(&desc);
-		D3DLOCKED_RECT LockedRect;
-		RDCALL(pSysSurface->LockRect(&LockedRect,
-			0,
-			D3DLOCK_READONLY
-			));
-
-		for (int y=0; y<desc.Height; y++)
-		for (int x=0; x<desc.Width; x++)
-		{
-			Color4c* pix = (Color4c*)(LockedRect.pBits)+x+y*LockedRect.Pitch/4;
-			if (pix->r != 0)
-			{
-				sum++;
-				sumOverDraw += pix->r;
-			}
-		}
-
-		pSysSurface->UnlockRect();
-		pDestSurface->Release();
-		square_triangle = float(sumOverDraw)/float(sum);
-	}
-#endif
-	
-	
-	
-//	cInterfaceRenderDevice* rd=camera->GetRenderDevice();
-//	Vect3f p = GetPosition().trans();
-//	Mat3f r = GetPosition().rot();
-//	rd->DrawLine(p, p+r.xrow()*100, Color4c(255, 0, 0));
-//	rd->DrawLine(p, p+r.yrow()*100, Color4c(0, 255, 0));
-//	rd->DrawLine(p, p+r.zrow()*100, Color4c(0, 0, 255));
-#endif
 }
 
 void cEffect::setCycled(bool cycled)
@@ -3555,13 +3402,9 @@ void cEmitterZ::Draw(Camera* camera)
 	if (GetTexture(0) && GetTexture(0)->IsComplexTexture())
 		textureComplex = (cTextureComplex*)GetTexture(0);
 
-#ifdef _WIN32
-	cQuadBuffer<sVertexXYZDT1>* pBuf=rd->GetQuadBufferXYZDT1();
-#else
 	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
 	if(!pBuf)
 		return;
-#endif
 
 	Vect3f CameraPos;
 	UCHAR mode;
@@ -3571,18 +3414,8 @@ void cEmitterZ::Draw(Camera* camera)
 		CameraPos = emitterKey()->relative ? GlobalMatrix.invXformPoint(CameraPos) : camera->GetPos();
 		mode = (UCHAR)emitterKey()->planar + (emitterKey()->smooth ? 0 : 2);
 	}
-#ifdef _WIN32
-	gb_RenderDevice->SetSamplerDataVirtual(0,sampler_wrap_linear);
-	bool reflectionz=camera->getAttribute(ATTRCAMERA_REFLECTION);
-	{//Немного не к месту, зато быстро по скорости, для отражений.
-		gb_RenderDevice3D->SetTexture(5,camera->GetZTexture());
-		gb_RenderDevice3D->SetSamplerData(5,sampler_clamp_linear);
-	}
-	gb_RenderDevice3D->SetWorldMaterial(blend_mode, emitterKey()->relative ? GlobalMatrix:MatXf::ID, 0, GetTexture(0),0,COLOR_MOD,softSmoke,reflectionz);
-#else
 	pBuf->SetMaterial(blend_mode, GetTexture(0), true,
 	                  emitterKey()->relative ? GlobalMatrix : MatXf::ID);
-#endif
 #ifdef NEED_TREANGLE_COUNT
 	if (parent->drawOverDraw)
 	{

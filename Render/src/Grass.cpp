@@ -1,6 +1,8 @@
 #include "StdAfxRD.h"
 #include "Grass.h"
 #include "D3DRender.h"
+#include "Render/SDLRenderDevice.h"
+#include "Render/SDLGrassRenderer.h"
 #include "cCamera.h"
 #include "FileImage.h"
 #include "Terra/vmap.h"
@@ -86,10 +88,6 @@ GrassMap::GrassMap():BaseGraphObject(0)
 {
 	grassMap_ = 0;
 	textureMap_ = 0;
-	vsGrass = 0;
-	psGrass = 0;
-	psGrassShadow = 0;
-	psSkinZBuffer=0;
 	time = 0;
 	textureCount_ = 7;
 	texture_ = 0;
@@ -115,12 +113,6 @@ GrassMap::~GrassMap()
 	delete [] grassMap_;
 	RELEASE(texture_);
 	RELEASE(textureMap_);
-#ifdef _WIN32
-	delete vsGrass;
-	delete psGrass;
-	delete psGrassShadow;
-	delete psSkinZBuffer;
-#endif
 	drawTileFreeAll();
 }
 
@@ -140,25 +132,6 @@ void GrassMap::Init(const char* world_path)
 	grassMapSize_.set(hsize>>grassMapShift,vsize>>grassMapShift);
 
 	grassMap_ = new GrassTile[tileNumber_.x*tileNumber_.y];
-#ifdef _WIN32
-	vsGrass = new VSGrass;
-	vsGrass->Restore();
-	psGrass = new PSGrass;
-	psGrass->Restore();
-	psSkinZBuffer = new PSSkinZBufferAlpha();
-	psSkinZBuffer->Restore();
-
-	if(gb_RenderDevice3D->dtAdvanceOriginal && gb_RenderDevice3D->dtAdvanceOriginal->GetID()==DT_RADEON9700)
-	{
-		psGrassShadow = new PSGrassShadow;
-		psGrassShadow->Restore();
-	}else
-	if(gb_RenderDevice3D->dtAdvanceOriginal && gb_RenderDevice3D->dtAdvanceOriginal->GetID()==DT_GEFORCEFX)
-	{
-		psGrassShadow = new PSGrassShadowFX;
-		psGrassShadow->Restore();
-	}
-#endif
 	textureNames_.resize(textureCount_);
 	bushHights_.resize(textureCount_,3);
 	//textureMap_ = GetTexLibrary()->CreateAlphaTexture(grassMapSize_.x,grassMapSize_.y);
@@ -766,118 +739,83 @@ bool GrassMap::TestVisible(GrassTile& tile,Camera* camera)
 
 }
 
+// The two draw functions, ported to SDL GPU. The original pushed VSGrass / PSGrass (or
+// PSGrassShadow) and a wall of render states at gb_RenderDevice3D and then issued one
+// DrawIndexedPrimitive per visible tile; SDLGrassRenderer takes the same state and the same
+// per-tile draws, and cSDLRenderDevice::drawGrass puts them on the screen right here, where
+// Camera::DrawScene reached us. Everything above this line -- the tile grid, the blade
+// generation, the sort, the vertex and index buffers -- was portable and never changed.
+//
+// The blend and alpha-test states the original set around this are baked into the pipeline
+// and the shader's clip(); see SDLGrassRenderer.cpp and grass.frag.hlsl.
 void GrassMap::DrawGrass(eBlendMode mode,Camera* camera)
 {
-#ifdef _WIN32
-	if (sortedTile_.size()==0)
+	if(sortedTile_.empty() || !texture_)
 		return;
-	Color4c color(255,255,255,64);
-	
-	bool is_shadow=camera->IsShadow()&&enbaleShadow_;
-	
-	gb_RenderDevice3D->SetNoMaterial(ALPHA_NONE,MatXf::ID,0,texture_);
-	gb_RenderDevice3D->SetSamplerData(0,sampler_clamp_anisotropic);
-	gb_RenderDevice3D->SetRenderState(D3DRS_ALPHATESTENABLE,TRUE);
-	gb_RenderDevice3D->SetRenderState(D3DRS_ALPHABLENDENABLE,TRUE);
-	DWORD oldAlphaFunc = gb_RenderDevice3D->GetRenderState(D3DRS_ALPHAFUNC);
-	gb_RenderDevice3D->SetRenderState( D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
-	gb_RenderDevice3D->SetRenderState( D3DRS_ALPHAREF, 100);
-	gb_RenderDevice3D->SetRenderState(D3DRS_SRCBLEND,D3DBLEND_SRCALPHA);
-	gb_RenderDevice3D->SetRenderState(D3DRS_DESTBLEND,D3DBLEND_INVSRCALPHA);
-	gb_RenderDevice3D->SetRenderState(D3DRS_BLENDOP,D3DBLENDOP_ADD);
+	SDLGrassRenderer* renderer = sdlGrassRenderer();
+	cSDLRenderDevice* device = sdlRenderDevice();
+	if(!renderer || !device)
+		return;
+	cTileMap* tileMap = scene() ? scene()->GetTileMap() : 0;
+	if(!tileMap)
+		return;
 
-	gb_RenderDevice3D->SetTexture(3,gb_RenderDevice3D->GetLightMap());
-	gb_RenderDevice3D->SetSamplerData(3,sampler_clamp_linear);
+	SDLGrassRenderer::State state;
+	state.texture = texture_;
+	state.time = time_;
+	state.hideDistance = invHideDistance2_;
+	// The sun the terrain lights from, so the blades agree with the ground they stand on.
+	state.sunDiffuse = tileMap->GetDiffuse();
+	state.oldLighting = oldLighting;
+	state.receiveShadow = camera->IsShadow() && enbaleShadow_;
+	renderer->SetState(state, camera);
 
-	vsGrass->SetOldLighting(oldLighting);
-	bool toZbuffer = camera->getAttribute(ATTRCAMERA_ZBUFFER);
-	bool toFloatZBuffer = camera->getAttribute(ATTRCAMERA_FLOAT_ZBUFFER);
-	vsGrass->Select(time_,invHideDistance2_,scene()->GetTileMap()->GetDiffuse(),toZbuffer||toFloatZBuffer);
-	if (toZbuffer||toFloatZBuffer)
-	{
-		gb_RenderDevice3D->SetRenderState(D3DRS_ALPHATESTENABLE,FALSE);
-		gb_RenderDevice3D->SetRenderState(D3DRS_ALPHABLENDENABLE,FALSE);
-		psSkinZBuffer->SetSecondOpacity(0);
-		psSkinZBuffer->Select();
-		//gb_RenderDevice3D->dtAdvance->pPSZBuffer->Select(toFloatZBuffer);
-	}else
-	if (is_shadow)
-	{
-		psGrassShadow->SetShadowIntensity(scene()->GetShadowIntensity());
-		psGrassShadow->Select();
-	}else
-	{
-		psGrass->Select();
-	}
-	Vect2f vec1(0.5,0.5);
-
+	// Which of the two index buffers to use. Both list the same blades; they wind the quads
+	// in opposite orders, so one draws the tile's blades front-to-back and the other
+	// back-to-front. The dot with (0.5, 0.5) asks which side of the tile the camera is on --
+	// blades are alpha-blended and depth-writing, so drawing them out of order would let a
+	// near blade's transparent border punch a hole in the one behind it.
+	const Vect2f vec1(0.5f, 0.5f);
 	vector<SortedTile>::iterator it;
 	FOR_EACH(sortedTile_,it)
 	{
 		GrassTile* tile = it->tile;
-		Vect2f vec2(tile->pos.x+tileSize/2 - camera->GetPos().x,tile->pos.y+tileSize/2 - camera->GetPos().y);
-		float a = vec2.dot(vec1);
-		DrawTile* drawTile = drawTiles[tile->drawTileID];
-		if (tile->recreate)
+		if(tile->recreate || !drawTileValid(tile->drawTileID))
 			continue;
-		if (a>0)
-		{
-			gb_RenderDevice3D->DrawIndexedPrimitive(drawTile->vertexBuffer,0,drawTile->bladeCount*4,drawTile->backwardIndex,0,drawTile->bladeCount*2);
-		}
-		else
-		{
-			gb_RenderDevice3D->DrawIndexedPrimitive(drawTile->vertexBuffer,0,drawTile->bladeCount*4,drawTile->forwardIndex,0,drawTile->bladeCount*2);
-		}
-
+		DrawTile* drawTile = drawTiles[tile->drawTileID];
+		Vect2f vec2(tile->pos.x+tileSize/2 - camera->GetPos().x,
+		            tile->pos.y+tileSize/2 - camera->GetPos().y);
+		const float a = vec2.dot(vec1);
+		renderer->DrawIndexedPrimitive(drawTile->vertexBuffer,
+		                               a > 0 ? drawTile->backwardIndex : drawTile->forwardIndex,
+		                               drawTile->bladeCount*2);
 	}
-	
-	//for(int y=0; y<tileNumber_.y; y++)
-	//for(int x=0; x<tileNumber_.x; x++)
-	//{
-	//	GrassTile& tile = getTile(x,y);
-	//	if (!TestVisible(tile,UCamera))
-	//		continue;
 
-	//	gb_RenderDevice3D->DrawIndexedPrimitive(tile.vertexBuffer,0,tile.bushes_.size()*4,tile.indexBuffer,0,tile.bushes_.size()*2);
-	//}
-	gb_RenderDevice3D->SetRenderState( D3DRS_ALPHAFUNC, oldAlphaFunc);
-#endif
+	device->drawGrass();
 }
 
 void GrassMap::Draw(Camera* camera)
 {
-#ifdef _WIN32
 	start_timer_auto();
-	
+
 	if(!enable_ || debugShowSwitch.grass)
 		return;
 
+	// Far tiles first: the per-tile index buffers order the blades within a tile, this orders
+	// the tiles among themselves.
 	stable_sort(sortedTile_.begin(),sortedTile_.end(),TilesSortByRadius());
-	//gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,0);
-	//gb_RenderDevice3D->SetRenderState(D3DRS_ZWRITEENABLE,FALSE);
-	//gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC,D3DCMP_GREATEREQUAL);
-	//gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,D3DCOLORWRITEENABLE_ALPHA|D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED);
-	gb_RenderDevice3D->SetRenderState( RS_CULLMODE, D3DCULL_NONE );
-	DWORD colorEnableState = gb_RenderDevice3D->GetRenderState(D3DRS_COLORWRITEENABLE);
-	if (camera->getAttribute(ATTRCAMERA_ZBUFFER)||camera->getAttribute(ATTRCAMERA_FLOAT_ZBUFFER))
-	{
-		gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,D3DCOLORWRITEENABLE_ALPHA);
-	}else
-		gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,D3DCOLORWRITEENABLE_ALPHA|D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED);
-	//DWORD fogenable=gb_RenderDevice3D->GetRenderState(D3DRS_FOGENABLE);
-	//gb_RenderDevice3D->SetRenderState(D3DRS_FOGENABLE,FALSE);
-	//gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC,D3DCMP_EQUAL);
+
+	// The z-buffer cameras the original also fed from here (its ATTRCAMERA_ZBUFFER /
+	// ATTRCAMERA_FLOAT_ZBUFFER branch, which drew the blades into a depth-only target with
+	// colour writes masked to alpha) went with the D3D9 backend -- see Render/PORTING.md #12.
+	// Nothing creates such a camera now, and if something does, it must not get colour grass.
+	if(camera->getAttribute(ATTRCAMERA_ZBUFFER) || camera->getAttribute(ATTRCAMERA_FLOAT_ZBUFFER))
+		return;
+
+	// D3DCULL_NONE and the alpha-blend states the original set here are fixed properties of
+	// the grass pipeline; the colour-write mask it saved and restored has no SDL GPU
+	// equivalent (PORTING.md #16) and only ever mattered to the z-buffer path above.
 	DrawGrass(ALPHA_TEST,camera);
-	gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,colorEnableState);
-	//gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,D3DCOLORWRITEENABLE_ALPHA|D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED);
-	//gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC,D3DCMP_EQUAL);
-	//gb_RenderDevice3D->SetRenderState(D3DRS_FOGENABLE,fogenable);
-	//gb_RenderDevice3D->SetRenderState(D3DRS_ALPHAREF,128);
-	//gb_RenderDevice3D->SetRenderState(D3DRS_ZWRITEENABLE,FALSE);
-	//DrawGrass(ALPHA_BLEND,UCamera);
-	
-	//gb_RenderDevice3D->SetRenderState(D3DRS_ZWRITEENABLE,TRUE);
-#endif
 }
 
 void GrassMap::serialize(Archive& ar)

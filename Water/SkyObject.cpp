@@ -82,13 +82,6 @@ void cSunMoonObj::Draw(Camera* camera)
 	if (!texture)
 		return;
 	const MatXf& mat=camera->GetMatrix();
-#ifdef _WIN32
-	gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE);
-	gb_RenderDevice3D->SetRenderState(D3DRS_ZENABLE,FALSE);
-	cVertexBuffer<sVertexXYZDT1>* pBuf  = gb_RenderDevice->GetBufferXYZDT1();
-	gb_RenderDevice3D->SetNoMaterial(isDay?ALPHA_ADDBLENDALPHA:ALPHA_BLEND,MatXf::ID,0,texture);
-	sVertexXYZDT1* v = pBuf->Lock(4);
-#else
 	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
 	cSDLRenderDevice* dev = sdlRenderDevice();
 	if(!pBuf || !dev)
@@ -99,7 +92,6 @@ void cSunMoonObj::Draw(Camera* camera)
 	pBuf->SetMaterial(isDay?ALPHA_ADDBLENDALPHA:ALPHA_BLEND, texture, false);
 	pBuf->BeginDraw();
 	sVertexXYZDT1* v = pBuf->Get();
-#endif
 
 	Vect2f rot((isDay?attribute_.sunSize:attribute_.moonSize)*scale,0);
 	Vect3f& pos = position_.trans();
@@ -124,16 +116,10 @@ void cSunMoonObj::Draw(Camera* camera)
 	v[3].diffuse=color;
 	v[3].GetTexel().x = 1;v[3].GetTexel().y = 1;//  (1,1);
 
-#ifdef _WIN32
-	pBuf->Unlock(4);
-	pBuf->DrawPrimitive(PT_TRIANGLESTRIP, 2);
-	gb_RenderDevice3D->SetRenderState(D3DRS_ZENABLE,TRUE);
-#else
 	// The corners above are the two opposite edges 0,1 and 2,3 that the renderer's index
 	// pattern expects, so its two triangles cover the same quad D3D's strip does.
 	pBuf->EndDraw();
 	dev->drawWorldQuads();
-#endif
 }
 
 void cSunMoonObj::SetTextures()
@@ -154,37 +140,22 @@ void cSkyCamera::DrawScene()
 {
 	gb_RenderDevice->setCamera(this);
 
-#ifdef _WIN32
-	DWORD old_colorwrite=gb_RenderDevice3D->GetRenderState(D3DRS_COLORWRITEENABLE);
-#endif
 
 	sunMoonObj->Draw(this);
 	for(vector<OneObject>::iterator it=objects.begin();it!=objects.end();it++)
 	{
 		OneObject& p=*it;
-#ifdef _WIN32
-		// The alpha channel carries the HDR mask, which only the reflection and cubemap
-		// cameras want the sky written into; on screen the sky must leave alpha alone.
-		DWORD write=D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED;
-		if(p.write_alpha && enable_hdr_alpha)
-			write|=D3DCOLORWRITEENABLE_ALPHA;
-		gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,write);
-#endif
-		// Off-Windows there is no colour-write mask short of a second pipeline variant, so
-		// the sky writes alpha into whatever it draws to. Into the reflection target that is
-		// what the original wants (write_alpha is set for exactly that camera). On screen it
-		// costs nothing: the swapchain's alpha is never sampled.
+		// There is no colour-write mask short of a second pipeline variant, so the sky writes
+		// alpha into whatever it draws to. Into the reflection target that is what the
+		// original wanted (write_alpha is set for exactly that camera). On screen it costs
+		// nothing: the swapchain's alpha is never sampled.
 		p.obj->DrawAll(this);
 	}
 
-#ifdef _WIN32
-	gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,old_colorwrite);
-#else
 	// The sky models batch in SDLObject3dxRenderer, like any other 3dx object. Put them on
 	// the screen here, over the sun, before the caller returns and the world scene draws.
 	if(cSDLRenderDevice* dev = sdlRenderDevice())
 		dev->flushObjectPass();
-#endif
 	objects.clear();
 }
 
@@ -352,11 +323,12 @@ void cSkyObj::DrawSky(Camera* pGlobalCamera,bool hdr_alpha)
 	Vect2f zPlane(1e3f,1e5f);
 	pNormalCamera->SetFrustum(0,0,0,&zPlane);
 
-#ifdef _WIN32
-	cD3DRender* rd=gb_RenderDevice3D;
-	DWORD old_fogenable=rd->GetRenderState(D3DRS_FOGENABLE);
-	rd->SetRenderState(D3DRS_FOGENABLE,FALSE);
-#endif
+	// The sky is not fogged. Its frustum reaches 1e5, so everything in it sits far beyond
+	// the fog's far plane -- leave fog on and the whole sky, sun included, comes out a flat
+	// slab of fog colour. The original disabled it here for exactly that reason; the guard
+	// went with the D3D9 backend and comes back now that there is fog to disable again.
+	DWORD old_fogenable = gb_RenderDevice->GetRenderState(RS_FOGENABLE);
+	gb_RenderDevice->SetRenderState(RS_FOGENABLE, FALSE);
 
 	vector<SkyElement>::iterator it;
 	pNormalCamera->SetSunMoonObj(&sunMoonObj);
@@ -369,25 +341,8 @@ void cSkyObj::DrawSky(Camera* pGlobalCamera,bool hdr_alpha)
 	pSkyScene->Draw(pNormalCamera);
 	//DrawSun(pGlobalCamera);
 
-#ifdef _WIN32
-	rd->SetRenderState(D3DRS_FOGENABLE,old_fogenable);
+	gb_RenderDevice->SetRenderState(RS_FOGENABLE, old_fogenable);
 
-	// cFogCircleEX is a fixed-function ring shaded from D3DRS_TEXTUREFACTOR; nothing builds
-	// its buffers off-Windows (its constructor gives up without a gb_RenderDevice3D), so
-	// this block would draw nothing there anyway.
-	if(!hdr_alpha)///Непонятно - правильно ли?
-	{
-		rd->SetDrawTransform(pNormalCamera);
-		DWORD old_fogenable=rd->GetRenderState(D3DRS_FOGENABLE);
-		DWORD old_zwrite=rd->GetRenderState(D3DRS_ZWRITEENABLE);
-		rd->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-		rd->SetRenderState(D3DRS_FOGENABLE,FALSE);
-		if(pFogCircle)
-			pFogCircle->Draw(pNormalCamera);
-		rd->SetRenderState(D3DRS_FOGENABLE,old_fogenable);
-		rd->SetRenderState(D3DRS_ZWRITEENABLE, old_zwrite);
-	}
-#endif
 
 	pNormalCamera->SetRenderTarget((IDirect3DSurface9*)0,0);
 }
@@ -769,6 +724,10 @@ float EnvironmentTime::CalcNormalScale()
 	return k_scale;
 }
 
+// TODO(sdl-port): nothing calls this any more -- Environment::graphQuant did, from a D3D-only
+// branch. cRenderCubemap::Init gives up without a device, so pCubeRender holds no cube texture
+// and this would render into nothing. See Render/PORTING.md #9 -- and note it records that the
+// cubemap had no consumer even on D3D, so check that before reviving it.
 void EnvironmentTime::Draw()
 {
 	pCubeRender->Animate(0);

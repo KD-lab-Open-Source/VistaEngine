@@ -75,25 +75,6 @@ cWater::cWater()
 	// setTechnique overwrites this once the scene knows whether reflection is enabled.
 	technique_ = WATER_EMPTY;
 
-#ifdef _WIN32
-	psShader=new PSWater;
-	vsShader=new VSWater;
-	if(gb_RenderDevice3D->IsPS20())
-	{
-		psShader->SetTechnique(WATER_REFLECTION);
-		vsShader->SetTechnique(WATER_REFLECTION);
-	}else
-	{
-		psShader->SetTechnique(WATER_EMPTY);
-		vsShader->SetTechnique(WATER_EMPTY);
-	}
-	
-	vsShader->Restore();
-	psShader->Restore();
-
-	lavaShader_ = new ShaderSceneWaterLava;
-	lavaShader_->Restore();
-#endif
 
 	bumpTextureName_ = "Scripts\\Resource\\balmer\\shader\\waves.dds";
 	bumpTextureName1_ = "Scripts\\Resource\\balmer\\shader\\waves1.dds";
@@ -152,11 +133,6 @@ cWater::~cWater()
 	RELEASE(pWaterZ);
 	delete[] zbuffer;
 	delete[] speed_buffer;
-#ifdef _WIN32
-	delete vsShader;
-	delete psShader;
-	delete lavaShader_;
-#endif
 	delete pFunctorZ;
 	RELEASE(textureMiniMap_);
 	RELEASE(textureMiniMap2_);
@@ -250,7 +226,6 @@ void cWater::PreDraw(Camera* camera)
 	UpdateVB();
 }
 
-#ifndef _WIN32
 // VSWater::SetMirrorMatrix (Render/shader/ShaderWater.inl): the reflection camera's
 // view-projection, post-multiplied by the map from clip space to texture coordinates, so
 // water.vert.hlsl can project a world position straight into the reflection target.
@@ -268,7 +243,6 @@ static void fillMirrorMatrix(Camera* reflectionCamera, float out[16])
 	const Mat4f m = reflectionCamera->matViewProj * texAdj;
 	memcpy(out, &m, 16 * sizeof(float));
 }
-#endif
 
 void cWater::Draw(Camera* camera)
 {
@@ -279,116 +253,6 @@ void cWater::Draw(Camera* camera)
 		return;
 	}
 
-#ifdef _WIN32
-	cD3DRender* rd=gb_RenderDevice3D;
-
-	rd->AddNumPolygonToTilemap();
-
-	int old_zwrite=rd->GetRenderState(RS_ZWRITEENABLE);;
-	rd->SetRenderState(RS_ZWRITEENABLE,FALSE);
-	DWORD old_fogenable=rd->GetRenderState(D3DRS_FOGENABLE);
-//	rd->SetRenderState(D3DRS_FOGENABLE,FALSE);
-
-	rd->SetNoMaterial(ALPHA_BLEND, MatXf::ID);
-	vsShader->SetSpeedSky(Vect2f(2.0f/size.x,2.0f/size.y),Vect2f(0,fmodf(animate_time*0.01,1.0f)));
-
-	vsShader->EnableZBuffer(gb_VisGeneric->GetFloatZBufferType());
-	psShader->EnableZBuffer(gb_VisGeneric->GetFloatZBufferType());
-
-	Color4f plain_reflection_color;
-	plain_reflection_color.mul3(reflection_color,scene()->GetPlainLitColor());
-	plain_reflection_color.a=1-reflection_color.a;
-	psShader->SetReflectionColor(plain_reflection_color);
-	psShader->SetReflectionBrightnes(reflection_brightnes);
-
-	Color4f color = camera->scene()->GetSunDiffuse();
-	color.a = flashIntensity_;
-	psShader->setFlashColor(color);
-
-	vsShader->Select();
-	psShader->Select();
-
-	if(vsShader->GetTechnique()==WATER_LINEAR_REFLECTION){
-		float time_x=fmodf(animate_time*0.03,1.0f);
-		float time_y=fmodf(animate_time*0.02,1.0f);
-		float time_x1=fmodf(-animate_time*0.022,1.0f);
-		float time_y1=fmodf(-animate_time*0.033,1.0f);
-		const float speed_scale=5e-3f;
-		const float speed_scale1=7e-3f;
-		Camera* reflectionCamera = camera->FindChildCamera(ATTRCAMERA_REFLECTION);
-		vsShader->SetMirrorMatrix(reflectionCamera);
-		vsShader->SetSpeed(Vect2f(speed_scale,speed_scale),Vect2f(time_x,time_y));
-		vsShader->SetSpeed1(Vect2f(speed_scale1,speed_scale1),Vect2f(time_x1,time_y1));
-
-		rd->SetTexture(0, bumpTexture_);
-		rd->SetTexture(1, bumpTexture1_);
-		if(reflectionCamera)
-			rd->SetTexture(2,reflectionCamera->GetRenderTarget());
-
-		gb_RenderDevice3D->SetSamplerData(2,sampler_clamp_anisotropic);
-	}
-	else if(vsShader->GetTechnique()==WATER_LAVA){
-		gb_RenderDevice3D->SetTexture(1, lavaTexture_);
-		lavaShader_->setTextureScale(lavaTextureScale_, lavaVolumeTextureScale_);
-		lavaShader_->SetColors(lava_color_, lava_color_ambient_);
-		lavaShader_->SetTime(animate_time*0.01f);
-		lavaShader_->Select();
-	}
-	else if(vsShader->GetTechnique()==WATER_REFLECTION){
-		float time_x=fmodf(animate_time*0.03,1.0f);
-		float time_y=fmodf(animate_time*0.02,1.0f);
-		float time_x1=fmodf(-animate_time*0.022,1.0f);
-		float time_y1=fmodf(-animate_time*0.033,1.0f);
-		const float speed_scale=5e-3f;
-		const float speed_scale1=7e-3f;
-		vsShader->SetSpeed(Vect2f(speed_scale,speed_scale),Vect2f(time_x,time_y));
-		vsShader->SetSpeed1(Vect2f(speed_scale1,speed_scale1),Vect2f(time_x1,time_y1));
-
-		rd->SetTexture(0,bumpTexture_);
-		rd->SetTexture(1,bumpTexture1_);
-		rd->SetTexture(2,scene()->GetSkyCubemap());
-
-		gb_RenderDevice3D->SetSamplerData( 2,sampler_wrap_linear);
-	}
-	else if(vsShader->GetTechnique()==WATER_BAD){
-	}
-	else{
-		float time_x=fmodf(animate_time*0.03,1.0f);
-		float time_y=fmodf(animate_time*0.02,1.0f);
-		float time_x1=fmodf(-animate_time*0.022,1.0f);
-		float time_y1=fmodf(-animate_time*0.033,1.0f);
-		const float speed_scale=5e-3f;
-		const float speed_scale1=7e-3f;
-		vsShader->SetSpeed(Vect2f(speed_scale,speed_scale),Vect2f(time_x,time_y));
-		vsShader->SetSpeed1(Vect2f(speed_scale1,speed_scale1),Vect2f(time_x1,time_y1));
-
-		rd->SetTexture(0,bumpTexture_);
-		rd->SetTexture(1,bumpTexture1_);
-		//Color4f color;
-		//color.mul3(Color4f(0,0.5f,1,1),scene()->GetPlainLitColor());
-		//color.a=1;
-		//psShader->SetPS11Color(color);
-		psShader->SetPS11Color(cur_reflect_sky_color);
-	}
-	
-//	rd->SetTexture(pBump,0,1);
-	gb_RenderDevice3D->SetSamplerData( 0,sampler_wrap_anisotropic);
-	gb_RenderDevice3D->SetSamplerData( 1,sampler_wrap_anisotropic);
-	gb_RenderDevice3D->SetSamplerData( 3,sampler_clamp_anisotropic);
-
-	DrawPolygons(camera);
-
-	rd->SetRenderState(D3DRS_FOGENABLE,old_fogenable);
-	rd->SetRenderState(RS_ZWRITEENABLE,old_zwrite);
-	rd->SetVertexShader(0);
-	rd->SetPixelShader(0);
-
-	for(int i=0;i<8;i++){
-		rd->SetTexture(i,0);
-	}
-
-	rd->AddNumPolygonToNormal();
-#else
 	// WATER_LINEAR_REFLECTION when the scene has a reflection target, else WATER_EMPTY --
 	// what setTechnique chose. The other two, WATER_REFLECTION (sky cubemap) and WATER_LAVA,
 	// have no SDL shader pair. Everything the D3D path spreads across the render states, the
@@ -460,7 +324,6 @@ void cWater::Draw(Camera* camera)
 	dev->drawWater();
 
 	gb_RenderDevice->AddNumPolygonToNormal();
-#endif
 }
 
 void cWater::DrawPolygons(Camera* camera)
@@ -477,11 +340,9 @@ void cWater::DrawPolygons(Camera* camera)
 		}
 	}
 /*/
-#ifndef _WIN32
 	SDLWaterRenderer* renderer = sdlWaterRenderer();
 	if(!renderer)
 		return;
-#endif
 
 	int tile_polygons=visible_tile_size*visible_tile_size*2;
 	int num_tile_x=(grid_size.x-1)/visible_tile_size;
@@ -497,30 +358,18 @@ void cWater::DrawPolygons(Camera* camera)
 		xassert(cur_polygon>=0 && cur_polygon<65536);
 		xassert(cur_num>=0 && cur_num<65536);
 		xassert(cur_polygon+cur_num<=65536);
-#ifdef _WIN32
-		gb_RenderDevice3D->DrawIndexedPrimitive(vb[idx_vb],0,number_vertex,ib,cur_polygon,cur_num);
-#else
 		// Records the range against the state cWater::Draw set; it opens the pass after.
 		renderer->DrawIndexedPrimitive(vb[idx_vb],0,ib,cur_polygon,cur_num);
-#endif
 	}
 
 	if(border.isInit())
 		border.Draw(camera);
 }
 
+// TODO(sdl-port): unused -- it fed the float z-buffer camera, which is gone.
+// See Render/PORTING.md #13.
 void cWater::DrawToZBuffer(Camera* camera)
 {
-#ifdef _WIN32
-	cD3DRender* rd=gb_RenderDevice3D;
-	rd->AddNumPolygonToTilemap();
-	DWORD old_cull=rd->GetRenderState( D3DRS_CULLMODE);
-	rd->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
-	rd->SetWorldMaterial(ALPHA_NONE,MatXf::ID);
-	DrawPolygons(camera);
-	rd->SetRenderState( D3DRS_CULLMODE, old_cull );
-	rd->AddNumPolygonToNormal();
-#endif
 }
 
 void cWater::Animate(float dt)
@@ -1818,24 +1667,12 @@ void cWater::AddWaterRect(int x,int y,float dz,int size)
 void cWater::setTechnique()
 {
 	Technique set = WATER_EMPTY;
-#ifdef _WIN32
-	if(isLava()){
-		set = WATER_LAVA;
-		lavaTexture_ = GetTexLibrary()->GetElement3D(lavaTextureName_.c_str());
-	}
-	else if(gb_RenderDevice3D->IsPS20())
-		set = scene()->IsReflection() ? WATER_LINEAR_REFLECTION : WATER_REFLECTION;
-
-	vsShader->SetTechnique(set);
-	psShader->SetTechnique(set);
-#else
 	// Two of the four techniques have no SDL shader pair: WATER_LAVA, and WATER_REFLECTION
 	// -- the original's fallback when the reflection target is off -- which samples the sky
 	// cubemap. WATER_EMPTY stands in for both, exactly as it does on hardware without PS2.0,
 	// painting the surface with cur_reflect_sky_color instead of a reflection.
 	if(!isLava() && scene()->IsReflection())
 		set = WATER_LINEAR_REFLECTION;
-#endif
 	technique_ = set;
 }
 
@@ -2191,34 +2028,12 @@ void cEnvironmentEarth::PreDraw(Camera* camera)
 	camera->Attach(SCENENODE_OBJECTFIRST,this);
 }
 
+// TODO(sdl-port): the ground plane under the water does not draw. See Render/PORTING.md #7.
+//
+// The terrain-coloured plane that fills the horizon out beyond the map edge. Its buffers are
+// portable and still built; only the shader pass (psEnvironmentEarth) is missing.
 void cEnvironmentEarth::Draw(Camera* camera)
 {
-#ifdef _WIN32
-	if(camera->getAttribute(ATTRCAMERA_REFLECTION))
-		return;
-
-	if (earth_vb.IsInit())
-	{
-		cD3DRender* rd=gb_RenderDevice3D;
-		cScene* pScene=camera->scene();
-		Color4f tilecolor=pScene->GetTileMap()->GetDiffuse();
-		Vect3f dir = pScene->GetSunDirection();
-		float a = -dir.z;
-		tilecolor.r=min((tilecolor.r*a+tilecolor.a)*0.5f,1.0f);
-		tilecolor.g=min((tilecolor.g*a+tilecolor.a)*0.5f,1.0f);
-		tilecolor.b=min((tilecolor.b*a+tilecolor.a)*0.5f,1.0f);
-		tilecolor.a=1;
-
-		gb_RenderDevice3D->SetSamplerData(0,sampler_wrap_anisotropic);
-		tilecolor*=color;
-		rd->SetWorldMaterial(ALPHA_NONE, MatXf::ID, 0, Texture?Texture:rd->GetWhiteTexture());
-
-		psEnvironmentEarth->SetColor(tilecolor);
-		psEnvironmentEarth->Select();
-
-		rd->DrawIndexedPrimitive(earth_vb,0,size_vb,earth_ib,0,size_ib);
-	}
-#endif
 }
 
 

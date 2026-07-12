@@ -2,7 +2,6 @@
 #include "StdAfxRD.h"
 #include "SDLMinimapRenderer.h"
 
-#ifndef _WIN32
 
 #include <SDL3/SDL.h>
 #include <cstdio>
@@ -336,4 +335,3 @@ void SDLMinimapRenderer::DrawRun(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* 
 	SDL_DrawGPUPrimitives(pass, d.count, 1, d.first, 0);
 }
 
-#endif // !_WIN32

@@ -10,10 +10,8 @@
 #include "OcclusionQuery.h"
 #include "XMath/SafeMath.h"
 #include "Terra/vmap.h"
-#ifndef _WIN32
 #include "Render/SDLObject3dxRenderer.h"   // objects are drawn by SDLObject3dxRenderer,
 #include "Render/SDLRenderDevice.h"        // which the SDL device hands out
-#endif
 
 float AlphaMaxiumBlend=0.95f;
 float AlphaMiniumShadow=0.0f;
@@ -651,13 +649,11 @@ void cObject3dx::Draw(Camera* camera)
 
 	Update();
 
-#ifndef _WIN32
 	// The shadow-map camera is handled below, by DrawShadowAndZbuffer; the reflection
 	// camera draws normally, into the render target setCamera bound for it. The
 	// planar-shadow and float-Z passes still have no SDL equivalent.
 	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_FLOAT_ZBUFFER))
 		return;
-#endif
 
 	if(camera->getAttribute(ATTRCAMERA_SHADOWMAP)){
 		DrawShadowAndZbuffer(camera,false);
@@ -672,10 +668,6 @@ void cObject3dx::Draw(Camera* camera)
 	sDataRenderMaterial material;
 	material.lerp_texture=lerp_color;
 	material.point_light=&point_light;
-#ifdef _WIN32
-	gb_RenderDevice3D->SetSamplerData(1,sampler_wrap_linear);
-	gb_RenderDevice3D->SetTextureBase(4,0);
-#endif
 
 	//Из плюсов - выводит стабильное количество полигонов вне зависимости
 	//от количества подобъектов. Из минусов - для больших объектов не слишком
@@ -689,11 +681,6 @@ void cObject3dx::Draw(Camera* camera)
 	bool draw_opacity=camera->GetCameraPass()==SCENENODE_OBJECTSORT;
 	bool draw2passes = getAttribute(ATTRUNKOBJ_2PASS_ZBUFFER);//(camera->GetCameraPass()==SCENENODE_OBJECT_2PASS)||(camera->GetCameraPass()==SCENENODE_ZPASS);
 	if((draw_opacity || draw2passes)){
-#ifdef _WIN32
-		old_zfunc = gb_RenderDevice3D->GetRenderState(D3DRS_ZFUNC);
-		old_zwriteble = gb_RenderDevice3D->GetRenderState(D3DRS_ZWRITEENABLE);
-		old_color = gb_RenderDevice3D->GetRenderState(D3DRS_COLORWRITEENABLE);
-#endif
 	}
 
 	//!!! Не забыть сортировку по материалам.
@@ -730,9 +717,6 @@ void cObject3dx::Draw(Camera* camera)
 		material.Ambient.a = material.Diffuse.a = mat_anim.opacity*object_opacity*distance_alpha;
 
 		material.Tex[0]=diffuse_texture;
-#ifdef _WIN32
-		gb_RenderDevice3D->SetSamplerData(0,(mat.tiling_diffuse&StaticMaterial::TILING_U_WRAP)?sampler_wrap_anisotropic:sampler_clamp_anisotropic);
-#endif
 
 
 		if(mat.is_reflect_sky)
@@ -782,151 +766,6 @@ void cObject3dx::Draw(Camera* camera)
 				blend = ALPHA_SUBBLEND; /// dst=dst-src
 				break;
 		}
-#ifdef _WIN32
-		gb_RenderDevice3D->SetBlendStateAlphaRef(blend);
-		gb_RenderDevice3D->SetTexturePhase(0,material.Tex[0],texture_phase);
-		gb_RenderDevice3D->SetTexturePhase(1,material.Tex[1],texture_phase);
-
-		VSSkin* vs=0;
-		PSSkin* ps=0;
-
-		if(scene()->GetTileMap()){
-			gb_RenderDevice3D->SetSamplerData(3,sampler_clamp_linear);
-			gb_RenderDevice3D->SetTexture(3, gb_RenderDevice3D->GetLightMapObjects());
-		}
-		else
-			gb_RenderDevice3D->SetTextureBase(3,0);
-
-		if(mat.pSecondOpacityTexture){
-			vs=pShader3dx->vsSkinSecondOpacity;
-			ps=pShader3dx->psSkinSecondOpacity;
-			SetSecondUVTrans(true,vs,mat,mat_anim);
-
-			gb_RenderDevice3D->SetTexture(1,mat.pSecondOpacityTexture);
-		}
-		else if(getAttribute(ATTRUNKOBJ_NOLIGHT)){
-			vs=pShader3dx->vsSkinNoLight;
-			ps=pShader3dx->psSkin;
-			pShader3dx->psSkin->SelectLT(false,diffuse_texture);
-		}
-		else if(mat.pReflectTexture || mat.is_reflect_sky){
-			int is_cube=false;
-			if(material.Tex[1])
-				is_cube=material.Tex[1]->getAttribute(TEXTURE_CUBEMAP)?1:0;
-			if(is_shadow){
-				vs=pShader3dx->vsSkinReflectionSceneShadow;
-				ps=pShader3dx->psSkinReflectionSceneShadow;
-			}
-			else{
-				vs=pShader3dx->vsSkinReflection;
-				ps=pShader3dx->psSkinReflection;
-			}
-
-			Color4f amount;
-			amount.r=mat.reflect_amount*diffuse.r;
-			amount.g=mat.reflect_amount*diffuse.g;
-			amount.b=mat.reflect_amount*diffuse.b;
-			amount.a=0;
-
-			ps->SetReflection(is_cube,amount);
-			vs->SetReflection(is_cube);
-		}
-		else if(mat.pBumpTexture && Option_EnableBump){
-			if(is_shadow){
-				vs=pShader3dx->vsSkinBumpSceneShadow;
-				ps=pShader3dx->psSkinBumpSceneShadow;
-			}
-			else{
-				vs=pShader3dx->vsSkinBump;
-				ps=pShader3dx->psSkinBump;
-			}
-
-			ps->SelectSpecularMap(mat.pSpecularmap,texture_phase);
-		}
-		else{
-			if(is_shadow){
-				vs=pShader3dx->vsSkinSceneShadow;
-				if(diffuse_texture){
-					ps=pShader3dx->psSkinSceneShadow;
-				}
-				else{
-					ps=pShader3dx->psSkin;
-					pShader3dx->psSkin->SelectLT(true,false);
-				}
-			}
-			else{
-				vs=pShader3dx->vsSkin;
-				ps=pShader3dx->psSkin;
-				pShader3dx->psSkin->SelectLT(true,diffuse_texture);
-			}
-		}
-
-		SetUVTrans(vs,mat,mat_anim);
-
-		bool reflectionz=camera->getAttribute(ATTRCAMERA_REFLECTION);
-		vs->SetReflectionZ(reflectionz);
-		ps->SetReflectionZ(reflectionz);
-
-		//Немного не к месту, зато быстро по скорости, для отражений.
-		gb_RenderDevice3D->SetTexture(5,camera->GetZTexture());
-		gb_RenderDevice3D->SetSamplerData(5,sampler_clamp_linear);
-		
-		if(is_shadow)
-			ps->SetShadowIntensity(scene()->GetShadowIntensity());
-
-		ps->SetSelfIllumination(!mat.tex_self_illumination.empty() && !getAttribute(ATTR3DX_NO_SELFILLUMINATION));
-		ps->SetMaterial(&material, mat.is_big_ambient);
-
-		ps->Select();
-
-		static MatXf world[StaticBunch::max_index];
-		int world_num;
-		GetWorldPoses(bunch, world, world_num);
-
-		vs->Select(world, world_num, lod.blend_indices);
-		vs->SetMaterial(&material);
-
-		bool draw_2pass = draw_opacity;
-		if(mat.is_opacity_texture)
-			draw_2pass = false;
-
-		if(!draw2passes){
-			if(is_opacity_vg){
-				if(draw_2pass){
-					gb_RenderDevice3D->SetRenderState(D3DRS_ZWRITEENABLE,TRUE);
-					gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,0);
-					gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC,old_zfunc);
-				}
-
-				DrawMaterialGroupSelectively(bunch,material.Diffuse,draw_opacity,vs,ps);
-
-				if(draw_2pass){
-					gb_RenderDevice3D->SetRenderState(D3DRS_ZWRITEENABLE,FALSE);
-					gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC,old_zfunc);
-					gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,old_color);
-					DrawMaterialGroupSelectively(bunch,material.Diffuse,draw_opacity,vs,ps);
-				}
-			}
-			else{
-				if(draw_2pass){
-					gb_RenderDevice3D->SetRenderState(D3DRS_ZWRITEENABLE,TRUE);
-					gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,0);
-					gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC,old_zfunc);
-				}
-
-				DrawMaterialGroup(bunch);
-
-				if(draw_2pass){
-					gb_RenderDevice3D->SetRenderState(RS_ZWRITEENABLE,FALSE);
-					gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC,old_zfunc);
-					gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,old_color);
-					DrawMaterialGroup(bunch);
-				}
-			}
-		}
-		else
-			DrawMaterialGroup(bunch);
-#else
 		// The SDL analogue of the shader/state block above: one State carries what the
 		// D3D path spreads across SetBlendStateAlphaRef, SetTexturePhase, the vs/ps
 		// Select+SetMaterial calls and VSSkin::Select's bone matrices. Reflection and
@@ -986,15 +825,9 @@ void cObject3dx::Draw(Camera* camera)
 			else
 				DrawMaterialGroup(bunch);
 		}
-#endif
 	}
 
 	if(draw_opacity || draw2passes){
-#ifdef _WIN32
-		gb_RenderDevice3D->SetRenderState(D3DRS_ZWRITEENABLE,old_zwriteble);
-		gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC,old_zfunc);
-		gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,old_color);
-#endif
 	}
 
 	if(pStatic->enableFur && camera->GetCameraPass()==SCENENODE_OBJECTSORT)
@@ -1048,21 +881,15 @@ void cObject3dx::SetSecondUVTrans(bool use,class VSSkinBase* vs,StaticMaterial& 
 void cObject3dx::DrawMaterialGroup(StaticBunch& bunch)
 {
 	cStatic3dx::StaticLod& lod=pStatic->lods[iLOD];
-#ifndef _WIN32
 	SDLObject3dxRenderer* renderer = sdlObjectRenderer();
 	if(!renderer)
 		return;
-#endif
 	for(int ivg=0;ivg<bunch.visibleGroups.size();ivg++){
 		cTempVisibleGroup& vg = bunch.visibleGroups[ivg];
 		if(isVisible(vg)){
 			int num_polygon = vg.num_polygon;
 			num_out_polygons += num_polygon;
-#ifdef _WIN32
-			gb_RenderDevice3D->DrawIndexedPrimitive(lod.vb,bunch.offset_vertex,bunch.num_vertex,lod.ib,vg.begin_polygon + bunch.offset_polygon,num_polygon);
-#else
 			renderer->DrawIndexedPrimitive(lod.vb,bunch.offset_vertex,lod.ib,vg.begin_polygon + bunch.offset_polygon,num_polygon);
-#endif
 		}
 	}
 }
@@ -1070,11 +897,9 @@ void cObject3dx::DrawMaterialGroup(StaticBunch& bunch)
 void cObject3dx::DrawMaterialGroupSelectively(StaticBunch& bunch,const Color4f& color,bool draw_opacity,VSSkin* vs,PSSkin* ps)
 {
 	cStatic3dx::StaticLod& lod=pStatic->lods[iLOD];
-#ifndef _WIN32
 	SDLObject3dxRenderer* renderer = sdlObjectRenderer();
 	if(!renderer)
 		return;
-#endif
 	for(int ivg=0;ivg<bunch.visibleGroups.size();ivg++){
 		cTempVisibleGroup& vg=bunch.visibleGroups[ivg];
 		VisibilityGroup& group=visibilityGroups_[vg.visibilitySet];
@@ -1084,27 +909,16 @@ void cObject3dx::DrawMaterialGroupSelectively(StaticBunch& bunch,const Color4f& 
 					continue;
 				Color4f c(color);
 				c.a*=group.alpha;
-#ifdef _WIN32
-				vs->SetAlphaColor(c);
-				ps->SetAlphaColor(c);
-#else
 				renderer->SetAlphaColor(c);
-#endif
 			}
 			else if(group.alpha<AlphaMaxiumBlend)
 				continue;
 
 			//БЛИН!!! Этот подход не дает истинной гибкости!
 
-#ifdef _WIN32
-			gb_RenderDevice3D->DrawIndexedPrimitive(
-				lod.vb,bunch.offset_vertex,bunch.num_vertex,
-				lod.ib,vg.begin_polygon+bunch.offset_polygon,vg.num_polygon);
-#else
 			renderer->DrawIndexedPrimitive(
 				lod.vb,bunch.offset_vertex,
 				lod.ib,vg.begin_polygon+bunch.offset_polygon,vg.num_polygon);
-#endif
 
 		}
 	}
@@ -1130,15 +944,11 @@ bool cObject3dx::isVisibleMaterialGroup(StaticBunch& bunch) const
 
 void cObject3dx::DrawShadowAndZbuffer(Camera* camera,bool ZBuffer)
 {
-#ifdef _WIN32
-	gb_RenderDevice3D->SetTextureBase(1,0);
-#else
 	// ZBuffer is the float-z pass, which the SDL backend does not have; only the shadow
 	// camera reaches here.
 	SDLObject3dxRenderer* renderer = sdlObjectRenderer();
 	if(!renderer || ZBuffer)
 		return;
-#endif
 
 	//!!! Не забыть сортировку по материалам.
 	cStatic3dx::StaticLod& lod=pStatic->lods[iLOD];
@@ -1171,7 +981,6 @@ void cObject3dx::DrawShadowAndZbuffer(Camera* camera,bool ZBuffer)
 		if(alpha<AlphaMiniumShadow)
 			continue;
 
-#ifndef _WIN32
 		// The caster's whole state: the light's matViewProj (from the camera), the bone
 		// poses, and -- for cutout foliage -- the diffuse map its fragment shader clips
 		// against. Everything else the lit path carries is dead here; the shadow shaders
@@ -1208,54 +1017,6 @@ void cObject3dx::DrawShadowAndZbuffer(Camera* camera,bool ZBuffer)
 			DrawMaterialGroup(bunch);
 		}
 		continue;
-#else
-		gb_RenderDevice3D->SetSamplerData(0,(mat.tiling_diffuse&StaticMaterial::TILING_U_WRAP)?sampler_wrap_anisotropic:sampler_clamp_anisotropic);
-
-		if(gb_RenderDevice3D->dtAdvance->GetID()!=DT_GEFORCEFX)
-			blend=ALPHA_NONE;
-
-		gb_RenderDevice3D->SetBlendStateAlphaRef(blend);
-		if(is_alphatest){
-			float texture_phase=material_textures[bunch.imaterial].texture_phase;
-			gb_RenderDevice3D->SetTexturePhase(0,diffuse_texture,texture_phase);
-		}
-		else
-			gb_RenderDevice3D->SetTextureBase(0,0);
-
-		VSSkinBase* vs=0;
-
-		gb_RenderDevice3D->SetTextureBase(3,0);
-		vs=ZBuffer?pShader3dx->vsSkinZBuffer:pShader3dx->vsSkinShadow;
-		SetUVTrans(vs,mat,mat_anim);
-
-		if(is_alphatest){
-			if (ZBuffer){
-				pShader3dx->psSkinZBufferAlpha->SetSecondOpacity(mat.pSecondOpacityTexture);
-				pShader3dx->psSkinZBufferAlpha->Select();
-			}
-			else{
-				pShader3dx->psSkinShadowAlpha->SetSecondOpacity(mat.pSecondOpacityTexture);
-				pShader3dx->psSkinShadowAlpha->Select();
-			}
-		}
-		else{
-			if (ZBuffer)
-				pShader3dx->psSkinZBuffer->Select();
-			else
-				pShader3dx->psSkinShadow->Select();
-		}
-		
-		SetSecondUVTrans(mat.pSecondOpacityTexture?true:false,vs,mat,mat_anim);
-
-
-		static MatXf world[StaticBunch::max_index];
-		int world_num;
-		GetWorldPoses(bunch,world,world_num);
-
-		vs->Select(world,world_num,lod.blend_indices);
-
-		DrawMaterialGroup(bunch);
-#endif
 	}
 }
 
@@ -3339,15 +3100,9 @@ void cObject3dx::DrawAll(Camera* camera)
 	if(is_opacity)
 	{
 		camera->SetCameraPass(SCENENODE_OBJECTSORT);
-#ifdef _WIN32
-		DWORD old_cullmode=gb_RenderDevice3D->GetRenderState(D3DRS_CULLMODE);
-#endif
 		gb_RenderDevice->SetRenderState( RS_ZWRITEENABLE, FALSE );
 		Draw(camera);
 		gb_RenderDevice->SetRenderState( RS_ZWRITEENABLE, TRUE );
-#ifdef _WIN32
-		gb_RenderDevice3D->SetRenderState( D3DRS_CULLMODE, old_cullmode );
-#endif
 	}
 	camera->SetCameraPass(old_pass);
 }

@@ -290,11 +290,7 @@ class DrawStrip2D
 	// out -- SDL GPU draws only inside a render pass, which is a renderer's business -- and
 	// the UI renderer keeps it instead, answering to the same Lock/Unlock/GetSize/
 	// DrawPrimitive. Null until there is a device, which the callers below tolerate.
-#ifdef _WIN32
-	static cVertexBuffer<sVertexXYZWD>* buffer() { return gb_RenderDevice->GetBufferXYZWD(); }
-#else
 	static SDLUIRenderer* buffer() { return sdlUIRenderer(); }
-#endif
 
 public:
 	DrawStrip2D() : pb_(0)

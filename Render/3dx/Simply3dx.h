@@ -5,9 +5,7 @@
 #include "Render/Inc/IVisGenericInternal.h"
 #include "Render/Inc/IRenderDevice.h"
 #include "Render/Src/Texture.h"
-#ifndef _WIN32
 #include "Render/SDLObject3dxRenderer.h"   // State: what the D3D path keeps in vs/ps
-#endif
 
 class cStatic3dx;
 class cStaticSimply3dx;
@@ -210,15 +208,13 @@ public:
 	cSkinVertex GetSkinVertex(int num_weight){return cSkinVertex(num_weight,bump,is_uv2,enable_fur);}
 
 protected:
-#ifndef _WIN32
-	// The SDL backend has no D3D shader constants to leave state in. cSimply3dx::
+	// There are no D3D shader constants to leave state in any more. cSimply3dx::
 	// SelectMaterial parks the material here and SelectMatrix accumulates the batch's
-	// bone matrices -- exactly what they push into VSSkin/PSSkin on Windows. DrawModels
+	// bone matrices -- exactly what the original pushed into VSSkin/PSSkin. DrawModels
 	// then hands both to SDLObject3dxRenderer.
 	SDLObject3dxRenderer::State sdlState_;
 	Camera* sdlCamera_;
 	vector<MatXf> sdlWorld_;
-#endif
 
 	Color4f	ambient;
 	Color4f	diffuse;

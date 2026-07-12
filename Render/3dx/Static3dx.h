@@ -119,7 +119,6 @@ public:
 	cSkinVertex GetSkinVertex(int num_weight){return cSkinVertex(num_weight,bump,isUV2,enableFur);}
 
 private:
-	bool inPlace_;
 
 	void BuildMeshes();
 	void BuildMeshesLod(const TempMeshes& tempMeshesIn, int ilod,bool debris);
@@ -146,14 +145,12 @@ private:
 	void CreateDebrises();
 };
 
-#ifndef _WIN32
-// Portable InPlaceIArchive::construct customization points (defined in
-// Static3dx.cpp). They rebuild native objects from the raw 32-bit in-place image
-// (.3dxGB / .3dxG). Declared here so they are visible wherever construct<T> is
-// instantiated (e.g. constructInPlace / cLib3dx::LoadCache).
+// InPlaceIArchive::construct customization points (defined in Static3DX.cpp). They rebuild
+// native objects from the raw 32-bit in-place image (.3dxGB / .3dxG). Declared here so they
+// are visible wherever construct<T> is instantiated (e.g. constructInPlace /
+// cLib3dx::LoadCache).
 cStatic3dx::LodsCache* inPlaceReconstruct(cStatic3dx::LodsCache*, const char* image, int size);
 cStatic3dx*            inPlaceReconstruct(cStatic3dx*,            const char* image, int size);
-#endif
 
 struct Shader3dx
 {

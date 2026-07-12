@@ -41,55 +41,37 @@ set(RENDER_SOURCES
     # src/particle.cpp — orphan: not in Render.vcproj (superseded by NParticle.cpp);
     # references the pre-refactor hierarchy (cAnimUnkObj, sParticleKey, cCamera).
     src/perlin.cpp
+
+    # The renderer: SDL GPU, on every platform. The D3D9 backend it replaces
+    # (Render/D3D/D3DRender*.cpp, DrawType, PoolManager, OcclusionQuery, ...) is
+    # retired — Windows runs this one too, so there is one renderer to port a
+    # feature to, not two.
+    SDLRenderDevice.cpp
+    SDLUIRenderer.cpp
+    SDLMinimapRenderer.cpp
+    SDLTileMapRenderer.cpp
+    SDLObject3dxRenderer.cpp
+    SDLWaterRenderer.cpp
+    SDLWorldQuadRenderer.cpp
+    SDLGrassRenderer.cpp
+    SDLCloudShadowRenderer.cpp
+    # Symbols the engine still names that the D3D backend used to define
+    # (gb_RenderDevice, the sampler constants, the sPtr buffer handles).
+    RenderStub.cpp
+    # Vertex-format declaration tables (BEGIN_VERTEX_DECLARATION). Pure data — no
+    # device calls — feeding vertex::declaration layouts to the SDL backend.
+    D3D/VertexDeclaration.cpp
+    # Portable DDS decoder (D3DX is Windows-only); model textures ship as DDS.
+    src/DDSImage.cpp
 )
 
 if(WIN32)
+    # DbgHelp stack walkers: Windows-only debug tooling, nothing to do with the
+    # renderer.
     list(APPEND RENDER_SOURCES
-        # The D3D9 backend: these .cpp drive IDirect3DDevice9 / IDirect3D9 (device
-        # creation, GDI text) directly. Off-Windows the fake d3d9.h only makes the
-        # headers parse, not the device-creation call sites, so the real backend is
-        # Windows-only. The cross-platform renderer is the SDL GPU backend (Track B);
-        # off-Windows the referenced symbols come from RenderStub.cpp below.
-        D3D/AdapterMode.cpp
-        D3D/D3DRender.cpp
-        D3D/D3DRenderDraw.cpp
-        D3D/D3DRenderTexture.cpp
-        D3D/D3DRenderTilemap.cpp
-        D3D/DrawType.cpp
-        D3D/OcclusionQuery.cpp
-        D3D/PoolManager.cpp
-        D3D/RenderDevice.cpp
-        D3D/StdAfxRD.cpp
-        D3D/VertexDeclaration.cpp
-
-        # Win32 application host (WinMain + message loop) and DbgHelp stack
-        # walkers. The cross-platform entry point / windowing is the eventual
-        # SDL3 replacement (Track B).
-        Util/Runtime3D.cpp
         Util/stack.cpp
         Util/stackwalker.cpp
-        src/WinVideo.cpp
     )
-else()
-    # Off-Windows: no-op definitions for the render-backend symbols the engine
-    # references (gb_RenderDevice + the D3D device/buffer classes), so the game
-    # links with a silent renderer until the SDL GPU backend (Track B).
-    list(APPEND RENDER_SOURCES RenderStub.cpp)
-    # The cross-platform SDL GPU render device (replaces the D3D9 cD3DRender), plus
-    # the renderer classes it forwards drawing to (2D/UI so far).
-    list(APPEND RENDER_SOURCES SDLRenderDevice.cpp)
-    list(APPEND RENDER_SOURCES SDLUIRenderer.cpp)
-    list(APPEND RENDER_SOURCES SDLMinimapRenderer.cpp)
-    list(APPEND RENDER_SOURCES SDLTileMapRenderer.cpp)
-    list(APPEND RENDER_SOURCES SDLObject3dxRenderer.cpp)
-    list(APPEND RENDER_SOURCES SDLWaterRenderer.cpp)
-    list(APPEND RENDER_SOURCES SDLWorldQuadRenderer.cpp)
-    # Vertex-format declaration tables (BEGIN_VERTEX_DECLARATION). Pure data — no
-    # device calls — so it's portable: it feeds vertex::declaration layouts to the
-    # SDL backend via the portable cD3DRender::RegisterVertexDeclaration (RenderStub).
-    list(APPEND RENDER_SOURCES D3D/VertexDeclaration.cpp)
-    # Portable DDS decoder (D3DX is Windows-only); model textures ship as DDS.
-    list(APPEND RENDER_SOURCES src/DDSImage.cpp)
 endif()
 
 add_library(Render STATIC ${RENDER_SOURCES})

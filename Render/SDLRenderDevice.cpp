@@ -2,11 +2,11 @@
 #include "StdAfxRD.h"
 #include "SDLRenderDevice.h"
 
-#ifndef _WIN32
-
 #include <SDL3/SDL.h>
 #include <cstdio>
 #include <cstring>
+
+#include "Platform/Window.h"   // the SDL_Window we claim, and the OS handle beside it
 
 #include "Texture.h"     // cTexture (BitMap / GetDDSurface / attributes)
 #include "FileImage.h"   // cFileImage::GetTexture
@@ -20,6 +20,8 @@
 #include "SDLWaterRenderer.h"
 #include "SDLWorldQuadRenderer.h"
 #include "SDLMinimapRenderer.h"
+#include "SDLGrassRenderer.h"
+#include "SDLCloudShadowRenderer.h"
 
 // See the declarations in SDLRenderDevice.h.
 cSDLRenderDevice* sdlRenderDevice()
@@ -55,6 +57,18 @@ SDLMinimapRenderer* sdlMinimapRenderer()
 {
 	cSDLRenderDevice* dev = sdlRenderDevice();
 	return dev ? dev->minimapRenderer() : nullptr;
+}
+
+SDLGrassRenderer* sdlGrassRenderer()
+{
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	return dev ? dev->grassRenderer() : nullptr;
+}
+
+SDLCloudShadowRenderer* sdlCloudShadowRenderer()
+{
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	return dev ? dev->cloudShadowRenderer() : nullptr;
 }
 
 SDL_GPUTexture* createSolidGPUTexture(SDL_GPUDevice* device, unsigned int rgba)
@@ -116,9 +130,8 @@ void applyCameraViewport(SDL_GPURenderPass* pass, const sViewPort& vp, int targe
 }
 
 // ---------------------------------------------------------------------------
-// Base cInterfaceRenderDevice members. On Windows these live in
-// Render/D3D/RenderDevice.cpp (not compiled off-Windows), so the cross-platform
-// subclass must supply them here.
+// Base cInterfaceRenderDevice members. These used to live in the D3D backend
+// (Render/D3D/RenderDevice.cpp), so the surviving subclass supplies them here.
 // ---------------------------------------------------------------------------
 cInterfaceRenderDevice::cInterfaceRenderDevice()
 {
@@ -167,10 +180,11 @@ cSDLRenderDevice::~cSDLRenderDevice()
 	Done();
 }
 
-bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND hWnd, int /*RefreshRateInHz*/, HWND /*fallbackWindow*/)
+bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND /*hWnd*/, int /*RefreshRateInHz*/, HWND /*fallbackWindow*/)
 {
-	// hWnd carries the SDL_Window* created by Platform/Window.cpp (HWND == void*).
-	window_ = static_cast<SDL_Window*>(hWnd);
+	// Not hWnd: that is the OS window handle, which on Windows is a real HWND and not
+	// an SDL_Window at all. The window we claim is SDL's own (Platform/Window.h).
+	window_ = static_cast<SDL_Window*>(PlatformWindow::current());
 	if(!window_){
 		fprintf(stderr, "cSDLRenderDevice::Initialize: no window\n");
 		return false;
@@ -210,6 +224,10 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND hWnd, int
 		waterRenderer_ = std::make_unique<SDLWaterRenderer>(this, device_, window_);
 	if(!worldQuadRenderer_)
 		worldQuadRenderer_ = std::make_unique<SDLWorldQuadRenderer>(device_, window_);
+	if(!grassRenderer_)
+		grassRenderer_ = std::make_unique<SDLGrassRenderer>(this, device_, window_);
+	if(!cloudShadowRenderer_)
+		cloudShadowRenderer_ = std::make_unique<SDLCloudShadowRenderer>(this, device_, window_);
 	if(!minimapRenderer_){
 		minimapRenderer_ = std::make_unique<SDLMinimapRenderer>(device_, window_);
 		// The minimap draws inside the UI's pass, at the point in its run list where the
@@ -218,12 +236,17 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND hWnd, int
 		uiRenderer_->setMinimapRenderer(minimapRenderer_.get());
 	}
 
-	// Build the skinned-vertex declarations (on Windows cD3DRender does this at
-	// device init via CreateVertexDeclaration; cSkinVertex::Register is portable
-	// off-Windows). Needed so cStatic3dx buffers get a real vertex layout/stride.
+	// Build the skinned-vertex declarations (cD3DRender did this at device init via
+	// CreateVertexDeclaration). Needed so cStatic3dx buffers get a real vertex
+	// layout/stride.
 	static bool skinDeclRegistered = false;
 	if(!skinDeclRegistered){ cSkinVertex::Register(); skinDeclRegistered = true; }
 	return true;
+}
+
+HWND cSDLRenderDevice::GetWindowHandle()
+{
+	return PlatformWindow::nativeHandle();
 }
 
 int cSDLRenderDevice::Done()
@@ -249,6 +272,8 @@ int cSDLRenderDevice::Done()
 	objectRenderer_.reset();
 	waterRenderer_.reset();
 	worldQuadRenderer_.reset();
+	grassRenderer_.reset();
+	cloudShadowRenderer_.reset();
 
 	if(device_){
 		// The depth buffers the offscreen colour targets own. Their colour textures are
@@ -341,6 +366,10 @@ int cSDLRenderDevice::BeginScene()
 		waterRenderer_->BeginFrame();
 	if(worldQuadRenderer_)
 		worldQuadRenderer_->BeginFrame();
+	if(grassRenderer_)
+		grassRenderer_->BeginFrame();
+	if(cloudShadowRenderer_)
+		cloudShadowRenderer_->BeginFrame();
 
 	// The screen is this frame's swapchain image; its clear was armed by Fill(). Offscreen
 	// targets keep their textures across frames, but not the clears they have consumed.
@@ -643,6 +672,51 @@ void cSDLRenderDevice::drawWorldQuads()
 	}
 }
 
+void cSDLRenderDevice::drawGrass()
+{
+	if(!bActiveScene_ || !commandBuffer_ || !grassRenderer_ || !grassRenderer_->hasDraws())
+		return;
+	RenderTarget* rt = current_;
+	if(rt->depthOnly || !rt->usable()){
+		// Nowhere to put them, and they must not replay into the next camera's target.
+		grassRenderer_->DiscardDraws();
+		return;
+	}
+
+	// The terrain and the tilemap objects drew first, and Camera::DrawScene reaches the grass
+	// before DrawObject: the blades stand on the ground, and the units stand in front of them.
+	flushObjectPass();
+
+	const bool clear = rt->clearPending && !rt->colorCleared;
+	if(grassRenderer_->Draw(commandBuffer_, rt->color, rt->depth, rt->w, rt->h,
+	                        clear, rt->clearColor, !rt->depthCleared, fillMode_ == FILL_WIREFRAME)){
+		if(clear) rt->colorCleared = true;
+		rt->depthCleared = true;
+	}
+}
+
+// The cloud shadows, into the terrain lightmap: the first thing the planar light camera
+// draws, before drawLights() blends the world's light sources over them. See
+// SDLCloudShadowRenderer.h for why this is a lightmap effect and not a view one.
+void cSDLRenderDevice::drawCloudShadow()
+{
+	if(!bActiveScene_ || !commandBuffer_ || !cloudShadowRenderer_ || !cloudShadowRenderer_->hasDraws())
+		return;
+	RenderTarget* rt = current_;
+	if(rt->depthOnly || !rt->usable()){
+		cloudShadowRenderer_->DiscardDraws();
+		return;
+	}
+
+	const bool clear = rt->clearPending && !rt->colorCleared;
+	if(cloudShadowRenderer_->Draw(commandBuffer_, rt->color, rt->depth, rt->w, rt->h,
+	                              clear, rt->clearColor, !rt->depthCleared,
+	                              fillMode_ == FILL_WIREFRAME)){
+		if(clear) rt->colorCleared = true;
+		rt->depthCleared = true;
+	}
+}
+
 // ---------------------------------------------------------------------------
 // Shadow map
 // ---------------------------------------------------------------------------
@@ -750,13 +824,58 @@ void cSDLRenderDevice::SetRenderState(eRenderStateOption state, int value)
 		fillMode_ = value;
 	else if(state == RS_ZWRITEENABLE)
 		zWriteEnable_ = value != 0;
+	else if(state == RS_FOGENABLE)
+		fogEnable_ = value != 0;
 }
 
 unsigned int cSDLRenderDevice::GetRenderState(eRenderStateOption state)
 {
 	if(state == RS_FILLMODE) return (unsigned int)fillMode_;
 	if(state == RS_ZWRITEENABLE) return zWriteEnable_ ? 1u : 0u;
+	if(state == RS_FOGENABLE) return fogEnable_ ? 1u : 0u;
 	return 0u;
+}
+
+// ---------------------------------------------------------------------------
+// Distance fog. See the long note in the header.
+// ---------------------------------------------------------------------------
+void cSDLRenderDevice::SetGlobalFog(const Color4f& color, const Vect2f& range)
+{
+	fogColor_ = color;
+
+	// A negative plane is Environment::graphQuant saying "no fog" -- it passes (-1,-2) --
+	// and cD3DRender read it the same way.
+	if(range.x < 0.f || range.y < 0.f){
+		SetRenderState(RS_FOGENABLE, FALSE);
+		return;
+	}
+
+	// cD3DRender clamped the same degenerate case: start == end would divide by zero below.
+	fogRange_ = range;
+	const float minSize = 1.f;
+	if(!(fogRange_.x + minSize < fogRange_.y))
+		fogRange_.y = fogRange_.x + minSize;
+
+	SetRenderState(RS_FOGENABLE, TRUE);
+}
+
+Vect4f cSDLRenderDevice::fogPlane(Camera* camera) const
+{
+	// fog == 1 everywhere: the fragment shaders' lerp(FogColor, rgb, saturate(fog)) is then
+	// the identity, so "no fog" costs nothing and needs no variant.
+	if(!fogEnable_ || !camera)
+		return Vect4f(0.f, 0.f, 0.f, 1.f);
+
+	// The D3D linear fog factor, (end - viewZ) / (end - start), written as viewZ*c + b.
+	const float c = -1.f / (fogRange_.y - fogRange_.x);
+	const float b =  fogRange_.y / (fogRange_.y - fogRange_.x);
+
+	// viewZ is a plane equation over the world position: Mat4f is row-major and the engine
+	// multiplies row-vector-first (v' = v*M), so
+	//     viewZ = world.x*_13 + world.y*_23 + world.z*_33 + _43
+	// Folding the factor's own c and b in leaves one dot product for the vertex shader.
+	const Mat4f& view = camera->matView;
+	return Vect4f(view._13 * c, view._23 * c, view._33 * c, view._43 * c + b);
 }
 
 // ---------------------------------------------------------------------------
@@ -1237,4 +1356,3 @@ void cSDLRenderDevice::UnlockIndexBuffer(sPtrIndexBuffer& ib)
 	if(it != ibGpu_.end()) uploadBuffer(it->second);
 }
 
-#endif // !_WIN32

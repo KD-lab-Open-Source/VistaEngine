@@ -42,6 +42,13 @@ cbuffer Constants : register(b0, space1)
     // xy is (resolution/width, resolution/height) of the material's detail texture, so the
     // detail tiles every width/resolution world cells. zw unused.
     float4 MiniTexture;
+    // Distance fog, from cSDLRenderDevice::fogPlane(camera). The D3D9 fog factor
+    // (end - viewZ)/(end - start) is linear in view-space z, so it collapses into a plane
+    // equation over the world position and costs one dot product here. (0,0,0,1) means fog
+    // is off: the factor is then 1, and the fragment shader's lerp is the identity. The
+    // original never needed this in the terrain shader at all -- D3D fogged it in fixed
+    // function, per pixel, after the pixel shader ran. See SDLRenderDevice.h.
+    float4 FogPlane;
 };
 
 struct VSInput
@@ -58,6 +65,7 @@ struct VSOutput
     float4 ShadowPos : TEXCOORD1;
     float2 LightmapUV : TEXCOORD2;
     float2 MiniUV    : TEXCOORD3;
+    float  Fog       : TEXCOORD4;
 };
 
 VSOutput main(VSInput input)
@@ -74,5 +82,9 @@ VSOutput main(VSInput input)
     output.ShadowPos = mul(float4(input.Position, 1.0f), Shadow);
     // The original's `o.uv_lightmap = (pos.xy - fPlanarNode.xy) * fPlanarNode.zw`.
     output.LightmapUV = (input.Position.xy - PlanarNode.xy) * PlanarNode.zw;
+    // Unsaturated on purpose: the factor is linear in view depth, so interpolating it and
+    // clamping per pixel is exactly the per-pixel fog D3D's rasterizer computed. Clamping
+    // here first would bend it across a triangle that straddles the fog's near plane.
+    output.Fog = dot(float4(input.Position, 1.0f), FogPlane);
     return output;
 }

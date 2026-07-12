@@ -43,6 +43,8 @@ class SDLObject3dxRenderer;
 class SDLWaterRenderer;
 class SDLWorldQuadRenderer;
 class SDLMinimapRenderer;
+class SDLGrassRenderer;
+class SDLCloudShadowRenderer;
 class cTileMap;
 
 // Restrict drawing to a camera's viewport, the way cD3DRender::SetDrawTransform hands
@@ -58,9 +60,8 @@ void applyCameraViewport(SDL_GPURenderPass* pass, const sViewPort& vp, int targe
 // neutral to a multiply, mid-grey where it must be neutral to the terrain's `detail - 0.5`.
 SDL_GPUTexture* createSolidGPUTexture(SDL_GPUDevice* device, unsigned int rgba);
 
-// gb_RenderDevice as a cSDLRenderDevice, or null under any other device. Off-Windows
-// gb_RenderDevice3D stays null, so engine code that needs the backend (cScene's shadow
-// map, CameraShadowMap) asks for the SDL device through this instead.
+// gb_RenderDevice as a cSDLRenderDevice, or null under any other device. Engine code that
+// needs the backend itself (cScene's shadow map, CameraShadowMap) asks for it through this.
 class cSDLRenderDevice;
 cSDLRenderDevice* sdlRenderDevice();
 
@@ -88,6 +89,14 @@ SDLWorldQuadRenderer* sdlWorldQuadRenderer();
 // half drives it exactly as it drives psMiniMap / psMiniMapBorder on Windows. It draws
 // inside the UI renderer's pass -- see SDLMinimapRenderer.h.
 SDLMinimapRenderer* sdlMinimapRenderer();
+
+// The SDL backend's grass renderer, or null under any other device. GrassMap::DrawGrass
+// drives it exactly as it drives VSGrass / PSGrass on Windows.
+SDLGrassRenderer* sdlGrassRenderer();
+
+// The SDL backend's cloud-shadow renderer, or null under any other device. cCloudShadow::Draw
+// drives it exactly as it drives VSCloudShadow / PSCloudShadow on Windows.
+SDLCloudShadowRenderer* sdlCloudShadowRenderer();
 
 class cSDLRenderDevice : public cInterfaceRenderDevice
 {
@@ -123,6 +132,21 @@ public:
 	void drawWater();
 	SDLWorldQuadRenderer* worldQuadRenderer() { return worldQuadRenderer_.get(); }
 	void drawWorldQuads();
+
+	// --- Grass ---------------------------------------------------------------
+	// GrassMap::DrawGrass records its tiles into the grass renderer, then calls this. Same
+	// contract as the water: it lands where Camera::DrawScene reached it, over the terrain
+	// and the tilemap objects (hence the object flush inside), under everything DrawObject
+	// records afterwards.
+	SDLGrassRenderer* grassRenderer() { return grassRenderer_.get(); }
+	void drawGrass();
+
+	// --- Cloud shadows -------------------------------------------------------
+	// cCloudShadow::Draw records its one quad and calls this. It runs under the planar light
+	// camera, so the pass lands in the LIGHTMAP -- before SDLWorldQuadRenderer's pass for the
+	// light sources, which blend over it. See SDLCloudShadowRenderer.h.
+	SDLCloudShadowRenderer* cloudShadowRenderer() { return cloudShadowRenderer_.get(); }
+	void drawCloudShadow();
 
 	// --- UI and minimap -----------------------------------------------------
 	// Neither has a draw call of its own. The UI renderer's pass runs at EndScene, over
@@ -178,8 +202,43 @@ public:
 	// its inverse extent, so uv = (pos.xy - xy) * zw. cScene::AddPlanarCamera sets it.
 	void setPlanarTransform(const Vect4f& transform) { planarTransform_ = transform; }
 	const Vect4f& planarTransform() const { return planarTransform_; }
+
+	// cD3DRender::tilemap_inv_size, which cTileMap's constructor filled with
+	// (1/vMap.H_SIZE, 1/vMap.V_SIZE): world XY -> the 0..1 span of a map-sized texture. The
+	// field dome reads it to look itself up in the water's height texture (vReflectionMul in
+	// standart.vsl). It defaults to (1,1,0,0), as cD3DRender's did, so a world with no
+	// tilemap still divides by something sane.
+	void setTilemapInvSize(const Vect4f& v) { tilemapInvSize_ = v; }
+	const Vect4f& tilemapInvSize() const { return tilemapInvSize_; }
 	void SetShadowMatViewProj(const Mat4f& m) { shadowMatViewProj_ = m; }
 	const Mat4f& shadowMatViewProj() const { return shadowMatViewProj_; }
+
+	// --- Distance fog --------------------------------------------------------
+	// Environment::graphQuant sets the colour and the near/far range each frame from the
+	// time of day; a negative range turns fog off, exactly as cD3DRender::SetGlobalFog read
+	// it. Code that must not be fogged (the sky scene, the 2D pass) toggles RS_FOGENABLE
+	// around itself, as it always did.
+	//
+	// D3D9 did this in fixed function -- D3DRS_FOGTABLEMODE = D3DFOG_LINEAR, i.e. per-pixel
+	// fog over eye depth, applied to the shader's output colour before blending. That is why
+	// the terrain and object shaders have no fog term of their own to port: the rasterizer
+	// fogged them. (The `oFog` some .vsl files do write was the vertex-fog fallback, for the
+	// cards that had no table fog. Same linear formula, same constants.)
+	//
+	// There is no fixed-function fog here, so every world fragment shader ends with
+	//     rgb = lerp(FogColor, rgb, saturate(fog))
+	// and its vertex shader gets the fog factor from ONE float4:
+	//
+	//     fog = dot(float4(worldPos, 1), fogPlane(camera))
+	//
+	// The factor is linear in view-space z -- (end - z)/(end - start), the D3D formula
+	// verbatim -- so it collapses into a plane equation, and interpolating it across a
+	// triangle is the same thing as evaluating it per pixel. When fog is off the plane is
+	// (0,0,0,1): fog == 1, and the lerp above is exactly the identity. No shader branch,
+	// no pipeline variant.
+	void SetGlobalFog(const Color4f& color, const Vect2f& range) override;
+	const Color4f& fogColor() const { return fogColor_; }
+	Vect4f fogPlane(Camera* camera) const;
 	// Light clip space -> shadow map texture coordinates.
 	Mat4f shadowMatBias() const;
 	// The terrain caster, from cTileMap::Draw under the light camera -- where the D3D
@@ -222,7 +281,9 @@ public:
 	Vect2i GetOriginalScreenSize() override { return Vect2i(xScr, yScr); }
 	bool IsFullScreen() override { return false; }
 	int GetAvailableTextureMem() override { return 0; }
-	HWND GetWindowHandle() override { return (HWND)window_; }
+	// The OS window handle, not the SDL_Window: callers hand this to DirectSound,
+	// DirectInput and the kdw dialogs, which all want a real HWND on Windows.
+	HWND GetWindowHandle() override;
 
 	// --- Textures: real SDL GPU textures + CPU staging ----------------------
 	int   CreateTexture(cTexture* Texture, cFileImage* FileImage, int dxout, int dyout, bool enable_assert) override;
@@ -268,13 +329,11 @@ public:
 	void setWorldMatrix(const MatXf&) override {}
 
 	// --- Misc state (no-op) ----------------------------------------------
-	int  SetGamma(float, float, float) override { return 0; }
 	// Only RS_FILLMODE (GameShell drives it from debugWireFrame) and RS_ZWRITEENABLE
 	// (Camera::DrawSortObject turns it off for the transparent pass) are honoured; the
 	// rest of the D3D render states have no SDL GPU equivalent outside a pipeline object.
 	void SetRenderState(eRenderStateOption, int) override;
 	unsigned int GetRenderState(eRenderStateOption) override;
-	void SetGlobalFog(const Color4f&, const Vect2f&) override {}
 	// Sticky sampler state, as it is on D3D, where this sets one global the scene and the UI
 	// both draw with. Each renderer bakes its own sampler for its own geometry; only the UI
 	// takes this one, because only its callers change it (the selection frame asks for wrap
@@ -283,6 +342,8 @@ public:
 	// D3D: "the advanced DrawType exists", i.e. the device can render a shadow map.
 	// cVisGeneric::SetShadowType turns shadows off without it. We always can.
 	bool IsEnableSelfShadow() override { return true; }
+	// TODO(sdl-port): screenshots and gamma. See Render/PORTING.md #21.
+	int  SetGamma(float, float, float) override { return 0; }
 	bool SetScreenShot(const char*) override { return false; }
 
 	// --- 2D primitives (forwarded to the UI renderer) --------------------
@@ -294,6 +355,7 @@ public:
 	void FlushPrimitive2D() override {}
 
 	// --- 3D primitives (no-op) -------------------------------------------
+	// TODO(sdl-port): the 3D debug primitives draw nothing. See Render/PORTING.md #17.
 	void DrawLine(const Vect3f&, const Vect3f&, Color4c) override {}
 	void DrawPoint(const Vect3f&, Color4c) override {}
 	void FlushPrimitive3D() override {}
@@ -313,9 +375,9 @@ public:
 	// --- Sprites (forwarded to the UI renderer) ---------------------------
 	void DrawQuad(float, float, float, float, float, float, float, float, Color4c) override;
 	void DrawSprite(int, int, int, int, float, float, float, float, cTexture*, const Color4c&, float, eBlendMode, float) override;
-	// Unimplemented, and unreached: nothing outside the D3D backend calls the solid,
-	// two-texture or cTextureScale sprite variants. DrawSprite2 is used only by the
-	// chaos post-process (Render/src/CChaos.cpp), which has no SDL path yet.
+	// TODO(sdl-port): unimplemented, and currently unreached -- the solid, two-texture and
+	// cTextureScale sprite variants are used only by the chaos post-process
+	// (Render/src/CChaos.cpp), which has no SDL path. See Render/PORTING.md #18.
 	void DrawSpriteSolid(int, int, int, int, float, float, float, float, cTexture*, const Color4c&, float, eBlendMode) override {}
 	void DrawSprite2(int, int, int, int, float, float, float, float, cTexture*, cTexture*, const Color4c&, float) override {}
 	void DrawSprite2(int, int, int, int, float, float, float, float, float, float, float, float, cTexture*, cTexture*, const Color4c&, float, eColorMode, eBlendMode) override {}
@@ -345,6 +407,9 @@ public:
 	void UnlockIndexBuffer(sPtrIndexBuffer&) override;
 
 	// --- Internal shared dynamic buffers (no-op: none yet) ---------------
+	// TODO(sdl-port): the dynamic vertex/quad buffer family. Every one of these returns null,
+	// so any caller that was not rerouted through SDLWorldQuadRenderer draws nothing. This is
+	// what grass, the field dome and the lens flare need first. See Render/PORTING.md #15.
 	cVertexBuffer<sVertexXYZDT1>*  GetBufferXYZDT1() override { return nullptr; }
 	cVertexBuffer<sVertexXYZD>*    GetBufferXYZD() override { return nullptr; }
 	cVertexBuffer<sVertexXYZWD>*   GetBufferXYZWD() override { return nullptr; }
@@ -447,6 +512,7 @@ private:
 	cTexture* shadowMap_ = nullptr;
 	cTexture* lightMap_ = nullptr;
 	Vect4f planarTransform_ = Vect4f(0.f, 0.f, 1.f, 1.f);
+	Vect4f tilemapInvSize_ = Vect4f(1.f, 1.f, 0.f, 0.f);
 	int shadowMapSize_ = 0;
 	Mat4f shadowMatViewProj_;
 	bool shadowPassRan_ = false;
@@ -457,12 +523,22 @@ private:
 	int   fillMode_ = FILL_SOLID;   // RS_FILLMODE; FILL_WIREFRAME switches renderers to line pipelines
 	bool  zWriteEnable_ = true;     // RS_ZWRITEENABLE; picks the object pipeline's depth write
 
+	// RS_FOGENABLE. SetGlobalFog sets it, and the sky scene and the 2D pass clear it around
+	// themselves -- the same one state cD3DRender kept, saved and restored.
+	bool    fogEnable_ = false;
+	Color4f fogColor_ = Color4f(0.f, 0.f, 0.f, 0.f);
+	// D3DRS_FOGSTART / D3DRS_FOGEND: where the fog begins and where it is total, measured in
+	// world units along the camera's view axis. fogPlane() turns them into the factor.
+	Vect2f  fogRange_ = Vect2f(0.f, 1.f);
+
 	std::unique_ptr<SDLUIRenderer>        uiRenderer_;
 	std::unique_ptr<SDLTileMapRenderer>   tileMapRenderer_;
 	std::unique_ptr<SDLObject3dxRenderer> objectRenderer_;
 	std::unique_ptr<SDLWaterRenderer>     waterRenderer_;
 	std::unique_ptr<SDLWorldQuadRenderer> worldQuadRenderer_;
 	std::unique_ptr<SDLMinimapRenderer>   minimapRenderer_;
+	std::unique_ptr<SDLGrassRenderer>     grassRenderer_;
+	std::unique_ptr<SDLCloudShadowRenderer> cloudShadowRenderer_;
 };
 
 #endif // VISTA_SDL_RENDER_DEVICE_H

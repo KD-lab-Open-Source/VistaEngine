@@ -181,10 +181,6 @@ protected:
 	};
 	float dtime_;
 	bool enable_;
-	VSGrass* vsGrass;
-	PSGrassShadow* psGrassShadow;
-	PSGrass* psGrass;
-	PSSkinZBufferAlpha* psSkinZBuffer;
 	bool oldLighting;
 	vector<UpdateTile> updatedTiles_;
 	float density_;

@@ -29,7 +29,7 @@
 // Still to come: WATER_REFLECTION samples the sky cubemap, which has no SDL path yet, and
 // WATER_LAVA has its own shader pair. Also missing, each an input the SDL backend does not
 // have: the fog-of-war lightmap, fog, the FLOAT_ZBUFFER soft shoreline, and the
-// environment-water border tiles (cWater::InitBorder is guarded off-Windows).
+// environment-water border tiles.
 
 #include "IRenderDevice.h"    // cTexture, sPtrVertexBuffer, sPtrIndexBuffer
 #include <vector>
@@ -121,6 +121,7 @@ private:
 		float uvScaleOffset[4];
 		float uvScaleOffset1[4];
 		float mirrorVP[16];
+		float fogPlane[4];   // cSDLRenderDevice::fogPlane(camera)
 	};
 	// water.frag.hlsl's whole cbuffer, likewise. params.x is fBrightnes.
 	struct FSUniform
@@ -131,6 +132,7 @@ private:
 		float lightDirection[4];
 		float cameraPos[4];
 		float params[4];
+		float fogColor[4];   // D3DRS_FOGCOLOR
 	};
 
 	// One tile range of the surface grid. Every draw in a frame shares the one state

@@ -70,6 +70,8 @@ cbuffer Water : register(b0, space3)
     float4 LightDirection;   // vLightDirection: scene lighting direction, xyz
     float4 CameraPos;        // vCameraPos: the main camera's world position, xyz
     float4 Params;           // x = fBrightnes (PSWater::SetReflectionBrightnes)
+    // Distance fog: D3DRS_FOGCOLOR. The factor arrives interpolated, in VSOutput::Fog.
+    float4 FogColor;
 };
 
 struct VSOutput
@@ -82,6 +84,7 @@ struct VSOutput
     float4 UVSky    : TEXCOORD2;
     float3 PointPos : TEXCOORD3;
 #endif
+    float  Fog      : TEXCOORD4;
 };
 
 // One wave map's signed slope, undoing the decoder's +128 bias. The original reads the
@@ -118,12 +121,15 @@ float4 main(VSOutput input) : SV_Target0
     float light = smoothstep(0.99f, 1.0f, -dot(lightMirror, eye)) * LightColor.a;
     ot.rgb += light * LightColor.rgb;
     ot.a = input.Diffuse.a * (1.0f + light);
-    return ot;
 #else
     float4 ot;
     ot.rgb = PS11Color.rgb;
     ot.a   = input.Diffuse.a;
     ot.a += ot.a * saturate(tex0.x + tex1.x);
-    return ot;
 #endif
+
+    // Fog last, before the blend, as D3D9's fixed function applied it. Colour only: the
+    // alpha is the water's own depth-driven opacity, which fog must not touch.
+    ot.rgb = lerp(FogColor.rgb, ot.rgb, saturate(input.Fog));
+    return ot;
 }

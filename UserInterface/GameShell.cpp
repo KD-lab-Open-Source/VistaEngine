@@ -917,7 +917,6 @@ void GameShell::graphicsQuant()
 		}
 
 		processEvents();
-#ifndef _WIN32
 		// frame_time.delta() reflects the last (sub-millisecond) render iteration,
 		// not the time since the previous 15fps menu frame, so at our uncapped
 		// frame rate UI animations (e.g. screen activation) crawl and never finish
@@ -927,9 +926,6 @@ void GameShell::graphicsQuant()
 		float menuDt = lastMenuClock_ ? clamp(int(nowClock - lastMenuClock_), 0, 200) : 1000 / 15;
 		lastMenuClock_ = nowClock;
 		UI_Dispatcher::instance().quant(menuDt / 1000.0f, load_mode);
-#else
-		UI_Dispatcher::instance().quant(frame_time.delta()/1000.0f, load_mode);
-#endif
 		UI_Dispatcher::instance().logicQuant();
 		
 		if(!load_mode)
@@ -1268,12 +1264,10 @@ void GameShell::eventHandler(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_KEYUP:
 	case WM_SYSKEYUP: 
 	case WM_CHAR:
-#ifndef _WIN32
-	// Off-Windows, SDL text input arrives as WM_UNICHAR (Platform/Window.cpp);
-	// let it reach EventParser->unicodeCharInput. Left untouched on Windows.
+	// SDL text input arrives as WM_UNICHAR (Platform/Window.cpp); let it reach
+	// EventParser->unicodeCharInput.
 	case WM_UNICHAR:
 	case WM_USER + WM_CHAR:
-#endif
 	case WM_MOUSEWHEEL:
     case WM_ACTIVATEAPP:
 		break;

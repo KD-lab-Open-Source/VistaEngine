@@ -2,9 +2,7 @@
 #include "Texture.h"
 #include "D3DRender.h"
 #include "FileImage.h"
-#ifndef _WIN32
 #include "DDSImage.h"   // portable DDS decode for the cross-platform backend
-#endif
 #include "Serialization/ResourceSelector.h"
 #include "FileUtils/FileUtils.h"
 #include <ddraw.h>
@@ -30,11 +28,6 @@ cTexture::~cTexture()
 	if(gb_RenderDevice)
 	{
 		gb_RenderDevice->DeleteTexture(this);
-#ifdef _WIN32
-		// D3D default-pool bookkeeping (lost-device handling) lives on cD3DRender.
-		// The SDL backend has no default pool, so skip it off-Windows.
-		((cD3DRender*)gb_RenderDevice)->TexLibrary.DeleteFromDefaultPool(this);
-#endif
 	}else
 		xassert(0 && "Текстура удалена слишком поздно");
 }
@@ -118,10 +111,9 @@ bool cTexture::reloadDDS()
 	if(!RenderFileRead(name(),buf,size))
 		return false;
 
-#ifndef _WIN32
-	// No D3DX off-Windows: decode the DDS bytes (DXT1/3/5, uncompressed RGB, and V8U8
-	// bump maps like the water waves) to BGRA via the portable decoder and upload
-	// through the cross-platform device. RenderFileRead already resolved the VFS path.
+	// D3DX loaded these; it went with D3D9. Decode the DDS bytes (DXT1/3/5, uncompressed
+	// RGB, and V8U8 bump maps like the water waves) to BGRA with our own decoder and
+	// upload through the device. RenderFileRead already resolved the VFS path.
 	cDDSImage img;
 	int r = img.load(buf, size);
 	delete[] buf;
@@ -132,42 +124,6 @@ bool cTexture::reloadDDS()
 	if(frameNumber() < 1)
 		New(1);
 	return gb_RenderDevice->CreateTexture(this, &img, -1, -1) == 0;
-#else
-	if(!gb_RenderDevice3D) // no world-render GPU device on SDL backend yet; DDS load is D3D-only
-		return false;
-
-	DDSURFACEDESC2* ddsd = (DDSURFACEDESC2*)(1+(DWORD*)buf);
-	if(ddsd->ddsCaps.dwCaps2 & DDSCAPS2_CUBEMAP){
-		IDirect3DCubeTexture9* cubeTexture = 0;
-		if(!FAILED(D3DXCreateCubeTextureFromFileInMemory(gb_RenderDevice3D->D3DDevice_, buf, size, &cubeTexture))){
-			BitMap.push_back((IDirect3DTexture9*)cubeTexture);
-			setAttribute(TEXTURE_CUBEMAP);
-
-			D3DSURFACE_DESC desc;
-			RDCALL(cubeTexture->GetLevelDesc(0,&desc));
-			SetWidth(desc.Width);
-			SetHeight(desc.Height);
-			return true;
-		}
-	}
-	else{
-		IDirect3DTexture9* texture9 = gb_RenderDevice3D->CreateTextureFromMemory(buf, size, !IsTexture2D());
-		if(texture9){
-			int mipmaps = texture9->GetLevelCount();
-			setMipmapNumber(mipmaps);
-			D3DSURFACE_DESC desc;
-			RDCALL(texture9->GetLevelDesc(0,&desc));
-			SetWidth(desc.Width);
-			SetHeight(desc.Height);
-
-			BitMap.push_back(texture9);
-			return true;
-		}
-	}
-
-	delete[] buf;
-	return false;
-#endif
 }
 
 BYTE* cTexture::LockTexture(int& Pitch)
@@ -306,9 +262,8 @@ void cTexture::saveDDS(const char* file_name, int level)
 
 bool cTexture::loadDDS(const char* file_name)
 {
-#ifndef _WIN32
-	// Off-Windows there is no D3DX: decode the cached DDS (DXT1/3/5) to BGRA and
-	// create the texture through the cross-platform device's CreateTexture.
+	// D3DX loaded these; it went with D3D9. Decode the cached DDS (DXT1/3/5) to BGRA and
+	// create the texture through the device's CreateTexture.
 	cDDSImage img;
 	if(img.load(file_name) != 0)
 		return false;
@@ -317,27 +272,27 @@ bool cTexture::loadDDS(const char* file_name)
 	if(frameNumber() < 1)
 		New(1);
 	return gb_RenderDevice->CreateTexture(this, &img, -1, -1) == 0;
-#else
-	xassert(!BitMap.empty());
-	char* buf=0;
-	int size;
-
-	if(!RenderFileRead(file_name,buf,size))
-		return false;
-
-	IDirect3DTexture9* pTex=gb_RenderDevice3D->CreateTextureFromMemory(buf,size,true);
-	delete buf;
-	if (pTex==0)
-		return false;
-
-	BitMap[0] = pTex;
-	return true;
-#endif
 }
 
+// The width, in bits, of one pixel of the memory LockTexture hands back -- the staging
+// image, not whatever the GPU happens to store. Every caller (GrassMap::BuildGrass,
+// cWater's minimap, cFogOfWar) locks a texture and walks it with this as the stride.
+//
+// The original asked the D3D device: GetTextureFormatSize(gb_RenderDevice3D->TexFmtData[format()]),
+// a table cD3DRender::Init filled with whatever formats the adapter turned out to support.
+// There is no D3D device any more, so that read was a null dereference. The SDL backend
+// stages a texture in one of exactly three widths, and this must agree with the rule
+// cSDLRenderDevice::CreateTexture allocates by -- if it says more than was allocated, the
+// caller's writes run off the end of the staging buffer.
 int cTexture::bitsPerPixel() const
 {
-	return GetTextureFormatSize(gb_RenderDevice3D->TexFmtData[format()]);
+	// A8L8 is the odd one: TEXTURE_GRAY is set on it too (cWater's Z/reflection texture),
+	// but it stages two bytes per pixel, not one. It has to be tested first.
+	if(format() == SURFMT_A8L8)
+		return 16;
+	if(getAttribute(TEXTURE_GRAY))
+		return 8;
+	return 32;
 }
 
 cFileImage* cTextureAviScale::createFileImage()

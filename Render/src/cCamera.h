@@ -259,7 +259,6 @@ protected:
 	void DrawAlphaPlane();
 
 	void ClearZBuffer();
-	void ClearFloatZBuffer();
 	void ShowClip();
 
 	void CalcClipPlane();
@@ -277,14 +276,12 @@ protected:
 	void CalcTestForGrid();
 	eTestVisible GridTest(Vect3f p[8]);
 
-	void DrawShadowDebug();
 	void Set2DRenderState();
 	void DrawObjectNoZ(SceneNode nType);
 	void DrawObject(SceneNode nType);
 	void DrawObjectSpecial(SceneNode nType);
 	void DrawSilhouetteObject();
 	void DrawTilemapObject();
-	void DrawToZBuffer();
 
 	Color4c phone_color;
 
