@@ -34,6 +34,10 @@ cbuffer Constants : register(b0, space1)
     // space -> the light's clip space -> shadow map texture coords. Identity when there
     // is no shadow map; the fragment shader gates on ShadowParams.x, not on this.
     row_major float4x4 Shadow;
+    // The original's fPlanarNode (vsl c95), from cD3DRender::setPlanarTransform: xy is the
+    // lightmap box's world origin, zw its inverse extent. cScene::AddPlanarCamera sets it
+    // to the same box the lightmap camera renders, so this maps world xy onto its texels.
+    float4 PlanarNode;
 };
 
 struct VSInput
@@ -48,6 +52,7 @@ struct VSOutput
     float3 Normal    : NORMAL;
     float2 UV        : TEXCOORD0;
     float4 ShadowPos : TEXCOORD1;
+    float2 LightmapUV : TEXCOORD2;
 };
 
 VSOutput main(VSInput input)
@@ -60,5 +65,7 @@ VSOutput main(VSInput input)
     // computed per pixel instead: the fragment shader already has the normal and the
     // light direction, so interpolating it would only cost a varying.
     output.ShadowPos = mul(float4(input.Position, 1.0f), Shadow);
+    // The original's `o.uv_lightmap = (pos.xy - fPlanarNode.xy) * fPlanarNode.zw`.
+    output.LightmapUV = (input.Position.xy - PlanarNode.xy) * PlanarNode.zw;
     return output;
 }

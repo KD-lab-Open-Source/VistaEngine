@@ -10,6 +10,7 @@
 #include "VisGeneric.h"
 #ifndef _WIN32
 #include "Render/SDLRenderDevice.h"   // the shadow map and its depth pass live here
+#include "Render/SDLWorldQuadRenderer.h"   // the lightmap's light quads and circle shadows
 #endif
 
 class CameraShader
@@ -1338,6 +1339,7 @@ void CameraPlanarLight::DrawScene()
 {
 	//gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED|D3DCOLORWRITEENABLE_ALPHA);
 	gb_RenderDevice->setCamera(this);
+#ifdef _WIN32
 	gb_RenderDevice3D->SetGlobalLight(0);
 
 	gb_RenderDevice->SetRenderState(RS_ZWRITEENABLE, FALSE);
@@ -1346,12 +1348,22 @@ void CameraPlanarLight::DrawScene()
 
 	DWORD fogenable=gb_RenderDevice3D->GetRenderState(D3DRS_FOGENABLE);
 	gb_RenderDevice->SetRenderState(RS_FOGENABLE,FALSE);
+#endif
 
 	DrawObjectFirstSorted();
 	drawLights();
 
+#ifdef _WIN32
 	gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC, ZFUNC );
 	gb_RenderDevice->SetRenderState(RS_FOGENABLE,fogenable);
+#else
+	// D3D drew as each quad group's EndDraw went; open the pass now, into the lightmap that
+	// setCamera bound. The depth state the block above sets is baked into the quad pipeline
+	// (it never writes depth), and the quads all sit on the terrain, so nothing self-occludes
+	// even without ZFUNC ALWAYS.
+	if(cSDLRenderDevice* dev = sdlRenderDevice())
+		dev->drawWorldQuads();
+#endif
 }
 
 struct LightByTexture
@@ -1362,22 +1374,40 @@ struct LightByTexture
 };
 
 void CameraPlanarLight::drawLights()
-{ 
+{
+#ifdef _WIN32
 	DWORD old_colorwrite=gb_RenderDevice3D->GetRenderState(D3DRS_COLORWRITEENABLE);
 	gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED);
-	int i;
 	cQuadBuffer<sVertexXYZDT1>* quad = gb_RenderDevice3D->GetQuadBufferXYZDT1();
 	gb_RenderDevice3D->SetVertexShader(0);
 	gb_RenderDevice3D->SetPixelShader(0);
+#else
+	// The quad buffer, and the material calls below, are the only D3D in this function; the
+	// quad maths is shared. The colour-write mask is not carried: the lightmap's alpha is
+	// the fog of war, which nothing writes off-Windows yet, so leaving it alone costs
+	// nothing. See SDLWorldQuadRenderer.
+	SDLWorldQuadRenderer* quad = sdlWorldQuadRenderer();
+	if(!quad)
+		return;
+	quad->SetCamera(this);
+#endif
+	int i;
 	int size = scene()->circle_shadow.size();
 	if(size){
 		if(!sphereShadowTexture_)
 			sphereShadowTexture_ = GetTexLibrary()->GetSpericalTexture();
 
 		if(!objects){
+#ifdef _WIN32
 			gb_RenderDevice3D->SetNoMaterial(ALPHA_BLEND,MatXf::ID);
 			gb_RenderDevice3D->SetTexture(0,sphereShadowTexture_);
 			gb_RenderDevice3D->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_SELECTARG2);
+#else
+			// D3DTOP_SELECTARG2: the colour is the vertex's, and the spherical texture
+			// contributes only its alpha -- the falloff. That is the `selectDiffuse` flag.
+			quad->SetMaterial(ALPHA_BLEND, sphereShadowTexture_, true, MatXf::ID,
+			                  0, COLOR_MOD, true);
+#endif
 
 			quad->BeginDraw();
 			for(int i=0;i<size;i++){
@@ -1437,7 +1467,11 @@ void CameraPlanarLight::drawLights()
 			LightByTexture& pl=light[i];
 			if(!pl.subBlendingLight.empty())
 			{
+#ifdef _WIN32
 				gb_RenderDevice3D->SetNoMaterial(ALPHA_SUBBLEND,MatXf::ID,0,pl.texture);
+#else
+				quad->SetMaterial(ALPHA_SUBBLEND, pl.texture);
+#endif
 				quad->BeginDraw();
 				for(int j=0;j<pl.subBlendingLight.size();j++)
 				{
@@ -1467,7 +1501,11 @@ void CameraPlanarLight::drawLights()
 
 			if(!pl.addBlendingLight.empty())
 			{
+#ifdef _WIN32
 				gb_RenderDevice3D->SetNoMaterial(ALPHA_ADDBLEND,MatXf::ID,0,pl.texture);
+#else
+				quad->SetMaterial(ALPHA_ADDBLEND, pl.texture);
+#endif
 				quad->BeginDraw();
 				for(int j=0;j<pl.addBlendingLight.size();j++)
 				{
@@ -1494,7 +1532,9 @@ void CameraPlanarLight::drawLights()
 		}
 	}
 
+#ifdef _WIN32
 	gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,old_colorwrite);
+#endif
 }
 
 

@@ -1147,6 +1147,15 @@ void cScene::CalcShadowMapCamera(Camera* camera, Camera *shadowCamera)
 
 void cScene::AddPlanarCamera(Camera* camera, bool light, bool toObjects)
 {
+#ifndef _WIN32
+	// Only the terrain lightmap is ported. The objects' lightmap wants a sampler the object
+	// shader does not have, and the planar-shadow fallback (light == false) is a path SDL
+	// never takes -- it can always sample a depth texture. Bail before the child camera is
+	// attached: attached but targetless, it would resolve to the screen and draw over it.
+	if(!light || toObjects || !sdlRenderDevice() || !sdlRenderDevice()->GetLightMap())
+		return;
+#endif
+
 	sBox6f box;
 	ClippingMesh(tileMap_->zMax()).calcVisBox(camera,tileMap_->tileNumber(),tileMap_->tileSize(),Mat4f::ID,box);
 
@@ -1157,8 +1166,14 @@ void cScene::AddPlanarCamera(Camera* camera, bool light, bool toObjects)
 	box.max.y = int(round(box.max.y)) | mask;
 
 	Vect4f planarTransform(box.min.x, box.min.y, 1/(box.max.x-box.min.x), 1/(box.max.y-box.min.y));
-	if(light && !toObjects)
+	if(light && !toObjects){
+#ifdef _WIN32
 		gb_RenderDevice3D->setPlanarTransform(planarTransform);
+#else
+		if(cSDLRenderDevice* dev = sdlRenderDevice())
+			dev->setPlanarTransform(planarTransform);
+#endif
+	}
 
 	Camera* planarCamera = light ? (toObjects ? lightObjectsCamera_ : lightCamera_) : shadowCamera_;
 	Vect3f PosLight;
@@ -1180,7 +1195,11 @@ void cScene::AddPlanarCamera(Camera* camera, bool light, bool toObjects)
 	Vect2f Focus(planarTransform.z, planarTransform.w);
 	planarCamera->setAttribute(ATTRCAMERA_SHADOW|ATTRUNKOBJ_NOLIGHT);
 	planarCamera->clearAttribute(ATTRCAMERA_PERSPECTIVE | ATTRCAMERA_SHOWCLIP | ATTRCAMERA_WRITE_ALPHA);
-	planarCamera->SetRenderTarget(light ? (toObjects? gb_RenderDevice3D->GetLightMapObjects() : gb_RenderDevice3D->GetLightMap()) : gb_RenderDevice3D->GetShadowMap(), 0); 
+#ifdef _WIN32
+	planarCamera->SetRenderTarget(light ? (toObjects? gb_RenderDevice3D->GetLightMapObjects() : gb_RenderDevice3D->GetLightMap()) : gb_RenderDevice3D->GetShadowMap(), 0);
+#else
+	planarCamera->SetRenderTarget(sdlRenderDevice()->GetLightMap(), 0);   // guarded above
+#endif
 	planarCamera->SetFrustum(&Vect2f(0.5f,0.5f), &sRectangle4f(-0.5f,-0.5f,0.5f,0.5f),
 						   &Focus, &Vect2f(10,1e6f));
 	
@@ -1225,11 +1244,22 @@ void cScene::AddShadowCamera(Camera* camera)
 			AddPlanarCamera(camera, false, false);
 	}
 #else
-	// Shadow maps only: the planar-shadow fallback (AddPlanarCamera) is a separate render
-	// target and shader path the SDL backend does not have, and unlike D3D9 it can always
-	// sample a depth texture, so there is nothing to fall back to.
 	cSDLRenderDevice* dev = sdlRenderDevice();
-	if(!dev || !Option_shadowEnabled || !IsIntensityShadow())
+	if(!dev)
+		return;
+
+	// The terrain lightmap: the scene's light sources and circle shadows, drawn top-down
+	// into a 256x256 target that the terrain shader adds to its light term. Independent of
+	// the shadow map -- the original draws both whenever shadows are on -- so it is set up
+	// even when shadows are off.
+	if(!dev->GetLightMap())
+		dev->createLightMap(256);
+	AddPlanarCamera(camera, true, false);
+
+	// Shadows: the shadow map only. The planar-shadow fallback (AddPlanarCamera with
+	// light == false) is a separate target and shader path SDL does not have, and unlike
+	// D3D9 it can always sample a depth texture, so there is nothing to fall back to.
+	if(!Option_shadowEnabled || !IsIntensityShadow())
 		return;
 
 	if(!dev->GetShadowMap() || dev->GetShadowMapSize() != shadowMapSize()

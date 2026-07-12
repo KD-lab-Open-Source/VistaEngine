@@ -135,6 +135,24 @@ public:
 	void deleteShadowMap();
 	cTexture* GetShadowMap() { return shadowMap_; }
 	int  GetShadowMapSize() const { return shadowMapSize_; }
+
+	// --- Terrain lightmap ---------------------------------------------------
+	// The 256x256 colour target CameraPlanarLight draws the scene's light sources and
+	// circle shadows into, top-down, once a frame; the terrain shader multiplies its light
+	// term by it (tile_map_scene.psl: `light += 2*(lightmap.rgb-0.5)`), so the clear colour
+	// 128,128,128 is the neutral "no light source here". Named GetLightMap() to match
+	// cD3DRender, which cScene::AddPlanarCamera reads through.
+	//
+	// Not special-cased as a target either: AddPlanarCamera hands it to the light camera
+	// through Camera::SetRenderTarget, and setCamera resolves it like any other colour one.
+	bool createLightMap(int size);
+	void deleteLightMap();
+	cTexture* GetLightMap() { return lightMap_; }
+	// The original's planarTransform_ (cD3DRender::setPlanarTransform), which the terrain
+	// vertex shader reads as fPlanarNode: xy is the lightmap box's world-space origin, zw
+	// its inverse extent, so uv = (pos.xy - xy) * zw. cScene::AddPlanarCamera sets it.
+	void setPlanarTransform(const Vect4f& transform) { planarTransform_ = transform; }
+	const Vect4f& planarTransform() const { return planarTransform_; }
 	void SetShadowMatViewProj(const Mat4f& m) { shadowMatViewProj_ = m; }
 	const Mat4f& shadowMatViewProj() const { return shadowMatViewProj_; }
 	// Light clip space -> shadow map texture coordinates.
@@ -398,6 +416,8 @@ private:
 	// scene can ask its size. Its SDL depth texture lives in textures_ like any other,
 	// and resolveTarget turns it into a depth-only RenderTarget.
 	cTexture* shadowMap_ = nullptr;
+	cTexture* lightMap_ = nullptr;
+	Vect4f planarTransform_ = Vect4f(0.f, 0.f, 1.f, 1.f);
 	int shadowMapSize_ = 0;
 	Mat4f shadowMatViewProj_;
 	bool shadowPassRan_ = false;

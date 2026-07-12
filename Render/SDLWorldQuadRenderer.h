@@ -90,9 +90,14 @@ public:
 	// `texture1` and `colorMode` are the second texture and its colour operation, which
 	// only the triangle route uses (the quad shader has no second sampler). A null texture1
 	// leaves the operation off, exactly as cD3DRender::SetWorldMaterial does.
+	//
+	// `selectDiffuse` is the fixed-function D3DTSS_COLOROP = D3DTOP_SELECTARG2 that
+	// CameraPlanarLight::drawLights sets for the lightmap's circle shadows: the colour comes
+	// from the vertex alone and the texture contributes only its alpha. Quad route only.
 	void SetMaterial(eBlendMode blend, cTexture* texture, bool depthTest = true,
 	                 const MatXf& world = MatXf::ID,
-	                 cTexture* texture1 = nullptr, eColorMode colorMode = COLOR_MOD);
+	                 cTexture* texture1 = nullptr, eColorMode colorMode = COLOR_MOD,
+	                 bool selectDiffuse = false);
 
 	// cQuadBuffer<sVertexXYZDT1>'s contract: BeginDraw opens a group, each Get hands back
 	// four vertices for one quad, EndDraw closes it. A group carries the material
@@ -131,7 +136,8 @@ public:
 private:
 	// worldquad.vert.hlsl / worldtri.vert.hlsl's whole cbuffer: the original's mWVP.
 	struct VSUniform { float mvp[16]; };
-	// worldtri.frag.hlsl's: .x is COLOR_OPERATION. The quad shader has no uniform.
+	// The fragment cbuffer of whichever shader the group takes. .x is worldtri's
+	// COLOR_OPERATION on the triangle route, and worldquad's SelectDiffuse on the quad one.
 	struct FSUniform { float colorOp[4]; };
 
 	// Which stream a group's geometry lives in, and so which shader, vertex layout and

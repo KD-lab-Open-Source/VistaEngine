@@ -45,6 +45,12 @@ SamplerState      ColorSampler  : register(s0, space2);
 // depth values before comparing them is meaningless.
 Texture2D<float>  ShadowTexture : register(t1, space2);
 SamplerState      ShadowSampler : register(s1, space2);
+// The terrain lightmap (the original's LightMapSampler, s3): CameraPlanarLight draws the
+// scene's light sources and circle shadows into it top-down, once a frame. 128,128,128 is
+// its neutral clear, i.e. "no light source here", which is why it is applied as a *signed
+// offset on the light term* rather than as a multiplier on the surface colour.
+Texture2D<float4> LightMapTexture : register(t2, space2);
+SamplerState      LightMapSampler : register(s2, space2);
 
 cbuffer Light : register(b0, space3)
 {
@@ -61,6 +67,10 @@ cbuffer Light : register(b0, space3)
     // x != 0: the shadow map holds this frame's casters. y != 0: 2x2 filter (the
     // original's FILTER_SHADOW, a static shader define there, Option_filterShadow here).
     float4 ShadowParams;
+    // x != 0: the lightmap holds this frame's light sources. There is no such flag in the
+    // original -- LIGHTMAP is a shader define, and the map always exists once the device
+    // is up. Here the map may not be created yet, or the pass may not have run.
+    float4 LightMapParams;
 };
 
 struct VSOutput
@@ -69,6 +79,7 @@ struct VSOutput
     float3 Normal    : NORMAL;
     float2 UV        : TEXCOORD0;
     float4 ShadowPos : TEXCOORD1;
+    float2 LightmapUV : TEXCOORD2;
 };
 
 // shadow9700.inl's `#define ccx 0.0005`: the 2x2 tap offset, in shadow-map uv. Almost
@@ -113,6 +124,20 @@ float4 main(VSOutput input) : SV_Target0
     float3 N = normalize(input.Normal);
     float ndlRaw = -dot(N, LightDirection.xyz);
     float3 light = saturate(ndlRaw) * LightColor.rgb + LightColor.a;
+
+    // The lightmap, exactly as the original applies it:
+    //
+    //     lightmap.rgb = 2*(lightmap.rgb - 0.5);
+    //     light += lightmap.rgb;
+    //
+    // A signed offset on the LIGHT term, not on the surface colour -- so its neutral grey
+    // (128) adds nothing, a light source brightens, and a circle shadow darkens. Gated so
+    // that a scene with no lightmap (the map is bound white) is not washed out by +1.
+    if(LightMapParams.x != 0.0f)
+    {
+        float3 lm = LightMapTexture.Sample(LightMapSampler, input.LightmapUV).rgb;
+        light += 2.0f * (lm - 0.5f);
+    }
 
     float4 ot = ColorTexture.Sample(ColorSampler, input.UV);
     ot.rgb *= light;

@@ -239,6 +239,17 @@ void FieldOfViewMap::PreDraw(Camera* camera)
 
 void FieldOfViewMap::Draw(Camera* camera)
 {
+#ifndef _WIN32
+	// Fog of war, not ported. This is one map-sized quad drawn into the terrain lightmap's
+	// ALPHA channel -- which is why CameraPlanarLight::drawLights masks alpha off, so the
+	// light quads that follow cannot clobber it, and why the terrain shader's FOG_OF_WAR
+	// branch reads lightmap.a. Reproducing it needs a colour-write mask on the quad
+	// pipeline and that branch in tilemap.frag.hlsl; the lightmap itself does not.
+	//
+	// It attaches only to the planar light camera (ATTRUNKOBJ_IGNORE_NORMALCAMERA keeps it
+	// off the scene camera), so nothing reached it until that camera started drawing.
+	return;
+#else
 	int dx=vMap.H_SIZE;
 	int dy=vMap.V_SIZE;
 	Color4c diffuse(255,255,255);
@@ -255,8 +266,9 @@ void FieldOfViewMap::Draw(Camera* camera)
 	v[1].pos.x=0; v[1].pos.y=dy; v[1].pos.z=0; v[1].u1()=0; v[1].v1()=1; v[1].diffuse=diffuse;
 	v[2].pos.x=dx; v[2].pos.y=0; v[2].pos.z=0; v[2].u1()=1; v[2].v1()=0; v[2].diffuse=diffuse;
 	v[3].pos.x=dx; v[3].pos.y=dy; v[3].pos.z=0; v[3].u1()=1; v[3].v1()=1; v[3].diffuse=diffuse;
-	
+
 	quad->EndDraw();
+#endif
 }
 
 void FieldOfViewMap::serialize(Archive& ar)

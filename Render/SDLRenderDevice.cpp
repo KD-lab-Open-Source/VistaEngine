@@ -178,9 +178,10 @@ int cSDLRenderDevice::Done()
 	}
 	swapchainTexture_ = nullptr;
 
-	// Release the shadow map while the device (and gb_RenderDevice == this) is still
+	// Release the render targets while the device (and gb_RenderDevice == this) is still
 	// valid: ~cTexture routes through DeleteTexture, which needs textures_ and device_.
 	deleteShadowMap();
+	deleteLightMap();
 
 	// The renderers hold GPU objects built on device_, so they must go first.
 	uiRenderer_.reset();
@@ -604,6 +605,26 @@ void cSDLRenderDevice::deleteShadowMap()
 {
 	RELEASE(shadowMap_);
 	shadowMapSize_ = 0;
+}
+
+bool cSDLRenderDevice::createLightMap(int size)
+{
+	deleteLightMap();
+	if(!device_ || size <= 0)
+		return false;
+	// TEXTURE_RENDER32, as cD3DRender::createRenderTargets makes it: a colour target, so
+	// resolveTarget gives it a depth buffer it will not use (CameraPlanarLight turns depth
+	// write off and the depth test to ALWAYS).
+	lightMap_ = GetTexLibrary()->CreateRenderTexture(size, size, TEXTURE_RENDER32, false);
+	if(!lightMap_)
+		return false;
+	fprintf(stderr, "cSDLRenderDevice: terrain lightmap %dx%d ready\n", size, size);
+	return true;
+}
+
+void cSDLRenderDevice::deleteLightMap()
+{
+	RELEASE(lightMap_);
 }
 
 Mat4f cSDLRenderDevice::shadowMatBias() const

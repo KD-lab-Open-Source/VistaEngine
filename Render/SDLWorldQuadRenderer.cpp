@@ -151,7 +151,8 @@ bool SDLWorldQuadRenderer::createShaders()
 	fsi.code = fsCode; fsi.code_size = fsSize; fsi.entrypoint = entry;
 	fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
 	fsi.num_samplers = 1;           // the group's texture
-	fsShader_ = SDL_CreateGPUShader(device_, &fsi);   // no uniforms
+	fsi.num_uniform_buffers = 1;    // SelectDiffuse
+	fsShader_ = SDL_CreateGPUShader(device_, &fsi);
 
 	fsi.code = fsTriCode; fsi.code_size = fsTriSize;
 	fsi.num_samplers = 2;           // + the colour operation's second texture
@@ -299,7 +300,8 @@ void SDLWorldQuadRenderer::SetCamera(Camera* camera)
 }
 
 void SDLWorldQuadRenderer::SetMaterial(eBlendMode blend, cTexture* texture, bool depthTest,
-                                       const MatXf& world, cTexture* texture1, eColorMode colorMode)
+                                       const MatXf& world, cTexture* texture1, eColorMode colorMode,
+                                       bool selectDiffuse)
 {
 	material_.texture = sdlTextureOf(texture);
 	material_.texture1 = sdlTextureOf(texture1);
@@ -308,9 +310,11 @@ void SDLWorldQuadRenderer::SetMaterial(eBlendMode blend, cTexture* texture, bool
 	materialWorld_ = world;
 
 	// cD3DRender::SetWorldMaterial's color_operation: 0 without a second texture, else the
-	// eColorMode mapped as it maps it. psStandart reads it as COLOR_OPERATION.
-	float op = 0.f;
-	if(material_.texture1)
+	// eColorMode mapped as it maps it. psStandart reads it as COLOR_OPERATION. The quad
+	// shader reads the same slot as SelectDiffuse, so the two never collide -- a group is
+	// one route or the other.
+	float op = selectDiffuse ? 1.f : 0.f;
+	if(!selectDiffuse && material_.texture1)
 		switch(colorMode){
 			case COLOR_ADD:  op = 1.f; break;
 			case COLOR_MOD:  op = 2.f; break;
@@ -630,9 +634,8 @@ bool SDLWorldQuadRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 
 		SDL_GPUTexture* texture = g.texture ? g.texture : whiteTexture_;
 		if(g.kind == GROUP_TRI){
-			// The triangle shader always samples two textures and reads COLOR_OPERATION,
-			// so bind both even when there is no second texture -- white, with the
-			// operation off, which the shader then skips.
+			// The triangle shader always samples two textures, so bind both even when there
+			// is no second texture -- white, with the operation off, which the shader skips.
 			SDL_GPUTexture* texture1 = g.texture1 ? g.texture1 : whiteTexture_;
 			if(texture != boundTexture || texture1 != boundTexture1){
 				SDL_GPUTextureSamplerBinding ts[2] = {};
@@ -642,10 +645,6 @@ bool SDLWorldQuadRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 				boundTexture = texture;
 				boundTexture1 = texture1;
 			}
-			if(!boundFS || std::memcmp(boundFS, &g.fs, sizeof(g.fs)) != 0){
-				SDL_PushGPUFragmentUniformData(cmd, 0, &g.fs, sizeof(g.fs));
-				boundFS = &g.fs;
-			}
 		}
 		else if(texture != boundTexture){
 			SDL_GPUTextureSamplerBinding ts = {};
@@ -653,6 +652,13 @@ bool SDLWorldQuadRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 			ts.sampler = sampler_;
 			SDL_BindGPUFragmentSamplers(pass, 0, &ts, 1);
 			boundTexture = texture;
+		}
+
+		// Both shaders read a fragment uniform from the same slot: COLOR_OPERATION on the
+		// triangle route, SelectDiffuse on the quad one.
+		if(!boundFS || std::memcmp(boundFS, &g.fs, sizeof(g.fs)) != 0){
+			SDL_PushGPUFragmentUniformData(cmd, 0, &g.fs, sizeof(g.fs));
+			boundFS = &g.fs;
 		}
 
 		if(g.kind == GROUP_TRI)

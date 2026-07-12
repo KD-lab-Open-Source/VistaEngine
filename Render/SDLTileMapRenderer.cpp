@@ -22,8 +22,9 @@
 namespace {
 
 // Uniform blocks, laid out to match tilemap.{vert,frag}.hlsl exactly.
-struct VSUniform { float mvp[16]; float uv[4]; float shadow[16]; };
-struct FSUniform { float lightColor[4]; float lightDir[4]; float shade[4]; float params[4]; };
+struct VSUniform { float mvp[16]; float uv[4]; float shadow[16]; float planarNode[4]; };
+struct FSUniform { float lightColor[4]; float lightDir[4]; float shade[4]; float params[4];
+                   float lightMapParams[4]; };
 // tilemap_shadow.vert.hlsl's whole cbuffer: the light camera's view-projection.
 struct ShadowVSUniform { float mvp[16]; };
 
@@ -150,7 +151,7 @@ void SDLTileMapRenderer::createPipeline()
 	SDL_GPUShaderCreateInfo fsi = {};
 	fsi.code = fsCode; fsi.code_size = fsSize; fsi.entrypoint = entry;
 	fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
-	fsi.num_samplers = 2;           // the baked surface-colour texture, the shadow map
+	fsi.num_samplers = 3;           // surface colour, the shadow map, the lightmap
 	fsi.num_uniform_buffers = 1;    // LightColor + LightDirection + ShadeIntensity + params
 	SDL_GPUShader* fs = SDL_CreateGPUShader(device_, &fsi);
 
@@ -592,6 +593,24 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	fsu.params[1] = (shadow && Option_filterShadow) ? 1.f : 0.f;
 	fsu.params[2] = fsu.params[3] = 0.f;
 
+	// The terrain lightmap and its fPlanarNode, both from the device: cScene::AddPlanarCamera
+	// set the transform to the same world box the lightmap camera rendered.
+	cTexture* lightMapTexture = dev ? dev->GetLightMap() : nullptr;
+	SDL_GPUTexture* lightMap = lightMapTexture
+	                         ? reinterpret_cast<SDL_GPUTexture*>(lightMapTexture->GetDDSurface(0))
+	                         : nullptr;
+	fsu.lightMapParams[0] = lightMap ? 1.f : 0.f;
+	fsu.lightMapParams[1] = fsu.lightMapParams[2] = fsu.lightMapParams[3] = 0.f;
+	if(dev){
+		const Vect4f& pn = dev->planarTransform();
+		vsu.planarNode[0] = pn.x; vsu.planarNode[1] = pn.y;
+		vsu.planarNode[2] = pn.z; vsu.planarNode[3] = pn.w;
+	}
+	else{
+		vsu.planarNode[0] = vsu.planarNode[1] = 0.f;
+		vsu.planarNode[2] = vsu.planarNode[3] = 1.f;
+	}
+
 	// Wireframe is a diagnostic: kill the diffuse term and drive ambient to 1, so with
 	// the white texture bound below every edge comes out full white regardless of the
 	// map's baked surface colour (the Menu world's is all zeros).
@@ -629,14 +648,17 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	SDL_GPUBufferBinding ib = {}; ib.buffer = indexBuffer_; ib.offset = 0;
 	SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_16BIT);
 
-	SDL_GPUTextureSamplerBinding ts[2] = {};
+	SDL_GPUTextureSamplerBinding ts[3] = {};
 	ts[0].texture = (wireframe && whiteTexture_) ? whiteTexture_ : colorTexture_;
 	ts[0].sampler = sampler_;
-	// Slot 1 must always carry a texture, even with the shadow disabled; the white 1x1
-	// reads 1.0, which the shader would read as "nothing casts here" if it did sample it.
+	// Slots 1 and 2 must always carry a texture, even with the shadow or the lightmap
+	// disabled; the shader gates on ShadowParams.x / LightMapParams.x rather than on the
+	// binding, so the white 1x1 stands in and is never read.
 	ts[1].texture = shadowMap ? shadowMap : whiteTexture_;
 	ts[1].sampler = shadowSampler_;
-	SDL_BindGPUFragmentSamplers(pass, 0, ts, 2);
+	ts[2].texture = lightMap ? lightMap : whiteTexture_;
+	ts[2].sampler = sampler_;   // linear + clamp: the lightmap is 256x256 over the whole box
+	SDL_BindGPUFragmentSamplers(pass, 0, ts, 3);
 
 	SDL_DrawGPUIndexedPrimitives(pass, indexCount_, 1, 0, 0, 0);
 	SDL_EndGPURenderPass(pass);
