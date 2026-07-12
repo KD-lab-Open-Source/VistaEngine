@@ -185,6 +185,11 @@ void SDLTileMapRenderer::createPipeline()
 	pci.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
 	pci.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
 	pci.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;   // grid winding isn't guaranteed
+	// Clip near/far, don't clamp -- D3D9's default. The reflection camera sits inside the
+	// terrain volume looking up, so the whole heightfield falls outside its frustum; with
+	// SDL's default depth *clamp* those triangles would rasterize as a full-screen smear
+	// (straddling w==0), where D3D9 silently clips them and lets the sky show through.
+	pci.rasterizer_state.enable_depth_clip = true;
 	pci.depth_stencil_state.enable_depth_test = true;
 	pci.depth_stencil_state.enable_depth_write = true;
 	pci.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
