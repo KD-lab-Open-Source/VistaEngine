@@ -3,6 +3,8 @@
 #include "terra/vmap.h"
 #include "Serialization/ResourceSelector.h"
 #include "Render/D3D/D3DRender.h"
+#include "Render/SDLRenderDevice.h"
+#include "Render/SDLCloudShadowRenderer.h"
 #include "XMath/SafeMath.h"
 #include "SkyObject.h"
 #include "Render/Src/TileMap.h"
@@ -72,13 +74,50 @@ void cCloudShadow::PreDraw(Camera* camera)
 	camera->Attach(SCENENODE_OBJECTFIRST,this);
 }
 
-// TODO(sdl-port): cloud shadows do not draw. See Render/PORTING.md #5.
+// Ported to SDL GPU. SDLCloudShadowRenderer takes what this pushed into VSCloudShadow /
+// PSCloudShadow, and cSDLRenderDevice::drawCloudShadow opens the pass right here, where the
+// scene walk reached us. Everything above -- the quad, the two scrolling texture coordinate
+// sets, the animation -- was always portable and never stopped running.
 //
-// The scrolling shadow layer was VSCloudShadow/PSCloudShadow modulating the terrain's
-// diffuse by sun elevation. Its vertex/index buffers are portable and still built above;
-// only the shader pass is missing.
+// The camera is the planar LIGHT camera (cScene gives it ATTRCAMERA_SHADOW), so this draws
+// into the terrain lightmap, not into the view. The terrain and the grass both add the
+// lightmap to their own light, so they pick the clouds up with no change of their own. See
+// SDLCloudShadowRenderer.h.
 void cCloudShadow::Draw(Camera* camera)
 {
+	if(!camera->getAttribute(ATTRCAMERA_SHADOW))
+		return;
+
+	SDLCloudShadowRenderer* renderer = sdlCloudShadowRenderer();
+	cSDLRenderDevice* device = sdlRenderDevice();
+	if(!renderer || !device || !texture1)
+		return;
+	cTileMap* tileMap = scene_ ? scene_->GetTileMap() : 0;
+	if(!tileMap)
+		return;
+
+	SDLCloudShadowRenderer::State state;
+	state.texture = texture1;
+
+	// tfactor, exactly as the original builds it: the tile map's diffuse flattened to its own
+	// grey average (the clouds darken, they do not tint), scaled by the world's serialized
+	// cloud intensity, and then by how high the sun stands. -sunDirection.z goes to zero as
+	// the sun reaches the horizon, so the shadows fade out at dusk and are gone at night.
+	Color4f tfactor = tileMap->GetDiffuse();
+	tfactor.r =
+	tfactor.g =
+	tfactor.b = (tfactor.r + tfactor.g + tfactor.b) / 3;
+	tfactor *= color/255.0f;
+	tfactor *= -scene_->GetSunDirection().z;
+	tfactor.r = clamp(tfactor.r, 0.0f, 1.0f);
+	tfactor.g = clamp(tfactor.g, 0.0f, 1.0f);
+	tfactor.b = clamp(tfactor.b, 0.0f, 1.0f);
+	tfactor.a = tfactor.r;
+	state.tfactor = tfactor;
+
+	renderer->SetState(state, camera);
+	renderer->DrawIndexedPrimitive(earth_vb, earth_ib, size_ib);
+	device->drawCloudShadow();
 }
 
 

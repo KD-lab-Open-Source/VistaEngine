@@ -29,6 +29,7 @@ grep -rn "TODO(sdl-port)" --include=*.cpp --include=*.h .
 |---|---------|--------------|
 | 1 | **Grass** | `Render/SDLGrassRenderer.{h,cpp}` + `Render/SDLShaders/grass.{vert,frag}.hlsl`, driven from `GrassMap::Draw`/`DrawGrass` as the original drove `VSGrass`/`PSGrass`. Everything but the draw (tile grid, blade generation, sort, buffers) had always been portable. The alpha test (`D3DRS_ALPHAREF 100`) has no SDL GPU equivalent and became a `clip()` in the fragment shader. |
 | 2 | **Distance fog** | `cSDLRenderDevice::SetGlobalFog` + `fogPlane()`, and a fog term at the end of every world fragment shader: terrain, objects, grass, water, and the world quads (particles, coast foam, wave sources, light columns). Driven from `Environment::graphQuant`, as before. The world-quad renderer has two rules, since its groups are not all occluders: additive/subtractive ones fade to nothing (the original's `FIX_FOG_ADD_BLEND`), the rest fade toward the fog colour. Three cameras keep fog OFF and must stay that way — the sky (`cSkyObj::Draw`), the lightmap (`CameraPlanarLight::DrawScene`) and the 2D pass (`Camera::Set2DRenderState`). Still missing: the under-water post-effect's fog override, blocked on #6. |
+| 5 | **Cloud shadows** | `Render/SDLCloudShadowRenderer.{h,cpp}` + `Render/SDLShaders/cloudshadow.{vert,frag}.hlsl`, driven from `cCloudShadow::Draw`. Note this is a **lightmap** effect, not a view one: `cCloudShadow` carries `ATTRCAMERA_SHADOW`, which is the planar *light* camera's attribute, so its world-sized quad overwrites the terrain lightmap (`ALPHA_NONE`, `sortIndex -1`) before `drawLights()` blends over it. The shader is centred on 0.5 — the lightmap's neutral — so the terrain and the grass pick the clouds up through the lightmap term they already sample. Neither of their shaders changed. |
 
 ## Features with no SDL path
 
@@ -36,7 +37,6 @@ grep -rn "TODO(sdl-port)" --include=*.cpp --include=*.h .
 |---|---------|---------------|-----------------------|
 | 3 | **The perimeter field dome** | `VistaRender/Field.cpp` — `FieldDispatcher::Draw` | The game's signature effect: an additive `sVertexXYZDT2` tile strip over the water, sampling the reflection texture. |
 | 4 | **Lava + ice terrain materials** | `cTileMap::setMaterial` (deleted); `Water/ice.cpp` — `cTemperature::Draw` | `ShaderSceneWaterLava` / `ShaderSceneWaterIce` over the placement-zone materials. |
-| 5 | **Cloud shadows** | `Water/CloudShadow.cpp` — `cCloudShadow::Draw` | `VSCloudShadow`/`PSCloudShadow`, a scrolling shadow layer modulated by sun elevation. |
 | 6 | **Post-effect stack** | `Environment::drawPostEffects` | `PEManager`, screen flash, lens flare, the under-water effect, `CChaos`. Needs render-to-texture + fullscreen passes. |
 | 7 | **`cEnvironmentEarth`** | `Water/Water.cpp` | The ground plane drawn under the water out to the horizon. |
 | 8 | **`cFogCircleEX`** | `Water/SkyObject.cpp` | Fixed-function horizon ring shaded from `D3DRS_TEXTUREFACTOR`. |

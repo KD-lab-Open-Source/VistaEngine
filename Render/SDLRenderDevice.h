@@ -44,6 +44,7 @@ class SDLWaterRenderer;
 class SDLWorldQuadRenderer;
 class SDLMinimapRenderer;
 class SDLGrassRenderer;
+class SDLCloudShadowRenderer;
 class cTileMap;
 
 // Restrict drawing to a camera's viewport, the way cD3DRender::SetDrawTransform hands
@@ -93,6 +94,10 @@ SDLMinimapRenderer* sdlMinimapRenderer();
 // drives it exactly as it drives VSGrass / PSGrass on Windows.
 SDLGrassRenderer* sdlGrassRenderer();
 
+// The SDL backend's cloud-shadow renderer, or null under any other device. cCloudShadow::Draw
+// drives it exactly as it drives VSCloudShadow / PSCloudShadow on Windows.
+SDLCloudShadowRenderer* sdlCloudShadowRenderer();
+
 class cSDLRenderDevice : public cInterfaceRenderDevice
 {
 public:
@@ -135,6 +140,13 @@ public:
 	// records afterwards.
 	SDLGrassRenderer* grassRenderer() { return grassRenderer_.get(); }
 	void drawGrass();
+
+	// --- Cloud shadows -------------------------------------------------------
+	// cCloudShadow::Draw records its one quad and calls this. It runs under the planar light
+	// camera, so the pass lands in the LIGHTMAP -- before SDLWorldQuadRenderer's pass for the
+	// light sources, which blend over it. See SDLCloudShadowRenderer.h.
+	SDLCloudShadowRenderer* cloudShadowRenderer() { return cloudShadowRenderer_.get(); }
+	void drawCloudShadow();
 
 	// --- UI and minimap -----------------------------------------------------
 	// Neither has a draw call of its own. The UI renderer's pass runs at EndScene, over
@@ -517,6 +529,7 @@ private:
 	std::unique_ptr<SDLWorldQuadRenderer> worldQuadRenderer_;
 	std::unique_ptr<SDLMinimapRenderer>   minimapRenderer_;
 	std::unique_ptr<SDLGrassRenderer>     grassRenderer_;
+	std::unique_ptr<SDLCloudShadowRenderer> cloudShadowRenderer_;
 };
 
 #endif // VISTA_SDL_RENDER_DEVICE_H

@@ -21,6 +21,7 @@
 #include "SDLWorldQuadRenderer.h"
 #include "SDLMinimapRenderer.h"
 #include "SDLGrassRenderer.h"
+#include "SDLCloudShadowRenderer.h"
 
 // See the declarations in SDLRenderDevice.h.
 cSDLRenderDevice* sdlRenderDevice()
@@ -62,6 +63,12 @@ SDLGrassRenderer* sdlGrassRenderer()
 {
 	cSDLRenderDevice* dev = sdlRenderDevice();
 	return dev ? dev->grassRenderer() : nullptr;
+}
+
+SDLCloudShadowRenderer* sdlCloudShadowRenderer()
+{
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	return dev ? dev->cloudShadowRenderer() : nullptr;
 }
 
 SDL_GPUTexture* createSolidGPUTexture(SDL_GPUDevice* device, unsigned int rgba)
@@ -219,6 +226,8 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND /*hWnd*/,
 		worldQuadRenderer_ = std::make_unique<SDLWorldQuadRenderer>(device_, window_);
 	if(!grassRenderer_)
 		grassRenderer_ = std::make_unique<SDLGrassRenderer>(this, device_, window_);
+	if(!cloudShadowRenderer_)
+		cloudShadowRenderer_ = std::make_unique<SDLCloudShadowRenderer>(this, device_, window_);
 	if(!minimapRenderer_){
 		minimapRenderer_ = std::make_unique<SDLMinimapRenderer>(device_, window_);
 		// The minimap draws inside the UI's pass, at the point in its run list where the
@@ -264,6 +273,7 @@ int cSDLRenderDevice::Done()
 	waterRenderer_.reset();
 	worldQuadRenderer_.reset();
 	grassRenderer_.reset();
+	cloudShadowRenderer_.reset();
 
 	if(device_){
 		// The depth buffers the offscreen colour targets own. Their colour textures are
@@ -358,6 +368,8 @@ int cSDLRenderDevice::BeginScene()
 		worldQuadRenderer_->BeginFrame();
 	if(grassRenderer_)
 		grassRenderer_->BeginFrame();
+	if(cloudShadowRenderer_)
+		cloudShadowRenderer_->BeginFrame();
 
 	// The screen is this frame's swapchain image; its clear was armed by Fill(). Offscreen
 	// targets keep their textures across frames, but not the clears they have consumed.
@@ -678,6 +690,28 @@ void cSDLRenderDevice::drawGrass()
 	const bool clear = rt->clearPending && !rt->colorCleared;
 	if(grassRenderer_->Draw(commandBuffer_, rt->color, rt->depth, rt->w, rt->h,
 	                        clear, rt->clearColor, !rt->depthCleared, fillMode_ == FILL_WIREFRAME)){
+		if(clear) rt->colorCleared = true;
+		rt->depthCleared = true;
+	}
+}
+
+// The cloud shadows, into the terrain lightmap: the first thing the planar light camera
+// draws, before drawLights() blends the world's light sources over them. See
+// SDLCloudShadowRenderer.h for why this is a lightmap effect and not a view one.
+void cSDLRenderDevice::drawCloudShadow()
+{
+	if(!bActiveScene_ || !commandBuffer_ || !cloudShadowRenderer_ || !cloudShadowRenderer_->hasDraws())
+		return;
+	RenderTarget* rt = current_;
+	if(rt->depthOnly || !rt->usable()){
+		cloudShadowRenderer_->DiscardDraws();
+		return;
+	}
+
+	const bool clear = rt->clearPending && !rt->colorCleared;
+	if(cloudShadowRenderer_->Draw(commandBuffer_, rt->color, rt->depth, rt->w, rt->h,
+	                              clear, rt->clearColor, !rt->depthCleared,
+	                              fillMode_ == FILL_WIREFRAME)){
 		if(clear) rt->colorCleared = true;
 		rt->depthCleared = true;
 	}
