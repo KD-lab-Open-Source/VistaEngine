@@ -352,7 +352,7 @@ void cWaves::Draw(Camera* camera)
 	if(!pBuf || !dev)
 		return;
 	pBuf->SetCamera(camera);
-	pBuf->SetTexture(Texture);
+	pBuf->SetMaterial(ALPHA_BLEND, Texture);
 #endif
 	pBuf->BeginDraw();
 //	vector<list<WAVE> >::iterator vl;
@@ -715,7 +715,7 @@ void cFixedWaves::Draw(Camera* camera)
 	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
 	if(!pBuf)
 		return;
-	pBuf->SetTexture(texture_);
+	pBuf->SetMaterial(ALPHA_BLEND, texture_);
 #endif
 	bool avi_texture = texture_&&texture_->IsAviScaleTexture();
 

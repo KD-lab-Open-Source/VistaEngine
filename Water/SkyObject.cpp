@@ -17,6 +17,8 @@
 #include "DebugPrm.h"
 #include "DebugUtil.h"
 #include "Environment/Environment.h"
+#include "Render/SDLWorldQuadRenderer.h"   // the sun and the moon are drawn by SDLWorldQuadRenderer,
+#include "Render/SDLRenderDevice.h"        // reached via cSDLRenderDevice::drawWorldQuads
 
 //cRenderSky потомок от cRenderCubemap отвечает за отражения неба в воде.
 
@@ -79,12 +81,25 @@ void cSunMoonObj::Draw(Camera* camera)
 	cTexture* texture = isDay?SunTexture:MoonTexture;
 	if (!texture)
 		return;
+	const MatXf& mat=camera->GetMatrix();
+#ifdef _WIN32
 	gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE);
 	gb_RenderDevice3D->SetRenderState(D3DRS_ZENABLE,FALSE);
-	const MatXf& mat=camera->GetMatrix();
 	cVertexBuffer<sVertexXYZDT1>* pBuf  = gb_RenderDevice->GetBufferXYZDT1();
 	gb_RenderDevice3D->SetNoMaterial(isDay?ALPHA_ADDBLENDALPHA:ALPHA_BLEND,MatXf::ID,0,texture);
 	sVertexXYZDT1* v = pBuf->Lock(4);
+#else
+	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	if(!pBuf || !dev)
+		return;
+	pBuf->SetCamera(camera);
+	// The renderer culls nothing, and D3DRS_ZENABLE FALSE is the depth test off: the sun and
+	// the moon sit behind everything the sky camera draws after them.
+	pBuf->SetMaterial(isDay?ALPHA_ADDBLENDALPHA:ALPHA_BLEND, texture, false);
+	pBuf->BeginDraw();
+	sVertexXYZDT1* v = pBuf->Get();
+#endif
 
 	Vect2f rot((isDay?attribute_.sunSize:attribute_.moonSize)*scale,0);
 	Vect3f& pos = position_.trans();
@@ -109,9 +124,16 @@ void cSunMoonObj::Draw(Camera* camera)
 	v[3].diffuse=color;
 	v[3].GetTexel().x = 1;v[3].GetTexel().y = 1;//  (1,1);
 
+#ifdef _WIN32
 	pBuf->Unlock(4);
 	pBuf->DrawPrimitive(PT_TRIANGLESTRIP, 2);
 	gb_RenderDevice3D->SetRenderState(D3DRS_ZENABLE,TRUE);
+#else
+	// The corners above are the two opposite edges 0,1 and 2,3 that the renderer's index
+	// pattern expects, so its two triangles cover the same quad D3D's strip does.
+	pBuf->EndDraw();
+	dev->drawWorldQuads();
+#endif
 }
 
 void cSunMoonObj::SetTextures()
@@ -132,20 +154,33 @@ void cSkyCamera::DrawScene()
 {
 	gb_RenderDevice->setCamera(this);
 
+#ifdef _WIN32
 	DWORD old_colorwrite=gb_RenderDevice3D->GetRenderState(D3DRS_COLORWRITEENABLE);
+#endif
 
 	sunMoonObj->Draw(this);
 	for(vector<OneObject>::iterator it=objects.begin();it!=objects.end();it++)
 	{
 		OneObject& p=*it;
+#ifdef _WIN32
+		// The alpha channel carries the HDR mask, and only the reflection cubemap wants the
+		// sky in it -- which is the one caller that has no SDL path (see cSkyObj::DrawSky).
 		DWORD write=D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED;
 		if(p.write_alpha && enable_hdr_alpha)
 			write|=D3DCOLORWRITEENABLE_ALPHA;
 		gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,write);
+#endif
 		p.obj->DrawAll(this);
 	}
 
+#ifdef _WIN32
 	gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,old_colorwrite);
+#else
+	// The sky models batch in SDLObject3dxRenderer, like any other 3dx object. Put them on
+	// the screen here, over the sun, before the caller returns and the world scene draws.
+	if(cSDLRenderDevice* dev = sdlRenderDevice())
+		dev->flushObjectPass();
+#endif
 	objects.clear();
 }
 
@@ -313,9 +348,11 @@ void cSkyObj::DrawSky(Camera* pGlobalCamera,bool hdr_alpha)
 	Vect2f zPlane(1e3f,1e5f);
 	pNormalCamera->SetFrustum(0,0,0,&zPlane);
 
+#ifdef _WIN32
 	cD3DRender* rd=gb_RenderDevice3D;
 	DWORD old_fogenable=rd->GetRenderState(D3DRS_FOGENABLE);
 	rd->SetRenderState(D3DRS_FOGENABLE,FALSE);
+#endif
 
 	vector<SkyElement>::iterator it;
 	pNormalCamera->SetSunMoonObj(&sunMoonObj);
@@ -327,10 +364,13 @@ void cSkyObj::DrawSky(Camera* pGlobalCamera,bool hdr_alpha)
 
 	pSkyScene->Draw(pNormalCamera);
 	//DrawSun(pGlobalCamera);
-	
 
+#ifdef _WIN32
 	rd->SetRenderState(D3DRS_FOGENABLE,old_fogenable);
 
+	// cFogCircleEX is a fixed-function ring shaded from D3DRS_TEXTUREFACTOR; nothing builds
+	// its buffers off-Windows (its constructor gives up without a gb_RenderDevice3D), so
+	// this block would draw nothing there anyway.
 	if(!hdr_alpha)///Непонятно - правильно ли?
 	{
 		rd->SetDrawTransform(pNormalCamera);
@@ -343,6 +383,7 @@ void cSkyObj::DrawSky(Camera* pGlobalCamera,bool hdr_alpha)
 		rd->SetRenderState(D3DRS_FOGENABLE,old_fogenable);
 		rd->SetRenderState(D3DRS_ZWRITEENABLE, old_zwrite);
 	}
+#endif
 
 	pNormalCamera->SetRenderTarget((IDirect3DSurface9*)0,0);
 }
@@ -392,6 +433,9 @@ void cSkyObj::DrawSkyAndAnimate(Camera* pGlobalCamera)
 	}
 
 	DrawSky(pGlobalCamera,false);
+#ifdef _WIN32
+	// The sky again, into the water's planar-reflection render target, with the HDR mask in
+	// alpha. Neither the target nor the mask exists on the SDL backend yet.
 	Camera* pReflection=pGlobalCamera->scene()->reflectionCamera();
 	if(pReflection)
 	{
@@ -399,9 +443,10 @@ void cSkyObj::DrawSkyAndAnimate(Camera* pGlobalCamera)
 		//pReflection->SetFoneColor(pGlobalCamera->GetFoneColor());
 		pReflection->SetFoneColor(reflect_fone_color);
 //		gb_RenderDevice->setCamera(pReflection);
-		
+
 		DrawSky(pReflection,true);
 	}
+#endif
 }
 
 void cSkyObj::AddSkyModel(const char* sky_model_name)

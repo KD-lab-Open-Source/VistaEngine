@@ -15,7 +15,7 @@
 // classes that record their own passes into the frame's command buffer: SDLUIRenderer
 // (2D text, sprites, quads), SDLTileMapRenderer (terrain), SDLObject3dxRenderer
 // (skinned .3dx meshes), SDLWaterRenderer (the water surface) and SDLWorldQuadRenderer
-// (world-space textured quads: the shoreline foam, the wave sources).
+// (world-space textured quads: the sun and moon, the shoreline foam, the wave sources).
 
 #include "IRenderDevice.h"
 #include "MTSection.h"
@@ -82,17 +82,18 @@ public:
 	void drawTileMap(cTileMap* tileMap, Camera* camera);
 
 	// --- Water and world quads --------------------------------------------
-	// cWater::Draw, cCoastSprites::Draw and cFixedWavesContainer::Draw talk to their
-	// renderers directly (the way they talk to VSWater/PSWater and the shared quad buffer
-	// on Windows), then call these to put what they recorded on the screen.
+	// cSunMoonObj::Draw, cWater::Draw, cCoastSprites::Draw and cFixedWavesContainer::Draw
+	// talk to their renderers directly (the way they talk to VSWater/PSWater and the shared
+	// quad buffer on Windows), then call these to put what they recorded on the screen.
 	//
-	// None of them is the first thing in the frame the way the terrain is: each belongs
-	// where the scene walk reached it, over the opaque objects. Water and the coast
-	// sprites draw in DrawObjectSpecial, which sorts by sortIndex(), so the water (-2)
-	// lands under the sprites (0); the wave sources draw later still, in DrawSortObject's
-	// sorted transparent pass. The object renderer batches, so each of these first replays
-	// what it has recorded so far and only then opens its own pass over it. Whatever the
-	// walk records afterwards replays at EndScene, on top, as on D3D.
+	// Only the sun opens the frame, before the terrain: it is the first thing the sky
+	// camera draws, and the sky is drawn before the world. The rest belong where the scene
+	// walk reached them, over the opaque objects. Water and the coast sprites draw in
+	// DrawObjectSpecial, which sorts by sortIndex(), so the water (-2) lands under the
+	// sprites (0); the wave sources draw later still, in DrawSortObject's sorted transparent
+	// pass. The object renderer batches, so each of these first replays what it has recorded
+	// so far and only then opens its own pass over it. Whatever the walk records afterwards
+	// replays at EndScene, on top, as on D3D.
 	//
 	// drawWorldQuads is called by each of its renderer's callers in turn, and each call
 	// draws (and clears) only the quads recorded since the last one.
@@ -100,6 +101,18 @@ public:
 	void drawWater();
 	SDLWorldQuadRenderer* worldQuadRenderer() { return worldQuadRenderer_.get(); }
 	void drawWorldQuads();
+
+	// Replay the object batch recorded so far, and take the frame's clears if they are
+	// still going. drawWater / drawWorldQuads call it to get the opaque objects onto the
+	// screen before they blend over them; cSkyCamera::DrawScene calls it to get the sky
+	// models onto the screen before the world scene starts drawing over them.
+	void flushObjectPass();
+
+	// Camera::ClearZBuffer, which the main camera runs for ATTRCAMERA_CLEARZBUFFER: the sky
+	// draws first and leaves its own depth behind, in a frustum of its own (1e3..1e5). There
+	// is no clear outside a render pass here, so instead let the next pass own the depth
+	// clear again, exactly as if nothing had been drawn.
+	void clearZBuffer() { depthCleared_ = false; }
 
 	// --- Shadow map -------------------------------------------------------
 	// Mirrors cD3DRender: cScene creates the map, the light camera renders the casters
@@ -319,10 +332,6 @@ private:
 	bool ensureDepth(int w, int h);
 	// The depth texture behind shadowMap_, or null if there is nothing to render into.
 	SDL_GPUTexture* shadowDepthTexture();
-	// Replay the object batch recorded so far, and take the frame's clears if they are
-	// still going. drawWater / drawWorldQuads call it to get the opaque objects onto the
-	// screen before they blend over them.
-	void flushObjectPass();
 
 	// The shadow map, held as a cTexture so Camera::SetRenderTarget can take it and the
 	// scene can ask its size. Its SDL depth texture lives in textures_ like any other.

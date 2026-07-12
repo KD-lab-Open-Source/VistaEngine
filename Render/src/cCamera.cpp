@@ -208,9 +208,9 @@ void Camera::DrawScene()
 #ifdef _WIN32
 	if(getAttribute(ATTRCAMERA_FLOAT_ZBUFFER))
 		ClearFloatZBuffer();
+#endif
 	if(getAttribute(ATTRCAMERA_CLEARZBUFFER) )
 		ClearZBuffer();
-#endif
 	if(getAttribute(ATTRCAMERA_SHOWCLIP))
 		 ShowClip();
 #ifdef _WIN32
@@ -1114,7 +1114,12 @@ eTestVisible Camera::TestVisible(const Vect3f &min,const Vect3f &max)
 
 void Camera::ClearZBuffer()
 {
+#ifdef _WIN32
 	RDCALL(gb_RenderDevice3D->D3DDevice_->Clear(0,0,D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1, 0));
+#else
+	if(cSDLRenderDevice* dev = sdlRenderDevice())
+		dev->clearZBuffer();
+#endif
 }
 
 void Camera::ShowClip()

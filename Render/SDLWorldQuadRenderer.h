@@ -11,14 +11,18 @@
 //
 //   * cQuadBuffer<sVertexXYZDT1>, the shared dynamic quad buffer. Its contract is
 //     BeginDraw / Get / EndDraw, where each Get hands back four vertices for one quad.
-//     This class answers to exactly those names, so the callers' sprite and wave loops
-//     are shared, untouched code on both backends.
-//   * vsStandart / psStandart, the shader pair cD3DRender::SetWorldMaterial selects.
-//     SetTexture below is what is left of that call: everything else it configures is
-//     baked into the pipeline.
+//     This class answers to exactly those names, so the callers' sprite, wave and
+//     billboard loops are shared, untouched code on both backends.
+//   * The material. SetWorldMaterial selects vsStandart / psStandart; SetNoMaterial
+//     drops to the fixed-function pipeline, whose stage 0 is
+//     COLOROP/ALPHAOP = MODULATE(TEXTURE, DIFFUSE) -- which is exactly what psStandart
+//     computes in the plain configuration every caller here uses. So one shader serves
+//     both routes, and SetMaterial below is what is left of either call: the blend mode,
+//     the texture, and whether to depth-test.
 //
 // Callers, each reached through the engine's own scene-draw delegation:
 //
+//   cSunMoonObj::Draw            (cSkyCamera::DrawScene -- the sky, before everything else)
 //   cCoastSprites::Draw          (SCENENODE_OBJECTSPECIAL, sortIndex 0 -- after the water)
 //   cFixedWavesContainer::Draw   (SCENENODE_OBJECTSORT -- the sorted transparent pass)
 //   cWaves::Draw                 (SCENENODE_OBJECTSORT; nothing constructs a cWaves today)
@@ -26,14 +30,15 @@
 // Each opens its pass through cSDLRenderDevice::drawWorldQuads when its own draw call
 // returns, so the quads land where the scene walk reached them.
 //
-// Scope: one texture per group, alpha-blended, depth-tested against the scene, no depth
-// write. Still to come, each a shader variant SetWorldMaterial can select but no caller
-// here needs: the second texture and its four colour operations, TFACTOR, fog of war,
-// fog, FLOAT_ZBUFFER and the z-reflection clip. The other users of the shared quad buffer
-// (NParticle, Leaves, FogOfWar) want some of those, and will bring them.
+// Scope: one texture per group, two blend modes, never any depth write. Still to come,
+// each a shader variant SetWorldMaterial can select but no caller here needs: the second
+// texture and its four colour operations, TFACTOR, fog of war, fog, FLOAT_ZBUFFER and the
+// z-reflection clip. The other users of the shared quad buffer (NParticle, Leaves,
+// FogOfWar) want some of those, and will bring them.
 
 #include "IRenderDevice.h"    // cTexture
 #include "VertexFormat.h"     // sVertexXYZDT1 (the quad buffer's vertex)
+#include <unordered_map>
 #include <vector>
 
 struct SDL_Window;
@@ -42,6 +47,7 @@ struct SDL_GPUCommandBuffer;
 struct SDL_GPUTexture;
 struct SDL_GPUGraphicsPipeline;
 struct SDL_GPUSampler;
+struct SDL_GPUShader;
 struct SDL_GPUBuffer;
 
 class Camera;
@@ -49,8 +55,8 @@ class Camera;
 class SDLWorldQuadRenderer
 {
 public:
-	// Builds the worldquad pipelines and sampler. window is needed only to query the
-	// swapchain format. Must be destroyed before the SDL GPU device it was built on.
+	// Builds the sampler and the white stand-in; pipelines are built on demand. window is
+	// needed only to query the swapchain format. Must be destroyed before the SDL GPU device.
 	SDLWorldQuadRenderer(SDL_GPUDevice* device, SDL_Window* window);
 	~SDLWorldQuadRenderer();
 
@@ -65,15 +71,17 @@ public:
 	// the scene walk has moved on.
 	void SetCamera(Camera* camera);
 
-	// The texture the following group draws with, standing in for the
-	// SetWorldMaterial(ALPHA_BLEND, MatXf::ID, 0, Texture) that opens each caller's draw.
-	// Null draws untextured (a white 1x1), as SetWorldMaterial's own pWhiteTexture
-	// fallback does.
-	void SetTexture(cTexture* texture);
+	// The material the following group draws with, standing in for the SetWorldMaterial /
+	// SetNoMaterial call that opens each caller's draw. `blend` is ALPHA_BLEND or
+	// ALPHA_ADDBLENDALPHA (the sun's); anything else falls back to ALPHA_BLEND. A null
+	// texture draws untextured (a white 1x1), as those calls' own pWhiteTexture fallback
+	// does. depthTest false is D3DRS_ZENABLE FALSE, which only the sun and moon ask for --
+	// no caller ever writes depth.
+	void SetMaterial(eBlendMode blend, cTexture* texture, bool depthTest = true);
 
 	// cQuadBuffer<sVertexXYZDT1>'s contract: BeginDraw opens a group, each Get hands back
-	// four vertices for one quad, EndDraw closes it. A group carries the texture
-	// SetTexture last named.
+	// four vertices for one quad, EndDraw closes it. A group carries the material
+	// SetMaterial last named.
 	void BeginDraw();
 	sVertexXYZDT1* Get();
 	void EndDraw();
@@ -93,14 +101,20 @@ private:
 	// worldquad.vert.hlsl's whole cbuffer: the original's mWVP (mWorld is identity).
 	struct VSUniform { float mvp[16]; };
 
-	// One BeginDraw..EndDraw run: the quads it collected and the texture they sample.
+	// One BeginDraw..EndDraw run: the quads it collected and the material they draw with.
 	struct Group
 	{
 		SDL_GPUTexture* texture;   // null -> the 1x1 white stand-in
+		eBlendMode blend;
+		bool depthTest;
 		int firstQuad, quadCount;
 	};
 
-	void createPipelines();
+	void createSampler();
+	bool createShaders();
+	// The blend mode and the depth test are baked into an SDL GPU pipeline, so there is one
+	// per (blend, depthTest, wireframe). Built on demand and cached -- in practice two.
+	SDL_GPUGraphicsPipeline* pipelineFor(eBlendMode blend, bool depthTest, bool wireframe);
 	// Grow the GPU vertex/index buffers to hold `quads` quads, and refill the index buffer
 	// with the two-triangle pattern. The index buffer's contents depend only on capacity.
 	bool ensureCapacity(SDL_GPUCommandBuffer* cmd, int quads);
@@ -108,11 +122,12 @@ private:
 	SDL_GPUDevice* device_ = nullptr;
 	SDL_Window*    window_ = nullptr;
 
-	// Same shaders, differing only in fill mode. FILL/LINE mirrors RS_FILLMODE.
-	SDL_GPUGraphicsPipeline* pipelineFill_ = nullptr;
-	SDL_GPUGraphicsPipeline* pipelineLine_ = nullptr;
+	SDL_GPUShader* vsShader_ = nullptr;
+	SDL_GPUShader* fsShader_ = nullptr;
+	bool shadersTried_ = false;
+	std::unordered_map<unsigned, SDL_GPUGraphicsPipeline*> pipelines_;
 	// cCoastSprites::Draw's SetSamplerDataVirtual(0, sampler_wrap_anisotropic); the wave
-	// sources inherit the scene's sampler_wrap_linear, which this rounds up to.
+	// sources and the sun inherit the scene's sampler_wrap_linear, which this rounds up to.
 	SDL_GPUSampler* sampler_ = nullptr;
 	SDL_GPUTexture* whiteTexture_ = nullptr;   // bound for an untextured group
 
@@ -124,8 +139,8 @@ private:
 
 	std::vector<sVertexXYZDT1> vertices_;   // 4 per quad
 	std::vector<Group> groups_;
-	Group current_ = {nullptr, 0, 0};       // the open BeginDraw..EndDraw run
-	SDL_GPUTexture* texture_ = nullptr;     // set by SetTexture, taken by BeginDraw
+	Group current_ = {nullptr, ALPHA_BLEND, true, 0, 0};   // the open BeginDraw..EndDraw run
+	Group material_ = {nullptr, ALPHA_BLEND, true, 0, 0};  // set by SetMaterial, taken by BeginDraw
 	bool drawing_ = false;                  // inside BeginDraw..EndDraw, with a camera
 	sVertexXYZDT1 scratch_[4];              // what Get() hands back when there is no camera
 

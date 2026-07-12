@@ -329,7 +329,7 @@ void cCoastSprites::DrawSimpleCoastSprite(Camera* camera)
 	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
 	if(!pBuf)
 		return;
-	pBuf->SetTexture(Texture_stay);
+	pBuf->SetMaterial(ALPHA_BLEND, Texture_stay);
 #endif
 	bool avi_texture = Texture_stay&&Texture_stay->IsAviScaleTexture();
 	int grid_shift = pWater->GetCoordShift();
@@ -390,7 +390,7 @@ void cCoastSprites::DrawMovingCoastSprite(Camera* camera)
 	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
 	if(!pBuf)
 		return;
-	pBuf->SetTexture(Texture_mov);
+	pBuf->SetMaterial(ALPHA_BLEND, Texture_mov);
 #endif
 	bool avi_texture = Texture_mov&&Texture_mov->IsAviScaleTexture();
 	pBuf->BeginDraw();

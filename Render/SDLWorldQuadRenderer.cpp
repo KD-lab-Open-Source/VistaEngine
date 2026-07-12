@@ -36,7 +36,7 @@ SDL_GPUTexture* sdlTextureOf(cTexture* t)
 SDLWorldQuadRenderer::SDLWorldQuadRenderer(SDL_GPUDevice* device, SDL_Window* window)
 	: device_(device), window_(window)
 {
-	createPipelines();
+	createSampler();
 }
 
 SDLWorldQuadRenderer::~SDLWorldQuadRenderer()
@@ -46,14 +46,16 @@ SDLWorldQuadRenderer::~SDLWorldQuadRenderer()
 	if(indexBuffer_)   SDL_ReleaseGPUBuffer(device_, indexBuffer_);
 	if(whiteTexture_)  SDL_ReleaseGPUTexture(device_, whiteTexture_);
 	if(sampler_)       SDL_ReleaseGPUSampler(device_, sampler_);
-	if(pipelineFill_)  SDL_ReleaseGPUGraphicsPipeline(device_, pipelineFill_);
-	if(pipelineLine_)  SDL_ReleaseGPUGraphicsPipeline(device_, pipelineLine_);
+	if(vsShader_)      SDL_ReleaseGPUShader(device_, vsShader_);
+	if(fsShader_)      SDL_ReleaseGPUShader(device_, fsShader_);
+	for(auto& kv : pipelines_)
+		if(kv.second) SDL_ReleaseGPUGraphicsPipeline(device_, kv.second);
 }
 
 // ---------------------------------------------------------------------------
 // Pipeline
 // ---------------------------------------------------------------------------
-void SDLWorldQuadRenderer::createPipelines()
+void SDLWorldQuadRenderer::createSampler()
 {
 	if(!device_ || !window_) return;
 
@@ -100,6 +102,15 @@ void SDLWorldQuadRenderer::createPipelines()
 			SDL_ReleaseGPUTransferBuffer(device_, tb);
 		}
 	}
+}
+
+bool SDLWorldQuadRenderer::createShaders()
+{
+	if(shadersTried_)
+		return vsShader_ && fsShader_;
+	shadersTried_ = true;
+	if(!device_)
+		return false;
 
 	SDL_GPUShaderFormat formats = SDL_GetGPUShaderFormats(device_);
 	SDL_GPUShaderFormat fmt;
@@ -116,26 +127,36 @@ void SDLWorldQuadRenderer::createPipelines()
 		fsCode = worldquad_frag_spv; fsSize = worldquad_frag_spv_len;
 	} else {
 		fprintf(stderr, "SDLWorldQuadRenderer: no supported shader format (0x%x)\n", formats);
-		return;
+		return false;
 	}
 
 	SDL_GPUShaderCreateInfo vsi = {};
 	vsi.code = vsCode; vsi.code_size = vsSize; vsi.entrypoint = entry;
 	vsi.format = fmt; vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
 	vsi.num_uniform_buffers = 1;    // mWVP
-	SDL_GPUShader* vs = SDL_CreateGPUShader(device_, &vsi);
+	vsShader_ = SDL_CreateGPUShader(device_, &vsi);
 
 	SDL_GPUShaderCreateInfo fsi = {};
 	fsi.code = fsCode; fsi.code_size = fsSize; fsi.entrypoint = entry;
 	fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
-	fsi.num_samplers = 1;           // the bubble atlas
-	SDL_GPUShader* fs = SDL_CreateGPUShader(device_, &fsi);   // no uniforms
+	fsi.num_samplers = 1;           // the group's texture
+	fsShader_ = SDL_CreateGPUShader(device_, &fsi);   // no uniforms
 
-	if(!vs || !fs){
+	if(!vsShader_ || !fsShader_)
 		fprintf(stderr, "SDLWorldQuadRenderer: CreateGPUShader failed: %s\n", SDL_GetError());
-		if(vs) SDL_ReleaseGPUShader(device_, vs);
-		if(fs) SDL_ReleaseGPUShader(device_, fs);
-		return;
+	return vsShader_ && fsShader_;
+}
+
+SDL_GPUGraphicsPipeline* SDLWorldQuadRenderer::pipelineFor(eBlendMode blend, bool depthTest, bool wireframe)
+{
+	const unsigned key = (unsigned)blend | ((unsigned)depthTest << 8) | ((unsigned)wireframe << 9);
+	auto it = pipelines_.find(key);
+	if(it != pipelines_.end())
+		return it->second;
+
+	if(!window_ || !createShaders()){
+		pipelines_[key] = nullptr;
+		return nullptr;
 	}
 
 	// sVertexXYZDT1: float3 position @0, D3DCOLOR diffuse @12, float2 uv @16 (stride 24).
@@ -149,11 +170,11 @@ void SDLWorldQuadRenderer::createPipelines()
 	attrs[1].location = 1; attrs[1].buffer_slot = 0; attrs[1].format = SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4_NORM; attrs[1].offset = 12;
 	attrs[2].location = 2; attrs[2].buffer_slot = 0; attrs[2].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;      attrs[2].offset = 16;
 
-	// RS_ZWRITEENABLE is off for every caller -- cCoastSprites::Draw forces it around both
-	// sprite groups, Camera::DrawSortObject around the whole sorted pass the wave sources
-	// draw in -- and SetWorldMaterial(ALPHA_BLEND, ...) picks the blend. (ONE, 1-SRC_ALPHA)
-	// rather than the original's (SRC_ALPHA, 1-SRC_ALPHA) because the textures decode
-	// premultiplied and the shaders keep it that way -- see worldquad.frag.hlsl.
+	// The blend the caller's SetWorldMaterial / SetNoMaterial asked for. Both are written
+	// with a premultiplied source, because the textures decode premultiplied and the
+	// shaders keep them that way (see worldquad.frag.hlsl): ALPHA_BLEND's D3D
+	// (SRC_ALPHA, 1-SRC_ALPHA) becomes (ONE, 1-SRC_ALPHA), and ALPHA_ADDBLENDALPHA's
+	// (SRC_ALPHA, ONE) becomes (ONE, ONE). Both emit the pixel the original does.
 	SDL_GPUColorTargetDescription colorTarget = {};
 	colorTarget.format = SDL_GetGPUSwapchainTextureFormat(device_, window_);
 	SDL_GPUColorTargetBlendState& bs = colorTarget.blend_state;
@@ -161,22 +182,33 @@ void SDLWorldQuadRenderer::createPipelines()
 	bs.color_blend_op = SDL_GPU_BLENDOP_ADD;
 	bs.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
 	bs.src_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
-	bs.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
 	bs.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
-	bs.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+	if(blend == ALPHA_ADDBLENDALPHA){
+		bs.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+		bs.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+	}
+	else{
+		bs.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+		bs.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+	}
 
 	SDL_GPUGraphicsPipelineCreateInfo pci = {};
-	pci.vertex_shader = vs;
-	pci.fragment_shader = fs;
+	pci.vertex_shader = vsShader_;
+	pci.fragment_shader = fsShader_;
 	pci.vertex_input_state.vertex_buffer_descriptions = &vbDesc;
 	pci.vertex_input_state.num_vertex_buffers = 1;
 	pci.vertex_input_state.vertex_attributes = attrs;
 	pci.vertex_input_state.num_vertex_attributes = 3;
 	pci.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
-	pci.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
-	// Camera::DrawObjectSpecial forces D3DCULL_NONE for the whole node type.
+	pci.rasterizer_state.fill_mode = wireframe ? SDL_GPU_FILLMODE_LINE : SDL_GPU_FILLMODE_FILL;
+	// Camera::DrawObjectSpecial and DrawSortObject both force D3DCULL_NONE for their whole
+	// node, and cSunMoonObj::Draw sets it itself.
 	pci.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
-	pci.depth_stencil_state.enable_depth_test = true;
+	// RS_ZWRITEENABLE is off for every caller: cCoastSprites::Draw forces it around both
+	// sprite groups, Camera::DrawSortObject around the sorted pass the wave sources draw
+	// in, and the sky camera carries ATTRCAMERA_NOZWRITE. The sun and moon go further and
+	// turn the depth *test* off too (D3DRS_ZENABLE FALSE), so they sit behind everything.
+	pci.depth_stencil_state.enable_depth_test = depthTest;
 	pci.depth_stencil_state.enable_depth_write = false;
 	pci.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
 	pci.target_info.color_target_descriptions = &colorTarget;
@@ -184,17 +216,12 @@ void SDLWorldQuadRenderer::createPipelines()
 	pci.target_info.has_depth_stencil_target = true;
 	pci.target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
 
-	pipelineFill_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
-
-	// Wireframe variant (RS_FILLMODE == FILL_WIREFRAME). Same everything but LINE fill.
-	pci.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_LINE;
-	pipelineLine_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
-
-	SDL_ReleaseGPUShader(device_, vs);
-	SDL_ReleaseGPUShader(device_, fs);
-
-	fprintf(stderr, "SDLWorldQuadRenderer: worldquad pipeline %s (wireframe %s)\n",
-	        pipelineFill_ ? "ready" : "FAILED", pipelineLine_ ? "ready" : "FAILED");
+	SDL_GPUGraphicsPipeline* pipeline = SDL_CreateGPUGraphicsPipeline(device_, &pci);
+	if(!pipeline)
+		fprintf(stderr, "SDLWorldQuadRenderer: pipeline (blend %d, depthTest %d) failed: %s\n",
+		        (int)blend, (int)depthTest, SDL_GetError());
+	pipelines_[key] = pipeline;
+	return pipeline;
 }
 
 // ---------------------------------------------------------------------------
@@ -220,14 +247,16 @@ void SDLWorldQuadRenderer::SetCamera(Camera* camera)
 	cameraValid_ = true;
 }
 
-void SDLWorldQuadRenderer::SetTexture(cTexture* texture)
+void SDLWorldQuadRenderer::SetMaterial(eBlendMode blend, cTexture* texture, bool depthTest)
 {
-	texture_ = sdlTextureOf(texture);
+	material_.texture = sdlTextureOf(texture);
+	material_.blend = blend;
+	material_.depthTest = depthTest;
 }
 
 void SDLWorldQuadRenderer::BeginDraw()
 {
-	current_.texture = texture_;
+	current_ = material_;
 	current_.firstQuad = (int)(vertices_.size() / 4);
 	current_.quadCount = 0;
 	drawing_ = cameraValid_;
@@ -318,9 +347,7 @@ bool SDLWorldQuadRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
                                 int screenW, int screenH, bool clear, const float clearColor[4],
                                 bool clearDepth, bool wireframe)
 {
-	// Fall back to the solid pipeline if the LINE variant failed to build.
-	SDL_GPUGraphicsPipeline* pipeline = (wireframe && pipelineLine_) ? pipelineLine_ : pipelineFill_;
-	if(!device_ || !pipeline || !cmd || !target || !depth || groups_.empty())
+	if(!device_ || !cmd || !target || !depth || groups_.empty())
 		return false;
 
 	const int quads = (int)(vertices_.size() / 4);
@@ -369,18 +396,26 @@ bool SDLWorldQuadRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 	vp.MinZ = vpMinZ_; vp.MaxZ = vpMaxZ_;
 	applyCameraViewport(pass, vp, screenW, screenH);
 
-	SDL_BindGPUGraphicsPipeline(pass, pipeline);
-	SDL_PushGPUVertexUniformData(cmd, 0, &vs_, sizeof(vs_));
-
-	SDL_GPUBufferBinding vb = {}; vb.buffer = vertexBuffer_; vb.offset = 0;
-	SDL_BindGPUVertexBuffers(pass, 0, &vb, 1);
-	SDL_GPUBufferBinding ib = {}; ib.buffer = indexBuffer_; ib.offset = 0;
-	SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_32BIT);
-
 	// One group per BeginDraw..EndDraw run, replayed in the order the caller made them:
 	// cCoastSprites' stay sprites then its moving ones, or one group per wave source.
+	SDL_GPUGraphicsPipeline* boundPipeline = nullptr;
 	SDL_GPUTexture* boundTexture = nullptr;
 	for(const Group& g : groups_){
+		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(g.blend, g.depthTest, wireframe);
+		if(!pipeline) continue;
+		if(pipeline != boundPipeline){
+			SDL_BindGPUGraphicsPipeline(pass, pipeline);
+			SDL_PushGPUVertexUniformData(cmd, 0, &vs_, sizeof(vs_));
+
+			SDL_GPUBufferBinding vb = {}; vb.buffer = vertexBuffer_; vb.offset = 0;
+			SDL_BindGPUVertexBuffers(pass, 0, &vb, 1);
+			SDL_GPUBufferBinding ib = {}; ib.buffer = indexBuffer_; ib.offset = 0;
+			SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_32BIT);
+
+			boundPipeline = pipeline;
+			boundTexture = nullptr;   // bindings do not survive a pipeline change
+		}
+
 		SDL_GPUTexture* texture = g.texture ? g.texture : whiteTexture_;
 		if(texture != boundTexture){
 			SDL_GPUTextureSamplerBinding ts = {};

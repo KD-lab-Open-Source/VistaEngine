@@ -3339,11 +3339,15 @@ void cObject3dx::DrawAll(Camera* camera)
 	if(is_opacity)
 	{
 		camera->SetCameraPass(SCENENODE_OBJECTSORT);
+#ifdef _WIN32
 		DWORD old_cullmode=gb_RenderDevice3D->GetRenderState(D3DRS_CULLMODE);
-		gb_RenderDevice3D->SetRenderState( RS_ZWRITEENABLE, FALSE );
+#endif
+		gb_RenderDevice->SetRenderState( RS_ZWRITEENABLE, FALSE );
 		Draw(camera);
-		gb_RenderDevice3D->SetRenderState( RS_ZWRITEENABLE, TRUE );
+		gb_RenderDevice->SetRenderState( RS_ZWRITEENABLE, TRUE );
+#ifdef _WIN32
 		gb_RenderDevice3D->SetRenderState( D3DRS_CULLMODE, old_cullmode );
+#endif
 	}
 	camera->SetCameraPass(old_pass);
 }
