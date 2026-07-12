@@ -84,6 +84,8 @@ cbuffer Material : register(b0, space3)
     // x != 0 = sample the shadow map, y != 0 = 2x2 filter (the original's FILTER_SHADOW,
     // a static shader define there, Option_filterShadow here).
     float4 ShadowParams;
+    // Distance fog: D3DRS_FOGCOLOR. The factor arrives interpolated, in VSOutput::Fog.
+    float4 FogColor;
 };
 
 // shadow9700.inl's `#define ccx 0.0005`: the 2x2 tap offset, in shadow-map uv. That is
@@ -104,6 +106,7 @@ struct VSOutput
     float3 Specular  : COLOR1;
     float2 UV        : TEXCOORD0;
     float4 ShadowPos : TEXCOORD3;
+    float  Fog       : TEXCOORD4;
 };
 
 // Shadow9700 from Render/shader/Skin/shadow9700.inl. One deliberate difference: it
@@ -208,6 +211,11 @@ float4 main(VSOutput input) : SV_Target0
 
     if(Params.x > 0.0f)
         clip(ot.a - Params.x);
+
+    // Fog last, where D3D9's fixed function applied it: to the finished pixel, before the
+    // blend. Colour only -- the alpha still carries the material's own transparency, so a
+    // distant object recedes into the fog instead of being tinted by it.
+    ot.rgb = lerp(FogColor.rgb, ot.rgb, saturate(input.Fog));
 
     return ot;
 }

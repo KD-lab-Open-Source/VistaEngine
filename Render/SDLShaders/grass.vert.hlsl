@@ -75,6 +75,12 @@ cbuffer Constants : register(b0, space1)
     // z: OLD_LIGHTING. A static define in the original, chosen by VSGrass::SetOldLighting
     //    from GrassMap::oldLighting (which is serialized per world), so it must be a uniform.
     float4 Params;
+
+    // Distance fog, from cSDLRenderDevice::fogPlane(camera): fog = dot(float4(world,1), it).
+    // The original computed this here too (`o.fog = mul(pos,mView).z*vFog.z + vFog.y`), for
+    // the cards with no table fog; the plane form is the same factor with the view matrix
+    // folded in. (0,0,0,1) means fog is off. See SDLRenderDevice.h.
+    float4 FogPlane;
 };
 
 struct VSInput
@@ -108,6 +114,7 @@ struct VSOutput
     float2 UV         : TEXCOORD0;
     float4 ShadowPos  : TEXCOORD1;
     float2 LightmapUV : TEXCOORD2;
+    float  Fog        : TEXCOORD3;
 };
 
 VSOutput main(VSInput input)
@@ -177,5 +184,6 @@ VSOutput main(VSInput input)
 
     output.ShadowPos  = mul(world, Shadow);
     output.LightmapUV = (world.xy - PlanarNode.xy) * PlanarNode.zw;
+    output.Fog        = dot(world, FogPlane);
     return output;
 }

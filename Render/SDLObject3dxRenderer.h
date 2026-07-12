@@ -138,7 +138,7 @@ public:
 
 private:
 	// The vertex uniform block's fixed head, laid out to match object3dx.vert.hlsl up to
-	// (but not including) its World[] array: MVP, eight float4s, then the shadow matrix.
+	// (but not including) its World[] array.
 	struct VSHead
 	{
 		float mvp[16];
@@ -147,7 +147,18 @@ private:
 		float uTrans[4], vTrans[4];
 		float params[4];            // x = boneCount, y = noLight
 		float shadow[16];           // shadowMatViewProj() * shadowMatBias()
+		float fogPlane[4];          // cSDLRenderDevice::fogPlane(camera)
 	};
+
+	// The most bone poses one material group can reference: StaticBunch::max_index, and
+	// MAX_BONES in object3dx.vert.hlsl. Not Static3dxBase.h's MAX_BONES, which is the 4
+	// bones a single *vertex* may be weighted to.
+	static const int MAX_BONE_POSES = 20;
+	// The vertex cbuffer is always pushed whole, so the shader's World[60] is fully backed
+	// even though a bunch rarely uses all 20 bones. Derived from VSHead and never counted by
+	// hand: the draws push into a stack array of this size and memcpy sizeof(VSHead) into
+	// its front, so a field added above must widen this too, or they run off the end.
+	static const int VS_UNIFORM_FLOATS = sizeof(VSHead) / sizeof(float) + MAX_BONE_POSES * 3 * 4;
 	// The whole of object3dx.frag.hlsl's cbuffer.
 	struct FSUniform
 	{
@@ -159,6 +170,7 @@ private:
 		float params2[4];           // x = specular map present
 		float shade[4];             // vShade: a fully shadowed pixel's multiplier
 		float shadowParams[4];      // x = this material receives shadows
+		float fogColor[4];          // D3DRS_FOGCOLOR
 	};
 
 	// A state snapshot shared by every draw recorded under it.

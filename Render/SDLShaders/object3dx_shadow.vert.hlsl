@@ -22,6 +22,12 @@
 
 #define MAX_BONES 20
 
+// The SAME block the lit path pushes (SDLObject3dxRenderer::VSHead, then the bone rows) --
+// the caster pass reuses it whole rather than building a second one, and only reads MVP,
+// Params and World. So every field must be declared here, in order, even the ones this
+// shader never touches: drop one and World[] slides forward, the bones are read from the
+// wrong offsets, and the casters come out as garbage. Keep it in step with
+// object3dx.vert.hlsl.
 cbuffer Constants : register(b0, space1)
 {
     row_major float4x4 MVP;      // the light camera's matViewProj
@@ -34,6 +40,7 @@ cbuffer Constants : register(b0, space1)
     float4 VTrans;
     float4 Params;               // x = bone count per vertex (1..4)
     row_major float4x4 Shadow;   // the lit path's receiver matrix; unused here
+    float4 FogPlane;             // the lit path's fog plane; unused here
     float4 World[MAX_BONES * 3];
 };
 

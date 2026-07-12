@@ -64,6 +64,13 @@ cbuffer Constants : register(b0, space1)
     // ShadowParams.x, not on this.
     row_major float4x4 Shadow;
 
+    // Distance fog, from cSDLRenderDevice::fogPlane(camera): fog = dot(float4(world,1), it).
+    // The original object shaders have no fog term to port -- D3D fogged them in fixed
+    // function, per pixel (D3DFOG_LINEAR table fog), after the pixel shader ran. (0,0,0,1)
+    // means fog is off, making the fragment shader's lerp the identity. See SDLRenderDevice.h.
+    // It must stay ahead of World[], which is the tail the bone matrices are pushed into.
+    float4 FogPlane;
+
     // mWorldM[20] as 20 x 3 rows of (R | T): world.k = dot(float4(pos,1), World[3i+k]).
     // The original ships the same 3 registers per bone (setMatrix4x3VS).
     float4 World[MAX_BONES * 3];
@@ -98,6 +105,7 @@ struct VSOutput
     float3 Specular  : COLOR1;
     float2 UV        : TEXCOORD0;
     float4 ShadowPos : TEXCOORD3;   // the original's o.tshadow
+    float  Fog       : TEXCOORD4;
 };
 
 VSOutput main(VSInput input)
@@ -139,6 +147,7 @@ VSOutput main(VSInput input)
     // The original's `o.tshadow = mul(world_pos4, mShadow)`. Left unprojected: the
     // fragment shader divides, so the TSM warp the light matrix may carry survives.
     output.ShadowPos = mul(float4(worldPos, 1.0f), Shadow);
+    output.Fog = dot(float4(worldPos, 1.0f), FogPlane);
 
     // --- uv (uvtrans.inl) ---------------------------------------------------
     if(UTrans.w != 0.0f){

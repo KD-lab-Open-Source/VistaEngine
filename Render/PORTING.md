@@ -28,12 +28,12 @@ grep -rn "TODO(sdl-port)" --include=*.cpp --include=*.h .
 | # | Feature | Now lives in |
 |---|---------|--------------|
 | 1 | **Grass** | `Render/SDLGrassRenderer.{h,cpp}` + `Render/SDLShaders/grass.{vert,frag}.hlsl`, driven from `GrassMap::Draw`/`DrawGrass` as the original drove `VSGrass`/`PSGrass`. Everything but the draw (tile grid, blade generation, sort, buffers) had always been portable. The alpha test (`D3DRS_ALPHAREF 100`) has no SDL GPU equivalent and became a `clip()` in the fragment shader. |
+| 2 | **Distance fog** | `cSDLRenderDevice::SetGlobalFog` + `fogPlane()`, and a `lerp(FogColor, rgb, saturate(fog))` at the end of the terrain, object, grass and water fragment shaders. Driven from `Environment::graphQuant`, as before. **Not fogged yet: the world-quad renderer** (particles, sun/moon, coast foam) — additive blending needs the original's `FIX_FOG_ADD_BLEND` treatment (scale the contribution by the factor) rather than a lerp toward the fog colour, which would *add* it. The under-water post-effect's fog override is blocked on #6. |
 
 ## Features with no SDL path
 
 | # | Feature | Where it died | What the original did |
 |---|---------|---------------|-----------------------|
-| 2 | **Distance fog** | `cSDLRenderDevice::SetGlobalFog` is a no-op; `Environment::graphQuant` no longer sets it | D3D fixed-function global fog, colour + range driven by the time of day. Affects every world shader. |
 | 3 | **The perimeter field dome** | `VistaRender/Field.cpp` — `FieldDispatcher::Draw` | The game's signature effect: an additive `sVertexXYZDT2` tile strip over the water, sampling the reflection texture. |
 | 4 | **Lava + ice terrain materials** | `cTileMap::setMaterial` (deleted); `Water/ice.cpp` — `cTemperature::Draw` | `ShaderSceneWaterLava` / `ShaderSceneWaterIce` over the placement-zone materials. |
 | 5 | **Cloud shadows** | `Water/CloudShadow.cpp` — `cCloudShadow::Draw` | `VSCloudShadow`/`PSCloudShadow`, a scrolling shadow layer modulated by sun elevation. |

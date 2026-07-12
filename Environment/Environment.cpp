@@ -260,9 +260,22 @@ void Environment::graphQuant(float dt, Camera* camera)
 	if(water_)
 		water_->SetCurReflectSkyColor(environmentTime_->GetCurReflectSkyColor());
 
-	// TODO(sdl-port): four things the original did here are gone with D3D9 --
+	// Distance fog: the colour comes from the time of day, the near and far planes from the
+	// world, scaled into the camera's actual depth range. A negative range means "off", which
+	// is how cD3DRender::SetGlobalFog read it too.
+	if(isFogEnabled() && !isFogTempDisabled()){
+		// TODO(sdl-port): the under-water post-effect used to override the fog planes here
+		// (PostEffectUnderWater::setFog), pulling them in as the camera sinks. The whole
+		// post-effect stack is unported -- PORTING.md #6 -- so the world's own fog stands.
+		float range = camera->GetZPlane().y/max(GetGameFrustrumZMaxHorizontal(),GetGameFrustrumZMaxVertical());
+		gb_RenderDevice->SetGlobalFog(Color4f(environmentTime()->GetCurFogColor()),
+		                              Vect2f(fogStart()*range, fogEnd()*range));
+	}
+	else
+		gb_RenderDevice->SetGlobalFog(Color4f(environmentTime()->GetCurFogColor()), Vect2f(-1, -2));
+
+	// TODO(sdl-port): three things the original did here are gone with D3D9 --
 	//   the sky cubemap (environmentTime()->Draw()),      PORTING.md #9
-	//   distance fog (gb_RenderDevice->SetGlobalFog),     PORTING.md #2
 	//   the lens flare and the screen flash,              PORTING.md #6
 	//   fieldOfViewMap_->updateTexture().                 PORTING.md #10
 	// Everything they drive (the time-of-day colours, the sun position and size, the

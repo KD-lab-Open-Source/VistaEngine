@@ -114,6 +114,7 @@ private:
 		float lightDir[4];
 		float sunDiffuse[4];
 		float params[4];        // x = time, y = hideDistance, z = oldLighting
+		float fogPlane[4];      // cSDLRenderDevice::fogPlane(camera)
 	};
 	// The whole of grass.frag.hlsl's cbuffer.
 	struct FSUniform
@@ -122,6 +123,7 @@ private:
 		float shadowParams[4];    // x = receives shadow, y = 2x2 filter
 		float lightMapParams[4];  // x = the lightmap holds this frame's lights
 		float params[4];          // x = the alpha-test reference (D3DRS_ALPHAREF/255)
+		float fogColor[4];        // D3DRS_FOGCOLOR
 	};
 
 	// One SetState's worth: every draw recorded under it replays with these.

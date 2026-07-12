@@ -60,6 +60,8 @@ cbuffer Constants : register(b0, space3)
     float4 LightMapParams;
     // x: the alpha-test reference, D3DRS_ALPHAREF/255. See the note on clip() above.
     float4 Params;
+    // Distance fog: D3DRS_FOGCOLOR. The factor arrives interpolated, in VSOutput::Fog.
+    float4 FogColor;
 };
 
 struct VSOutput
@@ -69,6 +71,7 @@ struct VSOutput
     float2 UV         : TEXCOORD0;
     float4 ShadowPos  : TEXCOORD1;
     float2 LightmapUV : TEXCOORD2;
+    float  Fog        : TEXCOORD3;
 };
 
 // shadow9700.inl's `#define ccx 0.0005`: the 2x2 tap offset, in shadow-map uv. The same
@@ -126,6 +129,11 @@ float4 main(VSOutput input) : SV_Target0
         float lit = shadowLit(input.ShadowPos);
         ot.rgb *= ShadeIntensity.rgb * (1.0f - lit) + lit;
     }
+
+    // Fog last, as D3D9's fixed function applied it: to the finished pixel, before the
+    // blend. Only the colour is fogged -- the alpha still carries the blade's own fade and
+    // the alpha test above, so a blade dissolves into the fog rather than being tinted by it.
+    ot.rgb = lerp(FogColor.rgb, ot.rgb, saturate(input.Fog));
 
     return ot;
 }

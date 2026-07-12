@@ -48,6 +48,11 @@ cbuffer Constants : register(b0, space1)
     // view-projection, post-multiplied by the clip->uv adjust. Only read when
     // REFLECTION, but declared either way so one C++ uniform struct serves both.
     row_major float4x4 MirrorVP;
+    // Distance fog, from cSDLRenderDevice::fogPlane(camera): fog = dot(float4(world,1), it).
+    // water_easy.vsl wrote the same factor by hand (`o.fog = mul(pos,mView).z*vFog.z+vFog.y`)
+    // for the cards with no table fog; the plane form folds the view matrix in. (0,0,0,1)
+    // means fog is off. See SDLRenderDevice.h.
+    float4 FogPlane;
 };
 
 struct VSInput
@@ -69,6 +74,7 @@ struct VSOutput
     float4 UVSky    : TEXCOORD2;   // projective: sample as UVSky.xy/UVSky.w
     float3 PointPos : TEXCOORD3;   // world position, for the eye vector
 #endif
+    float  Fog      : TEXCOORD4;
 };
 
 VSOutput main(VSInput input)
@@ -82,5 +88,6 @@ VSOutput main(VSInput input)
     output.UVSky    = mul(float4(input.Position, 1.0f), MirrorVP);
     output.PointPos = input.Position;
 #endif
+    output.Fog = dot(float4(input.Position, 1.0f), FogPlane);
     return output;
 }

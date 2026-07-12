@@ -790,13 +790,58 @@ void cSDLRenderDevice::SetRenderState(eRenderStateOption state, int value)
 		fillMode_ = value;
 	else if(state == RS_ZWRITEENABLE)
 		zWriteEnable_ = value != 0;
+	else if(state == RS_FOGENABLE)
+		fogEnable_ = value != 0;
 }
 
 unsigned int cSDLRenderDevice::GetRenderState(eRenderStateOption state)
 {
 	if(state == RS_FILLMODE) return (unsigned int)fillMode_;
 	if(state == RS_ZWRITEENABLE) return zWriteEnable_ ? 1u : 0u;
+	if(state == RS_FOGENABLE) return fogEnable_ ? 1u : 0u;
 	return 0u;
+}
+
+// ---------------------------------------------------------------------------
+// Distance fog. See the long note in the header.
+// ---------------------------------------------------------------------------
+void cSDLRenderDevice::SetGlobalFog(const Color4f& color, const Vect2f& range)
+{
+	fogColor_ = color;
+
+	// A negative plane is Environment::graphQuant saying "no fog" -- it passes (-1,-2) --
+	// and cD3DRender read it the same way.
+	if(range.x < 0.f || range.y < 0.f){
+		SetRenderState(RS_FOGENABLE, FALSE);
+		return;
+	}
+
+	// cD3DRender clamped the same degenerate case: start == end would divide by zero below.
+	fogRange_ = range;
+	const float minSize = 1.f;
+	if(!(fogRange_.x + minSize < fogRange_.y))
+		fogRange_.y = fogRange_.x + minSize;
+
+	SetRenderState(RS_FOGENABLE, TRUE);
+}
+
+Vect4f cSDLRenderDevice::fogPlane(Camera* camera) const
+{
+	// fog == 1 everywhere: the fragment shaders' lerp(FogColor, rgb, saturate(fog)) is then
+	// the identity, so "no fog" costs nothing and needs no variant.
+	if(!fogEnable_ || !camera)
+		return Vect4f(0.f, 0.f, 0.f, 1.f);
+
+	// The D3D linear fog factor, (end - viewZ) / (end - start), written as viewZ*c + b.
+	const float c = -1.f / (fogRange_.y - fogRange_.x);
+	const float b =  fogRange_.y / (fogRange_.y - fogRange_.x);
+
+	// viewZ is a plane equation over the world position: Mat4f is row-major and the engine
+	// multiplies row-vector-first (v' = v*M), so
+	//     viewZ = world.x*_13 + world.y*_23 + world.z*_33 + _43
+	// Folding the factor's own c and b in leaves one dot product for the vertex shader.
+	const Mat4f& view = camera->matView;
+	return Vect4f(view._13 * c, view._23 * c, view._33 * c, view._43 * c + b);
 }
 
 // ---------------------------------------------------------------------------

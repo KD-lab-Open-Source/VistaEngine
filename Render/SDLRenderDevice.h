@@ -192,6 +192,33 @@ public:
 	const Vect4f& planarTransform() const { return planarTransform_; }
 	void SetShadowMatViewProj(const Mat4f& m) { shadowMatViewProj_ = m; }
 	const Mat4f& shadowMatViewProj() const { return shadowMatViewProj_; }
+
+	// --- Distance fog --------------------------------------------------------
+	// Environment::graphQuant sets the colour and the near/far range each frame from the
+	// time of day; a negative range turns fog off, exactly as cD3DRender::SetGlobalFog read
+	// it. Code that must not be fogged (the sky scene, the 2D pass) toggles RS_FOGENABLE
+	// around itself, as it always did.
+	//
+	// D3D9 did this in fixed function -- D3DRS_FOGTABLEMODE = D3DFOG_LINEAR, i.e. per-pixel
+	// fog over eye depth, applied to the shader's output colour before blending. That is why
+	// the terrain and object shaders have no fog term of their own to port: the rasterizer
+	// fogged them. (The `oFog` some .vsl files do write was the vertex-fog fallback, for the
+	// cards that had no table fog. Same linear formula, same constants.)
+	//
+	// There is no fixed-function fog here, so every world fragment shader ends with
+	//     rgb = lerp(FogColor, rgb, saturate(fog))
+	// and its vertex shader gets the fog factor from ONE float4:
+	//
+	//     fog = dot(float4(worldPos, 1), fogPlane(camera))
+	//
+	// The factor is linear in view-space z -- (end - z)/(end - start), the D3D formula
+	// verbatim -- so it collapses into a plane equation, and interpolating it across a
+	// triangle is the same thing as evaluating it per pixel. When fog is off the plane is
+	// (0,0,0,1): fog == 1, and the lerp above is exactly the identity. No shader branch,
+	// no pipeline variant.
+	void SetGlobalFog(const Color4f& color, const Vect2f& range) override;
+	const Color4f& fogColor() const { return fogColor_; }
+	Vect4f fogPlane(Camera* camera) const;
 	// Light clip space -> shadow map texture coordinates.
 	Mat4f shadowMatBias() const;
 	// The terrain caster, from cTileMap::Draw under the light camera -- where the D3D
@@ -287,8 +314,6 @@ public:
 	// rest of the D3D render states have no SDL GPU equivalent outside a pipeline object.
 	void SetRenderState(eRenderStateOption, int) override;
 	unsigned int GetRenderState(eRenderStateOption) override;
-	// TODO(sdl-port): there is no distance fog at all. See Render/PORTING.md #2.
-	void SetGlobalFog(const Color4f&, const Vect2f&) override {}
 	// Sticky sampler state, as it is on D3D, where this sets one global the scene and the UI
 	// both draw with. Each renderer bakes its own sampler for its own geometry; only the UI
 	// takes this one, because only its callers change it (the selection frame asks for wrap
@@ -476,6 +501,14 @@ private:
 	bool  bActiveScene_ = false;
 	int   fillMode_ = FILL_SOLID;   // RS_FILLMODE; FILL_WIREFRAME switches renderers to line pipelines
 	bool  zWriteEnable_ = true;     // RS_ZWRITEENABLE; picks the object pipeline's depth write
+
+	// RS_FOGENABLE. SetGlobalFog sets it, and the sky scene and the 2D pass clear it around
+	// themselves -- the same one state cD3DRender kept, saved and restored.
+	bool    fogEnable_ = false;
+	Color4f fogColor_ = Color4f(0.f, 0.f, 0.f, 0.f);
+	// D3DRS_FOGSTART / D3DRS_FOGEND: where the fog begins and where it is total, measured in
+	// world units along the camera's view axis. fogPlane() turns them into the factor.
+	Vect2f  fogRange_ = Vect2f(0.f, 1.f);
 
 	std::unique_ptr<SDLUIRenderer>        uiRenderer_;
 	std::unique_ptr<SDLTileMapRenderer>   tileMapRenderer_;

@@ -291,6 +291,13 @@ void SDLGrassRenderer::SetState(const State& state, Camera* camera)
 	c.fs.lightMapParams[0] = lightMap ? 1.f : 0.f;
 	c.fs.params[0] = ALPHA_REF;
 
+	// Distance fog. Off -> (0,0,0,1), i.e. factor 1, and the shader's lerp is the identity.
+	const Vect4f fogPlane = dev ? dev->fogPlane(camera) : Vect4f(0.f, 0.f, 0.f, 1.f);
+	c.vs.fogPlane[0] = fogPlane.x; c.vs.fogPlane[1] = fogPlane.y;
+	c.vs.fogPlane[2] = fogPlane.z; c.vs.fogPlane[3] = fogPlane.w;
+	const Color4f fog = dev ? dev->fogColor() : Color4f(0.f, 0.f, 0.f, 0.f);
+	c.fs.fogColor[0] = fog.r; c.fs.fogColor[1] = fog.g; c.fs.fogColor[2] = fog.b; c.fs.fogColor[3] = fog.a;
+
 	c.texture = state.texture
 	          ? reinterpret_cast<SDL_GPUTexture*>(state.texture->GetDDSurface(0))
 	          : nullptr;

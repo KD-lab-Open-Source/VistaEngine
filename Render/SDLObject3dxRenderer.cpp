@@ -19,15 +19,6 @@
 
 namespace {
 
-// The most bone poses one material group can reference: StaticBunch::max_index, and
-// MAX_BONES in object3dx.vert.hlsl. Not Static3dxBase.h's MAX_BONES, which is the 4 bones
-// a single *vertex* may be weighted to.
-const int MAX_BONE_POSES = 20;
-
-// The vertex cbuffer is always pushed whole, so the shader's World[60] is fully backed
-// even though a bunch rarely uses all 20 bones: MVP + 8 float4s + mShadow + 60 float4s.
-const int VS_UNIFORM_FLOATS = 16 + 8 * 4 + 16 + MAX_BONE_POSES * 3 * 4;   // 304 -> 1216 bytes
-
 // D3DRS_ALPHAREF the original sets for ALPHA_TEST (BLEND_STATE_ALPHA_REF in D3DRender.h).
 const float ALPHA_TEST_REF = 80.f / 255.f;
 
@@ -501,6 +492,17 @@ void SDLObject3dxRenderer::SetState(const State& state, Camera* camera)
 	// Option_filterShadow to StaticSelect); a uniform here, so it costs no extra variant.
 	current_.fs.shadowParams[1] = (current_.shadowTexture && Option_filterShadow) ? 1.f : 0.f;
 	current_.fs.shadowParams[2] = current_.fs.shadowParams[3] = 0.f;
+
+	// Distance fog. The plane folds in this camera's view matrix, so a model drawn into the
+	// reflection fogs by its own depth -- and the sky camera, which turns RS_FOGENABLE off
+	// around its scene, gets (0,0,0,1): factor 1, and the shader's lerp is the identity. That
+	// is what keeps the clouds out of the fog, as the original's FOGENABLE guard did.
+	const Vect4f fogPlane = owner_->fogPlane(camera);
+	current_.vs.fogPlane[0] = fogPlane.x; current_.vs.fogPlane[1] = fogPlane.y;
+	current_.vs.fogPlane[2] = fogPlane.z; current_.vs.fogPlane[3] = fogPlane.w;
+	const Color4f fog = owner_->fogColor();
+	current_.fs.fogColor[0] = fog.r; current_.fs.fogColor[1] = fog.g;
+	current_.fs.fogColor[2] = fog.b; current_.fs.fogColor[3] = fog.a;
 
 	current_.blend = state.blend;
 	current_.skinned = boneCount > 1;

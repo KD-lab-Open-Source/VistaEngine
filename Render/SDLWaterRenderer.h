@@ -121,6 +121,7 @@ private:
 		float uvScaleOffset[4];
 		float uvScaleOffset1[4];
 		float mirrorVP[16];
+		float fogPlane[4];   // cSDLRenderDevice::fogPlane(camera)
 	};
 	// water.frag.hlsl's whole cbuffer, likewise. params.x is fBrightnes.
 	struct FSUniform
@@ -131,6 +132,7 @@ private:
 		float lightDirection[4];
 		float cameraPos[4];
 		float params[4];
+		float fogColor[4];   // D3DRS_FOGCOLOR
 	};
 
 	// One tile range of the surface grid. Every draw in a frame shares the one state

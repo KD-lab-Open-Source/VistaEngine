@@ -323,6 +323,12 @@ void cSkyObj::DrawSky(Camera* pGlobalCamera,bool hdr_alpha)
 	Vect2f zPlane(1e3f,1e5f);
 	pNormalCamera->SetFrustum(0,0,0,&zPlane);
 
+	// The sky is not fogged. Its frustum reaches 1e5, so everything in it sits far beyond
+	// the fog's far plane -- leave fog on and the whole sky, sun included, comes out a flat
+	// slab of fog colour. The original disabled it here for exactly that reason; the guard
+	// went with the D3D9 backend and comes back now that there is fog to disable again.
+	DWORD old_fogenable = gb_RenderDevice->GetRenderState(RS_FOGENABLE);
+	gb_RenderDevice->SetRenderState(RS_FOGENABLE, FALSE);
 
 	vector<SkyElement>::iterator it;
 	pNormalCamera->SetSunMoonObj(&sunMoonObj);
@@ -334,6 +340,8 @@ void cSkyObj::DrawSky(Camera* pGlobalCamera,bool hdr_alpha)
 
 	pSkyScene->Draw(pNormalCamera);
 	//DrawSun(pGlobalCamera);
+
+	gb_RenderDevice->SetRenderState(RS_FOGENABLE, old_fogenable);
 
 
 	pNormalCamera->SetRenderTarget((IDirect3DSurface9*)0,0);
