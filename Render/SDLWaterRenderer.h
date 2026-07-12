@@ -29,7 +29,7 @@
 // Still to come: WATER_REFLECTION samples the sky cubemap, which has no SDL path yet, and
 // WATER_LAVA has its own shader pair. Also missing, each an input the SDL backend does not
 // have: the fog-of-war lightmap, fog, the FLOAT_ZBUFFER soft shoreline, and the
-// environment-water border tiles (cWater::InitBorder is guarded off-Windows).
+// environment-water border tiles.
 
 #include "IRenderDevice.h"    // cTexture, sPtrVertexBuffer, sPtrIndexBuffer
 #include <vector>

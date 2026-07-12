@@ -170,21 +170,29 @@ private:
 	const Node& back() const;
 };
 
-#ifndef _WIN32
-// Off-Windows customization point for InPlaceIArchive::construct(). The saved
-// image is a raw 32-bit memory dump, so it cannot be cast to a live 64-bit
-// object (offsets are 32-bit, struct strides/padding are 32-bit). Each concrete
-// type instead provides a reader `inPlaceReconstruct(T*, image, size)` (found by
-// ordinary lookup / ADL where T is complete) that rebuilds a real native object
-// from the raw image bytes. This primary template is the fallback for types
-// that have no portable reader yet.
+// Customization point for InPlaceIArchive::construct().
+//
+// The saved image is a raw *32-bit* memory dump: its offsets are 32-bit, and its struct
+// strides and padding are 32-bit. The original engine was a 32-bit process, so it could
+// relocate the image in place and cast the result straight to a live object. We are 64-bit
+// everywhere, and that trick cannot work here -- writing a 64-bit base into a 32-bit slot
+// truncates it.
+//
+// So each concrete type provides a reader `inPlaceReconstruct(T*, image, size)` (found by
+// ordinary lookup / ADL where T is complete) that reads the 32-bit offsets by hand and
+// rebuilds a real native object. This primary template is the fallback for types that have
+// no reader; it asserts rather than hand back a bogus object.
+//
+// The only type that actually reaches it today is LibraryWrapperBase, and it never runs:
+// LIBRARY_IN_PLACE is 0 (LibraryWrapper.h), so inPlaceEnabled() is always false and the
+// libraries take the XPrm path. Models (cStatic3dx / LodsCache) have real readers, in
+// Render/3dx/Static3DX.cpp.
 template<class T>
 T* inPlaceReconstruct(T*, const char* /*image*/, int /*size*/)
 {
-	xassert(!"InPlaceIArchive::construct: no portable in-place reader for this type");
+	xassert(!"InPlaceIArchive::construct: no in-place reader for this type");
 	return 0;
 }
-#endif
 
 class InPlaceIArchive
 {
@@ -192,25 +200,18 @@ public:
 	InPlaceIArchive(const char* name);
 
 	bool open(const char* fname);  // true if file exists
-#ifdef _WIN32
-	// 32-bit engine: open() has relocated the image, so it *is* the object.
-	template<class T>
-	void construct(T*& ptr) { ptr = (T*)data_; }
 
-	static void destruct(void* ptr) { delete ptr; }
-#else
-	// Reconstruction copies everything into native objects, so this archive owns
-	// the raw image and frees it on destruction.
+	// Reconstruction copies everything into native objects, so this archive owns the raw
+	// image and frees it on destruction.
 	~InPlaceIArchive() { delete[] data_; }
 
 	template<class T>
 	void construct(T*& ptr) { ptr = inPlaceReconstruct((T*)0, data_, size_); }
 
-	// Native objects: run the real destructor (unlike the Windows blob, whose
-	// members alias the image and must never be destructed field-by-field).
+	// Native objects: run the real destructor. (The 32-bit engine could not: its object
+	// *was* the image blob, and its members aliased it.)
 	template<class T>
 	static void destruct(T* ptr) { delete ptr; }
-#endif
 
 private:
 	int version_;

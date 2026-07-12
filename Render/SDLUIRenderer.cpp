@@ -473,7 +473,7 @@ void SDLUIRenderer::DrawRectangle(int x, int y, int dx, int dy, Color4c color, b
 
 // The engine's inline colour escape: "&rrggbb" sets the text colour from here on, and
 // "&&" is a literal ampersand. Advances str past whatever it consumed. Lifted from
-// ChangeTextColorW in Render/D3D/D3DRenderDraw.cpp, which is not built off-Windows.
+// ChangeTextColorW in the old Render/D3D/D3DRenderDraw.cpp.
 static void changeTextColor(const wchar_t*& str, Color4c& diffuse)
 {
 	while(*str == L'&'){

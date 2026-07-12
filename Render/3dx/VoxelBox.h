@@ -19,13 +19,11 @@ public:
 	void serialize(Archive& ar);
 	bool valid() const { return valid_; }
 
-#ifndef _WIN32
 	// Restore this voxel box from values read out of a 32-bit InPlace image
-	// (fields are private, so the portable model reconstructor sets them here).
+	// (fields are private, so the model reconstructor sets them here).
 	void reconstructInPlace(bool valid, int sizeLen, int size, int mask,
 	                        const Vect3f& scale, const Vect3f& scaleInv, const Vect3f& offset,
 	                        const void* buffer, int bufferSize);
-#endif
 
 	void draw(const Vect3f& pos, Color4c color);
 

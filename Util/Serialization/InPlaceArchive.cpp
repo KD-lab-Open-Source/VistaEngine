@@ -218,32 +218,12 @@ bool InPlaceIArchive::open(const char* fname)
 	data_ = new char[size_];
 	ff.read(data_, size_);
 
-#ifdef _WIN32
-	// Relocate the stored offsets into real 32-bit pointers, then the image is a
-	// live object. This only works in the 32-bit process that produced it.
-	int auxSize = ff.size() - ff.tell();
-	char* auxData = new char[auxSize];
-	ff.read(auxData, auxSize);
-	int* fixUp = (int*)auxData;
-	int fixUpSize = *fixUp++;
-	while(fixUpSize--)
-		*(int*)(data_ + *fixUp++) += (int)(intptr_t)data_;
-
-	int fixVTableSize = *fixUp++;
-	while(fixVTableSize--){
-		int offset = *fixUp++;
-		char* typeName = (char*)fixUp;
-		*(int*)(data_ + offset) = (int)(intptr_t)VTableFactory::getVTable(typeName);
-		typeName += strlen(typeName) + 1;
-		fixUp = (int*)typeName;
-	}
-
-	delete auxData;
-#else
-	// Off-Windows we do NOT relocate: adding a 64-bit base into a 32-bit slot
-	// would truncate it. inPlaceReconstruct() reads the raw offsets directly and
-	// copies out into native objects; the fixup/vtable tail is not needed.
-#endif
+	// We do NOT relocate. The 32-bit engine walked the file's fixup table here, adding the
+	// image base into each stored offset and patching vtable pointers, after which the image
+	// *was* a live object. In a 64-bit process that would write a 64-bit base into a 32-bit
+	// slot and truncate it. inPlaceReconstruct() reads the raw 32-bit offsets directly and
+	// copies out into native objects instead, so the fixup/vtable tail of the file is simply
+	// left unread. See InPlaceArchive.h.
 
 	return true;
 }

@@ -237,9 +237,6 @@ protected:
 	cWaterSpeedInterface* pSpeedInterface;
 	cWaterChangeTile change_function;
 
-	class VSWater* vsShader;
-	class PSWater* psShader;
-	class ShaderSceneWaterLava* lavaShader_;
 	// What setTechnique chose. On Windows the shader objects carry it (VSWater::GetTechnique);
 	// off-Windows there are no shader objects, so Draw reads it from here.
 	Technique technique_;

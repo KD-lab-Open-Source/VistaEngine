@@ -32,8 +32,6 @@ protected:
 	void SetTexture(const string& tex1);
 	void SetTexels();
 
-	class VSCloudShadow* vsCloudShadow;
-	class PSCloudShadow* psCloudShadow;
 };
 
 #endif

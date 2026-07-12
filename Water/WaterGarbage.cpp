@@ -204,8 +204,7 @@ void cWaterBubble::AnimateParticle(float dt)
 void cWaterBubble::Draw(Camera* camera)
 {
 //	dist.Draw(camera);
-#ifndef _WIN32
-	// The device hands out no quad buffer off Windows; the world-quad renderer keeps it and
+	// The device hands out no quad buffer; the world-quad renderer keeps it and
 	// answers to the same BeginDraw/Get/EndDraw. It never writes depth, which is what the
 	// RS_ZWRITEENABLE FALSE below asks for. Its groups replay in call order, so all the
 	// texture groups below can share one pass, opened once the loop is done.
@@ -214,7 +213,6 @@ void cWaterBubble::Draw(Camera* camera)
 	if(!pBuf || !dev)
 		return;
 	pBuf->SetCamera(camera);
-#endif
 	cInterfaceRenderDevice* rd=gb_RenderDevice;
 	int old_zwrite=rd->GetRenderState(RS_ZWRITEENABLE);
 	rd->SetRenderState(RS_ZWRITEENABLE,FALSE);
@@ -226,13 +224,7 @@ void cWaterBubble::Draw(Camera* camera)
 		int size=objects.size();
 		if(size==0)
 			continue;
-#ifdef _WIN32
-		rd->SetNoMaterial(ALPHA_BLEND, MatXf::ID, 0, (*itt)->pTexture);
-
-		cQuadBuffer<sVertexXYZDT1>* pBuf=rd->GetQuadBufferXYZDT1();
-#else
 		pBuf->SetMaterial(ALPHA_BLEND, (*itt)->pTexture);
-#endif
 		pBuf->BeginDraw();
 		for(int i=size-1;i>=0;i--)
 		{
@@ -256,9 +248,7 @@ void cWaterBubble::Draw(Camera* camera)
 		}
 		pBuf->EndDraw();
 	}
-#ifndef _WIN32
 	dev->drawWorldQuads();
-#endif
 	rd->SetRenderState(RS_ZWRITEENABLE,old_zwrite);
 }
 

@@ -55,6 +55,21 @@ grep -rn "TODO(sdl-port)" --include=*.cpp --include=*.h .
 | 21 | **Screenshots** (`SetScreenShot`), **gamma** (`SetGamma`) | `cSDLRenderDevice`, no-ops. |
 | 22 | **Fullscreen mode** | `PlatformWindow::create` always makes a windowed window; `IsFullScreen()` returns false. `OPTION_FULL_SCREEN` is ignored. |
 
+## The `_WIN32` guards that are still there on purpose
+
+Every `#ifdef _WIN32` in the rendering code is gone, and so is the one in the in-place
+serializer (the engine is 64-bit on every platform now, and reconstructs the 32-bit cache
+images by hand rather than relocating them — see `Util/Serialization/InPlaceArchive.h`).
+
+What remains are genuine OS-API guards, and deleting them would be wrong:
+
+- **`Render/3dx/Saver.h`** — Win32 `_open`/`_read` vs POSIX `open`/`read`.
+- **`Render/src/ftrender.cpp`** — `NormalizePath` (backslash → POSIX path, plus case
+  resolution on case-sensitive volumes) exists only off-Windows, and is not wanted on Windows.
+- **`Render/src/FileImage.cpp`** — the Video-for-Windows AVI reader.
+- **`Game/Runtime.cpp`** — `_beginthread` for the threaded mission load; elsewhere the load
+  is synchronous. A threading port, not a rendering one.
+
 ## Not the renderer, but still Windows-only
 
 These block a genuinely single-platform-behaviour build and are tracked here so they aren't

@@ -49,22 +49,12 @@ cCloudShadow::cCloudShadow() : BaseGraphObject(0)
 		pt[1].set(2,3,0);
 		gb_RenderDevice->UnlockIndexBuffer(earth_ib);
 	}
-#ifdef _WIN32
-	vsCloudShadow=new VSCloudShadow;
-	vsCloudShadow->Restore();
-	psCloudShadow=new PSCloudShadow;
-	psCloudShadow->Restore();
-#endif
 
 	color=128;
 
 }
 cCloudShadow::~cCloudShadow()
 {
-#ifdef _WIN32
-	delete vsCloudShadow;
-	delete psCloudShadow;
-#endif
 	RELEASE(texture1);
 }
 
@@ -82,38 +72,13 @@ void cCloudShadow::PreDraw(Camera* camera)
 	camera->Attach(SCENENODE_OBJECTFIRST,this);
 }
 
+// TODO(sdl-port): cloud shadows do not draw. See Render/PORTING.md #5.
+//
+// The scrolling shadow layer was VSCloudShadow/PSCloudShadow modulating the terrain's
+// diffuse by sun elevation. Its vertex/index buffers are portable and still built above;
+// only the shader pass is missing.
 void cCloudShadow::Draw(Camera* camera)
 {
-#ifdef _WIN32
-	if(!camera->getAttribute(ATTRCAMERA_SHADOW))
-		return;
-	cD3DRender* rd=gb_RenderDevice3D;
-//*
-	rd->SetBlendStateAlphaRef(ALPHA_NONE);
-	rd->SetTexture(0,texture1);
-	rd->SetTexture(1,texture1);
-	rd->SetSamplerData(0,sampler_wrap_linear);
-	rd->SetSamplerData(1,sampler_wrap_linear);
-
-	Color4f tfactor=scene_->GetTileMap()->GetDiffuse();
-	tfactor.r=
-	tfactor.g=
-	tfactor.b=(tfactor.r+tfactor.g+tfactor.b)/3;
-	tfactor*=color/255.0f;
-	tfactor*=-scene_->GetSunDirection().z;
-	tfactor.r=clamp(tfactor.r,0.0f,1.0f);
-	tfactor.g=clamp(tfactor.g,0.0f,1.0f);
-	tfactor.b=clamp(tfactor.b,0.0f,1.0f);
-	tfactor.a=tfactor.r;
-	vsCloudShadow->Select();
-	psCloudShadow->Select(tfactor);
-	rd->DrawIndexedPrimitive(earth_vb,0,size_vb,earth_ib,0,size_ib);
-/*/
-	static eColorMode color_mode = COLOR_MOD;
-	rd->SetNoMaterial(ALPHA_BLEND, MatXf::ID, 0, texture1, texture1, color_mode);
-	rd->DrawIndexedPrimitive(earth_vb,0,size_vb,earth_ib,0,size_ib);
-/**/
-#endif
 }
 
 

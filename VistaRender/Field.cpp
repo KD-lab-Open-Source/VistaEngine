@@ -354,69 +354,15 @@ void FieldDispatcher::PreDraw(Camera* camera)
 	camera->Attach(SCENENODE_OBJECTSPECIAL,this);
 }
 
+// TODO(sdl-port): the perimeter field dome does not draw -- the game's signature effect.
+// See Render/PORTING.md #3.
+//
+// An additive sVertexXYZDT2 tile strip over the water, sampling the reflection texture,
+// with the surface normal driving both texture coordinate sets. The field simulation above
+// (the cell grid, its heights, normals and colours) is portable and still runs every frame;
+// only the draw is missing.
 void FieldDispatcher::Draw(Camera* camera)
 {
-#ifdef _WIN32
-	start_timer_auto();
-
-	xassert(GetTexture(0) && GetTexture(1));
-
-	Vect3f uv[2];
-	const Mat3f& mC = camera->GetMatrix().rot();
-	uv[0].set(0.5f*mC[0][0],0.5f*mC[0][1],0.5f*mC[0][2]);
-	uv[1].set(0.5f*mC[1][0],0.5f*mC[1][1],0.5f*mC[1][2]);
-
-	DWORD AlphaTest = gb_RenderDevice3D->GetRenderState(D3DRS_ALPHATESTENABLE);
-	DWORD AlphaRef = gb_RenderDevice3D->GetRenderState(D3DRS_ALPHAREF);
-	DWORD zwrite = gb_RenderDevice3D->GetRenderState(D3DRS_ZWRITEENABLE);
-	DWORD cullMode = gb_RenderDevice3D->GetRenderState(D3DRS_CULLMODE);
-	
-	gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-	gb_RenderDevice3D->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-	gb_RenderDevice3D->SetWorldMaterial(ALPHA_ADDBLENDALPHA, MatXf::ID, phase_, GetTexture(0), GetTexture(1), COLOR_ADD, false, true);
-
-	{//������� �� � �����, ���� ������ �� ��������, ��� ���������.
-		gb_RenderDevice3D->SetTexture(5,water->reflectionTexture());
-		gb_RenderDevice3D->SetSamplerData(5,sampler_clamp_linear);
-	}
-
-	for(int yTile = 0; yTile < tileMap_.sizeY(); yTile++)
-		for(int xTile = 0; xTile < tileMap_.sizeX(); xTile++){
-			int tileHeight = tileMap_(xTile, yTile);
-			if(!tileHeight)
-				continue;
-			Vect3f boxMin(tileMap_.m2w(Vect2f(xTile, yTile)), 0);
-			Vect3f boxMax(tileMap_.m2w(Vect2f(xTile + 1, yTile + 1)), tileHeight);
-			if(!camera->TestVisible(boxMin, boxMax))
-				continue;
-			
-			sVertexXYZDT2* pv = tileStrip_.beginDraw();
-			int x_begin = xTile << FIELD_2_TILE_SHIFT;
-			int y_begin = yTile << FIELD_2_TILE_SHIFT;
-			int tile_size = 1 << FIELD_2_TILE_SHIFT;
-			for(int y = 0; y <= tile_size; y++)
-				for(int x = 0; x <= tile_size; x++){
-					sVertexXYZDT2& v = *pv++;
-					Vect2f pointMap(x + x_begin, y + y_begin);
-					Cell& cell = map_(pointMap);
-					pointMap = map_.m2w(pointMap + cell.delta);
-					Vect3f point(pointMap, water->GetZFast(pointMap.xi(), pointMap.yi()));
-					point.z += cell.height;
-					v.pos = point;
-					v.diffuse = cell.color;
-					const Vect3f& n = cell.normal;
-					v.GetTexel().set(n.dot(uv[0]) + 0.5f, n.dot(uv[1]) + 0.5f);
-					v.GetTexel2().set((n.y + 1)*0.5f, (n.z + 1)*0.5f - phase_);
-				}
-				
-				tileStrip_.endDraw();
-		}
-		
-	gb_RenderDevice3D->SetRenderState(D3DRS_ZWRITEENABLE,zwrite);
-	gb_RenderDevice3D->SetRenderState(D3DRS_ALPHATESTENABLE,AlphaTest);
-	gb_RenderDevice3D->SetRenderState(D3DRS_ALPHAREF,AlphaRef);
-	gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE, cullMode);
-#endif
 }
 
 void FieldDispatcher::debugDraw(Camera* camera)

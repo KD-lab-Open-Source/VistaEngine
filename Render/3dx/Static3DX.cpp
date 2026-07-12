@@ -14,7 +14,6 @@ cStatic3dx::cStatic3dx(bool isLogic, const char* fname)
   voxelBox(5)
 {
 	fileName_ = fname;
-	inPlace_ = false;
 }
 
 cStatic3dx::~cStatic3dx()
@@ -236,11 +235,9 @@ void StaticMaterial::createTextures(cStatic3dx* object)
 
 	// Bump and its specular map need pixel shader 2.0. The SDL GPU backend is well past
 	// that, and has no cD3DRender to ask, so it takes them unconditionally.
-#ifdef _WIN32
-	const bool supportBump = gb_RenderDevice3D && gb_RenderDevice3D->IsPS20();
-#else
+	// The original gated bump mapping on IsPS20(), a D3D9 capability. Every backend we
+	// target now has it.
 	const bool supportBump = true;
-#endif
 
 	if(!tex_bump.empty() && supportBump)
 		pBumpTexture = object->LoadTexture(tex_bump.c_str(),"Bump");
@@ -1747,9 +1744,8 @@ void cStatic3dx::serialize(Archive& ar)
 	ar.serialize(voxelBox, "voxelBox", "voxelBox");
 }
 
-#ifndef _WIN32
 // ---------------------------------------------------------------------------
-// Portable InPlaceIArchive::construct customizations (see InPlaceArchive.{h,cpp},
+// InPlaceIArchive::construct customizations (see InPlaceArchive.{h,cpp},
 // Util/Serialization/InPlaceArchive.md, tools/read_3dxG.py). The saved .3dxG /
 // .3dxGB is a raw 32-bit memory image; here we read its fields by their 32-bit
 // offsets and rebuild real native objects. std::string / std::vector / MemoryBlock
@@ -2089,18 +2085,12 @@ cStatic3dx* inPlaceReconstruct(cStatic3dx*, const char* image, int size)
 
 	return o;
 }
-#endif
 
 void cStatic3dx::constructInPlace(const char* fileName)
 {
-#ifdef _WIN32
-	// Windows: the object is the relocated image blob; mark it so Release() frees
-	// the blob instead of running destructors on members that alias it.
-	inPlace_ = true;
-#endif
-	// Off-Windows the object is a real native cStatic3dx (inPlace_ stays false),
-	// so Release() takes the normal destructor path.
-
+	// inPlaceReconstruct built a real native cStatic3dx out of the image, so this object
+	// owns its members and Release() takes the ordinary destructor path. (The 32-bit engine
+	// got back the relocated image blob itself, and had to free it as one.)
 	if(!is_logic){
 		LodsCache* cache = 0;
 		InPlaceIArchive ia(0);
@@ -2135,18 +2125,7 @@ void cStatic3dx::constructInPlace(const char* fileName)
 
 int cStatic3dx::Release()
 { 
-	if(!inPlace_)
-		return UnknownClass::Release();
-	else{
-		xassert(GetRef() > 0);
-		if(DecRef()>0) 
-			return GetRef();
-
-		releaseTextures();
-
-		InPlaceIArchive::destruct(this);
-		return 0;
-	}
+	return UnknownClass::Release();
 }
 
 

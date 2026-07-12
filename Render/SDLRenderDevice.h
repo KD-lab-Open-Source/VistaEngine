@@ -58,9 +58,8 @@ void applyCameraViewport(SDL_GPURenderPass* pass, const sViewPort& vp, int targe
 // neutral to a multiply, mid-grey where it must be neutral to the terrain's `detail - 0.5`.
 SDL_GPUTexture* createSolidGPUTexture(SDL_GPUDevice* device, unsigned int rgba);
 
-// gb_RenderDevice as a cSDLRenderDevice, or null under any other device. Off-Windows
-// gb_RenderDevice3D stays null, so engine code that needs the backend (cScene's shadow
-// map, CameraShadowMap) asks for the SDL device through this instead.
+// gb_RenderDevice as a cSDLRenderDevice, or null under any other device. Engine code that
+// needs the backend itself (cScene's shadow map, CameraShadowMap) asks for it through this.
 class cSDLRenderDevice;
 cSDLRenderDevice* sdlRenderDevice();
 

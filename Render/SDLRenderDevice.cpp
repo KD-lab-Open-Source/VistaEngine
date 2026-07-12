@@ -116,9 +116,8 @@ void applyCameraViewport(SDL_GPURenderPass* pass, const sViewPort& vp, int targe
 }
 
 // ---------------------------------------------------------------------------
-// Base cInterfaceRenderDevice members. On Windows these live in
-// Render/D3D/RenderDevice.cpp (not compiled off-Windows), so the cross-platform
-// subclass must supply them here.
+// Base cInterfaceRenderDevice members. These used to live in the D3D backend
+// (Render/D3D/RenderDevice.cpp), so the surviving subclass supplies them here.
 // ---------------------------------------------------------------------------
 cInterfaceRenderDevice::cInterfaceRenderDevice()
 {
@@ -219,9 +218,9 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND /*hWnd*/,
 		uiRenderer_->setMinimapRenderer(minimapRenderer_.get());
 	}
 
-	// Build the skinned-vertex declarations (on Windows cD3DRender does this at
-	// device init via CreateVertexDeclaration; cSkinVertex::Register is portable
-	// off-Windows). Needed so cStatic3dx buffers get a real vertex layout/stride.
+	// Build the skinned-vertex declarations (cD3DRender did this at device init via
+	// CreateVertexDeclaration). Needed so cStatic3dx buffers get a real vertex
+	// layout/stride.
 	static bool skinDeclRegistered = false;
 	if(!skinDeclRegistered){ cSkinVertex::Register(); skinDeclRegistered = true; }
 	return true;

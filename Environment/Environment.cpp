@@ -260,52 +260,26 @@ void Environment::graphQuant(float dt, Camera* camera)
 	if(water_)
 		water_->SetCurReflectSkyColor(environmentTime_->GetCurReflectSkyColor());
 
-#ifdef _WIN32
-	environmentTime()->Draw();   // the sky cubemap; a cube render target, which SDL GPU has no path to yet
-
-	if(isFogEnabled() && !isFogTempDisabled()){
-		PostEffectUnderWater* underWater = (PostEffectUnderWater*)PEManager()->getEffect(PE_UNDER_WATER);
-		if(underWater && underWater->isActive())
-			underWater->setFog(Color4f(environmentTime()->GetCurFogColor()));
-		else{
-			float range = camera->GetZPlane().y/max(GetGameFrustrumZMaxHorizontal(),GetGameFrustrumZMaxVertical());
-			gb_RenderDevice->SetGlobalFog(Color4f(environmentTime()->GetCurFogColor()),Vect2f(fogStart()*range,fogEnd()*range));
-		}
-	}
-	else
-		gb_RenderDevice->SetGlobalFog(Color4f(environmentTime()->GetCurFogColor()),Vect2f(-1, -2));
-#endif
+	// TODO(sdl-port): four things the original did here are gone with D3D9 --
+	//   the sky cubemap (environmentTime()->Draw()),      PORTING.md #9
+	//   distance fog (gb_RenderDevice->SetGlobalFog),     PORTING.md #2
+	//   the lens flare and the screen flash,              PORTING.md #6
+	//   fieldOfViewMap_->updateTexture().                 PORTING.md #10
+	// Everything they drive (the time-of-day colours, the sun position and size, the
+	// field-of-view map itself) is portable and still updated every frame.
 
 	// The sky: the sun or the moon, then the cloud models, drawn through the sky camera's
 	// own scene. It opens the frame -- everything below is drawn over it.
 	environmentTime()->DrawEnviroment(camera);
-
-#ifdef _WIN32
-	if(environmentTime_->isDay()){
-		lensFlare_->setFlareSource(environmentTime_->sunPosition(), environmentTime_->sunSize());
-		lensFlare_->setVisible(true);
-	}
-	else{
-		lensFlare_->setVisible(false);
-	}
-
-	flash()->setIntensity();
-
-	fieldOfViewMap_->updateTexture();
-#endif
 }
 
+// TODO(sdl-port): the whole post-effect stack is gone. See Render/PORTING.md #6.
+//
+// PEManager's chain (bloom, monochrome, colour-dodge, depth of field, mirage), the screen
+// flash and the under-water effect. All of it was D3D9 pixel shaders over fullscreen quads
+// into offscreen targets; VistaRender/postEffects.cpp still holds the original.
 void Environment::drawPostEffects(float dt, Camera* camera)
 {
-#ifdef _WIN32
-	start_timer_auto();
-
-	flash()->draw();
-	if(PostEffectUnderWater* eff = (PostEffectUnderWater*)PEManager()->getEffect(PE_UNDER_WATER))
-		eff->setUnderWater(water_->isUnderWater(camera->GetPos()));
-
-	PEManager()->draw(dt);
-#endif
 }
 
 void Environment::showEditor()

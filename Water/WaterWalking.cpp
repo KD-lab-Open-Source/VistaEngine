@@ -146,18 +146,12 @@ void cWaterPlume::Animate(float dt)
 void cWaterPlume::Draw(Camera* camera)
 {
 	static Color4c color(255, 255, 255);
-#ifdef _WIN32
-	cInterfaceRenderDevice* rd = gb_RenderDevice;
-	rd->SetNoMaterial(ALPHA_BLEND, MatXf::ID, 0, textureCyrcle);
-	cQuadBuffer<sVertexXYZDT1>* pBuf = rd->GetQuadBufferXYZDT1();
-#else
 	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
 	cSDLRenderDevice* dev = sdlRenderDevice();
 	if(!pBuf || !dev)
 		return;
 	pBuf->SetCamera(camera);
 	pBuf->SetMaterial(ALPHA_BLEND, textureCyrcle);
-#endif
 	pBuf->BeginDraw();
 	ParticlesUnDir::iterator it;
 	FOR_EACH(unDirPartls_, it){
@@ -178,7 +172,5 @@ void cWaterPlume::Draw(Camera* camera)
 		}
 	}
 	pBuf->EndDraw();
-#ifndef _WIN32
 	dev->drawWorldQuads();
-#endif
 }

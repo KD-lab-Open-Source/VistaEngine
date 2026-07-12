@@ -339,17 +339,13 @@ void cSkinVertex::Register()
 		}
 #undef ADD
 
-#ifdef _WIN32
-		RDCALL(gb_RenderDevice3D->D3DDevice_->CreateVertexDeclaration(&elements[0], &declaration[num_weight][bump][uv2][fur]));
-#else
-		// No D3D device off-Windows: point the declaration at an immortal copy of the
-		// element table so the SDL backend can read the layout (like the macro-built
-		// declarations, via the portable cD3DRender::RegisterVertexDeclaration).
+		// Point the declaration at an immortal copy of the element table so the renderer can
+		// read the layout, exactly as the macro-built declarations do (via
+		// cD3DRender::RegisterVertexDeclaration).
 		D3DVERTEXELEMENT9* immortal = new D3DVERTEXELEMENT9[elements.size()];
 		for(size_t k = 0; k < elements.size(); ++k)
 			immortal[k] = elements[k];
 		cD3DRender::RegisterVertexDeclaration(declaration[num_weight][bump][uv2][fur], immortal);
-#endif
 	}
 
 }
