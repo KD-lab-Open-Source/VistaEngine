@@ -8,47 +8,8 @@
 #include "Render/Shader/Shaders.h"
 #include "D3DRender.h"
 #include "VisGeneric.h"
-#ifndef _WIN32
 #include "Render/SDLRenderDevice.h"   // the shadow map and its depth pass live here
 #include "Render/SDLWorldQuadRenderer.h"   // the lightmap's light quads and circle shadows
-#endif
-
-class CameraShader
-{
-public:
-	PSShowMap* pShowMap;
-	PSShowAlpha* pShowAlpha;
-
-	CameraShader()
-	{
-		pShowMap=new PSShowMap;
-		pShowMap->Restore();
-		pShowAlpha=new PSShowAlpha;
-		pShowAlpha->Restore();
-	}
-
-	~CameraShader()
-	{
-		if(pShowMap)delete pShowMap;
-		if(pShowAlpha)delete pShowAlpha;
-	}
-
-};
-
-void cVisGeneric::InitShaders()
-{
-	if(!shaders)
-		shaders=new CameraShader;
-}
-
-void cVisGeneric::ReleaseShaders()
-{
-	if(shaders)
-	{
-		delete shaders;
-		shaders=0;
-	}
-}
 
 Camera::Camera(cScene *scene)
 {
@@ -103,8 +64,6 @@ Camera::~Camera()
 	delete pTestGrid;
 }
 
-void TempDrawShadow(int width,int height);
-
 class SortObjectSpecial
 {
 public:
@@ -113,26 +72,6 @@ public:
 		return p1->sortIndex()<p2->sortIndex();
 	}
 };
-
-void Camera::ClearFloatZBuffer()
-{
-	DWORD fogenable = gb_RenderDevice3D->GetRenderState(D3DRS_FOGENABLE);
-	gb_RenderDevice3D->SetRenderState(D3DRS_FOGENABLE,FALSE);
-	gb_RenderDevice3D->SetBlendState(ALPHA_NONE);
-	gb_RenderDevice3D->dtAdvance->pPSClearAlpha->Select(FLT_INF,0,0,1);
-	cVertexBuffer<sVertexXYZWD>* pBuf=gb_RenderDevice3D->GetBufferXYZWD();
-	sVertexXYZWD* v=	pBuf->Lock(4);
-
-	v[0].z=v[1].z=v[2].z=v[3].z=1.000f;
-	v[0].w=v[1].w=v[2].w=v[3].w=0.001f;
-	v[0].diffuse=v[1].diffuse=v[2].diffuse=v[3].diffuse=Color4c(255,255,255,255);
-	v[0].x=v[1].x=-0.5f; v[0].y=v[2].y=-0.5f; 
-	v[3].x=v[2].x=-0.5f+gb_RenderDevice3D->GetSizeX(); v[1].y=v[3].y=-0.5f+gb_RenderDevice3D->GetSizeY(); 
-
-	pBuf->Unlock(4);
-	pBuf->DrawPrimitive(PT_TRIANGLESTRIP,2);
-	gb_RenderDevice3D->SetRenderState(D3DRS_FOGENABLE,fogenable);
-}
 
 bool in_draw_assert=false;
 void Camera::DrawScene()
@@ -147,34 +86,13 @@ void Camera::DrawScene()
 	if(!Parent) {
 		start_timer_auto1(1);
 		gb_RenderDevice->FlushPrimitive3D();
-#ifdef _WIN32
-		gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC,D3DCMP_LESSEQUAL);
-  		gb_RenderDevice3D->SetSamplerData(0,sampler_wrap_anisotropic);
-#endif
 
 		Camera* pShadow=FindChildCamera(ATTRCAMERA_SHADOWMAP);
-		gb_RenderDevice3D->SetAdvance(pShadow!=0);
 		if(pShadow) {
-#ifdef _WIN32
-			gb_RenderDevice3D->SetShadowMatViewProj(pShadow->matViewProj);
-			if(gb_RenderDevice3D->GetShadowMap())
-				gb_RenderDevice3D->SetShadowMapSize(gb_RenderDevice3D->GetShadowMap()->GetWidth());
-#else
 			// The receivers' shadow matrix. The light camera has not drawn yet, but it has
 			// been fixed to the view frustum in cScene::Draw, so matViewProj is final.
 			if(cSDLRenderDevice* dev = sdlRenderDevice())
 				dev->SetShadowMatViewProj(pShadow->matViewProj);
-#endif
-		}
-		pShadow = FindChildCamera(ATTRCAMERA_FLOAT_ZBUFFER);
-		if (pShadow)
-		{
-#ifdef _WIN32
-			gb_RenderDevice3D->SetFloatZBufferMatViewProj(pShadow->matViewProj);
-			if(gb_RenderDevice3D->GetFloatMap())
-				gb_RenderDevice3D->SetFloatZBufferSize(gb_RenderDevice3D->GetFloatMap()->GetWidth(),
-													   gb_RenderDevice3D->GetFloatMap()->GetHeight());
-#endif
 		}
 		xassert(!in_draw_assert);
 		in_draw_assert=true;
@@ -189,15 +107,8 @@ void Camera::DrawScene()
 	Cameras::iterator it_c;
 	FOR_EACH(cameras_,it_c)
 		(*it_c)->DrawScene();
-#ifdef _WIN32
-	if(getAttribute(ATTRCAMERA_WRITE_ALPHA) && DrawArray[SCENENODE_FLAT_SILHOUETTE].empty()||getAttribute(ATTRCAMERA_REFLECTION))
-		gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,D3DCOLORWRITEENABLE_ALPHA|D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED);
-	else
-		gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED);
-#endif
 
 	gb_RenderDevice->setCamera(this);
-//	gb_RenderDevice3D->SetRenderTarget1(GetSecondRT());
 
 	if(!Option_ShowType[SHOW_REDLECTION] && getAttribute(ATTRCAMERA_REFLECTION))
 		return;
@@ -206,28 +117,14 @@ void Camera::DrawScene()
 		Set2DRenderState();
 		return;
 	}
-#ifdef _WIN32
-	if(getAttribute(ATTRCAMERA_FLOAT_ZBUFFER))
-		ClearFloatZBuffer();
-#endif
 	if(getAttribute(ATTRCAMERA_CLEARZBUFFER) )
 		ClearZBuffer();
 	if(getAttribute(ATTRCAMERA_SHOWCLIP))
 		 ShowClip();
-#ifdef _WIN32
-	gb_RenderDevice3D->SetRenderState(D3DRS_ALPHAREF,0);
-#endif
-	DWORD fogenable;
 
 	DrawObjectFirst();
 
 	gb_RenderDevice->SetRenderState( RS_ZWRITEENABLE, getAttribute(ATTRCAMERA_NOZWRITE)?FALSE:TRUE );
-#ifdef _WIN32
-	float fBiasSlope=0;
-	gb_RenderDevice3D->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, *(DWORD*)&fBiasSlope);
-
-	fogenable=gb_RenderDevice3D->GetRenderState(D3DRS_FOGENABLE);
-#endif
 
 	DrawTilemapObject();
 	if(Option_ShowType[SHOW_OBJECT])
@@ -238,10 +135,6 @@ void Camera::DrawScene()
 
 	if(Option_ShowType[SHOW_OBJECT]) {
 		start_timer_auto1(3);
-#ifdef _WIN32
-		DrawType* draw=gb_RenderDevice3D->dtAdvance;
-		draw->BeginDraw();
-#endif
 
 		DrawObject(SCENENODE_OBJECT);
 		DrawSilhouetteObject();
@@ -260,16 +153,10 @@ void Camera::DrawScene()
 
 	//------
 	//DebugDrawFrustum();
-#ifdef _WIN32
-	if (scene()->GetMirageCamera())
-		scene()->GetMirageCamera()->DrawScene();
-#endif
 	gb_RenderDevice->FlushPrimitive3D();
-	gb_RenderDevice->SetRenderState(RS_FOGENABLE,fogenable);
 
   	if(!Parent) {
 		start_timer_auto1(4);
-		DrawShadowDebug();
 		Set2DRenderState();
 		if(false) {
 			Camera* pShadow = FindChildCamera(ATTRCAMERA_SHADOWMAP);
@@ -289,61 +176,11 @@ void Camera::DrawScene()
 			DrawSilhouettePlane();
 	}
 
-	if(!Parent && Option_ShowRenderTextureDBG==7)
-		TempDrawShadow(vp.Width,vp.Height);
 //	if(!Parent)DrawTestGrid();
-#ifdef _WIN32
-	for(int i=0;i<4;i++)
-		gb_RenderDevice3D->SetSamplerData(i,sampler_wrap_linear);
-#endif
-//???	gb_RenderDevice3D->RestoreRenderTarget();
-}
-
-void Camera::DrawToZBuffer()
-{
-	DWORD colorEnableState = gb_RenderDevice3D->GetRenderState(D3DRS_COLORWRITEENABLE);
-	gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,D3DCOLORWRITEENABLE_ALPHA);
-	gb_RenderDevice->SetRenderState( RS_ZWRITEENABLE, FALSE );
-	gb_RenderDevice3D->dtAdvance->pPSClearAlpha->Select(Color4f(0,0,0,1));
-	cVertexBuffer<sVertexXYZWD>* pBuf=gb_RenderDevice3D->GetBufferXYZWD();
-	sVertexXYZWD* v=	pBuf->Lock(4);
-
-	v[0].z=v[1].z=v[2].z=v[3].z=1.000f;
-	v[0].w=v[1].w=v[2].w=v[3].w=0.001f;
-	v[0].diffuse=v[1].diffuse=v[2].diffuse=v[3].diffuse=Color4c(255,255,255,255);
-	v[0].x=v[1].x=-0.5f; v[0].y=v[2].y=-0.5f; 
-	v[3].x=v[2].x=-0.5f+gb_RenderDevice3D->GetSizeX(); v[1].y=v[3].y=-0.5f+gb_RenderDevice3D->GetSizeY(); 
-
-	pBuf->Unlock(4);
-	pBuf->DrawPrimitive(PT_TRIANGLESTRIP,2);
-	DWORD ZFUNC=gb_RenderDevice3D->GetRenderState(D3DRS_ZFUNC);
-	gb_RenderDevice3D->SetRenderState( D3DRS_ZFUNC, D3DCMP_EQUAL );
-	gb_RenderDevice3D->SetRenderState( D3DRS_ALPHAFUNC, D3DCMP_ALWAYS);
-	DWORD fogenable1=gb_RenderDevice3D->GetRenderState(D3DRS_FOGENABLE);
-	gb_RenderDevice->SetRenderState(RS_FOGENABLE,FALSE);
-	gb_RenderDevice3D->SetRenderState(D3DRS_ALPHABLENDENABLE,FALSE);
-	setAttribute(ATTRCAMERA_ZBUFFER);
-	//DrawObjectFirst();
-	DrawTilemapObject();
-	DrawObject(SCENENODE_OBJECT);
-	DrawObject(SCENENODE_FLAT_SILHOUETTE);
-	DrawObjectSpecial(SCENENODE_OBJECTSPECIAL);
-	//DrawSilhouetteObject();
-	//DrawSortObject();
-	clearAttribute(ATTRCAMERA_ZBUFFER);
-	gb_RenderDevice->SetRenderState( RS_ZWRITEENABLE, TRUE);
-	gb_RenderDevice3D->SetRenderState( D3DRS_ZFUNC, ZFUNC );
-	gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,colorEnableState);
-	gb_RenderDevice->SetRenderState(RS_FOGENABLE,fogenable1);
-
 }
 
 void Camera::Set2DRenderState()
 {
-#ifdef _WIN32
-	gb_RenderDevice3D->SetSamplerData(0,sampler_wrap_point);
-  	gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC,D3DCMP_ALWAYS);
-#endif
 	gb_RenderDevice->SetRenderState(RS_FOGENABLE,FALSE);
 }
 
@@ -755,22 +592,10 @@ void Camera::SetCopy(Camera* camera, bool copyAll)
 void Camera::DrawSortObject()
 {
 	start_timer_auto();
-	if(GetSecondRT())
-	{
-#ifdef _WIN32
-		gb_RenderDevice3D->SetRenderTarget1(0);
-		gb_RenderDevice3D->SetTexture(6,GetSecondRT());
-#endif
-	}
 
 	camerapass=SCENENODE_OBJECTSORT;
-#ifdef _WIN32
-	DWORD old_cullmode=gb_RenderDevice3D->GetRenderState(D3DRS_CULLMODE);
-#endif
 	gb_RenderDevice->SetRenderState( RS_ZWRITEENABLE, FALSE );
-#ifdef _WIN32
-	gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE);
-#endif
+
 	stable_sort(SortArray.begin(),SortArray.end(),ObjectSortByRadius());
 
 	vector<ObjectSort>::iterator it;
@@ -780,16 +605,6 @@ void Camera::DrawSortObject()
 	}
 
 	gb_RenderDevice->SetRenderState( RS_ZWRITEENABLE, TRUE );
-#ifdef _WIN32
-	gb_RenderDevice3D->SetRenderState( D3DRS_CULLMODE, old_cullmode );
-#endif
-
-	if(GetSecondRT())
-	{
-#ifdef _WIN32
-		gb_RenderDevice3D->SetTexture(6,0);
-#endif
-	}
 }
 
 void Camera::AttachNoRecursive(SceneNode pos,BaseGraphObject* object)
@@ -832,11 +647,6 @@ void Camera::Attach(SceneNode pos,BaseGraphObject* object)
 				float distance=cur_pos.distance((*camera)->GetPos());
 				(*camera)->SortArray.push_back(ObjectSort(distance, object));
 			}
-
-		if(object->getAttribute(ATTRCAMERA_MIRAGE) && scene()->GetMirageCamera()){
-			float distance=cur_pos.distance(scene()->GetMirageCamera()->GetPos());
-			scene()->GetMirageCamera()->SortArray.push_back(ObjectSort(distance, object));
-		}
 	}
 }
 
@@ -1115,12 +925,8 @@ eTestVisible Camera::TestVisible(const Vect3f &min,const Vect3f &max)
 
 void Camera::ClearZBuffer()
 {
-#ifdef _WIN32
-	RDCALL(gb_RenderDevice3D->D3DDevice_->Clear(0,0,D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1, 0));
-#else
 	if(cSDLRenderDevice* dev = sdlRenderDevice())
 		dev->clearZBuffer();
-#endif
 }
 
 void Camera::ShowClip()
@@ -1216,93 +1022,6 @@ void Camera::AttachChild(Camera *c)
 	c->RootCamera=RootCamera;
 }
 
-void Camera::DrawShadowDebug()
-{
-	if(Option_ShowRenderTextureDBG)
-	{
-		Camera* pShadow=0;
-		if(Option_ShowRenderTextureDBG==8)
-		{
-			DWORD fogenable=gb_RenderDevice3D->GetRenderState(D3DRS_FOGENABLE);
-			gb_RenderDevice->SetRenderState(RS_FOGENABLE,FALSE);
-			gb_RenderDevice3D->SetPixelShader(0);
-			gb_RenderDevice3D->SetVertexShader(0);
-			float mi=0.0f,ma=1.0f;
-			gb_RenderDevice3D->DrawSprite(0,0,512,512,
-				mi,mi,ma-mi,ma-mi,gb_RenderDevice3D->GetFloatMap());
-			gb_RenderDevice->SetRenderState(RS_FOGENABLE,fogenable);
-			return;
-		}
-		if(Option_ShowRenderTextureDBG==5)
-		{
-			pShadow=FindChildCamera(ATTRCAMERA_REFLECTION);
-		}else
-		{
-			pShadow=FindChildCamera((Option_ShowRenderTextureDBG!=2 && Option_ShowRenderTextureDBG!=6)?ATTRCAMERA_SHADOWMAP:ATTRCAMERA_SHADOW);
-		}
-		if(pShadow && pShadow->GetRenderTarget())
-		{
-			DWORD fogenable=gb_RenderDevice3D->GetRenderState(D3DRS_FOGENABLE);
-			gb_RenderDevice->SetRenderState(RS_FOGENABLE,FALSE);
-
-			const int size=256;
-			if(Option_ShowRenderTextureDBG!=4 && Option_ShowRenderTextureDBG!=6)
-			{
-				gb_RenderDevice3D->SetPixelShader(0);
-				gb_RenderDevice3D->SetVertexShader(0);
-				float mi=0.0f,ma=1.0f;
-				gb_RenderDevice3D->DrawSprite(0,0,size,size,
-						mi,mi,ma-mi,ma-mi,pShadow->GetRenderTarget(),Color4c(255,255,255,255),0,ALPHA_BLEND);
-			}else
-			{
-				float mi=0.0f,ma=1.0f;
-				int x1=0,y1=0;
-				int x2=x1+size,y2=y1+size;
-				float u1=mi,v1=mi;
-				float du=ma-mi,dv=ma-mi;
-
-				gb_RenderDevice->SetNoMaterial(ALPHA_NONE,MatXf::ID,0);//FIXME
-				gb_RenderDevice3D->SetVertexShader(0);
-
-
-				gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
-				gb_RenderDevice3D->SetTextureStageState(0, D3DTSS_TEXCOORDINDEX, 0);
-				gb_RenderDevice3D->SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_DISABLE);
-
-				/*
-				  gb_RenderDevice3D->SetTexture(0,gb_RenderDevice3D->dtAdvance->GetTZBuffer());
-			    /*/
-				gb_RenderDevice3D->SetTexture(0, pShadow->GetRenderTarget());
-				if(Option_ShowRenderTextureDBG==6)
-					gb_VisGeneric->GetShaders()->pShowAlpha->Select();
-				else
-					gb_VisGeneric->GetShaders()->pShowMap->Select();
-				/**/
-
-
-				Color4c ColorMul=Color4c(255,255,255,255);
-				cVertexBuffer<sVertexXYZWDT1>& BufferXYZWDT1=*gb_RenderDevice3D->GetBufferXYZWDT1();
-				sVertexXYZWDT1* v=BufferXYZWDT1.Lock(4);
-				v[0].z=v[1].z=v[2].z=v[3].z=0.001f;
-				v[0].w=v[1].w=v[2].w=v[3].w=0.001f;
-				v[0].diffuse=v[1].diffuse=v[2].diffuse=v[3].diffuse=ColorMul;
-				v[0].x=v[1].x=-0.5f+(float)x1; v[0].y=v[2].y=-0.5f+(float)y1; 
-				v[3].x=v[2].x=-0.5f+(float)x2; v[1].y=v[3].y=-0.5f+(float)y2; 
-				v[0].u1()=u1;    v[0].v1()=v1;
-				v[1].u1()=u1;    v[1].v1()=v1+dv;
-				v[2].u1()=u1+du; v[2].v1()=v1;
-				v[3].u1()=u1+du; v[3].v1()=v1+dv;
-				BufferXYZWDT1.Unlock(4);
-
-				BufferXYZWDT1.DrawPrimitive(PT_TRIANGLESTRIP,2);
-			}
-
-			gb_RenderDevice3D->SetPixelShader(0);
-			gb_RenderDevice->SetRenderState(RS_FOGENABLE,fogenable);
-		}
-	}
-}
-
 void Camera::GetLighting(Vect3f& l)
 {
 	scene()->GetLighting(&l);
@@ -1337,33 +1056,16 @@ CameraPlanarLight::~CameraPlanarLight()
 
 void CameraPlanarLight::DrawScene()
 {
-	//gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED|D3DCOLORWRITEENABLE_ALPHA);
 	gb_RenderDevice->setCamera(this);
-#ifdef _WIN32
-	gb_RenderDevice3D->SetGlobalLight(0);
-
-	gb_RenderDevice->SetRenderState(RS_ZWRITEENABLE, FALSE);
-	DWORD ZFUNC=gb_RenderDevice3D->GetRenderState(D3DRS_ZFUNC);
-	gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
-
-	DWORD fogenable=gb_RenderDevice3D->GetRenderState(D3DRS_FOGENABLE);
-	gb_RenderDevice->SetRenderState(RS_FOGENABLE,FALSE);
-#endif
 
 	DrawObjectFirstSorted();
 	drawLights();
 
-#ifdef _WIN32
-	gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC, ZFUNC );
-	gb_RenderDevice->SetRenderState(RS_FOGENABLE,fogenable);
-#else
 	// D3D drew as each quad group's EndDraw went; open the pass now, into the lightmap that
-	// setCamera bound. The depth state the block above sets is baked into the quad pipeline
-	// (it never writes depth), and the quads all sit on the terrain, so nothing self-occludes
-	// even without ZFUNC ALWAYS.
+	// setCamera bound. The depth state it set around this (no z-write, ZFUNC ALWAYS) is baked
+	// into the quad pipeline, and the quads all sit on the terrain, so nothing self-occludes.
 	if(cSDLRenderDevice* dev = sdlRenderDevice())
 		dev->drawWorldQuads();
-#endif
 }
 
 struct LightByTexture
@@ -1375,22 +1077,13 @@ struct LightByTexture
 
 void CameraPlanarLight::drawLights()
 {
-#ifdef _WIN32
-	DWORD old_colorwrite=gb_RenderDevice3D->GetRenderState(D3DRS_COLORWRITEENABLE);
-	gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED);
-	cQuadBuffer<sVertexXYZDT1>* quad = gb_RenderDevice3D->GetQuadBufferXYZDT1();
-	gb_RenderDevice3D->SetVertexShader(0);
-	gb_RenderDevice3D->SetPixelShader(0);
-#else
-	// The quad buffer, and the material calls below, are the only D3D in this function; the
-	// quad maths is shared. The colour-write mask is not carried: the lightmap's alpha is
-	// the fog of war, which nothing writes off-Windows yet, so leaving it alone costs
-	// nothing. See SDLWorldQuadRenderer.
+	// The colour-write mask D3D set here (RGB, no alpha) is not carried: the lightmap's alpha
+	// is the fog of war, which nothing writes yet, so leaving it alone costs nothing.
 	SDLWorldQuadRenderer* quad = sdlWorldQuadRenderer();
 	if(!quad)
 		return;
 	quad->SetCamera(this);
-#endif
+
 	int i;
 	int size = scene()->circle_shadow.size();
 	if(size){
@@ -1398,16 +1091,10 @@ void CameraPlanarLight::drawLights()
 			sphereShadowTexture_ = GetTexLibrary()->GetSpericalTexture();
 
 		if(!objects){
-#ifdef _WIN32
-			gb_RenderDevice3D->SetNoMaterial(ALPHA_BLEND,MatXf::ID);
-			gb_RenderDevice3D->SetTexture(0,sphereShadowTexture_);
-			gb_RenderDevice3D->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_SELECTARG2);
-#else
-			// D3DTOP_SELECTARG2: the colour is the vertex's, and the spherical texture
-			// contributes only its alpha -- the falloff. That is the `selectDiffuse` flag.
+			// D3D used D3DTOP_SELECTARG2 here: the colour is the vertex's, and the spherical
+			// texture contributes only its alpha -- the falloff. That is `selectDiffuse`.
 			quad->SetMaterial(ALPHA_BLEND, sphereShadowTexture_, true, MatXf::ID,
 			                  0, COLOR_MOD, true);
-#endif
 
 			quad->BeginDraw();
 			for(int i=0;i<size;i++){
@@ -1467,11 +1154,7 @@ void CameraPlanarLight::drawLights()
 			LightByTexture& pl=light[i];
 			if(!pl.subBlendingLight.empty())
 			{
-#ifdef _WIN32
-				gb_RenderDevice3D->SetNoMaterial(ALPHA_SUBBLEND,MatXf::ID,0,pl.texture);
-#else
 				quad->SetMaterial(ALPHA_SUBBLEND, pl.texture);
-#endif
 				quad->BeginDraw();
 				for(int j=0;j<pl.subBlendingLight.size();j++)
 				{
@@ -1501,11 +1184,7 @@ void CameraPlanarLight::drawLights()
 
 			if(!pl.addBlendingLight.empty())
 			{
-#ifdef _WIN32
-				gb_RenderDevice3D->SetNoMaterial(ALPHA_ADDBLEND,MatXf::ID,0,pl.texture);
-#else
 				quad->SetMaterial(ALPHA_ADDBLEND, pl.texture);
-#endif
 				quad->BeginDraw();
 				for(int j=0;j<pl.addBlendingLight.size();j++)
 				{
@@ -1531,42 +1210,8 @@ void CameraPlanarLight::drawLights()
 			}
 		}
 	}
-
-#ifdef _WIN32
-	gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,old_colorwrite);
-#endif
 }
 
-
-void TempDrawShadow(int width,int height)
-{
-	gb_RenderDevice3D->SetPixelShader(0);
-	gb_RenderDevice3D->SetVertexShader(0);
-	gb_RenderDevice3D->SetVertexDeclaration(sVertexXYZWD::declaration);
-
-	gb_RenderDevice3D->SetRenderState(D3DRS_ZWRITEENABLE,FALSE);
-	gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC,D3DCMP_GREATER);
-	gb_RenderDevice3D->SetNoMaterial(ALPHA_BLEND,MatXf::ID);
-
-	for(int c=255;c>=0;c-=8)
-	{
-		sVertexXYZWD Vertex[4];
-		float xOfs=0,yOfs=0;
-		Vertex[0].x=xOfs;     Vertex[0].y=yOfs;     
-		Vertex[1].x=xOfs;     Vertex[1].y=yOfs+height;
-		Vertex[2].x=xOfs+width;Vertex[2].y=yOfs;     
-		Vertex[3].x=xOfs+width;Vertex[3].y=yOfs+height;
-		for(int i=0;i<4;i++)
-		{
-			Vertex[i].z=Vertex[i].w=c/256.0f;
-			Vertex[i].diffuse.set(c,c,c,255);
-		}
-		gb_RenderDevice3D->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP,2,Vertex,sizeof(Vertex[0]));
-	}
-
-	gb_RenderDevice3D->SetRenderState(D3DRS_ZWRITEENABLE,TRUE);
-	gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL );
-}
 
 void Camera::DrawObjectNoZ(SceneNode nType)
 {
@@ -1577,33 +1222,14 @@ void Camera::DrawObjectNoZ(SceneNode nType)
 	{
 		vector<BaseGraphObject*>::iterator it;
 
-#ifdef _WIN32
-		DWORD zfunc=gb_RenderDevice3D->GetRenderState(D3DRS_ZFUNC);
-		gb_RenderDevice3D->SetRenderState( D3DRS_ZFUNC, D3DCMP_ALWAYS);
-		DWORD zwrite=gb_RenderDevice3D->GetRenderState(D3DRS_ZWRITEENABLE);
-		gb_RenderDevice3D->SetRenderState( D3DRS_ZWRITEENABLE, FALSE );
-		DWORD fogenable=gb_RenderDevice3D->GetRenderState(D3DRS_FOGENABLE);
-//balmer1		gb_RenderDevice3D->SetRenderState(D3DRS_FOGENABLE,FALSE);
-		DWORD old_cullmode=gb_RenderDevice3D->GetRenderState(D3DRS_CULLMODE);
-		gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE);
-#endif
-		// Off-Windows there is no device render state to save and restore: what this pass
-		// means -- no depth test, no depth write, no culling -- is baked into the pipeline
-		// each object's renderer picks. The one object that reaches this node, CircleManager,
-		// asks SDLWorldQuadRenderer for exactly that (SetMaterial's depthTest false).
-
+		// There is no device render state to save and restore: what this pass means -- no
+		// depth test, no depth write, no culling -- is baked into the pipeline each object's
+		// renderer picks. The one object that reaches this node, CircleManager, asks
+		// SDLWorldQuadRenderer for exactly that (SetMaterial's depthTest false).
 		FOR_EACH(obj,it)
 		{
 			(*it)->Draw(this);
 		}
-
-#ifdef _WIN32
-		gb_RenderDevice3D->SetRenderState( D3DRS_ZFUNC, zfunc );
-		gb_RenderDevice3D->SetRenderState( D3DRS_ZWRITEENABLE, zwrite );
-		gb_RenderDevice3D->SetRenderState( D3DRS_FOGENABLE,fogenable);
-
-		gb_RenderDevice->SetRenderState( RS_CULLMODE, old_cullmode );
-#endif
 	}
 
 }
@@ -1804,78 +1430,22 @@ void CameraShadowMap::DrawScene()
 	if(!Option_ShowType[SHOW_SHADOW])
 		return;
 
-#ifndef _WIN32
-	// The SDL caster pass. Everything the D3D path does with render states -- alpha ref,
+	// The caster pass. Everything the D3D path did with render states -- alpha ref,
 	// z-write, slope-scaled depth bias, fog off, the DrawType RT switch -- is baked into
 	// the caster pipelines instead (SDLObject3dxRenderer::pipelineFor and
 	// SDLTileMapRenderer::createShadowPipeline).
 	//
 	// SCENENODE_OBJECT holds what cObject3dx/cStaticSimply3dx::PreDraw attached, plus the
-	// tilemap that cScene::AddLightCamera attached -- exactly as on D3D. cTileMap::Draw
-	// runs its depth pass immediately; the objects only record, and replay below. So the
-	// terrain lands in the map first, and takes its clear. Silhouettes, special and sorted
-	// objects still do not cast.
+	// tilemap that cScene::AddLightCamera attached. cTileMap::Draw runs its depth pass
+	// immediately; the objects only record, and replay below. So the terrain lands in the
+	// map first, and takes its clear. Silhouettes, special and sorted objects do not cast.
 	if(Option_ShowType[SHOW_OBJECT])
 		DrawObject(SCENENODE_OBJECT);
 
-	// Where D3D calls DrawType::EndDrawShadow: record the depth pass now, so it lands in
+	// Where D3D called DrawType::EndDrawShadow: record the depth pass now, so it lands in
 	// the command buffer before any pass that samples the map.
 	if(cSDLRenderDevice* dev = sdlRenderDevice())
 		dev->endShadowPass();
-	return;
-#else
-	DWORD old_cullmode=gb_RenderDevice3D->GetRenderState(D3DRS_CULLMODE);
-//	gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE,D3DCULL_CCW);//bias должен в другую сторону смотреть.
-
-	gb_RenderDevice3D->SetRenderState(D3DRS_ALPHAREF,0);
-	DrawObjectFirst();
-
-	gb_RenderDevice3D->SetGlobalLight(0);
-
-	gb_RenderDevice->SetRenderState( RS_ZWRITEENABLE, getAttribute(ATTRCAMERA_NOZWRITE)?FALSE:TRUE );
-
-	float fBiasSlope=0.0f;
-    if(gb_RenderDevice3D->dtAdvance && gb_RenderDevice3D->dtAdvance->GetID()==DT_RADEON9700)
-        fBiasSlope=0.0f;
-    else
-        fBiasSlope=2.0f;
-	gb_RenderDevice3D->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, *(DWORD*)&fBiasSlope);
-
-	DWORD fogenable=gb_RenderDevice3D->GetRenderState(D3DRS_FOGENABLE);
-	if(getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_SHADOWMAP))
-		gb_RenderDevice->SetRenderState(RS_FOGENABLE,FALSE);
-	
-	DrawTilemapObject();
-	
-	DrawType* draw = gb_RenderDevice3D->dtAdvance;
-	draw->BeginDrawShadow();
-	
-	if(Option_ShowType[SHOW_OBJECT]) {
-		if(camerapass==SCENENODE_OBJECT)
-		{
-			for(int i=0;i<2;i++)
-			{
-				gb_RenderDevice3D->SetSamplerData(i,sampler_wrap_anisotropic);
-			}
-		}
-
-		DrawObject(SCENENODE_OBJECT);
-		DrawSilhouetteObject();
-		DrawObjectSpecial(SCENENODE_OBJECTSPECIAL);
-		DrawSortObject();
-	}
-
-	gb_RenderDevice->FlushPrimitive3D();
-	draw->EndDrawShadow();
-
-	if(Option_ShowRenderTextureDBG==3)
-		TempDrawShadow(vp.Width,vp.Height);
-
-	gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE,old_cullmode);
-	gb_RenderDevice->SetRenderState(RS_FOGENABLE,fogenable);
-
-	gb_RenderDevice3D->RestoreRenderTarget();
-#endif
 }
 
 Vect2f Camera::CalcZMinZMaxShadowReciver()

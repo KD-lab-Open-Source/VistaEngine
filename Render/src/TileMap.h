@@ -81,7 +81,6 @@ public:
 		return zeroplast_color[player];
 	}
 
-	cTileMapRender* GetTilemapRender() { return tileMapRender_; }
 
 	Vect2f CalcZ(Camera* camera);
 	sBox6f CalcShadowReciverInSpace(Camera* camera,const Mat4f& matrix);
@@ -143,7 +142,6 @@ public:
 
 	const PlacementZoneMaterial& placementZoneMaterial(int index) const { return placementZoneMaterials_[index]; }
 
-	bool setMaterial(int material, eBlendMode MatMode); // returns is Ice
 
 protected:
 	sTile*			tiles_;
@@ -151,7 +149,6 @@ protected:
 	Vect2i			tileNumber_;		// число тайлов по осям
 	int zMax_;
 
-	cTileMapRender* tileMapRender_;
 
 	int			update_zminmmax_time;
 	Color4f zeroplast_color[miniDetailTexturesNumber];
@@ -189,8 +186,6 @@ protected:
 	PlacementZoneMaterial placementZoneMaterials_[placementZoneMaterialNumber];
 	float animationTime_;
 
-	class ShaderSceneWaterLava* lavaShader_;
-	class ShaderSceneWaterIce* iceShader_;
 
 	////////////////////
 	void updateTileZ(int x,int y);

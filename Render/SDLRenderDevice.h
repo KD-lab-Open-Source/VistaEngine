@@ -270,12 +270,12 @@ public:
 	void setWorldMatrix(const MatXf&) override {}
 
 	// --- Misc state (no-op) ----------------------------------------------
-	int  SetGamma(float, float, float) override { return 0; }
 	// Only RS_FILLMODE (GameShell drives it from debugWireFrame) and RS_ZWRITEENABLE
 	// (Camera::DrawSortObject turns it off for the transparent pass) are honoured; the
 	// rest of the D3D render states have no SDL GPU equivalent outside a pipeline object.
 	void SetRenderState(eRenderStateOption, int) override;
 	unsigned int GetRenderState(eRenderStateOption) override;
+	// TODO(sdl-port): there is no distance fog at all. See Render/PORTING.md #2.
 	void SetGlobalFog(const Color4f&, const Vect2f&) override {}
 	// Sticky sampler state, as it is on D3D, where this sets one global the scene and the UI
 	// both draw with. Each renderer bakes its own sampler for its own geometry; only the UI
@@ -285,6 +285,8 @@ public:
 	// D3D: "the advanced DrawType exists", i.e. the device can render a shadow map.
 	// cVisGeneric::SetShadowType turns shadows off without it. We always can.
 	bool IsEnableSelfShadow() override { return true; }
+	// TODO(sdl-port): screenshots and gamma. See Render/PORTING.md #21.
+	int  SetGamma(float, float, float) override { return 0; }
 	bool SetScreenShot(const char*) override { return false; }
 
 	// --- 2D primitives (forwarded to the UI renderer) --------------------
@@ -296,6 +298,7 @@ public:
 	void FlushPrimitive2D() override {}
 
 	// --- 3D primitives (no-op) -------------------------------------------
+	// TODO(sdl-port): the 3D debug primitives draw nothing. See Render/PORTING.md #17.
 	void DrawLine(const Vect3f&, const Vect3f&, Color4c) override {}
 	void DrawPoint(const Vect3f&, Color4c) override {}
 	void FlushPrimitive3D() override {}
@@ -315,9 +318,9 @@ public:
 	// --- Sprites (forwarded to the UI renderer) ---------------------------
 	void DrawQuad(float, float, float, float, float, float, float, float, Color4c) override;
 	void DrawSprite(int, int, int, int, float, float, float, float, cTexture*, const Color4c&, float, eBlendMode, float) override;
-	// Unimplemented, and unreached: nothing outside the D3D backend calls the solid,
-	// two-texture or cTextureScale sprite variants. DrawSprite2 is used only by the
-	// chaos post-process (Render/src/CChaos.cpp), which has no SDL path yet.
+	// TODO(sdl-port): unimplemented, and currently unreached -- the solid, two-texture and
+	// cTextureScale sprite variants are used only by the chaos post-process
+	// (Render/src/CChaos.cpp), which has no SDL path. See Render/PORTING.md #18.
 	void DrawSpriteSolid(int, int, int, int, float, float, float, float, cTexture*, const Color4c&, float, eBlendMode) override {}
 	void DrawSprite2(int, int, int, int, float, float, float, float, cTexture*, cTexture*, const Color4c&, float) override {}
 	void DrawSprite2(int, int, int, int, float, float, float, float, float, float, float, float, cTexture*, cTexture*, const Color4c&, float, eColorMode, eBlendMode) override {}
@@ -347,6 +350,9 @@ public:
 	void UnlockIndexBuffer(sPtrIndexBuffer&) override;
 
 	// --- Internal shared dynamic buffers (no-op: none yet) ---------------
+	// TODO(sdl-port): the dynamic vertex/quad buffer family. Every one of these returns null,
+	// so any caller that was not rerouted through SDLWorldQuadRenderer draws nothing. This is
+	// what grass, the field dome and the lens flare need first. See Render/PORTING.md #15.
 	cVertexBuffer<sVertexXYZDT1>*  GetBufferXYZDT1() override { return nullptr; }
 	cVertexBuffer<sVertexXYZD>*    GetBufferXYZD() override { return nullptr; }
 	cVertexBuffer<sVertexXYZWD>*   GetBufferXYZWD() override { return nullptr; }

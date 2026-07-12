@@ -142,16 +142,8 @@ void Lighting::OneLight::Draw(Camera* camera,Lighting* parent)
 	// triangle strip.
 	const int nVertex = 2*(int)strip_list.size();
 
-#ifdef _WIN32
-	gb_RenderDevice->SetWorldMaterial(ALPHA_ADDBLENDALPHA,MatXf::ID,0,parent->pTexture);
-	gb_RenderDevice->SetSamplerDataVirtual(0,sampler_clamp_anisotropic);
-	//gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-	DrawStrip strip;
-	strip.Begin();
-#else
-	// As in CircleManager::Layer::drawSpline: DrawStrip has no off-Windows implementation
-	// (RenderStub's Begin/End are empty, so its buffer pointer stays uninitialised and the
-	// first Set() writes through it), so the strip goes through the world-quad renderer's
+	// As in CircleManager::Layer::drawSpline: DrawStrip was a D3D dynamic-buffer writer and
+	// has no implementation now, so the strip goes through the world-quad renderer's
 	// triangle route instead.
 	if(nVertex < 4)
 		return;   // a strip needs at least one quad
@@ -162,7 +154,6 @@ void Lighting::OneLight::Draw(Camera* camera,Lighting* parent)
 	pBuf->SetMaterial(ALPHA_ADDBLENDALPHA, parent->pTexture);
 	sVertexXYZDT2* vx = pBuf->Lock(nVertex);
 	int nv = 0;
-#endif
 	float size=parent->param.strip_width_begin+time*parent->param.strip_width_time;
 	sVertexXYZDT1 v1,v2;
 	v1.diffuse=diffuse;
@@ -177,9 +168,6 @@ void Lighting::OneLight::Draw(Camera* camera,Lighting* parent)
 
 		v1.u1()=v2.u1()=p.u;
 		v1.v1()=0;v2.v1()=1;
-#ifdef _WIN32
-		strip.Set(v1,v2);
-#else
 		// The triangle route's vertex carries a second texture coordinate; this material has
 		// no second texture, so it goes unread.
 		vx[nv].pos = v1.pos; vx[nv].diffuse = v1.diffuse;
@@ -188,18 +176,13 @@ void Lighting::OneLight::Draw(Camera* camera,Lighting* parent)
 		vx[nv].pos = v2.pos; vx[nv].diffuse = v2.diffuse;
 		vx[nv].GetTexel().set(v2.u1(), v2.v1()); vx[nv].GetTexel2().set(0.f, 0.f);
 		++nv;
-#endif
 	}
-#ifdef _WIN32
-	strip.End();
-#else
 	pBuf->Unlock(nv);
 	pBuf->DrawPrimitive(PT_TRIANGLESTRIP, nv - 2);
 	// D3D drew as DrawPrimitive went; open the pass here, where the scene walk reached the
 	// bolt. Lighting::Draw walks its OneLights, so each one's strip lands in call order.
 	if(cSDLRenderDevice* dev = sdlRenderDevice())
 		dev->drawWorldQuads();
-#endif
 }
 
 void Lighting::Animate(float dt)

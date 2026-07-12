@@ -124,7 +124,6 @@ public:
 	void SetCircleShadowIntensity(Color4c c){circle_shadow_intensity=c;}
 	Color4c GetCircleShadowIntensity(){return circle_shadow_intensity;}
 	
-	Camera* GetMirageCamera(){return mirageCamera_;}
 
 	void UpdateLists(int cur_quant);
 private:
@@ -156,8 +155,6 @@ private:
 	Camera*		shadowCamera_;
 	Camera*		lightCamera_;
 	Camera*		lightObjectsCamera_;
-	Camera*		mirageCamera_;
-	Camera*		floatZBufferCamera_;
 
 	bool			enable_reflection;
 	Camera*		reflectionCamera_;
@@ -169,8 +166,6 @@ private:
 	void AddLightCamera(Camera* camera);
 	void AddShadowCamera(Camera* camera);
 	void AddPlanarCamera(Camera* camera,bool light,bool toObjects);
-	void AddMirageCamera(Camera* camera);
-	void AddFloatZBufferCamera(Camera* camera);
 
 	void CreateShadowmap();
 	// The square shadow map's edge, from Option_ShadowSizePower.

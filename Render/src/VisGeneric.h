@@ -140,8 +140,6 @@ public:
 
 	bool IsMultithread(){return is_multithread;};
 
-	class CameraShader* GetShaders(){return shaders;}
-
 private:
 	virtual void SetData(cInterfaceRenderDevice *pData1);
 
@@ -151,10 +149,6 @@ private:
 	class cLib3dx			*Lib3dx;
 	class cLibSimply3dx		*LibSimply3dx;
 	friend class cD3DRender;
-	class CameraShader* shaders;
-
-	void InitShaders();
-	void ReleaseShaders();
 
 	string effect_path,effect_texture_path;
 

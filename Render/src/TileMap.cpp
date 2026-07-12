@@ -13,10 +13,8 @@
 #include "Serialization/EnumDescriptor.h"
 #include "Environment/Environment.h"
 #include "FileUtils/FileUtils.h"
-#ifndef _WIN32
 #include "Render/SDLTileMapRenderer.h"   // terrain is drawn by SDLTileMapRenderer,
 #include "Render/SDLRenderDevice.h"      // reached via cSDLRenderDevice::drawTileMap
-#endif
 
 namespace {
 ResourceSelector::Options textureOptions("*.tga", "Resource\\TerrainData\\Textures");
@@ -39,7 +37,6 @@ cTileMap::cTileMap(cScene* pScene, bool _tryColorEnable) : BaseGraphObject(0)
 	tileNumber_.set(0,0);
 	tiles_=0;
 
-	tileMapRender_=0;
 
 	zMax_ = 0;
 
@@ -54,21 +51,11 @@ cTileMap::cTileMap(cScene* pScene, bool _tryColorEnable) : BaseGraphObject(0)
 
 	for(int i=0;i < miniDetailTexturesNumber;i++)
 		zeroplast_color[i].set(1,1,1,1);
-#ifdef _WIN32
-	gb_RenderDevice3D->tilemap_inv_size.x=1.0f/vMap.H_SIZE;
-	gb_RenderDevice3D->tilemap_inv_size.y=1.0f/vMap.V_SIZE;
-#endif
 	update_zminmmax_time=1;
 
 	setScene(pScene);
 
 	trueColorEnable_=_tryColorEnable;
-#ifdef _WIN32
-	lavaShader_ = new ShaderSceneWaterLava(true);
-	lavaShader_->Restore();
-	iceShader_ = new ShaderSceneWaterIce;
-	iceShader_->Restore();
-#endif
 
 	vMap.registerUpdateMapClient(this);
 
@@ -83,9 +70,6 @@ cTileMap::cTileMap(cScene* pScene, bool _tryColorEnable) : BaseGraphObject(0)
 	tileBordersY_ = new short[tileBordersSize_.y = tileNumber().y*size.x];
 	tileBordersShr_.set(vMap.V_SIZE_POWER - TILEMAP_SHL, vMap.H_SIZE_POWER - TILEMAP_SHL);
 	heightFractionInv_ = 1.0f/float(1<<VX_FRACTION);
-#ifdef _WIN32
-	tileMapRender_ = new cTileMapRender(this);
-#endif
 
 	updateMap(Vect2i(0,0), Vect2i(size.x-1,size.y-1));
 }
@@ -93,12 +77,6 @@ cTileMap::cTileMap(cScene* pScene, bool _tryColorEnable) : BaseGraphObject(0)
 cTileMap::~cTileMap()
 {
 	vMap.unregisterUpdateMapClient(this);
-#ifdef _WIN32
-	delete lavaShader_;
-	delete iceShader_;
-
-	delete tileMapRender_;
-#endif
 
 	if(tiles_){
 		delete[] tiles_; 
@@ -135,9 +113,6 @@ void cTileMap::PreDraw(Camera* camera)
 	BuildRegionPoint();
 
 	camera->Attach(SCENENODE_OBJECT_TILEMAP,this);
-#ifdef _WIN32
-	tileMapRender_->PreDraw(camera);
-#endif
 }
 
 void cTileMap::Draw(Camera* camera)
@@ -146,23 +121,6 @@ void cTileMap::Draw(Camera* camera)
 		return;
 	start_timer_auto();
 
-#ifdef _WIN32
-//	cD3DRender *Render=gb_RenderDevice3D;
-//	if(camera->getAttribute(ATTRCAMERA_SHADOW)){
-//		Render->Draw(scene()); // рисовать источники света
-//	}
-//	else
-	if(camera->getAttribute(ATTRCAMERA_SHADOWMAP)){
-		if(Option_shadowEnabled)
-			tileMapRender_->DrawBump(camera, ALPHA_TEST, true, false);
-	}
-	else if(camera->getAttribute(ATTRCAMERA_FLOAT_ZBUFFER))
-		tileMapRender_->DrawBump(camera, ALPHA_NONE, false, true);
-	else
-		tileMapRender_->DrawBump(camera, ALPHA_NONE, false, false);
-
-	DrawLines();
-#else
 	// The planar-shadow and float-Z passes have no SDL equivalent yet. The reflection
 	// camera draws the terrain like any other: setCamera has bound its render target.
 	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_FLOAT_ZBUFFER))
@@ -176,7 +134,6 @@ void cTileMap::Draw(Camera* camera)
 	}
 	else
 		dev->drawTileMap(this, camera);
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -412,36 +369,6 @@ void cTileMap::Animate(float dt)
 				it++;
 		}
 	}
-}
-
-bool cTileMap::setMaterial(int material, eBlendMode MatMode)
-{
-#ifdef _WIN32
-	if(material < miniDetailTexturesNumber){
-		Color4f color=GetZeroplastColor(material);
-		if(MatMode!=ALPHA_BLEND)
-			color.a=1;
-		gb_RenderDevice3D->dtAdvance->SetTileColor(color);
-		cTexture* texture = Option_DetailTexture ? miniDetailTexture(material).texture : 0;
-		gb_RenderDevice3D->dtAdvance->SetMaterialTilemap(scene()->GetShadowIntensity(), texture, miniDetailTextureResolution());
-		return false;
-	}
-	else{
-		PlacementZoneMaterial& mat = placementZoneMaterials_[material - miniDetailTexturesNumber];
-		if(mat.shaderType == LAVA){
-			gb_RenderDevice3D->SetTexture(1, mat.texture);
-			lavaShader_->setTextureScale(mat.textureScale, mat.volumeTextureScale);
-			lavaShader_->SetColors(mat.lavaColor, mat.colorAmbient);
-			lavaShader_->SetTime(animationTime_*mat.speed);
-			lavaShader_->Select();
-			return false;
-		}
-		else{
-			iceShader_->beginDraw(mat.texture, mat.textureBump, 0, mat.textureCleft, 30, 0);
-			return true;
-		}
-	}
-#endif
 }
 
 void cTileMap::DrawLines()

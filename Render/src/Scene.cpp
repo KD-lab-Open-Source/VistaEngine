@@ -10,9 +10,7 @@
 #include "ClippingMesh.h"
 #include "Terra/vmap.h"
 #include "FileUtils/FileUtils.h"
-#ifndef _WIN32
 #include "Render/SDLRenderDevice.h"   // the shadow map lives on the SDL device
-#endif
 
 bool cScene::is_sky_cubemap=true;
 
@@ -51,8 +49,6 @@ cScene::cScene()
 	shadowCamera_ = new CameraShadowMap(this);
 	lightCamera_ = new CameraPlanarLight(this,false);
 	lightObjectsCamera_ = new CameraPlanarLight(this,true);
-	mirageCamera_ = new CameraMirageMap(this);
-	floatZBufferCamera_ = new Camera(this);
 	pReflectionRenderTarget=0;
 	reflectionCamera_=0;
 	pReflectionZBuffer=0;
@@ -117,8 +113,6 @@ cScene::~cScene()
 	RELEASE(shadowCamera_);
 	RELEASE(lightCamera_);
 	RELEASE(lightObjectsCamera_);
-	RELEASE(mirageCamera_);
-	RELEASE(floatZBufferCamera_);
 	RELEASE(pReflectionRenderTarget);
 	RELEASE(reflectionCamera_);
 	RELEASE(pReflectionZBuffer);
@@ -350,18 +344,11 @@ void cScene::Draw(Camera* camera)
 	//D3DSURFACE_DESC desc;
 	//gb_RenderDevice3D->lpBackBuffer->GetDesc(&desc);
 	//gb_RenderDevice3D->dtAdvance->CreateMirageMap(desc.Width,desc.Height);
-#ifdef _WIN32
-	camera->SetSecondRT(gb_RenderDevice3D->GetAccessibleZBuffer());//Криво, для демы.
-#endif
 
 //	unsigned int fp=_controlfp(0,0);
 //	_controlfp( _PC_24,  _MCW_PC ); 
 	//PreDraw
 	if(GetFogOfWar()){
-#ifdef _WIN32
-		gb_RenderDevice3D->SetFogOfWar(true);
-		gb_RenderDevice3D->fog_of_war_color=Color4f(GetFogOfWar()->GetFogColor());
-#endif
 	}
 
 /*
@@ -389,17 +376,10 @@ void cScene::Draw(Camera* camera)
 		lightObjectsCamera_->PreDrawScene();
 	if(reflectionCamera_)
 		reflectionCamera_->PreDrawScene();
-	if(mirageCamera_)
-		mirageCamera_->PreDrawScene();
-	if(floatZBufferCamera_)
-		floatZBufferCamera_->PreDrawScene();
 
 	if(tileMap_){
 		AddShadowCamera(camera);
 		AddReflectionCamera(camera);
-		AddMirageCamera(camera);
-		if(gb_VisGeneric->GetFloatZBufferType())
-			AddFloatZBufferCamera(camera);
 		camera->EnableGridTest(TileNumber.x,TileNumber.y,tile_size);
 		tileMap_->PreDraw(camera);
 	}
@@ -456,10 +436,7 @@ void cScene::Draw(Camera* camera)
 
 	if(cameraToDebug)
 		cameraToStore.SetCopy(camera);
-#ifdef _WIN32
-	gb_RenderDevice3D->SetFogOfWar(false);
 	gb_RenderDevice->SetClipRect(0,0,gb_RenderDevice->GetSizeX(),gb_RenderDevice->GetSizeY());
-#endif
 	circle_shadow.clear();
 }
 
@@ -798,27 +775,9 @@ int cScene::shadowMapSize()
 
 void cScene::CreateShadowmap()
 {
-#ifdef _WIN32
-	gb_RenderDevice3D->SetAdvance(true);
-	gb_RenderDevice3D->deleteRenderTargets();
-
-	int width = 256<<(Option_ShadowSizePower-1);
-
-	shadowEnabled_ = Option_shadowEnabled;
-
-	if(!gb_RenderDevice3D->createRenderTargets(width)){
-		gb_VisGeneric->SetShadowType(false, 0);
-		gb_RenderDevice3D->createRenderTargets(width);
-	}
-
-	float SizeLightMap=vMap.H_SIZE;
-	float focus=1/SizeLightMap;
-
-	GetTexLibrary()->Compact();
-#else
-	// The SDL backend needs only the shadow map itself: the light map, the mirage map and
-	// the float z-buffer that createRenderTargets also builds belong to passes it doesn't
-	// have. A failure means no shadows at all, so mirror the D3D fallback and turn them off.
+	// Only the shadow map. The light map, the mirage map and the float z-buffer that D3D's
+	// createRenderTargets also built belong to passes we don't have. A failure means no
+	// shadows at all, so mirror the D3D fallback and turn them off.
 	cSDLRenderDevice* dev = sdlRenderDevice();
 	if(!dev)
 		return;
@@ -830,7 +789,6 @@ void cScene::CreateShadowmap()
 	}
 
 	GetTexLibrary()->Compact();
-#endif
 }
 
 Vect2f cScene::CalcZMinZMaxShadowReciver()
@@ -1147,14 +1105,12 @@ void cScene::CalcShadowMapCamera(Camera* camera, Camera *shadowCamera)
 
 void cScene::AddPlanarCamera(Camera* camera, bool light, bool toObjects)
 {
-#ifndef _WIN32
 	// Only the terrain lightmap is ported. The objects' lightmap wants a sampler the object
-	// shader does not have, and the planar-shadow fallback (light == false) is a path SDL
-	// never takes -- it can always sample a depth texture. Bail before the child camera is
+	// shader does not have, and the planar-shadow fallback (light == false) is a path we
+	// never take -- we can always sample a depth texture. Bail before the child camera is
 	// attached: attached but targetless, it would resolve to the screen and draw over it.
 	if(!light || toObjects || !sdlRenderDevice() || !sdlRenderDevice()->GetLightMap())
 		return;
-#endif
 
 	sBox6f box;
 	ClippingMesh(tileMap_->zMax()).calcVisBox(camera,tileMap_->tileNumber(),tileMap_->tileSize(),Mat4f::ID,box);
@@ -1167,12 +1123,8 @@ void cScene::AddPlanarCamera(Camera* camera, bool light, bool toObjects)
 
 	Vect4f planarTransform(box.min.x, box.min.y, 1/(box.max.x-box.min.x), 1/(box.max.y-box.min.y));
 	if(light && !toObjects){
-#ifdef _WIN32
-		gb_RenderDevice3D->setPlanarTransform(planarTransform);
-#else
 		if(cSDLRenderDevice* dev = sdlRenderDevice())
 			dev->setPlanarTransform(planarTransform);
-#endif
 	}
 
 	Camera* planarCamera = light ? (toObjects ? lightObjectsCamera_ : lightCamera_) : shadowCamera_;
@@ -1195,11 +1147,7 @@ void cScene::AddPlanarCamera(Camera* camera, bool light, bool toObjects)
 	Vect2f Focus(planarTransform.z, planarTransform.w);
 	planarCamera->setAttribute(ATTRCAMERA_SHADOW|ATTRUNKOBJ_NOLIGHT);
 	planarCamera->clearAttribute(ATTRCAMERA_PERSPECTIVE | ATTRCAMERA_SHOWCLIP | ATTRCAMERA_WRITE_ALPHA);
-#ifdef _WIN32
-	planarCamera->SetRenderTarget(light ? (toObjects? gb_RenderDevice3D->GetLightMapObjects() : gb_RenderDevice3D->GetLightMap()) : gb_RenderDevice3D->GetShadowMap(), 0);
-#else
 	planarCamera->SetRenderTarget(sdlRenderDevice()->GetLightMap(), 0);   // guarded above
-#endif
 	planarCamera->SetFrustum(&Vect2f(0.5f,0.5f), &sRectangle4f(-0.5f,-0.5f,0.5f,0.5f),
 						   &Focus, &Vect2f(10,1e6f));
 	
@@ -1209,41 +1157,6 @@ void cScene::AddPlanarCamera(Camera* camera, bool light, bool toObjects)
 
 void cScene::AddShadowCamera(Camera* camera)
 {
-#ifdef _WIN32
-	gb_RenderDevice3D->SetAdvance(true);
-	if((Option_shadowEnabled && gb_RenderDevice3D->GetShadowMap()==0) || (!Option_shadowEnabled && gb_RenderDevice3D->GetLightMap() == 0)){
-		CreateShadowmap();
-	}
-	else{
-		bool change_shadowmap=false;
-		if(gb_RenderDevice3D->GetShadowMap() &&
-		  (256 << (Option_ShadowSizePower - 1) != gb_RenderDevice3D->GetShadowMap()->GetWidth() || 
-		   shadowEnabled_ != Option_shadowEnabled))
-			change_shadowmap = true;
-
-		if(!Option_ShadowSizePower && shadowEnabled_ != Option_shadowEnabled)
-			change_shadowmap = true;
-
-		if(change_shadowmap)
-			CreateShadowmap();
-	}
-
-	if(!IsIntensityShadow() || !Option_shadowEnabled) {
-		AddPlanarCamera(camera, true, false);
-		AddPlanarCamera(camera, true, true);
-	} 
-	else if(gb_RenderDevice3D->GetShadowMap()) { // shadow
-		if(Option_shadowEnabled) {
-			AddLightCamera(camera);
-			if(Option_shadowEnabled){
-				AddPlanarCamera(camera, true, false);
-				AddPlanarCamera(camera, true, true);
-			}
-		} 
-		else
-			AddPlanarCamera(camera, false, false);
-	}
-#else
 	cSDLRenderDevice* dev = sdlRenderDevice();
 	if(!dev)
 		return;
@@ -1268,33 +1181,10 @@ void cScene::AddShadowCamera(Camera* camera)
 
 	if(dev->GetShadowMap())
 		AddLightCamera(camera);
-#endif
 }
 
 void cScene::AddLightCamera(Camera* camera)
 {
-#ifdef _WIN32
-	camera->setAttribute(ATTRCAMERA_ZMINMAX);
-	camera->SetCopy(shadowCamera_);
-	camera->AttachChild(shadowCamera_);
-	shadowCamera_->setAttribute(ATTRCAMERA_SHADOWMAP|ATTRUNKOBJ_NOLIGHT);
-	shadowCamera_->clearAttribute(ATTRCAMERA_PERSPECTIVE|ATTRCAMERA_ZMINMAX|ATTRCAMERA_SHOWCLIP);
-	shadowCamera_->SetRenderTarget(gb_RenderDevice3D->GetShadowMap(), gb_RenderDevice3D->GetZBufferShadowMap());
-
-//	Vect2f z=CalcZ(camera);
-
-//	if(Option_ShadowType!=SHADOW_MAP_PERSPECTIVE)
-//		z.x=30.0f;
-
-//	Vect2f zplane=camera->GetZPlane();
-//	camera->SetZPlaneTemp(z);
-
-	CalcShadowMapCamera(camera, shadowCamera_);
-
-	shadowCamera_->Attach(SCENENODE_OBJECT, tileMap_);
-
-//	camera->SetZPlaneTemp(zplane);
-#else
 	cSDLRenderDevice* dev = sdlRenderDevice();
 	if(!dev || !dev->GetShadowMap())
 		return;
@@ -1313,27 +1203,7 @@ void cScene::AddLightCamera(Camera* camera)
 	// The terrain casts too: CameraShadowMap::DrawScene reaches it through
 	// DrawObject(SCENENODE_OBJECT), which is where the original puts it as well.
 	shadowCamera_->Attach(SCENENODE_OBJECT, tileMap_);
-#endif
 }
-
-void cScene::AddMirageCamera(Camera* camera)
-{
-#ifdef _WIN32
-	if(!gb_RenderDevice3D->GetMirageMap()){
-		D3DSURFACE_DESC desc;
-		gb_RenderDevice3D->backBuffer_->GetDesc(&desc);
-		gb_RenderDevice3D->CreateMirageMap(desc.Width,desc.Height);
-	}
-	camera->SetCopy(mirageCamera_);
-	//camera->AttachChild(mirageCamera_);
-	mirageCamera_->setAttribute(ATTRCAMERA_MIRAGE);
-	mirageCamera_->SetRenderTarget(gb_RenderDevice3D->GetMirageMap(), gb_RenderDevice3D->zBuffer_);
-	mirageCamera_->SetFoneColor(Color4c(128,128,128,0));
-	mirageCamera_->setAttribute(ATTRCAMERA_NOCLEARTARGET);
-	mirageCamera_->Update();
-#endif
-}
-
 
 void cScene::setZReflection(float zreflection, float weight)
 {
@@ -1364,27 +1234,6 @@ void cScene::AddReflectionCamera(Camera* camera)
 	}
 
 }
-void cScene::AddFloatZBufferCamera(Camera* camera)
-{
-#ifdef _WIN32
-	if(!gb_RenderDevice3D->GetFloatMap()){
-		D3DSURFACE_DESC desc;
-		gb_RenderDevice3D->backBuffer_->GetDesc(&desc);
-		if (!gb_RenderDevice3D->CreateFloatTexture(desc.Width,desc.Height))
-			return;
-		//gb_RenderDevice3D->CreateFloatTexture(512,512);
-	}
-	camera->SetCopy(floatZBufferCamera_);
-	floatZBufferCamera_->SetFrustum(&Vect2f(0.5f,0.5f), &sRectangle4f(-0.5f,-0.5f,0.5f,0.5f),
-		0, 0);
-	camera->AttachChild(floatZBufferCamera_);
-	floatZBufferCamera_->SetRenderTarget(gb_RenderDevice3D->GetFloatMap(), gb_RenderDevice3D->GetFloatZBuffer());
-	floatZBufferCamera_->setAttribute(ATTRCAMERA_FLOAT_ZBUFFER);
-	floatZBufferCamera_->Attach(SCENENODE_OBJECT, tileMap_);
-	floatZBufferCamera_->Update();
-#endif
-}
-
 void cScene::deleteManagedResource()
 {
 	DeleteReflectionSurface();
@@ -1404,21 +1253,10 @@ void cScene::CreateReflectionSurface()
 		return;
 
 	int xysize=1024;
-#ifdef _WIN32
-	HRESULT hr=gb_RenderDevice3D->D3DDevice_->CreateDepthStencilSurface(xysize, xysize,
-		D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 0, TRUE, &pReflectionZBuffer, 0);
-	if(FAILED(hr))
-	{
-		xassert(0);
-		RELEASE(pReflectionZBuffer);
-		return;
-	}
-#else
 	// No depth-stencil surface to make: cSDLRenderDevice::resolveTarget gives a colour
 	// render target a depth buffer of its own, sized to it. Same as the shadow map, where
 	// the z-buffer argument is likewise 0.
 	pReflectionZBuffer = 0;
-#endif
 
 	pReflectionRenderTarget=GetTexLibrary()->CreateRenderTexture(xysize,xysize,TEXTURE_RENDER32,false);
 	if(!pReflectionRenderTarget){
@@ -1441,10 +1279,6 @@ void cScene::DeleteReflectionSurface()
 
 void cScene::EnableReflection(bool enable)
 {
-#ifdef _WIN32
-	if(!gb_RenderDevice3D->IsPS20())
-		enable = false;
-#endif
 
 	enable_reflection = enable;
 	if(!enable){

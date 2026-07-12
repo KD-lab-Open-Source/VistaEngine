@@ -121,9 +121,8 @@ bool TextureMiniDetail::normalize()
 
 bool TextureMiniDetail::buildDDS()
 {
-#ifndef _WIN32
-	// No D3DX off-Windows: create the texture through the cross-platform device and hand
-	// it the equalised pixels. Color4c is b,g,r,a in memory, which is the device's staging
+	// D3DX built this; it went with D3D9. Create the texture through the device and hand it
+	// the equalised pixels. Color4c is b,g,r,a in memory, which is the device's staging
 	// order, so the rows copy straight in.
 	//
 	// The D3D path below builds the mip chain by hand, desaturating each level further than
@@ -132,9 +131,9 @@ bool TextureMiniDetail::buildDDS()
 	// instead; box-filtering noise converges on flat grey, which the shader's `detail - 0.5`
 	// turns into nothing, so the grain still fades out -- it just keeps its hue on the way.
 	//
-	// In practice this path only runs on a texture-cache miss: off-Windows cTexLibrary
-	// treats the shipped cache as exported, so the game's own detail textures come back as
-	// pre-built DDS (mips and all) through loadDDS, and reload() is never called for them.
+	// In practice this path only runs on a texture-cache miss: cTexLibrary treats the
+	// shipped cache as exported, so the game's own detail textures come back as pre-built
+	// DDS (mips and all) through loadDDS, and reload() is never called for them.
 	New(1);
 	if(gb_RenderDevice->CreateTexture(this, 0, -1, -1) != 0)
 		return false;
@@ -147,48 +146,4 @@ bool TextureMiniDetail::buildDDS()
 		memcpy(dst + y*pitch, in_data + y*sizeX_, sizeX_*sizeof(Color4c));
 	UnlockTexture();
 	return true;
-#else
-	New(1);
-	HRESULT hr=gb_RenderDevice3D->D3DDevice_->CreateTexture(sizeX_,sizeY_,0,0,D3DFMT_DXT1,D3DPOOL_MANAGED,&BitMap[0],0); // D3DPOOL_SCRATCH
-	if(FAILED(hr))
-		return false;
-
-	IDirect3DTexture9* texture9 = BitMap[0];
-	DWORD levels=texture9->GetLevelCount();
-	Color4c* out_data = new Color4c[sizeX_*sizeY_];
-
-	int num_bit=ReturnBit(tileSize_);
-
-	for(int i=0;i<levels;i++){
-		float smul = (num_bit-i)/(float)num_bit;
-		smul=clamp(smul,0,1);
-
-		for(int y=0;y<sizeY_;y++)
-			for(int x=0;x<sizeX_;x++){
-				Color4c& c=in_data[y*sizeX_+x];
-				Color4c& cout=out_data[y*sizeX_+x];
-				float h,s,v;
-				c.HSV(h,s,v);
-				cout.setHSV(h,s*smul,v);
-			}
-
-		LPDIRECT3DSURFACE9 lpSurface = 0;
-		hr = texture9->GetSurfaceLevel(i, &lpSurface);
-		if(FAILED(hr))
-			return false;
-
-		RECT rc;
-		rc.left=0;
-		rc.top=0;
-		rc.right=sizeX_;
-		rc.bottom=sizeY_;
-
-		hr=D3DXLoadSurfaceFromMemory(lpSurface, 0, 0, out_data, D3DFMT_A8R8G8B8, 4*sizeX_, 0, &rc, D3DX_FILTER_TRIANGLE, 0);
-		if(FAILED(hr))
-			return false;
-	}
-
-	delete out_data;
-	return true;
-#endif
 }

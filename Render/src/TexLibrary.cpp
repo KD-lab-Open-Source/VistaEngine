@@ -10,15 +10,10 @@
 
 RENDER_API cTexLibrary* GetTexLibrary()
 {
-#ifdef _WIN32
-	return &gb_RenderDevice3D->TexLibrary;
-#else
-	// Off-Windows there is no cD3DRender to host the texture library, so keep a
-	// standalone instance. (On Windows it lives inside cD3DRender so it resets on
-	// device loss; the SDL backend has no such reset yet.)
+	// A standalone instance. In the original it lived inside cD3DRender, so it reset on
+	// D3D device loss; SDL GPU has no such reset, and no such device-lost notion.
 	static cTexLibrary texLibrary;
 	return &texLibrary;
-#endif
 }
 
 cTexLibrary::cTexLibrary()
@@ -46,14 +41,12 @@ cTexLibrary::cTexLibrary()
 	if(ia.open(cacheInfo.c_str()))
 		serialize(ia);
 
-#ifndef _WIN32
 	// Cross-platform port runs against the shipped, frozen texture cache; the
 	// original source .tga assets aren't bundled, so the file-time validation in
 	// LoadCache (valid(): textureTime_ vs FileTime(source)) rejects perfectly good
 	// cached DDS (e.g. the menu's menu_button/rectangle_01/Map_Future). Treat the
 	// cache as exported so cached textures load without the source-time check.
 	exported_ = true;
-#endif
 }
 
 cTexLibrary::~cTexLibrary()
