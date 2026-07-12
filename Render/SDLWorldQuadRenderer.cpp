@@ -291,6 +291,7 @@ void SDLWorldQuadRenderer::BeginFrame()
 void SDLWorldQuadRenderer::SetCamera(Camera* camera)
 {
 	if(!camera) return;
+	camera_ = camera;
 	viewProj_ = camera->matViewProj;
 	vpX_ = camera->vp.X; vpY_ = camera->vp.Y;
 	vpW_ = camera->vp.Width; vpH_ = camera->vp.Height;
@@ -334,8 +335,46 @@ void SDLWorldQuadRenderer::openGroup(GroupKind kind)
 	current_.kind = kind;
 	current_.first = kind == GROUP_QUAD ? (int)(vertices_.size() / 4) : (int)indicesTri_.size();
 	current_.count = 0;
-	const Mat4f mvp = Mat4f(materialWorld_) * viewProj_;
+	const Mat4f world(materialWorld_);
+	const Mat4f mvp = world * viewProj_;
 	std::memcpy(current_.vs.mvp, &mvp, sizeof(current_.vs.mvp));
+
+	// Distance fog. The device's plane is in world space -- fog = dot(float4(worldPos,1), f)
+	// -- but these vertices are in the group's own space, so push the plane through the same
+	// world matrix the mvp folds in and let the shader dot it against the local position:
+	//     worldPos = local * W,  so  dot(local*W, f) == dot(local, W*f).
+	// A camera with fog off yields (0,0,0,1) here, and W*(0,0,0,1) is (0,0,0,1) again for any
+	// affine W -- so the sky camera and the lightmap camera keep the identity, as they must.
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	const Vect4f f = dev ? dev->fogPlane(camera_) : Vect4f(0.f, 0.f, 0.f, 1.f);
+	current_.vs.fogPlane[0] = world._11*f.x + world._12*f.y + world._13*f.z + world._14*f.w;
+	current_.vs.fogPlane[1] = world._21*f.x + world._22*f.y + world._23*f.z + world._24*f.w;
+	current_.vs.fogPlane[2] = world._31*f.x + world._32*f.y + world._33*f.z + world._34*f.w;
+	current_.vs.fogPlane[3] = world._41*f.x + world._42*f.y + world._43*f.z + world._44*f.w;
+
+	const Color4f fog = dev ? dev->fogColor() : Color4f(0.f, 0.f, 0.f, 0.f);
+	current_.fs.fogColor[0] = fog.r; current_.fs.fogColor[1] = fog.g;
+	current_.fs.fogColor[2] = fog.b; current_.fs.fogColor[3] = fog.a;
+
+	// Which of the two fog rules this group takes. The original said the same thing through
+	// a shader variant: cD3DRender::SetWorldMaterial selected FIX_FOG_ADD_BLEND for exactly
+	//     (blend == ALPHA_ADDBLENDALPHA || blend == ALPHA_ADDBLEND) && fog enabled
+	// and standart.vsl then scaled the vertex alpha by the fog factor instead of blending
+	// toward the fog colour. Its src blend factor was SRCALPHA, so scaling alpha scaled the
+	// contribution; ours is ONE over a premultiplied source, so the shader scales the whole
+	// premultiplied output instead. Same effect: a distant additive quad fades to nothing.
+	//
+	// ALPHA_SUBBLEND joins them, which the original did not do. It is the same kind of thing
+	// -- a contribution, not an occluder (the particle system picks between exactly these
+	// three, NParticle.cpp) -- and blending it toward the fog colour would make a distant
+	// subtractive particle *subtract the fog colour*, darkening the frame the further away it
+	// got. The original left that bug in place; there is no reason to port it.
+	const bool contribution = current_.blend == ALPHA_ADDBLEND
+	                       || current_.blend == ALPHA_ADDBLENDALPHA
+	                       || current_.blend == ALPHA_SUBBLEND;
+	current_.fs.fogParams[0] = contribution ? 1.f : 0.f;
+	current_.fs.fogParams[1] = current_.fs.fogParams[2] = current_.fs.fogParams[3] = 0.f;
+
 	drawing_ = cameraValid_;
 }
 
@@ -625,8 +664,9 @@ bool SDLWorldQuadRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 			boundFS = nullptr;
 		}
 
-		// Per group: a relative particle emitter folds its GlobalMatrix into the mvp.
-		if(!boundVS || std::memcmp(boundVS->mvp, g.vs.mvp, sizeof(g.vs.mvp)) != 0){
+		// Per group: a relative particle emitter folds its GlobalMatrix into the mvp -- and
+		// into the fog plane, so compare the whole block, not just the matrix.
+		if(!boundVS || std::memcmp(boundVS, &g.vs, sizeof(g.vs)) != 0){
 			SDL_PushGPUVertexUniformData(cmd, 0, &g.vs, sizeof(g.vs));
 			boundVS = &g.vs;
 		}

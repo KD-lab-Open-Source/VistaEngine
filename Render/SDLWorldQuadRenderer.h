@@ -134,11 +134,25 @@ public:
 	          bool clearDepth, bool wireframe);
 
 private:
-	// worldquad.vert.hlsl / worldtri.vert.hlsl's whole cbuffer: the original's mWVP.
-	struct VSUniform { float mvp[16]; };
-	// The fragment cbuffer of whichever shader the group takes. .x is worldtri's
+	// worldquad.vert.hlsl / worldtri.vert.hlsl's whole cbuffer: the original's mWVP, and the
+	// distance-fog plane. The plane is in the GROUP's space, not the world's -- the vertices
+	// are, so openGroup pushes cSDLRenderDevice::fogPlane through the same world matrix it
+	// folds into the mvp. (0,0,0,1) means fog is off.
+	struct VSUniform { float mvp[16]; float fogPlane[4]; };
+	// The fragment cbuffer of whichever shader the group takes. colorOp.x is worldtri's
 	// COLOR_OPERATION on the triangle route, and worldquad's SelectDiffuse on the quad one.
-	struct FSUniform { float colorOp[4]; };
+	//
+	// fogParams.x picks which of the TWO ways a group meets the fog, because this renderer's
+	// output is premultiplied and its groups are not all occluders:
+	//
+	//   0 -- an occluder (ALPHA_NONE / ALPHA_TEST / ALPHA_BLEND / ALPHA_MUL). It hides what
+	//        is behind it, so it fades TOWARD the fog colour, as D3D9's fixed function did.
+	//   1 -- a contribution (ALPHA_ADDBLEND / ALPHA_ADDBLENDALPHA / ALPHA_SUBBLEND). It adds
+	//        to (or takes from) what is behind it, so it must fade to NOTHING. Lerping it
+	//        toward the fog colour would literally add the fog colour to the frame, and a
+	//        distant particle would glow. This is the original's FIX_FOG_ADD_BLEND -- see
+	//        the note in SDLWorldQuadRenderer.cpp's openGroup.
+	struct FSUniform { float colorOp[4]; float fogColor[4]; float fogParams[4]; };
 
 	// Which stream a group's geometry lives in, and so which shader, vertex layout and
 	// buffers replay it. They share one group list, so the two interleave in call order.
@@ -225,6 +239,7 @@ private:
 	int lockFirst_ = 0, lockCount_ = 0;
 	std::vector<sVertexXYZDT2> scratchTri_;   // what Lock hands back when there is no camera
 
+	Camera* camera_ = nullptr;   // from SetCamera; the fog plane is built against its view matrix
 	Mat4f viewProj_;             // the camera's, from SetCamera; each group's mvp is world * this
 	int vpX_ = 0, vpY_ = 0, vpW_ = 0, vpH_ = 0;
 	float vpMinZ_ = 0.f, vpMaxZ_ = 1.f;

@@ -34,6 +34,22 @@ cbuffer Params : register(b0, space3)
     // its MODULATE default (CameraPlanarLight::drawLights). The spherical texture supplies
     // the falloff through its alpha; its rgb is not wanted.
     float4 SelectDiffuse;
+    // Distance fog: D3DRS_FOGCOLOR, and which of the two fog rules this group takes.
+    // The factor itself arrives interpolated, in VSOutput::Fog.
+    float4 FogColor;
+    // x == 0: an OCCLUDER (ALPHA_NONE / ALPHA_TEST / ALPHA_BLEND / ALPHA_MUL). It hides what
+    //         is behind it, so it fades toward the fog colour -- what D3D9's fixed function
+    //         did to every pixel. Note the lerp below is written for a PREMULTIPLIED source:
+    //         D3D fogged the raw colour and then multiplied by alpha, so the equivalent here
+    //         is lerp(FogColor * a, rgb, f) -- the fog colour has to be premultiplied too, or
+    //         a transparent pixel would fog to a solid one.
+    // x != 0: a CONTRIBUTION (ALPHA_ADDBLEND / ALPHA_ADDBLENDALPHA / ALPHA_SUBBLEND). It adds
+    //         to, or takes from, what is behind it, so it must fade to NOTHING -- lerping it
+    //         toward the fog colour would add the fog colour to the frame and make a distant
+    //         particle glow. This is the original's FIX_FOG_ADD_BLEND, which scaled the vertex
+    //         alpha by the fog factor; its src blend factor was SRC_ALPHA, so that scaled the
+    //         contribution. Ours is ONE over a premultiplied source, so scale the whole thing.
+    float4 FogParams;
 };
 
 struct VSOutput
@@ -41,7 +57,18 @@ struct VSOutput
     float4 Position : SV_Position;
     float4 Color    : COLOR0;
     float2 UV       : TEXCOORD0;
+    float  Fog      : TEXCOORD1;
 };
+
+// Fog a premultiplied pixel. See the cbuffer note above for why there are two rules.
+float4 applyFog(float4 ot, float fog)
+{
+    const float f = saturate(fog);
+    if(FogParams.x != 0.0f)
+        return ot * f;                                    // a contribution: fade it out
+    ot.rgb = lerp(FogColor.rgb * ot.a, ot.rgb, f);        // an occluder: fade it to the fog
+    return ot;
+}
 
 float4 main(VSOutput input) : SV_Target0
 {
@@ -53,8 +80,8 @@ float4 main(VSOutput input) : SV_Target0
         // (ONE, 1-SRC_ALPHA) blend wants. input.Color is already the vertex colour times
         // its own alpha, so multiplying it by the texture's alpha is exactly
         // raw_rgb * (t.a * diffuse.a), the premultiplied form of the pixel D3D emits.
-        return float4(input.Color.rgb * t.a, input.Color.a * t.a);
+        return applyFog(float4(input.Color.rgb * t.a, input.Color.a * t.a), input.Fog);
     }
 
-    return t * input.Color;
+    return applyFog(t * input.Color, input.Fog);
 }

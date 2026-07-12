@@ -1058,8 +1058,18 @@ void CameraPlanarLight::DrawScene()
 {
 	gb_RenderDevice->setCamera(this);
 
+	// The lightmap is not a view of the world -- it is a signed offset the terrain and the
+	// grass add to their own light, whose neutral is mid-grey. Fogging what is drawn into it
+	// would push every light source and circle shadow toward the fog colour and so leak fog
+	// into a surface that has already been fogged once, at its own depth. The original
+	// disabled fog here for exactly that reason.
+	DWORD fogenable = gb_RenderDevice->GetRenderState(RS_FOGENABLE);
+	gb_RenderDevice->SetRenderState(RS_FOGENABLE, FALSE);
+
 	DrawObjectFirstSorted();
 	drawLights();
+
+	gb_RenderDevice->SetRenderState(RS_FOGENABLE, fogenable);
 
 	// D3D drew as each quad group's EndDraw went; open the pass now, into the lightmap that
 	// setCamera bound. The depth state it set around this (no z-write, ZFUNC ALWAYS) is baked

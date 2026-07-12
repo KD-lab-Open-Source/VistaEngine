@@ -21,6 +21,12 @@
 cbuffer Constants : register(b0, space1)
 {
     row_major float4x4 MVP;   // the original's mWVP; engine row-major, so clip = mul(pos, MVP)
+    // Distance fog, from cSDLRenderDevice::fogPlane -- but pushed through this group's world
+    // matrix first (SDLWorldQuadRenderer::openGroup), because the position below is in the
+    // group's own space, not the world's. So the dot is against the LOCAL position.
+    // (0,0,0,1) means fog is off: the factor is 1, and the fragment shader leaves the pixel
+    // alone whichever of its two fog rules it takes.
+    float4 FogPlane;
 };
 
 struct VSInput
@@ -37,6 +43,7 @@ struct VSOutput
     float4 Color    : COLOR0;
     float2 UV0      : TEXCOORD0;
     float2 UV1      : TEXCOORD1;
+    float  Fog      : TEXCOORD2;
 };
 
 VSOutput main(VSInput input)
@@ -51,5 +58,7 @@ VSOutput main(VSInput input)
     // reasoning as worldquad.vert.hlsl, which explains it in full.
     float4 color = input.Color.bgra;
     output.Color = float4(color.rgb * color.a, color.a);
+
+    output.Fog = dot(float4(input.Position, 1.0f), FogPlane);
     return output;
 }
