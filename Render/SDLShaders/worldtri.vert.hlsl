@@ -27,6 +27,16 @@ cbuffer Constants : register(b0, space1)
     // (0,0,0,1) means fog is off: the factor is 1, and the fragment shader leaves the pixel
     // alone whichever of its two fog rules it takes.
     float4 FogPlane;
+
+    // --- ZREFLECTION only -----------------------------------------------------
+    // The original's mWorld (standart.vsl c-something; VSStandart::Select uploads it beside
+    // mWVP). MVP above has already folded the world matrix away into clip space, and the
+    // height lookup below needs a WORLD position, so it has to come across on its own.
+    row_major float4x4 World;
+    // The original's vReflectionMul: (1/H_SIZE, 1/V_SIZE, 1, 0) from cD3DRender's
+    // tilemap_inv_size. World XY lands in the height texture's 0..1; world Z passes through
+    // unscaled, to be compared against what the texture decodes to.
+    float4 ReflectionMul;
 };
 
 struct VSInput
@@ -44,6 +54,10 @@ struct VSOutput
     float2 UV0      : TEXCOORD0;
     float2 UV1      : TEXCOORD1;
     float  Fog      : TEXCOORD2;
+    // The original's `o.treflection = world_pos * vReflectionMul` (TEXCOORD5 there): xy is
+    // where this vertex sits in the height texture, z is its world height. Only ZREFLECTION
+    // reads it.
+    float3 ZRef     : TEXCOORD3;
 };
 
 VSOutput main(VSInput input)
@@ -60,5 +74,8 @@ VSOutput main(VSInput input)
     output.Color = float4(color.rgb * color.a, color.a);
 
     output.Fog = dot(float4(input.Position, 1.0f), FogPlane);
+
+    float3 worldPos = mul(float4(input.Position, 1.0f), World).xyz;
+    output.ZRef = worldPos * ReflectionMul.xyz;
     return output;
 }

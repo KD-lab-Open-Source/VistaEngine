@@ -9,24 +9,29 @@
 
 struct sVertexXYZDT2;
 
+// One tile's worth of the dome's surface: a grid of (xsize+1) x (ysize+1) vertices, wired
+// into triangles by a fixed index pattern that never changes once built.
+//
+// On D3D this owned a dynamic vertex buffer and cycled through eight pages of it with
+// NOOVERWRITE / DISCARD, so the GPU could still be reading the tile it drew last while the
+// CPU filled the next. SDLWorldQuadRenderer does that bookkeeping for every one of its
+// callers already -- it accumulates a frame's vertices and replays them in one pass -- so the
+// buffer, the paging and the raw D3D draw are all gone, and beginDraw/endDraw simply hand the
+// vertices to it. The index pattern stays, because the grid's vertices are shared between the
+// quads around them and neither a strip nor a list would express that.
 class TileStrip
 {
 public:
 	TileStrip(int xSize, int ySize);
-	~TileStrip();
 
 	sVertexXYZDT2* beginDraw();
 	void endDraw();
 
 private:
 	int xsize,ysize;
-	sPtrIndexBuffer ib;
-	sPtrVertexBuffer vb;
-	int pagesize;//in vertex
-	int pagenumber;
-	int curpage;
+	std::vector<sPolygon> indices_;
 
-	int numIndices(){return 3*2*xsize*ysize; }
+	int numPolygons() const { return 2*xsize*ysize; }
 	void setIB(sPolygon* pIndex);
 };
 

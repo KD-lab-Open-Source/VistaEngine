@@ -202,6 +202,14 @@ public:
 	// its inverse extent, so uv = (pos.xy - xy) * zw. cScene::AddPlanarCamera sets it.
 	void setPlanarTransform(const Vect4f& transform) { planarTransform_ = transform; }
 	const Vect4f& planarTransform() const { return planarTransform_; }
+
+	// cD3DRender::tilemap_inv_size, which cTileMap's constructor filled with
+	// (1/vMap.H_SIZE, 1/vMap.V_SIZE): world XY -> the 0..1 span of a map-sized texture. The
+	// field dome reads it to look itself up in the water's height texture (vReflectionMul in
+	// standart.vsl). It defaults to (1,1,0,0), as cD3DRender's did, so a world with no
+	// tilemap still divides by something sane.
+	void setTilemapInvSize(const Vect4f& v) { tilemapInvSize_ = v; }
+	const Vect4f& tilemapInvSize() const { return tilemapInvSize_; }
 	void SetShadowMatViewProj(const Mat4f& m) { shadowMatViewProj_ = m; }
 	const Mat4f& shadowMatViewProj() const { return shadowMatViewProj_; }
 
@@ -504,6 +512,7 @@ private:
 	cTexture* shadowMap_ = nullptr;
 	cTexture* lightMap_ = nullptr;
 	Vect4f planarTransform_ = Vect4f(0.f, 0.f, 1.f, 1.f);
+	Vect4f tilemapInvSize_ = Vect4f(1.f, 1.f, 0.f, 0.f);
 	int shadowMapSize_ = 0;
 	Mat4f shadowMatViewProj_;
 	bool shadowPassRan_ = false;

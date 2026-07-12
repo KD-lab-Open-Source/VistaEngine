@@ -59,6 +59,13 @@ cTileMap::cTileMap(cScene* pScene, bool _tryColorEnable) : BaseGraphObject(0)
 
 	vMap.registerUpdateMapClient(this);
 
+	// cD3DRender::tilemap_inv_size, which this constructor has always set. It maps world XY
+	// onto the 0..1 span of a map-sized texture, and the field dome uses it to find itself in
+	// the water's height texture. The D3D9 retirement took the assignment with it, leaving the
+	// value at its (1,1) default -- one of the globals only the D3D device ever populated.
+	if(cSDLRenderDevice* dev = sdlRenderDevice())
+		dev->setTilemapInvSize(Vect4f(1.0f/vMap.H_SIZE, 1.0f/vMap.V_SIZE, 0.f, 0.f));
+
 	Vect2i size((int)vMap.H_SIZE, (int)vMap.V_SIZE);
 	tileNumber_.set(size.x/tileSize().x,size.y/tileSize().y);
 	xassert(tileNumber_.x*tileSize().x==size.x);
