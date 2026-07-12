@@ -43,6 +43,7 @@ class SDLObject3dxRenderer;
 class SDLWaterRenderer;
 class SDLWorldQuadRenderer;
 class SDLMinimapRenderer;
+class SDLGrassRenderer;
 class cTileMap;
 
 // Restrict drawing to a camera's viewport, the way cD3DRender::SetDrawTransform hands
@@ -88,6 +89,10 @@ SDLWorldQuadRenderer* sdlWorldQuadRenderer();
 // inside the UI renderer's pass -- see SDLMinimapRenderer.h.
 SDLMinimapRenderer* sdlMinimapRenderer();
 
+// The SDL backend's grass renderer, or null under any other device. GrassMap::DrawGrass
+// drives it exactly as it drives VSGrass / PSGrass on Windows.
+SDLGrassRenderer* sdlGrassRenderer();
+
 class cSDLRenderDevice : public cInterfaceRenderDevice
 {
 public:
@@ -122,6 +127,14 @@ public:
 	void drawWater();
 	SDLWorldQuadRenderer* worldQuadRenderer() { return worldQuadRenderer_.get(); }
 	void drawWorldQuads();
+
+	// --- Grass ---------------------------------------------------------------
+	// GrassMap::DrawGrass records its tiles into the grass renderer, then calls this. Same
+	// contract as the water: it lands where Camera::DrawScene reached it, over the terrain
+	// and the tilemap objects (hence the object flush inside), under everything DrawObject
+	// records afterwards.
+	SDLGrassRenderer* grassRenderer() { return grassRenderer_.get(); }
+	void drawGrass();
 
 	// --- UI and minimap -----------------------------------------------------
 	// Neither has a draw call of its own. The UI renderer's pass runs at EndScene, over
@@ -470,6 +483,7 @@ private:
 	std::unique_ptr<SDLWaterRenderer>     waterRenderer_;
 	std::unique_ptr<SDLWorldQuadRenderer> worldQuadRenderer_;
 	std::unique_ptr<SDLMinimapRenderer>   minimapRenderer_;
+	std::unique_ptr<SDLGrassRenderer>     grassRenderer_;
 };
 
 #endif // VISTA_SDL_RENDER_DEVICE_H

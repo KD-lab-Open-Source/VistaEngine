@@ -23,11 +23,16 @@ grep -rn "TODO(sdl-port)" --include=*.cpp --include=*.h .
 
 ---
 
+## Ported since the retirement
+
+| # | Feature | Now lives in |
+|---|---------|--------------|
+| 1 | **Grass** | `Render/SDLGrassRenderer.{h,cpp}` + `Render/SDLShaders/grass.{vert,frag}.hlsl`, driven from `GrassMap::Draw`/`DrawGrass` as the original drove `VSGrass`/`PSGrass`. Everything but the draw (tile grid, blade generation, sort, buffers) had always been portable. The alpha test (`D3DRS_ALPHAREF 100`) has no SDL GPU equivalent and became a `clip()` in the fragment shader. |
+
 ## Features with no SDL path
 
 | # | Feature | Where it died | What the original did |
 |---|---------|---------------|-----------------------|
-| 1 | **Grass** | `Render/src/Grass.cpp` — `GrassMap::Draw` / `DrawGrass` are empty | `VSGrass`/`PSGrass` + per-card `PSGrassShadow` variants, alpha-tested wind-animated blades out of dynamic VBs. Everything but the draw (tile grid, blade generation, sort, buffers) still runs. Shaders: `Render/shader/Grass/`. |
 | 2 | **Distance fog** | `cSDLRenderDevice::SetGlobalFog` is a no-op; `Environment::graphQuant` no longer sets it | D3D fixed-function global fog, colour + range driven by the time of day. Affects every world shader. |
 | 3 | **The perimeter field dome** | `VistaRender/Field.cpp` — `FieldDispatcher::Draw` | The game's signature effect: an additive `sVertexXYZDT2` tile strip over the water, sampling the reflection texture. |
 | 4 | **Lava + ice terrain materials** | `cTileMap::setMaterial` (deleted); `Water/ice.cpp` — `cTemperature::Draw` | `ShaderSceneWaterLava` / `ShaderSceneWaterIce` over the placement-zone materials. |
@@ -36,7 +41,7 @@ grep -rn "TODO(sdl-port)" --include=*.cpp --include=*.h .
 | 7 | **`cEnvironmentEarth`** | `Water/Water.cpp` | The ground plane drawn under the water out to the horizon. |
 | 8 | **`cFogCircleEX`** | `Water/SkyObject.cpp` | Fixed-function horizon ring shaded from `D3DRS_TEXTUREFACTOR`. |
 | 9 | **Sky cubemap** | `EnvironmentTime::Draw` | A cube render target. Note: it had **no consumer** even on D3D — see the note in `MEMORY`/history before spending time on it. |
-| 10 | **Terrain lightmap alpha / fog of war** | `Render/src/FogOfWar.cpp` — `FogOfWar::Draw`; `VistaRender/FieldOfView.cpp` | An alpha-only quad into the lightmap's alpha channel. Blocked on a colour-write mask (#14). |
+| 10 | **Terrain lightmap alpha / fog of war** | `Render/src/FogOfWar.cpp` — `FogOfWar::Draw`; `VistaRender/FieldOfView.cpp` | An alpha-only quad into the lightmap's alpha channel. Blocked on a colour-write mask (#16). |
 | 11 | **Mirage camera** | `cScene::AddMirageCamera` (deleted) | Heat-haze render target, composited over the frame. |
 | 12 | **Float Z-buffer camera** | `cScene::AddFloatZBufferCamera`, `Camera::ClearFloatZBuffer`, `Camera::DrawToZBuffer` (deleted) | A float depth target for depth-of-field / soft particles. |
 | 13 | **Water depth prepass** | `cWater::DrawToZBuffer` | Feeds #12. |
@@ -46,7 +51,7 @@ grep -rn "TODO(sdl-port)" --include=*.cpp --include=*.h .
 
 | # | Capability | Where |
 |---|------------|-------|
-| 15 | **Dynamic vertex/quad buffers** — `GetBufferXYZD`, `GetQuadBufferXYZDT1`, … all return `nullptr` | `cSDLRenderDevice`. ~25 files called them. `SDLWorldQuadRenderer` covers the quad cases that were ported; the rest (grass, leaves, field, lens flare) need it or an equivalent. |
+| 15 | **Dynamic vertex/quad buffers** — `GetBufferXYZD`, `GetQuadBufferXYZDT1`, … all return `nullptr` | `cSDLRenderDevice`. ~25 files called them. `SDLWorldQuadRenderer` covers the quad cases that were ported; the rest (leaves, field, lens flare) need it or an equivalent. Note grass did **not**: it fills static `sPtrVertexBuffer`/`sPtrIndexBuffer`, which the device already implements — check which kind of buffer a feature really uses before assuming it is blocked on this. |
 | 16 | **Colour-write masks** (alpha-only / RGB-only passes) | Needs a pipeline variant per mask in the SDL renderers. Blocks #10. |
 | 17 | **3D debug primitives** — `DrawLine`, `DrawPoint`, `drawCircle`, `DrawBound`, `FlushPrimitive3D` | `cSDLRenderDevice`, all no-ops. Used by `cTileMap::DrawLines` and the debug overlays. |
 | 18 | **`DrawSprite2` / `DrawSpriteScale` / `DrawSpriteSolid`** | `cSDLRenderDevice`, all no-ops. Only `CChaos` (#6) uses them. |

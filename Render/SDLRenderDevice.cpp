@@ -20,6 +20,7 @@
 #include "SDLWaterRenderer.h"
 #include "SDLWorldQuadRenderer.h"
 #include "SDLMinimapRenderer.h"
+#include "SDLGrassRenderer.h"
 
 // See the declarations in SDLRenderDevice.h.
 cSDLRenderDevice* sdlRenderDevice()
@@ -55,6 +56,12 @@ SDLMinimapRenderer* sdlMinimapRenderer()
 {
 	cSDLRenderDevice* dev = sdlRenderDevice();
 	return dev ? dev->minimapRenderer() : nullptr;
+}
+
+SDLGrassRenderer* sdlGrassRenderer()
+{
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	return dev ? dev->grassRenderer() : nullptr;
 }
 
 SDL_GPUTexture* createSolidGPUTexture(SDL_GPUDevice* device, unsigned int rgba)
@@ -210,6 +217,8 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND /*hWnd*/,
 		waterRenderer_ = std::make_unique<SDLWaterRenderer>(this, device_, window_);
 	if(!worldQuadRenderer_)
 		worldQuadRenderer_ = std::make_unique<SDLWorldQuadRenderer>(device_, window_);
+	if(!grassRenderer_)
+		grassRenderer_ = std::make_unique<SDLGrassRenderer>(this, device_, window_);
 	if(!minimapRenderer_){
 		minimapRenderer_ = std::make_unique<SDLMinimapRenderer>(device_, window_);
 		// The minimap draws inside the UI's pass, at the point in its run list where the
@@ -254,6 +263,7 @@ int cSDLRenderDevice::Done()
 	objectRenderer_.reset();
 	waterRenderer_.reset();
 	worldQuadRenderer_.reset();
+	grassRenderer_.reset();
 
 	if(device_){
 		// The depth buffers the offscreen colour targets own. Their colour textures are
@@ -346,6 +356,8 @@ int cSDLRenderDevice::BeginScene()
 		waterRenderer_->BeginFrame();
 	if(worldQuadRenderer_)
 		worldQuadRenderer_->BeginFrame();
+	if(grassRenderer_)
+		grassRenderer_->BeginFrame();
 
 	// The screen is this frame's swapchain image; its clear was armed by Fill(). Offscreen
 	// targets keep their textures across frames, but not the clears they have consumed.
@@ -643,6 +655,29 @@ void cSDLRenderDevice::drawWorldQuads()
 	const bool clear = rt->clearPending && !rt->colorCleared;
 	if(worldQuadRenderer_->Draw(commandBuffer_, rt->color, rt->depth, rt->w, rt->h,
 	                            clear, rt->clearColor, !rt->depthCleared, fillMode_ == FILL_WIREFRAME)){
+		if(clear) rt->colorCleared = true;
+		rt->depthCleared = true;
+	}
+}
+
+void cSDLRenderDevice::drawGrass()
+{
+	if(!bActiveScene_ || !commandBuffer_ || !grassRenderer_ || !grassRenderer_->hasDraws())
+		return;
+	RenderTarget* rt = current_;
+	if(rt->depthOnly || !rt->usable()){
+		// Nowhere to put them, and they must not replay into the next camera's target.
+		grassRenderer_->DiscardDraws();
+		return;
+	}
+
+	// The terrain and the tilemap objects drew first, and Camera::DrawScene reaches the grass
+	// before DrawObject: the blades stand on the ground, and the units stand in front of them.
+	flushObjectPass();
+
+	const bool clear = rt->clearPending && !rt->colorCleared;
+	if(grassRenderer_->Draw(commandBuffer_, rt->color, rt->depth, rt->w, rt->h,
+	                        clear, rt->clearColor, !rt->depthCleared, fillMode_ == FILL_WIREFRAME)){
 		if(clear) rt->colorCleared = true;
 		rt->depthCleared = true;
 	}

@@ -274,9 +274,25 @@ bool cTexture::loadDDS(const char* file_name)
 	return gb_RenderDevice->CreateTexture(this, &img, -1, -1) == 0;
 }
 
+// The width, in bits, of one pixel of the memory LockTexture hands back -- the staging
+// image, not whatever the GPU happens to store. Every caller (GrassMap::BuildGrass,
+// cWater's minimap, cFogOfWar) locks a texture and walks it with this as the stride.
+//
+// The original asked the D3D device: GetTextureFormatSize(gb_RenderDevice3D->TexFmtData[format()]),
+// a table cD3DRender::Init filled with whatever formats the adapter turned out to support.
+// There is no D3D device any more, so that read was a null dereference. The SDL backend
+// stages a texture in one of exactly three widths, and this must agree with the rule
+// cSDLRenderDevice::CreateTexture allocates by -- if it says more than was allocated, the
+// caller's writes run off the end of the staging buffer.
 int cTexture::bitsPerPixel() const
 {
-	return GetTextureFormatSize(gb_RenderDevice3D->TexFmtData[format()]);
+	// A8L8 is the odd one: TEXTURE_GRAY is set on it too (cWater's Z/reflection texture),
+	// but it stages two bytes per pixel, not one. It has to be tested first.
+	if(format() == SURFMT_A8L8)
+		return 16;
+	if(getAttribute(TEXTURE_GRAY))
+		return 8;
+	return 32;
 }
 
 cFileImage* cTextureAviScale::createFileImage()

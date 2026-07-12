@@ -53,6 +53,7 @@ set(RENDER_SOURCES
     SDLObject3dxRenderer.cpp
     SDLWaterRenderer.cpp
     SDLWorldQuadRenderer.cpp
+    SDLGrassRenderer.cpp
     # Symbols the engine still names that the D3D backend used to define
     # (gb_RenderDevice, the sampler constants, the sPtr buffer handles).
     RenderStub.cpp

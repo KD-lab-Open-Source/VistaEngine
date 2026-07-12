@@ -1,6 +1,8 @@
 #include "StdAfxRD.h"
 #include "Grass.h"
 #include "D3DRender.h"
+#include "Render/SDLRenderDevice.h"
+#include "Render/SDLGrassRenderer.h"
 #include "cCamera.h"
 #include "FileImage.h"
 #include "Terra/vmap.h"
@@ -737,20 +739,83 @@ bool GrassMap::TestVisible(GrassTile& tile,Camera* camera)
 
 }
 
-// TODO(sdl-port): grass does not draw. See Render/PORTING.md #1.
+// The two draw functions, ported to SDL GPU. The original pushed VSGrass / PSGrass (or
+// PSGrassShadow) and a wall of render states at gb_RenderDevice3D and then issued one
+// DrawIndexedPrimitive per visible tile; SDLGrassRenderer takes the same state and the same
+// per-tile draws, and cSDLRenderDevice::drawGrass puts them on the screen right here, where
+// Camera::DrawScene reached us. Everything above this line -- the tile grid, the blade
+// generation, the sort, the vertex and index buffers -- was portable and never changed.
 //
-// The blades were drawn with their own D3D9 shaders (VSGrass / PSGrass, plus the per-card
-// PSGrassShadow variants) writing into the device's dynamic vertex buffers, and none of that
-// survived the D3D9 removal. Everything above this line -- the tile grid, the blade
-// generation, the sort, the vertex and index buffers -- is portable and still runs; only the
-// draw is missing. It needs an alpha-tested, wind-animated blade pipeline in the SDL
-// renderer; Render/shader/Grass/*.vsl,*.psl is what the original did.
+// The blend and alpha-test states the original set around this are baked into the pipeline
+// and the shader's clip(); see SDLGrassRenderer.cpp and grass.frag.hlsl.
 void GrassMap::DrawGrass(eBlendMode mode,Camera* camera)
 {
+	if(sortedTile_.empty() || !texture_)
+		return;
+	SDLGrassRenderer* renderer = sdlGrassRenderer();
+	cSDLRenderDevice* device = sdlRenderDevice();
+	if(!renderer || !device)
+		return;
+	cTileMap* tileMap = scene() ? scene()->GetTileMap() : 0;
+	if(!tileMap)
+		return;
+
+	SDLGrassRenderer::State state;
+	state.texture = texture_;
+	state.time = time_;
+	state.hideDistance = invHideDistance2_;
+	// The sun the terrain lights from, so the blades agree with the ground they stand on.
+	state.sunDiffuse = tileMap->GetDiffuse();
+	state.oldLighting = oldLighting;
+	state.receiveShadow = camera->IsShadow() && enbaleShadow_;
+	renderer->SetState(state, camera);
+
+	// Which of the two index buffers to use. Both list the same blades; they wind the quads
+	// in opposite orders, so one draws the tile's blades front-to-back and the other
+	// back-to-front. The dot with (0.5, 0.5) asks which side of the tile the camera is on --
+	// blades are alpha-blended and depth-writing, so drawing them out of order would let a
+	// near blade's transparent border punch a hole in the one behind it.
+	const Vect2f vec1(0.5f, 0.5f);
+	vector<SortedTile>::iterator it;
+	FOR_EACH(sortedTile_,it)
+	{
+		GrassTile* tile = it->tile;
+		if(tile->recreate || !drawTileValid(tile->drawTileID))
+			continue;
+		DrawTile* drawTile = drawTiles[tile->drawTileID];
+		Vect2f vec2(tile->pos.x+tileSize/2 - camera->GetPos().x,
+		            tile->pos.y+tileSize/2 - camera->GetPos().y);
+		const float a = vec2.dot(vec1);
+		renderer->DrawIndexedPrimitive(drawTile->vertexBuffer,
+		                               a > 0 ? drawTile->backwardIndex : drawTile->forwardIndex,
+		                               drawTile->bladeCount*2);
+	}
+
+	device->drawGrass();
 }
 
 void GrassMap::Draw(Camera* camera)
 {
+	start_timer_auto();
+
+	if(!enable_ || debugShowSwitch.grass)
+		return;
+
+	// Far tiles first: the per-tile index buffers order the blades within a tile, this orders
+	// the tiles among themselves.
+	stable_sort(sortedTile_.begin(),sortedTile_.end(),TilesSortByRadius());
+
+	// The z-buffer cameras the original also fed from here (its ATTRCAMERA_ZBUFFER /
+	// ATTRCAMERA_FLOAT_ZBUFFER branch, which drew the blades into a depth-only target with
+	// colour writes masked to alpha) went with the D3D9 backend -- see Render/PORTING.md #12.
+	// Nothing creates such a camera now, and if something does, it must not get colour grass.
+	if(camera->getAttribute(ATTRCAMERA_ZBUFFER) || camera->getAttribute(ATTRCAMERA_FLOAT_ZBUFFER))
+		return;
+
+	// D3DCULL_NONE and the alpha-blend states the original set here are fixed properties of
+	// the grass pipeline; the colour-write mask it saved and restored has no SDL GPU
+	// equivalent (PORTING.md #16) and only ever mattered to the z-buffer path above.
+	DrawGrass(ALPHA_TEST,camera);
 }
 
 void GrassMap::serialize(Archive& ar)
