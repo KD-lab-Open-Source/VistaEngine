@@ -10,12 +10,16 @@
 // Flush.
 //
 // The device owns what the whole backend shares — the SDL GPU device, the window
-// and swapchain, the frame's command buffer, the depth buffer, textures and
+// and swapchain, the frame's command buffer, the render targets, textures and
 // vertex/index buffers — but no drawing pipeline of its own. Drawing lives in renderer
 // classes that record their own passes into the frame's command buffer: SDLUIRenderer
 // (2D text, sprites, quads), SDLTileMapRenderer (terrain), SDLObject3dxRenderer
 // (skinned .3dx meshes), SDLWaterRenderer (the water surface) and SDLWorldQuadRenderer
 // (world-space textured quads: the sun and moon, the shoreline foam, the wave sources).
+//
+// Render targets follow the camera, as they do on D3D: cD3DRender::setCamera binds
+// camera->GetRenderTarget() and clears it, or restores the back buffer when the camera
+// has none. setCamera below is the same choke point -- see RenderTarget.
 
 #include "IRenderDevice.h"
 #include "MTSection.h"
@@ -102,17 +106,17 @@ public:
 	SDLWorldQuadRenderer* worldQuadRenderer() { return worldQuadRenderer_.get(); }
 	void drawWorldQuads();
 
-	// Replay the object batch recorded so far, and take the frame's clears if they are
-	// still going. drawWater / drawWorldQuads call it to get the opaque objects onto the
-	// screen before they blend over them; cSkyCamera::DrawScene calls it to get the sky
-	// models onto the screen before the world scene starts drawing over them.
+	// Replay the object batch recorded so far into the current target, and take that
+	// target's clears if they are still going. drawWater / drawWorldQuads call it to get
+	// the opaque objects onto the screen before they blend over them; cSkyCamera::DrawScene
+	// calls it to get the sky models onto the screen before the world scene draws over them.
 	void flushObjectPass();
 
 	// Camera::ClearZBuffer, which the main camera runs for ATTRCAMERA_CLEARZBUFFER: the sky
 	// draws first and leaves its own depth behind, in a frustum of its own (1e3..1e5). There
 	// is no clear outside a render pass here, so instead let the next pass own the depth
 	// clear again, exactly as if nothing had been drawn.
-	void clearZBuffer() { depthCleared_ = false; }
+	void clearZBuffer() { current_->depthCleared = false; }
 
 	// --- Shadow map -------------------------------------------------------
 	// Mirrors cD3DRender: cScene creates the map, the light camera renders the casters
@@ -122,6 +126,11 @@ public:
 	// renders the light-space z into a float colour target (object_shadow.psl's
 	// `return (float4)v.tdepth`) and forks the whole path on DT_RADEON9700 vs
 	// DT_GEFORCEFX. SDL GPU samples depth directly, so neither is needed.
+	//
+	// The map is not special-cased as a target: cScene::AddLightCamera hands it to the
+	// light camera through Camera::SetRenderTarget, and setCamera resolves it like any
+	// other -- to a depth-only RenderTarget, because its cTexture carries
+	// TEXTURE_RENDER_SHADOW_9700.
 	bool createShadowMap(int size);
 	void deleteShadowMap();
 	cTexture* GetShadowMap() { return shadowMap_; }
@@ -132,12 +141,14 @@ public:
 	Mat4f shadowMatBias() const;
 	// The terrain caster, from cTileMap::Draw under the light camera -- where the D3D
 	// backend calls tileMapRender_->DrawBump(camera, ALPHA_TEST, true, false). Draws
-	// immediately, so it lands before the object casters, which then load its depth.
-	// It needs no cTileMap: the caster mesh is the one SDLTileMapRenderer built from vMap.
+	// immediately into the current (depth-only) target, so it lands before the object
+	// casters, which then load its depth. It needs no cTileMap: the caster mesh is the one
+	// SDLTileMapRenderer built from vMap.
 	void drawTileMapShadow(Camera* camera);
 	// Record the depth pass the light camera accumulated, where the D3D backend calls
-	// DrawType::EndDrawShadow. It must land before any pass that samples the map.
-	void endShadowPass();
+	// DrawType::EndDrawShadow. Switching away from the map would flush it anyway; this
+	// only pins the moment, as the original does.
+	void endShadowPass() { flushTarget(current_); }
 	// True once a caster pass has filled the map this frame. Receivers must check it:
 	// cScene detaches the light camera whenever shadows are off, and the map outlives it.
 	bool shadowPassRan() const { return shadowPassRan_; }
@@ -199,11 +210,18 @@ public:
 
 	// --- Camera / transform ----------------------------------------------
 	// SDL GPU has no device-wide transform or viewport: matView/matProj reach the
-	// shaders as uniforms, and the viewport belongs to a render pass. So these only
-	// cache the camera, as cD3DRender does, and the renderers apply camera->vp when
+	// shaders as uniforms, and the viewport belongs to a render pass. So SetDrawTransform
+	// only caches the camera, as cD3DRender's does, and the renderers apply camera->vp when
 	// they open their pass (see applyCameraViewport).
+	//
+	// setCamera additionally binds the camera's render target, exactly where
+	// cD3DRender::setCamera calls SetRenderTarget / RestoreRenderTarget. Every camera
+	// passes through here before its own draws (Camera::DrawScene, CameraShadowMap::DrawScene
+	// and cSkyCamera::DrawScene all call it), and child cameras draw before their parent --
+	// so switching targets here is what gets an offscreen pass recorded, complete, ahead of
+	// the pass that samples it.
 	void SetDrawTransform(Camera* camera) override { camera_ = camera; }
-	void setCamera(Camera* camera) override { SetDrawTransform(camera); }
+	void setCamera(Camera* camera) override;
 	void setWorldMatrix(const MatXf&) override {}
 
 	// --- Misc state (no-op) ----------------------------------------------
@@ -291,6 +309,49 @@ public:
 	cVertexBuffer<sVertexXYZWDT2>* GetBufferXYZWDT2() override { return nullptr; }
 
 private:
+	// --- Render targets ---------------------------------------------------
+	// Where a pass draws, and how much of the clear it still owes. SDL GPU cannot clear
+	// outside a render pass, so a clear is *armed* here and consumed by whichever pass
+	// opens on the target first -- the bookkeeping the screen already carried, now per
+	// target. A null colour attachment means depth-only: that is the shadow map.
+	struct RenderTarget
+	{
+		SDL_GPUTexture* color = nullptr;
+		SDL_GPUTexture* depth = nullptr;
+		int   w = 0, h = 0;
+		float clearColor[4] = {0.f, 0.f, 0.f, 1.f};
+		bool  clearPending  = false;   // a clear is owed...
+		bool  colorCleared  = false;   // ...and some pass has already taken it
+		bool  depthCleared  = false;
+		bool  depthOnly     = false;   // no colour attachment: the shadow map
+		bool  ownsDepth     = false;   // offscreen colour targets carry their own depth
+		// Renderable at all? A camera can name a target whose texture is not resident yet.
+		bool  usable() const { return depth && (depthOnly || color); }
+	};
+
+	RenderTarget screen_;       // the swapchain image + depthTexture_
+	// A camera whose render target cannot be resolved (its texture is not created yet).
+	// Colour and depth stay null, so every pass skips rather than drawing to the screen.
+	RenderTarget nullTarget_;
+	// Offscreen targets, keyed by the cTexture the camera was handed. Node-based, so the
+	// RenderTarget* held in current_ survives a rehash.
+	std::unordered_map<cTexture*, RenderTarget> targets_;
+	RenderTarget* current_ = &screen_;
+
+	// The target `camera` draws into, created on first use: depth-only for a
+	// TEXTURE_RENDER_SHADOW_9700 texture, colour plus an owned depth buffer otherwise.
+	RenderTarget* resolveTarget(Camera* camera);
+	// Arm rt's clear from the camera, as cD3DRender::setCamera's Clear() does.
+	void armClear(RenderTarget* rt, Camera* camera);
+	// Replay whatever the object renderer has recorded into rt and settle rt's clear.
+	// Called when setCamera switches away, so an offscreen target is complete before
+	// anything samples it; and from EndScene for the screen.
+	void flushTarget(RenderTarget* rt);
+	// Drop an offscreen target when its cTexture goes away (DeleteTexture): the next
+	// cTexture allocated could land on the same address.
+	void releaseTarget(cTexture* texture);
+	SDL_GPUTexture* createDepthTexture(int w, int h);
+
 	// CPU-staged GPU texture: keyed by the SDL_GPUTexture* stored in cTexture's
 	// BitMap[0]. staging is the lockable CPU image; UnlockTexture uploads it.
 	// expand=true means 8-bit coverage staging uploaded into a BGRA texture as
@@ -325,35 +386,25 @@ private:
 	SDL_GPUCommandBuffer*  commandBuffer_    = nullptr;
 	SDL_GPUTexture*        swapchainTexture_ = nullptr;
 
-	// The scene depth buffer, shared by every 3D renderer so their passes occlude one
-	// another. Sized to the swapchain; owned here, like the swapchain image itself.
+	// The scene depth buffer behind screen_, shared by every 3D renderer so their passes
+	// occlude one another. Sized to the swapchain; owned here, like the swapchain image.
 	SDL_GPUTexture* depthTexture_ = nullptr;
 	int depthW_ = 0, depthH_ = 0;
 	bool ensureDepth(int w, int h);
-	// The depth texture behind shadowMap_, or null if there is nothing to render into.
-	SDL_GPUTexture* shadowDepthTexture();
 
 	// The shadow map, held as a cTexture so Camera::SetRenderTarget can take it and the
-	// scene can ask its size. Its SDL depth texture lives in textures_ like any other.
+	// scene can ask its size. Its SDL depth texture lives in textures_ like any other,
+	// and resolveTarget turns it into a depth-only RenderTarget.
 	cTexture* shadowMap_ = nullptr;
 	int shadowMapSize_ = 0;
 	Mat4f shadowMatViewProj_;
 	bool shadowPassRan_ = false;
-	// Which caster pass owns the map's clear this frame: the terrain's if it ran, else
-	// the objects'. Same bookkeeping as frameCleared_/depthCleared_ do for the screen.
-	bool shadowDepthCleared_ = false;
 
 	MTSection resetDeviceLock_;          // dummy lock (no device loss on SDL)
 	DWORD multisample_ = 0;
 	bool  bActiveScene_ = false;
-	bool  hasClear_     = false;
-	// Set once the frame's colour / depth clear has been consumed by whichever renderer
-	// opened the first pass, so later passes load the targets instead of wiping them.
-	bool  frameCleared_ = false;
-	bool  depthCleared_ = false;
 	int   fillMode_ = FILL_SOLID;   // RS_FILLMODE; FILL_WIREFRAME switches renderers to line pipelines
 	bool  zWriteEnable_ = true;     // RS_ZWRITEENABLE; picks the object pipeline's depth write
-	float clearColor_[4] = {0.f, 0.f, 0.f, 1.f};
 
 	std::unique_ptr<SDLUIRenderer>        uiRenderer_;
 	std::unique_ptr<SDLTileMapRenderer>   tileMapRenderer_;

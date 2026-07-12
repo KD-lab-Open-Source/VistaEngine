@@ -360,21 +360,14 @@ void SDLObject3dxRenderer::BeginFrame()
 {
 	states_.clear();
 	draws_.clear();
-	shadowDraws_.clear();
 	worldPool_.clear();
 	currentValid_ = false;
 	currentDirty_ = true;
-	currentShadow_ = false;
 }
 
 void SDLObject3dxRenderer::SetState(const State& state, Camera* camera)
 {
 	if(!camera) return;
-
-	// Which pass the draws that follow belong to. The light camera walks the scene first
-	// (Camera::DrawScene runs its children before its own draws), so the caster draws are
-	// recorded, and their pass replayed, before anything samples the map.
-	currentShadow_ = camera->getAttribute(ATTRCAMERA_SHADOWMAP) != 0;
 
 	// The bone poses, as VSSkin::Select uploads them: three float4 rows of (R | T) per
 	// bone, so the shader's world.k == dot(float4(pos,1), row k).
@@ -469,8 +462,11 @@ void SDLObject3dxRenderer::SetState(const State& state, Camera* camera)
 	//
 	// The map is already filled: Camera::DrawScene walks its child cameras, and so runs
 	// the light camera's whole caster pass, before drawing any of its own objects.
-	const bool receives = !currentShadow_ && !state.noLight && current_.texture
-	                   && camera->IsShadow() && owner_->shadowPassRan() && owner_->GetShadowMap();
+	// A caster never receives: under the light camera the map is a render target, not a
+	// texture. (shadowPassRan() is false there too, but say it once, plainly.)
+	const bool receives = !camera->getAttribute(ATTRCAMERA_SHADOWMAP) && !state.noLight
+	                   && current_.texture && camera->IsShadow()
+	                   && owner_->shadowPassRan() && owner_->GetShadowMap();
 	if(receives){
 		const Mat4f mShadow = owner_->shadowMatViewProj() * owner_->shadowMatBias();
 		std::memcpy(current_.vs.shadow, &mShadow, sizeof(current_.vs.shadow));
@@ -549,8 +545,9 @@ void SDLObject3dxRenderer::DrawIndexedPrimitive(sPtrVertexBuffer& vb, int OfsVer
 	// offsets -- the same arithmetic cD3DRender::DrawIndexedPrimitive hands to D3D.
 	d.firstIndex = 3 * nOfsPolygon;
 	d.indexCount = 3 * nPolygon;
-	d.depthWrite = currentShadow_ ? true : owner_->zWriteEnable();
-	(currentShadow_ ? shadowDraws_ : draws_).push_back(d);
+	// The caster pipelines always write depth, so this only matters to the colour pass.
+	d.depthWrite = owner_->zWriteEnable();
+	draws_.push_back(d);
 
 	*gb_RenderDevice->PtrNumberPolygon += nPolygon;
 	gb_RenderDevice->NumDrawObject++;
@@ -587,7 +584,7 @@ bool SDLObject3dxRenderer::DrawShadowPass(SDL_GPUCommandBuffer* cmd, SDL_GPUText
 	int boundState = -1;
 	float vsUniform[VS_UNIFORM_FLOATS];
 
-	for(const DrawCmd& d : shadowDraws_){
+	for(const DrawCmd& d : draws_){
 		const StateBlock& st = states_[d.state];
 
 		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, false, st.blend, true, false, true);
@@ -643,15 +640,17 @@ bool SDLObject3dxRenderer::DrawShadowPass(SDL_GPUCommandBuffer* cmd, SDL_GPUText
 	}
 
 	SDL_EndGPURenderPass(pass);
-	shadowDraws_.clear();   // recorded; a second endShadowPass this frame is a no-op
+	draws_.clear();   // recorded; a second flush of this target is a no-op
 	return true;
 }
 
 bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, SDL_GPUTexture* depth,
-                                int screenW, int screenH, bool clear, const float clearColor[4],
+                                int targetW, int targetH, bool clear, const float clearColor[4],
                                 bool clearDepth, bool wireframe)
 {
-	if(!device_ || !cmd || !target || !depth || draws_.empty())
+	// May run with nothing recorded: an offscreen target still owes its clear to whatever
+	// samples it. cSDLRenderDevice::flushTarget only calls in when there is work or a clear.
+	if(!device_ || !cmd || !target || !depth)
 		return false;
 
 	SDL_GPUColorTargetInfo ct = {};
@@ -698,7 +697,7 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 			sViewPort vp;
 			vp.X = st.vpX; vp.Y = st.vpY; vp.Width = st.vpW; vp.Height = st.vpH;
 			vp.MinZ = st.vpMinZ; vp.MaxZ = st.vpMaxZ;
-			applyCameraViewport(pass, vp, screenW, screenH);
+			applyCameraViewport(pass, vp, targetW, targetH);
 
 			// Push the cbuffer whole so the shader's World[20] is always fully backed;
 			// only the leading worldRows rows carry this bunch's bones.

@@ -112,24 +112,28 @@ public:
 	                          const sPtrIndexBuffer& ib, int nOfsPolygon, int nPolygon);
 
 	bool hasDraws() const { return !draws_.empty(); }
+	// Throw the pending draws away: the target they were recorded under cannot be rendered
+	// into (see cSDLRenderDevice::flushTarget), and they must not replay into the next one.
+	void DiscardDraws() { draws_.clear(); }
 
-	// Replay the draws recorded under the light camera into the shadow map, in a
-	// depth-only pass (no colour target). Called from CameraShadowMap::DrawScene via
-	// cSDLRenderDevice::endShadowPass, so the map is complete before anything samples it.
+	// Replay the pending draws into a depth-only pass (no colour target) -- the shadow map,
+	// which the light camera was walking when it recorded them. Reached from
+	// cSDLRenderDevice::flushTarget, so the map is complete before anything samples it.
 	// `clearDepth` means this pass owns the map's clear -- false once the terrain caster
-	// pass has already taken it. Returns true if the pass ran.
+	// pass has already taken it. Runs even with nothing recorded: the clear alone leaves an
+	// empty map at far depth. Returns true if the pass ran.
 	bool DrawShadowPass(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* depth, int size, bool clearDepth);
 
-	// Replay the draws recorded so far into one colour+depth render pass, and clear them.
-	// `clear`/`clearDepth` mean this pass owns the frame's colour/depth clear -- true only
+	// Replay the pending draws into one colour+depth render pass, and clear them.
+	// `clear`/`clearDepth` mean this pass owns the target's colour/depth clear -- true only
 	// when no earlier pass (the terrain) already took it. Returns true if the pass ran.
 	//
-	// Called at EndScene, and once more mid-scene from cSDLRenderDevice::flushObjectPass,
-	// which has to get the opaque objects onto the screen before the water and the coast
-	// sprites blend over them. The draws that follow that flush replay here, on top, as
-	// on D3D.
+	// Called from cSDLRenderDevice::flushTarget: at EndScene, mid-scene from
+	// flushObjectPass (which has to get the opaque objects onto the screen before the water
+	// and the coast sprites blend over them), and whenever setCamera switches targets. The
+	// draws that follow a flush replay in the next one, on top, as on D3D.
 	bool Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, SDL_GPUTexture* depth,
-	          int screenW, int screenH, bool clear, const float clearColor[4],
+	          int targetW, int targetH, bool clear, const float clearColor[4],
 	          bool clearDepth, bool wireframe);
 
 private:
@@ -225,17 +229,19 @@ private:
 	SDL_GPUTexture* whiteTexture_ = nullptr;   // bound when a material has no texture
 
 	std::vector<StateBlock> states_;
+	// The draws recorded since the last flush, all of them bound for whatever target the
+	// device has bound now. Draws made under the light camera are no different: their
+	// StateBlock simply carries the light's MVP and viewport, because SetState reads
+	// whichever camera it is handed, and cSDLRenderDevice::flushTarget replays them into
+	// the shadow map when the scene walk leaves that camera.
 	std::vector<DrawCmd>    draws_;
-	// Draws recorded while the light camera walked the scene. They share states_ and
-	// worldPool_ with the main pass -- their StateBlock simply carries the light's MVP
-	// and viewport, because SetState reads whichever camera it is handed.
-	std::vector<DrawCmd>    shadowDraws_;
-	std::vector<float>      worldPool_;   // bone rows for every state this frame
+	// Bone rows for every state this frame. Survives a flush, like states_: the draws still
+	// to come index into both.
+	std::vector<float>      worldPool_;
 
 	StateBlock current_;         // set by SetState, committed lazily by AddDraw
 	bool currentValid_ = false;  // SetState has run this frame
 	bool currentDirty_ = true;   // current_ differs from states_.back()
-	bool currentShadow_ = false; // the state's camera is the shadow-map camera
 };
 
 #endif // VISTA_SDL_OBJECT3DX_RENDERER_H

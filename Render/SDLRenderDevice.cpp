@@ -11,7 +11,8 @@
 #include "Texture.h"     // cTexture (BitMap / GetDDSurface / attributes)
 #include "FileImage.h"   // cFileImage::GetTexture
 #include "TexLibrary.h"  // GetTexLibrary()->CreateRenderTexture (the shadow map)
-#include "cCamera.h"     // sViewPort
+#include "cCamera.h"     // Camera (GetRenderTarget / GetFoneColor), sViewPort
+#include "VisGenericDefine.h"   // ATTRCAMERA_NOCLEARTARGET, ATTRCAMERA_REFLECTION
 
 #include "SDLUIRenderer.h"
 #include "SDLTileMapRenderer.h"
@@ -189,6 +190,15 @@ int cSDLRenderDevice::Done()
 	worldQuadRenderer_.reset();
 
 	if(device_){
+		// The depth buffers the offscreen colour targets own. Their colour textures are
+		// cTexture-backed and released with everything else in textures_.
+		for(auto& kv : targets_)
+			if(kv.second.ownsDepth && kv.second.depth)
+				SDL_ReleaseGPUTexture(device_, kv.second.depth);
+		targets_.clear();
+		current_ = &screen_;
+		screen_ = RenderTarget();
+
 		if(depthTexture_){
 			SDL_ReleaseGPUTexture(device_, depthTexture_);
 			depthTexture_ = nullptr;
@@ -229,11 +239,13 @@ bool cSDLRenderDevice::ChangeSize(int xScr_, int yScr_, int mode)
 
 int cSDLRenderDevice::Fill(int r, int g, int b, int a)
 {
-	clearColor_[0] = r / 255.f;
-	clearColor_[1] = g / 255.f;
-	clearColor_[2] = b / 255.f;
-	clearColor_[3] = a / 255.f;
-	hasClear_ = true;
+	// The screen's clear. Offscreen targets take theirs from the camera's fone colour
+	// when setCamera binds them (armClear), as they do on D3D.
+	screen_.clearColor[0] = r / 255.f;
+	screen_.clearColor[1] = g / 255.f;
+	screen_.clearColor[2] = b / 255.f;
+	screen_.clearColor[3] = a / 255.f;
+	screen_.clearPending = true;
 	return 0;
 }
 
@@ -268,10 +280,23 @@ int cSDLRenderDevice::BeginScene()
 		waterRenderer_->BeginFrame();
 	if(worldQuadRenderer_)
 		worldQuadRenderer_->BeginFrame();
-	frameCleared_ = false;
-	depthCleared_ = false;
+
+	// The screen is this frame's swapchain image; its clear was armed by Fill(). Offscreen
+	// targets keep their textures across frames, but not the clears they have consumed.
+	screen_.color = swapchainTexture_;
+	screen_.w = xScr;
+	screen_.h = yScr;
+	screen_.depth = ensureDepth(xScr, yScr) ? depthTexture_ : nullptr;
+	screen_.colorCleared = false;
+	screen_.depthCleared = false;
+	for(auto& kv : targets_){
+		kv.second.clearPending = false;
+		kv.second.colorCleared = false;
+		kv.second.depthCleared = false;
+	}
+	current_ = &screen_;
+
 	shadowPassRan_ = false;
-	shadowDepthCleared_ = false;
 	bActiveScene_ = true;
 	NumberPolygon = 0;
 	NumDrawObject = 0;
@@ -284,48 +309,49 @@ int cSDLRenderDevice::EndScene()
 	if(!bActiveScene_) return 1;
 	bActiveScene_ = false;
 
-	// Whatever objects the scene walk recorded and flushObjectPass has not already
-	// replayed -- everything past SCENENODE_OBJECTSPECIAL, or the whole scene in a mission
-	// with neither water nor coast sprites. Over the terrain and against its depth. Then
-	// the UI pass, last, over everything. Each pass carries the frame's colour (and depth)
-	// clear only if no earlier one already took it.
-	if(swapchainTexture_ && commandBuffer_ && objectRenderer_ && objectRenderer_->hasDraws()
-	   && ensureDepth(xScr, yScr)){
-		const bool clear = hasClear_ && !frameCleared_;
-		if(objectRenderer_->Draw(commandBuffer_, swapchainTexture_, depthTexture_, xScr, yScr,
-		                         clear, clearColor_, !depthCleared_, fillMode_ == FILL_WIREFRAME)){
-			if(clear) frameCleared_ = true;
-			depthCleared_ = true;
-		}
-	}
+	// Whatever objects the scene walk recorded and no earlier flush replayed -- everything
+	// past SCENENODE_OBJECTSPECIAL, or the whole scene in a mission with neither water nor
+	// coast sprites. Over the terrain and against its depth. The last camera to draw is the
+	// main one, so the current target is the screen; assert nothing, just settle it.
+	flushTarget(current_);
 
-	if(swapchainTexture_ && commandBuffer_ && uiRenderer_)
-		uiRenderer_->Draw(commandBuffer_, swapchainTexture_, xScr, yScr,
-		                  hasClear_ && !frameCleared_, clearColor_);
+	// Then the UI pass, last, over everything. It carries the frame's colour clear only if
+	// no earlier pass took it.
+	if(screen_.color && commandBuffer_ && uiRenderer_)
+		uiRenderer_->Draw(commandBuffer_, screen_.color, screen_.w, screen_.h,
+		                  screen_.clearPending && !screen_.colorCleared, screen_.clearColor);
 
 	if(commandBuffer_){
 		SDL_SubmitGPUCommandBuffer(commandBuffer_);
 		commandBuffer_ = nullptr;
 	}
 	swapchainTexture_ = nullptr;
-	hasClear_ = false;
+	screen_.color = nullptr;
+	screen_.clearPending = false;
+	current_ = &screen_;
 	return 0;
 }
 
-// The depth target every 3D pass shares. Sized to the swapchain, rebuilt on resize.
-bool cSDLRenderDevice::ensureDepth(int w, int h)
+SDL_GPUTexture* cSDLRenderDevice::createDepthTexture(int w, int h)
 {
-	if(!device_ || w <= 0 || h <= 0) return false;
-	if(depthTexture_ && depthW_ == w && depthH_ == h) return true;
-	if(depthTexture_) SDL_ReleaseGPUTexture(device_, depthTexture_);
-
+	if(!device_ || w <= 0 || h <= 0) return nullptr;
 	SDL_GPUTextureCreateInfo ti = {};
 	ti.type = SDL_GPU_TEXTURETYPE_2D;
 	ti.format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
 	ti.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET;
 	ti.width = (Uint32)w; ti.height = (Uint32)h;
 	ti.layer_count_or_depth = 1; ti.num_levels = 1;
-	depthTexture_ = SDL_CreateGPUTexture(device_, &ti);
+	return SDL_CreateGPUTexture(device_, &ti);
+}
+
+// The depth target behind the screen. Sized to the swapchain, rebuilt on resize.
+bool cSDLRenderDevice::ensureDepth(int w, int h)
+{
+	if(!device_ || w <= 0 || h <= 0) return false;
+	if(depthTexture_ && depthW_ == w && depthH_ == h) return true;
+	if(depthTexture_) SDL_ReleaseGPUTexture(device_, depthTexture_);
+
+	depthTexture_ = createDepthTexture(w, h);
 	depthW_ = depthTexture_ ? w : 0;
 	depthH_ = depthTexture_ ? h : 0;
 	return depthTexture_ != nullptr;
@@ -339,22 +365,169 @@ int cSDLRenderDevice::Flush()
 }
 
 // ---------------------------------------------------------------------------
+// Render targets
+//
+// cD3DRender::setCamera binds camera->GetRenderTarget() and clears it, or restores the
+// back buffer. These three do the same job: resolveTarget maps the camera's cTexture to
+// the SDL textures behind it, armClear stands in for D3D's Clear(), and flushTarget is
+// the boundary -- the object renderer batches across the whole scene walk, so whatever it
+// recorded under the outgoing camera must reach the outgoing target before the incoming
+// camera's passes (which may sample it) are recorded.
+// ---------------------------------------------------------------------------
+cSDLRenderDevice::RenderTarget* cSDLRenderDevice::resolveTarget(Camera* camera)
+{
+	cTexture* texture = camera ? camera->GetRenderTarget() : nullptr;
+	if(!texture)
+		return &screen_;
+
+	auto it = targets_.find(texture);
+	if(it != targets_.end())
+		return &it->second;
+
+	// cScene creates the target's cTexture before the device makes it resident. Until then
+	// there is nothing to draw into -- and drawing to the screen instead would paint the
+	// shadow casters over the frame.
+	SDL_GPUTexture* tex = texture->frameNumber() >= 1
+	                    ? reinterpret_cast<SDL_GPUTexture*>(texture->GetDDSurface(0))
+	                    : nullptr;
+	if(!tex)
+		return &nullTarget_;
+
+	RenderTarget rt;
+	rt.w = texture->GetWidth();
+	rt.h = texture->GetHeight();
+	if(texture->getAttribute(TEXTURE_RENDER_SHADOW_9700)){
+		rt.depthOnly = true;
+		rt.depth = tex;   // the shadow map *is* its depth buffer; no colour attachment
+	}
+	else {
+		rt.color = tex;
+		rt.depth = createDepthTexture(rt.w, rt.h);
+		if(!rt.depth)
+			return &nullTarget_;
+		rt.ownsDepth = true;
+	}
+	return &targets_.emplace(texture, rt).first->second;
+}
+
+void cSDLRenderDevice::armClear(RenderTarget* rt, Camera* camera)
+{
+	if(!camera)
+		return;
+
+	// ATTRCAMERA_NOCLEARTARGET: draw over whatever the target already holds. cSkyObj::
+	// DrawSky fills the reflection target with the sky, and the reflection camera then
+	// draws the world over it -- re-arming the depth clear on its own, and only the depth,
+	// through ATTRCAMERA_CLEARZBUFFER (Camera::ClearZBuffer -> clearZBuffer).
+	if(camera->getAttribute(ATTRCAMERA_NOCLEARTARGET)){
+		rt->clearPending = false;
+		rt->colorCleared = true;
+		rt->depthCleared = true;
+		return;
+	}
+
+	const Color4c c = camera->GetFoneColor();
+	rt->clearColor[0] = c.r / 255.f;
+	rt->clearColor[1] = c.g / 255.f;
+	rt->clearColor[2] = c.b / 255.f;
+	// cD3DRender::setCamera masks the fone colour's alpha off for a reflection camera
+	// (`color &= ~0xff000000`): the reflection target's alpha is the water's HDR mask.
+	rt->clearColor[3] = camera->getAttribute(ATTRCAMERA_REFLECTION) ? 0.f : c.a / 255.f;
+
+	rt->clearPending = true;
+	rt->colorCleared = false;
+	rt->depthCleared = false;
+}
+
+void cSDLRenderDevice::flushTarget(RenderTarget* rt)
+{
+	if(!rt || !commandBuffer_ || !objectRenderer_)
+		return;
+
+	// Nothing to render into (nullTarget_, or a frame with no swapchain image). The draws
+	// recorded under it belong nowhere; drop them, or they replay into the next target.
+	if(!rt->usable()){
+		objectRenderer_->DiscardDraws();
+		return;
+	}
+
+	const bool hasDraws = objectRenderer_->hasDraws();
+
+	if(rt->depthOnly){
+		// The shadow map. Worth a pass even with nothing to cast, because the clear alone
+		// leaves the map at far depth, i.e. every receiver lit. Skipping it would let them
+		// sample last frame's map, or on the first frame an undefined one.
+		if(!hasDraws && rt->depthCleared)
+			return;
+		if(objectRenderer_->DrawShadowPass(commandBuffer_, rt->depth, rt->w, !rt->depthCleared)){
+			rt->depthCleared = true;
+			shadowPassRan_   = true;
+		}
+		return;
+	}
+
+	// An offscreen colour target owes its clear to whatever samples it later, so open the
+	// pass for the clear alone if the scene walk drew nothing into it. The screen's clear
+	// can keep waiting: the UI pass at EndScene always runs and will take it.
+	const bool owesClear = rt != &screen_
+	                    && ((rt->clearPending && !rt->colorCleared) || !rt->depthCleared);
+	if(!hasDraws && !owesClear)
+		return;
+
+	const bool clear = rt->clearPending && !rt->colorCleared;
+	if(objectRenderer_->Draw(commandBuffer_, rt->color, rt->depth, rt->w, rt->h,
+	                         clear, rt->clearColor, !rt->depthCleared,
+	                         fillMode_ == FILL_WIREFRAME)){
+		if(clear) rt->colorCleared = true;
+		rt->depthCleared = true;
+	}
+}
+
+void cSDLRenderDevice::releaseTarget(cTexture* texture)
+{
+	auto it = targets_.find(texture);
+	if(it == targets_.end())
+		return;
+	if(current_ == &it->second)
+		current_ = &screen_;
+	if(it->second.ownsDepth && it->second.depth && device_)
+		SDL_ReleaseGPUTexture(device_, it->second.depth);
+	targets_.erase(it);
+}
+
+void cSDLRenderDevice::setCamera(Camera* camera)
+{
+	SetDrawTransform(camera);
+
+	RenderTarget* rt = resolveTarget(camera);
+	if(rt == current_)
+		return;
+
+	flushTarget(current_);
+	current_ = rt;
+
+	if(rt != &screen_ && rt != &nullTarget_)
+		armClear(rt, camera);
+}
+
+// ---------------------------------------------------------------------------
 // Terrain: forwarded to the tilemap renderer, which draws immediately in its own
 // pass. Called mid-scene from cTileMap::Draw, so the frame's command buffer and
 // swapchain image are live and no render pass is open.
 // ---------------------------------------------------------------------------
 void cSDLRenderDevice::drawTileMap(cTileMap* tileMap, Camera* camera)
 {
-	if(!bActiveScene_ || !commandBuffer_ || !swapchainTexture_ || !tileMapRenderer_)
+	if(!bActiveScene_ || !commandBuffer_ || !tileMapRenderer_)
 		return;
-	if(!ensureDepth(xScr, yScr))
+	RenderTarget* rt = current_;
+	if(rt->depthOnly || !rt->usable())
 		return;
-	const bool clear = hasClear_ && !frameCleared_;
-	if(tileMapRenderer_->Draw(commandBuffer_, swapchainTexture_, depthTexture_, xScr, yScr,
-	                          clear, clearColor_, !depthCleared_, tileMap, camera,
+	const bool clear = rt->clearPending && !rt->colorCleared;
+	if(tileMapRenderer_->Draw(commandBuffer_, rt->color, rt->depth, rt->w, rt->h,
+	                          clear, rt->clearColor, !rt->depthCleared, tileMap, camera,
 	                          fillMode_ == FILL_WIREFRAME)){
-		if(clear) frameCleared_ = true;
-		depthCleared_ = true;
+		if(clear) rt->colorCleared = true;
+		rt->depthCleared = true;
 	}
 }
 
@@ -365,49 +538,44 @@ void cSDLRenderDevice::drawTileMap(cTileMap* tileMap, Camera* camera)
 // ---------------------------------------------------------------------------
 void cSDLRenderDevice::flushObjectPass()
 {
-	if(!objectRenderer_ || !objectRenderer_->hasDraws())
-		return;
-	const bool clear = hasClear_ && !frameCleared_;
-	if(objectRenderer_->Draw(commandBuffer_, swapchainTexture_, depthTexture_, xScr, yScr,
-	                         clear, clearColor_, !depthCleared_, fillMode_ == FILL_WIREFRAME)){
-		if(clear) frameCleared_ = true;
-		depthCleared_ = true;
-	}
+	flushTarget(current_);
 }
 
 void cSDLRenderDevice::drawWater()
 {
-	if(!bActiveScene_ || !commandBuffer_ || !swapchainTexture_ || !waterRenderer_)
+	if(!bActiveScene_ || !commandBuffer_ || !waterRenderer_ || !waterRenderer_->hasDraws())
 		return;
-	if(!waterRenderer_->hasDraws() || !ensureDepth(xScr, yScr))
+	RenderTarget* rt = current_;
+	if(rt->depthOnly || !rt->usable())
 		return;
 
 	flushObjectPass();
 
-	const bool clear = hasClear_ && !frameCleared_;
-	if(waterRenderer_->Draw(commandBuffer_, swapchainTexture_, depthTexture_, xScr, yScr,
-	                        clear, clearColor_, !depthCleared_, fillMode_ == FILL_WIREFRAME)){
-		if(clear) frameCleared_ = true;
-		depthCleared_ = true;
+	const bool clear = rt->clearPending && !rt->colorCleared;
+	if(waterRenderer_->Draw(commandBuffer_, rt->color, rt->depth, rt->w, rt->h,
+	                        clear, rt->clearColor, !rt->depthCleared, fillMode_ == FILL_WIREFRAME)){
+		if(clear) rt->colorCleared = true;
+		rt->depthCleared = true;
 	}
 }
 
 void cSDLRenderDevice::drawWorldQuads()
 {
-	if(!bActiveScene_ || !commandBuffer_ || !swapchainTexture_ || !worldQuadRenderer_)
+	if(!bActiveScene_ || !commandBuffer_ || !worldQuadRenderer_ || !worldQuadRenderer_->hasDraws())
 		return;
-	if(!worldQuadRenderer_->hasDraws() || !ensureDepth(xScr, yScr))
+	RenderTarget* rt = current_;
+	if(rt->depthOnly || !rt->usable())
 		return;
 
 	// A no-op once an earlier caller drained the object batch. It has not, on a dry map,
 	// nor for whatever the sorted pass recorded before reaching the wave sources.
 	flushObjectPass();
 
-	const bool clear = hasClear_ && !frameCleared_;
-	if(worldQuadRenderer_->Draw(commandBuffer_, swapchainTexture_, depthTexture_, xScr, yScr,
-	                            clear, clearColor_, !depthCleared_, fillMode_ == FILL_WIREFRAME)){
-		if(clear) frameCleared_ = true;
-		depthCleared_ = true;
+	const bool clear = rt->clearPending && !rt->colorCleared;
+	if(worldQuadRenderer_->Draw(commandBuffer_, rt->color, rt->depth, rt->w, rt->h,
+	                            clear, rt->clearColor, !rt->depthCleared, fillMode_ == FILL_WIREFRAME)){
+		if(clear) rt->colorCleared = true;
+		rt->depthCleared = true;
 	}
 }
 
@@ -455,41 +623,20 @@ Mat4f cSDLRenderDevice::shadowMatBias() const
 	             0.5f,  0.5f, -bias, 1.0f);
 }
 
-// The depth texture behind the shadow map, or null if there is none to render into.
-SDL_GPUTexture* cSDLRenderDevice::shadowDepthTexture()
-{
-	if(!bActiveScene_ || !commandBuffer_ || !shadowMap_ || shadowMap_->frameNumber() < 1)
-		return nullptr;
-	return reinterpret_cast<SDL_GPUTexture*>(shadowMap_->GetDDSurface(0));
-}
-
 void cSDLRenderDevice::drawTileMapShadow(Camera* camera)
 {
-	if(!tileMapRenderer_)
+	if(!bActiveScene_ || !commandBuffer_ || !tileMapRenderer_)
 		return;
-	SDL_GPUTexture* depth = shadowDepthTexture();
-	if(!depth)
+	// Only into a depth-only target. cTileMap::Draw routes here on ATTRCAMERA_SHADOWMAP,
+	// so this is the light camera and setCamera has already bound it the shadow map --
+	// unless the map has no texture yet, in which case current_ is nullTarget_.
+	RenderTarget* rt = current_;
+	if(!rt->depthOnly || !rt->usable())
 		return;
-	if(tileMapRenderer_->DrawShadowPass(commandBuffer_, depth, shadowMapSize_, camera,
-	                                    !shadowDepthCleared_)){
-		shadowDepthCleared_ = true;
-		shadowPassRan_ = true;
-	}
-}
-
-void cSDLRenderDevice::endShadowPass()
-{
-	if(!objectRenderer_)
-		return;
-	SDL_GPUTexture* depth = shadowDepthTexture();
-	if(!depth)
-		return;
-	// Runs even with no casters recorded: its clear is what leaves an empty map at far
-	// depth. Only skips the clear if the terrain caster already took it.
-	if(objectRenderer_->DrawShadowPass(commandBuffer_, depth, shadowMapSize_,
-	                                   !shadowDepthCleared_)){
-		shadowDepthCleared_ = true;
-		shadowPassRan_ = true;
+	if(tileMapRenderer_->DrawShadowPass(commandBuffer_, rt->depth, rt->w, camera,
+	                                    !rt->depthCleared)){
+		rt->depthCleared = true;
+		shadowPassRan_   = true;
 	}
 }
 
@@ -704,6 +851,31 @@ int cSDLRenderDevice::CreateTexture(cTexture* Texture, cFileImage* FileImage, in
 		return 0;
 	}
 
+	// A colour render target (cTexLibrary::CreateRenderTexture with TEXTURE_RENDER32): a
+	// camera renders into it and a later pass samples it. Swapchain format, so every
+	// pipeline the renderers already built can draw into it unchanged. No staging: nothing
+	// locks it from the CPU, and no mip chain, because nothing regenerates one for it.
+	if(Texture->getAttribute(TEXTURE_RENDER32)){
+		SDL_GPUTextureCreateInfo ti = {};
+		ti.type = SDL_GPU_TEXTURETYPE_2D;
+		ti.format = SDL_GetGPUSwapchainTextureFormat(device_, window_);
+		ti.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER | SDL_GPU_TEXTUREUSAGE_COLOR_TARGET;
+		ti.width = (Uint32)w; ti.height = (Uint32)h;
+		ti.layer_count_or_depth = 1; ti.num_levels = 1;
+		SDL_GPUTexture* tex = SDL_CreateGPUTexture(device_, &ti);
+		if(!tex){
+			fprintf(stderr, "cSDLRenderDevice: render target %dx%d failed: %s\n", w, h, SDL_GetError());
+			return 1;
+		}
+		TextureData td;
+		td.tex = tex; td.w = w; td.h = h;
+		textures_[tex] = std::move(td);
+		if(Texture->frameNumber() < 1)
+			Texture->New(1);
+		Texture->GetDDSurface(0) = reinterpret_cast<IDirect3DTexture9*>(tex);
+		return 0;
+	}
+
 	// GPU texture is always BGRA8 so one UI shader/sampler covers everything.
 	// Gray/alpha-only (the font atlas) keeps 1-byte coverage staging (so the font
 	// code's LockTexture pitch is right) and is widened to BGRA on upload; colour
@@ -768,6 +940,9 @@ int cSDLRenderDevice::CreateTexture(cTexture* Texture, cFileImage* FileImage, in
 int cSDLRenderDevice::DeleteTexture(cTexture* Texture)
 {
 	if(!Texture) return 0;
+	// If a camera rendered into it, drop the target: the next cTexture allocated could
+	// land on this address and inherit its SDL textures.
+	releaseTarget(Texture);
 	for(int i = 0; i < Texture->frameNumber(); ++i){
 		SDL_GPUTexture* tex = reinterpret_cast<SDL_GPUTexture*>(Texture->GetDDSurface(i));
 		if(!tex) continue;
