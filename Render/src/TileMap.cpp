@@ -163,9 +163,9 @@ void cTileMap::Draw(Camera* camera)
 
 	DrawLines();
 #else
-	// The float-Z and reflection passes have no SDL equivalent yet, and each would open a
-	// pass of its own.
-	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_FLOAT_ZBUFFER|ATTRCAMERA_REFLECTION))
+	// The planar-shadow and float-Z passes have no SDL equivalent yet. The reflection
+	// camera draws the terrain like any other: setCamera has bound its render target.
+	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_FLOAT_ZBUFFER))
 		return;
 	cSDLRenderDevice* dev = dynamic_cast<cSDLRenderDevice*>(gb_RenderDevice);
 	if(!dev)

@@ -313,7 +313,7 @@ int cSDLRenderDevice::EndScene()
 	// past SCENENODE_OBJECTSPECIAL, or the whole scene in a mission with neither water nor
 	// coast sprites. Over the terrain and against its depth. The last camera to draw is the
 	// main one, so the current target is the screen; assert nothing, just settle it.
-	flushTarget(current_);
+	flushTarget(current_, true);
 
 	// Then the UI pass, last, over everything. It carries the frame's colour clear only if
 	// no earlier pass took it.
@@ -439,7 +439,7 @@ void cSDLRenderDevice::armClear(RenderTarget* rt, Camera* camera)
 	rt->depthCleared = false;
 }
 
-void cSDLRenderDevice::flushTarget(RenderTarget* rt)
+void cSDLRenderDevice::flushTarget(RenderTarget* rt, bool settle)
 {
 	if(!rt || !commandBuffer_ || !objectRenderer_)
 		return;
@@ -457,7 +457,7 @@ void cSDLRenderDevice::flushTarget(RenderTarget* rt)
 		// The shadow map. Worth a pass even with nothing to cast, because the clear alone
 		// leaves the map at far depth, i.e. every receiver lit. Skipping it would let them
 		// sample last frame's map, or on the first frame an undefined one.
-		if(!hasDraws && rt->depthCleared)
+		if(!hasDraws && (rt->depthCleared || !settle))
 			return;
 		if(objectRenderer_->DrawShadowPass(commandBuffer_, rt->depth, rt->w, !rt->depthCleared)){
 			rt->depthCleared = true;
@@ -466,10 +466,10 @@ void cSDLRenderDevice::flushTarget(RenderTarget* rt)
 		return;
 	}
 
-	// An offscreen colour target owes its clear to whatever samples it later, so open the
-	// pass for the clear alone if the scene walk drew nothing into it. The screen's clear
-	// can keep waiting: the UI pass at EndScene always runs and will take it.
-	const bool owesClear = rt != &screen_
+	// An offscreen colour target we are leaving still owes its clear to whatever samples it
+	// later, so open the pass for the clear alone if the scene walk drew nothing into it.
+	// The screen's clear can always keep waiting: the UI pass at EndScene will take it.
+	const bool owesClear = settle && rt != &screen_
 	                    && ((rt->clearPending && !rt->colorCleared) || !rt->depthCleared);
 	if(!hasDraws && !owesClear)
 		return;
@@ -503,7 +503,9 @@ void cSDLRenderDevice::setCamera(Camera* camera)
 	if(rt == current_)
 		return;
 
-	flushTarget(current_);
+	// Leaving the old target: it must be complete, because the camera we are switching to
+	// may open a pass that samples it (the water's reflection, the receivers' shadow map).
+	flushTarget(current_, true);
 	current_ = rt;
 
 	if(rt != &screen_ && rt != &nullTarget_)
@@ -538,7 +540,8 @@ void cSDLRenderDevice::drawTileMap(cTileMap* tileMap, Camera* camera)
 // ---------------------------------------------------------------------------
 void cSDLRenderDevice::flushObjectPass()
 {
-	flushTarget(current_);
+	// Mid-target: whatever opens the next pass takes the clear, so don't force one here.
+	flushTarget(current_, false);
 }
 
 void cSDLRenderDevice::drawWater()

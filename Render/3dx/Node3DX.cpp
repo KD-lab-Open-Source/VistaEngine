@@ -652,10 +652,10 @@ void cObject3dx::Draw(Camera* camera)
 	Update();
 
 #ifndef _WIN32
-	// The shadow-map camera is handled below, by DrawShadowAndZbuffer. The planar-shadow,
-	// float-Z and reflection passes have no SDL equivalent yet: each would need a render
-	// target of its own.
-	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_FLOAT_ZBUFFER|ATTRCAMERA_REFLECTION))
+	// The shadow-map camera is handled below, by DrawShadowAndZbuffer; the reflection
+	// camera draws normally, into the render target setCamera bound for it. The
+	// planar-shadow and float-Z passes still have no SDL equivalent.
+	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_FLOAT_ZBUFFER))
 		return;
 #endif
 

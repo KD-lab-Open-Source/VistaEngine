@@ -36,10 +36,13 @@ SDLWaterRenderer::SDLWaterRenderer(cSDLRenderDevice* owner, SDL_GPUDevice* devic
 SDLWaterRenderer::~SDLWaterRenderer()
 {
 	if(!device_) return;
-	if(flatTexture_)  SDL_ReleaseGPUTexture(device_, flatTexture_);
-	if(sampler_)      SDL_ReleaseGPUSampler(device_, sampler_);
-	if(pipelineFill_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineFill_);
-	if(pipelineLine_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineLine_);
+	if(flatTexture_)   SDL_ReleaseGPUTexture(device_, flatTexture_);
+	if(sampler_)       SDL_ReleaseGPUSampler(device_, sampler_);
+	if(samplerClamp_)  SDL_ReleaseGPUSampler(device_, samplerClamp_);
+	if(pipelineFill_)  SDL_ReleaseGPUGraphicsPipeline(device_, pipelineFill_);
+	if(pipelineLine_)  SDL_ReleaseGPUGraphicsPipeline(device_, pipelineLine_);
+	if(pipelineReflectFill_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineReflectFill_);
+	if(pipelineReflectLine_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineReflectLine_);
 }
 
 // ---------------------------------------------------------------------------
@@ -62,6 +65,14 @@ void SDLWaterRenderer::createPipelines()
 	si.address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
 	si.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
 	sampler_ = SDL_CreateGPUSampler(device_, &si);
+
+	// cWater::Draw's SetSamplerData(2, sampler_clamp_anisotropic) for the reflection target.
+	si.address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
+	si.address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
+	si.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
+	si.max_lod = 0.f;   // the render target has no mip chain
+	si.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
+	samplerClamp_ = SDL_CreateGPUSampler(device_, &si);
 
 	// 1x1 flat wave map: the decoder's bias, so water.frag.hlsl's slope() reads 0.
 	SDL_GPUTextureCreateInfo fti = {};
@@ -91,6 +102,18 @@ void SDLWaterRenderer::createPipelines()
 		}
 	}
 
+	createPipelinePair(false, pipelineFill_, pipelineLine_);
+	createPipelinePair(true,  pipelineReflectFill_, pipelineReflectLine_);
+
+	fprintf(stderr, "SDLWaterRenderer: water pipeline %s (wireframe %s), reflection %s\n",
+	        pipelineFill_ ? "ready" : "FAILED", pipelineLine_ ? "ready" : "FAILED",
+	        pipelineReflectFill_ ? "ready" : "FAILED");
+}
+
+bool SDLWaterRenderer::createPipelinePair(bool reflection,
+                                          SDL_GPUGraphicsPipeline*& fill,
+                                          SDL_GPUGraphicsPipeline*& line)
+{
 	SDL_GPUShaderFormat formats = SDL_GetGPUShaderFormats(device_);
 	SDL_GPUShaderFormat fmt;
 	const char* entry;
@@ -98,35 +121,40 @@ void SDLWaterRenderer::createPipelines()
 	unsigned int vsSize, fsSize;
 	if(formats & SDL_GPU_SHADERFORMAT_MSL){
 		fmt = SDL_GPU_SHADERFORMAT_MSL; entry = "main0";
-		vsCode = water_vert_msl; vsSize = water_vert_msl_len;
-		fsCode = water_frag_msl; fsSize = water_frag_msl_len;
+		vsCode = reflection ? water_reflect_vert_msl : water_vert_msl;
+		vsSize = reflection ? water_reflect_vert_msl_len : water_vert_msl_len;
+		fsCode = reflection ? water_reflect_frag_msl : water_frag_msl;
+		fsSize = reflection ? water_reflect_frag_msl_len : water_frag_msl_len;
 	} else if(formats & SDL_GPU_SHADERFORMAT_SPIRV){
 		fmt = SDL_GPU_SHADERFORMAT_SPIRV; entry = "main";
-		vsCode = water_vert_spv; vsSize = water_vert_spv_len;
-		fsCode = water_frag_spv; fsSize = water_frag_spv_len;
+		vsCode = reflection ? water_reflect_vert_spv : water_vert_spv;
+		vsSize = reflection ? water_reflect_vert_spv_len : water_vert_spv_len;
+		fsCode = reflection ? water_reflect_frag_spv : water_frag_spv;
+		fsSize = reflection ? water_reflect_frag_spv_len : water_frag_spv_len;
 	} else {
 		fprintf(stderr, "SDLWaterRenderer: no supported shader format (0x%x)\n", formats);
-		return;
+		return false;
 	}
 
 	SDL_GPUShaderCreateInfo vsi = {};
 	vsi.code = vsCode; vsi.code_size = vsSize; vsi.entrypoint = entry;
 	vsi.format = fmt; vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
-	vsi.num_uniform_buffers = 1;    // MVP + the two uv scale/offsets
+	vsi.num_uniform_buffers = 1;    // MVP, the two uv scale/offsets, vMirrorVP
 	SDL_GPUShader* vs = SDL_CreateGPUShader(device_, &vsi);
 
 	SDL_GPUShaderCreateInfo fsi = {};
 	fsi.code = fsCode; fsi.code_size = fsSize; fsi.entrypoint = entry;
 	fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
-	fsi.num_samplers = 2;           // the two wave maps
-	fsi.num_uniform_buffers = 1;    // vPS11Color
+	// The two wave maps, plus the reflection target on the water_linear path.
+	fsi.num_samplers = reflection ? 3 : 2;
+	fsi.num_uniform_buffers = 1;
 	SDL_GPUShader* fs = SDL_CreateGPUShader(device_, &fsi);
 
 	if(!vs || !fs){
 		fprintf(stderr, "SDLWaterRenderer: CreateGPUShader failed: %s\n", SDL_GetError());
 		if(vs) SDL_ReleaseGPUShader(device_, vs);
 		if(fs) SDL_ReleaseGPUShader(device_, fs);
-		return;
+		return false;
 	}
 
 	SDL_GPUVertexBufferDescription vbDesc = {};
@@ -171,17 +199,15 @@ void SDLWaterRenderer::createPipelines()
 	pci.target_info.has_depth_stencil_target = true;
 	pci.target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
 
-	pipelineFill_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
+	fill = SDL_CreateGPUGraphicsPipeline(device_, &pci);
 
 	// Wireframe variant (RS_FILLMODE == FILL_WIREFRAME). Same everything but LINE fill.
 	pci.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_LINE;
-	pipelineLine_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
+	line = SDL_CreateGPUGraphicsPipeline(device_, &pci);
 
 	SDL_ReleaseGPUShader(device_, vs);
 	SDL_ReleaseGPUShader(device_, fs);
-
-	fprintf(stderr, "SDLWaterRenderer: water pipeline %s (wireframe %s)\n",
-	        pipelineFill_ ? "ready" : "FAILED", pipelineLine_ ? "ready" : "FAILED");
+	return fill != nullptr;
 }
 
 // ---------------------------------------------------------------------------
@@ -197,13 +223,31 @@ void SDLWaterRenderer::SetState(const State& state, Camera* camera)
 {
 	if(!camera) return;
 
+	vs_ = VSUniform();
+	fs_ = FSUniform();
+
 	std::memcpy(vs_.mvp, &camera->matViewProj, sizeof(vs_.mvp));
 	std::memcpy(vs_.uvScaleOffset, state.uvScaleOffset, sizeof(vs_.uvScaleOffset));
 	std::memcpy(vs_.uvScaleOffset1, state.uvScaleOffset1, sizeof(vs_.uvScaleOffset1));
-	std::memcpy(fs_.ps11Color, state.ps11Color, sizeof(fs_.ps11Color));
 
 	texture0_ = sdlTextureOf(state.texture0);
 	texture1_ = sdlTextureOf(state.texture1);
+
+	// Without the reflection target there is nothing for water_linear to sample, so fall
+	// back to the flat colour rather than draw the surface black.
+	reflectionTexture_ = state.reflection ? sdlTextureOf(state.reflectionTexture) : nullptr;
+	reflection_ = reflectionTexture_ != nullptr;
+
+	if(reflection_){
+		std::memcpy(vs_.mirrorVP, state.mirrorVP, sizeof(vs_.mirrorVP));
+		std::memcpy(fs_.reflectionColor, state.reflectionColor, sizeof(fs_.reflectionColor));
+		std::memcpy(fs_.lightColor, state.lightColor, sizeof(fs_.lightColor));
+		std::memcpy(fs_.lightDirection, state.lightDirection, sizeof(state.lightDirection));
+		std::memcpy(fs_.cameraPos, state.cameraPos, sizeof(state.cameraPos));
+		fs_.params[0] = state.brightness;
+	}
+	else
+		std::memcpy(fs_.ps11Color, state.ps11Color, sizeof(fs_.ps11Color));
 
 	vpX_ = camera->vp.X; vpY_ = camera->vp.Y;
 	vpW_ = camera->vp.Width; vpH_ = camera->vp.Height;
@@ -248,8 +292,11 @@ bool SDLWaterRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, S
                             int screenW, int screenH, bool clear, const float clearColor[4],
                             bool clearDepth, bool wireframe)
 {
-	// Fall back to the solid pipeline if the LINE variant failed to build.
-	SDL_GPUGraphicsPipeline* pipeline = (wireframe && pipelineLine_) ? pipelineLine_ : pipelineFill_;
+	// The technique the recorded draws were made under, and within it the fill mode --
+	// falling back to the solid pipeline if the LINE variant failed to build.
+	SDL_GPUGraphicsPipeline* fill = reflection_ ? pipelineReflectFill_ : pipelineFill_;
+	SDL_GPUGraphicsPipeline* line = reflection_ ? pipelineReflectLine_ : pipelineLine_;
+	SDL_GPUGraphicsPipeline* pipeline = (wireframe && line) ? line : fill;
 	if(!device_ || !pipeline || !cmd || !target || !depth || draws_.empty())
 		return false;
 
@@ -281,12 +328,16 @@ bool SDLWaterRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, S
 	SDL_PushGPUVertexUniformData(cmd, 0, &vs_, sizeof(vs_));
 	SDL_PushGPUFragmentUniformData(cmd, 0, &fs_, sizeof(fs_));
 
-	SDL_GPUTextureSamplerBinding ts[2] = {};
+	SDL_GPUTextureSamplerBinding ts[3] = {};
 	ts[0].texture = texture0_ ? texture0_ : flatTexture_;
 	ts[0].sampler = sampler_;
 	ts[1].texture = texture1_ ? texture1_ : flatTexture_;
 	ts[1].sampler = sampler_;
-	SDL_BindGPUFragmentSamplers(pass, 0, ts, 2);
+	if(reflection_){
+		ts[2].texture = reflectionTexture_;
+		ts[2].sampler = samplerClamp_;
+	}
+	SDL_BindGPUFragmentSamplers(pass, 0, ts, reflection_ ? 3 : 2);
 
 	// The surface is drawn as a run of tile ranges over (at most two) vertex buffers,
 	// exactly as cWater::DrawPolygons walks its visible lines.

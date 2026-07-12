@@ -1313,7 +1313,7 @@ void cScene::setZReflection(float zreflection, float weight)
 void cScene::AddReflectionCamera(Camera* camera)
 {
 	if(reflectionCamera_)
-	{ 
+	{
 		DWORD clear=reflectionCamera_->getAttribute(ATTRCAMERA_NOCLEARTARGET);
 		camera->SetCopy(reflectionCamera_);
 		reflectionCamera_->setAttribute(clear);
@@ -1373,17 +1373,29 @@ void cScene::CreateReflectionSurface()
 	if(!enable_reflection)
 		return;
 
-	int xysize=1024;	
-	HRESULT hr=gb_RenderDevice3D->D3DDevice_->CreateDepthStencilSurface(xysize, xysize, 
+	int xysize=1024;
+#ifdef _WIN32
+	HRESULT hr=gb_RenderDevice3D->D3DDevice_->CreateDepthStencilSurface(xysize, xysize,
 		D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 0, TRUE, &pReflectionZBuffer, 0);
 	if(FAILED(hr))
-	{	
+	{
 		xassert(0);
 		RELEASE(pReflectionZBuffer);
 		return;
 	}
+#else
+	// No depth-stencil surface to make: cSDLRenderDevice::resolveTarget gives a colour
+	// render target a depth buffer of its own, sized to it. Same as the shadow map, where
+	// the z-buffer argument is likewise 0.
+	pReflectionZBuffer = 0;
+#endif
 
 	pReflectionRenderTarget=GetTexLibrary()->CreateRenderTexture(xysize,xysize,TEXTURE_RENDER32,false);
+	if(!pReflectionRenderTarget){
+		DeleteReflectionSurface();
+		enable_reflection = false;
+		return;
+	}
 
 	reflectionCamera_=CreateCamera();
 	reflectionCamera_->SetRenderTarget(pReflectionRenderTarget,pReflectionZBuffer);
@@ -1399,8 +1411,10 @@ void cScene::DeleteReflectionSurface()
 
 void cScene::EnableReflection(bool enable)
 {
-	if(!gb_RenderDevice3D || !gb_RenderDevice3D->IsPS20()) // no world-render GPU device on SDL backend yet
+#ifdef _WIN32
+	if(!gb_RenderDevice3D->IsPS20())
 		enable = false;
+#endif
 
 	enable_reflection = enable;
 	if(!enable){

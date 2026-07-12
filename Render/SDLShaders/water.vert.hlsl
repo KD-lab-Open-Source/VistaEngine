@@ -1,10 +1,15 @@
 // Water-surface vertex shader for the SDL GPU backend.
 //
-// Ported from the original P2 shader Render/shader/Water/water_easy.vsl -- the
-// WATER_EMPTY technique, which cWater::Draw selects on hardware without PS2.0. It is
-// the one water technique whose inputs all exist off-Windows: the two other techniques
-// sample a planar-reflection render target (water_linear) or the sky cubemap
-// (water_cube), and neither render target has an SDL path yet.
+// Two techniques, selected by -DREFLECTION:
+//
+//   REFLECTION=0 -- the original's water_easy.vsl (WATER_EMPTY), which cWater::Draw
+//                   selects on hardware without PS2.0, and which we select when the
+//                   planar-reflection target is off (cScene::EnableReflection).
+//   REFLECTION=1 -- the original's water_linear.vsl (WATER_LINEAR_REFLECTION): the same
+//                   thing plus the projective lookup into the reflection render target
+//                   and the world position the fragment shader needs for the sun glint.
+//
+// Both compute, from water_easy.vsl:
 //
 //     o.pos      = mul(v.pos, mVP);
 //     o.diffuse  = v.diffuse;
@@ -14,6 +19,14 @@
 // The two wave maps scroll over the surface at different speeds and, note, sample the
 // position under opposite swizzles (xy vs yx), which is what stops them beating against
 // each other into a visible grid.
+//
+// water_linear.vsl adds:
+//
+//     o.uv_sky    = mul(v.pos, vMirrorVP);   // projective; divided by w in the fragment
+//     o.point_pos = v.pos;
+//
+// The third technique, water_cube.vsl (WATER_REFLECTION), samples the sky cubemap, which
+// has no SDL path yet; water_lava.vsl is its own shader pair.
 //
 // Dropped, each for want of the input rather than by choice: o.uv_lightmap (the
 // fog-of-war lightmap, behind #ifdef FOG_OF_WAR in the fragment shader) and o.fog (the
@@ -31,6 +44,10 @@ cbuffer Constants : register(b0, space1)
     // there is no uv in the vertex at all.
     float4 UVScaleOffset;
     float4 UVScaleOffset1;
+    // The original's vMirrorVP (VSWater::SetMirrorMatrix): the reflection camera's
+    // view-projection, post-multiplied by the clip->uv adjust. Only read when
+    // REFLECTION, but declared either way so one C++ uniform struct serves both.
+    row_major float4x4 MirrorVP;
 };
 
 struct VSInput
@@ -48,6 +65,10 @@ struct VSOutput
     float4 Diffuse  : COLOR0;
     float2 UV0      : TEXCOORD0;
     float2 UV1      : TEXCOORD1;
+#if REFLECTION
+    float4 UVSky    : TEXCOORD2;   // projective: sample as UVSky.xy/UVSky.w
+    float3 PointPos : TEXCOORD3;   // world position, for the eye vector
+#endif
 };
 
 VSOutput main(VSInput input)
@@ -57,5 +78,9 @@ VSOutput main(VSInput input)
     output.Diffuse  = input.Diffuse;
     output.UV0 = UVScaleOffset.zw  + input.Position.xy * UVScaleOffset.xy;
     output.UV1 = UVScaleOffset1.zw + input.Position.yx * UVScaleOffset1.xy;
+#if REFLECTION
+    output.UVSky    = mul(float4(input.Position, 1.0f), MirrorVP);
+    output.PointPos = input.Position;
+#endif
     return output;
 }

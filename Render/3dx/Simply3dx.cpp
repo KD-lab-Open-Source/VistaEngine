@@ -397,9 +397,10 @@ void cSimply3dx::Draw(Camera* camera)
 		return;
 
 #ifndef _WIN32
-	// Only the main scene camera draws: the shadow-map, float-Z and reflection passes
-	// have no SDL equivalent yet.
-	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_SHADOWMAP|ATTRCAMERA_FLOAT_ZBUFFER|ATTRCAMERA_REFLECTION))
+	// A lone simply-object draws for the scene and reflection cameras. It has no caster
+	// path of its own (cStaticSimply3dx::DrawShadow is the batch's), and the planar-shadow
+	// and float-Z passes have no SDL equivalent yet.
+	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_SHADOWMAP|ATTRCAMERA_FLOAT_ZBUFFER))
 		return;
 #endif
 
@@ -1525,9 +1526,10 @@ void cStaticSimply3dx::Draw(Camera* camera)
 		return;
 	}
 #else
-	// The planar-shadow, float-Z and reflection passes have no SDL equivalent yet
-	// (DrawZBuffer is D3D-only).
-	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_FLOAT_ZBUFFER|ATTRCAMERA_REFLECTION))
+	// The shadow-map camera was handled above; the reflection camera draws the batch like
+	// the scene camera does. The planar-shadow and float-Z passes have no SDL equivalent
+	// yet (DrawZBuffer is D3D-only).
+	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_FLOAT_ZBUFFER))
 		return;
 #endif
 

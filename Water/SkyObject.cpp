@@ -163,13 +163,17 @@ void cSkyCamera::DrawScene()
 	{
 		OneObject& p=*it;
 #ifdef _WIN32
-		// The alpha channel carries the HDR mask, and only the reflection cubemap wants the
-		// sky in it -- which is the one caller that has no SDL path (see cSkyObj::DrawSky).
+		// The alpha channel carries the HDR mask, which only the reflection and cubemap
+		// cameras want the sky written into; on screen the sky must leave alpha alone.
 		DWORD write=D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED;
 		if(p.write_alpha && enable_hdr_alpha)
 			write|=D3DCOLORWRITEENABLE_ALPHA;
 		gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,write);
 #endif
+		// Off-Windows there is no colour-write mask short of a second pipeline variant, so
+		// the sky writes alpha into whatever it draws to. Into the reflection target that is
+		// what the original wants (write_alpha is set for exactly that camera). On screen it
+		// costs nothing: the swapchain's alpha is never sampled.
 		p.obj->DrawAll(this);
 	}
 
@@ -433,9 +437,13 @@ void cSkyObj::DrawSkyAndAnimate(Camera* pGlobalCamera)
 	}
 
 	DrawSky(pGlobalCamera,false);
-#ifdef _WIN32
+
 	// The sky again, into the water's planar-reflection render target, with the HDR mask in
-	// alpha. Neither the target nor the mask exists on the SDL backend yet.
+	// alpha. This runs before cScene::Draw, so the reflection camera finds the sky already
+	// in its target: it is marked NOCLEARTARGET here and clears only its depth (through the
+	// ATTRCAMERA_CLEARZBUFFER cScene::AddReflectionCamera sets) before drawing the world
+	// over it. DrawSky clears NOCLEARTARGET on the sky camera it copies to, so the sky's own
+	// pass is the one that wipes the target to reflect_fone_color.
 	Camera* pReflection=pGlobalCamera->scene()->reflectionCamera();
 	if(pReflection)
 	{
@@ -446,7 +454,6 @@ void cSkyObj::DrawSkyAndAnimate(Camera* pGlobalCamera)
 
 		DrawSky(pReflection,true);
 	}
-#endif
 }
 
 void cSkyObj::AddSkyModel(const char* sky_model_name)

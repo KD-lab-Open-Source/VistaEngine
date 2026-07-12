@@ -148,7 +148,7 @@ public:
 	// Record the depth pass the light camera accumulated, where the D3D backend calls
 	// DrawType::EndDrawShadow. Switching away from the map would flush it anyway; this
 	// only pins the moment, as the original does.
-	void endShadowPass() { flushTarget(current_); }
+	void endShadowPass() { flushTarget(current_, true); }
 	// True once a caster pass has filled the map this frame. Receivers must check it:
 	// cScene detaches the light camera whenever shadows are off, and the map outlives it.
 	bool shadowPassRan() const { return shadowPassRan_; }
@@ -343,10 +343,12 @@ private:
 	RenderTarget* resolveTarget(Camera* camera);
 	// Arm rt's clear from the camera, as cD3DRender::setCamera's Clear() does.
 	void armClear(RenderTarget* rt, Camera* camera);
-	// Replay whatever the object renderer has recorded into rt and settle rt's clear.
-	// Called when setCamera switches away, so an offscreen target is complete before
-	// anything samples it; and from EndScene for the screen.
-	void flushTarget(RenderTarget* rt);
+	// Replay whatever the object renderer has recorded into rt. `settle` means rt must come
+	// out of this call fully initialized -- we are leaving it, and something is about to
+	// sample it, so an offscreen target that nothing drew into still owes its clear. Mid-
+	// target flushes (flushObjectPass) pass false and let the next real pass take the clear,
+	// exactly as the screen's do.
+	void flushTarget(RenderTarget* rt, bool settle);
 	// Drop an offscreen target when its cTexture goes away (DeleteTexture): the next
 	// cTexture allocated could land on the same address.
 	void releaseTarget(cTexture* texture);

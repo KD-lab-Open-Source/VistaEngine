@@ -72,6 +72,9 @@ cWater::cWater()
 	lavaVolumeTextureScale_ = 0.03f;
 	lavaTextureName_ = "Scripts\\Resource\\balmer\\lava.tga";
 
+	// setTechnique overwrites this once the scene knows whether reflection is enabled.
+	technique_ = WATER_EMPTY;
+
 #ifdef _WIN32
 	psShader=new PSWater;
 	vsShader=new VSWater;
@@ -247,6 +250,26 @@ void cWater::PreDraw(Camera* camera)
 	UpdateVB();
 }
 
+#ifndef _WIN32
+// VSWater::SetMirrorMatrix (Render/shader/ShaderWater.inl): the reflection camera's
+// view-projection, post-multiplied by the map from clip space to texture coordinates, so
+// water.vert.hlsl can project a world position straight into the reflection target.
+// Row-vector convention, to match its mul(float4(pos,1), MirrorVP).
+//
+// Without the original's half-texel offset (0.5 + 0.5/map_size): that corrects D3D9's
+// pixel-centre convention, which SDL GPU does not share -- the same divergence as
+// cSDLRenderDevice::shadowMatBias.
+static void fillMirrorMatrix(Camera* reflectionCamera, float out[16])
+{
+	const Mat4f texAdj(0.5f,  0.0f, 0.0f, 0.0f,
+	                   0.0f, -0.5f, 0.0f, 0.0f,
+	                   0.0f,  0.0f, 1.0f, 0.0f,
+	                   0.5f,  0.5f, 0.0f, 1.0f);
+	const Mat4f m = reflectionCamera->matViewProj * texAdj;
+	memcpy(out, &m, 16 * sizeof(float));
+}
+#endif
+
 void cWater::Draw(Camera* camera)
 {
 	start_timer_auto();
@@ -366,10 +389,9 @@ void cWater::Draw(Camera* camera)
 
 	rd->AddNumPolygonToNormal();
 #else
-	// WATER_EMPTY: the branch above's `else`, which setTechnique picks whenever the
-	// device is not PS2.0. It is the only one of the four whose inputs the SDL backend
-	// has -- the other three want the planar-reflection target, the sky cubemap or the
-	// lava shader pair. Everything the D3D path spreads across the render states, the
+	// WATER_LINEAR_REFLECTION when the scene has a reflection target, else WATER_EMPTY --
+	// what setTechnique chose. The other two, WATER_REFLECTION (sky cubemap) and WATER_LAVA,
+	// have no SDL shader pair. Everything the D3D path spreads across the render states, the
 	// vs/ps Select+SetSpeed calls and SetTexture, one State carries.
 	SDLWaterRenderer* renderer = sdlWaterRenderer();
 	cSDLRenderDevice* dev = sdlRenderDevice();
@@ -390,12 +412,46 @@ void cWater::Draw(Camera* camera)
 	st.uvScaleOffset[2]  = time_x;        st.uvScaleOffset[3]  = time_y;
 	st.uvScaleOffset1[0] = speed_scale1;  st.uvScaleOffset1[1] = speed_scale1;
 	st.uvScaleOffset1[2] = time_x1;       st.uvScaleOffset1[3] = time_y1;
-	st.ps11Color[0] = cur_reflect_sky_color.r;
-	st.ps11Color[1] = cur_reflect_sky_color.g;
-	st.ps11Color[2] = cur_reflect_sky_color.b;
-	st.ps11Color[3] = cur_reflect_sky_color.a;
 	st.texture0 = bumpTexture_;
 	st.texture1 = bumpTexture1_;
+
+	Camera* reflectionCamera = technique_ == WATER_LINEAR_REFLECTION
+	                         ? camera->FindChildCamera(ATTRCAMERA_REFLECTION) : 0;
+	if(reflectionCamera){
+		st.reflection = true;
+		st.reflectionTexture = reflectionCamera->GetRenderTarget();
+		fillMirrorMatrix(reflectionCamera, st.mirrorVP);
+
+		// PSWater::SetReflectionColor's premultiply, inlined: rgb carries the water's own
+		// tint at weight reflection_color.a, and what is left goes to the sample. The D3D
+		// path builds the same Color4f in the WATER_LINEAR_REFLECTION branch above.
+		Color4f tint;
+		tint.mul3(reflection_color, scene()->GetPlainLitColor());
+		const float skyWeight = 1.f - reflection_color.a;
+		st.reflectionColor[0] = tint.r * reflection_color.a;
+		st.reflectionColor[1] = tint.g * reflection_color.a;
+		st.reflectionColor[2] = tint.b * reflection_color.a;
+		st.reflectionColor[3] = skyWeight;
+		st.brightness = reflection_brightnes;
+
+		// PSWater::Select's vLightColor / vLightDirection / vCameraPos, for the sun glint.
+		const Color4f sun = scene()->GetSunDiffuse();
+		st.lightColor[0] = sun.r; st.lightColor[1] = sun.g; st.lightColor[2] = sun.b;
+		st.lightColor[3] = flashIntensity_;
+
+		Vect3f lightDir;
+		camera->GetLighting(lightDir);
+		st.lightDirection[0] = lightDir.x; st.lightDirection[1] = lightDir.y; st.lightDirection[2] = lightDir.z;
+
+		const Vect3f& eye = camera->GetPos();
+		st.cameraPos[0] = eye.x; st.cameraPos[1] = eye.y; st.cameraPos[2] = eye.z;
+	}
+	else{
+		st.ps11Color[0] = cur_reflect_sky_color.r;
+		st.ps11Color[1] = cur_reflect_sky_color.g;
+		st.ps11Color[2] = cur_reflect_sky_color.b;
+		st.ps11Color[3] = cur_reflect_sky_color.a;
+	}
 	renderer->SetState(st, camera);
 
 	DrawPolygons(camera);
@@ -1761,9 +1817,8 @@ void cWater::AddWaterRect(int x,int y,float dz,int size)
 
 void cWater::setTechnique()
 {
-	if(!gb_RenderDevice3D) // no world-render GPU device on SDL backend yet (shaders not created)
-		return;
 	Technique set = WATER_EMPTY;
+#ifdef _WIN32
 	if(isLava()){
 		set = WATER_LAVA;
 		lavaTexture_ = GetTexLibrary()->GetElement3D(lavaTextureName_.c_str());
@@ -1773,6 +1828,15 @@ void cWater::setTechnique()
 
 	vsShader->SetTechnique(set);
 	psShader->SetTechnique(set);
+#else
+	// Two of the four techniques have no SDL shader pair: WATER_LAVA, and WATER_REFLECTION
+	// -- the original's fallback when the reflection target is off -- which samples the sky
+	// cubemap. WATER_EMPTY stands in for both, exactly as it does on hardware without PS2.0,
+	// painting the surface with cur_reflect_sky_color instead of a reflection.
+	if(!isLava() && scene()->IsReflection())
+		set = WATER_LINEAR_REFLECTION;
+#endif
+	technique_ = set;
 }
 
 void cWater::serialize(Archive& ar)
