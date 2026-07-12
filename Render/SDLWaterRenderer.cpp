@@ -11,8 +11,10 @@
 #include "Texture.h"           // cTexture (GetDDSurface / frameNumber)
 #include "SDLRenderDevice.h"   // owner: resolves the sPtr buffers, applyCameraViewport
 
-// Cross-compiled water shader blobs (SPIR-V + MSL); see Render/SDLShaders.
+// Water shader bytecode, compiled to this platform's native format at build time;
+// see Render/CMakeLists.txt.
 #include "SDLShaders/water_shaders.h"
+#include "SDLShaders/ShaderBlob.h"
 
 namespace {
 
@@ -113,37 +115,17 @@ bool SDLWaterRenderer::createPipelinePair(bool reflection,
                                           SDL_GPUGraphicsPipeline*& fill,
                                           SDL_GPUGraphicsPipeline*& line)
 {
-	SDL_GPUShaderFormat formats = SDL_GetGPUShaderFormats(device_);
-	SDL_GPUShaderFormat fmt;
-	const char* entry;
-	const unsigned char *vsCode, *fsCode;
-	unsigned int vsSize, fsSize;
-	if(formats & SDL_GPU_SHADERFORMAT_MSL){
-		fmt = SDL_GPU_SHADERFORMAT_MSL; entry = "main0";
-		vsCode = reflection ? water_reflect_vert_msl : water_vert_msl;
-		vsSize = reflection ? water_reflect_vert_msl_len : water_vert_msl_len;
-		fsCode = reflection ? water_reflect_frag_msl : water_frag_msl;
-		fsSize = reflection ? water_reflect_frag_msl_len : water_frag_msl_len;
-	} else if(formats & SDL_GPU_SHADERFORMAT_SPIRV){
-		fmt = SDL_GPU_SHADERFORMAT_SPIRV; entry = "main";
-		vsCode = reflection ? water_reflect_vert_spv : water_vert_spv;
-		vsSize = reflection ? water_reflect_vert_spv_len : water_vert_spv_len;
-		fsCode = reflection ? water_reflect_frag_spv : water_frag_spv;
-		fsSize = reflection ? water_reflect_frag_spv_len : water_frag_spv_len;
-	} else {
-		fprintf(stderr, "SDLWaterRenderer: no supported shader format (0x%x)\n", formats);
-		return false;
-	}
-
-	SDL_GPUShaderCreateInfo vsi = {};
-	vsi.code = vsCode; vsi.code_size = vsSize; vsi.entrypoint = entry;
-	vsi.format = fmt; vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+	// REFLECTION=1 is the original's water_linear, REFLECTION=0 its water_easy; the two
+	// are separate builds of the same HLSL.
+	SDL_GPUShaderCreateInfo vsi = vista::shaderCreateInfo(
+		reflection ? VISTA_SHADER(water_reflect_vert) : VISTA_SHADER(water_vert));
+	vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
 	vsi.num_uniform_buffers = 1;    // MVP, the two uv scale/offsets, vMirrorVP
 	SDL_GPUShader* vs = SDL_CreateGPUShader(device_, &vsi);
 
-	SDL_GPUShaderCreateInfo fsi = {};
-	fsi.code = fsCode; fsi.code_size = fsSize; fsi.entrypoint = entry;
-	fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+	SDL_GPUShaderCreateInfo fsi = vista::shaderCreateInfo(
+		reflection ? VISTA_SHADER(water_reflect_frag) : VISTA_SHADER(water_frag));
+	fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
 	// The two wave maps, plus the reflection target on the water_linear path.
 	fsi.num_samplers = reflection ? 3 : 2;
 	fsi.num_uniform_buffers = 1;

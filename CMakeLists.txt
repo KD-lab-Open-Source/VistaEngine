@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
 include(FetchContent)
 FetchContent_Declare(
     SDL3
@@ -13,6 +15,169 @@ FetchContent_Declare(
     GIT_SHALLOW    TRUE
 )
 FetchContent_MakeAvailable(SDL3)
+
+# ---------------------------------------------------------------------------
+# Shader toolchain
+# ---------------------------------------------------------------------------
+# The HLSL in Render/SDLShaders is compiled at build time to the one shader
+# format the host's SDL_GPU backend actually speaks, and embedded as bytes in
+# a generated header (see cmake/bin2h.cmake and Render/CMakeLists.txt):
+#
+#   Windows : D3D12  -> DXIL   via the Windows SDK's dxc.exe
+#   Linux   : Vulkan -> SPIR-V via SDL_shadercross
+#   macOS   : Metal  -> MSL    via SDL_shadercross
+#
+# Windows needs no third-party shader compiler: DXIL is the one target the SDK's
+# dxc.exe ships codegen for, and it is the only format the D3D12 backend loads.
+# SDL_shadercross is the HLSL -> SPIR-V/MSL route everywhere else, and it wants
+# DXC plus SPIRV-Cross underneath it.
+#
+# Setting SHADERCROSS_EXECUTABLE to an already-built shadercross CLI skips
+# fetching and building the whole thing — that is the fast path for a dev box
+# that has one lying around, and how CI reuses a cached build.
+if(WIN32)
+    # dxc.exe ships in the Windows SDK under Windows Kits\10\bin\<ver>\x64. Inside a
+    # VS developer prompt its directory is $WindowsSdkVerBinPath, but a plain
+    # cmake-from-Explorer inherits no such thing, so glob the install root and take
+    # the newest SDK (a descending sort puts the highest version first).
+    if(NOT DXC_EXECUTABLE)
+        file(GLOB _winsdk_dxc_candidates
+            "C:/Program Files (x86)/Windows Kits/10/bin/*/x64/dxc.exe"
+            "C:/Program Files/Windows Kits/10/bin/*/x64/dxc.exe")
+        if(_winsdk_dxc_candidates)
+            list(SORT _winsdk_dxc_candidates ORDER DESCENDING)
+            list(GET _winsdk_dxc_candidates 0 DXC_EXECUTABLE)
+        endif()
+    endif()
+    if(NOT DXC_EXECUTABLE)
+        find_program(DXC_EXECUTABLE
+            NAMES dxc.exe dxc
+            HINTS
+                "$ENV{WindowsSdkVerBinPath}x64"
+                "$ENV{WindowsSdkDir}bin/x64"
+            DOC "Windows SDK DirectX Shader Compiler (HLSL -> DXIL)")
+    endif()
+    if(NOT DXC_EXECUTABLE)
+        message(FATAL_ERROR
+            "dxc.exe not found. Install the Windows 10/11 SDK (it ships dxc.exe under "
+            "'C:/Program Files (x86)/Windows Kits/10/bin/<ver>/x64'), or pass "
+            "-DDXC_EXECUTABLE=<path/to/dxc.exe>.")
+    endif()
+    set(DXC_EXECUTABLE "${DXC_EXECUTABLE}" CACHE FILEPATH
+        "Windows SDK DirectX Shader Compiler (HLSL -> DXIL)" FORCE)
+    message(STATUS "Shaders: dxc.exe (DXIL) at ${DXC_EXECUTABLE}")
+elseif(SHADERCROSS_EXECUTABLE)
+    if(NOT EXISTS "${SHADERCROSS_EXECUTABLE}")
+        message(FATAL_ERROR
+            "SHADERCROSS_EXECUTABLE=${SHADERCROSS_EXECUTABLE} does not exist. Point it at a "
+            "prebuilt shadercross CLI, or leave it unset to build one from source.")
+    endif()
+    set(SHADERCROSS_EXECUTABLE "${SHADERCROSS_EXECUTABLE}" CACHE FILEPATH
+        "Prebuilt SDL_shadercross CLI (skips building DXC + SPIRV-Cross from source)" FORCE)
+    message(STATUS "Shaders: prebuilt SDL_shadercross at ${SHADERCROSS_EXECUTABLE}")
+else()
+    # Build SDL_shadercross from source. Its two dependencies are handled very
+    # differently per platform, because DXC is an LLVM fork and building it is by
+    # far the most expensive thing in this project's configure+build:
+    #
+    #   Linux: Microsoft publishes a prebuilt DXC, so download that instead of
+    #          spending ~25 min compiling LLVM. SPIRV-Cross still gets built from
+    #          the submodule (~1-2 min); distro packages of it are too old for
+    #          SDL_shadercross's C API.
+    #   macOS: no prebuilt DXC is published for it, so the vendored one is built
+    #          (~14 min). CI caches the resulting CLI and feeds it back in via
+    #          SHADERCROSS_EXECUTABLE above.
+    #
+    # Pinned rather than tracking main: this is the revision the checked-in shaders
+    # were developed against, and CI keys its build cache on it.
+    #
+    # SOURCE_SUBDIR names a directory with no CMakeLists.txt, which makes
+    # FetchContent_MakeAvailable download the sources *without* immediately calling
+    # add_subdirectory. The Linux path has to run SDL_shadercross's own DXC-download
+    # script out of the fetched tree before its CMakeLists is processed, and the
+    # options below have to be in the cache before it reads them.
+    if(LINUX)
+        set(_shadercross_submodules "external/SPIRV-Cross")
+    else()
+        set(_shadercross_submodules "")   # empty list => fetch them all, DXC included
+    endif()
+    FetchContent_Declare(
+        SDL_shadercross
+        GIT_REPOSITORY https://github.com/libsdl-org/SDL_shadercross.git
+        GIT_TAG        6b06e55c7c5d7e7a09a8a14f76e866dcfad5ab99
+        GIT_SUBMODULES ${_shadercross_submodules}
+        SOURCE_SUBDIR  cmake-entry-point-suppressed
+    )
+    FetchContent_MakeAvailable(SDL_shadercross)
+
+    set(SDLSHADERCROSS_DXC        ON  CACHE BOOL "" FORCE)
+    set(SDLSHADERCROSS_STATIC     ON  CACHE BOOL "" FORCE)
+    set(SDLSHADERCROSS_SHARED     OFF CACHE BOOL "" FORCE)
+    set(SDLSHADERCROSS_CLI        ON  CACHE BOOL "" FORCE)
+    set(SDLSHADERCROSS_INSTALL    OFF CACHE BOOL "" FORCE)
+    set(SDLSHADERCROSS_TESTS      OFF CACHE BOOL "" FORCE)
+
+    if(LINUX)
+        # Extracts a prebuilt DXC under <src>/external/DirectXShaderCompiler-binaries/linux
+        # and points DirectXShaderCompiler_ROOT at it; SDL_shadercross's own
+        # FindDirectXShaderCompiler.cmake then picks it up off that root.
+        include("${sdl_shadercross_SOURCE_DIR}/build-scripts/download-prebuilt-DirectXShaderCompiler.cmake")
+
+        # One knob, SDLSHADERCROSS_VENDORED, governs *both* dependencies. We want
+        # prebuilt DXC but vendored SPIRV-Cross, so turn it off and add SPIRV-Cross
+        # ourselves. SDL_shadercross guards its find_package with
+        # `if(NOT TARGET spirv_cross_c)`, so a pre-existing target makes it skip.
+        set(SDLSHADERCROSS_VENDORED          OFF CACHE BOOL "" FORCE)
+        set(SDLSHADERCROSS_SPIRVCROSS_SHARED OFF CACHE BOOL "" FORCE)
+
+        # SPIRV_CROSS_SKIP_INSTALL stays OFF, and not because anything is installed:
+        # SDL_shadercross calls export(TARGETS SDL3_shadercross-static) unconditionally,
+        # and CMake refuses to export a static library whose PRIVATE dependency
+        # (spirv-cross-c) belongs to no export set. SPIRV-Cross's install macro is what
+        # registers those targets, so skipping it fails the configure outright.
+        set(SPIRV_CROSS_SKIP_INSTALL     OFF CACHE BOOL "" FORCE)
+        set(SPIRV_CROSS_CLI              OFF CACHE BOOL "" FORCE)
+        set(SPIRV_CROSS_ENABLE_TESTS     OFF CACHE BOOL "" FORCE)
+        set(SPIRV_CROSS_SHARED           OFF CACHE BOOL "" FORCE)
+        set(SPIRV_CROSS_STATIC           ON  CACHE BOOL "" FORCE)
+        # spirv-cross-c ends up inside static SDL3_shadercross, which ends up inside
+        # the CLI; PIC keeps that relocatable link happy.
+        set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+        add_subdirectory("${sdl_shadercross_SOURCE_DIR}/external/SPIRV-Cross"
+                         "${sdl_shadercross_BINARY_DIR}/external/SPIRV-Cross" EXCLUDE_FROM_ALL)
+        # SPIRV-Cross names the target with hyphens; SDL_shadercross's existence check
+        # spells it with underscores. The alias satisfies the check — it links the
+        # hyphenated name directly, which is the real target.
+        add_library(spirv_cross_c ALIAS spirv-cross-c)
+        message(STATUS "Shaders: SDL_shadercross + prebuilt DXC + vendored SPIRV-Cross (Linux)")
+    else()
+        set(SDLSHADERCROSS_VENDORED          ON  CACHE BOOL "" FORCE)
+        set(SDLSHADERCROSS_SPIRVCROSS_SHARED OFF CACHE BOOL "" FORCE)
+        # HLSL -> MSL runs through DXC's SPIR-V codegen, which DXC leaves off by
+        # default. Force it on in the cache so the vendored DXC's option() sees it.
+        set(ENABLE_SPIRV_CODEGEN             ON  CACHE BOOL "" FORCE)
+        message(STATUS "Shaders: SDL_shadercross + vendored DXC (this build is slow; cache the CLI and pass -DSHADERCROSS_EXECUTABLE)")
+    endif()
+
+    add_subdirectory("${sdl_shadercross_SOURCE_DIR}" "${sdl_shadercross_BINARY_DIR}" EXCLUDE_FROM_ALL)
+endif()
+
+# What the shader rules in Render/CMakeLists.txt feed to cmake/bin2h.cmake. An empty
+# SHADER_COMPILER means "resolve $<TARGET_FILE:shadercross> at build time", i.e. use the
+# CLI this build is about to produce.
+if(WIN32)
+    set(SHADER_MODE       "dxc")
+    set(SHADER_COMPILER   "${DXC_EXECUTABLE}")
+    set(SHADER_FORMAT_EXT "dxil")
+else()
+    set(SHADER_MODE       "shadercross")
+    set(SHADER_COMPILER   "${SHADERCROSS_EXECUTABLE}")
+    if(APPLE)
+        set(SHADER_FORMAT_EXT "msl")
+    else()
+        set(SHADER_FORMAT_EXT "spv")
+    endif()
+endif()
 
 # FreeType — font rasterizer for the UI text (Render/src/FT_Font.cpp, ftrender.cpp).
 # Replaces the vendored 2.2 tree (XLibs.Net/FreeType) and the link-time stub.

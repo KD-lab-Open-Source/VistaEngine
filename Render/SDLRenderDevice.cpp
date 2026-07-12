@@ -7,6 +7,7 @@
 #include <cstring>
 
 #include "Platform/Window.h"   // the SDL_Window we claim, and the OS handle beside it
+#include "SDLShaders/ShaderBlob.h"   // vista::kShaderFormat — the one format we ship
 
 #include "Texture.h"     // cTexture (BitMap / GetDDSurface / attributes)
 #include "FileImage.h"   // cFileImage::GetTexture
@@ -191,9 +192,10 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND /*hWnd*/,
 	}
 
 	if(!device_){
-		device_ = SDL_CreateGPUDevice(
-			SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_MSL | SDL_GPU_SHADERFORMAT_DXIL,
-			false, nullptr);
+		// Only the one format this platform's shaders were compiled to (DXIL / SPIR-V /
+		// MSL, see SDLShaders/ShaderBlob.h). Naming formats we hold no bytecode for would
+		// let SDL pick a backend whose pipelines we then could not create.
+		device_ = SDL_CreateGPUDevice(vista::kShaderFormat, false, nullptr);
 		if(!device_){
 			fprintf(stderr, "cSDLRenderDevice::Initialize: SDL_CreateGPUDevice failed: %s\n", SDL_GetError());
 			return false;

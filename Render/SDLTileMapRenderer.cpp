@@ -17,8 +17,10 @@
 #include "VisGeneric.h"        // Option_filterShadow, Option_DetailTexture
 #include "SDLRenderDevice.h"   // applyCameraViewport, the shadow map
 
-// Cross-compiled tilemap shader blobs (SPIR-V + MSL); see Render/SDLShaders.
+// Terrain shader bytecode, compiled to this platform's native format at build time;
+// see Render/CMakeLists.txt.
 #include "SDLShaders/tilemap_shaders.h"
+#include "SDLShaders/ShaderBlob.h"
 
 namespace {
 
@@ -138,33 +140,13 @@ void SDLTileMapRenderer::createPipeline()
 	// 1x1 mid-grey, the detail texture's neutral: the shader adds `detail - 0.5`.
 	greyTexture_  = createSolidGPUTexture(device_, 0xFF808080u);
 
-	SDL_GPUShaderFormat formats = SDL_GetGPUShaderFormats(device_);
-	SDL_GPUShaderFormat fmt;
-	const char* entry;
-	const unsigned char *vsCode, *fsCode;
-	unsigned int vsSize, fsSize;
-	if(formats & SDL_GPU_SHADERFORMAT_MSL){
-		fmt = SDL_GPU_SHADERFORMAT_MSL; entry = "main0";
-		vsCode = tilemap_vert_msl; vsSize = tilemap_vert_msl_len;
-		fsCode = tilemap_frag_msl; fsSize = tilemap_frag_msl_len;
-	} else if(formats & SDL_GPU_SHADERFORMAT_SPIRV){
-		fmt = SDL_GPU_SHADERFORMAT_SPIRV; entry = "main";
-		vsCode = tilemap_vert_spv; vsSize = tilemap_vert_spv_len;
-		fsCode = tilemap_frag_spv; fsSize = tilemap_frag_spv_len;
-	} else {
-		fprintf(stderr, "SDLTileMapRenderer: no supported shader format (0x%x)\n", formats);
-		return;
-	}
-
-	SDL_GPUShaderCreateInfo vsi = {};
-	vsi.code = vsCode; vsi.code_size = vsSize; vsi.entrypoint = entry;
-	vsi.format = fmt; vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+	SDL_GPUShaderCreateInfo vsi = vista::shaderCreateInfo(VISTA_SHADER(tilemap_vert));
+	vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
 	vsi.num_uniform_buffers = 1;    // MVP + UV + Shadow
 	SDL_GPUShader* vs = SDL_CreateGPUShader(device_, &vsi);
 
-	SDL_GPUShaderCreateInfo fsi = {};
-	fsi.code = fsCode; fsi.code_size = fsSize; fsi.entrypoint = entry;
-	fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+	SDL_GPUShaderCreateInfo fsi = vista::shaderCreateInfo(VISTA_SHADER(tilemap_frag));
+	fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
 	fsi.num_samplers = 4;           // surface colour, shadow map, lightmap, detail tile
 	fsi.num_uniform_buffers = 1;    // LightColor + LightDirection + ShadeIntensity + params
 	SDL_GPUShader* fs = SDL_CreateGPUShader(device_, &fsi);
@@ -243,31 +225,13 @@ void SDLTileMapRenderer::createShadowPipeline()
 {
 	if(!device_) return;
 
-	SDL_GPUShaderFormat formats = SDL_GetGPUShaderFormats(device_);
-	SDL_GPUShaderFormat fmt;
-	const char* entry;
-	const unsigned char *vsCode, *fsCode;
-	unsigned int vsSize, fsSize;
-	if(formats & SDL_GPU_SHADERFORMAT_MSL){
-		fmt = SDL_GPU_SHADERFORMAT_MSL; entry = "main0";
-		vsCode = tilemap_shadow_vert_msl; vsSize = tilemap_shadow_vert_msl_len;
-		fsCode = tilemap_shadow_frag_msl; fsSize = tilemap_shadow_frag_msl_len;
-	} else if(formats & SDL_GPU_SHADERFORMAT_SPIRV){
-		fmt = SDL_GPU_SHADERFORMAT_SPIRV; entry = "main";
-		vsCode = tilemap_shadow_vert_spv; vsSize = tilemap_shadow_vert_spv_len;
-		fsCode = tilemap_shadow_frag_spv; fsSize = tilemap_shadow_frag_spv_len;
-	} else
-		return;   // createPipeline already complained
-
-	SDL_GPUShaderCreateInfo vsi = {};
-	vsi.code = vsCode; vsi.code_size = vsSize; vsi.entrypoint = entry;
-	vsi.format = fmt; vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+	SDL_GPUShaderCreateInfo vsi = vista::shaderCreateInfo(VISTA_SHADER(tilemap_shadow_vert));
+	vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
 	vsi.num_uniform_buffers = 1;    // the light's MVP
 	SDL_GPUShader* vs = SDL_CreateGPUShader(device_, &vsi);
 
-	SDL_GPUShaderCreateInfo fsi = {};
-	fsi.code = fsCode; fsi.code_size = fsSize; fsi.entrypoint = entry;
-	fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+	SDL_GPUShaderCreateInfo fsi = vista::shaderCreateInfo(VISTA_SHADER(tilemap_shadow_frag));
+	fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
 	SDL_GPUShader* fs = SDL_CreateGPUShader(device_, &fsi);   // no samplers, no uniforms
 
 	if(!vs || !fs){
