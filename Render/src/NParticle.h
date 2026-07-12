@@ -32,6 +32,16 @@ enum eBlendMode : int;
 enum eColorMode : int;
 template <class vertex> class cQuadBuffer;
 struct sVertexXYZDT1;
+class SDLWorldQuadRenderer;
+
+// What the emitters build their sprites into. Both offer the same BeginDraw/Get/EndDraw
+// contract, and the sprite loops only ever call Get(), so the loops themselves -- and
+// cPlume::PutToBuf below -- are the same code on either backend.
+#ifdef _WIN32
+typedef cQuadBuffer<sVertexXYZDT1> QuadSpriteBuffer;
+#else
+typedef SDLWorldQuadRenderer       QuadSpriteBuffer;
+#endif
 
 class PerlinNoise
 {
@@ -1047,7 +1057,7 @@ struct cPlume
 	}
 
 	bool PutToBuf(Vect3f& npos, float& dt,
-				cQuadBuffer<sVertexXYZDT1>*& pBuf, 
+				QuadSpriteBuffer*& pBuf,
 				const Color4c& color, const Vect3f& PosCamera,
 				const float& size, const sRectangle4f& rt,
 				const UCHAR mode,

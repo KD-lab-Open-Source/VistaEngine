@@ -170,26 +170,52 @@ SDL_GPUGraphicsPipeline* SDLWorldQuadRenderer::pipelineFor(eBlendMode blend, boo
 	attrs[1].location = 1; attrs[1].buffer_slot = 0; attrs[1].format = SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4_NORM; attrs[1].offset = 12;
 	attrs[2].location = 2; attrs[2].buffer_slot = 0; attrs[2].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;      attrs[2].offset = 16;
 
-	// The blend the caller's SetWorldMaterial / SetNoMaterial asked for. Both are written
-	// with a premultiplied source, because the textures decode premultiplied and the
-	// shaders keep them that way (see worldquad.frag.hlsl): ALPHA_BLEND's D3D
-	// (SRC_ALPHA, 1-SRC_ALPHA) becomes (ONE, 1-SRC_ALPHA), and ALPHA_ADDBLENDALPHA's
-	// (SRC_ALPHA, ONE) becomes (ONE, ONE). Both emit the pixel the original does.
+	// The blend the caller's SetWorldMaterial / SetNoMaterial asked for. Every one of them
+	// is written with a premultiplied source, because the textures decode premultiplied and
+	// the shaders keep them that way (see worldquad.frag.hlsl), so each D3D src factor of
+	// SRC_ALPHA becomes ONE:
+	//
+	//   ALPHA_BLEND         dst*(1-a) + src*a  ->  (ONE, 1-SRC_ALPHA)
+	//   ALPHA_ADDBLENDALPHA dst + src*a        ->  (ONE, ONE)
+	//   ALPHA_ADDBLEND      dst + src          ->  (ONE, ONE)  [see below]
+	//   ALPHA_SUBBLEND      dst - src          ->  (ONE, ONE), reverse-subtract
+	//   ALPHA_MUL           dst * src          ->  (DST_COLOR, ZERO)
+	//   ALPHA_NONE          src                ->  no blend
+	//
+	// ALPHA_ADDBLEND is the one place premultiplying is not exact: D3D adds the raw texel,
+	// this adds texel*alpha. The two agree wherever a transparent texel is black, which is
+	// how additive particle art is drawn -- and the alternative, dividing the alpha back
+	// out in the shader, would amplify the very edge texels premultiplying exists to fix.
 	SDL_GPUColorTargetDescription colorTarget = {};
 	colorTarget.format = SDL_GetGPUSwapchainTextureFormat(device_, window_);
 	SDL_GPUColorTargetBlendState& bs = colorTarget.blend_state;
-	bs.enable_blend = true;
+	bs.enable_blend = blend != ALPHA_NONE && blend != ALPHA_TEST;
 	bs.color_blend_op = SDL_GPU_BLENDOP_ADD;
 	bs.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
 	bs.src_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
 	bs.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
-	if(blend == ALPHA_ADDBLENDALPHA){
-		bs.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
-		bs.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
-	}
-	else{
-		bs.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
-		bs.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+	bs.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+	bs.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+	switch(blend){
+		case ALPHA_ADDBLENDALPHA:
+		case ALPHA_ADDBLEND:
+			bs.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+			bs.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+			break;
+		case ALPHA_SUBBLEND:
+			bs.color_blend_op = SDL_GPU_BLENDOP_REVERSE_SUBTRACT;   // dst - src
+			bs.alpha_blend_op = SDL_GPU_BLENDOP_REVERSE_SUBTRACT;
+			bs.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+			bs.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+			break;
+		case ALPHA_MUL:
+			bs.src_color_blendfactor = SDL_GPU_BLENDFACTOR_DST_COLOR;
+			bs.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_DST_ALPHA;
+			bs.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ZERO;
+			bs.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ZERO;
+			break;
+		default:
+			break;   // ALPHA_BLEND and its two variants keep the factors set above
 	}
 
 	SDL_GPUGraphicsPipelineCreateInfo pci = {};
@@ -238,27 +264,31 @@ void SDLWorldQuadRenderer::BeginFrame()
 void SDLWorldQuadRenderer::SetCamera(Camera* camera)
 {
 	if(!camera) return;
-	// The original's mWVP: mWorld is MatXf::ID for both sprite groups, so this is the
-	// camera's view-projection alone.
-	std::memcpy(vs_.mvp, &camera->matViewProj, sizeof(vs_.mvp));
+	viewProj_ = camera->matViewProj;
 	vpX_ = camera->vp.X; vpY_ = camera->vp.Y;
 	vpW_ = camera->vp.Width; vpH_ = camera->vp.Height;
 	vpMinZ_ = camera->vp.MinZ; vpMaxZ_ = camera->vp.MaxZ;
 	cameraValid_ = true;
 }
 
-void SDLWorldQuadRenderer::SetMaterial(eBlendMode blend, cTexture* texture, bool depthTest)
+void SDLWorldQuadRenderer::SetMaterial(eBlendMode blend, cTexture* texture, bool depthTest,
+                                       const MatXf& world)
 {
 	material_.texture = sdlTextureOf(texture);
 	material_.blend = blend;
 	material_.depthTest = depthTest;
+	materialWorld_ = world;
 }
 
-void SDLWorldQuadRenderer::BeginDraw()
+void SDLWorldQuadRenderer::BeginDraw(const MatXf&)
 {
 	current_ = material_;
 	current_.firstQuad = (int)(vertices_.size() / 4);
 	current_.quadCount = 0;
+	// SetWorldMaterial's mWVP. The camera cannot be folded in at SetMaterial: several
+	// emitters set their material under one camera, each with its own world matrix.
+	const Mat4f mvp = Mat4f(materialWorld_) * viewProj_;
+	std::memcpy(current_.vs.mvp, &mvp, sizeof(current_.vs.mvp));
 	drawing_ = cameraValid_;
 }
 
@@ -400,12 +430,12 @@ bool SDLWorldQuadRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 	// cCoastSprites' stay sprites then its moving ones, or one group per wave source.
 	SDL_GPUGraphicsPipeline* boundPipeline = nullptr;
 	SDL_GPUTexture* boundTexture = nullptr;
+	const VSUniform* boundVS = nullptr;
 	for(const Group& g : groups_){
 		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(g.blend, g.depthTest, wireframe);
 		if(!pipeline) continue;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);
-			SDL_PushGPUVertexUniformData(cmd, 0, &vs_, sizeof(vs_));
 
 			SDL_GPUBufferBinding vb = {}; vb.buffer = vertexBuffer_; vb.offset = 0;
 			SDL_BindGPUVertexBuffers(pass, 0, &vb, 1);
@@ -414,6 +444,13 @@ bool SDLWorldQuadRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 
 			boundPipeline = pipeline;
 			boundTexture = nullptr;   // bindings do not survive a pipeline change
+			boundVS = nullptr;
+		}
+
+		// Per group: a relative particle emitter folds its GlobalMatrix into the mvp.
+		if(!boundVS || std::memcmp(boundVS->mvp, g.vs.mvp, sizeof(g.vs.mvp)) != 0){
+			SDL_PushGPUVertexUniformData(cmd, 0, &g.vs, sizeof(g.vs));
+			boundVS = &g.vs;
 		}
 
 		SDL_GPUTexture* texture = g.texture ? g.texture : whiteTexture_;

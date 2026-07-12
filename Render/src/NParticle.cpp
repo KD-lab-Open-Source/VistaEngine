@@ -11,6 +11,10 @@
 #include "Serialization/Serialization.h"
 #include "XMath/SafeMath.h"
 #include "FileUtils/FileUtils.h"
+#ifndef _WIN32
+#include "Render/SDLRenderDevice.h"        // the emitters' sprites, reached via drawWorldQuads
+#include "Render/SDLWorldQuadRenderer.h"
+#endif
 
 bool enableMirage = false;
 static vector<Vect2f> rotate_angle;
@@ -186,6 +190,14 @@ void cEmitterColumnLight::Animate(float dt)
 }
 void cEmitterColumnLight::Draw(Camera* camera)
 {
+#ifndef _WIN32
+	// Not ported: the light column is triangle strips through cVertexBuffer, not the quad
+	// buffer the sprite emitters share, and it takes SetWorldMaterial's second texture and
+	// colour operation, which worldquad.frag.hlsl has no path for. cEffect::Draw now
+	// dispatches to every emitter, so bail before the D3D-only body dereferences
+	// gb_RenderDevice3D (null off-Windows).
+	return;
+#else
 	if(no_show_obj_editor)
 		return;
 	if(parent->GetParticleRateReal()<=0)
@@ -505,6 +517,7 @@ void cEmitterColumnLight::Draw(Camera* camera)
 			parent->AddCountTriangle(2);
 		#endif
 	}
+#endif   // !_WIN32 returned above
 }
 
 void cEmitterColumnLight::SetTarget(const Vect3f* pos_end,int pos_end_size)
@@ -1059,7 +1072,7 @@ bool cEmitterInt::SetFreeOrCycle(int index)
 }
 
 bool cPlume::PutToBuf(Vect3f& npos, float& dt,
-					cQuadBuffer<sVertexXYZDT1>*& pBuf, 
+					QuadSpriteBuffer*& pBuf,
 					const Color4c& color, const Vect3f& PosCamera,
 					const float& scale, const sRectangle4f& rt,
 					const UCHAR mode,float PlumeInterval,float time_summary)
@@ -1203,6 +1216,7 @@ void cEmitterInt::Draw(Camera* camera)
 	if (GetTexture(0) && GetTexture(0)->IsComplexTexture())
 		textureComplex = (cTextureComplex*)GetTexture(0);
 
+#ifdef _WIN32
 	cQuadBuffer<sVertexXYZDT1>* pBuf=rd->GetQuadBufferXYZDT1();
 
 	gb_RenderDevice->SetSamplerDataVirtual(0,emitterKey()->chPlume?sampler_clamp_linear:sampler_wrap_linear);
@@ -1212,6 +1226,17 @@ void cEmitterInt::Draw(Camera* camera)
 		gb_RenderDevice3D->SetSamplerData(5,sampler_clamp_linear);
 	}
 	gb_RenderDevice3D->SetWorldMaterial(blend_mode, emitterKey()->relative ? GlobalMatrix:MatXf::ID, 0, GetTexture(0),0,COLOR_MOD,softSmoke,reflectionz);
+#else
+	// The world-quad renderer answers to the quad buffer's BeginDraw/Get/EndDraw, so the
+	// sprite loop below is the same code on both backends; only the material call differs.
+	// softSmoke and the z-reflection clip both sample camera->GetZTexture(), which nothing
+	// ever sets (Camera::SetZTexture has no caller), so neither is carried.
+	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
+	if(!pBuf)
+		return;
+	pBuf->SetMaterial(blend_mode, GetTexture(0), true,
+	                  emitterKey()->relative ? GlobalMatrix : MatXf::ID);
+#endif
 #ifdef NEED_TREANGLE_COUNT
 	if (parent->drawOverDraw)
 	{
@@ -2037,6 +2062,7 @@ void cEmitterSpline::Draw(Camera* camera)
 	if (GetTexture(0) && GetTexture(0)->IsComplexTexture())
 		textureComplex = (cTextureComplex*)GetTexture(0);
 
+#ifdef _WIN32
 	cQuadBuffer<sVertexXYZDT1>* pBuf=rd->GetQuadBufferXYZDT1();
 
 	gb_RenderDevice->SetSamplerDataVirtual(0,emitterKey()->chPlume?sampler_clamp_linear:sampler_wrap_linear);
@@ -2047,6 +2073,15 @@ void cEmitterSpline::Draw(Camera* camera)
 	}
 	gb_RenderDevice3D->SetWorldMaterial(blend_mode, emitterKey()->relative ? GlobalMatrix:MatXf::ID, 0, GetTexture(0),0,COLOR_MOD,softSmoke,reflectionz);
 	rd->SetRenderState( RS_CULLMODE, D3DCULL_NONE );
+#else
+	// As cEmitterInt::Draw: the same sprite loop, a different material call. The quad
+	// pipeline is already CULLMODE_NONE.
+	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
+	if(!pBuf)
+		return;
+	pBuf->SetMaterial(blend_mode, GetTexture(0), true,
+	                  emitterKey()->relative ? GlobalMatrix : MatXf::ID);
+#endif
 #ifdef NEED_TREANGLE_COUNT
 	if (parent->drawOverDraw)
 	{
@@ -2808,14 +2843,26 @@ void cEffect::PreDraw(Camera* camera)
 
 void cEffect::Draw(Camera* camera)
 {
-#ifdef _WIN32
 	start_timer_auto();
 
+#ifdef _WIN32
 	bool old_fog_of_war=gb_RenderDevice3D->GetFogOfWar();
 	if(no_fog_of_war)
 		gb_RenderDevice3D->SetFogOfWar(false);
 
 	gb_RenderDevice3D->SetSamplerData(0,sampler_wrap_linear);
+#else
+	// The emitters build their sprites through the shared world-quad renderer, which wants
+	// the camera before the first group opens and a render pass of its own once they are
+	// all recorded -- SDL GPU cannot draw as each EndDraw goes, the way D3D did. The
+	// sampler is baked into its pipeline; fog of war is a shader path it does not have.
+	SDLWorldQuadRenderer* renderer = sdlWorldQuadRenderer();
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	if(!renderer || !dev)
+		return;
+	renderer->SetCamera(camera);
+#endif
+
 	vector<cEmitterInterface*>::iterator it;
 	if(camera->getAttribute(ATTRCAMERA_MIRAGE)){
 		FOR_EACH(emitters,it)
@@ -2845,6 +2892,11 @@ void cEffect::Draw(Camera* camera)
 				(*it)->Draw(camera);
 	}
 
+#ifndef _WIN32
+	// D3D drew as each group's EndDraw went; open the pass here, where the effects belong
+	// in the scene walk (the sorted pass, over the opaque objects and the water).
+	dev->drawWorldQuads();
+#else
 	gb_RenderDevice3D->SetFogOfWar(old_fog_of_war);
 #ifdef NEED_TREANGLE_COUNT
 	int sum = 0;
@@ -3494,7 +3546,13 @@ void cEmitterZ::Draw(Camera* camera)
 	if (GetTexture(0) && GetTexture(0)->IsComplexTexture())
 		textureComplex = (cTextureComplex*)GetTexture(0);
 
+#ifdef _WIN32
 	cQuadBuffer<sVertexXYZDT1>* pBuf=rd->GetQuadBufferXYZDT1();
+#else
+	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
+	if(!pBuf)
+		return;
+#endif
 
 	Vect3f CameraPos;
 	UCHAR mode;
@@ -3504,6 +3562,7 @@ void cEmitterZ::Draw(Camera* camera)
 		CameraPos = emitterKey()->relative ? GlobalMatrix.invXformPoint(CameraPos) : camera->GetPos();
 		mode = (UCHAR)emitterKey()->planar + (emitterKey()->smooth ? 0 : 2);
 	}
+#ifdef _WIN32
 	gb_RenderDevice->SetSamplerDataVirtual(0,sampler_wrap_linear);
 	bool reflectionz=camera->getAttribute(ATTRCAMERA_REFLECTION);
 	{//Немного не к месту, зато быстро по скорости, для отражений.
@@ -3511,6 +3570,10 @@ void cEmitterZ::Draw(Camera* camera)
 		gb_RenderDevice3D->SetSamplerData(5,sampler_clamp_linear);
 	}
 	gb_RenderDevice3D->SetWorldMaterial(blend_mode, emitterKey()->relative ? GlobalMatrix:MatXf::ID, 0, GetTexture(0),0,COLOR_MOD,softSmoke,reflectionz);
+#else
+	pBuf->SetMaterial(blend_mode, GetTexture(0), true,
+	                  emitterKey()->relative ? GlobalMatrix : MatXf::ID);
+#endif
 #ifdef NEED_TREANGLE_COUNT
 	if (parent->drawOverDraw)
 	{

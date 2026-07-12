@@ -36,8 +36,9 @@
 // z-reflection clip. The other users of the shared quad buffer (NParticle, Leaves,
 // FogOfWar) want some of those, and will bring them.
 
-#include "IRenderDevice.h"    // cTexture
+#include "IRenderDevice.h"    // cTexture, MatXf
 #include "VertexFormat.h"     // sVertexXYZDT1 (the quad buffer's vertex)
+#include "XMath/Mat4f.h"      // Mat4f: the camera's view-projection, and each group's mvp
 #include <unordered_map>
 #include <vector>
 
@@ -72,17 +73,25 @@ public:
 	void SetCamera(Camera* camera);
 
 	// The material the following group draws with, standing in for the SetWorldMaterial /
-	// SetNoMaterial call that opens each caller's draw. `blend` is ALPHA_BLEND or
-	// ALPHA_ADDBLENDALPHA (the sun's); anything else falls back to ALPHA_BLEND. A null
-	// texture draws untextured (a white 1x1), as those calls' own pWhiteTexture fallback
-	// does. depthTest false is D3DRS_ZENABLE FALSE, which only the sun and moon ask for --
-	// no caller ever writes depth.
-	void SetMaterial(eBlendMode blend, cTexture* texture, bool depthTest = true);
+	// SetNoMaterial call that opens each caller's draw. A null texture draws untextured (a
+	// white 1x1), as those calls' own pWhiteTexture fallback does. depthTest false is
+	// D3DRS_ZENABLE FALSE, which only the sun and moon ask for -- no caller ever writes
+	// depth. `world` is SetWorldMaterial's matrix: MatXf::ID for every caller whose quads
+	// are already in world space, and the emitter's GlobalMatrix for a particle emitter
+	// marked `relative`, whose quads are built in emitter space.
+	void SetMaterial(eBlendMode blend, cTexture* texture, bool depthTest = true,
+	                 const MatXf& world = MatXf::ID);
 
 	// cQuadBuffer<sVertexXYZDT1>'s contract: BeginDraw opens a group, each Get hands back
 	// four vertices for one quad, EndDraw closes it. A group carries the material
 	// SetMaterial last named.
-	void BeginDraw();
+	//
+	// BeginDraw's matrix is accepted and ignored, as it effectively is on D3D: there it
+	// reaches cD3DRender::setWorldMatrix, which sets the fixed-function D3DTS_WORLD, and
+	// every caller here draws through vsStandart -- whose world matrix comes from
+	// SetWorldMaterial instead (cD3DRender::SetWorldMaterial ends in vsStandart->Select(mat)).
+	// So SetMaterial's `world` is the one that shades, on both backends.
+	void BeginDraw(const MatXf& = MatXf::ID);
 	sVertexXYZDT1* Get();
 	void EndDraw();
 
@@ -108,6 +117,10 @@ private:
 		eBlendMode blend;
 		bool depthTest;
 		int firstQuad, quadCount;
+		// SetWorldMaterial's mWVP for this group: world * the camera's view-projection.
+		// Per group, not per frame -- a relative particle emitter carries its own world
+		// matrix, and several emitters with different ones draw under one camera.
+		VSUniform vs;
 	};
 
 	void createSampler();
@@ -139,12 +152,13 @@ private:
 
 	std::vector<sVertexXYZDT1> vertices_;   // 4 per quad
 	std::vector<Group> groups_;
-	Group current_ = {nullptr, ALPHA_BLEND, true, 0, 0};   // the open BeginDraw..EndDraw run
-	Group material_ = {nullptr, ALPHA_BLEND, true, 0, 0};  // set by SetMaterial, taken by BeginDraw
+	Group current_ = {};    // the open BeginDraw..EndDraw run
+	Group material_ = {};   // set by SetMaterial, taken by BeginDraw
+	MatXf materialWorld_ = MatXf::ID;       // SetMaterial's world, folded into the mvp at BeginDraw
 	bool drawing_ = false;                  // inside BeginDraw..EndDraw, with a camera
 	sVertexXYZDT1 scratch_[4];              // what Get() hands back when there is no camera
 
-	VSUniform vs_ = {};
+	Mat4f viewProj_;             // the camera's, from SetCamera; each group's mvp is world * this
 	int vpX_ = 0, vpY_ = 0, vpW_ = 0, vpH_ = 0;
 	float vpMinZ_ = 0.f, vpMaxZ_ = 1.f;
 	bool cameraValid_ = false;   // SetCamera has run for the group being recorded
