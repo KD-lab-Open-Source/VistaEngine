@@ -1,27 +1,18 @@
-// Non-Windows stub for the Sound module: no-op (silent) audio.
+// The not-yet-ported half of the Sound module: no-op (silent) Sound, Channel, OggPlayer
+// and SND3DListener.
 //
-// The real backend is DirectSound-based (SoundSystem.cpp / WaveFile.cpp / ...)
-// and stays WIN32-only. These stubs provide real C++ definitions (correct
-// signatures, no-op bodies) for the SoundSystem / Sound / Channel / OggPlayer
-// symbols the engine references, so the game links and runs silently until the
-// SDL3 audio backend (Track B) replaces them. See Sound/CMakeLists.txt.
+// The device itself is real and is miniaudio's (AudioBackend.cpp, SoundSystemMiniaudio.cpp).
+// What is still stubbed is everything that would make a noise through it — the sample pool
+// and its voices, the music/voice streams, and the 3D listener — so the game runs silent.
+// Each lands in its own slice, and the DirectSound original of each is still in the tree as
+// the reference: SoundSystem.cpp (Sound, Channel), C3D.cpp (SND3DListener), and
+// XLibs.Net/OGG/PlayOgg (OggPlayer).
 #include "StdAfx.h"
 #include "Sound.h"
 #include "SoundSystem.h"
 #include "PlayOgg.h"
 
-// ---- free functions (Sound.h) ----
-bool SNDInitSound(HWND, bool, bool) { return false; }
-void SNDReleaseSound() {}
-void SNDEnableSound(bool) {}
-bool SNDIsSoundEnabled() { return false; }
-void SNDSetVolume(float) {}
-void SNDSetFade(bool, int) {}
-void SNDSetGameActive(bool) {}
-void SNDStopAll() {}
-
 // ---- globals ----
-SoundSystem sndSystem;
 SND3DListener snd_listener;
 
 // ---- SND3DListener (Sound.h) ----
@@ -30,19 +21,6 @@ SND3DListener::~SND3DListener() {}
 bool SND3DListener::SetPos(const MatXf&) { return false; }
 bool SND3DListener::SetVelocity(const Vect3f&) { return false; }
 bool SND3DListener::Update() { return false; }
-
-// ---- SoundSystem (SoundSystem.h) ----
-SoundSystem::SoundSystem() {}
-SoundSystem::~SoundSystem() {}
-Sound* SoundSystem::CreateSound(const char*, DWORD) { return 0; }
-void SoundSystem::Update() {}
-int SoundSystem::numberOfPlayingSounds() { return 0; }
-int SoundSystem::numberOfUsedSounds() { return 0; }
-void SoundSystem::EnableSound(bool) {}
-void SoundSystem::RecalculateClipDistance() {}
-void SoundSystem::Mute3DSounds(bool) {}
-void SoundSystem::StartFade(bool, int, bool) {}
-void SoundSystem::SetStandbyTime(float) {}
 
 // ---- Sound (SoundSystem.h) ----
 Channel* Sound::CreateAndPlayChannel(bool) { return 0; }

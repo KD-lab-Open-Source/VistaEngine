@@ -1849,7 +1849,7 @@ void GameShell::ControlPressed(int key)
 			break;
 
 		case CTRL_TOGGLE_MUSIC:
-			InitSound(terSoundEnable, !terMusicEnable, gb_RenderDevice->GetWindowHandle(), getLocDataPath());
+			InitSound(terSoundEnable, !terMusicEnable, getLocDataPath());
 			if(terMusicEnable)
 				musicManager.Resume();
 			else
@@ -1859,7 +1859,7 @@ void GameShell::ControlPressed(int key)
 			UI_LogicDispatcher::instance().handleMessageReInitGameOptions();
 			break;
 		case CTRL_TOGGLE_SOUND:
-			InitSound(!terSoundEnable, terMusicEnable, gb_RenderDevice->GetWindowHandle(), getLocDataPath());
+			InitSound(!terSoundEnable, terMusicEnable, getLocDataPath());
 			GameOptions::instance().setOption(OPTION_SOUND_ENABLE, !terSoundEnable);
 			GameOptions::instance().userApply(true);
 			UI_LogicDispatcher::instance().handleMessageReInitGameOptions();

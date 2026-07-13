@@ -1,8 +1,11 @@
 #pragma once
-#include <mmsystem.h>
-#include <dsound.h>
 #include "Timers.h"
 #include "MTSection.h"
+
+/// A miniaudio voice. The backend owns it (Sound/AudioBackend.h); this header only
+/// passes the handle around, so it stays a forward declaration and miniaudio.h does not
+/// leak into the ~100 call sites that include this file.
+struct ma_sound;
 
 class Sound;
 class Channel;
@@ -19,28 +22,28 @@ class SoundSystem
 public:
 	SoundSystem();
 	~SoundSystem();
-	bool Init(HWND hWnd);
+	bool Init();
 	void Release();
 	Sound* CreateSound(const char* filename, DWORD mode);
 	void Update();
 	int numberOfPlayingSounds();
 	int numberOfUsedSounds();
-	void SetSpeakerConfig(DWORD dwSpeakerConfig);
 	void SetGlobalVolume(float volume);
-	LPDIRECTSOUND3DLISTENER8 pListener;
-	LPDIRECTSOUND8 GetDirectSound(){return lpDirectSound_;}
 	void EnableSound(bool enable);
 	bool IsEnabled();
 	float GetGlobalVolume();
 	void RecalculateClipDistance();
 	void Mute3DSounds(bool mute);
 	void StartFade(bool fadeIn,int time=0, bool allSounds=true);
-	void SetGameActive(bool active) {gameActive_ = active;}
+	void SetGameActive(bool active);
 	void SetStandbyTime(float time);
 	void StopAll();
 
+	/// The miniaudio engine (ma_engine*), for OggPlayer::initLibrary(). Typed void* so
+	/// that miniaudio.h stays out of this header.
+	void* GetAudioEngine();
+
 protected:
-	LPDIRECTSOUND8 lpDirectSound_; 
 	std::vector<Sound*> sounds_;
 	float globalVolume_;
 	float globalFadeFactor_;
@@ -48,6 +51,8 @@ protected:
 	bool mute3Dsounds_;
 	bool gameActive_;
 	void MuteAll(bool mute);
+	/// Pushes enable_/gameActive_ down to the device as one master mute.
+	void ApplyMuteState();
 	int numberOfUsedSounds_;
 	int numberOfPlayingSounds_;
 	float fadeTime;
@@ -69,7 +74,6 @@ public:
 	Sound(SoundSystem* system);
 	~Sound();
 	bool CreateSoundFromFile(const char* filename, DWORD mode);
-	bool RestoreBuffer();
 	void Release();
 
 	//int numberOfPlayingChannels();
@@ -91,15 +95,15 @@ public:
 	void SetUseGlobalFade(bool use){useGlobalFade_ = use;}
 protected:
 	SoundSystem* system_;
-	LPDIRECTSOUNDBUFFER8 buffer;
+	/// The decoded sample, loaded once. A Channel is a playing copy of it, so this one is
+	/// never played itself.
+	ma_sound* source_;
 	std::vector<Channel*> channels_;
 	DWORD mode_;
-	DS3DBUFFER ds3DBuffer_;
+	float minDistance_;
+	float maxDistance_;
 	float volume_;
-	DWORD lenght_;
 	int maxChannels_;
-	LPDIRECTSOUND8 DSound(){return system_->lpDirectSound_;}
-	DWORD GetCreationFlags();
 	Channel* FindFreeChannel();
 	void Update(float dt);
 	void UpdateVolume();
@@ -143,8 +147,9 @@ public:
 	void SetUseGlobalFade(bool use){useGlobalFade_ = use;}
 	bool isFree() const {return isFree_;}
 protected:
-	LPDIRECTSOUNDBUFFER8 buffer_;
-	LPDIRECTSOUND3DBUFFER8 buffer3D_;
+	/// This channel's own voice: a copy of Sound::source_, with its own playback position,
+	/// volume and 3D placement.
+	ma_sound* voice_;
 	Sound* sound_;
 	bool needDelete_;
 	bool isUsed_;
@@ -154,7 +159,6 @@ protected:
 	bool is3DSound_;
 	float minDistance_;
 	float maxDistance2_;
-	DS3DBUFFER ds3DBuffer_;
 	float volume_;
 	bool playing_;
 	int fadeOut_;
@@ -169,13 +173,10 @@ protected:
 	bool needFade_;
 	bool isFree_;
 	bool canPlay_;
-	void Set3DParameters(DS3DBUFFER& ds3DBuffer_);
 	void Apply3DParameters();
 	void Update(float dt);
 	void UpdateVolume();
 	Vect3f VectorToListener();
-	void Clear3dBuffer();
-	void Create3dBuffer();
 	void ChangeVolume(float volume);
 	void StartFade(bool fadeIn, int time);
 	void BufferPlay(bool fromZero = false);

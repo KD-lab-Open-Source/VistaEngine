@@ -4,9 +4,10 @@
 
 class Channel;
 //Инициализация/деинициализация библиотеки
-bool SNDInitSound(HWND g_hWnd,bool bEnable3d,bool soft3d);
+//The audio device is miniaudio's (Sound/AudioBackend.h): it needs no window handle, and
+//3D is always its own software spatializer, so the old hardware/software 3D flags are gone.
+bool SNDInitSound();
 void SNDReleaseSound();
-void* SNDGetDirectSound();//Возвращает указатель на LPDIRECTSOUND8
 
 void SNDEnableSound(bool enable);
 bool SNDIsSoundEnabled();

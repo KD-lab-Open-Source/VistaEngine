@@ -135,7 +135,7 @@ protected:
 	multimap<string,SNDSound*> playSounds;
 };
 
-void InitSound(bool sound, bool music, HWND hwnd, const char* localeDataPath);
+void InitSound(bool sound, bool music, const char* localeDataPath);
 void UpdateSound();
 void ApplySoundParameters();
 void SoundQuant();

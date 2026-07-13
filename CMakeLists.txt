@@ -10,8 +10,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(FetchContent)
 
 # The engine only ever calls SDL_Init(SDL_INIT_VIDEO) (Platform/Window.cpp): SDL is
-# our window, our input, and our GPU device, and nothing else. Audio is DirectSound
-# on Windows and a stub elsewhere, joystick is DirectInput, and the rest we never
+# our window, our input, and our GPU device, and nothing else. Audio is miniaudio's
+# (see below), joystick is DirectInput, and the rest we never
 # touch — so don't compile them. Besides the build time, each subsystem drags in
 # system dependencies of its own that CI would otherwise have to install.
 # SDL3_test is off for the same reason: it builds by default and we never link it.
@@ -215,6 +215,32 @@ FetchContent_Declare(
     GIT_SHALLOW    TRUE
 )
 FetchContent_MakeAvailable(freetype)
+
+# miniaudio — the audio device on every platform, Windows included (Sound/AudioBackend.cpp).
+# It replaces DirectSound, and SDL's audio subsystem stays off (see the SDL block above).
+#
+# SDL3 was the obvious candidate and does not fit: it mixes streams bound to a device and
+# stops there, whereas this game's sound API (SoundSystem/Sound/Channel/SND3DListener) is a
+# skin over DirectSound3D — per-emitter min/max distance, rolloff, doppler, fades, a voice
+# pool — plus Vorbis for the music. miniaudio's ma_engine covers that set almost 1:1.
+#
+# Runtime linking is miniaudio's default: it dlopen()s ALSA/PulseAudio/JACK rather than
+# linking them, so a Linux build (and CI) needs no audio -dev packages. Leave
+# MINIAUDIO_NO_RUNTIME_LINKING off. The libvorbis/libopus decoders are separate targets of
+# its own that we do not build; Vorbis arrives with the music slice, via stb_vorbis.
+set(MINIAUDIO_BUILD_EXAMPLES  OFF CACHE BOOL "" FORCE)
+set(MINIAUDIO_BUILD_TESTS     OFF CACHE BOOL "" FORCE)
+set(MINIAUDIO_BUILD_TOOLS     OFF CACHE BOOL "" FORCE)
+set(MINIAUDIO_NO_LIBVORBIS    ON  CACHE BOOL "" FORCE)
+set(MINIAUDIO_NO_LIBOPUS      ON  CACHE BOOL "" FORCE)
+set(MINIAUDIO_NO_EXTRA_NODES  ON  CACHE BOOL "" FORCE)   # reverb, vocoder, … : unused
+FetchContent_Declare(
+    miniaudio
+    GIT_REPOSITORY https://github.com/mackron/miniaudio.git
+    GIT_TAG        0.11.25
+    GIT_SHALLOW    TRUE
+)
+FetchContent_MakeAvailable(miniaudio)
 
 # Interface target that gives every module common include paths
 add_library(EngineIncludes INTERFACE)

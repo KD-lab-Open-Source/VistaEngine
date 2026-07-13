@@ -59,7 +59,7 @@ VoiceManager& voiceManager()
 	return vm;
 }
 
-void InitSound(bool sound, bool music, HWND hwnd, const char* localeDataPath)
+void InitSound(bool sound, bool music, const char* localeDataPath)
 {
 	terSoundEnable = sound;
 	terMusicEnable = music;
@@ -69,9 +69,9 @@ void InitSound(bool sound, bool music, HWND hwnd, const char* localeDataPath)
 	if(!inited){
 		inited = 1;
 
-		if(SNDInitSound(hwnd,true,false)){
+		if(SNDInitSound()){
 			LoadAllSound(localeDataPath,"RESOURCE\\SOUNDS\\");
-			OggPlayer::initLibrary(sndSystem.GetDirectSound());
+			OggPlayer::initLibrary(sndSystem.GetAudioEngine());
 		}
 	}
 
