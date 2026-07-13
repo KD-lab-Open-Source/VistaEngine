@@ -23,15 +23,11 @@ cCloudShadow::cCloudShadow() : BaseGraphObject(0)
 	dv=vMap.V_SIZE/2048;
 	rotate_angle=0;
 
-	vsCloudShadow=0;
-	psCloudShadow=0;
-	if(gb_RenderDevice3D){ // no world-render GPU device on SDL backend yet
-	cD3DRender* rd=gb_RenderDevice3D;
-	rd->CreateVertexBuffer(earth_vb, size_vb,VType::declaration);
-	rd->CreateIndexBuffer(earth_ib, size_ib);
+	gb_RenderDevice->CreateVertexBuffer(earth_vb, size_vb,VType::declaration);
+	gb_RenderDevice->CreateIndexBuffer(earth_ib, size_ib);
 
 	{
-		VType* vx=(VType*)rd->LockVertexBuffer(earth_vb);
+		VType* vx=(VType*)gb_RenderDevice->LockVertexBuffer(earth_vb);
 		Vect2i size((int)vMap.H_SIZE, (int)vMap.V_SIZE);
 		vx[0].pos.set(0,0, 0);
 		vx[1].pos.set(0,size.y, 0);
@@ -42,31 +38,33 @@ cCloudShadow::cCloudShadow() : BaseGraphObject(0)
 		Color4c color_diffuse(gc, gc, gc, 255);
 		for(int i=0;i<size_vb;i++)
 			vx[i].diffuse = color_diffuse;
-		rd->UnlockVertexBuffer(earth_vb);
+		gb_RenderDevice->UnlockVertexBuffer(earth_vb);
 
 		SetTexels();
 	}
 
 	{
-		sPolygon* pt=rd->LockIndexBuffer(earth_ib);
+		sPolygon* pt=gb_RenderDevice->LockIndexBuffer(earth_ib);
 		pt[0].set(0,1,2);
 		pt[1].set(2,3,0);
-		rd->UnlockIndexBuffer(earth_ib);
+		gb_RenderDevice->UnlockIndexBuffer(earth_ib);
 	}
-
+#ifdef _WIN32
 	vsCloudShadow=new VSCloudShadow;
 	vsCloudShadow->Restore();
 	psCloudShadow=new PSCloudShadow;
 	psCloudShadow->Restore();
-	}
+#endif
 
 	color=128;
 
 }
 cCloudShadow::~cCloudShadow()
 {
+#ifdef _WIN32
 	delete vsCloudShadow;
 	delete psCloudShadow;
+#endif
 	RELEASE(texture1);
 }
 
@@ -86,6 +84,7 @@ void cCloudShadow::PreDraw(Camera* camera)
 
 void cCloudShadow::Draw(Camera* camera)
 {
+#ifdef _WIN32
 	if(!camera->getAttribute(ATTRCAMERA_SHADOW))
 		return;
 	cD3DRender* rd=gb_RenderDevice3D;
@@ -114,6 +113,7 @@ void cCloudShadow::Draw(Camera* camera)
 	rd->SetNoMaterial(ALPHA_BLEND, MatXf::ID, 0, texture1, texture1, color_mode);
 	rd->DrawIndexedPrimitive(earth_vb,0,size_vb,earth_ib,0,size_ib);
 /**/
+#endif
 }
 
 
@@ -139,8 +139,7 @@ void cCloudShadow::Animate(float dt)
 
 void cCloudShadow::SetTexels()
 {
-	cD3DRender* rd=gb_RenderDevice3D;
-	VType* vx=(VType*)rd->LockVertexBuffer(earth_vb);
+	VType* vx=(VType*)gb_RenderDevice->LockVertexBuffer(earth_vb);
 
 	vx[0].GetTexel1().set(uv1.x, uv1.y);
 	vx[1].GetTexel1().set(uv1.x, uv1.y+dv);
@@ -152,7 +151,7 @@ void cCloudShadow::SetTexels()
 	vx[2].GetTexel2().set(uv2.x+du, uv2.y+dv);
 	vx[3].GetTexel2().set(uv2.x+du, uv2.y);
 
-	rd->UnlockVertexBuffer(earth_vb);
+	gb_RenderDevice->UnlockVertexBuffer(earth_vb);
 }
 
 void cCloudShadow::SetTexture(const string& tex1)

@@ -2,6 +2,10 @@
 #include "UnkLight.h"
 #include "D3DRender.h"
 #include "cCamera.h"
+#ifndef _WIN32
+#include "Render/SDLRenderDevice.h"        // the light sprite, reached via drawWorldQuads
+#include "Render/SDLWorldQuadRenderer.h"
+#endif
 
 cUnkLight::cUnkLight() : cUnkObj(KIND_LIGHT)
 {
@@ -43,23 +47,45 @@ void cUnkLight::PreDraw(Camera* camera)
 
 void cUnkLight::Draw(Camera* camera)
 {
-	DrawStrip strip;
-	gb_RenderDevice3D->SetWorldMaterial(ALPHA_ADDBLENDALPHA,MatXf::ID,0,GetTexture());//???
 	Color4c Diffuse(GetDiffuse().a*GetDiffuse().r*255,
 					GetDiffuse().a*GetDiffuse().g*255,
 					GetDiffuse().a*GetDiffuse().b*255,255);
 
+#ifdef _WIN32
+	DrawStrip strip;
+	gb_RenderDevice3D->SetWorldMaterial(ALPHA_ADDBLENDALPHA,MatXf::ID,0,GetTexture());//???
+
 	cVertexBuffer<sVertexXYZDT1>* buf=gb_RenderDevice->GetBufferXYZDT1();
 	sVertexXYZDT1 *v=buf->Lock(4);
+#else
+	// The billboard is four corners written as two opposite edges -- 0,1 then 2,3 -- which
+	// is exactly what the world-quad renderer's index pattern covers, so the strip becomes
+	// one of its quads and the corner maths below is unchanged.
+	SDLWorldQuadRenderer* buf = sdlWorldQuadRenderer();
+	if(!buf)
+		return;
+	buf->SetCamera(camera);
+	buf->SetMaterial(ALPHA_ADDBLENDALPHA, GetTexture());
+	buf->BeginDraw();
+	sVertexXYZDT1* v = buf->Get();
+#endif
 	Vect3f sx=GetRadius()*camera->GetWorldI(),sy=GetRadius()*camera->GetWorldJ();
-	v[0].pos=GetGlobalMatrix().trans()+sx+sy; v[0].u1()=0, v[0].v1()=0; 
+	v[0].pos=GetGlobalMatrix().trans()+sx+sy; v[0].u1()=0, v[0].v1()=0;
 	v[1].pos=GetGlobalMatrix().trans()+sx-sy; v[1].u1()=0, v[1].v1()=1;
 	v[2].pos=GetGlobalMatrix().trans()-sx+sy; v[2].u1()=1, v[2].v1()=0;
 	v[3].pos=GetGlobalMatrix().trans()-sx-sy; v[3].u1()=1, v[3].v1()=1;
 	v[0].diffuse=v[1].diffuse=v[2].diffuse=v[3].diffuse=Diffuse;
+#ifdef _WIN32
 	buf->Unlock(4);
 
 	buf->DrawPrimitive(PT_TRIANGLESTRIP,2);
+#else
+	buf->EndDraw();
+	// D3D drew as DrawPrimitive went; open the pass here, where the sprite sits in the
+	// sorted pass. cUnkLight::PreDraw attaches it to SCENENODE_OBJECTSORT.
+	if(cSDLRenderDevice* dev = sdlRenderDevice())
+		dev->drawWorldQuads();
+#endif
 }
 
 void cUnkLight::SetDirection(const Vect3f& direction)

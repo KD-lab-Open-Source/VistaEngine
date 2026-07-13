@@ -173,6 +173,8 @@ private:
 	void AddFloatZBufferCamera(Camera* camera);
 
 	void CreateShadowmap();
+	// The square shadow map's edge, from Option_ShadowSizePower.
+	static int shadowMapSize();
     void FixShadowMapCamera(Camera* camera, Camera* shadowCamera);
 	void fixShadowMapCameraTSM(Camera* camera, Camera* shadowCamera);
     void CalcShadowMapCamera(Camera* camera, Camera* shadowCamera);

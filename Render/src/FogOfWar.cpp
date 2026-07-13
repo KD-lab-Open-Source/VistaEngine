@@ -319,6 +319,13 @@ void FogOfWar::PreDraw(Camera* camera)
 
 void FogOfWar::Draw(Camera* camera)
 {
+#ifndef _WIN32
+	// Fog of war, not ported -- the same alpha-only quad as FieldOfViewMap::Draw, which
+	// says why. It draws into the terrain lightmap's alpha channel (note the
+	// COLORWRITEENABLE = ALPHA below), and nothing off-Windows reads that channel yet.
+	// Only reachable since CameraPlanarLight started drawing.
+	return;
+#else
 	cD3DRender* rd=gb_RenderDevice3D;
 
 	DWORD old_colorwrite=rd->GetRenderState(D3DRS_COLORWRITEENABLE);
@@ -342,6 +349,7 @@ void FogOfWar::Draw(Camera* camera)
 	quad->EndDraw();
 
 	rd->SetRenderState(D3DRS_COLORWRITEENABLE,old_colorwrite);
+#endif
 }
 
 void FogOfWar::Animate(float dt)

@@ -260,7 +260,8 @@ void Environment::graphQuant(float dt, Camera* camera)
 	if(water_)
 		water_->SetCurReflectSkyColor(environmentTime_->GetCurReflectSkyColor());
 
-	environmentTime()->Draw();
+#ifdef _WIN32
+	environmentTime()->Draw();   // the sky cubemap; a cube render target, which SDL GPU has no path to yet
 
 	if(isFogEnabled() && !isFogTempDisabled()){
 		PostEffectUnderWater* underWater = (PostEffectUnderWater*)PEManager()->getEffect(PE_UNDER_WATER);
@@ -273,9 +274,13 @@ void Environment::graphQuant(float dt, Camera* camera)
 	}
 	else
 		gb_RenderDevice->SetGlobalFog(Color4f(environmentTime()->GetCurFogColor()),Vect2f(-1, -2));
+#endif
 
+	// The sky: the sun or the moon, then the cloud models, drawn through the sky camera's
+	// own scene. It opens the frame -- everything below is drawn over it.
 	environmentTime()->DrawEnviroment(camera);
 
+#ifdef _WIN32
 	if(environmentTime_->isDay()){
 		lensFlare_->setFlareSource(environmentTime_->sunPosition(), environmentTime_->sunSize());
 		lensFlare_->setVisible(true);
@@ -287,10 +292,12 @@ void Environment::graphQuant(float dt, Camera* camera)
 	flash()->setIntensity();
 
 	fieldOfViewMap_->updateTexture();
+#endif
 }
 
 void Environment::drawPostEffects(float dt, Camera* camera)
 {
+#ifdef _WIN32
 	start_timer_auto();
 
 	flash()->draw();
@@ -298,6 +305,7 @@ void Environment::drawPostEffects(float dt, Camera* camera)
 		eff->setUnderWater(water_->isUnderWater(camera->GetPos()));
 
 	PEManager()->draw(dt);
+#endif
 }
 
 void Environment::showEditor()

@@ -1,7 +1,6 @@
 add_library(3dx STATIC
     Interpolator3dx.cpp
     Lib3dx.cpp
-    MeshCacheGeometry.cpp
     Node3DX.cpp
     Saver.cpp
     Simply3dx.cpp

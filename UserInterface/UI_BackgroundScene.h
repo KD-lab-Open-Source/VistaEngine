@@ -146,10 +146,6 @@ public:
 	void release();
 
 	void setPosition(const MatXf& pos);
-#ifndef _WIN32
-	// Push the model-view-projection matrix to the SDL fallback mesh (slice 3).
-	void setMeshTransform(const Mat4f& mvp);
-#endif
 
 	bool isPlaying() const;
 	bool isPlaying(UI_BackgroundAnimation::PlayMode mode) const;
@@ -172,10 +168,6 @@ private:
 	void stopEffect(const UI_EffectAttributeAttachable* attr);
 
 	cObject3dx* model_;
-	// Slice 3 (off-Windows): when CreateObject3dx fails, we fall back to drawing the
-	// raw .3dxGB geometry through the SDL GPU device directly. -1 == no fallback mesh.
-	int meshHandle_;
-	std::vector<cTexture*> meshTextures_;   // diffuse textures held for the mesh-pass draw
 	UI_BackgroundAnimationControllers animations_;
 
 	typedef SwapVector<UI_EffectControllerAttachable3D> Effects;
@@ -290,12 +282,6 @@ public:
 	}
 
 private:
-#ifndef _WIN32
-	// Recompute the current model's MVP from the menu camera + model transform and
-	// push it to the SDL fallback mesh (slice 3). No-op until the mesh is loaded.
-	void updateMeshTransform();
-#endif
-
 	cScene* scene_;
 	Camera* camera_;
 

@@ -262,8 +262,15 @@ void cVisGeneric::SetFavoriteLoadDDS(bool p)
 
 void cVisGeneric::SetShadowType(bool shadowEnabled, int shadow_size)
 {
+#ifdef _WIN32
 	if(!gb_RenderDevice3D || !gb_RenderDevice3D->IsPS20() || !gb_RenderDevice->IsEnableSelfShadow())
 		shadow_size = 0;
+#else
+	// gb_RenderDevice3D is null under the SDL backend, and IsPS20 is a D3D9 cap: ask the
+	// device itself whether it can render a shadow map.
+	if(!gb_RenderDevice || !gb_RenderDevice->IsEnableSelfShadow())
+		shadow_size = 0;
+#endif
 	if(shadow_size==0)
 		shadowEnabled = false;
 
@@ -478,31 +485,45 @@ void cVisGeneric::SetGlobalParticleRate(float r)
 
 bool cVisGeneric::PossibilityShadowMapSelf4x4()
 {
+#ifdef _WIN32
 	if(gb_RenderDevice3D && gb_RenderDevice3D->dtAdvanceOriginal)
 	{
 		eDrawID id=gb_RenderDevice3D->dtAdvanceOriginal->GetID();
 		return id==DT_RADEON9700 || id==DT_GEFORCEFX;
 	}
 	return false;
+#else
+	// dtAdvanceOriginal is a D3D9 DrawType and gb_RenderDevice3D is null here, so the
+	// original test would read as "the hardware cannot filter". Ask the device instead,
+	// as SetShadowType does: the 2x2 filter is four taps on a texture we already sample.
+	return gb_RenderDevice && gb_RenderDevice->IsEnableSelfShadow();
+#endif
 }
 
 void cVisGeneric::SetShadowMapSelf4x4(bool b4x4)
 {
 	Option_filterShadow=b4x4;
+	// D3D recompiles: FILTER_SHADOW is a static shader define there. The SDL backend
+	// carries it in ShadowParams.y instead, so the next frame simply picks it up.
 	if(gb_RenderDevice3D)
 		gb_RenderDevice3D->RestoreShader();
 }
 
 void cVisGeneric::SetTilemapDetail(bool b)
 {
+	Option_DetailTexture=b;
+#ifdef _WIN32
+	// A capability check, not a presence check: the detail layer needs ps2.0, and the
+	// D3D backend recompiles the tilemap shader for it (DETAIL_TEXTURE is a static define
+	// there). Off-Windows the SDL tilemap shader always carries the layer and reads the
+	// option straight out of a uniform, so there is nothing to gate and nothing to
+	// recompile -- and gating on the *device pointer*, which is null on SDL, would have
+	// forced the option off for good.
 	if(gb_RenderDevice3D && gb_RenderDevice3D->IsPS20())
-	{
-		Option_DetailTexture=b;
 		gb_RenderDevice3D->RestoreShader();
-	}else
-	{
+	else
 		Option_DetailTexture=false;
-	}
+#endif
 }
 
 bool cVisGeneric::GetTilemapDetail()

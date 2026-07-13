@@ -116,17 +116,6 @@ public:
 	int GetMovingCoastSpritesCount(){return mov_coast_sprites.size();};
 	int GetSimpleCoastSpritesCount(){return coast_sprites.size();};
 
-	// Off-Windows foam path: the D3D Draw (GetQuadBufferXYZDT1) is unreachable and the
-	// scene draw that would call PreDraw/Animate returns early, so the SDL foam renderer
-	// (CoastFoamRenderSDL) drives the real sim itself: animateSDL sets the camera and
-	// spawns; collectSprites advances phase / retires / emits the live sprites as flat
-	// quads (same bookkeeping as DrawSimple/MovingCoastSprite, minus the D3D vertices).
-	struct RenderSprite { Vect3f pos; float size; float alpha; float u0,v0,u1,v1; Vect2f dir; bool moving; };
-	void animateSDL(Camera* camera, float dtime_ms);
-	void collectSprites(vector<RenderSprite>& out);
-	cTexture* stayTexture() const { return Texture_stay; }
-	cTexture* movTexture()  const { return Texture_mov; }
-
 	CoastSpritesMode GetMode();
 	void SetMode(CoastSpritesMode m);
 	void SetSpriteParameters(const CoastSpriteSimpleAttributes* attributes, bool simple = true);

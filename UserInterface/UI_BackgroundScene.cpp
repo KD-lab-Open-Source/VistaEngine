@@ -10,10 +10,6 @@
 #include "Render/src/cCamera.h"
 #include "Render/3dx/Node3dx.h"
 #include "Render/src/VisGeneric.h"
-#ifndef _WIN32
-#include "Render/SDLRenderDevice.h"   // draw the reconstructed model via the mesh pass
-#include "TexLibrary.h"               // GetTexLibrary()->GetElement3D for submesh textures
-#endif
 
 #include "Environment/Environment.h"
 #include "Game/Universe.h"
@@ -108,11 +104,7 @@ void UI_BackgroundModelSetup::preLoad(cScene* scene, const Player* player) const
 	xassert(scene);
 	
 	cObject3dx* model = scene->CreateObject3dx(modelName(), NULL);
-	// CreateObject3dx can return null off-Windows (the 3DX InPlace mesh/GPU-buffer path
-	// isn't ported yet — slice 3; UI_BackgroundModel::load recovers the geometry from the
-	// baked .3dxGB cache). Tolerate it here so screen preload doesn't crash.
-	if(!model)
-		return;
+	xassert(model);
 
 	model->DisableDetailLevel();
 	
@@ -128,7 +120,7 @@ void UI_BackgroundModelSetup::preLoad(cScene* scene, const Player* player) const
 
 // ------------------------------- UI_BackgroundModel
 
-UI_BackgroundModel::UI_BackgroundModel() : model_(0), meshHandle_(-1)
+UI_BackgroundModel::UI_BackgroundModel() : model_(0)
 {
 
 }
@@ -145,13 +137,7 @@ void UI_BackgroundModel::load(cScene* scene, const UI_BackgroundModelSetup& setu
 	if(setup.isEmpty())
 		return;
 
-	// Off-Windows the model is reconstructed from the cache bytes by the transcoding
-	// loader (cLib3dx::GetElement -> cStatic3dx::reconstructFromCache), so this now
-	// returns a real object for the base-format models it can rebuild; null otherwise.
 	model_ = scene->CreateObject3dx(setup.modelName(), NULL);
-	if(!model_)
-		return;   // no cache / unbuildable format — leave the 3D background empty
-
 	model_->DisableDetailLevel();
 	if(player){
 		Color4f color(setup.ownSkinColor() ? setup.skinColor() : player->unitColor());
@@ -160,43 +146,6 @@ void UI_BackgroundModel::load(cScene* scene, const UI_BackgroundModelSetup& setu
 	else
 		model_->SetSkinColor(setup.skinColor(), 0);
 
-#ifndef _WIN32
-	// The model's normal draw path is cScene::Draw — the unportable D3D shadow/
-	// reflection pipeline — so draw the loaded model's geometry through the SDL mesh
-	// pass instead: register lod0's buffers and per-material sub-draws straight from
-	// the object's own lods/bunches/materials.
-	if(cSDLRenderDevice* dev = dynamic_cast<cSDLRenderDevice*>(gb_RenderDevice)){
-		cStatic3dx* stat = model_->GetStatic();
-		if(stat && !stat->lods.empty() && stat->lods[0].vb.IsInit()){
-			cStatic3dx::StaticLod& lod = stat->lods[0];
-			meshHandle_ = dev->registerMesh(lod.vb, lod.ib);  // shares via CopyAddRef
-			if(meshHandle_ >= 0){
-				cTexLibrary* texLib = GetTexLibrary();
-				for(size_t i = 0; i < lod.bunches.size(); ++i){
-					const StaticBunch& b = lod.bunches[i];
-					if(b.imaterial < 0 || b.imaterial >= (int)stat->materials.size())
-						continue;
-					const StaticMaterial& mat = stat->materials[b.imaterial];
-					cTexture* tex = (texLib && !mat.tex_diffuse.empty())
-					              ? texLib->GetElement3D(mat.tex_diffuse.c_str()) : 0;
-					if(tex)
-						meshTextures_.push_back(tex);  // held until release()
-					// Node3DX::Draw material tint: lerp(WHITE, diffuse.rgb, diffuse.a);
-					// blend alpha = separate material opacity (not diffuse.a).
-					const float da = mat.diffuse.a;
-					float tint[4] = {
-						1.f*(1.f - da) + mat.diffuse.r*da,
-						1.f*(1.f - da) + mat.diffuse.g*da,
-						1.f*(1.f - da) + mat.diffuse.b*da,
-						mat.opacity
-					};
-					dev->addMeshSubmesh(meshHandle_, b.offset_polygon*3, b.num_polygon*3,
-					                    tex, tint, (int)mat.transparencyType);
-				}
-			}
-		}
-	}
-#endif
 }
 
 void UI_BackgroundModel::release()
@@ -220,18 +169,6 @@ void UI_BackgroundModel::release()
 		model_->Release();
 		model_ = 0;
 	}
-
-#ifndef _WIN32
-	if(meshHandle_ >= 0){
-		if(cSDLRenderDevice* dev = dynamic_cast<cSDLRenderDevice*>(gb_RenderDevice))
-			dev->releaseMesh(meshHandle_);
-		meshHandle_ = -1;
-	}
-	for(size_t i = 0; i < meshTextures_.size(); ++i)
-		if(meshTextures_[i])
-			meshTextures_[i]->Release();
-	meshTextures_.clear();
-#endif
 }
 
 void UI_BackgroundModel::setPosition(const MatXf& pos)
@@ -240,16 +177,6 @@ void UI_BackgroundModel::setPosition(const MatXf& pos)
 	if(model_)
 		model_->SetPosition(pos);
 }
-
-#ifndef _WIN32
-void UI_BackgroundModel::setMeshTransform(const Mat4f& mvp)
-{
-	if(meshHandle_ < 0)
-		return;
-	if(cSDLRenderDevice* dev = dynamic_cast<cSDLRenderDevice*>(gb_RenderDevice))
-		dev->setMeshTransform(meshHandle_, (const float*)mvp);
-}
-#endif
 
 bool UI_BackgroundModel::isPlaying() const
 {
@@ -601,10 +528,6 @@ void UI_BackgroundScene::init(cVisGeneric* visGeneric)
 			Mat3f(G2R(modelAngles_.z), Z_AXIS), modelPosition_);
 
 		models_[currentModelIndex_].setPosition(pos);
-#ifndef _WIN32
-		// init()'s setCamera() ran before the mesh loaded; push the MVP now.
-		updateMeshTransform();
-#endif
 	}
 }
 
@@ -659,25 +582,7 @@ void UI_BackgroundScene::setCamera()
 
 	Vect2f frustumFocus(size.x * focus, size.x * focus);
 	camera_->SetFrustum(&center, &clip, &frustumFocus, 0);
-
-#ifndef _WIN32
-	// The camera's view-projection just changed; refresh the fallback mesh's MVP.
-	updateMeshTransform();
-#endif
 }
-
-#ifndef _WIN32
-void UI_BackgroundScene::updateMeshTransform()
-{
-	if(currentModelIndex_ < 0 || currentModelIndex_ >= (int)models_.size() || !camera_)
-		return;
-	// Model world matrix (same transform the D3D path feeds cObject3dx::SetPosition),
-	// composed with the camera view-projection: clip = pos_local * World * matViewProj.
-	MatXf world(Mat3f(G2R(modelAngles_.x), X_AXIS) * Mat3f(G2R(modelAngles_.y), Y_AXIS) *
-	            Mat3f(G2R(modelAngles_.z), Z_AXIS), modelPosition_);
-	models_[currentModelIndex_].setMeshTransform(Mat4f(world) * camera_->matViewProj);
-}
-#endif
 
 void UI_BackgroundScene::setFocus(float focus)
 {

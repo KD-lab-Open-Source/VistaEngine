@@ -3,6 +3,8 @@
 #include "Serialization/ResourceSelector.h"
 #include "Render/D3D/D3DRender.h"
 #include "Render/Src/cCamera.h"
+#include "Render/SDLWorldQuadRenderer.h"   // the splines are drawn by SDLWorldQuadRenderer,
+#include "Render/SDLRenderDevice.h"        // reached via cSDLRenderDevice::drawWorldQuads
 #include "Water/Water.h"
 #include "Terra/vMap.h"
 #include "Serialization/EnumDescriptor.h"
@@ -47,14 +49,29 @@ void CircleManager::Draw(Camera* camera)
 
 	currentDrawOrder_= drawOrder_;
 	currentLegionColor_ = legionColor_;
-
+#ifdef _WIN32
 	gb_RenderDevice3D->SetSamplerData(0,samplerCircle_);
+#else
+	// The world-quad renderer needs the camera before the groups the layers record below.
+	// samplerCircle_ (wrap u, clamp v) has no equivalent to set: it keeps one sampler, and
+	// the spline's u runs past 1 while its v is a constant 0 or 1, so wrapping both agrees
+	// with the original everywhere the circle actually samples.
+	if(SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer())
+		pBuf->SetCamera(camera);
+#endif
 
 	Layers::iterator i;
 	FOR_EACH(layers_, i)
 		i->second.draw();
 
 	clearLayers();
+
+#ifndef _WIN32
+	// D3D drew as each DrawPrimitive went; SDL GPU only draws inside a render pass, so open
+	// one now -- here in the scene walk, where the camera reached the circles.
+	if(cSDLRenderDevice* dev = sdlRenderDevice())
+		dev->drawWorldQuads();
+#endif
 }
 
 void CircleManager::addCircle(const Vect2f& pos, float radius, const CircleManagerParam& param)
@@ -96,7 +113,19 @@ CircleManager::Layer::Layer(const CircleManagerParam& _param)
 
 void CircleManager::Layer::draw()
 {
+#ifdef _WIN32
 	gb_RenderDevice->SetWorldMaterial(ALPHA_BLEND,MatXf::ID,0, texture);
+#else
+	// SetMaterial is what is left of that call. The depth test follows the draw order: the
+	// two NOZ orders land in a scene node Camera::DrawObjectNoZ draws with ZFUNC = ALWAYS,
+	// i.e. no depth test at all; CIRCLE_MANAGER_DRAW_NORMAL_ALPHA lands in the sorted
+	// transparent pass and keeps it (which is why drawSpline lifts its z by 1 there).
+	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
+	if(!pBuf)
+		return;
+	pBuf->SetMaterial(ALPHA_BLEND, texture,
+	                  currentDrawOrder_ == CIRCLE_MANAGER_DRAW_NORMAL_ALPHA);
+#endif
 
 	circles->calc();
 	OrCircleSplines splines;
@@ -111,9 +140,30 @@ void CircleManager::Layer::drawSpline(OrCircleSpline& spline)
 {
 	if(spline.empty())
 		return;
+
+	// Two vertices per spline point -- the outer and inner edge of the line -- run through
+	// as one triangle strip.
+	const int nVertex = 2*(int)spline.size();
+
+#ifdef _WIN32
 	DrawStrip strip;
 
 	strip.Begin();
+#else
+	// The world-quad renderer answers to cVertexBuffer's Lock/Unlock/DrawPrimitive, so the
+	// strip becomes one of its triangle groups. It takes the whole spline in one Lock, where
+	// DrawStrip has to flush and re-lock whenever the device's shared buffer fills.
+	//
+	// (DrawStrip itself has no off-Windows implementation: RenderStub's Begin/End are empty,
+	// which leaves its buffer pointer uninitialised, and its first Set() writes through it.)
+	if(nVertex < 4)
+		return;   // a strip needs at least one quad
+	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
+	if(!pBuf)
+		return;
+	sVertexXYZDT2* vx = pBuf->Lock(nVertex);
+	int nv = 0;
+#endif
 	float size=param.width;
 	float additionalz=0.0f;
 	if(currentDrawOrder_==CIRCLE_MANAGER_DRAW_NORMAL_ALPHA)
@@ -162,9 +212,25 @@ void CircleManager::Layer::drawSpline(OrCircleSpline& spline)
 
 		v1.u1()=v2.u1()=t;
 		v1.v1()=0;v2.v1()=1;
+#ifdef _WIN32
 		strip.Set(v1,v2);
+#else
+		// The triangle route's vertex carries a second texture coordinate; this material has
+		// no second texture, so it goes unread.
+		vx[nv].pos = v1.pos; vx[nv].diffuse = v1.diffuse;
+		vx[nv].GetTexel().set(v1.u1(), v1.v1()); vx[nv].GetTexel2().set(0.f, 0.f);
+		++nv;
+		vx[nv].pos = v2.pos; vx[nv].diffuse = v2.diffuse;
+		vx[nv].GetTexel().set(v2.u1(), v2.v1()); vx[nv].GetTexel2().set(0.f, 0.f);
+		++nv;
+#endif
 	}
+#ifdef _WIN32
 	strip.End();
+#else
+	pBuf->Unlock(nv);
+	pBuf->DrawPrimitive(PT_TRIANGLESTRIP, nv - 2);
+#endif
 }
 
 CircleManagerParam::CircleManagerParam(const Color4c& colorIn)

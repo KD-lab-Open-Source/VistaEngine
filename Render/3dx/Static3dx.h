@@ -28,8 +28,6 @@ struct StaticBunch
 };
 typedef vector<StaticBunch> StaticBunches;
 
-namespace MeshCacheGeometry { struct Geometry; }
-
 struct cSkinVertexSysMem
 {
 	Vect3f pos;
@@ -120,17 +118,6 @@ public:
 
 	cSkinVertex GetSkinVertex(int num_weight){return cSkinVertex(num_weight,bump,isUV2,enableFur);}
 
-#ifndef _WIN32
-	// Cross-platform spike: reconstruct a static object from the hand-parsed
-	// InPlace-cache geometry (MeshCacheGeometry) instead of the 32-bit in-place
-	// cast — builds lods[0] via initBuffersInPlace plus materials/bunches, so a
-	// real cStatic3dx exists off-Windows. Returns false if the geometry is empty.
-	bool reconstructFromCacheGeometry(const MeshCacheGeometry::Geometry& geo);
-	// Portable transcoding-loader entry: read the model's cache (.3dxG/.3dxGB) and
-	// reconstruct this object from those bytes. Used by cLib3dx::GetElement.
-	bool reconstructFromCache(const char* modelName);
-#endif
-
 private:
 	bool inPlace_;
 
@@ -158,6 +145,15 @@ private:
 
 	void CreateDebrises();
 };
+
+#ifndef _WIN32
+// Portable InPlaceIArchive::construct customization points (defined in
+// Static3dx.cpp). They rebuild native objects from the raw 32-bit in-place image
+// (.3dxGB / .3dxG). Declared here so they are visible wherever construct<T> is
+// instantiated (e.g. constructInPlace / cLib3dx::LoadCache).
+cStatic3dx::LodsCache* inPlaceReconstruct(cStatic3dx::LodsCache*, const char* image, int size);
+cStatic3dx*            inPlaceReconstruct(cStatic3dx*,            const char* image, int size);
+#endif
 
 struct Shader3dx
 {

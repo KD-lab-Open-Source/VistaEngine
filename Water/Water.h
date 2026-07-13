@@ -111,10 +111,6 @@ public:
 	cTexture* reflectionTexture() const {return pWaterZ; }
 
 	void SetCurReflectSkyColor(Color4c color){cur_reflect_sky_color=Color4f(color);}
-	// Portable reflected-sky base colour for the off-Windows SDL water sheet: the
-	// D3D path's tint math with the unavailable planar-reflection render target
-	// replaced by cur_reflect_sky_color (the engine's own ps1.1 sky stand-in).
-	Color4f GetReflectedSurfaceColor();
 
 	FunctorGetZ* GetFunctorZ() {return pFunctorZ;}
 
@@ -244,6 +240,9 @@ protected:
 	class VSWater* vsShader;
 	class PSWater* psShader;
 	class ShaderSceneWaterLava* lavaShader_;
+	// What setTechnique chose. On Windows the shader objects carry it (VSWater::GetTechnique);
+	// off-Windows there are no shader objects, so Draw reads it from here.
+	Technique technique_;
 
 	string bumpTextureName_;
 	string bumpTextureName1_;

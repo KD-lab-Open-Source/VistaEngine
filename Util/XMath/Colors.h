@@ -1,6 +1,7 @@
 #pragma once
 
 #include "XMath.h"
+#include <cstdint>
 
 class Archive;
 struct Color3c;
@@ -64,7 +65,10 @@ struct Color4c
 {
 	union{
 		struct{ unsigned char b,g,r,a; };
-		struct{ unsigned long argb; };
+		// Must stay 32 bits wide: `unsigned long` is 4 bytes on Windows but 8 on the
+		// LP64 platforms, which would make sizeof(Color4c) 8 and silently widen every
+		// vertex struct holding a diffuse past the stride its D3D declaration states.
+		struct{ uint32_t argb; };
 	};
 	
 	Color4c()										{ }

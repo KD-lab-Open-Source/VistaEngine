@@ -2,17 +2,28 @@
 #define VISTA_SDL_RENDER_DEVICE_H
 
 // Cross-platform render device (SDL GPU backend), replacing the Windows-only
-// D3D9 cD3DRender. This is the "minimal render device": the lifecycle + 2D
-// clear path are real SDL GPU; everything else (3D scene, meshes, tilemap,
-// text) is a safe no-op, filled in slice by slice. See the migration plan.
+// D3D9 cD3DRender.
 //
 // The legacy cInterfaceRenderDevice is an immediate-mode/synchronous D3D9 API;
 // SDL GPU is explicit/async (command buffers + render passes). We bridge by
 // recording during BeginScene..EndScene and submitting one command buffer at
-// Flush. Slice 1b implements only Fill/BeginScene/EndScene/Flush (window clear).
+// Flush.
+//
+// The device owns what the whole backend shares — the SDL GPU device, the window
+// and swapchain, the frame's command buffer, the render targets, textures and
+// vertex/index buffers — but no drawing pipeline of its own. Drawing lives in renderer
+// classes that record their own passes into the frame's command buffer: SDLUIRenderer
+// (2D text, sprites, quads), SDLTileMapRenderer (terrain), SDLObject3dxRenderer
+// (skinned .3dx meshes), SDLWaterRenderer (the water surface) and SDLWorldQuadRenderer
+// (world-space textured quads: the sun and moon, the shoreline foam, the wave sources).
+//
+// Render targets follow the camera, as they do on D3D: cD3DRender::setCamera binds
+// camera->GetRenderTarget() and clears it, or restores the back buffer when the camera
+// has none. setCamera below is the same choke point -- see RenderTarget.
 
 #include "IRenderDevice.h"
 #include "MTSection.h"
+#include "XMath/Mat4f.h"   // Mat4f (the light's view-projection and its bias)
 #include <vector>
 #include <unordered_map>
 #include <memory>
@@ -21,18 +32,172 @@
 struct SDL_Window;
 struct SDL_GPUDevice;
 struct SDL_GPUCommandBuffer;
-struct SDL_GPURenderPass;
 struct SDL_GPUTexture;
-struct SDL_GPUGraphicsPipeline;
-struct SDL_GPUSampler;
 struct SDL_GPUBuffer;
-struct SDL_GPUTransferBuffer;
+struct SDL_GPURenderPass;
+
+struct sViewPort;
+class SDLUIRenderer;
+class SDLTileMapRenderer;
+class SDLObject3dxRenderer;
+class SDLWaterRenderer;
+class SDLWorldQuadRenderer;
+class SDLMinimapRenderer;
+class cTileMap;
+
+// Restrict drawing to a camera's viewport, the way cD3DRender::SetDrawTransform hands
+// camera->vp to D3DDevice_->SetViewport. Camera::Update scales matProj to exactly that
+// rect, so a renderer that ignores it stretches the scene over the whole window and
+// loses the letterbox bars the 4:3 work area leaves. A render pass starts out with the
+// full target as its viewport, so this only ever needs setting, never restoring.
+void applyCameraViewport(SDL_GPURenderPass* pass, const sViewPort& vp, int targetW, int targetH);
+
+// A 1x1 RGBA texture of one colour, uploaded on a command buffer of its own. Every renderer
+// needs a couple: SDL requires a sampler binding to be non-null even where the shader gates
+// the layer off, so a solid stand-in goes in the slot -- white where the sample must be
+// neutral to a multiply, mid-grey where it must be neutral to the terrain's `detail - 0.5`.
+SDL_GPUTexture* createSolidGPUTexture(SDL_GPUDevice* device, unsigned int rgba);
+
+// gb_RenderDevice as a cSDLRenderDevice, or null under any other device. Off-Windows
+// gb_RenderDevice3D stays null, so engine code that needs the backend (cScene's shadow
+// map, CameraShadowMap) asks for the SDL device through this instead.
+class cSDLRenderDevice;
+cSDLRenderDevice* sdlRenderDevice();
+
+// The SDL backend's 3dx renderer, or null under any other device. cObject3dx::Draw and
+// cSimply3dx::SelectMaterial drive it exactly as they drive pShader3dx's shader objects
+// on Windows.
+SDLObject3dxRenderer* sdlObjectRenderer();
+
+// The SDL backend's water renderer, or null under any other device. cWater::Draw drives
+// it exactly as it drives VSWater/PSWater on Windows.
+SDLWaterRenderer* sdlWaterRenderer();
+
+// The SDL backend's world-quad renderer, or null under any other device. cCoastSprites,
+// cFixedWaves and cWaves drive it exactly as they drive the device's shared quad buffer
+// on Windows -- it even answers to the same BeginDraw/Get/EndDraw.
+SDLWorldQuadRenderer* sdlWorldQuadRenderer();
+
+// The SDL backend's minimap renderer, or null under any other device. UI_Minimap's draw
+// half drives it exactly as it drives psMiniMap / psMiniMapBorder on Windows. It draws
+// inside the UI renderer's pass -- see SDLMinimapRenderer.h.
+SDLMinimapRenderer* sdlMinimapRenderer();
 
 class cSDLRenderDevice : public cInterfaceRenderDevice
 {
 public:
 	cSDLRenderDevice();
 	~cSDLRenderDevice();
+
+	// --- Terrain ----------------------------------------------------------
+	// Called from cTileMap::Draw, i.e. from inside the engine's own scene-draw
+	// delegation, part-way through BeginScene..EndScene. Forwards the frame's command
+	// buffer and swapchain image to SDLTileMapRenderer, which opens its own colour +
+	// depth pass there and then. The first pass of a frame performs Fill()'s clear, so
+	// if the terrain pass runs, the UI pass at EndScene loads instead of clearing.
+	void drawTileMap(cTileMap* tileMap, Camera* camera);
+
+	// --- Water and world quads --------------------------------------------
+	// cSunMoonObj::Draw, cWater::Draw, cCoastSprites::Draw and cFixedWavesContainer::Draw
+	// talk to their renderers directly (the way they talk to VSWater/PSWater and the shared
+	// quad buffer on Windows), then call these to put what they recorded on the screen.
+	//
+	// Only the sun opens the frame, before the terrain: it is the first thing the sky
+	// camera draws, and the sky is drawn before the world. The rest belong where the scene
+	// walk reached them, over the opaque objects. Water and the coast sprites draw in
+	// DrawObjectSpecial, which sorts by sortIndex(), so the water (-2) lands under the
+	// sprites (0); the wave sources draw later still, in DrawSortObject's sorted transparent
+	// pass. The object renderer batches, so each of these first replays what it has recorded
+	// so far and only then opens its own pass over it. Whatever the walk records afterwards
+	// replays at EndScene, on top, as on D3D.
+	//
+	// drawWorldQuads is called by each of its renderer's callers in turn, and each call
+	// draws (and clears) only the quads recorded since the last one.
+	SDLWaterRenderer* waterRenderer() { return waterRenderer_.get(); }
+	void drawWater();
+	SDLWorldQuadRenderer* worldQuadRenderer() { return worldQuadRenderer_.get(); }
+	void drawWorldQuads();
+
+	// --- Minimap ------------------------------------------------------------
+	// Unlike the above, this one has no draw call of its own: the minimap is a UI control,
+	// so its draws are sequenced into SDLUIRenderer's run list and replayed inside the UI
+	// pass. See SDLMinimapRenderer.h.
+	SDLMinimapRenderer* minimapRenderer() { return minimapRenderer_.get(); }
+
+	// Replay the object batch recorded so far into the current target, and take that
+	// target's clears if they are still going. drawWater / drawWorldQuads call it to get
+	// the opaque objects onto the screen before they blend over them; cSkyCamera::DrawScene
+	// calls it to get the sky models onto the screen before the world scene draws over them.
+	void flushObjectPass();
+
+	// Camera::ClearZBuffer, which the main camera runs for ATTRCAMERA_CLEARZBUFFER: the sky
+	// draws first and leaves its own depth behind, in a frustum of its own (1e3..1e5). There
+	// is no clear outside a render pass here, so instead let the next pass own the depth
+	// clear again, exactly as if nothing had been drawn.
+	void clearZBuffer() { current_->depthCleared = false; }
+
+	// --- Shadow map -------------------------------------------------------
+	// Mirrors cD3DRender: cScene creates the map, the light camera renders the casters
+	// into it, and receivers transform by shadowMatViewProj() * shadowMatBias().
+	//
+	// It is a plain depth texture here. D3D9 could not sample depth, so the original
+	// renders the light-space z into a float colour target (object_shadow.psl's
+	// `return (float4)v.tdepth`) and forks the whole path on DT_RADEON9700 vs
+	// DT_GEFORCEFX. SDL GPU samples depth directly, so neither is needed.
+	//
+	// The map is not special-cased as a target: cScene::AddLightCamera hands it to the
+	// light camera through Camera::SetRenderTarget, and setCamera resolves it like any
+	// other -- to a depth-only RenderTarget, because its cTexture carries
+	// TEXTURE_RENDER_SHADOW_9700.
+	bool createShadowMap(int size);
+	void deleteShadowMap();
+	cTexture* GetShadowMap() { return shadowMap_; }
+	int  GetShadowMapSize() const { return shadowMapSize_; }
+
+	// --- Terrain lightmap ---------------------------------------------------
+	// The 256x256 colour target CameraPlanarLight draws the scene's light sources and
+	// circle shadows into, top-down, once a frame; the terrain shader multiplies its light
+	// term by it (tile_map_scene.psl: `light += 2*(lightmap.rgb-0.5)`), so the clear colour
+	// 128,128,128 is the neutral "no light source here". Named GetLightMap() to match
+	// cD3DRender, which cScene::AddPlanarCamera reads through.
+	//
+	// Not special-cased as a target either: AddPlanarCamera hands it to the light camera
+	// through Camera::SetRenderTarget, and setCamera resolves it like any other colour one.
+	bool createLightMap(int size);
+	void deleteLightMap();
+	cTexture* GetLightMap() { return lightMap_; }
+	// The original's planarTransform_ (cD3DRender::setPlanarTransform), which the terrain
+	// vertex shader reads as fPlanarNode: xy is the lightmap box's world-space origin, zw
+	// its inverse extent, so uv = (pos.xy - xy) * zw. cScene::AddPlanarCamera sets it.
+	void setPlanarTransform(const Vect4f& transform) { planarTransform_ = transform; }
+	const Vect4f& planarTransform() const { return planarTransform_; }
+	void SetShadowMatViewProj(const Mat4f& m) { shadowMatViewProj_ = m; }
+	const Mat4f& shadowMatViewProj() const { return shadowMatViewProj_; }
+	// Light clip space -> shadow map texture coordinates.
+	Mat4f shadowMatBias() const;
+	// The terrain caster, from cTileMap::Draw under the light camera -- where the D3D
+	// backend calls tileMapRender_->DrawBump(camera, ALPHA_TEST, true, false). Draws
+	// immediately into the current (depth-only) target, so it lands before the object
+	// casters, which then load its depth. It needs no cTileMap: the caster mesh is the one
+	// SDLTileMapRenderer built from vMap.
+	void drawTileMapShadow(Camera* camera);
+	// Record the depth pass the light camera accumulated, where the D3D backend calls
+	// DrawType::EndDrawShadow. Switching away from the map would flush it anyway; this
+	// only pins the moment, as the original does.
+	void endShadowPass() { flushTarget(current_, true); }
+	// True once a caster pass has filled the map this frame. Receivers must check it:
+	// cScene detaches the light camera whenever shadows are off, and the map outlives it.
+	bool shadowPassRan() const { return shadowPassRan_; }
+
+	// --- 3dx objects ------------------------------------------------------
+	// cObject3dx::Draw talks to the object renderer directly (the way it talks to
+	// gb_RenderDevice3D's shaders on Windows); the device only hands it over, and
+	// resolves the engine's buffer handles to the SDL GPU buffers it owns.
+	SDLObject3dxRenderer* objectRenderer() { return objectRenderer_.get(); }
+	SDL_GPUBuffer* gpuBuffer(const sPtrVertexBuffer& vb) const;
+	SDL_GPUBuffer* gpuBuffer(const sPtrIndexBuffer& ib) const;
+	// RS_ZWRITEENABLE, as the scene passes set it around the transparent draw.
+	bool zWriteEnable() const { return zWriteEnable_; }
 
 	// --- Lifecycle (real) -------------------------------------------------
 	bool Initialize(int xScr, int yScr, int mode, HWND hWnd, int RefreshRateInHz, HWND fallbackWindow) override;
@@ -52,37 +217,7 @@ public:
 	int GetAvailableTextureMem() override { return 0; }
 	HWND GetWindowHandle() override { return (HWND)window_; }
 
-	// --- Slice 4: static-mesh rendering via the real VB/IB interface -------
-	// Not part of cInterfaceRenderDevice: the off-Windows 3D models ship only as
-	// the 32-bit InPlace cache, so the menu background recovers raw VB/IB from
-	// .3dxGB and feeds them through the real CreateVertexBuffer/CreateIndexBuffer/
-	// DrawIndexedPrimitive path (which this exercises). registerMesh takes ownership
-	// of the caller's vb/ib (clearing the caller's handles) and retains the mesh so
-	// EndScene can redraw it every frame via DrawIndexedPrimitive. Returns a handle,
-	// -1 on failure.
-	int  registerMesh(sPtrVertexBuffer& vb, sPtrIndexBuffer& ib);
-	// Append a textured sub-range (firstIndex/indexCount into the mesh's index
-	// buffer). tint = material diffuse rgba (rgb color, a opacity); transparency
-	// selects the blend pipeline (0=substractive, 1=additive, 2=filter). light =
-	// 4 floats {dir.xyz toward the light (world space), strength}; null or w==0
-	// leaves the draw unlit/full-bright (menu default), w>0 adds relief lighting.
-	// water = 3 floats {strength, spatialScale, spare}; null or strength==0 leaves
-	// the draw foam-free, strength>0 adds the animated water-foam layer (time is
-	// injected per frame at draw time).
-	// depthWrite = true marks the draw as opaque base geometry (terrain): it writes
-	// depth so translucent things drawn after it (the water sheet, which keeps
-	// depth-write off) get occluded by geometry in front. Menu decals leave it false
-	// (they composite in paint order with depth-write off).
-	void addMeshSubmesh(int handle, int firstIndex, int indexCount, cTexture* tex,
-	                    const float* tint = nullptr, int transparency = 2,
-	                    const float* light = nullptr, const float* water = nullptr,
-	                    bool depthWrite = false);
-	// Supply the model-view-projection matrix (16 floats, row-major, row-vector
-	// v*M, D3D clip convention) for the mesh. Replaces the built-in auto-frame.
-	void setMeshTransform(int handle, const float* mvp16);
-	void releaseMesh(int handle);
-
-	// --- Textures (slice 2b): real SDL GPU textures + CPU staging ----------
+	// --- Textures: real SDL GPU textures + CPU staging ----------------------
 	int   CreateTexture(cTexture* Texture, cFileImage* FileImage, int dxout, int dyout, bool enable_assert) override;
 	int   DeleteTexture(cTexture* Texture) override;
 	void* LockTexture(cTexture* Texture, int& Pitch) override;
@@ -95,7 +230,7 @@ public:
 	int GetClipRect(int* xmin, int* ymin, int* xmax, int* ymax) override
 		{ if(xmin)*xmin=xScrMin; if(ymin)*ymin=yScrMin; if(xmax)*xmax=xScrMax; if(ymax)*ymax=yScrMax; return 0; }
 
-	// --- Frame / 2D clear (real) -----------------------------------------
+	// --- Frame (real) -----------------------------------------------------
 	bool IsInBeginEndScene() override { return bActiveScene_; }
 	int  Fill(int r, int g, int b, int a) override;
 	int  BeginScene() override;
@@ -109,24 +244,42 @@ public:
 	cRenderWindow* currentRenderWindow() override { return nullptr; }
 	void DeleteRenderWindow(cRenderWindow*) override {}
 
-	// --- Camera / transform (no-op) --------------------------------------
-	void SetDrawTransform(Camera*) override {}
-	void setCamera(Camera*) override {}
+	// --- Camera / transform ----------------------------------------------
+	// SDL GPU has no device-wide transform or viewport: matView/matProj reach the
+	// shaders as uniforms, and the viewport belongs to a render pass. So SetDrawTransform
+	// only caches the camera, as cD3DRender's does, and the renderers apply camera->vp when
+	// they open their pass (see applyCameraViewport).
+	//
+	// setCamera additionally binds the camera's render target, exactly where
+	// cD3DRender::setCamera calls SetRenderTarget / RestoreRenderTarget. Every camera
+	// passes through here before its own draws (Camera::DrawScene, CameraShadowMap::DrawScene
+	// and cSkyCamera::DrawScene all call it), and child cameras draw before their parent --
+	// so switching targets here is what gets an offscreen pass recorded, complete, ahead of
+	// the pass that samples it.
+	void SetDrawTransform(Camera* camera) override { camera_ = camera; }
+	void setCamera(Camera* camera) override;
 	void setWorldMatrix(const MatXf&) override {}
 
 	// --- Misc state (no-op) ----------------------------------------------
 	int  SetGamma(float, float, float) override { return 0; }
-	void SetRenderState(eRenderStateOption, int) override {}
-	unsigned int GetRenderState(eRenderStateOption) override { return 0; }
+	// Only RS_FILLMODE (GameShell drives it from debugWireFrame) and RS_ZWRITEENABLE
+	// (Camera::DrawSortObject turns it off for the transparent pass) are honoured; the
+	// rest of the D3D render states have no SDL GPU equivalent outside a pipeline object.
+	void SetRenderState(eRenderStateOption, int) override;
+	unsigned int GetRenderState(eRenderStateOption) override;
 	void SetGlobalFog(const Color4f&, const Vect2f&) override {}
 	void SetSamplerDataVirtual(DWORD, SAMPLER_DATA&) override {}
-	bool IsEnableSelfShadow() override { return false; }
+	// D3D: "the advanced DrawType exists", i.e. the device can render a shadow map.
+	// cVisGeneric::SetShadowType turns shadows off without it. We always can.
+	bool IsEnableSelfShadow() override { return true; }
 	bool SetScreenShot(const char*) override { return false; }
 
-	// --- 2D primitives (no-op until slice 2) -----------------------------
-	void DrawLine(int, int, int, int, Color4c) override {}
-	void DrawPixel(int, int, Color4c) override {}
-	void DrawRectangle(int, int, int, int, Color4c, bool) override {}
+	// --- 2D primitives (forwarded to the UI renderer) --------------------
+	void DrawLine(int x1, int y1, int x2, int y2, Color4c color) override;
+	void DrawPixel(int x, int y, Color4c color) override;
+	void DrawRectangle(int x, int y, int dx, int dy, Color4c color, bool outline) override;
+	// Nothing to flush: the UI renderer already records these in call order alongside
+	// the sprites and text, and draws them all in its pass at EndScene.
 	void FlushPrimitive2D() override {}
 
 	// --- 3D primitives (no-op) -------------------------------------------
@@ -137,15 +290,21 @@ public:
 	void drawCircle(const Vect3f&, float, Color4c) override {}
 	void DrawBound(const MatXf&, Vect3f&, Vect3f&, bool, Color4c) override {}
 
-	// --- Text ------------------------------------------------------------
-	void OutText(int, int, const char*, const Color4f&, ALIGN_TEXT, eBlendMode, Vect2f) override {}
+	// --- Text (forwarded to the UI renderer) ------------------------------
+	void OutText(int x, int y, const char* text, const Color4f& color, ALIGN_TEXT align, eBlendMode blend_mode, Vect2f scale) override;
 	int  OutTextLine(int x, int y, const FT::Font& font, const wchar_t* textline, const wchar_t* end, const Color4c& color, eBlendMode blend_mode, int xRangeMin, int xRangeMax) override;
+	// The D3D backend draws these straight onto the window's HDC with GDI (CreateFont /
+	// ExtTextOut), bypassing the renderer entirely. There is no equivalent here, and
+	// nothing in the game calls either.
 	void OutText(int, int, const char*, int, int, int) override {}
 	void OutText(int, int, const char*, int, int, int, char*, int, int, int, int) override {}
 
-	// --- Sprites ---------------------------------------------------------
+	// --- Sprites (forwarded to the UI renderer) ---------------------------
 	void DrawQuad(float, float, float, float, float, float, float, float, Color4c) override;
 	void DrawSprite(int, int, int, int, float, float, float, float, cTexture*, const Color4c&, float, eBlendMode, float) override;
+	// Unimplemented, and unreached: nothing outside the D3D backend calls the solid,
+	// two-texture or cTextureScale sprite variants. DrawSprite2 is used only by the
+	// chaos post-process (Render/src/CChaos.cpp), which has no SDL path yet.
 	void DrawSpriteSolid(int, int, int, int, float, float, float, float, cTexture*, const Color4c&, float, eBlendMode) override {}
 	void DrawSprite2(int, int, int, int, float, float, float, float, cTexture*, cTexture*, const Color4c&, float) override {}
 	void DrawSprite2(int, int, int, int, float, float, float, float, float, float, float, float, cTexture*, cTexture*, const Color4c&, float, eColorMode, eBlendMode) override {}
@@ -155,12 +314,16 @@ public:
 	void DrawSpriteScale2(int, int, int, int, float, float, float, float, cTextureScale*, cTextureScale*, const Color4c&, float, eColorMode) override {}
 
 	// --- Materials -------------------------------------------------------
-	// Records the current texture/blend for the following DrawQuad calls.
+	// Records the current texture for the following DrawQuad calls.
 	void SetNoMaterial(eBlendMode, const MatXf&, float, cTexture*, cTexture*, eColorMode) override;
 	void SetWorldMaterial(eBlendMode, const MatXf&, float, cTexture*, cTexture*, eColorMode, bool, bool) override {}
 
-	// --- Vertex/index buffers (slice 4): real SDL GPU static buffers ------
-	void DrawIndexedPrimitive(sPtrVertexBuffer&, int, int, const sPtrIndexBuffer&, int, int) override;
+	// --- Vertex/index buffers: real SDL GPU static buffers ----------------
+	// The buffers live here (the engine's 3dx/terrain code fills them through the sPtr
+	// wrappers), but the device draws nothing: SDL GPU draws only inside a render pass,
+	// which is a renderer's business. cObject3dx::Draw calls the object renderer's
+	// DrawIndexedPrimitive instead of this one.
+	void DrawIndexedPrimitive(sPtrVertexBuffer&, int, int, const sPtrIndexBuffer&, int, int) override {}
 	void CreateVertexBuffer(sPtrVertexBuffer&, int, IDirect3DVertexDeclaration9*, int) override;
 	void DeleteVertexBuffer(sPtrVertexBuffer&) override;
 	void* LockVertexBuffer(sPtrVertexBuffer&, bool) override;
@@ -182,15 +345,50 @@ public:
 	cVertexBuffer<sVertexXYZWDT2>* GetBufferXYZWDT2() override { return nullptr; }
 
 private:
-	// CPU-side 2D vertex, byte-compatible with the UI vertex input layout
-	// (matches sVertexXYZWDT1: float4 pos, BGRA u8 colour, float2 uv = 28 bytes).
-	struct UIVertex { float x, y, z, w; unsigned int color; float u, v; };
+	// --- Render targets ---------------------------------------------------
+	// Where a pass draws, and how much of the clear it still owes. SDL GPU cannot clear
+	// outside a render pass, so a clear is *armed* here and consumed by whichever pass
+	// opens on the target first -- the bookkeeping the screen already carried, now per
+	// target. A null colour attachment means depth-only: that is the shadow map.
+	struct RenderTarget
+	{
+		SDL_GPUTexture* color = nullptr;
+		SDL_GPUTexture* depth = nullptr;
+		int   w = 0, h = 0;
+		float clearColor[4] = {0.f, 0.f, 0.f, 1.f};
+		bool  clearPending  = false;   // a clear is owed...
+		bool  colorCleared  = false;   // ...and some pass has already taken it
+		bool  depthCleared  = false;
+		bool  depthOnly     = false;   // no colour attachment: the shadow map
+		bool  ownsDepth     = false;   // offscreen colour targets carry their own depth
+		// Renderable at all? A camera can name a target whose texture is not resident yet.
+		bool  usable() const { return depth && (depthOnly || color); }
+	};
 
-	void createUIPipeline();             // lazy one-time pipeline/sampler/buffers
-	void ensureVertexCapacity(int verts);
-	// Append a quad (6 verts) bound to tex, extending or starting a draw run.
-	void emitQuad(float x, float y, float dx, float dy,
-	              float u, float v, float du, float dv, unsigned int color, SDL_GPUTexture* tex);
+	RenderTarget screen_;       // the swapchain image + depthTexture_
+	// A camera whose render target cannot be resolved (its texture is not created yet).
+	// Colour and depth stay null, so every pass skips rather than drawing to the screen.
+	RenderTarget nullTarget_;
+	// Offscreen targets, keyed by the cTexture the camera was handed. Node-based, so the
+	// RenderTarget* held in current_ survives a rehash.
+	std::unordered_map<cTexture*, RenderTarget> targets_;
+	RenderTarget* current_ = &screen_;
+
+	// The target `camera` draws into, created on first use: depth-only for a
+	// TEXTURE_RENDER_SHADOW_9700 texture, colour plus an owned depth buffer otherwise.
+	RenderTarget* resolveTarget(Camera* camera);
+	// Arm rt's clear from the camera, as cD3DRender::setCamera's Clear() does.
+	void armClear(RenderTarget* rt, Camera* camera);
+	// Replay whatever the object renderer has recorded into rt. `settle` means rt must come
+	// out of this call fully initialized -- we are leaving it, and something is about to
+	// sample it, so an offscreen target that nothing drew into still owes its clear. Mid-
+	// target flushes (flushObjectPass) pass false and let the next real pass take the clear,
+	// exactly as the screen's do.
+	void flushTarget(RenderTarget* rt, bool settle);
+	// Drop an offscreen target when its cTexture goes away (DeleteTexture): the next
+	// cTexture allocated could land on the same address.
+	void releaseTarget(cTexture* texture);
+	SDL_GPUTexture* createDepthTexture(int w, int h);
 
 	// CPU-staged GPU texture: keyed by the SDL_GPUTexture* stored in cTexture's
 	// BitMap[0]. staging is the lockable CPU image; UnlockTexture uploads it.
@@ -199,20 +397,19 @@ private:
 	struct TextureData {
 		SDL_GPUTexture* tex = nullptr;
 		int w = 0, h = 0, bpp = 0, pitch = 0;
+		// Mip levels the texture was created with. The engine's cached DDS ship full
+		// chains and D3D sampled them anisotropically; SDL GPU regenerates the chain
+		// from level 0 after each upload. 1 means no chain (font atlas, A8L8).
+		int levels = 1;
 		bool expand = false;
 		std::vector<unsigned char> staging;
 	};
 	std::unordered_map<SDL_GPUTexture*, TextureData> textures_;
 	void uploadTexture(const TextureData& td);  // staging -> GPU (copy pass)
 
-	// One draw call per contiguous run of quads sharing a texture.
-	struct DrawRun { SDL_GPUTexture* tex; int first; int count; };
-	std::vector<DrawRun> runs_;
-	SDL_GPUTexture* currentTexture_ = nullptr;  // set by SetNoMaterial
-
-	// Slice 4: static VB/IB backed by SDL GPU buffers + a CPU staging mirror,
-	// keyed on the slot pointer (sSlotVB*/sSlotIB*) held by the sPtr wrappers.
-	// Lock hands back the staging; Unlock uploads it to the GPU buffer.
+	// Static VB/IB backed by SDL GPU buffers + a CPU staging mirror, keyed on the
+	// slot pointer (sSlotVB*/sSlotIB*) held by the sPtr wrappers. Lock hands back
+	// the staging; Unlock uploads it to the GPU buffer.
 	struct GpuBuffer {
 		SDL_GPUBuffer* buf = nullptr;
 		std::vector<unsigned char> staging;
@@ -222,133 +419,39 @@ private:
 	static int strideFromDeclaration(IDirect3DVertexDeclaration9* decl);
 	void uploadBuffer(GpuBuffer& gb);          // staging -> GPU (own copy pass)
 
-	// One indexed draw recorded by DrawIndexedPrimitive and replayed inside the
-	// 3D render pass at EndScene (SDL GPU can only draw inside a pass).
-	struct MeshDraw {
-		SDL_GPUBuffer* vbuf; SDL_GPUBuffer* ibuf;
-		int baseVertex; int startIndex; int indexCount;
-		float mvp[16];
-		SDL_GPUTexture* tex; float tint[4]; int transparency;
-		float light[4];   // xyz = dir toward light, w = strength (0 = unlit)
-		float water[4];   // x = foam strength (0 = none), y = scale, z spare, w = time
-		bool depthWrite;  // opaque base geometry (terrain) writes depth; water/decals don't
-	};
-	std::vector<MeshDraw> meshDraws_;
-	// "Current" material/transform state that DrawIndexedPrimitive snapshots into
-	// each MeshDraw (the immediate-mode state the D3D backend reads from the device).
-	float           curMVP_[16] = {0};
-	SDL_GPUTexture* curMeshTexture_ = nullptr;
-	float           curMeshTint_[4] = {1,1,1,1};
-	int             curMeshTransparency_ = 2;
-	float           curMeshLight_[4] = {0,0,0,0};   // xyz dir, w strength (0 = unlit)
-	float           curMeshWater_[4] = {0,0,0,0};   // x strength (0 = no foam), y scale
-	bool            curMeshDepthWrite_ = false;     // true = opaque, write depth (terrain)
-	void flushMeshDraws(SDL_GPURenderPass* pass);   // replay meshDraws_ in the pass
-
-	// Retained menu-background meshes: they own the real VB/IB (held indirectly so
-	// the sPtr members never move -> no double free) and are redrawn every frame by
-	// recordMenuMeshes() through the real DrawIndexedPrimitive interface.
-	struct SubDraw {
-		int firstIndex; int indexCount; SDL_GPUTexture* tex;
-		float tint[4];      // material diffuse rgba (rgb color, a opacity)
-		int transparency;   // 0=substractive, 1=additive, 2=filter
-		float light[4];     // xyz = dir toward light, w = strength (0 = unlit)
-		float water[4];     // x = foam strength (0 = none), y = scale, z spare, w unused
-		bool depthWrite;    // opaque base geometry (terrain) writes depth; decals/water don't
-	};
-	struct MenuMesh {
-		sPtrVertexBuffer vb; sPtrIndexBuffer ib;   // own one reference to the buffers
-		int numVertex = 0;
-		float bmin[3] = {0,0,0};
-		float bmax[3] = {0,0,0};
-		float mvp[16] = {0};
-		bool hasTransform = false;                 // false -> auto-frame fallback
-		std::vector<SubDraw> subdraws;
-	};
-	std::vector<std::unique_ptr<MenuMesh>> menuMeshes_;
-	void recordMenuMeshes();   // per frame: set curstate + call DrawIndexedPrimitive
-
-	SDL_GPUGraphicsPipeline* meshPipeline_ = nullptr;       // filter (alpha-over) blend, no depth write
-	SDL_GPUGraphicsPipeline* meshPipelineOpaque_ = nullptr; // filter blend + depth-write ON (terrain)
-	SDL_GPUGraphicsPipeline* meshPipelineAdd_ = nullptr;    // additive blend
-	SDL_GPUTexture*          depthTexture_ = nullptr;
-	int depthW_ = 0, depthH_ = 0;
-	bool meshPipelineTried_ = false;
-	void createMeshPipeline();
-	void ensureDepth(int w, int h);
-
-	// Water pipeline (P2 water slice): reuses the mesh3d vertex shader but a dedicated
-	// fragment shader (water.frag) that samples two scrolling bump textures + the baked
-	// depth-opacity texture for the animated wave surface + specular glint. A mesh draw
-	// with water[0] > 0 (set by WaterRenderSDL) is routed here instead of meshPipeline_.
-	SDL_GPUGraphicsPipeline* waterPipeline_ = nullptr;
-	bool waterPipelineTried_ = false;
-	void createWaterPipeline();
-	SDL_GPUTexture* waterBump0_ = nullptr;   // borrowed SDL handles (WaterRenderSDL owns
-	SDL_GPUTexture* waterBump1_ = nullptr;   // the cTextures); resolved via sdlTextureOf
-	SDL_GPUSampler* waterSampler_ = nullptr; // REPEAT/wrap: the wave bumps tile (worldXY UV)
-	float           waterFS_[12] = {0};      // {LightDir, CameraPos(.w=time), Params}
-
-	// Coast-foam pipeline (shoreline coast-sprite slice): a dynamic world-space quad
-	// stream rebuilt each frame from the real cCoastSprites sim, drawn on the water
-	// surface. Its own pos/color/uv vertex format (stride 24) + shader, unlike the
-	// mesh3d pipeline; premultiplied filter blend, depth-test on / write off (foam
-	// sits on the water, occluded by nearer terrain but not writing depth itself).
-	SDL_GPUGraphicsPipeline* foamPipeline_ = nullptr;
-	bool foamPipelineTried_ = false;
-	void createFoamPipeline();
-	SDL_GPUBuffer*         foamVB_ = nullptr;      // dynamic, grown to hold the frame's quads
-	SDL_GPUTransferBuffer* foamXfer_ = nullptr;
-	int                    foamVBCap_ = 0;         // capacity in vertices
-	// The coast sim uses two bubble atlases: a "stay" atlas for the simple sprites and
-	// a "moving" atlas for the drifting arcs. Verts are packed [stay | moving]; the
-	// split selects which atlas binds for each draw range (both borrowed textures).
-	SDL_GPUTexture*        foamTexA_ = nullptr;    // stay/simple atlas
-	SDL_GPUTexture*        foamTexB_ = nullptr;    // moving/arc atlas
-	int                    foamSplitA_ = 0;        // vert count drawn with foamTexA_
-	float                  foamMVP_[16] = {0};
-	void flushFoam(SDL_GPURenderPass* pass);       // draw the frame's foam inside the mesh pass
-public:
-	// One foam quad vertex: world position, packed BGRA colour (premultiplied fade),
-	// uv. The foam renderer builds a triangle-list (6 verts/quad) and submits it once
-	// per frame before EndScene; the device uploads + draws it in the 3D mesh pass.
-	// verts are packed [countA verts for texA][rest for texB] so the two atlases draw
-	// from one buffer.
-	struct FoamVertex { float x, y, z; unsigned int color; float u, v; };
-	void submitFoam(const FoamVertex* verts, int vcount, cTexture* texA, int countA,
-	                cTexture* texB, const float* mvp16);
-private:
-	std::vector<FoamVertex> foamVerts_;            // this frame's quads (cleared each EndScene)
-public:
-	// Per-frame water shading state, supplied by WaterRenderSDL before the pass. camPos3
-	// and lightDir3 are 3 floats each; bump0/bump1 are the two wave textures; the scalars
-	// tune the bump sampling/glint. Time is injected each frame from SDL ticks.
-	void setWaterRenderState(cTexture* bump0, cTexture* bump1, const float* camPos3,
-	                         const float* lightDir3, float bumpScale, float scrollSpeed,
-	                         float rippleStrength, float specStrength);
-private:
-
 	SDL_Window*            window_           = nullptr;
 	SDL_GPUDevice*         device_           = nullptr;
 	SDL_GPUCommandBuffer*  commandBuffer_    = nullptr;
-	SDL_GPURenderPass*     renderPass_       = nullptr;
 	SDL_GPUTexture*        swapchainTexture_ = nullptr;
 
-	// UI pipeline (slice 2)
-	SDL_GPUGraphicsPipeline* uiPipeline_     = nullptr;
-	SDL_GPUSampler*          sampler_        = nullptr;
-	SDL_GPUTexture*          whiteTexture_   = nullptr;
-	SDL_GPUBuffer*           vertexBuffer_   = nullptr;
-	SDL_GPUTransferBuffer*   transferBuffer_ = nullptr;
-	int   vertexCapacity_ = 0;
-	bool  pipelineTried_  = false;
-	std::vector<UIVertex> batch_;
+	// The scene depth buffer behind screen_, shared by every 3D renderer so their passes
+	// occlude one another. Sized to the swapchain; owned here, like the swapchain image.
+	SDL_GPUTexture* depthTexture_ = nullptr;
+	int depthW_ = 0, depthH_ = 0;
+	bool ensureDepth(int w, int h);
+
+	// The shadow map, held as a cTexture so Camera::SetRenderTarget can take it and the
+	// scene can ask its size. Its SDL depth texture lives in textures_ like any other,
+	// and resolveTarget turns it into a depth-only RenderTarget.
+	cTexture* shadowMap_ = nullptr;
+	cTexture* lightMap_ = nullptr;
+	Vect4f planarTransform_ = Vect4f(0.f, 0.f, 1.f, 1.f);
+	int shadowMapSize_ = 0;
+	Mat4f shadowMatViewProj_;
+	bool shadowPassRan_ = false;
 
 	MTSection resetDeviceLock_;          // dummy lock (no device loss on SDL)
 	DWORD multisample_ = 0;
 	bool  bActiveScene_ = false;
-	bool  hasClear_     = false;
-	float clearColor_[4] = {0.f, 0.f, 0.f, 1.f};
+	int   fillMode_ = FILL_SOLID;   // RS_FILLMODE; FILL_WIREFRAME switches renderers to line pipelines
+	bool  zWriteEnable_ = true;     // RS_ZWRITEENABLE; picks the object pipeline's depth write
+
+	std::unique_ptr<SDLUIRenderer>        uiRenderer_;
+	std::unique_ptr<SDLTileMapRenderer>   tileMapRenderer_;
+	std::unique_ptr<SDLObject3dxRenderer> objectRenderer_;
+	std::unique_ptr<SDLWaterRenderer>     waterRenderer_;
+	std::unique_ptr<SDLWorldQuadRenderer> worldQuadRenderer_;
+	std::unique_ptr<SDLMinimapRenderer>   minimapRenderer_;
 };
 
 #endif // VISTA_SDL_RENDER_DEVICE_H

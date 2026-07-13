@@ -7,6 +7,10 @@
 #include "cCamera.h"
 #include "VisGeneric.h"
 #include "Terra/vmap.h"
+#ifndef _WIN32
+#include <algorithm>
+#include "Render/SDLRenderDevice.h"   // sdlObjectRenderer()
+#endif
 
 /*
 
@@ -154,7 +158,9 @@ void cSimply3dx::SelectMaterial(Camera* camera)
 	material.Ambient.mul3(material.Ambient,pScene->GetSunAmbient());
 	material.Specular.mul3(material.Specular,pScene->GetSunSpecular());
 
+#ifdef _WIN32
 	gb_RenderDevice3D->SetSamplerData(0,sampler_wrap_anisotropic);
+#endif
 
 	float texture_phase=0;
 	eBlendMode blend;
@@ -166,6 +172,31 @@ void cSimply3dx::SelectMaterial(Camera* camera)
 	else
 		blend=ALPHA_NONE;
 
+#ifndef _WIN32
+	// The SDL analogue of everything below: one State carries what the D3D path spreads
+	// across SetBlendState, SetTexturePhase and the vs/ps Select + SetMaterial calls.
+	// The alpha-test reference is not carried: SDLObject3dxRenderer derives it from the
+	// blend mode, so IsDraw2Pass's alpha-scaled ref (a fade trick) is not reproduced.
+	pStatic->sdlCamera_ = camera;
+
+	SDLObject3dxRenderer::State& st = pStatic->sdlState_;
+	st = SDLObject3dxRenderer::State();
+	st.ambient = material.Ambient;
+	st.diffuse = material.Diffuse;
+	st.specular = material.Specular;      // .a = specular power (cStaticSimply3dx::Init)
+	st.lerpColor = material.lerp_texture; // zeroed above: simply objects have no skin colour
+	st.texture = material.Tex[0];
+	st.texturePhase = texture_phase;
+	st.tilingWrap = true;                 // sampler_wrap_anisotropic above
+	st.blend = blend;
+	st.noLight = getAttribute(ATTRUNKOBJ_NOLIGHT) != 0;
+
+	// VSSkin::Select uploads this object's matrices at offset 0. The batched path
+	// (cStaticSimply3dx::DrawObjects) overwrites them through SelectMatrix; the single
+	// transparent object drawn by cSimply3dx::Draw relies on exactly this.
+	pStatic->sdlWorld_.assign(node_position.begin(), node_position.end());
+	return;
+#else
 	{
 		int ref;
 		if(IsDraw2Pass())
@@ -235,13 +266,11 @@ void cSimply3dx::SelectMaterial(Camera* camera)
 	cStaticSimply3dx::ONE_LOD& lod=pStatic->lods[iLOD];
 	vs->Select(&node_position[0],node_position.size(),lod.blend_indices);
 	vs->SetMaterial(&material);
-
+#endif
 }
 
 void cSimply3dx::SelectShadowMaterial()
 {
-	gb_RenderDevice3D->SetTextureBase(1,0);
-
 	eBlendMode blend=ALPHA_NONE;
 	bool is_alphatest=false;
 	cTexture* pDiffuse=pStatic->pDiffuse;
@@ -254,6 +283,21 @@ void cSimply3dx::SelectShadowMaterial()
 			is_alphatest=true;
 		}
 	}
+
+#ifndef _WIN32
+	// The caster's state, as cObject3dx::DrawShadowAndZbuffer builds it: only the diffuse
+	// map matters, and only to clip cutout foliage. cStaticSimply3dx::DrawShadow supplies
+	// the camera; DrawModels supplies the batch's matrices through SelectMatrix.
+	SDLObject3dxRenderer::State& st = pStatic->sdlState_;
+	st = SDLObject3dxRenderer::State();
+	st.blend = blend;
+	st.tilingWrap = true;               // sampler_wrap_anisotropic in the D3D path
+	if(is_alphatest)
+		st.texture = pDiffuse;
+
+	pStatic->sdlWorld_.assign(node_position.begin(), node_position.end());
+#else
+	gb_RenderDevice3D->SetTextureBase(1,0);
 
 	gb_RenderDevice3D->SetSamplerData(0,sampler_wrap_anisotropic);
 
@@ -278,11 +322,12 @@ void cSimply3dx::SelectShadowMaterial()
 		pShader3dx->psSkinShadowAlpha->Select();
 	}else
 		pShader3dx->psSkinShadow->Select();
-	
+
 	vs->SetUVTrans(0);
 	vs->SetSecondOpacityUVTrans(0,SECOND_UV_NONE);
 	cStaticSimply3dx::ONE_LOD& lod=pStatic->lods[iLOD];
 	vs->Select(&node_position[0],node_position.size(),lod.blend_indices);
+#endif
 }
 void cSimply3dx::SelectZBufferMaterial()
 {
@@ -328,17 +373,40 @@ void cSimply3dx::SelectZBufferMaterial()
 
 void cSimply3dx::SelectMatrix(int offset_matrix)
 {
+#ifdef _WIN32
 	pShader3dx->vsSkinNoLight->SetWorldMatrix(&node_position[0],offset_matrix,node_position.size());
+#else
+	// The batch's matrices, in the same shader-constant slots the D3D path writes: this
+	// object's nodes land at offset_matrix, and the vertices of its copy of the mesh
+	// carry blend indices biased by exactly that (cStaticSimply3dx::BuildBuffers).
+	// offset_matrix == 0 starts a fresh batch, which is what DrawObjects means by it.
+	vector<MatXf>& world = pStatic->sdlWorld_;
+	if(offset_matrix == 0)
+		world.clear();
+	if(world.size() < offset_matrix + node_position.size())
+		world.resize(offset_matrix + node_position.size());
+	std::copy(node_position.begin(), node_position.end(), world.begin() + offset_matrix);
+#endif
 }
 
 void cSimply3dx::Draw(Camera* camera)
 {
 	start_timer_auto();
-	
+
 	if(debugShowSwitch.simplyObjects)
 		return;
 
+#ifndef _WIN32
+	// A lone simply-object draws for the scene and reflection cameras. It has no caster
+	// path of its own (cStaticSimply3dx::DrawShadow is the batch's), and the planar-shadow
+	// and float-Z passes have no SDL equivalent yet.
+	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_SHADOWMAP|ATTRCAMERA_FLOAT_ZBUFFER))
+		return;
+#endif
+
 	SelectMaterial(camera);
+
+#ifdef _WIN32
 	bool draw_2pass=IsDraw2Pass();
 
 	DWORD old_zfunc;
@@ -358,10 +426,14 @@ void cSimply3dx::Draw(Camera* camera)
 //		gb_RenderDevice3D->SetRenderState(D3DRS_ZFUNC,D3DCMP_LESSEQUAL);
 		gb_RenderDevice->SetRenderState( RS_CULLMODE, -1 );
 	}
+#endif
 
 	cStaticSimply3dx::ONE_LOD& lod=pStatic->lods[iLOD];
 	pStatic->DrawModels(1,lod);
 
+#ifdef _WIN32
+	// The z prepass that keeps a fading object from blending with itself is pure D3D
+	// render-state work; the SDL pipelines carry their own depth state.
 	if(draw_2pass)
 	{
 		gb_RenderDevice3D->SetRenderState(D3DRS_ZWRITEENABLE,FALSE);
@@ -374,6 +446,7 @@ void cSimply3dx::Draw(Camera* camera)
 		gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,old_color);
 		gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE,old_cull);
 	}
+#endif
 }
 
 void cSimply3dx::PreDraw(Camera* camera)
@@ -450,6 +523,9 @@ cStaticSimply3dx::cStaticSimply3dx()
 	radius=0;
 	pActiveSceneList=0;
 	pDiffuse=0;
+#ifndef _WIN32
+	sdlCamera_=0;
+#endif
 
 	ambient.set(1,1,1,1);
 	diffuse.set(1,1,1,1);
@@ -509,7 +585,21 @@ void cStaticSimply3dx::AddCircleShadow(Vect3f Simply3dxPos,float circle_shadow_r
 void cStaticSimply3dx::DrawModels(int num_models,ONE_LOD& lod)
 {
 	int polygons = num_models*lod.ib_polygon_one_models;
+#ifdef _WIN32
 	gb_RenderDevice3D->DrawIndexedPrimitive(lod.vb,lod.vb_begin,lod.vb.GetNumberVertex(),lod.ib,lod.ib_begin,polygons);
+#else
+	// One draw for num_models copies of the mesh: they share the vertex buffer, each
+	// copy's blend indices offset into the matrices SelectMatrix accumulated.
+	if(SDLObject3dxRenderer* renderer = sdlObjectRenderer()){
+		if(sdlCamera_ && !sdlWorld_.empty()){
+			sdlState_.world = &sdlWorld_[0];
+			sdlState_.worldNum = sdlWorld_.size();
+			sdlState_.boneCount = lod.blend_indices;
+			renderer->SetState(sdlState_, sdlCamera_);
+			renderer->DrawIndexedPrimitive(lod.vb,lod.vb_begin,lod.ib,lod.ib_begin,polygons);
+		}
+	}
+#endif
 	num_out_objects+=num_models;
 	num_out_polygons+=polygons;
 }
@@ -1428,12 +1518,21 @@ void cStaticSimply3dx::Draw(Camera* camera)
 		DrawShadow(camera);
 		return;
 	}
+#ifdef _WIN32
 	if(camera->getAttribute(ATTRCAMERA_FLOAT_ZBUFFER))
 	{
 		if(Option_FloatZBufferType==2)
 			DrawZBuffer(camera);
 		return;
 	}
+#else
+	// The shadow-map camera was handled above; the reflection camera draws the batch like
+	// the scene camera does. The planar-shadow and float-Z passes have no SDL equivalent
+	// yet (DrawZBuffer is D3D-only).
+	if(camera->getAttribute(ATTRCAMERA_SHADOW|ATTRCAMERA_FLOAT_ZBUFFER))
+		return;
+#endif
+
 	vector<cSimply3dx*>& active_list=*pActiveSceneList;
 	xassert(num_visible_object<=active_list.size());
 
@@ -1448,6 +1547,11 @@ void cStaticSimply3dx::DrawShadow(Camera* camera)
 {
 	if(shadow_visible_list.empty())
 		return;
+#ifndef _WIN32
+	// SelectShadowMaterial takes no camera; DrawModels reads this one, and SDLObject3dxRenderer
+	// routes the draws to the caster pass because it carries ATTRCAMERA_SHADOWMAP.
+	sdlCamera_ = camera;
+#endif
 	shadow_visible_list[0]->SelectShadowMaterial();
 	DrawObjects(camera, shadow_visible_list.empty()?0:&shadow_visible_list[0],shadow_visible_list.size());
 }

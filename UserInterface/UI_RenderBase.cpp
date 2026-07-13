@@ -23,7 +23,10 @@ void UI_RenderBase::create()
 
 cTexture* UI_RenderBase::createTexture(const char* file_name) const
 {
-	if(gb_RenderDevice3D)
+	// "Is there a render device?", not "is it D3D". gb_RenderDevice3D is the same object
+	// as gb_RenderDevice on Windows, but stays null on the SDL backend -- which left
+	// every UI sprite with a null texture, so UI_Render::drawSprite dropped it as empty.
+	if(gb_RenderDevice)
 		return GetTexLibrary()->GetElement2D(file_name);
 	return 0;
 }
@@ -172,9 +175,14 @@ void UI_RenderBase::drawRectangle(const Rectf& rect, const Color4f& color, bool 
 	gb_RenderDevice->FlushPrimitive2D();
 }
 
+// These four convert between screen pixels and the [-0.5, 0.5] device space, and need
+// nothing but renderSize_. The original guarded each on the D3D-only gb_RenderDevice3D
+// global -- null on the SDL backend, so every one of them returned its degenerate
+// placeholder: dead mouse coordinates, and a background scene framed to a 1x1 rect.
+// Guard on the divisor instead, which is what the guard was protecting all along.
 Vect2f UI_RenderBase::deviceCoords(const Vect2i& screen_coords) const
 {
-	if(!gb_RenderDevice3D)
+	if(!renderSize_.x || !renderSize_.y)
 		return Vect2f(0,0);
 
 	return Vect2f(
@@ -184,7 +192,7 @@ Vect2f UI_RenderBase::deviceCoords(const Vect2i& screen_coords) const
 
 Rectf UI_RenderBase::deviceCoords(const Recti& screen_coords) const
 {
-	if(!gb_RenderDevice3D)
+	if(!renderSize_.x || !renderSize_.y)
 		return Rectf(0,0,1,1);
 
 	return Rectf(float(screen_coords.left()) / float(renderSize_.x),
@@ -195,7 +203,7 @@ Rectf UI_RenderBase::deviceCoords(const Recti& screen_coords) const
 
 Recti UI_RenderBase::device2screenCoords(const Rectf& device_coords) const
 {
-	if(!gb_RenderDevice3D)
+	if(!renderSize_.x || !renderSize_.y)
 		return Recti(0,0,1,1);
 
 	return Recti(
@@ -205,9 +213,6 @@ Recti UI_RenderBase::device2screenCoords(const Rectf& device_coords) const
 
 Vect2f UI_RenderBase::device2relativeCoords(const Vect2f& device_coords) const
 {
-	// This only needs renderSize_; the original guard keyed on the D3D-only
-	// gb_RenderDevice3D global, which is null on the SDL backend and collapsed
-	// every mouse coordinate to (0,0) (dead hover/clicks).
 	if(!renderSize_.x || !renderSize_.y)
 		return Vect2f::ZERO;
 

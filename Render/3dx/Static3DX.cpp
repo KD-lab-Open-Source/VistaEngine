@@ -8,9 +8,6 @@
 #include "Serialization/XPrmArchive.h"
 #include "Serialization/InPlaceArchive.h"
 #include "FileUtils/FileUtils.h"
-#ifndef _WIN32
-#include "MeshCacheGeometry.h"   // cross-platform spike: reconstruct from parsed cache
-#endif
 
 cStatic3dx::cStatic3dx(bool isLogic, const char* fname)
 : Static3dxBase(isLogic),
@@ -237,10 +234,18 @@ void StaticMaterial::createTextures(cStatic3dx* object)
 	if(gb_RenderDevice3D) // no world-render GPU device on SDL backend yet
 		gb_RenderDevice3D->SetCurrentConvertDot3Mul(10.0f);//Потом читать из файла
 
-	if(!tex_bump.empty() && gb_RenderDevice3D && gb_RenderDevice3D->IsPS20())
+	// Bump and its specular map need pixel shader 2.0. The SDL GPU backend is well past
+	// that, and has no cD3DRender to ask, so it takes them unconditionally.
+#ifdef _WIN32
+	const bool supportBump = gb_RenderDevice3D && gb_RenderDevice3D->IsPS20();
+#else
+	const bool supportBump = true;
+#endif
+
+	if(!tex_bump.empty() && supportBump)
 		pBumpTexture = object->LoadTexture(tex_bump.c_str(),"Bump");
 
-	if(!tex_specularmap.empty() && gb_RenderDevice3D && gb_RenderDevice3D->IsPS20())
+	if(!tex_specularmap.empty() && supportBump)
 		pSpecularmap = object->LoadTexture(tex_specularmap.c_str(),"Specular");
 
 	if(!tex_secondopacity.empty())
@@ -1705,144 +1710,31 @@ void cStatic3dx::StaticLod::initBuffersInPlace(const LodCache& cache, cStatic3dx
 	ib = sPtrIndexBuffer();
 
 	if(cache.vertexNumber > 0){
-		xassert(cache.vbBlock.size() == cache.vertexNumber*cache.vertexSize);
 		cSkinVertex skin_vertex = object->GetSkinVertex(GetBlendWeight());
 		gb_RenderDevice->CreateVertexBuffer(vb, cache.vertexNumber, skin_vertex.GetDeclaration());
-		memcpy(gb_RenderDevice->LockVertexBuffer(vb), cache.vbBlock.buffer(), cache.vbBlock.size());
-		gb_RenderDevice->UnlockVertexBuffer(vb);
-		xassert(vb.GetVertexSize() == cache.vertexSize);
-
+		// Never copy more than the buffer we actually allocated (vertexNumber*stride).
+		// If the reconstructed cache disagrees with the declaration stride, a raw copy
+		// of cache.vbBlock.size() would overflow the vertex buffer's staging memory and
+		// corrupt the heap; clamp so a bad model fails cleanly instead.
+		size_t dstSize = (size_t)vb.GetNumberVertex() * vb.GetVertexSize();
+		if(void* dst = gb_RenderDevice->LockVertexBuffer(vb)){
+			xassert(cache.vbBlock.size() == dstSize && vb.GetVertexSize() == cache.vertexSize);
+			memcpy(dst, cache.vbBlock.buffer(), min(dstSize, (size_t)cache.vbBlock.size()));
+			gb_RenderDevice->UnlockVertexBuffer(vb);
+		}
 	}
 
 	if(cache.polygonNumber > 0){
-		xassert(cache.ibBlock.size() == cache.polygonNumber*sizeof(sPolygon));
 		gb_RenderDevice->CreateIndexBuffer(ib, cache.polygonNumber);
-		memcpy(gb_RenderDevice->LockIndexBuffer(ib), cache.ibBlock.buffer(), cache.ibBlock.size());
-		gb_RenderDevice->UnlockIndexBuffer(ib);
-	}
-}
-
-#ifndef _WIN32
-bool cStatic3dx::reconstructFromCacheGeometry(const MeshCacheGeometry::Geometry& geo)
-{
-	if(geo.lods.empty() || geo.lods[0].empty())
-		return false;
-
-	// The hand-parsed menu geometry is the base skin-vertex format (stride 36:
-	// position / blendindices / normal / uv). No bump / second-UV / fur.
-	bump = false;
-	isUV2 = false;
-	enableFur = false;
-
-	// Materials from the parsed .3dxG bunches (indexed by imaterial). We keep only
-	// what our SDL mesh pass reads: diffuse tint, opacity, blend, diffuse texture.
-	int maxMaterial = -1;
-	for(size_t i = 0; i < geo.submeshes.size(); ++i)
-		if(geo.submeshes[i].material > maxMaterial) maxMaterial = geo.submeshes[i].material;
-	materials.clear();
-	materials.resize(maxMaterial + 1);
-	for(size_t i = 0; i < geo.submeshes.size(); ++i){
-		const MeshCacheGeometry::SubMesh& sm = geo.submeshes[i];
-		StaticMaterial& mat = materials[sm.material];
-		mat.diffuse = Color4f(sm.diffuse[0], sm.diffuse[1], sm.diffuse[2], sm.diffuse[3]);
-		mat.opacity = sm.opacity;
-		mat.transparencyType = (StaticMaterial::TransparencyType)sm.transparency;
-		mat.tex_diffuse = sm.texture.c_str();   // already the resolved cache path
-	}
-
-	// Reconstruct lod 0: build the GPU buffers in place through the same portable
-	// path the InPlace loader uses (initBuffersInPlace -> gb_RenderDevice VB/IB).
-	lods.clear();
-	lods.resize(1);
-	StaticLod& lod = lods[0];
-	lod.blend_indices = 1;   // single bone -> GetBlendWeight()==0 -> base 36B format
-
-	const MeshCacheGeometry::Lod& glod = geo.lods[0];
-	LodCache cache;
-	cache.polygonNumber = glod.polygonNumber;
-	cache.vertexNumber  = glod.vertexNumber;
-	cache.vertexSize    = glod.vertexSize;
-	cache.vbBlock.alloc((int)glod.vertexData.size());
-	memcpy(cache.vbBlock.buffer(), glod.vertexData.data(), glod.vertexData.size());
-	cache.ibBlock.alloc((int)glod.indexData.size());
-	memcpy(cache.ibBlock.buffer(), glod.indexData.data(), glod.indexData.size());
-	// Only the base skin-vertex format (stride 36 == GetSkinVertex(0)) matches our
-	// SDL mesh pipeline; build GPU buffers only for it. Richer formats (skinned/bump/
-	// uv2) would trip initBuffersInPlace's stride assert, so leave them unbuilt and
-	// let the caller fall through (object not loaded) rather than crash.
-	if(glod.vertexSize == 36)
-		lod.initBuffersInPlace(cache, this);
-
-	// Bunches (material ranges) from the parsed submeshes.
-	for(size_t i = 0; i < geo.submeshes.size(); ++i){
-		const MeshCacheGeometry::SubMesh& sm = geo.submeshes[i];
-		StaticBunch b;
-		b.offset_polygon = sm.firstIndex / 3;
-		b.num_polygon    = sm.indexCount / 3;
-		b.offset_vertex  = 0;
-		b.num_vertex     = glod.vertexNumber;
-		b.imaterial      = sm.material;
-		lod.bunches.push_back(b);
-	}
-
-	// Minimal skeleton: one identity root node. The cache VB is already in model
-	// space (a single MVP renders it correctly), so no per-node transforms are
-	// needed — cObject3dx just needs a non-empty node list to construct.
-	nodes.clear();
-	StaticNode node;
-	node.name = "_root_";
-	node.inode = 0;
-	node.iparent = -1;
-	node.inv_begin_pos = MatXf::ID;
-	nodes.push_back(node);
-
-	// Bounds from lod0 positions (float3 @0), so cObject3dx skips CalcBoundingBox.
-	if(glod.vertexNumber > 0){
-		const uint8_t* p = glod.vertexData.data();
-		Vect3f lo, hi;
-		memcpy(&lo, p, sizeof(Vect3f));
-		hi = lo;
-		for(int i = 1; i < glod.vertexNumber; ++i){
-			Vect3f v;
-			memcpy(&v, p + (size_t)i * glod.vertexSize, sizeof(Vect3f));
-			lo.x = min(lo.x, v.x); lo.y = min(lo.y, v.y); lo.z = min(lo.z, v.z);
-			hi.x = max(hi.x, v.x); hi.y = max(hi.y, v.y); hi.z = max(hi.z, v.z);
+		size_t dstSize = (size_t)ib.GetNumberPolygon() * sizeof(sPolygon);
+		if(sPolygon* dst = gb_RenderDevice->LockIndexBuffer(ib)){
+			xassert(cache.ibBlock.size() == dstSize);
+			memcpy(dst, cache.ibBlock.buffer(), min(dstSize, (size_t)cache.ibBlock.size()));
+			gb_RenderDevice->UnlockIndexBuffer(ib);
 		}
-		boundBox.min = lo;
-		boundBox.max = hi;
 	}
-	boundRadius = boundBox.max.distance(boundBox.min) * 0.5f;
-	isBoundBoxInited = true;
-
-	// Minimal animation so consumers that dereference GetChain(0)/GetAnimationGroup
-	// (e.g. cSkyObj::SetSkyModel) don't index an empty vector. There is no real
-	// animation off-Windows — a single static "main" group + chain.
-	animationChains_.clear();
-	StaticAnimationChain chain;
-	chain.name = "main";
-	chain.time = 0.f;
-	chain.begin_frame = 0;
-	chain.end_frame = 0;
-	chain.cycled = false;
-	animationChains_.push_back(chain);
-
-	animationGroups_.clear();
-	AnimationGroup ag;
-	ag.name = "main";
-	ag.nodes.push_back(0);
-	animationGroups_.push_back(ag);
-
-	return lod.vb.IsInit() && lod.ib.IsInit();
 }
 
-bool cStatic3dx::reconstructFromCache(const char* modelName)
-{
-	MeshCacheGeometry::Geometry geo;
-	if(!MeshCacheGeometry::readForModel(modelName, geo) || geo.lods.empty())
-		return false;
-	return reconstructFromCacheGeometry(geo);
-}
-#endif
 
 void cStatic3dx::serialize(Archive& ar)
 {
@@ -1855,9 +1747,359 @@ void cStatic3dx::serialize(Archive& ar)
 	ar.serialize(voxelBox, "voxelBox", "voxelBox");
 }
 
+#ifndef _WIN32
+// ---------------------------------------------------------------------------
+// Portable InPlaceIArchive::construct customizations (see InPlaceArchive.{h,cpp},
+// Util/Serialization/InPlaceArchive.md, tools/read_3dxG.py). The saved .3dxG /
+// .3dxGB is a raw 32-bit memory image; here we read its fields by their 32-bit
+// offsets and rebuild real native objects. std::string / std::vector / MemoryBlock
+// are 12-byte {begin,end,cap} headers whose pointer words hold image offsets;
+// count = (end-begin)/sizeof(element).
+// ---------------------------------------------------------------------------
+namespace {
+
+struct InPlaceReader {
+	const char* img;
+	int size;
+
+	int32_t  i32(int o) const { int32_t  v; memcpy(&v, img + o, 4); return v; }
+	uint32_t u32(int o) const { uint32_t v; memcpy(&v, img + o, 4); return v; }
+	float    f32(int o) const { float    v; memcpy(&v, img + o, 4); return v; }
+	bool     boolean(int o) const { return img[o] != 0; }
+
+	Vect2f vec2(int o) const { return Vect2f(f32(o), f32(o + 4)); }
+	Vect3f vec3(int o) const { return Vect3f(f32(o), f32(o + 4), f32(o + 8)); }
+	Color4f col4f(int o) const { return Color4f(f32(o), f32(o + 4), f32(o + 8), f32(o + 12)); }
+
+	bool inBounds(int begin, int end) const { return begin >= 0 && begin <= end && end <= size; }
+
+	string str(int o) const {
+		int32_t b = i32(o), e = i32(o + 4);
+		if(b == 0 && e == 0) return string();
+		if(!inBounds(b, e) || e - b > 65536) return string();
+		return string(img + b, img + e);
+	}
+	// std::vector header at `o`: returns element count, sets `begin` to the
+	// element-array image offset. Returns 0 for empty / unreadable headers.
+	int vec(int o, int elemSize, int& begin) const {
+		int32_t b = i32(o), e = i32(o + 4);
+		begin = b;
+		if(b == 0 && e == 0) return 0;
+		if(!inBounds(b, e) || elemSize <= 0) return 0;
+		return (e - b) / elemSize;
+	}
+};
+
+void fillStringVector(const InPlaceReader& r, int off, std::vector<string>& out) {
+	int b; int n = r.vec(off, 12, b);
+	out.clear(); out.reserve(n);
+	for(int i = 0; i < n; ++i) out.push_back(r.str(b + i * 12));
+}
+void fillIntVector(const InPlaceReader& r, int off, std::vector<int>& out) {
+	int b; int n = r.vec(off, 4, b);
+	out.clear(); out.reserve(n);
+	for(int i = 0; i < n; ++i) out.push_back(r.i32(b + i * 4));
+}
+void fillCharVector(const InPlaceReader& r, int off, std::vector<char>& out) {
+	int b; int n = r.vec(off, 1, b);
+	out.assign(r.img + b, r.img + b + (n > 0 ? n : 0));
+}
+
+MatXf readMatXf(const InPlaceReader& r, int o) {
+	MatXf m;
+	m.R.xx = r.f32(o + 0);  m.R.xy = r.f32(o + 4);  m.R.xz = r.f32(o + 8);
+	m.R.yx = r.f32(o + 12); m.R.yy = r.f32(o + 16); m.R.yz = r.f32(o + 20);
+	m.R.zx = r.f32(o + 24); m.R.zy = r.f32(o + 28); m.R.zz = r.f32(o + 32);
+	m.d = r.vec3(o + 36);
+	return m;
+}
+
+template<int N>
+void readSplineInterp(const InPlaceReader& r, int off, Interpolator3dx<SplineData<N> >& interp) {
+	const int esize = 12 + N * 16;                 // itpl,tbegin,inv_tsize + a[N*4]
+	int b; int n = r.vec(off, esize, b);
+	interp.values.resize(n);
+	for(int i = 0; i < n; ++i) {
+		int e = b + i * esize;
+		SplineData<N>& d = interp.values[i];
+		d.itpl = (ITPL)r.i32(e);
+		d.tbegin = r.f32(e + 4);
+		d.inv_tsize = r.f32(e + 8);
+		for(int j = 0; j < N * 4; ++j) d.a[j] = r.f32(e + 12 + j * 4);
+	}
+}
+void readBoolInterp(const InPlaceReader& r, int off, Interpolator3dxBool& interp) {
+	int b; int n = r.vec(off, 12, b);              // SplineDataBool: tbegin,inv_tsize,value
+	interp.values.resize(n);
+	for(int i = 0; i < n; ++i) {
+		int e = b + i * 12;
+		SplineDataBool& d = interp.values[i];
+		d.tbegin = r.f32(e);
+		d.inv_tsize = r.f32(e + 4);
+		d.value = r.i32(e + 8);
+	}
+}
+
+void readNode(const InPlaceReader& r, int base, StaticNode& node) {  // stride 80
+	node.name = r.str(base);
+	node.inode = r.i32(base + 12);
+	node.iparent = r.i32(base + 16);
+	int b; int n = r.vec(base + 20, 48, b);        // chains: vector<StaticNodeAnimation>
+	node.chains.resize(n);
+	for(int i = 0; i < n; ++i) {
+		int e = b + i * 48;
+		StaticNodeAnimation& a = node.chains[i];
+		readSplineInterp<1>(r, e + 0,  a.scale);
+		readSplineInterp<3>(r, e + 12, a.position);
+		readSplineInterp<4>(r, e + 24, a.rotation);
+		readBoolInterp(r, e + 36, a.visibility);
+	}
+	node.inv_begin_pos = readMatXf(r, base + 32);
+}
+
+void readAnimGroup(const InPlaceReader& r, int base, AnimationGroup& g) {  // stride 48
+	g.name = r.str(base);
+	fillIntVector(r, base + 12, g.nodes);
+	fillStringVector(r, base + 24, g.nodesNames);
+	fillStringVector(r, base + 36, g.materialsNames);
+}
+
+void readAnimChain(const InPlaceReader& r, int base, StaticAnimationChain& c) {  // stride 28
+	c.name = r.str(base);
+	c.time = r.f32(base + 12);
+	c.begin_frame = r.i32(base + 16);
+	c.end_frame = r.i32(base + 20);
+	c.cycled = r.boolean(base + 24);
+}
+
+void readVisGroup(const InPlaceReader& r, int base, StaticVisibilityGroup& g) {  // stride 44
+	g.name = r.str(base);
+	g.visibility = r.u32(base + 12);
+	fillCharVector(r, base + 16, g.visibleNodes);
+	fillStringVector(r, base + 28, g.meshes);
+	g.is_invisible_list = r.boolean(base + 40);
+}
+void readVisSet(const InPlaceReader& r, int base, StaticVisibilitySet& s) {  // stride 36
+	s.name = r.str(base);                          // meshes@12 is not serialized
+	int b; int n = r.vec(base + 24, 44, b);
+	s.visibilityGroups.resize(n);
+	for(int i = 0; i < n; ++i) readVisGroup(r, b + i * 44, s.visibilityGroups[i]);
+}
+
+void readMatAnim(const InPlaceReader& r, int base, StaticMaterialAnimation& a) {  // stride 36
+	readSplineInterp<1>(r, base + 0,  a.opacity);
+	readSplineInterp<6>(r, base + 12, a.uv);
+	readSplineInterp<6>(r, base + 24, a.uv_displacement);
+}
+void readMaterial(const InPlaceReader& r, int base, StaticMaterial& m) {  // stride 252
+	m.name = r.str(base);
+	m.ambient  = r.col4f(base + 12);
+	m.diffuse  = r.col4f(base + 28);
+	m.specular = r.col4f(base + 44);
+	m.opacity = r.f32(base + 60);
+	m.specular_power = max(r.f32(base + 64), 1.0f);
+	m.is_opacity_texture = r.boolean(base + 68);
+	m.tex_diffuse = r.str(base + 72);
+	m.tiling_diffuse = r.i32(base + 84);
+	m.transparencyType = (StaticMaterial::TransparencyType)r.i32(base + 88);
+	m.is_skinned = r.boolean(base + 92);
+	m.tex_skin = r.str(base + 96);
+	m.tex_bump = r.str(base + 108);
+	m.tex_reflect = r.str(base + 124);
+	m.reflect_amount = r.f32(base + 140);
+	m.is_reflect_sky = r.boolean(base + 144);
+	m.tex_specularmap = r.str(base + 152);
+	m.tex_self_illumination = r.str(base + 164);
+	m.tex_secondopacity = r.str(base + 180);
+	m.animation_group_index = r.i32(base + 192);
+	m.no_light = r.boolean(base + 196);
+	int b; int n = r.vec(base + 200, 36, b);       // chains
+	m.chains.resize(n);
+	for(int i = 0; i < n; ++i) readMatAnim(r, b + i * 36, m.chains[i]);
+	m.fur_scale = r.f32(base + 216);
+	m.fur_alpha = r.f32(base + 220);
+	m.tex_furmap = r.str(base + 224);
+	m.tex_furnormalmap = r.str(base + 236);
+	m.fur_alpha_type = (FurInfo::FurType)r.i32(base + 248);
+	m.diffuse.a = m.opacity;                       // mirror StaticMaterial::serialize
+	const float min_ambient = 0.65f;
+	m.is_big_ambient = m.ambient.r > min_ambient || m.ambient.g > min_ambient || m.ambient.b > min_ambient;
+}
+
+void readEffect(const InPlaceReader& r, int base, StaticEffect& e) {  // stride 20
+	e.node = r.i32(base);
+	e.is_cycled = r.boolean(base + 4);
+	e.file_name = r.str(base + 8);
+}
+void readLight(const InPlaceReader& r, int base, StaticLight& l) {  // stride 56
+	l.inode = r.i32(base);
+	l.color = r.col4f(base + 4);
+	l.atten_start = r.f32(base + 20);
+	l.atten_end = r.f32(base + 24);
+	int b; int n = r.vec(base + 28, 12, b);        // chains: vector<StaticLightAnimation>
+	l.chains.resize(n);
+	for(int i = 0; i < n; ++i) readSplineInterp<4>(r, b + i * 12, l.chains[i].color);
+	l.texture = r.str(base + 40);
+}
+void readLeaf(const InPlaceReader& r, int base, StaticLeaf& l) {  // stride 52
+	l.inode = r.i32(base);
+	l.color = r.col4f(base + 4);
+	l.size = r.f32(base + 20);
+	l.texture = r.str(base + 24);
+	fillIntVector(r, base + 40, l.lods);
+}
+void readLogo(const InPlaceReader& r, int base, sLogo& lo) {  // stride 36
+	lo.rect.min = r.vec2(base);
+	lo.rect.max = r.vec2(base + 8);
+	lo.TextureName = r.str(base + 16);
+	lo.angle = r.f32(base + 28);
+}
+void readBoundSphere(const InPlaceReader& r, int base, cStatic3dx::BoundSphere& s) {  // stride 20
+	s.node_index = r.i32(base);
+	s.position = r.vec3(base + 4);
+	s.radius = r.f32(base + 16);
+}
+void readBox6f(const InPlaceReader& r, int base, sBox6f& box) {  // stride 24
+	box.min = r.vec3(base);
+	box.max = r.vec3(base + 12);
+}
+
+void readTVG(const InPlaceReader& r, int base, cTempVisibleGroup& v) {  // stride 20
+	v.visibilitySet = r.i32(base);
+	v.visibilities = r.u32(base + 4);
+	v.begin_polygon = r.i32(base + 8);
+	v.num_polygon = r.i32(base + 12);
+	v.visibilityNodeIndex = r.i32(base + 16);
+}
+void readBunch(const InPlaceReader& r, int base, StaticBunch& bun) {  // stride 44
+	bun.offset_polygon = r.i32(base);
+	bun.num_polygon = r.i32(base + 4);
+	bun.offset_vertex = r.i32(base + 8);
+	bun.num_vertex = r.i32(base + 12);
+	bun.imaterial = r.i32(base + 16);
+	fillIntVector(r, base + 20, bun.nodeIndices);
+	int b; int n = r.vec(base + 32, 20, b);        // visibleGroups
+	bun.visibleGroups.resize(n);
+	for(int i = 0; i < n; ++i) readTVG(r, b + i * 20, bun.visibleGroups[i]);
+}
+void readLod(const InPlaceReader& r, int base, cStatic3dx::StaticLod& lod) {  // stride 32
+	lod.blend_indices = r.i32(base + 8);           // ib/vb are rebuilt from the .3dxGB
+	int b; int n = r.vec(base + 12, 44, b);         // bunches
+	lod.bunches.resize(n);
+	for(int i = 0; i < n; ++i) readBunch(r, b + i * 44, lod.bunches[i]);
+}
+
+template<class T>
+void readStructVector(const InPlaceReader& r, int off, int stride, std::vector<T>& out,
+                      void(*read)(const InPlaceReader&, int, T&)) {
+	int b; int n = r.vec(off, stride, b);
+	out.resize(n);
+	for(int i = 0; i < n; ++i) read(r, b + i * stride, out[i]);
+}
+
+} // namespace
+
+// --- .3dxGB LodsCache ---
+cStatic3dx::LodsCache* inPlaceReconstruct(cStatic3dx::LodsCache*, const char* image, int size)
+{
+	InPlaceReader r{image, size};
+	auto readLodCache = [&](int base, cStatic3dx::LodCache& lod){
+		lod.polygonNumber = r.i32(base + 0);
+		lod.vertexNumber  = r.i32(base + 4);
+		lod.vertexSize    = r.i32(base + 8);
+		auto readBlock = [&](int mbOff, MemoryBlock& block){
+			int32_t off = r.i32(mbOff), sz = r.i32(mbOff + 4);
+			if(sz > 0 && off >= 0 && off + sz <= size){ block.alloc(sz); memcpy(block.buffer(), image + off, sz); }
+		};
+		readBlock(base + 12, lod.ibBlock);
+		readBlock(base + 24, lod.vbBlock);
+	};
+
+	cStatic3dx::LodsCache* cache = new cStatic3dx::LodsCache;
+	int b; int n = r.vec(0, 36, b);                // LodsCache: vector<LodCache> lods@0
+	cache->lods.resize(n);
+	for(int i = 0; i < n; ++i) readLodCache(b + i * 36, cache->lods[i]);
+	readLodCache(12, cache->debris);               // debris LodCache is inline in the root
+	return cache;
+}
+
+// --- .3dxG full cStatic3dx tree ---
+cStatic3dx* inPlaceReconstruct(cStatic3dx*, const char* image, int size)
+{
+	InPlaceReader r{image, size};
+
+	// is_logic (offset 205) and fileName_ (offset 248) come from the image; the
+	// ctor needs them. Everything else is filled below.
+	bool is_logic = r.boolean(205);
+	string fname = r.str(248);
+	cStatic3dx* o = new cStatic3dx(is_logic, fname.c_str());
+	o->DecRef();   // saved image has m_cRef==0 (saveInPlace zeroes refs); mirror it
+
+	// ---- Static3dxBase (subobject at image offset 8) ----
+	o->version = r.i32(8);
+	o->maxWeights = r.i32(12);
+	fillStringVector(r, 16, o->nonDeleteNodes);
+	fillStringVector(r, 28, o->logicNodes);
+	fillStringVector(r, 40, o->boundNodes);
+	readStructVector(r, 64, 48, o->animationGroups_, readAnimGroup);
+	readStructVector(r, 76, 28, o->animationChains_, readAnimChain);
+	readStructVector(r, 52, 80, o->nodes, readNode);
+	readStructVector(r, 88, 36, o->visibilitySets_, readVisSet);
+	readStructVector(r, 100, 252, o->materials, readMaterial);
+
+	o->isBoundBoxInited = r.boolean(112);
+	o->boundBox.min = r.vec3(116);
+	o->boundBox.max = r.vec3(128);
+	o->boundRadius = r.f32(140);
+	readStructVector(r, 144, 24, o->localLogicBounds, readBox6f);
+	readStructVector(r, 224, 20, o->boundSpheres, readBoundSphere);
+	readStructVector(r, 156, 36, o->logos.logos, readLogo);
+	readStructVector(r, 168, 20, o->effects, readEffect);
+	readStructVector(r, 180, 56, o->lights, readLight);
+	readStructVector(r, 192, 52, o->leaves, readLeaf);
+
+	o->is_lod = r.boolean(204);
+	o->is_logic = r.boolean(205);
+	o->is_old_model = r.boolean(206);
+	o->loaded = r.boolean(207);
+	o->circle_shadow_enable     = (StaticObjectShadowType)r.i32(208);
+	o->circle_shadow_enable_min = (StaticObjectShadowType)r.i32(212);
+	o->circle_shadow_height = r.i32(216);
+	o->circle_shadow_radius = r.f32(220);
+	o->bump = r.boolean(236);
+	o->isUV2 = r.boolean(237);
+	o->enableFur = r.boolean(238);
+	o->cameraParams.camera_node_num = r.i32(240);
+	o->cameraParams.fov = r.f32(244);
+
+	// ---- cStatic3dx own members ----
+	readStructVector(r, 296, 32, o->lods, readLod);
+	readLod(r, 308, o->debris);
+
+	// voxelBox @352: valid_@0 sizeLen_@4 size_@8 mask_@12 scale_@16 scaleInv_@28
+	//               offset_@40 buffer_(MemoryBlock)@52
+	{
+		int vb = 352;
+		int32_t bufOff = r.i32(vb + 52), bufSz = r.i32(vb + 56);
+		const void* buf = (bufSz > 0 && r.inBounds(bufOff, bufOff + bufSz)) ? image + bufOff : 0;
+		o->voxelBox.reconstructInPlace(
+			r.boolean(vb + 0), r.i32(vb + 4), r.i32(vb + 8), r.i32(vb + 12),
+			r.vec3(vb + 16), r.vec3(vb + 28), r.vec3(vb + 40), buf, bufSz);
+	}
+
+	return o;
+}
+#endif
+
 void cStatic3dx::constructInPlace(const char* fileName)
 {
+#ifdef _WIN32
+	// Windows: the object is the relocated image blob; mark it so Release() frees
+	// the blob instead of running destructors on members that alias it.
 	inPlace_ = true;
+#endif
+	// Off-Windows the object is a real native cStatic3dx (inPlace_ stays false),
+	// so Release() takes the normal destructor path.
 
 	if(!is_logic){
 		LodsCache* cache = 0;
@@ -1866,14 +2108,25 @@ void cStatic3dx::constructInPlace(const char* fileName)
 			ia.construct(cache);
 		xassert(cache);
 
-		int i = 0;
-		Lods::iterator iLod;
-		FOR_EACH(lods, iLod)
-			iLod->initBuffersInPlace(cache->lods[i++], this);
+		if(cache){
+			int i = 0;
+			Lods::iterator iLod;
+			FOR_EACH(lods, iLod){
+				// The .3dxG tree and the .3dxGB LodsCache are written with matching LOD
+				// counts (saveInPlace). If a reconstruction mismatch breaks that, stop
+				// rather than index cache->lods out of bounds and memcpy garbage blocks.
+				if(i >= (int)cache->lods.size()){
+					dprintf("cStatic3dx::constructInPlace: LOD/cache mismatch %s (%d vs %d)\n",
+						fileName, (int)lods.size(), (int)cache->lods.size());
+					break;
+				}
+				iLod->initBuffersInPlace(cache->lods[i++], this);
+			}
 
-		debris.initBuffersInPlace(cache->debris, this);
+			debris.initBuffersInPlace(cache->debris, this);
 
-		InPlaceIArchive::destruct(cache);
+			InPlaceIArchive::destruct(cache);
+		}
 
 		createTextures();
 		CreateDebrises();

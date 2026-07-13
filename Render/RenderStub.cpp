@@ -55,10 +55,10 @@ ManagedResource::~ManagedResource() {}
 // (mirrors the Windows D3DRender.cpp bodies), so the SDL backend owns the GPU
 // buffers behind the slot and releases them on Destroy/dtor.
 //
-// The gb_RenderDevice guard matters for handles with *static storage duration*
-// (e.g. TerrainRenderSDL.cpp's s_vb/s_ib): Runtime::done() releases the device
-// with RELEASE(gb_RenderDevice), which nulls the global, so by the time __cxa_
-// finalize runs these dtors at exit the device is already gone. cSDLRenderDevice::
+// The gb_RenderDevice guard matters for handles with *static storage duration*:
+// Runtime::done() releases the device with RELEASE(gb_RenderDevice), which nulls
+// the global, so by the time __cxa_finalize runs these dtors at exit the device is
+// already gone. cSDLRenderDevice::
 // Done() has by then released every GPU buffer and cleared vbGpu_/ibGpu_, so there
 // is nothing left to route -- skipping leaks only the tiny sSlot heap node, which
 // the process exit reclaims anyway. Without the guard the null-device virtual call
@@ -111,7 +111,14 @@ void cD3DRender::RegisterVertexDeclaration(LPDIRECT3DVERTEXDECLARATION9& declara
 // ---------------------------------------------------------------------------
 // DrawStrip / PoolManager
 // ---------------------------------------------------------------------------
-void DrawStrip::Begin() {}
+// DrawStrip has no off-Windows implementation: its Set() is an inline in
+// Render/D3D/VertexBuffer.h that writes straight into a locked cVertexBuffer, and there is
+// no such buffer here. These bodies exist only so the class still links -- and they leave
+// `buf` null and `pointer` uninitialised, so the first Set() writes through a garbage
+// pointer. Every off-Windows caller therefore takes SDLWorldQuadRenderer's triangle route
+// instead (cUnkLight::Draw, CircleManager::Layer::drawSpline, Lighting::OneLight::Draw);
+// the assert is here to catch a new one before it corrupts the heap.
+void DrawStrip::Begin() { xassert(0 && "DrawStrip is Windows-only: use SDLWorldQuadRenderer"); }
 void DrawStrip::End() {}
 
 PoolManager::PoolManager() {}
