@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "PhysicsMath.h"
 #include "Serialization/Serialization.h"
 

@@ -10,7 +10,7 @@
 
 #include "XMath/xmath.h"
 #include "xutil.h"
-#include "xzip.h"
+#include "XZip.h"
 #include "Profiler.h"
 
 #include <vector>

@@ -1,7 +1,7 @@
 #ifndef __AUXINLINEFUCTION_H__
 #define __AUXINLINEFUCTION_H__
 
-#include "VMap.h"
+#include "VMAP.H"
 
 inline int getDistX(int v0,int v1)
 {

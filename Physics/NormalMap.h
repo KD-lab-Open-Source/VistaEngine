@@ -1,7 +1,7 @@
 #ifndef __NORMAL_MAP_H_INCLUDED__
 #define __NORMAL_MAP_H_INCLUDED__
 
-#include "Terra/vmap.h"
+#include "Terra/VMAP.H"
 #include "Water/ice.h"
 #include "Environment/Environment.h"
 

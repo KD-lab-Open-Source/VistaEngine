@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "Serialization/Serialization.h"
 #include "WindMap.h"
 #include "NormalMap.h"

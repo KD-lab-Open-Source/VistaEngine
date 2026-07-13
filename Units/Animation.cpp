@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Universe.h"
 #include "Animation.h"
 #include "Serialization/Serialization.h"
@@ -6,7 +6,7 @@
 #include "BaseUnit.h"
 #include "Sound.h"
 #include "GlobalAttributes.h"
-#include "Terra/vMap.h"
+#include "Terra/VMAP.H"
 
 PhaseController::PhaseController() :
 	phase_(0.0f),

@@ -10,7 +10,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "stdafx.h"
 #include "XMath/xmath.h"
-#include "XUtil.h"
+#include "xutil.h"
 
 #pragma warning(disable : 4073 )
 #pragma init_seg(lib)

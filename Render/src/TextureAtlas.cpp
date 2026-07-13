@@ -1,4 +1,4 @@
-#include <my_stl.h>
+#include <my_STL.h>
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 #include <windows.h>
 //#include "StdAfxRD.h"
@@ -7,7 +7,7 @@
 using namespace std;
 #include "XMath/xmath.h"
 #include <xutil.h>
-#include "Render/3dx/umath.h"
+#include "Render/3dx/Umath.h"
 #include "TextureAtlas.h"
 
 cTextureAtlas::cTextureAtlas()

@@ -1,7 +1,7 @@
 
 #ifndef __XGLOBAL_H
 #define __XGLOBAL_H
-#include <my_stl.h>
+#include <my_STL.h>
 
 #include <windows.h>
 #include <process.h>
@@ -14,7 +14,7 @@
 
 #define _XUTIL_NO_AUTOMATIC_LIB
 #include "_xtool.h"
-#include "xmsgbuf.h"
+#include "XMSGBUF.H"
 
 #endif
 

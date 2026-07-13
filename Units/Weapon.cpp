@@ -13,7 +13,7 @@
 #include "UnitAttribute.h"
 #include "Serialization/ResourceSelector.h"
 #include "Water/Water.h"
-#include "Water/Ice.h"
+#include "Water/ice.h"
 #include "Environment/Environment.h"
 #include "Environment/SourceManager.h"
 #include "Environment/SourceTeleport.h"
@@ -29,7 +29,7 @@
 #include "Serialization/RadianWrapper.h"
 #include "Serialization/RangedWrapper.h"
 #include "Serialization/SerializationFactory.h"
-#include "Terra/vMap.h"
+#include "Terra/VMAP.H"
 #include "Render/src/Scene.h"
 
 #include "Serialization/Factory.h"

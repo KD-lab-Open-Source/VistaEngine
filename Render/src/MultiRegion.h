@@ -2,7 +2,7 @@
 #define __MULTI_REGION_H_INCLUDED__
 
 #include <vector>
-#include "XUtil.h"
+#include "xutil.h"
 #include "MTSection.h"
 #include "Render/inc/rd.h"
 

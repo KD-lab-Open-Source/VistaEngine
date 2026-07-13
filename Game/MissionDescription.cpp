@@ -1,5 +1,6 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include <random>
+#include <chrono>
 #include "NetPlayer.h"
 #include "crc.h"
 #include "NetCommands.h"
@@ -19,7 +20,7 @@
 #include "FileUtils/FileUtils.h"
 #include "UnicodeConverter.h"
 #include "WBuffer.h"
-#include "Terra/vMap.h"
+#include "Terra/VMAP.H"
 #include <mmsystem.h>
 
 
@@ -1053,8 +1054,11 @@ void MissionDescription::shufflePlayers()
 		int indices[NETWORK_PLAYERS_MAX];
 		for(int i = 0; i < playersAmountMax(); i++)
 			indices[i] = i;
-		srand(timeGetTime());
-		std::shuffle(&indices[0], &indices[0] + playersAmountMax(), std::mt19937(timeGetTime()));
+		// steady_clock, not timeGetTime(): this is only a seed, and timeGetTime is
+		// Windows multimedia — it would mean linking winmm.lib for a random number.
+		const unsigned seed = (unsigned)std::chrono::steady_clock::now().time_since_epoch().count();
+		srand(seed);
+		std::shuffle(&indices[0], &indices[0] + playersAmountMax(), std::mt19937(seed));
 		//for(int i = 0; i < playersAmountMax(); i++)
 		//	playersData_[i].shuffleIndex = indices[i];
 		for(int i = 0; i < playersAmountMax(); i++)

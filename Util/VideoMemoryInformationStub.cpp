@@ -14,7 +14,7 @@ int GetVideoMemory()
 
 bool CheckDeviceType(IDirect3D9* /*lpD3D*/, int /*xscr*/, int /*yscr*/,
 	bool /*fullscreen*/, bool /*stencil*/, bool /*alpha*/,
-	std::vector<DWORD>* multisamplemode)
+	std::vector<uint32_t>* multisamplemode)
 {
 	// No multisample modes advertised; the requested mode is "supported".
 	if(multisamplemode)

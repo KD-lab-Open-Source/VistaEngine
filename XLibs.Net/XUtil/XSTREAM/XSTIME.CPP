@@ -1,6 +1,6 @@
-#include "xglobal.h"
+#include "XGLOBAL.H"
 
-static char *timeMSG="FILE GET TIME ERROR";
+static const char*timeMSG="FILE GET TIME ERROR";
 
 void XStream::gettime(unsigned& fdate,unsigned& ftime)
 {

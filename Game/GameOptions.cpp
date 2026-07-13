@@ -12,7 +12,7 @@
 #include "Game/SoundApp.h"
 #include "UserInterface/UI_Logic.h"
 #include "VistaRender/postEffects.h"
-#include "Render/Src/TexLibrary.h"
+#include "Render/src/TexLibrary.h"
 #include "Render/src/Scene.h"
 #include "Render/src/Grass.h"
 #include "Render/src/VisGeneric.h"

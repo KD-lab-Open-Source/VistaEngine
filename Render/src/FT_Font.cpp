@@ -5,7 +5,7 @@
 #include "Texture.h"
 #include <math.h>
 
-void dprintfW(wchar_t *format, ...);
+void dprintfW(const wchar_t *format, ...);
 
 // расстояние между буквами в текстуре
 #define GLYPH_PAD_SPACE 2

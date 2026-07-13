@@ -1,6 +1,13 @@
 #ifndef __SYSTEM_UTIL_H__
 #define __SYSTEM_UTIL_H__
 
+#ifdef _WIN32
+// GetAsyncKeyState, VK_SHIFT/VK_CONTROL/VK_MENU and HWND, all named below. Off-Windows
+// the force-included WindowsAPI.h shim declares them; on Windows nothing had, because
+// the only file that includes this header is now SystemUtilPortable.cpp.
+#include <windows.h>
+#endif
+
 /////////////////////////////////////////////////////////////////////////////////
 //		Memory check
 /////////////////////////////////////////////////////////////////////////////////

@@ -7,12 +7,15 @@ bool RenderFileRead(const char *fname,char *&buf,int &size);//Читает фа�
 class CLoadDirectoryFileRender : public CLoadDirectory
 {
 public:
-	CLoadDirectoryFileRender::CLoadDirectoryFileRender()
+	// Unqualified: naming the class again inside its own definition
+	// (CLoadDirectoryFileRender::CLoadDirectoryFileRender) was an old MSVC extension,
+	// and a conforming MSVC now reads it as an explicit override (C3241/C3254).
+	CLoadDirectoryFileRender()
 		:CLoadDirectory(0,0)
 	{
 	}
 
-	CLoadDirectoryFileRender::~CLoadDirectoryFileRender()
+	~CLoadDirectoryFileRender()
 	{
 		delete begin;
 	}

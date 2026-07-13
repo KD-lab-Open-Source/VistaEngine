@@ -4,8 +4,8 @@
 #include "XTL/Map2D.h"
 #include "XTL/UniqueVector.h"
 #include "XTL/StaticMap.h"
-#include "Render/Inc/IRenderDevice.h"
-#include "Render/Src/UnkObj.h"
+#include "Render/inc/IRenderDevice.h"
+#include "Render/src/UnkObj.h"
 
 struct sVertexXYZDT2;
 

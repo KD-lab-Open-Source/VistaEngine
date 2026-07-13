@@ -1,7 +1,7 @@
 #ifndef __KEYBOARD_DRIVER_
 #define __KEYBOARD_DRIVER_
 
-#include <Windows.h>
+#include <windows.h>
 
 typedef unsigned int utf32_char;
 

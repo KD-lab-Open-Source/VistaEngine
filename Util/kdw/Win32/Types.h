@@ -2,47 +2,13 @@
 #define __KDW_WIN32_TYPES_H_INCLUDED__
 
 #ifdef _WIN32
-// Windows: use real types from windows.h (included via force-include or transitively)
-typedef unsigned long       DWORD;
-typedef int                 BOOL;
-typedef unsigned char       BYTE;
-typedef unsigned short      WORD;
-typedef float               FLOAT;
-typedef long				LONG;
-
-typedef int                 INT;
-typedef unsigned int        UINT;
-
-typedef __w64 unsigned int       UINT_PTR;
-typedef __w64 long				LONG_PTR;
-
-typedef UINT_PTR            WPARAM;
-typedef LONG_PTR            LPARAM;
-typedef LONG_PTR            LRESULT;
-
-typedef DWORD   COLORREF;
-
-struct HWND__;
-typedef HWND__* HWND;
-struct HDC__;
-typedef HDC__* HDC;
-struct HMENU__;
-typedef HMENU__* HMENU;
-struct HBITMAP__;
-typedef HBITMAP__* HBITMAP;
-struct HRGN__;
-typedef HRGN__* HRGN;
-struct HFONT__;
-typedef HFONT__* HFONT;
-struct HINSTANCE__;
-typedef HINSTANCE__* HINSTANCE;
-struct HACCEL__;
-typedef HACCEL__* HACCEL;
-struct _IMAGELIST;
-typedef struct _IMAGELIST* HIMAGELIST;
-struct tagRECT;
-typedef tagRECT RECT;
-// ^^^ ��� ��� ����� �������� �� #include <windows.h>
+// The SDK's own types. This header used to hand-roll the lot of them to avoid
+// including windows.h — and declared UINT_PTR and LONG_PTR as 32-bit ints, which a
+// 64-bit build rejects outright: basetsd.h makes them pointer-sized. The game only
+// parses these headers (kdw itself is no longer built anywhere, see Util/CMakeLists),
+// so let the SDK be the one source of truth for them.
+#include <windows.h>
+#include <commctrl.h>	// HIMAGELIST
 #endif // _WIN32
 
 

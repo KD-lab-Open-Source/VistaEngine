@@ -7,7 +7,10 @@
 class Archive;
 
 class FormulaString{
-	friend struct  Calculator;
+	// No `friend struct Calculator` any more. It named the Boost.Spirit parser that
+	// FormulaString.cpp no longer has, and all it did was declare a phantom
+	// ::Calculator that the replacement parser's own (anonymous-namespace) Calculator
+	// is then ambiguous with.
 public:
 
 	enum EvalResult {

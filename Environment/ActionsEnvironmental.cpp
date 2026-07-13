@@ -10,7 +10,7 @@
 #include "RenderObjects.h"
 #include "Water/SkyObject.h"
 #include "Water/CoastSprites.h"
-#include "vMap.h"
+#include "VMAP.H"
 #include "GameOptions.h"
 #include "Game/SoundApp.h"
 #include "Game/Universe.h"

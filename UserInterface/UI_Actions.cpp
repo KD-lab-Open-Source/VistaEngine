@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "UI_Actions.h"
 #include "UserInterface/SelectManager.h"
 #include "VistaRender/postEffects.h"

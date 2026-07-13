@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include <random>
 #include "ReelManager.h"
 #include "RenderObjects.h"
@@ -7,10 +7,10 @@
 #include "GameShell.h"
 #include "VistaRender/postEffects.h"
 #include "Units/GlobalAttributes.h"
-#include "bubles/blobs.h"
-#include "bubles/cell.h"
-#include "Render/Src/cCamera.h"
-#include "Render/Src/TexLibrary.h"
+#include "Bubles/Blobs.h"
+#include "Bubles/Cell.h"
+#include "Render/src/cCamera.h"
+#include "Render/src/TexLibrary.h"
 #include "Render/D3D/D3DRender.h"
 #include "Render/src/NParticle.h"
 #include "Render/src/Scene.h"
@@ -27,7 +27,7 @@ Vect2i mousePosition()
 		POINT pt;
 		GetCursorPos(&pt);
 		if(ScreenToClient(gb_RenderDevice->GetWindowHandle(), &pt))
-			return Vect2i(pt.x, pt.y);
+			return Vect2i((int)pt.x, (int)pt.y);	// POINT fields are LONG on Windows
 	}
 
 	return Vect2i(0, 0);

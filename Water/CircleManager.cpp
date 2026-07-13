@@ -1,12 +1,12 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "CircleManager.h"
 #include "Serialization/ResourceSelector.h"
 #include "Render/D3D/D3DRender.h"
-#include "Render/Src/cCamera.h"
+#include "Render/src/cCamera.h"
 #include "Render/SDLWorldQuadRenderer.h"   // the splines are drawn by SDLWorldQuadRenderer,
 #include "Render/SDLRenderDevice.h"        // reached via cSDLRenderDevice::drawWorldQuads
 #include "Water/Water.h"
-#include "Terra/vMap.h"
+#include "Terra/VMAP.H"
 #include "Serialization/EnumDescriptor.h"
 
 BEGIN_ENUM_DESCRIPTOR(CircleManagerDrawOrder, "CircleManagerDrawOrder")

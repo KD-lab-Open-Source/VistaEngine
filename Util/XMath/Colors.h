@@ -1,6 +1,6 @@
 #pragma once
 
-#include "XMath.h"
+#include "xmath.h"
 #include <cstdint>
 
 class Archive;

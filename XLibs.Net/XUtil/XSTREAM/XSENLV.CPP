@@ -1,8 +1,8 @@
-#include "xglobal.h"
+#include "XGLOBAL.H"
 
-static char* openMSG	 = "CREATE/OPEN FAILURE";
-static char* closeMSG	 = "CLOSE FAILURE";
-static char* appendMSG	 = "APPENDING FAILURE";
+static const char* openMSG	 = "CREATE/OPEN FAILURE";
+static const char* closeMSG	 = "CLOSE FAILURE";
+static const char* appendMSG	 = "APPENDING FAILURE";
 
 bool XStream::open(const char* name, unsigned f)
 {

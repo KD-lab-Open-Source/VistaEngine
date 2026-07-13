@@ -11,6 +11,7 @@
 
 #ifndef MAKEDEPEND
 # include <iterator>
+# include <ios>		// std::ios_base::failbit, used below via _IOS_FAILBIT
 #endif
 
 static

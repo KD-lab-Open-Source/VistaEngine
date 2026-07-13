@@ -1,7 +1,7 @@
 
 /* ---------------------------- INCLUDE SECTION ----------------------------- */
 
-#include "xglobal.h"
+#include "XGLOBAL.H"
 
 /* ----------------------------- STRUCT SECTION ----------------------------- */
 /* ----------------------------- EXTERN SECTION ----------------------------- */
@@ -9,7 +9,7 @@
 /* --------------------------- PROTOTYPE SECTION ---------------------------- */
 /* --------------------------- DEFINITION SECTION --------------------------- */
 
-char *memoutMSG = "OUT OF MEMORY";
+const char* memoutMSG = "OUT OF MEMORY";
 
 static unsigned int XRndValue = 83838383;
 

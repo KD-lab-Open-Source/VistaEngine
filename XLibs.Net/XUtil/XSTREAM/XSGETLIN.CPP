@@ -1,4 +1,4 @@
-#include "xglobal.h"
+#include "XGLOBAL.H"
 
 char* XStream::getline(char* buf, unsigned len)
 {

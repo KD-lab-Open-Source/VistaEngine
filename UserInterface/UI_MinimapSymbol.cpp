@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "UI_MinimapSymbol.h"
 #include "Render/src/Texture.h"
 #include "Serialization/Serialization.h"

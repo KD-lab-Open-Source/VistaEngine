@@ -87,22 +87,12 @@ GameOptions::GameOptions()
 	resolutions_.push_back(Vect2i(6400, 4800)); //HUXGA
 	resolutions_.push_back(Vect2i(7680, 4800)); //WHUXGA
 
-	antialiasModes_.push_back(D3DMULTISAMPLE_NONE);
-	antialiasModes_.push_back(D3DMULTISAMPLE_2_SAMPLES);
-	antialiasModes_.push_back(D3DMULTISAMPLE_3_SAMPLES);
-	antialiasModes_.push_back(D3DMULTISAMPLE_4_SAMPLES);
-	antialiasModes_.push_back(D3DMULTISAMPLE_5_SAMPLES);
-	antialiasModes_.push_back(D3DMULTISAMPLE_6_SAMPLES);
-	antialiasModes_.push_back(D3DMULTISAMPLE_7_SAMPLES);
-	antialiasModes_.push_back(D3DMULTISAMPLE_8_SAMPLES);
-	antialiasModes_.push_back(D3DMULTISAMPLE_9_SAMPLES);
-	antialiasModes_.push_back(D3DMULTISAMPLE_10_SAMPLES);
-	antialiasModes_.push_back(D3DMULTISAMPLE_11_SAMPLES);
-	antialiasModes_.push_back(D3DMULTISAMPLE_12_SAMPLES);
-	antialiasModes_.push_back(D3DMULTISAMPLE_13_SAMPLES);
-	antialiasModes_.push_back(D3DMULTISAMPLE_14_SAMPLES);
-	antialiasModes_.push_back(D3DMULTISAMPLE_15_SAMPLES);
-	antialiasModes_.push_back(D3DMULTISAMPLE_16_SAMPLES);
+	// The same 16 entries as before, by value: these were the D3DMULTISAMPLE_TYPE
+	// enumerators, and each one equals its sample count (NONE is 0). 1 is skipped —
+	// it was D3DMULTISAMPLE_NONMASKABLE, not a sample count at all.
+	antialiasModes_.push_back(0);
+	for(int samples = 2; samples <= 16; ++samples)
+		antialiasModes_.push_back(samples);
 
 	anisatropicFiltering_.push_back(0);
 	anisatropicFiltering_.push_back(2);
@@ -294,7 +284,7 @@ void GameOptions::filterBaseGraphOptions()
 	OptionPrm& prmAA = gameOptionPrms_[OPTION_ANTIALIAS];
 	dassert(antialiasModes_.size() == prmAA.valid_.size());
 
-	vector<DWORD> AAmask;
+	vector<uint32_t> AAmask;	// see VideoMemoryInformation.h: DWORD is not declared on every platform
 	::CheckDeviceType(0, currentResolution_.x, currentResolution_.y, true, true, false, &AAmask);
 	
 	for(int i = 1; i < antialiasModes_.size(); ++i)

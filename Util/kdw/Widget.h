@@ -4,7 +4,7 @@
 #include "kdw/API.h"
 
 #include "XTL/Rect.h"
-#include "xMath.h"
+#include "xmath.h"
 
 #include "XTL/sigslot.h"
 #include "Handle.h"

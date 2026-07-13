@@ -1,9 +1,10 @@
 #include "StdAfxRD.h"
+#include <cstdarg>	// va_start/va_list; libc++ pulls this in transitively, glibc does not
 #include "VisGeneric.h"
 #include "Scene.h"
 #include "D3DRender.h"
 #include "Render/3dx/Lib3dx.h"
-#include "Render/Src/VisGeneric.h"
+#include "Render/src/VisGeneric.h"
 #include "kdw/PropertyEditor.h"
 #include "Serialization/XPrmArchive.h"
 #include "Serialization/EnumDescriptor.h"
@@ -315,7 +316,7 @@ bool cVisGeneric::shadowEnabled() const
 	return Option_shadowEnabled;
 }
 
-RENDER_API void dprintf(char *format, ...)
+RENDER_API void dprintf(const char *format, ...)
 {
   va_list args;
   char    buffer[512];

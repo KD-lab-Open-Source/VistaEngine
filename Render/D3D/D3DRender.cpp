@@ -1456,7 +1456,7 @@ void cD3DRender::DrawSprite2(int x1,int y1,int dx,int dy,
 }
 
 
-void cD3DRender::OutText(int x,int y,const char *string,int r,int g,int b,char *FontName,int size,int bold,int italic,int underline)
+void cD3DRender::OutText(int x,int y,const char *string,int r,int g,int b,const char *FontName,int size,int bold,int italic,int underline)
 {
 	HDC hDC=0;
     HFONT hFont=CreateFont(size,0,0,0,bold?FW_BOLD:FW_NORMAL,italic,underline,0, ANSI_CHARSET,

@@ -1,6 +1,6 @@
 #include "stdafxTr.h"
 #include "tgai.h"
-#include "Serialization/serialization.h"
+#include "Serialization/Serialization.h"
 
 void TGAHEAD::save3layers(const char* fname,int sizeX,int sizeY,unsigned char* Ra,unsigned char* Ga,unsigned char* Ba)
 {
@@ -10,7 +10,7 @@ void TGAHEAD::save3layers(const char* fname,int sizeX,int sizeY,unsigned char* R
 	Height=(short)sizeY;
 	ff.write(this,sizeof(TGAHEAD));
 	unsigned char *line = new unsigned char[sizeX*3],*p;
-	register unsigned int i,j;
+	unsigned int i,j;
 	for(j = 0; j<sizeY; j++){
 		p = line;
 		for(i = 0; i<sizeX; i++){
@@ -75,7 +75,7 @@ bool TGAHEAD::load2buf(unsigned char* buf, unsigned int sizeBuf)
 	}
 
 	unsigned char *line = new unsigned char[Width*byteInPixel],*p;
-	register unsigned int i,j,k;
+	unsigned int i,j,k;
 	int ibeg,jbeg,iend,jend,ik,jk;
 	if(ImageDescriptor&0x20) { jbeg=0; jend=Height; jk=1;}
 	else { jbeg=Height-1; jend=-1; jk=-1;}
@@ -136,7 +136,7 @@ void TGAHEAD::load2RGBL(int sizeX,int sizeY, unsigned long* RGBLBuf)
 {
 	if( (Width!=sizeX) || (Height!=sizeY) ) return;
 	unsigned char *line = new unsigned char[sizeX*3],*p;
-	register unsigned int i,j;
+	unsigned int i,j;
 	int ibeg,jbeg,iend,jend,ik,jk;
 	if(ImageDescriptor&0x20) { jbeg=0; jend=sizeY; jk=1;}
 	else { jbeg=sizeY-1; jend=-1; jk=-1;}
@@ -167,7 +167,7 @@ void TGAHEAD::saveRGBL(const char* fname,int sizeX,int sizeY, unsigned long* RGB
 	XBuffer buffer(sizeof(TGAHEAD) + sizeX*sizeY*3);
 	buffer.write(this,sizeof(TGAHEAD));
 	unsigned char *line = new unsigned char[sizeX*3],*p;
-	register unsigned int i,j,k;
+	unsigned int i,j,k;
 	k=0;
 	for(j = 0; j<sizeY; j++){
 		p = line;

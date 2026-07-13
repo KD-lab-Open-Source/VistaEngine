@@ -1,7 +1,7 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "UI_RenderBase.h"
 #include "Render/src/TexLibrary.h"
-#include "Render/D3d/D3DRender.h"
+#include "Render/D3D/D3DRender.h"
 #include "UI_Sprite.h"
 
 UI_RenderBase* UI_RenderBase::self_ = 0;

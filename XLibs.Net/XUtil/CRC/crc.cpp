@@ -1,4 +1,4 @@
-#include "xglobal.h"
+#include "XGLOBAL.H"
 /* 
  * Copyright (C) 1995 Advanced RISC Machines Limited. All rights reserved.
  * 

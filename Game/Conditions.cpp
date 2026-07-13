@@ -2,7 +2,7 @@
 #include "Triggers.h"
 #include "CameraManager.h"
 #include "RenderObjects.h"
-#include "vmap.h"
+#include "VMAP.H"
 #include "Universe.h"
 
 #include "Squad.h"
@@ -21,7 +21,7 @@
 #include "Serialization/RangedWrapper.h"
 #include "Water/SkyObject.h"
 #include "CheatManager.h"
-#include "Ai/PlaceOperators.h"
+#include "AI/PlaceOperators.h"
 #include "ScanningShape.h"
 #include "Units/IronBuilding.h"
 #include "Water/Water.h"

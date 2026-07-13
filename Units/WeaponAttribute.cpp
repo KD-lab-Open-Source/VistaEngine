@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "WeaponAttribute.h"
 #include "WeaponPrms.h"

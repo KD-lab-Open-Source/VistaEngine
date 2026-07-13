@@ -1,4 +1,4 @@
-#include "stdafxrd.h"
+#include "StdAfxRD.h"
 #include "Serialization/Serialization.h"
 #include "ClippingMesh.h"
 #include "D3DRender.h"

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Colors.h"
 #include "Serialization/Serialization.h"
-#include "Windows.h"
+#include "windows.h"
 
 #pragma warning(disable : 4073 )
 #pragma init_seg(lib)

@@ -5,7 +5,7 @@
 #include "Interpolation.h"
 #include "Sound.h"
 #include "SoundApp.h"
-#include "vmap.h"
+#include "VMAP.H"
 #include "RenderObjects.h"
 #include "Serialization/Serialization.h"
 #include "Serialization/SerializationFactory.h"
@@ -14,6 +14,7 @@
 #include "GlobalAttributes.h"
 
 #include "EditorVisual.h"
+#include "Serialization/StringTableImpl.h"	// the StringTableReference constructor
 
 // Defined here (rather than inline in BaseUnit.h) so the UnitFactoryArg2::createArg
 // template can add a unit to its player without BaseUnit.h needing the complete
@@ -354,7 +355,7 @@ void UnitBase::showDebugInfo()
 	if(showDebugUnitBase.effects){
 		XBuffer msg;
 		//msg.SetDigits(2);
-		msg < "N Effects: " <= effectControllers_.size();
+		msg < "N Effects: " <= (int)effectControllers_.size();
 		show_text(position()+Vect3f(0, 0, 15), msg, Color4c::BLUE);
 		
 		EffectControllers::iterator ie;

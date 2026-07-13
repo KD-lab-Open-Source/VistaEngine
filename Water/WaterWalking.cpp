@@ -4,9 +4,9 @@
 #include "WaterWalking.h"
 #include "Water.h"
 #include "RenderObjects.h"
-#include "Render/Src/cCamera.h"
-#include "Render/Src/TexLibrary.h"
-#include "Render/Src/Scene.h"
+#include "Render/src/cCamera.h"
+#include "Render/src/TexLibrary.h"
+#include "Render/src/Scene.h"
 #include "Render/SDLWorldQuadRenderer.h"   // the plumes are drawn by SDLWorldQuadRenderer,
 #include "Render/SDLRenderDevice.h"        // reached via cSDLRenderDevice::drawWorldQuads
 

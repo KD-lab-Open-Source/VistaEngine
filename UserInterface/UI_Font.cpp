@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "UI_Font.h"
 #include "Serialization/Serialization.h"
 #include "Serialization/ResourceSelector.h"

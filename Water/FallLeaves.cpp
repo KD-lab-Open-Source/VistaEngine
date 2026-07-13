@@ -1,18 +1,18 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "FallLeaves.h"
-#include "Terra/vmap.h"
+#include "Terra/VMAP.H"
 #include "Physics/WindMap.h"
 #include "Serialization/ResourceSelector.h"
 #include "FileUtils/FileUtils.h"
 #include "Environment/Environment.h"
 #include "SkyObject.h"
 #include "FileUtils/FileUtils.h"
-#include "Render/Src/cCamera.h"
+#include "Render/src/cCamera.h"
 #include "Render/SDLWorldQuadRenderer.h"   // the leaves are drawn by SDLWorldQuadRenderer,
 #include "Render/SDLRenderDevice.h"        // reached via cSDLRenderDevice::drawWorldQuads
-#include "Render/Src/TileMap.h"
-#include "Render/Src/TexLibrary.h"
-#include "Render/Src/Scene.h"
+#include "Render/src/TileMap.h"
+#include "Render/src/TexLibrary.h"
+#include "Render/src/Scene.h"
 
 /*
   О листопаде.

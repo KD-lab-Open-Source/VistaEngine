@@ -1,4 +1,4 @@
-#include "xglobal.h"
+#include "XGLOBAL.H"
 #include "math.h"
 
 double strtod_(char* str, char** strOut)

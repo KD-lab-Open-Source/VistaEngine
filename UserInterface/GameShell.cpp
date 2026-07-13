@@ -1,4 +1,8 @@
-#include "StdAfx.h"
+#include "stdafx.h"
+#include <climits>	// INT_MAX etc.; libc++ pulls this in transitively, glibc does not
+#ifdef _WIN32
+#include <direct.h>	// _mkdir. Off-Windows the WindowsAPI.h shim maps it onto mkdir()
+#endif
 #include "CameraManager.h"
 #include "SoundApp.h"
 #include "GameShell.h"
@@ -12,7 +16,7 @@
 #include "ZipConfig.h"
 
 #include "CheatManager.h"
-#include "controls.h"
+#include "Controls.h"
 
 #include "RenderObjects.h"
 
@@ -29,11 +33,11 @@
 #include "FileUtils/FileUtils.h"
 #include "Serialization/SerializationFactory.h"
 #include "UnicodeConverter.h"
-#include "Joystick.h"
+#include "joystick.h"
 
 #include "Sound.h"
 #include "SoundSystem.h"
-#include "vmap.h"
+#include "VMAP.H"
 #include "EnginePrm.h"
 
 #include "Triggers.h"
@@ -63,14 +67,14 @@
 #include "UI_StreamVideo.h"
 extern Singleton<UI_StreamVideo> streamVideo;
 
-#include "Physics/crash/CrashSystem.h"
+#include "Physics/Crash/CrashSystem.h"
 
 #include "Water/SkyObject.h"
 #include "Terra/terTools.h"
 
 #include "StreamCommand.h"
 #include "Render/3dx/Lib3dx.h"
-#include "Render/Src/TexLibrary.h"
+#include "Render/src/TexLibrary.h"
 #include "Render/D3D/D3DRender.h"
 #undef XREALLOC
 #undef XFREE
@@ -1195,9 +1199,12 @@ Vect2f GameShell::convert(int x, int y) const
 
 Vect2i GameShell::convertToScreenAbsolute(const Vect2f& pos)
 {
-	POINT pt = { round((pos.x + 0.5f)*windowClientSize().x), round((pos.y + 0.5f)*windowClientSize().y) };
+	// Casts, because round() returns a double and POINT's fields are LONG — narrowing
+	// inside a braced initializer is not something a conforming compiler lets pass.
+	POINT pt = { (LONG)round((pos.x + 0.5f)*windowClientSize().x),
+	             (LONG)round((pos.y + 0.5f)*windowClientSize().y) };
 	ClientToScreen(gb_RenderDevice->GetWindowHandle(), &pt);
-	return Vect2i(pt.x, pt.y);
+	return Vect2i((int)pt.x, (int)pt.y);	// POINT fields are LONG on Windows: ambiguous against Vect2i(float,float)
 }
 
 bool GameShell::checkReel(UINT uMsg,WPARAM wParam,LPARAM lParam) 
@@ -1478,7 +1485,7 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 		}
 	case VK_F9 | KBD_CTRL | KBD_MENU: {
 		XBuffer name;
-		name < "Camera" <= cameraManager->splines().size();
+		name < "Camera" <= (int)cameraManager->splines().size();
 		CameraSpline* spline = new CameraSpline(cameraManager->spline());
 		spline->setName(editText(name));
 		cameraManager->addSpline(spline);
@@ -1583,7 +1590,7 @@ bool GameShell::DebugKeyPressed(sKey& Key)
 			Player* player = universe()->activePlayer();
 			if(isShiftPressed()){
 				XBuffer nameAlt;
-				nameAlt < "Игрок (0-" <= universe()->Players.size() - 1 < ")";
+				nameAlt < "Игрок (0-" <= (int)universe()->Players.size() - 1 < ")";
 				int playerID = player->playerID();
 				Serializer playerIDSerializer(playerID, "playerID", nameAlt);
 				if(kdw::edit(playerIDSerializer, "Scripts\\TreeControlSetups\\chooseTrigger", 0, hWnd())){

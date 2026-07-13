@@ -35,7 +35,7 @@ public:
 	cTextureComplex* GetElement2DComplex(vector<string>& textureNames);
 	cTexture* GetElement2DScale(const char *pTextureName,Vect2f scale);
 
-	cTexture* GetElement3D(const char *pTextureName,char *pMode=0);
+	cTexture* GetElement3D(const char *pTextureName,const char *pMode=0);
 	cTexture* GetElement3DColor(const char *pTextureName,const char* skin_color_name_,Color4c* color,
 								const char *SelfIlluminationName, const char* logo_name, const sRectangle4f& logo_position, float logo_angle);
 	cTexture* GetElement3DComplex(vector<string>& textureNames, bool allowResize=true,bool line=false);

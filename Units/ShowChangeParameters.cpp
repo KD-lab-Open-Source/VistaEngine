@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Parameters.h"
 #include "Environment/SourceManager.h"
 #include "UnitInterface.h"

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "shlwapi.h"
 // Serialization.h first: TriggerExport.h pulls UniqueVector.h, whose template
 // serialize() needs a complete Archive type at instantiation (clang).

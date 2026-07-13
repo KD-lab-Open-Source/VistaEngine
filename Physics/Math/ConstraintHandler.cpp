@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "ConstraintHandler.h"
 
 Contact::Contact(const Vect3f& point, const Vect3f& normal, RigidBodyPhysics* body0, RigidBodyPhysics* body1, float penetration) :

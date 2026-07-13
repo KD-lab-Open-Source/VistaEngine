@@ -6,7 +6,7 @@
 #include "Units/CircleManagerParam.h"
 #include "XTL/StaticMap.h"
 #include "Render/inc/IVisGenericInternal.h"
-#include "Render/D3D/RenderStates.h"
+#include "Render/D3D/renderstates.h"
 
 
 class CircleManager : public BaseGraphObject

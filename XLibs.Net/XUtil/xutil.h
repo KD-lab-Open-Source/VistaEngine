@@ -13,6 +13,8 @@
 #define __XUTIL_H
 
 #include <memory.h>
+#include <math.h>	// round(), which this header used to implement in x87 asm
+#include <bit>		// countl_zero(), which BitSR() used to implement as `bsr`
 
 ///////////////////////////////////
 //		XBuffer
@@ -335,6 +337,14 @@ void SetAssertRestoreGraphicsFunction(void(*func)());
 
 int DiagAssert(unsigned long dwOverrideOpts, const char* szMsg, const char* szFile, unsigned long dwLine ) ;
 
+// Break into the debugger. Was `__asm { int 3 }`, which is x86-only and which
+// MSVC rejects on x64; __debugbreak() is the intrinsic for exactly that opcode.
+#if defined(_MSC_VER)
+#	define XDEBUG_BREAK() __debugbreak()
+#else
+#	define XDEBUG_BREAK() __builtin_trap()
+#endif
+
 #undef NDEBUG
 #define xxassert(exp, msg) \
     do                                                              \
@@ -342,7 +352,7 @@ int DiagAssert(unsigned long dwOverrideOpts, const char* szMsg, const char* szFi
         if ( !(exp) && !ignore)				\
 		switch(DiagAssert ( 0 ,  msg, __FILE__  , __LINE__)){  \
 			case 1: ignore = 1; break; \
-			case 2: __asm { int 3 }; break; \
+			case 2: XDEBUG_BREAK(); break; \
 			}\
     } while (0)
 
@@ -394,58 +404,24 @@ char* XFindFirst(char* mask);
 #define M_PI	3.14159265358979323846
 #endif
 
+// See xmath.h: round() comes from the C library now, not from an x87 asm block.
 #ifndef __ROUND__
 #define __ROUND__
 
-__forceinline int round(double x)
-{
-	int a;
-	_asm {
-		fld x
-		fistp dword ptr a
-	}
-	return a;
-}
-
-__forceinline int round(float x)
-{
-	int a;
-	_asm {
-		fld x
-		fistp dword ptr a
-	}
-	return a;
-}
-
-template <class T> 
+template <class T>
 __forceinline T sqr(const T& x){ return x*x; }
 
-template <class T> 
+template <class T>
 __forceinline int SIGN(const T& x) { return x ? (x > 0 ? 1 : -1 ) : 0; }
 
-#endif __ROUND__
+#endif // __ROUND__
 
-#ifdef _WIN32
-__forceinline int BitSR(int x)
-{
-	int return_var;
-	_asm {
-		mov eax, x
-		cdq
-		xor eax,edx
-		sub     eax,edx
-		bsr     eax,eax
-		mov [return_var],eax
-	}
-	return return_var;
-}
-#else
+// Index of the highest set bit of |x|, i.e. the x86 `bsr` this used to be.
 inline int BitSR(int x)
 {
 	unsigned v = (unsigned)(x < 0 ? -x : x);
-	return v ? (31 - __builtin_clz(v)) : 0;
+	return v ? (31 - std::countl_zero(v)) : 0;
 }
-#endif
 
 int xclock();
 

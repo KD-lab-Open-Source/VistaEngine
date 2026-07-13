@@ -4,19 +4,11 @@
 #pragma warning(disable : 4251) // class '' needs to have dll-interface to be used by clients of class ''
 #pragma warning(disable : 4275) // non dll-interface class '' used as base for dll-interface class ''
 
-#if !defined(KDW_DLL) && (defined(_AFXDLL) || defined(_DLL) || defined(_MTD))
-#define KDW_DLL
-#endif
-
-#ifndef KDW_DLL
-# define KDW_API 
-#else
-# ifdef KDW_EXPORTED
-#  define KDW_API __declspec(dllexport)
-# else
-#  define KDW_API __declspec(dllimport)
-# endif
-#endif
+// Empty, for the same reason as RENDER_API (Render/inc/rd.h): _DLL is MSVC's flag for
+// linking against the DLL runtime, not for building one. kdw is not built at all now
+// (kdwStub.cpp provides its entry points), and declaring those __declspec(dllimport)
+// while the stub defines them is what produced the 'inconsistent dll linkage' warnings.
+#define KDW_API
 
 
 #endif

@@ -1,6 +1,7 @@
 #ifndef __HYPERSPACE_H__
 #define __HYPERSPACE_H__
 
+#include <climits>	// UINT_MAX etc.; libc++ pulls this in transitively, glibc does not
 #include "Universe.h"
 #include "EventBufferDP.h"
 

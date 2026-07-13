@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "CD2D.h"
 
 bool penetrationCircleRectangle(float circleRadius, const Vect2f& circlePosition, 

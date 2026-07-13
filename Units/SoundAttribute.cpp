@@ -6,7 +6,7 @@
 #include "Sound.h"
 #include "SoundApp.h"
 #include "Serialization/StringTableImpl.h"
-#include "Sound/soundSystem.h"
+#include "Sound/SoundSystem.h"
 #include "Universe.h"
 #include "GlobalAttributes.h"
 #include "Serialization/XPrmArchive.h"

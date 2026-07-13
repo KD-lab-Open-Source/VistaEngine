@@ -1,4 +1,4 @@
-#include "Stdafx.h"
+#include "stdafx.h"
 #include "TextDB.h"
 #include "Serialization/Serialization.h"
 #include "Serialization/XPrmArchive.h"

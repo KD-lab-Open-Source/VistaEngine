@@ -1,7 +1,7 @@
 #ifndef __PF_TRAP_H_INCLUDED__
 #define __PF_TRAP_H_INCLUDED__
 
-#include "AiAStar.h"
+#include "AIAStar.h"
 #include "Timers.h"
 #include "XTL/Rect.h"
 

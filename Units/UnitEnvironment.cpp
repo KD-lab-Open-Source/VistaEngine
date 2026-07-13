@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Universe.h"
 #include "UnitEnvironment.h"
 #include "TransparentTracking.h"

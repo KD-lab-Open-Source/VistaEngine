@@ -16,7 +16,7 @@
 #include "UserInterface/UI_Minimap.h"
 #include "Water/CircleManager.h"
 #include "Serialization/SerializationFactory.h"
-#include "Terra/vMap.h"
+#include "Terra/VMAP.H"
 #include "AI/PFTrap.h"
 #include "Physics/FormationController.h"
 #include <map>

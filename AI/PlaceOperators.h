@@ -4,7 +4,7 @@
 #include "Game/Universe.h"
 #include "IronBuilding.h"
 #include "UnitItemResource.h"
-#include "Terra/vMap.h"
+#include "Terra/VMAP.H"
 #include "Environment/SourceShield.h"
 
 class Archive;

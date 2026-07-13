@@ -1,8 +1,9 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 
 #include "UI_TextParser.h"
 #include "UI_Types.h"
 #include "UnicodeConverter.h"
+#include "Serialization/StringTableImpl.h"	// the StringTableReference constructor
 
 UI_TextParser::UI_TextParser(const FT::Font* font)
 {

@@ -3,7 +3,7 @@
 // The real CPUID.CPP uses x86 `__asm cpuid` to probe MMX/feature flags — there
 // is no arm64 equivalent and the engine only uses this for a startup capability
 // log, so we report "no x86 feature bits".
-#include "xglobal.h"
+#include "XGLOBAL.H"
 
 unsigned int xt_get_cpuid()
 {

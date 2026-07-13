@@ -1,6 +1,7 @@
 #include "stdafxTr.h"
+#include <climits>	// USHRT_MAX etc.; libc++ pulls this in transitively, glibc does not
 
-#include "vmap.h"
+#include "VMAP.H"
 #include "worldFileDispatcher.h"
 #include "Serialization/Serialization.h"
 #include "Serialization/XPrmArchive.h"
@@ -617,7 +618,7 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 					while(current_sx <= ceilxend) {
 					// используем z-буфер для определения видимости текущей точки
 						if( (current_sx<=imaxX) && (current_sx >= 0)) {
-							register int bufoff=vMap.offsetBuf(current_sx,current_sy);//(current_sy)*voxelBitmap.sx + current_sx;
+							int bufoff=vMap.offsetBuf(current_sx,current_sy);//(current_sy)*voxelBitmap.sx + current_sx;
 							if(flag_onlyTextured){
 								int vox=vMap.getAlt(bufoff);
 								if(pBitmap){
@@ -733,7 +734,7 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 				while(current_sx <= ceilxend) {
 					// используем z-буфер для определения видимости текущей точки
 					if( (current_sx<=imaxX) && (current_sx >= 0)) {
-						register int bufoff=vMap.offsetBuf(current_sx,current_sy);//(current_sy)*voxelBitmap.sx + current_sx;
+						int bufoff=vMap.offsetBuf(current_sx,current_sy);//(current_sy)*voxelBitmap.sx + current_sx;
 						if(flag_onlyTextured){
 							int vox=vMap.getAlt(bufoff);
 							if(pBitmap){
@@ -1021,7 +1022,7 @@ void RoadTool::putStrip(vector<sPolygon>& poligonArr, vector<VertexI> iPntArr, c
 					int cv=ceilFIntF0(v)%bitmapSize.y;//(==bitmapSizeV.y)
 					if(cv <0 ) cv+=bitmapSize.y;
 					if( (current_sx<=imaxX) && (current_sx >= 0)) {
-						register int bufoff=vMap.offsetBuf(current_sx,current_sy);//(current_sy)*voxelBitmap.sx + current_sx;
+						int bufoff=vMap.offsetBuf(current_sx,current_sy);//(current_sy)*voxelBitmap.sx + current_sx;
 						if(textureSetting.flag_onlyTextured){
 							int vox=vMap.getAlt(bufoff);
 							if(pBitmap){

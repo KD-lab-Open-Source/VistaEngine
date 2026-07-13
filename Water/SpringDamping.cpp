@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SpringDamping.h"
 
 bool SpringDamping3DX::isWindNode(const char* name)

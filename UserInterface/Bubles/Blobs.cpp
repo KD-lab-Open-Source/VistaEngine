@@ -1,8 +1,8 @@
-#include "StdAfx.h"
-#include "blobs.h"
+#include "stdafx.h"
+#include "Blobs.h"
 #include "Render/src/FileImage.h"
-#include "Render/Shader/Shaders.h"
-#include "Render/Src/TexLibrary.h"
+#include "Render/shader/shaders.h"
+#include "Render/src/TexLibrary.h"
 #include "Render/D3D/D3DRender.h"
 
 cBlobs::cBlobs()

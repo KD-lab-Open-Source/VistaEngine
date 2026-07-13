@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "Platform/Window.h"
-#include "CDKey.h"
 #include "GameOptions.h"
 #include "SoundApp.h"
 #include "CameraManager.h"
@@ -34,7 +33,7 @@
 
 #include <process.h>
 #include <malloc.h>
-#include <CommCtrl.h>
+#include <commctrl.h>
 #include "kdw/Win32/Window.h"
 
 #include "UnicodeConverter.h"
@@ -108,10 +107,6 @@ Runtime::Runtime(HINSTANCE hInstance, bool ht)
 		Console::instance().registerListener(&ConsoleWindow::instance());
 #endif
 
-	//CurrentDirectorySaver currentDir;
-	//if(!CDKeyChecker().check())
-	//	ErrH.Exit();
-	//currentDir.restore();
 
 #ifdef _FINAL_VERSION_
 	checkSingleRunning();

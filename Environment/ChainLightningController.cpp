@@ -8,7 +8,7 @@
 #include "Serialization/RangedWrapper.h"
 #include "Universe.h"
 #include "Squad.h"
-#include "Render/Src/Scene.h"
+#include "Render/src/Scene.h"
 
 void ChainLightningAttribute::serialize(Archive& ar)
 {

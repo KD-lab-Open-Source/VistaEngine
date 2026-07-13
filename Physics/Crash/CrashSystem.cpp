@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "RigidBodyBox.h"
 #include "BaseUniverseObject.h"
 #include "AbnormalStateAttribute.h"
@@ -8,6 +8,7 @@
 #include "NormalMap.h"
 #include "Render/3dx/Simply3dx.h"
 #include "Render/src/Scene.h"
+#include "Serialization/StringTableImpl.h"	// the StringTableReferencePolymorphic constructor
 
 CrashBody::CrashBody(cSimply3dx* model, float mass, ExplodeProperty* property_) : 
 	effectController(0),

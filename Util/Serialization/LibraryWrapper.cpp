@@ -1,14 +1,14 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "LibraryWrapper.h"
 #include "Serialization/XPrmArchive.h"
 #include "BinaryArchive.h"
 #include "InPlaceArchive.h"
 #include "LibrariesManager.h"
 #include "MultiArchive.h"
-#include "profiler.h"
-#ifdef _WIN32
+#include "Profiler.h"
+// kdw is not built on any platform now; kdwStub.cpp defines these entry points, and
+// editLibrary() below is a no-op everywhere as a result.
 #include "kdw/PropertyEditor.h"
-#endif
 
 LibraryWrapperBase::LibraryWrapperBase()
 {
@@ -83,14 +83,15 @@ public:
 
 bool LibraryWrapperBase::editLibrary(bool translatedOnly)
 {
-#ifdef _WIN32
 	string setupName = string("Scripts\\TreeControlSetups\\") + sectionName_ + "State";
 	LibrarySerializer lib(this);
-	if(kdw::edit(Serializer(lib), setupName.c_str(), translatedOnly ? kdw::ONLY_TRANSLATED : 0)){
+	// Named, not a temporary: kdw::edit takes a non-const reference, and a temporary
+	// cannot bind to one (old MSVC allowed it as an extension; nothing does now).
+	Serializer serializer(lib);
+	if(kdw::edit(serializer, setupName.c_str(), translatedOnly ? kdw::ONLY_TRANSLATED : 0)){
 		saveLibrary();
 		return true;
 	}
-#endif
 	return false;
 }
 

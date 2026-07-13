@@ -15,7 +15,7 @@
 #include "UserInterface/UserInterface.h"
 #include "UserInterface/UI_Logic.h"
 #include "EditorVisual.h"
-#include "Terra/vMap.h"
+#include "Terra/VMAP.H"
 #include "Terra/TerrainType.h"
 
 #pragma warning(disable: 4355)

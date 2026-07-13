@@ -4,7 +4,7 @@
 #include "cCamera.h"
 #include "D3DRender.h"
 #include "VisGeneric.h"
-#include "scene.h"
+#include "Scene.h"
 #include "NParticleID.h"
 #include "TileMap.h"
 #include "FileRead.h"

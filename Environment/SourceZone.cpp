@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 
 #include "Serialization/Serialization.h"
 #include "SourceZone.h"
@@ -13,7 +13,7 @@
 #include "ObjectSpreader.h"
 #include "Game/Universe.h"
 #include "Serialization/MillisecondsWrapper.h"
-#include "Terra/vMap.h"
+#include "Terra/VMAP.H"
 
 // ------------------- SourceZone
 

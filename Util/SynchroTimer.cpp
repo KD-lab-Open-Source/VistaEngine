@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SynchroTimer.h"
 #include "XMath/xmath.h"
 

@@ -1,4 +1,5 @@
-#include "StdAfx.h"
+#include "stdafx.h"
+#include <climits>	// USHRT_MAX etc.; libc++ pulls this in transitively, glibc does not
 
 #include "Runtime.h"
 #include "P2P_interface.h"
@@ -10,7 +11,7 @@
 
 #include "Lmcons.h"
 
-#include "Terra/vmap.h"
+#include "Terra/VMAP.H"
 
 #include <algorithm>
 

@@ -1,6 +1,6 @@
 #include "stdafxTr.h"
 
-#include "vmap.h"
+#include "VMAP.H"
 
 static const int MAX_SIZE_UNDO_REDO_BUFFER=64*1024*1024;//4096*4096;
 int UNDO_REDO_BUFFER_SIZE=0;

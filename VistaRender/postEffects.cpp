@@ -1,11 +1,11 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 
 #include "Serialization/Factory.h"
 
 #include "Render/shader/shaders.h"
-#include "Render/D3d/D3DRender.h"
+#include "Render/D3D/D3DRender.h"
 #include "Water/Water.h"
-#include "Render/Src/VisGeneric.h"
+#include "Render/src/VisGeneric.h"
 
 #include "postEffects.h"
 

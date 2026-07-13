@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "P2P_interface.h"
 #include "UniverseX.h"
 #include "UI_Logic.h"

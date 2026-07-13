@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "Interpolator3dx.h"
 #include "Serialization/Serialization.h"
 

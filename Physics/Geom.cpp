@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "RigidBodyBase.h"
 #include "NormalMap.h"
 #include "CD/CDDual.h"

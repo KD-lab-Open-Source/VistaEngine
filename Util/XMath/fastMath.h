@@ -18,27 +18,11 @@ inline float invSqrtFast(float x)
 	return x;
 }
 
-// Fast fmod using x87 FPU (Windows x86 only), falls back to fmodf on POSIX.
+// Was an x87 `fprem` loop on Windows. No 64-bit compiler takes inline asm, and
+// fmodf is what the hardware instruction does anyway.
 inline float fmodFast(float a, float b)
 {
-#ifdef _WIN32
-	float result;
-	_asm
-	{
-		fld b
-			fld a
-cycle_fast_fmod:
-		fprem
-			fnstsw ax
-			sahf
-			jp short cycle_fast_fmod
-			fstp st(1)
-			fstp result
-	}
-	return result;
-#else
 	return fmodf(a, b);
-#endif
 }
 
 inline unsigned int F2DW( float f ) 

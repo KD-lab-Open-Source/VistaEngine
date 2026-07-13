@@ -1,17 +1,17 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 // Serialization.h first: Field.h pulls UniqueVector.h, whose template
 // serialize() needs a complete Archive type at instantiation (clang).
 #include "Serialization/Serialization.h"
 #include "Field.h"
 #include "DebugUtil.h"
 #include "d3dx9.h"
-#include "Render/D3d/D3DRender.h"
+#include "Render/D3D/D3DRender.h"
 #include "Render/SDLRenderDevice.h"
 #include "Render/SDLWorldQuadRenderer.h"
-#include "Terra/vmap.h"
+#include "Terra/VMAP.H"
 #include "XMath/SafeMath.h"
 #include "Water/Water.h"
-#include "Render/Src/cCamera.h"
+#include "Render/src/cCamera.h"
 
 FieldSource::FieldMoulds FieldSource::fieldMoulds_;
 

@@ -3,7 +3,7 @@
 
 #include "UI_RenderBase.h"
 #include "XTL/Rect.h"
-#include "Render/3dx/UMath.h"
+#include "Render/3dx/Umath.h"
 #include "XMath/Colors.h"
 #include "XTL/SafeCast.h"
 

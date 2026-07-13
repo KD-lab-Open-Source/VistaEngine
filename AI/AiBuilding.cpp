@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "PlaceOperators.h"
 #include "ScanningShape.h"
 #include "DebugPrm.h"

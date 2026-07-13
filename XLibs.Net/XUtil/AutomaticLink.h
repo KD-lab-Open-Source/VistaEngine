@@ -16,9 +16,12 @@
 #define _DEBUG_SUFFIX 
 #endif 
 
+// No #pragma comment(lib, ...) any more. It asked the linker for names like
+// "XUtilDll.lib" — Dll because MSVC defines _DLL when linking the DLL runtime (/MD),
+// which is not what this header thought it meant — and no such library exists: CMake
+// builds XUtil as a static library and declares who links it. The suffix machinery
+// above is left as the record of what the name used to be.
 #define _FULL_NAME_ _LIB_NAME _MT_DLL_SUFFIX _DEBUG_SUFFIX ".lib"
-#pragma message("Automatically linking with " _FULL_NAME_) 
-#pragma comment(lib, _FULL_NAME_) 
 
 #undef _FULL_NAME_
 #undef _DEBUG_SUFFIX

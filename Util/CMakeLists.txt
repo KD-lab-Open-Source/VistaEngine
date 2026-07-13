@@ -2,10 +2,14 @@ add_subdirectory(XMath)
 add_subdirectory(Serialization)
 add_subdirectory(XmlRpc)
 
-if(WIN32)
-    add_subdirectory(ShaderToH2)
-    add_subdirectory(kdw)
-endif()
+# Neither of the two Util tools is built any more:
+#   ShaderToH2 compiled the old .vsl/.psl shaders into headers against d3dx9.h, and
+#   both the D3D9 backend and that toolchain are gone — CMake compiles the HLSL now
+#   (see cmake/bin2h.cmake).
+#   kdw is the Win32 widget toolkit behind the editors' property dialogs. It is 32-bit
+#   Win32 GUI code (its own mini-windows.h had UINT_PTR as a 32-bit int) and the game
+#   does not need it: kdwStub.cpp below satisfies every kdw entry point the game
+#   references, on every platform, as it already did off-Windows.
 
 set(UTIL_SOURCES
     ComboVectorString.cpp
@@ -28,44 +32,34 @@ set(UTIL_SOURCES
     DebugUtil.cpp
 )
 
-if(WIN32)
-    list(APPEND UTIL_SOURCES
-        ConsoleWindow.cpp
-        SplashScreen.cpp
-        mfc/PopupMenu.cpp
-        Win32/DebugSymbolManager.cpp
-        Win32/KeyboardDriver.cpp
-        # Win32-GUI / Game-dependent helpers (file dialogs, popup menus, dialog
-        # boxes) and D3D9/WMI display queries. Unused by the lower-level libs;
-        # revisit when porting the higher layers / SDL GPU backend.
-        SystemUtil.cpp
-        VideoMemoryInformation.cpp
-        # Win32 debug statistics window (CommCtrl/HWND); non-_FINAL_VERSION_ tooling.
-        ObjStatistic.cpp
-        # DirectInput8 joystick; SDL3 provides cross-platform joystick input.
-        joystick.cpp
-    )
-else()
-    # Portable display-capability queries (the real VideoMemoryInformation.cpp
-    # uses D3D9 + WMI): permissive defaults until the SDL GPU backend (Track B).
-    list(APPEND UTIL_SOURCES VideoMemoryInformationStub.cpp)
-    # Portable SystemUtil subset (time formatting, loc-data path); the Win32 GUI
-    # dialogs (file/popup/editText) are no-op off-Windows.
-    list(APPEND UTIL_SOURCES SystemUtilPortable.cpp)
-    # No-op stubs for the Win32 tooling / DirectInput leaves whose real sources
-    # are gated above (debug console, symbol resolver, joystick, keyboard,
-    # profiler).
-    list(APPEND UTIL_SOURCES
-        ConsoleWindowStub.cpp
-        ProfilerStub.cpp
-        joystickStub.cpp
-        Win32/DebugSymbolManagerStub.cpp
-        Win32/KeyboardDriverStub.cpp
-        # kdw editor toolkit (Win32 widgets): property-editor entry points and
-        # the editor dialogs the game references are no-op off-Windows.
-        kdwStub.cpp
-    )
-endif()
+# One source list, Windows included. Each of these replaces a Win32 leaf that either
+# cannot build 64-bit or that the game does not need — the real sources stay in the
+# tree as the reference for whoever ports them properly:
+#   SystemUtilPortable  the Win32 file dialogs / popup menus / editText boxes are
+#                       no-ops; the portable half (time formatting, loc-data path)
+#                       is what the game actually calls.
+#   ProfilerStub        the real Profiler (XLibs.Net/Profiler) is compiled nowhere,
+#                       on any platform — Windows was linking against nothing.
+#   VideoMemoryInformationStub  the real one asks D3D9 (and WMI) how much video
+#                       memory there is, and D3D9 is gone.
+#   joystickStub        joystick.cpp enumerates DirectInput8 devices; SDL3 is the
+#                       input layer now.
+#   kdwStub             kdw is the editors' 32-bit Win32 widget toolkit.
+#   ConsoleWindowStub   the Win32 debug console (and the only user of mfc/PopupMenu,
+#                       which despite the directory name is plain USER32 menu code —
+#                       nothing in this build has ever included an MFC header).
+#   Win32/*Stub         DbgHelp symbol resolver and the raw keyboard driver.
+# SplashScreen.cpp and ObjStatistic.cpp are simply gone: nothing references them.
+list(APPEND UTIL_SOURCES
+    SystemUtilPortable.cpp
+    ProfilerStub.cpp
+    VideoMemoryInformationStub.cpp
+    joystickStub.cpp
+    kdwStub.cpp
+    ConsoleWindowStub.cpp
+    Win32/DebugSymbolManagerStub.cpp
+    Win32/KeyboardDriverStub.cpp
+)
 
 add_library(Util STATIC ${UTIL_SOURCES})
 target_include_directories(Util PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

@@ -1,7 +1,7 @@
 #ifndef __N_PARTICLE_KEY_H_INCLUDED__
 #define __N_PARTICLE_KEY_H_INCLUDED__
 
-#include "Render/Inc/rd.h"
+#include "Render/inc/rd.h"
 #include "XMath/Colors.h"
 #include "XMath/KeysBase.h"
 #include "Serialization/Serialization.h"

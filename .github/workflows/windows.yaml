@@ -1,0 +1,51 @@
+name: Windows
+
+on:
+  push:
+    branches: [ crossplatform ]
+  pull_request:
+    branches: [ crossplatform ]
+  workflow_dispatch:
+
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  BUILD_TYPE: RelWithDebInfo
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # Nothing to install. SDL3 and FreeType come in through FetchContent, and the
+    # shaders are compiled by the Windows SDK's own dxc.exe (HLSL -> DXIL, the one
+    # format the D3D12 backend loads), which the root CMakeLists globs out of
+    # Windows Kits\10\bin\<ver>\x64 — so this platform needs no SDL_shadercross and
+    # therefore no DirectXShaderCompiler build.
+    #
+    # The generator is deliberately not named. CMake's default on Windows is the
+    # newest Visual Studio installed, and the runner image is a moving target:
+    # windows-latest carried VS 2022 until June 2026 and now carries VS 2026, so
+    # any pinned "-G Visual Studio <n> <year>" breaks on the next image bump. The
+    # image's own CMake is new enough to know whichever VS it ships with.
+    #
+    # Visual Studio is a multi-config generator: the build type is chosen at build
+    # time with --config, and CMAKE_BUILD_TYPE at configure time would be ignored.
+    - name: Game -- configure
+      run: cmake -A x64 -B build
+
+    - name: Game -- build
+      run: cmake --build build --config ${{env.BUILD_TYPE}} --parallel 3
+
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: VistaEngine-Windows
+        path: |
+          build/Game/${{env.BUILD_TYPE}}/Game.exe
+          build/Game/${{env.BUILD_TYPE}}/Game.pdb
+          build/_deps/sdl3-build/${{env.BUILD_TYPE}}/SDL3.dll

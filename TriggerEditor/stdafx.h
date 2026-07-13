@@ -12,6 +12,6 @@
 
 #include <vector>
 #include <string>
-#include "XUtil.h"
+#include "xutil.h"
 
 using namespace std;

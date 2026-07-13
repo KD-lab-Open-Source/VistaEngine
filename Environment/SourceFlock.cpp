@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include <functional>
 #include "SourceFlock.h"
 #include "Serialization/Serialization.h"
@@ -7,8 +7,8 @@
 #include "Game/RenderObjects.h"
 #include "Serialization/ResourceSelector.h"
 #include "Serialization/EnumDescriptor.h"
-#include "Render/Src/Scene.h"
-#include "Render/3dx/Node3dx.h"
+#include "Render/src/Scene.h"
+#include "Render/3dx/Node3DX.h"
 
 extern vrtMap vMap;
 

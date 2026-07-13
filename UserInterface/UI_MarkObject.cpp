@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "UI_MarkObjectAttribute.h"
 
 #include "Serialization/ResourceSelector.h"
@@ -7,7 +7,7 @@
 #include "Render/src/cCamera.h"
 #include "Game/Universe.h"
 #include "Units/WeaponTarget.h"
-#include "Render/Src/Scene.h"
+#include "Render/src/Scene.h"
 #include "Render/src/VisGeneric.h"
 
 #include "UI_Render.h"

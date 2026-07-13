@@ -102,7 +102,7 @@ class StatisticalData : public ProfilerInterface
 	int n;
 
 public:
-	StatisticalData(char* title = 0);
+	StatisticalData(const char* title = 0);
 	void clear();
 	void add(double x);
 	double avr() const { return n ? x_sum/n : 0; }

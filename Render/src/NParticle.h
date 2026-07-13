@@ -10,14 +10,14 @@
 
 #include "MTSection.h"
 #include "Render/3dx/Saver.h"
-#include "XMath/XMath.h"
+#include "XMath/xmath.h"
 #include "Serialization/StringTableBase.h"
 #include "Serialization/StringTableReference.h"
-#include "Render/Inc/IUnkObj.h"
+#include "Render/inc/IUnkObj.h"
 #include "NParticleKey.h"
 #include "observer.h"
-#include "texture.h"
-#include "material.h"
+#include "Texture.h"
+#include "Material.h"
 #define EXPORT_TO_GAME 1
 #ifndef _FINAL_VERSION_
 	#define NEED_TREANGLE_COUNT 

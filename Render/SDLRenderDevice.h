@@ -370,7 +370,7 @@ public:
 	// ExtTextOut), bypassing the renderer entirely. There is no equivalent here, and
 	// nothing in the game calls either.
 	void OutText(int, int, const char*, int, int, int) override {}
-	void OutText(int, int, const char*, int, int, int, char*, int, int, int, int) override {}
+	void OutText(int, int, const char*, int, int, int, const char*, int, int, int, int) override {}
 
 	// --- Sprites (forwarded to the UI renderer) ---------------------------
 	void DrawQuad(float, float, float, float, float, float, float, float, Color4c) override;

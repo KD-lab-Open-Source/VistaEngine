@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SelectManager.h"
 #include "UnitInterface.h"
 #include "CameraManager.h"

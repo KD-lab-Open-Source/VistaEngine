@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "UI_GlobalAttributes.h"
 #include "UI_Render.h"
 #include "CommonLocText.h"

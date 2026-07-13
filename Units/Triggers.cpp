@@ -3,7 +3,7 @@
 #include "Triggers.h"
 #include "CameraManager.h"
 #include "RenderObjects.h"
-#include "vmap.h"
+#include "VMAP.H"
 #include "Universe.h"
 
 #include "Squad.h"

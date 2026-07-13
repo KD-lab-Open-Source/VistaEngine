@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "AI/PFTrap.h"
-#include "normalMap.h"
+#include "NormalMap.h"
 #include "PositionGeneratorCircle.h"
 #include "WhellController.h"
 #include "RigidBodyCar.h"

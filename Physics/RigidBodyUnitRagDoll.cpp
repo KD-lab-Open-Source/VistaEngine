@@ -1,7 +1,8 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "RigidBodyUnitRagDoll.h"
 #include "NormalMap.h"
 #include "UnitAttribute.h"
+#include "Serialization/StringTableImpl.h"	// the StringTableReferencePolymorphic constructor
 
 REGISTER_CLASS_IN_FACTORY(RigidBodyFactory, RIGID_BODY_UNIT_RAG_DOLL, RigidBodyUnitRagDoll)
 

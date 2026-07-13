@@ -1,4 +1,4 @@
-#include "stdAfx.h"
+#include "stdafx.h"
 #undef XREALLOC
 #undef XFREE
 #include "PlayerStatistics.h"

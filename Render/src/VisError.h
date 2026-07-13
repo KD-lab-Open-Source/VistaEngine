@@ -2,9 +2,9 @@
 #define __VISERROR_H__
 
 #include "Console.h"
-#include "Render/Inc/rd.h"
+#include "Render/inc/rd.h"
 
-RENDER_API int RDWriteLog(HRESULT err,char *exp,char *file,int line);
+RENDER_API int RDWriteLog(HRESULT err,const char *exp,const char *file,int line);
 
 #define RDCALL(exp)									{ HRESULT hr=exp; if(hr){ RDWriteLog(hr,#exp,__FILE__,__LINE__); xassert(0 && #exp); } }
 
@@ -26,6 +26,6 @@ private:
 extern cVisError VisError;
 
 
-RENDER_API void dprintf(char *format, ...);
+RENDER_API void dprintf(const char *format, ...);
 
 #endif //__VISERROR_H__

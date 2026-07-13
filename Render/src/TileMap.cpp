@@ -5,7 +5,7 @@
 #include "Scene.h"
 #include "MultiRegion.h"
 #include "VisGeneric.h"
-#include "Terra/vmap.h"
+#include "Terra/VMAP.H"
 #include "D3DRenderTilemap.h"
 #include "Serialization/ResourceSelector.h"
 #include "Serialization/RangedWrapper.h"

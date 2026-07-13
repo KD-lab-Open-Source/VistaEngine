@@ -8,6 +8,27 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 include(FetchContent)
+
+# The engine only ever calls SDL_Init(SDL_INIT_VIDEO) (Platform/Window.cpp): SDL is
+# our window, our input, and our GPU device, and nothing else. Audio is DirectSound
+# on Windows and a stub elsewhere, joystick is DirectInput, and the rest we never
+# touch — so don't compile them. Besides the build time, each subsystem drags in
+# system dependencies of its own that CI would otherwise have to install.
+# SDL3_test is off for the same reason: it builds by default and we never link it.
+# (SDL_TESTS, the test *programs*, is already off — it defaults to "am I the main
+# project", and we are a FetchContent subproject.)
+#
+# SDL_JOYSTICK stays ON despite being just as unused: with it off, SDL's macOS build
+# does not link the GameController framework, yet SDL_cocoamouse.m still references
+# GCMouse from it, and libSDL3 fails to link. Leave the subsystem in rather than
+# carry a patch for it.
+set(SDL_AUDIO        OFF CACHE BOOL "" FORCE)
+set(SDL_CAMERA       OFF CACHE BOOL "" FORCE)
+set(SDL_DIALOG       OFF CACHE BOOL "" FORCE)
+set(SDL_HAPTIC       OFF CACHE BOOL "" FORCE)
+set(SDL_HIDAPI       OFF CACHE BOOL "" FORCE)
+set(SDL_SENSOR       OFF CACHE BOOL "" FORCE)
+set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
     SDL3
     GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
@@ -226,6 +247,34 @@ target_include_directories(EngineIncludes INTERFACE
     ${CMAKE_SOURCE_DIR}/XLibs.Net/Profiler/Profiler
     ${CMAKE_SOURCE_DIR}/XLibs.Net/OGG/PlayOgg
     ${CMAKE_SOURCE_DIR}/Util/XTL
+)
+
+if(WIN32)
+    # The Windows SDK declares a global `byte` (rpcndr.h), C++17 added std::byte, and
+    # this codebase says `using namespace std` in its shared headers — so every SDK
+    # header that names `byte` is ambiguous (C2872). _HAS_STD_BYTE=0 is the microsoft
+    # standard-library's own switch for exactly this; nothing here uses std::byte.
+    target_compile_definitions(EngineIncludes INTERFACE _HAS_STD_BYTE=0)
+
+    # windows.h in every C++ translation unit — the mirror of the WindowsAPI.h
+    # force-include below, and the same reason. This is MSVC-origin code that assumes
+    # the Win32 API is simply *there*: its headers name HWND, HANDLE and DWORD freely
+    # (Util/joystick.h, Util/Win32/DebugSymbolManager.h, Sound/Sound.h, the kdw
+    # headers, ~18 of them), and each module's StdAfx.h used to drag windows.h in for
+    # them. The stub translation units have no StdAfx, so on Windows they saw none of
+    # it. Forcing the header is what the original build did in effect, and it settles
+    # the whole class rather than one header at a time.
+    target_compile_options(EngineIncludes INTERFACE
+        "$<$<COMPILE_LANGUAGE:CXX>:/FIwindows.h>")
+endif()
+
+# D3D9 declarations, on every platform. The backend is retired and none of its .cpp are
+# built, but the render headers still name its types, so the declarations have to exist
+# — and on Windows d3dx9.h ships in no modern SDK, so it needs them as much as anyone.
+# BEFORE the system paths: on Windows this shadows the SDK's own d3d9.h, deliberately,
+# so all three platforms parse the same declarations for a backend nobody calls.
+target_include_directories(EngineIncludes BEFORE INTERFACE
+    ${CMAKE_SOURCE_DIR}/Platform/d3d9_compat
 )
 
 if(NOT WIN32)

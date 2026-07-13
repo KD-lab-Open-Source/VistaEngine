@@ -6,6 +6,10 @@
 #include "Serialization/StringTableReference.h"
 #include "Serialization/StringTableReferencePolymorphic.h"
 #include "Serialization/Factory.h"
+// editorSetGroup() below calls FactorySelector<T>::Factory::instance(), and that Factory
+// is a SerializationFactory — which Serialization.h only forward-declares. clang lets the
+// incomplete type through until something needs it; MSVC wants the definition here (C2027).
+#include "Serialization/SerializationFactory.h"
 #include "Console.h"
 
 ///////////////////////////////////////////////////////////////

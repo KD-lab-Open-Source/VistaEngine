@@ -1,8 +1,8 @@
 #ifndef __TILE_MAP_H_INCLUDED__
 #define __TILE_MAP_H_INCLUDED__
 
-#include "Render/Inc/IVisGenericInternal.h"
-#include "Render/Inc/IRenderDevice.h"
+#include "Render/inc/IVisGenericInternal.h"
+#include "Render/inc/IRenderDevice.h"
 #include "Terra/UpdateMapClient.h"
 #include "Starforce.h"
 

@@ -1,9 +1,9 @@
 // CDKey.cpp : Defines the entry point for the console application.
 //
 
-#include "stdafx.h"
-#include "kdw/dialog.h"
-#include "kdw/entry.h"
+#include "StdAfx.h"
+#include "kdw/Dialog.h"
+#include "kdw/Entry.h"
 #include "kdw/HBox.h"
 #include "kdw/Label.h"
 #include "kdw/kdWidgetsLib.h"

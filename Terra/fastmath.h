@@ -62,31 +62,10 @@ extern float  fastsqrtN (float x);
 extern unsigned short sqrtTable4IntegerCalculate[1024];
 extern void init_sqrtTable4IntegerCalculate();
 
+// Was a table lookup in x86 assembly, guarded to the non-_CROSS_PLATFORM_ side — which
+// meant Windows, where MSVC accepts no inline asm on x64 either. sqrtf is the whole
+// function now, on every platform.
 inline int fastsqrtI(int s)
 {
-#ifdef _CROSS_PLATFORM_
 	return s > 0 ? (int)sqrtf((float)s) : 0;
-#else
-	_asm{
-		xor eax,eax
-		xor esi,esi
-		lea esi, sqrtTable4IntegerCalculate
-		mov ebx, s
-		mov edx, 11
-		bsr ecx, ebx
-		sub ecx, 9
-		jle loc_skip
-		shr ecx, 1
-		adc ecx, 0
-		sub edx, ecx
-		shl ecx, 1
-		shr ebx, cl
-loc_skip:
-		mov ax, [esi+ebx*2]
-		mov ecx, edx
-		shr eax, cl
-		mov s, eax
-	}
-	return s;
-#endif
 }

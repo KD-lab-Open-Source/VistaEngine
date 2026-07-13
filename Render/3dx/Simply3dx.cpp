@@ -2,11 +2,11 @@
 #include "Simply3dx.h"
 #include "Static3dx.h"
 #include "Scene.h"
-#include "Render/Shader/Shaders.h"
+#include "Render/shader/shaders.h"
 #include "D3DRender.h"
 #include "cCamera.h"
 #include "VisGeneric.h"
-#include "Terra/vmap.h"
+#include "Terra/VMAP.H"
 #include <algorithm>
 #include "Render/SDLRenderDevice.h"   // sdlObjectRenderer()
 

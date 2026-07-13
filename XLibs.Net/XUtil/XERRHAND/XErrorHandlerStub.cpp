@@ -6,7 +6,7 @@
 // is portable. Off-Windows we provide the same fatal-error semantics (print the
 // message and abort) without the platform-specific machinery. A richer
 // cross-platform crash reporter is a later effort.
-#include "xglobal.h"
+#include "XGLOBAL.H"
 #include <cstdio>
 #include <cstdlib>
 
@@ -66,3 +66,32 @@ void XErrorHandler::SetRestore(void (*rf)())
 {
 	restore_func = rf;
 }
+
+// The same condition xutil.h uses to declare these: where the asserts compile out,
+// the names are macros or absent, and defining them here would not compile.
+#if (!defined(_FINAL_VERSION_) || defined(_DEBUG)) && !defined(NASSERT)
+
+// What xassert() calls on a failure. The Win32 original (XERRHAND/DiagAssert.cpp)
+// raised a MessageBox offering Ignore / Break / Abort, with a DbgHelp stack trace
+// read out of the x86 CONTEXT. Here: report it and carry on. Returning 1 is that
+// dialog's "Ignore", which latches the assert off, so one failing every frame
+// reports once instead of flooding.
+static void (*assertRestoreGraphics)() = nullptr;
+
+void SetAssertRestoreGraphicsFunction(void(*func)())
+{
+	assertRestoreGraphics = func;
+}
+
+int DiagAssert(unsigned long, const char* szMsg, const char* szFile, unsigned long dwLine)
+{
+	if(assertRestoreGraphics)
+		assertRestoreGraphics();	// leave fullscreen, or the report is invisible
+
+	fprintf(stderr, "ASSERTION FAILED: %s\n  %s:%lu\n",
+			szMsg ? szMsg : "", szFile ? szFile : "", dwLine);
+	fflush(stderr);
+	return 1;
+}
+
+#endif

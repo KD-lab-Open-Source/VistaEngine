@@ -25,5 +25,5 @@ TimerData::TimerData(const char* title) : title_(title) {}
 void TimerData::start() {}
 void TimerData::stop() {}
 
-StatisticalData::StatisticalData(char* title) : title_(title) {}
+StatisticalData::StatisticalData(const char* title) : title_(title) {}
 void StatisticalData::add(double) {}

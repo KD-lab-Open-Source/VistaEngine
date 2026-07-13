@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "XTL/Rect.h"
 #include "CameraManager.h"
 #include "GameOptions.h"
@@ -9,7 +9,7 @@
 #include "Render/src/FT_Font.h"
 #include "Render/src/Scene.h"
 #include "Render/src/VisGeneric.h"
-#include "Terra/vMap.h"
+#include "Terra/VMAP.H"
 
 int terFullScreen = 0;
 

@@ -2,7 +2,7 @@
 #include "D3DRender.h"
 #include "shaders.h"
 #include "UnkLight.h"
-#include "scene.h"
+#include "Scene.h"
 #include "cCamera.h"
 #include "VisGeneric.h"
 

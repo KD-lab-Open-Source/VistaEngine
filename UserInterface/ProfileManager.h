@@ -3,8 +3,8 @@
 
 #include "Network/NetPlayer.h"
 #include "Units/AttributeReference.h"
-#include "xtl/StaticMap.h"
-#include "xtl/UniqueVector.h"
+#include "XTL/StaticMap.h"
+#include "XTL/UniqueVector.h"
 #include "FileUtils/XGUID.h"
 #include "Parameters.h"
 #include "Starforce.h"

@@ -93,30 +93,18 @@ const int INT_INF = 0x7fffffff;
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+// round() is the C library's, from <math.h>. The engine used to declare its own
+// int round(double) here, implemented as x87 `fld; fistp` — which no 64-bit
+// compiler accepts (MSVC has no inline asm on x64) and which cannot be declared
+// anyway: it differs from the CRT's double round(double) only by return type.
+// Callers assign the result to an int as they always did.
+//
+// __ROUND__ guards sqr()/SIGN(), which xutil.h declares identically; whichever
+// header a translation unit sees first wins.
 #ifndef __ROUND__
 #define __ROUND__
 
-xm_inline int round(double x)
-{
-	int a;
-	_asm {
-		fld x
-		fistp dword ptr a
-	}
-	return a;
-}
-
-xm_inline int round(float x)
-{
-	int a;
-	_asm {
-		fld x
-		fistp dword ptr a
-	}
-	return a;
-}
-
-template <class T> 
+template <class T>
 xm_inline T sqr(const T& x){ return x*x; }
 
 #endif // __ROUND__

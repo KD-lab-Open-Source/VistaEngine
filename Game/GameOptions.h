@@ -4,7 +4,6 @@
 #include "Serialization/LibraryWrapper.h"
 #include "Starforce.h"
 #include "XMath/xmath.h"
-#include "d3d9types.h"
 #include "UserInterface/CommonLocText.h"
 
 enum GameOptionType
@@ -210,7 +209,11 @@ private:
 	typedef vector<Vect2i> Resolutions;
     Resolutions resolutions_;
 
-	typedef vector<D3DMULTISAMPLE_TYPE> AntialiasModes;
+	// Sample counts. These used to be D3DMULTISAMPLE_TYPE, whose enumerators are the
+	// sample count anyway (D3DMULTISAMPLE_NONE is 0, _4_SAMPLES is 4), and naming that
+	// type dragged d3d9types.h into every translation unit including this header —
+	// which on Windows is the SDK's real one, for a D3D9 that no longer exists here.
+	typedef vector<int> AntialiasModes;
 	AntialiasModes antialiasModes_;
 
 	string locDataRoot_;

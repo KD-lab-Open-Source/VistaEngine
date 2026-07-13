@@ -8,7 +8,7 @@
 #include <cstring>
 #include <vector>
 
-#include "terra/vmap.h"        // vMap heightfield + baked per-cell surface colour
+#include "Terra/VMAP.H"        // vMap heightfield + baked per-cell surface colour
 #include "MultiRegion.h"       // vMap.region(): the per-cell material map
 #include "cCamera.h"           // Camera::matView / matProj / GetLighting / vp
 #include "TileMap.h"           // cTileMap::GetDiffuse, miniDetailTexture (per material)

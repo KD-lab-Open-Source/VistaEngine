@@ -1,15 +1,30 @@
 #pragma once
-// Direct3D 9 — stub for non-Windows builds.
+// Direct3D 9 — declarations only, for every platform including Windows.
 //
-// The D3D9 renderer .cpp are excluded from the cross-platform CMake targets and
-// will be replaced by the SDL GPU backend (Track B). This stub exists so the
-// render *headers* (Render/D3D/D3DRender.h, Render/shader/Shaders.h, ...) PARSE
-// for the upper layers that include them (UserInterface, Game, ...). Those
-// layers compile against these declarations; the actual render symbols are
-// provided by the eventual Render stub LIB at link time.
+// The D3D9 backend is retired: the renderer is SDL GPU everywhere and none of the
+// D3D9 .cpp are built. But the render *headers* (Render/D3D/StdAfxRD.h, D3DRender.h,
+// Render/shader/ShaderStorage.h, ...) still name D3D9 types and enums, and the upper
+// layers include them — so those declarations have to exist somewhere. Here.
 //
-// Only what the inline code in the render headers touches is modelled here.
-#include "../WindowsAPI.h"
+// On Windows this deliberately shadows the SDK's d3d9.h. Two reasons: d3dx9.h ships
+// in no modern SDK at all (it was the legacy DirectX SDK), so Windows needs a stand-in
+// regardless; and one set of declarations on all three platforms means the same code
+// compiles the same way everywhere. Nothing here is ever called — a retired backend
+// only has to parse.
+//
+// Only what the inline code in the render headers touches is modelled.
+#ifdef _WIN32
+#  include <windows.h>			// HWND, HRESULT, IUnknown, ...
+#else
+#  include "Platform/WindowsAPI.h"
+#endif
+
+// The success HRESULT. Named by inline code that still checks D3D calls (Texture.cpp
+// asserts hr == D3D_OK); on Windows the SDK's d3d9.h is shadowed by this one, so it has
+// to be here too.
+#ifndef D3D_OK
+#define D3D_OK 0
+#endif
 
 // ─── COM-ish base ─────────────────────────────────────────────────────────────
 // Every D3D9 interface inherits IUnknown's Release/AddRef/QueryInterface; model

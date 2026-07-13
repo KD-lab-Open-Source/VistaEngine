@@ -75,8 +75,10 @@ void PositionGeneratorCircle<TUnitList>::init(float _radius, const Vect2f& _cent
 	ignoreGroup = _ignoreGroup;
 }
 
+// No default arguments here: they belong to the declaration above (line 35), and an
+// out-of-line definition of a class-template member may not repeat them (C5037).
 template <class TUnitList>
-Vect2i PositionGeneratorCircle<TUnitList>::get(const UnitBase * unit, bool _checkZones = true, bool _checkUnits = true)
+Vect2i PositionGeneratorCircle<TUnitList>::get(const UnitBase * unit, bool _checkZones, bool _checkUnits)
 {
 	checkZones = _checkZones;
 	checkUnits = _checkUnits;

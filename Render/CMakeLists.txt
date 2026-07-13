@@ -189,14 +189,9 @@ set(RENDER_SOURCES
     src/DDSImage.cpp
 )
 
-if(WIN32)
-    # DbgHelp stack walkers: Windows-only debug tooling, nothing to do with the
-    # renderer.
-    list(APPEND RENDER_SOURCES
-        Util/stack.cpp
-        Util/stackwalker.cpp
-    )
-endif()
+# Util/stack.cpp and Util/stackwalker.cpp are not built: DbgHelp stack walkers, x86
+# debug tooling with nothing to do with the renderer, and no file in the tree includes
+# either of them.
 
 add_library(Render STATIC ${RENDER_SOURCES})
 # FreeType (FetchContent) — used by the font rasterizer (FT_Font.cpp, ftrender.cpp).

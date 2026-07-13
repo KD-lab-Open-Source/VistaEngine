@@ -213,8 +213,8 @@ struct ColorQuantizer {
 		}
 	}
 	inline unsigned char findNearestColor(Color4c color){
-        register int r1, g1, b1, r2, g2, b2;
-        register long dist, newdist;
+        int r1, g1, b1, r2, g2, b2;
+        long dist, newdist;
 		r1 = color.r;
         g1 = color.g;
         b1 = color.b;

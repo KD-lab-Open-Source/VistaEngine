@@ -168,17 +168,17 @@ public:
 	void serializeParameters(Archive& ar);
 	void serializeRegion(Archive& ar);
 
-	static char* worldRasterDataFileSource;
-	static char* worldRGBFileSource;
-	static char* worldDataFile;
+	static const char* worldRasterDataFileSource;
+	static const char* worldRGBFileSource;
+	static const char* worldDataFile;
 	//static char* worldGeoPalFile;
-	static char* worldDamPalFile;
-	static char* worldLeveledTextureFile;
-	static char* worldSurfaceKindFile;
+	static const char* worldDamPalFile;
+	static const char* worldLeveledTextureFile;
+	static const char* worldSurfaceKindFile;
 
-	static char* worldRGBCacheFile;
-	static char* worldRasterDataCacheFile;
-	static char* worldMiniMapFile;
+	static const char* worldRGBCacheFile;
+	static const char* worldRasterDataCacheFile;
+	static const char* worldMiniMapFile;
 
 	const vector<sRect>& getChangedAreas() { return changedAreas; }
 	void clearChangedAreas() { changedAreas.clear(); }

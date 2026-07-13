@@ -1,4 +1,5 @@
 #include "XmlRpcUtil.h"
+#include <cstdarg>	// va_start/va_list; libc++ pulls this in transitively, glibc does not
 
 #ifndef MAKEDEPEND
 # include <ctype.h>

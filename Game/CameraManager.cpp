@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+#include "XTL/TempPtr.h"	// tempPtr(): &temporary is not an lvalue for a conforming compiler
 #include "CameraManager.h"
 
 #include "UserInterface/UI_Logic.h"
@@ -6,7 +7,7 @@
 #include "GameOptions.h"
 
 #include "UnitActing.h"
-#include "vmap.h"
+#include "VMAP.H"
 #include "RenderObjects.h"
 #include "EditorVisual.h"
 #include "XMath/SafeMath.h"
@@ -15,7 +16,7 @@
 #include "Water/Water.h"
 #include "Environment/Environment.h"
 #include "Render/D3D/D3DRender.h"
-#include "Render/Src/cCamera.h"
+#include "Render/src/cCamera.h"
 #include "Render/src/Scene.h"
 #include "Serialization/SerializationFactory.h"
 
@@ -368,9 +369,9 @@ void CameraManager::SetFrustumEditor(bool zFarInfinite)
 	frustumClip_.set(-0.5f, -0.5f, 0.5f, 0.5f);
 
 	camera_->SetFrustum(								// устанавливается пирамида видимости
-		&Vect2f(0.5f,0.5f),							// центр камеры
+		tempPtr(Vect2f(0.5f,0.5f)),							// центр камеры
 		&frustumClip_,								// видимая область камеры
-		&Vect2f(coordinate().focus(), coordinate().focus()),	// фокус камеры
+		tempPtr(Vect2f(coordinate().focus(), coordinate().focus())),	// фокус камеры
 		&z
 		);
 }
@@ -396,9 +397,9 @@ void CameraManager::SetFrustumGame()
 	float focus = correctedFocus(coordinate().focus());
 
 	camera_->SetFrustum(			// устанавливается пирамида видимости
-		&Vect2f(0.5f,0.5f),		// центр камеры
+		tempPtr(Vect2f(0.5f,0.5f)),		// центр камеры
 		&frustumClip_,			// видимая область камеры
-		&Vect2f(focus, focus),	// фокус камеры
+		tempPtr(Vect2f(focus, focus)),	// фокус камеры
 		&z
 		);
 }

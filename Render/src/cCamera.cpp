@@ -5,7 +5,7 @@
 #include "XMath/SafeMath.h"
 #include "ClippingMesh.h"
 #include "Render/src/FogOfWar.h"
-#include "Render/Shader/Shaders.h"
+#include "Render/shader/shaders.h"
 #include "D3DRender.h"
 #include "VisGeneric.h"
 #include "Render/SDLRenderDevice.h"   // the shadow map and its depth pass live here

@@ -6,7 +6,7 @@
 #pragma once
 
 #include "xmath.h"
-#include "xzip.h"
+#include "XZip.h"
 #include "Profiler.h"
 #include "DebugPrm.h"
 #include "DebugUtil.h"

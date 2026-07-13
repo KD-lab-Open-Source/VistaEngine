@@ -13,7 +13,8 @@
 #ifndef _WIN32
 
 #include <string>
-#include <dirent.h>
+#include <filesystem>
+#include <system_error>
 #include <fnmatch.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -167,15 +168,14 @@ std::string NormalizePath(const char* path) {
             struct stat st;
             if (::stat(candidate.c_str(), &st) != 0) {
                 // No exact match — scan the parent for a case-insensitive one.
-                const char* dirToScan = out.empty() ? "." : out.c_str();
-                if (DIR* d = ::opendir(dirToScan)) {
-                    for (struct dirent* ent; (ent = ::readdir(d)) != nullptr; ) {
-                        if (::strcasecmp(ent->d_name, comp.c_str()) == 0) {
-                            matched = ent->d_name;
-                            break;
-                        }
+                const std::string dirToScan = out.empty() ? "." : out;
+                std::error_code ec;
+                for (const auto& entry : std::filesystem::directory_iterator(dirToScan, ec)) {
+                    const std::string name = entry.path().filename().string();
+                    if (::strcasecmp(name.c_str(), comp.c_str()) == 0) {
+                        matched = name;
+                        break;
                     }
-                    ::closedir(d);
                 }
             }
         }
@@ -263,24 +263,35 @@ void _splitpath(const char* path, char* drive, char* dir, char* fname, char* ext
 // scenario mission list came back empty off-Windows (no campaign missions -> the
 // mission-select screen has nothing to select -> the Start button never appears).
 // "", "*" and "*.*" mean "everything" (classic Win32 semantics, incl. extensionless).
+// The search state behind the HANDLE that FindFirstFile returns. It lives here rather
+// than in the header so that <filesystem> — and, when this was POSIX dirent, the DT_*
+// names that clash with the engine's own — stay out of every translation unit.
+struct _FindContext {
+    std::filesystem::directory_iterator it;
+    std::string pattern;
+};
+
 static bool findNextMatch(_FindContext* ctx, WIN32_FIND_DATAA* fd) {
-    const bool matchAll = !ctx->pattern[0] ||
-                          !strcmp(ctx->pattern, "*") || !strcmp(ctx->pattern, "*.*");
-    struct dirent* ent;
-    while ((ent = readdir(ctx->dir)) != nullptr) {
-        if (ent->d_name[0] == '.') continue;   // skip ".", "..", dotfiles (as before)
-        if (!matchAll && fnmatch(ctx->pattern, ent->d_name, FNM_CASEFOLD) != 0) continue;
-        strncpy(fd->cFileName, ent->d_name, MAX_PATH-1); fd->cFileName[MAX_PATH-1] = '\0';
-        fd->dwFileAttributes = (ent->d_type == DT_DIR) ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL;
-        fd->nFileSizeHigh = fd->nFileSizeLow = 0;
-        // Report the real size so nFileSizeLow-gated callers (readFromDir) accept it.
-        std::string full = std::string(ctx->path) + "/" + ent->d_name;
-        struct stat st;
-        if (stat(full.c_str(), &st) == 0) {
-            fd->nFileSizeLow  = (DWORD)(st.st_size & 0xffffffff);
-            fd->nFileSizeHigh = (DWORD)(st.st_size >> 32);
-            if (S_ISDIR(st.st_mode)) fd->dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
-        }
+    const bool matchAll = ctx->pattern.empty() ||
+                          ctx->pattern == "*" || ctx->pattern == "*.*";
+    const std::filesystem::directory_iterator end;
+    for (; ctx->it != end; ++ctx->it) {
+        const std::string name = ctx->it->path().filename().string();
+        if (name.empty() || name[0] == '.') continue;   // skip ".", "..", dotfiles (as before)
+        if (!matchAll && fnmatch(ctx->pattern.c_str(), name.c_str(), FNM_CASEFOLD) != 0) continue;
+
+        strncpy(fd->cFileName, name.c_str(), MAX_PATH-1); fd->cFileName[MAX_PATH-1] = '\0';
+
+        std::error_code ec;
+        const bool isDir = ctx->it->is_directory(ec);
+        fd->dwFileAttributes = isDir ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL;
+        // Report the real size: nFileSizeLow-gated callers (MissionDescriptions::
+        // readFromDir) skip any entry of size 0, which once emptied the mission list.
+        const uintmax_t size = isDir ? 0 : ctx->it->file_size(ec);
+        fd->nFileSizeLow  = ec ? 0 : (DWORD)(size & 0xffffffff);
+        fd->nFileSizeHigh = ec ? 0 : (DWORD)(size >> 32);
+
+        ++ctx->it;      // leave the iterator on the next candidate for FindNextFile
         return true;
     }
     return false;
@@ -299,14 +310,15 @@ HANDLE FindFirstFileA(const char* rawPattern, WIN32_FIND_DATAA* fd) {
     if (sl == std::string::npos) { dir_s = "."; mask_s = pattern_s; }
     else { dir_s = pattern_s.substr(0, sl); if (dir_s.empty()) dir_s = "/"; mask_s = pattern_s.substr(sl + 1); }
 
-    DIR* d = opendir(dir_s.c_str());
-    if (!d) return INVALID_HANDLE_VALUE;
-    auto* ctx = new _FindContext; ctx->dir = d;
-    strncpy(ctx->path, dir_s.c_str(), MAX_PATH-1);     ctx->path[MAX_PATH-1] = '\0';
-    strncpy(ctx->pattern, mask_s.c_str(), MAX_PATH-1); ctx->pattern[MAX_PATH-1] = '\0';
+    // The error_code overload: a missing or unreadable directory must return
+    // INVALID_HANDLE_VALUE, not throw — callers probe with paths that may not exist.
+    std::error_code ec;
+    std::filesystem::directory_iterator it(dir_s, ec);
+    if (ec) return INVALID_HANDLE_VALUE;
 
+    auto* ctx = new _FindContext{ it, mask_s };
     if (findNextMatch(ctx, fd)) return (HANDLE)ctx;
-    closedir(d); delete ctx; return INVALID_HANDLE_VALUE;
+    delete ctx; return INVALID_HANDLE_VALUE;
 }
 
 BOOL FindNextFileA(HANDLE h, WIN32_FIND_DATAA* fd) {
@@ -316,8 +328,8 @@ BOOL FindNextFileA(HANDLE h, WIN32_FIND_DATAA* fd) {
 
 BOOL FindCloseHandle(HANDLE h) {
     if (h == INVALID_HANDLE_VALUE) return FALSE;
-    auto* ctx = (_FindContext*)h;
-    closedir(ctx->dir); delete ctx; return TRUE;
+    delete (_FindContext*)h;
+    return TRUE;
 }
 
 #endif // !_WIN32

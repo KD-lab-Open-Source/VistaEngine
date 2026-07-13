@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "CommonLocText.h"
 #include "Serialization/Serialization.h"
 #include "Serialization/EnumDescriptor.h"

@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "Wind.h"
+#include "wind.h"
 #include "Serialization.h"
 #include "ResourceSelector.h"
 #include "RenderObjects.h"

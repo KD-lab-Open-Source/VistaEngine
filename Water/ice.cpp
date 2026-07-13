@@ -1,9 +1,9 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "ice.h"
 #include "Render/shader/shaders.h"
 #include "Serialization/ResourceSelector.h"
-#include "Render/Src/TexLibrary.h"
-#include "Render/Src/cCamera.h"
+#include "Render/src/TexLibrary.h"
+#include "Render/src/cCamera.h"
 #include "Render/D3D/D3DRender.h"
 
 cTemperature::cTemperature()

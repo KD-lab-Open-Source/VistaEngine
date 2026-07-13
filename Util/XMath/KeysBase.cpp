@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "KeysBase.h"
 
 float KeyBase::time_delta=0.05f;//в секундах

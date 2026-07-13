@@ -1,10 +1,10 @@
 #ifndef __STATIC_3DX_BASE_H__
 #define __STATIC_3DX_BASE_H__
 
-#include "Interpolator3DX.h"
+#include "Interpolator3dx.h"
 #include "Render/3dx/Umath.h"
 #include "XMath/Colors.h"
-#include "XMath/Mats.h"
+#include "XMath/mats.h"
 #include "XMath/Rectangle4f.h"
 #include "XMath/Box6f.h"
 #include "XTL/UniqueVector.h"

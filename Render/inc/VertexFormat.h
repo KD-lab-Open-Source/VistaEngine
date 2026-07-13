@@ -1,7 +1,7 @@
 #ifndef __VERTEX_FORMAT_H_INCLUDED__
 #define __VERTEX_FORMAT_H_INCLUDED__
 
-#include "Render/3dx/umath.h"
+#include "Render/3dx/Umath.h"
 #include "XMath/Colors.h"
 
 struct IDirect3DVertexDeclaration9;

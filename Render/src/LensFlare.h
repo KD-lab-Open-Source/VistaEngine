@@ -3,7 +3,7 @@
 
 #include "XMath/xmath.h"
 #include "XMath/Colors.h"
-#include "Render/Inc/IVisGenericInternal.h"
+#include "Render/inc/IVisGenericInternal.h"
 
 class Archive;
 class cTexture;

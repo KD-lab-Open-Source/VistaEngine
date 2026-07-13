@@ -1,4 +1,5 @@
-#include "StdAfx.h"
+#include "stdafx.h"
+#include <cstdint>	// int32_t, for the 4-byte wire fields below
 #include "UniverseX.h"
 #include "RenderObjects.h"
 #include "Runtime.h"
@@ -13,7 +14,7 @@
 #include "Serialization/StringTable.h"
 
 #include "Lmcons.h"
-#include "vmap.h"
+#include "VMAP.H"
 #include "SelectManager.h"
 #include "NetCommands.h"
 #include "UserInterface/UI_Logic.h"
@@ -221,7 +222,7 @@ bool UniverseX::loadPlayReel(const char* fname)
 	temp.loadReplayInfoInBuf(buffer);
 
 	string name;
-	int varsSize;
+	int32_t varsSize;	// 4-byte wire field, written by savePlayReel()
 	buffer > varsSize;
 	currentProfileIntVariables_.clear();
 	for(; varsSize; varsSize--){
@@ -314,14 +315,17 @@ bool UniverseX::savePlayReel(const char* _fname)
 	mission.saveReplay(buffer);
 
 
-	buffer < currentProfileIntVariables_.size();
+	// int32_t, not size_t: this is the replay's wire format, and it is 4 bytes — what
+	// the original 32-bit build wrote and what loadPlayReel() reads back. On LP64
+	// size_t is 8 bytes, so this was streaming 8 into a 4-byte read.
+	buffer < (int32_t)currentProfileIntVariables_.size();
 	IntVariables::iterator i;
 	FOR_EACH(currentProfileIntVariables_, i)
 		buffer < StringOutWrapper(i->first) < i->second;
 
 	currentProfileParameters_.write(buffer);
 
-	buffer < voiceFileDurations_.size();
+	buffer < (int32_t)voiceFileDurations_.size();	// 4-byte wire field, as above
 	VoiceFileDurations::iterator vi;
 	FOR_EACH(voiceFileDurations_, vi)
 		buffer < StringOutWrapper(vi->first) < vi->second;

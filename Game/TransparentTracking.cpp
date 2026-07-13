@@ -1,6 +1,6 @@
 #include "StdAfx.h"
-#include "Render/3dx/Node3dx.h"
-#include "Render/Src/cCamera.h"
+#include "Render/3dx/Node3DX.h"
+#include "Render/src/cCamera.h"
 #include "TransparentTracking.h"
 #include "BaseUnit.h"
 #include "Universe.h"

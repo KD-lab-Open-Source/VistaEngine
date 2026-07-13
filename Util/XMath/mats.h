@@ -1,7 +1,7 @@
 #ifndef __MATS_H_INCLUDED__
 #define __MATS_H_INCLUDED__
 
-#include "XMath/XMath.h"
+#include "XMath/xmath.h"
 
 class Mats
 {

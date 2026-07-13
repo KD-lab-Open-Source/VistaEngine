@@ -34,7 +34,6 @@
 #ifndef __STATIC_MAP_H_INCLUDED__
 #define __STATIC_MAP_H_INCLUDED__
 
-#include <stl/_construct.h>
 #include <vector>
 #include <algorithm>
 

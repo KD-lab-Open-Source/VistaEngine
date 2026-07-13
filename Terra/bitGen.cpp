@@ -1,6 +1,6 @@
 #include "stdafxTr.h"
 
-#include "vmap.h"
+#include "VMAP.H"
 #include "bitGen.h"
 
 BitGenDispatcher bitGenDispatcher;

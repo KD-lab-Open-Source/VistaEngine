@@ -1,4 +1,5 @@
-#include "StdAfx.h"
+#include "stdafx.h"
+#include "XTL/TempPtr.h"	// tempPtr(): &temporary is not an lvalue for a conforming compiler
 #include "UI_Minimap.h"
 #include "UI_Render.h"
 #include "UI_Logic.h"
@@ -287,7 +288,7 @@ void UI_Minimap::drawStartLocations(float alpha)
 					buf < L"x";
 
 				Rectf rect(world2minimap(mission->startLocation(mission->playerData(number).shuffleIndex)) - Vect2f(0.5f * font->size() / scale_.x, 0.5f * font->size() / scale_.y), Vect2f(font->size() / scale_.x, font->size() / scale_.y));
-				UI_Render::instance().outText(rect, buf, &UI_TextFormat(color), UI_TEXT_ALIGN_CENTER, font, alpha);
+				UI_Render::instance().outText(rect, buf, tempPtr(UI_TextFormat(color)), UI_TEXT_ALIGN_CENTER, font, alpha);
 			}
 		}
 	}

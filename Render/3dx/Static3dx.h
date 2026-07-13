@@ -3,7 +3,7 @@
 
 #include "Static3dxBase.h"
 #include "VoxelBox.h"
-#include "Render/Inc/IRenderDevice.h"
+#include "Render/inc/IRenderDevice.h"
 
 // Кусок объекта, состоящий из нескольких нодов, но одного материала
 struct StaticBunch
@@ -63,7 +63,7 @@ public:
 
 	class cVisError& errlog();
 
-	cTexture* LoadTexture(const char* name,char* mode=0);//То же что и GetTexLibrary()->GetElement, но с более развернутым сообщением об ошибке.
+	cTexture* LoadTexture(const char* name,const char* mode=0);//То же что и GetTexLibrary()->GetElement, но с более развернутым сообщением об ошибке.
 	void GetTextureNames(TextureNames& names) const;
 	string fixTextureName(const char* name) const;
 

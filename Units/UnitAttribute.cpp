@@ -1,5 +1,5 @@
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "UnitAttribute.h"
 #include "Sound.h"
 #include "GlobalAttributes.h"
@@ -105,6 +105,12 @@ WRAP_LIBRARY(AttributeLibrary, "AttributeLibrary", "Юниты", "Scripts\\Conte
 WRAP_LIBRARY(AuxAttributeLibrary, "AuxAttributeLibrary", "AuxAttributeLibrary", "Scripts\\Engine\\AuxAttributeLibrary", 0, 0);
 
 WRAP_LIBRARY(RigidBodyPrmLibrary, "RigidBodyPrmLibrary", "RigidBodyPrmLibrary", "Scripts\\Engine\\RigidBodyPrmLibrary", 0, LIBRARY_IN_PLACE);
+
+// Emit RigidBodyPrmReference's out-of-line members once, here, where its library is
+// registered. Its constructor is defined in StringTableImpl.h, which the dozen TUs
+// that build a reference from a name do not include — and an optimised build inlines
+// away whatever local copies do exist, leaving nothing to link against.
+template class StringTableReferencePolymorphic<RigidBodyPrm, true>;
 
 WRAP_LIBRARY(RaceTable, "RaceTable", "Расы", "Scripts\\Content\\RaceTable", 0, LIBRARY_EDITABLE | LIBRARY_IN_PLACE);
 

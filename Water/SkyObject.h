@@ -2,7 +2,7 @@
 
 #include "Render/src/RenderCubemap.h"
 #include "Environment/EnvironmentColors.h"
-#include "Render/Src/cCamera.h"
+#include "Render/src/cCamera.h"
 
 class EnvironmentTime;
 class cSkyObj;
