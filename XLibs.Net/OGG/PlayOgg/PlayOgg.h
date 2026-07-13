@@ -8,6 +8,14 @@ enum OggState
 	OGG_PAUSED
 };
 
+/// Which mix bus a player feeds (Sound/AudioBackend.h). The music and the speech carry
+/// their own volume option, and are balanced -- and can later be ducked -- apart.
+enum OggBus
+{
+	OGG_BUS_MUSIC = 0,
+	OGG_BUS_VOICE
+};
+
 struct OggCallbacks
 {
 	int		(*open_func)	(void *datasource, const char* file_name);
@@ -30,6 +38,9 @@ public:
 	void stop();
 	void pause();
 	void resume();
+
+	/// Which bus this player feeds. Music unless told otherwise.
+	void setBus(OggBus bus);
 
 	/// имя проигрываемого файла
 	const char* fileName() const;

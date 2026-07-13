@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "AudioBackend.h"
+#include "VorbisDecoder.h"
 
 #include <mutex>
 
@@ -142,6 +143,12 @@ bool init()
 	// it reads through the VFS above.
 	ma_resource_manager_config resourceConfig = ma_resource_manager_config_init();
 	resourceConfig.pVFS = &zipVFS;
+
+	// Vorbis is not one of the formats miniaudio decodes for itself, and all of the music and all
+	// of the speech is .ogg (Sound/VorbisDecoder.cpp). The effects are .wav, which it does handle.
+	static ma_decoding_backend_vtable* customBackends[] = { vorbisDecodingBackend() };
+	resourceConfig.ppCustomDecodingBackendVTables = customBackends;
+	resourceConfig.customDecodingBackendCount = 1;
 
 	if(ma_resource_manager_init(&resourceConfig, &resourceManager) != MA_SUCCESS){
 		fprintf(stderr, "audio: ma_resource_manager_init failed\n");

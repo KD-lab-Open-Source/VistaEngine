@@ -18,6 +18,7 @@
 #include "SoundSystem.h"
 #include "AudioBackend.h"
 #include "SystemUtil.h"
+#include "Console.h"
 
 SoundSystem sndSystem;
 
@@ -344,7 +345,7 @@ bool Sound::CreateSoundFromFile(const char* filename, DWORD mode)
 	                                           MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION,
 	                                           0, 0, source_);
 	if(result != MA_SUCCESS){
-		fprintf(stderr, "Sound: cannot open '%s' (miniaudio result %i)\n", filename, (int)result);
+		kdWarning("&SoundSystem", XBuffer(1024, 1) < /*TRANSLATE*/("Невозможно открыть файл : ") < filename);
 		delete source_;
 		source_ = 0;
 		return false;

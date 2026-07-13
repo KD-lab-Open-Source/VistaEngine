@@ -222,6 +222,8 @@ VoiceManager::VoiceManager() : stream_(false)
 	soundTrack_ = "";
 	canPaused_ = true;
 
+	mpeg->setBus(OGG_BUS_VOICE);
+
 	OggPlayer::setCallbacks(&zipMpegCallbacks);
 }
 
@@ -313,6 +315,8 @@ MusicManager::MusicManager()
 	active = false;
 	mpeg = &gb_Music;
 	soundTrack_ = "";
+
+	mpeg->setBus(OGG_BUS_MUSIC);
 }
 
 MusicManager::~MusicManager()
@@ -367,12 +371,15 @@ bool MusicManager::Play(const char* soundTrack)
 		return false;
 
 #ifndef _FINAL_VERSION_
-	FILE* file=fopen(soundTrack,"r");
-	if(file==NULL){
-		kdWarning("&VoiceManager",XBuffer(1024, 1) < /*TRANSLATE*/("Невозможно открыть файл : ") < soundTrack);
+	// The track names come out of the script tables with backslashes ("Resource\Music\Battle.ogg"),
+	// so a raw fopen() of one — which is what this probe used to be — finds nothing anywhere but
+	// Windows. Ask the same reader that is about to play it.
+	XZipStream file(false);
+	if(!file.open(soundTrack, XZS_IN)){
+		kdWarning("&MusicManager",XBuffer(1024, 1) < /*TRANSLATE*/("Невозможно открыть файл : ") < soundTrack);
 		return false;
 	}
-	fclose(file);
+	file.close();
 #endif
 
 	if(mpeg->state() == OGG_PLAYING && soundTrack_ == soundTrack) {
