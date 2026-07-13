@@ -4,11 +4,11 @@
 #include "SlotManager.h"
 #include "Render/shader/shaders.h"
 #include "DrawType.h"
-#include "Render/Inc/IRenderDevice.h"
-#include "Render/Src/TexLibrary.h"
+#include "Render/inc/IRenderDevice.h"
+#include "Render/src/TexLibrary.h"
 #include "PoolManager.h"
 #include "OcclusionQuery.h"
-#include "Render/Src/VisError.h"
+#include "Render/src/VisError.h"
 
 class cFileImage;
 
@@ -92,7 +92,7 @@ public:
 	virtual int OutTextLine(int x, int y, const FT::Font& font, const wchar_t *textline, const wchar_t* end, const Color4c& color, eBlendMode blend_mode = ALPHA_BLEND, int xRangeMin = -1, int xRangeMax = -1);
 
 	virtual void OutText(int x,int y,const char *string,int r=255,int g=255,int b=255);
-	virtual void OutText(int x,int y,const char *string,int r,int g,int b,char *FontName="Arial",int size=12,int bold=0,int italic=0,int underline=0);
+	virtual void OutText(int x,int y,const char *string,int r,int g,int b,const char *FontName="Arial",int size=12,int bold=0,int italic=0,int underline=0);
 	virtual HWND GetWindowHandle(){ return globalRenderWindow_ ? globalRenderWindow_->GetHwnd() : 0; }
 	virtual bool SetScreenShot(const char *fname);
 	virtual void DrawSprite(int x,int y,int dx,int dy,float u,float v,float du,float dv,

@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "FieldOfView.h"
 #include "Render/D3D/D3DRender.h"
-#include "Render/Src/cCamera.h"
-#include "Terra/vMap.h"
+#include "Render/src/cCamera.h"
+#include "Terra/VMAP.H"
 #include "ScanPoly.h"
 #include "DebugUtil.h"
 
@@ -114,7 +114,9 @@ void FieldOfViewMap::add(const Vect3f& posWorld, float psi, float radius, float 
 	for(float t = -R; t < R; t += 0.01f){
 		float angle = psi + t;
 		int y = 100 + round(255*sqrtf(1.f - sqr(t/R) + FLT_EPS));
-		trace(pos, Vect2i(-round(radius*sinf(angle)), round(radius*cosf(angle))), zmin, zmax, colorIndex, y);
+		// (int): round() is the C library's now and returns a double, which is equally
+		// convertible to Vect2i's (int,int) and (float,float) constructors — ambiguous.
+		trace(pos, Vect2i((int)-round(radius*sinf(angle)), (int)round(radius*cosf(angle))), zmin, zmax, colorIndex, y);
 	}
 }
 

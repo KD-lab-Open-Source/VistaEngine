@@ -1,14 +1,15 @@
-#include "StdAfx.h"
+#include "stdafx.h"
+#include "XTL/TempPtr.h"	// tempPtr(): &temporary is not an lvalue for a conforming compiler
 
 #include "Render/inc/fps.h"
-#include "runtime.h"
+#include "Runtime.h"
 #include "GameShell.h"
 #include "Squad.h"
 #include "Universe.h"
 #include "Inventory.h"
 #include "SelectManager.h"
 #include "RenderObjects.h"
-#include "vmap.h"
+#include "VMAP.H"
 #include "Triggers.h"
 #include "IronBuilding.h"
 #include "Units/UnitItemInventory.h"
@@ -28,8 +29,8 @@
 #include "FileUtils/FileUtils.h"
 #include "Serialization/StringTable.h"
 #include "Serialization/SerializationFactory.h"
-#include "Render/Src/cCamera.h"
-#include "Render/Src/TexLibrary.h"
+#include "Render/src/cCamera.h"
+#include "Render/src/TexLibrary.h"
 #include "Render/SDLUIRenderer.h"          // the selection frame's quads are batched here,
 #include "Render/SDLRenderDevice.h"        // reached through sdlUIRenderer()
 #include "WBuffer.h"
@@ -51,13 +52,16 @@
 #include "CameraManager.h"
 #include "UniverseX.h"
 
-#include "Joystick.h"
+#include "joystick.h"
 
 #include "UI_StreamVideo.h"
 extern Singleton<UI_StreamVideo> streamVideo;
 
 #include "StreamCommand.h"
 #include <shellapi.h>
+// Defines the StringTableReference constructor. Without it this file gets only the
+// declaration, and an optimised build has no out-of-line copy to call.
+#include "Serialization/StringTableImpl.h"
 
 int indexInComboListStringW(const wchar_t* combo_string, const wchar_t* value);
 void splitComboListW(ComboWStrings& combo_array, const wchar_t* ptr, wchar_t delimeter);
@@ -497,7 +501,7 @@ void UI_LogicDispatcher::drawDebug2D() const
 				hovered_control->getDebugString(buf);
 			}
 			
-			UI_Render::instance().outDebugText(mousePosition_ + Vect2f(0.02f, 0.03f), buf.c_str(), &Color4c(120, 255, 120));
+			UI_Render::instance().outDebugText(mousePosition_ + Vect2f(0.02f, 0.03f), buf.c_str(), tempPtr(Color4c(120, 255, 120)));
 		}
 	}
 /*
@@ -1138,8 +1142,8 @@ void UI_LogicDispatcher::handleMessage(const ControlMessage& msg)
 
 void UI_LogicDispatcher::handleMessageReInitGameOptions()
 {
-	UI_Dispatcher::instance().handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_OPTION, UI_ActionDataControlCommand::RE_INIT)));
-	UI_Dispatcher::instance().handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_OPTION_PRESET_LIST, UI_ActionDataControlCommand::RE_INIT)));
+	UI_Dispatcher::instance().handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_OPTION, UI_ActionDataControlCommand::RE_INIT))));
+	UI_Dispatcher::instance().handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_OPTION_PRESET_LIST, UI_ActionDataControlCommand::RE_INIT))));
 }
 
 void UI_LogicDispatcher::updateInput(const UI_InputEvent& event)
@@ -2063,11 +2067,11 @@ void UI_LogicDispatcher::deleteSave()
 
 	UI_LogicDispatcher::instance().profileSystem().deleteSave(*mission);
 	handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND,
-		&UI_ActionDataControlCommand(
+		tempPtr(UI_ActionDataControlCommand(
 		mission->gameType() & GAME_TYPE_REEL ? UI_ACTION_REPLAY_NAME_INPUT : UI_ACTION_SAVE_GAME_NAME_INPUT,
-		UI_ActionDataControlCommand::CLEAR)
+		UI_ActionDataControlCommand::CLEAR))
 		));
-	handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_MISSION_LIST, UI_ActionDataControlCommand::RE_INIT)));
+	handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_MISSION_LIST, UI_ActionDataControlCommand::RE_INIT))));
 }
 
 bool UI_LogicDispatcher::isGameActive() const
@@ -3880,9 +3884,9 @@ void UI_LogicDispatcher::controlAction(UI_ControlActionID id, UI_ControlBase* co
 			if(UI_ControlStringList* lst = UI_ControlComboList::getList(control)){
 				if(const wchar_t* name = lst->selectedString()){
 					profileName_ = name;
-					handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_PROFILE_INPUT, UI_ActionDataControlCommand::GET_CURRENT_PROFILE_NAME)));
-					handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_CDKEY_INPUT, UI_ActionDataControlCommand::GET_CURRENT_CDKEY)));
-					handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_CDKEY_INPUT, UI_ActionDataControlCommand::EXECUTE)));
+					handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_PROFILE_INPUT, UI_ActionDataControlCommand::GET_CURRENT_PROFILE_NAME))));
+					handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_CDKEY_INPUT, UI_ActionDataControlCommand::GET_CURRENT_CDKEY))));
+					handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_CDKEY_INPUT, UI_ActionDataControlCommand::EXECUTE))));
 				}
 			}
 			break;
@@ -3891,7 +3895,7 @@ void UI_LogicDispatcher::controlAction(UI_ControlActionID id, UI_ControlBase* co
 			if(UI_ControlStringList* lst = dynamic_cast<UI_ControlStringList*>(control)){
 				if(const wchar_t* name = lst->selectedString()){
 					w2a(currentProfile().lastInetName, name);
-					handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_INET_NAME, UI_ActionDataControlCommand::RE_INIT)));
+					handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_INET_NAME, UI_ActionDataControlCommand::RE_INIT))));
 				}
 			}
 			break;
@@ -3917,12 +3921,12 @@ void UI_LogicDispatcher::controlAction(UI_ControlActionID id, UI_ControlBase* co
 					
 					if(action->resetSaveGameName())
 						if(action->gameType() & GAME_TYPE_REEL){
-							handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_REPLAY_NAME_INPUT, UI_ActionDataControlCommand::GET_CURRENT_SAVE_NAME)));
-							handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_REPLAY_NAME_INPUT, UI_ActionDataControlCommand::EXECUTE)));
+							handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_REPLAY_NAME_INPUT, UI_ActionDataControlCommand::GET_CURRENT_SAVE_NAME))));
+							handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_REPLAY_NAME_INPUT, UI_ActionDataControlCommand::EXECUTE))));
 						}
 						else {
-							handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_SAVE_GAME_NAME_INPUT, UI_ActionDataControlCommand::GET_CURRENT_SAVE_NAME)));
-							handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_SAVE_GAME_NAME_INPUT, UI_ActionDataControlCommand::EXECUTE)));
+							handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_SAVE_GAME_NAME_INPUT, UI_ActionDataControlCommand::GET_CURRENT_SAVE_NAME))));
+							handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_SAVE_GAME_NAME_INPUT, UI_ActionDataControlCommand::EXECUTE))));
 						}
 				}
 			}
@@ -4099,7 +4103,7 @@ void UI_LogicDispatcher::controlAction(UI_ControlActionID id, UI_ControlBase* co
 				int idx = profileSystem().updateProfile(profileName_);
 				if(idx >= 0)
 					if(profileSystem().setCurrentProfile(idx)){
-						handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_PROFILES_LIST, UI_ActionDataControlCommand::RE_INIT)));
+						handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_PROFILES_LIST, UI_ActionDataControlCommand::RE_INIT))));
 						profileReseted();
 					}
 			}
@@ -4110,7 +4114,7 @@ void UI_LogicDispatcher::controlAction(UI_ControlActionID id, UI_ControlBase* co
 			if(idx >= 0){
 				bool needReset = (idx == profileSystem().currentProfileIndex());
 				profileSystem().removeProfile(idx);
-				handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_PROFILES_LIST, UI_ActionDataControlCommand::RE_INIT)));
+				handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_PROFILES_LIST, UI_ActionDataControlCommand::RE_INIT))));
 				if(needReset)
 					profileReseted();
 			}
@@ -4127,7 +4131,7 @@ void UI_LogicDispatcher::controlAction(UI_ControlActionID id, UI_ControlBase* co
 
 		case UI_ACTION_DELETE_ONLINE_LOGIN_FROM_LIST:
 			profileSystem().deleteOnlineLogin();
-			handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_ONLINE_LOGIN_LIST, UI_ActionDataControlCommand::RE_INIT)));
+			handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_ONLINE_LOGIN_LIST, UI_ActionDataControlCommand::RE_INIT))));
 			break;
 
 		case UI_ACTION_SAVE_GAME_NAME_INPUT:
@@ -4154,7 +4158,7 @@ void UI_LogicDispatcher::controlAction(UI_ControlActionID id, UI_ControlBase* co
 		case UI_ACTION_OPERATE_MODAL_MESSAGE:
 			switch(safe_cast<const UI_ActionDataModalMessage*>(data)->type()){
 			case UI_ActionDataModalMessage::CLOSE:
-				handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_GET_MODAL_MESSAGE, UI_ActionDataControlCommand::CLEAR)));
+				handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_GET_MODAL_MESSAGE, UI_ActionDataControlCommand::CLEAR))));
 				UI_Dispatcher::instance().closeMessageBox();
 				break;
 			case UI_ActionDataModalMessage::CLEAR:
@@ -4189,12 +4193,12 @@ void UI_LogicDispatcher::controlAction(UI_ControlActionID id, UI_ControlBase* co
 
 		case UI_ACTION_CHAT_SEND_MESSAGE:
 			if(uiNetCenter().sendChatString(-1))
-				handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_CHAT_EDIT_STRING, UI_ActionDataControlCommand::CLEAR)));
+				handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_CHAT_EDIT_STRING, UI_ActionDataControlCommand::CLEAR))));
 			break;
 
 		case UI_ACTION_CHAT_SEND_CLAN_MESSAGE:
 			if(uiNetCenter().sendChatString(gameShell->CurrentMission.playerData(gameShell->CurrentMission.activePlayerID()).clan))
-				handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_CHAT_EDIT_STRING, UI_ActionDataControlCommand::CLEAR)));
+				handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_CHAT_EDIT_STRING, UI_ActionDataControlCommand::CLEAR))));
 			break;
 
 		case UI_ACTION_INET_LOGIN:
@@ -5270,8 +5274,8 @@ bool UI_LogicDispatcher::makeDiskOp(UI_DiskOpID id, const char* path, GameType g
 			profileSystem().newSave(MissionDescription(path, game_type));
 			currentProfile().lastSaveGameName = saveGameName_;
 
-			handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_SAVE_GAME_NAME_INPUT, UI_ActionDataControlCommand::CLEAR)));
-			handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_MISSION_LIST, UI_ActionDataControlCommand::RE_INIT)));
+			handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_SAVE_GAME_NAME_INPUT, UI_ActionDataControlCommand::CLEAR))));
+			handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_MISSION_LIST, UI_ActionDataControlCommand::RE_INIT))));
 		}
 		else 
 			UI_Dispatcher::instance().messageBox(GET_LOC_STR(UI_COMMON_TEXT_ERROR_SAVE));
@@ -5281,8 +5285,8 @@ bool UI_LogicDispatcher::makeDiskOp(UI_DiskOpID id, const char* path, GameType g
 			profileSystem().newSave(MissionDescription(path, GAME_TYPE_REEL));
 			currentProfile().lastSaveReplayName = saveReplayName_;
 
-			handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_REPLAY_NAME_INPUT, UI_ActionDataControlCommand::CLEAR)));
-			handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_MISSION_LIST, UI_ActionDataControlCommand::RE_INIT)));
+			handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_REPLAY_NAME_INPUT, UI_ActionDataControlCommand::CLEAR))));
+			handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_MISSION_LIST, UI_ActionDataControlCommand::RE_INIT))));
 		}
 		else 
 			UI_Dispatcher::instance().messageBox(GET_LOC_STR(UI_COMMON_TEXT_ERROR_SAVE));

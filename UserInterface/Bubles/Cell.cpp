@@ -1,7 +1,7 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "Serialization/Serialization.h"
-#include "cell.h"
-#include "blobs.h"
+#include "Cell.h"
+#include "Blobs.h"
 
 
 kdCell::kdCell( const Vect2f& position, const Vect2f& endPosition, int colorIndex )

@@ -1,6 +1,8 @@
 #ifndef __LOGMSG_H__
 #define __LOGMSG_H__
 
+#include <cstdarg>	// va_start/va_list; libc++ pulls this in transitively, glibc does not
+
 #include <strsafe.h>
 #include "MTSection.h"
 

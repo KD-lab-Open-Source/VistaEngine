@@ -7,12 +7,13 @@
 #include "Environment/Environment.h"
 #include "EditorVisual.h"
 #include "Physics/WindMap.h"
-#include "Physics/crash/CrashSystem.h"
+#include "Physics/Crash/CrashSystem.h"
 #include "EnvironmentSimple.h"
 #include "Serialization/BinaryArchive.h"
 #include "Serialization/SerializationFactory.h"
 #include "CameraManager.h"
 #include "Render/src/Scene.h"
+#include "Serialization/StringTableImpl.h"	// the StringTableReferencePolymorphic constructor
 
 DECLARE_SEGMENT(UnitEnvironmentSimple)
 REGISTER_CLASS(UnitBase, UnitEnvironmentSimple, "UnitEnvironmentSimple")

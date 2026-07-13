@@ -1,4 +1,4 @@
-#include "Stdafx.h"
+#include "stdafx.h"
 #include "Timers.h"
 #include "Serialization/Serialization.h"
 #include "DebugUtil.h"

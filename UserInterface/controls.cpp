@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "Controls.h"
 #include "CommonLocText.h"
 #include "GameOptions.h"

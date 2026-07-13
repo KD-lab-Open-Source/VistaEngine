@@ -816,7 +816,7 @@ cTexture* cTexLibrary::GetElement2DScale(const char *pTextureName,Vect2f scale)
 	return Texture;
 }
 
-cTexture* cTexLibrary::GetElement3D(const char *pTextureName,char *pMode)
+cTexture* cTexLibrary::GetElement3D(const char *pTextureName,const char *pMode)
 {
 	start_timer_auto();
 	MTAuto mtenter(lock);

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "IniFile.h"
 #include "Serialization/Serialization.h"
 #include "Serialization/XPrmArchive.h"

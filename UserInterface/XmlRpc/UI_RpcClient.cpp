@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "XTL/TempPtr.h"	// tempPtr(): &temporary is not an lvalue for a conforming compiler
 #include "UI_RpcClient.h"
 #include "Serialization/Serialization.h"
 #include "Serialization/Decorators.h"
@@ -75,7 +76,7 @@ void UI_RpcClient::registerUser(const char* n, const char* p)
 		return;
 	LogMsg((XBuffer() < "UI_RpcClient:: Регистрация: " < n < ", " < p < "\n").c_str());
 
-	RpcClient::instance()->rpcAsynchCall(&MethodRegister("Register", this, &UI_RpcClient::registerUserHandler, LoginData(n, p)));
+	RpcClient::instance()->rpcAsynchCall(tempPtr(MethodRegister("Register", this, &UI_RpcClient::registerUserHandler, LoginData(n, p))));
 }
 
 void UI_RpcClient::login(const char* n, const char* p)
@@ -84,7 +85,7 @@ void UI_RpcClient::login(const char* n, const char* p)
 		return;
 	LogMsg((XBuffer() < "UI_RpcClient:: Вход: " < n < ", " < p < "\n").c_str());
 
-	RpcClient::instance()->rpcAsynchCall(&MethodLogin("Login", this, &UI_RpcClient::loginHandler, LoginData(n, p, &session_)));
+	RpcClient::instance()->rpcAsynchCall(tempPtr(MethodLogin("Login", this, &UI_RpcClient::loginHandler, LoginData(n, p, &session_))));
 }
 
 void UI_RpcClient::logout()
@@ -93,7 +94,7 @@ void UI_RpcClient::logout()
 		return;
 	LogMsg("UI_RpcClient:: Выход\n");
 
-	RpcClient::instance()->rpcAsynchCall(&MethodLogout("Logout", this, &UI_RpcClient::logoutHandler, session_));
+	RpcClient::instance()->rpcAsynchCall(tempPtr(MethodLogout("Logout", this, &UI_RpcClient::logoutHandler, session_)));
 }
 
 void UI_RpcClient::registerUserHandler(int status)

@@ -1,7 +1,8 @@
-#include "StdAfxRd.h"
+#include "StdAfxRD.h"
+#include "XTL/TempPtr.h"	// tempPtr(): &temporary is not an lvalue for a conforming compiler
 #include "RenderCubemap.h"
 #include "D3DRender.h"
-#include "scene.h"
+#include "Scene.h"
 #include "cCamera.h"
 #include "VisGeneric.h"
 
@@ -84,11 +85,11 @@ void cRenderCubemap::Init(int linear_size_,Vect3f camera_pos)
 	for(int i=0;i<num_camera;i++)
 	{
 		camera[i]->SetFrustum(							// устанавливается пирамида видимости
-			&Vect2f(0.5f,0.5f),							// центр камеры
-			&sRectangle4f(-0.5f,-0.5f,0.5f,0.5f),		// видимая область камеры
+			tempPtr(Vect2f(0.5f,0.5f)),							// центр камеры
+			tempPtr(sRectangle4f(-0.5f,-0.5f,0.5f,0.5f)),		// видимая область камеры
 			//&Vect2f(1.f,1.f),							// фокус камеры
-			&Vect2f(0.5f,0.5f),							// фокус камеры
-			&Vect2f(30.0f,far_zplane)
+			tempPtr(Vect2f(0.5f,0.5f)),							// фокус камеры
+			tempPtr(Vect2f(30.0f,far_zplane))
 			);
 	}
 

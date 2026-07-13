@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "Universe.h"
 #include "EffectController.h"
 #include "UnitActing.h"
@@ -6,7 +6,7 @@
 #include "Sound.h"
 #include "SoundApp.h"
 #include "Water/Water.h"
-#include "Water/Ice.h"
+#include "Water/ice.h"
 #include "Environment/Environment.h"
 #include "UnitAttribute.h"
 #include "Physics/RigidBodyUnit.h"
@@ -14,7 +14,7 @@
 #include "Console.h"
 #include "RenderObjects.h"
 #include "DebugPrm.h"
-#include "Terra/vMap.h"
+#include "Terra/VMAP.H"
 #include "Render/src/Scene.h"
 
 EffectController::EffectController(const BaseUniverseObject* owner, const Vect2f delta) : effectAttribute_(0),

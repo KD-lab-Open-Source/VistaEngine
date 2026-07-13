@@ -1,12 +1,13 @@
-#include "StdAfx.h"
+#include "stdafx.h"
+#include "XTL/TempPtr.h"	// tempPtr(): &temporary is not an lvalue for a conforming compiler
 
 #include "Universe.h"
 #include "CameraManager.h"
 
 #include "UI_UnitView.h"
 #include "UI_Render.h"
-#include "Render/Src/cCamera.h"
-#include "Render/Src/Scene.h"
+#include "Render/src/cCamera.h"
+#include "Render/src/Scene.h"
 #include "Render/src/VisGeneric.h"
 
 UI_UnitView::UI_UnitView() : scene_(0),
@@ -79,10 +80,10 @@ bool UI_UnitView::setPosition(const Rectf& pos)
 		windowPosition_ = pos;
 		Rectf rect = UI_Render::instance().relative2deviceCoords(pos) + Vect2f(0.5f, 0.5f);
 		camera_->SetFrustum(                         
-			&rect.center(), // центр камеры
-			&sRectangle4f(-rect.width()/2, -rect.height()/2, rect.width()/2, rect.height()/2), // видимая область камеры
-			&Vect2f(focus, focus),                        // фокус камеры
-			&Vect2f(30.0f, 10000.0f)                    // ближайший и дальний z-плоскости отсечения
+			tempPtr(rect.center()), // центр камеры
+			tempPtr(sRectangle4f(-rect.width()/2, -rect.height()/2, rect.width()/2, rect.height()/2)), // видимая область камеры
+			tempPtr(Vect2f(focus, focus)),                        // фокус камеры
+			tempPtr(Vect2f(30.0f, 10000.0f))                    // ближайший и дальний z-плоскости отсечения
 			);
 
 		return true;

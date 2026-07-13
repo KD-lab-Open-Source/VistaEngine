@@ -1,6 +1,7 @@
 #include "stdafxTr.h"
+#include <climits>	// USHRT_MAX etc.; libc++ pulls this in transitively, glibc does not
 
-#include "vmap.h"
+#include "VMAP.H"
 #include "Serialization/Serialization.h"
 #include "Render/inc/IRenderDevice.h"
 
@@ -143,7 +144,7 @@ const float a90=(float)3.1415/2;
 int dh=1<<VX_FRACTION;
 void geoInfluence(int x,int y)
 {
-	register int i,j;
+	int i,j;
 //	int max;
 //	int* xx,*yy;
 

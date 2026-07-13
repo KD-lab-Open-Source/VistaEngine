@@ -49,8 +49,11 @@ cVisError& cVisError::operator << (const char *a)
 
 			if(ret==IDABORT)
 			{
-#if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
-				__asm { int 3 };
+				// __asm { int 3 } was here, guarded for _M_X64 among others — but x64 is
+				// precisely where MSVC accepts no inline asm. __debugbreak() is the
+				// intrinsic for that opcode.
+#if defined(_MSC_VER)
+				__debugbreak();
 #else
 				__builtin_debugtrap();
 #endif

@@ -1,7 +1,7 @@
-#include "xglobal.h"
+#include "XGLOBAL.H"
 
-static char* readMSG	= "WRONG READING";
-static char* writeMSG	= "WRONG WRITING";
+static const char* readMSG	= "WRONG READING";
+static const char* writeMSG	= "WRONG WRITING";
 
 unsigned xsReadBytes = 0;
 unsigned xsReadBytesDelta = 0;

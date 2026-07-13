@@ -1,8 +1,9 @@
-#include "StdAfx.h"
+#include "stdafx.h"
+#include "XTL/TempPtr.h"	// tempPtr(): &temporary is not an lvalue for a conforming compiler
 
 #include "UI_Render.h"
 
-#include "Render/d3d/D3DRender.h"
+#include "Render/D3D/D3DRender.h"
 #include "Render/src/cCamera.h"
 
 #include "UI_GlobalAttributes.h"
@@ -152,7 +153,7 @@ void UI_Render::outDebugText(const Vect2f& pos, const char* text, const Color4c*
 	
 	drawRectangle(Rectf(text_pos, text_size), Color4f(0, 0, 0, 0.4f));
 
-	outText(Rectf(text_pos, Vect2f::ZERO), parser, parser.outNodes().begin(), parser.outNodes().end(), &UI_TextFormat(*color, shadow), 0, 1.f);
+	outText(Rectf(text_pos, Vect2f::ZERO), parser, parser.outNodes().begin(), parser.outNodes().end(), tempPtr(UI_TextFormat(*color, shadow)), 0, 1.f);
 }
 
 Vect2f UI_Render::outText(const Rectf& pos, const wchar_t* text, const UI_TextFormat* format, int textAlign, const UI_Font* font, float alpha, bool formatText) const

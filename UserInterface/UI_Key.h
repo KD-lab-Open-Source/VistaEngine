@@ -2,7 +2,7 @@
 #define __UI_KEY_H_INCLUDED__
 
 #include "SystemUtil.h"
-#include "sKey.h"
+#include "skey.h"
 #include "LocString.h"
 
 struct UI_Key : sKey{

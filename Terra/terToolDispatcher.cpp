@@ -1,4 +1,5 @@
 #include "stdafxTr.h"
+#include <climits>	// USHRT_MAX etc.; libc++ pulls this in transitively, glibc does not
 
 #include "Serialization/Serialization.h"
 #include "quantizer.h"

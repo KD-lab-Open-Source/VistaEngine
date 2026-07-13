@@ -2,7 +2,7 @@
 #include "DebugPrm.h"
 #include "Serialization/XPrmArchive.h"
 #include "Serialization/RangedWrapper.h"
-#include "Terra/vmap.h"
+#include "Terra/VMAP.H"
 
 WRAP_LIBRARY(DebugPrm, "DebugPrm", "DebugPrm", "Scripts\\TreeControlSetups\\Debug.dat", 0, 0);
 

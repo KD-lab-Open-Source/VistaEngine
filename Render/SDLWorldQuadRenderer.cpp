@@ -11,9 +11,11 @@
 #include "Texture.h"           // cTexture (GetDDSurface / frameNumber)
 #include "SDLRenderDevice.h"   // applyCameraViewport
 
-// Cross-compiled world-quad shader blobs (SPIR-V + MSL); see Render/SDLShaders.
+// World-quad shader bytecode, compiled to this platform's native format at build time;
+// see Render/CMakeLists.txt.
 #include "SDLShaders/worldquad_shaders.h"
 #include "SDLShaders/worldtri_shaders.h"
+#include "SDLShaders/ShaderBlob.h"
 
 namespace {
 
@@ -125,47 +127,27 @@ bool SDLWorldQuadRenderer::createShaders()
 	if(!device_)
 		return false;
 
-	SDL_GPUShaderFormat formats = SDL_GetGPUShaderFormats(device_);
-	SDL_GPUShaderFormat fmt;
-	const char* entry;
-	const unsigned char *vsCode, *fsCode, *vsTriCode, *fsTriCode;
-	unsigned int vsSize, fsSize, vsTriSize, fsTriSize;
-	if(formats & SDL_GPU_SHADERFORMAT_MSL){
-		fmt = SDL_GPU_SHADERFORMAT_MSL; entry = "main0";
-		vsCode = worldquad_vert_msl; vsSize = worldquad_vert_msl_len;
-		fsCode = worldquad_frag_msl; fsSize = worldquad_frag_msl_len;
-		vsTriCode = worldtri_vert_msl; vsTriSize = worldtri_vert_msl_len;
-		fsTriCode = worldtri_frag_msl; fsTriSize = worldtri_frag_msl_len;
-	} else if(formats & SDL_GPU_SHADERFORMAT_SPIRV){
-		fmt = SDL_GPU_SHADERFORMAT_SPIRV; entry = "main";
-		vsCode = worldquad_vert_spv; vsSize = worldquad_vert_spv_len;
-		fsCode = worldquad_frag_spv; fsSize = worldquad_frag_spv_len;
-		vsTriCode = worldtri_vert_spv; vsTriSize = worldtri_vert_spv_len;
-		fsTriCode = worldtri_frag_spv; fsTriSize = worldtri_frag_spv_len;
-	} else {
-		fprintf(stderr, "SDLWorldQuadRenderer: no supported shader format (0x%x)\n", formats);
-		return false;
-	}
-
-	SDL_GPUShaderCreateInfo vsi = {};
-	vsi.code = vsCode; vsi.code_size = vsSize; vsi.entrypoint = entry;
-	vsi.format = fmt; vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+	SDL_GPUShaderCreateInfo vsi = vista::shaderCreateInfo(VISTA_SHADER(worldquad_vert));
+	vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
 	vsi.num_uniform_buffers = 1;    // mWVP
 	vsShader_ = SDL_CreateGPUShader(device_, &vsi);
-	vsi.code = vsTriCode; vsi.code_size = vsTriSize;
-	vsShaderTri_ = SDL_CreateGPUShader(device_, &vsi);
 
-	SDL_GPUShaderCreateInfo fsi = {};
-	fsi.code = fsCode; fsi.code_size = fsSize; fsi.entrypoint = entry;
-	fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+	SDL_GPUShaderCreateInfo vsiTri = vista::shaderCreateInfo(VISTA_SHADER(worldtri_vert));
+	vsiTri.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+	vsiTri.num_uniform_buffers = 1;
+	vsShaderTri_ = SDL_CreateGPUShader(device_, &vsiTri);
+
+	SDL_GPUShaderCreateInfo fsi = vista::shaderCreateInfo(VISTA_SHADER(worldquad_frag));
+	fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
 	fsi.num_samplers = 1;           // the group's texture
 	fsi.num_uniform_buffers = 1;    // SelectDiffuse
 	fsShader_ = SDL_CreateGPUShader(device_, &fsi);
 
-	fsi.code = fsTriCode; fsi.code_size = fsTriSize;
-	fsi.num_samplers = 3;           // + the colour operation's second texture, + ZREFLECTION's height map
-	fsi.num_uniform_buffers = 1;    // COLOR_OPERATION
-	fsShaderTri_ = SDL_CreateGPUShader(device_, &fsi);
+	SDL_GPUShaderCreateInfo fsiTri = vista::shaderCreateInfo(VISTA_SHADER(worldtri_frag));
+	fsiTri.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+	fsiTri.num_samplers = 3;        // + the colour operation's second texture, + ZREFLECTION's height map
+	fsiTri.num_uniform_buffers = 1; // COLOR_OPERATION
+	fsShaderTri_ = SDL_CreateGPUShader(device_, &fsiTri);
 
 	if(!vsShader_ || !fsShader_ || !vsShaderTri_ || !fsShaderTri_)
 		fprintf(stderr, "SDLWorldQuadRenderer: CreateGPUShader failed: %s\n", SDL_GetError());

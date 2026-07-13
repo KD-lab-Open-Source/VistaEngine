@@ -245,7 +245,7 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 					//	//*dest = palLight[round(cc)];
 					//	zBuffer[(current_sy-iminY)*voxelBitmap.sx + current_sx] = z1;
 					//}
-					register int bufoff=(current_sy)*voxelBitmap.sx + current_sx; //-iminY
+					int bufoff=(current_sy)*voxelBitmap.sx + current_sx; //-iminY
 					if(voxelBitmap.pRaster[bufoff]<= round(z1*(1<<VX_FRACTION)) ){
 						voxelBitmap.pRaster[bufoff] = round(z1*(1<<VX_FRACTION));
 					}
@@ -413,7 +413,7 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 				//xassert(z1 <= a->z+(20<<16) || z1 <= b->z+(20<<16) || z1 <= c->z+(20<<16));
 				//xassert(z1 >= a->z-(20<<16) || z1 >= b->z-(20<<16) || z1 >= c->z-(20<<16));
 				if( (current_sx<voxelBitmap.sx) && (current_sx >= 0)) {
-					register int bufoff=(current_sy)*voxelBitmap.sx + current_sx;
+					int bufoff=(current_sy)*voxelBitmap.sx + current_sx;
 					if(voxelBitmap.pRaster[bufoff]<= z1>>(PN_FRACTION-VX_FRACTION) ){
 						voxelBitmap.pRaster[bufoff] = z1>>(PN_FRACTION-VX_FRACTION);
 					}
@@ -545,7 +545,7 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 				z1 += (dz1>>8)* (tmp>>8);
 	#endif
 				for(current_sx; current_sx<=xe; current_sx++){
-					register int bufoff=(current_sy)*voxelBitmap.sx + current_sx;
+					int bufoff=(current_sy)*voxelBitmap.sx + current_sx;
 					if(voxelBitmap.pRaster[bufoff] <= z1>>(18-VX_FRACTION) ){
 						voxelBitmap.pRaster[bufoff] = z1>>(18-VX_FRACTION);
 					}
@@ -607,7 +607,7 @@ void drawPoligon(Vect3f* a, Vect3f* b, Vect3f* c, sVoxelBitmap& voxelBitmap)
 				z1 += (dz1>>8)* (tmp>>8);
 	#endif
 				for(current_sx; current_sx<=xe; current_sx++){
-					register int bufoff=(current_sy)*voxelBitmap.sx + current_sx;
+					int bufoff=(current_sy)*voxelBitmap.sx + current_sx;
 					if(voxelBitmap.pRaster[bufoff] <= z1>>(18-VX_FRACTION) ){
 						voxelBitmap.pRaster[bufoff] = z1>>(18-VX_FRACTION);
 					}

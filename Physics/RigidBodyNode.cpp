@@ -1,8 +1,8 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "RigidBodyNode.h"
 #include "RigidBodyNodePrm.h"
 #include "NormalMap.h"
-#include "Render/3dx/Node3dx.h"
+#include "Render/3dx/Node3DX.h"
 
 ///////////////////////////////////////////////////////////////
 //

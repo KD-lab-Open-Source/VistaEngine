@@ -13,8 +13,10 @@
 #include "SDLMinimapRenderer.h"   // replayed inside this renderer's pass, in draw order
 #include "SDLRenderDevice.h"       // createSolidGPUTexture
 
-// Cross-compiled UI shader blobs (SPIR-V + MSL); see Render/SDLShaders.
+// UI shader bytecode, compiled from SDLShaders/ui.{vert,frag}.hlsl to this platform's
+// native format at build time; see Render/CMakeLists.txt.
 #include "SDLShaders/ui_shaders.h"
+#include "SDLShaders/ShaderBlob.h"
 
 // Look up the SDL texture a cTexture is backed by (null => untextured/white).
 // cSDLRenderDevice::CreateTexture parks the SDL_GPUTexture* in BitMap[0].
@@ -78,34 +80,13 @@ void SDLUIRenderer::createPipeline()
 	// 1x1 white texture so untextured quads show the vertex colour.
 	whiteTexture_ = createSolidGPUTexture(device_, 0xFFFFFFFFu);
 
-	// Pick a shader format the backend supports (Metal->MSL, Vulkan->SPIRV).
-	SDL_GPUShaderFormat formats = SDL_GetGPUShaderFormats(device_);
-	SDL_GPUShaderFormat fmt;
-	const char* entry;
-	const unsigned char *vsCode, *fsCode;
-	unsigned int vsSize, fsSize;
-	if(formats & SDL_GPU_SHADERFORMAT_MSL){
-		fmt = SDL_GPU_SHADERFORMAT_MSL; entry = "main0";
-		vsCode = ui_vert_msl; vsSize = ui_vert_msl_len;
-		fsCode = ui_frag_msl; fsSize = ui_frag_msl_len;
-	} else if(formats & SDL_GPU_SHADERFORMAT_SPIRV){
-		fmt = SDL_GPU_SHADERFORMAT_SPIRV; entry = "main";
-		vsCode = ui_vert_spv; vsSize = ui_vert_spv_len;
-		fsCode = ui_frag_spv; fsSize = ui_frag_spv_len;
-	} else {
-		fprintf(stderr, "SDLUIRenderer: no supported shader format (0x%x)\n", formats);
-		return;
-	}
-
-	SDL_GPUShaderCreateInfo vsi = {};
-	vsi.code = vsCode; vsi.code_size = vsSize; vsi.entrypoint = entry;
-	vsi.format = fmt; vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+	SDL_GPUShaderCreateInfo vsi = vista::shaderCreateInfo(VISTA_SHADER(ui_vert));
+	vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
 	vsi.num_uniform_buffers = 1;
 	SDL_GPUShader* vs = SDL_CreateGPUShader(device_, &vsi);
 
-	SDL_GPUShaderCreateInfo fsi = {};
-	fsi.code = fsCode; fsi.code_size = fsSize; fsi.entrypoint = entry;
-	fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+	SDL_GPUShaderCreateInfo fsi = vista::shaderCreateInfo(VISTA_SHADER(ui_frag));
+	fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
 	fsi.num_samplers = 1;
 	SDL_GPUShader* fs = SDL_CreateGPUShader(device_, &fsi);
 

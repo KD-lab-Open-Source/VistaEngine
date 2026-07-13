@@ -10,8 +10,8 @@
 #include "UserInterface/UI_Render.h"
 #include "UserInterface/UI_Logic.h"
 #include "UserInterface/UI_Minimap.h"
-#include "Physics/crash/CrashSystem.h"
-#include "Render/Src/cCamera.h"
+#include "Physics/Crash/CrashSystem.h"
+#include "Render/src/cCamera.h"
 #include "Render/src/Scene.h"
 #include "Render/SDLUIRenderer.h"          // the parameter rings are batched here,
 #include "Render/SDLRenderDevice.h"        // reached through sdlUIRenderer()

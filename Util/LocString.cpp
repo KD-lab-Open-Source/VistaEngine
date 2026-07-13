@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "LocString.h"
 #include "Serialization/Serialization.h"
 #include "TextDB.h"

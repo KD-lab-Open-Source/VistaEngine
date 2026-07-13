@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "RigidBodyBox.h"
 #include "NormalMap.h"
 #include "Math/ConstraintHandlerSimple.h"

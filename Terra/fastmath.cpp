@@ -52,14 +52,9 @@ void  build_sqrt_table()
 
 __forceinline void FloatToInt(int *int_pointer, float f)
 {
-#ifdef _CROSS_PLATFORM_
-	*int_pointer = (int)lrintf(f); // round-to-nearest, matching FRNDINT/fistp
-#else
-	__asm  fld  f
-  __asm  mov  edx,int_pointer
-  __asm  FRNDINT
-  __asm  fistp dword ptr [edx];
-#endif
+	// lrintf is round-to-nearest, which is what the FRNDINT/fistp pair did. No inline
+	// asm on any 64-bit target, MSVC included.
+	*int_pointer = (int)lrintf(f);
 }
 
 

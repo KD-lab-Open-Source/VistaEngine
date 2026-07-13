@@ -1,10 +1,10 @@
 #ifndef __SIMPLY_3DX_H_INCLUDED__
 #define __SIMPLY_3DX_H_INCLUDED__
 
-#include "Render/Src/observer.h"
-#include "Render/Inc/IVisGenericInternal.h"
-#include "Render/Inc/IRenderDevice.h"
-#include "Render/Src/Texture.h"
+#include "Render/src/observer.h"
+#include "Render/inc/IVisGenericInternal.h"
+#include "Render/inc/IRenderDevice.h"
+#include "Render/src/Texture.h"
 #include "Render/SDLObject3dxRenderer.h"   // State: what the D3D path keeps in vs/ps
 
 class cStatic3dx;

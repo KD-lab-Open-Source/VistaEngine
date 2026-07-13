@@ -2,7 +2,7 @@
 #define _REELMANAGER_H
 
 #include "PlayBink.h"
-#include "bubles/blobs.h"
+#include "Bubles/Blobs.h"
 #include "Sound/SoundSystem.h"
 #include "Game/SoundApp.h"
 

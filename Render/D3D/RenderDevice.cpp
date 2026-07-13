@@ -72,7 +72,7 @@ void RDOpenLog(char *fname="RenderDevice.!!!")
 	fprintf(fRD,"----------------- Compilation data: %s time: %s -----------------\n",__DATE__,__TIME__);
 }
 
-RENDER_API int RDWriteLog(HRESULT err,char *exp,char *file,int line)
+RENDER_API int RDWriteLog(HRESULT err,const char *exp,const char *file,int line)
 {
 #ifndef _FINAL_VERSION_
 	if(fRD==0) RDOpenLog();

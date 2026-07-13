@@ -1,4 +1,4 @@
-#include "xglobal.h"
+#include "XGLOBAL.H"
 
 
 XBuffer& XBuffer::operator<= (char var)

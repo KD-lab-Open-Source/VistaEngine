@@ -5,7 +5,7 @@
 //#include "XTL/StaticMap.h"
 #include <map>
 #include "XTL/sigslot.h"
-#include "sKey.h"
+#include "skey.h"
 
 namespace kdw{
 

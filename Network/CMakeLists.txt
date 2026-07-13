@@ -16,22 +16,16 @@ set(NETWORK_SOURCES
     quantTimeStatistic.cpp
 )
 
-if(WIN32)
-    # The DirectPlay 8 networking backend. Stubbed off-Windows (the fake dplay8.h
-    # lets the Network headers parse, but these .cpp call IDirectPlay8Peer methods
-    # and DirectPlay8Create). Real cross-platform networking is a later
-    # replacement (Track B, like the renderer / DirectSound audio).
-    list(APPEND NETWORK_SOURCES
-        P2P_interface1Th.cpp
-        P2P_interface2ThDPF.cpp
-        P2P_interface3Th.cpp
-        P2P_interfaceAux.cpp
-    )
-else()
-    # Off-Windows: no-op PNetCenter methods otherwise defined by the gated
-    # DirectPlay files above, so the game links (silent networking).
-    list(APPEND NETWORK_SOURCES NetCenterStub.cpp)
-endif()
+# No DirectPlay backend on any platform. P2P_interface{1Th,3Th,2ThDPF,Aux}.cpp call
+# DirectPlay8Create and IDirectPlay8Peer, and Microsoft removed DirectPlay from the
+# Windows SDK — so <dplay8.h> is gone even there, and those files no longer build
+# anywhere. They stay in the tree as the reference for a real cross-platform
+# networking backend (Track B, like the renderer); Network/dplay8.h declares the
+# types their headers still name.
+#
+# NetCenterStub gives every platform the no-op PNetCenter methods those files
+# otherwise define, so the game links. Networking is silent.
+list(APPEND NETWORK_SOURCES NetCenterStub.cpp)
 
 add_library(Network STATIC ${NETWORK_SOURCES})
 target_link_libraries(Network PUBLIC EngineIncludes Util)

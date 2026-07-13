@@ -2,7 +2,7 @@
 #define __I_RENDER_DEVICE_H_INCLUDED__
 
 #include "rd.h"
-#include "unknown.h"
+#include "Unknown.h"
 #include "Render/D3D/renderstates.h"
 
 struct IDirect3DVertexBuffer9;
@@ -266,7 +266,7 @@ public:
 
 	/// ������� ���� ��� ������ GDI ������������ ������ ��� ������.
 	virtual void OutText(int x,int y,const char *string,int r=255,int g=255,int b=255)=0;
-	virtual void OutText(int x,int y,const char *string,int r,int g,int b,char *FontName/*="Arial"*/,int size=12,int bold=0,int italic=0,int underline=0)=0;
+	virtual void OutText(int x,int y,const char *string,int r,int g,int b,const char *FontName/*="Arial"*/,int size=12,int bold=0,int italic=0,int underline=0)=0;
 
 	/// ����, ��� �������� ��� ������ ���������� ��������.
 	virtual HWND GetWindowHandle()=0;

@@ -69,7 +69,10 @@ public:
     const Children& children() const { return children_; }
 	bool empty() const { return children_.empty(); }
 private:
-    PopupMenuItem& add(PopupMenuItem& item){
+    // const&: add(const char*) above calls this with a temporary, and a temporary does
+    // not bind to a non-const reference (old MSVC allowed it; nothing does now). The
+    // item is copied into the child list regardless.
+    PopupMenuItem& add(const PopupMenuItem& item){
         children_.push_back(new PopupMenuItem(item));
         children_.back()->parent_ = this;
 		return *children_.back();

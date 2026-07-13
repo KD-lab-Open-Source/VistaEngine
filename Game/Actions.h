@@ -1,7 +1,7 @@
 #ifndef __ACTIONS_H__
 #define __ACTIONS_H__
 
-#include "timers.h"
+#include "Timers.h"
 #include "TriggerEditor/TriggerExport.h"
 #include "Units/UnitAttribute.h"
 #include "Units/Triggers.h"

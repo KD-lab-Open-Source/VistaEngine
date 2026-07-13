@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "Network/quantTimeStatistic.h"
 #include "Network/P2P_interface.h"
 

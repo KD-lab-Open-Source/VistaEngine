@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "EnvironmentColors.h"
 #include "Serialization/Serialization.h"
 #include "Serialization/RangedWrapper.h"

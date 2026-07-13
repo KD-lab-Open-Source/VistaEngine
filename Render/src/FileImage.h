@@ -1,6 +1,6 @@
 #ifndef __FILEIMAGE_H__
 #define __FILEIMAGE_H__
-#include "Render/Inc/rd.h"
+#include "Render/inc/rd.h"
 #include "XMath/Colors.h"
 #include "XMath/Rectangle4f.h"
 #include <vector>

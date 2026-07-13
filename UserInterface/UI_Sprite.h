@@ -1,7 +1,7 @@
 #ifndef __UI_SPRITE_H__
 #define __UI_SPRITE_H__
 #include "XTL/Rect.h"
-#include "xtl/Handle.h"
+#include "XTL/Handle.h"
 #include "XMath/Colors.h"
 #include "Serialization/StringTableReferencePolymorphic.h"
 #include "Serialization/StringTableReference.h"

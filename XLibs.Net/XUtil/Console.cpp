@@ -1,9 +1,10 @@
-#include "xglobal.h"
-#include <my_stl.h>
+#include "XGLOBAL.H"
+#include <my_STL.h>
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 #include <windows.h>
 #include <string>
-#include "Xutil.h"
+#include <iterator>		// back_inserter; libc++ pulls it in transitively, MSVC does not
+#include "xutil.h"
 #include "Console.h"
 
 #pragma warning(disable : 4995)

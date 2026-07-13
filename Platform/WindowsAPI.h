@@ -245,9 +245,13 @@ struct SIZE   { LONG cx, cy; };
 #define _gcvt(v, d, buf) (sprintf(buf, "%.*g", d, (double)(v)), buf)
 
 // ─── Directory / file utilities ───────────────────────────────────────────────
+// No <dirent.h> here, deliberately. This header is force-included into every
+// translation unit, so anything it includes is included everywhere — and dirent
+// brings the whole POSIX DT_* namespace with it, which collides with the engine's
+// own names (Render/D3D/DrawType.h has a DT_UNKNOWN). Directory iteration is done
+// with <filesystem> in WindowsAPI.cpp, where it belongs.
 #include <sys/stat.h>
 #include <unistd.h>
-#include <dirent.h>
 #include <string>
 
 // ─── Path normalization ───────────────────────────────────────────────────────
@@ -596,11 +600,12 @@ inline LRESULT DefWindowProcA(HWND, UINT, WPARAM, LPARAM) { return 0; }
 #endif
 
 // ─── MSVC integer type aliases ───────────────────────────────────────────────
+// No __int64_t / __uint64_t here: those are glibc's own names, where they are
+// `long` on LP64, and redefining them as `long long` is a hard error on Linux.
+// Nothing in the tree used them.
 #ifndef __int64
 #  define __int64 long long
 #endif
-typedef long long          __int64_t;
-typedef unsigned long long __uint64_t;
 
 // ─── LARGE_INTEGER ────────────────────────────────────────────────────────────
 union LARGE_INTEGER {
@@ -617,7 +622,6 @@ inline BOOL QueryPerformanceFrequency(LARGE_INTEGER* f) {
 }
 
 // ─── Additional file / path API ───────────────────────────────────────────────
-#include <dirent.h>
 #include <libgen.h>
 
 #define FILE_FLAG_RANDOM_ACCESS  0x10000000
@@ -696,10 +700,10 @@ struct WIN32_FIND_DATAA {
 };
 typedef WIN32_FIND_DATAA WIN32_FIND_DATA;
 
-struct _FindContext { DIR* dir; char pattern[MAX_PATH]; char path[MAX_PATH]; };
-
 // Directory iteration — defined in WindowsAPI.cpp (the empty-pattern handling and
 // case-correcting scan are non-trivial and shouldn't live in this app-wide header).
+// The search state is a _FindContext, but callers only ever hold it as an opaque
+// HANDLE, so its definition stays in the .cpp along with the <filesystem> it needs.
 HANDLE FindFirstFileA(const char* rawPattern, WIN32_FIND_DATAA* fd);
 #define FindFirstFile FindFirstFileA
 
@@ -893,20 +897,14 @@ inline int MessageBoxW(HWND, const wchar_t*, const wchar_t*, UINT) { return IDOK
 int MultiByteToWideChar(UINT codePage, DWORD, const char* src, int srcLen, wchar_t* dst, int dstLen);
 int WideCharToMultiByte(UINT codePage, DWORD, const wchar_t* src, int srcLen, char* dst, int dstLen, const char*, BOOL*);
 
-// Prevent xutil.h's xxassert from using MSVC __asm { int 3 } on non-Windows.
-// With NASSERT defined xutil.h takes the else branch (empty xassert macros).
+// xassert() routes through DiagAssert(), which lives in the Win32 crash handler
+// (XERRHAND) and has no counterpart here. With NASSERT defined, xutil.h takes the
+// branch where the xassert macros expand to nothing.
 #ifndef NASSERT
 #define NASSERT
 #endif
 
-// ─── Prevent xutil.h from defining asm-based round() which clashes with <cmath> ─
 #include <cmath>
-#ifndef __ROUND__
-#  define __ROUND__
-#endif
-
-// ─── sqr<T> helper (also in xutil.h; safe to define here first) ──────────────
-template<class T> inline T sqr(const T& x) { return x * x; }
 
 // ─── Color extraction macros (Windows COLORREF helpers) ───────────────────────
 #define GetRValue(rgb)  ((BYTE)(rgb))

@@ -11,8 +11,10 @@
 #include "SDLUIRenderer.h"     // EmitMinimapRun: our place in the UI's draw order
 #include "SDLRenderDevice.h"   // sdlRenderDevice(), the owner
 
-// Cross-compiled minimap shader blobs (SPIR-V + MSL); see Render/SDLShaders.
+// Minimap shader bytecode, compiled to this platform's native format at build time;
+// see Render/CMakeLists.txt.
 #include "SDLShaders/minimap_shaders.h"
+#include "SDLShaders/ShaderBlob.h"
 
 namespace {
 
@@ -65,42 +67,19 @@ void SDLMinimapRenderer::createPipelines()
 
 	whiteTexture_ = createSolidGPUTexture(device_, 0xFFFFFFFFu);
 
-	SDL_GPUShaderFormat formats = SDL_GetGPUShaderFormats(device_);
-	SDL_GPUShaderFormat fmt;
-	const char* entry;
-	const unsigned char *vsCode, *mapCode, *borderCode;
-	unsigned int vsSize, mapSize, borderSize;
-	if(formats & SDL_GPU_SHADERFORMAT_MSL){
-		fmt = SDL_GPU_SHADERFORMAT_MSL; entry = "main0";
-		vsCode     = minimap_vert_msl;        vsSize     = minimap_vert_msl_len;
-		mapCode    = minimap_frag_msl;        mapSize    = minimap_frag_msl_len;
-		borderCode = minimap_border_frag_msl; borderSize = minimap_border_frag_msl_len;
-	} else if(formats & SDL_GPU_SHADERFORMAT_SPIRV){
-		fmt = SDL_GPU_SHADERFORMAT_SPIRV; entry = "main";
-		vsCode     = minimap_vert_spv;        vsSize     = minimap_vert_spv_len;
-		mapCode    = minimap_frag_spv;        mapSize    = minimap_frag_spv_len;
-		borderCode = minimap_border_frag_spv; borderSize = minimap_border_frag_spv_len;
-	} else {
-		fprintf(stderr, "SDLMinimapRenderer: no supported shader format (0x%x)\n", formats);
-		return;
-	}
-
-	SDL_GPUShaderCreateInfo vsi = {};
-	vsi.code = vsCode; vsi.code_size = vsSize; vsi.entrypoint = entry;
-	vsi.format = fmt; vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+	SDL_GPUShaderCreateInfo vsi = vista::shaderCreateInfo(VISTA_SHADER(minimap_vert));
+	vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
 	vsi.num_uniform_buffers = 1;    // InvScreenSize
 	SDL_GPUShader* vs = SDL_CreateGPUShader(device_, &vsi);
 
-	SDL_GPUShaderCreateInfo mfi = {};
-	mfi.code = mapCode; mfi.code_size = mapSize; mfi.entrypoint = entry;
-	mfi.format = fmt; mfi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+	SDL_GPUShaderCreateInfo mfi = vista::shaderCreateInfo(VISTA_SHADER(minimap_frag));
+	mfi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
 	mfi.num_samplers = 4;           // base, water, addition, border
 	mfi.num_uniform_buffers = 1;
 	SDL_GPUShader* mapFs = SDL_CreateGPUShader(device_, &mfi);
 
-	SDL_GPUShaderCreateInfo bfi = {};
-	bfi.code = borderCode; bfi.code_size = borderSize; bfi.entrypoint = entry;
-	bfi.format = fmt; bfi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+	SDL_GPUShaderCreateInfo bfi = vista::shaderCreateInfo(VISTA_SHADER(minimap_border_frag));
+	bfi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
 	bfi.num_samplers = 2;           // sprite atlas, border
 	bfi.num_uniform_buffers = 1;
 	SDL_GPUShader* borderFs = SDL_CreateGPUShader(device_, &bfi);

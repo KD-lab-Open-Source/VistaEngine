@@ -1,4 +1,5 @@
-#include "StdAfx.h"
+#include "stdafx.h"
+#include "XTL/TempPtr.h"	// tempPtr(): &temporary is not an lvalue for a conforming compiler
 #include <functional>
 #include "XTL/SafeCast.h"
 #include "Serialization/Serialization.h"
@@ -521,8 +522,8 @@ void UI_ControlHotKeyInput::done(const sKey& button, bool force)
 
 		if(last_key != button){
 			UI_LogicDispatcher::instance().setLastHotKeyInput(this);
-			UI_LogicDispatcher::instance().handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_SET_KEYS, UI_ActionDataControlCommand::UPDATE_HOTKEY)));
-			UI_LogicDispatcher::instance().handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_SET_KEYS, UI_ActionDataControlCommand::UPDATE_COMPATIBLE_HOTKEYS)));
+			UI_LogicDispatcher::instance().handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_SET_KEYS, UI_ActionDataControlCommand::UPDATE_HOTKEY))));
+			UI_LogicDispatcher::instance().handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_SET_KEYS, UI_ActionDataControlCommand::UPDATE_COMPATIBLE_HOTKEYS))));
 		}
 
 		waitingInput_ = false;
@@ -747,7 +748,7 @@ bool UI_ControlEdit::redraw() const
 				Vect2f end = UI_Render::instance().outText(pos, parser, parser.outNodes().begin(), parser.outNodes().end(), textFormat(), textAlign(), alpha(), true);
 				if(caretVisible_){
 					end.x -= shiftFronEnd;
-					UI_Render::instance().outText(Rectf(end, Vect2f::ZERO), L"|", &UI_TextFormat(caretColor_), UI_TEXT_ALIGN_CENTER, font(), alpha());
+					UI_Render::instance().outText(Rectf(end, Vect2f::ZERO), L"|", tempPtr(UI_TextFormat(caretColor_)), UI_TEXT_ALIGN_CENTER, font(), alpha());
 				}
 			}
 			else if(pos.width() >= shiftFronEnd){
@@ -755,7 +756,7 @@ bool UI_ControlEdit::redraw() const
 				Vect2f end = UI_Render::instance().outText(pos, parser, parser.outNodes().begin(), parser.outNodes().end(), textFormat(), align, alpha(), true);
 				if(caretVisible_){
 					end.x -= shiftFronEnd;
-					UI_Render::instance().outText(Rectf(end, Vect2f::ZERO), L"|", &UI_TextFormat(caretColor_), UI_TEXT_ALIGN_CENTER, font(), alpha());
+					UI_Render::instance().outText(Rectf(end, Vect2f::ZERO), L"|", tempPtr(UI_TextFormat(caretColor_)), UI_TEXT_ALIGN_CENTER, font(), alpha());
 				}
 			}
 			else if(pos.width() >= fullSize - shiftFronEnd){
@@ -764,7 +765,7 @@ bool UI_ControlEdit::redraw() const
 				if(caretVisible_){
 					Vect2f begin = pos.left_top();
 					begin.x += fullSize - shiftFronEnd;
-					UI_Render::instance().outText(Rectf(begin, Vect2f::ZERO), L"|", &UI_TextFormat(caretColor_), UI_TEXT_ALIGN_CENTER, font(), alpha());
+					UI_Render::instance().outText(Rectf(begin, Vect2f::ZERO), L"|", tempPtr(UI_TextFormat(caretColor_)), UI_TEXT_ALIGN_CENTER, font(), alpha());
 				}
 			}
 			else {
@@ -772,7 +773,7 @@ bool UI_ControlEdit::redraw() const
 				int align = textAlign() & UI_TEXT_VALIGN | UI_TEXT_ALIGN_RIGHT;
 				Vect2f end = UI_Render::instance().outText(pos, parser, parser.outNodes().begin(), parser.outNodes().end(), textFormat(), align, alpha(), true);
 				if(caretVisible_)
-					UI_Render::instance().outText(Rectf(end, Vect2f::ZERO), L"|", &UI_TextFormat(caretColor_), UI_TEXT_ALIGN_CENTER, font(), alpha());
+					UI_Render::instance().outText(Rectf(end, Vect2f::ZERO), L"|", tempPtr(UI_TextFormat(caretColor_)), UI_TEXT_ALIGN_CENTER, font(), alpha());
 			}
 		}
 		else
@@ -1028,9 +1029,9 @@ bool UI_ControlStringList::redraw() const
 	if(isScaled())
 		return true;
 
-	const UI_TextFormat* frm0 = textFormat(UI_SHOW_NORMAL);
-	const UI_TextFormat* frm1 = textFormat(UI_SHOW_HIGHLITED);
-	const UI_TextFormat* frm2 = showMode(UI_SHOW_ACTIVATED) ? textFormat(UI_SHOW_ACTIVATED) : frm1;
+	const UI_TextFormat* format0 = textFormat(UI_SHOW_NORMAL);
+	const UI_TextFormat* format1 = textFormat(UI_SHOW_HIGHLITED);
+	const UI_TextFormat* format2 = showMode(UI_SHOW_ACTIVATED) ? textFormat(UI_SHOW_ACTIVATED) : format1;
 
 	Rectf text_pos = textPosition();
 	Rectf pos = text_pos;
@@ -1043,11 +1044,11 @@ bool UI_ControlStringList::redraw() const
 		UI_Render::instance().drawSprite(pos, underline_, alpha());
 
 		if(i < (int)strings_.size()){
-			const UI_TextFormat* format = frm0;
+			const UI_TextFormat* format = format0;
 			if(i == selectedString_)
-				format = frm2;
+				format = format2;
 			else if(pos.point_inside(UI_LogicDispatcher::instance().mousePosition()))
-				format = frm1;
+				format = format1;
 
 			ComboWStrings cs;
 			if(columns_.size() > 0)
@@ -1096,7 +1097,7 @@ void UI_ControlStringList::drawDebug2D() const
 				Rectf txtpos = col;
 				txtpos.top(col.top() - stringHeight_);
 				txtpos.height(stringHeight_);
-				UI_Render::instance().outText(txtpos, buf.c_str(), &UI_TextFormat(Color4c::WHITE, Color4c::BLACK), UI_TEXT_ALIGN_CENTER);
+				UI_Render::instance().outText(txtpos, buf.c_str(), tempPtr(UI_TextFormat(Color4c::WHITE, Color4c::BLACK)), UI_TEXT_ALIGN_CENTER);
 				col.left(col.left() + col.width());
 				Rectf line = col;
 				line.width(0.f);
@@ -1227,9 +1228,9 @@ bool UI_ControlStringCheckedList::redraw() const
 
 	stringHeight_ = cfont()->size() * stringHeightFactor_ / UI_Render::instance().windowPosition().height();
 
-	const UI_TextFormat* frm0 = textFormat(UI_SHOW_NORMAL);
-	const UI_TextFormat* frm1 = textFormat(UI_SHOW_HIGHLITED);
-	const UI_TextFormat* frm2 = showMode(UI_SHOW_ACTIVATED) ? textFormat(UI_SHOW_ACTIVATED) : frm1;
+	const UI_TextFormat* format0 = textFormat(UI_SHOW_NORMAL);
+	const UI_TextFormat* format1 = textFormat(UI_SHOW_HIGHLITED);
+	const UI_TextFormat* format2 = showMode(UI_SHOW_ACTIVATED) ? textFormat(UI_SHOW_ACTIVATED) : format1;
 
 	Rectf text_pos = textPosition();
 	Rectf pos = text_pos;
@@ -1239,14 +1240,14 @@ bool UI_ControlStringCheckedList::redraw() const
 		if(pos.top() >= text_pos.top() + text_pos.height() - stringHeight_)
 			break;
 
-		const UI_TextFormat* format = frm0;
+		const UI_TextFormat* format = format0;
 		const UI_SpriteReference* check = &checkOff_;
 		if(selected_[i]){
-			format = frm2;
+			format = format2;
 			check = &checkOn_;
 		}
 		else if(pos.point_inside(UI_LogicDispatcher::instance().mousePosition()))
-			format = frm1;
+			format = format1;
 
 		WBuffer out;
 		out < L"<img=" < check->c_str() < ";style=2>" < strings_[i].c_str();

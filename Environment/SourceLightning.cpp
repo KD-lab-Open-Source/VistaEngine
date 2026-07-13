@@ -1,11 +1,11 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 
 #include "Serialization/Serialization.h"
 #include "SourceLightning.h"
 #include "Environment.h"
 #include "Render/src/Scene.h"
 
-#include "vmap.h"
+#include "VMAP.H"
 #include "RenderObjects.h"
 #include "Squad.h"
 

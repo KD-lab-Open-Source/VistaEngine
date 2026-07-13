@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "console.h"
+#include "Console.h"
 
 #include "Serialization/Serialization.h"
 #include "Serialization/ResourceSelector.h"
@@ -8,7 +8,7 @@
 
 #include "Render/src/Scene.h"
 #include "Render/src/cCamera.h"
-#include "Render/3dx/Node3dx.h"
+#include "Render/3dx/Node3DX.h"
 #include "Render/src/VisGeneric.h"
 
 #include "Environment/Environment.h"

@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "GlobalAttributes.h"
-#include "Terra/vmap.h"
+#include "Terra/VMAP.H"
 #include "CameraManager.h"
 #include "Serialization/SerializationFactory.h"
 #include "Serialization/EnumDescriptor.h"

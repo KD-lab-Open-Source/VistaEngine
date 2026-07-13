@@ -1,8 +1,8 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "StreamInterpolation.h"
 #include "XMath/SafeMath.h"
 #include "Render/src/NParticle.h"
-#include "Render/3dx/Node3dx.h"
+#include "Render/3dx/Node3DX.h"
 #include "Render/3dx/Simply3dx.h"
 
 #ifndef _FINAL_VERSION_
@@ -10,7 +10,7 @@
 #endif
 
 #ifdef CALL_STATISTIC
-#include "Util/xtl/StaticMap.h"
+#include "Util/XTL/StaticMap.h"
 #include "Util/Win32/DebugSymbolManager.h"
 struct TimerContainer
 {

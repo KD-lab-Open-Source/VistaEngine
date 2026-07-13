@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "Serialization/Serialization.h"
 #include "UserInterface/UI_Key.h"
 #include "WBuffer.h"

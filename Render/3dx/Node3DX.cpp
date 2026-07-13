@@ -1,15 +1,15 @@
 #include "StdAfxRD.h"
-#include "node3dx.h"
+#include "Node3DX.h"
 #include "Render/shader/shaders.h"
-#include "nparticle.h"
-#include "scene.h"
+#include "NParticle.h"
+#include "Scene.h"
 #include "TileMap.h"
 #include "D3DRender.h"
 #include "VisGeneric.h"
 #include "cCamera.h"
 #include "OcclusionQuery.h"
 #include "XMath/SafeMath.h"
-#include "Terra/vmap.h"
+#include "Terra/VMAP.H"
 #include "Render/SDLObject3dxRenderer.h"   // objects are drawn by SDLObject3dxRenderer,
 #include "Render/SDLRenderDevice.h"        // which the SDL device hands out
 

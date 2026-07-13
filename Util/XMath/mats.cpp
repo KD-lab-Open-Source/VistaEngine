@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "mats.h"
 
 #pragma warning(disable : 4073 )

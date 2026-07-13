@@ -1,10 +1,11 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "Object3dxInterface.h"
 #include "Interpolation.h"
 #include "RigidBodyPrm.h"
 #include "RigidBodyCarPrm.h"
 #include "WhellController.h"
-#include "normalMap.h"
+#include "NormalMap.h"
+#include "Serialization/StringTableImpl.h"	// the StringTableReferencePolymorphic constructor
 
 ///////////////////////////////////////////////////////////////
 //

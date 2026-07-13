@@ -6,7 +6,7 @@
 #include "CameraManager.h"
 #include "RenderObjects.h"
 #include "PlayOgg.h"
-#include "vmap.h"
+#include "VMAP.H"
 #include "UnitAttribute.h"
 #include "Serialization/ResourceSelector.h"
 #include "Serialization/XPrmArchive.h"

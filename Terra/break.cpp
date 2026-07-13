@@ -1,6 +1,6 @@
 #include "stdafxTr.h"
 
-#include "vmap.h"
+#include "VMAP.H"
 #include "Serialization/Serialization.h"
 #include "Serialization/XPrmArchive.h"
 #include "limits.h"
@@ -589,7 +589,7 @@ void elementGeoBreak::putPolygon(Vect3f* a, Vect3f* b, Vect3f* c)
 			while (length--) {
 			// используем z-буфер для определения видимости текущей точки
 				if( (current_sx< vMap.H_SIZE) && (current_sx >= 0)) {
-					register int bufoff=vMap.offsetBuf(current_sx, current_sy);
+					int bufoff=vMap.offsetBuf(current_sx, current_sy);
 					if(vMap.getAlt(bufoff) > round(z1*(1<<VX_FRACTION)))
 						vMap.putAlt(bufoff, round(z1*(1<<VX_FRACTION)));
 				}

@@ -2,7 +2,7 @@
 #define __CLIPPING_MESH_H_INCLUDED__
 
 #include "XTL/UniqueVector.h"
-#include "XMath/XMath.h"
+#include "XMath/xmath.h"
 #include "XMath/Box6f.h"
 #include "XMath/Mat4f.h"
 #include "XMath/Plane.h"

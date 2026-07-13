@@ -3,7 +3,7 @@
 #include "Nature.h"
 #include "RenderObjects.h"
 #include "GlobalAttributes.h"
-#include "Physics/crash/CrashSystem.h"
+#include "Physics/Crash/CrashSystem.h"
 #include "Environment/Environment.h"
 #include "EnvironmentSimple.h"
 #include "Serialization/BinaryArchive.h"

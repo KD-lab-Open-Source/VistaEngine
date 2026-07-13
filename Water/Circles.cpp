@@ -1,11 +1,11 @@
 #include "stdafx.h"
-#include "circles.h"
-#include "FallOut.h"
+#include "Circles.h"
+#include "Fallout.h"
 #include "XMath/Plane.h"
-#include "Render/Src/cCamera.h"
-#include "Render/Src/FogOfWar.h"
-#include "Render/Src/TexLibrary.h"
-#include "Render/Src/Scene.h"
+#include "Render/src/cCamera.h"
+#include "Render/src/FogOfWar.h"
+#include "Render/src/TexLibrary.h"
+#include "Render/src/Scene.h"
 #include "Render/SDLWorldQuadRenderer.h"   // the circles are drawn by SDLWorldQuadRenderer,
 #include "Render/SDLRenderDevice.h"        // reached via cSDLRenderDevice::drawWorldQuads
 

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 
 #include "Serialization/StringTableImpl.h"
 #include "UnitAttribute.h"

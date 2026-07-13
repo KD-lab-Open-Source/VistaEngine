@@ -1,7 +1,7 @@
 #include "StdAfxRD.h"
-#include "Perlin.h"
+#include "perlin.h"
 #include "XMath/fastMath.h"
-#include "Render/3dx/UMath.h"
+#include "Render/3dx/Umath.h"
 
 inline int remainder(float x,int dx,float& cx)//x - число, dx - цикл, return - целая часть цикла, cx - дробная часть
 {

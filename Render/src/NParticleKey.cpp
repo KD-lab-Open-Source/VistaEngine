@@ -1,7 +1,7 @@
 #include "StdAfxRD.h"
 #include "NParticle.h"
 #include "TexLibrary.h"
-#include "scene.h"
+#include "Scene.h"
 #include "NParticleID.h"
 #include "TileMap.h"
 #include "VisGeneric.h"
@@ -449,7 +449,7 @@ void EmitterKeyLighting::Save(Saver& s)
 		s.pop();
 		s.push(IDS_BUILDKEY_LIGHTING_POSITIONS);
 			s<<pos_begin;
-			s<<pos_end.size();
+			s<<(uint32_t)pos_end.size();	// 4-byte wire field: the loader reads a UINT
 			vector<Vect3f>::iterator it;
 			FOR_EACH(pos_end, it)
 				s<<(*it);

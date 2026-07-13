@@ -1,4 +1,4 @@
-#include <my_stl.h>
+#include <my_STL.h>
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 #include <windows.h>
 #include <stdio.h>
@@ -7,7 +7,7 @@
 #include <vfw.h>		// AVI include
 #include <setjmp.h>		// JPG include
 #include <math.h>
-#include <XUtil.h>
+#include <xutil.h>
 #include "XZip.h"
 #include "FileImage.h"
 
@@ -17,7 +17,7 @@
 #include <io.h>
 
 #include "Render/3dx/Umath.h"
-#include "Render/Src/filter.h"
+#include "Render/src/filter.h"
 #include "TextureAtlas.h"
 #include "Serialization/Serialization.h"
 #include "Render/inc/FileRead.h"

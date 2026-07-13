@@ -1,7 +1,7 @@
 #ifndef __C_CAMERA_H_INCLUDED__
 #define __C_CAMERA_H_INCLUDED__
 
-#include "Render/Inc/IVisGenericInternal.h"
+#include "Render/inc/IVisGenericInternal.h"
 #include "XMath/Plane.h"
 #include "XMath/Mat4f.h"
 #include "XMath/Rectangle4f.h"

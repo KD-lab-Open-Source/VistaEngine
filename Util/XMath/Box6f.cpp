@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "Box6f.h"
 
 void sBox6f::serialize(Archive& ar)

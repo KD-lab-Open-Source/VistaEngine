@@ -60,8 +60,8 @@ public:
 	Vect2i ix[8];
 	void CalcBorder();
 	vector<BORDER*> crotch;
-	cWaves::BORDER* cWaves::NextPoint(cWaves::BORDER* last, bool& again);
-	void cWaves::CalcContour(vector<ContourPt>& contour, vector<WaveLine>& front);
+	BORDER* NextPoint(cWaves::BORDER* last, bool& again);
+	void CalcContour(vector<ContourPt>& contour, vector<WaveLine>& front);
 	int bord_count;
 	float F_ebb;
 	struct FRONT
@@ -83,7 +83,7 @@ public:
 	cWaves();
 	~cWaves();
 	void SetTexture(const char* name);
-	void cWaves::Init(cWater* pWater, cScene* scene);
+	void Init(cWater* pWater, cScene* scene);
 	void PreDraw(Camera* camera);
 	void Draw(Camera* camera);
 	void Animate(float dt);

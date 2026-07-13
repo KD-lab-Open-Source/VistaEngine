@@ -2,11 +2,11 @@
 #include "Runtime3D.h"
 #include "Render/inc/fps.h"
 
-#include "Render/Inc/IRenderDevice.h"
-#include "Render/Src/cCamera.h"
-#include "Render/Src/Scene.h"
-#include "Render/Src/VisGeneric.h"
-#include "Render/D3d/D3dRender.h"
+#include "Render/inc/IRenderDevice.h"
+#include "Render/src/cCamera.h"
+#include "Render/src/Scene.h"
+#include "Render/src/VisGeneric.h"
+#include "Render/D3D/D3DRender.h"
 #include "UserInterface/UI_RenderBase.h"
 #include "Util/Win32/DebugSymbolManager.h"
 

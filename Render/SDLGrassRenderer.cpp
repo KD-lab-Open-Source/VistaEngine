@@ -13,8 +13,10 @@
 #include "Texture.h"           // cTexture::GetDDSurface
 #include "SDLRenderDevice.h"   // owner: resolves the sPtr buffers, holds the shadow map
 
-// Cross-compiled grass shader blobs (SPIR-V + MSL); see Render/SDLShaders.
+// Grass shader bytecode, compiled to this platform's native format at build time;
+// see Render/CMakeLists.txt.
 #include "SDLShaders/grass_shaders.h"
+#include "SDLShaders/ShaderBlob.h"
 
 namespace {
 
@@ -103,35 +105,15 @@ bool SDLGrassRenderer::createShaders()
 	if(!device_ || !window_)
 		return false;
 
-	SDL_GPUShaderFormat formats = SDL_GetGPUShaderFormats(device_);
-	SDL_GPUShaderFormat fmt;
-	const char* entry;
-	const unsigned char *vsCode, *fsCode;
-	unsigned int vsSize, fsSize;
-	if(formats & SDL_GPU_SHADERFORMAT_MSL){
-		fmt = SDL_GPU_SHADERFORMAT_MSL; entry = "main0";
-		vsCode = grass_vert_msl; vsSize = grass_vert_msl_len;
-		fsCode = grass_frag_msl; fsSize = grass_frag_msl_len;
-	} else if(formats & SDL_GPU_SHADERFORMAT_SPIRV){
-		fmt = SDL_GPU_SHADERFORMAT_SPIRV; entry = "main";
-		vsCode = grass_vert_spv; vsSize = grass_vert_spv_len;
-		fsCode = grass_frag_spv; fsSize = grass_frag_spv_len;
-	} else {
-		fprintf(stderr, "SDLGrassRenderer: no supported shader format\n");
-		return false;
-	}
-
-	SDL_GPUShaderCreateInfo vsi = {};
-	vsi.entrypoint = entry; vsi.format = fmt; vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+	SDL_GPUShaderCreateInfo vsi = vista::shaderCreateInfo(VISTA_SHADER(grass_vert));
+	vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
 	vsi.num_uniform_buffers = 1;
-	vsi.code = vsCode; vsi.code_size = vsSize;
 	vs_ = SDL_CreateGPUShader(device_, &vsi);
 
-	SDL_GPUShaderCreateInfo fsi = {};
-	fsi.entrypoint = entry; fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+	SDL_GPUShaderCreateInfo fsi = vista::shaderCreateInfo(VISTA_SHADER(grass_frag));
+	fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
 	fsi.num_uniform_buffers = 1;
 	fsi.num_samplers = 3;          // atlas + shadow map + lightmap
-	fsi.code = fsCode; fsi.code_size = fsSize;
 	fs_ = SDL_CreateGPUShader(device_, &fsi);
 
 	if(!vs_ || !fs_){

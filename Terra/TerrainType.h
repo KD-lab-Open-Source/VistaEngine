@@ -2,7 +2,7 @@
 
 #include "Serialization/EnumDescriptor.h"
 #include "Serialization/LibraryWrapper.h"
-#include "Terra.h"
+#include "terra.h"
 
 enum TerrainType : int
 {

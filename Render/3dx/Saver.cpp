@@ -1,6 +1,6 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "Saver.h"
-#include "UMath.h"
+#include "Umath.h"
 #include "XMath/Rectangle4f.h"
 
 Saver& operator<<(Saver& s,const sPolygon& p)

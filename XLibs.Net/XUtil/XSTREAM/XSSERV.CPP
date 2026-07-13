@@ -1,8 +1,8 @@
-#include "xglobal.h"
+#include "XGLOBAL.H"
 
-static char *seekMSG	= "BAD SEEK";
-static char *flushMSG	= "FLUSH FILE BUFFERS ERROR";
-static char *sizeMSG	= "FILE SIZE CALCULATION ERROR";
+static const char*seekMSG	= "BAD SEEK";
+static const char*flushMSG	= "FLUSH FILE BUFFERS ERROR";
+static const char*sizeMSG	= "FILE SIZE CALCULATION ERROR";
 
 long XStream::seek(long offset, int dir)
 {

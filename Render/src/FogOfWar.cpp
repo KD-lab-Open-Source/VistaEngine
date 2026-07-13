@@ -1,4 +1,4 @@
-#include "StdAfxRd.h"
+#include "StdAfxRD.h"
 // Serialization.h first: FogOfWar.h pulls in KeysBase<> whose virtual serialize()
 // is instantiated with the class and needs a complete Archive type.
 #include "Serialization/Serialization.h"
@@ -7,7 +7,7 @@
 #include "cCamera.h"
 #include "D3DRender.h"
 #include "Serialization/RangedWrapper.h"
-#include "Terra/vmap.h"
+#include "Terra/VMAP.H"
 
 
 ///////////////////////////////////////////////////////

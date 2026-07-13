@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "LabelObject.h"
 #include "Universe.h"
 #include "Environment/SourceManager.h"

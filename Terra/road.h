@@ -2,7 +2,7 @@
 #define __ROAD_H__
 
 #include "XMath/xmath.h"
-#include "Render/3dx/umath.h"
+#include "Render/3dx/Umath.h"
 
 #include "worldFileDispatcher.h"
 #include "procedurMap.h"

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "UI_Sprite.h"
 #include "Serialization/StringTableImpl.h"
 #include "Serialization/LibraryWrapper.h"
@@ -9,8 +9,10 @@
 #include "Render/src/Texture.h"
 #include "UI_RenderBase.h"
 #include "Util/DebugPrm.h"
+// cycle() is inline. Declaring it extern, as this file used to, leaves nothing to
+// call once an optimised build inlines every other caller's copy.
+#include "XMath/SafeMath.h"
 
-extern float cycle(float f, float size);
 extern bool isUnderEditor();
 const char* getLocDataPath();
 

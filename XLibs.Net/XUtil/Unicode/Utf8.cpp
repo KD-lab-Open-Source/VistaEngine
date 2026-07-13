@@ -1,4 +1,4 @@
-#include "xglobal.h"
+#include "XGLOBAL.H"
 #include "WBuffer.h"
 #include <string>
 

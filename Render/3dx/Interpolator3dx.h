@@ -1,7 +1,7 @@
 #ifndef __INTERPOLATOR3DX_H_INCLUDED__
 #define __INTERPOLATOR3DX_H_INCLUDED__
 
-#include "Render/Inc/3dx.h"
+#include "Render/inc/3dx.h"
 #include "Render/3dx/Saver.h"
 #include "Serialization/Serialization.h"
 

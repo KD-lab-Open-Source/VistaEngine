@@ -189,7 +189,7 @@ void  IndexPool::GetUsedMemory(int& total, int& free) { total = 0; free = 0; }
 // ---------------------------------------------------------------------------
 unsigned int ColorByNormalRGBA(Vect3f n);   // declared inline near its callers
 unsigned int ColorByNormalRGBA(Vect3f /*n*/) { return 0xffffffff; }
-int   RDWriteLog(HRESULT /*err*/, char* /*exp*/, char* /*file*/, int /*line*/) { return 0; }
+int   RDWriteLog(HRESULT /*err*/, const char* /*exp*/, const char* /*file*/, int /*line*/) { return 0; }
 int   GetTextureFormatSize(D3DFORMAT /*f*/) { return 0; }
 Vect2i GetSize(IDirect3DSurface9* /*pTexture*/) { return Vect2i(0, 0); }
 void  ShowGraphicsStatistic() {}

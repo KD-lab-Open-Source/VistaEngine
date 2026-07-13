@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "ScanningShape.h"
 
 void ScanningShape::setCircle(int radius)

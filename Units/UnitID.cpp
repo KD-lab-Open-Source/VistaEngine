@@ -2,9 +2,11 @@
 #include "UnitID.h"
 #include "BaseUnit.h"
 #include "Universe.h"
-#include "Windows.h"
+#include "windows.h"
 
-#pragma comment(lib)
+// (There was a `#pragma comment(lib)` here — with no library name. MSVC crashes on it
+// with an internal compiler error, and clang has been emitting it into every object file
+// as a malformed linker option: "-l missing <path>", the warning at every macOS link.)
 
 const int RELEASE_DELAY_QUANTS = 1200;
 int UnitID::totalIndex_ = 1;

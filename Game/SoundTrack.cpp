@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "SoundTrack.h"
 #include "Serialization/ResourceSelector.h"
 #include "DebugUtil.h"

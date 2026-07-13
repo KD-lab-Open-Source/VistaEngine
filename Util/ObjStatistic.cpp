@@ -9,7 +9,7 @@
 #include "Render/src/Grass.h"
 #include "Render/D3D/D3DRender.h"
 #include "Render/src/TexLibrary.h"
-#include "Render/d3d/D3DRenderTileMap.h"
+#include "Render/D3D/D3DRenderTilemap.h"
 #include "VistaRender/postEffects.h"
 #include "FileUtils/FileUtils.h"
 #include <commctrl.h>

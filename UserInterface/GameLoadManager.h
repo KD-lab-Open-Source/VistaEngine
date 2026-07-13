@@ -2,7 +2,7 @@
 #define __GAME_LOAD_MANAGER_H__
 
 #include "XTL/Handle.h"
-#include "Render/Src/VisError.h"
+#include "Render/src/VisError.h"
 
 typedef void (*RedrawFunction)(void);
 

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "XZip.h"
 #include "FileTime.h"
 #include "Serialization/Serialization.h"

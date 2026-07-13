@@ -261,7 +261,7 @@ void netCommand4G_UnitCommand::writeLog(XStream& ff)
 
 void netCommand4G_UnitListCommand::writeLog(XStream& ff)
 {
-	ff < "UnitListCommand: " <= unitCommand_.commandID() < "\t" <= unitList_.size() < "\n";
+	ff < "UnitListCommand: " <= unitCommand_.commandID() < "\t" <= (int)unitList_.size() < "\n";
 }
 
 void netCommand4G_PlayerCommand::writeLog(XStream& ff)

@@ -1,5 +1,6 @@
-#include "StdAfx.h"
-#include "terra/vmap.h"
+#include "stdafx.h"
+#include <climits>	// INT_MAX etc.; libc++ pulls this in transitively, glibc does not
+#include "Terra/VMAP.H"
 #include "Water.h"
 #include "Render/D3D/D3DRender.h"
 #include "Render/SDLWaterRenderer.h"   // the surface is drawn by SDLWaterRenderer,
@@ -12,9 +13,9 @@
 #include "Serialization/RangedWrapper.h"
 #include "DebugUtil.h"
 #include "Render/src/Gradients.h"
-#include "Render/Src/TileMap.h"
-#include "Render/Src/Scene.h"
-#include "Render/Src/VisGeneric.h"
+#include "Render/src/TileMap.h"
+#include "Render/src/Scene.h"
+#include "Render/src/VisGeneric.h"
 #include "Environment/Environment.h"
 
 float cWater::z_int_to_float;

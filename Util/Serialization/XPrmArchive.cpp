@@ -31,7 +31,7 @@ inline string& collapse_spec_chars(string& s)
 		pos = s.find("\\", pos);
 		if(pos >= s.size() - 1)
 			break;
-		char* dest;
+		const char* dest;
 		switch(s[pos + 1]){
 			case '\\':
 				dest = "\\";

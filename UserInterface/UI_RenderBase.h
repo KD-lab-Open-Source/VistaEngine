@@ -53,9 +53,11 @@ public:
 	}
 	/// пересчёт из относительного размера в экранный
 	Vect2i screenSize(const Vect2f& rel_size) const {
+		// (int): round() is the C library's and returns a double, which converts equally
+		// well to Vect2i's (int,int) and its (float,float) — so neither is chosen.
 		return Vect2i(
-			round(rel_size.x * float(windowPosition_.width())),
-			round(rel_size.y * float(windowPosition_.height())));
+			(int)round(rel_size.x * float(windowPosition_.width())),
+			(int)round(rel_size.y * float(windowPosition_.height())));
 	}
 
 	/// пересчёт из координат окна рендера в экранные

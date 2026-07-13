@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 
 // Terra/geo2.h
 // Terra/break.h

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "RigidBodyMissile.h"
-#include "normalMap.h"
+#include "NormalMap.h"
 
 REGISTER_CLASS_IN_FACTORY(RigidBodyFactory, RIGID_BODY_MISSILE, RigidBodyMissile)
 

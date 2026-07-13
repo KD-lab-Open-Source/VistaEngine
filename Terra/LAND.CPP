@@ -1,6 +1,6 @@
 #include "stdafxTr.h"
 
-#include "vmap.h"
+#include "VMAP.H"
 #include "worldFileDispatcher.h"
 //#include "Render\src\TileMap.h"
 //#include "Game\RenderObjects.h"
@@ -55,7 +55,7 @@ void vrtMap::prepareCircleArr()
 	int max = 0;
 
 	int calc = 1;
-	register int i,j,r,ind;
+	int i,j,r,ind;
 	short* p = rad;
 	if(calc){
 		for(j=-MAX_RADIUS_CIRCLEARR; j<=MAX_RADIUS_CIRCLEARR; j++)
@@ -443,7 +443,7 @@ void vrtMap::deltaZone(sToolzerPMO& var) //(int x,int y,int rad,int smth,int dh,
 		UndoDispatcher_PutPreChangedArea(sRect(x-rad, y-rad, 2*rad+1, 2*rad+1),1,0, new sToolzerPMO(var));
 
 
-	register int i,j;
+	int i,j;
 	int max;
 	int* xx,*yy;
 
@@ -656,7 +656,7 @@ void vrtMap::squareDeltaZone(sSquareToolzerPMO& var)//(int x,int y,int rad,int s
 	if(isRecordingPMO())
 		UndoDispatcher_PutPreChangedArea(sRect(x-rad, y-rad, 2*rad+1, 2*rad+1),1,0, new sSquareToolzerPMO(var));
 
-	register int i,j;
+	int i,j;
 	int max;
 	int* xx,*yy;
 
@@ -1240,7 +1240,7 @@ void vrtMap::regRender(int LowX,int LowY,int HiX,int HiY, char typeChange)
 //	int SizeX = (0 == XCYCL(HiX - LowX)) ? (H_SIZE-1) : (HiX - LowX);
 
 /*	int minX=LowX;
-	register int j;
+	int j;
 	for(j = 0;j <= SizeY;j++){
 		const int y = YCYCL(j + LowY);
 		if(changed) changedT[y] = 1;
@@ -1722,7 +1722,7 @@ int vrtMap::RenderStr(int XL, int Y, int dx)
 		rad=MAX_RADIUS_CIRCLEARR;
 	}
 
-	register int i,j;
+	int i,j;
 	int max;
 	int* xx,*yy;
 

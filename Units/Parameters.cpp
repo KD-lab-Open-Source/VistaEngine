@@ -1,4 +1,5 @@
-#include "stdafx.h"
+#include "StdAfx.h"
+#include <cstdint>	// int32_t, for the 4-byte wire fields below
 #include "Parameters.h"
 #include "UnitAttribute.h"
 #include "Serialization/StringTableImpl.h"
@@ -431,7 +432,9 @@ void ParameterSet::serialize(Archive& ar)
 
 void ParameterSet::write(XBuffer& buffer) const
 {
-	buffer < values_.size();
+	// int32_t: 4-byte wire field, matching ParameterSet::read below. size_t is 8 bytes
+	// on LP64, so this streamed 8 bytes into a 4-byte read.
+	buffer < (int32_t)values_.size();
 	Values::const_iterator i;
 	FOR_EACH(values_, i)
 		buffer < i->index < i->value;
@@ -440,7 +443,7 @@ void ParameterSet::write(XBuffer& buffer) const
 void ParameterSet::read(XBuffer& buffer)
 {
 	values_.clear();
-	int size;
+	int32_t size;	// 4-byte wire field, written by write() above
 	buffer > size;
 	values_.reserve(size);
 	while(size--){

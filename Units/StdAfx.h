@@ -26,7 +26,7 @@ using namespace std;
 // XTool
 #include "xutil.h"
 #include "XMath/xmath.h"
-#include "xzip.h"
+#include "XZip.h"
 
 #include "Profiler.h"
 #include "SystemUtil.h"

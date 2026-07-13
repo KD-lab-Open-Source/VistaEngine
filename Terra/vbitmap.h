@@ -1,7 +1,7 @@
 #ifndef __VBITMAP_H__
 #define __VBITMAP_H__
 
-#include "vmap.h"
+#include "VMAP.H"
 
 struct sBitMap8 {
 	unsigned short mX, mY;

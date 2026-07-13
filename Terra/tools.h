@@ -2,8 +2,8 @@
 #define __TOOLS_H__
 
 #include "Render/3dx/Umath.h"
-#include "Terra.h"
-#include "vMap.h"
+#include "terra.h"
+#include "VMAP.H"
 
 
 extern int* xRad[MAX_RADIUS_CIRCLEARR + 1];
@@ -230,7 +230,7 @@ public:
 		//void vrtMap::deltaZone(int x,int y,int rad,int smth,int dh,int smode,int eql)
 		int eql=0;
 
-		register int i,j;
+		int i,j;
 		int max;
 		int* xx,*yy;
 

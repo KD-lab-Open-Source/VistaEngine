@@ -6,7 +6,7 @@
 // game links; real cross-platform networking (SDL_net or similar) is a separate
 // Track-B effort. Only the symbols that aren't already defined by the compiled
 // Network sources (P2P_interface2Th.cpp / P2P_interfaceAnyTh.cpp) are stubbed here.
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "P2P_interface.h"
 
 // Member init list mirrors the real ctor (P2P_interface1Th.cpp): these members

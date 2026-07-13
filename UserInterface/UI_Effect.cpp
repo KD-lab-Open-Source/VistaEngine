@@ -1,15 +1,15 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "UI_Effect.h"
 #include "Serialization/Serialization.h"
 #include "VistaRender/StreamInterpolation.h"
-#include "Render/Src/cCamera.h"
-#include "Render/D3d/D3DRender.h"
+#include "Render/src/cCamera.h"
+#include "Render/D3D/D3DRender.h"
 #include "UI_Types.h"
 #include "UI_Render.h"
 #include "UI_BackgroundScene.h"
 #include "Render/src/NParticle.h"
 #include "Render/src/Scene.h"
-#include "Render/3dx/Node3dx.h"
+#include "Render/3dx/Node3DX.h"
 
 class FunctorSimpleZ : public FunctorGetZ
 {

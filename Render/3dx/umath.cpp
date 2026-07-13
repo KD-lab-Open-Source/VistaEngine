@@ -1,5 +1,5 @@
-#include "StdAfx.h"
-#include "umath.h"
+#include "stdafx.h"
+#include "Umath.h"
 #include "Serialization/Serialization.h"
 #include "XMath/SafeMath.h"
 

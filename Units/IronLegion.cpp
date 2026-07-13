@@ -4,7 +4,7 @@
 #include "Squad.h"
 #include "Sound.h"
 #include "Triggers.h"
-#include "vmap.h"
+#include "VMAP.H"
 #include "Serialization/Dictionary.h"
 #include "Serialization/Serialization.h"
 #include "IronBuilding.h"

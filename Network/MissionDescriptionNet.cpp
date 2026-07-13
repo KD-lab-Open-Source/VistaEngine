@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 
 #include "MissionDescriptionNet.h"
 #include "GlobalAttributes.h"

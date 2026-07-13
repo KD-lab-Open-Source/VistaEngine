@@ -1,12 +1,12 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "UserInterface.h"
 #include "CommonLocText.h"
 
 #include "UI_Logic.h"
 #include "UI_Render.h"
-#include "Render/Inc/IRenderDevice.h"
-#include "Render/Src/cCamera.h"
-#include "Render/d3d/D3DRender.h"
+#include "Render/inc/IRenderDevice.h"
+#include "Render/src/cCamera.h"
+#include "Render/D3D/D3DRender.h"
 #include "Render/src/VisGeneric.h"
 #include "VistaRender/postEffects.h"
 

@@ -1,4 +1,5 @@
 #include "stdafxTr.h"
+#include <climits>	// INT_MAX etc.; libc++ pulls this in transitively, glibc does not
 #include "terTools.h"
 #include "tgai.h"
 #include "scalingEngine.h"
@@ -22,7 +23,7 @@ void vrtMap::wrldShotMapHeight()
 
 	unsigned char* line = new unsigned char[SX],*p;
 
-	register unsigned int i,j;
+	unsigned int i,j;
 	for(j = 0; j<V_SIZE; j++){
 		p = line;
 		for(i = 0; i<H_SIZE; i++){
@@ -38,7 +39,7 @@ void vrtMap::wrldShotMapHeight()
 
 void vrtMap::FlipWorldH()
 {
-	register unsigned int i,j;
+	unsigned int i,j;
 	int DY=V_SIZE;
 	int DX=H_SIZE>>1;
 	int MX=H_SIZE-1;
@@ -58,7 +59,7 @@ void vrtMap::FlipWorldH()
 
 void vrtMap::FlipWorldV()
 {
-	register unsigned int i,j;
+	unsigned int i,j;
 	int DY=V_SIZE>>1;
 	int DX=H_SIZE;
 	int MY=V_SIZE-1;
@@ -78,7 +79,7 @@ void vrtMap::FlipWorldV()
 
 void vrtMap::RotateWorldP90()
 {
-	register int i,j;
+	int i,j;
 	//int DY=V_SIZE>>1;
 	//int DX=H_SIZE-1;
 	//int BEGI=0;
@@ -129,7 +130,7 @@ void vrtMap::RotateWorldP90()
 
 void vrtMap::RotateWorldM90()
 {
-	register unsigned int i,j;
+	unsigned int i,j;
 	int DY=V_SIZE>>1;
 	int DX=H_SIZE-1;
 	int BEGI=0;
@@ -162,7 +163,7 @@ void vrtMap::scalingHeighMap(int percent)
 {
 	float k=(float)percent/100.f;
 	static int cnt = 0;
-	register unsigned int i,j;
+	unsigned int i,j;
 	for(j = 0; j<V_SIZE; j++){
 		for(i = 0; i<H_SIZE; i++){
 			int offb=offsetBuf(i,j);

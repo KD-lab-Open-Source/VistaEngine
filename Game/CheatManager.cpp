@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "CheatManager.h"
 #include "GlobalAttributes.h"
 #include "Universe.h"

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "GlobalAttributes.h"
-#include "normalMap.h"
+#include "NormalMap.h"
 #include "UnitActing.h"
 #include "RigidBodyCar.h"
 

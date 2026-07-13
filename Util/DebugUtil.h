@@ -3,7 +3,7 @@
 
 #include "crc.h"
 #include "XMath/Colors.h"
-#include "Render/Inc/RenderMT.h"
+#include "Render/inc/RenderMT.h"
 #include "MTSection.h"
 #include "Serialization/Range.h"
 

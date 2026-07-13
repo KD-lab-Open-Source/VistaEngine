@@ -1,4 +1,4 @@
-#include "xglobal.h"
+#include "XGLOBAL.H"
 #include <cstdint>
 
 XStream& XStream::operator< (const char* v)

@@ -12,9 +12,9 @@
 #include "Game/CameraManager.h"
 #include "Environment.h"
 #include "Water/Water.h"
-#include "Water/Ice.h"
+#include "Water/ice.h"
 #include "Serialization/SerializationFactory.h"
-#include "Terra/vMap.h"
+#include "Terra/VMAP.H"
 
 REGISTER_CLASS(Anchor, Anchor, "Якорь на мире");
 

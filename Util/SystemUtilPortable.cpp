@@ -61,6 +61,17 @@ void setLogicFp()
 {
 }
 
+// Its counterpart: the logic threads xassert(checkLogicFp()) to catch a stray
+// _controlfp leaving the FPU in the wrong precision mid-simulation. With setLogicFp() a
+// no-op there is nothing to verify, so this reports success rather than failing an
+// assertion the code cannot satisfy. Windows needs it defined for the first time,
+// because there the asserts are live — off-Windows NASSERT compiles the call away, which
+// is why nothing ever missed it.
+bool checkLogicFp()
+{
+	return true;
+}
+
 const char* getLocDataPath()
 {
 	return GameOptions::instance().getLocDataPath();

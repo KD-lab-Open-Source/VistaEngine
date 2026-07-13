@@ -1,16 +1,17 @@
-#include "StdAfx.h"
+#include "stdafx.h"
+#include <climits>	// INT_MAX etc.; libc++ pulls this in transitively, glibc does not
 #include "Timers.h"
 #include "Serialization/Serialization.h"
 #include "WaterGarbage.h"
 #include "Water.h"
 #include "Serialization/RangedWrapper.h"
 #include "Serialization/ResourceSelector.h"
-#include "Terra/vmap.h"
+#include "Terra/VMAP.H"
 #include "Serialization/SerializationFactory.h"
 #include "Render/SDLWorldQuadRenderer.h"   // the bubbles are drawn by SDLWorldQuadRenderer,
 #include "Render/SDLRenderDevice.h"        // reached via cSDLRenderDevice::drawWorldQuads
-#include "Render/Src/cCamera.h"
-#include "Render/Src/TexLibrary.h"
+#include "Render/src/cCamera.h"
+#include "Render/src/TexLibrary.h"
 
 /////////////////////////////cWaterBubble//////////////////////////////
 cWaterBubble::cWaterBubble(class cWater* pWater_)

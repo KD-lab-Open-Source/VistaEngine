@@ -1,4 +1,5 @@
 #include "stdafxTr.h"
+#include <climits>	// USHRT_MAX etc.; libc++ pulls this in transitively, glibc does not
 
 #include "worldFileDispatcher.h"
 #include "stdio.h"
@@ -10,8 +11,8 @@
 #include "tgai.h"
 #include "Console.h"
 #include "vmap.inl"
-#include "Render\Src\MultiRegion.h"
-#include "Render\Src\TileMap.h"
+#include "Render/src/MultiRegion.h"
+#include "Render/src/TileMap.h"
 #include "Serialization\EnumDescriptor.h"
 
 /* ----------------------------- EXTERN SECTION ---------------------------- */
@@ -45,16 +46,16 @@ END_ENUM_DESCRIPTOR_ENCLOSED(vrtMapCreationParam, SIZE_POWER)
 //END_ENUM_DESCRIPTOR_ENCLOSED(vrtMap, eShowSpecialInfo)
 
 
-char* vrtMap::worldRasterDataFileSource = "output.vmp";
-char* vrtMap::worldRGBFileSource = "output.tga";
+const char* vrtMap::worldRasterDataFileSource = "output.vmp";
+const char* vrtMap::worldRGBFileSource = "output.tga";
 //char* vrtMap::worldGeoPalFile     = "inGeo.act";
-char* vrtMap::worldDamPalFile     = "inDam.act";
-char* vrtMap::worldLeveledTextureFile= "leveledSurfaceTexture.tga";
-char* vrtMap::worldSurfaceKindFile= "surkind.bin";
-char* vrtMap::worldDataFile			= "world.cls";
-char* vrtMap::worldRGBCacheFile			= "cache.tga";
-char* vrtMap::worldRasterDataCacheFile	= "cache.vmp";
-char* vrtMap::worldMiniMapFile			= "map.tga";
+const char* vrtMap::worldDamPalFile     = "inDam.act";
+const char* vrtMap::worldLeveledTextureFile= "leveledSurfaceTexture.tga";
+const char* vrtMap::worldSurfaceKindFile= "surkind.bin";
+const char* vrtMap::worldDataFile			= "world.cls";
+const char* vrtMap::worldRGBCacheFile			= "cache.tga";
+const char* vrtMap::worldRasterDataCacheFile	= "cache.vmp";
+const char* vrtMap::worldMiniMapFile			= "map.tga";
 
 unsigned long generateSerialNumber()
 {
@@ -358,7 +359,7 @@ void ConvertProcedure(char* name)
 
 	unsigned char* buf = new unsigned char[xsize];
 
-	register int i;
+	int i;
 	for(i = 0;i < ysize;i++){
 		fin.read(buf,xsize);
 		fout.write(buf,xsize);
@@ -1762,19 +1763,11 @@ bool vrtMap::sVmpHeader::cmpID(const char* pVmpID)
 	}
 	return true;
 }
+// Was a cmov pair in x86 assembly on the non-_CROSS_PLATFORM_ side, i.e. on Windows,
+// where MSVC takes no inline asm on x64 either. A clamp is a clamp.
 inline int clampX(const int x, const int xmax)
 {
-#ifdef _CROSS_PLATFORM_
 	return x < 0 ? 0 : (x > xmax ? xmax : x);
-#else
-	__asm {
-		mov eax, x
-		xor ecx, ecx
-		cmova eax, ecx
-		mov ecx, xmax
-		cmova eax, ecx
-	}
-#endif
 }
 
 void vrtMap::getTileZ(char* Texture,int pitch,int xstart,int ystart,int xend,int yend,int step)

@@ -1,9 +1,9 @@
-#include <stdafxRD.h>
+#include <StdAfxRD.h>
 #include "LensFlare.h"
 #include "OcclusionQuery.h"
 #include "cCamera.h"
 #include "D3DRender.h"
-#include "Render/3dx/Node3dx.h"
+#include "Render/3dx/Node3DX.h"
 #include "VisGeneric.h"
 #include "Serialization/Serialization.h"
 #include "Serialization/ResourceSelector.h"

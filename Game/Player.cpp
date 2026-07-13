@@ -22,13 +22,14 @@
 #include "UserInterface/UI_Logic.h"
 #include "UserInterface/UI_Minimap.h"
 #include "Serialization/StringTable.h"
-#include "Terra/vMap.h"
+#include "Terra/VMAP.H"
 #include "VistaRender/Field.h"
 #include "SurMap5/UniverseObjectAction.h"
 #include "FileUtils/FileUtils.h"
 #include "WBuffer.h"
 #include "UnicodeConverter.h"
 #include "Render/src/Scene.h"
+#include "Serialization/StringTableImpl.h"	// the StringTableReference constructor
 
 BEGIN_ENUM_DESCRIPTOR(AuxPlayerType, "AuxPlayerType")
 REGISTER_ENUM(AUX_PLAYER_TYPE_ORDINARY_PLAYER, "Обычный игрок");

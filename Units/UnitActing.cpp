@@ -19,7 +19,7 @@
 #include "Water/CircleManager.h"
 #include "UnitItemResource.h"
 #include "PositionGeneratorSquad.h"
-#include "Physics/crash/CrashSystem.h"
+#include "Physics/Crash/CrashSystem.h"
 
 BEGIN_ENUM_DESCRIPTOR(DirectControlMode, "DirectControlMode")
 REGISTER_ENUM(DIRECT_CONTROL_DISABLED, "None")
@@ -1371,7 +1371,7 @@ void UnitActing::showDebugInfo()
 
 	if(showDebugUnitReal.producedUnitQueue){
 		XBuffer msg;
-		msg < "producedQueue: " <= producedQueue_.size();
+		msg < "producedQueue: " <= (int)producedQueue_.size();
 		show_text(position(), msg, Color4c::GREEN);
 	}
 

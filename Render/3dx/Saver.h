@@ -129,21 +129,22 @@ public:
 		push();
 	}
 
+	// ftell/fseek, not fgetpos/fsetpos: this code wants a byte offset it can do
+	// arithmetic on, and glibc's fpos_t is an opaque struct — it converts to no
+	// integer at all. (It happened to be one on MSVC and macOS.)
 	size_t pop()
 	{
-		fpos_t old_position;
-		fgetpos(file_, &old_position);
+		long old_position = ftell(file_);
 
 		int n = int(stack_.size())-1;
 		DWORD min = stack_[n];
-		fpos_t tt = min-4;
-		fsetpos(file_, &tt);
+		fseek(file_, long(min) - 4, SEEK_SET);
 		DWORD size = DWORD(old_position) - min;
 		write(size);
 
 		stack_.pop_back();
 
-		fsetpos(file_, &old_position);
+		fseek(file_, old_position, SEEK_SET);
 		return size;
 	}
 
@@ -152,10 +153,7 @@ private:
 	{
 		DWORD w=0;
 		write(w);
-		fpos_t t;
-		fgetpos(file_,&t);
-
-		stack_.push_back((DWORD)t);
+		stack_.push_back(DWORD(ftell(file_)));
 	}
 	FILE* file_;
 

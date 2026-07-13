@@ -14,8 +14,10 @@
 #include "Texture.h"           // cTexture (GetDDSurface / frameNumber)
 #include "SDLRenderDevice.h"   // owner: resolves sPtr buffers, holds RS_ZWRITEENABLE
 
-// Cross-compiled object3dx shader blobs (SPIR-V + MSL); see Render/SDLShaders.
+// 3dx-object shader bytecode, compiled to this platform's native format at build time;
+// see Render/CMakeLists.txt.
 #include "SDLShaders/object3dx_shaders.h"
+#include "SDLShaders/ShaderBlob.h"
 
 namespace {
 
@@ -146,62 +148,32 @@ bool SDLObject3dxRenderer::createShaders()
 	shadersTried_ = true;
 	if(!device_ || !window_) return false;
 
-	SDL_GPUShaderFormat formats = SDL_GetGPUShaderFormats(device_);
-	SDL_GPUShaderFormat fmt;
-	const char* entry;
-	const unsigned char *rigidCode, *skinCode, *rigidBumpCode, *skinBumpCode, *fsCode, *fsBumpCode;
-	const unsigned char *shRigidCode, *shSkinCode, *shFsCode;
-	unsigned int rigidSize, skinSize, rigidBumpSize, skinBumpSize, fsSize, fsBumpSize;
-	unsigned int shRigidSize, shSkinSize, shFsSize;
-	if(formats & SDL_GPU_SHADERFORMAT_MSL){
-		fmt = SDL_GPU_SHADERFORMAT_MSL; entry = "main0";
-		rigidCode     = object3dx_rigid_vert_msl;      rigidSize     = object3dx_rigid_vert_msl_len;
-		skinCode      = object3dx_skin_vert_msl;       skinSize      = object3dx_skin_vert_msl_len;
-		rigidBumpCode = object3dx_rigid_bump_vert_msl; rigidBumpSize = object3dx_rigid_bump_vert_msl_len;
-		skinBumpCode  = object3dx_skin_bump_vert_msl;  skinBumpSize  = object3dx_skin_bump_vert_msl_len;
-		fsCode        = object3dx_frag_msl;            fsSize        = object3dx_frag_msl_len;
-		fsBumpCode    = object3dx_bump_frag_msl;       fsBumpSize    = object3dx_bump_frag_msl_len;
-		shRigidCode   = object3dx_shadow_rigid_vert_msl; shRigidSize = object3dx_shadow_rigid_vert_msl_len;
-		shSkinCode    = object3dx_shadow_skin_vert_msl;  shSkinSize  = object3dx_shadow_skin_vert_msl_len;
-		shFsCode      = object3dx_shadow_frag_msl;       shFsSize    = object3dx_shadow_frag_msl_len;
-	} else if(formats & SDL_GPU_SHADERFORMAT_SPIRV){
-		fmt = SDL_GPU_SHADERFORMAT_SPIRV; entry = "main";
-		rigidCode     = object3dx_rigid_vert_spv;      rigidSize     = object3dx_rigid_vert_spv_len;
-		skinCode      = object3dx_skin_vert_spv;       skinSize      = object3dx_skin_vert_spv_len;
-		rigidBumpCode = object3dx_rigid_bump_vert_spv; rigidBumpSize = object3dx_rigid_bump_vert_spv_len;
-		skinBumpCode  = object3dx_skin_bump_vert_spv;  skinBumpSize  = object3dx_skin_bump_vert_spv_len;
-		fsCode        = object3dx_frag_spv;            fsSize        = object3dx_frag_spv_len;
-		fsBumpCode    = object3dx_bump_frag_spv;       fsBumpSize    = object3dx_bump_frag_spv_len;
-		shRigidCode   = object3dx_shadow_rigid_vert_spv; shRigidSize = object3dx_shadow_rigid_vert_spv_len;
-		shSkinCode    = object3dx_shadow_skin_vert_spv;  shSkinSize  = object3dx_shadow_skin_vert_spv_len;
-		shFsCode      = object3dx_shadow_frag_spv;       shFsSize    = object3dx_shadow_frag_spv_len;
-	} else {
-		fprintf(stderr, "SDLObject3dxRenderer: no supported shader format (0x%x)\n", formats);
-		return false;
-	}
+	// Every vertex shader here takes one uniform block: MVP + material + bone matrices.
+	auto makeVS = [&](const vista::ShaderBlob& blob) {
+		SDL_GPUShaderCreateInfo vsi = vista::shaderCreateInfo(blob);
+		vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+		vsi.num_uniform_buffers = 1;
+		return SDL_CreateGPUShader(device_, &vsi);
+	};
+	vsRigid_       = makeVS(VISTA_SHADER(object3dx_rigid_vert));
+	vsSkin_        = makeVS(VISTA_SHADER(object3dx_skin_vert));
+	vsRigidBump_   = makeVS(VISTA_SHADER(object3dx_rigid_bump_vert));
+	vsSkinBump_    = makeVS(VISTA_SHADER(object3dx_skin_bump_vert));
+	vsShadowRigid_ = makeVS(VISTA_SHADER(object3dx_shadow_rigid_vert));
+	vsShadowSkin_  = makeVS(VISTA_SHADER(object3dx_shadow_skin_vert));
 
-	SDL_GPUShaderCreateInfo vsi = {};
-	vsi.entrypoint = entry; vsi.format = fmt; vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
-	vsi.num_uniform_buffers = 1;    // MVP + material + bone matrices
-	vsi.code = rigidCode;     vsi.code_size = rigidSize;     vsRigid_       = SDL_CreateGPUShader(device_, &vsi);
-	vsi.code = skinCode;      vsi.code_size = skinSize;      vsSkin_        = SDL_CreateGPUShader(device_, &vsi);
-	vsi.code = rigidBumpCode; vsi.code_size = rigidBumpSize; vsRigidBump_   = SDL_CreateGPUShader(device_, &vsi);
-	vsi.code = skinBumpCode;  vsi.code_size = skinBumpSize;  vsSkinBump_    = SDL_CreateGPUShader(device_, &vsi);
-	vsi.code = shRigidCode;   vsi.code_size = shRigidSize;   vsShadowRigid_ = SDL_CreateGPUShader(device_, &vsi);
-	vsi.code = shSkinCode;    vsi.code_size = shSkinSize;    vsShadowSkin_  = SDL_CreateGPUShader(device_, &vsi);
-
-	SDL_GPUShaderCreateInfo fsi = {};
-	fsi.entrypoint = entry; fsi.format = fmt; fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
-	fsi.num_uniform_buffers = 1;    // material colours + skin-colour lerp + flags
-	fsi.code = fsCode; fsi.code_size = fsSize;
-	fsi.num_samplers = 2;           // diffuse + shadow map
-	fs_ = SDL_CreateGPUShader(device_, &fsi);
-	fsi.code = fsBumpCode; fsi.code_size = fsBumpSize;
-	fsi.num_samplers = 4;           // diffuse + bump + specular map + shadow map
-	fsBump_ = SDL_CreateGPUShader(device_, &fsi);
-	fsi.code = shFsCode; fsi.code_size = shFsSize;
-	fsi.num_samplers = 1;           // diffuse, for the alpha-cutout clip
-	fsShadow_ = SDL_CreateGPUShader(device_, &fsi);
+	// The fragment shaders share a uniform block (material colours + skin-colour lerp +
+	// flags) and differ only in how many textures they sample.
+	auto makeFS = [&](const vista::ShaderBlob& blob, Uint32 numSamplers) {
+		SDL_GPUShaderCreateInfo fsi = vista::shaderCreateInfo(blob);
+		fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+		fsi.num_uniform_buffers = 1;
+		fsi.num_samplers = numSamplers;
+		return SDL_CreateGPUShader(device_, &fsi);
+	};
+	fs_       = makeFS(VISTA_SHADER(object3dx_frag),        2);  // diffuse + shadow map
+	fsBump_   = makeFS(VISTA_SHADER(object3dx_bump_frag),   4);  // diffuse + bump + specular + shadow map
+	fsShadow_ = makeFS(VISTA_SHADER(object3dx_shadow_frag), 1);  // diffuse, for the alpha-cutout clip
 
 	if(!vsRigid_ || !vsSkin_ || !vsRigidBump_ || !vsSkinBump_ || !fs_ || !fsBump_
 	   || !vsShadowRigid_ || !vsShadowSkin_ || !fsShadow_){

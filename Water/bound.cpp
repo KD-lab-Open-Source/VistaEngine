@@ -1,6 +1,6 @@
 //	2000 Balmer (Poskryakov Dmitry) 
-#include "StdAfx.h"
-#include "Bound.h"
+#include "stdafx.h"
+#include "bound.h"
 //#include <string.h>
 #ifndef _FINAL_VERSION_
 #define VERIFY(exp) xxassert(exp, #exp)

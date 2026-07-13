@@ -1,12 +1,12 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "UI_StreamVideo.h"
 
 #include "Handle.h"
 #include "GameOptions.h"
 #include "SystemUtil.h"
 #include "Render/3dx/Umath.h"
-#include "Render/Inc/Unknown.h"
-#include "Render/Src/Texture.h"
+#include "Render/inc/Unknown.h"
+#include "Render/src/Texture.h"
 #include "Render/src/VisGeneric.h"
 
 void* SNDGetDirectSound();

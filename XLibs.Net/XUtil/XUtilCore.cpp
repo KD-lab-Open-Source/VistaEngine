@@ -1,4 +1,5 @@
-#include "xglobal.h"
+#include "XGLOBAL.H"
+#include <cstdarg>	// va_start/va_list; libc++ pulls this in transitively, glibc does not
 //#include <ostream.h>
 
 void xtSysFinit(){}
@@ -105,7 +106,7 @@ void dcprintfW(wchar_t *format, ...)
 }
 
 // ����� Unicode ������ � Debug Output
-void dprintfW(wchar_t *format, ...)
+void dprintfW(const wchar_t *format, ...)
 {
 	wchar_t buffer[512];
 
@@ -124,7 +125,7 @@ void dcprintfW(wchar_t* format, ...) {
 	va_list args; va_start(args, format);
 	vfwprintf(stderr, format, args); va_end(args);
 }
-void dprintfW(wchar_t* format, ...) {
+void dprintfW(const wchar_t* format, ...) {
 	va_list args; va_start(args, format);
 	vfwprintf(stderr, format, args); va_end(args);
 }

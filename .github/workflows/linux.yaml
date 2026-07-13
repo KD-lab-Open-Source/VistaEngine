@@ -1,0 +1,68 @@
+name: Linux
+
+on:
+  push:
+    branches: [ crossplatform ]
+  pull_request:
+    branches: [ crossplatform ]
+  workflow_dispatch:
+
+concurrency:
+  group: linux-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  BUILD_TYPE: RelWithDebInfo
+  # Clang, not the distro default GCC: this is MSVC-origin code and the engine
+  # leans on __super in ~180 files, which only clang's -fms-extensions accepts
+  # (the flag exists in GCC but does not bring the keyword with it).
+  CC: clang
+  CXX: clang++
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # SDL3 is built from source (FetchContent), and it treats its X11 and Wayland
+    # dependencies as hard requirements: a missing one fails the configure outright
+    # rather than quietly disabling the backend. So this is SDL's own documented
+    # dependency list (docs/README-linux.md), narrowed to the video subsystem —
+    # SDL_INIT_VIDEO is all the engine ever initializes, and the root CMakeLists
+    # turns SDL's audio/joystick/camera/... off, which is what makes the audio and
+    # input packages of that list unnecessary here.
+    #
+    # Two names that look droppable and are not: libxtst-dev is the X11 XTest
+    # *extension*, nothing to do with SDL's test suite, and libwayland-bin is where
+    # wayland-scanner lives.
+    #
+    # FreeType is vendored too, with every optional dependency disabled, so it
+    # needs nothing from the system.
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          ninja-build clang pkg-config \
+          libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev \
+          libxfixes-dev libxss-dev libxtst-dev libxkbcommon-dev \
+          libwayland-dev libwayland-bin wayland-protocols libdecor-0-dev \
+          libgl1-mesa-dev libegl1-mesa-dev libdrm-dev libgbm-dev \
+          libdbus-1-dev libudev-dev
+
+    # No shadercross cache here, unlike macOS: on Linux the root CMakeLists
+    # downloads Microsoft's prebuilt DirectXShaderCompiler instead of compiling
+    # it, so all that is left to build is SPIRV-Cross and the CLI — a couple of
+    # minutes, not worth a cache round-trip.
+    - name: Game -- configure
+      run: cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Game -- build
+      run: cmake --build build -j3
+
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: VistaEngine-Linux
+        path: build/Game/Game

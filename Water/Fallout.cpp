@@ -7,12 +7,12 @@
 #include "Serialization/Serialization.h"
 #include "Environment/Environment.h"
 #include "Physics/WindMap.h"
-#include "Terra/vmap.h"
+#include "Terra/VMAP.H"
 #include "Serialization/EnumDescriptor.h"
-#include "Render/Src/cCamera.h"
+#include "Render/src/cCamera.h"
 #include "Render/SDLWorldQuadRenderer.h"   // the drops are drawn by SDLWorldQuadRenderer,
 #include "Render/SDLRenderDevice.h"        // reached via cSDLRenderDevice::drawWorldQuads
-#include "Render/Src/TexLibrary.h"
+#include "Render/src/TexLibrary.h"
 
 BEGIN_ENUM_DESCRIPTOR(ModeFall,"ModeFall");
 REGISTER_ENUM(FALLOUT_RAIN, "Дождь");

@@ -2,9 +2,9 @@
 #define _FALLLEAVES_H_
 
 #include "MTSection.h"
-#include "Render/Inc/IVisGenericInternal.h"
-#include "Render/Src/NParticleKey.h"
-#include "Render/Src/Texture.h"
+#include "Render/inc/IVisGenericInternal.h"
+#include "Render/src/NParticleKey.h"
+#include "Render/src/Texture.h"
 #include "Serialization/SerializationTypes.h"
 #include "XTL/StaticMap.h"
 

@@ -1,12 +1,12 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "ice.h"
 #include "CoastSprites.h"
 #include "Serialization/ResourceSelector.h"
 #include "Serialization/RangedWrapper.h"
-#include "Render/Src/cCamera.h"
-#include "Render/Src/TileMap.h"
-#include "Render/Src/TexLibrary.h"
-#include "Render/Src/Scene.h"
+#include "Render/src/cCamera.h"
+#include "Render/src/TileMap.h"
+#include "Render/src/TexLibrary.h"
+#include "Render/src/Scene.h"
 #include "Render/SDLWorldQuadRenderer.h"   // the sprites are drawn by SDLWorldQuadRenderer,
 #include "Render/SDLRenderDevice.h"        // reached via cSDLRenderDevice::drawWorldQuads
 

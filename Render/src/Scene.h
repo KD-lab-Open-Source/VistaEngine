@@ -1,9 +1,9 @@
 #ifndef __SCENE_H_INCLUDED__
 #define __SCENE_H_INCLUDED__
 #include "UnkLight.h"
-#include "czplane.h"
+#include "cZPlane.h"
 #include "NParticle.h"
-#include "Render/3dx/Node3dx.h"
+#include "Render/3dx/Node3DX.h"
 #include "Render/3dx/Simply3dx.h"
 
 class FogOfWar;

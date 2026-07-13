@@ -1,8 +1,8 @@
-#include <my_stl.h>
+#include <my_STL.h>
 #include <windows.h>
 #include <stdio.h>
 
-#include <hash_map>
+#include <unordered_map>
 #include <list>
 
 #include "XZip.h"
@@ -56,7 +56,8 @@ private:
 		unz_file_seek_info seekInfo_;
 	};
 
-	typedef std::hash_map<std::string, ZLibFileInfo, std::hash<std::string> > IndexMap;
+	// Was SGI/STLport std::hash_map, which no standard library ships any more.
+	typedef std::unordered_map<std::string, ZLibFileInfo> IndexMap;
 	IndexMap index_;
 
 	/// ��� ��������� � ������ ������ �����
@@ -67,17 +68,17 @@ private:
 	unsigned long fileDate_;
 };
 
-static char* openMSG	 = "OPEN FAILURE (file don't exist or not valid)";
-static char* openInMSG	 = "OPEN FAILURE FILE IN ARCHIVE";
-static char* closeInMSG  = "CLOSE FAILURE FILE IN ARCHIVE";
-static char* closeMSG	 = "CLOSE FAILURE";
-static char* appendMSG	 = "APPENDING FAILURE";
-static char* sizeMSG	 = "FILE SIZE CALCULATION ERROR";
-static char* surfMSG	 = "SURFING IN ARCHIVE ERROR";
-static char* locateMSG   = "LOCATE FILE ERROR";
-static char* timeMSG	 = "FILE GET TIME ERROR";
-static char* readMSG	 = "WRONG READING";
-static char *seekMSG	 = "BAD SEEK";
+static const char* openMSG	 = "OPEN FAILURE (file don't exist or not valid)";
+static const char* openInMSG	 = "OPEN FAILURE FILE IN ARCHIVE";
+static const char* closeInMSG  = "CLOSE FAILURE FILE IN ARCHIVE";
+static const char* closeMSG	 = "CLOSE FAILURE";
+static const char* appendMSG	 = "APPENDING FAILURE";
+static const char* sizeMSG	 = "FILE SIZE CALCULATION ERROR";
+static const char* surfMSG	 = "SURFING IN ARCHIVE ERROR";
+static const char* locateMSG   = "LOCATE FILE ERROR";
+static const char* timeMSG	 = "FILE GET TIME ERROR";
+static const char* readMSG	 = "WRONG READING";
+static const char*seekMSG	 = "BAD SEEK";
 
 static void zipError(const char* message, const char* subject = 0)
 {

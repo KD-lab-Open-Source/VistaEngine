@@ -1,5 +1,5 @@
 #include "StdAfxRD.h"
-#include "cChaos.h"
+#include "CChaos.h"
 #include "D3DRender.h"
 #include "cCamera.h"
 #include "VisGeneric.h"

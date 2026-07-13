@@ -1,0 +1,122 @@
+name: macOS
+
+on:
+  push:
+    branches: [ crossplatform ]
+  pull_request:
+    branches: [ crossplatform ]
+  workflow_dispatch:
+
+concurrency:
+  group: macos-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  BUILD_TYPE: RelWithDebInfo
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: brew install ninja
+
+    # No prebuilt DirectXShaderCompiler is published for macOS, so a cold build
+    # compiles the vendored one (an LLVM fork) from source — by far the most
+    # expensive thing in this project. Cache the three artifacts the shader step
+    # actually consumes (the CLI plus its two dylibs) and feed them back through
+    # -DSHADERCROSS_EXECUTABLE, which makes the root CMakeLists skip fetching and
+    # building SDL_shadercross altogether.
+    #
+    # The key is the SDL_shadercross revision pinned in CMakeLists.txt, read out
+    # of the file so the cache invalidates exactly when the pin moves. It is a
+    # FetchContent GIT_TAG, not a submodule, hence the awk instead of a
+    # `git rev-parse HEAD:<path>`.
+    - name: Compute shadercross cache key
+      id: keyinfo
+      run: |
+        sha=$(awk '/^[[:space:]]*SDL_shadercross[[:space:]]*$/{f=1} f && /GIT_TAG/{print $2; exit}' CMakeLists.txt)
+        if [ -z "$sha" ]; then
+          echo "could not read the SDL_shadercross GIT_TAG out of CMakeLists.txt" >&2
+          exit 1
+        fi
+        echo "shadercross_sha=$sha" >> "$GITHUB_OUTPUT"
+
+    - name: Restore prebuilt shadercross
+      id: cache-shadercross
+      uses: actions/cache@v4
+      with:
+        path: ~/dxc-prebuilt
+        # v2: v1 cached the CLI without libSDL3 and is unusable. The key has to change
+        # or the broken copy keeps being restored — bump this whenever what we stage
+        # into ~/dxc-prebuilt changes shape.
+        key: macos-shadercross-v2-${{ runner.arch }}-${{ env.ImageOS }}-${{ steps.keyinfo.outputs.shadercross_sha }}
+
+    # Cache miss: configure without SHADERCROSS_EXECUTABLE (so the root
+    # CMakeLists takes its build-from-source branch) and build only the
+    # `shadercross` target, which pulls in DXC and SPIRV-Cross transitively.
+    # Then stage the CLI and its dylibs into ~/dxc-prebuilt under the usual
+    # bin/ + lib/ layout. install_name_tool rewrites the rpaths so the relocated
+    # binary finds its dylibs at @loader_path/../lib — and libdxcompiler finds
+    # libdxil next to itself — independently of whatever rpaths CMake baked in
+    # at the original link.
+    #
+    # -j3 rather than "all cores": linking DXC is memory-hungry and the runner
+    # has little to spare.
+    - name: Build shadercross (cache miss)
+      if: steps.cache-shadercross.outputs.cache-hit != 'true'
+      run: |
+        set -euo pipefail
+        cmake -G Ninja -B build-shadercross-cache -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        cmake --build build-shadercross-cache --target shadercross -j3
+
+        cli=$(find build-shadercross-cache -type f -perm -111 -name shadercross | head -1)
+        if [ -z "$cli" ]; then
+          echo "the shadercross target built but no CLI binary was found" >&2
+          exit 1
+        fi
+
+        mkdir -p "$HOME/dxc-prebuilt/bin" "$HOME/dxc-prebuilt/lib"
+        cp "$cli" "$HOME/dxc-prebuilt/bin/"
+        # libSDL3 belongs here too: the CLI links it, and it lives in the SDL3
+        # subbuild, not next to DXC. Cache the CLI without it and the *next* run —
+        # the one that restores the cache — dies in dyld, because the build tree the
+        # rpath points into is gone.
+        find build-shadercross-cache \
+             \( -name 'libSDL3*.dylib' -o -name libdxcompiler.dylib -o -name libdxil.dylib \) \
+             -exec cp {} "$HOME/dxc-prebuilt/lib/" \;
+
+        # The CLI links DXC statically in some configurations; only fix up the
+        # rpaths for dylibs that were actually produced.
+        if [ -n "$(ls -A "$HOME/dxc-prebuilt/lib")" ]; then
+          install_name_tool -add_rpath @loader_path/../lib "$HOME/dxc-prebuilt/bin/shadercross"
+          if [ -f "$HOME/dxc-prebuilt/lib/libdxcompiler.dylib" ]; then
+            install_name_tool -add_rpath @loader_path "$HOME/dxc-prebuilt/lib/libdxcompiler.dylib"
+          fi
+        fi
+
+        # Delete the build tree before the smoke test. With it still on disk the
+        # binary resolves its libraries through the rpaths baked in at link time and
+        # proves nothing about the cached copy — which is exactly how a CLI that
+        # could not stand alone got cached in the first place.
+        rm -rf build-shadercross-cache
+        otool -L "$HOME/dxc-prebuilt/bin/shadercross"
+        "$HOME/dxc-prebuilt/bin/shadercross" --help > /dev/null
+
+    - name: Game -- configure
+      run: >
+        cmake -G Ninja -B build
+        -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        -DSHADERCROSS_EXECUTABLE=$HOME/dxc-prebuilt/bin/shadercross
+
+    - name: Game -- build
+      run: cmake --build build -j3
+
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: VistaEngine-macOS
+        path: build/Game/Game

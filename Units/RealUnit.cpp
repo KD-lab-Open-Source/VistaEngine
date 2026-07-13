@@ -14,10 +14,11 @@
 #include "IronBuilding.h"
 #include "IronLegion.h"
 #include "Physics/RigidBodyUnitRagDoll.h"
-#include "Physics/crash/CrashSystem.h"
-#include "Terra/vMap.h"
+#include "Physics/Crash/CrashSystem.h"
+#include "Terra/VMAP.H"
 #include "Render/src/Scene.h"
 #include "EditorVisual.h"
+#include "Serialization/StringTableImpl.h"	// the StringTableReference constructor
 
 #pragma warning(disable: 4355)
 

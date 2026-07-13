@@ -1,6 +1,7 @@
 #include "StdAfxRD.h"
+#include <climits>	// INT_MAX etc.; libc++ pulls this in transitively, glibc does not
 #include "VisGrid2d.h"
-#include "Render/3dx/Node3dx.h"
+#include "Render/3dx/Node3DX.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 QuatTreeVoid::QuatTreeVoid()

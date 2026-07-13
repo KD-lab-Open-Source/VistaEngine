@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 
 #include "Universe.h"
 #include "Environment.h"
@@ -11,7 +11,7 @@
 #include "SourceShield.h"
 #include "SourceZone.h"
 #include "SourceTerTool.h"
-#include "Water/Ice.h"
+#include "Water/ice.h"
 #include "Water/WaterGarbage.h"
 #include "SourceCameraShaking.h"
 #include "SourceTeleport.h"
@@ -27,6 +27,12 @@
 #pragma warning(disable: 4355)
 
 WRAP_LIBRARY(SourcesLibrary, "SourcesLibrary", "Источники", "Scripts\\Content\\SourcesLibrary", 0, LIBRARY_EDITABLE);
+
+// Emit SourceReference's out-of-line members once, here, where its library is
+// registered — the same reason RigidBodyPrmReference gets one in Units/UnitAttribute.cpp.
+// The constructors are defined in StringTableImpl.h, which SourceBase.cpp does not
+// include, and an optimised build inlines away whatever copies happen to exist.
+template class StringTableReferencePolymorphic<SourceBase, false>;
 
 DECLARE_SEGMENT(Sources)
 REGISTER_CLASS(SourceBase, SourceZone, "Зона на мире");

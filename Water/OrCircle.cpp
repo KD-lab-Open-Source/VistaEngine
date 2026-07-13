@@ -1,4 +1,5 @@
-#include "StdAfx.h"
+#include "stdafx.h"
+#include "XTL/TempPtr.h"	// tempPtr(): &temporary is not an lvalue for a conforming compiler
 #include "OrCircle.h"
 #include "Render/inc/IRenderDevice.h"
 
@@ -474,7 +475,7 @@ void OrCircle::testDraw()
 			Segment& s=**it;
 			if(s.type==SS_SEGMENT)
 			{
-				DrawSegment(circle.pos,circle.r,s.A,s.B,colors[color],&Color4c(255,255,255));
+				DrawSegment(circle.pos,circle.r,s.A,s.B,colors[color],tempPtr(Color4c(255,255,255)));
 				//DrawSegment(circle.pos,circle.r,s.A,s.B,s.color,&s.pB->color);
 /*
 				if(s.pA->s0)

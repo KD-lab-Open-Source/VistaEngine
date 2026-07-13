@@ -3,16 +3,10 @@
 
 #include "XMath/Colors.h"
 #include "Render/src/Texture.h"
-#include "Render/Shader/Shaders.h"
+#include "Render/shader/shaders.h"
 
 
 class cTileMap;
-
-// <sys/dirent.h> (pulled in transitively on macOS/Linux) defines DT_UNKNOWN as
-// a macro for its d_type field; undef it so our enumerator name is usable.
-#ifdef DT_UNKNOWN
-#undef DT_UNKNOWN
-#endif
 
 enum eDrawID
 {

@@ -12,4 +12,7 @@ add_library(XMath STATIC
 )
 
 target_include_directories(XMath PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(XMath PUBLIC EngineIncludes)
+# XUtil, because XMath.cpp serializes through XStream (operator<= / operator>=). The
+# dependency was always real, just never declared — Apple's linker resolves archives in
+# any order, GNU ld scans each one once, in the order given, and never goes back.
+target_link_libraries(XMath PUBLIC EngineIncludes XUtil)

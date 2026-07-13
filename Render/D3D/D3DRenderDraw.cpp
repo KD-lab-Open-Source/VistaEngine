@@ -1,6 +1,6 @@
 #include "StdAfxRD.h"
 #include "Render/D3D/D3DRender.h"
-#include "Render/Src/cCamera.h"
+#include "Render/src/cCamera.h"
 #include "Render/src/FT_Font.h"
 #include "UnicodeConverter.h"
 #include "VisGenericDefine.h"

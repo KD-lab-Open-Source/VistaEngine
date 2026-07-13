@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "Installer.h"
-#include "vmap.h"
+#include "VMAP.H"
 #include "CameraManager.h"
 #include "RenderObjects.h"
 #include "BaseUnit.h"
@@ -11,6 +11,7 @@
 #include "Render/src/cZPlane.h"
 #include "Render/src/Scene.h"
 #include "Render/src/VisGeneric.h"
+#include "Serialization/StringTableImpl.h"	// the StringTableReference constructor
 
 BuildingInstaller::BuildingInstaller()
 {

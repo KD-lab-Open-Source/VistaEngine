@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "XTL/TempPtr.h"	// tempPtr(): &temporary is not an lvalue for a conforming compiler
 #include "UI_NetCenter.h"
 #include "UI_Logic.h"
 #include "GameShell.h"
@@ -95,14 +96,14 @@ void UI_NetCenter::quant()
 		curNT=&extNetTask_CreateAccount;
 		if(extNetTask_CreateAccount.isOk()){
 			UI_LogicDispatcher::instance().profileSystem().newOnlineLogin();
-			UI_LogicDispatcher::instance().handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_ONLINE_LOGIN_LIST, UI_ActionDataControlCommand::RE_INIT)));
+			UI_LogicDispatcher::instance().handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_ONLINE_LOGIN_LIST, UI_ActionDataControlCommand::RE_INIT))));
 		}
 	}
 	else if(extNetTask_DeleteAccount.isRunAndEnd()){
 		curNT=&extNetTask_DeleteAccount;
 		if(extNetTask_CreateAccount.isOk()){
 			UI_LogicDispatcher::instance().profileSystem().deleteOnlineLogin();
-			UI_LogicDispatcher::instance().handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_ONLINE_LOGIN_LIST, UI_ActionDataControlCommand::RE_INIT)));
+			UI_LogicDispatcher::instance().handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_ONLINE_LOGIN_LIST, UI_ActionDataControlCommand::RE_INIT))));
 		}
 	}
 	else if(extNetTask_ChangePassword.isRunAndEnd()){
@@ -112,7 +113,7 @@ void UI_NetCenter::quant()
 		curNT=&extNetTask_Login;
 		if(extNetTask_Login.isRunCompleted() /*&& !extNetTask_Login.isErr()*/){ //подразумевается что нет ошибки если isRunCompleted
 			UI_LogicDispatcher::instance().profileSystem().newOnlineLogin();
-			UI_LogicDispatcher::instance().handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, &UI_ActionDataControlCommand(UI_ACTION_ONLINE_LOGIN_LIST, UI_ActionDataControlCommand::RE_INIT)));
+			UI_LogicDispatcher::instance().handleMessage(ControlMessage(UI_ACTION_CONTROL_COMMAND, tempPtr(UI_ActionDataControlCommand(UI_ACTION_ONLINE_LOGIN_LIST, UI_ActionDataControlCommand::RE_INIT))));
 			onlineLogined_ = true;
 			resetChatBoard();
 			lock_.unlock();
@@ -1689,7 +1690,7 @@ void UI_NetCenter::updateFilter()
 			LogMsg((XBuffer()
 				< "|gt=" <= UI_LogicDispatcher::instance().currentProfile().gameTypeFilter
 				< ", slot=" <= UI_LogicDispatcher::instance().currentProfile().playersSlotFilter
-				< ", map={size=" <= UI_LogicDispatcher::instance().currentProfile().findMissionFilter.getFilter().size()
+				< ", map={size=" <= (int)UI_LogicDispatcher::instance().currentProfile().findMissionFilter.getFilter().size()
 				< ", first=" < (UI_LogicDispatcher::instance().currentProfile().findMissionFilter.getFilter().empty()
 				? "EMPTY"
 				: (UI_LogicDispatcher::instance().getMissionByID(UI_LogicDispatcher::instance().currentProfile().findMissionFilter.getFilter().front())

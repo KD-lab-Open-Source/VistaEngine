@@ -200,8 +200,8 @@ int ColorQuantizer::ditherFloydSteinberg(unsigned long* pSource, unsigned char* 
 			sg=clamp(sg, 0l, 255l);
 			sb=clamp(sb, 0l, 255l);
 
-            register int r1, g1, b1, r2, g2, b2;
-            register long dist, newdist;
+            int r1, g1, b1, r2, g2, b2;
+            long dist, newdist;
             r1 = sr;
             g1 = sg;
             b1 = sb;

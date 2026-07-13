@@ -4,7 +4,7 @@
 #include "Serialization/RangedWrapper.h"
 #include "Serialization/SerializationFactory.h"
 #include "Game/CameraManager.h"
-#include "Render/Src/cCamera.h"
+#include "Render/src/cCamera.h"
 #include "UserInterface/UI_Logic.h"
 #include "UserInterface/UI_Font.h"
 #include "UserInterface/UI_TextParser.h"

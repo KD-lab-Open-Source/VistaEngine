@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Game/Universe.h"
-#include "soundSystem.h"
+#include "SoundSystem.h"
 #include "SoundInternal.h"
 #include "Game/SoundApp.h"
 #include "Console.h"

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "Rectangle4f.h"
 
 const sRectangle4f sRectangle4f::ID(0.0f, 0.0f, 1.0f, 1.0f);

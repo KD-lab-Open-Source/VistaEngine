@@ -1,8 +1,8 @@
-#include "StdAfxRd.h"
+#include "StdAfxRD.h"
 #include "Static3dx.h"
 #include "TexLibrary.h"
 #include "D3DRender.h"
-#include "scene.h"
+#include "Scene.h"
 #include "VisGeneric.h"
 #include "AccessTexture.h"
 #include "Serialization/XPrmArchive.h"
@@ -69,7 +69,7 @@ string cStatic3dx::fixTextureName(const char* name) const
 	return extractFilePath(fileName()) + "Textures\\" + extractFileName(name);
 }
 
-cTexture* cStatic3dx::LoadTexture(const char* name, char* mode)
+cTexture* cStatic3dx::LoadTexture(const char* name, const char* mode)
 {
 	if(name==0 || name[0]==0) 
 		return 0;

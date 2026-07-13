@@ -1,7 +1,7 @@
 #ifndef _MT_SECTION_H_
 #define _MT_SECTION_H_
 
-#include <Windows.h>
+#include <windows.h>
 
 class MTSection
 {

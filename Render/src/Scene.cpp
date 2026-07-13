@@ -1,5 +1,7 @@
 #include "StdAfxRD.h"
-#include "scene.h"
+#include "XTL/TempPtr.h"	// tempPtr(): &temporary is not an lvalue for a conforming compiler
+#include <climits>	// INT_MAX etc.; libc++ pulls this in transitively, glibc does not
+#include "Scene.h"
 #include "TileMap.h"
 #include "cCamera.h"
 #include "TexLibrary.h"
@@ -8,7 +10,7 @@
 #include "FogOfWar.h"
 #include "Render/3dx/Lib3dx.h"
 #include "ClippingMesh.h"
-#include "Terra/vmap.h"
+#include "Terra/VMAP.H"
 #include "FileUtils/FileUtils.h"
 #include "Render/SDLRenderDevice.h"   // the shadow map lives on the SDL device
 
@@ -824,8 +826,8 @@ void cScene::FixShadowMapCamera(Camera* camera, Camera* shadowCamera)
 	LightMatrix.trans()=-PosLight;
 
 	Vect2f Focus(1/(box.max.x-box.min.x),1/(box.max.y-box.min.y));
-	shadowCamera->SetFrustum(&Vect2f(0.5f,0.5f),&sRectangle4f(-0.5f,-0.5f,0.5f,0.5f),
-		&Focus, &Vect2f(0,box.max.z-box.min.z));
+	shadowCamera->SetFrustum(tempPtr(Vect2f(0.5f,0.5f)),tempPtr(sRectangle4f(-0.5f,-0.5f,0.5f,0.5f)),
+		&Focus, tempPtr(Vect2f(0,box.max.z-box.min.z)));
 	shadowCamera->SetPosition(LightMatrix);
 }
 
@@ -1092,8 +1094,8 @@ void cScene::CalcShadowMapCamera(Camera* camera, Camera *shadowCamera)
 	LightMatrix.trans()=-PosLight;
 
 	Vect2f Focus(1/(box.max.x-box.min.x),1/(box.max.y-box.min.y));
-	shadowCamera->SetFrustum(&Vect2f(0.5f,0.5f),&sRectangle4f(-0.5f,-0.5f,0.5f,0.5f),
-		&Focus, &Vect2f(0,box.max.z-box.min.z));
+	shadowCamera->SetFrustum(tempPtr(Vect2f(0.5f,0.5f)),tempPtr(sRectangle4f(-0.5f,-0.5f,0.5f,0.5f)),
+		&Focus, tempPtr(Vect2f(0,box.max.z-box.min.z)));
 	shadowCamera->SetPosition(LightMatrix);
 
 //С одной стороны эта камера должна быть посчитана до того момента
@@ -1148,8 +1150,8 @@ void cScene::AddPlanarCamera(Camera* camera, bool light, bool toObjects)
 	planarCamera->setAttribute(ATTRCAMERA_SHADOW|ATTRUNKOBJ_NOLIGHT);
 	planarCamera->clearAttribute(ATTRCAMERA_PERSPECTIVE | ATTRCAMERA_SHOWCLIP | ATTRCAMERA_WRITE_ALPHA);
 	planarCamera->SetRenderTarget(sdlRenderDevice()->GetLightMap(), 0);   // guarded above
-	planarCamera->SetFrustum(&Vect2f(0.5f,0.5f), &sRectangle4f(-0.5f,-0.5f,0.5f,0.5f),
-						   &Focus, &Vect2f(10,1e6f));
+	planarCamera->SetFrustum(tempPtr(Vect2f(0.5f,0.5f)), tempPtr(sRectangle4f(-0.5f,-0.5f,0.5f,0.5f)),
+						   &Focus, tempPtr(Vect2f(10,1e6f)));
 	
 	planarCamera->SetPosition(LightMatrix);
 	planarCamera->Attach(SCENENODE_OBJECT,tileMap_); // рисовать источники света							   

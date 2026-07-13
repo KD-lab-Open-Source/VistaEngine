@@ -1,4 +1,5 @@
-#include "StdAfx.h"
+#include "stdafx.h"
+#include "XTL/TempPtr.h"	// tempPtr(): &temporary is not an lvalue for a conforming compiler
 
 #include "XTL/SafeCast.h"
 #include "Serialization/Serialization.h"
@@ -23,8 +24,8 @@
 #include "CameraManager.h"
 #include "Environment/Environment.h"
 #include "Environment/SourceManager.h"
-#include "Terra/vMap.h"
-#include "Render/Src/cCamera.h"
+#include "Terra/VMAP.H"
+#include "Render/src/cCamera.h"
 
 #include "Universe.h"
 #include "WBuffer.h"
@@ -651,7 +652,7 @@ void UI_ControlBase::handleAction(const ControlMessage& msg)
 		for(int i = 0; i < actionCount(); i++)
 			if(ID == actionID(i))
 				if(ID == UI_ACTION_SET_KEYS)
-					actionExecute(ID, &UI_ActionKeys(safe_cast<const UI_ActionKeys*>(msg.data_)->ActionType(), safe_cast<const UI_ActionKeys*>(actionData(i))->Option()));
+					actionExecute(ID, tempPtr(UI_ActionKeys(safe_cast<const UI_ActionKeys*>(msg.data_)->ActionType(), safe_cast<const UI_ActionKeys*>(actionData(i))->Option())));
 				else
 					actionExecute(ID, msg.data_);
 	
@@ -659,7 +660,7 @@ void UI_ControlBase::handleAction(const ControlMessage& msg)
 			for(int i = 0; i < state->actionCount(); i++)
 				if(ID == state->actionID(i))
 					if(ID == UI_ACTION_SET_KEYS)
-						actionExecute(ID, &UI_ActionKeys(safe_cast<const UI_ActionKeys*>(msg.data_)->ActionType(), safe_cast<const UI_ActionKeys*>(state->actionData(i))->Option()));
+						actionExecute(ID, tempPtr(UI_ActionKeys(safe_cast<const UI_ActionKeys*>(msg.data_)->ActionType(), safe_cast<const UI_ActionKeys*>(state->actionData(i))->Option())));
 					else
 						actionExecute(ID, msg.data_);
 	}
@@ -1051,7 +1052,7 @@ void UI_ControlBase::adjastToLink()
 				anchor = sourceManager->findAnchor(linkAction->link());
 			if(anchor){
 				Vect3f e, w;
-				cameraManager->GetCamera()->ConvertorWorldToViewPort(&To3D(anchor->position()), &w, &e);
+				cameraManager->GetCamera()->ConvertorWorldToViewPort(tempPtr(To3D(anchor->position())), &w, &e);
 				if(w.z > 0){
 					show();
 					setPosition(UI_Render::instance().relativeCoords(e));
@@ -1610,7 +1611,7 @@ void UI_ControlHotKeyInput::actionExecute(UI_ControlActionID action_id, const UI
 				break;
 
 			case UI_OPTION_CANCEL:
-				actionInit(UI_ACTION_SET_KEYS, &UI_ActionKeys(UI_OPTION_UPDATE, action->Option()));
+				actionInit(UI_ACTION_SET_KEYS, tempPtr(UI_ActionKeys(UI_OPTION_UPDATE, action->Option())));
 				break;
 		}
 						  }

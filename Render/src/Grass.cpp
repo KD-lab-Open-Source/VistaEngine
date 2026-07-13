@@ -5,11 +5,13 @@
 #include "Render/SDLGrassRenderer.h"
 #include "cCamera.h"
 #include "FileImage.h"
-#include "Terra/vmap.h"
+#include "Terra/VMAP.H"
 #include "Scene.h"
 #include "Serialization/Serialization.h"
 #include "Serialization/ResourceSelector.h"
-#include "Terra/vmap.h"
+// vMap.getColor32() is an inline specialisation, defined here rather than in VMAP.H,
+// which declares it. (This line was a second copy of the VMAP.H include above.)
+#include "Terra/vmap.inl"
 #include "TileMap.h"
 #include "VisGeneric.h"
 #include "Environment/Environment.h"
