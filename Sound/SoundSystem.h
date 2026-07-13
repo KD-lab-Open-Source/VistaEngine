@@ -157,7 +157,11 @@ protected:
 	bool isMuted_;
 	bool isLooped_;
 	bool is3DSound_;
+	/// Where the emitter is. It used to live inside the channel's DS3DBUFFER.
+	Vect3f position_;
 	float minDistance_;
+	float maxDistance_;
+	/// maxDistance_ squared, so the clip-distance pass can compare against norm2().
 	float maxDistance2_;
 	float volume_;
 	bool playing_;

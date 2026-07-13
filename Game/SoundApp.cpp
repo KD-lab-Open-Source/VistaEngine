@@ -148,6 +148,11 @@ void SoundQuant()
 void FinitSound()
 {
 	OggPlayer::finitLibrary();
+
+	// sndLibrary indexes the Sounds by name, and SNDReleaseSound() is about to delete every
+	// one of them along with the device. Let go of them first.
+	sndLibrary.Release();
+
 	SNDReleaseSound();
 }
 
