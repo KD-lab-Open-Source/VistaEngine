@@ -3,6 +3,8 @@
 #include "SoundSystem.h"
 #include "SoundApp.h"
 #include "SystemUtil.h"
+#include "Game/Universe.h"
+#include "Render/src/FogOfWar.h"
 #include "CameraManager.h"
 #include "RenderObjects.h"
 #include "PlayOgg.h"
@@ -22,6 +24,16 @@ float terSoundVolume = 1;
 float terMusicVolume = 1;
 float terVoiceVolume = 1;
 float fSoundZMultiple = 0.5f; // 0..1 коэффициэнт масштабирования громкости по оси Z
+
+// A 3D sound standing under fog of war is not heard. The Sound module asks through this hook
+// rather than reaching into the universe itself (Sound.h, SNDSetFogOfWarQuery).
+static bool soundFogOfWarQuery(float x, float y)
+{
+	if(!universe() || !universe()->activePlayer() || !universe()->activePlayer()->fogOfWarMap())
+		return false;
+
+	return universe()->activePlayer()->fogOfWarMap()->getFogState(x, y) != FOGST_NONE;
+}
 
 // Добавляет слэш в конце пути к дирректории если нужно
 void SlashFixup(string& dir)
@@ -70,6 +82,7 @@ void InitSound(bool sound, bool music, const char* localeDataPath)
 		inited = 1;
 
 		if(SNDInitSound()){
+			SNDSetFogOfWarQuery(soundFogOfWarQuery);
 			LoadAllSound(localeDataPath,"RESOURCE\\SOUNDS\\");
 			OggPlayer::initLibrary(sndSystem.GetAudioEngine());
 		}

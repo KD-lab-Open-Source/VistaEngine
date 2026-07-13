@@ -21,6 +21,13 @@ void SNDStopAll();
 float SNDGetVolume();
 void SNDSetGameActive(bool active);
 
+/// How a 3D channel asks whether its emitter stands under fog of war, and so should fall silent.
+/// The game installs this (Game/SoundApp.cpp); the Sound module has no business knowing about the
+/// universe, and the original reached for it by including Game/Universe.h here. Until it is
+/// installed, nothing is fogged.
+typedef bool (*SNDFogOfWarQuery)(float x, float y);
+void SNDSetFogOfWarQuery(SNDFogOfWarQuery query);
+
 ////////////////////////////3D/////////////////////////////////
 class SND3DListener
 {

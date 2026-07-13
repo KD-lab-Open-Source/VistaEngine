@@ -23,6 +23,25 @@ SoundSystem sndSystem;
 
 namespace {
 
+/// Installed by the game; null until it is (Sound.h).
+SNDFogOfWarQuery fogOfWarQuery = 0;
+
+/// A playing channel and how far its emitter is from the listener, for the clip-distance pass.
+struct ChannelDistance
+{
+	ChannelDistance(Channel* ch = 0, float dist2 = 0.0f) : channel(ch), distance(dist2) {}
+
+	bool operator()(const ChannelDistance& s1, const ChannelDistance& s2) const
+	{
+		return s1.distance < s2.distance;
+	}
+
+	Channel* channel;
+	/// Squared: the pass only ever compares distances against each other and against
+	/// maxDistance2_, so there is no reason to take a root.
+	float distance;
+};
+
 // DirectSound took volume as millibels of attenuation, and the game fed it through
 // CalcVolume(): a 0..255 value on a logarithmic curve. miniaudio wants linear gain, so fold
 // the two together. CalcVolume gives
@@ -452,10 +471,38 @@ void Sound::RecalculateClipDistance()
 	if(!system_->enable_)
 		return;
 
-	// TODO(sound-port): with no listener there is no distance to sort by, so every channel
-	// stays audible and maxChannels_ caps nothing. The original ranked the playing channels by
-	// distance, muted the ones past maxDistance_, and paused everything past maxChannels_.
-	// Restore it with the 3D slice.
+	std::vector<Channel*> local_channels;
+	{
+		MTAuto lock(criticalSection);
+		local_channels = channels_;
+	}
+
+	std::vector<ChannelDistance> realPlayed;
+	realPlayed.reserve(local_channels.size());
+
+	for(int i = 0; i < local_channels.size(); i++){
+		Channel* channel = local_channels[i];
+		if(!channel || !channel->IsPlaying())
+			continue;
+
+		float distance2 = channel->VectorToListener().norm2();
+		realPlayed.push_back(ChannelDistance(channel, distance2));
+
+		// DirectSound created these buffers with DSBCAPS_MUTE3DATMAXDISTANCE: past the max
+		// distance the buffer went silent. miniaudio's attenuation only clamps at its quietest
+		// — the sound stays faintly audible from any distance — so the mute has to be ours.
+		channel->SetMute(distance2 > channel->maxDistance2_);
+	}
+
+	// Only so many of this sample may sound at once (maxCount in the sound library). The nearest
+	// win: rank what is playing by distance and pause everything past the budget.
+	std::sort(realPlayed.begin(), realPlayed.end(), ChannelDistance());
+
+	for(int i = 0; i < realPlayed.size(); i++){
+		bool canPlay = i < maxChannels_;
+		realPlayed[i].channel->SetPaused(!canPlay);
+		realPlayed[i].channel->canPlay_ = canPlay;
+	}
 }
 
 Channel* Sound::CreateAndPlayChannel(bool paused)
@@ -576,18 +623,26 @@ bool Channel::Init()
 	voice_ = new ma_sound;
 
 	// A copy shares the sample's decoded data but gets its own cursor, volume and pan — the
-	// same relationship DuplicateSoundBuffer gave a channel.
-	//
-	// TODO(sound-port): MA_SOUND_FLAG_NO_SPATIALIZATION unconditionally, so a 3D sound plays
-	// but is not placed. The 3D slice makes this conditional on is3DSound_.
-	ma_result result = ma_sound_init_copy(audio::engine(), sound_->source_,
-	                                      MA_SOUND_FLAG_NO_SPATIALIZATION,
+	// same relationship DuplicateSoundBuffer gave a channel. A 3D sound is placed in the world
+	// by the spatializer; a 2D one (the UI) is placed by pan alone, if at all.
+	ma_uint32 flags = is3DSound_ ? 0 : MA_SOUND_FLAG_NO_SPATIALIZATION;
+
+	ma_result result = ma_sound_init_copy(audio::engine(), sound_->source_, flags,
 	                                      audio::group(audio::GROUP_SFX), voice_);
 	if(result != MA_SUCCESS){
 		fprintf(stderr, "Channel: cannot create voice (miniaudio result %i)\n", (int)result);
 		delete voice_;
 		voice_ = 0;
 		return false;
+	}
+
+	if(is3DSound_){
+		// What the game actually asked DirectSound for was DS3DALG_DEFAULT — the HRTF algorithm
+		// is right there in the original, commented out — with every 3D parameter left at its
+		// default: an inverse distance law at a rolloff of 1, and no cone. That law is
+		// gain = minDistance/distance, and miniaudio's inverse model is the same formula.
+		ma_sound_set_attenuation_model(voice_, ma_attenuation_model_inverse);
+		ma_sound_set_rolloff(voice_, 1.0f);
 	}
 
 	fadeVolumeFactor_ = 0;
@@ -614,8 +669,10 @@ void Channel::Play()
 	isMuted_ = false;
 	playing_ = true;
 
-	// TODO(sound-port): the original muted a 3D channel here if it started further away than
-	// maxDistance_. No listener yet, so no distance.
+	// A 3D sound that starts out beyond its own max distance is born silent (see the
+	// DSBCAPS_MUTE3DATMAXDISTANCE note in Sound::RecalculateClipDistance).
+	if(is3DSound_ && VectorToListener().norm() > maxDistance_)
+		SetMute(true);
 
 	sound_->RecalculateClipDistance();
 
@@ -839,33 +896,125 @@ void Channel::Get3DMinMaxDistance(float* min, float* max)
 
 void Channel::Apply3DParameters()
 {
-	// TODO(sound-port): push position_ and the min/max distances at the voice's spatializer.
-	// Voices are created unspatialized until the 3D slice, so there is nothing to push at.
+	if(!is3DSound_ || !voice_)
+		return;
+
+	ma_sound_set_position(voice_, position_.x, position_.y, position_.z);
+	ma_sound_set_min_distance(voice_, minDistance_);
+	ma_sound_set_max_distance(voice_, maxDistance_);
 }
 
 Vect3f Channel::VectorToListener()
 {
-	// TODO(sound-port): there is no listener yet (SND3DListener is still a stub), so every
-	// emitter reads as being on top of it.
-	return Vect3f::ZERO;
+	return position_ - snd_listener.GetPos();
 }
 
 bool Channel::isInFogOfWar()
 {
-	// TODO(sound-port): 3D-only, and it needs the emitter placed in the world first. The
-	// original asked the active player's fog map about position_.
-	return false;
+	return sound_->system_->gameActive_ && stopInFogOfWar_ && is3DSound_ &&
+	       fogOfWarQuery && fogOfWarQuery(position_.x, position_.y);
 }
 
 void Channel::CheckFogOfWar()
 {
-	// TODO(sound-port): see isInFogOfWar().
+	if(!sound_->system_->gameActive_)
+		return;
+
+	if(isInFogOfWar() && !inFogOfWar_){
+		BufferStop();
+		inFogOfWar_ = true;
+	}
+
+	if(!isInFogOfWar() && inFogOfWar_){
+		if(isUsed_ && isLooped_)
+			BufferPlay(false);
+
+		inFogOfWar_ = false;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// SND3DListener — the ears
+//-----------------------------------------------------------------------------
+SND3DListener snd_listener;
+
+SND3DListener::SND3DListener()
+: velocity(0, 0, 0)
+{
+	rotate = invrotate = Mat3f::ID;
+	position = Vect3f::ZERO;
+
+	s_distance_factor = 1.0f;
+	s_doppler_factor = 1.0f;
+	s_rolloff_factor = 1.0f;
+
+	front = Vect3f(0, 0, 1.0f);
+	top = Vect3f(0, 1.0f, 0);
+	right = Vect3f(-1.0f, 0, 0);
+
+	zmultiple = 1.0f;
+}
+
+SND3DListener::~SND3DListener()
+{
+}
+
+// The camera matrix is world -> view, so the listener sits at -R^-1 * t, facing the camera's own
+// axes turned back into world space.
+bool SND3DListener::SetPos(const MatXf& _mat)
+{
+	Vect3f t = _mat.trans();
+
+	rotate = _mat.rot();
+	invrotate.invert(rotate);
+	position = invrotate*t;
+	position = -position;
+
+	front = invrotate*Vect3f(0, 0, 1.0f);
+	top = invrotate*Vect3f(0, 1.0f, 0);
+	right = invrotate*Vect3f(-1.0f, 0, 0);
+
+	return true;
+}
+
+bool SND3DListener::SetVelocity(const Vect3f& _velocity)
+{
+	velocity = _velocity;
+	return true;
+}
+
+bool SND3DListener::Update()
+{
+	start_timer_auto();
+
+	ma_engine* engine = audio::engine();
+	if(!engine)
+		return false;
+
+	// DirectSound was given a front and a top; miniaudio calls the pair a direction and a world
+	// up, and builds the same basis out of them (with the handedness set in AudioBackend.cpp).
+	//
+	// The velocity is here because the original sent it, but it is always zero — SoundQuant
+	// hands it Vect3f(0,0,0) every frame and no emitter ever sets one either — so doppler was
+	// inert in the shipped game and stays inert here. That is not an omission; see
+	// Sound/PORTING.md.
+	ma_engine_listener_set_position(engine, 0, position.x, position.y, position.z);
+	ma_engine_listener_set_velocity(engine, 0, velocity.x, velocity.y, velocity.z);
+	ma_engine_listener_set_direction(engine, 0, front.x, front.y, front.z);
+	ma_engine_listener_set_world_up(engine, 0, top.x, top.y, top.z);
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
 // The SND* entry points the game calls (Sound.h). The DirectSound originals are in
 // Sound/init.cpp.
 //-----------------------------------------------------------------------------
+void SNDSetFogOfWarQuery(SNDFogOfWarQuery query)
+{
+	fogOfWarQuery = query;
+}
+
 bool SNDInitSound()
 {
 	if(!sndSystem.Init())

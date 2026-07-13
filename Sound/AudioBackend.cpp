@@ -157,6 +157,14 @@ bool init()
 		return false;
 	}
 
+	// DirectSound's world was left-handed. miniaudio's listener defaults to right-handed, and
+	// the difference is not cosmetic: a left-handed listener negates the right-vector it builds
+	// from (direction x worldUp), so getting this wrong swaps left and right in every pan. We
+	// hand the listener the very vectors DirectSound was given (SND3DListener), so the
+	// spatializer has to read them the same way. There is no setter for it; the field is public.
+	for(ma_uint32 i = 0; i < ma_engine_get_listener_count(&maEngine); ++i)
+		maEngine.listeners[i].config.handedness = ma_handedness_left;
+
 	for(int i = 0; i < GROUP_COUNT; ++i){
 		if(ma_sound_group_init(&maEngine, MA_SOUND_FLAG_NO_SPATIALIZATION, NULL, &groups[i]) != MA_SUCCESS){
 			fprintf(stderr, "audio: ma_sound_group_init failed (group %i)\n", i);
