@@ -13,6 +13,8 @@
 #include "Physics/crash/CrashSystem.h"
 #include "Render/Src/cCamera.h"
 #include "Render/src/Scene.h"
+#include "Render/SDLUIRenderer.h"          // the parameter rings are batched here,
+#include "Render/SDLRenderDevice.h"        // reached through sdlUIRenderer()
 
 void ItemHideScaner::operator()(UnitBase* unit) 
 {
@@ -284,6 +286,16 @@ class DrawStrip2D
 	Color4c	clr_;
 	int num_;
 
+	// The device's shared 2D vertex buffer on D3D. Off Windows the device has none to hand
+	// out -- SDL GPU draws only inside a render pass, which is a renderer's business -- and
+	// the UI renderer keeps it instead, answering to the same Lock/Unlock/GetSize/
+	// DrawPrimitive. Null until there is a device, which the callers below tolerate.
+#ifdef _WIN32
+	static cVertexBuffer<sVertexXYZWD>* buffer() { return gb_RenderDevice->GetBufferXYZWD(); }
+#else
+	static SDLUIRenderer* buffer() { return sdlUIRenderer(); }
+#endif
+
 public:
 	DrawStrip2D() : pb_(0)
 	{
@@ -294,14 +306,18 @@ public:
 	void begin(const Color4c& d)
 	{
 		clr_ = d;
-		cVertexBuffer<sVertexXYZWD>* buf = gb_RenderDevice->GetBufferXYZWD();
-		pb_ = buf->Lock(24);
+		auto* buf = buffer();
+		pb_ = buf ? buf->Lock(24) : 0;
 		xassert(num_ == 0);
 	}
 
 	void end()
 	{
-		cVertexBuffer<sVertexXYZWD>* buf = gb_RenderDevice->GetBufferXYZWD();
+		auto* buf = buffer();
+		if(!buf || !pb_){
+			num_ = 0;
+			return;
+		}
 		buf->Unlock(num_);
 		if(num_ >= 4){
 			gb_RenderDevice->SetNoMaterial(ALPHA_BLEND, MatXf::ID);
@@ -312,7 +328,9 @@ public:
 
 	void set(int x0, int y0, int x1, int y1)
 	{
-		cVertexBuffer<sVertexXYZWD>* buf = gb_RenderDevice->GetBufferXYZWD();
+		auto* buf = buffer();
+		if(!buf || !pb_)
+			return;
 
 		sVertexXYZWD* pb = pb_ + num_;
 		pb->x=x0; pb->y=y0; pb->z=0.001f; pb->w=0.001f; pb->diffuse=clr_;

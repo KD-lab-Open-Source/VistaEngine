@@ -24,6 +24,34 @@
 #include <strings.h>
 #include <unordered_set>
 #include <mutex>
+#include <atomic>
+
+// ─── Polled key state ─────────────────────────────────────────────────────────
+// Written by the SDL event pump on the main thread, read by isPressed() from the
+// graphics thread, so the slots are atomic. Indexed by VK_* code.
+namespace {
+std::atomic<bool> g_keyState[256];
+}
+
+void PlatformSetKeyState(int vk, bool down)
+{
+	if(vk > 0 && vk < 256)
+		g_keyState[vk].store(down, std::memory_order_relaxed);
+}
+
+void PlatformClearKeyStates()
+{
+	for(std::atomic<bool>& key : g_keyState)
+		key.store(false, std::memory_order_relaxed);
+}
+
+SHORT GetAsyncKeyState(int vk)
+{
+	if(vk <= 0 || vk >= 256)
+		return 0;
+	// Win32 reports "currently down" in the high bit; isPressed() masks 0x8000.
+	return g_keyState[vk].load(std::memory_order_relaxed) ? SHORT(0x8000) : SHORT(0);
+}
 
 // CreateFileA returns a FILE* (cast to HANDLE). CloseHandle must fclose those, but
 // it is also called on event/thread handles (CreateEvent/_beginthread) that are NOT

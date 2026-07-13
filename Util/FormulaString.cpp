@@ -1,186 +1,208 @@
 #include "stdafx.h"
-#pragma warning( disable : 4518 )
 
 #include "Serialization/Serialization.h"
 
 #include "FormulaString.h"
 
-#include <boost\spirit\core.hpp>
-#include <boost\bind.hpp>
+#include <cctype>
+#include <cstdlib>
+#include <string>
 
-#pragma warning( disable : 4503 )
-#pragma inline_depth(255)
-#pragma inline_recursion(on)
-
-using namespace boost::spirit;
-using boost::bind;
+// Recursive-descent evaluator for the parameter formulas. Replaces the original
+// Boost.Spirit grammar, whose vendored Boost doesn't build under clang/C++20.
+//
+// Grammar (unchanged from the Spirit version, whitespace skipped between tokens):
+//   expression := term (('+' term) | ('-' term))*
+//   term       := factor (('*' factor) | ('%' factor) | ('/' factor))*
+//   factor     := number | name | 'quoted name' | '(' expression ')'
+//                        | '-' factor | '+' factor
+//
+// A name is either X/x (the parameter's own raw value) or a lookup into the
+// parameter table; a quoted name may contain spaces and '*' mask characters.
+// Quirks kept deliberately, because the game's data was authored against them:
+//   * unary '-'/'+' before a non-literal parse but do NOT negate (a number's
+//     sign is consumed by the number itself, so this only shows up in "-X");
+//   * division (and '%') by ~zero yields FLT_INF rather than failing.
+namespace {
 
 typedef FormulaString::ParserCallback ParserCallback;
 typedef FormulaString::LookupFunction LookupFunction;
 
-struct Calculator : grammar<Calculator> {
-    Calculator (float x_value, LookupFunction lookup_function, ParserCallback _var_func, ParserCallback _bad_var_func, ParserCallback _op_func)
-        : var_func_(_var_func)
-        , bad_var_func_(_bad_var_func)
-        , op_func_(_op_func)
-		, lookup_func_(lookup_function)
-		, bad_vars_(false)
-		, x_value_(x_value)
+class Calculator {
+public:
+	Calculator(const char* text, float x_value, LookupFunction lookup_function,
+	           ParserCallback var_func, ParserCallback bad_var_func, ParserCallback op_func)
+	: p_(text)
+	, x_value_(x_value)
+	, lookup_func_(lookup_function)
+	, var_func_(var_func)
+	, bad_var_func_(bad_var_func)
+	, op_func_(op_func)
+	, bad_vars_(false)
+	, syntax_error_(false)
+	{}
+
+	// Parses the whole input; true only if it is syntactically valid and fully
+	// consumed (Spirit's parse_info::full).
+	bool parse(float& result)
 	{
-    }
-
-	friend struct definition;
-
-    float result() const {
-        if (!values_.empty()) {
-            return values_.back();
-        } else {
-            return 0.0f;
-        }
-    }
-
-	bool haveUndefinedNames () const {
-		return bad_vars_;
+		skipSpace();
+		float value = expression();
+		skipSpace();
+		if(syntax_error_ || *p_)
+			return false;
+		result = value;
+		return true;
 	}
 
-    std::vector<float> values_;
+	bool haveUndefinedNames() const { return bad_vars_; }
+
+private:
+	void skipSpace() { while(*p_ && isspace((unsigned char)*p_)) ++p_; }
+
+	float expression()
+	{
+		float value = term();
+		for(;;){
+			skipSpace();
+			char op = *p_;
+			if(op != '+' && op != '-')
+				return value;
+			const char* op_pos = p_++;
+			float rhs = term();
+			if(syntax_error_)
+				return 0.f;
+			op_func_(op_pos, op_pos + 1);
+			value = op == '+' ? value + rhs : value - rhs;
+		}
+	}
+
+	float term()
+	{
+		float value = factor();
+		for(;;){
+			skipSpace();
+			char op = *p_;
+			if(op != '*' && op != '/' && op != '%')
+				return value;
+			const char* op_pos = p_++;
+			float rhs = factor();
+			if(syntax_error_)
+				return 0.f;
+			op_func_(op_pos, op_pos + 1);
+			if(op == '*')
+				value *= rhs;
+			else if(fabs(rhs) < FLT_COMPARE_TOLERANCE) // matches the original's guard
+				value = FLT_INF;
+			else if(op == '/')
+				value /= rhs;
+			else
+				value = value * rhs * 0.01f; // '%'
+		}
+	}
+
+	float factor()
+	{
+		skipSpace();
+		char c = *p_;
+
+		// A number carries its own sign, so try it before the unary operators.
+		if(c == '+' || c == '-' || c == '.' || isdigit((unsigned char)c)){
+			char* end = 0;
+			float value = strtof(p_, &end);
+			if(end != p_){
+				p_ = end;
+				return value;
+			}
+		}
+
+		if(c == '('){
+			++p_;
+			float value = expression();
+			skipSpace();
+			if(*p_ != ')'){
+				syntax_error_ = true;
+				return 0.f;
+			}
+			++p_;
+			return value;
+		}
+
+		if(c == '\''){
+			const char* begin = ++p_;
+			while(*p_ && *p_ != '\'')
+				++p_;
+			if(*p_ != '\''){
+				syntax_error_ = true;
+				return 0.f;
+			}
+			const char* end = p_++;
+			return variable(begin, end);
+		}
+
+		if(isalnum((unsigned char)c)){
+			const char* begin = p_;
+			while(isalnum((unsigned char)*p_))
+				++p_;
+			return variable(begin, p_);
+		}
+
+		// Unary sign on a non-literal: parsed, but deliberately not negated.
+		if(c == '-' || c == '+'){
+			++p_;
+			return factor();
+		}
+
+		syntax_error_ = true;
+		return 0.f;
+	}
+
+	float variable(const char* begin, const char* end)
+	{
+		std::string name(begin, end);
+		if(stricmp(name.c_str(), "X") == 0){
+			var_func_(begin, end);
+			return x_value_;
+		}
+
+		float value;
+		if(lookup_func_(name.c_str(), value)){
+			var_func_(begin, end);
+			return value;
+		}
+
+		bad_vars_ = true;
+		bad_var_func_(begin, end);
+		return 0.f;
+	}
+
+	const char* p_;
 	float x_value_;
 
-    ParserCallback var_func_;
-    ParserCallback bad_var_func_;
-    ParserCallback op_func_;
 	LookupFunction lookup_func_;
+	ParserCallback var_func_;
+	ParserCallback bad_var_func_;
+	ParserCallback op_func_;
+
 	bool bad_vars_;
-
-    template<typename ScannerT>
-    struct definition {
-        definition(Calculator const& const_self) {
-            using namespace boost;
-            Calculator& self = const_cast<Calculator&>(const_self);
-            first = (
-                expression = term   >> *(('+' >> term)[bind(&Calculator::add_op, ref(self), _1, _2)] |
-                                         ('-' >> term)[bind(&Calculator::subt_op, ref(self), _1, _2)]),
-
-                term       = factor >> *(('*' >> factor)[bind(&Calculator::mult_op, ref(self), _1, _2)] |
-										 ('%' >> factor)[bind(&Calculator::percent_op, ref(self), _1, _2)] |
-                                         ('/' >> factor)[bind(&Calculator::div_op, ref(self), _1, _2)]),
-
-                factor     = real_p[bind(&Calculator::push_op, ref(self), _1)] |
-							 lexeme_d[(+(alpha_p | digit_p))[bind(&Calculator::var_op, ref(self), _1, _2)]] |
-							 '\'' >> lexeme_d[(+(~ch_p('\'')))[bind(&Calculator::var_op, ref(self), _1, _2)]] >> '\'' |
-                             '(' >> expression >> ')' | ('-' >> factor) | ('+' >> factor)
-            );
-		}
-
-        subrule<0> expression;
-        subrule<1> term;
-        subrule<2> factor;
-
-        rule<ScannerT> first;
-
-        rule<ScannerT> const& start () const {
-            return first;
-        }
-    };
-private:
-    float pop () {
-        if (values_.empty ()) {
-            return 0;
-        } else {
-            float result = values_.back();
-            values_.pop_back();
-            return result;
-        }
-    }
-    
-    void push_op(float value) {
-        values_.push_back(value);
-    }
-
-    void var_op(const char* start, const char* end) {
-        std::string var (start, end);
-		if(stricmp(var.c_str(), "X") == 0){
-			var_func_ (start, end);
-			values_.push_back(x_value_);
-		}
-		else{
-			float value;
-			if(lookup_func_(var.c_str(), value)){
-				var_func_(start, end);
-				values_.push_back(value);
-			}
-			else{
-				bad_vars_ = true;
-				bad_var_func_(start, end);
-				values_.push_back(0.0f);
-			}
-		}
-    }
-
-    void mult_op(const char* start, const char* end){
-        op_func_ (start, start + 1);
-        float b = pop();
-        float a = pop();
-        push_op (a * b);
-    }
-
-    void div_op(const char* start, const char* end) {
-        op_func_ (start, start + 1);
-        float b = pop();
-        float a = pop();
-		if (fabs(b) < FLT_COMPARE_TOLERANCE){
-			push_op (FLT_INF);
-		} else {
-	        push_op (a / b);
-		}
-    }
-
-	void percent_op (const char* start, const char* end) {
-        op_func_ (start, start + 1);
-        float b = pop();
-        float a = pop();
-		if (fabs(b) < FLT_COMPARE_TOLERANCE) {
-			push_op (FLT_INF);
-		} else {
-	        push_op (a * b * 0.01f);
-		}
-    }
-
-    void add_op (const char* start, const char* end) {
-        op_func_ (start, start + 1);
-        float b = pop();
-        float a = pop();
-        push_op (a + b);
-    }
-
-    void subt_op (const char* start, const char* end) {
-        op_func_ (start, start + 1);
-        float b = pop();
-        float a = pop();
-        push_op (a - b);
-    }
+	bool syntax_error_;
 };
 
+} // namespace
 
-void FormulaString::serialize (Archive& ar) 
+void FormulaString::serialize(Archive& ar)
 {
-    ar.serialize(formula_, "formula", "^<Формула");
+	ar.serialize(formula_, "formula", "^<Формула");
 }
-
 
 FormulaString::EvalResult FormulaString::evaluate(float& result, float x, LookupFunction lookup_function, ParserCallback var_callback, ParserCallback badvar_callback, ParserCallback op_callback) const
 {
-	Calculator calc(x, lookup_function, var_callback, badvar_callback, op_callback);
-	parse_info<> info = parse(c_str(), calc, space_p);
-	if (info.full) {
-		result = calc.result();
-		if (calc.haveUndefinedNames ()) {
-			return EVAL_UNDEFINED_NAME;
-		} else {
-			return EVAL_SUCCESS;
-		}
-	} else {
-		return EVAL_SYNTAX_ERROR;
-	}
-}
+	Calculator calc(c_str(), x, lookup_function, var_callback, badvar_callback, op_callback);
 
+	float value;
+	if(!calc.parse(value))
+		return EVAL_SYNTAX_ERROR;
+
+	result = value;
+	return calc.haveUndefinedNames() ? EVAL_UNDEFINED_NAME : EVAL_SUCCESS;
+}

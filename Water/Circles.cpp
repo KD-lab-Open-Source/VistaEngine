@@ -6,6 +6,8 @@
 #include "Render/Src/FogOfWar.h"
 #include "Render/Src/TexLibrary.h"
 #include "Render/Src/Scene.h"
+#include "Render/SDLWorldQuadRenderer.h"   // the circles are drawn by SDLWorldQuadRenderer,
+#include "Render/SDLRenderDevice.h"        // reached via cSDLRenderDevice::drawWorldQuads
 
 static RandomGenerator rnd;
 
@@ -179,9 +181,18 @@ void cCircles::Draw(Camera* camera, float dt)
 {
 	float intensity = 0.5f*(fallout->GetN())/(2*M_PI*sqr(fallout->GetR()));
 	z = pWater->GetEnvironmentWater();
+#ifdef _WIN32
 	cInterfaceRenderDevice* rd=gb_RenderDevice;
 	rd->SetNoMaterial(ALPHA_BLEND, MatXf::ID, 0, Texture);
 	cQuadBuffer<sVertexXYZDT1>* pBuf=rd->GetQuadBufferXYZDT1();
+#else
+	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	if(!pBuf || !dev)
+		return;
+	pBuf->SetCamera(camera);
+	pBuf->SetMaterial(ALPHA_BLEND, Texture);
+#endif
 	pBuf->BeginDraw();
 	{
 		list<cWaterCircle>::iterator it;
@@ -221,6 +232,9 @@ void cCircles::Draw(Camera* camera, float dt)
 	}
 
 	pBuf->EndDraw();
+#ifndef _WIN32
+	dev->drawWorldQuads();
+#endif
 }
 
 void cCircles::Animate(float dt)

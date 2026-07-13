@@ -104,12 +104,31 @@ WPARAM mapKeyToVK(SDL_Keycode key)
 	case SDLK_RIGHT:     return VK_RIGHT;
 	case SDLK_UP:        return VK_UP;
 	case SDLK_DOWN:      return VK_DOWN;
+	case SDLK_PAUSE:     return VK_PAUSE;
 	case SDLK_LSHIFT:
 	case SDLK_RSHIFT:    return VK_SHIFT;
 	case SDLK_LCTRL:
 	case SDLK_RCTRL:     return VK_CONTROL;
 	case SDLK_LALT:
 	case SDLK_RALT:      return VK_MENU;
+
+	// The numeric keypad drives the camera: rotate is bound to KP 4/6/8/2 and
+	// zoom to KP +/- (Scripts/Content/Controls), so these are not optional.
+	case SDLK_KP_0:        return VK_NUMPAD0;
+	case SDLK_KP_1:        return VK_NUMPAD0 + 1;
+	case SDLK_KP_2:        return VK_NUMPAD2;
+	case SDLK_KP_3:        return VK_NUMPAD0 + 3;
+	case SDLK_KP_4:        return VK_NUMPAD4;
+	case SDLK_KP_5:        return VK_NUMPAD0 + 5;
+	case SDLK_KP_6:        return VK_NUMPAD6;
+	case SDLK_KP_7:        return VK_NUMPAD0 + 7;
+	case SDLK_KP_8:        return VK_NUMPAD8;
+	case SDLK_KP_9:        return VK_NUMPAD9;
+	case SDLK_KP_PLUS:     return VK_ADD;
+	case SDLK_KP_MINUS:    return VK_SUBTRACT;
+	case SDLK_KP_MULTIPLY: return VK_MULTIPLY;
+	case SDLK_KP_DIVIDE:   return VK_DIVIDE;
+	case SDLK_KP_PERIOD:   return VK_DECIMAL;
 	}
 
 	if(key >= SDLK_F1 && key <= SDLK_F12)
@@ -152,6 +171,9 @@ bool pumpEvents(WindowEventSink sink)
 			sink(WM_ACTIVATEAPP, TRUE, 0);
 			break;
 		case SDL_EVENT_WINDOW_FOCUS_LOST:
+			// SDL delivers no key-ups while unfocused, so anything held at this
+			// point would otherwise stay "down" forever (e.g. a camera pan key).
+			PlatformClearKeyStates();
 			sink(WM_ACTIVATEAPP, FALSE, 0);
 			break;
 
@@ -170,14 +192,17 @@ bool pumpEvents(WindowEventSink sink)
 			case SDL_BUTTON_LEFT:
 				msg = down ? (event.button.clicks >= 2 ? WM_LBUTTONDBLCLK : WM_LBUTTONDOWN)
 				           : WM_LBUTTONUP;
+				PlatformSetKeyState(VK_LBUTTON, down);
 				break;
 			case SDL_BUTTON_RIGHT:
 				msg = down ? (event.button.clicks >= 2 ? WM_RBUTTONDBLCLK : WM_RBUTTONDOWN)
 				           : WM_RBUTTONUP;
+				PlatformSetKeyState(VK_RBUTTON, down);
 				break;
 			case SDL_BUTTON_MIDDLE:
 				msg = down ? (event.button.clicks >= 2 ? WM_MBUTTONDBLCLK : WM_MBUTTONDOWN)
 				           : WM_MBUTTONUP;
+				PlatformSetKeyState(VK_MBUTTON, down);
 				break;
 			}
 			if(msg) sink(msg, wp, lp);
@@ -192,13 +217,26 @@ bool pumpEvents(WindowEventSink sink)
 
 		case SDL_EVENT_KEY_DOWN:
 		case SDL_EVENT_KEY_UP: {
+			bool down = (event.type == SDL_EVENT_KEY_DOWN);
+
+			// Take the modifiers from SDL's own state rather than from the key
+			// transition: VK_SHIFT/CONTROL/MENU are each shared by two physical
+			// keys, so releasing one must not clear the flag while the other is
+			// still held.
+			SDL_Keymod mod = event.key.mod;
+			PlatformSetKeyState(VK_SHIFT,   (mod & SDL_KMOD_SHIFT) != 0);
+			PlatformSetKeyState(VK_CONTROL, (mod & SDL_KMOD_CTRL)  != 0);
+			PlatformSetKeyState(VK_MENU,    (mod & SDL_KMOD_ALT)   != 0);
+
 			WPARAM vk = mapKeyToVK(event.key.key);
 			if(!vk) break;
+			if(vk != VK_SHIFT && vk != VK_CONTROL && vk != VK_MENU)
+				PlatformSetKeyState(int(vk), down);
+
 			// lParam bit 30 = previous key state (set on auto-repeat), matching
 			// what KeyPressed reads for repeat suppression.
-			LPARAM lp = (event.type == SDL_EVENT_KEY_DOWN && event.key.repeat)
-			            ? 0x40000000 : 0;
-			sink(event.type == SDL_EVENT_KEY_DOWN ? WM_KEYDOWN : WM_KEYUP, vk, lp);
+			LPARAM lp = (down && event.key.repeat) ? 0x40000000 : 0;
+			sink(down ? WM_KEYDOWN : WM_KEYUP, vk, lp);
 			break;
 		}
 
