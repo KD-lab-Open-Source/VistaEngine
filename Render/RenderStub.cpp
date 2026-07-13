@@ -111,7 +111,14 @@ void cD3DRender::RegisterVertexDeclaration(LPDIRECT3DVERTEXDECLARATION9& declara
 // ---------------------------------------------------------------------------
 // DrawStrip / PoolManager
 // ---------------------------------------------------------------------------
-void DrawStrip::Begin() {}
+// DrawStrip has no off-Windows implementation: its Set() is an inline in
+// Render/D3D/VertexBuffer.h that writes straight into a locked cVertexBuffer, and there is
+// no such buffer here. These bodies exist only so the class still links -- and they leave
+// `buf` null and `pointer` uninitialised, so the first Set() writes through a garbage
+// pointer. Every off-Windows caller therefore takes SDLWorldQuadRenderer's triangle route
+// instead (cUnkLight::Draw, CircleManager::Layer::drawSpline, Lighting::OneLight::Draw);
+// the assert is here to catch a new one before it corrupts the heap.
+void DrawStrip::Begin() { xassert(0 && "DrawStrip is Windows-only: use SDLWorldQuadRenderer"); }
 void DrawStrip::End() {}
 
 PoolManager::PoolManager() {}

@@ -1577,6 +1577,7 @@ void Camera::DrawObjectNoZ(SceneNode nType)
 	{
 		vector<BaseGraphObject*>::iterator it;
 
+#ifdef _WIN32
 		DWORD zfunc=gb_RenderDevice3D->GetRenderState(D3DRS_ZFUNC);
 		gb_RenderDevice3D->SetRenderState( D3DRS_ZFUNC, D3DCMP_ALWAYS);
 		DWORD zwrite=gb_RenderDevice3D->GetRenderState(D3DRS_ZWRITEENABLE);
@@ -1585,17 +1586,24 @@ void Camera::DrawObjectNoZ(SceneNode nType)
 //balmer1		gb_RenderDevice3D->SetRenderState(D3DRS_FOGENABLE,FALSE);
 		DWORD old_cullmode=gb_RenderDevice3D->GetRenderState(D3DRS_CULLMODE);
 		gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE);
+#endif
+		// Off-Windows there is no device render state to save and restore: what this pass
+		// means -- no depth test, no depth write, no culling -- is baked into the pipeline
+		// each object's renderer picks. The one object that reaches this node, CircleManager,
+		// asks SDLWorldQuadRenderer for exactly that (SetMaterial's depthTest false).
 
 		FOR_EACH(obj,it)
 		{
 			(*it)->Draw(this);
 		}
 
+#ifdef _WIN32
 		gb_RenderDevice3D->SetRenderState( D3DRS_ZFUNC, zfunc );
 		gb_RenderDevice3D->SetRenderState( D3DRS_ZWRITEENABLE, zwrite );
 		gb_RenderDevice3D->SetRenderState( D3DRS_FOGENABLE,fogenable);
 
 		gb_RenderDevice->SetRenderState( RS_CULLMODE, old_cullmode );
+#endif
 	}
 
 }
