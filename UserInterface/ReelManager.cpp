@@ -502,8 +502,26 @@ private:
 	float fadeTime_;
 };
 
+// TODO(sdl-port): the KD-lab logo splash -- the fish swimming under a screen full of metaballs --
+// is still D3D9, and it is the one thing behind the video gate that the video port did not bring
+// back. The scene half of it would run (cScene / cObject3dx have an SDL path); the effect half
+// does not. cBlobs draws its cells through the D3D9-only cQuadBuffer family, composites them
+// with PSBlobsShader out of the retired shader system (Render/shader/shaders.cpp), and asks
+// gb_RenderDevice3D for a render target, a PS 2.0 capability check and a SetVertexShader -- none
+// of which exist on the portable interface. The loop below also StretchRects the back buffer
+// into a texture, which has no equivalent either; the SDL way is to point the camera at a render
+// target (see Render/PORTING.md).
+//
+// It never ran off Windows and, with DisableVideo defaulting to true, it had not run at all --
+// so the crash it takes on gb_RenderDevice3D (null since the backend was retired) was latent
+// until the reels started playing. Skip it rather than dereference null. Nothing waits on it:
+// ActionShowLogoReel overrides no workedOut(), so its trigger completes the moment activate()
+// returns, and the game simply carries on without a logo.
 void ReelManager::showLogoModal(LogoAttributes& logoAttributes, const cBlobsSetting& blobsSetting, int stableTime,SoundLogoAttributes& soundAttributes)
 {
+	if(!gb_RenderDevice3D)
+		return;
+
 	int oldTextureDetail = gb_VisGeneric->GetTextureDetailLevel();
 	gb_VisGeneric->SetTextureDetailLevel(0);
 	int screenWidth = gb_RenderDevice->GetSizeX();

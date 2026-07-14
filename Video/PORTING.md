@@ -67,6 +67,13 @@ UI blend mode depends on knowing that (`UI_ControlVideo::redraw`). The original 
 - **`DisableVideo` defaulted to `true`** (`Game/IniFile.cpp`), which made sense only while there
   was no player. It is `false` now — but an `iniFile.cfg` already on disk overrides the default,
   so an existing install still needs the line changed by hand.
+- **The video gate hides more than video.** `isVideoEnabled()` guards *two* trigger actions, and
+  only one of them is a video: `ActionShowReel` (ported, above) and **`ActionShowLogoReel`**, the
+  KD-lab logo splash, which is a D3D9 *rendering* feature and is not ported. Turning the reels on
+  is what first fires it, and it went straight into a null `gb_RenderDevice3D`.
+  `ReelManager::showLogoModal` is now guarded off; the register entry is **#23 in
+  `Render/PORTING.md`**, where it belongs. Expect more of this: `DisableVideo = true` was load-
+  bearing in ways that have nothing to do with decoding a `.bik`.
 
 ## Not done
 
