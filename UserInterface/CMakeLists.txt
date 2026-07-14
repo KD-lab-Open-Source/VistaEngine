@@ -37,4 +37,4 @@ add_library(UserInterface STATIC
     controls.cpp
 )
 
-target_link_libraries(UserInterface PUBLIC EngineIncludes Util Units Network XmlRpc)
+target_link_libraries(UserInterface PUBLIC EngineIncludes Util Units Network XmlRpc PRIVATE Video)

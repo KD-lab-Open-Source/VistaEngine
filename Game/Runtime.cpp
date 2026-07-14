@@ -600,6 +600,11 @@ static void dispatchWindowEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	runtimeWndProc(hWnd, uMsg, wParam, lParam);
 }
 
+bool pumpApplicationEvents()
+{
+	return PlatformWindow::pumpEvents(&dispatchWindowEvent);
+}
+
 int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 {
 	Win32::_setGlobalInstance(hInst);
@@ -611,7 +616,7 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 	// SDL's is the only pump: on Windows SDL_PollEvent drains the OS message queue
 	// itself, so a PeekMessage loop next to it would race it for messages.
 	while(true){
-		if(!PlatformWindow::pumpEvents(&dispatchWindowEvent))
+		if(!pumpApplicationEvents())
 			break;
 
 		if(runtime->applicationRuns()){

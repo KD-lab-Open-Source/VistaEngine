@@ -4,293 +4,38 @@
 #include "Handle.h"
 #include "GameOptions.h"
 #include "SystemUtil.h"
+#include "Video/VideoPlayer.h"
 #include "Render/3dx/Umath.h"
 #include "Render/inc/Unknown.h"
 #include "Render/src/Texture.h"
+#include "Render/src/TexLibrary.h"
 #include "Render/src/VisGeneric.h"
 
-class BinkSimplePlayerImpl
-{
-public:
-	BinkSimplePlayerImpl();
-	~BinkSimplePlayerImpl();
-
-	bool open();
-	void stop();
-
-	const char* getBinkFileName() const { return binkFile_.c_str(); }
-	bool init(const char* bink_file);
-
-	void setPhase(float phase);
-	float getPhase() const { return 1.f; }
-
-	void setPause(bool pause) { EBinkWait w; paused_ = pause; }
-	bool getPause() const { return paused_; }
-
-	void setVolume(float vol);
-	float getVolume() const { return volume_; }
-
-	cTexture* getTexture();
-
-	bool isEnd() const { return true; }
-
-	int flags() const { return 0; } 
-
-private:
-	int pBinkInfo_;
-
-	class EBinkWait
-	{
-	public:
-		EBinkWait()
-		{
-			if(waitEventHandle_ == INVALID_HANDLE_VALUE) 
-				return;
-			WaitForSingleObject(waitEventHandle_,INFINITE);
-		}
-		~EBinkWait()
-		{
-			if(waitEventHandle_ == INVALID_HANDLE_VALUE) 
-				return;
-			SetEvent(waitEventHandle_);
-		}
-	};
-
-	void quant();
-	static DWORD WINAPI threadProc(LPVOID lpParameter);
-	void release();
-	void computeFrame();
-	void computeFrameQuant();
-
-	static HANDLE waitEventHandle_;
-	static HANDLE threadHandle_;
-	static int threadStopFlag_;
-
-	string binkFile_;
-
-	cTexture* pTextureBink1_;
-	cTexture* pTextureBink2_;
-
-	float volume_;
-	bool paused_;
-};
-
-HANDLE BinkSimplePlayerImpl::waitEventHandle_ = INVALID_HANDLE_VALUE;
-HANDLE BinkSimplePlayerImpl::threadHandle_ = INVALID_HANDLE_VALUE;
-int BinkSimplePlayerImpl::threadStopFlag_ = 0;
-
-class BinkSimplePlayer
-{
-public:
-	BinkSimplePlayer();
-	~BinkSimplePlayer();
-
-	static void preInit();
-
-	bool open() { return player_->open(); }
-	void stop() { player_->stop(); }
-	
-	bool init(const char* bink_file) { return player_->init(bink_file); }
-	const char* getBinkFileName() const { return player_->getBinkFileName(); }
-
-	void setPhase(float phase) { player_->setPhase(phase); }
-	float getPhase() const { return player_->getPhase(); }
-
-	void setPause(bool pause) { player_->setPause(pause); }
-	bool getPause() const { return player_->getPause(); }
-
-	void setVolume(float vol) { player_->setVolume(vol); }
-
-	cTexture* getTexture() const { return player_->getTexture(); }
-
-	bool isEnd() const { return player_->isEnd(); }
-
-	int flags() const { return player_->flags(); } 
-
-private:
-
-	BinkSimplePlayerImpl* player_;
-};
-
-BinkSimplePlayer::BinkSimplePlayer()
-{
-	player_ = new BinkSimplePlayerImpl;
-}
-
-BinkSimplePlayer::~BinkSimplePlayer()
-{
-	delete player_;
-}
-
-void BinkSimplePlayer::preInit()
-{
-}
-
-cTexture* BinkSimplePlayerImpl::getTexture() 
-{ 
-	//EBinkWait w; 
-	return pTextureBink1_; 
-}
-
-
-DWORD WINAPI BinkSimplePlayerImpl::threadProc(LPVOID lpParameter)
-{
-	SetThreadPriority(threadHandle_,THREAD_PRIORITY_HIGHEST);
-
-	BinkSimplePlayerImpl* pPlayer=(BinkSimplePlayerImpl*)lpParameter;
-
-	float volume = pPlayer->getVolume();
-	while(!threadStopFlag_)
-	{
-		{
-			if(!pPlayer->getPause() && applicationHasFocus()){
-				// если выключен звук
-				if(!GameOptions::instance().getBool(OPTION_VOICE_ENABLE))
-					pPlayer->setVolume(0.f);
-				else
-					if(volume != pPlayer->getVolume()){
-						pPlayer->setVolume(GameOptions::instance().getFloat(OPTION_VOICE_VOLUME));
-						volume = pPlayer->getVolume();
-					}
-				{
-					EBinkWait w;
-					pPlayer->quant();
-				}
-			}
-			else 
-				pPlayer->setVolume(0.f);
-		}
-
-		Sleep(1);
-	}
-
-	threadStopFlag_=2;
-	return 0;
-}
-
-BinkSimplePlayerImpl::BinkSimplePlayerImpl()
-{
-	EBinkWait w;
-
-	pTextureBink1_ = 0;
-	pTextureBink2_ = 0;
-
-	threadStopFlag_ = 0;
-	paused_ = false;
-}
-
-void BinkSimplePlayerImpl::stop()
-{
-	if(threadHandle_ != INVALID_HANDLE_VALUE)
-	{
-		threadStopFlag_ = 1;
-		while(threadStopFlag_ == 1)
-			Sleep(10);
-	}
-
-	if(waitEventHandle_ != INVALID_HANDLE_VALUE)
-		CloseHandle(waitEventHandle_);
-
-	waitEventHandle_ = INVALID_HANDLE_VALUE;
-	threadHandle_ = INVALID_HANDLE_VALUE;
-}
-
-BinkSimplePlayerImpl::~BinkSimplePlayerImpl()
-{
-	stop();
-	release();
-}
-
-void BinkSimplePlayerImpl::release()
-{
-	if(pBinkInfo_)
-	{
-		try{
-		} catch(...){}
-		pBinkInfo_ = 0;
-		binkFile_.clear();
-	}
-
-	RELEASE(pTextureBink1_);
-	RELEASE(pTextureBink2_);
-}
-
-bool BinkSimplePlayerImpl::init(const char* bink_file)
-{
-	// No Bink decoder is linked in the cross-platform build, so instead of failing the
-	// load (which left every UI_ControlVideo un-inited) we EMULATE a loaded video:
-	// report success without allocating frame textures or spawning the decode thread.
-	// This makes UI_StreamVideo::inited() true, so the briefing screens' video-gated
-	// trigger chains run -- e.g. "Select Mission" reveals its mission nodes and the
-	// START ("Go") button, which were otherwise hidden behind a never-playing video.
-	// getTexture() stays null; UI_ControlVideo::redraw() null-guards it, so the video
-	// area draws nothing (blank) rather than crashing.
-	release();
-	binkFile_ = bink_file;
-	pBinkInfo_ = 1;   // non-null "loaded" sentinel; also satisfies the xassert(pBinkInfo_)s
-	return true;
-}
-
-bool BinkSimplePlayerImpl::open()
-{
-	// Emulated player: no real Bink decode thread (threadProc would drive an absent
-	// decoder). play()/quant() only need us to report success here.
-	return true;
-}
-
-void BinkSimplePlayerImpl::computeFrame()
-{
-	xassert(pBinkInfo_);
-	int pitch = 0;
-	pTextureBink2_->UnlockTexture();
-}
-
-void BinkSimplePlayerImpl::computeFrameQuant()
-{
-	xassert(pBinkInfo_);
-	if(isEnd())
-		return;
-}
-void BinkSimplePlayerImpl::setPhase(float phase)
-{
-	EBinkWait w;
-
-	xassert(pBinkInfo_);
-}
-
-void BinkSimplePlayerImpl::setVolume(float vol)
-{
-	EBinkWait w;
-
-	volume_ = vol;
-	xassert(pBinkInfo_);
-	const float amplification = 0.8f;
-
-	if(vol < amplification)
-		vol = vol / amplification * 32768;
-	else
-		vol = 32767 + (vol - amplification) / (1.f - amplification) * 32768;
-
-}
-
-void BinkSimplePlayerImpl::quant()
-{
-	xassert(pBinkInfo_);
-	computeFrameQuant();
-}
-
-
-// -------------- UI_StreamVideo()
+// The Bink player, on ffmpeg (Video/VideoPlayer.cpp).
+//
+// RAD's binkw32 is what used to be here, and KD-lab stripped its calls out before releasing
+// the source: what was left was the shape of a player -- a decode thread, two frame textures,
+// a phase, a volume -- with nothing inside it, and an init() that reported success so the
+// briefing screens' video-gated triggers would still run. The shape is gone with it. The
+// decode thread in particular has no counterpart here: Bink needed to be pumped to keep its
+// own audio fed, whereas VideoPlayer hands the soundtrack to miniaudio whole and pulls
+// frames against the audio clock, on this thread, when quant() asks for them.
+//
+// Two things survive from the original in spirit:
+//  - alphaPlan() still picks the blend mode, and still means "the video carries an alpha
+//    plane". It used to read Bink's BINKALPHA flag (1<<20); it now asks the decoder, which
+//    answers by choosing yuva420p over yuv420p. Same bit, from the other end.
+//  - the frame is one texture, not two. The second one was the decode thread's half of a
+//    double buffer, and without the thread it has nothing to do.
 
 Singleton<UI_StreamVideo> streamVideo;
-
 
 UI_StreamVideo::UI_StreamVideo()
 : lock_()
 , player_(0)
+, texture_(0)
 {
 	release();
-	BinkSimplePlayer::preInit();
 }
 
 UI_StreamVideo::~UI_StreamVideo()
@@ -301,9 +46,13 @@ UI_StreamVideo::~UI_StreamVideo()
 void UI_StreamVideo::release()
 {
 	MTAuto autoLock(lock_);
-	
+
 	delete player_;
 	player_ = 0;
+
+	RELEASE(texture_);
+
+	fileName_.clear();
 	started_ = false;
 	needUpdate_ = false;
 	cycle_ = false;
@@ -315,35 +64,55 @@ bool UI_StreamVideo::init(const char* binkFileName, bool cycle)
 	MTAuto autoLock(lock_);
 
 	release();
-	player_ = new BinkSimplePlayer;
-	
-	if(!player_->init(binkFileName))
-	{
+
+	player_ = new VideoPlayer;
+	if(!player_->open(binkFileName)){
 		release();
 		return false;
 	}
-	player_->setVolume(0);
 
+	// The frame lands in a texture of exactly its own size -- no rounding up to a power of
+	// two, which is why size() below is the whole texture. Bink demanded one and the original
+	// paid for it with a partial UV rect; SDL GPU does not.
+	texture_ = GetTexLibrary()->CreateTexture(player_->width(), player_->height(), true);
+	if(!texture_){
+		release();
+		return false;
+	}
+
+	fileName_ = binkFileName;
 	cycle_ = cycle;
-	
+
+	player_->setVolume(0.f);
+
 	return true;
 }
 
 bool UI_StreamVideo::inited(const char* binkFileName) const
 {
-	return inited() && !stricmp(player_->getBinkFileName(), binkFileName);
+	return inited() && !stricmp(fileName_.c_str(), binkFileName);
 }
 
 void UI_StreamVideo::updateVolume()
 {
 	xassert(inited());
-	if(!player_->getPause() && GameOptions::instance().getBool(OPTION_VOICE_ENABLE) && applicationHasFocus())
-		if(!mute_)
-			player_->setVolume(GameOptions::instance().getFloat(OPTION_VOICE_VOLUME));
-		else
-			player_->setVolume(0);
+
+	if(!player_->paused() && !mute_ && GameOptions::instance().getBool(OPTION_VOICE_ENABLE) && applicationHasFocus())
+		player_->setVolume(GameOptions::instance().getFloat(OPTION_VOICE_VOLUME));
 	else
-		player_->setVolume(0);
+		player_->setVolume(0.f);
+}
+
+void UI_StreamVideo::updateTexture()
+{
+	if(!texture_)
+		return;
+
+	int pitch = 0;
+	if(BYTE* dst = texture_->LockTexture(pitch)){
+		player_->copyFrameTo(dst, pitch);
+		texture_->UnlockTexture();
+	}
 }
 
 void UI_StreamVideo::play()
@@ -353,14 +122,15 @@ void UI_StreamVideo::play()
 	if(!inited())
 		return;
 
-	if(!player_->open()){
-		release();
-		return;
-	}
-
+	player_->play();
 	started_ = true;
 
 	updateVolume();
+
+	// Put the first frame up now: the panel is drawn before the next quant() comes round, and
+	// an empty texture would show as one frame of garbage.
+	if(player_->quant())
+		updateTexture();
 }
 
 void UI_StreamVideo::stop()
@@ -372,8 +142,7 @@ void UI_StreamVideo::stop()
 
 	started_ = false;
 
-	player_->setVolume(0);
-	player_->setPhase(0.f);
+	player_->setVolume(0.f);
 	player_->stop();
 }
 
@@ -394,7 +163,7 @@ float UI_StreamVideo::phase() const
 	if(!inited())
 		return 0.f;
 
-	return player_->getPhase();
+	return player_->phase();
 }
 
 void UI_StreamVideo::pause(bool pause)
@@ -404,7 +173,7 @@ void UI_StreamVideo::pause(bool pause)
 	if(!inited())
 		return;
 
-	player_->setPause(pause);
+	player_->pause(pause);
 }
 
 bool UI_StreamVideo::pause() const
@@ -414,17 +183,15 @@ bool UI_StreamVideo::pause() const
 	if(!inited())
 		return false;
 
-	return player_->getPause();
+	return player_->paused();
 }
 
 bool UI_StreamVideo::grayScale() const
 {
-	MTAuto autoLock(lock_);
-
-	if(!inited())
-		return false;
-
-	return player_->flags() & (1 << 17);
+	// Bink's BINKGRAYSCALE (1<<17), which no video in the game sets: every .bik here decodes
+	// to yuv420p or yuva420p, none to a luma-only format. It was never true, and it stays a
+	// question the UI is entitled to ask.
+	return false;
 }
 
 bool UI_StreamVideo::alphaPlan() const
@@ -434,7 +201,7 @@ bool UI_StreamVideo::alphaPlan() const
 	if(!inited())
 		return false;
 
-	return player_->flags() & (1 << 20);
+	return player_->hasAlpha();
 }
 
 void UI_StreamVideo::mute(bool muteOn)
@@ -443,7 +210,7 @@ void UI_StreamVideo::mute(bool muteOn)
 
 	if(!inited())
 		return;
-	
+
 	if(muteOn != mute_){
 		mute_ = muteOn;
 		updateVolume();
@@ -459,13 +226,19 @@ bool UI_StreamVideo::quant()
 
 	updateVolume();
 
-	if(player_->isEnd())
-		if(cycle_)
-			player_->setPhase(0.f);
-		else{
+	if(player_->isEnd()){
+		if(!cycle_){
 			stop();
 			return false;
 		}
+
+		player_->setPhase(0.f);
+	}
+
+	// The player decodes only when the clock says a new frame is due, so most quants upload
+	// nothing: the video runs at 25 fps and the game does not.
+	if(player_->quant())
+		updateTexture();
 
 	return true;
 }
@@ -492,9 +265,7 @@ cTexture* UI_StreamVideo::texture() const
 {
 	MTAuto autoLock(lock_);
 
-	if(inited())
-		return player_->getTexture();
-	return 0;
+	return inited() ? texture_ : 0;
 }
 
 Vect2f UI_StreamVideo::size() const
@@ -504,5 +275,6 @@ Vect2f UI_StreamVideo::size() const
 	if(!inited())
 		return Vect2f::ZERO;
 
-	return Vect2f::ZERO;
+	// The UV extent of the frame within its texture, and the texture is the frame.
+	return Vect2f(1.f, 1.f);
 }

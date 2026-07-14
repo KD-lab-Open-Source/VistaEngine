@@ -67,18 +67,22 @@ porting; it would be inventing behaviour the game never had.
 | **Doppler** | The doppler factor is never sent to DirectSound, `SoundQuant` hardcodes the listener velocity to `Vect3f(0,0,0)`, and no emitter ever sets one. |
 | **`frequencyRnd`** (pitch randomisation) | Serialized into the sound attributes, read by nothing. |
 
-## Dead in the shipped source — not ours to restore
+## Dead in the shipped source — since restored
 
-**The reels (Bink cutscenes) do not play, and never did in this source tree.** KD-lab stripped the
-Bink player before releasing the source:
+**The reels (Bink cutscenes) did not play, and never had in this source tree.** KD-lab stripped the
+Bink player before releasing the source: `ReelManager::showModal()` opened with an unconditional
+`return;`, and `Game/PlayBink.cpp` was a class whose every method was empty.
 
-- `UserInterface/ReelManager.cpp` — `showModal()` opens with an unconditional `return;`
-- `Game/PlayBink.cpp` — `PlayBinkR::Init()` opens with `return false;`, and every other method is
-  empty. The file is not in the build (it includes `d3d9.h`).
+**That gap is closed** — it was a *video* gap, not an audio one, and it was filled by the `Video/`
+module (ffmpeg; see `Video/PORTING.md`). `PlayBink` is gone with it: it was the shape of RAD's
+player and had nothing inside it. What this file predicted still holds — a reel's soundtrack is a
+plain `.ogg` played through `gb_Music`, so the audio half of the cutscene path was already working
+and came along for free (#4).
 
-So this is a **video** gap, not an audio one. Worth knowing: a reel's soundtrack is a plain `.ogg`
-played through `gb_Music` — the *audio* half of the cutscene path is already ported and working
-(#4). If the video is ever restored, the sound will come with it; there is nothing to write here.
+One thing the video port *did* need from this side: a `.bik` carries its **own** soundtrack as well
+(44.1 kHz stereo, Bink's DCT codec), and that one is decoded by ffmpeg and played as a miniaudio
+sound on the **voice** bus — see `Video/VideoPlayer.cpp`. The two are independent: a reel with a
+voice-over `.ogg` plays both.
 
 ---
 

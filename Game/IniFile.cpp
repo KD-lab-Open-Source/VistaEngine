@@ -8,7 +8,10 @@ IniFile iniFile;
 IniFile::IniFile()
 {
 	MainMenu = true;
-	DisableVideo = true;
+	// The reels play again (ReelManager::showModal), so the default that skipped them goes:
+	// with no Bink player in the source release, "video enabled" could only ever have meant
+	// a cutscene that silently did nothing. An iniFile.cfg on disk still overrides this.
+	DisableVideo = false;
 	GameSpeed = 1.f;
 	HT = true;
 	EnableReplay = true;

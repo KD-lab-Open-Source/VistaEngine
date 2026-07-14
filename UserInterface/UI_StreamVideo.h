@@ -1,9 +1,11 @@
 #ifndef __UI_BINK_VIDEO_H__
 #define __UI_BINK_VIDEO_H__
 
-class BinkSimplePlayer;
+class VideoPlayer;
 class cTexture;
 
+/// The video panel: one video at a time, shared by every UI_ControlVideo on screen (there is
+/// never more than one playing). The briefing screens are what this is for.
 class UI_StreamVideo
 {
 	mutable MTSection lock_;
@@ -19,7 +21,7 @@ public:
 	/// запустить/перезапустить проигрывание
 	void play();
 	void stop();
-	
+
 	void phase(float newPhase);
 	float phase() const;
 
@@ -32,19 +34,24 @@ public:
 	void mute(bool muteOn);
 
 	bool quant();
-	
+
 	void setUpdated();
 	void ui_quant();
-	
+
 	/// текущий кадр
 	cTexture* texture() const;
 	Vect2f size() const;
 
 private:
-	bool inited() const { return player_; }
+	bool inited() const { return player_ != 0; }
 	void updateVolume();
+	/// Copy the frame the player is holding into the texture.
+	void updateTexture();
 
-	BinkSimplePlayer* player_;
+	VideoPlayer* player_;
+	cTexture* texture_;
+	string fileName_;
+
 	bool started_;
 	bool needUpdate_;
 	bool cycle_;

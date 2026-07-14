@@ -49,5 +49,10 @@ Dead D3D9 source still compiles but never runs: `Render/shader/shaders.cpp`,
 `ShaderStorage.cpp`, `Render/src/{CChaos,RenderCubemap,LensFlare}.cpp`,
 `VistaRender/postEffects.cpp`. It is kept as the reference implementation for the ports above.
 
-Audio (DirectSound), networking (DirectPlay), joystick (DirectInput) and video (Bink/AVI) are
-still Windows-only, stubbed elsewhere. Those are separate from the D3D9 retirement.
+Networking (DirectPlay) and joystick (DirectInput) are still Windows-only, stubbed elsewhere.
+Those are separate from the D3D9 retirement.
+
+Audio and video are ported and cross-platform: **miniaudio** replaced DirectSound
+(`Sound/PORTING.md`), and **ffmpeg** replaced Bink and Video-for-Windows (`Video/PORTING.md`).
+Both are the register for their subsystem — read them before touching one. The ffmpeg build is
+deliberately tiny (two demuxers, three decoders); `cmake/FFmpeg.cmake` says which and why.

@@ -44,7 +44,6 @@
 #include "TriggerEditor/TriggerEditor.h"
 
 #include "TextDB.h"
-#include "PlayBink.h"
 #include "SelectManager.h"
 
 #include "kdw/PropertyEditor.h"
