@@ -30,6 +30,42 @@ RENDER_API SAMPLER_DATA sampler_clamp_point;
 RENDER_API SAMPLER_DATA sampler_clamp_linear;
 RENDER_API SAMPLER_DATA sampler_clamp_anisotropic;
 
+// The six samplers the engine names when it calls SetSamplerData/SetSamplerDataVirtual.
+// cD3DRender::InitSamplerConstants fills them on Windows; without this they stay zeroed
+// off it, and a caller asking for sampler_wrap_linear (the selection frame's tiled centre)
+// would be asking for address mode 0, which is not a mode at all.
+static void initSamplerConstants()
+{
+	memset(&sampler_clamp_linear, 0, sizeof(SAMPLER_DATA));
+	sampler_clamp_linear.addressu = DX_TADDRESS_CLAMP;
+	sampler_clamp_linear.addressv = DX_TADDRESS_CLAMP;
+	sampler_clamp_linear.addressw = DX_TADDRESS_CLAMP;
+	sampler_clamp_linear.minfilter = DX_TEXF_LINEAR;
+	sampler_clamp_linear.magfilter = DX_TEXF_LINEAR;
+	sampler_clamp_linear.mipfilter = DX_TEXF_LINEAR;
+	sampler_clamp_linear.bordercolor = 0;
+
+	sampler_wrap_linear = sampler_clamp_linear;
+	sampler_wrap_linear.addressu = DX_TADDRESS_WRAP;
+	sampler_wrap_linear.addressv = DX_TADDRESS_WRAP;
+	sampler_wrap_linear.addressw = DX_TADDRESS_WRAP;
+
+	sampler_wrap_point = sampler_wrap_linear;
+	sampler_wrap_point.minfilter = DX_TEXF_POINT;
+	sampler_wrap_point.magfilter = DX_TEXF_POINT;
+	sampler_wrap_point.mipfilter = DX_TEXF_POINT;
+
+	sampler_clamp_point = sampler_wrap_point;
+	sampler_clamp_point.addressu = DX_TADDRESS_CLAMP;
+	sampler_clamp_point.addressv = DX_TADDRESS_CLAMP;
+	sampler_clamp_point.addressw = DX_TADDRESS_CLAMP;
+
+	// cD3DRender rounds these to linear until SetAnisotropic(n) raises them, and nothing
+	// off-Windows raises them yet.
+	sampler_wrap_anisotropic = sampler_wrap_linear;
+	sampler_clamp_anisotropic = sampler_clamp_linear;
+}
+
 RENDER_API cInterfaceRenderDevice* CreateIRenderDevice(bool multiThread)
 {
 	// Half 1 of the real CreateIRenderDevice (RenderDevice.cpp): construct the
@@ -39,6 +75,7 @@ RENDER_API cInterfaceRenderDevice* CreateIRenderDevice(bool multiThread)
 	//
 	// Half 2: the cross-platform render device is the SDL GPU backend
 	// (cSDLRenderDevice), replacing the Windows-only cD3DRender.
+	initSamplerConstants();
 	gb_VisGeneric = new cVisGeneric(multiThread);
 	return gb_RenderDevice = new cSDLRenderDevice;
 }

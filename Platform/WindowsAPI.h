@@ -961,7 +961,19 @@ template<class T> inline T sqr(const T& x) { return x * x; }
 #define VK_DECIMAL   0x6E
 #define VK_DIVIDE    0x6F
 
-inline SHORT GetAsyncKeyState(int) { return 0; }
+// Polled key state. This is the engine's ONLY source of held-key input: camera
+// pan/rotate/zoom poll it every frame (ControlManager::key(...).pressed() ->
+// isPressed(), Util/SystemUtil.h), and addModifiersState() folds the Ctrl/Shift/
+// Alt bits it reports into every click and keypress. The state is fed by the SDL
+// event pump (PlatformWindow::pumpEvents) rather than queried from SDL here, so
+// it stays valid when polled off the main thread. Bodies live in WindowsAPI.cpp.
+SHORT GetAsyncKeyState(int vk);
+
+// Called by the event pump: record a key/mouse-button transition (vk is a VK_*
+// code), and drop every key on focus loss so nothing sticks down while we are in
+// the background and SDL is not delivering key-ups.
+void PlatformSetKeyState(int vk, bool down);
+void PlatformClearKeyStates();
 
 // PeekMessage flag, LoadImage flags (winuser.h).
 #define PM_REMOVE       0x0001

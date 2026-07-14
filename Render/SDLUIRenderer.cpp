@@ -46,6 +46,7 @@ SDLUIRenderer::~SDLUIRenderer()
 	if(transferBuffer_) SDL_ReleaseGPUTransferBuffer(device_, transferBuffer_);
 	if(whiteTexture_)   SDL_ReleaseGPUTexture(device_, whiteTexture_);
 	if(sampler_)        SDL_ReleaseGPUSampler(device_, sampler_);
+	if(samplerWrap_)    SDL_ReleaseGPUSampler(device_, samplerWrap_);
 	if(pipeline_)       SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
 	if(linePipeline_)   SDL_ReleaseGPUGraphicsPipeline(device_, linePipeline_);
 }
@@ -67,6 +68,13 @@ void SDLUIRenderer::createPipeline()
 	si.address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
 	si.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
 	sampler_ = SDL_CreateGPUSampler(device_, &si);
+
+	// The same, wrapping: what SetSampler picks for a caller that asked for one of the
+	// sampler_wrap_* constants. Only the selection frame's tiled centre does.
+	si.address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+	si.address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+	si.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+	samplerWrap_ = SDL_CreateGPUSampler(device_, &si);
 
 	// 1x1 white texture so untextured quads show the vertex colour.
 	whiteTexture_ = createSolidGPUTexture(device_, 0xFFFFFFFFu);
@@ -188,15 +196,16 @@ void SDLUIRenderer::ensureVertexCapacity(int verts)
 // into the run that preceded it, or they would draw *before* the minimap.
 void SDLUIRenderer::EmitMinimapRun(int index)
 {
-	runs_.push_back(DrawRun{ nullptr, 0, 0, false, index });
+	runs_.push_back(DrawRun{ nullptr, nullptr, 0, 0, false, index });
 }
 
 void SDLUIRenderer::emitQuad(float x, float y, float dx, float dy,
                              float u, float v, float du, float dv, unsigned int color, SDL_GPUTexture* tex)
 {
-	// Extend the current run if it uses the same texture and primitive, else start one.
-	if(runs_.empty() || runs_.back().minimap >= 0 || runs_.back().tex != tex || runs_.back().lines)
-		runs_.push_back(DrawRun{ tex, (int)batch_.size(), 0, false, -1 });
+	// Extend the current run if it uses the same texture, sampler and primitive, else start one.
+	if(runs_.empty() || runs_.back().minimap >= 0 || runs_.back().tex != tex ||
+	   runs_.back().sampler != currentSampler_ || runs_.back().lines)
+		runs_.push_back(DrawRun{ tex, currentSampler_, (int)batch_.size(), 0, false, -1 });
 
 	// Two triangles (the D3D path used a tri-strip of 4 verts; here, 6 verts).
 	const float x1 = x, y1 = y, x2 = x + dx, y2 = y + dy;
@@ -210,12 +219,103 @@ void SDLUIRenderer::emitQuad(float x, float y, float dx, float dy,
 	++quadCount_;
 }
 
+// The same quad, from four corners the caller filled itself. The two triangles pair them
+// the way the device's standard index buffer does on D3D: 0-1-2 and 2-1-3, i.e. corners in
+// the order top-left, bottom-left, top-right, bottom-right.
+void SDLUIRenderer::emitQuad(const sVertexXYZWDT1* corners)
+{
+	if(runs_.empty() || runs_.back().minimap >= 0 || runs_.back().tex != currentTexture_ ||
+	   runs_.back().sampler != currentSampler_ || runs_.back().lines)
+		runs_.push_back(DrawRun{ currentTexture_, currentSampler_, (int)batch_.size(), 0, false, -1 });
+
+	static const int triangles[6] = { 0, 1, 2, 2, 1, 3 };
+	for(int i : triangles){
+		const sVertexXYZWDT1& c = corners[i];
+		// z/w are the pre-transformed vertex's depth and rhw; the UI shader takes x,y as
+		// pixels and writes a fixed depth, as the 2D pipeline has neither depth test nor
+		// perspective divide.
+		batch_.push_back(UIVertex{ c.x, c.y, 0.f, 1.f, packColor(c.diffuse), c.uv[0], c.uv[1] });
+	}
+	runs_.back().count += 6;
+	++quadCount_;
+}
+
+// ---------------------------------------------------------------------------
+// cQuadBuffer<sVertexXYZWDT1>'s contract
+// ---------------------------------------------------------------------------
+// BeginDraw's matrix is accepted and ignored, as it effectively is on D3D: there it reaches
+// cD3DRender::setWorldMatrix, which sets the fixed-function world matrix -- which a
+// pre-transformed vertex never passes through. Every caller here passes the identity anyway.
+void SDLUIRenderer::BeginDraw(const MatXf&)
+{
+	quadCorners_.clear();
+}
+
+sVertexXYZWDT1* SDLUIRenderer::Get()
+{
+	quadCorners_.resize(quadCorners_.size() + 4);
+	return &quadCorners_[quadCorners_.size() - 4];
+}
+
+void SDLUIRenderer::EndDraw()
+{
+	for(size_t i = 0; i + 4 <= quadCorners_.size(); i += 4)
+		emitQuad(&quadCorners_[i]);
+	quadCorners_.clear();
+}
+
+// ---------------------------------------------------------------------------
+// cVertexBuffer<sVertexXYZWD>'s contract
+// ---------------------------------------------------------------------------
+sVertexXYZWD* SDLUIRenderer::Lock(int nVertex)
+{
+	// The callers ask for one flush's worth (24 vertices) and then keep filling until
+	// GetSize() says stop -- which on D3D is thousands of vertices away, since the buffer is
+	// the device's and shared. Round up to a comparable floor so a ring is one strip here too.
+	lockCapacity_ = nVertex > 1024 ? nVertex : 1024;
+	lockVerts_.assign((size_t)lockCapacity_, sVertexXYZWD());
+	return lockVerts_.data();
+}
+
+void SDLUIRenderer::Unlock(int /*nVertex*/)
+{
+	// The caller wrote straight into lockVerts_; DrawPrimitive is handed the count.
+}
+
+void SDLUIRenderer::DrawPrimitive(PRIMITIVETYPE type, int nPolygon)
+{
+	if(nPolygon <= 0 || lockVerts_.empty())
+		return;
+
+	// Untextured, like the lines: the run carries no texture, so Draw() binds the 1x1 white
+	// and the vertex colour comes through unchanged. It could not carry one anyway -- this
+	// vertex format has no UVs, which is also why the sampler does not matter here.
+	if(runs_.empty() || runs_.back().minimap >= 0 || runs_.back().tex != nullptr || runs_.back().lines)
+		runs_.push_back(DrawRun{ nullptr, currentSampler_, (int)batch_.size(), 0, false, -1 });
+
+	const int have = (int)lockVerts_.size();
+	int triangles = 0;
+	for(int i = 0; i < nPolygon; i++){
+		// Triangle i of a strip is vertices i, i+1, i+2; of a list, 3i, 3i+1, 3i+2. The
+		// strip's alternating winding is not restored: the UI pipeline culls nothing.
+		const int first = (type == PT_TRIANGLESTRIP) ? i : 3 * i;
+		if(first + 2 >= have)
+			break;
+		for(int k = 0; k < 3; k++){
+			const sVertexXYZWD& v = lockVerts_[first + k];
+			batch_.push_back(UIVertex{ v.x, v.y, 0.f, 1.f, packColor(v.diffuse), 0.f, 0.f });
+		}
+		++triangles;
+	}
+	runs_.back().count += triangles * 3;
+}
+
 // Untextured: the run carries no texture, so Draw() binds the 1x1 white and the vertex
 // colour comes through unchanged.
 void SDLUIRenderer::emitLine(float x1, float y1, float x2, float y2, unsigned int color)
 {
 	if(runs_.empty() || runs_.back().minimap >= 0 || !runs_.back().lines || runs_.back().tex != nullptr)
-		runs_.push_back(DrawRun{ nullptr, (int)batch_.size(), 0, true, -1 });
+		runs_.push_back(DrawRun{ nullptr, currentSampler_, (int)batch_.size(), 0, true, -1 });
 
 	batch_.push_back(UIVertex{ x1, y1, 0, 1, color, 0.f, 0.f });
 	batch_.push_back(UIVertex{ x2, y2, 0, 1, color, 0.f, 0.f });
@@ -230,6 +330,7 @@ void SDLUIRenderer::BeginFrame()
 	batch_.clear();
 	runs_.clear();
 	currentTexture_ = nullptr;
+	currentSampler_ = nullptr;   // => sampler_, the clamped one every 2D caller but one wants
 	quadCount_ = 0;
 	if(minimap_)
 		minimap_->BeginFrame();   // its draws are sequenced by our run list, so they age with it
@@ -310,7 +411,7 @@ void SDLUIRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 			}
 			SDL_GPUTextureSamplerBinding ts = {};
 			ts.texture = run.tex ? run.tex : whiteTexture_;
-			ts.sampler = sampler_;
+			ts.sampler = run.sampler ? run.sampler : sampler_;
 			SDL_BindGPUFragmentSamplers(pass, 0, &ts, 1);
 			SDL_DrawGPUPrimitives(pass, run.count, 1, run.first, 0);
 		}
@@ -324,6 +425,11 @@ void SDLUIRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 void SDLUIRenderer::SetTexture(cTexture* texture)
 {
 	currentTexture_ = sdlTextureOf(texture);
+}
+
+void SDLUIRenderer::SetSampler(const SAMPLER_DATA& data)
+{
+	currentSampler_ = data.addressu == DX_TADDRESS_WRAP ? samplerWrap_ : sampler_;
 }
 
 void SDLUIRenderer::DrawQuad(float x1, float y1, float dx, float dy,

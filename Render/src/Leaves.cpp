@@ -3,6 +3,8 @@
 #include "Scene.h"
 #include "cCamera.h"
 #include "D3DRender.h"
+#include "Render/SDLWorldQuadRenderer.h"   // the leaves are drawn by SDLWorldQuadRenderer,
+#include "Render/SDLRenderDevice.h"        // reached via cSDLRenderDevice::drawWorldQuads
 
 Leaves::Leaves(): cUnkObj(KIND_LEAVES)
 {
@@ -163,8 +165,22 @@ void Leaves::CalcLeafColor()
 void Leaves::Draw(Camera* camera)
 {
 	stable_sort(sortedLeaves_.begin(),sortedLeaves_.end(),LeafSortByRadius());
+#ifdef _WIN32
 	DWORD oldCull = gb_RenderDevice3D->GetRenderState(D3DRS_CULLMODE);
 	gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE,D3DCULL_CCW);
+#else
+	// gb_RenderDevice3D is null off Windows, and the device hands out no quad buffer: the
+	// world-quad renderer keeps it and answers to the same BeginDraw/Get/EndDraw. Two states
+	// of the D3D path do not survive: it culls nothing (so the back faces of a leaf show), and
+	// its blend mode is plain ALPHA_BLEND rather than the alpha-tested one SetBlendStateAlphaRef
+	// asks for below, so a leaf's cut-out edge is blended rather than discarded.
+	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	if(!pBuf || !dev)
+		return;
+	pBuf->SetCamera(camera);
+	pBuf->SetMaterial(ALPHA_BLEND, texture_);
+#endif
 	//int firstLod=0;
 	//float distanceLod = distanceLod12_;
 	//float dist=camera->GetPos().distance2(GetPosition().trans());
@@ -198,10 +214,14 @@ void Leaves::Draw(Camera* camera)
 	sunDiffuse.a = clamp(sunDiffuse.a,0.f,1.f);
 	//camera->GetLighting(lightDir);
 	//Vect3f n(0,0,1);
+#ifdef _WIN32
 	cQuadBuffer<sVertexXYZDT1>* pBuf=gb_RenderDevice->GetQuadBufferXYZDT1();
+#endif
 	pBuf->BeginDraw();
+#ifdef _WIN32
 	gb_RenderDevice3D->SetWorldMaterial(ALPHA_BLEND,MatXf::ID,0,texture_);//???
 	gb_RenderDevice3D->SetBlendStateAlphaRef(ALPHA_TEST);
+#endif
 	for(int i=0; i<sortedLeaves_.size(); i++)
 	{
 		Leaf* leaf = sortedLeaves_[i].leaf;
@@ -230,7 +250,11 @@ void Leaves::Draw(Camera* camera)
 	}
 	pBuf->EndDraw();
 	//}
+#ifdef _WIN32
 	gb_RenderDevice3D->SetRenderState(D3DRS_CULLMODE,oldCull);
+#else
+	dev->drawWorldQuads();
+#endif
 }
 Leaf* Leaves::AddLeaf()
 {

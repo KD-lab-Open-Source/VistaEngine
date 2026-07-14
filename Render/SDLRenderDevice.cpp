@@ -27,6 +27,12 @@ cSDLRenderDevice* sdlRenderDevice()
 	return dynamic_cast<cSDLRenderDevice*>(gb_RenderDevice);
 }
 
+SDLUIRenderer* sdlUIRenderer()
+{
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	return dev ? dev->uiRenderer() : nullptr;
+}
+
 SDLObject3dxRenderer* sdlObjectRenderer()
 {
 	cSDLRenderDevice* dev = sdlRenderDevice();
@@ -764,6 +770,12 @@ void cSDLRenderDevice::SetNoMaterial(eBlendMode /*blend*/, const MatXf&, float /
 	// pipelines come later.)
 	if(uiRenderer_)
 		uiRenderer_->SetTexture(Texture0);
+}
+
+void cSDLRenderDevice::SetSamplerDataVirtual(DWORD stage, SAMPLER_DATA& data)
+{
+	if(stage == 0 && uiRenderer_)
+		uiRenderer_->SetSampler(data);
 }
 
 void cSDLRenderDevice::DrawQuad(float x1, float y1, float dx, float dy,

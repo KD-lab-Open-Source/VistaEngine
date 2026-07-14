@@ -30,6 +30,8 @@
 #include "Serialization/SerializationFactory.h"
 #include "Render/Src/cCamera.h"
 #include "Render/Src/TexLibrary.h"
+#include "Render/SDLUIRenderer.h"          // the selection frame's quads are batched here,
+#include "Render/SDLRenderDevice.h"        // reached through sdlUIRenderer()
 #include "WBuffer.h"
 #include "Controls.h"
 #include "GameLoadManager.h"
@@ -2073,8 +2075,11 @@ bool UI_LogicDispatcher::isGameActive() const
 	return gameShell->GameActive;
 }
 
-void SpriteToBuf(cQuadBuffer<sVertexXYZWDT1>* buf, const Color4c& color, int x1, int y1, int x2, int y2,
-					float u1=0.f, float v1=0.f,  
+// The buffer is the device's cQuadBuffer<sVertexXYZWDT1> on D3D and SDLUIRenderer off it;
+// both answer to BeginDraw/Get/EndDraw, so this and its callers below are one code path.
+template<class QuadBuffer>
+void SpriteToBuf(QuadBuffer* buf, const Color4c& color, int x1, int y1, int x2, int y2,
+					float u1=0.f, float v1=0.f,
 					float u2=0.f, float v2=1.f,
 					float u3=1.f, float v3=0.f,
 					float u4=1.f, float v4=1.f
@@ -2126,7 +2131,17 @@ bool UI_LogicDispatcher::drawSelection(const Vect2f& topLeft, const Vect2f& righ
 	cp.x-=wide.y/2;
 	cp.y-=wide.y/2;
 
+#ifdef _WIN32
 	cQuadBuffer<sVertexXYZWDT1>* buf= rd->GetQuadBufferXYZWDT1();
+#else
+	// The device has no quad buffer to hand out off Windows: SDL GPU draws only inside a
+	// render pass, which is a renderer's business. The UI renderer keeps the one the 2D
+	// callers share, and the SetNoMaterial calls below already reach it -- they are how it
+	// learns each strip's texture, on both backends.
+	SDLUIRenderer* buf = sdlUIRenderer();
+	if(!buf)
+		return false;
+#endif
 	rd->SetNoMaterial(ALPHA_NONE,MatXf::ID,0,selectionTexture_);
 	buf->BeginDraw();
 	float u = 1;

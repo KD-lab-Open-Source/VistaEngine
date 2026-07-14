@@ -17,7 +17,7 @@
 // vectors and empties them, in that order, at FlushPrimitive2D -- but every caller
 // flushes immediately after drawing, so the visible order is the same.
 
-#include "IRenderDevice.h"
+#include "IRenderDevice.h"   // also brings in sVertexXYZWDT1, the 2D quad buffer's vertex
 #include <vector>
 
 struct SDL_Window;
@@ -64,11 +64,49 @@ public:
 	// --- 2D entry points, forwarded from cSDLRenderDevice --------------------
 	// Texture for the following DrawQuad calls (from SetNoMaterial).
 	void SetTexture(cTexture* texture);
+	// Sampler for what follows (from SetSamplerData/SetSamplerDataVirtual). Only the
+	// address mode is honoured -- clamp or wrap -- since no 2D caller asks for anything but
+	// linear filtering, and only one asks for wrap: the selection frame, whose centre tiles
+	// its texture across the box and so runs its UVs past 1. Sticky, as the sampler state is
+	// on D3D, where it is one global the scene sets too.
+	void SetSampler(const SAMPLER_DATA& data);
 	void DrawQuad(float x, float y, float dx, float dy,
 	              float u, float v, float du, float dv, Color4c color);
 	void DrawSprite(int x, int y, int dx, int dy,
 	                float u, float v, float du, float dv,
 	                cTexture* texture, const Color4c& color);
+
+	// cQuadBuffer<sVertexXYZWDT1>'s contract, for the 2D callers that fill their quads'
+	// corners by hand rather than through DrawSprite -- the selection frame, whose edge and
+	// corner sprites rotate and mirror their UVs. BeginDraw opens a run, each Get hands back
+	// the four vertices of one quad, EndDraw batches them. They draw with the texture
+	// SetNoMaterial last named, as they do on D3D, where that call and the quad buffer are
+	// both the device's.
+	//
+	// Get's four vertices are top-left, bottom-left, top-right, bottom-right: the pairing
+	// the device's standard index buffer gives them (triangles 0-1-2 and 2-1-3), which is
+	// what the callers' corner order means. They are D3D pre-transformed vertices, so x and
+	// y are pixels and z/w are ignored here, as the fixed-function pipeline effectively
+	// ignores them there.
+	void BeginDraw(const MatXf& = MatXf::ID);
+	sVertexXYZWDT1* Get();
+	void EndDraw();
+
+	// cVertexBuffer<sVertexXYZWD>'s contract, likewise, for the 2D callers that draw
+	// untextured triangle strips and lists rather than quads -- the parameter ring a unit
+	// draws around itself when hovered or selected. Lock hands back nVertex vertices to
+	// fill, Unlock closes them, and DrawPrimitive batches them as triangles: the batch has
+	// no strip primitive, and these callers draw few enough that unrolling a strip costs
+	// less than a pipeline of its own. `nPolygon` is the triangle count, as it is on D3D.
+	//
+	// GetSize is the room left before the caller must flush what it has and lock again. On
+	// D3D that is whatever is left of the device's shared buffer, which is thousands of
+	// vertices; here the batch grows on demand, so Lock reports a comparable floor and the
+	// callers flush as rarely as they do there.
+	sVertexXYZWD* Lock(int nVertex);
+	void Unlock(int nVertex);
+	void DrawPrimitive(PRIMITIVETYPE type, int nPolygon);
+	int  GetSize() const { return lockCapacity_; }
 
 	// Untextured primitives. Callers have already clipped against the device's scissor
 	// rect, as the D3D backend does before it queues them.
@@ -95,17 +133,19 @@ private:
 	// (matches sVertexXYZWDT1: float4 pos, BGRA u8 colour, float2 uv = 28 bytes).
 	struct UIVertex { float x, y, z, w; unsigned int color; float u, v; };
 
-	// One draw call per contiguous run of vertices sharing a texture and a primitive
-	// type. `lines` picks the line-list pipeline over the triangle-list one. `minimap`
-	// >= 0 instead means the run is a placeholder: it owns no vertices here, and drawing
-	// it hands off to SDLMinimapRenderer's draw of that index.
-	struct DrawRun { SDL_GPUTexture* tex; int first; int count; bool lines; int minimap; };
+	// One draw call per contiguous run of vertices sharing a texture, a sampler and a
+	// primitive type. `lines` picks the line-list pipeline over the triangle-list one.
+	// `minimap` >= 0 instead means the run is a placeholder: it owns no vertices here, and
+	// drawing it hands off to SDLMinimapRenderer's draw of that index.
+	struct DrawRun { SDL_GPUTexture* tex; SDL_GPUSampler* sampler; int first; int count; bool lines; int minimap; };
 
 	void createPipeline();               // pipelines + sampler + white texture
 	void ensureVertexCapacity(int verts);
 	// Append a quad (6 verts) bound to tex, extending or starting a draw run.
 	void emitQuad(float x, float y, float dx, float dy,
 	              float u, float v, float du, float dv, unsigned int color, SDL_GPUTexture* tex);
+	// The same, from four hand-filled corners (see Get) rather than a rect and a UV rect.
+	void emitQuad(const sVertexXYZWDT1* corners);
 	// Append one untextured line segment (2 verts).
 	void emitLine(float x1, float y1, float x2, float y2, unsigned int color);
 
@@ -114,7 +154,8 @@ private:
 
 	SDL_GPUGraphicsPipeline* pipeline_       = nullptr;  // triangle list
 	SDL_GPUGraphicsPipeline* linePipeline_   = nullptr;  // line list; same shaders
-	SDL_GPUSampler*          sampler_        = nullptr;
+	SDL_GPUSampler*          sampler_        = nullptr;  // linear, clamp: what 2D wants
+	SDL_GPUSampler*          samplerWrap_    = nullptr;  // linear, wrap: the selection centre
 	SDL_GPUTexture*          whiteTexture_   = nullptr;  // untextured geometry shows vertex colour
 	SDL_GPUBuffer*           vertexBuffer_   = nullptr;
 	SDL_GPUTransferBuffer*   transferBuffer_ = nullptr;
@@ -122,7 +163,16 @@ private:
 
 	std::vector<UIVertex> batch_;
 	std::vector<DrawRun>  runs_;
+	// The open BeginDraw..EndDraw run, 4 vertices per quad. They cannot go straight into
+	// batch_: Get hands the caller a pointer to fill *after* it returns, and batch_ holds
+	// two triangles (6 vertices) per quad, not four corners.
+	std::vector<sVertexXYZWDT1> quadCorners_;
+	// The open Lock..DrawPrimitive run, for the same reason: the caller fills these after
+	// Lock returns, and DrawPrimitive is what says which triangles they make.
+	std::vector<sVertexXYZWD> lockVerts_;
+	int lockCapacity_ = 0;
 	SDL_GPUTexture*       currentTexture_ = nullptr;   // set by SetTexture
+	SDL_GPUSampler*       currentSampler_ = nullptr;   // set by SetSampler; null => sampler_
 	int                   quadCount_ = 0;
 	SDLMinimapRenderer*   minimap_ = nullptr;          // not owned; the device owns both
 };

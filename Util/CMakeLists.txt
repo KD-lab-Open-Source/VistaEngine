@@ -13,6 +13,9 @@ set(UTIL_SOURCES
     FileUtils/FileTime.cpp
     FileUtils/FileUtils.cpp
     FileUtils/XGUID.cpp
+    # Parameter-formula evaluator; hand-rolled recursive descent since the
+    # original Boost.Spirit grammar doesn't build under clang/C++20.
+    FormulaString.cpp
     LocString.cpp
     ObjectSpreader.cpp
     ScanningShape.cpp
@@ -28,7 +31,6 @@ set(UTIL_SOURCES
 if(WIN32)
     list(APPEND UTIL_SOURCES
         ConsoleWindow.cpp
-        FormulaString.cpp
         SplashScreen.cpp
         mfc/PopupMenu.cpp
         Win32/DebugSymbolManager.cpp
@@ -52,10 +54,9 @@ else()
     list(APPEND UTIL_SOURCES SystemUtilPortable.cpp)
     # No-op stubs for the Win32 tooling / DirectInput leaves whose real sources
     # are gated above (debug console, symbol resolver, joystick, keyboard,
-    # formula evaluator, profiler).
+    # profiler).
     list(APPEND UTIL_SOURCES
         ConsoleWindowStub.cpp
-        FormulaStringStub.cpp
         ProfilerStub.cpp
         joystickStub.cpp
         Win32/DebugSymbolManagerStub.cpp

@@ -64,6 +64,12 @@ SDL_GPUTexture* createSolidGPUTexture(SDL_GPUDevice* device, unsigned int rgba);
 class cSDLRenderDevice;
 cSDLRenderDevice* sdlRenderDevice();
 
+// The SDL backend's UI renderer, or null under any other device. Every 2D entry point of
+// the device already forwards here; this is for the 2D callers that reach past those for
+// the device's shared quad buffer (UI_LogicDispatcher::drawSelection) -- it answers to the
+// same BeginDraw/Get/EndDraw.
+SDLUIRenderer* sdlUIRenderer();
+
 // The SDL backend's 3dx renderer, or null under any other device. cObject3dx::Draw and
 // cSimply3dx::SelectMaterial drive it exactly as they drive pShader3dx's shader objects
 // on Windows.
@@ -118,10 +124,11 @@ public:
 	SDLWorldQuadRenderer* worldQuadRenderer() { return worldQuadRenderer_.get(); }
 	void drawWorldQuads();
 
-	// --- Minimap ------------------------------------------------------------
-	// Unlike the above, this one has no draw call of its own: the minimap is a UI control,
-	// so its draws are sequenced into SDLUIRenderer's run list and replayed inside the UI
-	// pass. See SDLMinimapRenderer.h.
+	// --- UI and minimap -----------------------------------------------------
+	// Neither has a draw call of its own. The UI renderer's pass runs at EndScene, over
+	// everything; the minimap is a UI control, so its draws are sequenced into that
+	// renderer's run list and replayed inside its pass. See SDLMinimapRenderer.h.
+	SDLUIRenderer* uiRenderer() { return uiRenderer_.get(); }
 	SDLMinimapRenderer* minimapRenderer() { return minimapRenderer_.get(); }
 
 	// Replay the object batch recorded so far into the current target, and take that
@@ -268,7 +275,11 @@ public:
 	void SetRenderState(eRenderStateOption, int) override;
 	unsigned int GetRenderState(eRenderStateOption) override;
 	void SetGlobalFog(const Color4f&, const Vect2f&) override {}
-	void SetSamplerDataVirtual(DWORD, SAMPLER_DATA&) override {}
+	// Sticky sampler state, as it is on D3D, where this sets one global the scene and the UI
+	// both draw with. Each renderer bakes its own sampler for its own geometry; only the UI
+	// takes this one, because only its callers change it (the selection frame asks for wrap
+	// so its centre tiles). Stages past 0 have no 2D caller.
+	void SetSamplerDataVirtual(DWORD stage, SAMPLER_DATA& data) override;
 	// D3D: "the advanced DrawType exists", i.e. the device can render a shadow map.
 	// cVisGeneric::SetShadowType turns shadows off without it. We always can.
 	bool IsEnableSelfShadow() override { return true; }
