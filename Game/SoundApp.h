@@ -36,7 +36,6 @@ public:
 private:
 	string soundTrack_;
 	OggPlayer* mpeg;
-	XZipStream stream_;
 	bool enabled_;
 	bool canPaused_;
 };

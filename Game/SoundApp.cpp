@@ -174,48 +174,12 @@ OggPlayer gb_Music;
 OggPlayer mpegSound;
 MusicManager musicManager;
 
-int XZipMpegOpen(void* datasource, const char* file_name)
-{
-	XZipStream* stream = reinterpret_cast<XZipStream*>(datasource);
-	if(stream->open(file_name))
-		return 1;
+// The ogg callback set that used to live here (XZipMpegOpen/Read/Seek/Close/Tell, handed to
+// OggPlayer::setCallbacks) is gone: the audio VFS in Sound/AudioBackend.cpp reads every sound in
+// the game through XZipStream, archives included, so the player needs no bridge of its own. Its
+// seek callback never worked anyway — it returned -1 unconditionally.
 
-	return 0;
-}
-
-size_t XZipMpegRead(void *ptr, size_t size, size_t nmemb, void *datasource)
-{
-	XZipStream* stream = reinterpret_cast<XZipStream*>(datasource);
-	xassert(stream->isOpen());
-
-	if(stream->isOpen())
-		return stream->read(ptr, size * nmemb);
-	return 0;
-}
-
-int XZipMpegSeek(void *datasource, __int64 offset, int dir)
-{
-	return -1;
-//	XZipStream* stream = reinterpret_cast<XZipStream*>(datasource);
-//	return stream->seek(offset, dir);
-}
-
-int XZipMpegClose(void *datasource)
-{
-	XZipStream* stream = reinterpret_cast<XZipStream*>(datasource);
-	stream->close();
-	return 0;
-}
-
-long XZipMpegTell(void *datasource)
-{
-	XZipStream* stream = reinterpret_cast<XZipStream*>(datasource);
-	return stream->tell();
-}
-
-OggCallbacks zipMpegCallbacks = { XZipMpegOpen, XZipMpegRead, XZipMpegSeek, XZipMpegClose, XZipMpegTell };
-
-VoiceManager::VoiceManager() : stream_(false)
+VoiceManager::VoiceManager()
 {
 	enabled_ = GameOptions::instance().getBool(OPTION_VOICE_ENABLE);
 	mpeg = &mpegSound;
@@ -223,8 +187,6 @@ VoiceManager::VoiceManager() : stream_(false)
 	canPaused_ = true;
 
 	mpeg->setBus(OGG_BUS_VOICE);
-
-	OggPlayer::setCallbacks(&zipMpegCallbacks);
 }
 
 bool VoiceManager::isPlaying() const
@@ -275,9 +237,10 @@ bool VoiceManager::Play(const char* soundTrack, bool cycled, bool canPaused, boo
 	canPaused_ = canPaused;
 
 	SetVolume(terVoiceVolume);
-	bool b = mpeg->play(soundTrack, cycled, &stream_);
-	// из-за открытия файла позже в другом потоке, говорит лишь о невозможности создания потока
-	xassertStr(b && "Cannot open music: ", soundTrack); 
+	bool b = mpeg->play(soundTrack, cycled);
+	// Теперь означает именно то, что сказано: файл не открылся. Раньше файл открывался позже и в
+	// другом потоке, поэтому результат говорил лишь о невозможности создания потока.
+	xassertStr(b && "Cannot open music: ", soundTrack);
 	return b;
 }
 
