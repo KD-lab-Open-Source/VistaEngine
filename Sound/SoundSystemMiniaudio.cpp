@@ -5,20 +5,22 @@
 // (the SND* functions at the bottom). Read it before porting a behaviour rather than
 // inventing one — the shape here follows it closely, deliberately.
 //
-// What is real: the sample pool and its voices. A Sound is one decoded sample; a Channel is
-// one voice playing it, with its own cursor, volume and fade. Looping, pausing, muting and
-// the global fade all behave as they did.
+// The sample pool and its voices: a Sound is one decoded sample, a Channel is one voice playing
+// it, with its own cursor, volume and fade. Looping, pausing, muting and the global fade all
+// behave as they did. A 3D voice is spatialized and a UI one is not; the listener, the inverse
+// distance law, the clip-distance pass and the fog-of-war muting are all live.
 //
-// What is not, yet: spatialization. Every voice is played unspatialized, so a 3D sound is
-// audible but not placed, and the listener, the distance attenuation, the clip-distance pass
-// and the fog-of-war muting are all still no-ops. That is the next slice; the sites are
-// tagged TODO(sound-port). OggPlayer and SND3DListener are still in SoundStub.cpp.
+// See Sound/PORTING.md for what miniaudio does not do (the voice cap, the mute past max distance,
+// fog of war, the focus mute), and for the three features that were never wired up in the original
+// and must not be "ported" back.
 #include "StdAfx.h"
 #include "Sound.h"
 #include "SoundSystem.h"
 #include "AudioBackend.h"
 #include "SystemUtil.h"
 #include "Console.h"
+
+#include <algorithm>   // std::sort: libc++ leaks it in through another header, MSVC does not
 
 SoundSystem sndSystem;
 
