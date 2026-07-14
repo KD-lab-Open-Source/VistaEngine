@@ -118,8 +118,8 @@ void GameOptions::gameSetup()
 {
 	voiceManager().setEnabled(getBool(OPTION_VOICE_ENABLE));
 
-	void InitSound(bool, bool, HWND, const char*);
-	InitSound(getBool(OPTION_SOUND_ENABLE), getBool(OPTION_MUSIC_ENABLE), gb_RenderDevice->GetWindowHandle(), this->getLocDataPath());
+	void InitSound(bool, bool, const char*);
+	InitSound(getBool(OPTION_SOUND_ENABLE), getBool(OPTION_MUSIC_ENABLE), this->getLocDataPath());
 
 	if(getBool(OPTION_MUSIC_ENABLE))
 		musicManager.Resume();

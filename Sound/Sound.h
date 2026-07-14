@@ -4,9 +4,10 @@
 
 class Channel;
 //Инициализация/деинициализация библиотеки
-bool SNDInitSound(HWND g_hWnd,bool bEnable3d,bool soft3d);
+//The audio device is miniaudio's (Sound/AudioBackend.h): it needs no window handle, and
+//3D is always its own software spatializer, so the old hardware/software 3D flags are gone.
+bool SNDInitSound();
 void SNDReleaseSound();
-void* SNDGetDirectSound();//Возвращает указатель на LPDIRECTSOUND8
 
 void SNDEnableSound(bool enable);
 bool SNDIsSoundEnabled();
@@ -19,6 +20,13 @@ void SNDSetFade(bool fadeIn,int time=0);
 void SNDStopAll();
 float SNDGetVolume();
 void SNDSetGameActive(bool active);
+
+/// How a 3D channel asks whether its emitter stands under fog of war, and so should fall silent.
+/// The game installs this (Game/SoundApp.cpp); the Sound module has no business knowing about the
+/// universe, and the original reached for it by including Game/Universe.h here. Until it is
+/// installed, nothing is fogged.
+typedef bool (*SNDFogOfWarQuery)(float x, float y);
+void SNDSetFogOfWarQuery(SNDFogOfWarQuery query);
 
 ////////////////////////////3D/////////////////////////////////
 class SND3DListener

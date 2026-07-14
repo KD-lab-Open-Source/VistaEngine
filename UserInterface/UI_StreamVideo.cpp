@@ -9,8 +9,6 @@
 #include "Render/src/Texture.h"
 #include "Render/src/VisGeneric.h"
 
-void* SNDGetDirectSound();
-
 class BinkSimplePlayerImpl
 {
 public:

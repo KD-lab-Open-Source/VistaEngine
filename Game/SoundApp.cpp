@@ -3,6 +3,8 @@
 #include "SoundSystem.h"
 #include "SoundApp.h"
 #include "SystemUtil.h"
+#include "Game/Universe.h"
+#include "Render/src/FogOfWar.h"
 #include "CameraManager.h"
 #include "RenderObjects.h"
 #include "PlayOgg.h"
@@ -22,6 +24,16 @@ float terSoundVolume = 1;
 float terMusicVolume = 1;
 float terVoiceVolume = 1;
 float fSoundZMultiple = 0.5f; // 0..1 коэффициэнт масштабирования громкости по оси Z
+
+// A 3D sound standing under fog of war is not heard. The Sound module asks through this hook
+// rather than reaching into the universe itself (Sound.h, SNDSetFogOfWarQuery).
+static bool soundFogOfWarQuery(float x, float y)
+{
+	if(!universe() || !universe()->activePlayer() || !universe()->activePlayer()->fogOfWarMap())
+		return false;
+
+	return universe()->activePlayer()->fogOfWarMap()->getFogState(x, y) != FOGST_NONE;
+}
 
 // Добавляет слэш в конце пути к дирректории если нужно
 void SlashFixup(string& dir)
@@ -59,7 +71,7 @@ VoiceManager& voiceManager()
 	return vm;
 }
 
-void InitSound(bool sound, bool music, HWND hwnd, const char* localeDataPath)
+void InitSound(bool sound, bool music, const char* localeDataPath)
 {
 	terSoundEnable = sound;
 	terMusicEnable = music;
@@ -69,9 +81,10 @@ void InitSound(bool sound, bool music, HWND hwnd, const char* localeDataPath)
 	if(!inited){
 		inited = 1;
 
-		if(SNDInitSound(hwnd,true,false)){
+		if(SNDInitSound()){
+			SNDSetFogOfWarQuery(soundFogOfWarQuery);
 			LoadAllSound(localeDataPath,"RESOURCE\\SOUNDS\\");
-			OggPlayer::initLibrary(sndSystem.GetDirectSound());
+			OggPlayer::initLibrary(sndSystem.GetAudioEngine());
 		}
 	}
 
@@ -148,6 +161,11 @@ void SoundQuant()
 void FinitSound()
 {
 	OggPlayer::finitLibrary();
+
+	// sndLibrary indexes the Sounds by name, and SNDReleaseSound() is about to delete every
+	// one of them along with the device. Let go of them first.
+	sndLibrary.Release();
+
 	SNDReleaseSound();
 }
 
@@ -156,55 +174,19 @@ OggPlayer gb_Music;
 OggPlayer mpegSound;
 MusicManager musicManager;
 
-int XZipMpegOpen(void* datasource, const char* file_name)
-{
-	XZipStream* stream = reinterpret_cast<XZipStream*>(datasource);
-	if(stream->open(file_name))
-		return 1;
+// The ogg callback set that used to live here (XZipMpegOpen/Read/Seek/Close/Tell, handed to
+// OggPlayer::setCallbacks) is gone: the audio VFS in Sound/AudioBackend.cpp reads every sound in
+// the game through XZipStream, archives included, so the player needs no bridge of its own. Its
+// seek callback never worked anyway — it returned -1 unconditionally.
 
-	return 0;
-}
-
-size_t XZipMpegRead(void *ptr, size_t size, size_t nmemb, void *datasource)
-{
-	XZipStream* stream = reinterpret_cast<XZipStream*>(datasource);
-	xassert(stream->isOpen());
-
-	if(stream->isOpen())
-		return stream->read(ptr, size * nmemb);
-	return 0;
-}
-
-int XZipMpegSeek(void *datasource, __int64 offset, int dir)
-{
-	return -1;
-//	XZipStream* stream = reinterpret_cast<XZipStream*>(datasource);
-//	return stream->seek(offset, dir);
-}
-
-int XZipMpegClose(void *datasource)
-{
-	XZipStream* stream = reinterpret_cast<XZipStream*>(datasource);
-	stream->close();
-	return 0;
-}
-
-long XZipMpegTell(void *datasource)
-{
-	XZipStream* stream = reinterpret_cast<XZipStream*>(datasource);
-	return stream->tell();
-}
-
-OggCallbacks zipMpegCallbacks = { XZipMpegOpen, XZipMpegRead, XZipMpegSeek, XZipMpegClose, XZipMpegTell };
-
-VoiceManager::VoiceManager() : stream_(false)
+VoiceManager::VoiceManager()
 {
 	enabled_ = GameOptions::instance().getBool(OPTION_VOICE_ENABLE);
 	mpeg = &mpegSound;
 	soundTrack_ = "";
 	canPaused_ = true;
 
-	OggPlayer::setCallbacks(&zipMpegCallbacks);
+	mpeg->setBus(OGG_BUS_VOICE);
 }
 
 bool VoiceManager::isPlaying() const
@@ -255,9 +237,10 @@ bool VoiceManager::Play(const char* soundTrack, bool cycled, bool canPaused, boo
 	canPaused_ = canPaused;
 
 	SetVolume(terVoiceVolume);
-	bool b = mpeg->play(soundTrack, cycled, &stream_);
-	// из-за открытия файла позже в другом потоке, говорит лишь о невозможности создания потока
-	xassertStr(b && "Cannot open music: ", soundTrack); 
+	bool b = mpeg->play(soundTrack, cycled);
+	// Теперь означает именно то, что сказано: файл не открылся. Раньше файл открывался позже и в
+	// другом потоке, поэтому результат говорил лишь о невозможности создания потока.
+	xassertStr(b && "Cannot open music: ", soundTrack);
 	return b;
 }
 
@@ -295,6 +278,8 @@ MusicManager::MusicManager()
 	active = false;
 	mpeg = &gb_Music;
 	soundTrack_ = "";
+
+	mpeg->setBus(OGG_BUS_MUSIC);
 }
 
 MusicManager::~MusicManager()
@@ -349,12 +334,15 @@ bool MusicManager::Play(const char* soundTrack)
 		return false;
 
 #ifndef _FINAL_VERSION_
-	FILE* file=fopen(soundTrack,"r");
-	if(file==NULL){
-		kdWarning("&VoiceManager",XBuffer(1024, 1) < /*TRANSLATE*/("Невозможно открыть файл : ") < soundTrack);
+	// The track names come out of the script tables with backslashes ("Resource\Music\Battle.ogg"),
+	// so a raw fopen() of one — which is what this probe used to be — finds nothing anywhere but
+	// Windows. Ask the same reader that is about to play it.
+	XZipStream file(false);
+	if(!file.open(soundTrack, XZS_IN)){
+		kdWarning("&MusicManager",XBuffer(1024, 1) < /*TRANSLATE*/("Невозможно открыть файл : ") < soundTrack);
 		return false;
 	}
-	fclose(file);
+	file.close();
 #endif
 
 	if(mpeg->state() == OGG_PLAYING && soundTrack_ == soundTrack) {

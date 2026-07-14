@@ -36,7 +36,6 @@ public:
 private:
 	string soundTrack_;
 	OggPlayer* mpeg;
-	XZipStream stream_;
 	bool enabled_;
 	bool canPaused_;
 };
@@ -135,7 +134,7 @@ protected:
 	multimap<string,SNDSound*> playSounds;
 };
 
-void InitSound(bool sound, bool music, HWND hwnd, const char* localeDataPath);
+void InitSound(bool sound, bool music, const char* localeDataPath);
 void UpdateSound();
 void ApplySoundParameters();
 void SoundQuant();
