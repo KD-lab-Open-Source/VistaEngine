@@ -29,9 +29,6 @@ set(GAME_SOURCES
 )
 
 # Not built on any platform:
-#   PlayBink.cpp draws Bink frames through d3d9.h / d3dx9.h, which went with the D3D9
-#   backend. Nothing constructs a PlayBink (GameShell.cpp only includes the header),
-#   so there is nothing to stub — video playback needs a real port.
 #   CDKey.cpp is the CD-key check. It links verifier.lib, a 32-bit VC7.1 import
 #   library that an x64 build cannot use, and Runtime.cpp's call to it has been
 #   commented out for years. There is no key check in this build.

@@ -5,6 +5,9 @@
 #include "SoundApp.h"
 #include "PlayOgg.h"
 #include "GameShell.h"
+#include "Runtime.h"			// pumpApplicationEvents: the modal loop below pumps for itself
+#include "Video/VideoPlayer.h"
+#include "Render/src/Texture.h"
 #include "VistaRender/postEffects.h"
 #include "Units/GlobalAttributes.h"
 #include "Bubles/Blobs.h"
@@ -47,33 +50,113 @@ ReelManager::~ReelManager() {
 	RELEASE(bgTexture);
 }
 
+// Where the frame goes on screen. FULL_SCREEN is what every caller gets — nothing in the game
+// sets sizeType or size — and it stretches, the way showPictureModal does with its splash.
+Recti ReelManager::frameRect(int videoWidth, int videoHeight) const {
+	const int screenWidth = gb_RenderDevice->GetSizeX();
+	const int screenHeight = gb_RenderDevice->GetSizeY();
+
+	switch (sizeType) {
+	case REAL_SIZE:
+		return Recti((screenWidth - videoWidth) / 2, (screenHeight - videoHeight) / 2,
+		             videoWidth, videoHeight);
+	case CUSTOM:
+		return Recti(pos.x, pos.y, size.x, size.y);
+	case FULL_SCREEN:
+	default:
+		return Recti(0, 0, screenWidth, screenHeight);
+	}
+}
+
+// The reel: a cutscene played over the top of everything, until it ends or the player skips it.
+//
+// This never ran in this source tree. KD-lab stripped RAD's Bink player out before releasing
+// the source and left the body as an unconditional `return;` — so the intro, and every mission
+// cutscene the ActionShowReel trigger fires, has been silently doing nothing. What is below is
+// the shape the surrounding code still describes: stop the music, start the separate voice-over
+// .ogg if the trigger named one, run the video, and let the abort key through.
+//
+// The loop pumps events itself. It has to: the abort arrives as a WM_KEYDOWN through
+// GameShell::checkReel, which is on the far side of the window procedure, and the PeekMessage
+// the original would have used is a stub that returns FALSE off Windows — a loop built on it
+// would ignore the key, never see the window close, and hang the application for the length of
+// the video.
 void ReelManager::showModal(const char* binkFileName, const char* soundFileName, bool stopBGMusic, int alpha) {
-#ifndef _DEMO_
-	return;
+	VideoPlayer video;
+	if (!video.open(binkFileName)) {
+		// Not fatal, and not a reason to sit on a black screen for two minutes: the mission
+		// carries on without its cutscene.
+		hide();
+		return;
+	}
+
+	cTexture* frame = GetTexLibrary()->CreateTexture(video.width(), video.height(), true);
+	if (!frame) {
+		hide();
+		return;
+	}
+
 	if (stopBGMusic) {
 		gb_Music.stop();
-//		bink->SetVolume(max(terMusicVolume, terSoundVolume));
-//	} else {
-//		bink->SetVolume(0);
 	}
 
+	// A reel's voice-over is a plain .ogg, played alongside the video rather than inside it —
+	// the .bik carries its own soundtrack too, and both are meant to be heard.
 	string soundPath = soundFileName ? soundFileName : "";
-
-	if (!soundPath.empty() && soundPath != "empty" && stopBGMusic) {
-		int ret = gb_Music.play(soundFileName);
-		xassert(ret);
+	const bool ownVoice = !soundPath.empty() && soundPath != "empty" && stopBGMusic;
+	if (ownVoice) {
+		gb_Music.play(soundFileName);
 	}
 
+	const Recti rect = frameRect(video.width(), video.height());
+
+	visible = true;
+	startTime = xclock();
+	video.play();
+
+	while (isVisible()) {
+		if (!pumpApplicationEvents()) {
+			break;   // the window was closed under us
+		}
+
+		// Long enough in, the reel becomes skippable whatever the trigger asked for.
+		if (xclock() - startTime > SPLASH_REEL_ABORT_DISABLED_TIME) {
+			gameShell->reelAbortEnabled = true;
+		}
+
+		if (video.quant()) {
+			int pitch = 0;
+			if (BYTE* dst = frame->LockTexture(pitch)) {
+				video.copyFrameTo(dst, pitch);
+				frame->UnlockTexture();
+			}
+		}
+
+		if (video.isEnd()) {
+			break;
+		}
+
+		gb_RenderDevice->Fill(0, 0, 0, 0);
+		gb_RenderDevice->BeginScene();
+		gb_RenderDevice->DrawSprite(rect.left(), rect.top(), rect.width(), rect.height(),
+		                            0, 0, 1, 1, frame, Color4c(255, 255, 255, alpha));
+		gb_RenderDevice->EndScene();
+		gb_RenderDevice->Flush();
+	}
+
+	video.close();
+	if (ownVoice) {
+		gb_Music.stop();
+	}
+	RELEASE(frame);
+
+	// Leave a clean frame behind: whatever comes next has not drawn itself yet.
 	gb_RenderDevice->Fill(0, 0, 0, 0);
 	gb_RenderDevice->BeginScene();
 	gb_RenderDevice->EndScene();
 	gb_RenderDevice->Flush();
 
-	if (soundFileName && strlen(soundFileName) && stopBGMusic) {
-		gb_Music.stop();
-	}
 	hide();
-#endif
 }
 
 void ReelManager::showPictureModal(const char* pictureFileName, int stableTime) {
@@ -419,8 +502,26 @@ private:
 	float fadeTime_;
 };
 
+// TODO(sdl-port): the KD-lab logo splash -- the fish swimming under a screen full of metaballs --
+// is still D3D9, and it is the one thing behind the video gate that the video port did not bring
+// back. The scene half of it would run (cScene / cObject3dx have an SDL path); the effect half
+// does not. cBlobs draws its cells through the D3D9-only cQuadBuffer family, composites them
+// with PSBlobsShader out of the retired shader system (Render/shader/shaders.cpp), and asks
+// gb_RenderDevice3D for a render target, a PS 2.0 capability check and a SetVertexShader -- none
+// of which exist on the portable interface. The loop below also StretchRects the back buffer
+// into a texture, which has no equivalent either; the SDL way is to point the camera at a render
+// target (see Render/PORTING.md).
+//
+// It never ran off Windows and, with DisableVideo defaulting to true, it had not run at all --
+// so the crash it takes on gb_RenderDevice3D (null since the backend was retired) was latent
+// until the reels started playing. Skip it rather than dereference null. Nothing waits on it:
+// ActionShowLogoReel overrides no workedOut(), so its trigger completes the moment activate()
+// returns, and the game simply carries on without a logo.
 void ReelManager::showLogoModal(LogoAttributes& logoAttributes, const cBlobsSetting& blobsSetting, int stableTime,SoundLogoAttributes& soundAttributes)
 {
+	if(!gb_RenderDevice3D)
+		return;
+
 	int oldTextureDetail = gb_VisGeneric->GetTextureDetailLevel();
 	gb_VisGeneric->SetTextureDetailLevel(0);
 	int screenWidth = gb_RenderDevice->GetSizeX();

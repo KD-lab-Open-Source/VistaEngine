@@ -21,7 +21,28 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    # Nothing to install. SDL3 and FreeType come in through FetchContent, and the
+    # ffmpeg is the one dependency that does not build itself with CMake: it has a configure
+    # script (cmake/FFmpeg.cmake runs it), and that needs a POSIX shell and make. MSYS2 is
+    # here to supply those two programs and nothing more — the *compiler* stays MSVC, because
+    # configure runs with --toolchain=msvc, so what comes out is native MSVC static libraries
+    # that the Visual Studio build links directly. No mingw, no second toolchain.
+    - name: Install MSYS2 (ffmpeg's configure wants bash and make)
+      id: msys2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: make diffutils
+        path-type: inherit
+
+    # Point the build at it, rather than putting it on PATH. cmake/FFmpeg.cmake takes bash and
+    # make from here by absolute path and puts MSYS2 on PATH for ffmpeg's own build steps only.
+    # PATH is the wrong tool for this in both directions: MSYS2 at the front shadows MSVC's
+    # link.exe with a coreutils program of the same name, and MSYS2 at the back loses to the
+    # runner's *other* GNU make — which is native, and cannot resolve the POSIX source path
+    # that ffmpeg's configure writes into its Makefile.
+    - name: Tell the build where MSYS2 is
+      run: echo "MSYS2_ROOT=${{ steps.msys2.outputs.msys2-location }}" >> $env:GITHUB_ENV
+
+    # Otherwise nothing to install. SDL3 and FreeType come in through FetchContent, and the
     # shaders are compiled by the Windows SDK's own dxc.exe (HLSL -> DXIL, the one
     # format the D3D12 backend loads), which the root CMakeLists globs out of
     # Windows Kits\10\bin\<ver>\x64 — so this platform needs no SDL_shadercross and

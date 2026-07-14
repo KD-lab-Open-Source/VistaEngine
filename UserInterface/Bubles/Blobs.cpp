@@ -147,7 +147,10 @@ void cBlobs::CreateBlobsTexture(int size)
 
 	cFileImageData fid(size,size,data);
 
-	if(gb_RenderDevice3D->CreateTexture(Texture,&fid,-1,-1))
+	// Creating a texture is the render *interface*'s job, not the D3D9 device's: gb_RenderDevice3D
+	// is null now that the backend is retired (Render/RenderStub.cpp), and this was a null
+	// dereference. The rest of cBlobs is not so easily rescued -- see ReelManager::showLogoModal.
+	if(gb_RenderDevice->CreateTexture(Texture,&fid,-1,-1))
 	{
 		delete data;
 		delete Texture;

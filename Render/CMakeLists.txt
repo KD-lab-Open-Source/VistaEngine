@@ -198,7 +198,7 @@ add_library(Render STATIC ${RENDER_SOURCES})
 # Replaces the old vendored include dir + FreeTypeStub.cpp; the freetype target
 # propagates its own include paths.
 target_link_libraries(Render PUBLIC EngineIncludes Util 3dx SDL3::SDL3)
-target_link_libraries(Render PRIVATE freetype)
+target_link_libraries(Render PRIVATE freetype Video)
 
 # The generated "SDLShaders/<module>_shaders.h" live in the build tree, so that has to
 # be an include root too — the renderers include them by the same path they used when

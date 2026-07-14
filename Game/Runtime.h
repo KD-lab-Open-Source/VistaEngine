@@ -87,6 +87,15 @@ private:
 
 bool applicationHasFocus();
 
+/// Drain the window's event queue into the game's window procedure, the way the main loop
+/// does. False when the application has been asked to quit.
+///
+/// A modal loop that runs its own frames — the reel player is the one that does — has to call
+/// this rather than PeekMessage: SDL owns the queue now, PeekMessage is a stub that returns
+/// FALSE off Windows, and a loop that does not pump neither hears the reel's abort key nor
+/// lets the window close.
+bool pumpApplicationEvents();
+
 Runtime* createRuntime(HINSTANCE hInstance);
 
 extern const char* currentVersion;

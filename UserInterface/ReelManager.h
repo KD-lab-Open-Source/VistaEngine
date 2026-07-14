@@ -1,10 +1,12 @@
 #ifndef _REELMANAGER_H
 #define _REELMANAGER_H
 
-#include "PlayBink.h"
+#include "XTL/Rect.h"
 #include "Bubles/Blobs.h"
 #include "Sound/SoundSystem.h"
 #include "Game/SoundApp.h"
+
+class cTexture;
 
 struct LogoAttributes
 {
@@ -39,8 +41,10 @@ class ReelManager {
 		Vect2i size;
 		SizeType sizeType;
 	protected:
+		/// Where a video frame of this size lands on screen, per sizeType.
+		Recti frameRect(int videoWidth, int videoHeight) const;
+
 		bool visible;
-		PlayBink* bink;
 		cTexture* bgTexture;
 		double startTime;
 };

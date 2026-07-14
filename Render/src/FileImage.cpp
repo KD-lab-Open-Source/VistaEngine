@@ -4,12 +4,12 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include <vfw.h>		// AVI include
 #include <setjmp.h>		// JPG include
 #include <math.h>
 #include <xutil.h>
 #include "XZip.h"
 #include "FileImage.h"
+#include "Video/VideoFile.h"	// AVI, on ffmpeg -- see cAVIImage below
 
 #include <fcntl.h>
 #include <sys/types.h>
@@ -22,9 +22,6 @@
 #include "Serialization/Serialization.h"
 #include "Render/inc/FileRead.h"
 #include "FileUtils/FileUtils.h"
-
-#pragma comment (lib,"vfw32") // AVI library
-
 
 #ifdef USE_JPEG
 #include "jpeglib.h"	// JPG include
@@ -474,112 +471,69 @@ public:
 //////////////////////////////////////////////////////////////////////////////////////////
 // реализация интерфейса cAVIImage
 //////////////////////////////////////////////////////////////////////////////////////////
-// Video-for-Windows AVI reader/writer — Windows-only multimedia backend.
-// Excluded on other platforms (no AVI image support); a cross-platform video
-// path is a later concern (Track B).
-#if defined(_WIN32)
+// The animated textures: the snowflakes, the water rings, the coast bubbles, the animated
+// UI elements. Every one of them is an .avi of uncompressed 32-bit BGRA frames -- a
+// container around raw DIBs, with no codec in it -- which Video-for-Windows used to unpack
+// and ffmpeg now does, on every platform (Video/VideoFile.cpp). They were simply missing
+// off Windows until now: cFileImage::Create had nothing to answer ".avi" with.
+//
+// load() decodes the whole clip. That is not a shortcut: cAviScaleFileImage, the only caller,
+// walks every frame in order and packs them into one texture atlas, so they all have to be
+// resident anyway, and the largest of them is under a megabyte.
+//
+// The writer went with VFW. Nothing called cFileImage::save() on an .avi -- it was the AVI
+// half of a tool path that predates this port -- and the ffmpeg we build carries no encoders.
 class cAVIImage : public cFileImage
 {
-	IGetFrame	*Frame;
-	IAVIStream	*pavi;
+	vector<unsigned char> frames_;   // length * x * y * 4, BGRA, top-down
 public:
-	cAVIImage()															{ Frame=0; pavi=0; }
+	cAVIImage()															{ length=0; }
 	virtual ~cAVIImage()												{ close(); }
 	virtual int close()
 	{
-		if(Frame) AVIStreamGetFrameClose(Frame); Frame=0;
-		if(pavi) AVIStreamRelease(pavi); pavi=0;
+		frames_.clear();
 		return 0;
 	}
 	virtual int load(const char *fname)
 	{
-		AVISTREAMINFO FAR psi;
+		close();
 
-		HRESULT hr=AVIStreamOpenFromFile(&pavi,fname,streamtypeVIDEO,0,OF_READ,0);
-		if(hr) return 1;
-		time=AVIStreamLengthTime(pavi);
-		AVIStreamInfo(pavi,&psi,sizeof(AVISTREAMINFO FAR));
-		x=psi.rcFrame.right-psi.rcFrame.left;
-		y=psi.rcFrame.bottom-psi.rcFrame.top;
-		length=psi.dwLength;
-		Frame=AVIStreamGetFrameOpen(pavi,0);
-		BITMAPINFO *pbmi=(BITMAPINFO*)AVIStreamGetFrame(Frame,AVIStreamTimeToSample(pavi,0));
-		bpp=pbmi->bmiHeader.biBitCount;
-		return 0;
-	}
-	virtual int save(char *fname,void *pointer,int bpp,int x,int y,int length=1,int time=0)
-	{ 
-		int err;
-		BITMAPINFOHEADER bmh;
-		memset(&bmh,0,sizeof(BITMAPINFOHEADER));
-		bmh.biSize        = sizeof(BITMAPINFOHEADER);
-		bmh.biWidth       = x;
-		bmh.biHeight      = y;
-		bmh.biPlanes      = 1;
-		bmh.biBitCount    = bpp;
-		bmh.biCompression = BI_RGB;
-		bmh.biSizeImage   = x*y*bpp/8;
-		if(bpp!=32) return -2;
-		PAVISTREAM pcomp=0;
-		PAVIFILE fAVI=0;
-		remove(fname);
-		if(err=AVIFileOpen(&fAVI,fname,OF_CREATE|OF_WRITE,0))
+		VideoFile video;
+		if(!video.open(fname))
 			return 1;
-		AVISTREAMINFO avi;
-		memset(&avi,0,sizeof(AVISTREAMINFO));
-		avi.fccType    = streamtypeVIDEO;
-		avi.fccHandler = mmioFOURCC('D', 'I', 'B', ' ');
-		avi.dwScale    = 1;
-		avi.dwRate     = length*1000/time;
-		avi.dwQuality  = 0;
-		avi.dwLength   = length;
-		if(err=AVIFileCreateStream(fAVI,&pavi,&avi))
-			return 2;
-		AVICOMPRESSOPTIONS compOptions;
-		memset(&compOptions, 0, sizeof(AVICOMPRESSOPTIONS));
-		compOptions.dwFlags         = AVICOMPRESSF_VALID | AVICOMPRESSF_KEYFRAMES;
-		compOptions.fccType         = streamtypeVIDEO;
-		compOptions.fccHandler      = avi.fccHandler;
-		compOptions.dwQuality       = avi.dwQuality;
-		compOptions.dwKeyFrameEvery = 15;
-		if(err=AVIMakeCompressedStream(&pcomp, pavi, &compOptions, 0))
-			return 3;
-		if(err=AVIStreamSetFormat(pcomp,0,&bmh,bmh.biSize))
-			return 4;
-		unsigned char *buf=new unsigned char[bmh.biSizeImage];
-		for(int i=0;i<length;i++)
-		{
-			for(int j=0;j<y;j++)
-				memcpy(&buf[(y-j-1)*bmh.biSizeImage/y],&((LPBYTE)pointer)[i*bmh.biSizeImage+j*bmh.biSizeImage/y],bmh.biSizeImage/y);
-			if(err=AVIStreamWrite(pcomp,i,1,buf,bmh.biSizeImage,AVIIF_KEYFRAME,0,0))
-				return 5;
+
+		x = video.width();
+		y = video.height();
+		bpp = 32;
+		time = round(video.duration() * 1000.f);   // ms, the unit AVIStreamLengthTime gave it in
+
+		const size_t frameBytes = (size_t)x * y * 4;
+		frames_.reserve(frameBytes * video.frameCount());
+
+		while(video.decodeFrame()){
+			const unsigned char* frame = video.frameBGRA();
+			frames_.insert(frames_.end(), frame, frame + frameBytes);
 		}
-		delete buf;
-		if(pcomp) AVIStreamRelease(pcomp); pcomp=0;
-		if(pavi) AVIStreamRelease(pavi); pavi=0;
-		if(fAVI) AVIFileRelease(fAVI); fAVI=0;
-		return 0; 
+
+		// What we decoded, rather than what the container claimed: the atlas is built from
+		// GetLength() frames and then asks for every one of them.
+		length = frames_.size() / frameBytes;
+
+		return length ? 0 : 1;
 	}
 	virtual int GetTexture(void *pointer,int time, int xDst,int yDst)
 	{
 		xassert(time>=0 && time<GetLength());
-		//int sample=AVIStreamTimeToSample(pavi,t%time);
-		BITMAPINFO *pbmi=(BITMAPINFO*)AVIStreamGetFrame(Frame,time/*sample*/);
-		if(pbmi->bmiHeader.biCompression) return 1;
-		int bytesPerPixel = GetBitPerPixel()>>3;
-		cFileImage_GetFrame(pointer,xDst,yDst,((unsigned char*)pbmi->bmiColors),GetX(),GetY(),bytesPerPixel,true);
+
+		const size_t frameBytes = (size_t)GetX() * GetY() * 4;
+		// vInvert is false where VFW needed true: a DIB is stored bottom-up, and the flip
+		// that used to happen here now happens in the decoder, where ffmpeg hands the rows
+		// over with a negative stride and swscale turns them the right way up.
+		cFileImage_GetFrame(pointer,xDst,yDst,&frames_[time*frameBytes],GetX(),GetY(),4,false);
 		return 0;
 	}
-	static void Init()
-	{ 
-		AVIFileInit(); /*opens AVIFile library*/ 
-	}
-	static void Done()
-	{
-		AVIFileExit(); /*closes AVIFile library*/
-	}
 };
-#endif // _WIN32
+
 //////////////////////////////////////////////////////////////////////////////////////////
 // реализация интерфейса cJPGImage
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -805,10 +759,8 @@ cFileImage* cFileImage::Create(const char* fname)
 	string ext = extractFileExt(fname);
 	if(ext == ".tga")
 		return new cTGAImage;
-#if defined(_WIN32)
 	else if(ext == ".avi")
 		return (cFileImage*)new cAVIImage;
-#endif
 #ifdef USE_JPEG
 	else if(ext == ".jpg")
 		return new cJPGImage;
@@ -873,17 +825,15 @@ cFileImage* cFileImage::Create(char const * diffuse_name, char const * self_illu
 
 	return new cCompositeImage(pMainImage,pSelfIlluminationImage,pEmblemImage,pSkinImage,skin_color,emblem_position,emblem_angle);
 }
+// Both were the Video-for-Windows library's AVIFileInit/AVIFileExit and nothing else. ffmpeg
+// needs no such bracket -- each VideoFile opens and closes its own decoders -- so these are
+// left empty rather than removed: gb_VisGeneric brackets its lifetime with them, and that is
+// the hook a future image format would want.
 void cFileImage::InitFileImage()
 {
-#if defined(_WIN32)
-	cAVIImage::Init();
-#endif
 }
 void cFileImage::DoneFileImage()
 {
-#if defined(_WIN32)
-	cAVIImage::Done();
-#endif
 }
 
 ////////////////////// Реализация cAviScaleFileImage ///////////////////////////

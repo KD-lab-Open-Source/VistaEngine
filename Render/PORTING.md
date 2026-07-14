@@ -46,6 +46,7 @@ grep -rn "TODO(sdl-port)" --include=*.cpp --include=*.h .
 | 12 | **Float Z-buffer camera** | `cScene::AddFloatZBufferCamera`, `Camera::ClearFloatZBuffer`, `Camera::DrawToZBuffer` (deleted) | A float depth target for depth-of-field / soft particles. |
 | 13 | **Water depth prepass** | `cWater::DrawToZBuffer` | Feeds #12. |
 | 14 | **Render-target debug viewers** | `Camera::DrawShadowDebug`, `TempDrawShadow` (deleted) | The `Option_ShowRenderTextureDBG` overlays that blit the shadow/reflection/float maps to the corner of the screen. Dev tooling, but genuinely useful — worth restoring early. |
+| 23 | **The KD-lab logo splash** (`cBlobs`) | `UserInterface/Bubles/Blobs.cpp`; `ReelManager::showLogoModal`, now guarded off | The fish swimming under a screen full of metaballs. The *scene* half would run today (`cScene`/`cObject3dx` have an SDL path); the effect half is D3D9 through and through — cells drawn with the `cQuadBuffer` family (#15), composited by `PSBlobsShader` out of the retired shader system, plus a render target, an `IsPS20()` capability check and a `SetVertexShader`, none of which the portable interface has. The loop also `StretchRect`s the back buffer into a texture; the SDL way is to point the camera at a render target. **Latent crash until the video port**: it is reached only through `ActionShowLogoReel`, which `DisableVideo` used to keep from ever firing. |
 
 ## Device capabilities the above need first
 

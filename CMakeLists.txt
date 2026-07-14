@@ -242,6 +242,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(miniaudio)
 
+# ffmpeg — the Bink/AVI decoder behind Video/. Built from source with all but five of its
+# components disabled; see the module for what we keep and why it is not a FetchContent.
+include(FFmpeg)
+
 # Interface target that gives every module common include paths
 add_library(EngineIncludes INTERFACE)
 target_include_directories(EngineIncludes INTERFACE
@@ -330,6 +334,7 @@ add_subdirectory(AI)
 add_subdirectory(Terra)
 add_subdirectory(Physics)
 add_subdirectory(Sound)
+add_subdirectory(Video)
 add_subdirectory(Network)
 add_subdirectory(Units)
 add_subdirectory(Environment)
