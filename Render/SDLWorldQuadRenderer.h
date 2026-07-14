@@ -38,12 +38,13 @@
 // share ONE group list, so they replay in the order the callers made them -- which is what
 // keeps a light column and the sprites of the same cEffect blending in the right order.
 //
-// Scope: two textures per group with the four colour operations, the six blend modes,
-// never any depth write. FLOAT_ZBUFFER -- the soft-particle fade -- is carried on the quad
-// route (SetMaterial's softDepth; see Draw's sceneDepth). Still to come, each a shader
-// variant SetWorldMaterial can select but no caller here needs: TFACTOR, fog of war and
-// the z-reflection clip (the last is dead in the original too -- Camera::SetZTexture has
-// no caller).
+// Scope: two textures per group with the four colour operations, the six blend modes, a
+// colour-write mask, never any depth write. FLOAT_ZBUFFER -- the soft-particle fade -- is
+// carried on the quad route (SetMaterial's softDepth; see Draw's sceneDepth). Still to come,
+// each a shader variant SetWorldMaterial can select but no caller here needs: TFACTOR, the
+// fog-of-war *lerp* (this renderer writes the fog of war into the lightmap, it never reads it
+// back) and the z-reflection clip (the last is dead in the original too -- Camera::SetZTexture
+// has no caller).
 
 #include "IRenderDevice.h"    // cTexture, MatXf
 #include "VertexFormat.h"     // sVertexXYZDT1 (the quad buffer's vertex)
@@ -61,6 +62,18 @@ struct SDL_GPUShader;
 struct SDL_GPUBuffer;
 
 class Camera;
+
+// D3DRS_COLORWRITEENABLE, which two of this renderer's callers set and no one else does.
+// Both of them are drawing into the terrain LIGHTMAP, whose four channels carry two
+// unrelated things: the light sources live in RGB and the fog of war lives in alpha. So
+// each writes only its own half and leaves the other's alone --  FogOfWar::Draw the alpha,
+// CameraPlanarLight::drawLights the RGB. Anything drawn into the view writes all four.
+enum eColorWriteMask
+{
+	COLOR_WRITE_ALL = 0,
+	COLOR_WRITE_RGB,      // D3DCOLORWRITEENABLE_RED|GREEN|BLUE -- the light quads
+	COLOR_WRITE_ALPHA,    // D3DCOLORWRITEENABLE_ALPHA          -- the fog-of-war quad
+};
 
 class SDLWorldQuadRenderer
 {
@@ -114,6 +127,12 @@ public:
 	                 cTexture* texture1 = nullptr, eColorMode colorMode = COLOR_MOD,
 	                 bool selectDiffuse = false, cTexture* zReflection = nullptr,
 	                 bool softDepth = false);
+
+	// D3DRS_COLORWRITEENABLE, which is a render state and not part of the material: the two
+	// callers that use it set it once around a run of groups and restore it after, and that
+	// is how it behaves here too -- it survives SetMaterial, and the groups opened until the
+	// next call carry it. See eColorWriteMask.
+	void SetColorWriteMask(eColorWriteMask mask) { material_.colorWrite = mask; }
 
 	// cQuadBuffer<sVertexXYZDT1>'s contract: BeginDraw opens a group, each Get hands back
 	// four vertices for one quad, EndDraw closes it. A group carries the material
@@ -212,6 +231,7 @@ private:
 		eBlendMode blend;
 		bool depthTest;
 		bool softDepth;             // SetMaterial's softDepth, already gated on the option
+		eColorWriteMask colorWrite;
 		// GROUP_QUAD: quads into vertices_/the shared quad index pattern.
 		// GROUP_TRI:  triangles into indicesTri_ (which indexes verticesTri_).
 		int first, count;
@@ -227,10 +247,11 @@ private:
 	// Start a group in the named stream, taking the material SetMaterial last named and
 	// folding its world matrix into the mvp.
 	void openGroup(GroupKind kind);
-	// The blend mode, the depth test and the vertex layout are baked into an SDL GPU
-	// pipeline, so there is one per (blend, depthTest, wireframe, kind). Built on demand.
+	// The blend mode, the depth test, the colour-write mask and the vertex layout are baked
+	// into an SDL GPU pipeline, so there is one per (blend, depthTest, colorWrite, wireframe,
+	// kind). Built on demand.
 	SDL_GPUGraphicsPipeline* pipelineFor(eBlendMode blend, bool depthTest, bool wireframe,
-	                                     GroupKind kind);
+	                                     GroupKind kind, eColorWriteMask colorWrite);
 	// Grow the GPU quad buffers to hold `quads` quads, and refill the index buffer with the
 	// two-triangle pattern. The index buffer's contents depend only on capacity.
 	bool ensureCapacity(SDL_GPUCommandBuffer* cmd, int quads);

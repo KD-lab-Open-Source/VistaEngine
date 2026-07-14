@@ -122,8 +122,10 @@ private:
 		float shade[4];           // cScene::GetShadowIntensity()
 		float shadowParams[4];    // x = receives shadow, y = 2x2 filter
 		float lightMapParams[4];  // x = the lightmap holds this frame's lights
+		                          // y = the fog of war is on, its coverage in the map's alpha
 		float params[4];          // x = the alpha-test reference (D3DRS_ALPHAREF/255)
 		float fogColor[4];        // D3DRS_FOGCOLOR
+		float fogOfWarColor[4];   // vFogOfWar: the colour unseen ground becomes
 	};
 
 	// One SetState's worth: every draw recorded under it replays with these.

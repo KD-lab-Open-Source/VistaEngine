@@ -350,8 +350,14 @@ void cScene::Draw(Camera* camera)
 //	unsigned int fp=_controlfp(0,0);
 //	_controlfp( _PC_24,  _MCW_PC ); 
 	//PreDraw
-	if(GetFogOfWar()){
-	}
+	// Fog of war on for this scene, off again once it is drawn (below), as the original
+	// drove cD3DRender::SetFogOfWar. GetFogOfWar() is null unless the world asked for one and
+	// nothing has since disabled it (Universe::setShowFogOfWar), so this is also the switch
+	// that the debug key and ActionSetFogOfWar throw. The coverage itself is FogOfWar::Draw's
+	// quad, into the lightmap's alpha; this only carries the colour to lerp toward.
+	if(cSDLRenderDevice* dev = sdlRenderDevice())
+		dev->SetFogOfWar(GetFogOfWar() != 0,
+		                 GetFogOfWar() ? Color4f(GetFogOfWar()->GetFogColor()) : Color4f());
 
 /*
 Если используется вариант удаления через несколько логических квантов, то когда счетчик сбрасывается,
@@ -438,6 +444,10 @@ void cScene::Draw(Camera* camera)
 
 	if(cameraToDebug)
 		cameraToStore.SetCopy(camera);
+	// Off again: anything drawn outside a scene -- the UI, another scene's camera -- reads the
+	// lightmap's alpha as whatever was left in it, and must not be fogged by it.
+	if(cSDLRenderDevice* dev = sdlRenderDevice())
+		dev->SetFogOfWar(false, Color4f());
 	gb_RenderDevice->SetClipRect(0,0,gb_RenderDevice->GetSizeX(),gb_RenderDevice->GetSizeY());
 	circle_shadow.clear();
 }

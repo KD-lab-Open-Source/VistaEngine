@@ -1087,12 +1087,16 @@ struct LightByTexture
 
 void CameraPlanarLight::drawLights()
 {
-	// The colour-write mask D3D set here (RGB, no alpha) is not carried: the lightmap's alpha
-	// is the fog of war, which nothing writes yet, so leaving it alone costs nothing.
 	SDLWorldQuadRenderer* quad = sdlWorldQuadRenderer();
 	if(!quad)
 		return;
 	quad->SetCamera(this);
+
+	// D3DCOLORWRITEENABLE_RED|GREEN|BLUE. The lightmap's alpha is not theirs to write: it
+	// carries the fog of war, which FogOfWar::Draw laid down in the sorted pass just above
+	// (SCENENODE_OBJECTFIRST). Without the mask every light source and circle shadow would
+	// punch a hole of clear visibility through the fog around it.
+	quad->SetColorWriteMask(COLOR_WRITE_RGB);
 
 	int i;
 	int size = scene()->circle_shadow.size();
@@ -1220,6 +1224,8 @@ void CameraPlanarLight::drawLights()
 			}
 		}
 	}
+
+	quad->SetColorWriteMask(COLOR_WRITE_ALL);
 }
 
 

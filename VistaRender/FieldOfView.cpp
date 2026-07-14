@@ -241,11 +241,18 @@ void FieldOfViewMap::PreDraw(Camera* camera)
 
 void FieldOfViewMap::Draw(Camera* camera)
 {
-	// Fog of war, not ported. This is one map-sized quad drawn into the terrain lightmap's
-	// ALPHA channel -- which is why CameraPlanarLight::drawLights masks alpha off, so the
-	// light quads that follow cannot clobber it, and why the terrain shader's FOG_OF_WAR
-	// branch reads lightmap.a. Reproducing it needs a colour-write mask on the quad
-	// pipeline and that branch in tilemap.frag.hlsl; the lightmap itself does not.
+	// TODO(sdl-port): the field-of-view map does not draw. See Render/PORTING.md #10b.
+	//
+	// NOT the fog of war, though it shares the lightmap and the light camera with it. The fog
+	// of war is ported (FogOfWar::Draw, PORTING.md #10) and now OWNS the lightmap's alpha
+	// channel: it writes it alpha-masked, drawLights masks it off, and the terrain and grass
+	// shaders read it as coverage.
+	//
+	// This quad is ALPHA_BLEND with no mask, so it writes colour *and* alpha -- and its alpha
+	// (128 + (color.a*visibility >> 9), see updateTexture) would land in that same channel and
+	// read as fog-of-war coverage. So it cannot simply be copied from FogOfWar::Draw: decide
+	// what its alpha is supposed to mean against the fog of war first. Its updateTexture() is
+	// unwired too (see Environment::graphQuant).
 	//
 	// It attaches only to the planar light camera (ATTRUNKOBJ_IGNORE_NORMALCAMERA keeps it
 	// off the scene camera), so nothing reached it until that camera started drawing.

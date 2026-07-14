@@ -294,7 +294,7 @@ void Environment::graphQuant(float dt, Camera* camera)
 
 	// TODO(sdl-port): two things the original did here are gone with D3D9 --
 	//   the sky cubemap (environmentTime()->Draw()),      PORTING.md #9
-	//   fieldOfViewMap_->updateTexture().                 PORTING.md #10
+	//   fieldOfViewMap_->updateTexture().                 PORTING.md #10b
 	// Everything they drive (the time-of-day colours, the field-of-view map itself) is
 	// portable and still updated every frame.
 

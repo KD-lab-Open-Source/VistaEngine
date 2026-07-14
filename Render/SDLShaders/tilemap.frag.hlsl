@@ -91,6 +91,9 @@ cbuffer Light : register(b0, space3)
     // x != 0: the lightmap holds this frame's light sources. There is no such flag in the
     // original -- LIGHTMAP is a shader define, and the map always exists once the device
     // is up. Here the map may not be created yet, or the pass may not have run.
+    // y != 0: the fog of war is on, and the lightmap's ALPHA holds this frame's coverage
+    // (FogOfWar::Draw's quad). The original's FOG_OF_WAR define, which cScene::Draw selected
+    // by calling cD3DRender::SetFogOfWar; here it is cSDLRenderDevice::fogOfWar().
     float4 LightMapParams;
     // x != 0: this draw's material has a detail texture bound. The original's DETAIL_TEXTURE
     // define, which it recompiles the shader for; Option_DetailTexture (the "detail texture"
@@ -99,6 +102,10 @@ cbuffer Light : register(b0, space3)
     // Distance fog: D3DRS_FOGCOLOR, the colour a fully fogged pixel becomes. The factor
     // itself arrives interpolated, in VSOutput::Fog. See the note in tilemap.vert.hlsl.
     float4 FogColor;
+    // The original's vFogOfWar (psl c3): the colour unseen ground becomes. Nothing to do
+    // with FogColor above -- this is the RTS shroud, and it is FogOfWar's own serialized
+    // fogColor. Only rgb is read; the strength is baked into the coverage the quad wrote.
+    float4 FogOfWarColor;
 };
 
 struct VSOutput
@@ -159,19 +166,23 @@ float4 main(VSOutput input) : SV_Target0
     float3 bumpN = normalize(float3(BumpTexture.Sample(BumpSampler, input.UV).xy, 0.5f));
     float3 light = saturate(-dot(bumpN, LightDirection.xyz)) * LightColor.rgb + LightColor.a;
 
-    // The lightmap, exactly as the original applies it:
+    // The lightmap. Its four channels carry two unrelated things, and both are read here:
+    // RGB is the light sources and circle shadows, ALPHA is the fog of war. The default
+    // below is the neutral of each -- mid-grey adds no light, and alpha 0 is "seen" -- so a
+    // scene whose lightmap was never drawn reads as an unlit, unfogged world rather than
+    // being washed out by +1 or shrouded outright.
+    float4 lightmap = float4(0.5f, 0.5f, 0.5f, 0.0f);
+    if(LightMapParams.x != 0.0f)
+        lightmap = LightMapTexture.Sample(LightMapSampler, input.LightmapUV);
+
+    // The light half, exactly as the original applies it:
     //
     //     lightmap.rgb = 2*(lightmap.rgb - 0.5);
     //     light += lightmap.rgb;
     //
     // A signed offset on the LIGHT term, not on the surface colour -- so its neutral grey
-    // (128) adds nothing, a light source brightens, and a circle shadow darkens. Gated so
-    // that a scene with no lightmap (the map is bound white) is not washed out by +1.
-    if(LightMapParams.x != 0.0f)
-    {
-        float3 lm = LightMapTexture.Sample(LightMapSampler, input.LightmapUV).rgb;
-        light += 2.0f * (lm - 0.5f);
-    }
+    // (128) adds nothing, a light source brightens, and a circle shadow darkens.
+    light += 2.0f * (lightmap.rgb - 0.5f);
 
     float4 ot = ColorTexture.Sample(ColorSampler, input.UV);
     ot.rgb *= light;
@@ -193,9 +204,18 @@ float4 main(VSOutput input) : SV_Target0
         ot.rgb *= ShadeIntensity.rgb * (1.0f - lit) + lit;
     }
 
+    // The fog of war, where the original puts it (`ot.rgb = lerp(ot.rgb, vFogOfWar,
+    // lightmap.a)`, after Shadow): the shroud hides the *finished* ground, shadows and all,
+    // so nothing about the terrain leaks through it. The coverage is the lightmap's alpha,
+    // which FogOfWar::Draw wrote under the planar light camera -- 0 where the tile is seen,
+    // and its own fogColor's alpha where it is not.
+    if(LightMapParams.y != 0.0f)
+        ot.rgb = lerp(ot.rgb, FogOfWarColor.rgb, lightmap.a);
+
     // Distance fog, last -- where D3D9's fixed function applied it: to the finished pixel,
     // after everything that shades it, before the blend. Fog off means Fog == 1, i.e. the
-    // identity, so there is nothing to branch on.
+    // identity, so there is nothing to branch on. It applies over the shroud, not under it:
+    // fogged-out ground is still far away.
     ot.rgb = lerp(FogColor.rgb, ot.rgb, saturate(input.Fog));
 
     // Terrain is opaque base geometry: it clears and writes depth, and nothing

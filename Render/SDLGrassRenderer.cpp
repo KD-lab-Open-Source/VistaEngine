@@ -271,6 +271,13 @@ void SDLGrassRenderer::SetState(const State& state, Camera* camera)
 	c.fs.shadowParams[0] = shadow ? 1.f : 0.f;
 	c.fs.shadowParams[1] = (shadow && Option_filterShadow) ? 1.f : 0.f;
 	c.fs.lightMapParams[0] = lightMap ? 1.f : 0.f;
+	// The fog of war rides the lightmap's alpha, so it needs the map to be there -- the same
+	// test the terrain makes. Grass inside the shroud must go with the ground under it.
+	const bool fogOfWar = dev && dev->fogOfWar() && lightMap;
+	c.fs.lightMapParams[1] = fogOfWar ? 1.f : 0.f;
+	const Color4f fow = dev ? dev->fogOfWarColor() : Color4f();
+	c.fs.fogOfWarColor[0] = fow.r; c.fs.fogOfWarColor[1] = fow.g;
+	c.fs.fogOfWarColor[2] = fow.b; c.fs.fogOfWarColor[3] = fow.a;
 	c.fs.params[0] = ALPHA_REF;
 
 	// Distance fog. Off -> (0,0,0,1), i.e. factor 1, and the shader's lerp is the identity.
