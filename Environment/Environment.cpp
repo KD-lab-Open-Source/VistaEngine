@@ -292,11 +292,10 @@ void Environment::graphQuant(float dt, Camera* camera)
 	else
 		gb_RenderDevice->SetGlobalFog(Color4f(environmentTime()->GetCurFogColor()), Vect2f(-1, -2));
 
-	// TODO(sdl-port): two things the original did here are gone with D3D9 --
-	//   the sky cubemap (environmentTime()->Draw()),      PORTING.md #9
-	//   fieldOfViewMap_->updateTexture().                 PORTING.md #10b
-	// Everything they drive (the time-of-day colours, the field-of-view map itself) is
-	// portable and still updated every frame.
+	// TODO(sdl-port): one thing the original did here is gone with D3D9 --
+	//   the sky cubemap (environmentTime()->Draw()).      PORTING.md #9
+	// Everything it drives (the time-of-day colours) is portable and still updated
+	// every frame.
 
 	// The sky: the sun or the moon, then the cloud models, drawn through the sky camera's
 	// own scene. It opens the frame -- everything below is drawn over it.
@@ -314,6 +313,11 @@ void Environment::graphQuant(float dt, Camera* camera)
 	// The screen flash's per-frame intensity interpolation. Without the bloom effect it
 	// feeds (masked off in PostEffectManager, on D3D9 too) this is bookkeeping only.
 	flash()->setIntensity();
+
+	// The field-of-view map's coverage texture (PORTING.md #10b): decay each cell's visibility
+	// and rewrite the window the planar camera renders, as the original did at the end of
+	// graphQuant. FieldOfViewMap::Draw then lays it into the terrain lightmap's RGB.
+	fieldOfViewMap_->updateTexture();
 }
 
 // The post-effect stack. Monochrome and the under-water effect are ported (they record
