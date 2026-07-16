@@ -10,6 +10,7 @@
 #include "cCamera.h"           // Camera::matViewProj / vp
 #include "Texture.h"           // cTexture (GetDDSurface / frameNumber)
 #include "SDLRenderDevice.h"   // applyCameraViewport
+#include "VisGeneric.h"        // Option_FloatZBufferType (the soft-smoke option)
 
 // World-quad shader bytecode, compiled to this platform's native format at build time;
 // see Render/CMakeLists.txt.
@@ -51,6 +52,7 @@ SDLWorldQuadRenderer::~SDLWorldQuadRenderer()
 	if(whiteTexture_)  SDL_ReleaseGPUTexture(device_, whiteTexture_);
 	if(sampler_)       SDL_ReleaseGPUSampler(device_, sampler_);
 	if(samplerClamp_)  SDL_ReleaseGPUSampler(device_, samplerClamp_);
+	if(samplerDepth_)  SDL_ReleaseGPUSampler(device_, samplerDepth_);
 	if(vsShader_)      SDL_ReleaseGPUShader(device_, vsShader_);
 	if(fsShader_)      SDL_ReleaseGPUShader(device_, fsShader_);
 	if(vsShaderTri_)   SDL_ReleaseGPUShader(device_, vsShaderTri_);
@@ -88,6 +90,16 @@ void SDLWorldQuadRenderer::createSampler()
 	si.address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
 	si.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
 	samplerClamp_ = SDL_CreateGPUSampler(device_, &si);
+
+	// The scene-depth snapshot's: nearest/clamp, as the shadow map is sampled.
+	SDL_GPUSamplerCreateInfo di = {};
+	di.min_filter = SDL_GPU_FILTER_NEAREST;
+	di.mag_filter = SDL_GPU_FILTER_NEAREST;
+	di.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
+	di.address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
+	di.address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
+	di.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
+	samplerDepth_ = SDL_CreateGPUSampler(device_, &di);
 
 	// 1x1 white, for a group whose texture failed to load -- SetWorldMaterial binds its
 	// own pWhiteTexture in the same case.
@@ -139,7 +151,7 @@ bool SDLWorldQuadRenderer::createShaders()
 
 	SDL_GPUShaderCreateInfo fsi = vista::shaderCreateInfo(VISTA_SHADER(worldquad_frag));
 	fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
-	fsi.num_samplers = 1;           // the group's texture
+	fsi.num_samplers = 2;           // the group's texture + the scene-depth snapshot
 	fsi.num_uniform_buffers = 1;    // SelectDiffuse
 	fsShader_ = SDL_CreateGPUShader(device_, &fsi);
 
@@ -277,6 +289,7 @@ void SDLWorldQuadRenderer::BeginFrame()
 	groups_.clear();
 	drawing_ = false;
 	cameraValid_ = false;
+	anySoftDepth_ = false;
 }
 
 void SDLWorldQuadRenderer::SetCamera(Camera* camera)
@@ -284,6 +297,14 @@ void SDLWorldQuadRenderer::SetCamera(Camera* camera)
 	if(!camera) return;
 	camera_ = camera;
 	viewProj_ = camera->matViewProj;
+	// The projection's z-row and w-column constants, with which the fragment shader turns a
+	// hardware depth back into this camera's pre-divide clip z (worldquad.frag.hlsl's
+	// clipZOf). All four, not the textbook two: Camera::Update leaves _44 at 1 even on a
+	// perspective camera.
+	zbParams_[0] = camera->matProj._33;
+	zbParams_[1] = camera->matProj._43;
+	zbParams_[2] = camera->matProj._34;
+	zbParams_[3] = camera->matProj._44;
 	vpX_ = camera->vp.X; vpY_ = camera->vp.Y;
 	vpW_ = camera->vp.Width; vpH_ = camera->vp.Height;
 	vpMinZ_ = camera->vp.MinZ; vpMaxZ_ = camera->vp.MaxZ;
@@ -292,13 +313,17 @@ void SDLWorldQuadRenderer::SetCamera(Camera* camera)
 
 void SDLWorldQuadRenderer::SetMaterial(eBlendMode blend, cTexture* texture, bool depthTest,
                                        const MatXf& world, cTexture* texture1, eColorMode colorMode,
-                                       bool selectDiffuse, cTexture* zReflection)
+                                       bool selectDiffuse, cTexture* zReflection, bool softDepth)
 {
 	material_.texture = sdlTextureOf(texture);
 	material_.texture1 = sdlTextureOf(texture1);
 	material_.textureZ = sdlTextureOf(zReflection);
 	material_.blend = blend;
 	material_.depthTest = depthTest;
+	// The soft-smoke option gate, where cD3DRender::SetWorldMaterial applies it
+	// (`gb_VisGeneric->GetFloatZBufferType() && useZBuffer`). The original's third condition
+	// -- the float map exists -- is Draw's: no scene-depth snapshot, no fade.
+	material_.softDepth = softDepth && Option_FloatZBufferType != 0;
 	materialWorld_ = world;
 
 	// ZREFLECTION: the height clip is on exactly when a height texture was handed in.
@@ -384,6 +409,20 @@ void SDLWorldQuadRenderer::openGroup(GroupKind kind)
 	                       || current_.blend == ALPHA_SUBBLEND;
 	current_.fs.fogParams[0] = contribution ? 1.f : 0.f;
 	current_.fs.fogParams[1] = current_.fs.fogParams[2] = current_.fs.fogParams[3] = 0.f;
+
+	// The soft-depth fade: the camera's projection constants, or the all-zero "off". Baked
+	// per group because each group keeps its own camera's projection -- the quad route only
+	// ever fades under the main camera, but nothing here should assume that.
+	if(current_.softDepth && cameraValid_){
+		current_.fs.zBufferParams[0] = zbParams_[0];
+		current_.fs.zBufferParams[1] = zbParams_[1];
+		current_.fs.zBufferParams[2] = zbParams_[2];
+		current_.fs.zBufferParams[3] = zbParams_[3];
+		anySoftDepth_ = true;
+	}
+	else
+		current_.fs.zBufferParams[0] = current_.fs.zBufferParams[1] =
+		current_.fs.zBufferParams[2] = current_.fs.zBufferParams[3] = 0.f;
 
 	drawing_ = cameraValid_;
 }
@@ -625,7 +664,8 @@ static bool uploadBuffer(SDL_GPUDevice* device, SDL_GPUCommandBuffer* cmd, SDL_G
 }
 
 bool SDLWorldQuadRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, SDL_GPUTexture* depth,
-                                int screenW, int screenH, bool clear, const float clearColor[4],
+                                int screenW, int screenH, SDL_GPUTexture* sceneDepth,
+                                bool clear, const float clearColor[4],
                                 bool clearDepth, bool wireframe)
 {
 	if(!device_ || !cmd || !target || !depth || groups_.empty())
@@ -680,7 +720,11 @@ bool SDLWorldQuadRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 	SDL_GPUTexture* boundTexture1 = nullptr;
 	SDL_GPUTexture* boundTextureZ = nullptr;
 	const VSUniform* boundVS = nullptr;
-	const FSUniform* boundFS = nullptr;
+	// The fragment uniform is tracked by value, not by pointer: a soft-depth group in a pass
+	// with no snapshot pushes a patched COPY of its block (zBufferParams zeroed), and a
+	// pointer into that would alias the next patch.
+	FSUniform boundFS = {};
+	bool fsPushed = false;
 	for(const Group& g : groups_){
 		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(g.blend, g.depthTest, wireframe, g.kind);
 		if(!pipeline) continue;
@@ -701,7 +745,7 @@ bool SDLWorldQuadRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 			// Bindings do not survive a pipeline change.
 			boundTexture = boundTexture1 = boundTextureZ = nullptr;
 			boundVS = nullptr;
-			boundFS = nullptr;
+			fsPushed = false;
 		}
 
 		// Per group: a relative particle emitter folds its GlobalMatrix into the mvp -- and
@@ -733,18 +777,30 @@ bool SDLWorldQuadRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 			}
 		}
 		else if(texture != boundTexture){
-			SDL_GPUTextureSamplerBinding ts = {};
-			ts.texture = texture;
-			ts.sampler = sampler_;
-			SDL_BindGPUFragmentSamplers(pass, 0, &ts, 1);
+			// The quad shader's second sampler is the scene-depth snapshot -- constant for
+			// the whole pass, but bound alongside the texture because bindings move as a
+			// unit. The white stand-in goes in the slot when there is no snapshot; no group
+			// samples it then (their zBufferParams are zeroed below).
+			SDL_GPUTextureSamplerBinding ts[2] = {};
+			ts[0].texture = texture;
+			ts[0].sampler = sampler_;
+			ts[1].texture = sceneDepth ? sceneDepth : whiteTexture_;
+			ts[1].sampler = samplerDepth_;
+			SDL_BindGPUFragmentSamplers(pass, 0, ts, 2);
 			boundTexture = texture;
 		}
 
 		// Both shaders read a fragment uniform from the same slot: COLOR_OPERATION on the
-		// triangle route, SelectDiffuse on the quad one.
-		if(!boundFS || std::memcmp(boundFS, &g.fs, sizeof(g.fs)) != 0){
-			SDL_PushGPUFragmentUniformData(cmd, 0, &g.fs, sizeof(g.fs));
-			boundFS = &g.fs;
+		// triangle route, SelectDiffuse on the quad one. A soft-depth group recorded for a
+		// pass that has no snapshot to sample -- an offscreen target -- draws with the fade
+		// off, exactly as the original drew when the float map did not exist.
+		FSUniform fs = g.fs;
+		if(!sceneDepth)
+			fs.zBufferParams[0] = fs.zBufferParams[1] = fs.zBufferParams[2] = fs.zBufferParams[3] = 0.f;
+		if(!fsPushed || std::memcmp(&boundFS, &fs, sizeof(fs)) != 0){
+			SDL_PushGPUFragmentUniformData(cmd, 0, &fs, sizeof(fs));
+			boundFS = fs;
+			fsPushed = true;
 		}
 
 		if(g.kind == GROUP_TRI)
@@ -759,6 +815,7 @@ bool SDLWorldQuadRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 	verticesTri_.clear();
 	indicesTri_.clear();
 	groups_.clear();
+	anySoftDepth_ = false;
 	return true;
 }
 

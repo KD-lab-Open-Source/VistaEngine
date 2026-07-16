@@ -309,11 +309,13 @@ void cCoastSprites::DrawSimpleCoastSprite(Camera* camera)
 	// SetWorldMaterial selects vsStandart/psStandart with Texture_stay on stage 0; the
 	// renderer's pipeline is that shader pair, so naming the texture is all that is left
 	// of it. It answers to the quad buffer's BeginDraw/Get/EndDraw, so the loop below is
-	// the same code on both backends.
+	// the same code on both backends. The original passes useZBuffer=true here -- the foam
+	// fades out where it meets the shore geometry -- so softDepth carries it.
 	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
 	if(!pBuf)
 		return;
-	pBuf->SetMaterial(ALPHA_BLEND, Texture_stay);
+	pBuf->SetMaterial(ALPHA_BLEND, Texture_stay, true, MatXf::ID,
+	                  nullptr, COLOR_MOD, false, nullptr, true);
 	bool avi_texture = Texture_stay&&Texture_stay->IsAviScaleTexture();
 	int grid_shift = pWater->GetCoordShift();
 	int phase_step = round(dt*simple_scale_time*INT_SIZE);
@@ -367,7 +369,9 @@ void cCoastSprites::DrawMovingCoastSprite(Camera* camera)
 	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
 	if(!pBuf)
 		return;
-	pBuf->SetMaterial(ALPHA_BLEND, Texture_mov);
+	// useZBuffer=true in the original, as in DrawSimpleCoastSprite above.
+	pBuf->SetMaterial(ALPHA_BLEND, Texture_mov, true, MatXf::ID,
+	                  nullptr, COLOR_MOD, false, nullptr, true);
 	bool avi_texture = Texture_mov&&Texture_mov->IsAviScaleTexture();
 	pBuf->BeginDraw();
 	int grid_shift = pWater->GetCoordShift();

@@ -549,6 +549,20 @@ private:
 	bool captureArmed_ = false;
 	bool ensureCapture(int w, int h);
 
+	// The scene-depth snapshot for the world quads' soft-depth fade -- the modern stand-in
+	// for the float Z-buffer camera (Render/PORTING.md #12). D3D9 could not sample its own
+	// depth buffer, so the original re-rendered the scene's depth into a float colour
+	// texture through a child camera; SDL GPU samples depth directly, so this is a plain
+	// copy of depthTexture_ instead -- no second scene walk, no depth-output shader
+	// variants. Taken by drawWorldQuads at most once per frame, at the opaque->transparent
+	// boundary: everything that writes depth (terrain, objects, grass) has drawn by the
+	// time the first soft consumer (the coast sprites, then the particles) asks for it, and
+	// nothing writes depth after. A frame with no soft group recorded never takes one.
+	SDL_GPUTexture* sceneDepthCopy_ = nullptr;
+	int sceneDepthCopyW_ = 0, sceneDepthCopyH_ = 0;
+	bool sceneDepthValid_ = false;   // the copy holds THIS frame's opaque scene depth
+	SDL_GPUTexture* snapshotSceneDepth();
+
 	// The shadow map, held as a cTexture so Camera::SetRenderTarget can take it and the
 	// scene can ask its size. Its SDL depth texture lives in textures_ like any other,
 	// and resolveTarget turns it into a depth-only RenderTarget.

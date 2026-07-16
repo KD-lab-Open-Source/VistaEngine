@@ -39,9 +39,11 @@
 // keeps a light column and the sprites of the same cEffect blending in the right order.
 //
 // Scope: two textures per group with the four colour operations, the six blend modes,
-// never any depth write. Still to come, each a shader variant SetWorldMaterial can select
-// but no caller here needs: TFACTOR, fog of war, fog, FLOAT_ZBUFFER and the z-reflection
-// clip (the last is dead in the original too -- Camera::SetZTexture has no caller).
+// never any depth write. FLOAT_ZBUFFER -- the soft-particle fade -- is carried on the quad
+// route (SetMaterial's softDepth; see Draw's sceneDepth). Still to come, each a shader
+// variant SetWorldMaterial can select but no caller here needs: TFACTOR, fog of war and
+// the z-reflection clip (the last is dead in the original too -- Camera::SetZTexture has
+// no caller).
 
 #include "IRenderDevice.h"    // cTexture, MatXf
 #include "VertexFormat.h"     // sVertexXYZDT1 (the quad buffer's vertex)
@@ -101,10 +103,17 @@ public:
 	// only ever one caller and one texture: FieldDispatcher::Draw, passing the water's A8L8
 	// height map. The fragment shader clips the dome away wherever it has sunk below the
 	// ground. Triangle route only.
+	//
+	// `softDepth` is cD3DRender::SetWorldMaterial's `useZBuffer` flag -- the FLOAT_ZBUFFER
+	// soft-particle fade (the particle emitters' softSmoke key, and always on for the coast
+	// sprites). Honoured, as there, only while the soft-smoke option is on
+	// (Option_FloatZBufferType != 0), and only where Draw has a scene-depth snapshot to
+	// sample (the frame's own target). Quad route only, matching the original's callers.
 	void SetMaterial(eBlendMode blend, cTexture* texture, bool depthTest = true,
 	                 const MatXf& world = MatXf::ID,
 	                 cTexture* texture1 = nullptr, eColorMode colorMode = COLOR_MOD,
-	                 bool selectDiffuse = false, cTexture* zReflection = nullptr);
+	                 bool selectDiffuse = false, cTexture* zReflection = nullptr,
+	                 bool softDepth = false);
 
 	// cQuadBuffer<sVertexXYZDT1>'s contract: BeginDraw opens a group, each Get hands back
 	// four vertices for one quad, EndDraw closes it. A group carries the material
@@ -135,14 +144,23 @@ public:
 	void DrawIndexedPrimitive(const sPolygon* indices, int nPolygon);
 
 	bool hasDraws() const { return !groups_.empty(); }
+	// A group recorded since the last Draw asked for the soft-depth fade: the device takes
+	// (or reuses) its scene-depth snapshot for the pass exactly when this is set.
+	bool wantsSceneDepth() const { return anySoftDepth_; }
 
 	// Replay the quads recorded so far into one colour+depth render pass, blended over the
 	// scene and writing no depth (ALPHA_BLEND with RS_ZWRITEENABLE off, as every caller's
 	// scene node sets). `clear`/`clearDepth` mean this pass owns the frame's colour/depth
 	// clear -- true only when no earlier pass took it. Clears the recorded quads, so a
 	// later caller in the same frame replays only its own. Returns true if the pass ran.
+	//
+	// `sceneDepth` is the frame's scene-depth snapshot for the soft-depth groups
+	// (cSDLRenderDevice::snapshotSceneDepth), or null when there is none -- an offscreen
+	// target, or no soft group recorded -- in which case those groups draw with the fade
+	// disabled (their ZBufferParams are pushed as zero).
 	bool Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, SDL_GPUTexture* depth,
-	          int screenW, int screenH, bool clear, const float clearColor[4],
+	          int screenW, int screenH, SDL_GPUTexture* sceneDepth,
+	          bool clear, const float clearColor[4],
 	          bool clearDepth, bool wireframe);
 
 private:
@@ -171,9 +189,13 @@ private:
 	//        distant particle would glow. This is the original's FIX_FOG_ADD_BLEND -- see
 	//        the note in SDLWorldQuadRenderer.cpp's openGroup.
 	// Likewise: worldquad.frag.hlsl declares the head (colorOp -- which it reads as
-	// SelectDiffuse -- fogColor, fogParams), worldtri.frag.hlsl declares all of it.
-	// zReflection.x != 0 turns the height clip on.
-	struct FSUniform { float colorOp[4]; float fogColor[4]; float fogParams[4]; float zReflection[4]; };
+	// SelectDiffuse -- fogColor, fogParams, zBufferParams), worldtri.frag.hlsl declares all
+	// of it. zBufferParams is the soft-depth fade's projection constants (matProj._33, _43,
+	// _34, _44 of the group's camera; all zero = the fade is off), which turn a hardware
+	// depth value back into the pre-divide clip z the original's float map stored -- see
+	// worldquad.frag.hlsl. zReflection.x != 0 turns the height clip on.
+	struct FSUniform { float colorOp[4]; float fogColor[4]; float fogParams[4];
+	                   float zBufferParams[4]; float zReflection[4]; };
 
 	// Which stream a group's geometry lives in, and so which shader, vertex layout and
 	// buffers replay it. They share one group list, so the two interleave in call order.
@@ -189,6 +211,7 @@ private:
 		SDL_GPUTexture* textureZ;   // the ZREFLECTION height map (GROUP_TRI only)
 		eBlendMode blend;
 		bool depthTest;
+		bool softDepth;             // SetMaterial's softDepth, already gated on the option
 		// GROUP_QUAD: quads into vertices_/the shared quad index pattern.
 		// GROUP_TRI:  triangles into indicesTri_ (which indexes verticesTri_).
 		int first, count;
@@ -234,6 +257,10 @@ private:
 	// sampler_clamp_linear, which FieldDispatcher::Draw sets on the ZREFLECTION stage: the
 	// lookup spans the whole map, so wrapping it would clip the dome against the far edge.
 	SDL_GPUSampler* samplerClamp_ = nullptr;
+	// For the scene-depth snapshot: nearest/clamp, like the shadow map's -- linear-filtering
+	// a depth texture is not guaranteed on Vulkan, and averaging depths across an edge would
+	// invent values from neither surface anyway.
+	SDL_GPUSampler* samplerDepth_ = nullptr;
 	SDL_GPUTexture* whiteTexture_ = nullptr;   // bound for an untextured group
 
 	// The quads accumulate on the CPU and upload once, at Draw. Grown, never shrunk:
@@ -266,9 +293,13 @@ private:
 
 	Camera* camera_ = nullptr;   // from SetCamera; the fog plane is built against its view matrix
 	Mat4f viewProj_;             // the camera's, from SetCamera; each group's mvp is world * this
+	// The camera's projection constants for the soft-depth fade (FSUniform::zBufferParams),
+	// snapshotted with the rest because the groups replay after the walk has moved on.
+	float zbParams_[4] = {0.f, 0.f, 0.f, 0.f};
 	int vpX_ = 0, vpY_ = 0, vpW_ = 0, vpH_ = 0;
 	float vpMinZ_ = 0.f, vpMaxZ_ = 1.f;
 	bool cameraValid_ = false;   // SetCamera has run for the group being recorded
+	bool anySoftDepth_ = false;  // a group since the last Draw baked nonzero zBufferParams
 };
 
 #endif // VISTA_SDL_WORLD_QUAD_RENDERER_H
