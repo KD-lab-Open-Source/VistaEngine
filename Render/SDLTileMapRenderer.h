@@ -22,10 +22,13 @@
 // material (the original's per-tile `index[material]` lists, hoisted to the whole map),
 // and Draw walks the runs, rebinding the detail texture between them.
 //
-// Scope: the heightfield surface with its baked per-cell colour, one directional light and
-// the per-material detail grain, receiving the scene's shadow map and casting into it. The
-// original's remaining layers -- bump, fog of war, fog -- the placement-zone (lava/ice)
-// materials, and the real tile/LOD streaming are still to come.
+// Scope: the heightfield surface with its baked per-cell colour, lit per pixel from the
+// baked slope (bump) map as the original's default path does, with one directional light
+// and the per-material detail grain, receiving the scene's shadow map and casting into it,
+// and following terramorphing: the dirty-tile flags cTileMap raises for vMap's update rects
+// are consumed each frame and the touched mesh rows / colour+bump texels re-uploaded. The
+// original's remaining layer -- fog of war -- the placement-zone (lava/ice) materials, and
+// the real tile/LOD streaming are still to come.
 
 #include <string>
 #include <vector>
@@ -88,7 +91,21 @@ private:
 	bool ensureMesh(SDL_GPUCommandBuffer* cmd);
 	bool buildMesh(SDL_GPUCommandBuffer* cmd);
 	bool buildColorTexture(SDL_GPUCommandBuffer* cmd, int H, int V);
+	// The per-fine-cell slope (bump) map the fragment shader lights from; shares the
+	// colour texture's dims and step. Bakes the texel rect [px0,py0]..(+w,+h).
+	bool buildBumpTexture(SDL_GPUCommandBuffer* cmd);
+	void bakeBumpRect(signed char* out, int px0, int py0, int w, int h) const;
 	void releaseMesh();
+	// One grid vertex from vMap: world position + normal, as buildMesh samples them.
+	void computeVertex(Vertex& v, int gx, int gy) const;
+	// quadMat_ -> index buffer grouped into one contiguous run per material (fills runs_).
+	void buildIndexData(std::vector<unsigned short>& idx);
+	// Terramorphing: consume the ATTRTILE_UPDATE_* flags cTileMap::BuildRegionPoint raised
+	// for vMap's update rects, recompute the covered mesh rows and colour texels in the CPU
+	// mirrors and upload just those; rebuild the index runs if a cell's material repainted.
+	void applyMapUpdates(SDL_GPUCommandBuffer* cmd, cTileMap* tileMap);
+	// Drop flags already satisfied by a fresh build (the constructor's full-map updateMap).
+	void clearTileUpdateFlags(cTileMap* tileMap);
 
 	SDL_GPUDevice* device_ = nullptr;
 	SDL_Window*    window_ = nullptr;
@@ -114,6 +131,15 @@ private:
 	int             indexCount_   = 0;
 	std::vector<MaterialRun> runs_;            // the index buffer, grouped by material
 	SDL_GPUTexture* colorTexture_ = nullptr;   // baked per-cell surface colour (vMap.clrBuf)
+	SDL_GPUTexture* bumpTexture_  = nullptr;   // baked per-cell slopes (the original's V8U8)
+
+	// CPU mirrors of the GPU mesh, kept so terramorphing can patch sub-rects in place.
+	std::vector<Vertex>        verts_;
+	std::vector<unsigned char> quadMat_;   // 2 per grid quad: each triangle's material
+	int gw_ = 0, gh_ = 0;                  // grid vertices per axis
+	int nx_ = 0, ny_ = 0;                  // grid quads per axis
+	int step_ = 0;                         // fine cells per grid cell
+	int texW_ = 0, texH_ = 0, texStep_ = 0;   // colour texture dims + its bake step
 	SDL_GPUTexture* whiteTexture_ = nullptr;   // 1x1, substituted in wireframe mode
 	// Mid-grey 1x1, bound as the detail texture when a material has none: the shader adds
 	// `detail - 0.5`, so 128,128,128 contributes exactly nothing. (The DetailParams gate
