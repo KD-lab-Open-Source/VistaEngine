@@ -58,6 +58,14 @@ cTexture* materialDetailTexture(cTileMap* tileMap, int material)
 	return tileMap->miniDetailTexture(material).texture;
 }
 
+// The material vMap's MultiRegion paints a fine cell with. filled() is 1-based; 0 (unpainted)
+// and out-of-range both fall back to material 0, as the D3D tilemap's `filled - 1` did.
+int regionMaterialAt(MultiRegion& region, int x, int y)
+{
+	const int m = (int)region.filled(x, y) - 1;
+	return (m >= 0 && m < cTileMap::multiRegionLayersNumber) ? m : 0;
+}
+
 } // namespace
 
 SDLTileMapRenderer::SDLTileMapRenderer(SDL_GPUDevice* device, SDL_Window* window)
@@ -90,6 +98,10 @@ void SDLTileMapRenderer::releaseMesh()
 	if(colorTexture_){ SDL_ReleaseGPUTexture(device_, colorTexture_); colorTexture_ = nullptr; }
 	indexCount_ = 0;
 	runs_.clear();
+	verts_.clear();
+	quadMat_.clear();
+	gw_ = gh_ = nx_ = ny_ = step_ = 0;
+	texW_ = texH_ = texStep_ = 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -314,6 +326,10 @@ bool SDLTileMapRenderer::buildColorTexture(SDL_GPUCommandBuffer* cmd, int H, int
 		pixels[0] = 56; pixels[1] = 102; pixels[2] = 140; pixels[3] = 255;  // B,G,R,A
 	}
 
+	// Remembered so applyMapUpdates can map a dirty rect of fine cells onto texels.
+	// texStep_ == 0 marks the fallback texture, which has no cells to re-bake.
+	texW_ = tw; texH_ = th; texStep_ = baked ? step : 0;
+
 	SDL_GPUTextureCreateInfo ti = {};
 	ti.type = SDL_GPU_TEXTURETYPE_2D;
 	ti.format = SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM;
@@ -344,6 +360,55 @@ bool SDLTileMapRenderer::buildColorTexture(SDL_GPUCommandBuffer* cmd, int H, int
 	return true;
 }
 
+// One grid vertex, sampled from vMap.
+//
+// The vMap<->world frame: vMap is H_SIZE x V_SIZE fine cells, world XY == fine
+// cell, and the world Z of the surface is getZf(x,y) = getAlt/vx_fraction. This is
+// NOT the D3D tilemap's round(getZ*64) fixed point (which its world matrix undoes);
+// getZf gives world units that line up with the camera directly.
+void SDLTileMapRenderer::computeVertex(Vertex& v, int gx, int gy) const
+{
+	int x = gx * step_; if(x > (int)vMap.H_SIZE - 1) x = (int)vMap.H_SIZE - 1;
+	int y = gy * step_; if(y > (int)vMap.V_SIZE - 1) y = (int)vMap.V_SIZE - 1;
+	v.x = (float)x; v.y = (float)y; v.z = vMap.getZf(x, y);
+	Vect3f nrm; vMap.getNormal(x, y, nrm);
+	v.nx = nrm.x; v.ny = nrm.y; v.nz = nrm.z;
+}
+
+// quadMat_ -> the index buffer, grouped into one contiguous run per material: the
+// buckets concatenate in material order and each becomes a MaterialRun that Draw
+// issues with that material's detail texture bound. Rebuilt whole when terramorphing
+// repaints a cell's material -- every triangle appears exactly once whatever its
+// bucket, so the buffer's size never changes.
+void SDLTileMapRenderer::buildIndexData(std::vector<unsigned short>& idx)
+{
+	runs_.clear();
+	std::vector<std::vector<unsigned short> > buckets(cTileMap::multiRegionLayersNumber);
+	for(int gy = 0; gy < ny_; ++gy)
+		for(int gx = 0; gx < nx_; ++gx){
+			unsigned short a = (unsigned short)(gy * gw_ + gx), b = (unsigned short)(a + 1);
+			unsigned short c = (unsigned short)(a + gw_),       d = (unsigned short)(c + 1);
+			// a=(x0,y0) b=(x1,y0) c=(x0,y1) d=(x1,y1). Winding is irrelevant (cull NONE).
+			std::vector<unsigned short>& bk0 = buckets[quadMat_[2 * ((size_t)gy * nx_ + gx)]];
+			bk0.push_back(a); bk0.push_back(c); bk0.push_back(b);
+			std::vector<unsigned short>& bk1 = buckets[quadMat_[2 * ((size_t)gy * nx_ + gx) + 1]];
+			bk1.push_back(b); bk1.push_back(c); bk1.push_back(d);
+		}
+
+	idx.clear();
+	idx.reserve((size_t)nx_ * ny_ * 6);
+	for(int m = 0; m < (int)buckets.size(); ++m){
+		if(buckets[m].empty())
+			continue;
+		MaterialRun run;
+		run.material = m;
+		run.first = (int)idx.size();
+		run.count = (int)buckets[m].size();
+		runs_.push_back(run);
+		idx.insert(idx.end(), buckets[m].begin(), buckets[m].end());
+	}
+}
+
 bool SDLTileMapRenderer::buildMesh(SDL_GPUCommandBuffer* cmd)
 {
 	const int H = (int)vMap.H_SIZE;
@@ -356,73 +421,41 @@ bool SDLTileMapRenderer::buildMesh(SDL_GPUCommandBuffer* cmd)
 	while(((H / step) + 1) * ((V / step) + 1) >= 65536)
 		step *= 2;
 
-	const int nx = H / step, ny = V / step;   // grid quads per axis
-	const int gw = nx + 1,   gh = ny + 1;     // vertices per axis
-	const int vcount = gw * gh;
-	const int tcount = nx * ny * 2;           // triangles
+	step_ = step;
+	nx_ = H / step; ny_ = V / step;   // grid quads per axis
+	gw_ = nx_ + 1;  gh_ = ny_ + 1;    // vertices per axis
+	const int vcount = gw_ * gh_;
+	const int tcount = nx_ * ny_ * 2;   // triangles
 
-	// The vMap<->world frame: vMap is H_SIZE x V_SIZE fine cells, world XY == fine
-	// cell, and the world Z of the surface is getZf(x,y) = getAlt/vx_fraction. This is
-	// NOT the D3D tilemap's round(getZ*64) fixed point (which its world matrix undoes);
-	// getZf gives world units that line up with the camera directly.
-	std::vector<Vertex> verts((size_t)vcount);
-	for(int gy = 0; gy < gh; ++gy){
-		int y = gy * step; if(y > V - 1) y = V - 1;
-		for(int gx = 0; gx < gw; ++gx){
-			int x = gx * step; if(x > H - 1) x = H - 1;
-			Vertex& v = verts[(size_t)gy * gw + gx];
-			v.x = (float)x; v.y = (float)y; v.z = vMap.getZf(x, y);
-			Vect3f nrm; vMap.getNormal(x, y, nrm);
-			v.nx = nrm.x; v.ny = nrm.y; v.nz = nrm.z;
-		}
-	}
+	verts_.resize((size_t)vcount);
+	for(int gy = 0; gy < gh_; ++gy)
+		for(int gx = 0; gx < gw_; ++gx)
+			computeVertex(verts_[(size_t)gy * gw_ + gx], gx, gy);
 
 	// vMap's MultiRegion paints every fine cell with one of cTileMap's materials, and the
 	// D3D tilemap reads it per triangle -- `region.filled(centroid) - 1` -- to bucket that
-	// triangle into a per-material index list. Do the same, once for the whole map: the
-	// buckets concatenate into one index buffer, and each becomes a MaterialRun that Draw
-	// issues with that material's detail texture bound.
+	// triangle into a per-material index list. Do the same, once for the whole map, into
+	// quadMat_ (kept: applyMapUpdates diffs against it when the region repaints).
 	//
 	// Our triangles span `step` fine cells where the original's span one, so a triangle
 	// straddling a material border takes the material under its centre and the border lands
 	// on the mesh grid rather than the region's true edge. Invisible in practice: the
 	// detail tile is grain, and the surface colour that carries the border is a texture.
 	MultiRegion& region = vMap.region();
-	auto materialAt = [&region](int x, int y) -> int {
-		const int m = (int)region.filled(x, y) - 1;   // filled() is 1-based; 0 == unpainted
-		return (m >= 0 && m < cTileMap::multiRegionLayersNumber) ? m : 0;
-	};
-
-	std::vector<std::vector<unsigned short> > buckets(cTileMap::multiRegionLayersNumber);
-	for(int gy = 0; gy < ny; ++gy)
-		for(int gx = 0; gx < nx; ++gx){
+	quadMat_.assign((size_t)nx_ * ny_ * 2, 0);
+	for(int gy = 0; gy < ny_; ++gy)
+		for(int gx = 0; gx < nx_; ++gx){
 			const int x0 = gx * step,       y0 = gy * step;
 			const int x1 = (gx + 1) * step > H - 1 ? H - 1 : (gx + 1) * step;
 			const int y1 = (gy + 1) * step > V - 1 ? V - 1 : (gy + 1) * step;
-
-			unsigned short a = (unsigned short)(gy * gw + gx), b = (unsigned short)(a + 1);
-			unsigned short c = (unsigned short)(a + gw),       d = (unsigned short)(c + 1);
-			// a=(x0,y0) b=(x1,y0) c=(x0,y1) d=(x1,y1). Winding is irrelevant (cull NONE).
-			std::vector<unsigned short>& bk0 = buckets[materialAt((x0 + x0 + x1) / 3, (y0 + y1 + y0) / 3)];
-			bk0.push_back(a); bk0.push_back(c); bk0.push_back(b);
-			std::vector<unsigned short>& bk1 = buckets[materialAt((x1 + x0 + x1) / 3, (y0 + y1 + y1) / 3)];
-			bk1.push_back(b); bk1.push_back(c); bk1.push_back(d);
+			quadMat_[2 * ((size_t)gy * nx_ + gx)]     = (unsigned char)regionMaterialAt(region, (x0 + x0 + x1) / 3, (y0 + y1 + y0) / 3);
+			quadMat_[2 * ((size_t)gy * nx_ + gx) + 1] = (unsigned char)regionMaterialAt(region, (x1 + x0 + x1) / 3, (y0 + y1 + y1) / 3);
 		}
 
 	std::vector<unsigned short> idx;
-	idx.reserve((size_t)tcount * 3);
-	for(int m = 0; m < (int)buckets.size(); ++m){
-		if(buckets[m].empty())
-			continue;
-		MaterialRun run;
-		run.material = m;
-		run.first = (int)idx.size();
-		run.count = (int)buckets[m].size();
-		runs_.push_back(run);
-		idx.insert(idx.end(), buckets[m].begin(), buckets[m].end());
-	}
+	buildIndexData(idx);
 
-	const Uint32 vbytes = (Uint32)(verts.size() * sizeof(Vertex));
+	const Uint32 vbytes = (Uint32)(verts_.size() * sizeof(Vertex));
 	const Uint32 ibytes = (Uint32)(idx.size() * sizeof(unsigned short));
 
 	SDL_GPUBufferCreateInfo vbi = {};
@@ -442,7 +475,7 @@ bool SDLTileMapRenderer::buildMesh(SDL_GPUCommandBuffer* cmd)
 	if(!tb){ releaseMesh(); return false; }
 
 	unsigned char* map = (unsigned char*)SDL_MapGPUTransferBuffer(device_, tb, false);
-	SDL_memcpy(map, verts.data(), vbytes);
+	SDL_memcpy(map, verts_.data(), vbytes);
 	SDL_memcpy(map + vbytes, idx.data(), ibytes);
 	SDL_UnmapGPUTransferBuffer(device_, tb);
 
@@ -488,8 +521,185 @@ bool SDLTileMapRenderer::ensureMesh(SDL_GPUCommandBuffer* cmd)
 			return false;
 		}
 		builtWorld_ = world;
+		// The build has just read vMap as it stands; the flags raised for the initial
+		// full-map updateMap (cTileMap's constructor) are already satisfied by it.
+		clearTileUpdateFlags(tileMap);
 	}
+	else
+		// Terramorphing: fold vMap's runtime edits into the mesh. First caller of the
+		// frame (the light camera, when shadows are on) consumes the flags; safe here
+		// because both callers run before opening their render pass.
+		applyMapUpdates(cmd, tileMap);
 	return true;
+}
+
+// Drop every tile's pending update flags. Used right after a fresh build: the mesh was
+// sampled from current vMap data, so anything flagged before this point is already in it.
+void SDLTileMapRenderer::clearTileUpdateFlags(cTileMap* tileMap)
+{
+	if(!tileMap)
+		return;
+	for(int j = 0; j < tileMap->tileNumber().y; ++j)
+		for(int i = 0; i < tileMap->tileNumber().x; ++i)
+			tileMap->GetTile(i, j).clearAttribute(ATTRTILE_UPDATE_VERTEX | ATTRTILE_UPDATE_TEXTURE);
+}
+
+// Terramorphing. vMap reports every runtime edit (zero layer spread, explosions, unit
+// tracks) through cTileMap::updateMap, and BuildRegionPoint converts the rects into
+// per-tile ATTRTILE_UPDATE_VERTEX / ATTRTILE_UPDATE_TEXTURE flags each PreDraw. The D3D
+// tilemap consumed them per tile (CalcVertex / CalcTexture); our mesh spans the whole
+// map, so the dirty tiles union into one rect whose vertices are recomputed in the CPU
+// mirror and re-uploaded as a contiguous row span, and whose span of the colour texture
+// is re-baked from vMap.clrBuf. If the repaint moved a material border (the region map
+// changed), the index buffer's material runs are rebuilt too.
+void SDLTileMapRenderer::applyMapUpdates(SDL_GPUCommandBuffer* cmd, cTileMap* tileMap)
+{
+	if(!tileMap || verts_.empty() || !vertexBuffer_)
+		return;
+
+	// Union the dirty tiles into one rect per flag, in fine cells (inclusive).
+	bool vertexDirty = false, textureDirty = false;
+	int vx0 = 0, vy0 = 0, vx1 = 0, vy1 = 0;
+	int tx0 = 0, ty0 = 0, tx1 = 0, ty1 = 0;
+	const Vect2i tileN = tileMap->tileNumber(), tileS = tileMap->tileSize();
+	for(int j = 0; j < tileN.y; ++j)
+		for(int i = 0; i < tileN.x; ++i){
+			sTile& tile = tileMap->GetTile(i, j);
+			if(tile.getAttribute(ATTRTILE_UPDATE_VERTEX)){
+				tile.clearAttribute(ATTRTILE_UPDATE_VERTEX);
+				const int x0 = i*tileS.x, y0 = j*tileS.y;
+				const int x1 = x0 + tileS.x - 1, y1 = y0 + tileS.y - 1;
+				if(!vertexDirty){ vx0 = x0; vy0 = y0; vx1 = x1; vy1 = y1; vertexDirty = true; }
+				else{
+					if(x0 < vx0) vx0 = x0;  if(y0 < vy0) vy0 = y0;
+					if(x1 > vx1) vx1 = x1;  if(y1 > vy1) vy1 = y1;
+				}
+			}
+			if(tile.getAttribute(ATTRTILE_UPDATE_TEXTURE)){
+				tile.clearAttribute(ATTRTILE_UPDATE_TEXTURE);
+				const int x0 = i*tileS.x, y0 = j*tileS.y;
+				const int x1 = x0 + tileS.x - 1, y1 = y0 + tileS.y - 1;
+				if(!textureDirty){ tx0 = x0; ty0 = y0; tx1 = x1; ty1 = y1; textureDirty = true; }
+				else{
+					if(x0 < tx0) tx0 = x0;  if(y0 < ty0) ty0 = y0;
+					if(x1 > tx1) tx1 = x1;  if(y1 > ty1) ty1 = y1;
+				}
+			}
+		}
+	if(!vertexDirty && !textureDirty)
+		return;
+
+	if(vertexDirty){
+		// One grid cell of padding on each side: a vertex's normal reads its +step
+		// neighbour, so verts just outside the rect see the changed heights too.
+		auto gridClamp = [](int v, int hi){ return v < 0 ? 0 : (v > hi ? hi : v); };
+		const int gx0 = gridClamp(vx0 / step_ - 1, gw_ - 1), gx1 = gridClamp(vx1 / step_ + 1, gw_ - 1);
+		const int gy0 = gridClamp(vy0 / step_ - 1, gh_ - 1), gy1 = gridClamp(vy1 / step_ + 1, gh_ - 1);
+		for(int gy = gy0; gy <= gy1; ++gy)
+			for(int gx = gx0; gx <= gx1; ++gx)
+				computeVertex(verts_[(size_t)gy * gw_ + gx], gx, gy);
+
+		// Whole rows gy0..gy1: contiguous in the buffer, so one upload covers the rect.
+		// cycle=false -- a partial write must land in the live buffer, not a fresh one.
+		const Uint32 off   = (Uint32)((size_t)gy0 * gw_ * sizeof(Vertex));
+		const Uint32 bytes = (Uint32)((size_t)(gy1 - gy0 + 1) * gw_ * sizeof(Vertex));
+		SDL_GPUTransferBufferCreateInfo tbi = {};
+		tbi.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+		tbi.size = bytes;
+		if(SDL_GPUTransferBuffer* tb = SDL_CreateGPUTransferBuffer(device_, &tbi)){
+			void* map = SDL_MapGPUTransferBuffer(device_, tb, false);
+			SDL_memcpy(map, verts_.data() + (size_t)gy0 * gw_, bytes);
+			SDL_UnmapGPUTransferBuffer(device_, tb);
+
+			SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(cmd);
+			SDL_GPUTransferBufferLocation src = {}; src.transfer_buffer = tb; src.offset = 0;
+			SDL_GPUBufferRegion dst = {}; dst.buffer = vertexBuffer_; dst.offset = off; dst.size = bytes;
+			SDL_UploadToGPUBuffer(copy, &src, &dst, false);
+			SDL_EndGPUCopyPass(copy);
+			SDL_ReleaseGPUTransferBuffer(device_, tb);
+		}
+
+		// Did the repaint move a material border? The zero layer's spread does: it paints
+		// its cells with the player's zeroplast material. Diff against quadMat_ and rebuild
+		// the runs only then -- pure height changes never pay for it. Locked, as the
+		// original's UpdateLine locked around its region reads: the logic thread edits the
+		// MultiRegion while we run.
+		MultiRegion& region = vMap.region();
+		const int H = (int)vMap.H_SIZE, V = (int)vMap.V_SIZE;
+		const int qx0 = gridClamp(vx0 / step_ - 1, nx_ - 1), qx1 = gridClamp(vx1 / step_ + 1, nx_ - 1);
+		const int qy0 = gridClamp(vy0 / step_ - 1, ny_ - 1), qy1 = gridClamp(vy1 / step_ + 1, ny_ - 1);
+		bool materialChanged = false;
+		region.lock();
+		for(int gy = qy0; gy <= qy1; ++gy)
+			for(int gx = qx0; gx <= qx1; ++gx){
+				const int x0 = gx * step_,       y0 = gy * step_;
+				const int x1 = (gx + 1) * step_ > H - 1 ? H - 1 : (gx + 1) * step_;
+				const int y1 = (gy + 1) * step_ > V - 1 ? V - 1 : (gy + 1) * step_;
+				const unsigned char m0 = (unsigned char)regionMaterialAt(region, (x0 + x0 + x1) / 3, (y0 + y1 + y0) / 3);
+				const unsigned char m1 = (unsigned char)regionMaterialAt(region, (x1 + x0 + x1) / 3, (y0 + y1 + y1) / 3);
+				unsigned char& s0 = quadMat_[2 * ((size_t)gy * nx_ + gx)];
+				unsigned char& s1 = quadMat_[2 * ((size_t)gy * nx_ + gx) + 1];
+				if(m0 != s0){ s0 = m0; materialChanged = true; }
+				if(m1 != s1){ s1 = m1; materialChanged = true; }
+			}
+		region.unlock();
+
+		if(materialChanged){
+			std::vector<unsigned short> idx;
+			buildIndexData(idx);
+			const Uint32 ibytes = (Uint32)(idx.size() * sizeof(unsigned short));
+			SDL_GPUTransferBufferCreateInfo itbi = {};
+			itbi.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+			itbi.size = ibytes;
+			if(SDL_GPUTransferBuffer* tb = SDL_CreateGPUTransferBuffer(device_, &itbi)){
+				void* map = SDL_MapGPUTransferBuffer(device_, tb, false);
+				SDL_memcpy(map, idx.data(), ibytes);
+				SDL_UnmapGPUTransferBuffer(device_, tb);
+
+				SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(cmd);
+				SDL_GPUTransferBufferLocation src = {}; src.transfer_buffer = tb; src.offset = 0;
+				SDL_GPUBufferRegion dst = {}; dst.buffer = indexBuffer_; dst.offset = 0; dst.size = ibytes;
+				SDL_UploadToGPUBuffer(copy, &src, &dst, false);
+				SDL_EndGPUCopyPass(copy);
+				SDL_ReleaseGPUTransferBuffer(device_, tb);
+			}
+		}
+
+	}
+
+	if(textureDirty && colorTexture_ && texStep_ > 0){
+		// Fine cells -> texel rect (inclusive), then re-bake it straight from vMap.clrBuf.
+		auto texClamp = [](int v, int hi){ return v < 0 ? 0 : (v > hi ? hi : v); };
+		const int px0 = texClamp(tx0 / texStep_, texW_ - 1), px1 = texClamp(tx1 / texStep_, texW_ - 1);
+		const int py0 = texClamp(ty0 / texStep_, texH_ - 1), py1 = texClamp(ty1 / texStep_, texH_ - 1);
+		const int w = px1 - px0 + 1, h = py1 - py0 + 1;
+
+		std::vector<unsigned char> pixels((size_t)w * h * 4);
+		vMap.getTileColor32Layer(pixels.data(), (DWORD)(w * 4),
+		                         px0 * texStep_, py0 * texStep_,
+		                         (px0 + w) * texStep_, (py0 + h) * texStep_, texStep_);
+
+		SDL_GPUTransferBufferCreateInfo tbi = {};
+		tbi.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+		tbi.size = (Uint32)pixels.size();
+		if(SDL_GPUTransferBuffer* tb = SDL_CreateGPUTransferBuffer(device_, &tbi)){
+			void* map = SDL_MapGPUTransferBuffer(device_, tb, false);
+			SDL_memcpy(map, pixels.data(), pixels.size());
+			SDL_UnmapGPUTransferBuffer(device_, tb);
+
+			SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(cmd);
+			SDL_GPUTextureTransferInfo src = {};
+			src.transfer_buffer = tb; src.offset = 0;
+			src.pixels_per_row = (Uint32)w; src.rows_per_layer = (Uint32)h;
+			SDL_GPUTextureRegion dst = {};
+			dst.texture = colorTexture_;
+			dst.x = (Uint32)px0; dst.y = (Uint32)py0;
+			dst.w = (Uint32)w; dst.h = (Uint32)h; dst.d = 1;
+			SDL_UploadToGPUTexture(copy, &src, &dst, false);   // partial: don't cycle
+			SDL_EndGPUCopyPass(copy);
+			SDL_ReleaseGPUTransferBuffer(device_, tb);
+		}
+	}
 }
 
 // ---------------------------------------------------------------------------
