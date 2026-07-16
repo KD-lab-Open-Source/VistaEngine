@@ -50,6 +50,7 @@ SDLUIRenderer::~SDLUIRenderer()
 	if(samplerWrap_)    SDL_ReleaseGPUSampler(device_, samplerWrap_);
 	if(pipeline_)       SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
 	if(linePipeline_)   SDL_ReleaseGPUGraphicsPipeline(device_, linePipeline_);
+	if(addPipeline_)    SDL_ReleaseGPUGraphicsPipeline(device_, addPipeline_);
 }
 
 // ---------------------------------------------------------------------------
@@ -137,6 +138,13 @@ void SDLUIRenderer::createPipeline()
 	pci.primitive_type = SDL_GPU_PRIMITIVETYPE_LINELIST;
 	linePipeline_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
 
+	// The additive variant: D3D's ALPHA_ADDBLENDALPHA, (SRCALPHA, ONE, ADD), which the
+	// lens flare's 2D sprites draw with. Same shaders; only the blend differs.
+	pci.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
+	colorTarget.blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+	colorTarget.blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+	addPipeline_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
+
 	SDL_ReleaseGPUShader(device_, vs);
 	SDL_ReleaseGPUShader(device_, fs);
 	if(!pipeline_){
@@ -145,6 +153,8 @@ void SDLUIRenderer::createPipeline()
 	}
 	if(!linePipeline_)
 		fprintf(stderr, "SDLUIRenderer: line pipeline failed: %s\n", SDL_GetError());
+	if(!addPipeline_)
+		fprintf(stderr, "SDLUIRenderer: additive pipeline failed: %s\n", SDL_GetError());
 
 	fprintf(stderr, "SDLUIRenderer: UI pipeline ready\n");
 }
@@ -176,16 +186,19 @@ void SDLUIRenderer::ensureVertexCapacity(int verts)
 // into the run that preceded it, or they would draw *before* the minimap.
 void SDLUIRenderer::EmitMinimapRun(int index)
 {
-	runs_.push_back(DrawRun{ nullptr, nullptr, 0, 0, false, index });
+	runs_.push_back(DrawRun{ nullptr, nullptr, 0, 0, false, false, index });
 }
 
 void SDLUIRenderer::emitQuad(float x, float y, float dx, float dy,
-                             float u, float v, float du, float dv, unsigned int color, SDL_GPUTexture* tex)
+                             float u, float v, float du, float dv, unsigned int color, SDL_GPUTexture* tex,
+                             bool additive)
 {
-	// Extend the current run if it uses the same texture, sampler and primitive, else start one.
+	// Extend the current run if it uses the same texture, sampler, primitive and blend,
+	// else start one.
 	if(runs_.empty() || runs_.back().minimap >= 0 || runs_.back().tex != tex ||
-	   runs_.back().sampler != currentSampler_ || runs_.back().lines)
-		runs_.push_back(DrawRun{ tex, currentSampler_, (int)batch_.size(), 0, false, -1 });
+	   runs_.back().sampler != currentSampler_ || runs_.back().lines ||
+	   runs_.back().additive != additive)
+		runs_.push_back(DrawRun{ tex, currentSampler_, (int)batch_.size(), 0, false, additive, -1 });
 
 	// Two triangles (the D3D path used a tri-strip of 4 verts; here, 6 verts).
 	const float x1 = x, y1 = y, x2 = x + dx, y2 = y + dy;
@@ -205,8 +218,8 @@ void SDLUIRenderer::emitQuad(float x, float y, float dx, float dy,
 void SDLUIRenderer::emitQuad(const sVertexXYZWDT1* corners)
 {
 	if(runs_.empty() || runs_.back().minimap >= 0 || runs_.back().tex != currentTexture_ ||
-	   runs_.back().sampler != currentSampler_ || runs_.back().lines)
-		runs_.push_back(DrawRun{ currentTexture_, currentSampler_, (int)batch_.size(), 0, false, -1 });
+	   runs_.back().sampler != currentSampler_ || runs_.back().lines || runs_.back().additive)
+		runs_.push_back(DrawRun{ currentTexture_, currentSampler_, (int)batch_.size(), 0, false, false, -1 });
 
 	static const int triangles[6] = { 0, 1, 2, 2, 1, 3 };
 	for(int i : triangles){
@@ -270,8 +283,9 @@ void SDLUIRenderer::DrawPrimitive(PRIMITIVETYPE type, int nPolygon)
 	// Untextured, like the lines: the run carries no texture, so Draw() binds the 1x1 white
 	// and the vertex colour comes through unchanged. It could not carry one anyway -- this
 	// vertex format has no UVs, which is also why the sampler does not matter here.
-	if(runs_.empty() || runs_.back().minimap >= 0 || runs_.back().tex != nullptr || runs_.back().lines)
-		runs_.push_back(DrawRun{ nullptr, currentSampler_, (int)batch_.size(), 0, false, -1 });
+	if(runs_.empty() || runs_.back().minimap >= 0 || runs_.back().tex != nullptr ||
+	   runs_.back().lines || runs_.back().additive)
+		runs_.push_back(DrawRun{ nullptr, currentSampler_, (int)batch_.size(), 0, false, false, -1 });
 
 	const int have = (int)lockVerts_.size();
 	int triangles = 0;
@@ -295,7 +309,7 @@ void SDLUIRenderer::DrawPrimitive(PRIMITIVETYPE type, int nPolygon)
 void SDLUIRenderer::emitLine(float x1, float y1, float x2, float y2, unsigned int color)
 {
 	if(runs_.empty() || runs_.back().minimap >= 0 || !runs_.back().lines || runs_.back().tex != nullptr)
-		runs_.push_back(DrawRun{ nullptr, currentSampler_, (int)batch_.size(), 0, true, -1 });
+		runs_.push_back(DrawRun{ nullptr, currentSampler_, (int)batch_.size(), 0, true, false, -1 });
 
 	batch_.push_back(UIVertex{ x1, y1, 0, 1, color, 0.f, 0.f });
 	batch_.push_back(UIVertex{ x2, y2, 0, 1, color, 0.f, 0.f });
@@ -381,7 +395,9 @@ void SDLUIRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 				bound = nullptr;
 				continue;
 			}
-			SDL_GPUGraphicsPipeline* want = run.lines ? linePipeline_ : pipeline_;
+			SDL_GPUGraphicsPipeline* want = run.lines ? linePipeline_
+			                              : run.additive && addPipeline_ ? addPipeline_
+			                              : pipeline_;
 			if(!want || !vertexBuffer_) continue;
 			if(want != bound){
 				SDL_BindGPUGraphicsPipeline(pass, want);
@@ -420,10 +436,11 @@ void SDLUIRenderer::DrawQuad(float x1, float y1, float dx, float dy,
 
 void SDLUIRenderer::DrawSprite(int x, int y, int dx, int dy,
                                float u, float v, float du, float dv,
-                               cTexture* texture, const Color4c& colorMul)
+                               cTexture* texture, const Color4c& colorMul, eBlendMode blend)
 {
 	emitQuad((float)x, (float)y, (float)dx, (float)dy, u, v, du, dv,
-	         packColor(colorMul), sdlTextureOf(texture));
+	         packColor(colorMul), sdlTextureOf(texture),
+	         blend == ALPHA_ADDBLENDALPHA);
 }
 
 void SDLUIRenderer::DrawLine(int x1, int y1, int x2, int y2, Color4c color)

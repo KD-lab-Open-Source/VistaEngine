@@ -17,6 +17,7 @@
 
 #include "Render/src/LensFlare.h"
 #include "Render/src/Scene.h"
+#include "Render/SDLRenderDevice.h"
 #include "VistaRender/postEffects.h"
 #include "Render/src/Grass.h"
 #include "Render/src/CChaos.h"
@@ -260,39 +261,80 @@ void Environment::graphQuant(float dt, Camera* camera)
 	if(water_)
 		water_->SetCurReflectSkyColor(environmentTime_->GetCurReflectSkyColor());
 
+	// The under-water post effect learns the camera's submersion before anything draws:
+	// the fog override below and the capture decision both hang on it. The original fed
+	// it in drawPostEffects, after the scene -- the SDL frame must know before.
+	PostEffectUnderWater* underWater = (PostEffectUnderWater*)PEManager()->getEffect(PE_UNDER_WATER);
+	if(underWater && water_)
+		underWater->setUnderWater(water_->isUnderWater(camera->GetPos()));
+
+	// The post effects sample the scene, so the scene must render into the device's
+	// capture target: arm it before the first pass (the sky, below) opens. On the frames
+	// where no effect will draw -- almost all of them -- nothing changes.
+	if(cSDLRenderDevice* device = sdlRenderDevice())
+		if(PEManager()->anyEffectWillDraw())
+			device->armSceneCapture();
+
 	// Distance fog: the colour comes from the time of day, the near and far planes from the
 	// world, scaled into the camera's actual depth range. A negative range means "off", which
-	// is how cD3DRender::SetGlobalFog read it too.
+	// is how cD3DRender::SetGlobalFog read it too. While the camera is under water the
+	// under-water effect overrides the planes, pulling them in as it sinks
+	// (PostEffectUnderWater::setFog), as the original did here.
 	if(isFogEnabled() && !isFogTempDisabled()){
-		// TODO(sdl-port): the under-water post-effect used to override the fog planes here
-		// (PostEffectUnderWater::setFog), pulling them in as the camera sinks. The whole
-		// post-effect stack is unported -- PORTING.md #6 -- so the world's own fog stands.
-		float range = camera->GetZPlane().y/max(GetGameFrustrumZMaxHorizontal(),GetGameFrustrumZMaxVertical());
-		gb_RenderDevice->SetGlobalFog(Color4f(environmentTime()->GetCurFogColor()),
-		                              Vect2f(fogStart()*range, fogEnd()*range));
+		if(underWater && underWater->isActive())
+			underWater->setFog(Color4f(environmentTime()->GetCurFogColor()));
+		else {
+			float range = camera->GetZPlane().y/max(GetGameFrustrumZMaxHorizontal(),GetGameFrustrumZMaxVertical());
+			gb_RenderDevice->SetGlobalFog(Color4f(environmentTime()->GetCurFogColor()),
+			                              Vect2f(fogStart()*range, fogEnd()*range));
+		}
 	}
 	else
 		gb_RenderDevice->SetGlobalFog(Color4f(environmentTime()->GetCurFogColor()), Vect2f(-1, -2));
 
-	// TODO(sdl-port): three things the original did here are gone with D3D9 --
+	// TODO(sdl-port): two things the original did here are gone with D3D9 --
 	//   the sky cubemap (environmentTime()->Draw()),      PORTING.md #9
-	//   the lens flare and the screen flash,              PORTING.md #6
 	//   fieldOfViewMap_->updateTexture().                 PORTING.md #10
-	// Everything they drive (the time-of-day colours, the sun position and size, the
-	// field-of-view map itself) is portable and still updated every frame.
+	// Everything they drive (the time-of-day colours, the field-of-view map itself) is
+	// portable and still updated every frame.
 
 	// The sky: the sun or the moon, then the cloud models, drawn through the sky camera's
 	// own scene. It opens the frame -- everything below is drawn over it.
 	environmentTime()->DrawEnviroment(camera);
+
+	// The lens flare rides the sun: it follows its position while it is day and hides at
+	// night. LensFlareRenderer draws it from inside the scene walk.
+	if(environmentTime_->isDay()){
+		lensFlare_->setFlareSource(environmentTime_->sunPosition(), environmentTime_->sunSize());
+		lensFlare_->setVisible(true);
+	}
+	else
+		lensFlare_->setVisible(false);
+
+	// The screen flash's per-frame intensity interpolation. Without the bloom effect it
+	// feeds (masked off in PostEffectManager, on D3D9 too) this is bookkeeping only.
+	flash()->setIntensity();
 }
 
-// TODO(sdl-port): the whole post-effect stack is gone. See Render/PORTING.md #6.
-//
-// PEManager's chain (bloom, monochrome, colour-dodge, depth of field, mirage), the screen
-// flash and the under-water effect. All of it was D3D9 pixel shaders over fullscreen quads
-// into offscreen targets; VistaRender/postEffects.cpp still holds the original.
+// The post-effect stack. Monochrome and the under-water effect are ported (they record
+// into SDLPostEffectRenderer; the device composites the scene capture through them); the
+// rest of PEManager's chain is not -- see Render/PORTING.md #6 for what remains and why.
 void Environment::drawPostEffects(float dt, Camera* camera)
 {
+	start_timer_auto();
+
+	// The screen flash feeds the bloom effect, which the manager masks off (as it did on
+	// D3D9 -- the nuke flash was invisible in retail P2 too). Kept for logic fidelity:
+	// every call inside null-checks the bloom.
+	flash()->draw();
+
+	// Each enabled effect updates its fade state and records this frame's parameters.
+	PEManager()->draw(dt);
+
+	// Composite the capture through whatever was recorded into the swapchain. If the
+	// capture was never armed this frame, it discards instead.
+	if(cSDLRenderDevice* device = sdlRenderDevice())
+		device->drawPostEffects();
 }
 
 void Environment::showEditor()

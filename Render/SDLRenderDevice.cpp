@@ -23,6 +23,7 @@
 #include "SDLMinimapRenderer.h"
 #include "SDLGrassRenderer.h"
 #include "SDLCloudShadowRenderer.h"
+#include "SDLPostEffectRenderer.h"
 
 // See the declarations in SDLRenderDevice.h.
 cSDLRenderDevice* sdlRenderDevice()
@@ -70,6 +71,12 @@ SDLCloudShadowRenderer* sdlCloudShadowRenderer()
 {
 	cSDLRenderDevice* dev = sdlRenderDevice();
 	return dev ? dev->cloudShadowRenderer() : nullptr;
+}
+
+SDLPostEffectRenderer* sdlPostEffectRenderer()
+{
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	return dev ? dev->postEffectRenderer() : nullptr;
 }
 
 SDL_GPUTexture* createSolidGPUTexture(SDL_GPUDevice* device, unsigned int rgba)
@@ -230,6 +237,8 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND /*hWnd*/,
 		grassRenderer_ = std::make_unique<SDLGrassRenderer>(this, device_, window_);
 	if(!cloudShadowRenderer_)
 		cloudShadowRenderer_ = std::make_unique<SDLCloudShadowRenderer>(this, device_, window_);
+	if(!postEffectRenderer_)
+		postEffectRenderer_ = std::make_unique<SDLPostEffectRenderer>(device_, window_);
 	if(!minimapRenderer_){
 		minimapRenderer_ = std::make_unique<SDLMinimapRenderer>(device_, window_);
 		// The minimap draws inside the UI's pass, at the point in its run list where the
@@ -276,6 +285,7 @@ int cSDLRenderDevice::Done()
 	worldQuadRenderer_.reset();
 	grassRenderer_.reset();
 	cloudShadowRenderer_.reset();
+	postEffectRenderer_.reset();
 
 	if(device_){
 		// The depth buffers the offscreen colour targets own. Their colour textures are
@@ -292,6 +302,13 @@ int cSDLRenderDevice::Done()
 			depthTexture_ = nullptr;
 			depthW_ = depthH_ = 0;
 		}
+		if(captureTexture_){
+			SDL_ReleaseGPUTexture(device_, captureTexture_);
+			captureTexture_ = nullptr;
+			captureW_ = captureH_ = 0;
+		}
+		capture_ = RenderTarget();
+		captureArmed_ = false;
 		for(auto& kv : textures_)
 			if(kv.second.tex) SDL_ReleaseGPUTexture(device_, kv.second.tex);
 		textures_.clear();
@@ -372,6 +389,8 @@ int cSDLRenderDevice::BeginScene()
 		grassRenderer_->BeginFrame();
 	if(cloudShadowRenderer_)
 		cloudShadowRenderer_->BeginFrame();
+	if(postEffectRenderer_)
+		postEffectRenderer_->BeginFrame();
 
 	// The screen is this frame's swapchain image; its clear was armed by Fill(). Offscreen
 	// targets keep their textures across frames, but not the clears they have consumed.
@@ -388,6 +407,11 @@ int cSDLRenderDevice::BeginScene()
 	}
 	current_ = &screen_;
 
+	// The scene capture is per frame: Environment::graphQuant re-arms it when an effect
+	// will draw (armSceneCapture); its texture persists, its state does not.
+	capture_ = RenderTarget();
+	captureArmed_ = false;
+
 	shadowPassRan_ = false;
 	bActiveScene_ = true;
 	NumberPolygon = 0;
@@ -399,6 +423,13 @@ int cSDLRenderDevice::BeginScene()
 int cSDLRenderDevice::EndScene()
 {
 	if(!bActiveScene_) return 1;
+
+	// The safety net for an armed capture nothing composited (a frame that never reached
+	// Environment::drawPostEffects): put the scene on the swapchain before the UI pass,
+	// or the frame comes out black.
+	if(captureArmed_)
+		drawPostEffects();
+
 	bActiveScene_ = false;
 
 	// Whatever objects the scene walk recorded and no earlier flush replayed -- everything
@@ -449,6 +480,27 @@ bool cSDLRenderDevice::ensureDepth(int w, int h)
 	return depthTexture_ != nullptr;
 }
 
+// The colour texture behind the scene capture. Swapchain format, so every pipeline the
+// renderers already built can draw into it unchanged; sampleable, because the post-effect
+// composite reads it back. Sized to the swapchain, rebuilt on resize, kept across frames.
+bool cSDLRenderDevice::ensureCapture(int w, int h)
+{
+	if(!device_ || w <= 0 || h <= 0) return false;
+	if(captureTexture_ && captureW_ == w && captureH_ == h) return true;
+	if(captureTexture_) SDL_ReleaseGPUTexture(device_, captureTexture_);
+
+	SDL_GPUTextureCreateInfo ti = {};
+	ti.type = SDL_GPU_TEXTURETYPE_2D;
+	ti.format = SDL_GetGPUSwapchainTextureFormat(device_, window_);
+	ti.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER | SDL_GPU_TEXTUREUSAGE_COLOR_TARGET;
+	ti.width = (Uint32)w; ti.height = (Uint32)h;
+	ti.layer_count_or_depth = 1; ti.num_levels = 1;
+	captureTexture_ = SDL_CreateGPUTexture(device_, &ti);
+	captureW_ = captureTexture_ ? w : 0;
+	captureH_ = captureTexture_ ? h : 0;
+	return captureTexture_ != nullptr;
+}
+
 int cSDLRenderDevice::Flush()
 {
 	if(bActiveScene_)
@@ -469,8 +521,11 @@ int cSDLRenderDevice::Flush()
 cSDLRenderDevice::RenderTarget* cSDLRenderDevice::resolveTarget(Camera* camera)
 {
 	cTexture* texture = camera ? camera->GetRenderTarget() : nullptr;
+	// While the capture is armed, it *is* the frame: every camera that would draw to the
+	// screen (the sky's, the main one) draws into the capture instead, and the post-effect
+	// composite puts the result on the swapchain (drawPostEffects).
 	if(!texture)
-		return &screen_;
+		return captureArmed_ ? &capture_ : &screen_;
 
 	auto it = targets_.find(texture);
 	if(it != targets_.end())
@@ -560,8 +615,9 @@ void cSDLRenderDevice::flushTarget(RenderTarget* rt, bool settle)
 
 	// An offscreen colour target we are leaving still owes its clear to whatever samples it
 	// later, so open the pass for the clear alone if the scene walk drew nothing into it.
-	// The screen's clear can always keep waiting: the UI pass at EndScene will take it.
-	const bool owesClear = settle && rt != &screen_
+	// The frame's own target can always keep waiting: the screen's clear goes to the UI
+	// pass at EndScene, the capture's to the composite in drawPostEffects.
+	const bool owesClear = settle && !isFrameTarget(rt)
 	                    && ((rt->clearPending && !rt->colorCleared) || !rt->depthCleared);
 	if(!hasDraws && !owesClear)
 		return;
@@ -600,7 +656,10 @@ void cSDLRenderDevice::setCamera(Camera* camera)
 	flushTarget(current_, true);
 	current_ = rt;
 
-	if(rt != &screen_ && rt != &nullTarget_)
+	// The frame's own target (screen or capture) keeps the clear Fill() armed: re-arming
+	// from the camera's fone colour here would wipe the sky when the main camera comes
+	// back from a child (the reflection, the shadow map).
+	if(!isFrameTarget(rt) && rt != &nullTarget_)
 		armClear(rt, camera);
 }
 
@@ -717,6 +776,75 @@ void cSDLRenderDevice::drawCloudShadow()
 		if(clear) rt->colorCleared = true;
 		rt->depthCleared = true;
 	}
+}
+
+// ---------------------------------------------------------------------------
+// Post effects: the scene-capture redirect and the composite. See the header.
+// ---------------------------------------------------------------------------
+void cSDLRenderDevice::armSceneCapture()
+{
+	if(!bActiveScene_ || !commandBuffer_ || captureArmed_ || !postEffectRenderer_)
+		return;
+	// Too late once anything has reached the screen: the whole scene must start in the
+	// capture. In GameShell's frame nothing has -- graphQuant runs before the sky draws.
+	if(current_ != &screen_ || screen_.colorCleared || screen_.depthCleared)
+		return;
+	if(!screen_.color || !screen_.depth || !ensureCapture(screen_.w, screen_.h))
+		return;
+
+	capture_ = RenderTarget();
+	capture_.color = captureTexture_;
+	capture_.depth = depthTexture_;   // shared: the capture is the frame, just off-screen
+	capture_.w = screen_.w;
+	capture_.h = screen_.h;
+
+	// The frame's Fill() clear moves with the scene. The screen keeps none: the composite
+	// overwrites its every pixel.
+	for(int i = 0; i < 4; ++i)
+		capture_.clearColor[i] = screen_.clearColor[i];
+	capture_.clearPending = screen_.clearPending;
+	screen_.clearPending = false;
+
+	captureArmed_ = true;
+	current_ = &capture_;
+}
+
+void cSDLRenderDevice::drawPostEffects()
+{
+	if(!bActiveScene_ || !commandBuffer_ || !postEffectRenderer_)
+		return;
+	if(!captureArmed_){
+		// Effects recorded with no capture armed have nothing to sample; they must not
+		// leak into a later frame.
+		postEffectRenderer_->DiscardDraws();
+		return;
+	}
+
+	// Settle the capture: whatever the scene walk still holds (everything recorded past
+	// the last mid-scene flush) goes in, and the composite can sample a finished frame.
+	flushTarget(current_, true);
+
+	// A frame where no pass at all opened on the capture (nothing drew, so its clear is
+	// still pending): give it the clear, or the composite samples last frame's contents.
+	// The object renderer opens the pass for the clear alone, as flushTarget has it do
+	// for the offscreen targets.
+	if(capture_.usable() && capture_.clearPending && !capture_.colorCleared && objectRenderer_){
+		if(objectRenderer_->Draw(commandBuffer_, capture_.color, capture_.depth,
+		                         capture_.w, capture_.h, true, capture_.clearColor,
+		                         !capture_.depthCleared, false)){
+			capture_.colorCleared = true;
+			capture_.depthCleared = true;
+		}
+	}
+
+	postEffectRenderer_->Draw(commandBuffer_, captureTexture_, screen_.color,
+	                          screen_.w, screen_.h);
+
+	// The frame is back on the screen, fully covered: the UI pass at EndScene loads.
+	screen_.colorCleared = true;
+	screen_.depthCleared = true;
+	captureArmed_ = false;
+	current_ = &screen_;
 }
 
 // ---------------------------------------------------------------------------
@@ -910,10 +1038,10 @@ void cSDLRenderDevice::DrawQuad(float x1, float y1, float dx, float dy,
 void cSDLRenderDevice::DrawSprite(int x, int y, int dx, int dy,
                                   float u, float v, float du, float dv,
                                   cTexture* Texture, const Color4c& ColorMul,
-                                  float /*phase*/, eBlendMode /*mode*/, float /*saturate*/)
+                                  float /*phase*/, eBlendMode mode, float /*saturate*/)
 {
 	if(!bActiveScene_ || !uiRenderer_) return;
-	uiRenderer_->DrawSprite(x, y, dx, dy, u, v, du, dv, Texture, ColorMul);
+	uiRenderer_->DrawSprite(x, y, dx, dy, u, v, du, dv, Texture, ColorMul, mode);
 	NumberPolygon += 2;
 }
 

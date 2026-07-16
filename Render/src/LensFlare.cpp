@@ -3,6 +3,8 @@
 #include "OcclusionQuery.h"
 #include "cCamera.h"
 #include "D3DRender.h"
+#include "Render/SDLRenderDevice.h"
+#include "Render/SDLWorldQuadRenderer.h"
 #include "Render/3dx/Node3DX.h"
 #include "VisGeneric.h"
 #include "Serialization/Serialization.h"
@@ -93,16 +95,14 @@ LensFlareRenderer::LensFlareRenderer()
 
 void LensFlareRenderer::drawFlare2D(const Vect2f& screenPoint, const LensFlare& flare, float alpha)
 {
-	cScene* scene = scene_;
-	cD3DRender* renderDevice = static_cast<cD3DRender*>(gb_RenderDevice);
-	////
-
-	Vect2f screenCenter(renderDevice->GetSizeX() * 0.5f, renderDevice->GetSizeY() * 0.5f);
-	float halfSizeMultiplier = 0.5f * float(renderDevice->GetSizeX());
+	// The D3D path drew these through the shared dynamic 2D buffer (GetBufferXYZWDT1),
+	// pre-transformed, Z off. DrawSprite records them into the UI batch instead: it draws
+	// over the scene in call order -- before the interface, which records later -- the
+	// order the D3D pass sequence had. (That batch replays after the post-effect
+	// composite, so monochrome does not grey the flare; see Render/PORTING.md.)
+	Vect2f screenCenter(gb_RenderDevice->GetSizeX() * 0.5f, gb_RenderDevice->GetSizeY() * 0.5f);
+	float halfSizeMultiplier = 0.5f * float(gb_RenderDevice->GetSizeX());
 	Vect2f flareAxis = (screenCenter - screenPoint) * 2.0f;
-
-    renderDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
-    renderDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 
 	LensFlare::const_iterator it;
 	FOR_EACH(flare, it){
@@ -115,57 +115,24 @@ void LensFlareRenderer::drawFlare2D(const Vect2f& screenPoint, const LensFlare& 
 		float halfSize = sprite.radius() * halfSizeMultiplier;
 		Vect2f spritePoint = screenPoint + flareAxis * sprite.position();
 
-		float x1 = spritePoint.x - halfSize;
-		float y1 = spritePoint.y - halfSize;
-		float x2 = spritePoint.x + halfSize;
-		float y2 = spritePoint.y + halfSize;
-
-		renderDevice->SetNoMaterial(sprite.additiveBlending() ? ALPHA_ADDBLENDALPHA : ALPHA_BLEND, MatXf::ID, 0, sprite.texture());
-		renderDevice->SetVertexShader(0);
-		renderDevice->SetPixelShader(0);
-
-		cVertexBuffer<sVertexXYZWDT1>* vertexBuffer = renderDevice->GetBufferXYZWDT1();
-		sVertexXYZWDT1* vertices = vertexBuffer->Lock(6);
-		vertices[0].z = vertices[1].z = vertices[2].z = vertices[4].z = 0.001f;
-		vertices[0].w = vertices[1].w = vertices[2].w = vertices[4].w = 0.001f;
-		vertices[0].diffuse = vertices[1].diffuse = vertices[2].diffuse = vertices[4].diffuse = color;
-
-		vertices[0].x = x1;
-		vertices[0].y = y1;
-		vertices[0].uv[0] = 0.0f;
-		vertices[0].uv[1] = 0.0f;
-
-		vertices[1].x = x2;
-		vertices[1].y = y1;
-		vertices[1].uv[0] = 1.0f;
-		vertices[1].uv[1] = 0.0f;
-
-		vertices[2].x = x2;
-		vertices[2].y = y2;
-		vertices[2].uv[0] = 1.0f;
-		vertices[2].uv[1] = 1.0f;
-
-		vertices[4].x = x1;
-		vertices[4].y = y2;
-		vertices[4].uv[0] = 0.0f;
-		vertices[4].uv[1] = 1.0f;
-
-		vertices[3] = vertices[2];
-		vertices[5] = vertices[0];
-		vertexBuffer->Unlock(6);
-		vertexBuffer->DrawPrimitive(PT_TRIANGLELIST, 2);
+		gb_RenderDevice->DrawSprite(int(spritePoint.x - halfSize), int(spritePoint.y - halfSize),
+		                            int(halfSize * 2.0f), int(halfSize * 2.0f),
+		                            0.0f, 0.0f, 1.0f, 1.0f, sprite.texture(), color, 0.0f,
+		                            sprite.additiveBlending() ? ALPHA_ADDBLENDALPHA : ALPHA_BLEND);
 	}
-    renderDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
-    renderDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
 void LensFlareRenderer::drawSprite(Camera* camera, const Vect3f& point, const LensFlareSprite& sprite, float alpha)
 {
-    cScene* scene = scene_;
-	cD3DRender* renderDevice = static_cast<cD3DRender*>(gb_RenderDevice);
-	////
+	// The glow: a camera-facing billboard at the sun, in world space. The D3D path drew it
+	// through the shared dynamic buffer (GetBufferXYZDT1) with SetNoMaterial; the world-quad
+	// renderer is that route's stand-in, depth test on as D3DRS_ZENABLE TRUE had it.
+	SDLWorldQuadRenderer* quads = sdlWorldQuadRenderer();
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	if(!quads || !dev)
+		return;
 
 	Vect3f vect = camera->GetPos() - sourcePosition_;
 	float distance = vect.norm();
@@ -173,45 +140,41 @@ void LensFlareRenderer::drawSprite(Camera* camera, const Vect3f& point, const Le
 	Vect3f xAxis;
 	Vect3f yAxis;
 	xAxis.cross(vect, Vect3f::I);
-    yAxis.cross(vect, xAxis);    
+	yAxis.cross(vect, xAxis);
 
 	float radius = sprite.radius() * distance;
 
 	xAxis.normalize(radius * 2.0f);
 	yAxis.normalize(radius * 2.0f);
 
-	renderDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
-    renderDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	renderDevice->SetNoMaterial(sprite.additiveBlending() ? ALPHA_ADDBLENDALPHA : ALPHA_BLEND, MatXf::ID, 0, sprite.texture());
-
-	cVertexBuffer<sVertexXYZDT1>* vertexBuffer = renderDevice->GetBufferXYZDT1();
-	sVertexXYZDT1* vertices = vertexBuffer->Lock(6);
-
 	Color4c color = sprite.color(); color.a *= alpha;
-	vertices[0].diffuse = vertices[1].diffuse = vertices[2].diffuse = vertices[4].diffuse = color;
-
 	Vect3f origin = point - (xAxis + yAxis) * 0.5f;
 
-	vertices[0].pos = origin;
-	vertices[0].uv[0] = 0.0f;
-	vertices[0].uv[1] = 0.0f;
+	quads->SetCamera(camera);
+	quads->SetMaterial(sprite.additiveBlending() ? ALPHA_ADDBLENDALPHA : ALPHA_BLEND, sprite.texture());
+	quads->BeginDraw();
+	sVertexXYZDT1* v = quads->Get();
 
-	vertices[1].pos = origin + xAxis;
-	vertices[1].uv[0] = 1.0f;
-	vertices[1].uv[1] = 0.0f;
+	// Get's corners are (0,0), (0,1), (1,0), (1,1) -- the renderer's index pattern pairs
+	// them into the same quad the D3D triangle list covered.
+	v[0].pos = origin;
+	v[0].diffuse = color;
+	v[0].GetTexel().x = 0.0f; v[0].GetTexel().y = 0.0f;
 
-	vertices[2].pos = origin + xAxis + yAxis;
-	vertices[2].uv[0] = 1.0f;
-	vertices[2].uv[1] = 1.0f;
+	v[1].pos = origin + yAxis;
+	v[1].diffuse = color;
+	v[1].GetTexel().x = 0.0f; v[1].GetTexel().y = 1.0f;
 
-	vertices[4].pos = origin + yAxis;
-	vertices[4].uv[0] = 0.0f;
-	vertices[4].uv[1] = 1.0f;
+	v[2].pos = origin + xAxis;
+	v[2].diffuse = color;
+	v[2].GetTexel().x = 1.0f; v[2].GetTexel().y = 0.0f;
 
-	vertices[3] = vertices[2];
-	vertices[5] = vertices[0];
-	vertexBuffer->Unlock(6);
-	vertexBuffer->DrawPrimitive(PT_TRIANGLELIST, 2);
+	v[3].pos = origin + xAxis + yAxis;
+	v[3].diffuse = color;
+	v[3].GetTexel().x = 1.0f; v[3].GetTexel().y = 1.0f;
+
+	quads->EndDraw();
+	dev->drawWorldQuads();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -235,65 +198,48 @@ void LensFlareRenderer::Draw(Camera* camera)
 	if(!isVisible_ || !isEnabled_)
 		return;
 
-	// TODO(sdl-port): the lens flare does not draw. See Render/PORTING.md #6.
-	//
-	// isEnabled_ is serialized, so a world that switches the flare on gets here -- and the
-	// cast below is a lie now: gb_RenderDevice is a cSDLRenderDevice, not a cD3DRender. The
-	// D3D9 body is kept as the reference for the port (it also needs the occlusion query,
-	// PORTING.md #20, to decide whether the sun is hidden).
-	return;
-
-	cD3DRender* renderDevice = static_cast<cD3DRender*>(gb_RenderDevice);
-	
-	DWORD oldFogState = renderDevice->GetRenderState(D3DRS_FOGENABLE);
-	DWORD oldAlphaBlend=renderDevice->GetRenderState(D3DRS_ALPHABLENDENABLE);
-	renderDevice->SetRenderState(D3DRS_FOGENABLE, FALSE);
-	const Mat4f& matViewProjScr = camera->matViewProjScr;
+	// Only the main view. PreDraw attached us to every camera, but the flare's 2D sprites
+	// go through the UI batch, which replays once, on the swapchain -- the reflection,
+	// shadow and lightmap cameras must not record them again.
+	if(camera->getAttribute(ATTRCAMERA_REFLECTION | ATTRCAMERA_SHADOW | ATTRCAMERA_SHADOWMAP | ATTRCAMERA_MIRAGE))
+		return;
 
 	Vect3f point;
-	matViewProjScr.xformCoord(sourcePosition_, point);
+	camera->matViewProjScr.xformCoord(sourcePosition_, point);
 
-	const int sampleSize = 5;
-	const int numPoints = sampleSize * sampleSize;
-
-	if(occlusionQuery_.IsInit()){
-		Vect3f vect = sourcePosition_ - camera->GetPos();
-		float distance = vect.norm();
-		vect.normalize();
-		//vect *= sourceRadius_ * 1.5f;
-		Vect3f sampleCenter = camera->GetPos() + vect * min(cameraClipMax_ * 0.9f, distance);
-		
-		if(camera->GetCameraPass() == SCENENODE_OBJECTSORT){
-			if(showGlowSprite_)
-				drawSprite(camera, sampleCenter, glowSprite_, min(1.0f, opacity_ * 2.0f));
-		} 
-		else{
+	if(camera->GetCameraPass() == SCENENODE_OBJECTSORT){
+		// The glow billboard, over the sorted transparents, where the D3D pass drew it.
+		if(showGlowSprite_ && opacity_ > 0.0f){
+			Vect3f vect = sourcePosition_ - camera->GetPos();
+			float distance = vect.norm();
 			vect.normalize();
-			Vect3f xAxis;
-			Vect3f yAxis;
-			xAxis.cross(vect, Vect3f::I);
-			yAxis.cross(vect, xAxis);        
-
-			points_.reserve(numPoints);
-			points_.clear();
-
-			xAxis.normalize();
-			yAxis.normalize();
-			for(int i = 0; i < numPoints; ++i){
-				float angle = M_PI * 2.0f * float(i) / float(numPoints);
-				Vect3f testPoint = sampleCenter + (xAxis * cos(angle) + yAxis * sin(angle)) * sourceRadius_ * 0.5f;
-				points_.push_back(testPoint);
-			}
-
-
-			drawFlare2D(Vect2f(point), lensFlare_, opacity_);
-			opacity_ = clamp(float(occlusionQuery_.VisibleCount()) / float(numPoints), 0.0f, 1.0f);
-			if(!points_.empty())
-				occlusionQuery_.Test(&points_[0], points_.size());
+			Vect3f sampleCenter = camera->GetPos() + vect * min(cameraClipMax_ * 0.9f, distance);
+			drawSprite(camera, sampleCenter, glowSprite_, min(1.0f, opacity_ * 2.0f));
 		}
+		return;
 	}
-	renderDevice->SetRenderState(D3DRS_FOGENABLE, oldFogState);
-	renderDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, oldAlphaBlend);
+
+	// The D3D path measured the sun's visibility with cOcclusionQuery: 25 points on a
+	// ring around it, z-tested by the GPU against the frame, opacity = the fraction that
+	// passed. SDL GPU has no occlusion queries (Render/PORTING.md #20), so this is a CPU
+	// stand-in: full opacity while the sun projects inside the viewport in front of the
+	// camera, fading over an edge margin comparable to the ring as it leaves. What it
+	// gives up is occlusion by terrain and objects -- with P2's camera the sun is high in
+	// the sky whenever it is on screen at all.
+	float opacity = 0.0f;
+	Vect3f viewPos;
+	camera->matView.xformCoord(sourcePosition_, viewPos);
+	if(viewPos.z > 0.0f){
+		const sViewPort& vp = camera->vp;
+		const float margin = 0.05f * float(vp.Width);
+		float fx = min(point.x - float(vp.X), float(vp.X + vp.Width) - point.x) / margin;
+		float fy = min(point.y - float(vp.Y), float(vp.Y + vp.Height) - point.y) / margin;
+		opacity = clamp(min(fx, fy), 0.0f, 1.0f);
+	}
+	opacity_ = opacity;
+
+	if(opacity_ > 0.0f)
+		drawFlare2D(Vect2f(point), lensFlare_, opacity_);
 }
 
 //////////////////////////////////////////////////////////////////////////////
