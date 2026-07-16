@@ -96,6 +96,7 @@ void SDLTileMapRenderer::releaseMesh()
 	if(vertexBuffer_){ SDL_ReleaseGPUBuffer(device_, vertexBuffer_); vertexBuffer_ = nullptr; }
 	if(indexBuffer_) { SDL_ReleaseGPUBuffer(device_, indexBuffer_);  indexBuffer_  = nullptr; }
 	if(colorTexture_){ SDL_ReleaseGPUTexture(device_, colorTexture_); colorTexture_ = nullptr; }
+	if(bumpTexture_) { SDL_ReleaseGPUTexture(device_, bumpTexture_);  bumpTexture_  = nullptr; }
 	indexCount_ = 0;
 	runs_.clear();
 	verts_.clear();
@@ -159,7 +160,7 @@ void SDLTileMapRenderer::createPipeline()
 
 	SDL_GPUShaderCreateInfo fsi = vista::shaderCreateInfo(VISTA_SHADER(tilemap_frag));
 	fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
-	fsi.num_samplers = 4;           // surface colour, shadow map, lightmap, detail tile
+	fsi.num_samplers = 5;           // surface colour, shadow map, lightmap, detail tile, bump
 	fsi.num_uniform_buffers = 1;    // LightColor + LightDirection + ShadeIntensity + params
 	SDL_GPUShader* fs = SDL_CreateGPUShader(device_, &fsi);
 
@@ -360,6 +361,70 @@ bool SDLTileMapRenderer::buildColorTexture(SDL_GPUCommandBuffer* cmd, int H, int
 	return true;
 }
 
+// One texel of the slope (bump) map per colour texel: (z0-zx, z0-zy) as signed bytes.
+// GetNormalArrayShort's fixed-point maths in float: getTileZ hands it z<<8 (world z *
+// 256), sampled every `step` cells, and it shifts the deltas down by 2+log2(step) --
+// i.e. dz_world * 64 / step -- before clamping to a byte. The shader rebuilds the
+// normal as normalize(bump.xy, 0.5), so the scale sets the shading contrast; keep it.
+void SDLTileMapRenderer::bakeBumpRect(signed char* out, int px0, int py0, int w, int h) const
+{
+	const int H = (int)vMap.H_SIZE, V = (int)vMap.V_SIZE;
+	const float scale = 64.f / (float)texStep_;
+	for(int ty = 0; ty < h; ++ty){
+		const int y = (py0 + ty) * texStep_;
+		const int y1 = y + texStep_ > V - 1 ? V - 1 : y + texStep_;
+		for(int tx = 0; tx < w; ++tx){
+			const int x = (px0 + tx) * texStep_;
+			const int x1 = x + texStep_ > H - 1 ? H - 1 : x + texStep_;
+			const float z0 = vMap.getZf(x, y);
+			int dzx = (int)((z0 - vMap.getZf(x1, y)) * scale);
+			int dzy = (int)((z0 - vMap.getZf(x, y1)) * scale);
+			if(dzx < -128) dzx = -128; else if(dzx > 127) dzx = 127;
+			if(dzy < -128) dzy = -128; else if(dzy > 127) dzy = 127;
+			*out++ = (signed char)dzx;
+			*out++ = (signed char)dzy;
+		}
+	}
+}
+
+bool SDLTileMapRenderer::buildBumpTexture(SDL_GPUCommandBuffer* cmd)
+{
+	if(texStep_ <= 0)
+		return true;   // fallback colour texture: no cells to bake slopes from
+
+	SDL_GPUTextureCreateInfo ti = {};
+	ti.type = SDL_GPU_TEXTURETYPE_2D;
+	ti.format = SDL_GPU_TEXTUREFORMAT_R8G8_SNORM;   // the original's V8U8
+	ti.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER;
+	ti.width = (Uint32)texW_; ti.height = (Uint32)texH_;
+	ti.layer_count_or_depth = 1; ti.num_levels = 1;
+	bumpTexture_ = SDL_CreateGPUTexture(device_, &ti);
+	if(!bumpTexture_) return false;
+
+	std::vector<signed char> texels((size_t)texW_ * texH_ * 2);
+	bakeBumpRect(texels.data(), 0, 0, texW_, texH_);
+
+	SDL_GPUTransferBufferCreateInfo tbi = {};
+	tbi.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+	tbi.size = (Uint32)texels.size();
+	SDL_GPUTransferBuffer* tb = SDL_CreateGPUTransferBuffer(device_, &tbi);
+	if(!tb) return false;
+	void* map = SDL_MapGPUTransferBuffer(device_, tb, false);
+	SDL_memcpy(map, texels.data(), texels.size());
+	SDL_UnmapGPUTransferBuffer(device_, tb);
+
+	SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(cmd);
+	SDL_GPUTextureTransferInfo src = {};
+	src.transfer_buffer = tb; src.offset = 0;
+	src.pixels_per_row = (Uint32)texW_; src.rows_per_layer = (Uint32)texH_;
+	SDL_GPUTextureRegion dst = {};
+	dst.texture = bumpTexture_; dst.w = (Uint32)texW_; dst.h = (Uint32)texH_; dst.d = 1;
+	SDL_UploadToGPUTexture(copy, &src, &dst, false);
+	SDL_EndGPUCopyPass(copy);
+	SDL_ReleaseGPUTransferBuffer(device_, tb);
+	return true;
+}
+
 // One grid vertex, sampled from vMap.
 //
 // The vMap<->world frame: vMap is H_SIZE x V_SIZE fine cells, world XY == fine
@@ -490,6 +555,7 @@ bool SDLTileMapRenderer::buildMesh(SDL_GPUCommandBuffer* cmd)
 	SDL_ReleaseGPUTransferBuffer(device_, tb);   // destruction deferred until the copies run
 
 	if(!buildColorTexture(cmd, H, V)){ releaseMesh(); return false; }
+	if(!buildBumpTexture(cmd)){ releaseMesh(); return false; }
 
 	// The colour map spans the world, so the shader's uv = pos.xy * (1/H, 1/V).
 	uvScale_[0] = 1.f / (float)H;
@@ -665,6 +731,38 @@ void SDLTileMapRenderer::applyMapUpdates(SDL_GPUCommandBuffer* cmd, cTileMap* ti
 			}
 		}
 
+		// The slope (bump) map follows the heights. A texel reads z at x and x+step, so
+		// changed cells reach one texel back on the min side; pad and re-bake the rect.
+		if(bumpTexture_ && texStep_ > 0){
+			auto texClamp = [](int v, int hi){ return v < 0 ? 0 : (v > hi ? hi : v); };
+			const int px0 = texClamp(vx0 / texStep_ - 1, texW_ - 1), px1 = texClamp(vx1 / texStep_, texW_ - 1);
+			const int py0 = texClamp(vy0 / texStep_ - 1, texH_ - 1), py1 = texClamp(vy1 / texStep_, texH_ - 1);
+			const int w = px1 - px0 + 1, h = py1 - py0 + 1;
+
+			std::vector<signed char> texels((size_t)w * h * 2);
+			bakeBumpRect(texels.data(), px0, py0, w, h);
+
+			SDL_GPUTransferBufferCreateInfo tbi = {};
+			tbi.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+			tbi.size = (Uint32)texels.size();
+			if(SDL_GPUTransferBuffer* tb = SDL_CreateGPUTransferBuffer(device_, &tbi)){
+				void* map = SDL_MapGPUTransferBuffer(device_, tb, false);
+				SDL_memcpy(map, texels.data(), texels.size());
+				SDL_UnmapGPUTransferBuffer(device_, tb);
+
+				SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(cmd);
+				SDL_GPUTextureTransferInfo src = {};
+				src.transfer_buffer = tb; src.offset = 0;
+				src.pixels_per_row = (Uint32)w; src.rows_per_layer = (Uint32)h;
+				SDL_GPUTextureRegion dst = {};
+				dst.texture = bumpTexture_;
+				dst.x = (Uint32)px0; dst.y = (Uint32)py0;
+				dst.w = (Uint32)w; dst.h = (Uint32)h; dst.d = 1;
+				SDL_UploadToGPUTexture(copy, &src, &dst, false);   // partial: don't cycle
+				SDL_EndGPUCopyPass(copy);
+				SDL_ReleaseGPUTransferBuffer(device_, tb);
+			}
+		}
 	}
 
 	if(textureDirty && colorTexture_ && texStep_ > 0){
@@ -878,7 +976,7 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	SDL_GPUBufferBinding ib = {}; ib.buffer = indexBuffer_; ib.offset = 0;
 	SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_16BIT);
 
-	SDL_GPUTextureSamplerBinding ts[4] = {};
+	SDL_GPUTextureSamplerBinding ts[5] = {};
 	ts[0].texture = (wireframe && whiteTexture_) ? whiteTexture_ : colorTexture_;
 	ts[0].sampler = sampler_;
 	// Slots 1..3 must always carry a texture, even with the shadow, the lightmap or the
@@ -889,6 +987,10 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	ts[2].texture = lightMap ? lightMap : whiteTexture_;
 	ts[2].sampler = sampler_;   // linear + clamp: the lightmap is 256x256 over the whole box
 	ts[3].sampler = detailSampler_;   // .texture varies per material, below
+	// The slope map always exists when the mesh does (buildBumpTexture failing fails the
+	// build). Wireframe needs no stand-in: it zeroes the diffuse, so the normal is moot.
+	ts[4].texture = bumpTexture_ ? bumpTexture_ : whiteTexture_;
+	ts[4].sampler = sampler_;   // linear + clamp, like the colour it is baked beside
 
 	// The original changes material between tiles -- cTileMap::setMaterial binds that
 	// material's detail texture and its mulMiniTexture, then draws the tile's index list
@@ -923,7 +1025,7 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 		SDL_PushGPUFragmentUniformData(cmd, 0, &fsu, sizeof(fsu));
 
 		ts[3].texture = detailTex ? detailTex : greyTexture_;
-		SDL_BindGPUFragmentSamplers(pass, 0, ts, 4);
+		SDL_BindGPUFragmentSamplers(pass, 0, ts, 5);
 
 		SDL_DrawGPUIndexedPrimitives(pass, run.count, 1, run.first, 0, 0);
 	}

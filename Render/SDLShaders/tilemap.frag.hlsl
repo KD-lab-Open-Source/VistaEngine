@@ -2,14 +2,20 @@
 //
 // Ported from Render/shader/Minimal/tile_map_scene.psl. That shader composes, in
 // order: a light term, the surface colour, a lightmap, an optional detail texture,
-// an optional shadow, and optional fog-of-war. This is the base of that stack -- the
-// #ifdef VERTEX_LIGHT path with no lightmap, detail, shadow or fog-of-war:
+// an optional shadow, and optional fog-of-war. The light term is the psl's default
+// (bump) path -- Option_tileMapVertexLight is false in retail:
 //
-//     o.color.rgb = -dot(v.n*2-1, vLightDirection);      // vsl
-//     o.color.rgb = o.color.rgb*vColor.rgb + vColor.w;   // vsl
-//     float3 light = v.color;                            // psl
-//     float4 ot = tex2D(ColorSampler, v.uv_color);       // psl
-//     ot.rgb *= light;                                   // psl
+//     float3 mapbump = tex2D(MapBumpSampler, v.uv_mapbump);   // psl
+//     mapbump.z = 0.5; mapbump = normalize(mapbump);          // psl
+//     float3 light = dot(mapbump, inv_light_dir.rgb);         // psl
+//     light = light*light_color.rgb + light_color.a;          // psl
+//     float4 ot = tex2D(ColorSampler, v.uv_color);            // psl
+//     ot.rgb *= light;                                        // psl
+//
+// The bump map holds per-FINE-CELL height slopes (GetNormalArrayShort's V8U8 --
+// R8G8_SNORM here), so the lighting resolves single-cell relief -- terramorphing's
+// churned rubble -- that the mesh's 4-16-cell vertex normals average away. The vertex
+// normal still feeds the shadowFactor smoothstep below, as the original's VS did.
 //
 // Kept faithfully: the lambert is against the *negated* light direction, because
 // vLightDirection points the way the light travels; and the light term is
@@ -32,8 +38,9 @@
 // intensity. shadowFactor is the original's per-vertex `smoothstep(0.15, 0.2, N.L)`: it
 // fades the shadow out on terrain already turned away from the sun.
 //
-// The remaining layers (bump, fog of war, fog) come back as this renderer grows; the
-// original's structure is the map for that.
+// The remaining layer (fog of war) comes back as this renderer grows; the original's
+// structure is the map for that. (This comment once listed bump and fog too; the bump
+// path is what the light term above now is, and the fog is applied at the end.)
 //
 // Authored in HLSL; cross-compiled to SPIR-V/MSL with SDL_shadercross. See
 // build-tilemap-shaders.sh.
@@ -60,6 +67,11 @@ SamplerState      LightMapSampler : register(s2, space2);
 // distance instead of aliasing into a shimmer.
 Texture2D<float4> DetailTexture : register(t3, space2);
 SamplerState      DetailSampler : register(s3, space2);
+// The bump map (the original's MapBumpSampler, s1): per-fine-cell height slopes
+// (z0-zx, z0-zy), baked map-wide at the colour texture's resolution and sampled with
+// the same UV. R8G8_SNORM reads back the original V8U8's [-1,1].
+Texture2D<float4> BumpTexture : register(t4, space2);
+SamplerState      BumpSampler : register(s4, space2);
 
 cbuffer Light : register(b0, space3)
 {
@@ -139,9 +151,13 @@ float shadowLit(float4 shadowPos)
 
 float4 main(VSOutput input) : SV_Target0
 {
+    // The vertex normal drives only the shadowFactor smoothstep (as the original's VS
+    // did); the light term reads the per-cell bump map, `mapbump.z = 0.5` and all.
     float3 N = normalize(input.Normal);
     float ndlRaw = -dot(N, LightDirection.xyz);
-    float3 light = saturate(ndlRaw) * LightColor.rgb + LightColor.a;
+
+    float3 bumpN = normalize(float3(BumpTexture.Sample(BumpSampler, input.UV).xy, 0.5f));
+    float3 light = saturate(-dot(bumpN, LightDirection.xyz)) * LightColor.rgb + LightColor.a;
 
     // The lightmap, exactly as the original applies it:
     //
