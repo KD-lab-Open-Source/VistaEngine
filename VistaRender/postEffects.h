@@ -62,6 +62,11 @@ public:
 	bool isActive(PostEffectType type) const;
 	void setActive(PostEffectType type, bool active);
 	bool isEnabled(PostEffectType type) const { return (enabledEffects_ & (1 << type)) != 0; }
+	// Will draw(dt) put anything on the screen this frame? Environment::graphQuant asks
+	// before the scene draws, to decide whether to arm the device's scene capture
+	// (cSDLRenderDevice::armSceneCapture) -- the effects sample the scene, so the decision
+	// must precede it. Sizes the manager on the way, so a first frame answers correctly.
+	bool anyEffectWillDraw();
 
 	cTexture* backBufferTexture();
 	int texturesSize(PostEffectType type) const;
@@ -107,6 +112,10 @@ public:
 	virtual void setActive(bool active = true){ isActive_ = active; }
 	virtual bool isActive() const { return isActive_; }
 	bool isEnabled() const { return isEnabled_; }
+	// Whether the coming redraw() will draw, answered *before* the scene renders -- the
+	// capture-arming predicate (see PostEffectManager::anyEffectWillDraw). Effects with no
+	// SDL path never draw.
+	virtual bool willDraw() const { return false; }
 
 	virtual int texturesSize() const { return 0; }
 	virtual void createTextures() = 0;
@@ -171,6 +180,7 @@ public:
 	void init();
 	void redraw(float dt);
 	void setActive(bool switchOn){process_ = true; fadeIn_=switchOn;}
+	bool willDraw() const { return isEnabled_ && (isActive_ || process_); }
 
 protected:
 
@@ -243,6 +253,7 @@ public:
 	bool isUnderWater() const {return underWater_; }
 	int texturesSize() const;
 	void setUnderWater(bool under_water);
+	bool willDraw() const;
 
 protected:
 

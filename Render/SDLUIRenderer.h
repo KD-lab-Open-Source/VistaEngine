@@ -72,9 +72,11 @@ public:
 	void SetSampler(const SAMPLER_DATA& data);
 	void DrawQuad(float x, float y, float dx, float dy,
 	              float u, float v, float du, float dv, Color4c color);
+	// blend honours ALPHA_ADDBLENDALPHA -- D3D's (SRCALPHA, ONE) -- which the lens flare's
+	// sprites ask for; everything else draws with the straight-alpha pipeline, as before.
 	void DrawSprite(int x, int y, int dx, int dy,
 	                float u, float v, float du, float dv,
-	                cTexture* texture, const Color4c& color);
+	                cTexture* texture, const Color4c& color, eBlendMode blend = ALPHA_BLEND);
 
 	// cQuadBuffer<sVertexXYZWDT1>'s contract, for the 2D callers that fill their quads'
 	// corners by hand rather than through DrawSprite -- the selection frame, whose edge and
@@ -133,17 +135,19 @@ private:
 	// (matches sVertexXYZWDT1: float4 pos, BGRA u8 colour, float2 uv = 28 bytes).
 	struct UIVertex { float x, y, z, w; unsigned int color; float u, v; };
 
-	// One draw call per contiguous run of vertices sharing a texture, a sampler and a
-	// primitive type. `lines` picks the line-list pipeline over the triangle-list one.
-	// `minimap` >= 0 instead means the run is a placeholder: it owns no vertices here, and
-	// drawing it hands off to SDLMinimapRenderer's draw of that index.
-	struct DrawRun { SDL_GPUTexture* tex; SDL_GPUSampler* sampler; int first; int count; bool lines; int minimap; };
+	// One draw call per contiguous run of vertices sharing a texture, a sampler, a
+	// primitive type and a blend. `lines` picks the line-list pipeline over the
+	// triangle-list one; `additive` the (SRCALPHA, ONE) pipeline over the straight-alpha
+	// one. `minimap` >= 0 instead means the run is a placeholder: it owns no vertices
+	// here, and drawing it hands off to SDLMinimapRenderer's draw of that index.
+	struct DrawRun { SDL_GPUTexture* tex; SDL_GPUSampler* sampler; int first; int count; bool lines; bool additive; int minimap; };
 
 	void createPipeline();               // pipelines + sampler + white texture
 	void ensureVertexCapacity(int verts);
 	// Append a quad (6 verts) bound to tex, extending or starting a draw run.
 	void emitQuad(float x, float y, float dx, float dy,
-	              float u, float v, float du, float dv, unsigned int color, SDL_GPUTexture* tex);
+	              float u, float v, float du, float dv, unsigned int color, SDL_GPUTexture* tex,
+	              bool additive = false);
 	// The same, from four hand-filled corners (see Get) rather than a rect and a UV rect.
 	void emitQuad(const sVertexXYZWDT1* corners);
 	// Append one untextured line segment (2 verts).
@@ -152,8 +156,9 @@ private:
 	SDL_GPUDevice* device_ = nullptr;
 	SDL_Window*    window_ = nullptr;
 
-	SDL_GPUGraphicsPipeline* pipeline_       = nullptr;  // triangle list
+	SDL_GPUGraphicsPipeline* pipeline_       = nullptr;  // triangle list, straight alpha
 	SDL_GPUGraphicsPipeline* linePipeline_   = nullptr;  // line list; same shaders
+	SDL_GPUGraphicsPipeline* addPipeline_    = nullptr;  // triangle list, (SRCALPHA, ONE)
 	SDL_GPUSampler*          sampler_        = nullptr;  // linear, clamp: what 2D wants
 	SDL_GPUSampler*          samplerWrap_    = nullptr;  // linear, wrap: the selection centre
 	SDL_GPUTexture*          whiteTexture_   = nullptr;  // untextured geometry shows vertex colour

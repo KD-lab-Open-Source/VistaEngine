@@ -6,6 +6,8 @@
 #include "Render/D3D/D3DRender.h"
 #include "Water/Water.h"
 #include "Render/src/VisGeneric.h"
+#include "Render/SDLRenderDevice.h"
+#include "Render/SDLPostEffectRenderer.h"
 
 #include "postEffects.h"
 
@@ -37,7 +39,9 @@ REGISTER_CLASS_IN_FACTORY(PostEffectFactory, PE_MONOCHROME, PostEffectMonochrome
 
 PostEffectManager::PostEffectManager()
 {
-	isPS20_ = gb_RenderDevice3D && gb_RenderDevice3D->IsPS20(); // no world-render GPU device on SDL backend yet
+	// Permanently false: gb_RenderDevice3D is the retired D3D9 backend. It now only says
+	// "the D3D9-reference effects in this file may be constructed", which they may not.
+	isPS20_ = gb_RenderDevice3D && gb_RenderDevice3D->IsPS20();
 	isEnabled_ = false;
 	width_ = 0;
 	height_ = 0;
@@ -66,7 +70,7 @@ PostEffectManager::~PostEffectManager()
 
 void PostEffectManager::init(PostEffectType type)
 {
-	if(!gb_RenderDevice3D) // no world-render GPU device on SDL backend yet
+	if(!gb_RenderDevice)
 		return;
 	if(type == PE_EFFECT_NUM){
 		for(int i = 0; i < PE_EFFECT_NUM; i++){
@@ -160,11 +164,9 @@ void PostEffectManager::setActive(PostEffectType type, bool active)
 
 void PostEffectManager::createTextures()
 {
-	if(!createTexture(PE_TEXTURE_BACKBUFFER, width_, height_)){
-		isEnabled_ = false;
-		return;
-	}
-
+	// No PE_TEXTURE_BACKBUFFER: that was the D3D9 StretchRect copy of the back buffer
+	// (backBufferTexture below). The SDL backend samples the scene through the device's
+	// capture target instead -- cSDLRenderDevice::armSceneCapture / drawPostEffects.
 	for(int i = 0; i < PE_EFFECT_NUM; i++){
 		if(effects_[i]){
 			effects_[i]->setSize(width_, height_);
@@ -176,7 +178,13 @@ void PostEffectManager::createTextures()
 
 bool PostEffectManager::createEffect(PostEffectType type)
 {
-	if(isPS20_ || type == PE_MONOCHROME){
+	// Only the effects with an SDL path are created: monochrome and the under-water
+	// effect, which record into SDLPostEffectRenderer. The rest of the enum -- DOF,
+	// mirage, colour-dodge (and bloom, masked off in the constructor on D3D9 too) --
+	// exist in this file only as their D3D9 reference implementations, and a constructed
+	// one would call through the permanently-null gb_RenderDevice3D when its redraw
+	// fired. See Render/PORTING.md #6 for what porting each still needs.
+	if(type == PE_MONOCHROME || type == PE_UNDER_WATER){
 		PostEffectFactory::instance().setArgument(this);
 		effects_[type] = PostEffectFactory::instance().create(type);
 		return true;
@@ -203,17 +211,31 @@ cTexture* PostEffectManager::backBufferTexture()
 
 bool PostEffectManager::updateSize()
 {
-	xassert(gb_RenderDevice3D);
+	// The D3D9 original read the back buffer's D3DSURFACE_DESC; the device's screen size
+	// is the same number, and is what the capture target is sized to.
+	if(!gb_RenderDevice)
+		return false;
 
-	D3DSURFACE_DESC desc;
-	gb_RenderDevice3D->backBuffer_->GetDesc(&desc);
-	if(desc.Width != width_ || desc.Height != height_){
-		width_ = desc.Width;
-		height_ = desc.Height;
+	if(gb_RenderDevice->GetSizeX() != width_ || gb_RenderDevice->GetSizeY() != height_){
+		width_ = gb_RenderDevice->GetSizeX();
+		height_ = gb_RenderDevice->GetSizeY();
 		createTextures();
 		return true;
 	}
 
+	return false;
+}
+
+bool PostEffectManager::anyEffectWillDraw()
+{
+	updateSize();   // draw(dt) sizes on entry; the predicate must agree with it
+	if(!isEnabled_)
+		return false;
+
+	for(int i = 0; i < PE_EFFECT_NUM; i++){
+		if(effects_[i] && effects_[i]->isEnabled() && effects_[i]->willDraw())
+			return true;
+	}
 	return false;
 }
 
@@ -362,8 +384,9 @@ PostEffectMonochrome::~PostEffectMonochrome()
 void PostEffectMonochrome::init()
 {
 	isEnabled_ = true;
-	shader_ = new PSMonochrome();
-	shader_->Restore();
+	// No PSMonochrome wrapper: that class loads the D3D9 shader. The SDL pipeline is
+	// SDLPostEffectRenderer's (Render/SDLShaders/monochrome.frag.hlsl, ported from the
+	// same PostProcessing/monochrome.psl).
 	timePrev_ = xclock();
 }
 
@@ -372,6 +395,9 @@ void PostEffectMonochrome::redraw(float timeUnused)
 	if ((!isActive_&&!process_))
 		return;
 	int time = xclock();
+	// timePrev_ never advances past init(), so dt is the seconds since mission start and
+	// the "fade" completes in a single frame -- the original arithmetic, kept as it was:
+	// retail P2 snapped to monochrome instantly too (pause, the campaign flashbacks).
 	float dt = float(time - timePrev_)*1e-3f;
 	if (process_)
 	{
@@ -395,15 +421,12 @@ void PostEffectMonochrome::redraw(float timeUnused)
 			}
 		}
 	}
-	setSamplerState();
-	PE_RENDER_STATE_BACKUP;
-
-	cTexture* backBuffer = manager_->backBufferTexture();
-	gb_RenderDevice3D->SetTexture(0,backBuffer);
-	shader_->Select(phase_);
-	gb_RenderDevice3D->DrawQuad(0, 0, width_, height_, 0, 0, 1, 1);
-
-	PE_RENDER_STATE_RESTORE;
+	// The D3D9 tail was: snapshot the back buffer, PSMonochrome->Select(phase_), one
+	// fullscreen DrawQuad, Z/blend/alpha-test off around it. Here the frame's parameters
+	// are recorded, and cSDLRenderDevice::drawPostEffects composites the chain once the
+	// scene has settled into the capture target.
+	if(SDLPostEffectRenderer* renderer = sdlPostEffectRenderer())
+		renderer->recordMonochrome(phase_);
 }
 
 void PostEffectMonochrome::setSamplerState()
@@ -580,8 +603,9 @@ void PostEffectUnderWater::createTextures()
 
 void PostEffectUnderWater::init()
 {
-	psUnderWater_ = new PSUnderWater();
-	psUnderWater_->Restore();
+	// No PSUnderWater wrapper: that class loads the D3D9 shader. The SDL pipeline is
+	// SDLPostEffectRenderer's (Render/SDLShaders/underwater.frag.hlsl, ported from the
+	// same PostProcessing/underwater.psl).
 }
 
 int PostEffectUnderWater::texturesSize() const
@@ -624,29 +648,38 @@ void PostEffectUnderWater::redraw(float dtime)
 	else
 		scale_ = 1.0f;
 
-	PE_RENDER_STATE_BACKUP;
-
-	cTexture* backBuffer = manager_->backBufferTexture();
-
-	gb_RenderDevice3D->SetTexture(0,backBuffer);
-	gb_RenderDevice3D->SetTexture(1,wave_texture);
-	setSamplerState();
-	psUnderWater_->Select(shift_,scale_,color_);
-	gb_RenderDevice3D->DrawQuad(0,0,width_,height_,0,0,1,1);
-
-	PE_RENDER_STATE_RESTORE;
+	// The D3D9 tail was: snapshot the back buffer, bind it and the wave texture wrap/
+	// linear, PSUnderWater->Select(shift_,scale_,color_), one fullscreen DrawQuad. Here
+	// the frame's parameters are recorded, and cSDLRenderDevice::drawPostEffects
+	// composites the chain once the scene has settled into the capture target.
+	if(SDLPostEffectRenderer* renderer = sdlPostEffectRenderer())
+		renderer->recordUnderWater(shift_, scale_, color_, wave_texture);
 }
 void PostEffectUnderWater::setFog(const Color4f& clr)
 {
+	// The fog planes pull in from the world's own to the underwater ones as the camera
+	// sinks. Deliberately NOT scaled by graphQuant's frustum `range` factor -- the
+	// original applied that only on its non-underwater branch.
 	Vect2f fog;
 	if(scale_ < 1){
 		fog.x = LinearInterpolate(environmentFog_.x,fogPlanes_.x,scale_);
 		fog.y = LinearInterpolate(environmentFog_.y,fogPlanes_.y,scale_);
-		gb_RenderDevice3D->SetGlobalFog(clr,fog);
+		gb_RenderDevice->SetGlobalFog(clr,fog);
 	}
 	else {
-		gb_RenderDevice3D->SetGlobalFog(clr,fogPlanes_);
+		gb_RenderDevice->SetGlobalFog(clr,fogPlanes_);
 	}
+}
+
+bool PostEffectUnderWater::willDraw() const
+{
+	// Mirrors redraw's own gating, evaluated before the scene renders: the wave texture
+	// must exist, and either the effect is forced on, the camera is under water this
+	// frame (setUnderWater ran), or the fade-out has not finished (underWater_ latches
+	// until scale_ reaches 0).
+	if(!isActive_ || !manager_->getTexture(PE_UNDER_WATER_TEXTURE_WAVE))
+		return false;
+	return activeAlways_ || activateUnderWater_ || underWater_;
 }
 
 void PostEffectUnderWater::setTexture(const char* name)

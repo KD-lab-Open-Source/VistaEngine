@@ -45,6 +45,7 @@ class SDLWorldQuadRenderer;
 class SDLMinimapRenderer;
 class SDLGrassRenderer;
 class SDLCloudShadowRenderer;
+class SDLPostEffectRenderer;
 class cTileMap;
 
 // Restrict drawing to a camera's viewport, the way cD3DRender::SetDrawTransform hands
@@ -98,6 +99,12 @@ SDLGrassRenderer* sdlGrassRenderer();
 // drives it exactly as it drives VSCloudShadow / PSCloudShadow on Windows.
 SDLCloudShadowRenderer* sdlCloudShadowRenderer();
 
+// The SDL backend's post-effect renderer, or null under any other device. The
+// PostEffectManager effects with an SDL path (PostEffectMonochrome, PostEffectUnderWater)
+// record into it exactly as they drive PSMonochrome / PSUnderWater on Windows; the device
+// composites the chain in drawPostEffects(). See SDLPostEffectRenderer.h.
+SDLPostEffectRenderer* sdlPostEffectRenderer();
+
 class cSDLRenderDevice : public cInterfaceRenderDevice
 {
 public:
@@ -147,6 +154,25 @@ public:
 	// light sources, which blend over it. See SDLCloudShadowRenderer.h.
 	SDLCloudShadowRenderer* cloudShadowRenderer() { return cloudShadowRenderer_.get(); }
 	void drawCloudShadow();
+
+	// --- Post effects ---------------------------------------------------------
+	// The D3D9 post effects sampled the frame by StretchRect'ing the back buffer into a
+	// texture (PostEffectManager::backBufferTexture). SDL GPU cannot sample the swapchain
+	// image, so the frame is turned around instead: when Environment::graphQuant knows an
+	// effect will draw, it arms the capture, and every camera that would have rendered to
+	// the screen renders into the capture target instead -- the capture stands in for the
+	// screen for the whole scene, including its Fill() clear, and is exempt from the
+	// per-camera clear re-arming exactly as the screen is.
+	//
+	// armSceneCapture must be called after BeginScene and before any pass opens on the
+	// screen; Environment::graphQuant runs before the sky draws, which satisfies that.
+	// drawPostEffects settles the capture and composites it into the swapchain through
+	// whatever the effects recorded (a plain copy if nothing did); should it never run,
+	// EndScene performs the same composite before the UI pass, so an armed frame can not
+	// come out black.
+	SDLPostEffectRenderer* postEffectRenderer() { return postEffectRenderer_.get(); }
+	void armSceneCapture();
+	void drawPostEffects();
 
 	// --- UI and minimap -----------------------------------------------------
 	// Neither has a draw call of its own. The UI renderer's pass runs at EndScene, over
@@ -408,8 +434,8 @@ public:
 
 	// --- Internal shared dynamic buffers (no-op: none yet) ---------------
 	// TODO(sdl-port): the dynamic vertex/quad buffer family. Every one of these returns null,
-	// so any caller that was not rerouted through SDLWorldQuadRenderer draws nothing. This is
-	// what grass, the field dome and the lens flare need first. See Render/PORTING.md #15.
+	// so any caller that was not rerouted through SDLWorldQuadRenderer or the UI batch draws
+	// nothing. cLeaves is what genuinely still waits on this. See Render/PORTING.md #15.
 	cVertexBuffer<sVertexXYZDT1>*  GetBufferXYZDT1() override { return nullptr; }
 	cVertexBuffer<sVertexXYZD>*    GetBufferXYZD() override { return nullptr; }
 	cVertexBuffer<sVertexXYZWD>*   GetBufferXYZWD() override { return nullptr; }
@@ -442,6 +468,11 @@ private:
 	};
 
 	RenderTarget screen_;       // the swapchain image + depthTexture_
+	// The scene capture: what the post effects sample. captureTexture_ + depthTexture_
+	// while armed for the frame; cameras that would resolve to the screen resolve here
+	// instead. isFrameTarget() makes it share the screen's exemptions -- no re-arming
+	// from a camera's fone colour, no forced clear-only settling mid-scene.
+	RenderTarget capture_;
 	// A camera whose render target cannot be resolved (its texture is not created yet).
 	// Colour and depth stay null, so every pass skips rather than drawing to the screen.
 	RenderTarget nullTarget_;
@@ -453,6 +484,9 @@ private:
 	// The target `camera` draws into, created on first use: depth-only for a
 	// TEXTURE_RENDER_SHADOW_9700 texture, colour plus an owned depth buffer otherwise.
 	RenderTarget* resolveTarget(Camera* camera);
+	// The screen, or the capture standing in for it. These two share the frame-primary
+	// exemptions in setCamera/armClear/flushTarget.
+	bool isFrameTarget(const RenderTarget* rt) const { return rt == &screen_ || rt == &capture_; }
 	// Arm rt's clear from the camera, as cD3DRender::setCamera's Clear() does.
 	void armClear(RenderTarget* rt, Camera* camera);
 	// Replay whatever the object renderer has recorded into rt. `settle` means rt must come
@@ -506,6 +540,15 @@ private:
 	int depthW_ = 0, depthH_ = 0;
 	bool ensureDepth(int w, int h);
 
+	// The colour texture behind capture_ (swapchain format, sampleable), created when a
+	// frame first arms the capture and re-created on resize. It shares depthTexture_: the
+	// capture *is* the frame, just off-screen, and the screen needs no depth of its own
+	// once the scene has gone to the capture (the UI pass binds no depth).
+	SDL_GPUTexture* captureTexture_ = nullptr;
+	int captureW_ = 0, captureH_ = 0;
+	bool captureArmed_ = false;
+	bool ensureCapture(int w, int h);
+
 	// The shadow map, held as a cTexture so Camera::SetRenderTarget can take it and the
 	// scene can ask its size. Its SDL depth texture lives in textures_ like any other,
 	// and resolveTarget turns it into a depth-only RenderTarget.
@@ -539,6 +582,7 @@ private:
 	std::unique_ptr<SDLMinimapRenderer>   minimapRenderer_;
 	std::unique_ptr<SDLGrassRenderer>     grassRenderer_;
 	std::unique_ptr<SDLCloudShadowRenderer> cloudShadowRenderer_;
+	std::unique_ptr<SDLPostEffectRenderer>  postEffectRenderer_;
 };
 
 #endif // VISTA_SDL_RENDER_DEVICE_H

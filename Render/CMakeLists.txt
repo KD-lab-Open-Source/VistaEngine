@@ -122,6 +122,15 @@ vista_shader_module(object3dx
     "object3dx_shadow_skin_vert=object3dx_shadow.vert.hlsl:vertex:SKINNED=1"
     "object3dx_shadow_frag=object3dx_shadow.frag.hlsl:fragment")
 
+# The post-effect chain: fullscreen passes over the scene-capture target. One shared
+# SV_VertexID triangle, one fragment shader per effect (ports of the originals under
+# Render/shader/PostProcessing/), plus the pass-through composite.
+vista_shader_module(posteffect
+    "posteffect_vert=posteffect.vert.hlsl:vertex"
+    "posteffect_copy_frag=copy.frag.hlsl:fragment"
+    "posteffect_monochrome_frag=monochrome.frag.hlsl:fragment"
+    "posteffect_underwater_frag=underwater.frag.hlsl:fragment")
+
 add_custom_target(VistaShaders DEPENDS ${SHADER_HEADERS})
 
 set(RENDER_SOURCES
@@ -179,6 +188,7 @@ set(RENDER_SOURCES
     SDLWorldQuadRenderer.cpp
     SDLGrassRenderer.cpp
     SDLCloudShadowRenderer.cpp
+    SDLPostEffectRenderer.cpp
     # Symbols the engine still names that the D3D backend used to define
     # (gb_RenderDevice, the sampler constants, the sPtr buffer handles).
     RenderStub.cpp
