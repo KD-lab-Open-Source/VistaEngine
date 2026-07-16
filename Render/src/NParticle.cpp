@@ -1205,13 +1205,16 @@ void cEmitterInt::Draw(Camera* camera)
 
 	// The world-quad renderer answers to the quad buffer's BeginDraw/Get/EndDraw, so the
 	// sprite loop below is the same code on both backends; only the material call differs.
-	// softSmoke and the z-reflection clip both sample camera->GetZTexture(), which nothing
-	// ever sets (Camera::SetZTexture has no caller), so neither is carried.
+	// softSmoke is SetWorldMaterial's useZBuffer -- the soft-depth fade against the scene's
+	// float Z map, carried here as SetMaterial's softDepth. The z-reflection clip is not:
+	// it sampled camera->GetZTexture(), which nothing ever sets (Camera::SetZTexture has
+	// no caller).
 	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
 	if(!pBuf)
 		return;
 	pBuf->SetMaterial(blend_mode, GetTexture(0), true,
-	                  emitterKey()->relative ? GlobalMatrix : MatXf::ID);
+	                  emitterKey()->relative ? GlobalMatrix : MatXf::ID,
+	                  nullptr, COLOR_MOD, false, nullptr, softSmoke);
 #ifdef NEED_TREANGLE_COUNT
 	if (parent->drawOverDraw)
 	{
@@ -2043,7 +2046,8 @@ void cEmitterSpline::Draw(Camera* camera)
 	if(!pBuf)
 		return;
 	pBuf->SetMaterial(blend_mode, GetTexture(0), true,
-	                  emitterKey()->relative ? GlobalMatrix : MatXf::ID);
+	                  emitterKey()->relative ? GlobalMatrix : MatXf::ID,
+	                  nullptr, COLOR_MOD, false, nullptr, softSmoke);
 #ifdef NEED_TREANGLE_COUNT
 	if (parent->drawOverDraw)
 	{
@@ -3415,7 +3419,8 @@ void cEmitterZ::Draw(Camera* camera)
 		mode = (UCHAR)emitterKey()->planar + (emitterKey()->smooth ? 0 : 2);
 	}
 	pBuf->SetMaterial(blend_mode, GetTexture(0), true,
-	                  emitterKey()->relative ? GlobalMatrix : MatXf::ID);
+	                  emitterKey()->relative ? GlobalMatrix : MatXf::ID,
+	                  nullptr, COLOR_MOD, false, nullptr, softSmoke);
 #ifdef NEED_TREANGLE_COUNT
 	if (parent->drawOverDraw)
 	{

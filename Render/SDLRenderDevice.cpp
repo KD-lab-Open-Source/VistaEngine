@@ -309,6 +309,12 @@ int cSDLRenderDevice::Done()
 		}
 		capture_ = RenderTarget();
 		captureArmed_ = false;
+		if(sceneDepthCopy_){
+			SDL_ReleaseGPUTexture(device_, sceneDepthCopy_);
+			sceneDepthCopy_ = nullptr;
+			sceneDepthCopyW_ = sceneDepthCopyH_ = 0;
+		}
+		sceneDepthValid_ = false;
 		for(auto& kv : textures_)
 			if(kv.second.tex) SDL_ReleaseGPUTexture(device_, kv.second.tex);
 		textures_.clear();
@@ -411,6 +417,9 @@ int cSDLRenderDevice::BeginScene()
 	// will draw (armSceneCapture); its texture persists, its state does not.
 	capture_ = RenderTarget();
 	captureArmed_ = false;
+
+	// So is the scene-depth snapshot: its texture persists, its contents are last frame's.
+	sceneDepthValid_ = false;
 
 	shadowPassRan_ = false;
 	bActiveScene_ = true;
@@ -725,12 +734,70 @@ void cSDLRenderDevice::drawWorldQuads()
 	// nor for whatever the sorted pass recorded before reaching the wave sources.
 	flushObjectPass();
 
+	// The soft-depth groups' scene depth: a snapshot of the frame's depth buffer, taken
+	// once (the first soft consumer pays for the copy; the later ones reuse it -- nothing
+	// writes depth between them). Only for the frame's own target: an offscreen pass (the
+	// water reflection) has depth of its own that the snapshot does not match, so its
+	// groups draw with the fade off, exactly as they did when the original's one float map
+	// belonged to the main camera. rt->depthCleared guards the first-ever pass: before any
+	// pass has written depthTexture_, there is nothing worth copying.
+	SDL_GPUTexture* sceneDepth = nullptr;
+	if(worldQuadRenderer_->wantsSceneDepth() && rt->depth == depthTexture_ && rt->depthCleared)
+		sceneDepth = snapshotSceneDepth();
+
 	const bool clear = rt->clearPending && !rt->colorCleared;
-	if(worldQuadRenderer_->Draw(commandBuffer_, rt->color, rt->depth, rt->w, rt->h,
+	if(worldQuadRenderer_->Draw(commandBuffer_, rt->color, rt->depth, rt->w, rt->h, sceneDepth,
 	                            clear, rt->clearColor, !rt->depthCleared, fillMode_ == FILL_WIREFRAME)){
 		if(clear) rt->colorCleared = true;
 		rt->depthCleared = true;
 	}
+}
+
+// Copy depthTexture_ into the sampleable sceneDepthCopy_, through a copy pass on the
+// frame's command buffer -- between render passes, which is where drawWorldQuads sits.
+// See the member's note in the header for why this replaces the float Z-buffer camera.
+SDL_GPUTexture* cSDLRenderDevice::snapshotSceneDepth()
+{
+	if(sceneDepthValid_)
+		return sceneDepthCopy_;
+	if(!device_ || !commandBuffer_ || !depthTexture_)
+		return nullptr;
+
+	if(sceneDepthCopy_ && (sceneDepthCopyW_ != depthW_ || sceneDepthCopyH_ != depthH_)){
+		SDL_ReleaseGPUTexture(device_, sceneDepthCopy_);
+		sceneDepthCopy_ = nullptr;
+	}
+	if(!sceneDepthCopy_){
+		SDL_GPUTextureCreateInfo ti = {};
+		ti.type = SDL_GPU_TEXTURETYPE_2D;
+		ti.format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
+		// SAMPLER is the point; DEPTH_STENCIL_TARGET completes the only usage pair SDL
+		// allows a depth format, as the shadow map's texture does.
+		ti.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER | SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET;
+		ti.width = (Uint32)depthW_; ti.height = (Uint32)depthH_;
+		ti.layer_count_or_depth = 1; ti.num_levels = 1;
+		sceneDepthCopy_ = SDL_CreateGPUTexture(device_, &ti);
+		if(!sceneDepthCopy_){
+			fprintf(stderr, "cSDLRenderDevice::snapshotSceneDepth: CreateGPUTexture failed: %s\n",
+			        SDL_GetError());
+			return nullptr;
+		}
+		sceneDepthCopyW_ = depthW_;
+		sceneDepthCopyH_ = depthH_;
+	}
+
+	SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(commandBuffer_);
+	if(!copy)
+		return nullptr;
+	SDL_GPUTextureLocation src = {};
+	src.texture = depthTexture_;
+	SDL_GPUTextureLocation dst = {};
+	dst.texture = sceneDepthCopy_;
+	SDL_CopyGPUTextureToTexture(copy, &src, &dst, (Uint32)depthW_, (Uint32)depthH_, 1, false);
+	SDL_EndGPUCopyPass(copy);
+
+	sceneDepthValid_ = true;
+	return sceneDepthCopy_;
 }
 
 void cSDLRenderDevice::drawGrass()

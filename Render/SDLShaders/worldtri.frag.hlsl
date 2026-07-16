@@ -59,6 +59,10 @@ cbuffer Params : register(b0, space3)
     //         alpha by the fog factor; its src blend factor was SRC_ALPHA, so that scaled the
     //         contribution. Ours is ONE over a premultiplied source, so scale the whole thing.
     float4 FogParams;
+    // The quad route's FLOAT_ZBUFFER soft-depth fade (see worldquad.frag.hlsl), declared
+    // only to keep the shared FSUniform layout: no triangle-route caller ever passed
+    // SetWorldMaterial's useZBuffer, so this is always zero here and never read.
+    float4 ZBufferParams;
     // x != 0: ZREFLECTION -- clip this pixel away where it has sunk below the ground. Only
     // FieldDispatcher asks for it; every other group leaves it at zero.
     float4 ZReflection;
