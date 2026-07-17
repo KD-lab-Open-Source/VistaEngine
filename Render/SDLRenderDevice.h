@@ -265,6 +265,26 @@ public:
 	void SetGlobalFog(const Color4f& color, const Vect2f& range) override;
 	const Color4f& fogColor() const { return fogColor_; }
 	Vect4f fogPlane(Camera* camera) const;
+
+	// --- Fog of war ----------------------------------------------------------
+	// Nothing to do with the distance fog above, despite the name: this is the RTS shroud
+	// over unseen ground. cScene::Draw turns it on for the scene it is about to draw and off
+	// again after, and hands over FogOfWar's serialized colour -- exactly as it drove
+	// cD3DRender::SetFogOfWar / fog_of_war_color, which selected the FOG_OF_WAR variant of
+	// the terrain and grass shaders and uploaded the colour into their vFogOfWar (psl c3).
+	//
+	// The *coverage* does not come through here. It arrives in the terrain lightmap's ALPHA
+	// channel, which FogOfWar::Draw writes with one world-sized quad under the planar light
+	// camera; the shaders that sample the lightmap already have it in hand and end with
+	//     ot.rgb = lerp(ot.rgb, fogOfWarColor, lightmap.a)
+	// which is why turning this on costs them a lerp and no extra texture.
+	void SetFogOfWar(bool enable, const Color4f& color)
+	{
+		fogOfWar_ = enable;
+		fogOfWarColor_ = color;
+	}
+	bool fogOfWar() const { return fogOfWar_; }
+	const Color4f& fogOfWarColor() const { return fogOfWarColor_; }
 	// Light clip space -> shadow map texture coordinates.
 	Mat4f shadowMatBias() const;
 	// The terrain caster, from cTileMap::Draw under the light camera -- where the D3D
@@ -587,6 +607,12 @@ private:
 	// D3DRS_FOGSTART / D3DRS_FOGEND: where the fog begins and where it is total, measured in
 	// world units along the camera's view axis. fogPlane() turns them into the factor.
 	Vect2f  fogRange_ = Vect2f(0.f, 1.f);
+
+	// cD3DRender's is_fog_of_war / fog_of_war_color. See SetFogOfWar. The colour's default is
+	// the one cD3DRender's constructor set, for a scene that draws before cScene::Draw has
+	// said otherwise; with fogOfWar_ off, nothing reads it.
+	bool    fogOfWar_ = false;
+	Color4f fogOfWarColor_ = Color4f(0.5f, 0.5f, 0.5f, 1.f);
 
 	std::unique_ptr<SDLUIRenderer>        uiRenderer_;
 	std::unique_ptr<SDLTileMapRenderer>   tileMapRenderer_;

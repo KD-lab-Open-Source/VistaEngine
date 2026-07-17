@@ -6,6 +6,8 @@
 #include "TexLibrary.h"
 #include "cCamera.h"
 #include "D3DRender.h"
+#include "Render/SDLRenderDevice.h"        // sdlWorldQuadRenderer()
+#include "Render/SDLWorldQuadRenderer.h"   // the quad route the fog rides, and eColorWriteMask
 #include "Serialization/RangedWrapper.h"
 #include "Terra/VMAP.H"
 
@@ -319,12 +321,53 @@ void FogOfWar::PreDraw(Camera* camera)
 
 void FogOfWar::Draw(Camera* camera)
 {
-	// TODO(sdl-port): fog of war does not draw. See Render/PORTING.md #10.
+	// One quad over the whole world, into the terrain LIGHTMAP's ALPHA channel -- not into
+	// the view. The lightmap's four channels carry two unrelated things: the light sources
+	// and circle shadows live in RGB (CameraPlanarLight::drawLights), and the fog of war
+	// lives in alpha, which is this. The terrain and the grass then read that alpha and
+	// lerp themselves toward the fog colour (`ot.rgb = lerp(ot.rgb, vFogOfWar, lightmap.a)`
+	// in tilemap.frag.hlsl and grass.frag.hlsl), so the whole effect costs them one lerp
+	// and this one quad.
 	//
-	// The same alpha-only quad as FieldOfViewMap::Draw. It drew into the terrain lightmap's
-	// alpha channel, which needs a colour-write mask we have no pipeline for, and nothing
-	// reads that channel yet.
-	return;
+	// ATTRUNKOBJ_IGNORE_NORMALCAMERA keeps us off the scene camera; guard the rest, as
+	// cCloudShadow::Draw does, since ATTRCAMERA_SHADOW is what makes a camera the planar
+	// light one.
+	if(!camera->getAttribute(ATTRCAMERA_SHADOW))
+		return;
+
+	SDLWorldQuadRenderer* quad = sdlWorldQuadRenderer();
+	if(!quad || !texture_)
+		return;
+	quad->SetCamera(camera);
+
+	// D3DCOLORWRITEENABLE_ALPHA, restored below: the light sources own the RGB and we must
+	// not touch it. We sort after cCloudShadow (sortIndex -1, ours 0), which lays the clouds
+	// into that same RGB, and before drawLights, which blends over them.
+	quad->SetColorWriteMask(COLOR_WRITE_ALPHA);
+
+	// ALPHA_NONE: the fog OVERWRITES the alpha rather than blending into it -- the texture
+	// is the whole truth about what is visible this frame, and the lightmap was cleared to
+	// alpha 0 (CameraPlanarLight's fone colour) meaning "nothing is fogged".
+	//
+	// texture_ is the L8 coverage map UpdateTexture rewrites every frame: 0 where the tile
+	// is seen, fogColor_.a where it is not. An 8-bit texture uploads as (255,255,255,
+	// coverage), so the quad shader's `t * diffuse` with a white diffuse puts exactly that
+	// coverage in alpha -- which is what the original's psFont did with the same texture.
+	quad->SetMaterial(ALPHA_NONE, texture_);
+
+	const int dx = vMap.H_SIZE;
+	const int dy = vMap.V_SIZE;
+	const Color4c diffuse(255, 255, 255);
+
+	quad->BeginDraw();
+	sVertexXYZDT1* v = quad->Get();
+	v[0].pos.x=0;  v[0].pos.y=0;  v[0].pos.z=0; v[0].u1()=0; v[0].v1()=0; v[0].diffuse=diffuse;
+	v[1].pos.x=0;  v[1].pos.y=dy; v[1].pos.z=0; v[1].u1()=0; v[1].v1()=1; v[1].diffuse=diffuse;
+	v[2].pos.x=dx; v[2].pos.y=0;  v[2].pos.z=0; v[2].u1()=1; v[2].v1()=0; v[2].diffuse=diffuse;
+	v[3].pos.x=dx; v[3].pos.y=dy; v[3].pos.z=0; v[3].u1()=1; v[3].v1()=1; v[3].diffuse=diffuse;
+	quad->EndDraw();
+
+	quad->SetColorWriteMask(COLOR_WRITE_ALL);
 }
 
 void FogOfWar::Animate(float dt)

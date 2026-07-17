@@ -1305,41 +1305,50 @@ int cSDLRenderDevice::CreateTexture(cTexture* Texture, cFileImage* FileImage, in
 		for(int m = (w > h ? w : h); m > 1; m >>= 1)
 			++levels;
 
-	SDL_GPUTextureCreateInfo ti = {};
-	ti.type = SDL_GPU_TEXTURETYPE_2D;
-	ti.format = SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM;
-	ti.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER | (levels > 1 ? SDL_GPU_TEXTUREUSAGE_COLOR_TARGET : 0);
-	ti.width = (Uint32)w; ti.height = (Uint32)h;
-	ti.layer_count_or_depth = 1; ti.num_levels = (Uint32)levels;
-	SDL_GPUTexture* tex = SDL_CreateGPUTexture(device_, &ti);
-	if(!tex) return 1;
-
-	TextureData td;
-	td.tex = tex; td.w = w; td.h = h; td.bpp = bpp; td.pitch = w * bpp;
-	td.levels = levels;
-	td.expand = (bpp == 1);
-	td.staging.assign((size_t)w * h * bpp, 0);
-
-	if(FileImage){
-		// GetTexture writes 32-bit BGRA pixels; meaningful for the colour path.
-		FileImage->GetTexture(td.staging.data(), 0, w, h);
-		uploadTexture(td);
-	}
-
-	textures_[tex] = std::move(td);
-
-	// Release any texture we previously parked in slot 0, then hand over the new
-	// handle. (Single-frame; animated multi-frame textures keep only frame 0.)
+	// One surface per frame. An animated texture carries frameNumber() frames, each its own
+	// full-size surface; SetTexturePhase (and sdlTextureOf) pick GetDDSurface(frame) by phase.
+	// The D3D CreateTexture built them all with FileImage->GetTexture(buf, i, ...) per frame --
+	// building only frame 0 leaves every later frame null, and a null frame samples as the
+	// white vertex-colour fallback (the minimap's 17-frame radar sweep flashed white for
+	// frames 1..16 that way). Single-frame textures run this loop exactly once.
 	if(Texture->frameNumber() < 1)
 		Texture->New(1);
-	else if(SDL_GPUTexture* old = reinterpret_cast<SDL_GPUTexture*>(Texture->GetDDSurface(0))){
-		auto it = textures_.find(old);
-		if(it != textures_.end() && old != tex){
-			SDL_ReleaseGPUTexture(device_, old);
-			textures_.erase(it);
+	const int frames = Texture->frameNumber();
+
+	for(int i = 0; i < frames; ++i){
+		SDL_GPUTextureCreateInfo ti = {};
+		ti.type = SDL_GPU_TEXTURETYPE_2D;
+		ti.format = SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM;
+		ti.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER | (levels > 1 ? SDL_GPU_TEXTUREUSAGE_COLOR_TARGET : 0);
+		ti.width = (Uint32)w; ti.height = (Uint32)h;
+		ti.layer_count_or_depth = 1; ti.num_levels = (Uint32)levels;
+		SDL_GPUTexture* tex = SDL_CreateGPUTexture(device_, &ti);
+		if(!tex) return 1;
+
+		TextureData td;
+		td.tex = tex; td.w = w; td.h = h; td.bpp = bpp; td.pitch = w * bpp;
+		td.levels = levels;
+		td.expand = (bpp == 1);
+		td.staging.assign((size_t)w * h * bpp, 0);
+
+		if(FileImage){
+			// GetTexture writes 32-bit BGRA pixels for frame i (the D3D loop's `i` arg).
+			FileImage->GetTexture(td.staging.data(), i, w, h);
+			uploadTexture(td);
 		}
+
+		textures_[tex] = std::move(td);
+
+		// Release any texture we previously parked in this slot, then hand over the new handle.
+		if(SDL_GPUTexture* old = reinterpret_cast<SDL_GPUTexture*>(Texture->GetDDSurface(i))){
+			auto it = textures_.find(old);
+			if(it != textures_.end() && old != tex){
+				SDL_ReleaseGPUTexture(device_, old);
+				textures_.erase(it);
+			}
+		}
+		Texture->GetDDSurface(i) = reinterpret_cast<IDirect3DTexture9*>(tex);
 	}
-	Texture->GetDDSurface(0) = reinterpret_cast<IDirect3DTexture9*>(tex);
 	return 0;  // 0 == success (matches the D3D contract)
 }
 

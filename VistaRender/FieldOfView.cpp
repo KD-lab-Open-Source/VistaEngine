@@ -2,6 +2,8 @@
 #include "FieldOfView.h"
 #include "Render/D3D/D3DRender.h"
 #include "Render/src/cCamera.h"
+#include "Render/SDLRenderDevice.h"        // sdlRenderDevice(), sdlWorldQuadRenderer()
+#include "Render/SDLWorldQuadRenderer.h"   // the quad route the sight sectors ride, and eColorWriteMask
 #include "Terra/VMAP.H"
 #include "ScanPoly.h"
 #include "DebugUtil.h"
@@ -204,7 +206,10 @@ void FieldOfViewMap::updateTexture()
 {
 	start_timer_auto();
 
-	Vect4f transform = gb_RenderDevice3D->planarTransform();
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	if(!dev)
+		return;
+	Vect4f transform = dev->planarTransform();
 	int x0 = max(0, map_.w2m(int(round(transform.x))));
 	int y0 = max(0, map_.w2m(int(round(transform.y))));
 	int x1 = min(map_.sizeX(), x0 + map_.w2m(int(round(1.f/transform.z))));
@@ -241,15 +246,49 @@ void FieldOfViewMap::PreDraw(Camera* camera)
 
 void FieldOfViewMap::Draw(Camera* camera)
 {
-	// Fog of war, not ported. This is one map-sized quad drawn into the terrain lightmap's
-	// ALPHA channel -- which is why CameraPlanarLight::drawLights masks alpha off, so the
-	// light quads that follow cannot clobber it, and why the terrain shader's FOG_OF_WAR
-	// branch reads lightmap.a. Reproducing it needs a colour-write mask on the quad
-	// pipeline and that branch in tilemap.frag.hlsl; the lightmap itself does not.
+	// One world-sized quad into the terrain LIGHTMAP, on the planar light camera -- a sibling of
+	// FogOfWar::Draw (PORTING.md #10), NOT the fog of war. The sight sectors live in the lightmap's
+	// RGB (the tint the terrain shader adds as `light += 2*(lightmap.rgb - 0.5)`), the fog of war
+	// in its ALPHA. updateTexture packs them centred on 128 = 0.5 = neutral, so the untraced
+	// ground contributes nothing; a traced cell rises above 0.5 and tints with the player colour.
 	//
-	// It attaches only to the planar light camera (ATTRUNKOBJ_IGNORE_NORMALCAMERA keeps it
-	// off the scene camera), so nothing reached it until that camera started drawing.
-	return;
+	// ATTRUNKOBJ_IGNORE_NORMALCAMERA keeps us off the scene camera; ATTRCAMERA_SHADOW is what
+	// marks a camera the planar light one, as FogOfWar::Draw and cCloudShadow::Draw guard on.
+	if(!camera->getAttribute(ATTRCAMERA_SHADOW))
+		return;
+
+	SDLWorldQuadRenderer* quad = sdlWorldQuadRenderer();
+	if(!quad || !texture_)
+		return;
+	quad->SetCamera(camera);
+
+	// The collision PORTING.md #10b warned about: the original was ALPHA_BLEND with NO mask, so
+	// its alpha (128 + (color.a*visibility >> 9)) would land in the channel the fog of war now
+	// owns and read as coverage. Mask to RGB -- exactly as CameraPlanarLight::drawLights does for
+	// the light quads -- so only the colour tint lands and the fog channel is left untouched. The
+	// mask hides the alpha *result*, not the src-alpha blend factor, so the RGB blend is unchanged
+	// from D3D9. The alpha was never meaningfully read anyway: FogOfWar::Draw (sortIndex 10)
+	// overwrites it after us (sortIndex 0) when fog is on, and nothing samples it when fog is off.
+	quad->SetColorWriteMask(COLOR_WRITE_RGB);
+
+	// ALPHA_BLEND with the BGRA coverage texture updateTexture rewrites each frame: the quad
+	// shader's `t * diffuse` with a white diffuse passes it straight through, and the src alpha
+	// is the per-cell visibility that fades the sector in and out.
+	quad->SetMaterial(ALPHA_BLEND, texture_);
+
+	const int dx = vMap.H_SIZE;
+	const int dy = vMap.V_SIZE;
+	const Color4c diffuse(255, 255, 255);
+
+	quad->BeginDraw();
+	sVertexXYZDT1* v = quad->Get();
+	v[0].pos.x=0;  v[0].pos.y=0;  v[0].pos.z=0; v[0].u1()=0; v[0].v1()=0; v[0].diffuse=diffuse;
+	v[1].pos.x=0;  v[1].pos.y=dy; v[1].pos.z=0; v[1].u1()=0; v[1].v1()=1; v[1].diffuse=diffuse;
+	v[2].pos.x=dx; v[2].pos.y=0;  v[2].pos.z=0; v[2].u1()=1; v[2].v1()=0; v[2].diffuse=diffuse;
+	v[3].pos.x=dx; v[3].pos.y=dy; v[3].pos.z=0; v[3].u1()=1; v[3].v1()=1; v[3].diffuse=diffuse;
+	quad->EndDraw();
+
+	quad->SetColorWriteMask(COLOR_WRITE_ALL);
 }
 
 void FieldOfViewMap::serialize(Archive& ar)

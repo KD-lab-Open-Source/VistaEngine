@@ -28,7 +28,8 @@ namespace {
 struct VSUniform { float mvp[16]; float uv[4]; float shadow[16]; float planarNode[4];
                    float miniTexture[4]; float fogPlane[4]; };
 struct FSUniform { float lightColor[4]; float lightDir[4]; float shade[4]; float params[4];
-                   float lightMapParams[4]; float detailParams[4]; float fogColor[4]; };
+                   float lightMapParams[4]; float detailParams[4]; float fogColor[4];
+                   float fogOfWarColor[4]; };
 // tilemap_shadow.vert.hlsl's whole cbuffer: the light camera's view-projection.
 struct ShadowVSUniform { float mvp[16]; };
 
@@ -921,7 +922,16 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	                         ? reinterpret_cast<SDL_GPUTexture*>(lightMapTexture->GetDDSurface(0))
 	                         : nullptr;
 	fsu.lightMapParams[0] = lightMap ? 1.f : 0.f;
-	fsu.lightMapParams[1] = fsu.lightMapParams[2] = fsu.lightMapParams[3] = 0.f;
+	// The fog of war rides that same lightmap, in its alpha channel, so it is on only if the
+	// map is there to read: cScene::Draw turns it on for the scene, FogOfWar::Draw fills the
+	// alpha under the light camera. Its colour is FogOfWar's own, carried on the device as
+	// cD3DRender carried fog_of_war_color.
+	const bool fogOfWar = dev && dev->fogOfWar() && lightMap;
+	fsu.lightMapParams[1] = fogOfWar ? 1.f : 0.f;
+	fsu.lightMapParams[2] = fsu.lightMapParams[3] = 0.f;
+	const Color4f fow = dev ? dev->fogOfWarColor() : Color4f();
+	fsu.fogOfWarColor[0] = fow.r; fsu.fogOfWarColor[1] = fow.g;
+	fsu.fogOfWarColor[2] = fow.b; fsu.fogOfWarColor[3] = fow.a;
 	if(dev){
 		const Vect4f& pn = dev->planarTransform();
 		vsu.planarNode[0] = pn.x; vsu.planarNode[1] = pn.y;

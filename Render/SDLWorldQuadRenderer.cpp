@@ -167,10 +167,11 @@ bool SDLWorldQuadRenderer::createShaders()
 }
 
 SDL_GPUGraphicsPipeline* SDLWorldQuadRenderer::pipelineFor(eBlendMode blend, bool depthTest,
-                                                           bool wireframe, GroupKind kind)
+                                                           bool wireframe, GroupKind kind,
+                                                           eColorWriteMask colorWrite)
 {
 	const unsigned key = (unsigned)blend | ((unsigned)depthTest << 8) | ((unsigned)wireframe << 9)
-	                   | ((unsigned)kind << 10);
+	                   | ((unsigned)kind << 10) | ((unsigned)colorWrite << 11);
 	auto it = pipelines_.find(key);
 	if(it != pipelines_.end())
 		return it->second;
@@ -241,6 +242,17 @@ SDL_GPUGraphicsPipeline* SDLWorldQuadRenderer::pipelineFor(eBlendMode blend, boo
 			break;
 		default:
 			break;   // ALPHA_BLEND and its two variants keep the factors set above
+	}
+
+	// D3DRS_COLORWRITEENABLE. SDL GPU only consults color_write_mask when the pipeline opts
+	// in with enable_color_write_mask, so leaving both zeroed is "write everything" -- which
+	// is what every caller but the two lightmap ones wants.
+	if(colorWrite != COLOR_WRITE_ALL){
+		bs.enable_color_write_mask = true;
+		bs.color_write_mask = colorWrite == COLOR_WRITE_ALPHA
+		                    ? SDL_GPU_COLORCOMPONENT_A
+		                    : (SDL_GPU_COLORCOMPONENT_R | SDL_GPU_COLORCOMPONENT_G |
+		                       SDL_GPU_COLORCOMPONENT_B);
 	}
 
 	SDL_GPUGraphicsPipelineCreateInfo pci = {};
@@ -325,6 +337,8 @@ void SDLWorldQuadRenderer::SetMaterial(eBlendMode blend, cTexture* texture, bool
 	// -- the float map exists -- is Draw's: no scene-depth snapshot, no fade.
 	material_.softDepth = softDepth && Option_FloatZBufferType != 0;
 	materialWorld_ = world;
+	// material_.colorWrite is deliberately NOT touched: it is a render state, and SetMaterial
+	// standing in for SetNoMaterial/SetWorldMaterial does not clear it on D3D either.
 
 	// ZREFLECTION: the height clip is on exactly when a height texture was handed in.
 	material_.fs.zReflection[0] = material_.textureZ ? 1.f : 0.f;
@@ -726,7 +740,8 @@ bool SDLWorldQuadRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 	FSUniform boundFS = {};
 	bool fsPushed = false;
 	for(const Group& g : groups_){
-		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(g.blend, g.depthTest, wireframe, g.kind);
+		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(g.blend, g.depthTest, wireframe, g.kind,
+		                                                g.colorWrite);
 		if(!pipeline) continue;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);

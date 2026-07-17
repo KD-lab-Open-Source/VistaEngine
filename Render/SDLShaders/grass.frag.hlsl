@@ -57,11 +57,16 @@ cbuffer Constants : register(b0, space3)
     // x != 0: the lightmap holds this frame's light sources. The original has no such flag
     // (LIGHTMAP is a define and the map always exists once the device is up); ours may not
     // have been created, or its pass may not have run.
+    // y != 0: the fog of war is on, and the lightmap's ALPHA holds this frame's coverage.
+    // The original's FOG_OF_WAR define -- Grass.psl has the same branch the terrain does.
     float4 LightMapParams;
     // x: the alpha-test reference, D3DRS_ALPHAREF/255. See the note on clip() above.
     float4 Params;
     // Distance fog: D3DRS_FOGCOLOR. The factor arrives interpolated, in VSOutput::Fog.
     float4 FogColor;
+    // The original's vFogOfWar (Grass.psl c3): the colour unseen ground becomes. Nothing to
+    // do with FogColor -- this is the RTS shroud. Only rgb is read.
+    float4 FogOfWarColor;
 };
 
 struct VSOutput
@@ -105,15 +110,19 @@ float4 main(VSOutput input) : SV_Target0
 {
     float4 ot = GrassTexture.Sample(GrassSampler, input.UV);
 
+    // The lightmap carries the light sources in RGB and the fog of war in alpha; the grass
+    // reads both. Neutral is mid-grey (adds no light) and alpha 0 (nothing shrouded).
+    float4 lightmap = float4(0.5f, 0.5f, 0.5f, 0.0f);
+    if(LightMapParams.x != 0.0f)
+        lightmap = LightMapTexture.Sample(LightMapSampler, input.LightmapUV);
+
     // The vertex shader already lit the blade; the lightmap is a signed offset on top of
     // that, so its neutral mid-grey adds nothing, a light source brightens and a circle
-    // shadow darkens.
+    // shadow darkens. Still branched rather than folded into the neutral above: the original
+    // saturates here and only here, and the vertex colour is not otherwise clamped.
     float3 diffuse = input.Color.rgb;
     if(LightMapParams.x != 0.0f)
-    {
-        float3 lm = LightMapTexture.Sample(LightMapSampler, input.LightmapUV).rgb;
-        diffuse = saturate(diffuse + (lm - 0.5f));
-    }
+        diffuse = saturate(diffuse + (lightmap.rgb - 0.5f));
 
     ot.rgb *= diffuse;
     ot.a   *= input.Color.a;   // the distance fade the vertex shader computed
@@ -129,6 +138,13 @@ float4 main(VSOutput input) : SV_Target0
         float lit = shadowLit(input.ShadowPos);
         ot.rgb *= ShadeIntensity.rgb * (1.0f - lit) + lit;
     }
+
+    // The fog of war, exactly as Grass.psl has it and in the same place the terrain does:
+    // `ot.rgb = lerp(ot.rgb, vFogOfWar, lightmap.a)`, after the shadow. Without this the
+    // grass would stay lit inside the shroud and stand out against the fogged ground under
+    // it -- the two sample the same lightmap, so the coverage costs nothing extra here.
+    if(LightMapParams.y != 0.0f)
+        ot.rgb = lerp(ot.rgb, FogOfWarColor.rgb, lightmap.a);
 
     // Fog last, as D3D9's fixed function applied it: to the finished pixel, before the
     // blend. Only the colour is fogged -- the alpha still carries the blade's own fade and
