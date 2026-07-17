@@ -115,6 +115,9 @@ bool cTexture::reloadDDS()
 	// RGB, and V8U8 bump maps like the water waves) to BGRA with our own decoder and
 	// upload through the device. RenderFileRead already resolved the VFS path.
 	cDDSImage img;
+	// A specular map's alpha is its power, and a bump map's is nothing -- neither is
+	// opacity, so don't premultiply RGB by it (that darkened the specular colour).
+	img.setPremultiplyAlpha(!getAttribute(TEXTURE_SPECULAR | TEXTURE_BUMP));
 	int r = img.load(buf, size);
 	delete[] buf;
 	if(r != 0)
@@ -265,6 +268,8 @@ bool cTexture::loadDDS(const char* file_name)
 	// D3DX loaded these; it went with D3D9. Decode the cached DDS (DXT1/3/5) to BGRA and
 	// create the texture through the device's CreateTexture.
 	cDDSImage img;
+	// See reloadDDS: specular/bump alpha is not opacity, so keep premultiply off it.
+	img.setPremultiplyAlpha(!getAttribute(TEXTURE_SPECULAR | TEXTURE_BUMP));
 	if(img.load(file_name) != 0)
 		return false;
 	SetWidth(img.GetX());
