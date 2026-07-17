@@ -17,6 +17,14 @@
 //           v.y*r1 + v.z*r2 in our row-per-register layout. Only the specular COLOR1
 //           output (zero here, before point lights) survives.
 //
+// REFLECTION=1 (with BUMP=0) is the original's vsSkinReflection, taken for a material
+// with a 2D environment ("matcap") map -- the shiny-metal units. It adds one output over
+// the plain lit path: a sphere-map UV built from the view-space normal, exactly the
+// original's `mul(world_n, (float3x2)mView)*0.5 + 0.5` (the view rotation's first two
+// columns are the camera right/up, so this is the normal's x,y in camera space, mapped to
+// [0,1]). REFLECTION never combines with BUMP: cObject3dx::Draw picks the reflection
+// technique before the bump one, and the two are mutually exclusive there.
+//
 // Both keep the same skinning (an index into mWorldM[] per vertex; for WEIGHT>1 a
 // weighted sum of the indexed 4x3 world matrices) and the same affine UV transform
 // (uvtrans.inl).
@@ -38,6 +46,9 @@
 #endif
 #ifndef BUMP
 #define BUMP 0
+#endif
+#ifndef REFLECTION
+#define REFLECTION 0
 #endif
 
 // Matches StaticBunch::max_index -- the most bones one material group can reference.
@@ -70,6 +81,11 @@ cbuffer Constants : register(b0, space1)
     // means fog is off, making the fragment shader's lerp the identity. See SDLRenderDevice.h.
     // It must stay ahead of World[], which is the tail the bone matrices are pushed into.
     float4 FogPlane;
+
+    // The camera's view matrix (world -> camera space), the original's mView (c90). Read
+    // only by the REFLECTION variant, for the sphere-map UV; pushed for every variant so
+    // the one uniform block stays in step (object3dx_shadow.vert.hlsl declares it too).
+    row_major float4x4 View;
 
     // mWorldM[20] as 20 x 3 rows of (R | T): world.k = dot(float4(pos,1), World[3i+k]).
     // The original ships the same 3 registers per bone (setMatrix4x3VS).
@@ -106,6 +122,9 @@ struct VSOutput
     float2 UV        : TEXCOORD0;
     float4 ShadowPos : TEXCOORD3;   // the original's o.tshadow
     float  Fog       : TEXCOORD4;
+#if REFLECTION
+    float2 Reflect   : TEXCOORD5;   // sphere-map UV: view-space normal.xy mapped to [0,1]
+#endif
 };
 
 VSOutput main(VSInput input)
@@ -181,6 +200,12 @@ VSOutput main(VSInput input)
     if(Params.y != 0.0f){        // NOLIGHT
         output.Diffuse = Ambient;
         output.Specular = 0.0f;
+#if REFLECTION
+        // A reflection material is always lit (cObject3dx::Draw picks it after the NOLIGHT
+        // branch), so this path is never taken for one at runtime -- but every output must
+        // still be written for the shader to compile.
+        output.Reflect = float2(0.5f, 0.5f);
+#endif
     }
     else{
         float3 n = float3(dot(input.Normal, r0.xyz), dot(input.Normal, r1.xyz), dot(input.Normal, r2.xyz));
@@ -202,6 +227,14 @@ VSOutput main(VSInput input)
         output.Diffuse.a = Diffuse.a;
         output.Specular = (ndl > 0.0f && ndh > 0.0f) ? pow(ndh, Specular.w) * Specular.rgb
                                                      : float3(0.0f, 0.0f, 0.0f);
+
+#if REFLECTION
+        // The original's `mul(world_n, (float3x2)mView)*0.5 + 0.5`: the world normal taken
+        // into camera space (w = 0 drops the translation), its x,y are the projections onto
+        // the camera right/up axes -- a view-space sphere map.
+        float3 nView = mul(float4(n, 0.0f), View).xyz;
+        output.Reflect = nView.xy * 0.5f + 0.5f;
+#endif
     }
 #endif
     return output;

@@ -26,12 +26,14 @@
 // SDL_GPUBuffer behind it (and for the current RS_ZWRITEENABLE).
 //
 // Scope: the plain lit path (vsSkin/psSkin), the bump path (vsSkinBump/psSkinBump, with
-// its optional specular map) and their scene-shadow variants -- skinning, diffuse texture,
-// lambert + specular, ambient, the skin-colour tint, the animated UV transform, casting
-// into and receiving from the shadow map, and the five blend modes cObject3dx::Draw
-// selects between. Still to come, each a shader variant cObject3dx::Draw picks in the
-// original: reflection (planar and cube), the second opacity map, the lightmap, fog of
-// war, fog, point lights, and fur.
+// its optional specular map), the 2D reflection path (vsSkinReflection/psSkinReflection --
+// the view-space environment ("matcap") map that gives the metal units their sheen) and
+// their scene-shadow variants -- skinning, diffuse texture, lambert + specular, ambient,
+// the skin-colour tint, the animated UV transform, casting into and receiving from the
+// shadow map, and the five blend modes cObject3dx::Draw selects between. Still to come,
+// each a shader variant cObject3dx::Draw picks in the original: the sky-cubemap reflection
+// (is_reflect_sky -- matches no shipped model), the second opacity map, the lightmap, fog
+// of war, point lights, and fur.
 
 #include "IRenderDevice.h"    // Color4f, eBlendMode, cTexture, MatXf
 #include <unordered_map>
@@ -82,6 +84,11 @@ public:
 		// tangent frame (cStatic3dx::bump) and the original would have picked vsSkinBump.
 		cTexture* bumpTexture = nullptr;    // mat.pBumpTexture
 		cTexture* specularMap = nullptr;    // mat.pSpecularmap (PSSkinBump::SelectSpecularMap)
+		// Non-null selects the reflection path (mutually exclusive with bump). The 2D
+		// environment map; a sky cubemap (is_reflect_sky) stays unported. reflectAmount is
+		// the original's reflect_amount * node diffuse, the weight it is added at.
+		cTexture* reflectTexture = nullptr;   // mat.pReflectTexture
+		Color4f reflectAmount = Color4f(0,0,0,0);
 		float texturePhase = 0.f;       // animation phase for a multi-frame texture
 		bool tilingWrap = false;        // mat.tiling_diffuse & TILING_U_WRAP
 
@@ -148,6 +155,7 @@ private:
 		float params[4];            // x = boneCount, y = noLight
 		float shadow[16];           // shadowMatViewProj() * shadowMatBias()
 		float fogPlane[4];          // cSDLRenderDevice::fogPlane(camera)
+		float view[16];             // camera->matView; the REFLECTION variant's sphere-map basis
 	};
 
 	// The most bone poses one material group can reference: StaticBunch::max_index, and
@@ -171,6 +179,7 @@ private:
 		float shade[4];             // vShade: a fully shadowed pixel's multiplier
 		float shadowParams[4];      // x = this material receives shadows
 		float fogColor[4];          // D3DRS_FOGCOLOR
+		float reflectAmount[4];     // reflectionAmount: rgb weight for the env map (reflect path)
 	};
 
 	// A state snapshot shared by every draw recorded under it.
@@ -183,11 +192,13 @@ private:
 		SDL_GPUTexture* texture;    // null -> the 1x1 white stand-in
 		SDL_GPUTexture* bumpTexture;
 		SDL_GPUTexture* specularTexture;
+		SDL_GPUTexture* reflectTexture;  // the 2D env map (reflect path)
 		SDL_GPUTexture* shadowTexture;   // null -> this material does not receive
 		SDL_GPUSampler* sampler;
 		eBlendMode blend;
 		bool skinned;               // vertex carries weight bytes (boneCount > 1)
 		bool bump;                  // bump path: tangent-frame vertex, per-pixel lambert
+		bool reflect;               // reflection path: adds a view-space env map (no bump)
 		// The camera was the reflection camera, whose mirror matrix reverses every
 		// triangle's winding: cull the other face (see pipelineFor).
 		bool mirrored;
@@ -213,8 +224,8 @@ private:
 	// depth write -- all baked into an SDL GPU pipeline. Built on demand and cached.
 	// `shadow` selects the caster pipeline: depth-only (no colour target), slope-scaled
 	// depth bias, and the shadow shaders, which ignore the tangent frame.
-	SDL_GPUGraphicsPipeline* pipelineFor(int stride, bool skinned, bool bump, eBlendMode blend, bool mirrored,
-	                                     bool depthWrite, bool wireframe, bool shadow);
+	SDL_GPUGraphicsPipeline* pipelineFor(int stride, bool skinned, bool bump, bool reflect, eBlendMode blend,
+	                                     bool mirrored, bool depthWrite, bool wireframe, bool shadow);
 	// Append the current state to states_ if it changed since the last recorded draw.
 	int commitState();
 
@@ -226,8 +237,11 @@ private:
 	SDL_GPUShader* vsSkin_        = nullptr;   // -DSKINNED=1 -DBUMP=0
 	SDL_GPUShader* vsRigidBump_   = nullptr;   // -DSKINNED=0 -DBUMP=1
 	SDL_GPUShader* vsSkinBump_    = nullptr;   // -DSKINNED=1 -DBUMP=1
+	SDL_GPUShader* vsRigidReflect_= nullptr;   // -DSKINNED=0 -DBUMP=0 -DREFLECTION=1
+	SDL_GPUShader* vsSkinReflect_ = nullptr;   // -DSKINNED=1 -DBUMP=0 -DREFLECTION=1
 	SDL_GPUShader* fs_            = nullptr;   // -DBUMP=0
 	SDL_GPUShader* fsBump_        = nullptr;   // -DBUMP=1
+	SDL_GPUShader* fsReflect_     = nullptr;   // -DBUMP=0 -DREFLECTION=1
 	SDL_GPUShader* vsShadowRigid_ = nullptr;   // object3dx_shadow, -DSKINNED=0
 	SDL_GPUShader* vsShadowSkin_  = nullptr;   // object3dx_shadow, -DSKINNED=1
 	SDL_GPUShader* fsShadow_      = nullptr;   // alpha-cutout clip, no colour output

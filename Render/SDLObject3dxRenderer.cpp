@@ -131,8 +131,11 @@ SDLObject3dxRenderer::~SDLObject3dxRenderer()
 	if(vsSkin_)        SDL_ReleaseGPUShader(device_, vsSkin_);
 	if(vsRigidBump_)   SDL_ReleaseGPUShader(device_, vsRigidBump_);
 	if(vsSkinBump_)    SDL_ReleaseGPUShader(device_, vsSkinBump_);
+	if(vsRigidReflect_)SDL_ReleaseGPUShader(device_, vsRigidReflect_);
+	if(vsSkinReflect_) SDL_ReleaseGPUShader(device_, vsSkinReflect_);
 	if(fs_)            SDL_ReleaseGPUShader(device_, fs_);
 	if(fsBump_)        SDL_ReleaseGPUShader(device_, fsBump_);
+	if(fsReflect_)     SDL_ReleaseGPUShader(device_, fsReflect_);
 	if(vsShadowRigid_) SDL_ReleaseGPUShader(device_, vsShadowRigid_);
 	if(vsShadowSkin_)  SDL_ReleaseGPUShader(device_, vsShadowSkin_);
 	if(fsShadow_)      SDL_ReleaseGPUShader(device_, fsShadow_);
@@ -143,7 +146,8 @@ SDLObject3dxRenderer::~SDLObject3dxRenderer()
 // ---------------------------------------------------------------------------
 bool SDLObject3dxRenderer::createShaders()
 {
-	if(shadersTried_) return vsRigid_ && vsSkin_ && vsRigidBump_ && vsSkinBump_ && fs_ && fsBump_
+	if(shadersTried_) return vsRigid_ && vsSkin_ && vsRigidBump_ && vsSkinBump_
+	                      && vsRigidReflect_ && vsSkinReflect_ && fs_ && fsBump_ && fsReflect_
 	                      && vsShadowRigid_ && vsShadowSkin_ && fsShadow_;
 	shadersTried_ = true;
 	if(!device_ || !window_) return false;
@@ -155,12 +159,14 @@ bool SDLObject3dxRenderer::createShaders()
 		vsi.num_uniform_buffers = 1;
 		return SDL_CreateGPUShader(device_, &vsi);
 	};
-	vsRigid_       = makeVS(VISTA_SHADER(object3dx_rigid_vert));
-	vsSkin_        = makeVS(VISTA_SHADER(object3dx_skin_vert));
-	vsRigidBump_   = makeVS(VISTA_SHADER(object3dx_rigid_bump_vert));
-	vsSkinBump_    = makeVS(VISTA_SHADER(object3dx_skin_bump_vert));
-	vsShadowRigid_ = makeVS(VISTA_SHADER(object3dx_shadow_rigid_vert));
-	vsShadowSkin_  = makeVS(VISTA_SHADER(object3dx_shadow_skin_vert));
+	vsRigid_        = makeVS(VISTA_SHADER(object3dx_rigid_vert));
+	vsSkin_         = makeVS(VISTA_SHADER(object3dx_skin_vert));
+	vsRigidBump_    = makeVS(VISTA_SHADER(object3dx_rigid_bump_vert));
+	vsSkinBump_     = makeVS(VISTA_SHADER(object3dx_skin_bump_vert));
+	vsRigidReflect_ = makeVS(VISTA_SHADER(object3dx_rigid_reflect_vert));
+	vsSkinReflect_  = makeVS(VISTA_SHADER(object3dx_skin_reflect_vert));
+	vsShadowRigid_  = makeVS(VISTA_SHADER(object3dx_shadow_rigid_vert));
+	vsShadowSkin_   = makeVS(VISTA_SHADER(object3dx_shadow_skin_vert));
 
 	// The fragment shaders share a uniform block (material colours + skin-colour lerp +
 	// flags) and differ only in how many textures they sample.
@@ -171,27 +177,31 @@ bool SDLObject3dxRenderer::createShaders()
 		fsi.num_samplers = numSamplers;
 		return SDL_CreateGPUShader(device_, &fsi);
 	};
-	fs_       = makeFS(VISTA_SHADER(object3dx_frag),        2);  // diffuse + shadow map
-	fsBump_   = makeFS(VISTA_SHADER(object3dx_bump_frag),   4);  // diffuse + bump + specular + shadow map
-	fsShadow_ = makeFS(VISTA_SHADER(object3dx_shadow_frag), 1);  // diffuse, for the alpha-cutout clip
+	fs_        = makeFS(VISTA_SHADER(object3dx_frag),         2);  // diffuse + shadow map
+	fsBump_    = makeFS(VISTA_SHADER(object3dx_bump_frag),    4);  // diffuse + bump + specular + shadow map
+	fsReflect_ = makeFS(VISTA_SHADER(object3dx_reflect_frag), 3);  // diffuse + env map + shadow map
+	fsShadow_  = makeFS(VISTA_SHADER(object3dx_shadow_frag),  1);  // diffuse, for the alpha-cutout clip
 
-	if(!vsRigid_ || !vsSkin_ || !vsRigidBump_ || !vsSkinBump_ || !fs_ || !fsBump_
+	if(!vsRigid_ || !vsSkin_ || !vsRigidBump_ || !vsSkinBump_ || !vsRigidReflect_ || !vsSkinReflect_
+	   || !fs_ || !fsBump_ || !fsReflect_
 	   || !vsShadowRigid_ || !vsShadowSkin_ || !fsShadow_){
 		fprintf(stderr, "SDLObject3dxRenderer: CreateGPUShader failed: %s\n", SDL_GetError());
 		return false;
 	}
-	fprintf(stderr, "SDLObject3dxRenderer: object3dx shaders ready (plain + bump + shadow)\n");
+	fprintf(stderr, "SDLObject3dxRenderer: object3dx shaders ready (plain + bump + reflect + shadow)\n");
 	return true;
 }
 
-SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skinned, bool bump,
+SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skinned, bool bump, bool reflect,
                                                            eBlendMode blend, bool mirrored, bool depthWrite,
                                                            bool wireframe, bool shadow)
 {
-	// The caster shaders take no tangent frame and write no colour, so bump and the blend
-	// mode never reach them: fold them out of the key rather than build dead pipelines.
+	// The caster shaders take no tangent frame, no env map and write no colour, so bump,
+	// reflection and the blend mode never reach them: fold them out of the key rather than
+	// build dead pipelines.
 	if(shadow){
 		bump = false;
+		reflect = false;
 		blend = (blend == ALPHA_TEST) ? ALPHA_TEST : ALPHA_NONE;
 		depthWrite = true;
 		wireframe = false;
@@ -204,7 +214,8 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 	                             | ((unsigned long long)wireframe  << 25)
 	                             | ((unsigned long long)bump       << 26)
 	                             | ((unsigned long long)shadow     << 27)
-	                             | ((unsigned long long)mirrored   << 28);
+	                             | ((unsigned long long)mirrored   << 28)
+	                             | ((unsigned long long)reflect    << 29);
 	auto it = pipelines_.find(key);
 	if(it != pipelines_.end())
 		return it->second;
@@ -278,10 +289,11 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 	}
 
 	SDL_GPUGraphicsPipelineCreateInfo pci = {};
-	pci.vertex_shader = shadow ? (skinned ? vsShadowSkin_ : vsShadowRigid_)
-	                  : bump   ? (skinned ? vsSkinBump_ : vsRigidBump_)
-	                           : (skinned ? vsSkin_ : vsRigid_);
-	pci.fragment_shader = shadow ? fsShadow_ : (bump ? fsBump_ : fs_);
+	pci.vertex_shader = shadow  ? (skinned ? vsShadowSkin_ : vsShadowRigid_)
+	                  : reflect ? (skinned ? vsSkinReflect_ : vsRigidReflect_)
+	                  : bump    ? (skinned ? vsSkinBump_ : vsRigidBump_)
+	                            : (skinned ? vsSkin_ : vsRigid_);
+	pci.fragment_shader = shadow ? fsShadow_ : reflect ? fsReflect_ : (bump ? fsBump_ : fs_);
 	pci.vertex_input_state.vertex_buffer_descriptions = &vbDesc;
 	pci.vertex_input_state.num_vertex_buffers = 1;
 	pci.vertex_input_state.vertex_attributes = attrs;
@@ -366,6 +378,9 @@ void SDLObject3dxRenderer::SetState(const State& state, Camera* camera)
 	current_.vpMinZ = camera->vp.MinZ; current_.vpMaxZ = camera->vp.MaxZ;
 
 	std::memcpy(current_.vs.mvp, &camera->matViewProj, sizeof(current_.vs.mvp));
+	// The reflection variant's sphere-map basis (world -> camera space). Pushed always so
+	// the one uniform block stays uniform; only that variant reads it.
+	std::memcpy(current_.vs.view, &camera->matView, sizeof(current_.vs.view));
 	setVec4(current_.vs.ambient, state.ambient);
 	setVec4(current_.vs.diffuse, state.diffuse);
 	setVec4(current_.vs.specular, state.specular);   // .a = specular power
@@ -419,11 +434,19 @@ void SDLObject3dxRenderer::SetState(const State& state, Camera* camera)
 	current_.texture = sdlTextureOf(state.texture, state.texturePhase);
 	current_.bumpTexture = sdlTextureOf(state.bumpTexture, state.texturePhase);
 	current_.specularTexture = sdlTextureOf(state.specularMap, state.texturePhase);
+	current_.reflectTexture = sdlTextureOf(state.reflectTexture, state.texturePhase);
 	current_.sampler = state.tilingWrap ? samplerWrap_ : samplerClamp_;
 
 	// The bump fragment shader always samples the diffuse map (the original has no
 	// NOTEXTURE variant of psSkinBump), so an untextured material can't take that path.
 	current_.bump = current_.bumpTexture != nullptr && current_.texture != nullptr;
+
+	// The reflection path, mutually exclusive with bump (cObject3dx::Draw dispatches it
+	// before the bump path and never sets both). Like bump, the reflect fragment shader
+	// always samples the diffuse map, so an untextured material can't take it.
+	current_.reflect = current_.reflectTexture != nullptr && current_.texture != nullptr
+	                && !current_.bump;
+	setVec4(current_.fs.reflectAmount, state.reflectAmount);
 
 	current_.fs.params[0] = state.blend == ALPHA_TEST ? ALPHA_TEST_REF : 0.f;
 	current_.fs.params[1] = current_.texture ? 1.f : 0.f;
@@ -577,7 +600,7 @@ bool SDLObject3dxRenderer::DrawShadowPass(SDL_GPUCommandBuffer* cmd, SDL_GPUText
 		const StateBlock& st = states_[d.state];
 
 		// The caster pass draws for the light camera, which is never mirrored.
-		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, false, st.blend, false, true, false, true);
+		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, false, false, st.blend, false, true, false, true);
 		if(!pipeline) continue;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);
@@ -673,8 +696,8 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 	for(const DrawCmd& d : draws_){
 		const StateBlock& st = states_[d.state];
 
-		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, st.bump, st.blend, st.mirrored,
-		                                                d.depthWrite, wireframe, false);
+		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, st.bump, st.reflect, st.blend,
+		                                                st.mirrored, d.depthWrite, wireframe, false);
 		if(!pipeline) continue;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);
@@ -706,17 +729,25 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 			// Every sampler the fragment shader declares must be bound, even where a
 			// uniform gates the sample away (Params2.x for the specular map,
 			// ShadowParams.x for the shadow map): the white stand-in is never read.
-			// The shadow map is last -- slot 1 without bump, slot 3 with.
+			// The shadow map is last -- slot 1 plain, slot 2 reflect (diffuse + env map),
+			// slot 3 bump (diffuse + bump + specular).
 			SDL_GPUTextureSamplerBinding ts[4] = {};
 			ts[0].texture = st.texture ? st.texture : whiteTexture_;
 			ts[0].sampler = st.sampler ? st.sampler : samplerWrap_;
+			int shadowSlot = 1;
 			if(st.bump){
 				ts[1].texture = st.bumpTexture;
 				ts[1].sampler = samplerWrap_;   // the original's sampler_wrap_linear on stage 1
 				ts[2].texture = st.specularTexture ? st.specularTexture : whiteTexture_;
 				ts[2].sampler = samplerWrap_;
+				shadowSlot = 3;
 			}
-			const int shadowSlot = st.bump ? 3 : 1;
+			else if(st.reflect){
+				// The 2D environment map. A sphere-map UV runs to the [0,1] edges, so clamp.
+				ts[1].texture = st.reflectTexture ? st.reflectTexture : whiteTexture_;
+				ts[1].sampler = samplerClamp_;
+				shadowSlot = 2;
+			}
 			ts[shadowSlot].texture = st.shadowTexture ? st.shadowTexture : whiteTexture_;
 			ts[shadowSlot].sampler = samplerShadow_;
 			SDL_BindGPUFragmentSamplers(pass, 0, ts, shadowSlot + 1);

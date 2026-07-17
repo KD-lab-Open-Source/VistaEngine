@@ -51,6 +51,9 @@
 #ifndef BUMP
 #define BUMP 0
 #endif
+#ifndef REFLECTION
+#define REFLECTION 0
+#endif
 
 Texture2D<float4> DiffuseTexture : register(t0, space2);
 SamplerState      DiffuseSampler : register(s0, space2);
@@ -63,6 +66,12 @@ SamplerState      SpecularSampler : register(s2, space2);
 // has it on s2 because it never binds a specular map and a bump map at once.
 Texture2D<float>  ShadowTexture   : register(t3, space2);
 SamplerState      ShadowSampler   : register(s3, space2);
+#elif REFLECTION
+// The 2D environment map (the original's ReflectionSampler), then the shadow map after it.
+Texture2D<float4> ReflectionTexture : register(t1, space2);
+SamplerState      ReflectionSampler : register(s1, space2);
+Texture2D<float>  ShadowTexture     : register(t2, space2);
+SamplerState      ShadowSampler     : register(s2, space2);
 #else
 Texture2D<float>  ShadowTexture   : register(t1, space2);
 SamplerState      ShadowSampler   : register(s1, space2);
@@ -86,6 +95,9 @@ cbuffer Material : register(b0, space3)
     float4 ShadowParams;
     // Distance fog: D3DRS_FOGCOLOR. The factor arrives interpolated, in VSOutput::Fog.
     float4 FogColor;
+    // reflectionAmount (PSSkin::SetReflection): rgb = reflect_amount * material diffuse,
+    // the weight the environment map is added at. Read only by the REFLECTION variant.
+    float4 ReflectAmount;
 };
 
 // shadow9700.inl's `#define ccx 0.0005`: the 2x2 tap offset, in shadow-map uv. That is
@@ -107,6 +119,9 @@ struct VSOutput
     float2 UV        : TEXCOORD0;
     float4 ShadowPos : TEXCOORD3;
     float  Fog       : TEXCOORD4;
+#if REFLECTION
+    float2 Reflect   : TEXCOORD5;   // sphere-map UV, from the vertex shader
+#endif
 };
 
 // Shadow9700 from Render/shader/Skin/shadow9700.inl. One deliberate difference: it
@@ -196,6 +211,12 @@ float4 main(VSOutput input) : SV_Target0
             t0.rgb = t0.rgb * tLerpPre.a + tLerpPre.rgb;
 
         ot.rgb = t0.rgb * input.Diffuse.rgb;
+#if REFLECTION
+        // The original adds the environment map before the shadow multiply and the ambient,
+        // so a shadowed metal surface loses its reflection too. reflectionAmount already
+        // folds in reflect_amount and the material's diffuse tint (a = 0).
+        ot.rgb += ReflectionTexture.Sample(ReflectionSampler, input.Reflect).rgb * ReflectAmount.rgb;
+#endif
         applyShadow(ot.rgb, input.ShadowPos);
         ot.rgb += Ambient.rgb * t0.rgb;
         ot.rgb += input.Specular;
