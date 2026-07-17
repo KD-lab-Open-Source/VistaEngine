@@ -49,7 +49,12 @@ void removeDirectoryRecursive(const char* _dir)
 string setExtention(const char* file_name, const char* extention)
 {
 	string str = file_name;
-	unsigned int pos = str.rfind(".");
+	// size_t, not unsigned int: rfind returns 64-bit string::npos when there is no '.',
+	// and truncating it to 32 bits made the npos guard miss (0xFFFFFFFF != 64-bit npos),
+	// so erase() ran with a past-the-end pos and threw out_of_range. The original 32-bit
+	// MSVC build had unsigned int == size_t, which hid this. Bites the extension-less
+	// -world path (e.g. "Resource\Worlds\C2_M08").
+	size_t pos = str.rfind(".");
 	if(pos != string::npos)
 		str.erase(pos, str.size());
 	if(!*extention)
@@ -60,7 +65,7 @@ string setExtention(const char* file_name, const char* extention)
 string getExtention(const char* file_name)
 {
 	string str = file_name;
-	unsigned int pos = str.rfind(".");
+	size_t pos = str.rfind(".");   // size_t: see setExtention -- npos must not truncate
 	if(pos != string::npos){
 		str.erase(0, pos + 1);
 		if(str.empty())
