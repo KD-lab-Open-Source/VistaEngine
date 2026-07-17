@@ -110,14 +110,19 @@ vista_shader_module(water
 # carries no weight bytes, so its vertex layout — and its shader — differ from the
 # skinned one. BUMP mirrors the original's two vertex shaders (object_scene_light.vsl /
 # object_scene_bump.vsl) and its psl BUMP define; a bump vertex also carries a tangent
-# frame. Shadow casters are depth-only: one fragment shader, no bump variants.
+# frame. REFLECTION=1 (BUMP=0) is the original's vsSkinReflection/psSkinReflection — the
+# 2D environment-map ("matcap") path for shiny-metal units; it never combines with BUMP.
+# Shadow casters are depth-only: one fragment shader, no bump/reflect variants.
 vista_shader_module(object3dx
     "object3dx_rigid_vert=object3dx.vert.hlsl:vertex:SKINNED=0,BUMP=0"
     "object3dx_skin_vert=object3dx.vert.hlsl:vertex:SKINNED=1,BUMP=0"
     "object3dx_rigid_bump_vert=object3dx.vert.hlsl:vertex:SKINNED=0,BUMP=1"
     "object3dx_skin_bump_vert=object3dx.vert.hlsl:vertex:SKINNED=1,BUMP=1"
+    "object3dx_rigid_reflect_vert=object3dx.vert.hlsl:vertex:SKINNED=0,BUMP=0,REFLECTION=1"
+    "object3dx_skin_reflect_vert=object3dx.vert.hlsl:vertex:SKINNED=1,BUMP=0,REFLECTION=1"
     "object3dx_frag=object3dx.frag.hlsl:fragment:BUMP=0"
     "object3dx_bump_frag=object3dx.frag.hlsl:fragment:BUMP=1"
+    "object3dx_reflect_frag=object3dx.frag.hlsl:fragment:BUMP=0,REFLECTION=1"
     "object3dx_shadow_rigid_vert=object3dx_shadow.vert.hlsl:vertex:SKINNED=0"
     "object3dx_shadow_skin_vert=object3dx_shadow.vert.hlsl:vertex:SKINNED=1"
     "object3dx_shadow_frag=object3dx_shadow.frag.hlsl:fragment")

@@ -796,6 +796,19 @@ void cObject3dx::Draw(Camera* camera)
 			st.noLight = no_light_object;
 			st.selfIllumination = !mat.tex_self_illumination.empty() && !getAttribute(ATTR3DX_NO_SELFILLUMINATION);
 
+			// The 2D reflection path (vsSkinReflection/psSkinReflection): a lit material
+			// with an environment ("matcap") map, dispatched before bump exactly as
+			// cObject3dx::Draw does -- the two are mutually exclusive. The sky-cubemap
+			// variant (is_reflect_sky) is not ported and falls through to the plain lit path.
+			if(!mat.pSecondOpacityTexture && !no_light_object
+			   && mat.pReflectTexture && !mat.is_reflect_sky){
+				st.reflectTexture = mat.pReflectTexture;
+				// PSSkin::SetReflection's amount: reflect_amount * the node's diffuse (a = 0).
+				st.reflectAmount = Color4f(mat.reflect_amount * diffuse.r,
+				                           mat.reflect_amount * diffuse.g,
+				                           mat.reflect_amount * diffuse.b, 0.f);
+			}
+
 			// The bump path, on the same terms the original picks vsSkinBump: after the
 			// second-opacity, NOLIGHT and reflection materials have had their turn. It also
 			// needs the tangent frame, which the vertex only carries when pStatic->bump.
