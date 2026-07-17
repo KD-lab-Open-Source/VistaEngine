@@ -19,8 +19,15 @@ public:
 	virtual int load(void* pointer, int size);
 	virtual int GetTexture(void* pointer, int time, int xSize, int ySize);
 
+	// RGB is premultiplied by alpha by default (to keep bilinear filtering from bleeding
+	// transparent-texel colour into cutout edges). Turn it off for maps whose alpha is not
+	// opacity -- a specular map's alpha is its power, so premultiply would darken the
+	// specular colour. Call before load().
+	void setPremultiplyAlpha(bool on) { premultiplyAlpha_ = on; }
+
 private:
 	std::vector<uint8_t> bgra_;   // GetX()*GetY()*4, top-down, B,G,R,A
+	bool premultiplyAlpha_ = true;
 };
 
 #endif // __DDS_IMAGE_H__

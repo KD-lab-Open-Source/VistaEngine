@@ -342,15 +342,20 @@ int cVisGeneric::GetFloatZBufferType()
 
 bool cVisGeneric::PossibilityBump()
 {
-	return gb_RenderDevice3D ? gb_RenderDevice3D->PossibilityBump() : false;
+	// Bump needs pixel shader 2.0; the SDL GPU backend is well past that on every platform
+	// and has no cD3DRender to ask (gb_RenderDevice3D is null now the D3D9 backend is gone),
+	// so report it capable unconditionally -- the same reasoning as the load-time
+	// supportBump in Static3DX.cpp. The original returned gb_RenderDevice3D->PossibilityBump(),
+	// a D3D9 capability that is now permanently false and silently made bump impossible.
+	return true;
 }
 
 void cVisGeneric::SetEnableBump(bool enable)
 {
-	if(gb_RenderDevice3D && gb_RenderDevice3D->IsPS20())
-		Option_EnableBump=enable;
-	else
-		Option_EnableBump=false;
+	// Honour the caller: the SDL backend always supports bump (see PossibilityBump). The
+	// original forced this off unless gb_RenderDevice3D->IsPS20() -- now permanently false --
+	// which disabled every unit's bump + specular map (the metallic sheen) off-Windows.
+	Option_EnableBump = enable;
 }
 
 bool cVisGeneric::GetEnableBump()

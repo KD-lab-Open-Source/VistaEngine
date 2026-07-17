@@ -135,7 +135,8 @@ int cDDSImage::load(void* pointer, int size)
 				src += blockBytes;
 			}
 		}
-		premultiply(bgra_);
+		if(premultiplyAlpha_)
+			premultiply(bgra_);
 		return 0;
 	}
 
@@ -180,7 +181,8 @@ int cDDSImage::load(void* pointer, int size)
 				src += bytespp;
 			}
 		}
-		premultiply(bgra_);
+		if(premultiplyAlpha_)
+			premultiply(bgra_);
 		return 0;
 	}
 
