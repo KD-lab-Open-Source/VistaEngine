@@ -341,6 +341,13 @@ void cSkyObj::DrawSky(Camera* pGlobalCamera,bool hdr_alpha)
 	pSkyScene->Draw(pNormalCamera);
 	//DrawSun(pGlobalCamera);
 
+	// The horizon fog ring, over the sky this pass laid down and behind the world that draws
+	// next -- the backdrop closing the gap between the sky and the terrain at the map edge
+	// (PORTING.md #8). Only on screen, never into the reflection/HDR target (the original's
+	// `if(!hdr_alpha)`), and while fog is still disabled above, so it is not itself fogged.
+	if(!hdr_alpha && pFogCircle)
+		pFogCircle->Draw(pNormalCamera);
+
 	gb_RenderDevice->SetRenderState(RS_FOGENABLE, old_fogenable);
 
 
@@ -439,27 +446,24 @@ ib
 
 #define FOG_CENTER
 //Инициализация тумана
+// The horizon fog ring (PORTING.md #8). Two vertical bands around the map -- an opaque lower
+// one at the horizon and an upper one fading to clear -- plus, with FOG_CENTER, a triangle
+// tent closing the bottom. On D3D it was a fixed-function ring with its own device buffers,
+// shaded from D3DRS_TEXTUREFACTOR; here it re-records into SDLWorldQuadRenderer's triangle
+// route every frame, the same way the field dome does, so it keeps no buffers of its own.
 cFogCircleEX::cFogCircleEX(EnvironmentTime* time_)
 {
-	cD3DRender* rd=gb_RenderDevice3D;
 	time = time_;
+	height = 2000;
 
 	//Две полосы одна - одна из прозрачного в непрозрачное, другая полностью непрозрачная.
 	//И снизу шатёр из треугольников.
-
 	size_vb = (hord_count+1)*3;
 	size_ib = hord_count*4;
 #ifdef FOG_CENTER
 	size_vb++;
 	size_ib+=hord_count;
 #endif
-
-	if(rd){ // no world-render GPU device on SDL backend yet
-		rd->CreateVertexBuffer(cborder_vb, size_vb,VType::declaration);
-		rd->CreateIndexBuffer(cborder_ib, size_ib);
-
-		SetHeight(2000);
-	}
 }
 cFogCircleEX::~cFogCircleEX()
 {
@@ -467,80 +471,104 @@ cFogCircleEX::~cFogCircleEX()
 
 void cFogCircleEX::SetHeight(int height_)
 {
+	// The geometry is rebuilt from `height` every frame in Draw, so this only stores it now.
 	height=height_;
+}
 
-	if(!gb_RenderDevice3D) // no world-render GPU device on SDL backend yet
-		return;
+// The index pattern for one ring: two triangles per band per segment, plus the tent floor.
+// It depends only on hord_count, so build it once. The indices are base-relative to the
+// vertices Draw locks, exactly as they indexed the D3D vertex buffer's page.
+static const vector<sPolygon>& fogCircleIndices(int hord_count, int size_ib)
+{
+	static vector<sPolygon> indices;
+	if(!indices.empty())
+		return indices;
 
-	float radius = max(vMap.H_SIZE,vMap.V_SIZE)*2.5f*0.98f;
-	float z0 = -height;
-	float z1 = 0;
-	float z2 = height;
-	float da = (M_PI*2)/hord_count;
-	Mat3f rot(da,Z_AXIS);
-
-	cD3DRender* rd=gb_RenderDevice3D;
-	Color4c color1(255, 255, 255, 255);
-	Color4c color2(255, 255, 255, 0);
-	VType* beg_vx = (VType*)rd->LockVertexBuffer(cborder_vb);
-	sPolygon* beg_pt=rd->LockIndexBuffer(cborder_ib);
-
-	VType* v = beg_vx;
-	sPolygon* pt = beg_pt;
-	
-	Vect3f pos(radius, 0, 0);
-	Vect3f center(vMap.H_SIZE/2, vMap.V_SIZE/2, 0);
+	indices.resize(size_ib);
+	sPolygon* pt = indices.data();
 	for(int i=0;i<3*hord_count; i+=3)
 	{
-		Vect3f p = pos+center;
-		v->pos.set(p.x, p.y, z0);  	v->diffuse = color1; v++;
-		v->pos.set(p.x, p.y, z1);  	v->diffuse = color1; v++;
-		v->pos.set(p.x, p.y, z2);  	v->diffuse = color2; v++;
-		pos = rot*pos;
-
-		pt->set(i+1, i+0, i+4);	pt++;
-		pt->set(i+4, i+0, i+3);	pt++;
-
-		pt->set(i+2, i+1, i+5);	pt++;
-		pt->set(i+5, i+1, i+4);	pt++;
+		(pt++)->set(i+1, i+0, i+4);
+		(pt++)->set(i+4, i+0, i+3);
+		(pt++)->set(i+2, i+1, i+5);
+		(pt++)->set(i+5, i+1, i+4);
 	}
-	Vect3f p = Vect3f(radius, 0,0)+center;
-	v->pos.set(p.x, p.y, z0);  	v->diffuse = color1; v++;
-	v->pos.set(p.x, p.y, z1);  	v->diffuse = color1; v++;
-	v->pos.set(p.x, p.y, z2);  	v->diffuse = color2; v++;
 #ifdef FOG_CENTER
-	int last_point=v-beg_vx;
-	v->pos.set(vMap.H_SIZE/2, vMap.V_SIZE/2, z0);  	v->diffuse = Color4c(255,255,255,255); v++;
+	int last_point=(hord_count+1)*3;
 	for(int i=0;i<3*hord_count; i+=3)
-	{
-		pt->set(last_point, i+3, i+0);	pt++;
-	}
+		(pt++)->set(last_point, i+3, i+0);
 #endif
-
-	xassert(v-beg_vx == size_vb);
-	xassert(pt-beg_pt == size_ib);
-
-	rd->UnlockVertexBuffer(cborder_vb);
-	rd->UnlockIndexBuffer(cborder_ib);
+	xassert(pt - indices.data() == size_ib);
+	return indices;
 }
 
 //Отрисовка тумана
+// Ported to SDL GPU (PORTING.md #8). Drawn from cSkyObj::DrawSky after the sky models and
+// while fog is disabled, so it lands over the sky and behind the world -- the backdrop that
+// closes the gap between the sky and the terrain at the map edge, where the D3D ring held.
+//
+// The original shaded RGB from D3DRS_TEXTUREFACTOR (the current fog colour) through a fixed-
+// function SELECTARG1 stage, and took alpha from the vertex diffuse. This route has no TFACTOR
+// stage, so the fog colour is baked into the vertex diffuse RGB instead: with the white 1x1
+// stand-in on texture 0, worldtri outputs texture*diffuse = the premultiplied fog colour, and
+// ALPHA_BLEND lays it down exactly as the fixed-function ring did. The alpha gradient -- opaque
+// at the horizon (color1), clear above (color2) -- is the original's.
 void cFogCircleEX::Draw(Camera* camera)
 {
-	if (cborder_vb.IsInit())
+	SDLWorldQuadRenderer* quad = sdlWorldQuadRenderer();
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	if(!quad || !dev)
+		return;
+
+	// Re-point the device at the sky camera's target, as the original's SetDrawTransform did:
+	// this runs after cScene::Draw has returned, so the bound target may have moved.
+	gb_RenderDevice->setCamera(camera);
+
+	Color4c fog = time->GetCurFogColor();
+	Color4c color1(fog.r, fog.g, fog.b, 255);   // opaque -- the horizon line
+	Color4c color2(fog.r, fog.g, fog.b, 0);     // clear  -- fading up into the sky
+
+	quad->SetCamera(camera);
+	// ALPHA_BLEND, no texture (the white stand-in), depth test off: a pure backdrop that never
+	// interacts with the sky it lays over, as the original's ZWRITE-off ring did. The distance-
+	// fog term is inert -- DrawSky records this with fog disabled, so the fog plane is identity.
+	quad->SetMaterial(ALPHA_BLEND, 0, false);
+
+	sVertexXYZDT2* v = quad->Lock(size_vb);
+	if(!v)
+		return;
+
+	float radius = max(vMap.H_SIZE,vMap.V_SIZE)*2.5f*0.98f;
+	float z0 = -height, z1 = 0, z2 = height;
+	float da = (M_PI*2)/hord_count;
+	Mat3f rot(da,Z_AXIS);
+	Vect3f pos(radius, 0, 0);
+	Vect3f center(vMap.H_SIZE/2, vMap.V_SIZE/2, 0);
+
+	sVertexXYZDT2* w = v;
+	for(int i=0;i<3*hord_count; i+=3)
 	{
-		cD3DRender* rd=gb_RenderDevice3D;
-		rd->SetNoMaterial(ALPHA_BLEND, MatXf::ID, 0, 0);
-
-		DWORD old_colorarg1=rd->GetTextureStageState(0,D3DTSS_COLORARG1);
-		rd->SetTextureStageState(0,D3DTSS_COLORARG1,D3DTA_TFACTOR);
-		rd->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_SELECTARG1);
-		rd->SetRenderState(D3DRS_TEXTUREFACTOR,time->GetCurFogColor().RGBA());
-		rd->DrawIndexedPrimitive(cborder_vb, 0, size_vb, cborder_ib, 0, size_ib);
-
-		rd->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE);
-		rd->SetTextureStageState( 0, D3DTSS_COLORARG1, old_colorarg1);
+		Vect3f p = pos+center;
+		w->pos.set(p.x, p.y, z0); w->diffuse = color1; w->GetTexel().set(0,0); w->GetTexel2().set(0,0); w++;
+		w->pos.set(p.x, p.y, z1); w->diffuse = color1; w->GetTexel().set(0,0); w->GetTexel2().set(0,0); w++;
+		w->pos.set(p.x, p.y, z2); w->diffuse = color2; w->GetTexel().set(0,0); w->GetTexel2().set(0,0); w++;
+		pos = rot*pos;
 	}
+	Vect3f p = Vect3f(radius, 0, 0)+center;
+	w->pos.set(p.x, p.y, z0); w->diffuse = color1; w->GetTexel().set(0,0); w->GetTexel2().set(0,0); w++;
+	w->pos.set(p.x, p.y, z1); w->diffuse = color1; w->GetTexel().set(0,0); w->GetTexel2().set(0,0); w++;
+	w->pos.set(p.x, p.y, z2); w->diffuse = color2; w->GetTexel().set(0,0); w->GetTexel2().set(0,0); w++;
+#ifdef FOG_CENTER
+	w->pos.set(vMap.H_SIZE/2, vMap.V_SIZE/2, z0); w->diffuse = color1; w->GetTexel().set(0,0); w->GetTexel2().set(0,0); w++;
+#endif
+	xassert(w - v == size_vb);
+
+	quad->Unlock(size_vb);
+	const vector<sPolygon>& indices = fogCircleIndices(hord_count, size_ib);
+	quad->DrawIndexedPrimitive(indices.data(), size_ib);
+
+	// Open the pass where the scene walk reached us: over the sky, before the world scene draws.
+	dev->drawWorldQuads();
 }
 
 /////////////////////////////////cEnvironmentTime/////////////////////////////////////////////
