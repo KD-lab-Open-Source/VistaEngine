@@ -45,6 +45,7 @@ class SDLWorldQuadRenderer;
 class SDLMinimapRenderer;
 class SDLGrassRenderer;
 class SDLCloudShadowRenderer;
+class SDLEnvironmentEarthRenderer;
 class SDLPostEffectRenderer;
 class cTileMap;
 
@@ -98,6 +99,10 @@ SDLGrassRenderer* sdlGrassRenderer();
 // The SDL backend's cloud-shadow renderer, or null under any other device. cCloudShadow::Draw
 // drives it exactly as it drives VSCloudShadow / PSCloudShadow on Windows.
 SDLCloudShadowRenderer* sdlCloudShadowRenderer();
+
+// The SDL backend's environment-earth renderer, or null under any other device.
+// cEnvironmentEarth::Draw drives it as it drove vsStandart / psEnvironmentEarth on Windows.
+SDLEnvironmentEarthRenderer* sdlEnvironmentEarthRenderer();
 
 // The SDL backend's post-effect renderer, or null under any other device. The
 // PostEffectManager effects with an SDL path (PostEffectMonochrome, PostEffectUnderWater)
@@ -154,6 +159,13 @@ public:
 	// light sources, which blend over it. See SDLCloudShadowRenderer.h.
 	SDLCloudShadowRenderer* cloudShadowRenderer() { return cloudShadowRenderer_.get(); }
 	void drawCloudShadow();
+
+	// --- Environment earth ----------------------------------------------------
+	// cEnvironmentEarth::Draw records its ground plane and calls this. It draws at
+	// SCENENODE_OBJECTFIRST -- before the terrain -- so the pass takes the depth clear and
+	// writes the plane's depth, and the terrain draws over it. See SDLEnvironmentEarthRenderer.h.
+	SDLEnvironmentEarthRenderer* environmentEarthRenderer() { return environmentEarthRenderer_.get(); }
+	void drawEnvironmentEarth();
 
 	// --- Post effects ---------------------------------------------------------
 	// The D3D9 post effects sampled the frame by StretchRect'ing the back buffer into a
@@ -622,6 +634,7 @@ private:
 	std::unique_ptr<SDLMinimapRenderer>   minimapRenderer_;
 	std::unique_ptr<SDLGrassRenderer>     grassRenderer_;
 	std::unique_ptr<SDLCloudShadowRenderer> cloudShadowRenderer_;
+	std::unique_ptr<SDLEnvironmentEarthRenderer> environmentEarthRenderer_;
 	std::unique_ptr<SDLPostEffectRenderer>  postEffectRenderer_;
 };
 

@@ -5,6 +5,7 @@
 #include "Render/D3D/D3DRender.h"
 #include "Render/SDLWaterRenderer.h"   // the surface is drawn by SDLWaterRenderer,
 #include "Render/SDLRenderDevice.h"    // reached via cSDLRenderDevice::drawWater
+#include "Render/SDLEnvironmentEarthRenderer.h"   // the ground plane, via cSDLRenderDevice::drawEnvironmentEarth
 #include "Render/shader/shaders.h"
 #include "Render/src/RenderCubemap.h"
 #include "Serialization/ResourceSelector.h"
@@ -782,11 +783,19 @@ int SetBoxBorder(Vect3f bp, Vect2i count, Vect2f add, VType* v, int offset, sPol
 	return i;
 }
 
+// The environment-water skirt: eight tiles extending the sea from the map edge out to the
+// horizon (InitBorder). It rides the same SDLWaterRenderer state cWater::DrawPolygons just set,
+// so the tiles land in the surface's own pass (dev->drawWater, opened by cWater::Draw right
+// after this) with the reflection, sun glint and depth-opacity the map's water has.
 void cWater::Border::Draw(Camera* camera)
 {
+	SDLWaterRenderer* renderer = sdlWaterRenderer();
+	if(!renderer)
+		return;
 	for(int i=0; i<8; i++)
 		if(tiles[i].vertexBuffer.IsInit() && camera->TestVisible(tiles[i].min,tiles[i].max))
-			gb_RenderDevice3D->DrawIndexedPrimitive(tiles[i].vertexBuffer,0,tiles[i].vertexBuffer.GetNumberVertex(),tiles[i].indexBuffer,0,tiles[i].indexBuffer.GetNumberPolygon());
+			renderer->DrawIndexedPrimitive(tiles[i].vertexBuffer, 0, tiles[i].indexBuffer, 0,
+			                               tiles[i].indexBuffer.GetNumberPolygon());
 }
 
 void cWater::Border::destroy()
@@ -799,7 +808,7 @@ void cWater::Border::destroy()
 
 void cWater::InitBorder()
 {
-	if(!gb_RenderDevice3D) // no world-render GPU device on SDL backend yet
+	if(!gb_RenderDevice)
 		return;
 	if(border.isInit()){
 		xassert(false);
@@ -845,15 +854,15 @@ void cWater::InitBorder()
 			step.set(f_add,f_add);
 			break;
 		}
-		gb_RenderDevice3D->CreateVertexBuffer(border.tiles[i].vertexBuffer,vertexSize,VType::declaration);
-		gb_RenderDevice3D->CreateIndexBuffer(border.tiles[i].indexBuffer,indexSize);
-		VType* v=(VType*)gb_RenderDevice3D->LockVertexBuffer(border.tiles[i].vertexBuffer);
-		sPolygon* pt=gb_RenderDevice3D->LockIndexBuffer(border.tiles[i].indexBuffer);
+		gb_RenderDevice->CreateVertexBuffer(border.tiles[i].vertexBuffer,vertexSize,VType::declaration);
+		gb_RenderDevice->CreateIndexBuffer(border.tiles[i].indexBuffer,indexSize);
+		VType* v=(VType*)gb_RenderDevice->LockVertexBuffer(border.tiles[i].vertexBuffer);
+		sPolygon* pt=gb_RenderDevice->LockIndexBuffer(border.tiles[i].indexBuffer);
 		SetBoxBorder(pos,Vect2i(f_nn+1,f_nn+1),step,v,0,pt,water_sea);
 		border.tiles[i].min = v->pos;
 		border.tiles[i].max = (v+vertexSize-1)->pos;
-		gb_RenderDevice3D->UnlockVertexBuffer(border.tiles[i].vertexBuffer);
-		gb_RenderDevice3D->UnlockIndexBuffer(border.tiles[i].indexBuffer);
+		gb_RenderDevice->UnlockVertexBuffer(border.tiles[i].vertexBuffer);
+		gb_RenderDevice->UnlockIndexBuffer(border.tiles[i].indexBuffer);
 	}
 
 	for(int i=4; i<8; i++)
@@ -898,10 +907,10 @@ void cWater::InitBorder()
 		}
 		vertexSize = (count.x+1)*(count.y+1)+addVertex;
 		indexSize = count.x*count.y*2+(addVertex-1)*2;
-		gb_RenderDevice3D->CreateVertexBuffer(border.tiles[i].vertexBuffer,vertexSize,VType::declaration);
-		gb_RenderDevice3D->CreateIndexBuffer(border.tiles[i].indexBuffer,indexSize);
-		VType* v=(VType*)gb_RenderDevice3D->LockVertexBuffer(border.tiles[i].vertexBuffer);
-		sPolygon* pt=gb_RenderDevice3D->LockIndexBuffer(border.tiles[i].indexBuffer);
+		gb_RenderDevice->CreateVertexBuffer(border.tiles[i].vertexBuffer,vertexSize,VType::declaration);
+		gb_RenderDevice->CreateIndexBuffer(border.tiles[i].indexBuffer,indexSize);
+		VType* v=(VType*)gb_RenderDevice->LockVertexBuffer(border.tiles[i].vertexBuffer);
+		sPolygon* pt=gb_RenderDevice->LockIndexBuffer(border.tiles[i].indexBuffer);
 		int sm = addVertex;
 		int offset = 0;
 		int prev = 0;
@@ -947,8 +956,8 @@ void cWater::InitBorder()
 		SetBoxBorder(pos,count,step,v,offset,pt+j,water_sea);
 		border.tiles[i].min = v->pos;
 		border.tiles[i].max = (v+vertexSize-1)->pos;
-		gb_RenderDevice3D->UnlockVertexBuffer(border.tiles[i].vertexBuffer);
-		gb_RenderDevice3D->UnlockIndexBuffer(border.tiles[i].indexBuffer);
+		gb_RenderDevice->UnlockVertexBuffer(border.tiles[i].vertexBuffer);
+		gb_RenderDevice->UnlockIndexBuffer(border.tiles[i].indexBuffer);
 	}
 
 	RELEASE(pEnvironmentEarth);
@@ -2029,12 +2038,50 @@ void cEnvironmentEarth::PreDraw(Camera* camera)
 	camera->Attach(SCENENODE_OBJECTFIRST,this);
 }
 
-// TODO(sdl-port): the ground plane under the water does not draw. See Render/PORTING.md #7.
+// Ported to SDL GPU (PORTING.md #7). The terrain-coloured plane that fills the world beyond the
+// map edge, out under the horizon fog ring (#8). Its vertex/index buffers were always portable
+// and always built; what was missing was the draw. It is an OPAQUE occluder, not a blended
+// overlay, so it has its own renderer (SDLEnvironmentEarthRenderer) rather than riding
+// SDLWorldQuadRenderer -- the plane writes depth, and the terrain draws over it.
 //
-// The terrain-coloured plane that fills the horizon out beyond the map edge. Its buffers are
-// portable and still built; only the shader pass (psEnvironmentEarth) is missing.
+// Reached at SCENENODE_OBJECTFIRST, which Camera::DrawScene walks before the terrain, so the
+// pass takes the depth clear and the terrain then sorts over the plane's depth.
 void cEnvironmentEarth::Draw(Camera* camera)
 {
+	// The original skipped the reflection camera: the plane sits at the water's own height and
+	// would fight the surface in the mirror.
+	if(camera->getAttribute(ATTRCAMERA_REFLECTION))
+		return;
+
+	if(!earth_vb.IsInit())
+		return;
+
+	SDLEnvironmentEarthRenderer* renderer = sdlEnvironmentEarthRenderer();
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	if(!renderer || !dev)
+		return;
+
+	// tfactor: the tile map's diffuse folded with the sun angle -- the same tint the terrain
+	// lights with, so the ground beyond the edge matches the ground inside it and darkens with
+	// it toward dusk -- then the object colour. Verbatim from the D3D path.
+	cScene* pScene = camera->scene();
+	Color4f tilecolor = pScene->GetTileMap()->GetDiffuse();
+	Vect3f dir = pScene->GetSunDirection();
+	float a = -dir.z;
+	tilecolor.r = min((tilecolor.r*a + tilecolor.a)*0.5f, 1.0f);
+	tilecolor.g = min((tilecolor.g*a + tilecolor.a)*0.5f, 1.0f);
+	tilecolor.b = min((tilecolor.b*a + tilecolor.a)*0.5f, 1.0f);
+	tilecolor.a = 1;
+	tilecolor *= color;
+
+	SDLEnvironmentEarthRenderer::State state;
+	state.texture = Texture;   // null -> the renderer's white stand-in, as GetWhiteTexture was
+	state.tfactor = tilecolor;
+	renderer->SetState(state, camera);
+	renderer->DrawIndexedPrimitive(earth_vb, earth_ib, size_ib);
+
+	// Open the pass where the walk reached us: SCENENODE_OBJECTFIRST, before the terrain.
+	dev->drawEnvironmentEarth();
 }
 
 
