@@ -409,9 +409,20 @@ private:
 		{
 			if(leader_ == leader)
 				return;
-			iterator it = find(begin() + 1, inactive(), leader);
-			if(it != end())
-				std::swap(front(), *it);
+			// Promote `leader` to the front of the active units if it is one of them. Guard the
+			// find against an empty active range: with no active units inactive() == begin(),
+			// so find(begin()+1, begin()) has first > last and runs forward off the end of the
+			// heap (the reported EXC_BAD_ACCESS). makeAllActive avoids this only because it first
+			// sets firstInactive_ = size(), so its guard is empty(); here the active range is a
+			// prefix, so we guard on activeSize(). Compare against inactive(), the range's end,
+			// not end(): find returns inactive() when `leader` is not active, and inactive() !=
+			// end() whenever inactive units follow -- `it != end()` would then swap an inactive
+			// unit to the front.
+			if(activeSize() > 0){
+				iterator it = find(begin() + 1, inactive(), leader);
+				if(it != inactive())
+					std::swap(front(), *it);
+			}
 			leader_ = leader;
 		}
 
