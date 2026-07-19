@@ -17,7 +17,19 @@
 
 namespace PlatformWindow {
 
-namespace { SDL_Window* g_window = nullptr; }
+namespace {
+	SDL_Window* g_window = nullptr;
+
+	// SDL reports wheel motion in notch units: 1.0 == one traditional wheel
+	// detent. A notched mouse delivers whole ±1.0 events, but high-resolution
+	// and touch devices (Apple Magic Mouse, trackpads) stream many fractional
+	// events per physical slide. GameShell::MouseWheel acts once per notch, so
+	// we accumulate the fractional motion and emit one WM_MOUSEWHEEL per whole
+	// notch crossed, carrying the residue forward. A standard wheel is
+	// unaffected (each detent already == 1.0); precision scrolling no longer
+	// fires a full zoom step per micro-event.
+	float g_wheelAccum = 0.0f;
+}
 
 void* create(const char* title, int width, int height)
 {
@@ -218,6 +230,7 @@ bool pumpEvents(WindowEventSink sink)
 			// SDL delivers no key-ups while unfocused, so anything held at this
 			// point would otherwise stay "down" forever (e.g. a camera pan key).
 			PlatformClearKeyStates();
+			g_wheelAccum = 0.0f;
 			sink(WM_ACTIVATEAPP, FALSE, 0);
 			break;
 
@@ -253,11 +266,23 @@ bool pumpEvents(WindowEventSink sink)
 			break;
 		}
 
-		case SDL_EVENT_MOUSE_WHEEL:
-			// GameShell::MouseWheel keys only off the sign of the delta.
-			sink(WM_MOUSEWHEEL, WPARAM(event.wheel.y > 0 ? 120 : -120),
-			     packCoords(event.wheel.mouse_x, event.wheel.mouse_y));
+		case SDL_EVENT_MOUSE_WHEEL: {
+			// GameShell::MouseWheel keys only off the sign of the delta; emit
+			// ±120 (one WHEEL_DELTA) per whole notch of accumulated motion (see
+			// g_wheelAccum above).
+			g_wheelAccum += event.wheel.y;
+			while(g_wheelAccum >= 1.0f){
+				g_wheelAccum -= 1.0f;
+				sink(WM_MOUSEWHEEL, WPARAM(120),
+				     packCoords(event.wheel.mouse_x, event.wheel.mouse_y));
+			}
+			while(g_wheelAccum <= -1.0f){
+				g_wheelAccum += 1.0f;
+				sink(WM_MOUSEWHEEL, WPARAM(-120),
+				     packCoords(event.wheel.mouse_x, event.wheel.mouse_y));
+			}
 			break;
+		}
 
 		case SDL_EVENT_KEY_DOWN:
 		case SDL_EVENT_KEY_UP: {
