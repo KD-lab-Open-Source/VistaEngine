@@ -19,12 +19,17 @@
 #include "SDLShaders/ShaderBlob.h"
 
 // Look up the SDL texture a cTexture is backed by (null => untextured/white).
-// cSDLRenderDevice::CreateTexture parks the SDL_GPUTexture* in BitMap[0].
-static SDL_GPUTexture* sdlTextureOf(const cTexture* t)
+// cSDLRenderDevice::CreateTexture parks one SDL_GPUTexture* per frame in BitMap[frame];
+// phase (0..1) picks the frame of an animated texture, the same way SDLMinimapRenderer and
+// SDLObject3dxRenderer do -- so the animated UI shapes (select_square/select_round/... .avi)
+// play their edge-light sweep instead of freezing on frame 0.
+static SDL_GPUTexture* sdlTextureOf(const cTexture* t, float phase = 0.f)
 {
-	if(t && t->frameNumber() >= 1)
-		return reinterpret_cast<SDL_GPUTexture*>(const_cast<cTexture*>(t)->GetDDSurface(0));
-	return nullptr;
+	if(!t || t->frameNumber() < 1)
+		return nullptr;
+	const int frames = t->frameNumber();
+	const int frame  = frames > 1 ? (int)(0.999f * phase * frames) : 0;
+	return reinterpret_cast<SDL_GPUTexture*>(const_cast<cTexture*>(t)->GetDDSurface(frame));
 }
 
 // The engine packs its Color4c as BGRA bytes; UBYTE4_NORM reads them in that order and
@@ -418,9 +423,9 @@ void SDLUIRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 // ---------------------------------------------------------------------------
 // 2D entry points
 // ---------------------------------------------------------------------------
-void SDLUIRenderer::SetTexture(cTexture* texture)
+void SDLUIRenderer::SetTexture(cTexture* texture, float phase)
 {
-	currentTexture_ = sdlTextureOf(texture);
+	currentTexture_ = sdlTextureOf(texture, phase);
 }
 
 void SDLUIRenderer::SetSampler(const SAMPLER_DATA& data)
@@ -436,10 +441,11 @@ void SDLUIRenderer::DrawQuad(float x1, float y1, float dx, float dy,
 
 void SDLUIRenderer::DrawSprite(int x, int y, int dx, int dy,
                                float u, float v, float du, float dv,
-                               cTexture* texture, const Color4c& colorMul, eBlendMode blend)
+                               cTexture* texture, const Color4c& colorMul, eBlendMode blend,
+                               float phase)
 {
 	emitQuad((float)x, (float)y, (float)dx, (float)dy, u, v, du, dv,
-	         packColor(colorMul), sdlTextureOf(texture),
+	         packColor(colorMul), sdlTextureOf(texture, phase),
 	         blend == ALPHA_ADDBLENDALPHA);
 }
 

@@ -62,8 +62,10 @@ public:
 	          int screenW, int screenH, bool clear, const float clearColor[4]);
 
 	// --- 2D entry points, forwarded from cSDLRenderDevice --------------------
-	// Texture for the following DrawQuad calls (from SetNoMaterial).
-	void SetTexture(cTexture* texture);
+	// Texture for the following DrawQuad calls (from SetNoMaterial). phase (0..1) selects
+	// the frame of a multi-frame (animated .avi) texture -- the animated UI shapes, whose
+	// green edge-light lives in the later frames; a single-frame texture ignores it.
+	void SetTexture(cTexture* texture, float phase = 0.f);
 	// Sampler for what follows (from SetSamplerData/SetSamplerDataVirtual). Only the
 	// address mode is honoured -- clamp or wrap -- since no 2D caller asks for anything but
 	// linear filtering, and only one asks for wrap: the selection frame, whose centre tiles
@@ -76,7 +78,8 @@ public:
 	// sprites ask for; everything else draws with the straight-alpha pipeline, as before.
 	void DrawSprite(int x, int y, int dx, int dy,
 	                float u, float v, float du, float dv,
-	                cTexture* texture, const Color4c& color, eBlendMode blend = ALPHA_BLEND);
+	                cTexture* texture, const Color4c& color, eBlendMode blend = ALPHA_BLEND,
+	                float phase = 0.f);
 
 	// cQuadBuffer<sVertexXYZWDT1>'s contract, for the 2D callers that fill their quads'
 	// corners by hand rather than through DrawSprite -- the selection frame, whose edge and
