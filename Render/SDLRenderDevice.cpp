@@ -23,6 +23,7 @@
 #include "SDLMinimapRenderer.h"
 #include "SDLGrassRenderer.h"
 #include "SDLCloudShadowRenderer.h"
+#include "SDLEnvironmentEarthRenderer.h"
 #include "SDLPostEffectRenderer.h"
 
 // See the declarations in SDLRenderDevice.h.
@@ -71,6 +72,12 @@ SDLCloudShadowRenderer* sdlCloudShadowRenderer()
 {
 	cSDLRenderDevice* dev = sdlRenderDevice();
 	return dev ? dev->cloudShadowRenderer() : nullptr;
+}
+
+SDLEnvironmentEarthRenderer* sdlEnvironmentEarthRenderer()
+{
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	return dev ? dev->environmentEarthRenderer() : nullptr;
 }
 
 SDLPostEffectRenderer* sdlPostEffectRenderer()
@@ -237,6 +244,8 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND /*hWnd*/,
 		grassRenderer_ = std::make_unique<SDLGrassRenderer>(this, device_, window_);
 	if(!cloudShadowRenderer_)
 		cloudShadowRenderer_ = std::make_unique<SDLCloudShadowRenderer>(this, device_, window_);
+	if(!environmentEarthRenderer_)
+		environmentEarthRenderer_ = std::make_unique<SDLEnvironmentEarthRenderer>(this, device_, window_);
 	if(!postEffectRenderer_)
 		postEffectRenderer_ = std::make_unique<SDLPostEffectRenderer>(device_, window_);
 	if(!minimapRenderer_){
@@ -285,6 +294,7 @@ int cSDLRenderDevice::Done()
 	worldQuadRenderer_.reset();
 	grassRenderer_.reset();
 	cloudShadowRenderer_.reset();
+	environmentEarthRenderer_.reset();
 	postEffectRenderer_.reset();
 
 	if(device_){
@@ -395,6 +405,8 @@ int cSDLRenderDevice::BeginScene()
 		grassRenderer_->BeginFrame();
 	if(cloudShadowRenderer_)
 		cloudShadowRenderer_->BeginFrame();
+	if(environmentEarthRenderer_)
+		environmentEarthRenderer_->BeginFrame();
 	if(postEffectRenderer_)
 		postEffectRenderer_->BeginFrame();
 
@@ -840,6 +852,33 @@ void cSDLRenderDevice::drawCloudShadow()
 	if(cloudShadowRenderer_->Draw(commandBuffer_, rt->color, rt->depth, rt->w, rt->h,
 	                              clear, rt->clearColor, !rt->depthCleared,
 	                              fillMode_ == FILL_WIREFRAME)){
+		if(clear) rt->colorCleared = true;
+		rt->depthCleared = true;
+	}
+}
+
+// The ground plane beyond the map edge, into the view: cEnvironmentEarth draws it at
+// SCENENODE_OBJECTFIRST, before the terrain, so this pass takes the depth clear the camera's
+// ClearZBuffer armed and writes the plane's depth; the terrain then draws over it. Opaque, so
+// unlike the world quads it writes depth. See SDLEnvironmentEarthRenderer.h.
+void cSDLRenderDevice::drawEnvironmentEarth()
+{
+	if(!bActiveScene_ || !commandBuffer_ || !environmentEarthRenderer_ || !environmentEarthRenderer_->hasDraws())
+		return;
+	RenderTarget* rt = current_;
+	if(rt->depthOnly || !rt->usable()){
+		environmentEarthRenderer_->DiscardDraws();
+		return;
+	}
+
+	// Nothing is batched this early in the walk, but drain the object pass for the same reason
+	// the grass does: keep this renderer's pass from splitting an object batch in two.
+	flushObjectPass();
+
+	const bool clear = rt->clearPending && !rt->colorCleared;
+	if(environmentEarthRenderer_->Draw(commandBuffer_, rt->color, rt->depth, rt->w, rt->h,
+	                                   clear, rt->clearColor, !rt->depthCleared,
+	                                   fillMode_ == FILL_WIREFRAME)){
 		if(clear) rt->colorCleared = true;
 		rt->depthCleared = true;
 	}

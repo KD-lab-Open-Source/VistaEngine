@@ -83,6 +83,10 @@ vista_shader_module(cloudshadow
     "cloudshadow_vert=cloudshadow.vert.hlsl:vertex"
     "cloudshadow_frag=cloudshadow.frag.hlsl:fragment")
 
+vista_shader_module(environmentearth
+    "environmentearth_vert=environmentearth.vert.hlsl:vertex"
+    "environmentearth_frag=environmentearth.frag.hlsl:fragment")
+
 vista_shader_module(worldquad
     "worldquad_vert=worldquad.vert.hlsl:vertex"
     "worldquad_frag=worldquad.frag.hlsl:fragment")
@@ -193,6 +197,7 @@ set(RENDER_SOURCES
     SDLWorldQuadRenderer.cpp
     SDLGrassRenderer.cpp
     SDLCloudShadowRenderer.cpp
+    SDLEnvironmentEarthRenderer.cpp
     SDLPostEffectRenderer.cpp
     # Symbols the engine still names that the D3D backend used to define
     # (gb_RenderDevice, the sampler constants, the sPtr buffer handles).

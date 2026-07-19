@@ -65,13 +65,11 @@ struct SkyElement
 
 class cFogCircleEX
 {
-	sPtrVertexBuffer cborder_vb;
-	sPtrIndexBuffer cborder_ib;
+	// The ring re-records into SDLWorldQuadRenderer's triangle route every frame (like the
+	// field dome), so it keeps no GPU buffers of its own -- only the vertex/index counts.
 	int size_vb, size_ib;
-	typedef sVertexXYZD VType;
-	Color4c fog_color;
 	EnvironmentTime* time;
-	enum 
+	enum
 	{
 		hord_count = 36,
 	};
