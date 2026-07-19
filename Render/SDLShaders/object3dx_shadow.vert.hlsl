@@ -42,6 +42,8 @@ cbuffer Constants : register(b0, space1)
     row_major float4x4 Shadow;   // the lit path's receiver matrix; unused here
     float4 FogPlane;             // the lit path's fog plane; unused here
     row_major float4x4 View;     // the lit path's REFLECTION view matrix; unused here
+    float4 SecondUTrans;         // the lit path's SECOND_OPACITY UV transform; unused here
+    float4 SecondVTrans;
     float4 World[MAX_BONES * 3];
 };
 

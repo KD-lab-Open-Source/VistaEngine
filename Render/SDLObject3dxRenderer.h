@@ -30,10 +30,12 @@
 // the view-space environment ("matcap") map that gives the metal units their sheen) and
 // their scene-shadow variants -- skinning, diffuse texture, lambert + specular, ambient,
 // the skin-colour tint, the animated UV transform, casting into and receiving from the
-// shadow map, and the five blend modes cObject3dx::Draw selects between. Still to come,
-// each a shader variant cObject3dx::Draw picks in the original: the sky-cubemap reflection
-// (is_reflect_sky -- matches no shipped model), the second opacity map, the lightmap, fog
-// of war, point lights, and fur.
+// shadow map, and the five blend modes cObject3dx::Draw selects between. Also the
+// second-opacity path (vsSkinSecondOpacity/psSkinSecondOpacity): a second, UV-scrolled map
+// whose alpha masks the output -- the moving light that traces the menu's shapes. Still to
+// come, each a shader variant cObject3dx::Draw picks in the original: the sky-cubemap
+// reflection (is_reflect_sky -- matches no shipped model), the lightmap, fog of war, point
+// lights, and fur.
 
 #include "IRenderDevice.h"    // Color4f, eBlendMode, cTexture, MatXf
 #include <unordered_map>
@@ -89,6 +91,11 @@ public:
 		// the original's reflect_amount * node diffuse, the weight it is added at.
 		cTexture* reflectTexture = nullptr;   // mat.pReflectTexture
 		Color4f reflectAmount = Color4f(0,0,0,0);
+		// Non-null selects the second-opacity path (the original's vsSkinSecondOpacity /
+		// psSkinSecondOpacity, dispatched before reflection and bump). A second texture whose
+		// alpha, sampled through the animated second UV, masks the output alpha -- the moving
+		// light that traces the menu's shapes.
+		cTexture* secondOpacityTexture = nullptr;   // mat.pSecondOpacityTexture
 		float texturePhase = 0.f;       // animation phase for a multi-frame texture
 		bool tilingWrap = false;        // mat.tiling_diffuse & TILING_U_WRAP
 
@@ -98,6 +105,10 @@ public:
 
 		bool hasUVTrans = false;        // mat.chains' animated UV transform
 		float uvTrans[6] = {0,0,0,0,0,0};
+		// The second-opacity map's UV transform, from mat_chain.uv_displacement (SECOND_UV_T0:
+		// the menu is isUV2 == false, so it reuses UV set 0). Off => the map samples untransformed.
+		bool hasSecondUVTrans = false;
+		float secondUvTrans[6] = {0,0,0,0,0,0};
 	};
 
 	// Drop the previous frame's draws. Called from BeginScene.
@@ -156,6 +167,8 @@ private:
 		float shadow[16];           // shadowMatViewProj() * shadowMatBias()
 		float fogPlane[4];          // cSDLRenderDevice::fogPlane(camera)
 		float view[16];             // camera->matView; the REFLECTION variant's sphere-map basis
+		float secondUTrans[4];      // SECOND_OPACITY variant's UV transform (u row); w != 0 applies it
+		float secondVTrans[4];      // (v row)
 	};
 
 	// The most bone poses one material group can reference: StaticBunch::max_index, and
@@ -193,12 +206,14 @@ private:
 		SDL_GPUTexture* bumpTexture;
 		SDL_GPUTexture* specularTexture;
 		SDL_GPUTexture* reflectTexture;  // the 2D env map (reflect path)
+		SDL_GPUTexture* secondOpacityTexture;  // the moving opacity mask (second-opacity path)
 		SDL_GPUTexture* shadowTexture;   // null -> this material does not receive
 		SDL_GPUSampler* sampler;
 		eBlendMode blend;
 		bool skinned;               // vertex carries weight bytes (boneCount > 1)
 		bool bump;                  // bump path: tangent-frame vertex, per-pixel lambert
 		bool reflect;               // reflection path: adds a view-space env map (no bump)
+		bool secondOpacity;         // second-opacity path: masks alpha by a second map (no bump/reflect)
 		// The camera was the reflection camera, whose mirror matrix reverses every
 		// triangle's winding: cull the other face (see pipelineFor).
 		bool mirrored;
@@ -224,8 +239,8 @@ private:
 	// depth write -- all baked into an SDL GPU pipeline. Built on demand and cached.
 	// `shadow` selects the caster pipeline: depth-only (no colour target), slope-scaled
 	// depth bias, and the shadow shaders, which ignore the tangent frame.
-	SDL_GPUGraphicsPipeline* pipelineFor(int stride, bool skinned, bool bump, bool reflect, eBlendMode blend,
-	                                     bool mirrored, bool depthWrite, bool wireframe, bool shadow);
+	SDL_GPUGraphicsPipeline* pipelineFor(int stride, bool skinned, bool bump, bool reflect, bool secondOpacity,
+	                                     eBlendMode blend, bool mirrored, bool depthWrite, bool wireframe, bool shadow);
 	// Append the current state to states_ if it changed since the last recorded draw.
 	int commitState();
 
@@ -239,9 +254,12 @@ private:
 	SDL_GPUShader* vsSkinBump_    = nullptr;   // -DSKINNED=1 -DBUMP=1
 	SDL_GPUShader* vsRigidReflect_= nullptr;   // -DSKINNED=0 -DBUMP=0 -DREFLECTION=1
 	SDL_GPUShader* vsSkinReflect_ = nullptr;   // -DSKINNED=1 -DBUMP=0 -DREFLECTION=1
+	SDL_GPUShader* vsRigidSecondOpacity_ = nullptr;   // -DSKINNED=0 -DBUMP=0 -DSECOND_OPACITY=1
+	SDL_GPUShader* vsSkinSecondOpacity_  = nullptr;   // -DSKINNED=1 -DBUMP=0 -DSECOND_OPACITY=1
 	SDL_GPUShader* fs_            = nullptr;   // -DBUMP=0
 	SDL_GPUShader* fsBump_        = nullptr;   // -DBUMP=1
 	SDL_GPUShader* fsReflect_     = nullptr;   // -DBUMP=0 -DREFLECTION=1
+	SDL_GPUShader* fsSecondOpacity_ = nullptr; // -DBUMP=0 -DSECOND_OPACITY=1
 	SDL_GPUShader* vsShadowRigid_ = nullptr;   // object3dx_shadow, -DSKINNED=0
 	SDL_GPUShader* vsShadowSkin_  = nullptr;   // object3dx_shadow, -DSKINNED=1
 	SDL_GPUShader* fsShadow_      = nullptr;   // alpha-cutout clip, no colour output

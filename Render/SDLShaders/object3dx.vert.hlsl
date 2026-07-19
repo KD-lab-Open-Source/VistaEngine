@@ -50,6 +50,9 @@
 #ifndef REFLECTION
 #define REFLECTION 0
 #endif
+#ifndef SECOND_OPACITY
+#define SECOND_OPACITY 0
+#endif
 
 // Matches StaticBunch::max_index -- the most bones one material group can reference.
 #define MAX_BONES 20
@@ -86,6 +89,13 @@ cbuffer Constants : register(b0, space1)
     // only by the REFLECTION variant, for the sphere-map UV; pushed for every variant so
     // the one uniform block stays in step (object3dx_shadow.vert.hlsl declares it too).
     row_major float4x4 View;
+
+    // The second-opacity map's affine UV transform (the original's vSecondUtrans/vSecondVtrans,
+    // set from mat_chain.uv_displacement -- the moving mask that traces the menu shapes). Read
+    // only by the SECOND_OPACITY variant; w != 0 applies it, otherwise the map reuses UV set 0
+    // untransformed. Pushed for every variant so the one block stays in step.
+    float4 SecondUTrans;
+    float4 SecondVTrans;
 
     // mWorldM[20] as 20 x 3 rows of (R | T): world.k = dot(float4(pos,1), World[3i+k]).
     // The original ships the same 3 registers per bone (setMatrix4x3VS).
@@ -124,6 +134,9 @@ struct VSOutput
     float  Fog       : TEXCOORD4;
 #if REFLECTION
     float2 Reflect   : TEXCOORD5;   // sphere-map UV: view-space normal.xy mapped to [0,1]
+#endif
+#if SECOND_OPACITY
+    float2 UV1       : TEXCOORD6;   // the original's o.t1: the second-opacity map's UV
 #endif
 };
 
@@ -175,6 +188,18 @@ VSOutput main(VSInput input)
     }
     else
         output.UV = input.UV;
+
+#if SECOND_OPACITY
+    // uvtrans.inl's SECOND_OPACITY_TEXTURE (!= 2) branch: the second map reads UV set 0,
+    // transformed by its own matrix when SECOND_UVTRANS is on (SecondUTrans.w != 0). The
+    // menu model is isUV2 == false, so this is the only mode that ships.
+    if(SecondUTrans.w != 0.0f){
+        float3 uvs = float3(input.UV, 1.0f);
+        output.UV1 = float2(dot(uvs, SecondUTrans.xyz), dot(uvs, SecondVTrans.xyz));
+    }
+    else
+        output.UV1 = input.UV;
+#endif
 
     // --- light --------------------------------------------------------------
 #if BUMP
