@@ -1118,13 +1118,14 @@ Vect4f cSDLRenderDevice::fogPlane(Camera* camera) const
 // 2D entry points: forwarded to the UI renderer, which batches them and draws
 // them all in its own pass at EndScene.
 // ---------------------------------------------------------------------------
-void cSDLRenderDevice::SetNoMaterial(eBlendMode /*blend*/, const MatXf&, float /*phase*/,
+void cSDLRenderDevice::SetNoMaterial(eBlendMode /*blend*/, const MatXf&, float phase,
                                      cTexture* Texture0, cTexture* /*Texture1*/, eColorMode /*mode*/)
 {
 	// (Blend state is baked into the single alpha pipeline for now; per-blend
-	// pipelines come later.)
+	// pipelines come later.) phase selects the frame of an animated texture, so the
+	// animated UI shapes play their edge-light sweep instead of freezing on frame 0.
 	if(uiRenderer_)
-		uiRenderer_->SetTexture(Texture0);
+		uiRenderer_->SetTexture(Texture0, phase);
 }
 
 void cSDLRenderDevice::SetSamplerDataVirtual(DWORD stage, SAMPLER_DATA& data)
@@ -1144,10 +1145,10 @@ void cSDLRenderDevice::DrawQuad(float x1, float y1, float dx, float dy,
 void cSDLRenderDevice::DrawSprite(int x, int y, int dx, int dy,
                                   float u, float v, float du, float dv,
                                   cTexture* Texture, const Color4c& ColorMul,
-                                  float /*phase*/, eBlendMode mode, float /*saturate*/)
+                                  float phase, eBlendMode mode, float /*saturate*/)
 {
 	if(!bActiveScene_ || !uiRenderer_) return;
-	uiRenderer_->DrawSprite(x, y, dx, dy, u, v, du, dv, Texture, ColorMul, mode);
+	uiRenderer_->DrawSprite(x, y, dx, dy, u, v, du, dv, Texture, ColorMul, mode, phase);
 	NumberPolygon += 2;
 }
 

@@ -13,6 +13,7 @@
 #include "Render/SDLObject3dxRenderer.h"   // objects are drawn by SDLObject3dxRenderer,
 #include "Render/SDLRenderDevice.h"        // which the SDL device hands out
 
+
 float AlphaMaxiumBlend=0.95f;
 float AlphaMiniumShadow=0.0f;
 
@@ -825,6 +826,22 @@ void cObject3dx::Draw(Camera* camera)
 				if(!mat_chain.uv.values.empty()){
 					mat_chain.uv.InterpolateSlow(mat_anim.phase, st.uvTrans);
 					st.hasUVTrans = true;
+				}
+			}
+
+			// The second-opacity path (vsSkinSecondOpacity/psSkinSecondOpacity), dispatched
+			// before reflection and bump: a second map whose alpha masks the output. Its UV is
+			// scrolled by the chain's uv_displacement (SetSecondUVTrans), the moving light that
+			// traces the menu's shapes. isUV2 is false for that model, so it reuses UV set 0
+			// (SECOND_UV_T0); the isUV2 (SECOND_UV_T1) case is not ported.
+			if(mat.pSecondOpacityTexture){
+				st.secondOpacityTexture = mat.pSecondOpacityTexture;
+				if(!mat.chains.empty()){
+					StaticMaterialAnimation& mat_chain = mat.chains[mat_anim.chain];
+					if(!mat_chain.uv_displacement.values.empty()){
+						mat_chain.uv_displacement.InterpolateSlow(mat_anim.phase, st.secondUvTrans);
+						st.hasSecondUVTrans = true;
+					}
 				}
 			}
 

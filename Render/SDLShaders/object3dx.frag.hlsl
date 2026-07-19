@@ -54,6 +54,9 @@
 #ifndef REFLECTION
 #define REFLECTION 0
 #endif
+#ifndef SECOND_OPACITY
+#define SECOND_OPACITY 0
+#endif
 
 Texture2D<float4> DiffuseTexture : register(t0, space2);
 SamplerState      DiffuseSampler : register(s0, space2);
@@ -72,6 +75,12 @@ Texture2D<float4> ReflectionTexture : register(t1, space2);
 SamplerState      ReflectionSampler : register(s1, space2);
 Texture2D<float>  ShadowTexture     : register(t2, space2);
 SamplerState      ShadowSampler     : register(s2, space2);
+#elif SECOND_OPACITY
+// The second-opacity map (the original's SecondOpacityTextureSampler on s1). Its alpha is
+// the moving mask multiplied into the output alpha; the original's second-opacity path
+// (object_scene_light_second_opacity.psl) never binds the shadow map, so there is none.
+Texture2D<float4> SecondOpacityTexture : register(t1, space2);
+SamplerState      SecondOpacitySampler : register(s1, space2);
 #else
 Texture2D<float>  ShadowTexture   : register(t1, space2);
 SamplerState      ShadowSampler   : register(s1, space2);
@@ -122,6 +131,9 @@ struct VSOutput
 #if REFLECTION
     float2 Reflect   : TEXCOORD5;   // sphere-map UV, from the vertex shader
 #endif
+#if SECOND_OPACITY
+    float2 UV1       : TEXCOORD6;   // second-opacity map UV, from the vertex shader
+#endif
 };
 
 // Shadow9700 from Render/shader/Skin/shadow9700.inl. One deliberate difference: it
@@ -131,7 +143,8 @@ struct VSOutput
 // that file's "bias нельзя передавать через матрицу из за TSM" comment complains about.
 //
 // Returns 1 where the light reaches, 0 where it does not, or a quarter-step between the
-// two under the filter.
+// two under the filter. Absent from the SECOND_OPACITY variant, which binds no shadow map.
+#if !SECOND_OPACITY
 float shadowLit(float4 shadowPos)
 {
     float3 sh = shadowPos.xyz / shadowPos.w;
@@ -152,9 +165,15 @@ float shadowLit(float4 shadowPos)
     taps.w = ShadowTexture.Sample(ShadowSampler, sh.xy + float2( c, -c)) - sh.z;
     return dot(step(0.0f, taps), 0.25f);
 }
+#endif
 
 // shadow9700.inl's Shadow(), with its k == 1: the objects' call site passes a constant,
 // unlike the tilemap's, which fades the shadow out where the surface turns away anyway.
+#if SECOND_OPACITY
+// The original's second-opacity path (object_scene_light_second_opacity.psl) has no shadow
+// map bound, so nothing multiplies in -- a no-op that also lets us keep the call site common.
+void applyShadow(inout float3 rgb, float4 shadowPos) {}
+#else
 void applyShadow(inout float3 rgb, float4 shadowPos)
 {
     if(ShadowParams.x == 0.0f)
@@ -162,6 +181,7 @@ void applyShadow(inout float3 rgb, float4 shadowPos)
     float lit = shadowLit(shadowPos);
     rgb *= ShadeIntensity.rgb * (1.0f - lit) + lit;
 }
+#endif
 
 float4 main(VSOutput input) : SV_Target0
 {
@@ -221,12 +241,20 @@ float4 main(VSOutput input) : SV_Target0
         ot.rgb += Ambient.rgb * t0.rgb;
         ot.rgb += input.Specular;
 
+#if SECOND_OPACITY
+        // object_scene_light.psl's SECOND_OPACITY_TEXTURE branch: the second map's alpha is
+        // a moving mask (its UV is scrolled by the animated uv_displacement), so the outline
+        // only shows where it lets the diffuse alpha through -- the light tracing the shape.
+        float4 t1 = SecondOpacityTexture.Sample(SecondOpacitySampler, input.UV1);
+        ot.a = t0.a * t1.a * input.Diffuse.a;
+#else
         if(Params.z != 0.0f){    // SELF_ILLUMINATION: alpha is the illumination mask
             ot.a = input.Diffuse.a;
             ot.rgb = lerp(ot.rgb, t0.rgb, t0.a);
         }
         else
             ot.a = t0.a * input.Diffuse.a;
+#endif
     }
 #endif
 

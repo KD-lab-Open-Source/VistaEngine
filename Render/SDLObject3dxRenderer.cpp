@@ -133,9 +133,12 @@ SDLObject3dxRenderer::~SDLObject3dxRenderer()
 	if(vsSkinBump_)    SDL_ReleaseGPUShader(device_, vsSkinBump_);
 	if(vsRigidReflect_)SDL_ReleaseGPUShader(device_, vsRigidReflect_);
 	if(vsSkinReflect_) SDL_ReleaseGPUShader(device_, vsSkinReflect_);
+	if(vsRigidSecondOpacity_) SDL_ReleaseGPUShader(device_, vsRigidSecondOpacity_);
+	if(vsSkinSecondOpacity_)  SDL_ReleaseGPUShader(device_, vsSkinSecondOpacity_);
 	if(fs_)            SDL_ReleaseGPUShader(device_, fs_);
 	if(fsBump_)        SDL_ReleaseGPUShader(device_, fsBump_);
 	if(fsReflect_)     SDL_ReleaseGPUShader(device_, fsReflect_);
+	if(fsSecondOpacity_) SDL_ReleaseGPUShader(device_, fsSecondOpacity_);
 	if(vsShadowRigid_) SDL_ReleaseGPUShader(device_, vsShadowRigid_);
 	if(vsShadowSkin_)  SDL_ReleaseGPUShader(device_, vsShadowSkin_);
 	if(fsShadow_)      SDL_ReleaseGPUShader(device_, fsShadow_);
@@ -147,7 +150,9 @@ SDLObject3dxRenderer::~SDLObject3dxRenderer()
 bool SDLObject3dxRenderer::createShaders()
 {
 	if(shadersTried_) return vsRigid_ && vsSkin_ && vsRigidBump_ && vsSkinBump_
-	                      && vsRigidReflect_ && vsSkinReflect_ && fs_ && fsBump_ && fsReflect_
+	                      && vsRigidReflect_ && vsSkinReflect_
+	                      && vsRigidSecondOpacity_ && vsSkinSecondOpacity_
+	                      && fs_ && fsBump_ && fsReflect_ && fsSecondOpacity_
 	                      && vsShadowRigid_ && vsShadowSkin_ && fsShadow_;
 	shadersTried_ = true;
 	if(!device_ || !window_) return false;
@@ -165,6 +170,8 @@ bool SDLObject3dxRenderer::createShaders()
 	vsSkinBump_     = makeVS(VISTA_SHADER(object3dx_skin_bump_vert));
 	vsRigidReflect_ = makeVS(VISTA_SHADER(object3dx_rigid_reflect_vert));
 	vsSkinReflect_  = makeVS(VISTA_SHADER(object3dx_skin_reflect_vert));
+	vsRigidSecondOpacity_ = makeVS(VISTA_SHADER(object3dx_rigid_second_opacity_vert));
+	vsSkinSecondOpacity_  = makeVS(VISTA_SHADER(object3dx_skin_second_opacity_vert));
 	vsShadowRigid_  = makeVS(VISTA_SHADER(object3dx_shadow_rigid_vert));
 	vsShadowSkin_   = makeVS(VISTA_SHADER(object3dx_shadow_skin_vert));
 
@@ -180,42 +187,46 @@ bool SDLObject3dxRenderer::createShaders()
 	fs_        = makeFS(VISTA_SHADER(object3dx_frag),         2);  // diffuse + shadow map
 	fsBump_    = makeFS(VISTA_SHADER(object3dx_bump_frag),    4);  // diffuse + bump + specular + shadow map
 	fsReflect_ = makeFS(VISTA_SHADER(object3dx_reflect_frag), 3);  // diffuse + env map + shadow map
+	fsSecondOpacity_ = makeFS(VISTA_SHADER(object3dx_second_opacity_frag), 2);  // diffuse + second-opacity map
 	fsShadow_  = makeFS(VISTA_SHADER(object3dx_shadow_frag),  1);  // diffuse, for the alpha-cutout clip
 
 	if(!vsRigid_ || !vsSkin_ || !vsRigidBump_ || !vsSkinBump_ || !vsRigidReflect_ || !vsSkinReflect_
-	   || !fs_ || !fsBump_ || !fsReflect_
+	   || !vsRigidSecondOpacity_ || !vsSkinSecondOpacity_
+	   || !fs_ || !fsBump_ || !fsReflect_ || !fsSecondOpacity_
 	   || !vsShadowRigid_ || !vsShadowSkin_ || !fsShadow_){
 		fprintf(stderr, "SDLObject3dxRenderer: CreateGPUShader failed: %s\n", SDL_GetError());
 		return false;
 	}
-	fprintf(stderr, "SDLObject3dxRenderer: object3dx shaders ready (plain + bump + reflect + shadow)\n");
+	fprintf(stderr, "SDLObject3dxRenderer: object3dx shaders ready (plain + bump + reflect + second-opacity + shadow)\n");
 	return true;
 }
 
 SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skinned, bool bump, bool reflect,
-                                                           eBlendMode blend, bool mirrored, bool depthWrite,
-                                                           bool wireframe, bool shadow)
+                                                           bool secondOpacity, eBlendMode blend, bool mirrored,
+                                                           bool depthWrite, bool wireframe, bool shadow)
 {
 	// The caster shaders take no tangent frame, no env map and write no colour, so bump,
-	// reflection and the blend mode never reach them: fold them out of the key rather than
-	// build dead pipelines.
+	// reflection, the second-opacity map and the blend mode never reach them: fold them out
+	// of the key rather than build dead pipelines.
 	if(shadow){
 		bump = false;
 		reflect = false;
+		secondOpacity = false;
 		blend = (blend == ALPHA_TEST) ? ALPHA_TEST : ALPHA_NONE;
 		depthWrite = true;
 		wireframe = false;
 	}
 
 	const unsigned long long key = (unsigned long long)(unsigned)stride
-	                             | ((unsigned long long)skinned    << 16)
-	                             | ((unsigned long long)blend      << 17)
-	                             | ((unsigned long long)depthWrite << 24)
-	                             | ((unsigned long long)wireframe  << 25)
-	                             | ((unsigned long long)bump       << 26)
-	                             | ((unsigned long long)shadow     << 27)
-	                             | ((unsigned long long)mirrored   << 28)
-	                             | ((unsigned long long)reflect    << 29);
+	                             | ((unsigned long long)skinned       << 16)
+	                             | ((unsigned long long)blend         << 17)
+	                             | ((unsigned long long)depthWrite    << 24)
+	                             | ((unsigned long long)wireframe     << 25)
+	                             | ((unsigned long long)bump          << 26)
+	                             | ((unsigned long long)shadow        << 27)
+	                             | ((unsigned long long)mirrored      << 28)
+	                             | ((unsigned long long)reflect       << 29)
+	                             | ((unsigned long long)secondOpacity << 30);
 	auto it = pipelines_.find(key);
 	if(it != pipelines_.end())
 		return it->second;
@@ -289,11 +300,15 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 	}
 
 	SDL_GPUGraphicsPipelineCreateInfo pci = {};
-	pci.vertex_shader = shadow  ? (skinned ? vsShadowSkin_ : vsShadowRigid_)
-	                  : reflect ? (skinned ? vsSkinReflect_ : vsRigidReflect_)
-	                  : bump    ? (skinned ? vsSkinBump_ : vsRigidBump_)
-	                            : (skinned ? vsSkin_ : vsRigid_);
-	pci.fragment_shader = shadow ? fsShadow_ : reflect ? fsReflect_ : (bump ? fsBump_ : fs_);
+	pci.vertex_shader = shadow        ? (skinned ? vsShadowSkin_ : vsShadowRigid_)
+	                  : secondOpacity ? (skinned ? vsSkinSecondOpacity_ : vsRigidSecondOpacity_)
+	                  : reflect       ? (skinned ? vsSkinReflect_ : vsRigidReflect_)
+	                  : bump          ? (skinned ? vsSkinBump_ : vsRigidBump_)
+	                                  : (skinned ? vsSkin_ : vsRigid_);
+	pci.fragment_shader = shadow ? fsShadow_
+	                    : secondOpacity ? fsSecondOpacity_
+	                    : reflect ? fsReflect_
+	                    : (bump ? fsBump_ : fs_);
 	pci.vertex_input_state.vertex_buffer_descriptions = &vbDesc;
 	pci.vertex_input_state.num_vertex_buffers = 1;
 	pci.vertex_input_state.vertex_attributes = attrs;
@@ -406,6 +421,20 @@ void SDLObject3dxRenderer::SetState(const State& state, Camera* camera)
 		std::memset(current_.vs.vTrans, 0, sizeof(current_.vs.vTrans));
 	}
 
+	// vSecondUtrans/vSecondVtrans, from mat_chain.uv_displacement, packed as the primary
+	// transform is; w flags it on. Read only by the SECOND_OPACITY variant; off => the map
+	// samples UV set 0 untransformed (SECOND_UVTRANS 0 in the original).
+	if(state.hasSecondUVTrans){
+		current_.vs.secondUTrans[0] = state.secondUvTrans[0]; current_.vs.secondUTrans[1] = state.secondUvTrans[2];
+		current_.vs.secondUTrans[2] = state.secondUvTrans[4]; current_.vs.secondUTrans[3] = 1.f;
+		current_.vs.secondVTrans[0] = state.secondUvTrans[1]; current_.vs.secondVTrans[1] = state.secondUvTrans[3];
+		current_.vs.secondVTrans[2] = state.secondUvTrans[5]; current_.vs.secondVTrans[3] = 0.f;
+	}
+	else{
+		std::memset(current_.vs.secondUTrans, 0, sizeof(current_.vs.secondUTrans));
+		std::memset(current_.vs.secondVTrans, 0, sizeof(current_.vs.secondVTrans));
+	}
+
 	const int boneCount = state.boneCount < 1 ? 1 : (state.boneCount > 4 ? 4 : state.boneCount);
 	current_.vs.params[0] = (float)boneCount;
 	current_.vs.params[1] = state.noLight ? 1.f : 0.f;
@@ -435,17 +464,26 @@ void SDLObject3dxRenderer::SetState(const State& state, Camera* camera)
 	current_.bumpTexture = sdlTextureOf(state.bumpTexture, state.texturePhase);
 	current_.specularTexture = sdlTextureOf(state.specularMap, state.texturePhase);
 	current_.reflectTexture = sdlTextureOf(state.reflectTexture, state.texturePhase);
+	current_.secondOpacityTexture = sdlTextureOf(state.secondOpacityTexture, state.texturePhase);
 	current_.sampler = state.tilingWrap ? samplerWrap_ : samplerClamp_;
+
+	// The second-opacity path, dispatched *before* reflection and bump in cObject3dx::Draw
+	// (both its branches guard on !mat.pSecondOpacityTexture), so it wins the material here
+	// too. Its fragment shader always samples the diffuse map, so an untextured material
+	// can't take it.
+	current_.secondOpacity = current_.secondOpacityTexture != nullptr && current_.texture != nullptr;
 
 	// The bump fragment shader always samples the diffuse map (the original has no
 	// NOTEXTURE variant of psSkinBump), so an untextured material can't take that path.
-	current_.bump = current_.bumpTexture != nullptr && current_.texture != nullptr;
+	current_.bump = current_.bumpTexture != nullptr && current_.texture != nullptr
+	             && !current_.secondOpacity;
 
 	// The reflection path, mutually exclusive with bump (cObject3dx::Draw dispatches it
-	// before the bump path and never sets both). Like bump, the reflect fragment shader
-	// always samples the diffuse map, so an untextured material can't take it.
+	// before the bump path and never sets both) and superseded by second-opacity. Like bump,
+	// the reflect fragment shader always samples the diffuse map, so an untextured material
+	// can't take it.
 	current_.reflect = current_.reflectTexture != nullptr && current_.texture != nullptr
-	                && !current_.bump;
+	                && !current_.bump && !current_.secondOpacity;
 	setVec4(current_.fs.reflectAmount, state.reflectAmount);
 
 	current_.fs.params[0] = state.blend == ALPHA_TEST ? ALPHA_TEST_REF : 0.f;
@@ -600,7 +638,7 @@ bool SDLObject3dxRenderer::DrawShadowPass(SDL_GPUCommandBuffer* cmd, SDL_GPUText
 		const StateBlock& st = states_[d.state];
 
 		// The caster pass draws for the light camera, which is never mirrored.
-		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, false, false, st.blend, false, true, false, true);
+		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, false, false, false, st.blend, false, true, false, true);
 		if(!pipeline) continue;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);
@@ -696,8 +734,8 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 	for(const DrawCmd& d : draws_){
 		const StateBlock& st = states_[d.state];
 
-		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, st.bump, st.reflect, st.blend,
-		                                                st.mirrored, d.depthWrite, wireframe, false);
+		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, st.bump, st.reflect, st.secondOpacity,
+		                                                st.blend, st.mirrored, d.depthWrite, wireframe, false);
 		if(!pipeline) continue;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);
@@ -730,28 +768,39 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 			// uniform gates the sample away (Params2.x for the specular map,
 			// ShadowParams.x for the shadow map): the white stand-in is never read.
 			// The shadow map is last -- slot 1 plain, slot 2 reflect (diffuse + env map),
-			// slot 3 bump (diffuse + bump + specular).
+			// slot 3 bump (diffuse + bump + specular). The second-opacity variant is the
+			// exception: it binds no shadow map, only diffuse + the opacity mask on slot 1.
 			SDL_GPUTextureSamplerBinding ts[4] = {};
 			ts[0].texture = st.texture ? st.texture : whiteTexture_;
 			ts[0].sampler = st.sampler ? st.sampler : samplerWrap_;
-			int shadowSlot = 1;
-			if(st.bump){
-				ts[1].texture = st.bumpTexture;
-				ts[1].sampler = samplerWrap_;   // the original's sampler_wrap_linear on stage 1
-				ts[2].texture = st.specularTexture ? st.specularTexture : whiteTexture_;
-				ts[2].sampler = samplerWrap_;
-				shadowSlot = 3;
+			if(st.secondOpacity){
+				// The moving opacity mask. Its UV is scrolled by the animated transform, so it
+				// wraps (the original leaves stage 1 on its default wrap sampler).
+				ts[1].texture = st.secondOpacityTexture ? st.secondOpacityTexture : whiteTexture_;
+				ts[1].sampler = samplerWrap_;
+				SDL_BindGPUFragmentSamplers(pass, 0, ts, 2);
+				boundState = d.state;
 			}
-			else if(st.reflect){
-				// The 2D environment map. A sphere-map UV runs to the [0,1] edges, so clamp.
-				ts[1].texture = st.reflectTexture ? st.reflectTexture : whiteTexture_;
-				ts[1].sampler = samplerClamp_;
-				shadowSlot = 2;
+			else{
+				int shadowSlot = 1;
+				if(st.bump){
+					ts[1].texture = st.bumpTexture;
+					ts[1].sampler = samplerWrap_;   // the original's sampler_wrap_linear on stage 1
+					ts[2].texture = st.specularTexture ? st.specularTexture : whiteTexture_;
+					ts[2].sampler = samplerWrap_;
+					shadowSlot = 3;
+				}
+				else if(st.reflect){
+					// The 2D environment map. A sphere-map UV runs to the [0,1] edges, so clamp.
+					ts[1].texture = st.reflectTexture ? st.reflectTexture : whiteTexture_;
+					ts[1].sampler = samplerClamp_;
+					shadowSlot = 2;
+				}
+				ts[shadowSlot].texture = st.shadowTexture ? st.shadowTexture : whiteTexture_;
+				ts[shadowSlot].sampler = samplerShadow_;
+				SDL_BindGPUFragmentSamplers(pass, 0, ts, shadowSlot + 1);
+				boundState = d.state;
 			}
-			ts[shadowSlot].texture = st.shadowTexture ? st.shadowTexture : whiteTexture_;
-			ts[shadowSlot].sampler = samplerShadow_;
-			SDL_BindGPUFragmentSamplers(pass, 0, ts, shadowSlot + 1);
-			boundState = d.state;
 		}
 
 		if(d.vertexBuffer != boundVB){
