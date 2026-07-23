@@ -26,9 +26,11 @@
 // baked slope (bump) map as the original's default path does, with one directional light
 // and the per-material detail grain, receiving the scene's shadow map and casting into it,
 // and following terramorphing: the dirty-tile flags cTileMap raises for vMap's update rects
-// are consumed each frame and the touched mesh rows / colour+bump texels re-uploaded. The
-// original's remaining layer -- fog of war -- the placement-zone (lava/ice) materials, and
-// the real tile/LOD streaming are still to come.
+// are consumed each frame and the touched mesh rows / colour+bump texels re-uploaded. A
+// terrain cell painted with a placement-zone LAVA or ICE material is drawn over with the
+// animated lava (tilemap_lava.{vert,frag}.hlsl) or the reflective ice
+// (tilemap_ice.{vert,frag}.hlsl) shader instead of the plain terrain pipeline; the real
+// tile/LOD streaming is still to come.
 
 #include <string>
 #include <vector>
@@ -86,6 +88,16 @@ private:
 
 	void createPipeline();
 	void createShadowPipeline();
+	// The placement-zone LAVA material's pipeline pair and its animated noise volume, built
+	// once. A lava run is drawn over the terrain mesh with these instead of the plain
+	// terrain pipeline -- see the run loop in Draw. lava.._ mirrors pipelineFill_/Mirror_'s
+	// cull so lava tiles behave in the reflection camera as the terrain around them does.
+	void createLavaPipeline();
+	// The placement-zone ICE material's pipeline pair, built once. An ice run is drawn over
+	// the terrain mesh with the reflective ice shader; opaque (Z-write on) like the terrain,
+	// so it needs no textures of its own -- the snow/bump come from the material and the
+	// reflection from the scene's reflection camera. ice.._ mirrors the terrain's cull.
+	void createIcePipeline();
 	// Rebuild when vMap is reloaded in place for a new mission. Returns false while
 	// the heightfield is not loaded yet (caller retries next frame) or on failure.
 	bool ensureMesh(SDL_GPUCommandBuffer* cmd);
@@ -118,6 +130,18 @@ private:
 	SDL_GPUGraphicsPipeline* pipelineMirror_ = nullptr;
 	// Depth-only, position-only, slope-scale biased: the terrain as a shadow caster.
 	SDL_GPUGraphicsPipeline* pipelineShadow_ = nullptr;
+	// The placement-zone LAVA material's pipeline (cull NONE) and its reflection-camera
+	// variant (cull FRONT), and the 64^3 random noise volume the lava fBm samples through.
+	SDL_GPUGraphicsPipeline* pipelineLava_       = nullptr;
+	SDL_GPUGraphicsPipeline* pipelineLavaMirror_ = nullptr;
+	SDL_GPUTexture*          volumeTexture_ = nullptr;
+	// Wrap + linear on the noise volume (the original's sampler_wrap_linear on stage 0).
+	SDL_GPUSampler*          volumeSampler_ = nullptr;
+	// The placement-zone ICE material's pipeline (cull NONE) and its reflection-camera variant
+	// (cull FRONT). No resources of its own -- snow/bump from the material, reflection from the
+	// scene's reflection camera, both bound per frame in Draw.
+	SDL_GPUGraphicsPipeline* pipelineIce_       = nullptr;
+	SDL_GPUGraphicsPipeline* pipelineIceMirror_ = nullptr;
 	SDL_GPUSampler*          sampler_      = nullptr;
 	// Point + clamp: the shadow compare is done by hand on raw depth values, which must
 	// not be filtered, and a receiver outside the map must read its edge, not wrap.

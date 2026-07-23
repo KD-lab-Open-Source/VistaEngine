@@ -734,6 +734,24 @@ void cSDLRenderDevice::drawWater()
 	}
 }
 
+void cSDLRenderDevice::drawWaterIce()
+{
+	if(!bActiveScene_ || !commandBuffer_ || !waterRenderer_ || !waterRenderer_->hasIceDraws())
+		return;
+	RenderTarget* rt = current_;
+	if(rt->depthOnly || !rt->usable())
+		return;
+
+	flushObjectPass();
+
+	const bool clear = rt->clearPending && !rt->colorCleared;
+	if(waterRenderer_->DrawIce(commandBuffer_, rt->color, rt->depth, rt->w, rt->h,
+	                           clear, rt->clearColor, !rt->depthCleared, fillMode_ == FILL_WIREFRAME)){
+		if(clear) rt->colorCleared = true;
+		rt->depthCleared = true;
+	}
+}
+
 void cSDLRenderDevice::drawWorldQuads()
 {
 	if(!bActiveScene_ || !commandBuffer_ || !worldQuadRenderer_ || !worldQuadRenderer_->hasDraws())

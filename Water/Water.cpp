@@ -462,7 +462,13 @@ void cWater::CalcVisibleLine(Camera* camera)
 
 void cWater::CalcColor(Color4c& color, int z, unsigned char opacity_shallow)
 {
-	color.g = color.b = 255;
+	// r was left uninitialized here (only g and b were set), which the water shaders never
+	// noticed -- they read only the alpha. The ice sheet does read it, though: water_ice.psl's
+	// aa = diffuse.r weights the temperature coverage, and the intent is a full weight over
+	// open water. Set it (white, as g and b are) so the ice coverage is well-defined rather
+	// than riding on whatever the stack held; the shallow-cutoff branch below still zeroes it,
+	// which correctly drops the ice where the water is fully transparent (land).
+	color.r = color.g = color.b = 255;
 
 	if(!opacity_shallow){
 		color.r = color.a = 0;

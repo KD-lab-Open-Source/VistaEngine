@@ -95,20 +95,30 @@ vista_shader_module(worldtri
     "worldtri_vert=worldtri.vert.hlsl:vertex"
     "worldtri_frag=worldtri.frag.hlsl:fragment")
 
-# The terrain, and the depth-only pass it casts shadows with.
+# The terrain, and the depth-only pass it casts shadows with. tilemap_lava / tilemap_ice are
+# the placement-zone LAVA / ICE materials' shader pairs (Render/shader/Water/water_lava and
+# water_ice.{vsl,psl}), drawn over the terrain cells those materials paint -- see
+# SDLTileMapRenderer.
 vista_shader_module(tilemap
     "tilemap_vert=tilemap.vert.hlsl:vertex"
     "tilemap_frag=tilemap.frag.hlsl:fragment"
+    "tilemap_lava_vert=tilemap_lava.vert.hlsl:vertex"
+    "tilemap_lava_frag=tilemap_lava.frag.hlsl:fragment"
+    "tilemap_ice_vert=tilemap_ice.vert.hlsl:vertex"
+    "tilemap_ice_frag=tilemap_ice.frag.hlsl:fragment"
     "tilemap_shadow_vert=tilemap_shadow.vert.hlsl:vertex"
     "tilemap_shadow_frag=tilemap_shadow.frag.hlsl:fragment")
 
 # REFLECTION=1 is the original's water_linear (samples the planar-reflection target);
-# REFLECTION=0 is water_easy.
+# REFLECTION=0 is water_easy. water_ice is the ice sheet cTemperature::Draw blends over the
+# surface (Render/shader/Water/water_ice.{vsl,psl}) -- see SDLWaterRenderer's ice path.
 vista_shader_module(water
     "water_vert=water.vert.hlsl:vertex:REFLECTION=0"
     "water_frag=water.frag.hlsl:fragment:REFLECTION=0"
     "water_reflect_vert=water.vert.hlsl:vertex:REFLECTION=1"
-    "water_reflect_frag=water.frag.hlsl:fragment:REFLECTION=1")
+    "water_reflect_frag=water.frag.hlsl:fragment:REFLECTION=1"
+    "water_ice_vert=water_ice.vert.hlsl:vertex"
+    "water_ice_frag=water_ice.frag.hlsl:fragment")
 
 # SKINNED mirrors the original's `#if(WEIGHT>1)`: a lod binding one bone per vertex
 # carries no weight bytes, so its vertex layout — and its shader — differ from the

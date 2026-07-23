@@ -4,7 +4,10 @@
 #include "Serialization/ResourceSelector.h"
 #include "Render/src/TexLibrary.h"
 #include "Render/src/cCamera.h"
+#include "Render/src/Scene.h"            // cScene::GetPlainLitColor (the ice snow tint)
 #include "Render/D3D/D3DRender.h"
+#include "Render/SDLRenderDevice.h"      // sdlWaterRenderer / sdlRenderDevice, drawWaterIce
+#include "Render/SDLWaterRenderer.h"     // SDLWaterRenderer::IceState, SetIceState/DrawIce
 
 cTemperature::cTemperature()
 :BaseGraphObject(0)
@@ -221,7 +224,6 @@ void cTemperature::UpdateColor()
 			*p=p00;
 			/**/
 			int	p00=clamp(round((data[x+y*grid_size.x]-border)*(1<<MUL_SHIFT)),0,255);
-			//int p00 = 255;
 			*p=p00;
 			/**/
 		}
@@ -268,12 +270,61 @@ void cTemperature::DebugShow()
 	quad->EndDraw();
 }
 
-// TODO(sdl-port): the ice sheet does not draw. See Render/PORTING.md #4.
-//
-// ShaderSceneWaterIce over the water polygons, keyed off the temperature field. The field
-// itself (SetT, UpdateColor) is portable and still runs; only the shader pass is missing.
+// ShaderSceneWaterIce over the water polygons, keyed off the temperature field (register #4).
+// The original: UpdateColor to refresh the coverage grid, then iceShader_->beginDraw over
+// pWater->DrawPolygons -- the same surface tiles drawn again, alpha-blended, so ice appears
+// only where the water froze. The SDL path hands SDLWaterRenderer the ice state, records the
+// polygons into its ice list through the same DrawPolygons, and draws them in a pass of their
+// own right after (dev->drawWaterIce), over the surface cWater::Draw already laid down.
 void cTemperature::Draw(Camera* cameraX)
 {
+	// The ice reflects the scene through the reflection camera's target, so like cWater::Draw
+	// it must not draw into that target itself -- the ice is not in its own reflection.
+	if(!cameraX || cameraX->getAttribute(ATTRCAMERA_REFLECTION))
+		return;
+
+	SDLWaterRenderer* renderer = sdlWaterRenderer();
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	if(!renderer || !dev || !pWater)
+		return;
+
+	// Refresh the 8-bit coverage grid from the temperature field (this is the portable part
+	// that already ran on Windows; only the draw below was missing).
+	UpdateColor();
+
+	SDLWaterRenderer::IceState st;
+	st.snow     = texture_;
+	st.bump     = textureBump_;
+	st.cleft    = textureCleft_;
+	st.coverage = textureAlpha_;
+	st.alphaRef = alpha_ref / 255.f;
+	// The coverage grid spans the map: talpha = pos.xy * (1/H, 1/V), the original's
+	// uvScaleOffset = tilemap_inv_size.
+	st.alphaScale[0] = real_size.x ? 1.f / real_size.x : 0.f;
+	st.alphaScale[1] = real_size.y ? 1.f / real_size.y : 0.f;
+
+	// vSnowColor = scene->GetPlainLitColor(), tinting the snow texture.
+	const Color4f snowColor = cameraX->scene() ? cameraX->scene()->GetPlainLitColor()
+	                                           : Color4f(1.f, 1.f, 1.f, 1.f);
+	st.snowColor[0] = snowColor.r; st.snowColor[1] = snowColor.g;
+	st.snowColor[2] = snowColor.b; st.snowColor[3] = 1.f;
+
+	// The planar reflection, exactly as cWater::Draw (fillMirrorMatrix) and SDLTileMapRenderer
+	// resolve it: the reflection camera's render target, projected through view-proj * texAdj.
+	Camera* reflectionCamera = cameraX->FindChildCamera(ATTRCAMERA_REFLECTION);
+	if(reflectionCamera && reflectionCamera->GetRenderTarget()){
+		st.reflectionTexture = reflectionCamera->GetRenderTarget();
+		const Mat4f texAdj(0.5f,  0.0f, 0.0f, 0.0f,
+		                   0.0f, -0.5f, 0.0f, 0.0f,
+		                   0.0f,  0.0f, 1.0f, 0.0f,
+		                   0.5f,  0.5f, 0.0f, 1.0f);
+		const Mat4f m = reflectionCamera->matViewProj * texAdj;
+		memcpy(st.mirrorVP, &m, sizeof(st.mirrorVP));
+	}
+
+	renderer->SetIceState(st, cameraX);
+	pWater->DrawPolygons(cameraX);   // records the surface tiles into the ice list
+	dev->drawWaterIce();             // and draws them, blended over the water
 }
 
 void cTemperature::SetT(int x,int y,float t,int size)
