@@ -15,6 +15,7 @@
 #include "Texture.h"           // cTexture::GetDDSurface / GetWidth / GetHeight
 #include "Scene.h"             // cScene::GetShadowIntensity (the shader's vShade)
 #include "VisGeneric.h"        // Option_filterShadow, Option_DetailTexture
+#include "IVisGenericInternal.h" // graphRnd, for the lava noise volume
 #include "SDLRenderDevice.h"   // applyCameraViewport, the shadow map
 
 // Terrain shader bytecode, compiled to this platform's native format at build time;
@@ -32,6 +33,23 @@ struct FSUniform { float lightColor[4]; float lightDir[4]; float shade[4]; float
                    float fogOfWarColor[4]; };
 // tilemap_shadow.vert.hlsl's whole cbuffer: the light camera's view-projection.
 struct ShadowVSUniform { float mvp[16]; };
+// tilemap_lava.{vert,frag}.hlsl's cbuffers. The VS carries the transform plus the two
+// terms lava keeps (fog-of-war lightmap uv, distance fog); the FS carries the material's
+// colours and scales, the animation time, and the two fog colours.
+struct LavaVSUniform { float mvp[16]; float planarNode[4]; float fogPlane[4]; };
+struct LavaFSUniform { float lavaColor[4]; float lavaAmbient[4]; float params[4];
+                       float fogColor[4]; float fogOfWarColor[4]; float lightMapParams[4]; };
+// tilemap_ice.{vert,frag}.hlsl's cbuffers. The VS carries the transform, the reflection
+// camera's mirror matrix, the fog-of-war lightmap uv, distance fog and the snow/bump UV
+// scales; the FS carries the snow tint, the two fog colours and the reflection / fog-of-war
+// flags (params.x = a reflection target exists, params.y = fog of war on).
+struct IceVSUniform { float mvp[16]; float mirrorVP[16]; float planarNode[4]; float fogPlane[4];
+                      float scaleBumpSnow[4]; };
+struct IceFSUniform { float snowColor[4]; float fogColor[4]; float fogOfWarColor[4]; float params[4]; };
+
+// The 64^3 random noise volume the lava fBm samples through -- the original's
+// CreateVolumeRand(64): an L8 cube of graphRnd() bytes. R8_UNORM here; the shader reads .x.
+const int VOLUME_SIZE = 64;
 
 // Sample every STEP_BASE fine cells (512/4 = 128 quads/axis -> 129x129 = 16641 verts
 // on the Menu). The step is doubled below as needed so the vertex count stays under
@@ -48,8 +66,8 @@ const int MAX_TEX = 2048;
 // cTileMap's miniDetailTextures_ (loaded from the world data -- grass, ground, mountain,
 // sand, ... one per material), gated on Option_DetailTexture, the "detail texture" graphics
 // option. The placement-zone materials, which index past miniDetailTexturesNumber, have no
-// detail texture of their own: the original runs its lava/ice shader for them instead, and
-// until that is ported they draw as plain terrain.
+// detail texture of their own: the original runs its lava/ice shader for them instead. The
+// lava run is handled in Draw with its own pipeline; ice still draws as plain terrain here.
 cTexture* materialDetailTexture(cTileMap* tileMap, int material)
 {
 	if(!tileMap || !Option_DetailTexture)
@@ -74,6 +92,8 @@ SDLTileMapRenderer::SDLTileMapRenderer(SDL_GPUDevice* device, SDL_Window* window
 {
 	createPipeline();
 	createShadowPipeline();
+	createLavaPipeline();
+	createIcePipeline();
 }
 
 SDLTileMapRenderer::~SDLTileMapRenderer()
@@ -89,6 +109,12 @@ SDLTileMapRenderer::~SDLTileMapRenderer()
 	if(pipelineLine_)   SDL_ReleaseGPUGraphicsPipeline(device_, pipelineLine_);
 	if(pipelineMirror_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineMirror_);
 	if(pipelineShadow_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineShadow_);
+	if(pipelineLava_)       SDL_ReleaseGPUGraphicsPipeline(device_, pipelineLava_);
+	if(pipelineLavaMirror_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineLavaMirror_);
+	if(volumeTexture_)  SDL_ReleaseGPUTexture(device_, volumeTexture_);
+	if(volumeSampler_)  SDL_ReleaseGPUSampler(device_, volumeSampler_);
+	if(pipelineIce_)        SDL_ReleaseGPUGraphicsPipeline(device_, pipelineIce_);
+	if(pipelineIceMirror_)  SDL_ReleaseGPUGraphicsPipeline(device_, pipelineIceMirror_);
 }
 
 void SDLTileMapRenderer::releaseMesh()
@@ -297,6 +323,194 @@ void SDLTileMapRenderer::createShadowPipeline()
 
 	fprintf(stderr, "SDLTileMapRenderer: terrain caster pipeline %s\n",
 	        pipelineShadow_ ? "ready" : "FAILED");
+}
+
+// The placement-zone LAVA material's pipeline pair, its noise volume and its wrap sampler.
+// Ported from ShaderSceneWaterLava (Render/shader/ShaderWater.inl): CreateVolumeRand(64) is
+// the L8 cube of graphRnd() bytes, sampler_wrap_linear the stage-0 sampler.
+void SDLTileMapRenderer::createLavaPipeline()
+{
+	if(!device_ || !window_) return;
+
+	// The noise volume: 64^3 random bytes, R8_UNORM (the shader reads .x). One graphRnd()
+	// byte per texel, exactly as CreateVolumeRand filled its D3DFMT_L8 box.
+	SDL_GPUTextureCreateInfo ti = {};
+	ti.type = SDL_GPU_TEXTURETYPE_3D;
+	ti.format = SDL_GPU_TEXTUREFORMAT_R8_UNORM;
+	ti.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER;
+	ti.width = VOLUME_SIZE; ti.height = VOLUME_SIZE;
+	ti.layer_count_or_depth = VOLUME_SIZE; ti.num_levels = 1;
+	volumeTexture_ = SDL_CreateGPUTexture(device_, &ti);
+	if(volumeTexture_){
+		const Uint32 bytes = (Uint32)VOLUME_SIZE * VOLUME_SIZE * VOLUME_SIZE;
+		SDL_GPUTransferBufferCreateInfo tbi = {};
+		tbi.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+		tbi.size = bytes;
+		if(SDL_GPUTransferBuffer* tb = SDL_CreateGPUTransferBuffer(device_, &tbi)){
+			unsigned char* p = (unsigned char*)SDL_MapGPUTransferBuffer(device_, tb, false);
+			for(Uint32 i = 0; i < bytes; ++i)
+				p[i] = (unsigned char)(graphRnd() & 255);
+			SDL_UnmapGPUTransferBuffer(device_, tb);
+
+			SDL_GPUCommandBuffer* cb = SDL_AcquireGPUCommandBuffer(device_);
+			SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(cb);
+			SDL_GPUTextureTransferInfo src = {};
+			src.transfer_buffer = tb; src.offset = 0;
+			src.pixels_per_row = VOLUME_SIZE; src.rows_per_layer = VOLUME_SIZE;
+			SDL_GPUTextureRegion dst = {};
+			dst.texture = volumeTexture_;
+			dst.w = VOLUME_SIZE; dst.h = VOLUME_SIZE; dst.d = VOLUME_SIZE;
+			SDL_UploadToGPUTexture(copy, &src, &dst, false);
+			SDL_EndGPUCopyPass(copy);
+			SDL_SubmitGPUCommandBuffer(cb);
+			SDL_ReleaseGPUTransferBuffer(device_, tb);
+		}
+	}
+
+	SDL_GPUSamplerCreateInfo vsmp = {};
+	vsmp.min_filter = SDL_GPU_FILTER_LINEAR;
+	vsmp.mag_filter = SDL_GPU_FILTER_LINEAR;
+	vsmp.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
+	vsmp.address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+	vsmp.address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+	vsmp.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+	volumeSampler_ = SDL_CreateGPUSampler(device_, &vsmp);
+
+	SDL_GPUShaderCreateInfo vsi = vista::shaderCreateInfo(VISTA_SHADER(tilemap_lava_vert));
+	vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+	vsi.num_uniform_buffers = 1;    // MVP + PlanarNode + FogPlane
+	SDL_GPUShader* vs = SDL_CreateGPUShader(device_, &vsi);
+
+	SDL_GPUShaderCreateInfo fsi = vista::shaderCreateInfo(VISTA_SHADER(tilemap_lava_frag));
+	fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+	fsi.num_samplers = 3;           // noise volume, ground texture, lightmap (fog of war)
+	fsi.num_uniform_buffers = 1;    // colours + scales + time + fog colours
+	SDL_GPUShader* fs = SDL_CreateGPUShader(device_, &fsi);
+
+	if(!vs || !fs){
+		fprintf(stderr, "SDLTileMapRenderer: lava CreateGPUShader failed: %s\n", SDL_GetError());
+		if(vs) SDL_ReleaseGPUShader(device_, vs);
+		if(fs) SDL_ReleaseGPUShader(device_, fs);
+		return;
+	}
+
+	// Same vertex layout as the terrain (position @0, normal @12), same opaque depth state.
+	SDL_GPUVertexBufferDescription vbDesc = {};
+	vbDesc.slot = 0;
+	vbDesc.pitch = sizeof(Vertex);
+	vbDesc.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
+
+	SDL_GPUVertexAttribute attrs[2] = {};
+	attrs[0].location = 0; attrs[0].buffer_slot = 0; attrs[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3; attrs[0].offset = 0;
+	attrs[1].location = 1; attrs[1].buffer_slot = 0; attrs[1].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3; attrs[1].offset = 12;
+
+	SDL_GPUColorTargetDescription colorTarget = {};
+	colorTarget.format = SDL_GetGPUSwapchainTextureFormat(device_, window_);
+
+	SDL_GPUGraphicsPipelineCreateInfo pci = {};
+	pci.vertex_shader = vs;
+	pci.fragment_shader = fs;
+	pci.vertex_input_state.vertex_buffer_descriptions = &vbDesc;
+	pci.vertex_input_state.num_vertex_buffers = 1;
+	pci.vertex_input_state.vertex_attributes = attrs;
+	pci.vertex_input_state.num_vertex_attributes = 2;
+	pci.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
+	pci.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
+	pci.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
+	pci.rasterizer_state.enable_depth_clip = true;
+	pci.depth_stencil_state.enable_depth_test = true;
+	pci.depth_stencil_state.enable_depth_write = true;
+	pci.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
+	pci.target_info.color_target_descriptions = &colorTarget;
+	pci.target_info.num_color_targets = 1;
+	pci.target_info.has_depth_stencil_target = true;
+	pci.target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
+
+	pipelineLava_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
+
+	// The reflection camera's variant: cull FRONT, as the terrain's pipelineMirror_ does, so
+	// lava tiles do not roof the reflection (see the note on pipelineMirror_).
+	pci.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_FRONT;
+	pipelineLavaMirror_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
+
+	SDL_ReleaseGPUShader(device_, vs);
+	SDL_ReleaseGPUShader(device_, fs);
+
+	fprintf(stderr, "SDLTileMapRenderer: lava pipeline %s (reflection %s), noise volume %s\n",
+	        pipelineLava_ ? "ready" : "FAILED", pipelineLavaMirror_ ? "ready" : "FAILED",
+	        volumeTexture_ ? "ready" : "FAILED");
+}
+
+// The placement-zone ICE material's pipeline pair. Opaque, like the terrain: the original's
+// cTileMap::setMaterial drove ShaderSceneWaterIce::beginDraw with a null alpha texture, which
+// keeps Z-write on and does not blend. Its samplers, snow/bump textures and the reflection
+// target are all bound per frame in Draw, so this only compiles the shaders and builds the
+// pipeline. Ported from Render/shader/Water/water_ice.{vsl,psl}.
+void SDLTileMapRenderer::createIcePipeline()
+{
+	if(!device_ || !window_) return;
+
+	SDL_GPUShaderCreateInfo vsi = vista::shaderCreateInfo(VISTA_SHADER(tilemap_ice_vert));
+	vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+	vsi.num_uniform_buffers = 1;    // MVP + MirrorVP + PlanarNode + FogPlane + ScaleBumpSnow
+	SDL_GPUShader* vs = SDL_CreateGPUShader(device_, &vsi);
+
+	SDL_GPUShaderCreateInfo fsi = vista::shaderCreateInfo(VISTA_SHADER(tilemap_ice_frag));
+	fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+	fsi.num_samplers = 4;           // snow, bump, reflection, lightmap (fog of war)
+	fsi.num_uniform_buffers = 1;    // snow tint + fog colours + flags
+	SDL_GPUShader* fs = SDL_CreateGPUShader(device_, &fsi);
+
+	if(!vs || !fs){
+		fprintf(stderr, "SDLTileMapRenderer: ice CreateGPUShader failed: %s\n", SDL_GetError());
+		if(vs) SDL_ReleaseGPUShader(device_, vs);
+		if(fs) SDL_ReleaseGPUShader(device_, fs);
+		return;
+	}
+
+	// Same vertex layout as the terrain (position @0, normal @12), same opaque depth state.
+	SDL_GPUVertexBufferDescription vbDesc = {};
+	vbDesc.slot = 0;
+	vbDesc.pitch = sizeof(Vertex);
+	vbDesc.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
+
+	SDL_GPUVertexAttribute attrs[2] = {};
+	attrs[0].location = 0; attrs[0].buffer_slot = 0; attrs[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3; attrs[0].offset = 0;
+	attrs[1].location = 1; attrs[1].buffer_slot = 0; attrs[1].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3; attrs[1].offset = 12;
+
+	SDL_GPUColorTargetDescription colorTarget = {};
+	colorTarget.format = SDL_GetGPUSwapchainTextureFormat(device_, window_);
+
+	SDL_GPUGraphicsPipelineCreateInfo pci = {};
+	pci.vertex_shader = vs;
+	pci.fragment_shader = fs;
+	pci.vertex_input_state.vertex_buffer_descriptions = &vbDesc;
+	pci.vertex_input_state.num_vertex_buffers = 1;
+	pci.vertex_input_state.vertex_attributes = attrs;
+	pci.vertex_input_state.num_vertex_attributes = 2;
+	pci.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
+	pci.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
+	pci.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
+	pci.rasterizer_state.enable_depth_clip = true;
+	pci.depth_stencil_state.enable_depth_test = true;
+	pci.depth_stencil_state.enable_depth_write = true;
+	pci.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
+	pci.target_info.color_target_descriptions = &colorTarget;
+	pci.target_info.num_color_targets = 1;
+	pci.target_info.has_depth_stencil_target = true;
+	pci.target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
+
+	pipelineIce_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
+
+	// The reflection camera's variant: cull FRONT, as the terrain's pipelineMirror_ does.
+	pci.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_FRONT;
+	pipelineIceMirror_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
+
+	SDL_ReleaseGPUShader(device_, vs);
+	SDL_ReleaseGPUShader(device_, fs);
+
+	fprintf(stderr, "SDLTileMapRenderer: ice pipeline %s (reflection %s)\n",
+	        pipelineIce_ ? "ready" : "FAILED", pipelineIceMirror_ ? "ready" : "FAILED");
 }
 
 // ---------------------------------------------------------------------------
@@ -1002,6 +1216,73 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	ts[4].texture = bumpTexture_ ? bumpTexture_ : whiteTexture_;
 	ts[4].sampler = sampler_;   // linear + clamp, like the colour it is baked beside
 
+	// A placement-zone LAVA run is drawn over the terrain mesh with the animated lava shader
+	// instead of the plain terrain pipeline, exactly where cTileMap::setMaterial switched to
+	// lavaShader_ on D3D9. Everything the lava FS needs that is not per-material -- the
+	// transform, the fog-of-war state and the fog colour -- is the same across the frame, so
+	// build it once; the per-material colours/scales/time are set in the loop. Skipped in
+	// wireframe (every run draws as the white grid) and when the pipeline failed to build.
+	const bool reflection = camera->getAttribute(ATTRCAMERA_REFLECTION);
+	SDL_GPUGraphicsPipeline* lavaPipeline = reflection ? pipelineLavaMirror_ : pipelineLava_;
+	const bool lavaReady = !wireframe && tileMap && lavaPipeline && volumeTexture_;
+	LavaVSUniform lvs;
+	std::memcpy(lvs.mvp, vsu.mvp, sizeof(lvs.mvp));
+	std::memcpy(lvs.planarNode, vsu.planarNode, sizeof(lvs.planarNode));
+	std::memcpy(lvs.fogPlane, vsu.fogPlane, sizeof(lvs.fogPlane));
+	LavaFSUniform lfs = {};
+	std::memcpy(lfs.fogColor, fsu.fogColor, sizeof(lfs.fogColor));
+	std::memcpy(lfs.fogOfWarColor, fsu.fogOfWarColor, sizeof(lfs.fogOfWarColor));
+	lfs.lightMapParams[0] = fsu.lightMapParams[1];   // fog of war on (the tilemap's y flag)
+	const float animTime = tileMap ? tileMap->animationTime() : 0.f;
+
+	// Ice frame-constant state. Like lava, a placement-zone ICE run is drawn over the terrain
+	// mesh with the reflective ice shader (tilemap_ice), where cTileMap::setMaterial drove
+	// ShaderSceneWaterIce for it. The reflection is the scene's planar reflection: the main
+	// camera's ATTRCAMERA_REFLECTION child rendered its target this frame, and the mirror
+	// matrix (Water.cpp::fillMirrorMatrix) projects a world position into it. When this pass IS
+	// the reflection camera -- no nested reflection -- or there is none, the shader draws plain
+	// snow (its Params.x gate), the sky-cubemap fallback of the original having no SDL consumer.
+	SDL_GPUGraphicsPipeline* icePipeline = reflection ? pipelineIceMirror_ : pipelineIce_;
+	const bool iceReady = !wireframe && tileMap && icePipeline;
+	SDL_GPUTexture* reflectionTex = nullptr;
+	IceVSUniform ivs = {};
+	std::memcpy(ivs.mvp, vsu.mvp, sizeof(ivs.mvp));
+	std::memcpy(ivs.planarNode, vsu.planarNode, sizeof(ivs.planarNode));
+	std::memcpy(ivs.fogPlane, vsu.fogPlane, sizeof(ivs.fogPlane));
+	// The original's fScaleBumpSnow: bump uv = pos.xy*0.01, snow uv = pos.xy*0.003.
+	ivs.scaleBumpSnow[0] = 0.01f; ivs.scaleBumpSnow[1] = 0.003f;
+	if(iceReady && !reflection){
+		if(Camera* refl = camera->FindChildCamera(ATTRCAMERA_REFLECTION)){
+			cTexture* rt = refl->GetRenderTarget();
+			if(rt && rt->frameNumber() >= 1 && rt->GetWidth() > 0 && rt->GetHeight() > 0){
+				reflectionTex = reinterpret_cast<SDL_GPUTexture*>(rt->GetDDSurface(0));
+				// fillMirrorMatrix: reflection view-proj folded with the clip->texture map,
+				// row-vector convention. No half-texel offset -- SDL's pixel-centre matches
+				// (see Water.cpp and cSDLRenderDevice::shadowMatBias).
+				const Mat4f texAdj(0.5f,  0.0f, 0.0f, 0.0f,
+				                   0.0f, -0.5f, 0.0f, 0.0f,
+				                   0.0f,  0.0f, 1.0f, 0.0f,
+				                   0.5f,  0.5f, 0.0f, 1.0f);
+				const Mat4f m = refl->matViewProj * texAdj;
+				std::memcpy(ivs.mirrorVP, &m, sizeof(ivs.mirrorVP));
+			}
+		}
+	}
+	IceFSUniform ifs = {};
+	std::memcpy(ifs.fogColor, fsu.fogColor, sizeof(ifs.fogColor));
+	std::memcpy(ifs.fogOfWarColor, fsu.fogOfWarColor, sizeof(ifs.fogOfWarColor));
+	ifs.params[0] = reflectionTex ? 1.f : 0.f;   // a reflection target exists to sample
+	ifs.params[1] = fsu.lightMapParams[1];        // fog of war on
+	// vSnowColor: the scene's plain-lit colour, tinting the snow texture.
+	const Color4f snowColor = (tileMap && tileMap->scene())
+	                        ? tileMap->scene()->GetPlainLitColor() : Color4f(1.f, 1.f, 1.f, 1.f);
+	ifs.snowColor[0] = snowColor.r; ifs.snowColor[1] = snowColor.g;
+	ifs.snowColor[2] = snowColor.b; ifs.snowColor[3] = 1.f;
+
+	// The pipeline bound before the loop (above). We switch to the lava pipeline for lava
+	// runs and back, so track what is currently bound to avoid redundant binds.
+	SDL_GPUGraphicsPipeline* boundPipeline = pipeline;
+
 	// The original changes material between tiles -- cTileMap::setMaterial binds that
 	// material's detail texture and its mulMiniTexture, then draws the tile's index list
 	// for it. Our index buffer is grouped by material for the whole map, so the same
@@ -1009,6 +1290,88 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	const float resolution = tileMap ? (float)tileMap->miniDetailTextureResolution() : 0.f;
 	for(size_t i = 0; i < runs_.size(); ++i){
 		const MaterialRun& run = runs_[i];
+
+		// Is this a LAVA placement-zone run with its ground texture ready? If so, draw it
+		// with the lava pipeline; otherwise it falls through to the plain terrain path
+		// (which for a placement-zone material draws the baked colour with no detail tile).
+		const int pz = run.material - cTileMap::miniDetailTexturesNumber;
+		SDL_GPUTexture* groundTex = nullptr;
+		if(lavaReady && pz >= 0 && pz < cTileMap::placementZoneMaterialNumber &&
+		   tileMap->placementZoneMaterial(pz).shaderType == cTileMap::LAVA){
+			cTexture* g = tileMap->placementZoneMaterial(pz).texture;
+			if(g && g->frameNumber() >= 1 && g->GetWidth() > 0 && g->GetHeight() > 0)
+				groundTex = reinterpret_cast<SDL_GPUTexture*>(g->GetDDSurface(0));
+		}
+
+		if(groundTex){
+			const cTileMap::PlacementZoneMaterial& mat = tileMap->placementZoneMaterial(pz);
+			lfs.lavaColor[0] = mat.lavaColor.r; lfs.lavaColor[1] = mat.lavaColor.g;
+			lfs.lavaColor[2] = mat.lavaColor.b; lfs.lavaColor[3] = 1.f;
+			lfs.lavaAmbient[0] = mat.colorAmbient.r; lfs.lavaAmbient[1] = mat.colorAmbient.g;
+			lfs.lavaAmbient[2] = mat.colorAmbient.b; lfs.lavaAmbient[3] = 1.f;
+			lfs.params[0] = mat.textureScale;         // uv_ground scale
+			lfs.params[1] = mat.volumeTextureScale;   // uv_volume scale
+			lfs.params[2] = animTime * mat.speed;     // ShaderSceneWaterLava::SetTime
+			lfs.params[3] = 0.f;
+
+			if(boundPipeline != lavaPipeline){
+				SDL_BindGPUGraphicsPipeline(pass, lavaPipeline);
+				boundPipeline = lavaPipeline;
+			}
+			SDL_PushGPUVertexUniformData(cmd, 0, &lvs, sizeof(lvs));
+			SDL_PushGPUFragmentUniformData(cmd, 0, &lfs, sizeof(lfs));
+
+			SDL_GPUTextureSamplerBinding lts[3] = {};
+			lts[0].texture = volumeTexture_; lts[0].sampler = volumeSampler_;   // wrap + linear
+			lts[1].texture = groundTex;      lts[1].sampler = detailSampler_;    // ground tiles
+			lts[2].texture = lightMap ? lightMap : whiteTexture_; lts[2].sampler = sampler_;
+			SDL_BindGPUFragmentSamplers(pass, 0, lts, 3);
+
+			SDL_DrawGPUIndexedPrimitives(pass, run.count, 1, run.first, 0, 0);
+			continue;
+		}
+
+		// A placement-zone ICE run: draw with the reflective ice shader, opaque like lava,
+		// where cTileMap::setMaterial called iceShader_->beginDraw for it. The snow texture is
+		// required; the bump falls back to neutral grey (unbiases to a zero perturbation).
+		if(iceReady && pz >= 0 && pz < cTileMap::placementZoneMaterialNumber &&
+		   tileMap->placementZoneMaterial(pz).shaderType == cTileMap::ICE){
+			const cTileMap::PlacementZoneMaterial& mat = tileMap->placementZoneMaterial(pz);
+			cTexture* snow = mat.texture;
+			SDL_GPUTexture* snowTex = nullptr;
+			if(snow && snow->frameNumber() >= 1 && snow->GetWidth() > 0 && snow->GetHeight() > 0)
+				snowTex = reinterpret_cast<SDL_GPUTexture*>(snow->GetDDSurface(0));
+			if(snowTex){
+				cTexture* bump = mat.textureBump;
+				SDL_GPUTexture* bumpTex = greyTexture_;   // neutral: (128*255...)->0 perturbation
+				if(bump && bump->frameNumber() >= 1 && bump->GetWidth() > 0 && bump->GetHeight() > 0)
+					bumpTex = reinterpret_cast<SDL_GPUTexture*>(bump->GetDDSurface(0));
+
+				if(boundPipeline != icePipeline){
+					SDL_BindGPUGraphicsPipeline(pass, icePipeline);
+					boundPipeline = icePipeline;
+				}
+				SDL_PushGPUVertexUniformData(cmd, 0, &ivs, sizeof(ivs));
+				SDL_PushGPUFragmentUniformData(cmd, 0, &ifs, sizeof(ifs));
+
+				SDL_GPUTextureSamplerBinding its[4] = {};
+				its[0].texture = snowTex; its[0].sampler = detailSampler_;   // wrap + aniso
+				its[1].texture = bumpTex; its[1].sampler = detailSampler_;   // wrap + aniso
+				its[2].texture = reflectionTex ? reflectionTex : whiteTexture_;
+				its[2].sampler = sampler_;   // clamp + linear (the reflection is 1:1 projected)
+				its[3].texture = lightMap ? lightMap : whiteTexture_;
+				its[3].sampler = sampler_;
+				SDL_BindGPUFragmentSamplers(pass, 0, its, 4);
+
+				SDL_DrawGPUIndexedPrimitives(pass, run.count, 1, run.first, 0, 0);
+				continue;
+			}
+		}
+
+		if(boundPipeline != pipeline){
+			SDL_BindGPUGraphicsPipeline(pass, pipeline);
+			boundPipeline = pipeline;
+		}
 
 		cTexture* detail = wireframe ? nullptr : materialDetailTexture(tileMap, run.material);
 		SDL_GPUTexture* detailTex = nullptr;

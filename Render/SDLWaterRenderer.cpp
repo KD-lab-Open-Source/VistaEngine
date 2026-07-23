@@ -44,6 +44,8 @@ SDLWaterRenderer::~SDLWaterRenderer()
 	if(pipelineLine_)  SDL_ReleaseGPUGraphicsPipeline(device_, pipelineLine_);
 	if(pipelineReflectFill_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineReflectFill_);
 	if(pipelineReflectLine_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineReflectLine_);
+	if(pipelineIceFill_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineIceFill_);
+	if(pipelineIceLine_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineIceLine_);
 }
 
 // ---------------------------------------------------------------------------
@@ -105,10 +107,84 @@ void SDLWaterRenderer::createPipelines()
 
 	createPipelinePair(false, pipelineFill_, pipelineLine_);
 	createPipelinePair(true,  pipelineReflectFill_, pipelineReflectLine_);
+	createIcePipeline();
 
-	fprintf(stderr, "SDLWaterRenderer: water pipeline %s (wireframe %s), reflection %s\n",
+	fprintf(stderr, "SDLWaterRenderer: water pipeline %s (wireframe %s), reflection %s, ice %s\n",
 	        pipelineFill_ ? "ready" : "FAILED", pipelineLine_ ? "ready" : "FAILED",
-	        pipelineReflectFill_ ? "ready" : "FAILED");
+	        pipelineReflectFill_ ? "ready" : "FAILED", pipelineIceFill_ ? "ready" : "FAILED");
+}
+
+// The ice sheet cTemperature::Draw blends over the surface: the water vertex again, alpha
+// blended (its coverage the opacity), depth tested but not written -- exactly the surface's
+// pipeline state, differing only in the shader (water_ice) and its six samplers.
+void SDLWaterRenderer::createIcePipeline()
+{
+	if(!device_ || !window_) return;
+
+	SDL_GPUShaderCreateInfo vsi = vista::shaderCreateInfo(VISTA_SHADER(water_ice_vert));
+	vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+	vsi.num_uniform_buffers = 1;
+	SDL_GPUShader* vs = SDL_CreateGPUShader(device_, &vsi);
+
+	SDL_GPUShaderCreateInfo fsi = vista::shaderCreateInfo(VISTA_SHADER(water_ice_frag));
+	fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+	fsi.num_samplers = 6;   // coverage, snow, bump, reflection, cleft, lightmap
+	fsi.num_uniform_buffers = 1;
+	SDL_GPUShader* fs = SDL_CreateGPUShader(device_, &fsi);
+
+	if(!vs || !fs){
+		fprintf(stderr, "SDLWaterRenderer: ice CreateGPUShader failed: %s\n", SDL_GetError());
+		if(vs) SDL_ReleaseGPUShader(device_, vs);
+		if(fs) SDL_ReleaseGPUShader(device_, fs);
+		return;
+	}
+
+	SDL_GPUVertexBufferDescription vbDesc = {};
+	vbDesc.slot = 0;
+	vbDesc.pitch = WATER_STRIDE;
+	vbDesc.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
+
+	SDL_GPUVertexAttribute attrs[2] = {};
+	attrs[0].location = 0; attrs[0].buffer_slot = 0; attrs[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;      attrs[0].offset = 0;
+	attrs[1].location = 1; attrs[1].buffer_slot = 0; attrs[1].format = SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4_NORM; attrs[1].offset = 12;
+
+	// beginDraw's ALPHA_BLEND with RS_ZWRITEENABLE off: blend over the water, leave depth.
+	SDL_GPUColorTargetDescription colorTarget = {};
+	colorTarget.format = SDL_GetGPUSwapchainTextureFormat(device_, window_);
+	SDL_GPUColorTargetBlendState& bs = colorTarget.blend_state;
+	bs.enable_blend = true;
+	bs.color_blend_op = SDL_GPU_BLENDOP_ADD;
+	bs.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
+	bs.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
+	bs.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+	bs.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+	bs.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+
+	SDL_GPUGraphicsPipelineCreateInfo pci = {};
+	pci.vertex_shader = vs;
+	pci.fragment_shader = fs;
+	pci.vertex_input_state.vertex_buffer_descriptions = &vbDesc;
+	pci.vertex_input_state.num_vertex_buffers = 1;
+	pci.vertex_input_state.vertex_attributes = attrs;
+	pci.vertex_input_state.num_vertex_attributes = 2;
+	pci.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
+	pci.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
+	pci.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
+	pci.depth_stencil_state.enable_depth_test = true;
+	pci.depth_stencil_state.enable_depth_write = false;
+	pci.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
+	pci.target_info.color_target_descriptions = &colorTarget;
+	pci.target_info.num_color_targets = 1;
+	pci.target_info.has_depth_stencil_target = true;
+	pci.target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
+
+	pipelineIceFill_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
+
+	pci.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_LINE;
+	pipelineIceLine_ = SDL_CreateGPUGraphicsPipeline(device_, &pci);
+
+	SDL_ReleaseGPUShader(device_, vs);
+	SDL_ReleaseGPUShader(device_, fs);
 }
 
 bool SDLWaterRenderer::createPipelinePair(bool reflection,
@@ -198,11 +274,17 @@ void SDLWaterRenderer::BeginFrame()
 {
 	draws_.clear();
 	stateValid_ = false;
+	iceDraws_.clear();
+	iceValid_ = false;
+	iceMode_ = false;
 }
 
 void SDLWaterRenderer::SetState(const State& state, Camera* camera)
 {
 	if(!camera) return;
+
+	// Surface polygons record into draws_, not the ice list.
+	iceMode_ = false;
 
 	vs_ = VSUniform();
 	fs_ = FSUniform();
@@ -245,10 +327,74 @@ void SDLWaterRenderer::SetState(const State& state, Camera* camera)
 	stateValid_ = true;
 }
 
+// The ice sheet's counterpart to SetState, from cTemperature::Draw. Captures the material
+// textures and the reflection, reads the frame-constant fog / fog-of-war / lightmap off the
+// device (as SetState does), and switches recording to the ice list for the DrawPolygons that
+// follows.
+void SDLWaterRenderer::SetIceState(const IceState& state, Camera* camera)
+{
+	if(!camera) return;
+
+	iceMode_ = true;
+	iceDraws_.clear();
+
+	iceVS_ = IceVSUniform();
+	iceFS_ = IceFSUniform();
+
+	std::memcpy(iceVS_.mvp, &camera->matViewProj, sizeof(iceVS_.mvp));
+	std::memcpy(iceVS_.mirrorVP, state.mirrorVP, sizeof(iceVS_.mirrorVP));
+	// The original's fScaleBumpSnow (ShaderSceneWaterIce::Select): bump 0.01, snow 0.003,
+	// cleft 0.002.
+	iceVS_.scaleBumpSnow[0] = 0.01f; iceVS_.scaleBumpSnow[1] = 0.003f; iceVS_.scaleBumpSnow[2] = 0.002f;
+	iceVS_.alphaScale[0] = state.alphaScale[0]; iceVS_.alphaScale[1] = state.alphaScale[1];
+
+	iceSnow_       = sdlTextureOf(state.snow);
+	iceBump_       = sdlTextureOf(state.bump);
+	iceCleft_      = sdlTextureOf(state.cleft);
+	iceCoverage_   = sdlTextureOf(state.coverage);
+	iceReflection_ = sdlTextureOf(state.reflectionTexture);
+
+	std::memcpy(iceFS_.snowColor, state.snowColor, sizeof(iceFS_.snowColor));
+	iceFS_.params[0] = iceReflection_ ? 1.f : 0.f;   // a reflection target to sample
+	iceFS_.params[2] = state.alphaRef;               // the clip() test reference
+
+	cSDLRenderDevice* dev = sdlRenderDevice();
+
+	// The fog-of-war lightmap + planar node, exactly as the terrain-ice path reads them.
+	iceLightMap_ = sdlTextureOf(dev ? dev->GetLightMap() : nullptr);
+	const bool fogOfWar = dev && dev->fogOfWar() && iceLightMap_;
+	iceFS_.params[1] = fogOfWar ? 1.f : 0.f;
+	const Color4f fow = dev ? dev->fogOfWarColor() : Color4f();
+	iceFS_.fogOfWarColor[0] = fow.r; iceFS_.fogOfWarColor[1] = fow.g;
+	iceFS_.fogOfWarColor[2] = fow.b; iceFS_.fogOfWarColor[3] = fow.a;
+	if(dev){
+		const Vect4f& pn = dev->planarTransform();
+		iceVS_.planarNode[0] = pn.x; iceVS_.planarNode[1] = pn.y;
+		iceVS_.planarNode[2] = pn.z; iceVS_.planarNode[3] = pn.w;
+	}
+	else{
+		iceVS_.planarNode[2] = iceVS_.planarNode[3] = 1.f;
+	}
+
+	// Distance fog. Off -> (0,0,0,1), i.e. factor 1, and the shader's lerp is the identity.
+	const Vect4f fogPlane = dev ? dev->fogPlane(camera) : Vect4f(0.f, 0.f, 0.f, 1.f);
+	iceVS_.fogPlane[0] = fogPlane.x; iceVS_.fogPlane[1] = fogPlane.y;
+	iceVS_.fogPlane[2] = fogPlane.z; iceVS_.fogPlane[3] = fogPlane.w;
+	const Color4f fog = dev ? dev->fogColor() : Color4f(0.f, 0.f, 0.f, 0.f);
+	iceFS_.fogColor[0] = fog.r; iceFS_.fogColor[1] = fog.g; iceFS_.fogColor[2] = fog.b; iceFS_.fogColor[3] = fog.a;
+
+	iceVpX_ = camera->vp.X; iceVpY_ = camera->vp.Y;
+	iceVpW_ = camera->vp.Width; iceVpH_ = camera->vp.Height;
+	iceVpMinZ_ = camera->vp.MinZ; iceVpMaxZ_ = camera->vp.MaxZ;
+
+	iceValid_ = true;
+}
+
 void SDLWaterRenderer::DrawIndexedPrimitive(sPtrVertexBuffer& vb, int OfsVertex,
                                             const sPtrIndexBuffer& ib, int nOfsPolygon, int nPolygon)
 {
-	if(!owner_ || !stateValid_ || nPolygon <= 0)
+	// In ice mode the same surface polygons are being recorded for the ice pass instead.
+	if(!owner_ || nPolygon <= 0 || (iceMode_ ? !iceValid_ : !stateValid_))
 		return;
 
 	SDL_GPUBuffer* vertexBuffer = owner_->gpuBuffer(vb);
@@ -268,7 +414,7 @@ void SDLWaterRenderer::DrawIndexedPrimitive(sPtrVertexBuffer& vb, int OfsVertex,
 	// offsets -- the same arithmetic cD3DRender::DrawIndexedPrimitive hands to D3D.
 	d.firstIndex = 3 * nOfsPolygon;
 	d.indexCount = 3 * nPolygon;
-	draws_.push_back(d);
+	(iceMode_ ? iceDraws_ : draws_).push_back(d);
 
 	*gb_RenderDevice->PtrNumberPolygon += nPolygon;
 	gb_RenderDevice->NumDrawObject++;
@@ -348,6 +494,80 @@ bool SDLWaterRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, S
 
 	SDL_EndGPURenderPass(pass);
 	draws_.clear();   // recorded; nothing left for EndScene to draw
+	return true;
+}
+
+bool SDLWaterRenderer::DrawIce(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, SDL_GPUTexture* depth,
+                               int screenW, int screenH, bool clear, const float clearColor[4],
+                               bool clearDepth, bool wireframe)
+{
+	SDL_GPUGraphicsPipeline* pipeline = (wireframe && pipelineIceLine_) ? pipelineIceLine_ : pipelineIceFill_;
+	if(!device_ || !pipeline || !cmd || !target || !depth || iceDraws_.empty())
+		return false;
+	// The ice sheet needs its coverage grid and snow colour; without them there is nothing to
+	// draw, and the coverage stand-in (flatTexture_, alpha 1) would flood the map with ice.
+	if(!iceCoverage_ || !iceSnow_){
+		iceDraws_.clear();
+		return false;
+	}
+
+	SDL_GPUColorTargetInfo ct = {};
+	ct.texture = target;
+	ct.clear_color.r = clearColor[0];
+	ct.clear_color.g = clearColor[1];
+	ct.clear_color.b = clearColor[2];
+	ct.clear_color.a = clearColor[3];
+	ct.load_op = clear ? SDL_GPU_LOADOP_CLEAR : SDL_GPU_LOADOP_LOAD;
+	ct.store_op = SDL_GPU_STOREOP_STORE;
+
+	SDL_GPUDepthStencilTargetInfo dt = {};
+	dt.texture = depth;
+	dt.clear_depth = 1.0f;
+	dt.load_op = clearDepth ? SDL_GPU_LOADOP_CLEAR : SDL_GPU_LOADOP_LOAD;
+	dt.store_op = SDL_GPU_STOREOP_STORE;
+	dt.stencil_load_op = SDL_GPU_LOADOP_DONT_CARE;
+	dt.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
+
+	SDL_GPURenderPass* pass = SDL_BeginGPURenderPass(cmd, &ct, 1, &dt);
+
+	sViewPort vp;
+	vp.X = iceVpX_; vp.Y = iceVpY_; vp.Width = iceVpW_; vp.Height = iceVpH_;
+	vp.MinZ = iceVpMinZ_; vp.MaxZ = iceVpMaxZ_;
+	applyCameraViewport(pass, vp, screenW, screenH);
+
+	SDL_BindGPUGraphicsPipeline(pass, pipeline);
+	SDL_PushGPUVertexUniformData(cmd, 0, &iceVS_, sizeof(iceVS_));
+	SDL_PushGPUFragmentUniformData(cmd, 0, &iceFS_, sizeof(iceFS_));
+
+	// Stand-ins where a texture is missing: flatTexture_ unbiases to a zero bump / a neutral
+	// (0.5) cleft, and the reflection/lightmap are gated off in the shader when absent.
+	SDL_GPUTextureSamplerBinding ts[6] = {};
+	ts[0].texture = iceCoverage_;   ts[0].sampler = samplerClamp_;   // the coverage grid (clamp)
+	ts[1].texture = iceSnow_;       ts[1].sampler = sampler_;        // snow (wrap)
+	ts[2].texture = iceBump_  ? iceBump_  : flatTexture_; ts[2].sampler = sampler_;
+	ts[3].texture = iceReflection_ ? iceReflection_ : flatTexture_; ts[3].sampler = samplerClamp_;
+	ts[4].texture = iceCleft_ ? iceCleft_ : flatTexture_; ts[4].sampler = sampler_;
+	ts[5].texture = iceLightMap_ ? iceLightMap_ : flatTexture_; ts[5].sampler = samplerClamp_;
+	SDL_BindGPUFragmentSamplers(pass, 0, ts, 6);
+
+	SDL_GPUBuffer* boundVB = nullptr;
+	SDL_GPUBuffer* boundIB = nullptr;
+	for(const DrawCmd& d : iceDraws_){
+		if(d.vertexBuffer != boundVB){
+			SDL_GPUBufferBinding vb = {}; vb.buffer = d.vertexBuffer; vb.offset = 0;
+			SDL_BindGPUVertexBuffers(pass, 0, &vb, 1);
+			boundVB = d.vertexBuffer;
+		}
+		if(d.indexBuffer != boundIB){
+			SDL_GPUBufferBinding ib = {}; ib.buffer = d.indexBuffer; ib.offset = 0;
+			SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_16BIT);
+			boundIB = d.indexBuffer;
+		}
+		SDL_DrawGPUIndexedPrimitives(pass, d.indexCount, 1, d.firstIndex, 0, 0);
+	}
+
+	SDL_EndGPURenderPass(pass);
+	iceDraws_.clear();
 	return true;
 }
 

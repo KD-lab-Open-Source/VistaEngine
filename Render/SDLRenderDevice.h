@@ -142,6 +142,8 @@ public:
 	// draws (and clears) only the quads recorded since the last one.
 	SDLWaterRenderer* waterRenderer() { return waterRenderer_.get(); }
 	void drawWater();
+	// The ice sheet cTemperature::Draw recorded over the surface, in its own pass after it.
+	void drawWaterIce();
 	SDLWorldQuadRenderer* worldQuadRenderer() { return worldQuadRenderer_.get(); }
 	void drawWorldQuads();
 

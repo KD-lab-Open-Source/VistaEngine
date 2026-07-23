@@ -88,6 +88,25 @@ public:
 		float cameraPos[3] = {0, 0, 0};
 	};
 
+	// The ice sheet's state, straight out of cTemperature::Draw: the material textures, the
+	// temperature coverage grid, the reflection camera's target + mirror matrix, and the snow
+	// tint. Everything frame-constant (fog, fog of war, lightmap, the fog plane) SetIceState
+	// reads from the device itself, as SetState does for the surface.
+	struct IceState
+	{
+		cTexture* snow      = nullptr;   // texture_ (snow colour)
+		cTexture* bump      = nullptr;   // textureBump_
+		cTexture* cleft     = nullptr;   // textureCleft_
+		cTexture* coverage  = nullptr;   // textureAlpha_: the temperature grid, 8-bit (in .a)
+		// The reflection camera's render target and the vMirrorVP that projects a world
+		// position into it, or null + identity when there is no reflection camera.
+		cTexture* reflectionTexture = nullptr;
+		float mirrorVP[16] = {0};
+		float snowColor[4] = {1, 1, 1, 1};   // scene->GetPlainLitColor()
+		float alphaScale[2] = {0, 0};        // 1/H, 1/V: the coverage grid spans the map
+		float alphaRef = 0.f;                // alpha_ref/255: the clip() test threshold
+	};
+
 	// Drop the previous frame's draws. Called from BeginScene.
 	void BeginFrame();
 
@@ -95,13 +114,20 @@ public:
 	// view-projection and viewport. cWater::Draw calls this once, before DrawPolygons.
 	void SetState(const State& state, Camera* camera);
 
+	// Snapshot the ice sheet's state and switch DrawIndexedPrimitive to record into the ice
+	// list. cTemperature::Draw calls this once, before its pWater->DrawPolygons; the ice
+	// polygons are the same surface tiles, so they arrive through the same recording path.
+	void SetIceState(const IceState& state, Camera* camera);
+
 	// Record one visible tile range, standing in for the D3D call of the same name that
 	// cWater::DrawPolygons issues per visible line. The buffers are cWater's; the device
-	// resolves them. Ignored until SetState has run.
+	// resolves them. Routed to the ice list while SetIceState is in effect, else the surface
+	// list; ignored until the matching SetState / SetIceState has run.
 	void DrawIndexedPrimitive(sPtrVertexBuffer& vb, int OfsVertex,
 	                          const sPtrIndexBuffer& ib, int nOfsPolygon, int nPolygon);
 
 	bool hasDraws() const { return !draws_.empty(); }
+	bool hasIceDraws() const { return !iceDraws_.empty(); }
 
 	// Replay the frame's draws into one colour+depth render pass, blended over what is
 	// already there and writing no depth (cWater::Draw's ALPHA_BLEND with
@@ -111,6 +137,13 @@ public:
 	bool Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, SDL_GPUTexture* depth,
 	          int screenW, int screenH, bool clear, const float clearColor[4],
 	          bool clearDepth, bool wireframe);
+
+	// Replay the ice sheet's draws over the surface in one colour+depth pass: alpha-blended,
+	// no depth write (cTemperature drew with ZWRITE off), the open water clipped away by the
+	// coverage alpha test. Same clear semantics as Draw. Clears the recorded ice draws.
+	bool DrawIce(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, SDL_GPUTexture* depth,
+	             int screenW, int screenH, bool clear, const float clearColor[4],
+	             bool clearDepth, bool wireframe);
 
 private:
 	// water.vert.hlsl's whole cbuffer. Both variants declare it whole, so one struct
@@ -135,6 +168,24 @@ private:
 		float fogColor[4];   // D3DRS_FOGCOLOR
 	};
 
+	// water_ice.{vert,frag}.hlsl's cbuffers.
+	struct IceVSUniform
+	{
+		float mvp[16];
+		float mirrorVP[16];
+		float planarNode[4];
+		float fogPlane[4];
+		float scaleBumpSnow[4];   // bump, snow, cleft UV scales
+		float alphaScale[4];      // xy = the coverage grid's 1/H, 1/V
+	};
+	struct IceFSUniform
+	{
+		float snowColor[4];
+		float fogColor[4];
+		float fogOfWarColor[4];
+		float params[4];   // x = reflection on, y = fog of war on, z = alpha-test reference
+	};
+
 	// One tile range of the surface grid. Every draw in a frame shares the one state
 	// below: the water is a single material, set once per frame by cWater::Draw.
 	struct DrawCmd
@@ -149,6 +200,8 @@ private:
 	// -DREFLECTION=1 variant, which declares the third sampler.
 	bool createPipelinePair(bool reflection,
 	                        SDL_GPUGraphicsPipeline*& fill, SDL_GPUGraphicsPipeline*& line);
+	// The ice sheet's pipeline pair: the water vertex, alpha-blended, depth test but no write.
+	void createIcePipeline();
 
 	cSDLRenderDevice* owner_  = nullptr;   // owns the vertex/index buffers we draw
 	SDL_GPUDevice* device_ = nullptr;
@@ -160,6 +213,9 @@ private:
 	SDL_GPUGraphicsPipeline* pipelineLine_ = nullptr;
 	SDL_GPUGraphicsPipeline* pipelineReflectFill_ = nullptr;
 	SDL_GPUGraphicsPipeline* pipelineReflectLine_ = nullptr;
+	// The ice sheet, blended over the surface (cTemperature::Draw). FILL/LINE per RS_FILLMODE.
+	SDL_GPUGraphicsPipeline* pipelineIceFill_ = nullptr;
+	SDL_GPUGraphicsPipeline* pipelineIceLine_ = nullptr;
 	// The original's sampler_wrap_anisotropic on stages 0 and 1: the wave maps tile
 	// across the whole surface.
 	SDL_GPUSampler* sampler_ = nullptr;
@@ -184,6 +240,23 @@ private:
 	bool stateValid_ = false;   // SetState has run this frame
 
 	std::vector<DrawCmd> draws_;
+
+	// The ice sheet's captured state, its viewport, and its own recording list. iceMode_
+	// routes DrawIndexedPrimitive here between SetIceState and DrawIce; the ice draws replay
+	// long after the scene walk, so like the surface it snapshots the camera's viewport.
+	IceVSUniform iceVS_ = {};
+	IceFSUniform iceFS_ = {};
+	SDL_GPUTexture* iceSnow_ = nullptr;
+	SDL_GPUTexture* iceBump_ = nullptr;
+	SDL_GPUTexture* iceCleft_ = nullptr;
+	SDL_GPUTexture* iceCoverage_ = nullptr;
+	SDL_GPUTexture* iceReflection_ = nullptr;
+	SDL_GPUTexture* iceLightMap_ = nullptr;
+	bool iceMode_ = false;      // DrawIndexedPrimitive records into iceDraws_
+	bool iceValid_ = false;     // SetIceState has run this frame
+	int iceVpX_ = 0, iceVpY_ = 0, iceVpW_ = 0, iceVpH_ = 0;
+	float iceVpMinZ_ = 0.f, iceVpMaxZ_ = 1.f;
+	std::vector<DrawCmd> iceDraws_;
 };
 
 #endif // VISTA_SDL_WATER_RENDERER_H

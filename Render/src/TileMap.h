@@ -142,6 +142,9 @@ public:
 
 	const PlacementZoneMaterial& placementZoneMaterial(int index) const { return placementZoneMaterials_[index]; }
 
+	// Animate() advances this by dt*0.001 each logic quant; the lava shader scrolls its
+	// noise volume by animationTime()*material.speed (as ShaderSceneWaterLava::SetTime did).
+	float animationTime() const { return animationTime_; }
 
 protected:
 	sTile*			tiles_;
