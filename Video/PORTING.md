@@ -48,6 +48,32 @@ the game (the 132-second intro) is 23 MB of PCM, which is the entire price of th
 
 A video with **no** soundtrack — three of them — runs off the wall clock instead.
 
+**Losing that thread is also what moved focus handling.** The thread was where the original
+handled the window going to the background, and it is worth reading:
+
+```cpp
+// BinkSimplePlayerImpl::threadProc, at ca9aa43
+if(!pPlayer->getPause() && applicationHasFocus()){
+    ...
+    pPlayer->quant();          // decode, and feed Bink's audio
+}
+else
+    pPlayer->setVolume(0.f);
+```
+
+Unfocused, it simply stopped pumping — so Bink's picture *and* its soundtrack stalled together,
+and the brief came back exactly where it was left. That falls out of a design where the audio is
+pumped; it does not fall out of ours, where the soundtrack is handed to miniaudio whole and plays
+on miniaudio's thread while the frame loop that pulls the picture is frozen (see the focus section
+in `Sound/PORTING.md` for why the frame loop freezes). Left alone, the picture stops and the voice
+runs to the end without it.
+
+So the brief is **paused** on focus loss, not muted: `UI_StreamVideo::setApplicationActive()`, from
+`GameShell::onSetFocus()`. `VideoPlayer::pause()` stops the sound and the cursor stays put, which
+is what keeps the two together — the audio *is* the clock, so pausing it pauses the video by
+construction. Note the composition: focus and the UI's own pause are two independent conditions
+that either can hold, and neither writes the other's flag, exactly as the `&&` above has it.
+
 **Alpha comes from the pixel format.** 96 of the 105 `.bik` files carry an alpha plane, and the
 UI blend mode depends on knowing that (`UI_ControlVideo::redraw`). The original read Bink's
 `BINKALPHA` flag (`1<<20`); we ask the decoder, which answers by choosing `yuva420p` over

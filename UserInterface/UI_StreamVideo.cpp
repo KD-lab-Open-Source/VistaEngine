@@ -34,6 +34,7 @@ UI_StreamVideo::UI_StreamVideo()
 : lock_()
 , player_(0)
 , texture_(0)
+, applicationActive_(true)   // survives release(): it is the window's state, not the video's
 {
 	release();
 }
@@ -57,6 +58,7 @@ void UI_StreamVideo::release()
 	needUpdate_ = false;
 	cycle_ = false;
 	mute_ = false;
+	paused_ = false;
 }
 
 bool UI_StreamVideo::init(const char* binkFileName, bool cycle)
@@ -131,6 +133,11 @@ void UI_StreamVideo::play()
 	// an empty texture would show as one frame of garbage.
 	if(player_->quant())
 		updateTexture();
+
+	// play() clears the player's own pause flag and starts the soundtrack, so a standing pause
+	// -- ours or the window's -- has to be put back. After the first frame, not before: a
+	// paused player decodes nothing, and the panel would draw that one garbage frame.
+	applyPause();
 }
 
 void UI_StreamVideo::stop()
@@ -170,20 +177,34 @@ void UI_StreamVideo::pause(bool pause)
 {
 	MTAuto autoLock(lock_);
 
-	if(!inited())
-		return;
+	paused_ = pause;
 
-	player_->pause(pause);
+	if(inited())
+		applyPause();
 }
 
 bool UI_StreamVideo::pause() const
 {
 	MTAuto autoLock(lock_);
 
-	if(!inited())
-		return false;
+	// What the UI asked for, not what the player is doing: losing focus pauses it underneath
+	// without the panel's play/pause control having changed its mind.
+	return paused_;
+}
 
-	return player_->paused();
+void UI_StreamVideo::setApplicationActive(bool active)
+{
+	MTAuto autoLock(lock_);
+
+	applicationActive_ = active;
+
+	if(inited())
+		applyPause();
+}
+
+void UI_StreamVideo::applyPause()
+{
+	player_->pause(paused_ || !applicationActive_);
 }
 
 bool UI_StreamVideo::grayScale() const

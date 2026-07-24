@@ -18,6 +18,11 @@ public:
 	bool Play(const char* soundTrack, bool cycled = false, bool canPaused = true, bool always = false);
 	void Pause();
 	void Resume();
+	/// The window gained or lost focus. The narration is streamed on miniaudio's own thread
+	/// while the text it belongs to is advanced by the frame loop, which stops dead when the
+	/// window goes to the background -- so the two only stay together if the voice stops too.
+	/// Composed with Pause()/Resume() rather than overwriting them: either one holds the voice.
+	void SetApplicationActive(bool active);
 	void Stop();
 	
 	void setEnabled(bool enable);
@@ -34,10 +39,15 @@ public:
 	bool validatePlayingFile(const VoiceAttribute& voice);
 
 private:
+	/// Push gamePaused_ and applicationActive_ down to the player as the one pause it has.
+	void applyPause();
+
 	string soundTrack_;
 	OggPlayer* mpeg;
 	bool enabled_;
 	bool canPaused_;
+	bool gamePaused_;
+	bool applicationActive_;
 };
 
 class MusicManager

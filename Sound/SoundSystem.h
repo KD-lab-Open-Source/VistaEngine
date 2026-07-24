@@ -36,6 +36,10 @@ public:
 	void Mute3DSounds(bool mute);
 	void StartFade(bool fadeIn,int time=0, bool allSounds=true);
 	void SetGameActive(bool active);
+	/// The window gained or lost focus. DirectSound muted a background application's buffers
+	/// itself; miniaudio does not, so this is where the game hands that mute to the device.
+	/// Call it from the focus event, never from the frame loop -- see the implementation.
+	void SetApplicationActive(bool active);
 	void SetStandbyTime(float time);
 	void StopAll();
 
@@ -51,8 +55,6 @@ protected:
 	bool mute3Dsounds_;
 	bool gameActive_;
 	void MuteAll(bool mute);
-	/// Pushes enable_/gameActive_ down to the device as one master mute.
-	void ApplyMuteState();
 	int numberOfUsedSounds_;
 	int numberOfPlayingSounds_;
 	float fadeTime;
