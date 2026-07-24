@@ -139,13 +139,10 @@ Sound* SoundSystem::CreateSound(const char* filename, DWORD mode)
 
 void SoundSystem::Update()
 {
-	// DirectSound at a normal cooperative level silenced itself when the window lost focus.
-	// miniaudio keeps playing to the device regardless, so the mute has to be ours.
-	bool focus = applicationHasFocus();
-	if(focus == audio::muted())
-		audio::setMuted(!focus);
-
-	if(!focus)
+	// The original bailed out here as well. It only ever comes up under -active, where the
+	// frame loop keeps running unfocused: fades and voice bookkeeping then freeze along with
+	// everything else. The focus *mute* is deliberately not here -- see SetApplicationActive().
+	if(!applicationHasFocus())
 		return;
 
 	start_timer_auto();
@@ -214,6 +211,20 @@ bool SoundSystem::IsEnabled()
 void SoundSystem::SetGameActive(bool active)
 {
 	gameActive_ = active;
+}
+
+// DirectSound silenced a background application's buffers by itself: the device was taken at
+// DSSCL_PRIORITY and not one secondary buffer asked for DSBCAPS_GLOBALFOCUS, so losing focus
+// muted the game -- sound effects and the streaming music alike -- without the game lifting a
+// finger. miniaudio mixes on its own thread and keeps playing, so that mute has to be ours.
+//
+// It has to happen here, on the event, and not in Update(): while the window is unfocused
+// Runtime::applicationRuns() is false, the main loop parks in waitEvents() and never calls
+// quant(), so nothing under it -- Update() included -- runs at all. A mute driven from the
+// frame loop would be reachable only in the one case it is not needed for.
+void SoundSystem::SetApplicationActive(bool active)
+{
+	audio::setMuted(!active);
 }
 
 void SoundSystem::SetGlobalVolume(float volume)

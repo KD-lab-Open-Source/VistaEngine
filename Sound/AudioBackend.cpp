@@ -185,7 +185,10 @@ bool init()
 	}
 
 	inited = true;
-	isMuted = false;
+
+	// A mute asked for before the device existed -- the window losing focus while the game
+	// is still loading -- is a standing state, not something init gets to forget.
+	ma_engine_set_volume(&maEngine, isMuted ? 0.0f : 1.0f);
 
 	ma_device* device = ma_engine_get_device(&maEngine);
 	fprintf(stderr, "audio: miniaudio %s on %s, %i ch @ %i Hz\n",

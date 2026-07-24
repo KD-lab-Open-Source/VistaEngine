@@ -185,6 +185,8 @@ VoiceManager::VoiceManager()
 	mpeg = &mpegSound;
 	soundTrack_ = "";
 	canPaused_ = true;
+	gamePaused_ = false;
+	applicationActive_ = true;
 
 	mpeg->setBus(OGG_BUS_VOICE);
 }
@@ -201,13 +203,32 @@ bool VoiceManager::isPaused() const
 
 void VoiceManager::Pause()
 {
-	if(isPlaying() && canPaused_)
-		mpeg->pause();
+	gamePaused_ = true;
+	applyPause();
 }
 
 void VoiceManager::Resume()
 {
-	if(isPaused())
+	gamePaused_ = false;
+	applyPause();
+}
+
+void VoiceManager::SetApplicationActive(bool active)
+{
+	applicationActive_ = active;
+	applyPause();
+}
+
+void VoiceManager::applyPause()
+{
+	// canPaused_ is the per-voice opt-out the message setup carries (isCanPaused_). A voice
+	// that refuses to be paused keeps running and is merely muted -- which is what every voice
+	// did in retail, where DirectSound silenced the buffer but PlayOgg kept feeding it.
+	if(gamePaused_ || !applicationActive_){
+		if(isPlaying() && canPaused_)
+			mpeg->pause();
+	}
+	else if(isPaused())
 		mpeg->resume();
 }
 

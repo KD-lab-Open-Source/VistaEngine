@@ -54,6 +54,66 @@ The entire sound library was mixed against this curve and it is audibly louder t
 A sound configured at 0.7 must come out at gain 0.741466. `PlayOgg`'s `ToDirectVolume()` and the
 game's `CalcVolume()` are the same function written twice, so the **music uses the same curve**.
 
+### Losing focus is a mute, and it has to fire on the event
+
+The original never paused audio when the window went to the background. It did not have to:
+`SoundSystem::Init` took the device at `DSSCL_PRIORITY` and **not one secondary buffer asked for
+`DSBCAPS_GLOBALFOCUS`** — neither the effects (`GetCreationFlags()`) nor the streaming music
+(`XLibs.Net/OGG/PlayOgg/PlayOgg.cpp`, `DSBCAPS_CTRLVOLUME | DSBCAPS_GETCURRENTPOSITION2`). DirectSound
+silences such a buffer for as long as its application is not foreground, so the game went quiet from
+the outside, without doing anything. Note it is a **mute, not a pause**: `PlayOgg`'s streaming thread
+kept feeding its buffer, so the track moved on while it was inaudible. miniaudio matches that — the
+voices keep running, `ma_engine`'s volume goes to zero.
+
+Two things then went silent on their own, and neither is ported as such because both fall out of
+where the mute now lives:
+
+- The **rest of the engine froze too**. `WinMain` only calls `Runtime::quant()` when
+  `applicationRuns()` — `applicationHasFocus() || alwaysRun()`, and `alwaysRun_` is
+  `check_command_line("active")`, off by default. Unfocused, the loop parks in `waitEvents()`.
+- `SoundSystem::Update()` opens with `if(!applicationHasFocus()) return;`. **That is not the mute** and
+  never was; it is a skip of the fades and the voice bookkeeping, and it only ever executes under
+  `-active`, where the frame loop keeps turning. It is kept, doing exactly that.
+
+Which is the trap. The mute belongs to `SoundSystem::SetApplicationActive()`, called from
+`GameShell::onSetFocus()` — **on the focus event, dispatched inside `pumpApplicationEvents()`, which is
+never gated**. Driving it from `Update()` instead looks right and is dead code: `Update()` is reached
+only from the `GameShell` quant paths, which run only under `Runtime::quant()`, which is precisely
+what stops being called while the window is unfocused. It was written that way once, and the symptom
+was a game that froze on alt-tab with its music still looping at full volume.
+
+The mute is applied whether or not `alwaysRun_` is set, because DirectSound applied it from outside
+the game: `-active` kept running unfocused, and it kept running *silently*. (Compare
+`GameShell::onSetFocus`'s other job, pausing the network session, which *is* skipped under
+`alwaysRun_`.) `audio::init()` honours a mute raised before the device existed, for the alt-tab that
+lands during the load.
+
+`UI_StreamVideo::updateVolume()` folds `applicationHasFocus()` into the voice volume by hand. That is
+the original's own code and it stays: it predates the engine-wide mute and is now redundant with it,
+not in conflict. It is also, for the record, dead the same way the mute was — it runs from the frame
+loop.
+
+### Two things pause instead, because something on screen is waiting for them
+
+A mute is right for anything whose only job is to be heard. It is wrong for a soundtrack, because the
+picture it belongs to is advanced by the frame loop and stops with it, while the sound is on
+miniaudio's thread and does not. Come back after a minute and the picture resumes where it froze with
+its audio long finished. Both cases go through `GameShell::onSetFocus()` alongside the mute:
+
+| What | Call | Why not a mute |
+|---|---|---|
+| The briefing video | `UI_StreamVideo::setApplicationActive()` | Its soundtrack *is* its clock (`Video/PORTING.md`). The original stalled picture and sound together by not pumping Bink; we have to stop the sound to get the same lockstep. |
+| The narration on a UI message | `VoiceManager::SetApplicationActive()` | The text's dwell time comes from `voiceDuration()` (`UI_MessageSetup`), so text and voice are two views of one timeline — and only one of them freezes. |
+
+Both compose their focus state with the pause the game already had (`pauseGame()` / the panel's own
+play-pause) rather than overwriting it: either condition holds the playback, neither writes the
+other's flag. That is the shape the original's Bink thread used — `!getPause() && applicationHasFocus()`
+— and getting it wrong means an alt-tab silently resumes a video the player had paused.
+
+**The narration pause is a deliberate divergence.** Retail muted that `.ogg` and let it keep running,
+so retail desynced here too; `canPaused_` (the per-voice `isCanPaused_` opt-out) is honoured, so the
+voices the game explicitly refuses to pause still behave exactly as they did.
+
 ---
 
 ## Never shipped — do not "port" these

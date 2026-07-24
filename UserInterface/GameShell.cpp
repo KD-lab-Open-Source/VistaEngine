@@ -1231,6 +1231,16 @@ void GameShell::onSetFocus(bool focus)
 {
 	__super::onSetFocus(focus);
 
+	// Unconditionally, alwaysRun_ or not: DirectSound muted a background application from
+	// outside the game, so -active used to keep running silently, and still should.
+	sndSystem.SetApplicationActive(focus);
+
+	// Two things must *pause* rather than mute, because each is a soundtrack to something the
+	// frame loop advances: the briefing video's picture, and the text a narration belongs to.
+	// Muting alone would let the pair drift apart by however long the player was away.
+	streamVideo().setApplicationActive(focus);
+	voiceManager().SetApplicationActive(focus);
+
 	if(PNetCenter::isNCCreated() && !alwaysRun_)
 		PNetCenter::instance()->setPause(!focus);
 }
