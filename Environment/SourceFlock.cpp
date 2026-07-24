@@ -402,9 +402,9 @@ Vect2f SourceFlock::CenterNode::getDelta() const
 void fBirdInterpolation(XBuffer& stream)
 {
 	start_timer_auto();
-	unsigned size;
+	uint32_t size;
 	stream.read(size);
-	for(unsigned bn = 0; bn < size; ++bn)
+	for(uint32_t bn = 0; bn < size; ++bn)
 		Bird::interpolate(stream);
 }
 
@@ -440,7 +440,7 @@ void SourceFlock::quant()
 
 	chaos.normalize(_chaosCoeff);
 
-	streamLogicInterpolator.set(fBirdInterpolation) << birds_.size();
+	streamLogicInterpolator.set(fBirdInterpolation) << (uint32_t)birds_.size();
 
 	Birds::iterator it;
 	FOR_EACH(birds_, it){
