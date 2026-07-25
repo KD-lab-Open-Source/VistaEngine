@@ -175,9 +175,21 @@ void cD3DRender::RegisterVertexDeclaration(LPDIRECT3DVERTEXDECLARATION9& declara
 
 // ---------------------------------------------------------------------------
 // Render free functions (D3D/*.cpp): logging, format/size queries, debug stats.
+// Stubbed, except ColorByNormalRGBA -- see below.
 // ---------------------------------------------------------------------------
+// Not a stub: this is the original's body (D3D/D3DRenderTexture.cpp), which is pure math and
+// only ever lived in a D3D file. GrassMap::BuildGrass packs each bush's terrain normal with it
+// and grass.vert.hlsl unpacks it -- `normal.xyz * 2 - 1`, then Lambert against the light. The
+// no-op that used to be here returned 0xffffffff, i.e. (1,1,1) for every bush on the map.
 unsigned int ColorByNormalRGBA(Vect3f n);   // declared inline near its callers
-unsigned int ColorByNormalRGBA(Vect3f /*n*/) { return 0xffffffff; }
+unsigned int ColorByNormalRGBA(Vect3f n)
+{
+	unsigned int x = round((n.x + 1) * 127.5f);
+	unsigned int y = round((n.y + 1) * 127.5f);
+	unsigned int z = round((n.z + 1) * 127.5f);
+
+	return z + (y << 8) + (x << 16);
+}
 int   RDWriteLog(HRESULT /*err*/, const char* /*exp*/, const char* /*file*/, int /*line*/) { return 0; }
 int   GetTextureFormatSize(D3DFORMAT /*f*/) { return 0; }
 Vect2i GetSize(IDirect3DSurface9* /*pTexture*/) { return Vect2i(0, 0); }
