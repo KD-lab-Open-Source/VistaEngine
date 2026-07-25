@@ -10,8 +10,8 @@
 // behave as they did. A 3D voice is spatialized and a UI one is not; the listener, the inverse
 // distance law, the clip-distance pass and the fog-of-war muting are all live.
 //
-// See Sound/PORTING.md for what miniaudio does not do (the voice cap, the mute past max distance,
-// fog of war, the focus mute), and for the three features that were never wired up in the original
+// See Documents/Sound-PORTING.md for what miniaudio does not do (the voice cap, the mute past max
+// distance, fog of war, the focus mute), and for the three features that were never wired up in the original
 // and must not be "ported" back.
 #include "StdAfx.h"
 #include "Sound.h"
@@ -1011,7 +1011,7 @@ bool SND3DListener::Update()
 	// The velocity is here because the original sent it, but it is always zero — SoundQuant
 	// hands it Vect3f(0,0,0) every frame and no emitter ever sets one either — so doppler was
 	// inert in the shipped game and stays inert here. That is not an omission; see
-	// Sound/PORTING.md.
+	// Documents/Sound-PORTING.md.
 	ma_engine_listener_set_position(engine, 0, position.x, position.y, position.z);
 	ma_engine_listener_set_velocity(engine, 0, velocity.x, velocity.y, velocity.z);
 	ma_engine_listener_set_direction(engine, 0, front.x, front.y, front.z);

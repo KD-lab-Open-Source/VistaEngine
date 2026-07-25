@@ -24,8 +24,8 @@
 // be at least 100/255 opaque to survive -- which is also what hides a distant blade, since
 // its alpha carries the distance fade the vertex shader computed.
 //
-// The FOG_OF_WAR path is not ported (Render/PORTING.md #10), and neither is the ZBUFFER
-// one (PORTING.md #12).
+// The FOG_OF_WAR path is not ported (Documents/Render-PORTING.md #10), and neither is the ZBUFFER
+// one (Render-PORTING.md #12).
 //
 // Authored in HLSL; cross-compiled to SPIR-V/MSL with SDL_shadercross. See
 // build-grass-shaders.sh.

@@ -809,14 +809,14 @@ void GrassMap::Draw(Camera* camera)
 
 	// The z-buffer cameras the original also fed from here (its ATTRCAMERA_ZBUFFER /
 	// ATTRCAMERA_FLOAT_ZBUFFER branch, which drew the blades into a depth-only target with
-	// colour writes masked to alpha) went with the D3D9 backend -- see Render/PORTING.md #12.
+	// colour writes masked to alpha) went with the D3D9 backend -- see Documents/Render-PORTING.md #12.
 	// Nothing creates such a camera now, and if something does, it must not get colour grass.
 	if(camera->getAttribute(ATTRCAMERA_ZBUFFER) || camera->getAttribute(ATTRCAMERA_FLOAT_ZBUFFER))
 		return;
 
 	// D3DCULL_NONE and the alpha-blend states the original set here are fixed properties of
 	// the grass pipeline; the colour-write mask it saved and restored has no SDL GPU
-	// equivalent (PORTING.md #16) and only ever mattered to the z-buffer path above.
+	// equivalent (Render-PORTING.md #16) and only ever mattered to the z-buffer path above.
 	DrawGrass(ALPHA_TEST,camera);
 }
 

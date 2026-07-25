@@ -99,7 +99,7 @@ void LensFlareRenderer::drawFlare2D(const Vect2f& screenPoint, const LensFlare& 
 	// pre-transformed, Z off. DrawSprite records them into the UI batch instead: it draws
 	// over the scene in call order -- before the interface, which records later -- the
 	// order the D3D pass sequence had. (That batch replays after the post-effect
-	// composite, so monochrome does not grey the flare; see Render/PORTING.md.)
+	// composite, so monochrome does not grey the flare; see Documents/Render-PORTING.md.)
 	Vect2f screenCenter(gb_RenderDevice->GetSizeX() * 0.5f, gb_RenderDevice->GetSizeY() * 0.5f);
 	float halfSizeMultiplier = 0.5f * float(gb_RenderDevice->GetSizeX());
 	Vect2f flareAxis = (screenCenter - screenPoint) * 2.0f;
@@ -221,7 +221,7 @@ void LensFlareRenderer::Draw(Camera* camera)
 
 	// The D3D path measured the sun's visibility with cOcclusionQuery: 25 points on a
 	// ring around it, z-tested by the GPU against the frame, opacity = the fraction that
-	// passed. SDL GPU has no occlusion queries (Render/PORTING.md #20), so this is a CPU
+	// passed. SDL GPU has no occlusion queries (Documents/Render-PORTING.md #20), so this is a CPU
 	// stand-in: full opacity while the sun projects inside the viewport in front of the
 	// camera, fading over an edge margin comparable to the ring as it leaves. What it
 	// gives up is occlusion by terrain and objects -- with P2's camera the sun is high in

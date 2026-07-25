@@ -247,7 +247,7 @@ void FieldOfViewMap::PreDraw(Camera* camera)
 void FieldOfViewMap::Draw(Camera* camera)
 {
 	// One world-sized quad into the terrain LIGHTMAP, on the planar light camera -- a sibling of
-	// FogOfWar::Draw (PORTING.md #10), NOT the fog of war. The sight sectors live in the lightmap's
+	// FogOfWar::Draw (Render-PORTING.md #10), NOT the fog of war. The sight sectors live in the lightmap's
 	// RGB (the tint the terrain shader adds as `light += 2*(lightmap.rgb - 0.5)`), the fog of war
 	// in its ALPHA. updateTexture packs them centred on 128 = 0.5 = neutral, so the untraced
 	// ground contributes nothing; a traced cell rises above 0.5 and tints with the player colour.
@@ -262,7 +262,7 @@ void FieldOfViewMap::Draw(Camera* camera)
 		return;
 	quad->SetCamera(camera);
 
-	// The collision PORTING.md #10b warned about: the original was ALPHA_BLEND with NO mask, so
+	// The collision Render-PORTING.md #10b warned about: the original was ALPHA_BLEND with NO mask, so
 	// its alpha (128 + (color.a*visibility >> 9)) would land in the channel the fog of war now
 	// owns and read as coverage. Mask to RGB -- exactly as CameraPlanarLight::drawLights does for
 	// the light quads -- so only the colour tint lands and the fog channel is left untouched. The

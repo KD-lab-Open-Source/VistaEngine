@@ -11,7 +11,7 @@
 // frame. SDL GPU cannot sample the swapchain image, so the device turns the frame around
 // instead: when any effect will draw, cSDLRenderDevice::armSceneCapture routes the whole
 // scene into an offscreen capture target, and this renderer composites capture ->
-// swapchain through the effect shaders (Render/PORTING.md #6).
+// swapchain through the effect shaders (Documents/Render-PORTING.md #6).
 //
 // Record/execute, like the other renderers: PostEffectMonochrome::redraw /
 // PostEffectUnderWater::redraw record their frame's parameters here (in PEManager's

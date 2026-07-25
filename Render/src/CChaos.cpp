@@ -20,7 +20,7 @@ cChaos::cChaos(Vect2f g_size,const char* str_tex0,const char* str_tex1,const cha
 	// TODO(sdl-port): gb_RenderDevice3D is gone, so this capability probe -- and with it the
 	// VSChaos/PSChaos shaders and the render-target bump path it selects -- can never run.
 	// enablebump stays BUMP_NONE and the object builds its geometry but draws nothing.
-	// See Render/PORTING.md #24.
+	// See Documents/Render-PORTING.md #24.
 	if(enablebump_ && gb_RenderDevice3D)
 	{
 		if(gb_RenderDevice3D->DeviceCaps.PixelShaderVersion>= D3DPS_VERSION(2,0))
@@ -140,7 +140,7 @@ void cChaos::PreDraw(Camera* camera)
 
 void cChaos::Draw(Camera* camera)
 {
-	// TODO(sdl-port): the chaos terrain does not draw. See Render/PORTING.md #24 —
+	// TODO(sdl-port): the chaos terrain does not draw. See Documents/Render-PORTING.md #24 —
 	// and note no shipped P2 world reaches it (no ENVIRONMENT_CHAOS preset).
 	//
 	// Everything below is D3D9: fixed-function bump-env-map texture stages, texture-transform

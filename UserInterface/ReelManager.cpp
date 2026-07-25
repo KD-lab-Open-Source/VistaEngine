@@ -510,7 +510,7 @@ private:
 // gb_RenderDevice3D for a render target, a PS 2.0 capability check and a SetVertexShader -- none
 // of which exist on the portable interface. The loop below also StretchRects the back buffer
 // into a texture, which has no equivalent either; the SDL way is to point the camera at a render
-// target (see Render/PORTING.md).
+// target (see Documents/Render-PORTING.md).
 //
 // It never ran off Windows and, with DisableVideo defaulting to true, it had not run at all --
 // so the crash it takes on gb_RenderDevice3D (null since the backend was retired) was latent

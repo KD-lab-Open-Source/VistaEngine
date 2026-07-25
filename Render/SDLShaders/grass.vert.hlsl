@@ -6,7 +6,7 @@
 //     shaderVS_->StaticSelect("SHADOW", 1);
 //
 // The ZBUFFER variant fed the float z-buffer camera, which the D3D9 retirement removed
-// (Render/PORTING.md #12), so it is not ported. LIGHTMAP is a uniform here rather than a
+// (Documents/Render-PORTING.md #12), so it is not ported. LIGHTMAP is a uniform here rather than a
 // static define, exactly as in tilemap.vert.hlsl, because our lightmap may not exist yet.
 //
 // Each blade is a quad of four vertices that all share ONE world position -- the bush's

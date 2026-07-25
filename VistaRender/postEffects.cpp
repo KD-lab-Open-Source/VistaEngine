@@ -183,7 +183,7 @@ bool PostEffectManager::createEffect(PostEffectType type)
 	// mirage, colour-dodge (and bloom, masked off in the constructor on D3D9 too) --
 	// exist in this file only as their D3D9 reference implementations, and a constructed
 	// one would call through the permanently-null gb_RenderDevice3D when its redraw
-	// fired. See Render/PORTING.md #6 for what porting each still needs.
+	// fired. See Documents/Render-PORTING.md #6 for what porting each still needs.
 	if(type == PE_MONOCHROME || type == PE_UNDER_WATER){
 		PostEffectFactory::instance().setArgument(this);
 		effects_[type] = PostEffectFactory::instance().create(type);

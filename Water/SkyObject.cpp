@@ -343,7 +343,7 @@ void cSkyObj::DrawSky(Camera* pGlobalCamera,bool hdr_alpha)
 
 	// The horizon fog ring, over the sky this pass laid down and behind the world that draws
 	// next -- the backdrop closing the gap between the sky and the terrain at the map edge
-	// (PORTING.md #8). Only on screen, never into the reflection/HDR target (the original's
+	// (Render-PORTING.md #8). Only on screen, never into the reflection/HDR target (the original's
 	// `if(!hdr_alpha)`), and while fog is still disabled above, so it is not itself fogged.
 	if(!hdr_alpha && pFogCircle)
 		pFogCircle->Draw(pNormalCamera);
@@ -446,7 +446,7 @@ ib
 
 #define FOG_CENTER
 //Инициализация тумана
-// The horizon fog ring (PORTING.md #8). Two vertical bands around the map -- an opaque lower
+// The horizon fog ring (Render-PORTING.md #8). Two vertical bands around the map -- an opaque lower
 // one at the horizon and an upper one fading to clear -- plus, with FOG_CENTER, a triangle
 // tent closing the bottom. On D3D it was a fixed-function ring with its own device buffers,
 // shaded from D3DRS_TEXTUREFACTOR; here it re-records into SDLWorldQuadRenderer's triangle
@@ -503,7 +503,7 @@ static const vector<sPolygon>& fogCircleIndices(int hord_count, int size_ib)
 }
 
 //Отрисовка тумана
-// Ported to SDL GPU (PORTING.md #8). Drawn from cSkyObj::DrawSky after the sky models and
+// Ported to SDL GPU (Render-PORTING.md #8). Drawn from cSkyObj::DrawSky after the sky models and
 // while fog is disabled, so it lands over the sky and behind the world -- the backdrop that
 // closes the gap between the sky and the terrain at the map edge, where the D3D ring held.
 //
@@ -754,7 +754,7 @@ float EnvironmentTime::CalcNormalScale()
 
 // TODO(sdl-port): nothing calls this any more -- Environment::graphQuant did, from a D3D-only
 // branch. cRenderCubemap::Init gives up without a device, so pCubeRender holds no cube texture
-// and this would render into nothing. See Render/PORTING.md #9 -- and note it records that the
+// and this would render into nothing. See Documents/Render-PORTING.md #9 -- and note it records that the
 // cubemap had no consumer even on D3D, so check that before reviving it.
 void EnvironmentTime::Draw()
 {

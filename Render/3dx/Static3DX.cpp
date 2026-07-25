@@ -1746,7 +1746,7 @@ void cStatic3dx::serialize(Archive& ar)
 
 // ---------------------------------------------------------------------------
 // InPlaceIArchive::construct customizations (see InPlaceArchive.{h,cpp},
-// Util/Serialization/InPlaceArchive.md, tools/read_3dxG.py). The saved .3dxG /
+// Documents/InPlaceArchive.md, tools/read_3dxG.py). The saved .3dxG /
 // .3dxGB is a raw 32-bit memory image; here we read its fields by their 32-bit
 // offsets and rebuild real native objects. std::string / std::vector / MemoryBlock
 // are 12-byte {begin,end,cap} headers whose pointer words hold image offsets;

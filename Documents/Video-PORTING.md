@@ -1,6 +1,6 @@
 # Video: Bink and AVI, on ffmpeg
 
-The companion to `Sound/PORTING.md` and `Render/PORTING.md`. This one records what the video
+The companion to `Sound-PORTING.md` and `Render-PORTING.md`. This one records what the video
 port had to reckon with, and what it deliberately did not do.
 
 The game has video in two places, and they have nothing to do with each other:
@@ -65,7 +65,7 @@ Unfocused, it simply stopped pumping — so Bink's picture *and* its soundtrack 
 and the brief came back exactly where it was left. That falls out of a design where the audio is
 pumped; it does not fall out of ours, where the soundtrack is handed to miniaudio whole and plays
 on miniaudio's thread while the frame loop that pulls the picture is frozen (see the focus section
-in `Sound/PORTING.md` for why the frame loop freezes). Left alone, the picture stops and the voice
+in `Sound-PORTING.md` for why the frame loop freezes). Left alone, the picture stops and the voice
 runs to the end without it.
 
 So the brief is **paused** on focus loss, not muted: `UI_StreamVideo::setApplicationActive()`, from
@@ -98,7 +98,7 @@ UI blend mode depends on knowing that (`UI_ControlVideo::redraw`). The original 
   KD-lab logo splash, which is a D3D9 *rendering* feature and is not ported. Turning the reels on
   is what first fires it, and it went straight into a null `gb_RenderDevice3D`.
   `ReelManager::showLogoModal` is now guarded off; the register entry is **#23 in
-  `Render/PORTING.md`**, where it belongs. Expect more of this: `DisableVideo = true` was load-
+  `Render-PORTING.md`**, where it belongs. Expect more of this: `DisableVideo = true` was load-
   bearing in ways that have nothing to do with decoding a `.bik`.
 
 ## Not done

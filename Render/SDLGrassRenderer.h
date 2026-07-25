@@ -14,7 +14,7 @@
 // It owns no geometry. The vertex and index buffers are GrassMap's own, created through
 // cSDLRenderDevice::CreateVertexBuffer/CreateIndexBuffer and filled by GrassMap::CalcVertex
 // -- which is why grass could be ported without the dynamic vertex/quad buffer family
-// (Render/PORTING.md #15) that the field dome and the lens flare still wait on. The device
+// (Documents/Render-PORTING.md #15) that the field dome and the lens flare still wait on. The device
 // stays their owner; this renderer asks it to resolve an sPtr wrapper to the SDL_GPUBuffer
 // behind it.
 //
@@ -29,8 +29,8 @@
 //
 // Scope: the lit path with the shadow map and the terrain lightmap, which is every
 // configuration VSGrass::RestoreShader ever built. Not ported, and not needed by any caller:
-// the ZBUFFER variant (it fed the float z-buffer camera, PORTING.md #12) and FOG_OF_WAR
-// (PORTING.md #10). Grass does not cast shadows -- it did not on D3D either, since
+// the ZBUFFER variant (it fed the float z-buffer camera, Render-PORTING.md #12) and FOG_OF_WAR
+// (Render-PORTING.md #10). Grass does not cast shadows -- it did not on D3D either, since
 // CameraShadowMap::DrawScene never reaches GrassMap.
 
 #include "IRenderDevice.h"    // Color4f, cTexture, sPtrVertexBuffer, sPtrIndexBuffer
