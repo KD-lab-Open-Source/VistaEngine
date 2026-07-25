@@ -14,7 +14,6 @@
 #include "VisGeneric.h"
 #include "SDLRenderDevice.h"
 #include "D3DRender.h"
-#include "D3DRenderTilemap.h"
 #include "src/WinVideo.h"
 
 // ---------------------------------------------------------------------------
@@ -146,43 +145,19 @@ void cD3DRender::RegisterVertexDeclaration(LPDIRECT3DVERTEXDECLARATION9& declara
 }
 
 // ---------------------------------------------------------------------------
-// DrawStrip / PoolManager
-// ---------------------------------------------------------------------------
-// DrawStrip has no off-Windows implementation: its Set() is an inline in
+// DrawStrip has no implementation, deliberately. Its Set() is an inline in
 // Render/D3D/VertexBuffer.h that writes straight into a locked cVertexBuffer, and there is
-// no such buffer here. These bodies exist only so the class still links -- and they leave
-// `buf` null and `pointer` uninitialised, so the first Set() writes through a garbage
-// pointer. Every off-Windows caller therefore takes SDLWorldQuadRenderer's triangle route
-// instead (cUnkLight::Draw, CircleManager::Layer::drawSpline, Lighting::OneLight::Draw);
-// the assert is here to catch a new one before it corrupts the heap.
-void DrawStrip::Begin() { xassert(0 && "DrawStrip is Windows-only: use SDLWorldQuadRenderer"); }
-void DrawStrip::End() {}
-
-PoolManager::PoolManager() {}
-PoolManager::~PoolManager() {}
-
-// Pool hierarchy (D3D/PoolManager.cpp): defining Pool's virtual dtor (key
-// function) emits its vtable+typeinfo; VertexPool/IndexPool define their full
-// override set so their vtables resolve when constructed.
-Pool::Pool() : total_pages(0), free_pages(0), free_pages_list(0), parameter(0) {}
-Pool::~Pool() {}
-
-VertexPool::VertexPool() : vb(0), page_size(0), vertex_declaration(0), vertex_size(0) {}
-VertexPool::~VertexPool() {}
-void  VertexPool::Create(const PoolParameter*) {}
-void  VertexPool::Select(int) {}
-void* VertexPool::LockPage(int) { return 0; }
-void  VertexPool::UnlockPage(int) {}
-void  VertexPool::GetUsedMemory(int& total, int& free) { total = 0; free = 0; }
-void* VertexPool::InternalLockPage(int) { return 0; }
-
-IndexPool::IndexPool() : ib(0), page_size(0) {}
-IndexPool::~IndexPool() {}
-void  IndexPool::Create(const PoolParameter*) {}
-void  IndexPool::Select(int) {}
-void* IndexPool::LockPage(int) { return 0; }
-void  IndexPool::UnlockPage(int) {}
-void  IndexPool::GetUsedMemory(int& total, int& free) { total = 0; free = 0; }
+// no such buffer here: a body would leave `buf` null and `pointer` uninitialised, so the
+// first Set() would write through a garbage pointer. Every caller takes
+// SDLWorldQuadRenderer's triangle route instead (cUnkLight::Draw,
+// CircleManager::Layer::drawSpline, Lighting::OneLight::Draw), and a new one now fails at
+// link time rather than corrupting the heap at run time.
+//
+// PoolManager / Pool / VertexPool / IndexPool (the D3D9 tilemap's page allocator), DrawType
+// and cTileMapRender were stubbed here for the same reason and are not stubbed any more:
+// nothing left in the build references them. They live on in Render/D3D/, which is compiled
+// nowhere.
+// ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 // Render free functions (D3D/*.cpp): logging, format/size queries, debug stats.
@@ -235,44 +210,18 @@ void cOcclusionQuery::Begin() {}
 void cOcclusionQuery::End() {}
 
 // ---------------------------------------------------------------------------
-// DrawType (abstract; only these non-virtual members are referenced — DrawType
-// itself is never constructed off-Windows, so no vtable is needed).
+// cD3DRender — the helper (non-virtual) methods still named by compiled code.
+// Every call reaches them through the permanently null gb_RenderDevice3D, so none of
+// these bodies ever runs; they exist so those call sites link. Only the methods the
+// linker actually asks for are here — the rest of cD3DRender's helpers went with the
+// pools above.
 // ---------------------------------------------------------------------------
-void DrawType::BeginDraw() {}
-void DrawType::SetTileColor(Color4f /*color*/) {}
-
-// ---------------------------------------------------------------------------
-// cTileMapRender (polymorphic via ManagedResource; defining the destructor
-// emits its vtable + typeinfo, so the pure-virtual overrides are defined too).
-// ---------------------------------------------------------------------------
-cTileMapRender::cTileMapRender(cTileMap* /*pTileMap*/) {}
-cTileMapRender::~cTileMapRender() {}
-void cTileMapRender::deleteManagedResource() {}
-void cTileMapRender::restoreManagedResource() {}
-void cTileMapRender::dumpManagedResource(XBuffer& /*buffer*/) {}
-void cTileMapRender::PreDraw(Camera* /*camera*/) {}
-void cTileMapRender::DrawBump(Camera* /*camera*/, eBlendMode /*MatMode*/, bool /*shadow*/, bool /*zbuffer*/) {}
-
-// ---------------------------------------------------------------------------
-// cD3DRender — the helper (non-virtual) methods called from compiled code.
-// ---------------------------------------------------------------------------
-void* cD3DRender::LockTexture(cTexture* /*Texture*/, int& /*Pitch*/) { return 0; }
-void* cD3DRender::LockTexture(cTexture* /*Texture*/, int& /*Pitch*/, Vect2i /*lock_min*/, Vect2i /*lock_size*/) { return 0; }
-void  cD3DRender::UnlockTexture(cTexture* /*Texture*/) {}
-void  cD3DRender::DrawQuad(float, float, float, float, float, float, float, float, Color4c) {}
 Mat4f cD3DRender::shadowMatBias() const { return Mat4f(); }
-bool  cD3DRender::createRenderTargets(int /*xysize*/) { return false; }
-void  cD3DRender::deleteRenderTargets() {}
-bool  cD3DRender::CreateFloatTexture(int /*width*/, int /*height*/) { return false; }
-void  cD3DRender::CreateMirageMap(int /*x*/, int /*y*/, bool /*recreate*/) {}
-void  cD3DRender::SetAdvance(bool /*is_shadow*/) {}
 void  cD3DRender::SetAnisotropic(int /*level*/) {}
 int   cD3DRender::GetAnisotropic() { return 0; }
 int   cD3DRender::GetMaxAnisotropicLevels() { return 0; }
-void  cD3DRender::SetBlendState(eBlendMode /*blend*/) {}
 void  cD3DRender::SetBlendStateAlphaRef(eBlendMode /*blend*/) {}
 void  cD3DRender::SetRenderTarget(cTexture* /*target*/, IDirect3DSurface9* /*pZBuffer*/) {}
-void  cD3DRender::SetRenderTarget1(cTexture* /*target1*/) {}
 void  cD3DRender::RestoreRenderTarget() {}
 void  cD3DRender::FlushPrimitive3DWorld() {}
 bool  cD3DRender::ReinitOcclusion() { return false; }
