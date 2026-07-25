@@ -12,7 +12,7 @@
 // opaque, so the reflection is the star: MIRROR_LINEAR projects the world position into the
 // reflection camera's render target (mul(pos, vMirrorVP)), exactly as water.vert.hlsl does.
 // When there is no reflection camera the original falls back to the sky cubemap, which has no
-// SDL consumer yet (see Render/PORTING.md); the fragment shader then shows plain snow.
+// SDL consumer yet (see Documents/Render-PORTING.md); the fragment shader then shows plain snow.
 //
 // The original's CONVERT_Z (pos.z *= 1/64, the USE_ALPHA-off branch) decoded the D3D
 // tile-map's fixed-point Z; SDLTileMapRenderer's mesh already holds world Z, so nothing is

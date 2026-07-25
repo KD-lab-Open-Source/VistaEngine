@@ -1,6 +1,6 @@
 # Building on Windows, Linux and macOS
 
-The companion to `Render/PORTING.md`. That one registers what the *renderer* still owes;
+The companion to `Render-PORTING.md`. That one registers what the *renderer* still owes;
 this one records what it took to make the engine **build** on all three platforms, and
 the traps that will bite again.
 

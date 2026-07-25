@@ -134,7 +134,7 @@ float cSimply3dx::GetScale()const
 
 // TODO(sdl-port): nothing calls this any more. It gated the z-prepass that keeps a fading
 // object from blending with itself, which was pure D3D render-state work. See
-// Render/PORTING.md #19.
+// Documents/Render-PORTING.md #19.
 bool cSimply3dx::IsDraw2Pass()
 {
 	return getAttribute(ATTRSIMPLY3DX_OPACITY) && !pStatic->is_opacity_texture;

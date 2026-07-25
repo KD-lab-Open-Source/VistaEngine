@@ -402,7 +402,7 @@ public:
 	// D3D: "the advanced DrawType exists", i.e. the device can render a shadow map.
 	// cVisGeneric::SetShadowType turns shadows off without it. We always can.
 	bool IsEnableSelfShadow() override { return true; }
-	// TODO(sdl-port): screenshots and gamma. See Render/PORTING.md #21.
+	// TODO(sdl-port): screenshots and gamma. See Documents/Render-PORTING.md #21.
 	int  SetGamma(float, float, float) override { return 0; }
 	bool SetScreenShot(const char*) override { return false; }
 
@@ -415,7 +415,7 @@ public:
 	void FlushPrimitive2D() override {}
 
 	// --- 3D primitives (no-op) -------------------------------------------
-	// TODO(sdl-port): the 3D debug primitives draw nothing. See Render/PORTING.md #17.
+	// TODO(sdl-port): the 3D debug primitives draw nothing. See Documents/Render-PORTING.md #17.
 	void DrawLine(const Vect3f&, const Vect3f&, Color4c) override {}
 	void DrawPoint(const Vect3f&, Color4c) override {}
 	void FlushPrimitive3D() override {}
@@ -437,7 +437,7 @@ public:
 	void DrawSprite(int, int, int, int, float, float, float, float, cTexture*, const Color4c&, float, eBlendMode, float) override;
 	// TODO(sdl-port): unimplemented, and currently unreached -- the solid, two-texture and
 	// cTextureScale sprite variants are used only by the chaos post-process
-	// (Render/src/CChaos.cpp), which has no SDL path. See Render/PORTING.md #18.
+	// (Render/src/CChaos.cpp), which has no SDL path. See Documents/Render-PORTING.md #18.
 	void DrawSpriteSolid(int, int, int, int, float, float, float, float, cTexture*, const Color4c&, float, eBlendMode) override {}
 	void DrawSprite2(int, int, int, int, float, float, float, float, cTexture*, cTexture*, const Color4c&, float) override {}
 	void DrawSprite2(int, int, int, int, float, float, float, float, float, float, float, float, cTexture*, cTexture*, const Color4c&, float, eColorMode, eBlendMode) override {}
@@ -469,7 +469,7 @@ public:
 	// --- Internal shared dynamic buffers (no-op: none yet) ---------------
 	// TODO(sdl-port): the dynamic vertex/quad buffer family. Every one of these returns null,
 	// so any caller that was not rerouted through SDLWorldQuadRenderer or the UI batch draws
-	// nothing. cLeaves is what genuinely still waits on this. See Render/PORTING.md #15.
+	// nothing. cLeaves is what genuinely still waits on this. See Documents/Render-PORTING.md #15.
 	cVertexBuffer<sVertexXYZDT1>*  GetBufferXYZDT1() override { return nullptr; }
 	cVertexBuffer<sVertexXYZD>*    GetBufferXYZD() override { return nullptr; }
 	cVertexBuffer<sVertexXYZWD>*   GetBufferXYZWD() override { return nullptr; }
@@ -584,7 +584,7 @@ private:
 	bool ensureCapture(int w, int h);
 
 	// The scene-depth snapshot for the world quads' soft-depth fade -- the modern stand-in
-	// for the float Z-buffer camera (Render/PORTING.md #12). D3D9 could not sample its own
+	// for the float Z-buffer camera (Documents/Render-PORTING.md #12). D3D9 could not sample its own
 	// depth buffer, so the original re-rendered the scene's depth into a float colour
 	// texture through a child camera; SDL GPU samples depth directly, so this is a plain
 	// copy of depthTexture_ instead -- no second scene walk, no depth-output shader

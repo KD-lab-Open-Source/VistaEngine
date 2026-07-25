@@ -293,7 +293,7 @@ void Environment::graphQuant(float dt, Camera* camera)
 		gb_RenderDevice->SetGlobalFog(Color4f(environmentTime()->GetCurFogColor()), Vect2f(-1, -2));
 
 	// TODO(sdl-port): one thing the original did here is gone with D3D9 --
-	//   the sky cubemap (environmentTime()->Draw()).      PORTING.md #9
+	//   the sky cubemap (environmentTime()->Draw()).      Render-PORTING.md #9
 	// Everything it drives (the time-of-day colours) is portable and still updated
 	// every frame.
 
@@ -314,7 +314,7 @@ void Environment::graphQuant(float dt, Camera* camera)
 	// feeds (masked off in PostEffectManager, on D3D9 too) this is bookkeeping only.
 	flash()->setIntensity();
 
-	// The field-of-view map's coverage texture (PORTING.md #10b): decay each cell's visibility
+	// The field-of-view map's coverage texture (Render-PORTING.md #10b): decay each cell's visibility
 	// and rewrite the window the planar camera renders, as the original did at the end of
 	// graphQuant. FieldOfViewMap::Draw then lays it into the terrain lightmap's RGB.
 	fieldOfViewMap_->updateTexture();
@@ -322,7 +322,7 @@ void Environment::graphQuant(float dt, Camera* camera)
 
 // The post-effect stack. Monochrome and the under-water effect are ported (they record
 // into SDLPostEffectRenderer; the device composites the scene capture through them); the
-// rest of PEManager's chain is not -- see Render/PORTING.md #6 for what remains and why.
+// rest of PEManager's chain is not -- see Documents/Render-PORTING.md #6 for what remains and why.
 void Environment::drawPostEffects(float dt, Camera* camera)
 {
 	start_timer_auto();

@@ -18,6 +18,16 @@ C++20. The original codebase was compiled with old Visual C++ (mixed C and C++).
 - `crossplatform` — long-lived integration branch for the cross-platform port
 - Feature branches cut from `crossplatform`, one per meaningful change, merged back via PR
 
+## Documentation
+
+The porting registers and format notes live in `Documents/`:
+
+- [Documents/Build-PORTING.md](Documents/Build-PORTING.md) — building on Windows, Linux and macOS: the CI jobs, the toolchain traps.
+- [Documents/Render-PORTING.md](Documents/Render-PORTING.md) — the renderer register: what D3D9 did that SDL GPU does not yet.
+- [Documents/Sound-PORTING.md](Documents/Sound-PORTING.md) — audio: DirectSound out, miniaudio in.
+- [Documents/Video-PORTING.md](Documents/Video-PORTING.md) — video: Bink and AVI, on ffmpeg.
+- [Documents/InPlaceArchive.md](Documents/InPlaceArchive.md) — the InPlace archive format and the `.3dxG` model cache.
+
 ## Current state
 
 CMake is the source of truth and builds the game on macOS. The MSVC `.sln`/`.vcproj` files
@@ -34,7 +44,7 @@ memory images, so they are reconstructed field-by-field rather than relocated in
 
 ### What is not ported yet
 
-**`Render/PORTING.md` is the register** — read it before touching the renderer. It lists the
+**`Documents/Render-PORTING.md` is the register** — read it before touching the renderer. It lists the
 features that existed only in the D3D9 branches and were deleted with them (grass, distance
 fog, the perimeter field dome, lava/ice terrain, cloud shadows, the post-effect stack, …),
 what each one did, and what has to exist first. Sites are tagged `TODO(sdl-port)`.
@@ -53,6 +63,7 @@ Networking (DirectPlay) and joystick (DirectInput) are still Windows-only, stubb
 Those are separate from the D3D9 retirement.
 
 Audio and video are ported and cross-platform: **miniaudio** replaced DirectSound
-(`Sound/PORTING.md`), and **ffmpeg** replaced Bink and Video-for-Windows (`Video/PORTING.md`).
+(`Documents/Sound-PORTING.md`), and **ffmpeg** replaced Bink and Video-for-Windows
+(`Documents/Video-PORTING.md`).
 Both are the register for their subsystem — read them before touching one. The ffmpeg build is
 deliberately tiny (two demuxers, three decoders); `cmake/FFmpeg.cmake` says which and why.

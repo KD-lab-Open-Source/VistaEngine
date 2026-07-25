@@ -22,7 +22,7 @@ set(SOUND_SOURCES
     # was silent on the other two platforms regardless — so there was nothing to preserve by
     # keeping Windows on it. Those files stay in the tree as the reference for the miniaudio port,
     # exactly as the D3D9 sources do for the renderer: read the original before porting a
-    # behaviour. See Sound/PORTING.md.
+    # behaviour. See Documents/Sound-PORTING.md.
 )
 
 add_library(Sound STATIC ${SOUND_SOURCES})

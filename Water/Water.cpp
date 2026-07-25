@@ -369,7 +369,7 @@ void cWater::DrawPolygons(Camera* camera)
 }
 
 // TODO(sdl-port): unused -- it fed the float z-buffer camera, which is gone.
-// See Render/PORTING.md #13.
+// See Documents/Render-PORTING.md #13.
 void cWater::DrawToZBuffer(Camera* camera)
 {
 }
@@ -2044,7 +2044,7 @@ void cEnvironmentEarth::PreDraw(Camera* camera)
 	camera->Attach(SCENENODE_OBJECTFIRST,this);
 }
 
-// Ported to SDL GPU (PORTING.md #7). The terrain-coloured plane that fills the world beyond the
+// Ported to SDL GPU (Render-PORTING.md #7). The terrain-coloured plane that fills the world beyond the
 // map edge, out under the horizon fog ring (#8). Its vertex/index buffers were always portable
 // and always built; what was missing was the draw. It is an OPAQUE occluder, not a blended
 // overlay, so it has its own renderer (SDLEnvironmentEarthRenderer) rather than riding

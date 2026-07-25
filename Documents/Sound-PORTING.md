@@ -102,7 +102,7 @@ its audio long finished. Both cases go through `GameShell::onSetFocus()` alongsi
 
 | What | Call | Why not a mute |
 |---|---|---|
-| The briefing video | `UI_StreamVideo::setApplicationActive()` | Its soundtrack *is* its clock (`Video/PORTING.md`). The original stalled picture and sound together by not pumping Bink; we have to stop the sound to get the same lockstep. |
+| The briefing video | `UI_StreamVideo::setApplicationActive()` | Its soundtrack *is* its clock (`Video-PORTING.md`). The original stalled picture and sound together by not pumping Bink; we have to stop the sound to get the same lockstep. |
 | The narration on a UI message | `VoiceManager::SetApplicationActive()` | The text's dwell time comes from `voiceDuration()` (`UI_MessageSetup`), so text and voice are two views of one timeline — and only one of them freezes. |
 
 Both compose their focus state with the pause the game already had (`pauseGame()` / the panel's own
@@ -134,7 +134,7 @@ Bink player before releasing the source: `ReelManager::showModal()` opened with 
 `return;`, and `Game/PlayBink.cpp` was a class whose every method was empty.
 
 **That gap is closed** — it was a *video* gap, not an audio one, and it was filled by the `Video/`
-module (ffmpeg; see `Video/PORTING.md`). `PlayBink` is gone with it: it was the shape of RAD's
+module (ffmpeg; see `Video-PORTING.md`). `PlayBink` is gone with it: it was the shape of RAD's
 player and had nothing inside it. What this file predicted still holds — a reel's soundtrack is a
 plain `.ogg` played through `gb_Music`, so the audio half of the cutscene path was already working
 and came along for free (#4).
