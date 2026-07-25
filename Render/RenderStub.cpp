@@ -1,15 +1,30 @@
-// Render-backend stub for the cross-platform build.
+// Where the renderer is created, and the seam the D3D9 retirement left behind.
 //
-// The real renderer is the D3D9 backend (Render/D3D/*.cpp), which drives
-// IDirect3DDevice9 / IDirect3D9 directly and is therefore Windows-only (gated in
-// Render/CMakeLists.txt). Off-Windows the fake d3d9.h only makes the render
-// headers parse, not the device-creation call sites, so we provide no-op
-// definitions for the render-backend symbols the rest of the engine references.
-// The real cross-platform renderer is the SDL GPU backend (Track B); until then
-// the game links and runs with a silent renderer.
+// CreateIRenderDevice() below is the engine's one entry point into the renderer: it builds
+// gb_VisGeneric and the SDL GPU device every platform now draws through. The D3D9 backend it
+// replaced is retired -- Render/D3D/*.cpp is compiled nowhere, nothing assigns
+// gb_RenderDevice3D, so that pointer is null for the life of the process, on Windows too.
+// Every D3D name below resolves through the fake d3d9.h; there is no Direct3D in this build.
 //
-// Only the symbols actually referenced by the compiled (non-WIN32) sources are
-// stubbed here — see the undefined-symbol set at the final Game link.
+// The rest of the file is what retirement could not reach. Portable engine code still speaks
+// D3D9 nouns -- cTexture::CalcTextureSize asks GetTextureFormatSize(D3DFORMAT),
+// GrassMap::BuildGrass packs normals with ColorByNormalRGBA, Camera::SetRenderTarget takes an
+// IDirect3DSurface9* -- and it still owns classes whose only implementation was D3D9:
+// cOcclusionQuery (cObject3dx's silhouette test, the lens flare), sVideoWrite (GameShell's
+// movie recorder), cVertexBufferInternal / cQuadBufferInternal (the dynamic buffer family,
+// Documents/Render-PORTING.md #15). The call sites are real and have to link; these bodies are
+// what they land on.
+//
+// Two different kinds of body, and the difference matters. The cD3DRender:: helpers are
+// unreachable -- every call goes through the null gb_RenderDevice3D, so nothing runs them.
+// The rest DO run, and their return values are consumed: GrassMap::BuildGrass writes
+// ColorByNormalRGBA's result into every bush (so each one gets a white normal), cOcclusionQuery
+// answers IsVisible() = true, GetTextureFormatSize reports 0 bits per pixel. Those are answers
+// the game acts on, not silence. Before treating one as inert, check what reads it.
+//
+// Only the symbols the linker actually asks for are defined here. When a feature above is
+// ported -- or the dead D3D9 reference sources go -- delete what goes with it; the way to find
+// out what is still owed is to remove a body and relink.
 #include "StdAfxRD.h"
 #include "VisGeneric.h"
 #include "SDLRenderDevice.h"
@@ -17,7 +32,8 @@
 #include "src/WinVideo.h"
 
 // ---------------------------------------------------------------------------
-// Globals (defined in D3DRender.cpp / RenderDevice.cpp on Windows).
+// Globals. cD3DRender's constructor used to define and own these; it no longer runs
+// anywhere, so gb_RenderDevice3D keeps the null it is initialised with here.
 // ---------------------------------------------------------------------------
 RENDER_API cInterfaceRenderDevice* gb_RenderDevice = 0;
 RENDER_API cD3DRender*             gb_RenderDevice3D = 0;
@@ -30,8 +46,8 @@ RENDER_API SAMPLER_DATA sampler_clamp_linear;
 RENDER_API SAMPLER_DATA sampler_clamp_anisotropic;
 
 // The six samplers the engine names when it calls SetSamplerData/SetSamplerDataVirtual.
-// cD3DRender::InitSamplerConstants fills them on Windows; without this they stay zeroed
-// off it, and a caller asking for sampler_wrap_linear (the selection frame's tiled centre)
+// cD3DRender::InitSamplerConstants used to fill them at device init; without this they stay
+// zeroed, and a caller asking for sampler_wrap_linear (the selection frame's tiled centre)
 // would be asking for address mode 0, which is not a mode at all.
 static void initSamplerConstants()
 {
@@ -59,21 +75,19 @@ static void initSamplerConstants()
 	sampler_clamp_point.addressv = DX_TADDRESS_CLAMP;
 	sampler_clamp_point.addressw = DX_TADDRESS_CLAMP;
 
-	// cD3DRender rounds these to linear until SetAnisotropic(n) raises them, and nothing
-	// off-Windows raises them yet.
+	// cD3DRender rounded these to linear until SetAnisotropic(n) raised them, and nothing
+	// raises them now: cVisGeneric::SetAnisotropic forwards to the null gb_RenderDevice3D.
 	sampler_wrap_anisotropic = sampler_wrap_linear;
 	sampler_clamp_anisotropic = sampler_clamp_linear;
 }
 
 RENDER_API cInterfaceRenderDevice* CreateIRenderDevice(bool multiThread)
 {
-	// Half 1 of the real CreateIRenderDevice (RenderDevice.cpp): construct the
-	// backend-agnostic cVisGeneric so gb_VisGeneric is non-null. Its constructor
-	// is pure file-IO/config (no GPU device), and VisGeneric.cpp is compiled into
-	// this library off-Windows, so this links and runs today.
+	// Half 1, unchanged from the original (RenderDevice.cpp): construct the backend-agnostic
+	// cVisGeneric so gb_VisGeneric is non-null. Its constructor is pure file-IO/config and
+	// touches no GPU device.
 	//
-	// Half 2: the cross-platform render device is the SDL GPU backend
-	// (cSDLRenderDevice), replacing the Windows-only cD3DRender.
+	// Half 2 is where the backends part: cSDLRenderDevice, not cD3DRender.
 	initSamplerConstants();
 	gb_VisGeneric = new cVisGeneric(multiThread);
 	return gb_RenderDevice = new cSDLRenderDevice;
@@ -88,7 +102,7 @@ ManagedResource::~ManagedResource() {}
 
 // ---------------------------------------------------------------------------
 // sPtrVertexBuffer / sPtrIndexBuffer — lifetime routes through the interface
-// (mirrors the Windows D3DRender.cpp bodies), so the SDL backend owns the GPU
+// (the shape the D3DRender.cpp bodies had), so the SDL backend owns the GPU
 // buffers behind the slot and releases them on Destroy/dtor.
 //
 // The gb_RenderDevice guard matters for handles with *static storage duration*:
@@ -127,10 +141,10 @@ void sPtrIndexBuffer::CopyAddRef(const sPtrIndexBuffer& from)
 }
 
 // ---------------------------------------------------------------------------
-// Vertex-format declaration registration. On Windows this queues (decl,elements)
-// pairs for CreateVertexDeclaration at device init; off-Windows there is no D3D
-// object, so we point the declaration at its immortal static element table (from
-// the BEGIN_VERTEX_DECLARATION macro) so the SDL backend can read the layout.
+// Vertex-format declaration registration. The D3D9 original queued (decl,elements)
+// pairs for CreateVertexDeclaration at device init; there is no D3D object to create
+// now, so the declaration points at its immortal static element table (from the
+// BEGIN_VERTEX_DECLARATION macro) and the SDL backend reads the layout straight off it.
 // The vertex::declaration statics themselves are defined by VertexDeclaration.cpp.
 // ---------------------------------------------------------------------------
 void cD3DRender::RegisterVertexDeclaration(LPDIRECT3DVERTEXDECLARATION9& declaration,
@@ -192,8 +206,8 @@ void  cQuadBufferInternal::EndDraw() {}
 void* cQuadBufferInternal::Get() { return 0; }
 void  cQuadBufferInternal::SetMatrix(const MatXf& /*m*/) {}
 
-// cSkinVertex (ctor / GetWeight / GetDeclaration / declaration[] / Register) is
-// defined by VertexDeclaration.cpp, which is now compiled off-Windows too.
+// cSkinVertex (ctor / GetWeight / GetDeclaration / declaration[] / Register) is not stubbed:
+// VertexDeclaration.cpp is real, portable, and in the build.
 
 // ---------------------------------------------------------------------------
 // cOcclusionQuery
