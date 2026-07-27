@@ -51,6 +51,55 @@ Two include directories serve everyone now: `Platform/d3d9_compat` (D3D9 declara
 render headers still name its types, and on Windows this *deliberately shadows* the SDK's
 `d3d9.h`, since a retired backend only has to parse) and `Network/dplay8.h`.
 
+## AddressSanitizer
+
+```
+cmake -B build-asan -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVISTA_ASAN=ON
+```
+
+**macOS only for now**, and the configure fails loudly anywhere else rather than ignoring the
+flag. Windows would need MSVC's `/fsanitize=address` plus its `clang_rt` DLL staged beside
+the executable, Linux its own `libasan` on the link line; neither has been tried.
+
+The option is declared **below every `FetchContent_MakeAvailable`** in the root
+`CMakeLists.txt` and that placement is the whole mechanism: `add_compile_options` reaches the
+subdirectories added *after* it, so SDL, FreeType, miniaudio and DXC stay clean while every
+engine module — `XLibs.Net` included, since `XZip` and `XBuffer` are where a buffer bug would
+hide — is instrumented. ffmpeg is out of reach either way; it is an ExternalProject with its
+own configure. Partial instrumentation is fine: the clean libraries report nothing of their
+own, and Game's link pulls the runtime in.
+
+Two things to know before reading a report:
+
+- **`RelWithDebInfo` is `-O2`, which drops the frame pointer**, so the option adds
+  `-fno-omit-frame-pointer` — without it half of every stack trace is unreadable.
+- **Leak detection does not exist here.** LeakSanitizer is unsupported on Darwin
+  (`detect_leaks=1` aborts with "not supported on this platform"); ASan on macOS finds
+  overflows and use-after-free, not leaks.
+
+The game reads its data from the working directory:
+
+```
+cd GameData && ASAN_OPTIONS=intercept_strstr=0 ../build-asan/Game/Game
+```
+
+**That option is not optional in a `Debug` build**, and it is the first thing this port trips
+over. Without it the game appears to hang during `loadAllLibraries()` — the last line printed
+is `SDLMinimapRenderer: …` and it sits there at 100% CPU. It is not hung and it is not a
+deadlock: `XPrmIArchive::getToken` (`XPrmArchive.cpp:832`) runs `strstr(i, "\"")` once per
+quoted literal while parsing the UI attributes, with `i` pointing into the whole remaining file
+buffer. Native `strstr` stops at the first quote a few bytes on; ASan's interceptor measures
+the *entire* haystack with `internal_strlen` first, to poison-check the range it might read. So
+every literal pays a scan of everything after it and an O(n) parse turns into O(n²) —
+`sample`(1) puts 2786 of 2795 samples in `internal_strlen`. `intercept_strstr=0` turns off that
+one interceptor and leaves the rest of ASan intact; the only checking lost is on `strstr`'s own
+reads. `RelWithDebInfo` has the same shape with a small enough constant to get through.
+
+Reports go to **stderr**, which is where this engine's own logging goes too, so a report lands
+in the log in the place it happened. ASan writes them with `write(2)` rather than stdio, so
+nothing buffers them away; `ASAN_OPTIONS=log_path=/tmp/asan` diverts them to `/tmp/asan.<pid>`
+if the interleaving gets in the way. Under `lldb` the process stops on the report either way.
+
 ## Traps, by platform
 
 ### Linux — case sensitivity
@@ -150,6 +199,22 @@ Not portability defects — actual bugs, on every platform:
   The original 32-bit build was consistent. Fixed in the replay format (`UniverseX`),
   `ParameterSet` and `NParticleKey`; **the wire fields say `int32_t`/`uint32_t` now**, and the
   pattern is worth looking for wherever reader and writer sit in different files.
+- **`%08lX` for a 32-bit field.** The first thing ASan reported, on the first run: `XGUID`
+  printed its GUID with `"%08lX, %04hX, %04hX, {%02wX, …}"`, and under LP64 the `l` takes 64
+  bits off the varargs for a 32-bit `Data1` — a 16-digit number, five bytes off the end of the
+  80-byte buffer, and every argument after it shifted by one. `sscanf` read it back with
+  `"%lx"` *into* `Data1`, writing eight bytes into four, over `Data2` and `Data3`. So every
+  GUID this build wrote — the campaign progress in `passedMissions`, the mission headers — was
+  garbage. It formats with `std::format` now, which takes each width from the argument's type;
+  the text is the same canonical 78-character form the 32-bit build wrote.
+- **A temporary bound to a reference member, in the collision path.**
+  `GeomBox::bodyCollision` built `CD::CDDuality penetrate(CD::Transform(X12, box_), …)`, and
+  `CDDuality` keeps both arguments as `const Convex&`. The transform was a temporary, dead at
+  the semicolon, and the next line read through the reference into the freed stack slot — on
+  every moving unit, every quant. This is the `-Wno-error=address-of-temporary` habit
+  (see above) applied where it does *not* hold: that exemption is only sound while the
+  temporary is used inside its own full-expression. Naming the local fixes it. ASan's
+  stack-use-after-scope is what surfaced it; nothing else would have.
 - **The vendored zlib compiled against the system's `zlib.h`.** `XLibs.Net/XZip/zlib` was on
   nobody's include path, so minizip's `#include "zlib.h"` quietly resolved to
   `/usr/include/zlib.h` — a different zlib than the `.c` files beside it.

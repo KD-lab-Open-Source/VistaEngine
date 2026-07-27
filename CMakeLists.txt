@@ -328,6 +328,42 @@ if(NOT WIN32)
     )
 endif()
 
+# ---------------------------------------------------------------------------
+# AddressSanitizer
+# ---------------------------------------------------------------------------
+# -DVISTA_ASAN=ON builds the engine — and only the engine — instrumented.
+#
+# The position in this file is the whole trick: compile and link options set on a
+# directory reach the subdirectories added *after* them, and every third-party
+# dependency is fetched above. So SDL, FreeType, miniaudio and (on a cold build)
+# the vendored DXC keep compiling clean, while everything in the
+# add_subdirectory() list below — XLibs.Net included, since XZip and XBuffer are
+# exactly where a buffer bug would hide — is instrumented. ffmpeg is out of reach
+# either way: it is an ExternalProject with a configure script of its own.
+#
+# Instrumenting only part of a program is what ASan is built for. The clean
+# libraries simply report nothing of their own, and the final link of Game is
+# what pulls the runtime in.
+#
+# macOS only for now. Windows would need MSVC's /fsanitize=address plus its
+# clang_rt DLL staged next to the executable, and Linux its own libasan on the
+# link line; neither has been tried, and a silently ignored flag is worse than a
+# refused one.
+option(VISTA_ASAN "Build the engine with AddressSanitizer (macOS only for now)" OFF)
+if(VISTA_ASAN)
+    if(NOT APPLE)
+        message(FATAL_ERROR
+            "VISTA_ASAN is macOS-only for now. See the comment above this check in "
+            "CMakeLists.txt for what the other two platforms would need.")
+    endif()
+    # -fno-omit-frame-pointer because the build type we actually run is
+    # RelWithDebInfo: -O2 drops the frame pointer, and with it the readable half
+    # of every ASan report.
+    add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
+    add_link_options(-fsanitize=address)
+    message(STATUS "AddressSanitizer: ON (engine targets only; dependencies stay uninstrumented)")
+endif()
+
 add_subdirectory(XLibs.Net)
 add_subdirectory(Util)
 add_subdirectory(AI)

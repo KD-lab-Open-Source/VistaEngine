@@ -1,6 +1,7 @@
 .svn
 .scc
 /build
+/build-asan
 /Source/cache_font
 /AttribEditor/TreeListCtrl/output
 **/.Debug
