@@ -199,6 +199,14 @@ Not portability defects — actual bugs, on every platform:
   The original 32-bit build was consistent. Fixed in the replay format (`UniverseX`),
   `ParameterSet` and `NParticleKey`; **the wire fields say `int32_t`/`uint32_t` now**, and the
   pattern is worth looking for wherever reader and writer sit in different files.
+- **`%08lX` for a 32-bit field.** The first thing ASan reported, on the first run: `XGUID`
+  printed its GUID with `"%08lX, %04hX, %04hX, {%02wX, …}"`, and under LP64 the `l` takes 64
+  bits off the varargs for a 32-bit `Data1` — a 16-digit number, five bytes off the end of the
+  80-byte buffer, and every argument after it shifted by one. `sscanf` read it back with
+  `"%lx"` *into* `Data1`, writing eight bytes into four, over `Data2` and `Data3`. So every
+  GUID this build wrote — the campaign progress in `passedMissions`, the mission headers — was
+  garbage. It formats with `std::format` now, which takes each width from the argument's type;
+  the text is the same canonical 78-character form the 32-bit build wrote.
 - **The vendored zlib compiled against the system's `zlib.h`.** `XLibs.Net/XZip/zlib` was on
   nobody's include path, so minizip's `#include "zlib.h"` quietly resolved to
   `/usr/include/zlib.h` — a different zlib than the `.c` files beside it.
