@@ -15,7 +15,6 @@
 #include "Serialization/Serialization.h"
 #include "Water/Water.h"
 #include "Environment/Environment.h"
-#include "Render/D3D/D3DRender.h"
 #include "Render/src/cCamera.h"
 #include "Render/src/Scene.h"
 #include "Serialization/SerializationFactory.h"
@@ -1639,20 +1638,6 @@ void CameraManager::drawBlackBars(float opacity)
 	if(isUnderEditor() || aspect() - FLT_COMPARE_TOLERANCE > 4.0f / 3.0f)
 		return;
 
-	if(!gb_RenderDevice3D) // world 3D render not ported to SDL backend yet (slice 3)
-		return;
-
-	gb_RenderDevice->SetNoMaterial(ALPHA_BLEND, MatXf::ID);
-
-	int oldAlphaBlend = gb_RenderDevice3D->GetRenderState(D3DRS_ALPHABLENDENABLE);
-	gb_RenderDevice3D->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-
-	int oldAlphaTest  = gb_RenderDevice3D->GetRenderState(D3DRS_ALPHATESTENABLE);
-	gb_RenderDevice3D->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-
-	int oldZEnable    = gb_RenderDevice3D->GetRenderState(D3DRS_ZENABLE);
-	gb_RenderDevice3D->SetRenderState(D3DRS_ZENABLE, FALSE);	
-
 	float topSize = 0.5f + frustumClip().ymin();
 	float bottomSize = 0.5f - frustumClip().ymax();
 
@@ -1671,28 +1656,26 @@ void CameraManager::drawBlackBars(float opacity)
 	};
 
 	const int numRects = sizeof(rectangles) / sizeof(rectangles[0]);
-	const int numPoints = numRects * 2 * 3;
 	Color4c color(0, 0, 0, round(opacity * 255.0f));
 
-	int npoint = 0;
-	cVertexBuffer<sVertexXYZWD>* buffer = gb_RenderDevice->GetBufferXYZWD();
-	sVertexXYZWD* pv = buffer->Lock(numPoints);
+	// The bars ride the 2D batch, which is where D3D drew them too: SetNoMaterial +
+	// GetBufferXYZWD() + PT_TRIANGLELIST is exactly what cD3DRender::DrawRectangle queued
+	// into `rectangles` and FlushFilledRect emptied at EndScene. Going through
+	// DrawRectangle instead of building the vertices by hand drops the whole
+	// GetRenderState/SetRenderState dance with it: the 2D pipeline has no depth test and
+	// no alpha test to turn off, and no world matrix to reset.
+	//
+	// One deliberate divergence: D3D drew these with D3DRS_ALPHABLENDENABLE FALSE, so the
+	// alpha in `color` never reached the blender and `opacity` did nothing -- the bars were
+	// solid black whatever was passed. The 2D pipeline blends, so opacity now works as its
+	// name says. The only caller takes the default 1.0f, so shipped content is unchanged.
 	for(BlackRectangle* it = &rectangles[0]; it != &rectangles[0] + numRects; ++it){
 		BlackRectangle& p = *it;
-
-		pv[0].x=p.x1; pv[0].y=p.y1; pv[0].z=0.001f; pv[0].w=0.001f; pv[0].diffuse = color;
-		pv[1].x=p.x1; pv[1].y=p.y2; pv[1].z=0.001f; pv[1].w=0.001f; pv[1].diffuse = color;
-		pv[2].x=p.x2; pv[2].y=p.y1; pv[2].z=0.001f; pv[2].w=0.001f; pv[2].diffuse = color;
-
-		pv[3].x=p.x2; pv[3].y=p.y1; pv[3].z=0.001f; pv[3].w=0.001f; pv[3].diffuse = color;
-		pv[4].x=p.x1; pv[4].y=p.y2; pv[4].z=0.001f; pv[4].w=0.001f; pv[4].diffuse = color;
-		pv[5].x=p.x2; pv[5].y=p.y2; pv[5].z=0.001f; pv[5].w=0.001f; pv[5].diffuse = color;
-		pv += 6;		
+		// DrawRectangle is integer; the rects are not. Expand to the enclosing integer rect
+		// rather than truncating, so a bar can only overshoot the work area by a pixel,
+		// never leave a lit seam of scene showing along its inner edge.
+		const int x1 = (int)floor(p.x1), y1 = (int)floor(p.y1);
+		const int x2 = (int)ceil(p.x2),  y2 = (int)ceil(p.y2);
+		gb_RenderDevice->DrawRectangle(x1, y1, x2 - x1, y2 - y1, color);
 	}
-	buffer->Unlock(numPoints);
-	buffer->DrawPrimitive(PT_TRIANGLELIST, numPoints / 3);
-
-	gb_RenderDevice3D->SetRenderState(D3DRS_ALPHABLENDENABLE, oldAlphaBlend);
-	gb_RenderDevice3D->SetRenderState(D3DRS_ALPHATESTENABLE, oldAlphaTest);
-	gb_RenderDevice3D->SetRenderState(D3DRS_ZENABLE, oldZEnable);
 }
