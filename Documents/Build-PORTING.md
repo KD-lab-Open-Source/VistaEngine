@@ -207,6 +207,14 @@ Not portability defects — actual bugs, on every platform:
   GUID this build wrote — the campaign progress in `passedMissions`, the mission headers — was
   garbage. It formats with `std::format` now, which takes each width from the argument's type;
   the text is the same canonical 78-character form the 32-bit build wrote.
+- **A temporary bound to a reference member, in the collision path.**
+  `GeomBox::bodyCollision` built `CD::CDDuality penetrate(CD::Transform(X12, box_), …)`, and
+  `CDDuality` keeps both arguments as `const Convex&`. The transform was a temporary, dead at
+  the semicolon, and the next line read through the reference into the freed stack slot — on
+  every moving unit, every quant. This is the `-Wno-error=address-of-temporary` habit
+  (see above) applied where it does *not* hold: that exemption is only sound while the
+  temporary is used inside its own full-expression. Naming the local fixes it. ASan's
+  stack-use-after-scope is what surfaced it; nothing else would have.
 - **The vendored zlib compiled against the system's `zlib.h`.** `XLibs.Net/XZip/zlib` was on
   nobody's include path, so minizip's `#include "zlib.h"` quietly resolved to
   `/usr/include/zlib.h` — a different zlib than the `.c` files beside it.

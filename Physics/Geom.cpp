@@ -396,7 +396,11 @@ bool GeomBox::bodyCollision(RigidBodyCollision* body1, RigidBodyCollision* body2
 		X12.invert();
 		X12.trans().add(X12.xformVect(center1));
 		X12.rot().postmult(body1->orientation());
-		CD::CDDuality penetrate(CD::Transform(X12, box_), safe_cast<const GeomBox*>(geom2)->box());
+		// CDDuality holds both arguments by reference (CDDual.h), so the transform has
+		// to be a named local: as a temporary it died at the end of this declaration and
+		// the computeBoxBoxPenetration() call below read a dead stack slot.
+		CD::Transform box1InBox2Space(X12, box_);
+		CD::CDDuality penetrate(box1InBox2Space, safe_cast<const GeomBox*>(geom2)->box());
 		//if(!penetrate.computePenetrationDistance(cp1, cp2))
 		if(!penetrate.computeBoxBoxPenetration(cp1, cp2))
 			return false;

@@ -77,7 +77,11 @@ bool MultiBodyDispatcher::test(RigidBody& b1, RigidBody& b2, MatXf& Xr1r2, Conta
 				}
 				else{
 					start_timer_auto(CDBox, STATISTICS_GROUP_PHYSICS);
-					CD::CDDuality penetrate(CD::Transform(Xr1r2, b1.box), b2.box);
+					// Named, not a temporary: CDDuality keeps a reference to it and uses
+					// it below, past the end of this declaration. Same defect as the one
+					// ASan caught in GeomBox::bodyCollision.
+					CD::Transform box1InBox2Space(Xr1r2, b1.box);
+					CD::CDDuality penetrate(box1InBox2Space, b2.box);
 					if(!penetrate.computePenetrationDistance(cp1, cp2))
 						return false;
 					Xr1r2.invXformPoint(cp1);
