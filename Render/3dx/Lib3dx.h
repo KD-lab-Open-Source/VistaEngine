@@ -30,6 +30,10 @@ public:
 protected:
 	void SaveCache(cStatic3dx* static3dx);
 	bool LoadCache(cStatic3dx*& static3dx);
+	/// Read a model out of Maelstrom's shipped base cache, for data whose models
+	/// exist in no other form. False when there is no such file, which is the usual
+	/// case for this engine's own data.
+	bool loadBaseCache(cStatic3dx* static3dx);
 	
 	void serialize(Archive& ar);
 

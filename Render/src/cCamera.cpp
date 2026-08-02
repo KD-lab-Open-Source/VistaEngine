@@ -1325,6 +1325,13 @@ void Camera::DrawTilemapObject()
 
 void Camera::DrawSilhouetteObject()
 {
+	// TODO(sdl-port): unit silhouettes. See Documents/Render-PORTING.md #22. The effect
+	// is drawn entirely through the stencil buffer, which the SDL GPU backend does not
+	// expose yet, so the whole body needs gb_RenderDevice3D and would fault on its null.
+	// Retail Perimeter 2 never fills the list; Maelstrom's data does.
+	if(!gb_RenderDevice3D)
+		return;
+
 	start_timer_auto();
 	gb_RenderDevice->SetRenderState( RS_CULLMODE, -1 );
 	SceneNode nType=SCENENODE_FLAT_SILHOUETTE;
