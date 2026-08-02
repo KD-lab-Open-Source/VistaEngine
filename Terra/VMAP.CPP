@@ -864,7 +864,20 @@ bool vrtMap::loadVMP(const char* file, bool flag_NoCheckCRC)
 			fmap.read(&clrBuf[0], H_SIZE*V_SIZE*sizeof(clrBuf[0]));
 		else if(supBuf)
 			convertVMapTryColor2TerClr();
-		else xassert(0&&"Not compatible color in world");;
+		else{
+			// S5L2 stores one palette index per cell where this engine's clrBuf holds
+			// RGB565 outright, and the conversion above needs the true-colour buffer,
+			// which is only allocated when flag_useTryColorBuffer is on -- it is not at
+			// run time. So read the indices and put them through the world's own
+			// palette, the same lookup getColor16T does for a byte-wide clrBuf.
+			// loadDamPal() runs again later in the load; reading inDam.act twice costs
+			// nothing and this cannot wait for it.
+			loadDamPal();
+			vector<unsigned char> indices(H_SIZE*V_SIZE);
+			fmap.read(&indices[0], H_SIZE*V_SIZE);
+			for(int i = 0; i < H_SIZE*V_SIZE; i++)
+				clrBuf[i] = (TerrainColor)ConvertTry2HighColor(DamPal[indices[i]].argb);
+		}
 	}
 	else if(VmpHeader.cmpID("S5L3") || VmpHeader.cmpID("S5L4") ) { //S5L3 - 256|HiColor  //S5L4 - 512 ������
 		if(VmpHeader.XSize!=H_SIZE || VmpHeader.YSize!=V_SIZE  || VmpHeader.AUX1!=VxABufCRC)

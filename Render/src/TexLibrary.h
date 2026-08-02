@@ -135,6 +135,10 @@ private:
 
 	void SaveCache(cTexture* texture,  sRectangle4f* logo_position = 0);
 	bool LoadCache(cTexture* texture);
+	/// Read a texture out of Maelstrom's shipped base cache, for data whose textures
+	/// exist in no other form. False when there is no such file, which is the usual
+	/// case for this engine's own data.
+	bool loadBaseCache(cTexture* texture);
 
 	void serialize(Archive& ar);
 
