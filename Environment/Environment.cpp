@@ -36,6 +36,7 @@
 #include "DebugUtil.h"
 #include "Serialization/EnumDescriptor.h"
 #include "Units/ShowChangeController.h"
+#include "Game/Universe.h"	// CONVERSION: minimapAngle moved from here to Universe
 #include "VistaRender/FieldOfView.h"
 
 #include "UserInterface/GameLoadManager.h"
@@ -366,6 +367,18 @@ void Environment::serialize(Archive& ar)
 		ar.serialize(minimapWaterColor_, "minimapWaterColor", "Цвет воды на миникарте");
 
 		ar.serialize(minimapZonesAlpha_, "minimapZonesAlpha", "Прозрачность зон на миникарте");
+
+		// CONVERSION: the minimap's rotation used to be an Environment field and is a
+		// Universe one now, so a pre-2008 world carries it in this block rather than in
+		// `universe`. We are deserialized first (Universe::Universe), so hand it across;
+		// Universe::serialize leaves its own value alone when the field is missing there.
+		// Maelstrom's worlds need this -- they are 2048x4096 and turn the minimap 90
+		// degrees to fit a landscape panel.
+		if(ar.isInput() && universe()){
+			float minimapAngle = universe()->minimapAngle();
+			if(ar.serialize(minimapAngle, "minimapAngle", "Угол поворота миникарты"))
+				universe()->setMinimapAngle(minimapAngle);
+		}
 
 		ar.serialize(*environmentTime_, "environmentTime", "Время");
 

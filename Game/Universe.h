@@ -149,6 +149,9 @@ public:
 	virtual float voiceFileDuration(const char* fileName, float duration) { return duration; }
 
 	float minimapAngle() const { return minimapAngle_; }
+	/// For Environment's CONVERSION only: pre-2008 worlds keep this angle in their
+	/// `environment` block, which is deserialized just before ours.
+	void setMinimapAngle(float angle) { minimapAngle_ = angle; }
 	class UniverseObjectAction* universeObjectAction;
 protected:
 	bool enableEventChecking_;
