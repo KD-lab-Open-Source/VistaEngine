@@ -196,6 +196,31 @@ Two traps, both settled by reading `origin/Maelstrom:UserInterface/UI_Background
   engines — old `selectModel` built its matrix from the rotation and `Vect3f::ZERO`. Zeroing
   the rotation too makes the model vanish edge-on.
 
+### Control show modes moved a level deeper — `UI_ControlState::serialize`
+
+The single largest visual difference, and the one that looks least like a schema problem.
+Pre-2008 a control state wrote its show modes **flat**, one field per
+`UI_ControlShowModeID` name, inside a transparent `openBlock("")`:
+
+```
+{ name_ = "Default"; UI_SHOW_NORMAL = "class UI_ControlShowMode" { sprite_ = { ... } }; }
+```
+
+By 2008 the same table had moved under a named block, `showModes = { UI_SHOW_NORMAL = … }`.
+The contents are byte-identical either way — `EnumTable::serialize` is what wrote them then
+and what writes them inside the block now — but our reader asks for the block, `openStruct`
+fails, and it moves on. Every control in Maelstrom's data therefore loaded with an **empty
+show-mode table**, and a control with no show mode draws no sprite at all.
+
+That is what made the interface look like a texture-loading fault: blank menus, white boxes
+where the HUD's resource icons belong, a white panel where the minimap belongs. No texture
+ever failed to load — none was ever asked for. The fix is to read the table at the state's
+own level when the block is absent.
+
+Worth checking early on anything that renders blank rather than wrong: `showMode()` returning
+null is indistinguishable at a glance from a missing texture, and the two lead to opposite
+places.
+
 ### The minimap's rotation — three fields that drifted apart
 
 Maelstrom's worlds are **2048×4096** — twice as deep as they are wide — and turn the minimap
@@ -267,9 +292,9 @@ Mostly nothing — they already load:
 6. **`C3DX_BASEMENT`** (500/501/502) — building foundation geometry, a Maelstrom feature P2
    dropped — is silently ignored by the chunk switch.
 7. **Not every mission has been run.** `c1_m1` and `c1_m2` load; the rest are untested.
-8. **The main menu renders white.** The black screen above was the unread trigger chain and
-   is fixed; the menu mission now loads (`Universe created`) and the first frames draw, but
-   the screen then turns white. Under investigation.
+8. **The main menu draws, but not all of it.** The black screen was the unread trigger
+   chain and the blank one was the show-mode nesting; both are fixed and the menu now comes
+   up. Parts of it are still missing — not yet diagnosed, and not necessarily one cause.
 9. **`OPTION_SCREEN_SIZE` means a different resolution.** It is an *index*, and the list it
    indexes is C++ (`Game/GameOptionsSerialization.cpp:48`) — the `comment` string beside it
    in the data is only a label. Maelstrom's saved index 25 is 1920×1080 in Maelstrom's list;
