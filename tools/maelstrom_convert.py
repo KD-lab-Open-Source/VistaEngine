@@ -174,6 +174,25 @@ def main():
                     with open(dst, 'wb') as fh:
                         fh.write(blob)
 
+    # The global trigger chain moved into a Triggers/ subdirectory between the two
+    # revisions.  It is what starts the game: its "Start Main Menu" trigger carries the
+    # ActionStartMission that loads Resource\Worlds\Menu.spg, and every screen the game
+    # ever shows follows from that.  GameShell::init loads exactly one path, so with the
+    # file a level up the chain is simply empty -- nothing starts, no screen is ever
+    # selected, and the game sits on a black window.  Copy rather than move: the engine
+    # is the only reader of the new location, and leaving the original in place keeps the
+    # tree readable next to Maelstrom's own source.
+    src = os.path.join(args.root, 'Scripts', 'Content', 'GlobalTrigger.scr')
+    dst = os.path.join(args.root, 'Scripts', 'Content', 'Triggers', 'GlobalTrigger.scr')
+    if os.path.exists(src) and not os.path.exists(dst):
+        print('\n  Scripts/Content/Triggers/GlobalTrigger.scr  <- Scripts/Content/GlobalTrigger.scr')
+        if args.apply:
+            with open(src, 'rb') as fh:
+                blob = fh.read()
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            with open(dst, 'wb') as fh:
+                fh.write(blob)
+
     print('\nscanned %d text files, %d needed changes%s'
           % (files, touched, '' if args.apply else '  (dry run -- pass --apply to write)'))
     for name, rewrite, why in RULES:

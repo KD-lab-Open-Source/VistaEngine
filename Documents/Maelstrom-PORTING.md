@@ -61,9 +61,33 @@ python3 tools/maelstrom_convert.py <MaelstromData> --font 'Resource\UI\Fonts\ARI
 | `steering_duration` float → int | `RigidBodyPrm::steering_duration` is `float` in Maelstrom (`Physics/RigidBodyPrm.h:109`), `int` here |
 | `groundPass` / `waterPass` `PASSABILITY`→`true`, `IMPASSABILITY`→`false` | `PassabilityFlags` there, `bool` here. `IMPASSABILITY = 0`, `PASSABILITY = 1`, and the two engines' constructed defaults agree exactly |
 | generate `Scripts/Content/UI_FontAttributes` from `Scripts/Content/UI_FontLibrary` | see below |
+| copy `Scripts/Content/GlobalTrigger.scr` to `Scripts/Content/Triggers/` | the chain moved into a subdirectory; see below |
 
 43 of each of the first two, one per entry in `Scripts/Engine/RigidBodyPrmLibrary` — that
 single file is the only one in the tree that needed rewriting.
+
+### The global trigger chain is what starts the game
+
+`GameShell::init` loads exactly one path, `Scripts\Content\Triggers\GlobalTrigger.scr`
+(`GameShell.cpp:192`). Maelstrom's sits a directory up, at `Scripts\Content\`, and its
+`Triggers\` holds only AI scripts — so the chain loaded empty.
+
+That chain is not decoration. Its `START` trigger runs a `Hide Cursor` / `Start Main Menu`
+sequence, and `Start Main Menu` carries the `ActionStartMission` that loads
+`Resource\Worlds\Menu.spg` — Maelstrom's main menu, like Perimeter 2's, *is* a running
+mission. With the file unread nothing ever fires: no mission, no screen selected, not one
+control reaching `UI_ControlBase::redraw`. The window stays black, which reads as a renderer
+fault and is not one.
+
+All eight classes the chain names (`ActionStartMission`, `ActionShowReel`,
+`ActionShowLogoReel`, `ActionSetCursor`, `ActionFreeCursor`, `ActionDelay`,
+`ActionGameQuit`, `ConditionEventComing`) still exist here, so it runs as written once
+found. The intro reels are skipped cleanly with `DisableVideo` — `ActionShowReel::workedOut`
+returns true when video is off, so the chain advances rather than stalling.
+
+Worth knowing when chasing this kind of thing: the actions are serialized as
+`"struct ActionFoo"`, not `"class ActionFoo"`. Grepping for the latter finds two entries in
+this file and suggests the chain is an empty skeleton.
 
 ### Fonts are a translation, not a substitution
 
@@ -243,9 +267,9 @@ Mostly nothing — they already load:
 6. **`C3DX_BASEMENT`** (500/501/502) — building foundation geometry, a Maelstrom feature P2
    dropped — is silently ignored by the chunk switch.
 7. **Not every mission has been run.** `c1_m1` and `c1_m2` load; the rest are untested.
-8. **The main menu is a black screen.** Started without `-world`, Maelstrom draws no UI at
-   all — not one control reaches `UI_ControlBase::redraw`. Missions loaded directly are
-   fine. Not diagnosed.
+8. **The main menu renders white.** The black screen above was the unread trigger chain and
+   is fixed; the menu mission now loads (`Universe created`) and the first frames draw, but
+   the screen then turns white. Under investigation.
 9. **`OPTION_SCREEN_SIZE` means a different resolution.** It is an *index*, and the list it
    indexes is C++ (`Game/GameOptionsSerialization.cpp:48`) — the `comment` string beside it
    in the data is only a label. Maelstrom's saved index 25 is 1920×1080 in Maelstrom's list;
