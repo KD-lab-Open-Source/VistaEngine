@@ -140,6 +140,68 @@ time, so the branch fell through to a release-mode no-op assert and left `clrBuf
 It now reads the indices and puts them through the world's own `inDam.act` palette, the
 same lookup `getColor16T` does for a byte-wide `clrBuf`.
 
+### The interface frame — `UI_BackgroundScene::serialize`
+
+The in-game HUD chrome is **not** UI sprites. It is a 3D model, one per race
+(`Remnant interf.3DX`), drawn by `UI_BackgroundScene` through a camera of its own, with the
+buttons, minimap and text laid over it as ordinary 2D controls. So when it is misplaced the
+2D layout is still exactly right, which sends you looking in the wrong file — `screenCoords`,
+`aspectedWorkArea` and `UI_RenderBase` are identical in the two engines, and the controls
+land within a pixel of where the original puts them.
+
+That camera used to be described in the data, once for the whole scene:
+
+```
+position = { x = 0.; y = -130.5; z = 1000.; };
+focusx = 1.8;
+perspective = true;
+```
+
+By 2008 all three were gone: the focus became a per-model `scale` (× `scale2focus`), the
+camera became orthographic, and a new `modelPosition_` pushed the model 1024 units off the
+origin. The read of the old block had been left commented out, so Maelstrom's model was
+drawn orthographic, at Perimeter 2's focus, at twice the distance — too large and too high.
+Perimeter 2's own `backgroundScene` ends after `lights` and carries none of the three, so
+reading them back costs it nothing.
+
+Two traps, both settled by reading `origin/Maelstrom:UserInterface/UI_BackgroundScene.cpp`:
+
+- The focus is useless without the placement. Honouring `focusx` alone swaps one wrong size
+  for another, because the perspective divide then happens at the 2008 distance.
+- Only the **translation** is new. `modelAngles_(90,0,0)` is the same constant in both
+  engines — old `selectModel` built its matrix from the rotation and `Vect3f::ZERO`. Zeroing
+  the rotation too makes the model vanish edge-on.
+
+### The minimap's rotation — three fields that drifted apart
+
+Maelstrom's worlds are **2048×4096** — twice as deep as they are wide — and turn the minimap
+90° so it fits a landscape panel. Getting that back needs three separate pieces, and any two
+of them leave it portrait:
+
+- **`minimapAngle` changed owner.** It was an `Environment` field and is a `Universe` one
+  now, so a pre-2008 world writes it in its `environment` block rather than in `universe`,
+  and `Universe::serialize` never sees it. `Environment` is deserialized first (inside
+  `Universe::Universe`), so the conversion reads it there and hands it across.
+- **`getAngleFromWorld` became unreachable.** It and `rotateByCamera` used to be independent
+  flags written side by side; 2008 made the second exclusive with a new
+  `rotateByCameraInitial` and put `getAngleFromWorld` in the `else`. Maelstrom's data sets
+  both, so the current reader takes the `if` and never asks for the angle at all.
+- **`rotationScale` did not exist.** Rotating the map always rescaled it to fit the control,
+  and `UI_Minimap::reposition` now does that only when the flag is set. Without it the quad
+  spins inside a box still fitted to the *unrotated* 1:2 world.
+
+`getAngleFromWorld` appearing next to a true `rotateByCamera` is a combination the current
+writer cannot produce, so it is the marker for old data and what the `rotationScale` default
+keys off. Perimeter 2 reads `rotateByCameraInitial` instead and is untouched — measured:
+
+```
+MAEL: rotByCam=1 init=0 fromWorld=1 rotScale=1 ctlAngle=0 worldAngle=90
+P2:   rotByCam=1 init=1 fromWorld=0 rotScale=0 ctlAngle=0 worldAngle=0
+```
+
+Reading order does not matter here: `XPrmIArchive::openNode` rewinds to the start of the
+block and rescans (twice) before giving up, so a field can be asked for out of order.
+
 ### Silhouettes — `Camera::DrawSilhouetteObject`
 
 Stencil work that was never ported. Retail Perimeter 2 never fills its draw list so it went
@@ -181,6 +243,17 @@ Mostly nothing — they already load:
 6. **`C3DX_BASEMENT`** (500/501/502) — building foundation geometry, a Maelstrom feature P2
    dropped — is silently ignored by the chunk switch.
 7. **Not every mission has been run.** `c1_m1` and `c1_m2` load; the rest are untested.
+8. **The main menu is a black screen.** Started without `-world`, Maelstrom draws no UI at
+   all — not one control reaches `UI_ControlBase::redraw`. Missions loaded directly are
+   fine. Not diagnosed.
+9. **`OPTION_SCREEN_SIZE` means a different resolution.** It is an *index*, and the list it
+   indexes is C++ (`Game/GameOptionsSerialization.cpp:48`) — the `comment` string beside it
+   in the data is only a label. Maelstrom's saved index 25 is 1920×1080 in Maelstrom's list;
+   in ours, after `filterBaseGraphOptions` drops the modes the display does not support, it
+   lands somewhere else entirely (1600×900 here). Harmless in itself, but it changes the
+   window aspect, and with it which branch of the letterbox/pillarbox code runs — Perimeter 2
+   at its own default of 1280×1024 never takes the wide branch that Maelstrom then does.
+   Belongs in the converter, which would have to renumber the index against our list.
 
 ## A note on judging behaviour
 

@@ -1821,8 +1821,17 @@ void UI_ControlCustom::serialize(Archive& ar)
 				ar.serialize(drawInstallZones_, "drawInstallZones", "Показывать зоны установки");
 			ar.serialize(drawWindDirection_, "drawWindDirection", "Рисовать направление ветра");
 			ar.serialize(rotateByCamera_, "rotateByCamera", "Может вращаться за камерой");
-			if(rotateByCamera_)
+			if(rotateByCamera_){
 				ar.serialize(rotateByCameraInitial_, "rotateByCameraInitial", "Вращаться за камерой");
+
+				// CONVERSION: "may rotate with the camera" and "take the angle from the
+				// world" used to be independent flags written side by side, and rotating
+				// the map always rescaled it to fit -- rotationScale did not exist. The
+				// current writer only ever emits getAngleFromWorld in the else branch, so
+				// finding it here means pre-2008 data, which wants the old default.
+				if(ar.isInput() && ar.serialize(getAngleFromWorld_, "getAngleFromWorld", "Брать угол поворота из мира"))
+					rotationScale_ = true;
+			}
 			else
 				ar.serialize(getAngleFromWorld_, "getAngleFromWorld", "Брать угол поворота из мира");
 			ar.serialize(rotationScale_, "rotationScale", "Масштабировать при вращении");
