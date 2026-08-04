@@ -1755,6 +1755,23 @@ void cWater::serialize(Archive& ar)
 	}
 }
 
+#ifdef MAELSTROM_DATA
+void cWater::serializeMaelstrom(Archive& ar)
+{
+	// Both are read above too, under the same names -- but a pre-2008 world keeps them
+	// outside the water block entirely, and the caller has already descended into the
+	// node they do sit in. Unread they stay at 1.0 and 7, where Maelstrom's worlds ask
+	// for 0.01 and 15: rain that never dries off the surface, and half the flow speed.
+	ar.serialize(rainConstant_, "rainConstant", "Параметр высыхания");
+	ar.serialize(RangedWrapperi(water_dampf_k_, 1, 15), "water_dampf_k", "Скорость течения");
+
+	if(ar.isInput()){
+		SetRainConstant(-rainConstant_);
+		SetDampfK(water_dampf_k_);
+	}
+}
+#endif
+
 void cWater::OnePoint::serialize(Archive& ar)
 {
 	ar.serialize(z, "z", 0);

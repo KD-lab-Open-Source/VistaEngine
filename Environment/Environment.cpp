@@ -423,22 +423,65 @@ void Environment::serialize(Archive& ar)
 			sourceManager->serialize(ar);
 #endif
 
+#ifdef MAELSTROM_DATA
+		// The preset group had not been split out of the world yet. One object owned it --
+		// EnvironmentAttributes, written as the world's "environmentColors" node -- and
+		// 2008 dissolved that object: its fields became Environment's own, its fog-of-war
+		// colours FogOfWar's, two of its constants cWater's, and the group as a whole moved
+		// out of the world and into a preset file. The names survived the move; the depth
+		// did not, and openBlock is a no-op in an XPrm archive (editor-only grouping, it
+		// does not descend), so read at this level not one of these names is found.
+		//
+		// "ownAttributes" says whether the world carries its own copy -- 11 of Maelstrom's
+		// 51 do, the other 40 taking the global one, which is what loadPreset() reads here.
+		if(ar.isInput()){
+			bool ownAttributes = true;
+			ar.serialize(ownAttributes, "ownAttributes", "Собственные настройки среды");
+			if(ownAttributes){
+				// The object handed to openStruct is only used by binary archives, for
+				// their size and type name; an XPrm archive descends by name alone.
+				if(ar.openStruct(*this, "environmentColors", "Цвета среды")){
+					serializeMaelstromColors(ar);
+					ar.closeStruct("environmentColors");
+				}
+			}
+			else if(!presetLoaded_)
+				loadPreset();
+		}
+#else
 		if(ar.isInput() && !presetLoaded_)
 			loadPreset();
+#endif
 	}
 
+#ifdef MAELSTROM_DATA
+	// The rest of the group is written flat in the world's environment block, where this
+	// reads it -- so run under the world filter as well. Maelstrom ships no
+	// Scripts\Content\Presets\ at all, so waiting for loadPreset() would leave every world
+	// on constructed defaults: fog at 1000-1400 where Menu.spg asks for 900-1200, a
+	// 30-4000 camera frustum where it asks for 2-1300, and no weather, shore or lens flare
+	// at all. What sits in the world's "environmentColors" node has been read by now; only
+	// the names beside that node are still to come.
+	if(ar.filter(SERIALIZE_WORLD_DATA | SERIALIZE_PRESET_DATA)){
+#else
 	if(ar.filter(SERIALIZE_PRESET_DATA)){
+#endif
+#ifndef MAELSTROM_DATA
 		if(fogOfWar_)
 			ar.serialize(*fogOfWar_, "fogOfWar", "Туман войны");
+#endif
 
 		if(ar.openBlock("Environment fog", "Туман на мире")){
 			ar.serialize(fog_enable_, "fog_enable", "Включить туман");
+#ifndef MAELSTROM_DATA
 			ar.serialize(fog_start_, "fog_start", "Ближняя граница тумана");
 			ar.serialize(fog_end_, "fog_end", "Дальняя граница тумана");
 			ar.serialize(RangedWrapperi(height_fog_circle_, 0, 2000), "height_fog_circle", "Высота перехода к туману");
+#endif
 			ar.closeBlock();
 		}
 
+#ifndef MAELSTROM_DATA
 		if(ar.openBlock("Efects", "Эффекты")){
 			ar.serialize(effectHideByDistance_, "effectHideByDistance", "Скрывать эффекты при удалении");
 			ar.serialize(effectNearDistance_, "effectNearDistance", "Ближняя граница эффектов");
@@ -455,8 +498,9 @@ void Environment::serialize(Archive& ar)
 			ar.serialize(hideSmoothly_, "hideSmoothly", "Исчезать плавно");
 			ar.closeBlock();
 		}
+#endif // !MAELSTROM_DATA
 
-		if(water_){	
+		if(water_){
 			if(ar.openBlock("undegroundEffect","Подводный эффект")){
 				ar.serialize(underWaterAlways, "underWaterAlways", "Всегда включенный");
 				ar.serialize(underWaterColor, "underWaterColor", "Цвет подводного эффекта");
@@ -510,7 +554,9 @@ void Environment::serialize(Archive& ar)
 			}
 		}
 
-		ar.serialize(outside_, "Outside", "Внешняя среда");
+		// Capitalised by 2008. The archive tries these in order and stops at the first hit,
+		// so Perimeter 2 matches on the first name and pays nothing for the second.
+		ar.serialize(outside_, "|Outside|outside", "Внешняя среда");
 		if(outside_ == ENVIRONMENT_EARTH)
 			ar.serialize(outsideHeight_, "outsideHeight", "Высота внешней среды");
 
@@ -520,6 +566,7 @@ void Environment::serialize(Archive& ar)
 		gb_VisGeneric->SetHideRange(hideByDistanceRange_);
 		gb_VisGeneric->SetHideSmoothly(hideSmoothly_);
 
+#ifndef MAELSTROM_DATA
 		ar.serialize(*fallout_, "fallout", "Осадки");
 		ar.serialize(*windMap, "windMap", "Ветер");
 
@@ -527,6 +574,7 @@ void Environment::serialize(Archive& ar)
 			ar.serialize(*pCoastSprite, "coastSprites", "Прибрежные спрайты");
 			ar.serialize(waterPlumeAtribute_, "|waterPlumeAtribute|waterPlume", "Следы на воде");
 		}
+#endif
 
 		ar.serialize(*lensFlare_, "lensFlare_", "Блик камеры");
 		ar.serialize(*fallLeaves_, "fallLeaves", "Падающие листья");
@@ -597,6 +645,73 @@ void Environment::serialize(Archive& ar)
 	}
 }
 
+#ifdef MAELSTROM_DATA
+void Environment::serializeMaelstromColors(Archive& ar)
+{
+	// Field for field this is the group the preset branch of serialize() reads; only the
+	// place the names sit in the file differs, so every name here is deliberately the
+	// same one -- except the two FogOfWar renamed, which its own reader carries.
+	//
+	// timeColors_ is deliberately left unread. It is this node's own copy of the six sky
+	// gradients, and it is not the set a world is lit by: Maelstrom lit from
+	// EnvironmentTime's gradients, written flat in the environment block and read in
+	// EnvironmentTime::serializeMaelstrom, and reached into a timeColors_ only for the
+	// global ones -- its Environment.cpp has
+	// ReplaceGlobal(GlobalAttributes::instance().environmentAttributes_.timeColors_).
+	// What the editor saved here beside them is that global set, a 9-key ramp against
+	// Menu.spg's own 8-key one, so reading it would overwrite a world's own lighting with
+	// the global default. miniDetailTexResolution has no reader in this engine at all.
+	if(fogOfWar_)
+		fogOfWar_->serializeMaelstrom(ar);
+
+	ar.serialize(fog_start_, "fog_start", "Ближняя граница тумана");
+	ar.serialize(fog_end_, "fog_end", "Дальняя граница тумана");
+	ar.serialize(RangedWrapperi(height_fog_circle_, 0, 2000), "height_fog_circle", "Высота перехода к туману");
+
+	ar.serialize(effectHideByDistance_, "effectHideByDistance", "Скрывать эффекты при удалении");
+	ar.serialize(effectNearDistance_, "effectNearDistance", "Ближняя граница эффектов");
+	ar.serialize(effectFarDistance_, "effectFarDistance", "Дальняя граница эффектов");
+
+	ar.serialize(RangedWrapperf(game_frustrum_z_min_, 1.0f, 100.0f), "game_frustrum_z_min", "Ближняя граница камеры");
+	ar.serialize(RangedWrapperf(game_frustrum_z_max_vertical_, 100.0f, 13000.0f), "game_frustrum_z_max", "Дальняя граница камеры (в вертикальном положении)");
+	game_frustrum_z_max_horizontal_ = game_frustrum_z_max_vertical_;
+	ar.serialize(RangedWrapperf(game_frustrum_z_max_horizontal_, 100.0f, 13000.0f), "game_frustrum_z_max_horizontal", "Дальняя граница камеры (в горизонтальном положении)");
+	ar.serialize(hideSmoothly_, "hideSmoothly", "Исчезать плавно");
+
+	if(water_)
+		water_->serializeMaelstrom(ar);
+
+	ar.serialize(*fallout_, "fallout", "Осадки");
+	ar.serialize(*windMap, "windMap", "Ветер");
+
+	if(water_){
+		ar.serialize(*pCoastSprite, "coastSprites", "Прибрежные спрайты");
+		ar.serialize(waterPlumeAtribute_, "|waterPlumeAtribute|waterPlume", "Следы на воде");
+	}
+}
+
+void Environment::loadPreset()
+{
+	// Maelstrom's preset file is Scripts\Content\GlobalAttributes: a world that does not
+	// carry its own settings ("ownAttributes = false", 40 of the 51) took this copy, which
+	// is what its Environment did with
+	// environmentAttributes_ = GlobalAttributes::instance().environmentAttributes_.
+	// The engine already reads this file as a library (Units/GlobalAttributes.cpp), but
+	// nothing there descends into its environmentColors, so open it again for that node
+	// alone. presetName_ is left alone: no Maelstrom install has a Presets directory.
+	presetLoaded_ = true;
+	XPrmIArchive ia;
+	ia.setFilter(SERIALIZE_PRESET_DATA);
+	if(ia.open("Scripts\\Content\\GlobalAttributes")
+	&& ia.openStruct(*this, "GlobalAttributes", "Глобальные параметры")){
+		if(ia.openStruct(*this, "environmentColors", "Цвета среды")){
+			serializeMaelstromColors(ia);
+			ia.closeStruct("environmentColors");
+		}
+		ia.closeStruct("GlobalAttributes");
+	}
+}
+#else
 void Environment::loadPreset()
 {
 	presetLoaded_ = true;
@@ -605,6 +720,7 @@ void Environment::loadPreset()
 	if(ia.open(presetName_.c_str()))
 		ia.serialize(*this, "environment", 0);
 }
+#endif
 
 void Environment::savePreset()
 {

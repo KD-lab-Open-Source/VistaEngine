@@ -406,6 +406,53 @@ A third guard is genuinely shared: `UnitLegionary::Quant` assumed a squad. `squa
 kill, so a legionary can outlive its squad — which Maelstrom's worlds reach, their source
 zones damaging what stands in them.
 
+### The preset group — the world's own `environmentColors`
+
+One object used to own it: `EnvironmentAttributes`, written as the world's `environmentColors`
+node. 2008 dissolved that object — its fields became `Environment`'s own, its fog-of-war
+colours `FogOfWar`'s, two of its constants `cWater`'s — and moved the group out of the world
+and into a preset file, `Scripts\Content\Presets\global.set`.
+
+Maelstrom ships no `Scripts\Content\Presets\` at all, so `loadPreset()` opened nothing and the
+whole `if(ar.filter(SERIALIZE_PRESET_DATA))` branch of `Environment::serialize` never ran, on
+any world: fog at 1000–1400 where `Menu.spg` asks for 900–1200, a 30–4000 camera frustum where
+it asks for 2–1300, and no weather, shore, lens flare or underwater effect at all.
+
+Two separate things had to change, because the group is split across two depths:
+
+- **The branch has to run during a world load**, not only from `loadPreset()`. Most of the
+  group — `fog_enable`, the underwater, bloom and DOF settings, `outside`, `lensFlare_`,
+  `fallLeaves`, the ice and chaos textures, the cloud shadow — is written flat in the world's
+  `environment` block, exactly where this already reads it.
+- **The rest needs a real descent.** `openBlock` is a no-op in an XPrm archive — editor-only
+  grouping, it does not nest — and `openNode`'s rescan skips a nested block whole
+  (`skipValue` counts braces), so from the environment's level not one name inside
+  `environmentColors` is visible. `openStruct` descends for real.
+
+`ownAttributes` decides which copy to read: 11 of the 51 worlds carry their own node, the
+other 40 taking the global one. Maelstrom kept that in `Scripts\Content\GlobalAttributes` —
+that file **is** its preset file, and `loadPreset()` now reads its `environmentColors` for
+exactly the worlds that ask for it, which is what the original did with
+`environmentAttributes_ = GlobalAttributes::instance().environmentAttributes_`.
+
+One member is deliberately left unread: `timeColors_`, the node's own copy of the six sky
+gradients. A world is not lit from it. Maelstrom lit from `EnvironmentTime`'s gradients,
+written flat in the environment block, and reached into a `timeColors_` only for the *global*
+set — its `Environment.cpp` has
+`ReplaceGlobal(GlobalAttributes::instance().environmentAttributes_.timeColors_)`. What the
+editor saved beside them inside the world is that global set: a 9-key ramp against `Menu.spg`'s
+own 8-key one, so reading it would overwrite a world's own lighting with the global default.
+`miniDetailTexResolution` has no reader in this engine at all.
+
+Two names drifted rather than moved: `outside` was capitalised to `Outside` (taken with the
+archive's own `|a|b` alias, so Perimeter 2 matches on the first name and pays nothing for the
+second), and `FogOfWar`'s `fogColor` / `scoutAreaAlpha` were `fogOfWarColor` /
+`scout_area_alpha`.
+
+Measured on `Menu.spg` after the change: fog 900–1200, `height_fog_circle` 500, frustum
+2–1300, `hideSmoothly` true, effects 0 / 0 / 1e6, `outside = ENVIRONMENT_WATER`, and the
+underwater and ice textures resolving to real paths instead of empty strings.
+
 ### Silhouettes — `Camera::DrawSilhouetteObject`
 
 Stencil work that was never ported. Retail Perimeter 2 never fills its draw list so it went
@@ -460,20 +507,7 @@ Mostly nothing — they already load:
    window aspect, and with it which branch of the letterbox/pillarbox code runs — Perimeter 2
    at its own default of 1280×1024 never takes the wide branch that Maelstrom then does.
    Belongs in the converter, which would have to renumber the index against our list.
-10. **The whole preset group is at its constructed defaults.** By 2008 the environment was
-    split in two: what a world carries, and what its `presetName` file carries — everything
-    under `if(ar.filter(SERIALIZE_PRESET_DATA))` in `Environment::serialize`. Maelstrom ships
-    no `Scripts\Content\Presets\` at all, so `loadPreset()` opens nothing and that whole
-    branch never runs, on any world. The data is there — the old writer put it flat in the
-    `environment` block (`fog_enable`, `enableBloom`, `underWater*`, DOF, `lensFlare_`) or one
-    level down in `environmentColors` (`fog_start`/`fog_end`, `height_fog_circle`,
-    `effect*Distance`, `game_frustrum_*`, `hideSmoothly`, `windMap`, `fallout`,
-    `coastSprites`) — and the names still match, `openBlock` being a no-op. So this is the
-    same shape of conversion as the environment-time one above and would want the same
-    treatment; it is simply larger, and `Outside` vs the old `outside` is one name that would
-    need an alias. Menu.spg asks for fog at 900–1200 and a 2–1300 frustum and gets 1000–1400
-    and 30–4000.
-11. **Unit silhouettes are not drawn.** Stencil work that was never ported —
+10. **Unit silhouettes are not drawn.** Stencil work that was never ported —
     **Render-PORTING.md #22**. Unreachable on retail Perimeter 2, so this build is the only
     way to exercise it.
 
