@@ -317,15 +317,19 @@ void UI_ControlState::serialize(Archive& ar)
 		typedef EnumTable<UI_ControlShowModeID, OptionalPtr<UI_ControlShowMode> > ShowModesOptional;
 		reinterpret_cast<ShowModesOptional&>(showModes_).serialize(ar); // HINT
 	}
-	// CONVERSION: the show modes used to be written flat into the state, one field per
-	// UI_ControlShowModeID name, and only later moved under a "showModes" block. The
-	// contents are identical either way -- EnumTable::serialize is what wrote them then
-	// and what writes them inside the block now -- so when the block is absent, read them
-	// at this level instead. Without it every control in pre-2008 data ends up with an
-	// empty show-mode table, and a control with no show mode draws no sprite at all:
-	// the whole interface goes blank, which looks like a texture fault and is not one.
-	else if(!ar.serialize(showModes_, "showModes", "Режимы отрисовки"))
+#ifdef MAELSTROM_DATA
+	// The show modes are written flat into the state, one field per UI_ControlShowModeID
+	// name; 2008 moved the same table under a "showModes" block. The contents are
+	// identical either way -- EnumTable::serialize is what writes them in both -- so read
+	// them at this level. Ask for the block instead and every control ends up with an
+	// empty show-mode table, and a control with no show mode draws no sprite at all: the
+	// whole interface goes blank, which looks like a texture fault and is not one.
+	else
 		showModes_.serialize(ar);
+#else
+	else
+		ar.serialize(showModes_, "showModes", "Режимы отрисовки");
+#endif
 	ar.serialize(actions_, "actions", "назначения");
 }
 

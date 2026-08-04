@@ -36,7 +36,8 @@
 #include "DebugUtil.h"
 #include "Serialization/EnumDescriptor.h"
 #include "Units/ShowChangeController.h"
-#include "Game/Universe.h"	// CONVERSION: minimapAngle moved from here to Universe
+#include "Game/Universe.h"	// MAELSTROM_DATA: minimapAngle moved from here to Universe
+#include "Environment/SourceManager.h"	// MAELSTROM_DATA: the world's sources used to live here
 #include "VistaRender/FieldOfView.h"
 
 #include "UserInterface/GameLoadManager.h"
@@ -348,7 +349,7 @@ void Environment::showEditor()
 		fixedWaves_->ShowInfo();
 }
 
-void Environment::serialize(Archive& ar) 
+void Environment::serialize(Archive& ar)
 {
 	start_timer_auto();
 
@@ -368,28 +369,29 @@ void Environment::serialize(Archive& ar)
 
 		ar.serialize(minimapZonesAlpha_, "minimapZonesAlpha", "Прозрачность зон на миникарте");
 
-		// CONVERSION: the minimap's rotation used to be an Environment field and is a
-		// Universe one now, so a pre-2008 world carries it in this block rather than in
-		// `universe`. We are deserialized first (Universe::Universe), so hand it across;
-		// Universe::serialize leaves its own value alone when the field is missing there.
-		// Maelstrom's worlds need this -- they are 2048x4096 and turn the minimap 90
-		// degrees to fit a landscape panel.
+#ifdef MAELSTROM_DATA
+		// The minimap's rotation is an Environment field here and a Universe one in 2008,
+		// so this world writes it in this block and Universe::serialize never sees it. We
+		// are deserialized first (Universe::Universe), so hand it across. Maelstrom's
+		// worlds need it -- they are 2048x4096 and turn the minimap 90 degrees to fit a
+		// landscape panel.
 		if(ar.isInput() && universe()){
 			float minimapAngle = universe()->minimapAngle();
 			if(ar.serialize(minimapAngle, "minimapAngle", "Угол поворота миникарты"))
 				universe()->setMinimapAngle(minimapAngle);
 		}
 
-		// CONVERSION: everything the environment lights a world with -- the sun, shadow
-		// and sky gradients, the sky models, the time of day -- used to be written flat
-		// in this block and moved under "environmentTime" by 2008.  Unread, a pre-2008
-		// world lights itself entirely from the constructed defaults: midday where it
-		// asked for a quarter past nine, ambient 0.2 where it asked for 0.5, a default
-		// cloud layer instead of its own.  The terrain still looks about right, because
-		// its colour is baked per cell in the height map -- it is the objects standing on
-		// it that go black.
-		if(!ar.serialize(*environmentTime_, "environmentTime", "Время") && ar.isInput())
-			environmentTime_->serializePre2008(ar);
+		// Everything the environment lights a world with -- the sun, shadow and sky
+		// gradients, the sky models, the time of day -- is written flat in this block;
+		// 2008 moved it under "environmentTime". Read where this world put it, or it
+		// lights itself entirely from the constructed defaults: midday where it asked for
+		// a quarter past nine, ambient 0.2 where it asked for 0.5, a default cloud layer
+		// instead of its own. The terrain still looks about right, its colour being baked
+		// per cell in the height map -- it is the objects standing on it that go black.
+		environmentTime_->serializeMaelstrom(ar);
+#else
+		ar.serialize(*environmentTime_, "environmentTime", "Время");
+#endif
 
 		if(grassMap)
 			ar.serialize(*grassMap, "Grass", "Трава");
@@ -404,6 +406,22 @@ void Environment::serialize(Archive& ar)
 
 		if(temperature_)
 			ar.serialize(*temperature_, "temperature", 0);
+
+#ifdef MAELSTROM_DATA
+		// A world's sources -- the zones that hold its standing effects, its damage and
+		// its unit generators -- are written here; 2008 split SourceManager out of
+		// Environment and moved them into Universe's "sourceManager" block. Unread, every
+		// placed effect in the world is simply absent: in Maelstrom's menu that is each
+		// building fire, every smoke column and the green outflow from the pipe, all of
+		// them SourceZones.
+		//
+		// Called inline, not through a named block: "sources" and "anchors" sit at this
+		// level. Universe::Universe reads the environment last for this data, so the
+		// players and their units are already in place and a source can be switched on as
+		// it is read, which is what SourceManager::serialize does when it finishes.
+		if(sourceManager)
+			sourceManager->serialize(ar);
+#endif
 
 		if(ar.isInput() && !presetLoaded_)
 			loadPreset();

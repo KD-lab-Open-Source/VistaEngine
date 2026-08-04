@@ -183,10 +183,22 @@ universeObjectAction(0)
 		Archive& ar = *ia;
 		ar.setFilter(SERIALIZE_WORLD_DATA);
 		GameLoadManager::instance().setProgressAndStartSub(.05f, mission.userSave() ? 0.1f : 0.7f);
+#ifdef MAELSTROM_DATA
+		// This engine reads the environment first; Maelstrom's read it last, and its data
+		// depends on that. The world's sources live in the environment block there, and a
+		// source refers to units -- its owner, its targets, the squads a generator fills.
+		// Read before the players exist and those references resolve to nothing, which
+		// takes the first quant down on a legionary with no squad.
+		ar.serialize(*cameraManager, "camera", 0);
+		GameLoadManager::instance().finishAndStartSub(.95f);
+		ar.serialize(*this, "universe", 0);
+		ar.serialize(*environment, "environment", 0);
+#else
 		ar.serialize(*environment, "environment", 0);
 		ar.serialize(*cameraManager, "camera", 0);
 		GameLoadManager::instance().finishAndStartSub(.95f);
 		ar.serialize(*this, "universe", 0);
+#endif
 		ar.setFilter(0);
 		GameLoadManager::instance().finishSub();
 		vMap.serializeRegion(ar);
@@ -686,7 +698,11 @@ void Universe::serialize(Archive& ar)
 		}
 	}
 
+#ifndef MAELSTROM_DATA
+	// Maelstrom has no "sourceManager" block: its sources sit in the environment, which
+	// is deserialized after this. See Environment::serialize.
 	ar.serialize(*sourceManager, "sourceManager", 0);
+#endif
 
 	if(userSave()){
 		ar.serialize(intVariables_, "intVariables", 0);
