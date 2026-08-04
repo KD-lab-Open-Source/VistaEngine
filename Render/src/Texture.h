@@ -72,6 +72,13 @@ public:
 	bool isAlpha() const { return getAttribute(TEXTURE_ALPHA_BLEND) ? true : false; }
 	bool isAlphaTest() const { return getAttribute(TEXTURE_ALPHA_TEST) ? true : false; }
 
+	/// Whether reload() multiplied this texture's RGB by its alpha. Only the DDS decoder
+	/// does (Render/src/DDSImage.cpp, to stop bilinear filtering bleeding transparent-texel
+	/// colour into opaque edges); a .tga or an .avi frame arrives with straight alpha. A
+	/// renderer that blends (ONE, 1-SRC_ALPHA) has to know which of the two it was handed.
+	bool isPremultiplied() const { return premultiplied_; }
+	void setPremultiplied(bool on) { premultiplied_ = on; }
+
 	virtual bool IsScaleTexture() const {return false;}
 	virtual bool IsAviScaleTexture() const {return false;}
 	virtual bool IsComplexTexture() const {return false;}
@@ -130,6 +137,7 @@ protected:
 	bool is2DTexture;
 	int TotalTime;
 	bool loaded;
+	bool premultiplied_ = false;
 
 	void DeleteFromDefaultPool();
 	bool reloadDDS();

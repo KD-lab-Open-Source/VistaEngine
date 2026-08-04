@@ -117,7 +117,8 @@ bool cTexture::reloadDDS()
 	cDDSImage img;
 	// A specular map's alpha is its power, and a bump map's is nothing -- neither is
 	// opacity, so don't premultiply RGB by it (that darkened the specular colour).
-	img.setPremultiplyAlpha(!getAttribute(TEXTURE_SPECULAR | TEXTURE_BUMP));
+	setPremultiplied(!getAttribute(TEXTURE_SPECULAR | TEXTURE_BUMP));
+	img.setPremultiplyAlpha(isPremultiplied());
 	int r = img.load(buf, size);
 	delete[] buf;
 	if(r != 0)

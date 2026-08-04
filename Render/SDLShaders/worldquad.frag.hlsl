@@ -46,6 +46,15 @@ SamplerState      SceneDepthSampler : register(s1, space2);
 
 cbuffer Params : register(b0, space3)
 {
+    // .y != 0: the texture arrived with STRAIGHT alpha and has to be premultiplied here.
+    // Everything downstream of this shader -- the blend factors, the fog rules, the
+    // soft-depth fade -- is written for a premultiplied source, which is what the DDS
+    // decoder produces (Render/src/DDSImage.cpp). A .tga or an .avi frame is not, and in
+    // both games every texture this renderer draws is one of those: particle sprites, the
+    // coast foam, the sun and moon, the rain. Left straight, a texel's colour enters at
+    // full strength however transparent it is, so the soft border of a smoke puff draws
+    // as hard as its middle and the sprite reads as a bright square.
+    //
     // .x != 0: take the colour from the vertex alone and the texture for its alpha only.
     // That is the fixed-function stage the terrain lightmap's circle shadows set --
     // D3DTSS_COLOROP = D3DTOP_SELECTARG2 (arg2 being DIFFUSE), with the alpha op left at
@@ -111,6 +120,8 @@ float clipZOf(float d)
 float4 main(VSOutput input) : SV_Target0
 {
     float4 t = Tex0.Sample(Tex0Sampler, input.UV);
+    if(SelectDiffuse.y != 0.0f)
+        t.rgb *= t.a;
 
     float4 ot;
     if(SelectDiffuse.x != 0.0f)
