@@ -4546,7 +4546,14 @@ ActionAIUnitCommand::ActionAIUnitCommand()
 void ActionAIUnitCommand::activate()
 {
 	contextUnit_->executeCommand(unitCommand);
-	if(&*contextUnit_)
+	// The command can kill the unit -- Maelstrom's menu has a trigger that does exactly
+	// that -- so the link is re-checked before the second use. It has to be checked as a
+	// POINTER. `if(&*contextUnit_)` dereferences the link to take the address back off it,
+	// and dereferencing a null pointer is undefined, so an optimising compiler is entitled
+	// to assume the link is non-null and fold the test away -- which clang at -O2 does.
+	// MSVC kept the test, so the original never saw this; here it called setUsedByTrigger
+	// with a null `this` and read a string member off address 0x317.
+	if(contextUnit_)
 		contextUnit_->setUsedByTrigger(priority_, this);
 }
 
