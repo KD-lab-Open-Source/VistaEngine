@@ -358,7 +358,14 @@ void SDLWorldQuadRenderer::SetMaterial(eBlendMode blend, cTexture* texture, bool
 			default:         op = 2.f; break;   // the original xasserts; MOD is its default
 		}
 	material_.fs.colorOp[0] = op;
-	material_.fs.colorOp[1] = material_.fs.colorOp[2] = material_.fs.colorOp[3] = 0.f;
+	// Whether the fragment shader has to premultiply the texel itself. This pipeline blends
+	// a premultiplied source, and the DDS decoder hands one over -- but a .tga or an .avi
+	// frame does not, and every texture that reaches this renderer in either game is one of
+	// those. Blending straight alpha with (ONE, ...) puts the texel's colour in at full
+	// strength however transparent it is, so a soft-edged particle draws as a hard bright
+	// square. See worldquad.frag.hlsl.
+	material_.fs.colorOp[1] = (texture && !texture->isPremultiplied()) ? 1.f : 0.f;
+	material_.fs.colorOp[2] = material_.fs.colorOp[3] = 0.f;
 }
 
 // The mvp the group being opened draws with. SetWorldMaterial's mWVP: the camera cannot be
