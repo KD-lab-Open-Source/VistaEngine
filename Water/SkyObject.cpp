@@ -685,7 +685,7 @@ void EnvironmentTimeColors::mergeColor(KeysColor& out/*0.00-24.00*/,const KeysCo
 
 }
 
-void EnvironmentTimeColors::serialize(Archive& ar)
+void EnvironmentTimeColors::serializeGradients(Archive& ar)
 {
 	ar.serialize(static_cast<SkyGradient&>(fone_color),"fone_color","Цвет неба");
 	ar.serialize(static_cast<SkyGradient&>(reflect_sky_color),"reflect_sky_color","Цвет отраженного неба в воде");
@@ -693,6 +693,11 @@ void EnvironmentTimeColors::serialize(Archive& ar)
 	ar.serialize(static_cast<SkyGradient&>(fog_color),"fog_color","Цвет тумана");
 	ar.serialize(static_cast<SkyGradient&>(shadow_color),"shadow_color","Цвет теней (!!! нормальный серый около 0.5 )");
 	ar.serialize(static_cast<SkyAlphaGradient&>(circle_shadow_color),"circle_shadow_color","Цвет теней кружками");
+}
+
+void EnvironmentTimeColors::serialize(Archive& ar)
+{
+	serializeGradients(ar);
 
 	ar.serialize(RangedWrapperf(shadow_intensity, 0.0f, 1.0f), "shadow_intensity", "Интенсивность теней");
 	ar.serialize(RangedWrapperf(shadowDecay, 0.0f, 1.0f), "shadowDecay", "Ослабление теней с наклоном солнца");
@@ -956,6 +961,33 @@ void EnvironmentTime::serialize(Archive& ar)
 		if(ar.isInput())
 			SetTime(day_time, true);
 	}
+}
+
+void EnvironmentTime::serializePre2008(Archive& ar)
+{
+	// Field for field this is what the 2008 serialize above reads; only the place the
+	// names sit in the file differs, so every name here is deliberately the same one.
+	// The order follows the old writer -- the sky and the sun parameters first, the
+	// gradients last -- so that the archive finds each name on its first forward scan.
+	skyObj_->serialize(ar);
+
+	ar.serialize(RangedWrapperf(shadow_intensity, 0.0f, 1.0f), "shadow_intensity", "Интенсивность теней");
+	ar.serialize(shadowing, "shadowing", "Освещение поверхности");
+	// One ShadowingOptions used to light the ground and the objects standing on it
+	// alike; "objectShadowing" is a 2008 split.  Left at its constructed value the
+	// objects get ambient 0.2 where the world asks for 0.5, and everything facing away
+	// from the sun -- the whole shaded side of a tower block -- comes out near black.
+	objectShadowing = shadowing;
+	ar.serialize(RangedWrapperf(latitude_angle, 0.0f, 70.0f), "latitude_angle", "Широта местности (0-экватор, 90-полюс)");
+	ar.serialize(RangedWrapperf(slant_angle, -180.0f, 180.0f), "slant_angle", "Поворот солнца (-180..+180)");
+	ar.serialize(RangedWrapperf(day_time, 0.0f, 24.0f), "dayTime", "Время суток");
+
+	// Each gradient is preceded in the file by a "global_<name>_color" flag saying the
+	// world defers to a global set.  It is not read: the writer resolved the flag before
+	// saving, so the copy sitting here is already the global gradient, byte for byte.
+	EnvironmentTimeColors::serializeGradients(ar);
+
+	SetTime(day_time, true);
 }
 
 void EnvironmentTime::DrawEnviroment(Camera* pGlobalCamera)
