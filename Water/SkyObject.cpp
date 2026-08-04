@@ -963,7 +963,8 @@ void EnvironmentTime::serialize(Archive& ar)
 	}
 }
 
-void EnvironmentTime::serializePre2008(Archive& ar)
+#ifdef MAELSTROM_DATA
+void EnvironmentTime::serializeMaelstrom(Archive& ar)
 {
 	// Field for field this is what the 2008 serialize above reads; only the place the
 	// names sit in the file differs, so every name here is deliberately the same one.
@@ -973,10 +974,10 @@ void EnvironmentTime::serializePre2008(Archive& ar)
 
 	ar.serialize(RangedWrapperf(shadow_intensity, 0.0f, 1.0f), "shadow_intensity", "Интенсивность теней");
 	ar.serialize(shadowing, "shadowing", "Освещение поверхности");
-	// One ShadowingOptions used to light the ground and the objects standing on it
-	// alike; "objectShadowing" is a 2008 split.  Left at its constructed value the
-	// objects get ambient 0.2 where the world asks for 0.5, and everything facing away
-	// from the sun -- the whole shaded side of a tower block -- comes out near black.
+	// One ShadowingOptions lights the ground and the objects standing on it alike;
+	// "objectShadowing" is a 2008 split.  Left at its constructed value the objects get
+	// ambient 0.2 where the world asks for 0.5, and everything facing away from the sun
+	// -- the whole shaded side of a tower block -- comes out near black.
 	objectShadowing = shadowing;
 	ar.serialize(RangedWrapperf(latitude_angle, 0.0f, 70.0f), "latitude_angle", "Широта местности (0-экватор, 90-полюс)");
 	ar.serialize(RangedWrapperf(slant_angle, -180.0f, 180.0f), "slant_angle", "Поворот солнца (-180..+180)");
@@ -989,6 +990,7 @@ void EnvironmentTime::serializePre2008(Archive& ar)
 
 	SetTime(day_time, true);
 }
+#endif // MAELSTROM_DATA
 
 void EnvironmentTime::DrawEnviroment(Camera* pGlobalCamera)
 {

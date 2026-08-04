@@ -32,6 +32,39 @@ leaves `strtol` (`XLibs.Net/XUtil/XBUFFER/XBCNVOUT.CPP:80`) parked on the `.`, a
 
 That abort is the whole reason the converter exists.
 
+## Two ways the data drifts, two mechanisms
+
+Drift comes in two shapes, and they are dealt with in different places.
+
+**A field's *type* changed under its name.** Rewriting the value is the whole fix, so the
+data is rewritten once, offline, by `tools/maelstrom_convert.py`. See below.
+
+**A field changed *nesting* or *owner*.** There is nothing to rewrite and nothing for the
+archive to skip: the reader asks for a block the old writer never wrote, and the entire
+subtree behind that name goes unread — every control's show modes, a world's whole
+lighting, all of its sources. Fixing that means reading a different shape, and a single
+body of code cannot do it without guessing at load time which game it is looking at.
+
+So those sites are written twice and chosen at **compile time**:
+
+```
+cmake -S . -B build-mael -DMAELSTROM_DATA=ON
+```
+
+`#ifdef MAELSTROM_DATA` selects the pre-2008 layout, `#else` keeps the 2008 one, and a
+stock build is the code that was already there — Perimeter 2 carries no Maelstrom
+branches, pays for no fallback lookups, and cannot be changed by a bug in one. The cost is
+that a binary reads one game's data or the other's, not both. `grep -rn MAELSTROM_DATA` is
+the full list; each site is a section below.
+
+This replaced an earlier attempt at runtime detection (read the 2008 name, fall back to the
+old one when it is missing). It works, and for one or two fields it is tidy, but it does not
+scale: a name the data does not carry costs `openNode` a rescan of the whole enclosing
+block — three passes, children and all — so the fallbacks are paid for by the game that
+does not need them, on every control in the library. And some of the drift cannot be
+detected that way at all: sources have to be read in one place and switched on in another,
+which is a different *call graph*, not a different field name.
+
 ### Finding the type changes
 
 Diffing the two data sets by field *name* does not work — it conflates unrelated structs.
@@ -248,14 +281,15 @@ Neither is a renderer fault; four fields of `UI_ControlBase` drifted, and each i
   control whose only job is a `borderFill` dimming the world behind it to 30% black. The flag
   kept its name, the colour did not, so the fill drew — in opaque white.
 
-One cost worth knowing: a name the data does *not* carry is not free. `openNode` scans to the
-end of the block, rewinds and rescans twice before giving up, and a control's block contains
-all of its children, so a failed lookup on a container costs a walk of its whole subtree.
-Three of the four conversions above are already self-gating — they only ask for the old name
-after the new one is missing. `borderEnabled` has no such guard, so it is asked for only when
-a border is actually switched on, which is a small minority of controls.
+All five are `#ifdef MAELSTROM_DATA`, and this section is why. Read once for both games, they
+would be five extra name lookups on **every control in the library**, and a name the data does
+not carry is not free: `openNode` scans to the end of the block, rewinds and rescans twice
+before giving up, and a control's block contains all of its children — so a failed lookup on a
+container costs a walk of its whole subtree. `borderEnabled` is the only one that could be
+cheaply gated (it is asked for only when a border is switched on at all); the other four are
+asked on every control or not at all.
 
-### The world's own lighting — `Environment::serialize` / `EnvironmentTime::serializePre2008`
+### The world's own lighting — `Environment::serialize` / `EnvironmentTime::serializeMaelstrom`
 
 Everything the engine lights a world with — the sun, sky, fog and shadow gradients, the sky
 models, the latitude and slant of the sun, the time of day — used to be written **flat** in
@@ -288,8 +322,8 @@ Two smaller things ride along in the same reader:
   gradient — `c1_m1.spg` sets all six flags and carries `Scripts\Content\GlobalAttributes`'
   11-key `sun_color` verbatim.
 
-Perimeter 2 writes the block and takes the existing path; verified that `-world C2_M08` never
-enters the conversion.
+Perimeter 2 writes the block, and its build compiles the `#else`, so nothing here is on its
+path at all.
 
 ### The minimap's rotation — three fields that drifted apart
 
@@ -299,8 +333,8 @@ of them leave it portrait:
 
 - **`minimapAngle` changed owner.** It was an `Environment` field and is a `Universe` one
   now, so a pre-2008 world writes it in its `environment` block rather than in `universe`,
-  and `Universe::serialize` never sees it. `Environment` is deserialized first (inside
-  `Universe::Universe`), so the conversion reads it there and hands it across.
+  and `Universe::serialize` never sees it. `Environment` reads it there and hands it across —
+  which works in either load order, the two objects both existing by then.
 - **`getAngleFromWorld` became unreachable.** It and `rotateByCamera` used to be independent
   flags written side by side; 2008 made the second exclusive with a new
   `rotateByCameraInitial` and put `getAngleFromWorld` in the `else`. Maelstrom's data sets
@@ -309,9 +343,10 @@ of them leave it portrait:
   and `UI_Minimap::reposition` now does that only when the flag is set. Without it the quad
   spins inside a box still fitted to the *unrotated* 1:2 world.
 
-`getAngleFromWorld` appearing next to a true `rotateByCamera` is a combination the current
-writer cannot produce, so it is the marker for old data and what the `rotationScale` default
-keys off. Perimeter 2 reads `rotateByCameraInitial` instead and is untouched — measured:
+`getAngleFromWorld` appearing next to a true `rotateByCamera` is a combination the 2008 writer
+cannot produce — it was the marker for old data while this was detected at runtime, and it is
+worth keeping in mind if you are ever staring at a world file wondering which schema it is.
+Perimeter 2 reads `rotateByCameraInitial` instead and is untouched — measured:
 
 ```
 MAEL: rotByCam=1 init=0 fromWorld=1 rotScale=1 ctlAngle=0 worldAngle=90
@@ -320,6 +355,56 @@ P2:   rotByCam=1 init=1 fromWorld=0 rotScale=0 ctlAngle=0 worldAngle=0
 
 Reading order does not matter here: `XPrmIArchive::openNode` rewinds to the start of the
 block and rescans (twice) before giving up, so a field can be asked for out of order.
+
+### The world's sources — and the load order that comes with them
+
+A world's **sources** are the zones that hold its standing effects, its damage areas and its
+unit generators. Pre-2008 they were written in the `environment` block; 2008 split
+`SourceManager` out of `Environment` and moved them into `Universe`'s `sourceManager` block.
+Unread, every *placed* effect in a world is simply absent — in Maelstrom's menu that is each
+building fire, every smoke column and the green outflow from the pipe, all of them
+`SourceZone`s.
+
+This one is worth reading closely because it looked, for a long time, like a renderer fault
+(see the old register item 11, now deleted). The `.effect` files all load, the world builds
+205 `cEffect`s, and the particle renderer is reached thousands of times a frame by the sun,
+the moon and the coast foam — so every measurement short of *which texture reached
+`SetMaterial`* said the sprites were being submitted and dropped. They were never created.
+
+The read is called **inline**, not through a named block: `sources` and `anchors` sit at the
+environment's own level. And it forces a **load-order swap**, which is the part that cannot
+be expressed as a different field name:
+
+```
+2008:       environment, camera, universe
+Maelstrom:  camera, universe, environment
+```
+
+A source refers to units — its owner, its targets, the squads a generator fills — and
+`SourceManager::serialize` switches each one on as it finishes reading it. Read the
+environment first and those references resolve to nothing; the first quant then goes down on
+a legionary whose squad never existed. Maelstrom's own engine read the environment last, and
+its data depends on that.
+
+Two engine bugs surfaced behind this one, both in code shared with Perimeter 2 and both fixed
+unconditionally:
+
+- **`if(&*contextUnit_)`** in `ActionAIUnitCommand::activate` — a null test written by taking
+  the address back off a dereferenced `UnitLink`. Dereferencing null is undefined, so clang at
+  `-O2` folds the test away; MSVC kept it, which is why the original never saw it. The trigger
+  chain in Maelstrom's menu kills the unit in `executeCommand`, and the next line then called
+  `setUsedByTrigger` on a null `this`. The only `&*` used as a null test in the tree.
+- **`StateTouchDown` cast to `UnitLegionary*`.** Anything born in the air lands in that state,
+  and `SourceZone::generateUnits` drops buildings as well as legionaries. `makeStaticXY` /
+  `makeDynamicXY` are `UnitActing`'s — virtual, empty there, overridden only on
+  `UnitLegionary`, which is the author saying a unit with nothing to pin in XY passes through.
+  `StateBirthInAir` already casts to `UnitActing*` for the same pair; `StateTouchDown` did not,
+  so `safe_cast` handed back null. Retail Perimeter 2 only ever drops legionaries here.
+
+A third guard is genuinely shared: `UnitLegionary::Quant` assumed a squad. `squad_` is a
+`UnitLink` and `UnitSquad::removeUnit` clears it before deciding whether anything is left to
+kill, so a legionary can outlive its squad — which Maelstrom's worlds reach, their source
+zones damaging what stands in them.
 
 ### Silhouettes — `Camera::DrawSilhouetteObject`
 
@@ -388,11 +473,9 @@ Mostly nothing — they already load:
     treatment; it is simply larger, and `Outside` vs the old `outside` is one name that would
     need an alias. Menu.spg asks for fog at 900–1200 and a 2–1300 frustum and gets 1000–1400
     and 30–4000.
-11. **Particle effects are invisible.** Not a data fault: all 535 `.effect` files load, the
-    menu world creates 205 `cEffect`s, and a headless run reaches
-    `SDLWorldQuadRenderer::Get` 2850 times — the sprites are built and submitted, and nothing
-    shows. Same family as the white-billboard glitch already registered against the particle
-    path in Render-PORTING.md; it is the renderer, not the conversion.
+11. **Unit silhouettes are not drawn.** Stencil work that was never ported —
+    **Render-PORTING.md #22**. Unreachable on retail Perimeter 2, so this build is the only
+    way to exercise it.
 
 ## A note on judging behaviour
 

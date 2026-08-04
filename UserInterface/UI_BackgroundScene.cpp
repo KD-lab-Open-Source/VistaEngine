@@ -816,17 +816,16 @@ void UI_BackgroundScene::serialize(Archive& ar)
 	ar.serialize(lightDirection_, "lightDirection", "Направление освещения");
 	ar.serialize(lights_, "lights", "Источники света");
 
-	// CONVERSION: the background camera used to be described here, once for the whole
-	// scene -- its position, its focus and whether it was perspective. By 2008 the focus
-	// had become the per-model "scale" above (selectModel() multiplies it by scale2focus),
-	// the camera had become orthographic, and the model was pushed off the origin by the
-	// new modelPosition_ -- selectModel() used to place it with the rotation alone.
-	// Perimeter 2's models were authored for that and its data carries none of these
-	// fields, so it keeps the constructed defaults. Maelstrom's data carries all three
-	// and its models expect the old placement, so honour both together -- one without the
-	// other draws the interface at the wrong size, in the wrong projection, or off-centre.
-	// Input only: writing these back would re-introduce fields the current schema has no
-	// place for, and a zeroed focusx would scale every model to nothing on the next load.
+#ifdef MAELSTROM_DATA
+	// The background camera is described here, once for the whole scene -- its position,
+	// its focus and whether it is perspective. By 2008 the focus had become the per-model
+	// "scale" above (selectModel() multiplies it by scale2focus), the camera had become
+	// orthographic, and the model was pushed off the origin by the new modelPosition_ --
+	// selectModel() used to place it with the rotation alone. Honour all of it together:
+	// one part without the others draws the interface at the wrong size, in the wrong
+	// projection, or off-centre. Input only -- writing these back would re-introduce
+	// fields the 2008 schema has no place for, and a zeroed focusx would scale every
+	// model to nothing on the next load.
 	if(ar.isInput() && ar.openBlock("camera", "Камера")){
 		bool legacyCamera = ar.serialize(cameraPosition_, "position", "Позиция");
 
@@ -847,6 +846,7 @@ void UI_BackgroundScene::serialize(Archive& ar)
 
 		ar.closeBlock();
 	}
+#endif
 }
 
 const char* UI_BackgroundScene::groupComboList() const

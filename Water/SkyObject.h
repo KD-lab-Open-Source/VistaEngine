@@ -162,9 +162,11 @@ public:
 	bool DayChanged() { return is_day != prev_is_day; }
 	bool CheckIsDay();
 	void serialize(Archive& ar);
-	/// CONVERSION: reads the same fields written flat in the environment block, the way
-	/// worlds saved before 2008 carry them.  See Environment::serialize.
-	void serializePre2008(Archive& ar);
+#ifdef MAELSTROM_DATA
+	/// The same fields, read where a pre-2008 world writes them: flat in the environment
+	/// block rather than under "environmentTime". See Environment::serialize.
+	void serializeMaelstrom(Archive& ar);
+#endif
 	void SetFogCircle(bool need);
 	void setFogHeight(int height);
 	const Vect3f& sunPosition() const;
