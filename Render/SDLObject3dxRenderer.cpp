@@ -170,6 +170,8 @@ bool SDLObject3dxRenderer::createShaders()
 	vsSkinBump_     = makeVS(VISTA_SHADER(object3dx_skin_bump_vert));
 	vsRigidReflect_ = makeVS(VISTA_SHADER(object3dx_rigid_reflect_vert));
 	vsSkinReflect_  = makeVS(VISTA_SHADER(object3dx_skin_reflect_vert));
+	vsRigidReflectCube_ = makeVS(VISTA_SHADER(object3dx_rigid_reflect_cube_vert));
+	vsSkinReflectCube_  = makeVS(VISTA_SHADER(object3dx_skin_reflect_cube_vert));
 	vsRigidSecondOpacity_ = makeVS(VISTA_SHADER(object3dx_rigid_second_opacity_vert));
 	vsSkinSecondOpacity_  = makeVS(VISTA_SHADER(object3dx_skin_second_opacity_vert));
 	vsShadowRigid_  = makeVS(VISTA_SHADER(object3dx_shadow_rigid_vert));
@@ -187,6 +189,7 @@ bool SDLObject3dxRenderer::createShaders()
 	fs_        = makeFS(VISTA_SHADER(object3dx_frag),         2);  // diffuse + shadow map
 	fsBump_    = makeFS(VISTA_SHADER(object3dx_bump_frag),    4);  // diffuse + bump + specular + shadow map
 	fsReflect_ = makeFS(VISTA_SHADER(object3dx_reflect_frag), 3);  // diffuse + env map + shadow map
+	fsReflectCube_ = makeFS(VISTA_SHADER(object3dx_reflect_cube_frag), 3);  // the env map is the sky cube
 	fsSecondOpacity_ = makeFS(VISTA_SHADER(object3dx_second_opacity_frag), 2);  // diffuse + second-opacity map
 	fsShadow_  = makeFS(VISTA_SHADER(object3dx_shadow_frag),  1);  // diffuse, for the alpha-cutout clip
 
@@ -202,8 +205,8 @@ bool SDLObject3dxRenderer::createShaders()
 }
 
 SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skinned, bool bump, bool reflect,
-                                                           bool secondOpacity, eBlendMode blend, bool mirrored,
-                                                           bool depthWrite, bool wireframe, bool shadow)
+                                                           bool reflectCube, bool secondOpacity, eBlendMode blend,
+                                                           bool mirrored, bool depthWrite, bool wireframe, bool shadow)
 {
 	// The caster shaders take no tangent frame, no env map and write no colour, so bump,
 	// reflection, the second-opacity map and the blend mode never reach them: fold them out
@@ -211,6 +214,7 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 	if(shadow){
 		bump = false;
 		reflect = false;
+		reflectCube = false;
 		secondOpacity = false;
 		blend = (blend == ALPHA_TEST) ? ALPHA_TEST : ALPHA_NONE;
 		depthWrite = true;
@@ -226,7 +230,8 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 	                             | ((unsigned long long)shadow        << 27)
 	                             | ((unsigned long long)mirrored      << 28)
 	                             | ((unsigned long long)reflect       << 29)
-	                             | ((unsigned long long)secondOpacity << 30);
+	                             | ((unsigned long long)secondOpacity << 30)
+	                             | ((unsigned long long)reflectCube   << 31);
 	auto it = pipelines_.find(key);
 	if(it != pipelines_.end())
 		return it->second;
@@ -302,12 +307,13 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 	SDL_GPUGraphicsPipelineCreateInfo pci = {};
 	pci.vertex_shader = shadow        ? (skinned ? vsShadowSkin_ : vsShadowRigid_)
 	                  : secondOpacity ? (skinned ? vsSkinSecondOpacity_ : vsRigidSecondOpacity_)
-	                  : reflect       ? (skinned ? vsSkinReflect_ : vsRigidReflect_)
+	                  : reflect       ? (reflectCube ? (skinned ? vsSkinReflectCube_ : vsRigidReflectCube_)
+	                                                 : (skinned ? vsSkinReflect_ : vsRigidReflect_))
 	                  : bump          ? (skinned ? vsSkinBump_ : vsRigidBump_)
 	                                  : (skinned ? vsSkin_ : vsRigid_);
 	pci.fragment_shader = shadow ? fsShadow_
 	                    : secondOpacity ? fsSecondOpacity_
-	                    : reflect ? fsReflect_
+	                    : reflect ? (reflectCube ? fsReflectCube_ : fsReflect_)
 	                    : (bump ? fsBump_ : fs_);
 	pci.vertex_input_state.vertex_buffer_descriptions = &vbDesc;
 	pci.vertex_input_state.num_vertex_buffers = 1;
@@ -484,6 +490,11 @@ void SDLObject3dxRenderer::SetState(const State& state, Camera* camera)
 	// can't take it.
 	current_.reflect = current_.reflectTexture != nullptr && current_.texture != nullptr
 	                && !current_.bump && !current_.secondOpacity;
+	// Which of the two the env map is. The original reads it off the bound texture in the
+	// same place -- `is_cube = material.Tex[1]->GetAttribute(TEXTURE_CUBEMAP)` -- rather
+	// than off the material, because a sky reflection and a matcap reach it identically.
+	current_.reflectCube = current_.reflect && state.reflectTexture
+	                    && state.reflectTexture->getAttribute(TEXTURE_CUBEMAP) != 0;
 	setVec4(current_.fs.reflectAmount, state.reflectAmount);
 
 	current_.fs.params[0] = state.blend == ALPHA_TEST ? ALPHA_TEST_REF : 0.f;
@@ -638,7 +649,7 @@ bool SDLObject3dxRenderer::DrawShadowPass(SDL_GPUCommandBuffer* cmd, SDL_GPUText
 		const StateBlock& st = states_[d.state];
 
 		// The caster pass draws for the light camera, which is never mirrored.
-		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, false, false, false, st.blend, false, true, false, true);
+		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, false, false, false, false, st.blend, false, true, false, true);
 		if(!pipeline) continue;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);
@@ -734,8 +745,9 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 	for(const DrawCmd& d : draws_){
 		const StateBlock& st = states_[d.state];
 
-		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, st.bump, st.reflect, st.secondOpacity,
-		                                                st.blend, st.mirrored, d.depthWrite, wireframe, false);
+		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, st.bump, st.reflect, st.reflectCube,
+		                                                st.secondOpacity, st.blend, st.mirrored, d.depthWrite,
+		                                                wireframe, false);
 		if(!pipeline) continue;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);

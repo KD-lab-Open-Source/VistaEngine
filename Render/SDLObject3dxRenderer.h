@@ -213,6 +213,10 @@ private:
 		bool skinned;               // vertex carries weight bytes (boneCount > 1)
 		bool bump;                  // bump path: tangent-frame vertex, per-pixel lambert
 		bool reflect;               // reflection path: adds a view-space env map (no bump)
+		// The env map is the sky cubemap, not a 2D matcap: sample it by a world reflection
+		// vector instead of a sphere-map UV. The original chose this the same way, off the
+		// bound texture's TEXTURE_CUBEMAP (cObject3dx::Draw -> VSSkin::SetReflection).
+		bool reflectCube;
 		bool secondOpacity;         // second-opacity path: masks alpha by a second map (no bump/reflect)
 		// The camera was the reflection camera, whose mirror matrix reverses every
 		// triangle's winding: cull the other face (see pipelineFor).
@@ -239,7 +243,7 @@ private:
 	// depth write -- all baked into an SDL GPU pipeline. Built on demand and cached.
 	// `shadow` selects the caster pipeline: depth-only (no colour target), slope-scaled
 	// depth bias, and the shadow shaders, which ignore the tangent frame.
-	SDL_GPUGraphicsPipeline* pipelineFor(int stride, bool skinned, bool bump, bool reflect, bool secondOpacity,
+	SDL_GPUGraphicsPipeline* pipelineFor(int stride, bool skinned, bool bump, bool reflect, bool reflectCube, bool secondOpacity,
 	                                     eBlendMode blend, bool mirrored, bool depthWrite, bool wireframe, bool shadow);
 	// Append the current state to states_ if it changed since the last recorded draw.
 	int commitState();
@@ -254,11 +258,14 @@ private:
 	SDL_GPUShader* vsSkinBump_    = nullptr;   // -DSKINNED=1 -DBUMP=1
 	SDL_GPUShader* vsRigidReflect_= nullptr;   // -DSKINNED=0 -DBUMP=0 -DREFLECTION=1
 	SDL_GPUShader* vsSkinReflect_ = nullptr;   // -DSKINNED=1 -DBUMP=0 -DREFLECTION=1
+	SDL_GPUShader* vsRigidReflectCube_ = nullptr;  // ... -DREFLECT_CUBE=1
+	SDL_GPUShader* vsSkinReflectCube_  = nullptr;  // ... -DREFLECT_CUBE=1
 	SDL_GPUShader* vsRigidSecondOpacity_ = nullptr;   // -DSKINNED=0 -DBUMP=0 -DSECOND_OPACITY=1
 	SDL_GPUShader* vsSkinSecondOpacity_  = nullptr;   // -DSKINNED=1 -DBUMP=0 -DSECOND_OPACITY=1
 	SDL_GPUShader* fs_            = nullptr;   // -DBUMP=0
 	SDL_GPUShader* fsBump_        = nullptr;   // -DBUMP=1
 	SDL_GPUShader* fsReflect_     = nullptr;   // -DBUMP=0 -DREFLECTION=1
+	SDL_GPUShader* fsReflectCube_ = nullptr;   // -DBUMP=0 -DREFLECTION=1 -DREFLECT_CUBE=1
 	SDL_GPUShader* fsSecondOpacity_ = nullptr; // -DBUMP=0 -DSECOND_OPACITY=1
 	SDL_GPUShader* vsShadowRigid_ = nullptr;   // object3dx_shadow, -DSKINNED=0
 	SDL_GPUShader* vsShadowSkin_  = nullptr;   // object3dx_shadow, -DSKINNED=1

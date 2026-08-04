@@ -50,6 +50,13 @@
 #ifndef REFLECTION
 #define REFLECTION 0
 #endif
+// The original's `#if(REFLECTION==1)` / `#else` inside object_scene_light.vsl: the same
+// shader served a 2D matcap and a cube, chosen at draw time by whether the bound texture
+// was a cubemap (cObject3dx::Draw reads TEXTURE_CUBEMAP and calls VSSkin::SetReflection).
+// Here that second case is its own permutation instead of a runtime branch.
+#ifndef REFLECT_CUBE
+#define REFLECT_CUBE 0
+#endif
 #ifndef SECOND_OPACITY
 #define SECOND_OPACITY 0
 #endif
@@ -133,7 +140,11 @@ struct VSOutput
     float4 ShadowPos : TEXCOORD3;   // the original's o.tshadow
     float  Fog       : TEXCOORD4;
 #if REFLECTION
+#if REFLECT_CUBE
+    float3 Reflect   : TEXCOORD5;   // world-space reflection vector, for the sky cubemap
+#else
     float2 Reflect   : TEXCOORD5;   // sphere-map UV: view-space normal.xy mapped to [0,1]
+#endif
 #endif
 #if SECOND_OPACITY
     float2 UV1       : TEXCOORD6;   // the original's o.t1: the second-opacity map's UV
@@ -229,7 +240,11 @@ VSOutput main(VSInput input)
         // A reflection material is always lit (cObject3dx::Draw picks it after the NOLIGHT
         // branch), so this path is never taken for one at runtime -- but every output must
         // still be written for the shader to compile.
+#if REFLECT_CUBE
+        output.Reflect = float3(0.0f, 0.0f, 1.0f);
+#else
         output.Reflect = float2(0.5f, 0.5f);
+#endif
 #endif
     }
     else{
@@ -254,11 +269,19 @@ VSOutput main(VSInput input)
                                                      : float3(0.0f, 0.0f, 0.0f);
 
 #if REFLECTION
+#if REFLECT_CUBE
+        // The original's cube branch, verbatim: `dir + (2*dot(world_n,dir))*world_n`, with
+        // dir the normalized vertex->camera vector computed above. That is the view ray
+        // mirrored about the normal, in world space, which is how the cube is addressed --
+        // the sky cubemap's faces were rendered with world-oriented cameras.
+        output.Reflect = dir + (2.0f * dot(n, dir)) * n;
+#else
         // The original's `mul(world_n, (float3x2)mView)*0.5 + 0.5`: the world normal taken
         // into camera space (w = 0 drops the translation), its x,y are the projections onto
         // the camera right/up axes -- a view-space sphere map.
         float3 nView = mul(float4(n, 0.0f), View).xyz;
         output.Reflect = nView.xy * 0.5f + 0.5f;
+#endif
 #endif
     }
 #endif

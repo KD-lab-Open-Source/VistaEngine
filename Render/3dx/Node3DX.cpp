@@ -797,13 +797,16 @@ void cObject3dx::Draw(Camera* camera)
 			st.noLight = no_light_object;
 			st.selfIllumination = !mat.tex_self_illumination.empty() && !getAttribute(ATTR3DX_NO_SELFILLUMINATION);
 
-			// The 2D reflection path (vsSkinReflection/psSkinReflection): a lit material
-			// with an environment ("matcap") map, dispatched before bump exactly as
-			// cObject3dx::Draw does -- the two are mutually exclusive. The sky-cubemap
-			// variant (is_reflect_sky) is not ported and falls through to the plain lit path.
-			if(!mat.pSecondOpacityTexture && !no_light_object
-			   && mat.pReflectTexture && !mat.is_reflect_sky){
-				st.reflectTexture = mat.pReflectTexture;
+			// The reflection path (vsSkinReflection/psSkinReflection): a lit material with an
+			// environment map, dispatched before bump exactly as cObject3dx::Draw does -- the
+			// two are mutually exclusive. The map is either the material's own 2D "matcap" or,
+			// when its reflect texture was named sky.* (is_reflect_sky), the sky cubemap the
+			// environment renders per frame. The original tests the two together here and
+			// tells the shader apart by the bound texture's type, which is what the renderer
+			// does with TEXTURE_CUBEMAP.
+			cTexture* envMap = mat.is_reflect_sky ? scene()->GetSkyCubemap() : mat.pReflectTexture;
+			if(!mat.pSecondOpacityTexture && !no_light_object && envMap){
+				st.reflectTexture = envMap;
 				// PSSkin::SetReflection's amount: reflect_amount * the node's diffuse (a = 0).
 				st.reflectAmount = Color4f(mat.reflect_amount * diffuse.r,
 				                           mat.reflect_amount * diffuse.g,
@@ -813,8 +816,7 @@ void cObject3dx::Draw(Camera* camera)
 			// The bump path, on the same terms the original picks vsSkinBump: after the
 			// second-opacity, NOLIGHT and reflection materials have had their turn. It also
 			// needs the tangent frame, which the vertex only carries when pStatic->bump.
-			if(!mat.pSecondOpacityTexture && !no_light_object
-			   && !mat.pReflectTexture && !mat.is_reflect_sky
+			if(!mat.pSecondOpacityTexture && !no_light_object && !envMap
 			   && mat.pBumpTexture && Option_EnableBump && pStatic->bump){
 				st.bumpTexture = mat.pBumpTexture;
 				st.specularMap = mat.pSpecularmap;   // PSSkinBump::SelectSpecularMap

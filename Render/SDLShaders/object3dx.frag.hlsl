@@ -54,6 +54,11 @@
 #ifndef REFLECTION
 #define REFLECTION 0
 #endif
+// See object3dx.vert.hlsl: the cube case of the original's one reflection shader. The sky
+// cubemap the environment renders per frame, sampled by a world-space reflection vector.
+#ifndef REFLECT_CUBE
+#define REFLECT_CUBE 0
+#endif
 #ifndef SECOND_OPACITY
 #define SECOND_OPACITY 0
 #endif
@@ -70,8 +75,14 @@ SamplerState      SpecularSampler : register(s2, space2);
 Texture2D<float>  ShadowTexture   : register(t3, space2);
 SamplerState      ShadowSampler   : register(s3, space2);
 #elif REFLECTION
-// The 2D environment map (the original's ReflectionSampler), then the shadow map after it.
-Texture2D<float4> ReflectionTexture : register(t1, space2);
+// The environment map (the original's ReflectionSampler), then the shadow map after it.
+// Same slot either way -- only the texture's type differs, so the renderer binds a cube
+// or a 2D texture to t1 and picks the matching permutation.
+#if REFLECT_CUBE
+TextureCube<float4> ReflectionTexture : register(t1, space2);
+#else
+Texture2D<float4>   ReflectionTexture : register(t1, space2);
+#endif
 SamplerState      ReflectionSampler : register(s1, space2);
 Texture2D<float>  ShadowTexture     : register(t2, space2);
 SamplerState      ShadowSampler     : register(s2, space2);
@@ -129,7 +140,11 @@ struct VSOutput
     float4 ShadowPos : TEXCOORD3;
     float  Fog       : TEXCOORD4;
 #if REFLECTION
+#if REFLECT_CUBE
+    float3 Reflect   : TEXCOORD5;   // world reflection vector, from the vertex shader
+#else
     float2 Reflect   : TEXCOORD5;   // sphere-map UV, from the vertex shader
+#endif
 #endif
 #if SECOND_OPACITY
     float2 UV1       : TEXCOORD6;   // second-opacity map UV, from the vertex shader

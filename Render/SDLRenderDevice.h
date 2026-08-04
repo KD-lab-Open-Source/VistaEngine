@@ -315,6 +315,18 @@ public:
 	// cScene detaches the light camera whenever shadows are off, and the map outlives it.
 	bool shadowPassRan() const { return shadowPassRan_; }
 
+	// --- the sky cubemap --------------------------------------------------
+	// cRenderCubemap's cube texture, which D3D made with CreateCubeTexture. Six faces of
+	// one square texture, sampled by the object shader's reflection path.
+	int createCubeTexture(cTexture* texture);
+	// Copy a face into it. The faces are NOT rendered into directly: every renderer here
+	// builds its own SDL_GPUColorTargetInfo, so aiming a pass at one cube layer would mean
+	// a layer argument through all ten of them. Instead cRenderSky draws a face into an
+	// ordinary offscreen 2D target -- the path the water reflection already proves -- and
+	// this copies that into the layer. One 256x256 copy per frame, since cRenderCubemap
+	// redraws one face per frame after the first.
+	void copyToCubeFace(cTexture* cube, int face, cTexture* source);
+
 	// --- 3dx objects ------------------------------------------------------
 	// cObject3dx::Draw talks to the object renderer directly (the way it talks to
 	// gb_RenderDevice3D's shaders on Windows); the device only hands it over, and
