@@ -757,10 +757,9 @@ float EnvironmentTime::CalcNormalScale()
 	return k_scale;
 }
 
-// TODO(sdl-port): nothing calls this any more -- Environment::graphQuant did, from a D3D-only
-// branch. cRenderCubemap::Init gives up without a device, so pCubeRender holds no cube texture
-// and this would render into nothing. See Documents/Render-PORTING.md #9 -- and note it records that the
-// cubemap had no consumer even on D3D, so check that before reviving it.
+// Called from Environment::graphQuant, before the world draws: one face of the sky cubemap
+// per frame. Its consumer is a material whose reflection map is named sky.* -- none in
+// Perimeter 2's content, 116 models in Maelstrom's, whose glass is nearly black without it.
 void EnvironmentTime::Draw()
 {
 	pCubeRender->Animate(0);

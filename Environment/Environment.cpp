@@ -294,10 +294,11 @@ void Environment::graphQuant(float dt, Camera* camera)
 	else
 		gb_RenderDevice->SetGlobalFog(Color4f(environmentTime()->GetCurFogColor()), Vect2f(-1, -2));
 
-	// TODO(sdl-port): one thing the original did here is gone with D3D9 --
-	//   the sky cubemap (environmentTime()->Draw()).      Render-PORTING.md #9
-	// Everything it drives (the time-of-day colours) is portable and still updated
-	// every frame.
+	// The sky cubemap, which every reflective material samples. It redraws one of its six
+	// faces per frame (cRenderCubemap::Draw), and only the sky scene goes into it, so the
+	// cost is about one extra sky render a frame. It has to happen before the world draws:
+	// the objects that reflect it are drawn below, and they read the texture it fills.
+	environmentTime()->Draw();
 
 	// The sky: the sun or the moon, then the cloud models, drawn through the sky camera's
 	// own scene. It opens the frame -- everything below is drawn over it.
