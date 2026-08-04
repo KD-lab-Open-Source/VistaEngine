@@ -221,6 +221,40 @@ Worth checking early on anything that renders blank rather than wrong: `showMode
 null is indistinguishable at a glance from a missing texture, and the two lead to opposite
 places.
 
+### The start screen — four fields on every control — `UI_ControlBase::serialize`
+
+With the show modes read, the start screen came up as a **white sheet with untitled buttons**.
+Neither is a renderer fault; four fields of `UI_ControlBase` drifted, and each is a different
+*kind* of drift, so they are worth keeping apart:
+
+| pre-2008 | now | what breaks when it is not read |
+|---|---|---|
+| `locText = { key; id; }` | `text` (literal) | every caption is blank |
+| `borderColor` — `sColor4f` | `borderClr` — `Color4c` | fills paint at the constructed opaque white |
+| `borderOutlineColor` — `sColor4f` | `borderOutlineClr` — `Color4c` | outlines likewise |
+| `borderEnabled` | *gone* | "keep the colours, don't draw" becomes a visible rectangle |
+| `screenZ_` | `screenZ` | depth is 0 everywhere; the screen draws in list order |
+
+- **Captions were a key, not a string.** A control named its text through the localization
+  database and the engine resolved it at load (`TextDB::getText`); the literal `text_` beside
+  it was only written when that key was empty. By 2008 the indirection was gone and
+  `UI_Attributes` is itself per-language. Reading `locText` when neither literal is present
+  restores every button label, screen title and prompt at once.
+- **The border colours are a rename *and* a type change** — float RGBA 0…1 to byte RGBA
+  0…255 — so neither the archive's name-skipping nor a plain re-read bridges it: pointing
+  `Color4c::serialize` at `r = 0.321569` stops the parser mid-number and aborts the load with
+  `Expected Token: ";", Received Token: ".321569"`. Read it into a `Color4f` and convert.
+- **That is where the white screen came from.** Every screen has a full-screen `background`
+  control whose only job is a `borderFill` dimming the world behind it to 30% black. The flag
+  kept its name, the colour did not, so the fill drew — in opaque white.
+
+One cost worth knowing: a name the data does *not* carry is not free. `openNode` scans to the
+end of the block, rewinds and rescans twice before giving up, and a control's block contains
+all of its children, so a failed lookup on a container costs a walk of its whole subtree.
+Three of the four conversions above are already self-gating — they only ask for the old name
+after the new one is missing. `borderEnabled` has no such guard, so it is asked for only when
+a border is actually switched on, which is a small minority of controls.
+
 ### The minimap's rotation — three fields that drifted apart
 
 Maelstrom's worlds are **2048×4096** — twice as deep as they are wide — and turn the minimap
@@ -292,9 +326,11 @@ Mostly nothing — they already load:
 6. **`C3DX_BASEMENT`** (500/501/502) — building foundation geometry, a Maelstrom feature P2
    dropped — is silently ignored by the chunk switch.
 7. **Not every mission has been run.** `c1_m1` and `c1_m2` load; the rest are untested.
-8. **The main menu draws, but not all of it.** The black screen was the unread trigger
-   chain and the blank one was the show-mode nesting; both are fixed and the menu now comes
-   up. Parts of it are still missing — not yet diagnosed, and not necessarily one cause.
+8. **Tooltips are missing.** A state used to carry its hover text directly
+   (`hoveredTextLoc`, a localization key, read by `UI_ControlState::serialize`); 2008 moved
+   it into a `UI_ACTION_HOVER_INFO` action. Maelstrom's data writes the old field, nothing
+   reads it, and no control shows a tooltip. Not converted — the screens themselves are
+   readable without it.
 9. **`OPTION_SCREEN_SIZE` means a different resolution.** It is an *index*, and the list it
    indexes is C++ (`Game/GameOptionsSerialization.cpp:48`) — the `comment` string beside it
    in the data is only a label. Maelstrom's saved index 25 is 1920×1080 in Maelstrom's list;

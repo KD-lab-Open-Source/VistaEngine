@@ -2143,13 +2143,29 @@ void UI_ControlBase::serialize(Archive& ar)
 
 	ar.serialize(canHovered_, "canHovered", "реагирует на мышь");
 
-	ar.serialize(screenZ_, "screenZ", "Глубина");
+	// CONVERSION: the depth used to be written as "screenZ_" and lost its underscore.
+	// Unread, every control keeps the constructed 0 and the screen draws in list order
+	// instead of in depth order -- backgrounds land on top of what they back.
+	if(!ar.serialize(screenZ_, "screenZ", "Глубина") && ar.isInput())
+		ar.serialize(screenZ_, "screenZ_", 0);
 
 	if(ar.openBlock ("text", "текст")){
 		if(!ar.serialize(text_, "text", "<")){
 			string ansitext;
 			ar.serialize(ansitext, "text_", 0);
 			a2w(text_, ansitext);
+
+			// CONVERSION: a caption used to be a key into the localization database
+			// ("locText"), resolved through TextDB at load; the literal "text_" above was
+			// only written when that key was empty. By 2008 the indirection was gone and
+			// UI_Attributes itself is per-language. Read the key when neither literal is
+			// there -- otherwise every caption in pre-2008 data is blank, and a control
+			// with no text draws no text: the buttons come up as bare sprites.
+			if(ar.isInput() && text_.empty()){
+				LocString locText;
+				if(ar.serialize(locText, "locText", 0))
+					text_ = locText.c_str();
+			}
 		}
 		ar.serialize(textAlign_, "textAlign_", "горизонтально");
 		ar.serialize(textVAlign_, "textVAlign", "вертикально");
@@ -2161,12 +2177,36 @@ void UI_ControlBase::serialize(Archive& ar)
 	if(ar.openBlock("border", "рамка"))
 	{
 		ar.serialize(borderOutline_, "borderOutline", "обводка");
-		if(borderOutline_)
-			ar.serialize(borderOutlineColor_, "borderOutlineClr", "цвет рамки");
+		// CONVERSION: both border colours were floats named "border*Color" and are bytes
+		// named "border*Clr" now -- a rename *and* a type change, so neither the archive's
+		// name skipping nor a plain re-read bridges it. The flags kept their names, so
+		// pre-2008 data switches the border on and then leaves the colour at the
+		// constructed opaque white. A screen's full-screen "background" control is exactly
+		// that: a fill meant to dim the world behind it to 30% black, which instead paints
+		// the whole screen white.
+		if(borderOutline_ && !ar.serialize(borderOutlineColor_, "borderOutlineClr", "цвет рамки") && ar.isInput()){
+			Color4f color = Color4f::ZERO;
+			if(ar.serialize(color, "borderOutlineColor", 0))
+				borderOutlineColor_ = color;
+		}
 
 		ar.serialize(borderFill_, "borderFill", "заливка");
-		if(borderFill_)
-			ar.serialize(borderColor_, "borderClr", "цвет заливки");
+		if(borderFill_ && !ar.serialize(borderColor_, "borderClr", "цвет заливки") && ar.isInput()){
+			Color4f color = Color4f::ZERO;
+			if(ar.serialize(color, "borderColor", 0))
+				borderColor_ = color;
+		}
+
+		// CONVERSION: drawing the border used to be gated on a third flag above the other
+		// two, and dropping it turned every "keep the colours but don't draw" control into
+		// a visible rectangle. Only ask when one of them is set -- a name the current data
+		// does not carry costs the archive a rescan of the whole control, children and all,
+		// and asking for every control in the library is measurable at load.
+		if(ar.isInput() && (borderFill_ || borderOutline_)){
+			bool borderEnabled = true;
+			if(ar.serialize(borderEnabled, "borderEnabled", 0) && !borderEnabled)
+				borderFill_ = borderOutline_ = false;
+		}
 
 		ar.closeBlock ();
 	}
