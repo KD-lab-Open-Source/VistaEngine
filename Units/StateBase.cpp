@@ -369,16 +369,24 @@ bool StateFlyDown::canFinish(UnitReal* owner) const
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
+// Anything born in the air lands in this state, and not everything born in the air is a
+// legionary: StateBirthInAir::finish switches into it, and both of these calls are
+// UnitActing's -- virtual, with empty bodies there and an override only on UnitLegionary,
+// which is the author saying that a unit with nothing to pin in XY passes through. Cast to
+// UnitLegionary and a building dropped from the sky gets a null out of safe_cast's
+// dynamic_cast and takes the frame down. StateBirthInAir, on the way in, already casts to
+// UnitActing for the same pair. Retail Perimeter 2 only ever drops legionaries here;
+// Maelstrom's menu drops buildings, which is how this surfaced.
 void StateTouchDown::start(UnitReal* owner) const
 {
-	safe_cast<UnitLegionary*>(owner)->makeStaticXY(UnitActing::STATIC_DUE_TO_TOUCH_DOWN);
+	safe_cast<UnitActing*>(owner)->makeStaticXY(UnitActing::STATIC_DUE_TO_TOUCH_DOWN);
 	owner->setChainByHealthWithTimer(CHAIN_TOUCH_DOWN, owner->attr().chainTouchDownTime);
 }
 
 void StateTouchDown::finish(UnitReal* owner, bool finished) const
 {
 	__super::finish(owner, finished);
-	safe_cast<UnitLegionary*>(owner)->makeDynamicXY(UnitActing::STATIC_DUE_TO_TOUCH_DOWN);
+	safe_cast<UnitActing*>(owner)->makeDynamicXY(UnitActing::STATIC_DUE_TO_TOUCH_DOWN);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
