@@ -380,7 +380,16 @@ void Environment::serialize(Archive& ar)
 				universe()->setMinimapAngle(minimapAngle);
 		}
 
-		ar.serialize(*environmentTime_, "environmentTime", "Время");
+		// CONVERSION: everything the environment lights a world with -- the sun, shadow
+		// and sky gradients, the sky models, the time of day -- used to be written flat
+		// in this block and moved under "environmentTime" by 2008.  Unread, a pre-2008
+		// world lights itself entirely from the constructed defaults: midday where it
+		// asked for a quarter past nine, ambient 0.2 where it asked for 0.5, a default
+		// cloud layer instead of its own.  The terrain still looks about right, because
+		// its colour is baked per cell in the height map -- it is the objects standing on
+		// it that go black.
+		if(!ar.serialize(*environmentTime_, "environmentTime", "Время") && ar.isInput())
+			environmentTime_->serializePre2008(ar);
 
 		if(grassMap)
 			ar.serialize(*grassMap, "Grass", "Трава");

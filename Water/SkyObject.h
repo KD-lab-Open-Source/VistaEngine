@@ -162,6 +162,9 @@ public:
 	bool DayChanged() { return is_day != prev_is_day; }
 	bool CheckIsDay();
 	void serialize(Archive& ar);
+	/// CONVERSION: reads the same fields written flat in the environment block, the way
+	/// worlds saved before 2008 carry them.  See Environment::serialize.
+	void serializePre2008(Archive& ar);
 	void SetFogCircle(bool need);
 	void setFogHeight(int height);
 	const Vect3f& sunPosition() const;

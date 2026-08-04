@@ -255,6 +255,42 @@ Three of the four conversions above are already self-gating — they only ask fo
 after the new one is missing. `borderEnabled` has no such guard, so it is asked for only when
 a border is actually switched on, which is a small minority of controls.
 
+### The world's own lighting — `Environment::serialize` / `EnvironmentTime::serializePre2008`
+
+Everything the engine lights a world with — the sun, sky, fog and shadow gradients, the sky
+models, the latitude and slant of the sun, the time of day — used to be written **flat** in
+the world's `environment` block. 2008 moved the lot under an `environmentTime` sub-block, so
+`openStruct` fails and a pre-2008 world lights itself entirely from constructed defaults.
+
+| the world asks for | it got instead |
+|---|---|
+| `dayTime = 9.2` | 14.0 — the sun in a different place in the sky |
+| `latitude_angle = 11`, `slant_angle = 5` | 36, 0 |
+| `shadowing = { 0.5, 0.5, 1.0 }` | 0.75, **0.2**, 1.0 |
+| its own 8-key `sun_color` ramp | the built-in default ramp |
+| `Sky_Clouds_Day_Default_90grad.3DX` + stars + night clouds | one default cloud layer |
+
+The visible half of that is `ambient_maximal`. The terrain survives it, because its colour is
+baked per fine cell in the height map and only modulated by the light — but an object is lit
+from the sun alone, so at ambient 0.2 every surface facing away from it, the whole shaded side
+of a tower block, comes out near black. Measured over matching patches of the same shot, the
+terrain came in at 0.42× the original's brightness and the shaded tower at 0.06×.
+
+Two smaller things ride along in the same reader:
+
+- **`objectShadowing` did not exist.** One `ShadowingOptions` lit the ground and the objects
+  standing on it alike; 2008 split it in two. The conversion gives the objects the ground's
+  numbers, which is what the old engine did.
+- **`global_<name>_color` is not read.** Each gradient is preceded in the file by a flag
+  saying the world defers to a global set (in its own `environmentColors` block, or in
+  `Scripts\Content\GlobalAttributes` when it declared none). It can be ignored: the writer
+  resolved the flag before saving, so the copy sitting in the world is already the global
+  gradient — `c1_m1.spg` sets all six flags and carries `Scripts\Content\GlobalAttributes`'
+  11-key `sun_color` verbatim.
+
+Perimeter 2 writes the block and takes the existing path; verified that `-world C2_M08` never
+enters the conversion.
+
 ### The minimap's rotation — three fields that drifted apart
 
 Maelstrom's worlds are **2048×4096** — twice as deep as they are wide — and turn the minimap
@@ -339,6 +375,24 @@ Mostly nothing — they already load:
    window aspect, and with it which branch of the letterbox/pillarbox code runs — Perimeter 2
    at its own default of 1280×1024 never takes the wide branch that Maelstrom then does.
    Belongs in the converter, which would have to renumber the index against our list.
+10. **The whole preset group is at its constructed defaults.** By 2008 the environment was
+    split in two: what a world carries, and what its `presetName` file carries — everything
+    under `if(ar.filter(SERIALIZE_PRESET_DATA))` in `Environment::serialize`. Maelstrom ships
+    no `Scripts\Content\Presets\` at all, so `loadPreset()` opens nothing and that whole
+    branch never runs, on any world. The data is there — the old writer put it flat in the
+    `environment` block (`fog_enable`, `enableBloom`, `underWater*`, DOF, `lensFlare_`) or one
+    level down in `environmentColors` (`fog_start`/`fog_end`, `height_fog_circle`,
+    `effect*Distance`, `game_frustrum_*`, `hideSmoothly`, `windMap`, `fallout`,
+    `coastSprites`) — and the names still match, `openBlock` being a no-op. So this is the
+    same shape of conversion as the environment-time one above and would want the same
+    treatment; it is simply larger, and `Outside` vs the old `outside` is one name that would
+    need an alias. Menu.spg asks for fog at 900–1200 and a 2–1300 frustum and gets 1000–1400
+    and 30–4000.
+11. **Particle effects are invisible.** Not a data fault: all 535 `.effect` files load, the
+    menu world creates 205 `cEffect`s, and a headless run reaches
+    `SDLWorldQuadRenderer::Get` 2850 times — the sprites are built and submitted, and nothing
+    shows. Same family as the white-billboard glitch already registered against the particle
+    path in Render-PORTING.md; it is the renderer, not the conversion.
 
 ## A note on judging behaviour
 
