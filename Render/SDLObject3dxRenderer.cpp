@@ -206,7 +206,8 @@ bool SDLObject3dxRenderer::createShaders()
 
 SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skinned, bool bump, bool reflect,
                                                            bool reflectCube, bool secondOpacity, eBlendMode blend,
-                                                           bool mirrored, bool depthWrite, bool wireframe, bool shadow)
+                                                           bool mirrored, bool depthWrite, bool wireframe, bool shadow,
+                                                           bool cullNone)
 {
 	// The caster shaders take no tangent frame, no env map and write no colour, so bump,
 	// reflection, the second-opacity map and the blend mode never reach them: fold them out
@@ -219,6 +220,10 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 		blend = (blend == ALPHA_TEST) ? ALPHA_TEST : ALPHA_NONE;
 		depthWrite = true;
 		wireframe = false;
+		// The caster keeps drawing both faces, as it did before culling was honoured: what
+		// the light sees is a separate question from what the camera does, and a one-sided
+		// caster changes which surface writes the depth every receiver is compared against.
+		cullNone = true;
 	}
 
 	const unsigned long long key = (unsigned long long)(unsigned)stride
@@ -231,7 +236,8 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 	                             | ((unsigned long long)mirrored      << 28)
 	                             | ((unsigned long long)reflect       << 29)
 	                             | ((unsigned long long)secondOpacity << 30)
-	                             | ((unsigned long long)reflectCube   << 31);
+	                             | ((unsigned long long)reflectCube   << 31)
+	                             | ((unsigned long long)cullNone      << 32);
 	auto it = pipelines_.find(key);
 	if(it != pipelines_.end())
 		return it->second;
@@ -321,18 +327,18 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 	pci.vertex_input_state.num_vertex_attributes = (Uint32)n;
 	pci.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
 	pci.rasterizer_state.fill_mode = wireframe ? SDL_GPU_FILLMODE_LINE : SDL_GPU_FILLMODE_FILL;
-	// The scene passes flip culling per node type (DrawObjectSpecial and DrawSortObject
-	// both force D3DCULL_NONE), and the SDL device does not track D3DRS_CULLMODE yet, so
-	// the ordinary cameras keep drawing both faces.
+	// cD3DRender::setCamera culls back faces throughout (CurrentCullMode = D3DCULL_CW),
+	// flipping the winding for the reflection camera, whose mirror matrix reversed every
+	// triangle (D3DCULL_CCW). Camera::DrawObject restores that with RS_CULLMODE -1, and
+	// DrawSortObject inherits it -- so in the main scene only DrawObjectSpecial turns
+	// culling off. Anything drawn double-sided that the original culled shows its far wall
+	// from the inside: a tower's broken windows read as opaque instead of seeing through.
 	//
-	// The reflection camera cannot: its mirror matrix puts the eye below the terrain, so
-	// with nothing culled the heightfield's underside rasterizes as a ceiling between the
-	// eye and everything standing on it, and the palms never survive the depth test.
-	// cD3DRender::setCamera meets this by culling back faces throughout and flipping the
-	// winding for the reflection (D3DCULL_CW -> D3DCULL_CCW), the mirror having reversed
-	// every triangle. Cull FRONT here, which with SDL's counter-clockwise front face is
-	// that same D3DCULL_CCW.
-	pci.rasterizer_state.cull_mode = mirrored ? SDL_GPU_CULLMODE_FRONT : SDL_GPU_CULLMODE_NONE;
+	// With SDL's counter-clockwise front face, D3DCULL_CW is CULLMODE_BACK and D3DCULL_CCW
+	// is CULLMODE_FRONT.
+	pci.rasterizer_state.cull_mode = cullNone  ? SDL_GPU_CULLMODE_NONE
+	                               : mirrored  ? SDL_GPU_CULLMODE_FRONT
+	                                           : SDL_GPU_CULLMODE_BACK;
 	// Clip near/far like D3D9's default, not SDL's depth-clamp default, so an object behind
 	// a camera's near plane is clipped rather than clamped onto it (see
 	// SDLTileMapRenderer::createPipeline). The shadow caster keeps clamp so casters past the
@@ -551,6 +557,16 @@ void SDLObject3dxRenderer::SetState(const State& state, Camera* camera)
 	current_.blend = state.blend;
 	current_.skinned = boneCount > 1;
 	current_.mirrored = camera->getAttribute(ATTRCAMERA_REFLECTION) != 0;
+	current_.cullNone = camera->GetCameraPass() == SCENENODE_OBJECTSPECIAL
+#ifdef MAELSTROM_DATA
+	// The one place the two engines' culling differs. Before 2008 DrawSortObject saved the
+	// cull mode, forced D3DCULL_NONE around the sorted pass and put it back; 2008 dropped
+	// the call, so the sorted pass inherits the camera's back-face cull. Maelstrom's models
+	// were authored against the first of those, so its transparent materials -- glass,
+	// foliage cards -- expect to be drawn from both sides.
+	                 || camera->GetCameraPass() == SCENENODE_OBJECTSORT
+#endif
+	                    ;
 
 	currentValid_ = true;
 	currentDirty_ = true;
@@ -649,7 +665,7 @@ bool SDLObject3dxRenderer::DrawShadowPass(SDL_GPUCommandBuffer* cmd, SDL_GPUText
 		const StateBlock& st = states_[d.state];
 
 		// The caster pass draws for the light camera, which is never mirrored.
-		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, false, false, false, false, st.blend, false, true, false, true);
+		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, false, false, false, false, st.blend, false, true, false, true, st.cullNone);
 		if(!pipeline) continue;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);
@@ -747,7 +763,7 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 
 		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, st.bump, st.reflect, st.reflectCube,
 		                                                st.secondOpacity, st.blend, st.mirrored, d.depthWrite,
-		                                                wireframe, false);
+		                                                wireframe, false, st.cullNone);
 		if(!pipeline) continue;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);
