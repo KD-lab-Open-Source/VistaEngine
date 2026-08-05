@@ -873,18 +873,52 @@ void EnvironmentTime::SetTime(float time, bool init)
 
 	Color4f sunDiffuse(cur_sun_color);
 	objectShadowing.scaleDiffuse(sunDiffuse);
+#ifdef MAELSTROM_DATA
+	// Before 2008 one ShadowingOptions lit the ground and the objects standing on it alike,
+	// and the objects took it at double strength: SetTime wrote tilemap_color.a*2 and
+	// tilemap_color.rgb*2 into SetSun, which clamped the result to 1. Splitting a separate
+	// "objectShadowing" out in 2008 dropped the factor, because a world can now write the
+	// doubled numbers itself -- Maelstrom's worlds cannot, and every one of them asks for
+	// ambient_factor 0.5, so without this the shaded side of a building is lit at half of
+	// what the original gave it. The terrain above is untouched: it never had the factor.
+	sunAmbient.r = sunAmbient.g = sunAmbient.b = min(sunAmbient.r*2.f, 1.f);
+	sunDiffuse.r = min(sunDiffuse.r*2.f, 1.f);
+	sunDiffuse.g = min(sunDiffuse.g*2.f, 1.f);
+	sunDiffuse.b = min(sunDiffuse.b*2.f, 1.f);
+#endif
 	pScene->SetSunColor(sunAmbient, sunDiffuse, Color4f(cur_sun_color));
 
 	pScene->SetSunDirection(light_vector);
 	pScene->SetSunShadowDir(light_vector_shadow);
 
 	Color4f shadowColor = shadow_color.Get(factor);
+#ifdef MAELSTROM_DATA
+	// The old formula, and it has to be the old one: the two read shadow_color differently.
+	// 2008 divides by the gradient's own darkest channel, so it treats the colour as a hue
+	// and takes the depth of the shadow from shadow_intensity alone -- which is why the
+	// editor caption asks for "normal grey, about 0.5". Before 2008 the colour *was* the
+	// shadow, doubled and faded by the sun's height, and Maelstrom's worlds are authored
+	// that way: c1_m1 asks for (0.23,0.27,0.47) at noon, which the 2008 reading normalises
+	// to (0.48,0.54,0.90) -- barely a shadow, and the blue gone with it.
+	//
+	// time_shadow_off and speed_shadow_off were constructor constants, never serialized:
+	// the shadow starts fading only in the last 30 degrees before the horizon, and then
+	// fast. shadowDecay, which replaced them, has no counterpart in the file.
+	const float time_shadow_off = 1 - 4.f/12;
+	const float speed_shadow_off = 10;
+	float shadowFactor = clamp((fabsf(light_angle_shadow) - M_PI_2*time_shadow_off)*speed_shadow_off, 0.f, 1.f);
+	shadowFactor = shadowFactor*shadow_intensity + (1 - shadow_intensity);
+	shadowColor.r = min(shadowColor.r*2*shadowFactor, 1.0f);
+	shadowColor.g = min(shadowColor.g*2*shadowFactor, 1.0f);
+	shadowColor.b = min(shadowColor.b*2*shadowFactor, 1.0f);
+#else
 	float shadowFactor = clamp(shadow_intensity*(1 - fabsf(time_angle)*shadowDecay/(M_PI_2)), 0.f, 1.f);
 	float minColor = min(shadowColor.r, shadowColor.g, shadowColor.b);
 	shadowFactor = (1.f - shadowFactor)/(minColor + 0.01f);
-	shadowColor.r = min(shadowColor.r*shadowFactor, 1.0f); 
-	shadowColor.g = min(shadowColor.g*shadowFactor, 1.0f); 
-	shadowColor.b = min(shadowColor.b*shadowFactor, 1.0f); 
+	shadowColor.r = min(shadowColor.r*shadowFactor, 1.0f);
+	shadowColor.g = min(shadowColor.g*shadowFactor, 1.0f);
+	shadowColor.b = min(shadowColor.b*shadowFactor, 1.0f);
+#endif
 	shadowColor.a = 1;
 	pScene->SetShadowIntensity(shadowColor);
 
@@ -976,7 +1010,8 @@ void EnvironmentTime::serializeMaelstrom(Archive& ar)
 	// One ShadowingOptions lights the ground and the objects standing on it alike;
 	// "objectShadowing" is a 2008 split.  Left at its constructed value the objects get
 	// ambient 0.2 where the world asks for 0.5, and everything facing away from the sun
-	// -- the whole shaded side of a tower block -- comes out near black.
+	// -- the whole shaded side of a tower block -- comes out near black.  The objects
+	// then took it at double strength; SetTime puts that factor back.
 	objectShadowing = shadowing;
 	ar.serialize(RangedWrapperf(latitude_angle, 0.0f, 70.0f), "latitude_angle", "Широта местности (0-экватор, 90-полюс)");
 	ar.serialize(RangedWrapperf(slant_angle, -180.0f, 180.0f), "slant_angle", "Поворот солнца (-180..+180)");
