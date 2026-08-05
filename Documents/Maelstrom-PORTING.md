@@ -329,7 +329,8 @@ Two smaller things ride along in the same reader:
 
 - **`objectShadowing` did not exist.** One `ShadowingOptions` lit the ground and the objects
   standing on it alike; 2008 split it in two. The conversion gives the objects the ground's
-  numbers, which is what the old engine did.
+  numbers, which is what the old engine did — and then doubles them, which is also what the
+  old engine did. See the next section.
 - **`global_<name>_color` is not read.** Each gradient is preceded in the file by a flag
   saying the world defers to a global set (in its own `environmentColors` block, or in
   `Scripts\Content\GlobalAttributes` when it declared none). It can be ignored: the writer
@@ -339,6 +340,42 @@ Two smaller things ride along in the same reader:
 
 Perimeter 2 writes the block, and its build compiles the `#else`, so nothing here is on its
 path at all.
+
+### Two lighting formulas that changed under the same field names — `EnvironmentTime::SetTime`
+
+Reading the right numbers is not enough here. `SetTime` turns them into the sun and shadow
+colours, and between the two engines that arithmetic changed twice, in both cases without
+renaming anything — so the fields load cleanly and light the world wrongly. Both are
+`#ifdef MAELSTROM_DATA` in `Water/SkyObject.cpp`; the `#else` is 2008's, untouched.
+
+**Objects were lit at double the ground's strength.** The old `SetTime` wrote
+`tilemap_color.a*2` and `tilemap_color.rgb*2` straight into `SetSun`, and `SetSunColor`
+clamped the result to 1. Splitting `objectShadowing` out in 2008 dropped the factor, because
+a world can now just write the doubled numbers itself. Maelstrom's worlds cannot: every one
+of them asks for `ambient_factor = 0.5`, and with `sun_color` at (1, 1, 0.859) that is
+
+| | ambient | diffuse |
+|---|---|---|
+| the original gave objects | 0.953 | (1, 1, 1) |
+| we gave them | 0.476 | (1, 1, 0.859) |
+
+Exactly half the ambient, which is the *whole* of the light on any surface facing away from
+the sun. The terrain is untouched — it never had the factor — so this is the second time a
+lighting bug has shown up on the buildings and not the ground, after `ambient_maximal` above.
+
+**`shadow_color` means something different.** 2008 divides the gradient by its own darkest
+channel, so the colour is only a hue and the depth of the shadow comes from `shadow_intensity`
+alone — hence the editor caption asking for "normal grey, about 0.5". Before 2008 the colour
+*was* the shadow: doubled, and faded by the sun's height. `c1_m1` asks for (0.23, 0.27, 0.47)
+at noon, which the 2008 reading normalises to (0.48, 0.54, 0.90) — barely a shadow, and the
+blue gone with it. The fade is by `light_angle_shadow` against two constructor constants that
+were never serialized (`time_shadow_off`, `speed_shadow_off`): nothing happens until the last
+30° before the horizon, and then it is quick. `shadowDecay`, which replaced them in 2008, has
+no counterpart in the file and is left unread.
+
+Worth stating plainly, because it points at where to look next: this one makes the port's
+shadows *lighter* than the original's, not darker. It was found while chasing the opposite
+complaint, and it is not the cause of it — the doubling above is.
 
 ### The minimap's rotation — three fields that drifted apart
 
