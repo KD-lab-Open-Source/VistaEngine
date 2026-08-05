@@ -115,10 +115,22 @@ bool cTexture::reloadDDS()
 	// RGB, and V8U8 bump maps like the water waves) to BGRA with our own decoder and
 	// upload through the device. RenderFileRead already resolved the VFS path.
 	cDDSImage img;
-	// A specular map's alpha is its power, and a bump map's is nothing -- neither is
-	// opacity, so don't premultiply RGB by it (that darkened the specular colour).
-	setPremultiplied(!getAttribute(TEXTURE_SPECULAR | TEXTURE_BUMP));
-	img.setPremultiplyAlpha(isPremultiplied());
+	// Straight alpha, as D3DX handed these over. Premultiplying here looked harmless --
+	// it pairs with a (ONE, ONE_MINUS_SRC_ALPHA) blend and kills the grey halo around
+	// alpha-cutout decals -- but it is destructive: it zeroes the RGB of every fully
+	// transparent texel, and a material drawn ALPHA_NONE never looks at alpha, so it
+	// reads that RGB as colour. A third of Maelstrom's tower facade texture is alpha 0,
+	// which came out as opaque black windows. Nothing downstream can undo it: the colour
+	// is gone. Whoever needs premultiplied source does the multiply at blend time
+	// instead -- see SDLWorldQuadRenderer's colorOp.
+	setPremultiplied(false);
+	img.setPremultiplyAlpha(false);
+	// As createFileImage does for every other format: assume the alpha means something,
+	// and let CreateTexture's scan clear it again if the texture turns out to be opaque.
+	// Without this a DDS never reaches that scan at all -- it is gated on the flag.
+	// A specular map's alpha is its power and a bump map's is nothing, so not those.
+	if(!getAttribute(TEXTURE_SPECULAR | TEXTURE_BUMP))
+		setAttribute(TEXTURE_ALPHA_TEST);
 	int r = img.load(buf, size);
 	delete[] buf;
 	if(r != 0)
@@ -269,8 +281,15 @@ bool cTexture::loadDDS(const char* file_name)
 	// D3DX loaded these; it went with D3D9. Decode the cached DDS (DXT1/3/5) to BGRA and
 	// create the texture through the device's CreateTexture.
 	cDDSImage img;
-	// See reloadDDS: specular/bump alpha is not opacity, so keep premultiply off it.
-	img.setPremultiplyAlpha(!getAttribute(TEXTURE_SPECULAR | TEXTURE_BUMP));
+	// Straight alpha, for the reason reloadDDS gives. This path -- the base cache, which
+	// is where every Maelstrom texture comes from -- also used to premultiply while
+	// leaving isPremultiplied() reporting false, so its consumers were told the opposite
+	// of what they were handed.
+	setPremultiplied(false);
+	img.setPremultiplyAlpha(false);
+	// See reloadDDS: flag it optimistically so CreateTexture's alpha scan runs.
+	if(!getAttribute(TEXTURE_SPECULAR | TEXTURE_BUMP))
+		setAttribute(TEXTURE_ALPHA_TEST);
 	if(img.load(file_name) != 0)
 		return false;
 	SetWidth(img.GetX());
