@@ -1499,6 +1499,34 @@ int cSDLRenderDevice::CreateTexture(cTexture* Texture, cFileImage* FileImage, in
 		if(FileImage){
 			// GetTexture writes 32-bit BGRA pixels for frame i (the D3D loop's `i` arg).
 			FileImage->GetTexture(td.staging.data(), i, w, h);
+
+			// cD3DRender::CreateTexture classified a texture by what its alpha actually
+			// holds, and cObject3dx::Draw reads the answer back through isAlphaTest() to
+			// pick ALPHA_TEST over ALPHA_NONE. Nothing did this after D3D9 went, so every
+			// material stayed opaque and the cut-out texels drew as solid colour -- the
+			// broken windows of Maelstrom's towers are a third of the facade texture at
+			// alpha 0, and came out as black panes you could not see through.
+			//
+			// Graded alpha is left alone: the loaders set ALPHA_TEST optimistically for
+			// anything with an alpha channel, and a material that wants a real blend gets
+			// there through its opacity map (is_opacity_texture), as the original does.
+			if(i == 0 && bpp == 4 && frames == 1
+			   && (Texture->isAlpha() || Texture->isAlphaTest())){
+				int num0 = 0, numPartial = 0;
+				const uint8_t* px = td.staging.data();
+				for(size_t p = 3; p < td.staging.size(); p += 4){
+					if(px[p] == 0)        ++num0;
+					else if(px[p] != 255) ++numPartial;
+				}
+				if(numPartial == 0){
+					if(num0 > 0){
+						Texture->clearAttribute(TEXTURE_ALPHA_BLEND);
+						Texture->setAttribute(TEXTURE_ALPHA_TEST);
+					}
+					else
+						Texture->clearAttribute(TEXTURE_ALPHA_BLEND | TEXTURE_ALPHA_TEST);
+				}
+			}
 			uploadTexture(td);
 		}
 
