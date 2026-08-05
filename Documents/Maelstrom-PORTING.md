@@ -176,6 +176,21 @@ Traps worth knowing:
   `visibleNodes` flags, or `cObject3dx::Update` indexes an empty vector and faults.
 - `cTempVisibleGroup` has a fifth field here (`visibilityNodeIndex`) that Maelstrom's
   record does not carry.
+- **Two bound boxes, and only one of them is the model's extent.** Maelstrom's record
+  carries `cStaticLogicBound::bound` — an optional collision box whose constructor zeroes
+  it and which almost no model fills — and then `cStatic3dx::bound_box`, the real extent
+  guarded by `is_inialized_bound_box`. This tree merged the two into one `boundBox`
+  (renamed from `logicBound` by CONVERSION 18.02.08), so the reader has to choose, and the
+  choice is settled by the original's `cObject3dx::GetBoundBox`, which returns `bound_box`.
+  Taking the logic box instead leaves `boundBox` empty for nearly every model, and nothing
+  repairs it later: `cObject3dx`'s constructor only recomputes a box when
+  `isBoundBoxInited` is false, and these files store that flag **true**. The damage
+  surfaced far away, in `UnitEnvironmentBuilding::setModel`'s
+  `radius()/max(boundBox.radius2D(), 0.001f)` — an empty box turns that floor into a
+  x1000 multiplier, so corpses and decor were built at scale ~10^4. Drawn into the shadow
+  map (whose caster pipeline clamps depth rather than clipping it, so oversized geometry
+  is not thrown away) they pinned every texel to 0 and the whole terrain read as
+  shadowed.
 
 ### Textures — `cTexLibrary::loadBaseCache`
 

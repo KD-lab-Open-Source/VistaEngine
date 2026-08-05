@@ -335,22 +335,30 @@ void cStatic3dx::loadMaelstromOtherInfo(CLoadData* ld)
 	it >> basementVertices;
 	it >> basementPolygons;
 
-	// Maelstrom's logic_bound.bound is this tree's boundBox: the field was renamed from
-	// logicBound by CONVERSION 18.02.08 (Static3dxBase::serialize), and the raw-.3DX
-	// path fills the same member from C3DX_LOGIC_BOUND.
-	it >> boundBox.min;
-	it >> boundBox.max;
+	// Maelstrom carries two boxes, and only one of them is the model's extent.
+	// cStaticLogicBound::bound is the optional logic/collision box -- its constructor
+	// zeroes it and most models never set it -- while cStatic3dx::bound_box is the real
+	// one, guarded by is_inialized_bound_box. The original's cObject3dx::GetBoundBox
+	// returns bound_box, so bound_box is what this tree's single boundBox must hold.
+	//
+	// Reading the logic box into it instead left boundBox empty for nearly every model,
+	// and nothing repaired it later: cObject3dx's constructor only recomputes a box when
+	// isBoundBoxInited is false, and Maelstrom's files set that flag true. The visible
+	// cost was UnitEnvironmentBuilding::setModel's `radius()/max(boundBox.radius2D(),
+	// 0.001f)`, where an empty box turns the floor into a x1000 multiplier -- corpses and
+	// other decor were built at scale ~10^4, and drawn into the shadow map (whose caster
+	// pipeline clamps depth rather than clipping it) they pinned every texel to 0, so the
+	// whole terrain read as shadowed.
+	sBox6f logicBound;
+	it >> logicBound.min;
+	it >> logicBound.max;
 
 	it >> is_logic;
 	it >> is_old_model;
 
-	// Maelstrom kept a second, graphics-only bound box alongside the logic one; this
-	// tree has just the one, so the box is read and dropped and only the flag and the
-	// radius are kept.
-	sBox6f graphicsBound;
 	it >> isBoundBoxInited;
-	it >> graphicsBound.min;
-	it >> graphicsBound.max;
+	it >> boundBox.min;
+	it >> boundBox.max;
 	it >> boundRadius;
 }
 
