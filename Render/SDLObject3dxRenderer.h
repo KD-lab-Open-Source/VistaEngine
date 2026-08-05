@@ -221,6 +221,9 @@ private:
 		// The camera was the reflection camera, whose mirror matrix reverses every
 		// triangle's winding: cull the other face (see pipelineFor).
 		bool mirrored;
+		// This pass is Camera::DrawObjectSpecial, the one place the original turns culling
+		// off (D3DCULL_NONE). Everything else keeps the camera's back-face cull.
+		bool cullNone;
 		// The camera's viewport, captured at SetState. Draws are replayed in one pass at
 		// EndScene, long after the scene walk moved on, so it cannot be read back then.
 		int vpX, vpY, vpW, vpH;
@@ -244,7 +247,8 @@ private:
 	// `shadow` selects the caster pipeline: depth-only (no colour target), slope-scaled
 	// depth bias, and the shadow shaders, which ignore the tangent frame.
 	SDL_GPUGraphicsPipeline* pipelineFor(int stride, bool skinned, bool bump, bool reflect, bool reflectCube, bool secondOpacity,
-	                                     eBlendMode blend, bool mirrored, bool depthWrite, bool wireframe, bool shadow);
+	                                     eBlendMode blend, bool mirrored, bool depthWrite, bool wireframe, bool shadow,
+	                                     bool cullNone);
 	// Append the current state to states_ if it changed since the last recorded draw.
 	int commitState();
 
