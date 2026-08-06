@@ -44,7 +44,10 @@ SDLGrassRenderer::SDLGrassRenderer(cSDLRenderDevice* owner, SDL_GPUDevice* devic
 	createSamplers();
 	whiteTexture_ = createSolidGPUTexture(device_, 0xffffffffu);
 	if(createShaders())
-		fprintf(stderr, "SDLGrassRenderer: grass pipeline ready\n");
+		// Shaders only: the pipelines themselves are built on demand, per vertex stride,
+		// in pipelineFor(). Do not report them as ready here -- a pipeline that fails to
+		// create does so long after this line, and saying "pipeline" reads as if it had not.
+		fprintf(stderr, "SDLGrassRenderer: grass shaders ready\n");
 }
 
 SDLGrassRenderer::~SDLGrassRenderer()

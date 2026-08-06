@@ -16,7 +16,9 @@ cbuffer Constants : register(b0, space1)
     row_major float4x4 MVP;   // the light camera's matViewProj
 };
 
-float4 main(float3 position : POSITION) : SV_Position
+// TEXCOORD0, not POSITION: SDL_GPU's D3D12 backend names every vertex input element
+// TEXCOORD<location>, whatever the data means. See SDLShaders/ShaderBlob.h.
+float4 main(float3 position : TEXCOORD0) : SV_Position
 {
     return mul(float4(position, 1.0f), MVP);
 }

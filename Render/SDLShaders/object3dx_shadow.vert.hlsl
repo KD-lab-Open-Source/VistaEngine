@@ -47,15 +47,26 @@ cbuffer Constants : register(b0, space1)
     float4 World[MAX_BONES * 3];
 };
 
+// SDL_GPU's D3D12 backend names every vertex input element TEXCOORD<location>, whatever
+// the data means, so the semantics below spell out the attribute location rather than the
+// D3D9 usage (see SDLShaders/ShaderBlob.h). SKINNED drops one attribute in the middle, so
+// the uv that follows it shifts down a location -- exactly as SDLObject3dxRenderer's
+// pipelineFor() numbers them, which skips the weight slot for a rigid lod.
+#if SKINNED
+#define SEM_UV TEXCOORD4
+#else
+#define SEM_UV TEXCOORD3
+#endif
+
 struct VSInput
 {
-    float3 Position     : POSITION;
-    uint4  BlendIndices : BLENDINDICES;
-    float3 Normal       : NORMAL;
+    float3 Position     : TEXCOORD0;
+    uint4  BlendIndices : TEXCOORD1;
+    float3 Normal       : TEXCOORD2;
 #if SKINNED
-    float4 BlendWeight  : COLOR0;
+    float4 BlendWeight  : TEXCOORD3;
 #endif
-    float2 UV           : TEXCOORD0;
+    float2 UV           : SEM_UV;
 };
 
 struct VSOutput

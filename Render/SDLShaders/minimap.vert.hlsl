@@ -24,10 +24,12 @@ cbuffer Constants : register(b0, space1)
 
 struct VSInput
 {
-    float2 Position : POSITION;    // screen pixels
-    float4 Color    : COLOR0;      // BGRA (Color4c byte order)
-    float2 MaskUV   : TEXCOORD0;
-    float2 UV       : TEXCOORD1;
+    // The semantics are TEXCOORD<location>, not what the data means -- SDL_GPU's D3D12
+    // backend names every input element TEXCOORD; see SDLShaders/ShaderBlob.h.
+    float2 Position : TEXCOORD0;   // screen pixels
+    float4 Color    : TEXCOORD1;   // BGRA (Color4c byte order)
+    float2 MaskUV   : TEXCOORD2;
+    float2 UV       : TEXCOORD3;
 };
 
 struct VSOutput

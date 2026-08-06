@@ -85,26 +85,28 @@ cbuffer Constants : register(b0, space1)
 
 struct VSInput
 {
-    // shortVertexGrass, stride 28. Attribute locations follow this declaration order.
+    // shortVertexGrass, stride 28. Attribute locations follow this declaration order, and
+    // the semantics spell that location out rather than what the data means -- SDL_GPU's
+    // D3D12 backend names every input element TEXCOORD; see SDLShaders/ShaderBlob.h.
     //
     // SHORT4, NOT normalized: these are world coordinates in whole units (Bush::pos), which
     // is why the position is only 8 bytes. D3D9's D3DDECLTYPE_SHORT4 hands them to the shader
     // as floats; SPIR-V hands them over as sint, so we take int4 and convert.
-    int4   Position : POSITION;    // offset 0
+    int4   Position : TEXCOORD0;   // offset 0
     // Color4c is stored b,g,r,a in memory, so UBYTE4_NORM gives (b,g,r,a): swizzle to read it.
     // rgb is the terrain colour under the bush (vMap.getColor32), a is Bush::shift -- the
     // blade's own wind phase, and 0 on the two vertices that stay rooted in the ground.
-    float4 Color    : COLOR0;      // offset 8,  D3DCOLOR
+    float4 Color    : TEXCOORD1;   // offset 8,  D3DCOLOR
     // The bush's surface normal, biased into 0..1 (hence the *2-1 below). Its ALPHA is not a
     // normal component at all: it is a per-blade brightness added to the vertex colour.
-    float4 Normal   : NORMAL;      // offset 12, D3DCOLOR
+    float4 Normal   : TEXCOORD2;   // offset 12, D3DCOLOR
     // xy: the blade's texture coordinate in the grass atlas, pre-multiplied by 10000 so it
     //     survives as a short (undone by *0.0001 below).
     // z:  ±half-width of the blade, in world units.
     // w:  the blade's height, in world units.
-    int4   TexCoord : TEXCOORD0;   // offset 16, SHORT4
+    int4   TexCoord : TEXCOORD3;   // offset 16, SHORT4
     // Bush::windPower: the time at which this blade was planted. See `sc` below.
-    float  PlantTime : TEXCOORD1;  // offset 24, FLOAT1 (stride 28)
+    float  PlantTime : TEXCOORD4;  // offset 24, FLOAT1 (stride 28)
 };
 
 struct VSOutput

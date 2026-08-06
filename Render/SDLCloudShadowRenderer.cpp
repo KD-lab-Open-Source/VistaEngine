@@ -22,7 +22,8 @@ SDLCloudShadowRenderer::SDLCloudShadowRenderer(cSDLRenderDevice* owner, SDL_GPUD
 	createSampler();
 	whiteTexture_ = createSolidGPUTexture(device_, 0xffffffffu);
 	if(createShaders())
-		fprintf(stderr, "SDLCloudShadowRenderer: cloud shadow pipeline ready\n");
+		// Shaders only; pipelineFor() builds the pipelines on demand. See SDLGrassRenderer.
+		fprintf(stderr, "SDLCloudShadowRenderer: cloud shadow shaders ready\n");
 }
 
 SDLCloudShadowRenderer::~SDLCloudShadowRenderer()

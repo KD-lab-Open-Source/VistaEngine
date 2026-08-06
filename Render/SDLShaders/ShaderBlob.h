@@ -39,6 +39,32 @@ inline constexpr SDL_GPUShaderFormat kShaderFormat     = SDL_GPU_SHADERFORMAT_SP
 inline constexpr const char*         kShaderEntryPoint = "main";
 #endif
 
+// ---------------------------------------------------------------------------------------
+// Why every vertex input in SDLShaders/*.vert.hlsl is a TEXCOORD
+// ---------------------------------------------------------------------------------------
+// SDL_GPU describes a vertex attribute by *location* alone -- SDL_GPUVertexAttribute has no
+// semantic field, because SPIR-V and MSL have no semantics to fill it with. D3D12 does, so
+// its backend has to invent one: D3D12_INTERNAL_ConvertVertexInputState stamps every
+// D3D12_INPUT_ELEMENT_DESC with SemanticName = "TEXCOORD" and SemanticIndex = location.
+//
+// ID3D12Device::CreateInputLayout then rejects any layout that does not name every element
+// the vertex shader's input signature reads. So a shader declaring `float3 pos : POSITION`
+// fails pipeline creation outright:
+//
+//   CREATEINPUTLAYOUT_MISSINGELEMENT: The provided input signature expects to read an
+//   element with SemanticName/Index: 'POSITION'/0, but the declaration doesn't provide a
+//   matching name.
+//
+// which surfaces from SDL_CreateGPUGraphicsPipeline as a bare E_INVALIDARG (0x80070057).
+// The rule is therefore: a vertex shader input's semantic is TEXCOORD<its location>, never
+// what the data means. The `#if`-conditional layouts (object3dx) renumber accordingly.
+//
+// Only the DXIL path cares. Locations in SPIR-V and MSL come from declaration order, which
+// the naming does not affect, so the same source keeps its bindings on Vulkan and Metal.
+//
+// This constrains *inputs* only. Interpolants between the vertex and fragment stages are
+// matched by name within our own shader pairs, and keep the semantic that reads best.
+
 // Fill in the fields of an SDL_GPUShaderCreateInfo that are the same for every shader we
 // build: the bytecode, its format, and its entry point. The caller still sets the stage
 // and the resource counts, which differ per shader.
