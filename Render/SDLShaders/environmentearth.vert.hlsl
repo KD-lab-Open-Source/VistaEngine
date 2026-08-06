@@ -26,9 +26,11 @@ struct VSInput
 {
     // sVertexXYZDT1, stride 24. The diffuse is carried to match the vertex declaration but not
     // used -- EnvironmentEarth.psl shades from the texture and the tfactor uniform alone.
-    float3 Position : POSITION;    // offset 0, world space
-    float4 Color    : COLOR0;      // offset 12, D3DCOLOR -> UBYTE4_NORM
-    float2 UV0      : TEXCOORD0;   // offset 16
+    // The semantics are TEXCOORD<location>, not what the data means -- SDL_GPU's D3D12
+    // backend names every input element TEXCOORD; see SDLShaders/ShaderBlob.h.
+    float3 Position : TEXCOORD0;   // offset 0, world space
+    float4 Color    : TEXCOORD1;   // offset 12, D3DCOLOR -> UBYTE4_NORM
+    float2 UV0      : TEXCOORD2;   // offset 16
 };
 
 struct VSOutput

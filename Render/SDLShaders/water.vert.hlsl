@@ -57,11 +57,13 @@ cbuffer Constants : register(b0, space1)
 
 struct VSInput
 {
-    float3 Position : POSITION;   // world space, offset 0
+    // The semantics are TEXCOORD<location>, not what the data means -- SDL_GPU's D3D12
+    // backend names every input element TEXCOORD; see SDLShaders/ShaderBlob.h.
+    float3 Position : TEXCOORD0;  // world space, offset 0
     // sVertexXYZD's D3DCOLOR diffuse, offset 12. Only the alpha is read (the fragment
     // shader's per-vertex water opacity, baked by cWater::CalcColor from the depth
     // gradient); .w is the alpha byte whichever way the other three are ordered.
-    float4 Diffuse  : COLOR0;
+    float4 Diffuse  : TEXCOORD1;
 };
 
 struct VSOutput

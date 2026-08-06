@@ -12,11 +12,13 @@ cbuffer Constants : register(b0, space1)
     float2 _pad;
 };
 
+// Vertex inputs are TEXCOORD<location>, not the semantic the data means -- SDL_GPU's
+// D3D12 backend names every input element TEXCOORD; see SDLShaders/ShaderBlob.h.
 struct VSInput
 {
-    float4 Position : POSITION;   // x,y in pixels
-    float4 Color    : COLOR0;     // BGRA (Color4c byte order)
-    float2 UV       : TEXCOORD0;
+    float4 Position : TEXCOORD0;  // x,y in pixels
+    float4 Color    : TEXCOORD1;  // BGRA (Color4c byte order)
+    float2 UV       : TEXCOORD2;
 };
 
 struct VSOutput

@@ -29,6 +29,39 @@ not bring `__super` with it, and the engine uses that keyword in ~180 files.
 Don't pin the Visual Studio generator. `windows-latest` moved to VS 2026 mid-2026; naming a
 version only moves the breakage to the next image bump. CMake picks the newest it finds.
 
+### Every vertex input's semantic is `TEXCOORD<location>`
+
+Windows is the one platform that compiles our HLSL *as HLSL* — dxc straight to DXIL, with
+the semantics we wrote. Linux and macOS launder them through SPIR-V, where semantics do not
+survive. Only D3D12 ever sees the names, and it is the one backend that checks them.
+
+SDL_GPU has no semantic to bind by: `SDL_GPUVertexAttribute` carries a *location*, because
+that is all SPIR-V and MSL need. Its D3D12 backend therefore invents one, stamping every
+`D3D12_INPUT_ELEMENT_DESC` with `SemanticName = "TEXCOORD"` and `SemanticIndex = location`
+(`D3D12_INTERNAL_ConvertVertexInputState`). `CreateInputLayout` then rejects a layout that
+does not name every element the shader reads — so `float3 pos : POSITION` cannot be bound:
+
+```
+D3D12 ERROR: ID3D12Device::CreateInputLayout: The provided input signature expects to read
+an element with SemanticName/Index: 'POSITION'/0, but the declaration doesn't provide a
+matching name. [ STATE_CREATION ERROR #65: CREATEINPUTLAYOUT_MISSINGELEMENT]
+```
+
+`SDL_CreateGPUGraphicsPipeline` reports that as a bare `E_INVALIDARG` (0x80070057) with no
+mention of semantics, so **turn on the D3D12 debug layer before believing any pipeline
+error** — the useful message only exists there.
+
+So: a vertex shader input takes `TEXCOORD<its own location>`, never the semantic the data
+means. `#if`-conditional layouts renumber with the `#if` (see `object3dx.vert.hlsl`, where
+a rigid lod carries no blend weights and everything after them shifts down one). Nothing
+else is constrained — interpolants between our own vertex and fragment stages are matched
+by name within the pair, and keep whatever reads best.
+
+Resource registers have a matching convention, and this tree already follows it: vertex
+uniforms at `b0, space1`, fragment textures/samplers at `t#/s#, space2`, fragment uniforms
+at `b0, space3`. Getting one wrong fails pipeline creation the same opaque way, because the
+root signature SDL builds will not cover the shader's bindings.
+
 ## One source list per module
 
 Every module's `CMakeLists.txt` used to have a `WIN32` branch feeding it a different set of

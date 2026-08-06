@@ -102,20 +102,35 @@ cbuffer Constants : register(b0, space1)
     float4 World[MAX_BONES * 3];
 };
 
+// SDL_GPU's D3D12 backend names every vertex input element TEXCOORD<location>, whatever
+// the data means, so the semantics below spell out the attribute location rather than the
+// D3D9 usage (see SDLShaders/ShaderBlob.h). SKINNED drops one attribute in the middle, so
+// everything after it shifts down a location -- exactly as SDLObject3dxRenderer's
+// pipelineFor() numbers them, which skips the weight slot for a rigid lod.
+#if SKINNED
+#define SEM_UV       TEXCOORD4
+#define SEM_BINORMAL TEXCOORD5
+#define SEM_TANGENT  TEXCOORD6
+#else
+#define SEM_UV       TEXCOORD3
+#define SEM_BINORMAL TEXCOORD4
+#define SEM_TANGENT  TEXCOORD5
+#endif
+
 struct VSInput
 {
-    float3 Position     : POSITION;       // offset 0
-    uint4  BlendIndices : BLENDINDICES;   // offset 12, D3DCOLOR -> UBYTE4 (memory order)
-    float3 Normal       : NORMAL;         // offset 16
+    float3 Position     : TEXCOORD0;      // offset 0
+    uint4  BlendIndices : TEXCOORD1;      // offset 12, D3DCOLOR -> UBYTE4 (memory order)
+    float3 Normal       : TEXCOORD2;      // offset 16
 #if SKINNED
-    float4 BlendWeight  : COLOR0;         // offset 28, D3DCOLOR -> UBYTE4_NORM (b,g,r,a)
+    float4 BlendWeight  : TEXCOORD3;      // offset 28, D3DCOLOR -> UBYTE4_NORM (b,g,r,a)
 #endif
-    float2 UV           : TEXCOORD0;      // offset 28 (rigid) / 32 (skinned)
+    float2 UV           : SEM_UV;         // offset 28 (rigid) / 32 (skinned)
 #if BUMP
     // cSkinVertex's tangent frame, right after the uv: BINORMAL is GetBumpS, TANGENT is
     // GetBumpT, and cStatic3dx::CalcBumpSTNorm makes the normal their cross product.
-    float3 Binormal     : BINORMAL;       // uv + 8
-    float3 Tangent      : TANGENT;        // uv + 20
+    float3 Binormal     : SEM_BINORMAL;   // uv + 8
+    float3 Tangent      : SEM_TANGENT;    // uv + 20
 #endif
 };
 

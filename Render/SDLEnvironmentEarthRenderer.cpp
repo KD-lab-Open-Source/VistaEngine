@@ -22,7 +22,8 @@ SDLEnvironmentEarthRenderer::SDLEnvironmentEarthRenderer(cSDLRenderDevice* owner
 	createSampler();
 	whiteTexture_ = createSolidGPUTexture(device_, 0xffffffffu);
 	if(createShaders())
-		fprintf(stderr, "SDLEnvironmentEarthRenderer: environment earth pipeline ready\n");
+		// Shaders only; pipelineFor() builds the pipelines on demand. See SDLGrassRenderer.
+		fprintf(stderr, "SDLEnvironmentEarthRenderer: environment earth shaders ready\n");
 }
 
 SDLEnvironmentEarthRenderer::~SDLEnvironmentEarthRenderer()

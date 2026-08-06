@@ -33,9 +33,11 @@ cbuffer Constants : register(b0, space1)
 
 struct VSInput
 {
-    float3 Position : POSITION;    // sVertexXYZDT1: world-space position, offset 0
-    float4 Color    : COLOR0;      // D3DCOLOR diffuse, offset 12 -> UBYTE4_NORM (b,g,r,a)
-    float2 UV       : TEXCOORD0;   // offset 16 (stride 24)
+    // The semantics are TEXCOORD<location>, not what the data means -- SDL_GPU's D3D12
+    // backend names every input element TEXCOORD; see SDLShaders/ShaderBlob.h.
+    float3 Position : TEXCOORD0;   // sVertexXYZDT1: world-space position, offset 0
+    float4 Color    : TEXCOORD1;   // D3DCOLOR diffuse, offset 12 -> UBYTE4_NORM (b,g,r,a)
+    float2 UV       : TEXCOORD2;   // offset 16 (stride 24)
 };
 
 struct VSOutput

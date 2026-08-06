@@ -17,7 +17,8 @@ SDLPostEffectRenderer::SDLPostEffectRenderer(SDL_GPUDevice* device, SDL_Window* 
 {
 	createSamplers();
 	if(createShaders())
-		fprintf(stderr, "SDLPostEffectRenderer: post-effect pipelines ready\n");
+		// Shaders only; the pipelines are built on demand. See SDLGrassRenderer.
+		fprintf(stderr, "SDLPostEffectRenderer: post-effect shaders ready\n");
 }
 
 SDLPostEffectRenderer::~SDLPostEffectRenderer()

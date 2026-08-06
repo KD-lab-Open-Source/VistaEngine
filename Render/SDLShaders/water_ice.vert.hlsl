@@ -35,8 +35,10 @@ cbuffer Constants : register(b0, space1)
 
 struct VSInput
 {
-    float3 Position : POSITION;   // world space, offset 0
-    float4 Diffuse  : COLOR0;     // UBYTE4_NORM @12; .r is the coverage weight aa
+    // The semantics are TEXCOORD<location>, not what the data means -- SDL_GPU's D3D12
+    // backend names every input element TEXCOORD; see SDLShaders/ShaderBlob.h.
+    float3 Position : TEXCOORD0;  // world space, offset 0
+    float4 Diffuse  : TEXCOORD1;  // UBYTE4_NORM @12; .r is the coverage weight aa
 };
 
 struct VSOutput
