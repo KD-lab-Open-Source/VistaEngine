@@ -85,9 +85,59 @@ reads them verbatim, so nothing re-encodes or re-wraps a line it did not have to
 idempotent, and it breaks a symlink before writing so it can run over a farm laid on top of
 a read-only pristine copy.
 
+### Setting up the run directory
+
+Nothing in this tree builds it; the converter rewrites a data root, it does not create one.
+Unpack the distribution and convert the copy:
+
 ```
-python3 tools/maelstrom_convert.py <MaelstromData> --font 'Resource\UI\Fonts\ARIALNB2.ttf' --apply
+unzip -q MaelstromEnhanced.zip -d GameData     # ~6.3 GB, Resource/ Scripts/ cacheData/
 ```
+
+The alternative, when the disk matters, is a farm: mirror the directory tree of a read-only
+pristine copy and symlink every file into it. That is the case the unlinking above is for —
+the three files the converter touches become real, the rest stay links, and the pristine
+copy is untouched. Verified by checksumming it across a full run.
+
+The game writes `iniFile.cfg` itself on first start, so there is nothing else to seed.
+
+### Running it
+
+Run it over the **run directory**, not the pristine copy. Without `--apply` it only reports,
+so the first pass is free:
+
+```
+$ python3 tools/maelstrom_convert.py ~/Projects/MaelstromEnhanced/GameData
+  Scripts/Engine/RigidBodyPrmLibrary                                     129
+
+  Scripts/Content/UI_FontLibrary needs translating to UI_FontAttributes, but Maelstrom ships no .ttf --
+  re-run with --font <engine-relative .ttf> to pick a substitute.
+
+  Scripts/Content/Triggers/GlobalTrigger.scr  <- Scripts/Content/GlobalTrigger.scr
+
+scanned 299 text files, 1 needed changes  (dry run -- pass --apply to write)
+  steering_duration         43  -- RigidBodyPrm::steering_duration is float in Maelstrom, int here
+  groundPass                43  -- RigidBodyPrm::groundPass is PassabilityFlags in Maelstrom, bool here
+  waterPass                 43  -- RigidBodyPrm::waterPass is PassabilityFlags in Maelstrom, bool here
+```
+
+Then commit to it, naming a font (see below):
+
+```
+$ python3 tools/maelstrom_convert.py ~/Projects/MaelstromEnhanced/GameData \
+      --font 'Resource\UI\Fonts\ARIALNB2.ttf' --apply
+  Scripts/Engine/RigidBodyPrmLibrary                                     129
+
+  Scripts/Content/UI_FontAttributes  <- UI_FontLibrary  (Aero 20 @16, Aero big @32, Aero medium @24)
+
+  Scripts/Content/Triggers/GlobalTrigger.scr  <- Scripts/Content/GlobalTrigger.scr
+
+scanned 299 text files, 1 needed changes
+```
+
+Re-running is a no-op: every rule returns "already in our shape" for a value it has already
+converted, and the two generated files are skipped once they exist — so a second pass over a
+partly-converted tree changes nothing.
 
 | what | why |
 |---|---|
@@ -137,6 +187,31 @@ Without that file `cfont()` falls back to a default font that never created, and
 translates the library and substitutes whatever TTF `--font` names. **The glyphs are not
 Maelstrom's.** Matching those means teaching the engine to read `.xfont`, which is a code
 change, not a conversion.
+
+#### Where to get the `.ttf`
+
+Take one from Perimeter 2's own data — `GameData/Resource/UI/Fonts/` ships `ARIALNB2.ttf`,
+`FUTURA_C.TTF`, `Perimeter.ttf`, `Perimeter2.ttf` and `default.ttf` — and copy it into the
+Maelstrom run directory at the path you are going to name:
+
+```
+mkdir -p ~/Projects/MaelstromEnhanced/GameData/Resource/UI/Fonts
+cp GameData/Resource/UI/Fonts/ARIALNB2.ttf \
+   ~/Projects/MaelstromEnhanced/GameData/Resource/UI/Fonts/
+```
+
+`ARIALNB2.ttf` is the one this tree has been run with. Any TrueType face the engine can open
+works — it must simply cover Cyrillic, since the UI text is CP1251.
+
+Two things to get right, because neither announces itself:
+
+- **`--font` is engine-relative, with backslashes.** It is written verbatim into
+  `UI_FontAttributes` for the engine to resolve inside the data root, so it is
+  `Resource\UI\Fonts\ARIALNB2.ttf` — not a host path, and not the path to the file you just
+  copied from.
+- **The converter does not check that the file exists.** `build_font_attributes` only
+  interpolates the string, so a wrong path converts cleanly and then faults at run time in
+  exactly the way described above. Copy the font first, then convert.
 
 ## What the engine had to learn
 
