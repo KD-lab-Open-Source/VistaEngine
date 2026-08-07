@@ -597,7 +597,13 @@ void cStatic3dx::prepareMesh()
 	PrepareIndices();
 	ParseEffect();
 
-	if(!is_logic && gb_RenderDevice3D){ // no world-render GPU device on SDL backend yet (model VB/IB unsupported)
+	// A logic model has no drawable geometry. Everything else needs its buffers built,
+	// and BuildMeshesLod/BuildFromNode raise them through gb_RenderDevice's
+	// Create/Lock{Vertex,Index}Buffer, which the SDL device implements -- so the test is
+	// simply whether a device exists. This used to read gb_RenderDevice3D, back when the
+	// SDL backend had no model VB/IB at all; that pointer is null on every platform now,
+	// so the guard had quietly stopped building any mesh reached through this path.
+	if(!is_logic && gb_RenderDevice){
 		BuildMeshes();
 		CreateDebrises();
 	}
