@@ -245,6 +245,26 @@ REGISTER_ENUM(CHAIN_IS_UPGRADED, 0)
 REGISTER_ENUM(CHAIN_UPGRADED_FROM_BUILDING, "Апгрейд из здания")
 REGISTER_ENUM(CHAIN_UPGRADED_FROM_LEGIONARY, "Апгрейд из юнита")
 REGISTER_ENUM(CHAIN_TELEPORTING, 0)
+#ifdef MAELSTROM_DATA
+// The pre-2008 chain names, registered under the names Maelstrom's files actually use so
+// they resolve at all -- REGISTER_ENUM would stringify our own identifier, so these call
+// add() directly. AnimationChain::serialize folds every one of them onto a 2008 chain.
+// Without this the tokens are unknown to the descriptor and roughly 900 of Maelstrom's
+// chains -- every CHAIN_RUN, CHAIN_TURN and the walking/running fire and aim variants --
+// resolve to nothing.
+add(CHAIN_MAELSTROM_RUN, "CHAIN_RUN", 0);
+add(CHAIN_MAELSTROM_TURN, "CHAIN_TURN", 0);
+add(CHAIN_MAELSTROM_GO_WALK, "CHAIN_GO_WALK", 0);
+add(CHAIN_MAELSTROM_STOP_WALK, "CHAIN_STOP_WALK", 0);
+add(CHAIN_MAELSTROM_GO_RUN, "CHAIN_GO_RUN", 0);
+add(CHAIN_MAELSTROM_STOP_RUN, "CHAIN_STOP_RUN", 0);
+add(CHAIN_MAELSTROM_FIRE_WALKING, "CHAIN_FIRE_WALKING", 0);
+add(CHAIN_MAELSTROM_FIRE_RUNNING, "CHAIN_FIRE_RUNNING", 0);
+add(CHAIN_MAELSTROM_AIM_WALKING, "CHAIN_AIM_WALKING", 0);
+add(CHAIN_MAELSTROM_AIM_RUNNING, "CHAIN_AIM_RUNNING", 0);
+add(CHAIN_MAELSTROM_STAND_WITH_RESOURCE, "CHAIN_STAND_WITH_RESOURCE", 0);
+add(CHAIN_MAELSTROM_WALK_WITH_RESOURCE, "CHAIN_WALK_WITH_RESOURCE", 0);
+#endif
 END_ENUM_DESCRIPTOR(ChainID)
 
 BEGIN_ENUM_DESCRIPTOR(AnimationTerrainTypeID, "AnimationTerrainTypeID")
@@ -712,7 +732,16 @@ void AttributeBase::serialize(Archive& ar)
 	ar.serialize(fow_mode, "fow_mode", "Режим видимости при тумане войны");
 	ar.serialize(permanentEffects, "permanentEffects", "постоянные эффекты");
 	
+#ifdef MAELSTROM_DATA
+	// 2008 rewrote the chain list and gave it a new key, so Maelstrom's "animationChains"
+	// is not read by the name this tree looks for and every unit came up with no chains at
+	// all: nothing to start, so ChainController::quant returned at finished() and the whole
+	// cast stood still -- legionaries slid across the ground with their legs frozen.
+	if(!ar.serialize(animationChains, "animationChainsNew", 0))
+		ar.serialize(animationChains, "animationChains", 0);
+#else
 	ar.serialize(animationChains, "animationChainsNew", 0);
+#endif
 
 	if(isActing()){
 		if(ar.openBlock("lights", "Лампочки")){
@@ -1524,7 +1553,101 @@ AnimationChain::AnimationChain()
 	noiseRadiusFactor = 1.f;
 }
 
-void AnimationChain::serialize(Archive& ar) 
+#ifdef MAELSTROM_DATA
+// Maelstrom kept the gait in the chain id -- CHAIN_STAND / WALK / RUN / TURN, plus the
+// walking and running variants of fire and aim -- and 2008 collapsed each family onto one
+// id, telling the members apart by AnimationStateID's pose (WALK/RUN/CRAWL/GRABBLE) and
+// movement (STAND/MOVE/TURN/WAIT) bits instead.
+//
+// So Maelstrom's files name chains this tree's state machine never asks for:
+// StateBuildingStand and UnitLegionary::setMovementChain both look up CHAIN_MOVEMENTS,
+// findAnimationChainInterval compares chainID for equality, and nothing matched -- every
+// unit loaded, drew and stood perfectly still.
+//
+// The conversion just above recovers the movementState that WAS written (Maelstrom wrote it
+// flat, this tree splits it into state and terrainType), but the pose and movement bits were
+// never in the file at all: they were the chain id. Put them back here.
+//
+// The match in findAnimationChainInterval is a superset test -- (chain & query) == query --
+// so a chain has to carry every bit a unit might ask for. getMovementState always names one
+// pose and one movement, hence the deliberately generous sets: a standing unit still reports
+// whichever gait it would walk with, so the stand chain has to accept all of them.
+static void convertMaelstromChain(ChainID& chainID, MovementState& movementState)
+{
+	int state = 0;
+
+	switch(chainID){
+	case CHAIN_STAND:
+		chainID = CHAIN_MOVEMENTS;
+		state = ANIMATION_STATE_STAND | ANIMATION_STATE_WAIT | ANIMATION_STATE_ALL_POSE;
+		break;
+	case CHAIN_WALK:
+		chainID = CHAIN_MOVEMENTS;
+		state = ANIMATION_STATE_MOVE | ANIMATION_STATE_WALK | ANIMATION_STATE_CRAWL | ANIMATION_STATE_GRABBLE;
+		break;
+	case CHAIN_MAELSTROM_RUN:
+		chainID = CHAIN_MOVEMENTS;
+		state = ANIMATION_STATE_MOVE | ANIMATION_STATE_RUN;
+		break;
+	case CHAIN_MAELSTROM_TURN:
+		chainID = CHAIN_MOVEMENTS;
+		state = ANIMATION_STATE_TURN | ANIMATION_STATE_ALL_POSE;
+		break;
+
+	// The four gait transitions have no 2008 equivalent -- CHAIN_TRANSITION replaced them
+	// and is driven by transitionToState, which these records do not carry. Fold them onto
+	// the gait they end in, so the unit at least animates rather than freezing mid-step.
+	case CHAIN_MAELSTROM_GO_WALK:
+	case CHAIN_MAELSTROM_STOP_RUN:
+		chainID = CHAIN_MOVEMENTS;
+		state = ANIMATION_STATE_MOVE | ANIMATION_STATE_WALK;
+		break;
+	case CHAIN_MAELSTROM_GO_RUN:
+		chainID = CHAIN_MOVEMENTS;
+		state = ANIMATION_STATE_MOVE | ANIMATION_STATE_RUN;
+		break;
+	case CHAIN_MAELSTROM_STOP_WALK:
+		chainID = CHAIN_MOVEMENTS;
+		state = ANIMATION_STATE_STAND | ANIMATION_STATE_WAIT | ANIMATION_STATE_ALL_POSE;
+		break;
+
+	case CHAIN_MAELSTROM_FIRE_WALKING:
+		chainID = CHAIN_FIRE;
+		state = ANIMATION_STATE_MOVE | ANIMATION_STATE_WALK | ANIMATION_STATE_CRAWL | ANIMATION_STATE_GRABBLE;
+		break;
+	case CHAIN_MAELSTROM_FIRE_RUNNING:
+		chainID = CHAIN_FIRE;
+		state = ANIMATION_STATE_MOVE | ANIMATION_STATE_RUN;
+		break;
+	case CHAIN_MAELSTROM_AIM_WALKING:
+		chainID = CHAIN_AIM;
+		state = ANIMATION_STATE_MOVE | ANIMATION_STATE_WALK | ANIMATION_STATE_CRAWL | ANIMATION_STATE_GRABBLE;
+		break;
+	case CHAIN_MAELSTROM_AIM_RUNNING:
+		chainID = CHAIN_AIM;
+		state = ANIMATION_STATE_MOVE | ANIMATION_STATE_RUN;
+		break;
+
+	// 2008 carries one "holding a resource" chain where Maelstrom had a standing and a
+	// walking one; the movement bits keep them apart.
+	case CHAIN_MAELSTROM_STAND_WITH_RESOURCE:
+		chainID = CHAIN_WITH_RESOURCE;
+		state = ANIMATION_STATE_STAND | ANIMATION_STATE_WAIT | ANIMATION_STATE_ALL_POSE;
+		break;
+	case CHAIN_MAELSTROM_WALK_WITH_RESOURCE:
+		chainID = CHAIN_WITH_RESOURCE;
+		state = ANIMATION_STATE_MOVE | ANIMATION_STATE_ALL_POSE;
+		break;
+
+	default:
+		return;
+	}
+
+	movementState.state() |= state;
+}
+#endif
+
+void AnimationChain::serialize(Archive& ar)
 {
 	ar.serialize(name_, "name", "&Пользовательское имя");
 	ar.serialize(chainID, "chainID", "&Идентификатор цепочки");
@@ -1533,6 +1656,10 @@ void AnimationChain::serialize(Archive& ar)
 		ar.serialize(state, "movementState", 0);
 		movementState = state;
 	}
+#ifdef MAELSTROM_DATA
+	if(ar.isInput())
+		convertMaelstromChain(chainID, movementState);
+#endif
 	ar.serialize(weapon, "weapon", "&Оружие");
 	if(chainID == CHAIN_TRANSITION){
 		if(!ar.serialize(transitionToState, "transitionToMovementState", "Переход в состояние")){ // conversion 15.02.08
