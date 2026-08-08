@@ -246,6 +246,13 @@ Traps worth knowing:
   *same id*, and feeding it to `LoadChainData` walks off the end of the block.
 - Do **not** point `fileName_` at the cache file. `LoadTexture` and `fixTextureName`
   resolve textures as `<model dir>\Textures\`, so it has to keep naming the model.
+- **A cached chain carries no frame interval**, baking having already resolved the splines it
+  was cut from, so `loadMaelstromChains` reads a chain's `name` and `time` and leaves
+  `begin_frame` / `end_frame` / `cycled` at their constructed defaults. Nothing misses them:
+  the interval's only consumer is `StaticAnimationChain::intervalSize()`, which has no callers
+  anywhere in the tree, and the runtime drives a chain from `time` alone. (The `cycled` that
+  the animation code does read belongs to `AnimationChain`, a different struct on the unit
+  attribute side.)
 - `prepareMesh()` must not run — the geometry is already baked — but the bookkeeping it
   does still has to happen: every visibility group needs its `visibility` bit and its
   `visibleNodes` flags, or `cObject3dx::Update` indexes an empty vector and faults.
@@ -580,11 +587,69 @@ Measured on `Menu.spg` after the change: fog 900–1200, `height_fog_circle` 500
 2–1300, `hideSmoothly` true, effects 0 / 0 / 1e6, `outside = ENVIRONMENT_WATER`, and the
 underwater and ice textures resolving to real paths instead of empty strings.
 
+### The animation chains — `AttributeBase::serialize` / `AnimationChain::serialize`
+
+Units loaded, moved, lit and shadowed correctly, and did not animate: legionaries slid across
+the ground with their legs frozen. Two independent drifts, and the first hid the second.
+
+**The list is written under a different key.** 2008 rewrote the chain record and renamed the
+whole list to `animationChainsNew`. Maelstrom writes `animationChains`, so the read matched
+nothing and every unit came up with an *empty* chain list — `ChainController::quant` returns
+at `finished()` before starting anything, and `SetAnimationGroupPhase` is never called. This
+was the dominant cause, and while it stood, no amount of looking at the model cache would have
+helped: the models carry their chains perfectly well, the units simply never asked for one.
+
+**The gait moved out of the chain id.** Maelstrom names a chain per gait — `CHAIN_STAND`,
+`CHAIN_WALK`, `CHAIN_RUN`, `CHAIN_TURN`, plus `FIRE_WALKING` / `AIM_RUNNING` and four
+`GO_`/`STOP_` transitions. 2008 collapsed them into one `CHAIN_MOVEMENTS` whose members are
+told apart by `MovementState`: a pose bit (`WALK`/`RUN`/`CRAWL`) and a movement bit
+(`STAND`/`MOVE`/`TURN`/`WAIT`). `findAnimationChainInterval` compares `chainID` for
+**equality** and tests the state as a **superset** — `(chain & query) == query` — so the old
+records, which carry no state bits at all, cannot match anything the 2008 code asks for.
+
+They are folded onto the new shape on read (`convertMaelstromChain`). Three things make that
+less mechanical than it sounds:
+
+- **The old ids cannot keep their values.** `CHAIN_RUN` was `CHAIN_MOVEMENTS + 3`, which is
+  this tree's `CHAIN_BUILDING_STAND`; `CHAIN_TURN` was `+ 4`, now `CHAIN_PAD_STAND`. The
+  `MAELSTROM_DATA` enumerators therefore take fresh values after `CHAIN_UNINSTALL`, and the
+  descriptor maps the old *names* onto them with `add(value, "CHAIN_RUN", 0)` — `REGISTER_ENUM`
+  would stringify our own identifier and defeat the point.
+- **The state sets have to be generous.** `getMovementState` always names one pose *and* one
+  movement, so a standing unit still reports whichever gait it would walk with. A stand chain
+  claiming only `STAND` fails the superset test the moment a gait is set; it has to accept all
+  of them, hence `ALL_POSE`.
+- **The four gait transitions have no equivalent.** `CHAIN_TRANSITION` replaced them and is
+  driven by `transitionToState`, which these records do not carry. They fold onto the gait
+  they end in — the unit animates rather than freezing mid-step, but the transition itself is
+  not played.
+
+`MovementState`'s flat-to-nested move needed nothing new: the engine's own
+`// conversion 15.02.08` already reads the old flat `movementState`.
+
+**Enabling animation woke three dormant crashes**, all in `cObject3dx::Update` and all the
+same shape — an index validated against the *model's* chain list, then used on a shorter one.
+`SetAnimationGroupChain` checks against `animationChains_`, but lights, materials and nodes
+each keep their own list; `UpdateVisibilityGroup` took `&groups[index]` with no check at all,
+which is null for an empty vector. The guards are unconditional: retail data simply never
+reaches them.
+
 ### Silhouettes — `Camera::DrawSilhouetteObject`
 
-Stencil work that was never ported. Retail Perimeter 2 never fills its draw list so it went
-unnoticed; Maelstrom's data does use it and faulted on the null `gb_RenderDevice3D`. Guarded
-off and registered as **Render-PORTING.md #22**.
+The outline itself is stencil work that was never ported (**Render-PORTING.md #22**), and
+guarding the whole function off on the null `gb_RenderDevice3D` looked like the safe thing to
+do. It was not. `cObject3dx::PreDraw` routes an object carrying
+`ATTRUNKOBJ_SHOW_FLAT_SILHOUETTE` to `SCENENODE_FLAT_SILHOUETTE` **instead of**
+`SCENENODE_OBJECT`, so returning early dropped those units out of the frame altogether rather
+than merely dropping their outline. Every unit whose attributes set `showSilhouette` — the
+guard tower, the legionaries, the warship — was invisible.
+
+Its shadow was not, which is what makes this worth writing down: the shadow camera is attached
+earlier in the same `PreDraw`, before the visibility test, so the ground showed the shadow of a
+unit that was not being drawn. That reads as a shadow-map bug and is not one.
+
+The list is now drawn plainly, exactly as the child-camera branch below it already did. Retail
+Perimeter 2 never fills it, which is why none of this surfaced there.
 
 ## What the rest of the binary formats do
 
@@ -605,28 +670,31 @@ Mostly nothing — they already load:
 1. **Visibility sets are approximated.** Maelstrom's per-LOD group indices
    (`C3DX_AVS_ONE_RAW` / `_LODS`) index a structure this tree replaced, so each set is
    collapsed to a single catch-all group and **parts the original hid per animation state
-   are all shown at once**. First suspect for any model that looks wrong.
-2. **Animation frame intervals are absent from the cache.** `StaticAnimationChain` keeps
-   its constructed `begin_frame`/`end_frame`, so animation may not play correctly.
-3. **Fonts are a substitute typeface.** Reading `.xfont` + its `.tga` atlas would restore
+   are all shown at once**. First suspect for any model that looks wrong — and a likelier
+   one since the chains started running, because the states that did the hiding are exactly
+   what was dormant before.
+2. **Fonts are a substitute typeface.** Reading `.xfont` + its `.tga` atlas would restore
    the original lettering.
-4. **Maelstrom-only `.spg` camera fields go unread** — `FarPlane`, `NearPlane`,
+3. **Maelstrom-only `.spg` camera fields go unread** — `FarPlane`, `NearPlane`,
    `CAMERA_ZOOM_*`, `CAMERA_MAX_HEIGHT`, `CAMERA_MIN_HEIGHT` — so the camera uses P2
    defaults on larger maps. Not known to matter; not investigated.
-5. **Ten polymorphic classes in Maelstrom's data do not exist in this source**, and resolve
+4. **Ten polymorphic classes in Maelstrom's data do not exist in this source**, and resolve
    to null objects rather than failing: the `AiAction_*` / `AiCondition_*` action-chain
    system (matching its `Scripts/Engine/AiActionChainList`, which P2 has no equivalent of),
    plus `ActionSquadMove`, `ActionSetCoastSprites`, `AttributeReal` and
    `ConditionObjectNearObjectByLabel`.
-6. **`C3DX_BASEMENT`** (500/501/502) — building foundation geometry, a Maelstrom feature P2
-   dropped — is silently ignored by the chunk switch.
-7. **Not every mission has been run.** `c1_m1` and `c1_m2` load; the rest are untested.
-8. **Tooltips are missing.** A state used to carry its hover text directly
+5. **The basement is read and thrown away.** `C3DX_BASEMENT` (500/501/502) is building
+   foundation geometry, a feature P2 dropped. The raw `.3DX` path ignores the chunks
+   outright; the cache path has no choice but to read them — they sit mid-record in
+   `otherInfo`, so skipping them would put the reader out of step — and then discards them.
+   If that geometry is ever wanted, it is already parsed.
+6. **Not every mission has been run.** `c1_m1` and `c1_m2` load; the rest are untested.
+7. **Tooltips are missing.** A state used to carry its hover text directly
    (`hoveredTextLoc`, a localization key, read by `UI_ControlState::serialize`); 2008 moved
    it into a `UI_ACTION_HOVER_INFO` action. Maelstrom's data writes the old field, nothing
    reads it, and no control shows a tooltip. Not converted — the screens themselves are
    readable without it.
-9. **`OPTION_SCREEN_SIZE` means a different resolution.** It is an *index*, and the list it
+8. **`OPTION_SCREEN_SIZE` means a different resolution.** It is an *index*, and the list it
    indexes is C++ (`Game/GameOptionsSerialization.cpp:48`) — the `comment` string beside it
    in the data is only a label. Maelstrom's saved index 25 is 1920×1080 in Maelstrom's list;
    in ours, after `filterBaseGraphOptions` drops the modes the display does not support, it
@@ -634,9 +702,10 @@ Mostly nothing — they already load:
    window aspect, and with it which branch of the letterbox/pillarbox code runs — Perimeter 2
    at its own default of 1280×1024 never takes the wide branch that Maelstrom then does.
    Belongs in the converter, which would have to renumber the index against our list.
-10. **Unit silhouettes are not drawn.** Stencil work that was never ported —
-    **Render-PORTING.md #22**. Unreachable on retail Perimeter 2, so this build is the only
-    way to exercise it.
+9. **The silhouette outline is still unported.** The units themselves draw now (see above);
+   what is missing is the coloured outline they show through a building they walk behind,
+   which is stencil work — **Render-PORTING.md #22**. Unreachable on retail Perimeter 2, so
+   this build is the only way to exercise it.
 
 ## A note on judging behaviour
 
