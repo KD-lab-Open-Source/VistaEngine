@@ -274,6 +274,46 @@ Traps worth knowing:
   is not thrown away) they pinned every texel to 0 and the whole terrain read as
   shadowed.
 
+### Visibility groups — `cStatic3dx::loadMaelstromVisibilitySets`
+
+A model's meshes are divided into **visibility groups**, and the object shows one group at a
+time: a transformer's `robo` / `transform` / `tank` forms, a building's `build` stages, a
+wreck's `debris`. The unit picks one by *name* — `AnimationChain`'s `VisibilityGroup` — which
+`VisibilityGroupName::update` resolves through `GetVisibilityGroupIndex`, falling back to
+group 0 when the name is not found.
+
+The cache carries all of this and it was being thrown away. A set is written as a
+`C3DX_AVS_ONE_HEAD` record, then each group in full under `C3DX_AVS_ONE_RAW`, then
+`C3DX_AVS_ONE_LODS` — three lists of indices back into the raw groups, one per LOD. Only the
+head was read; every set then got `DummyVisibilityGroup()`'s single catch-all, so **every name
+in the data failed to resolve and fell back to group 0**. Measured on the shipped data: of
+3436 `VisibilityGroup` requests, 3294 name a group that exists in some cache.
+
+`StaticVisibilityGroup::Load` reads Maelstrom's record **byte for byte** — it kept the
+throwaway `lod` field through the rewrite. The reader survived; nothing called it here.
+
+Two things had to be settled before the raw groups could be used:
+
+- **Which LOD's list.** 836 of 1031 sets split their raw groups across the three LODs, which
+  this tree's single list per set cannot express. It does not matter: all 836 name the same
+  groups in the same order in every LOD, and each LOD renumbers its own `visible_shift` from
+  bit 0 (`CalculateVisibleShift`), so LOD 0's list matches the bunch masks of every LOD. The
+  node flags differ across LODs in 107 sets, and those are reached only through
+  `visibilityNodeIndex`, which the cache path leaves at -1.
+- **Where the node flags come from.** Not from the mesh names: `temp_visible_object` is empty
+  in all 4235 cached groups, baking having resolved it into `visible_nodes`, which is written
+  one entry per node in every one of them. The old code derived the flags from a mesh list
+  that is never populated.
+
+**What this actually broke is worth stating, because the earlier note in this file had it
+backwards.** It said the parts the original hid per animation state were all shown at once.
+They were not shown at all. `isVisible` tests `vg.visibilities & group->visibility`, and the
+dummy group's `visibility` is `1 << 0`, so only bunches whose mask carries bit 0 ever passed.
+Of 3475 LOD-0 bunches, 2151 are reachable on group 0 and all 3475 across the full group list —
+so **1324 bunches in 491 models could not be drawn in any state**. A scene where nothing
+switches groups renders identically either way, which is why this survived so long: the fault
+is invisible until a unit transforms, finishes building, or dies.
+
 ### Textures — `cTexLibrary::loadBaseCache`
 
 Shipped the same way: no source images, only
@@ -667,34 +707,28 @@ Mostly nothing — they already load:
 
 ## Still open
 
-1. **Visibility sets are approximated.** Maelstrom's per-LOD group indices
-   (`C3DX_AVS_ONE_RAW` / `_LODS`) index a structure this tree replaced, so each set is
-   collapsed to a single catch-all group and **parts the original hid per animation state
-   are all shown at once**. First suspect for any model that looks wrong — and a likelier
-   one since the chains started running, because the states that did the hiding are exactly
-   what was dormant before.
-2. **Fonts are a substitute typeface.** Reading `.xfont` + its `.tga` atlas would restore
+1. **Fonts are a substitute typeface.** Reading `.xfont` + its `.tga` atlas would restore
    the original lettering.
-3. **Maelstrom-only `.spg` camera fields go unread** — `FarPlane`, `NearPlane`,
+2. **Maelstrom-only `.spg` camera fields go unread** — `FarPlane`, `NearPlane`,
    `CAMERA_ZOOM_*`, `CAMERA_MAX_HEIGHT`, `CAMERA_MIN_HEIGHT` — so the camera uses P2
    defaults on larger maps. Not known to matter; not investigated.
-4. **Ten polymorphic classes in Maelstrom's data do not exist in this source**, and resolve
+3. **Ten polymorphic classes in Maelstrom's data do not exist in this source**, and resolve
    to null objects rather than failing: the `AiAction_*` / `AiCondition_*` action-chain
    system (matching its `Scripts/Engine/AiActionChainList`, which P2 has no equivalent of),
    plus `ActionSquadMove`, `ActionSetCoastSprites`, `AttributeReal` and
    `ConditionObjectNearObjectByLabel`.
-5. **The basement is read and thrown away.** `C3DX_BASEMENT` (500/501/502) is building
+4. **The basement is read and thrown away.** `C3DX_BASEMENT` (500/501/502) is building
    foundation geometry, a feature P2 dropped. The raw `.3DX` path ignores the chunks
    outright; the cache path has no choice but to read them — they sit mid-record in
    `otherInfo`, so skipping them would put the reader out of step — and then discards them.
    If that geometry is ever wanted, it is already parsed.
-6. **Not every mission has been run.** `c1_m1` and `c1_m2` load; the rest are untested.
-7. **Tooltips are missing.** A state used to carry its hover text directly
+5. **Not every mission has been run.** `c1_m1` and `c1_m2` load; the rest are untested.
+6. **Tooltips are missing.** A state used to carry its hover text directly
    (`hoveredTextLoc`, a localization key, read by `UI_ControlState::serialize`); 2008 moved
    it into a `UI_ACTION_HOVER_INFO` action. Maelstrom's data writes the old field, nothing
    reads it, and no control shows a tooltip. Not converted — the screens themselves are
    readable without it.
-8. **`OPTION_SCREEN_SIZE` means a different resolution.** It is an *index*, and the list it
+7. **`OPTION_SCREEN_SIZE` means a different resolution.** It is an *index*, and the list it
    indexes is C++ (`Game/GameOptionsSerialization.cpp:48`) — the `comment` string beside it
    in the data is only a label. Maelstrom's saved index 25 is 1920×1080 in Maelstrom's list;
    in ours, after `filterBaseGraphOptions` drops the modes the display does not support, it
@@ -702,7 +736,7 @@ Mostly nothing — they already load:
    window aspect, and with it which branch of the letterbox/pillarbox code runs — Perimeter 2
    at its own default of 1280×1024 never takes the wide branch that Maelstrom then does.
    Belongs in the converter, which would have to renumber the index against our list.
-9. **The silhouette outline is still unported.** The units themselves draw now (see above);
+8. **The silhouette outline is still unported.** The units themselves draw now (see above);
    what is missing is the coloured outline they show through a building they walk behind,
    which is stencil work — **Render-PORTING.md #22**. Unreachable on retail Perimeter 2, so
    this build is the only way to exercise it.

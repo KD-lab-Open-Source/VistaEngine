@@ -288,29 +288,56 @@ void cStatic3dx::loadMaelstromVisibilitySets(CLoadData* ld)
 		if(one->id != C3DX_AVS_ONE)
 			continue;
 
+		visibilitySets_.push_back(StaticVisibilitySet());
+		StaticVisibilitySet& set = visibilitySets_.back();
+
+		// A set writes its groups twice. C3DX_AVS_ONE_RAW carries each one in full, and
+		// C3DX_AVS_ONE_LODS follows with three lists of indices back into them, one per
+		// LOD. This tree keeps a single group list per set, so the raw ones are held aside
+		// and the first LOD's list decides which of them the set ends up with.
+		StaticVisibilityGroups rawGroups;
+		vector<int> lodGroups;
+		bool allMeshesInSet = false;
+
 		CLoadDirectory parts(one);
 		while(CLoadData* part = parts.next()){
-			if(part->id != C3DX_AVS_ONE_HEAD)
-				continue;
-
 			CLoadIterator it(part);
-			visibilitySets_.push_back(StaticVisibilitySet());
-			StaticVisibilitySet& set = visibilitySets_.back();
-			it >> set.name;
+			switch(part->id){
+			case C3DX_AVS_ONE_HEAD:
+				it >> set.name;
+				it >> allMeshesInSet;
+				it >> set.meshes;
+				break;
+			case C3DX_AVS_ONE_RAW:
+				rawGroups.push_back(StaticVisibilityGroup());
+				// Byte-for-byte the record StaticVisibilityGroup::Load already reads --
+				// it kept the throwaway `lod` field through the rewrite.
+				rawGroups.back().Load(it);
+				break;
+			case C3DX_AVS_ONE_LODS:
+				// Only the first of the three lists is taken. The other two name the same
+				// groups by the same names in the same order -- measured across all 1031
+				// cached models -- and each LOD renumbers its own visible_shift from bit
+				// 0, so LOD 0's list matches the bunch masks of every LOD.
+				it >> lodGroups;
+				break;
+			}
+		}
 
-			// Maelstrom's per-LOD group indices (C3DX_AVS_ONE_RAW / _LODS) index a
-			// structure this tree replaced, so only the mesh list is carried over and
-			// every set gets the single catch-all group. Parts that the original
-			// switched on and off per animation state will all be shown.
-			bool allMeshesInSet = false;
-			it >> allMeshesInSet;
-			it >> set.meshes;
+		for(int i = 0; i < lodGroups.size(); i++)
+			if(lodGroups[i] >= 0 && lodGroups[i] < rawGroups.size())
+				set.visibilityGroups.push_back(rawGroups[lodGroups[i]]);
 
+		// A set with no LOD table at all keeps the raw list as written.
+		if(set.visibilityGroups.empty())
+			set.visibilityGroups.swap(rawGroups);
+
+		if(set.visibilityGroups.empty()){
+			// Nothing in the file: fall back to the catch-all group, and do by hand the
+			// bookkeeping prepareMesh() would have done -- hand out the visibility bit and
+			// turn the group's mesh names into the per-node flags cObject3dx::Update
+			// indexes. Baked geometry never reaches prepareMesh().
 			set.DummyVisibilityGroup();
-
-			// prepareMesh() is what normally hands out the visibility bit and turns a
-			// group's mesh names into the per-node flags cObject3dx::Update indexes;
-			// baked geometry skips it, so the bookkeeping is done here instead.
 			for(int igroup = 0; igroup < set.visibilityGroups.size(); igroup++){
 				StaticVisibilityGroup& group = set.visibilityGroups[igroup];
 				group.visibility = 1 << igroup;
@@ -319,6 +346,15 @@ void cStatic3dx::loadMaelstromVisibilitySets(CLoadData* ld)
 					group.visibleNodes[inode] =
 						allMeshesInSet || group.meshes.exists(nodes[inode].name);
 			}
+		}
+		else{
+			// visible_shift and the per-node flags both come out of the file, so there is
+			// nothing to synthesise. The flag array is written one entry per node in every
+			// cached model, but cObject3dx::Update indexes it by node without checking, so
+			// hold it to that length rather than trust the file.
+			StaticVisibilityGroups::iterator group;
+			FOR_EACH(set.visibilityGroups, group)
+				group->visibleNodes.resize(nodes.size());
 		}
 	}
 }
