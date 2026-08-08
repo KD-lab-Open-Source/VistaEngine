@@ -62,6 +62,36 @@ uniforms at `b0, space1`, fragment textures/samplers at `t#/s#, space2`, fragmen
 at `b0, space3`. Getting one wrong fails pipeline creation the same opaque way, because the
 root signature SDL builds will not cover the shader's bindings.
 
+### Anisotropic sampling forces linear min/mag/mip
+
+Same shape of trap, one layer down. Vulkan and Metal carry the three filters and anisotropy
+as independent fields; D3D12 packs them into one `D3D12_FILTER` enum, and anisotropy is a bit
+set on top of an all-linear encoding. `SDLToD3D12_Filter` builds it arithmetically, so
+
+```c
+enable_anisotropy = true;  mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
+```
+
+encodes `MIN_MAG_LINEAR_MIP_POINT (0x14) | ANISOTROPIC (0x40)` = `0x54`, **which is not a
+member of `D3D12_FILTER`**. Only `0x55` (`D3D12_FILTER_ANISOTROPIC`) and `0xd5` (its
+comparison form) are legal. So: if `enable_anisotropy` is set, all three of `min_filter`,
+`mag_filter` and `mipmap_mode` must be linear.
+
+Getting it wrong is not a returned error. `CreateSampler` returns `void`, so the runtime
+answers an unrecognised filter by **removing the device** — after which every texture and
+pipeline fails with `DXGI_ERROR_INVALID_CALL` and nothing points back at the sampler:
+
+```
+D3D12 ERROR: ID3D12Device::CreateSampler: Filter unrecognized. [ STATE_CREATION ERROR #742 ]
+D3D12: Removing Device.
+D3D12 ERROR: ID3D12Device::RemoveDevice: ... [ EXECUTION ERROR #232: DEVICE_REMOVAL_PROCESS_AT_FAULT ]
+```
+
+Watch for a `SDL_GPUSamplerCreateInfo` **reused** between samplers: that is how the water
+renderer got one, by switching `mipmap_mode` for a second sampler while `enable_anisotropy`
+stayed set from the first. Windows 11 hid it — its newer `D3D12Core.dll` sanitises the bit
+pattern where Windows 10's treats it as an illegal call.
+
 ## One source list per module
 
 Every module's `CMakeLists.txt` used to have a `WIN32` branch feeding it a different set of
