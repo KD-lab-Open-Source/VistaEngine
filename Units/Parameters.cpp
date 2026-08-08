@@ -9,6 +9,7 @@
 #include "Serialization/RangedWrapper.h"
 #include "Universe.h"
 #include "WBuffer.h"
+#include "DiagLog.h"
 
 string getStringTokenByIndex(const char*, int);
 
@@ -266,20 +267,73 @@ bool matchMask(const char* mask, const char* text)
 }
 
 
-float ParameterValue::value () const 
+namespace {
+
+// Names of the parameters currently inside evaluate(), outermost first. A parameter can
+// only be re-entered through another parameter's formula, so this is the reference chain
+// -- the part the assert's bare name never told us.
+thread_local std::vector<const char*> parameterCalculationStack;
+
+string parameterCalculationChain(const char* reentered)
+{
+	string chain;
+	for(vector<const char*>::const_iterator it = parameterCalculationStack.begin(); it != parameterCalculationStack.end(); ++it){
+		chain += *it;
+		chain += " -> ";
+	}
+	chain += reentered;
+	return chain;
+}
+
+const char* evalResultName(FormulaString::EvalResult result)
+{
+	switch(result){
+	case FormulaString::EVAL_SUCCESS:        return "EVAL_SUCCESS";
+	case FormulaString::EVAL_SYNTAX_ERROR:   return "EVAL_SYNTAX_ERROR";
+	case FormulaString::EVAL_UNDEFINED_NAME: return "EVAL_UNDEFINED_NAME";
+	}
+	return "unknown";
+}
+
+}
+
+float ParameterValue::value () const
 {
 	switch(state_) {
-	case NOT_CALCULATED:
+	case NOT_CALCULATED: {
 		state_ = CALCULATING;
+		parameterCalculationStack.push_back(c_str());
 		FormulaString::Dummy dummy;
-		if (formula_->formula().evaluate(calculated_value_, value_, LookupParameter(group_), dummy, dummy, dummy) == FormulaString::EVAL_SUCCESS) {
+		FormulaString::EvalResult result = formula_->formula().evaluate(calculated_value_, value_, LookupParameter(group_), dummy, dummy, dummy);
+		parameterCalculationStack.pop_back();
+		if (result == FormulaString::EVAL_SUCCESS) {
 			state_ = CALCULATED;
+		}
+		else
+			// The formula did not evaluate, and state_ deliberately stays CALCULATING --
+			// see the note on the CALCULATING branch below for what that then looks like.
+			// Silent until now, though it is the root event: the parser is ours (the
+			// original Boost.Spirit grammar is gone), so a formula the retail data has
+			// always carried can fail here and nowhere else.
+			diag::log("ParameterValue \"{}\": formula \"{}\" -> {} (group \"{}\")",
+					  c_str(), formula_->formula().c_str(), evalResultName(result), group_.c_str());
 		}
 	case CALCULATED:
 		return calculated_value_;
 	case CALCULATING:
 	default:
 		xassertStr(0 && "Циклическое обращение к значениям параметров:", c_str());
+		// Two different faults reach this branch and the assert calls both of them a
+		// cycle. Tell them apart: if we are inside this parameter's own evaluate() it is
+		// a real cycle, and the chain above names every step of it. If we are not, the
+		// parameter is simply stuck -- an earlier evaluate() failed and left state_ at
+		// CALCULATING, so every read from then on lands here and reports a cycle that
+		// does not exist.
+		if(std::find(parameterCalculationStack.begin(), parameterCalculationStack.end(), c_str()) != parameterCalculationStack.end())
+			diag::log("ParameterValue: cyclic reference: {}", parameterCalculationChain(c_str()));
+		else
+			diag::log("ParameterValue \"{}\": read while stuck in CALCULATING (an earlier evaluate() failed, not a cycle); formula \"{}\"",
+					  c_str(), formula_->formula().c_str());
 		return 0;
 	};
 }
