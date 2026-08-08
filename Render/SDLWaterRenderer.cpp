@@ -74,7 +74,17 @@ void SDLWaterRenderer::createPipelines()
 	si.address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
 	si.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
 	si.max_lod = 0.f;   // the render target has no mip chain
-	si.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
+	// mipmap_mode stays LINEAR, and must: si still carries enable_anisotropy from the
+	// sampler above, and D3D12 encodes anisotropy as a bit on top of the min/mag/mip
+	// filter -- MIN_MAG_LINEAR_MIP_POINT | ANISOTROPIC is 0x54, which is not a member of
+	// D3D12_FILTER. CreateSampler cannot fail by return code, so the runtime answers an
+	// unrecognised filter by REMOVING THE DEVICE, and every texture and pipeline after it
+	// fails with DXGI_ERROR_INVALID_CALL -- including the font atlas, which is where it
+	// finally surfaced, as a null FT::Font several subsystems away.
+	// Vulkan and Metal carry the filters and anisotropy as independent fields, so the same
+	// call is legal there and this only ever reached Windows.
+	// Nothing is lost: with one mip level there is nothing for POINT and LINEAR to differ
+	// over, and max_lod above already pins sampling to it.
 	samplerClamp_ = SDL_CreateGPUSampler(device_, &si);
 
 	// 1x1 flat wave map: the decoder's bias, so water.frag.hlsl's slope() reads 0.
