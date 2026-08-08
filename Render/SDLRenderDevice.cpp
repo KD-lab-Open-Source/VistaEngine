@@ -27,6 +27,28 @@
 #include "SDLEnvironmentEarthRenderer.h"
 #include "SDLPostEffectRenderer.h"
 
+namespace {
+
+// SDL's log, folded into ours. Its own default sink is stderr, which nothing on Windows
+// keeps; diag.log is the file a user can actually send back.
+void SDLCALL sdlLogToDiag(void*, int category, SDL_LogPriority priority, const char* message)
+{
+	const char* level = "?";
+	switch(priority){
+	case SDL_LOG_PRIORITY_TRACE:    level = "trace";    break;
+	case SDL_LOG_PRIORITY_VERBOSE:  level = "verbose";  break;
+	case SDL_LOG_PRIORITY_DEBUG:    level = "debug";    break;
+	case SDL_LOG_PRIORITY_INFO:     level = "info";     break;
+	case SDL_LOG_PRIORITY_WARN:     level = "warn";     break;
+	case SDL_LOG_PRIORITY_ERROR:    level = "error";    break;
+	case SDL_LOG_PRIORITY_CRITICAL: level = "critical"; break;
+	default: break;
+	}
+	diag::log("SDL[{} {}]: {}", category, level, message ? message : "");
+}
+
+}
+
 // See the declarations in SDLRenderDevice.h.
 cSDLRenderDevice* sdlRenderDevice()
 {
@@ -207,10 +229,28 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND /*hWnd*/,
 	}
 
 	if(!device_){
+		// SDL's own warnings say things no other channel does -- which validation layers
+		// came up, which feature checks the platform refused -- and by default they go
+		// somewhere a user never looks. Send them where the rest of the diagnostics go.
+		static bool sdlLogRouted = false;
+		if(!sdlLogRouted){
+			sdlLogRouted = true;
+			SDL_SetLogOutputFunction(sdlLogToDiag, nullptr);
+		}
+
+		// -gpudebug turns the backend's validation layer on. Worth a switch because the
+		// layer is the only thing that explains a refusal: D3D12 answers a rejected
+		// texture or pipeline with a bare HRESULT whose own text is "enable the D3D debug
+		// layer to view details in the debug messages". Those details go to the debugger's
+		// output (OutputDebugString), not through SDL_GetError, so read them there.
+		const bool gpuDebug = check_command_line("gpudebug") != 0;
+		if(gpuDebug)
+			SDL_SetLogPriorities(SDL_LOG_PRIORITY_VERBOSE);
+
 		// Only the one format this platform's shaders were compiled to (DXIL / SPIR-V /
 		// MSL, see SDLShaders/ShaderBlob.h). Naming formats we hold no bytecode for would
 		// let SDL pick a backend whose pipelines we then could not create.
-		device_ = SDL_CreateGPUDevice(vista::kShaderFormat, false, nullptr);
+		device_ = SDL_CreateGPUDevice(vista::kShaderFormat, gpuDebug, nullptr);
 		if(!device_){
 			diag::log("cSDLRenderDevice::Initialize: SDL_CreateGPUDevice failed: {}", SDL_GetError());
 			return false;
@@ -223,7 +263,8 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND /*hWnd*/,
 		}
 		// Logged unconditionally: which backend a user's machine actually picked is the
 		// first thing worth knowing about any report from the field.
-		diag::log("cSDLRenderDevice: SDL GPU device created, driver \"{}\", requested {}x{}", SDL_GetGPUDeviceDriver(device_), xScr_, yScr_);
+		diag::log("cSDLRenderDevice: SDL GPU device created, driver \"{}\", requested {}x{}, validation {}",
+				  SDL_GetGPUDeviceDriver(device_), xScr_, yScr_, gpuDebug ? "requested (-gpudebug)" : "off");
 	}
 
 	xScr = xScr_;

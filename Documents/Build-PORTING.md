@@ -84,6 +84,35 @@ Two include directories serve everyone now: `Platform/d3d9_compat` (D3D9 declara
 render headers still name its types, and on Windows this *deliberately shadows* the SDK's
 `d3d9.h`, since a retired backend only has to parse) and `Network/dplay8.h`.
 
+## `diag.log` and `-gpudebug`
+
+The game writes **`diag.log`** into the working directory, beside `_console.log`. It carries
+the failures that used to return a bare error code and leave nothing behind: GPU device and
+texture creation, the five ways `FontManager::createFont` can fail, and a formula that does
+not evaluate. Each line is flushed as it is written, because most of these are logged by code
+that is about to hand a null back to a caller that will not check it.
+
+It is not `kdError`. `Console` queues a message and writes it on the next `graphQuant`, so
+anything logged immediately before a crash is lost, and stderr on Windows goes nowhere a user
+can retrieve. The file is UTF-8 with a BOM: source literals are already UTF-8, but names out
+of the game data are CP1251 and so is `SDL_GetError()` on a Russian Windows — Windows formats
+the HRESULT text in the ANSI codepage. A line that fails a UTF-8 validity check is CP1251 and
+gets converted (`Util/DiagLog.cpp`).
+
+```
+cd GameData && ../build-rel/Game/Game -gpudebug
+```
+
+**`-gpudebug`** asks SDL for the backend's validation layer and raises SDL's own log to
+verbose; without it neither says anything. Reach for it when a `SDL_CreateGPUTexture` or
+`SDL_CreateGPUGraphicsPipeline` fails, because the HRESULT alone will not tell you why —
+D3D12 answers with `DXGI_ERROR_INVALID_CALL` whose own message text is *"enable the D3D debug
+layer to view details in the debug messages"*. **Those details do not come back through
+`SDL_GetError`**: the layer writes them with `OutputDebugString`, so read them in the debugger
+(or DebugView), not in `diag.log`. What does land in `diag.log` is SDL's own log, including
+whether the layer came up at all — `Validation layers enabled` versus `Validation layers not
+found, continuing without validation`.
+
 ## AddressSanitizer
 
 ```
