@@ -14,6 +14,9 @@ add_subdirectory(XmlRpc)
 set(UTIL_SOURCES
     ComboVectorString.cpp
     DebugPrm.cpp
+    # Immediately-flushed field log (diag.log); see DiagLog.h for why neither
+    # kdError nor stderr can carry a diagnostic that precedes a crash.
+    DiagLog.cpp
     FileUtils/FileTime.cpp
     FileUtils/FileUtils.cpp
     FileUtils/XGUID.cpp

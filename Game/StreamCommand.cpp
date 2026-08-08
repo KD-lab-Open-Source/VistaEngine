@@ -68,8 +68,16 @@ void StreamDataManager::execute()
 				TimerContainer& data = timerMap->operator []((int)func);
 				if(data.timer == 0){
 					string name;
-					debugSymbolManager->getProcName((void*)func, name);
-					xassert(!name.empty());
+					// debugSymbolManager is null in this build on every platform:
+					// DebugSymbolManagerStub's create() is empty, so the call below was
+					// made through a null pointer and could never produce a name. The
+					// xassert(!name.empty()) that used to sit here therefore fired on
+					// every run, and being the first assert of the session it is the one
+					// users click Ignore on -- training them past the asserts that matter.
+					// (StreamInterpolation.cpp has the same call, with the assert already
+					// commented out rather than the cause fixed.)
+					if(debugSymbolManager)
+						debugSymbolManager->getProcName((void*)func, name);
 					data.name = new char[name.size()+1];
 					strcpy(data.name, name.c_str());
 					data.timer = new TimerData(data.name);

@@ -6,6 +6,7 @@
 
 #include "Game/GameOptions.h"
 #include "UI_Render.h"
+#include "DiagLog.h"
 
 using namespace FT;
 
@@ -78,6 +79,12 @@ bool UI_Font::createFont()
 
 	font_ = fontManager().createFont(fontFile_.c_str(), newSize, &prm);
 	xxassert(font_, (XBuffer() < fontFile_.c_str() < ":" <= newSize).c_str());
+	// releaseFont() ran above, so a font that worked at the previous window size is now
+	// null too. Name the file and the size: the pixel size is derived from the window
+	// height, so it is the only part a user's machine can differ in.
+	if(!font_)
+		diag::log("UI_Font::createFont: failed for \"{}\" at {} px (window height {})",
+				  fontFile_.c_str(), newSize, UI_Render::instance().windowPosition().height());
 
 	return font_ != 0;
 }

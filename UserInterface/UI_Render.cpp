@@ -511,6 +511,15 @@ const UI_Font* UI_Render::defaultFont() const
 	}
 
 	xxassert(defaultFont_->font(), "Не удалось создать фонт по умолчанию");
+
+	// Not survivable, and it used to be treated as if it were: xxassert defaults to
+	// Ignore, so every caller went on to dereference the null FT::Font this returns.
+	// The crash then landed in FT::Font::size(), several frames and one subsystem away
+	// from the failure. Stop here instead, where we still know what went wrong. Each
+	// createFont() above has already logged its own reason to diag.log.
+	if(!defaultFont_->font())
+		ErrH.Abort("No usable font: every attempt to build the default font failed. See diag.log.");
+
 	return defaultFont_;
 }
 

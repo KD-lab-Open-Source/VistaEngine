@@ -3,6 +3,7 @@
 #include "ftrender.h"
 #include "TexLibrary.h"
 #include "Texture.h"
+#include "DiagLog.h"
 #include <math.h>
 
 void dprintfW(const wchar_t *format, ...);
@@ -174,15 +175,24 @@ FontManager::ShortSize FontManager::calcTextureSize(bool nonPow2)
 
 Font* FontManager::createFont(const char* ttf, uint8 font_pixel_size, const FontParam* prm)
 {
-	if(!ttf || !*ttf)
+	// Every exit below returns 0, and a null FT::Font is dereferenced unguarded all
+	// over the UI (UI_TextParser::parseString, UI_ControlBase::cfont, ...). Say which
+	// exit was taken: on a user's machine that is the only way to tell a missing .ttf
+	// from a GPU that refused the atlas.
+	if(!ttf || !*ttf){
+		diag::log("FT::createFont: empty font file name (size {})", (int)font_pixel_size);
 		return 0;
-	
+	}
+
 	if(!prm)
 		prm = &defParam;
-	
+
 	//dprintfW(L"Создается шрифт: %S размер: %d пикселов\n", ttf, font_pixel_size);
 	if(!render_->loadFont(ttf)){
 		//dprintfW(L"Создать шрифт не удалось\n");
+		// FT_New_Face opens the file with stdio, bypassing the pak VFS, so this means
+		// the .ttf is missing from disk, unreadable, or not a scalable outline font.
+		diag::log("FT::createFont: FT_New_Face failed for \"{}\" (size {}) -- file missing, unreadable or not scalable", ttf, (int)font_pixel_size);
 		return 0;
 	}
 	render_->setMonochrome(!prm->antialiasing);
@@ -193,6 +203,7 @@ Font* FontManager::createFont(const char* ttf, uint8 font_pixel_size, const Font
 		render_->setHinting(prm->hinting == FontParam::BYTE_CODE_ONLY, prm->hinting == FontParam::AUTO_HINT_ONLY);
 
 	if(!render_->setSize(font_pixel_size)){
+		diag::log("FT::createFont: setSize({}) failed for \"{}\"", (int)font_pixel_size, ttf);
 		render_->releaseFont();
 		return 0;
 	}
@@ -205,6 +216,10 @@ Font* FontManager::createFont(const char* ttf, uint8 font_pixel_size, const Font
 	font->size_ = font_pixel_size;
 	
 	if(!(font->texture_ = GetTexLibrary()->CreateAlphaTexture(size.x, size.y))){
+		// The GPU refused the glyph atlas. On SDL GPU this is CreateTexture returning
+		// non-zero, i.e. a dead device or a rejected SDL_CreateGPUTexture -- the render
+		// device logs which.
+		diag::log("FT::createFont: CreateAlphaTexture({}x{}) failed for \"{}\":{}", (int)size.x, (int)size.y, ttf, (int)font_pixel_size);
 		delete font;
 		return 0;
 	}
@@ -250,6 +265,12 @@ Font* FontManager::createFont(const char* ttf, uint8 font_pixel_size, const Font
 				render_->releaseFont();
 				releaseFont(font);
 				dprintfW(L"Не влезли в рассчитанную текстуру: %d*%d\nШрифт:%S, размер:%d\n", size.x, size.y, ttf, font_pixel_size);
+				// calcTextureSize caps at 2048x2048; when the glyphs do not fit it
+				// leaves the loop having doubled past the cap, and the size it hands
+				// back can hold less than the attempt that just failed. Reachable only
+				// at very large pixel sizes (screen height above ~4300 for the shipped
+				// fonts), so it is worth knowing if it ever fires in the field.
+				diag::log("FT::createFont: glyph atlas overflow, {}x{} too small for \"{}\":{}", (int)size.x, (int)size.y, ttf, (int)font_pixel_size);
 				return 0;
 			}
 		}

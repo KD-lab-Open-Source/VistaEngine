@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <cstring>
 
+#include "DiagLog.h"           // diag::log — flushed to diag.log, unlike stderr
 #include "Platform/Window.h"   // the SDL_Window we claim, and the OS handle beside it
 #include "SDLShaders/ShaderBlob.h"   // vista::kShaderFormat — the one format we ship
 
@@ -201,7 +202,7 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND /*hWnd*/,
 	// an SDL_Window at all. The window we claim is SDL's own (Platform/Window.h).
 	window_ = static_cast<SDL_Window*>(PlatformWindow::current());
 	if(!window_){
-		fprintf(stderr, "cSDLRenderDevice::Initialize: no window\n");
+		diag::log("cSDLRenderDevice::Initialize: no window");
 		return false;
 	}
 
@@ -211,16 +212,18 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND /*hWnd*/,
 		// let SDL pick a backend whose pipelines we then could not create.
 		device_ = SDL_CreateGPUDevice(vista::kShaderFormat, false, nullptr);
 		if(!device_){
-			fprintf(stderr, "cSDLRenderDevice::Initialize: SDL_CreateGPUDevice failed: %s\n", SDL_GetError());
+			diag::log("cSDLRenderDevice::Initialize: SDL_CreateGPUDevice failed: {}", SDL_GetError());
 			return false;
 		}
 		if(!SDL_ClaimWindowForGPUDevice(device_, window_)){
-			fprintf(stderr, "cSDLRenderDevice::Initialize: SDL_ClaimWindowForGPUDevice failed: %s\n", SDL_GetError());
+			diag::log("cSDLRenderDevice::Initialize: SDL_ClaimWindowForGPUDevice failed: {}", SDL_GetError());
 			SDL_DestroyGPUDevice(device_);
 			device_ = nullptr;
 			return false;
 		}
-		fprintf(stderr, "cSDLRenderDevice: SDL GPU device created (%s)\n", SDL_GetGPUDeviceDriver(device_));
+		// Logged unconditionally: which backend a user's machine actually picked is the
+		// first thing worth knowing about any report from the field.
+		diag::log("cSDLRenderDevice: SDL GPU device created, driver \"{}\", requested {}x{}", SDL_GetGPUDeviceDriver(device_), xScr_, yScr_);
 	}
 
 	xScr = xScr_;
@@ -380,7 +383,13 @@ int cSDLRenderDevice::BeginScene()
 	// the renderers record their copy + render passes once, at EndScene.
 	commandBuffer_ = SDL_AcquireGPUCommandBuffer(device_);
 	if(!commandBuffer_){
-		fprintf(stderr, "cSDLRenderDevice::BeginScene: AcquireGPUCommandBuffer failed: %s\n", SDL_GetError());
+		// Once per session: this fails every frame when it fails at all, and a log
+		// growing at frame rate is no use to anybody.
+		static bool reported = false;
+		if(!reported){
+			reported = true;
+			diag::log("cSDLRenderDevice::BeginScene: AcquireGPUCommandBuffer failed: {}", SDL_GetError());
+		}
 		return -1;
 	}
 
@@ -1264,7 +1273,19 @@ void cSDLRenderDevice::uploadTexture(const TextureData& td)
 	}
 	SDL_UnmapGPUTransferBuffer(device_, tb);
 
+	// Unchecked here until now: with a sick device this returns null and every SDL
+	// call below silently no-ops, so the texture keeps whatever it was created with
+	// and nothing says why.
 	SDL_GPUCommandBuffer* cb = SDL_AcquireGPUCommandBuffer(device_);
+	if(!cb){
+		static bool reported = false;
+		if(!reported){
+			reported = true;
+			diag::log("cSDLRenderDevice::uploadTexture: AcquireGPUCommandBuffer failed: {}", SDL_GetError());
+		}
+		SDL_ReleaseGPUTransferBuffer(device_, tb);
+		return;
+	}
 	SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(cb);
 	SDL_GPUTextureTransferInfo src = {};
 	src.transfer_buffer = tb;
@@ -1303,7 +1324,7 @@ int cSDLRenderDevice::CreateTexture(cTexture* Texture, cFileImage* FileImage, in
 		ti.layer_count_or_depth = 1; ti.num_levels = 1;
 		SDL_GPUTexture* tex = SDL_CreateGPUTexture(device_, &ti);
 		if(!tex){
-			fprintf(stderr, "cSDLRenderDevice: shadow map %dx%d failed: %s\n", w, h, SDL_GetError());
+			diag::log("cSDLRenderDevice::CreateTexture: shadow map {}x{} failed: {}", w, h, SDL_GetError());
 			return 1;
 		}
 		TextureData td;
@@ -1328,7 +1349,7 @@ int cSDLRenderDevice::CreateTexture(cTexture* Texture, cFileImage* FileImage, in
 		ti.layer_count_or_depth = 1; ti.num_levels = 1;
 		SDL_GPUTexture* tex = SDL_CreateGPUTexture(device_, &ti);
 		if(!tex){
-			fprintf(stderr, "cSDLRenderDevice: render target %dx%d failed: %s\n", w, h, SDL_GetError());
+			diag::log("cSDLRenderDevice::CreateTexture: render target {}x{} failed: {}", w, h, SDL_GetError());
 			return 1;
 		}
 		TextureData td;
@@ -1381,7 +1402,14 @@ int cSDLRenderDevice::CreateTexture(cTexture* Texture, cFileImage* FileImage, in
 		ti.width = (Uint32)w; ti.height = (Uint32)h;
 		ti.layer_count_or_depth = 1; ti.num_levels = (Uint32)levels;
 		SDL_GPUTexture* tex = SDL_CreateGPUTexture(device_, &ti);
-		if(!tex) return 1;
+		if(!tex){
+			// Was a bare `return 1`. Everything above it -- the font atlas most
+			// visibly -- turns that into a null resource its callers dereference
+			// without a check, several call frames away and with no clue left behind.
+			diag::log("cSDLRenderDevice::CreateTexture: SDL_CreateGPUTexture {}x{} levels {} frame {}/{} failed: {}",
+					  w, h, levels, i, frames, SDL_GetError());
+			return 1;
+		}
 
 		TextureData td;
 		td.tex = tex; td.w = w; td.h = h; td.bpp = bpp; td.pitch = w * bpp;

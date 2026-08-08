@@ -91,8 +91,11 @@ void StreamInterpolator::process(float factor)
 		TimerContainer& data = timerMap->operator []((int)func);
 		if(data.timer == 0){
 			string name;
-			debugSymbolManager->getProcName((void*)func, name);
-			//xassert(!name.empty());
+			// Null on every platform in this build (DebugSymbolManagerStub::create is
+			// empty), so this was a call through a null pointer; the assert that used to
+			// follow it was commented out instead of the call being guarded.
+			if(debugSymbolManager)
+				debugSymbolManager->getProcName((void*)func, name);
 			data.name = new char[name.size()+1];
 			strcpy(data.name, name.c_str());
 			data.timer = new TimerData(data.name);
