@@ -674,6 +674,47 @@ each keep their own list; `UpdateVisibilityGroup` took `&groups[index]` with no 
 which is null for an empty vector. The guards are unconditional: retail data simply never
 reaches them.
 
+### Aircraft banking — `FormationUnit::quant`
+
+Maelstrom's helicopters flew a clean path while spinning about their own axis: the heading
+swung ±40–57° per quant and the model rolled through ~140°, reversing whenever the turn rate
+changed sign. The position was never wrong — traced, `step` held 4.99–5.10 per quant the whole
+time — which is why this reads as a rendering or animation fault and is neither.
+
+A flying unit's bank comes from one term:
+
+```
+clamp(rotSpeed() / G2R(pathTrackingAngle), -1, 1) * additionalHorizontalRot
+```
+
+Pre-2008 divided by `pathTrackingAngle` **as written, in degrees**
+(`origin/Maelstrom Physics/RigidBodyUnit.cpp:1939`). 2008 converted the denominator to
+radians. `G2R(30) = 0.524` against `30` is a **57× larger ratio**, so the clamp saturates and
+the bank becomes the whole of `additionalHorizontalRot` — which is a bank angle in *radians*,
+and Maelstrom's aircraft prms carry `20`. Twenty radians where the old divisor gave a degree
+or two.
+
+Three things make this worth its own section:
+
+- **Our own tree disagrees with itself.** `Physics/PathTracking.cpp:507` still carries the
+  pre-2008 formula verbatim, `G2R`-free and unclamped. Only the `FormationController` path
+  converts, and that is the path a flying unit in a formation takes.
+- **It is not a port regression.** `git log -L 354,354:Physics/FormationController.cpp` shows
+  the line unchanged since the initial commit — stock 2008 code. Perimeter 2 reads the same
+  `20` and `45` in three of its own flying prms, so retail does this too. The fix is therefore
+  `#ifdef MAELSTROM_DATA` and the `#else` is byte-identical: Maelstrom's prm values were tuned
+  for the old divisor, Perimeter 2's for whatever 2008 intended.
+- **Measure amplitude, not reversals.** After the fix the turn-direction reversal *rate* is
+  still 11–24% on busy units; what changed is that each one is now fractions of a degree
+  instead of forty. Peak heading swing fell 118° → 11°, peak roll 0.94 → 0.18 (quaternion `y`).
+  Counting reversals would have said the fix barely worked.
+
+Found by recording the unit's pose per logic quant and per rendered frame and comparing the
+two series. That also cleared the three things it was *not*: the control loop (heading decays
+smoothly, 1 reversal in 91 quants on a clean flight), the interpolator (the factor advances
+0.00999 per ms against an ideal 0.01000, tracking real elapsed time exactly), and frame
+delivery (60 fps, ±2 ms, after a spawn transient in the first 2.5 s).
+
 ### Silhouettes — `Camera::DrawSilhouetteObject`
 
 The outline itself is stencil work that was never ported (**Render-PORTING.md #22**), and
