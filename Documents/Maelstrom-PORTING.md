@@ -705,6 +705,69 @@ Mostly nothing — they already load:
 | `.effect` | chunked Saver | same | same leading ids |
 | `inGeo.act` | present | — | the "geo" feature P2 dropped; harmless extra file |
 
+## Ruled out — physics, and a method note
+
+Maelstrom's units move and take hits differently enough to look wrong, and the obvious place
+to blame is `RigidBodyPrm`: its wire list is much longer on the old side. Three separate
+theories were chased from that and **all three are dead ends**. They are recorded here
+because each is easy to re-derive and cost real time.
+
+**The `RigidBodyPrm` wire lists differ by 23 names — and 19 of them are dead in Maelstrom
+too.** `RigidBodyPrm::serialize` reads 63 names here against 86 there. The 23 the old data
+writes and we never read look alarming, and the flight and steering cluster
+(`flying_stiffness`, `flying_oscillator_z`, `flying_vertical_direction_{x,y}_factor`,
+`zero_velocity_z`, `rudder_speed`, `steering_acceleration_max`,
+`steering_linear_velocity_min`, `brake_damping`, `point_control_slow_{distance,factor}`,
+`speed_map_factor`, `Dxy_minimal`, `analyze_points_density`, …) looks like the whole
+pre-2008 flight model gone missing. It is not: `git grep` each name across
+`origin/Maelstrom` and they appear **only in `Physics/RigidBodyPrm.h` and the constructor
+and serializer in `Physics/RigidBody.cpp`**. The original declared, defaulted, saved and
+loaded them, and never read one. Nothing that a field is not consumed by can change
+behaviour.
+
+Only **four** of the 23 are live in the original, and they are the only ones worth porting
+if a symptom ever points at them: `flying_down_without_way_points`
+(`RigidBodyUnit::checkDeepWater`, and the obstacle check for an uncontrolled flyer),
+`debris_angular_velocity` (`RigidBody::startDebris`, debris spin), and `impassabilityPass` /
+`ptImpassabilityCheck` (`PathTracking`). Two more that read as live are not:
+`isotropic` survives only as a constructor default and inside the words *isotropic* and
+*anisotropic* in comments, and `tree` is too common a word to grep for.
+
+**`hoverMode` and `alwaysMoving` are 2008 inventions, and their defaults are already
+correct.** Both are in the four fields *we* read that the old schema never writes, and both
+are tempting to set for Maelstrom's aircraft. Neither should be.
+`hoverMode` does not mean "hovers in place" — it means the unit rides on top of whatever is
+beneath it (`setDownUnit` / `isDownUnit`, and `checkPenetration` returning false for a
+non-hover flyer); the original tree contains **no** `downUnit` machinery at all, so its
+flyers pass over everything, which is what `hoverMode = false` gives. `alwaysMoving` gates
+`canRotate_` and `canMoveBack_` (`FormationController.cpp:990`); the original has no
+`canRotate_`, no `canMoveBack_` and no `alwaysMoving`, so its units could turn on the spot
+and reverse, which is what `alwaysMoving = false` gives. Setting either would move this port
+*away* from the original. The other two, `fieldPass` and `placeOnWaterSurface`, are likewise
+absent from the data and left at their defaults.
+
+**Missile knockback cannot fire here at all.** `IronBullet` throws its target with
+`attr().impulseStrength * sqrtf(mass)` through `addImpulseLinear`
+(`Units/IronBullet.cpp:189`), which is a plausible suspect for a unit that leaps when hit.
+It is unreachable twice over: the feature is a 2008 addition — the original's
+`Units/IronBullet.cpp` has no impulse code, and `addImpulseLinear` / `impulseStrength` occur
+in the whole Maelstrom tree only in `EnvironmentSimple.cpp` — and Maelstrom's data never
+writes `applyImpulse`, so our `false` default stands and the branch is never entered. A unit
+that appears to be thrown is arriving some other way; anything dropped from the sky comes
+through `StateBirthInAir` → `StateTouchDown`.
+
+Two smaller results from the same pass: the converter's `steering_duration` float→int rewrite
+is lossless on the shipped data (every value is `3000.`, `1500.`, `1000.` or `5000.`), and
+`gravity`, `restitution`, `friction`, `TOI_factor` and `relaxationTime` are read by **both**
+engines, so none of them is a candidate either.
+
+**The method note, which is the part worth keeping.** A wire name the old data writes and
+this tree does not read is *not* evidence of anything on its own. Before treating one as a
+regression, check that the **original** consumed it — `git grep -l <name> origin/Maelstrom`
+and discard the hits in the prm header and its serializer. Nineteen of these twenty-three
+fell at that step. The same test in reverse settles the fields we read and the data omits:
+ask what the original did *without* the field, not what our default happens to be.
+
 ## Still open
 
 1. **Fonts are a substitute typeface.** Reading `.xfont` + its `.tga` atlas would restore
@@ -716,7 +779,11 @@ Mostly nothing — they already load:
    to null objects rather than failing: the `AiAction_*` / `AiCondition_*` action-chain
    system (matching its `Scripts/Engine/AiActionChainList`, which P2 has no equivalent of),
    plus `ActionSquadMove`, `ActionSetCoastSprites`, `AttributeReal` and
-   `ConditionObjectNearObjectByLabel`.
+   `ConditionObjectNearObjectByLabel`. Only one of them is known to be *reached*:
+   `ActionSetCoastSprites` has 14 call sites in `Scripts/Content/Triggers/MAIN MENU.scr` —
+   the `Waves*` trigger in every screen's environment block — so the menu sets no coast
+   sprites. Of the 69 classes that script names, it is the only one this tree cannot
+   resolve.
 4. **The basement is read and thrown away.** `C3DX_BASEMENT` (500/501/502) is building
    foundation geometry, a feature P2 dropped. The raw `.3DX` path ignores the chunks
    outright; the cache path has no choice but to read them — they sit mid-record in
@@ -754,3 +821,19 @@ as broken.** Buildings visibly rendering through the fog looked like a bug and w
 long way into `cScene::AddPlanarCamera`'s visible-box computation before the original
 Windows build was checked — which does exactly the same thing. Compare against the original
 before opening the renderer.
+
+**The menu is a scripted set-piece, not a world running on its own.** `menu.spg` carries no
+triggers at all; the whole scene is driven by `Scripts/Content/Triggers/MAIN MENU.scr` —
+80,864 lines, 128 `ActionActivateSources`, 17 `ActionCreateUnit`, 21 `ActionSquadMoveToAnchor`.
+The guard-tower fight, the units walking between anchors and the aircraft are all placed by
+it. So is the time of day: each screen sets an environment block of
+
+```
+Fog3xx  ActionSetFog · TimeStopxxx  ActionSetTimeScale dayTimeScale = 0 ·
+SetTimexxx  ActionSetEnvironmentTime time = <hour> · SetHeavenColorxxx · Wavesxx · SetWaterTransxxx
+```
+
+with the clock **frozen** at 4.5, 9.0, 15.0, 15.4 or 16.9 and restored to the world's
+`dayTimeScale = 500` by exactly one trigger, `TimeStop100`. Day and night in the menu are the
+script stepping between pinned hours, not a cycle advancing — so lighting that changes when
+you move between screens, and only then, is correct.
