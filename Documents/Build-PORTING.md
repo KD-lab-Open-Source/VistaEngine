@@ -163,6 +163,38 @@ in the log in the place it happened. ASan writes them with `write(2)` rather tha
 nothing buffers them away; `ASAN_OPTIONS=log_path=/tmp/asan` diverts them to `/tmp/asan.<pid>`
 if the interleaving gets in the way. Under `lldb` the process stops on the report either way.
 
+## The editor (SurMap5Qt)
+
+The old MSVC tool projects (`SurMap5`, `ModelViewer`, `VistaEditor`, …) were never migrated to
+CMake. The map editor is being **rewritten on Qt 6** instead — the old `SurMap5/` tree stays in
+place as the reference implementation (like the kdw stubs): MFC + Prof-UIS + kdw are all
+Win32-only and do not build in this tree.
+
+Build it with:
+
+```
+cmake -B build -DBUILD_EDITOR=ON
+```
+
+which requires **Qt 6 (≥ 6.4) with the Widgets module** found via `find_package`:
+
+- **Windows**: install via the [Qt online installer](https://www.qt.io/download-open-source)
+  (MSVC kit matching your toolchain) or `aqt install-qt windows desktop 6.x.x win64_msvc2022_64`,
+  then add `CMAKE_PREFIX_PATH` pointing at the kit, e.g.
+  `-DCMAKE_PREFIX_PATH="C:/Qt/6.x.x/msvc2022_64"`.
+- **Linux**: `sudo apt install qt6-base-dev` (Debian/Ubuntu) or the distro equivalent
+  (`qt6-qtbase-devel` on Fedora).
+- **macOS**: `brew install qt` and let CMake find it, or point `CMAKE_PREFIX_PATH` at
+  `$(brew --prefix qt)`.
+
+Without Qt the configure fails at `find_package(Qt6 ...)` inside `SurMap5Qt/CMakeLists.txt` —
+the editor is opt-in and the game build does not touch it.
+
+Phase 1 is a pure-Qt application shell (main window, docks, toolbars, status bar, a black
+placeholder viewport) with **no engine linkage yet**. Phase 2 embeds the SDL GPU renderer
+into `RenderViewWidget` via `SDL_CreateWindowWithProperties` on its native window handle
+(see `SurMap5Qt/src/RenderViewWidget.h`); that is where the engine libraries join the link.
+
 ## Traps, by platform
 
 ### Linux — case sensitivity

@@ -379,3 +379,20 @@ add_subdirectory(UserInterface)
 add_subdirectory(Render)
 add_subdirectory(VistaRender)
 add_subdirectory(Game)
+
+# ---------------------------------------------------------------------------
+# Editor
+# ---------------------------------------------------------------------------
+# The SurMap5 map editor port (Qt 6). The old MSVC tool projects (SurMap5,
+# ModelViewer, VistaEditor, ...) were never migrated to CMake; SurMap5Qt is the
+# Qt 6 rewrite of the editor shell, built behind BUILD_EDITOR because it needs
+# Qt 6 (find_package below) and the engine linkage lands phase by phase.
+#
+# Phase 1 builds the pure-Qt application shell (main window, docks, toolbars,
+# status bar, a placeholder 3D viewport) — no engine linkage yet. Later phases
+# add the SDL GPU renderer embed (RenderViewWidget hosts a swapchain on its
+# native window), input and the tools.
+option(BUILD_EDITOR "Build the SurMap5Qt editor (requires Qt 6)" OFF)
+if(BUILD_EDITOR)
+    add_subdirectory(SurMap5Qt)
+endif()

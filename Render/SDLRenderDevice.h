@@ -365,12 +365,24 @@ public:
 	int  EndScene() override;
 	int  Flush() override;
 
-	// --- Render windows (no-op: single-window) ---------------------------
-	cRenderWindow* createRenderWindow(HWND) override { return nullptr; }
-	void selectRenderWindow(cRenderWindow*) override {}
-	void setGlobalRenderWindow(cRenderWindow*) override {}
-	cRenderWindow* currentRenderWindow() override { return nullptr; }
-	void DeleteRenderWindow(cRenderWindow*) override {}
+	// --- Render windows (multi-window, like the D3D backend) ---------------
+	// The editor creates one cRenderWindow per viewport (the 3D view, the
+	// minimap); each wraps its HWND in an SDL_Window claimed by the device, so
+	// every viewport has a swapchain of its own. The game's window is the
+	// default "global" one: PlatformWindow::current(), claimed at Initialize.
+	//
+	// The D3D backend's contract is preserved:
+	//   createRenderWindow(hwnd)   wraps hwnd (foreign window via
+	//                              SDL_CreateWindowWithProperties)
+	//   selectRenderWindow(w)      the active window; 0 restores the global one
+	//   currentRenderWindow()      the active window
+	//   setGlobalRenderWindow(w)   the window that selectRenderWindow(0) lands on
+	//                              (default: the one Initialize claimed)
+	cRenderWindow* createRenderWindow(HWND hwnd) override;
+	void selectRenderWindow(cRenderWindow* window) override;
+	void setGlobalRenderWindow(cRenderWindow* window) override;
+	cRenderWindow* currentRenderWindow() override;
+	void DeleteRenderWindow(cRenderWindow* wnd) override;
 
 	// --- Camera / transform ----------------------------------------------
 	// SDL GPU has no device-wide transform or viewport: matView/matProj reach the
@@ -567,6 +579,26 @@ private:
 	SDL_GPUDevice*         device_           = nullptr;
 	SDL_GPUCommandBuffer*  commandBuffer_    = nullptr;
 	SDL_GPUTexture*        swapchainTexture_ = nullptr;
+
+	// --- Multi-window bookkeeping ------------------------------------------
+	// One SDL_Window per cRenderWindow. The global window (the game's, claimed
+	// at Initialize) is not owned here — PlatformWindow owns it — but every
+	// editor viewport's foreign SDL_Window is, and Done() destroys them.
+	struct WindowBinding
+	{
+		SDL_Window* sdlWindow = nullptr;
+		bool        foreign   = false;   // created here around an editor HWND
+	};
+	std::vector<WindowBinding>        windowBindings_;   // index == cRenderWindow*
+	std::vector<cRenderWindow*>       renderWindows_;    // created ones, for iteration
+	cRenderWindow*                    globalRenderWindow_ = nullptr;
+	cRenderWindow*                    activeRenderWindow_ = nullptr;
+	// The SDL_Window behind the active cRenderWindow (== window_ for the game).
+	SDL_Window* activeWindow() const;
+	// Wrap an editor HWND in an SDL_Window and claim it on the device.
+	SDL_Window* createForeignWindow(HWND hwnd);
+	// Query the active window's drawable size.
+	void queryActiveWindowSize(int& w, int& h);
 
 	// The scene depth buffer behind screen_, shared by every 3D renderer so their passes
 	// occlude one another. Sized to the swapchain; owned here, like the swapchain image.

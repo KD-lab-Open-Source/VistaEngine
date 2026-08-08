@@ -44,3 +44,8 @@ BuildLog.htm
 /SurMap5/ProfUIS/*
 !/SurMap5/ProfUIS/readme.txt
 GameData/
+/.vs
+/out
+/build-qt-check
+/*.log
+/XLibs.Net/FreeType/objs/debug/*.obj

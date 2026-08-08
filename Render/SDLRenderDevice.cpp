@@ -86,6 +86,184 @@ SDLPostEffectRenderer* sdlPostEffectRenderer()
 	return dev ? dev->postEffectRenderer() : nullptr;
 }
 
+// ---------------------------------------------------------------------------
+// cRenderWindow.
+//
+// The D3D9 original (Render/D3D/RenderDevice.cpp) queried the HWND's client
+// rect with Win32. That file is compiled nowhere now, and the editor creates
+// cRenderWindows for its viewports, so the class's methods live here. The
+// client-rect query goes through the platform shim (WindowsAPI.h): on Windows
+// it is the real GetClientRect, elsewhere it is a no-op that zeroes the rect —
+// but the SDL path below does not rely on it, it asks SDL for the drawable
+// size of the SDL_Window behind the HWND (see ChangeSize).
+// ---------------------------------------------------------------------------
+cRenderWindow::cRenderWindow(HWND hwnd_)
+: hwnd(hwnd_)
+{
+	constant_size = false;
+	size_x = size_y = -1;
+	CalcSize();
+}
+
+void cRenderWindow::CalcSize()
+{
+	// The client rect of the native window. On Windows this is the real thing;
+	// off-Windows the shim zeroes it and the SDL-side query in ChangeSize takes
+	// over. The editor's viewports are always real windows on their platform.
+	RECT rect;
+	GetClientRect(hwnd, &rect);
+	size_x = rect.right - rect.left;
+	size_y = rect.bottom - rect.top;
+}
+
+void cRenderWindow::ChangeSize()
+{
+	CalcSize();
+	if(gb_RenderDevice)
+		gb_RenderDevice->RecalculateDeviceSize();
+}
+
+cRenderWindow::~cRenderWindow()
+{
+	if(gb_RenderDevice)
+		gb_RenderDevice->DeleteRenderWindow(this);
+}
+
+// ---------------------------------------------------------------------------
+// Multi-window support.
+//
+// The D3D backend kept a list of cRenderWindows and made the SDL-less
+// currentRenderWindow_ the target of Present(). SDL GPU has no Present-to-HWND:
+// each window is a swapchain, and which one a frame lands on is decided when
+// SDL_WaitAndAcquireGPUSwapchainTexture is called (BeginScene). So the active
+// cRenderWindow here selects the SDL_Window whose swapchain BeginScene/EndScene
+// use, and the global window — the one Initialize claimed from
+// PlatformWindow::current() — is what selectRenderWindow(0) restores.
+// ---------------------------------------------------------------------------
+SDL_Window* cSDLRenderDevice::activeWindow() const
+{
+	if(activeRenderWindow_){
+		for(size_t i = 0; i < renderWindows_.size(); ++i)
+			if(renderWindows_[i] == activeRenderWindow_)
+				return i < windowBindings_.size() ? windowBindings_[i].sdlWindow : nullptr;
+	}
+	return window_;
+}
+
+void cSDLRenderDevice::queryActiveWindowSize(int& w, int& h)
+{
+	w = h = 0;
+	SDL_Window* sdl = activeWindow();
+	if(!sdl)
+		return;
+	// Drawable size in pixels — what the swapchain is sized to. SDL returns
+	// false if the window is gone; the editor resizes viewports by recreating
+	// the swapchain through ChangeSize, so a stale size is better than none.
+	SDL_GetWindowSizeInPixels(sdl, &w, &h);
+	if(w <= 0 || h <= 0)
+		SDL_GetWindowSize(sdl, &w, &h);
+}
+
+cRenderWindow* cSDLRenderDevice::createRenderWindow(HWND hwnd)
+{
+	cRenderWindow* wnd = new cRenderWindow(hwnd);
+	SDL_Window* sdl = nullptr;
+
+	// If the caller hands us the global window's HWND (the game view, or the
+	// editor's main viewport which IS the game window), bind it to the global
+	// window rather than wrapping it again.
+	if(window_ && hwnd == PlatformWindow::nativeHandle())
+		sdl = window_;
+	else
+		sdl = createForeignWindow(hwnd);
+
+	renderWindows_.push_back(wnd);
+	WindowBinding binding;
+	binding.sdlWindow = sdl;
+	binding.foreign = (sdl != window_);
+	windowBindings_.push_back(binding);
+
+	if(!globalRenderWindow_)
+		globalRenderWindow_ = wnd;
+	return wnd;
+}
+
+void cSDLRenderDevice::selectRenderWindow(cRenderWindow* window)
+{
+	activeRenderWindow_ = window ? window : globalRenderWindow_;
+}
+
+void cSDLRenderDevice::setGlobalRenderWindow(cRenderWindow* window)
+{
+	globalRenderWindow_ = window;
+	if(!activeRenderWindow_ || activeRenderWindow_ == window)
+		activeRenderWindow_ = window;
+}
+
+cRenderWindow* cSDLRenderDevice::currentRenderWindow()
+{
+	return activeRenderWindow_ ? activeRenderWindow_ : globalRenderWindow_;
+}
+
+void cSDLRenderDevice::DeleteRenderWindow(cRenderWindow* wnd)
+{
+	for(size_t i = 0; i < renderWindows_.size(); ++i){
+		if(renderWindows_[i] != wnd)
+			continue;
+		// Unclaim + destroy the foreign SDL_Window. The global one is owned by
+		// PlatformWindow, not here.
+		if(i < windowBindings_.size() && windowBindings_[i].foreign){
+			SDL_Window* sdl = windowBindings_[i].sdlWindow;
+			if(sdl && device_)
+				SDL_ReleaseWindowFromGPUDevice(device_, sdl);
+			if(sdl)
+				SDL_DestroyWindow(sdl);
+		}
+		renderWindows_.erase(renderWindows_.begin() + i);
+		windowBindings_.erase(windowBindings_.begin() + i);
+		if(activeRenderWindow_ == wnd)
+			activeRenderWindow_ = globalRenderWindow_;
+		if(globalRenderWindow_ == wnd)
+			globalRenderWindow_ = renderWindows_.empty() ? nullptr : renderWindows_.front();
+		break;
+	}
+}
+
+// Wrap an existing native window (an editor viewport's HWND) in an SDL_Window
+// and claim it on the device so it gets a swapchain. SDL3's foreign-window
+// path is SDL_CreateWindowWithProperties with the platform's native-handle
+// property; SDL_WINDOW_EXTERNAL is set implicitly by the backend when the
+// handle property is present. See SDL_CreateWindowWithProperties in SDL_video.h.
+SDL_Window* cSDLRenderDevice::createForeignWindow(HWND hwnd)
+{
+	if(!device_ || !hwnd)
+		return nullptr;
+
+	SDL_PropertiesID props = SDL_CreateProperties();
+	// "The window is not created by SDL" — SDL will not show, position or size
+	// it; the embedding widget owns all of that.
+	SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_EXTERNAL_GRAPHICS_CONTEXT_BOOLEAN, true);
+#ifdef _WIN32
+	SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_WIN32_HWND_POINTER, hwnd);
+#elif defined(__linux__)
+	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X11_WINDOW_NUMBER, (Sint64)(uintptr_t)hwnd);
+#else // macOS
+	SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_COCOA_WINDOW_POINTER, hwnd);
+#endif
+	SDL_Window* sdl = SDL_CreateWindowWithProperties(props);
+	SDL_DestroyProperties(props);
+	if(!sdl){
+		fprintf(stderr, "cSDLRenderDevice::createForeignWindow: SDL_CreateWindowWithProperties failed: %s\n", SDL_GetError());
+		return nullptr;
+	}
+	if(!SDL_ClaimWindowForGPUDevice(device_, sdl)){
+		fprintf(stderr, "cSDLRenderDevice::createForeignWindow: SDL_ClaimWindowForGPUDevice failed: %s\n", SDL_GetError());
+		SDL_DestroyWindow(sdl);
+		return nullptr;
+	}
+	return sdl;
+}
+
 SDL_GPUTexture* createSolidGPUTexture(SDL_GPUDevice* device, unsigned int rgba)
 {
 	if(!device)
@@ -197,13 +375,13 @@ cSDLRenderDevice::~cSDLRenderDevice()
 
 bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND /*hWnd*/, int /*RefreshRateInHz*/, HWND /*fallbackWindow*/)
 {
-	// Not hWnd: that is the OS window handle, which on Windows is a real HWND and not
-	// an SDL_Window at all. The window we claim is SDL's own (Platform/Window.h).
+	// The window we claim is SDL's own (Platform/Window.h). In the game this is
+	// the one window SDL created; in the Qt editor there is none — Qt owns the
+	// native windows and the editor's viewports arrive later through
+	// createRenderWindow() (foreign windows wrapped around Qt HWNDs). So a null
+	// window here is not an error: the device still exists, and the first
+	// createRenderWindow() supplies the swapchain target.
 	window_ = static_cast<SDL_Window*>(PlatformWindow::current());
-	if(!window_){
-		fprintf(stderr, "cSDLRenderDevice::Initialize: no window\n");
-		return false;
-	}
 
 	if(!device_){
 		// Only the one format this platform's shaders were compiled to (DXIL / SPIR-V /
@@ -214,13 +392,31 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND /*hWnd*/,
 			fprintf(stderr, "cSDLRenderDevice::Initialize: SDL_CreateGPUDevice failed: %s\n", SDL_GetError());
 			return false;
 		}
-		if(!SDL_ClaimWindowForGPUDevice(device_, window_)){
-			fprintf(stderr, "cSDLRenderDevice::Initialize: SDL_ClaimWindowForGPUDevice failed: %s\n", SDL_GetError());
-			SDL_DestroyGPUDevice(device_);
-			device_ = nullptr;
-			return false;
-		}
+	}
+	if(window_ && !SDL_ClaimWindowForGPUDevice(device_, window_)){
+		fprintf(stderr, "cSDLRenderDevice::Initialize: SDL_ClaimWindowForGPUDevice failed: %s\n", SDL_GetError());
+		SDL_DestroyGPUDevice(device_);
+		device_ = nullptr;
+		return false;
+	}
+	if(window_)
 		fprintf(stderr, "cSDLRenderDevice: SDL GPU device created (%s)\n", SDL_GetGPUDeviceDriver(device_));
+
+	// The game's window is the implicit global render window: currentRenderWindow()
+	// and selectRenderWindow(0) land on it, exactly as cD3DRender::Initialize made
+	// the app window its globalRenderWindow_. Editor viewports created later via
+	// createRenderWindow() stack on top of it. With no global window (the Qt
+	// editor), globalRenderWindow_ stays null and the first createRenderWindow()
+	// becomes it.
+	if(window_ && renderWindows_.empty()){
+		cRenderWindow* global = new cRenderWindow(PlatformWindow::nativeHandle());
+		renderWindows_.push_back(global);
+		WindowBinding binding;
+		binding.sdlWindow = window_;
+		binding.foreign = false;
+		windowBindings_.push_back(binding);
+		globalRenderWindow_ = global;
+		activeRenderWindow_ = global;
 	}
 
 	xScr = xScr_;
@@ -332,6 +528,25 @@ int cSDLRenderDevice::Done()
 		for(auto& kv : ibGpu_) if(kv.second.buf) SDL_ReleaseGPUBuffer(device_, kv.second.buf);
 		vbGpu_.clear();
 		ibGpu_.clear();
+		// Foreign editor-viewport windows first: each is claimed on the device.
+		for(auto& binding : windowBindings_){
+			if(binding.foreign && binding.sdlWindow)
+				SDL_ReleaseWindowFromGPUDevice(device_, binding.sdlWindow);
+		}
+		for(auto& binding : windowBindings_){
+			if(binding.foreign && binding.sdlWindow)
+				SDL_DestroyWindow(binding.sdlWindow);
+		}
+		// Null the bindings so ~cRenderWindow's DeleteRenderWindow does not
+		// double-release the SDL windows; keep the arrays in sync so the
+		// index arithmetic inside DeleteRenderWindow stays valid, and delete
+		// the cRenderWindows (each ~cRenderWindow removes itself from both).
+		for(auto& binding : windowBindings_)
+			binding.sdlWindow = nullptr;
+		while(!renderWindows_.empty())
+			delete renderWindows_.back();
+		globalRenderWindow_ = nullptr;
+		activeRenderWindow_ = nullptr;
 		if(window_)
 			SDL_ReleaseWindowFromGPUDevice(device_, window_);
 		SDL_DestroyGPUDevice(device_);
@@ -385,13 +600,20 @@ int cSDLRenderDevice::BeginScene()
 	}
 
 	Uint32 w = 0, h = 0;
-	if(!SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer_, window_, &swapchainTexture_, &w, &h) || !swapchainTexture_){
+	SDL_Window* frameWindow = activeWindow();
+	if(!SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer_, frameWindow, &swapchainTexture_, &w, &h) || !swapchainTexture_){
 		// No drawable surface this frame (e.g. minimized); submit empty and bail.
 		SDL_SubmitGPUCommandBuffer(commandBuffer_);
 		commandBuffer_ = nullptr;
 		swapchainTexture_ = nullptr;
 		return -1;
 	}
+
+	// The active window's drawable size drives the frame's screen target. The
+	// engine's xScr/yScr are the full-window size (the 4:3 work area math in
+	// Camera uses them); the swapchain is exactly that window.
+	xScr = (int)w;
+	yScr = (int)h;
 
 	if(uiRenderer_)
 		uiRenderer_->BeginFrame();
