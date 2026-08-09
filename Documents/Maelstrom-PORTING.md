@@ -788,6 +788,74 @@ unit that was not being drawn. That reads as a shadow-map bug and is not one.
 The list is now drawn plainly, exactly as the child-camera branch below it already did. Retail
 Perimeter 2 never fills it, which is why none of this surfaced there.
 
+### The camera's limits — `Environment::serialize` / `CameraRestriction::serialize`
+
+How far the camera may be pushed past the map's edge, how close it may zoom, how far it may
+tilt: `selfCameraRestriction`, `cameraBorder` and a flat run of `CAMERA_*` names. All of it
+was an `Environment` field and is a `CameraManager` one now, so a pre-2008 world writes the
+group in its `environment` block and `CameraManager::serialize` never sees a name of it.
+
+Two levels, and only one of them was broken:
+
+- **The global set is in `Scripts\Content\GlobalAttributes`**, under a `cameraRestriction`
+  node this tree already opens — so the names the two schemas share were arriving all along
+  and only the renamed ones fell back to constructor defaults. That is where the visible part
+  was: `zoomMin` 300 against the file's 50, `heightMin` 0 against 50, and `zoomDefault` 300
+  against 500, which is the distance every mission opens at (`Player.cpp:554` places the
+  camera from the *global* set, before a world's own is read).
+- **The per-world copy is in the `.spg`.** All 51 write `cameraBorder`; three — `menu.spg`
+  and the two `TEST_Environment` worlds — set `selfCameraRestriction` and write the whole
+  restriction, the rest deferring to the global one.
+
+| pre-2008 | now | |
+|---|---|---|
+| `CAMERA_ZOOM_MIN` / `_MAX` / `_DEFAULT` | `zoomMin` / `zoomMax` / `zoomDefault` | rename |
+| `CAMERA_MIN_HEIGHT` / `CAMERA_MAX_HEIGHT` | `heightMin` / `heightMax` | rename |
+| `CAMERA_THETA_MAX` | `thetaMaxLow` | see below |
+| `CAMERA_THETA_MIN` | `thetaMaxHigh` | see below |
+| `CAMERA_THETA_DEFAULT` | `thetaDefault` | rename, and degrees against radians |
+| `CAMERA_ZOOM_SPEED_DELTA`, `_MOUSE_MULT`, `_SPEED_DAMP` | `zoomKeyAcceleration`, `zoomWheelImpulse`, `zoomDamping` | **not read** |
+
+**`CAMERA_THETA_MIN` is not a floor under the tilt.** The maximum tilt falls off with
+distance — `CameraCoordinate::check` interpolates it — and the two ends of that ramp are what
+the old pair held: `CAMERA_THETA_MAX` is the ceiling zoomed *in*, `CAMERA_THETA_MIN` the
+ceiling zoomed *out*, and the floor was a plain 0. So they pair with `thetaMaxLow` and
+`thetaMaxHigh`, `zoomMaxTheta` takes `CAMERA_ZOOM_MAX`, and `thetaMinLow`/`thetaMinHigh` stay
+at 0. The 2008 defaults for that pair are 60° and 18°, which are Maelstrom's own global
+values — a free check on the pairing, and the reason the tilt looked right while the zoom
+did not.
+
+Three smaller things:
+
+- **The zoom dynamics were rewritten, not renamed.** A key press used to add
+  `CAMERA_ZOOM_SPEED_DELTA` to the zoom force outright; it now adds `zoomKeyAcceleration`
+  *times the distance*. There is no value of the new field that reproduces the old one, so the
+  three old names are left unread and the 2008 defaults stand.
+- **`aboveWater` is a 2008 field the data cannot carry**, and the question is what the
+  original did without it: it tracked the ground with `vMap.GetApproxAlt` outright. Ours
+  routes that through `CameraCoordinate::height`, which with `aboveWater` takes
+  `cWater::GetZFast` — and that returns the water surface *everywhere*, over land as well, so
+  the camera's focus sinks to water level on a world with terrain above it. False here.
+- **A `RangedWrapper` does not clip outside the editor**; at load it is a plain float read. The
+  clamps in the pre-2008 serializer were ordinary `clamp` calls that ran either way, so the
+  Maelstrom branch spells them out — which matters, `menu.spg` asking for `CAMERA_ZOOM_MIN = 0`
+  where the 2008 wrapper's editor range starts at 20.
+
+Measured, against the values in the files:
+
+```
+c1_m1:  own=0 border=0/1344/-64/-64  zoom=50..1000 def=500  h=50..1000  thetaMax=60/18
+menu:   own=1 border=-1000 x4        zoom=0..5000  def=300  h=0..2000   thetaMax=85/5
+        scrollSpeed=0  mouseAngle=0   <- the menu camera is meant to be locked
+```
+
+`menu.spg`'s zeroed scroll and mouse-rotation speeds are the clearest single symptom: with
+them unread the main menu's camera was free to be dragged and spun.
+
+**`FarPlane` and `NearPlane` are not camera fields**, though an earlier note in this file
+listed them as such. They are the depth-of-field pair in the world's `environment` block,
+where `Environment::serialize` reads them already (`DofParams.x`/`.y`).
+
 ## What the rest of the binary formats do
 
 Mostly nothing — they already load:
@@ -902,10 +970,7 @@ ask what the original did *without* the field, not what our default happens to b
 
 ## Still open
 
-1. **Maelstrom-only `.spg` camera fields go unread** — `FarPlane`, `NearPlane`,
-   `CAMERA_ZOOM_*`, `CAMERA_MAX_HEIGHT`, `CAMERA_MIN_HEIGHT` — so the camera uses P2
-   defaults on larger maps. Not known to matter; not investigated.
-2. **Eleven polymorphic classes in Maelstrom's data do not exist in this source**, and
+1. **Eleven polymorphic classes in Maelstrom's data do not exist in this source**, and
    resolve to null objects rather than failing: the `AiAction_*` / `AiCondition_*`
    action-chain system (matching its `Scripts/Engine/AiActionChainList`, which P2 has no
    equivalent of), plus `ActionSquadMove`, `ActionSetCoastSprites`, `AttributeReal`,
@@ -919,17 +984,17 @@ ask what the original did *without* the field, not what our default happens to b
    behaviour. Neither is fatal: `XPrmIArchive` reports the miss, `skipValue`s the block and
    carries on (`Util/Serialization/XPrmArchive.cpp:1172`), which is why they surface as
    `ERROR! no such class registered` in a log rather than as a failure to load.
-3. **The basement is read and thrown away.** `C3DX_BASEMENT` (500/501/502) is building
+2. **The basement is read and thrown away.** `C3DX_BASEMENT` (500/501/502) is building
    foundation geometry, a feature P2 dropped. The raw `.3DX` path ignores the chunks
    outright; the cache path has no choice but to read them — they sit mid-record in
    `otherInfo`, so skipping them would put the reader out of step — and then discards them.
    If that geometry is ever wanted, it is already parsed.
-4. **Tooltips are missing.** A state used to carry its hover text directly
+3. **Tooltips are missing.** A state used to carry its hover text directly
    (`hoveredTextLoc`, a localization key, read by `UI_ControlState::serialize`); 2008 moved
    it into a `UI_ACTION_HOVER_INFO` action. Maelstrom's data writes the old field, nothing
    reads it, and no control shows a tooltip. Not converted — the screens themselves are
    readable without it.
-5. **The silhouette outline is still unported.** The units themselves draw now (see above);
+4. **The silhouette outline is still unported.** The units themselves draw now (see above);
    what is missing is the coloured outline they show through a building they walk behind,
    which is stencil work — **Render-PORTING.md #22**. Unreachable on retail Perimeter 2, so
    this build is the only way to exercise it.

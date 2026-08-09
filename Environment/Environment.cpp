@@ -38,6 +38,8 @@
 #include "Units/ShowChangeController.h"
 #include "Game/Universe.h"	// MAELSTROM_DATA: minimapAngle moved from here to Universe
 #include "Environment/SourceManager.h"	// MAELSTROM_DATA: the world's sources used to live here
+#include "Game/CameraManager.h"	// MAELSTROM_DATA: the camera restrictions used to live here
+#include "Units/GlobalAttributes.h"
 #include "VistaRender/FieldOfView.h"
 
 #include "UserInterface/GameLoadManager.h"
@@ -422,6 +424,33 @@ void Environment::serialize(Archive& ar)
 		// it is read, which is what SourceManager::serialize does when it finishes.
 		if(sourceManager)
 			sourceManager->serialize(ar);
+
+		// What the camera may do on this world -- how far it can be pushed past the map's
+		// edge, how close it can zoom, how far it can tilt -- was an Environment field and is
+		// a CameraManager one now, so a pre-2008 world writes the whole group here and
+		// CameraManager::serialize never sees a name of it. All 51 worlds write cameraBorder;
+		// Menu.spg and the two TEST_Environment worlds also write their own restrictions,
+		// the rest deferring to the global set in Scripts\Content\GlobalAttributes.
+		//
+		// Written flat, apart from cameraBorder: the CAMERA_* names sit at this level. The
+		// camera is deserialized before the environment (Universe::universeLoad), so handing
+		// them across here overrides what it read, which is the order the original relied on.
+		if(ar.isInput() && cameraManager){
+			bool ownCameraRestriction = false;
+			ar.serialize(ownCameraRestriction, "selfCameraRestriction", "&использовать собственные ограничения камеры");
+
+			CameraBorder cameraBorder;
+			ar.serialize(cameraBorder, "cameraBorder", "границы выезда за край миры");
+			cameraManager->setCameraBorder(cameraBorder);
+
+			if(ownCameraRestriction){
+				CameraRestriction cameraRestriction;
+				cameraRestriction.serialize(ar);
+				cameraManager->setCameraRestriction(cameraRestriction);
+			}
+			else
+				cameraManager->setCameraRestriction(GlobalAttributes::instance().cameraRestriction);
+		}
 #endif
 
 #ifdef MAELSTROM_DATA
