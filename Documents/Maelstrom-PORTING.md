@@ -108,6 +108,7 @@ so the first pass is free:
 
 ```
 $ python3 tools/maelstrom_convert.py ~/Projects/MaelstromEnhanced/GameData
+  Scripts/Content/GameOptions                                            3
   Scripts/Engine/RigidBodyPrmLibrary                                     129
 
   Scripts/Content/UI_FontLibrary needs translating to UI_FontAttributes, but Maelstrom ships no .ttf --
@@ -115,10 +116,13 @@ $ python3 tools/maelstrom_convert.py ~/Projects/MaelstromEnhanced/GameData
 
   Scripts/Content/Triggers/GlobalTrigger.scr  <- Scripts/Content/GlobalTrigger.scr
 
-scanned 299 text files, 1 needed changes  (dry run -- pass --apply to write)
+scanned 299 text files, 2 needed changes  (dry run -- pass --apply to write)
   steering_duration         43  -- RigidBodyPrm::steering_duration is float in Maelstrom, int here
   groundPass                43  -- RigidBodyPrm::groundPass is PassabilityFlags in Maelstrom, bool here
   waterPass                 43  -- RigidBodyPrm::waterPass is PassabilityFlags in Maelstrom, bool here
+  OPTION_LANGUAGE            1  -- index into a C++ list that changed shape
+  OPTION_SCREEN_SIZE         1  -- index into a C++ list that changed shape
+  OPTION_SHADOW              1  -- index into a C++ list that changed shape
 ```
 
 Then commit to it, naming a font (see below):
@@ -126,13 +130,14 @@ Then commit to it, naming a font (see below):
 ```
 $ python3 tools/maelstrom_convert.py ~/Projects/MaelstromEnhanced/GameData \
       --font 'Resource\UI\Fonts\ARIALNB2.ttf' --apply
+  Scripts/Content/GameOptions                                            3
   Scripts/Engine/RigidBodyPrmLibrary                                     129
 
   Scripts/Content/UI_FontAttributes  <- UI_FontLibrary  (Aero 20 @16, Aero big @32, Aero medium @24)
 
   Scripts/Content/Triggers/GlobalTrigger.scr  <- Scripts/Content/GlobalTrigger.scr
 
-scanned 299 text files, 1 needed changes
+scanned 299 text files, 2 needed changes
 ```
 
 Re-running is a no-op: every rule returns "already in our shape" for a value it has already
@@ -145,9 +150,41 @@ partly-converted tree changes nothing.
 | `groundPass` / `waterPass` `PASSABILITY`→`true`, `IMPASSABILITY`→`false` | `PassabilityFlags` there, `bool` here. `IMPASSABILITY = 0`, `PASSABILITY = 1`, and the two engines' constructed defaults agree exactly |
 | generate `Scripts/Content/UI_FontAttributes` from `Scripts/Content/UI_FontLibrary` | see below |
 | copy `Scripts/Content/GlobalTrigger.scr` to `Scripts/Content/Triggers/` | the chain moved into a subdirectory; see below |
+| renumber `OPTION_SCREEN_SIZE` / `OPTION_SHADOW` / `OPTION_LANGUAGE` in `Scripts/Content/GameOptions` | they are indices into a C++ list that changed shape; see below |
 
 43 of each of the first two, one per entry in `Scripts/Engine/RigidBodyPrmLibrary` — that
 single file is the only one in the tree that needed rewriting.
+
+### Indexed options point into a list that is not in the data
+
+`Scripts/Content/GameOptions` stores an option as `number = <index>`, and the list it
+indexes lives in **C++** (`Game/GameOptionsSerialization.cpp`), not beside it. The `comment`
+string next to the number looks like the list but is only a label — the engine never reads
+it. So an index written by one revision silently selects a different entry in the other, with
+nothing to warn you:
+
+| option | Maelstrom | means | in our list |
+|---|---|---|---|
+| `OPTION_SCREEN_SIZE` | 25 | `1920*1080` | index **27** — we added `858*484` and `1680*945` |
+| `OPTION_SHADOW` | 3 | `High` | index **2** — Maelstrom's `Circle` shadows were dropped |
+| `OPTION_LANGUAGE` | 0 | `Use Steam Language` | **0**, English — we have no auto-detect |
+
+`OPTION_SCREEN_SIZE` is the one that shows. Index 25 here is `1680*945`, and after
+`filterBaseGraphOptions` drops the modes the display cannot do, the window ends up at
+something like 1600×900 — which changes the aspect, and with it which branch of the
+letterbox/pillarbox code runs. It also scales the UI font: `UI_Font::createFont` computes
+`fontSize_ * windowHeight / 768`, so a 16-point font at a 900-pixel window asks FreeType for
+19. That is the `":19"` in a Windows 10 user's `UI_Font.cpp:80` assert.
+
+The conversion is self-contained, because **the comment is Maelstrom's own list**: resolve the
+index to a name against it, then look that name up in ours. The converter rewrites the comment
+too, and that is what keeps the pass idempotent — leaving the old list in place would make a
+second run resolve the *new* index against the *old* names and convert twice.
+
+The remaining indexed options (`OPTION_ANTIALIAS`, `OPTION_ANISOTROPY`,
+`OPTION_TEXTURE_DETAIL_LEVEL`, `OPTION_SOFT_SMOKE`) have identical lists in both games and are
+left alone. Note that a bad *antialias* index is a different fault: those are filtered against
+what the GPU reports at run time (`raw2filtered`), so no offline pass can settle them.
 
 ### The global trigger chain is what starts the game
 
@@ -875,15 +912,7 @@ ask what the original did *without* the field, not what our default happens to b
    it into a `UI_ACTION_HOVER_INFO` action. Maelstrom's data writes the old field, nothing
    reads it, and no control shows a tooltip. Not converted — the screens themselves are
    readable without it.
-6. **`OPTION_SCREEN_SIZE` means a different resolution.** It is an *index*, and the list it
-   indexes is C++ (`Game/GameOptionsSerialization.cpp:48`) — the `comment` string beside it
-   in the data is only a label. Maelstrom's saved index 25 is 1920×1080 in Maelstrom's list;
-   in ours, after `filterBaseGraphOptions` drops the modes the display does not support, it
-   lands somewhere else entirely (1600×900 here). Harmless in itself, but it changes the
-   window aspect, and with it which branch of the letterbox/pillarbox code runs — Perimeter 2
-   at its own default of 1280×1024 never takes the wide branch that Maelstrom then does.
-   Belongs in the converter, which would have to renumber the index against our list.
-7. **The silhouette outline is still unported.** The units themselves draw now (see above);
+6. **The silhouette outline is still unported.** The units themselves draw now (see above);
    what is missing is the coloured outline they show through a building they walk behind,
    which is stencil work — **Render-PORTING.md #22**. Unreachable on retail Perimeter 2, so
    this build is the only way to exercise it.

@@ -47,6 +47,71 @@ RULES = [
      'RigidBodyPrm::waterPass is PassabilityFlags in Maelstrom, bool here'),
 ]
 
+# --- Indexed options are indices into a C++ list ----------------------------------
+#
+# Scripts/Content/GameOptions stores an option as `number = <index>` into a list that
+# lives in C++ (Game/GameOptionsSerialization.cpp), not in the data.  The `comment`
+# string beside it is only a label -- the engine never reads it.  Three of those lists
+# gained or lost entries between the two revisions, so Maelstrom's saved indices select
+# the wrong entry here:
+#
+#   OPTION_SCREEN_SIZE  25 = 1920*1080 there; index 25 here is 1680*945
+#   OPTION_SHADOW        3 = High      there; we dropped Maelstrom's "Circle"
+#   OPTION_LANGUAGE      0 = auto      there; we have no "Use Steam Language"
+#
+# The comment *is* Maelstrom's own list, which makes the conversion self-contained:
+# resolve the index to a name against it, then look that name up in ours.  Both the
+# number and the comment are rewritten, and that is what keeps the pass idempotent --
+# leaving the old list in place would make a second run resolve the *new* index against
+# the *old* names and convert a second time.
+
+# Mirrors GameOptionsSerialization.cpp: resolutions_ (41), and the two translate lists.
+OUR_OPTION_LISTS = {
+    b'OPTION_SCREEN_SIZE':
+    b'640*480|720*480|720*576|800*600|848*480|852*480|858*484|960*600|1024*600|1024*768|'
+    b'1024*800|1088*612|1152*864|1280*720|1280*768|1280*800|1280*960|1280*1024|1360*768|'
+    b'1366*768|1400*1050|1440*900|1600*900|1600*1024|1600*1200|1680*945|1680*1050|1920*1080|'
+    b'1920*1200|1920*1440|2048*1080|2048*1536|2560*1600|2560*2048|3200*2048|3200*2400|'
+    b'3840*2400|5120*4096|6400*4096|6400*4800|7680*4800',
+    b'OPTION_SHADOW':   b'Disabled|Low|High',
+    b'OPTION_LANGUAGE': b'English|Russian|German|French|Spanish|Italian',
+}
+
+# Names with no counterpart here, and the index to settle on instead.
+OPTION_FALLBACK = {
+    (b'OPTION_LANGUAGE', b'Use Steam Language'): 0,   # no auto-detect; English
+    (b'OPTION_SHADOW',   b'Circle'):             1,   # circle shadows gone; Low
+}
+
+OPTION_BLOCK = re.compile(
+    rb'(type[ \t]*=[ \t]*(OPTION_[A-Z_0-9]+);[ \t]*\r?\n'
+    rb'[ \t]*number[ \t]*=[ \t]*)(-?\d+)(;[ \t]*\r?\n'
+    rb'[ \t]*comment[ \t]*=[ \t]*")([^"]*)(";)')
+
+def convert_options(data, counts):
+    """Renumber indexed options against our lists, and carry our list into the comment."""
+    def sub(m):
+        option, ours = m.group(2), OUR_OPTION_LISTS.get(m.group(2))
+        if ours is None:
+            return m.group(0)
+        theirs = m.group(5)
+        if theirs == ours:
+            return m.group(0)                        # already in our shape
+        old = int(m.group(3))
+        names = theirs.split(b'|')
+        if not 0 <= old < len(names):
+            return m.group(0)                        # not an index we can resolve
+        name = names[old]
+        our_names = ours.split(b'|')
+        new = our_names.index(name) if name in our_names \
+            else OPTION_FALLBACK.get((option, name))
+        if new is None:
+            return m.group(0)
+        counts[option.decode()] += 1
+        return m.group(1) + b'%d' % new + m.group(4) + ours + m.group(6)
+
+    return OPTION_BLOCK.sub(sub, data)
+
 # --- The font library ------------------------------------------------------------
 #
 # Maelstrom rasterised its fonts offline: Scripts/Content/UI_FontLibrary names logical
@@ -117,7 +182,8 @@ def convert(data, counts):
             return m.group(1) + new + m.group(3)
 
         data = pattern.sub(sub, data)
-    return data
+
+    return convert_options(data, counts)
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
@@ -197,6 +263,11 @@ def main():
           % (files, touched, '' if args.apply else '  (dry run -- pass --apply to write)'))
     for name, rewrite, why in RULES:
         print('  %-22s %5d  -- %s' % (name.decode(), counts[name.decode()], why))
+    for option in sorted(OUR_OPTION_LISTS):
+        n = counts[option.decode()]
+        if n:
+            print('  %-22s %5d  -- index into a C++ list that changed shape'
+                  % (option.decode(), n))
     return 0
 
 if __name__ == '__main__':
