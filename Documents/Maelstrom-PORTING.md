@@ -746,6 +746,41 @@ Mostly nothing — they already load:
 | `.effect` | chunked Saver | same | same leading ids |
 | `inGeo.act` | present | — | the "geo" feature P2 dropped; harmless extra file |
 
+## The load pass, and the crash it found
+
+Every `.spg` in the distribution was started with `-world <name>`, given fifteen seconds to
+reach a steady state and then killed. A world still running at the end had loaded; one that
+exited on its own had not. **47 of 51 build their universe with not one assertion between
+them** — all four campaigns, the multiplayer maps, the cutscene worlds and the menu. Only
+`c1_m1` and `c1_m2` had ever been loaded before this.
+
+The four that failed — `TEST_Effects`, `TEST_Environment_Buildings`, `TEST_Environment_Trees`,
+`TEST_World_Tutorial` — all segfaulted the same way, in `vrtMap::getAlt` (`VMAP.H:122`)
+dereferencing a null `vxaBuf`. **This was the long-standing "water vxaBuf null crash", open
+and unreproduced until the pass handed over four reliable repros.**
+
+It is not schema drift. Those four are `.spg` files with **no world directory beside them** —
+no `world.cls` to open, so `allocMem4Buf` never runs and `vxaBuf` stays null. `vrtMap::load`
+handles that correctly and returns `false`; `GameShell::GameLoad` called it as a statement and
+discarded the result, so the mission went on to build a universe over a heightfield that was
+never allocated, and the first `getAlt` faulted.
+
+**Fixed unconditionally, because Perimeter 2 ships orphan worlds too** — `cs_c1_open` and
+`intro_01` have no directory either, so the same segfault is reachable in retail. The load now
+aborts with the world's name.
+
+Two things worth keeping from this:
+
+- **`ErrH.Abort`'s message does not reach the log at that point.**
+  `XErrorHandlerStub::Abort` prints to `stderr`, and stderr stops being captured somewhere
+  after renderer init — the renderers' own "ready" lines are the last thing through it. The
+  first cut of the fix therefore turned a crash into a *silent* `exit(1)`, which is barely an
+  improvement. `dprintf` still works there (it is what prints `Universe created`), so the name
+  goes out through both.
+- **A load-only pass needs no visual judgement**, which is what makes it cheap enough to
+  re-run after any change to the schema readers. Worlds that merely *load* are not proven
+  playable — nothing here drives a mission past its first frames.
+
 ## Ruled out — physics, and a method note
 
 Maelstrom's units move and take hits differently enough to look wrong, and the obvious place
@@ -835,13 +870,12 @@ ask what the original did *without* the field, not what our default happens to b
    outright; the cache path has no choice but to read them — they sit mid-record in
    `otherInfo`, so skipping them would put the reader out of step — and then discards them.
    If that geometry is ever wanted, it is already parsed.
-5. **Not every mission has been run.** `c1_m1` and `c1_m2` load; the rest are untested.
-6. **Tooltips are missing.** A state used to carry its hover text directly
+5. **Tooltips are missing.** A state used to carry its hover text directly
    (`hoveredTextLoc`, a localization key, read by `UI_ControlState::serialize`); 2008 moved
    it into a `UI_ACTION_HOVER_INFO` action. Maelstrom's data writes the old field, nothing
    reads it, and no control shows a tooltip. Not converted — the screens themselves are
    readable without it.
-7. **`OPTION_SCREEN_SIZE` means a different resolution.** It is an *index*, and the list it
+6. **`OPTION_SCREEN_SIZE` means a different resolution.** It is an *index*, and the list it
    indexes is C++ (`Game/GameOptionsSerialization.cpp:48`) — the `comment` string beside it
    in the data is only a label. Maelstrom's saved index 25 is 1920×1080 in Maelstrom's list;
    in ours, after `filterBaseGraphOptions` drops the modes the display does not support, it
@@ -849,7 +883,7 @@ ask what the original did *without* the field, not what our default happens to b
    window aspect, and with it which branch of the letterbox/pillarbox code runs — Perimeter 2
    at its own default of 1280×1024 never takes the wide branch that Maelstrom then does.
    Belongs in the converter, which would have to renumber the index against our list.
-8. **The silhouette outline is still unported.** The units themselves draw now (see above);
+7. **The silhouette outline is still unported.** The units themselves draw now (see above);
    what is missing is the coloured outline they show through a building they walk behind,
    which is stencil work — **Render-PORTING.md #22**. Unreachable on retail Perimeter 2, so
    this build is the only way to exercise it.
