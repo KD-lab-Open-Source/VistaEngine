@@ -109,14 +109,19 @@ vista_shader_module(tilemap
     "tilemap_shadow_vert=tilemap_shadow.vert.hlsl:vertex"
     "tilemap_shadow_frag=tilemap_shadow.frag.hlsl:fragment")
 
-# REFLECTION=1 is the original's water_linear (samples the planar-reflection target);
-# REFLECTION=0 is water_easy. water_ice is the ice sheet cTemperature::Draw blends over the
+# cWater's three ported techniques, one HLSL pair built three ways (see water.vert.hlsl):
+# REFLECTION=1 is the original's water_linear (samples the planar-reflection target, when
+# the reflection option is on); CUBE=1 is water_cube (samples the sky cubemap, when it is
+# off); plain REFLECTION=0 is water_easy, the no-PS2.0 fallback we draw only when there is
+# no cubemap to sample. water_ice is the ice sheet cTemperature::Draw blends over the
 # surface (Render/shader/Water/water_ice.{vsl,psl}) -- see SDLWaterRenderer's ice path.
 vista_shader_module(water
-    "water_vert=water.vert.hlsl:vertex:REFLECTION=0"
-    "water_frag=water.frag.hlsl:fragment:REFLECTION=0"
-    "water_reflect_vert=water.vert.hlsl:vertex:REFLECTION=1"
-    "water_reflect_frag=water.frag.hlsl:fragment:REFLECTION=1"
+    "water_vert=water.vert.hlsl:vertex:REFLECTION=0,CUBE=0"
+    "water_frag=water.frag.hlsl:fragment:REFLECTION=0,CUBE=0"
+    "water_reflect_vert=water.vert.hlsl:vertex:REFLECTION=1,CUBE=0"
+    "water_reflect_frag=water.frag.hlsl:fragment:REFLECTION=1,CUBE=0"
+    "water_cube_vert=water.vert.hlsl:vertex:REFLECTION=0,CUBE=1"
+    "water_cube_frag=water.frag.hlsl:fragment:REFLECTION=0,CUBE=1"
     "water_ice_vert=water_ice.vert.hlsl:vertex"
     "water_ice_frag=water_ice.frag.hlsl:fragment")
 

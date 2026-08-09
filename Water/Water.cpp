@@ -80,7 +80,21 @@ cWater::cWater()
 
 	bumpTextureName_ = "Scripts\\Resource\\balmer\\shader\\waves.dds";
 	bumpTextureName1_ = "Scripts\\Resource\\balmer\\shader\\waves1.dds";
-	
+	// Load them here, as the pre-2008 engine did (its constructor called GetElement3D on
+	// these two literal names). 2008 turned them into serialized fields and moved the load
+	// into serialize()'s SERIALIZE_PRESET_DATA branch, which is fine for Perimeter 2 --
+	// loadPreset() reads Scripts\Content\Presets\global.set under that filter and the branch
+	// runs. Maelstrom ships no Presets directory at all: its loadPreset() opens
+	// GlobalAttributes and descends into "environmentColors" alone, which never reaches
+	// cWater::serialize, and the world itself is read under SERIALIZE_WORLD_DATA. So the
+	// branch never ran, both handles stayed null, and the water surface sampled the flat
+	// stand-in texture -- a zero slope, which is no waves in *any* technique: no crests in
+	// WATER_EMPTY, and a mirror-smooth reflection with no ripple in WATER_LINEAR_REFLECTION.
+	// The preset branch still reloads them, for a preset that names different maps.
+	bumpTexture_ = GetTexLibrary()->GetElement3D(bumpTextureName_.c_str());
+	bumpTexture1_ = GetTexLibrary()->GetElement3D(bumpTextureName1_.c_str());
+
+
 	animate_time=0;
 	speed_buffer=0;
 
@@ -255,10 +269,11 @@ void cWater::Draw(Camera* camera)
 		return;
 	}
 
-	// WATER_LINEAR_REFLECTION when the scene has a reflection target, else WATER_EMPTY --
-	// what setTechnique chose. The other two, WATER_REFLECTION (sky cubemap) and WATER_LAVA,
-	// have no SDL shader pair. Everything the D3D path spreads across the render states, the
-	// vs/ps Select+SetSpeed calls and SetTexture, one State carries.
+	// What setTechnique chose: WATER_LINEAR_REFLECTION when the reflection option is on,
+	// WATER_REFLECTION (the sky cubemap) when it is off, WATER_EMPTY only as a fallback.
+	// WATER_LAVA is the one technique with no SDL shader pair. Everything the D3D path
+	// spreads across the render states, the vs/ps Select+SetSpeed calls and SetTexture,
+	// one State carries.
 	SDLWaterRenderer* renderer = sdlWaterRenderer();
 	cSDLRenderDevice* dev = sdlRenderDevice();
 	if(!renderer || !dev)
@@ -311,6 +326,31 @@ void cWater::Draw(Camera* camera)
 
 		const Vect3f& eye = camera->GetPos();
 		st.cameraPos[0] = eye.x; st.cameraPos[1] = eye.y; st.cameraPos[2] = eye.z;
+	}
+	else if(technique_ == WATER_REFLECTION){
+		// The sky cubemap, which is what the original reflects when the reflection option
+		// is off. Same premultiplied vReflectionColor as the planar path above -- the D3D
+		// path computes it once, before the per-technique branch, and both read it.
+		st.cubeReflection = true;
+		st.skyCubemap = scene()->GetSkyCubemap();
+
+		Color4f tint;
+		tint.mul3(reflection_color, scene()->GetPlainLitColor());
+		st.reflectionColor[0] = tint.r * reflection_color.a;
+		st.reflectionColor[1] = tint.g * reflection_color.a;
+		st.reflectionColor[2] = tint.b * reflection_color.a;
+		st.reflectionColor[3] = 1.f - reflection_color.a;
+
+		// water_cube.vsl builds its lookup direction in the *vertex* shader, so the camera
+		// position goes into that cbuffer, not the fragment one the glint reads.
+		const Vect3f& eye = camera->GetPos();
+		st.cameraPosVS[0] = eye.x; st.cameraPosVS[1] = eye.y; st.cameraPosVS[2] = eye.z;
+
+		// If the cubemap is missing the renderer falls back to WATER_EMPTY, which needs this.
+		st.ps11Color[0] = cur_reflect_sky_color.r;
+		st.ps11Color[1] = cur_reflect_sky_color.g;
+		st.ps11Color[2] = cur_reflect_sky_color.b;
+		st.ps11Color[3] = cur_reflect_sky_color.a;
 	}
 	else{
 		st.ps11Color[0] = cur_reflect_sky_color.r;
@@ -1682,13 +1722,14 @@ void cWater::AddWaterRect(int x,int y,float dz,int size)
 
 void cWater::setTechnique()
 {
+	// The same choice the D3D path makes on PS2.0 hardware: the planar reflection when the
+	// option is on, the sky cubemap when it is off. WATER_EMPTY is the no-PS2.0 fallback and
+	// is reached here only if cWater::Draw finds no cubemap to sample -- reading it as "the
+	// reflections-off look" is what left the surface a flat colour with no sky in it.
+	// Only WATER_LAVA still has no SDL shader pair.
 	Technique set = WATER_EMPTY;
-	// Two of the four techniques have no SDL shader pair: WATER_LAVA, and WATER_REFLECTION
-	// -- the original's fallback when the reflection target is off -- which samples the sky
-	// cubemap. WATER_EMPTY stands in for both, exactly as it does on hardware without PS2.0,
-	// painting the surface with cur_reflect_sky_color instead of a reflection.
-	if(!isLava() && scene()->IsReflection())
-		set = WATER_LINEAR_REFLECTION;
+	if(!isLava())
+		set = scene()->IsReflection() ? WATER_LINEAR_REFLECTION : WATER_REFLECTION;
 	technique_ = set;
 }
 

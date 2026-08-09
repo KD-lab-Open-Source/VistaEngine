@@ -683,6 +683,43 @@ Measured on `Menu.spg` after the change: fog 900–1200, `height_fog_circle` 500
 2–1300, `hideSmoothly` true, effects 0 / 0 / 1e6, `outside = ENVIRONMENT_WATER`, and the
 underwater and ice textures resolving to real paths instead of empty strings.
 
+### The water's wave maps — a preset field with no preset — `cWater::cWater`
+
+Maelstrom's water had no waves at all: a flat sheet of colour, moving only where the shoreline
+faded it.
+
+The two scrolling bump maps that *are* the waves (`waves.dds` / `waves1.dds`, D3DFMT_V8U8 slope
+maps) are loaded in exactly one place — `cWater::serialize`, inside its
+`SERIALIZE_PRESET_DATA` branch:
+
+```cpp
+bumpTexture_  = GetTexLibrary()->GetElement3D(bumpTextureName_.c_str());
+bumpTexture1_ = GetTexLibrary()->GetElement3D(bumpTextureName1_.c_str());
+```
+
+For Perimeter 2 that branch runs: `Environment::loadPreset()` opens
+`Scripts\Content\Presets\global.set` under that filter and descends through `Environment`
+into the water block. **Maelstrom ships no `Presets` directory at all.** Its `loadPreset()` is a
+different function — it opens `Scripts\Content\GlobalAttributes` and descends into
+`environmentColors` alone, which never reaches `cWater::serialize` — and the world itself is
+read under `SERIALIZE_WORLD_DATA`. So the branch never ran, both handles stayed null, and
+`SDLWaterRenderer` bound its flat 1x1 stand-in: a zero slope, which is no waves in *any*
+technique.
+
+The fix is what the pre-2008 engine did anyway. Its constructor loaded them from two literal
+names (`origin/Maelstrom:Water/Water.cpp:88`); 2008 turned them into serialized fields and moved
+the load into the preset branch. Loading them in the constructor again is not a Maelstrom
+special case, so it carries no `#ifdef`: `GetElement3D` is a cache, so Perimeter 2's later
+preset-driven call finds the same texture and only takes a reference, and no shipped preset in
+either game names `bumpTextureName` — the constructor defaults are always what is used. It also
+closes the same hole for Perimeter 2 on any path where the preset does not load.
+
+**Everything else in that branch is still unread for Maelstrom** — `waterHeight`,
+`relativeWaterLevel`, `reflection_color`, `reflection_brightnes`, the opacity gradient,
+`flashIntensity`. Each was compared against the pre-2008 constructor and matches it exactly, so
+the defaults are right and nothing else is missing; but Maelstrom water is entirely
+default-configured, which is worth knowing before blaming something else for how it looks.
+
 ### The animation chains — `AttributeBase::serialize` / `AnimationChain::serialize`
 
 Units loaded, moved, lit and shadowed correctly, and did not animate: legionaries slid across
