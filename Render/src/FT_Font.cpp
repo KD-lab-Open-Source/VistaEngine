@@ -185,7 +185,7 @@ Font* FontManager::createFont(const char* ttf, uint8 font_pixel_size, const Font
 	// cannot open at all.  Same Font on the way out, so nothing downstream changes.
 	{
 		const char* dot = strrchr(ttf, '.');
-		if(dot && !strcasecmp(dot, ".font"))
+		if(dot && !stricmp(dot, ".font"))
 			return createBitmapFont(ttf, font_pixel_size, prm);
 	}
 #endif
