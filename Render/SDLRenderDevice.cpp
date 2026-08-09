@@ -1373,7 +1373,14 @@ void cSDLRenderDevice::copyToCubeFace(cTexture* cube, int face, cTexture* source
 	// reads the texture back out.
 	flushTarget(current_, true);
 
-	SDL_GPUCommandBuffer* cmd = SDL_AcquireGPUCommandBuffer(device_);
+	// Record into the frame's command buffer, not one of our own. flushTarget above only
+	// *records* the face's render pass into commandBuffer_, which is not submitted until
+	// EndScene -- so a separate buffer submitted here runs first, and the copy reads
+	// pFaceTarget before anything has been drawn into it. That put the previous face into
+	// every slot (and uninitialised memory into all six on the first pass): the cube came
+	// out rotated by one face, so every lookup returned a neighbour. The water asked for
+	// the sky overhead and got the horizon band.
+	SDL_GPUCommandBuffer* cmd = commandBuffer_;
 	if(!cmd)
 		return;
 	SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(cmd);
@@ -1387,7 +1394,6 @@ void cSDLRenderDevice::copyToCubeFace(cTexture* cube, int face, cTexture* source
 	SDL_CopyGPUTextureToTexture(copy, &s, &d,
 	                            (Uint32)source->GetWidth(), (Uint32)source->GetHeight(), 1, false);
 	SDL_EndGPUCopyPass(copy);
-	SDL_SubmitGPUCommandBuffer(cmd);
 }
 
 int cSDLRenderDevice::CreateTexture(cTexture* Texture, cFileImage* FileImage, int /*dxout*/, int /*dyout*/, bool /*enable_assert*/)
