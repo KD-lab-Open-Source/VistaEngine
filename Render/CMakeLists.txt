@@ -164,6 +164,7 @@ set(RENDER_SOURCES
     src/AccessTexture.cpp
     src/CChaos.cpp
     src/ClippingMesh.cpp
+    src/BitmapFont.cpp
     src/FT_Font.cpp
     src/FileImage.cpp
     src/FogOfWar.cpp

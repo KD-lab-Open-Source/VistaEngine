@@ -137,20 +137,36 @@ FONT_ENTRY = '''		{
 			};
 		}'''
 
-def build_font_attributes(src_bytes, ttf_path):
-    """Translate Maelstrom's UI_FontLibrary into our UI_FontAttributes."""
+def build_font_attributes(src_bytes, ttf_path=None):
+    """Translate Maelstrom's UI_FontLibrary into our UI_FontAttributes.
+
+    Each entry names a face (`fontName_`) and a pixel size.  The faces are Maelstrom's own
+    1bpp bitmap masters, which the engine reads directly (Render/src/BitmapFont.cpp), so the
+    generated file points at those and no TrueType is involved.
+
+    They are per-language -- Russian/MAEL_small.font is Cyrillic where the English one is
+    Latin-1 -- so the path is written relative to the language directory as
+    `LocData\Fonts\<face>.font`, and UI_Font::createFont fills the current language in.
+
+    Passing --font overrides that with a TTF, which is only useful for deliberately
+    substituting a different typeface.
+    """
     entries = re.findall(rb'first\s*=\s*"([^"]*)"\s*;\s*'
                          rb'second\s*=\s*"class UI_Font"\s*\{(.*?)\}', src_bytes, re.S)
     fonts = []
     for name, body in entries:
         m = re.search(rb'fontSize_\s*=\s*(\d+)', body)
-        fonts.append((name.decode('cp1251'), int(m.group(1)) if m else 16))
+        f = re.search(rb'fontName_\s*=\s*"([^"]*)"', body)
+        fonts.append((name.decode('cp1251'), int(m.group(1)) if m else 16,
+                      f.group(1).decode('cp1251') if f else ''))
     if not fonts:
         return None
-    header = ',\n'.join('\t\t"%s"' % n for n, _ in fonts)
-    strings = ',\n'.join(FONT_ENTRY % {'name': n, 'size': s,
-                                       'ttf': ttf_path.replace('\\', '\\\\')}
-                         for n, s in fonts)
+    header = ',\n'.join('\t\t"%s"' % n for n, _, _ in fonts)
+    strings = ',\n'.join(FONT_ENTRY % {
+                             'name': n, 'size': s,
+                             'ttf': (ttf_path.replace('\\', '\\\\') if ttf_path
+                                     else 'LocData\\\\Fonts\\\\%s.font' % face)}
+                         for n, s, face in fonts)
     text = ('Version = 0;\nUI_FontLibrary = {\n\theader = {\n\t\t%d;\n%s\n\t};\n'
             '\tstrings = {\n\t\t%d;\n%s\n\t};\n};\n'
             % (len(fonts), header, len(fonts), strings))
@@ -192,8 +208,10 @@ def main():
     ap.add_argument('--apply', action='store_true',
                     help='rewrite the files in place (default: report only)')
     ap.add_argument('--font', metavar='TTF',
-                    help='engine-relative .ttf to substitute for Maelstrom\'s glyph '
-                         'atlases, e.g. "Resource\\\\UI\\\\Fonts\\\\ARIALNB2.ttf"')
+                    help='override the bitmap masters with a TrueType face, '
+                         'engine-relative, e.g. "Resource\\\\UI\\\\Fonts\\\\ARIALNB2.ttf". '
+                         'Not needed: without it the generated file points at Maelstrom\'s '
+                         'own *.font masters.')
     args = ap.parse_args()
 
     counts = collections.Counter()
@@ -225,20 +243,15 @@ def main():
     src = os.path.join(args.root, 'Scripts', 'Content', 'UI_FontLibrary')
     dst = os.path.join(args.root, 'Scripts', 'Content', 'UI_FontAttributes')
     if os.path.exists(src) and not os.path.exists(dst):
-        if not args.font:
-            print('\n  Scripts/Content/UI_FontLibrary needs translating to '
-                  'UI_FontAttributes, but Maelstrom ships no .ttf --\n'
-                  '  re-run with --font <engine-relative .ttf> to pick a substitute.')
-        else:
-            with open(src, 'rb') as fh:
-                built = build_font_attributes(fh.read(), args.font)
-            if built:
-                blob, fonts = built
-                print('\n  Scripts/Content/UI_FontAttributes  <- UI_FontLibrary  (%s)'
-                      % ', '.join('%s @%d' % f for f in fonts))
-                if args.apply:
-                    with open(dst, 'wb') as fh:
-                        fh.write(blob)
+        with open(src, 'rb') as fh:
+            built = build_font_attributes(fh.read(), args.font)
+        if built:
+            blob, fonts = built
+            print('\n  Scripts/Content/UI_FontAttributes  <- UI_FontLibrary  (%s)'
+                  % ', '.join('%s @%d %s' % (n, s, face or '?') for n, s, face in fonts))
+            if args.apply:
+                with open(dst, 'wb') as fh:
+                    fh.write(blob)
 
     # The global trigger chain moved into a Triggers/ subdirectory between the two
     # revisions.  It is what starts the game: its "Start Main Menu" trigger carries the

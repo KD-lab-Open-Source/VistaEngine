@@ -111,8 +111,7 @@ $ python3 tools/maelstrom_convert.py ~/Projects/MaelstromEnhanced/GameData
   Scripts/Content/GameOptions                                            3
   Scripts/Engine/RigidBodyPrmLibrary                                     129
 
-  Scripts/Content/UI_FontLibrary needs translating to UI_FontAttributes, but Maelstrom ships no .ttf --
-  re-run with --font <engine-relative .ttf> to pick a substitute.
+  Scripts/Content/UI_FontAttributes  <- UI_FontLibrary  (Aero 20 @16 MAEL_small, Aero big @32 MAEL_big, Aero medium @24 MAEL_big)
 
   Scripts/Content/Triggers/GlobalTrigger.scr  <- Scripts/Content/GlobalTrigger.scr
 
@@ -125,15 +124,15 @@ scanned 299 text files, 2 needed changes  (dry run -- pass --apply to write)
   OPTION_SHADOW              1  -- index into a C++ list that changed shape
 ```
 
-Then commit to it, naming a font (see below):
+Then commit to it — nothing else has to be supplied, the fonts come from Maelstrom's own
+masters (see below):
 
 ```
-$ python3 tools/maelstrom_convert.py ~/Projects/MaelstromEnhanced/GameData \
-      --font 'Resource\UI\Fonts\ARIALNB2.ttf' --apply
+$ python3 tools/maelstrom_convert.py ~/Projects/MaelstromEnhanced/GameData --apply
   Scripts/Content/GameOptions                                            3
   Scripts/Engine/RigidBodyPrmLibrary                                     129
 
-  Scripts/Content/UI_FontAttributes  <- UI_FontLibrary  (Aero 20 @16, Aero big @32, Aero medium @24)
+  Scripts/Content/UI_FontAttributes  <- UI_FontLibrary  (Aero 20 @16 MAEL_small, Aero big @32 MAEL_big, Aero medium @24 MAEL_big)
 
   Scripts/Content/Triggers/GlobalTrigger.scr  <- Scripts/Content/GlobalTrigger.scr
 
@@ -148,7 +147,7 @@ partly-converted tree changes nothing.
 |---|---|
 | `steering_duration` float → int | `RigidBodyPrm::steering_duration` is `float` in Maelstrom (`Physics/RigidBodyPrm.h:109`), `int` here |
 | `groundPass` / `waterPass` `PASSABILITY`→`true`, `IMPASSABILITY`→`false` | `PassabilityFlags` there, `bool` here. `IMPASSABILITY = 0`, `PASSABILITY = 1`, and the two engines' constructed defaults agree exactly |
-| generate `Scripts/Content/UI_FontAttributes` from `Scripts/Content/UI_FontLibrary` | see below |
+| generate `Scripts/Content/UI_FontAttributes` from `Scripts/Content/UI_FontLibrary`, pointing at Maelstrom's own `*.font` masters | see below |
 | copy `Scripts/Content/GlobalTrigger.scr` to `Scripts/Content/Triggers/` | the chain moved into a subdirectory; see below |
 | renumber `OPTION_SCREEN_SIZE` / `OPTION_SHADOW` / `OPTION_LANGUAGE` in `Scripts/Content/GameOptions` | they are indices into a C++ list that changed shape; see below |
 
@@ -209,46 +208,66 @@ Worth knowing when chasing this kind of thing: the actions are serialized as
 `"struct ActionFoo"`, not `"class ActionFoo"`. Grepping for the latter finds two entries in
 this file and suggests the chain is an empty skeleton.
 
-### Fonts are a translation, not a substitution
+### Fonts are Maelstrom's own, not a substitute
 
-Maelstrom rasterised its fonts offline. `Scripts/Content/UI_FontLibrary` names logical
-fonts (`MAEL_small`) that resolve to glyph atlases in `cacheData/Fonts/*.xfont` + `.tga`,
-and **the distribution contains no `.ttf` at all**. By 2008 the engine had moved to
-FreeType reading `Scripts/Content/UI_FontAttributes` (`UserInterface/UI_Types.cpp:68`) — a
-different file name *and* a different shape: ours is a `StringTable<UI_LibFont>` with a
-nested `font` block, Maelstrom's a `StringTableBasePolymorphic` holding
-`second = "class UI_Font"`.
+Maelstrom rasterised its fonts offline and **ships no TrueType at all** — zero `.ttf` or
+`.otf` in the distribution. `Scripts/Content/UI_FontLibrary` names logical fonts
+(`Aero 20`) that resolve to a face (`MAEL_small`) and a pixel size; by 2008 the engine had
+moved to FreeType reading `Scripts/Content/UI_FontAttributes`
+(`UserInterface/UI_Types.cpp:68`) — a different file name *and* a different shape: ours is a
+`StringTable<UI_LibFont>` with a nested `font` block, Maelstrom's a
+`StringTableBasePolymorphic` holding `second = "class UI_Font"`.
 
-Without that file `cfont()` falls back to a default font that never created, and
-`FT::Font::size(this=0x0)` faults inside `UI_TextParser::parseString`. The converter
-translates the library and substitutes whatever TTF `--font` names. **The glyphs are not
-Maelstrom's.** Matching those means teaching the engine to read `.xfont`, which is a code
-change, not a conversion.
-
-#### Where to get the `.ttf`
-
-Take one from Perimeter 2's own data — `GameData/Resource/UI/Fonts/` ships `ARIALNB2.ttf`,
-`FUTURA_C.TTF`, `Perimeter.ttf`, `Perimeter2.ttf` and `default.ttf` — and copy it into the
-Maelstrom run directory at the path you are going to name:
+The faces are **1-bit-per-pixel bitmap masters**, one file each, rasterised at a fixed height
+and scaled to whatever size the UI asks for. `Render/src/BitmapFont.cpp` reads them, using the
+same layout the original had in `Render/src/Font.cpp::LoadFontImage`:
 
 ```
-mkdir -p ~/Projects/MaelstromEnhanced/GameData/Resource/UI/Fonts
-cp GameData/Resource/UI/Fonts/ARIALNB2.ttf \
-   ~/Projects/MaelstromEnhanced/GameData/Resource/UI/Fonts/
+"font" | int32 real_height | uint16 char_min | uint16 char_max
+per char in [char_min, char_max):  int32 width | uint8 bits[((width + 7) / 8) * real_height]
 ```
 
-`ARIALNB2.ttf` is the one this tree has been run with. Any TrueType face the engine can open
-works — it must simply cover Cyrillic, since the UI text is CP1251.
+Rows top to bottom, most significant bit first. All 15 masters parse with every byte consumed
+and nothing left over; `Courier New.font` reports the same width for every glyph, which is a
+free check that the width field is being read correctly.
 
-Two things to get right, because neither announces itself:
+**The `.xfont` files are not the source.** `cFontInternal::CreateTexture` tries `Load(name)`
+first and, failing that, builds from the master and writes the `.xfont` back — they are a
+cache of the six sizes one machine happened to ask for. Reading them would have bought fewer
+faces at fixed sizes; the masters give every face at any size.
 
-- **`--font` is engine-relative, with backslashes.** It is written verbatim into
-  `UI_FontAttributes` for the engine to resolve inside the data root, so it is
-  `Resource\UI\Fonts\ARIALNB2.ttf` — not a host path, and not the path to the file you just
-  copied from.
-- **The converter does not check that the file exists.** `build_font_attributes` only
-  interpolates the string, so a wrong path converts cleanly and then faults at run time in
-  exactly the way described above. Copy the font first, then convert.
+Three things are worth knowing before touching this:
+
+- **The masters are not all one codepage.** Byte `0xC0` draws a plain `А` in
+  `Russian/MAEL_small.font` and an accented `À` in `English/MAEL_small.font` — CP1251 against
+  CP1252. The LocData language directory decides, and the developers' own faces under
+  `Scripts/Resource/fonts` are Cyrillic. Assuming one codepage silently mangles every Western
+  language's accented text. The UTF-16 reverse map is built with the same
+  `MultiByteToWideChar` that built the char table, so the two agree by construction rather
+  than by a hand-copied table.
+- **The whole cell is scaled, padding included**, which is what `cFontInternal::CreateImage`
+  did. The masters carry ~18px of leading above and below the ink, so glyphs occupy roughly
+  70% of their nominal height. Trimming to the ink would give a visually larger font than
+  Maelstrom shipped.
+- **The greys come from the downsample.** The source is one bit deep; averaging the master
+  pixels each destination pixel covers is the whole of the antialiasing, exactly as the
+  original got its greys by rendering at master resolution and resampling down.
+
+The result is an ordinary `FT::Font` — same atlas texture, same `charTable_`, same metrics —
+so nothing downstream knows the difference, and `createFont` dispatches on the `.font`
+extension with the TrueType path untouched. All of it is `#ifdef MAELSTROM_DATA`: Perimeter 2
+ships TrueType and compiles the file to nothing.
+
+Because the masters are per-language, `UI_FontAttributes` names them relative to the language
+directory (`LocData\Fonts\MAEL_small.font`) and `UI_Font::createFont` fills in the current
+one. A bitmap face and a TrueType face are indistinguishable downstream, so a `BitmapFont:`
+line is logged when one is built — otherwise "the text looks wrong" is impossible to
+attribute.
+
+`--font` still overrides the lot with a TrueType face, which is only useful for deliberately
+substituting a different typeface. It is no longer needed, and with it goes the whole class of
+failures it used to invite: the converter never had to check that the named file existed, so a
+wrong path converted cleanly and then faulted at run time in `FT::Font::size(this=0x0)`.
 
 ## What the engine had to learn
 
@@ -883,12 +902,10 @@ ask what the original did *without* the field, not what our default happens to b
 
 ## Still open
 
-1. **Fonts are a substitute typeface.** Reading `.xfont` + its `.tga` atlas would restore
-   the original lettering.
-2. **Maelstrom-only `.spg` camera fields go unread** — `FarPlane`, `NearPlane`,
+1. **Maelstrom-only `.spg` camera fields go unread** — `FarPlane`, `NearPlane`,
    `CAMERA_ZOOM_*`, `CAMERA_MAX_HEIGHT`, `CAMERA_MIN_HEIGHT` — so the camera uses P2
    defaults on larger maps. Not known to matter; not investigated.
-3. **Eleven polymorphic classes in Maelstrom's data do not exist in this source**, and
+2. **Eleven polymorphic classes in Maelstrom's data do not exist in this source**, and
    resolve to null objects rather than failing: the `AiAction_*` / `AiCondition_*`
    action-chain system (matching its `Scripts/Engine/AiActionChainList`, which P2 has no
    equivalent of), plus `ActionSquadMove`, `ActionSetCoastSprites`, `AttributeReal`,
@@ -902,17 +919,17 @@ ask what the original did *without* the field, not what our default happens to b
    behaviour. Neither is fatal: `XPrmIArchive` reports the miss, `skipValue`s the block and
    carries on (`Util/Serialization/XPrmArchive.cpp:1172`), which is why they surface as
    `ERROR! no such class registered` in a log rather than as a failure to load.
-4. **The basement is read and thrown away.** `C3DX_BASEMENT` (500/501/502) is building
+3. **The basement is read and thrown away.** `C3DX_BASEMENT` (500/501/502) is building
    foundation geometry, a feature P2 dropped. The raw `.3DX` path ignores the chunks
    outright; the cache path has no choice but to read them — they sit mid-record in
    `otherInfo`, so skipping them would put the reader out of step — and then discards them.
    If that geometry is ever wanted, it is already parsed.
-5. **Tooltips are missing.** A state used to carry its hover text directly
+4. **Tooltips are missing.** A state used to carry its hover text directly
    (`hoveredTextLoc`, a localization key, read by `UI_ControlState::serialize`); 2008 moved
    it into a `UI_ACTION_HOVER_INFO` action. Maelstrom's data writes the old field, nothing
    reads it, and no control shows a tooltip. Not converted — the screens themselves are
    readable without it.
-6. **The silhouette outline is still unported.** The units themselves draw now (see above);
+5. **The silhouette outline is still unported.** The units themselves draw now (see above);
    what is missing is the coloured outline they show through a building they walk behind,
    which is stencil work — **Render-PORTING.md #22**. Unreachable on retail Perimeter 2, so
    this build is the only way to exercise it.
