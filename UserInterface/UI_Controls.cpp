@@ -2170,6 +2170,11 @@ void UI_ControlBase::serialize(Archive& ar)
 				if(ar.serialize(locText, "locText", 0))
 					text_ = locText.c_str();
 			}
+			// Kept unexpanded for UI_ACTION_EXPAND_TEMPLATE, which reads it rather than the
+			// caption it writes: six controls carry a template here, the in-game clock's
+			// "{time_h12} : {time_min} {time_ampm}" among them.
+			if(ar.isInput())
+				locText_ = text_;
 #endif
 		}
 		ar.serialize(textAlign_, "textAlign_", "горизонтально");
@@ -2306,6 +2311,10 @@ void UI_ControlBase::serialize(Archive& ar)
 				plink->setShift(parent->position().left_top() - position().left_top());
 
 	ar.serialize(actions_, "actions", "назначения");
+#ifdef MAELSTROM_DATA
+	// After the list is read, not before: reading it replaces the vector.
+	UI_ActionDataHoverInfo::appendMaelstromHover(ar, actions_);
+#endif
 	ar.serialize(backgroundAnimations_, "backgroundAnimations", "анимационные цепочки");
 
 	if(ar.isInput())

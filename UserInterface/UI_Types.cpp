@@ -331,6 +331,11 @@ void UI_ControlState::serialize(Archive& ar)
 		ar.serialize(showModes_, "showModes", "Режимы отрисовки");
 #endif
 	ar.serialize(actions_, "actions", "назначения");
+#ifdef MAELSTROM_DATA
+	// A state carried the same hover pair as its control, and findAction falls back to the
+	// current state's list, so the same synthesis serves both. 39 states name a tooltip.
+	UI_ActionDataHoverInfo::appendMaelstromHover(ar, actions_);
+#endif
 }
 
 

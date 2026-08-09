@@ -146,6 +146,9 @@ REGISTER_CLASS(Condition, ConditionPercentOfMaxUnits, "Параметры\\Ко�
 REGISTER_CLASS(Condition, ConditionObjectByLabelExists, "Объект по метке\\Объект по метке существует")
 REGISTER_CLASS(Condition, ConditionKillObjectByLabel, "Объект по метке\\Объект по метке уничтожен")
 REGISTER_CLASS(Condition, ConditionObjectNearAnchorByLabel, "Объект по метке\\Возле якоря по метке находится объект указанного типа")
+#ifdef MAELSTROM_DATA
+REGISTER_CLASS(Condition, ConditionObjectNearObjectByLabel, "Объект по метке\\Возле объекта по метке находится объект указанного типа")
+#endif
 REGISTER_CLASS(Condition, ConditionCheckSurfaceNearObjectByLabel, "Объект по метке\\Высота поверхности в радиусе объекта по метке")
 
 REGISTER_CLASS(Condition, ConditionKeyboardClick, "Интерфейс\\Клик по клавиатуре или мыши")
@@ -2307,6 +2310,84 @@ bool ConditionObjectNearAnchorByLabel::check() const
 		return false;
 	}
 }
+
+#ifdef MAELSTROM_DATA
+ConditionObjectNearObjectByLabel::ConditionObjectNearObjectByLabel()
+{
+	playerType = AI_PLAYER_TYPE_ME;
+	distance = 100;
+	objectConstructed = false;
+	onlyVisible_ = false;
+}
+
+void ConditionObjectNearObjectByLabel::serialize(Archive& ar)
+{
+	__super::serialize(ar);
+	ar.serialize(label, "label", "&Метка объекта");
+	ar.serialize(objects_, "objects", "&Указанные объекты");
+	removeZeros(objects_);
+	ar.serialize(objectConstructed, "objectConstructed", "Только если объект достроен");
+	ar.serialize(playerType, "playerType", "Владелец объекта");
+	ar.serialize(distance, "distance", "&Максимальное расстояние");
+	ar.serialize(onlyVisible_, "onlyVisible", "Учитывать только видимые объекты");
+}
+
+// The player-type switch, which the original spelled out twice -- once for "any object", once
+// per named attribute. Note the enemy branch: it is the first enemy player that has such a
+// unit at all, not the nearest one across all of them, because the original broke out of the
+// player loop on the first hit.
+bool ConditionObjectNearObjectByLabel::checkAttribute(const AttributeBase* attr,
+	const Vect2f& position, const ConstructionState& state) const
+{
+	UnitReal* unit = 0;
+	switch(playerType){
+		case AI_PLAYER_TYPE_ME:
+			unit = aiPlayer().findUnit(attr, position, 0, state, onlyVisible_);
+			break;
+		case AI_PLAYER_TYPE_ENEMY:
+			{
+				PlayerVect::iterator pi;
+				FOR_EACH(universe()->Players, pi)
+					if(!(*pi)->isWorld() && (*pi)->isEnemy(&aiPlayer()))
+						if(unit = (*pi)->findUnit(attr, position, 0, state, onlyVisible_))
+							break;
+				break;
+			}
+		case AI_PLAYER_TYPE_WORLD:
+			unit = universe()->worldPlayer()->findUnit(attr, position, 0, state, onlyVisible_);
+			break;
+		case AI_PLAYER_TYPE_ANY:
+			unit = universe()->findUnit(attr, position, 0, state, onlyVisible_);
+			break;
+	}
+
+	return unit && unit->position2D().distance2(position) < sqr(distance);
+}
+
+bool ConditionObjectNearObjectByLabel::check() const
+{
+	// Looked up on every check rather than cached in a UnitLink: the labelled object need not
+	// exist yet when the chain is first polled, which is what the original relied on.
+	UnitReal* unit = universe()->findUnitByLabel(label);
+	if(!unit){
+		xassertStr(0 && "Объект по метке не найден: ", label.c_str());
+		return false;
+	}
+
+	Vect2f position = unit->position2D();
+	const ConstructionState& state = objectConstructed ? CONSTRUCTED : CONSTRUCTED|CONSTRUCTING;
+
+	if(objects_.empty() || !objects_.front())
+		return checkAttribute(0, position, state);
+
+	AttributeReferences::const_iterator i;
+	FOR_EACH(objects_, i)
+		if(checkAttribute(*i, position, state))
+			return true;
+
+	return false;
+}
+#endif
 
 ConditionObjectUnderAttack::ConditionObjectUnderAttack()
 {

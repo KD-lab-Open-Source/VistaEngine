@@ -856,6 +856,88 @@ them unread the main menu's camera was free to be dragged and spun.
 listed them as such. They are the depth-of-field pair in the world's `environment` block,
 where `Environment::serialize` reads them already (`DofParams.x`/`.y`).
 
+### The classes the data names — three of eleven were worth porting
+
+Maelstrom's data names eleven polymorphic classes this source does not have. `XPrmIArchive`
+reports each miss, `skipValue`s the block and carries on
+(`Util/Serialization/XPrmArchive.cpp:1172`), so they surface as `ERROR! no such class
+registered` rather than as a failure to load — and, being non-fatal, they had never been
+sorted by whether anything reaches them.
+
+| class | in the data | in `origin/Maelstrom` | verdict |
+|---|---|---|---|
+| `ActionSetCoastSprites` | `MAIN MENU.scr` ×14 | `Environment/ActionsEnvironmental.cpp` | **ported** |
+| `ConditionObjectNearObjectByLabel` | 7 chains ×12 | `Util/Conditions.cpp` | **ported** |
+| `UI_ACTION_EXPAND_TEMPLATE` | `UI_Attributes` ×6 | `UserInterface/UI_ControlsGame.cpp` | **ported** |
+| `ActionSquadMove` | `MISSIA.scr` ×1 | `Util/Actions.cpp` | unreachable |
+| `AttributeReal` | `Scripts/Engine/AuxDictionary` | — | not a class |
+| `AiAction_{ExecuteChain,MoveToFireRadius,RotToPoint,Stop}`, `AiCondition_{FireRadius,RotToPoint}` | `Scripts/Engine/AiActionChainList` | — | dead in Maelstrom too |
+
+**Seven of the eleven exist in no C++ at all — including Maelstrom's.** The AI action-chain
+system reads like a feature this tree lacks; `git grep -E 'AiAction|AiCondition'` over
+`origin/Maelstrom` returns the data file and one `.vcproj` line listing it, and nothing else.
+`AiActionChainList` is 771 bytes holding two chains, one of them named `Test_2`. `AuxDictionary`
+is a four-line rename table whose *key* is `"class AttributeReal"` — a name being converted
+away from, not a class being instantiated. Neither file is opened by either engine. The same
+method note that settles unread wire names settles unresolved classes: ask what the **original**
+did with it.
+
+**`ActionSquadMove` is live in Maelstrom and still unreachable here**, because the chain that
+uses it is not loaded: mapping all 128 `.scr` files against every reference to them leaves four
+orphans — `MISSIA`, `AI_C1M1_E`, `AI_C2M1` and `TEST_!` — named by no world and no other chain.
+
+The three that were ported:
+
+- **`ActionSetCoastSprites`** sets the shoreline's sprite parameters. `cCoastSprites::serialize`
+  here *is* Maelstrom's `Init()` with the read folded into it, so the apply half is split back
+  out and the action calls it. Every screen of the main menu sets its own, in the `Waves*`
+  trigger of its environment block.
+- **`ConditionObjectNearObjectByLabel`** measures from a labelled *unit*; 2008 kept only the
+  anchor sibling, `ConditionObjectNearAnchorByLabel`. Ten of its twelve uses are in AI chains
+  that `c1_m1`, `c1_m7`, `c2_m1` and `c2_m7` load, where an unregistered condition reads as one
+  that is simply never true.
+- **`UI_ACTION_EXPAND_TEMPLATE`** is the pre-2008 form of `UI_ACTION_LOCALIZE_CONTROL`: it
+  carries no string and expands the control's *own* caption. Six controls use it, and the
+  in-game clock is one — `L_ASTRO TIME` resolves to `{time_h12} : {time_min} {time_ampm}`, which
+  without the action is drawn literally, braces and all. The caption has to be kept unexpanded
+  beside `text_` (the original kept the same thing under the same name, `locText_`), because
+  expanding into `text_` alone consumes the template on the first update.
+
+Worth knowing for next time: **`unresolved.txt` is one `fopen` away.** Logging `str` at the
+`result == -1` branch of `XPrmArchive.cpp` turns "which classes are missing" into a measurement
+instead of a grep — it counts only the ones actually reached, and it distinguishes a class that
+resolves from one whose file is never opened. Removing a single `REGISTER_CLASS` and re-running
+is the control that proves the probe is live: `ActionSetCoastSprites` came back 14 times, once
+per call site. With all three registered, a boot to the menu and a load of the four campaign
+worlds above report **nothing** unresolved.
+
+### Tooltips — `UI_ActionDataHoverInfo::appendMaelstromHover`
+
+A control used to carry its hover text and hover cursor itself, in a transparent
+`openBlock("hover")` — so `hoveredTextLoc` and `hoveredCursor` sit at the control's own level,
+and at the control *state's*, which had the same pair. 2008 collected them into a
+`UI_ACTION_HOVER_INFO` action.
+
+Rather than teach the tooltip popup a second way to find its text, the old fields are read back
+into the action that replaced them: `UI_ControlBase::findAction` already looks in the control's
+own list and then in the current state's, which is exactly the fallback the old
+`UI_ControlBase::hint()` did by hand. Everything downstream — the show delay, the type match,
+the template expansion, the hovered cursor — is then the code that was already there. The
+synthesis has to run *after* `actions_` is read, since reading it replaces the vector.
+
+It is worth the trouble: **757 of Maelstrom's controls name a tooltip key and not one names a
+`UI_ACTION_HOVER_INFO`**, so on this data the 2008 path is dead end to end. Where they are
+matters for testing them —
+
+| screen | tooltips |
+|---|---|
+| `ALIENS` / `ASCENSIONS` / `REMNANTS` (the three race HUDs) | 292 / 232 / 203 |
+| `Select Mission` | 25 |
+| `Main Menu`, `Select CAMPAIGN` | 3, 2 |
+
+— so the main menu shows almost none of it. Load a mission and hover a HUD button for
+`tipsDelay`, half a second.
+
 ## What the rest of the binary formats do
 
 Mostly nothing — they already load:
@@ -970,31 +1052,16 @@ ask what the original did *without* the field, not what our default happens to b
 
 ## Still open
 
-1. **Eleven polymorphic classes in Maelstrom's data do not exist in this source**, and
-   resolve to null objects rather than failing: the `AiAction_*` / `AiCondition_*`
-   action-chain system (matching its `Scripts/Engine/AiActionChainList`, which P2 has no
-   equivalent of), plus `ActionSquadMove`, `ActionSetCoastSprites`, `AttributeReal`,
-   `ConditionObjectNearObjectByLabel` and `UI_ACTION_EXPAND_TEMPLATE`.
-
-   Two are known to be *reached*. `ActionSetCoastSprites` has 14 call sites in
-   `Scripts/Content/Triggers/MAIN MENU.scr` — the `Waves*` trigger in every screen's
-   environment block — so the menu sets no coast sprites; of the 69 classes that script
-   names it is the only one this tree cannot resolve. `UI_ACTION_EXPAND_TEMPLATE` is a UI
-   action with no counterpart in `UI_Enums.h`, so any control that carries it gets no expand
-   behaviour. Neither is fatal: `XPrmIArchive` reports the miss, `skipValue`s the block and
-   carries on (`Util/Serialization/XPrmArchive.cpp:1172`), which is why they surface as
-   `ERROR! no such class registered` in a log rather than as a failure to load.
-2. **The basement is read and thrown away.** `C3DX_BASEMENT` (500/501/502) is building
+1. **The basement is read and thrown away.** `C3DX_BASEMENT` (500/501/502) is building
    foundation geometry, a feature P2 dropped. The raw `.3DX` path ignores the chunks
    outright; the cache path has no choice but to read them — they sit mid-record in
    `otherInfo`, so skipping them would put the reader out of step — and then discards them.
    If that geometry is ever wanted, it is already parsed.
-3. **Tooltips are missing.** A state used to carry its hover text directly
-   (`hoveredTextLoc`, a localization key, read by `UI_ControlState::serialize`); 2008 moved
-   it into a `UI_ACTION_HOVER_INFO` action. Maelstrom's data writes the old field, nothing
-   reads it, and no control shows a tooltip. Not converted — the screens themselves are
-   readable without it.
-4. **The silhouette outline is still unported.** The units themselves draw now (see above);
+2. **`ActionSquadMove` is unported**, the one class of the eleven that Maelstrom's engine
+   consumed and this tree cannot resolve. Its single call site is in `MISSIA.scr`, which no
+   world and no other chain names, so nothing reaches it. Port it if that chain is ever
+   wired up; `Util/Actions.cpp` in `origin/Maelstrom` has it.
+3. **The silhouette outline is still unported.** The units themselves draw now (see above);
    what is missing is the coloured outline they show through a building they walk behind,
    which is stencil work — **Render-PORTING.md #22**. Unreachable on retail Perimeter 2, so
    this build is the only way to exercise it.
