@@ -392,7 +392,12 @@ cObject3dx::~cObject3dx()
 	delete pOcclusionQuery;
 	delete pAnimSecond;
 
-	xassert(gb_RenderDevice3D);
+	// There used to be an xassert(gb_RenderDevice3D) here, meaning "the device must still
+	// exist while this object releases its GPU resources". That pointer is the D3D9 device
+	// and is permanently null on every platform now, so the check could only ever fail --
+	// it fired on every object destroyed in a build with assertions on, burying real ones.
+	// Not re-pointed at gb_RenderDevice: destruction legitimately outlives the device at
+	// shutdown, which is why the sPtr buffer destructors have to guard against exactly that.
 	xassert(GetRef()==0);
 }
 

@@ -816,15 +816,20 @@ ask what the original did *without* the field, not what our default happens to b
 2. **Maelstrom-only `.spg` camera fields go unread** — `FarPlane`, `NearPlane`,
    `CAMERA_ZOOM_*`, `CAMERA_MAX_HEIGHT`, `CAMERA_MIN_HEIGHT` — so the camera uses P2
    defaults on larger maps. Not known to matter; not investigated.
-3. **Ten polymorphic classes in Maelstrom's data do not exist in this source**, and resolve
-   to null objects rather than failing: the `AiAction_*` / `AiCondition_*` action-chain
-   system (matching its `Scripts/Engine/AiActionChainList`, which P2 has no equivalent of),
-   plus `ActionSquadMove`, `ActionSetCoastSprites`, `AttributeReal` and
-   `ConditionObjectNearObjectByLabel`. Only one of them is known to be *reached*:
-   `ActionSetCoastSprites` has 14 call sites in `Scripts/Content/Triggers/MAIN MENU.scr` —
-   the `Waves*` trigger in every screen's environment block — so the menu sets no coast
-   sprites. Of the 69 classes that script names, it is the only one this tree cannot
-   resolve.
+3. **Eleven polymorphic classes in Maelstrom's data do not exist in this source**, and
+   resolve to null objects rather than failing: the `AiAction_*` / `AiCondition_*`
+   action-chain system (matching its `Scripts/Engine/AiActionChainList`, which P2 has no
+   equivalent of), plus `ActionSquadMove`, `ActionSetCoastSprites`, `AttributeReal`,
+   `ConditionObjectNearObjectByLabel` and `UI_ACTION_EXPAND_TEMPLATE`.
+
+   Two are known to be *reached*. `ActionSetCoastSprites` has 14 call sites in
+   `Scripts/Content/Triggers/MAIN MENU.scr` — the `Waves*` trigger in every screen's
+   environment block — so the menu sets no coast sprites; of the 69 classes that script
+   names it is the only one this tree cannot resolve. `UI_ACTION_EXPAND_TEMPLATE` is a UI
+   action with no counterpart in `UI_Enums.h`, so any control that carries it gets no expand
+   behaviour. Neither is fatal: `XPrmIArchive` reports the miss, `skipValue`s the block and
+   carries on (`Util/Serialization/XPrmArchive.cpp:1172`), which is why they surface as
+   `ERROR! no such class registered` in a log rather than as a failure to load.
 4. **The basement is read and thrown away.** `C3DX_BASEMENT` (500/501/502) is building
    foundation geometry, a feature P2 dropped. The raw `.3DX` path ignores the chunks
    outright; the cache path has no choice but to read them — they sit mid-record in
