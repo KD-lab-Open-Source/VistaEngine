@@ -679,6 +679,34 @@ archive's own `|a|b` alias, so Perimeter 2 matches on the first name and pays no
 second), and `FogOfWar`'s `fogColor` / `scoutAreaAlpha` were `fogOfWarColor` /
 `scout_area_alpha`.
 
+`dayTimeScale` / `nightTimeScale` are the trap in this group, and are **deliberately left
+unread** — the reasoning is worth recording, because the file makes the opposite look obvious.
+The pair sits in Maelstrom's `GlobalAttributes` at 250 / 500, right between `hideSmoothly` and
+the water constants this reader does take; 2008 moved it *down* into `EnvironmentTime`'s own
+preset block, out of reach here. So it reads exactly like the other moved fields: a value the
+data supplies, a reader that cannot see it, and a live default (`EnvironmentTime`'s 500 / 1000)
+at twice the speed.
+
+It is not. **A/B against the original shows the same clock rate as ours**, so the original does
+not run a mission at 250 either. What actually governs a mission is `EnvironmentTime`'s own
+pair, which only `ActionSetTimeScale` changes, and the one non-zero setter in the whole data set
+is `MAIN MENU.scr` asking for 500 / 1000 — the default. Reading the preset value here would
+have made this build the odd one out. (`Environment::dayTimeScale_` / `nightTimeScale_`,
+`Environment.h:151`, hold 250 / 500 as a leftover of the pre-2008 ownership and are serialized
+and read by nothing.)
+
+Worth knowing when reading that clock, since it is what made the pair look wrong: **there are
+two of them**, adjacent in the top bar.
+
+| control | source | reads |
+|---|---|---|
+| `astro time` | `UI_ACTION_EXPAND_TEMPLATE` on loc template `{time_h12} : {time_min} {time_ampm}`, against `Environment::getTime()` | the world's **time of day**, 12-hour + a.m./p.m. — does not start at 00:00 |
+| `TIME` | `UI_ACTION_SHOW_TIME` | **elapsed** `h:mm:ss` since mission start; identical in both engines |
+
+At 500 the day scale is about eight game-minutes per real second, which is why `astro time`'s
+minutes field reads like a seconds counter. That is the cycle being fast, not the field being
+wrong.
+
 Measured on `Menu.spg` after the change: fog 900–1200, `height_fog_circle` 500, frustum
 2–1300, `hideSmoothly` true, effects 0 / 0 / 1e6, `outside = ENVIRONMENT_WATER`, and the
 underwater and ice textures resolving to real paths instead of empty strings.
@@ -974,6 +1002,32 @@ matters for testing them —
 
 — so the main menu shows almost none of it. Load a mission and hover a HUD button for
 `tipsDelay`, half a second.
+
+### Hints that cannot be closed — `ActionMessage::activate` / `::workedOut`
+
+The only drift here that is neither a type nor a nesting change: the same field, the same C++
+type, a different *meaning*. `messageSetup.displayTime` reads 0 on every Maelstrom hint, and
+
+- **pre-2008** (`origin/Maelstrom:Util/Actions.cpp`) started a `DurationTimer` at 0, so the
+  action **finished on its first quant**, and a finishing `MESSAGE_ADD` never took its own
+  message down — that was a separate `MESSAGE_REMOVE` trigger's job;
+- **2008** reads the same 0 as "show forever" (`workTimer_.start(time ? time : INT_INF)`) and
+  removes the message when the action finally completes.
+
+Read the 2008 way, the trigger that shows a hint never leaves `WORKING`. That is not a cosmetic
+difference, because a trigger activates its outgoing links **only on reaching `DONE`**
+(`Trigger::setState`, `TriggerEditor/TriggerExport.cpp`). Maelstrom builds each tutorial hint as
+a chain — show it, then a `ConditionClickOnButton` on `REMNANTS.TEXT.message inf.x` (the red ✕),
+then `MESSAGE_REMOVE` — so a stalled show-trigger strands **everything behind the first hint**,
+not just the close button. `C1M1.scr` alone hangs eight of these off one another.
+
+Both halves are switched. `UI_Message::aliveTime_` (`UI_Types.cpp`) already reads `displayTime`
+the pre-2008 way — a real time, or ~10000s when it is 0 — so once the action stops removing the
+message the UI keeps it up on its own, which is exactly the old division of labour.
+
+Worth knowing for diagnosis: the click, the `EventButtonClick`, and the delivery to the trigger
+system were all working. What localised it was logging *which* `ConditionClickOnButton`s were
+ever evaluated — all 55 belonged to the global and menu chains, none to the mission's.
 
 ## What the rest of the binary formats do
 
