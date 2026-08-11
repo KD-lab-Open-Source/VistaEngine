@@ -2879,11 +2879,23 @@ bool ConditionGetResourceLevel::check() const
 bool ConditionDistanceBetweenObjects::check(UnitActing* unit) const
 {
 	start_timer_auto();
+#ifdef MAELSTROM_DATA
+	// Maelstrom answers for the unit in hand: it clears its found_ flag before every scan.
+	// 2008 fused the rescan throttle and the answer into one two-second latch, so the first
+	// context unit with a neighbour in range makes the condition read true for every other
+	// unit the same trigger sweeps afterwards. A trigger that sweeps one squad cannot tell
+	// the difference, which is why P2's own seventeen uses never showed it; Maelstrom has
+	// 326, and they sweep whole armies. Clearing the latch first restores the per-unit
+	// answer, and leaves foundTimer_ doing nothing but carrying one scan's result out of
+	// operator().
+	foundTimer_.stop();
+#else
 	if(foundTimer_.busy())
 		return true;
-	
+#endif
+
 	unit1_ = unit;
-	Vect2i pos = unit->position2D(); 
+	Vect2i pos = unit->position2D();
 	universe()->unitGrid.ConditionScan(pos.x, pos.y, round(distance), const_cast<ConditionDistanceBetweenObjects&>(*this));
 	return foundTimer_.busy();
 }

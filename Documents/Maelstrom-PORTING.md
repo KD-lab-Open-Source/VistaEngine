@@ -1080,6 +1080,55 @@ Worth knowing for diagnosis: the click, the `EventButtonClick`, and the delivery
 system were all working. What localised it was logging *which* `ConditionClickOnButton`s were
 ever evaluated — all 55 belonged to the global and menu chains, none to the mission's.
 
+### The whole army attacks at once — `ConditionDistanceBetweenObjects::check`
+
+The second drift of the same kind: same field names, same C++ types, a different *meaning* —
+this time in a condition's answer rather than an action's.
+
+`c1_m1` is meant to open on a briefing and eight tutorial hints, and the player meets the first
+enemy only after walking west to the `P1` anchor. Instead both Ascension squads camped 437 and
+470 units from the player's start marched on him from the second second.
+
+The mission chain was not at fault. Logging every `Trigger` state change (`addLogRecord`, which
+already assembles the string) showed `C1M1.scr` running its briefing, its tasks and its hints in
+order and then parking on `01`, the `ConditionObjectNearAnchorByLabel` that waits for the walk
+west. The attack came from `E_AI MISSIONS.scr`, whose `E-UNIT юнитов 11` fired **on every quant
+from 0.2 s**. Its trigger is a context trigger over `squad = E-UNITS` — all 34 of them — and its
+condition is an OR whose first term is `ConditionDistanceBetweenObjects(distance = 310,
+aiPlayerType = AI_PLAYER_TYPE_ENEMY, onlyLegionaries, onlyVisible)`.
+
+Only two of those 34 squads have anything hostile within 310: they stand beside the neutral
+`V-PEOPLE` civilians and a Remnants scrambler far to the west. Logging the true results of
+`ConditionContext::checkDebug` showed the condition reading true for **every** squad, including
+ones whose nearest hostile was 349, 380, 389, 420.
+
+The two engines answer differently:
+
+- **pre-2008** (`origin/Maelstrom:Util/Conditions.cpp`) clears a `found_` flag before each scan
+  and returns it, so the answer is about **the unit in hand**. A separate `waitCounter_`
+  (`WAIT_COUNTER = 10`) throttles the grid scan, and a `Condition::scanWait_` static tells
+  `Trigger::checkCondition` not to advance the context index on a skipped quant — a pure rate
+  limiter, semantics untouched.
+- **2008** fused the throttle and the answer into one two-second `LogicTimer`:
+  `if(foundTimer_.busy()) return true;` at the top, `foundTimer_.start(2000)` on a hit. A
+  trigger that sweeps one unit cannot tell the two apart. One that sweeps 34 can: at one context
+  check per quant a full sweep takes ~3.4 s, the two squads in real contact restart the latch
+  every cycle, and it is therefore **never not busy** — so all 34 read true and all 34 get the
+  `ActionAttack`.
+
+`#ifdef MAELSTROM_DATA` stops the latch at the top of `check` instead of reading it, which
+restores the per-unit answer and leaves `foundTimer_` doing nothing but carrying one scan's
+result out of `operator()`. The throttle is deliberately not ported: it would need
+`scanWait_` threaded back into `Trigger::checkCondition`, and `unitsPerQuant_` already limits
+this trigger to one scan per quant.
+
+Measured on a 40-second load of `c1_m1`: the two squads near the player stay on their spawn
+coordinates for the whole run instead of closing from 437 to 292 in seven seconds, the trigger
+fires 17 times instead of once per quant, and the surviving activations are the western squads
+that genuinely are in contact. This is not a niche condition — P2's own scripts use it 17 times,
+Maelstrom's use it **326 times across 39 chains**, so the same latch was distorting every AI
+chain in the game, not just this one.
+
 ## What the rest of the binary formats do
 
 Mostly nothing — they already load:
