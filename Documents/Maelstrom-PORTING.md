@@ -921,6 +921,57 @@ them unread the main menu's camera was free to be dragged and spun.
 listed them as such. They are the depth-of-field pair in the world's `environment` block,
 where `Environment::serialize` reads them already (`DofParams.x`/`.y`).
 
+### The terrain's grain and grass — three names in the `environment` block, and a `.dds`
+
+The ground rendered as flat colour with no grass on it at all, most obvious at the zoom a
+mission opens at. Four separate causes, three of them the same drift: 2008 moved a group out
+of the `environment` block, and read where it now lives not one name is found.
+
+| what | pre-2008 | now | consequence when unread |
+|---|---|---|---|
+| the nine mini-detail noise tiles | `miniDetailTex`, a flat string list in `environment` | `tileMap` → `miniDetailTextureArray`, one struct each | no material has a detail texture; the ground has no grain |
+| which material paints each cell | `MultiDetailRegion`, in `environment` | at the root of the save, read by `Universe::universeLoad` | the region keeps `vrtMap::load`'s fill-with-1, so every cell is material 0 |
+| grass distance, lighting, seven textures | flat in `environment` | a `Grass` node of its own | every texture name empty → `GetElement3DComplex` builds no atlas → `DrawGrass` returns on the null texture |
+
+The grass one is the trap worth remembering. It *looks* nested in the original source — its
+`Environment::serialize` wraps the call in `openBlock("Grass")` and `GrassMap::serialize`
+wraps the names in `openBlock("Textures")` — but **`openBlock` does not descend in an XPrm
+archive**; it groups for the editor and nothing else. Two levels of apparent nesting, none of
+it in the file. The same is true of the preset group above. Read the file, not the source.
+
+`bushHeight0..6` are 2008's and are absent here; the 3 `GrassMap`'s constructor fills
+`bushHights_` with is the constant pre-2008 grew every bush at, so nothing is missing.
+
+Three notes on the detail textures specifically:
+
+- **The list is exactly as long as the container** — nine, `NumDetailTextures + 1` — in all
+  51 worlds, in the layer order two zone defaults, sand, earth, grass, cracks, road, stones,
+  crater. The original's reader had a second branch that shifted everything past the first
+  entry up a slot when the list came up short; it is unreachable for this data and is not
+  carried over.
+- **The resolution comes out right by accident, and is set explicitly anyway.**
+  `cTileMap::serialize` would have set `MiniDetailTexture::resolution` from the world's
+  `tileMap` node; with no such node it would keep the static's own 4 and the tiles would
+  repeat four times too densely. Maelstrom writes the *power* (`miniDetailTexResolution`) in
+  `environmentColors` and in `GlobalAttributes` — every world and the global set say 4, so
+  16, which is both this tree's default and the `_n16` the shipped tiles are named for.
+- **The `.spg` names a `.dds`, and it took a fourth fix.** `TextureMiniDetail::reload` builds
+  the tiled, normalized image from a source `.tga`, which is what P2's worlds name. Maelstrom
+  ships the built result beside the source, one per tile size (`D_Ground_001.tga` →
+  `D_Ground_001_n8/_n16/_n32.dds`), and names the `.dds`. `cFileImage::Create` knows only
+  `.tga`/`.avi`/`.jpg`, so all seven `.dds` entries failed to load outright — the two
+  `.tga` ones (`balmer\noise.tga`, layers 7 and 8) were the only ones that worked, and they
+  are the two nothing paints with. `reload` now sends a `.dds` name to `cTexture::reload`,
+  which already dispatches it to the DDS decoder, and skips the build.
+
+A fifth thing was making the ground look soft on top of all that, and it is not drift:
+`SDLTileMapRenderer`'s baked surface-colour texture was capped at 2048 a side, so Maelstrom's
+2048×4096 worlds were averaged down to one texel per 2×2 fine cells. The cap is 4096 now, so
+every world both games ship bakes at one texel per cell, which is all `vMap.clrBuf` holds.
+
+Verified on `c1_m1`: nine textures loaded, six material runs (materials 0, 1, 3, 4, 5, 6)
+each drawing with its own detail texture, colour texture 2048×4096 at step 1.
+
 ### The classes the data names — three of eleven were worth porting
 
 Maelstrom's data names eleven polymorphic classes this source does not have. `XPrmIArchive`

@@ -201,7 +201,11 @@ universeObjectAction(0)
 #endif
 		ar.setFilter(0);
 		GameLoadManager::instance().finishSub();
+#ifndef MAELSTROM_DATA
+		// A pre-2008 world writes MultiDetailRegion inside its environment block, and
+		// Environment::serialize reads it there.
 		vMap.serializeRegion(ar);
+#endif
 	}
 
 	GameLoadManager::instance().setProgress(1.f);
@@ -738,7 +742,11 @@ STARFORCE_API bool Universe::universalSave(const MissionDescription& mission, bo
 	oa.serialize(*cameraManager, "camera", 0);
 	oa.serialize(*this, "universe", 0);
 	oa.setFilter(0);
+#ifndef MAELSTROM_DATA
+	// Written inside the environment block for this data, so that a save reads back the way
+	// a world does -- see the load above and Environment::serialize.
 	vMap.serializeRegion(oa);
+#endif
 
 	SECUROM_MARKER_HIGH_SECURITY_OFF(8);
 	return oa.close();

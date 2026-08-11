@@ -384,6 +384,35 @@ void Environment::serialize(Archive& ar)
 				universe()->setMinimapAngle(minimapAngle);
 		}
 
+		// The mini-detail noise tiles the terrain materials draw with -- the grain, pebbles,
+		// cracks and road gravel over the baked surface colour -- are written here as one flat
+		// list of names, beside minimapAngle, and held by the scene rather than the tile map.
+		// 2008 moved them into cTileMap's own "tileMap" node, one struct each under
+		// "miniDetailTextureArray". A pre-2008 world has no such node, so the cTileMap call at
+		// the top of this function finds nothing: every material's texture stays null and the
+		// ground draws as flat colour, with no grain at all under a zoomed-in camera.
+		//
+		// All 51 worlds write exactly nine, the length of the original's own container
+		// (NumDetailTextures + 1), in its layer order: two zone defaults, then sand, earth,
+		// grass, cracks, road, stones, crater. Its reader had a second branch that shifted
+		// everything past the first entry up a slot when the list was shorter than the
+		// container -- unreachable for this data, and not carried over.
+		if(ar.isInput() && tileMap_){
+			vector<string> miniDetailTex;
+			if(ar.serialize(miniDetailTex, "miniDetailTex", "Мелкодетальные текстуры")){
+				// The tile size they were built at, which cTileMap::serialize would have set
+				// from the missing node. Left at the static's own 4 the tiles would repeat
+				// four times too densely. Maelstrom writes the power of two, in
+				// environmentColors or the global set; every world and the global say 4, so
+				// 16 -- which is both our default and the "_n16" the shipped tiles are named
+				// for, so read the power we already hold rather than inventing a second one.
+				cTileMap::MiniDetailTexture::resolution = tileMap_->miniDetailTextureResolution();
+				int count = min((int)miniDetailTex.size(), (int)cTileMap::miniDetailTexturesNumber);
+				for(int i = 0; i < count; i++)
+					tileMap_->miniDetailTexture(i).setTexture(miniDetailTex[i].c_str());
+			}
+		}
+
 		// Everything the environment lights a world with -- the sun, shadow and sky
 		// gradients, the sky models, the time of day -- is written flat in this block;
 		// 2008 moved it under "environmentTime". Read where this world put it, or it
@@ -396,8 +425,15 @@ void Environment::serialize(Archive& ar)
 		ar.serialize(*environmentTime_, "environmentTime", "Время");
 #endif
 
+#ifdef MAELSTROM_DATA
+		// Read inline: the grass settings sit at this level, not under a "Grass" node.
+		// GrassMap::serializeMaelstrom says why.
+		if(grassMap)
+			grassMap->serializeMaelstrom(ar);
+#else
 		if(grassMap)
 			ar.serialize(*grassMap, "Grass", "Трава");
+#endif
 	}
 
 	if(ar.filter(SERIALIZE_GLOBAL_DATA))
@@ -451,6 +487,19 @@ void Environment::serialize(Archive& ar)
 			else
 				cameraManager->setCameraRestriction(GlobalAttributes::instance().cameraRestriction);
 		}
+
+		// Which of the mini-detail textures above paints each fine cell. Written in this
+		// block; 2008 moved it out to the root of the save, where Universe::universeLoad reads
+		// it with this same call after every node is done -- and where, against a pre-2008
+		// world, the name is not found. The region then keeps the fill-with-1 vrtMap::load
+		// left it at, so every cell resolves to material 0 and the whole map takes one noise
+		// tile: the nine textures load and eight of them are never drawn with. Universe skips
+		// its own call for this data.
+		//
+		// Nothing sequences off this: the terrain mesh buckets its triangles by material on
+		// first draw, well after the load, which is also how the root-level call gets away
+		// with running last.
+		vMap.serializeRegion(ar);
 #endif
 
 #ifdef MAELSTROM_DATA
