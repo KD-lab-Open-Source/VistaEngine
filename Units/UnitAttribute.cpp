@@ -1639,8 +1639,17 @@ static void convertMaelstromChain(ChainID& chainID, MovementState& movementState
 		state = ANIMATION_STATE_MOVE | ANIMATION_STATE_ALL_POSE;
 		break;
 
+	// Everything else -- death, fire, birth, trigger, upgrade, the lot -- was never a gait
+	// chain, so its record carries no pose or movement bits either: across the whole
+	// distribution movementState only ever names directions and surfaces, in all 3436
+	// records. Left as read, such a chain matches nothing, because the superset test needs
+	// it to carry every bit getMovementState names, and that always includes one pose and
+	// one movement. Widening it here loses no information the file had, and reproduces what
+	// the 2008 converter wrote into this tree's own files, where every death chain reads
+	// ALL_MOVEMENTS | ALL_SIDES | ALL_POSE.
 	default:
-		return;
+		state = ANIMATION_STATE_ALL_MOVEMENTS | ANIMATION_STATE_ALL_POSE;
+		break;
 	}
 
 	movementState.state() |= state;
