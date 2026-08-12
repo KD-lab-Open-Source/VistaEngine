@@ -305,8 +305,14 @@ cObject3dx::cObject3dx(cStatic3dx* pStatic_, bool interpolate)
 			pStatic->boundRadius=pStatic->boundBox.max.distance(pStatic->boundBox.min)*0.5f;
 	}
 
-	if(gb_RenderDevice3D && !pStatic->is_logic && !pStatic->voxelBox.valid())
-		pStatic->voxelBox.create(this);   // voxel collision: skip on the SDL backend
+	// Perimeter 2's .3dxG caches ship a prebuilt voxel box, so this only ever had to run for
+	// a model that arrives without one -- which is every Maelstrom model: VoxelBox postdates
+	// that engine, and its baked cache has no chunk to hold one. The build reads geometry
+	// through gb_RenderDevice's staging mirror, not the retired D3D9 device, so gating it on
+	// gb_RenderDevice3D (permanently null here) only left those models with an empty box,
+	// and an empty box makes VoxelBox::trace miss every ray -- no projectile ever hits.
+	if(!pStatic->is_logic && !pStatic->voxelBox.valid())
+		pStatic->voxelBox.create(this);
 
 	silouette_center = pStatic->boundBox.center();
 
