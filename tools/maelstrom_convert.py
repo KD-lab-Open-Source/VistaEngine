@@ -17,9 +17,11 @@ import argparse, os, re, sys, collections
 
 # --- What actually changed --------------------------------------------------------
 #
-# Each rule is (wire name, matcher, rewriter, why).  The matcher runs against the
-# value text of `<name> = <value>;` and returns None when the value is already in
-# our shape, so re-running the converter is a no-op.
+# Each rule is (wire name, our wire name or None, rewriter, why).  The rewriter runs
+# against the value text of `<name> = <value>;` and returns None when the value is
+# already in our shape, so re-running the converter is a no-op.  A rule that also
+# renames stays a no-op the second time round for a different reason: the line no
+# longer carries the name the rule matches on.
 
 def _float_to_int(v):
     """`3000.` / `2.5e+003` -> `3000`.  Only fires on a value carrying a fraction."""
@@ -38,13 +40,23 @@ def _passability_to_bool(v):
     """
     return {b'PASSABILITY': b'true', b'IMPASSABILITY': b'false'}.get(v)
 
+# liveTime is the one that also moved name.  2008 turned ExplodeProperty::liveTime from
+# float to int and wrote the new type into the wire name -- `ar.serialize(liveTime,
+# "liveTimeInt", ...)` -- rather than aliasing it as `|liveTimeInt|liveTime`, which is
+# what that revision does everywhere it means to keep reading the old field (see the
+# `// CONVERSION` sites in UnitAttribute.cpp).  Renaming instead of aliasing is the
+# author refusing the old float, so honour that here and hand the engine an int under
+# the name it asks for.  Left alone the field is never seen: all ten entries take the
+# 10000 default, and the four asking for 15000 lose the extra five seconds.
 RULES = [
-    (b'steering_duration', _float_to_int,
+    (b'steering_duration', None, _float_to_int,
      'RigidBodyPrm::steering_duration is float in Maelstrom, int here'),
-    (b'groundPass', _passability_to_bool,
+    (b'groundPass', None, _passability_to_bool,
      'RigidBodyPrm::groundPass is PassabilityFlags in Maelstrom, bool here'),
-    (b'waterPass', _passability_to_bool,
+    (b'waterPass', None, _passability_to_bool,
      'RigidBodyPrm::waterPass is PassabilityFlags in Maelstrom, bool here'),
+    (b'liveTime', b'liveTimeInt', _float_to_int,
+     'ExplodeProperty::liveTime is float in Maelstrom, int named liveTimeInt here'),
 ]
 
 # --- Indexed options are indices into a C++ list ----------------------------------
@@ -186,16 +198,17 @@ def is_text_data(root, path):
 
 def convert(data, counts):
     """Apply every rule to one file's bytes.  Returns the new bytes."""
-    for name, rewrite, _why in RULES:
-        pattern = re.compile(rb'(^[ \t]*' + re.escape(name) + rb'[ \t]*=[ \t]*)'
+    for name, rename, rewrite, _why in RULES:
+        pattern = re.compile(rb'(^[ \t]*)' + re.escape(name) + rb'([ \t]*=[ \t]*)'
                              rb'([^;\r\n]*?)([ \t]*;)', re.M)
 
         def sub(m):
-            new = rewrite(m.group(2).strip())
-            if new is None:
+            new = rewrite(m.group(3).strip())
+            if new is None and rename is None:
                 return m.group(0)
             counts[name.decode()] += 1
-            return m.group(1) + new + m.group(3)
+            return (m.group(1) + (rename or name) + m.group(2)
+                    + (m.group(3) if new is None else new) + m.group(4))
 
         data = pattern.sub(sub, data)
 
@@ -274,7 +287,7 @@ def main():
 
     print('\nscanned %d text files, %d needed changes%s'
           % (files, touched, '' if args.apply else '  (dry run -- pass --apply to write)'))
-    for name, rewrite, why in RULES:
+    for name, _rename, _rewrite, why in RULES:
         print('  %-22s %5d  -- %s' % (name.decode(), counts[name.decode()], why))
     for option in sorted(OUR_OPTION_LISTS):
         n = counts[option.decode()]

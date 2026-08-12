@@ -110,15 +110,17 @@ so the first pass is free:
 $ python3 tools/maelstrom_convert.py ~/Projects/MaelstromEnhanced/GameData
   Scripts/Content/GameOptions                                            3
   Scripts/Engine/RigidBodyPrmLibrary                                     129
+  Scripts/Engine/ExplodeTable                                            10
 
   Scripts/Content/UI_FontAttributes  <- UI_FontLibrary  (Aero 20 @16 MAEL_small, Aero big @32 MAEL_big, Aero medium @24 MAEL_big)
 
   Scripts/Content/Triggers/GlobalTrigger.scr  <- Scripts/Content/GlobalTrigger.scr
 
-scanned 299 text files, 2 needed changes  (dry run -- pass --apply to write)
+scanned 299 text files, 3 needed changes  (dry run -- pass --apply to write)
   steering_duration         43  -- RigidBodyPrm::steering_duration is float in Maelstrom, int here
   groundPass                43  -- RigidBodyPrm::groundPass is PassabilityFlags in Maelstrom, bool here
   waterPass                 43  -- RigidBodyPrm::waterPass is PassabilityFlags in Maelstrom, bool here
+  liveTime                  10  -- ExplodeProperty::liveTime is float in Maelstrom, int named liveTimeInt here
   OPTION_LANGUAGE            1  -- index into a C++ list that changed shape
   OPTION_SCREEN_SIZE         1  -- index into a C++ list that changed shape
   OPTION_SHADOW              1  -- index into a C++ list that changed shape
@@ -131,28 +133,32 @@ masters (see below):
 $ python3 tools/maelstrom_convert.py ~/Projects/MaelstromEnhanced/GameData --apply
   Scripts/Content/GameOptions                                            3
   Scripts/Engine/RigidBodyPrmLibrary                                     129
+  Scripts/Engine/ExplodeTable                                            10
 
   Scripts/Content/UI_FontAttributes  <- UI_FontLibrary  (Aero 20 @16 MAEL_small, Aero big @32 MAEL_big, Aero medium @24 MAEL_big)
 
   Scripts/Content/Triggers/GlobalTrigger.scr  <- Scripts/Content/GlobalTrigger.scr
 
-scanned 299 text files, 2 needed changes
+scanned 299 text files, 3 needed changes
 ```
 
 Re-running is a no-op: every rule returns "already in our shape" for a value it has already
-converted, and the two generated files are skipped once they exist — so a second pass over a
-partly-converted tree changes nothing.
+converted, the one rule that also renames no longer matches the name it rewrote, and the two
+generated files are skipped once they exist — so a second pass over a partly-converted tree
+changes nothing.
 
 | what | why |
 |---|---|
 | `steering_duration` float → int | `RigidBodyPrm::steering_duration` is `float` in Maelstrom (`Physics/RigidBodyPrm.h:109`), `int` here |
 | `groundPass` / `waterPass` `PASSABILITY`→`true`, `IMPASSABILITY`→`false` | `PassabilityFlags` there, `bool` here. `IMPASSABILITY = 0`, `PASSABILITY = 1`, and the two engines' constructed defaults agree exactly |
+| `liveTime` float → int, renamed `liveTimeInt` | `ExplodeProperty::liveTime` is `float` in Maelstrom, `int` here — and 2008 wrote the new type into the wire name (`ar.serialize(liveTime, "liveTimeInt", …)`, `Units/AbnormalStateAttribute.cpp:22`) instead of aliasing it `\|liveTimeInt\|liveTime`, which is what that revision does wherever it means to keep reading the old field. The rename is the author refusing the old float, so the converter hands over an int under the name the engine asks for |
 | generate `Scripts/Content/UI_FontAttributes` from `Scripts/Content/UI_FontLibrary`, pointing at Maelstrom's own `*.font` masters | see below |
 | copy `Scripts/Content/GlobalTrigger.scr` to `Scripts/Content/Triggers/` | the chain moved into a subdirectory; see below |
 | renumber `OPTION_SCREEN_SIZE` / `OPTION_SHADOW` / `OPTION_LANGUAGE` in `Scripts/Content/GameOptions` | they are indices into a C++ list that changed shape; see below |
 
-43 of each of the first two, one per entry in `Scripts/Engine/RigidBodyPrmLibrary` — that
-single file is the only one in the tree that needed rewriting.
+43 of each of the first two rows, one per entry in `Scripts/Engine/RigidBodyPrmLibrary`, and
+10 of the third, one per entry in `Scripts/Engine/ExplodeTable` — those two files are the only
+ones in the tree whose fields needed rewriting.
 
 ### Indexed options point into a list that is not in the data
 
