@@ -488,6 +488,30 @@ container costs a walk of its whole subtree. `borderEnabled` is the only one tha
 cheaply gated (it is asked for only when a border is switched on at all); the other four are
 asked on every control or not at all.
 
+### The cursor table — `UI_GlobalAttributes::serialize`
+
+Every cursor in the game was the same one: a single static frame, `default.cur`. The cursor
+*files* were never the problem — all 33 load, animation and all (`Platform/Cursor.h` is the port,
+and it is not Maelstrom-specific). What is not read is the table that says which cursor goes
+where.
+
+2008 wraps the slots in a block of their own — `ar.serialize(cursors_, "cursors", …)` writes
+`cursors = { UI_CURSOR_MAIN_MENU = "G_Cur_Main"; … }`. Maelstrom writes all 38 of the same
+`UI_CURSOR_* = "name"` lines **flat**, among the attribute's own fields, one level up. Same
+`EnumTable`, same enum names, same library entries; only the nesting moved. Of our 39 slots the
+data names 38 — `UI_CURSOR_ASSEMBLY_POINT` is the one it does not have.
+
+Left in the block the name never matches, so the table keeps the empty references its
+constructor gave it and every `cursor()` answers null. Nothing errors, because
+`UI_LogicDispatcher::setCursor` treats null as *no cursor* and calls `setDefaultCursor()` —
+which loads `Scripts/Resource/Cursors/default.cur` and shows that instead. A game that appears
+to have one plain cursor rather than none is why this reads as a rendering fault and is not one.
+
+`cursors_.serialize(ar)` under `MAELSTROM_DATA` runs the `EnumTable`'s own loop at the current
+level, which is where the entries are. Same shape as the `environment` groups below, and the
+same diagnosis: dump the attribute's top-level keys next to retail's, and the flat block is
+visible at a glance.
+
 ### The world's own lighting — `Environment::serialize` / `EnvironmentTime::serializeMaelstrom`
 
 Everything the engine lights a world with — the sun, sky, fog and shadow gradients, the sky

@@ -45,7 +45,21 @@ void UI_GlobalAttributes::serialize(Archive& ar)
 	ar.serialize(systemMessage_, "systemMessage", "Цвет системного сообщения");
 	ar.serialize(chatDelay_, "chatMessageDelay", "Время отображения игрового чат-сообщения (сек)");
 
+#ifdef MAELSTROM_DATA
+	// The table is the same table -- one library name per UI_CursorType, and every name
+	// but UI_CURSOR_ASSEMBLY_POINT is present -- but pre-2008 it sat flat among the
+	// attribute's own fields rather than inside a "cursors" block. Serializing the
+	// EnumTable directly reads the entries at this level, which is where they are.
+	//
+	// Left in the block, the name never matches, the table keeps its constructed empty
+	// references, and every cursor() answers null. UI_LogicDispatcher::setCursor takes
+	// that for "no cursor" and falls back to setDefaultCursor() -- so the whole game runs
+	// on Scripts/Resource/Cursors/default.cur, a single static frame, instead of the
+	// animated pointer and hourglass.
+	cursors_.serialize(ar);
+#else
 	ar.serialize(cursors_, "cursors", "Курсоры");
+#endif
 
 	ar.serialize(messageSetups_, "messageSetups", "Сообщения");
 
