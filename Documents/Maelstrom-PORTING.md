@@ -1086,6 +1086,42 @@ Worth knowing for diagnosis: the click, the `EventButtonClick`, and the delivery
 system were all working. What localised it was logging *which* `ConditionClickOnButton`s were
 ever evaluated — all 55 belonged to the global and menu chains, none to the mission's.
 
+### The resource read-outs — `UI_LogicDispatcher::controlUpdate`, `UI_ACTION_PLAYER_PARAMETER`
+
+A third drift of the same family, and the odd one out: nothing renamed, nothing retyped —
+what changed meaning is the **class of the control the action is bound to**.
+
+Pre-2008 the action had one behaviour: read the parameter out of `Player::resource()` and
+print it (`origin/Maelstrom:UserInterface/UI_LogicGame.cpp`, `controlUpdate`). 2008 added a
+second: if the control is a `UI_ControlProgressBar`, fill it to `resource/resourceCapacity`
+instead — and never set the text. The retail `UI_Attributes` was re-authored to match, pairing
+a button that carries the number with a bar that carries the fill: 8 of its 13 bindings are
+`UI_ControlButton`, 5 are `UI_ControlProgressBar`. Maelstrom's HUD predates the split, so all
+**11** of its bindings are `UI_ControlProgressBar` — the class was simply what its author drew
+read-outs with, and pre-2008 it made no difference.
+
+Read the 2008 way, every one of those read-outs loses its number. The one that also gains
+something is the unit counter, and it is what makes the bug visible:
+
+| control (`REMNANTS` HUD) | `resource()` | `resourceCapacity()` | as a bar |
+| --- | --- | --- | --- |
+| `solar` | 100 | absent (−1) | `max <= 0` → `setProgress(0)`, nothing drawn |
+| `fresh water` | 500 | absent (−1) | likewise |
+| `salvage` | 0 | absent (−1) | likewise |
+| `max. units number` | 20 | **20** | 20/20 → **100% fill** |
+
+`UI_ControlProgressBar::redraw` (`UI_Controls.cpp`) paints an untextured `colorDone_`
+rectangle when `progressSprite` is empty, and Maelstrom's is — so a full bar is a solid
+colour block the size of the control. That is the grey rectangle the HUD shows where the
+population cap belongs.
+
+Its neighbour is the tell. `cur units number` is the *same* class in the *same* row, but bound
+to `UI_ACTION_PLAYER_UNITS_COUNT`, whose handler still calls `setText` unconditionally — which
+is why `8 / 20` came out as `8 /` and a block rather than losing both halves.
+
+Restoring the pre-2008 behaviour is one branch: under `MAELSTROM_DATA` the bar arm is not
+taken, so the action prints, as it did.
+
 ### The whole army attacks at once — `ConditionDistanceBetweenObjects::check`
 
 The second drift of the same kind: same field names, same C++ types, a different *meaning* —
