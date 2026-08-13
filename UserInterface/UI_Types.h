@@ -17,6 +17,7 @@
 #include "EffectReference.h"
 #include "Units/EffectController.h"
 #include "Game/GlobalStatistics.h"
+#include "Platform/Cursor.h"
 
 #include "Controls.h"
 #include "XTL/CallWrapper.h"
@@ -355,14 +356,14 @@ public:
 
 	void serialize(Archive& ar);
 
-	const HCURSOR cursor() const { return cursor_; }
+	PlatformCursor::Handle cursor() const { return cursor_; }
 	bool createCursor(const char* fname = NULL);
 	void releaseCursor();
 
 	const EffectReference& effectRef() const { return effectRef_; }
 private:
 	string fileName_;
-	HCURSOR cursor_;
+	PlatformCursor::Handle cursor_;
 	EffectReference effectRef_;
 };
 

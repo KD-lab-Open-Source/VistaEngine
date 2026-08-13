@@ -1291,8 +1291,7 @@ void UI_LogicDispatcher::showCursor()
 	if (!cursorVisible_)
 	{
 		cursorVisible_ = true;
-		HCURSOR cursor = !activeCursor_ ? 0 : activeCursor_->cursor();
-		::SetCursor(cursor);
+		PlatformCursor::set(!activeCursor_ ? 0 : activeCursor_->cursor());
 	}
 	
 	if (cursorEffect_)
@@ -1304,7 +1303,7 @@ void UI_LogicDispatcher::hideCursor()
 	if (cursorVisible_)
 	{
 		cursorVisible_ = false;
-		::SetCursor(NULL);
+		PlatformCursor::set(0);
 	}
 	
 	if (cursorEffect_)
@@ -1315,12 +1314,9 @@ void UI_LogicDispatcher::hideCursor()
 void UI_LogicDispatcher::updateCursor()
 {
 	if (cursorVisible_)
-	{
-		HCURSOR cursor = !activeCursor_ ? 0 : activeCursor_->cursor();
-		::SetCursor(cursor);
-	}
+		PlatformCursor::set(!activeCursor_ ? 0 : activeCursor_->cursor());
 	else
-		::SetCursor(NULL);
+		PlatformCursor::set(0);
 
 	if (cursorEffect_)
 	{

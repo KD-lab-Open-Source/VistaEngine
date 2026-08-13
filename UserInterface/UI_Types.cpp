@@ -191,16 +191,16 @@ bool UI_Cursor::createCursor(const char* fname/*=*/)
 	if (fileName_.empty()) return true; // Путь пустой => курсор NULL - все как надо
 
 	releaseCursor();
-	cursor_ = (HCURSOR)LoadImage(0, fileName_.c_str(), IMAGE_CURSOR, 0, 0, LR_LOADFROMFILE);
+	cursor_ = PlatformCursor::load(fileName_.c_str());
 
 	return (NULL != cursor_);
 }
 
 void UI_Cursor::releaseCursor()
 {
-	if (NULL != cursor_) 
+	if (NULL != cursor_)
 	{
-		DestroyCursor(cursor_);
+		PlatformCursor::destroy(cursor_);
 		cursor_ = NULL;
 	}
 }
