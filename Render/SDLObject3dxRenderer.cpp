@@ -214,15 +214,15 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
                                                            bool cullNone, TwoPass twoPass,
                                                            bool silhouette, bool silhouetteAlways)
 {
-	// The outline shader is the BUMP=0 permutation, so it shares VSOutput with the plain
-	// vertex shaders only: fold the variants that would change that struct out of the key,
-	// exactly as the caster does. It reads one uniform (Diffuse) and no texture, and the
-	// pipeline never blends -- the fragments have already been selected by the depth test.
+	// The outline reads one uniform (Diffuse), no texture and nothing the vertex shader
+	// interpolates, and it never blends -- the depth test has already picked its fragments.
+	//
+	// bump, reflect, reflectCube and secondOpacity are deliberately NOT folded out, unlike
+	// the caster below: they choose the vertex shader, and the outline has to keep whichever
+	// one the object's plain draw used or their depths will not compare equal. See the
+	// SILHOUETTE branch in object3dx.frag.hlsl. It costs nothing -- the outline's own
+	// fragment shader ignores every extra varying those permutations add.
 	if(silhouette){
-		bump = false;
-		reflect = false;
-		reflectCube = false;
-		secondOpacity = false;
 		blend = ALPHA_NONE;
 		depthWrite = false;
 		wireframe = false;

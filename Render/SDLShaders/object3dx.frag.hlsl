@@ -62,6 +62,9 @@
 #ifndef SECOND_OPACITY
 #define SECOND_OPACITY 0
 #endif
+#ifndef SILHOUETTE
+#define SILHOUETTE 0
+#endif
 
 Texture2D<float4> DiffuseTexture : register(t0, space2);
 SamplerState      DiffuseSampler : register(s0, space2);
@@ -126,6 +129,25 @@ cbuffer Material : register(b0, space3)
 // to 4 together, both only when OPTION_SHADOW == 2 ("good"). So it stays a literal.
 static const float SHADOW_TAP = 0.0005f;
 
+#if SILHOUETTE
+// The outline consumes nothing the vertex shader interpolates -- its colour comes from the
+// Diffuse uniform -- so it declares position alone. That is what lets it pair with EVERY
+// vertex-shader permutation instead of only the BUMP=0 ones: a fragment shader may read a
+// subset of the stage outputs, and reading none of them makes the subset trivially valid.
+//
+// This is load-bearing, not tidiness. The outline is selected by depth (COMPAREOP_GREATER
+// against the depth the object's own plain draw wrote), so the two draws have to rasterize
+// bit-identically -- and only the same vertex shader guarantees that. Pairing the outline
+// with a *different* VS that computes the same position from the same inputs is not enough:
+// the two are compiled separately, and one may contract a multiply-add into an fma where
+// the other does not. The result differs in the last bit, GREATER stops reading "behind
+// something else" and starts reading "rounded the other way", and the outline paints over
+// the whole visible unit.
+struct VSOutput
+{
+    float4 Position  : SV_Position;
+};
+#else
 struct VSOutput
 {
     float4 Position  : SV_Position;
@@ -150,6 +172,7 @@ struct VSOutput
     float2 UV1       : TEXCOORD6;   // second-opacity map UV, from the vertex shader
 #endif
 };
+#endif // SILHOUETTE
 
 // Shadow9700 from Render/shader/Skin/shadow9700.inl. One deliberate difference: it
 // divides only xy by w, because its caster wrote pre-divide clip z into a float colour
