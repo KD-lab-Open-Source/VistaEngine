@@ -16,7 +16,26 @@ env:
 
 jobs:
   build:
+    name: build (${{ matrix.label }})
     runs-on: windows-latest
+
+    # Both data schemas, in parallel. MAELSTROM_DATA=ON selects the pre-2008 layout
+    # at the ~dozen sites where a field changed nesting or owner (see the option in
+    # the root CMakeLists); those #ifdef branches are compiled by nothing else, so
+    # without this leg they rot untested.
+    #
+    # fail-fast is off on purpose: the legs are independent binaries -- neither can
+    # load the other's data -- and a break in one says nothing about the other.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Quoted: bare ON/OFF are booleans in YAML 1.1, and while GitHub's parser
+          # reads them as strings, nothing downstream should depend on knowing that.
+          - maelstrom: "OFF"
+            label: Perimeter2
+          - maelstrom: "ON"
+            label: Maelstrom
 
     steps:
     - uses: actions/checkout@v4
@@ -57,15 +76,18 @@ jobs:
     # Visual Studio is a multi-config generator: the build type is chosen at build
     # time with --config, and CMAKE_BUILD_TYPE at configure time would be ignored.
     - name: Game -- configure
-      run: cmake -A x64 -B build
+      run: cmake -A x64 -B build -DMAELSTROM_DATA=${{ matrix.maelstrom }}
 
     - name: Game -- build
       run: cmake --build build --config ${{env.BUILD_TYPE}} --parallel 3
 
+    # The executable is named Game.exe in both legs -- MAELSTROM_DATA only adds a
+    # compile definition, it does not rename the target -- so the artifact name is the
+    # only thing that says which schema the binary reads.
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: VistaEngine-Windows
+        name: VistaEngine-Windows-${{ matrix.label }}
         path: |
           build/Game/${{env.BUILD_TYPE}}/Game.exe
           build/Game/${{env.BUILD_TYPE}}/Game.pdb

@@ -16,7 +16,26 @@ env:
 
 jobs:
   build:
+    name: build (${{ matrix.label }})
     runs-on: macos-latest
+
+    # Both data schemas, in parallel. MAELSTROM_DATA=ON selects the pre-2008 layout
+    # at the ~dozen sites where a field changed nesting or owner (see the option in
+    # the root CMakeLists); those #ifdef branches are compiled by nothing else, so
+    # without this leg they rot untested.
+    #
+    # fail-fast is off on purpose: the legs are independent binaries -- neither can
+    # load the other's data -- and a break in one says nothing about the other.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Quoted: bare ON/OFF are booleans in YAML 1.1, and while GitHub's parser
+          # reads them as strings, nothing downstream should depend on knowing that.
+          - maelstrom: "OFF"
+            label: Perimeter2
+          - maelstrom: "ON"
+            label: Maelstrom
 
     steps:
     - uses: actions/checkout@v4
@@ -35,6 +54,12 @@ jobs:
     # of the file so the cache invalidates exactly when the pin moves. It is a
     # FetchContent GIT_TAG, not a submodule, hence the awk instead of a
     # `git rev-parse HEAD:<path>`.
+    #
+    # Both matrix legs share that key, deliberately: shadercross is a build-time tool
+    # and knows nothing of MAELSTROM_DATA, so one copy serves both. The cost is that
+    # a *cold* cache -- only when the pin moves -- has the two legs building DXC
+    # concurrently, and the one that finishes second cannot save what the first
+    # already saved ("Unable to reserve cache", a warning, not a failure).
     - name: Compute shadercross cache key
       id: keyinfo
       run: |
@@ -111,12 +136,16 @@ jobs:
         cmake -G Ninja -B build
         -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
         -DSHADERCROSS_EXECUTABLE=$HOME/dxc-prebuilt/bin/shadercross
+        -DMAELSTROM_DATA=${{ matrix.maelstrom }}
 
     - name: Game -- build
       run: cmake --build build -j3
 
+    # The executable is named Game in both legs -- MAELSTROM_DATA only adds a compile
+    # definition, it does not rename the target -- so the artifact name is the only
+    # thing that says which schema the binary reads.
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: VistaEngine-macOS
+        name: VistaEngine-macOS-${{ matrix.label }}
         path: build/Game/Game
