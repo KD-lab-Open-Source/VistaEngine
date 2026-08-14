@@ -65,6 +65,17 @@ public:
 	SDLObject3dxRenderer(const SDLObject3dxRenderer&) = delete;
 	SDLObject3dxRenderer& operator=(const SDLObject3dxRenderer&) = delete;
 
+	// The z prepass that keeps a uniformly faded object from blending with itself
+	// (Documents/Render-PORTING.md #19). cSimply3dx::Draw records the same mesh twice: the
+	// first draw fills depth and writes no colour, the second shades only the fragments that
+	// depth-test EQUAL against it -- so each pixel of the model blends with the scene exactly
+	// once instead of once per overlapping layer. Every other draw is PASS_NORMAL.
+	enum TwoPass : unsigned char { PASS_NORMAL = 0, PASS_DEPTH_ONLY, PASS_DEPTH_EQUAL };
+
+	// Set around a pair of DrawIndexedPrimitive calls; DrawIndexedPrimitive stamps it onto
+	// the DrawCmd, so it does not have to survive to replay.
+	void SetTwoPass(TwoPass pass) { twoPass_ = pass; }
+
 	// One material group's worth of state, straight out of cObject3dx::Draw: the same
 	// values it feeds to VSSkin::Select / VSSkin::SetMaterial / PSSkin::SetMaterial and
 	// to SetBlendStateAlphaRef, plus the bone poses from GetWorldPoses.
@@ -238,6 +249,7 @@ private:
 		int stride;
 		int firstIndex, indexCount;   // indices are absolute: no base-vertex offset
 		bool depthWrite;
+		TwoPass twoPass;
 	};
 
 	bool createShaders();
@@ -248,13 +260,14 @@ private:
 	// depth bias, and the shadow shaders, which ignore the tangent frame.
 	SDL_GPUGraphicsPipeline* pipelineFor(int stride, bool skinned, bool bump, bool reflect, bool reflectCube, bool secondOpacity,
 	                                     eBlendMode blend, bool mirrored, bool depthWrite, bool wireframe, bool shadow,
-	                                     bool cullNone);
+	                                     bool cullNone, TwoPass twoPass);
 	// Append the current state to states_ if it changed since the last recorded draw.
 	int commitState();
 
 	cSDLRenderDevice* owner_  = nullptr;   // owns the vertex/index buffers we draw
 	SDL_GPUDevice* device_ = nullptr;
 	SDL_Window*    window_ = nullptr;
+	TwoPass twoPass_ = PASS_NORMAL;        // see SetTwoPass
 
 	SDL_GPUShader* vsRigid_       = nullptr;   // -DSKINNED=0 -DBUMP=0
 	SDL_GPUShader* vsSkin_        = nullptr;   // -DSKINNED=1 -DBUMP=0

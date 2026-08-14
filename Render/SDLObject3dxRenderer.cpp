@@ -207,7 +207,7 @@ bool SDLObject3dxRenderer::createShaders()
 SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skinned, bool bump, bool reflect,
                                                            bool reflectCube, bool secondOpacity, eBlendMode blend,
                                                            bool mirrored, bool depthWrite, bool wireframe, bool shadow,
-                                                           bool cullNone)
+                                                           bool cullNone, TwoPass twoPass)
 {
 	// The caster shaders take no tangent frame, no env map and write no colour, so bump,
 	// reflection, the second-opacity map and the blend mode never reach them: fold them out
@@ -224,7 +224,13 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 		// the light sees is a separate question from what the camera does, and a one-sided
 		// caster changes which surface writes the depth every receiver is compared against.
 		cullNone = true;
+		twoPass = PASS_NORMAL;
 	}
+
+	// The original turned culling off for both halves of the pair (RS_CULLMODE -1), so the
+	// prepass records the far wall's depth too and the shade pass can match it.
+	if(twoPass != PASS_NORMAL)
+		cullNone = true;
 
 	const unsigned long long key = (unsigned long long)(unsigned)stride
 	                             | ((unsigned long long)skinned       << 16)
@@ -237,7 +243,8 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 	                             | ((unsigned long long)reflect       << 29)
 	                             | ((unsigned long long)secondOpacity << 30)
 	                             | ((unsigned long long)reflectCube   << 31)
-	                             | ((unsigned long long)cullNone      << 32);
+	                             | ((unsigned long long)cullNone      << 32)
+	                             | ((unsigned long long)twoPass      << 33);   // 2 bits
 	auto it = pipelines_.find(key);
 	if(it != pipelines_.end())
 		return it->second;
@@ -353,8 +360,23 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 		pci.rasterizer_state.depth_bias_constant_factor = 0.f;
 	}
 	pci.depth_stencil_state.enable_depth_test = true;
-	pci.depth_stencil_state.enable_depth_write = depthWrite;
-	pci.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
+	// The two-pass fade (#19) overrides both: D3DRS_ZWRITEENABLE TRUE + COLORWRITEENABLE 0 for
+	// the prepass, then ZWRITEENABLE FALSE + ZFUNC EQUAL for the shade. LESS_OR_EQUAL rather
+	// than LESS is what makes the second draw land on the first one's depth at all -- the
+	// original left ZFUNC alone for the prepass (its D3DCMP_LESSEQUAL line is commented out)
+	// because LESSEQUAL was already the device default.
+	pci.depth_stencil_state.enable_depth_write = twoPass == PASS_DEPTH_ONLY  ? true
+	                                           : twoPass == PASS_DEPTH_EQUAL ? false
+	                                                                         : depthWrite;
+	pci.depth_stencil_state.compare_op = twoPass == PASS_DEPTH_EQUAL ? SDL_GPU_COMPAREOP_EQUAL
+	                                                                : SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
+	// SDL GPU only consults color_write_mask when the pipeline asks it to, so "write
+	// everything" stays the zeroed default for every other pipeline (the same rule
+	// SDLWorldQuadRenderer's SetColorWriteMask follows, #16).
+	if(twoPass == PASS_DEPTH_ONLY){
+		colorTarget.blend_state.enable_color_write_mask = true;
+		colorTarget.blend_state.color_write_mask = 0;
+	}
 	// The caster pass has no colour target at all: it only fills the depth texture.
 	pci.target_info.color_target_descriptions = shadow ? nullptr : &colorTarget;
 	pci.target_info.num_color_targets = shadow ? 0 : 1;
@@ -622,8 +644,10 @@ void SDLObject3dxRenderer::DrawIndexedPrimitive(sPtrVertexBuffer& vb, int OfsVer
 	// offsets -- the same arithmetic cD3DRender::DrawIndexedPrimitive hands to D3D.
 	d.firstIndex = 3 * nOfsPolygon;
 	d.indexCount = 3 * nPolygon;
-	// The caster pipelines always write depth, so this only matters to the colour pass.
+	// The caster pipelines always write depth, so this only matters to the colour pass. The
+	// two-pass fade sets its own depth write per half, and pipelineFor honours that over this.
 	d.depthWrite = owner_->zWriteEnable();
+	d.twoPass = twoPass_;
 	draws_.push_back(d);
 
 	*gb_RenderDevice->PtrNumberPolygon += nPolygon;
@@ -664,8 +688,9 @@ bool SDLObject3dxRenderer::DrawShadowPass(SDL_GPUCommandBuffer* cmd, SDL_GPUText
 	for(const DrawCmd& d : draws_){
 		const StateBlock& st = states_[d.state];
 
-		// The caster pass draws for the light camera, which is never mirrored.
-		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, false, false, false, false, st.blend, false, true, false, true, st.cullNone);
+		// The caster pass draws for the light camera, which is never mirrored. It has no
+		// colour target, so the two-pass fade means nothing here -- pipelineFor folds it out.
+		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, false, false, false, false, st.blend, false, true, false, true, st.cullNone, PASS_NORMAL);
 		if(!pipeline) continue;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);
@@ -763,7 +788,7 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 
 		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, st.bump, st.reflect, st.reflectCube,
 		                                                st.secondOpacity, st.blend, st.mirrored, d.depthWrite,
-		                                                wireframe, false, st.cullNone);
+		                                                wireframe, false, st.cullNone, d.twoPass);
 		if(!pipeline) continue;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);
