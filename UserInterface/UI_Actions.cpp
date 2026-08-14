@@ -11,6 +11,9 @@ UI_ActionDataFactory::UI_ActionDataFactory()
 	add<UI_ActionDataInstrumentary>(UI_ACTION_INVERT_SHOW_PRIORITY);
 	add<UI_DataStateMark>(UI_ACTION_STATE_MARK);
 	add<UI_ActionDataLocString>(UI_ACTION_LOCALIZE_CONTROL);
+#ifdef MAELSTROM_DATA
+	add<UI_ActionDataUpdate>(UI_ACTION_EXPAND_TEMPLATE);
+#endif
 	add<UI_ActionDataHoverInfo>(UI_ACTION_HOVER_INFO);
 	add<UI_ActionDataLinkToAnchor>(UI_ACTION_LINK_TO_ANCHOR);
 	add<UI_ActionDataLinkToMouse>(UI_ACTION_LINK_TO_MOUSE);
@@ -236,6 +239,40 @@ void UI_ActionDataHoverInfo::serialize(Archive& ar)
 		text_.serialize(ar);
 	ar.serialize(cursor_, "cursor", "курсор при наведении");
 }
+
+#ifdef MAELSTROM_DATA
+// A control used to carry its hover text and hover cursor itself, in a transparent
+// openBlock("hover") -- so the two names sit at the control's own level, and at the control
+// state's, which had the same pair. 2008 collected them into this action, and the reader of
+// the tooltip (UI_ACTION_UI_HINT, on the popup control) goes through findAction to reach it.
+//
+// So rather than teaching the popup a second way to find its text, the old fields are read
+// back into the action 2008 replaced them with: findAction already looks in the control's
+// list and then in the current state's, which is exactly the fallback UI_ControlBase::hint()
+// used to do by hand. Everything downstream -- the delay, the type match, the template
+// expansion, the hovered cursor -- is then the code that was already there.
+//
+// Worth the trouble: 757 of Maelstrom's controls name a tooltip key and not one names a
+// UI_ACTION_HOVER_INFO, so on this data the 2008 path is dead from end to end.
+void UI_ActionDataHoverInfo::appendMaelstromHover(Archive& ar, UI_ControlActionList& actions)
+{
+	if(!ar.isInput())
+		return;
+
+	UI_ControlAction action(UI_ACTION_HOVER_INFO);
+	UI_ActionDataHoverInfo* hover = safe_cast<UI_ActionDataHoverInfo*>(action.type());
+	if(!hover)
+		return;
+
+	ar.serialize(hover->cursor_, "hoveredCursor", "курсор");
+	ar.serialize(hover->text_, "hoveredTextLoc", "текст подсказки (Loc)");
+
+	// The cursor alone is not worth an action: without text the popup hides itself again,
+	// and 4340 controls write the pair empty.
+	if(!hover->text_.empty())
+		actions.push_back(action);
+}
+#endif
 
 
 void UI_ActionDataLinkToAnchor::serialize(Archive& ar)

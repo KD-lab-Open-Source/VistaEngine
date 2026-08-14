@@ -816,14 +816,37 @@ void UI_BackgroundScene::serialize(Archive& ar)
 	ar.serialize(lightDirection_, "lightDirection", "Направление освещения");
 	ar.serialize(lights_, "lights", "Источники света");
 
-	//if(ar.openBlock("camera", "Камера")){
-	//	ar.serialize(cameraPosition_, "position", "Позиция");
-	//	ar.serialize(cameraAngles_, "angles", "Поворот");
-	//	ar.serialize(cameraFocus_, "focusx", "Фокус");
-	//	ar.serialize(cameraPerspective_, "perspective", "Перспектива");
+#ifdef MAELSTROM_DATA
+	// The background camera is described here, once for the whole scene -- its position,
+	// its focus and whether it is perspective. By 2008 the focus had become the per-model
+	// "scale" above (selectModel() multiplies it by scale2focus), the camera had become
+	// orthographic, and the model was pushed off the origin by the new modelPosition_ --
+	// selectModel() used to place it with the rotation alone. Honour all of it together:
+	// one part without the others draws the interface at the wrong size, in the wrong
+	// projection, or off-centre. Input only -- writing these back would re-introduce
+	// fields the 2008 schema has no place for, and a zeroed focusx would scale every
+	// model to nothing on the next load.
+	if(ar.isInput() && ar.openBlock("camera", "Камера")){
+		bool legacyCamera = ar.serialize(cameraPosition_, "position", "Позиция");
 
-	//	ar.closeBlock();
-	//}
+		float focus = 0.f;
+		if(ar.serialize(focus, "focusx", "Фокус") && focus > FLT_EPS){
+			legacyCamera = true;
+			for(UI_BackgroundModelSetups::iterator it = modelSetups_.begin(); it != modelSetups_.end(); ++it)
+				it->setScale(focus / scale2focus);
+		}
+
+		if(ar.serialize(cameraPerspective_, "perspective", "Перспектива"))
+			legacyCamera = true;
+
+		// The rotation is unchanged between the two schemas; only the translation is new,
+		// and old models are authored to sit on the camera axis at the origin.
+		if(legacyCamera)
+			modelPosition_ = Vect3f::ZERO;
+
+		ar.closeBlock();
+	}
+#endif
 }
 
 const char* UI_BackgroundScene::groupComboList() const

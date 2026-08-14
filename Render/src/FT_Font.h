@@ -97,6 +97,8 @@ class FontManager
 public:
 	~FontManager();
 
+	// `ttf` may also name one of Maelstrom's 1bpp bitmap masters (*.font); createFont
+	// dispatches on the extension and the caller cannot tell the two apart afterwards.
 	class Font* createFont(const char* ttf, uint8 size, const FontParam* prm = 0);
 	void releaseFont(class Font*& font);
 
@@ -119,6 +121,10 @@ private:
 	Chars chars_;
 
 	ShortSize calcTextureSize(bool nonPow2);
+#ifdef MAELSTROM_DATA
+	// Render/src/BitmapFont.cpp -- Maelstrom's *.font masters.
+	class Font* createBitmapFont(const char* path, uint8 size, const FontParam* prm);
+#endif
 
 	void addChar(uint16 charCode);
 	void addCharPage(uint16 page, bool all_span);

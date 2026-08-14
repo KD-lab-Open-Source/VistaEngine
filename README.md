@@ -2,6 +2,10 @@
 
 ![Perimeter2](https://cdn.cloudflare.steamstatic.com/steam/apps/12420/header.jpg?t=1574188988)
 
+[![Linux](https://github.com/KD-lab-Open-Source/VistaEngine/actions/workflows/linux.yaml/badge.svg?branch=crossplatform)](https://github.com/KD-lab-Open-Source/VistaEngine/actions/workflows/linux.yaml?query=branch%3Acrossplatform)
+[![Windows](https://github.com/KD-lab-Open-Source/VistaEngine/actions/workflows/windows.yaml/badge.svg?branch=crossplatform)](https://github.com/KD-lab-Open-Source/VistaEngine/actions/workflows/windows.yaml?query=branch%3Acrossplatform)
+[![macOS](https://github.com/KD-lab-Open-Source/VistaEngine/actions/workflows/macos.yaml/badge.svg?branch=crossplatform)](https://github.com/KD-lab-Open-Source/VistaEngine/actions/workflows/macos.yaml?query=branch%3Acrossplatform)
+
 [![Discord Maelstrom](https://img.shields.io/badge/Discord-Maelstrom-5765ec?logo=discord&logoColor=white)](https://discord.gg/rUcXXCY)
 [![Telegram Maelstrom Chat](https://img.shields.io/badge/Telegram-Maelstrom_Chat-35ade1?logo=telegram)](https://t.me/maelstrom2007chat)
 [![Discord Vista Engine](https://img.shields.io/badge/Discord-Vista_Engine-5765ec?logo=discord&logoColor=white)](https://discord.gg/Tfx49kBZPF)

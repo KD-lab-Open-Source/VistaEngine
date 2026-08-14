@@ -5,10 +5,13 @@
 #include "Scene.h"
 #include "cCamera.h"
 #include "VisGeneric.h"
+#include "TexLibrary.h"                // CreateRenderTexture: the scratch face target
+#include "Render/SDLRenderDevice.h"    // createCubeTexture / copyToCubeFace
 
 cRenderCubemap::cRenderCubemap()
 {
 	pTexture=0;
+	pFaceTarget=0;
 	pZBuffer=0;
 	pSceneBefore=gb_VisGeneric->CreateScene();
 	for(int i=0;i<num_camera;i++)
@@ -33,6 +36,7 @@ cRenderCubemap::~cRenderCubemap()
 
 	xassert(pTexture && pTexture->GetRef()==1);
 	RELEASE(pTexture);
+	RELEASE(pFaceTarget);
 }
 
 void cRenderCubemap::deleteManagedResource()
@@ -48,7 +52,24 @@ void cRenderCubemap::deleteManagedResource()
 void cRenderCubemap::restoreManagedResource()
 {
 	deleteManagedResource();
-	if(!gb_RenderDevice3D) // no world-render GPU device on SDL backend yet
+
+	// The SDL backend: one cube texture plus the scratch 2D target the faces are drawn
+	// into. Each camera keeps that target for its whole life -- DrawOne copies the result
+	// into the face afterwards -- so there is nothing per-face to bind here.
+	if(cSDLRenderDevice* dev = sdlRenderDevice()){
+		if(dev->createCubeTexture(pTexture)){
+			xassert(0 && "Cannot create the sky cubemap.");
+			return;
+		}
+		if(!pFaceTarget)
+			pFaceTarget = GetTexLibrary()->CreateRenderTexture(linear_size, linear_size,
+			                                                   TEXTURE_RENDER32, false);
+		for(int i=0;i<num_camera;i++)
+			camera[i]->SetRenderTarget(pFaceTarget, 0);
+		return;
+	}
+
+	if(!gb_RenderDevice3D)
 		return;
 	if(gb_RenderDevice3D->CreateCubeTexture(pTexture))
 	{
@@ -134,19 +155,29 @@ void cRenderCubemap::DrawOne(int i)
 	pSceneBefore->Draw(camera[i]);
 }
 
+// One face: draw it, then -- on the SDL backend -- move it into the cube's layer. D3D
+// needed no second step, its camera pointing straight at the face surface.
+void cRenderCubemap::DrawFace(int i)
+{
+	DrawOne(i);
+	if(cSDLRenderDevice* dev = sdlRenderDevice())
+		dev->copyToCubeFace(pTexture, i, pFaceTarget);
+}
+
 void cRenderCubemap::Draw()
 {
 	if(cur_draw_phase==-1)
 	{
 		for(int i=0;i<num_camera;i++)
-			DrawOne(i);
+			DrawFace(i);
 	}else
 	{
-		DrawOne(cur_draw_phase);
+		DrawFace(cur_draw_phase);
 	}
 
 	cur_draw_phase=(cur_draw_phase+1)%num_camera;
-	gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED);
+	if(gb_RenderDevice3D)
+		gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED);
 }
 
 void cRenderCubemap::Save(const char* file_name)

@@ -140,6 +140,13 @@ enum UI_ControlActionID
 	UI_ACTION_NONE,
 	/// локализировать заголовок
 	UI_ACTION_LOCALIZE_CONTROL,
+#ifdef MAELSTROM_DATA
+	// The pre-2008 form of the one above: it carries no string of its own and expands the
+	// control's own caption. Placed here rather than appended because the enum is serialized
+	// by name -- nothing depends on a value.
+	/// раскрыть шаблон в собственном заголовке
+	UI_ACTION_EXPAND_TEMPLATE,
+#endif
 	/// внутренняя команда контролу
 	UI_ACTION_CONTROL_COMMAND,
 	/// управление другим контролом

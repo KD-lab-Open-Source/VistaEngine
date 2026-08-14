@@ -885,6 +885,30 @@ private:
 	int count_;
 };
 
+#ifdef MAELSTROM_DATA
+// The sibling of the above, measuring from a labelled *unit* rather than a labelled anchor.
+// 2008 kept only the anchor one. Ten of its twelve uses are in AI chains four shipped worlds
+// load (c1_m1, c1_m7, c2_m1, c2_m7), where an unregistered class reads as a condition that is
+// simply never true -- so the AI never reacts to the player reaching the labelled object.
+struct ConditionObjectNearObjectByLabel : Condition // Возле объекта по метке находится объект указанного типа
+{
+	ConditionObjectNearObjectByLabel();
+	bool check() const;
+	void serialize(Archive& ar);
+
+private:
+	bool checkAttribute(const AttributeBase* attr, const Vect2f& position,
+		const ConstructionState& state) const;
+
+	ComboListString label;
+	AttributeReferences objects_;
+	AIPlayerType playerType;
+	float distance;
+	bool objectConstructed;
+	bool onlyVisible_;
+};
+#endif
+
 class ConditionMyObjectNearAnchorByLabel : public ConditionContext
 {
 public:

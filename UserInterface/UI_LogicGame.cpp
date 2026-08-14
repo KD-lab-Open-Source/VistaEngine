@@ -1291,8 +1291,7 @@ void UI_LogicDispatcher::showCursor()
 	if (!cursorVisible_)
 	{
 		cursorVisible_ = true;
-		HCURSOR cursor = !activeCursor_ ? 0 : activeCursor_->cursor();
-		::SetCursor(cursor);
+		PlatformCursor::set(!activeCursor_ ? 0 : activeCursor_->cursor());
 	}
 	
 	if (cursorEffect_)
@@ -1304,7 +1303,7 @@ void UI_LogicDispatcher::hideCursor()
 	if (cursorVisible_)
 	{
 		cursorVisible_ = false;
-		::SetCursor(NULL);
+		PlatformCursor::set(0);
 	}
 	
 	if (cursorEffect_)
@@ -1315,12 +1314,9 @@ void UI_LogicDispatcher::hideCursor()
 void UI_LogicDispatcher::updateCursor()
 {
 	if (cursorVisible_)
-	{
-		HCURSOR cursor = !activeCursor_ ? 0 : activeCursor_->cursor();
-		::SetCursor(cursor);
-	}
+		PlatformCursor::set(!activeCursor_ ? 0 : activeCursor_->cursor());
 	else
-		::SetCursor(NULL);
+		PlatformCursor::set(0);
 
 	if (cursorEffect_)
 	{
@@ -2760,7 +2756,22 @@ void UI_LogicDispatcher::controlUpdate(UI_ControlActionID id, UI_ControlBase* co
 					float current = pl->resource().findByIndex(action->parameterIndex(), -1.f);
 					if(current >= 0.f){
 						float max = pl->resourceCapacity().findByIndex(action->parameterIndex(), action->parameterMax());
-						if(UI_ControlProgressBar* bar = dynamic_cast<UI_ControlProgressBar*>(control)){
+						// The bar branch is a 2008 addition. Pre-2008 this action only ever printed the
+						// number -- see UI_LogicDispatcher::controlUpdate in origin/Maelstrom -- so the
+						// class of the control it was bound to did not matter, and Maelstrom's HUD wraps
+						// every readout in a UI_ControlProgressBar. 2008 re-authored the HUD to pair a
+						// button (the number) with a bar (the fill), and the retail UI_Attributes has
+						// both; Maelstrom's has bars only, all eleven of them. Letting them take the bar
+						// branch loses every readout: the resource counters go blank, and "max. units
+						// number" -- whose capacity equals its own value, so the fill comes out at 100% --
+						// paints a solid colorDone_ rectangle over the whole control, which is what shows
+						// up beside the unit count instead of the number.
+#ifdef MAELSTROM_DATA
+						UI_ControlProgressBar* bar = 0;
+#else
+						UI_ControlProgressBar* bar = dynamic_cast<UI_ControlProgressBar*>(control);
+#endif
+						if(bar){
 							if(max > FLT_EPS)
 								bar->setProgress(clamp(current / max, 0.0f, 1.0f));
 							else

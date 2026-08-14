@@ -73,6 +73,9 @@ class EnvironmentTimeColors
 public:
 	EnvironmentTimeColors();
 	void serialize(Archive& ar);
+	/// The gradients alone, without the sun and shadow parameters: before 2008 the two
+	/// groups were written apart, in different places of the world file.
+	void serializeGradients(Archive& ar);
 	void mergeColor(KeysColor& out/*0.00-24.00*/,const KeysColor& day/*6.00-18.00*/,const KeysColor& night/*18.00-6.00*/);
 
 	KeysColor fone_color;

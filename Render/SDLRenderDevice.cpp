@@ -1283,6 +1283,119 @@ void cSDLRenderDevice::uploadTexture(const TextureData& td)
 	SDL_ReleaseGPUTransferBuffer(device_, tb);
 }
 
+// cD3DRender::CreateCubeTexture's counterpart. The six faces are layers of one texture;
+// it is a colour target as well as a sampler source because copyToCubeFace writes into it
+// and because SDL wants the usage declared up front.
+int cSDLRenderDevice::createCubeTexture(cTexture* Texture)
+{
+	if(!device_ || !Texture) return 1;
+
+	const int w = Texture->GetWidth();
+	const int h = Texture->GetHeight();
+	if(w <= 0 || h <= 0 || w != h) return 1;   // a cube face is square
+
+	SDL_GPUTextureCreateInfo ti = {};
+	ti.type = SDL_GPU_TEXTURETYPE_CUBE;
+	ti.format = SDL_GetGPUSwapchainTextureFormat(device_, window_);
+	ti.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER | SDL_GPU_TEXTUREUSAGE_COLOR_TARGET;
+	ti.width = (Uint32)w; ti.height = (Uint32)h;
+	ti.layer_count_or_depth = 6;
+	ti.num_levels = 1;
+	SDL_GPUTexture* tex = SDL_CreateGPUTexture(device_, &ti);
+	if(!tex){
+		fprintf(stderr, "cSDLRenderDevice: sky cubemap %dx%d failed: %s\n", w, h, SDL_GetError());
+		return 1;
+	}
+
+	TextureData td;
+	td.tex = tex; td.w = w; td.h = h;
+	textures_[tex] = std::move(td);
+	if(Texture->frameNumber() < 1)
+		Texture->New(1);
+	Texture->GetDDSurface(0) = reinterpret_cast<IDirect3DTexture9*>(tex);
+	Texture->setAttribute(TEXTURE_CUBEMAP);
+
+	// Fill all six faces with a plausible sky before anything samples them. A face is only
+	// written when a pass opens on it, and the first sky draw of a world records nothing --
+	// its models are not attached yet -- so a face would otherwise be sampled while it still
+	// held uninitialised memory, which reads as magenta on every reflective surface for the
+	// first few frames. cRenderCubemap redraws one face per frame, so this is what is
+	// showing until the whole cube has been rendered once.
+	{
+		const Uint32 bytes = (Uint32)(w * h * 4);
+		SDL_GPUTransferBufferCreateInfo tbi = {};
+		tbi.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+		tbi.size = bytes;
+		if(SDL_GPUTransferBuffer* tb = SDL_CreateGPUTransferBuffer(device_, &tbi)){
+			if(unsigned char* px = (unsigned char*)SDL_MapGPUTransferBuffer(device_, tb, false)){
+				// cRenderCubemap's own default fone colour, in the swapchain's BGRA order.
+				for(int i = 0; i < w * h; ++i){
+					px[i*4+0] = 251; px[i*4+1] = 202; px[i*4+2] = 162; px[i*4+3] = 0;
+				}
+				SDL_UnmapGPUTransferBuffer(device_, tb);
+				if(SDL_GPUCommandBuffer* cmd = SDL_AcquireGPUCommandBuffer(device_)){
+					SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(cmd);
+					for(int face = 0; face < 6; ++face){
+						SDL_GPUTextureTransferInfo src = {};
+						src.transfer_buffer = tb;
+						src.pixels_per_row = (Uint32)w;
+						src.rows_per_layer = (Uint32)h;
+						SDL_GPUTextureRegion dst = {};
+						dst.texture = tex;
+						dst.layer = (Uint32)face;
+						dst.w = (Uint32)w; dst.h = (Uint32)h; dst.d = 1;
+						SDL_UploadToGPUTexture(copy, &src, &dst, false);
+					}
+					SDL_EndGPUCopyPass(copy);
+					SDL_SubmitGPUCommandBuffer(cmd);
+				}
+			}
+			SDL_ReleaseGPUTransferBuffer(device_, tb);
+		}
+	}
+	return 0;
+}
+
+void cSDLRenderDevice::copyToCubeFace(cTexture* cube, int face, cTexture* source)
+{
+	if(!device_ || !cube || !source || face < 0 || face >= 6)
+		return;
+	if(cube->frameNumber() < 1 || source->frameNumber() < 1)
+		return;
+
+	SDL_GPUTexture* dst = reinterpret_cast<SDL_GPUTexture*>(cube->GetDDSurface(0));
+	SDL_GPUTexture* src = reinterpret_cast<SDL_GPUTexture*>(source->GetDDSurface(0));
+	if(!dst || !src)
+		return;
+
+	// The face was drawn through the ordinary camera/target machinery, and the renderers
+	// batch: whatever they recorded for the scratch target has to reach it before this
+	// reads the texture back out.
+	flushTarget(current_, true);
+
+	// Record into the frame's command buffer, not one of our own. flushTarget above only
+	// *records* the face's render pass into commandBuffer_, which is not submitted until
+	// EndScene -- so a separate buffer submitted here runs first, and the copy reads
+	// pFaceTarget before anything has been drawn into it. That put the previous face into
+	// every slot (and uninitialised memory into all six on the first pass): the cube came
+	// out rotated by one face, so every lookup returned a neighbour. The water asked for
+	// the sky overhead and got the horizon band.
+	SDL_GPUCommandBuffer* cmd = commandBuffer_;
+	if(!cmd)
+		return;
+	SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(cmd);
+
+	SDL_GPUTextureLocation s = {};
+	s.texture = src;
+	SDL_GPUTextureLocation d = {};
+	d.texture = dst;
+	d.layer = (Uint32)face;
+
+	SDL_CopyGPUTextureToTexture(copy, &s, &d,
+	                            (Uint32)source->GetWidth(), (Uint32)source->GetHeight(), 1, false);
+	SDL_EndGPUCopyPass(copy);
+}
+
 int cSDLRenderDevice::CreateTexture(cTexture* Texture, cFileImage* FileImage, int /*dxout*/, int /*dyout*/, bool /*enable_assert*/)
 {
 	if(!device_ || !Texture) return 1;
@@ -1392,6 +1505,34 @@ int cSDLRenderDevice::CreateTexture(cTexture* Texture, cFileImage* FileImage, in
 		if(FileImage){
 			// GetTexture writes 32-bit BGRA pixels for frame i (the D3D loop's `i` arg).
 			FileImage->GetTexture(td.staging.data(), i, w, h);
+
+			// cD3DRender::CreateTexture classified a texture by what its alpha actually
+			// holds, and cObject3dx::Draw reads the answer back through isAlphaTest() to
+			// pick ALPHA_TEST over ALPHA_NONE. Nothing did this after D3D9 went, so every
+			// material stayed opaque and the cut-out texels drew as solid colour -- the
+			// broken windows of Maelstrom's towers are a third of the facade texture at
+			// alpha 0, and came out as black panes you could not see through.
+			//
+			// Graded alpha is left alone: the loaders set ALPHA_TEST optimistically for
+			// anything with an alpha channel, and a material that wants a real blend gets
+			// there through its opacity map (is_opacity_texture), as the original does.
+			if(i == 0 && bpp == 4 && frames == 1
+			   && (Texture->isAlpha() || Texture->isAlphaTest())){
+				int num0 = 0, numPartial = 0;
+				const uint8_t* px = td.staging.data();
+				for(size_t p = 3; p < td.staging.size(); p += 4){
+					if(px[p] == 0)        ++num0;
+					else if(px[p] != 255) ++numPartial;
+				}
+				if(numPartial == 0){
+					if(num0 > 0){
+						Texture->clearAttribute(TEXTURE_ALPHA_BLEND);
+						Texture->setAttribute(TEXTURE_ALPHA_TEST);
+					}
+					else
+						Texture->clearAttribute(TEXTURE_ALPHA_BLEND | TEXTURE_ALPHA_TEST);
+				}
+			}
 			uploadTexture(td);
 		}
 

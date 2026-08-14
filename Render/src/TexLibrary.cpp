@@ -422,6 +422,23 @@ void cTexLibrary::AddTexture(cTexture* texture)
 	texture->AddRef();
 }
 
+// Maelstrom shipped its textures the way it shipped its models: only as the baked
+// cache, with no source image anywhere on disk. Those cached files are ordinary DDS
+// and the three numbered directories are the detail levels this engine already picks
+// between, so all that differs is the name -- the texture's own path, upper-cased by
+// normalizePath already, with the separators turned into underscores. On this engine's
+// own data no such file exists and the open simply fails.
+bool cTexLibrary::loadBaseCache(cTexture* texture)
+{
+	string name = texture->name();
+	replaceSubString(name, "\\", "_");
+
+	int detail = texture->getAttribute(TEXTURE_DISABLE_DETAIL_LEVEL) ? 0 : Option_TextureDetailLevel;
+	XBuffer path;
+	path < "Resource\\cacheData\\baseCache\\Textures\\" <= detail < "\\" < name.c_str() < ".DDS";
+	return texture->loadDDS(path);
+}
+
 bool cTexLibrary::ReLoadTexture(cTexture* texture)
 {
 	if(Option_DprintfLoad)
@@ -431,8 +448,10 @@ bool cTexLibrary::ReLoadTexture(cTexture* texture)
 		return true;
 
 	if(!texture->reload()){
+		if(loadBaseCache(texture))
+			return true;
 		Error(texture);
-		return false; 
+		return false;
 	}
 
 	if(Option_UseTextureCache)

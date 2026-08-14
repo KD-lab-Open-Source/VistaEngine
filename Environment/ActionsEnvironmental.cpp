@@ -43,6 +43,9 @@ REGISTER_CLASS(Action, ActionSetWaterColor, "Погода\\Установить 
 REGISTER_CLASS(Action, ActionSetReflectSkyColor, "Погода\\Установить цвет отражённого неба")
 REGISTER_CLASS(Action, ActionSetTimeScale, "Погода\\Скорость течения времени суток на мире")
 REGISTER_CLASS(Action, ActionSetWaterLevel, "Погода\\Установить уровень воды")
+#ifdef MAELSTROM_DATA
+REGISTER_CLASS(Action, ActionSetCoastSprites, "Погода\\Параметры прибрежных спрайтов")
+#endif
 
 REGISTER_CLASS(Action, ActionSetEffect, "Глобальные действия\\Включить/выключить эффект");
 
@@ -394,6 +397,29 @@ void ActionSetFogOfWar::activate()
 			universe()->setShowFogOfWar(!debugDisableFogOfWar);	
 	}
 }
+
+#ifdef MAELSTROM_DATA
+ActionSetCoastSprites::ActionSetCoastSprites()
+{
+	// The trigger editor opened the action on the world's current settings and saved the
+	// difference, so the constructor has to start from them, not from an empty attribute set.
+	if(environment && environment->GetCoastSprites())
+		coastSprites_ = environment->GetCoastSprites()->attributes();
+}
+
+void ActionSetCoastSprites::serialize(Archive& ar)
+{
+	__super::serialize(ar);
+	ar.serialize(coastSprites_, "coastSprites", "Прибрежные спрайты");
+}
+
+void ActionSetCoastSprites::activate()
+{
+	if(environment)
+		if(cCoastSprites* coastSprites = environment->GetCoastSprites())
+			coastSprites->setAttributes(coastSprites_);
+}
+#endif
 
 ActionSetWaterOpacity::ActionSetWaterOpacity()
 {

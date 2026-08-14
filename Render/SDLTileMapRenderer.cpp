@@ -59,7 +59,13 @@ const int STEP_BASE = 4;
 
 // The baked surface-colour texture is capped on each side; larger maps are averaged
 // down by vMap.getTileColor32Layer's step (the sampler interpolates the rest).
-const int MAX_TEX = 2048;
+//
+// 4096 so that a step of 1 -- one texel per fine cell, which is all vMap.clrBuf holds and
+// therefore the most the bake can carry -- covers every world both games ship. P2's are
+// 512 and 2048 square; Maelstrom's are 2048x4096, and a 2048 cap halved those to one texel
+// per 2x2 cells, visibly soft under a zoomed-in camera. The worst case costs 2048*4096*4 ==
+// 32 MB of B8G8R8A8, and one host-side copy of the same size while the bake uploads.
+const int MAX_TEX = 4096;
 
 // The detail texture a material draws with, or null. This is exactly what
 // cTileMap::setMaterial hands to DrawType::SetMaterialTilemap: the material's own entry in

@@ -118,6 +118,24 @@ void cLib3dx::saveCacheInfo(bool exported)
 	serialize(oa);
 }
 
+// Maelstrom kept its baked meshes in a base cache shipped with the game, one
+// subdirectory per content pack; retail ships the single "baseCache". Nothing this
+// engine writes ever lands there, so on data of its own the open below just fails and
+// the caller reports the missing .3DX exactly as it did before.
+bool cLib3dx::loadBaseCache(cStatic3dx* static3dx)
+{
+	// The cache file name is the model's own path with the separators turned into
+	// underscores -- already upper-cased for us by normalizePath -- plus a .logic
+	// marker for the collision copy.
+	string name = static3dx->fileName();
+	if(static3dx->is_logic)
+		name += ".logic";
+	replaceSubString(name, "\\", "_");
+
+	string path = "Resource\\cacheData\\baseCache\\Models\\" + name + ".dat";
+	return static3dx->loadMaelstromCache(path.c_str());
+}
+
 void cLib3dx::SaveCache(cStatic3dx* static3dx)
 {
 	xassert(static3dx);
@@ -185,17 +203,22 @@ cStatic3dx* cLib3dx::GetElement(const char* fname_,const char* TexturePath,bool 
 
 	cStatic3dx* pStatic = new cStatic3dx(is_logic, fname.c_str());
 	if(!Option_UseMeshCache || !LoadCache(pStatic)){
-		if(!pStatic->load(fname.c_str())){
+		if(pStatic->load(fname.c_str())){
+			if(Option_UseMeshCache){
+				pStatic->AddRef();
+				cObject3dx* pTempObject=new cObject3dx(pStatic,false);//Нужно для расчёта bound box, bound sphere
+				RELEASE(pTempObject);
+				SaveCache(pStatic);
+			}
+		}
+		// No .3DX on disk. Data from Maelstrom has none to find -- its models ship
+		// only as that engine's baked cache -- so fall back to reading one of those.
+		// Not re-cached as a .3dxG afterwards: this path is already reading a cache.
+		else if(!loadBaseCache(pStatic)){
 			if(!is_logic)
 				VisError<<"Cannot open file: "<<fname.c_str()<<VERR_END;
 			delete pStatic;
 			return 0;
-		}
-		else if(Option_UseMeshCache){
-			pStatic->AddRef();
-			cObject3dx* pTempObject=new cObject3dx(pStatic,false);//Нужно для расчёта bound box, bound sphere
-			RELEASE(pTempObject);
-			SaveCache(pStatic);
 		}
 	}
 

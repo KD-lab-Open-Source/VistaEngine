@@ -21,7 +21,26 @@ env:
 
 jobs:
   build:
+    name: build (${{ matrix.label }})
     runs-on: ubuntu-latest
+
+    # Both data schemas, in parallel. MAELSTROM_DATA=ON selects the pre-2008 layout
+    # at the ~dozen sites where a field changed nesting or owner (see the option in
+    # the root CMakeLists); those #ifdef branches are compiled by nothing else, so
+    # without this leg they rot untested.
+    #
+    # fail-fast is off on purpose: the legs are independent binaries -- neither can
+    # load the other's data -- and a break in one says nothing about the other.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Quoted: bare ON/OFF are booleans in YAML 1.1, and while GitHub's parser
+          # reads them as strings, nothing downstream should depend on knowing that.
+          - maelstrom: "OFF"
+            label: Perimeter2
+          - maelstrom: "ON"
+            label: Maelstrom
 
     steps:
     - uses: actions/checkout@v4
@@ -56,13 +75,19 @@ jobs:
     # it, so all that is left to build is SPIRV-Cross and the CLI — a couple of
     # minutes, not worth a cache round-trip.
     - name: Game -- configure
-      run: cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: >
+        cmake -G Ninja -B build
+        -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        -DMAELSTROM_DATA=${{ matrix.maelstrom }}
 
     - name: Game -- build
       run: cmake --build build -j3
 
+    # The executable is named Game in both legs -- MAELSTROM_DATA only adds a compile
+    # definition, it does not rename the target -- so the artifact name is the only
+    # thing that says which schema the binary reads.
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: VistaEngine-Linux
+        name: VistaEngine-Linux-${{ matrix.label }}
         path: build/Game/Game

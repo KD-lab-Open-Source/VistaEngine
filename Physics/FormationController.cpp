@@ -351,7 +351,26 @@ void FormationUnit::postQuant(bool moveback)
 			rotationSide_ = ROT_LEFT;
 		if(rigidBody_->flyingMode()){
 			QuatF ptAdditionalRotNew(clamp(ptVelocity() / (rigidBody_->forwardVelocity() + 0.01f), -1.0f, 1.0f) * rigidBody_->prm().additionalForvardRot, moveback ? Vect3f::I : Vect3f::I_, false);
+#ifdef MAELSTROM_DATA
+			// Pre-2008 divided the turn rate by pathTrackingAngle as written, in degrees
+			// (origin/Maelstrom Physics/RigidBodyUnit.cpp:1939 -- and our own
+			// PathTracking.cpp:507 still carries that formula untouched). 2008 converted
+			// the denominator to radians here, which makes the ratio 57x larger, so the
+			// clamp saturates and the roll becomes the whole of additionalHorizontalRot.
+			//
+			// That parameter is a bank angle in radians: prm 20 is 20 rad, and Maelstrom's
+			// aircraft prms carry exactly that, tuned for the old divisor -- 20 * ang/30 is
+			// a degree or two of bank. Under the new one the same data rolls the model
+			// through ~140 degrees, reversing whenever the turn rate changes sign, which
+			// looks like a unit thrashing about its own axis while flying a clean path.
+			// Traced: heading swinging +-40 deg per quant with position steady at 5.0/quant.
+			//
+			// Perimeter 2 reads the same 20 and 45 in its own prms, so stock 2008 does this
+			// too -- this is not a port regression, and the #else stays exactly as shipped.
+			ptAdditionalRotNew.postmult(QuatF(clamp(rotSpeed() / ownerUnit().attr().pathTrackingAngle, -1.0f, 1.0f) * additionalHorizontalRot_, Vect3f::J_, false));
+#else
 			ptAdditionalRotNew.postmult(QuatF(clamp(rotSpeed() / G2R(ownerUnit().attr().pathTrackingAngle), -1.0f, 1.0f) * additionalHorizontalRot_, Vect3f::J_, false));
+#endif
 			if(rigidBody_->prm().orientation_tau < 1.0f){
 				QuatF poseQuatNew;
 				poseQuatNew.slerp(rigidBody_->ptAdditionalRot_, ptAdditionalRotNew, rigidBody_->prm().orientation_tau);

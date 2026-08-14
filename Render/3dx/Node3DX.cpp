@@ -305,8 +305,14 @@ cObject3dx::cObject3dx(cStatic3dx* pStatic_, bool interpolate)
 			pStatic->boundRadius=pStatic->boundBox.max.distance(pStatic->boundBox.min)*0.5f;
 	}
 
-	if(gb_RenderDevice3D && !pStatic->is_logic && !pStatic->voxelBox.valid())
-		pStatic->voxelBox.create(this);   // voxel collision: skip on the SDL backend
+	// Perimeter 2's .3dxG caches ship a prebuilt voxel box, so this only ever had to run for
+	// a model that arrives without one -- which is every Maelstrom model: VoxelBox postdates
+	// that engine, and its baked cache has no chunk to hold one. The build reads geometry
+	// through gb_RenderDevice's staging mirror, not the retired D3D9 device, so gating it on
+	// gb_RenderDevice3D (permanently null here) only left those models with an empty box,
+	// and an empty box makes VoxelBox::trace miss every ray -- no projectile ever hits.
+	if(!pStatic->is_logic && !pStatic->voxelBox.valid())
+		pStatic->voxelBox.create(this);
 
 	silouette_center = pStatic->boundBox.center();
 
@@ -392,7 +398,12 @@ cObject3dx::~cObject3dx()
 	delete pOcclusionQuery;
 	delete pAnimSecond;
 
-	xassert(gb_RenderDevice3D);
+	// There used to be an xassert(gb_RenderDevice3D) here, meaning "the device must still
+	// exist while this object releases its GPU resources". That pointer is the D3D9 device
+	// and is permanently null on every platform now, so the check could only ever fail --
+	// it fired on every object destroyed in a build with assertions on, burying real ones.
+	// Not re-pointed at gb_RenderDevice: destruction legitimately outlives the device at
+	// shutdown, which is why the sPtr buffer destructors have to guard against exactly that.
 	xassert(GetRef()==0);
 }
 
@@ -584,7 +595,11 @@ void cObject3dx::Update()
 		for(int i=0;i<lights.size();i++){
 			StaticLight& sl=pStatic->lights[i];
 			cNode3dx& node=nodes_[sl.inode];
-			if(!sl.chains.empty()){
+			// Bound the chain index, as UpdateMatrix does for the node chains: SetAnimationGroupChain
+			// only validates it against the model's animationChains_, and a light carries its own,
+			// possibly shorter, list. This never bit before because nothing started a chain off
+			// Windows, so chainIndex was always 0 -- the first animated model walked off the end.
+			if(node.chainIndex < sl.chains.size()){
 				StaticLightAnimation& chain=sl.chains[node.chainIndex];
 				Color4f color;
 				chain.color.InterpolateSlow(node.phase,(float*)&color);
@@ -603,7 +618,8 @@ void cObject3dx::Update()
 			bool is_group_visible = false;
 			vector<VisibilityGroup>::iterator iGroup;
 			FOR_EACH(visibilityGroups_, iGroup)
-				is_group_visible = is_group_visible || iGroup->visibilityGroup->visibleNodes[sl.inode];
+				is_group_visible = is_group_visible
+					|| (iGroup->visibilityGroup && iGroup->visibilityGroup->visibleNodes[sl.inode]);
 
 			lights[i]->putAttribute(ATTRUNKOBJ_IGNORE, getAttribute(ATTR3DX_HIDE_LIGHTS|ATTRUNKOBJ_IGNORE) || !is_group_visible || unvisible_);
 		}
@@ -797,13 +813,16 @@ void cObject3dx::Draw(Camera* camera)
 			st.noLight = no_light_object;
 			st.selfIllumination = !mat.tex_self_illumination.empty() && !getAttribute(ATTR3DX_NO_SELFILLUMINATION);
 
-			// The 2D reflection path (vsSkinReflection/psSkinReflection): a lit material
-			// with an environment ("matcap") map, dispatched before bump exactly as
-			// cObject3dx::Draw does -- the two are mutually exclusive. The sky-cubemap
-			// variant (is_reflect_sky) is not ported and falls through to the plain lit path.
-			if(!mat.pSecondOpacityTexture && !no_light_object
-			   && mat.pReflectTexture && !mat.is_reflect_sky){
-				st.reflectTexture = mat.pReflectTexture;
+			// The reflection path (vsSkinReflection/psSkinReflection): a lit material with an
+			// environment map, dispatched before bump exactly as cObject3dx::Draw does -- the
+			// two are mutually exclusive. The map is either the material's own 2D "matcap" or,
+			// when its reflect texture was named sky.* (is_reflect_sky), the sky cubemap the
+			// environment renders per frame. The original tests the two together here and
+			// tells the shader apart by the bound texture's type, which is what the renderer
+			// does with TEXTURE_CUBEMAP.
+			cTexture* envMap = mat.is_reflect_sky ? scene()->GetSkyCubemap() : mat.pReflectTexture;
+			if(!mat.pSecondOpacityTexture && !no_light_object && envMap){
+				st.reflectTexture = envMap;
 				// PSSkin::SetReflection's amount: reflect_amount * the node's diffuse (a = 0).
 				st.reflectAmount = Color4f(mat.reflect_amount * diffuse.r,
 				                           mat.reflect_amount * diffuse.g,
@@ -813,8 +832,7 @@ void cObject3dx::Draw(Camera* camera)
 			// The bump path, on the same terms the original picks vsSkinBump: after the
 			// second-opacity, NOLIGHT and reflection materials have had their turn. It also
 			// needs the tangent frame, which the vertex only carries when pStatic->bump.
-			if(!mat.pSecondOpacityTexture && !no_light_object
-			   && !mat.pReflectTexture && !mat.is_reflect_sky
+			if(!mat.pSecondOpacityTexture && !no_light_object && !envMap
 			   && mat.pBumpTexture && Option_EnableBump && pStatic->bump){
 				st.bumpTexture = mat.pBumpTexture;
 				st.specularMap = mat.pSpecularmap;   // PSSkinBump::SelectSpecularMap
@@ -956,7 +974,8 @@ void cObject3dx::DrawMaterialGroupSelectively(StaticBunch& bunch,const Color4f& 
 
 bool cObject3dx::isVisible(const cTempVisibleGroup& vg) const 
 { 
-	if(!(vg.visibilities & visibilityGroups_[vg.visibilitySet].visibilityGroup->visibility))
+	const StaticVisibilityGroup* group = visibilityGroups_[vg.visibilitySet].visibilityGroup;
+	if(!group || !(vg.visibilities & group->visibility))
 		return false;
 	if(vg.visibilityNodeIndex == -1)
 		return true;
@@ -1268,7 +1287,18 @@ void cObject3dx::SetVisibilityGroup(VisibilityGroupIndex group, VisibilitySetInd
 void cObject3dx::UpdateVisibilityGroup(VisibilitySetIndex iset)
 {
 	// !!! не нужна
-	visibilityGroups_[iset].visibilityGroup = &pStatic->visibilitySets_[iset].visibilityGroups[visibilityGroups_[iset].visibilityGroupIndex];
+	//
+	// Taking &groups[index] blindly is undefined when the index is out of range, and for an
+	// empty group list it quietly yields null (an empty vector's data() is null) -- which is
+	// exactly what the two readers below then dereferenced. SetVisibilityGroup only checks
+	// the index through an xassert, so nothing catches it in a release build, and a set that
+	// exists but carries no groups slips past DummyVisibilitySet, which only fires when
+	// there is no set at all. Hand out null deliberately instead, and let the readers treat
+	// "no group" as "not visible".
+	StaticVisibilityGroups& groups = pStatic->visibilitySets_[iset].visibilityGroups;
+	VisibilityGroupIndex index = visibilityGroups_[iset].visibilityGroupIndex;
+	visibilityGroups_[iset].visibilityGroup =
+		(index >= 0 && index < groups.size()) ? &groups[index] : 0;
 }
 
 void cObject3dx::UpdateVisibilityGroups()
@@ -1838,6 +1868,8 @@ void cObject3dx::ProcessEffect(Camera* camera)
 		StaticEffect& se=pStatic->effects[ieffect];
 		StaticNode& snode=pStatic->nodes[se.node];
 		cNode3dx& node=nodes_[se.node];
+		if(node.chainIndex >= snode.chains.size())	// as UpdateMatrix bounds it
+			continue;
 		StaticNodeAnimation& chain=snode.chains[node.chainIndex];
 
 		xassert(!chain.visibility.values.empty());
@@ -2128,6 +2160,8 @@ bool cObject3dx::GetVisibilityTrack(int nodeindex) const
 	ASSERT_NODEINDEX(nodeindex);
 	const StaticNode& snode=pStatic->nodes[nodeindex];
 	const cNode3dx& node=nodes_[nodeindex];
+	if(node.chainIndex >= snode.chains.size())	// as UpdateMatrix bounds it
+		return true;
 	const StaticNodeAnimation& chain=snode.chains[node.chainIndex];
 	if(chain.visibility.values.empty())
 		return true;
@@ -2142,6 +2176,8 @@ bool cObject3dx::GetVisibilityTrackInterval(int nodeindex,float begin_phase,floa
 	ASSERT_NODEINDEX(nodeindex);
 	const StaticNode& snode=pStatic->nodes[nodeindex];
 	const cNode3dx& node=nodes_[nodeindex];
+	if(node.chainIndex >= snode.chains.size())	// as UpdateMatrix bounds it
+		return true;
 	const StaticNodeAnimation& chain=snode.chains[node.chainIndex];
 	if(chain.visibility.values.empty())
 		return true;
@@ -2414,7 +2450,12 @@ void cObject3dxAnimation::SetAnimationGroupChain(int igroup,int chain_index)
 	for(int imat=0;imat<materials.size();imat++)
 	if(pStatic->materials[imat].animation_group_index==igroup)
 	{
-		materials[imat].chain=chain_index;
+		// Bounded here rather than at the six places that index mat.chains with it: the
+		// check above only proves the index fits the model's animationChains_, and a
+		// material keeps its own, possibly shorter, list. Every one of those readers
+		// already skips an empty list, so falling back to the first chain is safe.
+		StaticMaterial& mat=pStatic->materials[imat];
+		materials[imat].chain = chain_index < mat.chains.size() ? chain_index : 0;
 	}
 }
 

@@ -36,6 +36,10 @@
 #include "DebugUtil.h"
 #include "Serialization/EnumDescriptor.h"
 #include "Units/ShowChangeController.h"
+#include "Game/Universe.h"	// MAELSTROM_DATA: minimapAngle moved from here to Universe
+#include "Environment/SourceManager.h"	// MAELSTROM_DATA: the world's sources used to live here
+#include "Game/CameraManager.h"	// MAELSTROM_DATA: the camera restrictions used to live here
+#include "Units/GlobalAttributes.h"
 #include "VistaRender/FieldOfView.h"
 
 #include "UserInterface/GameLoadManager.h"
@@ -292,10 +296,11 @@ void Environment::graphQuant(float dt, Camera* camera)
 	else
 		gb_RenderDevice->SetGlobalFog(Color4f(environmentTime()->GetCurFogColor()), Vect2f(-1, -2));
 
-	// TODO(sdl-port): one thing the original did here is gone with D3D9 --
-	//   the sky cubemap (environmentTime()->Draw()).      Render-PORTING.md #9
-	// Everything it drives (the time-of-day colours) is portable and still updated
-	// every frame.
+	// The sky cubemap, which every reflective material samples. It redraws one of its six
+	// faces per frame (cRenderCubemap::Draw), and only the sky scene goes into it, so the
+	// cost is about one extra sky render a frame. It has to happen before the world draws:
+	// the objects that reflect it are drawn below, and they read the texture it fills.
+	environmentTime()->Draw();
 
 	// The sky: the sun or the moon, then the cloud models, drawn through the sky camera's
 	// own scene. It opens the frame -- everything below is drawn over it.
@@ -347,7 +352,7 @@ void Environment::showEditor()
 		fixedWaves_->ShowInfo();
 }
 
-void Environment::serialize(Archive& ar) 
+void Environment::serialize(Archive& ar)
 {
 	start_timer_auto();
 
@@ -367,10 +372,68 @@ void Environment::serialize(Archive& ar)
 
 		ar.serialize(minimapZonesAlpha_, "minimapZonesAlpha", "Прозрачность зон на миникарте");
 
-		ar.serialize(*environmentTime_, "environmentTime", "Время");
+#ifdef MAELSTROM_DATA
+		// The minimap's rotation is an Environment field here and a Universe one in 2008,
+		// so this world writes it in this block and Universe::serialize never sees it. We
+		// are deserialized first (Universe::Universe), so hand it across. Maelstrom's
+		// worlds need it -- they are 2048x4096 and turn the minimap 90 degrees to fit a
+		// landscape panel.
+		if(ar.isInput() && universe()){
+			float minimapAngle = universe()->minimapAngle();
+			if(ar.serialize(minimapAngle, "minimapAngle", "Угол поворота миникарты"))
+				universe()->setMinimapAngle(minimapAngle);
+		}
 
+		// The mini-detail noise tiles the terrain materials draw with -- the grain, pebbles,
+		// cracks and road gravel over the baked surface colour -- are written here as one flat
+		// list of names, beside minimapAngle, and held by the scene rather than the tile map.
+		// 2008 moved them into cTileMap's own "tileMap" node, one struct each under
+		// "miniDetailTextureArray". A pre-2008 world has no such node, so the cTileMap call at
+		// the top of this function finds nothing: every material's texture stays null and the
+		// ground draws as flat colour, with no grain at all under a zoomed-in camera.
+		//
+		// All 51 worlds write exactly nine, the length of the original's own container
+		// (NumDetailTextures + 1), in its layer order: two zone defaults, then sand, earth,
+		// grass, cracks, road, stones, crater. Its reader had a second branch that shifted
+		// everything past the first entry up a slot when the list was shorter than the
+		// container -- unreachable for this data, and not carried over.
+		if(ar.isInput() && tileMap_){
+			vector<string> miniDetailTex;
+			if(ar.serialize(miniDetailTex, "miniDetailTex", "Мелкодетальные текстуры")){
+				// The tile size they were built at, which cTileMap::serialize would have set
+				// from the missing node. Left at the static's own 4 the tiles would repeat
+				// four times too densely. Maelstrom writes the power of two, in
+				// environmentColors or the global set; every world and the global say 4, so
+				// 16 -- which is both our default and the "_n16" the shipped tiles are named
+				// for, so read the power we already hold rather than inventing a second one.
+				cTileMap::MiniDetailTexture::resolution = tileMap_->miniDetailTextureResolution();
+				int count = min((int)miniDetailTex.size(), (int)cTileMap::miniDetailTexturesNumber);
+				for(int i = 0; i < count; i++)
+					tileMap_->miniDetailTexture(i).setTexture(miniDetailTex[i].c_str());
+			}
+		}
+
+		// Everything the environment lights a world with -- the sun, shadow and sky
+		// gradients, the sky models, the time of day -- is written flat in this block;
+		// 2008 moved it under "environmentTime". Read where this world put it, or it
+		// lights itself entirely from the constructed defaults: midday where it asked for
+		// a quarter past nine, ambient 0.2 where it asked for 0.5, a default cloud layer
+		// instead of its own. The terrain still looks about right, its colour being baked
+		// per cell in the height map -- it is the objects standing on it that go black.
+		environmentTime_->serializeMaelstrom(ar);
+#else
+		ar.serialize(*environmentTime_, "environmentTime", "Время");
+#endif
+
+#ifdef MAELSTROM_DATA
+		// Read inline: the grass settings sit at this level, not under a "Grass" node.
+		// GrassMap::serializeMaelstrom says why.
+		if(grassMap)
+			grassMap->serializeMaelstrom(ar);
+#else
 		if(grassMap)
 			ar.serialize(*grassMap, "Grass", "Трава");
+#endif
 	}
 
 	if(ar.filter(SERIALIZE_GLOBAL_DATA))
@@ -383,22 +446,121 @@ void Environment::serialize(Archive& ar)
 		if(temperature_)
 			ar.serialize(*temperature_, "temperature", 0);
 
+#ifdef MAELSTROM_DATA
+		// A world's sources -- the zones that hold its standing effects, its damage and
+		// its unit generators -- are written here; 2008 split SourceManager out of
+		// Environment and moved them into Universe's "sourceManager" block. Unread, every
+		// placed effect in the world is simply absent: in Maelstrom's menu that is each
+		// building fire, every smoke column and the green outflow from the pipe, all of
+		// them SourceZones.
+		//
+		// Called inline, not through a named block: "sources" and "anchors" sit at this
+		// level. Universe::Universe reads the environment last for this data, so the
+		// players and their units are already in place and a source can be switched on as
+		// it is read, which is what SourceManager::serialize does when it finishes.
+		if(sourceManager)
+			sourceManager->serialize(ar);
+
+		// What the camera may do on this world -- how far it can be pushed past the map's
+		// edge, how close it can zoom, how far it can tilt -- was an Environment field and is
+		// a CameraManager one now, so a pre-2008 world writes the whole group here and
+		// CameraManager::serialize never sees a name of it. All 51 worlds write cameraBorder;
+		// Menu.spg and the two TEST_Environment worlds also write their own restrictions,
+		// the rest deferring to the global set in Scripts\Content\GlobalAttributes.
+		//
+		// Written flat, apart from cameraBorder: the CAMERA_* names sit at this level. The
+		// camera is deserialized before the environment (Universe::universeLoad), so handing
+		// them across here overrides what it read, which is the order the original relied on.
+		if(ar.isInput() && cameraManager){
+			bool ownCameraRestriction = false;
+			ar.serialize(ownCameraRestriction, "selfCameraRestriction", "&использовать собственные ограничения камеры");
+
+			CameraBorder cameraBorder;
+			ar.serialize(cameraBorder, "cameraBorder", "границы выезда за край миры");
+			cameraManager->setCameraBorder(cameraBorder);
+
+			if(ownCameraRestriction){
+				CameraRestriction cameraRestriction;
+				cameraRestriction.serialize(ar);
+				cameraManager->setCameraRestriction(cameraRestriction);
+			}
+			else
+				cameraManager->setCameraRestriction(GlobalAttributes::instance().cameraRestriction);
+		}
+
+		// Which of the mini-detail textures above paints each fine cell. Written in this
+		// block; 2008 moved it out to the root of the save, where Universe::universeLoad reads
+		// it with this same call after every node is done -- and where, against a pre-2008
+		// world, the name is not found. The region then keeps the fill-with-1 vrtMap::load
+		// left it at, so every cell resolves to material 0 and the whole map takes one noise
+		// tile: the nine textures load and eight of them are never drawn with. Universe skips
+		// its own call for this data.
+		//
+		// Nothing sequences off this: the terrain mesh buckets its triangles by material on
+		// first draw, well after the load, which is also how the root-level call gets away
+		// with running last.
+		vMap.serializeRegion(ar);
+#endif
+
+#ifdef MAELSTROM_DATA
+		// The preset group had not been split out of the world yet. One object owned it --
+		// EnvironmentAttributes, written as the world's "environmentColors" node -- and
+		// 2008 dissolved that object: its fields became Environment's own, its fog-of-war
+		// colours FogOfWar's, two of its constants cWater's, and the group as a whole moved
+		// out of the world and into a preset file. The names survived the move; the depth
+		// did not, and openBlock is a no-op in an XPrm archive (editor-only grouping, it
+		// does not descend), so read at this level not one of these names is found.
+		//
+		// "ownAttributes" says whether the world carries its own copy -- 11 of Maelstrom's
+		// 51 do, the other 40 taking the global one, which is what loadPreset() reads here.
+		if(ar.isInput()){
+			bool ownAttributes = true;
+			ar.serialize(ownAttributes, "ownAttributes", "Собственные настройки среды");
+			if(ownAttributes){
+				// The object handed to openStruct is only used by binary archives, for
+				// their size and type name; an XPrm archive descends by name alone.
+				if(ar.openStruct(*this, "environmentColors", "Цвета среды")){
+					serializeMaelstromColors(ar);
+					ar.closeStruct("environmentColors");
+				}
+			}
+			else if(!presetLoaded_)
+				loadPreset();
+		}
+#else
 		if(ar.isInput() && !presetLoaded_)
 			loadPreset();
+#endif
 	}
 
+#ifdef MAELSTROM_DATA
+	// The rest of the group is written flat in the world's environment block, where this
+	// reads it -- so run under the world filter as well. Maelstrom ships no
+	// Scripts\Content\Presets\ at all, so waiting for loadPreset() would leave every world
+	// on constructed defaults: fog at 1000-1400 where Menu.spg asks for 900-1200, a
+	// 30-4000 camera frustum where it asks for 2-1300, and no weather, shore or lens flare
+	// at all. What sits in the world's "environmentColors" node has been read by now; only
+	// the names beside that node are still to come.
+	if(ar.filter(SERIALIZE_WORLD_DATA | SERIALIZE_PRESET_DATA)){
+#else
 	if(ar.filter(SERIALIZE_PRESET_DATA)){
+#endif
+#ifndef MAELSTROM_DATA
 		if(fogOfWar_)
 			ar.serialize(*fogOfWar_, "fogOfWar", "Туман войны");
+#endif
 
 		if(ar.openBlock("Environment fog", "Туман на мире")){
 			ar.serialize(fog_enable_, "fog_enable", "Включить туман");
+#ifndef MAELSTROM_DATA
 			ar.serialize(fog_start_, "fog_start", "Ближняя граница тумана");
 			ar.serialize(fog_end_, "fog_end", "Дальняя граница тумана");
 			ar.serialize(RangedWrapperi(height_fog_circle_, 0, 2000), "height_fog_circle", "Высота перехода к туману");
+#endif
 			ar.closeBlock();
 		}
 
+#ifndef MAELSTROM_DATA
 		if(ar.openBlock("Efects", "Эффекты")){
 			ar.serialize(effectHideByDistance_, "effectHideByDistance", "Скрывать эффекты при удалении");
 			ar.serialize(effectNearDistance_, "effectNearDistance", "Ближняя граница эффектов");
@@ -415,8 +577,9 @@ void Environment::serialize(Archive& ar)
 			ar.serialize(hideSmoothly_, "hideSmoothly", "Исчезать плавно");
 			ar.closeBlock();
 		}
+#endif // !MAELSTROM_DATA
 
-		if(water_){	
+		if(water_){
 			if(ar.openBlock("undegroundEffect","Подводный эффект")){
 				ar.serialize(underWaterAlways, "underWaterAlways", "Всегда включенный");
 				ar.serialize(underWaterColor, "underWaterColor", "Цвет подводного эффекта");
@@ -470,7 +633,9 @@ void Environment::serialize(Archive& ar)
 			}
 		}
 
-		ar.serialize(outside_, "Outside", "Внешняя среда");
+		// Capitalised by 2008. The archive tries these in order and stops at the first hit,
+		// so Perimeter 2 matches on the first name and pays nothing for the second.
+		ar.serialize(outside_, "|Outside|outside", "Внешняя среда");
 		if(outside_ == ENVIRONMENT_EARTH)
 			ar.serialize(outsideHeight_, "outsideHeight", "Высота внешней среды");
 
@@ -480,6 +645,7 @@ void Environment::serialize(Archive& ar)
 		gb_VisGeneric->SetHideRange(hideByDistanceRange_);
 		gb_VisGeneric->SetHideSmoothly(hideSmoothly_);
 
+#ifndef MAELSTROM_DATA
 		ar.serialize(*fallout_, "fallout", "Осадки");
 		ar.serialize(*windMap, "windMap", "Ветер");
 
@@ -487,6 +653,7 @@ void Environment::serialize(Archive& ar)
 			ar.serialize(*pCoastSprite, "coastSprites", "Прибрежные спрайты");
 			ar.serialize(waterPlumeAtribute_, "|waterPlumeAtribute|waterPlume", "Следы на воде");
 		}
+#endif
 
 		ar.serialize(*lensFlare_, "lensFlare_", "Блик камеры");
 		ar.serialize(*fallLeaves_, "fallLeaves", "Падающие листья");
@@ -557,6 +724,73 @@ void Environment::serialize(Archive& ar)
 	}
 }
 
+#ifdef MAELSTROM_DATA
+void Environment::serializeMaelstromColors(Archive& ar)
+{
+	// Field for field this is the group the preset branch of serialize() reads; only the
+	// place the names sit in the file differs, so every name here is deliberately the
+	// same one -- except the two FogOfWar renamed, which its own reader carries.
+	//
+	// timeColors_ is deliberately left unread. It is this node's own copy of the six sky
+	// gradients, and it is not the set a world is lit by: Maelstrom lit from
+	// EnvironmentTime's gradients, written flat in the environment block and read in
+	// EnvironmentTime::serializeMaelstrom, and reached into a timeColors_ only for the
+	// global ones -- its Environment.cpp has
+	// ReplaceGlobal(GlobalAttributes::instance().environmentAttributes_.timeColors_).
+	// What the editor saved here beside them is that global set, a 9-key ramp against
+	// Menu.spg's own 8-key one, so reading it would overwrite a world's own lighting with
+	// the global default. miniDetailTexResolution has no reader in this engine at all.
+	if(fogOfWar_)
+		fogOfWar_->serializeMaelstrom(ar);
+
+	ar.serialize(fog_start_, "fog_start", "Ближняя граница тумана");
+	ar.serialize(fog_end_, "fog_end", "Дальняя граница тумана");
+	ar.serialize(RangedWrapperi(height_fog_circle_, 0, 2000), "height_fog_circle", "Высота перехода к туману");
+
+	ar.serialize(effectHideByDistance_, "effectHideByDistance", "Скрывать эффекты при удалении");
+	ar.serialize(effectNearDistance_, "effectNearDistance", "Ближняя граница эффектов");
+	ar.serialize(effectFarDistance_, "effectFarDistance", "Дальняя граница эффектов");
+
+	ar.serialize(RangedWrapperf(game_frustrum_z_min_, 1.0f, 100.0f), "game_frustrum_z_min", "Ближняя граница камеры");
+	ar.serialize(RangedWrapperf(game_frustrum_z_max_vertical_, 100.0f, 13000.0f), "game_frustrum_z_max", "Дальняя граница камеры (в вертикальном положении)");
+	game_frustrum_z_max_horizontal_ = game_frustrum_z_max_vertical_;
+	ar.serialize(RangedWrapperf(game_frustrum_z_max_horizontal_, 100.0f, 13000.0f), "game_frustrum_z_max_horizontal", "Дальняя граница камеры (в горизонтальном положении)");
+	ar.serialize(hideSmoothly_, "hideSmoothly", "Исчезать плавно");
+
+	if(water_)
+		water_->serializeMaelstrom(ar);
+
+	ar.serialize(*fallout_, "fallout", "Осадки");
+	ar.serialize(*windMap, "windMap", "Ветер");
+
+	if(water_){
+		ar.serialize(*pCoastSprite, "coastSprites", "Прибрежные спрайты");
+		ar.serialize(waterPlumeAtribute_, "|waterPlumeAtribute|waterPlume", "Следы на воде");
+	}
+}
+
+void Environment::loadPreset()
+{
+	// Maelstrom's preset file is Scripts\Content\GlobalAttributes: a world that does not
+	// carry its own settings ("ownAttributes = false", 40 of the 51) took this copy, which
+	// is what its Environment did with
+	// environmentAttributes_ = GlobalAttributes::instance().environmentAttributes_.
+	// The engine already reads this file as a library (Units/GlobalAttributes.cpp), but
+	// nothing there descends into its environmentColors, so open it again for that node
+	// alone. presetName_ is left alone: no Maelstrom install has a Presets directory.
+	presetLoaded_ = true;
+	XPrmIArchive ia;
+	ia.setFilter(SERIALIZE_PRESET_DATA);
+	if(ia.open("Scripts\\Content\\GlobalAttributes")
+	&& ia.openStruct(*this, "GlobalAttributes", "Глобальные параметры")){
+		if(ia.openStruct(*this, "environmentColors", "Цвета среды")){
+			serializeMaelstromColors(ia);
+			ia.closeStruct("environmentColors");
+		}
+		ia.closeStruct("GlobalAttributes");
+	}
+}
+#else
 void Environment::loadPreset()
 {
 	presetLoaded_ = true;
@@ -565,6 +799,7 @@ void Environment::loadPreset()
 	if(ia.open(presetName_.c_str()))
 		ia.serialize(*this, "environment", 0);
 }
+#endif
 
 void Environment::savePreset()
 {

@@ -1325,6 +1325,23 @@ void Camera::DrawTilemapObject()
 
 void Camera::DrawSilhouetteObject()
 {
+	// TODO(sdl-port): the silhouette OUTLINE. See Documents/Render-PORTING.md #22. It is
+	// drawn entirely through the stencil buffer, which the SDL GPU backend does not expose
+	// yet, so the stencil body below needs gb_RenderDevice3D and would fault on its null.
+	//
+	// The objects on this list are ordinary units, though, and cObject3dx::PreDraw routes
+	// them here INSTEAD of to SCENENODE_OBJECT -- so returning early dropped them from the
+	// frame entirely rather than merely dropping their outline. Retail Perimeter 2 never
+	// fills the list, which is why this went unnoticed; Maelstrom's data does, and every
+	// unit that sets showSilhouette (the guard tower, the legionaries, the warship) went
+	// missing while its shadow -- attached separately, and earlier, in the same PreDraw --
+	// kept drawing. Draw them plainly, exactly as the child-camera branch below does.
+	if(!gb_RenderDevice3D){
+		camerapass = SCENENODE_FLAT_SILHOUETTE;
+		DrawObject(SCENENODE_FLAT_SILHOUETTE);
+		return;
+	}
+
 	start_timer_auto();
 	gb_RenderDevice->SetRenderState( RS_CULLMODE, -1 );
 	SceneNode nType=SCENENODE_FLAT_SILHOUETTE;

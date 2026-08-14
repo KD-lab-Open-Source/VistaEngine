@@ -191,16 +191,16 @@ bool UI_Cursor::createCursor(const char* fname/*=*/)
 	if (fileName_.empty()) return true; // Путь пустой => курсор NULL - все как надо
 
 	releaseCursor();
-	cursor_ = (HCURSOR)LoadImage(0, fileName_.c_str(), IMAGE_CURSOR, 0, 0, LR_LOADFROMFILE);
+	cursor_ = PlatformCursor::load(fileName_.c_str());
 
 	return (NULL != cursor_);
 }
 
 void UI_Cursor::releaseCursor()
 {
-	if (NULL != cursor_) 
+	if (NULL != cursor_)
 	{
-		DestroyCursor(cursor_);
+		PlatformCursor::destroy(cursor_);
 		cursor_ = NULL;
 	}
 }
@@ -317,9 +317,25 @@ void UI_ControlState::serialize(Archive& ar)
 		typedef EnumTable<UI_ControlShowModeID, OptionalPtr<UI_ControlShowMode> > ShowModesOptional;
 		reinterpret_cast<ShowModesOptional&>(showModes_).serialize(ar); // HINT
 	}
+#ifdef MAELSTROM_DATA
+	// The show modes are written flat into the state, one field per UI_ControlShowModeID
+	// name; 2008 moved the same table under a "showModes" block. The contents are
+	// identical either way -- EnumTable::serialize is what writes them in both -- so read
+	// them at this level. Ask for the block instead and every control ends up with an
+	// empty show-mode table, and a control with no show mode draws no sprite at all: the
+	// whole interface goes blank, which looks like a texture fault and is not one.
+	else
+		showModes_.serialize(ar);
+#else
 	else
 		ar.serialize(showModes_, "showModes", "Режимы отрисовки");
+#endif
 	ar.serialize(actions_, "actions", "назначения");
+#ifdef MAELSTROM_DATA
+	// A state carried the same hover pair as its control, and findAction falls back to the
+	// current state's list, so the same synthesis serves both. 39 states name a tooltip.
+	UI_ActionDataHoverInfo::appendMaelstromHover(ar, actions_);
+#endif
 }
 
 

@@ -9,6 +9,9 @@
 #include "Physics/WindMap.h"
 #include "Starforce.h"
 #include "Units/LabelObject.h"
+#ifdef MAELSTROM_DATA
+#include "Environment/EnvironmentColors.h"	// CoastSpritesAttributes, for ActionSetCoastSprites
+#endif
 
 struct ActionActivateSources : Action
 {
@@ -208,6 +211,26 @@ class ActionSetSilhouette : public Action
 public:
 	void activate(){};
 };
+
+#ifdef MAELSTROM_DATA
+// Maelstrom's own action, dropped by 2008 along with Environment's copy of the coast sprite
+// attributes -- the sprites are still here and still read from the world, only nothing could
+// change them again once the world was loaded. Every screen of the main menu sets its own
+// (14 call sites in Scripts\Content\Triggers\MAIN MENU.scr, the "Waves*" trigger of each
+// screen's environment block), so without it the shoreline keeps the menu world's opening
+// settings through every screen.
+class ActionSetCoastSprites : public Action
+{
+public:
+	ActionSetCoastSprites();
+
+	void serialize(Archive& ar);
+	void activate();
+
+private:
+	CoastSpritesAttributes coastSprites_;
+};
+#endif
 
 class ActionSetFogOfWar : public Action
 {

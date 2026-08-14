@@ -43,7 +43,17 @@ void CameraBorder::serialize(Archive& ar)
 
 CameraRestriction::CameraRestriction()
 {
+#ifdef MAELSTROM_DATA
+	// A 2008 field the pre-2008 data cannot carry, so the question is what the original did
+	// without it, not what our default happens to be: its quant tracked the ground with
+	// vMap.GetApproxAlt outright (origin/Maelstrom Game/CameraManager.cpp:860). Ours routes
+	// that through CameraCoordinate::height, which with aboveWater takes cWater::GetZFast --
+	// and that returns the water surface everywhere, over land as well as over water, so the
+	// camera's focus point sinks to water level on a world with terrain above it.
+	aboveWater = false;
+#else
 	aboveWater = true;
+#endif
 
 	//горизонтальное перемещение камеры
 	CAMERA_SCROLL_SPEED_DELTA = 10.0f;
@@ -140,14 +150,62 @@ void CameraRestriction::serialize(Archive &ar)
 	if(tmp >= 1.0f) CAMERA_ANGLE_SPEED_DAMP = 1 / tmp;
 	CAMERA_ANGLE_SPEED_DAMP = clamp(CAMERA_ANGLE_SPEED_DAMP, 0.1f, 10.f);
 
+#ifdef MAELSTROM_DATA
+	// The zoom dynamics were rewritten in 2008, not renamed, so there is nothing to read the
+	// old three names into: a key press used to add CAMERA_ZOOM_SPEED_DELTA to the zoom force
+	// outright and now adds zoomKeyAcceleration times the distance, the wheel multiplier
+	// became an impulse, and the damping went from a per-quant factor to a per-second one.
+	// They are left unread and the 2008 defaults stand.
+#else
 	ar.serialize(zoomKeyAcceleration, "zoomKeyAcceleration", "Скорость зума клавишами");
 	ar.serialize(zoomWheelImpulse, "zoomWheelImpulse", "Скорость зума колесом");
 	ar.serialize(RangedWrapperf(zoomDamping, 0, 10.f) , "zoomDamping", "Дампинг зума");
-	
+#endif
+
 	ar.serialize(RangedWrapperf(CAMERA_FOLLOW_AVERAGE_TAU, 0.0001f, 0.01f), "CAMERA_FOLLOW_AVERAGE_TAU", "жесткость привязки к юниту");
 
 	ar.serialize(RangedWrapperf(CAMERA_MOVE_ZOOM_SCALE, 0.f, 5000.f), "CAMERA_MOVE_ZOOM_SCALE", "масштабирование движения");
 
+#ifdef MAELSTROM_DATA
+	// The limits kept their meaning and lost their names. A RangedWrapper does not clip
+	// outside the editor -- it is a plain float read at load -- so the clamps the pre-2008
+	// serializer applied are spelled out here, in its order, its bounds and its units:
+	// degrees in the file where 2008 writes radians.
+	ar.serialize(zoomMax, "CAMERA_ZOOM_MAX", "максимальное удаление от точки наблюдения");
+	zoomMax = clamp(zoomMax, 0.f, 5000.f);
+	ar.serialize(zoomMin, "CAMERA_ZOOM_MIN", "минимальное удаление от точки наблюдения");
+	zoomMin = clamp(zoomMin, 0.f, 0.95f*zoomMax);
+
+	ar.serialize(heightMax, "CAMERA_MAX_HEIGHT", "максимальная высота над миром");
+	heightMax = clamp(heightMax, 0.f, 5000.f);
+	ar.serialize(heightMin, "CAMERA_MIN_HEIGHT", "минимальная высота над миром");
+	heightMin = clamp(heightMin, 0.f, 5000.f);
+
+	ar.serialize(zoomDefault, "CAMERA_ZOOM_DEFAULT", "удаление от точки наблюдения по умолчанию");
+	zoomDefault = clamp(zoomDefault, zoomMin, zoomMax);
+
+	// The tilt limit is one line either side, and the two lines are the same line: the
+	// maximum tilt falls off with distance, from thetaMaxLow at zoomMin to thetaMaxHigh at
+	// zoomMaxTheta -- which is what CAMERA_THETA_MAX and CAMERA_THETA_MIN were, interpolated
+	// between CAMERA_ZOOM_MIN and CAMERA_ZOOM_MAX. So CAMERA_THETA_MIN is not a floor under
+	// the tilt; it is the ceiling on it when fully zoomed out, and the floor was a plain 0.
+	// The 2008 defaults (60 and 18 degrees) are Maelstrom's own global values, which is a
+	// free check on the pairing.
+	tmp = R2G(thetaMaxLow);
+	ar.serialize(tmp, "CAMERA_THETA_MAX", "максимальный угол наклона камеры");
+	thetaMaxLow = G2R(clamp(tmp, 0.f, 85.f));
+
+	tmp = R2G(thetaMaxHigh);
+	ar.serialize(tmp, "CAMERA_THETA_MIN", "минимальный угол наклона камеры");
+	thetaMaxHigh = clamp(G2R(tmp), G2R(5.f), 0.95f*thetaMaxLow);
+
+	zoomMaxTheta = zoomMax;
+	thetaMinLow = thetaMinHigh = 0.f;
+
+	tmp = R2G(thetaDefault);
+	ar.serialize(tmp, "CAMERA_THETA_DEFAULT", "угол наклона камеры по умолчанию");
+	thetaDefault = clamp(G2R(tmp), thetaMaxHigh, thetaMaxLow);
+#else
 	ar.serialize(RangedWrapperf(heightMax, 0.f, 5000.f), "heightMax", "максимальная высота над миром");
 	ar.serialize(RangedWrapperf(heightMin, 0.f, 5000.f), "heightMin", "минимальная высота над миром");
 
@@ -164,6 +222,7 @@ void CameraRestriction::serialize(Archive &ar)
 	ar.serialize(RadianWrapper(thetaMaxHigh, 0, angleMax), "thetaMaxHigh", "максимальный угол наклона камеры на максимальной высоте");
 
 	ar.serialize(RadianWrapper(thetaDefault, 0, angleMax), "thetaDefault", "угол наклона камеры по умолчанию");
+#endif
 
 	ar.serialize(RangedWrapperf(CAMERA_WORLD_SCROLL_BORDER, -50.f, 1000.f), "CAMERA_WORLD_SCROLL_BORDER", "ограничение выезда точки наблюдения за край при максимальном удалении");
 	

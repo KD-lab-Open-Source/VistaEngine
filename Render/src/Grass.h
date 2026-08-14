@@ -111,6 +111,9 @@ public:
 	void SetGrass(float x, float y, float radius, int texture,int count, bool clear,int intensity,int intensity2);
 	void SetAllGrass(int texture, int intensity,int intensity2);
 	void serialize(Archive& ar);
+#ifdef MAELSTROM_DATA
+	void serializeMaelstrom(Archive& ar);
+#endif
 	void SetTexture(const char* name, int num);
 	const char* GetTextureName(int num);
 	cTexture* GetTexture() {return texture_;}

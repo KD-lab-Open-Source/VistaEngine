@@ -1,6 +1,6 @@
 // Water-surface fragment shader for the SDL GPU backend.
 //
-// Two techniques, selected by -DREFLECTION.
+// Three techniques, selected by -DREFLECTION / -DCUBE.
 //
 // REFLECTION=0 -- the original's water_easy.psl (WATER_EMPTY), whole:
 //
@@ -22,6 +22,22 @@
 // by fBrightnes. Then a sun glint: reflect the light direction about the wave normal and
 // take a very tight smoothstep against the eye vector. The glint also thins the surface,
 // which is what `ot.a = v.diffuse.a*(1+light)` does.
+//
+// CUBE=1 -- the original's water_cube.psl (WATER_REFLECTION), whole:
+//
+//     float3 cube = v.uv_mirror;
+//     cube.xy += (tex0.xy + tex1.xy)*0.3;
+//     float4 sky = texCUBE(SkySampler, cube);
+//     ot.rgb = sky.rgb*vReflectionColor.a + vReflectionColor.rgb;
+//     ot.a   = v.diffuse.a;
+//     ot.a  += ot.a*saturate((tex0.x + tex1.x));
+//
+// This is what the original draws when the reflection option is OFF -- water_easy is the
+// no-PS2.0 path, not the option-off one. Note what is *not* here: no glint term, and no
+// brightness. The sun visible on the water is the sun rendered into the sky cubemap
+// (cRenderSky), and it moves across the surface because the wave slopes shift the lookup
+// direction; the crest term is water_easy's, on the alpha. So the colour is a reflection
+// and the opacity is the depth gradient, each carrying half the look.
 //
 // Three departures, all forced:
 //
@@ -55,6 +71,12 @@ SamplerState      Tex1Sampler : register(s1, space2);
 Texture2D<float4> Sky         : register(t2, space2);
 SamplerState      SkySampler  : register(s2, space2);
 #endif
+#if CUBE
+// The sky cubemap (cScene::GetSkyCubemap), the same stage 2 -- the original binds it there
+// with sampler_wrap_linear.
+TextureCube<float4> SkyCube       : register(t2, space2);
+SamplerState        SkyCubeSampler : register(s2, space2);
+#endif
 
 cbuffer Water : register(b0, space3)
 {
@@ -85,6 +107,9 @@ struct VSOutput
     float3 PointPos : TEXCOORD3;
 #endif
     float  Fog      : TEXCOORD4;
+#if CUBE
+    float3 Mirror   : TEXCOORD5;
+#endif
 };
 
 // One wave map's signed slope, undoing the decoder's +128 bias. The original reads the
@@ -99,7 +124,20 @@ float4 main(VSOutput input) : SV_Target0
     float2 tex0 = slope(Tex0, Tex0Sampler, input.UV0);
     float2 tex1 = slope(Tex1, Tex1Sampler, input.UV1);
 
-#if REFLECTION
+#if CUBE
+    float4 ot;
+
+    // Perturb the reflection direction by the wave slopes, then reflect the sky. The 0.3
+    // is the original's: far larger than the planar path's 0.03, because this offsets a
+    // direction vector rather than a projective uv.
+    float3 cube = input.Mirror;
+    cube.xy += (tex0 + tex1) * 0.3f;
+    float4 sky = SkyCube.Sample(SkyCubeSampler, cube);
+
+    ot.rgb = sky.rgb * ReflectionColor.a + ReflectionColor.rgb;
+    ot.a   = input.Diffuse.a;
+    ot.a += ot.a * saturate(tex0.x + tex1.x);
+#elif REFLECTION
     float4 ot;
 
     // Ripple the projective lookup along the wave slopes. Scaled by w so the offset is

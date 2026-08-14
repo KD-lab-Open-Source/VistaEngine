@@ -858,6 +858,41 @@ void GrassMap::serialize(Archive& ar)
 		SaveMap();
 }
 
+#ifdef MAELSTROM_DATA
+// A pre-2008 world writes the grass settings flat in its environment block. Both levels of
+// nesting they look like they have are illusory: that engine's Environment::serialize wrapped
+// the call in openBlock("Grass") and serialize() wrapped the names in openBlock("Textures"),
+// and openBlock does not descend in an XPrm archive -- it groups for the editor only. 2008
+// made GrassMap a node of its own instead, so read as one ("Grass = { ... }") against such a
+// world the block is not found: every texture name stays empty, GetElement3DComplex builds no
+// atlas, and DrawGrass returns on the null texture with all the blades already generated.
+//
+// bushHeight0..6 are 2008's as well. Pre-2008 had no per-texture blade size, and the 3 the
+// constructor fills bushHights_ with is the constant it grew every bush at.
+void GrassMap::serializeMaelstrom(Archive& ar)
+{
+	const ResourceSelector::Options textureOpts("*.tga", "Resource\\TerrainData\\Textures");
+
+	xassert(textureNames_.size()==textureCount_);
+	ar.serialize(hideDistance_,"hideDistance","Расстояние исчезновения");
+	ar.serialize(oldLighting,"oldLighting","Старая модель освещения");
+	ar.serialize(ResourceSelector(textureNames_[0], textureOpts),"textureName0","Текстура травы - 1");
+	ar.serialize(ResourceSelector(textureNames_[1], textureOpts),"textureName1","Текстура травы - 2");
+	ar.serialize(ResourceSelector(textureNames_[2], textureOpts),"textureName2","Текстура травы - 3");
+	ar.serialize(ResourceSelector(textureNames_[3], textureOpts),"textureName3","Текстура травы - 4");
+	ar.serialize(ResourceSelector(textureNames_[4], textureOpts),"textureName4","Текстура травы - 5");
+	ar.serialize(ResourceSelector(textureNames_[5], textureOpts),"textureName5","Текстура травы - 6");
+	ar.serialize(ResourceSelector(textureNames_[6], textureOpts),"textureName6","Текстура травы - 7");
+
+	hideDistance2_ = hideDistance_*hideDistance_;
+	invHideDistance2_ = 1/hideDistance2_;
+	if(ar.isInput()){
+		InitTextures();
+		GenerateGrass();
+	}
+}
+#endif
+
 void GrassMap::SetTexture(const char* name, int num)
 {
 	if (!name)

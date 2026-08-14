@@ -40,10 +40,13 @@ SDLWaterRenderer::~SDLWaterRenderer()
 	if(flatTexture_)   SDL_ReleaseGPUTexture(device_, flatTexture_);
 	if(sampler_)       SDL_ReleaseGPUSampler(device_, sampler_);
 	if(samplerClamp_)  SDL_ReleaseGPUSampler(device_, samplerClamp_);
+	if(samplerCube_)   SDL_ReleaseGPUSampler(device_, samplerCube_);
 	if(pipelineFill_)  SDL_ReleaseGPUGraphicsPipeline(device_, pipelineFill_);
 	if(pipelineLine_)  SDL_ReleaseGPUGraphicsPipeline(device_, pipelineLine_);
 	if(pipelineReflectFill_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineReflectFill_);
 	if(pipelineReflectLine_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineReflectLine_);
+	if(pipelineCubeFill_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineCubeFill_);
+	if(pipelineCubeLine_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineCubeLine_);
 	if(pipelineIceFill_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineIceFill_);
 	if(pipelineIceLine_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineIceLine_);
 }
@@ -87,6 +90,16 @@ void SDLWaterRenderer::createPipelines()
 	// over, and max_lod above already pins sampling to it.
 	samplerClamp_ = SDL_CreateGPUSampler(device_, &si);
 
+	// cWater::Draw's SetSamplerData(2, sampler_wrap_linear) for the sky cubemap. Anisotropy
+	// off, which also keeps it clear of the D3D12 filter trap described above; the cube has
+	// one mip level (cSDLRenderDevice::createCubeTexture), so max_lod stays 0.
+	si.address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+	si.address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+	si.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+	si.enable_anisotropy = false;
+	si.max_anisotropy = 0.f;
+	samplerCube_ = SDL_CreateGPUSampler(device_, &si);
+
 	// 1x1 flat wave map: the decoder's bias, so water.frag.hlsl's slope() reads 0.
 	SDL_GPUTextureCreateInfo fti = {};
 	fti.type = SDL_GPU_TEXTURETYPE_2D;
@@ -115,13 +128,16 @@ void SDLWaterRenderer::createPipelines()
 		}
 	}
 
-	createPipelinePair(false, pipelineFill_, pipelineLine_);
-	createPipelinePair(true,  pipelineReflectFill_, pipelineReflectLine_);
+	createPipelinePair(VARIANT_PLAIN,  pipelineFill_, pipelineLine_);
+	createPipelinePair(VARIANT_PLANAR, pipelineReflectFill_, pipelineReflectLine_);
+	createPipelinePair(VARIANT_CUBE,   pipelineCubeFill_, pipelineCubeLine_);
 	createIcePipeline();
 
-	fprintf(stderr, "SDLWaterRenderer: water pipeline %s (wireframe %s), reflection %s, ice %s\n",
+	fprintf(stderr, "SDLWaterRenderer: water pipeline %s (wireframe %s), reflection %s, cubemap %s, ice %s\n",
 	        pipelineFill_ ? "ready" : "FAILED", pipelineLine_ ? "ready" : "FAILED",
-	        pipelineReflectFill_ ? "ready" : "FAILED", pipelineIceFill_ ? "ready" : "FAILED");
+	        pipelineReflectFill_ ? "ready" : "FAILED", pipelineCubeFill_ ? "ready" : "FAILED",
+	        pipelineIceFill_ ? "ready" : "FAILED");
+
 }
 
 // The ice sheet cTemperature::Draw blends over the surface: the water vertex again, alpha
@@ -197,23 +213,27 @@ void SDLWaterRenderer::createIcePipeline()
 	SDL_ReleaseGPUShader(device_, fs);
 }
 
-bool SDLWaterRenderer::createPipelinePair(bool reflection,
+bool SDLWaterRenderer::createPipelinePair(Variant variant,
                                           SDL_GPUGraphicsPipeline*& fill,
                                           SDL_GPUGraphicsPipeline*& line)
 {
-	// REFLECTION=1 is the original's water_linear, REFLECTION=0 its water_easy; the two
-	// are separate builds of the same HLSL.
+	// Three separate builds of the same HLSL: water_easy, water_linear, water_cube.
 	SDL_GPUShaderCreateInfo vsi = vista::shaderCreateInfo(
-		reflection ? VISTA_SHADER(water_reflect_vert) : VISTA_SHADER(water_vert));
+		variant == VARIANT_CUBE   ? VISTA_SHADER(water_cube_vert) :
+		variant == VARIANT_PLANAR ? VISTA_SHADER(water_reflect_vert)
+		                          : VISTA_SHADER(water_vert));
 	vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;
-	vsi.num_uniform_buffers = 1;    // MVP, the two uv scale/offsets, vMirrorVP
+	vsi.num_uniform_buffers = 1;    // MVP, the two uv scale/offsets, vMirrorVP, vCameraPos
 	SDL_GPUShader* vs = SDL_CreateGPUShader(device_, &vsi);
 
 	SDL_GPUShaderCreateInfo fsi = vista::shaderCreateInfo(
-		reflection ? VISTA_SHADER(water_reflect_frag) : VISTA_SHADER(water_frag));
+		variant == VARIANT_CUBE   ? VISTA_SHADER(water_cube_frag) :
+		variant == VARIANT_PLANAR ? VISTA_SHADER(water_reflect_frag)
+		                          : VISTA_SHADER(water_frag));
 	fsi.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
-	// The two wave maps, plus the reflection target on the water_linear path.
-	fsi.num_samplers = reflection ? 3 : 2;
+	// The two wave maps, plus stage 2 on both reflecting paths -- the planar target for
+	// water_linear, the sky cubemap for water_cube.
+	fsi.num_samplers = (variant == VARIANT_PLAIN) ? 2 : 3;
 	fsi.num_uniform_buffers = 1;
 	SDL_GPUShader* fs = SDL_CreateGPUShader(device_, &fsi);
 
@@ -306,12 +326,22 @@ void SDLWaterRenderer::SetState(const State& state, Camera* camera)
 	texture0_ = sdlTextureOf(state.texture0);
 	texture1_ = sdlTextureOf(state.texture1);
 
-	// Without the reflection target there is nothing for water_linear to sample, so fall
-	// back to the flat colour rather than draw the surface black.
+	// Without the texture it samples there is nothing for either reflecting technique to
+	// read, so fall back to the flat colour rather than draw the surface black.
 	reflectionTexture_ = state.reflection ? sdlTextureOf(state.reflectionTexture) : nullptr;
 	reflection_ = reflectionTexture_ != nullptr;
+	cubeTexture_ = (!reflection_ && state.cubeReflection) ? sdlTextureOf(state.skyCubemap) : nullptr;
+	cubeReflection_ = cubeTexture_ != nullptr;
 
-	if(reflection_){
+	if(cubeReflection_){
+		// water_cube reads the same premultiplied vReflectionColor as water_linear, and
+		// builds its lookup direction in the vertex shader from the camera position.
+		std::memcpy(fs_.reflectionColor, state.reflectionColor, sizeof(fs_.reflectionColor));
+		vs_.cameraPos[0] = state.cameraPosVS[0];
+		vs_.cameraPos[1] = state.cameraPosVS[1];
+		vs_.cameraPos[2] = state.cameraPosVS[2];
+	}
+	else if(reflection_){
 		std::memcpy(vs_.mirrorVP, state.mirrorVP, sizeof(vs_.mirrorVP));
 		std::memcpy(fs_.reflectionColor, state.reflectionColor, sizeof(fs_.reflectionColor));
 		std::memcpy(fs_.lightColor, state.lightColor, sizeof(fs_.lightColor));
@@ -335,6 +365,7 @@ void SDLWaterRenderer::SetState(const State& state, Camera* camera)
 	vpMinZ_ = camera->vp.MinZ; vpMaxZ_ = camera->vp.MaxZ;
 
 	stateValid_ = true;
+
 }
 
 // The ice sheet's counterpart to SetState, from cTemperature::Draw. Captures the material
@@ -439,8 +470,10 @@ bool SDLWaterRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, S
 {
 	// The technique the recorded draws were made under, and within it the fill mode --
 	// falling back to the solid pipeline if the LINE variant failed to build.
-	SDL_GPUGraphicsPipeline* fill = reflection_ ? pipelineReflectFill_ : pipelineFill_;
-	SDL_GPUGraphicsPipeline* line = reflection_ ? pipelineReflectLine_ : pipelineLine_;
+	SDL_GPUGraphicsPipeline* fill = cubeReflection_ ? pipelineCubeFill_
+	                              : reflection_     ? pipelineReflectFill_ : pipelineFill_;
+	SDL_GPUGraphicsPipeline* line = cubeReflection_ ? pipelineCubeLine_
+	                              : reflection_     ? pipelineReflectLine_ : pipelineLine_;
 	SDL_GPUGraphicsPipeline* pipeline = (wireframe && line) ? line : fill;
 	if(!device_ || !pipeline || !cmd || !target || !depth || draws_.empty())
 		return false;
@@ -478,11 +511,15 @@ bool SDLWaterRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target, S
 	ts[0].sampler = sampler_;
 	ts[1].texture = texture1_ ? texture1_ : flatTexture_;
 	ts[1].sampler = sampler_;
-	if(reflection_){
+	if(cubeReflection_){
+		ts[2].texture = cubeTexture_;
+		ts[2].sampler = samplerCube_;
+	}
+	else if(reflection_){
 		ts[2].texture = reflectionTexture_;
 		ts[2].sampler = samplerClamp_;
 	}
-	SDL_BindGPUFragmentSamplers(pass, 0, ts, reflection_ ? 3 : 2);
+	SDL_BindGPUFragmentSamplers(pass, 0, ts, (reflection_ || cubeReflection_) ? 3 : 2);
 
 	// The surface is drawn as a run of tile ranges over (at most two) vertex buffers,
 	// exactly as cWater::DrawPolygons walks its visible lines.

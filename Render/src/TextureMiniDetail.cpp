@@ -2,6 +2,7 @@
 #include "TextureMiniDetail.h"
 #include "Render/3dx/Umath.h"
 #include "Render/src/FileImage.h"
+#include "FileUtils/FileUtils.h"
 #include "D3DRender.h"
 
 TextureMiniDetail::TextureMiniDetail(const char* textureName, int tileSize)
@@ -12,6 +13,16 @@ TextureMiniDetail::TextureMiniDetail(const char* textureName, int tileSize)
 
 bool TextureMiniDetail::reload()
 {
+	// A mini-detail texture that is already one. Everything below builds the tiled, normalized
+	// image from a source .tga, and P2's worlds name exactly that -- but Maelstrom's ship the
+	// built result beside the source, one per tile size ("D_Ground_001.tga" ->
+	// "D_Ground_001_n8/_n16/_n32.dds"), and name the .dds in the world. cFileImage::Create
+	// knows only .tga/.avi/.jpg, so the load below fails on those outright and the material
+	// gets no detail texture at all. cTexture::reload already dispatches a .dds name to the
+	// DDS decoder; take that route and skip the build.
+	if(getExtention(name()) == "dds")
+		return cTexture::reload();
+
 	cFileImage* fileImage = cFileImage::Create(name());
 	if(!fileImage || fileImage->load(name())){
 		VisError << "Cannot load tga file - " << name() << VERR_END;
