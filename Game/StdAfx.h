@@ -1,5 +1,5 @@
-#ifndef __UNITS_STD_AFX_H_INCLUDED__
-#define __UNITS_STD_AFX_H_INCLUDED__
+#ifndef __GAME_STD_AFX_H_INCLUDED__
+#define __GAME_STD_AFX_H_INCLUDED__
 
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 // A fallback now, not a choice: the root CMakeLists force-includes <windows.h> into every
