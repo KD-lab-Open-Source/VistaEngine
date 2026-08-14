@@ -139,6 +139,7 @@ SDLObject3dxRenderer::~SDLObject3dxRenderer()
 	if(fsBump_)        SDL_ReleaseGPUShader(device_, fsBump_);
 	if(fsReflect_)     SDL_ReleaseGPUShader(device_, fsReflect_);
 	if(fsSecondOpacity_) SDL_ReleaseGPUShader(device_, fsSecondOpacity_);
+	if(fsSilhouette_) SDL_ReleaseGPUShader(device_, fsSilhouette_);
 	if(vsShadowRigid_) SDL_ReleaseGPUShader(device_, vsShadowRigid_);
 	if(vsShadowSkin_)  SDL_ReleaseGPUShader(device_, vsShadowSkin_);
 	if(fsShadow_)      SDL_ReleaseGPUShader(device_, fsShadow_);
@@ -152,7 +153,7 @@ bool SDLObject3dxRenderer::createShaders()
 	if(shadersTried_) return vsRigid_ && vsSkin_ && vsRigidBump_ && vsSkinBump_
 	                      && vsRigidReflect_ && vsSkinReflect_
 	                      && vsRigidSecondOpacity_ && vsSkinSecondOpacity_
-	                      && fs_ && fsBump_ && fsReflect_ && fsSecondOpacity_
+	                      && fs_ && fsBump_ && fsReflect_ && fsSecondOpacity_ && fsSilhouette_
 	                      && vsShadowRigid_ && vsShadowSkin_ && fsShadow_;
 	shadersTried_ = true;
 	if(!device_ || !window_) return false;
@@ -191,11 +192,14 @@ bool SDLObject3dxRenderer::createShaders()
 	fsReflect_ = makeFS(VISTA_SHADER(object3dx_reflect_frag), 3);  // diffuse + env map + shadow map
 	fsReflectCube_ = makeFS(VISTA_SHADER(object3dx_reflect_cube_frag), 3);  // the env map is the sky cube
 	fsSecondOpacity_ = makeFS(VISTA_SHADER(object3dx_second_opacity_frag), 2);  // diffuse + second-opacity map
+	// Samples neither, but the replay binds the plain path's two, so declare them: a shader
+	// may declare more samplers than it reads, never fewer than are bound.
+	fsSilhouette_ = makeFS(VISTA_SHADER(object3dx_silhouette_frag), 2);
 	fsShadow_  = makeFS(VISTA_SHADER(object3dx_shadow_frag),  1);  // diffuse, for the alpha-cutout clip
 
 	if(!vsRigid_ || !vsSkin_ || !vsRigidBump_ || !vsSkinBump_ || !vsRigidReflect_ || !vsSkinReflect_
 	   || !vsRigidSecondOpacity_ || !vsSkinSecondOpacity_
-	   || !fs_ || !fsBump_ || !fsReflect_ || !fsSecondOpacity_
+	   || !fs_ || !fsBump_ || !fsReflect_ || !fsSecondOpacity_ || !fsSilhouette_
 	   || !vsShadowRigid_ || !vsShadowSkin_ || !fsShadow_){
 		fprintf(stderr, "SDLObject3dxRenderer: CreateGPUShader failed: %s\n", SDL_GetError());
 		return false;
@@ -207,8 +211,33 @@ bool SDLObject3dxRenderer::createShaders()
 SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skinned, bool bump, bool reflect,
                                                            bool reflectCube, bool secondOpacity, eBlendMode blend,
                                                            bool mirrored, bool depthWrite, bool wireframe, bool shadow,
-                                                           bool cullNone, TwoPass twoPass)
+                                                           bool cullNone, TwoPass twoPass,
+                                                           bool silhouette, bool silhouetteAlways)
 {
+	// The outline shader is the BUMP=0 permutation, so it shares VSOutput with the plain
+	// vertex shaders only: fold the variants that would change that struct out of the key,
+	// exactly as the caster does. It reads one uniform (Diffuse) and no texture, and the
+	// pipeline never blends -- the fragments have already been selected by the depth test.
+	if(silhouette){
+		bump = false;
+		reflect = false;
+		reflectCube = false;
+		secondOpacity = false;
+		blend = ALPHA_NONE;
+		depthWrite = false;
+		wireframe = false;
+		twoPass = PASS_NORMAL;
+		// Back faces MUST be culled, and DrawSilhouetteObject's RS_CULLMODE -1 is what asks
+		// for that: -1 restores the camera's cull (D3DCULL_CW), it does not turn culling off
+		// -- only DrawObjectSpecial does that. The outline is drawn after the object's own
+		// plain draw has written depth, so with culling off a unit's back faces would sit
+		// behind its own front faces, test GREATER against that depth and paint the outline
+		// across the whole visible unit.
+		cullNone = false;
+	}
+	else
+		silhouetteAlways = false;
+
 	// The caster shaders take no tangent frame, no env map and write no colour, so bump,
 	// reflection, the second-opacity map and the blend mode never reach them: fold them out
 	// of the key rather than build dead pipelines.
@@ -244,7 +273,9 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 	                             | ((unsigned long long)secondOpacity << 30)
 	                             | ((unsigned long long)reflectCube   << 31)
 	                             | ((unsigned long long)cullNone      << 32)
-	                             | ((unsigned long long)twoPass      << 33);   // 2 bits
+	                             | ((unsigned long long)twoPass      << 33)    // 2 bits
+	                             | ((unsigned long long)silhouette   << 35)
+	                             | ((unsigned long long)silhouetteAlways << 36);
 	auto it = pipelines_.find(key);
 	if(it != pipelines_.end())
 		return it->second;
@@ -325,6 +356,7 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 	                  : bump          ? (skinned ? vsSkinBump_ : vsRigidBump_)
 	                                  : (skinned ? vsSkin_ : vsRigid_);
 	pci.fragment_shader = shadow ? fsShadow_
+	                    : silhouette ? fsSilhouette_
 	                    : secondOpacity ? fsSecondOpacity_
 	                    : reflect ? (reflectCube ? fsReflectCube_ : fsReflect_)
 	                    : (bump ? fsBump_ : fs_);
@@ -368,8 +400,14 @@ SDL_GPUGraphicsPipeline* SDLObject3dxRenderer::pipelineFor(int stride, bool skin
 	pci.depth_stencil_state.enable_depth_write = twoPass == PASS_DEPTH_ONLY  ? true
 	                                           : twoPass == PASS_DEPTH_EQUAL ? false
 	                                                                         : depthWrite;
-	pci.depth_stencil_state.compare_op = twoPass == PASS_DEPTH_EQUAL ? SDL_GPU_COMPAREOP_EQUAL
-	                                                                : SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
+	// The outline is the object drawn where the scene is IN FRONT of it -- GREATER is the
+	// depth test the original's D3DSTENCILOP_REPLACE on STENCILZFAIL selected by hand, and
+	// it never writes depth. ATTR3DX_ALWAYS_FLAT_SILUETTE tints the whole object instead,
+	// which is that object's STENCILPASS=REPLACE.
+	pci.depth_stencil_state.compare_op = silhouette ? (silhouetteAlways ? SDL_GPU_COMPAREOP_ALWAYS
+	                                                                    : SDL_GPU_COMPAREOP_GREATER)
+	                                   : twoPass == PASS_DEPTH_EQUAL ? SDL_GPU_COMPAREOP_EQUAL
+	                                                                 : SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
 	// SDL GPU only consults color_write_mask when the pipeline asks it to, so "write
 	// everything" stays the zeroed default for every other pipeline (the same rule
 	// SDLWorldQuadRenderer's SetColorWriteMask follows, #16).
@@ -401,6 +439,18 @@ void SDLObject3dxRenderer::BeginFrame()
 	worldPool_.clear();
 	currentValid_ = false;
 	currentDirty_ = true;
+}
+
+void SDLObject3dxRenderer::SetSilhouette(const Color4c& color, bool alwaysFlat)
+{
+	silhouette_ = true;
+	silhouetteAlways_ = alwaysFlat;
+	// Color4c is 0..255; the shader wants 0..1. Alpha is ignored (the outline is opaque and
+	// unblended) but carried anyway so the uniform is never partly stale.
+	silhouetteColor_[0] = color.r / 255.f;
+	silhouetteColor_[1] = color.g / 255.f;
+	silhouetteColor_[2] = color.b / 255.f;
+	silhouetteColor_[3] = color.a / 255.f;
 }
 
 void SDLObject3dxRenderer::SetState(const State& state, Camera* camera)
@@ -576,7 +626,17 @@ void SDLObject3dxRenderer::SetState(const State& state, Camera* camera)
 	current_.fs.fogColor[0] = fog.r; current_.fs.fogColor[1] = fog.g;
 	current_.fs.fogColor[2] = fog.b; current_.fs.fogColor[3] = fog.a;
 
-	current_.blend = state.blend;
+	// The outline overrides the material wholesale: one flat colour in Diffuse, no blend,
+	// and none of the variant flags, so a silhouetted object records the same pipeline for
+	// every group it owns however its materials differ. Set last, over everything above.
+	current_.silhouette = silhouette_;
+	current_.silhouetteAlways = silhouette_ && silhouetteAlways_;
+	if(silhouette_){
+		std::memcpy(current_.fs.diffuse, silhouetteColor_, sizeof(current_.fs.diffuse));
+		current_.fs.params[0] = 0.f;   // no alpha test: the outline is solid
+	}
+
+	current_.blend = silhouette_ ? ALPHA_NONE : state.blend;
 	current_.skinned = boneCount > 1;
 	current_.mirrored = camera->getAttribute(ATTRCAMERA_REFLECTION) != 0;
 	current_.cullNone = camera->GetCameraPass() == SCENENODE_OBJECTSPECIAL
@@ -689,8 +749,9 @@ bool SDLObject3dxRenderer::DrawShadowPass(SDL_GPUCommandBuffer* cmd, SDL_GPUText
 		const StateBlock& st = states_[d.state];
 
 		// The caster pass draws for the light camera, which is never mirrored. It has no
-		// colour target, so the two-pass fade means nothing here -- pipelineFor folds it out.
-		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, false, false, false, false, st.blend, false, true, false, true, st.cullNone, PASS_NORMAL);
+		// colour target, so neither the two-pass fade nor the outline means anything here --
+		// pipelineFor folds both out.
+		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, false, false, false, false, st.blend, false, true, false, true, st.cullNone, PASS_NORMAL, false, false);
 		if(!pipeline) continue;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);
@@ -788,7 +849,8 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 
 		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, st.bump, st.reflect, st.reflectCube,
 		                                                st.secondOpacity, st.blend, st.mirrored, d.depthWrite,
-		                                                wireframe, false, st.cullNone, d.twoPass);
+		                                                wireframe, false, st.cullNone, d.twoPass,
+		                                                st.silhouette, st.silhouetteAlways);
 		if(!pipeline) continue;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);

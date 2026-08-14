@@ -202,6 +202,17 @@ float4 main(VSOutput input) : SV_Target0
 {
     float4 ot;
 
+#if SILHOUETTE
+    // The flat outline a unit shows through whatever it walked behind
+    // (Documents/Render-PORTING.md #22). No texture, no light, no fog: the pipeline has
+    // already selected the fragments -- those that fail the depth test against the scene --
+    // and every one of them is the silhouette colour. That colour rides in Diffuse, so this
+    // variant adds nothing to the Material cbuffer and its layout stays in step with the
+    // other permutations. Alpha is forced opaque: cVisGeneric::SetSilhouetteColor forces
+    // a = 255 anyway, and the pipeline does not blend.
+    return float4(Diffuse.rgb, 1.0f);
+#else
+
 #if BUMP
     // BUMP always samples: the original has no NOTEXTURE variant of psSkinBump.
     float4 t0 = DiffuseTexture.Sample(DiffuseSampler, input.UV);
@@ -282,4 +293,5 @@ float4 main(VSOutput input) : SV_Target0
     ot.rgb = lerp(FogColor.rgb, ot.rgb, saturate(input.Fog));
 
     return ot;
+#endif // SILHOUETTE
 }

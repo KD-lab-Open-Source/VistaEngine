@@ -1325,20 +1325,43 @@ void Camera::DrawTilemapObject()
 
 void Camera::DrawSilhouetteObject()
 {
-	// TODO(sdl-port): the silhouette OUTLINE. See Documents/Render-PORTING.md #22. It is
-	// drawn entirely through the stencil buffer, which the SDL GPU backend does not expose
-	// yet, so the stencil body below needs gb_RenderDevice3D and would fault on its null.
+	// The objects on this list are ordinary units -- cObject3dx::PreDraw routes them here
+	// INSTEAD of to SCENENODE_OBJECT -- so they are drawn plainly first, and then a second
+	// time as the outline. Retail Perimeter 2 never fills the list; Maelstrom's data does,
+	// through showSilhouette (the guard tower, the legionaries, the warship).
 	//
-	// The objects on this list are ordinary units, though, and cObject3dx::PreDraw routes
-	// them here INSTEAD of to SCENENODE_OBJECT -- so returning early dropped them from the
-	// frame entirely rather than merely dropping their outline. Retail Perimeter 2 never
-	// fills the list, which is why this went unnoticed; Maelstrom's data does, and every
-	// unit that sets showSilhouette (the guard tower, the legionaries, the warship) went
-	// missing while its shadow -- attached separately, and earlier, in the same PreDraw --
-	// kept drawing. Draw them plainly, exactly as the child-camera branch below does.
-	if(!gb_RenderDevice3D){
+	// The outline is NOT the original's stencil dance, and cannot be: D3D9 stamped
+	// D3DSTENCILOP_REPLACE on STENCILZFAIL -- "where the depth test failed" -- and then
+	// tinted those stencil values with a screen-space box per object (DrawSilhouettePlane).
+	// Drawing the object itself with COMPAREOP_GREATER selects exactly the same fragments
+	// with no stencil at all, which matters because the scene depth buffer is D32_FLOAT and
+	// giving it stencil would drag sceneDepthCopy_ -- the soft-particle depth source, #12 --
+	// onto a format only D16_UNORM is universally sampleable next to. See #22.
+	//
+	// One divergence, and it is the occlusion query's (#20), not the stencil's: the original
+	// gated the whole effect on cOcclusionSilouette::IsVisible, drawing no outline at all
+	// while the query still called the object visible, with 300ms of hysteresis either way.
+	// That query is stubbed, and `!occlusionQuery.IsInit()` makes it answer *visible* --
+	// so a faithful port would draw nothing, ever. Per-fragment depth is the honest reading
+	// of the same intent: the part of a unit that is behind something shows through it, at
+	// once and without the object-wide latch.
+	if(SDLObject3dxRenderer* renderer = sdlObjectRenderer()){
 		camerapass = SCENENODE_FLAT_SILHOUETTE;
 		DrawObject(SCENENODE_FLAT_SILHOUETTE);
+
+		if(!gb_VisGeneric->IsSilhouettesEnabled())
+			return;
+
+		vector<BaseGraphObject*>& list = DrawArray[SCENENODE_FLAT_SILHOUETTE];
+		vector<BaseGraphObject*>::iterator i;
+		FOR_EACH(list, i){
+			xassert((*i)->GetKind() == KIND_OBJ_3DX);
+			cObject3dx* obj = static_cast<cObject3dx*>(*i);
+			renderer->SetSilhouette(gb_VisGeneric->GetSilhouetteColor(obj->GetSilhouetteIndex()),
+			                        obj->getAttribute(ATTR3DX_ALWAYS_FLAT_SILUETTE) != 0);
+			obj->Draw(this);
+		}
+		renderer->ClearSilhouette();
 		return;
 	}
 
