@@ -2370,7 +2370,7 @@ bool ConditionObjectNearObjectByLabel::check() const
 	// exist yet when the chain is first polled, which is what the original relied on.
 	UnitReal* unit = universe()->findUnitByLabel(label);
 	if(!unit){
-		xassertStr(0 && "Объект по метке не найден: ", label.c_str());
+		xassertStr(0 && "Объект по метке не найден: ", label.value().c_str());
 		return false;
 	}
 
