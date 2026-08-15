@@ -48,4 +48,6 @@ GameData/
 /out
 /build-qt-check
 /*.log
+# Editor-generated test worlds (SurMap5Qt --selftest writes here)
+/Worlds
 /XLibs.Net/FreeType/objs/debug/*.obj

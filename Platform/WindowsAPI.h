@@ -753,6 +753,16 @@ inline BOOL FileTimeToDosDateTime(const FILETIME*, WORD* date, WORD* time_) {
 inline BOOL DeleteFileA(const char* path) { return remove(NormalizePath(path).c_str()) == 0; }
 #define DeleteFile DeleteFileA
 
+// MoveFile: rename(2). Windows fails (and the original editor warns) when the
+// destination exists; rename(2) overwrites silently, which is the behaviour the
+// SurMap5Qt editor's WorldList::renameWorld checks for explicitly beforehand.
+inline BOOL MoveFileA(const char* from, const char* to) {
+    return rename(NormalizePath(from).c_str(), NormalizePath(to).c_str()) == 0 ? TRUE : FALSE;
+}
+#ifndef MoveFile
+#  define MoveFile MoveFileA
+#endif
+
 // ─── File time stubs ──────────────────────────────────────────────────────────
 inline void GetSystemTimeAsFileTime(FILETIME* ft) {
     struct timespec ts; clock_gettime(CLOCK_REALTIME, &ts);
