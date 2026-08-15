@@ -65,6 +65,26 @@ public:
 	SDLObject3dxRenderer(const SDLObject3dxRenderer&) = delete;
 	SDLObject3dxRenderer& operator=(const SDLObject3dxRenderer&) = delete;
 
+	// The z prepass that keeps a uniformly faded object from blending with itself
+	// (Documents/Render-PORTING.md #19). cSimply3dx::Draw records the same mesh twice: the
+	// first draw fills depth and writes no colour, the second shades only the fragments that
+	// depth-test EQUAL against it -- so each pixel of the model blends with the scene exactly
+	// once instead of once per overlapping layer. Every other draw is PASS_NORMAL.
+	enum TwoPass : unsigned char { PASS_NORMAL = 0, PASS_DEPTH_ONLY, PASS_DEPTH_EQUAL };
+
+	// Set around a pair of DrawIndexedPrimitive calls; DrawIndexedPrimitive stamps it onto
+	// the DrawCmd, so it does not have to survive to replay.
+	void SetTwoPass(TwoPass pass) { twoPass_ = pass; }
+
+	// The flat outline a unit shows through whatever it walked behind
+	// (Documents/Render-PORTING.md #22). Set around a silhouetted object's Draw: every
+	// material group it records is turned into the outline instead of its own material --
+	// one flat colour, no texture, no light, no fog, no blend. `alwaysFlat` is
+	// ATTR3DX_ALWAYS_FLAT_SILUETTE: tint the whole object rather than only the part of it
+	// the scene depth hides.
+	void SetSilhouette(const Color4c& color, bool alwaysFlat);
+	void ClearSilhouette() { silhouette_ = false; }
+
 	// One material group's worth of state, straight out of cObject3dx::Draw: the same
 	// values it feeds to VSSkin::Select / VSSkin::SetMaterial / PSSkin::SetMaterial and
 	// to SetBlendStateAlphaRef, plus the bone poses from GetWorldPoses.
@@ -224,6 +244,9 @@ private:
 		// This pass is Camera::DrawObjectSpecial, the one place the original turns culling
 		// off (D3DCULL_NONE). Everything else keeps the camera's back-face cull.
 		bool cullNone;
+		// The flat outline pass (#22). silhouetteAlways is ATTR3DX_ALWAYS_FLAT_SILUETTE.
+		bool silhouette;
+		bool silhouetteAlways;
 		// The camera's viewport, captured at SetState. Draws are replayed in one pass at
 		// EndScene, long after the scene walk moved on, so it cannot be read back then.
 		int vpX, vpY, vpW, vpH;
@@ -238,6 +261,7 @@ private:
 		int stride;
 		int firstIndex, indexCount;   // indices are absolute: no base-vertex offset
 		bool depthWrite;
+		TwoPass twoPass;
 	};
 
 	bool createShaders();
@@ -248,13 +272,17 @@ private:
 	// depth bias, and the shadow shaders, which ignore the tangent frame.
 	SDL_GPUGraphicsPipeline* pipelineFor(int stride, bool skinned, bool bump, bool reflect, bool reflectCube, bool secondOpacity,
 	                                     eBlendMode blend, bool mirrored, bool depthWrite, bool wireframe, bool shadow,
-	                                     bool cullNone);
+	                                     bool cullNone, TwoPass twoPass, bool silhouette, bool silhouetteAlways);
 	// Append the current state to states_ if it changed since the last recorded draw.
 	int commitState();
 
 	cSDLRenderDevice* owner_  = nullptr;   // owns the vertex/index buffers we draw
 	SDL_GPUDevice* device_ = nullptr;
 	SDL_Window*    window_ = nullptr;
+	TwoPass twoPass_ = PASS_NORMAL;        // see SetTwoPass
+	bool silhouette_ = false;              // see SetSilhouette
+	bool silhouetteAlways_ = false;
+	float silhouetteColor_[4] = {0,0,0,0};
 
 	SDL_GPUShader* vsRigid_       = nullptr;   // -DSKINNED=0 -DBUMP=0
 	SDL_GPUShader* vsSkin_        = nullptr;   // -DSKINNED=1 -DBUMP=0
@@ -271,6 +299,7 @@ private:
 	SDL_GPUShader* fsReflect_     = nullptr;   // -DBUMP=0 -DREFLECTION=1
 	SDL_GPUShader* fsReflectCube_ = nullptr;   // -DBUMP=0 -DREFLECTION=1 -DREFLECT_CUBE=1
 	SDL_GPUShader* fsSecondOpacity_ = nullptr; // -DBUMP=0 -DSECOND_OPACITY=1
+	SDL_GPUShader* fsSilhouette_  = nullptr;   // -DBUMP=0 -DSILHOUETTE=1: flat Diffuse.rgb
 	SDL_GPUShader* vsShadowRigid_ = nullptr;   // object3dx_shadow, -DSKINNED=0
 	SDL_GPUShader* vsShadowSkin_  = nullptr;   // object3dx_shadow, -DSKINNED=1
 	SDL_GPUShader* fsShadow_      = nullptr;   // alpha-cutout clip, no colour output

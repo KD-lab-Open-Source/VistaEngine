@@ -148,6 +148,7 @@ vista_shader_module(object3dx
     "object3dx_reflect_frag=object3dx.frag.hlsl:fragment:BUMP=0,REFLECTION=1"
     "object3dx_reflect_cube_frag=object3dx.frag.hlsl:fragment:BUMP=0,REFLECTION=1,REFLECT_CUBE=1"
     "object3dx_second_opacity_frag=object3dx.frag.hlsl:fragment:BUMP=0,SECOND_OPACITY=1"
+    "object3dx_silhouette_frag=object3dx.frag.hlsl:fragment:BUMP=0,SILHOUETTE=1"
     "object3dx_shadow_rigid_vert=object3dx_shadow.vert.hlsl:vertex:SKINNED=0"
     "object3dx_shadow_skin_vert=object3dx_shadow.vert.hlsl:vertex:SKINNED=1"
     "object3dx_shadow_frag=object3dx_shadow.frag.hlsl:fragment")

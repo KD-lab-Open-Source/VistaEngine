@@ -668,6 +668,14 @@ void Camera::DrawSilhouettePlane()
 	Сортировать по этому признаку.
 	Если есть такие объекты, вызывать потом DrawShadowPlane()
 */
+	// This is the second half of the D3D9 stencil dance: DrawSilhouetteObject stamped a
+	// per-player stencil value where the depth test failed, and this pass then tinted those
+	// texels by drawing a screen-space box per object with STENCILFUNC EQUAL. SDL GPU has no
+	// stencil here and needs none -- the outline draw colours its own fragments (see #22) --
+	// so there is nothing left for this pass to do, and gb_RenderDevice3D below is null.
+	if(sdlObjectRenderer())
+		return;
+
 	gb_RenderDevice3D->SetVertexShader(0);
 	gb_RenderDevice3D->SetPixelShader(0);
 	cD3DRender* rd=gb_RenderDevice3D;
@@ -1325,20 +1333,77 @@ void Camera::DrawTilemapObject()
 
 void Camera::DrawSilhouetteObject()
 {
-	// TODO(sdl-port): the silhouette OUTLINE. See Documents/Render-PORTING.md #22. It is
-	// drawn entirely through the stencil buffer, which the SDL GPU backend does not expose
-	// yet, so the stencil body below needs gb_RenderDevice3D and would fault on its null.
+	// The objects on this list are ordinary units -- cObject3dx::PreDraw routes them here
+	// INSTEAD of to SCENENODE_OBJECT -- so this function owes them their ordinary draw as
+	// well as the outline, and draws each of them twice. Retail Perimeter 2 never fills the
+	// list; Maelstrom's data does, through showSilhouette (the guard tower, the legionaries,
+	// the warship).
 	//
-	// The objects on this list are ordinary units, though, and cObject3dx::PreDraw routes
-	// them here INSTEAD of to SCENENODE_OBJECT -- so returning early dropped them from the
-	// frame entirely rather than merely dropping their outline. Retail Perimeter 2 never
-	// fills the list, which is why this went unnoticed; Maelstrom's data does, and every
-	// unit that sets showSilhouette (the guard tower, the legionaries, the warship) went
-	// missing while its shadow -- attached separately, and earlier, in the same PreDraw --
-	// kept drawing. Draw them plainly, exactly as the child-camera branch below does.
-	if(!gb_RenderDevice3D){
+	// The outline is NOT the original's stencil dance, and cannot be: D3D9 stamped
+	// D3DSTENCILOP_REPLACE on STENCILZFAIL -- "where the depth test failed" -- and then
+	// tinted those stencil values with a screen-space box per object (DrawSilhouettePlane).
+	// Drawing the object itself with COMPAREOP_GREATER selects exactly the same fragments
+	// with no stencil at all, which matters because the scene depth buffer is D32_FLOAT and
+	// giving it stencil would drag sceneDepthCopy_ -- the soft-particle depth source, #12 --
+	// onto a format only D16_UNORM is universally sampleable next to. See #22.
+	//
+	// One divergence, and it is the occlusion query's (#20), not the stencil's: the original
+	// gated the whole effect on cOcclusionSilouette::IsVisible, drawing no outline at all
+	// while the query still called the object visible, with 300ms of hysteresis either way.
+	// That query is stubbed, and `!occlusionQuery.IsInit()` makes it answer *visible* --
+	// so a faithful port would draw nothing, ever. Per-fragment depth is the honest reading
+	// of the same intent: the part of a unit that is behind something shows through it, at
+	// once and without the object-wide latch.
+	//
+	// ORDER IS THE WHOLE TRICK. The outline runs BEFORE these objects draw themselves, so
+	// the depth it tests against holds the terrain and the buildings and none of the units
+	// being outlined. Drawn after, a unit's own nearer parts -- a raised arm over its chest,
+	// a turret over its hull -- have already written depth, its farther parts test GREATER
+	// against them and pass, and the outline paints across the middle of a unit standing in
+	// plain sight. The original was immune to that only because the occlusion query gated it
+	// object-wide: a visible object set STENCILZFAIL to KEEP and stamped nothing anywhere.
+	// Testing against a depth buffer this object has not contributed to buys the same
+	// immunity without the query.
+	if(SDLObject3dxRenderer* renderer = sdlObjectRenderer()){
 		camerapass = SCENENODE_FLAT_SILHOUETTE;
+
+		// Child cameras -- the reflection, the shadow map -- get the objects and nothing else.
+		// The original returns here too: the outline is the main camera's alone, and a mirror
+		// that painted its own would show a silhouette the player cannot see the unit through.
+		const bool outline = !Parent && gb_VisGeneric->IsSilhouettesEnabled();
+
+		vector<BaseGraphObject*>& list = DrawArray[SCENENODE_FLAT_SILHOUETTE];
+		vector<BaseGraphObject*>::iterator i;
+
+		if(outline){
+			FOR_EACH(list, i){
+				xassert((*i)->GetKind() == KIND_OBJ_3DX);
+				cObject3dx* obj = static_cast<cObject3dx*>(*i);
+				if(obj->getAttribute(ATTR3DX_ALWAYS_FLAT_SILUETTE))
+					continue;
+				renderer->SetSilhouette(gb_VisGeneric->GetSilhouetteColor(obj->GetSilhouetteIndex()), false);
+				obj->Draw(this);
+			}
+			renderer->ClearSilhouette();
+		}
+
 		DrawObject(SCENENODE_FLAT_SILHOUETTE);
+
+		// ATTR3DX_ALWAYS_FLAT_SILUETTE is the other half of the original's branch: STENCILPASS
+		// *and* STENCILZFAIL both REPLACE, so the object stamped everywhere it rasterized and
+		// the plane pass tinted the whole of it, hidden or not. COMPAREOP_ALWAYS says the same
+		// thing -- but it has to run after the object's own draw, or the object would paint
+		// straight back over it.
+		if(outline){
+			FOR_EACH(list, i){
+				cObject3dx* obj = static_cast<cObject3dx*>(*i);
+				if(!obj->getAttribute(ATTR3DX_ALWAYS_FLAT_SILUETTE))
+					continue;
+				renderer->SetSilhouette(gb_VisGeneric->GetSilhouetteColor(obj->GetSilhouetteIndex()), true);
+				obj->Draw(this);
+			}
+			renderer->ClearSilhouette();
+		}
 		return;
 	}
 
