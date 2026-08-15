@@ -51,10 +51,9 @@ struct IceFSUniform { float snowColor[4]; float fogColor[4]; float fogOfWarColor
 // CreateVolumeRand(64): an L8 cube of graphRnd() bytes. R8_UNORM here; the shader reads .x.
 const int VOLUME_SIZE = 64;
 
-// Sample every STEP_BASE fine cells (512/4 = 128 quads/axis -> 129x129 = 16641 verts
-// on the Menu). The step is doubled below as needed so the vertex count stays under
-// 65536 -- campaign maps are larger than the Menu's 512, and a 16-bit index buffer
-// can only address 65535 vertices (a 1024 map at step 4 would be 257x257 = 66049).
+// The step buildMesh starts from, in fine cells per grid vertex. It is halved or doubled
+// from here to fit VERTEX_BUDGET, so this is only where the search begins -- the finest
+// step is 1, one grid vertex per fine cell, which is what the heightfield actually holds.
 const int STEP_BASE = 4;
 
 // The baked surface-colour texture is capped on each side; larger maps are averaged
@@ -233,6 +232,21 @@ void SDLTileMapRenderer::createPipeline()
 	// the heightfield behind the mirrored eye would otherwise be clamped and rasterized,
 	// straddling w==0, into a full-screen smear; D3D9 silently clips them.
 	pci.rasterizer_state.enable_depth_clip = true;
+	// Push the drawn ground very slightly away from the camera, so geometry that lies flat
+	// ON it still wins the depth test. Two things do that and neither has clearance of its
+	// own worth speaking of: CircleManager's select ring (getAltWhole + 1, one world unit)
+	// and the flat plate at the base of a unit's model, the one that carries its legion
+	// colour and its emblem.
+	//
+	// The grid samples the heightfield every step_ fine cells and interpolates between, so
+	// the drawn surface departs from the true one in proportion to the local slope -- which
+	// is exactly what a SLOPE-scaled bias tracks, and why the constant term stays 0 (with a
+	// D32_FLOAT target its unit is implementation-defined and would not be predictable).
+	// It covers the residual; the vertex budget in buildMesh is what keeps that residual
+	// small in the first place.
+	pci.rasterizer_state.enable_depth_bias = true;
+	pci.rasterizer_state.depth_bias_slope_factor = 2.f;
+	pci.rasterizer_state.depth_bias_constant_factor = 0.f;
 	pci.depth_stencil_state.enable_depth_test = true;
 	pci.depth_stencil_state.enable_depth_write = true;
 	pci.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
@@ -427,6 +441,12 @@ void SDLTileMapRenderer::createLavaPipeline()
 	pci.depth_stencil_state.enable_depth_test = true;
 	pci.depth_stencil_state.enable_depth_write = true;
 	pci.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
+	// The same slope-scaled bias the plain terrain carries -- a lava run replaces the terrain
+	// pipeline over the same mesh, so without it a decal standing on lava would sink where
+	// one standing on soil does not. See the note in createPipeline.
+	pci.rasterizer_state.enable_depth_bias = true;
+	pci.rasterizer_state.depth_bias_slope_factor = 2.f;
+	pci.rasterizer_state.depth_bias_constant_factor = 0.f;
 	pci.target_info.color_target_descriptions = &colorTarget;
 	pci.target_info.num_color_targets = 1;
 	pci.target_info.has_depth_stencil_target = true;
@@ -501,6 +521,10 @@ void SDLTileMapRenderer::createIcePipeline()
 	pci.depth_stencil_state.enable_depth_test = true;
 	pci.depth_stencil_state.enable_depth_write = true;
 	pci.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS_OR_EQUAL;
+	// The same slope-scaled bias the plain terrain carries; see the note in createPipeline.
+	pci.rasterizer_state.enable_depth_bias = true;
+	pci.rasterizer_state.depth_bias_slope_factor = 2.f;
+	pci.rasterizer_state.depth_bias_constant_factor = 0.f;
 	pci.target_info.color_target_descriptions = &colorTarget;
 	pci.target_info.num_color_targets = 1;
 	pci.target_info.has_depth_stencil_target = true;
@@ -666,18 +690,18 @@ void SDLTileMapRenderer::computeVertex(Vertex& v, int gx, int gy) const
 // issues with that material's detail texture bound. Rebuilt whole when terramorphing
 // repaints a cell's material -- every triangle appears exactly once whatever its
 // bucket, so the buffer's size never changes.
-void SDLTileMapRenderer::buildIndexData(std::vector<unsigned short>& idx)
+void SDLTileMapRenderer::buildIndexData(std::vector<unsigned int>& idx)
 {
 	runs_.clear();
-	std::vector<std::vector<unsigned short> > buckets(cTileMap::multiRegionLayersNumber);
+	std::vector<std::vector<unsigned int> > buckets(cTileMap::multiRegionLayersNumber);
 	for(int gy = 0; gy < ny_; ++gy)
 		for(int gx = 0; gx < nx_; ++gx){
-			unsigned short a = (unsigned short)(gy * gw_ + gx), b = (unsigned short)(a + 1);
-			unsigned short c = (unsigned short)(a + gw_),       d = (unsigned short)(c + 1);
+			unsigned int a = (unsigned int)(gy * gw_ + gx), b = a + 1;
+			unsigned int c = (unsigned int)(a + gw_),       d = c + 1;
 			// a=(x0,y0) b=(x1,y0) c=(x0,y1) d=(x1,y1). Winding is irrelevant (cull NONE).
-			std::vector<unsigned short>& bk0 = buckets[quadMat_[2 * ((size_t)gy * nx_ + gx)]];
+			std::vector<unsigned int>& bk0 = buckets[quadMat_[2 * ((size_t)gy * nx_ + gx)]];
 			bk0.push_back(a); bk0.push_back(c); bk0.push_back(b);
-			std::vector<unsigned short>& bk1 = buckets[quadMat_[2 * ((size_t)gy * nx_ + gx) + 1]];
+			std::vector<unsigned int>& bk1 = buckets[quadMat_[2 * ((size_t)gy * nx_ + gx) + 1]];
 			bk1.push_back(b); bk1.push_back(c); bk1.push_back(d);
 		}
 
@@ -702,12 +726,33 @@ bool SDLTileMapRenderer::buildMesh(SDL_GPUCommandBuffer* cmd)
 	if(H <= 0 || V <= 0)
 		return false;   // heightfield not loaded yet -- caller retries next frame
 
-	// Pick the finest step whose grid fits in 16-bit indices.
+	// Pick the finest step whose grid fits the vertex budget.
+	//
+	// This used to be capped by the 16-bit index buffer (65536 vertices), which on a
+	// 2048x4096 campaign map forced step 16 -- one grid vertex per 16 world units. The drawn
+	// surface was then a linear interpolation across 16-unit spans while everything that
+	// hugs the ground is placed against the true per-cell heightfield: CircleManager's
+	// select ring at getAltWhole + 1, and the flat plate at the base of a unit's own model
+	// that carries its legion colour and emblem. Both lost the depth test to a terrain that
+	// bulged above them, so the decals showed on some units and not others, flickered as the
+	// camera moved, and looked like they sank into the ground.
+	//
+	// The index buffer is 32-bit now, so the budget is memory, not addressing. 600k vertices
+	// is 14 MB of Vertex plus a like amount of indices, and gives step 4 on the largest
+	// campaign map and step 1 on anything up to 512 -- close enough to the heightfield that
+	// the slope-scaled depth bias on the pipelines below covers what is left.
+	const int VERTEX_BUDGET = 600000;
 	int step = STEP_BASE;
-	while(((H / step) + 1) * ((V / step) + 1) >= 65536)
+	while(step > 1 && ((H / (step / 2)) + 1) * ((V / (step / 2)) + 1) <= VERTEX_BUDGET)
+		step /= 2;
+	while(((H / step) + 1) * ((V / step) + 1) > VERTEX_BUDGET)
 		step *= 2;
 
 	step_ = step;
+	// Worth a line beside the pipelines': the step is what decides how closely the drawn
+	// ground follows the heightfield, and so whether anything lying flat on it survives.
+	fprintf(stderr, "SDLTileMapRenderer: mesh %dx%d at step %d (%d verts) from a %dx%d heightfield\n",
+	        (H / step) + 1, (V / step) + 1, step, ((H / step) + 1) * ((V / step) + 1), H, V);
 	nx_ = H / step; ny_ = V / step;   // grid quads per axis
 	gw_ = nx_ + 1;  gh_ = ny_ + 1;    // vertices per axis
 	const int vcount = gw_ * gh_;
@@ -738,11 +783,11 @@ bool SDLTileMapRenderer::buildMesh(SDL_GPUCommandBuffer* cmd)
 			quadMat_[2 * ((size_t)gy * nx_ + gx) + 1] = (unsigned char)regionMaterialAt(region, (x1 + x0 + x1) / 3, (y0 + y1 + y1) / 3);
 		}
 
-	std::vector<unsigned short> idx;
+	std::vector<unsigned int> idx;
 	buildIndexData(idx);
 
 	const Uint32 vbytes = (Uint32)(verts_.size() * sizeof(Vertex));
-	const Uint32 ibytes = (Uint32)(idx.size() * sizeof(unsigned short));
+	const Uint32 ibytes = (Uint32)(idx.size() * sizeof(unsigned int));
 
 	SDL_GPUBufferCreateInfo vbi = {};
 	vbi.usage = SDL_GPU_BUFFERUSAGE_VERTEX; vbi.size = vbytes;
@@ -932,9 +977,9 @@ void SDLTileMapRenderer::applyMapUpdates(SDL_GPUCommandBuffer* cmd, cTileMap* ti
 		region.unlock();
 
 		if(materialChanged){
-			std::vector<unsigned short> idx;
+			std::vector<unsigned int> idx;
 			buildIndexData(idx);
-			const Uint32 ibytes = (Uint32)(idx.size() * sizeof(unsigned short));
+			const Uint32 ibytes = (Uint32)(idx.size() * sizeof(unsigned int));
 			SDL_GPUTransferBufferCreateInfo itbi = {};
 			itbi.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
 			itbi.size = ibytes;
@@ -1055,7 +1100,7 @@ bool SDLTileMapRenderer::DrawShadowPass(SDL_GPUCommandBuffer* cmd, SDL_GPUTextur
 	SDL_GPUBufferBinding vb = {}; vb.buffer = vertexBuffer_; vb.offset = 0;
 	SDL_BindGPUVertexBuffers(pass, 0, &vb, 1);
 	SDL_GPUBufferBinding ib = {}; ib.buffer = indexBuffer_; ib.offset = 0;
-	SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_16BIT);
+	SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_32BIT);
 
 	SDL_DrawGPUIndexedPrimitives(pass, indexCount_, 1, 0, 0, 0);
 	SDL_EndGPURenderPass(pass);
@@ -1204,7 +1249,7 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	SDL_GPUBufferBinding vb = {}; vb.buffer = vertexBuffer_; vb.offset = 0;
 	SDL_BindGPUVertexBuffers(pass, 0, &vb, 1);
 	SDL_GPUBufferBinding ib = {}; ib.buffer = indexBuffer_; ib.offset = 0;
-	SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_16BIT);
+	SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_32BIT);
 
 	SDL_GPUTextureSamplerBinding ts[5] = {};
 	ts[0].texture = (wireframe && whiteTexture_) ? whiteTexture_ : colorTexture_;

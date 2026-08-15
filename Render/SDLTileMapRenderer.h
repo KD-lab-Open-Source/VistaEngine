@@ -111,7 +111,7 @@ private:
 	// One grid vertex from vMap: world position + normal, as buildMesh samples them.
 	void computeVertex(Vertex& v, int gx, int gy) const;
 	// quadMat_ -> index buffer grouped into one contiguous run per material (fills runs_).
-	void buildIndexData(std::vector<unsigned short>& idx);
+	void buildIndexData(std::vector<unsigned int>& idx);
 	// Terramorphing: consume the ATTRTILE_UPDATE_* flags cTileMap::BuildRegionPoint raised
 	// for vMap's update rects, recompute the covered mesh rows and colour texels in the CPU
 	// mirrors and upload just those; rebuild the index runs if a cell's material repainted.
