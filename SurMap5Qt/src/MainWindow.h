@@ -40,6 +40,8 @@ public:
 
 public slots:
 	void about();
+	void openWorld();
+	void newWorld();
 
 protected:
 	void closeEvent(QCloseEvent* event) override;

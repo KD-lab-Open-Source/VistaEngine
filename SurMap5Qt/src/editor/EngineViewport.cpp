@@ -20,6 +20,14 @@ using namespace std;
 #include "Render/src/cCamera.h"      // Camera (SetFrustum, SetPosition)
 #include "Util/XMath/xmath.h"        // MatXf/Mat3f/Mat2f + X_AXIS/Y_AXIS/Z_AXIS
 
+// SDL_Init(SDL_INIT_VIDEO) normally happens in PlatformWindow::create; the Qt
+// editor never calls it (Qt owns the windows), so the GPU device would fail
+// with "Video subsystem not initialized". Initialize video here, once.
+// SDL_MAIN_HANDLED must precede any SDL header so SDL_main.h does not claim
+// main() (this is an executable with its own Qt main).
+#define SDL_MAIN_HANDLED
+#include <SDL3/SDL.h>
+
 namespace {
 // kMouseMove2Angle from CGeneralView::WindowProc — 0.25 deg per pixel.
 const float kMouseMove2Angle = 0.25f * 3.14159265f / 180.f;
@@ -49,6 +57,15 @@ bool EngineViewport::init(int width, int height)
 		return true;
 	if(!nativeWindow_)
 		return false;
+
+	// SDL_INIT_VIDEO is normally PlatformWindow::create's job; the Qt editor
+	// has no SDL window, so initialize the subsystem the GPU device needs.
+	if(!SDL_WasInit(SDL_INIT_VIDEO)){
+		if(!SDL_Init(SDL_INIT_VIDEO)){
+			fprintf(stderr, "EngineViewport: SDL_Init(VIDEO) failed: %s\n", SDL_GetError());
+			return false;
+		}
+	}
 
 	// The engine's one entry point into the renderer (Render/RenderStub.cpp):
 	// builds gb_VisGeneric + the SDL GPU device.

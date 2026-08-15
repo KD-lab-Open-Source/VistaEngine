@@ -15,6 +15,9 @@
 #include <QToolBar>
 
 #include "RenderViewWidget.h"
+#include "EditorApplication.h"
+#include "dialogs/SelectWorldDialog.h"
+#include "dialogs/WorldNameDialog.h"
 
 // Number of status-bar panes: 8 info + 2 separators — NUMBERS_PARTS_STATUSBAR
 // in GeneralView.h (8 + 2).
@@ -59,6 +62,8 @@ void MainWindow::createActions()
 	// the about dialog (CAboutDlg) is a plain QMessageBox.
 	connect(actExit_, &QAction::triggered, this, &QWidget::close);
 	connect(actAbout_, &QAction::triggered, this, &MainWindow::about);
+	connect(actNewWorld_, &QAction::triggered, this, &MainWindow::newWorld);
+	connect(actOpenWorld_, &QAction::triggered, this, &MainWindow::openWorld);
 	connect(actToggleAnimation_, &QAction::triggered, this, [this](bool checked) {
 		// CSurMap5App::OnViewAnimation toggled flag_animation; the loop timer
 		// keeps running but stops repainting the view.
@@ -161,6 +166,27 @@ void MainWindow::about()
 	QMessageBox::about(this, tr("About VistaEngine SurMap5"),
 	                   tr("VistaEngine map editor (Perimeter 2).\n"
 	                      "Qt port — shell milestone."));
+}
+
+void MainWindow::openWorld()
+{
+	// CMainFrame's world-open path: CDlgSelectWorld over vMap.getWorldsDir().
+	// The chosen world's loading (reInitWorld) lands in Phase 3b.
+	const QString worldsDir = qobject_cast<EditorApplication*>(qApp)->worldsDir();
+	SelectWorldDialog dlg(worldsDir, tr("Select world to open"), /*enableCreateDir=*/false, this);
+	if(dlg.exec() == QDialog::Accepted)
+		statusBar()->showMessage(tr("World selected: %1 (loading in Phase 3b)").arg(dlg.selectedWorld()));
+}
+
+void MainWindow::newWorld()
+{
+	// CMainFrame's new-world path: DlgWorldName to name it, then the world is
+	// created and loaded (Phase 3b). For now the dialog confirms the name.
+	const QString worldsDir = qobject_cast<EditorApplication*>(qApp)->worldsDir();
+	SelectWorldDialog dlg(worldsDir, tr("New world"), /*enableCreateDir=*/true, this);
+	dlg.setWindowTitle(tr("New world"));
+	if(dlg.exec() == QDialog::Accepted)
+		statusBar()->showMessage(tr("New world: %1 (creation in Phase 3b)").arg(dlg.selectedWorld()));
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)

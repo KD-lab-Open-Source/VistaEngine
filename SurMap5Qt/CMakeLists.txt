@@ -31,10 +31,13 @@ find_package(Qt6 6.4 REQUIRED COMPONENTS Widgets)
 set(CMAKE_AUTOMOC ON)
 
 # The engine-touching half of the editor: device init, the render window
-# wrapper, the per-frame draw. Compiled with the engine's flags and includes.
+# wrapper, the per-frame draw, the world-list scan. Compiled with the engine's
+# flags and includes.
 add_library(EditorEngine STATIC
     src/editor/EngineViewport.h
     src/editor/EngineViewport.cpp
+    src/editor/WorldList.h
+    src/editor/WorldList.cpp
 )
 # EngineIncludes brings the engine's include roots and (on Windows)
 # _HAS_STD_BYTE=0 + /FIwindows.h — exactly what engine headers expect.
@@ -94,6 +97,14 @@ add_executable(SurMap5Qt
     src/MainWindow.cpp
     src/RenderViewWidget.h
     src/RenderViewWidget.cpp
+    src/dialogs/WorldNameDialog.h
+    src/dialogs/WorldNameDialog.cpp
+    src/dialogs/EnterNameDialog.h
+    src/dialogs/EnterNameDialog.cpp
+    src/dialogs/ProgressDialog.h
+    src/dialogs/ProgressDialog.cpp
+    src/dialogs/SelectWorldDialog.h
+    src/dialogs/SelectWorldDialog.cpp
 )
 
 # SurMap5Qt links EditorEngine (which carries the engine modules); Qt code
@@ -106,8 +117,10 @@ target_link_libraries(SurMap5Qt PRIVATE
     SDL3::SDL3   # Platform/Window.cpp needs SDL3 headers; a clean import target
 )
 
-# Just the include root for Platform/Window.h (a path, not an engine flag).
+# Include roots for the editor's own sources: src/ for the dialogs' includes
+# of "dialogs/..." and "editor/WorldList.h" (a path, not an engine flag).
 target_include_directories(SurMap5Qt PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}
 )
 

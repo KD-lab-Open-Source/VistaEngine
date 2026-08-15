@@ -29,6 +29,12 @@ public:
 	// MainWindow::universeQuant.
 	QTimer& loopTimer() { return loopTimer_; }
 
+	// The directory holding the world files (.spg). Phase 3b will source it
+	// from vMap.getWorldsDir(); for now it is the editor's working directory.
+	QString worldsDir() const { return worldsDir_; }
+	void setWorldsDir(const QString& dir) { worldsDir_ = dir; }
+
 private:
 	QTimer loopTimer_;
+	QString worldsDir_ = QStringLiteral("Worlds");
 };
