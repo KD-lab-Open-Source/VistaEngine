@@ -39,11 +39,48 @@ add_library(EditorEngine STATIC
 # EngineIncludes brings the engine's include roots and (on Windows)
 # _HAS_STD_BYTE=0 + /FIwindows.h — exactly what engine headers expect.
 # PRIVATE: SurMap5Qt must not inherit any of it (Qt needs std::byte).
+# The include roots are duplicated below (PRIVATE) because EngineIncludes is
+# PRIVATE here — its include directories would otherwise not reach this
+# library's own .cpp files.
 target_link_libraries(EditorEngine PRIVATE EngineIncludes)
+target_include_directories(EditorEngine PRIVATE
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/Util
+    ${CMAKE_SOURCE_DIR}/Util/XMath
+    ${CMAKE_SOURCE_DIR}/Util/XTL
+    ${CMAKE_SOURCE_DIR}/Render/inc
+    ${CMAKE_SOURCE_DIR}/Render/src
+    ${CMAKE_SOURCE_DIR}/Render/3dx
+    ${CMAKE_SOURCE_DIR}/Render/D3D
+    ${CMAKE_SOURCE_DIR}/XLibs.Net/XUtil
+    ${CMAKE_SOURCE_DIR}/XLibs.Net/XUtil/CRC
+    ${CMAKE_SOURCE_DIR}/XLibs.Net/XUtil/Unicode
+    ${CMAKE_SOURCE_DIR}/XLibs.Net/XZip
+    ${CMAKE_SOURCE_DIR}/XLibs.Net/Profiler/Profiler
+    ${CMAKE_SOURCE_DIR}/Units
+    ${CMAKE_SOURCE_DIR}/Environment
+    ${CMAKE_SOURCE_DIR}/Physics
+    ${CMAKE_SOURCE_DIR}/Terra
+    ${CMAKE_SOURCE_DIR}/Game
+    ${CMAKE_SOURCE_DIR}/UserInterface
+    ${CMAKE_SOURCE_DIR}/Network
+    ${CMAKE_SOURCE_DIR}/Sound
+)
+# The full engine module set, the same order Game/CMakeLists.txt uses (MSVC
+# static-library order: a library's dependencies come after it). Phase 3 pulls
+# in the game-level modules (Game for CameraManager/Universe/RenderObjects,
+# Environment, Water, UserInterface) for the scene graph and camera.
 target_link_libraries(EditorEngine PRIVATE
-    # MSVC static-library order: dependencies after the library that needs them.
     Util
+    AI
     Terra
+    Physics
+    Sound
+    Network
+    Units
+    Environment
+    Water
+    UserInterface
     VistaRender
     Render
     SDL3::SDL3
