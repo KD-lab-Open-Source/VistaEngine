@@ -19,6 +19,11 @@ public:
 	EditorApplication();
 	~EditorApplication() override;
 
+	// The one editor object, set by main.cpp. MainWindow reaches the editor's
+	// state through it (qApp is the QApplication, a different object, so
+	// qobject_cast<EditorApplication*>(qApp) would be null).
+	static EditorApplication* instance() { return s_instance; }
+
 	// Editor-wide initialization. Returns false if the editor cannot run
 	// (the engine's ZipConfig::initArchives is expected to be called from
 	// here once Phase 2 links the engine in).
@@ -37,4 +42,5 @@ public:
 private:
 	QTimer loopTimer_;
 	QString worldsDir_ = QStringLiteral("Worlds");
+	static EditorApplication* s_instance;
 };

@@ -18,7 +18,9 @@ using namespace std;
 #include "Render/src/VisGeneric.h"   // gb_VisGeneric, CreateScene
 #include "Render/src/Scene.h"        // cScene (CreateCamera, Draw)
 #include "Render/src/cCamera.h"      // Camera (SetFrustum, SetPosition)
+#include "Render/src/TileMap.h"      // cTileMap (the terrain's tile map)
 #include "Util/XMath/xmath.h"        // MatXf/Mat3f/Mat2f + X_AXIS/Y_AXIS/Z_AXIS
+#include "Terra/VMAP.H"              // vMap (load/create, H_SIZE/V_SIZE)
 
 // SDL_Init(SDL_INIT_VIDEO) normally happens in PlatformWindow::create; the Qt
 // editor never calls it (Qt owns the windows), so the GPU device would fail
@@ -105,6 +107,7 @@ void EngineViewport::done()
 {
 	if(!inited_)
 		return;
+	doneWorld();
 	if(gb_RenderDevice){
 		gb_RenderDevice->selectRenderWindow(0);
 		if(renderWindow_)
@@ -117,6 +120,134 @@ void EngineViewport::done()
 	camera_ = nullptr;
 	renderWindow_ = nullptr;
 	inited_ = false;
+}
+
+bool EngineViewport::loadWorld(const char* worldsDir, const char* worldName)
+{
+	if(!inited_ || !scene_)
+		return false;
+
+	doneWorld();
+
+	// CMainFrame::OnFileOpen: vMap.load(world, true) + reInitWorld (minus the
+	// Universe, which is the Game exe's). vMap::load reads world.cls from
+	// <worldsDir>\<worldName>\ and builds the terrain buffers.
+	vMap.setWorldsDir(worldsDir);
+	if(!vMap.load(worldName, /*flag_useTryColorBuffer=*/true))
+		return false;
+
+	// Universe's ctor created the terrain tile map: terScene->CreateMap().
+	// cScene::CreateMap uses vMap.H_SIZE/V_SIZE and registers with vMap; the
+	// map becomes the scene's tile map and draws with cScene::Draw.
+	scene_->CreateMap(true);
+
+	// reInitWorld's camera reset: centre the orbit on the map, then let the
+	// camera keep its height (createScene used the map centre too).
+	orbit_.px = vMap.H_SIZE * 0.5f;
+	orbit_.py = vMap.V_SIZE * 0.5f;
+	orbit_.pz = 128.0f;
+	orbit_.distance = 512.f;
+	orbit_.psi = 0.f;
+	orbit_.theta = 0.f;
+	applyCamera();
+
+	worldLoaded_ = true;
+	return true;
+}
+
+void EngineViewport::doneWorld()
+{
+	if(!worldLoaded_)
+		return;
+
+	// doneScene's tile map release: cScene::~cScene releases tileMap_, and
+	// cTileMap unregisters from vMap. Drop the whole scene and rebuild it —
+	// the camera is owned by the scene, so it comes back too.
+	if(scene_)
+		RELEASE(scene_);
+	scene_ = gb_VisGeneric->CreateScene();
+	camera_ = scene_ ? scene_->CreateCamera() : nullptr;
+
+	vMap.releaseWorld();
+	worldLoaded_ = false;
+	applyCamera();
+}
+
+bool EngineViewport::createWorld(const char* worldsDir, const char* worldName)
+{
+	if(!inited_ || !scene_)
+		return false;
+
+	doneWorld();
+
+	// CMainFrame::OnFileNew: vMap.create(name) makes a default-size world (the
+	// original let the user pick size/relief via WorldCreationParam; the
+	// default vrtMapCreationParam is 256x256 flat — vMap::create uses it).
+	vMap.setWorldsDir(worldsDir);
+	vMap.create(worldName);
+	if(!vMap.isWorldLoaded())
+		return false;
+
+	// vMap.create builds the world in memory only; persist it so Open World
+	// (vMap.load) finds it on the next run. vMap.save creates the world's
+	// directory but not the worlds dir itself — CreateDirectory is not
+	// recursive, so make both first (CMainFrame's OnFileNew did the same via
+	// CreateDirectory before the world existed).
+	::CreateDirectory(worldsDir, 0);
+	std::string worldDir = worldsDir;
+	worldDir += "\\";
+	worldDir += worldName;
+	::CreateDirectory(worldDir.c_str(), 0);
+
+	vMap.save(worldName);
+
+	// Same terrain setup as loadWorld.
+	scene_->CreateMap(true);
+
+	orbit_.px = vMap.H_SIZE * 0.5f;
+	orbit_.py = vMap.V_SIZE * 0.5f;
+	orbit_.pz = 128.0f;
+	orbit_.distance = 512.f;
+	orbit_.psi = 0.f;
+	orbit_.theta = 0.f;
+	applyCamera();
+
+	worldLoaded_ = true;
+	return true;
+}
+
+// drawGrid — CGeneralView::drawGrid (GeneralView.cpp): the editor grid over
+// the terrain, vMap-sized, at the ground level.
+void EngineViewport::drawGrid()
+{
+	if(!worldLoaded_)
+		return;
+	if(!gb_RenderDevice || !camera_)
+		return;
+
+	const int gridStep = 64;
+	const int segmentLength = 16;
+	// The editor's grid colour (surMapOptions.gridColor_ default).
+	const Color4c color(96, 96, 96, 255);
+
+	// drawLineTerrain drew a segmented line following the terrain height.
+	// Simplified: a line strip at the terrain height read from vMap.
+	// (TODO(sdl-port): full terrain-following grid once the editor options
+	// land; this is the flat-map approximation that keeps Phase 3b simple.)
+	for(int x = 0; x <= (int)vMap.H_SIZE; x += gridStep){
+		for(int y = 0; y < (int)vMap.V_SIZE; y += segmentLength){
+			const Vect3f a(x, y, vMap.getZf(x, y));
+			const Vect3f b(x, y + segmentLength, vMap.getZf(x, y + segmentLength));
+			gb_RenderDevice->DrawLine(a, b, color);
+		}
+	}
+	for(int y = 0; y <= (int)vMap.V_SIZE; y += gridStep){
+		for(int x = 0; x < (int)vMap.H_SIZE; x += segmentLength){
+			const Vect3f a(x, y, vMap.getZf(x, y));
+			const Vect3f b(x + segmentLength, y, vMap.getZf(x + segmentLength, y));
+			gb_RenderDevice->DrawLine(a, b, color);
+		}
+	}
 }
 
 void EngineViewport::resize()
@@ -144,9 +275,9 @@ void EngineViewport::drawFrame()
 	gb_RenderDevice->Fill(32, 48, 64, 255);
 	gb_RenderDevice->BeginScene();
 
-	// The camera renders whatever the scene holds. With no world, the scene is
-	// empty — the clear is all the frame shows until Phase 3b loads terrain.
-	if(camera_){
+	// The camera renders whatever the scene holds: the terrain tile map when a
+	// world is loaded, nothing otherwise.
+	{
 		const Vect2f center(0.5f, 0.5f);
 		const sRectangle4f clip(-0.5f, -0.5f, 0.5f, 0.5f);
 		const Vect2f focus(orbit_.focus, orbit_.focus);
@@ -155,6 +286,9 @@ void EngineViewport::drawFrame()
 		camera_->PreDrawScene();
 		camera_->DrawScene();
 	}
+
+	// CGeneralView::graphQuant drew the grid after terScene->Draw().
+	drawGrid();
 
 	gb_RenderDevice->EndScene();
 	gb_RenderDevice->Flush();

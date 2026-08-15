@@ -7,6 +7,7 @@
 // becomes a QTimer tick connected to MainWindow::universeQuant.
 
 #include <QApplication>
+#include <QTimer>
 
 #include "EditorApplication.h"
 #include "MainWindow.h"
@@ -29,6 +30,31 @@ int main(int argc, char** argv)
 	// way CSurMap5App::OnIdle used to).
 	QObject::connect(&editor.loopTimer(), &QTimer::timeout,
 	                 &window, &MainWindow::universeQuant);
+
+	// Selftest hook (temporary, for Phase 3b verification): --selftest <name>
+	// (or --selftest=<name>) auto-creates the named world once the window is
+	// up, so the world-load path can be exercised without clicking through
+	// the dialog.
+	const QStringList args = app.arguments();
+	QString selftestWorld;
+	for(const QString& arg : args){
+		if(arg.startsWith(QStringLiteral("--selftest"))){
+			const int eq = arg.indexOf(QLatin1Char('='));
+			if(eq != -1)
+				selftestWorld = arg.mid(eq + 1);
+		}
+	}
+	if(selftestWorld.isEmpty()){
+		const int selftestIdx = args.indexOf(QStringLiteral("--selftest"));
+		if(selftestIdx != -1 && selftestIdx + 1 < args.size())
+			selftestWorld = args.at(selftestIdx + 1);
+	}
+	if(!selftestWorld.isEmpty()){
+		const QString worldName = selftestWorld;
+		QTimer::singleShot(1000, &window, [&window, worldName]{
+			window.selftestCreateWorld(worldName);
+		});
+	}
 
 	return app.exec();
 }

@@ -2,8 +2,15 @@
 
 #include "EditorApplication.h"
 
+#include <QDir>
+
+EditorApplication* EditorApplication::s_instance = nullptr;
+
 EditorApplication::EditorApplication()
 {
+	// The one editor object (main.cpp constructs it before the window).
+	s_instance = this;
+
 	// ~60 Hz, mirroring the repaint-driven loop of CSurMap5App::OnIdle.
 	loopTimer_.setInterval(16);
 	loopTimer_.start();
@@ -24,5 +31,10 @@ bool EditorApplication::initialize()
 	//   TranslationManager::instance().setDefaultLanguage("english");
 	//   TranslationManager::instance().setLanguage(GameOptions::instance().getLanguage());
 	//   EffectContainer::setTexturesPath("Resource\\FX\\Textures");
+
+	// The worlds directory must be absolute: vMap::load builds
+	// <worldsDir>\<world>\world.cls relative to the working directory, and the
+	// editor's working directory is wherever the exe was launched from.
+	worldsDir_ = QDir::current().absoluteFilePath(worldsDir_);
 	return true;
 }

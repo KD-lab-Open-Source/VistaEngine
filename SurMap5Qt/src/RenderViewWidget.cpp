@@ -82,6 +82,21 @@ RenderViewWidget::~RenderViewWidget()
 	delete viewport_;
 }
 
+bool RenderViewWidget::loadWorld(const QString& worldsDir, const QString& worldName)
+{
+	return viewport_->loadWorld(worldsDir.toStdString().c_str(), worldName.toStdString().c_str());
+}
+
+bool RenderViewWidget::createWorld(const QString& worldsDir, const QString& worldName)
+{
+	return viewport_->createWorld(worldsDir.toStdString().c_str(), worldName.toStdString().c_str());
+}
+
+bool RenderViewWidget::worldLoaded() const
+{
+	return viewport_->worldLoaded();
+}
+
 bool RenderViewWidget::initRenderDevice()
 {
 	if(viewport_->inited())
@@ -141,7 +156,7 @@ void RenderViewWidget::wheelEvent(QWheelEvent* event)
 
 void RenderViewWidget::mousePressEvent(QMouseEvent* event)
 {
-	const ToolVec2 pos{ event->position().x(), event->position().y() };
+	const ToolVec2 pos{ (int)event->position().x(), (int)event->position().y() };
 	const ToolVec3 world{ 0, 0, 0 };   // Phase 3b: CoordScr2vMap result
 	// The current tool sees the press first (CGeneralView: tool's onLMBDown
 	// decides whether the camera may pan/drag); unhandled -> the viewport.
@@ -156,7 +171,7 @@ void RenderViewWidget::mousePressEvent(QMouseEvent* event)
 
 void RenderViewWidget::mouseReleaseEvent(QMouseEvent* event)
 {
-	const ToolVec2 pos{ event->position().x(), event->position().y() };
+	const ToolVec2 pos{ (int)event->position().x(), (int)event->position().y() };
 	const ToolVec3 world{ 0, 0, 0 };
 	const bool handled =
 		(event->button() == Qt::LeftButton)  ? tools_->onLMBUp(world, pos) :
@@ -168,7 +183,7 @@ void RenderViewWidget::mouseReleaseEvent(QMouseEvent* event)
 
 void RenderViewWidget::mouseMoveEvent(QMouseEvent* event)
 {
-	const ToolVec2 pos{ event->position().x(), event->position().y() };
+	const ToolVec2 pos{ (int)event->position().x(), (int)event->position().y() };
 	const ToolVec3 world{ 0, 0, 0 };   // Phase 3b: screenPointToGround
 	tools_->onTrackingMouse(world, pos);
 	if(viewport_->inited())

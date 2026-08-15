@@ -2,6 +2,8 @@
 
 #include "MainWindow.h"
 
+#include <cstdio>
+
 #include <QAction>
 #include <QActionGroup>
 #include <QApplication>
@@ -208,23 +210,47 @@ void MainWindow::about()
 
 void MainWindow::openWorld()
 {
-	// CMainFrame's world-open path: CDlgSelectWorld over vMap.getWorldsDir().
-	// The chosen world's loading (reInitWorld) lands in Phase 3b.
-	const QString worldsDir = qobject_cast<EditorApplication*>(qApp)->worldsDir();
+	// CMainFrame's world-open path: CDlgSelectWorld over vMap.getWorldsDir(),
+	// then vMap.load + reInitWorld.
+	const QString worldsDir = EditorApplication::instance()->worldsDir();
 	SelectWorldDialog dlg(worldsDir, tr("Select world to open"), /*enableCreateDir=*/false, this);
-	if(dlg.exec() == QDialog::Accepted)
-		statusBar()->showMessage(tr("World selected: %1 (loading in Phase 3b)").arg(dlg.selectedWorld()));
+	if(dlg.exec() != QDialog::Accepted)
+		return;
+
+	const QString worldName = dlg.selectedWorld();
+	statusBar()->showMessage(tr("Loading world: %1...").arg(worldName));
+	QApplication::processEvents();
+
+	// Phase 3b: vMap.load + terrain tile map (EngineViewport::loadWorld).
+	if(view_->loadWorld(worldsDir, worldName))
+		statusBar()->showMessage(tr("World loaded: %1").arg(worldName));
+	else
+		statusBar()->showMessage(tr("Failed to load world: %1").arg(worldName));
 }
 
 void MainWindow::newWorld()
 {
 	// CMainFrame's new-world path: DlgWorldName to name it, then the world is
-	// created and loaded (Phase 3b). For now the dialog confirms the name.
-	const QString worldsDir = qobject_cast<EditorApplication*>(qApp)->worldsDir();
+	// created and loaded. vMap.create needs a creation dialog (WorldCreationParam
+	// in the original); for now create a default world (128x128, flat).
+	const QString worldsDir = EditorApplication::instance()->worldsDir();
 	SelectWorldDialog dlg(worldsDir, tr("New world"), /*enableCreateDir=*/true, this);
 	dlg.setWindowTitle(tr("New world"));
-	if(dlg.exec() == QDialog::Accepted)
-		statusBar()->showMessage(tr("New world: %1 (creation in Phase 3b)").arg(dlg.selectedWorld()));
+	if(dlg.exec() != QDialog::Accepted)
+		return;
+
+	const QString worldName = dlg.selectedWorld();
+	if(worldName.isEmpty())
+		return;
+
+	statusBar()->showMessage(tr("Creating world: %1...").arg(worldName));
+	QApplication::processEvents();
+
+	// vMap.create makes a default world; then load it (Phase 3b).
+	if(view_->createWorld(worldsDir, worldName))
+		statusBar()->showMessage(tr("World created: %1").arg(worldName));
+	else
+		statusBar()->showMessage(tr("Failed to create world: %1").arg(worldName));
 }
 
 void MainWindow::selectTool(int index)
@@ -233,6 +259,40 @@ void MainWindow::selectTool(int index)
 	view_->tools()->setCurrentTool(index);
 	statusBar()->showMessage(tr("Tool: %1").arg(view_->tools()->currentTool()->name()));
 	view_->setFocus();
+}
+
+void MainWindow::selftestCreateWorld(const QString& worldName)
+{
+	// Temporary: the --selftest hook in main.cpp. Tries Open World first
+	// (vMap.load); if the world does not exist, creates it (vMap.create+save).
+	// The status bar reports the outcome.
+	const QString worldsDir = EditorApplication::instance()->worldsDir();
+	statusBar()->showMessage(tr("Selftest: world %1...").arg(worldName));
+	QApplication::processEvents();
+
+	fprintf(stderr, "[selftest] trying load world=%s dir=%s\n",
+	        worldName.toStdString().c_str(), worldsDir.toStdString().c_str());
+	fflush(stderr);
+
+	if(view_->loadWorld(worldsDir, worldName)){
+		statusBar()->showMessage(tr("Selftest OK: world %1 loaded").arg(worldName));
+		fprintf(stderr, "[selftest] LOAD OK\n");
+		fflush(stderr);
+		return;
+	}
+
+	fprintf(stderr, "[selftest] load failed, creating\n");
+	fflush(stderr);
+	if(view_->createWorld(worldsDir, worldName)){
+		statusBar()->showMessage(tr("Selftest OK: world %1 created and loaded").arg(worldName));
+		fprintf(stderr, "[selftest] CREATE OK\n");
+		fflush(stderr);
+	}
+	else{
+		statusBar()->showMessage(tr("Selftest FAILED: world %1").arg(worldName));
+		fprintf(stderr, "[selftest] CREATE FAILED\n");
+		fflush(stderr);
+	}
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)

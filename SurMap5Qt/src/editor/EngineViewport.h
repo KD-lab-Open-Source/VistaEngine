@@ -41,6 +41,18 @@ public:
 	// The render window's size changed (Qt resize event).
 	void resize();
 
+	// --- World (Phase 3b) ---
+
+	// Load a world by name from the given worlds directory (CMainFrame's
+	// OnFileOpen: vMap.load + reInitWorld, minus Universe). Returns false if
+	// the world data could not be loaded.
+	bool loadWorld(const char* worldsDir, const char* worldName);
+	// Create a default world by name (CMainFrame's OnFileNew: vMap.create).
+	bool createWorld(const char* worldsDir, const char* worldName);
+	// Release the loaded world (doneScene's tile map release).
+	void doneWorld();
+	bool worldLoaded() const { return worldLoaded_; }
+
 	// Per-frame update: advance the camera from the held input state.
 	// dt is seconds. Called from the editor's ~60 Hz loop.
 	void tick(float dt);
@@ -71,6 +83,9 @@ private:
 	};
 	void applyCamera();
 
+	// CGeneralView::drawGrid — the editor's terrain grid.
+	void drawGrid();
+
 	void*                nativeWindow_ = nullptr;
 	cInterfaceRenderDevice* renderDevice_ = nullptr;
 	cRenderWindow*       renderWindow_ = nullptr;
@@ -78,6 +93,7 @@ private:
 	Camera*              camera_ = nullptr;
 	Orbit                orbit_;
 	bool                 inited_ = false;
+	bool                 worldLoaded_ = false;
 
 	// Mouse capture state (port of CGeneralView::WindowProc's statics).
 	bool   mouseMiddle_ = false;

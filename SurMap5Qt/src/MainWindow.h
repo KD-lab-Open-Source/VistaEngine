@@ -44,6 +44,9 @@ public slots:
 	void newWorld();
 	// Switch the active editor tool (0=Select, 1=Move, 2=Rotate, 3=Scale).
 	void selectTool(int index);
+	// Temporary selftest hook (Phase 3b verification): create + load a world
+	// by name without the dialog. Removed when the world dialog lands.
+	void selftestCreateWorld(const QString& worldName);
 
 protected:
 	void closeEvent(QCloseEvent* event) override;

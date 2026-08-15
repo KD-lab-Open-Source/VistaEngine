@@ -53,6 +53,18 @@ public:
 	// The tool manager (MainWindow's tool toolbar switches into it).
 	ToolManager* tools() { return tools_; }
 
+	// The engine-side viewport (world load, camera). EngineViewport is a
+	// forward declaration here — Qt code must not see engine headers; the
+	// world-load wrappers below keep MainWindow engine-free.
+	EngineViewport* viewport() { return viewport_; }
+
+	// World load/create wrappers (Phase 3b): forward to the engine viewport.
+	// MainWindow calls these instead of EngineViewport methods directly, so it
+	// never needs the engine headers.
+	bool loadWorld(const QString& worldsDir, const QString& worldName);
+	bool createWorld(const QString& worldsDir, const QString& worldName);
+	bool worldLoaded() const;
+
 public slots:
 	// Called ~60 Hz from MainWindow::universeQuant (MFC OnIdle equivalent).
 	void tick();
