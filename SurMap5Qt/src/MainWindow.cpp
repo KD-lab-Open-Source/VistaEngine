@@ -14,7 +14,9 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QProgressBar>
+#include <QSettings>
 #include <QStatusBar>
+#include <QTimer>
 #include <QToolBar>
 
 #include "RenderViewWidget.h"
@@ -40,6 +42,39 @@ MainWindow::MainWindow(QWidget* parent)
 	createToolBars();   // QToolBars (CExtToolControlBar set)
 	createDockPanels(); // QDockWidgets (CExtControlBar set)
 	createStatusBar();  // QStatusBar with progress pane (CExtStatusControlBar)
+
+	// Phase 7: restore the dock/toolbar layout the last run saved (CExtControlBar::
+	// ProfileBarStateSerialize on exit -> surMapOptions.dlgBarState). Qt keeps the
+	// equivalent state in QSettings; restoreState must come after every dock and
+	// toolbar exists (objectNames are the keys).
+	QSettings settings;
+	restoreState(settings.value("mainWindow/state").toByteArray());
+	restoreGeometry(settings.value("mainWindow/geometry").toByteArray());
+
+	// Auto-reopen the last world (surMapOptions remembered the last open world
+	// in the original too). Deferred a tick so the render device is ready (the
+	// viewport inits on its first paint).
+	const QString lastWorld = settings.value("mainWindow/lastWorld").toString();
+	if(!lastWorld.isEmpty()){
+		// The render device inits on the viewport's first paint; retry until
+		// ready (world load needs the device). The window is already up by the
+		// time this lambda runs (deferred with 0 ms from the ctor).
+		QTimer::singleShot(0, this, [this, lastWorld]() -> void {
+			auto retry = [this, lastWorld]{
+				if(view_->loadWorld(EditorApplication::instance()->worldsDir(), lastWorld)){
+					statusBar()->showMessage(tr("World restored: %1").arg(lastWorld));
+					fprintf(stderr, "[restore] world %s loaded\n", lastWorld.toStdString().c_str());
+				}
+				else
+					fprintf(stderr, "[restore] world %s FAILED\n", lastWorld.toStdString().c_str());
+				fflush(stderr);
+			};
+			if(view_->isReady())
+				retry();
+			else
+				QTimer::singleShot(50, this, retry);
+		});
+	}
 }
 
 void MainWindow::createView()
@@ -232,8 +267,10 @@ void MainWindow::openWorld()
 	QApplication::processEvents();
 
 	// Phase 3b: vMap.load + terrain tile map (EngineViewport::loadWorld).
-	if(view_->loadWorld(worldsDir, worldName))
+	if(view_->loadWorld(worldsDir, worldName)){
+		QSettings().setValue("mainWindow/lastWorld", worldName);
 		statusBar()->showMessage(tr("World loaded: %1").arg(worldName));
+	}
 	else
 		statusBar()->showMessage(tr("Failed to load world: %1").arg(worldName));
 }
@@ -257,8 +294,10 @@ void MainWindow::newWorld()
 	QApplication::processEvents();
 
 	// vMap.create makes a default world; then load it (Phase 3b).
-	if(view_->createWorld(worldsDir, worldName))
+	if(view_->createWorld(worldsDir, worldName)){
+		QSettings().setValue("mainWindow/lastWorld", worldName);
 		statusBar()->showMessage(tr("World created: %1").arg(worldName));
+	}
 	else
 		statusBar()->showMessage(tr("Failed to create world: %1").arg(worldName));
 }
@@ -288,6 +327,7 @@ void MainWindow::selftestCreateWorld(const QString& worldName)
 
 	if(view_->loadWorld(worldsDir, worldName)){
 		statusBar()->showMessage(tr("Selftest OK: world %1 loaded").arg(worldName));
+		QSettings().setValue("mainWindow/lastWorld", worldName);
 		fprintf(stderr, "[selftest] LOAD OK\n");
 		fflush(stderr);
 		return;
@@ -297,6 +337,7 @@ void MainWindow::selftestCreateWorld(const QString& worldName)
 	fflush(stderr);
 	if(view_->createWorld(worldsDir, worldName)){
 		statusBar()->showMessage(tr("Selftest OK: world %1 created and loaded").arg(worldName));
+		QSettings().setValue("mainWindow/lastWorld", worldName);
 		fprintf(stderr, "[selftest] CREATE OK\n");
 		fflush(stderr);
 	}
@@ -309,8 +350,11 @@ void MainWindow::selftestCreateWorld(const QString& worldName)
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-	// TODO(Phase 7): save dock/toolbar state here:
-	//   QSettings().setValue("mainWindow/state", saveState());
-	// (replaces saveDlgBarState()).
+	// Phase 7: persist the dock/toolbar layout (saveDlgBarState: CExtControlBar::
+	// ProfileBarStateSerialize -> surMapOptions.dlgBarState). Qt's equivalent is
+	// QMainWindow::saveState(), restored in the ctor via QSettings.
+	QSettings settings;
+	settings.setValue("mainWindow/state", saveState());
+	settings.setValue("mainWindow/geometry", saveGeometry());
 	QMainWindow::closeEvent(event);
 }

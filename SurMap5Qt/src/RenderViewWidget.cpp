@@ -97,6 +97,11 @@ bool RenderViewWidget::worldLoaded() const
 	return viewport_->worldLoaded();
 }
 
+bool RenderViewWidget::isReady() const
+{
+	return viewport_->inited();
+}
+
 bool RenderViewWidget::initRenderDevice()
 {
 	if(viewport_->inited())

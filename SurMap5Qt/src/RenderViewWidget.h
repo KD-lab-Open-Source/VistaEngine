@@ -64,6 +64,8 @@ public:
 	bool loadWorld(const QString& worldsDir, const QString& worldName);
 	bool createWorld(const QString& worldsDir, const QString& worldName);
 	bool worldLoaded() const;
+	// True once the render device exists (first paint happened).
+	bool isReady() const;
 
 public slots:
 	// Called ~60 Hz from MainWindow::universeQuant (MFC OnIdle equivalent).
