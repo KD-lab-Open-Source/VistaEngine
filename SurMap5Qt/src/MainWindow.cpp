@@ -3,6 +3,7 @@
 #include "MainWindow.h"
 
 #include <QAction>
+#include <QActionGroup>
 #include <QApplication>
 #include <QCloseEvent>
 #include <QDebug>
@@ -18,6 +19,7 @@
 #include "EditorApplication.h"
 #include "dialogs/SelectWorldDialog.h"
 #include "dialogs/WorldNameDialog.h"
+#include "tools/ToolManager.h"
 
 // Number of status-bar panes: 8 info + 2 separators — NUMBERS_PARTS_STATUSBAR
 // in GeneralView.h (8 + 2).
@@ -53,6 +55,33 @@ void MainWindow::createActions()
 	actToggleAnimation_ = new QAction(tr("&Animation"), this);
 	actToggleAnimation_->setCheckable(true);
 	actToggleAnimation_->setChecked(true); // flag_animation = 1
+
+	// Tool actions — the tools tree's transform set (Select/Move/Rotate/Scale).
+	// Checkable + an exclusive group mirrors the original's tool selection:
+	// exactly one tool is current at a time.
+	actToolSelect_ = new QAction(tr("&Select"), this);
+	actToolMove_   = new QAction(tr("&Move"), this);
+	actToolRotate_ = new QAction(tr("&Rotate"), this);
+	actToolScale_  = new QAction(tr("&Scale"), this);
+	actToolSelect_->setCheckable(true);
+	actToolMove_->setCheckable(true);
+	actToolRotate_->setCheckable(true);
+	actToolScale_->setCheckable(true);
+	actToolSelect_->setChecked(true);   // Select is the default tool
+	actToolSelect_->setShortcut(QKeySequence(Qt::Key_S));
+	actToolMove_->setShortcut(QKeySequence(Qt::Key_M));
+	actToolRotate_->setShortcut(QKeySequence(Qt::Key_R));
+	actToolScale_->setShortcut(QKeySequence(Qt::Key_T));
+
+	auto* toolGroup = new QActionGroup(this);
+	toolGroup->addAction(actToolSelect_);
+	toolGroup->addAction(actToolMove_);
+	toolGroup->addAction(actToolRotate_);
+	toolGroup->addAction(actToolScale_);
+	connect(actToolSelect_, &QAction::triggered, this, [this]{ selectTool(0); });
+	connect(actToolMove_,   &QAction::triggered, this, [this]{ selectTool(1); });
+	connect(actToolRotate_, &QAction::triggered, this, [this]{ selectTool(2); });
+	connect(actToolScale_,  &QAction::triggered, this, [this]{ selectTool(3); });
 
 	actExit_->setShortcut(QKeySequence::Quit);
 	actSaveWorld_->setShortcut(QKeySequence::Save);
@@ -103,6 +132,15 @@ void MainWindow::createToolBars()
 	// librariesBar_, editorsBar_, filtersBar_ — Phase 4/5, when the panels they
 	// control exist. Each gets its own QToolBar with a distinct objectName so
 	// saveState()/restoreState() can restore them.
+
+	// toolsBar_ — the transform tool set (the tools tree's top level in
+	// SurMap5; the original's toolbar strip IDR_TOOLBAR_TOOLS).
+	QToolBar* toolsBar = addToolBar(tr("Tools"));
+	toolsBar->setObjectName("toolsToolBar");
+	toolsBar->addAction(actToolSelect_);
+	toolsBar->addAction(actToolMove_);
+	toolsBar->addAction(actToolRotate_);
+	toolsBar->addAction(actToolScale_);
 }
 
 void MainWindow::createDockPanels()
@@ -187,6 +225,14 @@ void MainWindow::newWorld()
 	dlg.setWindowTitle(tr("New world"));
 	if(dlg.exec() == QDialog::Accepted)
 		statusBar()->showMessage(tr("New world: %1 (creation in Phase 3b)").arg(dlg.selectedWorld()));
+}
+
+void MainWindow::selectTool(int index)
+{
+	// Switch the active editor tool (CToolsTreeWindow::selectTool equivalent).
+	view_->tools()->setCurrentTool(index);
+	statusBar()->showMessage(tr("Tool: %1").arg(view_->tools()->currentTool()->name()));
+	view_->setFocus();
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)

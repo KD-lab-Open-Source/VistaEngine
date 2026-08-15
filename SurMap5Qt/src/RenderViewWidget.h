@@ -34,6 +34,9 @@
 // The engine-touching half of the viewport lives in the EditorEngine library
 // (see src/editor/EngineViewport.h) so engine headers never reach Qt code.
 class EngineViewport;
+// The current tool routes view input to the tool's handlers (Select/Move/
+// Rotate/Scale); engine-free, see src/tools/ToolManager.h.
+class ToolManager;
 
 class RenderViewWidget : public QWidget
 {
@@ -47,6 +50,9 @@ public:
 	bool initRenderDevice();
 	void doneRenderDevice();
 
+	// The tool manager (MainWindow's tool toolbar switches into it).
+	ToolManager* tools() { return tools_; }
+
 public slots:
 	// Called ~60 Hz from MainWindow::universeQuant (MFC OnIdle equivalent).
 	void tick();
@@ -58,7 +64,9 @@ protected:
 	void mousePressEvent(QMouseEvent* event) override;
 	void mouseReleaseEvent(QMouseEvent* event) override;
 	void mouseMoveEvent(QMouseEvent* event) override;
+	void keyPressEvent(QKeyEvent* event) override;
 
 private:
 	EngineViewport* viewport_ = nullptr;
+	ToolManager* tools_ = nullptr;
 };

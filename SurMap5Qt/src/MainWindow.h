@@ -42,6 +42,8 @@ public slots:
 	void about();
 	void openWorld();
 	void newWorld();
+	// Switch the active editor tool (0=Select, 1=Move, 2=Rotate, 3=Scale).
+	void selectTool(int index);
 
 protected:
 	void closeEvent(QCloseEvent* event) override;
@@ -74,4 +76,10 @@ private:
 	QAction* actExit_ = nullptr;
 	QAction* actAbout_ = nullptr;
 	QAction* actToggleAnimation_ = nullptr;
+
+	// --- tool actions (the tools tree's transform set) ---
+	QAction* actToolSelect_ = nullptr;
+	QAction* actToolMove_ = nullptr;
+	QAction* actToolRotate_ = nullptr;
+	QAction* actToolScale_ = nullptr;
 };

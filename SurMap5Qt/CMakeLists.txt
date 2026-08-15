@@ -105,6 +105,20 @@ add_executable(SurMap5Qt
     src/dialogs/ProgressDialog.cpp
     src/dialogs/SelectWorldDialog.h
     src/dialogs/SelectWorldDialog.cpp
+    # Phase 5 tools — engine-free behaviour classes (see src/editor/EditorTool.h)
+    src/editor/EditorTool.h
+    src/tools/ToolManager.h
+    src/tools/ToolManager.cpp
+    src/tools/SelectTool.h
+    src/tools/SelectTool.cpp
+    src/tools/TransformTool.h
+    src/tools/TransformTool.cpp
+    src/tools/MoveTool.h
+    src/tools/MoveTool.cpp
+    src/tools/RotateTool.h
+    src/tools/RotateTool.cpp
+    src/tools/ScaleTool.h
+    src/tools/ScaleTool.cpp
 )
 
 # SurMap5Qt links EditorEngine (which carries the engine modules); Qt code

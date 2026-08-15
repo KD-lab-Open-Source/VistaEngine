@@ -4,10 +4,14 @@
 
 #include <algorithm>
 
+#include <QKeyEvent>
 #include <QMouseEvent>
+#include <QPainter>
 #include <QWheelEvent>
 
 #include "editor/EngineViewport.h"
+#include "editor/EditorTool.h"
+#include "tools/ToolManager.h"
 
 // Qt mouse button -> EngineViewport button mask (1=left, 2=middle, 4=right),
 // matching the WM_* MK_* values CGeneralView's WindowProc used.
@@ -21,11 +25,45 @@ int qtButtonToEngine(Qt::MouseButton button)
 	default:               return 0;
 	}
 }
+
+// ToolAuxPainter over QPainter — the tools' overlay is drawn on top of the
+// rendered frame in paintEvent, screen-space widget pixels.
+class QtAuxPainter : public ToolAuxPainter
+{
+public:
+	explicit QtAuxPainter(QPainter& painter) : painter_(painter) {}
+
+	void drawLine2D(const ToolVec2& a, const ToolVec2& b, unsigned colorARGB) override
+	{
+		painter_.setPen(QColor::fromRgba(colorARGB));
+		painter_.drawLine(a.x, a.y, b.x, b.y);
+	}
+	void drawRect2D(const ToolVec2& a, const ToolVec2& b, unsigned colorARGB) override
+	{
+		QPen pen(QColor::fromRgba(colorARGB));
+		pen.setStyle(Qt::DashLine);
+		painter_.setPen(pen);
+		painter_.setBrush(Qt::NoBrush);
+		painter_.drawRect(QRect(QPoint(a.x, a.y), QPoint(b.x, b.y)));
+	}
+	void drawCircle2D(const ToolVec2& center, int radius, unsigned colorARGB) override
+	{
+		QPen pen(QColor::fromRgba(colorARGB));
+		pen.setStyle(Qt::DashLine);
+		painter_.setPen(pen);
+		painter_.setBrush(Qt::NoBrush);
+		painter_.drawEllipse(QPoint(center.x, center.y), radius, radius);
+	}
+
+private:
+	QPainter& painter_;
+};
 }
 
 RenderViewWidget::RenderViewWidget(QWidget* parent)
 	: QWidget(parent)
 	, viewport_(new EngineViewport)
+	, tools_(new ToolManager)
 {
 	// The engine's SDL GPU device claims a swapchain on a window created around
 	// this widget's native handle (EngineViewport::init). It must therefore
@@ -40,6 +78,7 @@ RenderViewWidget::RenderViewWidget(QWidget* parent)
 RenderViewWidget::~RenderViewWidget()
 {
 	doneRenderDevice();
+	delete tools_;
 	delete viewport_;
 }
 
@@ -61,6 +100,7 @@ void RenderViewWidget::tick()
 	// The editor's per-frame update, then repaint (MFC OnIdle equivalent).
 	// A fixed 16 ms step is close enough for camera/editor animation.
 	viewport_->tick(0.016f);
+	tools_->quant(0.016f);
 	update();
 }
 
@@ -69,6 +109,13 @@ void RenderViewWidget::paintEvent(QPaintEvent* /*event*/)
 	if(!viewport_->inited())
 		initRenderDevice();
 	viewport_->drawFrame();
+
+	// The tools' aux overlay (selection box, transform axis, cursor circle)
+	// draws on top of the rendered frame, exactly the original's
+	// onDrawAuxData pass after the 3D scene.
+	QPainter painter(this);
+	QtAuxPainter aux(painter);
+	tools_->currentTool()->onDrawAuxData(aux);
 }
 
 void RenderViewWidget::resizeEvent(QResizeEvent* event)
@@ -94,22 +141,51 @@ void RenderViewWidget::wheelEvent(QWheelEvent* event)
 
 void RenderViewWidget::mousePressEvent(QMouseEvent* event)
 {
-	if(viewport_->inited())
-		viewport_->mouseButton(qtButtonToEngine(event->button()), true, event->position().x(), event->position().y());
+	const ToolVec2 pos{ event->position().x(), event->position().y() };
+	const ToolVec3 world{ 0, 0, 0 };   // Phase 3b: CoordScr2vMap result
+	// The current tool sees the press first (CGeneralView: tool's onLMBDown
+	// decides whether the camera may pan/drag); unhandled -> the viewport.
+	const bool handled =
+		(event->button() == Qt::LeftButton)  ? tools_->onLMBDown(world, pos) :
+		(event->button() == Qt::RightButton) ? tools_->onRMBDown(world, pos) : false;
+	if(!handled && viewport_->inited())
+		viewport_->mouseButton(qtButtonToEngine(event->button()), true, pos.x, pos.y);
 	setFocus();
 	event->accept();
 }
 
 void RenderViewWidget::mouseReleaseEvent(QMouseEvent* event)
 {
-	if(viewport_->inited())
-		viewport_->mouseButton(qtButtonToEngine(event->button()), false, event->position().x(), event->position().y());
+	const ToolVec2 pos{ event->position().x(), event->position().y() };
+	const ToolVec3 world{ 0, 0, 0 };
+	const bool handled =
+		(event->button() == Qt::LeftButton)  ? tools_->onLMBUp(world, pos) :
+		(event->button() == Qt::RightButton) ? tools_->onRMBUp(world, pos) : false;
+	if(!handled && viewport_->inited())
+		viewport_->mouseButton(qtButtonToEngine(event->button()), false, pos.x, pos.y);
 	event->accept();
 }
 
 void RenderViewWidget::mouseMoveEvent(QMouseEvent* event)
 {
+	const ToolVec2 pos{ event->position().x(), event->position().y() };
+	const ToolVec3 world{ 0, 0, 0 };   // Phase 3b: screenPointToGround
+	tools_->onTrackingMouse(world, pos);
 	if(viewport_->inited())
-		viewport_->mouseMove(event->position().x(), event->position().y());
+		viewport_->mouseMove(pos.x, pos.y);
+	event->accept();
+}
+
+void RenderViewWidget::keyPressEvent(QKeyEvent* event)
+{
+	// The current tool's onKeyDown first (CGeneralView's WM_KEYDOWN tried the
+	// tool, then fell back to the camera). Escape/Delete are the common ones.
+	if(!tools_->onKeyDown(event->key(), event->modifiers() & Qt::ShiftModifier,
+	                      event->modifiers() & Qt::ControlModifier,
+	                      event->modifiers() & Qt::AltModifier)){
+		if(event->key() == Qt::Key_Delete)
+			tools_->onDelete();
+		QWidget::keyPressEvent(event);
+	}
 	event->accept();
 }
