@@ -22,6 +22,8 @@
 #include "dialogs/SelectWorldDialog.h"
 #include "dialogs/WorldNameDialog.h"
 #include "tools/ToolManager.h"
+#include "panels/ToolsTreePanel.h"
+#include "panels/ObjectsTreePanel.h"
 
 // Number of status-bar panes: 8 info + 2 separators — NUMBERS_PARTS_STATUSBAR
 // in GeneralView.h (8 + 2).
@@ -151,12 +153,20 @@ void MainWindow::createDockPanels()
 	toolsDock_ = new QDockWidget(tr("Tools"), this);
 	toolsDock_->setObjectName("toolsDock");
 	toolsDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+	toolsTreePanel_ = new ToolsTreePanel(view_->tools(), toolsDock_);
+	toolsDock_->setWidget(toolsTreePanel_);
 	addDockWidget(Qt::LeftDockWidgetArea, toolsDock_);
+
+	// Selecting a tool in the tree switches the current tool (the toolbar's
+	// QActionGroup does the same; the tree and toolbar stay in sync).
+	connect(toolsTreePanel_, &ToolsTreePanel::toolSelected, this, &MainWindow::selectTool);
 
 	// objectsManagerBar_ — world object tree (CObjectsManagerWindow), tabbed.
 	objectsDock_ = new QDockWidget(tr("Objects"), this);
 	objectsDock_->setObjectName("objectsDock");
 	objectsDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+	objectsTreePanel_ = new ObjectsTreePanel(objectsDock_);
+	objectsDock_->setWidget(objectsTreePanel_);
 	addDockWidget(Qt::LeftDockWidgetArea, objectsDock_);
 
 	// propertiesBar_ — the current tool's dialog (CExtControlBar hosting
@@ -257,6 +267,8 @@ void MainWindow::selectTool(int index)
 {
 	// Switch the active editor tool (CToolsTreeWindow::selectTool equivalent).
 	view_->tools()->setCurrentTool(index);
+	if(toolsTreePanel_)
+		toolsTreePanel_->syncToTool();
 	statusBar()->showMessage(tr("Tool: %1").arg(view_->tools()->currentTool()->name()));
 	view_->setFocus();
 }

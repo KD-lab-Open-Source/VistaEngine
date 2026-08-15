@@ -27,6 +27,8 @@ class QProgressBar;
 class QTimer;
 class QToolBar;
 class RenderViewWidget;
+class ToolsTreePanel;
+class ObjectsTreePanel;
 
 class MainWindow : public QMainWindow
 {
@@ -67,6 +69,8 @@ private:
 	QDockWidget* objectsDock_ = nullptr;   // objectsManagerBar_
 	QDockWidget* propertiesDock_ = nullptr;// propertiesBar_
 	QDockWidget* miniMapDock_ = nullptr;   // miniMapBar_
+	ToolsTreePanel* toolsTreePanel_ = nullptr;   // CToolsTreeWindow's tree
+	ObjectsTreePanel* objectsTreePanel_ = nullptr; // CObjectsManagerWindow
 
 	// --- status bar panes (NUMBERS_PARTS_STATUSBAR) ---
 	QProgressBar* progressBar_ = nullptr;  // progressBar_

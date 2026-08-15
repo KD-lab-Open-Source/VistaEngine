@@ -119,6 +119,11 @@ add_executable(SurMap5Qt
     src/tools/RotateTool.cpp
     src/tools/ScaleTool.h
     src/tools/ScaleTool.cpp
+    # Phase 6 — the kdw trees as QTreeWidgets (tools + objects manager)
+    src/panels/ToolsTreePanel.h
+    src/panels/ToolsTreePanel.cpp
+    src/panels/ObjectsTreePanel.h
+    src/panels/ObjectsTreePanel.cpp
 )
 
 # SurMap5Qt links EditorEngine (which carries the engine modules); Qt code

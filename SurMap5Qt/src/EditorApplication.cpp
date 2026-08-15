@@ -2,6 +2,7 @@
 
 #include "EditorApplication.h"
 
+#include <QCoreApplication>
 #include <QDir>
 
 EditorApplication* EditorApplication::s_instance = nullptr;
@@ -32,9 +33,12 @@ bool EditorApplication::initialize()
 	//   TranslationManager::instance().setLanguage(GameOptions::instance().getLanguage());
 	//   EffectContainer::setTexturesPath("Resource\\FX\\Textures");
 
-	// The worlds directory must be absolute: vMap::load builds
-	// <worldsDir>\<world>\world.cls relative to the working directory, and the
-	// editor's working directory is wherever the exe was launched from.
-	worldsDir_ = QDir::current().absoluteFilePath(worldsDir_);
+	// The worlds directory is anchored to the executable's directory (not the
+	// working directory): vMap::load builds <worldsDir>\<world>\world.cls, and
+	// the exe may be launched from anywhere (VS debugger, PATH, a shortcut).
+	// World files therefore live next to the editor, like the game's
+	// RESOURCE\WORLDS does.
+	worldsDir_ = QDir(QCoreApplication::applicationDirPath()).absoluteFilePath(worldsDir_);
+	QDir().mkpath(worldsDir_);
 	return true;
 }
