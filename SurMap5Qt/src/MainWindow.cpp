@@ -330,6 +330,7 @@ void MainWindow::selftestCreateWorld(const QString& worldName)
 		QSettings().setValue("mainWindow/lastWorld", worldName);
 		fprintf(stderr, "[selftest] LOAD OK\n");
 		fflush(stderr);
+		QCoreApplication::exit(0);
 		return;
 	}
 
@@ -340,11 +341,13 @@ void MainWindow::selftestCreateWorld(const QString& worldName)
 		QSettings().setValue("mainWindow/lastWorld", worldName);
 		fprintf(stderr, "[selftest] CREATE OK\n");
 		fflush(stderr);
+		QCoreApplication::exit(0);
 	}
 	else{
 		statusBar()->showMessage(tr("Selftest FAILED: world %1").arg(worldName));
 		fprintf(stderr, "[selftest] CREATE FAILED\n");
 		fflush(stderr);
+		QCoreApplication::exit(1);
 	}
 }
 

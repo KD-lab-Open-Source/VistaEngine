@@ -70,3 +70,57 @@ jobs:
           build/Game/${{env.BUILD_TYPE}}/Game.exe
           build/Game/${{env.BUILD_TYPE}}/Game.pdb
           build/_deps/sdl3-build/${{env.BUILD_TYPE}}/SDL3.dll
+
+  # The SurMap5Qt editor: same engine modules, plus Qt 6 and the Qt-specific
+  # sources. It needs Qt installed (aquamarine's action), and a build where
+  # BUILD_EDITOR=ON makes the root CMakeLists add SurMap5Qt. The build reuses
+  # the ffmpeg/MSYS2 setup the Game job needs, so this job is a trimmed copy.
+  editor:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # ffmpeg's configure needs a POSIX shell + make, exactly as in the Game job.
+    - name: Install MSYS2 (ffmpeg's configure wants bash and make)
+      id: msys2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: make diffutils
+        path-type: inherit
+
+    - name: Tell the build where MSYS2 is
+      run: echo "MSYS2_ROOT=${{ steps.msys2.outputs.msys2-location }}" >> $env:GITHUB_ENV
+
+    # Qt 6 (Widgets) is the one editor-only dependency. The engine itself needs
+    # nothing from it — the Qt translation units link Qt, the EditorEngine
+    # static library stays engine-flag-clean.
+    - name: Install Qt
+      id: qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.11.*'
+        arch: win64_msvc2022_64
+        cache: true
+
+    - name: Editor -- configure
+      run: cmake -A x64 -B build -DBUILD_EDITOR=ON -DCMAKE_PREFIX_PATH=${{ steps.qt.outputs.qtpath }}
+
+    - name: Editor -- build
+      run: cmake --build build --config ${{env.BUILD_TYPE}} --target SurMap5Qt --parallel 3
+
+    - name: Editor -- smoke test
+      # --selftest loads or creates the world, prints [selftest] LOAD OK /
+      # CREATE OK / CREATE FAILED to stderr, then exits with 0/1 itself.
+      run: |
+        $env:Path = "${{ steps.qt.outputs.qtpath }}\bin;" + $env:Path
+        Copy-Item build\_deps\sdl3-build\${{env.BUILD_TYPE}}\SDL3.dll build\SurMap5Qt\${{env.BUILD_TYPE}}\
+        & build\SurMap5Qt\${{env.BUILD_TYPE}}\SurMap5Qt.exe --selftest=SmokeTest
+
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: SurMap5Qt-Windows
+        path: |
+          build/SurMap5Qt/${{env.BUILD_TYPE}}/SurMap5Qt.exe
+          build/SurMap5Qt/${{env.BUILD_TYPE}}/SurMap5Qt.pdb

@@ -66,3 +66,57 @@ jobs:
       with:
         name: VistaEngine-Linux
         path: build/Game/Game
+
+  # The SurMap5Qt editor: engine modules + Qt 6 (Widgets). Same clang toolchain
+  # and SDL deps as the Game job; BUILD_EDITOR=ON adds SurMap5Qt to the build.
+  editor:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          ninja-build clang pkg-config \
+          libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev \
+          libxfixes-dev libxss-dev libxtst-dev libxkbcommon-dev \
+          libwayland-dev libwayland-bin wayland-protocols libdecor-0-dev \
+          libgl1-mesa-dev libegl1-mesa-dev libdrm-dev libgbm-dev \
+          libdbus-1-dev libudev-dev \
+          libglu1-mesa-dev libfontconfig1-dev libxkbcommon-x11-0 \
+          libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 \
+          libxcb-render-util0 libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 \
+          libxcb-cursor0 xvfb mesa-vulkan-drivers libvulkan1
+
+    # Qt 6 (Widgets) is the editor's UI framework. The engine needs none of it.
+    - name: Install Qt
+      id: qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.11.*'
+        cache: true
+
+    - name: Editor -- configure
+      run: cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_EDITOR=ON -DCMAKE_PREFIX_PATH=${{ steps.qt.outputs.qtpath }}
+
+    - name: Editor -- build
+      run: cmake --build build --target SurMap5Qt
+
+    - name: Editor -- smoke test
+      # --selftest loads/creates the world, prints [selftest] LOAD OK /
+      # CREATE OK / CREATE FAILED and exits with 0/1 itself. Qt and SDL both
+      # need a display; xvfb-run supplies a virtual one, and lavapipe (the
+      # mesa software Vulkan driver, installed above) backs SDL GPU. The app
+      # exits on its own, so a hard failure here is a real editor failure.
+      run: |
+        cp build/_deps/sdl3-build/libSDL3* build/SurMap5Qt/ 2>/dev/null || true
+        export LD_LIBRARY_PATH="${{ steps.qt.outputs.qtpath }}/lib:build/SurMap5Qt:${LD_LIBRARY_PATH}"
+        timeout 60 xvfb-run -a ./build/SurMap5Qt/SurMap5Qt --selftest=SmokeTest
+
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: SurMap5Qt-Linux
+        path: build/SurMap5Qt/SurMap5Qt

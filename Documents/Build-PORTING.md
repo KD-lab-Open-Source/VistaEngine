@@ -195,6 +195,26 @@ placeholder viewport) with **no engine linkage yet**. Phase 2 embeds the SDL GPU
 into `RenderViewWidget` via `SDL_CreateWindowWithProperties` on its native window handle
 (see `SurMap5Qt/src/RenderViewWidget.h`); that is where the engine libraries join the link.
 
+### CI
+
+Each platform workflow (`.github/workflows/{windows,linux,macos}.yaml`) has an `editor` job
+next to the game build job. It configures with `-DBUILD_EDITOR=ON`, builds the `SurMap5Qt`
+target, and runs a headless smoke test: `SurMap5Qt --selftest=SmokeTest` loads or creates
+the world, prints `[selftest] LOAD OK` / `CREATE OK` / `CREATE FAILED` to stderr, then
+exits with 0 or 1 itself (see `SurMap5Qt/src/MainWindow.cpp`, `selftestCreateWorld`).
+
+- **Windows**: Qt comes from `jurplel/install-qt-action@v4` (`win64_msvc2022_64`, the same
+  arch as the local `msvc2022_64` kit); `CMAKE_PREFIX_PATH` is the action's `qtpath` output.
+  SDL3.dll is copied next to the exe before the smoke test.
+- **Linux**: same Qt action (no `arch` — the action's default matches the runner), plus
+  `xvfb` and `mesa-vulkan-drivers`/`libvulkan1` (lavapipe) so the Qt/SDL windows and the
+  SDL GPU device have somewhere to live on a headless runner. The smoke test runs under
+  `xvfb-run -a` with `LD_LIBRARY_PATH` set to the Qt lib dir.
+- **macOS**: `brew install qt` (keg-only — `CMAKE_PREFIX_PATH=$(brew --prefix qt)`), and
+  the shadercross cache from the game job is reused because a cold DXC build is the
+  slowest thing in the project. macOS runners have a WindowServer, so the smoke test runs
+  directly with `DYLD_LIBRARY_PATH` pointing at Qt.
+
 ## Traps, by platform
 
 ### Linux — case sensitivity

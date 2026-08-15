@@ -120,3 +120,78 @@ jobs:
       with:
         name: VistaEngine-macOS
         path: build/Game/Game
+
+  # The SurMap5Qt editor: engine modules + Qt 6 (Widgets). Qt is a homebrew
+  # package here (Qt for macOS does not ship prebuilt binaries for CI in the
+  # same way), and BUILD_EDITOR=ON adds SurMap5Qt to the build.
+  editor:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        brew install ninja qt
+
+    - name: Compute shadercross cache key
+      id: keyinfo
+      run: |
+        sha=$(awk '/^[[:space:]]*SDL_shadercross[[:space:]]*$/{f=1} f && /GIT_TAG/{print $2; exit}' CMakeLists.txt)
+        if [ -z "$sha" ]; then
+          echo "could not read the SDL_shadercross GIT_TAG out of CMakeLists.txt" >&2
+          exit 1
+        fi
+        echo "shadercross_sha=$sha" >> "$GITHUB_OUTPUT"
+
+    # This job does not build shadercross from source (the Game job does); it
+    # builds only SurMap5Qt, which needs the shader cross-compiler only if the
+    # engine's shader step runs. With BUILD_EDITOR=ON the root CMakeLists still
+    # configures the full project, so reuse the shadercross cache the Game job
+    # populated, or build it fresh.
+    - name: Restore prebuilt shadercross
+      id: cache-shadercross
+      uses: actions/cache@v4
+      with:
+        path: ~/dxc-prebuilt
+        key: macos-shadercross-v2-${{ runner.arch }}-${{ env.ImageOS }}-${{ steps.keyinfo.outputs.shadercross_sha }}
+
+    - name: Build shadercross (cache miss)
+      if: steps.cache-shadercross.outputs.cache-hit != 'true'
+      run: |
+        set -euo pipefail
+        cmake -G Ninja -B build-shadercross-cache -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        cmake --build build-shadercross-cache --target shadercross -j3
+        cli=$(find build-shadercross-cache -type f -perm -111 -name shadercross | head -1)
+        mkdir -p "$HOME/dxc-prebuilt/bin" "$HOME/dxc-prebuilt/lib"
+        cp "$cli" "$HOME/dxc-prebuilt/bin/"
+        find build-shadercross-cache \
+             \( -name 'libSDL3*.dylib' -o -name libdxcompiler.dylib -o -name libdxil.dylib \) \
+             -exec cp {} "$HOME/dxc-prebuilt/lib/" \;
+        rm -rf build-shadercross-cache
+
+    - name: Editor -- configure
+      run: >
+        cmake -G Ninja -B build
+        -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        -DBUILD_EDITOR=ON
+        -DSHADERCROSS_EXECUTABLE=$HOME/dxc-prebuilt/bin/shadercross
+        -DCMAKE_PREFIX_PATH=$(brew --prefix qt)
+
+    - name: Editor -- build
+      run: cmake --build build --target SurMap5Qt
+
+    - name: Editor -- smoke test
+      # --selftest loads/creates the world, prints [selftest] LOAD OK /
+      # CREATE OK / CREATE FAILED and exits with 0/1 itself. macOS runners
+      # have a display (a headless WindowServer), so no xvfb needed here.
+      run: |
+        cp build/_deps/sdl3-build/libSDL3* build/SurMap5Qt/ 2>/dev/null || true
+        export DYLD_LIBRARY_PATH="$(brew --prefix qt)/lib:build/SurMap5Qt:${DYLD_LIBRARY_PATH}"
+        timeout 60 ./build/SurMap5Qt/SurMap5Qt --selftest=SmokeTest
+
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: SurMap5Qt-macOS
+        path: build/SurMap5Qt/SurMap5Qt
