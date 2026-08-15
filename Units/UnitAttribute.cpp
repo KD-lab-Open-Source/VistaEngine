@@ -1925,12 +1925,34 @@ void RaceProperty::serialize(Archive& ar)
 
 	ar.serialize(anchorForAssemblyPoint_, "anchorForAssemblyPoint", "Зона общего сбора альянса");
 
+#ifdef MAELSTROM_DATA
+	// Both tables sat flat among the race's own fields pre-2008: the original wrapped them in
+	// ar.openBlock("orderMarks") / ar.openBlock("minimapMarks"), which groups for the editor
+	// tree and writes no nesting, and 2008 turned each into a real ar.serialize(table, name).
+	// Serializing the EnumTable directly reads the entries at the level they are on.
+	//
+	// Left nested, the block name never matches and both tables keep their constructed empty
+	// entries. For orderMarks that means every race()->orderMark(...) is empty, addMark returns
+	// at inf.isEmpty(), and NO order ever shows a mark: no G_Fx_Sign_Go_001 at a move target,
+	// no attack, repair or patrol sign either.
+	//
+	// Maelstrom names six of the nine UI_CLICK_MARK_* (no ASSEMBLY_POINT, WAIPOINT or WAY) and
+	// eight of the nine UI_MINIMAP_SYMBOL_* (no UNIT_WAITING); the entries it does not name keep
+	// their empty default, which is what an absent mark means anyway. windMarks has no pre-2008
+	// counterpart at all, so it stays as it is -- there is nothing in the file to find.
+	orderMarks_.serialize(ar);
+#else
 	ar.serialize(orderMarks_, "orderMarks", "Визуализация отдачи приказов");
+#endif
 
 //	ar.serialize(unitAttackEffect_, "unitAttackEffect", "Визуализация атаки по юниту");
 	ar.serialize(weaponUpgradeEffect_, "weaponUpgradeEffect", "Визуализация апгрейда оружия");
 
+#ifdef MAELSTROM_DATA
+	minimapMarks_.serialize(ar);
+#else
 	ar.serialize(minimapMarks_, "minimapMarks", "Визуализация событий и юнитов на миникарте");
+#endif
 	ar.serialize(windMarks_, "windMarks", "Визуализация направления ветра на миникарте");
 
 	if(ar.openBlock("controlAI", "Под управлением AI")){

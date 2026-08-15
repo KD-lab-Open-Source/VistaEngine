@@ -512,6 +512,48 @@ level, which is where the entries are. Same shape as the `environment` groups be
 same diagnosis: dump the attribute's top-level keys next to retail's, and the flat block is
 visible at a glance.
 
+### The order marks — `RaceProperty::serialize`
+
+Giving an order showed nothing. Right-click a destination and the squad walks, but no sign is
+put down where it is walking to; the same for attack, repair and patrol.
+
+The marks themselves are fine — `UI_MarkObject` builds the model and starts the effect, and
+Maelstrom's races name real ones (`G_Fx_Sign_Go_001` for a move, `G_Fx_Sign_Go_Water_001` over
+water, `G_Fx_Sign_Attack_001`, `G_Fx_Point_Repair_001`, `G_Fx_Patrol_001`). What is not read is
+the table that holds them.
+
+This is the `openBlock` trap again, and the third instance of it. The original writes
+
+```cpp
+ar.openBlock("orderMarks", "Визуализация отдачи приказов");
+for(i = 0; i < UI_CLICK_MARK_SIZE; i++)
+    ar.serialize(orderMarks_[i], getEnumName(UI_ClickModeMarkID(i)), …);
+ar.closeBlock();
+```
+
+— which groups for the editor tree and writes no nesting at all, so the `UI_CLICK_MARK_*`
+entries sit **flat** among the race's own fields. 2008 turned it into a real
+`ar.serialize(orderMarks_, "orderMarks", …)`. `minimapMarks` moved the same way, in the same
+function, in the same commit's worth of change.
+
+Left nested the block name never matches, the `EnumTable` keeps the empty entries its
+constructor gave it, and `race()->orderMark(...)` answers an empty attribute for every id.
+Nothing errors: `UI_LogicDispatcher::addMark` opens with `if(inf.isEmpty()) return`, so the
+mark is dropped before anything is built. As with the cursor table, an order that quietly does
+nothing visible reads as a rendering fault and is not one.
+
+`orderMarks_.serialize(ar)` and `minimapMarks_.serialize(ar)` under `MAELSTROM_DATA` run the
+`EnumTable`'s own loop at the level the entries are on. Of our nine `UI_CLICK_MARK_*` the data
+names six — no `ASSEMBLY_POINT`, `WAIPOINT` or `WAY`, all 2008 additions — and of the nine
+`UI_MINIMAP_SYMBOL_*` it names eight, missing `UNIT_WAITING`. The ones it does not name keep
+their empty default, which is what an absent mark means anyway. `windMarks` has no pre-2008
+counterpart at all and stays nested: there is nothing in the file to find.
+
+Note that `UI_CLICK_MARK_WAIPOINT` and `UI_CLICK_MARK_WAY` being absent is correct, not a gap.
+They feed `UnitSquad::quant`'s per-unit waypoint marks, which are gated on `showWayPoint` /
+`showAllWayPoints` / `targetPoint` — none of which exist in Maelstrom's `AttributeSquad` either.
+The whole waypoint-trail feature is 2008's.
+
 ### The world's own lighting — `Environment::serialize` / `EnvironmentTime::serializeMaelstrom`
 
 Everything the engine lights a world with — the sun, sky, fog and shadow gradients, the sky
