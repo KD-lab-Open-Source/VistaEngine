@@ -554,6 +554,67 @@ They feed `UnitSquad::quant`'s per-unit waypoint marks, which are gated on `show
 `showAllWayPoints` / `targetPoint` — none of which exist in Maelstrom's `AttributeSquad` either.
 The whole waypoint-trail feature is 2008's.
 
+### The objective marks — `Anchor::serialize`
+
+The campaign's checkpoints. A mission assigns a task, the minimap pulses a ring of white
+rings — a stone dropped in water — over the place you are being sent to, and when you get
+there the ring moves to the next one. None of them were drawn.
+
+The ring is an `Anchor` of type `MINIMAP_MARK` placed in the world, switched on and off by
+`ActionActivateMinimapMark` / `ActionDeactivateMinimapMarks` from the mission's trigger chain.
+`SourceManager::logicQuant` walks the anchors every quant and hands the selected ones to
+`UI_Minimap::addAnchor`, which draws each one's `UI_MinimapSymbol`.
+
+The symbol is what drifted. Pre-2008 the anchor owned a bare `UI_MinimapSymbol*` and wrote it
+as a plain nested `symbol` node, and only when the anchor was a `MINIMAP_MARK`:
+
+```cpp
+if(type_ == MINIMAP_MARK){
+    if(!symbol_)
+        symbol_ = new UI_MinimapSymbol;
+    ar.serialize(*symbol_, "symbol", "Символ на миникарте");
+}
+else if(symbol_){ delete symbol_; symbol_ = 0; }
+```
+
+2008 made it a `PolymorphicHandle<UI_MinimapSymbolPolymorphic>` under a **different name**,
+`uisymbol`. Not one of Maelstrom's 51 worlds contains that string, so the handle stays null.
+Nothing errors — `addAnchor` opens with `if(anchor->symbol())` and drops the anchor before
+anything is built, the same shape of silent miss as the cursor table and the order marks.
+
+Everything else about the mark survived the move: the fields inside the node (`type`,
+`scaleByEvent`, `selfScale`, `useLegionColor`, `sprite`) are spelled identically on both sides,
+so only the container had to be read differently. The `active` flag is absent from the data —
+the editor did not write it — which is right: the marks start off and the triggers turn them on.
+
+The whole set is 47 anchors across 16 worlds, and they are uniform: every one is a
+`SYMBOL_SPRITE`, 44 on `point.avi` with `scaleByEvent` (radius 100–800 world units, so the
+ring is drawn at the size the designer gave the anchor) and 3 on `escape.avi` at `selfScale`.
+Both are animated textures, which is where the rings come from: `UI_Sprite::isAnimated` sends
+them down `flushSprites`' per-sprite `animatedSprites_` path, one draw each with its own phase.
+
+Reading it back is worth doing end to end, because five separate things have to line up and
+only the last one is visible. In C1M1, from the trigger that assigns the first task:
+
+```
+SERIALIZE found=1 label='P1' active=1              <- the action read its anchor name
+ACTION    label=P1 resolved=1 active=1             <- LabelObject found the anchor
+ADDANCHOR label=P1 inited=1 symbol=1               <- the fix: the symbol is there
+CMD       label=P1 spriteEmpty=0 animated=1 r=800  <- point.avi resolved and is multi-frame
+ANIMFLUSH phase=0.0157 quad=(343,952)-(283,1013)   <- reaching the renderer, phase advancing
+```
+
+The chain that carries it is worth naming too, since it crosses threads twice: trigger →
+`Anchor::setSelected` → `SourceManager::logicQuant` → `UI_Minimap::addAnchor` (logic) →
+`uiStreamCommand` → `fAddWorldMarkCommand` (graphics) → `updateEvent(BACKGROUND)` →
+`drawEvents` → `drawSprite` → `flushSprites`.
+
+The mission's own structure is the useful thing to know when testing: the mark is tied to the
+task, not to the player. `Задача 1 НАЗНАЧЕНА` links to a trigger holding
+`ActionActivateMinimapMark`, and `Задача 1 ВЫПОЛНЕНА` links to the pair that deactivates the
+old mark and activates the next. So the first ring is up seconds after the mission starts,
+before the player has done anything, and each later one arrives on a completed task.
+
 ### The world's own lighting — `Environment::serialize` / `EnvironmentTime::serializeMaelstrom`
 
 Everything the engine lights a world with — the sun, sky, fog and shadow gradients, the sky
