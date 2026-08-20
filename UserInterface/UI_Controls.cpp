@@ -2595,11 +2595,29 @@ void UI_ControlBase::doShow()
 			else
 				redrawLock_ = false;
 		}
-		else
+		else {
 			isVisible_ = true;
+			restoreShownTransform();
+		}
 	}
 
 	showChildControls();
+}
+
+// An animated hide leaves alpha_ (and the position) at the far end of the deactivation
+// transform. On an active screen applyShow() winds that back; on an inactive one doShow()
+// and doShowByTrigger() used to set the visibility flag and nothing else, so a control hidden while
+// the screen was active and shown again while it was not stayed at alpha 0 for good --
+// drawn every frame, perfectly transparent. Pre-2008 had no isActive() gate here and always
+// went through applyShow(); this restores what that guaranteed without doing background-scene
+// work for a screen that is not on show. See Documents/Maelstrom-PORTING.md.
+void UI_ControlBase::restoreShownTransform()
+{
+	if(!isVisible_ || !isVisibleByTrigger_)
+		return;
+
+	transformMode_ = TRANSFORM_NONE;
+	setActivationTransform(0.f, true);
 }
 
 void UI_ControlBase::showChildControls()
@@ -2662,8 +2680,10 @@ void UI_ControlBase::doShowByTrigger()
 			else
 				redrawLock_ = false;
 		}
-		else
+		else {
 			isVisibleByTrigger_ = true;
+			restoreShownTransform();
+		}
 	}
 
 	std::for_each(controls_.begin(), controls_.end(), [](auto& c){ c->doShowByTrigger(); });

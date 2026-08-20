@@ -615,6 +615,70 @@ task, not to the player. `Задача 1 НАЗНАЧЕНА` links to a trigger 
 old mark and activates the next. So the first ring is up seconds after the mission starts,
 before the player has done anything, and each later one arrives on a completed task.
 
+### The panel that came back invisible — `UI_ControlBase::doShowByTrigger`
+
+The other half of the same report. Reaching a checkpoint plays a cutscene, and when it ended
+the minimap panel was gone — frame, map, marks, all of it — and never returned for the rest of
+the mission.
+
+Nothing had hidden it. Every flag the engine tests said the control was fully visible
+(`isVisible_`, `isVisibleByTrigger_`, `isEnabled_` set, `redrawLock_` and `isDeactivating_`
+clear), no transform was running, the map texture was alive and `UI_Minimap::inited()` was
+true. The panel was being drawn every frame at `alpha_ == 0`.
+
+Three steps get it there, and the middle one is the bug:
+
+1. A trigger hides an ancestor of the minimap while the screen is active. `hideByTrigger` sets
+   `TRANSFORM_DEACTIVATION` and `applyHide` starts the fade the control declares
+   (`activationType = TRANSFORM_ALPHA`, `deactivationTime = 2.`). It runs to the end and
+   leaves `alpha_` at 0.
+2. The screen is deactivated for the cutscene, and the trigger shows the panel again while it
+   is inactive. `doShowByTrigger` takes its `else` branch, which flips
+   `isVisibleByTrigger_` back to true and does nothing else — no `applyShow()`, so nothing
+   winds the alpha back.
+3. The interface is rebuilt. `logicInit` clears `transformMode_` but never touches `alpha_`,
+   and the finished deactivation transform goes on re-applying `alpha_ = 1 - 1*1` from
+   `transformQuant` every frame, permanently.
+
+Pre-2008 cannot reach this. Its `showByTrigger` has no `screen()->isActive()` gate at all —
+it always calls `applyShow()`:
+
+```cpp
+if(!isVisibleByTrigger_){
+    waitingUpdate_ = true;
+    isVisibleByTrigger_ = true;
+    if(isVisible_) { redrawLock_ = true; applyShow(); }
+}
+```
+
+2008 added the gate, the `else` branch, and the `showByTrigger`/`doShowByTrigger` split. The
+hide side got a counterpart for the inactive case — `hideEffects(true)`, the immediate hide —
+and the show side never did. Stock P2 hides the asymmetry because a screen whose
+`activationTime` is non-zero re-establishes the transform on every activation
+(`UI_Screen::initActivationActions` calls `setActivationTransform` only `if(duration >
+FLT_EPS)`); Maelstrom's in-game screen declares zero, so nothing ever fixes it up.
+
+The fix is `UI_ControlBase::restoreShownTransform`, called from the inactive-screen branch of
+`doShowByTrigger` **and** of `doShow`, which had the identical gap. It replays the transform
+half of `applyShow` — `setActivationTransform(0.f, true)`, the same call `applyShow` makes —
+and deliberately skips the background-animation half, which is what the gate was keeping off a
+screen that is not on show. `showEffects` already self-guards on `screen()->isActive()`.
+
+Not gated on `MAELSTROM_DATA`: a control that is logically visible must not be drawn at
+`alpha_ == 0` under either schema.
+
+To watch it happen, log the control's state at the top of `UI_ControlBase::redraw` keyed on
+`name()` and only on change — one line per transition is enough to read the whole sequence,
+and the `scrActive` in the trace is what names the branch:
+
+```
+hideByTrigger    visTrig_=1 tmode=0 alpha=1.000 scrActive=1
+applyHide        visTrig_=0 tmode=2 alpha=1.000 scrActive=1
+MMBASE           vis=0 visTrig=0 tmode=2 alpha=0.990       <- the fade
+doShowByTrigger  visTrig_=0 tmode=0 alpha=0.000 scrActive=0 <- the inactive branch
+MMBASE           vis=1 visTrig=1 tmode=0 alpha=0.000        <- visible and transparent
+```
+
 ### The world's own lighting — `Environment::serialize` / `EnvironmentTime::serializeMaelstrom`
 
 Everything the engine lights a world with — the sun, sky, fog and shadow gradients, the sky
