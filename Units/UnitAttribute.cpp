@@ -1648,7 +1648,7 @@ static void convertMaelstromChain(ChainID& chainID, MovementState& movementState
 	// the 2008 converter wrote into this tree's own files, where every death chain reads
 	// ALL_MOVEMENTS | ALL_SIDES | ALL_POSE.
 	default:
-		state = ANIMATION_STATE_ALL_MOVEMENTS | ANIMATION_STATE_ALL_POSE;
+		state = ANIMATION_STATE_ALL_MOVEMENTS | ANIMATION_STATE_ALL_SIDES | ANIMATION_STATE_ALL_POSE;
 		break;
 	}
 
