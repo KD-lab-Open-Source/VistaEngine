@@ -381,6 +381,15 @@ void UI_ShowModeSprite::serialize(Archive& ar)
 	ar.serialize(sprites_, "sprites", "Спрайты");
 }
 
+#ifdef MAELSTROM_DATA
+void UI_ShowModeSprite::addSprite(UI_ControlShowModeID mode, const UI_Sprite& sprite)
+{
+	sprites_.push_back(StateSprite());
+	sprites_.back().mode_ = mode;
+	sprites_.back().sprite_ = sprite;
+}
+#endif
+
 void UI_ShowModeSprite::preLoad()
 {
 	StateSprites::iterator it;

@@ -1362,6 +1362,44 @@ that genuinely are in contact. This is not a niche condition — P2's own script
 Maelstrom's use it **326 times across 39 chains**, so the same latch was distorting every AI
 chain in the game, not just this one.
 
+### The unit pictures — `UI_ControlUnitList::serialize`
+
+Selecting a soldier showed his read-outs and no picture; selecting a group gave a row of health
+bars over empty slots. Selecting a *hero* looked right, which is what makes this one worth
+writing down — it is the tell that separates the two explanations, and it points away from the
+renderer. The Aliens HUD carries `FACE MAM`, `FACE AUR` and `FACE PSYCH`, one hand-made
+`UI_ControlButton` per hero, each with its portrait in its own show modes. Every other unit's
+picture comes out of a `UI_ControlUnitList` — `ONE`/`1Select A` for a single selection, `Select`
+for a group, `Waitlist` for the production queue. So a working hero portrait and a blank soldier
+are not the same control at all, and nothing about the pair implicates a texture.
+
+The list's table drifted in four ways at once:
+
+| pre-2008 | now |
+|---|---|
+| `unitSpriteParams_` — the member's trailing underscore is on the wire | `unitSpriteParams` |
+| `vector<{ unitAttributeReferenre_; ID_; sprite_ }>` — one entry per (unit, show mode) pair | `StaticMap<AttributeUnitOrBuildingReference, UI_ShowModeSprite>` — keyed by unit, show modes inside the value |
+| the **first entry of the list** is the sprite for any unit the list does not name | `defSprite` |
+| — | `squadRef`, for `UI_UNITLIST_SQUADS_IN_WORLD`, an enumerator pre-2008 does not have |
+
+Our reader asks for two names the data never wrote, so `unitSpriteParams_` and `defSprite_` both
+stayed empty. `getSprite()` then returned null, `getSelectSprite()` returned null too — pre-2008
+`AttributeBase` has no `Miniatures` field and no `ui_faces`, so nothing in `AttributeLibrary`
+could have answered — and `setSprites` fell through to the empty `defSprite_`. Eleven lists,
+between 14 and 80 entries each, all unread.
+
+The fold into the new shape is exact rather than approximate, which is worth stating because the
+lookup rule looks like it should have been lost. Pre-2008 `getSprite(unit, id)` scanned the flat
+list, kept the first entry naming the unit, and let an exact `ID_` match win; 2008's
+`UI_ShowModeSprite::sprite(id)` returns the exact `mode_` match and otherwise `sprites_.front()`.
+Push the entries in data order and the two agree term for term. Every entry of every shipped list
+is `UI_SHOW_NORMAL` with no unit named twice, so in practice the general case never comes up.
+
+Entry 0 of each list is `name = ""` with an empty `texture_` — a real default in the pre-2008
+sense, and one that resolves to no attribute. It goes into the map along with everything else (an
+unresolvable reference keys at `-1`, which no live unit can collide with) and its sprite is
+copied into `defSprite_`, so both the named and the unnamed path behave as they did.
+
 ## What the rest of the binary formats do
 
 Mostly nothing — they already load:
