@@ -554,6 +554,131 @@ They feed `UnitSquad::quant`'s per-unit waypoint marks, which are gated on `show
 `showAllWayPoints` / `targetPoint` — none of which exist in Maelstrom's `AttributeSquad` either.
 The whole waypoint-trail feature is 2008's.
 
+### The objective marks — `Anchor::serialize`
+
+The campaign's checkpoints. A mission assigns a task, the minimap pulses a ring of white
+rings — a stone dropped in water — over the place you are being sent to, and when you get
+there the ring moves to the next one. None of them were drawn.
+
+The ring is an `Anchor` of type `MINIMAP_MARK` placed in the world, switched on and off by
+`ActionActivateMinimapMark` / `ActionDeactivateMinimapMarks` from the mission's trigger chain.
+`SourceManager::logicQuant` walks the anchors every quant and hands the selected ones to
+`UI_Minimap::addAnchor`, which draws each one's `UI_MinimapSymbol`.
+
+The symbol is what drifted. Pre-2008 the anchor owned a bare `UI_MinimapSymbol*` and wrote it
+as a plain nested `symbol` node, and only when the anchor was a `MINIMAP_MARK`:
+
+```cpp
+if(type_ == MINIMAP_MARK){
+    if(!symbol_)
+        symbol_ = new UI_MinimapSymbol;
+    ar.serialize(*symbol_, "symbol", "Символ на миникарте");
+}
+else if(symbol_){ delete symbol_; symbol_ = 0; }
+```
+
+2008 made it a `PolymorphicHandle<UI_MinimapSymbolPolymorphic>` under a **different name**,
+`uisymbol`. Not one of Maelstrom's 51 worlds contains that string, so the handle stays null.
+Nothing errors — `addAnchor` opens with `if(anchor->symbol())` and drops the anchor before
+anything is built, the same shape of silent miss as the cursor table and the order marks.
+
+Everything else about the mark survived the move: the fields inside the node (`type`,
+`scaleByEvent`, `selfScale`, `useLegionColor`, `sprite`) are spelled identically on both sides,
+so only the container had to be read differently. The `active` flag is absent from the data —
+the editor did not write it — which is right: the marks start off and the triggers turn them on.
+
+The whole set is 47 anchors across 16 worlds, and they are uniform: every one is a
+`SYMBOL_SPRITE`, 44 on `point.avi` with `scaleByEvent` (radius 100–800 world units, so the
+ring is drawn at the size the designer gave the anchor) and 3 on `escape.avi` at `selfScale`.
+Both are animated textures, which is where the rings come from: `UI_Sprite::isAnimated` sends
+them down `flushSprites`' per-sprite `animatedSprites_` path, one draw each with its own phase.
+
+Reading it back is worth doing end to end, because five separate things have to line up and
+only the last one is visible. In C1M1, from the trigger that assigns the first task:
+
+```
+SERIALIZE found=1 label='P1' active=1              <- the action read its anchor name
+ACTION    label=P1 resolved=1 active=1             <- LabelObject found the anchor
+ADDANCHOR label=P1 inited=1 symbol=1               <- the fix: the symbol is there
+CMD       label=P1 spriteEmpty=0 animated=1 r=800  <- point.avi resolved and is multi-frame
+ANIMFLUSH phase=0.0157 quad=(343,952)-(283,1013)   <- reaching the renderer, phase advancing
+```
+
+The chain that carries it is worth naming too, since it crosses threads twice: trigger →
+`Anchor::setSelected` → `SourceManager::logicQuant` → `UI_Minimap::addAnchor` (logic) →
+`uiStreamCommand` → `fAddWorldMarkCommand` (graphics) → `updateEvent(BACKGROUND)` →
+`drawEvents` → `drawSprite` → `flushSprites`.
+
+The mission's own structure is the useful thing to know when testing: the mark is tied to the
+task, not to the player. `Задача 1 НАЗНАЧЕНА` links to a trigger holding
+`ActionActivateMinimapMark`, and `Задача 1 ВЫПОЛНЕНА` links to the pair that deactivates the
+old mark and activates the next. So the first ring is up seconds after the mission starts,
+before the player has done anything, and each later one arrives on a completed task.
+
+### The panel that came back invisible — `UI_ControlBase::doShowByTrigger`
+
+The other half of the same report. Reaching a checkpoint plays a cutscene, and when it ended
+the minimap panel was gone — frame, map, marks, all of it — and never returned for the rest of
+the mission.
+
+Nothing had hidden it. Every flag the engine tests said the control was fully visible
+(`isVisible_`, `isVisibleByTrigger_`, `isEnabled_` set, `redrawLock_` and `isDeactivating_`
+clear), no transform was running, the map texture was alive and `UI_Minimap::inited()` was
+true. The panel was being drawn every frame at `alpha_ == 0`.
+
+Three steps get it there, and the middle one is the bug:
+
+1. A trigger hides an ancestor of the minimap while the screen is active. `hideByTrigger` sets
+   `TRANSFORM_DEACTIVATION` and `applyHide` starts the fade the control declares
+   (`activationType = TRANSFORM_ALPHA`, `deactivationTime = 2.`). It runs to the end and
+   leaves `alpha_` at 0.
+2. The screen is deactivated for the cutscene, and the trigger shows the panel again while it
+   is inactive. `doShowByTrigger` takes its `else` branch, which flips
+   `isVisibleByTrigger_` back to true and does nothing else — no `applyShow()`, so nothing
+   winds the alpha back.
+3. The interface is rebuilt. `logicInit` clears `transformMode_` but never touches `alpha_`,
+   and the finished deactivation transform goes on re-applying `alpha_ = 1 - 1*1` from
+   `transformQuant` every frame, permanently.
+
+Pre-2008 cannot reach this. Its `showByTrigger` has no `screen()->isActive()` gate at all —
+it always calls `applyShow()`:
+
+```cpp
+if(!isVisibleByTrigger_){
+    waitingUpdate_ = true;
+    isVisibleByTrigger_ = true;
+    if(isVisible_) { redrawLock_ = true; applyShow(); }
+}
+```
+
+2008 added the gate, the `else` branch, and the `showByTrigger`/`doShowByTrigger` split. The
+hide side got a counterpart for the inactive case — `hideEffects(true)`, the immediate hide —
+and the show side never did. Stock P2 hides the asymmetry because a screen whose
+`activationTime` is non-zero re-establishes the transform on every activation
+(`UI_Screen::initActivationActions` calls `setActivationTransform` only `if(duration >
+FLT_EPS)`); Maelstrom's in-game screen declares zero, so nothing ever fixes it up.
+
+The fix is `UI_ControlBase::restoreShownTransform`, called from the inactive-screen branch of
+`doShowByTrigger` **and** of `doShow`, which had the identical gap. It replays the transform
+half of `applyShow` — `setActivationTransform(0.f, true)`, the same call `applyShow` makes —
+and deliberately skips the background-animation half, which is what the gate was keeping off a
+screen that is not on show. `showEffects` already self-guards on `screen()->isActive()`.
+
+Not gated on `MAELSTROM_DATA`: a control that is logically visible must not be drawn at
+`alpha_ == 0` under either schema.
+
+To watch it happen, log the control's state at the top of `UI_ControlBase::redraw` keyed on
+`name()` and only on change — one line per transition is enough to read the whole sequence,
+and the `scrActive` in the trace is what names the branch:
+
+```
+hideByTrigger    visTrig_=1 tmode=0 alpha=1.000 scrActive=1
+applyHide        visTrig_=0 tmode=2 alpha=1.000 scrActive=1
+MMBASE           vis=0 visTrig=0 tmode=2 alpha=0.990       <- the fade
+doShowByTrigger  visTrig_=0 tmode=0 alpha=0.000 scrActive=0 <- the inactive branch
+MMBASE           vis=1 visTrig=1 tmode=0 alpha=0.000        <- visible and transparent
+```
+
 ### The world's own lighting — `Environment::serialize` / `EnvironmentTime::serializeMaelstrom`
 
 Everything the engine lights a world with — the sun, sky, fog and shadow gradients, the sky

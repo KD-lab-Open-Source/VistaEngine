@@ -1134,6 +1134,8 @@ private:
 	void applyShow();
 	friend void fCommandControlApplyHide(void* data);
 	void applyHide(bool immediately);
+	/// Wind an animated hide back to the shown state, for a screen that is not active
+	void restoreShownTransform();
 
 	friend void logUIState(int line, const char* func, const UI_ControlBase* control, const wchar_t* str);
 };
