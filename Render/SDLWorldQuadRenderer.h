@@ -196,8 +196,8 @@ private:
 	struct VSUniform { float mvp[16]; float fogPlane[4]; float world[16]; float reflectionMul[4]; };
 	// The fragment cbuffer of whichever shader the group takes. colorOp.x is worldtri's
 	// COLOR_OPERATION on the triangle route, and worldquad's SelectDiffuse on the quad one.
-	// colorOp.y is the quad route's "this texture arrived with straight alpha, premultiply
-	// it" flag -- see SetMaterial and worldquad.frag.hlsl.
+	// colorOp.y is the "this texture arrived with straight alpha, premultiply it" flag, which
+	// both routes read -- see SetMaterial, worldquad.frag.hlsl and worldtri.frag.hlsl.
 	//
 	// fogParams.x picks which of the TWO ways a group meets the fog, because this renderer's
 	// output is premultiplied and its groups are not all occluders:
