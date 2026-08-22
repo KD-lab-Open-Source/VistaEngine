@@ -17,6 +17,9 @@
 // needs no help, so the pump's bookkeeping calls fold away.
 inline void PlatformSetKeyState(int /*vk*/, bool /*down*/) {}
 inline void PlatformClearKeyStates() {}
+// Likewise for the cursor: the real GetCursorPos asks the OS, so the pump's latch
+// is not needed here.
+inline void PlatformSetMousePosition(int /*x*/, int /*y*/) {}
 
 #else // !_WIN32
 
@@ -980,6 +983,15 @@ SHORT GetAsyncKeyState(int vk);
 void PlatformSetKeyState(int vk, bool down);
 void PlatformClearKeyStates();
 
+// Polled cursor position, the mouse's counterpart to GetAsyncKeyState above and fed
+// the same way -- by the SDL event pump, rather than queried from SDL on the spot.
+// The callers that poll rather than wait for WM_MOUSEMOVE are the modal
+// loops that run their own frame (ReelManager::showLogoModal, whose metaballs and
+// fish both track the cursor); a stub returning (0,0) leaves them pinned to the top
+// left corner. SDL reports motion in WINDOW coordinates, and ScreenToClient below
+// is the identity, so this is client-relative -- which is what every caller wants.
+void PlatformSetMousePosition(int x, int y);
+
 // PeekMessage flag, LoadImage flags (winuser.h).
 #define PM_REMOVE       0x0001
 #define IMAGE_CURSOR    2
@@ -993,7 +1005,7 @@ struct NMHDR { HWND hwndFrom; unsigned long idFrom; UINT code; };
 // eventual SDL3 replacement (Track B).
 inline BOOL ScreenToClient(HWND, POINT*) { return TRUE; }
 inline BOOL ClientToScreen(HWND, POINT*) { return TRUE; }
-inline BOOL GetCursorPos(POINT* p) { if(p){ p->x = 0; p->y = 0; } return TRUE; }
+BOOL GetCursorPos(POINT* p);   // see PlatformSetMousePosition above
 inline BOOL DestroyCursor(HCURSOR) { return TRUE; }
 inline int  ShowCursor(BOOL) { return 0; }
 inline BOOL ShowWindow(HWND, int) { return TRUE; }
