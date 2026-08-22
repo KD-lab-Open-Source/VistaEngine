@@ -325,6 +325,13 @@ struct UI_ShowModeSprite
 
 	const StateSprites& sprites() const { return sprites_; }
 
+#ifdef MAELSTROM_DATA
+	/// Pre-2008 wrote a UI_ControlUnitList's pictures as one flat (unit, mode, sprite) list
+	/// instead of a table per unit, so the reader of that layout has to build this table
+	/// entry by entry. See UI_ControlUnitList::serialize.
+	void addSprite(UI_ControlShowModeID mode, const UI_Sprite& sprite);
+#endif
+
 	void preLoad();
 	void release();
 

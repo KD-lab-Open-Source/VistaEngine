@@ -1844,6 +1844,28 @@ void UI_ControlCustom::serialize(Archive& ar)
 
 // ------------------- UI_ControlUnitList
 
+#ifdef MAELSTROM_DATA
+namespace {
+/// One entry of the pre-2008 unit-picture list: the unit it belongs to, the show mode it
+/// applies to, and the sprite itself. "unitAttributeReferenre_" is the original's spelling.
+struct MaelstromUnitSprite
+{
+	AttributeUnitOrBuildingReference unit;
+	UI_ControlShowModeID mode;
+	UI_Sprite sprite;
+
+	MaelstromUnitSprite() : mode(UI_SHOW_NORMAL) {}
+
+	void serialize(Archive& ar)
+	{
+		ar.serialize(unit, "unitAttributeReferenre_", "&юнит");
+		ar.serialize(mode, "ID_", "&состояние");
+		ar.serialize(sprite, "sprite_", "текстура");
+	}
+};
+}
+#endif
+
 UI_ControlUnitList::UI_ControlUnitList()
 {
 	type_ = UI_UNITLIST_SELECTED;
@@ -1880,9 +1902,33 @@ void UI_ControlUnitList::serialize(Archive& ar)
 	ar.serialize(type_, "type_", "тип списка");
 	if(type_ == UI_UNITLIST_SQUADS_IN_WORLD)
 		ar.serialize(squadRef_, "squadRef", "Тип сквада");
+#ifdef MAELSTROM_DATA
+	// Pre-2008 kept the pictures flat, one entry per (unit, show mode) pair, under a name
+	// carrying the member's trailing underscore -- and used the FIRST entry of that list for
+	// every unit the list does not name. 2008 keyed the table by unit, moved the show modes
+	// inside the value, dropped the underscore from the wire name, and gave the unnamed
+	// stand-in a field of its own. So our reader asks for two names the data never wrote and
+	// every slot of every unit list draws blank: no picture for a selected unit, and a
+	// multiple selection reduced to its health bars. Read the old list and fold it into the
+	// new shape -- the lookup rule survives the fold, because UI_ShowModeSprite::sprite()
+	// falls back to the first entry it holds exactly as getSprite() fell back to the first
+	// entry of the list. Only the input direction is meaningful; nothing writes this data back.
+	if(ar.isInput()){
+		vector<MaelstromUnitSprite> sprites;
+		if(ar.serialize(sprites, "unitSpriteParams_", "картинки юнитов") && !sprites.empty()){
+			unitSpriteParams_.clear();
+			defSprite_ = UI_ShowModeSprite();
+			vector<MaelstromUnitSprite>::const_iterator it;
+			FOR_EACH(sprites, it)
+				unitSpriteParams_[it->unit].addSprite(it->mode, it->sprite);
+			defSprite_.addSprite(sprites.front().mode, sprites.front().sprite);
+		}
+	}
+#else
 	ar.serialize(defSprite_, "defSprite", "Картинка по умолчанию");
 	ar.serialize(unitSpriteParams_, "unitSpriteParams", "приоритетные картинки юнитов");
-	
+#endif
+
 	float scaleFactor = (activeTransform_.scale().x - 1.f) * 100;
 	ar.serialize(scaleFactor, "scaleFactor", "% изменения активной ячейки");
 	scaleFactor = 1.f + scaleFactor / 100.f;
