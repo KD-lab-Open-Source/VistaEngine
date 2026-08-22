@@ -196,10 +196,11 @@ SDL_GPUGraphicsPipeline* SDLWorldQuadRenderer::pipelineFor(eBlendMode blend, boo
 	attrs[2].location = 2; attrs[2].buffer_slot = 0; attrs[2].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;      attrs[2].offset = 16;
 	attrs[3].location = 3; attrs[3].buffer_slot = 0; attrs[3].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;      attrs[3].offset = 24;
 
-	// The blend the caller's SetWorldMaterial / SetNoMaterial asked for. Every one of them
-	// is written with a premultiplied source, because the textures decode premultiplied and
-	// the shaders keep them that way (see worldquad.frag.hlsl), so each D3D src factor of
-	// SRC_ALPHA becomes ONE:
+	// The blend the caller's SetWorldMaterial / SetNoMaterial asked for. Every one of them is
+	// written with a premultiplied source, so each D3D src factor of SRC_ALPHA becomes ONE.
+	// Nothing hands this renderer a premultiplied texture -- no decoder does that any more --
+	// so BOTH fragment shaders premultiply t0 themselves, on SetMaterial's colorOp.y flag;
+	// their vertex shaders premultiply the vertex colour, and the product stays premultiplied:
 	//
 	//   ALPHA_BLEND         dst*(1-a) + src*a  ->  (ONE, 1-SRC_ALPHA)
 	//   ALPHA_ADDBLENDALPHA dst + src*a        ->  (ONE, ONE)
@@ -359,11 +360,11 @@ void SDLWorldQuadRenderer::SetMaterial(eBlendMode blend, cTexture* texture, bool
 		}
 	material_.fs.colorOp[0] = op;
 	// Whether the fragment shader has to premultiply the texel itself. This pipeline blends
-	// a premultiplied source, and the DDS decoder hands one over -- but a .tga or an .avi
-	// frame does not, and every texture that reaches this renderer in either game is one of
-	// those. Blending straight alpha with (ONE, ...) puts the texel's colour in at full
-	// strength however transparent it is, so a soft-edged particle draws as a hard bright
-	// square. See worldquad.frag.hlsl.
+	// a premultiplied source, and nothing that reaches this renderer is one: cTexture::
+	// isPremultiplied() is false for every texture in either game. Blending straight alpha
+	// with (ONE, ...) puts the texel's colour in at full strength however transparent it is,
+	// so a soft-edged particle draws as a hard bright square. Read by both routes' fragment
+	// shaders -- worldquad.frag.hlsl as SelectDiffuse.y, worldtri.frag.hlsl as ColorOp.y.
 	material_.fs.colorOp[1] = (texture && !texture->isPremultiplied()) ? 1.f : 0.f;
 	material_.fs.colorOp[2] = material_.fs.colorOp[3] = 0.f;
 }
