@@ -1386,10 +1386,22 @@ WeaponAnimationMode WeaponBase::animationMode() const
 	if(aimControllerPrm().hasAnimation()){
 		if(isFiring())
 			return WEAPON_ANIMATION_FIRE;
-		
+
+#ifndef MAELSTROM_DATA
+		// 2008 added the reload mode and the CHAIN_RELOAD / CHAIN_RELOAD_INVENTORY it looks
+		// up, and put the test ahead of isTargeting(). Pre-2008 had neither: WeaponAnimationMode
+		// was NONE/AIM/FIRE and the ChainID enum has no reload member at all, so a reloading
+		// weapon fell through to the aim chain and the unit held its aim pose.
+		//
+		// Maelstrom's units therefore carry no reload chain and never could. Asking for one
+		// makes weaponChainQuant's findChain return null, which leaves the animation group out
+		// of activeAnimationGroups, and setChainByHealthExcludeGroups then overwrites it with
+		// CHAIN_MOVEMENTS -- so a unit firing at a target snapped between its fire chain and
+		// its stand chain once per shot, each flip restarting the other at phase 0.
 		if(isLoading())
 			return WEAPON_ANIMATION_RELOAD;
-		
+#endif
+
 		if(isTargeting())
 			return WEAPON_ANIMATION_AIM;
 	}

@@ -1400,6 +1400,61 @@ sense, and one that resolves to no attribute. It goes into the map along with ev
 unresolvable reference keys at `-1`, which no live unit can collide with) and its sprite is
 copied into `defSprite_`, so both the named and the unnamed path behave as they did.
 
+### A weapon mode the data cannot answer — `WeaponBase::animationMode`
+
+A drift of a third kind: not a field that changed meaning, but an enumerator 2008 **added**,
+whose answer pre-2008 data has no way to supply.
+
+Any Maelstrom unit that reloads while it has a target loses its fire animation for the duration
+of the reload. On a single-animation-group unit the group flips to the stand chain and back once
+per shot, each flip restarting the other chain at phase 0 so neither ever plays through:
+
+| phase | 2008 `animationMode()` | lookup | result |
+| --- | --- | --- | --- |
+| firing | `WEAPON_ANIMATION_FIRE` | `CHAIN_FIRE` | found → group gets `Стрелять` |
+| reloading | `WEAPON_ANIMATION_RELOAD` | `CHAIN_RELOAD` | **null** → group falls back to `Движения` |
+
+The null is not recoverable by the data. In `origin/Maelstrom`, `WeaponAnimationMode` is
+`NONE, AIM, FIRE` — there is no reload mode — and the `ChainID` enum has `CHAIN_FIRE/_WALKING/
+_RUNNING` and `CHAIN_AIM/_WALKING/_RUNNING` but **no `CHAIN_RELOAD` member at all**. Pre-2008
+`WeaponBase::animationMode` has no `isLoading()` branch either, so a reloading weapon fell
+through to `isTargeting()` and held the aim chain. 2008 added the mode, added
+`CHAIN_RELOAD`/`CHAIN_RELOAD_INVENTORY`, and put `isLoading()` **ahead of** `isTargeting()`,
+pre-empting that fallback. O'Niel's 22 chain kinds contain no reload chain, and no pre-2008
+unit could: the id did not exist when the data was authored.
+
+When the lookup returns null, `weaponChainQuant` never puts the group in
+`activeAnimationGroups`, so `setChainByHealthExcludeGroups(CHAIN_MOVEMENTS, …)` overwrites it —
+hence the snap to the stand chain on every reload.
+
+`#ifndef MAELSTROM_DATA` around the `isLoading()` test restores the pre-2008 fall-through.
+
+This was found while chasing a report that skipping the `c1_m1` checkpoint cutscene left O'Niel
+waving his gun as if still talking. **That report is unrelated to this fix, and is not a bug at
+all** — recorded here so nobody investigates it twice. The skip is innocent: a no-skip run shows
+the same animation, and a per-quant trace has him aiming and firing from t≈19s, minutes before
+the cutscene starts. Three weapons produce it, all behaving as the data specifies — his rifle
+`WF ONIEL(винтовка)` engaging real hostiles (`E-GRUNT`, `E-SCOUTBAGGY-TURRET`) and civilians
+(`V-PEOPLE`); `R-захват союзных юнитов`, an `AFFECT_ALLIED_UNITS` capture ability that
+auto-acquires *friendly* units and fires at them, which looks like attacking nothing because the
+target is an ally and a capture ability has no visible projectile; and `JB alvais`,
+`SHOOT_MODE_ALWAYS`, whose `needAutoFire()` path picks a **random ground point** every reload and
+shoots at it, invisible only because it has no aim animation. The whole auto-fire chain —
+`fireRequest`'s dispatch, `fireRequestAuto`, `canAutoAttackTarget`, `canAutoFire`,
+`WeaponBase::canAttack`'s `affectMode` switch, `MicroAiScaner::canAttack`, `assignTargets`, and
+the random-ground-fire block — is identical to `origin/Maelstrom`; where 2008 differs it only
+adds restrictions. Two accessors mislead badly while probing this: `hiddenLogic()` is
+`hideReason_ &~ HIDE_BY_FOW`, so it can never report fog (use `hiddenGraphic()` to ask whether
+something is drawn), and `FogOfWarState` is a bitflag starting at `FOGST_NONE = 1`, so a fog
+state of `1` means *clear*.
+
+Fixed alongside it, found on the way and unrelated to the symptom: `convertMaelstromChain`'s
+`default:` branch set `ALL_MOVEMENTS | ALL_POSE` while the comment above it states the intended
+`ALL_MOVEMENTS | ALL_SIDES | ALL_POSE`. `ALL_SIDES` was missing, so any non-gait chain whose
+record omits direction bits would fail `findAnimationChainInterval`'s superset test against a
+query naming a direction. O'Niel's records supply `ALL_SIDES` themselves, which is why this one
+did not bite here.
+
 ## What the rest of the binary formats do
 
 Mostly nothing — they already load:
