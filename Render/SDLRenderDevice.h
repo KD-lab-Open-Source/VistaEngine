@@ -47,6 +47,7 @@ class SDLGrassRenderer;
 class SDLCloudShadowRenderer;
 class SDLEnvironmentEarthRenderer;
 class SDLPostEffectRenderer;
+class SDLBlobsRenderer;
 class cTileMap;
 
 // Restrict drawing to a camera's viewport, the way cD3DRender::SetDrawTransform hands
@@ -109,6 +110,11 @@ SDLEnvironmentEarthRenderer* sdlEnvironmentEarthRenderer();
 // record into it exactly as they drive PSMonochrome / PSUnderWater on Windows; the device
 // composites the chain in drawPostEffects(). See SDLPostEffectRenderer.h.
 SDLPostEffectRenderer* sdlPostEffectRenderer();
+
+// The SDL backend's metaball renderer, or null under any other device. cBlobs drives it
+// exactly as it drove the device's quad buffer and PSBlobsShader on Windows; the device
+// runs both of its passes in drawBlobs(). See SDLBlobsRenderer.h.
+SDLBlobsRenderer* sdlBlobsRenderer();
 
 class cSDLRenderDevice : public cInterfaceRenderDevice
 {
@@ -187,6 +193,15 @@ public:
 	SDLPostEffectRenderer* postEffectRenderer() { return postEffectRenderer_.get(); }
 	void armSceneCapture();
 	void drawPostEffects();
+
+	// --- The logo splash's metaballs -----------------------------------------
+	// cBlobs records its cells and its composite here and calls drawBlobs, which stands in
+	// for drawPostEffects for that frame: it settles the same scene capture and composites
+	// it to the swapchain through the metaball field instead of through the effect chain.
+	// The splash has no Environment, so no post effect is ever recorded alongside it.
+	// See SDLBlobsRenderer.h.
+	SDLBlobsRenderer* blobsRenderer() { return blobsRenderer_.get(); }
+	void drawBlobs();
 
 	// --- UI and minimap -----------------------------------------------------
 	// Neither has a draw call of its own. The UI renderer's pass runs at EndScene, over
@@ -650,6 +665,13 @@ private:
 	std::unique_ptr<SDLCloudShadowRenderer> cloudShadowRenderer_;
 	std::unique_ptr<SDLEnvironmentEarthRenderer> environmentEarthRenderer_;
 	std::unique_ptr<SDLPostEffectRenderer>  postEffectRenderer_;
+	std::unique_ptr<SDLBlobsRenderer>       blobsRenderer_;
+
+	// Settle the scene capture so a composite can sample a finished frame: replay what the
+	// scene walk still holds, and give a capture nothing drew into its clear. Shared by
+	// drawPostEffects and drawBlobs, which are the two composites. False if the capture is
+	// not armed, i.e. there is nothing to composite.
+	bool settleSceneCapture();
 };
 
 #endif // VISTA_SDL_RENDER_DEVICE_H

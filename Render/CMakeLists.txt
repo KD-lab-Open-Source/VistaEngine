@@ -162,6 +162,16 @@ vista_shader_module(posteffect
     "posteffect_monochrome_frag=monochrome.frag.hlsl:fragment"
     "posteffect_underwater_frag=underwater.frag.hlsl:fragment")
 
+# The logo splash's metaballs. Only the composite is new (blobs.frag.hlsl, the port of
+# Render/shader/PostProcessing/blobs.psl): the cell pass is a pixel-space textured quad
+# shaded `texture * diffuse`, which is exactly the UI pair, and the composite rides the
+# post effects' fullscreen triangle. See SDLBlobsRenderer.h.
+vista_shader_module(blobs
+    "blobs_cell_vert=ui.vert.hlsl:vertex"
+    "blobs_cell_frag=ui.frag.hlsl:fragment"
+    "blobs_vert=posteffect.vert.hlsl:vertex"
+    "blobs_frag=blobs.frag.hlsl:fragment")
+
 add_custom_target(VistaShaders DEPENDS ${SHADER_HEADERS})
 
 set(RENDER_SOURCES
@@ -222,6 +232,7 @@ set(RENDER_SOURCES
     SDLCloudShadowRenderer.cpp
     SDLEnvironmentEarthRenderer.cpp
     SDLPostEffectRenderer.cpp
+    SDLBlobsRenderer.cpp
     # Symbols the engine still names that the D3D backend used to define
     # (gb_RenderDevice, the sampler constants, the sPtr buffer handles).
     RenderStub.cpp

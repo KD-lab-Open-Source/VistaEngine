@@ -14,7 +14,6 @@
 #include "Bubles/Cell.h"
 #include "Render/src/cCamera.h"
 #include "Render/src/TexLibrary.h"
-#include "Render/D3D/D3DRender.h"
 #include "Render/src/NParticle.h"
 #include "Render/src/Scene.h"
 #include "Render/src/VisGeneric.h"
@@ -502,26 +501,24 @@ private:
 	float fadeTime_;
 };
 
-// TODO(sdl-port): the KD-lab logo splash -- the fish swimming under a screen full of metaballs --
-// is still D3D9, and it is the one thing behind the video gate that the video port did not bring
-// back. The scene half of it would run (cScene / cObject3dx have an SDL path); the effect half
-// does not. cBlobs draws its cells through the D3D9-only cQuadBuffer family, composites them
-// with PSBlobsShader out of the retired shader system (Render/shader/shaders.cpp), and asks
-// gb_RenderDevice3D for a render target, a PS 2.0 capability check and a SetVertexShader -- none
-// of which exist on the portable interface. The loop below also StretchRects the back buffer
-// into a texture, which has no equivalent either; the SDL way is to point the camera at a render
-// target (see Documents/Render-PORTING.md).
+// The KD-lab logo splash: the fish swimming under a screen full of metaballs, which
+// ActionShowLogoReel fires from the global trigger chain.
 //
-// It never ran off Windows and, with DisableVideo defaulting to true, it had not run at all --
-// so the crash it takes on gb_RenderDevice3D (null since the backend was retired) was latent
-// until the reels started playing. Skip it rather than dereference null. Nothing waits on it:
-// ActionShowLogoReel overrides no workedOut(), so its trigger completes the moment activate()
-// returns, and the game simply carries on without a logo.
+// Ported to SDL GPU (Documents/Render-PORTING.md #23). The scene half always would have run --
+// cScene / cObject3dx have an SDL path -- and the effect half now does too: cBlobs records its
+// cells and its composite into SDLBlobsRenderer, which owns the metaball field target and both
+// passes. See Render/SDLBlobsRenderer.h.
+//
+// One structural change from D3D9. The composite refracts the frame behind it, and the original
+// got that frame by StretchRect'ing the back buffer into a texture right here, after the scene
+// drew. SDL GPU cannot sample the swapchain, so the frame is turned around instead: cBlobs::
+// BeginFrame arms the scene-capture target before the scene walk and the composite reads that.
+// Same trick the post effects use (#6a), and the same reason.
+//
+// The loop pumps events itself, as showModal does: the abort key arrives through the window
+// procedure, and PeekMessage is a stub that returns FALSE off Windows.
 void ReelManager::showLogoModal(LogoAttributes& logoAttributes, const cBlobsSetting& blobsSetting, int stableTime,SoundLogoAttributes& soundAttributes)
 {
-	if(!gb_RenderDevice3D)
-		return;
-
 	int oldTextureDetail = gb_VisGeneric->GetTextureDetailLevel();
 	gb_VisGeneric->SetTextureDetailLevel(0);
 	int screenWidth = gb_RenderDevice->GetSizeX();
@@ -620,14 +617,12 @@ void ReelManager::showLogoModal(LogoAttributes& logoAttributes, const cBlobsSett
 		camera->SetFrustumPositionAutoCenter(sRectangle4f(0,0,1,1),1.0f/sqrt(2.f));
 	}
 	
-	cTexture* backTexture = GetTexLibrary()->CreateRenderTexture(screenWidth,screenHeight,TEXTURE_RENDER32);
 	float logoPhase=0;
 
 	// Init
 
 	cBlobs blobs;
 	blobs.Init(screenWidth, screenHeight);
-	//blobs.SetTexture(backTexture);
 	blobs.CreateBlobsTexture(64);
 
 	RandomGenerator rand_;
@@ -644,7 +639,6 @@ void ReelManager::showLogoModal(LogoAttributes& logoAttributes, const cBlobsSett
 	float clockPrev = startTime = xclock();
 	float maxTime = SPLASH_FADE_IN_TIME + stableTime + SPLASH_FADE_OUT_TIME;
 	visible = true;
-	MSG msg;
 	bool isWork = false;
 	float dnoPhase = 0;
 	bool bkgLoop = false;
@@ -660,6 +654,9 @@ void ReelManager::showLogoModal(LogoAttributes& logoAttributes, const cBlobsSett
 	sndSystem.StartFade(true);
 	Vect2i oldMousePos = mousePosition();
 	while (isVisible()) {
+			if (!pumpApplicationEvents())
+				break;   // the window was closed under us
+
 			sndSystem.Update();
 			double curTime = xclock();
 			if(curTime < clockPrev)
@@ -718,12 +715,11 @@ void ReelManager::showLogoModal(LogoAttributes& logoAttributes, const cBlobsSett
 			}
 			gb_RenderDevice->Fill(0, 0, 0, 0);
 			gb_RenderDevice->BeginScene();
+			// Route the scene into the capture target the composite samples, in place of
+			// the StretchRect of the back buffer that stood here. It has to be armed
+			// before anything draws, so it comes before the scene, not after it.
+			blobs.BeginFrame();
 			scene->Draw(camera);
-			IDirect3DSurface9 *pDestSurface=NULL;
-			RDCALL(backTexture->GetDDSurface(0)->GetSurfaceLevel(0,&pDestSurface));
-			RDCALL(gb_RenderDevice3D->D3DDevice_->StretchRect(
-				gb_RenderDevice3D->backBuffer_,NULL,pDestSurface,NULL,D3DTEXF_LINEAR));
-			RELEASE(pDestSurface);
 
 			blobs.BeginDraw();
 
@@ -745,7 +741,7 @@ void ReelManager::showLogoModal(LogoAttributes& logoAttributes, const cBlobsSett
 				}
 			}
 			
-			blobs.EndDraw(blobsSetting);
+			blobs.EndDraw();
 			
 			float workOut = false;
 			if(skate.isDrink()) {
@@ -820,8 +816,7 @@ void ReelManager::showLogoModal(LogoAttributes& logoAttributes, const cBlobsSett
 				}
 			}
 
-			if(gb_RenderDevice3D->IsPS20())
-				blobs.DrawBlobsShader(0, 0, phaseFade, backTexture, blobsSetting);
+			blobs.DrawBlobsShader(phaseFade, blobsSetting);
 			/**/
 /*
 			char s[512];
@@ -836,13 +831,6 @@ void ReelManager::showLogoModal(LogoAttributes& logoAttributes, const cBlobsSett
 */
 			gb_RenderDevice->EndScene();
 			gb_RenderDevice->Flush();
-
-			if ( PeekMessage(&msg, 0, 0, 0, PM_REMOVE) ) {
-				TranslateMessage( &msg );
-				DispatchMessage( &msg );
-		}
-
-//		}
 	}
 	bkgSound.Stop(true);
 	waterOut_.Stop(true);
@@ -854,7 +842,6 @@ void ReelManager::showLogoModal(LogoAttributes& logoAttributes, const cBlobsSett
 	gb_RenderDevice->Flush();
 	//RELEASE(logoTexture);
 	//RELEASE(backg);
-	RELEASE(backTexture);
 	RELEASE(dno);
 	skate.Release();
 	RELEASE(camera);

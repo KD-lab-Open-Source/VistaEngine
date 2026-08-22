@@ -54,6 +54,38 @@ SHORT GetAsyncKeyState(int vk)
 	return g_keyState[vk].load(std::memory_order_relaxed) ? SHORT(0x8000) : SHORT(0);
 }
 
+// ─── Polled cursor position ───────────────────────────────────────────────────
+// Written by the SDL event pump, read by GetCursorPos.
+//
+// Everything in this file runs on ONE thread: _beginthread is a no-op off Windows
+// (Platform/fake_includes/process.h) and Runtime::GameStart forces the synchronous
+// load path there, so the logic/graphics split never exists. These could be plain
+// ints. They are atomic to match g_keyState above -- the same kind of latch, fed
+// from the same place -- and relaxed atomics compile to the same load and store, so
+// the consistency costs nothing. Note it is per-slot, not per-pair: a reader can
+// still take x from one event and y from the next, which for a cursor is harmless.
+//
+// Window coordinates, since ScreenToClient is the identity here.
+namespace {
+std::atomic<int> g_mouseX{0};
+std::atomic<int> g_mouseY{0};
+}
+
+void PlatformSetMousePosition(int x, int y)
+{
+	g_mouseX.store(x, std::memory_order_relaxed);
+	g_mouseY.store(y, std::memory_order_relaxed);
+}
+
+BOOL GetCursorPos(POINT* p)
+{
+	if(!p)
+		return FALSE;
+	p->x = g_mouseX.load(std::memory_order_relaxed);
+	p->y = g_mouseY.load(std::memory_order_relaxed);
+	return TRUE;
+}
+
 // CreateFileA returns a FILE* (cast to HANDLE). CloseHandle must fclose those, but
 // it is also called on event/thread handles (CreateEvent/_beginthread) that are NOT
 // FILE*. Track the file handles we hand out so CloseHandle closes only those and is

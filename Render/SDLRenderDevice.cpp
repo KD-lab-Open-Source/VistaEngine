@@ -25,6 +25,7 @@
 #include "SDLCloudShadowRenderer.h"
 #include "SDLEnvironmentEarthRenderer.h"
 #include "SDLPostEffectRenderer.h"
+#include "SDLBlobsRenderer.h"
 
 // See the declarations in SDLRenderDevice.h.
 cSDLRenderDevice* sdlRenderDevice()
@@ -84,6 +85,12 @@ SDLPostEffectRenderer* sdlPostEffectRenderer()
 {
 	cSDLRenderDevice* dev = sdlRenderDevice();
 	return dev ? dev->postEffectRenderer() : nullptr;
+}
+
+SDLBlobsRenderer* sdlBlobsRenderer()
+{
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	return dev ? dev->blobsRenderer() : nullptr;
 }
 
 SDL_GPUTexture* createSolidGPUTexture(SDL_GPUDevice* device, unsigned int rgba)
@@ -248,6 +255,8 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND /*hWnd*/,
 		environmentEarthRenderer_ = std::make_unique<SDLEnvironmentEarthRenderer>(this, device_, window_);
 	if(!postEffectRenderer_)
 		postEffectRenderer_ = std::make_unique<SDLPostEffectRenderer>(device_, window_);
+	if(!blobsRenderer_)
+		blobsRenderer_ = std::make_unique<SDLBlobsRenderer>(device_, window_);
 	if(!minimapRenderer_){
 		minimapRenderer_ = std::make_unique<SDLMinimapRenderer>(device_, window_);
 		// The minimap draws inside the UI's pass, at the point in its run list where the
@@ -296,6 +305,7 @@ int cSDLRenderDevice::Done()
 	cloudShadowRenderer_.reset();
 	environmentEarthRenderer_.reset();
 	postEffectRenderer_.reset();
+	blobsRenderer_.reset();
 
 	if(device_){
 		// The depth buffers the offscreen colour targets own. Their colour textures are
@@ -409,6 +419,8 @@ int cSDLRenderDevice::BeginScene()
 		environmentEarthRenderer_->BeginFrame();
 	if(postEffectRenderer_)
 		postEffectRenderer_->BeginFrame();
+	if(blobsRenderer_)
+		blobsRenderer_->BeginFrame();
 
 	// The screen is this frame's swapchain image; its clear was armed by Fill(). Offscreen
 	// targets keep their textures across frames, but not the clears they have consumed.
@@ -933,16 +945,10 @@ void cSDLRenderDevice::armSceneCapture()
 	current_ = &capture_;
 }
 
-void cSDLRenderDevice::drawPostEffects()
+bool cSDLRenderDevice::settleSceneCapture()
 {
-	if(!bActiveScene_ || !commandBuffer_ || !postEffectRenderer_)
-		return;
-	if(!captureArmed_){
-		// Effects recorded with no capture armed have nothing to sample; they must not
-		// leak into a later frame.
-		postEffectRenderer_->DiscardDraws();
-		return;
-	}
+	if(!captureArmed_)
+		return false;
 
 	// Settle the capture: whatever the scene walk still holds (everything recorded past
 	// the last mid-scene flush) goes in, and the composite can sample a finished frame.
@@ -961,14 +967,57 @@ void cSDLRenderDevice::drawPostEffects()
 		}
 	}
 
-	postEffectRenderer_->Draw(commandBuffer_, captureTexture_, screen_.color,
-	                          screen_.w, screen_.h);
-
-	// The frame is back on the screen, fully covered: the UI pass at EndScene loads.
+	// The frame is about to go back on the screen, fully covered: the UI pass at EndScene
+	// loads rather than clears.
 	screen_.colorCleared = true;
 	screen_.depthCleared = true;
 	captureArmed_ = false;
 	current_ = &screen_;
+	return true;
+}
+
+void cSDLRenderDevice::drawPostEffects()
+{
+	if(!bActiveScene_ || !commandBuffer_ || !postEffectRenderer_)
+		return;
+	if(!captureArmed_){
+		// Effects recorded with no capture armed have nothing to sample; they must not
+		// leak into a later frame.
+		postEffectRenderer_->DiscardDraws();
+		return;
+	}
+
+	SDL_GPUTexture* capture = captureTexture_;
+	if(!settleSceneCapture())
+		return;
+
+	postEffectRenderer_->Draw(commandBuffer_, capture, screen_.color,
+	                          screen_.w, screen_.h);
+}
+
+// The logo splash's metaballs, and the frame they refract. This is drawPostEffects for that
+// one screen: the same armed capture, composited to the swapchain through the metaball
+// field instead of through the effect chain. See SDLBlobsRenderer.h.
+void cSDLRenderDevice::drawBlobs()
+{
+	if(!bActiveScene_ || !commandBuffer_ || !blobsRenderer_)
+		return;
+	if(!captureArmed_){
+		blobsRenderer_->DiscardDraws();
+		return;
+	}
+
+	SDL_GPUTexture* capture = captureTexture_;
+	if(!settleSceneCapture())
+		return;
+
+	if(!blobsRenderer_->Draw(commandBuffer_, capture, screen_.color, screen_.w, screen_.h)){
+		// Nothing was composited, and the swapchain is still empty. Fall back to the plain
+		// scene: the post-effect chain with no effect recorded is exactly that copy.
+		if(postEffectRenderer_)
+			postEffectRenderer_->Draw(commandBuffer_, capture, screen_.color,
+			                          screen_.w, screen_.h);
+	}
 }
 
 // ---------------------------------------------------------------------------

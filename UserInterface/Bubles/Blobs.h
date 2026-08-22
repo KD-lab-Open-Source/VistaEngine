@@ -19,34 +19,36 @@ struct cBlobsSetting
 
 };
 
+// The metaball field of the KD-lab logo splash. Ported to SDL GPU: the two draws below
+// record into SDLBlobsRenderer, which owns the field target and both passes. What used to
+// be here -- the field render target, PSBlobsShader, the unused per-plane textures and the
+// DrawBlobsSimply debug view of the target -- went with the D3D9 backend.
 class cBlobs
 {
-	enum { num_planes = 1 };
 public:
 	cBlobs();
 	~cBlobs();
 
 	void Init(int width,int height);
 
+	// Route the frame into the scene-capture target so the composite can sample it. Must
+	// run before anything draws -- i.e. right after BeginScene, not with the cells.
+	void BeginFrame();
+
 	void BeginDraw();
 	void Draw(int x,int y,int plane, float phase);
-	void EndDraw(const cBlobsSetting& setting);
+	void EndDraw();
 
-	cTexture* GetTarget(){return pRenderTarget;};
-
-	void DrawBlobsSimply(int x,int y);
-	void DrawBlobsShader(int x,int y, float phase, cTexture* texture, const cBlobsSetting& setting);
-	//void SetTexture(const char* name);
-	void SetTexture(cTexture* texture);
+	// The composite: the frame refracted and tinted through the field. `phase` is the
+	// splash's fade in/out.
+	void DrawBlobsShader(float phase, const cBlobsSetting& setting);
 
 	void CreateBlobsTexture(int size);
 protected:
-	cTexture* pRenderTarget;
-	cTexture* planeTextures[num_planes];
+	// The cell footprint, built on the CPU by CreateBlobsTexture.
 	cTexture *Texture;
 
 	vector<Vect3f> points;
-	class PSBlobsShader* pBlobsShader;
 };
 
 #endif _BLOBS_H_
