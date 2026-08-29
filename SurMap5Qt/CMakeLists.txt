@@ -149,6 +149,12 @@ add_executable(SurMap5Qt
     src/panels/ToolsTreePanel.cpp
     src/panels/ObjectsTreePanel.h
     src/panels/ObjectsTreePanel.cpp
+    # U6 panels — the minimap (CMiniMapWindow) and the gradients editor
+    # (CGradientsWindow) as dock widgets
+    src/panels/MiniMapPanel.h
+    src/panels/MiniMapPanel.cpp
+    src/panels/GradientsPanel.h
+    src/panels/GradientsPanel.cpp
 )
 
 # SurMap5Qt links EditorEngine (which carries the engine modules); Qt code

@@ -98,6 +98,16 @@ public:
 	};
 	int textureStatistics(QVector<TextureStat>& rows, int& totalSize);
 
+	// --- Minimap (U6). Forwarders to EngineViewport, so MainWindow and the
+	// minimap panel stay engine-free. ---
+	bool minimapSize(int& sizex, int& sizey) const;
+	// `out` receives sizex*sizey 0xFF000000|RGB pixels (the minimap image).
+	bool minimapPixels(unsigned long* out, int sizex, int sizey);
+	// Write map.tga into the world's directory (OnFileSaveminimaptoworld).
+	bool saveMiniMapToFile();
+	bool cameraCenter(float& x, float& y) const;
+	void setCameraCenter(float x, float y);
+
 public slots:
 	// Called ~60 Hz from MainWindow::universeQuant (MFC OnIdle equivalent).
 	void tick();

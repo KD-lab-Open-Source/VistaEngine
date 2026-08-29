@@ -8,6 +8,7 @@
 #include <QActionGroup>
 #include <QApplication>
 #include <QCloseEvent>
+#include <QComboBox>
 #include <QDebug>
 #include <QDockWidget>
 #include <QMenu>
@@ -33,6 +34,8 @@
 #include "tools/ToolManager.h"
 #include "panels/ToolsTreePanel.h"
 #include "panels/ObjectsTreePanel.h"
+#include "panels/MiniMapPanel.h"
+#include "panels/GradientsPanel.h"
 
 // Number of status-bar panes: 8 info + 2 separators — NUMBERS_PARTS_STATUSBAR
 // in GeneralView.h (8 + 2).
@@ -146,6 +149,8 @@ void MainWindow::createActions()
 	actStatistics_ = new QAction(tr("Statistics..."), this);
 	actResaveWorlds_ = new QAction(tr("Resave All Worlds"), this);
 	actMerge_      = new QAction(tr("Merge..."), this);
+	actSaveMiniMapToWorld_ = new QAction(tr("Save MiniMap to World"), this);
+	actSaveMiniMapToWorld_->setEnabled(false);   // OnUpdateIsWorldLoaded
 
 	// Edit menu (ID_EDIT_*).
 	actUndo_ = new QAction(tr("&Undo"), this);
@@ -271,6 +276,7 @@ void MainWindow::createActions()
 	connect(actStatistics_, &QAction::triggered, this, &MainWindow::fileStatistics);
 	connect(actResaveWorlds_, &QAction::triggered, this, &MainWindow::fileResaveWorlds);
 	connect(actMerge_, &QAction::triggered, this, &MainWindow::fileMerge);
+	connect(actSaveMiniMapToWorld_, &QAction::triggered, this, &MainWindow::fileSaveMiniMapToWorld);
 
 	// Edit menu.
 	connect(actUndo_, &QAction::triggered, this, &MainWindow::editUndo);
@@ -370,6 +376,7 @@ void MainWindow::createMenus()
 	fileMenu->addAction(actSaveWorldAs_);
 	// "Save MiniMap to World" / "Save Without terTool Color" — engine save
 	// variants, deferred until the minimap/save plumbing lands (U7).
+	fileMenu->addAction(actSaveMiniMapToWorld_);
 	fileMenu->addSeparator();
 	fileMenu->addAction(actResaveWorlds_);
 	fileMenu->addSeparator();
@@ -548,6 +555,23 @@ void MainWindow::createToolBars()
 	toolsToolBar_->addAction(actToolMove_);
 	toolsToolBar_->addAction(actToolRotate_);
 	toolsToolBar_->addAction(actToolScale_);
+	toolsToolBar_->addSeparator();
+
+	// ID_BRUSH_COMBO_PLACE — the brush-radius combo CToolsTreeWindow created on
+	// the tools toolbar (SurMap5/ToolsTreeWindow.cpp:87). The ArrSize_Brush
+	// list {1,3,5,7,10,15,20,30,50,75,100,150,200}; the data is the radius in
+	// world units, shown as-is (the original's SetItemData held the number).
+	brushRadiusCombo_ = new QComboBox(toolsToolBar_);
+	brushRadiusCombo_->setObjectName("brushRadiusCombo");
+	brushRadiusCombo_->setEditable(false);
+	static const long kArrSizeBrush[] = {1, 3, 5, 7, 10, 15, 20, 30, 50, 75, 100, 150, 200};
+	for(long v : kArrSizeBrush)
+		brushRadiusCombo_->addItem(QString::number(v), QVariant((qlonglong)v));
+	brushRadiusCombo_->setCurrentIndex(0);
+	brushRadius_ = 1;
+	toolsToolBar_->addWidget(brushRadiusCombo_);
+	connect(brushRadiusCombo_, QOverload<int>::of(&QComboBox::currentIndexChanged),
+	        this, &MainWindow::brushRadiusChanged);
 }
 
 void MainWindow::createDockPanels()
@@ -579,11 +603,23 @@ void MainWindow::createDockPanels()
 	propertiesDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	addDockWidget(Qt::RightDockWidgetArea, propertiesDock_);
 
-	// miniMapBar_ — the minimap render window (CMiniMapWindow). Phase 2.
+	// miniMapBar_ — the minimap render window (CMiniMapWindow). U6: the map
+	// image + camera marker panel (MiniMapPanel).
 	miniMapDock_ = new QDockWidget(tr("Minimap"), this);
 	miniMapDock_->setObjectName("miniMapDock");
 	miniMapDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+	miniMapPanel_ = new MiniMapPanel(view_, miniMapDock_);
+	miniMapDock_->setWidget(miniMapPanel_);
 	addDockWidget(Qt::RightDockWidgetArea, miniMapDock_);
+
+	// The gradients editor (CGradientsWindow) — U6 panel. The original hosted
+	// it as a bar dialog; here it is a dock next to the minimap.
+	gradientsDock_ = new QDockWidget(tr("Gradients"), this);
+	gradientsDock_->setObjectName("gradientsDock");
+	gradientsDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+	gradientsPanel_ = new GradientsPanel(gradientsDock_);
+	gradientsDock_->setWidget(gradientsPanel_);
+	addDockWidget(Qt::RightDockWidgetArea, gradientsDock_);
 
 	// TODO(Phase 7): QMainWindow::restoreState() from the saved geometry —
 	// replaces CExtControlBar::ProfileBarStateSerialize. Call restoreState()
@@ -638,6 +674,9 @@ void MainWindow::openWorld()
 	if(view_->loadWorld(worldsDir, worldName)){
 		QSettings().setValue("mainWindow/lastWorld", worldName);
 		statusBar()->showMessage(tr("World loaded: %1").arg(worldName));
+		if(miniMapPanel_)
+			miniMapPanel_->reload();      // CMiniMapWindow::onWorldChanged
+		actSaveMiniMapToWorld_->setEnabled(true);
 	}
 	else
 		statusBar()->showMessage(tr("Failed to load world: %1").arg(worldName));
@@ -665,6 +704,9 @@ void MainWindow::newWorld()
 	if(view_->createWorld(worldsDir, worldName)){
 		QSettings().setValue("mainWindow/lastWorld", worldName);
 		statusBar()->showMessage(tr("World created: %1").arg(worldName));
+		if(miniMapPanel_)
+			miniMapPanel_->reload();
+		actSaveMiniMapToWorld_->setEnabled(true);
 	}
 	else
 		statusBar()->showMessage(tr("Failed to create world: %1").arg(worldName));
@@ -832,6 +874,37 @@ void MainWindow::fileMerge()
 	// OnFileMerge: merge another world into the current one.
 	fprintf(stderr, "[file] merge: TODO\n");
 	statusBar()->showMessage(tr("Merge: not wired yet"));
+}
+
+void MainWindow::fileSaveMiniMapToWorld()
+{
+	// OnFileSaveminimaptoworld (SurMap5/MainFrame.cpp:1182): write the world's
+	// map.tga (vMap.saveMiniMap(H_SIZE/16, V_SIZE/16)), then refresh the panel
+	// so it shows the newly written image.
+	if(!view_->worldLoaded()){
+		statusBar()->showMessage(tr("No world is open"));
+		return;
+	}
+	if(view_->saveMiniMapToFile()){
+		statusBar()->showMessage(tr("Minimap saved"), 3000);
+		if(miniMapPanel_)
+			miniMapPanel_->reload();
+	}
+	else
+		statusBar()->showMessage(tr("Could not save minimap"));
+}
+
+// --- Tools (U6) ------------------------------------------------------------
+
+void MainWindow::brushRadiusChanged(int index)
+{
+	// OnBrushRadiusComboSelChanged (SurMap5/SToolBar.cpp): the combo holds the
+	// ArrSize_Brush values in its item data; switching updates the current
+	// brush radius the tools read (CSurToolBase::getBrushRadius).
+	const QVariant data = brushRadiusCombo_ ? brushRadiusCombo_->itemData(index) : QVariant();
+	brushRadius_ = data.isValid() ? data.toInt() : 1;
+	fprintf(stderr, "[tools] brush radius: %d\n", brushRadius_);
+	statusBar()->showMessage(tr("Brush radius: %1").arg(brushRadius_));
 }
 
 // --- Edit menu ------------------------------------------------------------

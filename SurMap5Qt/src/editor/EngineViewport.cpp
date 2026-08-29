@@ -585,3 +585,80 @@ int EngineViewport::textureStatistics(const TextureStat*& out, int& totalSize)
 	out = stats.data();
 	return count;
 }
+
+// --- Minimap (U6) ----------------------------------------------------------
+
+bool EngineViewport::minimapSize(int& sizex, int& sizey) const
+{
+	if(!worldLoaded_)
+		return false;
+	sizex = (int)vMap.H_SIZE / 16;
+	sizey = (int)vMap.V_SIZE / 16;
+	if(sizex < 1) sizex = 1;
+	if(sizey < 1) sizey = 1;
+	return true;
+}
+
+// Port of vrtMap::saveMiniMap (Terra/VMAP.CPP:917): average every stepXVM x
+// stepYVM block of the world into one RGB pixel, exactly the way the original
+// built map.tga — minus the TGA file write, so the Qt minimap panel gets the
+// pixels directly.
+bool EngineViewport::minimapPixels(unsigned long* out, int sizex, int sizey)
+{
+	if(!worldLoaded_ || !out)
+		return false;
+	if(sizex < 1 || sizey < 1)
+		return false;
+
+	const int stepXVM = (int)vMap.H_SIZE / sizex;
+	const int stepYVM = (int)vMap.V_SIZE / sizey;
+	if(stepXVM < 1 || stepYVM < 1)
+		return false;
+	const int stepPoints = stepXVM * stepYVM;
+
+	int cnt = 0;
+	for(unsigned i = 0; i < vMap.V_SIZE; i += (unsigned)stepYVM){
+		for(unsigned j = 0; j < vMap.H_SIZE; j += (unsigned)stepXVM){
+			int r = 0, g = 0, b = 0;
+			for(int k = 0; k < stepYVM; k++){
+				for(int m = 0; m < stepXVM; m++){
+					const int color = vMap.getColor32((int)j + m, (int)i + k);
+					r += (color >> 16) & 0xFF;
+					g += (color >> 8) & 0xFF;
+					b += color & 0xFF;
+				}
+			}
+			out[cnt++] = 0xFF000000u |
+				((unsigned)(r / stepPoints) << 16) |
+				((unsigned)(g / stepPoints) << 8) |
+				(unsigned)(b / stepPoints);
+		}
+	}
+	return true;
+}
+
+bool EngineViewport::saveMiniMapToFile()
+{
+	if(!worldLoaded_)
+		return false;
+	vMap.saveMiniMap((int)vMap.H_SIZE / 16, (int)vMap.V_SIZE / 16);
+	return true;
+}
+
+bool EngineViewport::cameraCenter(float& x, float& y) const
+{
+	if(!worldLoaded_)
+		return false;
+	x = orbit_.px;
+	y = orbit_.py;
+	return true;
+}
+
+void EngineViewport::setCameraCenter(float x, float y)
+{
+	if(!worldLoaded_)
+		return;
+	orbit_.px = x;
+	orbit_.py = y;
+	applyCamera();
+}

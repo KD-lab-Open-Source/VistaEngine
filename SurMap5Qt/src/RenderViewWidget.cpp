@@ -149,6 +149,31 @@ int RenderViewWidget::textureStatistics(QVector<TextureStat>& rows, int& totalSi
 	return count;
 }
 
+bool RenderViewWidget::minimapSize(int& sizex, int& sizey) const
+{
+	return viewport_->minimapSize(sizex, sizey);
+}
+
+bool RenderViewWidget::minimapPixels(unsigned long* out, int sizex, int sizey)
+{
+	return viewport_->minimapPixels(out, sizex, sizey);
+}
+
+bool RenderViewWidget::saveMiniMapToFile()
+{
+	return viewport_->saveMiniMapToFile();
+}
+
+bool RenderViewWidget::cameraCenter(float& x, float& y) const
+{
+	return viewport_->cameraCenter(x, y);
+}
+
+void RenderViewWidget::setCameraCenter(float x, float y)
+{
+	viewport_->setCameraCenter(x, y);
+}
+
 bool RenderViewWidget::initRenderDevice()
 {
 	if(viewport_->inited())

@@ -22,6 +22,7 @@
 #include <QList>
 
 class QAction;
+class QComboBox;
 class QDockWidget;
 class QProgressBar;
 class QTimer;
@@ -29,6 +30,8 @@ class QToolBar;
 class RenderViewWidget;
 class ToolsTreePanel;
 class ObjectsTreePanel;
+class MiniMapPanel;
+class GradientsPanel;
 
 class MainWindow : public QMainWindow
 {
@@ -87,6 +90,12 @@ public slots:
 	// ID_VIEW_TIME_SLIDER — the time-of-day slider dialog (TimeSliderDlg).
 	void viewTimeSlider();
 
+	// --- U6 panels ---
+	// The brush-radius combo (ID_BRUSH_COMBO_PLACE) changed value.
+	void brushRadiusChanged(int index);
+	// Save MiniMap to World (ID_FILE_SAVEMINIMAPTOWORLD).
+	void fileSaveMiniMapToWorld();
+
 protected:
 	void closeEvent(QCloseEvent* event) override;
 
@@ -110,8 +119,11 @@ private:
 	QDockWidget* objectsDock_ = nullptr;   // objectsManagerBar_
 	QDockWidget* propertiesDock_ = nullptr;// propertiesBar_
 	QDockWidget* miniMapDock_ = nullptr;   // miniMapBar_
+	QDockWidget* gradientsDock_ = nullptr; // gradients bar (new; see GradientsPanel)
 	ToolsTreePanel* toolsTreePanel_ = nullptr;   // CToolsTreeWindow's tree
 	ObjectsTreePanel* objectsTreePanel_ = nullptr; // CObjectsManagerWindow
+	MiniMapPanel* miniMapPanel_ = nullptr;   // CMiniMapWindow (U6)
+	GradientsPanel* gradientsPanel_ = nullptr; // CGradientsWindow (U6)
 
 	// --- toolbars (CExtToolControlBar set) ---
 	QToolBar* mainToolBar_ = nullptr;      // IDR_MAINFRAME
@@ -119,6 +131,13 @@ private:
 	QToolBar* filtersToolBar_ = nullptr;   // IDR_FILTERS_BAR
 	QToolBar* librariesToolBar_ = nullptr; // IDR_LIBRARIES_BAR
 	QToolBar* editorsToolBar_ = nullptr;   // IDR_EDITORS_BAR
+
+	// The brush-radius combo on the tools toolbar (ID_BRUSH_COMBO_PLACE in
+	// CToolsTreeWindow). Holds the ArrSize_Brush list {1,3,5,...}.
+	QComboBox* brushRadiusCombo_ = nullptr;
+
+	// The current brush radius in world units (the combo's value).
+	int brushRadius_ = 1;
 
 	// --- status bar panes (NUMBERS_PARTS_STATUSBAR) ---
 	QProgressBar* progressBar_ = nullptr;  // progressBar_
@@ -143,6 +162,7 @@ private:
 	QAction* actStatistics_ = nullptr;
 	QAction* actResaveWorlds_ = nullptr;
 	QAction* actMerge_ = nullptr;
+	QAction* actSaveMiniMapToWorld_ = nullptr;   // ID_FILE_SAVEMINIMAPTOWORLD
 
 	// --- Edit menu actions (ID_EDIT_*) ---
 	QAction* actUndo_ = nullptr;

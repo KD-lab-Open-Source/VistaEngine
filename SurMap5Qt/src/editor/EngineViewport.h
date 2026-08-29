@@ -126,6 +126,31 @@ public:
 	// writes the summed size to `totalSize`.
 	int textureStatistics(const TextureStat*& out, int& totalSize);
 
+	// --- Minimap (U6) ---
+
+	// The minimap's pixel size (vMap.H_SIZE/16 x V_SIZE/16 — the same
+	// reduction OnFileSaveminimaptoworld used; SurMap5/MainFrame.cpp:1182).
+	// Returns false when no world is loaded.
+	bool minimapSize(int& sizex, int& sizey) const;
+
+	// Fill `out` (sizex*sizey entries) with the minimap's averaged terrain
+	// colors — one 0xFF000000|RGB pixel per entry. Port of vMap::saveMiniMap
+	// (Terra/VMAP.CPP:917) minus the TGA write, so the Qt side can show the
+	// map without touching the engine's file formats. Returns false on failure.
+	bool minimapPixels(unsigned long* out, int sizex, int sizey);
+
+	// OnFileSaveminimaptoworld: vMap.saveMiniMap(H_SIZE/16, V_SIZE/16) — writes
+	// map.tga into the world's directory. Returns false when no world is loaded.
+	bool saveMiniMapToFile();
+
+	// The orbit centre in world coordinates (the camera marker the minimap
+	// panel draws over the map). Returns false when no world is loaded.
+	bool cameraCenter(float& x, float& y) const;
+
+	// Center the orbit on a world point (a minimap click; CMiniMapWindow routed
+	// it through minimap().pressEvent -> cameraToEvent).
+	void setCameraCenter(float x, float y);
+
 	bool inited() const { return inited_; }
 
 private:
