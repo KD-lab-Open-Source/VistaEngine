@@ -112,6 +112,24 @@ add_executable(SurMap5Qt
     src/dialogs/ExImWorldDialog.cpp
     src/dialogs/ChangeTotalWorldHeightDialog.h
     src/dialogs/ChangeTotalWorldHeightDialog.cpp
+    # U5 dialogs — TimeSlider / TexturesStatistics / Camera / Wave
+    src/dialogs/TimeSliderDialog.h
+    src/dialogs/TimeSliderDialog.cpp
+    src/dialogs/TexturesStatisticsDialog.h
+    src/dialogs/TexturesStatisticsDialog.cpp
+    src/dialogs/CameraDialog.h
+    src/dialogs/CameraDialog.cpp
+    src/dialogs/WaveDialog.h
+    src/dialogs/WaveDialog.cpp
+    # U5 dialogs — Time slider / Textures statistics / Camera / Waves
+    src/dialogs/TimeSliderDialog.h
+    src/dialogs/TimeSliderDialog.cpp
+    src/dialogs/TexturesStatisticsDialog.h
+    src/dialogs/TexturesStatisticsDialog.cpp
+    src/dialogs/CameraDialog.h
+    src/dialogs/CameraDialog.cpp
+    src/dialogs/WaveDialog.h
+    src/dialogs/WaveDialog.cpp
     # Phase 5 tools — engine-free behaviour classes (see src/editor/EditorTool.h)
     src/editor/EditorTool.h
     src/tools/ToolManager.h

@@ -30,6 +30,7 @@
 #pragma once
 
 #include <QPoint>
+#include <QVector>
 #include <QWidget>
 
 // The engine-touching half of the viewport lives in the EditorEngine library
@@ -88,6 +89,14 @@ public:
 	// The loaded world's name (vMap.getWorldName via the viewport), empty when
 	// nothing is loaded.
 	QString worldName() const;
+
+	// Texture statistics (U5): rows of name+size + the summed size, forwarded
+	// from the engine's texture library (EngineViewport::textureStatistics).
+	struct TextureStat {
+		QString name;
+		int size = 0;
+	};
+	int textureStatistics(QVector<TextureStat>& rows, int& totalSize);
 
 public slots:
 	// Called ~60 Hz from MainWindow::universeQuant (MFC OnIdle equivalent).

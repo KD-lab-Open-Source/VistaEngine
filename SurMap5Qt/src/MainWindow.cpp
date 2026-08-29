@@ -26,6 +26,10 @@
 #include "dialogs/WorldPropertiesDialog.h"
 #include "dialogs/ExImWorldDialog.h"
 #include "dialogs/ChangeTotalWorldHeightDialog.h"
+#include "dialogs/TexturesStatisticsDialog.h"
+#include "dialogs/TimeSliderDialog.h"
+#include "dialogs/CameraDialog.h"
+#include "dialogs/WaveDialog.h"
 #include "tools/ToolManager.h"
 #include "panels/ToolsTreePanel.h"
 #include "panels/ObjectsTreePanel.h"
@@ -174,6 +178,7 @@ void MainWindow::createActions()
 	actViewCameraBorders_->setCheckable(true);
 	actViewTimeFlow_ = new QAction(tr("Enable &Time Flow"), this);
 	actViewTimeFlow_->setCheckable(true);
+	actViewTimeSlider_ = new QAction(tr("Time of Day..."), this);   // ID_VIEW_TIME_SLIDER
 	actViewHideModels_ = new QAction(tr("Hide Models"), this);
 	actViewHideModels_->setCheckable(true);
 	actViewObjectsManager_ = new QAction(tr("Objects Manager"), this);
@@ -286,6 +291,7 @@ void MainWindow::createActions()
 	connect(actViewShowGrid_, &QAction::toggled, this, &MainWindow::viewToggleGrid);
 	connect(actViewCameraBorders_, &QAction::toggled, this, &MainWindow::viewToggleCameraBorders);
 	connect(actViewTimeFlow_, &QAction::toggled, this, &MainWindow::viewToggleTimeFlow);
+	connect(actViewTimeSlider_, &QAction::triggered, this, &MainWindow::viewTimeSlider);
 	connect(actViewHideModels_, &QAction::toggled, this, &MainWindow::viewToggleHideModels);
 	connect(actViewObjectsManager_, &QAction::toggled, this, [this](bool on){ if(objectsDock_) objectsDock_->setVisible(on); });
 
@@ -410,6 +416,7 @@ void MainWindow::createMenus()
 	viewMenu->addAction(actViewCameraBorders_);
 	viewMenu->addAction(actToggleAnimation_);
 	viewMenu->addAction(actViewTimeFlow_);
+	viewMenu->addAction(actViewTimeSlider_);
 	viewMenu->addAction(actViewHideModels_);
 
 	// Libraries (IDR_MAINFRAME's Libraries popup).
@@ -796,9 +803,21 @@ void MainWindow::fileProperties()
 
 void MainWindow::fileStatistics()
 {
-	// OnFileStatistics: DlgTexturesStatistics (U5).
-	fprintf(stderr, "[file] statistics: TODO U5 (DlgTexturesStatistics)\n");
-	statusBar()->showMessage(tr("Statistics: not wired yet"));
+	// OnFileStatistics: ShowGraphicsStatistic in the original; the texture
+	// statistics dialog (DlgTexturesStatistics) shows the loaded texture
+	// library. The engine side is available even without a world (the library
+	// is a render-device global).
+	QVector<RenderViewWidget::TextureStat> rows;
+	int totalSize = 0;
+	view_->textureStatistics(rows, totalSize);
+
+	QVector<QPair<QString, int>> pairs;
+	pairs.reserve(rows.size());
+	for(const auto& row : rows)
+		pairs.append(qMakePair(row.name, row.size));
+
+	TexturesStatisticsDialog dlg(pairs, totalSize, this);
+	dlg.exec();
 }
 
 void MainWindow::fileResaveWorlds()
@@ -940,6 +959,14 @@ void MainWindow::viewToggleSources(bool checked)
 
 void MainWindow::viewToggleCameras(bool checked)
 {
+	// OnViewCameras: show/hide the camera paths on the map. The camera editor
+	// dialog (CameraDlg) is the IDD_DLG_CAMERA bar dialog; the original toggled
+	// the bar with this command too. Show it for now — cameraManager (the
+	// actual spline data) is not wired in the Qt editor yet.
+	if(checked){
+		CameraDialog dlg(this);
+		dlg.exec();
+	}
 	fprintf(stderr, "[view] cameras: %s\n", checked ? "on" : "off");
 	statusBar()->showMessage(tr("Cameras: %1").arg(checked ? tr("on") : tr("off")));
 }
@@ -965,8 +992,24 @@ void MainWindow::viewToggleCameraBorders(bool checked)
 void MainWindow::viewToggleTimeFlow(bool checked)
 {
 	// OnViewEnableTimeFlow: let the world's time advance (filters bar toggle).
+	// The Qt editor has no Environment yet, so the toggle only records the
+	// state (the time-slider dialog reads it to enable/disable its controls).
+	timeFlowEnabled_ = checked;
 	fprintf(stderr, "[view] time-flow: %s\n", checked ? "on" : "off");
 	statusBar()->showMessage(tr("Enable Time Flow: %1").arg(checked ? tr("on") : tr("off")));
+}
+
+void MainWindow::viewTimeSlider()
+{
+	// ID_VIEW_TIME_SLIDER: the time-of-day slider (TimeSliderDlg). The Qt
+	// editor keeps the clock in the dialog (no Environment yet); the dialog
+	// is modeless-hosted like the original's filters-bar child.
+	TimeSliderDialog dlg(editorTime_, this);
+	dlg.setTimeFlowEnabled(timeFlowEnabled_);
+	if(dlg.exec() == QDialog::Accepted)
+		editorTime_ = dlg.time();
+	else
+		editorTime_ = dlg.time();   // keep the last value either way
 }
 
 void MainWindow::viewToggleHideModels(bool checked)

@@ -21,6 +21,8 @@ using namespace std;
 #include "Render/src/Scene.h"        // cScene (CreateCamera, Draw)
 #include "Render/src/cCamera.h"      // Camera (SetFrustum, SetPosition)
 #include "Render/src/TileMap.h"      // cTileMap (the terrain's tile map)
+#include "Render/src/TexLibrary.h"   // GetTexLibrary (texture statistics)
+#include "Render/src/Texture.h"      // cTexture (GetName, CalcTextureSize)
 #include "Util/XMath/xmath.h"        // MatXf/Mat3f/Mat2f + X_AXIS/Y_AXIS/Z_AXIS
 #include "Terra/VMAP.H"              // vMap (load/create, H_SIZE/V_SIZE)
 
@@ -553,4 +555,33 @@ float EngineViewport::changeTotalWorldParam(int deltaVx, float kScale, const Edi
 	p.kScaleModels = params.kScaleModels;
 
 	return vMap.changeTotalWorldParam(deltaVx, kScale, p);
+}
+
+int EngineViewport::textureStatistics(const TextureStat*& out, int& totalSize)
+{
+	out = nullptr;
+	totalSize = 0;
+
+	// GetTexLibrary (Render/src/TexLibrary.h) is a global that exists as soon
+	// as the render device is up. The texture names point into the library, so
+	// the returned array is only valid for the caller's immediate use.
+	cTexLibrary* texLib = GetTexLibrary();
+	if(!texLib)
+		return 0;
+
+	const int count = texLib->GetNumberTexture();
+	if(count <= 0)
+		return 0;
+
+	static std::vector<TextureStat> stats;
+	stats.resize(count);
+	for(int i = 0; i < count; i++){
+		cTexture* tex = texLib->GetTexture(i);
+		stats[i].name = tex ? tex->name() : "";
+		stats[i].size = tex ? tex->CalcTextureSize() : 0;
+		totalSize += stats[i].size;
+	}
+
+	out = stats.data();
+	return count;
 }

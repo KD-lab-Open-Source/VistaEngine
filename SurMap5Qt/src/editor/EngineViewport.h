@@ -111,6 +111,21 @@ public:
 	// Only valid when a world is loaded.
 	float changeTotalWorldParam(int deltaVx, float kScale, const Editor::MapChangeParams& params);
 
+	// --- Texture statistics (U5) ---
+
+	// One row of the texture-statistics dialog (DlgTexturesStatistics): name +
+	// size in bytes (cTexture::CalcTextureSize).
+	struct TextureStat {
+		const char* name = nullptr;
+		int size = 0;
+	};
+
+	// The loaded texture library's rows (GetTexLibrary: Render/src/TexLibrary.h).
+	// `out` receives <count> entries; the dialog reads them while this call is
+	// alive (the names point into the texture library). Returns the count, and
+	// writes the summed size to `totalSize`.
+	int textureStatistics(const TextureStat*& out, int& totalSize);
+
 	bool inited() const { return inited_; }
 
 private:

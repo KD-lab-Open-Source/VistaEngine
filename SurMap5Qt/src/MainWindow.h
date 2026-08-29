@@ -84,6 +84,8 @@ public slots:
 	void viewToggleCameraBorders(bool checked);
 	void viewToggleTimeFlow(bool checked);
 	void viewToggleHideModels(bool checked);
+	// ID_VIEW_TIME_SLIDER — the time-of-day slider dialog (TimeSliderDlg).
+	void viewTimeSlider();
 
 protected:
 	void closeEvent(QCloseEvent* event) override;
@@ -98,6 +100,10 @@ private:
 
 	// --- view ---
 	RenderViewWidget* view_ = nullptr;
+
+	// --- editor clock (TimeSliderDlg state; the Qt editor has no Environment) ---
+	float editorTime_ = 12.f;        // time of day in hours
+	bool timeFlowEnabled_ = false;   // Environment::flag_EnableTimeFlow
 
 	// --- panels (QDockWidget equivalents of the CExtControlBar members) ---
 	QDockWidget* toolsDock_ = nullptr;     // toolsWindowBar_
@@ -158,6 +164,7 @@ private:
 	QAction* actViewShowGrid_ = nullptr;
 	QAction* actViewCameraBorders_ = nullptr;
 	QAction* actViewTimeFlow_ = nullptr;
+	QAction* actViewTimeSlider_ = nullptr;   // ID_VIEW_TIME_SLIDER (TimeSliderDlg)
 	QAction* actViewHideModels_ = nullptr;
 	QAction* actViewObjectsManager_ = nullptr;
 

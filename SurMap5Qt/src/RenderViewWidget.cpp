@@ -134,6 +134,21 @@ QString RenderViewWidget::worldName() const
 	return QString::fromUtf8(viewport_->worldName());
 }
 
+int RenderViewWidget::textureStatistics(QVector<TextureStat>& rows, int& totalSize)
+{
+	const EngineViewport::TextureStat* stats = nullptr;
+	int count = viewport_->textureStatistics(stats, totalSize);
+	rows.clear();
+	rows.reserve(count);
+	for(int i = 0; i < count; i++){
+		TextureStat row;
+		row.name = QString::fromUtf8(stats[i].name ? stats[i].name : "");
+		row.size = stats[i].size;
+		rows.append(row);
+	}
+	return count;
+}
+
 bool RenderViewWidget::initRenderDevice()
 {
 	if(viewport_->inited())
