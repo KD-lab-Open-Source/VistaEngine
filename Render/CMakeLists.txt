@@ -91,6 +91,13 @@ vista_shader_module(worldquad
     "worldquad_vert=worldquad.vert.hlsl:vertex"
     "worldquad_frag=worldquad.frag.hlsl:fragment")
 
+# The 3D debug line (DrawLine(const Vect3f&, ...)): the editor's terrain grid draws
+# through it. One vertex shader (position * camera view-projection), one fragment
+# shader (pass the colour). See SDLWorldLineRenderer.
+vista_shader_module(worldline
+    "worldline_vert=worldline.vert.hlsl:vertex"
+    "worldline_frag=worldline.frag.hlsl:fragment")
+
 vista_shader_module(worldtri
     "worldtri_vert=worldtri.vert.hlsl:vertex"
     "worldtri_frag=worldtri.frag.hlsl:fragment")
@@ -208,6 +215,7 @@ set(RENDER_SOURCES
     SDLObject3dxRenderer.cpp
     SDLWaterRenderer.cpp
     SDLWorldQuadRenderer.cpp
+    SDLWorldLineRenderer.cpp
     SDLGrassRenderer.cpp
     SDLCloudShadowRenderer.cpp
     SDLEnvironmentEarthRenderer.cpp

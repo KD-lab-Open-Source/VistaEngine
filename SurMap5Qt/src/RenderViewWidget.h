@@ -29,6 +29,7 @@
 
 #pragma once
 
+#include <QPoint>
 #include <QWidget>
 
 // The engine-touching half of the viewport lives in the EditorEngine library
@@ -37,6 +38,9 @@ class EngineViewport;
 // The current tool routes view input to the tool's handlers (Select/Move/
 // Rotate/Scale); engine-free, see src/tools/ToolManager.h.
 class ToolManager;
+// ToolVec3 (the tools' plain world-coordinate triple) is a struct, so the
+// worldAt helper below needs the full definition — EditorTool.h is engine-free.
+#include "editor/EditorTool.h"
 
 class RenderViewWidget : public QWidget
 {
@@ -81,6 +85,11 @@ protected:
 	void keyPressEvent(QKeyEvent* event) override;
 
 private:
+	// Ray-cast the widget-local point into the terrain (viewport_->
+	// screenPointToGround, the CoordScr2vMap port). Returns the world point,
+	// or the origin when the world is not loaded or the ray misses.
+	ToolVec3 worldAt(const QPoint& pos) const;
+
 	EngineViewport* viewport_ = nullptr;
 	ToolManager* tools_ = nullptr;
 };

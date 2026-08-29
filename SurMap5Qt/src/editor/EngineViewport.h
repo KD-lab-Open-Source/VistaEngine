@@ -68,6 +68,13 @@ public:
 	void mouseButton(int button, bool pressed, int x, int y);
 	void mouseMove(int x, int y);
 
+	// Ray-cast the given widget-local pixel into the world and write the terrain
+	// intersection point. Port of CGeneralView::CoordScr2vMap (SurMap5/GeneralView.cpp:
+	//405): normalize to (x/sizeX-0.5, y/sizeY-0.5), camera_->GetWorldRay, scene_->
+	//TraceDir. Returns false when no world is loaded or the ray misses the terrain
+	// (out stays untouched). x,y are widget-local pixels.
+	bool screenPointToGround(int x, int y, float& outX, float& outY, float& outZ);
+
 	bool inited() const { return inited_; }
 
 private:

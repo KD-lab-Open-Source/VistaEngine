@@ -276,15 +276,18 @@ void EngineViewport::drawFrame()
 	gb_RenderDevice->BeginScene();
 
 	// The camera renders whatever the scene holds: the terrain tile map when a
-	// world is loaded, nothing otherwise.
+	// world is loaded, nothing otherwise. cScene::Draw is the entry point, NOT
+	// Camera::DrawScene alone: it calls tileMap_->PreDraw first, which attaches
+	// the tile map to the camera's SCENENODE_OBJECT_TILEMAP slot that
+	// DrawTilemapObject then draws from. Calling DrawScene directly skips that
+	// attach and renders no terrain (only the grid, drawn after).
 	{
 		const Vect2f center(0.5f, 0.5f);
 		const sRectangle4f clip(-0.5f, -0.5f, 0.5f, 0.5f);
 		const Vect2f focus(orbit_.focus, orbit_.focus);
 		const Vect2f zPlane(30.0f, 12000.0f);
 		camera_->SetFrustum(&center, &clip, &focus, &zPlane);
-		camera_->PreDrawScene();
-		camera_->DrawScene();
+		scene_->Draw(camera_);
 	}
 
 	// CGeneralView::graphQuant drew the grid after terScene->Draw().
@@ -374,6 +377,45 @@ void EngineViewport::mouseMove(int x, int y)
 		orbit_.py = dragStartPy_ - (dx * s + dy * c) * scale;
 		applyCamera();
 	}
+}
+
+// --- Picking --------------------------------------------------------------
+
+// Port of CGeneralView::CoordScr2vMap (SurMap5/GeneralView.cpp:405): the mouse
+// pixel becomes a ray out of the camera, and the first terrain hit is the
+// world point. GetWorldRay needs the camera's frustum (SetFrustum) to have
+// run -- drawFrame does it each frame, but mouse events arrive between frames,
+// so re-apply the same frustum here before unprojecting.
+bool EngineViewport::screenPointToGround(int x, int y, float& outX, float& outY, float& outZ)
+{
+	if(!inited_ || !camera_ || !scene_ || !gb_RenderDevice || !worldLoaded_)
+		return false;
+
+	const int w = gb_RenderDevice->GetSizeX();
+	const int h = gb_RenderDevice->GetSizeY();
+	if(w <= 0 || h <= 0)
+		return false;
+
+	// CGeneralView::CoordScr2vMap normalized with the render-device size, origin
+	// at the centre (the engine's screen-space convention).
+	const Vect2f posIn((float)x / (float)w - 0.5f, (float)y / (float)h - 0.5f);
+
+	// The frustum drawFrame uses (CGeneralView::graphQuant's camera set-up).
+	const Vect2f center(0.5f, 0.5f);
+	const sRectangle4f clip(-0.5f, -0.5f, 0.5f, 0.5f);
+	const Vect2f focus(orbit_.focus, orbit_.focus);
+	const Vect2f zPlane(30.0f, 12000.0f);
+	camera_->SetFrustum(&center, &clip, &focus, &zPlane);
+
+	Vect3f pos, dir;
+	camera_->GetWorldRay(posIn, pos, dir);
+
+	Vect3f trace;
+	if(scene_->TraceDir(pos, dir, &trace)){
+		outX = trace.x; outY = trace.y; outZ = trace.z;
+		return true;
+	}
+	return false;
 }
 
 // --- Camera --------------------------------------------------------------

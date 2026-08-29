@@ -162,7 +162,7 @@ void RenderViewWidget::wheelEvent(QWheelEvent* event)
 void RenderViewWidget::mousePressEvent(QMouseEvent* event)
 {
 	const ToolVec2 pos{ (int)event->position().x(), (int)event->position().y() };
-	const ToolVec3 world{ 0, 0, 0 };   // Phase 3b: CoordScr2vMap result
+	const ToolVec3 world = worldAt(event->position().toPoint());
 	// The current tool sees the press first (CGeneralView: tool's onLMBDown
 	// decides whether the camera may pan/drag); unhandled -> the viewport.
 	const bool handled =
@@ -177,7 +177,7 @@ void RenderViewWidget::mousePressEvent(QMouseEvent* event)
 void RenderViewWidget::mouseReleaseEvent(QMouseEvent* event)
 {
 	const ToolVec2 pos{ (int)event->position().x(), (int)event->position().y() };
-	const ToolVec3 world{ 0, 0, 0 };
+	const ToolVec3 world = worldAt(event->position().toPoint());
 	const bool handled =
 		(event->button() == Qt::LeftButton)  ? tools_->onLMBUp(world, pos) :
 		(event->button() == Qt::RightButton) ? tools_->onRMBUp(world, pos) : false;
@@ -189,11 +189,23 @@ void RenderViewWidget::mouseReleaseEvent(QMouseEvent* event)
 void RenderViewWidget::mouseMoveEvent(QMouseEvent* event)
 {
 	const ToolVec2 pos{ (int)event->position().x(), (int)event->position().y() };
-	const ToolVec3 world{ 0, 0, 0 };   // Phase 3b: screenPointToGround
+	const ToolVec3 world = worldAt(event->position().toPoint());
 	tools_->onTrackingMouse(world, pos);
 	if(viewport_->inited())
 		viewport_->mouseMove(pos.x, pos.y);
 	event->accept();
+}
+
+// Ray-cast the widget-local point into the terrain (viewport_->
+// screenPointToGround, the CoordScr2vMap port). Returns the world point, or
+// the origin when the world is not loaded or the ray misses.
+ToolVec3 RenderViewWidget::worldAt(const QPoint& pos) const
+{
+	ToolVec3 world{ 0, 0, 0 };
+	if(viewport_ && viewport_->screenPointToGround(pos.x(), pos.y(),
+	                                               world.x, world.y, world.z))
+		return world;
+	return ToolVec3{ 0, 0, 0 };
 }
 
 void RenderViewWidget::keyPressEvent(QKeyEvent* event)

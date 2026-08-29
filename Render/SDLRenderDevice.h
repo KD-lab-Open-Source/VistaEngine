@@ -47,6 +47,7 @@ class SDLGrassRenderer;
 class SDLCloudShadowRenderer;
 class SDLEnvironmentEarthRenderer;
 class SDLPostEffectRenderer;
+class SDLWorldLineRenderer;
 class cTileMap;
 
 // Restrict drawing to a camera's viewport, the way cD3DRender::SetDrawTransform hands
@@ -187,6 +188,14 @@ public:
 	SDLPostEffectRenderer* postEffectRenderer() { return postEffectRenderer_.get(); }
 	void armSceneCapture();
 	void drawPostEffects();
+
+	// --- World-space lines ------------------------------------------------
+	// The 3D debug-primitive route (DrawLine(const Vect3f&, ...), FlushLine3D). The
+	// editor's terrain grid draws through it (EngineViewport::drawGrid); the game's
+	// D3D-only line helpers are dead on this backend. Segments record during
+	// BeginScene..EndScene and replay in one pass before the UI, see
+	// SDLWorldLineRenderer.h.
+	SDLWorldLineRenderer* lineRenderer() { return lineRenderer_.get(); }
 
 	// --- UI and minimap -----------------------------------------------------
 	// Neither has a draw call of its own. The UI renderer's pass runs at EndScene, over
@@ -426,9 +435,11 @@ public:
 	// the sprites and text, and draws them all in its pass at EndScene.
 	void FlushPrimitive2D() override {}
 
-	// --- 3D primitives (no-op) -------------------------------------------
-	// TODO(sdl-port): the 3D debug primitives draw nothing. See Documents/Render-PORTING.md #17.
-	void DrawLine(const Vect3f&, const Vect3f&, Color4c) override {}
+	// --- 3D primitives ----------------------------------------------------
+	// DrawLine(const Vect3f&, ...) records into the world-line renderer (the editor's
+	// terrain grid); the rest are no-ops -- the D3D callers they served are dead here.
+	// See Documents/Render-PORTING.md #17.
+	void DrawLine(const Vect3f& v1, const Vect3f& v2, Color4c color) override;
 	void DrawPoint(const Vect3f&, Color4c) override {}
 	void FlushPrimitive3D() override {}
 	void FlushLine3D(bool, bool) override {}
@@ -670,6 +681,7 @@ private:
 	std::unique_ptr<SDLCloudShadowRenderer> cloudShadowRenderer_;
 	std::unique_ptr<SDLEnvironmentEarthRenderer> environmentEarthRenderer_;
 	std::unique_ptr<SDLPostEffectRenderer>  postEffectRenderer_;
+	std::unique_ptr<SDLWorldLineRenderer>   lineRenderer_;
 };
 
 #endif // VISTA_SDL_RENDER_DEVICE_H

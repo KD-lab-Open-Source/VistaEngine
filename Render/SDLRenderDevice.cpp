@@ -20,6 +20,7 @@
 #include "SDLObject3dxRenderer.h"
 #include "SDLWaterRenderer.h"
 #include "SDLWorldQuadRenderer.h"
+#include "SDLWorldLineRenderer.h"
 #include "SDLMinimapRenderer.h"
 #include "SDLGrassRenderer.h"
 #include "SDLCloudShadowRenderer.h"
@@ -444,6 +445,8 @@ bool cSDLRenderDevice::Initialize(int xScr_, int yScr_, int mode, HWND /*hWnd*/,
 		environmentEarthRenderer_ = std::make_unique<SDLEnvironmentEarthRenderer>(this, device_, window_);
 	if(!postEffectRenderer_)
 		postEffectRenderer_ = std::make_unique<SDLPostEffectRenderer>(device_, window_);
+	if(!lineRenderer_)
+		lineRenderer_ = std::make_unique<SDLWorldLineRenderer>(device_, window_);
 	if(!minimapRenderer_){
 		minimapRenderer_ = std::make_unique<SDLMinimapRenderer>(device_, window_);
 		// The minimap draws inside the UI's pass, at the point in its run list where the
@@ -492,6 +495,7 @@ int cSDLRenderDevice::Done()
 	cloudShadowRenderer_.reset();
 	environmentEarthRenderer_.reset();
 	postEffectRenderer_.reset();
+	lineRenderer_.reset();
 
 	if(device_){
 		// The depth buffers the offscreen colour targets own. Their colour textures are
@@ -631,6 +635,13 @@ int cSDLRenderDevice::BeginScene()
 		environmentEarthRenderer_->BeginFrame();
 	if(postEffectRenderer_)
 		postEffectRenderer_->BeginFrame();
+	if(lineRenderer_){
+		lineRenderer_->BeginFrame();
+		// The line renderer draws with the current camera's view-projection; the
+		// camera is bound on the first SetDrawTransform of the scene walk. Set it
+		// here so a frame whose camera never drew (a paused editor) still has it.
+		lineRenderer_->SetCamera(camera_);
+	}
 
 	// The screen is this frame's swapchain image; its clear was armed by Fill(). Offscreen
 	// targets keep their textures across frames, but not the clears they have consumed.
@@ -680,6 +691,17 @@ int cSDLRenderDevice::EndScene()
 	// coast sprites. Over the terrain and against its depth. The last camera to draw is the
 	// main one, so the current target is the screen; assert nothing, just settle it.
 	flushTarget(current_, true);
+
+	// The world-space line pass (the editor's terrain grid), over the scene and against
+	// its depth, before the UI. The grid drew through DrawLine during the scene walk, so
+	// this is where it lands.
+	if(screen_.color && commandBuffer_ && lineRenderer_ && lineRenderer_->hasDraws()
+	   && current_ && !current_->depthOnly && current_->usable()){
+		lineRenderer_->Draw(commandBuffer_, current_->color, current_->depth,
+		                    current_->w, current_->h,
+		                    screen_.clearPending && !screen_.colorCleared, screen_.clearColor,
+		                    !current_->depthCleared);
+	}
 
 	// Then the UI pass, last, over everything. It carries the frame's colour clear only if
 	// no earlier pass took it.
@@ -889,6 +911,13 @@ void cSDLRenderDevice::releaseTarget(cTexture* texture)
 void cSDLRenderDevice::setCamera(Camera* camera)
 {
 	SetDrawTransform(camera);
+
+	// The world-line renderer draws with the current camera's view-projection
+	// (the editor's terrain grid, recorded between cameras). SetDrawTransform is
+	// an inline in the header, where SDLWorldLineRenderer is incomplete, so the
+	// snapshot happens here.
+	if(lineRenderer_)
+		lineRenderer_->SetCamera(camera);
 
 	RenderTarget* rt = resolveTarget(camera);
 	if(rt == current_)
@@ -1421,6 +1450,17 @@ void cSDLRenderDevice::DrawRectangle(int x, int y, int dx, int dy, Color4c color
 	else if(y < yScrMin || y2 > yScrMax) return;
 	uiRenderer_->DrawRectangle(x, y, dx, dy, color, outline);
 	if(!outline) NumberPolygon += 2;
+}
+
+void cSDLRenderDevice::DrawLine(const Vect3f& v1, const Vect3f& v2, Color4c color)
+{
+	// Records into the world-line renderer (the editor's terrain grid), replayed in
+	// EndScene before the UI. Mirrors cD3DRender::DrawLine (D3DRender.cpp:1127), which
+	// queued the pair into lines3d for FlushLine3D; the view-projection is the current
+	// camera's, snapshotted by the renderer on SetDrawTransform.
+	if(!bActiveScene_ || !lineRenderer_)
+		return;
+	lineRenderer_->DrawLine(&v1.x, &v2.x, color.argb);
 }
 
 void cSDLRenderDevice::OutText(int x, int y, const char* text, const Color4f& color,
