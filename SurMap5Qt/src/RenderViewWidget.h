@@ -41,6 +41,9 @@ class ToolManager;
 // ToolVec3 (the tools' plain world-coordinate triple) is a struct, so the
 // worldAt helper below needs the full definition — EditorTool.h is engine-free.
 #include "editor/EditorTool.h"
+// MapChangeParams is engine-free (no engine headers), so it can be named by
+// value in the changeTotalWorldParam signature below.
+#include "editor/MapChangeParams.h"
 
 class RenderViewWidget : public QWidget
 {
@@ -70,6 +73,21 @@ public:
 	bool worldLoaded() const;
 	// True once the render device exists (first paint happened).
 	bool isReady() const;
+
+	// --- World data (U4 dialogs). Forwarders to EngineViewport so MainWindow
+	// stays engine-free. ---
+	bool mapSize(int& hSize, int& vSize) const;
+	bool mapCreationParams(int& hSizePower, int& vSizePower,
+	                       int& createWorldMetod, int& initialHeight) const;
+	bool worldHeightHistogram(int out[256], int& minVx, int& maxVx);
+	float changeTotalWorldParam(int deltaVx, float kScale,
+	                            const Editor::MapChangeParams& params);
+	// Rebuild the terrain scene after an in-place terrain mutation
+	// (EngineViewport::reinitWorld).
+	bool reinitWorld();
+	// The loaded world's name (vMap.getWorldName via the viewport), empty when
+	// nothing is loaded.
+	QString worldName() const;
 
 public slots:
 	// Called ~60 Hz from MainWindow::universeQuant (MFC OnIdle equivalent).

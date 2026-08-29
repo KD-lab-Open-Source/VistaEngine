@@ -105,6 +105,13 @@ add_executable(SurMap5Qt
     src/dialogs/ProgressDialog.cpp
     src/dialogs/SelectWorldDialog.h
     src/dialogs/SelectWorldDialog.cpp
+    # U4 dialogs — WorldProperties / Export-Import World / Change Total Height
+    src/dialogs/WorldPropertiesDialog.h
+    src/dialogs/WorldPropertiesDialog.cpp
+    src/dialogs/ExImWorldDialog.h
+    src/dialogs/ExImWorldDialog.cpp
+    src/dialogs/ChangeTotalWorldHeightDialog.h
+    src/dialogs/ChangeTotalWorldHeightDialog.cpp
     # Phase 5 tools — engine-free behaviour classes (see src/editor/EditorTool.h)
     src/editor/EditorTool.h
     src/tools/ToolManager.h

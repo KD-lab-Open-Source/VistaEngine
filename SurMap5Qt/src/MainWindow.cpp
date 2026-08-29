@@ -23,6 +23,9 @@
 #include "EditorApplication.h"
 #include "dialogs/SelectWorldDialog.h"
 #include "dialogs/WorldNameDialog.h"
+#include "dialogs/WorldPropertiesDialog.h"
+#include "dialogs/ExImWorldDialog.h"
+#include "dialogs/ChangeTotalWorldHeightDialog.h"
 #include "tools/ToolManager.h"
 #include "panels/ToolsTreePanel.h"
 #include "panels/ObjectsTreePanel.h"
@@ -767,16 +770,28 @@ void MainWindow::fileExportTextToExcel()
 
 void MainWindow::fileExImWorld()
 {
-	// OnFileExportImportWorld: DlgExImWorld (U4). Stub until the dialog lands.
-	fprintf(stderr, "[file] exim-world: TODO U4 (DlgExImWorld)\n");
-	statusBar()->showMessage(tr("Export/Import World: not wired yet"));
+	// OnFileExportImportWorld: DlgExImWorld over vMap.getWorldsDir().
+	if(!view_->worldLoaded()){
+		statusBar()->showMessage(tr("Load a world first"));
+		return;
+	}
+	ExImWorldDialog dlg(EditorApplication::instance()->worldsDir(), QString(), this);
+	dlg.exec();
 }
 
 void MainWindow::fileProperties()
 {
-	// OnFileProperties: WorldPropertiesDlg (U4) — shows the loaded map's size.
-	fprintf(stderr, "[file] properties: TODO U4 (WorldPropertiesDlg)\n");
-	statusBar()->showMessage(tr("Properties: not wired yet"));
+	// OnFileProperties: WorldPropertiesDlg — the loaded map's size + creation
+	// parameters.
+	int hSize = 0, vSize = 0;
+	int hPower = 0, vPower = 0, method = 0, initialHeight = 0;
+	if(!view_->mapSize(hSize, vSize) ||
+	   !view_->mapCreationParams(hPower, vPower, method, initialHeight)){
+		statusBar()->showMessage(tr("Load a world first"));
+		return;
+	}
+	WorldPropertiesDialog dlg(hSize, vSize, hPower, vPower, method, initialHeight, this);
+	dlg.exec();
 }
 
 void MainWindow::fileStatistics()
@@ -851,9 +866,52 @@ void MainWindow::editUpdateSurface()
 
 void MainWindow::editChangeTotalWorldHeight()
 {
-	// OnEditChangetotalworldheight: DlgChangeTotalWorldHeight (U4).
-	fprintf(stderr, "[edit] change-total-height: TODO U4 (DlgChangeTotalWorldHeight)\n");
-	statusBar()->showMessage(tr("Change Total World Param: not wired yet"));
+	// OnEditChangetotalworldheight: DlgChangeTotalWorldHeight — shift/scale the
+	// whole terrain, then re-create the scene and re-init the world.
+	if(!view_->worldLoaded()){
+		statusBar()->showMessage(tr("Load a world first"));
+		return;
+	}
+
+	int hist[256];
+	int minVx = 0, maxVx = 0;
+	if(!view_->worldHeightHistogram(hist, minVx, maxVx)){
+		statusBar()->showMessage(tr("Could not read the terrain"));
+		return;
+	}
+
+	int hPower = 0, vPower = 0, method = 0, initialHeight = 0;
+	view_->mapCreationParams(hPower, vPower, method, initialHeight);
+
+	ChangeTotalWorldHeightDialog dlg(minVx, maxVx, hist, initialHeight, this);
+	if(dlg.exec() != QDialog::Accepted)
+		return;
+
+	// The engine call, as CMainFrame::OnEditChangetotalworldheight did:
+	//   vMap.changeTotalWorldParam(deltaVx, scaleVx, m_changeParam)
+	// then re-init the scene + world so the terrain buffers rebuild.
+	// The creation params stay the world's own unless "resize to new borders"
+	// was checked, in which case the dialog's slider values only affect the
+	// delta/scale, not the map size (the original used the attrib editor to
+	// change sizes; the Qt port keeps sizes fixed for now — TODO(U4): expose
+	// the size-power editor).
+	Editor::MapChangeParams params;
+	params.hSizePower = hPower;
+	params.vSizePower = vPower;
+	params.createWorldMetod = method;
+	params.initialHeight = (unsigned short)initialHeight;
+	params.flag_resizeWorld2NewBorder = dlg.resizeWorld();
+
+	statusBar()->showMessage(tr("Changing total world height..."));
+	QApplication::setOverrideCursor(Qt::WaitCursor);
+	const float scaleVx = (float)dlg.scalePercent() / 100.f;
+	view_->changeTotalWorldParam(dlg.deltaVx(), scaleVx, params);
+	// The terrain buffers changed in place; rebuild the render-side map the
+	// way CMainFrame called view_->reInitWorld() after the change.
+	view_->reinitWorld();
+	QApplication::restoreOverrideCursor();
+
+	statusBar()->showMessage(tr("Total world height changed"), 3000);
 }
 
 void MainWindow::editRollingBorder()

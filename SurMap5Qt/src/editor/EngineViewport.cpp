@@ -8,6 +8,8 @@
 // engine headers call all of them.
 #include <vector>
 #include <string>
+#include <climits>
+#include <cmath>
 using namespace std;
 #include "xutil.h"
 #include "my_STL.h"
@@ -437,4 +439,118 @@ void EngineViewport::applyCamera()
 	matrix.rot() = Mat3f(orbit_.theta, X_AXIS) * Mat3f(orbit_.fi, Y_AXIS) * Mat3f(M_PI_2 - orbit_.psi, Z_AXIS);
 	matrix *= MatXf(Mat3f::ID, -position);
 	setCameraPosition(camera_, matrix);
+}
+
+// --- World data (U4 dialogs) ---------------------------------------------
+
+const char* EngineViewport::worldName() const
+{
+	return worldLoaded_ ? vMap.getWorldName().c_str() : "";
+}
+
+// CMainFrame's view_->reInitWorld after a terrain mutation: the tile map is
+// dropped (its buffers reference the old vMap) and re-created from the current
+// vMap state. doneWorld() would release the world too; here only the scene is
+// rebuilt.
+bool EngineViewport::reinitWorld()
+{
+	if(!inited_ || !scene_ || !worldLoaded_)
+		return false;
+
+	if(scene_)
+		RELEASE(scene_);
+	scene_ = gb_VisGeneric->CreateScene();
+	camera_ = scene_ ? scene_->CreateCamera() : nullptr;
+	if(!scene_ || !camera_)
+		return false;
+
+	scene_->CreateMap(true);
+	applyCamera();
+	return true;
+}
+
+bool EngineViewport::mapSize(int& hSize, int& vSize) const
+{
+	if(!worldLoaded_)
+		return false;
+	hSize = (int)vMap.H_SIZE;
+	vSize = (int)vMap.V_SIZE;
+	return true;
+}
+
+bool EngineViewport::mapCreationParams(int& hSizePower, int& vSizePower,
+                                       int& createWorldMetod, int& initialHeight) const
+{
+	if(!worldLoaded_)
+		return false;
+	hSizePower = (int)vMap.H_SIZE_POWER;
+	vSizePower = (int)vMap.V_SIZE_POWER;
+	createWorldMetod = (int)vMap.createWorldMetod;
+	initialHeight = (int)vMap.initialHeight;
+	return true;
+}
+
+// Port of world2Histogram (SurMap5/DlgChangeTotalWorldHeight.cpp): bin every
+// vertex's voxel height over 256 buckets, then sqrt-scale the columns so the
+// dialog's bars stay readable.
+bool EngineViewport::worldHeightHistogram(int out[256], int& minVx, int& maxVx)
+{
+	if(!worldLoaded_)
+		return false;
+
+	// Terra/terra.h: MAX_VX_HEIGHT = (1<<(VX_FRACTION+9))-1 (0x3fff).
+	const int kMaxVxHeight = MAX_VX_HEIGHT;
+
+	int histArr[256] = {0};
+	int mn = INT_MAX;
+	int mx = INT_MIN;
+	for(unsigned i = 0; i < vMap.V_SIZE; i++){
+		for(unsigned j = 0; j < vMap.H_SIZE; j++){
+			const int h = (int)vMap.getAlt((int)j, (int)i);
+			if(mn > h) mn = h;
+			if(mx < h) mx = h;
+			histArr[h * 256 / (kMaxVxHeight + 1)]++;
+		}
+	}
+
+	int maxVal = 0;
+	for(int i = 0; i < 256; i++)
+		if(histArr[i] > maxVal) maxVal = histArr[i];
+
+	// sqrt(maxVal) normalizes the columns; clamp to the whole-voxel max so a
+	// full-height world still fits (the original clamped to MAX_VX_HEIGHT_WHOLE
+	// and never let a column drop below 4px).
+	const float maxValF = sqrtf((float)maxVal);
+	for(int i = 0; i < 256; i++){
+		int s = 0;
+		if(histArr[i]){
+			s = (int)roundf(sqrtf((float)histArr[i]) / maxValF * 255.f);
+			if(s > MAX_VX_HEIGHT_WHOLE) s = MAX_VX_HEIGHT_WHOLE;
+			if(s < 4) s = 4;
+		}
+		out[i] = s;
+	}
+	minVx = mn;
+	maxVx = mx;
+	return true;
+}
+
+float EngineViewport::changeTotalWorldParam(int deltaVx, float kScale, const Editor::MapChangeParams& params)
+{
+	if(!worldLoaded_)
+		return 0.f;
+
+	// Build the engine's vrtMapChangeParam (vrtMapCreationParam base + the
+	// move/resize flags) from the engine-free struct.
+	vrtMapChangeParam p;
+	static_cast<vrtMapCreationParam&>(p).H_SIZE_POWER = (vrtMapCreationParam::SIZE_POWER)params.hSizePower;
+	static_cast<vrtMapCreationParam&>(p).V_SIZE_POWER = (vrtMapCreationParam::SIZE_POWER)params.vSizePower;
+	p.createWorldMetod = (vrtMapCreationParam::eCreateWorldMetod)params.createWorldMetod;
+	p.initialHeight = params.initialHeight;
+	p.flag_resizeWorld2NewBorder = params.flag_resizeWorld2NewBorder;
+	p.oldWorldBegCoordX = params.oldWorldBegCoordX;
+	p.oldWorldBegCoordY = params.oldWorldBegCoordY;
+	p.kScaleModels = params.kScaleModels;
+
+	return vMap.changeTotalWorldParam(deltaVx, kScale, p);
 }

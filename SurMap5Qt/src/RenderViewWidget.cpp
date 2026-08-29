@@ -102,6 +102,38 @@ bool RenderViewWidget::isReady() const
 	return viewport_->inited();
 }
 
+bool RenderViewWidget::mapSize(int& hSize, int& vSize) const
+{
+	return viewport_->mapSize(hSize, vSize);
+}
+
+bool RenderViewWidget::mapCreationParams(int& hSizePower, int& vSizePower,
+                                         int& createWorldMetod, int& initialHeight) const
+{
+	return viewport_->mapCreationParams(hSizePower, vSizePower, createWorldMetod, initialHeight);
+}
+
+bool RenderViewWidget::worldHeightHistogram(int out[256], int& minVx, int& maxVx)
+{
+	return viewport_->worldHeightHistogram(out, minVx, maxVx);
+}
+
+float RenderViewWidget::changeTotalWorldParam(int deltaVx, float kScale,
+                                              const Editor::MapChangeParams& params)
+{
+	return viewport_->changeTotalWorldParam(deltaVx, kScale, params);
+}
+
+bool RenderViewWidget::reinitWorld()
+{
+	return viewport_->reinitWorld();
+}
+
+QString RenderViewWidget::worldName() const
+{
+	return QString::fromUtf8(viewport_->worldName());
+}
+
 bool RenderViewWidget::initRenderDevice()
 {
 	if(viewport_->inited())

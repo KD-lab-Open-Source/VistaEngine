@@ -17,6 +17,8 @@
 // (the same math CameraManager::quant uses) until the world load lands.
 #pragma once
 
+#include "MapChangeParams.h"
+
 // Forward declarations only — the full engine headers stay in the .cpp.
 class cInterfaceRenderDevice;
 class cRenderWindow;
@@ -53,6 +55,15 @@ public:
 	void doneWorld();
 	bool worldLoaded() const { return worldLoaded_; }
 
+	// Rebuild the terrain scene from the in-memory world after the terrain
+	// data changed in place (CMainFrame's view_->reInitWorld: drop the tile
+	// map, re-create it from the current vMap buffers). The world stays
+	// loaded; only the render-side map is rebuilt.
+	bool reinitWorld();
+
+	// The loaded world's name (vMap.getWorldName), empty when none.
+	const char* worldName() const;
+
 	// Per-frame update: advance the camera from the held input state.
 	// dt is seconds. Called from the editor's ~60 Hz loop.
 	void tick(float dt);
@@ -74,6 +85,31 @@ public:
 	//TraceDir. Returns false when no world is loaded or the ray misses the terrain
 	// (out stays untouched). x,y are widget-local pixels.
 	bool screenPointToGround(int x, int y, float& outX, float& outY, float& outZ);
+
+	// --- World data (U4 dialogs) ---
+
+	// The loaded map's grid size in vertices (vMap.H_SIZE/V_SIZE). Returns
+	// false when no world is loaded.
+	bool mapSize(int& hSize, int& vSize) const;
+
+	// The map's creation parameters the properties dialog shows (vMap.H_SIZE_
+	// POWER/V_SIZE_POWER, createWorldMetod, initialHeight). Returns false when
+	// no world is loaded.
+	bool mapCreationParams(int& hSizePower, int& vSizePower,
+	                       int& createWorldMetod, int& initialHeight) const;
+
+	// A 256-bin histogram of the loaded world's vertex heights (voxel units,
+	// binned over MAX_VX_HEIGHT+1) plus the min/max heights. Port of
+	// world2Histogram (SurMap5/DlgChangeTotalWorldHeight.cpp). `out` must be a
+	// 256-int array; each bin holds the sqrt-scaled column height the dialog
+	// draws. Returns false when no world is loaded.
+	bool worldHeightHistogram(int out[256], int& minVx, int& maxVx);
+
+	// Apply changeTotalWorldParam(deltaVx, kScale, params) to the loaded world
+	// (vMap's terrain height transform + optional resize; vmap4vi.cpp:178).
+	// Returns the base height (min height in world units), like the original.
+	// Only valid when a world is loaded.
+	float changeTotalWorldParam(int deltaVx, float kScale, const Editor::MapChangeParams& params);
 
 	bool inited() const { return inited_; }
 
