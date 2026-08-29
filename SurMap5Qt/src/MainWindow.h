@@ -50,6 +50,41 @@ public slots:
 	// by name without the dialog. Removed when the world dialog lands.
 	void selftestCreateWorld(const QString& worldName);
 
+	// --- File menu (CMainFrame::OnFile*) ---
+	void fileSave();
+	void fileSaveAs();
+	void fileRunWorld();
+	void fileRunMenu();
+	void fileExportVistaEngine();
+	void fileImportTextFromExcel();
+	void fileExportTextToExcel();
+	void fileExImWorld();
+	void fileProperties();
+	void fileStatistics();
+	void fileResaveWorlds();
+	void fileMerge();
+
+	// --- Edit menu (CMainFrame::OnEdit*) ---
+	void editUndo();
+	void editRedo();
+	void editMapScenario();
+	void editGameScenario();
+	void editSaveCameraAsDefault();
+	void editRebuildWorld();
+	void editUpdateSurface();
+	void editChangeTotalWorldHeight();
+	void editRollingBorder();
+
+	// --- View menu (CMainFrame::OnView*) ---
+	void viewToggleGrid(bool checked);
+	void viewToggleSources(bool checked);
+	void viewToggleCameras(bool checked);
+	void viewToggleGeosurface(bool checked);
+	void viewTogglePathFinding(bool checked);
+	void viewToggleCameraBorders(bool checked);
+	void viewToggleTimeFlow(bool checked);
+	void viewToggleHideModels(bool checked);
+
 protected:
 	void closeEvent(QCloseEvent* event) override;
 
@@ -72,6 +107,13 @@ private:
 	ToolsTreePanel* toolsTreePanel_ = nullptr;   // CToolsTreeWindow's tree
 	ObjectsTreePanel* objectsTreePanel_ = nullptr; // CObjectsManagerWindow
 
+	// --- toolbars (CExtToolControlBar set) ---
+	QToolBar* mainToolBar_ = nullptr;      // IDR_MAINFRAME
+	QToolBar* toolsToolBar_ = nullptr;     // IDR_TOOLS_BAR
+	QToolBar* filtersToolBar_ = nullptr;   // IDR_FILTERS_BAR
+	QToolBar* librariesToolBar_ = nullptr; // IDR_LIBRARIES_BAR
+	QToolBar* editorsToolBar_ = nullptr;   // IDR_EDITORS_BAR
+
 	// --- status bar panes (NUMBERS_PARTS_STATUSBAR) ---
 	QProgressBar* progressBar_ = nullptr;  // progressBar_
 
@@ -83,6 +125,88 @@ private:
 	QAction* actExit_ = nullptr;
 	QAction* actAbout_ = nullptr;
 	QAction* actToggleAnimation_ = nullptr;
+
+	// --- File menu actions (ID_FILE_*) ---
+	QAction* actRunWorld_ = nullptr;
+	QAction* actRunMenu_ = nullptr;
+	QAction* actExportVistaEngine_ = nullptr;
+	QAction* actImportTextExcel_ = nullptr;
+	QAction* actExportTextExcel_ = nullptr;
+	QAction* actExImWorld_ = nullptr;
+	QAction* actProperties_ = nullptr;
+	QAction* actStatistics_ = nullptr;
+	QAction* actResaveWorlds_ = nullptr;
+	QAction* actMerge_ = nullptr;
+
+	// --- Edit menu actions (ID_EDIT_*) ---
+	QAction* actUndo_ = nullptr;
+	QAction* actRedo_ = nullptr;
+	QAction* actMapScenario_ = nullptr;
+	QAction* actGameScenario_ = nullptr;
+	QAction* actSaveCameraAsDefault_ = nullptr;
+	QAction* actRebuildWorld_ = nullptr;
+	QAction* actUpdateSurface_ = nullptr;
+	QAction* actChangeTotalWorldHeight_ = nullptr;
+	QAction* actRollingBorder_ = nullptr;
+
+	// --- View menu actions (ID_VIEW_*) ---
+	QAction* actViewSources_ = nullptr;
+	QAction* actViewCameras_ = nullptr;
+	QAction* actViewGeosurface_ = nullptr;
+	QAction* actViewPathFinding_ = nullptr;
+	QAction* actViewPathFindingRef_ = nullptr;
+	QAction* actViewShowGrid_ = nullptr;
+	QAction* actViewCameraBorders_ = nullptr;
+	QAction* actViewTimeFlow_ = nullptr;
+	QAction* actViewHideModels_ = nullptr;
+	QAction* actViewObjectsManager_ = nullptr;
+
+	// --- Libraries menu (ID_EDIT_*/ID_LIBRARIES_*) ---
+	QAction* actLibUnits_ = nullptr;
+	QAction* actLibEffects_ = nullptr;
+	QAction* actLibSounds_ = nullptr;
+	QAction* actLibUIMessageTypes_ = nullptr;
+	QAction* actLibUIMessages_ = nullptr;
+	QAction* actLibUIShowModeSprites_ = nullptr;
+	QAction* actLibSoundTracks_ = nullptr;
+	QAction* actLibReels_ = nullptr;
+	QAction* actLibHeads_ = nullptr;
+	QAction* actLibTerTools_ = nullptr;
+	QAction* actLibCursors_ = nullptr;
+	QAction* actLibCommandColors_ = nullptr;
+	QAction* actLibTextImages_ = nullptr;
+	QAction* actLibTerrainTypeName_ = nullptr;
+	QAction* actLibImportParametersFull_ = nullptr;
+	QAction* actLibImportParametersByGroups_ = nullptr;
+	QAction* actLibExportParametersFull_ = nullptr;
+	QAction* actLibExportParametersByGroups_ = nullptr;
+	QAction* actLibExportParametersStatistics_ = nullptr;
+
+	// --- Tools menu (ID_EDIT_*) ---
+	QAction* actToolUIEditor_ = nullptr;
+	QAction* actToolEffectsEditor_ = nullptr;
+	QAction* actToolTriggers_ = nullptr;
+
+	// --- Workspace menu (ID_VIEW_*) ---
+	QAction* actWsReset_ = nullptr;
+	QAction* actWsMenuBar_ = nullptr;
+	QAction* actWsMainToolbar_ = nullptr;
+	QAction* actWsFiltersBar_ = nullptr;
+	QAction* actWsLibrariesBar_ = nullptr;
+	QAction* actWsEditorsBar_ = nullptr;
+	QAction* actWsStatusBar_ = nullptr;
+	QAction* actWsTools_ = nullptr;
+	QAction* actWsProperties_ = nullptr;
+	QAction* actWsMinimap_ = nullptr;
+	QAction* actWsObjectsManager_ = nullptr;
+
+	// --- Debug menu (ID_DEBUG_*) ---
+	QAction* actDbgEditableTree_ = nullptr;
+	QAction* actDbgSaveTree_ = nullptr;
+	QAction* actDbgEditZipConfig_ = nullptr;
+	QAction* actDbgEditDebugPrm_ = nullptr;
+	QAction* actDbgShowPaletteTexture_ = nullptr;
+	QAction* actDbgShowMipmap_ = nullptr;
 
 	// --- tool actions (the tools tree's transform set) ---
 	QAction* actToolSelect_ = nullptr;

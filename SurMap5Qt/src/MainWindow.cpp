@@ -126,32 +126,348 @@ void MainWindow::createActions()
 	actSaveWorld_->setShortcut(QKeySequence::Save);
 	actSaveWorldAs_->setShortcut(QKeySequence::SaveAs);
 
+	// File menu (CMainFrame's ID_FILE_* set from SurMap5.rc). The actions land
+	// in createMenus; the slots behind the ones that need engine/UI work beyond
+	// the current phase log to stderr and show a status message for now.
+	actRunWorld_ = new QAction(tr("&Run World..."), this);
+	actRunMenu_  = new QAction(tr("Run &Main Menu..."), this);
+	actExportVistaEngine_ = new QAction(tr("&Export VistaEngine..."), this);
+	actImportTextExcel_   = new QAction(tr("&Import Text from Excel..."), this);
+	actExportTextExcel_   = new QAction(tr("Ex&port Text to Excel..."), this);
+	actExImWorld_  = new QAction(tr("Export/Import World..."), this);
+	actProperties_ = new QAction(tr("P&roperties..."), this);
+	actStatistics_ = new QAction(tr("Statistics..."), this);
+	actResaveWorlds_ = new QAction(tr("Resave All Worlds"), this);
+	actMerge_      = new QAction(tr("Merge..."), this);
+
+	// Edit menu (ID_EDIT_*).
+	actUndo_ = new QAction(tr("&Undo"), this);
+	actUndo_->setShortcut(QKeySequence::Undo);
+	actRedo_ = new QAction(tr("&Redo"), this);
+	actRedo_->setShortcut(QKeySequence::Redo);
+	actMapScenario_   = new QAction(tr("&Map Scenario..."), this);
+	actGameScenario_  = new QAction(tr("&Game Scenario..."), this);
+	actSaveCameraAsDefault_ = new QAction(tr("Save Camera As Default"), this);
+	actRebuildWorld_  = new QAction(tr("&Rebuild World"), this);
+	actUpdateSurface_ = new QAction(tr("Update Surface"), this);
+	actChangeTotalWorldHeight_ = new QAction(tr("Change Total World Param"), this);
+	actRollingBorder_ = new QAction(tr("Rolling Border"), this);
+
+	// View menu (ID_VIEW_*). Checkable: they mirror the original's toggle
+	// buttons on the filters bar and the checkmark state in the View menu.
+	actViewSources_ = new QAction(tr("&Sources"), this);
+	actViewSources_->setCheckable(true);
+	actViewCameras_ = new QAction(tr("&Cameras"), this);
+	actViewCameras_->setCheckable(true);
+	actViewGeosurface_ = new QAction(tr("&Geosurface"), this);
+	actViewGeosurface_->setCheckable(true);
+	actViewPathFinding_ = new QAction(tr("Path Finding"), this);
+	actViewPathFinding_->setCheckable(true);
+	actViewPathFindingRef_ = new QAction(tr("Path Finding - Select Reference Unit"), this);
+	actViewShowGrid_ = new QAction(tr("Show &Grid"), this);
+	actViewShowGrid_->setCheckable(true);
+	actViewShowGrid_->setChecked(true);   // the editor starts with the grid on
+	actViewCameraBorders_ = new QAction(tr("Show Camera &Borders"), this);
+	actViewCameraBorders_->setCheckable(true);
+	actViewTimeFlow_ = new QAction(tr("Enable &Time Flow"), this);
+	actViewTimeFlow_->setCheckable(true);
+	actViewHideModels_ = new QAction(tr("Hide Models"), this);
+	actViewHideModels_->setCheckable(true);
+	actViewObjectsManager_ = new QAction(tr("Objects Manager"), this);
+	actViewObjectsManager_->setCheckable(true);
+	actViewObjectsManager_->setChecked(true);
+
+	// Libraries menu (ID_EDIT_* / ID_LIBRARIES_* — the library editors the
+	// libraries bar launches; each is a separate external-ish editor that later
+	// phases host as a dock or dialog).
+	actLibUnits_ = new QAction(tr("U&nits..."), this);
+	actLibEffects_ = new QAction(tr("&Effects..."), this);
+	actLibSounds_ = new QAction(tr("&Sounds..."), this);
+	actLibUIMessageTypes_ = new QAction(tr("UI Message Types..."), this);
+	actLibUIMessages_ = new QAction(tr("UI &Messages..."), this);
+	actLibUIShowModeSprites_ = new QAction(tr("UI Show Mode Sprites..."), this);
+	actLibSoundTracks_ = new QAction(tr("Sound Tracks..."), this);
+	actLibReels_ = new QAction(tr("Cut-Scenes..."), this);
+	actLibHeads_ = new QAction(tr("Heads..."), this);
+	actLibTerTools_ = new QAction(tr("TerTools..."), this);
+	actLibCursors_ = new QAction(tr("Cursors..."), this);
+	actLibCommandColors_ = new QAction(tr("Command Colors"), this);
+	actLibTextImages_ = new QAction(tr("Text images"), this);
+	actLibTerrainTypeName_ = new QAction(tr("Terrrain Type Name"), this);
+	actLibImportParametersFull_ = new QAction(tr("Full"), this);
+	actLibImportParametersByGroups_ = new QAction(tr("By Groups"), this);
+	actLibExportParametersFull_ = new QAction(tr("Full"), this);
+	actLibExportParametersByGroups_ = new QAction(tr("By Groups"), this);
+	actLibExportParametersStatistics_ = new QAction(tr("Balance Parameters"), this);
+
+	// Tools menu (ID_EDIT_* — the editors bar).
+	actToolUIEditor_ = new QAction(tr("&UI Editor"), this);
+	actToolEffectsEditor_ = new QAction(tr("&Effects Editor"), this);
+	actToolTriggers_ = new QAction(tr("Edit &Triggers..."), this);
+
+	// Workspace menu (ID_VIEW_* — dock/toolbar toggles).
+	actWsReset_ = new QAction(tr("&Reset Workspace"), this);
+	actWsMenuBar_ = new QAction(tr("Menu Bar"), this);
+	actWsMenuBar_->setCheckable(true);
+	actWsMenuBar_->setChecked(true);
+	actWsMainToolbar_ = new QAction(tr("Main &Toolbar"), this);
+	actWsMainToolbar_->setCheckable(true);
+	actWsMainToolbar_->setChecked(true);
+	actWsFiltersBar_ = new QAction(tr("Filters Bar"), this);
+	actWsFiltersBar_->setCheckable(true);
+	actWsLibrariesBar_ = new QAction(tr("Libraries Bar"), this);
+	actWsLibrariesBar_->setCheckable(true);
+	actWsEditorsBar_ = new QAction(tr("Editors Bar"), this);
+	actWsEditorsBar_->setCheckable(true);
+	actWsStatusBar_ = new QAction(tr("&Status Bar"), this);
+	actWsStatusBar_->setCheckable(true);
+	actWsStatusBar_->setChecked(true);
+	actWsTools_ = new QAction(tr("Tools"), this);
+	actWsTools_->setCheckable(true);
+	actWsTools_->setChecked(true);
+	actWsProperties_ = new QAction(tr("Properties"), this);
+	actWsProperties_->setCheckable(true);
+	actWsProperties_->setChecked(true);
+	actWsMinimap_ = new QAction(tr("&Minimap"), this);
+	actWsMinimap_->setCheckable(true);
+	actWsObjectsManager_ = new QAction(tr("Objects Manager"), this);
+	actWsObjectsManager_->setCheckable(true);
+	actWsObjectsManager_->setChecked(true);
+
+	// Debug menu (ID_DEBUG_*).
+	actDbgEditableTree_ = new QAction(tr("Editable Tools Tree"), this);
+	actDbgEditableTree_->setCheckable(true);
+	actDbgSaveTree_ = new QAction(tr("Save Tools Tree"), this);
+	actDbgEditZipConfig_ = new QAction(tr("Edit ZipConfig..."), this);
+	actDbgEditDebugPrm_ = new QAction(tr("Edit debugPrm..."), this);
+	actDbgShowPaletteTexture_ = new QAction(tr("Show Palette Texture"), this);
+	actDbgShowPaletteTexture_->setCheckable(true);
+	actDbgShowMipmap_ = new QAction(tr("Show Mipmap"), this);
+	actDbgShowMipmap_->setCheckable(true);
+
 	// File menu: world save/open land in Phase 4 (DlgWorldName, DlgExImWorld);
 	// the about dialog (CAboutDlg) is a plain QMessageBox.
 	connect(actExit_, &QAction::triggered, this, &QWidget::close);
 	connect(actAbout_, &QAction::triggered, this, &MainWindow::about);
 	connect(actNewWorld_, &QAction::triggered, this, &MainWindow::newWorld);
 	connect(actOpenWorld_, &QAction::triggered, this, &MainWindow::openWorld);
+	connect(actSaveWorld_, &QAction::triggered, this, &MainWindow::fileSave);
+	connect(actSaveWorldAs_, &QAction::triggered, this, &MainWindow::fileSaveAs);
+	connect(actRunWorld_, &QAction::triggered, this, &MainWindow::fileRunWorld);
+	connect(actRunMenu_, &QAction::triggered, this, &MainWindow::fileRunMenu);
+	connect(actExportVistaEngine_, &QAction::triggered, this, &MainWindow::fileExportVistaEngine);
+	connect(actImportTextExcel_, &QAction::triggered, this, &MainWindow::fileImportTextFromExcel);
+	connect(actExportTextExcel_, &QAction::triggered, this, &MainWindow::fileExportTextToExcel);
+	connect(actExImWorld_, &QAction::triggered, this, &MainWindow::fileExImWorld);
+	connect(actProperties_, &QAction::triggered, this, &MainWindow::fileProperties);
+	connect(actStatistics_, &QAction::triggered, this, &MainWindow::fileStatistics);
+	connect(actResaveWorlds_, &QAction::triggered, this, &MainWindow::fileResaveWorlds);
+	connect(actMerge_, &QAction::triggered, this, &MainWindow::fileMerge);
+
+	// Edit menu.
+	connect(actUndo_, &QAction::triggered, this, &MainWindow::editUndo);
+	connect(actRedo_, &QAction::triggered, this, &MainWindow::editRedo);
+	connect(actMapScenario_, &QAction::triggered, this, &MainWindow::editMapScenario);
+	connect(actGameScenario_, &QAction::triggered, this, &MainWindow::editGameScenario);
+	connect(actSaveCameraAsDefault_, &QAction::triggered, this, &MainWindow::editSaveCameraAsDefault);
+	connect(actRebuildWorld_, &QAction::triggered, this, &MainWindow::editRebuildWorld);
+	connect(actUpdateSurface_, &QAction::triggered, this, &MainWindow::editUpdateSurface);
+	connect(actChangeTotalWorldHeight_, &QAction::triggered, this, &MainWindow::editChangeTotalWorldHeight);
+	connect(actRollingBorder_, &QAction::triggered, this, &MainWindow::editRollingBorder);
+
+	// View menu (toggled).
+	connect(actViewSources_, &QAction::toggled, this, &MainWindow::viewToggleSources);
+	connect(actViewCameras_, &QAction::toggled, this, &MainWindow::viewToggleCameras);
+	connect(actViewGeosurface_, &QAction::toggled, this, &MainWindow::viewToggleGeosurface);
+	connect(actViewPathFinding_, &QAction::toggled, this, &MainWindow::viewTogglePathFinding);
+	connect(actViewShowGrid_, &QAction::toggled, this, &MainWindow::viewToggleGrid);
+	connect(actViewCameraBorders_, &QAction::toggled, this, &MainWindow::viewToggleCameraBorders);
+	connect(actViewTimeFlow_, &QAction::toggled, this, &MainWindow::viewToggleTimeFlow);
+	connect(actViewHideModels_, &QAction::toggled, this, &MainWindow::viewToggleHideModels);
+	connect(actViewObjectsManager_, &QAction::toggled, this, [this](bool on){ if(objectsDock_) objectsDock_->setVisible(on); });
+
 	connect(actToggleAnimation_, &QAction::triggered, this, [this](bool checked) {
 		// CSurMap5App::OnViewAnimation toggled flag_animation; the loop timer
 		// keeps running but stops repainting the view.
 		view_->setUpdatesEnabled(checked);
 	});
+
+	// Libraries / Tools / Workspace / Debug: stub handlers. Each logs and shows
+	// a status message; the library editors and external tools land in later
+	// phases (U6 panels, U2 external-tool launches). Grouped so the menus exist
+	// and are navigable now.
+	auto stub = [this](const char* tag, const QString& msg){
+		fprintf(stderr, "[ui] %s: TODO\n", tag);
+		statusBar()->showMessage(msg);
+	};
+	connect(actLibUnits_, &QAction::triggered, this, [this, stub]{ stub("libraries/units", tr("Units editor: not wired yet")); });
+	connect(actLibEffects_, &QAction::triggered, this, [this, stub]{ stub("libraries/effects", tr("Effects editor: not wired yet")); });
+	connect(actLibSounds_, &QAction::triggered, this, [this, stub]{ stub("libraries/sounds", tr("Sounds editor: not wired yet")); });
+	connect(actLibUIMessageTypes_, &QAction::triggered, this, [this, stub]{ stub("libraries/ui-message-types", tr("UI Message Types: not wired yet")); });
+	connect(actLibUIMessages_, &QAction::triggered, this, [this, stub]{ stub("libraries/ui-messages", tr("UI Messages: not wired yet")); });
+	connect(actLibUIShowModeSprites_, &QAction::triggered, this, [this, stub]{ stub("libraries/ui-show-mode-sprites", tr("UI Show Mode Sprites: not wired yet")); });
+	connect(actLibSoundTracks_, &QAction::triggered, this, [this, stub]{ stub("libraries/sound-tracks", tr("Sound Tracks: not wired yet")); });
+	connect(actLibReels_, &QAction::triggered, this, [this, stub]{ stub("libraries/reels", tr("Cut-Scenes: not wired yet")); });
+	connect(actLibHeads_, &QAction::triggered, this, [this, stub]{ stub("libraries/heads", tr("Heads: not wired yet")); });
+	connect(actLibTerTools_, &QAction::triggered, this, [this, stub]{ stub("libraries/tertools", tr("TerTools: not wired yet")); });
+	connect(actLibCursors_, &QAction::triggered, this, [this, stub]{ stub("libraries/cursors", tr("Cursors: not wired yet")); });
+	connect(actLibCommandColors_, &QAction::triggered, this, [this, stub]{ stub("libraries/command-colors", tr("Command Colors: not wired yet")); });
+	connect(actLibTextImages_, &QAction::triggered, this, [this, stub]{ stub("libraries/text-images", tr("Text images: not wired yet")); });
+	connect(actLibTerrainTypeName_, &QAction::triggered, this, [this, stub]{ stub("libraries/terrain-type-name", tr("Terrain Type Name: not wired yet")); });
+	connect(actLibImportParametersFull_, &QAction::triggered, this, [this, stub]{ stub("libraries/import-params-full", tr("Import Parameters (Full): not wired yet")); });
+	connect(actLibImportParametersByGroups_, &QAction::triggered, this, [this, stub]{ stub("libraries/import-params-groups", tr("Import Parameters (By Groups): not wired yet")); });
+	connect(actLibExportParametersFull_, &QAction::triggered, this, [this, stub]{ stub("libraries/export-params-full", tr("Export Parameters (Full): not wired yet")); });
+	connect(actLibExportParametersByGroups_, &QAction::triggered, this, [this, stub]{ stub("libraries/export-params-groups", tr("Export Parameters (By Groups): not wired yet")); });
+	connect(actLibExportParametersStatistics_, &QAction::triggered, this, [this, stub]{ stub("libraries/export-params-statistics", tr("Export Parameters (Balance): not wired yet")); });
+
+	connect(actToolUIEditor_, &QAction::triggered, this, [this, stub]{ stub("tools/ui-editor", tr("UI Editor: not wired yet")); });
+	connect(actToolEffectsEditor_, &QAction::triggered, this, [this, stub]{ stub("tools/effects-editor", tr("Effects Editor: not wired yet")); });
+	connect(actToolTriggers_, &QAction::triggered, this, [this, stub]{ stub("tools/triggers", tr("Edit Triggers: not wired yet")); });
+
+	// Workspace: dock/toolbar visibility toggles. The docks exist (createDockPanels)
+	// and the toolbars exist (createToolBars) by the time these fire, so toggle
+	// them for real.
+	connect(actWsReset_, &QAction::triggered, this, [this]{
+		restoreState(QByteArray());   // OnViewResettoolbar2default
+		statusBar()->showMessage(tr("Workspace reset"));
+	});
+	connect(actWsMenuBar_, &QAction::toggled, this, [this](bool on){ menuBar()->setVisible(on); });
+	connect(actWsMainToolbar_, &QAction::toggled, this, [this](bool on){ if(mainToolBar_) mainToolBar_->setVisible(on); });
+	connect(actWsStatusBar_, &QAction::toggled, this, [this](bool on){ statusBar()->setVisible(on); });
+	connect(actWsTools_, &QAction::toggled, this, [this](bool on){ if(toolsDock_) toolsDock_->setVisible(on); });
+	connect(actWsProperties_, &QAction::toggled, this, [this](bool on){ if(propertiesDock_) propertiesDock_->setVisible(on); });
+	connect(actWsMinimap_, &QAction::toggled, this, [this](bool on){ if(miniMapDock_) miniMapDock_->setVisible(on); });
+	connect(actWsObjectsManager_, &QAction::toggled, this, [this](bool on){ if(objectsDock_) objectsDock_->setVisible(on); });
+	connect(actWsFiltersBar_, &QAction::toggled, this, [this](bool on){ if(filtersToolBar_) filtersToolBar_->setVisible(on); });
+	connect(actWsLibrariesBar_, &QAction::toggled, this, [this](bool on){ if(librariesToolBar_) librariesToolBar_->setVisible(on); });
+	connect(actWsEditorsBar_, &QAction::toggled, this, [this](bool on){ if(editorsToolBar_) editorsToolBar_->setVisible(on); });
+
+	connect(actDbgEditableTree_, &QAction::toggled, this, [this, stub](bool on){ (void)on; stub("debug/editable-tree", tr("Editable Tools Tree: not wired yet")); });
+	connect(actDbgSaveTree_, &QAction::triggered, this, [this, stub]{ stub("debug/save-tree", tr("Save Tools Tree: not wired yet")); });
+	connect(actDbgEditZipConfig_, &QAction::triggered, this, [this, stub]{ stub("debug/edit-zipconfig", tr("Edit ZipConfig: not wired yet")); });
+	connect(actDbgEditDebugPrm_, &QAction::triggered, this, [this, stub]{ stub("debug/edit-debugprm", tr("Edit debugPrm: not wired yet")); });
+	connect(actDbgShowPaletteTexture_, &QAction::toggled, this, [this](bool on){ (void)on; });
+	connect(actDbgShowMipmap_, &QAction::toggled, this, [this](bool on){ (void)on; });
 }
 
 void MainWindow::createMenus()
 {
+	// File (IDR_MAINFRAME's File popup).
 	QMenu* fileMenu = menuBar()->addMenu(tr("&File"));
 	fileMenu->addAction(actNewWorld_);
 	fileMenu->addAction(actOpenWorld_);
 	fileMenu->addSeparator();
 	fileMenu->addAction(actSaveWorld_);
 	fileMenu->addAction(actSaveWorldAs_);
+	// "Save MiniMap to World" / "Save Without terTool Color" — engine save
+	// variants, deferred until the minimap/save plumbing lands (U7).
+	fileMenu->addSeparator();
+	fileMenu->addAction(actResaveWorlds_);
+	fileMenu->addSeparator();
+	fileMenu->addAction(actMerge_);
+	fileMenu->addSeparator();
+	fileMenu->addAction(actRunWorld_);
+	fileMenu->addAction(actRunMenu_);
+	fileMenu->addAction(actExportVistaEngine_);
+	fileMenu->addSeparator();
+	fileMenu->addAction(actImportTextExcel_);
+	fileMenu->addAction(actExportTextExcel_);
+	fileMenu->addAction(actExImWorld_);
+	fileMenu->addSeparator();
+	fileMenu->addAction(actProperties_);
+	fileMenu->addAction(actStatistics_);
 	fileMenu->addSeparator();
 	fileMenu->addAction(actExit_);
 
+	// Edit (IDR_MAINFRAME's Edit popup).
+	QMenu* editMenu = menuBar()->addMenu(tr("&Edit"));
+	editMenu->addAction(actUndo_);
+	editMenu->addAction(actRedo_);
+	editMenu->addSeparator();
+	editMenu->addAction(actMapScenario_);
+	editMenu->addAction(actGameScenario_);
+	editMenu->addSeparator();
+	editMenu->addAction(actSaveCameraAsDefault_);
+	editMenu->addSeparator();
+	editMenu->addAction(actRebuildWorld_);
+	editMenu->addAction(actUpdateSurface_);
+	editMenu->addAction(actChangeTotalWorldHeight_);
+	editMenu->addAction(actRollingBorder_);
+
+	// View (IDR_MAINFRAME's View popup).
 	QMenu* viewMenu = menuBar()->addMenu(tr("&View"));
+	viewMenu->addAction(actViewSources_);
+	viewMenu->addAction(actViewCameras_);
+	viewMenu->addAction(actViewGeosurface_);
+	viewMenu->addSeparator();
+	viewMenu->addAction(actViewPathFinding_);
+	viewMenu->addAction(actViewPathFindingRef_);
+	viewMenu->addSeparator();
+	viewMenu->addAction(actViewShowGrid_);
+	viewMenu->addAction(actViewCameraBorders_);
 	viewMenu->addAction(actToggleAnimation_);
+	viewMenu->addAction(actViewTimeFlow_);
+	viewMenu->addAction(actViewHideModels_);
+
+	// Libraries (IDR_MAINFRAME's Libraries popup).
+	QMenu* libMenu = menuBar()->addMenu(tr("&Libraries"));
+	libMenu->addAction(actLibUnits_);
+	libMenu->addAction(actLibEffects_);
+	libMenu->addAction(actLibSounds_);
+	libMenu->addAction(actLibUIMessageTypes_);
+	libMenu->addAction(actLibUIMessages_);
+	libMenu->addAction(actLibUIShowModeSprites_);
+	libMenu->addSeparator();
+	libMenu->addAction(actLibSoundTracks_);
+	libMenu->addAction(actLibReels_);
+	libMenu->addAction(actLibHeads_);
+	libMenu->addAction(actLibTerTools_);
+	libMenu->addAction(actLibCursors_);
+	libMenu->addAction(actLibCommandColors_);
+	libMenu->addAction(actLibTextImages_);
+	libMenu->addAction(actLibTerrainTypeName_);
+	libMenu->addSeparator();
+	QMenu* importMenu = libMenu->addMenu(tr("Import Parameters from Excel"));
+	importMenu->addAction(actLibImportParametersFull_);
+	importMenu->addAction(actLibImportParametersByGroups_);
+	QMenu* exportMenu = libMenu->addMenu(tr("Export Parameters to Excel"));
+	exportMenu->addAction(actLibExportParametersFull_);
+	exportMenu->addAction(actLibExportParametersByGroups_);
+	exportMenu->addAction(actLibExportParametersStatistics_);
+
+	// Tools (IDR_MAINFRAME's Tools popup — the editors bar launches).
+	QMenu* toolsMenu = menuBar()->addMenu(tr("&Tools"));
+	toolsMenu->addAction(actToolUIEditor_);
+	toolsMenu->addAction(actToolEffectsEditor_);
+	toolsMenu->addSeparator();
+	toolsMenu->addAction(actToolTriggers_);
+
+	// Workspace (IDR_MAINFRAME's Workspace popup — dock/toolbar toggles).
+	QMenu* wsMenu = menuBar()->addMenu(tr("&Workspace"));
+	wsMenu->addAction(actWsReset_);
+	wsMenu->addSeparator();
+	wsMenu->addAction(actWsMenuBar_);
+	wsMenu->addAction(actWsMainToolbar_);
+	wsMenu->addAction(actWsFiltersBar_);
+	wsMenu->addAction(actWsLibrariesBar_);
+	wsMenu->addAction(actWsEditorsBar_);
+	wsMenu->addAction(actWsStatusBar_);
+	wsMenu->addSeparator();
+	wsMenu->addAction(actWsTools_);
+	wsMenu->addAction(actWsProperties_);
+	wsMenu->addAction(actWsMinimap_);
+	wsMenu->addAction(actWsObjectsManager_);
+
+	// Debug (IDR_MAINFRAME's Debug popup).
+	QMenu* debugMenu = menuBar()->addMenu(tr("&Debug"));
+	debugMenu->addAction(actDbgEditableTree_);
+	debugMenu->addAction(actDbgSaveTree_);
+	debugMenu->addSeparator();
+	debugMenu->addAction(actDbgEditZipConfig_);
+	debugMenu->addAction(actDbgEditDebugPrm_);
+	debugMenu->addSeparator();
+	debugMenu->addAction(actDbgShowPaletteTexture_);
+	debugMenu->addAction(actDbgShowMipmap_);
 
 	QMenu* helpMenu = menuBar()->addMenu(tr("&Help"));
 	helpMenu->addAction(actAbout_);
@@ -161,25 +477,67 @@ void MainWindow::createToolBars()
 {
 	// toolBar_ — main toolbar (IDR_MAINFRAME strip in the .rc). Actions will
 	// carry icons from the original res/ bitmaps in Phase 1 polish.
-	QToolBar* toolBar = addToolBar(tr("Main"));
-	toolBar->setObjectName("mainToolBar"); // unique name for saveState()
-	toolBar->addAction(actNewWorld_);
-	toolBar->addAction(actOpenWorld_);
-	toolBar->addAction(actSaveWorld_);
-	toolBar->addAction(actSaveWorldAs_);
+	mainToolBar_ = addToolBar(tr("Main"));
+	mainToolBar_->setObjectName("mainToolBar"); // unique name for saveState()
+	mainToolBar_->addAction(actNewWorld_);
+	mainToolBar_->addAction(actOpenWorld_);
+	mainToolBar_->addAction(actSaveWorld_);
+	mainToolBar_->addSeparator();
+	mainToolBar_->addAction(actRunWorld_);
+	mainToolBar_->addAction(actRunMenu_);
+	mainToolBar_->addSeparator();
+	mainToolBar_->addAction(actExportVistaEngine_);
+	mainToolBar_->addSeparator();
+	mainToolBar_->addAction(actUndo_);
+	mainToolBar_->addAction(actRedo_);
+	mainToolBar_->addSeparator();
+	mainToolBar_->addAction(actUpdateSurface_);
+	mainToolBar_->addSeparator();
+	mainToolBar_->addAction(actMapScenario_);
+	mainToolBar_->addAction(actGameScenario_);
+	mainToolBar_->addAction(actViewObjectsManager_);
 
-	// librariesBar_, editorsBar_, filtersBar_ — Phase 4/5, when the panels they
-	// control exist. Each gets its own QToolBar with a distinct objectName so
-	// saveState()/restoreState() can restore them.
+	// filtersBar_ — IDR_FILTERS_BAR: the view toggles + the time slider. The
+	// time slider (IDD_TIME_SLIDER) is a separate widget in the original; it
+	// lands with U5 (TimeSliderDlg) as a widget action.
+	filtersToolBar_ = addToolBar(tr("Filters"));
+	filtersToolBar_->setObjectName("filtersToolBar");
+	filtersToolBar_->addAction(actViewShowGrid_);
+	filtersToolBar_->addAction(actViewTimeFlow_);
+	filtersToolBar_->addSeparator();
+	filtersToolBar_->addAction(actViewSources_);
+	filtersToolBar_->addAction(actViewCameras_);
+	filtersToolBar_->addAction(actViewPathFinding_);
+	filtersToolBar_->addAction(actViewPathFindingRef_);
+
+	// librariesBar_ — IDR_LIBRARIES_BAR: the library editors.
+	librariesToolBar_ = addToolBar(tr("Libraries"));
+	librariesToolBar_->setObjectName("librariesToolBar");
+	librariesToolBar_->addAction(actLibEffects_);
+	librariesToolBar_->addAction(actLibSounds_);
+	librariesToolBar_->addAction(actLibUIMessages_);
+	librariesToolBar_->addAction(actLibSoundTracks_);
+	librariesToolBar_->addAction(actLibReels_);
+	librariesToolBar_->addAction(actLibHeads_);
+	librariesToolBar_->addAction(actLibTerTools_);
+	librariesToolBar_->addAction(actLibCursors_);
+
+	// editorsBar_ — IDR_EDITORS_BAR: the external tool launchers.
+	editorsToolBar_ = addToolBar(tr("Editors"));
+	editorsToolBar_->setObjectName("editorsToolBar");
+	editorsToolBar_->addAction(actToolUIEditor_);
+	editorsToolBar_->addAction(actToolTriggers_);
+	editorsToolBar_->addAction(actToolEffectsEditor_);
+	editorsToolBar_->addAction(actLibUnits_);
 
 	// toolsBar_ — the transform tool set (the tools tree's top level in
 	// SurMap5; the original's toolbar strip IDR_TOOLBAR_TOOLS).
-	QToolBar* toolsBar = addToolBar(tr("Tools"));
-	toolsBar->setObjectName("toolsToolBar");
-	toolsBar->addAction(actToolSelect_);
-	toolsBar->addAction(actToolMove_);
-	toolsBar->addAction(actToolRotate_);
-	toolsBar->addAction(actToolScale_);
+	toolsToolBar_ = addToolBar(tr("Tools"));
+	toolsToolBar_->setObjectName("toolsToolBar");
+	toolsToolBar_->addAction(actToolSelect_);
+	toolsToolBar_->addAction(actToolMove_);
+	toolsToolBar_->addAction(actToolRotate_);
+	toolsToolBar_->addAction(actToolScale_);
 }
 
 void MainWindow::createDockPanels()
@@ -349,6 +707,215 @@ void MainWindow::selftestCreateWorld(const QString& worldName)
 		fflush(stderr);
 		QCoreApplication::exit(1);
 	}
+}
+
+// --- File menu ------------------------------------------------------------
+// The original's handlers are in SurMap5/MainFrame.cpp (OnFile*). Those that
+// need plumbing beyond the current phase log and show a status message; the
+// world ops (save, save as, properties) land in U7 once the engine save path
+// (vMap.save) is wired through RenderViewWidget.
+
+void MainWindow::fileSave()
+{
+	// OnFileSave: vMap.save(current world). U7 wires the engine call; until
+	// then report the world that would be saved.
+	if(!view_->worldLoaded()){
+		statusBar()->showMessage(tr("No world to save"));
+		return;
+	}
+	fprintf(stderr, "[file] save: TODO U7 (vMap.save)\n");
+	statusBar()->showMessage(tr("Save: not wired yet (U7)"));
+}
+
+void MainWindow::fileSaveAs()
+{
+	fprintf(stderr, "[file] save-as: TODO U7 (DlgWorldName + vMap.save)\n");
+	statusBar()->showMessage(tr("Save As: not wired yet (U7)"));
+}
+
+void MainWindow::fileRunWorld()
+{
+	// OnFileRunWorld: launch the game with the current world. Needs the game
+	// executable path; stub for now.
+	fprintf(stderr, "[file] run-world: TODO\n");
+	statusBar()->showMessage(tr("Run World: not wired yet"));
+}
+
+void MainWindow::fileRunMenu()
+{
+	fprintf(stderr, "[file] run-menu: TODO\n");
+	statusBar()->showMessage(tr("Run Main Menu: not wired yet"));
+}
+
+void MainWindow::fileExportVistaEngine()
+{
+	fprintf(stderr, "[file] export-vistaengine: TODO\n");
+	statusBar()->showMessage(tr("Export VistaEngine: not wired yet"));
+}
+
+void MainWindow::fileImportTextFromExcel()
+{
+	fprintf(stderr, "[file] import-excel: TODO\n");
+	statusBar()->showMessage(tr("Import Text from Excel: not wired yet"));
+}
+
+void MainWindow::fileExportTextToExcel()
+{
+	fprintf(stderr, "[file] export-excel: TODO\n");
+	statusBar()->showMessage(tr("Export Text to Excel: not wired yet"));
+}
+
+void MainWindow::fileExImWorld()
+{
+	// OnFileExportImportWorld: DlgExImWorld (U4). Stub until the dialog lands.
+	fprintf(stderr, "[file] exim-world: TODO U4 (DlgExImWorld)\n");
+	statusBar()->showMessage(tr("Export/Import World: not wired yet"));
+}
+
+void MainWindow::fileProperties()
+{
+	// OnFileProperties: WorldPropertiesDlg (U4) — shows the loaded map's size.
+	fprintf(stderr, "[file] properties: TODO U4 (WorldPropertiesDlg)\n");
+	statusBar()->showMessage(tr("Properties: not wired yet"));
+}
+
+void MainWindow::fileStatistics()
+{
+	// OnFileStatistics: DlgTexturesStatistics (U5).
+	fprintf(stderr, "[file] statistics: TODO U5 (DlgTexturesStatistics)\n");
+	statusBar()->showMessage(tr("Statistics: not wired yet"));
+}
+
+void MainWindow::fileResaveWorlds()
+{
+	// OnFileResaveWorlds: re-save every world in the worlds dir.
+	fprintf(stderr, "[file] resave-worlds: TODO\n");
+	statusBar()->showMessage(tr("Resave All Worlds: not wired yet"));
+}
+
+void MainWindow::fileMerge()
+{
+	// OnFileMerge: merge another world into the current one.
+	fprintf(stderr, "[file] merge: TODO\n");
+	statusBar()->showMessage(tr("Merge: not wired yet"));
+}
+
+// --- Edit menu ------------------------------------------------------------
+
+void MainWindow::editUndo()
+{
+	// OnEditUndo: selection undo (U8).
+	fprintf(stderr, "[edit] undo: TODO U8\n");
+	statusBar()->showMessage(tr("Undo: not wired yet"));
+}
+
+void MainWindow::editRedo()
+{
+	fprintf(stderr, "[edit] redo: TODO U8\n");
+	statusBar()->showMessage(tr("Redo: not wired yet"));
+}
+
+void MainWindow::editMapScenario()
+{
+	// OnEditMap: the map scenario editor (external tools land in U2).
+	fprintf(stderr, "[edit] map-scenario: TODO\n");
+	statusBar()->showMessage(tr("Map Scenario: not wired yet"));
+}
+
+void MainWindow::editGameScenario()
+{
+	fprintf(stderr, "[edit] game-scenario: TODO\n");
+	statusBar()->showMessage(tr("Game Scenario: not wired yet"));
+}
+
+void MainWindow::editSaveCameraAsDefault()
+{
+	// OnEditSaveCameraAsDefault: persist the current orbit as the world's
+	// default camera. The engine camera state lives in EngineViewport (U7).
+	fprintf(stderr, "[edit] save-camera-default: TODO U7\n");
+	statusBar()->showMessage(tr("Save Camera As Default: not wired yet"));
+}
+
+void MainWindow::editRebuildWorld()
+{
+	// OnEditRebuildworld: rebuild terrain caches (vMap.rebuild?).
+	fprintf(stderr, "[edit] rebuild-world: TODO\n");
+	statusBar()->showMessage(tr("Rebuild World: not wired yet"));
+}
+
+void MainWindow::editUpdateSurface()
+{
+	fprintf(stderr, "[edit] update-surface: TODO\n");
+	statusBar()->showMessage(tr("Update Surface: not wired yet"));
+}
+
+void MainWindow::editChangeTotalWorldHeight()
+{
+	// OnEditChangetotalworldheight: DlgChangeTotalWorldHeight (U4).
+	fprintf(stderr, "[edit] change-total-height: TODO U4 (DlgChangeTotalWorldHeight)\n");
+	statusBar()->showMessage(tr("Change Total World Param: not wired yet"));
+}
+
+void MainWindow::editRollingBorder()
+{
+	// OnEditRollingborder: DlgBorderRolling.
+	fprintf(stderr, "[edit] rolling-border: TODO U5 (DlgBorderRolling)\n");
+	statusBar()->showMessage(tr("Rolling Border: not wired yet"));
+}
+
+// --- View menu ------------------------------------------------------------
+
+void MainWindow::viewToggleGrid(bool checked)
+{
+	// OnViewShowGrid: the editor grid (drawGrid) visibility. EngineViewport
+	// draws the grid unconditionally for now; a flag lands with U7.
+	fprintf(stderr, "[view] show-grid: %s (TODO wire to drawGrid)\n", checked ? "on" : "off");
+	statusBar()->showMessage(tr("Show Grid: %1").arg(checked ? tr("on") : tr("off")));
+}
+
+void MainWindow::viewToggleSources(bool checked)
+{
+	// OnViewSources: render the world's sources (extraction points).
+	fprintf(stderr, "[view] sources: %s\n", checked ? "on" : "off");
+	statusBar()->showMessage(tr("Sources: %1").arg(checked ? tr("on") : tr("off")));
+}
+
+void MainWindow::viewToggleCameras(bool checked)
+{
+	fprintf(stderr, "[view] cameras: %s\n", checked ? "on" : "off");
+	statusBar()->showMessage(tr("Cameras: %1").arg(checked ? tr("on") : tr("off")));
+}
+
+void MainWindow::viewToggleGeosurface(bool checked)
+{
+	fprintf(stderr, "[view] geosurface: %s\n", checked ? "on" : "off");
+	statusBar()->showMessage(tr("Geosurface: %1").arg(checked ? tr("on") : tr("off")));
+}
+
+void MainWindow::viewTogglePathFinding(bool checked)
+{
+	fprintf(stderr, "[view] path-finding: %s\n", checked ? "on" : "off");
+	statusBar()->showMessage(tr("Path Finding: %1").arg(checked ? tr("on") : tr("off")));
+}
+
+void MainWindow::viewToggleCameraBorders(bool checked)
+{
+	fprintf(stderr, "[view] camera-borders: %s\n", checked ? "on" : "off");
+	statusBar()->showMessage(tr("Show Camera Borders: %1").arg(checked ? tr("on") : tr("off")));
+}
+
+void MainWindow::viewToggleTimeFlow(bool checked)
+{
+	// OnViewEnableTimeFlow: let the world's time advance (filters bar toggle).
+	fprintf(stderr, "[view] time-flow: %s\n", checked ? "on" : "off");
+	statusBar()->showMessage(tr("Enable Time Flow: %1").arg(checked ? tr("on") : tr("off")));
+}
+
+void MainWindow::viewToggleHideModels(bool checked)
+{
+	// OnViewHideModels: draw the terrain but not the 3D models.
+	fprintf(stderr, "[view] hide-models: %s\n", checked ? "on" : "off");
+	statusBar()->showMessage(tr("Hide Models: %1").arg(checked ? tr("on") : tr("off")));
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
