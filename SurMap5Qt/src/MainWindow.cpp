@@ -992,8 +992,30 @@ void MainWindow::fileStatistics()
 void MainWindow::fileResaveWorlds()
 {
 	// OnFileResaveWorlds: re-save every world in the worlds dir.
-	fprintf(stderr, "[file] resave-worlds: TODO\n");
-	statusBar()->showMessage(tr("Resave All Worlds: not wired yet"));
+	const QString worldsDir = EditorApplication::instance()->worldsDir();
+	const QFileInfoList entries = QDir(worldsDir).entryInfoList(
+		QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+	if(entries.isEmpty()) {
+		statusBar()->showMessage(tr("No worlds found in %1").arg(worldsDir));
+		return;
+	}
+
+	int saved = 0;
+	int failed = 0;
+	QApplication::setOverrideCursor(Qt::WaitCursor);
+	for(const QFileInfo& entry : entries) {
+		const QString worldName = entry.fileName();
+		statusBar()->showMessage(tr("Resaving %1...").arg(worldName));
+		QApplication::processEvents();
+		if(view_->loadWorld(worldsDir, worldName) && view_->saveWorld(worldName))
+			++saved;
+		else
+			++failed;
+	}
+	QApplication::restoreOverrideCursor();
+	statusBar()->showMessage(tr("Resaved %1 world(s), %2 failed").arg(saved).arg(failed),
+	                         failed == 0 ? 5000 : 0);
+	updateWorldTitle();
 }
 
 void MainWindow::fileMerge()
