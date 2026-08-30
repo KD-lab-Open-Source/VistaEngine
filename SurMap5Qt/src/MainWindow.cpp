@@ -653,6 +653,10 @@ void MainWindow::universeQuant()
 	// SyncroTimer and invalidated the view. Phase 3 fills this in; for now the
 	// tick reaches the viewport so animation can run.
 	view_->tick();
+	if(actUndo_)
+		actUndo_->setEnabled(view_->canUndo());
+	if(actRedo_)
+		actRedo_->setEnabled(view_->canRedo());
 }
 
 void MainWindow::about()
@@ -1003,15 +1007,18 @@ void MainWindow::brushRadiusChanged(int index)
 
 void MainWindow::editUndo()
 {
-	// OnEditUndo: selection undo (U8).
-	fprintf(stderr, "[edit] undo: TODO U8\n");
-	statusBar()->showMessage(tr("Undo: not wired yet"));
+	if(view_->undo()){
+		statusBar()->showMessage(tr("Undo"));
+		view_->update();
+	}
 }
 
 void MainWindow::editRedo()
 {
-	fprintf(stderr, "[edit] redo: TODO U8\n");
-	statusBar()->showMessage(tr("Redo: not wired yet"));
+	if(view_->redo()){
+		statusBar()->showMessage(tr("Redo"));
+		view_->update();
+	}
 }
 
 void MainWindow::editMapScenario()

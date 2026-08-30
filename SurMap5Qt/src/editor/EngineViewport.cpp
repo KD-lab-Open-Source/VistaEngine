@@ -238,6 +238,32 @@ bool EngineViewport::saveWorld()
 	return saveWorld(vMap.getWorldName().c_str());
 }
 
+bool EngineViewport::canUndo() const
+{
+	return worldLoaded_ && vMap.UndoDispatcher_IsUndoExist();
+}
+
+bool EngineViewport::canRedo() const
+{
+	return worldLoaded_ && vMap.UndoDispatcher_IsRedoExist();
+}
+
+bool EngineViewport::undo()
+{
+	if(!canUndo())
+		return false;
+	vMap.UndoDispatcher_Undo();
+	return true;
+}
+
+bool EngineViewport::redo()
+{
+	if(!canRedo())
+		return false;
+	vMap.UndoDispatcher_Redo();
+	return true;
+}
+
 bool EngineViewport::autoLace(int laceHeightVoxels, float angleRadians)
 {
 	// CMainFrame::OnEditRollingborder (SurMap5/MainFrame.cpp:2844):

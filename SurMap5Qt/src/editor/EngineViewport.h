@@ -161,6 +161,11 @@ public:
 	bool saveWorld(const char* worldName);
 	// Save under the world's current name (CMainFrame::OnFileSave).
 	bool saveWorld();
+	// Undo/redo state and operations from vrtMap's existing dispatcher.
+	bool canUndo() const;
+	bool canRedo() const;
+	bool undo();
+	bool redo();
 	// --- Rolling border (D1) ---
 
 	// CMainFrame::OnEditRollingborder: vMap.autoLace(laceH, angle) — laces the

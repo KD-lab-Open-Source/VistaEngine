@@ -184,6 +184,26 @@ bool RenderViewWidget::saveWorld()
 	return viewport_->saveWorld();
 }
 
+bool RenderViewWidget::canUndo() const
+{
+	return viewport_->canUndo();
+}
+
+bool RenderViewWidget::canRedo() const
+{
+	return viewport_->canRedo();
+}
+
+bool RenderViewWidget::undo()
+{
+	return viewport_->undo();
+}
+
+bool RenderViewWidget::redo()
+{
+	return viewport_->redo();
+}
+
 bool RenderViewWidget::autoLace(int laceHeightVoxels, float angleRadians)
 {
 	return viewport_->autoLace(laceHeightVoxels, angleRadians);

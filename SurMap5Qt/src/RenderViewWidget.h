@@ -114,6 +114,10 @@ public:
 	bool saveWorld(const QString& worldName);
 	// Save under the world's current name (CMainFrame::OnFileSave).
 	bool saveWorld();
+	bool canUndo() const;
+	bool canRedo() const;
+	bool undo();
+	bool redo();
 	// Rolling border (CMainFrame::OnEditRollingborder -> vMap.autoLace).
 	bool autoLace(int laceHeightVoxels, float angleRadians);
 	// Terrain maintenance (D3): rebuild world caches (OnEditRebuildworld).
