@@ -606,6 +606,8 @@ int cSDLRenderDevice::BeginScene()
 	Uint32 w = 0, h = 0;
 	SDL_Window* frameWindow = activeWindow();
 	if(!SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer_, frameWindow, &swapchainTexture_, &w, &h) || !swapchainTexture_){
+		fprintf(stderr, "cSDLRenderDevice::BeginScene: swapchain acquire failed (window=%p): %s\n",
+		        (void*)frameWindow, SDL_GetError());
 		// No drawable surface this frame (e.g. minimized); submit empty and bail.
 		SDL_SubmitGPUCommandBuffer(commandBuffer_);
 		commandBuffer_ = nullptr;
@@ -756,7 +758,7 @@ bool cSDLRenderDevice::ensureCapture(int w, int h)
 
 	SDL_GPUTextureCreateInfo ti = {};
 	ti.type = SDL_GPU_TEXTURETYPE_2D;
-	ti.format = SDL_GetGPUSwapchainTextureFormat(device_, window_);
+	ti.format = SDL_GetGPUSwapchainTextureFormat(device_, activeWindow());
 	ti.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER | SDL_GPU_TEXTUREUSAGE_COLOR_TARGET;
 	ti.width = (Uint32)w; ti.height = (Uint32)h;
 	ti.layer_count_or_depth = 1; ti.num_levels = 1;
@@ -1584,7 +1586,7 @@ int cSDLRenderDevice::CreateTexture(cTexture* Texture, cFileImage* FileImage, in
 	if(Texture->getAttribute(TEXTURE_RENDER32)){
 		SDL_GPUTextureCreateInfo ti = {};
 		ti.type = SDL_GPU_TEXTURETYPE_2D;
-		ti.format = SDL_GetGPUSwapchainTextureFormat(device_, window_);
+		ti.format = SDL_GetGPUSwapchainTextureFormat(device_, activeWindow());
 		ti.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER | SDL_GPU_TEXTUREUSAGE_COLOR_TARGET;
 		ti.width = (Uint32)w; ti.height = (Uint32)h;
 		ti.layer_count_or_depth = 1; ti.num_levels = 1;

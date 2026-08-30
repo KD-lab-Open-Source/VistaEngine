@@ -36,6 +36,7 @@
 // The engine-touching half of the viewport lives in the EditorEngine library
 // (see src/editor/EngineViewport.h) so engine headers never reach Qt code.
 class EngineViewport;
+class QPaintEngine;
 // The current tool routes view input to the tool's handlers (Select/Move/
 // Rotate/Scale); engine-free, see src/tools/ToolManager.h.
 class ToolManager;
@@ -140,6 +141,9 @@ public slots:
 	void tick();
 
 protected:
+	// SDL owns the native surface; prevent QWidget's backing-store paint engine
+	// from being selected for this direct-rendered child window.
+	QPaintEngine* paintEngine() const override { return nullptr; }
 	void paintEvent(QPaintEvent* event) override;
 	void resizeEvent(QResizeEvent* event) override;
 	void wheelEvent(QWheelEvent* event) override;

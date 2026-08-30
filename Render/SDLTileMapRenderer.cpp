@@ -1191,6 +1191,11 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	dt.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
 
 	SDL_GPURenderPass* pass = SDL_BeginGPURenderPass(cmd, &ct, 1, &dt);
+	if(!pass){
+		fprintf(stderr, "SDLTileMapRenderer: terrain render pass failed for %dx%d: %s\n",
+		        screenW, screenH, SDL_GetError());
+		return false;
+	}
 	applyCameraViewport(pass, camera->vp, screenW, screenH);
 
 	SDL_BindGPUGraphicsPipeline(pass, pipeline);
