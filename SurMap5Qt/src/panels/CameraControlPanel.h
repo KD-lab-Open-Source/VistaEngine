@@ -14,6 +14,7 @@ public:
 private slots:
 	void applyCamera();
 	void applyEyeCamera();
+	void fitWorld();
 	void topView();
 	void overview();
 	void readCamera();

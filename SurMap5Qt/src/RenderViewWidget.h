@@ -141,6 +141,7 @@ public:
 	void setOrbitCamera(float distance, float theta);
 	void cameraState(CameraState& state) const;
 	void setCameraState(const CameraState& state);
+	void fitCameraToWorld();
 	// Grid visibility (surMapOptions.enableGrid_): gates the viewport's grid.
 	void setGridVisible(bool visible);
 	bool gridVisible() const;

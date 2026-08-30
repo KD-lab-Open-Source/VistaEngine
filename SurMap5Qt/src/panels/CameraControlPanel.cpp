@@ -37,6 +37,7 @@ CameraControlPanel::CameraControlPanel(RenderViewWidget* view, QWidget* parent)
 	auto* applyEye = new QPushButton(tr("Apply Eye"), this);
 	auto* top = new QPushButton(tr("Top View"), this);
 	auto* overview = new QPushButton(tr("Overview"), this);
+	auto* fit = new QPushButton(tr("Fit World"), this);
 	auto* read = new QPushButton(tr("Read"), this);
 	auto* reset = new QPushButton(tr("Reset"), this);
 	auto* buttons = new QHBoxLayout;
@@ -44,6 +45,7 @@ CameraControlPanel::CameraControlPanel(RenderViewWidget* view, QWidget* parent)
 	buttons->addWidget(applyEye);
 	buttons->addWidget(top);
 	buttons->addWidget(overview);
+	buttons->addWidget(fit);
 	buttons->addWidget(read);
 	buttons->addWidget(reset);
 
@@ -57,6 +59,7 @@ CameraControlPanel::CameraControlPanel(RenderViewWidget* view, QWidget* parent)
 	connect(applyEye, &QPushButton::clicked, this, &CameraControlPanel::applyEyeCamera);
 	connect(top, &QPushButton::clicked, this, &CameraControlPanel::topView);
 	connect(overview, &QPushButton::clicked, this, &CameraControlPanel::overview);
+	connect(fit, &QPushButton::clicked, this, &CameraControlPanel::fitWorld);
 	connect(read, &QPushButton::clicked, this, &CameraControlPanel::readCamera);
 	connect(reset, &QPushButton::clicked, this, &CameraControlPanel::resetCamera);
 	readCamera();
@@ -135,6 +138,14 @@ void CameraControlPanel::overview()
 	state.roll = 0.0f;
 	state.distance = 8000.0f;
 	view_->setCameraState(state);
+	readCamera();
+}
+
+void CameraControlPanel::fitWorld()
+{
+	if(!view_)
+		return;
+	view_->fitCameraToWorld();
 	readCamera();
 }
 

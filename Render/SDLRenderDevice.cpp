@@ -956,7 +956,7 @@ void cSDLRenderDevice::drawTileMap(cTileMap* tileMap, Camera* camera)
 	const bool clear = rt->clearPending && !rt->colorCleared;
 	if(tileMapRenderer_->Draw(commandBuffer_, rt->color, rt->depth, rt->w, rt->h,
 	                          clear, rt->clearColor, !rt->depthCleared, tileMap, camera,
-	                          true)){
+	                          fillMode_ == FILL_WIREFRAME)){
 		if(clear) rt->colorCleared = true;
 		rt->depthCleared = true;
 	}

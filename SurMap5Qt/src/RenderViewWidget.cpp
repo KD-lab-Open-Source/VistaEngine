@@ -261,6 +261,12 @@ void RenderViewWidget::setCameraState(const CameraState& state)
 	update();
 }
 
+void RenderViewWidget::fitCameraToWorld()
+{
+	viewport_->fitCameraToWorld();
+	update();
+}
+
 void RenderViewWidget::setGridVisible(bool visible)
 {
 	viewport_->setGridVisible(visible);

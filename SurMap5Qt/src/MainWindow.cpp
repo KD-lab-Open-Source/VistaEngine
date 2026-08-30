@@ -54,9 +54,9 @@ MainWindow::MainWindow(QWidget* parent)
 
 	createView();       // the 3D viewport (central widget)
 	createActions();
-	createMenus();      // QMenuBar (CExtMenuControlBar)
 	createToolBars();   // QToolBars (CExtToolControlBar set)
 	createDockPanels(); // QDockWidgets (CExtControlBar set)
+	createMenus();      // QMenuBar (CExtMenuControlBar)
 	createStatusBar();  // QStatusBar with progress pane (CExtStatusControlBar)
 
 	// Phase 7: restore the dock/toolbar layout the last run saved (CExtControlBar::
@@ -512,6 +512,8 @@ void MainWindow::createMenus()
 	wsMenu->addAction(actWsProperties_);
 	wsMenu->addAction(actWsMinimap_);
 	wsMenu->addAction(actWsObjectsManager_);
+	wsMenu->addSeparator();
+	wsMenu->addAction(cameraControlDock_->toggleViewAction());
 
 	// Debug (IDR_MAINFRAME's Debug popup).
 	QMenu* debugMenu = menuBar()->addMenu(tr("&Debug"));
@@ -776,15 +778,9 @@ void MainWindow::updateWorldTitle()
 
 void MainWindow::applySavedCameraDefault()
 {
-	// The editor's camera default (editSaveCameraAsDefault persisted it; the
-	// original's GlobalAttributes::setCameraCoordinate + camera init read it
-	// back). Applied after each world load, like the original's camera create.
-	const QSettings settings;
-	const double distance = settings.value("editor/cameraDefaultDistance", -1.0).toDouble();
-	const double theta = settings.value("editor/cameraDefaultTheta", -1.0).toDouble();
-	if(distance < 0.0 || theta < 0.0)
-		return;
-	view_->setOrbitCamera((float)std::max(distance, 8000.0), (float)theta);
+	// Always start with a calculated overview. A saved camera default may belong
+	// to a different map and can leave a newly loaded world off-screen.
+	view_->fitCameraToWorld();
 }
 
 void MainWindow::selectTool(int index)

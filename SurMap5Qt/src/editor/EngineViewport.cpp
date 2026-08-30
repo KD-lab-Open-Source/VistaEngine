@@ -23,9 +23,8 @@ using namespace std;
 #include "Render/src/TileMap.h"      // cTileMap (the terrain's tile map)
 #include "Render/src/TexLibrary.h"   // GetTexLibrary (texture statistics)
 #include "Render/src/Texture.h"      // cTexture (GetName, CalcTextureSize)
-#include "Render/SDLUIRenderer.h"    // diagnostic screen-space primitive
 #include "Util/XMath/xmath.h"        // MatXf/Mat3f/Mat2f + X_AXIS/Y_AXIS/Z_AXIS
-#include "Render/SDLRenderDevice.h"  // sdlUIRenderer (viewport probe)
+#include "Render/SDLRenderDevice.h"
 #include "Terra/VMAP.H"              // vMap (load/create, H_SIZE/V_SIZE)
 
 // SDL_Init(SDL_INIT_VIDEO) normally happens in PlatformWindow::create; the Qt
@@ -152,14 +151,14 @@ bool EngineViewport::loadWorld(const char* worldsDir, const char* worldName)
 	orbit_.px = vMap.H_SIZE * 0.5f;
 	orbit_.py = vMap.V_SIZE * 0.5f;
 	orbit_.pz = 256.0f;
-	orbit_.distance = 8000.f;
+	orbit_.distance = 20000.f;
 	orbit_.psi = 0.f;
-	orbit_.theta = 0.65f;
+	orbit_.theta = 0.f;
 	applyCamera();
 	const Vect2f center(0.5f, 0.5f);
 	const sRectangle4f clip(-0.5f, -0.5f, 0.5f, 0.5f);
 	const Vect2f focus(orbit_.focus, orbit_.focus);
-	const Vect2f zPlane(30.0f, 12000.0f);
+	const Vect2f zPlane(30.0f, std::max(12000.0f, orbit_.distance * 3.0f));
 	camera_->SetFrustum(&center, &clip, &focus, &zPlane);
 	Vect3f rayPoint, rayDirection;
 	camera_->GetWorldRay(Vect2f(0.f, 0.f), rayPoint, rayDirection);
@@ -367,6 +366,23 @@ void EngineViewport::setCameraState(const CameraState& state)
 	applyCamera();
 }
 
+void EngineViewport::fitCameraToWorld()
+{
+	if(!worldLoaded_)
+		return;
+
+	orbit_.px = vMap.H_SIZE * 0.5f;
+	orbit_.py = vMap.V_SIZE * 0.5f;
+	orbit_.pz = 256.0f;
+	const float halfDiagonal = 0.5f * std::sqrt(vMap.H_SIZE * vMap.H_SIZE +
+	                                             vMap.V_SIZE * vMap.V_SIZE);
+	orbit_.distance = std::max(20000.0f, halfDiagonal * 8.0f);
+	orbit_.psi = -0.785398163f;
+	orbit_.theta = 0.65f;
+	orbit_.fi = 0.0f;
+	applyCamera();
+}
+
 void EngineViewport::setGridVisible(bool visible)
 {
 	// OnViewShowGrid toggled surMapOptions.enableGrid_, which drawGrid
@@ -445,28 +461,13 @@ void EngineViewport::drawFrame()
 		const Vect2f center(0.5f, 0.5f);
 		const sRectangle4f clip(-0.5f, -0.5f, 0.5f, 0.5f);
 		const Vect2f focus(orbit_.focus, orbit_.focus);
-		const Vect2f zPlane(30.0f, 12000.0f);
+		const Vect2f zPlane(30.0f, std::max(12000.0f, orbit_.distance * 3.0f));
 		camera_->SetFrustum(&center, &clip, &focus, &zPlane);
-		static bool cameraLogged = false;
-		if(!cameraLogged){
-			Vect3f rayPoint, rayDirection;
-			camera_->GetWorldRay(Vect2f(0.f, 0.f), rayPoint, rayDirection);
-			const Vect3f eye = camera_->GetPos();
-			fprintf(stderr, "EngineViewport: camera eye=(%.1f,%.1f,%.1f) center=(%.1f,%.1f,%.1f) ray=(%.3f,%.3f,%.3f)\n",
-			        eye.x, eye.y, eye.z, orbit_.px, orbit_.py, orbit_.pz,
-			        rayDirection.x, rayDirection.y, rayDirection.z);
-			cameraLogged = true;
-		}
 		scene_->Draw(camera_);
 	}
 
 	// CGeneralView::graphQuant drew the grid after terScene->Draw().
 	drawGrid();
-
-	// Temporary viewport probe: this is screen-space and is independent of the
-	// terrain camera, so it tests only the SDL swapchain presentation.
-	if(SDLUIRenderer* ui = sdlUIRenderer())
-		ui->DrawDebugTriangle(gb_RenderDevice->GetSizeX(), gb_RenderDevice->GetSizeY());
 
 	gb_RenderDevice->EndScene();
 	gb_RenderDevice->Flush();
@@ -579,7 +580,7 @@ bool EngineViewport::screenPointToGround(int x, int y, float& outX, float& outY,
 	const Vect2f center(0.5f, 0.5f);
 	const sRectangle4f clip(-0.5f, -0.5f, 0.5f, 0.5f);
 	const Vect2f focus(orbit_.focus, orbit_.focus);
-	const Vect2f zPlane(30.0f, 12000.0f);
+	const Vect2f zPlane(30.0f, std::max(12000.0f, orbit_.distance * 3.0f));
 	camera_->SetFrustum(&center, &clip, &focus, &zPlane);
 
 	Vect3f pos, dir;
