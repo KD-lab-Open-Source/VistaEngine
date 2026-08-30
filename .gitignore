@@ -48,6 +48,14 @@ GameData/
 /out
 /build-qt-check
 /*.log
+# SurMap5Qt build/run helpers, outputs and screenshots (ad-hoc verification)
+/*.ps1
+/*.cmd
+/*-err.txt
+/*-out.txt
+/*.png
+/XLibs.Net/**/Garbage/
+/XLibs.Net/**/.garbage/
 # Editor-generated test worlds (SurMap5Qt --selftest writes here)
 /Worlds
 /XLibs.Net/FreeType/objs/debug/*.obj
