@@ -186,6 +186,10 @@ cRenderWindow* cSDLRenderDevice::createRenderWindow(HWND hwnd)
 
 	if(!globalRenderWindow_)
 		globalRenderWindow_ = wnd;
+	if(uiRenderer_)
+		uiRenderer_->setWindow(sdl);
+	if(tileMapRenderer_)
+		tileMapRenderer_->setWindow(sdl);
 	return wnd;
 }
 

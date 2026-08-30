@@ -56,6 +56,7 @@ public:
 
 	SDLTileMapRenderer(const SDLTileMapRenderer&) = delete;
 	SDLTileMapRenderer& operator=(const SDLTileMapRenderer&) = delete;
+	void setWindow(SDL_Window* window);
 
 	// Build the terrain mesh if needed (uploading through cmd), then draw it in its
 	// own render pass against the device's shared colour and depth targets. `clear` /

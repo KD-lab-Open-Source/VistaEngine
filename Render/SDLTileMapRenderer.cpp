@@ -117,6 +117,16 @@ SDLTileMapRenderer::~SDLTileMapRenderer()
 	if(pipelineIceMirror_)  SDL_ReleaseGPUGraphicsPipeline(device_, pipelineIceMirror_);
 }
 
+void SDLTileMapRenderer::setWindow(SDL_Window* window)
+{
+	if(window_ == window)
+		return;
+	window_ = window;
+	if(!device_ || !window_ || pipelineFill_)
+		return;
+	createPipeline();
+}
+
 void SDLTileMapRenderer::releaseMesh()
 {
 	if(!device_) return;
