@@ -42,6 +42,9 @@ public:
 
 	SDLUIRenderer(const SDLUIRenderer&) = delete;
 	SDLUIRenderer& operator=(const SDLUIRenderer&) = delete;
+	// The Qt editor creates its foreign SDL window after the GPU device. Build
+	// the swapchain-format-dependent pipeline once that window exists.
+	void setWindow(SDL_Window* window);
 
 	// The minimap draws part-way through the UI -- panels behind it, its own start-location
 	// labels (ordinary UI text) in front -- so it cannot own a pass of its own without
@@ -118,6 +121,9 @@ public:
 	void DrawLine(int x1, int y1, int x2, int y2, Color4c color);
 	void DrawPixel(int x, int y, Color4c color);
 	void DrawRectangle(int x, int y, int dx, int dy, Color4c color, bool outline);
+	// Diagnostic screen-space triangle used by the Qt editor while validating
+	// the native SDL swapchain host.
+	void DrawDebugTriangle(int screenW, int screenH);
 
 	// Emits one textured quad per glyph from the font's FreeType atlas. Returns the
 	// x coordinate just past the last glyph drawn (the D3D OutTextLine contract).

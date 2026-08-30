@@ -23,7 +23,9 @@ using namespace std;
 #include "Render/src/TileMap.h"      // cTileMap (the terrain's tile map)
 #include "Render/src/TexLibrary.h"   // GetTexLibrary (texture statistics)
 #include "Render/src/Texture.h"      // cTexture (GetName, CalcTextureSize)
+#include "Render/SDLUIRenderer.h"    // diagnostic screen-space primitive
 #include "Util/XMath/xmath.h"        // MatXf/Mat3f/Mat2f + X_AXIS/Y_AXIS/Z_AXIS
+#include "Render/SDLRenderDevice.h"  // sdlUIRenderer (viewport probe)
 #include "Terra/VMAP.H"              // vMap (load/create, H_SIZE/V_SIZE)
 
 // SDL_Init(SDL_INIT_VIDEO) normally happens in PlatformWindow::create; the Qt
@@ -417,6 +419,11 @@ void EngineViewport::drawFrame()
 	// CGeneralView::graphQuant drew the grid after terScene->Draw().
 	drawGrid();
 
+	// Temporary viewport probe: this is screen-space and is independent of the
+	// terrain camera, so it tests only the SDL swapchain presentation.
+	if(SDLUIRenderer* ui = sdlUIRenderer())
+		ui->DrawDebugTriangle(gb_RenderDevice->GetSizeX(), gb_RenderDevice->GetSizeY());
+
 	gb_RenderDevice->EndScene();
 	gb_RenderDevice->Flush();
 }
@@ -553,9 +560,9 @@ void EngineViewport::applyCamera()
 	//   R(theta,X)*R(fi,Y)*R(pi/2-psi,Z) translated by -position.
 	// Position sits on the orbit sphere around the centre.
 	Vect3f position(
-		orbit_.px + orbit_.distance * cosf(orbit_.theta) * cosf(orbit_.psi),
-		orbit_.py + orbit_.distance * cosf(orbit_.theta) * sinf(orbit_.psi),
-		orbit_.pz + orbit_.distance * sinf(orbit_.theta));
+		orbit_.px + orbit_.distance * sinf(orbit_.theta) * cosf(orbit_.psi),
+		orbit_.py + orbit_.distance * sinf(orbit_.theta) * sinf(orbit_.psi),
+		orbit_.pz + orbit_.distance * cosf(orbit_.theta));
 
 	MatXf matrix = MatXf::ID;
 	matrix.rot() = Mat3f(orbit_.theta, X_AXIS) * Mat3f(orbit_.fi, Y_AXIS) * Mat3f(M_PI_2 - orbit_.psi, Z_AXIS);

@@ -58,6 +58,15 @@ SDLUIRenderer::~SDLUIRenderer()
 	if(addPipeline_)    SDL_ReleaseGPUGraphicsPipeline(device_, addPipeline_);
 }
 
+void SDLUIRenderer::setWindow(SDL_Window* window)
+{
+	if(window_ == window && pipeline_)
+		return;
+	window_ = window;
+	if(window_ && !pipeline_)
+		createPipeline();
+}
+
 // ---------------------------------------------------------------------------
 // Pipeline
 // ---------------------------------------------------------------------------
@@ -473,6 +482,27 @@ void SDLUIRenderer::DrawRectangle(int x, int y, int dx, int dy, Color4c color, b
 	}
 	else
 		emitQuad(x1, y1, (float)dx, (float)dy, 0.f, 0.f, 0.f, 0.f, c, nullptr);
+}
+
+void SDLUIRenderer::DrawDebugTriangle(int screenW, int screenH)
+{
+	if(screenW <= 0 || screenH <= 0)
+		return;
+
+	sVertexXYZWD* vertices = Lock(3);
+	vertices[0].x = screenW * 0.5f;
+	vertices[0].y = screenH * 0.25f;
+	vertices[1].x = screenW * 0.25f;
+	vertices[1].y = screenH * 0.75f;
+	vertices[2].x = screenW * 0.75f;
+	vertices[2].y = screenH * 0.75f;
+	for(int i = 0; i < 3; ++i){
+		vertices[i].z = 0.f;
+		vertices[i].w = 1.f;
+		vertices[i].diffuse = Color4c(255, 32, 32, 255);
+	}
+	Unlock(3);
+	DrawPrimitive(PT_TRIANGLELIST, 1);
 }
 
 // The engine's inline colour escape: "&rrggbb" sets the text colour from here on, and
