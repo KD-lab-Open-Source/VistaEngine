@@ -11,6 +11,7 @@
 #include <QComboBox>
 #include <QDebug>
 #include <QDockWidget>
+#include <QDir>
 #include <QFileInfo>
 #include <QMenu>
 #include <QMenuBar>
@@ -341,8 +342,38 @@ void MainWindow::createActions()
 	connect(actLibExportParametersByGroups_, &QAction::triggered, this, [this, stub]{ stub("libraries/export-params-groups", tr("Export Parameters (By Groups): not wired yet")); });
 	connect(actLibExportParametersStatistics_, &QAction::triggered, this, [this, stub]{ stub("libraries/export-params-statistics", tr("Export Parameters (Balance): not wired yet")); });
 
-	connect(actToolUIEditor_, &QAction::triggered, this, [this, stub]{ stub("tools/ui-editor", tr("UI Editor: not wired yet")); });
-	connect(actToolEffectsEditor_, &QAction::triggered, this, [this, stub]{ stub("tools/effects-editor", tr("Effects Editor: not wired yet")); });
+	auto launchEditor = [this](const QStringList& names, const QString& label) {
+		QString executable;
+		const QStringList roots = {
+			QCoreApplication::applicationDirPath(),
+			QDir::currentPath()
+		};
+		for(const QString& root : roots) {
+			for(const QString& name : names) {
+				const QString candidate = QDir(root).filePath(name);
+				if(QFileInfo(candidate).isFile()) {
+					executable = candidate;
+					break;
+				}
+			}
+			if(!executable.isEmpty())
+				break;
+		}
+		if(executable.isEmpty()) {
+			statusBar()->showMessage(tr("%1 executable not found").arg(label));
+			return;
+		}
+		if(!QProcess::startDetached(executable, {}, QFileInfo(executable).absolutePath()))
+			statusBar()->showMessage(tr("Could not launch %1").arg(label));
+		else
+			statusBar()->showMessage(tr("%1 launched").arg(label), 3000);
+	};
+	connect(actToolUIEditor_, &QAction::triggered, this, [launchEditor]{
+		launchEditor({QStringLiteral("UIEditor-Debug.exe"), QStringLiteral("UIEditor.exe")}, QObject::tr("UI Editor"));
+	});
+	connect(actToolEffectsEditor_, &QAction::triggered, this, [launchEditor]{
+		launchEditor({QStringLiteral("EffectTool.exe")}, QObject::tr("Effects Editor"));
+	});
 	connect(actToolTriggers_, &QAction::triggered, this, &MainWindow::editTriggers);
 
 	// Workspace: dock/toolbar visibility toggles. The docks exist (createDockPanels)
