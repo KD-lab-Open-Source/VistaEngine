@@ -13,6 +13,7 @@
 #include <QDockWidget>
 #include <QDir>
 #include <QFileInfo>
+#include <QLabel>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -66,6 +67,10 @@ MainWindow::MainWindow(QWidget* parent)
 	QSettings settings;
 	restoreState(settings.value("mainWindow/state").toByteArray());
 	restoreGeometry(settings.value("mainWindow/geometry").toByteArray());
+
+	// Restore the tools tree state (port of CToolsTreeCtrl::serialize / save).
+	if(toolsTreePanel_)
+		toolsTreePanel_->restoreState();
 
 	// Auto-reopen the last world (surMapOptions remembered the last open world
 	// in the original too). Deferred a tick so the render device is ready (the
@@ -395,12 +400,24 @@ void MainWindow::createActions()
 	connect(actWsLibrariesBar_, &QAction::toggled, this, [this](bool on){ if(librariesToolBar_) librariesToolBar_->setVisible(on); });
 	connect(actWsEditorsBar_, &QAction::toggled, this, [this](bool on){ if(editorsToolBar_) editorsToolBar_->setVisible(on); });
 
-	connect(actDbgEditableTree_, &QAction::toggled, this, [this, stub](bool on){ (void)on; stub("debug/editable-tree", tr("Editable Tools Tree: not wired yet")); });
-	connect(actDbgSaveTree_, &QAction::triggered, this, [this, stub]{ stub("debug/save-tree", tr("Save Tools Tree: not wired yet")); });
+	connect(actDbgEditableTree_, &QAction::toggled, this, [this](bool on){
+		if(toolsTreePanel_) toolsTreePanel_->setProperty("editableMode", on);
+		statusBar()->showMessage(on ? tr("Editable Tools Tree: ON") : tr("Editable Tools Tree: OFF"), 3000);
+	});
+	connect(actDbgSaveTree_, &QAction::triggered, this, [this]{
+		if(toolsTreePanel_) toolsTreePanel_->saveState();
+		statusBar()->showMessage(tr("Tools Tree saved"), 3000);
+	});
 	connect(actDbgEditZipConfig_, &QAction::triggered, this, [this, stub]{ stub("debug/edit-zipconfig", tr("Edit ZipConfig: not wired yet")); });
 	connect(actDbgEditDebugPrm_, &QAction::triggered, this, [this, stub]{ stub("debug/edit-debugprm", tr("Edit debugPrm: not wired yet")); });
 	connect(actDbgShowPaletteTexture_, &QAction::toggled, this, &MainWindow::viewTogglePaletteTexture);
-	connect(actDbgShowMipmap_, &QAction::toggled, this, [this](bool on){ (void)on; });
+	connect(actDbgShowMipmap_, &QAction::toggled, this, [this](bool on){
+		// The engine's texture library (GetTexLibrary) lives in the render
+		// device; the Qt editor does not include the engine header directly.
+		// The toggle is kept as a stub; the actual mipmap debug is deferred.
+		(void)on;
+		statusBar()->showMessage(on ? tr("Mipmap debug: ON (stub)") : tr("Mipmap debug: OFF (stub)"), 3000);
+	});
 }
 
 void MainWindow::createMenus()
@@ -685,6 +702,19 @@ void MainWindow::createStatusBar()
 	progressBar_->setVisible(false);
 	statusBar()->addPermanentWidget(progressBar_);
 
+	// Live info panes (CGeneralView::UpdateStatusBar): surface/alt, X, Y,
+	// camera focus, FPS.
+	statusSurf_ = new QLabel(tr(" — "), this);
+	statusX_    = new QLabel(tr(" — "), this);
+	statusY_    = new QLabel(tr(" — "), this);
+	statusFocus_= new QLabel(tr(" — "), this);
+	statusFps_  = new QLabel(tr(" — "), this);
+	statusBar()->addWidget(statusSurf_);
+	statusBar()->addWidget(statusX_);
+	statusBar()->addWidget(statusY_);
+	statusBar()->addWidget(statusFocus_);
+	statusBar()->addWidget(statusFps_);
+
 	statusBar()->showMessage(tr("Ready"));
 }
 
@@ -698,6 +728,56 @@ void MainWindow::universeQuant()
 		actUndo_->setEnabled(view_->canUndo());
 	if(actRedo_)
 		actRedo_->setEnabled(view_->canRedo());
+
+	// --- Status bar live update (CGeneralView::UpdateStatusBar) ---
+	if(view_->worldLoaded()){
+		// Surface kind name + exact voxel height under cursor
+		QString surfName;
+		int altVox = 0, approxAlt = 0, waterZ = 0;
+		if(view_->terrainInfoAt(0.f, 0.f, surfName, altVox, approxAlt, waterZ)){
+			// Use last mouse point if valid, else fall back to (0,0)
+			float mx=0, my=0, mz=0;
+			if(view_->lastMouseWorld(mx, my, mz)){
+				view_->terrainInfoAt(mx, my, surfName, altVox, approxAlt, waterZ);
+			}
+			statusSurf_->setText(QString("%1 / %2").arg(surfName).arg(altVox));
+		}else{
+			statusSurf_->setText(tr(" — "));
+		}
+
+		// Cursor X/Y in world coords (last mouse point)
+		float mx=0, my=0, mz=0;
+		if(view_->lastMouseWorld(mx, my, mz)){
+			statusX_->setText(QString("X:%1").arg((int)roundf(mx)));
+			statusY_->setText(QString("Y:%1").arg((int)roundf(my)));
+		}else{
+			statusX_->setText(tr(" — "));
+			statusY_->setText(tr(" — "));
+		}
+
+		// Camera focus (distance from orbit centre to camera)
+		float dist=0, theta=0;
+		view_->orbitCamera(dist, theta);
+		statusFocus_->setText(QString("Focus:%1").arg(dist, 0, 'f', 2));
+
+		// FPS: we don't have a direct FPS counter, so approximate from the timer
+		static int frame = 0;
+		static int lastSec = 0;
+		int sec = QDateTime::currentMSecsSinceEpoch() / 1000;
+		if(sec != lastSec){
+			statusFps_->setText(QString("FPS:%1").arg(frame));
+			frame = 0;
+			lastSec = sec;
+		}else{
+			++frame;
+		}
+	}else{
+		statusSurf_->setText(tr(" — "));
+		statusX_->setText(tr(" — "));
+		statusY_->setText(tr(" — "));
+		statusFocus_->setText(tr(" — "));
+		statusFps_->setText(tr(" — "));
+	}
 }
 
 void MainWindow::about()

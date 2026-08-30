@@ -24,6 +24,7 @@
 class QAction;
 class QComboBox;
 class QDockWidget;
+class QLabel;
 class QProgressBar;
 class QTimer;
 class QToolBar;
@@ -154,6 +155,13 @@ private:
 
 	// --- status bar panes (NUMBERS_PARTS_STATUSBAR) ---
 	QProgressBar* progressBar_ = nullptr;  // progressBar_
+	// Live info panes (CGeneralView::UpdateStatusBar): surface/alt, X, Y,
+	// camera focus, FPS. QLabel widgets in the status bar.
+	QLabel* statusSurf_ = nullptr;
+	QLabel* statusX_ = nullptr;
+	QLabel* statusY_ = nullptr;
+	QLabel* statusFocus_ = nullptr;
+	QLabel* statusFps_ = nullptr;
 
 	// --- actions ---
 	QAction* actNewWorld_ = nullptr;

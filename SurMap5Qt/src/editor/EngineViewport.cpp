@@ -26,6 +26,7 @@ using namespace std;
 #include "Util/XMath/xmath.h"        // MatXf/Mat3f/Mat2f + X_AXIS/Y_AXIS/Z_AXIS
 #include "Render/SDLRenderDevice.h"
 #include "Terra/VMAP.H"              // vMap (load/create, H_SIZE/V_SIZE)
+#include "Terra/TerrainType.h"       // TerrainTypeDescriptor (surface names)
 
 // SDL_Init(SDL_INIT_VIDEO) normally happens in PlatformWindow::create; the Qt
 // editor never calls it (Qt owns the windows), so the GPU device would fail
@@ -833,4 +834,34 @@ void EngineViewport::setCameraCenter(float x, float y)
 	orbit_.px = x;
 	orbit_.py = y;
 	applyCamera();
+}
+
+// --- Status bar (U8) ------------------------------------------------------
+
+// CGeneralView::UpdateStatusBar (SurMap5/GeneralView.cpp:687) filled the
+// status panes from the world point under the mouse: the surface-kind name
+// (TerrainTypeDescriptor::nameAlt of 1<<getSurKind), the exact voxel height
+// (getAlt), the approximate grid height (getApproxAlt) and the water height
+// (environment->water()->GetZ). The Qt editor has no Environment, so the
+// water pane is left at 0.
+bool EngineViewport::terrainInfoAt(float x, float y, char* surfName, int surfNameSize,
+                                   int& altVox, int& approxAlt, int& waterZ) const
+{
+	if(!worldLoaded_)
+		return false;
+	const int xi = (int)roundf(x);
+	const int yi = (int)roundf(y);
+	if(xi < 0 || yi < 0 || xi >= (int)vMap.H_SIZE || yi >= (int)vMap.V_SIZE)
+		return false;
+
+	const unsigned char kind = vMap.getSurKind(xi, yi);
+	const char* name = TerrainTypeDescriptor::instance().nameAlt(1 << kind);
+	if(surfName && surfNameSize > 0){
+		snprintf(surfName, surfNameSize, "%s", name ? name : "");
+		surfName[surfNameSize - 1] = 0;
+	}
+	altVox = (int)vMap.getAlt(xi, yi);
+	approxAlt = vMap.getApproxAlt(xi, yi);
+	waterZ = 0;   // no Environment in the Qt editor yet
+	return true;
 }

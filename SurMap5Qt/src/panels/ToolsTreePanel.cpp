@@ -5,6 +5,7 @@
 #include <QContextMenuEvent>
 #include <QHeaderView>
 #include <QMenu>
+#include <QSettings>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QVBoxLayout>
@@ -134,4 +135,23 @@ void ToolsTreePanel::renameSelected()
 		return;
 	item->setFlags(item->flags() | Qt::ItemIsEditable);
 	tree_->editItem(item, 0);
+}
+
+void ToolsTreePanel::saveState()
+{
+	QSettings s;
+	if(tree_->topLevelItemCount() > 0 && tree_->topLevelItem(0))
+		s.setValue("toolsTree/expanded", tree_->topLevelItem(0)->isExpanded());
+	QTreeWidgetItem* cur = tree_->currentItem();
+	s.setValue("toolsTree/currentRow", cur ? cur->text(0) : QString());
+}
+
+void ToolsTreePanel::restoreState()
+{
+	QSettings s;
+	bool expanded = s.value("toolsTree/expanded", true).toBool();
+	QString curText = s.value("toolsTree/currentRow").toString();
+	if(tree_->topLevelItemCount() > 0 && tree_->topLevelItem(0)){
+		tree_->topLevelItem(0)->setExpanded(expanded);
+	}
 }

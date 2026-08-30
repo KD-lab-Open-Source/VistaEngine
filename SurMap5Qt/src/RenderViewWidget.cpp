@@ -358,10 +358,30 @@ void RenderViewWidget::mouseMoveEvent(QMouseEvent* event)
 {
 	const ToolVec2 pos{ (int)event->position().x(), (int)event->position().y() };
 	const ToolVec3 world = worldAt(event->position().toPoint());
+	mouseWorld_ = world;
+	mouseWorldValid_ = viewport_->worldLoaded();
 	tools_->onTrackingMouse(world, pos);
 	if(viewport_->inited())
 		viewport_->mouseMove(pos.x, pos.y);
 	event->accept();
+}
+
+bool RenderViewWidget::lastMouseWorld(float& x, float& y, float& z) const
+{
+	if(!mouseWorldValid_)
+		return false;
+	x = mouseWorld_.x; y = mouseWorld_.y; z = mouseWorld_.z;
+	return true;
+}
+
+bool RenderViewWidget::terrainInfoAt(float x, float y, QString& surfName,
+                                     int& altVox, int& approxAlt, int& waterZ) const
+{
+	char name[64];
+	if(!viewport_->terrainInfoAt(x, y, name, (int)sizeof(name), altVox, approxAlt, waterZ))
+		return false;
+	surfName = QString::fromUtf8(name);
+	return true;
 }
 
 // Ray-cast the widget-local point into the terrain (viewport_->

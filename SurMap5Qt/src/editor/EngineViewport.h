@@ -218,6 +218,16 @@ public:
 	void setGridVisible(bool visible);
 	bool gridVisible() const { return gridVisible_; }
 
+	// --- Status bar (U8) ---
+
+	// Terrain info under a world point for the status bar's panes
+	// (CGeneralView::UpdateStatusBar): the surface-kind name (TerrainType
+	// descriptor's nameAlt of the surkind at the point), the exact height in
+	// voxels, the approximate grid height and the water height at the point.
+	// Returns false when no world is loaded or the point is off-map.
+	bool terrainInfoAt(float x, float y, char* surfName, int surfNameSize,
+	                   int& altVox, int& approxAlt, int& waterZ) const;
+
 	bool inited() const { return inited_; }
 
 private:

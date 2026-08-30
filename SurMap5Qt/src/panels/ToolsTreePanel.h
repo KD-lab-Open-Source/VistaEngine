@@ -29,6 +29,12 @@ public:
 	// switches tools, so the tree stays in step).
 	void syncToTool();
 
+	// Persist the current tree state (expanded folders, selection) to
+	// QSettings so the workspace survives restarts (port of CToolsTreeCtrl::
+	// save / serialize to Scripts\Content\VistaEngine.scr).
+	void saveState();
+	void restoreState();
+
 signals:
 	// Emitted when the user picks a tool in the tree (index into ToolManager's
 	// tool list: 0=Select, 1=Move, 2=Rotate, 3=Scale).

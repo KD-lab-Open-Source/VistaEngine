@@ -146,6 +146,17 @@ public:
 	void setGridVisible(bool visible);
 	bool gridVisible() const;
 
+	// The last world point the mouse hovered (worldAt of the most recent
+	// mouse move), for the status bar's X/Y/Alt panes. Returns false until the
+	// mouse has moved over a loaded world.
+	bool lastMouseWorld(float& x, float& y, float& z) const;
+
+	// Terrain info under a world point for the status bar (surface name,
+	// voxel height, approx grid height, water height). Returns false when no
+	// world is loaded or the point is off-map.
+	bool terrainInfoAt(float x, float y, QString& surfName,
+	                   int& altVox, int& approxAlt, int& waterZ) const;
+
 public slots:
 	// Called ~60 Hz from MainWindow::universeQuant (MFC OnIdle equivalent).
 	void tick();
@@ -170,4 +181,9 @@ private:
 
 	EngineViewport* viewport_ = nullptr;
 	ToolManager* tools_ = nullptr;
+
+	// The last world point the mouse hovered (set in mouseMoveEvent), for the
+	// status bar's X/Y/Alt panes. Valid only when mouseWorldValid_ is true.
+	ToolVec3 mouseWorld_{ 0, 0, 0 };
+	bool mouseWorldValid_ = false;
 };
