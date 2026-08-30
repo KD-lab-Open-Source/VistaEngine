@@ -152,7 +152,7 @@ bool EngineViewport::loadWorld(const char* worldsDir, const char* worldName)
 	orbit_.pz = 128.0f;
 	orbit_.distance = 512.f;
 	orbit_.psi = 0.f;
-	orbit_.theta = 0.f;
+	orbit_.theta = 0.65f;
 	applyCamera();
 
 	worldLoaded_ = true;

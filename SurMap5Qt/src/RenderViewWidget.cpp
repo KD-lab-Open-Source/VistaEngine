@@ -271,13 +271,6 @@ void RenderViewWidget::paintEvent(QPaintEvent* /*event*/)
 	if(!viewport_->inited())
 		initRenderDevice();
 	viewport_->drawFrame();
-
-	// The tools' aux overlay (selection box, transform axis, cursor circle)
-	// draws on top of the rendered frame, exactly the original's
-	// onDrawAuxData pass after the 3D scene.
-	QPainter painter(this);
-	QtAuxPainter aux(painter);
-	tools_->currentTool()->onDrawAuxData(aux);
 }
 
 void RenderViewWidget::resizeEvent(QResizeEvent* event)
