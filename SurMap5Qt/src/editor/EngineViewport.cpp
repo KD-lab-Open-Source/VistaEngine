@@ -248,6 +248,45 @@ bool EngineViewport::autoLace(int laceHeightVoxels, float angleRadians)
 	return true;
 }
 
+bool EngineViewport::rebuildWorld()
+{
+	// CMainFrame::OnEditRebuildworld (SurMap5/MainFrame.cpp:1564):
+	// vMap.rebuild() + view_->reInitWorld(). Rebuild re-derives the terrain
+	// from the source raster; reInitWorld rebuilds the render-side tile map.
+	if(!worldLoaded_)
+		return false;
+	vMap.rebuild();
+	reinitWorld();
+	return true;
+}
+
+bool EngineViewport::updateSurface()
+{
+	// CGeneralView::updateSurface (SurMap5/GeneralView.cpp:942):
+	// vMap.recalcArea2Grid(0,0,H-1,V-1) + regRender(whole map, Height|Texture|
+	// Region) — the Update Surface menu command.
+	if(!worldLoaded_)
+		return false;
+	vMap.recalcArea2Grid(0, 0, vMap.H_SIZE - 1, vMap.V_SIZE - 1);
+	const char typeChanges = static_cast<char>(vrtMap::TypeCh_Height |
+	                                           vrtMap::TypeCh_Texture |
+	                                           vrtMap::TypeCh_Region);
+	vMap.regRender(0, 0, vMap.H_SIZE - 1, vMap.V_SIZE - 1, typeChanges);
+	return true;
+}
+
+int EngineViewport::toggleTryColorDamTexture()
+{
+	// OnDebugShowpalettetexture (SurMap5/MainFrame.cpp:2006): flip the
+	// try-color dam texture view and re-render the world.
+	if(!worldLoaded_)
+		return -1;
+	const bool show = !vMap.isShowTryColorDamTexture();
+	vMap.toShowTryColorDamTexture(show);
+	vMap.WorldRender();
+	return show ? 1 : 0;
+}
+
 void EngineViewport::orbitCamera(float& distance, float& theta) const
 {
 	// GlobalAttributes::setCameraCoordinate persisted only distance + theta;

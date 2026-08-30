@@ -79,6 +79,8 @@ public slots:
 	void editRollingBorder();
 	// OnEditTriggers: pick a trigger file (SelectTriggerDialog).
 	void editTriggers();
+	// OnDebugShowpalettetexture: toggle the try-color dam texture view.
+	void viewTogglePaletteTexture(bool checked);
 
 	// --- View menu (CMainFrame::OnView*) ---
 	void viewToggleGrid(bool checked);

@@ -116,6 +116,13 @@ public:
 	bool saveWorld();
 	// Rolling border (CMainFrame::OnEditRollingborder -> vMap.autoLace).
 	bool autoLace(int laceHeightVoxels, float angleRadians);
+	// Terrain maintenance (D3): rebuild world caches (OnEditRebuildworld).
+	bool rebuildWorld();
+	// Mark the whole map dirty for the renderer (CGeneralView::updateSurface).
+	bool updateSurface();
+	// Toggle the try-color dam texture debug view (OnDebugShowpalettetexture).
+	// Returns the new state (0/1), or -1 when no world is loaded.
+	int toggleTryColorDamTexture();
 	// The current orbit distance/theta, for the Save-Camera-As-Default slot.
 	void orbitCamera(float& distance, float& theta) const;
 	// Apply a saved camera default (distance + theta) to the orbit.

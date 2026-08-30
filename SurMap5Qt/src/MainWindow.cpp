@@ -11,9 +11,11 @@
 #include <QComboBox>
 #include <QDebug>
 #include <QDockWidget>
+#include <QFileInfo>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QProcess>
 #include <QProgressBar>
 #include <QSettings>
 #include <QStatusBar>
@@ -365,7 +367,7 @@ void MainWindow::createActions()
 	connect(actDbgSaveTree_, &QAction::triggered, this, [this, stub]{ stub("debug/save-tree", tr("Save Tools Tree: not wired yet")); });
 	connect(actDbgEditZipConfig_, &QAction::triggered, this, [this, stub]{ stub("debug/edit-zipconfig", tr("Edit ZipConfig: not wired yet")); });
 	connect(actDbgEditDebugPrm_, &QAction::triggered, this, [this, stub]{ stub("debug/edit-debugprm", tr("Edit debugPrm: not wired yet")); });
-	connect(actDbgShowPaletteTexture_, &QAction::toggled, this, [this](bool on){ (void)on; });
+	connect(actDbgShowPaletteTexture_, &QAction::toggled, this, &MainWindow::viewTogglePaletteTexture);
 	connect(actDbgShowMipmap_, &QAction::toggled, this, [this](bool on){ (void)on; });
 }
 
@@ -848,16 +850,45 @@ void MainWindow::fileSaveAs()
 
 void MainWindow::fileRunWorld()
 {
-	// OnFileRunWorld: launch the game with the current world. Needs the game
-	// executable path; stub for now.
-	fprintf(stderr, "[file] run-world: TODO\n");
-	statusBar()->showMessage(tr("Run World: not wired yet"));
+	// OnFileRunWorld (SurMap5/MainFrame.cpp:1494): save the world to a temp
+	// name (TMP), spawn the game exe on that world, then delete the temp.
+	// GAME_EXE_PATH in the original was the game exe next to the editor.
+	if(!view_->worldLoaded()){
+		statusBar()->showMessage(tr("Load a world first"));
+		return;
+	}
+	const QString gameExe = QCoreApplication::applicationDirPath() + "/Game.exe";
+	if(!QFileInfo::exists(gameExe)){
+		statusBar()->showMessage(tr("Game executable not found: %1").arg(gameExe));
+		return;
+	}
+	statusBar()->showMessage(tr("Saving temp world and launching the game..."));
+	QApplication::setOverrideCursor(Qt::WaitCursor);
+	const bool saved = view_->saveWorld(QLatin1String("TMP"));
+	QApplication::restoreOverrideCursor();
+	if(!saved){
+		statusBar()->showMessage(tr("Could not save the temp world"));
+		return;
+	}
+	// _spawnl(_P_WAIT, GAME_EXE_PATH, GAME_EXE_PATH, "openResource\\Worlds\\TMP.spg", 0)
+	QProcess::startDetached(gameExe, {QStringLiteral("openResource/Worlds/TMP.spg")});
+	statusBar()->showMessage(tr("Game launched on the temp world"), 3000);
 }
 
 void MainWindow::fileRunMenu()
 {
-	fprintf(stderr, "[file] run-menu: TODO\n");
-	statusBar()->showMessage(tr("Run Main Menu: not wired yet"));
+	// OnFileRunMenu (SurMap5/MainFrame.cpp:1602): save the current world, then
+	// spawn the game exe with no arguments (the main menu).
+	if(view_->worldLoaded()){
+		view_->saveWorld();
+	}
+	const QString gameExe = QCoreApplication::applicationDirPath() + "/Game.exe";
+	if(!QFileInfo::exists(gameExe)){
+		statusBar()->showMessage(tr("Game executable not found: %1").arg(gameExe));
+		return;
+	}
+	QProcess::startDetached(gameExe, {});
+	statusBar()->showMessage(tr("Game launched (main menu)"), 3000);
 }
 
 void MainWindow::fileExportVistaEngine()
@@ -1013,15 +1044,31 @@ void MainWindow::editSaveCameraAsDefault()
 
 void MainWindow::editRebuildWorld()
 {
-	// OnEditRebuildworld: rebuild terrain caches (vMap.rebuild?).
-	fprintf(stderr, "[edit] rebuild-world: TODO\n");
-	statusBar()->showMessage(tr("Rebuild World: not wired yet"));
+	// OnEditRebuildworld (SurMap5/MainFrame.cpp:1564): vMap.rebuild() —
+	// re-derives the terrain caches from the source raster, then re-inits the
+	// render-side world (reInitWorld).
+	if(!view_->worldLoaded()){
+		statusBar()->showMessage(tr("Load a world first"));
+		return;
+	}
+	statusBar()->showMessage(tr("Rebuilding world..."));
+	QApplication::setOverrideCursor(Qt::WaitCursor);
+	const bool ok = view_->rebuildWorld();
+	QApplication::restoreOverrideCursor();
+	statusBar()->showMessage(ok ? tr("World rebuilt") : tr("Could not rebuild the world"),
+	                         ok ? 3000 : 0);
 }
 
 void MainWindow::editUpdateSurface()
 {
-	fprintf(stderr, "[edit] update-surface: TODO\n");
-	statusBar()->showMessage(tr("Update Surface: not wired yet"));
+	// OnEditUpdateSurface (SurMap5/MainFrame.cpp:2497): view_->updateSurface()
+	// — recalcArea2Grid + regRender over the whole map.
+	if(!view_->worldLoaded()){
+		statusBar()->showMessage(tr("Load a world first"));
+		return;
+	}
+	view_->updateSurface();
+	statusBar()->showMessage(tr("Surface updated"), 3000);
 }
 
 void MainWindow::editChangeTotalWorldHeight()
@@ -1118,6 +1165,20 @@ void MainWindow::editTriggers()
 	// editor port (the Scripts module is not wired into the Qt editor yet).
 	fprintf(stderr, "[tools] trigger selected: %s (editor TODO)\n", file.toStdString().c_str());
 	statusBar()->showMessage(tr("Trigger: %1 (editor not wired yet)").arg(file));
+}
+
+void MainWindow::viewTogglePaletteTexture(bool checked)
+{
+	// OnDebugShowpalettetexture (SurMap5/MainFrame.cpp:2006): toggles
+	// vMap's try-color dam texture debug view and re-renders the world.
+	// The action is checkable; the engine returns the actual new state.
+	if(!view_->worldLoaded()){
+		statusBar()->showMessage(tr("Load a world first"));
+		return;
+	}
+	const int state = view_->toggleTryColorDamTexture();
+	if(state >= 0)
+		statusBar()->showMessage(state ? tr("Palette texture shown") : tr("Palette texture hidden"), 3000);
 }
 
 // --- View menu ------------------------------------------------------------

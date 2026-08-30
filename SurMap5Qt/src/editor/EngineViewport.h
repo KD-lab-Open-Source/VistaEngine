@@ -167,6 +167,24 @@ public:
 	// world's edge relief (DlgBorderRolling's borderHeight*VOXEL_MULTIPLIER and
 	// borderAngle*M_PI/180). Returns false when no world is loaded.
 	bool autoLace(int laceHeightVoxels, float angleRadians);
+
+	// --- Terrain maintenance (D3) ---
+
+	// CMainFrame::OnEditRebuildworld: vMap.rebuild() — re-derives the world's
+	// caches from the source raster (bitmap/bitGen dispatchers are cleared and
+	// the surface is recreated), then re-creates the render-side tile map.
+	// Returns false when no world is loaded.
+	bool rebuildWorld();
+
+	// CGeneralView::updateSurface (SurMap5/GeneralView.cpp:942):
+	// vMap.recalcArea2Grid + regRender over the whole map — marks every
+	// tile's grid/region dirty so the renderer regenerates them.
+	bool updateSurface();
+
+	// OnDebugShowpalettetexture: vMap.toShowTryColorDamTexture(!current) —
+	// toggles the "try-color dam texture" debug view and re-renders the world.
+	// Returns the new state, or -1 when no world is loaded.
+	int toggleTryColorDamTexture();
 	// --- Camera default (U7) ---
 
 	// The current orbit centre/distance/theta, for persisting the camera

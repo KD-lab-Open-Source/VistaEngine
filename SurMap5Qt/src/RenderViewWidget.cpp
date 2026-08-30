@@ -189,6 +189,21 @@ bool RenderViewWidget::autoLace(int laceHeightVoxels, float angleRadians)
 	return viewport_->autoLace(laceHeightVoxels, angleRadians);
 }
 
+bool RenderViewWidget::rebuildWorld()
+{
+	return viewport_->rebuildWorld();
+}
+
+bool RenderViewWidget::updateSurface()
+{
+	return viewport_->updateSurface();
+}
+
+int RenderViewWidget::toggleTryColorDamTexture()
+{
+	return viewport_->toggleTryColorDamTexture();
+}
+
 void RenderViewWidget::orbitCamera(float& distance, float& theta) const
 {
 	viewport_->orbitCamera(distance, theta);
