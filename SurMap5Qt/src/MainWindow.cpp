@@ -41,6 +41,7 @@
 #include "panels/ObjectsTreePanel.h"
 #include "panels/MiniMapPanel.h"
 #include "panels/GradientsPanel.h"
+#include "panels/CameraControlPanel.h"
 
 // Number of status-bar panes: 8 info + 2 separators — NUMBERS_PARTS_STATUSBAR
 // in GeneralView.h (8 + 2).
@@ -658,6 +659,13 @@ void MainWindow::createDockPanels()
 	gradientsDock_->setWidget(gradientsPanel_);
 	addDockWidget(Qt::RightDockWidgetArea, gradientsDock_);
 
+	cameraControlDock_ = new QDockWidget(tr("Camera"), this);
+	cameraControlDock_->setObjectName("cameraControlDock");
+	cameraControlDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+	cameraControlPanel_ = new CameraControlPanel(view_, cameraControlDock_);
+	cameraControlDock_->setWidget(cameraControlPanel_);
+	addDockWidget(Qt::RightDockWidgetArea, cameraControlDock_);
+
 	// TODO(Phase 7): QMainWindow::restoreState() from the saved geometry —
 	// replaces CExtControlBar::ProfileBarStateSerialize. Call restoreState()
 	// after all docks are created, and saveState() in closeEvent.
@@ -776,7 +784,7 @@ void MainWindow::applySavedCameraDefault()
 	const double theta = settings.value("editor/cameraDefaultTheta", -1.0).toDouble();
 	if(distance < 0.0 || theta < 0.0)
 		return;
-	view_->setOrbitCamera((float)distance, (float)theta);
+	view_->setOrbitCamera((float)std::max(distance, 8000.0), (float)theta);
 }
 
 void MainWindow::selectTool(int index)

@@ -25,7 +25,7 @@ CameraControlPanel::CameraControlPanel(RenderViewWidget* view, QWidget* parent)
 	centerX_ = addField(form, tr("Center X"), -100000.0, 100000.0, 0.0, 1);
 	centerY_ = addField(form, tr("Center Y"), -100000.0, 100000.0, 0.0, 1);
 	centerZ_ = addField(form, tr("Center Z"), -100000.0, 100000.0, 0.0, 1);
-	distance_ = addField(form, tr("Distance"), 2.0, 100000.0, 5000.0, 1);
+	distance_ = addField(form, tr("Distance"), 2.0, 100000.0, 8000.0, 1);
 	yaw_ = addField(form, tr("Yaw (deg)"), -3600.0, 3600.0, 0.0, 2);
 	pitch_ = addField(form, tr("Pitch (deg)"), -3600.0, 3600.0, 37.0, 2);
 	roll_ = addField(form, tr("Roll (deg)"), -3600.0, 3600.0, 0.0, 2);
@@ -35,11 +35,15 @@ CameraControlPanel::CameraControlPanel(RenderViewWidget* view, QWidget* parent)
 
 	auto* apply = new QPushButton(tr("Apply"), this);
 	auto* applyEye = new QPushButton(tr("Apply Eye"), this);
+	auto* top = new QPushButton(tr("Top View"), this);
+	auto* overview = new QPushButton(tr("Overview"), this);
 	auto* read = new QPushButton(tr("Read"), this);
 	auto* reset = new QPushButton(tr("Reset"), this);
 	auto* buttons = new QHBoxLayout;
 	buttons->addWidget(apply);
 	buttons->addWidget(applyEye);
+	buttons->addWidget(top);
+	buttons->addWidget(overview);
 	buttons->addWidget(read);
 	buttons->addWidget(reset);
 
@@ -51,6 +55,8 @@ CameraControlPanel::CameraControlPanel(RenderViewWidget* view, QWidget* parent)
 
 	connect(apply, &QPushButton::clicked, this, &CameraControlPanel::applyCamera);
 	connect(applyEye, &QPushButton::clicked, this, &CameraControlPanel::applyEyeCamera);
+	connect(top, &QPushButton::clicked, this, &CameraControlPanel::topView);
+	connect(overview, &QPushButton::clicked, this, &CameraControlPanel::overview);
 	connect(read, &QPushButton::clicked, this, &CameraControlPanel::readCamera);
 	connect(reset, &QPushButton::clicked, this, &CameraControlPanel::resetCamera);
 	readCamera();
@@ -100,6 +106,34 @@ void CameraControlPanel::applyEyeCamera()
 		state.distance = 2.0f;
 	state.yaw = (float)std::atan2(dy, dx);
 	state.pitch = (float)std::atan2(horizontal, dz);
+	view_->setCameraState(state);
+	readCamera();
+}
+
+void CameraControlPanel::topView()
+{
+	if(!view_)
+		return;
+	RenderViewWidget::CameraState state;
+	view_->cameraState(state);
+	state.yaw = 0.0f;
+	state.pitch = 0.0f;
+	state.roll = 0.0f;
+	state.distance = 8000.0f;
+	view_->setCameraState(state);
+	readCamera();
+}
+
+void CameraControlPanel::overview()
+{
+	if(!view_)
+		return;
+	RenderViewWidget::CameraState state;
+	view_->cameraState(state);
+	state.yaw = -0.78539816f;
+	state.pitch = 0.55f;
+	state.roll = 0.0f;
+	state.distance = 8000.0f;
 	view_->setCameraState(state);
 	readCamera();
 }

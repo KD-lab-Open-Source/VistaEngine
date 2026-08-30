@@ -151,11 +151,22 @@ bool EngineViewport::loadWorld(const char* worldsDir, const char* worldName)
 	// camera keep its height (createScene used the map centre too).
 	orbit_.px = vMap.H_SIZE * 0.5f;
 	orbit_.py = vMap.V_SIZE * 0.5f;
-	orbit_.pz = 128.0f;
-	orbit_.distance = 512.f;
+	orbit_.pz = 256.0f;
+	orbit_.distance = 8000.f;
 	orbit_.psi = 0.f;
 	orbit_.theta = 0.65f;
 	applyCamera();
+	const Vect2f center(0.5f, 0.5f);
+	const sRectangle4f clip(-0.5f, -0.5f, 0.5f, 0.5f);
+	const Vect2f focus(orbit_.focus, orbit_.focus);
+	const Vect2f zPlane(30.0f, 12000.0f);
+	camera_->SetFrustum(&center, &clip, &focus, &zPlane);
+	Vect3f rayPoint, rayDirection;
+	camera_->GetWorldRay(Vect2f(0.f, 0.f), rayPoint, rayDirection);
+	const Vect3f eye = camera_->GetPos();
+	fprintf(stderr, "EngineViewport: loaded camera eye=(%.1f,%.1f,%.1f) center=(%.1f,%.1f,%.1f) ray=(%.3f,%.3f,%.3f)\n",
+	        eye.x, eye.y, eye.z, orbit_.px, orbit_.py, orbit_.pz,
+	        rayDirection.x, rayDirection.y, rayDirection.z);
 
 	worldLoaded_ = true;
 	return true;
@@ -213,7 +224,7 @@ bool EngineViewport::createWorld(const char* worldsDir, const char* worldName)
 	orbit_.px = vMap.H_SIZE * 0.5f;
 	orbit_.py = vMap.V_SIZE * 0.5f;
 	orbit_.pz = 128.0f;
-	orbit_.distance = 512.f;
+	orbit_.distance = 5000.f;
 	orbit_.psi = 0.f;
 	orbit_.theta = 0.f;
 	applyCamera();
@@ -333,6 +344,29 @@ void EngineViewport::setOrbitCamera(float distance, float theta)
 	applyCamera();
 }
 
+void EngineViewport::cameraState(CameraState& state) const
+{
+	state.centerX = orbit_.px;
+	state.centerY = orbit_.py;
+	state.centerZ = orbit_.pz;
+	state.distance = orbit_.distance;
+	state.yaw = orbit_.psi;
+	state.pitch = orbit_.theta;
+	state.roll = orbit_.fi;
+}
+
+void EngineViewport::setCameraState(const CameraState& state)
+{
+	orbit_.px = state.centerX;
+	orbit_.py = state.centerY;
+	orbit_.pz = state.centerZ;
+	orbit_.distance = max(state.distance, 2.0f);
+	orbit_.psi = state.yaw;
+	orbit_.theta = state.pitch;
+	orbit_.fi = state.roll;
+	applyCamera();
+}
+
 void EngineViewport::setGridVisible(bool visible)
 {
 	// OnViewShowGrid toggled surMapOptions.enableGrid_, which drawGrid
@@ -413,6 +447,16 @@ void EngineViewport::drawFrame()
 		const Vect2f focus(orbit_.focus, orbit_.focus);
 		const Vect2f zPlane(30.0f, 12000.0f);
 		camera_->SetFrustum(&center, &clip, &focus, &zPlane);
+		static bool cameraLogged = false;
+		if(!cameraLogged){
+			Vect3f rayPoint, rayDirection;
+			camera_->GetWorldRay(Vect2f(0.f, 0.f), rayPoint, rayDirection);
+			const Vect3f eye = camera_->GetPos();
+			fprintf(stderr, "EngineViewport: camera eye=(%.1f,%.1f,%.1f) center=(%.1f,%.1f,%.1f) ray=(%.3f,%.3f,%.3f)\n",
+			        eye.x, eye.y, eye.z, orbit_.px, orbit_.py, orbit_.pz,
+			        rayDirection.x, rayDirection.y, rayDirection.z);
+			cameraLogged = true;
+		}
 		scene_->Draw(camera_);
 	}
 
