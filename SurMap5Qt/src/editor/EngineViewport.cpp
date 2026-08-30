@@ -238,6 +238,16 @@ bool EngineViewport::saveWorld()
 	return saveWorld(vMap.getWorldName().c_str());
 }
 
+bool EngineViewport::autoLace(int laceHeightVoxels, float angleRadians)
+{
+	// CMainFrame::OnEditRollingborder (SurMap5/MainFrame.cpp:2844):
+	// vMap.autoLace(borderHeight*VOXEL_MULTIPLIER, boderAngle*M_PI/180.).
+	if(!worldLoaded_)
+		return false;
+	vMap.autoLace(laceHeightVoxels, angleRadians);
+	return true;
+}
+
 void EngineViewport::orbitCamera(float& distance, float& theta) const
 {
 	// GlobalAttributes::setCameraCoordinate persisted only distance + theta;

@@ -77,6 +77,8 @@ public slots:
 	void editUpdateSurface();
 	void editChangeTotalWorldHeight();
 	void editRollingBorder();
+	// OnEditTriggers: pick a trigger file (SelectTriggerDialog).
+	void editTriggers();
 
 	// --- View menu (CMainFrame::OnView*) ---
 	void viewToggleGrid(bool checked);

@@ -184,6 +184,11 @@ bool RenderViewWidget::saveWorld()
 	return viewport_->saveWorld();
 }
 
+bool RenderViewWidget::autoLace(int laceHeightVoxels, float angleRadians)
+{
+	return viewport_->autoLace(laceHeightVoxels, angleRadians);
+}
+
 void RenderViewWidget::orbitCamera(float& distance, float& theta) const
 {
 	viewport_->orbitCamera(distance, theta);

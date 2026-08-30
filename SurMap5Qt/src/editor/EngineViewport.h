@@ -161,7 +161,12 @@ public:
 	bool saveWorld(const char* worldName);
 	// Save under the world's current name (CMainFrame::OnFileSave).
 	bool saveWorld();
+	// --- Rolling border (D1) ---
 
+	// CMainFrame::OnEditRollingborder: vMap.autoLace(laceH, angle) — laces the
+	// world's edge relief (DlgBorderRolling's borderHeight*VOXEL_MULTIPLIER and
+	// borderAngle*M_PI/180). Returns false when no world is loaded.
+	bool autoLace(int laceHeightVoxels, float angleRadians);
 	// --- Camera default (U7) ---
 
 	// The current orbit centre/distance/theta, for persisting the camera

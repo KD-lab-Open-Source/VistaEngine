@@ -130,6 +130,18 @@ add_executable(SurMap5Qt
     src/dialogs/CameraDialog.cpp
     src/dialogs/WaveDialog.h
     src/dialogs/WaveDialog.cpp
+    # D1 dialogs — the remaining CDialog ports (DlgBorderRolling,
+    # NameComboDlg, CreateAttribDlg, OutputProgressDlg, DlgSelectTrigger)
+    src/dialogs/BorderRollingDialog.h
+    src/dialogs/BorderRollingDialog.cpp
+    src/dialogs/NameComboDialog.h
+    src/dialogs/NameComboDialog.cpp
+    src/dialogs/CreateAttribDialog.h
+    src/dialogs/CreateAttribDialog.cpp
+    src/dialogs/OutputProgressDialog.h
+    src/dialogs/OutputProgressDialog.cpp
+    src/dialogs/SelectTriggerDialog.h
+    src/dialogs/SelectTriggerDialog.cpp
     # Phase 5 tools — engine-free behaviour classes (see src/editor/EditorTool.h)
     src/editor/EditorTool.h
     src/tools/ToolManager.h

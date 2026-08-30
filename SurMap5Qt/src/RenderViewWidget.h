@@ -114,6 +114,8 @@ public:
 	bool saveWorld(const QString& worldName);
 	// Save under the world's current name (CMainFrame::OnFileSave).
 	bool saveWorld();
+	// Rolling border (CMainFrame::OnEditRollingborder -> vMap.autoLace).
+	bool autoLace(int laceHeightVoxels, float angleRadians);
 	// The current orbit distance/theta, for the Save-Camera-As-Default slot.
 	void orbitCamera(float& distance, float& theta) const;
 	// Apply a saved camera default (distance + theta) to the orbit.

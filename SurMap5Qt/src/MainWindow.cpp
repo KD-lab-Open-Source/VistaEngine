@@ -31,6 +31,8 @@
 #include "dialogs/TimeSliderDialog.h"
 #include "dialogs/CameraDialog.h"
 #include "dialogs/WaveDialog.h"
+#include "dialogs/BorderRollingDialog.h"
+#include "dialogs/SelectTriggerDialog.h"
 #include "tools/ToolManager.h"
 #include "panels/ToolsTreePanel.h"
 #include "panels/ObjectsTreePanel.h"
@@ -339,7 +341,7 @@ void MainWindow::createActions()
 
 	connect(actToolUIEditor_, &QAction::triggered, this, [this, stub]{ stub("tools/ui-editor", tr("UI Editor: not wired yet")); });
 	connect(actToolEffectsEditor_, &QAction::triggered, this, [this, stub]{ stub("tools/effects-editor", tr("Effects Editor: not wired yet")); });
-	connect(actToolTriggers_, &QAction::triggered, this, [this, stub]{ stub("tools/triggers", tr("Edit Triggers: not wired yet")); });
+	connect(actToolTriggers_, &QAction::triggered, this, &MainWindow::editTriggers);
 
 	// Workspace: dock/toolbar visibility toggles. The docks exist (createDockPanels)
 	// and the toolbars exist (createToolBars) by the time these fire, so toggle
@@ -1074,9 +1076,48 @@ void MainWindow::editChangeTotalWorldHeight()
 
 void MainWindow::editRollingBorder()
 {
-	// OnEditRollingborder: DlgBorderRolling.
-	fprintf(stderr, "[edit] rolling-border: TODO U5 (DlgBorderRolling)\n");
-	statusBar()->showMessage(tr("Rolling Border: not wired yet"));
+	// OnEditRollingborder (SurMap5/MainFrame.cpp:2844): DlgBorderRolling,
+	// then vMap.autoLace(borderHeight*VOXEL_MULTIPLIER, boderAngle*M_PI/180).
+	if(!view_->worldLoaded()){
+		statusBar()->showMessage(tr("Load a world first"));
+		return;
+	}
+	BorderRollingDialog dlg(this);
+	if(dlg.exec() != QDialog::Accepted)
+		return;
+	// Original call: vMap.autoLace(borderHeight*VOXEL_MULTIPLIER,
+	// boderAngle*M_PI/180). VOXEL_MULTIPLIER = 1<<VX_FRACTION = 32
+	// (Terra/terra.h); the Qt side stays engine-free, so the constants are
+	// inlined here.
+	const int laceH = dlg.borderHeight() * 32;
+	const float angle = dlg.borderAngle() * 3.14159265358979f / 180.f;
+	statusBar()->showMessage(tr("Lacing the border..."));
+	QApplication::setOverrideCursor(Qt::WaitCursor);
+	const bool ok = view_->autoLace(laceH, angle);
+	QApplication::restoreOverrideCursor();
+	statusBar()->showMessage(ok ? tr("Border laced") : tr("Could not lace the border"),
+	                         ok ? 3000 : 0);
+}
+
+void MainWindow::editTriggers()
+{
+	// OnEditTriggers (SurMap5/MainFrame.cpp:876): pick a *.scr trigger file
+	// under Scripts\Content\Triggers, then edit it. The editor exe sits next
+	// to the game dir in the dev tree; anchor the path like the original did
+	// (a fixed relative path from the working directory).
+	const QString triggersDir = QCoreApplication::applicationDirPath() + "/Scripts/Content/Triggers";
+	SelectTriggerDialog dlg(triggersDir, tr("Select trigger"), this);
+	if(dlg.exec() != QDialog::Accepted)
+		return;
+	const QString file = dlg.selectedTrigger();
+	if(file.isEmpty()){
+		statusBar()->showMessage(tr("No trigger selected"));
+		return;
+	}
+	// The actual TriggerChain load + TriggerEditor land with the trigger
+	// editor port (the Scripts module is not wired into the Qt editor yet).
+	fprintf(stderr, "[tools] trigger selected: %s (editor TODO)\n", file.toStdString().c_str());
+	statusBar()->showMessage(tr("Trigger: %1 (editor not wired yet)").arg(file));
 }
 
 // --- View menu ------------------------------------------------------------
