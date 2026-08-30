@@ -151,6 +151,35 @@ public:
 	// it through minimap().pressEvent -> cameraToEvent).
 	void setCameraCenter(float x, float y);
 
+	// --- World save (U7) ---
+
+	// CMainFrame::save (SurMap5/MainFrame.cpp:1076): vMap.save(worldName) —
+	// persists the world's terrain buffers to <worldsDir>\<worldName>\ (vMap
+	// creates the directory if missing). Returns false when no world is loaded.
+	// The world name passed to vMap.load/create is stored in vMap, so the
+	// caller only supplies it for Save As.
+	bool saveWorld(const char* worldName);
+	// Save under the world's current name (CMainFrame::OnFileSave).
+	bool saveWorld();
+
+	// --- Camera default (U7) ---
+
+	// The current orbit centre/distance/theta, for persisting the camera
+	// default (GlobalAttributes::setCameraCoordinate reads only distance +
+	// theta; the orbit centre is the map centre anyway).
+	void orbitCamera(float& distance, float& theta) const;
+	// Apply a saved camera default (distance + theta) to the orbit; the
+	// centre stays the map centre, as the original's camera init did.
+	void setOrbitCamera(float distance, float theta);
+
+	// --- Grid visibility (U7) ---
+
+	// Show/hide the editor grid (surMapOptions.enableGrid_). True by default
+	// (the original loaded the persisted option; the Qt editor has no
+	// SurMapOptions yet, and the View menu starts checked).
+	void setGridVisible(bool visible);
+	bool gridVisible() const { return gridVisible_; }
+
 	bool inited() const { return inited_; }
 
 private:
@@ -177,6 +206,7 @@ private:
 	Orbit                orbit_;
 	bool                 inited_ = false;
 	bool                 worldLoaded_ = false;
+	bool                 gridVisible_ = true;   // surMapOptions.enableGrid_ (U7)
 
 	// Mouse capture state (port of CGeneralView::WindowProc's statics).
 	bool   mouseMiddle_ = false;

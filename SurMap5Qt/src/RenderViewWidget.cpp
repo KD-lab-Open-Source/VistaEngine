@@ -174,6 +174,36 @@ void RenderViewWidget::setCameraCenter(float x, float y)
 	viewport_->setCameraCenter(x, y);
 }
 
+bool RenderViewWidget::saveWorld(const QString& worldName)
+{
+	return viewport_->saveWorld(worldName.toStdString().c_str());
+}
+
+bool RenderViewWidget::saveWorld()
+{
+	return viewport_->saveWorld();
+}
+
+void RenderViewWidget::orbitCamera(float& distance, float& theta) const
+{
+	viewport_->orbitCamera(distance, theta);
+}
+
+void RenderViewWidget::setOrbitCamera(float distance, float theta)
+{
+	viewport_->setOrbitCamera(distance, theta);
+}
+
+void RenderViewWidget::setGridVisible(bool visible)
+{
+	viewport_->setGridVisible(visible);
+}
+
+bool RenderViewWidget::gridVisible() const
+{
+	return viewport_->gridVisible();
+}
+
 bool RenderViewWidget::initRenderDevice()
 {
 	if(viewport_->inited())

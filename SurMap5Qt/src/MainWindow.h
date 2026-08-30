@@ -107,6 +107,12 @@ private:
 	void createStatusBar();
 	void createView();
 
+	// put2TitleNameDirWorld: put the loaded world's name in the frame title.
+	void updateWorldTitle();
+	// Restore the camera default the user saved (Save Camera As Default) into
+	// the viewport's orbit after a world load.
+	void applySavedCameraDefault();
+
 	// --- view ---
 	RenderViewWidget* view_ = nullptr;
 

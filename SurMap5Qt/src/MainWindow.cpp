@@ -72,6 +72,8 @@ MainWindow::MainWindow(QWidget* parent)
 		QTimer::singleShot(0, this, [this, lastWorld]() -> void {
 			auto retry = [this, lastWorld]{
 				if(view_->loadWorld(EditorApplication::instance()->worldsDir(), lastWorld)){
+					applySavedCameraDefault();
+					updateWorldTitle();
 					statusBar()->showMessage(tr("World restored: %1").arg(lastWorld));
 					fprintf(stderr, "[restore] world %s loaded\n", lastWorld.toStdString().c_str());
 				}
@@ -673,6 +675,8 @@ void MainWindow::openWorld()
 	// Phase 3b: vMap.load + terrain tile map (EngineViewport::loadWorld).
 	if(view_->loadWorld(worldsDir, worldName)){
 		QSettings().setValue("mainWindow/lastWorld", worldName);
+		applySavedCameraDefault();      // OnFileOpen re-created the camera with the default
+		updateWorldTitle();             // put2TitleNameDirWorld
 		statusBar()->showMessage(tr("World loaded: %1").arg(worldName));
 		if(miniMapPanel_)
 			miniMapPanel_->reload();      // CMiniMapWindow::onWorldChanged
@@ -703,6 +707,8 @@ void MainWindow::newWorld()
 	// vMap.create makes a default world; then load it (Phase 3b).
 	if(view_->createWorld(worldsDir, worldName)){
 		QSettings().setValue("mainWindow/lastWorld", worldName);
+		applySavedCameraDefault();
+		updateWorldTitle();
 		statusBar()->showMessage(tr("World created: %1").arg(worldName));
 		if(miniMapPanel_)
 			miniMapPanel_->reload();
@@ -710,6 +716,28 @@ void MainWindow::newWorld()
 	}
 	else
 		statusBar()->showMessage(tr("Failed to create world: %1").arg(worldName));
+}
+
+void MainWindow::updateWorldTitle()
+{
+	// put2TitleNameDirWorld (SurMap5/MainFrame.cpp): the loaded world's name
+	// in the frame title.
+	const QString name = view_->worldName();
+	setWindowTitle(name.isEmpty() ? tr("VistaEngine SurMap5")
+	                              : tr("VistaEngine SurMap5 — %1").arg(name));
+}
+
+void MainWindow::applySavedCameraDefault()
+{
+	// The editor's camera default (editSaveCameraAsDefault persisted it; the
+	// original's GlobalAttributes::setCameraCoordinate + camera init read it
+	// back). Applied after each world load, like the original's camera create.
+	const QSettings settings;
+	const double distance = settings.value("editor/cameraDefaultDistance", -1.0).toDouble();
+	const double theta = settings.value("editor/cameraDefaultTheta", -1.0).toDouble();
+	if(distance < 0.0 || theta < 0.0)
+		return;
+	view_->setOrbitCamera((float)distance, (float)theta);
 }
 
 void MainWindow::selectTool(int index)
@@ -764,25 +792,56 @@ void MainWindow::selftestCreateWorld(const QString& worldName)
 // --- File menu ------------------------------------------------------------
 // The original's handlers are in SurMap5/MainFrame.cpp (OnFile*). Those that
 // need plumbing beyond the current phase log and show a status message; the
-// world ops (save, save as, properties) land in U7 once the engine save path
-// (vMap.save) is wired through RenderViewWidget.
+// world ops (save, save as) are wired through RenderViewWidget (U7).
 
 void MainWindow::fileSave()
 {
-	// OnFileSave: vMap.save(current world). U7 wires the engine call; until
-	// then report the world that would be saved.
+	// OnFileSave (SurMap5/MainFrame.cpp:1057): vMap.save(getWorldName) — when
+	// the world had no name yet the original fell through to Save As; the Qt
+	// editor's load/create always names the world, so the direct path is
+	// enough.
 	if(!view_->worldLoaded()){
 		statusBar()->showMessage(tr("No world to save"));
 		return;
 	}
-	fprintf(stderr, "[file] save: TODO U7 (vMap.save)\n");
-	statusBar()->showMessage(tr("Save: not wired yet (U7)"));
+	statusBar()->showMessage(tr("Saving world: %1...").arg(view_->worldName()));
+	QApplication::setOverrideCursor(Qt::WaitCursor);
+	const bool ok = view_->saveWorld();
+	QApplication::restoreOverrideCursor();
+	if(ok)
+		statusBar()->showMessage(tr("World saved: %1").arg(view_->worldName()), 3000);
+	else
+		statusBar()->showMessage(tr("Could not save the world"));
 }
 
 void MainWindow::fileSaveAs()
 {
-	fprintf(stderr, "[file] save-as: TODO U7 (DlgWorldName + vMap.save)\n");
-	statusBar()->showMessage(tr("Save As: not wired yet (U7)"));
+	// OnFileSaveas (SurMap5/MainFrame.cpp:1165): CDlgSelectWorld over
+	// vMap.getWorldsDir() with the New-world button — picking an existing
+	// world overwrites it, New asks for a fresh name. Then save + retitle.
+	if(!view_->worldLoaded()){
+		statusBar()->showMessage(tr("No world to save"));
+		return;
+	}
+	const QString worldsDir = EditorApplication::instance()->worldsDir();
+	SelectWorldDialog dlg(worldsDir, tr("Save world as"), /*enableCreateDir=*/true, this);
+	if(dlg.exec() != QDialog::Accepted)
+		return;
+	const QString worldName = dlg.selectedWorld();
+	if(worldName.isEmpty())
+		return;
+
+	statusBar()->showMessage(tr("Saving world as: %1...").arg(worldName));
+	QApplication::setOverrideCursor(Qt::WaitCursor);
+	const bool ok = view_->saveWorld(worldName);
+	QApplication::restoreOverrideCursor();
+	if(!ok){
+		statusBar()->showMessage(tr("Could not save the world as %1").arg(worldName));
+		return;
+	}
+	QSettings().setValue("mainWindow/lastWorld", worldName);
+	updateWorldTitle();
+	statusBar()->showMessage(tr("World saved: %1").arg(worldName), 3000);
 }
 
 void MainWindow::fileRunWorld()
@@ -937,10 +996,17 @@ void MainWindow::editGameScenario()
 
 void MainWindow::editSaveCameraAsDefault()
 {
-	// OnEditSaveCameraAsDefault: persist the current orbit as the world's
-	// default camera. The engine camera state lives in EngineViewport (U7).
-	fprintf(stderr, "[edit] save-camera-default: TODO U7\n");
-	statusBar()->showMessage(tr("Save Camera As Default: not wired yet"));
+	// OnEditSaveCameraAsDefault (SurMap5/MainFrame.cpp:1977):
+	// GlobalAttributes::setCameraCoordinate — the camera manager's distance +
+	// theta became the defaults the next camera init used. The Qt editor's
+	// orbit lives in EngineViewport; QSettings stands in for the global-
+	// attributes file (applySavedCameraDefault restores it after a load).
+	float distance = 0.f, theta = 0.f;
+	view_->orbitCamera(distance, theta);
+	QSettings().setValue("editor/cameraDefaultDistance", (double)distance);
+	QSettings().setValue("editor/cameraDefaultTheta", (double)theta);
+	fprintf(stderr, "[edit] save-camera-default: distance=%g theta=%g\n", distance, theta);
+	statusBar()->showMessage(tr("Camera saved as default"), 3000);
 }
 
 void MainWindow::editRebuildWorld()
@@ -1017,9 +1083,11 @@ void MainWindow::editRollingBorder()
 
 void MainWindow::viewToggleGrid(bool checked)
 {
-	// OnViewShowGrid: the editor grid (drawGrid) visibility. EngineViewport
-	// draws the grid unconditionally for now; a flag lands with U7.
-	fprintf(stderr, "[view] show-grid: %s (TODO wire to drawGrid)\n", checked ? "on" : "off");
+	// OnViewShowGrid (SurMap5/MainFrame.cpp:2276): surMapOptions.enableGrid_ =
+	// !enableGrid_; CGeneralView::drawGrid (GeneralView.cpp:915) read that
+	// flag. The Qt editor keeps it in EngineViewport (gridVisible_).
+	view_->setGridVisible(checked);
+	fprintf(stderr, "[view] show-grid: %s\n", checked ? "on" : "off");
 	statusBar()->showMessage(tr("Show Grid: %1").arg(checked ? tr("on") : tr("off")));
 }
 

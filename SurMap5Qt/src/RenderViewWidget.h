@@ -108,6 +108,20 @@ public:
 	bool cameraCenter(float& x, float& y) const;
 	void setCameraCenter(float x, float y);
 
+	// --- World save (U7). Forwarders to EngineViewport, so MainWindow stays
+	// engine-free. ---
+	// CMainFrame::save (vMap.save under the given name).
+	bool saveWorld(const QString& worldName);
+	// Save under the world's current name (CMainFrame::OnFileSave).
+	bool saveWorld();
+	// The current orbit distance/theta, for the Save-Camera-As-Default slot.
+	void orbitCamera(float& distance, float& theta) const;
+	// Apply a saved camera default (distance + theta) to the orbit.
+	void setOrbitCamera(float distance, float theta);
+	// Grid visibility (surMapOptions.enableGrid_): gates the viewport's grid.
+	void setGridVisible(bool visible);
+	bool gridVisible() const;
+
 public slots:
 	// Called ~60 Hz from MainWindow::universeQuant (MFC OnIdle equivalent).
 	void tick();

@@ -220,6 +220,49 @@ bool EngineViewport::createWorld(const char* worldsDir, const char* worldName)
 	return true;
 }
 
+bool EngineViewport::saveWorld(const char* worldName)
+{
+	if(!worldLoaded_ || !worldName)
+		return false;
+	// CMainFrame::save (SurMap5/MainFrame.cpp:1076): vMap.save(worldName) —
+	// writes world.cls + the caches into <worldsDir>\<worldName>\ (vMap::save
+	// creates the directory if missing; the worlds dir itself must exist —
+	// createWorld/loadWorld made it).
+	vMap.save(worldName);
+	return true;
+}
+
+bool EngineViewport::saveWorld()
+{
+	// OnFileSave: vMap.getWorldName() is the name passed to load/create.
+	return saveWorld(vMap.getWorldName().c_str());
+}
+
+void EngineViewport::orbitCamera(float& distance, float& theta) const
+{
+	// GlobalAttributes::setCameraCoordinate persisted only distance + theta;
+	// the orbit centre stays the map centre (reInitWorld resets it there).
+	distance = orbit_.distance;
+	theta = orbit_.theta;
+}
+
+void EngineViewport::setOrbitCamera(float distance, float theta)
+{
+	// The inverse of orbitCamera: restore the persisted default onto the
+	// orbit. The centre is not saved (the original's camera create re-centred
+	// on the map), so it stays where reInitWorld put it.
+	orbit_.distance = distance;
+	orbit_.theta = theta;
+	applyCamera();
+}
+
+void EngineViewport::setGridVisible(bool visible)
+{
+	// OnViewShowGrid toggled surMapOptions.enableGrid_, which drawGrid
+	// (GeneralView.cpp:915) read. The engine-side flag gates the same call.
+	gridVisible_ = visible;
+}
+
 // drawGrid — CGeneralView::drawGrid (GeneralView.cpp): the editor grid over
 // the terrain, vMap-sized, at the ground level.
 void EngineViewport::drawGrid()
@@ -227,6 +270,8 @@ void EngineViewport::drawGrid()
 	if(!worldLoaded_)
 		return;
 	if(!gb_RenderDevice || !camera_)
+		return;
+	if(!gridVisible_)
 		return;
 
 	const int gridStep = 64;
