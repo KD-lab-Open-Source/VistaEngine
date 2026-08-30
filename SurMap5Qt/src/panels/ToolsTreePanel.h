@@ -6,12 +6,15 @@
 // tool factory's REGISTER_CLASS list). In Qt the tree is a QTreeWidget in the
 // tools dock; selecting a tool switches the ToolManager's current tool. The
 // XPrm-serialized tree configuration is deferred — the tree mirrors the tool
-// set ToolManager owns, which is the part the editor actually uses.
+// set ToolManager owns, grouped into the folder structure the original's
+// REGISTER_CLASS list implied (Folder/UnitFolder/MiniDetaileFolder/PlayerFolder
+// are folder tools; the terrain set lives under a "Terrain" group).
 
 #pragma once
 
 #include <QWidget>
 
+class QContextMenuEvent;
 class QTreeWidget;
 class QTreeWidgetItem;
 class ToolManager;
@@ -31,8 +34,15 @@ signals:
 	// tool list: 0=Select, 1=Move, 2=Rotate, 3=Scale).
 	void toolSelected(int index);
 
+protected:
+	// Context menu (the original's NM_RCLICK): Delete + Rename on tool rows;
+	// the folder rows are fixed. ID_POPUP_DELETE / ID_POPUP_RENAME.
+	void contextMenuEvent(QContextMenuEvent* event) override;
+
 private:
 	void onItemActivated(QTreeWidgetItem* item, int column);
+	void deleteSelected();
+	void renameSelected();
 
 	ToolManager* tools_ = nullptr;
 	QTreeWidget* tree_ = nullptr;
