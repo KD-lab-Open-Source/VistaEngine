@@ -51,6 +51,13 @@ class RenderViewWidget : public QWidget
 {
 	Q_OBJECT
 public:
+	struct CameraState
+	{
+		float centerX = 0.f, centerY = 0.f, centerZ = 0.f;
+		float distance = 512.f;
+		float yaw = 0.f, pitch = 0.f, roll = 0.f;
+	};
+
 	explicit RenderViewWidget(QWidget* parent = nullptr);
 	~RenderViewWidget() override;
 
@@ -132,6 +139,8 @@ public:
 	void orbitCamera(float& distance, float& theta) const;
 	// Apply a saved camera default (distance + theta) to the orbit.
 	void setOrbitCamera(float distance, float theta);
+	void cameraState(CameraState& state) const;
+	void setCameraState(const CameraState& state);
 	// Grid visibility (surMapOptions.enableGrid_): gates the viewport's grid.
 	void setGridVisible(bool visible);
 	bool gridVisible() const;

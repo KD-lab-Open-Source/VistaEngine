@@ -167,6 +167,8 @@ add_executable(SurMap5Qt
     src/panels/MiniMapPanel.cpp
     src/panels/GradientsPanel.h
     src/panels/GradientsPanel.cpp
+    src/panels/CameraControlPanel.h
+    src/panels/CameraControlPanel.cpp
 )
 
 # SurMap5Qt links EditorEngine (which carries the engine modules); Qt code

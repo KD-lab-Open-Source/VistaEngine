@@ -32,6 +32,7 @@ class ToolsTreePanel;
 class ObjectsTreePanel;
 class MiniMapPanel;
 class GradientsPanel;
+class CameraControlPanel;
 
 class MainWindow : public QMainWindow
 {
@@ -130,10 +131,12 @@ private:
 	QDockWidget* propertiesDock_ = nullptr;// propertiesBar_
 	QDockWidget* miniMapDock_ = nullptr;   // miniMapBar_
 	QDockWidget* gradientsDock_ = nullptr; // gradients bar (new; see GradientsPanel)
+	QDockWidget* cameraControlDock_ = nullptr;
 	ToolsTreePanel* toolsTreePanel_ = nullptr;   // CToolsTreeWindow's tree
 	ObjectsTreePanel* objectsTreePanel_ = nullptr; // CObjectsManagerWindow
 	MiniMapPanel* miniMapPanel_ = nullptr;   // CMiniMapWindow (U6)
 	GradientsPanel* gradientsPanel_ = nullptr; // CGradientsWindow (U6)
+	CameraControlPanel* cameraControlPanel_ = nullptr;
 
 	// --- toolbars (CExtToolControlBar set) ---
 	QToolBar* mainToolBar_ = nullptr;      // IDR_MAINFRAME

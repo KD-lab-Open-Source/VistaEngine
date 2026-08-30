@@ -28,6 +28,13 @@ class cScene;
 class EngineViewport
 {
 public:
+	struct CameraState
+	{
+		float centerX = 0.f, centerY = 0.f, centerZ = 0.f;
+		float distance = 512.f;
+		float yaw = 0.f, pitch = 0.f, roll = 0.f;
+	};
+
 	EngineViewport();
 	~EngineViewport();
 
@@ -199,6 +206,8 @@ public:
 	// Apply a saved camera default (distance + theta) to the orbit; the
 	// centre stays the map centre, as the original's camera init did.
 	void setOrbitCamera(float distance, float theta);
+	void cameraState(CameraState& state) const;
+	void setCameraState(const CameraState& state);
 
 	// --- Grid visibility (U7) ---
 

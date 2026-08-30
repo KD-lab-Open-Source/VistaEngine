@@ -14,6 +14,8 @@ public:
 private slots:
 	void applyCamera();
 	void applyEyeCamera();
+	void topView();
+	void overview();
 	void readCamera();
 	void resetCamera();
 

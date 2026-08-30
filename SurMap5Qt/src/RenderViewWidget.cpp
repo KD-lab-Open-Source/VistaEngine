@@ -234,6 +234,33 @@ void RenderViewWidget::setOrbitCamera(float distance, float theta)
 	viewport_->setOrbitCamera(distance, theta);
 }
 
+void RenderViewWidget::cameraState(CameraState& state) const
+{
+	EngineViewport::CameraState engineState;
+	viewport_->cameraState(engineState);
+	state.centerX = engineState.centerX;
+	state.centerY = engineState.centerY;
+	state.centerZ = engineState.centerZ;
+	state.distance = engineState.distance;
+	state.yaw = engineState.yaw;
+	state.pitch = engineState.pitch;
+	state.roll = engineState.roll;
+}
+
+void RenderViewWidget::setCameraState(const CameraState& state)
+{
+	EngineViewport::CameraState engineState;
+	engineState.centerX = state.centerX;
+	engineState.centerY = state.centerY;
+	engineState.centerZ = state.centerZ;
+	engineState.distance = state.distance;
+	engineState.yaw = state.yaw;
+	engineState.pitch = state.pitch;
+	engineState.roll = state.roll;
+	viewport_->setCameraState(engineState);
+	update();
+}
+
 void RenderViewWidget::setGridVisible(bool visible)
 {
 	viewport_->setGridVisible(visible);
