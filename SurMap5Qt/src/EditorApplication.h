@@ -41,6 +41,6 @@ public:
 
 private:
 	QTimer loopTimer_;
-	QString worldsDir_ = QStringLiteral("Worlds");
+	QString worldsDir_ = QStringLiteral("Resource/Worlds");
 	static EditorApplication* s_instance;
 };

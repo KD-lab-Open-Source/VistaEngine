@@ -2281,63 +2281,68 @@ void loadAllLibraries()
 {
 	start_timer_auto();
 
-	initConditions();
-	initActions();
-	initActionsEnvironmental();
-	initActionsSound();
+	// [SurMap5Qt] VISTA_LOG_LIBRARIES=1 prints each library before loading it —
+	// used by the SurMap5Qt editor bring-up to find which singleton load crashes
+	// (EngineViewport.cpp calls loadAllLibraries before building a Universe).
+	// Diagnostic only, guarded by the env var; delete when the editor is stable.
+	const bool logLibs = getenv("VISTA_LOG_LIBRARIES") != 0;
+#define LL_LOG(name) do{ if(logLibs){ fprintf(stderr, "lib: %s\n", name); fflush(stderr); } }while(0)
+	LL_LOG("initConditions"); initConditions();
+	LL_LOG("initActions"); initActions();
+	LL_LOG("initActionsEnvironmental"); initActionsEnvironmental();
+	LL_LOG("initActionsSound"); initActionsSound();
 
-	UnitNameTable::instance().add("None");
+	LL_LOG("UnitNameTable"); UnitNameTable::instance().add("None");
 
-	DebugPrm::instance();
-    EnginePrm::instance();
-    SoundAttributeLibrary::instance();
-    SoundTrackTable::instance();
-    BodyPartTypeTable::instance();
-	WeaponAnimationTypeTable::instance();
-    AbnormalStateTypeTable::instance();
-    ParameterTypeTable::instance();
-    ParameterGroupTable::instance();
-    ParameterValueTable::instance();
-    AttributeLibrary::instance();
-    AuxAttributeLibrary::instance();
-    AttributeSquadTable::instance();
-    WeaponPrm::updateIdentifiers();
-    WeaponGroupTypeTable::instance();
-    WeaponPrmLibrary::instance();
-	WeaponAmmoTypeTable::instance();
-    RaceTable::instance();
-	DifficultyTable::instance();
-    UnitNameTable::instance();
-    AttributeProjectileTable::instance();
-    ParameterFormulaTable::instance();
-    SourcesLibrary::instance();
-    TerToolsLibrary::instance();
-	TerrainTypeDescriptor::instance();
-	CommandsQueueLibrary::instance();
-	CommandColorManager::instance();
-    TextDB::instance();
+	LL_LOG("DebugPrm"); DebugPrm::instance();
+	LL_LOG("EnginePrm"); EnginePrm::instance();
+	LL_LOG("SoundAttributeLibrary"); SoundAttributeLibrary::instance();
+	LL_LOG("SoundTrackTable"); SoundTrackTable::instance();
+	LL_LOG("BodyPartTypeTable"); BodyPartTypeTable::instance();
+	LL_LOG("WeaponAnimationTypeTable"); WeaponAnimationTypeTable::instance();
+	LL_LOG("AbnormalStateTypeTable"); AbnormalStateTypeTable::instance();
+	LL_LOG("ParameterTypeTable"); ParameterTypeTable::instance();
+	LL_LOG("ParameterGroupTable"); ParameterGroupTable::instance();
+	LL_LOG("ParameterValueTable"); ParameterValueTable::instance();
+	LL_LOG("AttributeLibrary"); AttributeLibrary::instance();
+	LL_LOG("AuxAttributeLibrary"); AuxAttributeLibrary::instance();
+	LL_LOG("AttributeSquadTable"); AttributeSquadTable::instance();
+	LL_LOG("WeaponPrm::updateIdentifiers"); WeaponPrm::updateIdentifiers();
+	LL_LOG("WeaponGroupTypeTable"); WeaponGroupTypeTable::instance();
+	LL_LOG("WeaponPrmLibrary"); WeaponPrmLibrary::instance();
+	LL_LOG("WeaponAmmoTypeTable"); WeaponAmmoTypeTable::instance();
+	LL_LOG("RaceTable"); RaceTable::instance();
+	LL_LOG("DifficultyTable"); DifficultyTable::instance();
+	LL_LOG("UnitNameTable(2)"); UnitNameTable::instance();
+	LL_LOG("AttributeProjectileTable"); AttributeProjectileTable::instance();
+	LL_LOG("ParameterFormulaTable"); ParameterFormulaTable::instance();
+	LL_LOG("SourcesLibrary"); SourcesLibrary::instance();
+	LL_LOG("TerToolsLibrary"); TerToolsLibrary::instance();
+	LL_LOG("TerrainTypeDescriptor"); TerrainTypeDescriptor::instance();
+	LL_LOG("CommandsQueueLibrary"); CommandsQueueLibrary::instance();
+	LL_LOG("CommandColorManager"); CommandColorManager::instance();
+	LL_LOG("TextDB"); TextDB::instance();
 
-    // редактируесть через ComboBox:
-	FormationPatterns::instance();
-	UnitFormationTypes::instance();
-	PlacementZoneTable::instance();
+	LL_LOG("FormationPatterns"); FormationPatterns::instance();
+	LL_LOG("UnitFormationTypes"); UnitFormationTypes::instance();
+	LL_LOG("PlacementZoneTable"); PlacementZoneTable::instance();
 
-    // Для общей кучи перезагружаем все
-	GlobalAttributes::instance();
-	EffectLibrary::instance();
+	LL_LOG("GlobalAttributes"); GlobalAttributes::instance();
+	LL_LOG("EffectLibrary"); EffectLibrary::instance();
 
-	UI_SpriteLibrary::instance();
-    UI_TextureLibrary::instance();
-	UI_ShowModeSpriteTable::instance();
-	UI_MessageTypeLibrary::instance();
-    UI_FontLibrary::instance();
-    UI_CursorLibrary::instance();
-	CommonLocText::instance();
+	LL_LOG("UI_SpriteLibrary"); UI_SpriteLibrary::instance();
+	LL_LOG("UI_TextureLibrary"); UI_TextureLibrary::instance();
+	LL_LOG("UI_ShowModeSpriteTable"); UI_ShowModeSpriteTable::instance();
+	LL_LOG("UI_MessageTypeLibrary"); UI_MessageTypeLibrary::instance();
+	LL_LOG("UI_FontLibrary"); UI_FontLibrary::instance();
+	LL_LOG("UI_CursorLibrary"); UI_CursorLibrary::instance();
+	LL_LOG("CommonLocText"); CommonLocText::instance();
 	if(!isUnderEditor())
 		VoiceAttribute::VoiceFile::loadVoiceFileDuration();
-	UI_GlobalAttributes::instance();
-	UI_Dispatcher::instance();
-	UI_TextLibrary::instance();
+	LL_LOG("UI_GlobalAttributes"); UI_GlobalAttributes::instance();
+	LL_LOG("UI_Dispatcher"); UI_Dispatcher::instance();
+	LL_LOG("UI_TextLibrary"); UI_TextLibrary::instance();
+#undef LL_LOG
 
 	//Correct tertool
 	vector<string> names4delete;

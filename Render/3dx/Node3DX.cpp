@@ -685,6 +685,17 @@ void cObject3dx::Draw(Camera* camera)
 	}
 
 	//!!! Не забыть сортировку по материалам.
+	// [SurMap5Qt] A model whose .3dxG cache says is_lod=true but carries fewer than
+	// three lods (or none) selects iLOD 0..2 in Update() and would index lods out of
+	// bounds here. Guard + report instead of the invalid-parameter fast-fail. Hit while
+	// the Qt editor draws world objects (SurMap5Qt); possibly delete when the .3dxG
+	// LOD-count mismatch is understood.
+	if(iLOD < 0 || iLOD >= (int)pStatic->lods.size()){
+		VisError << "cObject3dx::Draw: lods[" << iLOD << "] out of range, file="
+			<< pStatic->fileName() << " is_lod=" << (int)pStatic->is_lod
+			<< " lods=" << (int)pStatic->lods.size() << VERR_END;
+		return;
+	}
 	cStatic3dx::StaticLod& lod=pStatic->lods[iLOD];
 	int size=lod.bunches.size();
 	for(int iBunch=0;iBunch<size;iBunch++){
@@ -979,6 +990,15 @@ void cObject3dx::DrawShadowAndZbuffer(Camera* camera,bool ZBuffer)
 	SDLObject3dxRenderer* renderer = sdlObjectRenderer();
 	if(!renderer || ZBuffer)
 		return;
+
+	// [SurMap5Qt] Same lods[iLOD] guard as Draw() above (see that comment) — the
+	// shadow-map camera reaches DrawShadowAndZbuffer before Draw's own guard.
+	if(iLOD < 0 || iLOD >= (int)pStatic->lods.size()){
+		VisError << "cObject3dx::DrawShadowAndZbuffer: lods[" << iLOD << "] out of range, file="
+			<< pStatic->fileName() << " is_lod=" << (int)pStatic->is_lod
+			<< " lods=" << (int)pStatic->lods.size() << VERR_END;
+		return;
+	}
 
 	//!!! Не забыть сортировку по материалам.
 	cStatic3dx::StaticLod& lod=pStatic->lods[iLOD];

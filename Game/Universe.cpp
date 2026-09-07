@@ -58,6 +58,11 @@ unitGrid(vMap.H_SIZE, vMap.V_SIZE),
 universeObjectAction(0)
 {
 	start_timer_auto();
+	// [SurMap5Qt debug] fprintf stage logs added while bringing the Qt editor's
+	// world load up (SurMap5Qt/src/editor/EngineViewport.cpp loadWorld runs this
+	// ctor directly). Console diagnostics only; safe to delete when the editor
+	// is stable.
+	fprintf(stderr, "Universe: [ctor] begin, h=%d v=%d ia=%p\n", (int)vMap.H_SIZE, (int)vMap.V_SIZE, (void*)ia); fflush(stderr);
 
 	xassert(vMap.H_SIZE && vMap.V_SIZE);
 	xassert(!universe());
@@ -68,6 +73,7 @@ universeObjectAction(0)
 	gameType_ = mission.gameType();
 
 	circleManager_=new CircleManager;
+	fprintf(stderr, "Universe: [ctor] circleManager created\n"); fflush(stderr);
 	circleManager_->SetDrawOrder(GlobalAttributes::instance().circleManagerDrawOrder);
 	terScene->AttachObj(circleManager_);
 
@@ -78,6 +84,7 @@ universeObjectAction(0)
 		setLogicFp();
 	GlobalAttributes::instance();
 	AuxAttributeLibrary::instance();
+	fprintf(stderr, "Universe: [ctor] globals + AuxAttributeLibrary ready\n"); fflush(stderr);
     
 	for(int i = 0; i < RaceTable::instance().size(); i++)
 		RaceTable::instance()[i].setUnused();
@@ -95,8 +102,10 @@ universeObjectAction(0)
 
 	tileMapUpdateRegions.clear();
     
+	fprintf(stderr, "Universe: [ctor] before PathFinder\n"); fflush(stderr);
 	pathFinder = new PathFinder(vMap.H_SIZE,vMap.V_SIZE);
 	pathFinder->enableAutoImpassability(GlobalAttributes::instance().enableAutoImpassability);
+	fprintf(stderr, "Universe: [ctor] PathFinder ready\n"); fflush(stderr);
 
 	quant_counter_ = 0;
 
@@ -109,12 +118,15 @@ universeObjectAction(0)
 	global_time.setTime(mission.globalTime); // Нужно установить время до загрузки spg
 
 	if(ia){
+		fprintf(stderr, "Universe: [ctor] loading header + gameMap from spg\n"); fflush(stderr);
 		missionSignature = ia->crc();
 		ia->serialize(MissionDescription(), "header", 0); // для избежания скипования при загрузке
 		vMap.loadGameMap(*ia);
+		fprintf(stderr, "Universe: [ctor] gameMap loaded\n"); fflush(stderr);
 	}
-	
+	fprintf(stderr, "Universe: [ctor] before RigidBodyPhysics init\n"); fflush(stderr);
     RigidBodyPhysics::initConstraintHandler(&constraintHandler_);
+	fprintf(stderr, "Universe: [ctor] RigidBodyPhysics ready, creating players\n"); fflush(stderr);
 
 	// Создание игроков
 	int actActivePlayerID=0, actActiveCoopIdx=0;
@@ -145,10 +157,13 @@ universeObjectAction(0)
 	}
 
 	Player* world_player = addPlayer(PlayerData(Players.size(), REAL_PLAYER_TYPE_WORLD));
+	fprintf(stderr, "Universe: [ctor] players=%d, creating tileMap + Environment\n", (int)Players.size()); fflush(stderr);
 
 	tileMap = terScene->CreateMap(isUnderEditor());
+	fprintf(stderr, "Universe: [ctor] tileMap created, isWater=%d isFog=%d isTemp=%d\n", (int)mission.is_water, (int)mission.is_fog_of_war, (int)mission.is_temperature); fflush(stderr);
 
 	environment = new Environment(terScene, tileMap, mission.is_water, mission.is_fog_of_war, mission.is_temperature);
+	fprintf(stderr, "Universe: [ctor] Environment created\n"); fflush(stderr);
 	if(environment->water())
 		environment->water()->SetChangeTile(waterChangePF);
 
@@ -157,39 +172,56 @@ universeObjectAction(0)
 
 	if(!ia)
 		environment->loadPreset();
+	fprintf(stderr, "Universe: [ctor] loadPreset done\n"); fflush(stderr);
 
 	GameOptions::instance().environmentSetup();
+	fprintf(stderr, "Universe: [ctor] environmentSetup done\n"); fflush(stderr);
 
 	if(mission.gameType() & GAME_TYPE_REEL)
 		universe()->setShowFogOfWar(false);
+	fprintf(stderr, "Universe: [ctor] after reel fog\n"); fflush(stderr);
 
-	if(environment->fogOfWar())
+	if(environment->fogOfWar()){
+		fprintf(stderr, "Universe: [ctor] initFogOfWarMap for %d players\n", (int)Players.size()); fflush(stderr);
 		std::for_each(Players.begin(), Players.end(), [](Player* p){ p->initFogOfWarMap(); });
+	}
+	fprintf(stderr, "Universe: [ctor] fog done, new SourceManager\n"); fflush(stderr);
 
 	sourceManager = new SourceManager;
+	fprintf(stderr, "Universe: [ctor] SourceManager ready\n"); fflush(stderr);
 
 	//setActivePlayer(mission.activePlayerID(), mission.activeCooperativeIndex());
 	setActivePlayer(actActivePlayerID, actActiveCoopIdx);
+	fprintf(stderr, "Universe: [ctor] setActivePlayer done\n"); fflush(stderr);
 
 	UI_BackgroundScene::instance().setSky(environment->environmentTime()->GetCubeMap());
+	fprintf(stderr, "Universe: [ctor] setSky done\n"); fflush(stderr);
 
 	soundEnvironmentManager_ = new SoundEnvironmentManager();
+	fprintf(stderr, "Universe: [ctor] SoundEnvironmentManager ready\n"); fflush(stderr);
 
 	crashSystem = new CrashSystem;
+	fprintf(stderr, "Universe: [ctor] CrashSystem ready\n"); fflush(stderr);
 
 	UnitID::clearCounter();
+	fprintf(stderr, "Universe: [ctor] UnitID cleared\n"); fflush(stderr);
 
 	if(ia){
+		fprintf(stderr, "Universe: [ctor] loading world-data from spg\n"); fflush(stderr);
 		Archive& ar = *ia;
 		ar.setFilter(SERIALIZE_WORLD_DATA);
 		GameLoadManager::instance().setProgressAndStartSub(.05f, mission.userSave() ? 0.1f : 0.7f);
 		ar.serialize(*environment, "environment", 0);
+		fprintf(stderr, "Universe: [ctor] environment serialized\n"); fflush(stderr);
 		ar.serialize(*cameraManager, "camera", 0);
+		fprintf(stderr, "Universe: [ctor] camera serialized\n"); fflush(stderr);
 		GameLoadManager::instance().finishAndStartSub(.95f);
 		ar.serialize(*this, "universe", 0);
+		fprintf(stderr, "Universe: [ctor] universe serialized\n"); fflush(stderr);
 		ar.setFilter(0);
 		GameLoadManager::instance().finishSub();
 		vMap.serializeRegion(ar);
+		fprintf(stderr, "Universe: [ctor] region serialized\n"); fflush(stderr);
 	}
 
 	GameLoadManager::instance().setProgress(1.f);
@@ -224,6 +256,7 @@ universeObjectAction(0)
 	normalMap->updateRect(0,0,vMap.H_SIZE-1, vMap.V_SIZE-1);
 	windMap->updateRect(0,0,vMap.H_SIZE-1, vMap.V_SIZE-1);
 	pathFinder->updateRect(0,0,vMap.H_SIZE-1, vMap.V_SIZE-1);
+	fprintf(stderr, "Universe: [ctor] normalMap/windMap/pathFinder updated, DONE\n"); fflush(stderr);
 	
 	//-----------------
 
@@ -946,22 +979,32 @@ void Universe::collectWorldSheets()
 
 void Universe::setActivePlayer(int playerID, int cooperativeIndex)
 {
+	// [SurMap5Qt debug] fprintf stage logs (see ctor note) — console
+	// diagnostics for the Qt editor's world load, safe to delete later.
+	fprintf(stderr, "Universe: setActivePlayer(%d, %d) active_player was %p\n", playerID, cooperativeIndex, (void*)active_player_); fflush(stderr);
 	if(activePlayer())
 		activePlayer()->SetDeactivePlayer();
+	fprintf(stderr, "Universe: setActivePlayer deactivated\n"); fflush(stderr);
 
 	active_player_ = findPlayer(playerID);
+	fprintf(stderr, "Universe: setActivePlayer found player %p, setting active\n", (void*)active_player_); fflush(stderr);
 	activePlayer()->setActivePlayer(cooperativeIndex);
+	fprintf(stderr, "Universe: setActivePlayer active set\n"); fflush(stderr);
 
 	UI_Dispatcher::instance().clearTexts();
+	fprintf(stderr, "Universe: setActivePlayer texts cleared\n"); fflush(stderr);
 	UI_LogicDispatcher::instance().disableDirectControl();
+	fprintf(stderr, "Universe: setActivePlayer direct control disabled\n"); fflush(stderr);
 
 	circleManager_->clear();
 	circleManager_->SetLegionColor(active_player_->unitColor());
+	fprintf(stderr, "Universe: setActivePlayer circle done\n"); fflush(stderr);
 
 	if(environment->fogOfWar()){
 		xassert(active_player_->fogOfWarMap() != 0);
 		environment->fogOfWar()->SelectMap(active_player_->fogOfWarMap());
 	}
+	fprintf(stderr, "Universe: setActivePlayer done\n"); fflush(stderr);
 }
 
 void Universe::exportPlayers(PlayerDataVect& playerDataVect) const 

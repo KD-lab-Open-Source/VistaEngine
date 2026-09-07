@@ -266,8 +266,39 @@ bool matchMask(const char* mask, const char* text)
 }
 
 
-float ParameterValue::value () const 
+float ParameterValue::value () const
 {
+	// [SurMap5Qt] Cycle + stack guard: the state_==CALCULATING check only catches
+	// direct self-reference (P1 -> P1). The P1 -> P2 -> P1 cycle walks
+	// the same loop indefinitely and blows the stack — the editor is
+	// killed by STATUS_STACK_OVERFLOW. The thread-local counter caps
+	// the chain length so the cycle returns 0 instead. The cap is
+	// generous (256) so legitimate deep chains are not truncated; the
+	// cycle breaks at the first re-entry. The "first 64 entries" log
+	// surfaces which .prm parameter is the loop so the .prm can be
+	// fixed at the source. Added for the SurMap5Qt editor world load;
+	// if the cyclic .prm formulas get fixed at the source this guard can
+	// be removed.
+	static thread_local int t_depth = 0;
+	static thread_local int t_logged = 0;
+	const int depth = ++t_depth;
+	// Only log actual recursion (depth > 1) and the cycle break — the
+	// ordinary depth=1 resolutions flood the console on every unit
+	// attribute load. A cycle P1->P2->P1 recurses, so the depth>1
+	// filter still shows it.
+	if((depth > 1 && t_logged < 64) || depth > 256){
+		const char* nm = c_str();
+		if(depth > 256)
+			fprintf(stderr, "Parameters: CYCLE break depth=%d name=%s state=%d\n", depth, nm ? nm : "(null)", (int)state_);
+		else
+			fprintf(stderr, "Parameters: value() depth=%d name=%s state=%d\n", depth, nm ? nm : "(null)", (int)state_);
+		fflush(stderr);
+		++t_logged;
+	}
+	if(t_depth > 256){
+		--t_depth;
+		return 0;
+	}
 	switch(state_) {
 	case NOT_CALCULATED:
 		state_ = CALCULATING;
@@ -276,10 +307,12 @@ float ParameterValue::value () const
 			state_ = CALCULATED;
 		}
 	case CALCULATED:
+		--t_depth;
 		return calculated_value_;
 	case CALCULATING:
 	default:
 		xassertStr(0 && "Циклическое обращение к значениям параметров:", c_str());
+		--t_depth;
 		return 0;
 	};
 }

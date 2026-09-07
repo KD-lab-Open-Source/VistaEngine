@@ -18,6 +18,12 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QProcess>
+#include <QTextEdit>
+#include <QDialog>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QFile>
+#include <QTextStream>
 #include <QProgressBar>
 #include <QSettings>
 #include <QStatusBar>
@@ -80,23 +86,31 @@ MainWindow::MainWindow(QWidget* parent)
 		// The render device inits on the viewport's first paint; retry until
 		// ready (world load needs the device). The window is already up by the
 		// time this lambda runs (deferred with 0 ms from the ctor).
-		QTimer::singleShot(0, this, [this, lastWorld]() -> void {
-			auto retry = [this, lastWorld]{
-				if(view_->loadWorld(EditorApplication::instance()->worldsDir(), lastWorld)){
-					applySavedCameraDefault();
-					updateWorldTitle();
-					statusBar()->showMessage(tr("World restored: %1").arg(lastWorld));
-					fprintf(stderr, "[restore] world %s loaded\n", lastWorld.toStdString().c_str());
-				}
+		// VISTA_EDITOR_NO_AUTOLOAD skips this so a Universe ctor bug
+		// (recursive parameter, missing asset) cannot kill the editor at
+		// startup. The user opens the world through File > Open.
+		if(qEnvironmentVariableIsSet("VISTA_EDITOR_NO_AUTOLOAD")){
+			fprintf(stderr, "[restore] auto-reopen skipped (VISTA_EDITOR_NO_AUTOLOAD)\n");
+		}
+		else{
+			QTimer::singleShot(0, this, [this, lastWorld]() -> void {
+				auto retry = [this, lastWorld]{
+					if(view_->loadWorld(EditorApplication::instance()->worldsDir(), lastWorld)){
+						applySavedCameraDefault();
+						updateWorldTitle();
+						statusBar()->showMessage(tr("World restored: %1").arg(lastWorld));
+						fprintf(stderr, "[restore] world %s loaded\n", lastWorld.toStdString().c_str());
+					}
+					else
+						fprintf(stderr, "[restore] world %s FAILED\n", lastWorld.toStdString().c_str());
+					fflush(stderr);
+				};
+				if(view_->isReady())
+					retry();
 				else
-					fprintf(stderr, "[restore] world %s FAILED\n", lastWorld.toStdString().c_str());
-				fflush(stderr);
-			};
-			if(view_->isReady())
-				retry();
-			else
-				QTimer::singleShot(50, this, retry);
-		});
+					QTimer::singleShot(50, this, retry);
+			});
+		}
 	}
 }
 
@@ -408,8 +422,46 @@ void MainWindow::createActions()
 		if(toolsTreePanel_) toolsTreePanel_->saveState();
 		statusBar()->showMessage(tr("Tools Tree saved"), 3000);
 	});
-	connect(actDbgEditZipConfig_, &QAction::triggered, this, [this, stub]{ stub("debug/edit-zipconfig", tr("Edit ZipConfig: not wired yet")); });
-	connect(actDbgEditDebugPrm_, &QAction::triggered, this, [this, stub]{ stub("debug/edit-debugprm", tr("Edit debugPrm: not wired yet")); });
+	connect(actDbgEditZipConfig_, &QAction::triggered, this, [this]{
+	const QString zipConfigPath = QCoreApplication::applicationDirPath() + "/Scripts/Content/ZipConfig";
+	QFile file(zipConfigPath);
+	if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+		statusBar()->showMessage(tr("Could not open ZipConfig: %1").arg(zipConfigPath));
+		return;
+	}
+	QDialog dlg(this);
+	dlg.setWindowTitle(tr("Edit ZipConfig"));
+	QVBoxLayout* layout = new QVBoxLayout(&dlg);
+	QTextEdit* edit = new QTextEdit(&dlg);
+	edit->setPlainText(QString::fromUtf8(file.readAll()));
+	edit->setReadOnly(true);
+	layout->addWidget(edit);
+	QPushButton* closeBtn = new QPushButton(tr("Close"), &dlg);
+	layout->addWidget(closeBtn);
+	connect(closeBtn, &QPushButton::clicked, &dlg, &QDialog::accept);
+	dlg.resize(600, 400);
+	dlg.exec();
+});
+	connect(actDbgEditDebugPrm_, &QAction::triggered, this, [this]{
+	const QString debugPrmPath = QCoreApplication::applicationDirPath() + "/Scripts/TreeControlSetups/Debug.dat";
+	QFile file(debugPrmPath);
+	if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+		statusBar()->showMessage(tr("Could not open DebugPrm: %1").arg(debugPrmPath));
+		return;
+	}
+	QDialog dlg(this);
+	dlg.setWindowTitle(tr("Edit debugPrm"));
+	QVBoxLayout* layout = new QVBoxLayout(&dlg);
+	QTextEdit* edit = new QTextEdit(&dlg);
+	edit->setPlainText(QString::fromUtf8(file.readAll()));
+	edit->setReadOnly(true);
+	layout->addWidget(edit);
+	QPushButton* closeBtn = new QPushButton(tr("Close"), &dlg);
+	layout->addWidget(closeBtn);
+	connect(closeBtn, &QPushButton::clicked, &dlg, &QDialog::accept);
+	dlg.resize(600, 400);
+	dlg.exec();
+});
 	connect(actDbgShowPaletteTexture_, &QAction::toggled, this, &MainWindow::viewTogglePaletteTexture);
 	connect(actDbgShowMipmap_, &QAction::toggled, this, [this](bool on){
 		// The engine's texture library (GetTexLibrary) lives in the render
@@ -650,6 +702,7 @@ void MainWindow::createDockPanels()
 	objectsDock_->setObjectName("objectsDock");
 	objectsDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	objectsTreePanel_ = new ObjectsTreePanel(objectsDock_);
+	objectsTreePanel_->setViewport(view_->viewport());
 	objectsDock_->setWidget(objectsTreePanel_);
 	addDockWidget(Qt::LeftDockWidgetArea, objectsDock_);
 

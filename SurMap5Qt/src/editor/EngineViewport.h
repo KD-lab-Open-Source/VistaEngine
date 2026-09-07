@@ -19,11 +19,15 @@
 
 #include "MapChangeParams.h"
 
+#include <memory>
+
 // Forward declarations only — the full engine headers stay in the .cpp.
 class cInterfaceRenderDevice;
 class cRenderWindow;
 class Camera;
 class cScene;
+class MissionDescription;
+class Universe;
 
 class EngineViewport
 {
@@ -228,6 +232,18 @@ public:
 	bool terrainInfoAt(float x, float y, char* surfName, int surfNameSize,
 	                   int& altVox, int& approxAlt, int& waterZ) const;
 
+	// --- Object list (Objects Manager) ---
+
+	// Tab id for objectList (matches ObjectsManagerTab: 0=sources, 1=environment,
+	// 2=units, 3=cameras, 4=anchors).
+	enum class ObjectTab { Sources = 0, Environment = 1, Units = 2, Cameras = 3, Anchors = 4 };
+
+	// Fill `out` with at most `maxCount` display labels for the given tab of
+	// the objects manager tree. Each label is null-terminated UTF-8 (or
+	// Latin-1, like the original). The strings are heap-allocated; the
+	// caller owns them and should `free()` each. Returns the actual count.
+	int objectList(ObjectTab tab, char** out, int maxCount);
+
 	bool inited() const { return inited_; }
 
 private:
@@ -249,12 +265,23 @@ private:
 	void*                nativeWindow_ = nullptr;
 	cInterfaceRenderDevice* renderDevice_ = nullptr;
 	cRenderWindow*       renderWindow_ = nullptr;
-	cScene*              scene_ = nullptr;
-	Camera*              camera_ = nullptr;
+	cScene*              scene_ = nullptr;     // == terScene once initScene() ran
+	Camera*              camera_ = nullptr;    // == cameraManager->GetCamera() once initScene() ran
 	Orbit                orbit_;
+	// The Universe + MissionDescription the editor built for the current
+	// world (CMainFrame::reInitWorld's `new Universe(mission, ia)`). The
+	// unique_ptr's dtor calls `delete universe()`, which is the original
+	// teardown order (CGeneralView::doneUniverse). Held as members so
+	// reloading a world drops the old one before building the next.
+	std::unique_ptr<Universe> ownedUniverse_;
+	std::unique_ptr<MissionDescription> ownedMission_;
 	bool                 inited_ = false;
 	bool                 worldLoaded_ = false;
 	bool                 gridVisible_ = true;   // surMapOptions.enableGrid_ (U7)
+	// loadAllLibraries() (the SurMap5 initRenderDevice prelude) ran — the
+	// UI_* + attribute libraries are loaded, so the first Universe ctor's
+	// UI_Dispatcher::instance() has its dependencies ready.
+	bool                 librariesLoaded_ = false;
 
 	// Mouse capture state (port of CGeneralView::WindowProc's statics).
 	bool   mouseMiddle_ = false;

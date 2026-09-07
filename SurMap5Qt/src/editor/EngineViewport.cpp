@@ -27,6 +27,24 @@ using namespace std;
 #include "Render/SDLRenderDevice.h"
 #include "Terra/VMAP.H"              // vMap (load/create, H_SIZE/V_SIZE)
 #include "Terra/TerrainType.h"       // TerrainTypeDescriptor (surface names)
+#include "Environment/SourceManager.h"  // sourceManager (sources, anchors)
+#include "Environment/SourceBase.h"     // SourceBase::label()
+#include "Environment/Anchor.h"         // Anchor (Environment owns the type)
+#include "Environment/Environment.h"    // environment (Environment tab data)
+#include "Game/Universe.h"               // universe(), Players, worldPlayer
+#include "Game/Player.h"                 // Player::units(), worldPlayer
+#include "Game/CameraManager.h"          // cameraManager, splines()
+#include "Game/RenderObjects.h"          // initScene/finitScene, terScene, cameraManager
+#include "Network/NetPlayer.h"           // MissionDescription
+#include "Serialization/Dictionary.h"    // TranslationManager (Universe ctor calls GameOptions::setTranslate)
+#include "Serialization/XPrmArchive.h"   // XPrmIArchive (.spg loading)
+#include "Units/UnitAttribute.h"         // AttributeBase (libraryKey/isEnvironment)
+#include "Units/UnitEnvironment.h"       // UnitEnvironment (Environment tab filter)
+#include "Units/EnvironmentSimple.h"    // UnitEnvironmentSimple (Environment tab filter)
+#include "Units/BaseUnit.h"              // UnitBase, UnitList
+#include "Game/GameOptions.h"            // GameOptions::filterBaseGraphOptions (Universe ctor calls it)
+#include "UserInterface/UI_Render.h"     // UI_Render::create (SurMap5/SurMap5.cpp prelude)
+#include "UserInterface/UI_GlobalAttributes.h" // UI_GlobalAttributes (loadAllLibraries dep)
 
 // SDL_Init(SDL_INIT_VIDEO) normally happens in PlatformWindow::create; the Qt
 // editor never calls it (Qt owns the windows), so the GPU device would fail
@@ -50,6 +68,40 @@ void setCameraPosition(Camera* camera, const MatXf& matrix)
 	mr.rot()[1][1] = -1;
 	camera->SetPosition(mr * ml * matrix);
 }
+
+// Heap-allocated SourceManager so the global `sourceManager` is set on
+// construction and cleared on destruction. The Qt editor does not run
+// Game/Universe (VISTA_EDITOR_NO_UNIVERSE), so this is the only place
+// the SourceManager global gets populated. When Universe is enabled,
+// Universe's ctor overwrites the global with its own SourceManager
+// (it deletes the old one on Universe destruction).
+//
+// SourceManager lives outside vMap's universe data: the editor's
+// world.cls does not persist sources, and vMap::load never restores
+// them, so the live list is always empty here. The Objects Manager
+// shows the engine's view, which is "Sources: 0, Anchors: 0" for
+// the Qt editor's world-only load — SurMap5 (MFC) had a separate
+// SourcesSerialization hook in CSurMap5Doc::Serialize that the Qt
+// port does not yet wire.
+struct SourceManagerHolder {
+	SourceManager mgr;
+};
+SourceManagerHolder g_sourceManagerHolder;
+
+// Universe is built directly on the calling thread, exactly as the original
+// SurMap5's CGeneralView::reInitWorld did (`new Universe(*currentMission_, ...)`
+// with no SEH, no worker thread). The recursive parameter-formula cycle in the
+// .prm files is already contained in Units/Parameters.cpp (thread-local depth
+// cap + xassert), so the ctor no longer blows the stack.
+//
+// The one prerequisite is loadAllLibraries() (Units/UnitAttribute.cpp) before
+// the first `new Universe`: Universe::setActivePlayer -> UI_Dispatcher::
+// instance().clearTexts() constructs the UI_Dispatcher singleton, whose ctor
+// deserializes Scripts\Content\UI_Attributes. That deserialization references
+// the other UI_* libraries (UI_SpriteLibrary, UI_FontLibrary, UI_GlobalAttributes,
+// ...) which must already be loaded — loadAllLibraries() loads them in the
+// right order, which is why SurMap5/GeneralView.cpp:135 calls it in
+// initRenderDevice, long before any world load. See init().
 }
 
 EngineViewport::EngineViewport() = default;
@@ -61,10 +113,31 @@ EngineViewport::~EngineViewport()
 
 bool EngineViewport::init(int width, int height)
 {
+	fprintf(stderr, "EngineViewport: [init] enter w=%d h=%d inited=%d\n", width, height, (int)inited_); fflush(stderr);
 	if(inited_)
 		return true;
-	if(!nativeWindow_)
+	if(!nativeWindow_){
+		fprintf(stderr, "EngineViewport: [init] no native window, abort\n"); fflush(stderr);
 		return false;
+	}
+
+	// Universe's ctor (Game/Universe.cpp:185) calls GameOptions::environmentSetup
+	// which reads setTranslate — that walks the localizations directory
+	// ("Scripts\\Engine\\Translations\\<lang>") and ErrH.Abort's when the
+	// directory is empty or missing the per-language folder. The original
+	// SurMap5 (SurMap5/SurMap5.cpp:155) and Configurator/Configurator.cpp:45
+	// both call this trio before any engine work. The editor needs the same
+	// prelude so GameOptions can read its language list.
+	TranslationManager::instance().setTranslationsDir("Scripts\\Engine\\Translations");
+	TranslationManager::instance().setDefaultLanguage("english");
+
+	// UI_Render::create() (SurMap5/SurMap5.cpp:152, before GameOptions and
+	// any library load) instantiates the UI_Render singleton. loadAllLibraries
+	// -> UI_GlobalAttributes::instance() serializes into UI_Render::instance(),
+	// which xassert(self_)s until create() ran. Cheap (one static new), so
+	// this stays in init() even though loadAllLibraries moved to loadWorld.
+	UI_Render::create();
+	TranslationManager::instance().setLanguage("english");
 
 	// SDL_INIT_VIDEO is normally PlatformWindow::create's job; the Qt editor
 	// has no SDL window, so initialize the subsystem the GPU device needs.
@@ -94,18 +167,27 @@ bool EngineViewport::init(int width, int height)
 		return false;
 	gb_RenderDevice->selectRenderWindow(renderWindow_);
 
-	// The scene graph + a camera off it, as initScene() (Game/RenderObjects.cpp)
-	// does. No world is loaded yet — the scene holds the engine's globals and
-	// the camera renders whatever the world load (Phase 3b) will add.
-	scene_ = gb_VisGeneric->CreateScene();
-	if(!scene_)
+	// initScene() (Game/RenderObjects.cpp) creates the engine-wide terScene
+	// + cameraManager. The original SurMap5 called initRenderObjects /
+	// initScene in CGeneralView::initRenderDevice + createScene; the Qt
+	// editor keeps the render device + render window Qt-side, but borrows
+	// terScene + cameraManager because the Game/Universe ctor attaches
+	// tileMap and objects to terScene and reads the editor camera from
+	// cameraManager->GetCamera(). Without this, Universe has nowhere to
+	// put its tile map and the Objects Manager tabs have no unit/spline
+	// containers to walk.
+	if(!terScene)
+		initScene();
+	if(!terScene || !cameraManager)
 		return false;
-	camera_ = scene_->CreateCamera();
+	scene_ = terScene;
+	camera_ = cameraManager->GetCamera();
 	if(!camera_)
 		return false;
 
 	applyCamera();
 	inited_ = true;
+	fprintf(stderr, "EngineViewport: [init] SUCCESS\n"); fflush(stderr);
 	return true;
 }
 
@@ -119,9 +201,11 @@ void EngineViewport::done()
 		if(renderWindow_)
 			gb_RenderDevice->DeleteRenderWindow(renderWindow_);
 	}
-	// Camera is owned by the scene (CreateCamera); releasing the scene drops it.
-	if(scene_)
-		RELEASE(scene_);
+	// terScene and cameraManager are owned by initScene/finitScene — the
+	// editor keeps them across loads so reloading a world reuses the
+	// same scene + camera. (SurMap5/GeneralView.cpp called createScene
+	// once and reInitWorld on every world load.) Drop the references;
+	// the teardown order matches SurMap5/VistaEngineContext.cpp.
 	scene_ = nullptr;
 	camera_ = nullptr;
 	renderWindow_ = nullptr;
@@ -130,25 +214,92 @@ void EngineViewport::done()
 
 bool EngineViewport::loadWorld(const char* worldsDir, const char* worldName)
 {
-	if(!inited_ || !scene_)
+	fprintf(stderr, "EngineViewport: [loadWorld] enter dir=%s name=%s\n", worldsDir, worldName); fflush(stderr);
+	if(!inited_ || !scene_){
+		fprintf(stderr, "EngineViewport: [loadWorld] not inited or no scene, abort\n"); fflush(stderr);
 		return false;
+	}
 
 	doneWorld();
+	fprintf(stderr, "EngineViewport: [loadWorld] doneWorld() ok, calling vMap.load\n"); fflush(stderr);
 
-	// CMainFrame::OnFileOpen: vMap.load(world, true) + reInitWorld (minus the
-	// Universe, which is the Game exe's). vMap::load reads world.cls from
-	// <worldsDir>\<worldName>\ and builds the terrain buffers.
+	// CMainFrame::OnFileOpen: vMap.load(world, true) + reInitWorld. vMap::load
+	// reads world.cls from <worldsDir>\<worldName>\ and builds the terrain
+	// buffers.
 	vMap.setWorldsDir(worldsDir);
-	if(!vMap.load(worldName, /*flag_useTryColorBuffer=*/true))
+	if(!vMap.load(worldName, /*flag_useTryColorBuffer=*/true)){
+		fprintf(stderr, "EngineViewport: [loadWorld] vMap.load FAILED\n"); fflush(stderr);
 		return false;
+	}
+	fprintf(stderr, "EngineViewport: [loadWorld] vMap.load ok, creating Universe\n"); fflush(stderr);
 
-	// Universe's ctor created the terrain tile map: terScene->CreateMap().
-	// cScene::CreateMap uses vMap.H_SIZE/V_SIZE and registers with vMap; the
-	// map becomes the scene's tile map and draws with cScene::Draw.
-	scene_->CreateMap(true);
+	// CGeneralView::reInitWorld (SurMap5/GeneralView.cpp:227) builds the
+	// game state on top of vMap: MissionDescription (loaded from
+	// <worldsDir>\<worldName>.spg if present, else empty), then
+	// `new Universe(mission, ia)`. Universe owns the terScene's tile map,
+	// the sourceManager, the cameraManager's splines and the Players
+	// (Units live there). The Objects Manager walks all of these.
+	//
+	// loadAllLibraries() (Units/UnitAttribute.cpp) — the SurMap5
+	// initRenderDevice prelude (GeneralView.cpp:135), run once before any
+	// world load. Universe::setActivePlayer constructs the UI_Dispatcher
+	// singleton on first use; its ctor deserializes Scripts\Content\
+	// UI_Attributes, which references the UI_* libraries that
+	// loadAllLibraries loads first. Without the prelude that
+	// deserialization faults. Deliberately NOT in init(): init() runs from
+	// RenderViewWidget::paintEvent, and a heavy library load there dies
+	// with STATUS_FATAL_USER_CALLBACK_EXCEPTION; loadWorld runs from a
+	// normal event (File > Open, restore timer), the same context the
+	// original MFC editor used.
+	//
+	// VISTA_EDITOR_NO_UNIVERSE skips the Universe build: the Qt editor
+	// can still show the terrain and the user can pick a world to open
+	// without the recursive ParameterValue in Units/Parameters.cpp:282
+	// killing the editor on a .prm file with a cyclic formula. The
+	// Objects Manager falls back to sourceManager-only data (Sources,
+	// Anchors).
+	if(!getenv("VISTA_EDITOR_NO_UNIVERSE")){
+		if(!librariesLoaded_){
+			fprintf(stderr, "EngineViewport: [loadWorld] loadAllLibraries...\n"); fflush(stderr);
+			try{
+				loadAllLibraries();
+				librariesLoaded_ = true;
+				fprintf(stderr, "EngineViewport: [loadWorld] loadAllLibraries done\n"); fflush(stderr);
+			}
+			catch(const std::exception& e){
+				fprintf(stderr, "EngineViewport: [loadWorld] loadAllLibraries threw: %s\n", e.what()); fflush(stderr);
+			}
+			catch(...){
+				fprintf(stderr, "EngineViewport: [loadWorld] loadAllLibraries threw (non-std)\n"); fflush(stderr);
+			}
+		}
+		MissionDescription* mission = new MissionDescription();
+		mission->setByWorldName(worldName);
 
-	// reInitWorld's camera reset: centre the orbit on the map, then let the
-	// camera keep its height (createScene used the map centre too).
+		std::string spgPath = std::string(worldsDir) + "\\" + worldName + ".spg";
+		XPrmIArchive ia;
+		const bool haveMission = ia.open(spgPath.c_str());
+		if(haveMission){
+			*mission = MissionDescription(spgPath.c_str());
+		}
+
+		// The editor's Universe: an empty mission (no player buildings, no
+		// mission units) is enough to populate sourceManager, the camera
+		// splines saved in <world>.spg.bin and the world's anchor list.
+		// Environment ctor runs without a mission's water/fog/temperature
+		// flags and falls back to defaults — the Qt editor never invokes
+		// Environment::graphQuant, so its render state does not need to
+		// match the original Game's. The recursive ParameterValue cycle is
+		// contained in Units/Parameters.cpp (thread-local depth cap).
+		Universe* uni = new Universe(*mission, haveMission ? &ia : 0);
+		ownedMission_.reset(mission);
+		ownedUniverse_.reset(uni);
+		if(!isUnderEditor())
+			uni->relaxLoading();
+	}
+
+	// reInitWorld's camera reset: centre the orbit on the map, then let
+	// the camera keep its height (createScene used the map centre too).
 	orbit_.px = vMap.H_SIZE * 0.5f;
 	orbit_.py = vMap.V_SIZE * 0.5f;
 	orbit_.pz = 256.0f;
@@ -169,25 +320,32 @@ bool EngineViewport::loadWorld(const char* worldsDir, const char* worldName)
 	        rayDirection.x, rayDirection.y, rayDirection.z);
 
 	worldLoaded_ = true;
+	fprintf(stderr, "EngineViewport: [loadWorld] SUCCESS world=%s\n", worldName); fflush(stderr);
 	return true;
 }
 
 void EngineViewport::doneWorld()
 {
-	if(!worldLoaded_)
+	fprintf(stderr, "EngineViewport: [doneWorld] enter worldLoaded=%d\n", (int)worldLoaded_); fflush(stderr);
+	if(!worldLoaded_){
+		fprintf(stderr, "EngineViewport: [doneWorld] nothing to do\n"); fflush(stderr);
 		return;
+	}
 
-	// doneScene's tile map release: cScene::~cScene releases tileMap_, and
-	// cTileMap unregisters from vMap. Drop the whole scene and rebuild it —
-	// the camera is owned by the scene, so it comes back too.
-	if(scene_)
-		RELEASE(scene_);
-	scene_ = gb_VisGeneric->CreateScene();
-	camera_ = scene_ ? scene_->CreateCamera() : nullptr;
+	// Universe dtor releases the tile map (RELEASE(tileMap)) and clears
+	// the engine globals (sourceManager, environment, cameraManager
+	// splines, Players, pathFinder, soundEnvironmentManager_). The
+	// scene + camera stay — they belong to initScene / cameraManager,
+	// reused across world loads.
+	if(ownedUniverse_){
+		ownedUniverse_.reset();
+	}
+	ownedMission_.reset();
 
 	vMap.releaseWorld();
 	worldLoaded_ = false;
 	applyCamera();
+	fprintf(stderr, "EngineViewport: [doneWorld] done\n"); fflush(stderr);
 }
 
 bool EngineViewport::createWorld(const char* worldsDir, const char* worldName)
@@ -217,6 +375,35 @@ bool EngineViewport::createWorld(const char* worldsDir, const char* worldName)
 	::CreateDirectory(worldDir.c_str(), 0);
 
 	vMap.save(worldName);
+
+	// Same Universe bootstrap as loadWorld, but without an .spg: a fresh
+	// world has no mission script, so the Universe runs with an empty
+	// MissionDescription and ia = 0 (the Universe ctor's `if(!ia)
+	// environment->loadPreset()` branch — no .spg = no world objects).
+	// VISTA_EDITOR_NO_UNIVERSE skips this, see loadWorld.
+	if(!getenv("VISTA_EDITOR_NO_UNIVERSE")){
+		if(!librariesLoaded_){
+			fprintf(stderr, "EngineViewport: [createWorld] loadAllLibraries...\n"); fflush(stderr);
+			try{
+				loadAllLibraries();
+				librariesLoaded_ = true;
+				fprintf(stderr, "EngineViewport: [createWorld] loadAllLibraries done\n"); fflush(stderr);
+			}
+			catch(const std::exception& e){
+				fprintf(stderr, "EngineViewport: [createWorld] loadAllLibraries threw: %s\n", e.what()); fflush(stderr);
+			}
+			catch(...){
+				fprintf(stderr, "EngineViewport: [createWorld] loadAllLibraries threw (non-std)\n"); fflush(stderr);
+			}
+		}
+		MissionDescription* mission = new MissionDescription();
+		mission->setByWorldName(worldName);
+		Universe* uni = new Universe(*mission, 0);
+		ownedMission_.reset(mission);
+		ownedUniverse_.reset(uni);
+		if(!isUnderEditor())
+			uni->relaxLoading();
+	}
 
 	// Same terrain setup as loadWorld.
 	scene_->CreateMap(true);
@@ -864,4 +1051,144 @@ bool EngineViewport::terrainInfoAt(float x, float y, char* surfName, int surfNam
 	approxAlt = vMap.getApproxAlt(xi, yi);
 	waterZ = 0;   // no Environment in the Qt editor yet
 	return true;
+}
+// --- Object list (Objects Manager) ---
+
+// Mirrors CObjectsManagerTree::rebuild (SurMap5/ObjectsManagerTree.cpp:78).
+// Each tab walks the engine's live container: sourceManager for Sources
+// and Anchors, universe()->worldPlayer()->units_ filtered by attribute
+// for Environment/Units, cameraManager->splines() for Cameras.
+int EngineViewport::objectList(ObjectTab tab, char** out, int maxCount)
+{
+	if(!out || maxCount <= 0)
+		return 0;
+	if(!sourceManager)
+		return 0;
+
+	if(tab == ObjectTab::Sources){
+		// TAB_SOURCES — flushNewSources, then walk getTypeSources per type
+		// and emit "<DisplayName(type)> #N - <label>". The original
+		// grouped by SourceType (LightSource, WaterSource, ...); here
+		// we keep a flat list but still prefix with the type so the
+		// editor stays compatible with the per-type display names.
+		sourceManager->flushNewSources();
+		int n = 0;
+		for(int typeIdx = 0; typeIdx < SOURCE_MAX && n < maxCount; ++typeIdx){
+			const SourceType type = (SourceType)typeIdx;
+			SourceManager::Sources byType;
+			sourceManager->getTypeSources(type, byType);
+			const std::string typeName = SourceBase::getDisplayName(type);
+			int index = 0;
+			for(int i = 0; i < (int)byType.size() && n < maxCount; ++i){
+				SourceBase* src = byType[i].get();
+				if(!src || !src->isAlive())
+					continue;
+				const char* label = src->label();
+				char buf[256];
+				if(label && *label)
+					snprintf(buf, sizeof(buf), "%s #%d - %s", typeName.c_str(), index++, label);
+				else
+					snprintf(buf, sizeof(buf), "%s #%d", typeName.c_str(), index++);
+				out[n++] = strdup(buf);
+			}
+		}
+		return n;
+	}
+	if(tab == ObjectTab::Anchors){
+		// TAB_ANCHORS — sourceManager->anchors() filtered by visibility
+		// (the on-mouse anchor is hidden in the original).
+		const SourceManager::Anchors& anchors = sourceManager->anchors();
+		int n = 0;
+		int index = 0;
+		for(; n < maxCount && index < (int)anchors.size(); ++index){
+			Anchor* a = anchors[index].get();
+			if(!a)
+				continue;
+			const char* label = a->label();
+			char buf[256];
+			snprintf(buf, sizeof(buf), "Anchor #%d - %s", n, label ? label : "");
+			out[n++] = strdup(buf);
+		}
+		return n;
+	}
+	if(tab == ObjectTab::Cameras){
+		// TAB_CAMERA — cameraManager->splines(). CameraSpline::name()
+		// is the splines's display label.
+		if(!cameraManager)
+			return 0;
+		const CameraSplines& splines = cameraManager->splines();
+		int n = 0;
+		for(int i = 0; i < (int)splines.size() && n < maxCount; ++i){
+			ShareHandle<CameraSpline> sp = splines[i];
+			if(!sp)
+				continue;
+			const char* name = sp->name();
+			char buf[256];
+			snprintf(buf, sizeof(buf), "Camera #%d - %s", n, (name && *name) ? name : "(unnamed)");
+			out[n++] = strdup(buf);
+		}
+		return n;
+	}
+
+	// Environment and Units: walk universe()->Players[i]->units_() —
+	// the original did the same (SurMap5/ObjectsManagerTree.cpp:107-141).
+	if(!universe())
+		return 0;
+
+	if(tab == ObjectTab::Environment){
+		// TAB_ENVIRONMENT — only UnitEnvironment / UnitEnvironmentSimple
+		// units (the original dynamic_cast-filtered the world's units
+		// by these two types). modelName() is the asset path; the
+		// dialog shows the basename.
+		Player* wp = universe()->worldPlayer();
+		if(!wp)
+			return 0;
+		UnitList& units = const_cast<UnitList&>(wp->units());
+		int n = 0;
+		for(int i = 0; i < (int)units.size() && n < maxCount; ++i){
+			UnitBase*& unit = units[i].unit();
+			if(!unit || unit->auxiliary() || !unit->alive())
+				continue;
+			UnitEnvironment* uenv = dynamic_cast<UnitEnvironment*>(unit);
+			UnitEnvironmentSimple* uenvs = uenv ? nullptr : dynamic_cast<UnitEnvironmentSimple*>(unit);
+			if(!uenv && !uenvs)
+				continue;
+			const char* model = uenv ? uenv->modelName() : uenvs->modelName();
+			std::string name = model ? model : "";
+			const auto pos = name.rfind('\\');
+			if(pos != std::string::npos)
+				name = name.substr(pos + 1);
+			char buf[256];
+			snprintf(buf, sizeof(buf), "Environment #%d - %s", n, name.c_str());
+			out[n++] = strdup(buf);
+		}
+		return n;
+	}
+	if(tab == ObjectTab::Units){
+		// TAB_UNITS — every non-internal, non-auxiliary, alive unit
+		// across all Players. attr().libraryKey() is the unit's
+		// display label (the same string the original used).
+		const PlayerVect& players = universe()->Players;
+		int n = 0;
+		for(int p = 0; p < (int)players.size() && n < maxCount; ++p){
+			Player* player = players[p];
+			if(!player)
+				continue;
+			UnitList& units = const_cast<UnitList&>(player->units());
+			for(int i = 0; i < (int)units.size() && n < maxCount; ++i){
+				UnitBase*& unit = units[i].unit();
+				if(!unit)
+					continue;
+				if(unit->attr().internal || unit->auxiliary() || !unit->alive())
+					continue;
+				const char* key = unit->attr().libraryKey();
+				char buf[256];
+				snprintf(buf, sizeof(buf), "Unit #%d - %s", n, key ? key : "(no key)");
+				out[n++] = strdup(buf);
+			}
+		}
+		return n;
+	}
+
+	return 0;
 }

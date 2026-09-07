@@ -22,6 +22,10 @@ class ObjectsTreePanel : public QWidget
 public:
 	explicit ObjectsTreePanel(QWidget* parent = nullptr);
 
+	// Wire the engine side (the only Qt-side object the panel reaches into:
+	// EngineViewport's objectList). MainWindow sets this in createDockPanels.
+	void setViewport(class EngineViewport* viewport) { viewport_ = viewport; }
+
 	// Clear and repopulate from the current world (CObjectsManagerWindow
 	// rebuilt the tree on onWorldChanged). No world objects yet — each tab's
 	// tree shows the type group, ready for objects.
@@ -42,5 +46,6 @@ private:
 	// The tree of the active tab.
 	QTreeWidget* currentTree() const;
 
+	EngineViewport* viewport_ = nullptr;
 	QTabWidget* tabs_ = nullptr;
 };

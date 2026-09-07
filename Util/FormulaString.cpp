@@ -60,18 +60,45 @@ public:
 private:
 	void skipSpace() { while(*p_ && isspace((unsigned char)*p_)) ++p_; }
 
+	// [SurMap5Qt] Cycle/stack guard: a recursive ParameterValue chain can blow the
+	// stack long before Calculator::parse unwinds. The counter caps
+	// the expression() depth; the cycle breaks at 512 nested calls and
+	// returns 0 (the original Parameters.cpp:282 already returns 0 on
+	// a self-cycle — the same value is fine for a P1 -> P2 -> P1
+	// cycle where neither ParameterValue detects it). Added for the
+	// SurMap5Qt editor world load; delete together with the guard in
+	// Units/Parameters.cpp when the cyclic .prm formulas are fixed.
+	int& depthCounter()
+	{
+		static thread_local int t_depth = 0;
+		return t_depth;
+	}
+
 	float expression()
 	{
+		int& depth = depthCounter();
+		++depth;
+		if(depth > 512){
+			--depth;
+			return 0.f;
+		}
+		if(depth == 50 || depth == 100 || depth == 200 || depth == 300 || depth == 500){
+			fprintf(stderr, "FormulaString: expression() depth=%d near '%.40s'\n", depth, p_);
+		}
 		float value = term();
 		for(;;){
 			skipSpace();
 			char op = *p_;
-			if(op != '+' && op != '-')
+			if(op != '+' && op != '-'){
+				--depth;
 				return value;
+			}
 			const char* op_pos = p_++;
 			float rhs = term();
-			if(syntax_error_)
+			if(syntax_error_){
+				--depth;
 				return 0.f;
+			}
 			op_func_(op_pos, op_pos + 1);
 			value = op == '+' ? value + rhs : value - rhs;
 		}

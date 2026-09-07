@@ -54,8 +54,18 @@ GameData/
 /*-err.txt
 /*-out.txt
 /*.png
+/*.err
+/*.out
+# SurMap5Qt run artifacts (engine's iniFile.cfg is written next to the exe/cwd)
+/iniFile.cfg
 /XLibs.Net/**/Garbage/
 /XLibs.Net/**/.garbage/
+# Third-party leftovers that MSVC/git tools unpack into the tree (debug/ helper
+# headers of boost/preprocessor, boost/spirit, STLPort/stlport and XLibs.Net/stl).
+/XLibs.Net/**/debug/
+# The .slnx MSVC generates next to the .sln when the solution is opened in VS 18.
+/VistaEngine.slnx
+/Perimeter2.slnx
 # Editor-generated test worlds (SurMap5Qt --selftest writes here)
 /Worlds
 /XLibs.Net/FreeType/objs/debug/*.obj

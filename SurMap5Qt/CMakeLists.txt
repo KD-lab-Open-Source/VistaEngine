@@ -38,6 +38,45 @@ add_library(EditorEngine STATIC
     src/editor/EngineViewport.cpp
     src/editor/WorldList.h
     src/editor/WorldList.cpp
+    # Editor-side engine stubs: isUnderEditor() / applicationHasFocus() /
+    # updateResolution() — the same hooks SurMap5/VistaEngineContext.cpp
+    # defined. Without this, the engine links fail (every TU that
+    # references isUnderEditor() needs a definition).
+    src/stubs/VistaEngineContext.cpp
+    # The Game module is built as an executable in the main build (see
+    # Game/CMakeLists.txt), but the Qt editor's Objects Manager needs
+    # Universe/CameraManager/Player/etc. for the real object list. The
+    # original SurMap5 linked the same Game sources into the editor exe
+    # (the editor IS one of the Game builds in the old vcproj). We follow
+    # the same pattern: pull the Game sources into EditorEngine, minus
+    # PlatformStub.cpp (main) / TriggerEditorStub.cpp / WindowsAPI.cpp
+    # which are not relevant here.
+    ${CMAKE_SOURCE_DIR}/Game/GameContext.cpp
+    ${CMAKE_SOURCE_DIR}/Game/Runtime.cpp
+    ${CMAKE_SOURCE_DIR}/Game/StdAfx.cpp
+    ${CMAKE_SOURCE_DIR}/Game/Actions.cpp
+    ${CMAKE_SOURCE_DIR}/Game/CameraManager.cpp
+    ${CMAKE_SOURCE_DIR}/Game/CheatManager.cpp
+    ${CMAKE_SOURCE_DIR}/Game/Conditions.cpp
+    ${CMAKE_SOURCE_DIR}/Game/GameOptions.cpp
+    ${CMAKE_SOURCE_DIR}/Game/GameOptionsSerialization.cpp
+    ${CMAKE_SOURCE_DIR}/Game/IniFile.cpp
+    ${CMAKE_SOURCE_DIR}/Game/MissionDescription.cpp
+    ${CMAKE_SOURCE_DIR}/Game/Player.cpp
+    ${CMAKE_SOURCE_DIR}/Game/PlayerStatistics.cpp
+    ${CMAKE_SOURCE_DIR}/Game/RenderObjects.cpp
+    ${CMAKE_SOURCE_DIR}/Game/ShowHead.cpp
+    ${CMAKE_SOURCE_DIR}/Game/SoundApp.cpp
+    ${CMAKE_SOURCE_DIR}/Game/SoundTrack.cpp
+    ${CMAKE_SOURCE_DIR}/Game/StreamCommand.cpp
+    ${CMAKE_SOURCE_DIR}/Game/TransparentTracking.cpp
+    ${CMAKE_SOURCE_DIR}/Game/Universe.cpp
+    ${CMAKE_SOURCE_DIR}/TriggerEditor/TriggerExport.cpp
+    # TriggerEditorStub.cpp provides the empty TriggerEditor symbols the
+    # editor needs (Game/Universe.cpp + UserInterface/GameShell.cpp both
+    # reference TriggerEditor::TriggerEditor / TriggerEditor::edit). The
+    # full TriggerEditor is a kdw-based MFC dialog not built here.
+    ${CMAKE_SOURCE_DIR}/TriggerEditor/TriggerEditorStub.cpp
 )
 # EngineIncludes brings the engine's include roots and (on Windows)
 # _HAS_STD_BYTE=0 + /FIwindows.h — exactly what engine headers expect.
@@ -88,6 +127,11 @@ target_link_libraries(EditorEngine PRIVATE
     Render
     SDL3::SDL3
 )
+
+if(WIN32)
+    # Runtime.cpp uses comctl32's underscored TrackMouseEvent.
+    target_link_libraries(EditorEngine PRIVATE comctl32)
+endif()
 
 add_executable(SurMap5Qt
     src/main.cpp

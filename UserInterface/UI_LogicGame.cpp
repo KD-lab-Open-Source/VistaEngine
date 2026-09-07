@@ -1626,6 +1626,14 @@ void UI_LogicDispatcher::toggleBuildingInstaller(const AttributeBase* attr)
 
 void UI_LogicDispatcher::disableDirectControl()
 {
+	// [SurMap5Qt] The map editor has no GameShell (gameShell is created by the
+	// game's createRuntime/WinMain, never by SurMap5/SurMap5Qt). Universe::
+	// setActivePlayer calls this on world load; guard so the editor does not
+	// null-deref. When the game runs, gameShell exists here and the guard is a
+	// no-op. SurMap5Qt-only safety; can be removed if the editor stops building
+	// a Universe (or starts creating a GameShell).
+	if(!gameShell)
+		return;
 	if(gameShell->directControl())
 		selectManager->makeCommand(UnitCommand(COMMAND_ID_DIRECT_CONTROL, false));
 }

@@ -2,6 +2,7 @@
 
 #include "ObjectsTreePanel.h"
 
+#include "editor/EngineViewport.h"   // EngineViewport::ObjectTab (objects tree)
 #include <QContextMenuEvent>
 #include <QHeaderView>
 #include <QMenu>
@@ -9,6 +10,9 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QVBoxLayout>
+// vMap is engine-side; the Qt side reads world state via EngineViewport
+// (worldLoaded() is the only public probe for now). The integration of
+// object lists lands with the engine-side object bridge.
 
 ObjectsTreePanel::ObjectsTreePanel(QWidget* parent)
 	: QWidget(parent)
@@ -50,16 +54,49 @@ int ObjectsTreePanel::currentTab() const
 
 void ObjectsTreePanel::rebuild()
 {
-	// CObjectsManagerWindow's tree groups (WorldTreeObjects.h: units, sources,
-	// environment objects, anchors, cameras). Empty until a world contributes
-	// objects; the group row keeps each tab stable across world loads.
-	for(int t = 0; t < tabs_->count(); ++t){
-		auto* tree = qobject_cast<QTreeWidget*>(tabs_->widget(t));
+	// Map tab index to EngineViewport::ObjectTab (matches
+	// CObjectsManagerTree::setTab's TAB_* enum).
+	static const EngineViewport::ObjectTab kTabs[] = {
+		EngineViewport::ObjectTab::Sources,
+		EngineViewport::ObjectTab::Environment,
+		EngineViewport::ObjectTab::Units,
+		EngineViewport::ObjectTab::Cameras,
+		EngineViewport::ObjectTab::Anchors,
+	};
+
+	// CObjectsManagerTree::rebuild rebuilt from the world's object list
+	// (Sources, Environment, Units, Cameras, Anchors). The Qt editor asks
+	// the engine side (EngineViewport::objectList) for the current world's
+	// labels per tab; no world loaded = empty trees.
+	for(int i = 0; i < tabs_->count(); ++i){
+		QTreeWidget* tree = qobject_cast<QTreeWidget*>(tabs_->widget(i));
+		if(!tree) continue;
 		tree->clear();
-		auto* group = new QTreeWidgetItem(tree);
-		group->setText(0, tabs_->tabText(t));
-		group->setData(0, Qt::UserRole, QString());   // empty = group row
-		group->setExpanded(true);
+
+		if(!viewport_)
+			continue;
+
+		// Ask the engine for this tab's labels. CObjectsManagerTree used
+		// "<prefix> #N - <label>" with N running across types (Sources),
+		// or per-name (Cameras/Anchors). Without a real list we only show
+		// the type group; the engine-side object bridge will fill this in
+		// when the editor links Universe.
+		enum { kMaxLabels = 1024 };
+		char* labels[kMaxLabels] = {};
+		const int count = viewport_->objectList(kTabs[i], labels, kMaxLabels);
+		if(count == 0){
+			// No live objects yet — show the type group so the panel is
+			// not empty.
+			QTreeWidgetItem* root = new QTreeWidgetItem(tree);
+			root->setText(0, tabs_->tabText(i));
+		}
+		else{
+			for(int j = 0; j < count; ++j){
+				QTreeWidgetItem* item = new QTreeWidgetItem(tree);
+				item->setText(0, QString::fromUtf8(labels[j]));
+				free(labels[j]);
+			}
+		}
 	}
 }
 
