@@ -70,6 +70,15 @@ cLib3dx::cLib3dx()
 	if(ia.open(cacheInfo.c_str()))
 		serialize(ia);
 
+	// [SurMap5Qt] Cross-platform port runs against the shipped, frozen mesh
+	// cache (CacheData\Models\*.3dxG); the original source .3dx files are not
+	// bundled (only a few TerTools craters are raw). The file-time validation
+	// in LoadCache (CacheData::valid(): meshTime_/furTime_/meshSize_ vs the
+	// missing source) would reject every perfectly good cached model, exactly
+	// the problem cTexLibrary already solves the same way. Treat the cache as
+	// exported so cached models load without the source-time check.
+	exported_ = true;
+
 	kdw::getAllTextureNamesFunc = GetAllTextureNames;
 }
 

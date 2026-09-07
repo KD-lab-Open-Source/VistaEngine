@@ -61,6 +61,10 @@ public:
 	explicit RenderViewWidget(QWidget* parent = nullptr);
 	~RenderViewWidget() override;
 
+	// The world-object selection changed (Select tool click/box, or a delete).
+	// MainWindow connects it to the Objects Manager + property panels.
+	Q_SIGNAL void selectionChanged();
+
 	// Engine-side device init (Phase 2). Called once the widget has a native
 	// window handle (winId()).
 	bool initRenderDevice();
@@ -145,6 +149,16 @@ public:
 	// Grid visibility (surMapOptions.enableGrid_): gates the viewport's grid.
 	void setGridVisible(bool visible);
 	bool gridVisible() const;
+
+	// --- Object selection (SelectionUtil ports; forward to the viewport) ---
+	// Select the topmost unit under the pixel (mode 0 = replace, 1 = toggle,
+	// 2 = add). Box-select every unit inside the pixel rect. Delete the
+	// selected units. Each returns true when something changed; selection
+	// signals are emitted by the caller (mouse handlers).
+	bool selectObjectAt(int screenX, int screenY, int mode);
+	bool selectObjectsInRect(int x0, int y0, int x1, int y1);
+	void deleteSelectedObjects();
+	int selectedObjectsCount();
 
 	// The last world point the mouse hovered (worldAt of the most recent
 	// mouse move), for the status bar's X/Y/Alt panes. Returns false until the

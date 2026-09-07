@@ -66,6 +66,14 @@ MainWindow::MainWindow(QWidget* parent)
 	createMenus();      // QMenuBar (CExtMenuControlBar)
 	createStatusBar();  // QStatusBar with progress pane (CExtStatusControlBar)
 
+	// The 3D view's selection changed (Select tool click/box, Delete key):
+	// refresh the Objects Manager tree (the original CMainFrame listened to
+	// signalSelectionChanged -> ObjectsManagerTree::rebuild).
+	connect(view_, &RenderViewWidget::selectionChanged, this, [this]{
+		if(objectsTreePanel_)
+			objectsTreePanel_->rebuild();
+	});
+
 	// Phase 7: restore the dock/toolbar layout the last run saved (CExtControlBar::
 	// ProfileBarStateSerialize on exit -> surMapOptions.dlgBarState). Qt keeps the
 	// equivalent state in QSettings; restoreState must come after every dock and

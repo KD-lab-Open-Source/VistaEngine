@@ -3,6 +3,7 @@
 #include "ObjectsTreePanel.h"
 
 #include "editor/EngineViewport.h"   // EngineViewport::ObjectTab (objects tree)
+#include <cstdio>
 #include <QContextMenuEvent>
 #include <QHeaderView>
 #include <QMenu>

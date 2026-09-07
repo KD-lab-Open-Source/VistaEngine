@@ -45,6 +45,7 @@ using namespace std;
 #include "Game/GameOptions.h"            // GameOptions::filterBaseGraphOptions (Universe ctor calls it)
 #include "UserInterface/UI_Render.h"     // UI_Render::create (SurMap5/SurMap5.cpp prelude)
 #include "UserInterface/UI_GlobalAttributes.h" // UI_GlobalAttributes (loadAllLibraries dep)
+#include "Util/EffectContainer.h"        // EffectContainer::setTexturesPath (effect texture root)
 
 // SDL_Init(SDL_INIT_VIDEO) normally happens in PlatformWindow::create; the Qt
 // editor never calls it (Qt owns the windows), so the GPU device would fail
@@ -161,6 +162,28 @@ bool EngineViewport::init(int width, int height)
 	if(!gb_RenderDevice->inited() &&
 	   !gb_RenderDevice->Initialize(width, height, RENDERDEVICE_MODE_WINDOW, nullptr, 0, nullptr))
 		return false;
+
+	// [SurMap5Qt] The shipped content is cache-only: world models exist as
+	// CacheData\Models\*.3dxG and textures as CacheData\Textures\*, with no
+	// raw Resource\TerrainData\Models\*.3dx beside them. The original editor
+	// enabled both caches in CGeneralView::initRenderDevice through
+	// initRenderObjects (Game/RenderObjects.cpp:70); the Qt port only calls
+	// initScene(), so Option_UseMeshCache stays false and cLib3dx::GetElement
+	// tries to open the missing raw .3dx — every environment/unit model fails,
+	// the units Kill() themselves at load and never reach the Objects Manager.
+	gb_VisGeneric->SetUseMeshCache(true);
+	gb_VisGeneric->SetUseTextureCache(true);
+	gb_VisGeneric->SetFavoriteLoadDDS(true);
+
+	// [SurMap5Qt] CSurMap5App::InitInstance set the effect texture root
+	// (SurMap5/SurMap5.cpp:166) before any world load. Effect files in
+	// Resource\FX name their frame textures relative to that root; without it
+	// EffectContainer::getEffect passes no texture path, the library looks the
+	// textures up as bare names, and the complex-texture path
+	// (cTexLibrary::GetElement3DComplex) throws std::out_of_range on a name
+	// that has no '\' separator. Must run before the first effect key loads
+	// (unit setPose -> startPermanentEffects during .spg load).
+	EffectContainer::setTexturesPath("Resource\\FX\\Textures");
 
 	renderWindow_ = gb_RenderDevice->createRenderWindow((HWND)nativeWindow_);
 	if(!renderWindow_)
@@ -1191,4 +1214,181 @@ int EngineViewport::objectList(ObjectTab tab, char** out, int maxCount)
 	}
 
 	return 0;
+}
+
+// --- Object selection (SurMap5/SelectionUtil.cpp) ---
+
+int EngineViewport::objectCount(ObjectTab tab)
+{
+	// Cheap count-only walk: reuse objectList with a sink.
+	int count = 0;
+	auto consume = [](char** out, int maxCount){
+		for(int i = 0; i < maxCount; ++i){
+			if(!out[i])
+				break;
+			free(out[i]);
+		}
+	};
+	char* labels[64] = {};
+	int n = 0;
+	do {
+		n = objectList(tab, labels, 64);
+		consume(labels, n);
+		count += n;
+	} while(n == 64);
+	return count;
+}
+
+int EngineViewport::selectedObjectsCount()
+{
+	if(!ownedUniverse_ || !sourceManager)
+		return 0;
+	int count = 0;
+	PlayerVect::const_iterator pi;
+	FOR_EACH(universe()->Players, pi){
+		const UnitList& units = (*pi)->units();
+		UnitList::const_iterator it;
+		FOR_EACH(units, it){
+			UnitBase* unit = *it;
+			if(unit && !unit->auxiliary() && unit->alive() && unit->selected())
+				++count;
+		}
+	}
+	return count;
+}
+
+void EngineViewport::deselectAllObjects()
+{
+	if(!ownedUniverse_ || !sourceManager)
+		return;
+	sourceManager->deselectAll();
+	universe()->deselectAll();
+	if(cameraManager){
+		CameraSplines::const_iterator it;
+		FOR_EACH(cameraManager->splines(), it)
+			(*it)->setSelected(false);
+	}
+}
+
+bool EngineViewport::selectObjectAt(int screenX, int screenY, int mode)
+{
+	if(!inited_ || !camera_ || !ownedUniverse_ || !gb_RenderDevice || !worldLoaded_)
+		return false;
+
+	const int w = gb_RenderDevice->GetSizeX();
+	const int h = gb_RenderDevice->GetSizeY();
+	if(w <= 0 || h <= 0)
+		return false;
+
+	const Vect2f posIn((float)screenX / (float)w - 0.5f, (float)screenY / (float)h - 0.5f);
+
+	// Re-apply the frustum (see screenPointToGround) then unproject the ray.
+	const Vect2f center(0.5f, 0.5f);
+	const sRectangle4f clip(-0.5f, -0.5f, 0.5f, 0.5f);
+	const Vect2f focus(orbit_.focus, orbit_.focus);
+	const Vect2f zPlane(30.0f, std::max(12000.0f, orbit_.distance * 3.0f));
+	camera_->SetFrustum(&center, &clip, &focus, &zPlane);
+
+	Vect3f v0, dir;
+	camera_->GetWorldRay(posIn, v0, dir);
+	const Vect3f v1 = v0 + dir * 50000.0f;
+	const Vect3f v01 = v1 - v0;
+
+	// unitHoverAll: the nearest alive non-auxiliary unit whose intersect() the
+	// ray hits, measured by distance to the ray origin.
+	float distMin = FLT_MAX;
+	UnitBase* unitMin = 0;
+	PlayerVect::const_iterator pi;
+	FOR_EACH(universe()->Players, pi){
+		const UnitList& units = (*pi)->units();
+		UnitList::const_iterator it;
+		FOR_EACH(units, it){
+			UnitBase* unit = *it;
+			Vect3f hit;
+			if(unit && !unit->auxiliary() && unit->alive() && unit->intersect(v0, v1, hit)){
+				const float d = unit->position().distance2(v0);
+				if(d < distMin){
+					distMin = d;
+					unitMin = unit;
+				}
+			}
+		}
+	}
+	(void)v01;
+	if(!unitMin)
+		return false;
+
+	// CSurToolSelect::onLMBUp: shift = add, ctrl = toggle, plain = replace.
+	if(mode == 1){            // toggle (ctrl)
+		unitMin->setSelected(!unitMin->selected());
+	}
+	else if(mode == 2){       // add (shift)
+		if(!unitMin->selected())
+			unitMin->setSelected(true);
+	}
+	else{                     // replace
+		deselectAllObjects();
+		unitMin->setSelected(true);
+	}
+	return true;
+}
+
+bool EngineViewport::selectObjectsInRect(int x0, int y0, int x1, int y1)
+{
+	if(!ownedUniverse_ || !gb_RenderDevice || !worldLoaded_)
+		return false;
+	if(x0 > x1) std::swap(x0, x1);
+	if(y0 > y1) std::swap(y0, y1);
+
+	const float width = (float)gb_RenderDevice->GetSizeX();
+	const float height = (float)gb_RenderDevice->GetSizeY();
+	if(width <= 0.f || height <= 0.f)
+		return false;
+
+	// SelectionUtil::selectByScreenRectangle normalized the box corners and
+	// picked every unit whose 2D screen position (ConvertorWorldToViewPort)
+	// falls inside. ConvertorWorldToViewPort returns the screen point in
+	// device pixels (SurMap5/SelectionUtil.cpp:worldToScreen used round(e.x)
+	// directly), so compare in pixels against the original box.
+	const int xA = std::min(x0, x1);
+	const int xB = std::max(x0, x1);
+	const int yA = std::min(y0, y1);
+	const int yB = std::max(y0, y1);
+
+	bool changed = false;
+	PlayerVect::const_iterator pi;
+	FOR_EACH(universe()->Players, pi){
+		const UnitList& units = (*pi)->units();
+		UnitList::const_iterator it;
+		FOR_EACH(units, it){
+			UnitBase* unit = *it;
+			if(!unit || unit->auxiliary() || !unit->alive())
+				continue;
+			// position() is the unit's pose translation, a world Vect3f.
+			const Vect3f& world = unit->position();
+			Vect3f view, screen;
+			camera_->ConvertorWorldToViewPort(&world, &view, &screen);
+			const bool inside = screen.x >= (float)xA && screen.x <= (float)xB
+			                 && screen.y >= (float)yA && screen.y <= (float)yB;
+			if(inside && !unit->selected()){
+				unit->setSelected(true);
+				changed = true;
+			}
+			else if(!inside && unit->selected()){
+				unit->setSelected(false);
+				changed = true;
+			}
+		}
+	}
+	return changed;
+}
+
+void EngineViewport::deleteSelectedObjects()
+{
+	if(!ownedUniverse_ || !sourceManager)
+		return;
+	sourceManager->deleteSelected();
+	universe()->deleteSelected();
+	if(cameraManager)
+		cameraManager->deleteSelected();
 }

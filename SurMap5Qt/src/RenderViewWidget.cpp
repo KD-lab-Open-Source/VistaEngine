@@ -12,6 +12,7 @@
 #include "editor/EngineViewport.h"
 #include "editor/EditorTool.h"
 #include "tools/ToolManager.h"
+#include "tools/SelectTool.h"   // the Select tool's finished box -> selection
 
 // Qt mouse button -> EngineViewport button mask (1=left, 2=middle, 4=right),
 // matching the WM_* MK_* values CGeneralView's WindowProc used.
@@ -351,6 +352,29 @@ void RenderViewWidget::mouseReleaseEvent(QMouseEvent* event)
 		(event->button() == Qt::RightButton) ? tools_->onRMBUp(world, pos) : false;
 	if(!handled && viewport_->inited())
 		viewport_->mouseButton(qtButtonToEngine(event->button()), false, pos.x, pos.y);
+
+	// The Select tool finalizes a drag box / click in onLMBUp; the engine-side
+	// selection lives in the viewport (the tool itself is engine-free), so turn
+	// the tool's finished box into a real selection here — CSurToolSelect::
+	// onLMBUp -> unitHoverAll / selectByScreenRectangle.
+	if(event->button() == Qt::LeftButton && viewport_->worldLoaded()){
+		if(SelectTool* select = dynamic_cast<SelectTool*>(tools_->currentTool())){
+			const ToolVec2 start = select->boxStart();
+			const ToolVec2 end = select->boxEnd();
+			const bool isClick = !select->isDragging() &&
+			                     start.x == end.x && start.y == end.y;
+			if(isClick){
+				// Plain click: replace; Shift = add; Ctrl = toggle.
+				int mode = 0;
+				if(event->modifiers() & Qt::ControlModifier) mode = 1;
+				else if(event->modifiers() & Qt::ShiftModifier) mode = 2;
+				selectObjectAt(end.x, end.y, mode);
+			}
+			else{
+				selectObjectsInRect(start.x, start.y, end.x, end.y);
+			}
+		}
+	}
 	event->accept();
 }
 
@@ -403,9 +427,46 @@ void RenderViewWidget::keyPressEvent(QKeyEvent* event)
 	if(!tools_->onKeyDown(event->key(), event->modifiers() & Qt::ShiftModifier,
 	                      event->modifiers() & Qt::ControlModifier,
 	                      event->modifiers() & Qt::AltModifier)){
-		if(event->key() == Qt::Key_Delete)
-			tools_->onDelete();
+		if(event->key() == Qt::Key_Delete){
+			if(!tools_->onDelete())
+				deleteSelectedObjects();   // SelectTool has no engine; the view deletes
+		}
 		QWidget::keyPressEvent(event);
 	}
 	event->accept();
+}
+
+// --- Object selection (SelectionUtil ports; forward to the viewport) ---
+
+bool RenderViewWidget::selectObjectAt(int screenX, int screenY, int mode)
+{
+	const bool changed = viewport_ && viewport_->selectObjectAt(screenX, screenY, mode);
+	if(changed){
+		update();
+		emit selectionChanged();
+	}
+	return changed;
+}
+
+bool RenderViewWidget::selectObjectsInRect(int x0, int y0, int x1, int y1)
+{
+	const bool changed = viewport_ && viewport_->selectObjectsInRect(x0, y0, x1, y1);
+	if(changed){
+		update();
+		emit selectionChanged();
+	}
+	return changed;
+}
+
+void RenderViewWidget::deleteSelectedObjects()
+{
+	if(viewport_)
+		viewport_->deleteSelectedObjects();
+	update();
+	emit selectionChanged();
+}
+
+int RenderViewWidget::selectedObjectsCount()
+{
+	return viewport_ ? viewport_->selectedObjectsCount() : 0;
 }

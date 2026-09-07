@@ -244,6 +244,34 @@ public:
 	// caller owns them and should `free()` each. Returns the actual count.
 	int objectList(ObjectTab tab, char** out, int maxCount);
 
+	// --- Object selection (SurMap5/SelectionUtil.cpp) ---
+
+	// How many world objects (units, sources, anchors, camera splines) are
+	// currently selected. 0 when no world is loaded.
+	int selectedObjectsCount();
+
+	// Deselect every object (sourceManager->deselectAll + universe()->deselectAll
+	// + cameraManager splines) — SelectionUtil::deselectAll.
+	void deselectAllObjects();
+
+	// Select the topmost world object under the widget pixel (unitHoverAll:
+	// cast a camera ray through the point, pick the nearest unit whose
+	// intersect() the ray hits). Mode: 0 = replace (deselect all, then select),
+	// 1 = toggle (ctrl), 2 = add (shift). Returns true when an object was hit.
+	bool selectObjectAt(int screenX, int screenY, int mode);
+
+	// Select every object whose screen box intersects [x0,y0]-[x1,y1]
+	// (SelectionUtil::selectByScreenRectangle). Returns true when the
+	// selection changed.
+	bool selectObjectsInRect(int x0, int y0, int x1, int y1);
+
+	// Delete the selected objects (SelectionUtil::deleteSelectedUniverseObjects).
+	void deleteSelectedObjects();
+
+	// The number of world objects the given tab lists (0 when no world):
+	// convenience for empty-tree checks.
+	int objectCount(ObjectTab tab);
+
 	bool inited() const { return inited_; }
 
 private:

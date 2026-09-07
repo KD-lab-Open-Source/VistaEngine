@@ -24,6 +24,13 @@ public:
 	bool onKeyDown(unsigned keyCode, bool shift, bool control, bool alt) override;
 	bool onDrawAuxData(ToolAuxPainter& painter) override;
 
+	// The engine side reads the finished selection drag (RenderViewWidget
+	// turns it into EngineViewport::selectObjectsInRect): the box is a
+	// click when start == end. isDragging() is true between LMB down/up.
+	bool isDragging() const { return dragging_; }
+	ToolVec2 boxStart() const { return boxStart_; }
+	ToolVec2 boxEnd() const { return boxEnd_; }
+
 private:
 	// The drag selection box, in screen pixels (ends inclusive).
 	bool dragging_ = false;
