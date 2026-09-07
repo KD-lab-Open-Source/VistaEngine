@@ -268,6 +268,12 @@ void RenderViewWidget::fitCameraToWorld()
 	update();
 }
 
+void RenderViewWidget::resetEditorCamera()
+{
+	viewport_->resetEditorCamera();
+	update();
+}
+
 void RenderViewWidget::setGridVisible(bool visible)
 {
 	viewport_->setGridVisible(visible);

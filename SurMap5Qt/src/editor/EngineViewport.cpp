@@ -42,6 +42,8 @@ using namespace std;
 #include "Units/UnitEnvironment.h"       // UnitEnvironment (Environment tab filter)
 #include "Units/EnvironmentSimple.h"    // UnitEnvironmentSimple (Environment tab filter)
 #include "Units/BaseUnit.h"              // UnitBase, UnitList
+#include "Render/3dx/Node3DX.h"          // cObject3dx (model state debug)
+#include "Render/3dx/Simply3dx.h"        // cSimply3dx (environment models)
 #include "Game/GameOptions.h"            // GameOptions::filterBaseGraphOptions (Universe ctor calls it)
 #include "UserInterface/UI_Render.h"     // UI_Render::create (SurMap5/SurMap5.cpp prelude)
 #include "UserInterface/UI_GlobalAttributes.h" // UI_GlobalAttributes (loadAllLibraries dep)
@@ -319,6 +321,18 @@ bool EngineViewport::loadWorld(const char* worldsDir, const char* worldName)
 		ownedUniverse_.reset(uni);
 		if(!isUnderEditor())
 			uni->relaxLoading();
+
+		// [SurMap5Qt] Ship the pose/visibility commands the Universe ctor queued.
+		// Unit setPose(initPose=true) during .spg deserialization wrote into the
+		// global streamLogicCommand / streamLogicInterpolator (RealUnit.cpp:368);
+		// they only reach the graph objects after interpolationQuant moves them
+		// into universe()->streamCommand/streamInterpolator and drawFrame's
+		// process() applies them. Without this the models keep their creation
+		// pose (the origin) and the units are invisible over the terrain. The
+		// original CMainFrame::universeQuant ran Quant + interpolationQuant on
+		// every logic tick; a single call after load covers the static editor
+		// world (drawFrame keeps draining the universe streams each frame).
+		uni->interpolationQuant();
 	}
 
 	// reInitWorld's camera reset: centre the orbit on the map, then let
@@ -594,6 +608,26 @@ void EngineViewport::fitCameraToWorld()
 	applyCamera();
 }
 
+void EngineViewport::resetEditorCamera()
+{
+	if(!worldLoaded_)
+		return;
+
+	// CGeneralView::createScene: psi 90 deg, theta 0, distance 512, centre of
+	// the map at 128. The Qt orbit model maps psi/theta onto a sphere around the
+	// centre; a pure overhead (theta 0) would still be beyond the 500 hide
+	// distance, so keep a working editor tilt (~30 deg) — close enough to the
+	// original's low default that HIDE_BY_DISTANCE units stay visible.
+	orbit_.px = vMap.H_SIZE * 0.5f;
+	orbit_.py = vMap.V_SIZE * 0.5f;
+	orbit_.pz = 256.0f;
+	orbit_.distance = 700.f;
+	orbit_.psi = 0.785398163f;      // 45 deg, a quarter turn from the +X axis
+	orbit_.theta = 0.5f;            // ~29 deg tilt from vertical
+	orbit_.fi = 0.0f;
+	applyCamera();
+}
+
 void EngineViewport::setGridVisible(bool visible)
 {
 	// OnViewShowGrid toggled surMapOptions.enableGrid_, which drawGrid
@@ -657,6 +691,106 @@ void EngineViewport::drawFrame()
 	if(!inited_ || !gb_RenderDevice || !camera_)
 		return;
 
+	// CGeneralView::graphQuant (SurMap5/GeneralView.cpp:265) drained the
+	// universe's command streams before drawing. Units don't move their model
+	// directly: setPose writes a command into streamLogicCommand (or the
+	// interpolator), Universe::interpolationQuant moves it into
+	// universe()->streamCommand / streamInterpolator, and only process() here
+	// applies it to the graph objects (fCommandSetPose -> BaseGraphObject::
+	// SetPosition, fSe3fInterpolation -> interpolate). Without this drain the
+	// models stay at the pose they were created with — the origin — no matter
+	// where the unit logically stands. streamCommand carries the pose/visibility
+	// snap commands, streamInterpolator the (factor 0 = snapped) motion.
+	if(ownedUniverse_){
+		universe()->streamCommand.process(0.0f);
+		universe()->streamCommand.clear();
+		universe()->streamInterpolator.process(0.0f);
+		universe()->streamInterpolator.clear();
+
+		// [SurMap5Qt] The editor shows every object regardless of distance. The
+		// game sets hideDistance=500 (Units/GlobalAttributes.cpp, Render/3dx/
+		// Node3DX.cpp:264) and flags models ATTRUNKOBJ_HIDE_BY_DISTANCE when the
+		// unit attribute wants it; cObject3dx::PreDraw then culls anything whose
+		// view-space depth exceeds hideDistance. An editor camera routinely sits
+		// further than that from a unit (even 700 away), so the world looks
+		// empty. The original editor got away with it only because its camera
+		// stayed close to the action; the Qt editor's orbit view does not. Clear
+		// the attribute and raise the per-model limit every frame — cheap walk,
+		// and the editor has no reason to honour the game's LOD hide.
+		const float kEditorHideDistance = 1e7f;
+		PlayerVect::const_iterator pi;
+		FOR_EACH(universe()->Players, pi){
+			const UnitList& units = (*pi)->units();
+			UnitList::const_iterator it;
+			FOR_EACH(units, it){
+				UnitBase* u = *it;
+				if(!u || u->auxiliary() || !u->alive())
+					continue;
+				if(cObject3dx* m = dynamic_cast<cObject3dx*>(u->model())){
+					if(m->getAttribute(ATTRUNKOBJ_HIDE_BY_DISTANCE)){
+						m->clearAttribute(ATTRUNKOBJ_HIDE_BY_DISTANCE);
+						m->SetHideDistance(kEditorHideDistance);
+					}
+				}
+				// UnitEnvironmentSimple keeps its model in modelSimple_ (a
+				// cSimply3dx), not the virtual model() slot.
+				if(UnitEnvironmentSimple* es = dynamic_cast<UnitEnvironmentSimple*>(u)){
+					if(cSimply3dx* ms = es->modelSimple()){
+						if(ms->getAttribute(ATTRUNKOBJ_HIDE_BY_DISTANCE)){
+							ms->clearAttribute(ATTRUNKOBJ_HIDE_BY_DISTANCE);
+							ms->SetHideDistance(kEditorHideDistance);
+						}
+					}
+				}
+			}
+		}
+
+		// [SurMap5Qt debug] one-shot: where the models are vs what the camera
+		// sees, after the stream drain and the hide-distance clear above.
+		static int dbgOnce = 0;
+		if(dbgOnce < 3){
+			++dbgOnce;
+			int shown = 0;
+			PlayerVect::const_iterator pi2;
+			FOR_EACH(universe()->Players, pi2){
+				const UnitList& units2 = (*pi2)->units();
+				UnitList::const_iterator it2;
+				FOR_EACH(units2, it2){
+					UnitBase* u = *it2;
+					if(!u || u->auxiliary() || !u->alive())
+						continue;
+					cObject3dx* m = dynamic_cast<cObject3dx*>(u->model());
+					if(!m)
+						continue;
+					const MatXf& mp = m->GetPosition();
+					const Vect3f& upos = u->position();
+					eTestVisible vis = camera_->TestVisible(mp, Vect3f(-1,-1,-1), Vect3f(1,1,1));
+					const Vect3f ceye = camera_->GetPos();
+					// Screen-space projection of the model origin: where on the
+					// viewport the model SHOULD land. pe.z outside the frustum's
+					// near/far, or pe outside the window, means a projection or
+					// camera-matrix problem — not a culling one.
+					Vect3f pv, pe;
+					const Vect3f origin = mp.trans();
+					camera_->ConvertorWorldToViewPort(&origin, &pv, &pe);
+					const Vect2f& zplane = camera_->GetZPlane();
+					fprintf(stderr,
+						"[dbg3d] key='%s' upos=(%.0f,%.0f,%.0f) mpos=(%.0f,%.0f,%.0f) attr=0x%X vis=%d scale=%.2f | cam=(%.0f,%.0f,%.0f) | scr=(%.0f,%.0f) viewZ=%.0f zNear=%.0f zFar=%.0f\n",
+						u->attr().libraryKey() ? u->attr().libraryKey() : "?",
+						upos.x, upos.y, upos.z,
+						mp.trans().x, mp.trans().y, mp.trans().z,
+						(unsigned)m->getAttribute(0xFFFFFFFF), (int)vis, m->GetScale(),
+						ceye.x, ceye.y, ceye.z,
+						pe.x, pe.y, pv.z, zplane.x, zplane.y);
+					if(++shown >= 5)
+						break;
+				}
+				if(shown >= 5)
+					break;
+			}
+		}
+	}
+
 	// The editor viewport's clear (CGeneralView used the environment's fone
 	// colour; with no world loaded, a neutral slate).
 	gb_RenderDevice->Fill(32, 48, 64, 255);
@@ -674,11 +808,92 @@ void EngineViewport::drawFrame()
 		const Vect2f focus(orbit_.focus, orbit_.focus);
 		const Vect2f zPlane(30.0f, std::max(12000.0f, orbit_.distance * 3.0f));
 		camera_->SetFrustum(&center, &clip, &focus, &zPlane);
-		scene_->Draw(camera_);
+
+		// [SurMap5Qt debug] draw the loaded world once in wireframe (after the
+		// first world load — the pre-world empty frame is useless): if the unit
+		// models show up as line cages over the terrain, the vertex transforms
+		// are fine and the problem is in the solid fill (materials/textures);
+		// if they stay invisible the geometry never reaches the screen.
+		static bool dbgWireArmed = true;
+		if(dbgWireArmed && worldLoaded_){
+			dbgWireArmed = false;
+			gb_RenderDevice->SetRenderState(RS_FILLMODE, FILL_WIREFRAME);
+			scene_->Draw(camera_);
+			gb_RenderDevice->SetRenderState(RS_FILLMODE, FILL_SOLID);
+			fprintf(stderr, "[dbgwire] first loaded-world frame drawn in wireframe\n"); fflush(stderr);
+		}
+		else
+			scene_->Draw(camera_);
+
+		// [SurMap5Qt debug] one-shot scene stats: how many 3dx objects the
+		// scene grid holds and how many polygons came out of Draw — the models
+		// are positioned (see [dbg3d]) but if the count is zero nothing reached
+		// the render.
+		static int dbgScene = 0;
+		if(dbgScene < 3){
+			++dbgScene;
+			std::vector<cObject3dx*> objs;
+			scene_->GetAllObject3dx(objs);
+			int alive = 0;
+			int ignored = 0;
+			int attached = 0;
+			int deleted = 0;
+			for(size_t i = 0; i < objs.size(); ++i){
+				if(objs[i]){
+					++alive;
+					if(objs[i]->getAttribute(ATTRUNKOBJ_IGNORE)) ++ignored;
+					if(objs[i]->getAttribute(ATTRUNKOBJ_ATTACHED)) ++attached;
+					if(objs[i]->getAttribute(ATTRUNKOBJ_DELETED)) ++deleted;
+				}
+			}
+			const int objPolys = gb_RenderDevice->NumberPolygon;
+			const int tilePolys = gb_RenderDevice->GetDrawNumberTilemapPolygon();
+			fprintf(stderr,
+				"[dbgscene] scene 3dx objects=%zu alive=%d ignored=%d deleted=%d attached=%d | objPolys=%d tilePolys=%d dips=%d\n",
+				objs.size(), alive, ignored, deleted, attached,
+				objPolys, tilePolys,
+				gb_RenderDevice->GetDrawNumberObjects());
+			fflush(stderr);
+		}
+
+		// [SurMap5Qt debug] marker crosses at live unit positions, drawn right
+		// after the scene — confirms where the engine believes units are.
+		if(ownedUniverse_){
+			const float s = 40.f;
+			Color4c col(255, 255, 0, 255);
+			int drawn = 0;
+			PlayerVect::const_iterator pi3;
+			FOR_EACH(universe()->Players, pi3){
+				const UnitList& units3 = (*pi3)->units();
+				UnitList::const_iterator it3;
+				FOR_EACH(units3, it3){
+					UnitBase* u = *it3;
+					if(!u || u->auxiliary() || !u->alive())
+						continue;
+					const Vect3f& p = u->position();
+					const Vect3f pz(p.x, p.y, p.z + 60.f);   // a little above ground
+					gb_RenderDevice->DrawLine(pz + Vect3f(-s, 0, 0), pz + Vect3f(s, 0, 0), col);
+					gb_RenderDevice->DrawLine(pz + Vect3f(0, -s, 0), pz + Vect3f(0, s, 0), col);
+					gb_RenderDevice->DrawLine(pz + Vect3f(0, 0, -s), pz + Vect3f(0, 0, s), col);
+					if(++drawn >= 200)
+						break;
+				}
+				if(drawn >= 200)
+					break;
+			}
+		}
 	}
 
 	// CGeneralView::graphQuant drew the grid after terScene->Draw().
 	drawGrid();
+
+	// CGeneralView::graphQuant then ran universe()->graphQuant(dt) — under the
+	// editor it walks the players and calls showEditor() on every unit, which
+	// applies the HIDE_BY_EDITOR visibility (UnitBase::showEditor). EditorVisual
+	// is always-visible in the Qt port for now, so this is the hook the View
+	// filters will drive later.
+	if(ownedUniverse_)
+		universe()->graphQuant(0.0f);
 
 	gb_RenderDevice->EndScene();
 	gb_RenderDevice->Flush();

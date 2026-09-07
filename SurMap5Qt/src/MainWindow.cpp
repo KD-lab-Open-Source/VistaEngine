@@ -918,9 +918,11 @@ void MainWindow::updateWorldTitle()
 
 void MainWindow::applySavedCameraDefault()
 {
-	// Always start with a calculated overview. A saved camera default may belong
-	// to a different map and can leave a newly loaded world off-screen.
-	view_->fitCameraToWorld();
+	// Always start at the editor's low working view of the map centre
+	// (CGeneralView::createScene), not a saved default that may belong to a
+	// different map nor the 20k-up overview (which culls every unit by
+	// HIDE_BY_DISTANCE).
+	view_->resetEditorCamera();
 }
 
 void MainWindow::onWorldChanged()

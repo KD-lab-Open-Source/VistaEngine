@@ -26,10 +26,34 @@
 #include "StreamCommand.h"
 #include "EditorVisual.h"
 
+// [SurMap5Qt] The game's non-editor builds have no editor visuals and used to
+// xassert + return a null dereference here. The Qt editor runs the real SurMap5
+// code paths (UnitBase::showEditor -> hide(HIDE_BY_EDITOR, ...), Anchor /
+// SourceBase editor drawing) through EditorVisual::isVisible, so the editor
+// needs a live implementation. SurMap5's own lives in SurMap5/EditorVisualImpl.cpp
+// and depends on MFC (CMainFrame, SurMapOptions); this is the engine-side
+// equivalent until the View filters land: everything is visible, the draw
+// helpers draw nothing. Draw calls only happen from the editor overlay loops
+// (sources/anchors labels, selection radius) which the Qt editor does not run
+// yet.
+namespace{
+	class EditorVisualImpl : public EditorVisual::Interface{
+	public:
+		bool isVisible(UniverseObjectClass) override { return true; }
+		void beforeQuant() override {}
+		void afterQuant() override {}
+		void drawImpassabilityRadius(UnitBase&) override {}
+		void drawCross(const Vect3f&, float, EditorVisual::CrossType, bool) override {}
+		void drawRadius(const Vect3f&, float, EditorVisual::RadiusType, bool) override {}
+		void drawText(const Vect3f&, const char*, EditorVisual::TextType) override {}
+		void drawOrientationArrow(const Se3f&, bool) override {}
+	};
+}
+
 EditorVisual::Interface& editorVisual()
 {
-	xassert(0 && "EditorVisual можно использовать только в редакторе!");
-	return *reinterpret_cast<EditorVisual::Interface*>(0);
+	static EditorVisualImpl impl;
+	return impl;
 }
 
 void ActionSetDirectControl::activate()

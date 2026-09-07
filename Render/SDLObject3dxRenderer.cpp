@@ -155,7 +155,13 @@ bool SDLObject3dxRenderer::createShaders()
 	                      && fs_ && fsBump_ && fsReflect_ && fsSecondOpacity_
 	                      && vsShadowRigid_ && vsShadowSkin_ && fsShadow_;
 	shadersTried_ = true;
-	if(!device_ || !window_) return false;
+	// window_ can be null -- the Qt editor creates no SDL window of its own; the
+	// swapchain comes from the foreign window later. SDL_GetGPUSwapchainTextureFormat
+	// tolerates a null window: it returns the device's default swapchain format, which
+	// SDLWorldLineRenderer and the tile map's ctor pipelines rely on. So only the device
+	// matters here; demanding a window made every object pipeline abort to null before a
+	// single draw, and the models never rasterized.
+	if(!device_) return false;
 
 	// Every vertex shader here takes one uniform block: MVP + material + bone matrices.
 	auto makeVS = [&](const vista::ShaderBlob& blob) {
@@ -731,12 +737,19 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 	int boundState = -1;
 	float vsUniform[VS_UNIFORM_FLOATS];
 
+	// [SurMap5Qt debug] one-shot: how many recorded draws actually replay into the
+	// frame target. A large draws_ with a small drawn_ means pipelineFor() is
+	// rejecting the states the scene records (null pipeline -> skip).
+	static int dbgReplayOnce = 1;
+	int dbgTotal = 0, dbgNullPipeline = 0;
+
 	for(const DrawCmd& d : draws_){
 		const StateBlock& st = states_[d.state];
 
 		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, st.bump, st.reflect, st.secondOpacity,
 		                                                st.blend, st.mirrored, d.depthWrite, wireframe, false);
-		if(!pipeline) continue;
+		if(!pipeline){ if(dbgReplayOnce) ++dbgNullPipeline; continue; }
+		++dbgTotal;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);
 			boundPipeline = pipeline;
@@ -815,6 +828,14 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 		}
 
 		SDL_DrawGPUIndexedPrimitives(pass, d.indexCount, 1, d.firstIndex, 0, 0);
+	}
+
+	// [SurMap5Qt debug] see the counters set above the loop.
+	if(dbgReplayOnce){
+		--dbgReplayOnce;
+		fprintf(stderr, "[dbgreplay] draws=%d nullPipeline=%d replayed=%d wireframe=%d\n",
+			dbgTotal + dbgNullPipeline, dbgNullPipeline, dbgTotal, (int)wireframe);
+		fflush(stderr);
 	}
 
 	SDL_EndGPURenderPass(pass);

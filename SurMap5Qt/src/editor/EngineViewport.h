@@ -214,6 +214,13 @@ public:
 	void setCameraState(const CameraState& state);
 	void fitCameraToWorld();
 
+	// Editor start camera after a world load (SurMap5 CGeneralView::createScene,
+	// GeneralView.cpp:157): a low, tilted view of the map centre — distance ~512
+	// over the centre, psi at 90 deg. The overview fitCameraToWorld (20k up) is a
+	// user command, not the start pose: at 20k the units' HIDE_BY_DISTANCE
+	// (hideDistance 500, Node3DX::PreDraw) culls every model.
+	void resetEditorCamera();
+
 	// --- Grid visibility (U7) ---
 
 	// Show/hide the editor grid (surMapOptions.enableGrid_). True by default
