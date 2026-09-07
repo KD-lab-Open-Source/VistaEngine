@@ -99,6 +99,7 @@ MainWindow::MainWindow(QWidget* parent)
 						applySavedCameraDefault();
 						updateWorldTitle();
 						statusBar()->showMessage(tr("World restored: %1").arg(lastWorld));
+						onWorldChanged();
 						fprintf(stderr, "[restore] world %s loaded\n", lastWorld.toStdString().c_str());
 					}
 					else
@@ -860,8 +861,7 @@ void MainWindow::openWorld()
 		applySavedCameraDefault();      // OnFileOpen re-created the camera with the default
 		updateWorldTitle();             // put2TitleNameDirWorld
 		statusBar()->showMessage(tr("World loaded: %1").arg(worldName));
-		if(miniMapPanel_)
-			miniMapPanel_->reload();      // CMiniMapWindow::onWorldChanged
+		onWorldChanged();               // CMainFrame::signalWorldChanged
 		actSaveMiniMapToWorld_->setEnabled(true);
 	}
 	else
@@ -892,8 +892,7 @@ void MainWindow::newWorld()
 		applySavedCameraDefault();
 		updateWorldTitle();
 		statusBar()->showMessage(tr("World created: %1").arg(worldName));
-		if(miniMapPanel_)
-			miniMapPanel_->reload();
+		onWorldChanged();               // CMainFrame::signalWorldChanged
 		actSaveMiniMapToWorld_->setEnabled(true);
 	}
 	else
@@ -914,6 +913,18 @@ void MainWindow::applySavedCameraDefault()
 	// Always start with a calculated overview. A saved camera default may belong
 	// to a different map and can leave a newly loaded world off-screen.
 	view_->fitCameraToWorld();
+}
+
+void MainWindow::onWorldChanged()
+{
+	// The world changed (loaded/created): refresh the panels that walk it.
+	// Objects Manager rebuilds its five trees from EngineViewport::objectList
+	// (the original subscribed to CMainFrame::signalWorldChanged — see
+	// SurMap5/ObjectsManagerTree.cpp / MiniMapWindow.cpp).
+	if(objectsTreePanel_)
+		objectsTreePanel_->rebuild();
+	if(miniMapPanel_)
+		miniMapPanel_->reload();
 }
 
 void MainWindow::selectTool(int index)

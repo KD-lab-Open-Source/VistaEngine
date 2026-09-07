@@ -118,6 +118,11 @@ private:
 	// Restore the camera default the user saved (Save Camera As Default) into
 	// the viewport's orbit after a world load.
 	void applySavedCameraDefault();
+	// After a world was loaded or created: refresh the panels that show world
+	// state (Objects Manager tree, MiniMap). The original MFC editor signalled
+	// this via CMainFrame::signalWorldChanged; the Qt port calls this directly
+	// from each load/create success path.
+	void onWorldChanged();
 
 	// --- view ---
 	RenderViewWidget* view_ = nullptr;
