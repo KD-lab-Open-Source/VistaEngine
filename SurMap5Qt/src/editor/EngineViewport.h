@@ -325,4 +325,10 @@ private:
 	int    dragStartX_ = 0, dragStartY_ = 0;
 	float  dragStartPsi_ = 0.f, dragStartTheta_ = 0.f;
 	float  dragStartPx_ = 0.f, dragStartPy_ = 0.f, dragStartPz_ = 0.f;
+
+	// CMainFrame::universeQuant's syncroTimer: logic (universe Quant) runs at
+	// the logicTimePeriod (100 ms); the accumulated ms since the last logic
+	// quant live here, ticked from the editor's ~60 Hz loop.
+	double logicAccumMs_ = 0.0;
+	double lastLogicMs_ = 0.0;
 };

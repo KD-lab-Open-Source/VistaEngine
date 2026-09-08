@@ -31,10 +31,12 @@ using namespace std;
 #include "Environment/SourceBase.h"     // SourceBase::label()
 #include "Environment/Anchor.h"         // Anchor (Environment owns the type)
 #include "Environment/Environment.h"    // environment (Environment tab data)
+#include "Water/SkyObject.h"            // EnvironmentTime (GetCurFoneColor), cSkyObj
 #include "Game/Universe.h"               // universe(), Players, worldPlayer
 #include "Game/Player.h"                 // Player::units(), worldPlayer
 #include "Game/CameraManager.h"          // cameraManager, splines()
 #include "Game/RenderObjects.h"          // initScene/finitScene, terScene, cameraManager
+#include "Util/DebugPrm.h"               // logicTimePeriod (the universe logic quant period)
 #include "Network/NetPlayer.h"           // MissionDescription
 #include "Serialization/Dictionary.h"    // TranslationManager (Universe ctor calls GameOptions::setTranslate)
 #include "Serialization/XPrmArchive.h"   // XPrmIArchive (.spg loading)
@@ -322,6 +324,14 @@ bool EngineViewport::loadWorld(const char* worldsDir, const char* worldName)
 		if(!isUnderEditor())
 			uni->relaxLoading();
 
+		// [SurMap5Qt] Single-threaded editor: run logic and graphics on one
+		// thread (tick's Quant + drawFrame's render both on the GUI thread).
+		// The original SurMap5 did the same (SurMap5/GeneralView.cpp:238,
+		// straight after `new Universe`) — useHT_ arms a busy-wait in
+		// Universe::clearDeletedUnits for the graph thread to catch up, which
+		// on one thread would spin forever the moment a unit is deleted.
+		uni->setUseHT(false);
+
 		// [SurMap5Qt] Ship the pose/visibility commands the Universe ctor queued.
 		// Unit setPose(initPose=true) during .spg deserialization wrote into the
 		// global streamLogicCommand / streamLogicInterpolator (RealUnit.cpp:368);
@@ -371,18 +381,35 @@ void EngineViewport::doneWorld()
 
 	// Universe dtor releases the tile map (RELEASE(tileMap)) and clears
 	// the engine globals (sourceManager, environment, cameraManager
-	// splines, Players, pathFinder, soundEnvironmentManager_). The
-	// scene + camera stay — they belong to initScene / cameraManager,
-	// reused across world loads.
+	// splines, Players, pathFinder, soundEnvironmentManager_).
 	if(ownedUniverse_){
 		ownedUniverse_.reset();
 	}
 	ownedMission_.reset();
 
+	// [SurMap5Qt] Rebuild the scene between worlds. The original editor's
+	// OnFileOpen called CGeneralView::createScene() before every world load
+	// (SurMap5/MainFrame.cpp:1029), and createScene is doneScene() +
+	// initScene() — the whole terScene/cameraManager pair is torn down and
+	// re-created, so the second world's Universe starts from an empty scene.
+	// The Qt port kept terScene alive across loads, so every re-loaded world
+	// piled a second cTileMap (assert "tileMap_==0" in cScene::CreateMap), a
+	// second cWater, grassMap, cloudShadow ... over the first world's corpses
+	// — and the first world's cWater, freed with its Environment, left the
+	// global `water` pointer null while the new world's units were already
+	// quantsing effects against it (EffectController.cpp:298 -> water->isLava
+	// on null). Delete and re-create the scene the same way the original
+	// editor did.
+	finitScene();
+	initScene();
+
+	scene_ = terScene;
+	camera_ = cameraManager ? cameraManager->GetCamera() : nullptr;
+
 	vMap.releaseWorld();
 	worldLoaded_ = false;
 	applyCamera();
-	fprintf(stderr, "EngineViewport: [doneWorld] done\n"); fflush(stderr);
+	fprintf(stderr, "EngineViewport: [doneWorld] done (scene rebuilt)\n"); fflush(stderr);
 }
 
 bool EngineViewport::createWorld(const char* worldsDir, const char* worldName)
@@ -440,6 +467,8 @@ bool EngineViewport::createWorld(const char* worldsDir, const char* worldName)
 		ownedUniverse_.reset(uni);
 		if(!isUnderEditor())
 			uni->relaxLoading();
+		// [SurMap5Qt] Single-threaded editor, as in loadWorld — see there.
+		uni->setUseHT(false);
 	}
 
 	// Same terrain setup as loadWorld.
@@ -677,19 +706,61 @@ void EngineViewport::resize()
 		renderWindow_->ChangeSize();
 }
 
-void EngineViewport::tick(float /*dt*/)
+void EngineViewport::tick(float dt)
 {
 	// The orbit state is applied immediately on input (like CGeneralView's
 	// WindowProc, which sets cameraManager->setCoordinate per event), so there
 	// is nothing to integrate per-frame yet. Phase 3b (world + animation) will
 	// advance the scene here.
 	applyCamera();
+
+	// CMainFrame::universeQuant (SurMap5/MainFrame.cpp:684) ran the world's
+	// logic at the logic time period: when its syncroTimer ticked it called
+	// universe()->Quant() + interpolationQuant(). Quant walks the players and
+	// quants every unit (RealUnit::quant -> chainControllers_.quant — the
+	// skeletal animation phases, turret turns, effects), advances the
+	// environment (environment->logicQuant: water AnimateLogic, the time of
+	// day) and the source manager. Without it the units hold whatever pose the
+	// load left them in and nothing animates. In the editor the same clock
+	// applies: logicTimePeriod ms of real time accumulate, then one Quant +
+	// interpolationQuant ships the new poses into streamCommand, which
+	// drawFrame's drain applies to the graph models next frame.
+	if(ownedUniverse_ && environment){
+		const double now = (double)xclock();
+		if(lastLogicMs_ == 0.0)
+			lastLogicMs_ = now;   // first tick: start the clock, don't burst
+		logicAccumMs_ += now - lastLogicMs_;
+		lastLogicMs_ = now;
+		if(logicAccumMs_ >= logicTimePeriod){
+			logicAccumMs_ = 0.0;
+			gb_VisGeneric->SetLogicQuant(universe()->quantCounter() + 2);
+			universe()->Quant();
+			universe()->interpolationQuant();
+		}
+	}
 }
 
 void EngineViewport::drawFrame()
 {
 	if(!inited_ || !gb_RenderDevice || !camera_)
 		return;
+
+	// CGeneralView::OnPaint (SurMap5/GeneralView.cpp:385) measured the real time
+	// between frames (capped at 100 ms) and fed it to Animate() ->
+	// terScene->SetDeltaTime before graphQuant. That delta is what cScene::Draw's
+	// Animate() steps the world's animations with (water waves, cloud drift,
+	// texture phases), so a static editor still moves. dt is in milliseconds
+	// here — SetDeltaTime's unit (cScene::SetDeltaTime "в миллисекундах"),
+	// and GetDeltaTime returns it as-is.
+	const double frameMs = [this]{
+		static double s_prevMs = 0.0;
+		const double now = (double)xclock();
+		double dt = (s_prevMs > 0.0) ? (now - s_prevMs) : 0.0;
+		s_prevMs = now;
+		return std::min(100.0, dt);
+	}();
+	if(scene_)
+		scene_->SetDeltaTime((float)frameMs);
 
 	// CGeneralView::graphQuant (SurMap5/GeneralView.cpp:265) drained the
 	// universe's command streams before drawing. Units don't move their model
@@ -701,7 +772,15 @@ void EngineViewport::drawFrame()
 	// models stay at the pose they were created with — the origin — no matter
 	// where the unit logically stands. streamCommand carries the pose/visibility
 	// snap commands, streamInterpolator the (factor 0 = snapped) motion.
+	//
+	// The graph quant counter must advance here too: Universe::clearDeletedUnits
+	// (reached from Quant in tick) busy-waits while
+	// GetGraphLogicQuant() < quantCounter() - 8 when useHT_ is on, and only
+	// SetGraphLogicQuant releases it. The original set it in graphQuant
+	// (SurMap5/GeneralView.cpp:277, GameShell.cpp:560); without it the editor's
+	// first Quant hangs forever the moment a unit is queued for deletion.
 	if(ownedUniverse_){
+		gb_VisGeneric->SetGraphLogicQuant(universe()->quantCounter());
 		universe()->streamCommand.process(0.0f);
 		universe()->streamCommand.clear();
 		universe()->streamInterpolator.process(0.0f);
@@ -717,6 +796,13 @@ void EngineViewport::drawFrame()
 		// stayed close to the action; the Qt editor's orbit view does not. Clear
 		// the attribute and raise the per-model limit every frame — cheap walk,
 		// and the editor has no reason to honour the game's LOD hide.
+		//
+		// Walk every unit, auxiliary and dead included: decoration (trees,
+		// vegetation, props) is often auxiliary() on the world player, and the
+		// units killed at load (missing effects etc.) still hold models worth
+		// seeing in an editor. A dead unit's model is hidden by HIDE_BY_EDITOR
+		// elsewhere; hide-by-distance must not be the reason a whole class of
+		// objects vanishes at the editor's typical viewing range.
 		const float kEditorHideDistance = 1e7f;
 		PlayerVect::const_iterator pi;
 		FOR_EACH(universe()->Players, pi){
@@ -724,7 +810,7 @@ void EngineViewport::drawFrame()
 			UnitList::const_iterator it;
 			FOR_EACH(units, it){
 				UnitBase* u = *it;
-				if(!u || u->auxiliary() || !u->alive())
+				if(!u)
 					continue;
 				if(cObject3dx* m = dynamic_cast<cObject3dx*>(u->model())){
 					if(m->getAttribute(ATTRUNKOBJ_HIDE_BY_DISTANCE)){
@@ -745,56 +831,114 @@ void EngineViewport::drawFrame()
 			}
 		}
 
+		// Not every world object lives in a player's unit list: decoration that
+		// the .spg attaches straight to the scene grid (some vegetation, props)
+		// never passes through the loop above. Sweep the scene's own 3dx
+		// objects for the same hide-by-distance flag so nothing stays invisible
+		// purely because the editor camera is further than the game's 500.
+		{
+			std::vector<cObject3dx*> sceneObjs;
+			scene_->GetAllObject3dx(sceneObjs);
+			for(size_t i = 0; i < sceneObjs.size(); ++i){
+				cObject3dx* m = sceneObjs[i];
+				if(!m)
+					continue;
+				if(m->getAttribute(ATTRUNKOBJ_HIDE_BY_DISTANCE)){
+					m->clearAttribute(ATTRUNKOBJ_HIDE_BY_DISTANCE);
+					m->SetHideDistance(kEditorHideDistance);
+				}
+			}
+		}
+
+		// The same for the scene's cSimply3dx objects (buildings, vegetation,
+		// props that render through cStaticSimply3dx). They are culled by
+		// cSimply3dx::CalcDistanceAlpha against hideDistance (default 500) in
+		// cStaticSimply3dx::PreDraw — a separate path from cObject3dx::PreDraw,
+		// so the cObject3dx sweep above never reaches them. An editor camera
+		// routinely sits further than 500 from the centre of the world, so
+		// without this every simply-3dx object in the middle of the map stays
+		// invisible while the cObject3dx ones at the edges show.
+		{
+			vector<ListSimply3dx>& lists = scene_->GetAllSimply3dxList();
+			for(size_t li = 0; li < lists.size(); ++li){
+				vector<cSimply3dx*>& objs = lists[li].objects;
+				for(size_t oi = 0; oi < objs.size(); ++oi){
+					cSimply3dx* ms = objs[oi];
+					if(!ms)
+						continue;
+					if(ms->getAttribute(ATTRUNKOBJ_HIDE_BY_DISTANCE)){
+						ms->clearAttribute(ATTRUNKOBJ_HIDE_BY_DISTANCE);
+						ms->SetHideDistance(kEditorHideDistance);
+					}
+				}
+			}
+		}
+
 		// [SurMap5Qt debug] one-shot: where the models are vs what the camera
 		// sees, after the stream drain and the hide-distance clear above.
 		static int dbgOnce = 0;
 		if(dbgOnce < 3){
 			++dbgOnce;
+			// [SurMap5Qt debug] walk the SCENE's 3dx objects (not just player units):
+			// buildings/vegetation may live outside the player lists. Show position,
+			// distance from the camera, visibility and screen projection so a class of
+			// objects that PreDraw rejects (or the camera never reaches) shows up.
+			std::vector<cObject3dx*> sceneObjs;
+			scene_->GetAllObject3dx(sceneObjs);
 			int shown = 0;
-			PlayerVect::const_iterator pi2;
-			FOR_EACH(universe()->Players, pi2){
-				const UnitList& units2 = (*pi2)->units();
-				UnitList::const_iterator it2;
-				FOR_EACH(units2, it2){
-					UnitBase* u = *it2;
-					if(!u || u->auxiliary() || !u->alive())
-						continue;
-					cObject3dx* m = dynamic_cast<cObject3dx*>(u->model());
-					if(!m)
-						continue;
-					const MatXf& mp = m->GetPosition();
-					const Vect3f& upos = u->position();
-					eTestVisible vis = camera_->TestVisible(mp, Vect3f(-1,-1,-1), Vect3f(1,1,1));
-					const Vect3f ceye = camera_->GetPos();
-					// Screen-space projection of the model origin: where on the
-					// viewport the model SHOULD land. pe.z outside the frustum's
-					// near/far, or pe outside the window, means a projection or
-					// camera-matrix problem — not a culling one.
-					Vect3f pv, pe;
-					const Vect3f origin = mp.trans();
-					camera_->ConvertorWorldToViewPort(&origin, &pv, &pe);
-					const Vect2f& zplane = camera_->GetZPlane();
-					fprintf(stderr,
-						"[dbg3d] key='%s' upos=(%.0f,%.0f,%.0f) mpos=(%.0f,%.0f,%.0f) attr=0x%X vis=%d scale=%.2f | cam=(%.0f,%.0f,%.0f) | scr=(%.0f,%.0f) viewZ=%.0f zNear=%.0f zFar=%.0f\n",
-						u->attr().libraryKey() ? u->attr().libraryKey() : "?",
-						upos.x, upos.y, upos.z,
-						mp.trans().x, mp.trans().y, mp.trans().z,
-						(unsigned)m->getAttribute(0xFFFFFFFF), (int)vis, m->GetScale(),
-						ceye.x, ceye.y, ceye.z,
-						pe.x, pe.y, pv.z, zplane.x, zplane.y);
-					if(++shown >= 5)
-						break;
-				}
-				if(shown >= 5)
-					break;
+			for(size_t i = 0; i < sceneObjs.size() && shown < 12; ++i){
+				cObject3dx* m = sceneObjs[i];
+				if(!m)
+					continue;
+				const MatXf& mp = m->GetPosition();
+				const Vect3f ceye = camera_->GetPos();
+				const float d2 = ceye.distance2(mp.trans());
+				eTestVisible vis = camera_->TestVisible(mp, Vect3f(-1,-1,-1), Vect3f(1,1,1));
+				Vect3f pv, pe;
+				const Vect3f origin = mp.trans();
+				camera_->ConvertorWorldToViewPort(&origin, &pv, &pe);
+				const Vect2f& zplane = camera_->GetZPlane();
+				const float terrainZ = vMap.getZf((int)mp.trans().x, (int)mp.trans().y);
+				fprintf(stderr,
+					"[dbg3d] mpos=(%.0f,%.0f,%.0f) terrZ=%.0f d2=%.0f vis=%d scale=%.2f | cam=(%.0f,%.0f,%.0f) | scr=(%.0f,%.0f) viewZ=%.0f zNear=%.0f zFar=%.0f\n",
+					mp.trans().x, mp.trans().y, mp.trans().z, terrainZ, d2, (int)vis, m->GetScale(),
+					ceye.x, ceye.y, ceye.z,
+					pe.x, pe.y, pv.z, zplane.x, zplane.y);
+				++shown;
 			}
 		}
 	}
 
-	// The editor viewport's clear (CGeneralView used the environment's fone
-	// colour; with no world loaded, a neutral slate).
-	gb_RenderDevice->Fill(32, 48, 64, 255);
+	// The editor viewport's clear. CGeneralView used the environment's fone
+	// colour for the clear so the horizon behind the world and the water's
+	// reflected-sky tint match the time of day; with no world loaded (no
+	// Environment yet), a neutral slate.
+	if(environment)
+	{
+		Color4c fone = environment->environmentTime()->GetCurFoneColor();
+		gb_RenderDevice->Fill(fone.r, fone.g, fone.b, 255);
+	}
+	else
+		gb_RenderDevice->Fill(32, 48, 64, 255);
 	gb_RenderDevice->BeginScene();
+
+	// CGeneralView::graphQuant called environment->graphQuant(dt, camera) right
+	// after BeginScene and before terScene->Draw: it opens the frame with the
+	// sky (EnvironmentTime::DrawEnviroment -> cSkyObj::DrawSkyAndAnimate — the
+	// sun/moon and cloud models in their own sky scene), sets the distance fog
+	// plane from the time of day, feeds the water's reflected-sky colour and
+	// arms the post-effect capture when an effect will draw. The Qt port never
+	// called it, so the sky never drew and the fog never reached the terrain or
+	// the objects. dt here is in seconds, the graph side's unit (0.001 * the
+	// milliseconds scene_->SetDeltaTime got above, as CGeneralView did).
+	//
+	// Environment exists only while a world is loaded (Universe's ctor creates
+	// it, its dtor destroys it); environmentTime() exists from the Environment
+	// ctor on. Nothing below touches a world object, so a bare check suffices.
+	if(environment){
+		const float dt = 0.001f * (float)frameMs;
+		environment->graphQuant(dt, camera_);
+	}
 
 	// The camera renders whatever the scene holds: the terrain tile map when a
 	// world is loaded, nothing otherwise. cScene::Draw is the entry point, NOT
@@ -825,13 +969,14 @@ void EngineViewport::drawFrame()
 		else
 			scene_->Draw(camera_);
 
-		// [SurMap5Qt debug] one-shot scene stats: how many 3dx objects the
-		// scene grid holds and how many polygons came out of Draw — the models
-		// are positioned (see [dbg3d]) but if the count is zero nothing reached
-		// the render.
+		// [SurMap5Qt debug] periodic scene stats (every 300th frame after the
+		// first three): how many 3dx objects the scene grid holds and how many
+		// polygons came out of Draw — a steady-state world whose objPolys
+		// collapsed to near zero after the load frames means something (the
+		// editor's graphQuant / Quant path) is hiding the objects post-load.
 		static int dbgScene = 0;
-		if(dbgScene < 3){
-			++dbgScene;
+		++dbgScene;
+		if(dbgScene <= 3 || (dbgScene % 300) == 0){
 			std::vector<cObject3dx*> objs;
 			scene_->GetAllObject3dx(objs);
 			int alive = 0;
@@ -849,8 +994,8 @@ void EngineViewport::drawFrame()
 			const int objPolys = gb_RenderDevice->NumberPolygon;
 			const int tilePolys = gb_RenderDevice->GetDrawNumberTilemapPolygon();
 			fprintf(stderr,
-				"[dbgscene] scene 3dx objects=%zu alive=%d ignored=%d deleted=%d attached=%d | objPolys=%d tilePolys=%d dips=%d\n",
-				objs.size(), alive, ignored, deleted, attached,
+				"[dbgscene] frame=%d scene 3dx objects=%zu alive=%d ignored=%d deleted=%d attached=%d | objPolys=%d tilePolys=%d dips=%d\n",
+				dbgScene, objs.size(), alive, ignored, deleted, attached,
 				objPolys, tilePolys,
 				gb_RenderDevice->GetDrawNumberObjects());
 			fflush(stderr);
@@ -884,8 +1029,15 @@ void EngineViewport::drawFrame()
 		}
 	}
 
-	// CGeneralView::graphQuant drew the grid after terScene->Draw().
+	// CGeneralView::graphQuant drew the grid after terScene->Draw(), then
+	// composited the post-effect stack (environment->drawPostEffects). Monochrome
+	// and the under-water effect are ported to SDL (Render-PORTING.md #6a); the
+	// composite is a no-op on frames where no effect recorded anything.
 	drawGrid();
+	if(environment){
+		const float dt = 0.001f * (float)frameMs;
+		environment->drawPostEffects(dt, camera_);
+	}
 
 	// CGeneralView::graphQuant then ran universe()->graphQuant(dt) — under the
 	// editor it walks the players and calls showEditor() on every unit, which

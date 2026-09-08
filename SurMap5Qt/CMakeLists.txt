@@ -47,11 +47,14 @@ add_library(EditorEngine STATIC
     # Game/CMakeLists.txt), but the Qt editor's Objects Manager needs
     # Universe/CameraManager/Player/etc. for the real object list. The
     # original SurMap5 linked the same Game sources into the editor exe
-    # (the editor IS one of the Game builds in the old vcproj). We follow
+    # (the editor IS one of the Game builds in the old vcproj) — but NOT
+    # GameContext.cpp: the game's Action/Condition bodies, isUnderEditor()
+    # = false and the rest live there, and the editor needs the no-op
+    # versions (SurMap5/VistaEngineContext.cpp). The editor-side context is
+    # src/stubs/VistaEngineContext.cpp (see it for the full list). We follow
     # the same pattern: pull the Game sources into EditorEngine, minus
-    # PlatformStub.cpp (main) / TriggerEditorStub.cpp / WindowsAPI.cpp
-    # which are not relevant here.
-    ${CMAKE_SOURCE_DIR}/Game/GameContext.cpp
+    # GameContext.cpp / PlatformStub.cpp (main) / TriggerEditorStub.cpp /
+    # WindowsAPI.cpp which are not relevant here.
     ${CMAKE_SOURCE_DIR}/Game/Runtime.cpp
     ${CMAKE_SOURCE_DIR}/Game/StdAfx.cpp
     ${CMAKE_SOURCE_DIR}/Game/Actions.cpp
