@@ -92,9 +92,16 @@ void ObjectsTreePanel::rebuild()
 			root->setText(0, tabs_->tabText(i));
 		}
 		else{
+			// The engine's object labels are not all in one encoding: the
+			// source labels arrive as UTF-8, while the unit libraryKey and
+			// camera spline name are plain CP1251 (the archive does not
+			// transcode them). Decode Sources as UTF-8 and the rest with the
+			// system locale (CP1251 on a Russian Windows), which matches.
+			const bool utf8 = (i == 0);   // Sources tab
 			for(int j = 0; j < count; ++j){
 				QTreeWidgetItem* item = new QTreeWidgetItem(tree);
-				item->setText(0, QString::fromUtf8(labels[j]));
+				item->setText(0, utf8 ? QString::fromUtf8(labels[j])
+				                      : QString::fromLocal8Bit(labels[j]));
 				free(labels[j]);
 			}
 		}
