@@ -874,40 +874,7 @@ void EngineViewport::drawFrame()
 			}
 		}
 
-		// [SurMap5Qt debug] one-shot: where the models are vs what the camera
-		// sees, after the stream drain and the hide-distance clear above.
-		static int dbgOnce = 0;
-		if(dbgOnce < 3){
-			++dbgOnce;
-			// [SurMap5Qt debug] walk the SCENE's 3dx objects (not just player units):
-			// buildings/vegetation may live outside the player lists. Show position,
-			// distance from the camera, visibility and screen projection so a class of
-			// objects that PreDraw rejects (or the camera never reaches) shows up.
-			std::vector<cObject3dx*> sceneObjs;
-			scene_->GetAllObject3dx(sceneObjs);
-			int shown = 0;
-			for(size_t i = 0; i < sceneObjs.size() && shown < 12; ++i){
-				cObject3dx* m = sceneObjs[i];
-				if(!m)
-					continue;
-				const MatXf& mp = m->GetPosition();
-				const Vect3f ceye = camera_->GetPos();
-				const float d2 = ceye.distance2(mp.trans());
-				eTestVisible vis = camera_->TestVisible(mp, Vect3f(-1,-1,-1), Vect3f(1,1,1));
-				Vect3f pv, pe;
-				const Vect3f origin = mp.trans();
-				camera_->ConvertorWorldToViewPort(&origin, &pv, &pe);
-				const Vect2f& zplane = camera_->GetZPlane();
-				const float terrainZ = vMap.getZf((int)mp.trans().x, (int)mp.trans().y);
-				fprintf(stderr,
-					"[dbg3d] mpos=(%.0f,%.0f,%.0f) terrZ=%.0f d2=%.0f vis=%d scale=%.2f | cam=(%.0f,%.0f,%.0f) | scr=(%.0f,%.0f) viewZ=%.0f zNear=%.0f zFar=%.0f\n",
-					mp.trans().x, mp.trans().y, mp.trans().z, terrainZ, d2, (int)vis, m->GetScale(),
-					ceye.x, ceye.y, ceye.z,
-					pe.x, pe.y, pv.z, zplane.x, zplane.y);
-				++shown;
-			}
 		}
-	}
 
 	// The editor viewport's clear. CGeneralView used the environment's fone
 	// colour for the clear so the horizon behind the world and the water's
@@ -940,6 +907,16 @@ void EngineViewport::drawFrame()
 		environment->graphQuant(dt, camera_);
 	}
 
+	// CGeneralView::graphQuant and GameShell::Show both set ATTRCAMERA_CLEARZBUFFER
+	// on the camera right after graphQuant and before terScene->Draw, with the
+	// comment "Потому как в небе могут рисоваться планеты в z buffer" -- the sky
+	// draws first (EnvironmentTime::DrawEnviroment -> cSkyObj::DrawSkyAndAnimate)
+	// in a frustum of its own (1e3..1e5) and leaves its depth behind. clearZBuffer
+	// (Camera::ClearZBuffer -> cSDLRenderDevice::clearZBuffer) lets the next pass
+	// own the depth clear again, exactly as if nothing had been drawn, so the
+	// terrain and objects sort against a clean depth buffer instead of the sky's.
+	camera_->setAttribute(ATTRCAMERA_CLEARZBUFFER);
+
 	// The camera renders whatever the scene holds: the terrain tile map when a
 	// world is loaded, nothing otherwise. cScene::Draw is the entry point, NOT
 	// Camera::DrawScene alone: it calls tileMap_->PreDraw first, which attaches
@@ -953,80 +930,7 @@ void EngineViewport::drawFrame()
 		const Vect2f zPlane(30.0f, std::max(12000.0f, orbit_.distance * 3.0f));
 		camera_->SetFrustum(&center, &clip, &focus, &zPlane);
 
-		// [SurMap5Qt debug] draw the loaded world once in wireframe (after the
-		// first world load — the pre-world empty frame is useless): if the unit
-		// models show up as line cages over the terrain, the vertex transforms
-		// are fine and the problem is in the solid fill (materials/textures);
-		// if they stay invisible the geometry never reaches the screen.
-		static bool dbgWireArmed = true;
-		if(dbgWireArmed && worldLoaded_){
-			dbgWireArmed = false;
-			gb_RenderDevice->SetRenderState(RS_FILLMODE, FILL_WIREFRAME);
-			scene_->Draw(camera_);
-			gb_RenderDevice->SetRenderState(RS_FILLMODE, FILL_SOLID);
-			fprintf(stderr, "[dbgwire] first loaded-world frame drawn in wireframe\n"); fflush(stderr);
-		}
-		else
-			scene_->Draw(camera_);
-
-		// [SurMap5Qt debug] periodic scene stats (every 300th frame after the
-		// first three): how many 3dx objects the scene grid holds and how many
-		// polygons came out of Draw — a steady-state world whose objPolys
-		// collapsed to near zero after the load frames means something (the
-		// editor's graphQuant / Quant path) is hiding the objects post-load.
-		static int dbgScene = 0;
-		++dbgScene;
-		if(dbgScene <= 3 || (dbgScene % 300) == 0){
-			std::vector<cObject3dx*> objs;
-			scene_->GetAllObject3dx(objs);
-			int alive = 0;
-			int ignored = 0;
-			int attached = 0;
-			int deleted = 0;
-			for(size_t i = 0; i < objs.size(); ++i){
-				if(objs[i]){
-					++alive;
-					if(objs[i]->getAttribute(ATTRUNKOBJ_IGNORE)) ++ignored;
-					if(objs[i]->getAttribute(ATTRUNKOBJ_ATTACHED)) ++attached;
-					if(objs[i]->getAttribute(ATTRUNKOBJ_DELETED)) ++deleted;
-				}
-			}
-			const int objPolys = gb_RenderDevice->NumberPolygon;
-			const int tilePolys = gb_RenderDevice->GetDrawNumberTilemapPolygon();
-			fprintf(stderr,
-				"[dbgscene] frame=%d scene 3dx objects=%zu alive=%d ignored=%d deleted=%d attached=%d | objPolys=%d tilePolys=%d dips=%d\n",
-				dbgScene, objs.size(), alive, ignored, deleted, attached,
-				objPolys, tilePolys,
-				gb_RenderDevice->GetDrawNumberObjects());
-			fflush(stderr);
-		}
-
-		// [SurMap5Qt debug] marker crosses at live unit positions, drawn right
-		// after the scene — confirms where the engine believes units are.
-		if(ownedUniverse_){
-			const float s = 40.f;
-			Color4c col(255, 255, 0, 255);
-			int drawn = 0;
-			PlayerVect::const_iterator pi3;
-			FOR_EACH(universe()->Players, pi3){
-				const UnitList& units3 = (*pi3)->units();
-				UnitList::const_iterator it3;
-				FOR_EACH(units3, it3){
-					UnitBase* u = *it3;
-					if(!u || u->auxiliary() || !u->alive())
-						continue;
-					const Vect3f& p = u->position();
-					const Vect3f pz(p.x, p.y, p.z + 60.f);   // a little above ground
-					gb_RenderDevice->DrawLine(pz + Vect3f(-s, 0, 0), pz + Vect3f(s, 0, 0), col);
-					gb_RenderDevice->DrawLine(pz + Vect3f(0, -s, 0), pz + Vect3f(0, s, 0), col);
-					gb_RenderDevice->DrawLine(pz + Vect3f(0, 0, -s), pz + Vect3f(0, 0, s), col);
-					if(++drawn >= 200)
-						break;
-				}
-				if(drawn >= 200)
-					break;
-			}
-		}
+		scene_->Draw(camera_);
 	}
 
 	// CGeneralView::graphQuant drew the grid after terScene->Draw(), then
