@@ -53,7 +53,12 @@ SDLWaterRenderer::~SDLWaterRenderer()
 // ---------------------------------------------------------------------------
 void SDLWaterRenderer::createPipelines()
 {
-	if(!device_ || !window_) return;
+	// window_ may be null -- the Qt editor creates no SDL window of its own; the swapchain
+	// comes from the foreign window later. SDL_GetGPUSwapchainTextureFormat tolerates a null
+	// window (it returns the device's default swapchain format, which SDLTileMapRenderer's
+	// ctor pipelines rely on), so only the device matters here. Requiring a window left the
+	// water pipelines never built in the Qt editor and the sea invisible.
+	if(!device_) return;
 
 	// cWater::Draw's SetSamplerData(0|1, sampler_wrap_anisotropic). max_lod must be set:
 	// it defaults to 0, which pins sampling to the top level however many the texture has.
@@ -129,7 +134,9 @@ void SDLWaterRenderer::createPipelines()
 // pipeline state, differing only in the shader (water_ice) and its six samplers.
 void SDLWaterRenderer::createIcePipeline()
 {
-	if(!device_ || !window_) return;
+	// See createPipelines: only the device matters; the swapchain-format query tolerates a
+	// null window.
+	if(!device_) return;
 
 	SDL_GPUShaderCreateInfo vsi = vista::shaderCreateInfo(VISTA_SHADER(water_ice_vert));
 	vsi.stage = SDL_GPU_SHADERSTAGE_VERTEX;

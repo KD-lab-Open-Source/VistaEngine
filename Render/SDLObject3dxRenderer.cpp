@@ -737,10 +737,12 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 	int boundState = -1;
 	float vsUniform[VS_UNIFORM_FLOATS];
 
-	// [SurMap5Qt debug] one-shot: how many recorded draws actually replay into the
+	// [SurMap5Qt debug] periodic: how many recorded draws actually replay into the
 	// frame target. A large draws_ with a small drawn_ means pipelineFor() is
-	// rejecting the states the scene records (null pipeline -> skip).
-	static int dbgReplayOnce = 1;
+	// rejecting the states the scene records (null pipeline -> skip). Prints every
+	// 120th colour pass so a steady-state world can be inspected.
+	static int dbgReplayFrame = 0;
+	const bool dbgReplayNow = (++dbgReplayFrame % 120) == 1;
 	int dbgTotal = 0, dbgNullPipeline = 0;
 
 	for(const DrawCmd& d : draws_){
@@ -748,7 +750,7 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 
 		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(d.stride, st.skinned, st.bump, st.reflect, st.secondOpacity,
 		                                                st.blend, st.mirrored, d.depthWrite, wireframe, false);
-		if(!pipeline){ if(dbgReplayOnce) ++dbgNullPipeline; continue; }
+		if(!pipeline){ if(dbgReplayNow) ++dbgNullPipeline; continue; }
 		++dbgTotal;
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);
@@ -831,8 +833,7 @@ bool SDLObject3dxRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 	}
 
 	// [SurMap5Qt debug] see the counters set above the loop.
-	if(dbgReplayOnce){
-		--dbgReplayOnce;
+	if(dbgReplayNow){
 		fprintf(stderr, "[dbgreplay] draws=%d nullPipeline=%d replayed=%d wireframe=%d\n",
 			dbgTotal + dbgNullPipeline, dbgNullPipeline, dbgTotal, (int)wireframe);
 		fflush(stderr);

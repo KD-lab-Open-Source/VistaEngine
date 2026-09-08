@@ -130,6 +130,8 @@ public:
 	                          const sPtrIndexBuffer& ib, int nOfsPolygon, int nPolygon);
 
 	bool hasDraws() const { return !draws_.empty(); }
+	// [SurMap5Qt debug] number of recorded draws, for diagnostics.
+	int drawCount() const { return (int)draws_.size(); }
 	// Throw the pending draws away: the target they were recorded under cannot be rendered
 	// into (see cSDLRenderDevice::flushTarget), and they must not replay into the next one.
 	void DiscardDraws() { draws_.clear(); }

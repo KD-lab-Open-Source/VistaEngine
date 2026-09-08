@@ -64,7 +64,10 @@ bool SDLPostEffectRenderer::createShaders()
 	if(shadersTried_)
 		return vs_ != nullptr;
 	shadersTried_ = true;
-	if(!device_ || !window_)
+	// window_ may be null -- the Qt editor creates no SDL window of its own; the swapchain
+	// comes from the foreign window later. SDL_GetGPUSwapchainTextureFormat tolerates a null
+	// window (it returns the device's default swapchain format), so only the device matters.
+	if(!device_)
 		return false;
 
 	SDL_GPUShaderCreateInfo vsi = vista::shaderCreateInfo(VISTA_SHADER(posteffect_vert));

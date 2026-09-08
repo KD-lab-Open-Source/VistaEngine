@@ -66,7 +66,10 @@ SDLWorldQuadRenderer::~SDLWorldQuadRenderer()
 // ---------------------------------------------------------------------------
 void SDLWorldQuadRenderer::createSampler()
 {
-	if(!device_ || !window_) return;
+	// window_ may be null -- the Qt editor creates no SDL window of its own; the swapchain
+	// comes from the foreign window later. Samplers need no window; only the pipeline
+	// format query does, and that tolerates a null window.
+	if(!device_) return;
 
 	// cCoastSprites::Draw's SetSamplerDataVirtual(0, sampler_wrap_anisotropic); the wave
 	// sources inherit the scene's sampler_wrap_linear, which this rounds up to. max_lod
@@ -176,7 +179,11 @@ SDL_GPUGraphicsPipeline* SDLWorldQuadRenderer::pipelineFor(eBlendMode blend, boo
 	if(it != pipelines_.end())
 		return it->second;
 
-	if(!window_ || !createShaders()){
+	// window_ may be null -- the Qt editor creates no SDL window of its own; the swapchain
+	// comes from the foreign window later. SDL_GetGPUSwapchainTextureFormat tolerates a null
+	// window (it returns the device's default swapchain format, as SDLWorldLineRenderer
+	// relies on), so only the device matters.
+	if(!createShaders()){
 		pipelines_[key] = nullptr;
 		return nullptr;
 	}

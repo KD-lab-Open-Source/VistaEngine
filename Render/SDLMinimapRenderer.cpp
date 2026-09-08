@@ -54,7 +54,10 @@ SDLMinimapRenderer::~SDLMinimapRenderer()
 // ---------------------------------------------------------------------------
 void SDLMinimapRenderer::createPipelines()
 {
-	if(!device_ || !window_) return;
+	// window_ may be null -- the Qt editor creates no SDL window of its own; the swapchain
+	// comes from the foreign window later. SDL_GetGPUSwapchainTextureFormat tolerates a null
+	// window (it returns the device's default swapchain format), so only the device matters.
+	if(!device_) return;
 
 	SDL_GPUSamplerCreateInfo si = {};
 	si.min_filter = SDL_GPU_FILTER_LINEAR;

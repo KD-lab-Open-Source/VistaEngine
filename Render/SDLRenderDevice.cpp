@@ -862,6 +862,29 @@ void cSDLRenderDevice::flushTarget(RenderTarget* rt, bool settle)
 	if(!rt || !commandBuffer_ || !objectRenderer_)
 		return;
 
+	// [SurMap5Qt debug] cumulative by target: which render target's flushes carry the
+	// object draws. If the colour draws pile up on a non-screen target (capture/offscreen)
+	// and the screen flush is empty, objects are drawn somewhere the user never sees.
+	static int dbgFlushN = 0;
+	static long dbgFlushScreen = 0, dbgFlushCapture = 0, dbgFlushOther = 0, dbgFlushShadow = 0;
+	++dbgFlushN;
+	const bool isScreen = rt->color == screen_.color && screen_.color;
+	const bool isCapture = captureArmed_ && rt->color == capture_.color;
+	if(rt->depthOnly)
+		dbgFlushShadow += objectRenderer_->drawCount();
+	else if(isScreen)
+		dbgFlushScreen += objectRenderer_->drawCount();
+	else if(isCapture)
+		dbgFlushCapture += objectRenderer_->drawCount();
+	else
+		dbgFlushOther += objectRenderer_->drawCount();
+	if(dbgFlushN >= 300){
+		fprintf(stderr, "[dbgflush] 300 flushes: screen=%ld capture=%ld other=%ld shadow=%ld captureArmed=%d\n",
+		        dbgFlushScreen, dbgFlushCapture, dbgFlushOther, dbgFlushShadow, (int)captureArmed_);
+		fflush(stderr);
+		dbgFlushN = 0; dbgFlushScreen = 0; dbgFlushCapture = 0; dbgFlushOther = 0; dbgFlushShadow = 0;
+	}
+
 	// Nothing to render into (nullTarget_, or a frame with no swapchain image). The draws
 	// recorded under it belong nowhere; drop them, or they replay into the next target.
 	if(!rt->usable()){
