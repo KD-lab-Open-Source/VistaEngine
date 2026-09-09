@@ -166,6 +166,12 @@ add_executable(SurMap5Qt
     src/dialogs/TexturesStatisticsDialog.cpp
     src/dialogs/CameraDialog.h
     src/dialogs/CameraDialog.cpp
+    src/dialogs/HeadsDialog.h
+    src/dialogs/HeadsDialog.cpp
+    src/dialogs/ReelsDialog.h
+    src/dialogs/ReelsDialog.cpp
+    src/dialogs/TerrainTypeDialog.h
+    src/dialogs/TerrainTypeDialog.cpp
     src/dialogs/WaveDialog.h
     src/dialogs/WaveDialog.cpp
     # U5 dialogs — Time slider / Textures statistics / Camera / Waves

@@ -40,6 +40,9 @@
 #include "dialogs/TexturesStatisticsDialog.h"
 #include "dialogs/TimeSliderDialog.h"
 #include "dialogs/CameraDialog.h"
+#include "dialogs/HeadsDialog.h"
+#include "dialogs/ReelsDialog.h"
+#include "dialogs/TerrainTypeDialog.h"
 #include "dialogs/WaveDialog.h"
 #include "dialogs/BorderRollingDialog.h"
 #include "dialogs/SelectTriggerDialog.h"
@@ -358,13 +361,24 @@ void MainWindow::createActions()
 	connect(actLibUIMessages_, &QAction::triggered, this, [this, stub]{ stub("libraries/ui-messages", tr("UI Messages: not wired yet")); });
 	connect(actLibUIShowModeSprites_, &QAction::triggered, this, [this, stub]{ stub("libraries/ui-show-mode-sprites", tr("UI Show Mode Sprites: not wired yet")); });
 	connect(actLibSoundTracks_, &QAction::triggered, this, [this, stub]{ stub("libraries/sound-tracks", tr("Sound Tracks: not wired yet")); });
-	connect(actLibReels_, &QAction::triggered, this, [this, stub]{ stub("libraries/reels", tr("Cut-Scenes: not wired yet")); });
-	connect(actLibHeads_, &QAction::triggered, this, [this, stub]{ stub("libraries/heads", tr("Heads: not wired yet")); });
+	connect(actLibReels_, &QAction::triggered, this, [this]{
+		ReelsDialog dlg(this);
+		dlg.exec();
+	});
+	connect(actLibHeads_, &QAction::triggered, this, [this]{
+		HeadsDialog dlg(this);
+		dlg.setBridge(view_->worldBridge());
+		dlg.exec();
+	});
 	connect(actLibTerTools_, &QAction::triggered, this, [this, stub]{ stub("libraries/tertools", tr("TerTools: not wired yet")); });
 	connect(actLibCursors_, &QAction::triggered, this, [this, stub]{ stub("libraries/cursors", tr("Cursors: not wired yet")); });
 	connect(actLibCommandColors_, &QAction::triggered, this, [this, stub]{ stub("libraries/command-colors", tr("Command Colors: not wired yet")); });
 	connect(actLibTextImages_, &QAction::triggered, this, [this, stub]{ stub("libraries/text-images", tr("Text images: not wired yet")); });
-	connect(actLibTerrainTypeName_, &QAction::triggered, this, [this, stub]{ stub("libraries/terrain-type-name", tr("Terrain Type Name: not wired yet")); });
+	connect(actLibTerrainTypeName_, &QAction::triggered, this, [this]{
+		TerrainTypeDialog dlg(this);
+		dlg.setBridge(view_->worldBridge());
+		dlg.exec();
+	});
 	connect(actLibImportParametersFull_, &QAction::triggered, this, [this, stub]{ stub("libraries/import-params-full", tr("Import Parameters (Full): not wired yet")); });
 	connect(actLibImportParametersByGroups_, &QAction::triggered, this, [this, stub]{ stub("libraries/import-params-groups", tr("Import Parameters (By Groups): not wired yet")); });
 	connect(actLibExportParametersFull_, &QAction::triggered, this, [this, stub]{ stub("libraries/export-params-full", tr("Export Parameters (Full): not wired yet")); });

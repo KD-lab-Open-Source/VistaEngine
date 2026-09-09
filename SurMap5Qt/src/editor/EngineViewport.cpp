@@ -46,6 +46,9 @@ using namespace std;
 #include "Units/EnvironmentSimple.h"    // UnitEnvironmentSimple (Environment tab filter)
 #include "Units/BaseUnit.h"              // UnitBase, UnitList
 #include "Units/BaseUniverseObject.h"    // BaseUniverseObject (world bridge visit)
+#include "Units/GlobalAttributes.h"      // GlobalAttributes::showHeadNames (Heads library)
+#include "Units/CommandsQueue.h"         // CommandColorManager (command colors)
+#include "Util/Serialization/EnumDescriptor.h" // getEnumDescriptor (command colors)
 #include "Render/3dx/Node3DX.h"          // cObject3dx (model state debug)
 #include "Render/3dx/Simply3dx.h"        // cSimply3dx (environment models)
 #include "Render/src/NParticle.h"        // cEffect::setVisibleRange (editor shows all effects)
@@ -377,6 +380,84 @@ public:
 			return false;
 		environment->environmentTime()->SetTime(hours);
 		return true;
+	}
+
+	void headNames(std::vector<std::string>& out) override
+	{
+		out.clear();
+		// GlobalAttributes::showHeadNames is a public field (vector of
+		// ShowHeadName, each holding a file name).
+		const ShowHeadNames& heads = GlobalAttributes::instance().showHeadNames;
+		for(size_t i = 0; i < heads.size(); ++i)
+			out.push_back(heads[i].fileName_);
+	}
+
+	bool setHeadNames(const std::vector<std::string>& names) override
+	{
+		// Replace the head list and persist it (GlobalAttributes::saveLibrary).
+		ShowHeadNames& heads = GlobalAttributes::instance().showHeadNames;
+		heads.clear();
+		for(const std::string& n : names)
+			heads.push_back(ShowHeadName(n.c_str()));
+		GlobalAttributes::instance().saveLibrary();
+		return true;
+	}
+
+	void terrainTypeNames(std::vector<std::string>& names,
+	                      std::vector<unsigned>& colors) override
+	{
+		names.clear();
+		colors.clear();
+		// TerrainTypeDescriptor: names via nameAlt(1<<i), colors via getColors().
+		TerrainTypeDescriptor& desc = TerrainTypeDescriptor::instance();
+		const Color4c* cols = desc.getColors();
+		for(int i = 0; i < TERRAIN_TYPES_NUMBER; ++i){
+			const char* n = desc.nameAlt(1 << i);
+			names.push_back(n ? n : "");
+			if(cols){
+				const Color4c& c = cols[i];
+				colors.push_back(((unsigned)c.r << 16) | ((unsigned)c.g << 8) | (unsigned)c.b);
+			}
+			else
+				colors.push_back(0);
+		}
+	}
+
+	bool setTerrainTypeNames(const std::vector<std::string>& names,
+	                         const std::vector<unsigned>& colors) override
+	{
+		// TerrainTypeDescriptor's name/color arrays are private; the public
+		// write path is serialize + saveLibrary. Rebuild via a temporary
+		// archive is not practical here, so this is a no-op for now (the
+		// dialog shows the names read-only).
+		(void)names; (void)colors;
+		return false;
+	}
+
+	void commandColors(std::vector<int>& ids,
+	                   std::vector<unsigned>& colors) override
+	{
+		// CommandColorManager::colors_ is private with no setter; reading the
+		// per-command colors requires the CommandID enum. Expose the ids and
+		// their colors via getColor where the enum is reachable.
+		ids.clear();
+		colors.clear();
+		const EnumDescriptor& desc = getEnumDescriptor(CommandID(0));
+		const ComboStrings& strings = desc.comboStrings();
+		for(size_t i = 0; i < strings.size(); ++i){
+			const int key = desc.keyByName(strings[i].c_str());
+			const Color3c& c = CommandColorManager::instance().getColor(CommandID(key));
+			ids.push_back(key);
+			colors.push_back(((unsigned)c.r << 16) | ((unsigned)c.g << 8) | (unsigned)c.b);
+		}
+	}
+
+	bool setCommandColor(int id, unsigned color) override
+	{
+		// CommandColorManager::colors_ is private with no setter; writing a
+		// color would need engine changes. No-op for now.
+		(void)id; (void)color;
+		return false;
 	}
 };
 

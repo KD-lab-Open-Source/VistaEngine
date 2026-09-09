@@ -210,6 +210,28 @@ public:
 	// Set the time of day in hours (0..24). Returns false when no environment.
 	virtual bool setTimeOfDay(float hours) = 0;
 
+	// --- Libraries (Libraries menu) ---
+
+	// Heads (GlobalAttributes::showHeadNames): the list of head file names.
+	virtual void headNames(std::vector<std::string>& out) = 0;
+	// Replace the whole head list (GlobalAttributes::showHeadNames + save).
+	virtual bool setHeadNames(const std::vector<std::string>& names) = 0;
+
+	// Terrain type names (TerrainTypeDescriptor): 16 entries of (name, color).
+	// Colors are 0xRRGGBB.
+	virtual void terrainTypeNames(std::vector<std::string>& names,
+	                              std::vector<unsigned>& colors) = 0;
+	// Replace the terrain type names/colors (TerrainTypeDescriptor + save).
+	virtual bool setTerrainTypeNames(const std::vector<std::string>& names,
+	                                 const std::vector<unsigned>& colors) = 0;
+
+	// Command colors (CommandColorManager): colors indexed by command id.
+	// Returns the command ids + their colors (0xRRGGBB).
+	virtual void commandColors(std::vector<int>& ids,
+	                           std::vector<unsigned>& colors) = 0;
+	// Set one command's color (CommandColorManager + save).
+	virtual bool setCommandColor(int id, unsigned color) = 0;
+
 	// Static sentinel representing "no object".
 	static constexpr EditorObjectId kNoObject = 0;
 };
