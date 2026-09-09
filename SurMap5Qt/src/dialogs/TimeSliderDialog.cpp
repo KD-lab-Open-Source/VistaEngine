@@ -89,6 +89,9 @@ void TimeSliderDialog::onSliderChanged(int pos)
 	updating_ = true;
 	edit_->setText(QString::number(time_, 'f', 2));
 	updating_ = false;
+	// Push the new time into the world's clock (Environment::environmentTime).
+	if(bridge_)
+		bridge_->setTimeOfDay(time_);
 	if(!timeFlowEnabled_)
 		emit timeChanged(time_);
 }
@@ -104,6 +107,8 @@ void TimeSliderDialog::onEditChanged()
 		updating_ = true;
 		slider_->setValue((int)((time_ / 24.f) * (kSliderMax - kSliderMin) + kSliderMin));
 		updating_ = false;
+		if(bridge_)
+			bridge_->setTimeOfDay(time_);
 		if(!timeFlowEnabled_)
 			emit timeChanged(time_);
 	}

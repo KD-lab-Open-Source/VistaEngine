@@ -19,6 +19,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 // Engine vectors live in the engine libs; the tools must not include engine
 // headers, so coordinates are plain 3-component float triples (Vect3f is
@@ -50,10 +51,19 @@ public:
 	virtual void drawCircle2D(const ToolVec2& center, int radius, unsigned colorARGB) = 0;
 };
 
+// IWorldBridge is the engine-free surface the tools use; see its definition
+// after EditorTool below. Forward-declared so EditorTool can hold a pointer.
+class IWorldBridge;
+
 class EditorTool
 {
 public:
 	virtual ~EditorTool() = default;
+
+	// The world bridge installed by ToolManager (render view wires it in on
+	// construction). Tools that don't touch the world ignore it.
+	void setWorldBridge(IWorldBridge* bridge) { bridge_ = bridge; }
+	IWorldBridge* bridge() const { return bridge_; }
 
 	// The tool's display name (the tools tree label).
 	virtual const char* name() const = 0;
@@ -90,4 +100,116 @@ public:
 	// Tool becomes/ceases to be the current tool.
 	virtual void onActivate() {}
 	virtual void onDeactivate() {}
+
+private:
+	IWorldBridge* bridge_ = nullptr;
+};
+
+// WorldBridge — the engine-free bridge a tool uses to reach the engine side.
+//
+// The Qt tools must not include engine headers, so the engine-facing surface
+// EngineViewport exposes is exactly this interface (a port of the global
+// SelectionUtil helpers + universe/sourceManager/cameraManager access). The
+// concrete implementation lives engine-side (EngineViewport::WorldBridge);
+// RenderViewWidget hands a pointer to ToolManager, which installs it on every
+// tool. Tools that never touch the world keep bridge() == nullptr.
+//
+// This mirrors how CSurToolBase reached the engine globals directly in MFC:
+// manipulating a generic object id (a port of BaseUniverseObject) instead of
+// the engine's UnitBase/SourceBase/CameraSpline directly.
+
+// An opaque handle to one world object (a unit, source, anchor or camera
+// spline). Engine-side it maps to BaseUniverseObject*. Plain int-sized so
+// tools can hold it across a selection without engine types.
+using EditorObjectId = intptr_t;
+
+// Pose of an editor object: orientation (x,y,z,w quaternion) + position.
+// Matches Se3f field-for-field so the engine side can convert freely.
+struct EditorPose
+{
+	// Quaternion (w,x,y,z — Se3f uses QuatF(x,y,z,w), so keep field order
+	// and convert by name on the engine side).
+	float ox = 0.f, oy = 0.f, oz = 0.f, ow = 1.f;
+	ToolVec3 pos;
+};
+
+// A visitor over the currently selected objects. Implemented by the tool that
+// wants to act on the selection (port of UniverseObjectAction). The object id
+// is valid only for the duration of the visit() call.
+class IEditorObjectVisitor
+{
+public:
+	virtual ~IEditorObjectVisitor() = default;
+	virtual void visit(EditorObjectId id) = 0;
+};
+
+class IWorldBridge
+{
+public:
+	virtual ~IWorldBridge() = default;
+
+	// Ports of SelectionUtil globals.
+	virtual void forEachSelected(IEditorObjectVisitor& visitor) = 0;
+	virtual void deselectAll() = 0;
+	virtual void deleteSelected() = 0;
+
+	// Hover/selection helpers used by the tools.
+	// Returns the topmost object under the normalized screen point (-0.5..0.5),
+	// or kNoObject when nothing is hit.
+	virtual EditorObjectId hoverAt(float screenX, float screenY) = 0;
+	// Select the whole world by a screen box (pixels, widget space).
+	virtual void selectInRect(int x0, int y0, int x1, int y1, bool add) = 0;
+
+	// Pose read/write on a single object (base does not have setPosition;
+	// everything goes through setPose).
+	virtual EditorPose objectPose(EditorObjectId id) = 0;
+	virtual void setObjectPose(EditorObjectId id, const EditorPose& pose, bool init) = 0;
+	virtual float objectRadius(EditorObjectId id) = 0;
+	virtual void setObjectRadius(EditorObjectId id, float radius) = 0;
+
+	// Terrain height + a ray-cast of a widget pixel to the ground (the
+	// tools' screenPointToGround / projectScreenPointOnPlane ports).
+	virtual float terrainHeight(float x, float y) = 0;
+	virtual bool screenPointToGround(int sx, int sy, ToolVec3& out) = 0;
+
+	// Terrain generation (SurToolGeoNet::onOperationOnMap -> geoGeneration).
+	// Applies a geo-net hill generation centred at (x, y) over a brush-sized
+	// area. `height` is the target voxel height, `noise` the noise level,
+	// `mesh` the grid density. Returns false when no world is loaded.
+	virtual bool applyGeoNet(float x, float y, float brushRadius,
+	                         int height, int noise, int mesh) = 0;
+
+	// Re-render the whole world (SurToolGeoTx::onOperationOnMap ->
+	// vMap.WorldRender). Returns false when no world is loaded.
+	virtual bool worldRender() = 0;
+
+	// Camera splines (CameraDialog). Names of the saved camera paths.
+	virtual void cameraNames(std::vector<std::string>& out) = 0;
+	// Create a new (empty) camera spline with the given name.
+	virtual bool createCamera(const std::string& name) = 0;
+	// Delete the camera spline with the given name.
+	virtual bool deleteCamera(const std::string& name) = 0;
+	// Replay the camera spline with the given name (loadPath + startReplayPath).
+	virtual bool playCamera(const std::string& name) = 0;
+
+	// Fixed waves (WaveDialog -> environment->fixedWaves()). Names of the
+	// wave lines.
+	virtual void waveNames(std::vector<std::string>& out) = 0;
+	// Create a new wave line with the given name.
+	virtual bool createWave(const std::string& name) = 0;
+	// Remove the wave line with the given name.
+	virtual bool removeWave(const std::string& name) = 0;
+	// Apply the wave-line parameters (CWaveDlg::OnBnClickedApply).
+	virtual bool applyWave(const std::string& name, float distance, float speed,
+	                       float sizeMin, float sizeMax, float generationTime,
+	                       bool invert) = 0;
+
+	// Time of day (TimeSliderDialog -> Environment::environmentTime()).
+	// Returns the current time in hours (0..24), or -1 when no environment.
+	virtual float timeOfDay() = 0;
+	// Set the time of day in hours (0..24). Returns false when no environment.
+	virtual bool setTimeOfDay(float hours) = 0;
+
+	// Static sentinel representing "no object".
+	static constexpr EditorObjectId kNoObject = 0;
 };

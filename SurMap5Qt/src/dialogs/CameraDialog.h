@@ -11,6 +11,8 @@
 
 #include <QStringList>
 
+#include "editor/EditorTool.h"   // IWorldBridge (engine-free)
+
 class QLabel;
 class QLineEdit;
 class QListWidget;
@@ -21,6 +23,10 @@ class CameraDialog : public QDialog
 	Q_OBJECT
 public:
 	explicit CameraDialog(QWidget* parent = nullptr);
+
+	// The engine-free bridge to the camera splines (CameraManager). Without
+	// it the dialog's actions are no-ops.
+	void setBridge(IWorldBridge* bridge) { bridge_ = bridge; refresh(); }
 
 	// The camera paths to list (CameraManager::splines names). Empty by
 	// default — populated when cameraManager is wired.
@@ -33,6 +39,10 @@ private slots:
 	void onListSelectionChanged();
 
 private:
+	// Reload the camera list from the bridge (if any).
+	void refresh();
+
+	IWorldBridge* bridge_ = nullptr;
 	QListWidget* list_ = nullptr;
 	QPushButton* btnCreate_ = nullptr;
 	QPushButton* btnDelete_ = nullptr;

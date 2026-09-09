@@ -11,6 +11,8 @@
 
 #include <QStringList>
 
+#include "editor/EditorTool.h"   // IWorldBridge (engine-free)
+
 class QLabel;
 class QListWidget;
 class QPushButton;
@@ -23,6 +25,9 @@ class WaveDialog : public QDialog
 public:
 	explicit WaveDialog(QWidget* parent = nullptr);
 
+	// The engine-free bridge to the fixed waves (environment->fixedWaves()).
+	void setBridge(IWorldBridge* bridge) { bridge_ = bridge; refresh(); }
+
 	// The wave-line names to list (cFixedWavesContainer waves).
 	void setWaves(const QStringList& names);
 
@@ -33,6 +38,10 @@ private slots:
 	void onListSelectionChanged();
 
 private:
+	// Reload the wave list from the bridge (if any).
+	void refresh();
+
+	IWorldBridge* bridge_ = nullptr;
 	QListWidget* list_ = nullptr;
 	QPushButton* btnCreate_ = nullptr;
 	QPushButton* btnRemove_ = nullptr;

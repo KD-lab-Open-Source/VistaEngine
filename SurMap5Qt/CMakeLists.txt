@@ -203,6 +203,19 @@ add_executable(SurMap5Qt
     src/tools/RotateTool.cpp
     src/tools/ScaleTool.h
     src/tools/ScaleTool.cpp
+    # The Properties dock's panel for the transform tools (axis radio trio).
+    src/tools/TransformPropertyPanel.h
+    src/tools/TransformPropertyPanel.cpp
+    # The GeoNet terrain tool + its Properties panel (height/noise/mesh).
+    src/tools/GeoNetTool.h
+    src/tools/GeoNetTool.cpp
+    src/tools/GeoNetPropertyPanel.h
+    src/tools/GeoNetPropertyPanel.cpp
+    # The GeoTx geo-texture tool + its Properties panel (two .tga pickers).
+    src/tools/GeoTxTool.h
+    src/tools/GeoTxTool.cpp
+    src/tools/GeoTxPropertyPanel.h
+    src/tools/GeoTxPropertyPanel.cpp
     # Phase 6 — the kdw trees as QTreeWidgets (tools + objects manager)
     src/panels/ToolsTreePanel.h
     src/panels/ToolsTreePanel.cpp

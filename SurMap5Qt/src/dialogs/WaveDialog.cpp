@@ -2,6 +2,8 @@
 
 #include "WaveDialog.h"
 
+#include <vector>
+
 #include <QCheckBox>
 #include <QDialogButtonBox>
 #include <QGridLayout>
@@ -81,6 +83,18 @@ void WaveDialog::setWaves(const QStringList& names)
 	onListSelectionChanged();
 }
 
+void WaveDialog::refresh()
+{
+	if(!bridge_)
+		return;
+	std::vector<std::string> names;
+	bridge_->waveNames(names);
+	QStringList list;
+	for(const std::string& n : names)
+		list.push_back(QString::fromStdString(n));
+	setWaves(list);
+}
+
 void WaveDialog::onListSelectionChanged()
 {
 	const bool has = list_->currentItem() != nullptr;
@@ -96,15 +110,55 @@ void WaveDialog::onListSelectionChanged()
 
 void WaveDialog::onCreateWave()
 {
-	statusLabel_->setText(tr("Wave creation needs environment->fixedWaves() (not wired in the Qt port yet)."));
+	if(!bridge_){
+		statusLabel_->setText(tr("Wave creation needs environment->fixedWaves() (not wired in the Qt port yet)."));
+		return;
+	}
+	// CWaveDlg::OnBnClickedCreateWave: ask for a name, then AddWaves().
+	// The original used a separate CEnterNameDlg; here we default the name.
+	const QString waveName = tr("Wave %1").arg(list_->count() + 1);
+	if(bridge_->createWave(waveName.toStdString())){
+		statusLabel_->setText(tr("Wave '%1' created.").arg(waveName));
+		refresh();
+	}
+	else
+		statusLabel_->setText(tr("Could not create wave."));
 }
 
 void WaveDialog::onRemoveWave()
 {
-	statusLabel_->setText(tr("Wave removal needs environment->fixedWaves() (not wired in the Qt port yet)."));
+	if(!bridge_){
+		statusLabel_->setText(tr("Wave removal needs environment->fixedWaves() (not wired in the Qt port yet)."));
+		return;
+	}
+	const QString name = list_->currentItem() ? list_->currentItem()->text() : QString();
+	if(name.isEmpty())
+		return;
+	if(bridge_->removeWave(name.toStdString())){
+		statusLabel_->setText(tr("Wave '%1' removed.").arg(name));
+		refresh();
+	}
+	else
+		statusLabel_->setText(tr("Could not remove wave."));
 }
 
 void WaveDialog::onApply()
 {
-	statusLabel_->setText(tr("Wave apply needs environment->fixedWaves() (not wired in the Qt port yet)."));
+	if(!bridge_){
+		statusLabel_->setText(tr("Wave apply needs environment->fixedWaves() (not wired in the Qt port yet)."));
+		return;
+	}
+	const QString name = list_->currentItem() ? list_->currentItem()->text() : QString();
+	if(name.isEmpty())
+		return;
+	const float distance = distanceEdit_->text().toFloat();
+	const float speed = speedEdit_->text().toFloat();
+	const float sizeMin = sizeMinEdit_->text().toFloat();
+	const float sizeMax = sizeMaxEdit_->text().toFloat();
+	const float genTime = generationTimeEdit_->text().toFloat();
+	const bool invert = invertCheck_->isChecked();
+	if(bridge_->applyWave(name.toStdString(), distance, speed, sizeMin, sizeMax, genTime, invert))
+		statusLabel_->setText(tr("Wave '%1' applied.").arg(name));
+	else
+		statusLabel_->setText(tr("Could not apply wave."));
 }

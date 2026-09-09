@@ -10,6 +10,8 @@
 
 #include <QDialog>
 
+#include "editor/EditorTool.h"   // IWorldBridge (engine-free)
+
 class QLineEdit;
 class QSlider;
 
@@ -19,6 +21,11 @@ class TimeSliderDialog : public QDialog
 public:
 	// time: the initial time of day in hours (0..24).
 	explicit TimeSliderDialog(float time, QWidget* parent = nullptr);
+
+	// The engine-free bridge to the environment's clock
+	// (Environment::environmentTime()). When set, the dialog reads/writes the
+	// world's time instead of its local copy.
+	void setBridge(IWorldBridge* bridge) { bridge_ = bridge; }
 
 	// The current time in hours (0..24).
 	float time() const;
@@ -43,6 +50,7 @@ private:
 	// pos 0..240 -> hours 0..24 (posToTime).
 	static float posToTime(int pos);
 
+	IWorldBridge* bridge_ = nullptr;
 	QSlider* slider_ = nullptr;
 	QLineEdit* edit_ = nullptr;
 	float time_ = 0.f;

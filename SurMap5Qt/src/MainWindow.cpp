@@ -716,10 +716,13 @@ void MainWindow::createDockPanels()
 	addDockWidget(Qt::LeftDockWidgetArea, objectsDock_);
 
 	// propertiesBar_ — the current tool's dialog (CExtControlBar hosting
-	// CSurToolBase). Phase 5.
+	// CSurToolBase). The transform tools' axis panel (TransformPropertyPanel)
+	// is the first such dialog; MainWindow swaps it per tool via selectTool.
 	propertiesDock_ = new QDockWidget(tr("Properties"), this);
 	propertiesDock_->setObjectName("propertiesDock");
 	propertiesDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+	if(view_->tools()->propertyWidget())
+		propertiesDock_->setWidget(view_->tools()->propertyWidget());
 	addDockWidget(Qt::RightDockWidgetArea, propertiesDock_);
 
 	// miniMapBar_ — the minimap render window (CMiniMapWindow). U6: the map
@@ -1426,6 +1429,7 @@ void MainWindow::viewToggleCameras(bool checked)
 	// actual spline data) is not wired in the Qt editor yet.
 	if(checked){
 		CameraDialog dlg(this);
+		dlg.setBridge(view_->worldBridge());
 		dlg.exec();
 	}
 	fprintf(stderr, "[view] cameras: %s\n", checked ? "on" : "off");
@@ -1467,6 +1471,7 @@ void MainWindow::viewTimeSlider()
 	// is modeless-hosted like the original's filters-bar child.
 	TimeSliderDialog dlg(editorTime_, this);
 	dlg.setTimeFlowEnabled(timeFlowEnabled_);
+	dlg.setBridge(view_->worldBridge());
 	if(dlg.exec() == QDialog::Accepted)
 		editorTime_ = dlg.time();
 	else

@@ -2,6 +2,27 @@
 
 #include "MoveTool.h"
 
+namespace {
+// Visitor that translates every selected object by delta (UniverseObjectActions::Move).
+class MoveVisitor : public IEditorObjectVisitor
+{
+public:
+	MoveVisitor(IWorldBridge* bridge, const ToolVec3& delta) : bridge_(bridge), delta_(delta) {}
+	void visit(EditorObjectId id) override
+	{
+		if(!bridge_)
+			return;
+		EditorPose pose = bridge_->objectPose(id);
+		pose.pos.x += delta_.x;
+		pose.pos.y += delta_.y;
+		pose.pos.z += delta_.z;
+		bridge_->setObjectPose(id, pose, false);
+	}
+	IWorldBridge* bridge_;
+	ToolVec3 delta_;
+};
+} // namespace
+
 MoveTool::MoveTool()
 {
 	// CSurToolMove's ctor: X and Y axes active (move on the ground plane).
@@ -16,8 +37,6 @@ bool MoveTool::onTrackingMouse(const ToolVec3& worldCoord, const ToolVec2& scree
 
 	// CSurToolMove::onTrackingMouse: on the ground plane, move the selection
 	// by (point - endPoint); on the Z axis, project onto the vertical line.
-	// The delta is computed but not applied until there is a selection
-	// (Phase 3b) — selectionCenter_/endPoint_ track it for the gizmo.
 	const ToolVec3 delta{ worldCoord.x - endPoint_.x,
 	                      worldCoord.y - endPoint_.y,
 	                      worldCoord.z - endPoint_.z };
@@ -25,6 +44,12 @@ bool MoveTool::onTrackingMouse(const ToolVec3& worldCoord, const ToolVec2& scree
 	selectionCenter_.x += delta.x;
 	selectionCenter_.y += delta.y;
 	selectionCenter_.z += delta.z;
+
+	// Apply the delta to every selected object (forEachSelected(Move(delta))).
+	if(bridge()){
+		MoveVisitor visitor(bridge(), delta);
+		bridge()->forEachSelected(visitor);
+	}
 	return true;
 }
 
@@ -36,10 +61,14 @@ bool MoveTool::onDrawAuxData(ToolAuxPainter& painter)
 
 void MoveTool::beginTransformation()
 {
-	// CSurToolMove::beginTransformation: store the selection poses (Phase 3b).
+	// CSurToolMove::beginTransformation: store the selection poses.
+	storePoses();
+	recomputeSelection();
 }
 
 void MoveTool::finishTransformation()
 {
-	// CSurToolMove::finishTransformation: commit the move (Phase 3b).
+	// CSurToolMove::finishTransformation: commit the move (the poses were
+	// already applied live in onTrackingMouse; just refresh the gizmo).
+	recomputeSelection();
 }

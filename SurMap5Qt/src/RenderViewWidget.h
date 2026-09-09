@@ -78,6 +78,12 @@ public:
 	// world-load wrappers below keep MainWindow engine-free.
 	EngineViewport* viewport() { return viewport_; }
 
+	// The engine-free world bridge (IWorldBridge) the tools and dialogs use
+	// to reach the world. Forwarded from the viewport so Qt code never needs
+	// the EngineViewport type (implemented in the .cpp where the engine
+	// header is reachable).
+	IWorldBridge* worldBridge();
+
 	// World load/create wrappers (Phase 3b): forward to the engine viewport.
 	// MainWindow calls these instead of EngineViewport methods directly, so it
 	// never needs the engine headers.

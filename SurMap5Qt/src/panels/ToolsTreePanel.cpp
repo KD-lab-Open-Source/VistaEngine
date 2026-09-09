@@ -38,8 +38,8 @@ ToolsTreePanel::ToolsTreePanel(ToolManager* tools, QWidget* parent)
 	struct Group { const char* label; int first; int count; };
 	const Group groups[] = {
 		{ "Transform", 0, 4 },                 // Select/Move/Rotate/Scale
-		{ "Terrain", 4, 0 },                   // the terrain tools land in G3
-		{ "Objects", 4, 0 },                   // Unit/Source/Anchor/Camera land in G4
+		{ "Terrain", 4, 2 },                   // GeoNet, GeoTx
+		{ "Objects", 6, 0 },                   // Unit/Source/Anchor/Camera land in G4
 	};
 
 	for(const Group& group : groups){

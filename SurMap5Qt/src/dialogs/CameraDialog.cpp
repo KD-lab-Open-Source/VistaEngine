@@ -2,6 +2,8 @@
 
 #include "CameraDialog.h"
 
+#include <vector>
+
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QLabel>
@@ -69,6 +71,19 @@ void CameraDialog::setCameras(const QStringList& names)
 	onListSelectionChanged();
 }
 
+void CameraDialog::refresh()
+{
+	// Reload the camera list from the bridge (CameraManager::splines names).
+	if(!bridge_)
+		return;
+	std::vector<std::string> names;
+	bridge_->cameraNames(names);
+	QStringList list;
+	for(const std::string& n : names)
+		list.push_back(QString::fromStdString(n));
+	setCameras(list);
+}
+
 void CameraDialog::onListSelectionChanged()
 {
 	const bool has = list_->currentItem() != nullptr;
@@ -88,18 +103,54 @@ void CameraDialog::onListSelectionChanged()
 
 void CameraDialog::onCreateCamera()
 {
-	// The original asked for a name (CEnterNameDlg) then switched the map
-	// editor into CREATE_POINTS mode. cameraManager is not wired in the Qt
-	// editor yet.
-	statusLabel_->setText(tr("Camera creation needs cameraManager (not wired in the Qt port yet)."));
+	// CCameraDlg::OnBnClickedButton1: ask for a name, then register a new
+	// camera spline (the original switched to CREATE_POINTS mode; here the
+	// empty spline is created and the list refreshed).
+	if(!bridge_){
+		statusLabel_->setText(tr("Camera creation needs cameraManager (not wired in the Qt port yet)."));
+		return;
+	}
+	const QString name = nameEdit_->text().trimmed();
+	if(name.isEmpty()){
+		statusLabel_->setText(tr("Enter a camera name first."));
+		return;
+	}
+	if(bridge_->createCamera(name.toStdString())){
+		statusLabel_->setText(tr("Camera '%1' created.").arg(name));
+		refresh();
+	}
+	else
+		statusLabel_->setText(tr("Could not create camera."));
 }
 
 void CameraDialog::onDeleteCamera()
 {
-	statusLabel_->setText(tr("Camera deletion needs cameraManager (not wired in the Qt port yet)."));
+	if(!bridge_){
+		statusLabel_->setText(tr("Camera deletion needs cameraManager (not wired in the Qt port yet)."));
+		return;
+	}
+	const QString name = nameEdit_->text().trimmed();
+	if(name.isEmpty())
+		return;
+	if(bridge_->deleteCamera(name.toStdString())){
+		statusLabel_->setText(tr("Camera '%1' deleted.").arg(name));
+		refresh();
+	}
+	else
+		statusLabel_->setText(tr("Could not delete camera."));
 }
 
 void CameraDialog::onPlayCamera()
 {
-	statusLabel_->setText(tr("Camera replay needs cameraManager (not wired in the Qt port yet)."));
+	if(!bridge_){
+		statusLabel_->setText(tr("Camera replay needs cameraManager (not wired in the Qt port yet)."));
+		return;
+	}
+	const QString name = nameEdit_->text().trimmed();
+	if(name.isEmpty())
+		return;
+	if(bridge_->playCamera(name.toStdString()))
+		statusLabel_->setText(tr("Replaying camera '%1'.").arg(name));
+	else
+		statusLabel_->setText(tr("Could not replay camera."));
 }

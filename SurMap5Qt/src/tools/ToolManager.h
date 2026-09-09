@@ -12,10 +12,16 @@
 
 #include <vector>
 
+class QWidget;
 class SelectTool;
 class MoveTool;
 class RotateTool;
 class ScaleTool;
+class GeoNetTool;
+class GeoTxTool;
+class TransformPropertyPanel;
+class GeoNetPropertyPanel;
+class GeoTxPropertyPanel;
 
 class ToolManager
 {
@@ -23,8 +29,17 @@ public:
 	ToolManager();
 	~ToolManager();
 
+	// Install the engine-facing world bridge on the tools (RenderViewWidget
+	// hands EngineViewport's bridge here once it exists).
+	void setWorldBridge(IWorldBridge* bridge);
+
 	// The current tool (CGeneralView::getCurCtrl / currentTool()).
 	EditorTool* currentTool() { return current_; }
+
+	// The Properties dock's panel for the current tool (the original's
+	// CSurToolBase dialog). Returns a QWidget the MainWindow puts in the
+	// propertiesDock_; null when the current tool has no panel.
+	QWidget* propertyWidget();
 
 	// Switch the active tool by index (0 = Select, 1 = Move, 2 = Rotate,
 	// 3 = Scale — the tools tree order in SurMap5).
@@ -49,8 +64,17 @@ private:
 	MoveTool* move_ = nullptr;
 	RotateTool* rotate_ = nullptr;
 	ScaleTool* scale_ = nullptr;
+	GeoNetTool* geoNet_ = nullptr;
+	GeoTxTool* geoTx_ = nullptr;
 
 	std::vector<EditorTool*> tools_;
 	EditorTool* current_ = nullptr;
 	int currentIndex_ = 0;
+
+	// The Properties dock's panel for the transform tools (created lazily).
+	TransformPropertyPanel* propertyPanel_ = nullptr;
+	// The Properties dock's panel for the GeoNet tool (created lazily).
+	GeoNetPropertyPanel* geoNetPanel_ = nullptr;
+	// The Properties dock's panel for the GeoTx tool (created lazily).
+	GeoTxPropertyPanel* geoTxPanel_ = nullptr;
 };

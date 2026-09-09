@@ -83,6 +83,11 @@ RenderViewWidget::~RenderViewWidget()
 	delete viewport_;
 }
 
+IWorldBridge* RenderViewWidget::worldBridge()
+{
+	return viewport_ ? viewport_->worldBridge() : nullptr;
+}
+
 bool RenderViewWidget::loadWorld(const QString& worldsDir, const QString& worldName)
 {
 	return viewport_->loadWorld(worldsDir.toStdString().c_str(), worldName.toStdString().c_str());
@@ -289,7 +294,13 @@ bool RenderViewWidget::initRenderDevice()
 	if(viewport_->inited())
 		return true;
 	viewport_->setNativeWindow((void*)winId());
-	return viewport_->init(std::max(1, width()), std::max(1, height()));
+	const bool ok = viewport_->init(std::max(1, width()), std::max(1, height()));
+	// Once the viewport owns a world bridge, hand it to the tools so the
+	// transform/select tools can reach the world (it stays installed across
+	// world reloads — the engine globals it reads outlive a single load).
+	if(ok)
+		tools_->setWorldBridge(viewport_->worldBridge());
+	return ok;
 }
 
 void RenderViewWidget::doneRenderDevice()
@@ -369,16 +380,21 @@ void RenderViewWidget::mouseReleaseEvent(QMouseEvent* event)
 			const ToolVec2 end = select->boxEnd();
 			const bool isClick = !select->isDragging() &&
 			                     start.x == end.x && start.y == end.y;
+			bool changed = false;
 			if(isClick){
 				// Plain click: replace; Shift = add; Ctrl = toggle.
 				int mode = 0;
 				if(event->modifiers() & Qt::ControlModifier) mode = 1;
 				else if(event->modifiers() & Qt::ShiftModifier) mode = 2;
-				selectObjectAt(end.x, end.y, mode);
+				changed = selectObjectAt(end.x, end.y, mode);
 			}
 			else{
-				selectObjectsInRect(start.x, start.y, end.x, end.y);
+				changed = selectObjectsInRect(start.x, start.y, end.x, end.y);
 			}
+			// The selection changed: let the current tool refresh its gizmo
+			// (CSurToolTransform::onSelectionChanged recomputed centre/radius).
+			if(changed && tools_->currentTool())
+				tools_->currentTool()->onSelectionChanged();
 		}
 	}
 	event->accept();

@@ -14,6 +14,9 @@
 
 #include "editor/EditorTool.h"
 
+#include <utility>
+#include <vector>
+
 class TransformTool : public EditorTool
 {
 public:
@@ -27,6 +30,8 @@ public:
 	bool onKeyDown(unsigned keyCode, bool shift, bool control, bool alt) override;
 	bool onDrawAuxData(ToolAuxPainter& painter) override;
 	void quant(float dt) override;
+	// Refresh the gizmo when the selection changes elsewhere.
+	void onSelectionChanged() override;
 
 	// The transform axis (transformAxis_): 0=X, 1=Y, 2=Z.
 	int axis() const { return axisIndex_; }
@@ -43,6 +48,22 @@ protected:
 	ToolVec2 cursorScreen_;
 	ToolVec3 startPoint_;   // ground point where the drag began
 	ToolVec3 endPoint_;     // current ground point
+
+	// The selection's poses, snapshotted at beginTransformation (the
+	// original's std::vector<PoseRadius> poses_). Each entry pairs the
+	// object id with the pose it had when the drag began, so cancel can
+	// restore it. Empty when the world bridge is absent.
+	std::vector<std::pair<EditorObjectId, EditorPose>> poses_;
+
+	// Snapshot the selected objects' poses into poses_ (StorePose). No-op
+	// without a bridge.
+	void storePoses();
+	// Restore poses_ back onto the objects (RestorePose). No-op without a
+	// bridge.
+	void restorePoses();
+	// Recompute selectionCenter_/selectionRadius_ from the current selection
+	// (RadiusExtractor). No-op without a bridge.
+	void recomputeSelection();
 
 	virtual void beginTransformation() {}
 	virtual void finishTransformation() {}

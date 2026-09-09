@@ -18,6 +18,9 @@
 #pragma once
 
 #include "MapChangeParams.h"
+// IWorldBridge — engine-free interface the tools use to reach the world. The
+// concrete engine-side implementation lives in EngineViewport (worldBridge).
+#include "EditorTool.h"
 
 #include <memory>
 
@@ -50,6 +53,12 @@ public:
 	// Returns false if the device or window could not be created.
 	bool init(int width, int height);
 	void done();
+
+	// The engine-free bridge the tools use to reach the world (selection,
+	// poses, terrain). Valid once the render device is up; the implementation
+	// is a nested class defined in the .cpp (it needs the engine's
+	// BaseUniverseObject/Universe headers, which stay out of this header).
+	IWorldBridge* worldBridge() const { return bridge_; }
 
 	// The render window's size changed (Qt resize event).
 	void resize();
@@ -331,4 +340,9 @@ private:
 	// quant live here, ticked from the editor's ~60 Hz loop.
 	double logicAccumMs_ = 0.0;
 	double lastLogicMs_ = 0.0;
+
+	// The world bridge (IWorldBridge), heap-allocated once the Universe is up
+	// and freed with it (doneWorld). Forward-declared impl class, defined in
+	// the .cpp where the engine headers are reachable.
+	IWorldBridge* bridge_ = nullptr;
 };

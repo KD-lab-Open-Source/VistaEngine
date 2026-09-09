@@ -32,6 +32,7 @@ using namespace std;
 #include "Environment/Anchor.h"         // Anchor (Environment owns the type)
 #include "Environment/Environment.h"    // environment (Environment tab data)
 #include "Water/SkyObject.h"            // EnvironmentTime (GetCurFoneColor), cSkyObj
+#include "Water/Waves.h"                // cFixedWavesContainer (fixedWaves)
 #include "Game/Universe.h"               // universe(), Players, worldPlayer
 #include "Game/Player.h"                 // Player::units(), worldPlayer
 #include "Game/CameraManager.h"          // cameraManager, splines()
@@ -44,12 +45,18 @@ using namespace std;
 #include "Units/UnitEnvironment.h"       // UnitEnvironment (Environment tab filter)
 #include "Units/EnvironmentSimple.h"    // UnitEnvironmentSimple (Environment tab filter)
 #include "Units/BaseUnit.h"              // UnitBase, UnitList
+#include "Units/BaseUniverseObject.h"    // BaseUniverseObject (world bridge visit)
 #include "Render/3dx/Node3DX.h"          // cObject3dx (model state debug)
 #include "Render/3dx/Simply3dx.h"        // cSimply3dx (environment models)
+#include "Render/src/NParticle.h"        // cEffect::setVisibleRange (editor shows all effects)
 #include "Game/GameOptions.h"            // GameOptions::filterBaseGraphOptions (Universe ctor calls it)
 #include "UserInterface/UI_Render.h"     // UI_Render::create (SurMap5/SurMap5.cpp prelude)
 #include "UserInterface/UI_GlobalAttributes.h" // UI_GlobalAttributes (loadAllLibraries dep)
 #include "Util/EffectContainer.h"        // EffectContainer::setTexturesPath (effect texture root)
+#include "Util/ZipConfig.h"              // ZipConfig::initArchives (pak archives)
+#include "Util/SystemUtil.h"             // setLogicFp (FPU precision)
+#include "Util/ConsoleWindow.h"          // ConsoleWindow::instance (console listener)
+#include "Util/Win32/DebugSymbolManager.h" // DebugSymbolManager::create
 
 // SDL_Init(SDL_INIT_VIDEO) normally happens in PlatformWindow::create; the Qt
 // editor never calls it (Qt owns the windows), so the GPU device would fail
@@ -108,6 +115,270 @@ SourceManagerHolder g_sourceManagerHolder;
 // right order, which is why SurMap5/GeneralView.cpp:135 calls it in
 // initRenderDevice, long before any world load. See init().
 }
+
+// WorldBridge — the engine-side implementation of the engine-free IWorldBridge
+// the tools talk to. It is a port of the SelectionUtil globals +
+// universe/sourceManager/cameraManager access, but over the common
+// BaseUniverseObject base (exactly what the original's UniverseObjectAction
+// visited). Every method maps an EditorObjectId to a BaseUniverseObject*.
+class WorldBridge : public IWorldBridge
+{
+public:
+	EditorObjectId hoverAt(float screenX, float screenY) override { (void)screenX; (void)screenY; return IWorldBridge::kNoObject; }
+	void selectInRect(int x0, int y0, int x1, int y1, bool add) override { (void)x0; (void)y0; (void)x1; (void)y1; (void)add; }
+	bool screenPointToGround(int sx, int sy, ToolVec3& out) override { (void)sx; (void)sy; (void)out; return false; }
+
+	// forEachSelected: walk units → sources → anchors → camera splines, as
+	// SelectionUtil::forEachUniverseObject did.
+	void forEachSelected(IEditorObjectVisitor& visitor) override
+	{
+		if(universe()){
+			PlayerVect::const_iterator pi;
+			FOR_EACH(universe()->Players, pi){
+				const UnitList& units = (*pi)->units();
+				UnitList::const_iterator it;
+				FOR_EACH(units, it){
+					UnitBase* u = *it;   // UnitSerializer::operator UnitBase* (const)
+					if(u && u->selected())
+						visitor.visit(reinterpret_cast<EditorObjectId>(u));
+				}
+			}
+		}
+		if(sourceManager){
+			const SourceManager::Sources& sources = sourceManager->sources();
+			for(size_t i = 0; i < sources.size(); ++i)
+				if(sources[i] && sources[i]->selected())
+					visitor.visit(reinterpret_cast<EditorObjectId>(sources[i].get()));
+			const SourceManager::Anchors& anchors = sourceManager->anchors();
+			for(size_t i = 0; i < anchors.size(); ++i)
+				if(anchors[i] && anchors[i]->selected())
+					visitor.visit(reinterpret_cast<EditorObjectId>(anchors[i].get()));
+		}
+		if(cameraManager){
+			const CameraSplines& splines = cameraManager->splines();
+			for(size_t i = 0; i < splines.size(); ++i)
+				if(splines[i] && splines[i]->selected())
+					visitor.visit(reinterpret_cast<EditorObjectId>(splines[i].get()));
+		}
+	}
+
+	void deselectAll() override
+	{
+		if(sourceManager)
+			sourceManager->deselectAll();
+		if(universe())
+			universe()->deselectAll();
+		if(cameraManager){
+			CameraSplines::const_iterator it;
+			FOR_EACH(cameraManager->splines(), it)
+				(*it)->setSelected(false);
+		}
+	}
+
+	void deleteSelected() override
+	{
+		if(sourceManager)
+			sourceManager->deleteSelected();
+		if(universe())
+			universe()->deleteSelected();
+		if(cameraManager)
+			cameraManager->deleteSelected();
+	}
+
+	EditorPose objectPose(EditorObjectId id) override
+	{
+		EditorPose pose;
+		BaseUniverseObject* obj = reinterpret_cast<BaseUniverseObject*>(id);
+		if(!obj)
+			return pose;
+		const Se3f& p = obj->pose();
+		const QuatF& q = p.rot();
+		const Vect3f& t = p.trans();
+		pose.ow = q.s(); pose.ox = q.x(); pose.oy = q.y(); pose.oz = q.z();
+		pose.pos = ToolVec3{ t.x, t.y, t.z };
+		return pose;
+	}
+
+	void setObjectPose(EditorObjectId id, const EditorPose& pose, bool init) override
+	{
+		BaseUniverseObject* obj = reinterpret_cast<BaseUniverseObject*>(id);
+		if(!obj)
+			return;
+		Se3f p(QuatF(pose.ow, pose.ox, pose.oy, pose.oz),
+		       Vect3f(pose.pos.x, pose.pos.y, pose.pos.z));
+		obj->setPose(p, init);
+	}
+
+	float objectRadius(EditorObjectId id) override
+	{
+		BaseUniverseObject* obj = reinterpret_cast<BaseUniverseObject*>(id);
+		return obj ? obj->radius() : 0.f;
+	}
+
+	void setObjectRadius(EditorObjectId id, float radius) override
+	{
+		BaseUniverseObject* obj = reinterpret_cast<BaseUniverseObject*>(id);
+		if(obj)
+			obj->setRadius(radius);
+	}
+
+	float terrainHeight(float x, float y) override
+	{
+		if(!vMap.isWorldLoaded())
+			return 0.f;
+		const int xi = (int)roundf(x), yi = (int)roundf(y);
+		if(xi < 0 || yi < 0 || xi >= (int)vMap.H_SIZE || yi >= (int)vMap.V_SIZE)
+			return 0.f;
+		return vMap.getZf(xi, yi);
+	}
+
+	bool applyGeoNet(float x, float y, float brushRadius,
+	                 int height, int noise, int mesh) override
+	{
+		// SurToolGeoNet::onOperationOnMap -> geoGeneration(sGeoPMO(...)).
+		// The brush is a square of side 2*radius; the generation parameters
+		// mirror the original's call (powerCellSize=8, powerShift=1,
+		// noiseLevel=100, borderForm=3, inverse=0).
+		if(!vMap.isWorldLoaded())
+			return false;
+		const int rad = std::max(1, (int)brushRadius);
+		sGeoPMO pmo((int)x, (int)y, rad * 2, rad * 2,
+		            height, 8, 1, mesh, noise, 3, 0);
+		geoGeneration(pmo);
+		return true;
+	}
+
+	bool worldRender() override
+	{
+		if(!vMap.isWorldLoaded())
+			return false;
+		vMap.WorldRender();
+		return true;
+	}
+
+	void cameraNames(std::vector<std::string>& out) override
+	{
+		out.clear();
+		if(!cameraManager)
+			return;
+		const CameraSplines& splines = cameraManager->splines();
+		for(size_t i = 0; i < splines.size(); ++i)
+			if(splines[i])
+				out.push_back(splines[i]->name());
+	}
+
+	bool createCamera(const std::string& name) override
+	{
+		if(!cameraManager || name.empty())
+			return false;
+		// The original's CCameraDlg created a spline with the given name and
+		// switched to CREATE_POINTS mode; here we just register an empty
+		// spline (points are added by the camera tool later).
+		CameraSpline* spline = new CameraSpline;
+		spline->setName(name.c_str());
+		cameraManager->addSpline(spline);
+		return true;
+	}
+
+	bool deleteCamera(const std::string& name) override
+	{
+		if(!cameraManager)
+			return false;
+		CameraSpline* spline = cameraManager->findSpline(name.c_str());
+		if(!spline)
+			return false;
+		cameraManager->deleteSpline(spline);
+		return true;
+	}
+
+	bool playCamera(const std::string& name) override
+	{
+		if(!cameraManager)
+			return false;
+		CameraSpline* spline = cameraManager->findSpline(name.c_str());
+		if(!spline)
+			return false;
+		// CCameraDlg::OnBnClickedButton3: loadPath(name, false) +
+		// startReplayPath(stepDuration, 1).
+		cameraManager->loadPath(*spline, false);
+		cameraManager->startReplayPath(spline->stepDuration(), 1);
+		return true;
+	}
+
+	void waveNames(std::vector<std::string>& out) override
+	{
+		out.clear();
+		if(!environment || !environment->fixedWaves())
+			return;
+		cFixedWavesContainer* waves = environment->fixedWaves();
+		for(int i = 0; i < waves->GetCount(); ++i)
+			if(cFixedWaves* w = waves->GetWave(i))
+				out.push_back(w->name());
+	}
+
+	bool createWave(const std::string& name) override
+	{
+		if(!environment || !environment->fixedWaves() || name.empty())
+			return false;
+		cFixedWaves* wave = environment->fixedWaves()->AddWaves();
+		if(!wave)
+			return false;
+		wave->name() = name;
+		return true;
+	}
+
+	bool removeWave(const std::string& name) override
+	{
+		if(!environment || !environment->fixedWaves())
+			return false;
+		cFixedWavesContainer* waves = environment->fixedWaves();
+		for(int i = 0; i < waves->GetCount(); ++i){
+			cFixedWaves* w = waves->GetWave(i);
+			if(w && w->name() == name)
+				return waves->DeleteWaves(w);
+		}
+		return false;
+	}
+
+	bool applyWave(const std::string& name, float distance, float speed,
+	               float sizeMin, float sizeMax, float generationTime,
+	               bool invert) override
+	{
+		if(!environment || !environment->fixedWaves())
+			return false;
+		cFixedWavesContainer* waves = environment->fixedWaves();
+		for(int i = 0; i < waves->GetCount(); ++i){
+			cFixedWaves* w = waves->GetWave(i);
+			if(!w || w->name() != name)
+				continue;
+			// CWaveDlg::OnBnClickedApply: write the properties + rebuild.
+			w->distance() = distance;
+			w->speed() = speed / 10.f;
+			w->generationTime() = generationTime;
+			w->invertation() = invert ? -1 : 1;
+			w->sizeMin() = sizeMin;
+			w->sizeMax() = sizeMax;
+			w->CreateSegments();
+			return true;
+		}
+		return false;
+	}
+
+	float timeOfDay() override
+	{
+		if(!environment || !environment->environmentTime())
+			return -1.f;
+		return environment->environmentTime()->GetTime();
+	}
+
+	bool setTimeOfDay(float hours) override
+	{
+		if(!environment || !environment->environmentTime())
+			return false;
+		environment->environmentTime()->SetTime(hours);
+		return true;
+	}
+};
 
 EngineViewport::EngineViewport() = default;
 
@@ -189,6 +460,16 @@ bool EngineViewport::init(int width, int height)
 	// (unit setPose -> startPermanentEffects during .spg load).
 	EffectContainer::setTexturesPath("Resource\\FX\\Textures");
 
+	// [SurMap5Qt] The rest of CSurMap5App::InitInstance's engine prelude
+	// (SurMap5/SurMap5.cpp:145-167), in the same order: the pak archives, the
+	// console listener, the FPU precision and the debug-symbol manager. These
+	// are engine-side and must run before any world load (ZipConfig mounts the
+	// .pak files the world assets live in).
+	ZipConfig::initArchives();
+	Console::instance().registerListener(&ConsoleWindow::instance());
+	setLogicFp();
+	DebugSymbolManager::create();
+
 	renderWindow_ = gb_RenderDevice->createRenderWindow((HWND)nativeWindow_);
 	if(!renderWindow_)
 		return false;
@@ -213,6 +494,10 @@ bool EngineViewport::init(int width, int height)
 		return false;
 
 	applyCamera();
+	// The tools' world bridge lives for the viewport's lifetime (the engine
+	// globals it reads — universe/sourceManager/cameraManager/vMap — exist
+	// from initScene on and are torn down in done).
+	bridge_ = new (std::nothrow) WorldBridge;
 	inited_ = true;
 	fprintf(stderr, "EngineViewport: [init] SUCCESS\n"); fflush(stderr);
 	return true;
@@ -233,6 +518,8 @@ void EngineViewport::done()
 	// same scene + camera. (SurMap5/GeneralView.cpp called createScene
 	// once and reInitWorld on every world load.) Drop the references;
 	// the teardown order matches SurMap5/VistaEngineContext.cpp.
+	delete bridge_;
+	bridge_ = nullptr;
 	scene_ = nullptr;
 	camera_ = nullptr;
 	renderWindow_ = nullptr;
@@ -343,6 +630,19 @@ bool EngineViewport::loadWorld(const char* worldsDir, const char* worldName)
 		// every logic tick; a single call after load covers the static editor
 		// world (drawFrame keeps draining the universe streams each frame).
 		uni->interpolationQuant();
+
+		// [SurMap5Qt] The editor shows every effect regardless of distance. The
+		// game's Environment serializes effectHideByDistance_=true with a
+		// near/far range (Environment.cpp:112-114, 50..1200) and cEffect::PreDraw
+		// then scales GetParticleRateReal by distance_rate = 1-(d-near)/(far-near),
+		// which hits 0 past far_distance — so any effect further than ~1200 world
+		// units from the camera emits nothing. An editor camera routinely sits
+		// thousands of units out (the orbit view), so every unit's fountains,
+		// beams and glows silently stop emitting. The original editor had no such
+		// LOD: disable the distance check, exactly as HIDE_BY_DISTANCE is cleared
+		// per-frame above. Environment::serialize re-arms it on every .spg load,
+		// so this must run after the Universe ctor (which loads the environment).
+		cEffect::setVisibleRange(false, 0.0f, 0.0f);
 	}
 
 	// reInitWorld's camera reset: centre the orbit on the map, then let
@@ -817,6 +1117,17 @@ void EngineViewport::drawFrame()
 						m->clearAttribute(ATTRUNKOBJ_HIDE_BY_DISTANCE);
 						m->SetHideDistance(kEditorHideDistance);
 					}
+					// [SurMap5Qt] The game's UnitReal::dayQuant flags models
+					// ATTR3DX_HIDE_LIGHTS by day (RealUnit.cpp:318) — the day-time
+					// look hides each model's glow sprites; cObject3dx::Update then
+					// puts ATTRLIGHT_IGNORE on every sprite light of the model
+					// (Node3DX.cpp:608) and UnkLight::PreDraw drops them all. The
+					// editor has no day/night cycle driving it, the Environment runs
+					// on its defaults, and the result is that no unit glows at all —
+					// what the original editor showed. The editor shows the lights:
+					// clear the flag every frame, like HIDE_BY_DISTANCE above.
+					if(m->getAttribute(ATTR3DX_HIDE_LIGHTS))
+						m->clearAttribute(ATTR3DX_HIDE_LIGHTS);
 				}
 				// UnitEnvironmentSimple keeps its model in modelSimple_ (a
 				// cSimply3dx), not the virtual model() slot.
@@ -947,9 +1258,11 @@ void EngineViewport::drawFrame()
 	// editor it walks the players and calls showEditor() on every unit, which
 	// applies the HIDE_BY_EDITOR visibility (UnitBase::showEditor). EditorVisual
 	// is always-visible in the Qt port for now, so this is the hook the View
-	// filters will drive later.
+	// filters will drive later. dt is the real frame delta in seconds, exactly
+	// as the game (GameShell::Show) and the original editor (CGeneralView::graphQuant)
+	// passed it — the graph side uses it to advance per-frame animation.
 	if(ownedUniverse_)
-		universe()->graphQuant(0.0f);
+		universe()->graphQuant(0.001f * (float)frameMs);
 
 	gb_RenderDevice->EndScene();
 	gb_RenderDevice->Flush();
