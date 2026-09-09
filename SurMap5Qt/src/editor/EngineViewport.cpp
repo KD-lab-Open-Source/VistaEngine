@@ -60,6 +60,10 @@ using namespace std;
 #include "Util/SystemUtil.h"             // setLogicFp (FPU precision)
 #include "Util/ConsoleWindow.h"          // ConsoleWindow::instance (console listener)
 #include "Util/Win32/DebugSymbolManager.h" // DebugSymbolManager::create
+#include "PropertyRows.h"                   // registerBuiltinPropertyRows (LibraryEditor core)
+#include "PropertyArchive.h"                // PropertyOArchive/PropertyIArchive (LibraryEditor bridge)
+#include "Serialization/LibrariesManager.h" // LibrariesManager (library lookup)
+#include "Serialization/LibraryWrapper.h"   // EditorLibraryInterface (library element access)
 
 // SDL_Init(SDL_INIT_VIDEO) normally happens in PlatformWindow::create; the Qt
 // editor never calls it (Qt owns the windows), so the GPU device would fail
@@ -459,6 +463,68 @@ public:
 		(void)id; (void)color;
 		return false;
 	}
+
+	// --- Generic library editor (LibraryEditorDialog) ---
+
+	void libraryElementNames(const std::string& libraryName,
+	                         std::vector<std::string>& out) override
+	{
+		out.clear();
+		EditorLibraryInterface* lib = LibrariesManager::instance().find(libraryName.c_str());
+		if(!lib)
+			return;
+		const std::size_t count = lib->editorSize();
+		for(std::size_t i = 0; i < count; ++i){
+			const char* name = lib->editorElementName((int)i);
+			if(name && name[0] != '\0')
+				out.push_back(name);
+		}
+	}
+
+	editor::PropertyRow* libraryElementTree(const std::string& libraryName,
+	                                       int elementIndex,
+	                                       bool editOnly) override
+	{
+		EditorLibraryInterface* lib = LibrariesManager::instance().find(libraryName.c_str());
+		if(!lib)
+			return nullptr;
+		if(elementIndex < 0 || elementIndex >= (int)lib->editorSize())
+			return nullptr;
+		Serializer se = lib->editorElementSerializer(elementIndex, "", "", editOnly);
+		if(!se)
+			return nullptr;
+		editor::PropertyOArchive oa;
+		se.serialize(oa);
+		return oa.root();
+	}
+
+	bool libraryElementSetTree(const std::string& libraryName,
+	                           int elementIndex,
+	                           editor::PropertyRow* root) override
+	{
+		if(!root)
+			return false;
+		EditorLibraryInterface* lib = LibrariesManager::instance().find(libraryName.c_str());
+		if(!lib)
+			return false;
+		if(elementIndex < 0 || elementIndex >= (int)lib->editorSize())
+			return false;
+		Serializer se = lib->editorElementSerializer(elementIndex, "", "", false);
+		if(!se)
+			return false;
+		editor::PropertyIArchive ia(root);
+		se.serialize(ia);
+		return true;
+	}
+
+	bool librarySave(const std::string& libraryName) override
+	{
+		EditorLibraryInterface* lib = LibrariesManager::instance().find(libraryName.c_str());
+		if(!lib)
+			return false;
+		lib->saveLibrary();
+		return true;
+	}
 };
 
 EngineViewport::EngineViewport() = default;
@@ -579,6 +645,12 @@ bool EngineViewport::init(int width, int height)
 	// globals it reads — universe/sourceManager/cameraManager/vMap — exist
 	// from initScene on and are torn down in done).
 	bridge_ = new (std::nothrow) WorldBridge;
+
+	// The LibraryEditor core: register the builtin property-row types
+	// (string/bool/numeric) so PropertyOArchive can build rows for them.
+	// Idempotent; safe to call once at startup.
+	editor::registerBuiltinPropertyRows();
+
 	inited_ = true;
 	fprintf(stderr, "EngineViewport: [init] SUCCESS\n"); fflush(stderr);
 	return true;

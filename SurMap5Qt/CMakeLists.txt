@@ -38,6 +38,12 @@ add_library(EditorEngine STATIC
     src/editor/EngineViewport.cpp
     src/editor/WorldList.h
     src/editor/WorldList.cpp
+    # LibraryEditor core: the property-row model + Serializer bridge
+    # (Qt port of kdw::PropertyRow / PropertyOArchive / PropertyIArchive).
+    src/editor/PropertyRow.h
+    src/editor/PropertyRows.h
+    src/editor/PropertyRows.cpp
+    src/editor/PropertyArchive.h
     # Editor-side engine stubs: isUnderEditor() / applicationHasFocus() /
     # updateResolution() — the same hooks SurMap5/VistaEngineContext.cpp
     # defined. Without this, the engine links fail (every TU that
@@ -235,6 +241,17 @@ add_executable(SurMap5Qt
     src/panels/GradientsPanel.cpp
     src/panels/CameraControlPanel.h
     src/panels/CameraControlPanel.cpp
+    # LibraryEditor (kdw::LibraryEditor port) — the universal library editor:
+    # a LibraryTree of elements + a PropertyTree of the selected element's
+    # serialized fields, bridged to the engine through IWorldBridge.
+    src/panels/PropertyTree.h
+    src/panels/PropertyTree.cpp
+    src/panels/LibraryTree.h
+    src/panels/LibraryTree.cpp
+    src/panels/LibraryEditor.h
+    src/panels/LibraryEditor.cpp
+    src/dialogs/LibraryEditorDialog.h
+    src/dialogs/LibraryEditorDialog.cpp
 )
 
 # SurMap5Qt links EditorEngine (which carries the engine modules); Qt code

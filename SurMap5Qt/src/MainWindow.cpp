@@ -44,6 +44,7 @@
 #include "dialogs/ReelsDialog.h"
 #include "dialogs/TerrainTypeDialog.h"
 #include "dialogs/WaveDialog.h"
+#include "dialogs/LibraryEditorDialog.h"
 #include "dialogs/BorderRollingDialog.h"
 #include "dialogs/SelectTriggerDialog.h"
 #include "tools/ToolManager.h"
@@ -354,13 +355,22 @@ void MainWindow::createActions()
 		fprintf(stderr, "[ui] %s: TODO\n", tag);
 		statusBar()->showMessage(msg);
 	};
-	connect(actLibUnits_, &QAction::triggered, this, [this, stub]{ stub("libraries/units", tr("Units editor: not wired yet")); });
-	connect(actLibEffects_, &QAction::triggered, this, [this, stub]{ stub("libraries/effects", tr("Effects editor: not wired yet")); });
-	connect(actLibSounds_, &QAction::triggered, this, [this, stub]{ stub("libraries/sounds", tr("Sounds editor: not wired yet")); });
-	connect(actLibUIMessageTypes_, &QAction::triggered, this, [this, stub]{ stub("libraries/ui-message-types", tr("UI Message Types: not wired yet")); });
-	connect(actLibUIMessages_, &QAction::triggered, this, [this, stub]{ stub("libraries/ui-messages", tr("UI Messages: not wired yet")); });
-	connect(actLibUIShowModeSprites_, &QAction::triggered, this, [this, stub]{ stub("libraries/ui-show-mode-sprites", tr("UI Show Mode Sprites: not wired yet")); });
-	connect(actLibSoundTracks_, &QAction::triggered, this, [this, stub]{ stub("libraries/sound-tracks", tr("Sound Tracks: not wired yet")); });
+	// The universal library editor (kdw::LibraryEditor port): open the given
+	// registered library in a modal LibraryEditorDialog. The library name is
+	// the section name the engine's LibrariesManager registered it under
+	// (the same names CMainFrame::editLibrary used).
+	auto openLibrary = [this](const std::string& libraryName){
+		LibraryEditorDialog dlg(this);
+		dlg.setBridge(view_->worldBridge());
+		dlg.openLibrary(libraryName);
+	};
+	connect(actLibUnits_, &QAction::triggered, this, [this, openLibrary]{ openLibrary("AttributeLibrary"); });
+	connect(actLibEffects_, &QAction::triggered, this, [this, openLibrary]{ openLibrary("EffectContainerLibrary"); });
+	connect(actLibSounds_, &QAction::triggered, this, [this, openLibrary]{ openLibrary("SoundLibrary"); });
+	connect(actLibUIMessageTypes_, &QAction::triggered, this, [this, openLibrary]{ openLibrary("UI_MessageTypeLibrary"); });
+	connect(actLibUIMessages_, &QAction::triggered, this, [this, openLibrary]{ openLibrary("UI_TextLibrary"); });
+	connect(actLibUIShowModeSprites_, &QAction::triggered, this, [this, openLibrary]{ openLibrary("UI_ShowModeSpriteTable"); });
+	connect(actLibSoundTracks_, &QAction::triggered, this, [this, openLibrary]{ openLibrary("SoundTrackTable"); });
 	connect(actLibReels_, &QAction::triggered, this, [this]{
 		ReelsDialog dlg(this);
 		dlg.exec();
@@ -370,10 +380,10 @@ void MainWindow::createActions()
 		dlg.setBridge(view_->worldBridge());
 		dlg.exec();
 	});
-	connect(actLibTerTools_, &QAction::triggered, this, [this, stub]{ stub("libraries/tertools", tr("TerTools: not wired yet")); });
-	connect(actLibCursors_, &QAction::triggered, this, [this, stub]{ stub("libraries/cursors", tr("Cursors: not wired yet")); });
-	connect(actLibCommandColors_, &QAction::triggered, this, [this, stub]{ stub("libraries/command-colors", tr("Command Colors: not wired yet")); });
-	connect(actLibTextImages_, &QAction::triggered, this, [this, stub]{ stub("libraries/text-images", tr("Text images: not wired yet")); });
+	connect(actLibTerTools_, &QAction::triggered, this, [this, openLibrary]{ openLibrary("TerToolsLibrary"); });
+	connect(actLibCursors_, &QAction::triggered, this, [this, openLibrary]{ openLibrary("UI_CursorLibrary"); });
+	connect(actLibCommandColors_, &QAction::triggered, this, [this, openLibrary]{ openLibrary("CommandColorManager"); });
+	connect(actLibTextImages_, &QAction::triggered, this, [this, openLibrary]{ openLibrary("UI_SpriteLibrary"); });
 	connect(actLibTerrainTypeName_, &QAction::triggered, this, [this]{
 		TerrainTypeDialog dlg(this);
 		dlg.setBridge(view_->worldBridge());

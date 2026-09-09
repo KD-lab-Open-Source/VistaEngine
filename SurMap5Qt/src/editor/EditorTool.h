@@ -21,6 +21,11 @@
 #include <string>
 #include <vector>
 
+// The PropertyRow model is engine-free (std types only), so the engine-free
+// bridge can reference it. The Qt LibraryEditor renders these rows; the
+// engine side builds/consumes them via PropertyOArchive/PropertyIArchive.
+#include "PropertyRow.h"
+
 // Engine vectors live in the engine libs; the tools must not include engine
 // headers, so coordinates are plain 3-component float triples (Vect3f is
 // exactly that). Keep the field order (x,y,z) matching Vect3f so a cast is
@@ -231,6 +236,38 @@ public:
 	                           std::vector<unsigned>& colors) = 0;
 	// Set one command's color (CommandColorManager + save).
 	virtual bool setCommandColor(int id, unsigned color) = 0;
+
+	// --- Generic library editor (LibraryEditorDialog) ---
+	//
+	// The universal library editor (port of kdw::LibraryEditor) edits any
+	// registered library through the engine's LibrariesManager + Serializer.
+	// The Qt side is engine-free, so the bridge exposes the library as a
+	// plain list of element names plus a serialized PropertyRow tree per
+	// element (the editor::PropertyRow model is engine-free — std types only).
+	//
+	// The engine side (WorldBridge) implements these with LibrariesManager /
+	// LibraryWrapper / PropertyOArchive / PropertyIArchive.
+
+	// The names of the elements in the library (editorElementName over
+	// editorSize). Empty when the library is unknown. The names are display
+	// only — the engine's names are cp1251, Qt is UTF-8, so they must NOT be
+	// round-tripped back to the engine. Use the element index instead.
+	virtual void libraryElementNames(const std::string& libraryName,
+	                                 std::vector<std::string>& out) = 0;
+	// Serialize one library element (by index) into a PropertyRow tree.
+	// Returns the root row (owned by the caller), or null when the index is
+	// out of range. `editOnly` mirrors editorElementSerializer's
+	// protectedName flag.
+	virtual editor::PropertyRow* libraryElementTree(
+		const std::string& libraryName, int elementIndex, bool editOnly) = 0;
+	// Write a PropertyRow tree back into one library element (by index) and
+	// save the library. Returns false when the index is out of range.
+	virtual bool libraryElementSetTree(const std::string& libraryName,
+	                                   int elementIndex,
+	                                   editor::PropertyRow* root) = 0;
+	// Save the library (LibraryWrapper::saveLibrary). Returns false when the
+	// library is unknown.
+	virtual bool librarySave(const std::string& libraryName) = 0;
 
 	// Static sentinel representing "no object".
 	static constexpr EditorObjectId kNoObject = 0;
