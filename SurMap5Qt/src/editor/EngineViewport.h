@@ -114,6 +114,16 @@ public:
 	// this on resize). screenPointToGround normalizes mouse pixels against it.
 	void setWidgetSize(int w, int h) { widgetW_ = w; widgetH_ = h; }
 
+	// The Select tool's rubber band in widget-local pixels (RenderViewWidget
+	// forwards it every frame before drawFrame). drawFrame draws it through
+	// DrawRectangle so it survives the swapchain present (QPainter over the
+	// natively-rendered frame gets overwritten by the GPU present).
+	void setSelectionBox(int x0, int y0, int x1, int y1, bool visible)
+	{
+		selBoxX0_ = x0; selBoxY0_ = y0; selBoxX1_ = x1; selBoxY1_ = y1;
+		selBoxVisible_ = visible;
+	}
+
 	// --- World data (U4 dialogs) ---
 
 	// The loaded map's grid size in vertices (vMap.H_SIZE/V_SIZE). Returns
@@ -350,6 +360,10 @@ private:
 	int    dragStartX_ = 0, dragStartY_ = 0;
 	float  dragStartPsi_ = 0.f, dragStartTheta_ = 0.f;
 	float  dragStartPx_ = 0.f, dragStartPy_ = 0.f, dragStartPz_ = 0.f;
+
+	// The Select tool's rubber band (see setSelectionBox).
+	int    selBoxX0_ = 0, selBoxY0_ = 0, selBoxX1_ = 0, selBoxY1_ = 0;
+	bool   selBoxVisible_ = false;
 
 	// CMainFrame::universeQuant's syncroTimer: logic (universe Quant) runs at
 	// the logicTimePeriod (100 ms); the accumulated ms since the last logic

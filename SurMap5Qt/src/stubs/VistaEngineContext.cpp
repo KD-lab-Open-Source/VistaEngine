@@ -58,9 +58,21 @@ namespace {
 		}
 		void drawRadius(const Vect3f& position, float radius, EditorVisual::RadiusType radiusType, bool selected) override
 		{
+			// Port of SurMap5/EditorVisualImpl.cpp, but drawn directly through
+			// DrawLine: the original's circleManager()->addCircle goes through
+			// the world-quad pass, which never becomes visible in the editor
+			// frame. A 36-segment ring like CSurToolTransform::drawCircle.
 			const Color4c color = selected ? Color4c::RED : Color4c::GREEN;
-			if(universe())
-				universe()->circleManager()->addCircle(position, max(radius, 7.0f), CircleManagerParam(color));
+			const float r = max(radius, 7.0f);
+			const int segs = 36;
+			const float step = 2.0f * 3.14159265f / (float)segs;
+			Vect3f prev(position.x + r, position.y, position.z);
+			for(int i = 1; i <= segs; ++i){
+				const float a = step * (float)i;
+				const Vect3f cur(position.x + cosf(a) * r, position.y + sinf(a) * r, position.z);
+				gb_RenderDevice->DrawLine(prev, cur, color);
+				prev = cur;
+			}
 			(void)radiusType;
 		}
 		void drawText(const Vect3f& position, const char* text, EditorVisual::TextType textType) override

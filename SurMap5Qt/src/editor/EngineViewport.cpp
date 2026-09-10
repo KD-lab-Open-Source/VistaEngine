@@ -1433,6 +1433,25 @@ void EngineViewport::drawFrame()
 		environment->showEditor();
 	drawToolAux();
 
+	// The Select tool's rubber band (CSurToolSelect::onDrawAuxData drew it via
+	// DrawRectangle after the 3D scene). DrawRectangle goes through the UI
+	// renderer, so it lands on top of the frame in the same present. The box
+	// arrives in widget-local pixels; scale into device pixels (see
+	// selectObjectsInRect).
+	if(selBoxVisible_){
+		const float devW = (float)gb_RenderDevice->GetSizeX();
+		const float devH = (float)gb_RenderDevice->GetSizeY();
+		if(devW > 0.f && devH > 0.f && widgetW_ > 0 && widgetH_ > 0){
+			const float kx = devW / (float)widgetW_;
+			const float ky = devH / (float)widgetH_;
+			const int x = (int)((float)std::min(selBoxX0_, selBoxX1_) * kx);
+			const int y = (int)((float)std::min(selBoxY0_, selBoxY1_) * ky);
+			const int dx = (int)((float)abs(selBoxX1_ - selBoxX0_) * kx);
+			const int dy = (int)((float)abs(selBoxY1_ - selBoxY0_) * ky);
+			gb_RenderDevice->DrawRectangle(x, y, dx, dy, Color4c(0, 255, 0, 255), true);
+		}
+	}
+
 	gb_RenderDevice->EndScene();
 	gb_RenderDevice->Flush();
 }
@@ -1491,8 +1510,21 @@ void EngineViewport::drawToolAux()
 	gb_RenderDevice->DrawLine(center, center + Vect3f(0.f, radius, 0.f), Color4c(0, 255, 0, 255));
 
 	// drawCircle: selection circle in the XY plane at the centre.
-	if(universe()->circleManager())
-		universe()->circleManager()->addCircle(center, max(radius, 7.0f), CircleManagerParam(Color4c::WHITE));
+	// CSurToolTransform::drawCircle built it from 36 DrawLine segments;
+	// circleManager()->addCircle goes through the world-quad pass which the
+	// editor frame never flushes at the right point, so draw the ring
+	// directly like the axes above (visible immediately, no extra pass).
+	{
+		const int segs = 36;
+		const float step = 2.0f * 3.14159265f / (float)segs;
+		Vect3f prev(center.x + radius, center.y, center.z);
+		for(int i = 1; i <= segs; ++i){
+			const float a = step * (float)i;
+			const Vect3f cur(center.x + cosf(a) * radius, center.y + sinf(a) * radius, center.z);
+			gb_RenderDevice->DrawLine(prev, cur, Color4c(255, 255, 255, 255));
+			prev = cur;
+		}
+	}
 }
 
 // --- Input ---------------------------------------------------------------
