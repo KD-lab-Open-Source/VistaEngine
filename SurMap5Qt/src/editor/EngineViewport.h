@@ -101,10 +101,18 @@ public:
 
 	// Ray-cast the given widget-local pixel into the world and write the terrain
 	// intersection point. Port of CGeneralView::CoordScr2vMap (SurMap5/GeneralView.cpp:
-	//405): normalize to (x/sizeX-0.5, y/sizeY-0.5), camera_->GetWorldRay, scene_->
+	//405): normalize to (x/viewW-0.5, y/viewH-0.5), camera_->GetWorldRay, scene_->
 	//TraceDir. Returns false when no world is loaded or the ray misses the terrain
 	// (out stays untouched). x,y are widget-local pixels.
+	//
+	// The normalization uses the WIDGET size (setWidgetSize), not the render
+	// device's swapchain size: on HiDPI the drawable is devicePixelRatio times
+	// larger than the widget, and GetSizeX()/GetSizeY() report the swapchain.
 	bool screenPointToGround(int x, int y, float& outX, float& outY, float& outZ);
+
+	// The viewport widget's size in widget-local pixels (RenderViewWidget calls
+	// this on resize). screenPointToGround normalizes mouse pixels against it.
+	void setWidgetSize(int w, int h) { widgetW_ = w; widgetH_ = h; }
 
 	// --- World data (U4 dialogs) ---
 
@@ -309,6 +317,9 @@ private:
 	void*                nativeWindow_ = nullptr;
 	cInterfaceRenderDevice* renderDevice_ = nullptr;
 	cRenderWindow*       renderWindow_ = nullptr;
+	// The viewport widget's size in widget-local pixels (see setWidgetSize).
+	// Mouse pixels are normalized against this, not the swapchain size.
+	int                  widgetW_ = 1, widgetH_ = 1;
 	cScene*              scene_ = nullptr;     // == terScene once initScene() ran
 	Camera*              camera_ = nullptr;    // == cameraManager->GetCamera() once initScene() ran
 	Orbit                orbit_;

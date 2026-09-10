@@ -294,6 +294,7 @@ bool RenderViewWidget::initRenderDevice()
 	if(viewport_->inited())
 		return true;
 	viewport_->setNativeWindow((void*)winId());
+	viewport_->setWidgetSize(std::max(1, width()), std::max(1, height()));
 	const bool ok = viewport_->init(std::max(1, width()), std::max(1, height()));
 	// Once the viewport owns a world bridge, hand it to the tools so the
 	// transform/select tools can reach the world (it stays installed across
@@ -327,6 +328,7 @@ void RenderViewWidget::paintEvent(QPaintEvent* /*event*/)
 void RenderViewWidget::resizeEvent(QResizeEvent* event)
 {
 	QWidget::resizeEvent(event);
+	viewport_->setWidgetSize(std::max(1, width()), std::max(1, height()));
 	viewport_->resize();
 }
 

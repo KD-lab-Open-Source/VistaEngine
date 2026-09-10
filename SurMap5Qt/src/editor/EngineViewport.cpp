@@ -1487,18 +1487,29 @@ void EngineViewport::mouseMove(int x, int y)
 		applyCamera();
 	}
 	else if(mouseRight_){
-		// Pan: move the orbit centre in the camera plane (CGeneralView's
-		// RMB branch, minus the terrain-height coupling).
+		// Pan: move the orbit centre in the camera plane. Port of CGeneralView's
+		// WM_MOUSEMOVE RMB branch (SurMap5/GeneralView.cpp:546):
+		//   - the anchor advances every event (BegMousePos = CurMousePos), so
+		//     the delta is incremental, not from the drag start;
+		//   - the screen delta rotates by Mat2f(pi/2 + psi);
+		//   - the centre moves by += delta (not -=);
+		//   - pz follows the terrain height under the new centre (To3D).
 		const float dx = float(x - dragStartX_);
 		const float dy = float(y - dragStartY_);
-		// The pan scales with distance like the original.
-		const float scale = max(orbit_.distance, 100.f) / 800.f;
-		// Camera-plane basis: psi rotates the yaw; a screen delta maps to
-		// world x/y through the yaw rotation.
-		const float c = cosf(orbit_.psi);
-		const float s = sinf(orbit_.psi);
-		orbit_.px = dragStartPx_ - (dx * c - dy * s) * scale;
-		orbit_.py = dragStartPy_ - (dx * s + dy * c) * scale;
+		dragStartX_ = x;
+		dragStartY_ = y;
+		Vect2f delta(dx, dy);
+		delta *= Mat2f(M_PI_2 + orbit_.psi);
+		delta *= max(orbit_.distance, 100.f) / 800.f;
+		orbit_.px += delta.x;
+		orbit_.py += delta.y;
+		// To3D: the terrain height under the new centre (vMap.getZf, clamped
+		// to the map like cTileMap::To3D).
+		if(vMap.isWorldLoaded()){
+			const int xi = (int)roundf(orbit_.px), yi = (int)roundf(orbit_.py);
+			if(xi >= 0 && yi >= 0 && xi < (int)vMap.H_SIZE && yi < (int)vMap.V_SIZE)
+				orbit_.pz = max(0.0f, vMap.getZf(xi, yi));
+		}
 		applyCamera();
 	}
 }
@@ -1515,8 +1526,14 @@ bool EngineViewport::screenPointToGround(int x, int y, float& outX, float& outY,
 	if(!inited_ || !camera_ || !scene_ || !gb_RenderDevice || !worldLoaded_)
 		return false;
 
-	const int w = gb_RenderDevice->GetSizeX();
-	const int h = gb_RenderDevice->GetSizeY();
+	// Normalize against the WIDGET size, not the render device's swapchain
+	// size: GetSizeX()/GetSizeY() report the swapchain drawable (device pixels,
+	// devicePixelRatio times larger on HiDPI), while x,y arrive in widget-local
+	// pixels. Normalizing widget pixels by the swapchain size shrinks the ray
+	// toward the centre, so tools edit the wrong spot. The original had no such
+	// mismatch (the D3D backbuffer was 1:1 with the window).
+	const int w = widgetW_;
+	const int h = widgetH_;
 	if(w <= 0 || h <= 0)
 		return false;
 
@@ -2012,8 +2029,9 @@ bool EngineViewport::selectObjectAt(int screenX, int screenY, int mode)
 	if(!inited_ || !camera_ || !ownedUniverse_ || !gb_RenderDevice || !worldLoaded_)
 		return false;
 
-	const int w = gb_RenderDevice->GetSizeX();
-	const int h = gb_RenderDevice->GetSizeY();
+	// Widget size, not the swapchain size (see screenPointToGround).
+	const int w = widgetW_;
+	const int h = widgetH_;
 	if(w <= 0 || h <= 0)
 		return false;
 
@@ -2077,20 +2095,23 @@ bool EngineViewport::selectObjectsInRect(int x0, int y0, int x1, int y1)
 	if(x0 > x1) std::swap(x0, x1);
 	if(y0 > y1) std::swap(y0, y1);
 
-	const float width = (float)gb_RenderDevice->GetSizeX();
-	const float height = (float)gb_RenderDevice->GetSizeY();
-	if(width <= 0.f || height <= 0.f)
-		return false;
-
 	// SelectionUtil::selectByScreenRectangle normalized the box corners and
 	// picked every unit whose 2D screen position (ConvertorWorldToViewPort)
-	// falls inside. ConvertorWorldToViewPort returns the screen point in
-	// device pixels (SurMap5/SelectionUtil.cpp:worldToScreen used round(e.x)
-	// directly), so compare in pixels against the original box.
-	const int xA = std::min(x0, x1);
-	const int xB = std::max(x0, x1);
-	const int yA = std::min(y0, y1);
-	const int yB = std::max(y0, y1);
+	// falls inside. ConvertorWorldToViewPort goes through matViewProjScr,
+	// which Camera::UpdateViewport builds from the swapchain size
+	// (GetSizeX()/GetSizeY() — device pixels), while the box arrives in
+	// widget-local pixels. Scale the box into device pixels so both sides
+	// match (1:1 when devicePixelRatio == 1).
+	const float devW = (float)gb_RenderDevice->GetSizeX();
+	const float devH = (float)gb_RenderDevice->GetSizeY();
+	if(devW <= 0.f || devH <= 0.f || widgetW_ <= 0 || widgetH_ <= 0)
+		return false;
+	const float kx = devW / (float)widgetW_;
+	const float ky = devH / (float)widgetH_;
+	const float xA = (float)std::min(x0, x1) * kx;
+	const float xB = (float)std::max(x0, x1) * kx;
+	const float yA = (float)std::min(y0, y1) * ky;
+	const float yB = (float)std::max(y0, y1) * ky;
 
 	bool changed = false;
 	PlayerVect::const_iterator pi;
