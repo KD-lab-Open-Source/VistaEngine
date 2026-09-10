@@ -323,6 +323,16 @@ void RenderViewWidget::paintEvent(QPaintEvent* /*event*/)
 	if(!viewport_->inited())
 		initRenderDevice();
 	viewport_->drawFrame();
+
+	// The tools' 2D overlay (selection box, cursor circle, brush ring):
+	// CSurToolSelect::onDrawAuxData drew the rubber band via DrawRectangle
+	// after the 3D scene. The Qt tools draw in screen space through
+	// ToolAuxPainter; QPainter over the natively-rendered frame draws on top.
+	if(tools_ && tools_->currentTool()){
+		QPainter painter(this);
+		QtAuxPainter aux(painter);
+		tools_->currentTool()->onDrawAuxData(aux);
+	}
 }
 
 void RenderViewWidget::resizeEvent(QResizeEvent* event)

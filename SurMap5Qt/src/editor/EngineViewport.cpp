@@ -34,6 +34,8 @@ using namespace std;
 #include "Water/SkyObject.h"            // EnvironmentTime (GetCurFoneColor), cSkyObj
 #include "Water/Waves.h"                // cFixedWavesContainer (fixedWaves)
 #include "Game/Universe.h"               // universe(), Players, worldPlayer
+#include "Water/CircleManager.h"         // circleManager()->addCircle (selection circle)
+#include "Units/CircleManagerParam.h"    // CircleManagerParam (selection circle color)
 #include "Game/Player.h"                 // Player::units(), worldPlayer
 #include "Game/CameraManager.h"          // cameraManager, splines()
 #include "Game/RenderObjects.h"          // initScene/finitScene, terScene, cameraManager
@@ -1417,8 +1419,80 @@ void EngineViewport::drawFrame()
 	if(ownedUniverse_)
 		universe()->graphQuant(0.001f * (float)frameMs);
 
+	// CGeneralView::graphQuant (SurMap5/GeneralView.cpp:314) then drew the
+	// editor aux layers: cameraManager->showEditor() (camera splines),
+	// sourceManager->showEditor() (sources/anchors), environment->showEditor(),
+	// the current tool's onDrawAuxData(), and editorVisual().afterQuant().
+	// Without these the 3D view shows no selection circles, no camera paths,
+	// no source marks, no tool gizmos.
+	if(cameraManager)
+		cameraManager->showEditor();
+	if(sourceManager)
+		sourceManager->showEditor();
+	if(environment)
+		environment->showEditor();
+	drawToolAux();
+
 	gb_RenderDevice->EndScene();
 	gb_RenderDevice->Flush();
+}
+
+// --- Editor aux drawing (3D gizmos) ----------------------------------------
+
+// Port of the tool aux drawing (CSurToolTransform::drawAxis/drawCircle,
+// SurMap5/SurToolTransform.cpp:183-239): the selection centre + radius drive
+// three axis lines and a selection circle, drawn in world space through
+// gb_RenderDevice (DrawLine) and circleManager (addCircle) — exactly like the
+// original. The Qt tools are engine-free and draw in screen space (never
+// called); this engine-side pass draws the 3D gizmos the original showed.
+void EngineViewport::drawToolAux()
+{
+	if(!ownedUniverse_ || !universe())
+		return;
+
+	// Selection centre + radius: AABB of the selected units' positions
+	// (CSurToolTransform::selectionCenter_/selectionRadius_).
+	Vect3f center = Vect3f::ZERO;
+	float radius = 100.0f;
+	int count = 0;
+	float minX = 0, maxX = 0, minY = 0, maxY = 0, firstRadius = 0;
+	PlayerVect::const_iterator pi;
+	FOR_EACH(universe()->Players, pi){
+		const UnitList& units = (*pi)->units();
+		UnitList::const_iterator it;
+		FOR_EACH(units, it){
+			UnitBase* u = *it;
+			if(!u || !u->selected())
+				continue;
+			const Vect3f& p = u->position();
+			const float r = u->radius();
+			if(count == 0){
+				minX = maxX = p.x;
+				minY = maxY = p.y;
+				firstRadius = r;
+			}
+			else{
+				minX = std::min(minX, p.x); maxX = std::max(maxX, p.x);
+				minY = std::min(minY, p.y); maxY = std::max(maxY, p.y);
+			}
+			++count;
+		}
+	}
+	if(count == 0)
+		return;
+	center.set((minX + maxX) * 0.5f, (minY + maxY) * 0.5f, 0);
+	const float dx = maxX - minX, dy = maxY - minY;
+	const float diag = sqrtf(dx * dx + dy * dy);
+	radius = diag > 1e-6f ? diag * 0.5f : firstRadius;
+
+	// drawAxis: three lines from the centre (X red, Y green, Z blue).
+	gb_RenderDevice->DrawLine(center, center + Vect3f(0.f, 0.f, radius), Color4c(0, 0, 255, 255));
+	gb_RenderDevice->DrawLine(center, center + Vect3f(radius, 0.f, 0.f), Color4c(255, 0, 0, 255));
+	gb_RenderDevice->DrawLine(center, center + Vect3f(0.f, radius, 0.f), Color4c(0, 255, 0, 255));
+
+	// drawCircle: selection circle in the XY plane at the centre.
+	if(universe()->circleManager())
+		universe()->circleManager()->addCircle(center, max(radius, 7.0f), CircleManagerParam(Color4c::WHITE));
 }
 
 // --- Input ---------------------------------------------------------------

@@ -36,6 +36,10 @@ using namespace std;   // engine headers expect the StdAfx preamble
 #include "Units/CommandsQueue.h"
 #include "Render/src/VisGeneric.h"
 #include "EditorVisual.h"
+#include "Game/CameraManager.h"   // cameraManager (drawText projection)
+#include "Game/Universe.h"        // universe()->circleManager() (drawRadius)
+#include "Water/CircleManager.h"  // CircleManager::addCircle (drawRadius)
+#include "Render/src/cCamera.h"   // ConvertorWorldToViewPort
 
 namespace {
 	class EditorVisualImpl : public EditorVisual::Interface {
@@ -44,10 +48,56 @@ namespace {
 		void beforeQuant() override {}
 		void afterQuant() override {}
 		void drawImpassabilityRadius(UnitBase&) override {}
-		void drawCross(const Vect3f&, float, EditorVisual::CrossType, bool) override {}
-		void drawRadius(const Vect3f&, float, EditorVisual::RadiusType, bool) override {}
-		void drawText(const Vect3f&, const char*, EditorVisual::TextType) override {}
-		void drawOrientationArrow(const Se3f&, bool) override {}
+		// Port of SurMap5/EditorVisualImpl.cpp: the 3D aux marks the original
+		// drew through gb_RenderDevice (DrawLine) and circleManager (addCircle).
+		void drawCross(const Vect3f& position, float size, EditorVisual::CrossType, bool selected) override
+		{
+			const Color4c color = selected ? Color4c::RED : Color4c::GREEN;
+			gb_RenderDevice->DrawLine(position + Vect3f(-size, 0.0f, 0.0f), position + Vect3f(size, 0.0f, 0.0f), color);
+			gb_RenderDevice->DrawLine(position + Vect3f(0.0f, -size, 0.0f), position + Vect3f(0.0f, size, 0.0f), color);
+		}
+		void drawRadius(const Vect3f& position, float radius, EditorVisual::RadiusType radiusType, bool selected) override
+		{
+			const Color4c color = selected ? Color4c::RED : Color4c::GREEN;
+			if(universe())
+				universe()->circleManager()->addCircle(position, max(radius, 7.0f), CircleManagerParam(color));
+			(void)radiusType;
+		}
+		void drawText(const Vect3f& position, const char* text, EditorVisual::TextType textType) override
+		{
+			if(!cameraManager)
+				return;
+			Vect3f e, w;
+			cameraManager->GetCamera()->ConvertorWorldToViewPort(&position, &w, &e);
+			Color4c color = Color4c::WHITE;
+			if(textType == EditorVisual::TEXT_LABEL)
+				color = Color4c::RED;
+			else if(textType == EditorVisual::TEXT_PROPERTIES){
+				color = Color4c::BLUE;
+				e.y += 16;
+			}
+			gb_RenderDevice->OutText((int)round(e.x), (int)round(e.y), text, Color4f(color));
+		}
+		void drawOrientationArrow(const Se3f& pose, bool) override
+		{
+			const Vect3f pos3d = pose.trans();
+			const float scale = 100.0f;
+			static const Vect3f points[] = {
+				Vect3f( 0.0f,  0.5f, 0.0f),
+				Vect3f( 0.0f, -0.5f, 0.0f),
+				Vect3f( 0.1f,  0.4f, 0.0f),
+				Vect3f( 0.0f,  0.5f, 0.0f),
+				Vect3f(-0.1f,  0.4f, 0.0f),
+				Vect3f( 0.0f,  0.5f, 0.0f),
+			};
+			for(size_t i = 1; i < sizeof(points) / sizeof(points[0]); i += 2){
+				Vect3f a = points[i - 1] * scale;
+				Vect3f b = points[i] * scale;
+				pose.rot().xform(a);
+				pose.rot().xform(b);
+				gb_RenderDevice->DrawLine(pos3d + a, pos3d + b, Color4c(0, 200, 0));
+			}
+		}
 	};
 }
 

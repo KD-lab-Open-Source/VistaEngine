@@ -314,6 +314,11 @@ private:
 	// CGeneralView::drawGrid — the editor's terrain grid.
 	void drawGrid();
 
+	// The 3D editor gizmos (selection axes + circle), drawn in drawFrame
+	// after universe()->graphQuant — port of CSurToolTransform::drawAxis/
+	// drawCircle plus the showEditor() aux layers.
+	void drawToolAux();
+
 	void*                nativeWindow_ = nullptr;
 	cInterfaceRenderDevice* renderDevice_ = nullptr;
 	cRenderWindow*       renderWindow_ = nullptr;
