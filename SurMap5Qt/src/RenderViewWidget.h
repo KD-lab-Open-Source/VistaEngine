@@ -159,6 +159,26 @@ public:
 	void setGridVisible(bool visible);
 	bool gridVisible() const;
 
+	// --- TEMP FX debug (убрать после диагностики частиц) ---
+	int fxEffectCount();
+	void fxSetVisible(bool visible);
+	bool fxVisible();
+	void fxSetEmitting(bool emitting);
+	void fxRestartAll();
+	void fxSetPaused(bool paused);
+	bool fxPaused();
+	void fxSetIsolated(bool isolated);
+	bool fxIsolated();
+	// TEMP FX debug: оверрайды quad-рендерера (по одному выключать гасители).
+	void fxSetForceNoDepth(bool b);
+	void fxSetForceNoFog(bool b);
+	void fxSetForceNoSoft(bool b);
+	void fxSetForceNoPremul(bool b);
+	void fxSetWireParticles(bool b);
+	bool fxWireParticles();
+	void fxSetForceFlat(bool b);
+	bool fxForceFlat();
+
 	// --- Object selection (SelectionUtil ports; forward to the viewport) ---
 	// Select the topmost unit under the pixel (mode 0 = replace, 1 = toggle,
 	// 2 = add). Box-select every unit inside the pixel rect. Delete the

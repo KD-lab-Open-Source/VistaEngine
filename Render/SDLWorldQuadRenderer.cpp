@@ -31,7 +31,14 @@ const int INITIAL_QUADS = 1024;
 
 SDL_GPUTexture* sdlTextureOf(cTexture* t)
 {
-	return (t && t->frameNumber() >= 1) ? reinterpret_cast<SDL_GPUTexture*>(t->GetDDSurface(0)) : nullptr;
+	if(!t)
+		return nullptr;
+	if(t->frameNumber() < 1)
+		return nullptr;
+	SDL_GPUTexture* surf = reinterpret_cast<SDL_GPUTexture*>(t->GetDDSurface(0));
+	if(!surf)
+		return nullptr;
+	return surf;
 }
 
 } // namespace
@@ -372,6 +379,9 @@ void SDLWorldQuadRenderer::SetMaterial(eBlendMode blend, cTexture* texture, bool
 	// strength however transparent it is, so a soft-edged particle draws as a hard bright
 	// square. See worldquad.frag.hlsl.
 	material_.fs.colorOp[1] = (texture && !texture->isPremultiplied()) ? 1.f : 0.f;
+	// TEMP FX debug: forceNoPremul — не домножать texel на alpha в шейдере.
+	if(forceNoPremul_)
+		material_.fs.colorOp[1] = 0.f;
 	material_.fs.colorOp[2] = material_.fs.colorOp[3] = 0.f;
 }
 
@@ -384,6 +394,23 @@ void SDLWorldQuadRenderer::openGroup(GroupKind kind)
 	current_.kind = kind;
 	current_.first = kind == GROUP_QUAD ? (int)(vertices_.size() / 4) : (int)indicesTri_.size();
 	current_.count = 0;
+	// TEMP FX debug: принудительный плоский квад — белый whiteTexture_,
+	// ALPHA_NONE, depthTest=false, туман и soft-depth выкл, мир ID.
+	// Виден — виноваты текстура/бленд/туман/depth; не виден — MVP/вьюпорт/
+	// формат вершин.
+	if(forceFlat_){
+		current_.texture = nullptr;
+		current_.texture1 = nullptr;
+		current_.textureZ = nullptr;
+		current_.blend = ALPHA_NONE;
+		current_.depthTest = false;
+		current_.softDepth = false;
+		materialWorld_ = MatXf::ID;
+	}
+	// TEMP FX debug: по одному выключать то, что может гасить частицы.
+	// forceNoDepth — без depth-теста (pipelineFor возьмёт depthTest=false).
+	if(forceNoDepth_)
+		current_.depthTest = false;
 	const Mat4f world(materialWorld_);
 	const Mat4f mvp = world * viewProj_;
 	std::memcpy(current_.vs.mvp, &mvp, sizeof(current_.vs.mvp));
@@ -401,10 +428,12 @@ void SDLWorldQuadRenderer::openGroup(GroupKind kind)
 	// affine W -- so the sky camera and the lightmap camera keep the identity, as they must.
 	cSDLRenderDevice* dev = sdlRenderDevice();
 	const Vect4f f = dev ? dev->fogPlane(camera_) : Vect4f(0.f, 0.f, 0.f, 1.f);
-	current_.vs.fogPlane[0] = world._11*f.x + world._12*f.y + world._13*f.z + world._14*f.w;
-	current_.vs.fogPlane[1] = world._21*f.x + world._22*f.y + world._23*f.z + world._24*f.w;
-	current_.vs.fogPlane[2] = world._31*f.x + world._32*f.y + world._33*f.z + world._34*f.w;
-	current_.vs.fogPlane[3] = world._41*f.x + world._42*f.y + world._43*f.z + world._44*f.w;
+	// TEMP FX debug: forceNoFog — туман выкл (Fog=1 везде).
+	const float fw = forceNoFog_ ? 0.f : 1.f;
+	current_.vs.fogPlane[0] = (world._11*f.x + world._12*f.y + world._13*f.z + world._14*f.w) * fw;
+	current_.vs.fogPlane[1] = (world._21*f.x + world._22*f.y + world._23*f.z + world._24*f.w) * fw;
+	current_.vs.fogPlane[2] = (world._31*f.x + world._32*f.y + world._33*f.z + world._34*f.w) * fw;
+	current_.vs.fogPlane[3] = forceNoFog_ ? 1.f : (world._41*f.x + world._42*f.y + world._43*f.z + world._44*f.w);
 
 	const Color4f fog = dev ? dev->fogColor() : Color4f(0.f, 0.f, 0.f, 0.f);
 	current_.fs.fogColor[0] = fog.r; current_.fs.fogColor[1] = fog.g;
@@ -437,11 +466,18 @@ void SDLWorldQuadRenderer::openGroup(GroupKind kind)
 	                       || current_.blend == ALPHA_SUBBLEND;
 	current_.fs.fogParams[0] = contribution ? 1.f : 0.f;
 	current_.fs.fogParams[1] = current_.fs.fogParams[2] = current_.fs.fogParams[3] = 0.f;
+	// TEMP FX debug: плоский квад — туман полностью выкл (Fog=1 везде).
+	if(forceFlat_){
+		current_.vs.fogPlane[0] = current_.vs.fogPlane[1] = current_.vs.fogPlane[2] = 0.f;
+		current_.vs.fogPlane[3] = 1.f;
+		current_.fs.colorOp[1] = 0.f;
+	}
 
 	// The soft-depth fade: the camera's projection constants, or the all-zero "off". Baked
 	// per group because each group keeps its own camera's projection -- the quad route only
 	// ever fades under the main camera, but nothing here should assume that.
-	if(current_.softDepth && cameraValid_){
+	// TEMP FX debug: forceNoSoft — фейд выкл всегда.
+	if(current_.softDepth && cameraValid_ && !forceNoSoft_){
 		current_.fs.zBufferParams[0] = zbParams_[0];
 		current_.fs.zBufferParams[1] = zbParams_[1];
 		current_.fs.zBufferParams[2] = zbParams_[2];
@@ -475,6 +511,23 @@ sVertexXYZDT1* SDLWorldQuadRenderer::Get()
 
 void SDLWorldQuadRenderer::EndDraw()
 {
+	// TEMP FX debug: проволочный каркас — дублировать каждый записанный квад
+	// 4 ребрами через DrawLine (line-пайплайн работает). Если боксы видны,
+	// а квадов нет — позиции верны, сломан именно quad-пайплайн (MVP/шейдер/
+	// бленд/туман); если и боксов нет — вершины не там (мир/камера).
+	if(drawing_ && current_.count > 0 && debugWireParticles_){
+		cSDLRenderDevice* dev = sdlRenderDevice();
+		if(dev){
+			const size_t base = (size_t)current_.first * 4;
+			for(int q = 0; q < current_.count; ++q){
+				const sVertexXYZDT1* v = &vertices_[base + (size_t)q * 4];
+				dev->DrawLine(v[0].pos, v[1].pos, Color4c(255, 0, 255, 255));
+				dev->DrawLine(v[1].pos, v[3].pos, Color4c(255, 0, 255, 255));
+				dev->DrawLine(v[3].pos, v[2].pos, Color4c(255, 0, 255, 255));
+				dev->DrawLine(v[2].pos, v[0].pos, Color4c(255, 0, 255, 255));
+			}
+		}
+	}
 	if(drawing_ && current_.count > 0)
 		groups_.push_back(current_);
 	drawing_ = false;

@@ -167,6 +167,26 @@ public:
 	// (or reuses) its scene-depth snapshot for the pass exactly when this is set.
 	bool wantsSceneDepth() const { return anySoftDepth_; }
 
+	// TEMP FX debug (убрать после диагностики): по одному выключать то, что
+	// может гасить частицы. Применяются в openGroup ко всем группам кадра:
+	// forceNoDepth — depthTest=false; forceNoFog — FogPlane=(0,0,0,1);
+	// forceNoSoft — zBufferParams=0; forceNoPremul — colorOp.y=0.
+	// debugWireParticles — дублировать каждый записанный квад 4 ребрами
+	// через DrawLine (line-пайплайн работает), чтобы разделить «позиции
+	// неверны» и «сломан именно quad-пайплайн».
+	// forceFlat — принудительный плоский квад: белый whiteTexture_,
+	// ALPHA_NONE, depthTest=false, туман и soft-depth выкл, мир ID.
+	// Виден — виноваты текстура/бленд/туман/depth; не виден — MVP/вьюпорт/
+	// формат вершин.
+	void setForceNoDepth(bool b) { forceNoDepth_ = b; }
+	void setForceNoFog(bool b) { forceNoFog_ = b; }
+	void setForceNoSoft(bool b) { forceNoSoft_ = b; }
+	void setForceNoPremul(bool b) { forceNoPremul_ = b; }
+	void setDebugWireParticles(bool b) { debugWireParticles_ = b; }
+	bool debugWireParticles() const { return debugWireParticles_; }
+	void setForceFlat(bool b) { forceFlat_ = b; }
+	bool forceFlat() const { return forceFlat_; }
+
 	// Replay the quads recorded so far into one colour+depth render pass, blended over the
 	// scene and writing no depth (ALPHA_BLEND with RS_ZWRITEENABLE off, as every caller's
 	// scene node sets). `clear`/`clearDepth` mean this pass owns the frame's colour/depth
@@ -323,6 +343,14 @@ private:
 	float vpMinZ_ = 0.f, vpMaxZ_ = 1.f;
 	bool cameraValid_ = false;   // SetCamera has run for the group being recorded
 	bool anySoftDepth_ = false;  // a group since the last Draw baked nonzero zBufferParams
+
+	// TEMP FX debug (убрать после диагностики): см. сеттеры выше.
+	bool forceNoDepth_ = false;
+	bool forceNoFog_ = false;
+	bool forceNoSoft_ = false;
+	bool forceNoPremul_ = false;
+	bool debugWireParticles_ = false;
+	bool forceFlat_ = false;
 };
 
 #endif // VISTA_SDL_WORLD_QUAD_RENDERER_H

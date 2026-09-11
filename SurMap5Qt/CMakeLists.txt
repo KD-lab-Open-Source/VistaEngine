@@ -241,6 +241,9 @@ add_executable(SurMap5Qt
     src/panels/GradientsPanel.cpp
     src/panels/CameraControlPanel.h
     src/panels/CameraControlPanel.cpp
+    # TEMP FX debug panel (убрать после диагностики частиц).
+    src/panels/FxDebugPanel.h
+    src/panels/FxDebugPanel.cpp
     # LibraryEditor (kdw::LibraryEditor port) — the universal library editor:
     # a LibraryTree of elements + a PropertyTree of the selected element's
     # serialized fields, bridged to the engine through IWorldBridge.

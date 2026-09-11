@@ -34,6 +34,7 @@ class ObjectsTreePanel;
 class MiniMapPanel;
 class GradientsPanel;
 class CameraControlPanel;
+class FxDebugPanel;
 
 class MainWindow : public QMainWindow
 {
@@ -138,11 +139,13 @@ private:
 	QDockWidget* miniMapDock_ = nullptr;   // miniMapBar_
 	QDockWidget* gradientsDock_ = nullptr; // gradients bar (new; see GradientsPanel)
 	QDockWidget* cameraControlDock_ = nullptr;
+	QDockWidget* fxDebugDock_ = nullptr;   // TEMP FX debug (убрать после диагностики)
 	ToolsTreePanel* toolsTreePanel_ = nullptr;   // CToolsTreeWindow's tree
 	ObjectsTreePanel* objectsTreePanel_ = nullptr; // CObjectsManagerWindow
 	MiniMapPanel* miniMapPanel_ = nullptr;   // CMiniMapWindow (U6)
 	GradientsPanel* gradientsPanel_ = nullptr; // CGradientsWindow (U6)
 	CameraControlPanel* cameraControlPanel_ = nullptr;
+	FxDebugPanel* fxDebugPanel_ = nullptr;   // TEMP FX debug (убрать после диагностики)
 
 	// --- toolbars (CExtToolControlBar set) ---
 	QToolBar* mainToolBar_ = nullptr;      // IDR_MAINFRAME

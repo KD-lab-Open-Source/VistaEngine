@@ -308,6 +308,35 @@ public:
 
 	bool inited() const { return inited_; }
 
+	// --- TEMP FX debug panel (убрать после диагностики частиц) ---
+
+	// Сколько эффектов в сцене (terScene->GetAllEffects).
+	int fxEffectCount();
+	// Глобальная видимость (debugShowSwitch.effects — PreDraw gate).
+	void fxSetVisible(bool visible);
+	bool fxVisible() const;
+	// Эмиссия всех эффектов (SetParticleRate 1/0).
+	void fxSetEmitting(bool emitting);
+	// Рестарт всех эффектов (SetTime(0) + cycled + rate 1).
+	void fxRestartAll();
+	// Пауза времени сцены (drawFrame идёт с dt=0 — частицы замирают на месте).
+	void fxSetPaused(bool paused);
+	bool fxPaused() const { return fxPaused_; }
+	// TEMP FX debug: изоляция — скрыть всё, кроме частиц (террейн, вода,
+	// объекты, трава, небо через env graphQuant). Убрать после диагностики.
+	void fxSetIsolated(bool isolated);
+	bool fxIsolated() const { return fxIsolated_; }
+	// TEMP FX debug (убрать после диагностики): по одному выключать то, что
+	// может гасить частицы + проволочный каркас квадов линиями.
+	void fxSetForceNoDepth(bool b);
+	void fxSetForceNoFog(bool b);
+	void fxSetForceNoSoft(bool b);
+	void fxSetForceNoPremul(bool b);
+	void fxSetWireParticles(bool b);
+	bool fxWireParticles() const;
+	void fxSetForceFlat(bool b);
+	bool fxForceFlat() const;
+
 private:
 	// The camera's orbit state (CameraManager::CameraCoordinate equivalent).
 	struct Orbit
@@ -348,6 +377,10 @@ private:
 	bool                 inited_ = false;
 	bool                 worldLoaded_ = false;
 	bool                 gridVisible_ = true;   // surMapOptions.enableGrid_ (U7)
+	// TEMP FX debug: пауза времени сцены (drawFrame идёт с dt=0).
+	bool                 fxPaused_ = false;
+	// TEMP FX debug: изоляция частиц (скрыть всё остальное).
+	bool                 fxIsolated_ = false;
 	// loadAllLibraries() (the SurMap5 initRenderDevice prelude) ran — the
 	// UI_* + attribute libraries are loaded, so the first Universe ctor's
 	// UI_Dispatcher::instance() has its dependencies ready.

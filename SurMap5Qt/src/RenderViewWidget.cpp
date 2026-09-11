@@ -3,6 +3,7 @@
 #include "RenderViewWidget.h"
 
 #include <algorithm>
+#include <vector>
 
 #include <QKeyEvent>
 #include <QMouseEvent>
@@ -287,6 +288,93 @@ void RenderViewWidget::setGridVisible(bool visible)
 bool RenderViewWidget::gridVisible() const
 {
 	return viewport_->gridVisible();
+}
+
+// --- TEMP FX debug (убрать после диагностики частиц) ---
+
+int RenderViewWidget::fxEffectCount()
+{
+	return viewport_->fxEffectCount();
+}
+
+void RenderViewWidget::fxSetVisible(bool visible)
+{
+	viewport_->fxSetVisible(visible);
+}
+
+bool RenderViewWidget::fxVisible()
+{
+	return viewport_->fxVisible();
+}
+
+void RenderViewWidget::fxSetEmitting(bool emitting)
+{
+	viewport_->fxSetEmitting(emitting);
+}
+
+void RenderViewWidget::fxRestartAll()
+{
+	viewport_->fxRestartAll();
+}
+
+void RenderViewWidget::fxSetPaused(bool paused)
+{
+	viewport_->fxSetPaused(paused);
+}
+
+bool RenderViewWidget::fxPaused()
+{
+	return viewport_->fxPaused();
+}
+
+void RenderViewWidget::fxSetIsolated(bool isolated)
+{
+	viewport_->fxSetIsolated(isolated);
+}
+
+bool RenderViewWidget::fxIsolated()
+{
+	return viewport_->fxIsolated();
+}
+
+void RenderViewWidget::fxSetForceNoDepth(bool b)
+{
+	viewport_->fxSetForceNoDepth(b);
+}
+
+void RenderViewWidget::fxSetForceNoFog(bool b)
+{
+	viewport_->fxSetForceNoFog(b);
+}
+
+void RenderViewWidget::fxSetForceNoSoft(bool b)
+{
+	viewport_->fxSetForceNoSoft(b);
+}
+
+void RenderViewWidget::fxSetForceNoPremul(bool b)
+{
+	viewport_->fxSetForceNoPremul(b);
+}
+
+void RenderViewWidget::fxSetWireParticles(bool b)
+{
+	viewport_->fxSetWireParticles(b);
+}
+
+bool RenderViewWidget::fxWireParticles()
+{
+	return viewport_->fxWireParticles();
+}
+
+void RenderViewWidget::fxSetForceFlat(bool b)
+{
+	viewport_->fxSetForceFlat(b);
+}
+
+bool RenderViewWidget::fxForceFlat()
+{
+	return viewport_->fxForceFlat();
 }
 
 bool RenderViewWidget::initRenderDevice()

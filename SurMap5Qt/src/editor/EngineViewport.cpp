@@ -25,6 +25,7 @@ using namespace std;
 #include "Render/src/Texture.h"      // cTexture (GetName, CalcTextureSize)
 #include "Util/XMath/xmath.h"        // MatXf/Mat3f/Mat2f + X_AXIS/Y_AXIS/Z_AXIS
 #include "Render/SDLRenderDevice.h"
+#include "Render/SDLWorldQuadRenderer.h"  // TEMP FX debug (оверрайды quad-рендерера)
 #include "Terra/VMAP.H"              // vMap (load/create, H_SIZE/V_SIZE)
 #include "Terra/TerrainType.h"       // TerrainTypeDescriptor (surface names)
 #include "Environment/SourceManager.h"  // sourceManager (sources, anchors)
@@ -66,6 +67,8 @@ using namespace std;
 #include "PropertyArchive.h"                // PropertyOArchive/PropertyIArchive (LibraryEditor bridge)
 #include "Serialization/LibrariesManager.h" // LibrariesManager (library lookup)
 #include "Serialization/LibraryWrapper.h"   // EditorLibraryInterface (library element access)
+#include "Util/EditorVisual.h"              // editorVisual (before/afterQuant, как в CGeneralView::graphQuant)
+#include "UserInterface/UserInterface.h"    // UI_Dispatcher (конструируется в Universe ctor)
 
 // SDL_Init(SDL_INIT_VIDEO) normally happens in PlatformWindow::create; the Qt
 // editor never calls it (Qt owns the windows), so the GPU device would fail
@@ -608,6 +611,19 @@ bool EngineViewport::init(int width, int height)
 	// that has no '\' separator. Must run before the first effect key loads
 	// (unit setPose -> startPermanentEffects during .spg load).
 	EffectContainer::setTexturesPath("Resource\\FX\\Textures");
+	// [SurMap5Qt] initRenderObjects (Game/RenderObjects.cpp:72) also set the
+	// VisGeneric effect library path (used by Node3DX/Static3DX model effects
+	// via GetEffectTexturePath). The Qt port calls initScene(), not
+	// initRenderObjects(), so set it here too — otherwise model-attached
+	// effects resolve textures as bare names ("Texture is bad: 038a.tga").
+	gb_VisGeneric->SetEffectLibraryPath("RESOURCE\\FX", "RESOURCE\\FX\\TEXTURES");
+	// [SurMap5Qt] Старый редактор (CGeneralView::initRenderDevice ->
+	// initRenderObjects + GameOptions::gameSetup) применял graphSetup:
+	// particle rate, soft smoke, тени, bump, анизотропия, гамма.
+	// Без этого Option_ остаются дефолтными и поведение отличается от
+	// старого редактора и игры. Только graphSetup: полный gameSetup
+	// тянет звук (InitSound) и UI-диспетчер, которых в редакторе нет.
+	GameOptions::instance().graphSetup();
 
 	// [SurMap5Qt] The rest of CSurMap5App::InitInstance's engine prelude
 	// (SurMap5/SurMap5.cpp:145-167), in the same order: the pak archives, the
@@ -1188,9 +1204,15 @@ void EngineViewport::tick(float dt)
 		lastLogicMs_ = now;
 		if(logicAccumMs_ >= logicTimePeriod){
 			logicAccumMs_ = 0.0;
+			// Как в CMainFrame::universeQuant (SurMap5/MainFrame.cpp:684):
+			// Console::quant до Quant, Console::graphQuant после.
+			// UI_Dispatcher::logicQuant здесь нет: в редакторе gameShell==0,
+			// и он падает на UI_LogicDispatcher::isGameActive()->gameShell.
+			Console::instance().quant();
 			gb_VisGeneric->SetLogicQuant(universe()->quantCounter() + 2);
 			universe()->Quant();
 			universe()->interpolationQuant();
+			Console::instance().graphQuant();
 		}
 	}
 }
@@ -1214,8 +1236,9 @@ void EngineViewport::drawFrame()
 		s_prevMs = now;
 		return std::min(100.0, dt);
 	}();
+	// TEMP FX debug: пауза времени — частицы замирают на месте (dt=0).
 	if(scene_)
-		scene_->SetDeltaTime((float)frameMs);
+		scene_->SetDeltaTime(fxPaused_ ? 0.0f : (float)frameMs);
 
 	// CGeneralView::graphQuant (SurMap5/GeneralView.cpp:265) drained the
 	// universe's command streams before drawing. Units don't move their model
@@ -1355,6 +1378,18 @@ void EngineViewport::drawFrame()
 		gb_RenderDevice->Fill(32, 48, 64, 255);
 	gb_RenderDevice->BeginScene();
 
+	// [SurMap5Qt] Как в CGeneralView::graphQuant (SurMap5/GeneralView.cpp:293):
+	// editorVisual().beforeQuant() до отрисовки мира.
+	editorVisual().beforeQuant();
+
+	// [SurMap5Qt] Старого вызова environmentTime()->Draw() здесь нет,
+	// хотя CGeneralView::graphQuant его делал: это D3D-only путь
+	// (cRenderCubemap::Draw -> gb_RenderDevice3D->SetRenderState, девайса
+	// нет в SDL-порте — вылет). См. TODO(sdl-port) над
+	// EnvironmentTime::Draw и Documents/Render-PORTING.md #9: у кубмапа
+	// не было потребителя даже на D3D. Небо рисуется через DrawEnviroment
+	// внутри environment->graphQuant ниже.
+
 	// CGeneralView::graphQuant called environment->graphQuant(dt, camera) right
 	// after BeginScene and before terScene->Draw: it opens the frame with the
 	// sky (EnvironmentTime::DrawEnviroment -> cSkyObj::DrawSkyAndAnimate — the
@@ -1370,7 +1405,10 @@ void EngineViewport::drawFrame()
 	// ctor on. Nothing below touches a world object, so a bare check suffices.
 	if(environment){
 		const float dt = 0.001f * (float)frameMs;
-		environment->graphQuant(dt, camera_);
+		// TEMP FX debug: в изоляции небо не рисуем (его depth и заливка
+		// мешают рассмотреть частицы на пустом фоне).
+		if(!fxIsolated_)
+			environment->graphQuant(dt, camera_);
 	}
 
 	// CGeneralView::graphQuant and GameShell::Show both set ATTRCAMERA_CLEARZBUFFER
@@ -1403,8 +1441,10 @@ void EngineViewport::drawFrame()
 	// composited the post-effect stack (environment->drawPostEffects). Monochrome
 	// and the under-water effect are ported to SDL (Render-PORTING.md #6a); the
 	// composite is a no-op on frames where no effect recorded anything.
-	drawGrid();
-	if(environment){
+	// TEMP FX debug: в изоляции сетку и aux не рисуем — только частицы.
+	if(!fxIsolated_)
+		drawGrid();
+	if(environment && !fxIsolated_){
 		const float dt = 0.001f * (float)frameMs;
 		environment->drawPostEffects(dt, camera_);
 	}
@@ -1425,13 +1465,25 @@ void EngineViewport::drawFrame()
 	// the current tool's onDrawAuxData(), and editorVisual().afterQuant().
 	// Without these the 3D view shows no selection circles, no camera paths,
 	// no source marks, no tool gizmos.
-	if(cameraManager)
-		cameraManager->showEditor();
-	if(sourceManager)
-		sourceManager->showEditor();
-	if(environment)
-		environment->showEditor();
-	drawToolAux();
+	// TEMP FX debug: в изоляции aux-слои не рисуем — только частицы.
+	// (drawToolAux также рисует жёлтые кресты позиций эффектов — их гасим
+	// тоже, чтобы не путать с самими частицами.)
+	// Старого вызова UI_Dispatcher::quant здесь нет: в редакторе gameShell==0
+	// (создаётся только в игре), и quant падает на
+	// UI_LogicDispatcher::isGameActive()->gameShell->GameActive.
+	if(!fxIsolated_){
+		if(cameraManager)
+			cameraManager->showEditor();
+		if(sourceManager)
+			sourceManager->showEditor();
+		if(environment)
+			environment->showEditor();
+		drawToolAux();
+	}
+
+	// [SurMap5Qt] Как в CGeneralView::graphQuant (SurMap5/GeneralView.cpp:325):
+	// editorVisual().afterQuant() после aux-слоёв.
+	editorVisual().afterQuant();
 
 	// The Select tool's rubber band (CSurToolSelect::onDrawAuxData drew it via
 	// DrawRectangle after the 3D scene). DrawRectangle goes through the UI
@@ -2255,4 +2307,134 @@ void EngineViewport::deleteSelectedObjects()
 	universe()->deleteSelected();
 	if(cameraManager)
 		cameraManager->deleteSelected();
+}
+
+// --- TEMP FX debug panel (убрать после диагностики частиц) ---
+
+int EngineViewport::fxEffectCount()
+{
+	if(!scene_)
+		return 0;
+	vector<cEffect*> fxList;
+	terScene->GetAllEffects(fxList);
+	return (int)fxList.size();
+}
+
+void EngineViewport::fxSetVisible(bool visible)
+{
+	// cEffect::PreDraw возвращается сразу, когда debugShowSwitch.effects.
+	debugShowSwitch.effects = !visible;
+}
+
+bool EngineViewport::fxVisible() const
+{
+	return !debugShowSwitch.effects;
+}
+
+void EngineViewport::fxSetEmitting(bool emitting)
+{
+	if(!scene_)
+		return;
+	vector<cEffect*> fxList;
+	terScene->GetAllEffects(fxList);
+	for(size_t i = 0; i < fxList.size(); ++i){
+		if(fxList[i])
+			fxList[i]->SetParticleRate(emitting ? 1.0f : 0.0f);
+	}
+}
+
+void EngineViewport::fxRestartAll()
+{
+	if(!scene_)
+		return;
+	vector<cEffect*> fxList;
+	terScene->GetAllEffects(fxList);
+	for(size_t i = 0; i < fxList.size(); ++i){
+		cEffect* e = fxList[i];
+		if(!e)
+			continue;
+		e->SetTime(0.0f);
+		e->setCycled(true);
+		e->SetParticleRate(1.0f);
+	}
+}
+
+void EngineViewport::fxSetPaused(bool paused)
+{
+	fxPaused_ = paused;
+}
+
+void EngineViewport::fxSetIsolated(bool isolated)
+{
+	// TEMP FX debug: оставить юнитов и частицы, скрыть всё остальное.
+	// debugShowSwitch.*=true гейтит PreDraw слоёв: террейн, вода, трава —
+	// скрыты; objects/simplyObjects=false — юниты (cObject3dx и
+	// UnitEnvironmentSimple через cSimply3dx) остаются; effects=false —
+	// частицы остаются. Небо пропускаем через пропуск env graphQuant в кадре.
+	fxIsolated_ = isolated;
+	debugShowSwitch.tilemap = isolated;
+	debugShowSwitch.water = isolated;
+	debugShowSwitch.objects = false;
+	debugShowSwitch.simplyObjects = false;
+	debugShowSwitch.grass = isolated;
+	debugShowSwitch.effects = false;
+}
+
+// TEMP FX debug (убрать после диагностики): оверрайды quad-рендерера.
+namespace {
+SDLWorldQuadRenderer* fxQuadRenderer()
+{
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	return dev ? dev->worldQuadRenderer() : nullptr;
+}
+}
+
+void EngineViewport::fxSetForceNoDepth(bool b)
+{
+	if(SDLWorldQuadRenderer* r = fxQuadRenderer())
+		r->setForceNoDepth(b);
+}
+
+void EngineViewport::fxSetForceNoFog(bool b)
+{
+	if(SDLWorldQuadRenderer* r = fxQuadRenderer())
+		r->setForceNoFog(b);
+}
+
+void EngineViewport::fxSetForceNoSoft(bool b)
+{
+	if(SDLWorldQuadRenderer* r = fxQuadRenderer())
+		r->setForceNoSoft(b);
+}
+
+void EngineViewport::fxSetForceNoPremul(bool b)
+{
+	if(SDLWorldQuadRenderer* r = fxQuadRenderer())
+		r->setForceNoPremul(b);
+}
+
+void EngineViewport::fxSetWireParticles(bool b)
+{
+	if(SDLWorldQuadRenderer* r = fxQuadRenderer())
+		r->setDebugWireParticles(b);
+}
+
+bool EngineViewport::fxWireParticles() const
+{
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	SDLWorldQuadRenderer* r = dev ? dev->worldQuadRenderer() : nullptr;
+	return r ? r->debugWireParticles() : false;
+}
+
+void EngineViewport::fxSetForceFlat(bool b)
+{
+	if(SDLWorldQuadRenderer* r = fxQuadRenderer())
+		r->setForceFlat(b);
+}
+
+bool EngineViewport::fxForceFlat() const
+{
+	cSDLRenderDevice* dev = sdlRenderDevice();
+	SDLWorldQuadRenderer* r = dev ? dev->worldQuadRenderer() : nullptr;
+	return r ? r->forceFlat() : false;
 }

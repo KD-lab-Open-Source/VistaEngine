@@ -53,6 +53,7 @@
 #include "panels/MiniMapPanel.h"
 #include "panels/GradientsPanel.h"
 #include "panels/CameraControlPanel.h"
+#include "panels/FxDebugPanel.h"   // TEMP FX debug (убрать после диагностики)
 
 // Number of status-bar panes: 8 info + 2 separators — NUMBERS_PARTS_STATUSBAR
 // in GeneralView.h (8 + 2).
@@ -773,6 +774,15 @@ void MainWindow::createDockPanels()
 	cameraControlPanel_ = new CameraControlPanel(view_, cameraControlDock_);
 	cameraControlDock_->setWidget(cameraControlPanel_);
 	addDockWidget(Qt::RightDockWidgetArea, cameraControlDock_);
+
+	// TEMP FX debug panel — временные кнопки управления частицами.
+	// Убрать после диагностики (вместе с FxDebugPanel.* и fx*-методами).
+	fxDebugDock_ = new QDockWidget(tr("FX Debug (TEMP)"), this);
+	fxDebugDock_->setObjectName("fxDebugDock");
+	fxDebugDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+	fxDebugPanel_ = new FxDebugPanel(view_, fxDebugDock_);
+	fxDebugDock_->setWidget(fxDebugPanel_);
+	addDockWidget(Qt::RightDockWidgetArea, fxDebugDock_);
 
 	// TODO(Phase 7): QMainWindow::restoreState() from the saved geometry —
 	// replaces CExtControlBar::ProfileBarStateSerialize. Call restoreState()
