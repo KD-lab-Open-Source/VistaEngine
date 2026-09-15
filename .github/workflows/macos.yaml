@@ -2,9 +2,9 @@ name: macOS
 
 on:
   push:
-    branches: [ crossplatform ]
+    branches: [ crossplatform, qt-editor ]
   pull_request:
-    branches: [ crossplatform ]
+    branches: [ crossplatform, qt-editor ]
   workflow_dispatch:
 
 concurrency:

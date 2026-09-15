@@ -2,9 +2,9 @@ name: Windows
 
 on:
   push:
-    branches: [ crossplatform ]
+    branches: [ crossplatform, qt-editor ]
   pull_request:
-    branches: [ crossplatform ]
+    branches: [ crossplatform, qt-editor ]
   workflow_dispatch:
 
 concurrency:
@@ -117,6 +117,16 @@ jobs:
         Copy-Item build\_deps\sdl3-build\${{env.BUILD_TYPE}}\SDL3.dll build\SurMap5Qt\${{env.BUILD_TYPE}}\
         & build\SurMap5Qt\${{env.BUILD_TYPE}}\SurMap5Qt.exe --selftest=SmokeTest
 
+    - name: Editor -- stage runtime DLLs
+      # The exe needs SDL3 + the Qt 6 runtime next to it (Widgets, Gui, Core
+      # and their ICU/OpenSSL/transitive deps). windeployqt stages exactly
+      # that set; the extra SDL3.dll copy keeps the smoke-test layout and the
+      # artifact layout identical.
+      run: |
+        $env:Path = "${{ steps.qt.outputs.qtpath }}\bin;" + $env:Path
+        & "${{ steps.qt.outputs.qtpath }}\bin\windeployqt.exe" --release --no-translations --no-system-d3d-compiler --no-opengl-sw build\SurMap5Qt\${{env.BUILD_TYPE}}\SurMap5Qt.exe
+        Copy-Item build\_deps\sdl3-build\${{env.BUILD_TYPE}}\SDL3.dll build\SurMap5Qt\${{env.BUILD_TYPE}}\ -Force
+
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -124,3 +134,4 @@ jobs:
         path: |
           build/SurMap5Qt/${{env.BUILD_TYPE}}/SurMap5Qt.exe
           build/SurMap5Qt/${{env.BUILD_TYPE}}/SurMap5Qt.pdb
+          build/SurMap5Qt/${{env.BUILD_TYPE}}/*.dll
