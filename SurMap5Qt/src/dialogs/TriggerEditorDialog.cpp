@@ -29,6 +29,11 @@ TriggerEditorDialog::TriggerEditorDialog(RenderViewWidget* view, QWidget* parent
 	setWindowTitle(tr("Trigger Editor"));
 	setMinimumSize(900, 600);
 	resize(1100, 700);
+	// The original kdw dialog opened maximized (TriggerEditor ctor:
+	// setResizeable(true) + setMaximized(true)). A QDialog has only a
+	// Close button by default — add Min/Max so it can go fullscreen.
+	setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
+	setSizeGripEnabled(true);
 
 	// Menu + toolbar commands (TriggerEditor::commandManager_ set):
 	// Debug / Undo / Redo / Find / open-for-copy.
@@ -84,6 +89,14 @@ TriggerEditorDialog::TriggerEditorDialog(RenderViewWidget* view, QWidget* parent
 	mainSplit->setStretchFactor(0, 2);
 	mainSplit->setStretchFactor(1, 7);
 	mainSplit->setStretchFactor(2, 3);
+	// The side columns keep a minimum width so the splitter cannot hide
+	// them completely (nor collapse them on handle double-click). Down to
+	// that minimum they still shrink — the tree/list children scroll
+	// internally (QTreeWidget/QListWidget scrollbars).
+	leftCol->setMinimumWidth(180);
+	rightCol->setMinimumWidth(280);
+	mainSplit->setCollapsible(0, false);
+	mainSplit->setCollapsible(2, false);
 
 	auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
 	connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
