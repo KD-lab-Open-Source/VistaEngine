@@ -101,7 +101,8 @@ jobs:
         cache: true
 
     - name: Editor -- configure
-      run: cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_EDITOR=ON -DCMAKE_PREFIX_PATH=${{ steps.qt.outputs.qtpath }}
+      # QT_ROOT_DIR is the env var the Qt action sets (it has no qtpath output).
+      run: cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_EDITOR=ON -DCMAKE_PREFIX_PATH=$QT_ROOT_DIR
 
     - name: Editor -- build
       run: cmake --build build --target SurMap5Qt
@@ -117,7 +118,7 @@ jobs:
     #   # exits on its own, so a hard failure here is a real editor failure.
     #   run: |
     #     cp build/_deps/sdl3-build/libSDL3* build/SurMap5Qt/ 2>/dev/null || true
-    #     export LD_LIBRARY_PATH="${{ steps.qt.outputs.qtpath }}/lib:build/SurMap5Qt:${LD_LIBRARY_PATH}"
+    #     export LD_LIBRARY_PATH="$QT_ROOT_DIR/lib:build/SurMap5Qt:${LD_LIBRARY_PATH}"
     #     timeout 60 xvfb-run -a ./build/SurMap5Qt/SurMap5Qt --selftest=SmokeTest
 
     - name: Upload a Build Artifact

@@ -110,7 +110,9 @@ jobs:
         cache: true
 
     - name: Editor -- configure
-      run: cmake -A x64 -B build -DBUILD_EDITOR=ON -DCMAKE_PREFIX_PATH=${{ steps.qt.outputs.qtpath }}
+      # QT_ROOT_DIR is the env var the Qt action sets (it has no qtpath
+      # output — ${{ steps.qt.outputs.qtpath }} expands to empty).
+      run: cmake -A x64 -B build -DBUILD_EDITOR=ON -DCMAKE_PREFIX_PATH="$env:QT_ROOT_DIR"
 
     - name: Editor -- build
       run: cmake --build build --config ${{env.BUILD_TYPE}} --target SurMap5Qt --parallel 3
@@ -122,18 +124,17 @@ jobs:
     #   # --selftest loads or creates the world, prints [selftest] LOAD OK /
     #   # CREATE OK / CREATE FAILED to stderr, then exits with 0/1 itself.
     #   run: |
-    #     $env:Path = "${{ steps.qt.outputs.qtpath }}\bin;" + $env:Path
+    #     $env:Path = "$env:QT_ROOT_DIR\bin;" + $env:Path
     #     Copy-Item build\_deps\sdl3-build\${{env.BUILD_TYPE}}\SDL3.dll build\SurMap5Qt\${{env.BUILD_TYPE}}\
     #     & build\SurMap5Qt\${{env.BUILD_TYPE}}\SurMap5Qt.exe --selftest=SmokeTest
 
     - name: Editor -- stage runtime DLLs
       # The exe needs SDL3 + the Qt 6 runtime next to it (Widgets, Gui, Core
       # and their ICU/OpenSSL/transitive deps). windeployqt stages exactly
-      # that set; the extra SDL3.dll copy keeps the smoke-test layout and the
-      # artifact layout identical.
+      # that set; the extra SDL3.dll copy keeps the artifact layout complete.
       run: |
-        $env:Path = "${{ steps.qt.outputs.qtpath }}\bin;" + $env:Path
-        & "${{ steps.qt.outputs.qtpath }}\bin\windeployqt.exe" --release --no-translations --no-system-d3d-compiler --no-opengl-sw build\SurMap5Qt\${{env.BUILD_TYPE}}\SurMap5Qt.exe
+        $env:Path = "$env:QT_ROOT_DIR\bin;" + $env:Path
+        & "$env:QT_ROOT_DIR\bin\windeployqt.exe" --release --no-translations --no-system-d3d-compiler --no-opengl-sw build\SurMap5Qt\${{env.BUILD_TYPE}}\SurMap5Qt.exe
         Copy-Item build\_deps\sdl3-build\${{env.BUILD_TYPE}}\SDL3.dll build\SurMap5Qt\${{env.BUILD_TYPE}}\ -Force
 
     - name: Upload a Build Artifact
