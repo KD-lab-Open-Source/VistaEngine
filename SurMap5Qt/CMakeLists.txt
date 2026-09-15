@@ -255,6 +255,20 @@ add_executable(SurMap5Qt
     src/panels/LibraryEditor.cpp
     src/dialogs/LibraryEditorDialog.h
     src/dialogs/LibraryEditorDialog.cpp
+    # TriggerEditor (TriggerEditor port) — the modal trigger-chain editor:
+    # graph canvas + type palette + minimap + condition panel + debugger.
+    src/panels/TriggerGraphView.h
+    src/panels/TriggerGraphView.cpp
+    src/panels/TriggerClassTree.h
+    src/panels/TriggerClassTree.cpp
+    src/panels/TriggerMiniMapPanel.h
+    src/panels/TriggerMiniMapPanel.cpp
+    src/panels/TriggerConditionPanel.h
+    src/panels/TriggerConditionPanel.cpp
+    src/panels/TriggerDebuggerPanel.h
+    src/panels/TriggerDebuggerPanel.cpp
+    src/dialogs/TriggerEditorDialog.h
+    src/dialogs/TriggerEditorDialog.cpp
 )
 
 # SurMap5Qt links EditorEngine (which carries the engine modules); Qt code

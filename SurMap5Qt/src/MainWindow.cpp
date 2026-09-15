@@ -47,6 +47,7 @@
 #include "dialogs/LibraryEditorDialog.h"
 #include "dialogs/BorderRollingDialog.h"
 #include "dialogs/SelectTriggerDialog.h"
+#include "dialogs/TriggerEditorDialog.h"
 #include "tools/ToolManager.h"
 #include "panels/ToolsTreePanel.h"
 #include "panels/ObjectsTreePanel.h"
@@ -1416,10 +1417,18 @@ void MainWindow::editTriggers()
 		statusBar()->showMessage(tr("No trigger selected"));
 		return;
 	}
-	// The actual TriggerChain load + TriggerEditor land with the trigger
-	// editor port (the Scripts module is not wired into the Qt editor yet).
-	fprintf(stderr, "[tools] trigger selected: %s (editor TODO)\n", file.toStdString().c_str());
-	statusBar()->showMessage(tr("Trigger: %1 (editor not wired yet)").arg(file));
+	// OnEditTriggers: load the chain (TriggerChain::load), edit it in the
+	// Qt TriggerEditorDialog, save on accept (chain.save + TextDB, as the
+	// original did). The dialog owns the engine-side session lifetime.
+	QString fileName = file;
+	if(!fileName.endsWith(".scr", Qt::CaseInsensitive))
+		fileName += ".scr";
+	const QString fullPath = triggersDir + "/" + fileName;
+	TriggerEditorDialog editor(view_, this);
+	if(editor.openChain(fullPath.toStdString()))
+		statusBar()->showMessage(tr("Trigger saved: %1").arg(fileName), 3000);
+	else
+		statusBar()->showMessage(tr("Trigger: %1").arg(fileName), 3000);
 }
 
 void MainWindow::viewTogglePaletteTexture(bool checked)

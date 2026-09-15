@@ -67,6 +67,10 @@ using namespace std;
 #include "PropertyArchive.h"                // PropertyOArchive/PropertyIArchive (LibraryEditor bridge)
 #include "Serialization/LibrariesManager.h" // LibrariesManager (library lookup)
 #include "Serialization/LibraryWrapper.h"   // EditorLibraryInterface (library element access)
+#include "TriggerEditor/TriggerExport.h"    // TriggerChain/Trigger/Condition/Action (trigger editor session)
+#include "Serialization/SerializationFactory.h" // FactorySelector<Action/Condition> (trigger palettes)
+#include "Serialization/BinaryArchive.h"    // BinaryOArchive/BinaryIArchive (trigger undo history)
+#include "Util/TextDB.h"                    // TextDB::saveLanguage (trigger save, as OnEditTriggers)
 #include "Util/EditorVisual.h"              // editorVisual (before/afterQuant, как в CGeneralView::graphQuant)
 #include "UserInterface/UserInterface.h"    // UI_Dispatcher (конструируется в Universe ctor)
 
@@ -127,6 +131,98 @@ SourceManagerHolder g_sourceManagerHolder;
 // right order, which is why SurMap5/GeneralView.cpp:135 calls it in
 // initRenderDevice, long before any world load. See init().
 }
+
+// TriggerSession — the engine-side TriggerChain behind the Qt trigger editor.
+// A port of TriggerView's TriggerChain& + history_ (HISTORY_STEPS = 20 over
+// BinaryOArchive snapshots). Only one session is open at a time; the Qt side
+// addresses triggers/links by index, never by name (cp1251 vs UTF-8).
+struct TriggerSession
+{
+	enum { HISTORY_STEPS = 20 };
+	typedef vector<ShareHandle<BinaryOArchive> > History;
+
+	TriggerChain chain;
+	bool open = false;
+	History history;
+	int undoIndex = 0;
+
+	void close()
+	{
+		open = false;
+		history.clear();
+		undoIndex = 0;
+		chain = TriggerChain();
+	}
+
+	bool openFile(const char* path)
+	{
+		close();
+		if(!path || !path[0])
+			return false;
+		// TriggerChain::load keeps the fresh START chain when the file does
+		// not exist yet (the SelectTriggerDialog New path), and sets name.
+		chain.load(path);
+		open = true;
+		saveStep();
+		return true;
+	}
+
+	bool save()
+	{
+		if(!open)
+			return false;
+		// CMainFrame::OnEditTriggers: chain.save + TextDB languages.
+		chain.save();
+		TextDB::instance().saveLanguage();
+		return true;
+	}
+
+	void saveStep()
+	{
+		// TriggerView::saveStep: skip duplicate snapshots, cap the history.
+		ShareHandle<BinaryOArchive> oa = new BinaryOArchive();
+		oa->serialize(chain, "triggerChain", 0);
+		if(!history.empty() && *history[undoIndex] == *oa)
+			return;
+		if(!history.empty() && undoIndex != (int)history.size() - 1)
+			history.erase(history.begin() + undoIndex + 1, history.end());
+		if((int)history.size() > HISTORY_STEPS)
+			history.erase(history.begin());
+		history.push_back(oa);
+		undoIndex = (int)history.size() - 1;
+	}
+
+	bool canUndo() const { return open && undoIndex > 0; }
+	bool canRedo() const { return open && !history.empty() && undoIndex < (int)history.size() - 1; }
+
+	bool undo()
+	{
+		if(!canUndo())
+			return false;
+		BinaryIArchive ia(*history[--undoIndex]);
+		ia.serialize(chain, "triggerChain", 0);
+		return true;
+	}
+
+	bool redo()
+	{
+		if(!canRedo())
+			return false;
+		BinaryIArchive ia(*history[++undoIndex]);
+		ia.serialize(chain, "triggerChain", 0);
+		return true;
+	}
+
+	bool valid(int i) const { return open && i >= 0 && i < (int)chain.triggers.size(); }
+};
+
+// Chain-property wrapper (TriggerView::TriggerChainPropertySerializer):
+// serializeProperties is not a free Serializer, so wrap it for the bridge.
+struct TriggerChainPropsSerializer
+{
+	TriggerChain* chain = nullptr;
+	void serialize(Archive& ar) { if(chain) chain->serializeProperties(ar); }
+};
 
 // WorldBridge — the engine-side implementation of the engine-free IWorldBridge
 // the tools talk to. It is a port of the SelectionUtil globals +
@@ -530,6 +626,423 @@ public:
 		lib->saveLibrary();
 		return true;
 	}
+
+	// --- Trigger editor (TriggerEditor port) ---
+
+	bool triggerSessionOpen(const std::string& filePath) override
+	{
+		return triggerSession_.openFile(filePath.c_str());
+	}
+
+	bool triggerSessionSave() override
+	{
+		return triggerSession_.save();
+	}
+
+	void triggerSessionClose() override
+	{
+		triggerSession_.close();
+	}
+
+	bool triggerSessionOpenNow() override
+	{
+		return triggerSession_.open;
+	}
+
+	std::string triggerChainName() override
+	{
+		return triggerSession_.open ? triggerSession_.chain.name : std::string();
+	}
+
+	void triggerList(std::vector<TriggerInfo>& out) override
+	{
+		out.clear();
+		if(!triggerSession_.open)
+			return;
+		TriggerList& triggers = triggerSession_.chain.triggers;
+		for(size_t i = 0; i < triggers.size(); ++i){
+			Trigger& t = triggers[i];
+			TriggerInfo info;
+			info.name = t.name() ? t.name() : "";
+			info.cellX = t.cellIndex().x;
+			info.cellY = t.cellIndex().y;
+			const Color4c& c = t.color();
+			info.colorRGBA = ((unsigned)c.a << 24) | ((unsigned)c.r << 16) |
+			                     ((unsigned)c.g << 8) | (unsigned)c.b;
+			info.state = (int)t.state();
+			if(t.condition){
+				if(Condition* cond = t.condition.get())
+					info.conditionType = FactorySelector<Condition>::Factory::instance().find(cond).name();
+			}
+			if(t.action){
+				if(Action* act = t.action.get())
+					info.actionType = FactorySelector<Action>::Factory::instance().find(act).name();
+			}
+			out.push_back(info);
+		}
+	}
+
+	void triggerLinkList(std::vector<TriggerLinkInfo>& out) override
+	{
+		out.clear();
+		if(!triggerSession_.open)
+			return;
+		TriggerChain& chain = triggerSession_.chain;
+		const Vect2f grid = Trigger::gridSize();
+		for(size_t i = 0; i < chain.triggers.size(); ++i){
+			Trigger& parent = chain.triggers[i];
+			OutcomingLinksList::iterator li;
+			FOR_EACH(parent.outcomingLinks(), li){
+				int childIndex = -1;
+				if(li->child)
+					childIndex = chain.triggerIndex(*li->child);
+				if(childIndex < 0 && li->triggerName()){
+					if(Trigger* f = chain.find(li->triggerName()))
+						childIndex = chain.triggerIndex(*f);
+				}
+				if(childIndex < 0)
+					continue;
+				Trigger& child = chain.triggers[(size_t)childIndex];
+				TriggerLinkInfo info;
+				info.parent = (int)i;
+				info.child = childIndex;
+				info.colorType = li->colorType();
+				info.autoRestarted = li->autoRestarted();
+				info.active = li->active();
+				// Offsets are private; recover them from the link points.
+				const Vect2f pp = li->parentPoint();
+				const Vect2f cp = li->childPoint();
+				const Vect2f plt = parent.leftTop();
+				const Vect2f clt = child.leftTop();
+				info.parentOffsetX = (int)(pp.x - (plt.x + grid.x * 0.5f));
+				info.parentOffsetY = (int)(pp.y - (plt.y + grid.y * 0.5f));
+				info.childOffsetX = (int)(cp.x - (clt.x + grid.x * 0.5f));
+				info.childOffsetY = (int)(cp.y - (clt.y + grid.y * 0.5f));
+				out.push_back(info);
+			}
+		}
+	}
+
+	int triggerCreate(int actionTypeIndex, const std::string& nameHint,
+	                  int cellX, int cellY) override
+	{
+		if(!triggerSession_.open)
+			return -1;
+		TriggerChain& chain = triggerSession_.chain;
+		// TriggerView::createTrigger: unique name + action from the palette.
+		std::string name = chain.uniqueName(nameHint.empty() ? "Trigger" : nameHint.c_str());
+		Trigger trigger;
+		trigger.setName(name.c_str());
+		{
+			typedef FactorySelector<Action>::Factory Factory;
+			if(actionTypeIndex >= 0 && actionTypeIndex < Factory::instance().size()){
+				if(Action* a = Factory::instance().createByIndex(actionTypeIndex))
+					trigger.action = a;
+			}
+		}
+		trigger.setCellIndex(Vect2i(cellX, cellY));
+		trigger.setColor(Color4c(128, 255, 128));
+		trigger.setSelected(false);
+		chain.triggers.push_back(trigger);
+		chain.buildLinks();
+		triggerSession_.saveStep();
+		return (int)chain.triggers.size() - 1;
+	}
+
+	bool triggerDelete(int triggerIndex) override
+	{
+		// Index 0 is START (TriggerChain::initialize guarantees it); the
+		// original never deleted it via the graph, so protect it here.
+		if(!triggerSession_.valid(triggerIndex) || triggerIndex == 0)
+			return false;
+		triggerSession_.chain.removeTrigger(triggerIndex);
+		triggerSession_.saveStep();
+		return true;
+	}
+
+	bool triggerRename(int triggerIndex, const std::string& newName) override
+	{
+		if(!triggerSession_.valid(triggerIndex) || newName.empty())
+			return false;
+		TriggerChain& chain = triggerSession_.chain;
+		if(Trigger* f = chain.find(newName.c_str())){
+			if(chain.triggerIndex(*f) != triggerIndex)
+				return false;
+		}
+		const char* oldName = chain.triggers[(size_t)triggerIndex].name();
+		chain.renameTrigger(oldName ? oldName : "", newName.c_str());
+		triggerSession_.saveStep();
+		return true;
+	}
+
+	bool triggerSetCell(int triggerIndex, int cellX, int cellY) override
+	{
+		if(!triggerSession_.valid(triggerIndex))
+			return false;
+		triggerSession_.chain.triggers[(size_t)triggerIndex].setCellIndex(Vect2i(cellX, cellY));
+		triggerSession_.saveStep();
+		return true;
+	}
+
+	bool triggerCreateLink(int parentIndex, int childIndex,
+	                       int colorType, bool autoRestarted) override
+	{
+		if(!triggerSession_.valid(parentIndex) || !triggerSession_.valid(childIndex))
+			return false;
+		if(parentIndex == childIndex)
+			return false;
+		TriggerChain& chain = triggerSession_.chain;
+		Trigger& parent = chain.triggers[(size_t)parentIndex];
+		Trigger& child = chain.triggers[(size_t)childIndex];
+		OutcomingLinksList::iterator li;
+		FOR_EACH(parent.outcomingLinks(), li)
+			if(li->child == &child)
+				return false;
+		// TriggerView::createLink: push + name + buildLinks, then style.
+		parent.outcomingLinks().push_back(TriggerLink());
+		TriggerLink& link = parent.outcomingLinks().back();
+		link.setTriggerName(child.name());
+		chain.buildLinks();
+		if(colorType >= 0 && colorType < STRATEGY_COLOR_MAX)
+			link.setColorType(colorType);
+		link.setAutoRestarted(autoRestarted);
+		triggerSession_.saveStep();
+		return true;
+	}
+
+	bool triggerDeleteLink(int parentIndex, int childIndex) override
+	{
+		if(!triggerSession_.valid(parentIndex) || !triggerSession_.valid(childIndex))
+			return false;
+		TriggerChain& chain = triggerSession_.chain;
+		Trigger& parent = chain.triggers[(size_t)parentIndex];
+		Trigger& child = chain.triggers[(size_t)childIndex];
+		OutcomingLinksList::iterator li;
+		FOR_EACH(parent.outcomingLinks(), li){
+			if(li->child == &child || (li->triggerName() && child.name() &&
+			    !strcmp(li->triggerName(), child.name()))){
+				parent.outcomingLinks().erase(li);
+				chain.buildLinks();
+				triggerSession_.saveStep();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	editor::PropertyRow* triggerConditionTree(int triggerIndex) override
+	{
+		if(!triggerSession_.valid(triggerIndex))
+			return nullptr;
+		ShareHandle<Condition>& cond = triggerSession_.chain.triggers[(size_t)triggerIndex].condition;
+		Serializer se(cond, "condition", "Condition");
+		editor::PropertyOArchive oa;
+		se.serialize(oa);
+		return oa.root();
+	}
+
+	editor::PropertyRow* triggerActionTree(int triggerIndex) override
+	{
+		if(!triggerSession_.valid(triggerIndex))
+			return nullptr;
+		ShareHandle<Action>& act = triggerSession_.chain.triggers[(size_t)triggerIndex].action;
+		Serializer se(act, "action", "Action");
+		editor::PropertyOArchive oa;
+		se.serialize(oa);
+		return oa.root();
+	}
+
+	bool triggerConditionSetTree(int triggerIndex, editor::PropertyRow* root) override
+	{
+		if(!triggerSession_.valid(triggerIndex) || !root)
+			return false;
+		// Write directly into the pointed-to object, not the ShareHandle:
+		// PropertyIArchive::openPointer cannot preserve polymorphic
+		// pointers (it returns NULL_POINTER, so serializePolymorphic input
+		// would delete the condition). Type changes go through
+		// triggerSetConditionType; here only field values are written.
+		Condition* cond = triggerSession_.chain.triggers[(size_t)triggerIndex].condition.get();
+		if(!cond)
+			return false;
+		Serializer se(*cond, "condition", "Condition");
+		editor::PropertyIArchive ia(root);
+		se.serialize(ia);
+		triggerSession_.saveStep();
+		return true;
+	}
+
+	bool triggerActionSetTree(int triggerIndex, editor::PropertyRow* root) override
+	{
+		if(!triggerSession_.valid(triggerIndex) || !root)
+			return false;
+		// Same as above: direct-object write, type changes via
+		// triggerSetActionType.
+		Action* act = triggerSession_.chain.triggers[(size_t)triggerIndex].action.get();
+		if(!act)
+			return false;
+		Serializer se(*act, "action", "Action");
+		editor::PropertyIArchive ia(root);
+		se.serialize(ia);
+		triggerSession_.saveStep();
+		return true;
+	}
+
+	editor::PropertyRow* triggerTree(int triggerIndex) override
+	{
+		if(!triggerSession_.valid(triggerIndex))
+			return nullptr;
+		Trigger& trigger = triggerSession_.chain.triggers[(size_t)triggerIndex];
+		Serializer se(trigger, "trigger", "Trigger");
+		editor::PropertyOArchive oa;
+		se.serialize(oa);
+		return oa.root();
+	}
+
+	bool triggerSetTree(int triggerIndex, editor::PropertyRow* root) override
+	{
+		if(!triggerSession_.valid(triggerIndex) || !root)
+			return false;
+		TriggerChain& chain = triggerSession_.chain;
+		Trigger& trigger = chain.triggers[(size_t)triggerIndex];
+		const char* oldName = trigger.name();
+		const std::string oldNameCopy = oldName ? oldName : "";
+		Serializer se(trigger, "trigger", "Trigger");
+		editor::PropertyIArchive ia(root);
+		se.serialize(ia);
+		// A renamed trigger must rewire link names (Trigger::setName only
+		// fixes incoming links of the live object; the serialized write
+		// bypasses it, so rename explicitly like onPropertyChanged did).
+		const char* newName = trigger.name();
+		if(newName && oldNameCopy != newName)
+			chain.renameTrigger(oldNameCopy.c_str(), newName);
+		chain.buildLinks();
+		triggerSession_.saveStep();
+		return true;
+	}
+
+	editor::PropertyRow* triggerChainTree() override
+	{
+		if(!triggerSession_.open)
+			return nullptr;
+		TriggerChainPropsSerializer wrap;
+		wrap.chain = &triggerSession_.chain;
+		Serializer se(wrap, "chain", "TriggerChain");
+		editor::PropertyOArchive oa;
+		se.serialize(oa);
+		return oa.root();
+	}
+
+	bool triggerChainSetTree(editor::PropertyRow* root) override
+	{
+		if(!triggerSession_.open || !root)
+			return false;
+		TriggerChainPropsSerializer wrap;
+		wrap.chain = &triggerSession_.chain;
+		Serializer se(wrap, "chain", "TriggerChain");
+		editor::PropertyIArchive ia(root);
+		se.serialize(ia);
+		triggerSession_.saveStep();
+		return true;
+	}
+
+	void triggerActionTypes(std::vector<std::string>& names,
+	                        std::vector<std::string>& namesAlt) override
+	{
+		names.clear();
+		namesAlt.clear();
+		typedef FactorySelector<Action>::Factory Factory;
+		const ComboStrings& combo = Factory::instance().comboStrings();
+		const ComboStrings& comboAlt = Factory::instance().comboStringsAlt();
+		for(size_t i = 0; i < combo.size(); ++i)
+			names.push_back(combo[i]);
+		for(size_t i = 0; i < comboAlt.size(); ++i)
+			namesAlt.push_back(comboAlt[i]);
+	}
+
+	void triggerConditionTypes(std::vector<std::string>& names,
+	                           std::vector<std::string>& namesAlt) override
+	{
+		names.clear();
+		namesAlt.clear();
+		typedef FactorySelector<Condition>::Factory Factory;
+		const ComboStrings& combo = Factory::instance().comboStrings();
+		const ComboStrings& comboAlt = Factory::instance().comboStringsAlt();
+		for(size_t i = 0; i < combo.size(); ++i)
+			names.push_back(combo[i]);
+		for(size_t i = 0; i < comboAlt.size(); ++i)
+			namesAlt.push_back(comboAlt[i]);
+	}
+
+	bool triggerSetActionType(int triggerIndex, int typeIndex) override
+	{
+		if(!triggerSession_.valid(triggerIndex))
+			return false;
+		typedef FactorySelector<Action>::Factory Factory;
+		if(typeIndex < 0 || typeIndex >= Factory::instance().size())
+			return false;
+		Action* a = Factory::instance().createByIndex(typeIndex);
+		if(!a)
+			return false;
+		triggerSession_.chain.triggers[(size_t)triggerIndex].action = a;
+		triggerSession_.saveStep();
+		return true;
+	}
+
+	bool triggerSetConditionType(int triggerIndex, int typeIndex) override
+	{
+		if(!triggerSession_.valid(triggerIndex))
+			return false;
+		// Negative index clears the condition (the Clear button path).
+		if(typeIndex < 0){
+			triggerSession_.chain.triggers[(size_t)triggerIndex].condition = (Condition*)nullptr;
+			triggerSession_.saveStep();
+			return true;
+		}
+		typedef FactorySelector<Condition>::Factory Factory;
+		if(typeIndex < 0 || typeIndex >= Factory::instance().size())
+			return false;
+		Condition* c = Factory::instance().createByIndex(typeIndex);
+		if(!c)
+			return false;
+		triggerSession_.chain.triggers[(size_t)triggerIndex].condition = c;
+		triggerSession_.saveStep();
+		return true;
+	}
+
+	bool triggerSetConditionInverted(int triggerIndex, bool inverted) override
+	{
+		if(!triggerSession_.valid(triggerIndex))
+			return false;
+		Condition* c = triggerSession_.chain.triggers[(size_t)triggerIndex].condition.get();
+		if(!c)
+			return false;
+		c->setInverted(inverted);
+		triggerSession_.saveStep();
+		return true;
+	}
+
+	bool triggerCanUndo() override { return triggerSession_.canUndo(); }
+	bool triggerCanRedo() override { return triggerSession_.canRedo(); }
+	bool triggerUndo() override { return triggerSession_.undo(); }
+	bool triggerRedo() override { return triggerSession_.redo(); }
+
+	void triggerLogRecords(std::vector<TriggerLogRecord>& out) override
+	{
+		out.clear();
+		if(!triggerSession_.open)
+			return;
+		const TriggerChain::TriggerEventList& log = triggerSession_.chain.logData();
+		for(size_t i = 0; i < log.size(); ++i){
+			TriggerLogRecord rec;
+			rec.event = log[i].event;
+			rec.triggerName = log[i].triggerName;
+			rec.state = (int)log[i].state;
+			out.push_back(rec);
+		}
+	}
+
+private:
+	TriggerSession triggerSession_;
 };
 
 EngineViewport::EngineViewport() = default;

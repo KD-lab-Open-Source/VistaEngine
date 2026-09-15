@@ -200,6 +200,44 @@ public:
 	bool terrainInfoAt(float x, float y, QString& surfName,
 	                   int& altVox, int& approxAlt, int& waterZ) const;
 
+	// --- Trigger editor (TriggerEditor port). Forwarders to the engine-side
+	// TriggerSession behind IWorldBridge, so the dialog stays engine-free. ---
+	bool triggerSessionOpen(const std::string& filePath);
+	bool triggerSessionSave();
+	void triggerSessionClose();
+	bool triggerSessionOpenNow();
+	std::string triggerChainName();
+	void triggerList(std::vector<TriggerInfo>& out);
+	void triggerLinkList(std::vector<TriggerLinkInfo>& out);
+	int triggerCreate(int actionTypeIndex, const std::string& nameHint,
+	                  int cellX, int cellY);
+	bool triggerDelete(int triggerIndex);
+	bool triggerRename(int triggerIndex, const std::string& newName);
+	bool triggerSetCell(int triggerIndex, int cellX, int cellY);
+	bool triggerCreateLink(int parentIndex, int childIndex,
+	                       int colorType, bool autoRestarted);
+	bool triggerDeleteLink(int parentIndex, int childIndex);
+	editor::PropertyRow* triggerConditionTree(int triggerIndex);
+	editor::PropertyRow* triggerActionTree(int triggerIndex);
+	bool triggerConditionSetTree(int triggerIndex, editor::PropertyRow* root);
+	bool triggerActionSetTree(int triggerIndex, editor::PropertyRow* root);
+	editor::PropertyRow* triggerTree(int triggerIndex);
+	bool triggerSetTree(int triggerIndex, editor::PropertyRow* root);
+	editor::PropertyRow* triggerChainTree();
+	bool triggerChainSetTree(editor::PropertyRow* root);
+	void triggerActionTypes(std::vector<std::string>& names,
+	                        std::vector<std::string>& namesAlt);
+	void triggerConditionTypes(std::vector<std::string>& names,
+	                           std::vector<std::string>& namesAlt);
+	bool triggerSetActionType(int triggerIndex, int typeIndex);
+	bool triggerSetConditionType(int triggerIndex, int typeIndex);
+	bool triggerSetConditionInverted(int triggerIndex, bool inverted);
+	bool triggerCanUndo();
+	bool triggerCanRedo();
+	bool triggerUndo();
+	bool triggerRedo();
+	void triggerLogRecords(std::vector<TriggerLogRecord>& out);
+
 public slots:
 	// Called ~60 Hz from MainWindow::universeQuant (MFC OnIdle equivalent).
 	void tick();

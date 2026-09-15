@@ -148,6 +148,44 @@ public:
 	virtual void visit(EditorObjectId id) = 0;
 };
 
+// --- Trigger editor (TriggerEditor port) ---
+//
+// Engine-free snapshot of one trigger node (TriggerEditor/TriggerExport.h).
+// The Qt graph talks indices, never names (engine names are cp1251, Qt is
+// UTF-8 — round-tripping names breaks lookup, as with library elements).
+struct TriggerInfo
+{
+	std::string name;
+	int cellX = 0;
+	int cellY = 0;
+	unsigned colorRGBA = 0xFF80FF80u; // 0xAARRGGBB
+	int state = 0;                    // Trigger::State
+	std::string conditionType;        // factory name, may be empty
+	std::string actionType;           // factory name, may be empty
+};
+
+// Engine-free snapshot of one trigger link (TriggerLink).
+struct TriggerLinkInfo
+{
+	int parent = -1;          // trigger index
+	int child = -1;           // trigger index
+	int colorType = 0;        // ColorType 0..STRATEGY_COLOR_MAX-1
+	bool autoRestarted = false;
+	bool active = false;
+	int parentOffsetX = 0;
+	int parentOffsetY = 0;
+	int childOffsetX = 0;
+	int childOffsetY = 0;
+};
+
+// One debug-log record (TriggerEvent).
+struct TriggerLogRecord
+{
+	std::string event;
+	std::string triggerName;
+	int state = 0;
+};
+
 class IWorldBridge
 {
 public:
@@ -268,6 +306,85 @@ public:
 	// Save the library (LibraryWrapper::saveLibrary). Returns false when the
 	// library is unknown.
 	virtual bool librarySave(const std::string& libraryName) = 0;
+
+	// --- Trigger editor (TriggerEditor port) ---
+	//
+	// The Qt trigger editor (TriggerEditorDialog) edits a TriggerChain
+	// engine-side: the chain lives in the EditorEngine session (a port of
+	// TriggerView's TriggerChain& + history_), and the Qt side sees plain
+	// TriggerInfo/TriggerLinkInfo snapshots by index. Names are display
+	// only (cp1251 vs UTF-8) — every mutation addresses triggers by index.
+	//
+	// Session: triggerSessionOpen loads a .scr file (TriggerChain::load),
+	// triggerSessionSave persists it (chain.save + TextDB::saveLanguage, as
+	// CMainFrame::OnEditTriggers did), triggerSessionClose drops it.
+	// Only one session is open at a time; opening a new one closes the old.
+	virtual bool triggerSessionOpen(const std::string& filePath) = 0;
+	virtual bool triggerSessionSave() = 0;
+	virtual void triggerSessionClose() = 0;
+	virtual bool triggerSessionOpenNow() = 0;
+	// The chain's display name (TriggerChain::name).
+	virtual std::string triggerChainName() = 0;
+	// All triggers in chain order (index 0 is the START trigger).
+	virtual void triggerList(std::vector<TriggerInfo>& out) = 0;
+	// All outcoming links, flattened (parent/child are trigger indices).
+	virtual void triggerLinkList(std::vector<TriggerLinkInfo>& out) = 0;
+	// Create a trigger with the given action factory index (as
+	// TriggerView::createTrigger did via FactorySelector<Action>), at the
+	// given cell. Returns the new trigger index, or -1. The name is made
+	// unique via TriggerChain::uniqueName.
+	virtual int triggerCreate(int actionTypeIndex, const std::string& nameHint,
+	                          int cellX, int cellY) = 0;
+	// Delete the trigger at the index (TriggerChain::removeTrigger).
+	virtual bool triggerDelete(int triggerIndex) = 0;
+	// Rename (TriggerChain::renameTrigger — rewires link names too).
+	virtual bool triggerRename(int triggerIndex, const std::string& newName) = 0;
+	// Move a trigger on the grid (Trigger::setCellIndex).
+	virtual bool triggerSetCell(int triggerIndex, int cellX, int cellY) = 0;
+	// Create/delete a link (outcomingLinks push / removeLinkByChild).
+	virtual bool triggerCreateLink(int parentIndex, int childIndex,
+	                               int colorType, bool autoRestarted) = 0;
+	virtual bool triggerDeleteLink(int parentIndex, int childIndex) = 0;
+	// Serialize one trigger's condition/action into a PropertyRow tree
+	// (PropertyOArchive over Serializer(condition/action), as
+	// TriggerView::updatePropertyTree attached Serializer(trigger)).
+	virtual editor::PropertyRow* triggerConditionTree(int triggerIndex) = 0;
+	virtual editor::PropertyRow* triggerActionTree(int triggerIndex) = 0;
+	// Write a PropertyRow tree back (PropertyIArchive). Saves an undo step.
+	virtual bool triggerConditionSetTree(int triggerIndex,
+	                                     editor::PropertyRow* root) = 0;
+	virtual bool triggerActionSetTree(int triggerIndex,
+	                                  editor::PropertyRow* root) = 0;
+	// Serialize the whole trigger (name/color/condition/action/links) into
+	// a PropertyRow tree, and write it back. Used by the property panel.
+	virtual editor::PropertyRow* triggerTree(int triggerIndex) = 0;
+	virtual bool triggerSetTree(int triggerIndex, editor::PropertyRow* root) = 0;
+	// Serialize chain properties (checkType) into a PropertyRow tree.
+	virtual editor::PropertyRow* triggerChainTree() = 0;
+	virtual bool triggerChainSetTree(editor::PropertyRow* root) = 0;
+	// Factory palettes (FactorySelector<Action/Condition> comboStrings +
+	// comboStringsAlt, as ClassTree built from them).
+	virtual void triggerActionTypes(std::vector<std::string>& names,
+	                                std::vector<std::string>& namesAlt) = 0;
+	virtual void triggerConditionTypes(std::vector<std::string>& names,
+	                                   std::vector<std::string>& namesAlt) = 0;
+	// Replace the trigger's action/condition with a fresh instance of the
+	// given factory type index (as createTrigger/editConditions did).
+	virtual bool triggerSetActionType(int triggerIndex, int typeIndex) = 0;
+	virtual bool triggerSetConditionType(int triggerIndex, int typeIndex) = 0;
+	// Flip the trigger's root condition inverted flag (ConditionSlot::invert).
+	// A direct engine-side toggle: the PropertyRow write-back cannot touch
+	// it safely (PropertyIArchive::openPointer returns NULL_POINTER, so a
+	// polymorphic input would delete the condition instead of updating it).
+	virtual bool triggerSetConditionInverted(int triggerIndex, bool inverted) = 0;
+	// Undo/redo over the BinaryOArchive history (TriggerView::saveStep/
+	// undo/redo, HISTORY_STEPS = 20).
+	virtual bool triggerCanUndo() = 0;
+	virtual bool triggerCanRedo() = 0;
+	virtual bool triggerUndo() = 0;
+	virtual bool triggerRedo() = 0;
+	// Debug log (TriggerChain::logData): records for the debugger panel.
+	virtual void triggerLogRecords(std::vector<TriggerLogRecord>& out) = 0;
 
 	// Static sentinel representing "no object".
 	static constexpr EditorObjectId kNoObject = 0;

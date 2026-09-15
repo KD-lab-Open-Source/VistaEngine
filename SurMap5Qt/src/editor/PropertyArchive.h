@@ -13,6 +13,7 @@
 #pragma once
 
 #include "Serialization/Serialization.h"
+#include "Serialization/ComboStrings.h"   // indexInComboListString (pointer write-back)
 #include "PropertyRow.h"
 #include "PropertyRows.h"
 
@@ -101,8 +102,13 @@ public:
 
 	int openPointer(void*& object, const char* name, const char* nameAlt, const char* baseName, const char* derivedName, const char* derivedNameAlt) override
 	{
-		(void)object; (void)derivedName; (void)derivedNameAlt;
+		(void)object; (void)derivedNameAlt;
+		// Keep the concrete type name on the row (kdw::PropertyRowPointer::
+		// derivedName_): PropertyIArchive maps it back to the factory index
+		// so a polymorphic write-back recreates the object instead of
+		// deleting it (serializePolymorphic deletes on NULL_POINTER).
 		PropertyRowContainer* row = new PropertyRowContainer(name, nameAlt, baseName);
+		row->setDerivedName(derivedName);
 		current_->addChild(row);
 		current_ = row;
 		return NULL_POINTER;

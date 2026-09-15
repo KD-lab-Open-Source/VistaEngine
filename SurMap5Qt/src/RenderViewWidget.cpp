@@ -191,6 +191,245 @@ bool RenderViewWidget::saveWorld()
 	return viewport_->saveWorld();
 }
 
+// --- Trigger editor (TriggerEditor port). The bridge lives behind
+// EngineViewport::worldBridge; guard for null like worldBridge() does. ---
+
+namespace {
+IWorldBridge* triggerBridge(EngineViewport* viewport)
+{
+	return viewport ? viewport->worldBridge() : nullptr;
+}
+}
+
+bool RenderViewWidget::triggerSessionOpen(const std::string& filePath)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerSessionOpen(filePath);
+	return false;
+}
+
+bool RenderViewWidget::triggerSessionSave()
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerSessionSave();
+	return false;
+}
+
+void RenderViewWidget::triggerSessionClose()
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		b->triggerSessionClose();
+}
+
+bool RenderViewWidget::triggerSessionOpenNow()
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerSessionOpenNow();
+	return false;
+}
+
+std::string RenderViewWidget::triggerChainName()
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerChainName();
+	return std::string();
+}
+
+void RenderViewWidget::triggerList(std::vector<TriggerInfo>& out)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		b->triggerList(out);
+	else
+		out.clear();
+}
+
+void RenderViewWidget::triggerLinkList(std::vector<TriggerLinkInfo>& out)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		b->triggerLinkList(out);
+	else
+		out.clear();
+}
+
+int RenderViewWidget::triggerCreate(int actionTypeIndex, const std::string& nameHint,
+                                    int cellX, int cellY)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerCreate(actionTypeIndex, nameHint, cellX, cellY);
+	return -1;
+}
+
+bool RenderViewWidget::triggerDelete(int triggerIndex)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerDelete(triggerIndex);
+	return false;
+}
+
+bool RenderViewWidget::triggerRename(int triggerIndex, const std::string& newName)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerRename(triggerIndex, newName);
+	return false;
+}
+
+bool RenderViewWidget::triggerSetCell(int triggerIndex, int cellX, int cellY)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerSetCell(triggerIndex, cellX, cellY);
+	return false;
+}
+
+bool RenderViewWidget::triggerCreateLink(int parentIndex, int childIndex,
+                                         int colorType, bool autoRestarted)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerCreateLink(parentIndex, childIndex, colorType, autoRestarted);
+	return false;
+}
+
+bool RenderViewWidget::triggerDeleteLink(int parentIndex, int childIndex)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerDeleteLink(parentIndex, childIndex);
+	return false;
+}
+
+editor::PropertyRow* RenderViewWidget::triggerConditionTree(int triggerIndex)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerConditionTree(triggerIndex);
+	return nullptr;
+}
+
+editor::PropertyRow* RenderViewWidget::triggerActionTree(int triggerIndex)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerActionTree(triggerIndex);
+	return nullptr;
+}
+
+bool RenderViewWidget::triggerConditionSetTree(int triggerIndex, editor::PropertyRow* root)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerConditionSetTree(triggerIndex, root);
+	return false;
+}
+
+bool RenderViewWidget::triggerActionSetTree(int triggerIndex, editor::PropertyRow* root)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerActionSetTree(triggerIndex, root);
+	return false;
+}
+
+editor::PropertyRow* RenderViewWidget::triggerTree(int triggerIndex)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerTree(triggerIndex);
+	return nullptr;
+}
+
+bool RenderViewWidget::triggerSetTree(int triggerIndex, editor::PropertyRow* root)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerSetTree(triggerIndex, root);
+	return false;
+}
+
+editor::PropertyRow* RenderViewWidget::triggerChainTree()
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerChainTree();
+	return nullptr;
+}
+
+bool RenderViewWidget::triggerChainSetTree(editor::PropertyRow* root)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerChainSetTree(root);
+	return false;
+}
+
+void RenderViewWidget::triggerActionTypes(std::vector<std::string>& names,
+                                          std::vector<std::string>& namesAlt)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		b->triggerActionTypes(names, namesAlt);
+	else{
+		names.clear();
+		namesAlt.clear();
+	}
+}
+
+void RenderViewWidget::triggerConditionTypes(std::vector<std::string>& names,
+                                             std::vector<std::string>& namesAlt)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		b->triggerConditionTypes(names, namesAlt);
+	else{
+		names.clear();
+		namesAlt.clear();
+	}
+}
+
+bool RenderViewWidget::triggerSetActionType(int triggerIndex, int typeIndex)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerSetActionType(triggerIndex, typeIndex);
+	return false;
+}
+
+bool RenderViewWidget::triggerSetConditionType(int triggerIndex, int typeIndex)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerSetConditionType(triggerIndex, typeIndex);
+	return false;
+}
+
+bool RenderViewWidget::triggerSetConditionInverted(int triggerIndex, bool inverted)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerSetConditionInverted(triggerIndex, inverted);
+	return false;
+}
+
+bool RenderViewWidget::triggerCanUndo()
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerCanUndo();
+	return false;
+}
+
+bool RenderViewWidget::triggerCanRedo()
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerCanRedo();
+	return false;
+}
+
+bool RenderViewWidget::triggerUndo()
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerUndo();
+	return false;
+}
+
+bool RenderViewWidget::triggerRedo()
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		return b->triggerRedo();
+	return false;
+}
+
+void RenderViewWidget::triggerLogRecords(std::vector<TriggerLogRecord>& out)
+{
+	if(IWorldBridge* b = triggerBridge(viewport_))
+		b->triggerLogRecords(out);
+	else
+		out.clear();
+}
+
 bool RenderViewWidget::canUndo() const
 {
 	return viewport_->canUndo();

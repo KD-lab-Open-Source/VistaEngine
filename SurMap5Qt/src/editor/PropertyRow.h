@@ -50,10 +50,18 @@ public:
 	// Parent (set by addChild).
 	PropertyRow* parent() const { return parent_; }
 
+	// The concrete derived type name for pointer rows (openPointer's
+	// derivedName). Lets PropertyIArchive map the row back to the factory
+	// index so a polymorphic write-back updates the live object in place
+	// instead of deleting it (serializePolymorphic deletes on NULL_POINTER).
+	const std::string& derivedName() const { return derivedName_; }
+	void setDerivedName(const char* derived) { derivedName_ = derived ? derived : ""; }
+
 protected:
 	std::string name_;
 	std::string nameAlt_;
 	std::string typeName_;
+	std::string derivedName_;
 	std::vector<PropertyRow*> children_;
 	PropertyRow* parent_ = nullptr;
 };
