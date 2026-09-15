@@ -96,15 +96,16 @@ jobs:
     # nothing from it — the Qt translation units link Qt, the EditorEngine
     # static library stays engine-flag-clean.
     #
-    # Pinned to an exact version, not '6.11.*': aqt resolves the glob to the
-    # newest patch (6.11.2), whose Updates.xml metadata is missing from the
-    # mirrors ("Failed to locate XML data for Qt version '6.11.2'"). 6.11.1
-    # is also what the local dev machines carry (C:\Qt\6.11.1\msvc2022_64).
+    # Pinned to 6.8.3, the action's tested LTS default: the aqt mirrors carry
+    # no metadata for the 6.11 line at all ("Failed to locate XML data" for
+    # both the 6.11.* glob → 6.11.2 and the exact 6.11.1). Our CMakeLists only
+    # requires Qt 6.4+, so the LTS build stays representative; dev machines
+    # may keep whatever 6.x they have locally.
     - name: Install Qt
       id: qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.11.1'
+        version: '6.8.3'
         arch: win64_msvc2022_64
         cache: true
 
