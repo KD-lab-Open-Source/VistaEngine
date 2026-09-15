@@ -139,9 +139,11 @@ jobs:
 
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4
+      # The whole directory, not selected files: windeployqt stages the
+      # platform plugin (platforms/qwindows.dll — without it the exe dies
+      # with "no Qt platform plugin could be initialized") plus styles,
+      # imageformats and other plugin subfolders, which a *.dll glob would
+      # silently drop.
       with:
         name: SurMap5Qt-Windows
-        path: |
-          build/SurMap5Qt/${{env.BUILD_TYPE}}/SurMap5Qt.exe
-          build/SurMap5Qt/${{env.BUILD_TYPE}}/SurMap5Qt.pdb
-          build/SurMap5Qt/${{env.BUILD_TYPE}}/*.dll
+        path: build/SurMap5Qt/${{env.BUILD_TYPE}}/
