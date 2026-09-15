@@ -91,11 +91,13 @@ jobs:
           libxcb-cursor0 xvfb mesa-vulkan-drivers libvulkan1
 
     # Qt 6 (Widgets) is the editor's UI framework. The engine needs none of it.
+    # Pinned exact (see windows.yaml): the '6.11.*' glob resolves to 6.11.2,
+    # whose mirror metadata is missing.
     - name: Install Qt
       id: qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.11.*'
+        version: '6.11.1'
         cache: true
 
     - name: Editor -- configure
