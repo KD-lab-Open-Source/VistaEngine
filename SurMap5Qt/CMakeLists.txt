@@ -240,6 +240,8 @@ add_executable(SurMap5Qt
     # serialized fields, bridged to the engine through IWorldBridge.
     src/panels/PropertyTree.h
     src/panels/PropertyTree.cpp
+    src/panels/PropertyDelegates.h
+    src/panels/PropertyDelegates.cpp
     src/panels/LibraryTree.h
     src/panels/LibraryTree.cpp
     src/panels/LibraryEditor.h

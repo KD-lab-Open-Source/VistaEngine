@@ -14,8 +14,10 @@
 
 #include "Serialization/Serialization.h"
 #include "Serialization/ComboStrings.h"   // indexInComboListString (pointer write-back)
+#include "Serialization/EnumDescriptor.h" // descriptor entries for enum/flag rows
 #include "PropertyRow.h"
 #include "PropertyRows.h"
+#include "PropertyRowsEngine.h"           // engine rows (EditorEngine only)
 
 #include <climits>
 
@@ -52,20 +54,31 @@ public:
 	bool processValue(double& v, const char* n, const char* na) override { return addValue("double", n, na, &v); }
 	bool processValue(std::string& v, const char* n, const char* na) override { return addValue("std::string", n, na, &v); }
 	bool processValue(std::wstring& v, const char* n, const char* na) override { (void)v; (void)n; (void)na; return true; }
-	bool processValue(ComboListString& v, const char* n, const char* na) override { (void)v; (void)n; (void)na; return true; }
+	bool processValue(ComboListString& v, const char* n, const char* na) override
+	{
+		// A combo-box string row (kdw::PropertyRowComboListString): the
+		// value plus its pipe-separated string list.
+		PropertyRowEngineComboList* row = new PropertyRowEngineComboList(n, na, "ComboListString", v);
+		current_->addChild(row);
+		return true;
+	}
 
 	bool processEnum(int& value, const EnumDescriptor& descriptor, const char* name, const char* nameAlt) override
 	{
-		(void)nameAlt;
-		PropertyRow* row = new PropertyRowEnum(name, nameAlt, descriptor.typeName(), value);
+		// An enum row with the descriptor's entries (kdw::PropertyRowEnum):
+		// display names for the combo, keys for the value mapping.
+		PropertyRowEnum* row = new PropertyRowEnum(name, nameAlt, descriptor.typeName(), value);
+		fillEntries(*row, descriptor);
 		current_->addChild(row);
 		return true;
 	}
 
 	bool processBitVector(int& flags, const EnumDescriptor& descriptor, const char* name, const char* nameAlt) override
 	{
-		(void)nameAlt;
-		PropertyRow* row = new PropertyRowBitVector(name, nameAlt, descriptor.typeName(), flags);
+		// A flags row with the descriptor's entries (kdw::
+		// PropertyRowBitVector + CheckComboBox).
+		PropertyRowBitVector* row = new PropertyRowBitVector(name, nameAlt, descriptor.typeName(), flags);
+		fillEntries(*row, descriptor);
 		current_->addChild(row);
 		return true;
 	}
@@ -73,7 +86,21 @@ public:
 	// --- Structs / containers / pointers ---
 	bool openStructInternal(void* object, int size, const char* name, const char* nameAlt, const char* typeName, bool polymorphic) override
 	{
-		(void)object; (void)size; (void)polymorphic;
+		(void)polymorphic;
+		// Struct types with a registered row (colors, ranged wrappers,
+		// file selectors, combo colors) become LEAF rows that snapshot the
+		// object — kdw::PropertyOArchive::openStructInternal consulted the
+		// row factory the same way. The inner serialize body is skipped
+		// (return false), exactly like the original.
+		if(object && typeName && PropertyRowFactory::instance().isRegistered(typeName)){
+			PropertyRow* row = PropertyRowFactory::instance().create(typeName, name, nameAlt, object);
+			if(row && row->isLeaf()){
+				current_->addChild(row);
+				return false;
+			}
+			delete row;
+		}
+		(void)object; (void)size;
 		// A container row for the struct; descend into it.
 		PropertyRowContainer* row = new PropertyRowContainer(name, nameAlt, typeName);
 		current_->addChild(row);
@@ -137,6 +164,35 @@ public:
 	}
 
 private:
+	// Fill an enum/flags row's combo entries from the descriptor: display
+	// (alt) names with their keys, so the tree shows names and edits
+	// through a combo/checklist.
+	void fillEntries(PropertyRowEnum& row, const EnumDescriptor& descriptor)
+	{
+		const ComboStrings& names = descriptor.comboStrings();
+		const ComboStrings& namesAlt = descriptor.comboStringsAlt();
+		std::vector<std::string> display;
+		std::vector<int> keys;
+		for(size_t i = 0; i < names.size(); ++i){
+			keys.push_back(descriptor.keyByName(names[i].c_str()));
+			display.push_back(i < namesAlt.size() ? namesAlt[i] : names[i]);
+		}
+		row.setEntries(std::move(display), std::move(keys));
+	}
+
+	void fillEntries(PropertyRowBitVector& row, const EnumDescriptor& descriptor)
+	{
+		const ComboStrings& names = descriptor.comboStrings();
+		const ComboStrings& namesAlt = descriptor.comboStringsAlt();
+		std::vector<std::string> display;
+		std::vector<int> keys;
+		for(size_t i = 0; i < names.size(); ++i){
+			keys.push_back(descriptor.keyByName(names[i].c_str()));
+			display.push_back(i < namesAlt.size() ? namesAlt[i] : names[i]);
+		}
+		row.setEntries(std::move(display), std::move(keys));
+	}
+
 	// Add a leaf row for a typed value.
 	bool addValue(const std::string& typeName, const char* name, const char* nameAlt, const void* value)
 	{
@@ -196,8 +252,16 @@ public:
 	bool openStructInternal(void* object, int size, const char* name, const char* nameAlt, const char* typeName, bool polymorphic) override
 	{
 		(void)object; (void)size; (void)nameAlt; (void)typeName; (void)polymorphic;
-		// Descend into the matching child container.
+		// A leaf row (color, ranged wrapper, file selector, ...) snapshots
+		// the whole struct: write it back and skip descending, mirroring
+		// the OArchive side (which returned false there, so closeStruct is
+		// not called for it either).
 		PropertyRow* child = findChild(name);
+		if(child && !child->isContainer()){
+			child->assignTo(object, size);
+			return false;
+		}
+		// Descend into the matching child container.
 		if(child)
 			current_ = child;
 		return true;

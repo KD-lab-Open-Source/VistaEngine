@@ -4,6 +4,8 @@
 
 #include <QTreeWidgetItem>
 
+#include "PropertyText.h"   // displayBytes: UTF-8 or cp1251 element names
+
 LibraryTree::LibraryTree(QWidget* parent)
 	: QTreeWidget(parent)
 {
@@ -24,7 +26,9 @@ void LibraryTree::setLibrary(IWorldBridge* bridge, const std::string& libraryNam
 	bridge->libraryElementNames(libraryName, names);
 	for(int i = 0; i < (int)names.size(); ++i){
 		QTreeWidgetItem* item = new QTreeWidgetItem(invisibleRootItem());
-		item->setText(0, QString::fromStdString(names[i]));
+		// Element names come from data files in mixed encodings (cp1251
+		// Russian names); display-only, indices address the engine.
+		item->setText(0, propertytext::displayBytes(names[i]));
 		item->setData(0, Qt::UserRole, i);
 	}
 	if(topLevelItemCount() > 0)

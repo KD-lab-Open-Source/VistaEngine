@@ -64,6 +64,7 @@ using namespace std;
 #include "Util/ConsoleWindow.h"          // ConsoleWindow::instance (console listener)
 #include "Util/Win32/DebugSymbolManager.h" // DebugSymbolManager::create
 #include "PropertyRows.h"                   // registerBuiltinPropertyRows (LibraryEditor core)
+#include "PropertyRowsEngine.h"             // registerEnginePropertyRows (typed rows)
 #include "PropertyArchive.h"                // PropertyOArchive/PropertyIArchive (LibraryEditor bridge)
 #include "Serialization/LibrariesManager.h" // LibrariesManager (library lookup)
 #include "Serialization/LibraryWrapper.h"   // EditorLibraryInterface (library element access)
@@ -1181,6 +1182,9 @@ bool EngineViewport::init(int width, int height)
 	// (string/bool/numeric) so PropertyOArchive can build rows for them.
 	// Idempotent; safe to call once at startup.
 	editor::registerBuiltinPropertyRows();
+	// The engine-typed rows (colors, combos, ranged wrappers, file
+	// selectors) — the kdw in-place editors' data counterparts.
+	editor::registerEnginePropertyRows();
 
 	inited_ = true;
 	fprintf(stderr, "EngineViewport: [init] SUCCESS\n"); fflush(stderr);

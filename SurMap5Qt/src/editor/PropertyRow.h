@@ -17,6 +17,24 @@
 
 namespace editor {
 
+// The editor kind of a row: which in-place control the Qt PropertyTree
+// shows for it (Qt port of kdw's per-row widgets — PropertyRowWidget,
+// ColorChooser, CheckComboBox, sliders...). Containers never edit.
+enum class RowKind
+{
+	Container,   // struct/object with children
+	Text,        // free string (Entry)
+	Number,      // numeric text / spinbox
+	Bool,        // checkbox toggle
+	Enum,        // combo box over descriptor entries
+	Flags,       // checklist over bitvector entries
+	Color,       // swatch + color dialog
+	Combo,       // editable combo over a string list
+	Ranged,      // slider + spinbox over [min, max]
+	File,        // path + file-dialog button
+	Other,       // leaf of an unregistered type — display only
+};
+
 // A property row: a named, typed value (leaf) or a container of children.
 class PropertyRow
 {
@@ -35,6 +53,9 @@ public:
 	// Leaf vs container.
 	virtual bool isLeaf() const { return true; }
 	virtual bool isContainer() const { return false; }
+
+	// Which in-place editor the tree shows for this row.
+	virtual RowKind kind() const { return isContainer() ? RowKind::Container : RowKind::Other; }
 
 	// The row's value as a string (for display).
 	virtual std::string valueAsString() const { return ""; }
@@ -114,6 +135,7 @@ public:
 
 	bool isLeaf() const override { return false; }
 	bool isContainer() const override { return true; }
+	RowKind kind() const override { return RowKind::Container; }
 };
 
 } // namespace editor

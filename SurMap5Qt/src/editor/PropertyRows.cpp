@@ -10,7 +10,10 @@ void registerBuiltinPropertyRows()
 
 	// String.
 	f.registerRow("std::string", [](const char* n, const char* na, const char* tn, const void* v) -> PropertyRow* {
-		return new PropertyRowString(n, na, tn, v ? *reinterpret_cast<const std::string*>(v) : std::string());
+		const std::string value = v ? *reinterpret_cast<const std::string*>(v) : std::string();
+		PropertyRowString* row = new PropertyRowString(n, na, tn, value);
+		row->setSourceCp1251(!isValidUtf8(value));
+		return row;
 	});
 
 	// Bool.

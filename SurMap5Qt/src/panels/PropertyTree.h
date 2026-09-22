@@ -2,9 +2,10 @@
 //
 // Renders an editor::PropertyRow tree (the property form) in a QTreeWidget.
 // Each row shows the field name (name/nameAlt) and its value as a string
-// (valueAsString). Leaf values are editable in place (double-click / F2):
-// the edit parses back into the row (setValueFromString) and stays only on
-// success, otherwise the cell reverts. Container rows are display only.
+// (valueAsString). Leaf values edit in place through per-kind editors
+// (PropertyRowDelegate — combo boxes, spinboxes, sliders, file pickers),
+// bools toggle through the item checkbox, colors and flag sets through
+// their dialogs on double-click.
 //
 // The tree takes ownership of the root passed to setRoot (the engine bridge
 // hands out a fresh heap tree per call); root() exposes it for write-back
@@ -38,10 +39,14 @@ public:
 
 private slots:
 	void onItemChanged(QTreeWidgetItem* item, int column);
+	void onItemClicked(QTreeWidgetItem* item, int column);
+	void onItemDoubleClicked(QTreeWidgetItem* item, int column);
 
 private:
 	// Recursively build QTreeWidgetItems under `parentItem` from `row`.
 	void buildItem(QTreeWidgetItem* parentItem, editor::PropertyRow* row);
+	// Refresh one item's value cell from its row (checkbox + text).
+	static void refreshItem(QTreeWidgetItem* item, editor::PropertyRow* row);
 
 	editor::PropertyRow* root_ = nullptr;
 	bool building_ = false;   // setRoot in progress — ignore itemChanged
