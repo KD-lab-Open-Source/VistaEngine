@@ -39,6 +39,11 @@ public:
 	// The row's value as a string (for display).
 	virtual std::string valueAsString() const { return ""; }
 
+	// Parse an edited display string back into the row's value (the Qt
+	// PropertyTree's itemChanged path). Returns false when the text does
+	// not parse — the tree then reverts the edit. Containers ignore it.
+	virtual bool setValueFromString(const std::string& /*text*/) { return false; }
+
 	// Write the value into a typed slot (PropertyIArchive).
 	virtual bool assignTo(void* object, int size) { (void)object; (void)size; return false; }
 

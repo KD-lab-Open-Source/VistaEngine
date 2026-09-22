@@ -12,10 +12,80 @@
 
 #include "PropertyRow.h"
 
+#include <cstdlib>
 #include <map>
 #include <string>
+#include <type_traits>
 
 namespace editor {
+
+// --- Edit parsing (PropertyTree itemChanged -> setValueFromString) --------
+// Strict whole-string number parses: trailing garbage rejects the edit so a
+// typo never silently truncates into the row value.
+
+inline bool parseWhole(const std::string& text, double& out)
+{
+	if(text.empty())
+		return false;
+	char* end = nullptr;
+	out = std::strtod(text.c_str(), &end);
+	return end && *end == '\0';
+}
+
+inline bool parseWhole(const std::string& text, long long& out)
+{
+	if(text.empty())
+		return false;
+	char* end = nullptr;
+	out = std::strtoll(text.c_str(), &end, 0);
+	return end && *end == '\0';
+}
+
+inline bool parseWhole(const std::string& text, unsigned long long& out)
+{
+	if(text.empty() || text[0] == '-')
+		return false;
+	char* end = nullptr;
+	out = std::strtoull(text.c_str(), &end, 0);
+	return end && *end == '\0';
+}
+
+// Overloads routing each numeric row type through the right parser.
+inline bool parseNumber(const std::string& text, float& out)
+{
+	double d = 0;
+	if(!parseWhole(text, d))
+		return false;
+	out = (float)d;
+	return true;
+}
+
+inline bool parseNumber(const std::string& text, double& out)
+{
+	return parseWhole(text, out);
+}
+
+template<class Type>
+std::enable_if_t<std::is_integral_v<Type> && std::is_signed_v<Type>, bool>
+parseNumber(const std::string& text, Type& out)
+{
+	long long v = 0;
+	if(!parseWhole(text, v))
+		return false;
+	out = (Type)v;
+	return true;
+}
+
+template<class Type>
+std::enable_if_t<std::is_integral_v<Type> && std::is_unsigned_v<Type>, bool>
+parseNumber(const std::string& text, Type& out)
+{
+	unsigned long long v = 0;
+	if(!parseWhole(text, v))
+		return false;
+	out = (Type)v;
+	return true;
+}
 
 // --- Concrete leaf rows ---------------------------------------------------
 
@@ -26,6 +96,11 @@ public:
 	PropertyRowString(const char* name, const char* nameAlt, const char* typeName, const std::string& value)
 		: PropertyRowImpl<std::string>(name, nameAlt, typeName, value) {}
 	std::string valueToString(const std::string& v) const override { return v; }
+	bool setValueFromString(const std::string& text) override
+	{
+		value_ = text;
+		return true;
+	}
 };
 
 // A numeric value (int/float/double/...).
@@ -42,6 +117,14 @@ public:
 			return std::to_string((long long)v);
 		return std::to_string((double)v);
 	}
+	bool setValueFromString(const std::string& text) override
+	{
+		Type v{};
+		if(!parseNumber(text, v))
+			return false;
+		this->value_ = v;
+		return true;
+	}
 };
 
 // A boolean value.
@@ -51,6 +134,18 @@ public:
 	PropertyRowBool(const char* name, const char* nameAlt, const char* typeName, const bool& value)
 		: PropertyRowImpl<bool>(name, nameAlt, typeName, value) {}
 	std::string valueToString(const bool& v) const override { return v ? "true" : "false"; }
+	bool setValueFromString(const std::string& text) override
+	{
+		if(text == "true" || text == "1" || text == "yes" || text == "on"){
+			value_ = true;
+			return true;
+		}
+		if(text == "false" || text == "0" || text == "no" || text == "off"){
+			value_ = false;
+			return true;
+		}
+		return false;
+	}
 };
 
 // An enum value row (processEnum). Holds the raw int + the EnumDescriptor.
@@ -66,6 +161,15 @@ public:
 	void setValue(int v) { value_ = v; }
 
 	std::string valueAsString() const override { return std::to_string(value_); }
+
+	bool setValueFromString(const std::string& text) override
+	{
+		int v = 0;
+		if(!parseNumber(text, v))
+			return false;
+		value_ = v;
+		return true;
+	}
 
 	bool assignTo(void* object, int size) override
 	{
@@ -91,6 +195,15 @@ public:
 	void setFlags(int f) { flags_ = f; }
 
 	std::string valueAsString() const override { return std::to_string(flags_); }
+
+	bool setValueFromString(const std::string& text) override
+	{
+		int v = 0;
+		if(!parseNumber(text, v))
+			return false;
+		flags_ = v;
+		return true;
+	}
 
 	bool assignTo(void* object, int size) override
 	{

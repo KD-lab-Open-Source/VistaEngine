@@ -11,15 +11,30 @@ PropertyTree::PropertyTree(QWidget* parent)
 	setColumnCount(2);
 	setRootIsDecorated(true);
 	setAlternatingRowColors(true);
+	setEditTriggers(QAbstractItemView::DoubleClicked |
+	                QAbstractItemView::SelectedClicked |
+	                QAbstractItemView::EditKeyPressed);
+	connect(this, &QTreeWidget::itemChanged, this, &PropertyTree::onItemChanged);
+}
+
+PropertyTree::~PropertyTree()
+{
+	delete root_;
 }
 
 void PropertyTree::setRoot(editor::PropertyRow* root)
 {
+	building_ = true;
+	blockSignals(true);
 	clear();
-	if(!root)
-		return;
-	for(editor::PropertyRow* child : root->children())
-		buildItem(nullptr, child);
+	delete root_;
+	root_ = root;
+	if(root_){
+		for(editor::PropertyRow* child : root_->children())
+			buildItem(nullptr, child);
+	}
+	blockSignals(false);
+	building_ = false;
 }
 
 editor::PropertyRow* PropertyTree::currentRow() const
@@ -39,9 +54,32 @@ void PropertyTree::buildItem(QTreeWidgetItem* parentItem, editor::PropertyRow* r
 	item->setText(1, QString::fromStdString(row->valueAsString()));
 	item->setData(0, Qt::UserRole, QVariant::fromValue(row));
 
-	if(row->isContainer()){
+	if(row->isContainer())
 		item->setExpanded(true);
+	else
+		item->setFlags(item->flags() | Qt::ItemIsEditable);
+
+	if(row->isContainer()){
 		for(editor::PropertyRow* child : row->children())
 			buildItem(item, child);
 	}
+}
+
+void PropertyTree::onItemChanged(QTreeWidgetItem* item, int column)
+{
+	if(building_ || applying_ || column != 1 || !item)
+		return;
+	QVariant data = item->data(0, Qt::UserRole);
+	if(!data.isValid())
+		return;
+	editor::PropertyRow* row = data.value<editor::PropertyRow*>();
+	if(!row || row->isContainer())
+		return;
+	const std::string text = item->text(1).toStdString();
+	applying_ = true;
+	if(row->setValueFromString(text))
+		item->setText(1, QString::fromStdString(row->valueAsString())); // normalized form
+	else
+		item->setText(1, QString::fromStdString(row->valueAsString())); // revert
+	applying_ = false;
 }

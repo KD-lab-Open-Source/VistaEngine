@@ -48,16 +48,20 @@ void LibraryEditor::loadElement(int elementIndex)
 	if(!bridge_ || elementIndex < 0)
 		return;
 	currentElement_ = elementIndex;
-	editor::PropertyRow* root = bridge_->libraryElementTree(libraryName_, elementIndex, true);
-	propertyTree_->setRoot(root);
-	delete root;
+	// PropertyTree takes ownership of the bridge's heap tree; the rows stay
+	// alive while displayed, so in-place edits land in this tree and onSave
+	// can write it back.
+	propertyTree_->setRoot(bridge_->libraryElementTree(libraryName_, elementIndex, true));
 }
 
 void LibraryEditor::onSave()
 {
 	if(!bridge_ || currentElement_ < 0)
 		return;
-	// The property tree holds the rows; write them back through the bridge.
-	// For now the tree is read-only, so this just persists the current state.
+	// Write the (possibly edited) tree back into the library element, then
+	// persist the library — kdw::LibraryEditor::onSave did the same through
+	// PropertyIArchive + saveLibrary.
+	if(editor::PropertyRow* root = propertyTree_->root())
+		bridge_->libraryElementSetTree(libraryName_, currentElement_, root);
 	bridge_->librarySave(libraryName_);
 }

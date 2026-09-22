@@ -17,6 +17,8 @@
 #include "PropertyRow.h"
 #include "PropertyRows.h"
 
+#include <climits>
+
 namespace editor {
 
 // Builds a PropertyRow tree from a Serializer.
@@ -268,7 +270,11 @@ private:
 		PropertyRow* child = findChild(name);
 		if(!child)
 			return false;
-		return child->assignTo(value, (int)sizeof(void*));
+		// assignTo checks `size < sizeof(Type)`; the row already holds a
+		// correctly typed value, so pass an unbounded size. (Passing
+		// sizeof(void*) here used to reject every type larger than a
+		// pointer — e.g. std::string write-back always failed.)
+		return child->assignTo(value, INT_MAX);
 	}
 
 	PropertyRow* root_;

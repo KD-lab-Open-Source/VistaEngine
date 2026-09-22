@@ -54,6 +54,10 @@ private:
 	RenderViewWidget* view_ = nullptr;
 	std::string filePath_;
 
+	// Which trigger the property tree currently shows (-1 = chain
+	// properties). Set by loadPropertyPanel for onSaveProps' write-back.
+	int propTriggerIndex_ = -1;
+
 	TriggerGraphView* graph_ = nullptr;
 	TriggerClassTree* classTree_ = nullptr;
 	TriggerMiniMapPanel* miniMap_ = nullptr;

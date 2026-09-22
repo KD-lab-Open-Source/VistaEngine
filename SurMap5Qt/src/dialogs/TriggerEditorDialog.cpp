@@ -179,15 +179,17 @@ void TriggerEditorDialog::loadPropertyPanel()
 	if(!view_ || !graph_)
 		return;
 	const std::set<int> sel = graph_->selectedTriggers();
+	// PropertyTree takes ownership of the bridge's heap tree (see its
+	// header); remember which trigger/chain the tree shows so onSaveProps
+	// can write the (possibly edited) rows back through the matching
+	// bridge call.
 	if(sel.size() == 1){
-		editor::PropertyRow* root = view_->triggerTree(*sel.begin());
-		propertyTree_->setRoot(root);
-		delete root;
+		propTriggerIndex_ = *sel.begin();
+		propertyTree_->setRoot(view_->triggerTree(propTriggerIndex_));
 	}
 	else{
-		editor::PropertyRow* root = view_->triggerChainTree();
-		propertyTree_->setRoot(root);
-		delete root;
+		propTriggerIndex_ = -1;
+		propertyTree_->setRoot(view_->triggerChainTree());
 	}
 }
 
@@ -250,11 +252,17 @@ void TriggerEditorDialog::onFind()
 
 void TriggerEditorDialog::onSaveProps()
 {
-	// The property panel is read-only display in this pass (PropertyTree
-	// has no editors yet), so there is no tree to write back — every graph
-	// mutation already saved an undo step engine-side. This button writes
-	// the .scr file now (Accept saves too), so work is not lost if the
-	// dialog is cancelled afterwards.
+	// Write the (possibly edited) property tree back first — the panel is
+	// an editable PropertyTree now — then the .scr file, so work is not
+	// lost if the dialog is cancelled afterwards. Every graph mutation
+	// already saved an undo step engine-side.
+	if(view_ && propertyTree_->root()){
+		if(propTriggerIndex_ >= 0)
+			view_->triggerSetTree(propTriggerIndex_, propertyTree_->root());
+		else
+			view_->triggerChainSetTree(propertyTree_->root());
+		reloadAll();
+	}
 	if(view_)
 		view_->triggerSessionSave();
 }

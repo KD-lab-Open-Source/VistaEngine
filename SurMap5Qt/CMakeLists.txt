@@ -180,15 +180,6 @@ add_executable(SurMap5Qt
     src/dialogs/TerrainTypeDialog.cpp
     src/dialogs/WaveDialog.h
     src/dialogs/WaveDialog.cpp
-    # U5 dialogs — Time slider / Textures statistics / Camera / Waves
-    src/dialogs/TimeSliderDialog.h
-    src/dialogs/TimeSliderDialog.cpp
-    src/dialogs/TexturesStatisticsDialog.h
-    src/dialogs/TexturesStatisticsDialog.cpp
-    src/dialogs/CameraDialog.h
-    src/dialogs/CameraDialog.cpp
-    src/dialogs/WaveDialog.h
-    src/dialogs/WaveDialog.cpp
     # D1 dialogs — the remaining CDialog ports (DlgBorderRolling,
     # NameComboDlg, CreateAttribDlg, OutputProgressDlg, DlgSelectTrigger)
     src/dialogs/BorderRollingDialog.h
