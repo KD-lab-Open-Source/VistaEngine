@@ -292,6 +292,15 @@ public:
 	// round-tripped back to the engine. Use the element index instead.
 	virtual void libraryElementNames(const std::string& libraryName,
 	                                 std::vector<std::string>& out) = 0;
+	// The group of each element (editorElementGroup over editorSize),
+	// parallel to libraryElementNames. Groups are the faction folders
+	// (WATER/GROUND/...) kdw's buildLibraryTree showed the elements under.
+	virtual void libraryElementGroups(const std::string& libraryName,
+	                                  std::vector<std::string>& out) = 0;
+	// The library's predefined group list (editorGroupsComboList,
+	// '|' separated, '\\' nests). Empty when the library defines none —
+	// groups then come from the elements alone.
+	virtual std::string libraryGroupsComboList(const std::string& libraryName) = 0;
 	// Serialize one library element (by index) into a PropertyRow tree.
 	// Returns the root row (owned by the caller), or null when the index is
 	// out of range. `editOnly` mirrors editorElementSerializer's

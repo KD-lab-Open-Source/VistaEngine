@@ -571,6 +571,9 @@ public:
 	void libraryElementNames(const std::string& libraryName,
 	                         std::vector<std::string>& out) override
 	{
+		// One entry per element index (empty when unnamed): positions
+		// address the engine, so nothing is skipped here — the tree hides
+		// empty names itself.
 		out.clear();
 		EditorLibraryInterface* lib = LibrariesManager::instance().find(libraryName.c_str());
 		if(!lib)
@@ -578,9 +581,30 @@ public:
 		const std::size_t count = lib->editorSize();
 		for(std::size_t i = 0; i < count; ++i){
 			const char* name = lib->editorElementName((int)i);
-			if(name && name[0] != '\0')
-				out.push_back(name);
+			out.push_back(name ? name : "");
 		}
+	}
+
+	void libraryElementGroups(const std::string& libraryName,
+	                          std::vector<std::string>& out) override
+	{
+		// Parallel to libraryElementNames (one entry per element index).
+		out.clear();
+		EditorLibraryInterface* lib = LibrariesManager::instance().find(libraryName.c_str());
+		if(!lib)
+			return;
+		const std::size_t count = lib->editorSize();
+		for(std::size_t i = 0; i < count; ++i)
+			out.push_back(lib->editorElementGroup((int)i));
+	}
+
+	std::string libraryGroupsComboList(const std::string& libraryName) override
+	{
+		EditorLibraryInterface* lib = LibrariesManager::instance().find(libraryName.c_str());
+		if(!lib)
+			return std::string();
+		const char* list = lib->editorGroupsComboList();
+		return list ? list : std::string();
 	}
 
 	editor::PropertyRow* libraryElementTree(const std::string& libraryName,
