@@ -2562,7 +2562,11 @@ void UnitAttribute::editorCreate(const char* name, const char* groupName)
 
 string UnitAttribute::editorGroupName() const
 {
-	return type_ ? string(unitAttributeID_.race().c_str()) + "\\" + FactorySelector<AttributeBase>::Factory::instance().nameAlt(typeid(*type_).name()) : "";
+	// Silent normalized lookup: registration keys are normalized type
+	// names, so the raw typeid spelling ("class X") must be normalized
+	// first — otherwise every group misses ("No translation for such class
+	// name!"). Unregistered types fall back to the normalized name.
+	return type_ ? string(unitAttributeID_.race().c_str()) + "\\" + FactorySelector<AttributeBase>::Factory::instance().nameAlt(normalizeTypeName(typeid(*type_).name()), true) : "";
 }
 
 const char* UnitAttribute::editorGroupsComboList()

@@ -75,7 +75,11 @@ public:
 	Serializer       editorSerializer(U* self, const char* name, const char* nameAlt, bool protectedName);
 	template<class U>
 	static void			editorGroupMoveBefore(int index, int beforeIndex) { xassert(0); }
-	string         editorGroupName() const{ return type_ ? FactorySelector<T>::Factory::instance().nameAlt(typeid(*type_).name()) : ""; }
+	// Silent normalized lookup (same reason as UnitAttribute::
+	// editorGroupName): registration keys are normalized, the raw typeid
+	// spelling must be normalized first; unregistered types fall back to
+	// the normalized name instead of asserting.
+	string         editorGroupName() const{ return type_ ? FactorySelector<T>::Factory::instance().nameAlt(normalizeTypeName(typeid(*type_).name()), true) : ""; }
 	void                editorSetGroup(const char* group);
 	static const char*  editorGroupsComboList() { return FactorySelector<T>::Factory::instance().comboListAlt(); }
 	static bool		    editorAllowDrag() { return false; }
