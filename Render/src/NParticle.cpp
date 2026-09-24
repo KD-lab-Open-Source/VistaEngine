@@ -19,6 +19,23 @@ static vector<Vect2f> rotate_angle;
 
 static const float INV_2_PI=1/(2*M_PI);
 
+// The depth test an emitter's sprites draw with. The original selected it through the
+// camera PASS, not the material: Camera::DrawObjectNoZ (SCENENODE_OBJECT_NOZ and its
+// two `..._BEFORE/AFTER_GRASS` siblings) turned D3DRS_ZENABLE OFF for its whole node,
+// so an emitter whose zMode asked for one of those passes (EMITTER_DRAW_AFTER_ALL and
+// the two grass modes) was drawn with no depth test at all. cEffect::Draw reaches the
+// emitters through this same SetMaterial, so the pass has to be read from the camera;
+// leaving it hardcoded true depth-tested those sprites against the terrain and the
+// units and dropped them.
+static bool emitterDepthTest(Camera* camera)
+{
+	if(!camera)
+		return true;
+	const SceneNode p = camera->GetCameraPass();
+	return !(p == SCENENODE_OBJECT_NOZ || p == SCENENODE_OBJECT_NOZ_BEFORE_GRASS ||
+	         p == SCENENODE_OBJECT_NOZ_AFTER_GRASS);
+}
+
 FunctorGetZ* cEmitterInterface::terraFunctor_;
 FunctorGetZ* cEmitterInterface::waterFunctor_;
 FunctorWindVelocity* cEmitterInterface::windFunctor_;
@@ -215,11 +232,11 @@ void cEmitterColumnLight::Draw(Camera* camera)
 	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
 	if(!pBuf)
 		return;
-	pBuf->SetMaterial(blend_mode, GetTexture(0), true, wm, GetTexture(1), color_mode);
+	pBuf->SetMaterial(blend_mode, GetTexture(0), emitterDepthTest(camera), wm, GetTexture(1), color_mode);
 	if(!GetTexture(0)){
 		// No first texture: the original moves the second onto stage 0 and drops the colour
 		// operation, and scrolls stage 0's uv instead.
-		pBuf->SetMaterial(blend_mode, GetTexture(1), true, wm);
+		pBuf->SetMaterial(blend_mode, GetTexture(1), emitterDepthTest(camera), wm);
 		ut1 = ut;
 		vt1 = vt;
 	}
@@ -1212,7 +1229,7 @@ void cEmitterInt::Draw(Camera* camera)
 	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
 	if(!pBuf)
 		return;
-	pBuf->SetMaterial(blend_mode, GetTexture(0), true,
+	pBuf->SetMaterial(blend_mode, GetTexture(0), emitterDepthTest(camera),
 	                  emitterKey()->relative ? GlobalMatrix : MatXf::ID,
 	                  nullptr, COLOR_MOD, false, nullptr, softSmoke);
 #ifdef NEED_TREANGLE_COUNT
@@ -2045,7 +2062,7 @@ void cEmitterSpline::Draw(Camera* camera)
 	SDLWorldQuadRenderer* pBuf = sdlWorldQuadRenderer();
 	if(!pBuf)
 		return;
-	pBuf->SetMaterial(blend_mode, GetTexture(0), true,
+	pBuf->SetMaterial(blend_mode, GetTexture(0), emitterDepthTest(camera),
 	                  emitterKey()->relative ? GlobalMatrix : MatXf::ID,
 	                  nullptr, COLOR_MOD, false, nullptr, softSmoke);
 #ifdef NEED_TREANGLE_COUNT
@@ -3418,7 +3435,7 @@ void cEmitterZ::Draw(Camera* camera)
 		CameraPos = emitterKey()->relative ? GlobalMatrix.invXformPoint(CameraPos) : camera->GetPos();
 		mode = (UCHAR)emitterKey()->planar + (emitterKey()->smooth ? 0 : 2);
 	}
-	pBuf->SetMaterial(blend_mode, GetTexture(0), true,
+	pBuf->SetMaterial(blend_mode, GetTexture(0), emitterDepthTest(camera),
 	                  emitterKey()->relative ? GlobalMatrix : MatXf::ID,
 	                  nullptr, COLOR_MOD, false, nullptr, softSmoke);
 #ifdef NEED_TREANGLE_COUNT
