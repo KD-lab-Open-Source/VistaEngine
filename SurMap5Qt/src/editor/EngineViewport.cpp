@@ -1156,11 +1156,31 @@ bool EngineViewport::init(int width, int height)
 	// effects resolve textures as bare names ("Texture is bad: 038a.tga").
 	gb_VisGeneric->SetEffectLibraryPath("RESOURCE\\FX", "RESOURCE\\FX\\TEXTURES");
 	// [SurMap5Qt] Старый редактор (CGeneralView::initRenderDevice ->
-	// initRenderObjects + GameOptions::gameSetup) применял graphSetup:
-	// particle rate, soft smoke, тени, bump, анизотропия, гамма.
-	// Без этого Option_ остаются дефолтными и поведение отличается от
-	// старого редактора и игры. Только graphSetup: полный gameSetup
-	// тянет звук (InitSound) и UI-диспетчер, которых в редакторе нет.
+	// initRenderObjects + GameOptions::gameSetup, затем surMapOptions.load()
+	// -> serializeForEditor -> userApply) применял СОХРАНЁННЫЕ опции:
+	// particle rate, soft smoke, тени, bump, анизотропия, гамма, отражения.
+	// Без загрузки UserInterface.cfg Option_ остаются дефолтными
+	// (тени SHADOW=2 с 2048 shadow map каждый кадр!) и поведение отличается
+	// от старого редактора. Только GRAPHICS-подмножество и только graphSetup:
+	// полный userApply/gameSetup тянет звук (InitSound), смену разрешения
+	// (updateResolution) и RestoreDeviceForce, которых в Qt-окне быть
+	// не должно; gameSetup зовёт UI-диспетчер, которого в редакторе нет.
+	{
+		XPrmIArchive ia;
+		if(ia.open("UserInterface.cfg")){
+			try{
+				GameOptions::instance().serializeForEditor(
+					ia, GameOptions::GRAPHICS | GameOptions::GAME | GameOptions::CAMERA);
+				fprintf(stderr, "EngineViewport: [init] UserInterface.cfg options loaded\n");
+			}
+			catch(...){
+				fprintf(stderr, "EngineViewport: [init] UserInterface.cfg load failed, defaults kept\n");
+			}
+		}
+		else
+			fprintf(stderr, "EngineViewport: [init] no UserInterface.cfg, defaults kept\n");
+		fflush(stderr);
+	}
 	GameOptions::instance().graphSetup();
 
 	// [SurMap5Qt] The rest of CSurMap5App::InitInstance's engine prelude
@@ -1369,7 +1389,8 @@ bool EngineViewport::loadWorld(const char* worldsDir, const char* worldName)
 	const Vect2f center(0.5f, 0.5f);
 	const sRectangle4f clip(-0.5f, -0.5f, 0.5f, 0.5f);
 	const Vect2f focus(orbit_.focus, orbit_.focus);
-	const Vect2f zPlane(30.0f, std::max(12000.0f, orbit_.distance * 3.0f));
+	float zMin = 0.f, zMax = 0.f; editorZPlane(zMin, zMax);
+	const Vect2f zPlane(zMin, zMax);
 	camera_->SetFrustum(&center, &clip, &focus, &zPlane);
 	Vect3f rayPoint, rayDirection;
 	camera_->GetWorldRay(Vect2f(0.f, 0.f), rayPoint, rayDirection);
@@ -1972,7 +1993,8 @@ void EngineViewport::drawFrame()
 		const Vect2f center(0.5f, 0.5f);
 		const sRectangle4f clip(-0.5f, -0.5f, 0.5f, 0.5f);
 		const Vect2f focus(orbit_.focus, orbit_.focus);
-		const Vect2f zPlane(30.0f, std::max(12000.0f, orbit_.distance * 3.0f));
+		float zMin = 0.f, zMax = 0.f; editorZPlane(zMin, zMax);
+		const Vect2f zPlane(zMin, zMax);
 		camera_->SetFrustum(&center, &clip, &focus, &zPlane);
 
 		scene_->Draw(camera_);
@@ -2244,7 +2266,8 @@ bool EngineViewport::screenPointToGround(int x, int y, float& outX, float& outY,
 	const Vect2f center(0.5f, 0.5f);
 	const sRectangle4f clip(-0.5f, -0.5f, 0.5f, 0.5f);
 	const Vect2f focus(orbit_.focus, orbit_.focus);
-	const Vect2f zPlane(30.0f, std::max(12000.0f, orbit_.distance * 3.0f));
+	float zMin = 0.f, zMax = 0.f; editorZPlane(zMin, zMax);
+	const Vect2f zPlane(zMin, zMax);
 	camera_->SetFrustum(&center, &clip, &focus, &zPlane);
 
 	Vect3f pos, dir;
@@ -2259,6 +2282,56 @@ bool EngineViewport::screenPointToGround(int x, int y, float& outX, float& outY,
 }
 
 // --- Camera --------------------------------------------------------------
+
+// The camera's near/far planes. The original editor's CGeneralView::graphQuant
+// called cameraManager->SetFrustumEditor(surMapOptions.zFarInfinite), which is
+// CameraManager::calcZMinMax(): the environment's game frustum (defaults
+// 30..4000). The Qt port hand-rolled zPlane = (30, max(12000, distance*3)) in
+// every place that needed it, so zFar was 3x-15x larger than the original and
+// the depth buffer lost most of its precision at the editor's working range.
+// The visible symptom: additive effects lying near the ground plane (energy
+// beams/columns between units, coast foam) z-fight with the terrain and get
+// rejected by the depth test, so they never draw.
+//
+// Keep the original's z when the whole map fits in it, extend it only when the
+// orbit is far enough to need it, and scale zNear with zFar so the far/near
+// ratio stays bounded (a fixed zNear=30 against a 60000 zFar is a ratio of 2000
+// and the depth buffer cannot tell the terrain from the effects).
+void EngineViewport::editorZPlane(float& zMin, float& zMax) const
+{
+	// calcZMinMax(): the environment's frustum, blended by the camera tilt.
+	float zn = 30.0f;
+	float zf = 4000.0f;
+	if(environment){
+		zn = environment->GetGameFrustrumZMin();
+		const float angle = orbit_.theta;
+		float c = fabsf(angle) / (float)M_PI_2;
+		c = clamp(c, 0.0f, 1.0f);
+		zf = environment->GetGameFrustrumZMaxHorizontal() * c +
+		     environment->GetGameFrustrumZMaxVertical() * (1.0f - c);
+	}
+	if(zn < 1.0f)
+		zn = 1.0f;
+
+	// The whole map (plus the orbit centre) must stay inside the far plane, or
+	// zooming out clips the terrain. The original camera never left the map's
+	// neighbourhood, the Qt orbit does.
+	if(vMap.isWorldLoaded()){
+		const float diagonal = sqrtf((float)vMap.H_SIZE * (float)vMap.H_SIZE +
+		                             (float)vMap.V_SIZE * (float)vMap.V_SIZE);
+		zf = std::max(zf, orbit_.distance + diagonal);
+	}
+	zf = std::max(zf, 1000.0f);
+
+	// Bound the ratio: a perspective depth buffer's usable precision lives in
+	// zNear/zFar. 100 keeps the terrain and the ground-level effects ~20x more
+	// distinguishable than the old 2000 did.
+	const float maxRatio = 100.0f;
+	zn = std::max(zn, zf / maxRatio);
+
+	zMin = zn;
+	zMax = zf;
+}
 
 void EngineViewport::applyCamera()
 {
@@ -2740,7 +2813,8 @@ bool EngineViewport::selectObjectAt(int screenX, int screenY, int mode)
 	const Vect2f center(0.5f, 0.5f);
 	const sRectangle4f clip(-0.5f, -0.5f, 0.5f, 0.5f);
 	const Vect2f focus(orbit_.focus, orbit_.focus);
-	const Vect2f zPlane(30.0f, std::max(12000.0f, orbit_.distance * 3.0f));
+	float zMin = 0.f, zMax = 0.f; editorZPlane(zMin, zMax);
+	const Vect2f zPlane(zMin, zMax);
 	camera_->SetFrustum(&center, &clip, &focus, &zPlane);
 
 	Vect3f v0, dir;
