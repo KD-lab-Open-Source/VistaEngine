@@ -598,11 +598,22 @@ void Camera::DrawSortObject()
 
 	stable_sort(SortArray.begin(),SortArray.end(),ObjectSortByRadius());
 
+	// Each of these -- cUnkLight above all, then the cEffects -- used to flush its own
+	// world-quad pass as it drew, so a map's few hundred unit lights opened as many render
+	// passes a frame. Bracket the pass so they share one. See
+	// cSDLRenderDevice::beginQuadBatch.
+	cSDLRenderDevice* quadBatchDev = sdlRenderDevice();
+	if(quadBatchDev)
+		quadBatchDev->beginQuadBatch();
+
 	vector<ObjectSort>::iterator it;
 	FOR_EACH( SortArray, it )
 	{
 		it->obj->Draw(this);
 	}
+
+	if(quadBatchDev)
+		quadBatchDev->endQuadBatch();
 
 	gb_RenderDevice->SetRenderState( RS_ZWRITEENABLE, TRUE );
 }

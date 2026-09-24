@@ -1009,6 +1009,19 @@ void cSDLRenderDevice::drawWaterIce()
 	}
 }
 
+void cSDLRenderDevice::beginQuadBatch()
+{
+	++quadBatchDepth_;
+}
+
+void cSDLRenderDevice::endQuadBatch()
+{
+	if(quadBatchDepth_ > 0 && --quadBatchDepth_ == 0 && quadBatchPending_){
+		quadBatchPending_ = false;
+		drawWorldQuads();
+	}
+}
+
 void cSDLRenderDevice::drawWorldQuads()
 {
 	if(!bActiveScene_ || !commandBuffer_ || !worldQuadRenderer_ || !worldQuadRenderer_->hasDraws())
@@ -1016,6 +1029,12 @@ void cSDLRenderDevice::drawWorldQuads()
 	RenderTarget* rt = current_;
 	if(rt->depthOnly || !rt->usable())
 		return;
+
+	// Inside a batch: leave the groups for the batch's single flush. See the header.
+	if(quadBatchDepth_ > 0){
+		quadBatchPending_ = true;
+		return;
+	}
 
 	// A no-op once an earlier caller drained the object batch. It has not, on a dry map,
 	// nor for whatever the sorted pass recorded before reaching the wave sources.

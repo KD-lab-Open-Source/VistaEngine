@@ -148,6 +148,15 @@ public:
 	SDLWorldQuadRenderer* worldQuadRenderer() { return worldQuadRenderer_.get(); }
 	void drawWorldQuads();
 
+	// Batches the world quads recorded between the two calls. On its own, each of the
+	// walk's callers flushes when it is done, and on SDL GPU a flush is a whole render pass
+	// -- a full-target load/store per light or effect, several hundred a frame on a busy
+	// map. A pass of the walk that is going to record many of them back to back brackets
+	// itself with these and they collapse into one pass. The quads never write depth, so
+	// deferring the flush to the batch's end only moves where the pass opens.
+	void beginQuadBatch();
+	void endQuadBatch();
+
 	// --- Grass ---------------------------------------------------------------
 	// GrassMap::DrawGrass records its tiles into the grass renderer, then calls this. Same
 	// contract as the water: it lands where Camera::DrawScene reached it, over the terrain
@@ -625,6 +634,11 @@ private:
 	int captureW_ = 0, captureH_ = 0;
 	bool captureArmed_ = false;
 	bool ensureCapture(int w, int h);
+
+	// beginQuadBatch/endQuadBatch: while nonzero, drawWorldQuads holds its groups for the
+	// batch's single flush; quadBatchPending_ records that at least one is waiting.
+	int  quadBatchDepth_ = 0;
+	bool quadBatchPending_ = false;
 
 	// The scene-depth snapshot for the world quads' soft-depth fade -- the modern stand-in
 	// for the float Z-buffer camera (Documents/Render-PORTING.md #12). D3D9 could not sample its own
