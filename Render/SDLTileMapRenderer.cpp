@@ -51,11 +51,14 @@ struct IceFSUniform { float snowColor[4]; float fogColor[4]; float fogOfWarColor
 // CreateVolumeRand(64): an L8 cube of graphRnd() bytes. R8_UNORM here; the shader reads .x.
 const int VOLUME_SIZE = 64;
 
-// Sample every STEP_BASE fine cells (512/4 = 128 quads/axis -> 129x129 = 16641 verts
-// on the Menu). The step is doubled below as needed so the vertex count stays under
-// 65536 -- campaign maps are larger than the Menu's 512, and a 16-bit index buffer
-// can only address 65535 vertices (a 1024 map at step 4 would be 257x257 = 66049).
-const int STEP_BASE = 4;
+// Sample every STEP_BASE fine cells (the original's finest LOD was 1<<1 = 2 within a tile,
+// so this matches it). The step is doubled below only if the vertex count would get
+// unreasonable for the memory a single mesh costs -- indices are 32-bit (SDL GPU binds
+// SDL_GPU_INDEXELEMENTSIZE_32BIT), so the old 65536-vertex ceiling that forced 2048 maps to
+// step 16 is gone. A coarse mesh was not just a look: the interpolated surface sits above
+// the true heightfield in dips, and everything drawn at ground level (energy beams and
+// columns between units, the coast foam) failed the depth test against it and vanished.
+const int STEP_BASE = 2;
 
 // The baked surface-colour texture is capped on each side; larger maps are averaged
 // down by vMap.getTileColor32Layer's step (the sampler interpolates the rest).
@@ -670,18 +673,18 @@ void SDLTileMapRenderer::computeVertex(Vertex& v, int gx, int gy) const
 // issues with that material's detail texture bound. Rebuilt whole when terramorphing
 // repaints a cell's material -- every triangle appears exactly once whatever its
 // bucket, so the buffer's size never changes.
-void SDLTileMapRenderer::buildIndexData(std::vector<unsigned short>& idx)
+void SDLTileMapRenderer::buildIndexData(std::vector<unsigned int>& idx)
 {
 	runs_.clear();
-	std::vector<std::vector<unsigned short> > buckets(cTileMap::multiRegionLayersNumber);
+	std::vector<std::vector<unsigned int> > buckets(cTileMap::multiRegionLayersNumber);
 	for(int gy = 0; gy < ny_; ++gy)
 		for(int gx = 0; gx < nx_; ++gx){
-			unsigned short a = (unsigned short)(gy * gw_ + gx), b = (unsigned short)(a + 1);
-			unsigned short c = (unsigned short)(a + gw_),       d = (unsigned short)(c + 1);
+			unsigned int a = (unsigned int)(gy * gw_ + gx), b = (a + 1);
+			unsigned int c = (a + gw_),                 d = (c + 1);
 			// a=(x0,y0) b=(x1,y0) c=(x0,y1) d=(x1,y1). Winding is irrelevant (cull NONE).
-			std::vector<unsigned short>& bk0 = buckets[quadMat_[2 * ((size_t)gy * nx_ + gx)]];
+			std::vector<unsigned int>& bk0 = buckets[quadMat_[2 * ((size_t)gy * nx_ + gx)]];
 			bk0.push_back(a); bk0.push_back(c); bk0.push_back(b);
-			std::vector<unsigned short>& bk1 = buckets[quadMat_[2 * ((size_t)gy * nx_ + gx) + 1]];
+			std::vector<unsigned int>& bk1 = buckets[quadMat_[2 * ((size_t)gy * nx_ + gx) + 1]];
 			bk1.push_back(b); bk1.push_back(c); bk1.push_back(d);
 		}
 
@@ -706,9 +709,11 @@ bool SDLTileMapRenderer::buildMesh(SDL_GPUCommandBuffer* cmd)
 	if(H <= 0 || V <= 0)
 		return false;   // heightfield not loaded yet -- caller retries next frame
 
-	// Pick the finest step whose grid fits in 16-bit indices.
+	// Pick the finest step whose grid stays within a sane memory budget. Indices are
+	// 32-bit, so a 65536-vertex ceiling no longer applies; STEP_BASE (2, the original's
+	// finest LOD) is used for every shipped map size and only 4096+ maps step up.
 	int step = STEP_BASE;
-	while(((H / step) + 1) * ((V / step) + 1) >= 65536)
+	while((long long)(H / step + 1) * (long long)(V / step + 1) > 4194304LL)
 		step *= 2;
 
 	step_ = step;
@@ -742,11 +747,11 @@ bool SDLTileMapRenderer::buildMesh(SDL_GPUCommandBuffer* cmd)
 			quadMat_[2 * ((size_t)gy * nx_ + gx) + 1] = (unsigned char)regionMaterialAt(region, (x1 + x0 + x1) / 3, (y0 + y1 + y1) / 3);
 		}
 
-	std::vector<unsigned short> idx;
+	std::vector<unsigned int> idx;
 	buildIndexData(idx);
 
 	const Uint32 vbytes = (Uint32)(verts_.size() * sizeof(Vertex));
-	const Uint32 ibytes = (Uint32)(idx.size() * sizeof(unsigned short));
+	const Uint32 ibytes = (Uint32)(idx.size() * sizeof(unsigned int));
 
 	SDL_GPUBufferCreateInfo vbi = {};
 	vbi.usage = SDL_GPU_BUFFERUSAGE_VERTEX; vbi.size = vbytes;
@@ -936,9 +941,9 @@ void SDLTileMapRenderer::applyMapUpdates(SDL_GPUCommandBuffer* cmd, cTileMap* ti
 		region.unlock();
 
 		if(materialChanged){
-			std::vector<unsigned short> idx;
+			std::vector<unsigned int> idx;
 			buildIndexData(idx);
-			const Uint32 ibytes = (Uint32)(idx.size() * sizeof(unsigned short));
+			const Uint32 ibytes = (Uint32)(idx.size() * sizeof(unsigned int));
 			SDL_GPUTransferBufferCreateInfo itbi = {};
 			itbi.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
 			itbi.size = ibytes;
@@ -1059,7 +1064,7 @@ bool SDLTileMapRenderer::DrawShadowPass(SDL_GPUCommandBuffer* cmd, SDL_GPUTextur
 	SDL_GPUBufferBinding vb = {}; vb.buffer = vertexBuffer_; vb.offset = 0;
 	SDL_BindGPUVertexBuffers(pass, 0, &vb, 1);
 	SDL_GPUBufferBinding ib = {}; ib.buffer = indexBuffer_; ib.offset = 0;
-	SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_16BIT);
+	SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_32BIT);
 
 	SDL_DrawGPUIndexedPrimitives(pass, indexCount_, 1, 0, 0, 0);
 	SDL_EndGPURenderPass(pass);
@@ -1220,7 +1225,7 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 	SDL_GPUBufferBinding vb = {}; vb.buffer = vertexBuffer_; vb.offset = 0;
 	SDL_BindGPUVertexBuffers(pass, 0, &vb, 1);
 	SDL_GPUBufferBinding ib = {}; ib.buffer = indexBuffer_; ib.offset = 0;
-	SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_16BIT);
+	SDL_BindGPUIndexBuffer(pass, &ib, SDL_GPU_INDEXELEMENTSIZE_32BIT);
 
 	SDL_GPUTextureSamplerBinding ts[5] = {};
 	ts[0].texture = (wireframe && whiteTexture_) ? whiteTexture_ : colorTexture_;
