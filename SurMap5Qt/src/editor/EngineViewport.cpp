@@ -1798,20 +1798,8 @@ void EngineViewport::drawFrame()
 		s_prevMs = now;
 		return std::min(100.0, dt);
 	}();
-	// TEMP FX debug: пауза времени — частицы замирают на месте (dt=0).
 	if(scene_)
-		scene_->SetDeltaTime(fxPaused_ ? 0.0f : (float)frameMs);
-
-	// TEMP CLEAN (убрать): VISTA_FX_CLEAN=1 — минимальный проход для эффектов.
-	// VISTA_FX_ON=DEPTH,SOFT,BLEND,COLOROP,FOG,ZREF,TRIALPHA — вернуть фильтры по одному.
-	{
-		static int s_set = -1;
-		if(s_set < 0){
-			s_set = getenv("VISTA_FX_CLEAN") ? 1 : 0;
-			if(s_set)
-				fxSetClean(true);
-		}
-	}
+		scene_->SetDeltaTime((float)frameMs);
 
 	// CGeneralView::graphQuant (SurMap5/GeneralView.cpp:265) drained the
 	// universe's command streams before drawing. Units don't move their model
@@ -1978,10 +1966,7 @@ void EngineViewport::drawFrame()
 	// ctor on. Nothing below touches a world object, so a bare check suffices.
 	if(environment){
 		const float dt = 0.001f * (float)frameMs;
-		// TEMP FX debug: в изоляции небо не рисуем (его depth и заливка
-		// мешают рассмотреть частицы на пустом фоне).
-		if(!fxIsolated_)
-			environment->graphQuant(dt, camera_);
+		environment->graphQuant(dt, camera_);
 	}
 
 	// CGeneralView::graphQuant and GameShell::Show both set ATTRCAMERA_CLEARZBUFFER
@@ -2015,10 +2000,8 @@ void EngineViewport::drawFrame()
 	// composited the post-effect stack (environment->drawPostEffects). Monochrome
 	// and the under-water effect are ported to SDL (Render-PORTING.md #6a); the
 	// composite is a no-op on frames where no effect recorded anything.
-	// TEMP FX debug: в изоляции сетку и aux не рисуем — только частицы.
-	if(!fxIsolated_)
-		drawGrid();
-	if(environment && !fxIsolated_){
+	drawGrid();
+	if(environment){
 		const float dt = 0.001f * (float)frameMs;
 		environment->drawPostEffects(dt, camera_);
 	}
@@ -2039,21 +2022,16 @@ void EngineViewport::drawFrame()
 	// the current tool's onDrawAuxData(), and editorVisual().afterQuant().
 	// Without these the 3D view shows no selection circles, no camera paths,
 	// no source marks, no tool gizmos.
-	// TEMP FX debug: в изоляции aux-слои не рисуем — только частицы.
-	// (drawToolAux также рисует жёлтые кресты позиций эффектов — их гасим
-	// тоже, чтобы не путать с самими частицами.)
 	// Старого вызова UI_Dispatcher::quant здесь нет: в редакторе gameShell==0
 	// (создаётся только в игре), и quant падает на
 	// UI_LogicDispatcher::isGameActive()->gameShell->GameActive.
-	if(!fxIsolated_){
-		if(cameraManager)
-			cameraManager->showEditor();
-		if(sourceManager)
-			sourceManager->showEditor();
-		if(environment)
-			environment->showEditor();
-		drawToolAux();
-	}
+	if(cameraManager)
+		cameraManager->showEditor();
+	if(sourceManager)
+		sourceManager->showEditor();
+	if(environment)
+		environment->showEditor();
+	drawToolAux();
 
 	// [SurMap5Qt] Как в CGeneralView::graphQuant (SurMap5/GeneralView.cpp:325):
 	// editorVisual().afterQuant() после aux-слоёв.
@@ -2935,160 +2913,3 @@ void EngineViewport::deleteSelectedObjects()
 		cameraManager->deleteSelected();
 }
 
-// --- TEMP FX debug panel (убрать после диагностики частиц) ---
-
-int EngineViewport::fxEffectCount()
-{
-	if(!scene_)
-		return 0;
-	vector<cEffect*> fxList;
-	terScene->GetAllEffects(fxList);
-	return (int)fxList.size();
-}
-
-void EngineViewport::fxSetVisible(bool visible)
-{
-	// cEffect::PreDraw возвращается сразу, когда debugShowSwitch.effects.
-	debugShowSwitch.effects = !visible;
-}
-
-bool EngineViewport::fxVisible() const
-{
-	return !debugShowSwitch.effects;
-}
-
-void EngineViewport::fxSetEmitting(bool emitting)
-{
-	if(!scene_)
-		return;
-	vector<cEffect*> fxList;
-	terScene->GetAllEffects(fxList);
-	for(size_t i = 0; i < fxList.size(); ++i){
-		if(fxList[i])
-			fxList[i]->SetParticleRate(emitting ? 1.0f : 0.0f);
-	}
-}
-
-void EngineViewport::fxRestartAll()
-{
-	if(!scene_)
-		return;
-	vector<cEffect*> fxList;
-	terScene->GetAllEffects(fxList);
-	for(size_t i = 0; i < fxList.size(); ++i){
-		cEffect* e = fxList[i];
-		if(!e)
-			continue;
-		e->SetTime(0.0f);
-		e->setCycled(true);
-		e->SetParticleRate(1.0f);
-	}
-}
-
-void EngineViewport::fxSetPaused(bool paused)
-{
-	fxPaused_ = paused;
-}
-
-void EngineViewport::fxSetIsolated(bool isolated)
-{
-	// TEMP FX debug: оставить юнитов и частицы, скрыть всё остальное.
-	// debugShowSwitch.*=true гейтит PreDraw слоёв: террейн, вода, трава —
-	// скрыты; objects/simplyObjects=false — юниты (cObject3dx и
-	// UnitEnvironmentSimple через cSimply3dx) остаются; effects=false —
-	// частицы остаются. Небо пропускаем через пропуск env graphQuant в кадре.
-	fxIsolated_ = isolated;
-	debugShowSwitch.tilemap = isolated;
-	debugShowSwitch.water = isolated;
-	debugShowSwitch.objects = false;
-	debugShowSwitch.simplyObjects = false;
-	debugShowSwitch.grass = isolated;
-	debugShowSwitch.effects = false;
-}
-
-// TEMP FX debug (убрать после диагностики): оверрайды quad-рендерера.
-namespace {
-SDLWorldQuadRenderer* fxQuadRenderer()
-{
-	cSDLRenderDevice* dev = sdlRenderDevice();
-	return dev ? dev->worldQuadRenderer() : nullptr;
-}
-}
-
-void EngineViewport::fxSetForceNoDepth(bool b)
-{
-	if(SDLWorldQuadRenderer* r = fxQuadRenderer())
-		r->setForceNoDepth(b);
-}
-
-// TEMP CLEAN (убрать): VISTA_FX_CLEAN=1 — минимальный проход для эффектов.
-// VISTA_FX_ON=DEPTH,SOFT,BLEND,COLOROP,FOG,ZREF,TRIALPHA — вернуть фильтры по одному.
-void EngineViewport::fxSetClean(bool b)
-{
-	SDLWorldQuadRenderer* r = fxQuadRenderer();
-	if(!r)
-		return;
-	r->setCleanFx(b);
-	if(b){
-		if(const char* on = getenv("VISTA_FX_ON")){
-			std::string s(on);
-			for(size_t i = 0; i < s.size(); ++i)
-				if(s[i] >= 'a' && s[i] <= 'z') s[i] = (char)(s[i] - 32);
-			unsigned keep = 0;
-			if(s.find("DEPTH")    != std::string::npos) keep |= SDLWorldQuadRenderer::CLEAN_KEEP_DEPTH;
-			if(s.find("SOFT")     != std::string::npos) keep |= SDLWorldQuadRenderer::CLEAN_KEEP_SOFT;
-			if(s.find("BLEND")    != std::string::npos) keep |= SDLWorldQuadRenderer::CLEAN_KEEP_BLEND;
-			if(s.find("COLOROP")  != std::string::npos) keep |= SDLWorldQuadRenderer::CLEAN_KEEP_COLOROP;
-			if(s.find("FOG")      != std::string::npos) keep |= SDLWorldQuadRenderer::CLEAN_KEEP_FOG;
-			if(s.find("ZREF")     != std::string::npos) keep |= SDLWorldQuadRenderer::CLEAN_KEEP_ZREF;
-			if(s.find("TRIALPHA") != std::string::npos) keep |= SDLWorldQuadRenderer::CLEAN_KEEP_TRIALPHA;
-			r->setCleanKeep(keep);
-			fprintf(stderr, "[fxclean] VISTA_FX_ON='%s' keep=0x%x\n", on, keep);
-			fflush(stderr);
-		}
-	}
-}
-
-void EngineViewport::fxSetForceNoFog(bool b)
-{
-	if(SDLWorldQuadRenderer* r = fxQuadRenderer())
-		r->setForceNoFog(b);
-}
-
-void EngineViewport::fxSetForceNoSoft(bool b)
-{
-	if(SDLWorldQuadRenderer* r = fxQuadRenderer())
-		r->setForceNoSoft(b);
-}
-
-void EngineViewport::fxSetForceNoPremul(bool b)
-{
-	if(SDLWorldQuadRenderer* r = fxQuadRenderer())
-		r->setForceNoPremul(b);
-}
-
-void EngineViewport::fxSetWireParticles(bool b)
-{
-	if(SDLWorldQuadRenderer* r = fxQuadRenderer())
-		r->setDebugWireParticles(b);
-}
-
-bool EngineViewport::fxWireParticles() const
-{
-	cSDLRenderDevice* dev = sdlRenderDevice();
-	SDLWorldQuadRenderer* r = dev ? dev->worldQuadRenderer() : nullptr;
-	return r ? r->debugWireParticles() : false;
-}
-
-void EngineViewport::fxSetForceFlat(bool b)
-{
-	if(SDLWorldQuadRenderer* r = fxQuadRenderer())
-		r->setForceFlat(b);
-}
-
-bool EngineViewport::fxForceFlat() const
-{
-	cSDLRenderDevice* dev = sdlRenderDevice();
-	SDLWorldQuadRenderer* r = dev ? dev->worldQuadRenderer() : nullptr;
-	return r ? r->forceFlat() : false;
-}

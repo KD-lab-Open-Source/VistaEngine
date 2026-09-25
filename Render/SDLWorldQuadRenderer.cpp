@@ -31,14 +31,7 @@ const int INITIAL_QUADS = 1024;
 
 SDL_GPUTexture* sdlTextureOf(cTexture* t)
 {
-	if(!t)
-		return nullptr;
-	if(t->frameNumber() < 1)
-		return nullptr;
-	SDL_GPUTexture* surf = reinterpret_cast<SDL_GPUTexture*>(t->GetDDSurface(0));
-	if(!surf)
-		return nullptr;
-	return surf;
+	return (t && t->frameNumber() >= 1) ? reinterpret_cast<SDL_GPUTexture*>(t->GetDDSurface(0)) : nullptr;
 }
 
 } // namespace
@@ -73,10 +66,7 @@ SDLWorldQuadRenderer::~SDLWorldQuadRenderer()
 // ---------------------------------------------------------------------------
 void SDLWorldQuadRenderer::createSampler()
 {
-	// window_ may be null -- the Qt editor creates no SDL window of its own; the swapchain
-	// comes from the foreign window later. Samplers need no window; only the pipeline
-	// format query does, and that tolerates a null window.
-	if(!device_) return;
+	if(!device_ || !window_) return;
 
 	// cCoastSprites::Draw's SetSamplerDataVirtual(0, sampler_wrap_anisotropic); the wave
 	// sources inherit the scene's sampler_wrap_linear, which this rounds up to. max_lod
@@ -186,11 +176,7 @@ SDL_GPUGraphicsPipeline* SDLWorldQuadRenderer::pipelineFor(eBlendMode blend, boo
 	if(it != pipelines_.end())
 		return it->second;
 
-	// window_ may be null -- the Qt editor creates no SDL window of its own; the swapchain
-	// comes from the foreign window later. SDL_GetGPUSwapchainTextureFormat tolerates a null
-	// window (it returns the device's default swapchain format, as SDLWorldLineRenderer
-	// relies on), so only the device matters.
-	if(!createShaders()){
+	if(!window_ || !createShaders()){
 		pipelines_[key] = nullptr;
 		return nullptr;
 	}
@@ -380,9 +366,6 @@ void SDLWorldQuadRenderer::SetMaterial(eBlendMode blend, cTexture* texture, bool
 	// so a soft-edged particle draws as a hard bright square. Read by both routes' fragment
 	// shaders -- worldquad.frag.hlsl as SelectDiffuse.y, worldtri.frag.hlsl as ColorOp.y.
 	material_.fs.colorOp[1] = (texture && !texture->isPremultiplied()) ? 1.f : 0.f;
-	// TEMP FX debug: forceNoPremul — не домножать texel на alpha в шейдере.
-	if(forceNoPremul_)
-		material_.fs.colorOp[1] = 0.f;
 	material_.fs.colorOp[2] = material_.fs.colorOp[3] = 0.f;
 }
 
@@ -395,37 +378,6 @@ void SDLWorldQuadRenderer::openGroup(GroupKind kind)
 	current_.kind = kind;
 	current_.first = kind == GROUP_QUAD ? (int)(vertices_.size() / 4) : (int)indicesTri_.size();
 	current_.count = 0;
-	// TEMP FX debug: принудительный плоский квад — белый whiteTexture_,
-	// ALPHA_NONE, depthTest=false, туман и soft-depth выкл, мир ID.
-	// Виден — виноваты текстура/бленд/туман/depth; не виден — MVP/вьюпорт/
-	// формат вершин.
-	if(forceFlat_){
-		current_.texture = nullptr;
-		current_.texture1 = nullptr;
-		current_.textureZ = nullptr;
-		current_.blend = ALPHA_NONE;
-		current_.depthTest = false;
-		current_.softDepth = false;
-		materialWorld_ = MatXf::ID;
-	}
-	// TEMP FX debug: по одному выключать то, что может гасить частицы.
-	// forceNoDepth — без depth-теста (pipelineFor возьмёт depthTest=false).
-	if(forceNoDepth_)
-		current_.depthTest = false;
-	// TEMP CLEAN (убрать): VISTA_FX_CLEAN=1 — минимальный проход для эффектов:
-	// без depth-теста, без тумана, без soft-fade, без премультипликации,
-	// без второй текстуры (COLOR_OPERATION) — у TRI это colorOp[0], у QUAD colorOp[1].
-	// cleanKeep_ позволяет вернуть фильтр по одному (VISTA_FX_ON).
-	if(cleanFx_){
-		if(!(cleanKeep_ & CLEAN_KEEP_DEPTH))
-			current_.depthTest = false;
-		if(!(cleanKeep_ & CLEAN_KEEP_SOFT))
-			current_.softDepth = false;
-		if(!(cleanKeep_ & CLEAN_KEEP_BLEND))
-			current_.blend = ALPHA_ADDBLEND;   // (ONE, ONE): чистый аддитив, ничего не затемняет
-		if(!(cleanKeep_ & CLEAN_KEEP_COLOROP))
-			current_.fs.colorOp[0] = 0.f;      // TRI: COLOR_OPERATION off (ot.rgb не домножается на Tex1)
-	}
 	const Mat4f world(materialWorld_);
 	const Mat4f mvp = world * viewProj_;
 	std::memcpy(current_.vs.mvp, &mvp, sizeof(current_.vs.mvp));
@@ -443,12 +395,10 @@ void SDLWorldQuadRenderer::openGroup(GroupKind kind)
 	// affine W -- so the sky camera and the lightmap camera keep the identity, as they must.
 	cSDLRenderDevice* dev = sdlRenderDevice();
 	const Vect4f f = dev ? dev->fogPlane(camera_) : Vect4f(0.f, 0.f, 0.f, 1.f);
-	// TEMP FX debug: forceNoFog — туман выкл (Fog=1 везде).
-	const float fw = forceNoFog_ ? 0.f : 1.f;
-	current_.vs.fogPlane[0] = (world._11*f.x + world._12*f.y + world._13*f.z + world._14*f.w) * fw;
-	current_.vs.fogPlane[1] = (world._21*f.x + world._22*f.y + world._23*f.z + world._24*f.w) * fw;
-	current_.vs.fogPlane[2] = (world._31*f.x + world._32*f.y + world._33*f.z + world._34*f.w) * fw;
-	current_.vs.fogPlane[3] = forceNoFog_ ? 1.f : (world._41*f.x + world._42*f.y + world._43*f.z + world._44*f.w);
+	current_.vs.fogPlane[0] = world._11*f.x + world._12*f.y + world._13*f.z + world._14*f.w;
+	current_.vs.fogPlane[1] = world._21*f.x + world._22*f.y + world._23*f.z + world._24*f.w;
+	current_.vs.fogPlane[2] = world._31*f.x + world._32*f.y + world._33*f.z + world._34*f.w;
+	current_.vs.fogPlane[3] = world._41*f.x + world._42*f.y + world._43*f.z + world._44*f.w;
 
 	const Color4f fog = dev ? dev->fogColor() : Color4f(0.f, 0.f, 0.f, 0.f);
 	current_.fs.fogColor[0] = fog.r; current_.fs.fogColor[1] = fog.g;
@@ -462,21 +412,6 @@ void SDLWorldQuadRenderer::openGroup(GroupKind kind)
 	current_.vs.reflectionMul[1] = inv.y;
 	current_.vs.reflectionMul[2] = 1.f;
 	current_.vs.reflectionMul[3] = 0.f;
-
-	// TEMP CLEAN (убрать): туман, премультипликация и soft-fade выключены.
-	if(cleanFx_){
-		if(!(cleanKeep_ & CLEAN_KEEP_FOG)){
-			current_.vs.fogPlane[0] = current_.vs.fogPlane[1] = current_.vs.fogPlane[2] = 0.f;
-			current_.vs.fogPlane[3] = 1.f;
-		}
-		if(!(cleanKeep_ & CLEAN_KEEP_COLOROP))
-			current_.fs.colorOp[1] = 0.f;        // не домножать texel на alpha
-		if(!(cleanKeep_ & CLEAN_KEEP_SOFT))
-			current_.fs.zBufferParams[0] = current_.fs.zBufferParams[1] =
-			current_.fs.zBufferParams[2] = current_.fs.zBufferParams[3] = 0.f;
-		if(!(cleanKeep_ & CLEAN_KEEP_ZREF))
-			current_.fs.zReflection[0] = 0.f;    // TRI: без height-clip (clip() выбрасывал бы пиксели)
-	}
 
 	// Which of the two fog rules this group takes. The original said the same thing through
 	// a shader variant: cD3DRender::SetWorldMaterial selected FIX_FOG_ADD_BLEND for exactly
@@ -496,18 +431,11 @@ void SDLWorldQuadRenderer::openGroup(GroupKind kind)
 	                       || current_.blend == ALPHA_SUBBLEND;
 	current_.fs.fogParams[0] = contribution ? 1.f : 0.f;
 	current_.fs.fogParams[1] = current_.fs.fogParams[2] = current_.fs.fogParams[3] = 0.f;
-	// TEMP FX debug: плоский квад — туман полностью выкл (Fog=1 везде).
-	if(forceFlat_){
-		current_.vs.fogPlane[0] = current_.vs.fogPlane[1] = current_.vs.fogPlane[2] = 0.f;
-		current_.vs.fogPlane[3] = 1.f;
-		current_.fs.colorOp[1] = 0.f;
-	}
 
 	// The soft-depth fade: the camera's projection constants, or the all-zero "off". Baked
 	// per group because each group keeps its own camera's projection -- the quad route only
 	// ever fades under the main camera, but nothing here should assume that.
-	// TEMP FX debug: forceNoSoft — фейд выкл всегда.
-	if(current_.softDepth && cameraValid_ && !forceNoSoft_){
+	if(current_.softDepth && cameraValid_){
 		current_.fs.zBufferParams[0] = zbParams_[0];
 		current_.fs.zBufferParams[1] = zbParams_[1];
 		current_.fs.zBufferParams[2] = zbParams_[2];
@@ -541,23 +469,6 @@ sVertexXYZDT1* SDLWorldQuadRenderer::Get()
 
 void SDLWorldQuadRenderer::EndDraw()
 {
-	// TEMP FX debug: проволочный каркас — дублировать каждый записанный квад
-	// 4 ребрами через DrawLine (line-пайплайн работает). Если боксы видны,
-	// а квадов нет — позиции верны, сломан именно quad-пайплайн (MVP/шейдер/
-	// бленд/туман); если и боксов нет — вершины не там (мир/камера).
-	if(drawing_ && current_.count > 0 && debugWireParticles_){
-		cSDLRenderDevice* dev = sdlRenderDevice();
-		if(dev){
-			const size_t base = (size_t)current_.first * 4;
-			for(int q = 0; q < current_.count; ++q){
-				const sVertexXYZDT1* v = &vertices_[base + (size_t)q * 4];
-				dev->DrawLine(v[0].pos, v[1].pos, Color4c(255, 0, 255, 255));
-				dev->DrawLine(v[1].pos, v[3].pos, Color4c(255, 0, 255, 255));
-				dev->DrawLine(v[3].pos, v[2].pos, Color4c(255, 0, 255, 255));
-				dev->DrawLine(v[2].pos, v[0].pos, Color4c(255, 0, 255, 255));
-			}
-		}
-	}
 	if(drawing_ && current_.count > 0)
 		groups_.push_back(current_);
 	drawing_ = false;
@@ -594,14 +505,6 @@ void SDLWorldQuadRenderer::DrawPrimitive(PRIMITIVETYPE type, int nPolygon)
 		lockFirst_ = lockCount_ = 0;
 		drawing_ = false;
 		return;
-	}
-
-	// TEMP CLEAN (убрать): у TRI-маршрута вершинный шейдер премультиплицирует
-	// цвет на alpha (worldtri.vert.hlsl), а фрагментный — нет, и результат гасится
-	// на v.a. Для диагностики в чистом режиме возвращаем alpha=255.
-	if(cleanFx_ && !(cleanKeep_ & CLEAN_KEEP_TRIALPHA)){
-		for(int i = 0; i < lockCount_ && (size_t)(lockFirst_ + i) < verticesTri_.size(); ++i)
-			verticesTri_[lockFirst_ + i].diffuse.a = 255;
 	}
 
 	// Unroll into indexed triangles. Strips would need SDL's own strip primitive and a

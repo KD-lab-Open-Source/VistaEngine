@@ -1121,13 +1121,6 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
                               int screenW, int screenH, bool clear, const float clearColor[4],
                               bool clearDepth, cTileMap* tileMap, Camera* camera, bool wireframe)
 {
-	static bool loggedDraw = false;
-	if(!loggedDraw){
-		loggedDraw = true;
-		fprintf(stderr, "SDLTileMapRenderer: draw target=%p depth=%p pipeline=%p indices=%d camera=%p size=%dx%d\n",
-		        (void*)target, (void*)depth, (void*)pipelineFill_, indexCount_,
-		        (void*)camera, screenW, screenH);
-	}
 	if(!camera)
 		return false;
 	// Fall back to the solid pipeline if a variant failed to build.
@@ -1264,7 +1257,6 @@ bool SDLTileMapRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* target,
 		        screenW, screenH, SDL_GetError());
 		return false;
 	}
-	applyCameraViewport(pass, camera->vp, screenW, screenH);
 
 	SDL_BindGPUGraphicsPipeline(pass, pipeline);
 

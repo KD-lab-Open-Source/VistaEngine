@@ -121,9 +121,6 @@ public:
 	void DrawLine(int x1, int y1, int x2, int y2, Color4c color);
 	void DrawPixel(int x, int y, Color4c color);
 	void DrawRectangle(int x, int y, int dx, int dy, Color4c color, bool outline);
-	// Diagnostic screen-space triangle used by the Qt editor while validating
-	// the native SDL swapchain host.
-	void DrawDebugTriangle(int screenW, int screenH);
 
 	// Emits one textured quad per glyph from the font's FreeType atlas. Returns the
 	// x coordinate just past the last glyph drawn (the D3D OutTextLine contract).
