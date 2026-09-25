@@ -48,6 +48,8 @@ GameData/
 /out
 /build-qt-check
 /*.log
+# Local build/run helpers (per-machine, not part of the repo)
+/.local/
 # SurMap5Qt build/run helpers, outputs and screenshots (ad-hoc verification)
 /*.ps1
 /*.cmd
