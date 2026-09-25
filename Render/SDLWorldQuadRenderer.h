@@ -163,6 +163,12 @@ public:
 	void DrawIndexedPrimitive(const sPolygon* indices, int nPolygon);
 
 	bool hasDraws() const { return !groups_.empty(); }
+
+	// Hand the renderer the SDL window whose swapchain it draws into, once one
+	// exists. The Qt editor creates its foreign window after the device, so this is
+	// what lets the pipelines (built from the swapchain format) come up at all --
+	// createRenderWindow calls it beside the tile map's and the UI's.
+	void setWindow(SDL_Window* window);
 	// A group recorded since the last Draw asked for the soft-depth fade: the device takes
 	// (or reuses) its scene-depth snapshot for the pass exactly when this is set.
 	bool wantsSceneDepth() const { return anySoftDepth_; }
@@ -242,6 +248,14 @@ private:
 		// matrix, and several emitters with different ones draw under one camera.
 		VSUniform vs;
 		FSUniform fs;
+		// The camera viewport captured when this group was opened. Per group, not per
+		// frame: SetCamera can run again between recording this group and the pass that
+		// replays it (a child camera -- the sky cubemap face, the reflection -- draws a
+		// world-quad group of its own under its own viewport), and the whole batch then
+		// replays under whichever viewport ran last. The effects recorded for the main
+		// camera would draw into the cubemap's 256x256 viewport and vanish.
+		int vpX, vpY, vpW, vpH;
+		float vpMinZ, vpMaxZ;
 	};
 
 	void createSampler();

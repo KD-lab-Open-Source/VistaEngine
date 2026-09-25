@@ -42,6 +42,24 @@ SDLWorldQuadRenderer::SDLWorldQuadRenderer(SDL_GPUDevice* device, SDL_Window* wi
 	createSampler();
 }
 
+// The Qt editor claims no SDL window at Initialize, so window_ is null when this
+// renderer is built; createRenderWindow hands the viewport's foreign window here
+// once it exists, exactly as it does for the tile map and the UI renderers. The
+// pipeline is built from the window's swapchain format, so it must not be cached
+// before a window is known.
+void SDLWorldQuadRenderer::setWindow(SDL_Window* window)
+{
+	if(window_ == window)
+		return;
+	window_ = window;
+	if(!device_ || !window_)
+		return;
+	// Pipelines were keyed on the old (null) format; drop them so they rebuild.
+	for(auto& kv : pipelines_)
+		if(kv.second) SDL_ReleaseGPUGraphicsPipeline(device_, kv.second);
+	pipelines_.clear();
+}
+
 SDLWorldQuadRenderer::~SDLWorldQuadRenderer()
 {
 	if(!device_) return;
@@ -66,7 +84,10 @@ SDLWorldQuadRenderer::~SDLWorldQuadRenderer()
 // ---------------------------------------------------------------------------
 void SDLWorldQuadRenderer::createSampler()
 {
-	if(!device_ || !window_) return;
+	// Samplers need no window: only the device. (window_ is null in the Qt editor
+	// until createRenderWindow hands one over; the samplers must exist from the
+	// constructor regardless.)
+	if(!device_) return;
 
 	// cCoastSprites::Draw's SetSamplerDataVirtual(0, sampler_wrap_anisotropic); the wave
 	// sources inherit the scene's sampler_wrap_linear, which this rounds up to. max_lod
@@ -176,6 +197,9 @@ SDL_GPUGraphicsPipeline* SDLWorldQuadRenderer::pipelineFor(eBlendMode blend, boo
 	if(it != pipelines_.end())
 		return it->second;
 
+	// The Qt editor claims no SDL window at Initialize (window_ is null there); the
+	// renderer must be handed one before a pipeline is built. createRenderWindow()
+	// calls setWindow() for exactly this, as it does for the tile map and the UI.
 	if(!window_ || !createShaders()){
 		pipelines_[key] = nullptr;
 		return nullptr;
@@ -378,6 +402,10 @@ void SDLWorldQuadRenderer::openGroup(GroupKind kind)
 	current_.kind = kind;
 	current_.first = kind == GROUP_QUAD ? (int)(vertices_.size() / 4) : (int)indicesTri_.size();
 	current_.count = 0;
+	// Snapshot the viewport with the group: the batch may be replayed after another
+	// camera (a child cubemap/reflection camera) ran SetCamera. See Group::vpX.
+	current_.vpX = vpX_; current_.vpY = vpY_; current_.vpW = vpW_; current_.vpH = vpH_;
+	current_.vpMinZ = vpMinZ_; current_.vpMaxZ = vpMaxZ_;
 	const Mat4f world(materialWorld_);
 	const Mat4f mvp = world * viewProj_;
 	std::memcpy(current_.vs.mvp, &mvp, sizeof(current_.vs.mvp));
@@ -729,11 +757,6 @@ bool SDLWorldQuadRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 
 	SDL_GPURenderPass* pass = SDL_BeginGPURenderPass(cmd, &ct, 1, &dt);
 
-	sViewPort vp;
-	vp.X = vpX_; vp.Y = vpY_; vp.Width = vpW_; vp.Height = vpH_;
-	vp.MinZ = vpMinZ_; vp.MaxZ = vpMaxZ_;
-	applyCameraViewport(pass, vp, screenW, screenH);
-
 	// One group per BeginDraw..EndDraw run or per DrawPrimitive, replayed in the order the
 	// callers made them -- quads and triangles interleaved, which is what keeps a light
 	// column and the sprites of the same cEffect blending in the order D3D drew them.
@@ -751,6 +774,14 @@ bool SDLWorldQuadRenderer::Draw(SDL_GPUCommandBuffer* cmd, SDL_GPUTexture* targe
 		SDL_GPUGraphicsPipeline* pipeline = pipelineFor(g.blend, g.depthTest, wireframe, g.kind,
 		                                                g.colorWrite);
 		if(!pipeline) continue;
+		// This group's own viewport (see Group::vpX): the batch may be replayed after a
+		// child camera (the sky cubemap face, the reflection) ran SetCamera.
+		{
+			sViewPort vp;
+			vp.X = g.vpX; vp.Y = g.vpY; vp.Width = g.vpW; vp.Height = g.vpH;
+			vp.MinZ = g.vpMinZ; vp.MaxZ = g.vpMaxZ;
+			applyCameraViewport(pass, vp, screenW, screenH);
+		}
 		if(pipeline != boundPipeline){
 			SDL_BindGPUGraphicsPipeline(pass, pipeline);
 

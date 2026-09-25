@@ -191,6 +191,8 @@ cRenderWindow* cSDLRenderDevice::createRenderWindow(HWND hwnd)
 		uiRenderer_->setWindow(sdl);
 	if(tileMapRenderer_)
 		tileMapRenderer_->setWindow(sdl);
+	if(worldQuadRenderer_)
+		worldQuadRenderer_->setWindow(sdl);
 	return wnd;
 }
 
@@ -684,6 +686,14 @@ int cSDLRenderDevice::BeginScene()
 	// So is the scene-depth snapshot: its texture persists, its contents are last frame's.
 	sceneDepthValid_ = false;
 
+	// A quad batch is per frame too: a batch that opened and never closed (an early
+	// return between beginQuadBatch and endQuadBatch) would leave the depth nonzero
+	// and make drawWorldQuads defer forever, flushing the sorted pass's quads in a
+	// later frame -- after that frame's clear, so the effects vanish. The frame
+	// boundary is where a stray batch must not survive.
+	quadBatchDepth_ = 0;
+	quadBatchPending_ = false;
+
 	shadowPassRan_ = false;
 	bActiveScene_ = true;
 	NumberPolygon = 0;
@@ -708,6 +718,17 @@ int cSDLRenderDevice::EndScene()
 	// past SCENENODE_OBJECTSPECIAL, or the whole scene in a mission with neither water nor
 	// coast sprites. Over the terrain and against its depth. The last camera to draw is the
 	// main one, so the current target is the screen; assert nothing, just settle it.
+	//
+	// A stray open quad batch is drained first (and its deferral lifted): otherwise the
+	// sorted pass's quads would be held past this frame and replayed after the next
+	// frame's clear, which reads as the effects disappearing.
+	if(quadBatchDepth_ != 0){
+		quadBatchDepth_ = 0;
+		if(quadBatchPending_){
+			quadBatchPending_ = false;
+			drawWorldQuads();
+		}
+	}
 	flushTarget(current_, true);
 
 	// The world-space line pass (the editor's terrain grid), over the scene and against
