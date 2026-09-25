@@ -326,6 +326,51 @@ appear. The remaining candidates, in order of likelihood:
 
 **Next step:** test (1) first — it is one line and reversible — then (2).
 
+### Result of the render-side probes (session, continued)
+
+All three candidates were measured, and a fourth fact came out of it:
+
+- **The quad batch is not it** (the user confirmed, and the traces agree: the
+  pass runs).
+- **Premultiply/blend is not it.** `VISTA_FX_OPAQUE=1` (every group drawn
+  `ALPHA_NONE`, no premultiply, no depth test) showed **nothing** — so the loss is
+  not alpha or blend.
+- **The pass is not overwritten.** The effects' world-quad pass goes straight to
+  `screen_` (`captureArmed=0`), opens with `clear=0, clearDepth=0` (LOAD), and the
+  geometry is in it every frame.
+- **The geometry projects on screen.** `VISTA_FX_PROJ` showed the particle groups
+  at `ndc≈(-0.96, 0.0, 0.97)`, screen `(19,438)` etc. — on screen, correct
+  viewport.
+
+**The actual split:** `VISTA_FX_ZMODE` shows the visible and invisible effects
+differ by **`zMode` alone**:
+
+| effect | emitters | zMode | pass | visible |
+|---|---|---|---|---|
+| `A_MAM` (columns) | 3 (1 useZ, **2 nozBefore**) | NOZ-before-grass | 2 | **yes** |
+| `G_Fx_Pump_001` | 3 | **all `EMITTER_USE_ZBUFFER`** | 11 (sorted) | no |
+| `G_Fx_Chain_002` | 7 | all `EMITTER_USE_ZBUFFER` | 11 | no |
+| `G_Fx_Core_001` | 4 | all `EMITTER_USE_ZBUFFER` | 11 | no |
+| `G_Fx_Sign_Disconect` | 4 | all `EMITTER_USE_ZBUFFER` | 11 | no |
+
+So: **effects whose emitters ask for a NOZ pass are visible; effects whose
+emitters all ask for the z-buffer pass are not.** The NOZ passes are exactly the
+ones the original drew with `D3DRS_ZFUNC = D3DCMP_ALWAYS` (verified in `ca9aa43`'s
+`Camera::DrawObjectNoZ`), i.e. an always-passing depth test.
+
+The sorted pass (`EMITTER_USE_ZBUFFER`) has the default LESS-EQUAL depth test on
+both backends, so the original *did* depth-test those sprites. The question the
+data now points at is **what depth they test against**: the emitter's world z is
+~95-100 while the terrain under it is at the same height, so a sorted, depth-tested
+particle at `ndc.z≈0.967` loses to the terrain unless it is drawn **before** the
+terrain writes depth, or with an always-pass test.
+
+**The one experiment left** (and the one that settles editor-vs-engine): run the
+game (`VistaEngineDbg.exe`) on the same world and look at `G_Fx_Pump_001` /
+`G_Fx_Chain_002`. If the game shows them and the editor does not, the delta is
+editor-only (draw order / target / camera); if the game also hides them, it is
+engine-wide and belongs in `Render-PORTING.md`, not the editor register.
+
 ### `EngineViewport::drawFrame` vs `GameShell::Show` / `CGeneralView::graphQuant`
 
 The frame order matches the original editor's `graphQuant` (Fill → BeginScene →
