@@ -151,7 +151,9 @@ a circular brush — `vMap.deltaZone`, the port of `CSurToolToolzer`'s circle
 variant), **Kind** ("Hardness": paint the surface type — `vMap.drawInGrid` with
 `GRIDAT_MASK_SURFACE_KIND`, plus the `toShowSurKind` tint while active),
 **ColorPic** ("Texture": paint a bitmap texture with a `ColorModificator` —
-`vMap.drawBitmapCircle` / `putBitmap2AllWorld`), GeoNet (`bridge_->applyGeoNet`
+`vMap.drawBitmapCircle` / `putBitmap2AllWorld`), **Unit** (place a unit of the
+chosen `AttributeLibrary` attribute — `Player::buildUnit` + `setPose` at the
+terrain height), GeoNet (`bridge_->applyGeoNet`
 → `geoGeneration`; no direct MFC counterpart), GeoTx (re-render only — matches
 the original, where the paint call is commented out). The Toolzer/Kind/ColorPic
 editors live in the Properties dock (`ToolzerPropertyPanel`,
@@ -174,7 +176,10 @@ Not yet ported (original class → what it does):
 - CSurToolSpecFilter ("Detail Filter") — `vMap.specialFilter`.
 - CSurToolBlur — `vMap.gaussFilter`.
 - CSurToolImp — original stub (no-op) → N/A.
-- CSurToolUnit / CSurToolUnitFolder / CSurToolPlayerFolder — place units / assign player.
+- CSurToolUnitFolder / CSurToolPlayerFolder — the per-player unit tree (the port
+  lists the whole AttributeLibrary in one combo instead). Base unit placement is
+  done (`UnitTool`); the original's legionary/squad handling and player
+  assignment are not.
 - CSurToolPathEditor — path (waypoint) editing.
 - CSurToolCamera / CSurToolCameraEditor / CSurToolCameraRestriction — placed from
   CameraDialog / CameraControlPanel in the port instead of as map tools.
@@ -240,8 +245,9 @@ exist yet.
    Models real and persistable. Left: the path-finding aux unit, the
    camera-border overlay, and the remaining `SurMapOptions` fields (dirs, dock
    state, grid colour, LOD) in one struct.
-3. **Placement tools** — SurToolUnit (pick from AttributeLibrary),
-   SurTool3DM/Environment (file-pick a model), SurToolSource, SurToolAnchor.
+3. **Placement tools** — ~~SurToolUnit~~ **done** (`UnitTool`); still open:
+   SurTool3DM/Environment (file-pick a model), SurToolSource, SurToolAnchor
+   (the library/combo picker pattern `UnitTool` uses transfers to each).
 4. **Wire the ready dialogs**: put WaveDialog on a command; give CameraDialog its
    own command and add the CREATE_POINTS/SELECT_POINTS mouse modes.
 5. **Close dead/stale items**: `actViewPathFindingRef_` (unconnected), Debug
