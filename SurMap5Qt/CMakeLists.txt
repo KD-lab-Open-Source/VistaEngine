@@ -234,6 +234,11 @@ add_executable(SurMap5Qt
     src/tools/ColorPicTool.cpp
     src/tools/ColorPicPropertyPanel.h
     src/tools/ColorPicPropertyPanel.cpp
+    # The unit-placement tool + its Properties panel.
+    src/tools/UnitTool.h
+    src/tools/UnitTool.cpp
+    src/tools/UnitPropertyPanel.h
+    src/tools/UnitPropertyPanel.cpp
     # Phase 6 — the kdw trees as QTreeWidgets (tools + objects manager)
     src/panels/ToolsTreePanel.h
     src/panels/ToolsTreePanel.cpp

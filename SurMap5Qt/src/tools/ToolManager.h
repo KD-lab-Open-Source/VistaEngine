@@ -22,12 +22,14 @@ class GeoTxTool;
 class ToolzerTool;
 class KindTool;
 class ColorPicTool;
+class UnitTool;
 class TransformPropertyPanel;
 class GeoNetPropertyPanel;
 class GeoTxPropertyPanel;
 class ToolzerPropertyPanel;
 class KindPropertyPanel;
 class ColorPicPropertyPanel;
+class UnitPropertyPanel;
 
 class ToolManager
 {
@@ -80,6 +82,7 @@ private:
 	ToolzerTool* toolzer_ = nullptr;
 	KindTool* kind_ = nullptr;
 	ColorPicTool* colorPic_ = nullptr;
+	UnitTool* unit_ = nullptr;
 
 	std::vector<EditorTool*> tools_;
 	EditorTool* current_ = nullptr;
@@ -97,4 +100,6 @@ private:
 	KindPropertyPanel* kindPanel_ = nullptr;
 	// The Properties dock's panel for the texture brush (created lazily).
 	ColorPicPropertyPanel* colorPicPanel_ = nullptr;
+	// The Properties dock's panel for the unit-placement tool (created lazily).
+	UnitPropertyPanel* unitPanel_ = nullptr;
 };

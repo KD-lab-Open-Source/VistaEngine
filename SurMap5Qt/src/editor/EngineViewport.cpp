@@ -46,6 +46,7 @@ using namespace std;
 #include "Serialization/Dictionary.h"    // TranslationManager (Universe ctor calls GameOptions::setTranslate)
 #include "Serialization/XPrmArchive.h"   // XPrmIArchive (.spg loading)
 #include "Units/UnitAttribute.h"         // AttributeBase (libraryKey/isEnvironment)
+#include "Units/AttributeReference.h"   // AttributeLibrary (unit placement)
 #include "Units/UnitEnvironment.h"       // UnitEnvironment (Environment tab filter)
 #include "Units/EnvironmentSimple.h"    // UnitEnvironmentSimple (Environment tab filter)
 #include "Units/BaseUnit.h"              // UnitBase, UnitList
@@ -448,6 +449,50 @@ public:
 		                      (float)brightness / 100.f);
 		vMap.putBitmap2AllWorld(uid, (short)minH, (short)maxH, cmod);
 		return true;
+	}
+
+	void unitAttributeNames(std::vector<std::string>& out) override
+	{
+		// SurToolPlayerFolder built its unit tree from
+		// AttributeLibrary::instance().map() (each element is a UnitAttribute,
+		// wrapping an AttributeBase). Names are display only; placement
+		// addresses the index, since names are cp1251 and must not round-trip
+		// through Qt.
+		out.clear();
+		const AttributeLibrary::Map& map = AttributeLibrary::instance().map();
+		for(size_t i = 0; i < map.size(); ++i){
+			const AttributeBase* attr = map[i].get();
+			const char* key = attr ? attr->libraryKey() : nullptr;
+			out.push_back(key ? key : "");
+		}
+	}
+
+	EditorObjectId placeUnit(int libraryIndex, float x, float y, bool select) override
+	{
+		// SurToolUnit::createUnit: Player::buildUnit(attribute) + setPose. The
+		// unit lands at the terrain height, as CSurToolUnit used To3D.
+		if(!vMap.isWorldLoaded() || !universe())
+			return kNoObject;
+		Player* wp = universe()->worldPlayer();
+		if(!wp)
+			return kNoObject;
+		const AttributeLibrary::Map& map = AttributeLibrary::instance().map();
+		if(libraryIndex < 0 || libraryIndex >= (int)map.size())
+			return kNoObject;
+		const AttributeBase* attr = map[libraryIndex].get();
+		if(!attr)
+			return kNoObject;
+		UnitBase* unit = wp->buildUnit(AttributeReference(attr));
+		if(!unit)
+			return kNoObject;
+		float z = 0.f;
+		const int xi = (int)roundf(x), yi = (int)roundf(y);
+		if(xi >= 0 && yi >= 0 && xi < (int)vMap.H_SIZE && yi < (int)vMap.V_SIZE)
+			z = vMap.getZf(xi, yi);
+		unit->setPose(Se3f(QuatF::ID, Vect3f(x, y, z)), true);
+		if(select)
+			unit->setSelected(true);
+		return (EditorObjectId)unit;
 	}
 
 	bool worldRender() override

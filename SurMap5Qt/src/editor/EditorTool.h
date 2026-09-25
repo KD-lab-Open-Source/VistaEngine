@@ -264,6 +264,19 @@ public:
 	                                  int r, int g, int b,
 	                                  int minH, int maxH) = 0;
 
+	// --- Placement (SurToolUnit / CSurToolEnvironment) ---
+	//
+	// The unit-attribute names of AttributeLibrary (SurToolPlayerFolder built
+	// the unit tree from AttributeLibrary::instance().map()). Index-addressed:
+	// the Qt panel shows the names, the engine resolves the index.
+	virtual void unitAttributeNames(std::vector<std::string>& out) = 0;
+
+	// Place a unit of the given AttributeLibrary index at (x, y) on the ground
+	// (SurToolUnit::onOperationOnMap -> Player::buildUnit + setPose). The unit
+	// lands at the terrain height; `select` selects it afterwards. Returns the
+	// new object id, or kNoObject when the index/world is invalid.
+	virtual EditorObjectId placeUnit(int libraryIndex, float x, float y, bool select) = 0;
+
 	// Re-render the whole world (SurToolGeoTx::onOperationOnMap ->
 	// vMap.WorldRender). Returns false when no world is loaded.
 	virtual bool worldRender() = 0;
