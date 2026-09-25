@@ -54,8 +54,16 @@
 #ifndef REFLECTION
 #define REFLECTION 0
 #endif
+// See object3dx.vert.hlsl: the cube case of the original's one reflection shader. The sky
+// cubemap the environment renders per frame, sampled by a world-space reflection vector.
+#ifndef REFLECT_CUBE
+#define REFLECT_CUBE 0
+#endif
 #ifndef SECOND_OPACITY
 #define SECOND_OPACITY 0
+#endif
+#ifndef SILHOUETTE
+#define SILHOUETTE 0
 #endif
 
 Texture2D<float4> DiffuseTexture : register(t0, space2);
@@ -70,8 +78,14 @@ SamplerState      SpecularSampler : register(s2, space2);
 Texture2D<float>  ShadowTexture   : register(t3, space2);
 SamplerState      ShadowSampler   : register(s3, space2);
 #elif REFLECTION
-// The 2D environment map (the original's ReflectionSampler), then the shadow map after it.
-Texture2D<float4> ReflectionTexture : register(t1, space2);
+// The environment map (the original's ReflectionSampler), then the shadow map after it.
+// Same slot either way -- only the texture's type differs, so the renderer binds a cube
+// or a 2D texture to t1 and picks the matching permutation.
+#if REFLECT_CUBE
+TextureCube<float4> ReflectionTexture : register(t1, space2);
+#else
+Texture2D<float4>   ReflectionTexture : register(t1, space2);
+#endif
 SamplerState      ReflectionSampler : register(s1, space2);
 Texture2D<float>  ShadowTexture     : register(t2, space2);
 SamplerState      ShadowSampler     : register(s2, space2);
@@ -115,6 +129,25 @@ cbuffer Material : register(b0, space3)
 // to 4 together, both only when OPTION_SHADOW == 2 ("good"). So it stays a literal.
 static const float SHADOW_TAP = 0.0005f;
 
+#if SILHOUETTE
+// The outline consumes nothing the vertex shader interpolates -- its colour comes from the
+// Diffuse uniform -- so it declares position alone. That is what lets it pair with EVERY
+// vertex-shader permutation instead of only the BUMP=0 ones: a fragment shader may read a
+// subset of the stage outputs, and reading none of them makes the subset trivially valid.
+//
+// This is load-bearing, not tidiness. The outline is selected by depth (COMPAREOP_GREATER
+// against the depth the object's own plain draw wrote), so the two draws have to rasterize
+// bit-identically -- and only the same vertex shader guarantees that. Pairing the outline
+// with a *different* VS that computes the same position from the same inputs is not enough:
+// the two are compiled separately, and one may contract a multiply-add into an fma where
+// the other does not. The result differs in the last bit, GREATER stops reading "behind
+// something else" and starts reading "rounded the other way", and the outline paints over
+// the whole visible unit.
+struct VSOutput
+{
+    float4 Position  : SV_Position;
+};
+#else
 struct VSOutput
 {
     float4 Position  : SV_Position;
@@ -129,12 +162,17 @@ struct VSOutput
     float4 ShadowPos : TEXCOORD3;
     float  Fog       : TEXCOORD4;
 #if REFLECTION
+#if REFLECT_CUBE
+    float3 Reflect   : TEXCOORD5;   // world reflection vector, from the vertex shader
+#else
     float2 Reflect   : TEXCOORD5;   // sphere-map UV, from the vertex shader
+#endif
 #endif
 #if SECOND_OPACITY
     float2 UV1       : TEXCOORD6;   // second-opacity map UV, from the vertex shader
 #endif
 };
+#endif // SILHOUETTE
 
 // Shadow9700 from Render/shader/Skin/shadow9700.inl. One deliberate difference: it
 // divides only xy by w, because its caster wrote pre-divide clip z into a float colour
@@ -186,6 +224,17 @@ void applyShadow(inout float3 rgb, float4 shadowPos)
 float4 main(VSOutput input) : SV_Target0
 {
     float4 ot;
+
+#if SILHOUETTE
+    // The flat outline a unit shows through whatever it walked behind
+    // (Documents/Render-PORTING.md #22). No texture, no light, no fog: the pipeline has
+    // already selected the fragments -- those that fail the depth test against the scene --
+    // and every one of them is the silhouette colour. That colour rides in Diffuse, so this
+    // variant adds nothing to the Material cbuffer and its layout stays in step with the
+    // other permutations. Alpha is forced opaque: cVisGeneric::SetSilhouetteColor forces
+    // a = 255 anyway, and the pipeline does not blend.
+    return float4(Diffuse.rgb, 1.0f);
+#else
 
 #if BUMP
     // BUMP always samples: the original has no NOTEXTURE variant of psSkinBump.
@@ -267,4 +316,5 @@ float4 main(VSOutput input) : SV_Target0
     ot.rgb = lerp(FogColor.rgb, ot.rgb, saturate(input.Fog));
 
     return ot;
+#endif // SILHOUETTE
 }

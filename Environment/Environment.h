@@ -87,6 +87,13 @@ public:
 	bool isUnderWaterSilouette(const Vect3f& pos);
 
 	void serialize(Archive& ar);
+#ifdef MAELSTROM_DATA
+	/// The contents of a pre-2008 "environmentColors" node -- the object that owned the
+	/// preset group before 2008 split it up. The caller has already descended into the
+	/// node; the same body serves the copy in a world and the global one. See
+	/// Environment::serialize.
+	void serializeMaelstromColors(Archive& ar);
+#endif
 	const char* presetName()const{ return presetName_.c_str(); }
 	void setPresetName(const char* name) { presetName_ = name; }
 	void loadPreset();

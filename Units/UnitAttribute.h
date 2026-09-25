@@ -463,6 +463,38 @@ enum ChainID
 	CHAIN_TRIGGER = CHAIN_DEATH + 2,
 
 	CHAIN_UNINSTALL = CHAIN_DEATH + 3
+
+#ifdef MAELSTROM_DATA
+	,
+	// Chain ids that existed only before 2008. Maelstrom put the gait in the chain id and
+	// told stand from walk from run that way; this tree folded all of them into
+	// CHAIN_MOVEMENTS and tells them apart by the MovementState bits instead, so these
+	// names are gone from the enum above and its descriptor -- Maelstrom's files would
+	// otherwise name chains nothing here can resolve.
+	//
+	// They deliberately do NOT keep their original values: several of those now belong to
+	// other chains (Maelstrom's CHAIN_RUN was CHAIN_MOVEMENTS + 3, which is this tree's
+	// CHAIN_BUILDING_STAND, and its CHAIN_TURN was + 4, now CHAIN_PAD_STAND). The
+	// descriptor maps the old *names* onto these, and AnimationChain::serialize folds each
+	// one onto the 2008 chain id and the state bits that replaced it.
+	CHAIN_MAELSTROM_FIRST = CHAIN_UNINSTALL + 1,
+
+	CHAIN_MAELSTROM_RUN = CHAIN_MAELSTROM_FIRST,
+	CHAIN_MAELSTROM_TURN,
+
+	CHAIN_MAELSTROM_GO_WALK,
+	CHAIN_MAELSTROM_STOP_WALK,
+	CHAIN_MAELSTROM_GO_RUN,
+	CHAIN_MAELSTROM_STOP_RUN,
+
+	CHAIN_MAELSTROM_FIRE_WALKING,
+	CHAIN_MAELSTROM_FIRE_RUNNING,
+	CHAIN_MAELSTROM_AIM_WALKING,
+	CHAIN_MAELSTROM_AIM_RUNNING,
+
+	CHAIN_MAELSTROM_STAND_WITH_RESOURCE,
+	CHAIN_MAELSTROM_WALK_WITH_RESOURCE
+#endif
 };
 
 enum AnimationTerrainTypeID

@@ -108,6 +108,8 @@ public:
 	~cCoastSprites();
 	//void serialize(Archive& ar);
 	void serialize(Archive& ar);
+	const CoastSpritesAttributes& attributes() const { return attributes_; }
+	void setAttributes(const CoastSpritesAttributes& attributes);
 	void Draw(Camera* camera);
 	void Animate(float dt);
 	void DrawSimpleCoastSprite(Camera* camera);
@@ -125,6 +127,7 @@ public:
 	void PreDraw(Camera* camera);
 	virtual int sortIndex()const{return 0;}
 protected:
+	void applyAttributes();
 	void SoftClampGenerate(int num_sprites,float dt,float animation_time,float& soft_clamp);
 	CoastSpritesAttributes attributes_;
 	float soft_clamp_simple;

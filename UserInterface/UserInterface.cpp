@@ -1729,6 +1729,9 @@ BEGIN_ENUM_DESCRIPTOR(UI_ControlActionID, "UI_ControlActionID")
 REGISTER_ENUM(UI_ACTION_NONE, "нет")
 REGISTER_ENUM(UI_ACTION_INVERT_SHOW_PRIORITY, "привязки\\все привязки должны сработать (И)")
 REGISTER_ENUM(UI_ACTION_LOCALIZE_CONTROL, "управление интерфейсом\\локализировать")
+#ifdef MAELSTROM_DATA
+REGISTER_ENUM(UI_ACTION_EXPAND_TEMPLATE, "управление интерфейсом\\раскрыть шаблон в заголовке")
+#endif
 REGISTER_ENUM(UI_ACTION_HOVER_INFO, "управление интерфейсом\\информация при наведении")
 REGISTER_ENUM(UI_ACTION_LINK_TO_ANCHOR, "управление интерфейсом\\привязать к объекту на мире")
 REGISTER_ENUM(UI_ACTION_LINK_TO_PARENT, "управление интерфейсом\\привязать к координатам родителя")

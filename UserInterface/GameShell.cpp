@@ -456,7 +456,22 @@ void GameShell::GameLoad(const MissionDescription& mission)
 	stop_timer(1);
 
 	start_timer(2);
-	vMap.load(CurrentMission.worldName());
+	// vrtMap::load returns false when the world's own data is missing -- no world.cls to
+	// open, so allocMem4Buf never runs and vxaBuf stays null. Ignoring that let the mission
+	// go on to build a universe over a heightfield that was never allocated, and the first
+	// vrtMap::getAlt (VMAP.H:122) dereferenced the null. Both games ship worlds in that
+	// state: a .spg with no directory beside it -- Maelstrom's four TEST_* scenarios,
+	// Perimeter 2's cs_c1_open and intro_01. Abort with the world's name instead of
+	// faulting somewhere that says nothing about which world was at fault.
+	//
+	// The name goes out through dprintf as well as the abort: XErrorHandlerStub::Abort
+	// prints to stderr, and stderr no longer reaches the log by this point in startup --
+	// the renderers' own "ready" lines are the last thing to come through it -- so the
+	// abort alone would exit silently and say nothing about which world was at fault.
+	if(!vMap.load(CurrentMission.worldName())){
+		dprintf("World data is missing or unreadable: %s\n", CurrentMission.worldName());
+		ErrH.Abort("World data is missing or unreadable: ", XERR_USER, -1, CurrentMission.worldName());
+	}
 	stop_timer(2);
 
 	start_timer(3);

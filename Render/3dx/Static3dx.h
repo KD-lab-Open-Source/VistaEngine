@@ -57,6 +57,12 @@ public:
 	int Release();
 
 	bool load(const char* fileName);
+
+	/// Load Maelstrom's baked mesh cache (Resource\cacheData\baseCache\Models\*.dat),
+	/// the only form its unit and building models ship in. See the implementation for
+	/// how that container relates to a .3DX.
+	bool loadMaelstromCache(const char* fileName);
+
 	void serialize(Archive& ar);
 	void constructInPlace(const char* fileName);
 	void saveInPlace(const char* fileName);
@@ -119,6 +125,14 @@ public:
 	cSkinVertex GetSkinVertex(int num_weight){return cSkinVertex(num_weight,bump,isUV2,enableFur);}
 
 private:
+
+	// Maelstrom's baked mesh cache, read by loadMaelstromCache above.
+	void loadMaelstromChains(class CLoadData* ld);
+	void loadMaelstromGroups(class CLoadData* ld);
+	void loadMaelstromVisibilitySets(class CLoadData* ld);
+	void loadMaelstromOtherInfo(class CLoadData* ld);
+	void loadMaelstromLods(class CLoadData* ld);
+	void loadMaelstromLod(class CLoadDirectory rd, StaticLod& lod);
 
 	void BuildMeshes();
 	void BuildMeshesLod(const TempMeshes& tempMeshesIn, int ilod,bool debris);

@@ -364,6 +364,27 @@ if(VISTA_ASAN)
     message(STATUS "AddressSanitizer: ON (engine targets only; dependencies stay uninstrumented)")
 endif()
 
+# Which game's data this binary reads.
+#
+# Maelstrom (KD Lab, 2007) ships data written by a VistaEngine from before ~Aug 2007;
+# this tree is a 2008+ snapshot. Most of the drift the archive absorbs on its own --
+# XPrmIArchive skips names it does not know -- but where a field CHANGED NESTING or
+# CHANGED OWNER there is nothing to skip: the reader asks for a block the old writer
+# never wrote, and the whole subtree goes unread. Those sites cannot be served by one
+# body of code without guessing at load time which schema is in front of them, so they
+# are written twice and selected here.
+#
+# The rule at such a site is `#ifdef MAELSTROM_DATA` / `#else` / `#endif`, with the
+# 2008 layout in the #else so a stock build is the code that was already there. Grep
+# MAELSTROM_DATA for the full set; Documents/Maelstrom-PORTING.md explains each one.
+#
+# ON builds a Maelstrom binary, which cannot load Perimeter 2's data, and vice versa.
+option(MAELSTROM_DATA "Read Maelstrom's (pre-2008) data schema instead of Perimeter 2's" OFF)
+if(MAELSTROM_DATA)
+    add_compile_definitions(MAELSTROM_DATA)
+    message(STATUS "Data schema: Maelstrom (pre-2008)")
+endif()
+
 add_subdirectory(XLibs.Net)
 add_subdirectory(Util)
 add_subdirectory(AI)

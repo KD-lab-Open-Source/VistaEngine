@@ -235,6 +235,9 @@ bool pumpEvents(WindowEventSink sink)
 			break;
 
 		case SDL_EVENT_MOUSE_MOTION:
+			// Also latched for the pollers: GetCursorPos reads it, and the modal loops
+			// that run their own frame have nothing else to ask. See WindowsAPI.h.
+			PlatformSetMousePosition((int)event.motion.x, (int)event.motion.y);
 			sink(WM_MOUSEMOVE, currentMouseFlags(),
 			     packCoords(event.motion.x, event.motion.y));
 			break;
@@ -242,6 +245,7 @@ bool pumpEvents(WindowEventSink sink)
 		case SDL_EVENT_MOUSE_BUTTON_DOWN:
 		case SDL_EVENT_MOUSE_BUTTON_UP: {
 			bool down = event.button.down;
+			PlatformSetMousePosition((int)event.button.x, (int)event.button.y);
 			LPARAM lp = packCoords(event.button.x, event.button.y);
 			WPARAM wp = currentMouseFlags();
 			UINT msg = 0;

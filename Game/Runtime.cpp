@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "Platform/Window.h"
+#include "Platform/Cursor.h"
 #include "GameOptions.h"
 #include "SoundApp.h"
 #include "CameraManager.h"
@@ -602,6 +603,10 @@ static void dispatchWindowEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 bool pumpApplicationEvents()
 {
+	// Most of the game's cursors are animated, and SDL holds one image per cursor, so
+	// the frames are walked here -- once a frame, off the wall clock. See Platform/Cursor.h.
+	PlatformCursor::animate();
+
 	return PlatformWindow::pumpEvents(&dispatchWindowEvent);
 }
 

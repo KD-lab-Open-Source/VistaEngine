@@ -394,10 +394,11 @@ int cVisGeneric::GetMaxAnisotropyLevel()
 }
 void cVisGeneric::EnableSilhouettes(bool enable)
 {
-	if(gb_RenderDevice3D && gb_RenderDevice3D->IsPS20())
-		silhouettes_enabled = enable;
-	else
-		silhouettes_enabled =false;
+	// The IsPS20() test this used to make was a D3D9 capability check -- the outline needed a
+	// pixel shader, and a 2004 card might not have one. gb_RenderDevice3D is permanently null
+	// now, so keeping the guard answered "no shaders" every time and silently pinned the flag
+	// to false whatever the mission asked for. SDL GPU has no sub-SM2.0 tier to fall off.
+	silhouettes_enabled = enable;
 }
 
 void cVisGeneric::EnableOcclusion(bool b)

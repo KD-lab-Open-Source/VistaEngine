@@ -20,11 +20,17 @@ VoxelBox::~VoxelBox()
 
 void VoxelBox::create(cObject3dx* model)
 {
-	valid_ = true;
-	memset(buffer_.buffer(), 0, buffer_.size());
-
 	TriangleInfo info;
 	model->GetTriangleInfo(info,TIF_TRIANGLES|TIF_POSITIONS|TIF_ZERO_POS);
+
+	// GetTriangleInfo returns nothing when the model has no mesh built yet. Staying invalid
+	// leaves the box to be built by a later construction; marking it valid would freeze an
+	// empty box in place, and trace() reports a miss for every ray against one.
+	if(info.positions.empty())
+		return;
+
+	valid_ = true;
+	memset(buffer_.buffer(), 0, buffer_.size());
 
 	sBox6f bound;
 	vector<Vect3f>::iterator vi;

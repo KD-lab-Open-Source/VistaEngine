@@ -3,6 +3,7 @@
 
 #include "XTL/Handle.h"
 #include "Render/src/VisError.h"
+#include "Platform/Cursor.h"
 
 typedef void (*RedrawFunction)(void);
 
@@ -52,6 +53,15 @@ public:
 	
 	void setProgress(float val){
 		if(started_){
+			// The one thing that still has to move while the game loads. Windows animated
+			// .ani cursors itself, in the OS, so the hourglass turned however long the main
+			// thread stayed inside the load; SDL holds one image per cursor and leaves the
+			// walking to us (Platform/Cursor.h), and the frame loop -- where that normally
+			// happens -- is exactly what a load does not reach. This is the finest-grained
+			// beat the load has: callBack() reports every item, while showProgress() below
+			// only fires once the bar has moved a whole percent.
+			PlatformCursor::animate();
+
 			float oldProgress = progressCurrent_;
 			progressCurrent_ = getRealProgress(val);
 			xassert(progressCurrent_ >= oldProgress);
@@ -124,7 +134,7 @@ private:
 
 	RedrawFunction fRedraw_;
 
-	void showProgress() { 
+	void showProgress() {
 		if(fRedraw_)
 			(*fRedraw_)();
 	}

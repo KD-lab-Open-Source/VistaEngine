@@ -164,6 +164,358 @@ bool cStatic3dx::load(const char* fileName)
 	return true;
 }
 
+// Chunk ids Maelstrom's mesh cache uses on top of the shared C3DX_* table. They are
+// absent from Render/inc/3dx.h because this engine's own cache is an InPlace memory
+// image rather than a chunk stream; the values are from the Maelstrom tree's
+// IGameExporter3/3dx.h. The four-character ones are spelled out rather than written
+// as 'lods' so the value cannot depend on how a compiler orders multi-character
+// literals.
+namespace {
+	const int C3DX_MAEL_SKIN_GROUPS   = 1000;
+	const int C3DX_MAEL_SKIN_GROUP    = 1001;
+	const int C3DX_MAEL_BUFFERS       = 1200;
+	const int C3DX_MAEL_BUFFERS_HEAD  = 1201;
+	const int C3DX_MAEL_BUFFER_VERTEX = 1203;
+	const int C3DX_MAEL_BUFFER_INDEX  = 1204;
+
+	const int C3DX_MAEL_LODS   = 0x6C6F6473; // 'lods'
+	const int C3DX_MAEL_HEAD   = 0x68656164; // 'head'
+	const int C3DX_MAEL_DEBRIS = 0x64656272; // 'debr'
+}
+
+// Maelstrom (VistaEngine, 2007) shipped no .3DX for its units and buildings: those
+// models exist only as its baked mesh cache, Resource\cacheData\baseCache\Models\*.dat.
+// That cache is the same chunked container as a .3DX written with the same C3DX_* ids
+// (cStatic3dx::saveCacheData in the Maelstrom tree), so most of it feeds straight
+// through the ordinary loaders. Two things differ:
+//
+//  - the chunks sit at the top level instead of nested in C3DX_GRAPH_OBJECT, and
+//  - there is no C3DX_MESHES. Geometry arrives already baked, as a 'lods' chunk of
+//    vertex and index buffer bytes, so prepareMesh() must not run over it.
+//
+// The vertex layout did not change between the two engines -- cSkinVertex's offsets
+// are identical and ours only appends the optional fur field Maelstrom never had --
+// so the buffers go to the ordinary in-place path verbatim.
+bool cStatic3dx::loadMaelstromCache(const char* fileName)
+{
+	// fileName_ deliberately keeps pointing at the model, not at this cache file:
+	// LoadTexture and fixTextureName resolve textures as <model dir>\Textures\, which
+	// is the same convention Maelstrom's own cache reader used, and pointing it at the
+	// cache would send every lookup into the cache directory instead.
+	CLoadDirectoryFileRender rd;
+	if(!rd.Load(fileName))
+		return false;
+
+	// The chains block, nodes, materials, lights and camera are byte-identical to a
+	// .3DX -- Maelstrom's cache reader calls the very same loaders -- so they come in
+	// through the ordinary path, which ignores the ids it does not recognise.
+	rd.rewind();
+	LoadInternal(rd);
+
+	// The animation chunks cannot: baking flattened them, so C3DX_ANIMATION_GROUP and
+	// friends hold a plain record here where a .3DX nests sub-chunks under the same
+	// id. Feeding these to LoadChainData walks it off the end of the block.
+	rd.rewind();
+	while(CLoadData* ld = rd.next()){
+		switch(ld->id){
+		case C3DX_ANIMATION_CHAIN:
+			loadMaelstromChains(ld);
+			break;
+		case C3DX_ANIMATION_GROUPS:
+			loadMaelstromGroups(ld);
+			break;
+		case C3DX_ANIMATION_VISIBLE_SETS:
+			loadMaelstromVisibilitySets(ld);
+			break;
+		case C3DX_LOGOS:
+			logos.Load(ld);
+			break;
+		case C3DX_OTHER_INFO:
+			loadMaelstromOtherInfo(ld);
+			break;
+		case C3DX_MAEL_LODS:
+			loadMaelstromLods(ld);
+			break;
+		}
+	}
+
+	DummyVisibilitySet();
+
+	if(!is_logic)
+		createTextures();
+
+	return true;
+}
+
+void cStatic3dx::loadMaelstromChains(CLoadData* ld)
+{
+	CLoadDirectory rd(ld);
+	while(CLoadData* one = rd.next()){
+		if(one->id != C3DX_AC_ONE)
+			continue;
+
+		CLoadIterator it(one);
+		animationChains_.push_back(StaticAnimationChain());
+		StaticAnimationChain& chain = animationChains_.back();
+		it >> chain.name;
+		it >> chain.time;
+		// The cache stores no frame interval: baking had already resolved the splines
+		// it was cut from, so begin_frame/end_frame keep their constructed defaults.
+	}
+}
+
+void cStatic3dx::loadMaelstromGroups(CLoadData* ld)
+{
+	CLoadDirectory rd(ld);
+	while(CLoadData* one = rd.next()){
+		if(one->id != C3DX_ANIMATION_GROUP)
+			continue;
+
+		CLoadIterator it(one);
+		animationGroups_.push_back(AnimationGroup());
+		AnimationGroup& group = animationGroups_.back();
+		it >> group.name;
+		it >> group.nodes;
+		it >> group.nodesNames;
+		it >> group.materialsNames;
+	}
+}
+
+void cStatic3dx::loadMaelstromVisibilitySets(CLoadData* ld)
+{
+	CLoadDirectory rd(ld);
+	while(CLoadData* one = rd.next()){
+		if(one->id != C3DX_AVS_ONE)
+			continue;
+
+		visibilitySets_.push_back(StaticVisibilitySet());
+		StaticVisibilitySet& set = visibilitySets_.back();
+
+		// A set writes its groups twice. C3DX_AVS_ONE_RAW carries each one in full, and
+		// C3DX_AVS_ONE_LODS follows with three lists of indices back into them, one per
+		// LOD. This tree keeps a single group list per set, so the raw ones are held aside
+		// and the first LOD's list decides which of them the set ends up with.
+		StaticVisibilityGroups rawGroups;
+		vector<int> lodGroups;
+		bool allMeshesInSet = false;
+
+		CLoadDirectory parts(one);
+		while(CLoadData* part = parts.next()){
+			CLoadIterator it(part);
+			switch(part->id){
+			case C3DX_AVS_ONE_HEAD:
+				it >> set.name;
+				it >> allMeshesInSet;
+				it >> set.meshes;
+				break;
+			case C3DX_AVS_ONE_RAW:
+				rawGroups.push_back(StaticVisibilityGroup());
+				// Byte-for-byte the record StaticVisibilityGroup::Load already reads --
+				// it kept the throwaway `lod` field through the rewrite.
+				rawGroups.back().Load(it);
+				break;
+			case C3DX_AVS_ONE_LODS:
+				// Only the first of the three lists is taken. The other two name the same
+				// groups by the same names in the same order -- measured across all 1031
+				// cached models -- and each LOD renumbers its own visible_shift from bit
+				// 0, so LOD 0's list matches the bunch masks of every LOD.
+				it >> lodGroups;
+				break;
+			}
+		}
+
+		for(int i = 0; i < lodGroups.size(); i++)
+			if(lodGroups[i] >= 0 && lodGroups[i] < rawGroups.size())
+				set.visibilityGroups.push_back(rawGroups[lodGroups[i]]);
+
+		// A set with no LOD table at all keeps the raw list as written.
+		if(set.visibilityGroups.empty())
+			set.visibilityGroups.swap(rawGroups);
+
+		if(set.visibilityGroups.empty()){
+			// Nothing in the file: fall back to the catch-all group, and do by hand the
+			// bookkeeping prepareMesh() would have done -- hand out the visibility bit and
+			// turn the group's mesh names into the per-node flags cObject3dx::Update
+			// indexes. Baked geometry never reaches prepareMesh().
+			set.DummyVisibilityGroup();
+			for(int igroup = 0; igroup < set.visibilityGroups.size(); igroup++){
+				StaticVisibilityGroup& group = set.visibilityGroups[igroup];
+				group.visibility = 1 << igroup;
+				group.visibleNodes.resize(nodes.size());
+				for(int inode = 0; inode < nodes.size(); inode++)
+					group.visibleNodes[inode] =
+						allMeshesInSet || group.meshes.exists(nodes[inode].name);
+			}
+		}
+		else{
+			// visible_shift and the per-node flags both come out of the file, so there is
+			// nothing to synthesise. The flag array is written one entry per node in every
+			// cached model, but cObject3dx::Update indexes it by node without checking, so
+			// hold it to that length rather than trust the file.
+			StaticVisibilityGroups::iterator group;
+			FOR_EACH(set.visibilityGroups, group)
+				group->visibleNodes.resize(nodes.size());
+		}
+	}
+}
+
+void cStatic3dx::loadMaelstromOtherInfo(CLoadData* ld)
+{
+	CLoadIterator it(ld);
+	it >> is_lod;
+
+	// The basement -- a building's foundation footprint -- is a Maelstrom feature this
+	// engine dropped, but it sits mid-record, so it has to be read to stay in step.
+	vector<Vect3f> basementVertices;
+	vector<sPolygon> basementPolygons;
+	it >> basementVertices;
+	it >> basementPolygons;
+
+	// Maelstrom carries two boxes, and only one of them is the model's extent.
+	// cStaticLogicBound::bound is the optional logic/collision box -- its constructor
+	// zeroes it and most models never set it -- while cStatic3dx::bound_box is the real
+	// one, guarded by is_inialized_bound_box. The original's cObject3dx::GetBoundBox
+	// returns bound_box, so bound_box is what this tree's single boundBox must hold.
+	//
+	// Reading the logic box into it instead left boundBox empty for nearly every model,
+	// and nothing repaired it later: cObject3dx's constructor only recomputes a box when
+	// isBoundBoxInited is false, and Maelstrom's files set that flag true. The visible
+	// cost was UnitEnvironmentBuilding::setModel's `radius()/max(boundBox.radius2D(),
+	// 0.001f)`, where an empty box turns the floor into a x1000 multiplier -- corpses and
+	// other decor were built at scale ~10^4, and drawn into the shadow map (whose caster
+	// pipeline clamps depth rather than clipping it) they pinned every texel to 0, so the
+	// whole terrain read as shadowed.
+	sBox6f logicBound;
+	it >> logicBound.min;
+	it >> logicBound.max;
+
+	it >> is_logic;
+	it >> is_old_model;
+
+	it >> isBoundBoxInited;
+	it >> boundBox.min;
+	it >> boundBox.max;
+	it >> boundRadius;
+}
+
+void cStatic3dx::loadMaelstromLods(CLoadData* ld)
+{
+	CLoadDirectory dir(ld);
+
+	IF_FIND_DATA(C3DX_MAEL_HEAD){
+		DWORD count = 0;
+		rd >> count;
+		lods.resize(count);
+	}
+
+	// Each LOD is its own sub-directory keyed by the LOD index, not by a named id.
+	for(int i = 0; i < lods.size(); i++){
+		IF_FIND_DIR(i)
+			loadMaelstromLod(dir, lods[i]);
+	}
+
+	IF_FIND_DIR(C3DX_MAEL_DEBRIS)
+		loadMaelstromLod(dir, debris);
+}
+
+void cStatic3dx::loadMaelstromLod(CLoadDirectory rd, StaticLod& lod)
+{
+	LodCache cache;
+
+	while(CLoadData* ld = rd.next()){
+		switch(ld->id){
+		case C3DX_MAEL_SKIN_GROUPS:
+			{
+				CLoadDirectory groups(ld);
+				while(CLoadData* group = groups.next()){
+					if(group->id != C3DX_MAEL_SKIN_GROUP)
+						continue;
+
+					CLoadIterator it(group);
+					lod.bunches.push_back(StaticBunch());
+					StaticBunch& bunch = lod.bunches.back();
+					it >> bunch.imaterial;
+					it >> bunch.nodeIndices;
+					it >> bunch.num_polygon;
+					it >> bunch.num_vertex;
+					it >> bunch.offset_polygon;
+					it >> bunch.offset_vertex;
+
+					DWORD visibleGroups = 0;
+					it >> visibleGroups;
+					bunch.visibleGroups.resize(visibleGroups);
+					for(DWORD i = 0; i < visibleGroups; i++){
+						cTempVisibleGroup& group = bunch.visibleGroups[i];
+						it >> group.begin_polygon;
+						it >> group.num_polygon;
+						it >> group.visibilities;
+						it >> group.visibilitySet;
+						// Maelstrom's record ends here; visibilityNodeIndex is this
+						// tree's addition and has no value in the stream.
+						group.visibilityNodeIndex = -1;
+					}
+				}
+			}
+			break;
+		case C3DX_MAEL_BUFFERS:
+			{
+				CLoadDirectory buffers(ld);
+				while(CLoadData* buffer = buffers.next()){
+					CLoadIterator it(buffer);
+					switch(buffer->id){
+					case C3DX_MAEL_BUFFERS_HEAD:
+						// bump and isUV2 select the vertex layout, so they have to be
+						// set before the buffer bytes are handed to cSkinVertex below.
+						it >> cache.polygonNumber;
+						it >> cache.vertexNumber;
+						it >> lod.blend_indices;
+						it >> bump;
+						it >> isUV2;
+						break;
+					case C3DX_MAEL_BUFFER_VERTEX:
+						{
+							int size = 0;
+							it >> size;
+							cache.vbBlock.alloc(size);
+							it.read(cache.vbBlock.buffer(), size);
+						}
+						break;
+					case C3DX_MAEL_BUFFER_INDEX:
+						{
+							int size = 0;
+							it >> size;
+							cache.ibBlock.alloc(size);
+							it.read(cache.ibBlock.buffer(), size);
+						}
+						break;
+					}
+				}
+			}
+			break;
+		}
+	}
+
+	// Maelstrom had no fur, and its cSkinVertex had no field for one; leaving the flag
+	// set would shift every offset past the texture coordinates.
+	enableFur = false;
+
+	if(cache.vertexNumber > 0)
+		cache.vertexSize = int(cache.vbBlock.size() / cache.vertexNumber);
+
+	lod.initBuffersInPlace(cache, this);
+
+	// The stride the buffer was baked at has to agree with the one this engine's vertex
+	// declaration produces, or every vertex after the first is read from the wrong
+	// offset. It should -- cSkinVertex's layout is unchanged between the two engines --
+	// so say which model disagreed rather than quietly drawing the garbage: a mismatch
+	// means the format flags above were read wrong, not that the model is broken.
+	if(cache.vertexNumber > 0 && lod.vb.GetVertexSize() != cache.vertexSize)
+		errlog() << "Maelstrom cache: vertex stride " << cache.vertexSize
+		         << ", declaration says " << lod.vb.GetVertexSize()
+		         << " (blend " << lod.blend_indices << ", bump " << int(bump)
+		         << ", uv2 " << int(isUV2) << ")" << VERR_END;
+}
+
 void cStatic3dx::createTextures()
 {
 	StaticMaterials::iterator mi;
@@ -281,7 +633,13 @@ void cStatic3dx::prepareMesh()
 	PrepareIndices();
 	ParseEffect();
 
-	if(!is_logic && gb_RenderDevice3D){ // no world-render GPU device on SDL backend yet (model VB/IB unsupported)
+	// A logic model has no drawable geometry. Everything else needs its buffers built,
+	// and BuildMeshesLod/BuildFromNode raise them through gb_RenderDevice's
+	// Create/Lock{Vertex,Index}Buffer, which the SDL device implements -- so the test is
+	// simply whether a device exists. This used to read gb_RenderDevice3D, back when the
+	// SDL backend had no model VB/IB at all; that pointer is null on every platform now,
+	// so the guard had quietly stopped building any mesh reached through this path.
+	if(!is_logic && gb_RenderDevice){
 		BuildMeshes();
 		CreateDebrises();
 	}

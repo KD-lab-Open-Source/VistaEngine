@@ -1821,8 +1821,18 @@ void UI_ControlCustom::serialize(Archive& ar)
 				ar.serialize(drawInstallZones_, "drawInstallZones", "Показывать зоны установки");
 			ar.serialize(drawWindDirection_, "drawWindDirection", "Рисовать направление ветра");
 			ar.serialize(rotateByCamera_, "rotateByCamera", "Может вращаться за камерой");
-			if(rotateByCamera_)
+			if(rotateByCamera_){
 				ar.serialize(rotateByCameraInitial_, "rotateByCameraInitial", "Вращаться за камерой");
+#ifdef MAELSTROM_DATA
+				// "May rotate with the camera" and "take the angle from the world" are
+				// independent flags written side by side here; 2008 made the second
+				// exclusive with the first, so a control that sets both never has its
+				// angle read. Rotating the map always rescaled it to fit back then, too --
+				// rotationScale did not exist, and its default is the old behaviour.
+				if(ar.isInput() && ar.serialize(getAngleFromWorld_, "getAngleFromWorld", "Брать угол поворота из мира"))
+					rotationScale_ = true;
+#endif
+			}
 			else
 				ar.serialize(getAngleFromWorld_, "getAngleFromWorld", "Брать угол поворота из мира");
 			ar.serialize(rotationScale_, "rotationScale", "Масштабировать при вращении");
@@ -1833,6 +1843,28 @@ void UI_ControlCustom::serialize(Archive& ar)
 }
 
 // ------------------- UI_ControlUnitList
+
+#ifdef MAELSTROM_DATA
+namespace {
+/// One entry of the pre-2008 unit-picture list: the unit it belongs to, the show mode it
+/// applies to, and the sprite itself. "unitAttributeReferenre_" is the original's spelling.
+struct MaelstromUnitSprite
+{
+	AttributeUnitOrBuildingReference unit;
+	UI_ControlShowModeID mode;
+	UI_Sprite sprite;
+
+	MaelstromUnitSprite() : mode(UI_SHOW_NORMAL) {}
+
+	void serialize(Archive& ar)
+	{
+		ar.serialize(unit, "unitAttributeReferenre_", "&юнит");
+		ar.serialize(mode, "ID_", "&состояние");
+		ar.serialize(sprite, "sprite_", "текстура");
+	}
+};
+}
+#endif
 
 UI_ControlUnitList::UI_ControlUnitList()
 {
@@ -1870,9 +1902,33 @@ void UI_ControlUnitList::serialize(Archive& ar)
 	ar.serialize(type_, "type_", "тип списка");
 	if(type_ == UI_UNITLIST_SQUADS_IN_WORLD)
 		ar.serialize(squadRef_, "squadRef", "Тип сквада");
+#ifdef MAELSTROM_DATA
+	// Pre-2008 kept the pictures flat, one entry per (unit, show mode) pair, under a name
+	// carrying the member's trailing underscore -- and used the FIRST entry of that list for
+	// every unit the list does not name. 2008 keyed the table by unit, moved the show modes
+	// inside the value, dropped the underscore from the wire name, and gave the unnamed
+	// stand-in a field of its own. So our reader asks for two names the data never wrote and
+	// every slot of every unit list draws blank: no picture for a selected unit, and a
+	// multiple selection reduced to its health bars. Read the old list and fold it into the
+	// new shape -- the lookup rule survives the fold, because UI_ShowModeSprite::sprite()
+	// falls back to the first entry it holds exactly as getSprite() fell back to the first
+	// entry of the list. Only the input direction is meaningful; nothing writes this data back.
+	if(ar.isInput()){
+		vector<MaelstromUnitSprite> sprites;
+		if(ar.serialize(sprites, "unitSpriteParams_", "картинки юнитов") && !sprites.empty()){
+			unitSpriteParams_.clear();
+			defSprite_ = UI_ShowModeSprite();
+			vector<MaelstromUnitSprite>::const_iterator it;
+			FOR_EACH(sprites, it)
+				unitSpriteParams_[it->unit].addSprite(it->mode, it->sprite);
+			defSprite_.addSprite(sprites.front().mode, sprites.front().sprite);
+		}
+	}
+#else
 	ar.serialize(defSprite_, "defSprite", "Картинка по умолчанию");
 	ar.serialize(unitSpriteParams_, "unitSpriteParams", "приоритетные картинки юнитов");
-	
+#endif
+
 	float scaleFactor = (activeTransform_.scale().x - 1.f) * 100;
 	ar.serialize(scaleFactor, "scaleFactor", "% изменения активной ячейки");
 	scaleFactor = 1.f + scaleFactor / 100.f;
@@ -2134,13 +2190,38 @@ void UI_ControlBase::serialize(Archive& ar)
 
 	ar.serialize(canHovered_, "canHovered", "реагирует на мышь");
 
+#ifdef MAELSTROM_DATA
+	// The depth is written as "screenZ_" here and lost its underscore by 2008. Ask for
+	// the 2008 name and every control keeps the constructed 0, so the screen draws in
+	// list order instead of in depth order -- backgrounds land on top of what they back.
+	ar.serialize(screenZ_, "screenZ_", "Глубина");
+#else
 	ar.serialize(screenZ_, "screenZ", "Глубина");
+#endif
 
 	if(ar.openBlock ("text", "текст")){
 		if(!ar.serialize(text_, "text", "<")){
 			string ansitext;
 			ar.serialize(ansitext, "text_", 0);
 			a2w(text_, ansitext);
+
+#ifdef MAELSTROM_DATA
+			// A caption is a key into the localization database ("locText"), resolved
+			// through TextDB at load; the literal "text_" above is only written when that
+			// key is empty. By 2008 the indirection was gone and UI_Attributes is itself
+			// per-language. Skip the key and every caption is blank, and a control with
+			// no text draws no text: the buttons come up as bare sprites.
+			if(ar.isInput() && text_.empty()){
+				LocString locText;
+				if(ar.serialize(locText, "locText", 0))
+					text_ = locText.c_str();
+			}
+			// Kept unexpanded for UI_ACTION_EXPAND_TEMPLATE, which reads it rather than the
+			// caption it writes: six controls carry a template here, the in-game clock's
+			// "{time_h12} : {time_min} {time_ampm}" among them.
+			if(ar.isInput())
+				locText_ = text_;
+#endif
 		}
 		ar.serialize(textAlign_, "textAlign_", "горизонтально");
 		ar.serialize(textVAlign_, "textVAlign", "вертикально");
@@ -2152,12 +2233,44 @@ void UI_ControlBase::serialize(Archive& ar)
 	if(ar.openBlock("border", "рамка"))
 	{
 		ar.serialize(borderOutline_, "borderOutline", "обводка");
+#ifdef MAELSTROM_DATA
+		// Both border colours are floats named "border*Color" and are bytes named
+		// "border*Clr" in 2008 -- a rename *and* a type change, so neither the archive's
+		// name skipping nor a re-read bridges it; Color4c::serialize pointed at a float
+		// aborts the load mid-number. The flags kept their names, so asking for the 2008
+		// colour switches the border on and leaves it at the constructed opaque white. A
+		// screen's full-screen "background" control is exactly that: a fill meant to dim
+		// the world behind it to 30% black, which instead paints the whole screen white.
+		if(borderOutline_ && ar.isInput()){
+			Color4f color = Color4f::ZERO;
+			if(ar.serialize(color, "borderOutlineColor", "цвет рамки"))
+				borderOutlineColor_ = color;
+		}
+
+		ar.serialize(borderFill_, "borderFill", "заливка");
+		if(borderFill_ && ar.isInput()){
+			Color4f color = Color4f::ZERO;
+			if(ar.serialize(color, "borderColor", "цвет заливки"))
+				borderColor_ = color;
+		}
+
+		// Drawing the border is gated on a third flag above the other two; 2008 dropped
+		// it, which turns every "keep the colours but don't draw" control into a visible
+		// rectangle. Only ask when one of them is set -- a name the data does not carry
+		// costs the archive a rescan of the whole control, children and all.
+		if(ar.isInput() && (borderFill_ || borderOutline_)){
+			bool borderEnabled = true;
+			if(ar.serialize(borderEnabled, "borderEnabled", 0) && !borderEnabled)
+				borderFill_ = borderOutline_ = false;
+		}
+#else
 		if(borderOutline_)
 			ar.serialize(borderOutlineColor_, "borderOutlineClr", "цвет рамки");
 
 		ar.serialize(borderFill_, "borderFill", "заливка");
 		if(borderFill_)
 			ar.serialize(borderColor_, "borderClr", "цвет заливки");
+#endif
 
 		ar.closeBlock ();
 	}
@@ -2244,6 +2357,10 @@ void UI_ControlBase::serialize(Archive& ar)
 				plink->setShift(parent->position().left_top() - position().left_top());
 
 	ar.serialize(actions_, "actions", "назначения");
+#ifdef MAELSTROM_DATA
+	// After the list is read, not before: reading it replaces the vector.
+	UI_ActionDataHoverInfo::appendMaelstromHover(ar, actions_);
+#endif
 	ar.serialize(backgroundAnimations_, "backgroundAnimations", "анимационные цепочки");
 
 	if(ar.isInput())
@@ -2524,11 +2641,29 @@ void UI_ControlBase::doShow()
 			else
 				redrawLock_ = false;
 		}
-		else
+		else {
 			isVisible_ = true;
+			restoreShownTransform();
+		}
 	}
 
 	showChildControls();
+}
+
+// An animated hide leaves alpha_ (and the position) at the far end of the deactivation
+// transform. On an active screen applyShow() winds that back; on an inactive one doShow()
+// and doShowByTrigger() used to set the visibility flag and nothing else, so a control hidden while
+// the screen was active and shown again while it was not stayed at alpha 0 for good --
+// drawn every frame, perfectly transparent. Pre-2008 had no isActive() gate here and always
+// went through applyShow(); this restores what that guaranteed without doing background-scene
+// work for a screen that is not on show. See Documents/Maelstrom-PORTING.md.
+void UI_ControlBase::restoreShownTransform()
+{
+	if(!isVisible_ || !isVisibleByTrigger_)
+		return;
+
+	transformMode_ = TRANSFORM_NONE;
+	setActivationTransform(0.f, true);
 }
 
 void UI_ControlBase::showChildControls()
@@ -2591,8 +2726,10 @@ void UI_ControlBase::doShowByTrigger()
 			else
 				redrawLock_ = false;
 		}
-		else
+		else {
 			isVisibleByTrigger_ = true;
+			restoreShownTransform();
+		}
 	}
 
 	std::for_each(controls_.begin(), controls_.end(), [](auto& c){ c->doShowByTrigger(); });

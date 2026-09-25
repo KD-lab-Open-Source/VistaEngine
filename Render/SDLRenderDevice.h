@@ -48,6 +48,7 @@ class SDLCloudShadowRenderer;
 class SDLEnvironmentEarthRenderer;
 class SDLPostEffectRenderer;
 class SDLWorldLineRenderer;
+class SDLBlobsRenderer;
 class cTileMap;
 
 // Restrict drawing to a camera's viewport, the way cD3DRender::SetDrawTransform hands
@@ -110,6 +111,11 @@ SDLEnvironmentEarthRenderer* sdlEnvironmentEarthRenderer();
 // record into it exactly as they drive PSMonochrome / PSUnderWater on Windows; the device
 // composites the chain in drawPostEffects(). See SDLPostEffectRenderer.h.
 SDLPostEffectRenderer* sdlPostEffectRenderer();
+
+// The SDL backend's metaball renderer, or null under any other device. cBlobs drives it
+// exactly as it drove the device's quad buffer and PSBlobsShader on Windows; the device
+// runs both of its passes in drawBlobs(). See SDLBlobsRenderer.h.
+SDLBlobsRenderer* sdlBlobsRenderer();
 
 class cSDLRenderDevice : public cInterfaceRenderDevice
 {
@@ -205,6 +211,15 @@ public:
 	// BeginScene..EndScene and replay in one pass before the UI, see
 	// SDLWorldLineRenderer.h.
 	SDLWorldLineRenderer* lineRenderer() { return lineRenderer_.get(); }
+
+	// --- The logo splash's metaballs -----------------------------------------
+	// cBlobs records its cells and its composite here and calls drawBlobs, which stands in
+	// for drawPostEffects for that frame: it settles the same scene capture and composites
+	// it to the swapchain through the metaball field instead of through the effect chain.
+	// The splash has no Environment, so no post effect is ever recorded alongside it.
+	// See SDLBlobsRenderer.h.
+	SDLBlobsRenderer* blobsRenderer() { return blobsRenderer_.get(); }
+	void drawBlobs();
 
 	// --- UI and minimap -----------------------------------------------------
 	// Neither has a draw call of its own. The UI renderer's pass runs at EndScene, over
@@ -332,6 +347,18 @@ public:
 	// True once a caster pass has filled the map this frame. Receivers must check it:
 	// cScene detaches the light camera whenever shadows are off, and the map outlives it.
 	bool shadowPassRan() const { return shadowPassRan_; }
+
+	// --- the sky cubemap --------------------------------------------------
+	// cRenderCubemap's cube texture, which D3D made with CreateCubeTexture. Six faces of
+	// one square texture, sampled by the object shader's reflection path.
+	int createCubeTexture(cTexture* texture);
+	// Copy a face into it. The faces are NOT rendered into directly: every renderer here
+	// builds its own SDL_GPUColorTargetInfo, so aiming a pass at one cube layer would mean
+	// a layer argument through all ten of them. Instead cRenderSky draws a face into an
+	// ordinary offscreen 2D target -- the path the water reflection already proves -- and
+	// this copies that into the layer. One 256x256 copy per frame, since cRenderCubemap
+	// redraws one face per frame after the first.
+	void copyToCubeFace(cTexture* cube, int face, cTexture* source);
 
 	// --- 3dx objects ------------------------------------------------------
 	// cObject3dx::Draw talks to the object renderer directly (the way it talks to
@@ -696,6 +723,13 @@ private:
 	std::unique_ptr<SDLEnvironmentEarthRenderer> environmentEarthRenderer_;
 	std::unique_ptr<SDLPostEffectRenderer>  postEffectRenderer_;
 	std::unique_ptr<SDLWorldLineRenderer>   lineRenderer_;
+	std::unique_ptr<SDLBlobsRenderer>       blobsRenderer_;
+
+	// Settle the scene capture so a composite can sample a finished frame: replay what the
+	// scene walk still holds, and give a capture nothing drew into its clear. Shared by
+	// drawPostEffects and drawBlobs, which are the two composites. False if the capture is
+	// not armed, i.e. there is nothing to composite.
+	bool settleSceneCapture();
 };
 
 #endif // VISTA_SDL_RENDER_DEVICE_H

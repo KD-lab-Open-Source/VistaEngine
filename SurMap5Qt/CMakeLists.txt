@@ -283,4 +283,5 @@ target_include_directories(SurMap5Qt PRIVATE
 
 target_sources(SurMap5Qt PRIVATE
     ${CMAKE_SOURCE_DIR}/Platform/Window.cpp
+    ${CMAKE_SOURCE_DIR}/Platform/Cursor.cpp
 )

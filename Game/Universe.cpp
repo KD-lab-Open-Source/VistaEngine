@@ -211,6 +211,17 @@ universeObjectAction(0)
 		Archive& ar = *ia;
 		ar.setFilter(SERIALIZE_WORLD_DATA);
 		GameLoadManager::instance().setProgressAndStartSub(.05f, mission.userSave() ? 0.1f : 0.7f);
+#ifdef MAELSTROM_DATA
+		// This engine reads the environment first; Maelstrom's read it last, and its data
+		// depends on that. The world's sources live in the environment block there, and a
+		// source refers to units -- its owner, its targets, the squads a generator fills.
+		// Read before the players exist and those references resolve to nothing, which
+		// takes the first quant down on a legionary with no squad.
+		ar.serialize(*cameraManager, "camera", 0);
+		GameLoadManager::instance().finishAndStartSub(.95f);
+		ar.serialize(*this, "universe", 0);
+		ar.serialize(*environment, "environment", 0);
+#else
 		ar.serialize(*environment, "environment", 0);
 		fprintf(stderr, "Universe: [ctor] environment serialized\n"); fflush(stderr);
 		ar.serialize(*cameraManager, "camera", 0);
@@ -218,10 +229,15 @@ universeObjectAction(0)
 		GameLoadManager::instance().finishAndStartSub(.95f);
 		ar.serialize(*this, "universe", 0);
 		fprintf(stderr, "Universe: [ctor] universe serialized\n"); fflush(stderr);
+#endif
 		ar.setFilter(0);
 		GameLoadManager::instance().finishSub();
+#ifndef MAELSTROM_DATA
+		// A pre-2008 world writes MultiDetailRegion inside its environment block, and
+		// Environment::serialize reads it there.
 		vMap.serializeRegion(ar);
 		fprintf(stderr, "Universe: [ctor] region serialized\n"); fflush(stderr);
+#endif
 	}
 
 	GameLoadManager::instance().setProgress(1.f);
@@ -719,7 +735,11 @@ void Universe::serialize(Archive& ar)
 		}
 	}
 
+#ifndef MAELSTROM_DATA
+	// Maelstrom has no "sourceManager" block: its sources sit in the environment, which
+	// is deserialized after this. See Environment::serialize.
 	ar.serialize(*sourceManager, "sourceManager", 0);
+#endif
 
 	if(userSave()){
 		ar.serialize(intVariables_, "intVariables", 0);
@@ -755,7 +775,11 @@ STARFORCE_API bool Universe::universalSave(const MissionDescription& mission, bo
 	oa.serialize(*cameraManager, "camera", 0);
 	oa.serialize(*this, "universe", 0);
 	oa.setFilter(0);
+#ifndef MAELSTROM_DATA
+	// Written inside the environment block for this data, so that a save reads back the way
+	// a world does -- see the load above and Environment::serialize.
 	vMap.serializeRegion(oa);
+#endif
 
 	SECUROM_MARKER_HIGH_SECURITY_OFF(8);
 	return oa.close();

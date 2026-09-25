@@ -35,9 +35,15 @@ protected:
 
 	int linear_size;
 	cTexture *pTexture;
+	// Where a face is drawn before it is copied into pTexture's layer. D3D pointed each
+	// camera straight at a cube face surface; the SDL backend has no per-pass layer
+	// argument, so the faces go through one ordinary offscreen 2D target instead --
+	// cSDLRenderDevice::copyToCubeFace explains why.
+	cTexture *pFaceTarget;
 	IDirect3DSurface9* pZBuffer;
 	int cur_draw_phase;
 	virtual void DrawOne(int i);
+	void DrawFace(int i);
 };
 
 #endif

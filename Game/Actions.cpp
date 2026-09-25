@@ -3930,7 +3930,18 @@ void ActionMessage::activate()
 			UI_Dispatcher::instance().sendMessage(messageSetup_);
 			universe()->activeMessages().add(this);
 			int time = round(messageSetup_.displayTime()*1000.f);
+#ifdef MAELSTROM_DATA
+			// Pre-2008 a displayTime of 0 meant "finish the action now"; the message then
+			// lived on its own until a MESSAGE_REMOVE trigger took it down. 2008 read the
+			// same 0 as "show forever" (INT_INF below), which never lets the trigger leave
+			// WORKING -- and a trigger that never reaches DONE never activates its outgoing
+			// links (Trigger::setState, TriggerEditor/TriggerExport.cpp). Every Maelstrom
+			// hint is displayTime=0 with its close button watched by a follow-on trigger,
+			// so the 2008 reading strands the whole chain behind the first hint.
+			workTimer_.start(time);
+#else
 			workTimer_.start(time ? time : INT_INF);
+#endif
 			}
 			break;
 		case MESSAGE_REMOVE:
@@ -3946,10 +3957,10 @@ void ActionMessage::interrupt()
 } 
 
 bool ActionMessage::workedOut()
-{ 
+{
 	if(workTimer_.busy())
 		return false;
-	
+
 	if(!finishTimer_.started()){
 		finishTimer_.start(round(pause_*1000.f));
 		fadeTimer_.start(round(fadeTime_*1000.f));
@@ -3963,6 +3974,14 @@ bool ActionMessage::workedOut()
 		return false;
 	}
 	else{
+#ifdef MAELSTROM_DATA
+		// The other half of the displayTime change above: pre-2008 a finishing MESSAGE_ADD
+		// never took its own message down, it only stopped being a running action. What the
+		// message is worth on screen is UI_Message::aliveTime_ (UI_Types.cpp), which already
+		// reads displayTime the old way -- a real time, or ~10000s when it is 0. Removing
+		// here as well would erase every Maelstrom hint on the quant it appeared.
+		if(type_ != MESSAGE_ADD)
+#endif
         UI_Dispatcher::instance().removeMessage(messageSetup_, false);
 		universe()->activeMessages().remove(this);
 		workTimer_.stop();
@@ -3970,7 +3989,7 @@ bool ActionMessage::workedOut()
 		finishTimer_.stop();
 		return true;
 	}
-} 
+}
 
 bool ActionMessage::automaticCondition() const
 {

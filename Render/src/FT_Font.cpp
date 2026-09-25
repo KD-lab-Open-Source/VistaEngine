@@ -179,6 +179,16 @@ Font* FontManager::createFont(const char* ttf, uint8 font_pixel_size, const Font
 	
 	if(!prm)
 		prm = &defParam;
+
+#ifdef MAELSTROM_DATA
+	// Maelstrom shipped no TrueType: its faces are 1bpp bitmap masters that FreeType
+	// cannot open at all.  Same Font on the way out, so nothing downstream changes.
+	{
+		const char* dot = strrchr(ttf, '.');
+		if(dot && !stricmp(dot, ".font"))
+			return createBitmapFont(ttf, font_pixel_size, prm);
+	}
+#endif
 	
 	//dprintfW(L"Создается шрифт: %S размер: %d пикселов\n", ttf, font_pixel_size);
 	if(!render_->loadFont(ttf)){

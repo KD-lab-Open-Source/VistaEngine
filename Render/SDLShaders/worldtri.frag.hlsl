@@ -20,11 +20,18 @@
 // always bound -- a white 1x1 when there is no second texture -- so the pipeline's sampler
 // count is fixed.
 //
-// The premultiplied caveat: t0 and the vertex colour are premultiplied (see
-// worldquad.frag.hlsl), and so is t1, since every texture goes through the same decoder.
-// The colour operations read t1.rgb only, and the original read it raw. They agree while
-// t1 is opaque, which a modulate/detail map is; a t1 with real alpha would come out darker
-// than on D3D.
+// The premultiplied caveat: this pipeline blends a PREMULTIPLIED source -- (ONE, ...) where
+// D3D had (SRC_ALPHA, ...) -- so whatever it emits has to be the raw colour already times
+// its alpha. The vertex colour arrives that way from worldtri.vert.hlsl, but no decoder
+// premultiplies a texture (cTexture::isPremultiplied() is false for every one of them), so
+// t0 is premultiplied HERE, on ColorOp.y, exactly as the quad route does it. Leaving that
+// out is what drew the light columns as solid cones: FX_Light_Vertical*.tga is white all
+// over with the whole shape and its 1-25% opacity in the alpha channel, and blending it with
+// a src factor of ONE put that white in at full strength however transparent the texel was.
+//
+// t1 is left raw, which is what the original read. The colour operations use t1.rgb only, so
+// nothing here wants it premultiplied; the add is scaled by the finished alpha instead, so
+// that `(t0*c + t1) * a` -- the pixel D3D's SRC_ALPHA blend produced -- comes out unchanged.
 //
 // Authored in HLSL; cross-compiled to SPIR-V/MSL with SDL_shadercross. See
 // build-worldtri-shaders.sh.
@@ -42,6 +49,7 @@ SamplerState      ReflectionZSampler : register(s2, space2);
 cbuffer Params : register(b0, space3)
 {
     float4 ColorOp;   // .x = COLOR_OPERATION (0 none, 1 add, 2 mod, 3 mod2x, 4 mod4x)
+                      // .y != 0 = t0 arrived with STRAIGHT alpha and is premultiplied here
 
     // Distance fog: D3DRS_FOGCOLOR, and which of the two fog rules this group takes.
     // The factor itself arrives interpolated, in VSOutput::Fog.
@@ -97,15 +105,23 @@ float4 main(VSOutput input) : SV_Target0
         clip(input.ZRef.z - refz);
     }
 
-    float4 ot = Tex0.Sample(Tex0Sampler, input.UV0);
-    ot *= input.Color;
+    float4 t = Tex0.Sample(Tex0Sampler, input.UV0);
+    if(ColorOp.y != 0.0f)
+        t.rgb *= t.a;
+
+    // input.Color is already the vertex colour times its own alpha, so this product is the
+    // premultiplied form of D3D's `ot = tex2D(t0, uv0) * v.color`: rgb = raw * (t.a * c.a),
+    // a = t.a * c.a.
+    float4 ot = t * input.Color;
 
     const int op = (int)ColorOp.x;
     if(op != 0)
     {
         const float3 t1 = Tex1.Sample(Tex1Sampler, input.UV1).rgb;
         if(op == 1)
-            ot.rgb += t1;
+            // The add happened on the raw colour, before the blend scaled the sum by the
+            // alpha, so this term carries the same alpha the product above already has.
+            ot.rgb += t1 * (t.a * input.Color.a);
         else if(op == 2)
             ot.rgb *= t1;
         else if(op == 3)

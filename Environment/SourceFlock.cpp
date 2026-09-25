@@ -214,7 +214,12 @@ void Bird::create(const SourceFlock* owner)
 	model_ = terScene->CreateObject3dxDetached(owner->modelName());
 	xassert(model_);
 
-	model_->SetScale(logicRNDinterval(owner->modelSize().minimum(), owner->modelSize().maximum()));
+	// The size is a Rangef, and logicRNDinterval is the *integer* macro (logicRNDii takes
+	// int min, int max), so every flock model was scaled by a truncated 0 and drew as
+	// nothing. Maelstrom called `logicRndInterval(owner->modelSize())`, which resolved to
+	// an `inline float logicRndInterval(const Rangef&)` overload doing exactly the
+	// fabsRnd below; 2008 dropped that overload and rewrote the call to the int one.
+	model_->SetScale(logicRNDfabsRndInterval(owner->modelSize().minimum(), owner->modelSize().maximum()));
     	
 	model_->SetPosition(Se3f(relativePose_.rot(), realPosition()));
 	if(owner->hasAnimation()){

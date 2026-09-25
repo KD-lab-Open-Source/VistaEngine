@@ -546,30 +546,40 @@ void cCoastSprites::SetMode(CoastSpritesMode m)
 void cCoastSprites::serialize(Archive& ar)
 {
 	attributes_.serialize(ar);
-	if(ar.isInput()){
-		add_z = attributes_.heightOverWater_;
-		dieInCoast = attributes_.dieInCoast_;
-		if (attributes_.modeStay_ || attributes_.modeMove_)
-		{
-			CoastSpritesMode m = CSM_NOTHING;
-			if (attributes_.modeStay_)	m= CoastSpritesMode(m|CSM_SIMPLE);
-			if (attributes_.modeMove_)   m= CoastSpritesMode(m|CSM_MOVING);
-			SetMode(m);
-			speed = attributes_.movingSprites_.speed_/100;
+	if(ar.isInput())
+		applyAttributes();
+}
 
-			SetSpriteParameters(&attributes_.simpleSprites_);
-			SetSpriteParameters(&attributes_.movingSprites_,false);
+void cCoastSprites::setAttributes(const CoastSpritesAttributes& attributes)
+{
+	attributes_ = attributes;
+	applyAttributes();
+}
 
-		}
-		else{
-			SetMode(CSM_NOTHING);
-			simple_coast_sprite_centers.clear();
-			move_coast_sprite_centers.clear();
-			coast_sprites.clear();
-			mov_coast_sprites.clear();
-			Vect2i grid_size(pWater->GetGridSizeX(), pWater->GetGridSizeY());
-			memset(grid_center, 0, sizeof(SpriteCenterContainer)*grid_size.x*grid_size.y);
-		}
+void cCoastSprites::applyAttributes()
+{
+	add_z = attributes_.heightOverWater_;
+	dieInCoast = attributes_.dieInCoast_;
+	if (attributes_.modeStay_ || attributes_.modeMove_)
+	{
+		CoastSpritesMode m = CSM_NOTHING;
+		if (attributes_.modeStay_)	m= CoastSpritesMode(m|CSM_SIMPLE);
+		if (attributes_.modeMove_)   m= CoastSpritesMode(m|CSM_MOVING);
+		SetMode(m);
+		speed = attributes_.movingSprites_.speed_/100;
+
+		SetSpriteParameters(&attributes_.simpleSprites_);
+		SetSpriteParameters(&attributes_.movingSprites_,false);
+
+	}
+	else{
+		SetMode(CSM_NOTHING);
+		simple_coast_sprite_centers.clear();
+		move_coast_sprite_centers.clear();
+		coast_sprites.clear();
+		mov_coast_sprites.clear();
+		Vect2i grid_size(pWater->GetGridSizeX(), pWater->GetGridSizeY());
+		memset(grid_center, 0, sizeof(SpriteCenterContainer)*grid_size.x*grid_size.y);
 	}
 }
 

@@ -116,14 +116,19 @@ vista_shader_module(tilemap
     "tilemap_shadow_vert=tilemap_shadow.vert.hlsl:vertex"
     "tilemap_shadow_frag=tilemap_shadow.frag.hlsl:fragment")
 
-# REFLECTION=1 is the original's water_linear (samples the planar-reflection target);
-# REFLECTION=0 is water_easy. water_ice is the ice sheet cTemperature::Draw blends over the
+# cWater's three ported techniques, one HLSL pair built three ways (see water.vert.hlsl):
+# REFLECTION=1 is the original's water_linear (samples the planar-reflection target, when
+# the reflection option is on); CUBE=1 is water_cube (samples the sky cubemap, when it is
+# off); plain REFLECTION=0 is water_easy, the no-PS2.0 fallback we draw only when there is
+# no cubemap to sample. water_ice is the ice sheet cTemperature::Draw blends over the
 # surface (Render/shader/Water/water_ice.{vsl,psl}) -- see SDLWaterRenderer's ice path.
 vista_shader_module(water
-    "water_vert=water.vert.hlsl:vertex:REFLECTION=0"
-    "water_frag=water.frag.hlsl:fragment:REFLECTION=0"
-    "water_reflect_vert=water.vert.hlsl:vertex:REFLECTION=1"
-    "water_reflect_frag=water.frag.hlsl:fragment:REFLECTION=1"
+    "water_vert=water.vert.hlsl:vertex:REFLECTION=0,CUBE=0"
+    "water_frag=water.frag.hlsl:fragment:REFLECTION=0,CUBE=0"
+    "water_reflect_vert=water.vert.hlsl:vertex:REFLECTION=1,CUBE=0"
+    "water_reflect_frag=water.frag.hlsl:fragment:REFLECTION=1,CUBE=0"
+    "water_cube_vert=water.vert.hlsl:vertex:REFLECTION=0,CUBE=1"
+    "water_cube_frag=water.frag.hlsl:fragment:REFLECTION=0,CUBE=1"
     "water_ice_vert=water_ice.vert.hlsl:vertex"
     "water_ice_frag=water_ice.frag.hlsl:fragment")
 
@@ -141,12 +146,16 @@ vista_shader_module(object3dx
     "object3dx_skin_bump_vert=object3dx.vert.hlsl:vertex:SKINNED=1,BUMP=1"
     "object3dx_rigid_reflect_vert=object3dx.vert.hlsl:vertex:SKINNED=0,BUMP=0,REFLECTION=1"
     "object3dx_skin_reflect_vert=object3dx.vert.hlsl:vertex:SKINNED=1,BUMP=0,REFLECTION=1"
+    "object3dx_rigid_reflect_cube_vert=object3dx.vert.hlsl:vertex:SKINNED=0,BUMP=0,REFLECTION=1,REFLECT_CUBE=1"
+    "object3dx_skin_reflect_cube_vert=object3dx.vert.hlsl:vertex:SKINNED=1,BUMP=0,REFLECTION=1,REFLECT_CUBE=1"
     "object3dx_rigid_second_opacity_vert=object3dx.vert.hlsl:vertex:SKINNED=0,BUMP=0,SECOND_OPACITY=1"
     "object3dx_skin_second_opacity_vert=object3dx.vert.hlsl:vertex:SKINNED=1,BUMP=0,SECOND_OPACITY=1"
     "object3dx_frag=object3dx.frag.hlsl:fragment:BUMP=0"
     "object3dx_bump_frag=object3dx.frag.hlsl:fragment:BUMP=1"
     "object3dx_reflect_frag=object3dx.frag.hlsl:fragment:BUMP=0,REFLECTION=1"
+    "object3dx_reflect_cube_frag=object3dx.frag.hlsl:fragment:BUMP=0,REFLECTION=1,REFLECT_CUBE=1"
     "object3dx_second_opacity_frag=object3dx.frag.hlsl:fragment:BUMP=0,SECOND_OPACITY=1"
+    "object3dx_silhouette_frag=object3dx.frag.hlsl:fragment:BUMP=0,SILHOUETTE=1"
     "object3dx_shadow_rigid_vert=object3dx_shadow.vert.hlsl:vertex:SKINNED=0"
     "object3dx_shadow_skin_vert=object3dx_shadow.vert.hlsl:vertex:SKINNED=1"
     "object3dx_shadow_frag=object3dx_shadow.frag.hlsl:fragment")
@@ -160,6 +169,16 @@ vista_shader_module(posteffect
     "posteffect_monochrome_frag=monochrome.frag.hlsl:fragment"
     "posteffect_underwater_frag=underwater.frag.hlsl:fragment")
 
+# The logo splash's metaballs. Only the composite is new (blobs.frag.hlsl, the port of
+# Render/shader/PostProcessing/blobs.psl): the cell pass is a pixel-space textured quad
+# shaded `texture * diffuse`, which is exactly the UI pair, and the composite rides the
+# post effects' fullscreen triangle. See SDLBlobsRenderer.h.
+vista_shader_module(blobs
+    "blobs_cell_vert=ui.vert.hlsl:vertex"
+    "blobs_cell_frag=ui.frag.hlsl:fragment"
+    "blobs_vert=posteffect.vert.hlsl:vertex"
+    "blobs_frag=blobs.frag.hlsl:fragment")
+
 add_custom_target(VistaShaders DEPENDS ${SHADER_HEADERS})
 
 set(RENDER_SOURCES
@@ -168,6 +187,7 @@ set(RENDER_SOURCES
     src/AccessTexture.cpp
     src/CChaos.cpp
     src/ClippingMesh.cpp
+    src/BitmapFont.cpp
     src/FT_Font.cpp
     src/FileImage.cpp
     src/FogOfWar.cpp
@@ -220,6 +240,7 @@ set(RENDER_SOURCES
     SDLCloudShadowRenderer.cpp
     SDLEnvironmentEarthRenderer.cpp
     SDLPostEffectRenderer.cpp
+    SDLBlobsRenderer.cpp
     # Symbols the engine still names that the D3D backend used to define
     # (gb_RenderDevice, the sampler constants, the sPtr buffer handles).
     RenderStub.cpp

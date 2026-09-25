@@ -418,7 +418,11 @@ void SourceBase::environmentAnalysis()
 
 	if(move_by_wind_){
 		Vect2f wnd = windMap->getBilinear(clampWorldPosition(position2D(), 2));
-		wnd *= logicRNDinterval(windSensitivity_.minimum(), windSensitivity_.maximum());
+		// logicRNDinterval is the *integer* macro (logicRNDii takes int min, int max), so a
+		// float range collapses on the way in: 0.9..1.1 became 0..0, and logicRnd(0, 0)
+		// returns 0 without even drawing -- the wind was multiplied away to nothing. The
+		// float macro is the one the next line already uses.
+		wnd *= logicRNDfabsRndInterval(windSensitivity_.minimum(), windSensitivity_.maximum());
 		QuatF rndRotate(logicRNDfabsRndInterval(-M_PI_2, M_PI_2), Vect3f::K, 0);
 		Vect3f windVelocity(wnd, 0.f);
 		rndRotate.xform(windVelocity);

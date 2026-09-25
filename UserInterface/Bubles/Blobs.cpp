@@ -1,112 +1,83 @@
 #include "stdafx.h"
 #include "Blobs.h"
 #include "Render/src/FileImage.h"
-#include "Render/shader/shaders.h"
-#include "Render/src/TexLibrary.h"
-#include "Render/D3D/D3DRender.h"
+#include "Render/src/Texture.h"
+#include "Render/SDLRenderDevice.h"
+#include "Render/SDLBlobsRenderer.h"
+
+// Ported to SDL GPU. SDLBlobsRenderer takes what this pushed into the device's quad buffer
+// and PSBlobsShader, and cSDLRenderDevice::drawBlobs runs both of its passes -- the cells
+// into the metaball field, then field + frame -> the swapchain. See SDLBlobsRenderer.h.
+//
+// Everything below the draw calls was always portable and never stopped running: the cell
+// list, the falloff texture, the settings.
 
 cBlobs::cBlobs()
 {
-	pRenderTarget=NULL;
-	pBlobsShader=new PSBlobsShader;
-	pBlobsShader->Restore();
-
-	for(int i=0;i<num_planes;i++)
-		planeTextures[i]=NULL;
+	Texture = NULL;
 }
 
 cBlobs::~cBlobs()
 {
-	delete pBlobsShader;
-	RELEASE(pRenderTarget);
 	RELEASE(Texture);
-	for(int i=0;i<num_planes;i++)
-		RELEASE(planeTextures[i]);
 }
 
-void cBlobs::Init(int width,int height)
+// The frame the composite refracts. D3D9 rendered the scene to the back buffer and
+// StretchRect'ed a copy out of it each frame; SDL GPU cannot sample the swapchain, so the
+// scene walk is routed into the capture target instead and the composite reads that. It
+// has to be armed before anything draws -- hence a call of its own, at the top of the
+// frame, rather than inside BeginDraw (which runs after the scene).
+void cBlobs::BeginFrame()
 {
-	pRenderTarget=GetTexLibrary()->CreateRenderTexture(width,height,TEXTURE_RENDER32);
+	cSDLRenderDevice* device = sdlRenderDevice();
+	if(!device)
+		return;
+	device->armSceneCapture();
+}
+
+void cBlobs::Init(int /*width*/, int /*height*/)
+{
+	// The field target was cTexLibrary::CreateRenderTexture(width, height, TEXTURE_RENDER32)
+	// here. SDLBlobsRenderer owns it now and sizes it to the target it composites onto,
+	// which is the same screen size every caller passed.
 }
 
 void cBlobs::BeginDraw()
 {
-	if(gb_RenderDevice3D->IsPS20())
-	{
-		gb_RenderDevice3D->SetRenderTarget(pRenderTarget,NULL);
-		RDCALL(gb_RenderDevice3D->D3DDevice_->Clear(0,NULL,D3DCLEAR_TARGET,0,1,0));
-	}
-	gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,D3DCOLORWRITEENABLE_ALPHA|D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED);
+	if(SDLBlobsRenderer* renderer = sdlBlobsRenderer())
+		renderer->BeginCells();
 	points.clear();
 }
 
-void cBlobs::Draw(int x,int y,int plane, float phase)
+void cBlobs::Draw(int x, int y, int plane, float phase)
 {
 	points.push_back(Vect3f(x, y, phase));
 }
 
-void cBlobs::EndDraw(const cBlobsSetting& setting)
+void cBlobs::EndDraw()
 {
-	gb_RenderDevice3D->SetRenderState(D3DRS_COLORWRITEENABLE,D3DCOLORWRITEENABLE_ALPHA|D3DCOLORWRITEENABLE_BLUE|D3DCOLORWRITEENABLE_GREEN|D3DCOLORWRITEENABLE_RED);
-	int dx=Texture->GetWidth(),dy=Texture->GetHeight();
+	SDLBlobsRenderer* renderer = sdlBlobsRenderer();
+	if(!renderer || !Texture)
+		return;
 
-	gb_RenderDevice3D->SetNoMaterial(ALPHA_NONE,MatXf::ID,0,Texture);
-	gb_RenderDevice3D->SetBlendStateAlphaRef(ALPHA_ADDBLEND);
-	gb_RenderDevice3D->SetSamplerData(0,sampler_clamp_point);
+	// One additive sprite per cell, white scaled by the cell's phase -- the original drew
+	// them in cBlobsSetting::color_ only on the no-PS2.0 path, which is not ported (the
+	// composite tints the field itself). See SDLBlobsRenderer.h.
+	for(vector<Vect3f>::iterator it = points.begin(), ite = points.end(); it != ite; ++it)
+		renderer->AddCell(it->x, it->y, it->z);
 
-	cQuadBuffer<sVertexXYZWDT1>* quad=gb_RenderDevice3D->GetQuadBufferXYZWDT1();
-	quad->BeginDraw();
-	Color4c color;
-	if(gb_RenderDevice3D->IsPS20())
-		color.set(255,255,255);
-	else
-		color = setting.color_;
-	int dx2=dx/2,dy2=dy/2;
-	float w=0.99f;
-	for(vector<Vect3f>::iterator it=points.begin(),ite=points.end();it!=ite;++it)
-	{
-		Vect3f& p=*it;
-		sVertexXYZWDT1 *v=quad->Get();
-		v[0].x=p.x-dx2-0.5f; v[0].y=p.y-dy2-0.5f; v[0].z=v[0].w=w; v[0].u1()=0; v[0].v1()=0;v[0].diffuse = color; v[0].diffuse *= p.z;
-		v[1].x=p.x-dx2-0.5f; v[1].y=p.y+dy2-0.5f; v[1].z=v[1].w=w; v[1].u1()=0; v[1].v1()=1;v[1].diffuse = color; v[1].diffuse *= p.z;
-		v[2].x=p.x+dx2-0.5f; v[2].y=p.y-dy2-0.5f; v[2].z=v[2].w=w; v[2].u1()=1; v[2].v1()=0;v[2].diffuse = color; v[2].diffuse *= p.z;
-		v[3].x=p.x+dx2-0.5f; v[3].y=p.y+dy2-0.5f; v[3].z=v[3].w=w; v[3].u1()=1; v[3].v1()=1;v[3].diffuse = color; v[3].diffuse *= p.z;
-	}
-	quad->EndDraw();
-
-	gb_RenderDevice3D->RestoreRenderTarget();
+	renderer->EndCells(Texture);
 }
 
-void cBlobs::DrawBlobsSimply(int x,int y)
+void cBlobs::DrawBlobsShader(float phase, const cBlobsSetting& setting)
 {
-	gb_RenderDevice->DrawSprite(x,y,pRenderTarget->GetWidth(),pRenderTarget->GetHeight(),
-						0,0,1,1,pRenderTarget,Color4c(255,255,255,255),0,ALPHA_NONE);
-}
+	SDLBlobsRenderer* renderer = sdlBlobsRenderer();
+	cSDLRenderDevice* device = sdlRenderDevice();
+	if(!renderer || !device)
+		return;
 
-void cBlobs::DrawBlobsShader(int x,int y, float phase, cTexture* texture, const cBlobsSetting& setting)
-{
-	//Не забыть выключить биоинейную интерполяцию наверно, для скорости потом.
-	gb_RenderDevice3D->SetBlendStateAlphaRef(ALPHA_NONE);
-	gb_RenderDevice3D->SetVertexShader(NULL);
-	
-
-	Vect4f def_color(setting.color_.r, setting.color_.g, setting.color_.b, setting.color_.a);
-	Vect4f spec_color(setting.specularColor_.r, setting.specularColor_.g, setting.specularColor_.b, 1.0f);
-	pBlobsShader->Select(pRenderTarget, def_color, spec_color, phase);
-	//for(int i=0;i<num_planes;i++)
-	//	gb_RenderDevice3D->SetTexture(i+1,planeTextures[i]);
-	gb_RenderDevice3D->SetTexture(1,texture);
-	gb_RenderDevice3D->DrawQuad(x,y,pRenderTarget->GetWidth(),pRenderTarget->GetHeight(),
-		0,0,1,1,Color4c(255,255,255,255));
-}
-
-//void cBlobs::SetTexture(const char* name)
-//{
-//	planeTextures[0] = GetTexLibrary()->GetElement2D(name);
-//}
-void cBlobs::SetTexture(cTexture* texture)
-{
-	planeTextures[0] = texture;
+	renderer->recordComposite(phase, setting.color_, setting.specularColor_);
+	device->drawBlobs();
 }
 
 void cBlobs::CreateBlobsTexture(int size)
@@ -147,15 +118,15 @@ void cBlobs::CreateBlobsTexture(int size)
 
 	cFileImageData fid(size,size,data);
 
-	// Creating a texture is the render *interface*'s job, not the D3D9 device's: gb_RenderDevice3D
-	// is null now that the backend is retired (Render/RenderStub.cpp), and this was a null
-	// dereference. The rest of cBlobs is not so easily rescued -- see ReelManager::showLogoModal.
+	// Creating a texture is the render *interface*'s job, not the D3D9 device's:
+	// gb_RenderDevice3D is null now that the backend is retired (Render/RenderStub.cpp),
+	// and this was a null dereference.
 	if(gb_RenderDevice->CreateTexture(Texture,&fid,-1,-1))
 	{
-		delete data;
 		delete Texture;
 		Texture = 0;
 	}
 
-	delete data;
+	// `data` is an array, and it was freed twice on the failure path above.
+	delete[] data;
 }

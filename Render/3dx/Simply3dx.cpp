@@ -132,9 +132,9 @@ float cSimply3dx::GetScale()const
 }
 
 
-// TODO(sdl-port): nothing calls this any more. It gated the z-prepass that keeps a fading
-// object from blending with itself, which was pure D3D render-state work. See
-// Documents/Render-PORTING.md #19.
+// Gates the z-prepass in Draw: an object being faded out whose texture carries no opacity
+// channel, so the fade is uniform over the whole model and every overlapping layer of it
+// would otherwise blend in turn. See Documents/Render-PORTING.md #19.
 bool cSimply3dx::IsDraw2Pass()
 {
 	return getAttribute(ATTRSIMPLY3DX_OPACITY) && !pStatic->is_opacity_texture;
@@ -169,9 +169,13 @@ void cSimply3dx::SelectMaterial(Camera* camera)
 		blend=ALPHA_NONE;
 
 	// One State carries what the D3D path spread across SetBlendState, SetTexturePhase and
-	// the vs/ps Select + SetMaterial calls. The alpha-test reference is not carried:
-	// SDLObject3dxRenderer derives it from the blend mode, so IsDraw2Pass's alpha-scaled
-	// ref (a fade trick) is not reproduced.
+	// the vs/ps Select + SetMaterial calls. The alpha-test reference is not carried, and
+	// does not need to be: SDLObject3dxRenderer derives the test from the blend mode and
+	// only ALPHA_TEST clips. D3D9 enabled the test for ALPHA_BLEND as well
+	// (D3DRender.cpp:1777), which is why IsDraw2Pass scaled the ref by the fade -- with the
+	// final alpha being that same fade, `alpha >= 80/255*alpha` holds for every texel, so
+	// the trick's whole effect was to stop the test culling the model as it faded. Here it
+	// never culls in the first place.
 	pStatic->sdlCamera_ = camera;
 
 	SDLObject3dxRenderer::State& st = pStatic->sdlState_;
@@ -293,8 +297,24 @@ void cSimply3dx::Draw(Camera* camera)
 
 
 	cStaticSimply3dx::ONE_LOD& lod=pStatic->lods[iLOD];
+
+	// A uniformly faded object -- opacity, and no opacity texture to vary it per texel -- is
+	// drawn twice: once to fill depth with no colour, once shading only the fragments that
+	// match that depth. Without it every overlapping layer of the model blends in turn and
+	// the object shows its own far side through its near one. The original did the same with
+	// D3D render states around these two DrawModels calls; the state now rides the pipeline,
+	// so it is set on the renderer instead. See Documents/Render-PORTING.md #19.
+	SDLObject3dxRenderer* renderer = IsDraw2Pass() ? sdlObjectRenderer() : nullptr;
+	if(renderer){
+		renderer->SetTwoPass(SDLObject3dxRenderer::PASS_DEPTH_ONLY);
+		pStatic->DrawModels(1,lod);
+		renderer->SetTwoPass(SDLObject3dxRenderer::PASS_DEPTH_EQUAL);
+	}
+
 	pStatic->DrawModels(1,lod);
 
+	if(renderer)
+		renderer->SetTwoPass(SDLObject3dxRenderer::PASS_NORMAL);
 }
 
 void cSimply3dx::PreDraw(Camera* camera)

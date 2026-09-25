@@ -17,6 +17,7 @@
 #include "EffectReference.h"
 #include "Units/EffectController.h"
 #include "Game/GlobalStatistics.h"
+#include "Platform/Cursor.h"
 
 #include "Controls.h"
 #include "XTL/CallWrapper.h"
@@ -324,6 +325,13 @@ struct UI_ShowModeSprite
 
 	const StateSprites& sprites() const { return sprites_; }
 
+#ifdef MAELSTROM_DATA
+	/// Pre-2008 wrote a UI_ControlUnitList's pictures as one flat (unit, mode, sprite) list
+	/// instead of a table per unit, so the reader of that layout has to build this table
+	/// entry by entry. See UI_ControlUnitList::serialize.
+	void addSprite(UI_ControlShowModeID mode, const UI_Sprite& sprite);
+#endif
+
 	void preLoad();
 	void release();
 
@@ -355,14 +363,14 @@ public:
 
 	void serialize(Archive& ar);
 
-	const HCURSOR cursor() const { return cursor_; }
+	PlatformCursor::Handle cursor() const { return cursor_; }
 	bool createCursor(const char* fname = NULL);
 	void releaseCursor();
 
 	const EffectReference& effectRef() const { return effectRef_; }
 private:
 	string fileName_;
-	HCURSOR cursor_;
+	PlatformCursor::Handle cursor_;
 	EffectReference effectRef_;
 };
 
@@ -381,6 +389,14 @@ public:
 	const UI_Cursor* hoveredCursor() const { return cursor_; }
 
 	void serialize(Archive& ar);
+
+#ifdef MAELSTROM_DATA
+	/// Reads the pre-2008 pair this action replaced -- "hoveredCursor" and "hoveredTextLoc",
+	/// written flat on the control and on the control state -- and, when there is a tooltip
+	/// to show, appends the action the rest of the engine looks for.
+	static void appendMaelstromHover(Archive& ar, UI_ControlActionList& actions);
+#endif
+
 private:
 
 	UI_CursorReference cursor_;
@@ -1064,6 +1080,13 @@ private:
 	float alpha_;
 
 	std::wstring text_;
+#ifdef MAELSTROM_DATA
+	// The caption as the localization database gave it, before UI_ACTION_EXPAND_TEMPLATE
+	// substituted anything into it. The original kept the same thing, under the same name --
+	// expanding into text_ alone would consume the template on the first update and leave
+	// nothing to expand on the next one.
+	std::wstring locText_;
+#endif
 	std::wstring newText_;
 	UI_TextAlign textAlign_;
 	UI_TextVAlign textVAlign_;
@@ -1118,6 +1141,8 @@ private:
 	void applyShow();
 	friend void fCommandControlApplyHide(void* data);
 	void applyHide(bool immediately);
+	/// Wind an animated hide back to the shown state, for a screen that is not active
+	void restoreShownTransform();
 
 	friend void logUIState(int line, const char* func, const UI_ControlBase* control, const wchar_t* str);
 };

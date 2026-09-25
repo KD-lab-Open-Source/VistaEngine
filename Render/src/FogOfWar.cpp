@@ -415,6 +415,20 @@ void FogOfWar::serialize(Archive& ar)
 	}
 }
 
+#ifdef MAELSTROM_DATA
+void FogOfWar::serializeMaelstrom(Archive& ar)
+{
+	// Field for field this is what serialize above reads; two of the three carry their
+	// old names, and the caller has already descended into the node they sit in.
+	ar.serialize(fogColor_, "fogOfWarColor", "Цвет тумана войны");
+	ar.serialize(RangedWrapperi(scoutAreaAlpha_, 0, 255), "scout_area_alpha", "Прозрачность разведанного");
+	ar.serialize(RangedWrapperi(fogMinimapAlpha_, 0, 255), "fogMinimapAlpha", "Прозрачность тумана войны на миникарте");
+
+	if(ar.isInput())
+		invAlpha = fogColor_.a > 0 ? (float)fogMinimapAlpha_/fogColor_.a : 0;
+}
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 
 FogOfWarMap::FogOfWarMap(FogOfWar *const fogOfWar, const Vect2i& size)

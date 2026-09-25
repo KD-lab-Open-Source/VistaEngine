@@ -1,13 +1,19 @@
 // Water-surface vertex shader for the SDL GPU backend.
 //
-// Two techniques, selected by -DREFLECTION:
+// Three techniques, selected by -DREFLECTION / -DCUBE:
 //
 //   REFLECTION=0 -- the original's water_easy.vsl (WATER_EMPTY), which cWater::Draw
-//                   selects on hardware without PS2.0, and which we select when the
-//                   planar-reflection target is off (cScene::EnableReflection).
+//                   selects on hardware without PS2.0. Now only a fallback: it is what
+//                   we draw when the technique below has no cubemap to sample.
 //   REFLECTION=1 -- the original's water_linear.vsl (WATER_LINEAR_REFLECTION): the same
 //                   thing plus the projective lookup into the reflection render target
 //                   and the world position the fragment shader needs for the sun glint.
+//   CUBE=1       -- the original's water_cube.vsl (WATER_REFLECTION), which the original
+//                   picks when the reflection option is OFF -- not water_easy, which is
+//                   the no-PS2.0 path. It reflects the sky cubemap instead of a planar
+//                   target. Note there is no glint term in the fragment shader: the sun
+//                   you see sliding over the crests is the sun *in the cubemap*, moved by
+//                   the wave slopes that perturb the lookup.
 //
 // Both compute, from water_easy.vsl:
 //
@@ -25,8 +31,19 @@
 //     o.uv_sky    = mul(v.pos, vMirrorVP);   // projective; divided by w in the fragment
 //     o.point_pos = v.pos;
 //
-// The third technique, water_cube.vsl (WATER_REFLECTION), samples the sky cubemap, which
-// has no SDL path yet; water_lava.vsl is its own shader pair.
+// water_cube.vsl adds the cubemap direction, verbatim including its oddity:
+//
+//     float3 dir = vCameraPos - v.pos;
+//     dir.z -= v.pos.z;                      // so dir.z = camera.z - 2*pos.z
+//     o.uv_mirror = normalize(dir);
+//
+// -- the surface-to-eye vector with z mirrored about the plane z=0, which is the cheap
+// reflection this technique settles for (the water is a heightfield near z=0, so a true
+// per-vertex reflection about the local surface would cost a normal the vertex does not
+// carry). Its uv_sky output is dropped: water_cube.psl declares it and never reads it, so
+// uvScaleOffsetSky / VSWater::SetSpeedSky feed nothing here.
+//
+// water_lava.vsl is its own shader pair, still unported.
 //
 // Dropped, each for want of the input rather than by choice: o.uv_lightmap (the
 // fog-of-war lightmap, behind #ifdef FOG_OF_WAR in the fragment shader) and o.fog (the
@@ -53,6 +70,10 @@ cbuffer Constants : register(b0, space1)
     // for the cards with no table fog; the plane form folds the view matrix in. (0,0,0,1)
     // means fog is off. See SDLRenderDevice.h.
     float4 FogPlane;
+    // The original's vCameraPos, the main camera's world position. water_cube.vsl builds
+    // its cubemap direction from it; declared either way so one C++ uniform struct serves
+    // all three variants. CUBE only.
+    float4 CameraPos;
 };
 
 struct VSInput
@@ -77,6 +98,9 @@ struct VSOutput
     float3 PointPos : TEXCOORD3;   // world position, for the eye vector
 #endif
     float  Fog      : TEXCOORD4;
+#if CUBE
+    float3 Mirror   : TEXCOORD5;   // water_cube.vsl's uv_mirror, the cubemap direction
+#endif
 };
 
 VSOutput main(VSInput input)
@@ -89,6 +113,11 @@ VSOutput main(VSInput input)
 #if REFLECTION
     output.UVSky    = mul(float4(input.Position, 1.0f), MirrorVP);
     output.PointPos = input.Position;
+#endif
+#if CUBE
+    float3 dir = CameraPos.xyz - input.Position;
+    dir.z -= input.Position.z;
+    output.Mirror = normalize(dir);
 #endif
     output.Fog = dot(float4(input.Position, 1.0f), FogPlane);
     return output;

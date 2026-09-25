@@ -7,6 +7,8 @@
 #include "Game/GameOptions.h"
 #include "UI_Render.h"
 
+const char* getLocDataPath();
+
 using namespace FT;
 
 UI_Font::UI_Font()
@@ -76,8 +78,18 @@ bool UI_Font::createFont()
 	prm.inBox = inBox;
 #endif
 
-	font_ = fontManager().createFont(fontFile_.c_str(), newSize, &prm);
-	xxassert(font_, (XBuffer() < fontFile_.c_str() < ":" <= newSize).c_str());
+	string path = fontFile_;
+#ifdef MAELSTROM_DATA
+	// Maelstrom's bitmap masters are per-language -- Russian/MAEL_small.font is Cyrillic
+	// where English/MAEL_small.font is Latin-1 -- so the converter writes them relative to
+	// the language directory and the current one is filled in here.  Same idiom as
+	// UI_Sprite.cpp, which forward-declares getLocDataPath() rather than pull in GameOptions.
+	if(!strncmp(path.c_str(), "LocData\\", 8))
+		path = string(getLocDataPath()) + (path.c_str() + 8);
+#endif
+
+	font_ = fontManager().createFont(path.c_str(), newSize, &prm);
+	xxassert(font_, (XBuffer() < path.c_str() < ":" <= newSize).c_str());
 
 	return font_ != 0;
 }

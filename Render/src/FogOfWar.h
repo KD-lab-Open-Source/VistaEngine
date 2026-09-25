@@ -91,6 +91,12 @@ public:
 	int sortIndex() const { return 10; }
 
 	void serialize(Archive& ar);
+#ifdef MAELSTROM_DATA
+	/// The same three fields, read where a pre-2008 world writes them: inside the world's
+	/// "environmentColors" node, and two of them under their old names. See
+	/// Environment::serialize.
+	void serializeMaelstrom(Archive& ar);
+#endif
 
 	void AnimateLogic();
 

@@ -26,6 +26,9 @@ set(GAME_SOURCES
     # SDL3 windowing and input — the engine's only window, on every platform, and
     # the one the SDL GPU device claims its swapchain on.
     ${CMAKE_SOURCE_DIR}/Platform/Window.cpp
+    # The mouse cursor: the game's own .cur/.ani files, decoded here and shown as SDL
+    # cursors. UserInterface calls it, and links against this executable's objects.
+    ${CMAKE_SOURCE_DIR}/Platform/Cursor.cpp
 )
 
 # Not built on any platform:

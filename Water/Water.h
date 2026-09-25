@@ -102,6 +102,11 @@ public:
 	void findMinMaxInArea(const Vect2i& center, int radius, int& zMin, int& zMax); // высоты zMin, zMax относительные
 
 	void serialize(Archive& ar);
+#ifdef MAELSTROM_DATA
+	/// The two constants a pre-2008 world keeps outside the water block, in its
+	/// "environmentColors" node. See Environment::serialize.
+	void serializeMaelstrom(Archive& ar);
+#endif
 
 	bool Trace(const Vect3f& begin, const Vect3f& end, Vect3f& intersecttion);
 

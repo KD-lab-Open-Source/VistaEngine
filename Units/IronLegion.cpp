@@ -496,12 +496,19 @@ void UnitLegionary::Quant()
 
 	// A legionary can outlive its squad: squad_ is a UnitLink, and UnitSquad::removeUnit
 	// clears it outright (IronLegion.cpp -- setSquad(0)) before deciding whether anything
-	// is left to kill. Everything below assumes there is a squad, and the automatic-join
+	// is left to kill. The living path below assumes there is a squad, and the automatic-join
 	// check dereferences it four times, so a legionary that has lost one takes the frame
 	// down. The engine used to guard this here and kill the unit; the check was dropped,
 	// and Maelstrom's worlds reach the state again -- their source zones damage what
 	// stands in them, and a squad can die a quant before its last legionary.
-	if(!squad()){
+	//
+	// Only a living one, though. Death itself clears the squad -- UnitLegionary::Kill calls
+	// squad()->removeUnit(this) -- so every corpse is squadless by construction, and killing
+	// one here returns before __super::Quant(), and so before the stateQuant() that advances
+	// StateDeath: the death chain never plays, the corpse never fades or clears, and Kill()
+	// re-registers a fresh unit ID every quant for the rest of the mission. Nothing below
+	// reads the squad until well past the !alive() early-out.
+	if(!squad() && alive()){
 		Kill();
 		return;
 	}

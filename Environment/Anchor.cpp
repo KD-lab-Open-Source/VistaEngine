@@ -77,6 +77,22 @@ void Anchor::serialize(Archive& ar)
 	ar.serialize(selected_, "active", 0);
 	ar.serialize(label_, "label", type_ == START_LOCATION ? 0 : "Имя метки");
 	ar.serialize(radius_, "radius", "Радиус");
+#ifdef MAELSTROM_DATA
+	// The symbol was a bare UI_MinimapSymbol the anchor owned outright, written as a plain
+	// nested "symbol" node and only by a MINIMAP_MARK; 2008 made it a polymorphic handle
+	// under "uisymbol". Asked for at the 2008 name nothing is found, symbol() stays null and
+	// UI_Minimap::addAnchor drops the anchor on the floor -- which is every campaign mission's
+	// objective marker: 47 of them across 16 worlds, all SYMBOL_SPRITE, 44 on the animated
+	// point.avi and 3 on escape.avi, the ring the minimap pulses over where you are being sent.
+	if(type_ == MINIMAP_MARK){
+		if(!symbol_)
+			symbol_.set(new UI_MinimapSymbolPolymorphic);
+		if(!ar.serialize(static_cast<UI_MinimapSymbol&>(*symbol_), "symbol", "Символ на миникарте") && ar.isInput())
+			symbol_ = 0;
+	}
+	else if(ar.isInput())
+		symbol_ = 0;
+#else
 	if(ar.isEdit()){
 		typedef OptionalPtr<UI_MinimapSymbolPolymorphic,
 			                PolymorphicHandle<UI_MinimapSymbolPolymorphic> > OptionalPtrType;
@@ -85,4 +101,5 @@ void Anchor::serialize(Archive& ar)
 	}
 	else
 		ar.serialize(symbol_, "uisymbol", "Символ на миникарте");
+#endif
 }

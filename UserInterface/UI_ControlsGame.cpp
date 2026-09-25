@@ -133,6 +133,20 @@ void UI_ControlBase::controlUpdate(ControlState& controlState)
 void UI_ControlBase::actionUpdate(UI_ControlActionID action_id, const UI_ActionData* action_data, ControlState& controlState)
 {
 	switch(action_id){
+#ifdef MAELSTROM_DATA
+		// 2008 gave the action its own string and an "expand" flag; before that it took the
+		// control's own caption. It hides the control when nothing expands, and -- unlike
+		// UI_ACTION_LOCALIZE_CONTROL below -- does not show it again when something does.
+		case UI_ACTION_EXPAND_TEMPLATE:{
+			wstring str = locText_;
+			UI_LogicDispatcher::instance().expandTextTemplate(str, ExpandInfo(ExpandInfo::MESSAGE));
+			if(!str.empty())
+				setText(str.c_str());
+			else
+				controlState.hide();
+			break;
+		}
+#endif
 		case UI_ACTION_LOCALIZE_CONTROL:
 			if(safe_cast<const UI_ActionDataLocString*>(action_data)->expand()){
 				wstring str(safe_cast<const UI_ActionDataLocString*>(action_data)->text());
