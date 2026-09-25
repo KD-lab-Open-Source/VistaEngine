@@ -1802,6 +1802,17 @@ void EngineViewport::drawFrame()
 	if(scene_)
 		scene_->SetDeltaTime(fxPaused_ ? 0.0f : (float)frameMs);
 
+	// TEMP CLEAN (убрать): VISTA_FX_CLEAN=1 — минимальный проход для эффектов.
+	{
+		static int s_set = -1;
+		if(s_set < 0){
+			s_set = getenv("VISTA_FX_CLEAN") ? 1 : 0;
+			if(s_set){
+				fxSetClean(true);
+			}
+		}
+	}
+
 	// CGeneralView::graphQuant (SurMap5/GeneralView.cpp:265) drained the
 	// universe's command streams before drawing. Units don't move their model
 	// directly: setPose writes a command into streamLogicCommand (or the
@@ -3008,6 +3019,13 @@ void EngineViewport::fxSetForceNoDepth(bool b)
 {
 	if(SDLWorldQuadRenderer* r = fxQuadRenderer())
 		r->setForceNoDepth(b);
+}
+
+// TEMP CLEAN (убрать): VISTA_FX_CLEAN=1 — минимальный проход для эффектов.
+void EngineViewport::fxSetClean(bool b)
+{
+	if(SDLWorldQuadRenderer* r = fxQuadRenderer())
+		r->setCleanFx(b);
 }
 
 void EngineViewport::fxSetForceNoFog(bool b)

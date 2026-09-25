@@ -186,6 +186,9 @@ public:
 	bool debugWireParticles() const { return debugWireParticles_; }
 	void setForceFlat(bool b) { forceFlat_ = b; }
 	bool forceFlat() const { return forceFlat_; }
+	// TEMP CLEAN (убрать): минимальный проход — без depth/тумана/premul/soft.
+	void setCleanFx(bool b) { cleanFx_ = b; }
+	bool cleanFx() const { return cleanFx_; }
 
 	// Replay the quads recorded so far into one colour+depth render pass, blended over the
 	// scene and writing no depth (ALPHA_BLEND with RS_ZWRITEENABLE off, as every caller's
@@ -351,6 +354,7 @@ private:
 	bool forceNoPremul_ = false;
 	bool debugWireParticles_ = false;
 	bool forceFlat_ = false;
+	bool cleanFx_ = false;   // TEMP CLEAN (убрать)
 };
 
 #endif // VISTA_SDL_WORLD_QUAD_RENDERER_H

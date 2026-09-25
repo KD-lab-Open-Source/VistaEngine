@@ -329,6 +329,7 @@ public:
 	// TEMP FX debug (убрать после диагностики): по одному выключать то, что
 	// может гасить частицы + проволочный каркас квадов линиями.
 	void fxSetForceNoDepth(bool b);
+	void fxSetClean(bool b);   // TEMP CLEAN (убрать)
 	void fxSetForceNoFog(bool b);
 	void fxSetForceNoSoft(bool b);
 	void fxSetForceNoPremul(bool b);
