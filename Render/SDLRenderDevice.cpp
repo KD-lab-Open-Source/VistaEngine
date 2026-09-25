@@ -1632,7 +1632,13 @@ int cSDLRenderDevice::createCubeTexture(cTexture* Texture)
 
 	SDL_GPUTextureCreateInfo ti = {};
 	ti.type = SDL_GPU_TEXTURETYPE_CUBE;
-	ti.format = SDL_GetGPUSwapchainTextureFormat(device_, window_);
+	// The active window's swapchain format, not window_: the Qt editor claims no
+	// SDL window at Initialize (PlatformWindow::current() is null), so window_ is
+	// null there and SDL_GetGPUSwapchainTextureFormat falls back to a default the
+	// D3D12 backend rejects for a cube colour target ("invalid parameter"). Every
+	// other swapchain-format query here goes through activeWindow() for the same
+	// reason.
+	ti.format = SDL_GetGPUSwapchainTextureFormat(device_, activeWindow());
 	ti.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER | SDL_GPU_TEXTUREUSAGE_COLOR_TARGET;
 	ti.width = (Uint32)w; ti.height = (Uint32)h;
 	ti.layer_count_or_depth = 6;

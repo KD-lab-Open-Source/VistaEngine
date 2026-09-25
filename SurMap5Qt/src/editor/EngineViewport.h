@@ -321,16 +321,6 @@ private:
 	};
 	void applyCamera();
 
-	// The camera's near/far planes, as the original editor computed them:
-	// CameraManager::SetFrustumEditor -> calcZMinMax(), i.e. the environment's
-	// game frustum (defaults 30..4000), not a hand-rolled huge far plane.
-	// The Qt port used max(12000, distance*3) for zFar, which crushed the
-	// depth-buffer precision and made ground-level additive effects (energy
-	// beams/columns, coast foam) z-fight with the terrain and disappear.
-	// Kept >= the whole map + orbit distance so zooming out never clips, but
-	// the near plane scales with the far one to bound the far/near ratio.
-	void editorZPlane(float& zMin, float& zMax) const;
-
 	// CGeneralView::drawGrid — the editor's terrain grid.
 	void drawGrid();
 

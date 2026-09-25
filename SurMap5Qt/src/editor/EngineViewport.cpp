@@ -1386,12 +1386,6 @@ bool EngineViewport::loadWorld(const char* worldsDir, const char* worldName)
 	orbit_.psi = 0.f;
 	orbit_.theta = 0.f;
 	applyCamera();
-	const Vect2f center(0.5f, 0.5f);
-	const sRectangle4f clip(-0.5f, -0.5f, 0.5f, 0.5f);
-	const Vect2f focus(orbit_.focus, orbit_.focus);
-	float zMin = 0.f, zMax = 0.f; editorZPlane(zMin, zMax);
-	const Vect2f zPlane(zMin, zMax);
-	camera_->SetFrustum(&center, &clip, &focus, &zPlane);
 	Vect3f rayPoint, rayDirection;
 	camera_->GetWorldRay(Vect2f(0.f, 0.f), rayPoint, rayDirection);
 	const Vect3f eye = camera_->GetPos();
@@ -1985,16 +1979,12 @@ void EngineViewport::drawFrame()
 	// the tile map to the camera's SCENENODE_OBJECT_TILEMAP slot that
 	// DrawTilemapObject then draws from. Calling DrawScene directly skips that
 	// attach and renders no terrain (only the grid, drawn after).
-	{
-		const Vect2f center(0.5f, 0.5f);
-		const sRectangle4f clip(-0.5f, -0.5f, 0.5f, 0.5f);
-		const Vect2f focus(orbit_.focus, orbit_.focus);
-		float zMin = 0.f, zMax = 0.f; editorZPlane(zMin, zMax);
-		const Vect2f zPlane(zMin, zMax);
-		camera_->SetFrustum(&center, &clip, &focus, &zPlane);
-
-		scene_->Draw(camera_);
-	}
+	// The camera and its frustum come from cameraManager->quant(0,0,dt) (called
+	// from applyCamera at the top of the frame, as the original's CameraQuant
+	// did). Do not re-set them here: quant's SetFrustumGame already carries the
+	// game frustum the original editor used, and overriding it with the port's
+	// own editorZPlane was the divergence this restores.
+	scene_->Draw(camera_);
 
 	// CGeneralView::graphQuant drew the grid after terScene->Draw(), then
 	// composited the post-effect stack (environment->drawPostEffects). Monochrome
@@ -2251,13 +2241,10 @@ bool EngineViewport::screenPointToGround(int x, int y, float& outX, float& outY,
 	// at the centre (the engine's screen-space convention).
 	const Vect2f posIn((float)x / (float)w - 0.5f, (float)y / (float)h - 0.5f);
 
-	// The frustum drawFrame uses (CGeneralView::graphQuant's camera set-up).
-	const Vect2f center(0.5f, 0.5f);
-	const sRectangle4f clip(-0.5f, -0.5f, 0.5f, 0.5f);
-	const Vect2f focus(orbit_.focus, orbit_.focus);
-	float zMin = 0.f, zMax = 0.f; editorZPlane(zMin, zMax);
-	const Vect2f zPlane(zMin, zMax);
-	camera_->SetFrustum(&center, &clip, &focus, &zPlane);
+	// The frustum and matrix drawFrame uses -- cameraManager->quant(0,0,dt),
+	// which the frame already ran. Re-run it so a picking event between frames
+	// unprojects against exactly the frame's camera.
+	applyCamera();
 
 	Vect3f pos, dir;
 	camera_->GetWorldRay(posIn, pos, dir);
@@ -2272,69 +2259,42 @@ bool EngineViewport::screenPointToGround(int x, int y, float& outX, float& outY,
 
 // --- Camera --------------------------------------------------------------
 
-// The camera's near/far planes. The original editor's CGeneralView::graphQuant
-// called cameraManager->SetFrustumEditor(surMapOptions.zFarInfinite), which is
-// CameraManager::calcZMinMax(): the environment's game frustum (defaults
-// 30..4000). The Qt port hand-rolled zPlane = (30, max(12000, distance*3)) in
-// every place that needed it, so zFar was 3x-15x larger than the original and
-// the depth buffer lost most of its precision at the editor's working range.
-// The visible symptom: additive effects lying near the ground plane (energy
-// beams/columns between units, coast foam) z-fight with the terrain and get
-// rejected by the depth test, so they never draw.
-//
-// Keep the original's z when the whole map fits in it, extend it only when the
-// orbit is far enough to need it, and scale zNear with zFar so the far/near
-// ratio stays bounded (a fixed zNear=30 against a 60000 zFar is a ratio of 2000
-// and the depth buffer cannot tell the terrain from the effects).
-void EngineViewport::editorZPlane(float& zMin, float& zMax) const
-{
-	// calcZMinMax(): the environment's frustum, blended by the camera tilt.
-	float zn = 30.0f;
-	float zf = 4000.0f;
-	if(environment){
-		zn = environment->GetGameFrustrumZMin();
-		const float angle = orbit_.theta;
-		float c = fabsf(angle) / (float)M_PI_2;
-		c = clamp(c, 0.0f, 1.0f);
-		zf = environment->GetGameFrustrumZMaxHorizontal() * c +
-		     environment->GetGameFrustrumZMaxVertical() * (1.0f - c);
-	}
-	if(zn < 1.0f)
-		zn = 1.0f;
-
-	// The whole map (plus the orbit centre) must stay inside the far plane, or
-	// zooming out clips the terrain. The original camera never left the map's
-	// neighbourhood, the Qt orbit does.
-	if(vMap.isWorldLoaded()){
-		const float diagonal = sqrtf((float)vMap.H_SIZE * (float)vMap.H_SIZE +
-		                             (float)vMap.V_SIZE * (float)vMap.V_SIZE);
-		zf = std::max(zf, orbit_.distance + diagonal);
-	}
-	zf = std::max(zf, 1000.0f);
-
-	// Bound the ratio: a perspective depth buffer's usable precision lives in
-	// zNear/zFar. 100 keeps the terrain and the ground-level effects ~20x more
-	// distinguishable than the old 2000 did.
-	const float maxRatio = 100.0f;
-	zn = std::max(zn, zf / maxRatio);
-
-	zMin = zn;
-	zMax = zf;
-}
-
 void EngineViewport::applyCamera()
 {
 	if(!camera_)
 		return;
 
-	// The orbit matrix, as CameraManager::quant builds it:
-	//   R(theta,X)*R(fi,Y)*R(pi/2-psi,Z) translated by -position.
 	// Position sits on the orbit sphere around the centre.
 	Vect3f position(
 		orbit_.px + orbit_.distance * sinf(orbit_.theta) * cosf(orbit_.psi),
 		orbit_.py + orbit_.distance * sinf(orbit_.theta) * sinf(orbit_.psi),
 		orbit_.pz + orbit_.distance * cosf(orbit_.theta));
 
+	// The original editor wrote every input into cameraManager->coordinate() and
+	// let CGeneralView::CameraQuant -> cameraManager->quant(0,0,dt) build the
+	// camera from it each frame (SurMap5/GeneralView.cpp:340). quant runs
+	// update(): SetFrustumGame() (the real game frustum, from calcZMinMax) and
+	// CameraManager::update()'s matrix -- R(theta,X)*R(fi,Y)*R(pi/2-psi,Z)
+	// translated by -position -- then SetCameraPosition. Doing the same here
+	// keeps one camera model instead of the port's parallel orbit matrix, and
+	// brings back whatever else quant's update drives. The orbit is the
+	// authority; sync it into the coordinate first.
+	if(cameraManager && worldLoaded_){
+		CameraCoordinate coord = cameraManager->coordinate();
+		coord.position() = position;
+		coord.psi() = orbit_.psi;
+		coord.theta() = orbit_.theta;
+		coord.fi() = orbit_.fi;
+		coord.distance() = orbit_.distance;
+		coord.focus() = orbit_.focus;
+		cameraManager->setCoordinate(coord);
+		// quant takes the frame delta in seconds; the editor is event-driven, so
+		// the camera has no velocity of its own -- 0 is what CameraQuant passed.
+		cameraManager->quant(0.f, 0.f, 1.f / 60.f);
+		return;
+	}
+
+	// No cameraManager yet (before initScene): apply the matrix directly.
 	MatXf matrix = MatXf::ID;
 	matrix.rot() = Mat3f(orbit_.theta, X_AXIS) * Mat3f(orbit_.fi, Y_AXIS) * Mat3f(M_PI_2 - orbit_.psi, Z_AXIS);
 	matrix *= MatXf(Mat3f::ID, -position);
@@ -2798,13 +2758,8 @@ bool EngineViewport::selectObjectAt(int screenX, int screenY, int mode)
 
 	const Vect2f posIn((float)screenX / (float)w - 0.5f, (float)screenY / (float)h - 0.5f);
 
-	// Re-apply the frustum (see screenPointToGround) then unproject the ray.
-	const Vect2f center(0.5f, 0.5f);
-	const sRectangle4f clip(-0.5f, -0.5f, 0.5f, 0.5f);
-	const Vect2f focus(orbit_.focus, orbit_.focus);
-	float zMin = 0.f, zMax = 0.f; editorZPlane(zMin, zMax);
-	const Vect2f zPlane(zMin, zMax);
-	camera_->SetFrustum(&center, &clip, &focus, &zPlane);
+	// Re-apply the camera (see screenPointToGround) then unproject the ray.
+	applyCamera();
 
 	Vect3f v0, dir;
 	camera_->GetWorldRay(posIn, v0, dir);
