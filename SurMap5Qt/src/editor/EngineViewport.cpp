@@ -357,6 +357,25 @@ public:
 		return true;
 	}
 
+	bool applyToolzer(float x, float y, float brushRadius,
+	                  int deltaH, int smooth, int minH, int maxH) override
+	{
+		// SurToolToolzer::onOperationOnMap -> vMap.deltaZone(sToolzerPMO(...)).
+		// The circle brush (BRUSHFORM_CIRCLE, idxCurToolzerType 0): smth=9,
+		// smode/eql 0, and the height filter (0..MAX_VX_HEIGHT when disabled).
+		if(!vMap.isWorldLoaded())
+			return false;
+		int rad = std::max(1, (int)brushRadius);
+		if(rad > MAX_RADIUS_CIRCLEARR)
+			rad = MAX_RADIUS_CIRCLEARR;
+		if(minH == 0 && maxH == 0)
+			maxH = MAX_VX_HEIGHT;
+		sToolzerPMO pmo((int)x, (int)y, rad, 9, deltaH, 0, 0,
+		                (short)minH, (short)maxH);
+		vMap.deltaZone(pmo);
+		return true;
+	}
+
 	bool worldRender() override
 	{
 		if(!vMap.isWorldLoaded())

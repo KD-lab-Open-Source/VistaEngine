@@ -19,9 +19,11 @@ class RotateTool;
 class ScaleTool;
 class GeoNetTool;
 class GeoTxTool;
+class ToolzerTool;
 class TransformPropertyPanel;
 class GeoNetPropertyPanel;
 class GeoTxPropertyPanel;
+class ToolzerPropertyPanel;
 
 class ToolManager
 {
@@ -71,6 +73,7 @@ private:
 	ScaleTool* scale_ = nullptr;
 	GeoNetTool* geoNet_ = nullptr;
 	GeoTxTool* geoTx_ = nullptr;
+	ToolzerTool* toolzer_ = nullptr;
 
 	std::vector<EditorTool*> tools_;
 	EditorTool* current_ = nullptr;
@@ -82,4 +85,6 @@ private:
 	GeoNetPropertyPanel* geoNetPanel_ = nullptr;
 	// The Properties dock's panel for the GeoTx tool (created lazily).
 	GeoTxPropertyPanel* geoTxPanel_ = nullptr;
+	// The Properties dock's panel for the Toolzer tool (created lazily).
+	ToolzerPropertyPanel* toolzerPanel_ = nullptr;
 };

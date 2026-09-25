@@ -222,6 +222,14 @@ public:
 	virtual bool applyGeoNet(float x, float y, float brushRadius,
 	                         int height, int noise, int mesh) = 0;
 
+	// Toolzer (SurToolToolzer::onOperationOnMap -> vMap.deltaZone): raise or
+	// lower the terrain under a circular brush. `deltaH` is the signed height
+	// change in voxel units (negative digs, positive raises), `smooth` the
+	// smoothing/roughness 0..100, `minH`/`maxH` the optional height filter
+	// (set both to 0/MAX to disable). Returns false when no world is loaded.
+	virtual bool applyToolzer(float x, float y, float brushRadius,
+	                          int deltaH, int smooth, int minH, int maxH) = 0;
+
 	// Re-render the whole world (SurToolGeoTx::onOperationOnMap ->
 	// vMap.WorldRender). Returns false when no world is loaded.
 	virtual bool worldRender() = 0;

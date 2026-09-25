@@ -219,6 +219,11 @@ add_executable(SurMap5Qt
     src/tools/GeoTxTool.cpp
     src/tools/GeoTxPropertyPanel.h
     src/tools/GeoTxPropertyPanel.cpp
+    # The Toolzer terrain brush (raise/lower) + its Properties panel.
+    src/tools/ToolzerTool.h
+    src/tools/ToolzerTool.cpp
+    src/tools/ToolzerPropertyPanel.h
+    src/tools/ToolzerPropertyPanel.cpp
     # Phase 6 — the kdw trees as QTreeWidgets (tools + objects manager)
     src/panels/ToolsTreePanel.h
     src/panels/ToolsTreePanel.cpp

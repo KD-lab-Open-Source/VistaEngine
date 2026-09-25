@@ -10,6 +10,8 @@
 #include "GeoNetPropertyPanel.h"
 #include "GeoTxTool.h"
 #include "GeoTxPropertyPanel.h"
+#include "ToolzerTool.h"
+#include "ToolzerPropertyPanel.h"
 #include "TransformPropertyPanel.h"
 #include "TransformTool.h"
 
@@ -21,6 +23,7 @@ ToolManager::ToolManager()
 	move_   = new MoveTool;
 	rotate_ = new RotateTool;
 	scale_  = new ScaleTool;
+	toolzer_ = new ToolzerTool;
 	geoNet_ = new GeoNetTool;
 	geoTx_  = new GeoTxTool;
 
@@ -28,6 +31,7 @@ ToolManager::ToolManager()
 	tools_.push_back(move_);
 	tools_.push_back(rotate_);
 	tools_.push_back(scale_);
+	tools_.push_back(toolzer_);
 	tools_.push_back(geoNet_);
 	tools_.push_back(geoTx_);
 
@@ -43,6 +47,7 @@ ToolManager::~ToolManager()
 	delete scale_;
 	delete geoNet_;
 	delete geoTx_;
+	delete toolzer_;
 }
 
 void ToolManager::setWorldBridge(IWorldBridge* bridge)
@@ -63,6 +68,8 @@ void ToolManager::setBrushRadius(float radius)
 	// future brush tool opts in by overloading the same setter.
 	if(geoNet_)
 		geoNet_->setBrushRadius(radius);
+	if(toolzer_)
+		toolzer_->setBrushRadius(radius);
 }
 
 void ToolManager::setCurrentTool(int index)
@@ -84,6 +91,8 @@ void ToolManager::setCurrentTool(int index)
 		geoNetPanel_->setTool(dynamic_cast<GeoNetTool*>(current_));
 	if(geoTxPanel_)
 		geoTxPanel_->setTool(dynamic_cast<GeoTxTool*>(current_));
+	if(toolzerPanel_)
+		toolzerPanel_->setTool(dynamic_cast<ToolzerTool*>(current_));
 }
 
 QWidget* ToolManager::propertyWidget()
@@ -104,6 +113,13 @@ QWidget* ToolManager::propertyWidget()
 			geoTxPanel_->setTool(geoTx_);
 		}
 		return geoTxPanel_;
+	}
+	if(dynamic_cast<ToolzerTool*>(current_)){
+		if(!toolzerPanel_){
+			toolzerPanel_ = new ToolzerPropertyPanel;
+			toolzerPanel_->setTool(toolzer_);
+		}
+		return toolzerPanel_;
 	}
 	if(!propertyPanel_){
 		propertyPanel_ = new TransformPropertyPanel;
