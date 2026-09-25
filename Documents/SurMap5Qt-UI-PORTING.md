@@ -127,7 +127,7 @@ Where a stub can be promoted now that the editor builds a real Universe
 
 | Panel | Original | Port | Notes |
 |---|---|---|---|
-| Tools tree | CToolsTreeWindow / CToolsTreeCtrl | PARTIAL | real tool tree + selection + QSettings persistence; still only the 4 transform tools (+GeoNet/GeoTx), and no per-tool Create/Delete/Properties popup |
+| Tools tree | CToolsTreeWindow / CToolsTreeCtrl | PARTIAL | real tool tree + selection + QSettings persistence; nine tools now (Select/Move/Rotate/Scale + Toolzer/Kind/ColorPic/GeoNet/GeoTx), grouped Transform/Terrain/Objects; no per-tool Create/Delete/Properties popup |
 | Objects Manager | CObjectsManagerWindow | OK | 5 tabs rebuilt from `EngineViewport::objectList`; **rename/delete only edit the tree row**, not the world object; no drag&drop |
 | Properties | propertiesBar_ hosting the current CSurToolBase dialog | OK | `PropertyTree` + `PropertyDelegates` render/edits `editor::PropertyRow` trees fed by the bridge; per-tool panels are `TransformPropertyPanel` / `GeoNetPropertyPanel` / `GeoTxPropertyPanel` |
 | Minimap | CMiniMapWindow | OK | real terrain minimap + camera marker, click moves the camera |
@@ -146,19 +146,22 @@ The original registered ~36 tool types through `FactorySelector<CSurToolBase>`
 **Ported and real:** Select (rubber-band **plus** real picking — `RenderViewWidget`
 calls `EngineViewport::selectObjectAt` / `selectObjectsInRect`, which set
 `unit->setSelected`), Move, Rotate, Scale (they mutate the selected objects'
-pose/radius through the `IWorldBridge`), GeoNet (`bridge_->applyGeoNet` →
-`geoGeneration(sGeoPMO)`; no direct MFC counterpart), GeoTx (re-render only —
-matches the original, where the paint call is commented out).
+pose/radius through the `IWorldBridge`), **Toolzer** (raise/lower the terrain by
+a circular brush — `vMap.deltaZone`, the port of `CSurToolToolzer`'s circle
+variant), **Kind** ("Hardness": paint the surface type — `vMap.drawInGrid` with
+`GRIDAT_MASK_SURFACE_KIND`, plus the `toShowSurKind` tint while active),
+**ColorPic** ("Texture": paint a bitmap texture with a `ColorModificator` —
+`vMap.drawBitmapCircle` / `putBitmap2AllWorld`), GeoNet (`bridge_->applyGeoNet`
+→ `geoGeneration`; no direct MFC counterpart), GeoTx (re-render only — matches
+the original, where the paint call is commented out). The Toolzer/Kind/ColorPic
+editors live in the Properties dock (`ToolzerPropertyPanel`,
+`KindPropertyPanel`, `ColorPicPropertyPanel`).
 
 Dependency note: selection works for **alive, non-auxiliary units** only.
 Sources, anchors and camera splines are not click-pickable, and a real marquee
 that picks non-unit objects is still missing.
 
 Not yet ported (original class → what it does):
-- CSurToolToolzer — raise/lower/flatten terrain with a brush (toolzer). **Top gap:**
-  the only terrain brush ported so far is GeoNet.
-- CSurToolKind — edit surface kind (terrain type) by brush.
-- CSurToolColorPic — paint a texture ("Color picture") on the terrain.
 - CSurTool3DM / CSurToolEnvironment — place a .3dx model / environment object on the map
   (`worldPlayer()->buildUnit(...)`, `setEnvirontmentType/setModel/setRadius/setPose`).
 - CSurToolMiniDetaile / CSurToolMiniDetaileFolder — mini-details placement.
@@ -225,9 +228,11 @@ exist yet.
 
 ## Priority proposal
 
-1. **Terrain brushes** — SurToolToolzer (raise/lower/level), SurToolKind
-   (surface type), SurToolColorPic (texture paint). GeoNet is the only brush so
-   far; these are the core map-editing loop.
+1. ~~**Terrain brushes** — SurToolToolzer (raise/lower/level), SurToolKind
+   (surface type), SurToolColorPic (texture paint).~~ **Done:** Toolzer, Kind
+   and ColorPic are ported (`ToolzerTool`, `KindTool`, `ColorPicTool`); the
+   Toolzer's square/Exp/PNoise/MPD variants and the ColorPic live preview are
+   the only pieces left of that original set.
 2. **`EditorVisual::isVisible` + a Qt `SurMapOptions`** — one piece makes every
    View filter (Sources/Cameras/Hide Models/Camera Borders/Path Finding) real and
    persistable.
