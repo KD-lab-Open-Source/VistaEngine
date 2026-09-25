@@ -12,6 +12,8 @@
 #include "GeoTxPropertyPanel.h"
 #include "ToolzerTool.h"
 #include "ToolzerPropertyPanel.h"
+#include "KindTool.h"
+#include "KindPropertyPanel.h"
 #include "TransformPropertyPanel.h"
 #include "TransformTool.h"
 
@@ -24,6 +26,7 @@ ToolManager::ToolManager()
 	rotate_ = new RotateTool;
 	scale_  = new ScaleTool;
 	toolzer_ = new ToolzerTool;
+	kind_    = new KindTool;
 	geoNet_ = new GeoNetTool;
 	geoTx_  = new GeoTxTool;
 
@@ -32,6 +35,7 @@ ToolManager::ToolManager()
 	tools_.push_back(rotate_);
 	tools_.push_back(scale_);
 	tools_.push_back(toolzer_);
+	tools_.push_back(kind_);
 	tools_.push_back(geoNet_);
 	tools_.push_back(geoTx_);
 
@@ -48,6 +52,7 @@ ToolManager::~ToolManager()
 	delete geoNet_;
 	delete geoTx_;
 	delete toolzer_;
+	delete kind_;
 }
 
 void ToolManager::setWorldBridge(IWorldBridge* bridge)
@@ -70,6 +75,8 @@ void ToolManager::setBrushRadius(float radius)
 		geoNet_->setBrushRadius(radius);
 	if(toolzer_)
 		toolzer_->setBrushRadius(radius);
+	if(kind_)
+		kind_->setBrushRadius(radius);
 }
 
 void ToolManager::setCurrentTool(int index)
@@ -93,6 +100,8 @@ void ToolManager::setCurrentTool(int index)
 		geoTxPanel_->setTool(dynamic_cast<GeoTxTool*>(current_));
 	if(toolzerPanel_)
 		toolzerPanel_->setTool(dynamic_cast<ToolzerTool*>(current_));
+	if(kindPanel_)
+		kindPanel_->setTool(dynamic_cast<KindTool*>(current_));
 }
 
 QWidget* ToolManager::propertyWidget()
@@ -120,6 +129,13 @@ QWidget* ToolManager::propertyWidget()
 			toolzerPanel_->setTool(toolzer_);
 		}
 		return toolzerPanel_;
+	}
+	if(dynamic_cast<KindTool*>(current_)){
+		if(!kindPanel_){
+			kindPanel_ = new KindPropertyPanel;
+			kindPanel_->setTool(kind_);
+		}
+		return kindPanel_;
 	}
 	if(!propertyPanel_){
 		propertyPanel_ = new TransformPropertyPanel;

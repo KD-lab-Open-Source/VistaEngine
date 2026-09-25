@@ -230,6 +230,18 @@ public:
 	virtual bool applyToolzer(float x, float y, float brushRadius,
 	                          int deltaH, int smooth, int minH, int maxH) = 0;
 
+	// Surface-kind brush (SurToolKind::onOperationOnMap -> vMap.drawInGrid):
+	// paint the terrain type (0..TERRAIN_TYPES_NUMBER-1) under a circular
+	// brush. `minH`/`maxH` are the optional height filter. Returns false when
+	// no world is loaded.
+	virtual bool applySurKind(float x, float y, float brushRadius,
+	                          int kind, int minH, int maxH) = 0;
+
+	// Toggle the "show surface kind" terrain tint (SurToolKind::OnInitDialog /
+	// OnDestroy -> vMap.toShowSurKind + WorldRender). Returns false when no
+	// world is loaded.
+	virtual bool setShowSurKind(bool on) = 0;
+
 	// Re-render the whole world (SurToolGeoTx::onOperationOnMap ->
 	// vMap.WorldRender). Returns false when no world is loaded.
 	virtual bool worldRender() = 0;

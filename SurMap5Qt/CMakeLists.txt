@@ -224,6 +224,11 @@ add_executable(SurMap5Qt
     src/tools/ToolzerTool.cpp
     src/tools/ToolzerPropertyPanel.h
     src/tools/ToolzerPropertyPanel.cpp
+    # The surface-kind (Hardness) brush + its Properties panel.
+    src/tools/KindTool.h
+    src/tools/KindTool.cpp
+    src/tools/KindPropertyPanel.h
+    src/tools/KindPropertyPanel.cpp
     # Phase 6 — the kdw trees as QTreeWidgets (tools + objects manager)
     src/panels/ToolsTreePanel.h
     src/panels/ToolsTreePanel.cpp

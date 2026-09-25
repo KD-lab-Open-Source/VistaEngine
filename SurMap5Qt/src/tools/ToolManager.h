@@ -20,10 +20,12 @@ class ScaleTool;
 class GeoNetTool;
 class GeoTxTool;
 class ToolzerTool;
+class KindTool;
 class TransformPropertyPanel;
 class GeoNetPropertyPanel;
 class GeoTxPropertyPanel;
 class ToolzerPropertyPanel;
+class KindPropertyPanel;
 
 class ToolManager
 {
@@ -74,6 +76,7 @@ private:
 	GeoNetTool* geoNet_ = nullptr;
 	GeoTxTool* geoTx_ = nullptr;
 	ToolzerTool* toolzer_ = nullptr;
+	KindTool* kind_ = nullptr;
 
 	std::vector<EditorTool*> tools_;
 	EditorTool* current_ = nullptr;
@@ -87,4 +90,6 @@ private:
 	GeoTxPropertyPanel* geoTxPanel_ = nullptr;
 	// The Properties dock's panel for the Toolzer tool (created lazily).
 	ToolzerPropertyPanel* toolzerPanel_ = nullptr;
+	// The Properties dock's panel for the surface-kind brush (created lazily).
+	KindPropertyPanel* kindPanel_ = nullptr;
 };

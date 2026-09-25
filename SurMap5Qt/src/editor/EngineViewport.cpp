@@ -376,6 +376,32 @@ public:
 		return true;
 	}
 
+	bool applySurKind(float x, float y, float brushRadius,
+	                  int kind, int minH, int maxH) override
+	{
+		// SurToolKind::onOperationOnMap -> vMap.drawInGrid(x, y, rad, kind,
+		// GRIDAT_MASK_SURFACE_KIND, minfh, maxfh).
+		if(!vMap.isWorldLoaded())
+			return false;
+		const int rad = std::max(1, (int)brushRadius);
+		if(minH == 0 && maxH == 0)
+			maxH = MAX_VX_HEIGHT;
+		vMap.drawInGrid((int)x, (int)y, rad, (unsigned short)kind,
+		                GRIDAT_MASK_SURFACE_KIND, (short)minH, (short)maxH);
+		return true;
+	}
+
+	bool setShowSurKind(bool on) override
+	{
+		// SurToolKind showed the surface-kind tint while active and cleared it
+		// on destroy (vMap.toShowSurKind + WorldRender both ways).
+		if(!vMap.isWorldLoaded())
+			return false;
+		vMap.toShowSurKind(on);
+		vMap.WorldRender();
+		return true;
+	}
+
 	bool worldRender() override
 	{
 		if(!vMap.isWorldLoaded())
