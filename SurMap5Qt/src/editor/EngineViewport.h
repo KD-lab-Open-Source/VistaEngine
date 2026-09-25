@@ -321,6 +321,11 @@ private:
 	};
 	void applyCamera();
 
+	// The camera's near/far planes, as the original editor computed them:
+	// CameraManager::SetFrustumEditor -> calcZMinMax(), the environment's game
+	// frustum, extended only when the orbit would otherwise clip the map.
+	void editorZPlane(float& zMin, float& zMax) const;
+
 	// CGeneralView::drawGrid — the editor's terrain grid.
 	void drawGrid();
 
