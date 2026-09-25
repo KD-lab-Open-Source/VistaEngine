@@ -78,15 +78,15 @@ Where a stub can be promoted now that the editor builds a real Universe
 ### View
 | Command | Original handler | Port | Notes |
 |---|---|---|---|
-| Sources | OnViewSources | STUB | original flipped `surMapOptions.showSources_` + `Environment::flag_ViewWaves`; needs `EditorVisual::isVisible` |
-| Cameras | OnViewCameras | PARTIAL | opens CameraDialog (real spline editing); does not toggle a visibility filter |
+| Sources | OnViewSources | OK | flags `EditorVisualOptions::showSources_`; hides/shows sources + anchors + their overlays via `editorVisual().isVisible` |
+| Cameras | OnViewCameras | OK | flips `showCameras_`; hides/shows camera-spline overlays (`CameraSpline::showInfo`) |
 | Geosurface | OnViewGeosurface | N/A | original is commented out (no-op) |
-| Show Grid | OnViewShowGrid | OK | `viewToggleGrid` → EngineViewport `gridVisible_` |
-| Camera Borders | OnViewShowCameraBorders | STUB | needs `showCameraBorders_` + overlay |
-| Path Finding | OnViewPathFinding | STUB | needs `showPathFinding_` + EditorVisual aux unit |
-| Path Finding - Select Ref Unit | OnViewPathFindingReferenceUnit | DEAD | action exists but has **no** connect |
+| Show Grid | OnViewShowGrid | OK | `viewToggleGrid` → EngineViewport `gridVisible_`, persisted |
+| Camera Borders | OnViewShowCameraBorders | PARTIAL | flag `showCameraBorders_` persisted; the border overlay itself is not drawn yet |
+| Path Finding | OnViewPathFinding | PARTIAL | flag `showPathFinding_` persisted; the impassability aux-unit draw is not ported yet |
+| Path Finding - Select Ref Unit | OnViewPathFindingReferenceUnit | DEAD | action disabled (no reference-unit picker) |
 | Time Flow | OnViewEnableTimeFlow | PARTIAL | records `timeFlowEnabled_`; does not advance `Environment` time |
-| Hide Models | OnViewHideModels | STUB | needs `hideWorldModels_` → EditorVisual::isVisible |
+| Hide Models | OnViewHideModels | OK | flips `hideWorldModels_`; `UnitBase::showEditor` → `hide(HIDE_BY_EDITOR)` hides units/environment models |
 | Animation | OnViewAnimation | PARTIAL | `setUpdatesEnabled` — repaint gate, not engine `flag_animation` |
 | Time Slider | CTimeSliderDlg in filtersBar | OK | TimeSliderDialog → `environmentTime()->SetTime`; but modal, not the modeless filters-bar child |
 | Objects Manager (bar toggle) | OnViewObjectsManager | OK | dock toggle |
@@ -203,15 +203,17 @@ the Properties dock and (b) a pick-from-scene / click-to-place path through
 
 - SurMapOptions (SurMap5/SurMapOptions.h) — showSources_/showCameras_/
   hideWorldModels_/showPathFinding_/enableGrid_/gridSpacing_/gridColor_/
-  cameraBorder*_/last_dirs_/dlgBarState. A single Qt `SurMapOptions`
-  (QSettings-backed) is still missing; the port has scattered flags
-  (`EngineViewport::gridVisible_`, `MainWindow::timeFlowEnabled_`) and no
-  equivalent struct. Only the grid flag actually drives rendering.
+  cameraBorder*_/last_dirs_/dlgBarState. The **visibility flags the renderer
+  reads** are now ported as `Util/EditorVisualOptions` (engine-side, one copy for
+  the game and the editor) and driven from MainWindow's View menu, QSettings-
+  backed. The rest (last dirs, dock state, grid colour, LOD) is still scattered
+  Qt/QSettings state with no single struct.
 - `EditorVisual::isVisible` (SurMap5/EditorVisualImpl.cpp) — the per-class
-  visibility hook the renderer asks. **Not ported.** The port's `editorVisual()`
-  is always-visible (it even raises the hide-distance and clears
-  `ATTRUNKOBJ_HIDE_BY_DISTANCE` each frame), so the View toggles
-  (Sources/Cameras/Hide Models) cannot affect the 3D view.
+  visibility hook the renderer asks. **Ported** in the Qt stub
+  (`VistaEngineContext.cpp`): units/environment follow `hideWorldModels_`,
+  sources/anchors follow `showSources_`, camera splines `showCameras_`. The
+  original's path-finding aux unit (`beforeQuant`/`afterQuant` + the reference
+  unit) is not ported yet, and the camera-border overlay is not drawn.
 - Tools tree persistence (ToolsTreeCtrl::serialize reads/writes
   `Scripts\TreeControlSetups\...`). The port persists only QSettings state, not
   the original XPrm tree file.
@@ -233,9 +235,11 @@ exist yet.
    and ColorPic are ported (`ToolzerTool`, `KindTool`, `ColorPicTool`); the
    Toolzer's square/Exp/PNoise/MPD variants and the ColorPic live preview are
    the only pieces left of that original set.
-2. **`EditorVisual::isVisible` + a Qt `SurMapOptions`** — one piece makes every
-   View filter (Sources/Cameras/Hide Models/Camera Borders/Path Finding) real and
-   persistable.
+2. ~~**`EditorVisual::isVisible` + a Qt `SurMapOptions`**~~ **Done (visibility).**
+   `Util/EditorVisualOptions` + the ported `isVisible` make Sources/Cameras/Hide
+   Models real and persistable. Left: the path-finding aux unit, the
+   camera-border overlay, and the remaining `SurMapOptions` fields (dirs, dock
+   state, grid colour, LOD) in one struct.
 3. **Placement tools** — SurToolUnit (pick from AttributeLibrary),
    SurTool3DM/Environment (file-pick a model), SurToolSource, SurToolAnchor.
 4. **Wire the ready dialogs**: put WaveDialog on a command; give CameraDialog its
