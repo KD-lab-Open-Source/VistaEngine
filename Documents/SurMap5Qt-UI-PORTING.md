@@ -284,6 +284,69 @@ Note (session, editor rendering): the columns themselves are the `A_MAM` /
 `G_Core_Working_001`-style emitters and the core model's `Light` visibility set,
 not the particles — a separate line of work from the particle filters above.
 
+## Editor effects: where they are lost (session findings)
+
+After the crossplatform merge (`ab82ddcc`) and the diagnostic clean-up
+(`5daa4599`), the light columns appear and a part of the effects does not.
+
+**What is NOT the cause** (all measured, not guessed):
+
+- **Depth near/far.** Forcing `zNear=1, zFar=6000` (20x better precision) changed
+  nothing. The editor's `editorZPlane` does extend `zFar` to
+  `orbit.distance + map diagonal` (~23000 at the default orbit), where the game's
+  `cameraManager->SetFrustumEditor` caps it at `12000` — but that is not what hides
+  the effects. It is, however, the obvious candidate for the **jumping sky**.
+- **The effects are created and reach the renderer.** `VISTA_FX_TRACE`
+  instrumentation showed every effect (`G_Fx_Pump_001`, `G_Fx_Chain_002`,
+  `G_Fx_Core_001`, `A_MAM`, …) running `PreDraw` **and** `Draw` every frame, all in
+  pass 11 = `SCENENODE_OBJECTSORT`, and the world-quad renderer's `Draw` receiving
+  `groups=771`, `quads≈5100`, `tris=3510` per frame. The pass opens with
+  `clear=0, clearDepth=0` (it loads). So geometry is recorded and a pass runs.
+- **Distance LOD.** The editor already clears `ATTRUNKOBJ_HIDE_BY_DISTANCE` and
+  `cEffect::setVisibleRange(false, …)`; emitters show `rateReal≈0.64` (not 0).
+- **The zMode pass split.** No effect is dropped by pass assignment; they are all
+  `EMITTER_USE_ZBUFFER` → the sorted pass.
+
+**So the loss is at the draw itself** — the geometry reaches the pass but does not
+appear. The remaining candidates, in order of likelihood:
+
+1. **The quad batch (`7d287404`, our only kept render change).** It defers the
+   sorted pass's world-quad flush to `endQuadBatch`. It is the one thing in the
+   sorted pass that differs from crossplatform. Test: bracket-free
+   `Camera::DrawSortObject` (revert to flushing per `drawWorldQuads`).
+2. **A later pass overwriting the effects' pass.** The effects land in
+   `SCENENODE_OBJECTSORT`, and `Camera::DrawScene` draws `DrawObjectNoZ(SCENENODE_OBJECT_NOZ)`
+   after it; the sky cubemap (`environmentTime()->Draw()` → `cRenderCubemap::DrawFace` →
+   a child camera) now renders a face every frame *before* the world, and shares the
+   command buffer. Worth checking the target/clear bookkeeping across those passes.
+3. **Premultiply/blend after crossplatform's `1e67532e`** (the DDS premultiply was
+   removed and `colorOp[1]` now decides). If the particle textures are `.tga`
+   (straight alpha) the flag should be 1; a wrong flag draws fully transparent or
+   fully black.
+
+**Next step:** test (1) first — it is one line and reversible — then (2).
+
+### `EngineViewport::drawFrame` vs `GameShell::Show` / `CGeneralView::graphQuant`
+
+The frame order matches the original editor's `graphQuant` (Fill → BeginScene →
+`environment->graphQuant` → `ATTRCAMERA_CLEARZBUFFER` → `terScene->Draw` →
+`drawGrid` → `drawPostEffects` → `cameraManager->showEditor` → `universe()->graphQuant`
+→ aux → `afterQuant` → EndScene/Flush). Deliberate differences and gaps:
+
+- The port calls `editorZPlane()` + `camera_->SetFrustum()` by hand instead of
+  `cameraManager->SetFrustumEditor(surMapOptions.zFarInfinite)`. `SetFrustumEditor`
+  also has the `zFarInfinite → 12000` cap the port dropped, and resets
+  `frustumClip_`. Worth switching to the engine call.
+- **`cameraManager->quant()` is never called.** The game runs it every frame; it
+  drives `CameraCoordinate::check()` and the camera matrix. The port sets the matrix
+  in `applyCamera()` instead, so the camera moves — but no child-camera/coordinate
+  bookkeeping happens. Whether that matters for the effects is open.
+- The port calls `environment->graphQuant` (which now draws the sky cubemap via
+  crossplatform's `EnvironmentTime::Draw()`) — matching the original, which called
+  `environmentTime()->Draw()` explicitly before it.
+- `UI_Dispatcher::quant` and `gb_RenderDevice->selectRenderWindow(renderWindow_)`
+  around the frame are not mirrored (the port selects the window once at init).
+
 ## Engine-side changes made for the editor (outside `SurMap5Qt/`)
 
 The Qt editor branch is cut from `b7660ed4`. Bringing the editor up changed engine
