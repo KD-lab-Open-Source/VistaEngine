@@ -27,6 +27,9 @@ The porting registers and format notes live in `Documents/`:
 - [Documents/Sound-PORTING.md](Documents/Sound-PORTING.md) — audio: DirectSound out, miniaudio in.
 - [Documents/Video-PORTING.md](Documents/Video-PORTING.md) — video: Bink and AVI, on ffmpeg.
 - [Documents/InPlaceArchive.md](Documents/InPlaceArchive.md) — the InPlace archive format and the `.3dxG` model cache.
+- [Documents/SurMap5Qt-UI-PORTING.md](Documents/SurMap5Qt-UI-PORTING.md) — the Qt editor
+  (SurMap5Qt): what of the MFC map editor is still a stub or missing, and the engine-side
+  changes the editor needed.
 
 ## Current state
 

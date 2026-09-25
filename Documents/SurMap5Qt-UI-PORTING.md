@@ -283,3 +283,190 @@ the blend against.
 Note (session, editor rendering): the columns themselves are the `A_MAM` /
 `G_Core_Working_001`-style emitters and the core model's `Light` visibility set,
 not the particles — a separate line of work from the particle filters above.
+
+## Engine-side changes made for the editor (outside `SurMap5Qt/`)
+
+The Qt editor branch is cut from `b7660ed4`. Bringing the editor up changed engine
+code **outside** `SurMap5Qt/` too, because the editor drives the real game code
+paths (`new Universe`, world load, `loadAllLibraries`, the SDL renderers) in a
+context those paths never saw before: no `GameShell`, no SDL-owned window at
+`Initialize`, no MFC `EditorVisual`, a frozen `.3dxG` cache with no source
+`.3dx`, and `.prm` data the game tolerates but a direct `Universe` construction
+does not.
+
+This is the register of those changes — what, where, why — so they are not
+mistaken for unrelated engine edits. Reproduce the list with:
+
+```
+git diff --name-only b7660ed4..HEAD -- . ':(exclude)SurMap5Qt'
+```
+
+Items marked **[TEMP]** are diagnostics or band-aids added during bring-up and
+are candidates for removal once the problem they measure is fixed.
+
+### Game / Units / Util (the simulation)
+
+- **`Game/GameContext.cpp` — a real `editorVisual()`.** The non-editor build
+  `xassert`ed and returned `*reinterpret_cast<EditorVisual::Interface*>(0)`. The
+  Qt editor runs `UnitBase::showEditor` → `hide(HIDE_BY_EDITOR, ...)` and the
+  anchor/source editor drawing through `EditorVisual::isVisible`, so it needs a
+  live implementation. Added an engine-side `EditorVisualImpl`: everything
+  visible, the draw helpers no-ops (the editor overlay loops that would call
+  them — source/anchor labels, selection radius — do not run yet). SurMap5's own
+  `SurMap5/EditorVisualImpl.cpp` is MFC-bound (`CMainFrame`, `SurMapOptions`).
+  Extend it when the editor's View filters land.
+- **`UserInterface/UI_LogicGame.cpp` — guard `disableDirectControl()`.** It
+  dereferenced `gameShell`, which the map editor never creates (`createRuntime` /
+  `WinMain` do). `Universe::setActivePlayer` calls it on world load. Added
+  `if(!gameShell) return;` (no-op in the game).
+- **`Util/Serialization/StringTableBase.h` + `Units/UnitAttribute.cpp` —
+  normalized `editorGroupName()`.** The lookup used the raw
+  `typeid(*type_).name()` spelling ("class X"), but the factory registers
+  *normalized* names, so every group missed ("No translation for such class
+  name!") and the Units library editor crashed. Now normalize through
+  `normalizeTypeName(...)` and pass `true` (silent) so an unregistered type falls
+  back to the normalized name instead of asserting.
+- **`Units/Parameters.cpp` + `Util/FormulaString.cpp` — cycle/stack guards
+  [TEMP].** `ParameterValue::value()`'s `state_==CALCULATING` check only catches
+  direct self-reference (P1→P1); a P1→P2→P1 cycle recurses until
+  `STATUS_STACK_OVERFLOW`. Added a thread-local depth counter (cap 256) that
+  returns 0 at the cap, plus a "first 64 entries" log naming the looping `.prm`
+  parameter. `FormulaString.cpp` got the same guard at depth 512 for the
+  expression parser. These are a band-aid for cyclic `.prm` data — fix the data
+  at the source (the log names it) and remove both.
+- **`Units/UnitAttribute.cpp` — `VISTA_LOG_LIBRARIES` [TEMP].** `loadAllLibraries`
+  prints each library before loading it when `VISTA_LOG_LIBRARIES=1`, used by the
+  editor bring-up to find which singleton load crashes.
+- **`Platform/WindowsAPI.h` — `MoveFile` shim.** Added `MoveFileA`/`MoveFile`
+  (`rename(2)`) for the editor's WorldList rename/resave path; the caller checks
+  destination existence itself, matching `rename`'s overwrite semantics.
+- **`Game/Universe.cpp` — stage `fprintf` logs [TEMP].** `[ctor]` / `setActivePlayer`
+  progress lines, added while bringing the editor's `Universe` construction up.
+  Console-only; delete when the editor is stable.
+
+### Render
+
+- **`Render/3dx/Lib3dx.cpp` — `exported_ = true`.** The port runs against the
+  shipped frozen cache (`CacheData/Models/*.3dxG`); the source `.3dx` files are
+  not bundled. `LoadCache`'s file-time validation (`meshTime_`/`meshSize_` vs the
+  missing source) rejected every good cached model, so `cLib3dx` now treats the
+  cache as exported — the same fix `cTexLibrary` already uses.
+- **`Render/3dx/Node3DX.cpp` — `lods[iLOD]` bounds guards.** A model whose cache
+  says `is_lod=true` but carries fewer than three lods (or none) selects iLOD 0..2
+  in `Update()` and indexed out of range in `Draw()` / `DrawShadowAndZbuffer()`.
+  Report via `VisError` and return instead of the invalid-parameter fast-fail.
+  Marked "possibly delete when the `.3dxG` LOD-count mismatch is understood".
+- **`Render/src/NParticle.cpp` — `emitterDepthTest(camera)`.** The emitters' depth
+  test comes from the camera **pass**, not the material: D3D's
+  `Camera::DrawObjectNoZ` (`SCENENODE_OBJECT_NOZ` and the two `..._GRASS`
+  siblings) turned `D3DRS_ZENABLE` off for the whole node, so an emitter asking
+  for one of those passes (`EMITTER_DRAW_AFTER_ALL`, the grass modes) drew with no
+  depth test. The port had it hardcoded `true`, depth-testing those sprites
+  against terrain/units and dropping them. Applied to `cEmitterColumnLight`,
+  `cEmitterInt`, `cEmitterSpline`, `cEmitterZ`.
+- **`Render/src/cCamera.cpp` — quad batch bracket.** `DrawSortObject` brackets the
+  sorted pass with `beginQuadBatch()`/`endQuadBatch()` (see the render device), so
+  the few hundred unit lights and effects share one world-quad render pass instead
+  of one each.
+
+### Renderer (SDL GPU)
+
+- **`Render/SDLRenderDevice.cpp/.h` — `cRenderWindow` and multi-window.** The D3D
+  implementation (`Render/D3D/RenderDevice.cpp`) is compiled nowhere, and the
+  editor creates one `cRenderWindow` per viewport, so the class lives here now:
+  `CalcSize` via the shim's `GetClientRect`, `ChangeSize` →
+  `RecalculateDeviceSize`, dtor → `DeleteRenderWindow`. `createRenderWindow(hwnd)`
+  wraps the viewport's HWND in a foreign `SDL_Window`
+  (`SDL_CreateWindowWithProperties`, with `SDL_PROP_WINDOW_CREATE_WIN32_HWND_POINTER`
+  / X11 window number / Cocoa window pointer) and claims it on the device;
+  `selectRenderWindow` / `currentRenderWindow` / `setGlobalRenderWindow` pick which
+  swapchain `BeginScene`/`EndScene` use; `activeWindow()` maps the active
+  `cRenderWindow` to its `SDL_Window`. The game's window is the implicit global
+  one registered by `Initialize`.
+- **`Render/SDLRenderDevice.cpp` — null-window and active-window paths.**
+  `Initialize` tolerates `window_ == null` (the Qt editor creates no SDL window of
+  its own, so the device is created without claiming a window; the first
+  `createRenderWindow()` supplies the swapchain target — before, a null window was
+  fatal). `BeginScene` acquires the swapchain from `activeWindow()` and sets
+  `xScr/yScr` from the acquired drawable size (the engine's `xScr/yScr` are the
+  window size the Camera's 4:3 math uses). `ensureCapture` and
+  `CreateTexture(TEXTURE_RENDER32)` query the format from `activeWindow()`. `Done`
+  destroys foreign editor windows first, nulls the bindings, deletes the
+  `cRenderWindow`s.
+- **`Render/SDLRenderDevice.cpp/.h` — `beginQuadBatch`/`endQuadBatch`.** On SDL GPU
+  a world-quad flush is a whole render pass (a full-target load/store per light or
+  effect — several hundred a frame on a busy map). A walk pass that records many
+  back to back brackets itself and they collapse into one pass. The quads never
+  write depth, so deferring the flush only moves where the pass opens.
+- **`Render/SDLRenderDevice.cpp/.h` — `DrawLine(const Vect3f&, ...)` implemented.**
+  It records into the new world-line renderer; `EndScene` replays it before the
+  UI. See `Documents/Render-PORTING.md` #17 (no longer a no-op).
+- **`Render/SDLWorldLineRenderer.{cpp,h}` + `Render/SDLShaders/worldline.{vert,frag}.hlsl`
+  + `Render/CMakeLists.txt` — new world-line pipeline.** The editor's terrain grid
+  (`EngineViewport::drawGrid`) draws through `DrawLine`. It is the SDL stand-in for
+  D3D's `FlushLine3D`: `PT_LINELIST`, `SetWorldMaterial(ALPHA_BLEND, MatXf::ID)`,
+  world-space vertices × the camera's view-projection, LESS-EQUAL z-test, no
+  z-write, `SRC_ALPHA`/`1-SRC_ALPHA` blend. One pipeline, one vertex layout
+  (`sVertexXYZD`), one uniform (MVP), replayed in one pass at `EndScene` before the
+  UI. `Render/CMakeLists.txt` adds the `worldline` shader module and the source.
+- **Null-window tolerance across the other renderers.** `SDLCloudShadowRenderer`,
+  `SDLEnvironmentEarthRenderer`, `SDLGrassRenderer`, `SDLMinimapRenderer`,
+  `SDLPostEffectRenderer`, `SDLWaterRenderer`, `SDLObject3dxRenderer` and
+  `SDLWorldQuadRenderer` no longer require `window_` to build their
+  shaders/pipelines: `SDL_GetGPUSwapchainTextureFormat` tolerates a null window
+  (returns the device default), so only `device_` gates. Before this, with no SDL
+  window every pipeline aborted to null and nothing rasterized (models, water,
+  clouds, …).
+- **`Render/SDLUIRenderer.{cpp,h}` + `Render/SDLTileMapRenderer.{cpp,h}` —
+  `setWindow`.** Rebuild the swapchain-format-dependent pipeline once the editor's
+  foreign window exists; `createRenderWindow` calls both.
+- **`Render/SDLUIRenderer.cpp/.h` — `DrawDebugTriangle` [TEMP].** Screen-space
+  diagnostic triangle used while validating the native SDL swapchain host.
+- **`Render/SDLTileMapRenderer.cpp` — terrain bring-up logs [TEMP].** A first-draw
+  `target/depth/pipeline/indices/camera/size` line and a `BeginGPURenderPass`
+  failure line.
+- **`Render/SDLObject3dxRenderer.{cpp,h}` — null-window gate + replay diagnostics
+  [TEMP].** The null-window gate is what let the models rasterize at all; the
+  `[dbgreplay]` periodic `draws`/`nullPipeline`/`replayed` counters and `drawCount()`
+  separate "nothing recorded" from "recorded but the pipeline was rejected".
+- **`Render/SDLWorldQuadRenderer.{cpp,h}` — null-window tolerance + the FX debug
+  layer [TEMP].** `forceNoDepth`/`forceNoFog`/`forceNoSoft`/`forceNoPremul`/`forceFlat`,
+  `debugWireParticles`, and `cleanFx_`/`cleanKeep_` with the `VISTA_FX_ON` bits. See
+  "Effect render filters — diagnostic mode" above.
+
+### Build, packaging and CI
+
+- **`CMakeLists.txt`** — `option(BUILD_EDITOR ...)` + `add_subdirectory(SurMap5Qt)`.
+  The old MSVC tool projects (`SurMap5`, `ModelViewer`, `VistaEditor`, …) were
+  never migrated to CMake and stay in place as the reference implementation.
+- **`Render/CMakeLists.txt`** — the `worldline` shader module and
+  `SDLWorldLineRenderer.cpp` in `RENDER_SOURCES` (part of the `BUILD_EDITOR` work
+  but useful to the engine independently).
+- **`Documents/Build-PORTING.md`** — "The editor (SurMap5Qt)" section: build with
+  `-DBUILD_EDITOR=ON`, Qt 6 ≥ 6.4 (Widgets), per-platform Qt install, the CI
+  editor jobs.
+- **`.github/workflows/{windows,linux,macos}.yaml`** — `qt-editor` added to the
+  push/PR triggers, plus an `editor` job per platform: configure
+  `-DBUILD_EDITOR=ON`, build `SurMap5Qt`, stage the runtime (Windows:
+  `windeployqt` + the whole directory so `platforms/qwindows.dll` ships; macOS:
+  reuse the Game job's shadercross cache), upload the artifact. The
+  `--selftest=SmokeTest` step is disabled (commented) — it needs a GPU/display and
+  staged content the runners do not provide yet.
+- **`.gitignore`** — editor build/run artifacts (`build-qt-check`, `iniFile.cfg`,
+  `Worlds`, helper `*.ps1`/`*.cmd`, screenshots and `*.log`/`*.err`/`*.out`),
+  `.vs`/`out`/`*.slnx`, and the XLibs/STLPort debug leftovers MSVC and the git
+  tools unpack into the tree.
+
+### Permanent vs. temporary
+
+The **permanent** engine changes are the ones that make a code path the editor
+legitimately runs safe: `EditorVisual`, the `GameShell` guard, the normalized
+`editorGroupName` lookups, `MoveFile`, `exported_ = true` for the frozen cache,
+the `lods[iLOD]` guards, `emitterDepthTest`, and the whole SDL render device /
+world-line / null-window body of work.
+
+Everything tagged **[TEMP]** is a diagnostic (`VISTA_LOG_LIBRARIES`,
+`VISTA_FX_CLEAN`/`VISTA_FX_ON`, `[dbgreplay]`, the `fprintf` stage logs, the
+`--selftest`/debug triangle) or a band-aid for bad `.prm` data (the
+`Parameters.cpp`/`FormulaString.cpp` cycle guards) and should be removed once the
+underlying problem is fixed.
