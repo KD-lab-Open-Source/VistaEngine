@@ -55,6 +55,16 @@ void ToolManager::setWorldBridge(IWorldBridge* bridge)
 			tool->setWorldBridge(bridge);
 }
 
+void ToolManager::setBrushRadius(float radius)
+{
+	// The brush radius is shared across brush tools (the original's
+	// CSurToolBase::getBrushRadius read one value from the toolbar combo).
+	// Only GeoNet has a brush today; the assignment is type-checked so a
+	// future brush tool opts in by overloading the same setter.
+	if(geoNet_)
+		geoNet_->setBrushRadius(radius);
+}
+
 void ToolManager::setCurrentTool(int index)
 {
 	if(index < 0 || index >= (int)tools_.size())

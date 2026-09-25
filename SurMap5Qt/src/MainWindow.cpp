@@ -217,6 +217,11 @@ void MainWindow::createActions()
 	actViewPathFinding_ = new QAction(tr("Path Finding"), this);
 	actViewPathFinding_->setCheckable(true);
 	actViewPathFindingRef_ = new QAction(tr("Path Finding - Select Reference Unit"), this);
+	// OnViewPathFindingReferenceUnit opened a kdw TreeSelectorDialog to pick
+	// the reference unit. There is no Qt picker yet, so the action is disabled
+	// rather than silently ignoring clicks (it used to have no connect at all).
+	actViewPathFindingRef_->setEnabled(false);
+	actViewPathFindingRef_->setToolTip(tr("Not implemented in the Qt editor yet"));
 	actViewShowGrid_ = new QAction(tr("Show &Grid"), this);
 	actViewShowGrid_->setCheckable(true);
 	actViewShowGrid_->setChecked(true);   // the editor starts with the grid on
@@ -715,6 +720,10 @@ void MainWindow::createToolBars()
 	toolsToolBar_->addWidget(brushRadiusCombo_);
 	connect(brushRadiusCombo_, QOverload<int>::of(&QComboBox::currentIndexChanged),
 	        this, &MainWindow::brushRadiusChanged);
+	// Apply the initial value too, so the tool's brush matches the combo from
+	// the first stroke (the combo's currentIndexChanged only fires on change).
+	if(view_ && view_->tools())
+		view_->tools()->setBrushRadius((float)brushRadius_);
 }
 
 void MainWindow::createDockPanels()
@@ -1238,6 +1247,10 @@ void MainWindow::brushRadiusChanged(int index)
 	// brush radius the tools read (CSurToolBase::getBrushRadius).
 	const QVariant data = brushRadiusCombo_ ? brushRadiusCombo_->itemData(index) : QVariant();
 	brushRadius_ = data.isValid() ? data.toInt() : 1;
+	// Push it to the tools, so the brush tools actually paint at this radius
+	// (CSurToolBase::getBrushRadius read the combo's value directly).
+	if(view_ && view_->tools())
+		view_->tools()->setBrushRadius((float)brushRadius_);
 	fprintf(stderr, "[tools] brush radius: %d\n", brushRadius_);
 	statusBar()->showMessage(tr("Brush radius: %1").arg(brushRadius_));
 }

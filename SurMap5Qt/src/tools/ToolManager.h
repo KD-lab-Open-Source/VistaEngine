@@ -46,6 +46,11 @@ public:
 	void setCurrentTool(int index);
 	int currentIndex() const { return currentIndex_; }
 
+	// Set the brush radius for every brush tool (CSurToolBase::getBrushRadius
+	// read a shared value from the tools toolbar combo). Tools without a brush
+	// ignore it.
+	void setBrushRadius(float radius);
+
 	// All tools, in tree order (CSurToolBase* list the tools tree held).
 	const std::vector<EditorTool*>& tools() const { return tools_; }
 
