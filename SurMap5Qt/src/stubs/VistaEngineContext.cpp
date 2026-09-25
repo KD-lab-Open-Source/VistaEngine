@@ -36,6 +36,8 @@ using namespace std;   // engine headers expect the StdAfx preamble
 #include "Units/CommandsQueue.h"
 #include "Render/src/VisGeneric.h"
 #include "EditorVisual.h"
+#include "EditorVisualOptions.h"   // the View-menu flags isVisible reads
+#include "Units/BaseUniverseObject.h" // UniverseObjectClass (isVisible switch)
 #include "Game/CameraManager.h"   // cameraManager (drawText projection)
 #include "Game/Universe.h"        // universe()->circleManager() (drawRadius)
 #include "Water/CircleManager.h"  // CircleManager::addCircle (drawRadius)
@@ -44,7 +46,29 @@ using namespace std;   // engine headers expect the StdAfx preamble
 namespace {
 	class EditorVisualImpl : public EditorVisual::Interface {
 	public:
-		bool isVisible(UniverseObjectClass) override { return true; }
+		bool isVisible(UniverseObjectClass objectClass) override
+		{
+			// Port of SurMap5/EditorVisualImpl.cpp::Impl::isVisible: the
+			// per-class visibility hook the engine asks (UnitBase::showEditor,
+			// SourceBase::showEditor, Anchor::showEditor, CameraSpline). In the
+			// MFC editor these read surMapOptions; here they read the Qt
+			// editor's EditorVisualOptions (MainWindow's View menu writes them).
+			switch(objectClass){
+			case UNIVERSE_OBJECT_ANCHOR:
+				return EditorVisualOptions::showSources();
+			case UNIVERSE_OBJECT_CAMERA_SPLINE:
+				return EditorVisualOptions::showCameras();
+			case UNIVERSE_OBJECT_ENVIRONMENT:
+				return !EditorVisualOptions::hideWorldModels();
+			case UNIVERSE_OBJECT_SOURCE:
+				return EditorVisualOptions::showSources();
+			case UNIVERSE_OBJECT_UNIT:
+				return !EditorVisualOptions::hideWorldModels();
+			case UNIVERSE_OBJECT_UNKNOWN:
+			default:
+				return true;
+			}
+		}
 		void beforeQuant() override {}
 		void afterQuant() override {}
 		void drawImpassabilityRadius(UnitBase&) override {}

@@ -14,6 +14,9 @@ add_subdirectory(XmlRpc)
 set(UTIL_SOURCES
     ComboVectorString.cpp
     DebugPrm.cpp
+    # The visibility flags EditorVisual::isVisible reads (the Qt port's stand-in
+    # for the MFC SurMapOptions fields the View menu toggled).
+    EditorVisualOptions.cpp
     FileUtils/FileTime.cpp
     FileUtils/FileUtils.cpp
     FileUtils/XGUID.cpp

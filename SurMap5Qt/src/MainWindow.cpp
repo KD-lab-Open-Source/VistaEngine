@@ -32,6 +32,7 @@
 
 #include "RenderViewWidget.h"
 #include "EditorApplication.h"
+#include "Util/EditorVisualOptions.h"   // the View-menu visibility flags
 #include "dialogs/SelectWorldDialog.h"
 #include "dialogs/WorldNameDialog.h"
 #include "dialogs/WorldPropertiesDialog.h"
@@ -235,6 +236,31 @@ void MainWindow::createActions()
 	actViewObjectsManager_ = new QAction(tr("Objects Manager"), this);
 	actViewObjectsManager_->setCheckable(true);
 	actViewObjectsManager_->setChecked(true);
+
+	// Restore the persisted View filters (SurMapOptions persisted these in
+	// UserInterface.cfg; here they are QSettings-backed). The connects are not
+	// set up yet, so setChecked does not fire the handlers; apply the engine
+	// flags directly here too (the handlers do the same on a later toggle).
+	{
+		QSettings s;
+		const bool sources = s.value("view/sources", false).toBool();
+		const bool cameras = s.value("view/cameras", false).toBool();
+		const bool hideModels = s.value("view/hideModels", false).toBool();
+		const bool pathFinding = s.value("view/pathFinding", false).toBool();
+		const bool cameraBorders = s.value("view/cameraBorders", false).toBool();
+		const bool grid = s.value("view/grid", true).toBool();
+		actViewSources_->setChecked(sources);
+		actViewCameras_->setChecked(cameras);
+		actViewHideModels_->setChecked(hideModels);
+		actViewPathFinding_->setChecked(pathFinding);
+		actViewCameraBorders_->setChecked(cameraBorders);
+		actViewShowGrid_->setChecked(grid);
+		EditorVisualOptions::setShowSources(sources);
+		EditorVisualOptions::setShowCameras(cameras);
+		EditorVisualOptions::setHideWorldModels(hideModels);
+		EditorVisualOptions::setShowPathFinding(pathFinding);
+		EditorVisualOptions::setShowCameraBorders(cameraBorders);
+	}
 
 	// Libraries menu (ID_EDIT_* / ID_LIBRARIES_* — the library editors the
 	// libraries bar launches; each is a separate external-ish editor that later
@@ -1456,30 +1482,33 @@ void MainWindow::viewToggleGrid(bool checked)
 	// !enableGrid_; CGeneralView::drawGrid (GeneralView.cpp:915) read that
 	// flag. The Qt editor keeps it in EngineViewport (gridVisible_).
 	view_->setGridVisible(checked);
+	QSettings().setValue("view/grid", checked);
 	fprintf(stderr, "[view] show-grid: %s\n", checked ? "on" : "off");
 	statusBar()->showMessage(tr("Show Grid: %1").arg(checked ? tr("on") : tr("off")));
 }
 
 void MainWindow::viewToggleSources(bool checked)
 {
-	// OnViewSources: render the world's sources (extraction points).
+	// OnViewSources: render the world's sources (extraction points) and their
+	// editor overlays. The engine reads the flag in editorVisual().isVisible
+	// (UnitBase/SourceBase/Anchor::showEditor).
+	EditorVisualOptions::setShowSources(checked);
+	QSettings().setValue("view/sources", checked);
 	fprintf(stderr, "[view] sources: %s\n", checked ? "on" : "off");
 	statusBar()->showMessage(tr("Sources: %1").arg(checked ? tr("on") : tr("off")));
+	if(view_) view_->update();
 }
 
 void MainWindow::viewToggleCameras(bool checked)
 {
-	// OnViewCameras: show/hide the camera paths on the map. The camera editor
-	// dialog (CameraDlg) is the IDD_DLG_CAMERA bar dialog; the original toggled
-	// the bar with this command too. Show it for now — cameraManager (the
-	// actual spline data) is not wired in the Qt editor yet.
-	if(checked){
-		CameraDialog dlg(this);
-		dlg.setBridge(view_->worldBridge());
-		dlg.exec();
-	}
+	// OnViewCameras: show/hide the camera splines on the map. The engine reads
+	// the flag in editorVisual().isVisible (CameraSpline::showInfo). The camera
+	// editor dialog is opened from its own command, not this toggle.
+	EditorVisualOptions::setShowCameras(checked);
+	QSettings().setValue("view/cameras", checked);
 	fprintf(stderr, "[view] cameras: %s\n", checked ? "on" : "off");
 	statusBar()->showMessage(tr("Cameras: %1").arg(checked ? tr("on") : tr("off")));
+	if(view_) view_->update();
 }
 
 void MainWindow::viewToggleGeosurface(bool checked)
@@ -1490,14 +1519,24 @@ void MainWindow::viewToggleGeosurface(bool checked)
 
 void MainWindow::viewTogglePathFinding(bool checked)
 {
+	// OnViewPathFinding: the pathfinding/impassability aux unit. The flag is
+	// read by editorVisual().isVisible and the aux-unit build path.
+	EditorVisualOptions::setShowPathFinding(checked);
+	QSettings().setValue("view/pathFinding", checked);
 	fprintf(stderr, "[view] path-finding: %s\n", checked ? "on" : "off");
 	statusBar()->showMessage(tr("Path Finding: %1").arg(checked ? tr("on") : tr("off")));
+	if(view_) view_->update();
 }
 
 void MainWindow::viewToggleCameraBorders(bool checked)
 {
+	// OnViewShowCameraBorders: draw the camera restriction border (read by the
+	// minimap/viewport overlay once that lands; the flag persists meanwhile).
+	EditorVisualOptions::setShowCameraBorders(checked);
+	QSettings().setValue("view/cameraBorders", checked);
 	fprintf(stderr, "[view] camera-borders: %s\n", checked ? "on" : "off");
 	statusBar()->showMessage(tr("Show Camera Borders: %1").arg(checked ? tr("on") : tr("off")));
+	if(view_) view_->update();
 }
 
 void MainWindow::viewToggleTimeFlow(bool checked)
@@ -1526,9 +1565,14 @@ void MainWindow::viewTimeSlider()
 
 void MainWindow::viewToggleHideModels(bool checked)
 {
-	// OnViewHideModels: draw the terrain but not the 3D models.
+	// OnViewHideModels: draw the terrain and editor overlays but hide the units
+	// and environment models. The engine reads the flag in
+	// editorVisual().isVisible -> UnitBase::showEditor -> hide(HIDE_BY_EDITOR).
+	EditorVisualOptions::setHideWorldModels(checked);
+	QSettings().setValue("view/hideModels", checked);
 	fprintf(stderr, "[view] hide-models: %s\n", checked ? "on" : "off");
 	statusBar()->showMessage(tr("Hide Models: %1").arg(checked ? tr("on") : tr("off")));
+	if(view_) view_->update();
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
