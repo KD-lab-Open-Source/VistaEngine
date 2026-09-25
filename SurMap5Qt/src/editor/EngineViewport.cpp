@@ -27,6 +27,7 @@ using namespace std;
 #include "Render/SDLRenderDevice.h"
 #include "Render/SDLWorldQuadRenderer.h"  // TEMP FX debug (оверрайды quad-рендерера)
 #include "Terra/VMAP.H"              // vMap (load/create, H_SIZE/V_SIZE)
+#include "Terra/worldFileDispatcher.h" // bitmapDispatcher (the texture brush)
 #include "Terra/TerrainType.h"       // TerrainTypeDescriptor (surface names)
 #include "Environment/SourceManager.h"  // sourceManager (sources, anchors)
 #include "Environment/SourceBase.h"     // SourceBase::label()
@@ -399,6 +400,53 @@ public:
 			return false;
 		vMap.toShowSurKind(on);
 		vMap.WorldRender();
+		return true;
+	}
+
+	bool applyTexturePaint(float x, float y, float brushRadius,
+	                       const std::string& texturePath,
+	                       int centerAlpha, int kColor,
+	                       int saturation, int brightness,
+	                       int r, int g, int b,
+	                       int minH, int maxH) override
+	{
+		// SurToolColorPic::onOperationOnMap -> vMap.drawBitmapCircle with a
+		// ColorModificator (txColor + the K/S/B sliders / 100).
+		if(!vMap.isWorldLoaded())
+			return false;
+		// getBitmap registers the file and loads it on first use; getUID then
+		// yields the index drawBitmapCircle addresses.
+		if(!bitmapDispatcher.getBitmap(texturePath.c_str()))
+			return false;
+		const int uid = bitmapDispatcher.getUID(texturePath.c_str());
+		const int rad = std::max(1, (int)brushRadius);
+		if(minH == 0 && maxH == 0)
+			maxH = MAX_VX_HEIGHT;
+		ColorModificator cmod(Color4c((unsigned char)r, (unsigned char)g, (unsigned char)b),
+		                      (float)kColor / 100.f, (float)saturation / 100.f,
+		                      (float)brightness / 100.f);
+		vMap.drawBitmapCircle((int)x, (int)y, rad, (unsigned char)centerAlpha, uid,
+		                      (short)minH, (short)maxH, cmod);
+		return true;
+	}
+
+	bool putTextureToAllWorld(const std::string& texturePath,
+	                          int kColor, int saturation, int brightness,
+	                          int r, int g, int b,
+	                          int minH, int maxH) override
+	{
+		// SurToolColorPic::OnBnClicked_Put2World -> vMap.putBitmap2AllWorld.
+		if(!vMap.isWorldLoaded())
+			return false;
+		if(!bitmapDispatcher.getBitmap(texturePath.c_str()))
+			return false;
+		const int uid = bitmapDispatcher.getUID(texturePath.c_str());
+		if(minH == 0 && maxH == 0)
+			maxH = MAX_VX_HEIGHT;
+		ColorModificator cmod(Color4c((unsigned char)r, (unsigned char)g, (unsigned char)b),
+		                      (float)kColor / 100.f, (float)saturation / 100.f,
+		                      (float)brightness / 100.f);
+		vMap.putBitmap2AllWorld(uid, (short)minH, (short)maxH, cmod);
 		return true;
 	}
 

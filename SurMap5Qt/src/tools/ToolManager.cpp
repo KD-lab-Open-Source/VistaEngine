@@ -14,6 +14,8 @@
 #include "ToolzerPropertyPanel.h"
 #include "KindTool.h"
 #include "KindPropertyPanel.h"
+#include "ColorPicTool.h"
+#include "ColorPicPropertyPanel.h"
 #include "TransformPropertyPanel.h"
 #include "TransformTool.h"
 
@@ -27,6 +29,7 @@ ToolManager::ToolManager()
 	scale_  = new ScaleTool;
 	toolzer_ = new ToolzerTool;
 	kind_    = new KindTool;
+	colorPic_ = new ColorPicTool;
 	geoNet_ = new GeoNetTool;
 	geoTx_  = new GeoTxTool;
 
@@ -36,6 +39,7 @@ ToolManager::ToolManager()
 	tools_.push_back(scale_);
 	tools_.push_back(toolzer_);
 	tools_.push_back(kind_);
+	tools_.push_back(colorPic_);
 	tools_.push_back(geoNet_);
 	tools_.push_back(geoTx_);
 
@@ -53,6 +57,7 @@ ToolManager::~ToolManager()
 	delete geoTx_;
 	delete toolzer_;
 	delete kind_;
+	delete colorPic_;
 }
 
 void ToolManager::setWorldBridge(IWorldBridge* bridge)
@@ -77,6 +82,8 @@ void ToolManager::setBrushRadius(float radius)
 		toolzer_->setBrushRadius(radius);
 	if(kind_)
 		kind_->setBrushRadius(radius);
+	if(colorPic_)
+		colorPic_->setBrushRadius(radius);
 }
 
 void ToolManager::setCurrentTool(int index)
@@ -102,6 +109,8 @@ void ToolManager::setCurrentTool(int index)
 		toolzerPanel_->setTool(dynamic_cast<ToolzerTool*>(current_));
 	if(kindPanel_)
 		kindPanel_->setTool(dynamic_cast<KindTool*>(current_));
+	if(colorPicPanel_)
+		colorPicPanel_->setTool(dynamic_cast<ColorPicTool*>(current_));
 }
 
 QWidget* ToolManager::propertyWidget()
@@ -136,6 +145,13 @@ QWidget* ToolManager::propertyWidget()
 			kindPanel_->setTool(kind_);
 		}
 		return kindPanel_;
+	}
+	if(dynamic_cast<ColorPicTool*>(current_)){
+		if(!colorPicPanel_){
+			colorPicPanel_ = new ColorPicPropertyPanel;
+			colorPicPanel_->setTool(colorPic_);
+		}
+		return colorPicPanel_;
 	}
 	if(!propertyPanel_){
 		propertyPanel_ = new TransformPropertyPanel;

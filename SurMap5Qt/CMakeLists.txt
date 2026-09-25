@@ -229,6 +229,11 @@ add_executable(SurMap5Qt
     src/tools/KindTool.cpp
     src/tools/KindPropertyPanel.h
     src/tools/KindPropertyPanel.cpp
+    # The texture (ColorPic) brush + its Properties panel.
+    src/tools/ColorPicTool.h
+    src/tools/ColorPicTool.cpp
+    src/tools/ColorPicPropertyPanel.h
+    src/tools/ColorPicPropertyPanel.cpp
     # Phase 6 — the kdw trees as QTreeWidgets (tools + objects manager)
     src/panels/ToolsTreePanel.h
     src/panels/ToolsTreePanel.cpp

@@ -242,6 +242,28 @@ public:
 	// world is loaded.
 	virtual bool setShowSurKind(bool on) = 0;
 
+	// Texture brush (SurToolColorPic::onOperationOnMap -> vMap.drawBitmapCircle):
+	// paint a bitmap texture (Resource\TerrainData\Pictures\*.tga) under a
+	// circular brush, tinted by a ColorModificator. `texturePath` is the engine
+	// resource path; `centerAlpha` 0..255; `kColor`/`saturation`/`brightness`
+	// the modifiers (percent / 100, the original's slider values); `r/g/b` the
+	// tint colour 0..255. `minH`/`maxH` the optional height filter. Returns
+	// false when no world is loaded or the texture cannot be loaded.
+	virtual bool applyTexturePaint(float x, float y, float brushRadius,
+	                               const std::string& texturePath,
+	                               int centerAlpha, int kColor,
+	                               int saturation, int brightness,
+	                               int r, int g, int b,
+	                               int minH, int maxH) = 0;
+
+	// Paint the same texture over the whole world (SurToolColorPic::
+	// OnBnClicked_Put2World -> vMap.putBitmap2AllWorld). Returns false when no
+	// world is loaded or the texture cannot be loaded.
+	virtual bool putTextureToAllWorld(const std::string& texturePath,
+	                                  int kColor, int saturation, int brightness,
+	                                  int r, int g, int b,
+	                                  int minH, int maxH) = 0;
+
 	// Re-render the whole world (SurToolGeoTx::onOperationOnMap ->
 	// vMap.WorldRender). Returns false when no world is loaded.
 	virtual bool worldRender() = 0;
