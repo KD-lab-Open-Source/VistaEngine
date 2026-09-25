@@ -1004,6 +1004,14 @@ void MainWindow::selectTool(int index)
 {
 	// Switch the active editor tool (CToolsTreeWindow::selectTool equivalent).
 	view_->tools()->setCurrentTool(index);
+	// Swap the Properties dock to the new tool's panel. The dock's widget was
+	// set once for the startup tool (Select); without this, the per-tool panels
+	// (GeoNet/Toolzer/Kind/ColorPic/Unit) never showed up. The panels are owned
+	// and cached by ToolManager, so re-parenting them here is safe.
+	if(propertiesDock_){
+		if(QWidget* panel = view_->tools()->propertyWidget())
+			propertiesDock_->setWidget(panel);
+	}
 	if(toolsTreePanel_)
 		toolsTreePanel_->syncToTool();
 	statusBar()->showMessage(tr("Tool: %1").arg(view_->tools()->currentTool()->name()));

@@ -51,6 +51,9 @@ using namespace std;
 #include "Units/EnvironmentSimple.h"    // UnitEnvironmentSimple (Environment tab filter)
 #include "Units/BaseUnit.h"              // UnitBase, UnitList
 #include "Units/BaseUniverseObject.h"    // BaseUniverseObject (world bridge visit)
+#include "Units/IronLegion.h"            // UnitLegionary (placement: squad join)
+#include "Units/Squad.h"                 // UnitSquad (placement: addUnit)
+#include "Util/XTL/SafeCast.h"           // safe_cast (placement: legionary/squad)
 #include "Units/GlobalAttributes.h"      // GlobalAttributes::showHeadNames (Heads library)
 #include "Units/CommandsQueue.h"         // CommandColorManager (command colors)
 #include "Util/Serialization/EnumDescriptor.h" // getEnumDescriptor (command colors)
@@ -485,6 +488,18 @@ public:
 		UnitBase* unit = wp->buildUnit(AttributeReference(attr));
 		if(!unit)
 			return kNoObject;
+		// SurToolUnit::createUnit: a legionary is never standalone — it lives in
+		// a UnitSquad, and UnitLegionary::Quant kills a living legionary whose
+		// squad() is null (IronLegion.cpp). Build the squad the attribute points
+		// at, put it at the same spot, then add the legionary to it. Without
+		// this the placed unit blinked and vanished on the first logic quant.
+		if(unit->attr().isLegionary()){
+			UnitLegionary* legionary = safe_cast<UnitLegionary*>(unit);
+			UnitSquad* squad = safe_cast<UnitSquad*>(wp->buildUnit(&*legionary->attr().squad));
+			if(squad)
+				squad->setPose(Se3f(QuatF::ID, Vect3f(x, y, 0)), true);
+			squad->addUnit(legionary);
+		}
 		float z = 0.f;
 		const int xi = (int)roundf(x), yi = (int)roundf(y);
 		if(xi >= 0 && yi >= 0 && xi < (int)vMap.H_SIZE && yi < (int)vMap.V_SIZE)

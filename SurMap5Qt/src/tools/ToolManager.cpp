@@ -147,10 +147,12 @@ QWidget* ToolManager::propertyWidget()
 		return toolzerPanel_;
 	}
 	if(dynamic_cast<KindTool*>(current_)){
-		if(!kindPanel_){
+		if(!kindPanel_)
 			kindPanel_ = new KindPropertyPanel;
-			kindPanel_->setTool(kind_);
-		}
+		// Re-fill every time: the type names come from the world's
+		// TerrainTypeDescriptor, which may only be loaded after the panel
+		// was first created.
+		kindPanel_->setTool(kind_);
 		return kindPanel_;
 	}
 	if(dynamic_cast<ColorPicTool*>(current_)){
@@ -161,10 +163,11 @@ QWidget* ToolManager::propertyWidget()
 		return colorPicPanel_;
 	}
 	if(dynamic_cast<UnitTool*>(current_)){
-		if(!unitPanel_){
+		if(!unitPanel_)
 			unitPanel_ = new UnitPropertyPanel;
-			unitPanel_->setTool(unit_);
-		}
+		// Re-fill every time: AttributeLibrary is populated by the world load,
+		// so a panel created before the load would show an empty list.
+		unitPanel_->setTool(unit_);
 		return unitPanel_;
 	}
 	if(!propertyPanel_){

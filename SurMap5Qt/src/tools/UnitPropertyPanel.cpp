@@ -45,8 +45,14 @@ void UnitPropertyPanel::reloadAttributes()
 	}
 	if(attribute_->count() == 0)
 		attribute_->addItem(tr("(load a world to list units)"));
-	if(tool_ && tool_->attributeIndex() >= 0)
-		attribute_->setCurrentIndex(tool_->attributeIndex());
+	// Make sure the tool's index matches what the combo shows: a combo that
+	// already sat on index 0 would not emit currentIndexChanged, leaving the
+	// tool with attributeIndex_ == -1 and every click a no-op.
+	if(tool_ && attribute_->count() > 0){
+		const int index = tool_->attributeIndex() >= 0 ? tool_->attributeIndex() : 0;
+		attribute_->setCurrentIndex(index);
+		tool_->setAttributeIndex(index);
+	}
 }
 
 void UnitPropertyPanel::setTool(UnitTool* tool)
