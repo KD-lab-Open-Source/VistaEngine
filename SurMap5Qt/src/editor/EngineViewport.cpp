@@ -1803,13 +1803,13 @@ void EngineViewport::drawFrame()
 		scene_->SetDeltaTime(fxPaused_ ? 0.0f : (float)frameMs);
 
 	// TEMP CLEAN (убрать): VISTA_FX_CLEAN=1 — минимальный проход для эффектов.
+	// VISTA_FX_ON=DEPTH,SOFT,BLEND,COLOROP,FOG,ZREF,TRIALPHA — вернуть фильтры по одному.
 	{
 		static int s_set = -1;
 		if(s_set < 0){
 			s_set = getenv("VISTA_FX_CLEAN") ? 1 : 0;
-			if(s_set){
+			if(s_set)
 				fxSetClean(true);
-			}
 		}
 	}
 
@@ -3022,10 +3022,31 @@ void EngineViewport::fxSetForceNoDepth(bool b)
 }
 
 // TEMP CLEAN (убрать): VISTA_FX_CLEAN=1 — минимальный проход для эффектов.
+// VISTA_FX_ON=DEPTH,SOFT,BLEND,COLOROP,FOG,ZREF,TRIALPHA — вернуть фильтры по одному.
 void EngineViewport::fxSetClean(bool b)
 {
-	if(SDLWorldQuadRenderer* r = fxQuadRenderer())
-		r->setCleanFx(b);
+	SDLWorldQuadRenderer* r = fxQuadRenderer();
+	if(!r)
+		return;
+	r->setCleanFx(b);
+	if(b){
+		if(const char* on = getenv("VISTA_FX_ON")){
+			std::string s(on);
+			for(size_t i = 0; i < s.size(); ++i)
+				if(s[i] >= 'a' && s[i] <= 'z') s[i] = (char)(s[i] - 32);
+			unsigned keep = 0;
+			if(s.find("DEPTH")    != std::string::npos) keep |= SDLWorldQuadRenderer::CLEAN_KEEP_DEPTH;
+			if(s.find("SOFT")     != std::string::npos) keep |= SDLWorldQuadRenderer::CLEAN_KEEP_SOFT;
+			if(s.find("BLEND")    != std::string::npos) keep |= SDLWorldQuadRenderer::CLEAN_KEEP_BLEND;
+			if(s.find("COLOROP")  != std::string::npos) keep |= SDLWorldQuadRenderer::CLEAN_KEEP_COLOROP;
+			if(s.find("FOG")      != std::string::npos) keep |= SDLWorldQuadRenderer::CLEAN_KEEP_FOG;
+			if(s.find("ZREF")     != std::string::npos) keep |= SDLWorldQuadRenderer::CLEAN_KEEP_ZREF;
+			if(s.find("TRIALPHA") != std::string::npos) keep |= SDLWorldQuadRenderer::CLEAN_KEEP_TRIALPHA;
+			r->setCleanKeep(keep);
+			fprintf(stderr, "[fxclean] VISTA_FX_ON='%s' keep=0x%x\n", on, keep);
+			fflush(stderr);
+		}
+	}
 }
 
 void EngineViewport::fxSetForceNoFog(bool b)

@@ -414,11 +414,16 @@ void SDLWorldQuadRenderer::openGroup(GroupKind kind)
 	// TEMP CLEAN (убрать): VISTA_FX_CLEAN=1 — минимальный проход для эффектов:
 	// без depth-теста, без тумана, без soft-fade, без премультипликации,
 	// без второй текстуры (COLOR_OPERATION) — у TRI это colorOp[0], у QUAD colorOp[1].
+	// cleanKeep_ позволяет вернуть фильтр по одному (VISTA_FX_ON).
 	if(cleanFx_){
-		current_.depthTest = false;
-		current_.softDepth = false;
-		current_.blend = ALPHA_ADDBLEND;   // (ONE, ONE): чистый аддитив, ничего не затемняет
-		current_.fs.colorOp[0] = 0.f;      // TRI: COLOR_OPERATION off (ot.rgb не домножается на Tex1)
+		if(!(cleanKeep_ & CLEAN_KEEP_DEPTH))
+			current_.depthTest = false;
+		if(!(cleanKeep_ & CLEAN_KEEP_SOFT))
+			current_.softDepth = false;
+		if(!(cleanKeep_ & CLEAN_KEEP_BLEND))
+			current_.blend = ALPHA_ADDBLEND;   // (ONE, ONE): чистый аддитив, ничего не затемняет
+		if(!(cleanKeep_ & CLEAN_KEEP_COLOROP))
+			current_.fs.colorOp[0] = 0.f;      // TRI: COLOR_OPERATION off (ot.rgb не домножается на Tex1)
 	}
 	const Mat4f world(materialWorld_);
 	const Mat4f mvp = world * viewProj_;
@@ -459,12 +464,17 @@ void SDLWorldQuadRenderer::openGroup(GroupKind kind)
 
 	// TEMP CLEAN (убрать): туман, премультипликация и soft-fade выключены.
 	if(cleanFx_){
-		current_.vs.fogPlane[0] = current_.vs.fogPlane[1] = current_.vs.fogPlane[2] = 0.f;
-		current_.vs.fogPlane[3] = 1.f;
-		current_.fs.colorOp[1] = 0.f;        // не домножать texel на alpha
-		current_.fs.zBufferParams[0] = current_.fs.zBufferParams[1] =
-		current_.fs.zBufferParams[2] = current_.fs.zBufferParams[3] = 0.f;
-		current_.fs.zReflection[0] = 0.f;    // TRI: без height-clip (clip() выбрасывал бы пиксели)
+		if(!(cleanKeep_ & CLEAN_KEEP_FOG)){
+			current_.vs.fogPlane[0] = current_.vs.fogPlane[1] = current_.vs.fogPlane[2] = 0.f;
+			current_.vs.fogPlane[3] = 1.f;
+		}
+		if(!(cleanKeep_ & CLEAN_KEEP_COLOROP))
+			current_.fs.colorOp[1] = 0.f;        // не домножать texel на alpha
+		if(!(cleanKeep_ & CLEAN_KEEP_SOFT))
+			current_.fs.zBufferParams[0] = current_.fs.zBufferParams[1] =
+			current_.fs.zBufferParams[2] = current_.fs.zBufferParams[3] = 0.f;
+		if(!(cleanKeep_ & CLEAN_KEEP_ZREF))
+			current_.fs.zReflection[0] = 0.f;    // TRI: без height-clip (clip() выбрасывал бы пиксели)
 	}
 
 	// Which of the two fog rules this group takes. The original said the same thing through
@@ -588,7 +598,7 @@ void SDLWorldQuadRenderer::DrawPrimitive(PRIMITIVETYPE type, int nPolygon)
 	// TEMP CLEAN (убрать): у TRI-маршрута вершинный шейдер премультиплицирует
 	// цвет на alpha (worldtri.vert.hlsl), а фрагментный — нет, и результат гасится
 	// на v.a. Для диагностики в чистом режиме возвращаем alpha=255.
-	if(cleanFx_){
+	if(cleanFx_ && !(cleanKeep_ & CLEAN_KEEP_TRIALPHA)){
 		for(int i = 0; i < lockCount_ && (size_t)(lockFirst_ + i) < verticesTri_.size(); ++i)
 			verticesTri_[lockFirst_ + i].diffuse.a = 255;
 	}

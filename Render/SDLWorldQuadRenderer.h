@@ -189,6 +189,18 @@ public:
 	// TEMP CLEAN (убрать): минимальный проход — без depth/тумана/premul/soft.
 	void setCleanFx(bool b) { cleanFx_ = b; }
 	bool cleanFx() const { return cleanFx_; }
+	// TEMP CLEAN (убрать): какие фильтры НЕ отключать в чистом режиме — чтобы
+	// включать их по одному и находить, что именно ломает эффекты.
+	enum CleanItem {
+		CLEAN_KEEP_DEPTH    = 1,
+		CLEAN_KEEP_SOFT     = 2,
+		CLEAN_KEEP_BLEND    = 4,
+		CLEAN_KEEP_COLOROP  = 8,
+		CLEAN_KEEP_FOG      = 16,
+		CLEAN_KEEP_ZREF     = 32,
+		CLEAN_KEEP_TRIALPHA = 64,
+	};
+	void setCleanKeep(unsigned bits) { cleanKeep_ = bits; }
 
 	// Replay the quads recorded so far into one colour+depth render pass, blended over the
 	// scene and writing no depth (ALPHA_BLEND with RS_ZWRITEENABLE off, as every caller's
@@ -355,6 +367,7 @@ private:
 	bool debugWireParticles_ = false;
 	bool forceFlat_ = false;
 	bool cleanFx_ = false;   // TEMP CLEAN (убрать)
+	unsigned cleanKeep_ = 0; // TEMP CLEAN (убрать): какие фильтры НЕ отключать
 };
 
 #endif // VISTA_SDL_WORLD_QUAD_RENDERER_H

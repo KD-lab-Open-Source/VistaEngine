@@ -224,3 +224,62 @@ LibraryEditorDialog: a tree of library elements + a serialized property form
 11. Smaller MISSING items: Save Without terTool Color, Resave All Triggers,
     Save VoiceFile Durations, Update quick start list, Map Preset,
     Preferences, PlayPMO, camera borders overlay, extended tree-bar mode.
+
+## Effect render filters — diagnostic mode
+
+The world-quad renderer's effect filters can be dropped at runtime to see which
+one hides or distorts the effects. Set `VISTA_FX_CLEAN=1` to start in "clean
+mode" (all filters off), then list the ones to put back via `VISTA_FX_ON`
+(comma-separated, no rebuild needed). Implemented in
+`Render/SDLWorldQuadRenderer.cpp` (`openGroup`, `DrawPrimitive`) with the
+`CLEAN_KEEP_*` mask; parsed in `SurMap5Qt/src/editor/EngineViewport.cpp`
+(`fxSetClean`).
+
+| `VISTA_FX_ON` item | what it restores | observation |
+|---|---|---|
+| (none — clean mode) | all filters off | effects/particles visible |
+| `DEPTH` | depth test | **hides the effects** — the depth test is what suppresses them |
+| `SOFT` | soft-fade (scene-depth fade) | almost everything works, but with the fade on part of the units, seen at a certain angle, take the terrain texture. (A single unit rendering as the terrain at a certain angle may show up in every variant — not yet checked across all of them.) |
+| `BLEND` | the material's own blend (instead of forcing additive) | **the columns appear**, but part of the effects disappear or dim |
+| `COLOROP` | texel×alpha premultiply / COLOR_OPERATION | everything works **except the columns** — the same result as with every filter off, so COLOR_OPERATION is not what breaks the effects |
+| `FOG` | distance fog | everything works except the columns — same as all filters off |
+| `ZREF` | TRI height-clip (ZREFLECTION) | everything works except the columns — same as all filters off |
+| `TRIALPHA` | TRI vertex alpha (instead of forcing 255) | everything works except the columns — same as all-off (effects look a little brighter without the forced alpha=255) |
+
+These are diagnostics; the goal is to find the real filter bug and fix it, then
+remove the clean-mode code.
+
+### Findings
+
+Putting any filter back **one at a time** gave, for every item but two, the same
+picture: everything works except the columns. Only two items changed anything:
+
+- **`DEPTH`** — with the depth test back, the effects **vanish**. So the depth
+  test is what is suppressing the effect groups: they lose against the scene
+  depth (terrain/units). In the original the emitters that ask for a no-Z pass
+  (`EMITTER_DRAW_AFTER_ALL` and the two grass modes) are drawn with
+  `D3DRS_ZENABLE` off; the port reads that from the camera pass
+  (`emitterDepthTest`, commit `72e6441f`), so the groups that still fail the test
+  are the ones drawn in the *sorted* pass — i.e. the depth they compare against,
+  or the depth they are drawn at, is wrong.
+- **`BLEND`** — with the material's own blend back, **the columns appear**, but
+  part of the effects dim or disappear. The clean mode forces
+  `ALPHA_ADDBLEND`; the columns need their own blend to be visible, so a wrong
+  blend is a second, separate defect (it does not explain the columns being
+  missing in the normal build, where the blend is already the material's own —
+  there the depth test hides them like every other effect).
+
+Everything else (`SOFT`, `COLOROP`, `FOG`, `ZREF`, `TRIALALPHA`) is neutral for
+the columns.
+
+So the two things to fix are (1) the depth test that hides the effect groups,
+and (2) the columns' blend. Neither is a "filter to disable" — the clean mode
+only proved where the loss happens.
+
+Next: fix (1) the effect groups' depth test, then (2) the columns' blend.
+`VISTA_FX_ON=BLEND` shows the columns reliably, so it is the reference to diff
+the blend against.
+
+Note (session, editor rendering): the columns themselves are the `A_MAM` /
+`G_Core_Working_001`-style emitters and the core model's `Light` visibility set,
+not the particles — a separate line of work from the particle filters above.
