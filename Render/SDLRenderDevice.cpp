@@ -187,12 +187,34 @@ cRenderWindow* cSDLRenderDevice::createRenderWindow(HWND hwnd)
 
 	if(!globalRenderWindow_)
 		globalRenderWindow_ = wnd;
+	// Every renderer whose pipeline bakes in the swapchain format must learn the window
+	// once it exists: the Qt editor claims no SDL window at Initialize, so they were all
+	// constructed with a null window_ and would otherwise keep null (or default-format)
+	// pipelines forever. setWindow drops the ones built against the old format.
 	if(uiRenderer_)
 		uiRenderer_->setWindow(sdl);
 	if(tileMapRenderer_)
 		tileMapRenderer_->setWindow(sdl);
 	if(worldQuadRenderer_)
 		worldQuadRenderer_->setWindow(sdl);
+	if(objectRenderer_)
+		objectRenderer_->setWindow(sdl);
+	if(waterRenderer_)
+		waterRenderer_->setWindow(sdl);
+	if(grassRenderer_)
+		grassRenderer_->setWindow(sdl);
+	if(cloudShadowRenderer_)
+		cloudShadowRenderer_->setWindow(sdl);
+	if(environmentEarthRenderer_)
+		environmentEarthRenderer_->setWindow(sdl);
+	if(postEffectRenderer_)
+		postEffectRenderer_->setWindow(sdl);
+	if(lineRenderer_)
+		lineRenderer_->setWindow(sdl);
+	if(blobsRenderer_)
+		blobsRenderer_->setWindow(sdl);
+	if(minimapRenderer_)
+		minimapRenderer_->setWindow(sdl);
 	return wnd;
 }
 

@@ -49,6 +49,33 @@ SDLMinimapRenderer::~SDLMinimapRenderer()
 	if(primLinePipeline_) SDL_ReleaseGPUGraphicsPipeline(device_, primLinePipeline_);
 }
 
+// The Qt editor claims no SDL window at Initialize, so window_ is null when this
+// renderer is built; createRenderWindow hands the viewport's foreign window here once
+// it exists, as it does for every renderer. The pipelines are built from the window's
+// swapchain format, so they are dropped here and rebuilt against the real one --
+// createPipelines is otherwise called only from the constructor, so it must run again
+// here or the minimap would be left with no pipelines at all.
+void SDLMinimapRenderer::setWindow(SDL_Window* window)
+{
+	if(window_ == window)
+		return;
+	window_ = window;
+	if(!device_ || !window_)
+		return;
+	SDL_GPUGraphicsPipeline** ps[] = { &mapPipeline_, &primPipeline_, &primLinePipeline_ };
+	for(SDL_GPUGraphicsPipeline** p : ps){
+		if(*p) SDL_ReleaseGPUGraphicsPipeline(device_, *p);
+		*p = nullptr;
+	}
+	// createPipelines also (re)creates the sampler and the white stand-in texture; release
+	// the old ones first or they leak on the second run.
+	if(sampler_)      SDL_ReleaseGPUSampler(device_, sampler_);
+	if(whiteTexture_) SDL_ReleaseGPUTexture(device_, whiteTexture_);
+	sampler_ = nullptr;
+	whiteTexture_ = nullptr;
+	createPipelines();
+}
+
 // ---------------------------------------------------------------------------
 // Pipelines
 // ---------------------------------------------------------------------------

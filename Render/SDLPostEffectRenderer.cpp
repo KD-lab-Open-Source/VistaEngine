@@ -35,6 +35,25 @@ SDLPostEffectRenderer::~SDLPostEffectRenderer()
 	if(pingTexture_) SDL_ReleaseGPUTexture(device_, pingTexture_);
 }
 
+// The Qt editor claims no SDL window at Initialize, so window_ is null when this
+// renderer is built; createRenderWindow hands the viewport's foreign window here once
+// it exists, as it does for every renderer. The pipelines are built from the window's
+// swapchain format, so they are dropped here and rebuilt on demand.
+void SDLPostEffectRenderer::setWindow(SDL_Window* window)
+{
+	if(window_ == window)
+		return;
+	window_ = window;
+	if(!device_ || !window_)
+		return;
+	for(SDL_GPUGraphicsPipeline*& p : pipelines_){
+		if(p) SDL_ReleaseGPUGraphicsPipeline(device_, p);
+		p = nullptr;
+	}
+	// The intermediate ping-pong texture is target-sized, not format-bound, but its
+	// pipelines keyed on the old format are gone; it is recreated on demand anyway.
+}
+
 void SDLPostEffectRenderer::createSamplers()
 {
 	if(!device_)

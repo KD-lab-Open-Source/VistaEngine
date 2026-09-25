@@ -371,6 +371,74 @@ game (`VistaEngineDbg.exe`) on the same world and look at `G_Fx_Pump_001` /
 editor-only (draw order / target / camera); if the game also hides them, it is
 engine-wide and belongs in `Render-PORTING.md`, not the editor register.
 
+### Found: the frame's screen clear lands after the effects pass (game vs editor)
+
+The game was built from this tree (`Game` target, run with the editor's working
+directory so both load the same content) and the two frames were traced with the
+same instrumented renderer. The game shows the effects; the editor does not, and
+the pass order is where they part.
+
+Game, one frame:
+
+```
+#9370 WORLDQUAD  cubemap 256²   clear=1
+#9371 WORLDQUAD  screen 1920²   clear=1   <- the frame's only screen clear
+#9372 WORLDQUAD  screen 1920²   clear=0
+#9373 WORLDQUAD  reflection 1024² clear=1
+#9374 WORLDQUAD  256²           clear=0
+#9375 TERRAIN    1024²           clearDepth=1
+#9376-9379 WORLDQUAD 1024²      clear=0
+#9380 TERRAIN    screen 1920²   clear=0
+#9381-9386 WORLDQUAD screen 1920² clear=0   <- main scene + effects
+```
+
+Editor, one frame:
+
+```
+#402 WORLDQUAD screen 1035²  clear=0        <- effects drawn here
+#403 WORLDQUAD cubemap 256²  clear=1
+#404 WORLDQUAD screen 1035²  clear=1        <- the clear lands AFTER #402
+#405 WORLDQUAD screen 1035²  clear=0
+```
+
+In the game the screen is cleared **once, before** anything draws into it; in the
+editor the screen's clear opens **after** a world-quad pass already drew the
+effects into it, so that pass is wiped. The `#403` cubemap face (the sky, which
+`EnvironmentTime::Draw()` now renders — crossplatform's `Environment::graphQuant`
+calls it) sits between the two screen targets, and the editor's two `...EB0` /
+`...F08` screen images show the clear being armed on the wrong one.
+
+The original editor's `CGeneralView::graphQuant` called `environmentTime()->Draw()`
+**once, explicitly, right after `BeginScene` and before `environment->graphQuant`**
+(`SurMap5/GeneralView.cpp:297`); crossplatform moved that call **inside**
+`Environment::graphQuant`. The fix is to restore the original ordering for the
+editor's frame (or make the cubemap render not re-arm the frame's screen clear),
+not to touch the effects.
+
+### RESOLVED: the light columns were a missing window, not lost logic
+
+The whole hunt above (pass order, clear, premultiply, `zMode`, triggery) described
+effects that *reached* `Draw` and then did not appear. The in-body **light columns
+of the core** turned out to be a different, simpler thing: the effect that carries
+them (`G_Fx_Button_005`, per the game's own `[fxcol]` trace) was **never created**
+in the editor at all, and the columns that *did* exist were drawn by
+`SDLWorldQuadRenderer`, which the editor had left with `window_ == null`.
+
+`SDLWorldQuadRenderer` was built at `Initialize` with no window (the Qt editor
+claims none then) and, unlike the tile map and the UI, it had **no `setWindow`** —
+so `pipelineFor` bailed on `!window_` and returned a null pipeline for every group.
+`Draw` then skipped every group silently. Commit `623d7f6f` fixed it for world-quad
+alone; the same fix has now been applied to **every** renderer, so none is left
+with a null (or default-format) pipeline. That is what made the columns appear.
+
+So the editor's remaining difference from the game is **not** here: it is the
+game-logic channels the editor skips on purpose (`isUnderEditor()` gates:
+`Universe::Quant` → no `triggerQuant`, `SourceBase::quant` → no source activation
+or waiting effects, `SourceZone::apply` → no damage/abnormal state, `UnitActing`
+→ no weapon quant, and `Environment::logicQuant` → time stands still unless the
+time-flow toggle is on). Effects started by those channels are absent in the
+editor by design; effects tied to a unit's `permanentEffects` load and show.
+
 ### `EngineViewport::drawFrame` vs `GameShell::Show` / `CGeneralView::graphQuant`
 
 The frame order matches the original editor's `graphQuant` (Fill → BeginScene →
@@ -517,17 +585,39 @@ are candidates for removal once the problem they measure is fixed.
   z-write, `SRC_ALPHA`/`1-SRC_ALPHA` blend. One pipeline, one vertex layout
   (`sVertexXYZD`), one uniform (MVP), replayed in one pass at `EndScene` before the
   UI. `Render/CMakeLists.txt` adds the `worldline` shader module and the source.
-- **Null-window tolerance across the other renderers.** `SDLCloudShadowRenderer`,
-  `SDLEnvironmentEarthRenderer`, `SDLGrassRenderer`, `SDLMinimapRenderer`,
-  `SDLPostEffectRenderer`, `SDLWaterRenderer`, `SDLObject3dxRenderer` and
-  `SDLWorldQuadRenderer` no longer require `window_` to build their
-  shaders/pipelines: `SDL_GetGPUSwapchainTextureFormat` tolerates a null window
-  (returns the device default), so only `device_` gates. Before this, with no SDL
-  window every pipeline aborted to null and nothing rasterized (models, water,
-  clouds, …).
-- **`Render/SDLUIRenderer.{cpp,h}` + `Render/SDLTileMapRenderer.{cpp,h}` —
-  `setWindow`.** Rebuild the swapchain-format-dependent pipeline once the editor's
-  foreign window exists; `createRenderWindow` calls both.
+- **Null-window tolerance across the renderers.** When the Qt editor had no SDL
+  window, every renderer was constructed with `window_ == null`. Two mechanisms
+  cover it, and between them **every** renderer now builds its pipelines in the
+  editor:
+  - The plain-single-pipeline renderers (`SDLCloudShadowRenderer`,
+    `SDLEnvironmentEarthRenderer`, `SDLGrassRenderer`, `SDLPostEffectRenderer`,
+    `SDLObject3dxRenderer`) build their shaders from the device alone:
+    `SDL_GetGPUSwapchainTextureFormat` tolerates a null window (returns the device
+    default), so only `device_` gates. Their window-format pipelines are built
+    lazily and dropped/rebuilt when the window arrives (below).
+  - `SDLWorldQuadRenderer` (the effects), `SDLWaterRenderer` and
+    `SDLMinimapRenderer` need the **real** swapchain format, so they keep their
+    window gate and get a `setWindow` instead.
+- **`setWindow` on every renderer.** `cSDLRenderDevice::createRenderWindow` hands
+  the viewport's foreign window to **all twelve** renderers (`ui`, `tileMap`,
+  `worldQuad`, `object3dx`, `water`, `grass`, `cloudShadow`, `environmentEarth`,
+  `postEffect`, `worldLine`, `blobs`, `minimap`), not just the first three. Each
+  `setWindow` releases the pipelines built against the old (null) format and lets
+  them rebuild; the shaders and samplers, which are window-independent, are kept.
+  This is what restored the light columns: before, only the tile map and the UI
+  got the window, so `SDLWorldQuadRenderer` stayed with a null `window_` and
+  `pipelineFor` returned null for every effect group, silently.
+  Two renderers build their pipelines **only** in the constructor, with no lazy
+  path, so their `setWindow` *re-runs* the build (releasing the samplers and the
+  flat stand-in texture first, or they would leak): `SDLWaterRenderer`
+  (`createPipelines` → fill/line/reflect/cube/ice) and `SDLMinimapRenderer`
+  (`createPipelines` → map/symbol/lines). `SDLWorldLineRenderer::setWindow` also
+  clears `shadersTried_` beside `pipelineReady_`, since `ensurePipeline` keys off
+  it and would otherwise keep returning the stale `false`.
+- **`Render/SDLBlobsRenderer.cpp` — shaders need no window.** Its `createShaders`
+  was the last one still gated on `window_`; the shaders read no window (only the
+  swapchain-format query in `createPipelines` does), so it builds from the device
+  alone now.
 - **`Render/SDLUIRenderer.cpp/.h` — `DrawDebugTriangle` [TEMP].** Screen-space
   diagnostic triangle used while validating the native SDL swapchain host.
 - **`Render/SDLTileMapRenderer.cpp` — terrain bring-up logs [TEMP].** A first-draw

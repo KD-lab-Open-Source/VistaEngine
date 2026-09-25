@@ -62,6 +62,27 @@ SDLWorldLineRenderer::~SDLWorldLineRenderer()
 	if(pipeline_)      SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
 }
 
+void SDLWorldLineRenderer::setWindow(SDL_Window* window)
+{
+	if(window_ == window)
+		return;
+	window_ = window;
+	if(!device_ || !window_)
+		return;
+	// The pipeline bakes in the swapchain format; drop it and let ensurePipeline rebuild
+	// against the real window. ensurePipeline keys off shadersTried_, so that flag has to
+	// go too or it would return the stale pipelineReady_ (false) and never rebuild. The
+	// shaders are released with it, since the rebuild path creates them again.
+	if(pipeline_) SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
+	if(vs_)       SDL_ReleaseGPUShader(device_, vs_);
+	if(fs_)       SDL_ReleaseGPUShader(device_, fs_);
+	pipeline_ = nullptr;
+	vs_ = nullptr;
+	fs_ = nullptr;
+	pipelineReady_ = false;
+	shadersTried_ = false;
+}
+
 // ---------------------------------------------------------------------------
 // Pipeline
 // ---------------------------------------------------------------------------

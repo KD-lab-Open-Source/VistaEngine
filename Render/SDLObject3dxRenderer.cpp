@@ -145,6 +145,22 @@ SDLObject3dxRenderer::~SDLObject3dxRenderer()
 	if(fsShadow_)      SDL_ReleaseGPUShader(device_, fsShadow_);
 }
 
+// The Qt editor claims no SDL window at Initialize, so window_ is null when this
+// renderer is built; createRenderWindow hands the viewport's foreign window here once
+// it exists, as it does for every renderer. The pipelines are built from the window's
+// swapchain format, so they are dropped here and rebuilt on demand.
+void SDLObject3dxRenderer::setWindow(SDL_Window* window)
+{
+	if(window_ == window)
+		return;
+	window_ = window;
+	if(!device_ || !window_)
+		return;
+	for(auto& p : pipelines_)
+		if(p.second) SDL_ReleaseGPUGraphicsPipeline(device_, p.second);
+	pipelines_.clear();
+}
+
 // ---------------------------------------------------------------------------
 // Pipelines
 // ---------------------------------------------------------------------------

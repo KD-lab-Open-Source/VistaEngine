@@ -72,6 +72,11 @@ public:
 	// into, and they must not replay into the next one.
 	void DiscardDraws() { draws_.clear(); }
 
+	// Hand the renderer the SDL window whose swapchain it draws into, once one exists
+	// (the Qt editor creates its foreign window after the device). The pipelines are
+	// built from the swapchain format, so they are released here and rebuilt on demand.
+	void setWindow(SDL_Window* window);
+
 	// Replay the pending draws into one colour+depth pass, and clear them. `clear`/`clearDepth`
 	// mean this pass owns the target's clears -- clearDepth is true here, since the earth draws
 	// first (after the camera's ClearZBuffer) and the terrain draws over its depth. Returns

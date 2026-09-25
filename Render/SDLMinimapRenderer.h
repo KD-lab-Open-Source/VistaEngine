@@ -103,6 +103,11 @@ public:
 	void DrawRun(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* cmd, int index,
 	             int screenW, int screenH);
 
+	// Hand the renderer the SDL window whose swapchain it draws into, once one exists
+	// (the Qt editor creates its foreign window after the device). The pipelines are
+	// built from the swapchain format, so they are released here and rebuilt on demand.
+	void setWindow(SDL_Window* window);
+
 private:
 	// One recorded draw: a run of vertices, the pipeline to draw it with, up to four
 	// textures, and the fragment uniforms that gate the shader's optional layers.

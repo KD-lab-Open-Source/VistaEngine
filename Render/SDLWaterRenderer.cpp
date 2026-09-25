@@ -51,6 +51,42 @@ SDLWaterRenderer::~SDLWaterRenderer()
 	if(pipelineIceLine_) SDL_ReleaseGPUGraphicsPipeline(device_, pipelineIceLine_);
 }
 
+// The Qt editor claims no SDL window at Initialize, so window_ is null when this
+// renderer is built; createRenderWindow hands the viewport's foreign window here once
+// it exists, as it does for every renderer. The pipelines are built from the window's
+// swapchain format, so they are dropped here and rebuilt against the real one --
+// createPipelines is otherwise called only from the constructor, so it must run again
+// here or the water would be left with no pipelines at all.
+void SDLWaterRenderer::setWindow(SDL_Window* window)
+{
+	if(window_ == window)
+		return;
+	window_ = window;
+	if(!device_ || !window_)
+		return;
+	SDL_GPUGraphicsPipeline** ps[] = {
+		&pipelineFill_, &pipelineLine_,
+		&pipelineReflectFill_, &pipelineReflectLine_,
+		&pipelineCubeFill_, &pipelineCubeLine_,
+		&pipelineIceFill_, &pipelineIceLine_,
+	};
+	for(SDL_GPUGraphicsPipeline** p : ps){
+		if(*p) SDL_ReleaseGPUGraphicsPipeline(device_, *p);
+		*p = nullptr;
+	}
+	// createPipelines also (re)creates the samplers and the flat stand-in texture;
+	// release the old ones first or they leak on the second run.
+	if(sampler_)      SDL_ReleaseGPUSampler(device_, sampler_);
+	if(samplerClamp_) SDL_ReleaseGPUSampler(device_, samplerClamp_);
+	if(samplerCube_)  SDL_ReleaseGPUSampler(device_, samplerCube_);
+	if(flatTexture_)  SDL_ReleaseGPUTexture(device_, flatTexture_);
+	sampler_ = nullptr;
+	samplerClamp_ = nullptr;
+	samplerCube_ = nullptr;
+	flatTexture_ = nullptr;
+	createPipelines();
+}
+
 // ---------------------------------------------------------------------------
 // Pipeline
 // ---------------------------------------------------------------------------

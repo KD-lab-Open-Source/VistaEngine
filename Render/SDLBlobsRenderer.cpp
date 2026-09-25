@@ -41,6 +41,22 @@ SDLBlobsRenderer::~SDLBlobsRenderer()
 	if(transferBuffer_) SDL_ReleaseGPUTransferBuffer(device_, transferBuffer_);
 }
 
+void SDLBlobsRenderer::setWindow(SDL_Window* window)
+{
+	if(window_ == window)
+		return;
+	window_ = window;
+	if(!device_ || !window_)
+		return;
+	// The pipelines bake in the swapchain format of the old (null) window; drop them so
+	// the next Draw rebuilds them against the real one. The shaders and samplers do not
+	// depend on the window, so they stay.
+	if(cellPipeline_)      SDL_ReleaseGPUGraphicsPipeline(device_, cellPipeline_);
+	if(compositePipeline_) SDL_ReleaseGPUGraphicsPipeline(device_, compositePipeline_);
+	cellPipeline_ = nullptr;
+	compositePipeline_ = nullptr;
+}
+
 void SDLBlobsRenderer::createSamplers()
 {
 	if(!device_)
@@ -66,7 +82,12 @@ bool SDLBlobsRenderer::createShaders()
 	if(shadersTried_)
 		return cellVS_ && cellFS_ && compositeVS_ && compositeFS_;
 	shadersTried_ = true;
-	if(!device_ || !window_)
+	// window_ may be null -- the Qt editor creates no SDL window of its own; the swapchain
+	// comes from the foreign window later. SDL_GetGPUSwapchainTextureFormat tolerates a null
+	// window (it returns the device's default swapchain format), so only the device
+	// matters; the shaders do not read the window at all. Requiring one left them null
+	// forever in the Qt editor.
+	if(!device_)
 		return false;
 
 	// The cell quad: ui.vert.hlsl's one vertex uniform is (1/width, 1/height) of the

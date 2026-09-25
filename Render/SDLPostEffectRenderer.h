@@ -54,6 +54,11 @@ public:
 	void recordUnderWater(float shift, float scale, const Color4f& color, cTexture* wave);
 
 	bool hasEffects() const { return !effects_.empty(); }
+
+	// Hand the renderer the SDL window whose swapchain it draws into, once one exists
+	// (the Qt editor creates its foreign window after the device). The pipelines are
+	// built from the swapchain format, so they are released here and rebuilt on demand.
+	void setWindow(SDL_Window* window);
 	// Throw the pending effects away: the frame has nowhere to composite them.
 	void DiscardDraws() { effects_.clear(); }
 

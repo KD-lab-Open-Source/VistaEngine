@@ -150,6 +150,11 @@ public:
 	                          const sPtrIndexBuffer& ib, int nOfsPolygon, int nPolygon);
 
 	bool hasDraws() const { return !draws_.empty(); }
+
+	// Hand the renderer the SDL window whose swapchain it draws into, once one exists
+	// (the Qt editor creates its foreign window after the device). The pipelines are
+	// built from the swapchain format, so they are released here and rebuilt on demand.
+	void setWindow(SDL_Window* window);
 	// Throw the pending draws away: the target they were recorded under cannot be rendered
 	// into (see cSDLRenderDevice::flushTarget), and they must not replay into the next one.
 	void DiscardDraws() { draws_.clear(); }

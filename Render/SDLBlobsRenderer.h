@@ -59,6 +59,13 @@ public:
 	SDLBlobsRenderer(const SDLBlobsRenderer&) = delete;
 	SDLBlobsRenderer& operator=(const SDLBlobsRenderer&) = delete;
 
+	// The Qt editor claims no SDL window at Initialize, so window_ is null when this
+	// renderer is built; createRenderWindow hands the viewport's foreign window here
+	// once it exists, as it does for every other renderer. The pipelines are built
+	// from the window's swapchain format, so they must not be cached before a window
+	// is known -- the old ones are released here and rebuilt on the next Draw.
+	void setWindow(SDL_Window* window);
+
 	// Drop the previous frame's cells and composite. Called from BeginScene.
 	void BeginFrame();
 

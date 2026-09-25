@@ -71,6 +71,11 @@ public:
 
 	bool hasDraws() const { return !vertices_.empty(); }
 
+	// Hand the renderer the SDL window whose swapchain it draws into, once one exists
+	// (the Qt editor creates its foreign window after the device). The pipeline is built
+	// from the swapchain format, so it is released here and rebuilt on the next Draw.
+	void setWindow(SDL_Window* window);
+
 	// Replay the recorded segments into one colour+depth render pass, blended
 	// over the scene and writing no depth, z-tested LESS-EQUAL against the
 	// depth target. `clear`/`clearDepth` mean this pass owns the frame's
