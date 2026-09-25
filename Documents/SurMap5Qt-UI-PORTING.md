@@ -3,6 +3,15 @@
 The MFC editor (SurMap5/) is the reference; this file tracks what the Qt port
 (SurMap5Qt/) still has as a stub or is missing entirely. Status values:
 
+> **Status as of the `qt-editor` branch (session audit).** Parts of this file
+> are older than the code: the Qt library editor, the Objects Manager, real
+> 3D picking/selection, the transform tools, the Properties dock and the whole
+> trigger editor are **implemented now**, not stubs. The tables below were
+> corrected against `SurMap5Qt/src`, but the *narrative* sections that follow
+> them (Panels, Tools, Camera/Environment, External-tool editors) still carry
+> some of the old wording — treat the tables and the "Current gaps" summary at
+> the end as authoritative.
+
 - **OK** — real implementation in the Qt port.
 - **STUB** — the action/menu exists but only logs "not wired yet" / shows a
   status message / is a placeholder.
@@ -18,66 +27,68 @@ Where a stub can be promoted now that the editor builds a real Universe
 ### File
 | Command | Original handler | Port | Notes |
 |---|---|---|---|
-| New World | OnFileNew | OK | `newWorld()` |
-| Open World | OnFileOpen | OK | `openWorld()` |
-| Save / Save As | OnFileSave/Saveas | OK | `fileSave()/fileSaveAs()` |
-| Save MiniMap to World | OnFileSaveminimaptoworld | OK | `fileSaveMiniMapToWorld()` |
-| Save Without terTool Color | OnFileSavewithouttertoolcolor | MISSING | vMap.save variant; engine `saveWorld` flag |
-| Resave All Worlds | OnFileResaveWorlds | OK | `fileResaveWorlds()` |
-| Resave All Triggers | OnFileResaveTriggers | MISSING | iterate Scripts\Content\Triggers, `triggerChain.save()` |
+| New World | OnFileNew | OK | `newWorld()` → `EngineViewport::createWorld` (`vMap.create/save` + `new Universe`) |
+| Open World | OnFileOpen | OK | `openWorld()` → `vMap.load` + `MissionDescription` + `new Universe` |
+| Save / Save As | OnFileSave/Saveas | OK | `fileSave()/fileSaveAs()` → `vMap.save` |
+| Save MiniMap to World | OnFileSaveminimaptoworld | OK | `fileSaveMiniMapToWorld()` → `vMap.saveMiniMap` |
+| Save Without terTool Color | OnFileSavewithouttertoolcolor | N/A | original body is commented out |
+| Resave All Worlds | OnFileResaveWorlds | OK | `fileResaveWorlds()` loops load+save |
+| Resave All Triggers | OnFileResaveTriggers | MISSING | iterate `Scripts\Content\Triggers`, `TriggerChain::load/save` |
 | Save VoiceFile Durations | OnFileSaveVoiceFileDurations | MISSING | `VoiceAttribute::loadVoiceFileDuration` then save |
 | Update quick start worlds list | OnFileUpdateQuickStartWorldsList | MISSING | rebuild `Scripts\Content\QuickStartWorlds` list |
 | Merge | OnFileMerge | STUB | `fileMerge()` TODO; needs `universe()->mergeWorld` |
-| Run World / Run Main Menu | OnFileRunWorld/RunMenu | OK | spawns Game.exe |
-| Export VistaEngine | OnFileExportVistaEngine | STUB | `fileExportVistaEngine()` TODO |
-| Import/Export Text Excel | OnFileImportTextFromExcel / ExportTextToExcel | STUB | two slots TODO |
-| Export/Import World | OnFileExportImportWorld | OK | `fileExImWorld()` + ExImWorldDialog |
-| Properties | OnFileProperties | OK | WorldPropertiesDialog |
-| Statistics | OnFileStatistics | OK | TexturesStatisticsDialog |
+| Run World / Run Main Menu | OnFileRunWorld/RunMenu | OK | spawns `Game.exe` (staged next to the editor by `.local/build-game.ps1`) |
+| Export VistaEngine | OnFileExportVistaEngine | STUB | packaging pipeline (bat, exe/dll copy, archives, installer) |
+| Import/Export Text Excel | OnFileImportTextFromExcel / ExportTextToExcel | STUB | `ImportImpl/ExportImpl` ↔ `TextDB` |
+| Export/Import World | OnFileExportImportWorld | PARTIAL | `fileExImWorld()` + `ExImWorldDialog`; drives external `packer.exe` |
+| Properties | OnFileProperties | OK | WorldPropertiesDialog (read-only) |
+| Statistics | OnFileStatistics | OK | TexturesStatisticsDialog (read-only) |
 | Exit | ID_APP_EXIT | OK | |
 
 ### Edit
 | Command | Original handler | Port | Notes |
 |---|---|---|---|
-| Undo/Redo | OnEditUndo/Redo | OK | `editUndo()/editRedo()` |
-| Map Scenario | OnEditMap | STUB | `editMapScenario()` TODO; original edits MapSerializer via kdw |
-| Game Scenario | OnEditGameScenario | STUB | TODO |
-| Map Preset | OnEditPreset | MISSING | Edit menu "Карта пресет" — attribute preset editor |
-| Preferences | OnEditPreferences | MISSING | full options dialog (see Preferences section) |
-| Save Camera As Default | OnEditSaveCameraAsDefault | OK | `editSaveCameraAsDefault()` |
-| PlayPMO | OnEditPlaypmo | MISSING | debug replay (PMO) |
-| Rebuild World | OnEditRebuildworld | OK | |
-| Update Surface | OnEditUpdateSurface | OK | |
-| Change Total World Param | OnEditChangetotalworldheight | OK | ChangeTotalWorldHeightDialog |
-| Rolling Border | OnEditRollingborder | OK | BorderRollingDialog |
-| Triggers | OnEditTriggers | STUB | `editTriggers()` picks file, editor TODO |
-| Units | OnEditUnits | STUB | Library editor (kdw) |
-| Objects (editors?) | OnEditObjects | MISSING | |
-| User Interface | OnEditUserInterface | STUB | launches external UIEditor.exe |
-| Effects | OnEditEffects | STUB | |
-| Sounds | OnEditSounds | STUB | |
-| TerTools | OnEditTertools | STUB | |
-| Cursors | OnEditCursors | STUB | |
-| Heads | OnEditHeads | STUB | |
-| Sound Tracks | OnEditSoundTracks | STUB | |
-| Reels | OnEditReels | STUB | (original is a no-op too → N/A-ish) |
-| Command Color | OnEditCommandColor | STUB | |
-| UITextSprites | OnEditUITextSprites | STUB | |
+| Undo/Redo | OnEditUndo/Redo | OK | `vMap.UndoDispatcher_*` |
+| Map Scenario | OnEditMap | STUB | `editMapScenario()` TODO; original edited `MapSerializer` |
+| Game Scenario | OnEditGameScenario | STUB | `editGameScenario()` TODO; original `GameSerializer` |
+| Map Preset | OnEditPreset | MISSING | `PresetSerializer` / `environment->loadPreset/savePreset` |
+| Preferences | OnEditPreferences | MISSING | full `SurMapOptions` dialog (see Preferences section) |
+| Save Camera As Default | OnEditSaveCameraAsDefault | PARTIAL | writes QSettings, but `applySavedCameraDefault()` never calls `setOrbitCamera` |
+| PlayPMO | OnEditPlaypmo | MISSING | debug replay (`vMap.playPMOperation`) |
+| Rebuild World | OnEditRebuildworld | OK | `vMap.rebuild` + `reinitWorld` |
+| Update Surface | OnEditUpdateSurface | OK | `vMap.recalcArea2Grid` |
+| Change Total World Param | OnEditChangetotalworldheight | OK | ChangeTotalWorldHeightDialog + `changeTotalWorldParam` |
+| Rolling Border | OnEditRollingborder | OK | BorderRollingDialog + `vMap.autoLace` |
+| Triggers | OnEditTriggers | OK | SelectTriggerDialog + full TriggerEditorDialog (graph, class tree, conditions, debugger, minimap) |
+| Units | OnEditUnits | OK | Qt library editor, `openLibrary("AttributeLibrary")` |
+| Objects | OnEditObjects | N/A | original body commented out |
+| User Interface | OnEditUserInterface | PARTIAL | launches external `UIEditor.exe` |
+| Effects | OnEditEffects | OK | `openLibrary("EffectContainerLibrary")` |
+| Sounds | OnEditSounds | OK | `openLibrary("SoundLibrary")` |
+| TerTools | OnEditTertools | OK | `openLibrary("TerToolsLibrary")` |
+| Cursors | OnEditCursors | OK | `openLibrary("UI_CursorLibrary")` |
+| Heads | OnEditHeads | OK | HeadsDialog → `GlobalAttributes::showHeadNames` + `saveLibrary` |
+| Sound Tracks | OnEditSoundTracks | OK | `openLibrary("SoundTrackTable")` |
+| Reels | OnEditReels | PARTIAL | `ReelsDialog` lists `.bik`; original was a no-op → N/A-ish |
+| Command Color | OnEditCommandColor | PARTIAL | `openLibrary("CommandColorManager")` reads real colors; `setCommandColor` is a no-op |
+| UITextSprites | OnEditUITextSprites | OK | `openLibrary("UI_SpriteLibrary")` |
+| Terrain Type Name | OnLibrariesTerrraintypename | PARTIAL | TerrainTypeDialog reads; `setTerrainTypeNames` write is a no-op |
+| Effects Editor (tool) | OnEditEffectsEditor | PARTIAL | launches external `EffectTool.exe` |
 
 ### View
 | Command | Original handler | Port | Notes |
 |---|---|---|---|
-| Sources | OnViewSources | STUB | original flips `surMapOptions.showSources_` + `Environment::flag_ViewWaves`; visibility read by EditorVisual::isVisible |
-| Cameras | OnViewCameras | STUB | same pattern (`showCameras_`) |
-| Geosurface | OnViewGeosurface | STUB | original is commented out (no-op) → N/A |
-| Show Grid | OnViewShowGrid | OK | `viewToggleGrid` → EngineViewport gridVisible_ |
-| Camera Borders | OnViewShowCameraBorders | STUB | `showCameraBorders_` + GeneralView::drawGrid |
-| Path Finding | OnViewPathFinding | STUB | `showPathFinding_` + EditorVisual aux unit |
-| Path Finding - Select Ref Unit | OnViewPathFindingReferenceUnit | STUB | kdw TreeSelectorDialog |
-| Time Flow | OnViewEnableTimeFlow | OK | `viewToggleTimeFlow` (state only) |
-| Hide Models | OnViewHideModels | STUB | `hideWorldModels_` → EditorVisual::isVisible |
-| Animation | OnViewAnimation | OK | `actToggleAnimation_` |
-| Time Slider (dock) | (CTimeSliderDlg in filtersBar) | PARTIAL | modal dialog port only; original is a modeless child of the filters bar |
+| Sources | OnViewSources | STUB | original flipped `surMapOptions.showSources_` + `Environment::flag_ViewWaves`; needs `EditorVisual::isVisible` |
+| Cameras | OnViewCameras | PARTIAL | opens CameraDialog (real spline editing); does not toggle a visibility filter |
+| Geosurface | OnViewGeosurface | N/A | original is commented out (no-op) |
+| Show Grid | OnViewShowGrid | OK | `viewToggleGrid` → EngineViewport `gridVisible_` |
+| Camera Borders | OnViewShowCameraBorders | STUB | needs `showCameraBorders_` + overlay |
+| Path Finding | OnViewPathFinding | STUB | needs `showPathFinding_` + EditorVisual aux unit |
+| Path Finding - Select Ref Unit | OnViewPathFindingReferenceUnit | DEAD | action exists but has **no** connect |
+| Time Flow | OnViewEnableTimeFlow | PARTIAL | records `timeFlowEnabled_`; does not advance `Environment` time |
+| Hide Models | OnViewHideModels | STUB | needs `hideWorldModels_` → EditorVisual::isVisible |
+| Animation | OnViewAnimation | PARTIAL | `setUpdatesEnabled` — repaint gate, not engine `flag_animation` |
+| Time Slider | CTimeSliderDlg in filtersBar | OK | TimeSliderDialog → `environmentTime()->SetTime`; but modal, not the modeless filters-bar child |
 | Objects Manager (bar toggle) | OnViewObjectsManager | OK | dock toggle |
 
 ### Workspace (docks/toolbars)
@@ -99,131 +110,140 @@ Where a stub can be promoted now that the editor builds a real Universe
 ### Debug
 | Command | Original handler | Port | Notes |
 |---|---|---|---|
-| Editable Tools Tree | OnViewExtendedmodetreelbar (debug) | STUB | property only |
-| Save Tools Tree | OnDebugSaveconfig | OK | `saveState()` |
-| Save config | OnDebugSaveconfig | STUB | should also persist view/panels state |
-| Edit ZipConfig | OnDebugEditZipConfig | STUB | read-only text view of Scripts\Content\ZipConfig (no save) |
-| Edit debugPrm | OnDebugEditDebugPrm | STUB | read-only text view of Debug.dat (no save) |
-| Edit AuxAttribute | OnDebugEditAuxAttribute | MISSING | kdw library editor |
+| Editable Tools Tree | OnViewExtendedmodetreelbar (debug) | PARTIAL | sets a Qt property; nothing reads it |
+| Save Tools Tree | OnDebugSaveconfig | OK | `ToolsTreePanel::saveState()` (QSettings, not the original XPrm tree file) |
+| Edit ZipConfig | OnDebugEditZipConfig | PARTIAL | read-only text view of `Scripts\Content\ZipConfig` |
+| Edit debugPrm | OnDebugEditDebugPrm | PARTIAL | read-only text view of `Debug.dat` |
+| Edit AuxAttribute | OnDebugEditAuxAttribute | MISSING | library editor on `AuxAttributeLibrary` |
 | Edit RigidBodyPrm | OnDebugEditRigidBodyPrm | MISSING | |
-| Edit Toolzer | OnDebugEditToolzer | MISSING | |
+| Edit Toolzer | OnDebugEditToolzer | N/A | original body empty |
 | Edit ExplodeTable | OnDebugEditExplodeTable | MISSING | |
-| Edit SourcesLibrary | OnDebugEditSourcesLibrary | MISSING | |
-| UI Sprite Lib | OnDebugUISpriteLib | MISSING | |
-| Show Palette Texture | OnDebugShowpalettetexture | OK | |
+| Edit SourcesLibrary | OnDebugEditSourcesLibrary | MISSING | `openLibrary("SourcesLibrary")` |
+| UI Sprite Lib | OnDebugUISpriteLib | MISSING | `openLibrary("UI_ShowModeSpriteTable")` |
+| Show Palette Texture | OnDebugShowpalettetexture | OK | `vMap.toShowTryColorDamTexture` |
 | Show Mipmap | OnDebugShowmipmap | STUB | no engine effect |
 
 ## Panels
 
 | Panel | Original | Port | Notes |
 |---|---|---|---|
-| Tools tree | CToolsTreeWindow / CToolsTreeCtrl | STUB | ToolsTreePanel shows only the 4 transform tools + a static tree; original built a real per-tool tree from FactorySelector<CSurToolBase>, persisted in ToolsTreeCtrl::serialize, with popup Create/Delete/Properties |
-| Objects Manager | CObjectsManagerWindow | PARTIAL | tabs + objectList() now show data; **drag&drop, selection sync (selectObject/worldObjectSelected), rename/delete via popup, context menu** not wired |
-| Properties | propertiesBar_ hosting the current CSurToolBase dialog | MISSING | propertiesDock_ exists with NO widget; tools' per-tool property pages not ported |
-| Minimap | CMiniMapWindow | PARTIAL | MiniMapPanel (see its own notes) |
-| Gradients | CGradientsWindow | PARTIAL | GradientsPanel exists |
-| Camera control | (camera controls) | PARTIAL | CameraControlPanel exists |
-| Time slider | CTimeSliderDlg modeless in filtersBar | PARTIAL | only modal dialog; not embedded |
-| Wave dialog | CWaveDlg floating | STUB | WaveDialog: create/remove/apply all say "needs environment->fixedWaves()" — but Universe now runs with an Environment; wire fixedWaves |
-| Camera dialog | CCameraDlg (IDD_DLG_CAMERA) | STUB | CameraDialog create/delete/play say "needs cameraManager" — cameraManager now runs; wire splines + mouse CREATE_POINTS mode |
+| Tools tree | CToolsTreeWindow / CToolsTreeCtrl | PARTIAL | real tool tree + selection + QSettings persistence; still only the 4 transform tools (+GeoNet/GeoTx), and no per-tool Create/Delete/Properties popup |
+| Objects Manager | CObjectsManagerWindow | OK | 5 tabs rebuilt from `EngineViewport::objectList`; **rename/delete only edit the tree row**, not the world object; no drag&drop |
+| Properties | propertiesBar_ hosting the current CSurToolBase dialog | OK | `PropertyTree` + `PropertyDelegates` render/edits `editor::PropertyRow` trees fed by the bridge; per-tool panels are `TransformPropertyPanel` / `GeoNetPropertyPanel` / `GeoTxPropertyPanel` |
+| Minimap | CMiniMapWindow | OK | real terrain minimap + camera marker, click moves the camera |
+| Gradients | CGradientsWindow | STUB | draws hard-coded built-in gradients; no engine gradient list, edits change local data only |
+| Camera control | (camera controls) | OK | CameraControlPanel: centre/distance/yaw/pitch/roll, eye/apply/top/overview/fit/reset |
+| Time slider | CTimeSliderDlg modeless in filtersBar | OK (modal) | drives `environmentTime()->SetTime`; modal dialog, not embedded in the filters bar |
+| Wave dialog | CWaveDlg floating | OK code, UNUSED | `WaveDialog` calls `bridge_->wave*` → `environment->fixedWaves()`; **no menu opens it** |
+| Camera dialog | CCameraDlg (IDD_DLG_CAMERA) | OK | `CameraDialog` → `cameraManager` splines; opened from View→Cameras, not its own command |
 
 ## Tools (SurTool*, the map-editing tools)
 
 The original registered ~36 tool types through `FactorySelector<CSurToolBase>`
 (SurMap5/SurTool*.h/.cpp) and stored the per-world tool tree in
-`ToolsTreeCtrl::serialize`. The Qt port has only the 4 transform tools
-(Select/Move/Rotate/Scale) and they act on **no selection** (the tools'
-selection state is empty — SurMap5Qt/src/tools are "Phase 3b" stubs that
-store poses but nothing selects world objects yet).
+`ToolsTreeCtrl::serialize`.
+
+**Ported and real:** Select (rubber-band **plus** real picking — `RenderViewWidget`
+calls `EngineViewport::selectObjectAt` / `selectObjectsInRect`, which set
+`unit->setSelected`), Move, Rotate, Scale (they mutate the selected objects'
+pose/radius through the `IWorldBridge`), GeoNet (`bridge_->applyGeoNet` →
+`geoGeneration(sGeoPMO)`; no direct MFC counterpart), GeoTx (re-render only —
+matches the original, where the paint call is commented out).
+
+Dependency note: selection works for **alive, non-auxiliary units** only.
+Sources, anchors and camera splines are not click-pickable, and a real marquee
+that picks non-unit objects is still missing.
 
 Not yet ported (original class → what it does):
-- CSurTool3DM / CSurToolEnvironment — place a .3dx model / environment object on the map.
+- CSurToolToolzer — raise/lower/flatten terrain with a brush (toolzer). **Top gap:**
+  the only terrain brush ported so far is GeoNet.
 - CSurToolKind — edit surface kind (terrain type) by brush.
 - CSurToolColorPic — paint a texture ("Color picture") on the terrain.
-- CSurToolToolzer — raise/lower/flatten terrain with a brush (toolzer).
+- CSurTool3DM / CSurToolEnvironment — place a .3dx model / environment object on the map
+  (`worldPlayer()->buildUnit(...)`, `setEnvirontmentType/setModel/setRadius/setPose`).
 - CSurToolMiniDetaile / CSurToolMiniDetaileFolder — mini-details placement.
 - CSurToolRoad — road drawing.
 - CSurToolWater / CSurToolWaves / CSurToolWindStatic — water level / waves / wind zones.
 - CSurToolLighting — lighting (sun) editing.
-- CSurToolSource — extraction/resource source placement.
+- CSurToolSource — extraction/resource source placement (`sourceManager->addSource`).
+- CSurToolAnchor — anchor placement (`sourceManager->addAnchor`).
+- CSurToolGrass — grass zones (`environment->grass()->SetGrass`).
+- CSurToolSpecFilter ("Detail Filter") — `vMap.specialFilter`.
+- CSurToolBlur — `vMap.gaussFilter`.
+- CSurToolImp — original stub (no-op) → N/A.
 - CSurToolUnit / CSurToolUnitFolder / CSurToolPlayerFolder — place units / assign player.
 - CSurToolPathEditor — path (waypoint) editing.
-- CSurToolZone... / CSurToolSpecFilter — zone/spec-filter editing.
-- CSurToolSelect — real marquee that selects world objects (the port's
-  SelectTool only rubber-bands; nothing is selected).
+- CSurToolCamera / CSurToolCameraEditor / CSurToolCameraRestriction — placed from
+  CameraDialog / CameraControlPanel in the port instead of as map tools.
+- CSurToolGeo / CSurToolGeoTx — the port's GeoNet/GeoTx cover the geo tools.
 
-Dependency note: every real placement tool needs (a) the tool property page
-in the properties dock (was a kdw dialog — must become a Qt form), and (b) a
-pick-from-scene / click-to-place path through EngineViewport that ends in
-`worldPlayer()->buildUnit(...)` / vMap mutations. The transform tools also
-need object selection before Move/Rotate/Scale do anything.
+Dependency note: every remaining placement tool needs (a) a Qt property form in
+the Properties dock and (b) a pick-from-scene / click-to-place path through
+`EngineViewport` that ends in `worldPlayer()->buildUnit(...)` / vMap mutations.
 
 ## Camera / Environment editing
 
-- **CameraDialog**: original CCameraDlg switched CGeneralView into
-  mouseMode CREATE_POINTS / SELECT_POINTS / EDIT_POINTS and edited
-  `cameraManager->splines()` points on the map. Port's dialog buttons are all
-  stubs. Now that cameraManager exists after a world load, this can be wired
-  (list splines, add points by clicking the map, set time/cycling).
-- **WaveDialog**: original CWaveDlg added/removed fixed waves via
-  `environment->fixedWaves()` and applied them. Port's three buttons are
-  stubs. Universe's Environment is alive now; wire fixedWaves.
-- **TimeSlider**: original was a modeless child of the filters bar that
-  nudged `environment->environmentTime()->...` (time of day + time flow).
-  Port has only a modal dialog that stores a float. To actually change the
-  scene light, drive `environment->environmentTime()` / sun from the dialog.
+- **CameraDialog**: `cameraManager` spline create/delete/play is wired through the
+  bridge (`bridge_->cameraNames/createCamera/deleteCamera/playCamera`). Missing:
+  the original's mouse modes (CREATE_POINTS / SELECT_POINTS / EDIT_POINTS) — the
+  port cannot yet add/select/edit spline points by clicking the map.
+- **WaveDialog**: create/remove/apply are wired (`bridge_->wave*` →
+  `environment->fixedWaves()`). **It is just never opened** — no menu command
+  instantiates it.
+- **TimeSlider**: really moves the sun (`bridge_->setTimeOfDay` →
+  `environmentTime()->SetTime`), but as a modal dialog; the original was a
+  modeless child of the filters bar.
+- **Camera restriction** (CSurToolCameraRestriction — the camera border rect on
+  the minimap) is not ported.
 
 ## Editor state & persistence
 
 - SurMapOptions (SurMap5/SurMapOptions.h) — showSources_/showCameras_/
   hideWorldModels_/showPathFinding_/enableGrid_/gridSpacing_/gridColor_/
-  cameraBorder*_/last_dirs_/dlgBarState. The port kept gridVisible_ inside
-  EngineViewport and has no equivalent struct. A Qt `SurMapOptions`
-  (QSettings-backed) would let the View filters and the View menu checks
-  persist and actually drive rendering (via EditorVisual::isVisible ports).
+  cameraBorder*_/last_dirs_/dlgBarState. A single Qt `SurMapOptions`
+  (QSettings-backed) is still missing; the port has scattered flags
+  (`EngineViewport::gridVisible_`, `MainWindow::timeFlowEnabled_`) and no
+  equivalent struct. Only the grid flag actually drives rendering.
 - `EditorVisual::isVisible` (SurMap5/EditorVisualImpl.cpp) — the per-class
-  visibility hook the renderer asks. Not ported; without it the View toggles
+  visibility hook the renderer asks. **Not ported.** The port's `editorVisual()`
+  is always-visible (it even raises the hide-distance and clears
+  `ATTRUNKOBJ_HIDE_BY_DISTANCE` each frame), so the View toggles
   (Sources/Cameras/Hide Models) cannot affect the 3D view.
 - Tools tree persistence (ToolsTreeCtrl::serialize reads/writes
-  "Scripts\TreeControlSetups\..." files). Port saves only QSettings state.
+  `Scripts\TreeControlSetups\...`). The port persists only QSettings state, not
+  the original XPrm tree file.
 
 ## External-tool editors (kdw-based library editors)
 
-Units, Effects, Sounds, UI Message Types, UI Messages, UI Show Mode Sprites,
-Sound Tracks, Heads, TerTools, Cursors, Command Colors, Text Images, Terrain
-Type Name — all open a `kdw::LibraryEditorDialog` over a LibraryWrapper
-singleton (editLibrary()). kdw is not built on any platform now
-(Util/kdwStub.cpp), so these need a Qt re-implementation of
-LibraryEditorDialog: a tree of library elements + a serialized property form
-(Serializer). This is the single biggest missing chunk (a generic
-"library editor" widget), and most of the Libraries menu rides on it.
+The big MFC chunk — `editLibrary()` over `kdw::LibraryEditorDialog` — is
+**ported**: `SurMap5Qt/src/dialogs/LibraryEditorDialog` + `src/panels/LibraryEditor`
++ `PropertyArchive` give a generic library editor (tree of elements + serialized
+property form), and every `openLibrary("...")` command uses it. What remains is
+per-library write gaps: `CommandColorManager::setCommandColor` and
+`setTerrainTypeNames` are no-ops, and the parameter Excel import/export does not
+exist yet.
 
 ## Priority proposal
 
-1. **Properties dock content + tool property pages** (currently an empty
-   dock) — start with the transform tools' minimal pages (position/rotation/
-   scale readout), then per-tool forms as tools land.
-2. **Real object selection in the 3D view** (pick unit/environment/source
-   under cursor, sync with Objects Manager selection). Unlocks every SurTool
-   port and the Objects Manager rename/delete.
-3. **EditorVisual::isVisible + SurMapOptions** so the View menu toggles
-   (Sources, Cameras, Hide Models, Grid persists) actually drive rendering.
-4. **Objects Manager interaction**: context menu delete/rename for real
-   (UnitTreeObject/SourceTreeObject select+kill), drag&drop to move objects.
-5. **CameraDialog wiring** (cameraManager splines are loaded; add/select/
-   edit points on the map).
-6. **Terrain brushes** (SurToolToolzer: raise/lower/level; SurToolKind:
-   surface type; SurToolColorPic: texture paint) — the core terrain editing
-   loop that makes the tool tree meaningful.
-7. **Placement tools**: SurToolUnit (pick from AttributeLibrary),
-   SurTool3DM/Environment (file-pick a model), SurToolSource.
-8. **Wave dialog wiring** (environment->fixedWaves()).
-9. **Qt Library editor** (replaces kdw::LibraryEditorDialog) → promotes the
-   whole Libraries menu.
-10. **Time slider as modeless filters-bar child** driving environment time.
-11. Smaller MISSING items: Save Without terTool Color, Resave All Triggers,
-    Save VoiceFile Durations, Update quick start list, Map Preset,
-    Preferences, PlayPMO, camera borders overlay, extended tree-bar mode.
+1. **Terrain brushes** — SurToolToolzer (raise/lower/level), SurToolKind
+   (surface type), SurToolColorPic (texture paint). GeoNet is the only brush so
+   far; these are the core map-editing loop.
+2. **`EditorVisual::isVisible` + a Qt `SurMapOptions`** — one piece makes every
+   View filter (Sources/Cameras/Hide Models/Camera Borders/Path Finding) real and
+   persistable.
+3. **Placement tools** — SurToolUnit (pick from AttributeLibrary),
+   SurTool3DM/Environment (file-pick a model), SurToolSource, SurToolAnchor.
+4. **Wire the ready dialogs**: put WaveDialog on a command; give CameraDialog its
+   own command and add the CREATE_POINTS/SELECT_POINTS mouse modes.
+5. **Close dead/stale items**: `actViewPathFindingRef_` (unconnected), Debug
+   Mipmap, `actSaveCameraAsDefault_` (saved but never restored), brush-radius
+   combo (never reaches `GeoNetTool`).
+6. **Objects Manager interaction**: context-menu delete/rename against the world
+   object (not just the tree row), drag&drop.
+7. **Remaining File/Edit stubs**: Merge (`universe()->mergeWorld`), Map/Game
+   Scenario, Map Preset, parameter Excel import/export, Export VistaEngine.
+8. **Smaller MISSING items**: Resave All Triggers, Save VoiceFile Durations,
+   Update quick start list, PlayPMO, camera-restriction tool, extended tree-bar mode.
 
 ## Effect render filters — diagnostic mode
 
@@ -652,8 +672,8 @@ are candidates for removal once the problem they measure is fixed.
   staged content the runners do not provide yet.
 - **`.gitignore`** — editor build/run artifacts (`build-qt-check`, `iniFile.cfg`,
   `Worlds`, helper `*.ps1`/`*.cmd`, screenshots and `*.log`/`*.err`/`*.out`),
-  `.vs`/`out`/`*.slnx`, and the XLibs/STLPort debug leftovers MSVC and the git
-  tools unpack into the tree.
+  `.vs`/`out`/`*.slnx`, the local `.local/` build/run helpers, and the
+  XLibs/STLPort debug leftovers MSVC and the git tools unpack into the tree.
 
 ### Permanent vs. temporary
 
