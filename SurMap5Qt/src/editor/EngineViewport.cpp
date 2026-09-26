@@ -1041,6 +1041,24 @@ public:
 		return owner_ ? owner_->setEffectPreviewTime(time) : false;
 	}
 
+	void effectSetPreviewPlaying(bool playing) override
+	{
+		if(owner_)
+			owner_->setEffectPreviewPlaying(playing);
+	}
+
+	void effectPreviewOrbit(float dPsi, float dTheta) override
+	{
+		if(owner_)
+			owner_->effectPreviewOrbit(dPsi, dTheta);
+	}
+
+	void effectPreviewZoom(float factor) override
+	{
+		if(owner_)
+			owner_->effectPreviewZoom(factor);
+	}
+
 	// --- UI Editor tree mutations (UIEditor's Create/Erase actions) ---
 
 	bool uiControlTypes(std::vector<std::string>& out) override
@@ -3303,8 +3321,9 @@ bool EngineViewport::effectPreviewRender(int width, int height)
 		previewCamera_->SetFrustum(&center, &clip, &focus, &zPlane);
 		// The effect is detached (not in the level's draw list); render it
 		// directly into the preview window. Animate advances its clock (dt in
-		// ms, cEffect::Animate adds dt*1e-3 to the effect time) so time flows.
-		effectPreview_->Animate(16.f);
+		// ms, cEffect::Animate adds dt*1e-3 to the effect time) when playing.
+		if(effectPreviewPlaying_)
+			effectPreview_->Animate(16.f);
 		effectPreview_->PreDraw(previewCamera_);
 		effectPreview_->Draw(previewCamera_);
 		gb_RenderDevice->EndScene();
@@ -3337,19 +3356,9 @@ bool EngineViewport::startEffectPreview(EffectKey* effectKey)
 	// Deliberately NOT Attach()ed: the level's cScene::Draw must not draw the
 	// preview effect (it would appear in the 3D view too). We render it
 	// ourselves into the preview window.
-	// A fixed three-quarter view of the effect at the origin — close enough
-	// that typical effects fill the preview (orbit construction applyCamera
-	// uses: theta 0.5, psi 0, distance 200).
-	const float distance = 200.f;
-	const float theta = 0.5f;
-	const float psi = 0.f;
-	const Vect3f position(distance * sinf(theta) * cosf(psi),
-	                      distance * sinf(theta) * sinf(psi),
-	                      distance * cosf(theta));
-	MatXf matrix = MatXf::ID;
-	matrix.rot() = Mat3f(theta, X_AXIS) * Mat3f(psi, Y_AXIS) * Mat3f(M_PI_2 - psi, Z_AXIS);
-	matrix *= MatXf(Mat3f::ID, -position);
-	setCameraPosition(previewCamera_, matrix);
+	// A fixed three-quarter view of the effect at the origin (user-orbitable
+	// and zoomable through effectPreviewOrbit/effectPreviewZoom).
+	applyPreviewCamera();
 	effect->SetPosition(MatXf(Se3f(QuatF::ID, Vect3f(0.f, 0.f, 0.f))));
 	for(size_t i = 0; i < effectKey->emitterKeys.size(); ++i){
 		if(EmitterKeyInterface* emitter = effectKey->emitterKeys[i].get())
@@ -3380,22 +3389,57 @@ bool EngineViewport::setEffectPreviewTime(float time)
 	return effectPreview_ != nullptr;
 }
 
+void EngineViewport::setEffectPreviewPlaying(bool playing)
+{
+	effectPreviewPlaying_ = playing;
+}
+
+void EngineViewport::applyPreviewCamera()
+{
+	if(!previewCamera_)
+		return;
+	const float distance = previewOrbitDistance_;
+	const float theta = previewOrbitTheta_;
+	const float psi = previewOrbitPsi_;
+	const Vect3f position(distance * sinf(theta) * cosf(psi),
+	                      distance * sinf(theta) * sinf(psi),
+	                      distance * cosf(theta));
+	MatXf matrix = MatXf::ID;
+	matrix.rot() = Mat3f(theta, X_AXIS) * Mat3f(0.f, Y_AXIS) * Mat3f(M_PI_2 - psi, Z_AXIS);
+	matrix *= MatXf(Mat3f::ID, -position);
+	setCameraPosition(previewCamera_, matrix);
+}
+
+void EngineViewport::effectPreviewOrbit(float dPsi, float dTheta)
+{
+	previewOrbitPsi_ += dPsi;
+	previewOrbitTheta_ = std::clamp(previewOrbitTheta_ + dTheta, 0.05f, 1.55f);
+	applyPreviewCamera();
+}
+
+void EngineViewport::effectPreviewZoom(float factor)
+{
+	previewOrbitDistance_ = std::clamp(previewOrbitDistance_ * factor, 10.f, 10000.f);
+	applyPreviewCamera();
+}
+
 bool EngineViewport::startUiPreview(UI_Screen* screen)
 {
 	if(!gb_RenderDevice)
 		return false;
 	try{
 		if(!uiPreviewInited_){
-			// The UIEditor prelude: UI_Render::init + UI_Dispatcher::init
-			// (UI_LogicDispatcher::init + UI_BackgroundScene::init).
+			// The UIEditor prelude, minus UI_Dispatcher::init(): that calls
+			// the game's UI_LogicDispatcher::init, which sets the waiting
+			// cursor (and does unit/head/mission game setup the editor cannot
+			// use). Do only what a preview needs: fonts, the background scene,
+			// and the per-screen control indices.
 			UI_Render::instance().init();
-			UI_Dispatcher::instance().init();
-			// UI_LogicDispatcher::init (the game build linked into the
-			// editor) set the waiting cursor through PlatformCursor; the
-			// editor has no cursor of its own. Restore SDL's default so the
-			// main map's cursor is not left as a game icon.
-			SDL_SetCursor(nullptr);
-			SDL_ShowCursor();
+			UI_Dispatcher::instance().initBgScene();
+			UI_Dispatcher& dispatcher = UI_Dispatcher::instance();
+			for(UI_Dispatcher::ScreenContainer::iterator it = dispatcher.screens().begin();
+			    it != dispatcher.screens().end(); ++it)
+				it->updateIndex();
 			uiPreviewInited_ = true;
 		}
 		if(screen){
@@ -3404,6 +3448,10 @@ bool EngineViewport::startUiPreview(UI_Screen* screen)
 			// editor has none of and crashes. A preview only needs the graph
 			// side (preLoad loads the sprites the screen draws with).
 			screen->preLoad();
+			// UI_Screen::initActivationActions selected the screen's 3D
+			// background model; the preview selects it directly so the
+			// animated menu background shows.
+			UI_BackgroundScene::instance().selectModel(screen->backgroundModelName());
 		}
 		uiPreviewScreen_ = screen;
 		uiPreview_ = screen != nullptr;

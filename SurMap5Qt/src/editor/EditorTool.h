@@ -328,6 +328,10 @@ public:
 	// main viewport shows it) and scrub its time.
 	virtual bool effectPreview(bool on) = 0;
 	virtual bool effectSetPreviewTime(float time) = 0;
+	// Pause/resume the effect's clock and orbit/zoom the preview camera.
+	virtual void effectSetPreviewPlaying(bool playing) = 0;
+	virtual void effectPreviewOrbit(float dPsi, float dTheta) = 0;
+	virtual void effectPreviewZoom(float factor) = 0;
 
 	// --- UI Editor tree mutations (UIEditor's Create/Erase actions) ---
 	// Display names of the UI_ControlBase factory types (add-control list).

@@ -52,6 +52,12 @@ EffectEditorWindow::EffectEditorWindow(IWorldBridge* bridge, QWidget* parent)
 		[this](void* handle){ return bridge_ && bridge_->attachPreviewWindow(handle); },
 		[this](int w, int h){ return bridge_ && bridge_->effectPreviewRender(w, h); },
 		[this]{ if(bridge_) bridge_->detachPreviewWindow(); });
+	connect(preview_, &PreviewView::orbited, this, [this](float dPsi, float dTheta){
+		if(bridge_) bridge_->effectPreviewOrbit(dPsi, dTheta);
+	});
+	connect(preview_, &PreviewView::zoomed, this, [this](float factor){
+		if(bridge_) bridge_->effectPreviewZoom(factor);
+	});
 	rightLayout->addWidget(new QLabel(tr("Preview"), right));
 	rightLayout->addWidget(preview_, 3);
 
@@ -69,6 +75,9 @@ EffectEditorWindow::EffectEditorWindow(IWorldBridge* bridge, QWidget* parent)
 	toolbar->addSeparator();
 	previewCheck_ = new QCheckBox(tr("3D preview"), toolbar);
 	toolbar->addWidget(previewCheck_);
+	timeFlowCheck_ = new QCheckBox(tr("Time flow"), toolbar);
+	timeFlowCheck_->setChecked(true);
+	toolbar->addWidget(timeFlowCheck_);
 	previewTime_ = new QDoubleSpinBox(toolbar);
 	previewTime_->setRange(0.0, 60.0);
 	previewTime_->setDecimals(2);
@@ -78,6 +87,7 @@ EffectEditorWindow::EffectEditorWindow(IWorldBridge* bridge, QWidget* parent)
 	previewTime_->setEnabled(false);
 	toolbar->addWidget(previewTime_);
 	connect(previewCheck_, &QCheckBox::toggled, this, &EffectEditorWindow::onPreviewToggled);
+	connect(timeFlowCheck_, &QCheckBox::toggled, this, &EffectEditorWindow::onTimeFlowToggled);
 	connect(previewTime_, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
 	        this, &EffectEditorWindow::onPreviewTimeChanged);
 
@@ -239,8 +249,9 @@ void EffectEditorWindow::onPreviewToggled(bool on)
 			previewCheck_->setChecked(false);
 			return;
 		}
+		bridge_->effectSetPreviewPlaying(timeFlowCheck_ && timeFlowCheck_->isChecked());
 		bridge_->effectSetPreviewTime(previewTime_->value());
-		statusBar()->showMessage(tr("Preview shown in the main 3D view"), 3000);
+		statusBar()->showMessage(tr("Preview shown in the panel (drag to orbit, wheel to zoom)"), 3000);
 	}
 	else{
 		bridge_->effectPreview(false);
@@ -252,6 +263,12 @@ void EffectEditorWindow::onPreviewTimeChanged(double time)
 {
 	if(bridge_ && previewCheck_->isChecked())
 		bridge_->effectSetPreviewTime((float)time);
+}
+
+void EffectEditorWindow::onTimeFlowToggled(bool on)
+{
+	if(bridge_)
+		bridge_->effectSetPreviewPlaying(on);
 }
 
 void EffectEditorWindow::onPropertyEdited()

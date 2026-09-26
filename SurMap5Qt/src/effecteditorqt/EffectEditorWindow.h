@@ -40,6 +40,7 @@ private slots:
 	void onCurveKeyChanged(int row, int column);
 	void onPreviewToggled(bool on);
 	void onPreviewTimeChanged(double time);
+	void onTimeFlowToggled(bool on);
 
 private:
 	void populateCurveKeys(int curveNodeId);
@@ -50,6 +51,7 @@ private:
 	QTableWidget* curveKeys_ = nullptr;
 	PreviewView* preview_ = nullptr;
 	QCheckBox* previewCheck_ = nullptr;
+	QCheckBox* timeFlowCheck_ = nullptr;
 	QDoubleSpinBox* previewTime_ = nullptr;
 	int curveNodeId_ = -1;
 	bool loading_ = false;

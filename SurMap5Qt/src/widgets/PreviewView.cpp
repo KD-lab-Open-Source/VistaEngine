@@ -3,9 +3,11 @@
 #include "PreviewView.h"
 
 #include <QHideEvent>
+#include <QMouseEvent>
 #include <QPainter>
 #include <QShowEvent>
 #include <QTimer>
+#include <QWheelEvent>
 
 PreviewView::PreviewView(QWidget* parent)
 	: QWidget(parent)
@@ -67,4 +69,30 @@ void PreviewView::paintEvent(QPaintEvent* /*event*/)
 	painter.fillRect(rect(), QColor(24, 32, 40));
 	painter.setPen(Qt::lightGray);
 	painter.drawText(rect(), Qt::AlignCenter, tr("Preview unavailable"));
+}
+
+void PreviewView::mousePressEvent(QMouseEvent* event)
+{
+	if(event->button() == Qt::LeftButton)
+		lastMouse_ = event->position().toPoint();
+	QWidget::mousePressEvent(event);
+}
+
+void PreviewView::mouseMoveEvent(QMouseEvent* event)
+{
+	if(event->buttons() & Qt::LeftButton){
+		const QPoint pos = event->position().toPoint();
+		const QPoint delta = pos - lastMouse_;
+		lastMouse_ = pos;
+		emit orbited(delta.x() * 0.01f, delta.y() * 0.01f);
+	}
+	QWidget::mouseMoveEvent(event);
+}
+
+void PreviewView::wheelEvent(QWheelEvent* event)
+{
+	const int dy = event->angleDelta().y();
+	if(dy != 0)
+		emit zoomed(dy > 0 ? 0.9f : 1.1f);
+	QWidget::wheelEvent(event);
 }

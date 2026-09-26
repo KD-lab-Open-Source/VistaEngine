@@ -105,6 +105,11 @@ public:
 	bool startEffectPreview(EffectKey* effectKey);
 	void stopEffectPreview();
 	bool setEffectPreviewTime(float time);
+	// Pause/resume the effect's clock (Animate) and orbit/zoom the preview
+	// camera (drag / wheel in the embedded preview).
+	void setEffectPreviewPlaying(bool playing);
+	void effectPreviewOrbit(float dPsi, float dTheta);
+	void effectPreviewZoom(float factor);
 
 	// UI preview: preLoad the screen the embedded preview renders.
 	bool startUiPreview(UI_Screen* screen);
@@ -373,6 +378,9 @@ private:
 	};
 	void applyCamera();
 
+	// Effects preview camera (a second camera; orbit around the effect origin).
+	void applyPreviewCamera();
+
 	// The camera's near/far planes, as the original editor computed them:
 	// CameraManager::SetFrustumEditor -> calcZMinMax(), the environment's game
 	// frustum, extended only when the orbit would otherwise clip the map.
@@ -424,6 +432,10 @@ private:
 	// its scrub time.
 	cEffect*             effectPreview_ = nullptr;
 	float                effectPreviewTime_ = 0.f;
+	bool                 effectPreviewPlaying_ = true;
+	float                previewOrbitPsi_ = 0.f;
+	float                previewOrbitTheta_ = 0.5f;
+	float                previewOrbitDistance_ = 200.f;
 	// Embedded preview render window (its own swapchain) + the camera the
 	// effects preview draws with (a second camera on the level scene; never
 	// the level's own camera).

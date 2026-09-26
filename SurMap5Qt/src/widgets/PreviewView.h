@@ -8,6 +8,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QPoint>
 
 #include <functional>
 
@@ -30,10 +31,19 @@ public:
 
 	QSize sizeHint() const override { return QSize(520, 380); }
 
+signals:
+	// Drag with the left button in the preview; wheel zooms. Only the effects
+	// editor connects them (its preview camera is orbitable).
+	void orbited(float dPsi, float dTheta);
+	void zoomed(float factor);
+
 protected:
 	void paintEvent(QPaintEvent* event) override;
 	void showEvent(QShowEvent* event) override;
 	void hideEvent(QHideEvent* event) override;
+	void mousePressEvent(QMouseEvent* event) override;
+	void mouseMoveEvent(QMouseEvent* event) override;
+	void wheelEvent(QWheelEvent* event) override;
 
 private:
 	void ensureAttached();
@@ -43,4 +53,5 @@ private:
 	DetachFn detach_;
 	QTimer* timer_ = nullptr;
 	bool attached_ = false;
+	QPoint lastMouse_;
 };

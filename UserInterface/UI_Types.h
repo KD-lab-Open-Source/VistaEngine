@@ -1215,6 +1215,11 @@ public:
 	float activationTime() const { return max(activationTime_, controlsActivationTime()); }
 	float deactivationTime() const { return max(deactivationTime_, controlsDeactivationTime()); }
 
+	/// The 3D background model the screen selects on activation
+	/// (UI_Screen::initActivationActions). The editor's preview selects it
+	/// directly since it never runs the activation.
+	const char* backgroundModelName() const { return backgroundModelName_.c_str(); }
+
 	bool isActivating() const;
 	bool isDeactivating() const;
 
