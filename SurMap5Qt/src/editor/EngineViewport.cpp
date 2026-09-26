@@ -67,6 +67,9 @@ using namespace std;
 #include "Render/3dx/Node3DX.h"          // cObject3dx (model state debug)
 #include "Render/3dx/Simply3dx.h"        // cSimply3dx (environment models)
 #include "Render/src/NParticle.h"        // cEffect::setVisibleRange (editor shows all effects)
+#include "Render/src/CurveWrapper.h"     // CurveWrapperBase/CurveCollector (Effects Editor curves)
+#include "Render/src/NParticleID.h"      // IDS_EFFECTKEY (Effects Editor .effect load)
+#include "Render/3dx/Saver.h"            // CLoadDirectoryFile/FileSaver (Effects Editor .effect I/O)
 #include "Game/GameOptions.h"            // GameOptions::filterBaseGraphOptions (Universe ctor calls it)
 #include "UserInterface/UI_Render.h"     // UI_Render::create (SurMap5/SurMap5.cpp prelude)
 #include "UserInterface/UI_GlobalAttributes.h" // UI_GlobalAttributes (loadAllLibraries dep)
@@ -837,6 +840,145 @@ public:
 		saveInterfaceLibraries();
 		return true;
 	}
+
+	// --- Effects Editor (EffectEditor port) ---
+
+	bool effectOpen(const std::string& fileName) override
+	{
+		effectClose();
+		CLoadDirectoryFile directory;
+		if(!directory.Load(fileName.c_str()))
+			return false;
+		EffectKey* key = nullptr;
+		while(CLoadData* ld = directory.next()){
+			if(ld->id == IDS_EFFECTKEY){
+				key = new EffectKey;
+				key->filename = fileName;
+				key->Load(ld);
+				std::string texturesPath = extractFilePath(fileName.c_str());
+				texturesPath += "\\Textures";
+				key->changeTexturePath(texturesPath.c_str());
+			}
+		}
+		if(!key)
+			return false;
+		effectKey_ = key;
+		effectFileName_ = fileName;
+		return true;
+	}
+
+	void effectClose() override
+	{
+		effectNodes_.clear();
+		effectEmitters_.clear();
+		effectCurveStore_.clear();
+		if(effectKey_){
+			delete effectKey_;
+			effectKey_ = nullptr;
+		}
+		effectFileName_.clear();
+	}
+
+	bool effectTree(std::vector<EffectTreeNode>& out) override
+	{
+		out.clear();
+		effectNodes_.clear();
+		effectEmitters_.clear();
+		effectCurveStore_.clear();
+		if(!effectKey_)
+			return false;
+		const int rootId = addEffectNode(kEffectRoot, -1, effectKey_->name.c_str(),
+		                                 "EffectKey", effectKey_, nullptr, nullptr, out);
+		for(size_t i = 0; i < effectKey_->emitterKeys.size(); ++i){
+			EmitterKeyInterface* emitter = effectKey_->emitterKeys[i].get();
+			if(!emitter)
+				continue;
+			effectEmitters_.push_back(emitter);
+			const int emitterId = addEffectNode(kEffectEmitter, rootId, emitter->name.c_str(),
+			                                    typeid(*emitter).name(), nullptr, emitter,
+			                                    nullptr, out);
+			// Collect the emitter's curve wrappers (EffectDocument's
+			// NodeEmitter::update ran the same serialize with a
+			// CurveCollector); keep the clones alive so their pointers stay
+			// valid for the tree.
+			CurveCollector collector;
+			editor::PropertyOArchive oa;
+			Serializer se(*emitter);
+			se.serialize(oa);
+			CurveCollector::Curves& curves = collector.curves();
+			for(size_t c = 0; c < curves.size(); ++c){
+				effectCurveStore_.push_back(curves[c]);
+				CurveWrapperBase* curve = curves[c].get();
+				if(!curve)
+					continue;
+				addEffectNode(kEffectCurve, emitterId, curve->name(), "Curve",
+				              nullptr, nullptr, curve, out);
+			}
+		}
+		return true;
+	}
+
+	editor::PropertyRow* effectNodeTree(int nodeId, bool editOnly) override
+	{
+		(void)editOnly;
+		if(nodeId < 0 || nodeId >= (int)effectNodes_.size())
+			return nullptr;
+		const EffectNodeRef& ref = effectNodes_[nodeId];
+		editor::PropertyOArchive oa;
+		if(ref.kind == kEffectRoot && ref.root){
+			Serializer se(*ref.root);
+			se.serialize(oa);
+		}
+		else if(ref.kind == kEffectEmitter && ref.emitter){
+			Serializer se(*ref.emitter);
+			se.serialize(oa);
+		}
+		else
+			return nullptr;   // curves are edited by the curve editor
+		return oa.root();
+	}
+
+	bool effectNodeSetTree(int nodeId, editor::PropertyRow* root) override
+	{
+		if(!root || nodeId < 0 || nodeId >= (int)effectNodes_.size())
+			return false;
+		const EffectNodeRef& ref = effectNodes_[nodeId];
+		editor::PropertyIArchive ia(root);
+		if(ref.kind == kEffectRoot && ref.root){
+			Serializer se(*ref.root);
+			se.serialize(ia);
+			return true;
+		}
+		if(ref.kind == kEffectEmitter && ref.emitter){
+			Serializer se(*ref.emitter);
+			se.serialize(ia);
+			// EffectDocument::NodeEmitter re-BuildKey()'d after a property
+			// change; the same keeps the emitter's runtime key in sync.
+			ref.emitter->BuildKey();
+			return true;
+		}
+		return false;
+	}
+
+	bool effectSave() override
+	{
+		if(!effectKey_ || effectFileName_.empty())
+			return false;
+		FileSaver saver;
+		if(!saver.Init(effectFileName_.c_str()))
+			return false;
+		saver.SetData(EXPORT_TO_GAME);
+		effectKey_->Save(saver);
+		return true;
+	}
+
+	bool effectSaveAs(const std::string& fileName) override
+	{
+		effectFileName_ = fileName;
+		return effectSave();
+	}
+
+	std::string effectFileName() const override { return effectFileName_; }
 
 	void setObjectRadius(EditorObjectId id, float radius) override
 	{
@@ -2157,6 +2299,37 @@ private:
 		addUiContainerTree(screen, id, out);
 	}
 
+	// --- Effects Editor helpers (EffectEditor port) ---
+
+	struct EffectNodeRef
+	{
+		int kind = kEffectRoot;
+		EffectKey* root = nullptr;
+		EmitterKeyInterface* emitter = nullptr;
+		CurveWrapperBase* curve = nullptr;
+	};
+
+	int addEffectNode(int kind, int parentId, const char* name, const char* type,
+	                  EffectKey* root, EmitterKeyInterface* emitter, CurveWrapperBase* curve,
+	                  std::vector<EffectTreeNode>& out)
+	{
+		EffectNodeRef ref;
+		ref.kind = kind;
+		ref.root = root;
+		ref.emitter = emitter;
+		ref.curve = curve;
+		const int id = (int)effectNodes_.size();
+		effectNodes_.push_back(ref);
+		EffectTreeNode node;
+		node.id = id;
+		node.parentId = parentId;
+		node.kind = kind;
+		node.name = name ? name : "";
+		node.type = type ? type : "";
+		out.push_back(node);
+		return id;
+	}
+
 	void envKillPreview()
 	{
 		for(size_t i = 0; i < envPreviewObjs_.size(); ++i)
@@ -2338,6 +2511,15 @@ private:
 	EngineViewport* owner_ = nullptr;
 	bool uiLibrariesInited_ = false;
 	std::vector<UiNodeRef> uiNodes_;
+
+	// Effects Editor (EffectEditor port): the loaded EffectKey, its file, the
+	// node cache and the collected curve clones (kept alive while the tree
+	// references them).
+	EffectKey* effectKey_ = nullptr;
+	std::string effectFileName_;
+	std::vector<EmitterKeyInterface*> effectEmitters_;
+	std::vector<ShareHandle<CurveWrapperBase> > effectCurveStore_;
+	std::vector<EffectNodeRef> effectNodes_;
 
 	// CSurToolSource / CSurToolAnchor: the live preview object that follows the
 	// cursor (the original's sourceOnMouse_ / anchorOnMouse_). Owned by the

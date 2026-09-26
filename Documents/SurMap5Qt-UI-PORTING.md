@@ -49,8 +49,8 @@ Where a stub can be promoted now that the editor builds a real Universe
 | Command | Original handler | Port | Notes |
 |---|---|---|---|
 | Undo/Redo | OnEditUndo/Redo | OK | `vMap.UndoDispatcher_*` |
-| Map Scenario | OnEditMap | STUB | `editMapScenario()` TODO; original edited `MapSerializer` |
-| Game Scenario | OnEditGameScenario | STUB | `editGameScenario()` TODO; original `GameSerializer` |
+| Map Scenario | OnEditMap | OK | `editMapScenario()` → `ScenarioDialog` over `MapScenarioSerializer` (mission/universe/map params/environment/camera manager/players/world triggers); OK writes back + saves library/language/world |
+| Game Scenario | OnEditGameScenario | OK | `editGameScenario()` → `ScenarioDialog` over `GameSerializer` (GlobalAttributes/GameOptions/UI globals/ControlManager/environment); OK saves all libraries |
 | Map Preset | OnEditPreset | MISSING | `PresetSerializer` / `environment->loadPreset/savePreset` |
 | Preferences | OnEditPreferences | MISSING | full `SurMapOptions` dialog (see Preferences section) |
 | Save Camera As Default | OnEditSaveCameraAsDefault | PARTIAL | writes QSettings, but `applySavedCameraDefault()` never calls `setOrbitCamera` |
@@ -62,7 +62,7 @@ Where a stub can be promoted now that the editor builds a real Universe
 | Triggers | OnEditTriggers | OK | SelectTriggerDialog + full TriggerEditorDialog (graph, class tree, conditions, debugger, minimap) |
 | Units | OnEditUnits | OK | Qt library editor, `openLibrary("AttributeLibrary")` |
 | Objects | OnEditObjects | N/A | original body commented out |
-| User Interface | OnEditUserInterface | PARTIAL | launches external `UIEditor.exe` |
+| User Interface | OnEditUserInterface | PARTIAL | in-process `UiEditorWindow` (`src/uieditorqt/`): screen/control/state tree + property editor + save; **live render preview + drag/edit not yet ported** |
 | Effects | OnEditEffects | OK | `openLibrary("EffectContainerLibrary")` |
 | Sounds | OnEditSounds | OK | `openLibrary("SoundLibrary")` |
 | TerTools | OnEditTertools | OK | `openLibrary("TerToolsLibrary")` |
@@ -73,7 +73,7 @@ Where a stub can be promoted now that the editor builds a real Universe
 | Command Color | OnEditCommandColor | PARTIAL | `openLibrary("CommandColorManager")` reads real colors; `setCommandColor` is a no-op |
 | UITextSprites | OnEditUITextSprites | OK | `openLibrary("UI_SpriteLibrary")` |
 | Terrain Type Name | OnLibrariesTerrraintypename | PARTIAL | TerrainTypeDialog reads; `setTerrainTypeNames` write is a no-op |
-| Effects Editor (tool) | OnEditEffectsEditor | PARTIAL | launches external `EffectTool.exe` |
+| Effects Editor (tool) | OnEditEffectsEditor | PARTIAL | in-process `EffectEditorWindow` (`src/effecteditorqt/`): opens a `.effect`, effect→emitter→curve tree + property editor, save/save-as; **3D preview + curve editor not yet ported** |
 
 ### View
 | Command | Original handler | Port | Notes |

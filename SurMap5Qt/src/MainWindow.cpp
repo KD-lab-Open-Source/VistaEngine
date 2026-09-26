@@ -48,6 +48,7 @@
 #include "dialogs/LibraryEditorDialog.h"
 #include "dialogs/ScenarioDialog.h"
 #include "uieditorqt/UiEditorWindow.h"
+#include "effecteditorqt/EffectEditorWindow.h"
 #include "dialogs/BorderRollingDialog.h"
 #include "dialogs/SelectTriggerDialog.h"
 #include "dialogs/TriggerEditorDialog.h"
@@ -450,32 +451,6 @@ void MainWindow::createActions()
 	connect(actLibExportParametersByGroups_, &QAction::triggered, this, [this, stub]{ stub("libraries/export-params-groups", tr("Export Parameters (By Groups): not wired yet")); });
 	connect(actLibExportParametersStatistics_, &QAction::triggered, this, [this, stub]{ stub("libraries/export-params-statistics", tr("Export Parameters (Balance): not wired yet")); });
 
-	auto launchEditor = [this](const QStringList& names, const QString& label) {
-		QString executable;
-		const QStringList roots = {
-			QCoreApplication::applicationDirPath(),
-			QDir::currentPath()
-		};
-		for(const QString& root : roots) {
-			for(const QString& name : names) {
-				const QString candidate = QDir(root).filePath(name);
-				if(QFileInfo(candidate).isFile()) {
-					executable = candidate;
-					break;
-				}
-			}
-			if(!executable.isEmpty())
-				break;
-		}
-		if(executable.isEmpty()) {
-			statusBar()->showMessage(tr("%1 executable not found").arg(label));
-			return;
-		}
-		if(!QProcess::startDetached(executable, {}, QFileInfo(executable).absolutePath()))
-			statusBar()->showMessage(tr("Could not launch %1").arg(label));
-		else
-			statusBar()->showMessage(tr("%1 launched").arg(label), 3000);
-	};
 	connect(actToolUIEditor_, &QAction::triggered, this, [this]{
 		// The Qt UI Editor (port of the MFC UIEditor app), in-process. Opens
 		// its own top-level window; the engine libraries load on first use.
@@ -483,8 +458,11 @@ void MainWindow::createActions()
 		win->setAttribute(Qt::WA_DeleteOnClose);
 		win->show();
 	});
-	connect(actToolEffectsEditor_, &QAction::triggered, this, [launchEditor]{
-		launchEditor({QStringLiteral("EffectTool.exe")}, QObject::tr("Effects Editor"));
+	connect(actToolEffectsEditor_, &QAction::triggered, this, [this]{
+		// The Qt Effects Editor (port of the MFC EffectEditor app), in-process.
+		auto* win = new EffectEditorWindow(view_->worldBridge());
+		win->setAttribute(Qt::WA_DeleteOnClose);
+		win->show();
 	});
 	connect(actToolTriggers_, &QAction::triggered, this, &MainWindow::editTriggers);
 

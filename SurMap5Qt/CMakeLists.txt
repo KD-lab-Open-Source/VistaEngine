@@ -293,6 +293,10 @@ add_executable(SurMap5Qt
     # property editor, bridged to UI_Dispatcher through IWorldBridge.
     src/uieditorqt/UiEditorWindow.h
     src/uieditorqt/UiEditorWindow.cpp
+    # The Qt Effects Editor (port of the MFC EffectEditor app): effect/emitter
+    # tree + property editor over a loaded .effect (IWorldBridge effect*).
+    src/effecteditorqt/EffectEditorWindow.h
+    src/effecteditorqt/EffectEditorWindow.cpp
     # TriggerEditor (TriggerEditor port) — the modal trigger-chain editor:
     # graph canvas + type palette + minimap + condition panel + debugger.
     src/panels/TriggerGraphView.h

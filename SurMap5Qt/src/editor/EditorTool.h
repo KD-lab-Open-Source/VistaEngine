@@ -295,6 +295,30 @@ public:
 	// libraries), as UIEditor's File > Save did.
 	virtual bool uiSave() = 0;
 
+	// --- Effects Editor (EffectEditor port) ---
+	// A flattened snapshot of the loaded EffectKey: effect root → emitters →
+	// collected curves. `id` is stable until the next effectTree() call.
+	enum EffectNodeKind { kEffectRoot = 0, kEffectEmitter = 1, kEffectCurve = 2 };
+	struct EffectTreeNode
+	{
+		int id = -1;
+		int parentId = -1;
+		int kind = kEffectRoot;
+		std::string name;
+		std::string type;
+	};
+	// Load one .effect file (EffectKey::Load). False when it cannot be read.
+	virtual bool effectOpen(const std::string& fileName) = 0;
+	virtual void effectClose() = 0;
+	virtual bool effectTree(std::vector<EffectTreeNode>& out) = 0;
+	// Serialized properties of the effect root or an emitter (curves have
+	// none through this path — they are edited by the curve editor).
+	virtual editor::PropertyRow* effectNodeTree(int nodeId, bool editOnly) = 0;
+	virtual bool effectNodeSetTree(int nodeId, editor::PropertyRow* root) = 0;
+	virtual bool effectSave() = 0;
+	virtual bool effectSaveAs(const std::string& fileName) = 0;
+	virtual std::string effectFileName() const = 0;
+
 	// Terrain height + a ray-cast of a widget pixel to the ground (the
 	// tools' screenPointToGround / projectScreenPointOnPlane ports).
 	virtual float terrainHeight(float x, float y) = 0;
