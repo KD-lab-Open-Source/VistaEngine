@@ -56,6 +56,7 @@ using namespace std;
 #include "Units/BaseUniverseObject.h"    // BaseUniverseObject (world bridge visit)
 #include "Units/IronLegion.h"            // UnitLegionary (placement: squad join)
 #include "Units/Squad.h"                 // UnitSquad (placement: addUnit)
+#include "Physics/RigidBodyBase.h"       // RigidBodyBase::awake (SelectionUtil::awakePhysics)
 #include "Util/XTL/SafeCast.h"           // safe_cast (placement: legionary/squad)
 #include "Util/ObjectSpreader.h"         // ObjectSpreader (environment spread cluster)
 #include "Util/FileUtils/FileUtils.h"    // DirIterator (environment model list)
@@ -376,6 +377,21 @@ public:
 		Se3f p(QuatF(pose.ow, pose.ox, pose.oy, pose.oz),
 		       Vect3f(pose.pos.x, pose.pos.y, pose.pos.z));
 		obj->setPose(p, init);
+	}
+
+	// SelectionUtil::awakePhysics: only units/environment carry a rigid body.
+	void awakePhysics(EditorObjectId id) override
+	{
+		BaseUniverseObject* obj = reinterpret_cast<BaseUniverseObject*>(id);
+		if(!obj)
+			return;
+		const UniverseObjectClass objectClass = obj->objectClass();
+		if(objectClass == UNIVERSE_OBJECT_UNIT
+		   || objectClass == UNIVERSE_OBJECT_ENVIRONMENT){
+			UnitBase* unit = dynamic_cast<UnitBase*>(obj);
+			if(unit && unit->rigidBody())
+				unit->rigidBody()->awake();
+		}
 	}
 
 	float objectRadius(EditorObjectId id) override

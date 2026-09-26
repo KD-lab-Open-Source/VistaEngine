@@ -22,6 +22,7 @@ public:
 		pose.pos.z = origin_.z + (pose.pos.z - origin_.z) * scale_;
 		bridge_->setObjectPose(id, pose, true);
 		bridge_->setObjectRadius(id, bridge_->objectRadius(id) * scale_);
+		bridge_->awakePhysics(id);
 	}
 	IWorldBridge* bridge_;
 	ToolVec3 origin_;

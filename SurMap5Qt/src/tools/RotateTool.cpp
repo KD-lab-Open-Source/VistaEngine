@@ -27,6 +27,7 @@ public:
 		// Rotate the orientation by the same axis-angle (premult).
 		pose = rotateOrientation(pose);
 		bridge_->setObjectPose(id, pose, true);
+		bridge_->awakePhysics(id);
 	}
 	// Rotate a vector around axis_ by angle_ (Rodrigues' rotation formula).
 	ToolVec3 rotate(const ToolVec3& v) const

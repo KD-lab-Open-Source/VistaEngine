@@ -225,7 +225,15 @@ public:
 	// Pose read/write on a single object (base does not have setPosition;
 	// everything goes through setPose).
 	virtual EditorPose objectPose(EditorObjectId id) = 0;
+	// `init == true` maps to BaseUniverseObject::setPose(pose, true): for a
+	// UnitReal it calls rigidBody()->initPose() and sends a fCommandSetPose
+	// instead of interpolating — the original's Move(ZERO, true) commit on
+	// mouse-up (SurToolMove.cpp:138), without which the physics step snaps the
+	// unit back to its old pose.
 	virtual void setObjectPose(EditorObjectId id, const EditorPose& pose, bool init) = 0;
+	// SelectionUtil::awakePhysics — wake the unit's rigid body so a moved
+	// object actually settles at its new pose (called by Move/Rotate/Scale).
+	virtual void awakePhysics(EditorObjectId id) = 0;
 	virtual float objectRadius(EditorObjectId id) = 0;
 	virtual void setObjectRadius(EditorObjectId id, float radius) = 0;
 

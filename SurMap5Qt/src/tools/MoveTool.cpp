@@ -7,7 +7,8 @@ namespace {
 class MoveVisitor : public IEditorObjectVisitor
 {
 public:
-	MoveVisitor(IWorldBridge* bridge, const ToolVec3& delta) : bridge_(bridge), delta_(delta) {}
+	MoveVisitor(IWorldBridge* bridge, const ToolVec3& delta, bool init)
+		: bridge_(bridge), delta_(delta), init_(init) {}
 	void visit(EditorObjectId id) override
 	{
 		if(!bridge_)
@@ -16,10 +17,13 @@ public:
 		pose.pos.x += delta_.x;
 		pose.pos.y += delta_.y;
 		pose.pos.z += delta_.z;
-		bridge_->setObjectPose(id, pose, false);
+		// UniverseObjectActions::Move: setPose(delta, init_) + awakePhysics.
+		bridge_->setObjectPose(id, pose, init_);
+		bridge_->awakePhysics(id);
 	}
 	IWorldBridge* bridge_;
 	ToolVec3 delta_;
+	bool init_;
 };
 } // namespace
 
@@ -46,8 +50,11 @@ bool MoveTool::onTrackingMouse(const ToolVec3& worldCoord, const ToolVec2& scree
 	selectionCenter_.z += delta.z;
 
 	// Apply the delta to every selected object (forEachSelected(Move(delta))).
+	// The original's ground-plane call uses Move's default init=true (only the
+	// Z-axis branch passes false), which updates the rigid body each frame — an
+	// init=false pose is overwritten by UnitEnvironment::Quant/UnitReal physics.
 	if(bridge()){
-		MoveVisitor visitor(bridge(), delta);
+		MoveVisitor visitor(bridge(), delta, true);
 		bridge()->forEachSelected(visitor);
 	}
 	return true;
@@ -68,7 +75,15 @@ void MoveTool::beginTransformation()
 
 void MoveTool::finishTransformation()
 {
-	// CSurToolMove::finishTransformation: commit the move (the poses were
-	// already applied live in onTrackingMouse; just refresh the gizmo).
+	// CSurToolMove::onLMBUp: forEachSelected(Move(ZERO, true)) — re-apply the
+	// current pose with init=true so the move is committed to the rigid body
+	// (a plain init=false pose is overwritten by the next physics step, which
+	// made units snap back to where they started).
+	if(bridge()){
+		MoveVisitor visitor(bridge(), ToolVec3{ 0, 0, 0 }, true);
+		bridge()->forEachSelected(visitor);
+	}
+	// CSurToolTransform's commit (the poses were applied live in
+	// onTrackingMouse; just refresh the gizmo).
 	recomputeSelection();
 }
