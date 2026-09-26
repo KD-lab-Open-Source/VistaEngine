@@ -70,6 +70,11 @@ UiEditorWindow::~UiEditorWindow()
 
 void UiEditorWindow::refresh()
 {
+	// Rebuilding invalidates the bridge's node/screen pointers; stop the
+	// preview first (the user re-enables it after selecting a node).
+	if(previewCheck_ && previewCheck_->isChecked())
+		previewCheck_->setChecked(false);
+
 	loading_ = true;
 	tree_->clear();
 	properties_->setRoot(nullptr);

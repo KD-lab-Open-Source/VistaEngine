@@ -3223,15 +3223,21 @@ bool EngineViewport::startEffectPreview(EffectKey* effectKey)
 	if(!effect)
 		return false;
 	effect->Attach();
-	const float x = vMap.isWorldLoaded() ? vMap.H_SIZE * 0.5f : 0.f;
-	const float y = vMap.isWorldLoaded() ? vMap.V_SIZE * 0.5f : 0.f;
-	effect->SetPosition(MatXf(Se3f(QuatF::ID, Vect3f(x, y, 1000.f))));
+	// Place it at the camera's orbit centre so the main 3D view is looking at
+	// it (the map centre is off-screen whenever the user has panned).
+	const float x = orbit_.px;
+	const float y = orbit_.py;
+	const float z = orbit_.pz + 50.f;
+	effect->SetPosition(MatXf(Se3f(QuatF::ID, Vect3f(x, y, z))));
 	for(size_t i = 0; i < effectKey->emitterKeys.size(); ++i){
 		if(EmitterKeyInterface* emitter = effectKey->emitterKeys[i].get())
 			effect->ShowEmitter(emitter, true);
 	}
 	effect->SetTime(0.f);
 	effect->MoveToTime(effectPreviewTime_);
+	// EffectDocument::quant set the particle rate every frame; without it the
+	// detached effect emits nothing.
+	effect->SetParticleRate(1.0f);
 	effectPreview_ = effect;
 	return true;
 }
@@ -3264,13 +3270,18 @@ bool EngineViewport::startUiPreview(UI_Screen* screen)
 			UI_Dispatcher::instance().init();
 			uiPreviewInited_ = true;
 		}
-		if(screen)
-			UI_Dispatcher::instance().selectScreen(screen);
+		if(screen){
+			// Do NOT go through UI_Dispatcher::selectScreen: it runs the
+			// screen's logic init/activate, which dereferences game state the
+			// editor has none of and crashes. A preview only needs the graph
+			// side (preLoad loads the sprites the screen draws with).
+			screen->preLoad();
+		}
+		uiPreviewScreen_ = screen;
 		const int w = gb_RenderDevice->GetSizeX();
 		const int h = gb_RenderDevice->GetSizeY();
 		UI_Render::instance().setWindowPosition(Recti(0, 0, w, h));
 		UI_Render::instance().updateRenderSize();
-		uiPreviewScreen_ = screen;
 		uiPreview_ = true;
 	}
 	catch(const std::exception& e){
@@ -3287,6 +3298,7 @@ bool EngineViewport::startUiPreview(UI_Screen* screen)
 void EngineViewport::stopUiPreview()
 {
 	uiPreview_ = false;
+	uiPreviewScreen_ = nullptr;
 }
 
 bool EngineViewport::saveWorld(const char* worldName)
@@ -3807,17 +3819,18 @@ void EngineViewport::drawFrame()
 	// editorVisual().afterQuant() после aux-слоёв.
 	editorVisual().afterQuant();
 
-	// UI Editor preview: draw the selected UI_Dispatcher screen over the 3D
-	// frame (the same engine render device the original UIEditor used). The
-	// window is set to the whole viewport; the overlay goes on top of the aux
-	// layers and below the tool rubber band.
-	if(uiPreview_){
+	// UI Editor preview: draw the selected UI screen over the 3D frame (the
+	// same engine render device the original UIEditor used). Drawn directly
+	// through the screen's redraw (UI_Dispatcher::selectScreen would run the
+	// screen's logic activation, which the editor cannot). The overlay goes on
+	// top of the aux layers and below the tool rubber band.
+	if(uiPreview_ && uiPreviewScreen_){
 		try{
 			const int w = gb_RenderDevice->GetSizeX();
 			const int h = gb_RenderDevice->GetSizeY();
 			UI_Render::instance().setWindowPosition(Recti(0, 0, w, h));
 			UI_Render::instance().updateRenderSize();
-			UI_Dispatcher::instance().redraw();
+			uiPreviewScreen_->redraw();
 		}
 		catch(...){
 			uiPreview_ = false;
