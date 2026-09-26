@@ -7,8 +7,8 @@
 // port keeps the same flags here, in the engine's Util library, so both the
 // engine (isVisible, UnitBase::showEditor) and the Qt editor write the one copy.
 // The Qt editor's MainWindow sets them from its View menu; the engine-side
-// editorVisual() reads them. Defaults match the original SurMapOptions: sources,
-// cameras and camera borders off, models shown.
+// editorVisual() reads them. Defaults match the original SurMapOptions: sources
+// and cameras on, models shown, path-finding/camera-borders off.
 //
 // Only the flags the visibility hook needs live here; the rest of SurMapOptions
 // (last dirs, dock state, grid colour, ...) is Qt-side and QSettings-backed.

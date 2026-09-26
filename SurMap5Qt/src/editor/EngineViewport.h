@@ -31,6 +31,7 @@ class Camera;
 class cScene;
 class MissionDescription;
 class Universe;
+namespace FT { class Font; }
 
 class EngineViewport
 {
@@ -342,6 +343,10 @@ private:
 	int                  widgetW_ = 1, widgetH_ = 1;
 	cScene*              scene_ = nullptr;     // == terScene once initScene() ran
 	Camera*              camera_ = nullptr;    // == cameraManager->GetCamera() once initScene() ran
+	// The default UI font the editor creates (initRenderObjects made it; the
+	// editor skips that, which left gb_RenderDevice->OutText a no-op — no red
+	// source/anchor labels). Owned by FT::fontManager().
+	FT::Font*            editorFont_ = nullptr;
 	Orbit                orbit_;
 	// The Universe + MissionDescription the editor built for the current
 	// world (CMainFrame::reInitWorld's `new Universe(mission, ia)`). The

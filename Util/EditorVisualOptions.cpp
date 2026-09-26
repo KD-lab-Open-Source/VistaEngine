@@ -3,8 +3,10 @@
 
 #include "EditorVisualOptions.h"
 
-bool EditorVisualOptions::showSources_ = false;
-bool EditorVisualOptions::showCameras_ = false;
+// Defaults match the original SurMapOptions (SurMap5/SurMapOptions.cpp:17-18):
+// sources and cameras on, models shown, path-finding/camera-borders off.
+bool EditorVisualOptions::showSources_ = true;
+bool EditorVisualOptions::showCameras_ = true;
 bool EditorVisualOptions::hideWorldModels_ = false;
 bool EditorVisualOptions::showPathFinding_ = false;
 bool EditorVisualOptions::showCameraBorders_ = false;

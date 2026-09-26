@@ -23,6 +23,7 @@ using namespace std;
 #include "Render/src/TileMap.h"      // cTileMap (the terrain's tile map)
 #include "Render/src/TexLibrary.h"   // GetTexLibrary (texture statistics)
 #include "Render/src/Texture.h"      // cTexture (GetName, CalcTextureSize)
+#include "Render/src/FT_Font.h"      // FT::fontManager (editor UI text / drawText)
 #include "Util/XMath/xmath.h"        // MatXf/Mat3f/Mat2f + X_AXIS/Y_AXIS/Z_AXIS
 #include "Render/SDLRenderDevice.h"
 #include "Render/SDLWorldQuadRenderer.h"  // TEMP FX debug (оверрайды quad-рендерера)
@@ -121,6 +122,36 @@ struct SourceManagerHolder {
 	SourceManager mgr;
 };
 SourceManagerHolder g_sourceManagerHolder;
+
+// CSurToolAnchor used kdw::makeName to keep anchor labels unique. That helper
+// lives in the heavy Util/kdw/LibraryTab translation unit, so this local copy
+// does the same: if `base` is already one of the '|'-separated `reserved`
+// labels, return "<base> N" with the first free N.
+static std::string uniqueLabel(const std::string& reserved, const std::string& base)
+{
+	const std::string name = base.empty() ? "unnamed" : base;
+	// A '|'-delimited exact match, or "<name> <digits>" followed by '|'/end.
+	auto taken = [&reserved](const std::string& candidate){
+		size_t pos = 0;
+		while(pos <= reserved.size()){
+			size_t end = reserved.find('|', pos);
+			if(end == std::string::npos)
+				end = reserved.size();
+			if(reserved.compare(pos, end - pos, candidate) == 0)
+				return true;
+			pos = end + 1;
+		}
+		return false;
+	};
+	if(!taken(name))
+		return name;
+	for(int i = 2; i < 100000; ++i){
+		std::string candidate = name + " " + std::to_string(i);
+		if(!taken(candidate))
+			return candidate;
+	}
+	return name;
+}
 
 // Universe is built directly on the calling thread, exactly as the original
 // SurMap5's CGeneralView::reInitWorld did (`new Universe(*currentMission_, ...)`
@@ -508,6 +539,193 @@ public:
 		if(select)
 			unit->setSelected(true);
 		return (EditorObjectId)unit;
+	}
+
+	// --- Source / Anchor placement (CSurToolSource / CSurToolAnchor) ---
+
+	void sourceNames(std::vector<std::string>& out) override
+	{
+		out.clear();
+		const SourcesLibrary::Map& map = SourcesLibrary::instance().map();
+		for(size_t i = 0; i < map.size(); ++i){
+			const SourceBase* src = map[i].get();
+			// label_ is the instance label and is empty for a library element;
+			// the element's name is its library key (SourceBase::serialize sets
+			// libraryKey_ from SourceReference(this)). Fall back to the source
+			// type's display name when the key is empty.
+			std::string name;
+			if(src){
+				name = src->libraryKey();
+				if(name.empty())
+					name = SourceBase::getDisplayName(src->type());
+			}
+			out.push_back(name);
+		}
+	}
+
+	editor::PropertyRow* sourceElementTree(int index, bool editOnly) override
+	{
+		const SourcesLibrary::Map& map = SourcesLibrary::instance().map();
+		if(index < 0 || index >= (int)map.size())
+			return nullptr;
+		SourceBase* src = map[index].get();
+		if(!src)
+			return nullptr;
+		// The original's attribEditor().attachSerializer(Serializer(*source)):
+		// same PropertyOArchive path the library editor uses.
+		editor::PropertyOArchive oa;
+		Serializer se(*src);
+		(void)editOnly;   // SourceBase has no edit-only conditional fields
+		se.serialize(oa);
+		return oa.root();
+	}
+
+	bool sourceElementSetTree(int index, editor::PropertyRow* root) override
+	{
+		if(!root)
+			return false;
+		const SourcesLibrary::Map& map = SourcesLibrary::instance().map();
+		if(index < 0 || index >= (int)map.size())
+			return false;
+		SourceBase* src = map[index].get();
+		if(!src)
+			return false;
+		editor::PropertyIArchive ia(root);
+		Serializer se(*src);
+		se.serialize(ia);
+		return true;
+	}
+
+	bool previewSource(int index) override
+	{
+		if(!sourceManager)
+			return false;
+		if(previewSource_){
+			previewSource_->kill();
+			previewSource_ = 0;
+		}
+		if(index < 0 || !vMap.isWorldLoaded())
+			return true;
+		const SourcesLibrary::Map& map = SourcesLibrary::instance().map();
+		if(index >= (int)map.size())
+			return false;
+		const SourceBase* original = map[index].get();
+		if(!original)
+			return false;
+		// CSurToolSource::OnInitDialog: sourceOnMouse_ = addSource(original).
+		previewSource_ = sourceManager->addSource(original);
+		if(previewSource_)
+			previewSource_->setActivity(true);
+		return previewSource_ != 0;
+	}
+
+	bool movePreviewSource(float x, float y) override
+	{
+		if(!previewSource_)
+			return false;
+		const int xi = (int)roundf(x), yi = (int)roundf(y);
+		float z = 0.f;
+		if(xi >= 0 && yi >= 0 && xi < (int)vMap.H_SIZE && yi < (int)vMap.V_SIZE)
+			z = vMap.getZf(xi, yi);
+		previewSource_->setPose(Se3f(previewSource_->orientation(), Vect3f(x, y, z)), true);
+		return true;
+	}
+
+	EditorObjectId placeSource(int index, float x, float y) override
+	{
+		if(!sourceManager || !vMap.isWorldLoaded())
+			return kNoObject;
+		const SourcesLibrary::Map& map = SourcesLibrary::instance().map();
+		if(index < 0 || index >= (int)map.size())
+			return kNoObject;
+		const SourceBase* original = map[index].get();
+		if(!original)
+			return kNoObject;
+		SourceBase* src = sourceManager->addSource(original);
+		if(!src)
+			return kNoObject;
+		const int xi = (int)roundf(x), yi = (int)roundf(y);
+		float z = 0.f;
+		if(xi >= 0 && yi >= 0 && xi < (int)vMap.H_SIZE && yi < (int)vMap.V_SIZE)
+			z = vMap.getZf(xi, yi);
+		src->setPose(Se3f(QuatF::ID, Vect3f(x, y, z)), true);
+		return (EditorObjectId)src;
+	}
+
+	editor::PropertyRow* anchorTree(bool editOnly) override
+	{
+		editor::PropertyOArchive oa;
+		Serializer se(editableAnchor_);
+		(void)editOnly;
+		se.serialize(oa);
+		return oa.root();
+	}
+
+	bool anchorSetTree(editor::PropertyRow* root) override
+	{
+		if(!root)
+			return false;
+		editor::PropertyIArchive ia(root);
+		Serializer se(editableAnchor_);
+		se.serialize(ia);
+		return true;
+	}
+
+	bool previewAnchor(bool create) override
+	{
+		if(!sourceManager)
+			return false;
+		if(previewAnchor_){
+			sourceManager->removeAnchor(previewAnchor_);
+			previewAnchor_ = 0;
+		}
+		if(!create || !vMap.isWorldLoaded())
+			return true;
+		// CSurToolAnchor::OnInitDialog: anchorOnMouse_ =
+		// sourceManager->addAnchor(originalAnchor()).
+		previewAnchor_ = sourceManager->addAnchor(&editableAnchor_);
+		return previewAnchor_ != 0;
+	}
+
+	bool movePreviewAnchor(float x, float y) override
+	{
+		if(!previewAnchor_)
+			return false;
+		const int xi = (int)roundf(x), yi = (int)roundf(y);
+		float z = 0.f;
+		if(xi >= 0 && yi >= 0 && xi < (int)vMap.H_SIZE && yi < (int)vMap.V_SIZE)
+			z = vMap.getZf(xi, yi);
+		previewAnchor_->setPose(Se3f(previewAnchor_->orientation(), Vect3f(x, y, z)), true);
+		return true;
+	}
+
+	EditorObjectId placeAnchor(float x, float y) override
+	{
+		if(!sourceManager || !vMap.isWorldLoaded())
+			return kNoObject;
+		Anchor* anchor = sourceManager->addAnchor(&editableAnchor_);
+		if(!anchor)
+			return kNoObject;
+		// CSurToolAnchor::onOperationOnMap generated a unique label from the
+		// existing labels (kdw::makeName) before placing. Same idea, local: the
+		// label becomes "<base> N" until it is not taken.
+		std::string reserved;
+		const SourceManager::Anchors& anchors = sourceManager->anchors();
+		for(size_t i = 0; i < anchors.size(); ++i){
+			if(anchors[i].get() == anchor)
+				continue;
+			if(!reserved.empty())
+				reserved += "|";
+			reserved += anchors[i]->label();
+		}
+		const std::string label = uniqueLabel(reserved, editableAnchor_.label());
+		anchor->setLabel(label.c_str());
+		const int xi = (int)roundf(x), yi = (int)roundf(y);
+		float z = 0.f;
+		if(xi >= 0 && yi >= 0 && xi < (int)vMap.H_SIZE && yi < (int)vMap.V_SIZE)
+			z = vMap.getZf(xi, yi);
+		anchor->setPose(Se3f(QuatF::ID, Vect3f(x, y, z)), true);
+		return (EditorObjectId)anchor;
 	}
 
 	bool worldRender() override
@@ -1221,6 +1439,17 @@ public:
 
 private:
 	TriggerSession triggerSession_;
+
+	// CSurToolSource / CSurToolAnchor: the live preview object that follows the
+	// cursor (the original's sourceOnMouse_ / anchorOnMouse_). Owned by the
+	// sourceManager once added; the -1 previewSource()/previewAnchor(false)
+	// calls kill/remove them, and the editor clears them on tool change.
+	SourceBase* previewSource_ = nullptr;
+	Anchor* previewAnchor_ = nullptr;
+	// CSurToolAnchor's editable Anchor instance (anchor_): the property tree
+	// edits this, and placeAnchor stamps a fresh copy of it. doNotRegister=true
+	// so it stays out of sourceManager until a preview/place is asked for.
+	Anchor editableAnchor_{ true };
 };
 
 EngineViewport::EngineViewport() = default;
@@ -1280,6 +1509,19 @@ bool EngineViewport::init(int width, int height)
 	if(!gb_RenderDevice->inited() &&
 	   !gb_RenderDevice->Initialize(width, height, RENDERDEVICE_MODE_WINDOW, nullptr, 0, nullptr))
 		return false;
+
+	// [SurMap5Qt] initRenderObjects (Game/RenderObjects.cpp:99-101) created the
+	// engine's default UI font and set it on the device. The Qt port calls
+	// initScene() but not initRenderObjects(), so DefaultFont/CurrentFont stay
+	// null and every gb_RenderDevice->OutText is a no-op — that is why the
+	// editor drew no red source/anchor labels (EditorVisual::drawText). Create
+	// the same font here.
+	if(!editorFont_){
+		editorFont_ = FT::fontManager().createFont(default_font_name.c_str(),
+			round(18.f / 768.f * float(gb_RenderDevice->GetSizeY())));
+		if(editorFont_)
+			gb_RenderDevice->SetDefaultFont(editorFont_);
+	}
 
 	// [SurMap5Qt] The shipped content is cache-only: world models exist as
 	// CacheData\Models\*.3dxG and textures as CacheData\Textures\*, with no
@@ -1397,6 +1639,14 @@ void EngineViewport::done()
 		gb_RenderDevice->selectRenderWindow(0);
 		if(renderWindow_)
 			gb_RenderDevice->DeleteRenderWindow(renderWindow_);
+		// Release the editor's UI font the way finitRenderObjects did
+		// (Game/RenderObjects.cpp:141-143).
+		if(editorFont_){
+			gb_RenderDevice->SetDefaultFont(NULL);
+			gb_RenderDevice->SetFont(NULL);
+			FT::fontManager().releaseFont(editorFont_);
+			editorFont_ = nullptr;
+		}
 	}
 	// terScene and cameraManager are owned by initScene/finitScene — the
 	// editor keeps them across loads so reloading a world reuses the

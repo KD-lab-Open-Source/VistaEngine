@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "UnitTool.h"
+#include "panels/PropertyText.h"  // propertytext::displayBytes (cp1251 names)
 #include "editor/EditorTool.h"   // IWorldBridge
 
 UnitPropertyPanel::UnitPropertyPanel(QWidget* parent)
@@ -41,7 +42,7 @@ void UnitPropertyPanel::reloadAttributes()
 		std::vector<std::string> names;
 		bridge->unitAttributeNames(names);
 		for(const std::string& n : names)
-			attribute_->addItem(QString::fromUtf8(n.c_str()));
+			attribute_->addItem(propertytext::displayBytes(n));
 	}
 	if(attribute_->count() == 0)
 		attribute_->addItem(tr("(load a world to list units)"));

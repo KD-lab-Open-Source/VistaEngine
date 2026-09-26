@@ -243,8 +243,9 @@ void MainWindow::createActions()
 	// flags directly here too (the handlers do the same on a later toggle).
 	{
 		QSettings s;
-		const bool sources = s.value("view/sources", false).toBool();
-		const bool cameras = s.value("view/cameras", false).toBool();
+		// Defaults match SurMapOptions (sources/cameras on).
+		const bool sources = s.value("view/sources", true).toBool();
+		const bool cameras = s.value("view/cameras", true).toBool();
 		const bool hideModels = s.value("view/hideModels", false).toBool();
 		const bool pathFinding = s.value("view/pathFinding", false).toBool();
 		const bool cameraBorders = s.value("view/cameraBorders", false).toBool();

@@ -153,11 +153,13 @@ variant), **Kind** ("Hardness": paint the surface type — `vMap.drawInGrid` wit
 **ColorPic** ("Texture": paint a bitmap texture with a `ColorModificator` —
 `vMap.drawBitmapCircle` / `putBitmap2AllWorld`), **Unit** (place a unit of the
 chosen `AttributeLibrary` attribute — `Player::buildUnit` + `setPose` at the
-terrain height), GeoNet (`bridge_->applyGeoNet`
+terrain height, with the legionary/squad join), **Source** (`SourceTool`:
+SourcesLibrary element + live preview + `addSource`) and **Anchor** (`AnchorTool`:
+editable anchor + live preview + `addAnchor`), GeoNet (`bridge_->applyGeoNet`
 → `geoGeneration`; no direct MFC counterpart), GeoTx (re-render only — matches
 the original, where the paint call is commented out). The Toolzer/Kind/ColorPic
 editors live in the Properties dock (`ToolzerPropertyPanel`,
-`KindPropertyPanel`, `ColorPicPropertyPanel`).
+`KindPropertyPanel`, `ColorPicPropertyPanel`); Source/Anchor/Unit get their own.
 
 Dependency note: selection works for **alive, non-auxiliary units** only.
 Sources, anchors and camera splines are not click-pickable, and a real marquee
@@ -170,8 +172,11 @@ Not yet ported (original class → what it does):
 - CSurToolRoad — road drawing.
 - CSurToolWater / CSurToolWaves / CSurToolWindStatic — water level / waves / wind zones.
 - CSurToolLighting — lighting (sun) editing.
-- CSurToolSource — extraction/resource source placement (`sourceManager->addSource`).
-- CSurToolAnchor — anchor placement (`sourceManager->addAnchor`).
+- CSurToolSource — extraction/resource source placement (`sourceManager->addSource`). **Ported** (`SourceTool` + `SourcePropertyPanel`): the SourcesLibrary element list
+  (cp1251 decoded through `propertytext::displayBytes`), a live `sourceOnMouse_` preview under the cursor, the element's parameters edited through the bridge's
+  PropertyRow tree (`sourceElementTree`/`sourceElementSetTree`), and `placeSource` on click.
+- CSurToolAnchor — anchor placement (`sourceManager->addAnchor`). **Ported** (`AnchorTool` + `AnchorPropertyPanel`): one editable anchor, live preview, PropertyRow
+  tree (`anchorTree`/`anchorSetTree`), unique label via a local `kdw::makeName` equivalent, `placeAnchor` on click.
 - CSurToolGrass — grass zones (`environment->grass()->SetGrass`).
 - CSurToolSpecFilter ("Detail Filter") — `vMap.specialFilter`.
 - CSurToolBlur — `vMap.gaussFilter`.
@@ -211,8 +216,9 @@ the Properties dock and (b) a pick-from-scene / click-to-place path through
   cameraBorder*_/last_dirs_/dlgBarState. The **visibility flags the renderer
   reads** are now ported as `Util/EditorVisualOptions` (engine-side, one copy for
   the game and the editor) and driven from MainWindow's View menu, QSettings-
-  backed. The rest (last dirs, dock state, grid colour, LOD) is still scattered
-  Qt/QSettings state with no single struct.
+  backed; defaults match the original (sources/cameras **on**). The rest (last
+  dirs, dock state, grid colour, LOD) is still scattered Qt/QSettings state with
+  no single struct.
 - `EditorVisual::isVisible` (SurMap5/EditorVisualImpl.cpp) — the per-class
   visibility hook the renderer asks. **Ported** in the Qt stub
   (`VistaEngineContext.cpp`): units/environment follow `hideWorldModels_`,
@@ -245,9 +251,10 @@ exist yet.
    Models real and persistable. Left: the path-finding aux unit, the
    camera-border overlay, and the remaining `SurMapOptions` fields (dirs, dock
    state, grid colour, LOD) in one struct.
-3. **Placement tools** — ~~SurToolUnit~~ **done** (`UnitTool`); still open:
-   SurTool3DM/Environment (file-pick a model), SurToolSource, SurToolAnchor
-   (the library/combo picker pattern `UnitTool` uses transfers to each).
+3. **Placement tools** — ~~SurToolUnit~~ **done** (`UnitTool`); ~~SurToolSource~~
+   and ~~SurToolAnchor~~ **done** (`SourceTool`/`AnchorTool`, live preview +
+   embedded PropertyRow attrib editor). Still open: SurTool3DM/Environment
+   (file-pick a model), then the Road/PathEditor/CameraEditor/MiniDetaile set.
 4. **Wire the ready dialogs**: put WaveDialog on a command; give CameraDialog its
    own command and add the CREATE_POINTS/SELECT_POINTS mouse modes.
 5. **Close dead/stale items**: `actViewPathFindingRef_` (unconnected), Debug

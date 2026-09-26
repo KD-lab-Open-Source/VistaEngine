@@ -277,6 +277,45 @@ public:
 	// new object id, or kNoObject when the index/world is invalid.
 	virtual EditorObjectId placeUnit(int libraryIndex, float x, float y, bool select) = 0;
 
+	// --- Source / Anchor placement (CSurToolSource / CSurToolAnchor) ---
+	//
+	// The originals were CSurToolEditable: a list of the placed type plus a
+	// live preview object that follows the cursor and an attrib editor for the
+	// type's parameters. The Qt side shows the list + a PropertyTree; the
+	// engine resolves the index and owns the preview object.
+
+	// The names of SourcesLibrary's elements (CSurToolSource's type list). The
+	// index-addressed element is what placeSource/previewSource resolve.
+	virtual void sourceNames(std::vector<std::string>& out) = 0;
+	// Serialize SourcesLibrary element `index` into a PropertyRow tree for the
+	// attrib editor (the original's attribEditor().attachSerializer; editOnly
+	// hides the non-editable fields). Null when the index is invalid.
+	virtual editor::PropertyRow* sourceElementTree(int index, bool editOnly) = 0;
+	// Write the (possibly edited) tree back into the library element.
+	virtual bool sourceElementSetTree(int index, editor::PropertyRow* root) = 0;
+	// Create/replace the live preview source from element `index` (index < 0
+	// kills it); it sits under the cursor and is not saved. Returns false when
+	// no world / sourceManager.
+	virtual bool previewSource(int index) = 0;
+	// Move the live preview to (x, y) on the ground (onTrackingMouse).
+	virtual bool movePreviewSource(float x, float y) = 0;
+	// Place a saved source of element `index` at (x, y)
+	// (CSurToolSource::onOperationOnMap -> sourceManager->addSource + setPose).
+	// Returns the new object id or kNoObject.
+	virtual EditorObjectId placeSource(int index, float x, float y) = 0;
+
+	// Anchors have no library — CSurToolAnchor created a single editable Anchor
+	// instance. The tree is that editable anchor; placeAnchor stamps it.
+	virtual editor::PropertyRow* anchorTree(bool editOnly) = 0;
+	virtual bool anchorSetTree(editor::PropertyRow* root) = 0;
+	// Create/replace the live preview anchor (create==false kills it).
+	virtual bool previewAnchor(bool create) = 0;
+	virtual bool movePreviewAnchor(float x, float y) = 0;
+	// Place a saved anchor at (x, y); generates a unique label like the
+	// original (kdw::makeName over the existing anchor labels). Returns the
+	// new object id or kNoObject.
+	virtual EditorObjectId placeAnchor(float x, float y) = 0;
+
 	// Re-render the whole world (SurToolGeoTx::onOperationOnMap ->
 	// vMap.WorldRender). Returns false when no world is loaded.
 	virtual bool worldRender() = 0;

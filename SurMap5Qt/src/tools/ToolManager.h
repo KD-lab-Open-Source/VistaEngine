@@ -23,6 +23,8 @@ class ToolzerTool;
 class KindTool;
 class ColorPicTool;
 class UnitTool;
+class SourceTool;
+class AnchorTool;
 class TransformPropertyPanel;
 class GeoNetPropertyPanel;
 class GeoTxPropertyPanel;
@@ -30,6 +32,8 @@ class ToolzerPropertyPanel;
 class KindPropertyPanel;
 class ColorPicPropertyPanel;
 class UnitPropertyPanel;
+class SourcePropertyPanel;
+class AnchorPropertyPanel;
 
 class ToolManager
 {
@@ -83,6 +87,8 @@ private:
 	KindTool* kind_ = nullptr;
 	ColorPicTool* colorPic_ = nullptr;
 	UnitTool* unit_ = nullptr;
+	SourceTool* source_ = nullptr;
+	AnchorTool* anchor_ = nullptr;
 
 	std::vector<EditorTool*> tools_;
 	EditorTool* current_ = nullptr;
@@ -102,4 +108,7 @@ private:
 	ColorPicPropertyPanel* colorPicPanel_ = nullptr;
 	// The Properties dock's panel for the unit-placement tool (created lazily).
 	UnitPropertyPanel* unitPanel_ = nullptr;
+	// Source/anchor placement panels (created lazily).
+	SourcePropertyPanel* sourcePanel_ = nullptr;
+	AnchorPropertyPanel* anchorPanel_ = nullptr;
 };
