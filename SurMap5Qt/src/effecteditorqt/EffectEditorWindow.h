@@ -15,6 +15,8 @@
 
 class IWorldBridge;
 class PropertyTree;
+class QCheckBox;
+class QDoubleSpinBox;
 class QTableWidget;
 class QTreeWidget;
 
@@ -35,6 +37,8 @@ private slots:
 	void onTreeSelectionChanged();
 	void onPropertyEdited();
 	void onCurveKeyChanged(int row, int column);
+	void onPreviewToggled(bool on);
+	void onPreviewTimeChanged(double time);
 
 private:
 	void populateCurveKeys(int curveNodeId);
@@ -43,6 +47,8 @@ private:
 	QTreeWidget* tree_ = nullptr;
 	PropertyTree* properties_ = nullptr;
 	QTableWidget* curveKeys_ = nullptr;
+	QCheckBox* previewCheck_ = nullptr;
+	QDoubleSpinBox* previewTime_ = nullptr;
 	int curveNodeId_ = -1;
 	bool loading_ = false;
 };

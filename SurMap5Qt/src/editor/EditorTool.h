@@ -324,6 +324,10 @@ public:
 	virtual int effectCurveKeyCount(int curveNodeId) = 0;
 	virtual bool effectCurveKey(int curveNodeId, int index, float& time, float& value) = 0;
 	virtual bool effectCurveSetKey(int curveNodeId, int index, float time, float value) = 0;
+	// 3D preview: attach/detach the loaded effect to the editor scene (the
+	// main viewport shows it) and scrub its time.
+	virtual bool effectPreview(bool on) = 0;
+	virtual bool effectSetPreviewTime(float time) = 0;
 
 	// --- UI Editor tree mutations (UIEditor's Create/Erase actions) ---
 	// Display names of the UI_ControlBase factory types (add-control list).
@@ -336,6 +340,9 @@ public:
 	// Remove a node: a screen (UI_Dispatcher::removeScreen), a state
 	// (states().erase) or a control (owner container's removeControl).
 	virtual bool uiDeleteNode(int nodeId) = 0;
+	// UI preview overlay: show (or stop showing) the screen owning
+	// `screenNodeId` on the editor's main 3D view.
+	virtual bool uiPreview(int screenNodeId, bool on) = 0;
 
 	// Terrain height + a ray-cast of a widget pixel to the ground (the
 	// tools' screenPointToGround / projectScreenPointOnPlane ports).

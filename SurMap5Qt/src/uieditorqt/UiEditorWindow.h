@@ -15,6 +15,7 @@
 
 class IWorldBridge;
 class PropertyTree;
+class QCheckBox;
 class QTreeWidget;
 class QTreeWidgetItem;
 
@@ -23,6 +24,7 @@ class UiEditorWindow : public QMainWindow
 	Q_OBJECT
 public:
 	explicit UiEditorWindow(IWorldBridge* bridge, QWidget* parent = nullptr);
+	~UiEditorWindow() override;
 
 public slots:
 	// Rebuild the tree from the bridge (after a change).
@@ -35,6 +37,7 @@ private slots:
 	void onAddControl();
 	void onAddState();
 	void onDelete();
+	void onPreviewToggled(bool on);
 
 private:
 	int currentNodeId() const;
@@ -42,5 +45,6 @@ private:
 	IWorldBridge* bridge_ = nullptr;
 	QTreeWidget* tree_ = nullptr;
 	PropertyTree* properties_ = nullptr;
+	QCheckBox* previewCheck_ = nullptr;
 	bool loading_ = false;
 };

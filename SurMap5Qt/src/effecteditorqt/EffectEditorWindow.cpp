@@ -6,7 +6,9 @@
 #include "panels/PropertyTree.h"
 
 #include <QAction>
+#include <QCheckBox>
 #include <QDir>
+#include <QDoubleSpinBox>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QHeaderView>
@@ -55,6 +57,20 @@ EffectEditorWindow::EffectEditorWindow(IWorldBridge* bridge, QWidget* parent)
 	connect(toolbar->addAction(tr("&Open...")), &QAction::triggered, this, &EffectEditorWindow::onOpen);
 	connect(toolbar->addAction(tr("&Save")), &QAction::triggered, this, &EffectEditorWindow::onSave);
 	connect(toolbar->addAction(tr("Save &As...")), &QAction::triggered, this, &EffectEditorWindow::onSaveAs);
+	toolbar->addSeparator();
+	previewCheck_ = new QCheckBox(tr("3D preview"), toolbar);
+	toolbar->addWidget(previewCheck_);
+	previewTime_ = new QDoubleSpinBox(toolbar);
+	previewTime_->setRange(0.0, 60.0);
+	previewTime_->setDecimals(2);
+	previewTime_->setSingleStep(0.05);
+	previewTime_->setPrefix(tr("t = "));
+	previewTime_->setSuffix(tr(" s"));
+	previewTime_->setEnabled(false);
+	toolbar->addWidget(previewTime_);
+	connect(previewCheck_, &QCheckBox::toggled, this, &EffectEditorWindow::onPreviewToggled);
+	connect(previewTime_, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+	        this, &EffectEditorWindow::onPreviewTimeChanged);
 
 	connect(tree_, &QTreeWidget::itemSelectionChanged, this, &EffectEditorWindow::onTreeSelectionChanged);
 	connect(properties_, &QTreeWidget::itemChanged, this, &EffectEditorWindow::onPropertyEdited);
@@ -65,8 +81,10 @@ EffectEditorWindow::EffectEditorWindow(IWorldBridge* bridge, QWidget* parent)
 
 EffectEditorWindow::~EffectEditorWindow()
 {
-	if(bridge_)
+	if(bridge_){
+		bridge_->effectPreview(false);
 		bridge_->effectClose();
+	}
 }
 
 void EffectEditorWindow::refresh()
@@ -113,6 +131,7 @@ void EffectEditorWindow::onOpen()
 		return;
 	const std::string native = QDir::toNativeSeparators(path).toStdString();
 	if(bridge_->effectOpen(native)){
+		previewCheck_->setChecked(false);   // effectOpen stopped any old preview
 		refresh();
 		statusBar()->showMessage(tr("Opened %1").arg(QFileInfo(path).fileName()), 3000);
 	}
@@ -192,6 +211,32 @@ void EffectEditorWindow::onCurveKeyChanged(int row, int /*column*/)
 		return;
 	bridge_->effectCurveSetKey(curveNodeId_, row,
 		timeItem->text().toFloat(), valueItem->text().toFloat());
+}
+
+void EffectEditorWindow::onPreviewToggled(bool on)
+{
+	if(!bridge_)
+		return;
+	previewTime_->setEnabled(on);
+	if(on){
+		if(!bridge_->effectPreview(true)){
+			statusBar()->showMessage(tr("Open an effect with a loaded world first"));
+			previewCheck_->setChecked(false);
+			return;
+		}
+		bridge_->effectSetPreviewTime(previewTime_->value());
+		statusBar()->showMessage(tr("Preview shown in the main 3D view"), 3000);
+	}
+	else{
+		bridge_->effectPreview(false);
+		statusBar()->showMessage(tr("Preview off"), 3000);
+	}
+}
+
+void EffectEditorWindow::onPreviewTimeChanged(double time)
+{
+	if(bridge_ && previewCheck_->isChecked())
+		bridge_->effectSetPreviewTime((float)time);
 }
 
 void EffectEditorWindow::onPropertyEdited()

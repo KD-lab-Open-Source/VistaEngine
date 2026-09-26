@@ -33,6 +33,9 @@ class Camera;
 class cScene;
 class MissionDescription;
 class Universe;
+class EffectKey;
+class cEffect;
+class UI_Screen;
 namespace FT { class Font; }
 
 class EngineViewport
@@ -83,6 +86,21 @@ public:
 	// loaded; the same prelude loadWorld runs. Returns false when the load
 	// fails. Idempotent.
 	bool ensureUiLibraries();
+
+	// --- Effects Editor preview (EffectEditor port) ---
+	// Attach the loaded EffectKey to the editor scene as a detached cEffect
+	// (EffectDocument::createEffect) so the main 3D viewport shows it, and
+	// destroy it again. setEffectPreviewTime scrubs (cEffect::MoveToTime).
+	bool startEffectPreview(EffectKey* effectKey);
+	void stopEffectPreview();
+	bool setEffectPreviewTime(float time);
+
+	// --- UI Editor preview (UIEditor port) ---
+	// Overlay UI_Dispatcher's screen on the editor's 3D view (the original
+	// rendered the UI with the same engine device). No-op until a screen is
+	// selected. stopUiPreview turns the overlay off.
+	bool startUiPreview(UI_Screen* screen);
+	void stopUiPreview();
 
 	// Rebuild the terrain scene from the in-memory world after the terrain
 	// data changed in place (CMainFrame's view_->reInitWorld: drop the tile
@@ -394,6 +412,14 @@ private:
 	std::unique_ptr<MissionDescription> ownedMission_;
 	bool                 inited_ = false;
 	bool                 worldLoaded_ = false;
+	// Effects Editor preview: the detached cEffect attached to the scene and
+	// its scrub time.
+	cEffect*             effectPreview_ = nullptr;
+	float                effectPreviewTime_ = 0.f;
+	// UI Editor preview overlay.
+	bool                 uiPreview_ = false;
+	UI_Screen*           uiPreviewScreen_ = nullptr;
+	bool                 uiPreviewInited_ = false;
 	bool                 gridVisible_ = true;   // surMapOptions.enableGrid_ (U7)
 	// loadAllLibraries() (the SurMap5 initRenderDevice prelude) ran — the
 	// UI_* + attribute libraries are loaded, so the first Universe ctor's

@@ -858,6 +858,13 @@ public:
 				std::string texturesPath = extractFilePath(fileName.c_str());
 				texturesPath += "\\Textures";
 				key->changeTexturePath(texturesPath.c_str());
+				// EffectDocument::add preloaded the frame textures so the
+				// preview has them; guard because it touches the device.
+				try{
+					key->preloadTexture();
+				}
+				catch(...){
+				}
 			}
 		}
 		if(!key)
@@ -869,6 +876,8 @@ public:
 
 	void effectClose() override
 	{
+		if(owner_)
+			owner_->stopEffectPreview();
 		effectNodes_.clear();
 		effectEmitters_.clear();
 		effectCurveStore_.clear();
@@ -1014,6 +1023,21 @@ public:
 		return true;
 	}
 
+	bool effectPreview(bool on) override
+	{
+		if(!owner_)
+			return false;
+		if(on)
+			return owner_->startEffectPreview(effectKey_);
+		owner_->stopEffectPreview();
+		return true;
+	}
+
+	bool effectSetPreviewTime(float time) override
+	{
+		return owner_ ? owner_->setEffectPreviewTime(time) : false;
+	}
+
 	// --- UI Editor tree mutations (UIEditor's Create/Erase actions) ---
 
 	bool uiControlTypes(std::vector<std::string>& out) override
@@ -1089,6 +1113,20 @@ public:
 			return true;
 		}
 		return false;
+	}
+
+	bool uiPreview(int screenNodeId, bool on) override
+	{
+		if(!owner_)
+			return false;
+		if(!on){
+			owner_->stopUiPreview();
+			return true;
+		}
+		UI_Screen* screen = nullptr;
+		if(screenNodeId >= 0 && screenNodeId < (int)uiNodes_.size())
+			screen = uiNodes_[screenNodeId].screen;
+		return owner_->startUiPreview(screen);
 	}
 
 	void setObjectRadius(EditorObjectId id, float radius) override
@@ -2369,7 +2407,7 @@ private:
 	{
 		UiNodeRef ref;
 		ref.kind = kind;
-		ref.screen = screen;
+		ref.screen = screen ? screen : uiCurrentScreen_;
 		ref.control = control;
 		ref.state = state;
 		const int id = (int)uiNodes_.size();
@@ -2407,9 +2445,11 @@ private:
 
 	void addUiScreenTree(UI_Screen& screen, int parentId, std::vector<UiTreeNode>& out)
 	{
+		uiCurrentScreen_ = &screen;
 		const int id = addUiNode(kUiScreen, parentId, screen.name(), "UI_Screen",
 		                         &screen, nullptr, nullptr, out);
 		addUiContainerTree(screen, id, out);
+		uiCurrentScreen_ = nullptr;
 	}
 
 	// --- Effects Editor helpers (EffectEditor port) ---
@@ -2624,6 +2664,7 @@ private:
 	EngineViewport* owner_ = nullptr;
 	bool uiLibrariesInited_ = false;
 	std::vector<UiNodeRef> uiNodes_;
+	UI_Screen* uiCurrentScreen_ = nullptr;   // the screen uiTree is walking
 
 	// Effects Editor (EffectEditor port): the loaded EffectKey, its file, the
 	// node cache and the collected curve clones (kept alive while the tree
@@ -2864,8 +2905,10 @@ void EngineViewport::done()
 	// same scene + camera. (SurMap5/GeneralView.cpp called createScene
 	// once and reInitWorld on every world load.) Drop the references;
 	// the teardown order matches SurMap5/VistaEngineContext.cpp.
+	stopEffectPreview();
 	delete bridge_;
 	bridge_ = nullptr;
+	effectPreview_ = nullptr;   // the scene owns it; tear-down drops it with scene_
 	scene_ = nullptr;
 	camera_ = nullptr;
 	renderWindow_ = nullptr;
@@ -3166,6 +3209,84 @@ bool EngineViewport::ensureUiLibraries()
 		return false;
 	}
 	return true;
+}
+
+bool EngineViewport::startEffectPreview(EffectKey* effectKey)
+{
+	stopEffectPreview();
+	if(!effectKey || !scene_ || !gb_RenderDevice)
+		return false;
+	// EffectDocument::createEffect: a detached effect attached to the scene,
+	// positioned at the map centre (origin when no world is loaded) and with
+	// every emitter visible.
+	cEffect* effect = scene_->CreateEffectDetached(*effectKey, 0, false);
+	if(!effect)
+		return false;
+	effect->Attach();
+	const float x = vMap.isWorldLoaded() ? vMap.H_SIZE * 0.5f : 0.f;
+	const float y = vMap.isWorldLoaded() ? vMap.V_SIZE * 0.5f : 0.f;
+	effect->SetPosition(MatXf(Se3f(QuatF::ID, Vect3f(x, y, 1000.f))));
+	for(size_t i = 0; i < effectKey->emitterKeys.size(); ++i){
+		if(EmitterKeyInterface* emitter = effectKey->emitterKeys[i].get())
+			effect->ShowEmitter(emitter, true);
+	}
+	effect->SetTime(0.f);
+	effect->MoveToTime(effectPreviewTime_);
+	effectPreview_ = effect;
+	return true;
+}
+
+void EngineViewport::stopEffectPreview()
+{
+	if(effectPreview_){
+		RELEASE(effectPreview_);   // detached effects are RELEASE()d (EffectDocument::createEffect)
+		effectPreview_ = nullptr;
+	}
+}
+
+bool EngineViewport::setEffectPreviewTime(float time)
+{
+	effectPreviewTime_ = time;
+	if(effectPreview_)
+		effectPreview_->MoveToTime(time);
+	return effectPreview_ != nullptr;
+}
+
+bool EngineViewport::startUiPreview(UI_Screen* screen)
+{
+	if(!gb_RenderDevice)
+		return false;
+	try{
+		if(!uiPreviewInited_){
+			// The UIEditor prelude: UI_Render::init + UI_Dispatcher::init
+			// (UI_LogicDispatcher::init + UI_BackgroundScene::init).
+			UI_Render::instance().init();
+			UI_Dispatcher::instance().init();
+			uiPreviewInited_ = true;
+		}
+		if(screen)
+			UI_Dispatcher::instance().selectScreen(screen);
+		const int w = gb_RenderDevice->GetSizeX();
+		const int h = gb_RenderDevice->GetSizeY();
+		UI_Render::instance().setWindowPosition(Recti(0, 0, w, h));
+		UI_Render::instance().updateRenderSize();
+		uiPreviewScreen_ = screen;
+		uiPreview_ = true;
+	}
+	catch(const std::exception& e){
+		fprintf(stderr, "EngineViewport: [startUiPreview] threw: %s\n", e.what());
+		return false;
+	}
+	catch(...){
+		fprintf(stderr, "EngineViewport: [startUiPreview] threw (non-std)\n");
+		return false;
+	}
+	return true;
+}
+
+void EngineViewport::stopUiPreview()
+{
+	uiPreview_ = false;
 }
 
 bool EngineViewport::saveWorld(const char* worldName)
@@ -3685,6 +3806,23 @@ void EngineViewport::drawFrame()
 	// [SurMap5Qt] Как в CGeneralView::graphQuant (SurMap5/GeneralView.cpp:325):
 	// editorVisual().afterQuant() после aux-слоёв.
 	editorVisual().afterQuant();
+
+	// UI Editor preview: draw the selected UI_Dispatcher screen over the 3D
+	// frame (the same engine render device the original UIEditor used). The
+	// window is set to the whole viewport; the overlay goes on top of the aux
+	// layers and below the tool rubber band.
+	if(uiPreview_){
+		try{
+			const int w = gb_RenderDevice->GetSizeX();
+			const int h = gb_RenderDevice->GetSizeY();
+			UI_Render::instance().setWindowPosition(Recti(0, 0, w, h));
+			UI_Render::instance().updateRenderSize();
+			UI_Dispatcher::instance().redraw();
+		}
+		catch(...){
+			uiPreview_ = false;
+		}
+	}
 
 	// The Select tool's rubber band (CSurToolSelect::onDrawAuxData drew it via
 	// DrawRectangle after the 3D scene). DrawRectangle goes through the UI

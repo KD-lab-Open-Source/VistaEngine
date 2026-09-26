@@ -6,6 +6,7 @@
 #include "panels/PropertyTree.h"
 
 #include <QAction>
+#include <QCheckBox>
 #include <QHBoxLayout>
 #include <QInputDialog>
 #include <QLabel>
@@ -51,11 +52,20 @@ UiEditorWindow::UiEditorWindow(IWorldBridge* bridge, QWidget* parent)
 	connect(toolbar->addAction(tr("&Delete")), &QAction::triggered, this, &UiEditorWindow::onDelete);
 	toolbar->addSeparator();
 	connect(toolbar->addAction(tr("&Refresh")), &QAction::triggered, this, &UiEditorWindow::refresh);
+	previewCheck_ = new QCheckBox(tr("Preview in 3D view"), toolbar);
+	toolbar->addWidget(previewCheck_);
+	connect(previewCheck_, &QCheckBox::toggled, this, &UiEditorWindow::onPreviewToggled);
 
 	connect(tree_, &QTreeWidget::itemSelectionChanged, this, &UiEditorWindow::onTreeSelectionChanged);
 	connect(properties_, &QTreeWidget::itemChanged, this, &UiEditorWindow::onPropertyEdited);
 
 	refresh();
+}
+
+UiEditorWindow::~UiEditorWindow()
+{
+	if(bridge_)
+		bridge_->uiPreview(-1, false);
 }
 
 void UiEditorWindow::refresh()
@@ -102,6 +112,8 @@ void UiEditorWindow::onTreeSelectionChanged()
 	loading_ = true;
 	properties_->setRoot(bridge_->uiNodeTree(nodeId, true));
 	loading_ = false;
+	if(previewCheck_->isChecked())
+		bridge_->uiPreview(nodeId, true);
 }
 
 void UiEditorWindow::onPropertyEdited()
@@ -180,4 +192,21 @@ void UiEditorWindow::onDelete()
 		refresh();
 	else
 		statusBar()->showMessage(tr("Could not delete the node"));
+}
+
+void UiEditorWindow::onPreviewToggled(bool on)
+{
+	if(!bridge_)
+		return;
+	if(on){
+		const int nodeId = currentNodeId();
+		if(nodeId < 0 || !bridge_->uiPreview(nodeId, true)){
+			statusBar()->showMessage(tr("Select a screen (or one of its controls) first"), 3000);
+			previewCheck_->setChecked(false);
+			return;
+		}
+		statusBar()->showMessage(tr("UI preview shown in the main 3D view"), 3000);
+	}
+	else
+		bridge_->uiPreview(-1, false);
 }
