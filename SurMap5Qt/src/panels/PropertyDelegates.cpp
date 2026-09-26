@@ -33,7 +33,11 @@ PropertyRowDelegate::PropertyRowDelegate(QObject* parent)
 
 editor::PropertyRow* PropertyRowDelegate::row(const QModelIndex& index)
 {
-	QVariant data = index.data(Qt::UserRole);
+	// PropertyTree stores the row pointer on column 0 only (buildItem's
+	// setData(0, Qt::UserRole, row)); the value editor lives on column 1, so
+	// read the sibling's data, not the (empty) column-1 UserRole.
+	const QModelIndex nameIndex = index.sibling(index.row(), 0);
+	QVariant data = nameIndex.data(Qt::UserRole);
 	if(!data.isValid())
 		return nullptr;
 	return data.value<editor::PropertyRow*>();
@@ -368,13 +372,11 @@ void PropertyRowDelegate::setModelData(QWidget* editor, QAbstractItemModel* mode
 	default:
 		return;
 	}
-	// Refresh the normalized display (blocking the tree's itemChanged: the
-	// row already holds the edited value, re-parsing would be redundant).
-	if(QObject* tree = parent())
-		tree->blockSignals(true);
+	r->setTouched(true);   // the common-tree write-back applies touched rows
+	// Update the display cell. Do NOT block the tree's signals: the
+	// PropertyTree::itemChanged carries the edit to the panels' write-back
+	// (SelectPropertyPanel::applyEdits); blocking it silently dropped edits.
 	model->setData(index, propertytext::displayRowText(r), Qt::DisplayRole);
-	if(QObject* tree = parent())
-		tree->blockSignals(false);
 }
 
 void PropertyRowDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option,

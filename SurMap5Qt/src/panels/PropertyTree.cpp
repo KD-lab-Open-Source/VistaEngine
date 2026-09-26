@@ -52,7 +52,10 @@ editor::PropertyRow* PropertyTree::currentRow() const
 
 void PropertyTree::refreshItem(QTreeWidgetItem* item, editor::PropertyRow* row)
 {
-	item->setText(1, propertytext::displayRowText(row));
+	if(row->mixed())
+		item->setText(1, tr("<different>"));
+	else
+		item->setText(1, propertytext::displayRowText(row));
 	if(row->kind() == editor::RowKind::Bool){
 		auto* boolRow = static_cast<editor::PropertyRowBool*>(row);
 		item->setCheckState(1, boolRow->value() ? Qt::Checked : Qt::Unchecked);
@@ -117,6 +120,7 @@ void PropertyTree::onItemChanged(QTreeWidgetItem* item, int column)
 	}
 	else
 		propertytext::commitRowText(row, item->text(1));
+	row->setTouched(true);   // the common-tree write-back applies touched rows
 	refreshItem(item, row);
 	applying_ = false;
 }
@@ -135,6 +139,7 @@ void PropertyTree::onItemClicked(QTreeWidgetItem* item, int column)
 	auto* boolRow = static_cast<editor::PropertyRowBool*>(row);
 	applying_ = true;
 	boolRow->setValue(!boolRow->value());
+	row->setTouched(true);
 	refreshItem(item, row);
 	applying_ = false;
 }

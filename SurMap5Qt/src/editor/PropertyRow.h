@@ -72,6 +72,28 @@ public:
 	std::vector<PropertyRow*>& children() { return children_; }
 	const std::vector<PropertyRow*>& children() const { return children_; }
 	void addChild(PropertyRow* child) { children_.push_back(child); child->parent_ = this; }
+	// Remove and delete a direct child (the multi-selection common tree drops
+	// fields not present in every selected object).
+	void removeChild(PropertyRow* child)
+	{
+		for(std::vector<PropertyRow*>::iterator it = children_.begin(); it != children_.end(); ++it){
+			if(*it == child){
+				children_.erase(it);
+				delete child;
+				return;
+			}
+		}
+	}
+
+	// The multi-selection mixed marker: the selected objects hold different
+	// values for this field. The tree shows it as "<different>"; editing it
+	// writes the new value to every object.
+	bool mixed() const { return mixed_; }
+	void setMixed(bool mixed) { mixed_ = mixed; }
+	// Set when the user edited this row in the common tree, so the write-back
+	// applies it (and only it) to every selected object.
+	bool touched() const { return touched_; }
+	void setTouched(bool touched) { touched_ = touched; }
 
 	// Parent (set by addChild).
 	PropertyRow* parent() const { return parent_; }
@@ -90,6 +112,8 @@ protected:
 	std::string derivedName_;
 	std::vector<PropertyRow*> children_;
 	PropertyRow* parent_ = nullptr;
+	bool mixed_ = false;
+	bool touched_ = false;
 };
 
 // A leaf row holding a typed value.

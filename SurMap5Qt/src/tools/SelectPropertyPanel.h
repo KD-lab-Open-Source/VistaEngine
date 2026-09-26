@@ -33,4 +33,5 @@ private:
 	QLabel* info_ = nullptr;
 	PropertyTree* attrib_ = nullptr;
 	bool loading_ = false;
+	bool multi_ = false;   // the shown tree is the multi-selection common tree
 };

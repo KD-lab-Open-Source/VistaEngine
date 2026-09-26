@@ -307,6 +307,104 @@ static BaseUniverseObject* singleSelectedObject(IWorldBridge& bridge, int* count
 	return visitor.count == 1 ? visitor.first : nullptr;
 }
 
+// Collector of every selected universe object (the multi-selection common
+// editor walks them all).
+static void collectSelectedObjects(IWorldBridge& bridge, std::vector<BaseUniverseObject*>& out)
+{
+	struct Visitor : IEditorObjectVisitor
+	{
+		std::vector<BaseUniverseObject*>* out = nullptr;
+		void visit(EditorObjectId id) override
+		{
+			if(BaseUniverseObject* obj = reinterpret_cast<BaseUniverseObject*>(id))
+				out->push_back(obj);
+		}
+	} visitor;
+	visitor.out = &out;
+	bridge.forEachSelected(visitor);
+}
+
+// Deep-copy a property row (PropertyRow has no clone): containers recurse,
+// leaves are recreated through the factory and their raw value string copied.
+static editor::PropertyRow* clonePropertyRow(const editor::PropertyRow* src)
+{
+	if(!src)
+		return nullptr;
+	if(src->isContainer()){
+		auto* dst = new editor::PropertyRowContainer(src->name().c_str(), src->nameAlt().c_str(),
+		                                             src->typeName().c_str());
+		for(const editor::PropertyRow* child : src->children())
+			dst->addChild(clonePropertyRow(child));
+		return dst;
+	}
+	editor::PropertyRow* dst = editor::PropertyRowFactory::instance().create(
+		src->typeName(), src->name().c_str(), src->nameAlt().c_str(), nullptr);
+	if(!dst){
+		dst = new editor::PropertyRow(src->name().c_str(), src->nameAlt().c_str(), src->typeName().c_str());
+	} else {
+		dst->setValueFromString(src->valueAsString());
+		// The factory marked the empty initial value as UTF-8; restore the
+		// source encoding so cp1251 text edits round-trip.
+		if(auto* stringRow = dynamic_cast<editor::PropertyRowString*>(dst))
+			stringRow->setSourceCp1251(!editor::isValidUtf8(src->valueAsString()));
+	}
+	return dst;
+}
+
+static editor::PropertyRow* findChildByName(editor::PropertyRow* parent, const std::string& name)
+{
+	if(!parent)
+		return nullptr;
+	for(editor::PropertyRow* child : parent->children())
+		if(child->name() == name)
+			return child;
+	return nullptr;
+}
+
+// Keep only the fields common to `common` and `other` (CAttribEditorCtrl::
+// showMix): recurse containers, drop fields missing from either side, flag the
+// leaves whose values differ as mixed.
+static void intersectPropertyRows(editor::PropertyRow* common, const editor::PropertyRow* other)
+{
+	std::vector<editor::PropertyRow*> drop;
+	for(editor::PropertyRow* child : common->children()){
+		editor::PropertyRow* o = findChildByName(const_cast<editor::PropertyRow*>(other), child->name());
+		if(!o || o->isContainer() != child->isContainer()){
+			drop.push_back(child);
+			continue;
+		}
+		if(child->isContainer()){
+			intersectPropertyRows(child, o);
+		} else {
+			if(child->kind() != o->kind()){
+				drop.push_back(child);
+				continue;
+			}
+			if(child->valueAsString() != o->valueAsString())
+				child->setMixed(true);
+		}
+	}
+	for(editor::PropertyRow* child : drop)
+		common->removeChild(child);
+}
+
+// Copy the touched rows of `common` into `dst` at the same path (the
+// multi-selection write-back only applies what the user actually edited).
+static void applyTouchedRows(editor::PropertyRow* dst, const editor::PropertyRow* common)
+{
+	if(!dst || !common)
+		return;
+	for(const editor::PropertyRow* child : common->children()){
+		editor::PropertyRow* d = findChildByName(dst, child->name());
+		if(!d)
+			continue;
+		if(child->isContainer())
+			applyTouchedRows(d, child);
+		else if(child->touched())
+			d->setValueFromString(child->valueAsString());
+	}
+}
+
 // WorldBridge — the engine-side implementation of the engine-free IWorldBridge
 // the tools talk to. It is a port of the SelectionUtil globals +
 // universe/sourceManager/cameraManager access, but over the common
@@ -479,6 +577,49 @@ public:
 		sources = visitor.s;
 		cameras = visitor.c;
 		anchors = visitor.a;
+	}
+
+	// Multi-selection common tree (the original's mixIn + showMix).
+	editor::PropertyRow* selectedObjectsCommonTree() override
+	{
+		std::vector<BaseUniverseObject*> objs;
+		collectSelectedObjects(*this, objs);
+		if(objs.size() < 2)
+			return nullptr;
+		std::vector<editor::PropertyRow*> trees;
+		trees.reserve(objs.size());
+		for(BaseUniverseObject* obj : objs){
+			editor::PropertyOArchive oa;
+			Serializer se(*obj);
+			se.serialize(oa);
+			trees.push_back(oa.root());
+		}
+		editor::PropertyRow* common = clonePropertyRow(trees[0]);
+		for(size_t i = 1; i < trees.size(); ++i)
+			intersectPropertyRows(common, trees[i]);
+		for(editor::PropertyRow* tree : trees)
+			delete tree;
+		return common;
+	}
+
+	bool selectedObjectsSetCommonTree(editor::PropertyRow* root) override
+	{
+		if(!root)
+			return false;
+		std::vector<BaseUniverseObject*> objs;
+		collectSelectedObjects(*this, objs);
+		for(BaseUniverseObject* obj : objs){
+			editor::PropertyOArchive oa;
+			Serializer se(*obj);
+			se.serialize(oa);
+			editor::PropertyRow* tree = oa.root();
+			applyTouchedRows(tree, root);
+			editor::PropertyIArchive ia(tree);
+			Serializer seOut(*obj);
+			seOut.serialize(ia);
+			delete tree;
+		}
+		return true;
 	}
 
 	void setObjectRadius(EditorObjectId id, float radius) override

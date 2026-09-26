@@ -37,6 +37,7 @@ void SelectPropertyPanel::refresh()
 	IWorldBridge* bridge = tool_ ? tool_->bridge() : nullptr;
 	if(!bridge){
 		info_->setText(tr("No world loaded."));
+		multi_ = false;
 		loading_ = true;
 		attrib_->setRoot(nullptr);
 		loading_ = false;
@@ -49,6 +50,7 @@ void SelectPropertyPanel::refresh()
 
 	if(total == 0){
 		info_->setText(tr("Nothing selected"));
+		multi_ = false;
 		loading_ = true;
 		attrib_->setRoot(nullptr);
 		loading_ = false;
@@ -56,21 +58,25 @@ void SelectPropertyPanel::refresh()
 	}
 
 	if(total > 1){
-		// CSurToolSelect::updateLayout's multi-selection summary.
+		// CSurToolSelect::updateLayout's multi-selection summary + the
+		// Edit button's mix-in editor (the common fields of every object).
+		multi_ = true;
 		QString text = tr("Selected:");
 		if(sources)     text += tr("\n\tSources: %1").arg(sources);
 		if(environment) text += tr("\n\tEnvironment: %1").arg(environment);
 		if(units)       text += tr("\n\tUnits: %1").arg(units);
 		if(cameras)     text += tr("\n\tCameras: %1").arg(cameras);
 		if(anchors)     text += tr("\n\tAnchors: %1").arg(anchors);
+		text += tr("\nCommon properties (<different> = values differ):");
 		info_->setText(text);
 		loading_ = true;
-		attrib_->setRoot(nullptr);
+		attrib_->setRoot(bridge->selectedObjectsCommonTree());
 		loading_ = false;
 		return;
 	}
 
 	// Exactly one object: show its serialized properties.
+	multi_ = false;
 	info_->setText(tr("Selected object"));
 	loading_ = true;
 	attrib_->setRoot(bridge->selectedObjectTree(true));
@@ -84,6 +90,10 @@ void SelectPropertyPanel::applyEdits()
 	IWorldBridge* bridge = tool_ ? tool_->bridge() : nullptr;
 	if(!bridge)
 		return;
-	if(editor::PropertyRow* root = attrib_->root())
-		bridge->selectedObjectSetTree(root);
+	if(editor::PropertyRow* root = attrib_->root()){
+		if(multi_)
+			bridge->selectedObjectsSetCommonTree(root);
+		else
+			bridge->selectedObjectSetTree(root);
+	}
 }

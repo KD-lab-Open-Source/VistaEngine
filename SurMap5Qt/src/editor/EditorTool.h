@@ -248,6 +248,14 @@ public:
 	// CollectSerializersAndCount) for the multi-selection summary.
 	virtual void selectedObjectCounts(int& units, int& environment, int& sources,
 	                                  int& cameras, int& anchors) = 0;
+	// The common (intersected) property tree of a multi-selection — the port
+	// of CAttribEditorCtrl::mixIn + showMix for CSurToolSelect's Edit button.
+	// Fields present in every selected object appear; fields whose values
+	// differ are flagged mixed (PropertyRow::mixed). Null when not a
+	// multi-selection. selectedObjectsSetCommonTree writes the touched rows
+	// back to every selected object.
+	virtual editor::PropertyRow* selectedObjectsCommonTree() = 0;
+	virtual bool selectedObjectsSetCommonTree(editor::PropertyRow* root) = 0;
 
 	// Terrain height + a ray-cast of a widget pixel to the ground (the
 	// tools' screenPointToGround / projectScreenPointOnPlane ports).
