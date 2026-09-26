@@ -319,6 +319,18 @@ public:
 	virtual bool effectSaveAs(const std::string& fileName) = 0;
 	virtual std::string effectFileName() const = 0;
 
+	// --- UI Editor tree mutations (UIEditor's Create/Erase actions) ---
+	// Display names of the UI_ControlBase factory types (add-control list).
+	virtual bool uiControlTypes(std::vector<std::string>& out) = 0;
+	// Add a control of `typeIndex` under a screen/control node and give it a
+	// "Default" state (CreateControlAction::act). Rebuild the tree afterwards.
+	virtual bool uiAddControl(int containerNodeId, int typeIndex) = 0;
+	// Append an empty state to a control (CreateStateAction::act).
+	virtual bool uiAddState(int controlNodeId) = 0;
+	// Remove a node: a screen (UI_Dispatcher::removeScreen), a state
+	// (states().erase) or a control (owner container's removeControl).
+	virtual bool uiDeleteNode(int nodeId) = 0;
+
 	// Terrain height + a ray-cast of a widget pixel to the ground (the
 	// tools' screenPointToGround / projectScreenPointOnPlane ports).
 	virtual float terrainHeight(float x, float y) = 0;

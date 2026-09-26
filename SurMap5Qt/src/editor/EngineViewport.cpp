@@ -980,6 +980,83 @@ public:
 
 	std::string effectFileName() const override { return effectFileName_; }
 
+	// --- UI Editor tree mutations (UIEditor's Create/Erase actions) ---
+
+	bool uiControlTypes(std::vector<std::string>& out) override
+	{
+		if(!uiEnsureLibraries())
+			return false;
+		out.clear();
+		const ComboStrings& names =
+			FactorySelector<UI_ControlBase>::Factory::instance().comboStringsAlt();
+		for(size_t i = 0; i < names.size(); ++i)
+			out.push_back(names[i]);
+		return true;
+	}
+
+	bool uiAddControl(int containerNodeId, int typeIndex) override
+	{
+		if(containerNodeId < 0 || containerNodeId >= (int)uiNodes_.size())
+			return false;
+		const UiNodeRef& ref = uiNodes_[containerNodeId];
+		UI_ControlContainer* container = ref.screen
+			? static_cast<UI_ControlContainer*>(ref.screen)
+			: static_cast<UI_ControlContainer*>(ref.control);
+		if(!container)
+			return false;
+		typedef FactorySelector<UI_ControlBase>::Factory Factory;
+		Factory& factory = Factory::instance();
+		const ComboStrings& names = factory.comboStringsAlt();
+		if(typeIndex < 0 || typeIndex >= (int)names.size())
+			return false;
+		UI_ControlBase* control = factory.createByIndex(typeIndex);
+		if(!control)
+			return false;
+		// CreateControlAction::act: name from the factory, one "Default" state.
+		control->setName(names[typeIndex].c_str());
+		control->states().push_back(UI_ControlState("Default", true));
+		container->addControl(control);
+		control->setState(0);
+		return true;
+	}
+
+	bool uiAddState(int controlNodeId) override
+	{
+		if(controlNodeId < 0 || controlNodeId >= (int)uiNodes_.size())
+			return false;
+		UI_ControlBase* control = uiNodes_[controlNodeId].control;
+		if(!control)
+			return false;
+		control->states().push_back(UI_ControlState());
+		control->init();
+		return true;
+	}
+
+	bool uiDeleteNode(int nodeId) override
+	{
+		if(nodeId < 0 || nodeId >= (int)uiNodes_.size())
+			return false;
+		const UiNodeRef& ref = uiNodes_[nodeId];
+		if(ref.kind == kUiScreen && ref.screen)
+			return UI_Dispatcher::instance().removeScreen(ref.screen->name());
+		if(ref.kind == kUiState && ref.control && ref.state){
+			UI_ControlBase::StateContainer& states = ref.control->states();
+			for(size_t i = 0; i < states.size(); ++i){
+				if(&states[i] == ref.state){
+					states.erase(states.begin() + i);
+					ref.control->init();
+					return true;
+				}
+			}
+			return false;
+		}
+		if(ref.control && ref.ownerContainer){
+			ref.ownerContainer->removeControl(ref.control);
+			return true;
+		}
+		return false;
+	}
+
 	void setObjectRadius(EditorObjectId id, float radius) override
 	{
 		BaseUniverseObject* obj = reinterpret_cast<BaseUniverseObject*>(id);
@@ -2239,6 +2316,7 @@ private:
 		UI_Screen* screen = nullptr;
 		UI_ControlBase* control = nullptr;
 		UI_ControlState* state = nullptr;
+		UI_ControlContainer* ownerContainer = nullptr;
 	};
 
 	bool uiEnsureLibraries()
@@ -2284,6 +2362,7 @@ private:
 				continue;
 			const int id = addUiNode(kUiControl, parentId, control->name(),
 			                         typeid(*control).name(), nullptr, control, nullptr, out);
+			uiNodes_[id].ownerContainer = &container;
 			UI_ControlBase::StateContainer& states = control->states();
 			for(size_t j = 0; j < states.size(); ++j)
 				addUiNode(kUiState, id, states[j].name(), "UI_ControlState",

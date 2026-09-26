@@ -32,8 +32,13 @@ private slots:
 	void onTreeSelectionChanged();
 	void onPropertyEdited();
 	void onSave();
+	void onAddControl();
+	void onAddState();
+	void onDelete();
 
 private:
+	int currentNodeId() const;
+
 	IWorldBridge* bridge_ = nullptr;
 	QTreeWidget* tree_ = nullptr;
 	PropertyTree* properties_ = nullptr;

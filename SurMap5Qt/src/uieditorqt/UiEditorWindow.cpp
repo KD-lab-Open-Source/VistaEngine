@@ -7,6 +7,7 @@
 
 #include <QAction>
 #include <QHBoxLayout>
+#include <QInputDialog>
 #include <QLabel>
 #include <QSplitter>
 #include <QStatusBar>
@@ -44,6 +45,12 @@ UiEditorWindow::UiEditorWindow(IWorldBridge* bridge, QWidget* parent)
 	auto* toolbar = addToolBar(tr("UI Editor"));
 	auto* saveAction = toolbar->addAction(tr("&Save"));
 	connect(saveAction, &QAction::triggered, this, &UiEditorWindow::onSave);
+	toolbar->addSeparator();
+	connect(toolbar->addAction(tr("Add &Control...")), &QAction::triggered, this, &UiEditorWindow::onAddControl);
+	connect(toolbar->addAction(tr("Add &State")), &QAction::triggered, this, &UiEditorWindow::onAddState);
+	connect(toolbar->addAction(tr("&Delete")), &QAction::triggered, this, &UiEditorWindow::onDelete);
+	toolbar->addSeparator();
+	connect(toolbar->addAction(tr("&Refresh")), &QAction::triggered, this, &UiEditorWindow::refresh);
 
 	connect(tree_, &QTreeWidget::itemSelectionChanged, this, &UiEditorWindow::onTreeSelectionChanged);
 	connect(properties_, &QTreeWidget::itemChanged, this, &UiEditorWindow::onPropertyEdited);
@@ -117,4 +124,60 @@ void UiEditorWindow::onSave()
 		statusBar()->showMessage(tr("UI document saved"), 3000);
 	else
 		statusBar()->showMessage(tr("Could not save the UI document"));
+}
+
+int UiEditorWindow::currentNodeId() const
+{
+	QTreeWidgetItem* item = tree_ ? tree_->currentItem() : nullptr;
+	return item ? item->data(0, Qt::UserRole).toInt() : -1;
+}
+
+void UiEditorWindow::onAddControl()
+{
+	if(!bridge_)
+		return;
+	const int nodeId = currentNodeId();
+	if(nodeId < 0){
+		statusBar()->showMessage(tr("Select a screen or control first"), 3000);
+		return;
+	}
+	std::vector<std::string> types;
+	if(!bridge_->uiControlTypes(types) || types.empty()){
+		statusBar()->showMessage(tr("Control types unavailable"));
+		return;
+	}
+	QStringList items;
+	for(const std::string& t : types)
+		items << QString::fromStdString(t);
+	bool ok = false;
+	const QString choice = QInputDialog::getItem(this, tr("Add Control"), tr("Control type:"), items, 0, false, &ok);
+	if(!ok)
+		return;
+	if(bridge_->uiAddControl(nodeId, items.indexOf(choice)))
+		refresh();
+}
+
+void UiEditorWindow::onAddState()
+{
+	if(!bridge_)
+		return;
+	const int nodeId = currentNodeId();
+	if(nodeId < 0 || !bridge_->uiAddState(nodeId)){
+		statusBar()->showMessage(tr("Select a control first"), 3000);
+		return;
+	}
+	refresh();
+}
+
+void UiEditorWindow::onDelete()
+{
+	if(!bridge_)
+		return;
+	const int nodeId = currentNodeId();
+	if(nodeId < 0)
+		return;
+	if(bridge_->uiDeleteNode(nodeId))
+		refresh();
+	else
+		statusBar()->showMessage(tr("Could not delete the node"));
 }
