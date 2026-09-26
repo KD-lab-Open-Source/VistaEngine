@@ -141,8 +141,13 @@ void EffectEditorWindow::onOpen()
 		return;
 	const std::string native = QDir::toNativeSeparators(path).toStdString();
 	if(bridge_->effectOpen(native)){
-		previewCheck_->setChecked(false);   // effectOpen stopped any old preview
+		// effectOpen stopped any old preview; reset the check so the toggle
+		// fires and recreates the effect for the new file.
+		previewCheck_->setChecked(false);
 		refresh();
+		// The 3D preview is on by default (the original EffectEditor always
+		// showed the effect); time flows via the engine's Animate.
+		previewCheck_->setChecked(true);
 		statusBar()->showMessage(tr("Opened %1").arg(QFileInfo(path).fileName()), 3000);
 	}
 	else

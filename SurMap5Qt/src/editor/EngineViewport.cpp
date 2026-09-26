@@ -90,6 +90,7 @@ using namespace std;
 #include "Util/TextDB.h"                    // TextDB::saveLanguage (trigger save, as OnEditTriggers)
 #include "Util/EditorVisual.h"              // editorVisual (before/afterQuant, как в CGeneralView::graphQuant)
 #include "UserInterface/UserInterface.h"    // UI_Dispatcher (конструируется в Universe ctor)
+#include "UserInterface/UI_BackgroundScene.h" // UI_BackgroundScene (UI Editor preview background)
 
 // SDL_Init(SDL_INIT_VIDEO) normally happens in PlatformWindow::create; the Qt
 // editor never calls it (Qt owns the windows), so the GPU device would fail
@@ -3267,6 +3268,12 @@ bool EngineViewport::uiPreviewRender(int width, int height)
 		gb_RenderDevice->BeginScene();
 		UI_Render::instance().setWindowPosition(Recti(0, 0, width, height));
 		UI_Render::instance().updateRenderSize();
+		// The background scene (UI_Dispatcher::redraw draws it before the
+		// screen's controls; we bypass the dispatcher, so draw it here) — the
+		// animated menu background the original UIEditor showed.
+		UI_BackgroundScene::instance().setCamera();
+		UI_BackgroundScene::instance().graphQuant(0.016f);
+		UI_BackgroundScene::instance().draw();
 		if(uiPreviewScreen_)
 			uiPreviewScreen_->redraw();
 		gb_RenderDevice->EndScene();
@@ -3295,7 +3302,9 @@ bool EngineViewport::effectPreviewRender(int width, int height)
 		const Vect2f zPlane(10.f, 100000.f);
 		previewCamera_->SetFrustum(&center, &clip, &focus, &zPlane);
 		// The effect is detached (not in the level's draw list); render it
-		// directly into the preview window.
+		// directly into the preview window. Animate advances its clock (dt in
+		// ms, cEffect::Animate adds dt*1e-3 to the effect time) so time flows.
+		effectPreview_->Animate(16.f);
 		effectPreview_->PreDraw(previewCamera_);
 		effectPreview_->Draw(previewCamera_);
 		gb_RenderDevice->EndScene();
@@ -3328,7 +3337,10 @@ bool EngineViewport::startEffectPreview(EffectKey* effectKey)
 	// Deliberately NOT Attach()ed: the level's cScene::Draw must not draw the
 	// preview effect (it would appear in the 3D view too). We render it
 	// ourselves into the preview window.
-	const float distance = 800.f;
+	// A fixed three-quarter view of the effect at the origin — close enough
+	// that typical effects fill the preview (orbit construction applyCamera
+	// uses: theta 0.5, psi 0, distance 200).
+	const float distance = 200.f;
 	const float theta = 0.5f;
 	const float psi = 0.f;
 	const Vect3f position(distance * sinf(theta) * cosf(psi),
