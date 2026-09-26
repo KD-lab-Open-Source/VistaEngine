@@ -128,8 +128,8 @@ Where a stub can be promoted now that the editor builds a real Universe
 | Panel | Original | Port | Notes |
 |---|---|---|---|
 | Tools tree | CToolsTreeWindow / CToolsTreeCtrl | PARTIAL | real tool tree + selection + QSettings persistence; nine tools now (Select/Move/Rotate/Scale + Toolzer/Kind/ColorPic/GeoNet/GeoTx), grouped Transform/Terrain/Objects; no per-tool Create/Delete/Properties popup |
-| Objects Manager | CObjectsManagerWindow | OK | 5 tabs rebuilt from `EngineViewport::objectList`; **rename/delete only edit the tree row**, not the world object; no drag&drop |
-| Properties | propertiesBar_ hosting the current CSurToolBase dialog | OK | `PropertyTree` + `PropertyDelegates` render/edits `editor::PropertyRow` trees fed by the bridge; per-tool panels are `TransformPropertyPanel` / `GeoNetPropertyPanel` / `GeoTxPropertyPanel` |
+| Objects Manager | CObjectsManagerWindow | OK | 5 tabs rebuilt from `EngineViewport::objectList`; row selection ↔ world selection both ways (multi-selection too), selecting moves the camera (`objectPosition`/`setCameraCenter`); **rename/delete only edit the tree row**, not the world object; no drag&drop |
+| Properties | propertiesBar_ hosting the current CSurToolBase dialog | OK | `PropertyTree` + `PropertyDelegates` render/edits `editor::PropertyRow` trees fed by the bridge; per-tool panels are `TransformPropertyPanel` / `GeoNetPropertyPanel` / `GeoTxPropertyPanel` / `SelectPropertyPanel` (the Select panel shows the selected object's attributes, or the multi-selection common tree — `selectedObjectsCommonTree`/`selectedObjectsSetCommonTree`, mixed fields shown as `<different>`) |
 | Minimap | CMiniMapWindow | OK | real terrain minimap + camera marker, click moves the camera |
 | Gradients | CGradientsWindow | STUB | draws hard-coded built-in gradients; no engine gradient list, edits change local data only |
 | Camera control | (camera controls) | OK | CameraControlPanel: centre/distance/yaw/pitch/roll, eye/apply/top/overview/fit/reset |
@@ -176,9 +176,11 @@ cursor preview: Sources/Anchors (engine objects), Environment (a scene model —
 `cSimply3dx` for simple environments, `cObject3dx` for buildings) and Unit
 (CSurToolUnit's auxiliary `unitOnMouse_`).
 
-Dependency note: selection works for **alive, non-auxiliary units** only.
-Sources, anchors and camera splines are not click-pickable, and a real marquee
-that picks non-unit objects is still missing.
+Dependency note: map picking (click/marquee) still works for **alive,
+non-auxiliary units** only. Sources, anchors and camera splines are not
+click-pickable on the map, and a real marquee that picks non-unit objects is
+still missing — but they can be selected from the Objects Manager tree, which
+now also mirrors the selection back (`updateSelectFromWorld`).
 
 Not yet ported (original class → what it does):
 - CSurToolMiniDetaile / CSurToolMiniDetaileFolder — mini-details placement.
