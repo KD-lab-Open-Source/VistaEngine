@@ -257,6 +257,44 @@ public:
 	virtual editor::PropertyRow* selectedObjectsCommonTree() = 0;
 	virtual bool selectedObjectsSetCommonTree(editor::PropertyRow* root) = 0;
 
+	// --- Scenario editors (CMainFrame::OnEditMap / OnEditGameScenario) ---
+	// Map Scenario serializes CMainFrame::MapSerializer: the mission, the
+	// universe/map parameters, the environment, the camera manager, the
+	// players and the world's trigger names. Game Scenario serializes
+	// GameSerializer: the global attributes, game options, UI globals, the
+	// control manager and the environment's global data.
+	// The tree is built by `...Tree`, written back by `...SetTree` (on the
+	// dialog's OK) and persisted by `...Save`. All return false/null when no
+	// world (map) is loaded.
+	virtual editor::PropertyRow* mapScenarioTree() = 0;
+	virtual bool mapScenarioSetTree(editor::PropertyRow* root) = 0;
+	virtual bool mapScenarioSave() = 0;
+	virtual editor::PropertyRow* gameScenarioTree() = 0;
+	virtual bool gameScenarioSetTree(editor::PropertyRow* root) = 0;
+	virtual bool gameScenarioSave() = 0;
+
+	// --- UI Editor (UIEditor port) ---
+	// A flattened snapshot of UI_Dispatcher's screen/control/state tree.
+	// `id` is stable until the next uiTree() call; uiNodeTree/uiNodeSetTree
+	// take it to fetch/write one node's serialized properties.
+	enum UiNodeKind { kUiScreen = 0, kUiControl = 1, kUiState = 2 };
+	struct UiTreeNode
+	{
+		int id = -1;
+		int parentId = -1;
+		int kind = kUiScreen;
+		std::string name;
+		std::string type;
+	};
+	// Build the screen/control/state tree. False when the UI libraries are
+	// unavailable.
+	virtual bool uiTree(std::vector<UiTreeNode>& out) = 0;
+	virtual editor::PropertyRow* uiNodeTree(int nodeId, bool editOnly) = 0;
+	virtual bool uiNodeSetTree(int nodeId, editor::PropertyRow* root) = 0;
+	// Persist the UI document (UI_Dispatcher + the related interface
+	// libraries), as UIEditor's File > Save did.
+	virtual bool uiSave() = 0;
+
 	// Terrain height + a ray-cast of a widget pixel to the ground (the
 	// tools' screenPointToGround / projectScreenPointOnPlane ports).
 	virtual float terrainHeight(float x, float y) = 0;

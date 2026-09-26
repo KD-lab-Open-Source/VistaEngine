@@ -46,6 +46,8 @@
 #include "dialogs/TerrainTypeDialog.h"
 #include "dialogs/WaveDialog.h"
 #include "dialogs/LibraryEditorDialog.h"
+#include "dialogs/ScenarioDialog.h"
+#include "uieditorqt/UiEditorWindow.h"
 #include "dialogs/BorderRollingDialog.h"
 #include "dialogs/SelectTriggerDialog.h"
 #include "dialogs/TriggerEditorDialog.h"
@@ -474,8 +476,12 @@ void MainWindow::createActions()
 		else
 			statusBar()->showMessage(tr("%1 launched").arg(label), 3000);
 	};
-	connect(actToolUIEditor_, &QAction::triggered, this, [launchEditor]{
-		launchEditor({QStringLiteral("UIEditor-Debug.exe"), QStringLiteral("UIEditor.exe")}, QObject::tr("UI Editor"));
+	connect(actToolUIEditor_, &QAction::triggered, this, [this]{
+		// The Qt UI Editor (port of the MFC UIEditor app), in-process. Opens
+		// its own top-level window; the engine libraries load on first use.
+		auto* win = new UiEditorWindow(view_->worldBridge());
+		win->setAttribute(Qt::WA_DeleteOnClose);
+		win->show();
 	});
 	connect(actToolEffectsEditor_, &QAction::triggered, this, [launchEditor]{
 		launchEditor({QStringLiteral("EffectTool.exe")}, QObject::tr("Effects Editor"));
@@ -1349,15 +1355,52 @@ void MainWindow::editRedo()
 
 void MainWindow::editMapScenario()
 {
-	// OnEditMap: the map scenario editor (external tools land in U2).
-	fprintf(stderr, "[edit] map-scenario: TODO\n");
-	statusBar()->showMessage(tr("Map Scenario: not wired yet"));
+	// OnEditMap: build the MapSerializer property form in a kdw::edit-style
+	// dialog; on OK write it back into the mission/universe/players and save
+	// (GlobalAttributes library + language + the world).
+	IWorldBridge* bridge = view_ ? view_->worldBridge() : nullptr;
+	if(!bridge){
+		statusBar()->showMessage(tr("Load a world first"));
+		return;
+	}
+	editor::PropertyRow* root = bridge->mapScenarioTree();
+	if(!root){
+		statusBar()->showMessage(tr("Load a world first"));
+		return;
+	}
+	ScenarioDialog dlg(tr("Map Scenario"), root, this);
+	if(dlg.exec() == QDialog::Accepted){
+		bridge->mapScenarioSetTree(dlg.root());
+		if(bridge->mapScenarioSave())
+			statusBar()->showMessage(tr("Map scenario saved"), 3000);
+		else
+			statusBar()->showMessage(tr("Could not save the map scenario"));
+	}
 }
 
 void MainWindow::editGameScenario()
 {
-	fprintf(stderr, "[edit] game-scenario: TODO\n");
-	statusBar()->showMessage(tr("Game Scenario: not wired yet"));
+	// OnEditGameScenario: the GameSerializer property form (global
+	// attributes, game options, UI globals, controls, environment globals);
+	// on OK save every registered library.
+	IWorldBridge* bridge = view_ ? view_->worldBridge() : nullptr;
+	if(!bridge){
+		statusBar()->showMessage(tr("Load a world first"));
+		return;
+	}
+	editor::PropertyRow* root = bridge->gameScenarioTree();
+	if(!root){
+		statusBar()->showMessage(tr("Load a world first"));
+		return;
+	}
+	ScenarioDialog dlg(tr("Game Scenario"), root, this);
+	if(dlg.exec() == QDialog::Accepted){
+		bridge->gameScenarioSetTree(dlg.root());
+		if(bridge->gameScenarioSave())
+			statusBar()->showMessage(tr("Game scenario saved"), 3000);
+		else
+			statusBar()->showMessage(tr("Could not save the game scenario"));
+	}
 }
 
 void MainWindow::editSaveCameraAsDefault()

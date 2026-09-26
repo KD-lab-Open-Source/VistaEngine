@@ -70,6 +70,7 @@ using namespace std;
 #include "Game/GameOptions.h"            // GameOptions::filterBaseGraphOptions (Universe ctor calls it)
 #include "UserInterface/UI_Render.h"     // UI_Render::create (SurMap5/SurMap5.cpp prelude)
 #include "UserInterface/UI_GlobalAttributes.h" // UI_GlobalAttributes (loadAllLibraries dep)
+#include "UserInterface/Controls.h"      // ControlManager (Game Scenario's Controls block)
 #include "Util/EffectContainer.h"        // EffectContainer::setTexturesPath (effect texture root)
 #include "Util/ZipConfig.h"              // ZipConfig::initArchives (pak archives)
 #include "Util/SystemUtil.h"             // setLogicFp (FPU precision)
@@ -267,6 +268,67 @@ struct TriggerChainPropsSerializer
 	void serialize(Archive& ar) { if(chain) chain->serializeProperties(ar); }
 };
 
+// --- Scenario serializers (CMainFrame::MapSerializer / GameSerializer) ---
+// Map scenario: mission + universe/map params + environment + camera manager
+// + the exported players + the world's trigger-chain names. The original kept
+// mission_/players_/worldTriggers_ by reference, so an edit wrote straight into
+// them; here mission_ is the live MissionDescription while players_ and
+// worldTriggers_ are the bridge's copies, imported back by mapScenarioSetTree.
+struct MapScenarioSerializer
+{
+	MissionDescription& mission_;
+	PlayerDataVect& players_;
+	TriggerChainNames& worldTriggers_;
+	MapScenarioSerializer(MissionDescription& mission, PlayerDataVect& players,
+	                      TriggerChainNames& triggers)
+		: mission_(mission), players_(players), worldTriggers_(triggers) {}
+
+	void serialize(Archive& ar)
+	{
+		ar.setFilter(SERIALIZE_PRESET_DATA);
+		mission_.serialize(ar);
+		if(universe())
+			universe()->serialize(ar);
+
+		static_cast<vrtMap&>(vMap).serializeParameters(ar);
+
+		if(environment){
+			ar.setFilter(SERIALIZE_WORLD_DATA);
+			ar.serialize(*environment, "environment", "Параметры окружения");
+		}
+
+		if(cameraManager)
+			ar.serialize(*cameraManager, "cameraManager", "Менеджер камер");
+
+		ar.serialize(players_, "players", "Игроки");
+		ar.serialize(worldTriggers_, "worldTriggers", "Триггеры мира");
+	}
+};
+
+// Game scenario: global attributes + game-option presets + UI globals + the
+// control manager + the environment's global data.
+struct GameScenarioSerializer
+{
+	void serialize(Archive& ar)
+	{
+		GlobalAttributes::instance().serializeGameScenario(ar);
+		GameOptions::instance().serializePresets(ar);
+		UI_GlobalAttributes::instance().serialize(ar);
+		if(ar.openBlock("Controls", "Управление")){
+			ControlManager::instance().serialize(ar);
+			ar.closeBlock();
+		}
+		if(environment){
+			ar.setFilter(SERIALIZE_GLOBAL_DATA);
+			environment->serialize(ar);
+		}
+	}
+};
+
+// UIEditor's File > Save (Units/UnitAttribute.cpp) — declared in
+// UIEditor/UIEditor_Utils.h, which the Qt editor must not include (MFC).
+void saveInterfaceLibraries();
+
 // EnvironmentType from the dialog combo index (SurTool3DM
 // convertIdx2EnvironmentType: idx 0 == PHANTOM, else 1 << (idx-1)).
 static EnvironmentType environmentTypeFromIndex(int idx)
@@ -413,6 +475,8 @@ static void applyTouchedRows(editor::PropertyRow* dst, const editor::PropertyRow
 class WorldBridge : public IWorldBridge
 {
 public:
+	explicit WorldBridge(EngineViewport* owner) : owner_(owner) {}
+
 	EditorObjectId hoverAt(float screenX, float screenY) override { (void)screenX; (void)screenY; return IWorldBridge::kNoObject; }
 	void selectInRect(int x0, int y0, int x1, int y1, bool add) override { (void)x0; (void)y0; (void)x1; (void)y1; (void)add; }
 	bool screenPointToGround(int sx, int sy, ToolVec3& out) override { (void)sx; (void)sy; (void)out; return false; }
@@ -619,6 +683,158 @@ public:
 			seOut.serialize(ia);
 			delete tree;
 		}
+		return true;
+	}
+
+	// --- Scenario editors (CMainFrame::OnEditMap / OnEditGameScenario) ---
+
+	editor::PropertyRow* mapScenarioTree() override
+	{
+		if(!mission_ || !universe())
+			return nullptr;
+		scenarioPlayers_.clear();
+		universe()->exportPlayers(scenarioPlayers_);
+		universe()->worldPlayer()->getPlayerData(scenarioWorldPlayer_);
+		MapScenarioSerializer serializer(*mission_, scenarioPlayers_,
+		                                scenarioWorldPlayer_.triggerChainNames);
+		editor::PropertyOArchive oa;
+		Serializer se(serializer, "mapSerializer", "Сценарий карты");
+		if(!se.serialize(oa))
+			return nullptr;
+		return oa.root();
+	}
+
+	bool mapScenarioSetTree(editor::PropertyRow* root) override
+	{
+		if(!root || !mission_ || !universe())
+			return false;
+		MapScenarioSerializer serializer(*mission_, scenarioPlayers_,
+		                                scenarioWorldPlayer_.triggerChainNames);
+		editor::PropertyIArchive ia(root);
+		Serializer se(serializer, "mapSerializer", "Сценарий карты");
+		se.serialize(ia);
+		// OnEditMap's post-edit sync: import the (edited) players back and
+		// refresh the silhouette colors.
+		universe()->importPlayers(scenarioPlayers_);
+		universe()->worldPlayer()->setPlayerData(scenarioWorldPlayer_);
+		setSilhouetteColors();
+		return true;
+	}
+
+	bool mapScenarioSave() override
+	{
+		// OnEditMap: GlobalAttributes::saveLibrary + TextDB language + the
+		// world save (OnFileSave -> vMap.save).
+		GlobalAttributes::instance().saveLibrary();
+		TextDB::instance().saveLanguage();
+		if(!vMap.isWorldLoaded())
+			return false;
+		vMap.save(vMap.getWorldName().c_str());
+		return true;
+	}
+
+	editor::PropertyRow* gameScenarioTree() override
+	{
+		if(!universe())
+			return nullptr;
+		GameScenarioSerializer serializer;
+		editor::PropertyOArchive oa;
+		Serializer se(serializer, "gameSerializer", "Сценарий игры");
+		if(!se.serialize(oa))
+			return nullptr;
+		return oa.root();
+	}
+
+	bool gameScenarioSetTree(editor::PropertyRow* root) override
+	{
+		if(!root)
+			return false;
+		GameScenarioSerializer serializer;
+		editor::PropertyIArchive ia(root);
+		Serializer se(serializer, "gameSerializer", "Сценарий игры");
+		return se.serialize(ia);
+	}
+
+	bool gameScenarioSave() override
+	{
+		// OnEditGameScenario: saveAllLibraries().
+		saveAllLibraries();
+		return true;
+	}
+
+	// The live mission the map-scenario serializer edits (EngineViewport owns
+	// it; loadWorld/doneWorld keep this in sync).
+	void setMission(MissionDescription* mission) { mission_ = mission; }
+
+	// --- UI Editor (UIEditor port) ---
+
+	bool uiTree(std::vector<UiTreeNode>& out) override
+	{
+		if(!uiEnsureLibraries())
+			return false;
+		uiNodes_.clear();
+		out.clear();
+		UI_Dispatcher& dispatcher = UI_Dispatcher::instance();
+		for(UI_Dispatcher::ScreenContainer::iterator it = dispatcher.screens().begin();
+		    it != dispatcher.screens().end(); ++it)
+			addUiScreenTree(*it, -1, out);
+		return true;
+	}
+
+	editor::PropertyRow* uiNodeTree(int nodeId, bool editOnly) override
+	{
+		(void)editOnly;
+		if(nodeId < 0 || nodeId >= (int)uiNodes_.size())
+			return nullptr;
+		const UiNodeRef& ref = uiNodes_[nodeId];
+		editor::PropertyOArchive oa;
+		if(ref.kind == kUiScreen && ref.screen){
+			Serializer se(*ref.screen);
+			se.serialize(oa);
+		}
+		else if(ref.kind == kUiState && ref.state){
+			Serializer se(*ref.state);
+			se.serialize(oa);
+		}
+		else if(ref.control){
+			Serializer se(*ref.control);
+			se.serialize(oa);
+		}
+		else
+			return nullptr;
+		return oa.root();
+	}
+
+	bool uiNodeSetTree(int nodeId, editor::PropertyRow* root) override
+	{
+		if(!root || nodeId < 0 || nodeId >= (int)uiNodes_.size())
+			return false;
+		const UiNodeRef& ref = uiNodes_[nodeId];
+		editor::PropertyIArchive ia(root);
+		if(ref.kind == kUiScreen && ref.screen){
+			Serializer se(*ref.screen);
+			se.serialize(ia);
+		}
+		else if(ref.kind == kUiState && ref.state){
+			Serializer se(*ref.state);
+			se.serialize(ia);
+		}
+		else if(ref.control){
+			Serializer se(*ref.control);
+			se.serialize(ia);
+		}
+		else
+			return false;
+		return true;
+	}
+
+	bool uiSave() override
+	{
+		if(!uiEnsureLibraries())
+			return false;
+		// UIEditor's File > Save: saveInterfaceLibraries (UI_Dispatcher + the
+		// related UI_* libraries).
+		saveInterfaceLibraries();
 		return true;
 	}
 
@@ -1872,7 +2088,74 @@ public:
 	}
 
 private:
-	// --- Environment preview/placement helpers (CSurToolEnvironment) ---
+	// --- UI Editor helpers (UIEditor port) ---
+
+	// One UI node's engine object (indexed by UiTreeNode::id).
+	struct UiNodeRef
+	{
+		int kind = kUiScreen;
+		UI_Screen* screen = nullptr;
+		UI_ControlBase* control = nullptr;
+		UI_ControlState* state = nullptr;
+	};
+
+	bool uiEnsureLibraries()
+	{
+		if(uiLibrariesInited_)
+			return true;
+		if(!owner_ || !owner_->ensureUiLibraries())
+			return false;
+		uiLibrariesInited_ = true;
+		return true;
+	}
+
+	int addUiNode(int kind, int parentId, const char* name, const char* type,
+	              UI_Screen* screen, UI_ControlBase* control, UI_ControlState* state,
+	              std::vector<UiTreeNode>& out)
+	{
+		UiNodeRef ref;
+		ref.kind = kind;
+		ref.screen = screen;
+		ref.control = control;
+		ref.state = state;
+		const int id = (int)uiNodes_.size();
+		uiNodes_.push_back(ref);
+		UiTreeNode node;
+		node.id = id;
+		node.parentId = parentId;
+		node.kind = kind;
+		node.name = name ? name : "";
+		node.type = type ? type : "";
+		out.push_back(node);
+		return id;
+	}
+
+	// Recurse a container's controls (UIEditor's UITreeObjectControl child
+	// enumeration), adding a state node per control state first.
+	void addUiContainerTree(UI_ControlContainer& container, int parentId,
+	                        std::vector<UiTreeNode>& out)
+	{
+		const UI_ControlContainer::ControlList& list = container.controlList();
+		for(size_t i = 0; i < list.size(); ++i){
+			UI_ControlBase* control = list[i].get();
+			if(!control)
+				continue;
+			const int id = addUiNode(kUiControl, parentId, control->name(),
+			                         typeid(*control).name(), nullptr, control, nullptr, out);
+			UI_ControlBase::StateContainer& states = control->states();
+			for(size_t j = 0; j < states.size(); ++j)
+				addUiNode(kUiState, id, states[j].name(), "UI_ControlState",
+				          nullptr, control, &states[j], out);
+			addUiContainerTree(*control, id, out);
+		}
+	}
+
+	void addUiScreenTree(UI_Screen& screen, int parentId, std::vector<UiTreeNode>& out)
+	{
+		const int id = addUiNode(kUiScreen, parentId, screen.name(), "UI_Screen",
+		                         &screen, nullptr, nullptr, out);
+		addUiContainerTree(screen, id, out);
+	}
 
 	void envKillPreview()
 	{
@@ -2042,6 +2325,19 @@ private:
 	}
 
 	TriggerSession triggerSession_;
+
+	// Scenario editor state (CMainFrame::OnEditMap / OnEditGameScenario):
+	// the live mission (set by EngineViewport::loadWorld) and the exported
+	// player/world-player copies the MapSerializer edits.
+	MissionDescription* mission_ = nullptr;
+	PlayerDataVect scenarioPlayers_;
+	PlayerDataEdit scenarioWorldPlayer_;
+
+	// UI Editor (UIEditor port): the engine viewport (for the lazy library
+	// load) and the node-id → engine object cache uiTree rebuilds.
+	EngineViewport* owner_ = nullptr;
+	bool uiLibrariesInited_ = false;
+	std::vector<UiNodeRef> uiNodes_;
 
 	// CSurToolSource / CSurToolAnchor: the live preview object that follows the
 	// cursor (the original's sourceOnMouse_ / anchorOnMouse_). Owned by the
@@ -2235,7 +2531,7 @@ bool EngineViewport::init(int width, int height)
 	// The tools' world bridge lives for the viewport's lifetime (the engine
 	// globals it reads — universe/sourceManager/cameraManager/vMap — exist
 	// from initScene on and are torn down in done).
-	bridge_ = new (std::nothrow) WorldBridge;
+	bridge_ = new (std::nothrow) WorldBridge(this);
 
 	// The LibraryEditor core: register the builtin property-row types
 	// (string/bool/numeric) so PropertyOArchive can build rows for them.
@@ -2362,6 +2658,8 @@ bool EngineViewport::loadWorld(const char* worldsDir, const char* worldName)
 		// contained in Units/Parameters.cpp (thread-local depth cap).
 		Universe* uni = new Universe(*mission, haveMission ? &ia : 0);
 		ownedMission_.reset(mission);
+		if(bridge_)
+			static_cast<WorldBridge*>(bridge_)->setMission(mission);
 		ownedUniverse_.reset(uni);
 		if(!isUnderEditor())
 			uni->relaxLoading();
@@ -2448,6 +2746,8 @@ void EngineViewport::doneWorld()
 	if(ownedUniverse_){
 		ownedUniverse_.reset();
 	}
+	if(bridge_)
+		static_cast<WorldBridge*>(bridge_)->setMission(nullptr);
 	ownedMission_.reset();
 
 	// [SurMap5Qt] Rebuild the scene between worlds. The original editor's
@@ -2527,6 +2827,8 @@ bool EngineViewport::createWorld(const char* worldsDir, const char* worldName)
 		mission->setByWorldName(worldName);
 		Universe* uni = new Universe(*mission, 0);
 		ownedMission_.reset(mission);
+		if(bridge_)
+			static_cast<WorldBridge*>(bridge_)->setMission(mission);
 		ownedUniverse_.reset(uni);
 		if(!isUnderEditor())
 			uni->relaxLoading();
@@ -2546,6 +2848,28 @@ bool EngineViewport::createWorld(const char* worldsDir, const char* worldName)
 	applyCamera();
 
 	worldLoaded_ = true;
+	return true;
+}
+
+bool EngineViewport::ensureUiLibraries()
+{
+	if(librariesLoaded_)
+		return true;
+	// The same prelude loadWorld runs before `new Universe`: the UI_* +
+	// attribute libraries. UIEditor did this at startup; here the UI editor
+	// runs it on first use.
+	try{
+		loadAllLibraries();
+		librariesLoaded_ = true;
+	}
+	catch(const std::exception& e){
+		fprintf(stderr, "EngineViewport: [ensureUiLibraries] loadAllLibraries threw: %s\n", e.what());
+		return false;
+	}
+	catch(...){
+		fprintf(stderr, "EngineViewport: [ensureUiLibraries] loadAllLibraries threw (non-std)\n");
+		return false;
+	}
 	return true;
 }
 

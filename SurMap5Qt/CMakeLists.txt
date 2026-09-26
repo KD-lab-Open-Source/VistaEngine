@@ -284,6 +284,15 @@ add_executable(SurMap5Qt
     src/panels/LibraryEditor.cpp
     src/dialogs/LibraryEditorDialog.h
     src/dialogs/LibraryEditorDialog.cpp
+    # The scenario editor (kdw::edit) — a modal PropertyTree over the
+    # MapScenario/GameScenario serializers (CMainFrame::OnEditMap /
+    # OnEditGameScenario).
+    src/dialogs/ScenarioDialog.h
+    src/dialogs/ScenarioDialog.cpp
+    # The Qt UI Editor (port of the MFC UIEditor app): screen/control tree +
+    # property editor, bridged to UI_Dispatcher through IWorldBridge.
+    src/uieditorqt/UiEditorWindow.h
+    src/uieditorqt/UiEditorWindow.cpp
     # TriggerEditor (TriggerEditor port) — the modal trigger-chain editor:
     # graph canvas + type palette + minimap + condition panel + debugger.
     src/panels/TriggerGraphView.h

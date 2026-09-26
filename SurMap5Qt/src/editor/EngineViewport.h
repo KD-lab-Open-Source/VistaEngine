@@ -78,6 +78,12 @@ public:
 	void doneWorld();
 	bool worldLoaded() const { return worldLoaded_; }
 
+	// Load the UI/attribute libraries (loadAllLibraries) if they are not up
+	// yet. The Qt UIEditor (uieditorqt) needs UI_Dispatcher before a world is
+	// loaded; the same prelude loadWorld runs. Returns false when the load
+	// fails. Idempotent.
+	bool ensureUiLibraries();
+
 	// Rebuild the terrain scene from the in-memory world after the terrain
 	// data changed in place (CMainFrame's view_->reInitWorld: drop the tile
 	// map, re-create it from the current vMap buffers). The world stays
