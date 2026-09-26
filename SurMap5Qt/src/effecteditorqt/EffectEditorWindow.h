@@ -15,6 +15,7 @@
 
 class IWorldBridge;
 class PropertyTree;
+class QTableWidget;
 class QTreeWidget;
 
 class EffectEditorWindow : public QMainWindow
@@ -33,10 +34,15 @@ private slots:
 	void onSaveAs();
 	void onTreeSelectionChanged();
 	void onPropertyEdited();
+	void onCurveKeyChanged(int row, int column);
 
 private:
+	void populateCurveKeys(int curveNodeId);
+
 	IWorldBridge* bridge_ = nullptr;
 	QTreeWidget* tree_ = nullptr;
 	PropertyTree* properties_ = nullptr;
+	QTableWidget* curveKeys_ = nullptr;
+	int curveNodeId_ = -1;
 	bool loading_ = false;
 };

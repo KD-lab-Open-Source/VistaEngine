@@ -912,7 +912,7 @@ public:
 				if(!curve)
 					continue;
 				addEffectNode(kEffectCurve, emitterId, curve->name(), "Curve",
-				              nullptr, nullptr, curve, out);
+				              nullptr, emitter, curve, out);
 			}
 		}
 		return true;
@@ -979,6 +979,40 @@ public:
 	}
 
 	std::string effectFileName() const override { return effectFileName_; }
+
+	int effectCurveKeyCount(int curveNodeId) override
+	{
+		if(curveNodeId < 0 || curveNodeId >= (int)effectNodes_.size())
+			return 0;
+		CurveWrapperBase* curve = effectNodes_[curveNodeId].curve;
+		return curve ? (int)curve->size() : 0;
+	}
+
+	bool effectCurveKey(int curveNodeId, int index, float& time, float& value) override
+	{
+		if(curveNodeId < 0 || curveNodeId >= (int)effectNodes_.size())
+			return false;
+		CurveWrapperBase* curve = effectNodes_[curveNodeId].curve;
+		if(!curve || index < 0 || index >= (int)curve->size())
+			return false;
+		time = curve->time(index);
+		value = curve->value(index);
+		return true;
+	}
+
+	bool effectCurveSetKey(int curveNodeId, int index, float time, float value) override
+	{
+		if(curveNodeId < 0 || curveNodeId >= (int)effectNodes_.size())
+			return false;
+		const EffectNodeRef& ref = effectNodes_[curveNodeId];
+		if(!ref.curve || index < 0 || index >= (int)ref.curve->size())
+			return false;
+		ref.curve->setPoint(index, time, value);
+		// The clone shares the emitter's key array; refresh its runtime key.
+		if(ref.emitter)
+			ref.emitter->BuildKey();
+		return true;
+	}
 
 	// --- UI Editor tree mutations (UIEditor's Create/Erase actions) ---
 

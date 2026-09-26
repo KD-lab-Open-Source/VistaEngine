@@ -318,6 +318,12 @@ public:
 	virtual bool effectSave() = 0;
 	virtual bool effectSaveAs(const std::string& fileName) = 0;
 	virtual std::string effectFileName() const = 0;
+	// Curve editor (EffectEditor's CurveCKey): the selected curve's keys.
+	// The collected clones share the emitter's key arrays, so setKey writes
+	// through and re-BuildKey()s the owning emitter.
+	virtual int effectCurveKeyCount(int curveNodeId) = 0;
+	virtual bool effectCurveKey(int curveNodeId, int index, float& time, float& value) = 0;
+	virtual bool effectCurveSetKey(int curveNodeId, int index, float time, float value) = 0;
 
 	// --- UI Editor tree mutations (UIEditor's Create/Erase actions) ---
 	// Display names of the UI_ControlBase factory types (add-control list).

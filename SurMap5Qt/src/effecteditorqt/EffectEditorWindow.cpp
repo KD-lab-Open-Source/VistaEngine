@@ -9,9 +9,11 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QHeaderView>
 #include <QLabel>
 #include <QSplitter>
 #include <QStatusBar>
+#include <QTableWidget>
 #include <QToolBar>
 #include <QTreeWidget>
 #include <QVBoxLayout>
@@ -29,12 +31,18 @@ EffectEditorWindow::EffectEditorWindow(IWorldBridge* bridge, QWidget* parent)
 	tree_->setColumnWidth(0, 280);
 
 	properties_ = new PropertyTree(this);
+	curveKeys_ = new QTableWidget(this);
+	curveKeys_->setColumnCount(2);
+	curveKeys_->setHorizontalHeaderLabels({ tr("Time"), tr("Value") });
+	curveKeys_->horizontalHeader()->setStretchLastSection(true);
 
 	auto* right = new QWidget(this);
 	auto* rightLayout = new QVBoxLayout(right);
 	rightLayout->setContentsMargins(0, 0, 0, 0);
 	rightLayout->addWidget(new QLabel(tr("Properties"), right));
-	rightLayout->addWidget(properties_, 1);
+	rightLayout->addWidget(properties_, 2);
+	rightLayout->addWidget(new QLabel(tr("Curve keys"), right));
+	rightLayout->addWidget(curveKeys_, 1);
 
 	auto* splitter = new QSplitter(Qt::Horizontal, this);
 	splitter->addWidget(tree_);
@@ -50,6 +58,7 @@ EffectEditorWindow::EffectEditorWindow(IWorldBridge* bridge, QWidget* parent)
 
 	connect(tree_, &QTreeWidget::itemSelectionChanged, this, &EffectEditorWindow::onTreeSelectionChanged);
 	connect(properties_, &QTreeWidget::itemChanged, this, &EffectEditorWindow::onPropertyEdited);
+	connect(curveKeys_, &QTableWidget::cellChanged, this, &EffectEditorWindow::onCurveKeyChanged);
 
 	statusBar()->showMessage(tr("Open a .effect file (Resource/FX)"));
 }
@@ -85,6 +94,7 @@ void EffectEditorWindow::refresh()
 		item->setText(0, QString::fromStdString(node.name));
 		item->setText(1, QString::fromStdString(node.type));
 		item->setData(0, Qt::UserRole, node.id);
+		item->setData(0, Qt::UserRole + 1, node.kind);
 		itemById[node.id] = item;
 	}
 	tree_->expandAll();
@@ -144,11 +154,44 @@ void EffectEditorWindow::onTreeSelectionChanged()
 	if(!item)
 		return;
 	const int nodeId = item->data(0, Qt::UserRole).toInt();
+	const int kind = item->data(0, Qt::UserRole + 1).toInt();
 	loading_ = true;
 	properties_->setRoot(bridge_->effectNodeTree(nodeId, true));
 	loading_ = false;
-	if(!item->childCount() && properties_->root() == nullptr)
-		statusBar()->showMessage(tr("Curves are edited by the curve editor (later milestone)"), 3000);
+	populateCurveKeys(kind == IWorldBridge::kEffectCurve ? nodeId : -1);
+	if(kind == IWorldBridge::kEffectCurve)
+		statusBar()->showMessage(tr("Edit the curve keys in the table below"), 3000);
+}
+
+void EffectEditorWindow::populateCurveKeys(int curveNodeId)
+{
+	curveNodeId_ = curveNodeId;
+	loading_ = true;
+	curveKeys_->setRowCount(0);
+	if(curveNodeId >= 0 && bridge_){
+		const int count = bridge_->effectCurveKeyCount(curveNodeId);
+		curveKeys_->setRowCount(count);
+		for(int i = 0; i < count; ++i){
+			float t = 0.f, v = 0.f;
+			if(bridge_->effectCurveKey(curveNodeId, i, t, v)){
+				curveKeys_->setItem(i, 0, new QTableWidgetItem(QString::number(t, 'g', 6)));
+				curveKeys_->setItem(i, 1, new QTableWidgetItem(QString::number(v, 'g', 6)));
+			}
+		}
+	}
+	loading_ = false;
+}
+
+void EffectEditorWindow::onCurveKeyChanged(int row, int /*column*/)
+{
+	if(loading_ || curveNodeId_ < 0 || !bridge_)
+		return;
+	QTableWidgetItem* timeItem = curveKeys_->item(row, 0);
+	QTableWidgetItem* valueItem = curveKeys_->item(row, 1);
+	if(!timeItem || !valueItem)
+		return;
+	bridge_->effectCurveSetKey(curveNodeId_, row,
+		timeItem->text().toFloat(), valueItem->text().toFloat());
 }
 
 void EffectEditorWindow::onPropertyEdited()
