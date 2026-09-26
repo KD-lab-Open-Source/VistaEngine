@@ -138,6 +138,25 @@ struct EditorPose
 	ToolVec3 pos;
 };
 
+// Environment placement parameters (SurTool3DM / CSurToolEnvironment dialog).
+// Engine-free snapshot of the sliders/checkboxes; the bridge turns this into a
+// UnitEnvironment on placement and into a scene model for the cursor preview.
+// The scale/angle deltas are the original's random spread (± value).
+struct EnvironmentParams
+{
+	std::string model;             // engine resource path, e.g. Resource\TerrainData\Models\tree.3dx
+	int typeIndex = 0;             // convertIdx2EnvironmentType index (0..ENVIRONMENT_TYPE_MAX-1)
+	float angle = 0.f;             // angleSlider_.value, degrees
+	float angleDelta = 0.f;        // angleDeltaSlider_.value, degrees
+	float scale = 100.f;           // scaleSlider_.value, percent (100 == 1.0)
+	float scaleDelta = 0.f;        // scaleDeltaSlider_.value, percent
+	float spreadRadius = 25.f;     // spreadRadiusSlider_.value, world units
+	float spreadRadiusDelta = 10.f;// spreadRadiusDeltaSlider_.value, percent
+	float brushRadius = 25.f;      // getBrushRadius(), the fill area for spread
+	bool vertical = false;         // m_bVertical (keep upright, do not align to the normal)
+	bool spread = false;           // m_bSpread (fill the brush area with a cluster)
+};
+
 // A visitor over the currently selected objects. Implemented by the tool that
 // wants to act on the selection (port of UniverseObjectAction). The object id
 // is valid only for the duration of the visit() call.
@@ -315,6 +334,33 @@ public:
 	// original (kdw::makeName over the existing anchor labels). Returns the
 	// new object id or kNoObject.
 	virtual EditorObjectId placeAnchor(float x, float y) = 0;
+
+	// --- Environment placement (SurTool3DM / CSurToolEnvironment) ---
+	//
+	// CSurToolEnvironment placed UnitEnvironment objects from a picked .3dx
+	// model with angle/scale/spread parameters and a live model preview that
+	// followed the cursor. The Qt side edits EnvironmentParams; the engine
+	// resolves the type index, builds the preview model and the units.
+
+	// The EnvironmentType display names (0..ENVIRONMENT_TYPE_MAX-1), the
+	// dialog's attributes combo.
+	virtual void environmentTypeNames(std::vector<std::string>& out) = 0;
+	// The model list (the mesh cache's entries), the dialog's model combo.
+	virtual void environmentModelNames(std::vector<std::string>& out) = 0;
+	// Create/rebuild the live preview from params and move it to (x, y). The
+	// preview is a scene model (the original's visualObjects), not a unit.
+	// `rebuild` forces a new model set (model/spread/radius change, activate,
+	// after placing); false only repositions the existing one (mouse tracking)
+	// so it survives long enough to render. Returns false when no world/model.
+	virtual bool updateEnvironmentPreview(const EnvironmentParams& params,
+	                                      float x, float y, bool rebuild) = 0;
+	// Kill the live preview model(s).
+	virtual void killEnvironmentPreview() = 0;
+	// Place the environment object(s) at (x, y)
+	// (CSurToolEnvironment::onOperationOnMap -> buildUnit + setModel +
+	// setRadius + setPose). With params.spread a cluster fills the brush area.
+	// Returns the number of units placed.
+	virtual int placeEnvironment(const EnvironmentParams& params, float x, float y) = 0;
 
 	// Re-render the whole world (SurToolGeoTx::onOperationOnMap ->
 	// vMap.WorldRender). Returns false when no world is loaded.

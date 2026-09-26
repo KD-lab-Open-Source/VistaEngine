@@ -75,6 +75,11 @@ RenderViewWidget::RenderViewWidget(QWidget* parent)
 	setAutoFillBackground(false);
 	setAttribute(Qt::WA_PaintOnScreen);
 	setFocusPolicy(Qt::StrongFocus);
+	// CGeneralView's WM_MOUSEMOVE ran whenever the mouse moved, button or not:
+	// the tools' cursor previews (sources, environment models, brushes) follow
+	// the pointer on hover. Qt delivers mouseMoveEvent without tracking only
+	// while a button is held, so enable tracking.
+	setMouseTracking(true);
 }
 
 RenderViewWidget::~RenderViewWidget()

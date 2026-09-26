@@ -39,7 +39,7 @@ ToolsTreePanel::ToolsTreePanel(ToolManager* tools, QWidget* parent)
 	const Group groups[] = {
 		{ "Transform", 0, 4 },                 // Select/Move/Rotate/Scale
 		{ "Terrain", 4, 5 },                   // Toolzer, Kind, ColorPic, GeoNet, GeoTx
-		{ "Objects", 9, 3 },                   // Unit, Source, Anchor
+		{ "Objects", 9, 4 },                   // Unit, Source, Anchor, Environment
 	};
 
 	for(const Group& group : groups){

@@ -25,6 +25,7 @@ class ColorPicTool;
 class UnitTool;
 class SourceTool;
 class AnchorTool;
+class EnvironmentTool;
 class TransformPropertyPanel;
 class GeoNetPropertyPanel;
 class GeoTxPropertyPanel;
@@ -34,6 +35,7 @@ class ColorPicPropertyPanel;
 class UnitPropertyPanel;
 class SourcePropertyPanel;
 class AnchorPropertyPanel;
+class EnvironmentPropertyPanel;
 
 class ToolManager
 {
@@ -89,6 +91,7 @@ private:
 	UnitTool* unit_ = nullptr;
 	SourceTool* source_ = nullptr;
 	AnchorTool* anchor_ = nullptr;
+	EnvironmentTool* environment_ = nullptr;
 
 	std::vector<EditorTool*> tools_;
 	EditorTool* current_ = nullptr;
@@ -111,4 +114,6 @@ private:
 	// Source/anchor placement panels (created lazily).
 	SourcePropertyPanel* sourcePanel_ = nullptr;
 	AnchorPropertyPanel* anchorPanel_ = nullptr;
+	// The Environment tool's parameter panel (created lazily).
+	EnvironmentPropertyPanel* environmentPanel_ = nullptr;
 };

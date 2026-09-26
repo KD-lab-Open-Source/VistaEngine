@@ -154,20 +154,21 @@ variant), **Kind** ("Hardness": paint the surface type — `vMap.drawInGrid` wit
 `vMap.drawBitmapCircle` / `putBitmap2AllWorld`), **Unit** (place a unit of the
 chosen `AttributeLibrary` attribute — `Player::buildUnit` + `setPose` at the
 terrain height, with the legionary/squad join), **Source** (`SourceTool`:
-SourcesLibrary element + live preview + `addSource`) and **Anchor** (`AnchorTool`:
-editable anchor + live preview + `addAnchor`), GeoNet (`bridge_->applyGeoNet`
+SourcesLibrary element + live preview + `addSource`), **Anchor** (`AnchorTool`:
+editable anchor + live preview + `addAnchor`) and **Environment**
+(`EnvironmentTool`: mesh-cache model + EnvironmentType + angle/scale/spread,
+live cursor preview, `UnitEnvironment` placement), GeoNet (`bridge_->applyGeoNet`
 → `geoGeneration`; no direct MFC counterpart), GeoTx (re-render only — matches
 the original, where the paint call is commented out). The Toolzer/Kind/ColorPic
 editors live in the Properties dock (`ToolzerPropertyPanel`,
-`KindPropertyPanel`, `ColorPicPropertyPanel`); Source/Anchor/Unit get their own.
+`KindPropertyPanel`, `ColorPicPropertyPanel`); Source/Anchor/Unit/Environment
+get their own.
 
 Dependency note: selection works for **alive, non-auxiliary units** only.
 Sources, anchors and camera splines are not click-pickable, and a real marquee
 that picks non-unit objects is still missing.
 
 Not yet ported (original class → what it does):
-- CSurTool3DM / CSurToolEnvironment — place a .3dx model / environment object on the map
-  (`worldPlayer()->buildUnit(...)`, `setEnvirontmentType/setModel/setRadius/setPose`).
 - CSurToolMiniDetaile / CSurToolMiniDetaileFolder — mini-details placement.
 - CSurToolRoad — road drawing.
 - CSurToolWater / CSurToolWaves / CSurToolWindStatic — water level / waves / wind zones.
@@ -253,8 +254,17 @@ exist yet.
    state, grid colour, LOD) in one struct.
 3. **Placement tools** — ~~SurToolUnit~~ **done** (`UnitTool`); ~~SurToolSource~~
    and ~~SurToolAnchor~~ **done** (`SourceTool`/`AnchorTool`, live preview +
-   embedded PropertyRow attrib editor). Still open: SurTool3DM/Environment
-   (file-pick a model), then the Road/PathEditor/CameraEditor/MiniDetaile set.
+   embedded PropertyRow attrib editor); ~~SurTool3DM/Environment~~ **done**
+   (`EnvironmentTool`/`EnvironmentPropertyPanel`: the mesh-cache model list, the
+   EnvironmentType combo, angle/scale/spread/vertical, a live scene-model
+   preview that follows the cursor — cSimply3dx for simple environments,
+   cObject3dx for buildings — and spread/cluster placement with the type's
+   preset). The picked model sets its type/vertical by name. Still open:
+   **file-pick** a raw `.3dx` (the original's Browse + copy; moot with the
+   cache-only content), then the Road/PathEditor/CameraEditor/MiniDetaile set.
+   A live preview now needs `RenderViewWidget::setMouseTracking(true)` — Qt
+   delivers `mouseMoveEvent` on hover only with tracking on, unlike the
+   original's `WM_MOUSEMOVE`.
 4. **Wire the ready dialogs**: put WaveDialog on a command; give CameraDialog its
    own command and add the CREATE_POINTS/SELECT_POINTS mouse modes.
 5. **Close dead/stale items**: `actViewPathFindingRef_` (unconnected), Debug

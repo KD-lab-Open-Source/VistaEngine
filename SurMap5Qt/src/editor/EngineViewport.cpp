@@ -8,7 +8,9 @@
 // engine headers call all of them.
 #include <vector>
 #include <string>
+#include <algorithm>
 #include <climits>
+#include <cstdlib>
 #include <cmath>
 using namespace std;
 #include "xutil.h"
@@ -55,6 +57,9 @@ using namespace std;
 #include "Units/IronLegion.h"            // UnitLegionary (placement: squad join)
 #include "Units/Squad.h"                 // UnitSquad (placement: addUnit)
 #include "Util/XTL/SafeCast.h"           // safe_cast (placement: legionary/squad)
+#include "Util/ObjectSpreader.h"         // ObjectSpreader (environment spread cluster)
+#include "Util/FileUtils/FileUtils.h"    // DirIterator (environment model list)
+#include "Units/WeaponAttribute.h"       // EnvironmentType, isEnvironmentSimple
 #include "Units/GlobalAttributes.h"      // GlobalAttributes::showHeadNames (Heads library)
 #include "Units/CommandsQueue.h"         // CommandColorManager (command colors)
 #include "Util/Serialization/EnumDescriptor.h" // getEnumDescriptor (command colors)
@@ -259,6 +264,25 @@ struct TriggerChainPropsSerializer
 {
 	TriggerChain* chain = nullptr;
 	void serialize(Archive& ar) { if(chain) chain->serializeProperties(ar); }
+};
+
+// EnvironmentType from the dialog combo index (SurTool3DM
+// convertIdx2EnvironmentType: idx 0 == PHANTOM, else 1 << (idx-1)).
+static EnvironmentType environmentTypeFromIndex(int idx)
+{
+	return EnvironmentType(idx ? 1 << (idx - 1) : 0);
+}
+
+// SurTool3DM's CircleInRadius: keep a spread circle while it stays inside the
+// brush area.
+struct EnvCircleInRadius
+{
+	explicit EnvCircleInRadius(float radius) : radius_(radius) {}
+	bool operator()(const ObjectSpreader::Circle& circle) const
+	{
+		return circle.position.norm() + circle.radius < radius_;
+	}
+	float radius_;
 };
 
 // WorldBridge — the engine-side implementation of the engine-free IWorldBridge
@@ -726,6 +750,99 @@ public:
 			z = vMap.getZf(xi, yi);
 		anchor->setPose(Se3f(QuatF::ID, Vect3f(x, y, z)), true);
 		return (EditorObjectId)anchor;
+	}
+
+	// --- Environment placement (CSurToolEnvironment / CSurTool3DM) ---
+
+	void environmentTypeNames(std::vector<std::string>& out) override
+	{
+		// The dialog's attributes combo (SurTool3DM::initControls):
+		// getEnumNameAlt(EnvironmentType(nItem ? 1 << nItem-1 : 0)).
+		out.clear();
+		for(int i = 0; i < ENVIRONMENT_TYPE_MAX; ++i){
+			const char* n = getEnumNameAlt(environmentTypeFromIndex(i));
+			out.push_back(n ? n : "");
+		}
+	}
+
+	void environmentModelNames(std::vector<std::string>& out) override
+	{
+		// The mesh cache holds every loadable .3dx (the shipped content is
+		// cache-only). Rebuild the reference path from the cache file name:
+		// cLib3dx keyed the cache by cutPathToResource(name) with '\' -> '_',
+		// so the leading directory prefixes map back to real separators and
+		// the rest is the file name.
+		out.clear();		for(DirIterator it("cacheData\\Models\\*.3dxG"); it; ++it){
+			if(!it.isFile())
+				continue;
+			std::string name = it.c_str();
+			// Windows' wildcard also matches .3dxGB/.3dxGL (the logic/burnt
+			// variants); keep only the render-model cache.
+			if(name.size() < 5 || name.compare(name.size() - 5, 5, ".3dxG") != 0)
+				continue;
+			name.erase(name.size() - 1);   // strip the cache's trailing "G", keep ".3dx"
+			std::string ref;
+			if(name.rfind("resource_terraindata_models_", 0) == 0)
+				ref = "Resource\\TerrainData\\Models\\" + name.substr(28);
+			else if(name.rfind("resource_terraindata_tertools_", 0) == 0)
+				ref = "Resource\\TerrainData\\TerTools\\" + name.substr(30);
+			else if(name.rfind("resource_models_", 0) == 0)
+				ref = "Resource\\Models\\" + name.substr(16);
+			else if(name.rfind("resource_", 0) == 0)
+				ref = "Resource\\" + name.substr(9);
+			else
+				ref = name;
+			out.push_back(ref);
+		}
+		std::sort(out.begin(), out.end());
+	}
+
+	bool updateEnvironmentPreview(const EnvironmentParams& params,
+	                              float x, float y, bool rebuild) override
+	{
+		envLastX_ = x;
+		envLastY_ = y;
+		// Only rebuild when the panel says so (model/spread/radius change,
+		// activate, after placing) or when there is no preview yet; a plain
+		// mouse move just repositions, so the model survives to render.
+		if(rebuild || (envPreviewObjs_.empty() && envPreviewSimple_.empty()))
+			envBuildPreview(params);
+		envPositionPreview(params);
+		return true;
+	}
+
+	void killEnvironmentPreview() override
+	{
+		envKillPreview();
+	}
+
+	int placeEnvironment(const EnvironmentParams& params, float x, float y) override
+	{
+		// CSurToolEnvironment::onOperationOnMap.
+		if(!vMap.isWorldLoaded() || !universe())
+			return 0;
+		Player* wp = universe()->worldPlayer();
+		if(!wp || params.model.empty())
+			return 0;
+		envRandom_.set(envSeed_);
+		int placed = 0;
+		if(params.spread){
+			const ObjectSpreader::CirclesList& circles = envSpreader_.circles();
+			for(size_t i = 0; i < circles.size(); ++i){
+				const Vect2f pos(x + circles[i].position.x, y + circles[i].position.y);
+				if(!envCanPlace(wp, pos, circles[i].radius))
+					continue;
+				if(envBuildUnit(wp, params, pos))
+					++placed;
+			}
+		} else {
+			if(envBuildUnit(wp, params, Vect2f(x, y)))
+				++placed;
+		}
+		// The original reseeded the RNG after placing (ReloadM3D +
+		// UpdateShapeModel); the tool's refresh then rebuilds the preview.
+		envSeed_ = rand();
+		return placed;
 	}
 
 	bool worldRender() override
@@ -1438,6 +1555,175 @@ public:
 	}
 
 private:
+	// --- Environment preview/placement helpers (CSurToolEnvironment) ---
+
+	void envKillPreview()
+	{
+		for(size_t i = 0; i < envPreviewObjs_.size(); ++i)
+			RELEASE(envPreviewObjs_[i]);
+		envPreviewObjs_.clear();
+		for(size_t i = 0; i < envPreviewSimple_.size(); ++i)
+			RELEASE(envPreviewSimple_[i]);
+		envPreviewSimple_.clear();
+	}
+
+	// A simple environment (tree/bush/stone/...) is placed as UnitEnvironmentSimple
+	// whose model is a cSimply3dx; buildings use cObject3dx. The preview must use
+	// the same kind as placement, or it renders as nothing.
+	bool envPreviewIsSimple(const EnvironmentParams& params)
+	{
+		return isEnvironmentSimple(environmentTypeFromIndex(params.typeIndex));
+	}
+
+	// SurTool3DM::getScale: scaleSlider +/- scaleDeltaSlider percent.
+	float envScale(const EnvironmentParams& params)
+	{
+		float sv = params.scale;
+		float sd = params.scaleDelta;
+		return (sv * (100.0f + envRandom_.frnd(sd)) / 100.0f) / 100.0f;
+	}
+
+	// SurTool3DM::calculateObjectPose: terrain height + normal alignment.
+	Se3f envObjectPose(const EnvironmentParams& params, const Vect2f& position, float radius)
+	{
+		Vect3f normal;
+		Vect3f pos(position.x, position.y, 0.0f);
+		const Vect2i center((int)roundf(position.x), (int)roundf(position.y));
+		pos.z = vMap.analyzeArea(center, (int)roundf(radius), normal);
+		float angle = params.angle + envRandom_.frnd(params.angleDelta);
+		Se3f result(QuatF(angle * (M_PI / 180.0f), Vect3f::K), pos);
+		if(!params.vertical){
+			Vect3f cross = Vect3f::K % normal;
+			float len = cross.norm();
+			if(len > 1e-5f)
+				result.rot().premult(QuatF(acosf(dot(Vect3f::K, normal) / (normal.norm() + 1e-5f)), cross));
+		}
+		return result;
+	}
+
+	void envBuildPreview(const EnvironmentParams& params)
+	{
+		envKillPreview();
+		if(!terScene || params.model.empty() || !vMap.isWorldLoaded())
+			return;
+		envSeed_ = rand();
+		envRandom_.set(envSeed_);
+		const bool simple = envPreviewIsSimple(params);
+		int count = 1;
+		if(params.spread){
+			float scale = max(5.0f, params.spreadRadius);
+			float d = params.spreadRadiusDelta / 100.0f;
+			envSpreader_.setSeed(envSeed_);
+			envSpreader_.setRadius(Rangef(scale - scale * d, scale + scale * d));
+			envSpreader_.fill(EnvCircleInRadius(params.brushRadius));
+			count = (int)envSpreader_.circles().size();
+		}
+		for(int i = 0; i < count; ++i){
+			if(simple){
+				if(cSimply3dx* m = terScene->CreateSimply3dx(params.model.c_str()))
+					envPreviewSimple_.push_back(m);
+			} else {
+				if(cObject3dx* m = terScene->CreateObject3dx(params.model.c_str()))
+					envPreviewObjs_.push_back(m);
+			}
+		}
+	}
+
+	void envPositionPreview(const EnvironmentParams& params)
+	{
+		const bool simple = envPreviewIsSimple(params);
+		const size_t total = simple ? envPreviewSimple_.size() : envPreviewObjs_.size();
+		if(total == 0)
+			return;
+		envRandom_.set(envSeed_);
+		const Vect2f center(envLastX_, envLastY_);
+		const ObjectSpreader::CirclesList& circles = envSpreader_.circles();
+		const bool spread = params.spread && !circles.empty();
+		for(size_t i = 0; i < total; ++i){
+			const Vect2f pos = spread
+				? Vect2f(center.x + circles[i].position.x, center.y + circles[i].position.y)
+				: center;
+			if(simple){
+				cSimply3dx* m = envPreviewSimple_[i];
+				m->SetScale(1.0f);
+				m->SetScale(envScale(params));
+				float radius = m->GetBoundRadius();
+				if(!spread)
+					radius = clamp(radius, 0.001f, min(float(vMap.H_SIZE) / 2.5f, float(vMap.V_SIZE) / 2.5f));
+				m->SetPosition(envObjectPose(params, pos, radius));
+			} else {
+				cObject3dx* m = envPreviewObjs_[i];
+				m->SetScale(1.0f);
+				m->SetScale(envScale(params));
+				float radius = m->GetBoundRadius();
+				if(!spread)
+					radius = clamp(radius, 0.001f, min(float(vMap.H_SIZE) / 2.5f, float(vMap.V_SIZE) / 2.5f));
+				m->SetPosition(envObjectPose(params, pos, radius));
+			}
+		}
+	}
+
+	// CSurToolEnvironment::loadPreset: overlay the type's saved preset, if any
+	// (Scripts\TreeControlSetups\EnvironmentPreset_<type>).
+	void envLoadPreset(UnitEnvironment* unit)
+	{
+		if(!unit)
+			return;
+		XBuffer buf(256, 1);
+		buf < "Scripts\\TreeControlSetups\\EnvironmentPreset_"
+			< getEnumDescriptor(unit->environmentType()).name(unit->environmentType());
+		XPrmIArchive ia;
+		if(!ia.open(buf))
+			return;
+		std::string model = unit->modelName();
+		float radius = unit->radius();
+		Se3f pose = unit->pose();
+		ia.serialize(*unit, "unit", 0);
+		unit->setModel(model.c_str());
+		unit->setRadius(radius);
+		unit->setPose(pose, true);
+		if(unit->rigidBody())
+			unit->rigidBody()->awake();
+	}
+
+	// CSurToolEnvironment::onOperationOnMap single-unit branch.
+	UnitEnvironment* envBuildUnit(Player* wp, const EnvironmentParams& params, const Vect2f& position)
+	{
+		EnvironmentType type = environmentTypeFromIndex(params.typeIndex);
+		UnitBase* base = wp->buildUnit(AuxAttributeReference(
+			isEnvironmentSimple(type) ? AUX_ATTRIBUTE_ENVIRONMENT_SIMPLE : AUX_ATTRIBUTE_ENVIRONMENT));
+		UnitEnvironment* unit = safe_cast<UnitEnvironment*>(base);
+		if(!unit)
+			return nullptr;
+		unit->setEnvirontmentType(type);
+		unit->setModel(params.model.c_str());
+		float logicRadius = envScale(params) * unit->radius();
+		unit->setRadius(logicRadius);
+		unit->setPose(envObjectPose(params, position, logicRadius), true);
+		unit->mapUpdate(unit->position2D().x - unit->radius(), unit->position2D().x + unit->radius(),
+		                unit->position2D().y - unit->radius(), unit->position2D().y + unit->radius());
+		envLoadPreset(unit);
+		return unit;
+	}
+
+	// The spread branch skipped a circle if an environment already overlaps
+	// (SurTool3DM::onOperationOnMap can_be_placed).
+	bool envCanPlace(Player* wp, const Vect2f& pos, float radius)
+	{
+		const UnitList& units = wp->units();
+		for(UnitList::const_iterator it = units.begin(); it != units.end(); ++it){
+			UnitBase* base = *it;
+			UnitEnvironment* unit = dynamic_cast<UnitEnvironment*>(base);
+			if(unit && unit->environmentType() != ENVIRONMENT_PHANTOM){
+				const Vect3f& t = unit->pose().trans();
+				const Vect2f up(t.x, t.y);
+				if((up - pos).norm() < (unit->radius() + radius) * 0.8f)
+					return false;
+			}
+		}
+		return true;
+	}
+
 	TriggerSession triggerSession_;
 
 	// CSurToolSource / CSurToolAnchor: the live preview object that follows the
@@ -1450,6 +1736,18 @@ private:
 	// edits this, and placeAnchor stamps a fresh copy of it. doNotRegister=true
 	// so it stays out of sourceManager until a preview/place is asked for.
 	Anchor editableAnchor_{ true };
+
+	// CSurToolEnvironment's live preview models (visualObjects), the spread
+	// layout they follow, and the RNG seeded per reload (random_/seed_).
+	// Simple environments preview as cSimply3dx, buildings as cObject3dx —
+	// the same kinds placement creates.
+	std::vector<cObject3dx*> envPreviewObjs_;
+	std::vector<cSimply3dx*> envPreviewSimple_;
+	ObjectSpreader envSpreader_;
+	RandomGenerator envRandom_;
+	int envSeed_ = 12345;
+	float envLastX_ = 0.f;
+	float envLastY_ = 0.f;
 };
 
 EngineViewport::EngineViewport() = default;

@@ -22,6 +22,8 @@
 #include "SourcePropertyPanel.h"
 #include "AnchorTool.h"
 #include "AnchorPropertyPanel.h"
+#include "EnvironmentTool.h"
+#include "EnvironmentPropertyPanel.h"
 #include "TransformPropertyPanel.h"
 #include "TransformTool.h"
 
@@ -39,6 +41,7 @@ ToolManager::ToolManager()
 	unit_    = new UnitTool;
 	source_  = new SourceTool;
 	anchor_  = new AnchorTool;
+	environment_ = new EnvironmentTool;
 	geoNet_ = new GeoNetTool;
 	geoTx_  = new GeoTxTool;
 
@@ -54,6 +57,7 @@ ToolManager::ToolManager()
 	tools_.push_back(unit_);
 	tools_.push_back(source_);
 	tools_.push_back(anchor_);
+	tools_.push_back(environment_);
 
 	current_ = select_;
 	currentIndex_ = 0;
@@ -73,6 +77,7 @@ ToolManager::~ToolManager()
 	delete unit_;
 	delete source_;
 	delete anchor_;
+	delete environment_;
 }
 
 void ToolManager::setWorldBridge(IWorldBridge* bridge)
@@ -99,6 +104,8 @@ void ToolManager::setBrushRadius(float radius)
 		kind_->setBrushRadius(radius);
 	if(colorPic_)
 		colorPic_->setBrushRadius(radius);
+	if(environment_)
+		environment_->setBrushRadius(radius);
 }
 
 void ToolManager::setCurrentTool(int index)
@@ -132,6 +139,8 @@ void ToolManager::setCurrentTool(int index)
 		sourcePanel_->setTool(dynamic_cast<SourceTool*>(current_));
 	if(anchorPanel_)
 		anchorPanel_->setTool(dynamic_cast<AnchorTool*>(current_));
+	if(environmentPanel_)
+		environmentPanel_->setTool(dynamic_cast<EnvironmentTool*>(current_));
 }
 
 QWidget* ToolManager::propertyWidget()
@@ -196,6 +205,14 @@ QWidget* ToolManager::propertyWidget()
 			anchorPanel_ = new AnchorPropertyPanel;
 		anchorPanel_->setTool(anchor_);
 		return anchorPanel_;
+	}
+	if(dynamic_cast<EnvironmentTool*>(current_)){
+		if(!environmentPanel_)
+			environmentPanel_ = new EnvironmentPropertyPanel;
+		// Re-fill every time: the model/type lists come from the engine, which
+		// may only have a world after the panel was first created.
+		environmentPanel_->setTool(environment_);
+		return environmentPanel_;
 	}
 	if(!propertyPanel_){
 		propertyPanel_ = new TransformPropertyPanel;

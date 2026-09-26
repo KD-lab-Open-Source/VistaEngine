@@ -249,6 +249,11 @@ add_executable(SurMap5Qt
     src/tools/AnchorTool.cpp
     src/tools/AnchorPropertyPanel.h
     src/tools/AnchorPropertyPanel.cpp
+
+    src/tools/EnvironmentTool.h
+    src/tools/EnvironmentTool.cpp
+    src/tools/EnvironmentPropertyPanel.h
+    src/tools/EnvironmentPropertyPanel.cpp
     # Phase 6 — the kdw trees as QTreeWidgets (tools + objects manager)
     src/panels/ToolsTreePanel.h
     src/panels/ToolsTreePanel.cpp
