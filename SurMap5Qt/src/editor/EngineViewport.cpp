@@ -91,6 +91,7 @@ using namespace std;
 #include "Util/EditorVisual.h"              // editorVisual (before/afterQuant, как в CGeneralView::graphQuant)
 #include "UserInterface/UserInterface.h"    // UI_Dispatcher (конструируется в Universe ctor)
 #include "UserInterface/UI_BackgroundScene.h" // UI_BackgroundScene (UI Editor preview background)
+#include "UserInterface/UI_StreamVideo.h"    // UI_StreamVideo (UI_ControlVideo frames)
 
 // SDL_Init(SDL_INIT_VIDEO) normally happens in PlatformWindow::create; the Qt
 // editor never calls it (Qt owns the windows), so the GPU device would fail
@@ -99,6 +100,10 @@ using namespace std;
 // main() (this is an executable with its own Qt main).
 #define SDL_MAIN_HANDLED
 #include <SDL3/SDL.h>
+
+// The UI's shared video panel (UI_StreamVideo.cpp owns the definition); the
+// UI preview advances it so UI_ControlVideo plays.
+extern Singleton<UI_StreamVideo> streamVideo;
 
 namespace {
 // kMouseMove2Angle from CGeneralView::WindowProc — 0.25 deg per pixel.
@@ -3292,8 +3297,15 @@ bool EngineViewport::uiPreviewRender(int width, int height)
 		UI_BackgroundScene::instance().setCamera();
 		UI_BackgroundScene::instance().graphQuant(0.016f);
 		UI_BackgroundScene::instance().draw();
-		if(uiPreviewScreen_)
+		if(uiPreviewScreen_){
+			// Advance the screen's controls before drawing: UI_ControlVideo's
+			// quant starts/plays the shared stream video and asks for the next
+			// frame, which ui_quant then copies into its texture. Without this
+			// the video control draws nothing.
+			uiPreviewScreen_->quant(0.016f);
+			streamVideo().ui_quant();
 			uiPreviewScreen_->redraw();
+		}
 		gb_RenderDevice->EndScene();
 		gb_RenderDevice->Flush();
 	}
