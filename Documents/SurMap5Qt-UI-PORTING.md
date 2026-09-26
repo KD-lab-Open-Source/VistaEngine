@@ -164,6 +164,18 @@ editors live in the Properties dock (`ToolzerPropertyPanel`,
 `KindPropertyPanel`, `ColorPicPropertyPanel`); Source/Anchor/Unit/Environment
 get their own.
 
+The **Tools tree** (`ToolsTreePanel`) now mirrors the original's folders
+(Object-based terrain / Textures / Units / Sources / Anchors / Environmental
+Objects). Units are grouped by race (`[GROUND]`, `[WATER]`, …) and filtered to
+placeable buildings/legionaries (`CSurToolUnitFolder`/`CSurToolPlayerFolder`);
+Environmental Objects lists only `Resource\TerrainData\Models` (+ TerTools).
+Picking a catalog leaf switches to its tool and sets its target, and the
+transform Select/Move/Rotate/Scale buttons + the brush-radius combo live in the
+Tools dock's own toolbar (`CToolsTreeWindow`). All placement tools keep a live
+cursor preview: Sources/Anchors (engine objects), Environment (a scene model —
+`cSimply3dx` for simple environments, `cObject3dx` for buildings) and Unit
+(CSurToolUnit's auxiliary `unitOnMouse_`).
+
 Dependency note: selection works for **alive, non-auxiliary units** only.
 Sources, anchors and camera splines are not click-pickable, and a real marquee
 that picks non-unit objects is still missing.

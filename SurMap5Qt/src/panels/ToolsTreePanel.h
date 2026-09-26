@@ -1,14 +1,14 @@
 // ToolsTreePanel.h — Qt port of the tools tree (CToolsTreeWindow + CToolsTreeCtrl,
 // SurMap5/ToolsTreeWindow.cpp / ToolsTreeCtrl.cpp).
 //
-// The original was a CFrameWnd hosting a CTreeView of tools (the transform set
-// plus the serialized tree from Scripts\Engine\VistaEngine.scr, rebuilt by the
-// tool factory's REGISTER_CLASS list). In Qt the tree is a QTreeWidget in the
-// tools dock; selecting a tool switches the ToolManager's current tool. The
-// XPrm-serialized tree configuration is deferred — the tree mirrors the tool
-// set ToolManager owns, grouped into the folder structure the original's
-// REGISTER_CLASS list implied (Folder/UnitFolder/MiniDetaileFolder/PlayerFolder
-// are folder tools; the terrain set lives under a "Terrain" group).
+// The original was a CFrameWnd hosting a CTreeView: the transform tools as
+// toolbar buttons, and a tree of placement tools grouped by object type
+// (Object-based terrain / Textures / Environmental Objects / Units, as in the
+// original's tool tree). In Qt the tree is a QTreeWidget in the tools dock;
+// the terrain/texture rows switch the ToolManager's current tool, while the
+// object folders list the world's catalog entries (unit attributes, sources,
+// environment models) — picking one switches to that tool and sets its target.
+// The XPrm-serialized tree configuration is deferred.
 
 #pragma once
 
@@ -24,6 +24,10 @@ class ToolsTreePanel : public QWidget
 	Q_OBJECT
 public:
 	explicit ToolsTreePanel(ToolManager* tools, QWidget* parent = nullptr);
+
+	// Populate the object catalog (unit attributes, sources, environment models)
+	// from the bridge. Call after a world load — the libraries arrive with it.
+	void rebuildCatalog();
 
 	// Sync the tree's selection to the current tool (used after the toolbar
 	// switches tools, so the tree stays in step).
@@ -46,10 +50,15 @@ protected:
 	void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
+	void buildTree();
 	void onItemActivated(QTreeWidgetItem* item, int column);
 	void deleteSelected();
 	void renameSelected();
 
 	ToolManager* tools_ = nullptr;
 	QTreeWidget* tree_ = nullptr;
+	// The object folders the catalogs hang under.
+	QTreeWidgetItem* unitsFolder_ = nullptr;
+	QTreeWidgetItem* sourcesFolder_ = nullptr;
+	QTreeWidgetItem* environmentFolder_ = nullptr;
 };

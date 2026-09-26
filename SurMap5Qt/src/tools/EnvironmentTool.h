@@ -12,6 +12,12 @@
 
 #include "editor/EditorTool.h"
 
+// EnvironmentType index (SurTool3DM convertIdx2EnvironmentType) inferred from a
+// model name, or -1 when no rule matches; `vertical` receives the type's
+// default (trees/buildings stand upright). Shared by the tool and the tools
+// tree's object catalog.
+int environmentTypeForModel(const std::string& model, bool& vertical);
+
 class EnvironmentTool : public EditorTool
 {
 public:
@@ -32,6 +38,11 @@ public:
 	const EnvironmentParams& params() const { return params_; }
 	// Rebuild/move the cursor preview from the current params (panel change).
 	void applyParams();
+
+	// Pick a model and pull its environment type/vertical from the name (the
+	// editor's models follow the engine naming convention). Used by the panel's
+	// model combo and the tools tree's object catalog.
+	void setModel(const std::string& model);
 
 	// The shared brush radius (CSurToolBase::getBrushRadius) — spread fills
 	// this area.

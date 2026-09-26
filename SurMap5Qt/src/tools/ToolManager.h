@@ -47,6 +47,10 @@ public:
 	// hands EngineViewport's bridge here once it exists).
 	void setWorldBridge(IWorldBridge* bridge);
 
+	// The installed bridge (null before a world load). The tools tree uses it to
+	// list the object catalog (units/sources/environment models).
+	IWorldBridge* bridge() const { return bridge_; }
+
 	// The current tool (CGeneralView::getCurCtrl / currentTool()).
 	EditorTool* currentTool() { return current_; }
 
@@ -96,6 +100,7 @@ private:
 	std::vector<EditorTool*> tools_;
 	EditorTool* current_ = nullptr;
 	int currentIndex_ = 0;
+	IWorldBridge* bridge_ = nullptr;
 
 	// The Properties dock's panel for the transform tools (created lazily).
 	TransformPropertyPanel* propertyPanel_ = nullptr;

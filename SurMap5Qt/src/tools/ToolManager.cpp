@@ -85,6 +85,7 @@ void ToolManager::setWorldBridge(IWorldBridge* bridge)
 	// Propagate to every tool; RenderViewWidget calls this once after the
 	// viewport's bridge is constructed (a null bridge just detaches tools
 	// from the world — e.g. before any world is loaded).
+	bridge_ = bridge;
 	for(EditorTool* tool : tools_)
 		if(tool)
 			tool->setWorldBridge(bridge);

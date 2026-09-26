@@ -722,21 +722,42 @@ void MainWindow::createToolBars()
 	editorsToolBar_->addAction(actToolEffectsEditor_);
 	editorsToolBar_->addAction(actLibUnits_);
 
-	// toolsBar_ — the transform tool set (the tools tree's top level in
-	// SurMap5; the original's toolbar strip IDR_TOOLBAR_TOOLS).
-	toolsToolBar_ = addToolBar(tr("Tools"));
-	toolsToolBar_->setObjectName("toolsToolBar");
-	toolsToolBar_->addAction(actToolSelect_);
-	toolsToolBar_->addAction(actToolMove_);
-	toolsToolBar_->addAction(actToolRotate_);
-	toolsToolBar_->addAction(actToolScale_);
-	toolsToolBar_->addSeparator();
+	// The transform buttons + the brush-radius combo live in the Tools dock's
+	// own toolbar (CToolsTreeWindow had them above its tree), created in
+	// createDockPanels — not on a separate main-window bar. See the original's
+	// Tools window in the screenshot.
+}
+
+void MainWindow::createDockPanels()
+{
+	// toolsWindowBar_ — the tools tree + toolbar (CToolsTreeWindow). The
+	// transform buttons and the brush-radius combo sit in the dock's own
+	// toolbar, above the tree, exactly like the original's Tools window.
+	toolsDock_ = new QDockWidget(tr("Tools"), this);
+	toolsDock_->setObjectName("toolsDock");
+	toolsDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+
+	toolsTreePanel_ = new ToolsTreePanel(view_->tools(), toolsDock_);
+
+	auto* toolsContainer = new QWidget(toolsDock_);
+	auto* toolsLayout = new QVBoxLayout(toolsContainer);
+	toolsLayout->setContentsMargins(0, 0, 0, 0);
+	toolsLayout->setSpacing(0);
+
+	auto* toolsBar = new QToolBar(tr("Tools"), toolsContainer);
+	toolsBar->setObjectName("toolsDockBar");
+	toolsBar->setIconSize(QSize(18, 18));
+	toolsBar->addAction(actToolSelect_);
+	toolsBar->addAction(actToolMove_);
+	toolsBar->addAction(actToolRotate_);
+	toolsBar->addAction(actToolScale_);
+	toolsBar->addSeparator();
 
 	// ID_BRUSH_COMBO_PLACE — the brush-radius combo CToolsTreeWindow created on
 	// the tools toolbar (SurMap5/ToolsTreeWindow.cpp:87). The ArrSize_Brush
 	// list {1,3,5,7,10,15,20,30,50,75,100,150,200}; the data is the radius in
 	// world units, shown as-is (the original's SetItemData held the number).
-	brushRadiusCombo_ = new QComboBox(toolsToolBar_);
+	brushRadiusCombo_ = new QComboBox(toolsBar);
 	brushRadiusCombo_->setObjectName("brushRadiusCombo");
 	brushRadiusCombo_->setEditable(false);
 	static const long kArrSizeBrush[] = {1, 3, 5, 7, 10, 15, 20, 30, 50, 75, 100, 150, 200};
@@ -744,24 +765,20 @@ void MainWindow::createToolBars()
 		brushRadiusCombo_->addItem(QString::number(v), QVariant((qlonglong)v));
 	brushRadiusCombo_->setCurrentIndex(0);
 	brushRadius_ = 1;
-	toolsToolBar_->addWidget(brushRadiusCombo_);
+	toolsBar->addWidget(brushRadiusCombo_);
 	connect(brushRadiusCombo_, QOverload<int>::of(&QComboBox::currentIndexChanged),
 	        this, &MainWindow::brushRadiusChanged);
+
+	toolsTreePanel_->setParent(toolsContainer);
+	toolsLayout->addWidget(toolsBar);
+	toolsLayout->addWidget(toolsTreePanel_, 1);
+	toolsDock_->setWidget(toolsContainer);
+	addDockWidget(Qt::LeftDockWidgetArea, toolsDock_);
+
 	// Apply the initial value too, so the tool's brush matches the combo from
 	// the first stroke (the combo's currentIndexChanged only fires on change).
 	if(view_ && view_->tools())
 		view_->tools()->setBrushRadius((float)brushRadius_);
-}
-
-void MainWindow::createDockPanels()
-{
-	// toolsWindowBar_ — the tools tree + toolbar (CToolsTreeWindow).
-	toolsDock_ = new QDockWidget(tr("Tools"), this);
-	toolsDock_->setObjectName("toolsDock");
-	toolsDock_->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-	toolsTreePanel_ = new ToolsTreePanel(view_->tools(), toolsDock_);
-	toolsDock_->setWidget(toolsTreePanel_);
-	addDockWidget(Qt::LeftDockWidgetArea, toolsDock_);
 
 	// Selecting a tool in the tree switches the current tool (the toolbar's
 	// QActionGroup does the same; the tree and toolbar stay in sync).
@@ -997,6 +1014,8 @@ void MainWindow::onWorldChanged()
 	// SurMap5/ObjectsManagerTree.cpp / MiniMapWindow.cpp).
 	if(objectsTreePanel_)
 		objectsTreePanel_->rebuild();
+	if(toolsTreePanel_)
+		toolsTreePanel_->rebuildCatalog();
 	if(miniMapPanel_)
 		miniMapPanel_->reload();
 }

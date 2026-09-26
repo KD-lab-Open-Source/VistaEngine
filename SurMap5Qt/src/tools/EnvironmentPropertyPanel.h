@@ -25,7 +25,6 @@ private:
 	void reloadTypes();
 	void readParams();
 	void writeParams();
-	void applyModelHint();
 
 	QComboBox* model_ = nullptr;
 	QComboBox* type_ = nullptr;

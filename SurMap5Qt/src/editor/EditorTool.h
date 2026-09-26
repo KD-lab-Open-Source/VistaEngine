@@ -289,12 +289,27 @@ public:
 	// the unit tree from AttributeLibrary::instance().map()). Index-addressed:
 	// the Qt panel shows the names, the engine resolves the index.
 	virtual void unitAttributeNames(std::vector<std::string>& out) = 0;
+	// Whether AttributeLibrary element `index` is a placeable unit
+	// (SurToolPlayerFolder kept isBuilding()/isLegionary(), !internal). The
+	// Units catalog shows only these; the index stays the library index.
+	virtual bool unitAttributePlaceable(int index) = 0;
 
 	// Place a unit of the given AttributeLibrary index at (x, y) on the ground
 	// (SurToolUnit::onOperationOnMap -> Player::buildUnit + setPose). The unit
 	// lands at the terrain height; `select` selects it afterwards. Returns the
 	// new object id, or kNoObject when the index/world is invalid.
 	virtual EditorObjectId placeUnit(int libraryIndex, float x, float y, bool select) = 0;
+
+	// SurToolUnit's live preview: CSurToolUnit built a real auxiliary unit of
+	// the picked attribute (unitOnMouse_) and reposed it under the cursor
+	// (updateUnitOnMouse). angle/angleDelta are the tool's slider values in
+	// degrees. previewUnit creates/replaces it, movePreviewUnit reposes it,
+	// killPreviewUnit removes it (Kill()). Return false when invalid.
+	virtual bool previewUnit(int libraryIndex, float x, float y,
+	                         float angle, float angleDelta) = 0;
+	virtual bool movePreviewUnit(float x, float y,
+	                             float angle, float angleDelta) = 0;
+	virtual void killPreviewUnit() = 0;
 
 	// --- Source / Anchor placement (CSurToolSource / CSurToolAnchor) ---
 	//

@@ -24,38 +24,6 @@ QString modelLabel(const std::string& path)
 		label.chop(4);
 	return label;
 }
-
-// The picked model carries its environment type: the editor's models follow the
-// engine naming convention, so the tool sets the type combo (and Vertical) from
-// the model name — a tree model places as ENVIRONMENT_TREE upright, a rock as
-// ENVIRONMENT_ROCK, and so on. typeIndex is the convertIdx2EnvironmentType
-// index; -1 leaves the current type (no hint).
-struct ModelHint { int typeIndex; bool vertical; };
-ModelHint hintForModel(const QString& modelPath)
-{
-	const QString n = modelPath.toLower();
-	auto has = [&n](const char* s){ return n.contains(QLatin1String(s)); };
-	if(has("boulder") || has("rock"))
-		return {7, false};                       // ENVIRONMENT_ROCK
-	if(has("tree"))
-		return {3, true};                        // ENVIRONMENT_TREE
-	if(has("bush"))
-		return {2, false};                       // ENVIRONMENT_BUSH
-	if(has("fence"))
-		return {4, true};                        // ENVIRONMENT_FENCE
-	if(has("stone"))
-		return {6, false};                       // ENVIRONMENT_STONE
-	if(has("basement") || has("cellar"))
-		return {8, true};                        // ENVIRONMENT_BASEMENT
-	if(has("barn"))
-		return {9, true};                        // ENVIRONMENT_BARN
-	if(has("bridge"))
-		return {11, true};                       // ENVIRONMENT_BRIDGE
-	if(has("building") || has("house") || has("tower") || has("factory") ||
-	   has("castle") || has("barrack"))
-		return {10, true};                       // ENVIRONMENT_BUILDING
-	return {-1, false};
-}
 }
 
 EnvironmentPropertyPanel::EnvironmentPropertyPanel(QWidget* parent)
@@ -95,10 +63,14 @@ EnvironmentPropertyPanel::EnvironmentPropertyPanel(QWidget* parent)
 	layout->addRow(vertical_);
 
 	connect(model_, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]{
-		if(loading_)
+		if(loading_ || !tool_)
 			return;
-		applyModelHint();
-		writeParams();
+		// The tool sets the model and pulls its type/vertical from the name;
+		// re-read the widgets to show the inferred type.
+		tool_->setModel(model_->currentData().toString().toStdString());
+		loading_ = true;
+		readParams();
+		loading_ = false;
 	});
 	connect(type_, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]{ writeParams(); });
 	connect(angle_, QOverload<int>::of(&QSpinBox::valueChanged), this, [this]{ writeParams(); });
@@ -172,19 +144,6 @@ void EnvironmentPropertyPanel::readParams()
 		type_->setCurrentIndex(p.typeIndex);
 }
 
-void EnvironmentPropertyPanel::applyModelHint()
-{
-	const ModelHint hint = hintForModel(model_->currentData().toString());
-	if(hint.typeIndex < 0)
-		return;
-	type_->blockSignals(true);
-	type_->setCurrentIndex(hint.typeIndex);
-	type_->blockSignals(false);
-	vertical_->blockSignals(true);
-	vertical_->setChecked(hint.vertical);
-	vertical_->blockSignals(false);
-}
-
 void EnvironmentPropertyPanel::writeParams()
 {
 	if(loading_ || !tool_)
@@ -215,12 +174,12 @@ void EnvironmentPropertyPanel::setTool(EnvironmentTool* tool)
 	readParams();
 	loading_ = false;
 	// A fresh tool with no model gets the first list entry (the original picked
-	// model.3dx by default); push it so the first click has something to place.
-	// The picked model also sets the type/vertical (applyModelHint), unless the
-	// tool already carries a model+type from earlier.
+	// model.3dx by default); push it (which also sets its type/vertical) so the
+	// first click has something to place.
 	if(tool_ && tool_->params().model.empty() && !model_->currentData().toString().isEmpty()){
-		model_->setCurrentIndex(0);
-		applyModelHint();
-		writeParams();
+		tool_->setModel(model_->currentData().toString().toStdString());
+		loading_ = true;
+		readParams();
+		loading_ = false;
 	}
 }

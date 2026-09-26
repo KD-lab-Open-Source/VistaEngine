@@ -525,6 +525,20 @@ public:
 		}
 	}
 
+	bool unitAttributePlaceable(int index) override
+	{
+		// SurToolPlayerFolder's world-player folder: isBuilding() ||
+		// isLegionary(), !internal. Items/resources/effects are not placed as
+		// units.
+		const AttributeLibrary::Map& map = AttributeLibrary::instance().map();
+		if(index < 0 || index >= (int)map.size())
+			return false;
+		const AttributeBase* attr = map[index].get();
+		if(!attr || attr->internal)
+			return false;
+		return attr->isBuilding() || attr->isLegionary();
+	}
+
 	EditorObjectId placeUnit(int libraryIndex, float x, float y, bool select) override
 	{
 		// SurToolUnit::createUnit: Player::buildUnit(attribute) + setPose. The
@@ -563,6 +577,72 @@ public:
 		if(select)
 			unit->setSelected(true);
 		return (EditorObjectId)unit;
+	}
+
+	// CSurToolUnit's cursor preview (unitOnMouse_): a real auxiliary unit of
+	// the picked attribute, reposed under the cursor.
+	bool previewUnit(int libraryIndex, float x, float y,
+	                 float angle, float angleDelta) override
+	{
+		killPreviewUnit();
+		if(libraryIndex < 0)
+			return true;
+		if(!vMap.isWorldLoaded() || !universe())
+			return false;
+		Player* wp = universe()->worldPlayer();
+		if(!wp)
+			return false;
+		const AttributeLibrary::Map& map = AttributeLibrary::instance().map();
+		if(libraryIndex >= (int)map.size())
+			return false;
+		const AttributeBase* attr = map[libraryIndex].get();
+		if(!attr)
+			return false;
+		UnitBase* unit = wp->buildUnit(AttributeReference(attr));
+		if(!unit)
+			return false;
+		unit->setAuxiliary(true);
+		previewUnit_ = unit;
+		previewUnitLibrary_ = libraryIndex;
+		unitSeed_ = rand();
+		// A legionary needs its squad (UnitLegionary::Quant kills a living
+		// legionary whose squad() is null), exactly like placeUnit.
+		if(unit->attr().isLegionary()){
+			UnitLegionary* legionary = safe_cast<UnitLegionary*>(unit);
+			UnitSquad* squad = safe_cast<UnitSquad*>(wp->buildUnit(&*legionary->attr().squad));
+			if(squad){
+				squad->setAuxiliary(true);
+				squad->setPose(Se3f(QuatF::ID, Vect3f(x, y, 0)), true);
+				squad->addUnit(legionary);
+			}
+		}
+		return movePreviewUnit(x, y, angle, angleDelta);
+	}
+
+	bool movePreviewUnit(float x, float y, float angle, float angleDelta) override
+	{
+		if(!previewUnit_)
+			return false;
+		const int xi = (int)roundf(x), yi = (int)roundf(y);
+		float z = 0.f;
+		if(xi >= 0 && yi >= 0 && xi < (int)vMap.H_SIZE && yi < (int)vMap.V_SIZE)
+			z = vMap.getZf(xi, yi);
+		unitRandom_.set(unitSeed_);
+		const float a = angle + unitRandom_.frnd(angleDelta);
+		const Se3f pose(QuatF(a * (M_PI / 180.0f), Vect3f::K), Vect3f(x, y, z));
+		previewUnit_->setPose(pose, false);
+		if(previewUnit_->rigidBody())
+			previewUnit_->rigidBody()->setPose(pose);
+		return true;
+	}
+
+	void killPreviewUnit() override
+	{
+		if(previewUnit_){
+			previewUnit_->Kill();
+			previewUnit_ = nullptr;
+		}
+		previewUnitLibrary_ = -1;
 	}
 
 	// --- Source / Anchor placement (CSurToolSource / CSurToolAnchor) ---
@@ -767,12 +847,15 @@ public:
 
 	void environmentModelNames(std::vector<std::string>& out) override
 	{
-		// The mesh cache holds every loadable .3dx (the shipped content is
-		// cache-only). Rebuild the reference path from the cache file name:
-		// cLib3dx keyed the cache by cutPathToResource(name) with '\' -> '_',
-		// so the leading directory prefixes map back to real separators and
-		// the rest is the file name.
-		out.clear();		for(DirIterator it("cacheData\\Models\\*.3dxG"); it; ++it){
+		// CSurToolEnvironment browsed Resource\TerrainData\Models (plus the
+		// TerTools craters). The mesh cache also holds unit models
+		// (Resource\Models\*) and UI/sky models — those are not environment
+		// objects and must not appear in this list (they were being placed as
+		// environment with the wrong size). Rebuild the reference path from the
+		// cache file name: cLib3dx keyed the cache by cutPathToResource(name)
+		// with '\' -> '_', so the directory prefixes map back to separators.
+		out.clear();
+		for(DirIterator it("cacheData\\Models\\*.3dxG"); it; ++it){
 			if(!it.isFile())
 				continue;
 			std::string name = it.c_str();
@@ -786,12 +869,8 @@ public:
 				ref = "Resource\\TerrainData\\Models\\" + name.substr(28);
 			else if(name.rfind("resource_terraindata_tertools_", 0) == 0)
 				ref = "Resource\\TerrainData\\TerTools\\" + name.substr(30);
-			else if(name.rfind("resource_models_", 0) == 0)
-				ref = "Resource\\Models\\" + name.substr(16);
-			else if(name.rfind("resource_", 0) == 0)
-				ref = "Resource\\" + name.substr(9);
 			else
-				ref = name;
+				continue;   // unit / UI / sky models — not environment objects
 			out.push_back(ref);
 		}
 		std::sort(out.begin(), out.end());
@@ -1732,6 +1811,11 @@ private:
 	// calls kill/remove them, and the editor clears them on tool change.
 	SourceBase* previewSource_ = nullptr;
 	Anchor* previewAnchor_ = nullptr;
+	// CSurToolUnit's cursor preview unit (unitOnMouse_) and its RNG/seed.
+	UnitBase* previewUnit_ = nullptr;
+	int previewUnitLibrary_ = -1;
+	RandomGenerator unitRandom_;
+	int unitSeed_ = 1;
 	// CSurToolAnchor's editable Anchor instance (anchor_): the property tree
 	// edits this, and placeAnchor stamps a fresh copy of it. doNotRegister=true
 	// so it stays out of sourceManager until a preview/place is asked for.
@@ -2111,6 +2195,13 @@ void EngineViewport::doneWorld()
 	if(!worldLoaded_){
 		fprintf(stderr, "EngineViewport: [doneWorld] nothing to do\n"); fflush(stderr);
 		return;
+	}
+
+	// The tools' cursor previews (a scene model / an auxiliary unit) reference
+	// the world being torn down; drop them before the scene and universe go.
+	if(bridge_){
+		bridge_->killEnvironmentPreview();
+		bridge_->killPreviewUnit();
 	}
 
 	// Universe dtor releases the tile map (RELEASE(tileMap)) and clears
