@@ -1129,6 +1129,27 @@ public:
 		return owner_->startUiPreview(screen);
 	}
 
+	bool attachPreviewWindow(void* nativeHandle) override
+	{
+		return owner_ ? owner_->attachPreviewWindow(nativeHandle) : false;
+	}
+
+	void detachPreviewWindow() override
+	{
+		if(owner_)
+			owner_->detachPreviewWindow();
+	}
+
+	bool uiPreviewRender(int width, int height) override
+	{
+		return owner_ ? owner_->uiPreviewRender(width, height) : false;
+	}
+
+	bool effectPreviewRender(int width, int height) override
+	{
+		return owner_ ? owner_->effectPreviewRender(width, height) : false;
+	}
+
 	void setObjectRadius(EditorObjectId id, float radius) override
 	{
 		BaseUniverseObject* obj = reinterpret_cast<BaseUniverseObject*>(id);
@@ -2905,7 +2926,7 @@ void EngineViewport::done()
 	// same scene + camera. (SurMap5/GeneralView.cpp called createScene
 	// once and reInitWorld on every world load.) Drop the references;
 	// the teardown order matches SurMap5/VistaEngineContext.cpp.
-	stopEffectPreview();
+	detachPreviewWindow();   // release the preview render window + private scene
 	delete bridge_;
 	bridge_ = nullptr;
 	effectPreview_ = nullptr;   // the scene owns it; tear-down drops it with scene_
@@ -3211,24 +3232,109 @@ bool EngineViewport::ensureUiLibraries()
 	return true;
 }
 
+bool EngineViewport::attachPreviewWindow(void* nativeHandle)
+{
+	if(!gb_RenderDevice || !nativeHandle)
+		return false;
+	// A single shared preview render window (the two editors are rarely open
+	// at once; the last attached widget owns it).
+	if(previewWindow_)
+		return true;
+	previewWindow_ = gb_RenderDevice->createRenderWindow((HWND)nativeHandle);
+	return previewWindow_ != nullptr;
+}
+
+void EngineViewport::detachPreviewWindow()
+{
+	stopEffectPreview();
+	stopUiPreview();
+	if(previewWindow_){
+		gb_RenderDevice->DeleteRenderWindow(previewWindow_);
+		previewWindow_ = nullptr;
+	}
+	if(previewScene_){
+		RELEASE(previewScene_);
+		previewScene_ = nullptr;
+		previewCamera_ = nullptr;
+	}
+}
+
+bool EngineViewport::uiPreviewRender(int width, int height)
+{
+	if(!previewWindow_ || !gb_RenderDevice || width <= 0 || height <= 0)
+		return false;
+	try{
+		gb_RenderDevice->selectRenderWindow(previewWindow_);
+		gb_RenderDevice->Fill(0, 0, 0, 255);
+		gb_RenderDevice->BeginScene();
+		UI_Render::instance().setWindowPosition(Recti(0, 0, width, height));
+		UI_Render::instance().updateRenderSize();
+		if(uiPreviewScreen_)
+			uiPreviewScreen_->redraw();
+		gb_RenderDevice->EndScene();
+		gb_RenderDevice->Flush();
+	}
+	catch(...){
+		gb_RenderDevice->selectRenderWindow(0);
+		return false;
+	}
+	gb_RenderDevice->selectRenderWindow(0);
+	return true;
+}
+
+bool EngineViewport::effectPreviewRender(int width, int height)
+{
+	if(!previewWindow_ || !gb_RenderDevice || !previewScene_ || !previewCamera_)
+		return false;
+	(void)width; (void)height;
+	try{
+		gb_RenderDevice->selectRenderWindow(previewWindow_);
+		gb_RenderDevice->Fill(24, 32, 40, 255);
+		gb_RenderDevice->BeginScene();
+		previewScene_->SetDeltaTime(16.f);
+		const Vect2f center(0.5f, 0.5f);
+		const sRectangle4f clip(-0.5f, -0.5f, 0.5f, 0.5f);
+		const Vect2f focus(0.5f, 0.5f);
+		const Vect2f zPlane(10.f, 100000.f);
+		previewCamera_->SetFrustum(&center, &clip, &focus, &zPlane);
+		previewScene_->Draw(previewCamera_);
+		gb_RenderDevice->EndScene();
+		gb_RenderDevice->Flush();
+	}
+	catch(...){
+		gb_RenderDevice->selectRenderWindow(0);
+		return false;
+	}
+	gb_RenderDevice->selectRenderWindow(0);
+	return true;
+}
+
 bool EngineViewport::startEffectPreview(EffectKey* effectKey)
 {
 	stopEffectPreview();
-	if(!effectKey || !scene_ || !gb_RenderDevice)
+	if(!effectKey || !gb_RenderDevice || !gb_VisGeneric)
 		return false;
-	// EffectDocument::createEffect: a detached effect attached to the scene,
-	// positioned at the map centre (origin when no world is loaded) and with
-	// every emitter visible.
-	cEffect* effect = scene_->CreateEffectDetached(*effectKey, 0, false);
+	// A private scene for the preview (EffectDocument made its own), so the
+	// level scene is never involved.
+	if(!previewScene_){
+		previewScene_ = gb_VisGeneric->CreateScene();
+		if(!previewScene_)
+			return false;
+		previewCamera_ = previewScene_->CreateCamera();
+		if(!previewCamera_)
+			return false;
+		previewCamera_->setAttribute(ATTRCAMERA_PERSPECTIVE);
+	}
+	cEffect* effect = previewScene_->CreateEffectDetached(*effectKey, 0, false);
 	if(!effect)
 		return false;
 	effect->Attach();
-	// Place it at the camera's orbit centre so the main 3D view is looking at
-	// it (the map centre is off-screen whenever the user has panned).
-	const float x = orbit_.px;
-	const float y = orbit_.py;
-	const float z = orbit_.pz + 50.f;
-	effect->SetPosition(MatXf(Se3f(QuatF::ID, Vect3f(x, y, z))));
+	// A fixed three-quarter view of the effect at the origin.
+	MatXf matrix = MatXf::ID;
+	matrix.rot() = Mat3f(0.4f, X_AXIS);
+	matrix *= MatXf(Mat3f::ID, -Vect3f(0.f, -800.f, 400.f));
+	setCameraPosition(previewCamera_, matrix);
+	effect->SetPosition(MatXf(Se3f(QuatF::ID, Vect3f(0.f, 0.f, 0.f))));
 	for(size_t i = 0; i < effectKey->emitterKeys.size(); ++i){
 		if(EmitterKeyInterface* emitter = effectKey->emitterKeys[i].get())
 			effect->ShowEmitter(emitter, true);
@@ -3278,11 +3384,7 @@ bool EngineViewport::startUiPreview(UI_Screen* screen)
 			screen->preLoad();
 		}
 		uiPreviewScreen_ = screen;
-		const int w = gb_RenderDevice->GetSizeX();
-		const int h = gb_RenderDevice->GetSizeY();
-		UI_Render::instance().setWindowPosition(Recti(0, 0, w, h));
-		UI_Render::instance().updateRenderSize();
-		uiPreview_ = true;
+		uiPreview_ = screen != nullptr;
 	}
 	catch(const std::exception& e){
 		fprintf(stderr, "EngineViewport: [startUiPreview] threw: %s\n", e.what());
@@ -3819,23 +3921,9 @@ void EngineViewport::drawFrame()
 	// editorVisual().afterQuant() после aux-слоёв.
 	editorVisual().afterQuant();
 
-	// UI Editor preview: draw the selected UI screen over the 3D frame (the
-	// same engine render device the original UIEditor used). Drawn directly
-	// through the screen's redraw (UI_Dispatcher::selectScreen would run the
-	// screen's logic activation, which the editor cannot). The overlay goes on
-	// top of the aux layers and below the tool rubber band.
-	if(uiPreview_ && uiPreviewScreen_){
-		try{
-			const int w = gb_RenderDevice->GetSizeX();
-			const int h = gb_RenderDevice->GetSizeY();
-			UI_Render::instance().setWindowPosition(Recti(0, 0, w, h));
-			UI_Render::instance().updateRenderSize();
-			uiPreviewScreen_->redraw();
-		}
-		catch(...){
-			uiPreview_ = false;
-		}
-	}
+	// The UI/Effects editor previews render into their own render windows
+	// (EngineViewport::uiPreviewRender/effectPreviewRender), never into this
+	// level frame.
 
 	// The Select tool's rubber band (CSurToolSelect::onDrawAuxData drew it via
 	// DrawRectangle after the 3D scene). DrawRectangle goes through the UI

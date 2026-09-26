@@ -1,9 +1,9 @@
 // UiEditorWindow.h — the Qt UI Editor (port of the MFC UIEditor app).
 //
-// First slice: the screen/control/state tree (IWorldBridge::uiTree) on the
-// left and the selected node's serialized properties (PropertyTree) on the
-// right, with Save writing the UI document back to disk (uiSave). The live
-// render preview is a later milestone.
+// Layout: screen/control/state tree + the selected node's serialized
+// properties on the left, and an embedded PreviewView on the right that the
+// engine renders the selected screen into (its own render window, never the
+// level's 3D view). Save writes the UI document back to disk.
 //
 // Qt-clean: talks to the engine only through IWorldBridge.
 
@@ -11,11 +11,9 @@
 
 #include <QMainWindow>
 
-#include <vector>
-
 class IWorldBridge;
+class PreviewView;
 class PropertyTree;
-class QCheckBox;
 class QTreeWidget;
 class QTreeWidgetItem;
 
@@ -37,7 +35,6 @@ private slots:
 	void onAddControl();
 	void onAddState();
 	void onDelete();
-	void onPreviewToggled(bool on);
 
 private:
 	int currentNodeId() const;
@@ -45,6 +42,6 @@ private:
 	IWorldBridge* bridge_ = nullptr;
 	QTreeWidget* tree_ = nullptr;
 	PropertyTree* properties_ = nullptr;
-	QCheckBox* previewCheck_ = nullptr;
+	PreviewView* preview_ = nullptr;
 	bool loading_ = false;
 };

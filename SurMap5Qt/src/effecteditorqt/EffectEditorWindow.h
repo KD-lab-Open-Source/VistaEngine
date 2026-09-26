@@ -14,6 +14,7 @@
 #include <vector>
 
 class IWorldBridge;
+class PreviewView;
 class PropertyTree;
 class QCheckBox;
 class QDoubleSpinBox;
@@ -47,6 +48,7 @@ private:
 	QTreeWidget* tree_ = nullptr;
 	PropertyTree* properties_ = nullptr;
 	QTableWidget* curveKeys_ = nullptr;
+	PreviewView* preview_ = nullptr;
 	QCheckBox* previewCheck_ = nullptr;
 	QDoubleSpinBox* previewTime_ = nullptr;
 	int curveNodeId_ = -1;

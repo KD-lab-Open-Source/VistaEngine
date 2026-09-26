@@ -4,6 +4,7 @@
 
 #include "editor/EditorTool.h"    // IWorldBridge
 #include "panels/PropertyTree.h"
+#include "widgets/PreviewView.h"
 
 #include <QAction>
 #include <QCheckBox>
@@ -46,6 +47,14 @@ EffectEditorWindow::EffectEditorWindow(IWorldBridge* bridge, QWidget* parent)
 	rightLayout->addWidget(new QLabel(tr("Curve keys"), right));
 	rightLayout->addWidget(curveKeys_, 1);
 
+	preview_ = new PreviewView(right);
+	preview_->setPreviewFunctions(
+		[this](void* handle){ return bridge_ && bridge_->attachPreviewWindow(handle); },
+		[this](int w, int h){ return bridge_ && bridge_->effectPreviewRender(w, h); },
+		[this]{ if(bridge_) bridge_->detachPreviewWindow(); });
+	rightLayout->addWidget(new QLabel(tr("Preview"), right));
+	rightLayout->addWidget(preview_, 3);
+
 	auto* splitter = new QSplitter(Qt::Horizontal, this);
 	splitter->addWidget(tree_);
 	splitter->addWidget(right);
@@ -83,6 +92,7 @@ EffectEditorWindow::~EffectEditorWindow()
 {
 	if(bridge_){
 		bridge_->effectPreview(false);
+		bridge_->detachPreviewWindow();
 		bridge_->effectClose();
 	}
 }

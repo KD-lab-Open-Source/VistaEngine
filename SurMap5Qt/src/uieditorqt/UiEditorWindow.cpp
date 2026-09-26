@@ -4,12 +4,10 @@
 
 #include "editor/EditorTool.h"    // IWorldBridge
 #include "panels/PropertyTree.h"
+#include "widgets/PreviewView.h"
 
 #include <QAction>
-#include <QCheckBox>
-#include <QHBoxLayout>
 #include <QInputDialog>
-#include <QLabel>
 #include <QSplitter>
 #include <QStatusBar>
 #include <QToolBar>
@@ -22,7 +20,7 @@ UiEditorWindow::UiEditorWindow(IWorldBridge* bridge, QWidget* parent)
 	: QMainWindow(parent), bridge_(bridge)
 {
 	setWindowTitle(tr("UI Editor"));
-	resize(1000, 700);
+	resize(1200, 760);
 
 	tree_ = new QTreeWidget(this);
 	tree_->setHeaderLabels({ tr("Name"), tr("Type") });
@@ -30,31 +28,33 @@ UiEditorWindow::UiEditorWindow(IWorldBridge* bridge, QWidget* parent)
 
 	properties_ = new PropertyTree(this);
 
-	auto* right = new QWidget(this);
-	auto* rightLayout = new QVBoxLayout(right);
-	rightLayout->setContentsMargins(0, 0, 0, 0);
-	rightLayout->addWidget(new QLabel(tr("Properties"), right));
-	rightLayout->addWidget(properties_, 1);
+	auto* left = new QSplitter(Qt::Vertical, this);
+	left->addWidget(tree_);
+	left->addWidget(properties_);
+	left->setStretchFactor(0, 2);
+	left->setStretchFactor(1, 1);
+
+	preview_ = new PreviewView(this);
+	preview_->setPreviewFunctions(
+		[this](void* handle){ return bridge_ && bridge_->attachPreviewWindow(handle); },
+		[this](int w, int h){ return bridge_ && bridge_->uiPreviewRender(w, h); },
+		[this]{ if(bridge_) bridge_->detachPreviewWindow(); });
 
 	auto* splitter = new QSplitter(Qt::Horizontal, this);
-	splitter->addWidget(tree_);
-	splitter->addWidget(right);
+	splitter->addWidget(left);
+	splitter->addWidget(preview_);
 	splitter->setStretchFactor(0, 1);
 	splitter->setStretchFactor(1, 2);
 	setCentralWidget(splitter);
 
 	auto* toolbar = addToolBar(tr("UI Editor"));
-	auto* saveAction = toolbar->addAction(tr("&Save"));
-	connect(saveAction, &QAction::triggered, this, &UiEditorWindow::onSave);
+	connect(toolbar->addAction(tr("&Save")), &QAction::triggered, this, &UiEditorWindow::onSave);
 	toolbar->addSeparator();
 	connect(toolbar->addAction(tr("Add &Control...")), &QAction::triggered, this, &UiEditorWindow::onAddControl);
 	connect(toolbar->addAction(tr("Add &State")), &QAction::triggered, this, &UiEditorWindow::onAddState);
 	connect(toolbar->addAction(tr("&Delete")), &QAction::triggered, this, &UiEditorWindow::onDelete);
 	toolbar->addSeparator();
 	connect(toolbar->addAction(tr("&Refresh")), &QAction::triggered, this, &UiEditorWindow::refresh);
-	previewCheck_ = new QCheckBox(tr("Preview in 3D view"), toolbar);
-	toolbar->addWidget(previewCheck_);
-	connect(previewCheck_, &QCheckBox::toggled, this, &UiEditorWindow::onPreviewToggled);
 
 	connect(tree_, &QTreeWidget::itemSelectionChanged, this, &UiEditorWindow::onTreeSelectionChanged);
 	connect(properties_, &QTreeWidget::itemChanged, this, &UiEditorWindow::onPropertyEdited);
@@ -64,16 +64,18 @@ UiEditorWindow::UiEditorWindow(IWorldBridge* bridge, QWidget* parent)
 
 UiEditorWindow::~UiEditorWindow()
 {
-	if(bridge_)
+	if(bridge_){
 		bridge_->uiPreview(-1, false);
+		bridge_->detachPreviewWindow();
+	}
 }
 
 void UiEditorWindow::refresh()
 {
-	// Rebuilding invalidates the bridge's node/screen pointers; stop the
-	// preview first (the user re-enables it after selecting a node).
-	if(previewCheck_ && previewCheck_->isChecked())
-		previewCheck_->setChecked(false);
+	// Rebuilding invalidates the bridge's node/screen pointers; clear the
+	// previewed screen until a node is selected again.
+	if(bridge_)
+		bridge_->uiPreview(-1, false);
 
 	loading_ = true;
 	tree_->clear();
@@ -117,8 +119,10 @@ void UiEditorWindow::onTreeSelectionChanged()
 	loading_ = true;
 	properties_->setRoot(bridge_->uiNodeTree(nodeId, true));
 	loading_ = false;
-	if(previewCheck_->isChecked())
-		bridge_->uiPreview(nodeId, true);
+	// Preview the screen owning this node (the embedded PreviewView renders it).
+	bridge_->uiPreview(nodeId, true);
+	if(preview_)
+		preview_->update();
 }
 
 void UiEditorWindow::onPropertyEdited()
@@ -197,21 +201,4 @@ void UiEditorWindow::onDelete()
 		refresh();
 	else
 		statusBar()->showMessage(tr("Could not delete the node"));
-}
-
-void UiEditorWindow::onPreviewToggled(bool on)
-{
-	if(!bridge_)
-		return;
-	if(on){
-		const int nodeId = currentNodeId();
-		if(nodeId < 0 || !bridge_->uiPreview(nodeId, true)){
-			statusBar()->showMessage(tr("Select a screen (or one of its controls) first"), 3000);
-			previewCheck_->setChecked(false);
-			return;
-		}
-		statusBar()->showMessage(tr("UI preview shown in the main 3D view"), 3000);
-	}
-	else
-		bridge_->uiPreview(-1, false);
 }

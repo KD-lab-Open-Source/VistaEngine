@@ -87,18 +87,26 @@ public:
 	// fails. Idempotent.
 	bool ensureUiLibraries();
 
-	// --- Effects Editor preview (EffectEditor port) ---
-	// Attach the loaded EffectKey to the editor scene as a detached cEffect
-	// (EffectDocument::createEffect) so the main 3D viewport shows it, and
-	// destroy it again. setEffectPreviewTime scrubs (cEffect::MoveToTime).
+	// --- Embedded preview windows (UI / Effects editors) ---
+	// Each editor embeds a native PreviewView; it hands the widget's handle to
+	// attachPreviewWindow(), which creates a render window of its own (and, for
+	// effects, a private scene), so the preview never draws the level. The
+	// widget then calls uiPreviewRender / effectPreviewRender each paint; the
+	// engine selects the preview render window, draws, and restores the main
+	// one. detachPreviewWindow() releases it.
+	bool attachPreviewWindow(void* nativeHandle);
+	void detachPreviewWindow();
+	bool uiPreviewRender(int width, int height);
+	bool effectPreviewRender(int width, int height);
+
+	// Effects preview: build the detached cEffect on the private preview scene
+	// (EffectDocument::createEffect) and scrub it. setEffectPreviewTime calls
+	// cEffect::MoveToTime.
 	bool startEffectPreview(EffectKey* effectKey);
 	void stopEffectPreview();
 	bool setEffectPreviewTime(float time);
 
-	// --- UI Editor preview (UIEditor port) ---
-	// Overlay UI_Dispatcher's screen on the editor's 3D view (the original
-	// rendered the UI with the same engine device). No-op until a screen is
-	// selected. stopUiPreview turns the overlay off.
+	// UI preview: preLoad the screen the embedded preview renders.
 	bool startUiPreview(UI_Screen* screen);
 	void stopUiPreview();
 
@@ -416,6 +424,11 @@ private:
 	// its scrub time.
 	cEffect*             effectPreview_ = nullptr;
 	float                effectPreviewTime_ = 0.f;
+	// Embedded preview render window (its own swapchain) + the private scene
+	// and camera the effects preview draws (never the level scene).
+	cRenderWindow*       previewWindow_ = nullptr;
+	cScene*              previewScene_ = nullptr;
+	Camera*              previewCamera_ = nullptr;
 	// UI Editor preview overlay.
 	bool                 uiPreview_ = false;
 	UI_Screen*           uiPreviewScreen_ = nullptr;

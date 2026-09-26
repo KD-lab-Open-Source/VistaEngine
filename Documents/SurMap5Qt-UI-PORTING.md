@@ -62,7 +62,7 @@ Where a stub can be promoted now that the editor builds a real Universe
 | Triggers | OnEditTriggers | OK | SelectTriggerDialog + full TriggerEditorDialog (graph, class tree, conditions, debugger, minimap) |
 | Units | OnEditUnits | OK | Qt library editor, `openLibrary("AttributeLibrary")` |
 | Objects | OnEditObjects | N/A | original body commented out |
-| User Interface | OnEditUserInterface | PARTIAL | in-process `UiEditorWindow` (`src/uieditorqt/`): screen/control/state tree + property editor + save, add control/state & delete, **preview overlay** of the selected screen on the main 3D view; **canvas drag/resize, offscreen preview, undo not yet ported** |
+| User Interface | OnEditUserInterface | PARTIAL | in-process `UiEditorWindow` (`src/uieditorqt/`): screen/control/state tree + property editor + save, add control/state & delete, **embedded PreviewView** (own engine render window) of the selected screen; **canvas drag/resize, undo not yet ported** |
 | Effects | OnEditEffects | OK | `openLibrary("EffectContainerLibrary")` |
 | Sounds | OnEditSounds | OK | `openLibrary("SoundLibrary")` |
 | TerTools | OnEditTertools | OK | `openLibrary("TerToolsLibrary")` |
@@ -73,7 +73,7 @@ Where a stub can be promoted now that the editor builds a real Universe
 | Command Color | OnEditCommandColor | PARTIAL | `openLibrary("CommandColorManager")` reads real colors; `setCommandColor` is a no-op |
 | UITextSprites | OnEditUITextSprites | OK | `openLibrary("UI_SpriteLibrary")` |
 | Terrain Type Name | OnLibrariesTerrraintypename | PARTIAL | TerrainTypeDialog reads; `setTerrainTypeNames` write is a no-op |
-| Effects Editor (tool) | OnEditEffectsEditor | PARTIAL | in-process `EffectEditorWindow` (`src/effecteditorqt/`): opens a `.effect`, effect→emitter→curve tree + property editor, curve key table (time/value), save/save-as, **3D preview** (detached cEffect on the editor scene + time scrub); **graphical curve editor + history not yet ported** |
+| Effects Editor (tool) | OnEditEffectsEditor | PARTIAL | in-process `EffectEditorWindow` (`src/effecteditorqt/`): opens a `.effect`, effect→emitter→curve tree + property editor, curve key table (time/value), save/save-as, **embedded PreviewView** (own render window + private scene) with a detached `cEffect` + time scrub; **graphical curve editor + history not yet ported** |
 
 ### View
 | Command | Original handler | Port | Notes |

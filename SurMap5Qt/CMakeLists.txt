@@ -297,6 +297,9 @@ add_executable(SurMap5Qt
     # tree + property editor over a loaded .effect (IWorldBridge effect*).
     src/effecteditorqt/EffectEditorWindow.h
     src/effecteditorqt/EffectEditorWindow.cpp
+    # The shared embedded preview widget (engine render window of its own).
+    src/widgets/PreviewView.h
+    src/widgets/PreviewView.cpp
     # TriggerEditor (TriggerEditor port) — the modal trigger-chain editor:
     # graph canvas + type palette + minimap + condition panel + debugger.
     src/panels/TriggerGraphView.h

@@ -340,9 +340,18 @@ public:
 	// Remove a node: a screen (UI_Dispatcher::removeScreen), a state
 	// (states().erase) or a control (owner container's removeControl).
 	virtual bool uiDeleteNode(int nodeId) = 0;
-	// UI preview overlay: show (or stop showing) the screen owning
-	// `screenNodeId` on the editor's main 3D view.
+	// UI preview: select the screen the embedded preview renders (on=false
+	// clears it). The screen is preLoaded, never logic-activated.
 	virtual bool uiPreview(int screenNodeId, bool on) = 0;
+
+	// --- Embedded preview render windows (both editors) ---
+	// The editor windows embed a native PreviewView; it attaches the widget's
+	// handle (the engine creates a render window of its own) and renders into
+	// it each paint. Never touches the level render path.
+	virtual bool attachPreviewWindow(void* nativeHandle) = 0;
+	virtual void detachPreviewWindow() = 0;
+	virtual bool uiPreviewRender(int width, int height) = 0;
+	virtual bool effectPreviewRender(int width, int height) = 0;
 
 	// Terrain height + a ray-cast of a widget pixel to the ground (the
 	// tools' screenPointToGround / projectScreenPointOnPlane ports).
