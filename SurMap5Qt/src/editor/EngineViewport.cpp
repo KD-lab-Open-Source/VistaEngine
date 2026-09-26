@@ -858,9 +858,11 @@ public:
 				std::string texturesPath = extractFilePath(fileName.c_str());
 				texturesPath += "\\Textures";
 				key->changeTexturePath(texturesPath.c_str());
-				// EffectDocument::add preloaded the frame textures so the
-				// preview has them; guard because it touches the device.
+				// Emitter runtime keys/curve data (NodeEmitter::buildKey ran
+				// BuildKey + BuildRuntimeData); the preview needs them before
+				// CreateEffectDetached.
 				try{
+					key->BuildRuntimeData();
 					key->preloadTexture();
 				}
 				catch(...){
@@ -2926,10 +2928,11 @@ void EngineViewport::done()
 	// same scene + camera. (SurMap5/GeneralView.cpp called createScene
 	// once and reInitWorld on every world load.) Drop the references;
 	// the teardown order matches SurMap5/VistaEngineContext.cpp.
-	detachPreviewWindow();   // release the preview render window + private scene
+	detachPreviewWindow();   // release the preview render window
 	delete bridge_;
 	bridge_ = nullptr;
 	effectPreview_ = nullptr;   // the scene owns it; tear-down drops it with scene_
+	previewCamera_ = nullptr;   // belongs to scene_, released below
 	scene_ = nullptr;
 	camera_ = nullptr;
 	renderWindow_ = nullptr;
@@ -3252,11 +3255,6 @@ void EngineViewport::detachPreviewWindow()
 		gb_RenderDevice->DeleteRenderWindow(previewWindow_);
 		previewWindow_ = nullptr;
 	}
-	if(previewScene_){
-		RELEASE(previewScene_);
-		previewScene_ = nullptr;
-		previewCamera_ = nullptr;
-	}
 }
 
 bool EngineViewport::uiPreviewRender(int width, int height)
@@ -3284,20 +3282,22 @@ bool EngineViewport::uiPreviewRender(int width, int height)
 
 bool EngineViewport::effectPreviewRender(int width, int height)
 {
-	if(!previewWindow_ || !gb_RenderDevice || !previewScene_ || !previewCamera_)
+	if(!previewWindow_ || !gb_RenderDevice || !previewCamera_ || !effectPreview_)
 		return false;
 	(void)width; (void)height;
 	try{
 		gb_RenderDevice->selectRenderWindow(previewWindow_);
 		gb_RenderDevice->Fill(24, 32, 40, 255);
 		gb_RenderDevice->BeginScene();
-		previewScene_->SetDeltaTime(16.f);
 		const Vect2f center(0.5f, 0.5f);
 		const sRectangle4f clip(-0.5f, -0.5f, 0.5f, 0.5f);
 		const Vect2f focus(0.5f, 0.5f);
 		const Vect2f zPlane(10.f, 100000.f);
 		previewCamera_->SetFrustum(&center, &clip, &focus, &zPlane);
-		previewScene_->Draw(previewCamera_);
+		// The effect is detached (not in the level's draw list); render it
+		// directly into the preview window.
+		effectPreview_->PreDraw(previewCamera_);
+		effectPreview_->Draw(previewCamera_);
 		gb_RenderDevice->EndScene();
 		gb_RenderDevice->Flush();
 	}
@@ -3312,27 +3312,31 @@ bool EngineViewport::effectPreviewRender(int width, int height)
 bool EngineViewport::startEffectPreview(EffectKey* effectKey)
 {
 	stopEffectPreview();
-	if(!effectKey || !gb_RenderDevice || !gb_VisGeneric)
+	if(!effectKey || !gb_RenderDevice || !scene_)
 		return false;
-	// A private scene for the preview (EffectDocument made its own), so the
-	// level scene is never involved.
-	if(!previewScene_){
-		previewScene_ = gb_VisGeneric->CreateScene();
-		if(!previewScene_)
-			return false;
-		previewCamera_ = previewScene_->CreateCamera();
+	// The preview camera lives on the level's scene (only for its tilemap /
+	// render state); it is never the level's camera.
+	if(!previewCamera_){
+		previewCamera_ = scene_->CreateCamera();
 		if(!previewCamera_)
 			return false;
 		previewCamera_->setAttribute(ATTRCAMERA_PERSPECTIVE);
 	}
-	cEffect* effect = previewScene_->CreateEffectDetached(*effectKey, 0, false);
+	cEffect* effect = scene_->CreateEffectDetached(*effectKey, 0, false);
 	if(!effect)
 		return false;
-	effect->Attach();
-	// A fixed three-quarter view of the effect at the origin.
+	// Deliberately NOT Attach()ed: the level's cScene::Draw must not draw the
+	// preview effect (it would appear in the 3D view too). We render it
+	// ourselves into the preview window.
+	const float distance = 800.f;
+	const float theta = 0.5f;
+	const float psi = 0.f;
+	const Vect3f position(distance * sinf(theta) * cosf(psi),
+	                      distance * sinf(theta) * sinf(psi),
+	                      distance * cosf(theta));
 	MatXf matrix = MatXf::ID;
-	matrix.rot() = Mat3f(0.4f, X_AXIS);
-	matrix *= MatXf(Mat3f::ID, -Vect3f(0.f, -800.f, 400.f));
+	matrix.rot() = Mat3f(theta, X_AXIS) * Mat3f(psi, Y_AXIS) * Mat3f(M_PI_2 - psi, Z_AXIS);
+	matrix *= MatXf(Mat3f::ID, -position);
 	setCameraPosition(previewCamera_, matrix);
 	effect->SetPosition(MatXf(Se3f(QuatF::ID, Vect3f(0.f, 0.f, 0.f))));
 	for(size_t i = 0; i < effectKey->emitterKeys.size(); ++i){
@@ -3374,6 +3378,12 @@ bool EngineViewport::startUiPreview(UI_Screen* screen)
 			// (UI_LogicDispatcher::init + UI_BackgroundScene::init).
 			UI_Render::instance().init();
 			UI_Dispatcher::instance().init();
+			// UI_LogicDispatcher::init (the game build linked into the
+			// editor) set the waiting cursor through PlatformCursor; the
+			// editor has no cursor of its own. Restore SDL's default so the
+			// main map's cursor is not left as a game icon.
+			SDL_SetCursor(nullptr);
+			SDL_ShowCursor();
 			uiPreviewInited_ = true;
 		}
 		if(screen){

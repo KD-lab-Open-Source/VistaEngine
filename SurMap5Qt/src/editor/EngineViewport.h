@@ -424,10 +424,10 @@ private:
 	// its scrub time.
 	cEffect*             effectPreview_ = nullptr;
 	float                effectPreviewTime_ = 0.f;
-	// Embedded preview render window (its own swapchain) + the private scene
-	// and camera the effects preview draws (never the level scene).
+	// Embedded preview render window (its own swapchain) + the camera the
+	// effects preview draws with (a second camera on the level scene; never
+	// the level's own camera).
 	cRenderWindow*       previewWindow_ = nullptr;
-	cScene*              previewScene_ = nullptr;
 	Camera*              previewCamera_ = nullptr;
 	// UI Editor preview overlay.
 	bool                 uiPreview_ = false;
