@@ -239,6 +239,10 @@ add_executable(SurMap5Qt
     src/tools/UnitTool.cpp
     src/tools/UnitPropertyPanel.h
     src/tools/UnitPropertyPanel.cpp
+    # The Select tool's selected-object Properties panel (CSurToolSelect's
+    # IDD_BARDLG_SELECT attrib editor).
+    src/tools/SelectPropertyPanel.h
+    src/tools/SelectPropertyPanel.cpp
     # The source/anchor placement tools + their Properties panels
     # (CSurToolSource / CSurToolAnchor).
     src/tools/SourceTool.h

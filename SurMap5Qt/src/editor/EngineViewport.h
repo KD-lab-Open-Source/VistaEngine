@@ -23,6 +23,8 @@
 #include "EditorTool.h"
 
 #include <memory>
+#include <utility>
+#include <vector>
 
 // Forward declarations only — the full engine headers stay in the .cpp.
 class cInterfaceRenderDevice;
@@ -279,6 +281,23 @@ public:
 	// caller owns them and should `free()` each. Returns the actual count.
 	int objectList(ObjectTab tab, char** out, int maxCount);
 
+	// The world position of the object at `index` in the same display order
+	// objectList walks (the objects manager's "move camera to the selected
+	// object"). Returns false when the index is out of range. objectList
+	// records the positions as it emits labels; objectPosition re-walks the
+	// tab up to `index + 1`.
+	bool objectPosition(ObjectTab tab, int index, float& x, float& y);
+
+	// Whether the object at `index` (same order as objectList) is selected in
+	// the world — the objects manager reads this to mirror the world selection
+	// into its rows (ObjectsManagerTree::updateSelectFromWorld).
+	bool objectSelected(ObjectTab tab, int index);
+
+	// Select/deselect the object at `index` in the world — the objects manager
+	// writes a row selection back (WorldTreeObject::select/deselect). Returns
+	// false when the index is out of range.
+	bool setObjectSelected(ObjectTab tab, int index, bool selected);
+
 	// --- Object selection (SurMap5/SelectionUtil.cpp) ---
 
 	// How many world objects (units, sources, anchors, camera splines) are
@@ -334,6 +353,18 @@ private:
 	// after universe()->graphQuant — port of CSurToolTransform::drawAxis/
 	// drawCircle plus the showEditor() aux layers.
 	void drawToolAux();
+
+	// Parallel to the labels objectList emits: each object's world position,
+	// recorded so objectPosition can answer without a second walk variant.
+	std::vector<std::pair<float, float>> objectPositions_;
+	// Parallel to the labels: the object handle and its selection state, so
+	// objectSelected/setObjectSelected map a tree row back to the world object.
+	std::vector<EditorObjectId> objectIds_;
+	std::vector<char> objectSelected_;
+	// The index-th entry of the last objectList walk (shared by
+	// objectPosition/objectSelected/setObjectSelected). Returns false when out
+	// of range.
+	bool objectEntry(ObjectTab tab, int index, EditorObjectId& id, float& x, float& y, bool& selected);
 
 	void*                nativeWindow_ = nullptr;
 	cInterfaceRenderDevice* renderDevice_ = nullptr;

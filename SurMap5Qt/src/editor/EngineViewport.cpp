@@ -286,6 +286,27 @@ struct EnvCircleInRadius
 	float radius_;
 };
 
+// Returns the selection's single object (and the count via countOut), matching
+// CSurToolSelect's attach path (it edited a single selection).
+static BaseUniverseObject* singleSelectedObject(IWorldBridge& bridge, int* countOut = nullptr)
+{
+	struct Visitor : IEditorObjectVisitor
+	{
+		BaseUniverseObject* first = nullptr;
+		int count = 0;
+		void visit(EditorObjectId id) override
+		{
+			if(count == 0)
+				first = reinterpret_cast<BaseUniverseObject*>(id);
+			++count;
+		}
+	} visitor;
+	bridge.forEachSelected(visitor);
+	if(countOut)
+		*countOut = visitor.count;
+	return visitor.count == 1 ? visitor.first : nullptr;
+}
+
 // WorldBridge — the engine-side implementation of the engine-free IWorldBridge
 // the tools talk to. It is a port of the SelectionUtil globals +
 // universe/sourceManager/cameraManager access, but over the common
@@ -398,6 +419,66 @@ public:
 	{
 		BaseUniverseObject* obj = reinterpret_cast<BaseUniverseObject*>(id);
 		return obj ? obj->radius() : 0.f;
+	}
+
+	// --- Selected object properties (CSurToolSelect's attrib editor) ---
+	// The original attached the single selection's serializer
+	// (SerializerUniverseObject(UnitLink) for source/unit/environment, else
+	// Serializer(object)); the same PropertyOArchive path the library editor
+	// uses. Multiple/zero selections have no single tree.
+	editor::PropertyRow* selectedObjectTree(bool editOnly) override
+	{
+		(void)editOnly;   // no edit-only conditional fields on live objects
+		BaseUniverseObject* obj = singleSelectedObject(*this);
+		if(!obj)
+			return nullptr;
+		editor::PropertyOArchive oa;
+		Serializer se(*obj);
+		se.serialize(oa);
+		return oa.root();
+	}
+
+	bool selectedObjectSetTree(editor::PropertyRow* root) override
+	{
+		if(!root)
+			return false;
+		BaseUniverseObject* obj = singleSelectedObject(*this);
+		if(!obj)
+			return false;
+		editor::PropertyIArchive ia(root);
+		Serializer se(*obj);
+		se.serialize(ia);
+		return true;
+	}
+
+	void selectedObjectCounts(int& units, int& environment, int& sources,
+	                          int& cameras, int& anchors) override
+	{
+		units = environment = sources = cameras = anchors = 0;
+		struct CountVisitor : IEditorObjectVisitor
+		{
+			int u = 0, e = 0, s = 0, c = 0, a = 0;
+			void visit(EditorObjectId id) override
+			{
+				BaseUniverseObject* obj = reinterpret_cast<BaseUniverseObject*>(id);
+				if(!obj)
+					return;
+				switch(obj->objectClass()){
+				case UNIVERSE_OBJECT_ENVIRONMENT: ++e; break;
+				case UNIVERSE_OBJECT_UNIT:        ++u; break;
+				case UNIVERSE_OBJECT_SOURCE:      ++s; break;
+				case UNIVERSE_OBJECT_CAMERA_SPLINE: ++c; break;
+				case UNIVERSE_OBJECT_ANCHOR:      ++a; break;
+				default: break;
+				}
+			}
+		} visitor;
+		forEachSelected(visitor);
+		units = visitor.u;
+		environment = visitor.e;
+		sources = visitor.s;
+		cameras = visitor.c;
+		anchors = visitor.a;
 	}
 
 	void setObjectRadius(EditorObjectId id, float radius) override
@@ -3408,6 +3489,9 @@ bool EngineViewport::terrainInfoAt(float x, float y, char* surfName, int surfNam
 // for Environment/Units, cameraManager->splines() for Cameras.
 int EngineViewport::objectList(ObjectTab tab, char** out, int maxCount)
 {
+	objectPositions_.clear();
+	objectIds_.clear();
+	objectSelected_.clear();
 	if(!out || maxCount <= 0)
 		return 0;
 	if(!sourceManager)
@@ -3437,7 +3521,11 @@ int EngineViewport::objectList(ObjectTab tab, char** out, int maxCount)
 					snprintf(buf, sizeof(buf), "%s #%d - %s", typeName.c_str(), index++, label);
 				else
 					snprintf(buf, sizeof(buf), "%s #%d", typeName.c_str(), index++);
-				out[n++] = strdup(buf);
+				out[n] = strdup(buf);
+				objectPositions_.push_back({ src->position2D().x, src->position2D().y });
+				objectIds_.push_back((EditorObjectId)src);
+				objectSelected_.push_back(src->selected() ? 1 : 0);
+				++n;
 			}
 		}
 		return n;
@@ -3455,7 +3543,11 @@ int EngineViewport::objectList(ObjectTab tab, char** out, int maxCount)
 			const char* label = a->label();
 			char buf[256];
 			snprintf(buf, sizeof(buf), "Anchor #%d - %s", n, label ? label : "");
-			out[n++] = strdup(buf);
+			out[n] = strdup(buf);
+			objectPositions_.push_back({ a->position2D().x, a->position2D().y });
+			objectIds_.push_back((EditorObjectId)a);
+			objectSelected_.push_back(a->selected() ? 1 : 0);
+			++n;
 		}
 		return n;
 	}
@@ -3473,7 +3565,11 @@ int EngineViewport::objectList(ObjectTab tab, char** out, int maxCount)
 			const char* name = sp->name();
 			char buf[256];
 			snprintf(buf, sizeof(buf), "Camera #%d - %s", n, (name && *name) ? name : "(unnamed)");
-			out[n++] = strdup(buf);
+			out[n] = strdup(buf);
+			objectPositions_.push_back({ sp->position2D().x, sp->position2D().y });
+			objectIds_.push_back((EditorObjectId)sp.get());
+			objectSelected_.push_back(sp->selected() ? 1 : 0);
+			++n;
 		}
 		return n;
 	}
@@ -3508,7 +3604,11 @@ int EngineViewport::objectList(ObjectTab tab, char** out, int maxCount)
 				name = name.substr(pos + 1);
 			char buf[256];
 			snprintf(buf, sizeof(buf), "Environment #%d - %s", n, name.c_str());
-			out[n++] = strdup(buf);
+			out[n] = strdup(buf);
+			objectPositions_.push_back({ unit->position2D().x, unit->position2D().y });
+			objectIds_.push_back((EditorObjectId)unit);
+			objectSelected_.push_back(unit->selected() ? 1 : 0);
+			++n;
 		}
 		return n;
 	}
@@ -3532,13 +3632,69 @@ int EngineViewport::objectList(ObjectTab tab, char** out, int maxCount)
 				const char* key = unit->attr().libraryKey();
 				char buf[256];
 				snprintf(buf, sizeof(buf), "Unit #%d - %s", n, key ? key : "(no key)");
-				out[n++] = strdup(buf);
+				out[n] = strdup(buf);
+				objectPositions_.push_back({ unit->position2D().x, unit->position2D().y });
+				objectIds_.push_back((EditorObjectId)unit);
+				objectSelected_.push_back(unit->selected() ? 1 : 0);
+				++n;
 			}
 		}
 		return n;
 	}
 
 	return 0;
+}
+
+bool EngineViewport::objectPosition(ObjectTab tab, int index, float& x, float& y)
+{
+	EditorObjectId id = IWorldBridge::kNoObject;
+	bool selected = false;
+	if(!objectEntry(tab, index, id, x, y, selected))
+		return false;
+	return true;
+}
+
+// The index-th entry of the last objectList walk. objectList records the
+// per-entry data (position, handle, selection) as it emits; re-walk the tab up
+// to include `index`.
+bool EngineViewport::objectEntry(ObjectTab tab, int index, EditorObjectId& id,
+                                 float& x, float& y, bool& selected)
+{
+	if(index < 0)
+		return false;
+	std::vector<char*> labels((size_t)index + 1, nullptr);
+	const int n = objectList(tab, labels.data(), index + 1);
+	for(int i = 0; i < n; ++i)
+		free(labels[i]);
+	if(index >= (int)objectPositions_.size())
+		return false;
+	x = objectPositions_[(size_t)index].first;
+	y = objectPositions_[(size_t)index].second;
+	id = objectIds_[(size_t)index];
+	selected = objectSelected_[(size_t)index] != 0;
+	return true;
+}
+
+bool EngineViewport::objectSelected(ObjectTab tab, int index)
+{
+	EditorObjectId id = IWorldBridge::kNoObject;
+	float x = 0.f, y = 0.f;
+	bool selected = false;
+	if(!objectEntry(tab, index, id, x, y, selected))
+		return false;
+	return selected;
+}
+
+bool EngineViewport::setObjectSelected(ObjectTab tab, int index, bool selected)
+{
+	EditorObjectId id = IWorldBridge::kNoObject;
+	float x = 0.f, y = 0.f;
+	bool wasSelected = false;
+	if(!objectEntry(tab, index, id, x, y, wasSelected))
+		return false;
+	if(BaseUniverseObject* obj = reinterpret_cast<BaseUniverseObject*>(id))
+		obj->setSelected(selected);
+	return true;
 }
 
 // --- Object selection (SurMap5/SelectionUtil.cpp) ---

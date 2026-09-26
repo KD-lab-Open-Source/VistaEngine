@@ -26,6 +26,7 @@
 #include "EnvironmentPropertyPanel.h"
 #include "TransformPropertyPanel.h"
 #include "TransformTool.h"
+#include "SelectPropertyPanel.h"
 
 ToolManager::ToolManager()
 {
@@ -109,6 +110,13 @@ void ToolManager::setBrushRadius(float radius)
 		environment_->setBrushRadius(radius);
 }
 
+void ToolManager::refreshSelectionProperties()
+{
+	// Only the Select panel tracks the world selection; other panels ignore it.
+	if(selectPanel_)
+		selectPanel_->refresh();
+}
+
 void ToolManager::setCurrentTool(int index)
 {
 	if(index < 0 || index >= (int)tools_.size())
@@ -142,6 +150,8 @@ void ToolManager::setCurrentTool(int index)
 		anchorPanel_->setTool(dynamic_cast<AnchorTool*>(current_));
 	if(environmentPanel_)
 		environmentPanel_->setTool(dynamic_cast<EnvironmentTool*>(current_));
+	if(selectPanel_)
+		selectPanel_->setTool(dynamic_cast<SelectTool*>(current_));
 }
 
 QWidget* ToolManager::propertyWidget()
@@ -149,6 +159,13 @@ QWidget* ToolManager::propertyWidget()
 	// The transform tools share one axis panel (the original's CSurToolTransform
 	// dialog); the GeoNet tool has its own parameter panel. Created lazily so a
 	// tool-less editor never allocates them.
+	if(dynamic_cast<SelectTool*>(current_)){
+		// CSurToolSelect's IDD_BARDLG_SELECT: the selected object's attributes.
+		if(!selectPanel_)
+			selectPanel_ = new SelectPropertyPanel;
+		selectPanel_->setTool(select_);
+		return selectPanel_;
+	}
 	if(dynamic_cast<GeoNetTool*>(current_)){
 		if(!geoNetPanel_){
 			geoNetPanel_ = new GeoNetPropertyPanel;

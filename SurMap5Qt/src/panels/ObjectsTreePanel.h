@@ -31,9 +31,20 @@ public:
 	// tree shows the type group, ready for objects.
 	void rebuild();
 
+	// Mirror the world selection into the tree rows (the original's
+	// ObjectsManagerTree::updateSelectFromWorld). Called when the map selection
+	// changes; does not rebuild the rows.
+	void syncSelectionFromWorld();
+
 	// The object-type tab currently shown (TAB_SOURCES=0, TAB_ENVIRONMENT=1,
 	// TAB_UNITS=2, TAB_CAMERA=3, TAB_ANCHORS=4 — the typeTabs_ order).
 	int currentTab() const;
+
+signals:
+	// Emitted when a row selection changed the world selection (the original's
+	// eventMaster().signalSelectionChanged()), so the Properties dock can
+	// refresh.
+	void objectSelectionChanged();
 
 protected:
 	// Context menu (the original's NM_RCLICK): Delete + Rename when a row
@@ -48,4 +59,7 @@ private:
 
 	EngineViewport* viewport_ = nullptr;
 	QTabWidget* tabs_ = nullptr;
+	// Set while syncSelectionFromWorld writes the rows, so the trees'
+	// itemSelectionChanged does not write the (unchanged) selection back.
+	bool syncing_ = false;
 };

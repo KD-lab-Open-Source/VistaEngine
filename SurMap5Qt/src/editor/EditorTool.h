@@ -237,6 +237,18 @@ public:
 	virtual float objectRadius(EditorObjectId id) = 0;
 	virtual void setObjectRadius(EditorObjectId id, float radius) = 0;
 
+	// --- Selected object properties (CSurToolSelect's attrib editor) ---
+	// The single selected universe object serialized into a PropertyRow tree
+	// (the original's attribEditor().attachSerializer(SerializerUniverseObject))
+	// for the Properties dock. Null when the selection is not exactly one
+	// object. Edits are written back with selectedObjectSetTree.
+	virtual editor::PropertyRow* selectedObjectTree(bool editOnly) = 0;
+	virtual bool selectedObjectSetTree(editor::PropertyRow* root) = 0;
+	// Per-class counts of the current selection (CSurToolSelect::
+	// CollectSerializersAndCount) for the multi-selection summary.
+	virtual void selectedObjectCounts(int& units, int& environment, int& sources,
+	                                  int& cameras, int& anchors) = 0;
+
 	// Terrain height + a ray-cast of a widget pixel to the ground (the
 	// tools' screenPointToGround / projectScreenPointOnPlane ports).
 	virtual float terrainHeight(float x, float y) = 0;

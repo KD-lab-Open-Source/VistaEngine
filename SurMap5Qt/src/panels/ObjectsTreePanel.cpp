@@ -25,13 +25,63 @@ ObjectsTreePanel::ObjectsTreePanel(QWidget* parent)
 	const QStringList tabLabels = {
 		tr("Sources"), tr("Environment"), tr("Units"), tr("Cameras"), tr("Anchors"),
 	};
-	for(const QString& label : tabLabels){
+	for(int i = 0; i < tabLabels.size(); ++i){
+		const QString& label = tabLabels[i];
 		auto* tree = new QTreeWidget(tabs_);
 		tree->setHeaderHidden(true);
 		tree->setSelectionMode(QAbstractItemView::ExtendedSelection);
 		tree->setEditTriggers(QAbstractItemView::NoEditTriggers);
 		tree->setIndentation(12);
 		tree->setContextMenuPolicy(Qt::DefaultContextMenu);
+
+		// Selecting an object moves the editor camera to it (the objects
+		// manager's "go to object"). objectPosition maps the tree row back to
+		// the engine object's world position in the same order objectList
+		// emitted the labels.
+		connect(tree, &QTreeWidget::currentItemChanged, this,
+		        [this, i](QTreeWidgetItem* current, QTreeWidgetItem*){
+			if(!viewport_ || !current)
+				return;
+			QTreeWidget* t = qobject_cast<QTreeWidget*>(sender());
+			if(!t)
+				return;
+			const int row = t->indexOfTopLevelItem(current);
+			if(row < 0)
+				return;
+			static const EngineViewport::ObjectTab kTabs[] = {
+				EngineViewport::ObjectTab::Sources,
+				EngineViewport::ObjectTab::Environment,
+				EngineViewport::ObjectTab::Units,
+				EngineViewport::ObjectTab::Cameras,
+				EngineViewport::ObjectTab::Anchors,
+			};
+			float x = 0.f, y = 0.f;
+			if(viewport_->objectPosition(kTabs[i], row, x, y))
+				viewport_->setCameraCenter(x, y);
+		});
+
+		// Selecting rows also selects the world objects (the original's
+		// WorldTreeObject::onSelect -> unit/source/anchor setSelected), and
+		// notifies the Properties dock. Multiple rows supported.
+		connect(tree, &QTreeWidget::itemSelectionChanged, this, [this, i]{
+			if(syncing_ || !viewport_)
+				return;
+			QTreeWidget* t = qobject_cast<QTreeWidget*>(sender());
+			if(!t)
+				return;
+			static const EngineViewport::ObjectTab kTabsSel[] = {
+				EngineViewport::ObjectTab::Sources,
+				EngineViewport::ObjectTab::Environment,
+				EngineViewport::ObjectTab::Units,
+				EngineViewport::ObjectTab::Cameras,
+				EngineViewport::ObjectTab::Anchors,
+			};
+			for(int row = 0; row < t->topLevelItemCount(); ++row){
+				if(QTreeWidgetItem* item = t->topLevelItem(row))
+					viewport_->setObjectSelected(kTabsSel[i], row, item->isSelected());
+			}
+			emit objectSelectionChanged();
+		});
 		tabs_->addTab(tree, label);
 	}
 	tabs_->setCurrentIndex(0);   // SetCurSel(TAB_SOURCES)
@@ -69,6 +119,7 @@ void ObjectsTreePanel::rebuild()
 	// (Sources, Environment, Units, Cameras, Anchors). The Qt editor asks
 	// the engine side (EngineViewport::objectList) for the current world's
 	// labels per tab; no world loaded = empty trees.
+	syncing_ = true;   // building rows must not write a selection back
 	for(int i = 0; i < tabs_->count(); ++i){
 		QTreeWidget* tree = qobject_cast<QTreeWidget*>(tabs_->widget(i));
 		if(!tree) continue;
@@ -106,6 +157,39 @@ void ObjectsTreePanel::rebuild()
 			}
 		}
 	}
+	syncing_ = false;
+
+	// Reflect the world's current selection into the fresh rows
+	// (ObjectsManagerTree::rebuild selected the already-selected objects).
+	syncSelectionFromWorld();
+}
+
+void ObjectsTreePanel::syncSelectionFromWorld()
+{
+	if(!viewport_)
+		return;
+	static const EngineViewport::ObjectTab kTabs[] = {
+		EngineViewport::ObjectTab::Sources,
+		EngineViewport::ObjectTab::Environment,
+		EngineViewport::ObjectTab::Units,
+		EngineViewport::ObjectTab::Cameras,
+		EngineViewport::ObjectTab::Anchors,
+	};
+	syncing_ = true;
+	for(int i = 0; i < tabs_->count(); ++i){
+		QTreeWidget* tree = qobject_cast<QTreeWidget*>(tabs_->widget(i));
+		if(!tree)
+			continue;
+		for(int row = 0; row < tree->topLevelItemCount(); ++row){
+			QTreeWidgetItem* item = tree->topLevelItem(row);
+			if(!item)
+				continue;
+			const bool selected = viewport_->objectSelected(kTabs[i], row);
+			if(item->isSelected() != selected)
+				item->setSelected(selected);
+		}
+	}
+	syncing_ = false;
 }
 
 void ObjectsTreePanel::contextMenuEvent(QContextMenuEvent* event)

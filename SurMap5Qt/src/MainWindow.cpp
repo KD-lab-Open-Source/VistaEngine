@@ -77,8 +77,28 @@ MainWindow::MainWindow(QWidget* parent)
 	// signalSelectionChanged -> ObjectsManagerTree::rebuild).
 	connect(view_, &RenderViewWidget::selectionChanged, this, [this]{
 		if(objectsTreePanel_)
-			objectsTreePanel_->rebuild();
+			objectsTreePanel_->syncSelectionFromWorld();
+		if(view_ && view_->tools())
+			view_->tools()->refreshSelectionProperties();
 	});
+
+	// The Objects Manager rows changed the world selection (the original's
+	// ObjectsManagerTree::selectOnWorld -> signalSelectionChanged): refresh the
+	// Properties dock. The view repaints its selection circles on the next tick.
+	if(objectsTreePanel_)
+		connect(objectsTreePanel_, &ObjectsTreePanel::objectSelectionChanged, this, [this]{
+			// WorldTreeObject::onSelect: selecting a row switches the editor
+			// mode to Select (ToolsTreeWindow::replaceEditorMode(0) pushed
+			// tools_[TOOL_SELECT]) so its Properties dialog shows the object.
+			if(view_ && view_->tools()){
+				if(view_->tools()->currentIndex() != 0)
+					selectTool(0);
+				else
+					view_->tools()->refreshSelectionProperties();
+			}
+			if(view_)
+				view_->update();
+		});
 
 	// Phase 7: restore the dock/toolbar layout the last run saved (CExtControlBar::
 	// ProfileBarStateSerialize on exit -> surMapOptions.dlgBarState). Qt keeps the

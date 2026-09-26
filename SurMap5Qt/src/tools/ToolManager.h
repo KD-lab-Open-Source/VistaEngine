@@ -27,6 +27,7 @@ class SourceTool;
 class AnchorTool;
 class EnvironmentTool;
 class TransformPropertyPanel;
+class SelectPropertyPanel;
 class GeoNetPropertyPanel;
 class GeoTxPropertyPanel;
 class ToolzerPropertyPanel;
@@ -69,6 +70,12 @@ public:
 	// ignore it.
 	void setBrushRadius(float radius);
 
+	// Re-read the world selection into the Select tool's Properties panel
+	// (CMainFrame::onSelectionChanged forwarded signalSelectionChanged to the
+	// current tool; here it also refreshes the panel). Called when the map or
+	// the Objects Manager changes the selection.
+	void refreshSelectionProperties();
+
 	// All tools, in tree order (CSurToolBase* list the tools tree held).
 	const std::vector<EditorTool*>& tools() const { return tools_; }
 
@@ -104,6 +111,8 @@ private:
 
 	// The Properties dock's panel for the transform tools (created lazily).
 	TransformPropertyPanel* propertyPanel_ = nullptr;
+	// The Select tool's selected-object properties panel (created lazily).
+	SelectPropertyPanel* selectPanel_ = nullptr;
 	// The Properties dock's panel for the GeoNet tool (created lazily).
 	GeoNetPropertyPanel* geoNetPanel_ = nullptr;
 	// The Properties dock's panel for the GeoTx tool (created lazily).
