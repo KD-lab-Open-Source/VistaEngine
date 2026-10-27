@@ -16,6 +16,11 @@ static const char* QSWorldsMgrSection	= "QSDate";
 QSWorldsMgr::QSWorldsMgr()
 {
 	worldsLst.reserve(32);
+}
+
+void QSWorldsMgr::load()
+{
+	worldsLst.clear();
 	XPrmIArchive ia;
 	if(ia.open(QSWorldsMgrFileName)){
 		ia.serialize(*this, QSWorldsMgrSection, 0);

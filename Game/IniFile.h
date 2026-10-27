@@ -46,7 +46,11 @@ public:
 	Network network;
 
 	IniFile();
-	~IniFile();
+	/// Reads iniFile.cfg over the defaults. Not done by the constructor: iniFile is a
+	/// global, built before main() has made the data directory the working directory.
+	void load();
+	/// Writes it back. WinMain does, on the way out -- not the destructor: at exit the
+	/// archive code's own statics, first built inside load(), are already destroyed.
 	void save();
 	void serialize(Archive& ar);
 };

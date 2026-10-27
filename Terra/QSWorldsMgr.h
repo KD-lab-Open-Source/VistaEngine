@@ -19,6 +19,9 @@ struct QSWorldInfo {
 class QSWorldsMgr {
 public:
 	QSWorldsMgr();
+	/// Reads the list from the data directory. Not done by the constructor: qsWorldsMgr is
+	/// a global, built before main() has made the data directory the working directory.
+	void load();
 	void updateQSWorld(const char* missionName, XGUID& missionID);
 	void serialize(Archive& ar);
 	void save();

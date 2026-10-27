@@ -10,6 +10,7 @@
 #include "Serialization/StringTable.h"
 
 #include <shlobj.h>
+#include <SDL3/SDL_filesystem.h>
 
 GUIDcontainer Profile::MissionFilter::EMPTY;
 
@@ -77,12 +78,13 @@ ProfileManager::ProfileManager() :
 currentProfileIndex_(-1)
 {
 	string path;
+#ifdef _WIN32
 	char szPath[MAX_PATH];
-	if(SUCCEEDED(SHGetFolderPathA(NULL, 
-		CSIDL_PERSONAL|CSIDL_FLAG_CREATE, 
-		NULL, 
-		0, 
-		szPath))) 
+	if(SUCCEEDED(SHGetFolderPathA(NULL,
+		CSIDL_PERSONAL|CSIDL_FLAG_CREATE,
+		NULL,
+		0,
+		szPath)))
 	{
 		path = szPath;
 		path += "\\My Games\\";
@@ -92,6 +94,20 @@ currentProfileIndex_(-1)
 	}
 	else
 		path = "Resource\\Saves\\";
+#else
+	// Documents\My Games is the Windows convention, and where the original kept its
+	// profiles. macOS and Linux have their own place for an application's user data:
+	// ~/Library/Application Support/<savePath>/ and $XDG_DATA_HOME (~/.local/share)/
+	// <savePath>/, which SDL creates if it is missing. (They are also the roots Steam
+	// Auto-Cloud calls MacAppSupport and LinuxXdgDataHome.) The shim's SHGetFolderPathA
+	// answered $HOME, which put a "My Games" folder in the user's home directory.
+	if(char* pref = SDL_GetPrefPath(0, GlobalAttributes::instance().savePath.c_str())){
+		path = pref;
+		SDL_free(pref);
+	}
+	else
+		path = "Resource\\Saves\\";
+#endif
 	const_cast<string&>(rootPath) = path;
 
 	reset();
