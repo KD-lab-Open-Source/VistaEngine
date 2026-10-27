@@ -12,7 +12,7 @@
 #ifndef _FINAL_VERSION_
 #include "Serialization/Dictionary.h"
 #endif
-#include "version.h" 
+#include "vista_version.h"
 #include "Console.h"
 #include "ConsoleWindow.h"
 
@@ -58,8 +58,9 @@ void __cdecl logic_thread( void * argument)
 		Runtime::instance()->logic_thread(0);
 }
 
-const char* currentVersion = 
-"Ver " VISTA_ENGINE_VERSION " (" __DATE__ " " __TIME__ ")";
+// Heads crash reports and the network/replay logs. The engine commit in it says which
+// build this is better than the compile date and time that used to stand here did.
+const char* currentVersion = "Ver " VISTA_VERSION_FULL;
 
 LRESULT CALLBACK runtimeWndProc(HWND hWnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 

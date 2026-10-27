@@ -391,6 +391,56 @@ if(MAELSTROM_DATA)
     message(STATUS "Data schema: Maelstrom (pre-2008)")
 endif()
 
+# The version this build reports -- in crash headings and logs, and in the product
+# metadata (Windows VERSIONINFO, the macOS Info.plist) a release project builds from it.
+#
+# Whoever builds a release sets it: the game's release CI passes its git tag
+# (v1.2.0 -> 1.2.0, v1.2.0-beta.3 -> 1.2.0-beta.3) and the CI run number. A developer
+# build leaves both alone and reports 0.0.0-dev. vista_version.h carries them, together
+# with the engine commit.
+#
+# This is the *product* version only. MULTIPLAYER_VERSION (version.h) decides which
+# builds can play each other, and VERSION_REVISION (revision.h) is stamped into saves;
+# both move when their formats do, not with every release.
+set(VISTA_VERSION "0.0.0-dev" CACHE STRING
+    "Version this build reports: MAJOR.MINOR.PATCH, optionally -prerelease")
+set(VISTA_BUILD_NUMBER "0" CACHE STRING "Build number (the release CI's run number)")
+if(NOT VISTA_VERSION MATCHES "^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.-]+)?$")
+    message(FATAL_ERROR
+        "VISTA_VERSION=\"${VISTA_VERSION}\" is not MAJOR.MINOR.PATCH[-prerelease]. "
+        "From a git tag, strip the leading v: v1.2.0 -> 1.2.0.")
+endif()
+if(NOT VISTA_BUILD_NUMBER MATCHES "^[0-9]+$")
+    message(FATAL_ERROR "VISTA_BUILD_NUMBER=\"${VISTA_BUILD_NUMBER}\" is not a number.")
+endif()
+message(STATUS "Version: ${VISTA_VERSION}, build ${VISTA_BUILD_NUMBER}")
+
+# vista_version.h is written at *build* time, so the engine commit in it is the one
+# being compiled -- written at configure time, a build tree would keep stamping the
+# commit it was configured at. The script leaves the header untouched when nothing in
+# it changed, so a build that moved no commit recompiles nothing.
+find_package(Git QUIET)
+set(VISTA_VERSION_DIR "${PROJECT_BINARY_DIR}/generated/version")
+add_custom_target(VistaVersionHeader
+    COMMAND "${CMAKE_COMMAND}"
+        "-DOUT_HEADER=${VISTA_VERSION_DIR}/vista_version.h"
+        "-DVERSION=${VISTA_VERSION}"
+        "-DBUILD_NUMBER=${VISTA_BUILD_NUMBER}"
+        "-DGIT_EXECUTABLE=${GIT_EXECUTABLE}"
+        "-DSOURCE_DIR=${PROJECT_SOURCE_DIR}"
+        -P "${PROJECT_SOURCE_DIR}/cmake/VistaVersion.cmake"
+    BYPRODUCTS "${VISTA_VERSION_DIR}/vista_version.h"
+    VERBATIM
+)
+add_library(VistaVersion INTERFACE)
+target_include_directories(VistaVersion INTERFACE "${VISTA_VERSION_DIR}")
+# An interface library builds nothing itself; CMake hands this dependency on to every
+# target that links it.
+add_dependencies(VistaVersion VistaVersionHeader)
+# Every module links EngineIncludes, so every module can include vista_version.h.
+# Only the translation units that do recompile when it changes.
+target_link_libraries(EngineIncludes INTERFACE VistaVersion)
+
 add_subdirectory(XLibs.Net)
 add_subdirectory(Util)
 add_subdirectory(AI)

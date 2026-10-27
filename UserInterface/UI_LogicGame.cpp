@@ -51,6 +51,7 @@
 
 #include "CameraManager.h"
 #include "UniverseX.h"
+#include "vista_version.h"	// {version}
 
 #include "joystick.h"
 
@@ -268,7 +269,8 @@ enum UITextTag {
 	UI_TAG_ACCOUNTSIZE, // сколько слотов занимает юнит
 	UI_TAG_SUPPLYSLOTS, // сколько слотов занимает юнит (с раскраской)
 	UI_TAG_SQUAD_ACCOUNTSIZE, // сколько слотов занимает сквад юнита
-	UI_TAG_SQUAD_SUPPLYSLOTS // сколько слотов занимает сквад юнита (с раскраской)
+	UI_TAG_SQUAD_SUPPLYSLOTS, // сколько слотов занимает сквад юнита (с раскраской)
+	UI_TAG_VERSION // the build's version, VISTA_VERSION_STRING
 };
 
 struct CharStringLess {
@@ -366,6 +368,10 @@ UI_LogicDispatcher::UI_LogicDispatcher() :
 	uiTextTags.insert(make_pair(L"time_ampm", UI_TAG_TIME_AMPM)); // до полудня или после полудня
 	uiTextTags.insert(make_pair(L"time_h24", UI_TAG_TIME_H24)); // вреям мира в 24 часовом формате
 	uiTextTags.insert(make_pair(L"time_min", UI_TAG_TIME_M)); // минуты времени мира
+	// The main menu's "Version 1.00" was a fixed localized string (MM_VERSION_NUM) that
+	// every patch had to edit by hand. Written as "Version {version}" in a control with
+	// expand_ set, it shows the version this build was made as.
+	uiTextTags.insert(make_pair(L"version", UI_TAG_VERSION));
 }
 
 UI_LogicDispatcher::~UI_LogicDispatcher()
@@ -4752,6 +4758,9 @@ const wchar_t* UI_LogicDispatcher::getParam(const wchar_t* name, const ExpandInf
 				retBuf <= int(time);
 				break;
 							   }
+			case UI_TAG_VERSION:
+				retBuf < VISTA_VERSION_STRING;
+				break;
 			default:
 				xxassert(false, "такого быть не должно!");
 				retBuf.init();
