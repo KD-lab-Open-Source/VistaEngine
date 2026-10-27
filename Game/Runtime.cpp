@@ -27,6 +27,7 @@
 #include "UserInterface/UserInterface.h"
 #include "Game/Runtime.h"
 #include "Game/IniFile.h"
+#include "Terra/QSWorldsMgr.h"
 #include "Render/src/Scene.h"
 #include "Render/src/VisGeneric.h"
 #include "Util/Win32/DebugSymbolManager.h"
@@ -614,6 +615,11 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 {
 	Win32::_setGlobalInstance(hInst);
 
+	// The two globals that read data of their own, and could not when they were built:
+	// that was before main() made the data directory the working directory.
+	iniFile.load();
+	qsWorldsMgr.load();
+
 	//profiler_start_stop();
     Runtime* runtime = createRuntime(hInst);
 	//profiler_start_stop();
@@ -633,6 +639,8 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 	}
 
 	delete runtime;
+
+	iniFile.save();
 
 	return 0;
 }

@@ -37,4 +37,5 @@ add_library(UserInterface STATIC
     controls.cpp
 )
 
-target_link_libraries(UserInterface PUBLIC EngineIncludes Util Units Network XmlRpc PRIVATE Video)
+# SDL3: SDL_GetPrefPath for the profiles directory (ProfileManager.cpp)
+target_link_libraries(UserInterface PUBLIC EngineIncludes Util Units Network XmlRpc PRIVATE Video SDL3::SDL3)

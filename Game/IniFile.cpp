@@ -24,15 +24,13 @@ IniFile::IniFile()
 	StandartFrameRate = 25;
 
 	enableConsole = true;
+}
 
+void IniFile::load()
+{
 	XPrmIArchive ia;
 	if(ia.open("iniFile.cfg"))
 		serialize(ia);
-}
-
-IniFile::~IniFile()
-{
-	save();
 }
 
 void IniFile::save()
