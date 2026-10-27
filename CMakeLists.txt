@@ -29,10 +29,13 @@ set(SDL_HAPTIC       OFF CACHE BOOL "" FORCE)
 set(SDL_HIDAPI       OFF CACHE BOOL "" FORCE)
 set(SDL_SENSOR       OFF CACHE BOOL "" FORCE)
 set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
+# A release tag, not main: the same commit of this tree has to build the same SDL
+# tomorrow, or a release tag of the game stops meaning one binary. Every SDL API
+# the engine calls exists in 3.4; move the pin deliberately, and re-test when you do.
 FetchContent_Declare(
     SDL3
     GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-    GIT_TAG        main
+    GIT_TAG        release-3.4.18
     GIT_SHALLOW    TRUE
 )
 FetchContent_MakeAvailable(SDL3)
