@@ -5,7 +5,10 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+# Paths in this tree are PROJECT_SOURCE_DIR / PROJECT_BINARY_DIR, never CMAKE_SOURCE_DIR /
+# CMAKE_BINARY_DIR. The engine is also built as a subdirectory of a game's release
+# project (add_subdirectory), and there the CMAKE_ pair names *that* project's root.
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 include(FetchContent)
 
@@ -252,31 +255,31 @@ target_include_directories(EngineIncludes INTERFACE
     # Util's precompiled-header StdAfx.h lives here; list it first so bare
     # "StdAfx.h" includes from Util/*.cpp resolve to it rather than to a
     # same-named StdAfx.h in one of the module dirs added below.
-    ${CMAKE_SOURCE_DIR}/Util/XMath
-    ${CMAKE_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/Util
+    ${PROJECT_SOURCE_DIR}/Util/XMath
+    ${PROJECT_SOURCE_DIR}
+    ${PROJECT_SOURCE_DIR}/Util
     # Module source dirs, so legacy unqualified cross-module includes
     # (e.g. "UnitLink.h", "BaseUniverseObject.h") resolve as they did
     # under the original MSVC build, where every module dir was a search root.
-    ${CMAKE_SOURCE_DIR}/Units
-    ${CMAKE_SOURCE_DIR}/Environment
-    ${CMAKE_SOURCE_DIR}/Physics
-    ${CMAKE_SOURCE_DIR}/Terra
-    ${CMAKE_SOURCE_DIR}/Game
-    ${CMAKE_SOURCE_DIR}/UserInterface
-    ${CMAKE_SOURCE_DIR}/Network
-    ${CMAKE_SOURCE_DIR}/Sound
-    ${CMAKE_SOURCE_DIR}/Render/inc
-    ${CMAKE_SOURCE_DIR}/Render/src
-    ${CMAKE_SOURCE_DIR}/Render/3dx
-    ${CMAKE_SOURCE_DIR}/Render/D3D
-    ${CMAKE_SOURCE_DIR}/XLibs.Net/XUtil
-    ${CMAKE_SOURCE_DIR}/XLibs.Net/XUtil/CRC
-    ${CMAKE_SOURCE_DIR}/XLibs.Net/XUtil/Unicode
-    ${CMAKE_SOURCE_DIR}/XLibs.Net/XZip
-    ${CMAKE_SOURCE_DIR}/XLibs.Net/Profiler/Profiler
-    ${CMAKE_SOURCE_DIR}/XLibs.Net/OGG/PlayOgg
-    ${CMAKE_SOURCE_DIR}/Util/XTL
+    ${PROJECT_SOURCE_DIR}/Units
+    ${PROJECT_SOURCE_DIR}/Environment
+    ${PROJECT_SOURCE_DIR}/Physics
+    ${PROJECT_SOURCE_DIR}/Terra
+    ${PROJECT_SOURCE_DIR}/Game
+    ${PROJECT_SOURCE_DIR}/UserInterface
+    ${PROJECT_SOURCE_DIR}/Network
+    ${PROJECT_SOURCE_DIR}/Sound
+    ${PROJECT_SOURCE_DIR}/Render/inc
+    ${PROJECT_SOURCE_DIR}/Render/src
+    ${PROJECT_SOURCE_DIR}/Render/3dx
+    ${PROJECT_SOURCE_DIR}/Render/D3D
+    ${PROJECT_SOURCE_DIR}/XLibs.Net/XUtil
+    ${PROJECT_SOURCE_DIR}/XLibs.Net/XUtil/CRC
+    ${PROJECT_SOURCE_DIR}/XLibs.Net/XUtil/Unicode
+    ${PROJECT_SOURCE_DIR}/XLibs.Net/XZip
+    ${PROJECT_SOURCE_DIR}/XLibs.Net/Profiler/Profiler
+    ${PROJECT_SOURCE_DIR}/XLibs.Net/OGG/PlayOgg
+    ${PROJECT_SOURCE_DIR}/Util/XTL
 )
 
 if(WIN32)
@@ -304,13 +307,13 @@ endif()
 # BEFORE the system paths: on Windows this shadows the SDK's own d3d9.h, deliberately,
 # so all three platforms parse the same declarations for a backend nobody calls.
 target_include_directories(EngineIncludes BEFORE INTERFACE
-    ${CMAKE_SOURCE_DIR}/Platform/d3d9_compat
+    ${PROJECT_SOURCE_DIR}/Platform/d3d9_compat
 )
 
 if(NOT WIN32)
     # fake Windows headers must come before any system paths
     target_include_directories(EngineIncludes BEFORE INTERFACE
-        ${CMAKE_SOURCE_DIR}/Platform/fake_includes
+        ${PROJECT_SOURCE_DIR}/Platform/fake_includes
     )
     target_compile_definitions(EngineIncludes INTERFACE _CROSS_PLATFORM_)
     # This is MSVC-origin code: -fms-extensions lets clang accept MSVC-isms that
@@ -324,7 +327,7 @@ if(NOT WIN32)
         # the full-expression, so the calls are well-defined; downgrade to a warning.
         "$<$<COMPILE_LANGUAGE:CXX>:-Wno-error=address-of-temporary>"
         # Force-include WindowsAPI.h as the very first header in every C++ translation unit
-        "$<$<COMPILE_LANGUAGE:CXX>:-include;${CMAKE_SOURCE_DIR}/Platform/WindowsAPI.h>"
+        "$<$<COMPILE_LANGUAGE:CXX>:-include;${PROJECT_SOURCE_DIR}/Platform/WindowsAPI.h>"
     )
 endif()
 
