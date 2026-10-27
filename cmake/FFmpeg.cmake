@@ -32,7 +32,7 @@
 
 include(ExternalProject)
 
-set(FFMPEG_INSTALL_DIR "${CMAKE_BINARY_DIR}/ffmpeg-install")
+set(FFMPEG_INSTALL_DIR "${PROJECT_BINARY_DIR}/ffmpeg-install")
 
 # Link order matters for static libraries, and it is the dependency order: avformat needs
 # avcodec, both need avutil. The file names are the same on every platform — the win32 branch
@@ -138,7 +138,7 @@ ExternalProject_Add(ffmpeg_external
     URL      https://ffmpeg.org/releases/ffmpeg-7.1.1.tar.xz
     URL_HASH SHA256=733984395e0dbbe5c046abda2dc49a5544e7e0e1e2366bba849222ae9e3a03b1
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    PREFIX      "${CMAKE_BINARY_DIR}/ffmpeg"
+    PREFIX      "${PROJECT_BINARY_DIR}/ffmpeg"
     INSTALL_DIR "${FFMPEG_INSTALL_DIR}"
     CONFIGURE_COMMAND ${FFMPEG_ENV} ${FFMPEG_SHELL} <SOURCE_DIR>/configure ${FFMPEG_CONFIGURE_FLAGS}
     BUILD_COMMAND     ${FFMPEG_ENV} ${FFMPEG_MAKE} -j4

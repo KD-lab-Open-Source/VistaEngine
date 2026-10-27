@@ -58,8 +58,8 @@ function(vista_shader_module MODULE)
             "-DSRC_DIR=${SHADER_SRC_DIR}"
             "-DGEN_DIR=${SHADER_GEN_DIR}"
             "-DENTRIES=${_entries_arg}"
-            -P "${CMAKE_SOURCE_DIR}/cmake/bin2h.cmake"
-        DEPENDS ${_sources} ${_extra_deps} "${CMAKE_SOURCE_DIR}/cmake/bin2h.cmake"
+            -P "${PROJECT_SOURCE_DIR}/cmake/bin2h.cmake"
+        DEPENDS ${_sources} ${_extra_deps} "${PROJECT_SOURCE_DIR}/cmake/bin2h.cmake"
         COMMENT "Compiling ${MODULE} shaders (${SHADER_MODE} -> ${SHADER_FORMAT_EXT})"
         VERBATIM
     )
