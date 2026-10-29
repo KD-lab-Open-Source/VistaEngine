@@ -134,9 +134,62 @@ else()
     endif()
 endif()
 
+# The source tarball is fetched here, at configure time, not by ExternalProject at build
+# time. ExternalProject retries only the errors that happen before a transfer starts (no DNS,
+# no connection, a timeout); ffmpeg.org resetting the connection mid-transfer -- curl error
+# 56, which has failed a Windows CI job at 99% -- ends its download on the first attempt.
+# Here every failure is retried after a pause, and what arrives is checked against the
+# pinned hash before anything uses it.
+#
+# A tarball already in FFMPEG_DOWNLOAD_DIR with the right hash is not downloaded again. The
+# CI workflows cache that directory (build/_downloads), so ffmpeg.org is only asked when
+# this file changes.
+set(FFMPEG_VERSION 7.1.1)
+set(FFMPEG_SHA256  733984395e0dbbe5c046abda2dc49a5544e7e0e1e2366bba849222ae9e3a03b1)
+set(FFMPEG_DOWNLOAD_DIR "${PROJECT_BINARY_DIR}/_downloads" CACHE PATH
+    "Where the ffmpeg source tarball is kept; point several build trees at one to download it once")
+set(FFMPEG_TARBALL "${FFMPEG_DOWNLOAD_DIR}/ffmpeg-${FFMPEG_VERSION}.tar.xz")
+
+set(_ffmpeg_hash "")
+if(EXISTS "${FFMPEG_TARBALL}")
+    file(SHA256 "${FFMPEG_TARBALL}" _ffmpeg_hash)
+endif()
+if(NOT _ffmpeg_hash STREQUAL FFMPEG_SHA256)
+    set(_ffmpeg_url "https://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.xz")
+    set(_ffmpeg_errors "")
+    foreach(_attempt 1 2 3 4 5)
+        message(STATUS "Downloading ${_ffmpeg_url} (attempt ${_attempt} of 5)")
+        file(DOWNLOAD "${_ffmpeg_url}" "${FFMPEG_TARBALL}.part"
+            TLS_VERIFY ON
+            INACTIVITY_TIMEOUT 60   # a stalled transfer fails, and is retried, rather than hangs
+            STATUS _status)
+        list(GET _status 0 _code)
+        list(GET _status 1 _reason)
+        if(_code EQUAL 0)
+            file(SHA256 "${FFMPEG_TARBALL}.part" _ffmpeg_hash)
+            if(_ffmpeg_hash STREQUAL FFMPEG_SHA256)
+                file(RENAME "${FFMPEG_TARBALL}.part" "${FFMPEG_TARBALL}")
+                break()
+            endif()
+            set(_reason "downloaded, but its SHA256 is ${_ffmpeg_hash}")
+        else()
+            set(_reason "curl error ${_code}, ${_reason}")
+        endif()
+        string(APPEND _ffmpeg_errors "\n  attempt ${_attempt}: ${_reason}")
+        file(REMOVE "${FFMPEG_TARBALL}.part")
+        if(_attempt LESS 5)
+            math(EXPR _pause "10 * ${_attempt}")
+            execute_process(COMMAND "${CMAKE_COMMAND}" -E sleep ${_pause})
+        endif()
+    endforeach()
+    if(NOT _ffmpeg_hash STREQUAL FFMPEG_SHA256)
+        message(FATAL_ERROR "Could not download ${_ffmpeg_url}:${_ffmpeg_errors}")
+    endif()
+endif()
+
 ExternalProject_Add(ffmpeg_external
-    URL      https://ffmpeg.org/releases/ffmpeg-7.1.1.tar.xz
-    URL_HASH SHA256=733984395e0dbbe5c046abda2dc49a5544e7e0e1e2366bba849222ae9e3a03b1
+    URL      "${FFMPEG_TARBALL}"
+    URL_HASH SHA256=${FFMPEG_SHA256}
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     PREFIX      "${PROJECT_BINARY_DIR}/ffmpeg"
     INSTALL_DIR "${FFMPEG_INSTALL_DIR}"

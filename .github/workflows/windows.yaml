@@ -61,6 +61,15 @@ jobs:
     - name: Tell the build where MSYS2 is
       run: echo "MSYS2_ROOT=${{ steps.msys2.outputs.msys2-location }}" >> $env:GITHUB_ENV
 
+    # The ffmpeg source tarball. cmake/FFmpeg.cmake downloads it into build/_downloads only
+    # when no copy with the pinned hash is already there, so with this restored ffmpeg.org is
+    # asked once per change to that file instead of on every run. Both legs share the key.
+    - name: Restore the ffmpeg source tarball
+      uses: actions/cache@v4
+      with:
+        path: build/_downloads
+        key: ffmpeg-src-${{ hashFiles('cmake/FFmpeg.cmake') }}
+
     # Otherwise nothing to install. SDL3 and FreeType come in through FetchContent, and the
     # shaders are compiled by the Windows SDK's own dxc.exe (HLSL -> DXIL, the one
     # format the D3D12 backend loads), which the root CMakeLists globs out of
