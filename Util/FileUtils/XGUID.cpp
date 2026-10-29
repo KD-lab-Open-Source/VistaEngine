@@ -2,7 +2,7 @@
 #ifdef _WIN32
 #  include <objbase.h>
 #endif
-#include <format>
+#include <cstdio>
 #include "FileUtils/XGUID.h"
 #include "Serialization/Serialization.h"
 
@@ -24,18 +24,25 @@ bool XGUID::serialize(Archive& ar, const char* name, const char* nameAlt)
 {
 	string data;
 
-	// std::format takes each field's width from its type instead of from a conversion
-	// the caller has to keep in sync by hand. The printf original did not survive the
-	// move to 64 bits: "%08lX" for a 32-bit Data1 took 64 bits off the varargs, which
-	// printed a 16-digit number, overran the 80-byte static buffer it wrote into, and
-	// shifted every argument after it by one. (Its "%02wX" was not a conversion at all,
-	// only an MSVC-ism.) The text is unchanged — the canonical 78-character form the
-	// 32-bit build wrote, which is what the profiles and mission headers hold.
-	if(ar.isOutput())
-		data = std::format(
-			"{{0x{:08X}, 0x{:04X}, 0x{:04X}, {{0x{:02X}, 0x{:02X}, 0x{:02X}, 0x{:02X}, 0x{:02X}, 0x{:02X}, 0x{:02X}, 0x{:02X}}}}}",
-			Data1, Data2, Data3, Data4[0],
-			Data4[1], Data4[2], Data4[3], Data4[4], Data4[5], Data4[6], Data4[7]);
+	// Every field is cast to unsigned, the one type every %X below reads, so the format
+	// string no longer depends on how wide GUID's fields happen to be. The printf original
+	// did not survive the move to 64 bits: "%08lX" for a 32-bit Data1 took 64 bits off the
+	// varargs, which printed a 16-digit number, overran the 80-byte static buffer it wrote
+	// into, and shifted every argument after it by one. (Its "%02wX" was not a conversion
+	// at all, only an MSVC-ism.) The text is unchanged — the canonical 78-character form
+	// the 32-bit build wrote, which is what the profiles and mission headers hold.
+	//
+	// Not std::format: it would be the engine's only use of it, and <format> needs
+	// libstdc++ 13, newer than the Steam Runtime's default compiler or Ubuntu 22.04 has.
+	if(ar.isOutput()){
+		char text[96];
+		snprintf(text, sizeof(text),
+			"{0x%08X, 0x%04X, 0x%04X, {0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X}}",
+			unsigned(Data1), unsigned(Data2), unsigned(Data3), unsigned(Data4[0]),
+			unsigned(Data4[1]), unsigned(Data4[2]), unsigned(Data4[3]), unsigned(Data4[4]),
+			unsigned(Data4[5]), unsigned(Data4[6]), unsigned(Data4[7]));
+		data = text;
+	}
 
 	bool res = ar.serialize(data, name, nameAlt);
 
