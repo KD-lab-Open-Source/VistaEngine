@@ -70,6 +70,15 @@ jobs:
           libgl1-mesa-dev libegl1-mesa-dev libdrm-dev libgbm-dev \
           libdbus-1-dev libudev-dev
 
+    # The ffmpeg source tarball. cmake/FFmpeg.cmake downloads it into build/_downloads only
+    # when no copy with the pinned hash is already there, so with this restored ffmpeg.org is
+    # asked once per change to that file instead of on every run. Both legs share the key.
+    - name: Restore the ffmpeg source tarball
+      uses: actions/cache@v4
+      with:
+        path: build/_downloads
+        key: ffmpeg-src-${{ hashFiles('cmake/FFmpeg.cmake') }}
+
     # No shadercross cache here, unlike macOS: on Linux the root CMakeLists
     # downloads Microsoft's prebuilt DirectXShaderCompiler instead of compiling
     # it, so all that is left to build is SPIRV-Cross and the CLI — a couple of
