@@ -115,6 +115,11 @@ else()
     #          (~14 min). CI caches the resulting CLI and feeds it back in via
     #          SHADERCROSS_EXECUTABLE above.
     #
+    # SHADERCROSS_PREBUILT_DXC=OFF puts Linux on the macOS path. Microsoft's Linux DXC
+    # (v1.9.2602) needs glibc 2.38, so it cannot run in an older build environment:
+    # a game's Steam release builds in the Steam Runtime 3 "sniper" SDK, glibc 2.31,
+    # so that its binary runs on every Linux Steam supports.
+    #
     # Pinned rather than tracking main: this is the revision the checked-in shaders
     # were developed against, and CI keys its build cache on it.
     #
@@ -123,7 +128,15 @@ else()
     # add_subdirectory. The Linux path has to run SDL_shadercross's own DXC-download
     # script out of the fetched tree before its CMakeLists is processed, and the
     # options below have to be in the cache before it reads them.
-    if(LINUX)
+    option(SHADERCROSS_PREBUILT_DXC
+        "Linux: download Microsoft's prebuilt DXC (needs glibc 2.38) instead of building it" ON)
+    if(LINUX AND SHADERCROSS_PREBUILT_DXC)
+        set(_shadercross_prebuilt_dxc TRUE)
+    else()
+        set(_shadercross_prebuilt_dxc FALSE)
+    endif()
+
+    if(_shadercross_prebuilt_dxc)
         set(_shadercross_submodules "external/SPIRV-Cross")
     else()
         set(_shadercross_submodules "")   # empty list => fetch them all, DXC included
@@ -144,7 +157,7 @@ else()
     set(SDLSHADERCROSS_INSTALL    OFF CACHE BOOL "" FORCE)
     set(SDLSHADERCROSS_TESTS      OFF CACHE BOOL "" FORCE)
 
-    if(LINUX)
+    if(_shadercross_prebuilt_dxc)
         # Extracts a prebuilt DXC under <src>/external/DirectXShaderCompiler-binaries/linux
         # and points DirectXShaderCompiler_ROOT at it; SDL_shadercross's own
         # FindDirectXShaderCompiler.cmake then picks it up off that root.
@@ -180,8 +193,9 @@ else()
     else()
         set(SDLSHADERCROSS_VENDORED          ON  CACHE BOOL "" FORCE)
         set(SDLSHADERCROSS_SPIRVCROSS_SHARED OFF CACHE BOOL "" FORCE)
-        # HLSL -> MSL runs through DXC's SPIR-V codegen, which DXC leaves off by
-        # default. Force it on in the cache so the vendored DXC's option() sees it.
+        # HLSL -> SPIR-V (and on macOS, on to MSL) runs through DXC's SPIR-V codegen,
+        # which DXC leaves off by default. Force it on in the cache so the vendored
+        # DXC's option() sees it.
         set(ENABLE_SPIRV_CODEGEN             ON  CACHE BOOL "" FORCE)
         message(STATUS "Shaders: SDL_shadercross + vendored DXC (this build is slow; cache the CLI and pass -DSHADERCROSS_EXECUTABLE)")
     endif()
