@@ -262,6 +262,17 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(miniaudio)
 
+# miniaudio works out the system libraries it needs -- dl for the dlopen() above, pthread, m
+# -- but hands that list only to its own examples, not to the miniaudio target. Before 2.34,
+# glibc kept dlopen() in libdl rather than libc, and the Steam Runtime's is 2.31: there the
+# game failed to link with "undefined reference to symbol 'dlclose@@GLIBC_2.2.5'". pthread
+# and m only arrived by way of ffmpeg's target. Name all three where they belong.
+# (CMAKE_DL_LIBS is empty where dlopen() needs no library of its own, macOS among them.)
+if(UNIX)
+    find_package(Threads REQUIRED)
+    target_link_libraries(miniaudio INTERFACE ${CMAKE_DL_LIBS} Threads::Threads m)
+endif()
+
 # ffmpeg — the Bink/AVI decoder behind Video/. Built from source with all but five of its
 # components disabled; see the module for what we keep and why it is not a FetchContent.
 include(FFmpeg)
