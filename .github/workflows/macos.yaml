@@ -38,7 +38,7 @@ jobs:
             label: Maelstrom
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
 
     - name: Install dependencies
       run: brew install ninja
@@ -72,13 +72,18 @@ jobs:
 
     - name: Restore prebuilt shadercross
       id: cache-shadercross
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: ~/dxc-prebuilt
         # v2: v1 cached the CLI without libSDL3 and is unusable. The key has to change
         # or the broken copy keeps being restored — bump this whenever what we stage
         # into ~/dxc-prebuilt changes shape.
-        key: macos-shadercross-v2-${{ runner.arch }}-${{ env.ImageOS }}-${{ steps.keyinfo.outputs.shadercross_sha }}
+        #
+        # Not keyed on the runner image: a CLI built on one macOS keeps running on the
+        # newer ones that macos-latest moves to. (The key named ${{ env.ImageOS }} once,
+        # which is always empty: ImageOS is a runner environment variable, and the env
+        # context only holds what the workflow sets.)
+        key: macos-shadercross-v2-${{ runner.arch }}-${{ steps.keyinfo.outputs.shadercross_sha }}
 
     # Cache miss: configure without SHADERCROSS_EXECUTABLE (so the root
     # CMakeLists takes its build-from-source branch) and build only the
@@ -135,7 +140,7 @@ jobs:
     # when no copy with the pinned hash is already there, so with this restored ffmpeg.org is
     # asked once per change to that file instead of on every run. Both legs share the key.
     - name: Restore the ffmpeg source tarball
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: build/_downloads
         key: ffmpeg-src-${{ hashFiles('cmake/FFmpeg.cmake') }}
@@ -154,7 +159,7 @@ jobs:
     # definition, it does not rename the target -- so the artifact name is the only
     # thing that says which schema the binary reads.
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: VistaEngine-macOS-${{ matrix.label }}
         path: build/Game/Game
