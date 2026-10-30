@@ -38,7 +38,7 @@ jobs:
             label: Maelstrom
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
 
     # ffmpeg is the one dependency that does not build itself with CMake: it has a configure
     # script (cmake/FFmpeg.cmake runs it), and that needs a POSIX shell and make. MSYS2 is
@@ -49,6 +49,9 @@ jobs:
       id: msys2
       uses: msys2/setup-msys2@v2
       with:
+        # MSYS, not the action's default MINGW64 (deprecated): make and diffutils are
+        # MSYS2's own packages, and no MinGW toolchain is wanted.
+        msystem: MSYS
         install: make diffutils
         path-type: inherit
 
@@ -65,7 +68,7 @@ jobs:
     # when no copy with the pinned hash is already there, so with this restored ffmpeg.org is
     # asked once per change to that file instead of on every run. Both legs share the key.
     - name: Restore the ffmpeg source tarball
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: build/_downloads
         key: ffmpeg-src-${{ hashFiles('cmake/FFmpeg.cmake') }}
@@ -94,7 +97,7 @@ jobs:
     # compile definition, it does not rename the target -- so the artifact name is the
     # only thing that says which schema the binary reads.
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: VistaEngine-Windows-${{ matrix.label }}
         path: |

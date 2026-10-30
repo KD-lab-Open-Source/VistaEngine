@@ -43,7 +43,7 @@ jobs:
             label: Maelstrom
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
 
     # SDL3 is built from source (FetchContent), and it treats its X11 and Wayland
     # dependencies as hard requirements: a missing one fails the configure outright
@@ -74,7 +74,7 @@ jobs:
     # when no copy with the pinned hash is already there, so with this restored ffmpeg.org is
     # asked once per change to that file instead of on every run. Both legs share the key.
     - name: Restore the ffmpeg source tarball
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: build/_downloads
         key: ffmpeg-src-${{ hashFiles('cmake/FFmpeg.cmake') }}
@@ -96,7 +96,7 @@ jobs:
     # definition, it does not rename the target -- so the artifact name is the only
     # thing that says which schema the binary reads.
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: VistaEngine-Linux-${{ matrix.label }}
         path: build/Game/Game
