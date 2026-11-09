@@ -21,6 +21,7 @@
 #include "Controls.h"
 #include "StreamCommand.h"
 #include "UI_StreamVideo.h"
+#include "Platform/Window.h"
 
 extern Singleton<UI_StreamVideo> streamVideo;
 
@@ -563,6 +564,8 @@ UI_ControlEdit::UI_ControlEdit()
 
 UI_ControlEdit::~UI_ControlEdit()
 {
+	if(isEditing_)
+		PlatformWindow::stopTextInput();
 }
 
 bool UI_ControlEdit::checkSymbol(wchar_t chr)
@@ -614,6 +617,10 @@ bool UI_ControlEdit::activate()
 		caretTimer_ = 0.0f;
 
 		UI_Dispatcher::instance().setFocus(this);
+
+		// Characters arrive only while text input is on; see PlatformWindow::startTextInput.
+		Recti area = UI_Render::instance().screenCoords(transfPosition());
+		PlatformWindow::startTextInput(area.left(), area.top(), area.width(), area.height());
 	}
 	return false;
 }
@@ -624,6 +631,7 @@ bool UI_ControlEdit::editDone(bool done)
 		applyText(done ? textEdit_.c_str() : textBackup_.c_str());
 		isEditing_ = false;
 		toggleDeactivation(true);
+		PlatformWindow::stopTextInput();
 		return true;
 	}
 
