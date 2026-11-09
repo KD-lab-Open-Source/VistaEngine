@@ -218,6 +218,12 @@ and `Vect2i(float,float)`. Expect that one to keep surfacing.
 `RENDER_API`/`KDW_API` keyed off it and so declared a static library's symbols
 `__declspec(dllimport)`.
 
+**One C runtime.** Everything CMake builds uses the DLL runtime (`/MD`). ffmpeg is built by
+its own configure, which names no runtime, so `cl.exe` fell back to the static one (`/MT`):
+the game linked both, and said so with `LNK4098: defaultlib 'LIBCMT' conflicts with use of
+other libs`. `cmake/FFmpeg.cmake` passes `-MD`. A new `LNK4098` means another library chose
+its own runtime.
+
 ### Windows — MSVC is conforming now, clang only warns
 
 Harvest these from a **clean** macOS build (an incremental one only re-emits warnings for
