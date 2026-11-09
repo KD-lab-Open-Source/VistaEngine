@@ -107,6 +107,13 @@ if(WIN32)
         --modify "PATH=path_list_prepend:${MSYS2_BIN}")
     set(FFMPEG_SHELL ${FFMPEG_BASH})
     list(APPEND FFMPEG_CONFIGURE_FLAGS --toolchain=msvc --target-os=win64 --arch=x86_64)
+
+    # The C runtime: the DLL one (/MD), CMake's default for everything else in the build.
+    # ffmpeg's configure names none, so cl.exe used its own default, the static runtime (/MT),
+    # and the game's link warned "LNK4098: defaultlib 'LIBCMT' conflicts with use of other
+    # libs" -- two C runtimes in one program. A Debug build, which wants /MDd, still links this
+    # release-runtime ffmpeg: it is built once, the same way for every configuration.
+    list(APPEND FFMPEG_CONFIGURE_FLAGS --extra-cflags=-MD)
 else()
     set(FFMPEG_ENV "")
     set(FFMPEG_SHELL "")
