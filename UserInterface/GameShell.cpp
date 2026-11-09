@@ -6,6 +6,7 @@
 #include "CameraManager.h"
 #include "SoundApp.h"
 #include "GameShell.h"
+#include "Platform/Services.h"
 #include "Squad.h"
 #include "BaseUnit.h"
 #include "UnitItemInventory.h"
@@ -811,11 +812,25 @@ void GameShell::processEvents()
 	eventProcessing_ = false;
 }
 
+// While a store's overlay covers the game, a single-player game holds still. A game the player
+// or a menu has paused already is left as it is, and so is a network game, which can't wait.
+void GameShell::overlayPauseQuant()
+{
+	if(PlatformServices::overlayActive()){
+		if(!isPaused(PAUSE_BY_ANY) && universe() && !universe()->isMultiPlayer())
+			pauseGame(PAUSE_BY_OVERLAY);
+	}
+	else if(isPaused(PAUSE_BY_OVERLAY))
+		resumeGame(PAUSE_BY_OVERLAY);
+}
+
 void GameShell::graphicsQuant()
 {
 	start_timer_auto();
 
 	UpdateDirectInputState();
+
+	overlayPauseQuant();
 
 	if(!GameActive && useHT() && !load_mode)
 		PNetCenter::netQuant(); //NetQuant();
@@ -838,7 +853,7 @@ void GameShell::graphicsQuant()
 			sleepGraphics_ = true;
 	}
 
-	if(!isPaused(PAUSE_BY_USER | PAUSE_BY_MENU))
+	if(!isPaused(PAUSE_BY_ANY))
 		scale_time.next_frame();
 	else
 		scale_time.skip();

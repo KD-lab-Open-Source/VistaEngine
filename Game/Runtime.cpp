@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "Platform/Window.h"
 #include "Platform/Cursor.h"
+#include "Platform/Services.h"
 #include "GameOptions.h"
 #include "SoundApp.h"
 #include "CameraManager.h"
@@ -616,6 +617,11 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 {
 	Win32::_setGlobalInstance(hInst);
 
+	// The store comes first: it may be starting the game again its own way, and then there
+	// is nothing to do here but leave. See Platform/Services.h.
+	if(!PlatformServices::startup())
+		return 0;
+
 	// The two globals that read data of their own, and could not when they were built:
 	// that was before main() made the data directory the working directory.
 	iniFile.load();
@@ -628,6 +634,8 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 	// SDL's is the only pump: on Windows SDL_PollEvent drains the OS message queue
 	// itself, so a PeekMessage loop next to it would race it for messages.
 	while(true){
+		if(!PlatformServices::update())
+			break;
 		if(!pumpApplicationEvents())
 			break;
 
@@ -642,6 +650,8 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 	delete runtime;
 
 	iniFile.save();
+
+	PlatformServices::shutdown();
 
 	return 0;
 }
