@@ -121,10 +121,11 @@ public:
 	void incrSpeedStep();
 	float getSpeed() const { return game_speed; }
 
-	enum PauseType { 
+	enum PauseType {
 		PAUSE_BY_USER = 1,
 		PAUSE_BY_MENU = 2,
-		PAUSE_BY_ANY = PAUSE_BY_USER | PAUSE_BY_MENU
+		PAUSE_BY_OVERLAY = 4, // a store's overlay is up (Platform/Services.h)
+		PAUSE_BY_ANY = PAUSE_BY_USER | PAUSE_BY_MENU | PAUSE_BY_OVERLAY
 	};
 	void pauseGame(PauseType pauseType);
 	void resumeGame(PauseType pauseType);
@@ -205,6 +206,8 @@ public:
 	int accessibleQuantPeriod() const { return quantTimeStatistic.accessibleQuantPeriod(); }
 
 private:
+
+	void overlayPauseQuant();
 
 	void GameLoad(const MissionDescription& mission);
 	void GameRelaxLoading();

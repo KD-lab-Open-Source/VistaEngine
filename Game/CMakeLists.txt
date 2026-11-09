@@ -48,6 +48,14 @@ list(APPEND GAME_SOURCES
     ${PROJECT_SOURCE_DIR}/Platform/WindowsAPI.cpp
 )
 
+# The store's services (Platform/Services.h). The engine itself has none. A game sold in a
+# store turns this on and adds its own implementation to Game, along with the store's SDK.
+option(VISTA_PLATFORM_SERVICES_EXTERNAL
+    "The project around the engine adds the Platform/Services.h implementation to Game" OFF)
+if(NOT VISTA_PLATFORM_SERVICES_EXTERNAL)
+    list(APPEND GAME_SOURCES ${PROJECT_SOURCE_DIR}/Platform/ServicesNone.cpp)
+endif()
+
 add_executable(Game ${GAME_SOURCES})
 target_link_libraries(Game PRIVATE
     Util
