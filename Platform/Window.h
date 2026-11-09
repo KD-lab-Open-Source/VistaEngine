@@ -57,6 +57,22 @@ void focus();
 // Minimize the window -- the error handler does this before putting a dialog up.
 void minimize();
 
+// Text input -- SDL_EVENT_TEXT_INPUT, the only source of the characters an edit field
+// receives -- is on only while one is being typed into (UI_ControlEdit). The rest of the
+// time it is off, for two reasons:
+//
+//   - an input method (a Chinese or Japanese IME, say) does not take the keys meant as
+//     hotkeys;
+//   - an on-screen keyboard appears only when there is something to type. SDL opens the
+//     Steam Deck's on SDL_StartTextInput and closes it on SDL_StopTextInput, when Steam
+//     asks it to (SDL_ENABLE_STEAM_SCREEN_KEYBOARD, which Steam sets on the Deck and in
+//     Big Picture). With text input always on, it opened as the game started.
+//
+// The rectangle is the field, in window coordinates: an on-screen keyboard or an IME's
+// candidate list is placed to keep clear of it.
+void startTextInput(int x, int y, int width, int height);
+void stopTextInput();
+
 // Sink for translated input events. Parameters mirror the Win32 window-procedure
 // message triple (uMsg, wParam, lParam) so the SDL events can be fed straight
 // into the engine's existing message path (runtimeWndProc -> eventHandler).

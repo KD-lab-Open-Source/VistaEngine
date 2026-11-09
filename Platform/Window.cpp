@@ -51,9 +51,8 @@ void* create(const char* title, int width, int height)
 		return nullptr;
 	}
 
-	// Route keyboard text through SDL_EVENT_TEXT_INPUT so edit fields (profile
-	// name, multiplayer IP, ...) receive characters.
-	SDL_StartTextInput(window);
+	// No SDL_StartTextInput here: text input is on only while an edit field is being
+	// typed into. See startTextInput below.
 	g_window = window;
 	return window;
 }
@@ -105,6 +104,23 @@ void minimize()
 {
 	if(g_window)
 		SDL_MinimizeWindow(g_window);
+}
+
+void startTextInput(int x, int y, int width, int height)
+{
+	if(!g_window)
+		return;
+	// Window coordinates, which are the UI's pixels too: the window is not created
+	// high-pixel-density, so SDL scales nothing between them.
+	SDL_Rect area = { x, y, width, height };
+	SDL_SetTextInputArea(g_window, &area, 0);
+	SDL_StartTextInput(g_window);
+}
+
+void stopTextInput()
+{
+	if(g_window)
+		SDL_StopTextInput(g_window);
 }
 
 namespace {
