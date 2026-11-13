@@ -892,9 +892,11 @@ inline int MessageBoxW(HWND, const wchar_t*, const wchar_t*, UINT) { return IDOK
 //                    terminator (none is appended unless room and requested).
 //   * srcLen <  0  → source is null-terminated; the terminator is converted and
 //                    INCLUDED in the returned count (matches Win32).
-// Only CP_UTF8 gets real multibyte decoding; every other code page (CP_ACP,
-// 1251/1252, …) is treated as a single-byte/Latin-1 passthrough — correct for
-// ASCII, which is all the non-UTF-8 callers here actually need.
+// CP_UTF8 is real multibyte decoding. 1251 (Cyrillic) and 1252 (Western) are
+// real single-byte tables: the fonts build their character tables from those two
+// pages, so Russian text and Western punctuation (curly quotes, dashes, …) need
+// them. Every other code page, CP_ACP among them, is a single-byte/Latin-1
+// passthrough — correct for ASCII, which is all those callers here need.
 // Bodies live in WindowsAPI.cpp so edits don't rebuild the whole project.
 #define MB_PRECOMPOSED 0x00000001
 int MultiByteToWideChar(UINT codePage, DWORD, const char* src, int srcLen, wchar_t* dst, int dstLen);
