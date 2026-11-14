@@ -10,6 +10,7 @@
 #include "Serialization/RangedWrapper.h"
 #include "TextDB.h"
 #include "VideoMemoryInformation.h"
+#include "Platform/Services.h"
 #include "FileUtils/FileUtils.h"
 
 bool isUnderEditor();
@@ -503,9 +504,10 @@ void GameOptions::serialize(Archive& ar)
 	else if(ar.isOutput())
 		ar.serialize(options_, "options_", 0);
 	else{
-		Options tmp;			
+		Options tmp;
 		ar.serialize(tmp, "options_", 0);
 		setOptions(tmp);
+		followStoreLanguage();
 		optionsSaved_ = options_;
 	}
 	
@@ -525,6 +527,25 @@ void GameOptions::serialize(Archive& ar)
 			setTranslate();
 		}
 	}
+}
+
+// The language the store has the game in wins over the options file, where the engine has
+// that language's folder (filterGameOptions marks those valid). A Steam player picks the
+// game's language in Steam, and none of the game's own menus offers OPTION_LANGUAGE.
+// Called before optionsSaved_ is taken, so the options screen has nothing to apply or roll
+// back, and before the language's text is loaded (serialize, just above).
+void GameOptions::followStoreLanguage()
+{
+	const char* name = PlatformServices::language();
+	if(!name || !*name)
+		return;
+
+	const OptionPrm& prm = gameOptionPrms_[OPTION_LANGUAGE];
+	for(int i = 0; i < locDatas_.size(); ++i)
+		if(prm.valid_[i] && !_stricmp(locDatas_[i].language_.c_str(), name)){
+			getOptionObject(OPTION_LANGUAGE)->data_ = raw2filtered(OPTION_LANGUAGE, i);
+			return;
+		}
 }
 
 int GameOptions::raw2filtered(GameOptionType type, int data) const
