@@ -25,6 +25,12 @@ bool update();
 // (GameShell::graphicsQuant).
 bool overlayActive();
 
+// The language the store has the game in, named the way the engine names its language
+// folders (Resource/LocData/<name>: "english", "russian", ...), or null when the store has
+// no say. Read once the options are loaded, after startup(); where the engine has that
+// language, it wins over the options file (GameOptions::followStoreLanguage).
+const char* language();
+
 // Last thing before the program exits.
 void shutdown();
 

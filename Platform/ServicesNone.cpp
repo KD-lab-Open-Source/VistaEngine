@@ -4,9 +4,10 @@
 
 namespace PlatformServices {
 
-bool startup()       { return true; }
-bool update()        { return true; }
-bool overlayActive() { return false; }
-void shutdown()      {}
+bool startup()        { return true; }
+bool update()         { return true; }
+bool overlayActive()  { return false; }
+const char* language() { return nullptr; }
+void shutdown()       {}
 
 } // namespace PlatformServices

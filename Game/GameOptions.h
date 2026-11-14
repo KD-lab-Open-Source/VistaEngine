@@ -196,6 +196,8 @@ public:
 	void filterGraphOptions();
 
 private:
+	void followStoreLanguage();
+
 	bool presetSerialization_;
 	
 	GameOptionPrms gameOptionPrms_;
