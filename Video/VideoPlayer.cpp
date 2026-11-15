@@ -1,9 +1,16 @@
 #include "VideoPlayer.h"
 
 #include "AudioBackend.h"
+#include "FileUtils/FileUtils.h"
 
 #include <chrono>
+#include <ctype.h>
+#include <string>
 #include <string.h>
+
+// Util/SystemUtil.h, declared rather than included: that header leans on the precompiled
+// header's `using namespace std`, which this library does not have. UI_Sprite.cpp does the same.
+std::string getLocDataPath(const char* dir);
 
 namespace {
 
@@ -11,6 +18,32 @@ double wallClock()
 {
 	using namespace std::chrono;
 	return duration_cast<duration<double> >(steady_clock::now().time_since_epoch()).count();
+}
+
+// The current language's version of a video the game names under Resource\Video\: the same
+// file name in Resource\LocData\<language>\Video\. A language's cutscenes ship there, beside
+// its text and voice -- in a Steam depot of their own, downloaded only by players of that
+// language -- while Resource\Video keeps the ones every language falls back to. Empty when
+// the path is not under Resource\Video\ or the language has no version of it.
+std::string languageVersion(const char* fileName)
+{
+	static const char root[] = "Resource\\Video\\";
+	const size_t rootLength = sizeof(root) - 1;
+	if(!fileName || strlen(fileName) <= rootLength)
+		return std::string();
+	for(size_t i = 0; i < rootLength; ++i){
+		char c = fileName[i] == '/' ? '\\' : fileName[i];
+		if(tolower((unsigned char)c) != tolower((unsigned char)root[i]))
+			return std::string();
+	}
+
+	// The scripts spell it both ways, "Resource\Video\x.bik" and "Resource\Video\\x.bik".
+	const char* name = fileName + rootLength;
+	while(*name == '\\' || *name == '/')
+		++name;
+
+	std::string candidate = getLocDataPath("Video\\") + name;
+	return isFileExists(candidate.c_str()) ? candidate : std::string();
 }
 
 }
@@ -42,7 +75,8 @@ bool VideoPlayer::open(const char* fileName)
 {
 	close();
 
-	if(!file_.open(fileName))
+	const std::string localized = languageVersion(fileName);
+	if(!file_.open(localized.empty() ? fileName : localized.c_str()))
 		return false;
 
 	// The soundtrack goes on the voice bus. That is where the game already put it: the volume
