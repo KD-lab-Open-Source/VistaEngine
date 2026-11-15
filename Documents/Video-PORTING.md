@@ -79,6 +79,15 @@ UI blend mode depends on knowing that (`UI_ControlVideo::redraw`). The original 
 `BINKALPHA` flag (`1<<20`); we ask the decoder, which answers by choosing `yuva420p` over
 `yuv420p`. Same bit, from the other end.
 
+**A language can bring its own cutscenes.** The scripts name videos under `Resource\Video\`, and a
+localized release used to replace those files in place — 1C's Russian Perimeter 2 ships 96 of
+the 104 with Russian voice-over at the very same paths. That cannot work when several languages
+share one install, so `VideoPlayer::open` looks first for the same file name in
+`Resource\LocData\<language>\Video\` and plays that when it exists; `Resource\Video` is what every
+language falls back to. Both the full-screen reels and the briefing panels open through it. On
+Steam, a language's videos then go in a depot set to that language, downloaded only by its
+players. Paths the scripts write into `LocData` themselves (the logo stings) are left alone.
+
 ## Traps worth knowing
 
 - **A raw-DIB `.avi` decodes bottom-up.** ffmpeg hands the rows over with a *negative* stride and
